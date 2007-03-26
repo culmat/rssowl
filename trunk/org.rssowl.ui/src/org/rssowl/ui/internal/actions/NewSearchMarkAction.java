@@ -1,0 +1,146 @@
+/*   **********************************************************************  **
+ **   Copyright notice                                                       **
+ **                                                                          **
+ **   (c) 2005-2006 RSSOwl Development Team                                  **
+ **   http://www.rssowl.org/                                                 **
+ **                                                                          **
+ **   All rights reserved                                                    **
+ **                                                                          **
+ **   This program and the accompanying materials are made available under   **
+ **   the terms of the Eclipse Public License v1.0 which accompanies this    **
+ **   distribution, and is available at:                                     **
+ **   http://www.rssowl.org/legal/epl-v10.html                               **
+ **                                                                          **
+ **   A copy is found in the file epl-v10.html and important notices to the  **
+ **   license from the team is found in the textfile LICENSE.txt distributed **
+ **   in this package.                                                       **
+ **                                                                          **
+ **   This copyright notice MUST APPEAR in all copies of the file!           **
+ **                                                                          **
+ **   Contributors:                                                          **
+ **     RSSOwl Development Team - initial API and implementation             **
+ **                                                                          **
+ **  **********************************************************************  */
+
+package org.rssowl.ui.internal.actions;
+
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IObjectActionDelegate;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.model.dao.PersistenceException;
+import org.rssowl.core.model.dao.PersistenceLayer;
+import org.rssowl.core.model.reference.FolderReference;
+import org.rssowl.core.model.types.IFolder;
+import org.rssowl.core.model.types.IMark;
+import org.rssowl.ui.internal.dialogs.SearchMarkDialog;
+import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
+
+/**
+ * TODO This is a rough-Action which is not polished or optimized and only for
+ * developers purposes!
+ *
+ * @author bpasero
+ */
+public class NewSearchMarkAction implements IWorkbenchWindowActionDelegate, IObjectActionDelegate {
+  private Shell fShell;
+  private IFolder fParent;
+  private PersistenceLayer fPersist;
+
+  /** Keep for Reflection */
+  public NewSearchMarkAction() {
+    this(null, null);
+  }
+
+  /**
+   * @param shell
+   * @param parent
+   */
+  public NewSearchMarkAction(Shell shell, IFolder parent) {
+    fShell = shell;
+    fParent = parent;
+    fPersist = NewsModel.getDefault().getPersistenceLayer();
+  }
+
+  /*
+   * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
+   */
+  public void dispose() {}
+
+  /*
+   * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
+   */
+  public void init(IWorkbenchWindow window) {
+    fShell = window.getShell();
+  }
+
+  /*
+   * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+   */
+  public void run(IAction action) {
+    internalRun();
+  }
+
+  private void internalRun() throws PersistenceException {
+    SearchMarkDialog dialog = new SearchMarkDialog(fShell, getParent());
+    dialog.open();
+  }
+
+  /*
+   * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
+   * org.eclipse.jface.viewers.ISelection)
+   */
+  public void selectionChanged(IAction action, ISelection selection) {
+
+    /* Delete the old Selection */
+    fParent = null;
+
+    /* Check Selection */
+    if (selection instanceof IStructuredSelection) {
+      IStructuredSelection structSel = (IStructuredSelection) selection;
+      if (!structSel.isEmpty()) {
+        Object firstElement = structSel.getFirstElement();
+        if (firstElement instanceof IFolder)
+          fParent = (IFolder) firstElement;
+        else if (firstElement instanceof IMark)
+          fParent = ((IMark) firstElement).getFolder();
+      }
+    }
+  }
+
+  /*
+   * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction,
+   * org.eclipse.ui.IWorkbenchPart)
+   */
+  public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+    fShell = targetPart.getSite().getShell();
+  }
+
+  private IFolder getParent() throws PersistenceException {
+    Long selectedRootFolderID = fPersist.getPreferencesDAO().getLong(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET);
+
+    /* Check if available Parent is still valid */
+    if (fParent != null) {
+      if (hasParent(fParent, new FolderReference(selectedRootFolderID)))
+        return fParent;
+    }
+
+    /* Otherwise return visible root-folder */
+    return new FolderReference(selectedRootFolderID).resolve();
+  }
+
+  private boolean hasParent(IFolder folder, FolderReference folderRef) {
+    if (folder == null)
+      return false;
+
+    if (folderRef.references(folder))
+      return true;
+
+    return hasParent(folder.getParent(), folderRef);
+  }
+}
