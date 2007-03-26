@@ -1,0 +1,61 @@
+/*   **********************************************************************  **
+ **   Copyright notice                                                       **
+ **                                                                          **
+ **   (c) 2005-2006 RSSOwl Development Team                                  **
+ **   http://www.rssowl.org/                                                 **
+ **                                                                          **
+ **   All rights reserved                                                    **
+ **                                                                          **
+ **   This program and the accompanying materials are made available under   **
+ **   the terms of the Eclipse Public License v1.0 which accompanies this    **
+ **   distribution, and is available at:                                     **
+ **   http://www.rssowl.org/legal/epl-v10.html                               **
+ **                                                                          **
+ **   A copy is found in the file epl-v10.html and important notices to the  **
+ **   license from the team is found in the textfile LICENSE.txt distributed **
+ **   in this package.                                                       **
+ **                                                                          **
+ **   This copyright notice MUST APPEAR in all copies of the file!           **
+ **                                                                          **
+ **   Contributors:                                                          **
+ **     RSSOwl Development Team - initial API and implementation             **
+ **                                                                          **
+ **  **********************************************************************  */
+
+package org.rssowl.core.model.events;
+
+import java.util.Set;
+
+/**
+ * A Listener being notified whenever the type <code>IFeed</code> was added,
+ * updated or deleted in the persistance layer.
+ * 
+ * @author bpasero
+ */
+public interface FeedListener {
+
+  /**
+   * @param events an unmodifiable set of Event object containing additional 
+   * information like the Type that is affected.
+   */
+  void feedAdded(Set<FeedEvent> events);
+
+  /**
+   * <p>
+   * Note: The resolved type from the event is no longer stored in the
+   * persistance layer. It is <em>not</em> recommended to use the resolved
+   * type for future operations in that layer.
+   * </p>
+   * 
+   * @param events an unmodifiable set of Event object containing additional 
+   * information like the Type that is affected.
+   */
+  void feedDeleted(Set<FeedEvent> events);
+
+  /**
+   * @param events an unmodifiable set of Event object containing additional 
+   * information like the Type that is affected.
+   */
+  void feedUpdated(Set<FeedEvent> events);
+
+}
