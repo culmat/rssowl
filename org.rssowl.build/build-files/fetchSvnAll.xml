@@ -1,0 +1,49 @@
+<project name="Generated">
+  <target name="fetch.svn.all">
+    <antcall target="svn.co">
+      <param name="target" value="features"/>
+      <param name="element.id" value="org.rssowl"/>
+      <param name="project.name" value="features/org.rssowl/trunk"/>
+    </antcall>
+    <antcall target="svn.co">
+      <param name="target" value="plugins"/>
+      <param name="element.id" value="org.rssowl.lib.jdom"/>
+      <param name="project.name" value="plugins/org.rssowl.lib.jdom/trunk"/>
+    </antcall>
+    <antcall target="svn.co">
+      <param name="target" value="plugins"/>
+      <param name="element.id" value="org.rssowl.ui"/>
+      <param name="project.name" value="plugins/org.rssowl.ui/trunk"/>
+    </antcall>
+    <antcall target="svn.co">
+      <param name="target" value="plugins"/>
+      <param name="element.id" value="org.rssowl.contrib.search"/>
+      <param name="project.name" value="plugins/org.rssowl.contrib.search/trunk"/>
+    </antcall>
+    <antcall target="svn.co">
+      <param name="target" value="plugins"/>
+      <param name="element.id" value="org.rssowl.lib.db4o"/>
+      <param name="project.name" value="plugins/org.rssowl.lib.db4o/trunk"/>
+    </antcall>
+    <antcall target="svn.co">
+      <param name="target" value="plugins"/>
+      <param name="element.id" value="org.rssowl.core"/>
+      <param name="project.name" value="plugins/org.rssowl.core/trunk"/>
+    </antcall>
+    <antcall target="svn.co">
+      <param name="target" value="plugins"/>
+      <param name="element.id" value="org.rssowl.lib.httpclient"/>
+      <param name="project.name" value="plugins/org.rssowl.lib.httpclient/trunk"/>
+    </antcall>
+  	<!--<antcall target="svn.co">
+  	   <param name="target" value="features"/>
+  	   <param name="element.id" value="org.rssowl.tests"/>
+  	   <param name="project.name" value="features/org.rssowl.tests/trunk"/>
+  	</antcall>
+  	<antcall target="svn.co">
+  	   <param name="target" value="plugins"/>
+  	   <param name="element.id" value="org.rssowl.core.tests"/>
+  	   <param name="project.name" value="plugins/org.rssowl.core.tests/trunk"/>
+  	 </antcall>-->
+  </target>
+</project>
