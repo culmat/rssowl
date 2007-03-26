@@ -3,37 +3,37 @@
     <antcall target="svn.co">
       <param name="target" value="features"/>
       <param name="element.id" value="org.rssowl"/>
-      <param name="project.name" value="features/org.rssowl/trunk"/>
+      <param name="project.name" value="trunk/org.rssowl"/>
     </antcall>
     <antcall target="svn.co">
       <param name="target" value="plugins"/>
       <param name="element.id" value="org.rssowl.lib.jdom"/>
-      <param name="project.name" value="plugins/org.rssowl.lib.jdom/trunk"/>
+      <param name="project.name" value="trunk/org.rssowl.lib.jdom"/>
     </antcall>
     <antcall target="svn.co">
       <param name="target" value="plugins"/>
       <param name="element.id" value="org.rssowl.ui"/>
-      <param name="project.name" value="plugins/org.rssowl.ui/trunk"/>
+      <param name="project.name" value="trunk/org.rssowl.ui"/>
     </antcall>
     <antcall target="svn.co">
       <param name="target" value="plugins"/>
       <param name="element.id" value="org.rssowl.contrib.search"/>
-      <param name="project.name" value="plugins/org.rssowl.contrib.search/trunk"/>
+      <param name="project.name" value="trunk/org.rssowl.contrib.search"/>
     </antcall>
     <antcall target="svn.co">
       <param name="target" value="plugins"/>
       <param name="element.id" value="org.rssowl.lib.db4o"/>
-      <param name="project.name" value="plugins/org.rssowl.lib.db4o/trunk"/>
+      <param name="project.name" value="trunk/org.rssowl.lib.db4o"/>
     </antcall>
     <antcall target="svn.co">
       <param name="target" value="plugins"/>
       <param name="element.id" value="org.rssowl.core"/>
-      <param name="project.name" value="plugins/org.rssowl.core/trunk"/>
+      <param name="project.name" value="trunk/org.rssowl.core"/>
     </antcall>
     <antcall target="svn.co">
       <param name="target" value="plugins"/>
       <param name="element.id" value="org.rssowl.lib.httpclient"/>
-      <param name="project.name" value="plugins/org.rssowl.lib.httpclient/trunk"/>
+      <param name="project.name" value="trunk/org.rssowl.lib.httpclient"/>
     </antcall>
   	<!--<antcall target="svn.co">
   	   <param name="target" value="features"/>
