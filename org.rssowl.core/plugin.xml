@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+   <extension-point id="ModelTypesFactory" name="Model Types Factory" schema="schema/ModelTypesFactory.exsd"/>
+   <extension-point id="ModelDAO" name="Model Data Access Objects" schema="schema/ModelDAO.exsd"/>
+   <extension-point id="ModelSearch" name="Model Search" schema="schema/ModelSearch.exsd"/>
+   <extension-point id="PreferencesDAO" name="Preferences DAO" schema="schema/PreferencesDAO.exsd"/>
+   <extension-point id="PersistanceLayer" name="Persistance Layer" schema="schema/PersistanceLayer.exsd"/>
+   <extension-point id="ApplicationLayer" name="Application Layer" schema="schema/ApplicationLayer.exsd"/>
+   <extension-point id="PreferencesInitializer" name="Preferences Initializer" schema="schema/PreferencesInitializer.exsd"/>
+   <extension-point id="IDGenerator" name="ID Generator" schema="schema/IDGenerator.exsd"/>
+   <extension-point id="FormatInterpreter" name="Format Interpreter" schema="schema/FormatInterpreter.exsd"/>
+   <extension-point id="InterpreterTypesFactory" name="Interpreter Types Factory" schema="schema/InterpreterTypesFactory.exsd"/>
+   <extension-point id="NamespaceHandler" name="Namespace Handler" schema="schema/NamespaceHandler.exsd"/>
+   <extension-point id="ElementHandler" name="Element Handler" schema="schema/ElementHandler.exsd"/>
+   <extension-point id="XMLParser" name="XML Parser" schema="schema/XMLParser.exsd"/>
+   <extension-point id="TypeImporter" name="Type Importer" schema="schema/TypeImporter.exsd"/>
+   <extension-point id="ProtocolHandler" name="Protocol Handler" schema="schema/ProtocolHandler.exsd"/>
+   <extension-point id="CredentialsProvider" name="Credentials Provider" schema="schema/CredentialsProvider.exsd"/>
+   <extension-point id="SSLHandler" name="SSL Handler" schema="schema/SSLHandler.exsd"/>
+   <extension
+         point="org.rssowl.core.PersistanceLayer">
+      <persistancelayer class="org.rssowl.core.model.internal.db4o.PersistenceLayerImpl"/>
+   </extension>
+   <extension
+         point="org.rssowl.core.ModelDAO">
+      <modeldao class="org.rssowl.core.model.internal.db4o.ModelDAOImpl"/>
+   </extension>
+   <extension
+         point="org.rssowl.core.PreferencesDAO">
+      <preferencesdao class="org.rssowl.core.model.internal.db4o.PreferencesDAOImpl"/>
+   </extension>
+   <extension
+         point="org.rssowl.core.ApplicationLayer">
+      <applicationlayer class="org.rssowl.core.model.internal.db4o.ApplicationLayerImpl"/>
+   </extension>
+   <extension
+         point="org.rssowl.core.IDGenerator">
+      <idgenerator
+            class="org.rssowl.core.model.internal.db4o.DB4OIDGenerator">
+      </idgenerator>
+   </extension>
+	<extension
+         point="org.rssowl.core.FormatInterpreter">
+      <formatInterpreter
+            class="org.rssowl.core.interpreter.internal.RSSInterpreter"
+            rootElement="rss"/>
+      <formatInterpreter
+            class="org.rssowl.core.interpreter.internal.RDFInterpreter"
+            rootElement="rdf"/>
+      <formatInterpreter
+            class="org.rssowl.core.interpreter.internal.AtomInterpreter"
+            rootElement="feed"/>
+      <formatInterpreter
+            class="org.rssowl.core.interpreter.internal.OPMLInterpreter"
+            rootElement="opml"/>
+      <formatInterpreter
+            class="org.rssowl.core.interpreter.internal.CDFInterpreter"
+            rootElement="channel"/>
+      <formatInterpreter
+            class="org.rssowl.core.interpreter.internal.BugzillaInterpreter"
+            rootElement="bugzilla"/>
+   </extension>
+   <extension
+         point="org.rssowl.core.NamespaceHandler">
+      <namespaceHandler
+            class="org.rssowl.core.interpreter.internal.DublinCoreNamespaceHandler"
+            namespaceURI="http://purl.org/dc/elements/1.1/"/>
+      <namespaceHandler
+            class="org.rssowl.core.interpreter.internal.SyndicationNamespaceHandler"
+            namespaceURI="http://purl.org/rss/1.0/modules/syndication/"/>
+      <namespaceHandler
+            class="org.rssowl.core.interpreter.internal.ContentNamespaceHandler"
+            namespaceURI="http://purl.org/rss/1.0/modules/content/"/>
+      <namespaceHandler
+            class="org.rssowl.core.interpreter.internal.XMLNamespaceHandler"
+            namespaceURI="http://www.w3.org/XML/1998/namespace"/>
+      <namespaceHandler
+            class="org.rssowl.core.interpreter.internal.PodcastNamespaceHandler"
+            namespaceURI="http://www.itunes.com/dtds/podcast-1.0.dtd">
+      </namespaceHandler>
+   </extension>
+   <extension
+         point="org.rssowl.core.TypeImporter">
+      <typeImporter
+            class="org.rssowl.core.interpreter.internal.OPMLImporter"
+            rootElement="opml"/>
+   </extension>
+   <extension
+         point="org.rssowl.core.ProtocolHandler">
+      <protocolHandler
+            class="org.rssowl.core.connection.internal.DefaultProtocolHandler"
+            protocol="http"/>
+      <protocolHandler
+            class="org.rssowl.core.connection.internal.DefaultProtocolHandler"
+            protocol="https"/>
+      <protocolHandler
+            class="org.rssowl.core.connection.internal.DefaultProtocolHandler"
+            protocol="file"/>
+   </extension>
+   <extension
+         point="org.rssowl.core.PreferencesInitializer">
+      <preferencesInitializer
+            class="org.rssowl.core.internal.DefaultPreferences">
+      </preferencesInitializer>
+   </extension>
+</plugin>
