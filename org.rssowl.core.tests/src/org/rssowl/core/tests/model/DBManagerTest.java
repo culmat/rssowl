@@ -1,0 +1,1943 @@
+/*   **********************************************************************  **
+ **   Copyright notice                                                       **
+ **                                                                          **
+ **   (c) 2005-2006 RSSOwl Development Team                                  **
+ **   http://www.rssowl.org/                                                 **
+ **                                                                          **
+ **   All rights reserved                                                    **
+ **                                                                          **
+ **   This program and the accompanying materials are made available under   **
+ **   the terms of the Eclipse Public License v1.0 which accompanies this    **
+ **   distribution, and is available at:                                     **
+ **   http://www.rssowl.org/legal/epl-v10.html                               **
+ **                                                                          **
+ **   A copy is found in the file epl-v10.html and important notices to the  **
+ **   license from the team is found in the textfile LICENSE.txt distributed **
+ **   in this package.                                                       **
+ **                                                                          **
+ **   This copyright notice MUST APPEAR in all copies of the file!           **
+ **                                                                          **
+ **   Contributors:                                                          **
+ **     RSSOwl Development Team - initial API and implementation             **
+ **                                                                          **
+ **  **********************************************************************  */
+
+package org.rssowl.core.tests.model;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.model.dao.IApplicationLayer;
+import org.rssowl.core.model.dao.IModelDAO;
+import org.rssowl.core.model.dao.PersistenceException;
+import org.rssowl.core.model.events.BookMarkAdapter;
+import org.rssowl.core.model.events.BookMarkEvent;
+import org.rssowl.core.model.events.BookMarkListener;
+import org.rssowl.core.model.events.CategoryAdapter;
+import org.rssowl.core.model.events.CategoryEvent;
+import org.rssowl.core.model.events.CategoryListener;
+import org.rssowl.core.model.events.FeedAdapter;
+import org.rssowl.core.model.events.FeedEvent;
+import org.rssowl.core.model.events.FeedListener;
+import org.rssowl.core.model.events.FolderAdapter;
+import org.rssowl.core.model.events.FolderEvent;
+import org.rssowl.core.model.events.FolderListener;
+import org.rssowl.core.model.events.LabelAdapter;
+import org.rssowl.core.model.events.LabelEvent;
+import org.rssowl.core.model.events.LabelListener;
+import org.rssowl.core.model.events.NewsAdapter;
+import org.rssowl.core.model.events.NewsEvent;
+import org.rssowl.core.model.events.NewsListener;
+import org.rssowl.core.model.events.PersonAdapter;
+import org.rssowl.core.model.events.PersonEvent;
+import org.rssowl.core.model.events.PersonListener;
+import org.rssowl.core.model.events.SearchMarkAdapter;
+import org.rssowl.core.model.events.SearchMarkEvent;
+import org.rssowl.core.model.events.SearchMarkListener;
+import org.rssowl.core.model.internal.db4o.DBManager;
+import org.rssowl.core.model.internal.types.BookMark;
+import org.rssowl.core.model.internal.types.Category;
+import org.rssowl.core.model.internal.types.Feed;
+import org.rssowl.core.model.internal.types.Folder;
+import org.rssowl.core.model.internal.types.Guid;
+import org.rssowl.core.model.internal.types.Image;
+import org.rssowl.core.model.internal.types.Label;
+import org.rssowl.core.model.internal.types.News;
+import org.rssowl.core.model.internal.types.Person;
+import org.rssowl.core.model.internal.types.SearchMark;
+import org.rssowl.core.model.internal.types.Source;
+import org.rssowl.core.model.reference.BookMarkReference;
+import org.rssowl.core.model.reference.CategoryReference;
+import org.rssowl.core.model.reference.FeedLinkReference;
+import org.rssowl.core.model.reference.FeedReference;
+import org.rssowl.core.model.reference.FolderReference;
+import org.rssowl.core.model.reference.LabelReference;
+import org.rssowl.core.model.reference.NewsReference;
+import org.rssowl.core.model.reference.PersonReference;
+import org.rssowl.core.model.reference.SearchConditionReference;
+import org.rssowl.core.model.reference.SearchMarkReference;
+import org.rssowl.core.model.search.ISearchCondition;
+import org.rssowl.core.model.search.ISearchField;
+import org.rssowl.core.model.search.SearchSpecifier;
+import org.rssowl.core.model.types.IAttachment;
+import org.rssowl.core.model.types.IBookMark;
+import org.rssowl.core.model.types.ICategory;
+import org.rssowl.core.model.types.IConditionalGet;
+import org.rssowl.core.model.types.IExtendableType;
+import org.rssowl.core.model.types.IFeed;
+import org.rssowl.core.model.types.IFolder;
+import org.rssowl.core.model.types.IImage;
+import org.rssowl.core.model.types.ILabel;
+import org.rssowl.core.model.types.IMark;
+import org.rssowl.core.model.types.IModelTypesFactory;
+import org.rssowl.core.model.types.INews;
+import org.rssowl.core.model.types.IPerson;
+import org.rssowl.core.model.types.ISearchMark;
+import org.rssowl.core.model.types.ISource;
+import org.rssowl.core.model.types.INews.State;
+import org.rssowl.core.tests.TestUtils;
+
+import com.db4o.ObjectContainer;
+
+import java.lang.reflect.Field;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+
+/**
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+@SuppressWarnings("nls")
+public class DBManagerTest {
+
+  private static final String NOT_IDENTICAL_MESSAGE = "Item in the database is not identical to initial item.";
+  private IModelTypesFactory fTypesFactory;
+  private IModelDAO fModelDAO;
+  private IApplicationLayer fAppLayer;
+  private ObjectContainer fDb;
+
+  /**
+   * @throws Exception
+   */
+  @Before
+  public void setUp() throws Exception {
+    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    NewsModel.getDefault().getPersistenceLayer().getModelSearch().shutdown();
+    fTypesFactory = NewsModel.getDefault().getTypesFactory();
+    fModelDAO = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
+    fAppLayer = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer();
+    fDb = DBManager.getDefault().getObjectContainer();
+  }
+  
+  /**
+   * Tests that deleting a search condition removes it and its search field
+   * from the database.
+   */
+  @Test
+  public void testDeleteSearchCondition() {
+    IFolder folder = fTypesFactory.createFolder(null, null, "Folder");
+    ISearchMark searchMark = fTypesFactory.createSearchMark(null, folder, "Mark");
+    fModelDAO.saveFolder(folder);
+    ISearchField searchField = fTypesFactory.createSearchField(0, "SomeEntity");
+    ISearchCondition searchCondition = fTypesFactory.createSearchCondition(null,
+        searchMark, searchField, SearchSpecifier.BEGINS_WITH, "value");
+    fModelDAO.saveSearchMark(searchMark);
+    assertNotNull(fModelDAO.loadSearchCondition(searchCondition.getId()));
+    long searchFieldId = fDb.ext().getID(searchCondition.getField());
+    assertNotNull(fDb.ext().getByID(searchFieldId));
+    fModelDAO.deleteSearchCondition(new SearchConditionReference(searchCondition.getId()));
+    assertNull(fModelDAO.loadSearchCondition(searchCondition.getId()));
+    assertNull(fDb.ext().getByID(searchFieldId));
+    assertEquals(0, searchMark.getSearchConditions().size());
+  }
+  
+  /**
+   * Tests that deleting a search mark removes it from the database and
+   * cascades it appropriately to its children.
+   */
+  @Test
+  public void testDeleteSearchMark() {
+    IFolder folder = fTypesFactory.createFolder(null, null, "Folder");
+    ISearchMark searchMark = fTypesFactory.createSearchMark(null, folder, "Mark");
+    ISearchField searchField = fTypesFactory.createSearchField(0, "SomeEntity");
+    ISearchCondition searchCondition = fTypesFactory.createSearchCondition(null,
+        searchMark, searchField, SearchSpecifier.BEGINS_WITH, "value");
+    fModelDAO.saveFolder(folder);
+    assertNotNull(fModelDAO.loadSearchMark(searchMark.getId()));
+    assertNotNull(fModelDAO.loadSearchCondition(searchCondition.getId()));
+    long searchFieldId = fDb.ext().getID(searchCondition.getField());
+    assertNotNull(fDb.ext().getByID(searchFieldId));
+    fModelDAO.deleteSearchMark(new SearchMarkReference(searchMark.getId()));
+    assertNull(fModelDAO.loadSearchMark(searchMark.getId()));
+    assertNull(fModelDAO.loadSearchCondition(searchCondition.getId()));
+    assertNull(fDb.ext().getByID(searchFieldId));
+  }
+
+  private ICategory createFeedCategory() throws PersistenceException {
+    IFeed feed = fModelDAO.saveFeed(createFeed());
+    ICategory category = fTypesFactory.createCategory(null, feed);
+    category.setName("categoryName");
+    category.setDomain("some/domain");
+    category.setProperty("one_property", "value");
+    return category;
+  }
+
+  private ICategory createNewsCategory() throws PersistenceException {
+    IFeed feed = fModelDAO.saveFeed(createFeed());
+    INews news = fModelDAO.saveNews(createNews(feed));
+    ICategory category = fTypesFactory.createCategory(null, news);
+    category.setName("categoryName");
+    category.setDomain("some/domain");
+    category.setProperty("one_property", "value");
+    return category;
+  }
+
+  private IBookMark createBookMark() throws PersistenceException {
+    IFolder folder = fModelDAO.saveFolder(createFolder());
+    return createBookMark(folder);
+  }
+
+  private ISearchMark createSearchMark() throws PersistenceException {
+    IFolder folder = fModelDAO.saveFolder(createFolder());
+    return createSearchMark(folder);
+  }
+
+  private IBookMark createBookMark(IFolder folder) throws PersistenceException {
+    IFeed feed = createFeed();
+    IFeed savedFeed = fAppLayer.loadFeed(feed.getLink());
+    if (savedFeed == null)
+      savedFeed = fModelDAO.saveFeed(feed);
+
+    IBookMark bookMark = fTypesFactory.createBookMark(null, folder, new FeedLinkReference(savedFeed.getLink()), "Default bookmark");
+    bookMark.setLastVisitDate(createDate());
+    bookMark.setPopularity(50);
+    bookMark.setErrorLoading(false);
+    return bookMark;
+  }
+
+  private IFolder createFolder() {
+    return createFolder(null);
+  }
+
+  private IFolder createFolder(IFolder parent) {
+    IFolder folder = fTypesFactory.createFolder(null, parent, "SomeFolder");
+    folder.setBlogrollLink(createURI("http://someuri.com"));
+    folder.setProperty("somekey", "somevalue");
+    return folder;
+  }
+
+  /**
+   * Checks: - Addition of person - That ADD event is issued - Updating of
+   * person - That UPDATE event is issued - Getting of person
+   */
+  @Test
+  public void testAddUpdateAndGetPerson() {
+    IFeed feed = createFeed();
+    final Person initialJohn = (Person) createPersonJohn(feed);
+    final Person[] updatedJohn = new Person[1];
+    final boolean[] personAddedCalled = new boolean[] { false };
+    final boolean[] personUpdatedCalled = new boolean[] { false };
+    PersonListener personListener = null;
+    try {
+      personListener = new PersonAdapter() {
+        @Override
+        public void personAdded(Set<PersonEvent> events) {
+          for (PersonEvent event : events) {
+            personAddedCalled[0] = true;
+            Person dbPerson = (Person) event.getEntity();
+            initialJohn.setId(dbPerson.getId());
+            assertTrue(initialJohn.isIdentical(dbPerson));
+          }
+        }
+
+        @Override
+        public void personUpdated(Set<PersonEvent> events) {
+          PersonEvent event = events.iterator().next();
+          personUpdatedCalled[0] = true;
+          Person dbPerson = (Person) event.getEntity();
+          assertTrue(updatedJohn[0].isIdentical(dbPerson));
+        }
+      };
+      NewsModel.getDefault().addPersonListener(personListener);
+      long savedJohnId = fModelDAO.savePerson(initialJohn).getId().longValue();
+      System.gc();
+      IPerson savedJohn = fModelDAO.loadPerson(savedJohnId);
+      initialJohn.setId(savedJohn.getId());
+      assertTrue(initialJohn.isIdentical(savedJohn));
+      URI oldJohnEmail = savedJohn.getEmail();
+      IPerson dan = createPersonDan(feed);
+      dan.setEmail(oldJohnEmail);
+      NewsModel.getDefault().removePersonListener(personListener);
+      fModelDAO.savePerson(dan);
+      savedJohn.setEmail(createURI("anewemailaddress@gmail.com"));
+      updatedJohn[0] = (Person) savedJohn;
+      NewsModel.getDefault().addPersonListener(personListener);
+      fModelDAO.savePerson(savedJohn);
+      assertTrue(personAddedCalled[0]);
+      assertTrue(personUpdatedCalled[0]);
+      fModelDAO.deletePerson(new PersonReference(updatedJohn[0].getId()));
+
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    } finally {
+      if (personListener != null) {
+        NewsModel.getDefault().removePersonListener(personListener);
+      }
+    }
+
+  }
+
+  /**
+   * Tests that {@link News#merge(INews)} copies the link property correctly.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testNewsMergeLink() throws Exception {
+    IFeed feed = fModelDAO.saveFeed(createFeed());
+    INews news = fTypesFactory.createNews(null, feed, new Date());
+    news.setLink(createURI("http://www.uri.com"));
+
+    INews anotherNews = fTypesFactory.createNews(null, feed, new Date());
+    URI uri = createURI("http://www.anotheruri.com");
+    anotherNews.setLink(uri);
+
+    news.merge(anotherNews);
+
+    assertEquals(uri, news.getLink());
+    Field linkField = News.class.getDeclaredField("fLink");
+    linkField.setAccessible(true);
+    URI link = (URI) linkField.get(news);
+    assertEquals(uri, link);
+  }
+
+  /**
+   * Tests INews#setLink.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testNewsSetLink() throws Exception {
+    IFeed feed = fModelDAO.saveFeed(createFeed());
+    INews news = fTypesFactory.createNews(null, feed, new Date());
+    URI uri = createURI("http://uri.com");
+    news.setLink(uri);
+    assertEquals(uri, news.getLink());
+    news.setLink(null);
+    assertNull(news.getLink());
+    news.setLink(uri);
+    assertEquals(uri, news.getLink());
+    URI anotherUri = createURI("http://anotheruri.com");
+    news.setLink(anotherUri);
+
+    assertSame("URI is not being cached", anotherUri, news.getLink());
+    assertEquals(anotherUri, news.getLink());
+  }
+
+  /**
+   * Tests deleting a INews and checking that the parent feed doesn't have it
+   * anymore.
+   *
+   * @throws PersistenceException
+   */
+  @Test
+  public void testDeleteNews() throws PersistenceException {
+    IFeed feed = createFeed();
+    feed = fModelDAO.saveFeed(feed);
+    INews news = createNews(feed);
+    news = fModelDAO.saveNews(news);
+    Long newsId = news.getId();
+    fModelDAO.deleteNews(new NewsReference(newsId));
+    feed = fModelDAO.loadFeed(feed.getId());
+    assertEquals(0, feed.getNews().size());
+    assertNull(fModelDAO.loadNews(newsId));
+  }
+
+  /**
+   * Tests loading the root folders.
+   */
+  @Test
+  public void testLoadRootFolders() {
+    try {
+      // Save root folders
+      IFolder folder1 = createFolder();
+      folder1 = fModelDAO.saveFolder(folder1);
+
+      IFolder folder2 = fTypesFactory.createFolder(null, null, "AnotherFolder");
+      folder2 = fModelDAO.saveFolder(folder2);
+
+      // Save non-root folder
+      IFolder nonRootFolder = createFolderWithParent();
+      fModelDAO.saveFolder(nonRootFolder);
+
+      List<IFolder> rootFolderRefs = fAppLayer.loadRootFolders();
+      assertEquals(3, rootFolderRefs.size());
+
+      for (IFolder rootFolder : rootFolderRefs) {
+        assertTrue(rootFolder.equals(folder1) || rootFolder.equals(folder2) || rootFolder.equals(nonRootFolder.getParent()));
+      }
+
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    }
+  }
+
+  /**
+   * Simply adds and deletes a IBookMark and fails if an exceptions is thrown.
+   */
+  @Test
+  public void testAddAndDeleteBookMark() {
+    try {
+      IBookMark bookMark = createBookMark();
+      bookMark = fModelDAO.saveBookMark(bookMark);
+      fModelDAO.deleteBookMark(new BookMarkReference(bookMark.getId()));
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    }
+  }
+
+  /**
+   * Simply adds and deletes a ICategory with a feed as parent and fails if an
+   * exception is thrown.
+   */
+  @Test
+  public void testAddAndDeleteFeedCategory() {
+    try {
+      ICategory category = createFeedCategory();
+      ICategory savedCategory = fModelDAO.saveCategory(category);
+      fModelDAO.deleteCategory(new CategoryReference(savedCategory.getId()));
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    }
+  }
+
+  /**
+   * Simply adds and deletes a ICategory with a news as parent and fails if an
+   * exception is thrown.
+   */
+  @Test
+  public void testAddAndDeleteNewsCategory() {
+    try {
+      ICategory category = createNewsCategory();
+      ICategory savedCategory = fModelDAO.saveCategory(category);
+      fModelDAO.deleteCategory(new CategoryReference(savedCategory.getId()));
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    }
+  }
+
+  /**
+   * Adds, retrieves and checks if the added object matches the retrieved one.
+   */
+  // FIXME Need the method loadCategories in a public interface
+  // @Test
+  // public void testAddAndGetFeedCategory() {
+  // try {
+  // Category category = (Category) createFeedCategory();
+  // CategoryReference ref = fModelDAO.saveCategory(category);
+  // List<ICategory> categories = fModelDAO.loadCategories();
+  // assertEquals(1, categories.size());
+  // category.setId(categories.get(0).getId());
+  // assertTrue(category.isIdentical(categories.get(0)));
+  // manager.deleteCategory(ref);
+  // } catch (PersistenceLayerException e) {
+  // fail(e.getMessage());
+  // }
+  // }
+  /**
+   * Adds, retrieves and checks if the added object matches the retrieved one.
+   */
+  // FIXME Need the method loadCategories in a public interface
+  // @Test
+  // public void testAddAndGetNewsCategory() {
+  // try {
+  // Category category = (Category) createNewsCategory();
+  // CategoryManager manager = fManagers.getCategoryManager();
+  // CategoryReference ref = manager.saveCategory(category);
+  // List<ICategory> categories = manager.loadCategories();
+  // assertEquals(1, categories.size());
+  // category.setId(categories.get(0).getId());
+  // assertTrue(category.isIdentical(categories.get(0)));
+  // manager.deleteCategory(ref);
+  // } catch (PersistenceLayerException e) {
+  // fail(e.getMessage());
+  // }
+  // }
+  private ILabel createLabel() {
+    ILabel label = fTypesFactory.createLabel(null, "someLabel");
+    label.setColor("200,100,009");
+    return label;
+  }
+
+  /**
+   * Checks: - Addition of label - That ADD event is issued - Updating of label -
+   * That UPDATE event is issued - Getting of label
+   */
+  @Test
+  public void testAddUpdateAndGetLabel() {
+    final Label initialLabel = (Label) createLabel();
+    final Label[] updatedLabel = new Label[1];
+    final boolean[] labelAddedCalled = new boolean[] { false };
+    final boolean[] labelUpdatedCalled = new boolean[] { false };
+    LabelListener labelListener = null;
+    try {
+      labelListener = new LabelAdapter() {
+        @Override
+        public void labelAdded(Set<LabelEvent> events) {
+          for (LabelEvent event : events) {
+            labelAddedCalled[0] = true;
+            Label dbLabel = (Label) event.getEntity();
+            initialLabel.setId(dbLabel.getId());
+            assertTrue(initialLabel.isIdentical(dbLabel));
+          }
+        }
+
+        @Override
+        public void labelUpdated(Set<LabelEvent> events) {
+          LabelEvent event = events.iterator().next();
+          labelUpdatedCalled[0] = true;
+          Label dbLabel = (Label) event.getEntity();
+          assertTrue(updatedLabel[0].isIdentical(dbLabel));
+        }
+      };
+      NewsModel.getDefault().addLabelListener(labelListener);
+      long savedLabelId = fModelDAO.saveLabel(initialLabel).getId().longValue();
+      System.gc();
+      ILabel dbLabel = fModelDAO.loadLabel(savedLabelId);
+      initialLabel.setId(dbLabel.getId());
+      assertTrue(initialLabel.isIdentical(dbLabel));
+      dbLabel.setColor("255,255,137");
+      updatedLabel[0] = (Label) dbLabel;
+      fModelDAO.saveLabel(dbLabel);
+      assertTrue(labelAddedCalled[0]);
+      assertTrue(labelUpdatedCalled[0]);
+      fModelDAO.deleteLabel(new LabelReference(updatedLabel[0].getId()));
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    } finally {
+      if (labelListener != null) {
+        NewsModel.getDefault().removeLabelListener(labelListener);
+      }
+    }
+
+  }
+
+  /**
+   * Checks: - Addition of category - That ADD event is issued - Updating of
+   * category - That UPDATE event is issued - Getting of category
+   */
+  @Test
+  public void testAddUpdateAndGetCategory() {
+    final Category[] initialCategory = new Category[1];
+    try {
+      initialCategory[0] = (Category) createNewsCategory();
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    }
+    final Category[] updatedCategory = new Category[1];
+    final boolean[] categoryAddedCalled = new boolean[] { false };
+    final boolean[] categoryUpdatedCalled = new boolean[] { false };
+    CategoryListener categoryListener = null;
+    try {
+      categoryListener = new CategoryAdapter() {
+        @Override
+        public void categoryAdded(Set<CategoryEvent> events) {
+          CategoryEvent event = events.iterator().next();
+          try {
+            categoryAddedCalled[0] = true;
+            Category dbCategory = (Category) event.getEntity();
+            initialCategory[0].setId(dbCategory.getId());
+            assertTrue(initialCategory[0].isIdentical(dbCategory));
+            dbCategory.setDomain("newDomain/newDomain");
+            updatedCategory[0] = dbCategory;
+            fModelDAO.saveCategory(dbCategory);
+          } catch (PersistenceException e) {
+            fail(e.getMessage());
+          }
+        }
+
+        @Override
+        public void categoryUpdated(Set<CategoryEvent> events) {
+          CategoryEvent event = events.iterator().next();
+          categoryUpdatedCalled[0] = true;
+          Category dbCategory = (Category) event.getEntity();
+          assertTrue(updatedCategory[0].isIdentical(dbCategory));
+        }
+      };
+      NewsModel.getDefault().addCategoryListener(categoryListener);
+      fModelDAO.saveCategory(initialCategory[0]);
+      assertTrue(categoryAddedCalled[0]);
+      assertTrue(categoryUpdatedCalled[0]);
+      fModelDAO.deleteCategory(new CategoryReference(updatedCategory[0].getId()));
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    } finally {
+      if (categoryListener != null) {
+        NewsModel.getDefault().removeCategoryListener(categoryListener);
+      }
+    }
+  }
+
+  /**
+   * Tests adding, updating and getting a folder with no parent.
+   */
+  @Test
+  public void testAddUpdateAndGetFolder() {
+    final Folder initialFolder = (Folder) createFolder();
+    final Folder[] updatedFolder = new Folder[1];
+    final boolean[] folderAddedCalled = new boolean[] { false };
+    final boolean[] folderUpdatedCalled = new boolean[] { false };
+    FolderListener folderListener = null;
+    try {
+      folderListener = new FolderAdapter() {
+        @Override
+        public void folderAdded(Set<FolderEvent> events) {
+          for (FolderEvent event : events) {
+            try {
+              folderAddedCalled[0] = true;
+              Folder dbFolder = (Folder) event.getEntity();
+              initialFolder.setId(dbFolder.getId());
+              assertTrue(NOT_IDENTICAL_MESSAGE, initialFolder.isIdentical(dbFolder));
+              dbFolder.setBlogrollLink(createURI("http://www.newuri.com"));
+              dbFolder.setName("New name");
+              updatedFolder[0] = dbFolder;
+              fModelDAO.saveFolder(dbFolder);
+            } catch (PersistenceException e) {
+              fail(e.getMessage());
+            }
+          }
+        }
+
+        @Override
+        public void folderUpdated(Set<FolderEvent> events) {
+          for (FolderEvent event : events) {
+            folderUpdatedCalled[0] = true;
+            Folder dbFolder = (Folder) event.getEntity();
+            assertTrue(updatedFolder[0].isIdentical(dbFolder));
+          }
+        }
+      };
+      NewsModel.getDefault().addFolderListener(folderListener);
+      fModelDAO.saveFolder(initialFolder);
+      assertTrue(folderAddedCalled[0]);
+      assertTrue(folderUpdatedCalled[0]);
+      fModelDAO.deleteFolder(new FolderReference(updatedFolder[0].getId()));
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    } finally {
+      if (folderListener != null) {
+        NewsModel.getDefault().removeFolderListener(folderListener);
+      }
+    }
+  }
+
+  private IFolder createFolderWithParent() throws PersistenceException {
+    IFolder parentFolder = createFolder();
+    parentFolder = fModelDAO.saveFolder(parentFolder);
+    IFolder folder = fTypesFactory.createFolder(null, parentFolder, "MainFolder");
+    folder.setBlogrollLink(createURI("http://www.rssowl.com"));
+    folder.setProperty("skey", "svalue");
+    return folder;
+
+  }
+
+  /**
+   * Tests adding, updating and getting a folder that has a parent.
+   */
+  @Test
+  public void testAddUpdateAndGetFolderWithParent() {
+    final Folder[] initialFolder = new Folder[1];
+    final String[] folderName = new String[1];
+    try {
+      initialFolder[0] = (Folder) createFolderWithParent();
+      folderName[0] = initialFolder[0].getName();
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    }
+    final Folder[] updatedFolder = new Folder[1];
+    final boolean[] folderAddedCalled = new boolean[] { false };
+    final boolean[] folderUpdatedCalled = new boolean[] { false };
+    FolderListener folderListener = null;
+    try {
+      folderListener = new FolderAdapter() {
+        @Override
+        public void folderAdded(Set<FolderEvent> events) {
+          for (FolderEvent event : events) {
+            try {
+              folderAddedCalled[0] = true;
+              Folder dbFolder = (Folder) event.getEntity();
+              initialFolder[0].setId(dbFolder.getId());
+              assertTrue(initialFolder[0].isIdentical(dbFolder));
+              dbFolder.setBlogrollLink(createURI("http://www.newuri.com"));
+              updatedFolder[0] = dbFolder;
+              fModelDAO.saveFolder(dbFolder);
+            } catch (PersistenceException e) {
+              fail(e.getMessage());
+            }
+          }
+        }
+
+        @Override
+        public void folderUpdated(Set<FolderEvent> events) {
+          for (FolderEvent event : events) {
+            /* Ignore event from parent */
+            if (!folderName[0].equals(event.getEntity().getName())) {
+              return;
+            }
+            folderUpdatedCalled[0] = true;
+            Folder dbFolder = (Folder) event.getEntity();
+            assertTrue(updatedFolder[0].isIdentical(dbFolder));
+          }
+        }
+      };
+      NewsModel.getDefault().addFolderListener(folderListener);
+      fModelDAO.saveFolder(initialFolder[0]);
+      assertTrue(folderAddedCalled[0]);
+      assertTrue(folderUpdatedCalled[0]);
+      fModelDAO.deleteFolder(new FolderReference(updatedFolder[0].getId()));
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    } finally {
+      if (folderListener != null) {
+        NewsModel.getDefault().removeFolderListener(folderListener);
+      }
+    }
+  }
+
+  /**
+   * When updating a child folder, the root event should be on the folder where
+   * save is called.
+   */
+  @Test
+  public void testRootFolderWhenFolderChildIsUpdated() {
+    final Folder[] initialFolder = new Folder[1];
+    final String[] folderName = new String[1];
+    try {
+      initialFolder[0] = (Folder) createFolderWithParent();
+      folderName[0] = initialFolder[0].getName();
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    }
+    FolderListener folderListener = null;
+    try {
+      folderListener = new FolderAdapter() {
+        @Override
+        public void folderAdded(Set<FolderEvent> events) {
+          for (FolderEvent event : events) {
+            if (folderName[0].equals(event.getEntity().getName())) {
+              assertEquals(true, event.isRoot());
+            } else {
+              assertEquals(false, event.isRoot());
+            }
+          }
+        }
+      };
+      NewsModel.getDefault().addFolderListener(folderListener);
+      fModelDAO.saveFolder(initialFolder[0]);
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    } finally {
+      if (folderListener != null) {
+        NewsModel.getDefault().removeFolderListener(folderListener);
+      }
+    }
+  }
+
+  private IPerson createPersonJohn(IExtendableType type) {
+    IPerson person = fTypesFactory.createPerson(null, type);
+    person.setName("John");
+    person.setEmail(createURI("john@hotmail.com"));
+    person.setUri(createURI("http://mysite.hotmail.com"));
+    person.setProperty("property", "property_value");
+    return person;
+  }
+
+  URI createURI(String uri) {
+    try {
+      return new URI(uri);
+    } catch (URISyntaxException e) {
+      // should not happen;
+      return null;
+    }
+  }
+
+  private IPerson createPersonMary(IExtendableType type) {
+    IPerson person = fTypesFactory.createPerson(null, type);
+    person.setName("Mary");
+    person.setEmail(createURI("mary@hotmail.com"));
+    person.setUri(createURI("http://mary.hotmail.com"));
+    person.setProperty("test", "property");
+    return person;
+  }
+
+  @SuppressWarnings("unused")
+  private IPerson createPersonDan(IExtendableType type) {
+    IPerson person = fTypesFactory.createPerson(null, type);
+    person.setName("Dan");
+    person.setEmail(createURI("dan@yahoo.com"));
+    return person;
+  }
+
+  /**
+   * Saves the same feed twice without merging. Should throw an
+   * IllegalArgumentException.
+   *
+   * @throws PersistenceException
+   */
+  @Test(expected = IllegalArgumentException.class)
+  public void testSaveFeedTwice() throws PersistenceException {
+    fModelDAO.saveFeed(createFeed());
+    fModelDAO.saveFeed(createFeed());
+  }
+
+  /**
+   * Saves the same feed twice, but merge it before saving it a second time. No
+   * exception should be thrown.
+   */
+  @Test
+  public void testSaveFeedTwiceAfterMerging() {
+    try {
+      IFeed savedFeed = fModelDAO.saveFeed(createFeed());
+      savedFeed.merge(createFeed());
+      fModelDAO.saveFeed(savedFeed);
+    } catch (PersistenceException e) {
+      TestUtils.fail(e);
+    }
+  }
+
+  /**
+   * Tests adding, updating and getting a bookmark.
+   */
+  @Test
+  public void testAddUpdateAndGetBookMark() {
+    BookMarkListener bookMarkListener = null;
+    try {
+      final BookMark initialBookMark = (BookMark) createBookMark();
+      final BookMark[] updatedBookMark = new BookMark[1];
+      final boolean[] bookMarkAddedCalled = new boolean[] { false };
+      final boolean[] bookMarkUpdatedCalled = new boolean[] { false };
+      bookMarkListener = new BookMarkAdapter() {
+        @Override
+        public void bookMarkAdded(Set<BookMarkEvent> events) {
+          BookMarkEvent event = events.iterator().next();
+          try {
+            bookMarkAddedCalled[0] = true;
+            BookMark dbBookMark = (BookMark) event.getEntity();
+            initialBookMark.setId(dbBookMark.getId());
+            assertTrue(initialBookMark.isIdentical(dbBookMark));
+            dbBookMark.setName("Another name");
+            updatedBookMark[0] = dbBookMark;
+            fModelDAO.saveBookMark(dbBookMark);
+          } catch (PersistenceException e) {
+            fail(e.getMessage());
+          }
+        }
+
+        @Override
+        public void bookMarkUpdated(Set<BookMarkEvent> events) {
+          BookMarkEvent event = events.iterator().next();
+          bookMarkUpdatedCalled[0] = true;
+          BookMark dbBookMark = (BookMark) event.getEntity();
+          assertTrue(updatedBookMark[0].isIdentical(dbBookMark));
+        }
+      };
+      NewsModel.getDefault().addBookMarkListener(bookMarkListener);
+      fModelDAO.saveBookMark(initialBookMark);
+      assertTrue(bookMarkAddedCalled[0]);
+      assertTrue(bookMarkUpdatedCalled[0]);
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    }
+
+    finally {
+      if (bookMarkListener != null) {
+        NewsModel.getDefault().removeBookMarkListener(bookMarkListener);
+      }
+    }
+  }
+
+  /**
+   * Tests adding, updating and getting a ISearchMark.
+   */
+  @Test
+  public void testAddUpdateAndGetSearchMark() {
+    SearchMarkListener searchMarkListener = null;
+    try {
+      final SearchMark initialSearchMark = (SearchMark) createSearchMark();
+      final SearchMark[] updatedSearchMark = new SearchMark[1];
+      final boolean[] searchMarkAddedCalled = new boolean[] { false };
+      final boolean[] searchMarkUpdatedCalled = new boolean[] { false };
+      searchMarkListener = new SearchMarkAdapter() {
+        @Override
+        public void searchMarkAdded(Set<SearchMarkEvent> events) {
+          SearchMarkEvent event = events.iterator().next();
+          try {
+            searchMarkAddedCalled[0] = true;
+            SearchMark dbSearchMark = (SearchMark) event.getEntity();
+            initialSearchMark.setId(dbSearchMark.getId());
+            assertTrue(initialSearchMark.isIdentical(dbSearchMark));
+            dbSearchMark.setName("Another name");
+            updatedSearchMark[0] = dbSearchMark;
+            fModelDAO.saveSearchMark(dbSearchMark);
+          } catch (PersistenceException e) {
+            fail(e.getMessage());
+          }
+        }
+
+        @Override
+        public void searchMarkUpdated(Set<SearchMarkEvent> events) {
+          SearchMarkEvent event = events.iterator().next();
+          searchMarkUpdatedCalled[0] = true;
+          SearchMark dbSearchMark = (SearchMark) event.getEntity();
+          assertTrue(updatedSearchMark[0].isIdentical(dbSearchMark));
+        }
+      };
+      NewsModel.getDefault().addSearchMarkListener(searchMarkListener);
+      fModelDAO.saveSearchMark(initialSearchMark);
+      assertTrue(searchMarkAddedCalled[0]);
+      assertTrue(searchMarkUpdatedCalled[0]);
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    }
+
+    finally {
+      if (searchMarkListener != null) {
+        NewsModel.getDefault().removeSearchMarkListener(searchMarkListener);
+      }
+    }
+  }
+
+  private Date createDate() {
+    return new Date();
+  }
+
+  private IImage createImage(IFeed feed) {
+    IImage image = fTypesFactory.createImage(feed);
+    image.setHomepage(createURI("http://www.rssowl.org/image.png"));
+    return image;
+  }
+
+  /**
+   * Tests that saving a news with an attachment stores the attachment
+   * correctly.
+   */
+  @Test
+  public void testAddAttachmentToNewsAfterGC() {
+    NewsListener newsListener = null;
+    try {
+      IFeed feed = createFeed();
+      INews news = createNews(feed);
+      List<IAttachment> attachments = new ArrayList<IAttachment>(news.getAttachments());
+      for (IAttachment attachment : attachments)
+        news.removeAttachment(attachment);
+
+      fModelDAO.saveFeed(feed);
+      NewsReference newsRef = new NewsReference(feed.getNews().get(0).getId());
+      fTypesFactory.createAttachment(null, news);
+      fModelDAO.saveFeed(feed);
+      feed = null;
+      news = null;
+      System.gc();
+      assertEquals(1, newsRef.resolve().getAttachments().size());
+      newsListener = new NewsAdapter() {
+        @Override
+        public void newsUpdated(Set<NewsEvent> events) {
+          assertEquals(1, events.size());
+          int attachmentsSize = events.iterator().next().getOldNews().getAttachments().size();
+          assertEquals(1, attachmentsSize);
+        }
+      };
+      NewsModel.getDefault().addNewsListener(newsListener);
+      fModelDAO.saveNews(newsRef.resolve());
+    } finally {
+      if (newsListener != null)
+        NewsModel.getDefault().removeNewsListener(newsListener);
+    }
+  }
+
+  /**
+   * Tests adding, updating and getting a news.
+   */
+  @Test
+  public void testAddUpdateAndGetNews() {
+    final IFeed feed;
+    try {
+      feed = fModelDAO.saveFeed(createFeed());
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+      return;
+    }
+    final News initialNews = (News) createNews(feed);
+    final Feed[] initialFeed = new Feed[1];
+    final Person[] initialAuthor = new Person[1];
+    final Source[] initialSource = new Source[1];
+    final Guid[] initialGuid = new Guid[1];
+    final News[] updatedNews = new News[1];
+    final boolean[] NewsAddedCalled = new boolean[] { false };
+    final boolean[] NewsUpdatedCalled = new boolean[] { false };
+    NewsListener newsListener = null;
+    try {
+      newsListener = new NewsAdapter() {
+        @Override
+        public void newsAdded(Set<NewsEvent> events) {
+          NewsEvent event = events.iterator().next();
+          try {
+            NewsAddedCalled[0] = true;
+            initialFeed[0] = (Feed) initialNews.getFeedReference().resolve();
+            initialAuthor[0] = (Person) initialNews.getAuthor();
+            initialSource[0] = (Source) initialNews.getSource();
+            initialGuid[0] = (Guid) initialNews.getGuid();
+            News dbNews = (News) event.getEntity();
+            initialAuthor[0].setId(dbNews.getAuthor().getId());
+            initialAuthor[0].isIdentical(dbNews.getAuthor());
+            initialNews.setId(dbNews.getId());
+            assertTrue(initialNews.isIdentical(dbNews));
+            dbNews.setDescription("The description has been changed in the news");
+            dbNews.setState(State.UNREAD);
+            updatedNews[0] = dbNews;
+            fModelDAO.saveNews(dbNews);
+          } catch (PersistenceException e) {
+            fail(e.getMessage());
+          }
+        }
+
+        @Override
+        public void newsUpdated(Set<NewsEvent> events) {
+          NewsEvent event = events.iterator().next();
+          NewsUpdatedCalled[0] = true;
+          News dbNews = (News) event.getEntity();
+          assertTrue(updatedNews[0].isIdentical(dbNews));
+        }
+      };
+      NewsModel.getDefault().addNewsListener(newsListener);
+      fModelDAO.saveNews(initialNews);
+      assertTrue(NewsAddedCalled[0]);
+      assertTrue(NewsUpdatedCalled[0]);
+      fModelDAO.deleteNews(new NewsReference(updatedNews[0].getId()));
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    } finally {
+      if (newsListener != null) {
+        NewsModel.getDefault().removeNewsListener(newsListener);
+      }
+    }
+  }
+
+  /**
+   * Tests that {@link IModelDAO#saveFeed(IFeed)} cascades the complex
+   * types of INews appropriately.
+   */
+  @Test
+  public void testSaveFeedNewsCascadeWithGC() {
+    IFeed feed = createFeed();
+    INews news = createNews(feed);
+    fModelDAO.saveFeed(feed);
+    String authorName = news.getAuthor().getName();
+    URI attachmentLink = news.getAttachments().get(0).getLink();
+    String categoryName = news.getCategories().get(0).getName();
+    URI sourceLink = news.getSource().getLink();
+    fModelDAO.saveNews(news);
+    NewsReference newsRef = new NewsReference(news.getId());
+    feed = null;
+    news = null;
+    System.gc();
+    news = newsRef.resolve();
+    assertNewsEquals(categoryName, attachmentLink, authorName, sourceLink, news);
+    authorName = authorName + " changed";
+    attachmentLink = createURI(attachmentLink.toString() + "/new");
+    categoryName = categoryName + " changed";
+    sourceLink = createURI(sourceLink.toString() + "/new");
+    updateNews(authorName, attachmentLink, categoryName, sourceLink, news);
+    fModelDAO.saveFeed(news.getFeedReference().resolve());
+    news = null;
+    System.gc();
+    news = newsRef.resolve();
+    assertNewsEquals(categoryName, attachmentLink, authorName, sourceLink, news);
+  }
+
+  /**
+   * Tests that {@link IModelDAO#saveNews(INews)} cascades the complex
+   * types appropriately.
+   */
+  @Test
+  public void testSaveNewsCascadeWithGC() {
+    IFeed feed = createFeed();
+    fModelDAO.saveFeed(feed);
+    INews news = createNews(feed);
+    String authorName = news.getAuthor().getName();
+    URI attachmentLink = news.getAttachments().get(0).getLink();
+    String categoryName = news.getCategories().get(0).getName();
+    URI sourceLink = news.getSource().getLink();
+    fModelDAO.saveNews(news);
+    NewsReference newsRef = new NewsReference(news.getId());
+    feed = null;
+    news = null;
+    System.gc();
+    news = newsRef.resolve();
+    assertNewsEquals(categoryName, attachmentLink, authorName, sourceLink, news);
+    authorName = authorName + " changed";
+    attachmentLink = createURI(attachmentLink.toString() + "/new");
+    categoryName = categoryName + " changed";
+    sourceLink = createURI(sourceLink.toString() + "/new");
+    updateNews(authorName, attachmentLink, categoryName, sourceLink, news);
+    fModelDAO.saveNews(news);
+    news = null;
+    System.gc();
+    news = newsRef.resolve();
+    assertNewsEquals(categoryName, attachmentLink, authorName, sourceLink, news);
+  }
+
+  /**
+   * Tests that {@link IApplicationLayer#saveNews(List)} cascades the complex
+   * types appropriately.
+   */
+  @Test
+  public void testSaveNewsListCascadeWithGC() {
+    IFeed feed = createFeed();
+    fModelDAO.saveFeed(feed);
+    INews news = createNews(feed);
+    String authorName = news.getAuthor().getName();
+    URI attachmentLink = news.getAttachments().get(0).getLink();
+    String categoryName = news.getCategories().get(0).getName();
+    URI sourceLink = news.getSource().getLink();
+    fAppLayer.saveNews(Collections.singletonList(news));
+    NewsReference newsRef = new NewsReference(news.getId());
+    feed = null;
+    news = null;
+    System.gc();
+    news = newsRef.resolve();
+    assertNewsEquals(categoryName, attachmentLink, authorName, sourceLink, news);
+    authorName = authorName + " changed";
+    attachmentLink = createURI(attachmentLink.toString() + "/new");
+    categoryName = categoryName + " changed";
+    sourceLink = createURI(sourceLink.toString() + "/new");
+    updateNews(authorName, attachmentLink, categoryName, sourceLink, news);
+    fAppLayer.saveNews(Collections.singletonList(news));
+    news = null;
+    System.gc();
+    news = newsRef.resolve();
+    assertNewsEquals(categoryName, attachmentLink, authorName, sourceLink, news);
+  }
+
+  private void updateNews(String authorName, URI attachmentLink, String categoryName, URI sourceLink, INews news) {
+    news.getAuthor().setName(authorName);
+    news.getAttachments().get(0).setLink(attachmentLink);
+    news.getCategories().get(0).setName(categoryName);
+    news.getSource().setLink(sourceLink);
+  }
+
+  private void assertNewsEquals(String categoryName, URI attachmentLink,
+      String authorName, URI sourceLink, INews news) {
+    assertNotNull(news);
+    assertEquals(1, news.getCategories().size());
+    assertEquals(categoryName, news.getCategories().get(0).getName());
+    assertEquals(1, news.getAttachments().size());
+    assertEquals(attachmentLink, news.getAttachments().get(0).getLink());
+    assertEquals(authorName, news.getAuthor().getName());
+    assertEquals(sourceLink, news.getSource().getLink());
+  }
+
+  private INews createNews(IFeed feed) {
+    INews news = fTypesFactory.createNews(null, feed, createDate());
+    IAttachment attachment = fTypesFactory.createAttachment(null, news);
+    attachment.setLink(createURI("http://attachmenturi.com"));
+    ICategory category = fTypesFactory.createCategory(null, news);
+    category.setName("Category name #1");
+    news.setAuthor(createPersonMary(news));
+    news.setBase(createURI("http://www.someuri.com"));
+    news.setComments("One comment");
+    news.setState(State.DELETED);
+    news.setDescription("News description");
+    news.setGuid(fTypesFactory.createGuid(news, "someGUIDvalue"));
+    news.setLink(createURI("http://www.somelocation.com/feed.rss"));
+    news.setModifiedDate(createDate());
+    news.setProperty("property", "value");
+    news.setPublishDate(createDate());
+    ISource source = fTypesFactory.createSource(news);
+    source.setLink(createURI("http://www.someuri.com"));
+    news.setSource(source);
+    news.setTitle("This is the news title");
+    news.setRating(70);
+    return news;
+  }
+
+  private Feed createFeed() {
+    return createFeed("http://www.rssowl.org/feed.rss");
+  }
+
+  private Feed createFeed(String link) {
+    Feed feed = (Feed) fTypesFactory.createFeed(null, createURI(link));
+    feed.setTitle("feed title");
+    feed.setDescription("feed description");
+    feed.setHomepage(createURI("http://www.rssowl.org"));
+    feed.setAuthor(createPersonJohn(feed));
+    feed.setLanguage("English");
+    feed.setCopyright("This feed is copyrighted");
+    feed.setDocs(createURI("http://www.rssowl.org/documentation.html"));
+    feed.setGenerator("Manual");
+    feed.setImage(createImage(feed));
+    feed.setPublishDate(createDate());
+    feed.setLastBuildDate(createDate());
+    feed.setLastModifiedDate(createDate());
+    feed.setWebmaster("Webmaster");
+    feed.setTTL(60);
+    feed.setFormat("RSS");
+    feed.setProperty("feedProperty", "randomValue");
+    feed.setBase(createURI("http://www.baseuri.com/"));
+    return feed;
+  }
+
+  /**
+   * Saves feed and verifies that the feed still contains the news after being
+   * GC'd and reloaded. See bug #261.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testFeedRetainsLinkToNewsAfterSave() throws Exception {
+    IFeed feed = createFeed();
+
+    /* Need to save this without the news first */
+    fModelDAO.saveFeed(feed);
+
+    createNews(feed);
+    fModelDAO.saveFeed(feed);
+
+    long feedId = feed.getId();
+    feed = null;
+    System.gc();
+    IFeed savedFeed = fModelDAO.loadFeed(feedId);
+    assertEquals(1, savedFeed.getNews().size());
+    fModelDAO.deleteFeed(new FeedReference(feedId));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testDeleteFeed() throws Exception {
+    IFeed feed = createFeed();
+    createNews(feed);
+    fTypesFactory.createNews(null, feed, new Date());
+    fModelDAO.saveFeed(feed);
+
+    FeedReference feedRef = new FeedReference(feed.getId());
+    System.gc();
+    fModelDAO.deleteFeed(feedRef);
+    assertNull(fModelDAO.loadFeed(feedRef.getId()));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testDeleteFeedDeletesConditionalGet() throws Exception {
+    IFeed feed = createFeed();
+
+    fModelDAO.saveFeed(feed);
+
+    IConditionalGet conditionalGet = fTypesFactory.createConditionalGet("2005/11/04", feed.getLink(), null);
+
+    fModelDAO.saveConditionalGet(conditionalGet);
+
+    fModelDAO.deleteFeed(new FeedReference(feed.getId()));
+    assertNull(fModelDAO.loadFeed(feed.getId()));
+    assertNull(fModelDAO.loadConditionalGet(feed.getLink()));
+  }
+
+  /**
+   *
+   */
+  @Test
+  public void testAddUpdateAndGetConditionalGet() {
+    IFeed feed = createFeed();
+    fModelDAO.saveFeed(feed);
+
+    final String ifModifiedSince = "2005/11/04";
+    final String ifNoneMatch = "2005/05/12";
+    IConditionalGet conditionalGet = fTypesFactory.createConditionalGet(ifModifiedSince, feed.getLink(), ifNoneMatch);
+    fModelDAO.saveConditionalGet(conditionalGet);
+    conditionalGet = null;
+    System.gc();
+    conditionalGet = fModelDAO.loadConditionalGet(feed.getLink());
+    assertEquals(ifModifiedSince, conditionalGet.getIfModifiedSince());
+    assertEquals(ifNoneMatch, conditionalGet.getIfNoneMatch());
+    assertEquals(feed.getLink().toString(), conditionalGet.getLink().toString());
+  }
+
+  /**
+   * Simply adds and deletes a feed and fails if an exception is thrown
+   */
+  @Test
+  public void testAddAndDeleteFeed() {
+    try {
+      IFeed feed = createFeed();
+      feed = fModelDAO.saveFeed(feed);
+      fModelDAO.deleteFeed(new FeedReference(feed.getId()));
+      assertNull(fModelDAO.loadFeed(feed.getId()));
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    }
+  }
+
+  /**
+   * Simply adds and deletes a feed and fails if an exception is thrown
+   */
+  @Test
+  public void testAddAndDeleteFeed2() {
+    try {
+      IFeed feed = createFeed();
+      feed = fModelDAO.saveFeed(feed);
+      fModelDAO.deleteFeed(new FeedLinkReference(feed.getLink()));
+      assertNull(fModelDAO.loadFeed(feed.getId()));
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    }
+  }
+
+  /**
+   * Tests adding, updating and getting a feed.
+   */
+  // TODO Need to test news and categories
+  @Test
+  public void testAddUpdateAndGetFeed() {
+    final Feed initialFeed = createFeed();
+    final Person[] initialAuthor = new Person[1];
+    final Image[] initialImage = new Image[1];
+    final Feed[] updatedFeed = new Feed[1];
+    final boolean[] feedAddedCalled = new boolean[] { false };
+    final boolean[] feedUpdatedCalled = new boolean[] { false };
+    FeedListener feedListener = null;
+    try {
+      feedListener = new FeedAdapter() {
+        @Override
+        public void feedAdded(Set<FeedEvent> events) {
+          FeedEvent event = events.iterator().next();
+          try {
+            feedAddedCalled[0] = true;
+            initialAuthor[0] = (Person) initialFeed.getAuthor();
+            initialImage[0] = (Image) initialFeed.getImage();
+            Feed dbFeed = (Feed) event.getEntity();
+            initialAuthor[0].setId(dbFeed.getAuthor().getId());
+            initialAuthor[0].isIdentical(dbFeed.getAuthor());
+            initialImage[0].equals(dbFeed.getImage());
+            initialFeed.setId(dbFeed.getId());
+            assertTrue(NOT_IDENTICAL_MESSAGE, initialFeed.isIdentical(dbFeed));
+            dbFeed.setCopyright("GPL");
+            dbFeed.setFormat("someDifferentformat");
+            dbFeed.getImage().setHeight(150);
+            dbFeed.getImage().setDescription("Some new description");
+            dbFeed.getImage().setTitle("yet another title");
+            updatedFeed[0] = dbFeed;
+            fModelDAO.saveFeed(dbFeed);
+          } catch (PersistenceException e) {
+            fail(e.getMessage());
+          }
+        }
+
+        @Override
+        public void feedUpdated(Set<FeedEvent> events) {
+          FeedEvent event = events.iterator().next();
+          feedUpdatedCalled[0] = true;
+          Feed dbFeed = (Feed) event.getEntity();
+          assertTrue(updatedFeed[0].isIdentical(dbFeed));
+        }
+      };
+      NewsModel.getDefault().addFeedListener(feedListener);
+      fModelDAO.saveFeed(initialFeed);
+      assertTrue(feedAddedCalled[0]);
+      assertTrue(feedUpdatedCalled[0]);
+      fModelDAO.deleteFeed(new FeedReference(updatedFeed[0].getId()));
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    } finally {
+      if (feedListener != null) {
+        NewsModel.getDefault().removeFeedListener(feedListener);
+      }
+    }
+  }
+
+  /**
+   * Tests that the image attribute override solves the name clashes between
+   * certain column names in Feed and Image.
+   */
+  @Test
+  public void testImageAttributeOverride() {
+    final Feed initialFeed = createFeed();
+    final URI feedLink = initialFeed.getLink();
+    IImage image = fTypesFactory.createImage(initialFeed);
+    image.setHomepage(createURI("http://www.someuri.com"));
+    initialFeed.setImage(image);
+    initialFeed.getImage().setDescription("Some description");
+    initialFeed.getImage().setTitle("Title");
+    initialFeed.getImage().setHomepage(createURI("http://www.imageuri.com"));
+    final Feed[] updatedFeed = new Feed[1];
+    FeedListener feedListener = null;
+    try {
+      feedListener = new FeedAdapter() {
+        @Override
+        public void feedAdded(Set<FeedEvent> events) {
+          try {
+            FeedEvent event = events.iterator().next();
+            Feed dbFeed = (Feed) event.getEntity();
+            dbFeed.setDescription("feed description2");
+            dbFeed.setTitle("feed title2");
+            dbFeed.getImage().setDescription("Some new description");
+            dbFeed.getImage().setTitle("yet another title");
+            dbFeed.getImage().setHomepage(createURI("http://www.newimageuri.com"));
+            updatedFeed[0] = dbFeed;
+            fModelDAO.saveFeed(dbFeed);
+          } catch (PersistenceException e) {
+            TestUtils.fail(e);
+          }
+        }
+
+        @Override
+        public void feedUpdated(Set<FeedEvent> events) {
+          try {
+            FeedEvent event = events.iterator().next();
+            // TODO Add method to load entities without using the cache and
+            // then use it here. Atm, this test won't actually show the bug
+            // we want it to show because it's getting the feed from the cache
+            // bypassing the db inconsistency
+            Feed dbFeed = (Feed) event.getEntity();
+            assertEquals(feedLink.toString(), dbFeed.getLink().toString());
+          } catch (RuntimeException re) {
+            fail(re.getMessage());
+          }
+        }
+
+      };
+      NewsModel.getDefault().addFeedListener(feedListener);
+      fModelDAO.saveFeed(initialFeed);
+      fModelDAO.deleteFeed(new FeedReference(updatedFeed[0].getId()));
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    } finally {
+      if (feedListener != null) {
+        NewsModel.getDefault().removeFeedListener(feedListener);
+      }
+    }
+  }
+
+  /**
+   * Tests that no event is sent when NewsManager#setState() is called and the
+   * new state is the same as the old state.
+   */
+  @Test
+  public void testNewsManagerSetSameStateWithQuery() {
+    final IFeed feed;
+    try {
+      feed = fModelDAO.saveFeed(createFeed());
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+      return;
+    }
+    final News initialNews = (News) createNews(feed);
+    initialNews.setState(State.NEW);
+    INews news = null;
+    try {
+      news = fModelDAO.saveNews(initialNews);
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+      return;
+    }
+    NewsListener newsListener = null;
+    try {
+      newsListener = new NewsListener() {
+        public void newsAdded(Set<NewsEvent> events) {
+          fail("No events should have been fired, but NewsListener#newsAdded() was called");
+        }
+
+        public void newsDeleted(Set<NewsEvent> events) {
+          fail("No events should have been fired, but NewsListener#newsDeleted() was called.");
+        }
+
+        public void newsUpdated(Set<NewsEvent> events) {
+          fail("No events should have been fired, but NewsListener#newsUpdated() was called.");
+        }
+      };
+      NewsModel.getDefault().addNewsListener(newsListener);
+      List<INews> newsList = new ArrayList<INews>();
+      newsList.add(news);
+      fAppLayer.setNewsState(newsList, State.NEW, true, false);
+      NewsModel.getDefault().removeNewsListener(newsListener);
+      fModelDAO.deleteNews(new NewsReference(news.getId()));
+      fModelDAO.deleteFeed(new FeedReference(feed.getId()));
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    } finally {
+      if (newsListener != null) {
+        NewsModel.getDefault().removeNewsListener(newsListener);
+      }
+    }
+  }
+
+  /**
+   * Tests {@link IApplicationLayer#setNewsState(List, State, boolean, boolean)}
+   */
+  @Test
+  public void testNewsManagerSetState() {
+    final IFeed feed;
+    try {
+      feed = fModelDAO.saveFeed(createFeed());
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+      return;
+    }
+    final News initialNews = (News) createNews(feed);
+    initialNews.setState(State.NEW);
+    INews newsItem = null;
+    NewsReference newsRef = null;
+    try {
+      newsItem = fModelDAO.saveNews(initialNews);
+      newsRef = new NewsReference(newsItem.getId());
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+      return;
+    }
+    try {
+      List<INews> newsList = new ArrayList<INews>();
+      newsList.add(newsItem);
+      fAppLayer.setNewsState(newsList, State.UPDATED, true, false);
+      INews news = newsRef.resolve();
+      assertEquals(State.UPDATED, news.getState());
+      fAppLayer.setNewsState(newsList, State.DELETED, true, false);
+      news = newsRef.resolve();
+      assertEquals(State.DELETED, news.getState());
+      fAppLayer.setNewsState(newsList, State.HIDDEN, true, false);
+      news = newsRef.resolve();
+      assertEquals(State.HIDDEN, news.getState());
+      fAppLayer.setNewsState(newsList, State.READ, true, false);
+      news = newsRef.resolve();
+      assertEquals(State.READ, news.getState());
+      fAppLayer.setNewsState(newsList, State.UNREAD, true, false);
+      news = newsRef.resolve();
+      assertEquals(State.UNREAD, news.getState());
+      fAppLayer.setNewsState(newsList, State.NEW, true, false);
+      news = newsRef.resolve();
+      assertEquals(State.NEW, news.getState());
+      // Make sure it doesn't change when we set it to the same
+      fAppLayer.setNewsState(newsList, State.NEW, true, false);
+      news = newsRef.resolve();
+      assertEquals(State.NEW, news.getState());
+
+      fModelDAO.deleteNews(newsRef);
+      fModelDAO.deleteFeed(new FeedReference(feed.getId()));
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    }
+  }
+
+  /**
+   * Tests that the folders inside the folder are returned from the db in the
+   * same order as they were saved.
+   *
+   * @throws PersistenceException
+   */
+  @Test
+  public void testFoldersOrder() throws PersistenceException {
+    IFolder root = createFolder();
+    root = fModelDAO.saveFolder(root);
+    for (int i = 0; i < 10; ++i) {
+      IFolder child = createFolder(root);
+      child.setName(String.valueOf(i));
+    }
+    root = fModelDAO.saveFolder(root);
+    int counter = 0;
+    for (IFolder child : root.getFolders()) {
+      String name = String.valueOf(counter++);
+      assertEquals(name, child.getName());
+    }
+  }
+
+  /**
+   * Tests that the marks inside the folder are returned from the db in the same
+   * order as they were saved.
+   *
+   * @throws PersistenceException
+   */
+  @Test
+  public void testMarksOrder() throws PersistenceException {
+    IFolder root = createFolder();
+    root = fModelDAO.saveFolder(root);
+    int count = 10;
+    for (int i = 0; i < count; ++i) {
+      IBookMark child = createBookMark(root);
+      child.setName(String.valueOf(i));
+    }
+    int count2 = count * 2;
+    for (int i = count; i < count2; ++i) {
+      ISearchMark child = createSearchMark(root);
+      child.setName(String.valueOf(i));
+    }
+    root = fModelDAO.saveFolder(root);
+    int counter = 0;
+    for (IMark child : root.getMarks()) {
+      String name = String.valueOf(counter++);
+      assertEquals(name, child.getName());
+    }
+  }
+
+  private ISearchMark createSearchMark(IFolder folder) {
+    ISearchMark mark = fTypesFactory.createSearchMark(null, folder, "SomeName");
+    mark.setCreationDate(new Date());
+    mark.setLastVisitDate(createDate());
+    mark.setPopularity(50);
+    ISearchField field1 = fTypesFactory.createSearchField(INews.STATE, INews.class.getName());
+    fTypesFactory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, State.NEW);
+
+    ISearchField field2 = fTypesFactory.createSearchField(INews.STATE, INews.class.getName());
+    fTypesFactory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, State.UPDATED);
+
+    ISearchField field3 = fTypesFactory.createSearchField(INews.STATE, INews.class.getName());
+    fTypesFactory.createSearchCondition(null, mark, field3, SearchSpecifier.IS, State.UNREAD);
+
+    return mark;
+  }
+
+  /**
+   * Tests that
+   * {@link IApplicationLayer#setNewsState(List, State, boolean, boolean)}
+   * changes the state in news that have the same link but are in different
+   * feeds.
+   */
+  @Test
+  public void testNewsManagerSetStateWithMultipleFeedsAndGuidNull() {
+    final IFeed feed1;
+    IFeed feed2;
+    NewsAdapter newsAdapter;
+    try {
+      feed1 = fModelDAO.saveFeed(createFeed());
+      IFeed tempFeed = createFeed("http://adifferentlink.com");
+      tempFeed.setTitle("A different title");
+      feed2 = fModelDAO.saveFeed(tempFeed);
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+      return;
+    }
+
+    final NewsReference[] newsRef = new NewsReference[1];
+    newsAdapter = new NewsAdapter() {
+      @Override
+      public void newsAdded(Set<NewsEvent> events) {
+        assertEquals(1, events.size());
+        newsRef[0] = new NewsReference(events.iterator().next().getEntity().getId());
+      }
+    };
+    NewsModel.getDefault().addNewsListener(newsAdapter);
+
+    final News initialNews1 = (News) createNews(feed1);
+    initialNews1.setGuid(null);
+    initialNews1.setState(State.NEW);
+    final News initialNews2 = (News) createNews(feed2);
+    initialNews2.setGuid(null);
+    initialNews2.setState(State.NEW);
+
+    INews newsItem1 = null;
+    NewsReference newsRef1 = null;
+
+    INews newsItem2 = null;
+    NewsReference newsRef2 = null;
+
+    NewsReference newsRef3 = null;
+    try {
+      fModelDAO.saveFeed(feed1);
+      newsRef1 = newsRef[0];
+      newsItem1 = newsRef1.resolve();
+
+      feed2 = fModelDAO.saveFeed(feed2);
+      newsRef2 = newsRef[0];
+      newsItem2 = newsRef2.resolve();
+
+      final News initialNews3 = (News) createNews(feed2);
+      initialNews3.setTitle("Some other title");
+      initialNews3.setGuid(null);
+      initialNews3.setLink(null);
+      initialNews3.setState(State.NEW);
+      fModelDAO.saveFeed(feed2);
+      newsRef3 = newsRef[0];
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+      return;
+    } finally {
+      NewsModel.getDefault().removeNewsListener(newsAdapter);
+    }
+    try {
+      List<INews> newsList1 = new ArrayList<INews>();
+      newsList1.add(newsItem1);
+
+      List<INews> newsList2 = new ArrayList<INews>();
+      newsList2.add(newsItem2);
+
+      fAppLayer.setNewsState(newsList1, State.UPDATED, true, false);
+      INews news1 = newsRef1.resolve();
+      INews news2 = newsRef2.resolve();
+      INews news3 = newsRef3.resolve();
+      assertEquals(State.UPDATED, news1.getState());
+      assertEquals(State.UPDATED, news2.getState());
+      assertEquals(State.NEW, news3.getState());
+
+      fAppLayer.setNewsState(newsList2, State.DELETED, true, false);
+      news1 = newsRef1.resolve();
+      news2 = newsRef2.resolve();
+      news3 = newsRef3.resolve();
+      assertEquals(State.DELETED, news1.getState());
+      assertEquals(State.DELETED, news2.getState());
+      assertEquals(State.NEW, news3.getState());
+
+      fAppLayer.setNewsState(newsList1, State.HIDDEN, true, false);
+      news1 = newsRef1.resolve();
+      news2 = newsRef2.resolve();
+      news3 = newsRef3.resolve();
+      assertEquals(State.HIDDEN, news1.getState());
+      assertEquals(State.HIDDEN, news2.getState());
+      assertEquals(State.NEW, news3.getState());
+
+      fAppLayer.setNewsState(newsList2, State.READ, true, false);
+      news1 = newsRef1.resolve();
+      news2 = newsRef2.resolve();
+      news3 = newsRef3.resolve();
+      assertEquals(State.READ, news1.getState());
+      assertEquals(State.READ, news2.getState());
+      assertEquals(State.NEW, news3.getState());
+
+      fAppLayer.setNewsState(newsList1, State.UNREAD, true, false);
+      news1 = newsRef1.resolve();
+      news2 = newsRef2.resolve();
+      news3 = newsRef3.resolve();
+      assertEquals(State.UNREAD, news1.getState());
+      assertEquals(State.UNREAD, news2.getState());
+      assertEquals(State.NEW, news3.getState());
+
+      fAppLayer.setNewsState(newsList2, State.NEW, true, false);
+      news1 = newsRef1.resolve();
+      news2 = newsRef2.resolve();
+      news3 = newsRef3.resolve();
+      assertEquals(State.NEW, news1.getState());
+      assertEquals(State.NEW, news2.getState());
+      assertEquals(State.NEW, news3.getState());
+
+      // Make sure it doesn't change when we set it to the same
+      fAppLayer.setNewsState(newsList1, State.NEW, true, false);
+      news1 = newsRef1.resolve();
+      news2 = newsRef2.resolve();
+      news3 = newsRef3.resolve();
+      assertEquals(State.NEW, news1.getState());
+      assertEquals(State.NEW, news2.getState());
+      assertEquals(State.NEW, news3.getState());
+
+      fModelDAO.deleteNews(newsRef1);
+      fModelDAO.deleteNews(newsRef2);
+      fModelDAO.deleteFeed(new FeedReference(feed1.getId()));
+      fModelDAO.deleteFeed(new FeedReference(feed2.getId()));
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    }
+  }
+
+  /**
+   * Tests that
+   * {@link IApplicationLayer#setNewsState(List, State, boolean, boolean)}
+   * changes the state in news that have the same guid but are in different
+   * feeds.
+   */
+  @Test
+  public void testNewsManagerSetStateWithMultipleFeeds() {
+    final IFeed feed1;
+    IFeed feed2;
+    NewsListener newsAdapter = null;
+    try {
+      feed1 = fModelDAO.saveFeed(createFeed());
+      IFeed tempFeed = createFeed("http://adifferentlink.com");
+      tempFeed.setTitle("A different title");
+      feed2 = fModelDAO.saveFeed(tempFeed);
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+      return;
+    }
+    final News initialNews1 = (News) createNews(feed1);
+    initialNews1.setState(State.NEW);
+    final News initialNews2 = (News) createNews(feed2);
+    initialNews2.setState(State.NEW);
+
+    final NewsReference[] newsRef = new NewsReference[1];
+
+    newsAdapter = new NewsAdapter() {
+      @Override
+      public void newsAdded(Set<NewsEvent> events) {
+        assertEquals(1, events.size());
+        newsRef[0] = new NewsReference(events.iterator().next().getEntity().getId());
+      }
+    };
+    NewsModel.getDefault().addNewsListener(newsAdapter);
+    INews newsItem1 = null;
+    NewsReference newsRef1 = null;
+
+    INews newsItem2 = null;
+    NewsReference newsRef2 = null;
+
+    NewsReference newsRef3 = null;
+    try {
+      fModelDAO.saveFeed(feed1);
+      newsRef1 = newsRef[0];
+      newsItem1 = newsRef1.resolve();
+
+      feed2 = fModelDAO.saveFeed(feed2);
+      newsRef2 = newsRef[0];
+      newsItem2 = newsRef2.resolve();
+
+      final News initialNews3 = (News) createNews(feed2);
+      initialNews3.setTitle("Some other title");
+      initialNews3.setGuid(null);
+      initialNews3.setLink(null);
+      initialNews3.setState(State.NEW);
+      fModelDAO.saveFeed(feed2);
+      newsRef3 = newsRef[0];
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+      return;
+    } finally {
+      NewsModel.getDefault().removeNewsListener(newsAdapter);
+    }
+    try {
+      List<INews> newsList1 = new ArrayList<INews>();
+      newsList1.add(newsItem1);
+
+      List<INews> newsList2 = new ArrayList<INews>();
+      newsList2.add(newsItem2);
+
+      fAppLayer.setNewsState(newsList1, State.UPDATED, true, false);
+      INews news1 = newsRef1.resolve();
+      INews news2 = newsRef2.resolve();
+      INews news3 = newsRef3.resolve();
+      assertEquals(State.UPDATED, news1.getState());
+      assertEquals(State.UPDATED, news2.getState());
+      assertEquals(State.NEW, news3.getState());
+
+      fAppLayer.setNewsState(newsList2, State.DELETED, true, false);
+      news1 = newsRef1.resolve();
+      news2 = newsRef2.resolve();
+      news3 = newsRef3.resolve();
+      assertEquals(State.DELETED, news1.getState());
+      assertEquals(State.DELETED, news2.getState());
+      assertEquals(State.NEW, news3.getState());
+
+      fAppLayer.setNewsState(newsList1, State.HIDDEN, true, false);
+      news1 = newsRef1.resolve();
+      news2 = newsRef2.resolve();
+      news3 = newsRef3.resolve();
+      assertEquals(State.HIDDEN, news1.getState());
+      assertEquals(State.HIDDEN, news2.getState());
+      assertEquals(State.NEW, news3.getState());
+
+      fAppLayer.setNewsState(newsList2, State.READ, true, false);
+      news1 = newsRef1.resolve();
+      news2 = newsRef2.resolve();
+      news3 = newsRef3.resolve();
+      assertEquals(State.READ, news1.getState());
+      assertEquals(State.READ, news2.getState());
+      assertEquals(State.NEW, news3.getState());
+
+      fAppLayer.setNewsState(newsList1, State.UNREAD, true, false);
+      news1 = newsRef1.resolve();
+      news2 = newsRef2.resolve();
+      news3 = newsRef3.resolve();
+      assertEquals(State.UNREAD, news1.getState());
+      assertEquals(State.UNREAD, news2.getState());
+      assertEquals(State.NEW, news3.getState());
+
+      fAppLayer.setNewsState(newsList2, State.NEW, true, false);
+      news1 = newsRef1.resolve();
+      news2 = newsRef2.resolve();
+      news3 = newsRef3.resolve();
+      assertEquals(State.NEW, news1.getState());
+      assertEquals(State.NEW, news2.getState());
+      assertEquals(State.NEW, news3.getState());
+
+      // Make sure it doesn't change when we set it to the same
+      fAppLayer.setNewsState(newsList1, State.NEW, true, false);
+      news1 = newsRef1.resolve();
+      news2 = newsRef2.resolve();
+      news3 = newsRef3.resolve();
+      assertEquals(State.NEW, news1.getState());
+      assertEquals(State.NEW, news2.getState());
+      assertEquals(State.NEW, news3.getState());
+
+      fModelDAO.deleteNews(newsRef1);
+      fModelDAO.deleteNews(newsRef2);
+      fModelDAO.deleteFeed(new FeedReference(feed1.getId()));
+      fModelDAO.deleteFeed(new FeedReference(feed2.getId()));
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    }
+  }
+
+  /**
+   * Tests {@link IApplicationLayer#setNewsState(List, State, boolean, boolean)}.
+   */
+  @Test
+  public void testNewsManagerSetStateWithGuidNull() {
+    final IFeed feed;
+    try {
+      feed = fModelDAO.saveFeed(createFeed());
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+      return;
+    }
+    final News initialNews = (News) createNews(feed);
+    initialNews.setState(State.NEW);
+    initialNews.setGuid(null);
+    INews newsItem = null;
+    NewsReference newsRef = null;
+    try {
+      newsItem = fModelDAO.saveNews(initialNews);
+      newsRef = new NewsReference(newsItem.getId());
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+      return;
+    }
+    try {
+      List<INews> newsList = new ArrayList<INews>();
+      newsList.add(newsItem);
+      fAppLayer.setNewsState(newsList, State.UPDATED, true, false);
+      INews news = newsRef.resolve();
+      assertEquals(State.UPDATED, news.getState());
+      fAppLayer.setNewsState(newsList, State.DELETED, true, false);
+      news = newsRef.resolve();
+      assertEquals(State.DELETED, news.getState());
+      fAppLayer.setNewsState(newsList, State.HIDDEN, true, false);
+      news = newsRef.resolve();
+      assertEquals(State.HIDDEN, news.getState());
+      fAppLayer.setNewsState(newsList, State.READ, true, false);
+      news = newsRef.resolve();
+      assertEquals(State.READ, news.getState());
+      fAppLayer.setNewsState(newsList, State.UNREAD, true, false);
+      news = newsRef.resolve();
+      assertEquals(State.UNREAD, news.getState());
+      fAppLayer.setNewsState(newsList, State.NEW, true, false);
+      news = newsRef.resolve();
+      assertEquals(State.NEW, news.getState());
+      // Make sure it doesn't change when we set it to the same
+      fAppLayer.setNewsState(newsList, State.NEW, true, false);
+      news = newsRef.resolve();
+      assertEquals(State.NEW, news.getState());
+
+      fModelDAO.deleteNews(newsRef);
+      fModelDAO.deleteFeed(new FeedReference(feed.getId()));
+    } catch (PersistenceException e) {
+      fail(e.getMessage());
+    }
+  }
+}
