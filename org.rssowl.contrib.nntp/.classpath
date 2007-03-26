@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="lib" path="commons-io-1.3.1.jar" sourcepath="commons-io-1.3.1-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="mime4j-0.2.jar" sourcepath="mime4j-0.2-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="commons-net-1.4.1.jar" sourcepath="commons-net-1.4.1.src.zip"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins">
+		<accessrules>
+			<accessrule kind="discouraged" pattern="**/internal/**"/>
+			<accessrule kind="accessible" pattern="**"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
