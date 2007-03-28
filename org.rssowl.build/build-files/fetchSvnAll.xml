@@ -35,15 +35,25 @@
       <param name="element.id" value="org.rssowl.lib.httpclient"/>
       <param name="project.name" value="trunk/org.rssowl.lib.httpclient"/>
     </antcall>
+  	<antcall target="svn.co">
+      <param name="target" value="features"/>
+      <param name="element.id" value="org.rssowl.contrib.nntp"/>
+      <param name="project.name" value="trunk/org.rssowl.nntp"/>
+  	</antcall>
+  	<antcall target="svn.co">
+      <param name="target" value="plugins"/>
+      <param name="element.id" value="org.rssowl.contrib.nntp"/>
+      <param name="project.name" value="trunk/org.rssowl.contrib.nntp"/>
+  	</antcall>
   	<!--<antcall target="svn.co">
   	   <param name="target" value="features"/>
   	   <param name="element.id" value="org.rssowl.tests"/>
-  	   <param name="project.name" value="features/org.rssowl.tests/trunk"/>
+  	   <param name="project.name" value="trunk/org.rssowl.tests"/>
   	</antcall>
   	<antcall target="svn.co">
   	   <param name="target" value="plugins"/>
   	   <param name="element.id" value="org.rssowl.core.tests"/>
-  	   <param name="project.name" value="plugins/org.rssowl.core.tests/trunk"/>
+  	   <param name="project.name" value="trunk/org.rssowl.core.tests"/>
   	 </antcall>-->
   </target>
 </project>
