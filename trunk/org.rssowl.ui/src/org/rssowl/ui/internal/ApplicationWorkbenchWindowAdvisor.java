@@ -323,13 +323,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
   /* Restore from System Tray */
   void restoreFromTray(Shell shell) {
+    shell.setVisible(true);
+    shell.setActive();
 
     /* Un-Minimize if minimized */
-    if (shell.getMinimized()) {
-      shell.setVisible(true);
-      shell.setActive();
+    if (shell.getMinimized())
       shell.setMinimized(false);
-    }
 
     /*
      * Bug in Eclipse: For some reason the workbench-layout is broken, when
@@ -339,8 +338,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     else {
       shell.setRedraw(false);
       try {
-        shell.setVisible(true);
-        shell.setActive();
         shell.layout();
       } finally {
         shell.setRedraw(true);
