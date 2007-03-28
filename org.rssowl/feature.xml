@@ -240,7 +240,6 @@ litigation.
       <import plugin="org.eclipse.update.core"/>
       <import plugin="org.eclipse.core.net"/>
       <import feature="org.eclipse.rcp" version="3.3.0.v20070316b-8l8VCEYXUPdNkSgt8LpKG"/>
-      <import feature="org.rssowl.contrib.nntp" version="2.0.0.qualifier"/>
    </requires>
 
    <plugin
