@@ -335,14 +335,14 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
      * restoring from the Tray after it has been moved to tray with Shell-Close.
      * Force a layout() to avoid this issue.
      */
-    else {
-      shell.setRedraw(false);
-      try {
-        shell.layout();
-      } finally {
-        shell.setRedraw(true);
-      }
-    }
+//    else {
+//      shell.setRedraw(false);
+//      try {
+//        shell.layout();
+//      } finally {
+//        shell.setRedraw(true);
+//      }
+//    }
 
     if (Application.IS_WINDOWS)
       fTrayItem.setVisible(false);
