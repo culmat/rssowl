@@ -331,18 +331,18 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       shell.setMinimized(false);
 
     /*
-     * Bug in Eclipse: For some reason the workbench-layout is broken, when
-     * restoring from the Tray after it has been moved to tray with Shell-Close.
-     * Force a layout() to avoid this issue.
+     * Bug in Eclipse (#180881): For some reason the workbench-layout is broken,
+     * when restoring from the Tray after it has been moved to tray with
+     * Shell-Close. Force a layout() to avoid this issue.
      */
-//    else {
-//      shell.setRedraw(false);
-//      try {
-//        shell.layout();
-//      } finally {
-//        shell.setRedraw(true);
-//      }
-//    }
+    else {
+      shell.setRedraw(false);
+      try {
+        shell.layout();
+      } finally {
+        shell.setRedraw(true);
+      }
+    }
 
     if (Application.IS_WINDOWS)
       fTrayItem.setVisible(false);
