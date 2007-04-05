@@ -24,6 +24,12 @@
 
 package org.rssowl.ui.internal;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
@@ -32,6 +38,7 @@ import org.eclipse.swt.browser.LocationListener;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Menu;
 import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.preferences.IPreferencesScope;
@@ -72,6 +79,10 @@ public class CBrowser {
     fPreferences = NewsModel.getDefault().getGlobalScope();
     fLinkHandler = new HashMap<String, ILinkHandler>();
     hookListeners();
+
+    /* Add custom Context Menu on OS where this is not supported */
+    if (Application.IS_LINUX || fgMozillaAvailable)
+      hookMenu();
   }
 
   /**
@@ -114,6 +125,81 @@ public class CBrowser {
     });
 
     return browser;
+  }
+
+  private void hookMenu() {
+    MenuManager manager = new MenuManager();
+    manager.setRemoveAllWhenShown(true);
+    manager.addMenuListener(new IMenuListener() {
+      public void menuAboutToShow(IMenuManager manager) {
+
+        /* Back */
+        manager.add(new Action("Back") {
+          @Override
+          public void run() {
+            fBrowser.back();
+          }
+
+          @Override
+          public boolean isEnabled() {
+            return fBrowser.isBackEnabled();
+          }
+
+          @Override
+          public ImageDescriptor getImageDescriptor() {
+            return RSSOwlUI.getImageDescriptor("icons/etool16/backward.gif");
+          }
+        });
+
+        /* Forward */
+        manager.add(new Action("Forward") {
+          @Override
+          public void run() {
+            fBrowser.forward();
+          }
+
+          @Override
+          public boolean isEnabled() {
+            return fBrowser.isForwardEnabled();
+          }
+
+          @Override
+          public ImageDescriptor getImageDescriptor() {
+            return RSSOwlUI.getImageDescriptor("icons/etool16/forward.gif");
+          }
+        });
+
+        /* Reload */
+        manager.add(new Separator());
+        manager.add(new Action("Reload") {
+          @Override
+          public void run() {
+            fBrowser.refresh();
+          }
+
+          @Override
+          public ImageDescriptor getImageDescriptor() {
+            return RSSOwlUI.getImageDescriptor("icons/elcl16/reload.gif");
+          }
+        });
+
+        /* Stop */
+        manager.add(new Action("Stop") {
+          @Override
+          public void run() {
+            fBrowser.stop();
+          }
+
+          @Override
+          public ImageDescriptor getImageDescriptor() {
+            return RSSOwlUI.getImageDescriptor("icons/etool16/cancel.gif");
+          }
+        });
+      }
+    });
+
+    Menu menu = manager.createContextMenu(fBrowser);
+    fBrowser.setMenu(menu);
   }
 
   /**
