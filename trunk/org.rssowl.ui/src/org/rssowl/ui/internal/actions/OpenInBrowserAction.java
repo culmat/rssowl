@@ -31,9 +31,14 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.rssowl.core.model.types.INews;
-import org.rssowl.ui.internal.util.BrowserUtils;
+import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 
+import java.net.MalformedURLException;
 import java.util.List;
 
 /**
@@ -42,9 +47,7 @@ import java.util.List;
 public class OpenInBrowserAction extends Action implements IWorkbenchWindowActionDelegate {
   private IStructuredSelection fSelection;
 
-  /**
-   *
-   */
+  /** */
   public OpenInBrowserAction() {
     this(StructuredSelection.EMPTY);
   }
@@ -83,8 +86,16 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
     for (Object object : selection) {
       if (object instanceof INews) {
         INews news = (INews) object;
-        if (news.getLink() != null)
-          BrowserUtils.openLink(news.getLink().toString());
+        if (news.getLink() != null) {
+          IWorkbenchBrowserSupport browser = PlatformUI.getWorkbench().getBrowserSupport();
+          try {
+            browser.createBrowser(WebBrowserView.EDITOR_ID).openURL(news.getLink().toURL());
+          } catch (PartInitException e) {
+            Activator.getDefault().getLog().log(e.getStatus());
+          } catch (MalformedURLException e) {
+            Activator.getDefault().getLog().log(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+          }
+        }
       }
     }
   }

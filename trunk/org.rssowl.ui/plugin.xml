@@ -891,6 +891,13 @@
             id="org.rssowl.ui.FeedView"
             matchingStrategy="org.rssowl.ui.internal.editors.feed.FeedViewMatcher"
             name="Feed View"/>
+      <editor
+            class="org.rssowl.ui.internal.editors.browser.WebBrowserView"
+            default="false"
+            icon="icons/eview16/webbrowser.gif"
+            id="org.rssowl.ui.WebBrowser"
+            name="Web Browser">
+      </editor>
    </extension>
    <extension
          point="org.rssowl.ui.entityPropertyPage">
@@ -997,5 +1004,12 @@
             The bookmark explorer font is used in the bookmark explorer to display all folders, bookmarks and saved searches.
          </description>
       </fontDefinition>
+   </extension>
+   <extension
+         point="org.eclipse.ui.browserSupport">
+      <support
+            class="org.rssowl.ui.internal.editors.browser.WebBrowserSupport"
+            default="true">
+      </support>
    </extension>
 </plugin>
