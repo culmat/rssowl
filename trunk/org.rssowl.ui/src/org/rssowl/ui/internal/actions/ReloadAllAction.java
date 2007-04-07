@@ -40,17 +40,17 @@ import java.util.Set;
 
 /**
  * Action to reload all BookMarks.
- * 
+ *
  * @author bpasero
  */
 public class ReloadAllAction extends Action implements IWorkbenchWindowActionDelegate {
   private Shell fShell;
 
   /**
-   * 
+   * Action to reload all BookMarks.
    */
   public ReloadAllAction() {
-    super("Reload All", RSSOwlUI.getImageDescriptor("icons/elcl16/reload_all.gif"));
+    super("Update All", RSSOwlUI.getImageDescriptor("icons/elcl16/reload_all.gif"));
   }
 
   /*
@@ -72,6 +72,9 @@ public class ReloadAllAction extends Action implements IWorkbenchWindowActionDel
     run();
   }
 
+  /*
+   * @see org.eclipse.jface.action.Action#run()
+   */
   @Override
   public void run() {
     JobRunner.runInBackgroundThread(new Runnable() {
