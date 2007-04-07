@@ -220,7 +220,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
 
       @Override
       public Image getImage(Object element) {
-        return RSSOwlUI.getImage(fResources, "icons/obj16/bkmrk_set.gif");
+        return RSSOwlUI.getImage(fResources, RSSOwlUI.BOOKMARK_SET);
       }
     });
 
