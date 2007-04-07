@@ -500,7 +500,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
           final BookMarkEvent event = events.iterator().next();
           JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
             public void run() {
-              fViewer.setExpandedState(event.getEntity().getFolder(), true);
+              expand(event.getEntity().getFolder());
             }
           });
         }
@@ -619,7 +619,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
             final SearchMarkEvent event = events.iterator().next();
             JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
               public void run() {
-                fViewer.setExpandedState(event.getEntity().getFolder(), true);
+                expand(event.getEntity().getFolder());
               }
             });
           }
@@ -794,5 +794,13 @@ public class BookMarkContentProvider implements ITreeContentProvider {
     }
 
     return false;
+  }
+
+  private void expand(IFolder folder) {
+    IFolder parent = folder.getParent();
+    if (parent != null)
+      expand(parent);
+
+    fViewer.setExpandedState(folder, true);
   }
 }
