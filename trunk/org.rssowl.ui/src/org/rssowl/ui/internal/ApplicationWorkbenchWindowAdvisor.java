@@ -319,30 +319,24 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       fTrayItem.setVisible(true);
     shell.setVisible(false);
     fMinimizedToTray = true;
-  }
-
-  /* Restore from System Tray */
-  void restoreFromTray(Shell shell) {
-    shell.setVisible(true);
-    shell.setActive();
-
-    /* Un-Minimize if minimized */
-    if (shell.getMinimized())
-      shell.setMinimized(false);
 
     /*
      * Bug in Eclipse (#180881): For some reason the workbench-layout is broken,
      * when restoring from the Tray after it has been moved to tray with
      * Shell-Close. Force a layout() to avoid this issue.
      */
-    else {
-      shell.setRedraw(false);
-      try {
-        shell.layout();
-      } finally {
-        shell.setRedraw(true);
-      }
-    }
+    shell.setLayoutDeferred(true);
+  }
+
+  /* Restore from System Tray */
+  void restoreFromTray(Shell shell) {
+    shell.setVisible(true);
+    shell.setLayoutDeferred(false);
+    shell.setActive();
+
+    /* Un-Minimize if minimized */
+    if (shell.getMinimized())
+      shell.setMinimized(false);
 
     if (Application.IS_WINDOWS)
       fTrayItem.setVisible(false);
