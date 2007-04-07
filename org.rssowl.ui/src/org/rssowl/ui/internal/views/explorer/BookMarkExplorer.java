@@ -639,7 +639,7 @@ public class BookMarkExplorer extends ViewPart {
                 changeSet(rootFolder);
             }
           };
-          selectBookMarkSet.setImageDescriptor(RSSOwlUI.getImageDescriptor("icons/obj16/bkmrk_set.gif")); //$NON-NLS-1$
+          selectBookMarkSet.setImageDescriptor(RSSOwlUI.BOOKMARK_SET); //$NON-NLS-1$
 
           if (fSelectedBookMarkSet.equals(rootFolder))
             selectBookMarkSet.setChecked(true);
