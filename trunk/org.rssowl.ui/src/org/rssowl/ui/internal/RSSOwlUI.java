@@ -95,6 +95,9 @@ public class RSSOwlUI {
   /** Folder with new News */
   public static final ImageDescriptor FOLDER_NEW = Activator.getImageDescriptor("icons/obj16/folder_new.gif"); //$NON-NLS-1$
 
+  /** Bookmark Set */
+  public static final ImageDescriptor BOOKMARK_SET = Activator.getImageDescriptor("icons/obj16/bkmrk_set.gif"); //$NON-NLS-1$
+
   /** BookMark */
   public static final ImageDescriptor BOOKMARK = Activator.getImageDescriptor("icons/obj16/bookmark.gif"); //$NON-NLS-1$
 
@@ -199,7 +202,15 @@ public class RSSOwlUI {
    */
   @SuppressWarnings("nls")
   public static ImageDescriptor getImageDescriptor(Object obj) {
-    if (obj instanceof IFolder || obj instanceof FolderReference)
+    if (obj instanceof IFolder) {
+      IFolder folder = (IFolder) obj;
+      if (folder.getParent() == null)
+        return BOOKMARK_SET;
+
+      return FOLDER;
+    }
+
+    if (obj instanceof FolderReference)
       return FOLDER;
 
     if (obj instanceof IBookMark || obj instanceof BookMarkReference)
