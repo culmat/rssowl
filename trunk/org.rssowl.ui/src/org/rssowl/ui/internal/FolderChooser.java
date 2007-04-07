@@ -27,6 +27,8 @@ package org.rssowl.ui.internal;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -203,6 +205,24 @@ public class FolderChooser {
       public void selectionChanged(SelectionChangedEvent event) {
         IStructuredSelection selection = (IStructuredSelection) event.getSelection();
         onFolderSelected((IFolder) selection.getFirstElement());
+      }
+    });
+
+    fFolderViewer.addDoubleClickListener(new IDoubleClickListener() {
+      public void doubleClick(DoubleClickEvent event) {
+        IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+        IFolder folder = (IFolder) selection.getFirstElement();
+
+        /* Expand / Collapse Folder */
+        if (!folder.getFolders().isEmpty()) {
+          boolean expandedState = !fFolderViewer.getExpandedState(folder);
+          fFolderViewer.setExpandedState(folder, expandedState);
+        }
+
+        /* Select Folder and toggle */
+        else {
+          onToggle();
+        }
       }
     });
 
