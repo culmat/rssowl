@@ -170,6 +170,15 @@ public class RSSOwlUI {
   /** Minimum width of Dialogs in Dialog Units */
   public static final int MIN_DIALOG_WIDTH_DLU = 320;
 
+  /** News-Text Font Key */
+  public static final String NEWS_TEXT_FONT_ID = "org.rssowl.ui.NewsTextFont";
+
+  /** Headlines Font Key */
+  public static final String HEADLINES_FONT_ID = "org.rssowl.ui.HeadlinesFont";
+
+  /** BookMark Explorer Font Key */
+  public static final String BKMRK_EXPLORER_FONT_ID = "org.rssowl.ui.BookmarkExplorerFont";
+
   /* Used to cache Image-Descriptors for Favicons */
   private static final Map<Long, ImageDescriptor> FAVICO_CACHE = new HashMap<Long, ImageDescriptor>();
 

@@ -112,7 +112,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     fGroupIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.GROUP);
 
     /* Fonts */
-    fBoldFont = RSSOwlUI.getThemeFont(NewsTableControl.HEADLINES_FONT_ID, SWT.BOLD);
+    fBoldFont = RSSOwlUI.getThemeFont(RSSOwlUI.HEADLINES_FONT_ID, SWT.BOLD);
   }
 
   @Override

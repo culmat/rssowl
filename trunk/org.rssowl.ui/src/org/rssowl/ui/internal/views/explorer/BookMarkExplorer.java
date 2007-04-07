@@ -160,9 +160,6 @@ public class BookMarkExplorer extends ViewPart {
   private static final String GROUP_ACTION = "org.rssowl.ui.internal.views.explorer.GroupAction";
   private static final String FILTER_ACTION = "org.rssowl.ui.internal.views.explorer.FilterAction";
 
-  /* ID of the Bookmark Explorer Font */
-  static final String BKMRK_EXPLORER_FONT_ID = "org.rssowl.ui.BookmarkExplorerFont";
-
   /* Settings */
   private IPreferencesScope fGlobalPreferences;
   private List<Long> fExpandedNodes;
@@ -254,7 +251,7 @@ public class BookMarkExplorer extends ViewPart {
     fViewer = new BookMarkViewer(this, parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
     fViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fViewer.getControl().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
-    fViewer.getControl().setFont(RSSOwlUI.getThemeFont(BKMRK_EXPLORER_FONT_ID, SWT.NORMAL));
+    fViewer.getControl().setFont(RSSOwlUI.getThemeFont(RSSOwlUI.BKMRK_EXPLORER_FONT_ID, SWT.NORMAL));
 
     /* Setup Drag & Drop Support */
     initDragAndDrop();
