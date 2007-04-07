@@ -57,9 +57,6 @@ import java.text.DateFormat;
  */
 public class NewsBrowserLabelProvider extends LabelProvider {
 
-  /* ID for the News-Text Font */
-  static final String NEWS_FONT_ID = "org.rssowl.ui.NewsTextFont";
-
   /* Date Formatter for News */
   private DateFormat fDateFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT);
 
@@ -91,7 +88,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       fPropertyChangeListener = new IPropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent event) {
           String property = event.getProperty();
-          if (NEWS_FONT_ID.equals(property))
+          if (RSSOwlUI.NEWS_TEXT_FONT_ID.equals(property))
             createFonts();
         }
       };
@@ -109,7 +106,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   /* Init the Theme Font (from UI Thread) */
   private void createFonts() {
     int fontHeight = 10;
-    Font newsFont = RSSOwlUI.getThemeFont(NEWS_FONT_ID, SWT.NORMAL);
+    Font newsFont = RSSOwlUI.getThemeFont(RSSOwlUI.NEWS_TEXT_FONT_ID, SWT.NORMAL);
     FontData[] fontData = newsFont.getFontData();
     if (fontData.length > 0) {
       fNewsFontFamily = fontData[0].getName();

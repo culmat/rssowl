@@ -111,9 +111,6 @@ public class NewsTableControl implements IFeedViewPart {
   /* TODO Developer's flag to enable / disable COD */
   static final boolean USE_CUSTOM_OWNER_DRAWN = true;
 
-  /* ID of the Headlines Font */
-  static final String HEADLINES_FONT_ID = "org.rssowl.ui.HeadlinesFont";
-
   /* Indices of Columns in the Tree-Viewer */
   static final int COL_TITLE = 0;
   static final int COL_PUBDATE = 1;
@@ -222,7 +219,7 @@ public class NewsTableControl implements IFeedViewPart {
     fViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fViewer.setUseHashlookup(true);
     fViewer.getControl().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
-    fViewer.getControl().setFont(RSSOwlUI.getThemeFont(HEADLINES_FONT_ID, SWT.NORMAL));
+    fViewer.getControl().setFont(RSSOwlUI.getThemeFont(RSSOwlUI.HEADLINES_FONT_ID, SWT.NORMAL));
 
     /* TODO This is a Workaround until we remember expanded Groups */
     fViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);

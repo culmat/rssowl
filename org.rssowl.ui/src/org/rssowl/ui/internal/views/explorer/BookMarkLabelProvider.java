@@ -88,8 +88,8 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     fSearchMarkIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.SEARCHMARK);
 
     /* Fonts */
-    fBoldFont = RSSOwlUI.getThemeFont(BookMarkExplorer.BKMRK_EXPLORER_FONT_ID, SWT.BOLD);
-    fDefaultFont = RSSOwlUI.getThemeFont(BookMarkExplorer.BKMRK_EXPLORER_FONT_ID, SWT.NORMAL);
+    fBoldFont = RSSOwlUI.getThemeFont(RSSOwlUI.BKMRK_EXPLORER_FONT_ID, SWT.BOLD);
+    fDefaultFont = RSSOwlUI.getThemeFont(RSSOwlUI.BKMRK_EXPLORER_FONT_ID, SWT.NORMAL);
 
     /* Colors */
     fStickyBgColor = RSSOwlUI.getColor(fResources, RSSOwlUI.STICKY_BG_COLOR);
