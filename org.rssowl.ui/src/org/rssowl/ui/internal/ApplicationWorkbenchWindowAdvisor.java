@@ -24,11 +24,15 @@
 
 package org.rssowl.ui.internal;
 
+import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
@@ -37,6 +41,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
@@ -272,8 +277,30 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     fTrayItem.addListener(SWT.MenuDetect, new Listener() {
       public void handleEvent(Event event) {
         MenuManager trayMenu = new MenuManager();
-        Menu menu = trayMenu.createContextMenu(shell);
+
+        /* Restore */
+        trayMenu.add(new ContributionItem() {
+          @Override
+          public void fill(Menu menu, int index) {
+            MenuItem restoreItem = new MenuItem(menu, SWT.PUSH);
+            restoreItem.setText("Restore");
+            restoreItem.addSelectionListener(new SelectionAdapter() {
+              @Override
+              public void widgetSelected(SelectionEvent e) {
+                restoreFromTray(shell);
+              }
+            });
+            menu.setDefaultItem(restoreItem);
+          }
+        });
+
+        /* Separator */
+        trayMenu.add(new Separator());
+
+        /* Other Items */
         fActionBarAdvisor.fillTrayItem(trayMenu);
+
+        Menu menu = trayMenu.createContextMenu(shell);
         menu.setVisible(true);
       }
     });
