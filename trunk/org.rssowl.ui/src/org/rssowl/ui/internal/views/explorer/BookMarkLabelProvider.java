@@ -63,12 +63,14 @@ public class BookMarkLabelProvider extends CellLabelProvider {
   private Image fBookMarkIcon;
   private Image fSearchMarkIcon;
   private Image fGroupIcon;
+  private Image fBookmarkSetIcon;
   private Color fStickyBgColor;
   private Color fGroupFgColor;
   private Font fBoldFont;
   private Font fDefaultFont;
 
-  BookMarkLabelProvider() {
+  /** */
+  public BookMarkLabelProvider() {
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fNewsService = Controller.getDefault().getNewsService();
     createResources();
@@ -77,6 +79,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
   private void createResources() {
 
     /* Images */
+    fBookmarkSetIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.BOOKMARK_SET);
     fGroupIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.GROUP);
     fFolderIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.FOLDER);
     fFolderNewIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.FOLDER_NEW);
@@ -106,7 +109,9 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       newNewsCount = getNewsCount(folder, false);
 
       /* Image */
-      if (newNewsCount == 0)
+      if (folder.getParent() == null)
+        cell.setImage(fBookmarkSetIcon);
+      else if (newNewsCount == 0)
         cell.setImage(fFolderIcon);
       else
         cell.setImage(fFolderNewIcon);
