@@ -55,6 +55,7 @@ import org.rssowl.core.model.dao.PersistenceLayer;
 import org.rssowl.core.model.reference.FolderReference;
 import org.rssowl.core.model.types.IFolder;
 import org.rssowl.core.model.types.IMark;
+import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.RSSOwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
@@ -76,11 +77,13 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
   private class NewFolderDialog extends TitleAreaDialog {
     private Text fNameInput;
     private ResourceManager fResources;
+    private String fName;
+    private IFolder fFolder;
+    private FolderChooser fFolderChooser;
 
-    String fName;
-
-    NewFolderDialog(Shell shell) {
+    NewFolderDialog(Shell shell, IFolder folder) {
       super(shell);
+      fFolder = folder;
       fResources = new LocalResourceManager(JFaceResources.getResources());
     }
 
@@ -125,8 +128,8 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
       container.setLayout(LayoutUtils.createGridLayout(2, 5, 5));
       container.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
-      Label l2 = new Label(container, SWT.NONE);
-      l2.setText("Name: ");
+      Label l1 = new Label(container, SWT.NONE);
+      l1.setText("Name: ");
 
       fNameInput = new Text(container, SWT.SINGLE | SWT.BORDER);
       fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -135,6 +138,15 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
           validateInput();
         }
       });
+
+      if (!fRootMode) {
+        Label l2 = new Label(container, SWT.NONE);
+        l2.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+        l2.setText("Location: ");
+
+        /* Folder Chooser */
+        fFolderChooser = new FolderChooser(container, fFolder);
+      }
 
       return container;
     }
@@ -151,6 +163,10 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
       boolean valid = fNameInput.getText().length() > 0;
       Control button = getButton(IDialogConstants.OK_ID);
       button.setEnabled(valid);
+    }
+
+    IFolder getFolder() {
+      return fRootMode ? null : fFolderChooser.getFolder();
     }
   }
 
@@ -197,12 +213,15 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
   }
 
   private void internalRun() throws PersistenceException {
-    NewFolderDialog dialog = new NewFolderDialog(fShell);
+
+    /* Get the parent Folder */
+    IFolder parent = fRootMode ? null : getParent();
+
+    /* Show Dialog */
+    NewFolderDialog dialog = new NewFolderDialog(fShell, parent);
     if (dialog.open() == Window.OK) {
       String name = dialog.fName;
-
-      /* Get the parent Folder */
-      IFolder parent = fRootMode ? null : getParent();
+      parent = dialog.getFolder();
 
       /* Create the Folder */
       if (fRootMode || parent != null) {

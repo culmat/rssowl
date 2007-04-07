@@ -66,6 +66,7 @@ import org.rssowl.core.model.types.IMark;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.RSSOwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
@@ -92,12 +93,14 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
     private Text fLinkInput;
     private Text fNameInput;
     private ResourceManager fResources;
+    private String fLink;
+    private String fName;
+    private IFolder fFolder;
+    private FolderChooser fFolderChooser;
 
-    String fLink;
-    String fName;
-
-    NewBookMarkDialog(Shell shell, String initialLinkValue) {
+    NewBookMarkDialog(Shell shell, IFolder folder, String initialLinkValue) {
       super(shell);
+      fFolder = folder;
       fInitialLinkValue = initialLinkValue;
       fResources = new LocalResourceManager(JFaceResources.getResources());
 
@@ -153,8 +156,8 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       container.setLayout(LayoutUtils.createGridLayout(2, 5, 5));
       container.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
-      Label l2 = new Label(container, SWT.NONE);
-      l2.setText("Name: ");
+      Label l1 = new Label(container, SWT.NONE);
+      l1.setText("Name: ");
 
       fNameInput = new Text(container, SWT.SINGLE | SWT.BORDER);
       fNameInput.setText(fInitialNameValue != null ? fInitialNameValue : "");
@@ -165,8 +168,8 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
         }
       });
 
-      Label l1 = new Label(container, SWT.NONE);
-      l1.setText("Link: ");
+      Label l2 = new Label(container, SWT.NONE);
+      l2.setText("Link: ");
 
       fLinkInput = new Text(container, SWT.SINGLE | SWT.BORDER);
       fLinkInput.setText(fInitialLinkValue != null ? fInitialLinkValue : "http://");
@@ -176,6 +179,13 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
           validateInput();
         }
       });
+
+      Label l3 = new Label(container, SWT.NONE);
+      l3.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+      l3.setText("Location: ");
+
+      /* Folder Chooser */
+      fFolderChooser = new FolderChooser(container, fFolder);
 
       return container;
     }
@@ -192,6 +202,10 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       boolean valid = fLinkInput.getText().length() > 0 && fNameInput.getText().length() > 0;
       Control button = getButton(IDialogConstants.OK_ID);
       button.setEnabled(valid);
+    }
+
+    IFolder getFolder() {
+      return fFolderChooser.getFolder();
     }
   }
 
@@ -262,44 +276,44 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       }
     }
 
-    NewBookMarkDialog dialog = new NewBookMarkDialog(fShell, initial);
+    /* Get the parent Folder */
+    IFolder parent = getParent();
+
+    /* Show Dialog */
+    NewBookMarkDialog dialog = new NewBookMarkDialog(fShell, parent, initial);
     if (dialog.open() == Window.OK) {
       String title = dialog.fName;
+      parent = dialog.getFolder();
 
       IApplicationLayer applicationLayer = fPersist.getApplicationLayer();
       URI uriObj = new URI(dialog.fLink.trim());
 
-      /* Get the parent Folder */
-      IFolder parent = getParent();
-
       /* Check if a Feed with the URL already exists */
-      if (parent != null) {
-        FeedReference feedRef = applicationLayer.loadFeedReference(uriObj);
+      FeedReference feedRef = applicationLayer.loadFeedReference(uriObj);
 
-        /* Create a new Feed then */
-        if (feedRef == null) {
-          IFeed feed = Interpreter.getDefault().getTypesFactory().createFeed(uriObj);
-          feed = fPersist.getModelDAO().saveFeed(feed);
-        }
+      /* Create a new Feed then */
+      if (feedRef == null) {
+        IFeed feed = Interpreter.getDefault().getTypesFactory().createFeed(uriObj);
+        feed = fPersist.getModelDAO().saveFeed(feed);
+      }
 
-        /* Create the BookMark */
-        FeedLinkReference feedLinkRef = new FeedLinkReference(uriObj);
-        IBookMark bookmark = Interpreter.getDefault().getTypesFactory().createBookMark(parent, feedLinkRef, title);
+      /* Create the BookMark */
+      FeedLinkReference feedLinkRef = new FeedLinkReference(uriObj);
+      IBookMark bookmark = Interpreter.getDefault().getTypesFactory().createBookMark(parent, feedLinkRef, title);
 
-        /* Copy all Properties from Parent into this Mark */
-        Map<String, ? > properties = parent.getProperties();
+      /* Copy all Properties from Parent into this Mark */
+      Map<String, ? > properties = parent.getProperties();
 
-        for (Map.Entry<String, ? > property : properties.entrySet())
-          bookmark.setProperty(property.getKey(), property.getValue());
+      for (Map.Entry<String, ? > property : properties.entrySet())
+        bookmark.setProperty(property.getKey(), property.getValue());
 
-        parent = fPersist.getModelDAO().saveFolder(parent);
+      parent = fPersist.getModelDAO().saveFolder(parent);
 
-        /* Auto-Reload added BookMark */
-        for (IMark mark : parent.getMarks()) {
-          if (mark.equals(bookmark)) {
-            new ReloadTypesAction(new StructuredSelection(mark), fShell).run();
-            break;
-          }
+      /* Auto-Reload added BookMark */
+      for (IMark mark : parent.getMarks()) {
+        if (mark.equals(bookmark)) {
+          new ReloadTypesAction(new StructuredSelection(mark), fShell).run();
+          break;
         }
       }
     }

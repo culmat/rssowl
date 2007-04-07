@@ -54,6 +54,7 @@ import org.rssowl.core.model.types.IModelTypesFactory;
 import org.rssowl.core.model.types.INews;
 import org.rssowl.core.model.types.ISearchMark;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.RSSOwlUI;
 import org.rssowl.ui.internal.search.SearchConditionList;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -84,6 +85,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
   private PersistenceLayer fPersist;
   private List<ISearchCondition> fInitialSearchConditions;
   private boolean fInitialMatchAllConditions;
+  private FolderChooser fFolderChooser;
 
   /**
    * @param shell
@@ -108,6 +110,10 @@ public class SearchMarkDialog extends TitleAreaDialog {
     fDialogSettings = Activator.getDefault().getDialogSettings();
     fFirstTimeOpen = (fDialogSettings.getSection(SETTINGS_SECTION) == null);
     fPersist = NewsModel.getDefault().getPersistenceLayer();
+
+    /* Use default Parent if required */
+    if (fParent == null)
+      fParent = getDefaultParent();
   }
 
   /*
@@ -122,9 +128,8 @@ public class SearchMarkDialog extends TitleAreaDialog {
       return;
     }
 
-    /* Retrieve Parent */
-    if (fParent == null)
-      fParent = getDefaultParent();
+    /* Get selected Folder */
+    fParent = fFolderChooser.getFolder();
 
     /* Create new Searchmark */
     ISearchMark searchMark = NewsModel.getDefault().getTypesFactory().createSearchMark(null, fParent, fNameInput.getText());
@@ -211,6 +216,13 @@ public class SearchMarkDialog extends TitleAreaDialog {
         validateInput();
       }
     });
+
+    Label folderLabel = new Label(container, SWT.NONE);
+    folderLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+    folderLabel.setText("Location: ");
+
+    /* Folder Chooser */
+    fFolderChooser = new FolderChooser(container, fParent);
 
     Composite radioContainer = new Composite(container, SWT.None);
     radioContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
