@@ -222,7 +222,10 @@ public class SearchMarkDialog extends TitleAreaDialog {
     folderLabel.setText("Location: ");
 
     /* Folder Chooser */
-    fFolderChooser = new FolderChooser(container, fParent);
+    fFolderChooser = new FolderChooser(container, fParent, SWT.BORDER);
+    fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
+    fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
     Composite radioContainer = new Composite(container, SWT.None);
     radioContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
