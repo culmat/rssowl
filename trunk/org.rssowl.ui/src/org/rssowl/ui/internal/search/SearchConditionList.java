@@ -35,8 +35,9 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.search.ISearchCondition;
 import org.rssowl.core.model.search.ISearchField;
@@ -285,7 +286,7 @@ public class SearchConditionList extends ScrolledComposite {
     getVerticalBar().setIncrement(10);
 
     /* Create the Container */
-    fContainer = new Composite(this, SWT.None);
+    fContainer = new Composite(this, SWT.NONE);
     fContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
     fContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     setContent(fContainer);
@@ -306,16 +307,18 @@ public class SearchConditionList extends ScrolledComposite {
   private void addStateConditionControl(EnumSet<State> selectedStates) {
 
     /* Add the State Condition Control */
-    Composite stateControlContainer = new Composite(fContainer, SWT.None);
-    stateControlContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0));
+    Composite stateControlContainer = new Composite(fContainer, SWT.NONE);
+    stateControlContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
     stateControlContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
-    fStateConditionControl = new StateConditionControl(stateControlContainer, SWT.None, selectedStates);
+    fStateConditionControl = new StateConditionControl(stateControlContainer, SWT.NONE, selectedStates);
+
+    ToolBar buttonBar = new ToolBar(stateControlContainer, SWT.FLAT);
+    buttonBar.setLayoutData(new GridData(SWT.END, SWT.CENTER, true, false));
 
     /* Button to add Condition */
-    Button addButton = new Button(stateControlContainer, SWT.PUSH);
+    ToolItem addButton = new ToolItem(buttonBar, SWT.PUSH);
     addButton.setImage(fAddIcon);
-    addButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, true, false));
     addButton.setToolTipText("Add Condition");
     addButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -325,9 +328,8 @@ public class SearchConditionList extends ScrolledComposite {
     });
 
     /* Button to reset State Control */
-    Button deleteButton = new Button(stateControlContainer, SWT.PUSH);
+    ToolItem deleteButton = new ToolItem(buttonBar, SWT.PUSH);
     deleteButton.setImage(fDeleteIcon);
-    deleteButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
     deleteButton.setToolTipText("Reset Condition");
     deleteButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -362,11 +364,11 @@ public class SearchConditionList extends ScrolledComposite {
     item.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Create Button Box */
-    final Composite buttonBox = new Composite(itemContainer, SWT.NONE);
-    buttonBox.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    ToolBar buttonBar = new ToolBar(itemContainer, SWT.FLAT);
+    buttonBar.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 
     /* Button to add Condition */
-    Button addButton = new Button(buttonBox, SWT.PUSH);
+    ToolItem addButton = new ToolItem(buttonBar, SWT.PUSH);
     addButton.setImage(fAddIcon);
     addButton.setToolTipText("Add Condition");
     addButton.addSelectionListener(new SelectionAdapter() {
@@ -377,7 +379,7 @@ public class SearchConditionList extends ScrolledComposite {
     });
 
     /* Button to delete Condition */
-    Button deleteButton = new Button(buttonBox, SWT.PUSH);
+    ToolItem deleteButton = new ToolItem(buttonBar, SWT.PUSH);
     deleteButton.setImage(fDeleteIcon);
     deleteButton.setToolTipText("Delete Condition");
     deleteButton.addSelectionListener(new SelectionAdapter() {
