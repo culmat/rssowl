@@ -21,11 +21,12 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model;
+package org.rssowl.core.model.internal.persist;
 
 import org.eclipse.core.runtime.Assert;
+import org.rssowl.core.model.persist.IPersistable;
 
-public final class NewsCounterItem {
+public final class NewsCounterItem extends Persistable implements IPersistable  {
   private int newCounter;
   private int unreadCounter;
   private int stickyCounter;

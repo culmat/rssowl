@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.dao;
 
-import org.rssowl.core.model.NewsCounter;
+import org.rssowl.core.model.internal.persist.NewsCounter;
 import org.rssowl.core.model.persist.IAttachment;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.ICategory;
