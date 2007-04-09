@@ -30,7 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.model.NewsModel;
-import org.rssowl.core.model.RetentionStrategy;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IBookMark;
@@ -45,6 +44,7 @@ import org.rssowl.core.model.reference.BookMarkReference;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FolderReference;
 import org.rssowl.core.util.DateUtils;
+import org.rssowl.core.util.RetentionStrategy;
 
 import java.net.URI;
 import java.util.Date;

@@ -34,7 +34,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.model.NewsModel;
-import org.rssowl.core.model.ReparentInfo;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
@@ -64,6 +63,7 @@ import org.rssowl.core.model.reference.FeedReference;
 import org.rssowl.core.model.reference.FolderReference;
 import org.rssowl.core.model.reference.NewsReference;
 import org.rssowl.core.tests.TestUtils;
+import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.NewsService;
 
