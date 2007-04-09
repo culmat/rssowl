@@ -44,6 +44,17 @@ import org.rssowl.core.model.events.NewsEvent;
 import org.rssowl.core.model.events.NewsListener;
 import org.rssowl.core.model.internal.search.SearchValueType;
 import org.rssowl.core.model.internal.types.Feed;
+import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.ICategory;
+import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.ILabel;
+import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.IPersistable;
+import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.INews.State;
 import org.rssowl.core.model.reference.AttachmentReference;
 import org.rssowl.core.model.reference.BookMarkReference;
 import org.rssowl.core.model.reference.CategoryReference;
@@ -56,17 +67,6 @@ import org.rssowl.core.model.reference.SearchMarkReference;
 import org.rssowl.core.model.search.ISearchField;
 import org.rssowl.core.model.search.ISearchValueType;
 import org.rssowl.core.model.search.SearchSpecifier;
-import org.rssowl.core.model.types.IBookMark;
-import org.rssowl.core.model.types.ICategory;
-import org.rssowl.core.model.types.IEntity;
-import org.rssowl.core.model.types.IExtendableType;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.IFolder;
-import org.rssowl.core.model.types.ILabel;
-import org.rssowl.core.model.types.IModelTypesFactory;
-import org.rssowl.core.model.types.INews;
-import org.rssowl.core.model.types.ISearchMark;
-import org.rssowl.core.model.types.INews.State;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -787,14 +787,14 @@ public class ModelTest1 {
   public void testEquals() throws Exception {
 
     /* IExtendableType */
-    IExtendableType type1 = fFactory.createLabel(null, "name");
-    IExtendableType type2 = fFactory.createLabel(null, "name");
+    IPersistable type1 = fFactory.createLabel(null, "name");
+    IPersistable type2 = fFactory.createLabel(null, "name");
 
-    IExtendableType type3 = fFactory.createLabel(Long.valueOf(1), "name");
-    IExtendableType type4 = fFactory.createLabel(Long.valueOf(1), "name");
+    IPersistable type3 = fFactory.createLabel(Long.valueOf(1), "name");
+    IPersistable type4 = fFactory.createLabel(Long.valueOf(1), "name");
 
-    IExtendableType type5 = fFactory.createLabel(Long.valueOf(1), "name");
-    IExtendableType type6 = fFactory.createLabel(Long.valueOf(2), "name");
+    IPersistable type5 = fFactory.createLabel(Long.valueOf(1), "name");
+    IPersistable type6 = fFactory.createLabel(Long.valueOf(2), "name");
 
     assertFalse(type1.equals(type2));
     assertTrue(type3.equals(type4));
@@ -835,14 +835,14 @@ public class ModelTest1 {
   public void testHashCode() throws Exception {
 
     /* ExtendableType */
-    IExtendableType type1 = fFactory.createLabel(null, "name");
-    IExtendableType type2 = fFactory.createLabel(null, "name");
+    IPersistable type1 = fFactory.createLabel(null, "name");
+    IPersistable type2 = fFactory.createLabel(null, "name");
 
-    IExtendableType type3 = fFactory.createLabel(Long.valueOf(1), "name");
-    IExtendableType type4 = fFactory.createLabel(Long.valueOf(1), "name");
+    IPersistable type3 = fFactory.createLabel(Long.valueOf(1), "name");
+    IPersistable type4 = fFactory.createLabel(Long.valueOf(1), "name");
 
-    IExtendableType type5 = fFactory.createLabel(Long.valueOf(1), "name");
-    IExtendableType type6 = fFactory.createLabel(Long.valueOf(2), "name");
+    IPersistable type5 = fFactory.createLabel(Long.valueOf(1), "name");
+    IPersistable type6 = fFactory.createLabel(Long.valueOf(2), "name");
 
     assertFalse(type1.hashCode() == type2.hashCode());
     assertTrue(type3.hashCode() == type4.hashCode());

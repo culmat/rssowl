@@ -27,11 +27,11 @@ package org.rssowl.core.model.internal.preferences;
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IModelDAO;
+import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.preferences.IPreferencesScope;
-import org.rssowl.core.model.types.IBookMark;
-import org.rssowl.core.model.types.IEntity;
-import org.rssowl.core.model.types.IFolder;
-import org.rssowl.core.model.types.ISearchMark;
 
 import java.util.Arrays;
 

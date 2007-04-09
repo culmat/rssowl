@@ -25,7 +25,7 @@
 package org.rssowl.core.interpreter;
 
 import org.jdom.Element;
-import org.rssowl.core.model.types.IExtendableType;
+import org.rssowl.core.model.persist.IPersistable;
 
 /**
  * The Element Handler allows to contribute processing of Elements for a Format.
@@ -48,5 +48,5 @@ public interface IElementHandler {
    * @param element The Element to process.
    * @param type The Interpreter Type the given Element belongs to.
    */
-  void processElement(Element element, IExtendableType type);
+  void processElement(Element element, IPersistable type);
 }
