@@ -24,7 +24,6 @@
 
 package org.rssowl.core.model.dao;
 
-import org.rssowl.core.model.internal.persist.NewsCounter;
 import org.rssowl.core.model.persist.IAttachment;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.ICategory;
@@ -35,6 +34,7 @@ import org.rssowl.core.model.persist.ILabel;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.NewsCounter;
 import org.rssowl.core.model.persist.search.ISearchCondition;
 import org.rssowl.core.model.reference.AttachmentReference;
 import org.rssowl.core.model.reference.BookMarkReference;

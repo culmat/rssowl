@@ -21,56 +21,39 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.persist;
+package org.rssowl.core.model.persist;
 
-import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.persist.IPersistable;
+import org.rssowl.core.model.internal.persist.Persistable;
 
-public final class NewsCounterItem extends Persistable implements IPersistable  {
-  private int newCounter;
-  private int unreadCounter;
-  private int stickyCounter;
+import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
+
+public class NewsCounter extends Persistable implements IPersistable    {
+
+  private Map<String, NewsCounterItem> countersMap;
   
-  public NewsCounterItem() {
+  public NewsCounter() {
+  }
+  
+  public synchronized void put(URI feedLink, NewsCounterItem item) {
+    if (countersMap == null)
+      countersMap = new HashMap<String, NewsCounterItem>();
     
+    countersMap.put(feedLink.toString(), item);
   }
   
-  public final int getNewCounter() {
-    return newCounter;
+  public synchronized NewsCounterItem get(URI feedLink) {
+    if (countersMap == null)
+      return null;
+    
+    return countersMap.get(feedLink.toString());
   }
-  
-  public final void incrementNewCounter() {
-    ++newCounter;
-  }
-  
-  public final void decrementNewCounter() {
-    Assert.isTrue(newCounter > 0, "newCounter must not be negative"); //$NON-NLS-1$
-    --newCounter;
-  }
-  
-  public final int getUnreadCounter() {
-    return unreadCounter;
-  }
-  
-  public final void incrementUnreadCounter() {
-    ++unreadCounter;
-  }
-  
-  public final void decrementUnreadCounter() {
-    Assert.isTrue(unreadCounter > 0, "unreadCounter must not be negative"); //$NON-NLS-1$
-    --unreadCounter;
-  }
-  
-  public final int getStickyCounter() {
-    return stickyCounter;
-  }
-  
-  public final void incrementStickyCounter() {
-    ++stickyCounter;
-  }
-  
-  public final void decrementStickyCounter() {
-    Assert.isTrue(stickyCounter > 0, "stickyCounter must not be negative"); //$NON-NLS-1$
-    --stickyCounter;
+
+  public synchronized NewsCounterItem remove(URI feedLink) {
+    if (countersMap == null)
+      return null;
+    
+    return countersMap.remove(feedLink.toString());
   }
 }
