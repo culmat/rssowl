@@ -25,14 +25,14 @@
 package org.rssowl.ui.internal;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.NewsCounter;
-import org.rssowl.core.model.NewsCounterItem;
 import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.events.FeedAdapter;
 import org.rssowl.core.model.events.FeedEvent;
 import org.rssowl.core.model.events.NewsAdapter;
 import org.rssowl.core.model.events.NewsEvent;
+import org.rssowl.core.model.internal.persist.NewsCounter;
+import org.rssowl.core.model.internal.persist.NewsCounterItem;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.reference.FeedLinkReference;

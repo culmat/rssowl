@@ -21,9 +21,8 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model;
+package org.rssowl.core.model.internal.persist;
 
-import org.rssowl.core.model.internal.persist.Persistable;
 import org.rssowl.core.model.persist.IPersistable;
 
 import java.net.URI;

@@ -24,7 +24,6 @@
 package org.rssowl.core.model.internal.db4o;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.NewsCounter;
 import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
@@ -40,6 +39,7 @@ import org.rssowl.core.model.events.PersonEvent;
 import org.rssowl.core.model.events.SearchConditionEvent;
 import org.rssowl.core.model.events.SearchMarkEvent;
 import org.rssowl.core.model.internal.persist.ConditionalGet;
+import org.rssowl.core.model.internal.persist.NewsCounter;
 import org.rssowl.core.model.persist.IAttachment;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.ICategory;
