@@ -26,7 +26,7 @@ package org.rssowl.core.interpreter;
 
 import org.jdom.Attribute;
 import org.jdom.Element;
-import org.rssowl.core.model.types.IExtendableType;
+import org.rssowl.core.model.persist.IPersistable;
 
 /**
  * The Namespace Handler allows to contribute processing of Namespaces. Use this
@@ -44,7 +44,7 @@ public interface INamespaceHandler {
    * @param element The Element to process.
    * @param type The Interpreter Type the given Element belongs to.
    */
-  void processElement(Element element, IExtendableType type);
+  void processElement(Element element, IPersistable type);
 
   /**
    * This Method is called whenever an Attribute has been reached that makes use
@@ -59,5 +59,5 @@ public interface INamespaceHandler {
    * @param attribute The Attribute to process.
    * @param type The Interpreter Type the given Element belongs to.
    */
-  void processAttribute(Attribute attribute, IExtendableType type);
+  void processAttribute(Attribute attribute, IPersistable type);
 }

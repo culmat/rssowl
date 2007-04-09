@@ -25,9 +25,10 @@
 package org.rssowl.core.util;
 
 import org.rssowl.core.model.internal.types.ComplexMergeResult;
-import org.rssowl.core.model.types.IExtendableType;
-import org.rssowl.core.model.types.MergeCapable;
-import org.rssowl.core.model.types.Reparentable;
+import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.IPersistable;
+import org.rssowl.core.model.persist.MergeCapable;
+import org.rssowl.core.model.persist.Reparentable;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -87,7 +88,7 @@ public class MergeUtils {
   }
 
   /**
-   * Convenience method that calls {@link #merge(List, List, Comparator, IExtendableType)} with a
+   * Convenience method that calls {@link #merge(List, List, Comparator, IPersistable)} with a
    * Comparator that uses equals().
    * 
    * @param <T>
@@ -97,7 +98,7 @@ public class MergeUtils {
    * @return ListMergeResult indicating the results of the merge operation.
    */
   public static final <T extends MergeCapable<T>> ComplexMergeResult<List<T>> merge(List<T> existingList, List<T> newList,
-      IExtendableType newParent) {
+      IPersistable newParent) {
 
     return merge(existingList, newList, new Comparator<T>() {
       public int compare(T o1, T o2) {
@@ -121,7 +122,7 @@ public class MergeUtils {
    * @param newParent 
    * @return ListMergeResult indicating the results of the merge operation.
    */
-  public static final <T extends MergeCapable<T>> ComplexMergeResult<List<T>> merge(List<T> existingList, List<T> newList, Comparator<T> comparator, IExtendableType newParent) {
+  public static final <T extends MergeCapable<T>> ComplexMergeResult<List<T>> merge(List<T> existingList, List<T> newList, Comparator<T> comparator, IPersistable newParent) {
     if ((existingList == null) && (newList == null || newList.isEmpty())) {
       return ComplexMergeResult.create(null);
     }
@@ -186,12 +187,12 @@ public class MergeUtils {
   }
   
   @SuppressWarnings("unchecked")
-  private static void reparent(Object object, IExtendableType newParent) {
+  private static void reparent(Object object, IPersistable newParent) {
     if (newParent == null)
       return;
     
     if (object instanceof Reparentable) {
-      ((Reparentable<IExtendableType>) object).setParent(newParent);
+      ((Reparentable<IPersistable>) object).setParent(newParent);
     }
     else {
       throw new IllegalArgumentException("if newParent is non-null, the elements " + //$NON-NLS-1$
@@ -207,7 +208,7 @@ public class MergeUtils {
    * @return ListMergeResult indicating the operations performed as part of
    * the merge.
    */
-  public static final ComplexMergeResult<?> mergeProperties(IExtendableType existingType, IExtendableType newType) {
+  public static final ComplexMergeResult<?> mergeProperties(IEntity existingType, IEntity newType) {
     ComplexMergeResult<Object> mergeResult = ComplexMergeResult.create(null);
     Map<String, ? > existingProperties = existingType.getProperties();
     Map<String, ? > newProperties = newType.getProperties();

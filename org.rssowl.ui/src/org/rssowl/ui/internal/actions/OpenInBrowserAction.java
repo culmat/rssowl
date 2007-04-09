@@ -34,7 +34,7 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
-import org.rssowl.core.model.types.INews;
+import org.rssowl.core.model.persist.INews;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 

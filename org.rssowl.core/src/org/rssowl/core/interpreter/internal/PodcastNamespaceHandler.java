@@ -29,12 +29,12 @@ import org.jdom.Element;
 import org.rssowl.core.interpreter.IInterpreterTypesFactory;
 import org.rssowl.core.interpreter.INamespaceHandler;
 import org.rssowl.core.interpreter.Interpreter;
-import org.rssowl.core.model.types.ICategory;
-import org.rssowl.core.model.types.IEntity;
-import org.rssowl.core.model.types.IExtendableType;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.INews;
-import org.rssowl.core.model.types.IPerson;
+import org.rssowl.core.model.persist.ICategory;
+import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.IPersistable;
+import org.rssowl.core.model.persist.IPerson;
 
 import java.util.Iterator;
 import java.util.List;
@@ -54,13 +54,13 @@ public class PodcastNamespaceHandler implements INamespaceHandler {
    * @see org.rssowl.core.interpreter.INamespaceHandler#processAttribute(org.jdom.Attribute,
    * org.rssowl.core.model.types.IExtendableType)
    */
-  public void processAttribute(Attribute attribute, IExtendableType type) {}
+  public void processAttribute(Attribute attribute, IPersistable type) {}
 
   /*
    * @see org.rssowl.core.interpreter.INamespaceHandler#processElement(org.jdom.Element,
    * org.rssowl.core.model.types.IExtendableType)
    */
-  public void processElement(Element element, IExtendableType type) {
+  public void processElement(Element element, IPersistable type) {
     IInterpreterTypesFactory factory = Interpreter.getDefault().getTypesFactory();
 
     /* Category */
@@ -90,7 +90,7 @@ public class PodcastNamespaceHandler implements INamespaceHandler {
     }
   }
 
-  private void processCategory(Element element, IExtendableType type) {
+  private void processCategory(Element element, IPersistable type) {
     IInterpreterTypesFactory factory = Interpreter.getDefault().getTypesFactory();
 
     ICategory category = factory.createCategory((IEntity) type);

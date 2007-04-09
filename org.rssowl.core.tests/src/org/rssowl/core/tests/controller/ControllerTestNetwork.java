@@ -33,12 +33,12 @@ import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.internal.types.Feed;
+import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.reference.BookMarkReference;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FeedReference;
-import org.rssowl.core.model.types.IBookMark;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.IFolder;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.NewsService;
 

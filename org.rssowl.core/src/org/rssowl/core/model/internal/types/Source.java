@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.internal.types;
 
-import org.rssowl.core.model.types.ISource;
+import org.rssowl.core.model.persist.ISource;
 import org.rssowl.core.util.MergeUtils;
 
 import java.net.URI;
@@ -35,7 +35,7 @@ import java.net.URI;
  * 
  * @author bpasero
  */
-public class Source extends ExtendableType implements ISource {
+public class Source extends Persistable implements ISource {
 
   /* Attributes */
   private String fLink;
@@ -96,9 +96,7 @@ public class Source extends ExtendableType implements ISource {
     Source s = (Source) source;
     
     return (fLink == null ? s.fLink == null : getLink().equals(s.getLink())) &&
-        (fName == null ? s.fName == null : fName.equals(s.fName)) && 
-        (getProperties() == null ? s.getProperties() == null : 
-          getProperties().equals(s.getProperties()));
+        (fName == null ? s.fName == null : fName.equals(s.fName));
   }
 
   @Override
@@ -122,8 +120,8 @@ public class Source extends ExtendableType implements ISource {
     updated |= !MergeUtils.equals(getLink(), objectToMerge.getLink());
     setLink(objectToMerge.getLink());
 
-    ComplexMergeResult<?> mergeResult = MergeUtils.mergeProperties(this, objectToMerge);
-    if (updated || mergeResult.isStructuralChange())
+    MergeResult mergeResult = new MergeResult();
+    if (updated)
       mergeResult.addUpdatedObject(this);
     
     return mergeResult;

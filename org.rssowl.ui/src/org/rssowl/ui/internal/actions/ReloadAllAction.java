@@ -31,7 +31,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.rssowl.core.model.types.IFolder;
+import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.RSSOwlUI;
 import org.rssowl.ui.internal.util.JobRunner;

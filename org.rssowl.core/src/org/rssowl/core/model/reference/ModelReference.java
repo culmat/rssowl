@@ -25,7 +25,7 @@
 package org.rssowl.core.model.reference;
 
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.types.IEntity;
+import org.rssowl.core.model.persist.IEntity;
 
 /**
  * A <code>ModelReference</code> is a potential lightweight representation of

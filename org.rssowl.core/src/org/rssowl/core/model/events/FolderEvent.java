@@ -25,7 +25,7 @@
 package org.rssowl.core.model.events;
 
 import org.rssowl.core.model.events.runnable.FolderEventRunnable;
-import org.rssowl.core.model.types.IFolder;
+import org.rssowl.core.model.persist.IFolder;
 
 /**
  * <p>

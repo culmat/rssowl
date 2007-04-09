@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.model.types;
+package org.rssowl.core.model.persist;
 
 import org.rssowl.core.model.internal.types.MergeResult;
 
@@ -771,7 +771,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    *  
    * @param news to delete.
    * @return <code>true</code> if feed contained the given news.
-   * @see INews#setState(org.rssowl.core.model.types.INews.State)
+   * @see INews#setState(org.rssowl.core.model.persist.INews.State)
    * @see INews.State#DELETED
    */
   boolean removeNews(INews news);

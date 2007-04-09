@@ -31,7 +31,6 @@ import org.rssowl.core.model.internal.preferences.Preference;
 import org.rssowl.core.model.internal.types.AbstractEntity;
 import org.rssowl.core.model.internal.types.BookMark;
 import org.rssowl.core.model.internal.types.ConditionalGet;
-import org.rssowl.core.model.internal.types.ExtendableType;
 import org.rssowl.core.model.internal.types.Feed;
 import org.rssowl.core.model.internal.types.Folder;
 import org.rssowl.core.model.internal.types.News;
@@ -193,7 +192,7 @@ public class DBManager {
     globalConfig.exceptionsOnNotStorable(true);
     globalConfig.objectClass(AbstractEntity.class).objectField("fId").indexed(true); //$NON-NLS-1$
     globalConfig.objectClass(AbstractEntity.class).objectField("fId").cascadeOnActivate(true); //$NON-NLS-1$
-    globalConfig.objectClass(ExtendableType.class).objectField("fProperties").cascadeOnUpdate(true); //$NON-NLS-1$
+    globalConfig.objectClass(AbstractEntity.class).objectField("fProperties").cascadeOnUpdate(true); //$NON-NLS-1$
     globalConfig.objectClass(BookMark.class).objectField("fFeedLink").indexed(true); //$NON-NLS-1$
     globalConfig.objectClass(ConditionalGet.class).objectField("fLink").indexed(true); //$NON-NLS-1$
     configureFeed();

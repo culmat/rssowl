@@ -38,8 +38,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowPulldownDelegate;
-import org.rssowl.core.model.types.IFolder;
-import org.rssowl.core.model.types.IMark;
+import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.IMark;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.RSSOwlUI;
 

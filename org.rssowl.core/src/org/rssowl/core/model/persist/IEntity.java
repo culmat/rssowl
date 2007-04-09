@@ -22,9 +22,11 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.model.types;
+package org.rssowl.core.model.persist;
 
 import org.rssowl.core.model.dao.IDGenerator;
+
+import java.util.Map;
 
 /**
  * Implementors of <code>IEntity</code> add a certain model-type to the
@@ -35,13 +37,57 @@ import org.rssowl.core.model.dao.IDGenerator;
  * @see IDGenerator
  * @author bpasero
  */
-public interface IEntity extends IExtendableType {
+public interface IEntity extends IPersistable {
 
   /**
    * Can be used in a
    * <code>ISearchField<code> to represent a search over all fields of the given Type.
    */
   public static final int ALL_FIELDS = -1;
+  
+  /**
+   * Set a Property identified by a unique Key to this Model. This Method can be
+   * used to extend the Model with values, for example in case the interpreted
+   * Feed makes use of non-Feed-standard Elements.
+   * <p>
+   * It is <em>not</em> recommended to store complex types as Properties, but
+   * Strings and other basic Types.
+   * </p>
+   * <p>
+   * Chose a key with <em>caution</em>. The key should be qualified like
+   * classes, for instance "org.yourproject.yourpackage.YourProperty" in order
+   * to avoid overriding another key that was set by a different person.
+   * </p>
+   * 
+   * @param key The unique identifier of the Property.
+   * @param value The value of the Property.
+   */
+  void setProperty(String key, Object value);
+
+  /**
+   * Get a Property from this Map or NULL if not existing for the given Key.
+   * 
+   * @param key The unique identifier of the Property.
+   * @return The value of the Property or NULL if no value is stored for the
+   * given key.
+   */
+  Object getProperty(String key);
+
+  /**
+   * Removes a Property from this Map.
+   * 
+   * @param key The unique identifier of the Property.
+   * @return The value of the Property or NULL if no value is stored for the
+   * given key.
+   */
+  Object removeProperty(String key);
+
+  /**
+   * Get the Map containing all Properties of this Type.
+   * 
+   * @return The Map containing all Properties of this Type.
+   */
+  Map<String, ? > getProperties();
 
   /**
    * Get the unique id for this object. Implementors have to make sure, that no

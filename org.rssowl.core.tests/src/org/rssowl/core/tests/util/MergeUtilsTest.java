@@ -31,9 +31,9 @@ import org.rssowl.core.model.internal.types.Category;
 import org.rssowl.core.model.internal.types.ComplexMergeResult;
 import org.rssowl.core.model.internal.types.Label;
 import org.rssowl.core.model.internal.types.Person;
-import org.rssowl.core.model.types.ICategory;
-import org.rssowl.core.model.types.ILabel;
-import org.rssowl.core.model.types.IPerson;
+import org.rssowl.core.model.persist.ICategory;
+import org.rssowl.core.model.persist.ILabel;
+import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.util.MergeUtils;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ import java.util.List;
 public class MergeUtilsTest {
 
   /**
-   * Tests {@link MergeUtils#merge(org.rssowl.core.model.types.MergeCapable, org.rssowl.core.model.types.MergeCapable)}.
+   * Tests {@link MergeUtils#merge(org.rssowl.core.model.persist.MergeCapable, org.rssowl.core.model.persist.MergeCapable)}.
    */
   @Test
   public void testSingleItemMergeWithNullDestination() {
@@ -56,7 +56,7 @@ public class MergeUtilsTest {
   }
   
   /**
-   * Tests {@link MergeUtils#merge(org.rssowl.core.model.types.MergeCapable, org.rssowl.core.model.types.MergeCapable)}.
+   * Tests {@link MergeUtils#merge(org.rssowl.core.model.persist.MergeCapable, org.rssowl.core.model.persist.MergeCapable)}.
    */
   @Test
   public void testSingleItemMergeWithNonNullDestinationAndNullOrigin() {
@@ -67,7 +67,7 @@ public class MergeUtilsTest {
   }
   
   /**
-   * Tests {@link MergeUtils#merge(List, List, org.rssowl.core.model.types.IExtendableType)}.
+   * Tests {@link MergeUtils#merge(List, List, org.rssowl.core.model.persist.IExtendableType)}.
    */
   @Test
   public void testCollectionMergeWithNullExistingListAndNullNewParent() {
@@ -77,7 +77,7 @@ public class MergeUtilsTest {
   }
   
   /**
-   * Tests {@link MergeUtils#mergeProperties(org.rssowl.core.model.types.IExtendableType, org.rssowl.core.model.types.IExtendableType)}.
+   * Tests {@link MergeUtils#mergeProperties(org.rssowl.core.model.persist.IExtendableType, org.rssowl.core.model.persist.IExtendableType)}.
    */
   @Test
   public void testMergeProperties() {

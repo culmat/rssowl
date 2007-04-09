@@ -26,7 +26,7 @@ package org.rssowl.ui.dialogs.properties;
 
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.rssowl.core.model.types.IEntity;
+import org.rssowl.core.model.persist.IEntity;
 
 import java.util.List;
 import java.util.Set;

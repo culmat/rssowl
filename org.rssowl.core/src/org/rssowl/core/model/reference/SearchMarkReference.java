@@ -26,7 +26,7 @@ package org.rssowl.core.model.reference;
 
 import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.types.ISearchMark;
+import org.rssowl.core.model.persist.ISearchMark;
 
 /**
  * Implementation of the <code>ModelReference</code> for the Type

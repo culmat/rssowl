@@ -25,7 +25,7 @@
 package org.rssowl.core.model.reference;
 
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.types.IMark;
+import org.rssowl.core.model.persist.IMark;
 
 /**
  * Implementation of the <code>ModelReference</code> for the Type

@@ -17,8 +17,8 @@ import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.NewsEvent;
 import org.rssowl.core.model.events.NewsListener;
-import org.rssowl.core.model.types.IEntity;
-import org.rssowl.core.model.types.INews;
+import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.util.JobQueue;
 
 import java.io.IOException;

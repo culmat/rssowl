@@ -24,7 +24,7 @@
 
 package org.rssowl.core.util;
 
-import org.rssowl.core.model.types.INews;
+import org.rssowl.core.model.persist.INews;
 
 import java.text.DateFormat;
 import java.text.ParseException;

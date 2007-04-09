@@ -73,6 +73,22 @@ import org.rssowl.core.model.internal.types.News;
 import org.rssowl.core.model.internal.types.Person;
 import org.rssowl.core.model.internal.types.SearchMark;
 import org.rssowl.core.model.internal.types.Source;
+import org.rssowl.core.model.persist.IAttachment;
+import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.ICategory;
+import org.rssowl.core.model.persist.IConditionalGet;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.IImage;
+import org.rssowl.core.model.persist.ILabel;
+import org.rssowl.core.model.persist.IMark;
+import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.IPersistable;
+import org.rssowl.core.model.persist.IPerson;
+import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.ISource;
+import org.rssowl.core.model.persist.INews.State;
 import org.rssowl.core.model.reference.BookMarkReference;
 import org.rssowl.core.model.reference.CategoryReference;
 import org.rssowl.core.model.reference.FeedLinkReference;
@@ -86,22 +102,6 @@ import org.rssowl.core.model.reference.SearchMarkReference;
 import org.rssowl.core.model.search.ISearchCondition;
 import org.rssowl.core.model.search.ISearchField;
 import org.rssowl.core.model.search.SearchSpecifier;
-import org.rssowl.core.model.types.IAttachment;
-import org.rssowl.core.model.types.IBookMark;
-import org.rssowl.core.model.types.ICategory;
-import org.rssowl.core.model.types.IConditionalGet;
-import org.rssowl.core.model.types.IExtendableType;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.IFolder;
-import org.rssowl.core.model.types.IImage;
-import org.rssowl.core.model.types.ILabel;
-import org.rssowl.core.model.types.IMark;
-import org.rssowl.core.model.types.IModelTypesFactory;
-import org.rssowl.core.model.types.INews;
-import org.rssowl.core.model.types.IPerson;
-import org.rssowl.core.model.types.ISearchMark;
-import org.rssowl.core.model.types.ISource;
-import org.rssowl.core.model.types.INews.State;
 import org.rssowl.core.tests.TestUtils;
 
 import com.db4o.ObjectContainer;
@@ -754,7 +754,7 @@ public class DBManagerTest {
     }
   }
 
-  private IPerson createPersonJohn(IExtendableType type) {
+  private IPerson createPersonJohn(IPersistable type) {
     IPerson person = fTypesFactory.createPerson(null, type);
     person.setName("John");
     person.setEmail(createURI("john@hotmail.com"));
@@ -772,7 +772,7 @@ public class DBManagerTest {
     }
   }
 
-  private IPerson createPersonMary(IExtendableType type) {
+  private IPerson createPersonMary(IPersistable type) {
     IPerson person = fTypesFactory.createPerson(null, type);
     person.setName("Mary");
     person.setEmail(createURI("mary@hotmail.com"));
@@ -782,7 +782,7 @@ public class DBManagerTest {
   }
 
   @SuppressWarnings("unused")
-  private IPerson createPersonDan(IExtendableType type) {
+  private IPerson createPersonDan(IPersistable type) {
     IPerson person = fTypesFactory.createPerson(null, type);
     person.setName("Dan");
     person.setEmail(createURI("dan@yahoo.com"));

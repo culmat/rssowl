@@ -35,9 +35,9 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.dao.PersistenceLayer;
+import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.reference.FolderReference;
-import org.rssowl.core.model.types.IFolder;
-import org.rssowl.core.model.types.IMark;
 import org.rssowl.ui.internal.dialogs.SearchMarkDialog;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 

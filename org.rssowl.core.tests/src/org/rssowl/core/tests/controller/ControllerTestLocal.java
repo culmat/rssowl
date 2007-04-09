@@ -32,10 +32,10 @@ import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.internal.types.Feed;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.NewsReference;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.INews;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.NewsService;
 

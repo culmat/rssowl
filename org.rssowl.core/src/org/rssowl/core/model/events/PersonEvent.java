@@ -25,7 +25,7 @@
 package org.rssowl.core.model.events;
 
 import org.rssowl.core.model.events.runnable.PersonEventRunnable;
-import org.rssowl.core.model.types.IPerson;
+import org.rssowl.core.model.persist.IPerson;
 
 /**
  * <p>

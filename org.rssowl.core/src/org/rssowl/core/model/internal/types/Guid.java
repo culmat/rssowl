@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.internal.types;
 
-import org.rssowl.core.model.types.IGuid;
+import org.rssowl.core.model.persist.IGuid;
 import org.rssowl.core.util.MergeUtils;
 
 /**
@@ -33,7 +33,7 @@ import org.rssowl.core.util.MergeUtils;
  * 
  * @author bpasero
  */
-public class Guid extends ExtendableType implements IGuid {
+public class Guid extends Persistable implements IGuid {
 
   /* Attributes */
   private String fValue;
@@ -122,9 +122,9 @@ public class Guid extends ExtendableType implements IGuid {
     fIsPermaLink = objectToMerge.isPermaLink();
     updated |= !MergeUtils.equals(fValue, objectToMerge.getValue());
     fValue = objectToMerge.getValue();
-    ComplexMergeResult<?> mergeResult = MergeUtils.mergeProperties(this, objectToMerge);
-    if (updated || mergeResult.isStructuralChange())
-      mergeResult.addRemovedObject(this);
+    MergeResult mergeResult = new MergeResult();
+    if (updated)
+      mergeResult.addUpdatedObject(this);
     
     return mergeResult;
   }

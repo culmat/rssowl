@@ -30,10 +30,10 @@ import org.rssowl.core.model.events.ModelEvent;
 import org.rssowl.core.model.events.NewsEvent;
 import org.rssowl.core.model.events.runnable.EventRunnable;
 import org.rssowl.core.model.internal.types.Feed;
-import org.rssowl.core.model.types.IEntity;
-import org.rssowl.core.model.types.IExtendableType;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.INews;
+import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.IPersistable;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
@@ -81,7 +81,7 @@ public class DBHelper {
     db.ext().set(feed, 2);
   }
   
-  private static void saveEntity(ObjectContainer db, IExtendableType entity) {
+  private static void saveEntity(ObjectContainer db, IPersistable entity) {
     if (entity != null)
       db.set(entity);
   }

@@ -22,21 +22,17 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.model.types;
+package org.rssowl.core.model.persist;
 
-/**
- * Objects that are <code>Reparentable</code> provide a method to set the
- * parent.
- * 
- * @author bpasero
- * @param <T>
- */
-public interface Reparentable<T> {
+import org.rssowl.core.model.search.ISearchHit;
+
+import java.util.List;
+
+/** TODO Tmp API, see Bug #108 */
+public interface INewsGetter {
 
   /**
-   * Set the new parent to the Object.
-   * 
-   * @param newParent the new parent of the Object to set.
+   * @return Returns News
    */
-  public void setParent(T newParent);
+  List<ISearchHit<INews>> getNews();
 }

@@ -27,8 +27,8 @@ package org.rssowl.core.interpreter.internal;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.rssowl.core.interpreter.INamespaceHandler;
-import org.rssowl.core.model.types.IExtendableType;
-import org.rssowl.core.model.types.IFeed;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.IPersistable;
 import org.rssowl.core.util.DateUtils;
 
 /**
@@ -46,7 +46,7 @@ public class SyndicationNamespaceHandler implements INamespaceHandler {
    * @see org.rssowl.core.interpreter.INamespaceHandler#processElement(org.jdom.Element,
    * org.rssowl.core.interpreter.types.IExtendableType)
    */
-  public void processElement(Element element, IExtendableType type) {
+  public void processElement(Element element, IPersistable type) {
     String name = element.getName().toLowerCase();
 
     /* Update Period */
@@ -76,5 +76,5 @@ public class SyndicationNamespaceHandler implements INamespaceHandler {
    * @see org.rssowl.core.interpreter.INamespaceHandler#processAttribute(org.jdom.Attribute,
    * org.rssowl.core.interpreter.types.IExtendableType)
    */
-  public void processAttribute(Attribute attribute, IExtendableType type) {}
+  public void processAttribute(Attribute attribute, IPersistable type) {}
 }

@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events;
 
-import org.rssowl.core.model.types.IEntity;
+import org.rssowl.core.model.persist.IEntity;
 
 /**
  * The listener interface for receiving entity loaded events. This is

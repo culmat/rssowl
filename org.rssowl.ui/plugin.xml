@@ -715,12 +715,12 @@
                tooltip="Mark selected Items as Read"/>
          <visibility>
             <or>
-               <objectClass name="org.rssowl.core.model.types.IMark"/>
+               <objectClass name="org.rssowl.core.model.persist.IMark"/>
                <objectClass
-                     name="org.rssowl.core.model.types.IFolder">
+                     name="org.rssowl.core.model.persist.IFolder">
                </objectClass>
                <objectClass
-                     name="org.rssowl.core.model.types.INews">
+                     name="org.rssowl.core.model.persist.INews">
                </objectClass>
                <objectState
                      name="entity.group.category"
@@ -748,12 +748,12 @@
          </action>
          <visibility>
             <or>
-               <objectClass name="org.rssowl.core.model.types.IMark"/>
+               <objectClass name="org.rssowl.core.model.persist.IMark"/>
                <objectClass
-                     name="org.rssowl.core.model.types.IFolder">
+                     name="org.rssowl.core.model.persist.IFolder">
                </objectClass>
                <objectClass
-                     name="org.rssowl.core.model.types.INews">
+                     name="org.rssowl.core.model.persist.INews">
                </objectClass>
                <objectState
                      name="entity.group.category"
@@ -780,12 +780,12 @@
          </action>
          <visibility>
             <or>
-               <objectClass name="org.rssowl.core.model.types.IBookMark"/>
+               <objectClass name="org.rssowl.core.model.persist.IBookMark"/>
                <objectClass
-                     name="org.rssowl.core.model.types.IFolder">
+                     name="org.rssowl.core.model.persist.IFolder">
                </objectClass>
                <objectClass
-                     name="org.rssowl.core.model.types.INews">
+                     name="org.rssowl.core.model.persist.INews">
                </objectClass>
                <objectState
                      name="entity.group.category"
@@ -813,10 +813,10 @@
          <visibility>
             <or>
                <objectClass
-                     name="org.rssowl.core.model.types.IBookMark">
+                     name="org.rssowl.core.model.persist.IBookMark">
                </objectClass>
                <objectClass
-                     name="org.rssowl.core.model.types.INews">
+                     name="org.rssowl.core.model.persist.INews">
                </objectClass>
             </or>
          </visibility>
@@ -836,10 +836,10 @@
          <visibility>
             <or>
                <objectClass
-                     name="org.rssowl.core.model.types.IBookMark">
+                     name="org.rssowl.core.model.persist.IBookMark">
                </objectClass>
                <objectClass
-                     name="org.rssowl.core.model.types.INews">
+                     name="org.rssowl.core.model.persist.INews">
                </objectClass>
             </or>
          </visibility>
@@ -847,7 +847,7 @@
       <objectContribution
             adaptable="false"
             id="org.rssowl.ui.OpenInBrowserContribution"
-            objectClass="org.rssowl.core.model.types.INews">
+            objectClass="org.rssowl.core.model.persist.INews">
          <action
                class="org.rssowl.ui.internal.actions.OpenInBrowserAction"
                definitionId="org.rssowl.ui.OpenInBrowserAction"
@@ -860,7 +860,7 @@
       <objectContribution
             adaptable="false"
             id="org.rssowl.ui.MarkUnreadContribution"
-            objectClass="org.rssowl.core.model.types.INews">
+            objectClass="org.rssowl.core.model.persist.INews">
          <action
                class="org.rssowl.ui.internal.actions.MarkUnreadAction"
                definitionId="org.rssowl.ui.actions.MarkUnread"
@@ -877,9 +877,9 @@
             objectClass="java.lang.Object">
          <visibility>
             <or>
-               <objectClass name="org.rssowl.core.model.types.IMark"/>
+               <objectClass name="org.rssowl.core.model.persist.IMark"/>
                <objectClass
-                     name="org.rssowl.core.model.types.IFolder">
+                     name="org.rssowl.core.model.persist.IFolder">
                </objectClass>
                <objectState
                      name="entity.group.category"
@@ -923,10 +923,10 @@
             name="General"
             order="0">
          <entityTarget
-               class="org.rssowl.core.model.types.IFolder">
+               class="org.rssowl.core.model.persist.IFolder">
          </entityTarget>
          <entityTarget
-               class="org.rssowl.core.model.types.IBookMark">
+               class="org.rssowl.core.model.persist.IBookMark">
          </entityTarget>
       </entityPropertyPage>
       <entityPropertyPage
@@ -936,10 +936,10 @@
             name="Clean Up"
             order="2">
          <entityTarget
-               class="org.rssowl.core.model.types.IFolder">
+               class="org.rssowl.core.model.persist.IFolder">
          </entityTarget>
          <entityTarget
-               class="org.rssowl.core.model.types.IBookMark">
+               class="org.rssowl.core.model.persist.IBookMark">
          </entityTarget>
       </entityPropertyPage>
       <entityPropertyPage
@@ -949,13 +949,13 @@
             name="Display"
             order="1">
          <entityTarget
-               class="org.rssowl.core.model.types.IFolder">
+               class="org.rssowl.core.model.persist.IFolder">
          </entityTarget>
          <entityTarget
-               class="org.rssowl.core.model.types.IBookMark">
+               class="org.rssowl.core.model.persist.IBookMark">
          </entityTarget>
          <entityTarget
-               class="org.rssowl.core.model.types.ISearchMark">
+               class="org.rssowl.core.model.persist.ISearchMark">
          </entityTarget>
       </entityPropertyPage>
       <entityPropertyPage
@@ -965,7 +965,7 @@
             name="General"
             order="0">
          <entityTarget
-               class="org.rssowl.core.model.types.ISearchMark">
+               class="org.rssowl.core.model.persist.ISearchMark">
          </entityTarget>
       </entityPropertyPage>
    </extension>

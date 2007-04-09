@@ -23,11 +23,14 @@
  **  **********************************************************************  */
 package org.rssowl.core.model;
 
+import org.rssowl.core.model.internal.types.Persistable;
+import org.rssowl.core.model.persist.IPersistable;
+
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NewsCounter {
+public class NewsCounter extends Persistable implements IPersistable    {
 
   private Map<String, NewsCounterItem> countersMap;
   

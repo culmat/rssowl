@@ -22,173 +22,141 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.model.types;
+package org.rssowl.core.model.persist;
 
-import java.net.URI;
+import org.rssowl.core.model.reference.FeedReference;
 
 /**
- * The super-type of all Image Elements in Feeds.
+ * The super-type of all Cloud Elements in Feeds.
  * 
  * @author bpasero
  */
-public interface IImage extends IExtendableType, MergeCapable<IImage> {
+public interface ICloud extends IPersistable {
 
   /** One of the fields in this type described as constant */
-  public static final int LINK = 0;
+  public static final int DOMAIN = 0;
 
   /** One of the fields in this type described as constant */
-  public static final int TITLE = 1;
+  public static final int PORT = 1;
 
   /** One of the fields in this type described as constant */
-  public static final int HOMEPAGE = 2;
+  public static final int PATH = 2;
 
   /** One of the fields in this type described as constant */
-  public static final int WIDTH = 3;
+  public static final int PROCEDURE = 3;
 
   /** One of the fields in this type described as constant */
-  public static final int HEIGHT = 4;
-
-  /** One of the fields in this type described as constant */
-  public static final int DESCRIPTION = 5;
+  public static final int PROTOCOL = 4;
 
   /**
-   * The Link of this Image that represents the Feed.
+   * The Domain of the WebService.
    * <p>
    * Used by:
    * <ul>
-   * <li>RSS 0.91</li>
-   * <li>RSS 0.92</li>
-   * <li>RDF 1.0</li>
-   * <li>RSS 2.0</li>
-   * <li>Atom</li>
-   * </ul>
-   * </p>
-   * 
-   * @param link The Link of this Image that represents the Feed to set.
-   */
-  void setLink(URI link);
-
-  /**
-   * The Title of the Image.
-   * <p>
-   * Used by:
-   * <ul>
-   * <li>RSS 0.91</li>
-   * <li>RSS 0.92</li>
-   * <li>RDF 1.0</li>
-   * <li>RSS 2.0</li>
-   * <li>Dublin Core Namespace</li>
-   * </ul>
-   * </p>
-   * 
-   * @param title The Title of the Image to set.
-   */
-  void setTitle(String title);
-
-  /**
-   * The Link to the Homepage of the Feed this Image is coming from.
-   * <p>
-   * Used by:
-   * <ul>
-   * <li>RSS 0.91</li>
-   * <li>RSS 0.92</li>
-   * <li>RDF 1.0</li>
-   * <li>RSS 2.0</li>
-   * </ul>
-   * </p>
-   * 
-   * @param homepage The Link to the Homepage of the Feed this Image is coming
-   * from to set.
-   */
-  void setHomepage(URI homepage);
-
-  /**
-   * The Width of the Image in pixels.
-   * <p>
-   * Used by:
-   * <ul>
-   * <li>RSS 0.91</li>
    * <li>RSS 0.92</li>
    * <li>RSS 2.0</li>
    * </ul>
    * </p>
    * 
-   * @param width The Width of the Image in pixels to set.
+   * @param domain The Domain of the WebService to set.
    */
-  void setWidth(int width);
+  void setDomain(String domain);
 
   /**
-   * The Height of the Image in pixels.
+   * The Port of the WebService.
    * <p>
    * Used by:
    * <ul>
-   * <li>RSS 0.91</li>
    * <li>RSS 0.92</li>
    * <li>RSS 2.0</li>
    * </ul>
    * </p>
    * 
-   * @param height The Height of the Image in pixels to set.
+   * @param port The Port of the WebService to set.
    */
-  void setHeight(int height);
+  void setPort(int port);
 
   /**
-   * Description of the Image.
+   * The Path of the WebService.
    * <p>
    * Used by:
    * <ul>
-   * <li>RSS 0.91</li>
    * <li>RSS 0.92</li>
    * <li>RSS 2.0</li>
-   * <li>Dublin Core Namespace</li>
    * </ul>
    * </p>
    * 
-   * @param description The Description of the Image to set.
+   * @param path The Path of the WebService to set.
    */
-  void setDescription(String description);
+  void setPath(String path);
 
   /**
-   * Description of the Image.
+   * The Procdeure Call.
+   * <p>
+   * Used by:
+   * <ul>
+   * <li>RSS 0.92</li>
+   * <li>RSS 2.0</li>
+   * </ul>
+   * </p>
    * 
-   * @return Returns the description of the Image.
+   * @param registerProcedure The Procdeure Call to set.
    */
-  String getDescription();
+  void setRegisterProcedure(String registerProcedure);
 
   /**
-   * The Height of the Image in pixels.
+   * The Protocol of the WebService.
+   * <p>
+   * Used by:
+   * <ul>
+   * <li>RSS 0.92</li>
+   * <li>RSS 2.0</li>
+   * </ul>
+   * </p>
    * 
-   * @return Returns the height of the Image in pixels.
+   * @param protocol The Protocol of the WebService to set.
    */
-  int getHeight();
+  void setProtocol(String protocol);
 
   /**
-   * The Link to the Homepage of the Feed this Image is coming from.
+   * The Domain of the WebService.
    * 
-   * @return Returns the Link to the Homepage of the Feed this Image is coming
-   * from.
+   * @return Returns the Domain of the WebService.
    */
-  URI getHomepage();
+  String getDomain();
 
   /**
-   * The Title of the Image.
+   * The Path of the WebService.
    * 
-   * @return Returns the Title of the Image.
+   * @return Returns the Path of the WebService.
    */
-  String getTitle();
+  String getPath();
 
   /**
-   * The Link of this Image that represents the Feed.
+   * The Port of the WebService.
    * 
-   * @return Returns the Link of this Image that represents the Feed.
+   * @return Returns the Port of the WebService.
    */
-  URI getLink();
+  int getPort();
 
   /**
-   * The Width of the Image in pixels.
+   * The Protocol of the WebService.
    * 
-   * @return Returns the width of the Image in pixels.
+   * @return Returns the Protocol of the WebService.
    */
-  int getWidth();
+  String getProtocol();
 
+  /**
+   * The Procdeure Call.
+   * 
+   * @return Returns the Procdeure Call.
+   */
+  String getRegisterProcedure();
+
+  /**
+   * The Feed this Cloud belongs to.
+   * 
+   * @return The Feed this Cloud belongs to.
+   */
+  FeedReference getFeed();
 }

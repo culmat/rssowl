@@ -56,7 +56,7 @@ import org.eclipse.swt.widgets.ToolItem;
 import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.events.FolderAdapter;
 import org.rssowl.core.model.events.FolderEvent;
-import org.rssowl.core.model.types.IFolder;
+import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.ui.internal.actions.NewFolderAction;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;

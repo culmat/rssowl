@@ -22,24 +22,28 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.model.types;
+package org.rssowl.core.model.persist;
 
+import java.net.URI;
 
 /**
- * The super-type of all Category Elements in Feeds.
+ * The super-type of all Attachment Elements in Feeds.
  * 
  * @author bpasero
  */
-public interface ICategory extends IEntity, MergeCapable<ICategory> {
+public interface IAttachment extends IEntity, MergeCapable<IAttachment>, Reparentable<INews> {
 
   /** One of the fields in this type described as constant */
-  public static final int NAME = 0;
+  public static final int LINK = 0;
 
   /** One of the fields in this type described as constant */
-  public static final int DOMAIN = 1;
+  public static final int TYPE = 1;
+
+  /** One of the fields in this type described as constant */
+  public static final int LENGTH = 2;
 
   /**
-   * The Name of the Category.
+   * A URI pointing to where the Attachment is located.
    * <p>
    * Used by:
    * <ul>
@@ -49,14 +53,12 @@ public interface ICategory extends IEntity, MergeCapable<ICategory> {
    * </ul>
    * </p>
    * 
-   * @param name The Name of the Category to set.
+   * @param link The URI pointing to where the enclosure is located to set.
    */
-  void setName(String name);
+  void setLink(URI link);
 
   /**
-   * A String that identifies a categorization taxonomy. The value of the
-   * element is a forward-slash-separated string that identifies a hierarchic
-   * location in the indicated taxonomy.
+   * The standard MIME Type of the Attachment.
    * <p>
    * Used by:
    * <ul>
@@ -66,23 +68,50 @@ public interface ICategory extends IEntity, MergeCapable<ICategory> {
    * </ul>
    * </p>
    * 
-   * @param domain The categorization taxonomy to set.
+   * @param type The standard MIME Type of the Attachment to set.
    */
-  void setDomain(String domain);
+  void setType(String type);
 
   /**
-   * A String that identifies a categorization taxonomy. The value of the
-   * element is a forward-slash-separated string that identifies a hierarchic
-   * location in the indicated taxonomy.
+   * The size of the Attachment in Bytes.
+   * <p>
+   * Used by:
+   * <ul>
+   * <li>RSS 0.92</li>
+   * <li>RSS 2.0</li>
+   * <li>Atom</li>
+   * </ul>
+   * </p>
    * 
-   * @return Returns the domain of this category.
+   * @param length The size of the Attachment in Bytes to set.
    */
-  String getDomain();
+  void setLength(int length);
 
   /**
-   * The Name of this Category.
+   * The size of the Attachment in Bytes.
    * 
-   * @return Returns the name of this category.
+   * @return Returns te size of the Attachment in Bytes.
    */
-  String getName();
+  int getLength();
+
+  /**
+   * The standard MIME Type of the Attachment.
+   * 
+   * @return Returns the standard MIME Type of the Attachment.
+   */
+  String getType();
+
+  /**
+   * A URI pointing to where the Attachment is located.
+   * 
+   * @return Returns a URI pointing to where the Attachment is located.
+   */
+  URI getLink();
+
+  /**
+   * The News this Attachment belongs to.
+   * 
+   * @return Returns the News this Attachment belongs to.
+   */
+  INews getNews();
 }

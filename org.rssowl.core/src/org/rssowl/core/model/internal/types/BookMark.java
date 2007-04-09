@@ -25,9 +25,9 @@
 package org.rssowl.core.model.internal.types;
 
 import org.eclipse.core.runtime.Assert;
+import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.reference.FeedLinkReference;
-import org.rssowl.core.model.types.IBookMark;
-import org.rssowl.core.model.types.IFolder;
 
 import java.net.URI;
 import java.net.URISyntaxException;

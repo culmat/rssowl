@@ -28,16 +28,16 @@ import org.jdom.Attribute;
 import org.jdom.Element;
 import org.rssowl.core.interpreter.INamespaceHandler;
 import org.rssowl.core.interpreter.Interpreter;
-import org.rssowl.core.model.types.ICategory;
-import org.rssowl.core.model.types.IEntity;
-import org.rssowl.core.model.types.IExtendableType;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.IGuid;
-import org.rssowl.core.model.types.IImage;
-import org.rssowl.core.model.types.INews;
-import org.rssowl.core.model.types.IPerson;
-import org.rssowl.core.model.types.ISource;
-import org.rssowl.core.model.types.ITextInput;
+import org.rssowl.core.model.persist.ICategory;
+import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.IGuid;
+import org.rssowl.core.model.persist.IImage;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.IPersistable;
+import org.rssowl.core.model.persist.IPerson;
+import org.rssowl.core.model.persist.ISource;
+import org.rssowl.core.model.persist.ITextInput;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.URIUtils;
 
@@ -56,7 +56,7 @@ public class DublinCoreNamespaceHandler implements INamespaceHandler {
    * @see org.rssowl.core.interpreter.INamespaceHandler#processElement(org.jdom.Element,
    * org.rssowl.core.interpreter.types.IExtendableType)
    */
-  public void processElement(Element element, IExtendableType type) {
+  public void processElement(Element element, IPersistable type) {
     String name = element.getName().toLowerCase();
 
     /* Title */
@@ -140,5 +140,5 @@ public class DublinCoreNamespaceHandler implements INamespaceHandler {
    * @see org.rssowl.core.interpreter.INamespaceHandler#processAttribute(org.jdom.Attribute,
    * org.rssowl.core.interpreter.types.IExtendableType)
    */
-  public void processAttribute(Attribute attribute, IExtendableType type) {}
+  public void processAttribute(Attribute attribute, IPersistable type) {}
 }

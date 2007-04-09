@@ -29,13 +29,13 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.INews.State;
 import org.rssowl.core.model.search.ISearchCondition;
 import org.rssowl.core.model.search.ISearchField;
 import org.rssowl.core.model.search.SearchSpecifier;
-import org.rssowl.core.model.types.IModelTypesFactory;
-import org.rssowl.core.model.types.INews;
-import org.rssowl.core.model.types.ISearchMark;
-import org.rssowl.core.model.types.INews.State;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;

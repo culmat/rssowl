@@ -26,9 +26,9 @@ package org.rssowl.ui.internal.editors.feed;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.rssowl.core.model.types.ICategory;
-import org.rssowl.core.model.types.INews;
-import org.rssowl.core.model.types.IPerson;
+import org.rssowl.core.model.persist.ICategory;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 

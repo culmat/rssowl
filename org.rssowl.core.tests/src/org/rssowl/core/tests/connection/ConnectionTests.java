@@ -43,9 +43,9 @@ import org.rssowl.core.interpreter.Interpreter;
 import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.internal.types.Feed;
+import org.rssowl.core.model.persist.IConditionalGet;
+import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.reference.FeedLinkReference;
-import org.rssowl.core.model.types.IConditionalGet;
-import org.rssowl.core.model.types.IFeed;
 import org.rssowl.core.util.Pair;
 
 import java.io.InputStream;

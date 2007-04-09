@@ -59,13 +59,13 @@ import org.rssowl.core.model.internal.preferences.DefaultScope;
 import org.rssowl.core.model.internal.preferences.EntityScope;
 import org.rssowl.core.model.internal.preferences.GlobalScope;
 import org.rssowl.core.model.internal.types.DefaultModelTypesFactory;
+import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IPersistable;
 import org.rssowl.core.model.preferences.IPreferencesInitializer;
 import org.rssowl.core.model.preferences.IPreferencesScope;
 import org.rssowl.core.model.preferences.PreferencesEvent;
 import org.rssowl.core.model.preferences.PreferencesListener;
-import org.rssowl.core.model.types.IEntity;
-import org.rssowl.core.model.types.IExtendableType;
-import org.rssowl.core.model.types.IModelTypesFactory;
 import org.rssowl.core.util.ExtensionUtils;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
@@ -325,7 +325,7 @@ public class NewsModel {
           eventTypeString = " Removed ("; //$NON-NLS-1$
           break;
       }
-      IExtendableType type = null;
+      IPersistable type = null;
       ModelEvent event = events.iterator().next();
       if (eventType != EventType.REMOVE)
         type = event.getEntity();

@@ -28,11 +28,11 @@ import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.rssowl.core.model.types.IBookMark;
-import org.rssowl.core.model.types.IFolder;
-import org.rssowl.core.model.types.IMark;
-import org.rssowl.core.model.types.INews;
-import org.rssowl.core.model.types.ISearchMark;
+import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.IMark;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.ISearchMark;
 
 /**
  * Add the <code>StatusLineUpdater</code> to your ViewPart to have the

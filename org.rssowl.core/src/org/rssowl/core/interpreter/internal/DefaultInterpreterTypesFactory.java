@@ -37,21 +37,21 @@ import org.rssowl.core.model.internal.types.News;
 import org.rssowl.core.model.internal.types.Person;
 import org.rssowl.core.model.internal.types.Source;
 import org.rssowl.core.model.internal.types.TextInputAdapter;
+import org.rssowl.core.model.persist.IAttachment;
+import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.ICategory;
+import org.rssowl.core.model.persist.ICloud;
+import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.IGuid;
+import org.rssowl.core.model.persist.IImage;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.IPersistable;
+import org.rssowl.core.model.persist.IPerson;
+import org.rssowl.core.model.persist.ISource;
+import org.rssowl.core.model.persist.ITextInput;
 import org.rssowl.core.model.reference.FeedLinkReference;
-import org.rssowl.core.model.types.IAttachment;
-import org.rssowl.core.model.types.IBookMark;
-import org.rssowl.core.model.types.ICategory;
-import org.rssowl.core.model.types.ICloud;
-import org.rssowl.core.model.types.IEntity;
-import org.rssowl.core.model.types.IExtendableType;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.IFolder;
-import org.rssowl.core.model.types.IGuid;
-import org.rssowl.core.model.types.IImage;
-import org.rssowl.core.model.types.INews;
-import org.rssowl.core.model.types.IPerson;
-import org.rssowl.core.model.types.ISource;
-import org.rssowl.core.model.types.ITextInput;
 
 import java.net.URI;
 
@@ -130,7 +130,7 @@ public class DefaultInterpreterTypesFactory implements IInterpreterTypesFactory 
   /*
    * @see org.rssowl.core.model.types.ITypesFactory#createPerson(org.rssowl.core.model.types.IExtendableType)
    */
-  public IPerson createPerson(final IExtendableType type) {
+  public IPerson createPerson(final IPersistable type) {
     return new Person(null);
   }
 

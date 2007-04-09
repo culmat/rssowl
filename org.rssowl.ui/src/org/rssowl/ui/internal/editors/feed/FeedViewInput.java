@@ -29,9 +29,9 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
-import org.rssowl.core.model.types.IBookMark;
-import org.rssowl.core.model.types.IMark;
-import org.rssowl.core.model.types.ISearchMark;
+import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.IMark;
+import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.ui.internal.RSSOwlUI;
 
 /**
