@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Podcast Plug-in
+Bundle-SymbolicName: org.rssowl.contrib.podcast; singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: org.rssowl.contrib.podcast.Activator
+Require-Bundle: org.rssowl.lib.httpclient,
+ org.rssowl.core,
+ org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.rssowl.ui
+Eclipse-LazyStart: true
