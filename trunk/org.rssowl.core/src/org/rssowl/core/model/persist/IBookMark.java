@@ -22,96 +22,53 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.model.types;
+package org.rssowl.core.model.persist;
 
-import java.net.URI;
+import org.rssowl.core.model.reference.FeedLinkReference;
 
 /**
- * The super-type of all Attachment Elements in Feeds.
+ * A usual bookmark as seen in Firefox or other Browsers. The Bookmark is used
+ * to define a position for a <code>Feed</code> inside the hierarchy of
+ * Folders. The user may define some properties, e.g. how often to reload the
+ * related Feed.
  * 
  * @author bpasero
  */
-public interface IAttachment extends IEntity, MergeCapable<IAttachment>, Reparentable<INews> {
+public interface IBookMark extends IMark {
 
   /** One of the fields in this type described as constant */
-  public static final int LINK = 0;
+  public static final int PROXY_USED = 6;
 
   /** One of the fields in this type described as constant */
-  public static final int TYPE = 1;
+  public static final int UPDATE_INTERVAL = 7;
 
   /** One of the fields in this type described as constant */
-  public static final int LENGTH = 2;
+  public static final int IS_ERROR_LOADING = 8;
+
+  /** One of the fields in this type described as constant */
+  public static final int LOAD_ON_STARTUP = 9;
 
   /**
-   * A URI pointing to where the Attachment is located.
-   * <p>
-   * Used by:
-   * <ul>
-   * <li>RSS 0.92</li>
-   * <li>RSS 2.0</li>
-   * <li>Atom</li>
-   * </ul>
-   * </p>
-   * 
-   * @param link The URI pointing to where the enclosure is located to set.
+   * @return TRUE in case the last time this BookMark's Feed was reloading
+   * returned an Error, FALSE otherwise.
    */
-  void setLink(URI link);
+  boolean isErrorLoading();
 
   /**
-   * The standard MIME Type of the Attachment.
-   * <p>
-   * Used by:
-   * <ul>
-   * <li>RSS 0.92</li>
-   * <li>RSS 2.0</li>
-   * <li>Atom</li>
-   * </ul>
-   * </p>
-   * 
-   * @param type The standard MIME Type of the Attachment to set.
+   * @param isErrorLoading TRUE in case the last time this BookMark's Feed was
+   * reloading returned an Error, FALSE otherwise.
    */
-  void setType(String type);
+  void setErrorLoading(boolean isErrorLoading);
 
   /**
-   * The size of the Attachment in Bytes.
-   * <p>
-   * Used by:
-   * <ul>
-   * <li>RSS 0.92</li>
-   * <li>RSS 2.0</li>
-   * <li>Atom</li>
-   * </ul>
-   * </p>
-   * 
-   * @param length The size of the Attachment in Bytes to set.
+   * @return a reference to the link of the feed that this mark is related to.
    */
-  void setLength(int length);
-
+  FeedLinkReference getFeedLinkReference();
+  
   /**
-   * The size of the Attachment in Bytes.
+   * Sets the reference to the link of the feed that this mark is related to.
    * 
-   * @return Returns te size of the Attachment in Bytes.
+   * @param feedLinkRef
    */
-  int getLength();
-
-  /**
-   * The standard MIME Type of the Attachment.
-   * 
-   * @return Returns the standard MIME Type of the Attachment.
-   */
-  String getType();
-
-  /**
-   * A URI pointing to where the Attachment is located.
-   * 
-   * @return Returns a URI pointing to where the Attachment is located.
-   */
-  URI getLink();
-
-  /**
-   * The News this Attachment belongs to.
-   * 
-   * @return Returns the News this Attachment belongs to.
-   */
-  INews getNews();
+  void setFeedLinkReference(FeedLinkReference feedLinkRef);
 }

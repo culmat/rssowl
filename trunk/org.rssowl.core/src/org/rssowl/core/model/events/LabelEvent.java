@@ -25,7 +25,7 @@
 package org.rssowl.core.model.events;
 
 import org.rssowl.core.model.events.runnable.LabelEventRunnable;
-import org.rssowl.core.model.types.ILabel;
+import org.rssowl.core.model.persist.ILabel;
 
 /**
  * <p>

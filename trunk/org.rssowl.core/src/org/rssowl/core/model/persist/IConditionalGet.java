@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.model.types;
+package org.rssowl.core.model.persist;
 
 import java.net.URI;
 
@@ -33,7 +33,7 @@ import java.net.URI;
  * 
  * @author bpasero
  */
-public interface IConditionalGet {
+public interface IConditionalGet extends IPersistable   {
 
   /**
    * @return the link that this object refers to.

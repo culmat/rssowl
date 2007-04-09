@@ -42,29 +42,29 @@ import org.rssowl.core.model.internal.types.BookMark;
 import org.rssowl.core.model.internal.types.Feed;
 import org.rssowl.core.model.internal.types.Folder;
 import org.rssowl.core.model.internal.types.News;
+import org.rssowl.core.model.persist.IAttachment;
+import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.ICategory;
+import org.rssowl.core.model.persist.ICloud;
+import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.IGuid;
+import org.rssowl.core.model.persist.IImage;
+import org.rssowl.core.model.persist.ILabel;
+import org.rssowl.core.model.persist.IMark;
+import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.IPersistable;
+import org.rssowl.core.model.persist.IPerson;
+import org.rssowl.core.model.persist.ISource;
+import org.rssowl.core.model.persist.ITextInput;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FeedReference;
 import org.rssowl.core.model.search.IModelSearch;
 import org.rssowl.core.model.search.ISearchCondition;
 import org.rssowl.core.model.search.ISearchField;
 import org.rssowl.core.model.search.SearchSpecifier;
-import org.rssowl.core.model.types.IAttachment;
-import org.rssowl.core.model.types.IBookMark;
-import org.rssowl.core.model.types.ICategory;
-import org.rssowl.core.model.types.ICloud;
-import org.rssowl.core.model.types.IEntity;
-import org.rssowl.core.model.types.IExtendableType;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.IFolder;
-import org.rssowl.core.model.types.IGuid;
-import org.rssowl.core.model.types.IImage;
-import org.rssowl.core.model.types.ILabel;
-import org.rssowl.core.model.types.IMark;
-import org.rssowl.core.model.types.IModelTypesFactory;
-import org.rssowl.core.model.types.INews;
-import org.rssowl.core.model.types.IPerson;
-import org.rssowl.core.model.types.ISource;
-import org.rssowl.core.model.types.ITextInput;
 import org.rssowl.core.tests.Activator;
 import org.rssowl.core.tests.TestUtils;
 import org.rssowl.core.util.ITask;
@@ -1134,17 +1134,18 @@ public class PerformanceTest {
     return feeds;
   }
 
-  private void accessAllFields(IExtendableType type) {
+  private void accessAllFields(IPersistable type) {
     if (type instanceof IEntity) {
-      ((IEntity) type).getId();
+      IEntity entity = (IEntity) type;
+      entity.getId();
+      Map<String, ? > properties = entity.getProperties();
+      if (properties != null) {
+        Set<String> keys = properties.keySet();
+        for (String string : keys)
+          properties.get(string);
+      }
     }
 
-    Map<String, ? > properties = type.getProperties();
-    if (properties != null) {
-      Set<String> keys = properties.keySet();
-      for (String string : keys)
-        properties.get(string);
-    }
 
     if (type instanceof IFeed) {
       IFeed feed = (IFeed) type;

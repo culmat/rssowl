@@ -31,9 +31,8 @@ import org.junit.Test;
 import org.rssowl.core.interpreter.Interpreter;
 import org.rssowl.core.interpreter.UnknownFormatException;
 import org.rssowl.core.model.internal.types.Feed;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.IImage;
-import org.rssowl.core.model.types.INews;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.util.DateUtils;
 import org.xml.sax.InputSource;
 
@@ -556,8 +555,6 @@ public class InterpreterTest {
     assertEquals("sub_channel_leveld", feed.getProperty("sub_channel_leveld"));
 
     assertNotNull(feed.getImage());
-    IImage img = feed.getImage();
-    assertEquals("sub_image_leveld", img.getProperty("sub_image_leveld"));
 
     assertEquals(1, feed.getNews().size());
     INews news = feed.getNews().get(0);
@@ -586,10 +583,6 @@ public class InterpreterTest {
     assertEquals("custom_categoryAttribute", feed.getCategories().get(0).getProperty("custom_categoryAttribute"));
 
     assertNotNull(feed.getImage());
-    IImage img = feed.getImage();
-    assertEquals("custom_imageAttribute", img.getProperty("custom_imageAttribute"));
-    assertEquals("sub_image_leveld", img.getProperty("sub_image_leveld"));
-    assertEquals("custom_imageTitleAttribute", img.getProperty("custom_imageTitleAttribute"));
 
     assertEquals(1, feed.getNews().size());
     INews news = feed.getNews().get(0);
@@ -598,13 +591,11 @@ public class InterpreterTest {
     assertEquals("custom_titleAttribute", news.getProperty("custom_titleAttribute"));
 
     assertNotNull(news.getSource());
-    assertEquals("custom_sourceAttribute", news.getSource().getProperty("custom_sourceAttribute"));
 
     assertNotNull(news.getAttachments());
     assertEquals("custom_enclosureAttribute", news.getAttachments().get(0).getProperty("custom_enclosureAttribute"));
 
     assertNotNull(news.getSource());
-    assertEquals("custom_sourceAttribute", news.getSource().getProperty("custom_sourceAttribute"));
   }
 
   /**
@@ -629,7 +620,6 @@ public class InterpreterTest {
     assertEquals("sub_entry_leveld", news.getProperty("sub_entry_leveld"));
 
     assertNotNull(news.getSource());
-    assertEquals("sub_source_leveld", news.getSource().getProperty("sub_source_leveld"));
 
     assertNotNull(news.getAuthor());
     assertEquals("sub_author_leveld", news.getAuthor().getProperty("sub_author_leveld"));
@@ -675,9 +665,6 @@ public class InterpreterTest {
     assertEquals("custom_enclosureAttribute", news.getAttachments().get(0).getProperty("custom_enclosureAttribute"));
 
     assertNotNull(news.getSource());
-    assertEquals("sub_source_leveld", news.getSource().getProperty("sub_source_leveld"));
-    assertEquals("custom_sourceAttribute", news.getSource().getProperty("custom_sourceAttribute"));
-    assertEquals("custom_rightsTitleAttribute", news.getSource().getProperty("custom_rightsTitleAttribute"));
 
     assertNotNull(news.getAuthor());
     assertEquals("sub_author_leveld", news.getAuthor().getProperty("sub_author_leveld"));
@@ -787,7 +774,6 @@ public class InterpreterTest {
     assertEquals("sub_channel_leveld", feed.getProperty("sub_channel_leveld"));
 
     assertNotNull(feed.getImage());
-    assertEquals("sub_image_leveld", feed.getImage().getProperty("sub_image_leveld"));
 
     assertEquals(1, feed.getNews().size());
     INews news = feed.getNews().get(0);
@@ -814,9 +800,6 @@ public class InterpreterTest {
     assertEquals("sub_channel_leveld", feed.getProperty("sub_channel_leveld"));
 
     assertNotNull(feed.getImage());
-    assertEquals("sub_image_leveld", feed.getImage().getProperty("sub_image_leveld"));
-    assertEquals("custom_imageAttribute", feed.getImage().getProperty("custom_imageAttribute"));
-    assertEquals("custom_imageUrlAttribute", feed.getImage().getProperty("custom_imageUrlAttribute"));
 
     assertEquals(1, feed.getNews().size());
     INews news = feed.getNews().get(0);

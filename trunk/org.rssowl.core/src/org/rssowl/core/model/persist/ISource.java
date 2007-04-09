@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.model.types;
+package org.rssowl.core.model.persist;
 
 import java.net.URI;
 
@@ -31,7 +31,7 @@ import java.net.URI;
  * 
  * @author bpasero
  */
-public interface ISource extends IExtendableType, MergeCapable<ISource> {
+public interface ISource extends IPersistable, MergeCapable<ISource> {
 
   /** One of the fields in this type described as constant */
   public static final int NAME = 0;

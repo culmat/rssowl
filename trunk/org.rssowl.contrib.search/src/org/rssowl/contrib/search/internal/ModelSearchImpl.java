@@ -51,14 +51,14 @@ import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.NativeFSLockFactory;
 import org.rssowl.contrib.search.Activator;
 import org.rssowl.core.model.dao.PersistenceException;
+import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.reference.NewsReference;
 import org.rssowl.core.model.search.IModelSearch;
 import org.rssowl.core.model.search.ISearchCondition;
 import org.rssowl.core.model.search.ISearchHit;
 import org.rssowl.core.model.search.ISearchValueType;
 import org.rssowl.core.model.search.SearchSpecifier;
-import org.rssowl.core.model.types.IEntity;
-import org.rssowl.core.model.types.INews;
 
 import java.io.IOException;
 import java.io.StringReader;

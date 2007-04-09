@@ -37,8 +37,8 @@ import org.jdom.input.DOMBuilder;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.interpreter.internal.DefaultInterpreterTypesFactory;
 import org.rssowl.core.interpreter.internal.DefaultSaxParserImpl;
-import org.rssowl.core.model.types.IEntity;
-import org.rssowl.core.model.types.IFeed;
+import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.util.ExtensionUtils;
 
 import java.io.InputStream;

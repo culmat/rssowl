@@ -25,7 +25,7 @@
 package org.rssowl.core.model.events;
 
 import org.rssowl.core.model.events.runnable.NewsEventRunnable;
-import org.rssowl.core.model.types.INews;
+import org.rssowl.core.model.persist.INews;
 
 /**
  * <p>

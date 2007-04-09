@@ -33,9 +33,9 @@ import org.rssowl.core.model.events.FeedAdapter;
 import org.rssowl.core.model.events.FeedEvent;
 import org.rssowl.core.model.events.NewsAdapter;
 import org.rssowl.core.model.events.NewsEvent;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.reference.FeedLinkReference;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.INews;
 
 import java.net.URI;
 import java.util.List;

@@ -27,8 +27,8 @@ package org.rssowl.core.interpreter.internal;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.rssowl.core.interpreter.INamespaceHandler;
-import org.rssowl.core.model.types.IExtendableType;
-import org.rssowl.core.model.types.INews;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.IPersistable;
 
 /**
  * Handler for the Content Namespace.
@@ -45,7 +45,7 @@ public class ContentNamespaceHandler implements INamespaceHandler {
    * @see org.rssowl.core.interpreter.INamespaceHandler#processElement(org.jdom.Element,
    * org.rssowl.core.interpreter.types.IExtendableType)
    */
-  public void processElement(Element element, IExtendableType type) {
+  public void processElement(Element element, IPersistable type) {
 
     /* Encoded */
     if ("encoded".equals(element.getName()) && type instanceof INews) //$NON-NLS-1$
@@ -56,5 +56,5 @@ public class ContentNamespaceHandler implements INamespaceHandler {
    * @see org.rssowl.core.interpreter.INamespaceHandler#processAttribute(org.jdom.Attribute,
    * org.rssowl.core.interpreter.types.IExtendableType)
    */
-  public void processAttribute(Attribute attribute, IExtendableType type) {}
+  public void processAttribute(Attribute attribute, IPersistable type) {}
 }

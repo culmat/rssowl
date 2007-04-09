@@ -4,7 +4,7 @@ package org.rssowl.contrib.search.internal;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
-import org.rssowl.core.model.types.INews;
+import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.util.DateUtils;
 
 import java.util.ArrayList;

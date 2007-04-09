@@ -27,8 +27,8 @@ package org.rssowl.core.connection;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.osgi.service.url.URLStreamHandlerService;
-import org.rssowl.core.model.types.IConditionalGet;
-import org.rssowl.core.model.types.IFeed;
+import org.rssowl.core.model.persist.IConditionalGet;
+import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.util.Pair;
 
 import java.net.URI;

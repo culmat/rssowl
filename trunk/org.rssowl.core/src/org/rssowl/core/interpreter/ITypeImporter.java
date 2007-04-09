@@ -25,7 +25,7 @@
 package org.rssowl.core.interpreter;
 
 import org.jdom.Document;
-import org.rssowl.core.model.types.IEntity;
+import org.rssowl.core.model.persist.IEntity;
 
 import java.util.List;
 

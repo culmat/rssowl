@@ -25,15 +25,15 @@
 package org.rssowl.core.model.internal.types;
 
 import org.eclipse.core.runtime.Assert;
+import org.rssowl.core.model.persist.IAttachment;
+import org.rssowl.core.model.persist.ICategory;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.IGuid;
+import org.rssowl.core.model.persist.ILabel;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.IPerson;
+import org.rssowl.core.model.persist.ISource;
 import org.rssowl.core.model.reference.FeedLinkReference;
-import org.rssowl.core.model.types.IAttachment;
-import org.rssowl.core.model.types.ICategory;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.IGuid;
-import org.rssowl.core.model.types.ILabel;
-import org.rssowl.core.model.types.INews;
-import org.rssowl.core.model.types.IPerson;
-import org.rssowl.core.model.types.ISource;
 import org.rssowl.core.util.MergeUtils;
 
 import java.net.URI;

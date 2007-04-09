@@ -25,8 +25,8 @@
 package org.rssowl.core.model.events;
 
 import org.rssowl.core.model.events.runnable.BookMarkEventRunnable;
-import org.rssowl.core.model.types.IBookMark;
-import org.rssowl.core.model.types.IFolder;
+import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.IFolder;
 
 /**
  * <p>

@@ -64,7 +64,7 @@
             name="TestPage1"
             order="0">
          <entityTarget
-               class="org.rssowl.core.model.types.ILabel">
+               class="org.rssowl.core.model.persist.ILabel">
          </entityTarget>
       </entityPropertyPage>
       <entityPropertyPage
@@ -73,7 +73,7 @@
             name="TestPage2"
             order="10">
          <entityTarget
-               class="org.rssowl.core.model.types.ILabel">
+               class="org.rssowl.core.model.persist.ILabel">
          </entityTarget>
       </entityPropertyPage>
       <entityPropertyPage
@@ -83,10 +83,10 @@
             name="TestPage3"
             order="20">
          <entityTarget
-               class="org.rssowl.core.model.types.ILabel">
+               class="org.rssowl.core.model.persist.ILabel">
          </entityTarget>
          <entityTarget
-               class="org.rssowl.core.model.types.IFeed">
+               class="org.rssowl.core.model.persist.IFeed">
          </entityTarget>
       </entityPropertyPage>
    </extension>

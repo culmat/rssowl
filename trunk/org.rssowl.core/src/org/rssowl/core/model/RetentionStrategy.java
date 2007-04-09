@@ -26,12 +26,12 @@ package org.rssowl.core.model;
 
 import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.model.dao.PersistenceException;
+import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.IMark;
+import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.preferences.IPreferencesScope;
-import org.rssowl.core.model.types.IBookMark;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.IFolder;
-import org.rssowl.core.model.types.IMark;
-import org.rssowl.core.model.types.INews;
 import org.rssowl.core.util.DateUtils;
 
 import java.util.ArrayList;

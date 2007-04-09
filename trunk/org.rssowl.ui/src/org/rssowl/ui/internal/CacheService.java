@@ -31,11 +31,11 @@ import org.rssowl.core.model.events.FolderEvent;
 import org.rssowl.core.model.events.FolderListener;
 import org.rssowl.core.model.events.SearchMarkEvent;
 import org.rssowl.core.model.events.SearchMarkListener;
+import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.IMark;
+import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.reference.FeedLinkReference;
-import org.rssowl.core.model.types.IBookMark;
-import org.rssowl.core.model.types.IFolder;
-import org.rssowl.core.model.types.IMark;
-import org.rssowl.core.model.types.ISearchMark;
 
 import java.util.Collections;
 import java.util.HashSet;

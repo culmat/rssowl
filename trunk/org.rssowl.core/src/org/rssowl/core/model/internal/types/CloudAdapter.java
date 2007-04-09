@@ -24,8 +24,8 @@
 
 package org.rssowl.core.model.internal.types;
 
+import org.rssowl.core.model.persist.ICloud;
 import org.rssowl.core.model.reference.FeedReference;
-import org.rssowl.core.model.types.ICloud;
 
 /**
  * Adapter Implementation of this Type. Methods of interest should be overriden
@@ -33,7 +33,7 @@ import org.rssowl.core.model.types.ICloud;
  * 
  * @author bpasero
  */
-public class CloudAdapter extends ExtendableType implements ICloud {
+public class CloudAdapter extends Persistable implements ICloud {
 
   /**
    * This Type is not used in the implementation!

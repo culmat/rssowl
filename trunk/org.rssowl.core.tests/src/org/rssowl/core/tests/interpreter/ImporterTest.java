@@ -32,10 +32,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.interpreter.Interpreter;
 import org.rssowl.core.model.NewsModel;
-import org.rssowl.core.model.types.IBookMark;
-import org.rssowl.core.model.types.IEntity;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.IFolder;
+import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.IFolder;
 
 import java.io.InputStream;
 import java.net.URI;

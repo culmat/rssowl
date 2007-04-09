@@ -25,8 +25,8 @@
 package org.rssowl.core.model.internal.types;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.types.IEntity;
-import org.rssowl.core.model.types.MergeCapable;
+import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.MergeCapable;
 
 import java.util.Collections;
 import java.util.HashSet;

@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.model.types;
+package org.rssowl.core.model.persist;
 
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.search.ISearchCondition;
@@ -60,7 +60,7 @@ public interface IModelTypesFactory {
    * @param parentRef The Type this Person belongs to.
    * @return A new instance of IPerson with the provided parameters.
    */
-  IPerson createPerson(Long id, IExtendableType parentRef);
+  IPerson createPerson(Long id, IPersistable parentRef);
 
   /**
    * Creates a new instance of IImage with the provided parameters. The new

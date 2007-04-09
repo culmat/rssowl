@@ -25,7 +25,7 @@
 package org.rssowl.core.model.internal.types;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.types.ICategory;
+import org.rssowl.core.model.persist.ICategory;
 import org.rssowl.core.util.MergeUtils;
 
 /**

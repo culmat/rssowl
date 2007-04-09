@@ -25,15 +25,15 @@
 package org.rssowl.core.model.dao;
 
 import org.rssowl.core.model.ReparentInfo;
+import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.IConditionalGet;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.ILabel;
+import org.rssowl.core.model.persist.IMark;
+import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FeedReference;
-import org.rssowl.core.model.types.IBookMark;
-import org.rssowl.core.model.types.IConditionalGet;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.IFolder;
-import org.rssowl.core.model.types.ILabel;
-import org.rssowl.core.model.types.IMark;
-import org.rssowl.core.model.types.INews;
 
 import java.net.URI;
 import java.util.List;

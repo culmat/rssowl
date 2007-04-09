@@ -30,8 +30,8 @@ import org.jdom.Element;
 import org.rssowl.core.interpreter.Interpreter;
 import org.rssowl.core.interpreter.IFormatInterpreter;
 import org.rssowl.core.interpreter.InterpreterException;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.INews;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.INews;
 
 import java.net.URI;
 import java.net.URISyntaxException;

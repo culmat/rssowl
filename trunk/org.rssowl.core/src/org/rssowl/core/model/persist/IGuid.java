@@ -22,53 +22,68 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.model.types;
-
-import org.rssowl.core.model.reference.FeedLinkReference;
+package org.rssowl.core.model.persist;
 
 /**
- * A usual bookmark as seen in Firefox or other Browsers. The Bookmark is used
- * to define a position for a <code>Feed</code> inside the hierarchy of
- * Folders. The user may define some properties, e.g. how often to reload the
- * related Feed.
+ * The super-type of all GUID Elements in Feeds.
  * 
  * @author bpasero
  */
-public interface IBookMark extends IMark {
+public interface IGuid extends IPersistable, MergeCapable<IGuid> {
 
   /** One of the fields in this type described as constant */
-  public static final int PROXY_USED = 6;
+  public static final int VALUE = 0;
 
   /** One of the fields in this type described as constant */
-  public static final int UPDATE_INTERVAL = 7;
-
-  /** One of the fields in this type described as constant */
-  public static final int IS_ERROR_LOADING = 8;
-
-  /** One of the fields in this type described as constant */
-  public static final int LOAD_ON_STARTUP = 9;
+  public static final int PERMALINK = 1;
 
   /**
-   * @return TRUE in case the last time this BookMark's Feed was reloading
-   * returned an Error, FALSE otherwise.
-   */
-  boolean isErrorLoading();
-
-  /**
-   * @param isErrorLoading TRUE in case the last time this BookMark's Feed was
-   * reloading returned an Error, FALSE otherwise.
-   */
-  void setErrorLoading(boolean isErrorLoading);
-
-  /**
-   * @return a reference to the link of the feed that this mark is related to.
-   */
-  FeedLinkReference getFeedLinkReference();
-  
-  /**
-   * Sets the reference to the link of the feed that this mark is related to.
+   * GUID stands for globally unique identifier. It's a string that uniquely
+   * identifies the item. When present, an aggregator may choose to use this
+   * string to determine if an item is new.
+   * <p>
+   * Used by:
+   * <ul>
+   * <li>RSS 2.0</li>
+   * </ul>
+   * </p>
    * 
-   * @param feedLinkRef
+   * @param value The value of the GUID.
    */
-  void setFeedLinkReference(FeedLinkReference feedLinkRef);
+  void setValue(String value);
+
+  /**
+   * If the guid element has an attribute named "isPermaLink" with a value of
+   * true, the reader may assume that it is a permalink to the item, that is, a
+   * url that can be opened in a Web browser, that points to the full item
+   * described by the Item Element.
+   * <p>
+   * Used by:
+   * <ul>
+   * <li>RSS 2.0</li>
+   * </ul>
+   * </p>
+   * 
+   * @param isPermaLink Set wether the GUID is a permanent link.
+   */
+  void setPermaLink(boolean isPermaLink);
+
+  /**
+   * If the guid element has an attribute named "isPermaLink" with a value of
+   * true, the reader may assume that it is a permalink to the item, that is, a
+   * url that can be opened in a Web browser, that points to the full item
+   * described by the Item Element.
+   * 
+   * @return Returns wether this GUID is a permalink.
+   */
+  boolean isPermaLink();
+
+  /**
+   * GUID stands for globally unique identifier. It's a string that uniquely
+   * identifies the item. When present, an aggregator may choose to use this
+   * string to determine if an item is new.
+   * 
+   * @return Returns the value of this GUID.
+   */
+  String getValue();
 }

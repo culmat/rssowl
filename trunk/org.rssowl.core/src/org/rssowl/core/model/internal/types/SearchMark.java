@@ -25,12 +25,12 @@
 package org.rssowl.core.model.internal.types;
 
 import org.eclipse.core.runtime.Assert;
+import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.INewsGetter;
+import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.search.ISearchCondition;
 import org.rssowl.core.model.search.ISearchHit;
-import org.rssowl.core.model.types.IFolder;
-import org.rssowl.core.model.types.INews;
-import org.rssowl.core.model.types.INewsGetter;
-import org.rssowl.core.model.types.ISearchMark;
 
 import java.util.ArrayList;
 import java.util.Collections;

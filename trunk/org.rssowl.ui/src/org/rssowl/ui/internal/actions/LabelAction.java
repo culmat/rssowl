@@ -28,9 +28,9 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IApplicationLayer;
-import org.rssowl.core.model.types.IEntity;
-import org.rssowl.core.model.types.ILabel;
-import org.rssowl.core.model.types.INews;
+import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.ILabel;
+import org.rssowl.core.model.persist.INews;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;

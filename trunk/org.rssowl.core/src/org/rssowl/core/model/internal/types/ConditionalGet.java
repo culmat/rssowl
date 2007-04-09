@@ -25,7 +25,7 @@
 package org.rssowl.core.model.internal.types;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.types.IConditionalGet;
+import org.rssowl.core.model.persist.IConditionalGet;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -33,7 +33,7 @@ import java.net.URISyntaxException;
 /**
  * Implementation of IConditionalGet.
  */
-public class ConditionalGet implements IConditionalGet {
+public class ConditionalGet extends Persistable implements IConditionalGet {
   private String fLink;
   private String fIfModifiedSince;
   private String fIfNoneMatch;

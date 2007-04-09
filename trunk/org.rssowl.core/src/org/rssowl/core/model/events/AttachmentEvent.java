@@ -25,7 +25,7 @@
 package org.rssowl.core.model.events;
 
 import org.rssowl.core.model.events.runnable.AttachmentEventRunnable;
-import org.rssowl.core.model.types.IAttachment;
+import org.rssowl.core.model.persist.IAttachment;
 
 /**
  * <p>

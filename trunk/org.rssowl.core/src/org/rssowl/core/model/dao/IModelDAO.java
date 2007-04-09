@@ -25,6 +25,16 @@
 package org.rssowl.core.model.dao;
 
 import org.rssowl.core.model.NewsCounter;
+import org.rssowl.core.model.persist.IAttachment;
+import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.ICategory;
+import org.rssowl.core.model.persist.IConditionalGet;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.ILabel;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.IPerson;
+import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.reference.AttachmentReference;
 import org.rssowl.core.model.reference.BookMarkReference;
 import org.rssowl.core.model.reference.CategoryReference;
@@ -37,16 +47,6 @@ import org.rssowl.core.model.reference.PersonReference;
 import org.rssowl.core.model.reference.SearchConditionReference;
 import org.rssowl.core.model.reference.SearchMarkReference;
 import org.rssowl.core.model.search.ISearchCondition;
-import org.rssowl.core.model.types.IAttachment;
-import org.rssowl.core.model.types.IBookMark;
-import org.rssowl.core.model.types.ICategory;
-import org.rssowl.core.model.types.IConditionalGet;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.IFolder;
-import org.rssowl.core.model.types.ILabel;
-import org.rssowl.core.model.types.INews;
-import org.rssowl.core.model.types.IPerson;
-import org.rssowl.core.model.types.ISearchMark;
 
 import java.net.URI;
 

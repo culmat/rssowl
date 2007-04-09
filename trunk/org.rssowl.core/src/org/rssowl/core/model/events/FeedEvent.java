@@ -25,7 +25,7 @@
 package org.rssowl.core.model.events;
 
 import org.rssowl.core.model.events.runnable.FeedEventRunnable;
-import org.rssowl.core.model.types.IFeed;
+import org.rssowl.core.model.persist.IFeed;
 
 /**
  * <p>

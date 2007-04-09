@@ -27,7 +27,8 @@ package org.rssowl.core.tests.interpreter;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.rssowl.core.interpreter.INamespaceHandler;
-import org.rssowl.core.model.types.IExtendableType;
+import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.IPersistable;
 
 /**
  * @author bpasero
@@ -38,15 +39,19 @@ public class CustomNamespaceHandler implements INamespaceHandler {
    * @see org.rssowl.core.interpreter.INamespaceHandler#processElement(org.jdom.Element,
    * org.rssowl.core.model.types.IExtendableType)
    */
-  public void processElement(Element element, IExtendableType type) {
-    type.setProperty(element.getText(), element.getText());
+  public void processElement(Element element, IPersistable type) {
+    if (type instanceof IEntity) {
+      ((IEntity) type).setProperty(element.getText(), element.getText());
+    }
   }
 
   /*
    * @see org.rssowl.core.interpreter.INamespaceHandler#processAttribute(org.jdom.Attribute,
    * org.rssowl.core.model.types.IExtendableType)
    */
-  public void processAttribute(Attribute attribute, IExtendableType type) {
-    type.setProperty(attribute.getValue(), attribute.getValue());
+  public void processAttribute(Attribute attribute, IPersistable type) {
+    if (type instanceof IEntity) {
+      ((IEntity) type).setProperty(attribute.getValue(), attribute.getValue());
+    }
   }
 }

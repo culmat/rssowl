@@ -25,7 +25,7 @@
 package org.rssowl.core.model.search;
 
 import org.rssowl.core.model.internal.search.SearchField;
-import org.rssowl.core.model.types.IEntity;
+import org.rssowl.core.model.persist.IEntity;
 
 /**
  * <p>

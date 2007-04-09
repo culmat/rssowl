@@ -24,8 +24,8 @@
 
 package org.rssowl.core.model.internal.types;
 
+import org.rssowl.core.model.persist.ITextInput;
 import org.rssowl.core.model.reference.FeedReference;
-import org.rssowl.core.model.types.ITextInput;
 
 import java.net.URI;
 
@@ -35,7 +35,7 @@ import java.net.URI;
  * 
  * @author bpasero
  */
-public class TextInputAdapter extends ExtendableType implements ITextInput {
+public class TextInputAdapter extends Persistable implements ITextInput {
 
   /**
    * This Type is not used in the model implementation!

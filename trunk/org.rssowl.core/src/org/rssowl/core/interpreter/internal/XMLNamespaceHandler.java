@@ -27,9 +27,9 @@ package org.rssowl.core.interpreter.internal;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.rssowl.core.interpreter.INamespaceHandler;
-import org.rssowl.core.model.types.IExtendableType;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.INews;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.IPersistable;
 import org.rssowl.core.util.URIUtils;
 
 import java.net.URI;
@@ -49,7 +49,7 @@ public class XMLNamespaceHandler implements INamespaceHandler {
    * @see org.rssowl.core.interpreter.INamespaceHandler#processElement(org.jdom.Element,
    * org.rssowl.core.model.types.IExtendableType)
    */
-  public void processElement(Element element, IExtendableType type) {
+  public void processElement(Element element, IPersistable type) {
   /* The XML Namespace is not defined for Elements */
   }
 
@@ -57,7 +57,7 @@ public class XMLNamespaceHandler implements INamespaceHandler {
    * @see org.rssowl.core.interpreter.INamespaceHandler#processAttribute(org.jdom.Attribute,
    * org.rssowl.core.model.types.IExtendableType)
    */
-  public void processAttribute(Attribute attribute, IExtendableType type) {
+  public void processAttribute(Attribute attribute, IPersistable type) {
 
     /* Language */
     if ("lang".equals(attribute.getName()) && type instanceof IFeed) //$NON-NLS-1$

@@ -22,60 +22,67 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.model.types;
+package org.rssowl.core.model.persist;
 
-import org.eclipse.core.runtime.IAdaptable;
-
-import java.util.Map;
 
 /**
- * The super-type of all Elements.
+ * The super-type of all Category Elements in Feeds.
  * 
  * @author bpasero
  */
-public interface IExtendableType extends IAdaptable {
+public interface ICategory extends IEntity, MergeCapable<ICategory> {
+
+  /** One of the fields in this type described as constant */
+  public static final int NAME = 0;
+
+  /** One of the fields in this type described as constant */
+  public static final int DOMAIN = 1;
 
   /**
-   * Set a Property identified by a unique Key to this Model. This Method can be
-   * used to extend the Model with values, for example in case the interpreted
-   * Feed makes use of non-Feed-standard Elements.
+   * The Name of the Category.
    * <p>
-   * It is <em>not</em> recommended to store complex types as Properties, but
-   * Strings and other basic Types.
+   * Used by:
+   * <ul>
+   * <li>RSS 0.92</li>
+   * <li>RSS 2.0</li>
+   * <li>Atom</li>
+   * </ul>
    * </p>
+   * 
+   * @param name The Name of the Category to set.
+   */
+  void setName(String name);
+
+  /**
+   * A String that identifies a categorization taxonomy. The value of the
+   * element is a forward-slash-separated string that identifies a hierarchic
+   * location in the indicated taxonomy.
    * <p>
-   * Chose a key with <em>caution</em>. The key should be qualified like
-   * classes, for instance "org.yourproject.yourpackage.YourProperty" in order
-   * to avoid overriding another key that was set by a different person.
+   * Used by:
+   * <ul>
+   * <li>RSS 0.92</li>
+   * <li>RSS 2.0</li>
+   * <li>Atom</li>
+   * </ul>
    * </p>
    * 
-   * @param key The unique identifier of the Property.
-   * @param value The value of the Property.
+   * @param domain The categorization taxonomy to set.
    */
-  void setProperty(String key, Object value);
+  void setDomain(String domain);
 
   /**
-   * Get a Property from this Map or NULL if not existing for the given Key.
+   * A String that identifies a categorization taxonomy. The value of the
+   * element is a forward-slash-separated string that identifies a hierarchic
+   * location in the indicated taxonomy.
    * 
-   * @param key The unique identifier of the Property.
-   * @return The value of the Property or NULL if no value is stored for the
-   * given key.
+   * @return Returns the domain of this category.
    */
-  Object getProperty(String key);
+  String getDomain();
 
   /**
-   * Removes a Property from this Map.
+   * The Name of this Category.
    * 
-   * @param key The unique identifier of the Property.
-   * @return The value of the Property or NULL if no value is stored for the
-   * given key.
+   * @return Returns the name of this category.
    */
-  Object removeProperty(String key);
-
-  /**
-   * Get the Map containing all Properties of this Type.
-   * 
-   * @return The Map containing all Properties of this Type.
-   */
-  Map<String, ? > getProperties();
+  String getName();
 }

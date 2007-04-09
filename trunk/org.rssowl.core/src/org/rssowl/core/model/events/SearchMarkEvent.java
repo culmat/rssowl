@@ -25,8 +25,8 @@
 package org.rssowl.core.model.events;
 
 import org.rssowl.core.model.events.runnable.SearchMarkEventRunnable;
-import org.rssowl.core.model.types.IFolder;
-import org.rssowl.core.model.types.ISearchMark;
+import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.ISearchMark;
 
 /**
  * <p>

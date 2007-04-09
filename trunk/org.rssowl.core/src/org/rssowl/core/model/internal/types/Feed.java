@@ -25,13 +25,13 @@
 package org.rssowl.core.model.internal.types;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.types.ICategory;
-import org.rssowl.core.model.types.ICloud;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.IImage;
-import org.rssowl.core.model.types.INews;
-import org.rssowl.core.model.types.IPerson;
-import org.rssowl.core.model.types.ITextInput;
+import org.rssowl.core.model.persist.ICategory;
+import org.rssowl.core.model.persist.ICloud;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.IImage;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.IPerson;
+import org.rssowl.core.model.persist.ITextInput;
 import org.rssowl.core.util.MergeUtils;
 
 import java.net.URI;

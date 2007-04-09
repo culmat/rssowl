@@ -29,16 +29,16 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.rssowl.core.interpreter.Interpreter;
-import org.rssowl.core.model.types.IAttachment;
-import org.rssowl.core.model.types.ICategory;
-import org.rssowl.core.model.types.IEntity;
-import org.rssowl.core.model.types.IExtendableType;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.IGuid;
-import org.rssowl.core.model.types.IImage;
-import org.rssowl.core.model.types.INews;
-import org.rssowl.core.model.types.IPerson;
-import org.rssowl.core.model.types.ISource;
+import org.rssowl.core.model.persist.IAttachment;
+import org.rssowl.core.model.persist.ICategory;
+import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.IGuid;
+import org.rssowl.core.model.persist.IImage;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.IPersistable;
+import org.rssowl.core.model.persist.IPerson;
+import org.rssowl.core.model.persist.ISource;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
@@ -389,7 +389,7 @@ public class AtomInterpreter extends BasicInterpreter {
       ((IFeed) type).addCategory(category);
   }
 
-  private void processAuthor(Element element, IExtendableType type) {
+  private void processAuthor(Element element, IPersistable type) {
     IPerson person = Interpreter.getDefault().getTypesFactory().createPerson(type);
 
     /* Check wether the Attributes are to be processed by a Contribution */

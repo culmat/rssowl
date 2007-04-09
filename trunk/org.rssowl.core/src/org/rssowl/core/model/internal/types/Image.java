@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.internal.types;
 
-import org.rssowl.core.model.types.IImage;
+import org.rssowl.core.model.persist.IImage;
 import org.rssowl.core.util.MergeUtils;
 
 import java.net.URI;
@@ -35,7 +35,7 @@ import java.net.URI;
  * 
  * @author bpasero
  */
-public class Image extends ExtendableType implements IImage {
+public class Image extends Persistable implements IImage {
   private String fLink;
   private String fTitle;
   private String fHomepage;
@@ -170,8 +170,7 @@ public class Image extends ExtendableType implements IImage {
     return (fLink == null ? i.fLink == null : fLink.equals(i.fLink)) && 
            (fDescription == null ? i.fDescription == null : fDescription.equals(i.fDescription)) && 
            fHeight == i.fHeight && fWidth == i.fWidth && (fHomepage == null ? i.fHomepage == null : fHomepage.equals(i.fHomepage)) && 
-           (fTitle == null ? i.fTitle == null : fTitle.equals(i.fTitle)) && 
-           (getProperties() == null ? i.getProperties() == null : getProperties().equals(i.getProperties()));
+           (fTitle == null ? i.fTitle == null : fTitle.equals(i.fTitle));
   }
 
   @SuppressWarnings("nls")
@@ -210,8 +209,8 @@ public class Image extends ExtendableType implements IImage {
     setLink(objectToMerge.getLink());
     fWidth = objectToMerge.getWidth();
     fDescription = objectToMerge.getDescription();
-    ComplexMergeResult<?> mergeResult = MergeUtils.mergeProperties(this, objectToMerge);
-    if (updated || mergeResult.isStructuralChange())
+    MergeResult mergeResult = new MergeResult();
+    if (updated)
       mergeResult.addUpdatedObject(this);
       
     return mergeResult;

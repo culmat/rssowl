@@ -22,89 +22,131 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.model.types;
+package org.rssowl.core.model.persist;
+
+import org.rssowl.core.model.reference.FeedReference;
 
 import java.net.URI;
 
 /**
- * The super-type of all Person Elements in Feeds.
+ * The super-type of all TextInput Elements in Feeds.
  * 
  * @author bpasero
  */
-public interface IPerson extends IEntity, MergeCapable<IPerson> {
+public interface ITextInput extends IPersistable {
 
   /** One of the fields in this type described as constant */
-  public static final int NAME = 0;
+  public static final int TITLE = 0;
 
   /** One of the fields in this type described as constant */
-  public static final int URI = 1;
+  public static final int DESCRIPTION = 1;
 
   /** One of the fields in this type described as constant */
-  public static final int EMAIL = 2;
+  public static final int NAME = 2;
+
+  /** One of the fields in this type described as constant */
+  public static final int LINK = 3;
 
   /**
-   * Human-readable name for the person
+   * The label of the Submit button in the text input area.
    * <p>
    * Used by:
    * <ul>
+   * <li>RSS 0.91</li>
    * <li>RSS 0.92</li>
+   * <li>RDF 1.0</li>
    * <li>RSS 2.0</li>
-   * <li>OPML 1.0</li>
-   * <li>Atom</li>
+   * <li>Dublin Core Namespace</li>
    * </ul>
    * </p>
    * 
-   * @param name The Human-readable name for the person to set.
+   * @param title The label of the Submit button in the text input area to set.
+   */
+  void setTitle(String title);
+
+  /**
+   * Explains the text input area.
+   * <p>
+   * Used by:
+   * <ul>
+   * <li>RSS 0.91</li>
+   * <li>RSS 0.92</li>
+   * <li>RDF 1.0</li>
+   * <li>RSS 2.0</li>
+   * <li>Dublin Core Namespace</li>
+   * </ul>
+   * </p>
+   * 
+   * @param description Explains the text input area.
+   */
+  void setDescription(String description);
+
+  /**
+   * The name of the text object in the text input area.
+   * <p>
+   * Used by:
+   * <ul>
+   * <li>RSS 0.91</li>
+   * <li>RSS 0.92</li>
+   * <li>RDF 1.0</li>
+   * <li>RSS 2.0</li>
+   * </ul>
+   * </p>
+   * 
+   * @param name The name of the text object in the text input area to set.
    */
   void setName(String name);
 
   /**
-   * An Internationalized Resource Identifier associated with the person.
+   * The URL of the CGI script that processes text input requests.
    * <p>
    * Used by:
    * <ul>
-   * <li>Atom</li>
+   * <li>RSS 0.91</li>
+   * <li>RSS 0.92</li>
+   * <li>RDF 1.0</li>
+   * <li>RSS 2.0</li>
    * </ul>
    * </p>
    * 
-   * @param uri The Internationalized Resource Identifier associated with the
-   * person to set.
+   * @param link The URL of the CGI script that processes text input requests to
+   * set.
    */
-  void setUri(URI uri);
+  void setLink(URI link);
 
   /**
-   * An e-mail address associated with the person.
-   * <p>
-   * Used by:
-   * <ul>
-   * <li>Atom</li>
-   * <li>OPML 1.0</li>
-   * </ul>
-   * </p>
+   * Explains the text input area.
    * 
-   * @param email an e-mail address associated with the person to set.
+   * @return Returns an explanation of the text input area.
    */
-  void setEmail(URI email);
+  String getDescription();
 
   /**
-   * Get the Human-readable name for the person
+   * The URL of the CGI script that processes text input requests.
    * 
-   * @return The Human-readable name for the person
+   * @return Returns the URL of the CGI script that processes text input
+   * requests.
+   */
+  URI getLink();
+
+  /**
+   * The name of the text object in the text input area.
+   * 
+   * @return Returns the name of the text object in the text input area.
    */
   String getName();
 
   /**
-   * Get the Internationalized Resource Identifier associated with the person
+   * The label of the Submit button in the text input area.
    * 
-   * @return The Internationalized Resource Identifier associated with the
-   * person
+   * @return Returns the label of the Submit button in the text input area.
    */
-  URI getUri();
+  String getTitle();
 
   /**
-   * Get the e-mail address associated with the person
+   * The Feed that this TextInput belongs to.
    * 
-   * @return an e-mail address associated with the person
+   * @return the feed that this textinput belongs to.
    */
-  URI getEmail();
+  FeedReference getFeed();
 }

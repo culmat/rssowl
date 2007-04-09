@@ -27,7 +27,7 @@ package org.rssowl.core.model.reference;
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.types.IFeed;
+import org.rssowl.core.model.persist.IFeed;
 
 import java.net.URI;
 

@@ -25,7 +25,7 @@
 package org.rssowl.core.model.events;
 
 import org.rssowl.core.model.events.runnable.CategoryEventRunnable;
-import org.rssowl.core.model.types.ICategory;
+import org.rssowl.core.model.persist.ICategory;
 
 /**
  * <p>

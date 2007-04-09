@@ -26,7 +26,7 @@ package org.rssowl.ui.internal;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.ui.IActionFilter;
-import org.rssowl.core.model.types.IEntity;
+import org.rssowl.core.model.persist.IEntity;
 
 import java.util.ArrayList;
 import java.util.List;

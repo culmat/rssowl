@@ -25,7 +25,7 @@
 package org.rssowl.core.model.events;
 
 import org.rssowl.core.model.events.runnable.EventRunnable;
-import org.rssowl.core.model.types.IEntity;
+import org.rssowl.core.model.persist.IEntity;
 
 
 /**

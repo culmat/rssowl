@@ -30,7 +30,7 @@ import org.rssowl.core.interpreter.IElementHandler;
 import org.rssowl.core.interpreter.IFormatInterpreter;
 import org.rssowl.core.interpreter.INamespaceHandler;
 import org.rssowl.core.interpreter.Interpreter;
-import org.rssowl.core.model.types.IExtendableType;
+import org.rssowl.core.model.persist.IPersistable;
 
 import java.util.Iterator;
 import java.util.List;
@@ -103,7 +103,7 @@ public abstract class BasicInterpreter implements IFormatInterpreter {
    * @param element The Element to check.
    * @param parent The Type this Element is belonging to.
    */
-  protected void processNamespaceAttributes(Element element, IExtendableType parent) {
+  protected void processNamespaceAttributes(Element element, IPersistable parent) {
 
     /* In case no Attributes present to interpret */
     if (element.getAttributes().isEmpty())
@@ -127,7 +127,7 @@ public abstract class BasicInterpreter implements IFormatInterpreter {
    * @return TRUE in case a Handler is provided for this Element, FALSE
    * otherwise.
    */
-  protected boolean processElementExtern(Element element, IExtendableType parent) {
+  protected boolean processElementExtern(Element element, IPersistable parent) {
     String name = element.getName().toLowerCase();
     String namespaceURI = element.getNamespaceURI();
 
@@ -161,7 +161,7 @@ public abstract class BasicInterpreter implements IFormatInterpreter {
    * @return TRUE in case a Handler is provided for this Attribute, FALSE
    * otherwise.
    */
-  protected boolean processAttributeExtern(Attribute attribute, IExtendableType parent) {
+  protected boolean processAttributeExtern(Attribute attribute, IPersistable parent) {
     String namespaceURI = attribute.getNamespaceURI();
 
     /* Check for contributed Namespace Handlers */

@@ -24,17 +24,12 @@
 
 package org.rssowl.core.model.internal.types;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
-import org.rssowl.core.model.types.IExtendableType;
+import org.rssowl.core.model.persist.IPersistable;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * The abstract super-type of all Model Objects. It offers the following
@@ -53,82 +48,11 @@ import java.util.Map;
  * 
  * @author bpasero
  */
-public abstract class ExtendableType implements IExtendableType {
-  private HashMap<String, Serializable> fProperties;
-
+public abstract class Persistable implements IPersistable {
   /**
    * Default constructor provided for deserialization purposes.
    */
-  protected ExtendableType() {}
-
-  /**
-   * Set a Property identified by a unique Key to this Model. Because the value
-   * is persisted into the DataBase, it is required that the value is
-   * implementing <code>java.io.Serializable</code>
-   * <p>
-   * It is <em>not</em> recommended to store complex types as Properties, but
-   * Strings and other basic Types.
-   * </p>
-   * <p>
-   * Chose a key with <em>caution</em>. The key should be qualified like
-   * classes, for instance "org.yourproject.yourpackage.YourProperty" in order
-   * to avoid overriding another key that was set by a different person.
-   * </p>
-   * 
-   * @param key The unique identifier of the Property.
-   * @param value The value of the Property.
-   * @see org.rssowl.core.model.types.IExtendableType#setProperty(java.lang.String,
-   * java.lang.Object)
-   */
-  public void setProperty(String key, Object value) {
-    Assert.isNotNull(key, "Using NULL as Key is not permitted!"); //$NON-NLS-1$
-    if (fProperties == null)
-      fProperties = new HashMap<String, Serializable>();
-
-    /* Ignore any value not being a subtype of Serializable */
-    if (value instanceof Serializable)
-      fProperties.put(key, (Serializable) value);
-  }
-
-  /*
-   * @see org.rssowl.core.model.types.IExtendableType#getProperty(java.lang.String)
-   */
-  public Object getProperty(String key) {
-    Assert.isNotNull(key, "Using NULL as Key is not permitted!"); //$NON-NLS-1$
-    if (fProperties == null)
-      return null;
-
-    return fProperties.get(key);
-  }
-
-  /*
-   * @see org.rssowl.core.model.types.IExtendableType#removeProperty(java.lang.String)
-   */
-  public Object removeProperty(String key) {
-    Assert.isNotNull(key, "Using NULL as Key is not permitted!"); //$NON-NLS-1$
-    if (fProperties == null)
-      return null;
-
-    return fProperties.remove(key);
-  }
-
-  /*
-   * @see org.rssowl.core.model.types.IExtendableType#getProperties()
-   */
-  public Map<String, ? > getProperties() {
-    if (fProperties == null)
-      return Collections.emptyMap();
-
-    return Collections.unmodifiableMap(fProperties);
-  }
-  
-  protected final boolean processListMergeResult(MergeResult mergeResult, ComplexMergeResult<?> listMergeResult) {
-    mergeResult.addAll(listMergeResult);
-    if (listMergeResult.isStructuralChange())
-      return true;
-    
-    return false;
-  }
+  protected Persistable() {}
 
   /**
    * If <code>uri</code> is <code>null</code>, returns <code>null</code>.
@@ -159,6 +83,24 @@ public abstract class ExtendableType implements IExtendableType {
    */
   protected final String getURIText(URI uri) {
     return uri == null ? null : uri.toString();
+  }
+  
+  /**
+   * Copies the contents of <code>listMergeResult</code> into
+   * <code>mergeResult</code> and returns whether there were any structural
+   * changes in <code>listMergeResult</code>.
+   * 
+   * @param mergeResult
+   * @param listMergeResult
+   * @return <code>true</code> if there were structural changes in 
+   * <code>listMergeResult</code>. Returns <code>false</code> otherwise.
+   */
+  protected final boolean processListMergeResult(MergeResult mergeResult, ComplexMergeResult<?> listMergeResult) {
+    mergeResult.addAll(listMergeResult);
+    if (listMergeResult.isStructuralChange())
+      return true;
+    
+    return false;
   }
 
   /**
