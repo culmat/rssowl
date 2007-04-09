@@ -33,13 +33,13 @@ import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.events.BookMarkAdapter;
 import org.rssowl.core.model.events.BookMarkEvent;
 import org.rssowl.core.model.events.BookMarkListener;
+import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.IMark;
+import org.rssowl.core.model.persist.IModelTypesFactory;
 import org.rssowl.core.model.preferences.IPreferencesInitializer;
 import org.rssowl.core.model.preferences.IPreferencesScope;
 import org.rssowl.core.model.reference.FeedLinkReference;
-import org.rssowl.core.model.types.IFeed;
-import org.rssowl.core.model.types.IFolder;
-import org.rssowl.core.model.types.IMark;
-import org.rssowl.core.model.types.IModelTypesFactory;
 
 import java.net.URI;
 import java.util.Arrays;
