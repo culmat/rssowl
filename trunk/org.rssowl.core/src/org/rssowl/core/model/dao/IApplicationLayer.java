@@ -24,7 +24,6 @@
 
 package org.rssowl.core.model.dao;
 
-import org.rssowl.core.model.ReparentInfo;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IConditionalGet;
 import org.rssowl.core.model.persist.IFeed;
@@ -34,6 +33,7 @@ import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FeedReference;
+import org.rssowl.core.util.ReparentInfo;
 
 import java.net.URI;
 import java.util.List;

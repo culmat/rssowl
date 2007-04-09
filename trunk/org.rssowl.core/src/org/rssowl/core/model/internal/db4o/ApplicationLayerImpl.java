@@ -24,8 +24,6 @@
 package org.rssowl.core.model.internal.db4o;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.ReparentInfo;
-import org.rssowl.core.model.RetentionStrategy;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.BookMarkEvent;
@@ -52,6 +50,8 @@ import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.INews.State;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FeedReference;
+import org.rssowl.core.util.ReparentInfo;
+import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.core.util.StringUtils;
 
 import com.db4o.ObjectContainer;

@@ -22,9 +22,10 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.model;
+package org.rssowl.core.util;
 
 import org.rssowl.core.internal.DefaultPreferences;
+import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IFeed;
@@ -32,7 +33,6 @@ import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.pref.IPreferencesScope;
-import org.rssowl.core.util.DateUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
