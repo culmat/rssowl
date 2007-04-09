@@ -33,9 +33,9 @@ import org.rssowl.core.model.persist.IModelTypesFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.INews.State;
-import org.rssowl.core.model.search.ISearchCondition;
-import org.rssowl.core.model.search.ISearchField;
-import org.rssowl.core.model.search.SearchSpecifier;
+import org.rssowl.core.model.persist.search.ISearchCondition;
+import org.rssowl.core.model.persist.search.ISearchField;
+import org.rssowl.core.model.persist.search.SearchSpecifier;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;
