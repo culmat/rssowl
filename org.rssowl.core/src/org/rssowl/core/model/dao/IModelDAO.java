@@ -54,14 +54,14 @@ import java.net.URI;
  * The central interface for saving, deleting and retrieving types from the
  * persistance layer. The implementation is contributable via extension-point
  * mechanism.
- * 
+ *
  * @author bpasero
  */
 public interface IModelDAO {
 
   /**
    * Saves the given Type.
-   * 
+   *
    * @param bookmark The BookMark to update.
    * @return A Reference of the Type that was saved.
    * @throws PersistenceException In case of an error while accessing the
@@ -71,7 +71,7 @@ public interface IModelDAO {
 
   /**
    * Delete the given Type.
-   * 
+   *
    * @param reference The BookMark to delete as reference.
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
@@ -80,7 +80,7 @@ public interface IModelDAO {
 
   /**
    * Saves the given Type.
-   * 
+   *
    * @param Attachment The Attachment to update.
    * @return A Reference of the Type that was saved.
    * @throws PersistenceException In case of an error while accessing the
@@ -90,7 +90,7 @@ public interface IModelDAO {
 
   /**
    * Delete the given Type.
-   * 
+   *
    * @param reference The Attachment to delete as reference.
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
@@ -100,7 +100,7 @@ public interface IModelDAO {
   /**
    * Saves the given Type using <code>IModelDAO.DEEP</code> as kind of
    * operation.
-   * 
+   *
    * @param category The Category to update.
    * @return A Reference of the Type that was saved.
    * @throws PersistenceException In case of an error while accessing the
@@ -110,7 +110,7 @@ public interface IModelDAO {
 
   /**
    * Delete the given Type.
-   * 
+   *
    * @param reference The Category to delete as reference.
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
@@ -119,7 +119,7 @@ public interface IModelDAO {
 
   /**
    * Saves the given Type.
-   * 
+   *
    * @param feed The Feed to update.
    * @return A Reference of the Type that was saved.
    * @throws PersistenceException In case of an error while accessing the
@@ -129,7 +129,7 @@ public interface IModelDAO {
 
   /**
    * Delete the given Type.
-   * 
+   *
    * @param reference The Feed to delete as reference.
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
@@ -138,7 +138,7 @@ public interface IModelDAO {
 
   /**
    * Delete the given Type.
-   * 
+   *
    * @param reference The Feed to delete as reference.
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
@@ -147,7 +147,7 @@ public interface IModelDAO {
 
   /**
    * Saves the given Type.
-   * 
+   *
    * @param folder The Folder to update.
    * @return A Reference of the Type that was saved.
    * @throws PersistenceException In case of an error while accessing the
@@ -157,7 +157,7 @@ public interface IModelDAO {
 
   /**
    * Delete the given Type.
-   * 
+   *
    * @param reference The Folder to delete as reference.
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
@@ -166,7 +166,7 @@ public interface IModelDAO {
 
   /**
    * Saves the given Type.
-   * 
+   *
    * @param label The Label to update.
    * @return A Reference of the Type that was saved.
    * @throws PersistenceException In case of an error while accessing the
@@ -176,7 +176,7 @@ public interface IModelDAO {
 
   /**
    * Delete the given Type.
-   * 
+   *
    * @param reference The Label to delete as reference.
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
@@ -185,7 +185,7 @@ public interface IModelDAO {
 
   /**
    * Saves the given Type.
-   * 
+   *
    * @param Person The Person to update.
    * @return A Reference of the Type that was saved.
    * @throws PersistenceException In case of an error while accessing the
@@ -195,7 +195,7 @@ public interface IModelDAO {
 
   /**
    * Delete the given Type.
-   * 
+   *
    * @param reference The Person to delete as reference.
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
@@ -204,7 +204,7 @@ public interface IModelDAO {
 
   /**
    * Saves the given Type.
-   * 
+   *
    * @param news The News to update.
    * @return A Reference of the Type that was saved.
    * @throws PersistenceException In case of an error while accessing the
@@ -214,7 +214,7 @@ public interface IModelDAO {
 
   /**
    * Delete the given Type.
-   * 
+   *
    * @param reference The News to delete as reference.
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
@@ -223,7 +223,7 @@ public interface IModelDAO {
 
   /**
    * Saves the given Type.
-   * 
+   *
    * @param searchmark The SearchMark to update.
    * @return A Reference of the Type that was saved.
    * @throws PersistenceException In case of an error while accessing the
@@ -233,7 +233,7 @@ public interface IModelDAO {
 
   /**
    * Delete the given Type.
-   * 
+   *
    * @param reference The SearchMark to delete as reference.
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
@@ -242,7 +242,7 @@ public interface IModelDAO {
 
   /**
    * Loads the given type with the given ID from the persistance layer.
-   * 
+   *
    * @param id The ID of the type to load from the persistance layer.
    * @return The Type with the given ID loaded from the persistance layer or
    * <code>NULL</code> in case there is no Type available for the given ID.
@@ -253,7 +253,7 @@ public interface IModelDAO {
 
   /**
    * Loads the given type with the given ID from the persistance layer.
-   * 
+   *
    * @param id The ID of the type to load from the persistance layer.
    * @return The Type with the given ID loaded from the persistance layer or
    * <code>NULL</code> in case there is no Type available for the given ID.
@@ -264,7 +264,7 @@ public interface IModelDAO {
 
   /**
    * Loads the given type with the given ID from the persistance layer.
-   * 
+   *
    * @param id The ID of the type to load from the persistance layer.
    * @return The Type with the given ID loaded from the persistance layer or
    * <code>NULL</code> in case there is no Type available for the given ID.
@@ -275,7 +275,7 @@ public interface IModelDAO {
 
   /**
    * Loads the given type with the given ID from the persistance layer.
-   * 
+   *
    * @param id The ID of the type to load from the persistance layer.
    * @return The Type with the given ID loaded from the persistance layer or
    * <code>NULL</code> in case there is no Type available for the given ID.
@@ -286,7 +286,7 @@ public interface IModelDAO {
 
   /**
    * Loads the given type with the given ID from the persistance layer.
-   * 
+   *
    * @param id The ID of the type to load from the persistance layer.
    * @return The Type with the given ID loaded from the persistance layer or
    * <code>NULL</code> in case there is no Type available for the given ID.
@@ -297,7 +297,7 @@ public interface IModelDAO {
 
   /**
    * Loads the given type with the given ID from the persistance layer.
-   * 
+   *
    * @param id The ID of the type to load from the persistance layer.
    * @return The Type with the given ID loaded from the persistance layer or
    * <code>NULL</code> in case there is no Type available for the given ID.
@@ -308,7 +308,7 @@ public interface IModelDAO {
 
   /**
    * Loads the given type with the given ID from the persistance layer.
-   * 
+   *
    * @param id The ID of the type to load from the persistance layer.
    * @return The Type with the given ID loaded from the persistance layer or
    * <code>NULL</code> in case there is no Type available for the given ID.
@@ -319,7 +319,7 @@ public interface IModelDAO {
 
   /**
    * Loads the given type with the given ID from the persistance layer.
-   * 
+   *
    * @param id The ID of the type to load from the persistance layer.
    * @return The Type with the given ID loaded from the persistance layer or
    * <code>NULL</code> in case there is no Type available for the given ID.
@@ -330,7 +330,7 @@ public interface IModelDAO {
 
   /**
    * Loads the given type with the given ID from the persistance layer.
-   * 
+   *
    * @param id The ID of the type to load from the persistance layer.
    * @return The Type with the given ID loaded from the persistance layer or
    * <code>NULL</code> in case there is no Type available for the given ID.
@@ -341,7 +341,7 @@ public interface IModelDAO {
 
   /**
    * Loads the given type with the given ID from the persistance layer.
-   * 
+   *
    * @param id The ID of the type to load from the persistance layer.
    * @return The Type with the given ID loaded from the persistance layer or
    * <code>NULL</code> in case there is no Type available for the given ID.
@@ -352,7 +352,7 @@ public interface IModelDAO {
 
   /**
    * Saves the given Type.
-   * 
+   *
    * @param condition The SearchCondition to update.
    * @return A Reference of the Type that was saved.
    * @throws PersistenceException In case of an error while accessing the
@@ -362,7 +362,7 @@ public interface IModelDAO {
 
   /**
    * Delete the given Type.
-   * 
+   *
    * @param reference The SearchCondition to delete as reference.
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
@@ -371,7 +371,7 @@ public interface IModelDAO {
 
   /**
    * Loads the given type with the given ID from the persistance layer.
-   * 
+   *
    * @param link The link of the IConditionalGet to load from the persistance
    * layer.
    * @return The Type with the given <code>link</code> loaded from the
@@ -386,7 +386,7 @@ public interface IModelDAO {
 
   /**
    * Saves the given Type.
-   * 
+   *
    * @param conditionalGet The {@link IConditionalGet} to update.
    * @return The object that was saved.
    * @throws PersistenceException In case of an error while accessing the
@@ -396,17 +396,21 @@ public interface IModelDAO {
 
   /**
    * Deletes the given Type.
-   * 
+   *
    * @param conditionalGet The IConditionalGet to delete.
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
    */
   void deleteConditionalGet(IConditionalGet conditionalGet) throws PersistenceException;
-  
+
   /**
    * Loads the NewsCounter from the persistance layer or returns <code>null</code>
    * if no counter has been saved yet.
-   * 
+   * <p>
+   * TODO Consider contributing the NewsCounter from org.rssowl.ui if its only used from
+   * that bundle.
+   * </p>
+   *
    * @return The NewsCounter from the persistance layer or returns <code>null</code>
    * if no counter has been saved yet.
    * @throws PersistenceException In case of an error while accessing the
@@ -418,7 +422,7 @@ public interface IModelDAO {
 
   /**
    * Saves the NewsCounter.
-   * 
+   *
    * @param newsCounter The {@link NewsCounter} to update.
    * @return The object that was saved.
    * @throws PersistenceException In case of an error while accessing the
@@ -428,7 +432,7 @@ public interface IModelDAO {
 
   /**
    * Deletes the news counter.
-   * 
+   *
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
    */

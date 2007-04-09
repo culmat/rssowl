@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.model.persist;
 
 import org.rssowl.core.model.internal.persist.Persistable;
@@ -29,31 +30,36 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NewsCounter extends Persistable implements IPersistable    {
+/**
+ * <p>
+ * TODO Consider contributing the NewsCounter from org.rssowl.ui if its only
+ * used from that bundle.
+ * </p>
+ */
+public class NewsCounter extends Persistable implements IPersistable {
 
   private Map<String, NewsCounterItem> countersMap;
-  
-  public NewsCounter() {
-  }
-  
+
+  public NewsCounter() {}
+
   public synchronized void put(URI feedLink, NewsCounterItem item) {
     if (countersMap == null)
       countersMap = new HashMap<String, NewsCounterItem>();
-    
+
     countersMap.put(feedLink.toString(), item);
   }
-  
+
   public synchronized NewsCounterItem get(URI feedLink) {
     if (countersMap == null)
       return null;
-    
+
     return countersMap.get(feedLink.toString());
   }
 
   public synchronized NewsCounterItem remove(URI feedLink) {
     if (countersMap == null)
       return null;
-    
+
     return countersMap.remove(feedLink.toString());
   }
 }
