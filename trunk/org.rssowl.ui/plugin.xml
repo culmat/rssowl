@@ -355,7 +355,7 @@
             class="org.rssowl.ui.internal.views.explorer.BookMarkExplorer"
             icon="icons/eview16/bkmrk_explorer.gif"
             id="org.rssowl.ui.BookMarkExplorer"
-            name="BookMark Explorer"/>
+            name="Bookmarks"/>
       <category
             id="org.rssowl.ui.category"
             name="RSSOwl">
