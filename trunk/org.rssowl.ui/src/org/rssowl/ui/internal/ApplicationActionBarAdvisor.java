@@ -50,6 +50,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
   /** Name of the View Top Menu */
   public static final String M_VIEW = "view";
 
+  /** Start of the View Top Menu */
+  public static final String M_VIEW_START = "viewStart";
+
+  /** End of the View Top Menu */
+  public static final String M_VIEW_END = "viewEnd";
+
   private IContributionItem fOpenWindowsItem;
   private IContributionItem fShowViewMenu;
   private IContributionItem fReopenEditors;
@@ -209,7 +215,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     menuBar.add(viewMenu);
 
     viewMenu.add(getAction(ActionFactory.TOGGLE_COOLBAR.getId()));
+    viewMenu.add(new GroupMarker(M_VIEW_START));
     viewMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+    viewMenu.add(new GroupMarker(M_VIEW_START));
   }
 
   /* Menu: Go */
