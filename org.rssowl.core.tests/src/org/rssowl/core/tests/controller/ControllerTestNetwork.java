@@ -32,7 +32,7 @@ import org.junit.Test;
 import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.internal.types.Feed;
+import org.rssowl.core.model.internal.persist.Feed;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;

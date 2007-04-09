@@ -56,9 +56,9 @@ import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.events.NewsAdapter;
 import org.rssowl.core.model.events.NewsEvent;
 import org.rssowl.core.model.events.runnable.EventType;
-import org.rssowl.core.model.preferences.IPreferencesScope;
-import org.rssowl.core.model.preferences.PreferencesEvent;
-import org.rssowl.core.model.preferences.PreferencesListener;
+import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.PreferencesEvent;
+import org.rssowl.core.model.persist.pref.PreferencesListener;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.util.JobRunner;
 

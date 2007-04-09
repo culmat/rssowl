@@ -24,10 +24,10 @@
 
 package org.rssowl.core.model.persist;
 
+import org.rssowl.core.model.persist.search.ISearchCondition;
+import org.rssowl.core.model.persist.search.ISearchField;
+import org.rssowl.core.model.persist.search.SearchSpecifier;
 import org.rssowl.core.model.reference.FeedLinkReference;
-import org.rssowl.core.model.search.ISearchCondition;
-import org.rssowl.core.model.search.ISearchField;
-import org.rssowl.core.model.search.SearchSpecifier;
 
 import java.net.URI;
 import java.util.Date;

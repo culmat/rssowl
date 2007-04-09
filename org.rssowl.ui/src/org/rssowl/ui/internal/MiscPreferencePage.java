@@ -38,7 +38,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.model.NewsModel;
-import org.rssowl.core.model.preferences.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferencesScope;
 
 /**
  * Container for all Preferences that have not yet been categorized.

@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.ISearchMark;
-import org.rssowl.core.model.search.ISearchCondition;
+import org.rssowl.core.model.persist.search.ISearchCondition;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
 import org.rssowl.ui.internal.search.SearchConditionList;

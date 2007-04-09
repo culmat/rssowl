@@ -29,7 +29,7 @@ import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.internal.db4o.ApplicationLayerImpl;
-import org.rssowl.core.model.internal.types.MergeResult;
+import org.rssowl.core.model.internal.persist.MergeResult;
 import org.rssowl.core.util.ITask;
 
 import java.lang.reflect.InvocationTargetException;

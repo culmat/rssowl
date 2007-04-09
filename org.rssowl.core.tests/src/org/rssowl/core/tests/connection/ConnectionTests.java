@@ -42,7 +42,7 @@ import org.rssowl.core.connection.auth.IProxyCredentials;
 import org.rssowl.core.interpreter.Interpreter;
 import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IModelDAO;
-import org.rssowl.core.model.internal.types.Feed;
+import org.rssowl.core.model.internal.persist.Feed;
 import org.rssowl.core.model.persist.IConditionalGet;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.reference.FeedLinkReference;

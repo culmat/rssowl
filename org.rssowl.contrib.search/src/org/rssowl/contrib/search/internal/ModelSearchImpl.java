@@ -53,12 +53,12 @@ import org.rssowl.contrib.search.Activator;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.search.IModelSearch;
+import org.rssowl.core.model.persist.search.ISearchCondition;
+import org.rssowl.core.model.persist.search.ISearchHit;
+import org.rssowl.core.model.persist.search.ISearchValueType;
+import org.rssowl.core.model.persist.search.SearchSpecifier;
 import org.rssowl.core.model.reference.NewsReference;
-import org.rssowl.core.model.search.IModelSearch;
-import org.rssowl.core.model.search.ISearchCondition;
-import org.rssowl.core.model.search.ISearchHit;
-import org.rssowl.core.model.search.ISearchValueType;
-import org.rssowl.core.model.search.SearchSpecifier;
 
 import java.io.IOException;
 import java.io.StringReader;

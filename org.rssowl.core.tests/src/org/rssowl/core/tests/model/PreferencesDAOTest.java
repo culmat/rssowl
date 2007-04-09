@@ -33,9 +33,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.preferences.IPreferencesDAO;
-import org.rssowl.core.model.preferences.PreferencesEvent;
-import org.rssowl.core.model.preferences.PreferencesListener;
+import org.rssowl.core.model.persist.pref.IPreferencesDAO;
+import org.rssowl.core.model.persist.pref.PreferencesEvent;
+import org.rssowl.core.model.persist.pref.PreferencesListener;
 import org.rssowl.core.tests.TestUtils;
 
 import java.util.Arrays;

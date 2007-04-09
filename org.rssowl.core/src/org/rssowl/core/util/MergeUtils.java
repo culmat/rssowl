@@ -24,7 +24,7 @@
 
 package org.rssowl.core.util;
 
-import org.rssowl.core.model.internal.types.ComplexMergeResult;
+import org.rssowl.core.model.internal.persist.ComplexMergeResult;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IPersistable;
 import org.rssowl.core.model.persist.MergeCapable;
