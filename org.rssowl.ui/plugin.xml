@@ -585,6 +585,21 @@
             id="org.rssowl.ui.SearchNewsAction"
             name="Search News">
       </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.actions.ExportFeeds"
+            name="Export Feeds">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.actions.ImportFeeds"
+            name="Import Feeds">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.OpenInBrowser"
+            name="Open in Browser">
+      </command>
    </extension>
    <extension
          id="product"
