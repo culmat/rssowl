@@ -37,8 +37,8 @@ import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.IModelTypesFactory;
-import org.rssowl.core.model.preferences.IPreferencesInitializer;
-import org.rssowl.core.model.preferences.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferencesInitializer;
+import org.rssowl.core.model.persist.pref.IPreferencesScope;
 import org.rssowl.core.model.reference.FeedLinkReference;
 
 import java.net.URI;

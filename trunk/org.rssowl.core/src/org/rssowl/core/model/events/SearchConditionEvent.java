@@ -25,7 +25,7 @@
 package org.rssowl.core.model.events;
 
 import org.rssowl.core.model.events.runnable.SearchConditionEventRunnable;
-import org.rssowl.core.model.search.ISearchCondition;
+import org.rssowl.core.model.persist.search.ISearchCondition;
 
 /**
  * <p>

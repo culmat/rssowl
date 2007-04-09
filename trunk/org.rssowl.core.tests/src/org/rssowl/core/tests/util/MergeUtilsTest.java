@@ -27,10 +27,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
-import org.rssowl.core.model.internal.types.Category;
-import org.rssowl.core.model.internal.types.ComplexMergeResult;
-import org.rssowl.core.model.internal.types.Label;
-import org.rssowl.core.model.internal.types.Person;
+import org.rssowl.core.model.internal.persist.Category;
+import org.rssowl.core.model.internal.persist.ComplexMergeResult;
+import org.rssowl.core.model.internal.persist.Label;
+import org.rssowl.core.model.internal.persist.Person;
 import org.rssowl.core.model.persist.ICategory;
 import org.rssowl.core.model.persist.ILabel;
 import org.rssowl.core.model.persist.IPerson;

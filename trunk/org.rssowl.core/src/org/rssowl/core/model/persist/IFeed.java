@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.persist;
 
-import org.rssowl.core.model.internal.types.MergeResult;
+import org.rssowl.core.model.internal.persist.MergeResult;
 
 import java.net.URI;
 import java.util.ArrayList;

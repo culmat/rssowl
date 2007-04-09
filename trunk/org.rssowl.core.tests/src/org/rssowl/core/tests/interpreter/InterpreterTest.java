@@ -30,7 +30,7 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Test;
 import org.rssowl.core.interpreter.Interpreter;
 import org.rssowl.core.interpreter.UnknownFormatException;
-import org.rssowl.core.model.internal.types.Feed;
+import org.rssowl.core.model.internal.persist.Feed;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.util.DateUtils;

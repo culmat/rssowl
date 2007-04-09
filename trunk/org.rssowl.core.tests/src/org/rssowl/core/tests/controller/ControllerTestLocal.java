@@ -31,7 +31,7 @@ import org.junit.Test;
 import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.dao.IModelDAO;
-import org.rssowl.core.model.internal.types.Feed;
+import org.rssowl.core.model.internal.persist.Feed;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.reference.FeedLinkReference;

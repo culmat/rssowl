@@ -25,10 +25,10 @@ package org.rssowl.core.model.internal.db4o;
 
 import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.internal.preferences.Preference;
-import org.rssowl.core.model.internal.preferences.Preference.Type;
-import org.rssowl.core.model.preferences.IPreferencesDAO;
-import org.rssowl.core.model.preferences.PreferencesEvent;
+import org.rssowl.core.model.internal.persist.pref.Preference;
+import org.rssowl.core.model.internal.persist.pref.Preference.Type;
+import org.rssowl.core.model.persist.pref.IPreferencesDAO;
+import org.rssowl.core.model.persist.pref.PreferencesEvent;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;

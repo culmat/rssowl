@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.model.NewsModel;
-import org.rssowl.core.model.preferences.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferencesScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.util.BrowserUtils;

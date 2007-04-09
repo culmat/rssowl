@@ -40,7 +40,7 @@ import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.IModelTypesFactory;
 import org.rssowl.core.model.persist.INews;
-import org.rssowl.core.model.preferences.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferencesScope;
 import org.rssowl.core.model.reference.BookMarkReference;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FolderReference;

@@ -50,7 +50,7 @@ import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.preferences.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferencesScope;
 import org.rssowl.ui.internal.editors.feed.NewsFilter;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import org.rssowl.ui.internal.util.EditorUtils;

@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model;
 
-import org.rssowl.core.model.internal.types.Persistable;
+import org.rssowl.core.model.internal.persist.Persistable;
 import org.rssowl.core.model.persist.IPersistable;
 
 import java.net.URI;

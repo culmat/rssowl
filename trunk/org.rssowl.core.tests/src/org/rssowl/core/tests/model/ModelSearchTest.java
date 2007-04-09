@@ -43,12 +43,12 @@ import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.model.persist.ISource;
 import org.rssowl.core.model.persist.INews.State;
+import org.rssowl.core.model.persist.search.IModelSearch;
+import org.rssowl.core.model.persist.search.ISearchCondition;
+import org.rssowl.core.model.persist.search.ISearchField;
+import org.rssowl.core.model.persist.search.ISearchHit;
+import org.rssowl.core.model.persist.search.SearchSpecifier;
 import org.rssowl.core.model.reference.NewsReference;
-import org.rssowl.core.model.search.IModelSearch;
-import org.rssowl.core.model.search.ISearchCondition;
-import org.rssowl.core.model.search.ISearchField;
-import org.rssowl.core.model.search.ISearchHit;
-import org.rssowl.core.model.search.SearchSpecifier;
 import org.rssowl.core.tests.TestUtils;
 
 import java.net.URI;

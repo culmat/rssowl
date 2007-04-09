@@ -35,6 +35,7 @@ import org.rssowl.core.model.persist.ILabel;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.search.ISearchCondition;
 import org.rssowl.core.model.reference.AttachmentReference;
 import org.rssowl.core.model.reference.BookMarkReference;
 import org.rssowl.core.model.reference.CategoryReference;
@@ -46,7 +47,6 @@ import org.rssowl.core.model.reference.NewsReference;
 import org.rssowl.core.model.reference.PersonReference;
 import org.rssowl.core.model.reference.SearchConditionReference;
 import org.rssowl.core.model.reference.SearchMarkReference;
-import org.rssowl.core.model.search.ISearchCondition;
 
 import java.net.URI;
 

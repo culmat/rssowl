@@ -29,7 +29,7 @@ import org.rssowl.core.model.events.FeedEvent;
 import org.rssowl.core.model.events.ModelEvent;
 import org.rssowl.core.model.events.NewsEvent;
 import org.rssowl.core.model.events.runnable.EventRunnable;
-import org.rssowl.core.model.internal.types.Feed;
+import org.rssowl.core.model.internal.persist.Feed;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.INews;
