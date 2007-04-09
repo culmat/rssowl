@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.model;
+package org.rssowl.core.util;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.model.dao.IApplicationLayer;
