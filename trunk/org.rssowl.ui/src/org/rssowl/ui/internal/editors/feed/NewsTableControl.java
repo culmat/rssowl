@@ -68,7 +68,7 @@ import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.ILabel;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
-import org.rssowl.core.model.preferences.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferencesScope;
 import org.rssowl.core.model.reference.ModelReference;
 import org.rssowl.core.model.reference.SearchMarkReference;
 import org.rssowl.core.util.ITask;
