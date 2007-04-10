@@ -188,6 +188,7 @@ public class OwlUI {
   /* Name of Folder for storing Icons */
   private static final String ICONS_FOLDER = "icons";
 
+  /* Shared Clipboard instance */
   private static Clipboard fgClipboard;
 
   /**
