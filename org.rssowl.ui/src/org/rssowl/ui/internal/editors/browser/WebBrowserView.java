@@ -66,7 +66,7 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 /**
  * The <code>WebBrowserView</code> is able to display a website in an embedded
  * Browser.
- * 
+ *
  * @author bpasero
  */
 public class WebBrowserView extends EditorPart {
@@ -363,8 +363,6 @@ public class WebBrowserView extends EditorPart {
           String url = ((Browser) event.widget).getUrl();
           if (ApplicationServer.getDefault().isNewsServerUrl(url))
             fLocationInput.setText(""); //$NON-NLS-1$
-          else if (StringUtils.isSet(url))
-            fLocationInput.setText(URIUtils.ABOUT_BLANK.equals(url) ? "" : url); //$NON-NLS-1$
         }
       }
 
