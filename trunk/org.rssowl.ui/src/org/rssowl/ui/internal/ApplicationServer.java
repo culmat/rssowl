@@ -388,7 +388,8 @@ public class ApplicationServer {
             if (StringUtils.isSet(message))
               safeProcess(socket, message);
           } catch (IOException e) {
-            Activator.getDefault().logInfo(e.getMessage());
+            if (!Controller.getDefault().isShuttingDown())
+              Activator.getDefault().logInfo(e.getMessage());
           }
 
           /* Cleanup */
