@@ -280,6 +280,11 @@ public class Controller {
    * @return Returns the contextService.
    */
   public ContextService getContextService() {
+
+    /* Create the Context Service if not yet done */
+    if (fContextService == null)
+      fContextService = new ContextService();
+
     return fContextService;
   }
 
@@ -524,10 +529,10 @@ public class Controller {
   }
 
   /**
-   * This method is called after the workbench has been initialized and just
-   * before the first window is about to be opened.
+   * Tells the Controller to start. This method is called automatically from
+   * osgi as soon as the org.rssowl.ui bundle gets activated.
    */
-  public void preUIStartup() {
+  public void startup() {
 
     /* Create Relations and Import Default Feeds if required */
     if (!Owl.TESTING) {
@@ -554,21 +559,81 @@ public class Controller {
     /* Create the News-Service */
     fNewsService = new NewsService();
 
-    /* Create the Context Service */
-    if (!Owl.TESTING)
-      fContextService = new ContextService();
-  }
-
-  /**
-   * This method is called just after the windows have been opened.
-   */
-  public void postUIStartup() {
-
     /* Create the Feed-Reload Service */
     if (!Owl.TESTING)
       fFeedReloadService = new FeedReloadService();
   }
 
+  /**
+   * Tells the Controller to stop. This method is called automatically from osgi
+   * as soon as the org.rssowl.ui bundle gets stopped.
+   */
+  public void shutdown() {
+
+    /* Stop the Feed Reload Service */
+    if (!Owl.TESTING)
+      fFeedReloadService.stopService();
+
+    /* Cancel the reload queue */
+    fReloadFeedQueue.cancel(false);
+
+    /* Stop the Cache-Service */
+    fCacheService.stopService();
+
+    /* Cancel the feed-save queue (join) */
+    fSaveFeedQueue.cancel(true);
+
+    /* Stop the News-Service */
+    fNewsService.stopService();
+
+    /* Shutdown ApplicationServer */
+    ApplicationServer.getDefault().shutdown();
+  }
+
+  /**
+   * This method is called after the workbench has been initialized and just
+   * before the first window is about to be opened.
+   */
+  //  public void preUIStartup() {
+  //
+  //    /* Create Relations and Import Default Feeds if required */
+  //    if (!Owl.TESTING) {
+  //      SafeRunner.run(new LoggingSafeRunnable() {
+  //        public void run() throws Exception {
+  //
+  //          /* First check wether this action is required */
+  //          Boolean firstStartToken = Owl.getPersistenceService().getPreferencesDAO().getBoolean(FIRST_START_TOKEN);
+  //          if (firstStartToken != null)
+  //            return;
+  //
+  //          onFirstStartup();
+  //
+  //          /* Mark this as the first start */
+  //          Owl.getPersistenceService().getPreferencesDAO().putBoolean(FIRST_START_TOKEN, true);
+  //        }
+  //      });
+  //    }
+  //
+  //    /* Create the Cache-Service */
+  //    fCacheService = new CacheService();
+  //    fCacheService.cacheRootFolders();
+  //
+  //    /* Create the News-Service */
+  //    fNewsService = new NewsService();
+  //
+  //    /* Create the Context Service */
+  //    if (!Owl.TESTING)
+  //      fContextService = new ContextService();
+  //  }
+  /**
+   * This method is called just after the windows have been opened.
+   */
+  //  public void postUIStartup() {
+  //
+  //    /* Create the Feed-Reload Service */
+  //    if (!Owl.TESTING)
+  //      fFeedReloadService = new FeedReloadService();
+  //  }
   /**
    * Returns wether the application is in process of shutting down.
    *
@@ -589,15 +654,15 @@ public class Controller {
   public boolean preUIShutdown() {
     fShuttingDown = true;
 
-    /* Stop the Feed Reload Service */
-    if (!Owl.TESTING)
-      fFeedReloadService.stopService();
-
-    /* Cancel the reload queue */
-    fReloadFeedQueue.cancel(false);
-
-    /* Stop the Cache-Service */
-    fCacheService.stopService();
+    //    /* Stop the Feed Reload Service */
+    //    if (!Owl.TESTING)
+    //      fFeedReloadService.stopService();
+    //
+    //    /* Cancel the reload queue */
+    //    fReloadFeedQueue.cancel(false);
+    //
+    //    /* Stop the Cache-Service */
+    //    fCacheService.stopService();
 
     return true;
   }
@@ -606,18 +671,17 @@ public class Controller {
    * This method is called during workbench shutdown after all windows have been
    * closed.
    */
-  public void postUIShutdown() {
-
-    /* Cancel the feed-save queue (join) */
-    fSaveFeedQueue.cancel(true);
-
-    /* Stop the News-Service */
-    fNewsService.stopService();
-
-    /* Shutdown ApplicationServer */
-    ApplicationServer.getDefault().shutdown();
-  }
-
+  //  public void postUIShutdown() {
+  //
+  //    /* Cancel the feed-save queue (join) */
+  //    fSaveFeedQueue.cancel(true);
+  //
+  //    /* Stop the News-Service */
+  //    fNewsService.stopService();
+  //
+  //    /* Shutdown ApplicationServer */
+  //    ApplicationServer.getDefault().shutdown();
+  //  }
   private void onFirstStartup() throws PersistenceException, InterpreterException, ParserException {
 
     /* Add Default Labels */
