@@ -117,7 +117,7 @@ public class BrowserBar {
           String url = ((Browser) event.widget).getUrl();
           if (ApplicationServer.getDefault().isNewsServerUrl(url))
             fLocationInput.setText(""); //$NON-NLS-1$
-          else
+          else if (!StringUtils.isSet(fLocationInput.getText()))
             fLocationInput.setText(URIUtils.ABOUT_BLANK.equals(url) ? "" : url); //$NON-NLS-1$
         }
       }
