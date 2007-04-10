@@ -683,6 +683,9 @@ public class BookMarkExplorer extends ViewPart {
             else
               fBookMarkComparator.setType(BookMarkSorter.Type.DEFAULT_SORTING);
             fViewer.refresh(false);
+
+            /* Save directly to global scope */
+            fGlobalPreferences.putBoolean(DefaultPreferences.BE_SORT_BY_NAME, fSortByName);
           }
         };
         sortByName.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/sort_alpha.gif")); //$NON-NLS-1$

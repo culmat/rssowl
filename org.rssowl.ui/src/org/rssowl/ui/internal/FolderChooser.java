@@ -38,6 +38,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -54,6 +55,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.model.events.FolderAdapter;
 import org.rssowl.core.model.events.FolderEvent;
 import org.rssowl.core.model.persist.IFolder;
@@ -236,6 +238,18 @@ public class FolderChooser extends Composite implements DisposeListener {
     fViewerHeight = fFolderViewer.getTree().getItemHeight() * 10 + 12;
     ((GridData) fFolderViewerContainer.getLayoutData()).heightHint = fViewerHeight;
     ((GridData) fFolderViewerContainer.getLayoutData()).exclude = true;
+
+    /* Sort by Name if set so */
+    if (Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.BE_SORT_BY_NAME))
+      fFolderViewer.setComparator(new ViewerComparator() {
+        @Override
+        public int compare(Viewer viewer, Object e1, Object e2) {
+          IFolder f1 = (IFolder) e1;
+          IFolder f2 = (IFolder) e2;
+
+          return f1.getName().compareTo(f2.getName());
+        }
+      });
 
     fFolderViewer.setContentProvider(new ITreeContentProvider() {
       public Object[] getElements(Object inputElement) {
