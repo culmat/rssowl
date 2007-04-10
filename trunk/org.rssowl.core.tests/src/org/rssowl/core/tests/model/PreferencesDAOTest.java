@@ -31,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.pref.IPreferencesDAO;
 import org.rssowl.core.model.persist.pref.PreferencesEvent;
@@ -53,9 +53,9 @@ public class PreferencesDAOTest {
    */
   @Before
   public void setUp() throws Exception {
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
-    NewsModel.getDefault().getPersistenceLayer().getModelSearch().shutdown();
-    fDao = NewsModel.getDefault().getPersistenceLayer().getPreferencesDAO();
+    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().getModelSearch().shutdown();
+    fDao = Owl.getPersistenceService().getPreferencesDAO();
   }
 
   /**
@@ -441,7 +441,7 @@ public class PreferencesDAOTest {
             deletionEvents[3] = true;
         }
       };
-      NewsModel.getDefault().addPreferencesListener(prefListener);
+      Owl.getListenerService().addPreferencesListener(prefListener);
 
       /* Add some Preferences */
       fDao.putBoolean(key1, value1);
@@ -472,7 +472,7 @@ public class PreferencesDAOTest {
         assertTrue("Missing Preference Deleted Event", element);
     } finally {
       if (prefListener != null)
-        NewsModel.getDefault().removePreferencesListener(prefListener);
+        Owl.getListenerService().removePreferencesListener(prefListener);
     }
   }
 

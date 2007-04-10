@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Before;
 import org.junit.Test;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.internal.persist.Feed;
@@ -57,10 +57,10 @@ public class ControllerTestNetwork {
    */
   @Before
   public void setUp() throws Exception {
-    fDao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
+    fDao = Owl.getPersistenceService().getModelDAO();
     Controller.getDefault().getNewsService().testDirtyShutdown();
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
-    NewsModel.getDefault().getPersistenceLayer().getModelSearch().shutdown();
+    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().getModelSearch().shutdown();
   }
 
   /**
@@ -88,9 +88,9 @@ public class ControllerTestNetwork {
     IFeed feed = new Feed(new URI("http://www.rssowl.org/rssowl2dg/tests/manager/rss_2_0.xml"));
     feed = fDao.saveFeed(feed);
 
-    IFolder folder = NewsModel.getDefault().getTypesFactory().createFolder(null, null, "Folder");
+    IFolder folder = Owl.getModelFactory().createFolder(null, null, "Folder");
     folder = fDao.saveFolder(folder);
-    IBookMark bookmark = NewsModel.getDefault().getTypesFactory().createBookMark(1L, folder, new FeedLinkReference(feed.getLink()), "BookMark");
+    IBookMark bookmark = Owl.getModelFactory().createBookMark(1L, folder, new FeedLinkReference(feed.getLink()), "BookMark");
 
     Controller.getDefault().reload(bookmark, null, new NullProgressMonitor());
 
@@ -108,9 +108,9 @@ public class ControllerTestNetwork {
     IFeed feed = new Feed(new URI("http://www.rssowl.org/rssowl2dg/tests/not_existing.xml"));
     feed = fDao.saveFeed(feed);
 
-    IFolder folder = NewsModel.getDefault().getTypesFactory().createFolder(null, null, "Folder");
+    IFolder folder = Owl.getModelFactory().createFolder(null, null, "Folder");
     folder = fDao.saveFolder(folder);
-    IBookMark bookmark = NewsModel.getDefault().getTypesFactory().createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark");
+    IBookMark bookmark = Owl.getModelFactory().createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark");
 
     Controller.getDefault().reload(bookmark, null, new NullProgressMonitor());
 
@@ -143,9 +143,9 @@ public class ControllerTestNetwork {
     IFeed feed = new Feed(new URI("http://www.rssowl.org/rssowl2dg/tests/manager/rss_2_0.xml"));
     feed = fDao.saveFeed(feed);
 
-    IFolder folder = NewsModel.getDefault().getTypesFactory().createFolder(null, null, "Folder");
+    IFolder folder = Owl.getModelFactory().createFolder(null, null, "Folder");
     folder = fDao.saveFolder(folder);
-    IBookMark bookmark = NewsModel.getDefault().getTypesFactory().createBookMark(1L, folder, new FeedLinkReference(feed.getLink()), "BookMark");
+    IBookMark bookmark = Owl.getModelFactory().createBookMark(1L, folder, new FeedLinkReference(feed.getLink()), "BookMark");
 
     Controller.getDefault().reload(bookmark, null, new NullProgressMonitor());
 
@@ -165,8 +165,8 @@ public class ControllerTestNetwork {
 
   private IBookMark createBookMark(IFeed feed) throws PersistenceException {
     IModelDAO dao = fDao;
-    IFolder folder = dao.saveFolder(NewsModel.getDefault().getTypesFactory().createFolder(null, null, "Root"));
+    IFolder folder = dao.saveFolder(Owl.getModelFactory().createFolder(null, null, "Root"));
 
-    return dao.saveBookMark(NewsModel.getDefault().getTypesFactory().createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark"));
+    return dao.saveBookMark(Owl.getModelFactory().createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark"));
   }
 }

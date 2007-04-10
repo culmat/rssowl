@@ -32,8 +32,8 @@ import static org.junit.Assert.fail;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
@@ -84,7 +84,6 @@ import java.util.Set;
 public class ApplicationLayerTest {
   private IModelTypesFactory fFactory;
   private IModelDAO fDao;
-  private NewsModel fModel;
   private IApplicationLayer fAppLayer;
 
   /**
@@ -92,18 +91,18 @@ public class ApplicationLayerTest {
    */
   @Before
   public void setUp() throws Exception {
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
-    NewsModel.getDefault().getPersistenceLayer().getModelSearch().shutdown();
+    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().getModelSearch().shutdown();
     Controller.getDefault().getNewsService().testDirtyShutdown();
-    fFactory = NewsModel.getDefault().getTypesFactory();
-    fDao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
-    fModel = NewsModel.getDefault();
-    fAppLayer = fModel.getPersistenceLayer().getApplicationLayer();
+    fFactory = Owl.getModelFactory();
+    fDao = Owl.getPersistenceService().getModelDAO();
+    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
   }
-  
+
   /**
    * See bug #184 : State change and async loading of the same news in different
    * feeds can lead to incorrect behaviour.
+   *
    * @throws Exception
    */
   @Test
@@ -114,32 +113,33 @@ public class ApplicationLayerTest {
     news0.setLink(newsLink);
     news0.setState(INews.State.READ);
     fDao.saveFeed(feed0);
-    
+
     IFolder folder = fFactory.createFolder(null, null, "Folder");
     IBookMark mark0 = fFactory.createBookMark(null, folder, new FeedLinkReference(feed0.getLink()), "Mark0");
     fDao.saveFolder(folder);
     fAppLayer.handleFeedReload(mark0, feed0, null, false);
-    
+
     IFeed feed1 = fFactory.createFeed(null, new URI("http://www.feed1.com"));
     fDao.saveFeed(feed1);
     IBookMark mark1 = fFactory.createBookMark(null, folder, new FeedLinkReference(feed1.getLink()), "Mark1");
     fDao.saveFolder(folder);
-    
+
     feed1 = fFactory.createFeed(null, new URI("http://www.feed1.com"));
     INews news1 = fFactory.createNews(null, feed1, new Date());
     news1.setLink(newsLink);
     fAppLayer.handleFeedReload(mark1, feed1, null, false);
-    
+
     assertEquals(INews.State.READ, fDao.loadNews(news1.getId()).getState());
   }
 
   /**
    * See bug #317 : Retention strategy works incorrectly if news is deleted
    * before being saved.
+   *
    * @throws Exception
    */
   @Test
-  public void testHandleFeedReloadWithRetentionStrategy() throws Exception   {
+  public void testHandleFeedReloadWithRetentionStrategy() throws Exception {
     IFeed feed = fFactory.createFeed(null, new URI("http://www.rssowl.org"));
     IFolder folder = fFactory.createFolder(null, null, "Folder");
     IBookMark mark = fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "Mark");
@@ -150,7 +150,7 @@ public class ApplicationLayerTest {
     INews news = fFactory.createNews(null, emptyFeed, new Date());
     news.setState(INews.State.READ);
 
-    NewsModel.getDefault().getEntityScope(mark).putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+    Owl.getPreferenceService().getEntityScope(mark).putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
     fAppLayer.handleFeedReload(mark, emptyFeed, null, false);
 
     assertEquals(0, feed.getVisibleNews().size());
@@ -160,10 +160,11 @@ public class ApplicationLayerTest {
   /**
    * See bug #318 : If attachments are deleted as part of a reload, oldNews are
    * not filled in NewsEvent.
+   *
    * @throws Exception
    */
   @Test
-  public void testHandleFeedReloadFillsOldNewsWithAttachmentDeleted() throws Exception  {
+  public void testHandleFeedReloadFillsOldNewsWithAttachmentDeleted() throws Exception {
     NewsListener newsListener = null;
     try {
       IFeed feed = fFactory.createFeed(null, new URI("http://www.rssowl.org"));
@@ -186,17 +187,17 @@ public class ApplicationLayerTest {
           assertNotNull(events.iterator().next().getOldNews());
         }
       };
-      NewsModel.getDefault().addNewsListener(newsListener);
+      Owl.getListenerService().addNewsListener(newsListener);
       fAppLayer.handleFeedReload(mark, emptyFeed, null, false);
     } finally {
       if (newsListener != null)
-        NewsModel.getDefault().removeNewsListener(newsListener);
+        Owl.getListenerService().removeNewsListener(newsListener);
     }
   }
 
   /**
-   * Tests that calling setNewsState with force = true
-   * fires both events even though the news state has not changed.
+   * Tests that calling setNewsState with force = true fires both events even
+   * though the news state has not changed.
    *
    * @throws Exception
    */
@@ -228,19 +229,18 @@ public class ApplicationLayerTest {
           assertEquals(2, events.size());
         }
       };
-      NewsModel.getDefault().addNewsListener(newsListener);
+      Owl.getListenerService().addNewsListener(newsListener);
       fAppLayer.setNewsState(newsList, INews.State.NEW, true, true);
       assertEquals(true, newsUpdatedCalled[0]);
     } finally {
       if (newsListener != null)
-        NewsModel.getDefault().removeNewsListener(newsListener);
+        Owl.getListenerService().removeNewsListener(newsListener);
     }
   }
 
   /**
-   * Tests that the all NewsEvents issued after a call to setNewsState are
-   * fully activated even if there was an equivalent news that was not
-   * in memory.
+   * Tests that the all NewsEvents issued after a call to setNewsState are fully
+   * activated even if there was an equivalent news that was not in memory.
    *
    * @throws Exception
    */
@@ -248,48 +248,48 @@ public class ApplicationLayerTest {
   public void testSetNewsStateWithEquivalentNewsHasNewsEventEntityActivated() throws Exception {
     NewsListener newsListener = null;
     try {
-    IFeed feed1 = fModel.getTypesFactory().createFeed(null, new URI("http://www.feed.com"));
-    IFeed feed2 = fModel.getTypesFactory().createFeed(null, new URI("http://www.feed2.com"));
+      IFeed feed1 = Owl.getModelFactory().createFeed(null, new URI("http://www.feed.com"));
+      IFeed feed2 = Owl.getModelFactory().createFeed(null, new URI("http://www.feed2.com"));
 
-    INews news1 = fModel.getTypesFactory().createNews(null, feed1, new Date());
-    news1.setLink(new URI("www.link.com"));
+      INews news1 = Owl.getModelFactory().createNews(null, feed1, new Date());
+      news1.setLink(new URI("www.link.com"));
 
-    INews news2 = fModel.getTypesFactory().createNews(null, feed2, new Date());
-    news2.setLink(new URI("www.link.com"));
+      INews news2 = Owl.getModelFactory().createNews(null, feed2, new Date());
+      news2.setLink(new URI("www.link.com"));
 
-    fModel.getTypesFactory().createNews(null, feed1, new Date());
-    fModel.getTypesFactory().createNews(null, feed2, new Date());
+      Owl.getModelFactory().createNews(null, feed1, new Date());
+      Owl.getModelFactory().createNews(null, feed2, new Date());
 
-    fDao.saveFeed(feed1);
-    feed2 = fDao.saveFeed(feed2);
-    feed1 = null;
-    feed2 = null;
-    news1 = null;
-    System.gc();
+      fDao.saveFeed(feed1);
+      feed2 = fDao.saveFeed(feed2);
+      feed1 = null;
+      feed2 = null;
+      news1 = null;
+      System.gc();
 
-    List<INews> newsList = Collections.singletonList(news2);
-    final boolean[] newsUpdatedCalled = new boolean[1];
-    newsListener = new NewsAdapter() {
-      @Override
-      public void newsUpdated(Set<NewsEvent> events) {
-        newsUpdatedCalled[0] = true;
-        assertEquals(2, events.size());
-        for (NewsEvent event : events) {
-          IFeed feed = event.getEntity().getFeedReference().resolve();
+      List<INews> newsList = Collections.singletonList(news2);
+      final boolean[] newsUpdatedCalled = new boolean[1];
+      newsListener = new NewsAdapter() {
+        @Override
+        public void newsUpdated(Set<NewsEvent> events) {
+          newsUpdatedCalled[0] = true;
+          assertEquals(2, events.size());
+          for (NewsEvent event : events) {
+            IFeed feed = event.getEntity().getFeedReference().resolve();
 
-          /* This should be enough to verify that the news is fully activated */
-          assertNotNull(feed.getId());
-          assertNotNull(feed.getNews());
-          assertNotNull(feed.getNews().get(0));
+            /* This should be enough to verify that the news is fully activated */
+            assertNotNull(feed.getId());
+            assertNotNull(feed.getNews());
+            assertNotNull(feed.getNews().get(0));
+          }
         }
-      }
-    };
-    NewsModel.getDefault().addNewsListener(newsListener);
-    fAppLayer.setNewsState(newsList, INews.State.READ, true, false);
-    assertEquals(true, newsUpdatedCalled[0]);
+      };
+      Owl.getListenerService().addNewsListener(newsListener);
+      fAppLayer.setNewsState(newsList, INews.State.READ, true, false);
+      assertEquals(true, newsUpdatedCalled[0]);
     } finally {
       if (newsListener != null)
-        NewsModel.getDefault().removeNewsListener(newsListener);
+        Owl.getListenerService().removeNewsListener(newsListener);
     }
   }
 
@@ -360,11 +360,11 @@ public class ApplicationLayerTest {
         assertEquals(State.UNREAD, event.getEntity().getState());
       }
     };
-    fModel.addNewsListener(newsListener);
+    Owl.getListenerService().addNewsListener(newsListener);
     try {
       newsList = fAppLayer.saveNews(newsList);
     } finally {
-      fModel.removeNewsListener(newsListener);
+      Owl.getListenerService().removeNewsListener(newsListener);
     }
     newsListener = new NewsAdapter() {
       @Override
@@ -376,12 +376,12 @@ public class ApplicationLayerTest {
         assertEquals(State.UPDATED, event.getEntity().getState());
       }
     };
-    fModel.addNewsListener(newsListener);
+    Owl.getListenerService().addNewsListener(newsListener);
     newsList.get(0).setState(State.UPDATED);
     try {
       fAppLayer.saveNews(newsList);
     } finally {
-      fModel.removeNewsListener(newsListener);
+      Owl.getListenerService().removeNewsListener(newsListener);
     }
   }
 
@@ -444,7 +444,6 @@ public class ApplicationLayerTest {
     assertEquals(newsId, feed1.getNews().get(0).getId());
   }
 
-
   /**
    * Tests {@link IApplicationLayer#saveNews(List)}.
    *
@@ -498,12 +497,12 @@ public class ApplicationLayerTest {
         }
       }
     };
-    fModel.addNewsListener(newsListener);
+    Owl.getListenerService().addNewsListener(newsListener);
     try {
       List<INews> savedNews = fAppLayer.saveNews(newsList);
       assertEquals(newsList, savedNews);
     } finally {
-      fModel.removeNewsListener(newsListener);
+      Owl.getListenerService().removeNewsListener(newsListener);
     }
     assertEquals(true, newsUpdatedCalled[0]);
   }
@@ -521,8 +520,7 @@ public class ApplicationLayerTest {
     try {
       /* Add */
       final IFolder oldMarkParent = fFactory.createFolder(null, null, "Old parent");
-      final IBookMark bookMark = fFactory.createBookMark(null, oldMarkParent,
-          new FeedLinkReference(new URI("http://www.link.com")), "bookmark");
+      final IBookMark bookMark = fFactory.createBookMark(null, oldMarkParent, new FeedLinkReference(new URI("http://www.link.com")), "bookmark");
       final ISearchMark searchMark = fFactory.createSearchMark(null, oldMarkParent, "searchmark");
       fDao.saveFolder(oldMarkParent);
 
@@ -607,12 +605,11 @@ public class ApplicationLayerTest {
         }
       };
 
-      fModel.addFolderListener(folderListener);
-      fModel.addBookMarkListener(bookMarkListener);
-      fModel.addSearchMarkListener(searchMarkListener);
+      Owl.getListenerService().addFolderListener(folderListener);
+      Owl.getListenerService().addBookMarkListener(bookMarkListener);
+      Owl.getListenerService().addSearchMarkListener(searchMarkListener);
 
-      ReparentInfo<IFolder, IFolder> folderInfo =
-        new ReparentInfo<IFolder, IFolder>(folder, newFolderParent, null, null);
+      ReparentInfo<IFolder, IFolder> folderInfo = new ReparentInfo<IFolder, IFolder>(folder, newFolderParent, null, null);
       List<ReparentInfo<IFolder, IFolder>> folderInfos = Collections.singletonList(folderInfo);
 
       List<ReparentInfo<IMark, IFolder>> markInfos = new ArrayList<ReparentInfo<IMark, IFolder>>();
@@ -644,17 +641,17 @@ public class ApplicationLayerTest {
       assertTrue("Missing bookMarkUpdated Event", bookMarkUpdateEventOccurred[0]);
       assertTrue("Missing searchMarkUpdated Event", searchMarkUpdateEventOccurred[0]);
 
-      fModel.removeFolderListener(folderListener);
-      fModel.removeBookMarkListener(bookMarkListener);
-      fModel.removeSearchMarkListener(searchMarkListener);
+      Owl.getListenerService().removeFolderListener(folderListener);
+      Owl.getListenerService().removeBookMarkListener(bookMarkListener);
+      Owl.getListenerService().removeSearchMarkListener(searchMarkListener);
     } finally {
       /* Cleanup */
       if (folderListener != null)
-        fModel.removeFolderListener(folderListener);
+        Owl.getListenerService().removeFolderListener(folderListener);
       if (bookMarkListener != null)
-        fModel.removeBookMarkListener(bookMarkListener);
+        Owl.getListenerService().removeBookMarkListener(bookMarkListener);
       if (searchMarkListener != null)
-        fModel.removeSearchMarkListener(searchMarkListener);
+        Owl.getListenerService().removeSearchMarkListener(searchMarkListener);
     }
   }
 
@@ -676,12 +673,9 @@ public class ApplicationLayerTest {
     IFolder childOfRoot1 = fFactory.createFolder(null, root1Ref.resolve(), "Child of Root 1");
     FolderReference childOfRoot1Ref = new FolderReference(fDao.saveFolder(childOfRoot1).getId());
 
-    IBookMark bookmark1 = fFactory.createBookMark(null, root1Ref.resolve(),
-        new FeedLinkReference(feed.getLink()), "Bookmark 1");
-    IBookMark bookmark2 = fFactory.createBookMark(null, root1Ref.resolve(),
-        new FeedLinkReference(feed.getLink()), "Bookmark 2");
-    IBookMark bookmark3 = fFactory.createBookMark(null, childOfRoot1Ref.resolve(),
-        new FeedLinkReference(feed.getLink()), "Bookmark 3");
+    IBookMark bookmark1 = fFactory.createBookMark(null, root1Ref.resolve(), new FeedLinkReference(feed.getLink()), "Bookmark 1");
+    IBookMark bookmark2 = fFactory.createBookMark(null, root1Ref.resolve(), new FeedLinkReference(feed.getLink()), "Bookmark 2");
+    IBookMark bookmark3 = fFactory.createBookMark(null, childOfRoot1Ref.resolve(), new FeedLinkReference(feed.getLink()), "Bookmark 3");
 
     BookMarkReference bookmarkRef1 = new BookMarkReference(fDao.saveBookMark(bookmark1).getId());
     BookMarkReference bookmarkRef2 = new BookMarkReference(fDao.saveBookMark(bookmark2).getId());
@@ -796,7 +790,7 @@ public class ApplicationLayerTest {
     marks = fAppLayer.loadAllBookMarks(false);
     assertEquals(1, marks.size());
     //TODO Using an activation depth of 1 seems to be buggy. Using 2 for now
-//    assertNull(marks.get(0).getFolder().getName());
+    //    assertNull(marks.get(0).getFolder().getName());
   }
 
   /**
@@ -840,7 +834,7 @@ public class ApplicationLayerTest {
   /**
    *
    */
-  public void testLoadLabelsActivation()    {
+  public void testLoadLabelsActivation() {
     String colour = "159,63,63";
     ILabel label1 = fFactory.createLabel(null, "Important");
     label1.setColor(colour);
@@ -887,7 +881,6 @@ public class ApplicationLayerTest {
   }
 
   /**
-   *
    * @throws Exception
    */
   @Test
@@ -914,10 +907,10 @@ public class ApplicationLayerTest {
   public void testSetNewsState() throws Exception {
     NewsListener newsListener = null;
     try {
-      IFeed feed = fModel.getTypesFactory().createFeed(null, new URI("http://www.feed.com"));
-      fModel.getTypesFactory().createNews(null, feed, new Date());
-      fModel.getTypesFactory().createNews(null, feed, new Date());
-      fModel.getTypesFactory().createNews(null, feed, new Date());
+      IFeed feed = Owl.getModelFactory().createFeed(null, new URI("http://www.feed.com"));
+      Owl.getModelFactory().createNews(null, feed, new Date());
+      Owl.getModelFactory().createNews(null, feed, new Date());
+      Owl.getModelFactory().createNews(null, feed, new Date());
 
       Feed savedFeed = (Feed) fDao.saveFeed(feed);
       assertTrue(savedFeed.isIdentical(fDao.loadFeed(savedFeed.getId())));
@@ -949,21 +942,21 @@ public class ApplicationLayerTest {
             assertEquals(true, event.isRoot());
         }
       };
-      fModel.addNewsListener(newsListener);
+      Owl.getListenerService().addNewsListener(newsListener);
 
-      fModel.getPersistenceLayer().getApplicationLayer().setNewsState(news, INews.State.UNREAD, true, false);
+      fAppLayer.setNewsState(news, INews.State.UNREAD, true, false);
 
       assertEquals(news1.resolve().getState(), INews.State.UNREAD);
       assertEquals(news2.resolve().getState(), INews.State.UNREAD);
       assertEquals(news3.resolve().getState(), INews.State.NEW);
 
-      fModel.getPersistenceLayer().getApplicationLayer().setNewsState(news, INews.State.READ, true, false);
+      fAppLayer.setNewsState(news, INews.State.READ, true, false);
 
       assertEquals(news1.resolve().getState(), INews.State.READ);
       assertEquals(news2.resolve().getState(), INews.State.READ);
       assertEquals(news3.resolve().getState(), INews.State.NEW);
 
-      fModel.getPersistenceLayer().getApplicationLayer().setNewsState(news, INews.State.DELETED, true, false);
+      fAppLayer.setNewsState(news, INews.State.DELETED, true, false);
 
       assertEquals(news1.resolve().getState(), INews.State.DELETED);
       assertEquals(news2.resolve().getState(), INews.State.DELETED);
@@ -972,7 +965,7 @@ public class ApplicationLayerTest {
       TestUtils.fail(e);
     } finally {
       if (newsListener != null)
-        fModel.removeNewsListener(newsListener);
+        Owl.getListenerService().removeNewsListener(newsListener);
     }
   }
 
@@ -985,17 +978,17 @@ public class ApplicationLayerTest {
     try {
       NewsService service = Controller.getDefault().getNewsService();
 
-      IFeed feed1 = fModel.getTypesFactory().createFeed(null, new URI("http://www.feed.com"));
-      IFeed feed2 = fModel.getTypesFactory().createFeed(null, new URI("http://www.feed2.com"));
+      IFeed feed1 = Owl.getModelFactory().createFeed(null, new URI("http://www.feed.com"));
+      IFeed feed2 = Owl.getModelFactory().createFeed(null, new URI("http://www.feed2.com"));
 
-      INews news1 = fModel.getTypesFactory().createNews(null, feed1, new Date());
+      INews news1 = Owl.getModelFactory().createNews(null, feed1, new Date());
       news1.setLink(new URI("www.link.com"));
 
-      INews news2 = fModel.getTypesFactory().createNews(null, feed2, new Date());
+      INews news2 = Owl.getModelFactory().createNews(null, feed2, new Date());
       news2.setLink(new URI("www.link.com"));
 
-      fModel.getTypesFactory().createNews(null, feed1, new Date());
-      fModel.getTypesFactory().createNews(null, feed2, new Date());
+      Owl.getModelFactory().createNews(null, feed1, new Date());
+      Owl.getModelFactory().createNews(null, feed2, new Date());
 
       feed1 = fDao.saveFeed(feed1);
       feed2 = fDao.saveFeed(feed2);
@@ -1034,7 +1027,7 @@ public class ApplicationLayerTest {
           }
         }
       };
-      fModel.addNewsListener(newsListener);
+      Owl.getListenerService().addNewsListener(newsListener);
 
       fAppLayer.setNewsState(Arrays.asList(new INews[] { new NewsReference(news1ID).resolve() }), INews.State.READ, true, false);
 
@@ -1044,7 +1037,7 @@ public class ApplicationLayerTest {
       assertEquals(1, service.getNewCount(news2.getFeedReference()));
     } finally {
       if (newsListener != null)
-        fModel.removeNewsListener(newsListener);
+        Owl.getListenerService().removeNewsListener(newsListener);
     }
   }
 }

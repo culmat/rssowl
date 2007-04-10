@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.internal.persist.BookMark;
 import org.rssowl.core.model.internal.persist.Folder;
 import org.rssowl.core.model.persist.IBookMark;
@@ -56,8 +56,8 @@ public class TreeTraversalTest {
    */
   @Before
   public void setUp() throws Exception {
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
-    NewsModel.getDefault().getPersistenceLayer().getModelSearch().shutdown();
+    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().getModelSearch().shutdown();
   }
 
   /**

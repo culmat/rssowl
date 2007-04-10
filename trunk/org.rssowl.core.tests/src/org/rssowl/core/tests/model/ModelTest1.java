@@ -33,7 +33,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.events.FolderAdapter;
@@ -85,7 +85,6 @@ import java.util.Set;
 public class ModelTest1 {
   private IModelTypesFactory fFactory;
   private IModelDAO fDao;
-  private NewsModel fModel;
   private IApplicationLayer fAppLayer;
 
   /**
@@ -93,12 +92,11 @@ public class ModelTest1 {
    */
   @Before
   public void setUp() throws Exception {
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
-    NewsModel.getDefault().getPersistenceLayer().getModelSearch().shutdown();
-    fFactory = NewsModel.getDefault().getTypesFactory();
-    fDao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
-    fModel = NewsModel.getDefault();
-    fAppLayer = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer();
+    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().getModelSearch().shutdown();
+    fFactory = Owl.getModelFactory();
+    fDao = Owl.getPersistenceService().getModelDAO();
+    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
   }
 
   /**
@@ -153,13 +151,13 @@ public class ModelTest1 {
         folderUpdatedCalled[0] = true;
       }
     };
-    NewsModel.getDefault().addFolderListener(listener);
+    Owl.getListenerService().addFolderListener(listener);
     try {
       fAppLayer.deleteFolders(foldersToRemove);
       assertEquals(true, folderDeletedCalled[0]);
       assertEquals(true, folderUpdatedCalled[0]);
     } finally {
-      NewsModel.getDefault().removeFolderListener(listener);
+      Owl.getListenerService().removeFolderListener(listener);
     }
   }
 
@@ -251,11 +249,11 @@ public class ModelTest1 {
         assertEquals(State.UNREAD, event.getEntity().getState());
       }
     };
-    fModel.addNewsListener(newsListener);
+    Owl.getListenerService().addNewsListener(newsListener);
     try {
       feed = fDao.saveFeed(feed);
     } finally {
-      fModel.removeNewsListener(newsListener);
+      Owl.getListenerService().removeNewsListener(newsListener);
     }
     newsListener = new NewsAdapter() {
       @Override
@@ -267,12 +265,12 @@ public class ModelTest1 {
         assertEquals(State.UPDATED, event.getEntity().getState());
       }
     };
-    fModel.addNewsListener(newsListener);
+    Owl.getListenerService().addNewsListener(newsListener);
     feed.getNews().get(0).setState(State.UPDATED);
     try {
       feed = fDao.saveFeed(feed);
     } finally {
-      fModel.removeNewsListener(newsListener);
+      Owl.getListenerService().removeNewsListener(newsListener);
     }
   }
 
@@ -308,11 +306,11 @@ public class ModelTest1 {
         assertEquals(State.UNREAD, event.getEntity().getState());
       }
     };
-    fModel.addNewsListener(newsListener);
+    Owl.getListenerService().addNewsListener(newsListener);
     try {
       savedNews = fDao.saveNews(savedNews);
     } finally {
-      fModel.removeNewsListener(newsListener);
+      Owl.getListenerService().removeNewsListener(newsListener);
     }
     newsListener = new NewsAdapter() {
       @Override
@@ -324,12 +322,12 @@ public class ModelTest1 {
         assertEquals(State.UPDATED, event.getEntity().getState());
       }
     };
-    fModel.addNewsListener(newsListener);
+    Owl.getListenerService().addNewsListener(newsListener);
     savedNews.setState(State.UPDATED);
     try {
       fDao.saveNews(savedNews);
     } finally {
-      fModel.removeNewsListener(newsListener);
+      Owl.getListenerService().removeNewsListener(newsListener);
     }
   }
 
@@ -692,13 +690,13 @@ public class ModelTest1 {
         folderUpdatedCalled[0] = true;
       }
     };
-    NewsModel.getDefault().addFolderListener(folderListener);
+    Owl.getListenerService().addFolderListener(folderListener);
     try {
       ISearchMark savedMark = (ISearchMark) savedFolder.getMarks().get(0);
       fDao.deleteSearchMark(new SearchMarkReference(savedMark.getId()));
       assertTrue("folderUpdated was not called", folderUpdatedCalled[0]);
     } finally {
-      NewsModel.getDefault().removeFolderListener(folderListener);
+      Owl.getListenerService().removeFolderListener(folderListener);
     }
   }
 

@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 import org.eclipse.jface.viewers.Viewer;
 import org.junit.Before;
 import org.junit.Test;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.persist.IAttachment;
 import org.rssowl.core.model.persist.IEntity;
@@ -78,8 +78,8 @@ public class NewsGroupFilterTest {
    */
   @Before
   public void setUp() throws Exception {
-    fFactory = NewsModel.getDefault().getTypesFactory();
-    fDao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
+    fFactory = Owl.getModelFactory();
+    fDao = Owl.getPersistenceService().getModelDAO();
     fGrouping = new NewsGrouping();
     fFiltering = new NewsFilter();
     fToday = new Date(DateUtils.getToday().getTimeInMillis() + 1000);

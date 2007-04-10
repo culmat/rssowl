@@ -28,12 +28,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.osgi.service.url.AbstractURLStreamHandlerService;
 import org.osgi.service.url.URLStreamHandlerService;
+import org.rssowl.core.Owl;
 import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.IConditionalGetCompatible;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IProtocolHandler;
-import org.rssowl.core.interpreter.Interpreter;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.persist.IConditionalGet;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IModelTypesFactory;
@@ -60,7 +59,7 @@ public class InMemoryProtocolHandler implements IProtocolHandler {
    * org.eclipse.core.runtime.IProgressMonitor, java.util.Map)
    */
   public Pair<IFeed, IConditionalGet> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException {
-    IModelTypesFactory typesFactory = NewsModel.getDefault().getTypesFactory();
+    IModelTypesFactory typesFactory = Owl.getModelFactory();
 
     /* Create a new empty feed from the existing one */
     IFeed feed = typesFactory.createFeed(null, link);
@@ -85,7 +84,7 @@ public class InMemoryProtocolHandler implements IProtocolHandler {
     }
 
     /* Pass the Stream to the Interpreter */
-    Interpreter.getDefault().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed);
 
     return Pair.create(feed, conditionalGet);
   }
@@ -98,7 +97,7 @@ public class InMemoryProtocolHandler implements IProtocolHandler {
   }
 
   private IConditionalGet getConditionalGet(URI link, InputStream inS) {
-    IModelTypesFactory typesFactory = NewsModel.getDefault().getTypesFactory();
+    IModelTypesFactory typesFactory = Owl.getModelFactory();
 
     if (inS instanceof IConditionalGetCompatible) {
       String ifModifiedSince = ((IConditionalGetCompatible) inS).getIfModifiedSince();

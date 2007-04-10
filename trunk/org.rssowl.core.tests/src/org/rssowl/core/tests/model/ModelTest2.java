@@ -33,7 +33,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
@@ -103,7 +103,6 @@ import java.util.Set;
 public class ModelTest2 {
   private IModelTypesFactory fFactory;
   private IModelDAO fDao;
-  private NewsModel fModel;
   private IApplicationLayer fAppLayer;
 
   /**
@@ -111,12 +110,11 @@ public class ModelTest2 {
    */
   @Before
   public void setUp() throws Exception {
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
-    NewsModel.getDefault().getPersistenceLayer().getModelSearch().shutdown();
-    fFactory = NewsModel.getDefault().getTypesFactory();
-    fDao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
-    fModel = NewsModel.getDefault();
-    fAppLayer = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer();
+    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().getModelSearch().shutdown();
+    fFactory = Owl.getModelFactory();
+    fDao = Owl.getPersistenceService().getModelDAO();
+    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
   }
 
   /**
@@ -172,7 +170,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addFolderListener(folderListener);
+      Owl.getListenerService().addFolderListener(folderListener);
 
       /* Check BookMark Added */
       final IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com"));
@@ -190,7 +188,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addFeedListener(feedListener);
+      Owl.getListenerService().addFeedListener(feedListener);
 
       /* Save Feed since a IBookMark now doesn't contain a feed */
       fDao.saveFeed(feed);
@@ -227,7 +225,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addBookMarkListener(bookMarkListener);
+      Owl.getListenerService().addBookMarkListener(bookMarkListener);
 
       /* Check SearchMark Added */
       final ISearchMark searchMark1 = fFactory.createSearchMark(null, root, "Root SearchMark");
@@ -262,7 +260,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addSearchMarkListener(searchMarkListener);
+      Owl.getListenerService().addSearchMarkListener(searchMarkListener);
 
       /* Check SearchCondition Added */
       ISearchField field1 = fFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
@@ -292,7 +290,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addSearchConditionListener(searchConditionListener);
+      Owl.getListenerService().addSearchConditionListener(searchConditionListener);
 
       /* Save Folder */
       fDao.saveFolder(root);
@@ -323,15 +321,15 @@ public class ModelTest2 {
       TestUtils.fail(e);
     } finally {
       if (folderListener != null)
-        fModel.removeFolderListener(folderListener);
+        Owl.getListenerService().removeFolderListener(folderListener);
       if (bookMarkListener != null)
-        fModel.removeBookMarkListener(bookMarkListener);
+        Owl.getListenerService().removeBookMarkListener(bookMarkListener);
       if (searchMarkListener != null)
-        fModel.removeSearchMarkListener(searchMarkListener);
+        Owl.getListenerService().removeSearchMarkListener(searchMarkListener);
       if (feedListener != null)
-        fModel.removeFeedListener(feedListener);
+        Owl.getListenerService().removeFeedListener(feedListener);
       if (searchConditionListener != null)
-        fModel.removeSearchConditionListener(searchConditionListener);
+        Owl.getListenerService().removeSearchConditionListener(searchConditionListener);
     }
   }
 
@@ -374,7 +372,7 @@ public class ModelTest2 {
         }
       };
 
-      fModel.addFeedListener(feedListener);
+      Owl.getListenerService().addFeedListener(feedListener);
 
       /* Check News Added */
       final INews news1 = fFactory.createNews(null, feed, new Date());
@@ -414,7 +412,7 @@ public class ModelTest2 {
             newsReceivedFromFeed[0] = true;
         }
       };
-      fModel.addNewsListener(newsListener);
+      Owl.getListenerService().addNewsListener(newsListener);
 
       /* Check Attachment Added */
       final IAttachment attachment1 = fFactory.createAttachment(null, news1);
@@ -444,7 +442,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addAttachmentListener(attachmentListener);
+      Owl.getListenerService().addAttachmentListener(attachmentListener);
 
       /* Check Person Added */
       final IPerson person1 = fFactory.createPerson(null, feed);
@@ -469,7 +467,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addPersonListener(personListener);
+      Owl.getListenerService().addPersonListener(personListener);
 
       /* Check Category Added */
       final ICategory category1 = fFactory.createCategory(null, news1);
@@ -494,7 +492,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addCategoryListener(categoryListener);
+      Owl.getListenerService().addCategoryListener(categoryListener);
 
       /* Save Feed */
       fDao.saveFeed(feed);
@@ -526,15 +524,15 @@ public class ModelTest2 {
       TestUtils.fail(e);
     } finally {
       if (feedListener != null)
-        fModel.removeFeedListener(feedListener);
+        Owl.getListenerService().removeFeedListener(feedListener);
       if (newsListener != null)
-        fModel.removeNewsListener(newsListener);
+        Owl.getListenerService().removeNewsListener(newsListener);
       if (attachmentListener != null)
-        fModel.removeAttachmentListener(attachmentListener);
+        Owl.getListenerService().removeAttachmentListener(attachmentListener);
       if (personListener != null)
-        fModel.removePersonListener(personListener);
+        Owl.getListenerService().removePersonListener(personListener);
       if (categoryListener != null)
-        fModel.removeCategoryListener(categoryListener);
+        Owl.getListenerService().removeCategoryListener(categoryListener);
     }
   }
 
@@ -574,7 +572,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addNewsListener(newsListener);
+      Owl.getListenerService().addNewsListener(newsListener);
 
       /* Check Author Added */
       final IPerson person = fFactory.createPerson(null, news);
@@ -590,7 +588,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addPersonListener(personListener);
+      Owl.getListenerService().addPersonListener(personListener);
 
       /* Check Attachments Added */
       final IAttachment attachment1 = fFactory.createAttachment(null, news);
@@ -617,7 +615,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addAttachmentListener(attachmentListener);
+      Owl.getListenerService().addAttachmentListener(attachmentListener);
 
       /* Check Category Added */
       final ICategory category = fFactory.createCategory(null, news);
@@ -633,7 +631,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addCategoryListener(categoryListener);
+      Owl.getListenerService().addCategoryListener(categoryListener);
 
       fDao.saveNews(news);
 
@@ -650,13 +648,13 @@ public class ModelTest2 {
       TestUtils.fail(e);
     } finally {
       if (newsListener != null)
-        fModel.removeNewsListener(newsListener);
+        Owl.getListenerService().removeNewsListener(newsListener);
       if (attachmentListener != null)
-        fModel.removeAttachmentListener(attachmentListener);
+        Owl.getListenerService().removeAttachmentListener(attachmentListener);
       if (personListener != null)
-        fModel.removePersonListener(personListener);
+        Owl.getListenerService().removePersonListener(personListener);
       if (categoryListener != null)
-        fModel.removeCategoryListener(categoryListener);
+        Owl.getListenerService().removeCategoryListener(categoryListener);
     }
   }
 
@@ -710,7 +708,7 @@ public class ModelTest2 {
           fail("Unexpected event");
         }
       };
-      fModel.addNewsListener(newsListener);
+      Owl.getListenerService().addNewsListener(newsListener);
 
       /* Check Attachments Added */
       final boolean attachmentDeleted[] = new boolean[2];
@@ -729,7 +727,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addAttachmentListener(attachmentListener);
+      Owl.getListenerService().addAttachmentListener(attachmentListener);
 
       fDao.deleteFeed(new FeedReference(feed.getId()));
       assertNull(fDao.loadFeed(feed.getId()));
@@ -742,9 +740,9 @@ public class ModelTest2 {
       assertTrue("Missed attachmentDeleted Event in PersonListener!", attachmentDeleted[1]);
     } finally {
       if (newsListener != null)
-        fModel.removeNewsListener(newsListener);
+        Owl.getListenerService().removeNewsListener(newsListener);
       if (attachmentListener != null)
-        fModel.removeAttachmentListener(attachmentListener);
+        Owl.getListenerService().removeAttachmentListener(attachmentListener);
     }
   }
 
@@ -781,7 +779,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addNewsListener(newsListener);
+      Owl.getListenerService().addNewsListener(newsListener);
 
       /* Check Attachments Added */
       final boolean attachmentDeleted[] = new boolean[1];
@@ -798,7 +796,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addAttachmentListener(attachmentListener);
+      Owl.getListenerService().addAttachmentListener(attachmentListener);
 
       AttachmentReference attachmentRef = new AttachmentReference(news.getAttachments().get(0).getId());
       fDao.deleteAttachment(attachmentRef);
@@ -809,9 +807,9 @@ public class ModelTest2 {
       assertTrue("Missed attachmentDeleted Event in PersonListener!", attachmentDeleted[0]);
     } finally {
       if (newsListener != null)
-        fModel.removeNewsListener(newsListener);
+        Owl.getListenerService().removeNewsListener(newsListener);
       if (attachmentListener != null)
-        fModel.removeAttachmentListener(attachmentListener);
+        Owl.getListenerService().removeAttachmentListener(attachmentListener);
     }
   }
 
@@ -868,7 +866,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addFolderListener(folderListener);
+      Owl.getListenerService().addFolderListener(folderListener);
 
       /* Check BookMark Deleted */
       final IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com"));
@@ -906,7 +904,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addBookMarkListener(bookMarkListener);
+      Owl.getListenerService().addBookMarkListener(bookMarkListener);
 
       feedListener = new FeedAdapter() {
         @Override
@@ -918,7 +916,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addFeedListener(feedListener);
+      Owl.getListenerService().addFeedListener(feedListener);
 
       /* Check SearchMark Deleted */
       ISearchMark searchMark1 = fFactory.createSearchMark(null, rootRef.resolve(), "Root SearchMark");
@@ -955,7 +953,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addSearchMarkListener(searchMarkListener);
+      Owl.getListenerService().addSearchMarkListener(searchMarkListener);
 
       /* Check SearchCondition Deleted */
       ISearchField field1 = fFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
@@ -991,7 +989,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addSearchConditionListener(searchConditionListener);
+      Owl.getListenerService().addSearchConditionListener(searchConditionListener);
 
       /* Delete Root Folder */
       fDao.deleteFolder(rootRef);
@@ -1021,15 +1019,15 @@ public class ModelTest2 {
       }
     } finally {
       if (folderListener != null)
-        fModel.removeFolderListener(folderListener);
+        Owl.getListenerService().removeFolderListener(folderListener);
       if (bookMarkListener != null)
-        fModel.removeBookMarkListener(bookMarkListener);
+        Owl.getListenerService().removeBookMarkListener(bookMarkListener);
       if (searchMarkListener != null)
-        fModel.removeSearchMarkListener(searchMarkListener);
+        Owl.getListenerService().removeSearchMarkListener(searchMarkListener);
       if (feedListener != null)
-        fModel.removeFeedListener(feedListener);
+        Owl.getListenerService().removeFeedListener(feedListener);
       if (searchConditionListener != null)
-        fModel.removeSearchConditionListener(searchConditionListener);
+        Owl.getListenerService().removeSearchConditionListener(searchConditionListener);
     }
   }
 
@@ -1069,7 +1067,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addFeedListener(feedListener);
+      Owl.getListenerService().addFeedListener(feedListener);
 
       /* Check News Deleted */
       final INews news1 = fFactory.createNews(null, feedRef.resolve(), new Date());
@@ -1088,7 +1086,7 @@ public class ModelTest2 {
           newsRef[0] = new NewsReference(events.iterator().next().getEntity().getId());
         }
       };
-      fModel.addNewsListener(newsAdapter);
+      Owl.getListenerService().addNewsListener(newsAdapter);
       /* Must save parent because it gets changed during creation of news */
       fDao.saveFeed(feedRef.resolve());
       final NewsReference newsRef1 = newsRef[0];
@@ -1135,7 +1133,7 @@ public class ModelTest2 {
             newsDeletedFromFeed[0] = true;
         }
       };
-      fModel.addNewsListener(newsListener);
+      Owl.getListenerService().addNewsListener(newsListener);
 
       /* Check Attachment Deleted */
       final IAttachment attachment1 = fFactory.createAttachment(null, newsRef1.resolve());
@@ -1165,7 +1163,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addAttachmentListener(attachmentListener);
+      Owl.getListenerService().addAttachmentListener(attachmentListener);
 
       /* Check Person Deleted */
       final boolean personDeleted[] = new boolean[2];
@@ -1184,7 +1182,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addPersonListener(personListener);
+      Owl.getListenerService().addPersonListener(personListener);
 
       /* Check Category Deleted */
       final ICategory category1 = fFactory.createCategory(null, newsRef1.resolve());
@@ -1209,7 +1207,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addCategoryListener(categoryListener);
+      Owl.getListenerService().addCategoryListener(categoryListener);
 
       /* Delete Feed */
       fDao.deleteFeed(feedRef);
@@ -1241,17 +1239,17 @@ public class ModelTest2 {
       TestUtils.fail(e);
     } finally {
       if (newsAdapter != null)
-        fModel.removeNewsListener(newsAdapter);
+        Owl.getListenerService().removeNewsListener(newsAdapter);
       if (feedListener != null)
-        fModel.removeFeedListener(feedListener);
+        Owl.getListenerService().removeFeedListener(feedListener);
       if (newsListener != null)
-        fModel.removeNewsListener(newsListener);
+        Owl.getListenerService().removeNewsListener(newsListener);
       if (attachmentListener != null)
-        fModel.removeAttachmentListener(attachmentListener);
+        Owl.getListenerService().removeAttachmentListener(attachmentListener);
       if (personListener != null)
-        fModel.removePersonListener(personListener);
+        Owl.getListenerService().removePersonListener(personListener);
       if (categoryListener != null)
-        fModel.removeCategoryListener(categoryListener);
+        Owl.getListenerService().removeCategoryListener(categoryListener);
     }
   }
 
@@ -1312,7 +1310,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addNewsListener(newsListener);
+      Owl.getListenerService().addNewsListener(newsListener);
 
       /* Check Author Deleted */
       final boolean personDeleted[] = new boolean[1];
@@ -1326,7 +1324,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addPersonListener(personListener);
+      Owl.getListenerService().addPersonListener(personListener);
 
       /* Check Attachments Deleted */
       final boolean attachmentDeleted[] = new boolean[3];
@@ -1347,7 +1345,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addAttachmentListener(attachmentListener);
+      Owl.getListenerService().addAttachmentListener(attachmentListener);
 
       /* Check Category Deleted */
       final boolean categoryDeleted[] = new boolean[1];
@@ -1361,7 +1359,7 @@ public class ModelTest2 {
           }
         }
       };
-      fModel.addCategoryListener(categoryListener);
+      Owl.getListenerService().addCategoryListener(categoryListener);
 
       /* Delete News */
       fDao.deleteNews(newsRef);
@@ -1379,13 +1377,13 @@ public class ModelTest2 {
       TestUtils.fail(e);
     } finally {
       if (newsListener != null)
-        fModel.removeNewsListener(newsListener);
+        Owl.getListenerService().removeNewsListener(newsListener);
       if (attachmentListener != null)
-        fModel.removeAttachmentListener(attachmentListener);
+        Owl.getListenerService().removeAttachmentListener(attachmentListener);
       if (personListener != null)
-        fModel.removePersonListener(personListener);
+        Owl.getListenerService().removePersonListener(personListener);
       if (categoryListener != null)
-        fModel.removeCategoryListener(categoryListener);
+        Owl.getListenerService().removeCategoryListener(categoryListener);
     }
   }
 }

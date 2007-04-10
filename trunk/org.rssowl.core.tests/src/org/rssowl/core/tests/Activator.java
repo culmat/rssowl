@@ -5,7 +5,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.ui.internal.Controller;
 
 /*   **********************************************************************  **
@@ -51,7 +51,7 @@ public class Activator extends Plugin {
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
-    NewsModel.TESTING = true;
+    Owl.TESTING = true;
     Controller.getDefault().preUIStartup();
   }
 

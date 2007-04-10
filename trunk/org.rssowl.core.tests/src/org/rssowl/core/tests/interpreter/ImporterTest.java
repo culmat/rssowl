@@ -30,8 +30,7 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.rssowl.core.interpreter.Interpreter;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
@@ -54,8 +53,8 @@ public class ImporterTest {
    */
   @Before
   public void setUp() throws Exception {
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
-    NewsModel.getDefault().getPersistenceLayer().getModelSearch().shutdown();
+    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().getModelSearch().shutdown();
   }
 
   /**
@@ -67,7 +66,7 @@ public class ImporterTest {
   @SuppressWarnings("nls")
   public void testImportOPML() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/import_opml.xml");
-    List<? extends IEntity> types = Interpreter.getDefault().importFrom(inS);
+    List<? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
     assertEquals(1, types.size());
     assertTrue(types.get(0) instanceof IFolder);
 
@@ -156,7 +155,7 @@ public class ImporterTest {
   @SuppressWarnings("nls")
   public void testImportMyImport() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/import_myimport.xml");
-    List<? extends IEntity> types = Interpreter.getDefault().importFrom(inS);
+    List<? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
     assertEquals(1, types.size());
     assertTrue(types.get(0) instanceof IFolder);
 

@@ -33,7 +33,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.AttachmentAdapter;
@@ -104,18 +104,16 @@ import java.util.Set;
 public class ModelTest3 {
   private IModelTypesFactory fFactory;
   private IModelDAO fDao;
-  private NewsModel fModel;
 
   /**
    * @throws Exception
    */
   @Before
   public void setUp() throws Exception {
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
-    NewsModel.getDefault().getPersistenceLayer().getModelSearch().shutdown();
-    fFactory = NewsModel.getDefault().getTypesFactory();
-    fDao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
-    fModel = NewsModel.getDefault();
+    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().getModelSearch().shutdown();
+    fFactory = Owl.getModelFactory();
+    fDao = Owl.getPersistenceService().getModelDAO();
   }
 
   private IFeed createFeed(String url) throws URISyntaxException {
@@ -927,7 +925,7 @@ public class ModelTest3 {
           }
         }
       };
-      fModel.addNewsListener(newsListener);
+      Owl.getListenerService().addNewsListener(newsListener);
 
       NewsReference newsReference1 = new NewsReference(fDao.saveNews(news1).getId());
       NewsReference newsReference2 = new NewsReference(fDao.saveNews(news2).getId());
@@ -960,7 +958,7 @@ public class ModelTest3 {
           fail("Missing newsUpdated event in NewsListener!");
     } finally {
       if (newsListener != null)
-        fModel.removeNewsListener(newsListener);
+        Owl.getListenerService().removeNewsListener(newsListener);
     }
   }
 
@@ -1011,7 +1009,7 @@ public class ModelTest3 {
           }
         }
       };
-      fModel.addFolderListener(folderListener);
+      Owl.getListenerService().addFolderListener(folderListener);
       folderReference[0] = new FolderReference(fDao.saveFolder(folder).getId());
 
       /* Update */
@@ -1029,7 +1027,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (folderListener != null)
-        fModel.removeFolderListener(folderListener);
+        Owl.getListenerService().removeFolderListener(folderListener);
     }
   }
 
@@ -1075,7 +1073,7 @@ public class ModelTest3 {
           }
         }
       };
-      fModel.addSearchMarkListener(searchMarkListener);
+      Owl.getListenerService().addSearchMarkListener(searchMarkListener);
       searchMarkReference[0] = new SearchMarkReference(fDao.saveSearchMark(searchMark).getId());
 
       /* Update */
@@ -1093,7 +1091,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (searchMarkListener != null)
-        fModel.removeSearchMarkListener(searchMarkListener);
+        Owl.getListenerService().removeSearchMarkListener(searchMarkListener);
     }
   }
 
@@ -1138,7 +1136,7 @@ public class ModelTest3 {
           }
         }
       };
-      fModel.addSearchConditionListener(searchConditionListener);
+      Owl.getListenerService().addSearchConditionListener(searchConditionListener);
       searchConditionReference[0] = new SearchConditionReference(fDao.saveSearchCondition(searchCondition).getId());
 
       /* Update */
@@ -1156,9 +1154,9 @@ public class ModelTest3 {
       assertTrue("Missing searchConditionDeleted Event", searchConditionEvents[1]);
 
     } finally {
-      fModel.removeSearchConditionListener(searchConditionListener);
+      Owl.getListenerService().removeSearchConditionListener(searchConditionListener);
       if (searchConditionListener != null)
-        fModel.removeSearchConditionListener(searchConditionListener);
+        Owl.getListenerService().removeSearchConditionListener(searchConditionListener);
     }
 
   }
@@ -1207,7 +1205,7 @@ public class ModelTest3 {
           }
         }
       };
-      fModel.addBookMarkListener(bookMarkListener);
+      Owl.getListenerService().addBookMarkListener(bookMarkListener);
       bookMarkReference[0] = new BookMarkReference(fDao.saveBookMark(bookMark).getId());
 
       /* Update */
@@ -1226,7 +1224,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (bookMarkListener != null)
-        fModel.removeBookMarkListener(bookMarkListener);
+        Owl.getListenerService().removeBookMarkListener(bookMarkListener);
     }
   }
 
@@ -1267,7 +1265,7 @@ public class ModelTest3 {
           }
         }
       };
-      fModel.addFeedListener(feedListener);
+      Owl.getListenerService().addFeedListener(feedListener);
       feedReference[0] = new FeedReference(fDao.saveFeed(feed).getId());
 
       /* Update */
@@ -1286,7 +1284,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (feedListener != null)
-        fModel.removeFeedListener(feedListener);
+        Owl.getListenerService().removeFeedListener(feedListener);
     }
   }
 
@@ -1332,7 +1330,7 @@ public class ModelTest3 {
           }
         }
       };
-      fModel.addNewsListener(newsListener);
+      Owl.getListenerService().addNewsListener(newsListener);
       newsReference[0] = new NewsReference(fDao.saveNews(news).getId());
 
       /* Update */
@@ -1351,7 +1349,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (newsListener != null)
-        fModel.removeNewsListener(newsListener);
+        Owl.getListenerService().removeNewsListener(newsListener);
     }
   }
 
@@ -1403,7 +1401,7 @@ public class ModelTest3 {
           }
         }
       };
-      fModel.addAttachmentListener(attachmentListener);
+      Owl.getListenerService().addAttachmentListener(attachmentListener);
       attachmentReference[0] = new AttachmentReference(fDao.saveAttachment(attachment).getId());
 
       /* Update */
@@ -1422,7 +1420,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (attachmentListener != null)
-        fModel.removeAttachmentListener(attachmentListener);
+        Owl.getListenerService().removeAttachmentListener(attachmentListener);
     }
   }
 
@@ -1475,7 +1473,7 @@ public class ModelTest3 {
           }
         }
       };
-      fModel.addCategoryListener(categoryListener);
+      Owl.getListenerService().addCategoryListener(categoryListener);
       categoryReference[0] = new CategoryReference(fDao.saveCategory(category1).getId());
       categoryReference[1] = new CategoryReference(fDao.saveCategory(category2).getId());
 
@@ -1502,7 +1500,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (categoryListener != null)
-        fModel.removeCategoryListener(categoryListener);
+        Owl.getListenerService().removeCategoryListener(categoryListener);
     }
   }
 
@@ -1555,7 +1553,7 @@ public class ModelTest3 {
           }
         }
       };
-      fModel.addPersonListener(personListener);
+      Owl.getListenerService().addPersonListener(personListener);
       personReference[0] = new PersonReference(fDao.savePerson(person1).getId());
       personReference[1] = new PersonReference(fDao.savePerson(person2).getId());
 
@@ -1582,7 +1580,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (personListener != null)
-        fModel.removePersonListener(personListener);
+        Owl.getListenerService().removePersonListener(personListener);
     }
   }
 
@@ -1623,7 +1621,7 @@ public class ModelTest3 {
           }
         }
       };
-      fModel.addLabelListener(labelListener);
+      Owl.getListenerService().addLabelListener(labelListener);
       labelReference[0] = new LabelReference(fDao.saveLabel(label).getId());
 
       /* Update */
@@ -1642,7 +1640,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (labelListener != null)
-        fModel.removeLabelListener(labelListener);
+        Owl.getListenerService().removeLabelListener(labelListener);
     }
   }
 
@@ -1745,7 +1743,7 @@ public class ModelTest3 {
   public void testAddDeleteFeedWithNoNews() throws Exception {
     NewsListener feedListener = null;
     try {
-      IFeed feed = NewsModel.getDefault().getTypesFactory().createFeed(null, new URI("http://www.feed.com"));
+      IFeed feed = Owl.getModelFactory().createFeed(null, new URI("http://www.feed.com"));
       final boolean addedEvent[] = new boolean[1];
       final boolean deletedEvent[] = new boolean[1];
 
@@ -1760,10 +1758,10 @@ public class ModelTest3 {
           deletedEvent[0] = true;
         }
       };
-      NewsModel.getDefault().addNewsListener(feedListener);
+      Owl.getListenerService().addNewsListener(feedListener);
 
-      feed = NewsModel.getDefault().getPersistenceLayer().getModelDAO().saveFeed(feed);
-      NewsModel.getDefault().getPersistenceLayer().getModelDAO().deleteFeed(new FeedReference(feed.getId()));
+      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      Owl.getPersistenceService().getModelDAO().deleteFeed(new FeedReference(feed.getId()));
 
       if (addedEvent[0])
         fail("Unexpected newsAdded Event for Feed with 0 News");
@@ -1774,7 +1772,7 @@ public class ModelTest3 {
       TestUtils.fail(e);
     } finally {
       if (feedListener != null)
-        NewsModel.getDefault().removeNewsListener(feedListener);
+        Owl.getListenerService().removeNewsListener(feedListener);
     }
   }
 
@@ -1784,11 +1782,11 @@ public class ModelTest3 {
   @SuppressWarnings("nls")
   @Test
   public void testSetNewsState() throws Exception {
-    IFeed feed = fModel.getTypesFactory().createFeed(null, new URI("http://www.feed.com"));
+    IFeed feed = Owl.getModelFactory().createFeed(null, new URI("http://www.feed.com"));
 
-    fModel.getTypesFactory().createNews(null, feed, new Date());
-    fModel.getTypesFactory().createNews(null, feed, new Date());
-    fModel.getTypesFactory().createNews(null, feed, new Date());
+    Owl.getModelFactory().createNews(null, feed, new Date());
+    Owl.getModelFactory().createNews(null, feed, new Date());
+    Owl.getModelFactory().createNews(null, feed, new Date());
 
     FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
 
@@ -1841,39 +1839,39 @@ public class ModelTest3 {
   @SuppressWarnings("nls")
   @Test
   public void testLoadNewsStates() throws Exception {
-    IFeed feed = fModel.getTypesFactory().createFeed(null, new URI("http://www.feed.com"));
+    IFeed feed = Owl.getModelFactory().createFeed(null, new URI("http://www.feed.com"));
     FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
 
     for (int i = 0; i < 5; i++) {
-      INews news = fModel.getTypesFactory().createNews(null, feed, new Date());
+      INews news = Owl.getModelFactory().createNews(null, feed, new Date());
       fDao.saveNews(news);
       news.setState(INews.State.NEW);
       fDao.saveNews(news);
     }
 
     for (int i = 0; i < 4; i++) {
-      INews news = fModel.getTypesFactory().createNews(null, feed, new Date());
+      INews news = Owl.getModelFactory().createNews(null, feed, new Date());
       fDao.saveNews(news);
       news.setState(INews.State.UPDATED);
       fDao.saveNews(news);
     }
 
     for (int i = 0; i < 3; i++) {
-      INews news = fModel.getTypesFactory().createNews(null, feed, new Date());
+      INews news = Owl.getModelFactory().createNews(null, feed, new Date());
       fDao.saveNews(news);
       news.setState(INews.State.UNREAD);
       fDao.saveNews(news);
     }
 
     for (int i = 0; i < 2; i++) {
-      INews news = fModel.getTypesFactory().createNews(null, feed, new Date());
+      INews news = Owl.getModelFactory().createNews(null, feed, new Date());
       fDao.saveNews(news);
       news.setState(INews.State.READ);
       fDao.saveNews(news);
     }
 
     for (int i = 0; i < 1; i++) {
-      INews news = fModel.getTypesFactory().createNews(null, feed, new Date());
+      INews news = Owl.getModelFactory().createNews(null, feed, new Date());
       fDao.saveNews(news);
       news.setState(INews.State.HIDDEN);
       fDao.saveNews(news);
@@ -2005,11 +2003,11 @@ public class ModelTest3 {
           }
         }
       };
-      NewsModel.getDefault().addFolderListener(folderListener);
+      Owl.getListenerService().addFolderListener(folderListener);
       try {
         fDao.saveFolder(root);
       } finally {
-        NewsModel.getDefault().removeFolderListener(folderListener);
+        Owl.getListenerService().removeFolderListener(folderListener);
       }
 
       assertNull("Expected this Entity to be NULL", new FolderReference(folder.getId()).resolve());
@@ -2124,14 +2122,14 @@ public class ModelTest3 {
         }
       };
 
-      fModel.addFolderListener(folderListener);
+      Owl.getListenerService().addFolderListener(folderListener);
 
       root.removeFolder(folder1);
       root.removeFolder(folder2);
       fDao.saveFolder(root);
     } finally {
       if (folderListener != null)
-        fModel.removeFolderListener(folderListener);
+        Owl.getListenerService().removeFolderListener(folderListener);
     }
   }
 }

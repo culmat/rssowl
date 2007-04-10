@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.events.BookMarkAdapter;
 import org.rssowl.core.model.events.BookMarkEvent;
@@ -38,7 +38,7 @@ import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.IModelTypesFactory;
 import org.rssowl.core.model.persist.pref.IPreferencesInitializer;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.FeedLinkReference;
 
 import java.net.URI;
@@ -66,10 +66,10 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
    */
   @Before
   public void setUp() throws Exception {
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
-    NewsModel.getDefault().getPersistenceLayer().getModelSearch().shutdown();
-    fFactory = NewsModel.getDefault().getTypesFactory();
-    fDao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
+    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().getModelSearch().shutdown();
+    fFactory = Owl.getModelFactory();
+    fDao = Owl.getPersistenceService().getModelDAO();
   }
 
   /**
@@ -77,7 +77,7 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
    */
   @Test
   public final void testPreferencesInitializer() throws Exception {
-    IPreferencesScope defaultScope = NewsModel.getDefault().getDefaultScope();
+    IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
     assertEquals(true, defaultScope.getBoolean(TEST_BOOLEAN));
     assertEquals(1, defaultScope.getInteger(TEST_INTEGER));
     assertEquals(true, Arrays.equals(new int[] { 1, 2, 3 }, defaultScope.getIntegers(TEST_INTEGERS)));
@@ -92,7 +92,7 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
    */
   @Test
   public final void testGlobalScope() throws Exception {
-    IPreferencesScope globalScope = NewsModel.getDefault().getGlobalScope();
+    IPreferenceScope globalScope = Owl.getPreferenceService().getGlobalScope();
 
     /* Test Defaults Taken */
     assertEquals(true, globalScope.getBoolean(TEST_BOOLEAN));
@@ -151,7 +151,7 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
     fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark");
     folder = fDao.saveFolder(folder);
 
-    IPreferencesScope entityScope = NewsModel.getDefault().getEntityScope(folder);
+    IPreferenceScope entityScope = Owl.getPreferenceService().getEntityScope(folder);
 
     /* Test Defaults Taken */
     assertEquals(true, entityScope.getBoolean(TEST_BOOLEAN));
@@ -201,7 +201,7 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
     assertEquals(true, Arrays.equals(new long[] { 1L, 2L, 3L }, entityScope.getLongs(TEST_LONGS)));
 
     /* Test Global Settings Taken */
-    IPreferencesScope globalScope = NewsModel.getDefault().getGlobalScope();
+    IPreferenceScope globalScope = Owl.getPreferenceService().getGlobalScope();
     globalScope.putBoolean(TEST_BOOLEAN, false);
     globalScope.putInteger(TEST_INTEGER, 2);
     globalScope.putIntegers(TEST_INTEGERS, new int[] { 4, 5, 6, 7, 8 });
@@ -229,7 +229,7 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
     feed = fDao.saveFeed(feed);
     folder = fDao.saveFolder(folder);
 
-    IPreferencesScope entityScope = NewsModel.getDefault().getEntityScope(folder);
+    IPreferenceScope entityScope = Owl.getPreferenceService().getEntityScope(folder);
 
     assertEquals(false, entityScope.getBoolean(TEST_BOOLEAN_INITIAL_FALSE));
 
@@ -242,8 +242,8 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
     entityScope = null;
     System.gc();
 
-    folder = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer().loadRootFolders().get(0);
-    entityScope = NewsModel.getDefault().getEntityScope(folder);
+    folder = Owl.getPersistenceService().getApplicationLayer().loadRootFolders().get(0);
+    entityScope = Owl.getPreferenceService().getEntityScope(folder);
 
     assertEquals(true, entityScope.getBoolean(TEST_BOOLEAN_INITIAL_FALSE));
 
@@ -255,8 +255,8 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
     entityScope = null;
     System.gc();
 
-    folder = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer().loadRootFolders().get(0);
-    entityScope = NewsModel.getDefault().getEntityScope(folder);
+    folder = Owl.getPersistenceService().getApplicationLayer().loadRootFolders().get(0);
+    entityScope = Owl.getPreferenceService().getEntityScope(folder);
 
     assertEquals(false, entityScope.getBoolean(TEST_BOOLEAN_INITIAL_FALSE));
   }
@@ -281,11 +281,11 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
           eventsCounter[0]++;
         }
       };
-      NewsModel.getDefault().addBookMarkListener(bookmarkListener);
+      Owl.getListenerService().addBookMarkListener(bookmarkListener);
 
       IMark mark = folder.getMarks().get(0);
 
-      IPreferencesScope bookmarkScope = NewsModel.getDefault().getEntityScope(mark);
+      IPreferenceScope bookmarkScope = Owl.getPreferenceService().getEntityScope(mark);
       bookmarkScope.putString("key1", "value1");
       bookmarkScope.flush();
 
@@ -297,14 +297,14 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
       assertEquals(2, eventsCounter[0]);
     } finally {
       if (bookmarkListener != null)
-        NewsModel.getDefault().removeBookMarkListener(bookmarkListener);
+        Owl.getListenerService().removeBookMarkListener(bookmarkListener);
     }
   }
 
   /*
    * @see org.rssowl.core.model.preferences.IPreferencesInitializer#initialize(org.rssowl.core.model.preferences.IPreferencesScope)
    */
-  public void initialize(IPreferencesScope defaultScope) {
+  public void initialize(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(TEST_BOOLEAN, true);
     defaultScope.putInteger(TEST_INTEGER, 1);
     defaultScope.putIntegers(TEST_INTEGERS, new int[] { 1, 2, 3 });

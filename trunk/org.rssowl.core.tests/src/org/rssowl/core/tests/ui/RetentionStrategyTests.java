@@ -28,8 +28,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IBookMark;
@@ -39,7 +39,7 @@ import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.IModelTypesFactory;
 import org.rssowl.core.model.persist.INews;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.BookMarkReference;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FolderReference;
@@ -71,10 +71,10 @@ public class RetentionStrategyTests {
    */
   @Before
   public void setUp() throws Exception {
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
-    NewsModel.getDefault().getPersistenceLayer().getModelSearch().shutdown();
-    fFactory = NewsModel.getDefault().getTypesFactory();
-    fDao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
+    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().getModelSearch().shutdown();
+    fFactory = Owl.getModelFactory();
+    fDao = Owl.getPersistenceService().getModelDAO();
   }
 
   /**
@@ -109,9 +109,9 @@ public class RetentionStrategyTests {
     }
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookMark1);
-    IPreferencesScope prefs2 = NewsModel.getDefault().getEntityScope(bookMark2);
-    IPreferencesScope prefs3 = NewsModel.getDefault().getEntityScope(bookMark3);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookMark1);
+    IPreferenceScope prefs2 = Owl.getPreferenceService().getEntityScope(bookMark2);
+    IPreferenceScope prefs3 = Owl.getPreferenceService().getEntityScope(bookMark3);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
@@ -161,9 +161,9 @@ public class RetentionStrategyTests {
     }
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookMark1);
-    IPreferencesScope prefs2 = NewsModel.getDefault().getEntityScope(bookMark2);
-    IPreferencesScope prefs3 = NewsModel.getDefault().getEntityScope(bookMark3);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookMark1);
+    IPreferenceScope prefs2 = Owl.getPreferenceService().getEntityScope(bookMark2);
+    IPreferenceScope prefs3 = Owl.getPreferenceService().getEntityScope(bookMark3);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
@@ -210,9 +210,9 @@ public class RetentionStrategyTests {
     }
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookMark1);
-    IPreferencesScope prefs2 = NewsModel.getDefault().getEntityScope(bookMark2);
-    IPreferencesScope prefs3 = NewsModel.getDefault().getEntityScope(bookMark3);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookMark1);
+    IPreferenceScope prefs2 = Owl.getPreferenceService().getEntityScope(bookMark2);
+    IPreferenceScope prefs3 = Owl.getPreferenceService().getEntityScope(bookMark3);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
@@ -262,9 +262,9 @@ public class RetentionStrategyTests {
     }
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookMark1);
-    IPreferencesScope prefs2 = NewsModel.getDefault().getEntityScope(bookMark2);
-    IPreferencesScope prefs3 = NewsModel.getDefault().getEntityScope(bookMark3);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookMark1);
+    IPreferenceScope prefs2 = Owl.getPreferenceService().getEntityScope(bookMark2);
+    IPreferenceScope prefs3 = Owl.getPreferenceService().getEntityScope(bookMark3);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
@@ -320,9 +320,9 @@ public class RetentionStrategyTests {
     }
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookMark1);
-    IPreferencesScope prefs2 = NewsModel.getDefault().getEntityScope(bookMark2);
-    IPreferencesScope prefs3 = NewsModel.getDefault().getEntityScope(bookMark3);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookMark1);
+    IPreferenceScope prefs2 = Owl.getPreferenceService().getEntityScope(bookMark2);
+    IPreferenceScope prefs3 = Owl.getPreferenceService().getEntityScope(bookMark3);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
@@ -375,9 +375,9 @@ public class RetentionStrategyTests {
     }
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookMark1);
-    IPreferencesScope prefs2 = NewsModel.getDefault().getEntityScope(bookMark2);
-    IPreferencesScope prefs3 = NewsModel.getDefault().getEntityScope(bookMark3);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookMark1);
+    IPreferenceScope prefs2 = Owl.getPreferenceService().getEntityScope(bookMark2);
+    IPreferenceScope prefs3 = Owl.getPreferenceService().getEntityScope(bookMark3);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
@@ -430,9 +430,9 @@ public class RetentionStrategyTests {
     }
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookMark1);
-    IPreferencesScope prefs2 = NewsModel.getDefault().getEntityScope(bookMark2);
-    IPreferencesScope prefs3 = NewsModel.getDefault().getEntityScope(bookMark3);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookMark1);
+    IPreferenceScope prefs2 = Owl.getPreferenceService().getEntityScope(bookMark2);
+    IPreferenceScope prefs3 = Owl.getPreferenceService().getEntityScope(bookMark3);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
@@ -477,7 +477,7 @@ public class RetentionStrategyTests {
     assertEquals(100, countNews(bookmark));
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookmark);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
@@ -507,7 +507,7 @@ public class RetentionStrategyTests {
     assertEquals(100, countNews(bookmark));
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookmark);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
@@ -536,7 +536,7 @@ public class RetentionStrategyTests {
     assertEquals(100, countNews(bookmark));
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookmark);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
@@ -566,7 +566,7 @@ public class RetentionStrategyTests {
     assertEquals(100, countNews(bookmark));
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookmark);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
@@ -598,7 +598,7 @@ public class RetentionStrategyTests {
     assertEquals(100, countNews(bookmark));
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookmark);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
@@ -629,7 +629,7 @@ public class RetentionStrategyTests {
     assertEquals(100, countNews(bookmark));
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookmark);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
@@ -660,7 +660,7 @@ public class RetentionStrategyTests {
     assertEquals(100, countNews(bookmark));
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookmark);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
@@ -693,7 +693,7 @@ public class RetentionStrategyTests {
     assertEquals(100, countNews(bookmark));
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookmark);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
@@ -735,7 +735,7 @@ public class RetentionStrategyTests {
     assertEquals(103, countNews(feed));
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookmark);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
@@ -774,7 +774,7 @@ public class RetentionStrategyTests {
     assertEquals(103, countNews(feed));
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookmark);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
@@ -813,7 +813,7 @@ public class RetentionStrategyTests {
     assertEquals(103, countNews(feed));
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookmark);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
@@ -852,7 +852,7 @@ public class RetentionStrategyTests {
     assertEquals(103, countNews(feed));
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookmark);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
@@ -890,7 +890,7 @@ public class RetentionStrategyTests {
     assertEquals(103, countNews(feed));
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookmark);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
@@ -931,7 +931,7 @@ public class RetentionStrategyTests {
     assertEquals(103, countNews(feed));
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookmark);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
@@ -971,7 +971,7 @@ public class RetentionStrategyTests {
     assertEquals(103, countNews(feed));
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookmark);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
@@ -1011,7 +1011,7 @@ public class RetentionStrategyTests {
     assertEquals(103, countNews(feed));
 
     /* Preferences */
-    IPreferencesScope prefs1 = NewsModel.getDefault().getEntityScope(bookmark);
+    IPreferenceScope prefs1 = Owl.getPreferenceService().getEntityScope(bookmark);
 
     /* Setup Retention */
     prefs1.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
