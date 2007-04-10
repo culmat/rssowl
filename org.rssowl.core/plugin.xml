@@ -20,7 +20,7 @@
    <extension-point id="SSLHandler" name="SSL Handler" schema="schema/SSLHandler.exsd"/>
    <extension
          point="org.rssowl.core.PersistanceLayer">
-      <persistancelayer class="org.rssowl.core.model.internal.db4o.PersistenceLayerImpl"/>
+      <persistancelayer class="org.rssowl.core.model.internal.db4o.PersistenceServiceImpl"/>
    </extension>
    <extension
          point="org.rssowl.core.ModelDAO">

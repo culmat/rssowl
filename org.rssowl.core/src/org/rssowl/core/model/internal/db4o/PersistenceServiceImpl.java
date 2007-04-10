@@ -30,10 +30,10 @@ import org.rssowl.core.model.dao.PersistenceException;
 /**
  * @author bpasero
  */
-public class PersistenceLayerImpl extends AbstractPersistenceService {
+public class PersistenceServiceImpl extends AbstractPersistenceService {
 
   /** */
-  public PersistenceLayerImpl() {
+  public PersistenceServiceImpl() {
     startup();
   }
 
