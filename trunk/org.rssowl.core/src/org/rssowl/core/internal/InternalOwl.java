@@ -25,9 +25,9 @@
 package org.rssowl.core.internal;
 
 import org.rssowl.core.connection.IConnectionService;
-import org.rssowl.core.connection.internal.ConnectionManager;
+import org.rssowl.core.connection.internal.ConnectionServiceImpl;
 import org.rssowl.core.interpreter.IInterpreterService;
-import org.rssowl.core.interpreter.internal.Interpreter;
+import org.rssowl.core.interpreter.internal.InterpreterServiceImpl;
 import org.rssowl.core.model.IListenerService;
 import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.internal.ListenerServiceImpl;
@@ -67,8 +67,8 @@ public class InternalOwl {
   public void startup() {
     fListenerService = new ListenerServiceImpl();
     fPersistenceService = loadPersistenceService();
-    fConnectionService = new ConnectionManager();
-    fInterpreterService = new Interpreter();
+    fConnectionService = new ConnectionServiceImpl();
+    fInterpreterService = new InterpreterServiceImpl();
     fModelFactory = loadTypesFactory();
     fPreferencesService = new PreferenceServiceImpl();
   }

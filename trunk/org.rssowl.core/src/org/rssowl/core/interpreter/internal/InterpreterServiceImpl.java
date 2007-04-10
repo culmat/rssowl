@@ -73,7 +73,7 @@ import java.util.Map;
  *
  * @author bpasero
  */
-public class Interpreter implements IInterpreterService {
+public class InterpreterServiceImpl implements IInterpreterService {
 
   /* ID for SAXParser Contribution */
   private static final String SAXPARSER_EXTENSION_POINT = "org.rssowl.core.SAXParser"; //$NON-NLS-1$
@@ -101,7 +101,7 @@ public class Interpreter implements IInterpreterService {
   private IXMLParser fXMLParserImpl;
 
   /** */
-  public Interpreter() {
+  public InterpreterServiceImpl() {
     startup();
   }
 

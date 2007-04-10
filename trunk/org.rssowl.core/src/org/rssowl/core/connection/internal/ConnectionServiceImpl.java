@@ -67,7 +67,7 @@ import java.util.Set;
  *
  * @author bpasero
  */
-public class ConnectionManager implements IConnectionService {
+public class ConnectionServiceImpl implements IConnectionService {
 
   /* ID of the contributed ProtocolHandlers */
   private static final String PROTHANDLER_EXTENSION_POINT = "org.rssowl.core.ProtocolHandler"; //$NON-NLS-1$
@@ -87,7 +87,7 @@ public class ConnectionManager implements IConnectionService {
   private FeedAdapter fFeedListener;
 
   /** */
-  public ConnectionManager() {
+  public ConnectionServiceImpl() {
     fProtocolHandler = new HashMap<String, IProtocolHandler>();
     fCredentialsProvider = new HashMap<String, ICredentialsProvider>();
 
