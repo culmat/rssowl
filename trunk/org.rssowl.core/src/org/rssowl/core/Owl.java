@@ -22,34 +22,65 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.model.reference;
+package org.rssowl.core;
 
-import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.connection.IConnectionService;
+import org.rssowl.core.internal.InternalOwl;
+import org.rssowl.core.interpreter.IInterpreterService;
+import org.rssowl.core.model.IListenerService;
+import org.rssowl.core.model.dao.IPersistenceService;
+import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.pref.IPreferenceService;
 
 /**
- * Implementation of the <code>ModelReference</code> for the Type
- * <code>IBookMark</code>.
- * 
+ * The <code>Owl</code> class is the main facade to all API in RSSOwl.
+ *
  * @author bpasero
  */
-public final class BookMarkReference extends MarkReference {
+public class Owl {
+
+  /** Flag indicating wether the Controller is accessed from a Test */
+  public static boolean TESTING = false;
 
   /**
-   * Instantiates a new leightweight reference. Any resolve()-call will be
-   * passed to the <code>IModelDAO</code> to load the heavyweight type from
-   * the persistance layer.
-   * 
-   * @param id The ID of the type to use for loading the type from the
-   * persistance layer.
+   * @return
    */
-  public BookMarkReference(long id) {
-    super(id);
+  public static IListenerService getListenerService() {
+    return InternalOwl.getDefault().getListenerService();
   }
 
-  @Override
-  public IBookMark resolve() throws PersistenceException {
-    return Owl.getPersistenceService().getModelDAO().loadBookMark(getId());
+  /**
+   * @return
+   */
+  public static IPreferenceService getPreferenceService() {
+    return InternalOwl.getDefault().getPreferenceService();
+  }
+
+  /**
+   * @return
+   */
+  public static IPersistenceService getPersistenceService() {
+    return InternalOwl.getDefault().getPersistenceService();
+  }
+
+  /**
+   * @return
+   */
+  public static IConnectionService getConnectionService() {
+    return InternalOwl.getDefault().getConnectionService();
+  }
+
+  /**
+   * @return
+   */
+  public static IInterpreterService getInterpreter() {
+    return InternalOwl.getDefault().getInterpreter();
+  }
+
+  /**
+   * @return
+   */
+  public static IModelTypesFactory getModelFactory() {
+    return InternalOwl.getDefault().getModelFactory();
   }
 }

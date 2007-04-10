@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.ILabel;
 
@@ -50,6 +50,6 @@ public final class LabelReference extends ModelReference {
 
   @Override
   public ILabel resolve() throws PersistenceException {
-    return NewsModel.getDefault().getPersistenceLayer().getModelDAO().loadLabel(getId());
+    return Owl.getPersistenceService().getModelDAO().loadLabel(getId());
   }
 }

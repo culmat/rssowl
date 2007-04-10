@@ -27,7 +27,7 @@ package org.rssowl.core.interpreter.internal;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.rssowl.core.interpreter.Interpreter;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.util.DateUtils;
@@ -111,7 +111,7 @@ public class CDFInterpreter extends BasicInterpreter {
   }
 
   private void processItem(Element element, IFeed feed) {
-    INews news = Interpreter.getDefault().getTypesFactory().createNews(feed);
+    INews news = Owl.getInterpreter().getTypesFactory().createNews(feed);
 
     /* Support sorting by natural order of items as appearing in the feed */
     news.setReceiveDate(new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));

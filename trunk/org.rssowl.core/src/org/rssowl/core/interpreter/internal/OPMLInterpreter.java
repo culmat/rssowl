@@ -27,7 +27,7 @@ package org.rssowl.core.interpreter.internal;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.rssowl.core.interpreter.Interpreter;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPerson;
@@ -133,7 +133,7 @@ public class OPMLInterpreter extends BasicInterpreter {
       /* Owner EMail */
       else if ("owneremail".equals(name)) { //$NON-NLS-1$
         if (feed.getAuthor() == null) {
-          IPerson person = Interpreter.getDefault().getTypesFactory().createPerson(feed);
+          IPerson person = Owl.getInterpreter().getTypesFactory().createPerson(feed);
           feed.setAuthor(person);
         }
 
@@ -146,7 +146,7 @@ public class OPMLInterpreter extends BasicInterpreter {
       /* Owner Name - Dont set if EMail present already */
       else if ("ownername".equals(name)) { //$NON-NLS-1$
         if (feed.getAuthor() == null) {
-          IPerson person = Interpreter.getDefault().getTypesFactory().createPerson(feed);
+          IPerson person = Owl.getInterpreter().getTypesFactory().createPerson(feed);
           feed.setAuthor(person);
         }
         feed.getAuthor().setName(child.getText());
@@ -177,7 +177,7 @@ public class OPMLInterpreter extends BasicInterpreter {
   }
 
   private void processOutline(Element element, IFeed feed) {
-    INews news = Interpreter.getDefault().getTypesFactory().createNews(feed);
+    INews news = Owl.getInterpreter().getTypesFactory().createNews(feed);
 
     /* Support sorting by natural order of items as appearing in the feed */
     news.setReceiveDate(new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
@@ -217,7 +217,7 @@ public class OPMLInterpreter extends BasicInterpreter {
       else if ("xmlurl".equals(name)) { //$NON-NLS-1$
         URI uri = URIUtils.createURI(attribute.getValue());
         if (uri != null) {
-          ISource source = Interpreter.getDefault().getTypesFactory().createSource(news);
+          ISource source = Owl.getInterpreter().getTypesFactory().createSource(news);
           source.setLink(uri);
           news.setSource(source);
         }

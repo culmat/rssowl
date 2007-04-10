@@ -50,7 +50,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.rssowl.core.model.dao.PersistanceLayer"/>
+                  <meta.attribute kind="java" basedOn="org.rssowl.core.model.dao.IPersistService"/>
                </appInfo>
             </annotation>
          </attribute>

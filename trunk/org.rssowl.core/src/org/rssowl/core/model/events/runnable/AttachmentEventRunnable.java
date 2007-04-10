@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events.runnable;
 
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.events.AttachmentEvent;
 import org.rssowl.core.model.events.ModelEvent;
 
@@ -51,16 +51,16 @@ public class AttachmentEventRunnable extends EventRunnable<AttachmentEvent> {
 
   @Override
   protected final void firePersistEvents(Set<AttachmentEvent> persistEvents) {
-    NewsModel.getDefault().notifyAttachmentAdded(persistEvents);
+    Owl.getListenerService().notifyAttachmentAdded(persistEvents);
   }
 
   @Override
   protected final void fireRemoveEvents(Set<AttachmentEvent> removeEvents) {
-    NewsModel.getDefault().notifyAttachmentDeleted(removeEvents);
+    Owl.getListenerService().notifyAttachmentDeleted(removeEvents);
   }
 
   @Override
   protected final void fireUpdateEvents(Set<AttachmentEvent> updateEvents) {
-    NewsModel.getDefault().notifyAttachmentUpdated(updateEvents);
+    Owl.getListenerService().notifyAttachmentUpdated(updateEvents);
   }
 }

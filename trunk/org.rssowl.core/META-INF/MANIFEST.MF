@@ -14,7 +14,8 @@ Eclipse-LazyStart: true
 Bundle-Vendor: RSSOwl.org
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ClassPath: .
-Export-Package: org.rssowl.core.connection,
+Export-Package: org.rssowl.core,
+ org.rssowl.core.connection,
  org.rssowl.core.connection.auth,
  org.rssowl.core.connection.internal,
  org.rssowl.core.internal,
@@ -24,6 +25,7 @@ Export-Package: org.rssowl.core.connection,
  org.rssowl.core.model.dao,
  org.rssowl.core.model.events,
  org.rssowl.core.model.events.runnable,
+ org.rssowl.core.model.internal,
  org.rssowl.core.model.internal.db4o,
  org.rssowl.core.model.internal.persist,
  org.rssowl.core.model.internal.persist.pref,

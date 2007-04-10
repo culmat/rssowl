@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events.runnable;
 
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.events.ModelEvent;
 import org.rssowl.core.model.events.SearchMarkEvent;
 
@@ -51,16 +51,16 @@ public class SearchMarkEventRunnable extends EventRunnable<SearchMarkEvent>  {
   
   @Override
   protected final void firePersistEvents(Set<SearchMarkEvent> persistEvents) {
-    NewsModel.getDefault().notifySearchMarkAdded(persistEvents);
+    Owl.getListenerService().notifySearchMarkAdded(persistEvents);
   }
 
   @Override
   protected final void fireRemoveEvents(Set<SearchMarkEvent> removeEvents) {
-    NewsModel.getDefault().notifySearchMarkDeleted(removeEvents);
+    Owl.getListenerService().notifySearchMarkDeleted(removeEvents);
   }
 
   @Override
   protected final void fireUpdateEvents(Set<SearchMarkEvent> updateEvents) {
-    NewsModel.getDefault().notifySearchMarkUpdated(updateEvents);
+    Owl.getListenerService().notifySearchMarkUpdated(updateEvents);
   }
 }

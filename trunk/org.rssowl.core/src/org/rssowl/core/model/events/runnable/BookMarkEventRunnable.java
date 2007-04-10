@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events.runnable;
 
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.events.BookMarkEvent;
 import org.rssowl.core.model.events.ModelEvent;
 
@@ -51,16 +51,16 @@ public class BookMarkEventRunnable extends EventRunnable<BookMarkEvent> {
   
   @Override
   protected final void firePersistEvents(Set<BookMarkEvent> persistEvents) {
-    NewsModel.getDefault().notifyBookMarkAdded(persistEvents);
+    Owl.getListenerService().notifyBookMarkAdded(persistEvents);
   }
 
   @Override
   protected final void fireRemoveEvents(Set<BookMarkEvent> removeEvents) {
-    NewsModel.getDefault().notifyBookMarkDeleted(removeEvents);
+    Owl.getListenerService().notifyBookMarkDeleted(removeEvents);
   }
 
   @Override
   protected final void fireUpdateEvents(Set<BookMarkEvent> updateEvents) {
-    NewsModel.getDefault().notifyBookMarkUpdated(updateEvents);
+    Owl.getListenerService().notifyBookMarkUpdated(updateEvents);
   }
 }

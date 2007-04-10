@@ -25,7 +25,7 @@
 package org.rssowl.core.internal;
 
 import org.rssowl.core.model.persist.pref.IPreferencesInitializer;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 
 /**
  * An instance of <code>IPreferencesInitializer</code> responsible for
@@ -134,7 +134,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /*
    * @see org.rssowl.core.model.preferences.IPreferencesInitializer#initialize(org.rssowl.core.model.preferences.IPreferencesScope)
    */
-  public void initialize(IPreferencesScope defaultScope) {
+  public void initialize(IPreferenceScope defaultScope) {
 
     /* Default Globals */
     initGlobalDefaults(defaultScope);
@@ -155,7 +155,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
     initReloadOpenDefaults(defaultScope);
   }
 
-  private void initGlobalDefaults(IPreferencesScope defaultScope) {
+  private void initGlobalDefaults(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(MARK_READ_ON_MINIMIZE, false);
     defaultScope.putBoolean(MARK_FEED_READ_ON_CHANGE, false);
     defaultScope.putBoolean(USE_EXTERNAL_BROWSER, true);
@@ -166,30 +166,30 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putBoolean(BE_ENABLE_LINKING, true);
   }
 
-  private void initRetentionDefaults(IPreferencesScope defaultScope) {
+  private void initRetentionDefaults(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(DEL_NEWS_BY_COUNT_STATE, true);
     defaultScope.putInteger(DEL_NEWS_BY_COUNT_VALUE, 200);
     defaultScope.putInteger(DEL_NEWS_BY_AGE_VALUE, 30);
   }
 
-  private void initDisplayDefaults(IPreferencesScope defaultScope) {
+  private void initDisplayDefaults(IPreferenceScope defaultScope) {
     defaultScope.putInteger(BM_NEWS_FILTERING, -1);
     defaultScope.putInteger(BM_NEWS_GROUPING, -1);
   }
 
-  private void initReloadOpenDefaults(IPreferencesScope defaultScope) {
+  private void initReloadOpenDefaults(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(BM_UPDATE_INTERVAL_STATE, true);
     defaultScope.putLong(BM_UPDATE_INTERVAL, 60 * 30); // 30 Minutes
     defaultScope.putBoolean(BM_OPEN_ON_STARTUP, false);
     defaultScope.putBoolean(BM_RELOAD_ON_STARTUP, false);
   }
 
-  private void initBookMarkExplorerDefaults(IPreferencesScope defaultScope) {
+  private void initBookMarkExplorerDefaults(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(BE_BEGIN_SEARCH_ON_TYPING, true);
     defaultScope.putBoolean(BE_SORT_BY_NAME, false);
   }
 
-  private void initFeedViewDefaults(IPreferencesScope defaultScope) {
+  private void initFeedViewDefaults(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(FV_LAYOUT_VERTICAL, true);
     defaultScope.putIntegers(FV_SASHFORM_WEIGHTS, new int[] { 50, 50 });
     defaultScope.putBoolean(BM_OPEN_SITE_FOR_NEWS, false);

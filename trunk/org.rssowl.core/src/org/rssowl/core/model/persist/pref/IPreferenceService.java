@@ -21,35 +21,37 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+package org.rssowl.core.model.persist.pref;
 
-package org.rssowl.core.model.reference;
-
-import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.IEntity;
 
 /**
- * Implementation of the <code>ModelReference</code> for the Type
- * <code>IBookMark</code>.
- * 
  * @author bpasero
  */
-public final class BookMarkReference extends MarkReference {
+public interface IPreferenceService {
 
   /**
-   * Instantiates a new leightweight reference. Any resolve()-call will be
-   * passed to the <code>IModelDAO</code> to load the heavyweight type from
-   * the persistance layer.
-   * 
-   * @param id The ID of the type to use for loading the type from the
-   * persistance layer.
+   * The default scope can be used to intialize default preferences. It is the
+   * most-outer Scope with no parent scope at all. None of the values stored in
+   * the default scope is persisted.
+   *
+   * @return The Default Scope for Preferences.
    */
-  public BookMarkReference(long id) {
-    super(id);
-  }
+   IPreferenceScope getDefaultScope() ;
 
-  @Override
-  public IBookMark resolve() throws PersistenceException {
-    return Owl.getPersistenceService().getModelDAO().loadBookMark(getId());
-  }
+  /**
+   * The global scope stores global preferences. Most entity-scopes will be
+   * initialized with the values of the global scope.
+   *
+   * @return The Global Scope for Preferences.
+   */
+   IPreferenceScope getGlobalScope();
+
+  /**
+   * The entity scope stores preferences in the given entity itself.
+   *
+   * @param entity The Entity to be used for the Scope.
+   * @return The Entity Scope for Preferences as defined by the given Entity.
+   */
+  IPreferenceScope getEntityScope(IEntity entity) ;
 }

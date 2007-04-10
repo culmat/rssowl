@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.connection;
+package org.rssowl.core.connection.internal;
 
 import org.apache.commons.httpclient.protocol.SecureProtocolSocketFactory;
 import org.eclipse.core.runtime.Assert;
@@ -35,15 +35,17 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
+import org.rssowl.core.Owl;
+import org.rssowl.core.connection.ConnectionException;
+import org.rssowl.core.connection.IConnectionService;
+import org.rssowl.core.connection.IProtocolHandler;
+import org.rssowl.core.connection.UnknownFeedException;
 import org.rssowl.core.connection.auth.CredentialsException;
 import org.rssowl.core.connection.auth.DefaultCredentialsProvider;
 import org.rssowl.core.connection.auth.ICredentials;
 import org.rssowl.core.connection.auth.ICredentialsProvider;
 import org.rssowl.core.connection.auth.IProxyCredentials;
-import org.rssowl.core.connection.internal.DefaultProtocolHandler;
-import org.rssowl.core.connection.internal.EasySSLProtocolSocketFactory;
 import org.rssowl.core.internal.Activator;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.events.FeedAdapter;
 import org.rssowl.core.model.events.FeedEvent;
 import org.rssowl.core.model.persist.IConditionalGet;
@@ -65,7 +67,7 @@ import java.util.Set;
  *
  * @author bpasero
  */
-public class ConnectionManager {
+public class ConnectionManager implements IConnectionService {
 
   /* ID of the contributed ProtocolHandlers */
   private static final String PROTHANDLER_EXTENSION_POINT = "org.rssowl.core.ProtocolHandler"; //$NON-NLS-1$
@@ -79,35 +81,21 @@ public class ConnectionManager {
   /* Some protocols supported by default */
   private static final String[] DEFAULT_PROTOCOLS = new String[] { "http", "https", "file" };
 
-  private static ConnectionManager fInstance;
-
   private Map<String, IProtocolHandler> fProtocolHandler;
   private Map<String, ICredentialsProvider> fCredentialsProvider;
   private SecureProtocolSocketFactory fSecureProtocolSocketFactory;
   private FeedAdapter fFeedListener;
 
-  private ConnectionManager() {
+  /** */
+  public ConnectionManager() {
     fProtocolHandler = new HashMap<String, IProtocolHandler>();
     fCredentialsProvider = new HashMap<String, ICredentialsProvider>();
+
+    /* Init */
+    startup();
   }
 
-  /**
-   * Get the singleton instance of ConnectionManager, responsible to retrieve
-   * the contents of a Feed by supplying an InputStream
-   *
-   * @return The Singleton Instance.
-   */
-  public static ConnectionManager getDefault() {
-    if (fInstance == null)
-      fInstance = new ConnectionManager();
-
-    return fInstance;
-  }
-
-  /**
-   * Load Contributions and register Stream Handlers.
-   */
-  public void startup() {
+  private void startup() {
 
     /* Load Contributions */
     loadProtocolHandlers();
@@ -143,34 +131,23 @@ public class ConnectionManager {
       }
     };
 
-    NewsModel.getDefault().addFeedListener(fFeedListener);
+    Owl.getListenerService().addFeedListener(fFeedListener);
   }
 
-  /**
-   * Unregister from Listeners
+  /*
+   * @see org.rssowl.core.connection.IConnectionService#shutdown()
    */
   public void shutdown() {
     unregisterListeners();
   }
 
   private void unregisterListeners() {
-    NewsModel.getDefault().removeFeedListener(fFeedListener);
+    Owl.getListenerService().removeFeedListener(fFeedListener);
   }
 
-  /**
-   * Load the Contents of the given HTTP/HTTPS - URL by connecting to it. The
-   * given <code>HashMap</code> may be used to define connection related
-   * properties as defined in <code>IConnectionPropertyConstants</code> for
-   * example.
-   *
-   * @param link The URL to Load.
-   * @param properties Connection related properties as defined in
-   * <code>IConnectionPropertyConstants</code> for example.
-   * @return The Content of the URL as InputStream.
-   * @throws ConnectionException In case of an error while loading the Feed or
-   * in case no suitable ProtocolHandler is present.
-   * @see AuthenticationRequiredException
-   * @see NotModifiedException
+  /*
+   * @see org.rssowl.core.connection.IConnectionService#openHTTPStream(java.net.URI,
+   * java.util.Map)
    */
   public InputStream openHTTPStream(URI link, Map<Object, Object> properties) throws ConnectionException {
     Assert.isTrue("http".equals(link.getScheme()) || "https".equals(link.getScheme()));
@@ -178,18 +155,9 @@ public class ConnectionManager {
     return new DefaultProtocolHandler().openStream(link, properties);
   }
 
-  /**
-   * Reloads a <code>IFeed</code> with its News from the given
-   * <code>URL</code> and returns it.
-   *
-   * @param link The Link to the Feed as <code>URL</code>.
-   * @param monitor The Progress-Monitor used from the callee.
-   * @param properties A Map of properties that can be used to transport custom
-   * information
-   * @return Returns the <code>IFeed</code> from the given URL.
-   * @throws CoreException In case of an Exception while loading the Feed from
-   * the URL.
-   * @see IConnectionPropertyConstants
+  /*
+   * @see org.rssowl.core.connection.IConnectionService#reload(java.net.URI,
+   * org.eclipse.core.runtime.IProgressMonitor, java.util.Map)
    */
   public Pair<IFeed, IConditionalGet> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException {
     String protocol = link.getScheme();
@@ -207,14 +175,8 @@ public class ConnectionManager {
     throw new UnknownFeedException(Activator.getDefault().createErrorStatus("Could not find a matching FeedHandler for: " + protocol, null)); //$NON-NLS-1$
   }
 
-  /**
-   * Returns the Feed Icon for the given Link. For instance, this could be the
-   * favicon associated with the host providing the Feed.
-   *
-   * @param link The Link to the Feed as <code>URI</code>.
-   * @return Returns an Icon for the given Link as byte-array.
-   * @throws UnknownFeedException In case of a missing Feed-Handler for the
-   * given Link.
+  /*
+   * @see org.rssowl.core.connection.IConnectionService#getFeedIcon(java.net.URI)
    */
   public byte[] getFeedIcon(URI link) throws UnknownFeedException {
     String protocol = link.getScheme();
@@ -228,33 +190,22 @@ public class ConnectionManager {
     throw new UnknownFeedException(Activator.getDefault().createErrorStatus("Could not find a matching FeedHandler for: " + protocol, null)); //$NON-NLS-1$
   }
 
-  /**
-   * Returns the Credentials-Provider capable of returning Credentials for
-   * protected URLs and Proxy-Server.
-   *
-   * @param link The Link for which to retrieve the Credentials-Provider.
-   * @return The Credentials-Provider.
+  /*
+   * @see org.rssowl.core.connection.IConnectionService#getCredentialsProvider(java.net.URI)
    */
   public ICredentialsProvider getCredentialsProvider(URI link) {
     return fCredentialsProvider.get(link.getScheme());
   }
 
-  /**
-   * Returns the contributed or default Factory for Secure Socket Connections.
-   *
-   * @return the contributed or default Factory for Secure Socket Connections.
+  /*
+   * @see org.rssowl.core.connection.IConnectionService#getSecureProtocolSocketFactory()
    */
   public SecureProtocolSocketFactory getSecureProtocolSocketFactory() {
     return fSecureProtocolSocketFactory;
   }
 
-  /**
-   * Return the Authentication Credentials for the given Feed or NULL if none.
-   *
-   * @param link The Link to check present Authentication Credentials.
-   * @return the Authentication Credentials for the given Feed or NULL if none.
-   * @throws CredentialsException In case of an error while retrieving
-   * Credentials for the Feed.
+  /*
+   * @see org.rssowl.core.connection.IConnectionService#getAuthCredentials(java.net.URI)
    */
   public ICredentials getAuthCredentials(URI link) throws CredentialsException {
     String protocol = link.getScheme();
@@ -273,13 +224,8 @@ public class ConnectionManager {
     return credentials;
   }
 
-  /**
-   * Return the Proxy Credentials for the given Feed or NULL if none.
-   *
-   * @param link The Link to check present Proxy Credentials.
-   * @return the Proxy Credentials for the given Feed or NULL if none.
-   * @throws CredentialsException In case of an error while retrieving Proxy
-   * Credentials.
+  /*
+   * @see org.rssowl.core.connection.IConnectionService#getProxyCredentials(java.net.URI)
    */
   public IProxyCredentials getProxyCredentials(URI link) throws CredentialsException {
     String protocol = link.getScheme();

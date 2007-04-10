@@ -28,7 +28,7 @@ import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
-import org.rssowl.core.interpreter.Interpreter;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.persist.IAttachment;
 import org.rssowl.core.model.persist.ICategory;
 import org.rssowl.core.model.persist.IEntity;
@@ -127,7 +127,7 @@ public class AtomInterpreter extends BasicInterpreter {
 
       /* Logo */
       else if ("logo".equals(name)) { //$NON-NLS-1$
-        IImage image = Interpreter.getDefault().getTypesFactory().createImage(feed);
+        IImage image = Owl.getInterpreter().getTypesFactory().createImage(feed);
         URI uri = URIUtils.createURI(child.getText());
         if (uri != null)
           image.setLink(uri);
@@ -169,7 +169,7 @@ public class AtomInterpreter extends BasicInterpreter {
   }
 
   private void processEntry(Element element, IFeed feed) {
-    INews news = Interpreter.getDefault().getTypesFactory().createNews(feed);
+    INews news = Owl.getInterpreter().getTypesFactory().createNews(feed);
     news.setBase(feed.getBase());
 
     /* Support sorting by natural order of items as appearing in the feed */
@@ -214,7 +214,7 @@ public class AtomInterpreter extends BasicInterpreter {
 
       /* Id */
       else if ("id".equals(name)) { //$NON-NLS-1$
-        IGuid guid = Interpreter.getDefault().getTypesFactory().createGuid(news);
+        IGuid guid = Owl.getInterpreter().getTypesFactory().createGuid(news);
         guid.setValue(child.getText());
         news.setGuid(guid);
 
@@ -235,7 +235,7 @@ public class AtomInterpreter extends BasicInterpreter {
 
         /* Enclosure */
         else if ("enclosure".equals(rel)) { //$NON-NLS-1$
-          IAttachment attachment = Interpreter.getDefault().getTypesFactory().createAttachment(news);
+          IAttachment attachment = Owl.getInterpreter().getTypesFactory().createAttachment(news);
 
           URI uri = URIUtils.createURI(child.getAttributeValue("href")); //$NON-NLS-1$
           if (uri != null)
@@ -313,7 +313,7 @@ public class AtomInterpreter extends BasicInterpreter {
   }
 
   private void processSource(Element element, INews news) {
-    ISource source = Interpreter.getDefault().getTypesFactory().createSource(news);
+    ISource source = Owl.getInterpreter().getTypesFactory().createSource(news);
 
     /* Check wether the Attributes are to be processed by a Contribution */
     processNamespaceAttributes(element, source);
@@ -356,7 +356,7 @@ public class AtomInterpreter extends BasicInterpreter {
   }
 
   private void processCategory(Element element, IEntity type) {
-    ICategory category = Interpreter.getDefault().getTypesFactory().createCategory(type);
+    ICategory category = Owl.getInterpreter().getTypesFactory().createCategory(type);
 
     /* Interpret Attributes */
     List< ? > categoryAttributes = element.getAttributes();
@@ -390,7 +390,7 @@ public class AtomInterpreter extends BasicInterpreter {
   }
 
   private void processAuthor(Element element, IPersistable type) {
-    IPerson person = Interpreter.getDefault().getTypesFactory().createPerson(type);
+    IPerson person = Owl.getInterpreter().getTypesFactory().createPerson(type);
 
     /* Check wether the Attributes are to be processed by a Contribution */
     processNamespaceAttributes(element, person);

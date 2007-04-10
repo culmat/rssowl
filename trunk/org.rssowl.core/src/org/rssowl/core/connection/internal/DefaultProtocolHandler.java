@@ -38,9 +38,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.service.url.URLStreamHandlerService;
+import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
-import org.rssowl.core.connection.ConnectionManager;
 import org.rssowl.core.connection.IConditionalGetCompatible;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IProtocolHandler;
@@ -50,8 +50,6 @@ import org.rssowl.core.connection.auth.CredentialsException;
 import org.rssowl.core.connection.auth.ICredentials;
 import org.rssowl.core.connection.auth.IProxyCredentials;
 import org.rssowl.core.internal.Activator;
-import org.rssowl.core.interpreter.Interpreter;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.persist.IConditionalGet;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IModelTypesFactory;
@@ -109,7 +107,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
    * org.eclipse.core.runtime.IProgressMonitor, java.util.Map)
    */
   public Pair<IFeed, IConditionalGet> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException {
-    IModelTypesFactory typesFactory = NewsModel.getDefault().getTypesFactory();
+    IModelTypesFactory typesFactory = Owl.getModelFactory();
 
     /* Create a new empty feed from the existing one */
     IFeed feed = typesFactory.createFeed(null, link);
@@ -135,7 +133,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     }
 
     /* Pass the Stream to the Interpreter */
-    Interpreter.getDefault().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed);
 
     return Pair.create(feed, conditionalGet);
   }
@@ -148,7 +146,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   }
 
   private IConditionalGet getConditionalGet(URI link, InputStream inS) {
-    IModelTypesFactory typesFactory = NewsModel.getDefault().getTypesFactory();
+    IModelTypesFactory typesFactory = Owl.getModelFactory();
 
     if (inS instanceof IConditionalGetCompatible) {
       String ifModifiedSince = ((IConditionalGetCompatible) inS).getIfModifiedSince();
@@ -303,7 +301,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   }
 
   private void setupAuthentication(URI link, HttpClient client, GetMethod getMethod) throws URIException, CredentialsException {
-    ICredentials authCredentials = ConnectionManager.getDefault().getAuthCredentials(link);
+    ICredentials authCredentials = Owl.getConnectionService().getAuthCredentials(link);
     if (authCredentials != null) {
       client.getParams().setAuthenticationPreemptive(true);
 
@@ -320,7 +318,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   }
 
   private void setupProxy(URI link, HttpClient client) throws CredentialsException {
-    IProxyCredentials creds = ConnectionManager.getDefault().getProxyCredentials(link);
+    IProxyCredentials creds = Owl.getConnectionService().getProxyCredentials(link);
     if (creds != null) {
 
       /* Apply Proxy Config to HTTPClient */
@@ -350,7 +348,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       return;
 
     /* Register Easy Protocol Socket Factory with HTTPS */
-    Protocol easyHttpsProtocol = new Protocol("https", (ProtocolSocketFactory) ConnectionManager.getDefault().getSecureProtocolSocketFactory(), 443); //$NON-NLS-1$
+    Protocol easyHttpsProtocol = new Protocol("https", (ProtocolSocketFactory) Owl.getConnectionService().getSecureProtocolSocketFactory(), 443); //$NON-NLS-1$
     Protocol.registerProtocol("https", easyHttpsProtocol); //$NON-NLS-1$
 
     fgSSLInitialized = true;

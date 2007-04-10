@@ -26,10 +26,10 @@ package org.rssowl.core.interpreter.internal;
 
 import org.jdom.Attribute;
 import org.jdom.Element;
+import org.rssowl.core.Owl;
 import org.rssowl.core.interpreter.IElementHandler;
 import org.rssowl.core.interpreter.IFormatInterpreter;
 import org.rssowl.core.interpreter.INamespaceHandler;
-import org.rssowl.core.interpreter.Interpreter;
 import org.rssowl.core.model.persist.IPersistable;
 
 import java.util.Iterator;
@@ -133,7 +133,7 @@ public abstract class BasicInterpreter implements IFormatInterpreter {
 
     /* First check for contributed Element Handlers */
     if (getDefaultNamespaceUri().equals(namespaceURI)) {
-      IElementHandler elementHandler = Interpreter.getDefault().getElementHandler(name, getRootElementName());
+      IElementHandler elementHandler = Owl.getInterpreter().getElementHandler(name, getRootElementName());
       if (elementHandler != null) {
         elementHandler.processElement(element, parent);
         return true;
@@ -142,7 +142,7 @@ public abstract class BasicInterpreter implements IFormatInterpreter {
 
     /* Second check for contributed Namespace Handlers */
     else if (!getDefaultNamespaceUri().equals(namespaceURI) && namespaceURI != null) {
-      INamespaceHandler handler = Interpreter.getDefault().getNamespaceHandler(namespaceURI);
+      INamespaceHandler handler = Owl.getInterpreter().getNamespaceHandler(namespaceURI);
       if (handler != null) {
         handler.processElement(element, parent);
         return true;
@@ -166,7 +166,7 @@ public abstract class BasicInterpreter implements IFormatInterpreter {
 
     /* Check for contributed Namespace Handlers */
     if (!getDefaultNamespaceUri().equals(namespaceURI)) {
-      INamespaceHandler handler = Interpreter.getDefault().getNamespaceHandler(namespaceURI);
+      INamespaceHandler handler = Owl.getInterpreter().getNamespaceHandler(namespaceURI);
       if (handler != null) {
         handler.processAttribute(attribute, parent);
         return true;

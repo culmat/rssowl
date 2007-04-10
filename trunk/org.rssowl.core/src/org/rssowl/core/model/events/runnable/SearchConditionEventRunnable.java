@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events.runnable;
 
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.events.ModelEvent;
 import org.rssowl.core.model.events.SearchConditionEvent;
 
@@ -52,16 +52,16 @@ public class SearchConditionEventRunnable extends
   
   @Override
   protected final void firePersistEvents(Set<SearchConditionEvent> persistEvents) {
-    NewsModel.getDefault().notifySearchConditionAdded(persistEvents);
+    Owl.getListenerService().notifySearchConditionAdded(persistEvents);
   }
 
   @Override
   protected final void fireRemoveEvents(Set<SearchConditionEvent> removeEvents) {
-    NewsModel.getDefault().notifySearchConditionDeleted(removeEvents);
+    Owl.getListenerService().notifySearchConditionDeleted(removeEvents);
   }
 
   @Override
   protected final void fireUpdateEvents(Set<SearchConditionEvent> updateEvents) {
-    NewsModel.getDefault().notifySearchConditionUpdated(updateEvents);
+    Owl.getListenerService().notifySearchConditionUpdated(updateEvents);
   }
 }

@@ -27,7 +27,7 @@ package org.rssowl.core.interpreter.internal;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.rssowl.core.interpreter.Interpreter;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.persist.IAttachment;
 import org.rssowl.core.model.persist.ICategory;
 import org.rssowl.core.model.persist.ICloud;
@@ -176,7 +176,7 @@ public class RSSInterpreter extends BasicInterpreter {
 
       /* Managing Editor */
       else if ("managingeditor".equals(name)) { //$NON-NLS-1$
-        IPerson person = Interpreter.getDefault().getTypesFactory().createPerson(feed);
+        IPerson person = Owl.getInterpreter().getTypesFactory().createPerson(feed);
         person.setName(child.getText());
         feed.setAuthor(person);
 
@@ -265,7 +265,7 @@ public class RSSInterpreter extends BasicInterpreter {
   }
 
   private void processCloud(Element element, IFeed feed) {
-    ICloud cloud = Interpreter.getDefault().getTypesFactory().createCloud(feed);
+    ICloud cloud = Owl.getInterpreter().getTypesFactory().createCloud(feed);
 
     /* Interpret Attributes */
     List< ? > cloudAttributes = element.getAttributes();
@@ -306,7 +306,7 @@ public class RSSInterpreter extends BasicInterpreter {
   }
 
   private void processCategory(Element element, IEntity type) {
-    ICategory category = Interpreter.getDefault().getTypesFactory().createCategory(type);
+    ICategory category = Owl.getInterpreter().getTypesFactory().createCategory(type);
     category.setName(element.getText());
 
     /* Interpret Attributes */
@@ -332,7 +332,7 @@ public class RSSInterpreter extends BasicInterpreter {
   }
 
   private void processImage(Element element, IFeed feed) {
-    IImage image = Interpreter.getDefault().getTypesFactory().createImage(feed);
+    IImage image = Owl.getInterpreter().getTypesFactory().createImage(feed);
 
     /* Check wether the Attributes are to be processed by a Contribution */
     processNamespaceAttributes(element, image);
@@ -397,7 +397,7 @@ public class RSSInterpreter extends BasicInterpreter {
   }
 
   private void processItems(Element element, IFeed feed) {
-    INews news = Interpreter.getDefault().getTypesFactory().createNews(feed);
+    INews news = Owl.getInterpreter().getTypesFactory().createNews(feed);
 
     /* Support sorting by natural order of items as appearing in the feed */
     news.setReceiveDate(new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
@@ -443,7 +443,7 @@ public class RSSInterpreter extends BasicInterpreter {
 
       /* Author */
       else if ("author".equals(name)) { //$NON-NLS-1$
-        IPerson person = Interpreter.getDefault().getTypesFactory().createPerson(news);
+        IPerson person = Owl.getInterpreter().getTypesFactory().createPerson(news);
         person.setName(child.getText());
         news.setAuthor(person);
 
@@ -478,7 +478,7 @@ public class RSSInterpreter extends BasicInterpreter {
   }
 
   private void processEnclosure(Element element, INews news) {
-    IAttachment attachment = Interpreter.getDefault().getTypesFactory().createAttachment(news);
+    IAttachment attachment = Owl.getInterpreter().getTypesFactory().createAttachment(news);
 
     /* Interpret Attributes */
     List< ? > attachmentAttributes = element.getAttributes();
@@ -514,7 +514,7 @@ public class RSSInterpreter extends BasicInterpreter {
   }
 
   private void processSource(Element element, INews news) {
-    ISource source = Interpreter.getDefault().getTypesFactory().createSource(news);
+    ISource source = Owl.getInterpreter().getTypesFactory().createSource(news);
     source.setName(element.getText());
 
     /* Check wether the Attributes are to be processed by a Contribution */
@@ -543,7 +543,7 @@ public class RSSInterpreter extends BasicInterpreter {
   }
 
   private void processGuid(Element element, INews news) {
-    IGuid guid = Interpreter.getDefault().getTypesFactory().createGuid(news);
+    IGuid guid = Owl.getInterpreter().getTypesFactory().createGuid(news);
     guid.setValue(element.getText());
 
     /* Check wether the Attributes are to be processed by a Contribution */
@@ -569,7 +569,7 @@ public class RSSInterpreter extends BasicInterpreter {
   }
 
   private void processTextInput(Element element, IFeed feed) {
-    ITextInput input = Interpreter.getDefault().getTypesFactory().createTextInput(feed);
+    ITextInput input = Owl.getInterpreter().getTypesFactory().createTextInput(feed);
 
     /* Check wether the Attributes are to be processed by a Contribution */
     processNamespaceAttributes(element, input);

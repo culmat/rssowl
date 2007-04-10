@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IFolder;
 
@@ -50,6 +50,6 @@ public final class FolderReference extends ModelReference {
 
   @Override
   public IFolder resolve() throws PersistenceException {
-    return NewsModel.getDefault().getPersistenceLayer().getModelDAO().loadFolder(getId());
+    return Owl.getPersistenceService().getModelDAO().loadFolder(getId());
   }
 }
