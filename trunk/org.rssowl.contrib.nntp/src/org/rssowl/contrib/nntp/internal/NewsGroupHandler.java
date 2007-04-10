@@ -36,14 +36,13 @@ import org.mime4j.decoder.DecoderUtil;
 import org.mime4j.decoder.QuotedPrintableInputStream;
 import org.osgi.service.url.AbstractURLStreamHandlerService;
 import org.osgi.service.url.URLStreamHandlerService;
+import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
-import org.rssowl.core.connection.ConnectionManager;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.connection.auth.CredentialsException;
 import org.rssowl.core.connection.auth.ICredentials;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.persist.IConditionalGet;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IGuid;
@@ -124,7 +123,7 @@ public class NewsGroupHandler implements IProtocolHandler {
    * Leave public constructor for reflection.
    */
   public NewsGroupHandler() {
-    fTypesFactory = NewsModel.getDefault().getTypesFactory();
+    fTypesFactory = Owl.getModelFactory();
   }
 
   /*
@@ -505,7 +504,7 @@ public class NewsGroupHandler implements IProtocolHandler {
   }
 
   private void setupAuthentication(URI link, NNTPClient client) throws CredentialsException, IOException {
-    ICredentials authCredentials = ConnectionManager.getDefault().getAuthCredentials(link);
+    ICredentials authCredentials = Owl.getConnectionService().getAuthCredentials(link);
     if (authCredentials != null)
       client.authenticate(authCredentials.getUsername(), authCredentials.getPassword());
   }
@@ -564,7 +563,7 @@ public class NewsGroupHandler implements IProtocolHandler {
       if (faviconLink == null)
         return null;
 
-      InputStream fis = ConnectionManager.getDefault().openHTTPStream(faviconLink, properties);
+      InputStream fis = Owl.getConnectionService().openHTTPStream(faviconLink, properties);
 
       ByteArrayOutputStream fos = new ByteArrayOutputStream();
       byte buffer[] = new byte[0xffff];
