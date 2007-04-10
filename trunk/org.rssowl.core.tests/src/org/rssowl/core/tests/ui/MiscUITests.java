@@ -41,7 +41,7 @@ import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.reference.BookMarkReference;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 
 import java.net.URI;
 
@@ -70,7 +70,7 @@ public class MiscUITests {
 
     /* Delete previously stored favicons */
     for (int i = 0; i < 5; i++)
-      RSSOwlUI.deleteImage(i);
+      OwlUI.deleteImage(i);
 
     IFeed feed = new Feed(new URI("http://www.rssowl.org/node/feed"));
     IFolder root = new Folder(null, null, "Root");
@@ -80,11 +80,11 @@ public class MiscUITests {
     feed = dao.saveFeed(feed);
     root = dao.saveFolder(root);
 
-    assertEquals(null, RSSOwlUI.getFavicon(bookmark));
+    assertEquals(null, OwlUI.getFavicon(bookmark));
 
     Controller.getDefault().reload(bookmark, null, new NullProgressMonitor());
 
-    assertNotNull(RSSOwlUI.getFavicon(bookmark));
+    assertNotNull(OwlUI.getFavicon(bookmark));
 
     dao.deleteBookMark(new BookMarkReference(bookmark.getId()));
 
