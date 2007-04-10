@@ -53,7 +53,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.events.FolderAdapter;
 import org.rssowl.core.model.events.FolderEvent;
 import org.rssowl.core.model.persist.IFolder;
@@ -144,7 +144,7 @@ public class FolderChooser extends Composite implements DisposeListener {
       }
     };
 
-    NewsModel.getDefault().addFolderListener(fFolderListener);
+    Owl.getListenerService().addFolderListener(fFolderListener);
   }
 
   private void expand(IFolder folder) {
@@ -156,7 +156,7 @@ public class FolderChooser extends Composite implements DisposeListener {
   }
 
   private void unregisterListeners() {
-    NewsModel.getDefault().removeFolderListener(fFolderListener);
+    Owl.getListenerService().removeFolderListener(fFolderListener);
   }
 
   private void initComponents() {

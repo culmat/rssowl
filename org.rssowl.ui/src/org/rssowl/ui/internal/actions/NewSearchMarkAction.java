@@ -32,9 +32,9 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
+import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.dao.PersistenceLayer;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.reference.FolderReference;
@@ -50,7 +50,7 @@ import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 public class NewSearchMarkAction implements IWorkbenchWindowActionDelegate, IObjectActionDelegate {
   private Shell fShell;
   private IFolder fParent;
-  private PersistenceLayer fPersist;
+  private IPersistenceService fPersist;
 
   /** Keep for Reflection */
   public NewSearchMarkAction() {
@@ -64,7 +64,7 @@ public class NewSearchMarkAction implements IWorkbenchWindowActionDelegate, IObj
   public NewSearchMarkAction(Shell shell, IFolder parent) {
     fShell = shell;
     fParent = parent;
-    fPersist = NewsModel.getDefault().getPersistenceLayer();
+    fPersist = Owl.getPersistenceService();
   }
 
   /*

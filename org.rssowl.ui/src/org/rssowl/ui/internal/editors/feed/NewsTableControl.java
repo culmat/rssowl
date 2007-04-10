@@ -61,14 +61,14 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.ILabel;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.ModelReference;
 import org.rssowl.core.model.reference.SearchMarkReference;
 import org.rssowl.core.util.ITask;
@@ -185,7 +185,7 @@ public class NewsTableControl implements IFeedViewPart {
   private AtomicBoolean fBlockNewsStateTracker = new AtomicBoolean(false);
 
   /* Settings */
-  private IPreferencesScope fPreferences;
+  private IPreferenceScope fPreferences;
   private Columns fInitialSortColumn = Columns.DATE;
   private boolean fInitialAscending = false;
 
@@ -194,7 +194,7 @@ public class NewsTableControl implements IFeedViewPart {
    */
   public void init(IEditorSite editorSite) {
     fEditorSite = editorSite;
-    fPreferences = NewsModel.getDefault().getGlobalScope();
+    fPreferences = Owl.getPreferenceService().getGlobalScope();
     fNewsStateTracker = new MarkReadTracker(fPreferences.getInteger(DefaultPreferences.MARK_READ_IN_MILLIS), false);
     fResources = new LocalResourceManager(JFaceResources.getResources());
   }
@@ -599,7 +599,7 @@ public class NewsTableControl implements IFeedViewPart {
         labelMenu.add(labelNone);
         labelMenu.add(new Separator());
 
-        List<ILabel> labels = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer().loadLabels();
+        List<ILabel> labels = Owl.getPersistenceService().getApplicationLayer().loadLabels();
         for (final ILabel label : labels) {
           IAction labelAction = new Action(label.getName(), IAction.AS_RADIO_BUTTON) {
             @Override
@@ -657,6 +657,6 @@ public class NewsTableControl implements IFeedViewPart {
   }
 
   private void setNewsState(List<INews> news, INews.State state) {
-    NewsModel.getDefault().getPersistenceLayer().getApplicationLayer().setNewsState(news, state, true, false);
+    Owl.getPersistenceService().getApplicationLayer().setNewsState(news, state, true, false);
   }
 }

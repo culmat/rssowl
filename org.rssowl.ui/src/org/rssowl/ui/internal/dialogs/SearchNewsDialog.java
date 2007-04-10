@@ -72,7 +72,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.events.NewsEvent;
 import org.rssowl.core.model.events.NewsListener;
 import org.rssowl.core.model.persist.IEntity;
@@ -193,7 +193,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fDialogSettings = Activator.getDefault().getDialogSettings();
     fFirstTimeOpen = (fDialogSettings.getSection(SETTINGS_SECTION) == null);
-    fModelSearch = NewsModel.getDefault().getPersistenceLayer().getModelSearch();
+    fModelSearch = Owl.getPersistenceService().getModelSearch();
     fHandCursor = parentShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND);
     fInitialConditions = conditions;
     fMatchAllConditions = matchAllConditions;
@@ -632,7 +632,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
         onNewsEvent(events);
       }
     };
-    NewsModel.getDefault().addNewsListener(fNewsListener);
+    Owl.getListenerService().addNewsListener(fNewsListener);
   }
 
   private void onNewsEvent(Set<NewsEvent> events) {
@@ -716,7 +716,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   }
 
   private void unregisterListeners() {
-    NewsModel.getDefault().removeNewsListener(fNewsListener);
+    Owl.getListenerService().removeNewsListener(fNewsListener);
   }
 
   private void onMouseDoubleClick(DoubleClickEvent event) {
@@ -774,7 +774,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
         labelMenu.add(labelNone);
         labelMenu.add(new Separator());
 
-        List<ILabel> labels = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer().loadLabels();
+        List<ILabel> labels = Owl.getPersistenceService().getApplicationLayer().loadLabels();
         for (final ILabel label : labels) {
           IAction labelAction = new Action(label.getName(), IAction.AS_RADIO_BUTTON) {
             @Override
@@ -894,7 +894,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
   private List<ISearchCondition> getDefaultConditions() {
     List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(1);
-    IModelTypesFactory factory = NewsModel.getDefault().getTypesFactory();
+    IModelTypesFactory factory = Owl.getModelFactory();
 
     ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
     ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS, "");
@@ -946,6 +946,6 @@ public class SearchNewsDialog extends TitleAreaDialog {
   }
 
   private void setNewsState(List<INews> news, INews.State state) {
-    NewsModel.getDefault().getPersistenceLayer().getApplicationLayer().setNewsState(news, state, true, false);
+    Owl.getPersistenceService().getApplicationLayer().setNewsState(news, state, true, false);
   }
 }

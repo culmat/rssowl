@@ -34,7 +34,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.persist.IModelTypesFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.search.ISearchCondition;
@@ -95,7 +95,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fId = String.valueOf(hashCode());
     fServer = ApplicationServer.getDefault();
     fServer.register(fId, this);
-    fFactory = NewsModel.getDefault().getTypesFactory();
+    fFactory = Owl.getModelFactory();
 
     /* Register Link Handler */
     fBrowser.addLinkHandler(AUTHOR_HANDLER_ID, this);

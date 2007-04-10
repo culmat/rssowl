@@ -30,7 +30,7 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.osgi.service.prefs.Preferences;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.RSSOwlUI;
 import org.rssowl.ui.internal.editors.feed.FeedView;
@@ -84,7 +84,7 @@ public class EditorUtils {
 
   /**
    * TODO Find a better solution once its possible to add listeners to
-   * {@link IPreferencesScope} and then listen to changes of display-properties.
+   * {@link IPreferenceScope} and then listen to changes of display-properties.
    */
   public static void updateFilterAndGrouping() {
     IWorkbenchPage page = RSSOwlUI.getPage();

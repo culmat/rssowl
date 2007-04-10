@@ -31,8 +31,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
@@ -40,7 +40,7 @@ import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.persist.search.ISearchHit;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Controller;
@@ -63,7 +63,7 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
   private IStructuredSelection fSelection;
 
   /**
-   * 
+   *
    */
   public MarkReadAction() {
     this(StructuredSelection.EMPTY);
@@ -144,7 +144,7 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
     Set<Entry<IBookMark, List<INews>>> entries = retentionHelperMap.entrySet();
     for (Entry<IBookMark, List<INews>> entry : entries) {
       IBookMark bookmark = entry.getKey();
-      IPreferencesScope bookMarkPreferences = NewsModel.getDefault().getEntityScope(bookmark);
+      IPreferenceScope bookMarkPreferences = Owl.getPreferenceService().getEntityScope(bookmark);
 
       /* Delete News that are now marked as Read */
       if (bookMarkPreferences.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE)) {
@@ -166,7 +166,7 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
       boolean affectEquivalentNews = !equalsRootFolders(folders);
 
       /* Peform Op */
-      NewsModel.getDefault().getPersistenceLayer().getApplicationLayer().setNewsState(news, INews.State.READ, affectEquivalentNews, true);
+      Owl.getPersistenceService().getApplicationLayer().setNewsState(news, INews.State.READ, affectEquivalentNews, true);
     }
   }
 

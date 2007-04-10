@@ -35,7 +35,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IFeed;
@@ -248,7 +248,7 @@ public class Application implements IApplication {
     }
 
     /* Check if a BookMark exists for the Link */
-    IApplicationLayer appLayer = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer();
+    IApplicationLayer appLayer = Owl.getPersistenceService().getApplicationLayer();
     IFeed feed = appLayer.loadFeed(linkAsURI);
     if (feed != null) {
       FeedLinkReference feedRef = new FeedLinkReference(feed.getLink());

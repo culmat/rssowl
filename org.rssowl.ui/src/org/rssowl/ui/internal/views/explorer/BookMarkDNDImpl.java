@@ -38,9 +38,9 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.TransferData;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IApplicationLayer;
-import org.rssowl.core.model.dao.PersistenceLayer;
+import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFolder;
@@ -65,7 +65,7 @@ import java.util.List;
  */
 public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceListener {
   private final BookMarkExplorer fExplorer;
-  private final PersistenceLayer fPersistence;
+  private final IPersistenceService fPersistence;
 
   /**
    * @param explorer
@@ -74,7 +74,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
   protected BookMarkDNDImpl(BookMarkExplorer explorer, Viewer viewer) {
     super(viewer);
     fExplorer = explorer;
-    fPersistence = NewsModel.getDefault().getPersistenceLayer();
+    fPersistence = Owl.getPersistenceService();
   }
 
   /*

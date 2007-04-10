@@ -25,7 +25,7 @@
 package org.rssowl.ui.internal;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.events.FeedAdapter;
 import org.rssowl.core.model.events.FeedEvent;
@@ -54,7 +54,7 @@ import java.util.Set;
  * the fields. This reduces possible errors in case some plugin manages to
  * register as News-Listener right before this service.
  * </p>
- * 
+ *
  * @author bpasero
  */
 public class NewsService {
@@ -65,7 +65,7 @@ public class NewsService {
   private IModelDAO fModelDao;
 
   NewsService() {
-    fModelDao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
+    fModelDao = Owl.getPersistenceService().getModelDAO();
     fCounter = loadCounter();
     registerListeners();
   }
@@ -73,7 +73,7 @@ public class NewsService {
   /**
    * Returns the number of unread News for the Feed referenced by
    * <code>feedLinkRef</code>.
-   * 
+   *
    * @param feedLinkRef The reference to the link of the Feed.
    * @return the number of unread News for the Feed having the given Id.
    */
@@ -92,7 +92,7 @@ public class NewsService {
   /**
    * Returns the number of new News for the Feed referenced by
    * <code>feedLinkRef</code>.
-   * 
+   *
    * @param feedLinkRef The reference to the link of the Feed.
    * @return the number of unread News for the Feed having the given link.
    */
@@ -111,7 +111,7 @@ public class NewsService {
   /**
    * Returns the number of sticky News for the Feed referenced by
    * <code>feedLinkRef</code>.
-   * 
+   *
    * @param feedLinkRef The reference to the link of the Feed.
    * @return the number of sticky News for the Feed having the given Id.
    */
@@ -163,7 +163,7 @@ public class NewsService {
 
   private NewsCounter countAll() {
     NewsCounter newsCounter = new NewsCounter();
-    List<IFeed> feeds = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer().loadAllFeeds();
+    List<IFeed> feeds = Owl.getPersistenceService().getApplicationLayer().loadAllFeeds();
     for (IFeed feed : feeds)
       newsCounter.put(feed.getLink(), count(feed));
 
@@ -199,7 +199,7 @@ public class NewsService {
   }
 
   private void registerListeners() {
-    NewsModel.getDefault().addNewsListener(new NewsAdapter() {
+    Owl.getListenerService().addNewsListener(new NewsAdapter() {
       @Override
       public void newsAdded(Set<NewsEvent> events) {
         onNewsAdded(events);
@@ -216,7 +216,7 @@ public class NewsService {
       }
     });
 
-    NewsModel.getDefault().addFeedListener(new FeedAdapter() {
+    Owl.getListenerService().addFeedListener(new FeedAdapter() {
       @Override
       public void feedDeleted(Set<FeedEvent> events) {
         onFeedDeleted(events);

@@ -32,7 +32,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.ui.internal.RSSOwlUI;
@@ -43,7 +43,7 @@ import java.util.List;
 
 /**
  * Sets the Sticky-State of selected Items.
- * 
+ *
  * @author bpasero
  */
 public class MakeTypesStickyAction extends Action implements IWorkbenchWindowActionDelegate {
@@ -114,7 +114,7 @@ public class MakeTypesStickyAction extends Action implements IWorkbenchWindowAct
     }
 
     /* Save List of INews */
-    NewsModel.getDefault().getPersistenceLayer().getApplicationLayer().saveNews(news);
+    Owl.getPersistenceService().getApplicationLayer().saveNews(news);
 
     /* Update in case this action is rerun on the same selection */
     fFlag = !fFlag;

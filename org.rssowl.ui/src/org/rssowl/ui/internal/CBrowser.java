@@ -39,9 +39,9 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.util.BrowserUtils;
@@ -67,7 +67,7 @@ public class CBrowser {
 
   private Browser fBrowser;
   private boolean fBlockNavigation;
-  private IPreferencesScope fPreferences;
+  private IPreferenceScope fPreferences;
   private Map<String, ILinkHandler> fLinkHandler;
 
   /**
@@ -76,7 +76,7 @@ public class CBrowser {
    */
   public CBrowser(Composite parent, int style) {
     fBrowser = createBrowser(parent, style);
-    fPreferences = NewsModel.getDefault().getGlobalScope();
+    fPreferences = Owl.getPreferenceService().getGlobalScope();
     fLinkHandler = new HashMap<String, ILinkHandler>();
     hookListeners();
 

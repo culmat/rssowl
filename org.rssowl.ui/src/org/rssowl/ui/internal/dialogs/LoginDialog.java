@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.rssowl.core.connection.ConnectionManager;
+import org.rssowl.core.Owl;
 import org.rssowl.core.connection.auth.CredentialsException;
 import org.rssowl.core.connection.auth.ICredentials;
 import org.rssowl.core.connection.auth.ICredentialsProvider;
@@ -54,7 +54,7 @@ import java.net.URI;
  * <p>
  * TODO: Add ability to not store credentials permanently.
  * </p>
- * 
+ *
  * @author bpasero
  */
 public class LoginDialog extends TitleAreaDialog {
@@ -76,7 +76,7 @@ public class LoginDialog extends TitleAreaDialog {
     super(parentShell);
     fLink = link;
     fResources = new LocalResourceManager(JFaceResources.getResources());
-    fCredProvider = ConnectionManager.getDefault().getCredentialsProvider(link);
+    fCredProvider = Owl.getConnectionService().getCredentialsProvider(link);
   }
 
   /*

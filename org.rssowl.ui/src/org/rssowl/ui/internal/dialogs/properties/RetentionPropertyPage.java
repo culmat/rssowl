@@ -38,13 +38,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
@@ -56,7 +56,7 @@ import java.util.Set;
 
 /**
  * Retention Properties.
- * 
+ *
  * @author bpasero
  */
 public class RetentionPropertyPage implements IEntityPropertyPage {
@@ -69,7 +69,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
   private boolean fSettingsChanged;
 
   /* Settings */
-  private List<IPreferencesScope> fEntityPreferences;
+  private List<IPreferenceScope> fEntityPreferences;
   private boolean fPrefDeleteNewsByCountState;
   private int fPrefDeleteNewsByCountValue;
   private boolean fPrefDeleteNewsByAgeState;
@@ -85,9 +85,9 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     fEntities = entities;
 
     /* Load Entity Preferences */
-    fEntityPreferences = new ArrayList<IPreferencesScope>(fEntities.size());
+    fEntityPreferences = new ArrayList<IPreferenceScope>(fEntities.size());
     for (IEntity entity : entities)
-      fEntityPreferences.add(NewsModel.getDefault().getEntityScope(entity));
+      fEntityPreferences.add(Owl.getPreferenceService().getEntityScope(entity));
 
     /* Load initial Settings */
     loadInitialSettings();
@@ -96,7 +96,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
   private void loadInitialSettings() {
 
     /* Take the first scope as initial values */
-    IPreferencesScope firstScope = fEntityPreferences.get(0);
+    IPreferenceScope firstScope = fEntityPreferences.get(0);
     fPrefDeleteNewsByCountState = firstScope.getBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE);
     fPrefDeleteNewsByCountValue = firstScope.getInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE);
     fPrefDeleteNewsByAgeState = firstScope.getBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE);
@@ -104,9 +104,9 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     fPrefDeleteReadNews = firstScope.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE);
 
     /* For any other scope not sharing the initial values, use the default */
-    IPreferencesScope defaultScope = NewsModel.getDefault().getDefaultScope();
+    IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
     for (int i = 1; i < fEntityPreferences.size(); i++) {
-      IPreferencesScope otherScope = fEntityPreferences.get(i);
+      IPreferenceScope otherScope = fEntityPreferences.get(i);
 
       if (otherScope.getBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE) != fPrefDeleteNewsByCountState)
         fPrefDeleteNewsByCountState = defaultScope.getBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE);
@@ -190,7 +190,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
   public boolean performOk(Set<IEntity> entitiesToSave) {
 
     /* Update this Entity */
-    for (IPreferencesScope scope : fEntityPreferences) {
+    for (IPreferenceScope scope : fEntityPreferences) {
       if (updatePreferences(scope)) {
         IEntity entityToSave = fEntities.get(fEntityPreferences.indexOf(scope));
         entitiesToSave.add(entityToSave);
@@ -213,7 +213,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     List<IMark> marks = folder.getMarks();
     for (IMark mark : marks) {
       if (mark instanceof IBookMark) {
-        IPreferencesScope scope = NewsModel.getDefault().getEntityScope(mark);
+        IPreferenceScope scope = Owl.getPreferenceService().getEntityScope(mark);
         updatePreferences(scope);
       }
     }
@@ -221,7 +221,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     /* Update changes to Child-Folders */
     List<IFolder> folders = folder.getFolders();
     for (IFolder childFolder : folders) {
-      IPreferencesScope scope = NewsModel.getDefault().getEntityScope(childFolder);
+      IPreferenceScope scope = Owl.getPreferenceService().getEntityScope(childFolder);
       updatePreferences(scope);
 
       /* Recursively Proceed */
@@ -229,7 +229,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     }
   }
 
-  private boolean updatePreferences(IPreferencesScope scope) {
+  private boolean updatePreferences(IPreferenceScope scope) {
     boolean changed = false;
 
     /* Delete by Count */

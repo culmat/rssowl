@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IFolder;
@@ -95,8 +95,8 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
         }
 
         /* Proceed Exporting */
-        Long selectedRootFolderID = NewsModel.getDefault().getPersistenceLayer().getPreferencesDAO().getLong(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET);
-        IFolder selectedRootFolder = NewsModel.getDefault().getPersistenceLayer().getModelDAO().loadFolder(selectedRootFolderID);
+        Long selectedRootFolderID = Owl.getPersistenceService().getPreferencesDAO().getLong(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET);
+        IFolder selectedRootFolder = Owl.getPersistenceService().getModelDAO().loadFolder(selectedRootFolderID);
         exportToOPML(file, selectedRootFolder);
       } catch (IOException e) {
         Activator.getDefault().logError(e.getMessage(), e);

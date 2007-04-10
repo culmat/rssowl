@@ -28,7 +28,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.persist.IModelTypesFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
@@ -74,7 +74,7 @@ public class StateConditionControl extends Composite {
   StateConditionControl(Composite parent, int style, EnumSet<INews.State> selectedStates) {
     super(parent, style);
     fSelectedStates = selectedStates;
-    fFactory = NewsModel.getDefault().getTypesFactory();
+    fFactory = Owl.getModelFactory();
 
     initComponents();
   }

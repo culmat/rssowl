@@ -33,7 +33,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
@@ -50,7 +50,7 @@ import java.util.Set;
 
 /**
  * Global Action for Reloading a Selection of Folders and contained BookMarks.
- * 
+ *
  * @author bpasero
  */
 public class ReloadTypesAction extends Action implements IObjectActionDelegate {
@@ -71,7 +71,7 @@ public class ReloadTypesAction extends Action implements IObjectActionDelegate {
 
   /**
    * Creates a new Action for Reloading Types from the given Selection.
-   * 
+   *
    * @param selection The Selection to Reload.
    * @param shell The Shell this operation is running from.
    */
@@ -79,7 +79,7 @@ public class ReloadTypesAction extends Action implements IObjectActionDelegate {
     Assert.isNotNull(selection);
     fSelection = selection;
     fShell = shell;
-    fAppLayer = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer();
+    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
   }
 
   /*

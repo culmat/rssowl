@@ -40,15 +40,15 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FeedReference;
 import org.rssowl.core.util.URIUtils;
@@ -91,7 +91,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
   private boolean fIsSingleBookMark;
 
   /* Settings */
-  private List<IPreferencesScope> fEntityPreferences;
+  private List<IPreferenceScope> fEntityPreferences;
   private boolean fPrefUpdateIntervalState;
   private long fPrefUpdateInterval;
   private boolean fPrefOpenOnStartup;
@@ -110,9 +110,9 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     fEntities = entities;
 
     /* Load Entity Preferences */
-    fEntityPreferences = new ArrayList<IPreferencesScope>(fEntities.size());
+    fEntityPreferences = new ArrayList<IPreferenceScope>(fEntities.size());
     for (IEntity entity : entities)
-      fEntityPreferences.add(NewsModel.getDefault().getEntityScope(entity));
+      fEntityPreferences.add(Owl.getPreferenceService().getEntityScope(entity));
 
     /* Load initial Settings */
     loadInitialSettings();
@@ -125,15 +125,15 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
   private void loadInitialSettings() {
 
     /* Take the first scope as initial values */
-    IPreferencesScope firstScope = fEntityPreferences.get(0);
+    IPreferenceScope firstScope = fEntityPreferences.get(0);
     fPrefUpdateIntervalState = firstScope.getBoolean(DefaultPreferences.BM_UPDATE_INTERVAL_STATE);
     fPrefUpdateInterval = firstScope.getLong(DefaultPreferences.BM_UPDATE_INTERVAL);
     fPrefOpenOnStartup = firstScope.getBoolean(DefaultPreferences.BM_OPEN_ON_STARTUP);
 
     /* For any other scope not sharing the initial values, use the default */
-    IPreferencesScope defaultScope = NewsModel.getDefault().getDefaultScope();
+    IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
     for (int i = 1; i < fEntityPreferences.size(); i++) {
-      IPreferencesScope otherScope = fEntityPreferences.get(i);
+      IPreferenceScope otherScope = fEntityPreferences.get(i);
 
       if (otherScope.getBoolean(DefaultPreferences.BM_UPDATE_INTERVAL_STATE) != fPrefUpdateIntervalState)
         fPrefUpdateIntervalState = defaultScope.getBoolean(DefaultPreferences.BM_UPDATE_INTERVAL_STATE);
@@ -269,7 +269,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     }
 
     /* Now handle single/multi entity Preferences */
-    for (IPreferencesScope scope : fEntityPreferences) {
+    for (IPreferenceScope scope : fEntityPreferences) {
       if (updatePreferences(scope)) {
         IEntity entityToSave = fEntities.get(fEntityPreferences.indexOf(scope));
         entitiesToSave.add(entityToSave);
@@ -334,7 +334,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       /* Check for changed Feed */
       if (!bookmark.getFeedLinkReference().getLink().toString().equals(uriAsString)) {
         try {
-          IApplicationLayer applicationLayer = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer();
+          IApplicationLayer applicationLayer = Owl.getPersistenceService().getApplicationLayer();
 
           /* Create URL */
           URI newFeedLink = new URI(uriAsString.trim());
@@ -345,8 +345,8 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
 
           /* This is a new Feed, so create it! */
           if (feedRef == null) {
-            IFeed feed = NewsModel.getDefault().getTypesFactory().createFeed(null, newFeedLink);
-            feed = NewsModel.getDefault().getPersistenceLayer().getModelDAO().saveFeed(feed);
+            IFeed feed = Owl.getModelFactory().createFeed(null, newFeedLink);
+            feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
           }
 
           /* Remember the old Reference */
@@ -358,7 +358,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
 
           /* Check if the old reference can be deleted now */
           if (applicationLayer.loadBookMarks(oldFeedRef).size() == 1)
-            NewsModel.getDefault().getPersistenceLayer().getModelDAO().deleteFeed(oldFeedRef);
+            Owl.getPersistenceService().getModelDAO().deleteFeed(oldFeedRef);
 
           /* Delete the Favicon since the feed has changed */
           RSSOwlUI.deleteImage(bookmark.getId());
@@ -396,7 +396,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     return null;
   }
 
-  private boolean updatePreferences(IPreferencesScope scope) {
+  private boolean updatePreferences(IPreferenceScope scope) {
     boolean changed = false;
 
     /* Update Interval State */
@@ -438,7 +438,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     List<IMark> marks = folder.getMarks();
     for (IMark mark : marks) {
       if (mark instanceof IBookMark) {
-        IPreferencesScope scope = NewsModel.getDefault().getEntityScope(mark);
+        IPreferenceScope scope = Owl.getPreferenceService().getEntityScope(mark);
         updatePreferences(scope);
       }
     }
@@ -446,7 +446,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     /* Update changes to Child-Folders */
     List<IFolder> folders = folder.getFolders();
     for (IFolder childFolder : folders) {
-      IPreferencesScope scope = NewsModel.getDefault().getEntityScope(childFolder);
+      IPreferenceScope scope = Owl.getPreferenceService().getEntityScope(childFolder);
       updatePreferences(scope);
 
       /* Recursively Proceed */
