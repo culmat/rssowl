@@ -13,7 +13,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rssowl.contrib.search.Activator;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.NewsEvent;
 import org.rssowl.core.model.events.NewsListener;
@@ -85,7 +85,7 @@ public class Indexer {
   public synchronized void index(List<INews> entities, boolean isUpdate) {
 
     /* For each Event */
-    for (ListIterator<INews> it = entities.listIterator(entities.size()); it.hasPrevious(); ) {
+    for (ListIterator<INews> it = entities.listIterator(entities.size()); it.hasPrevious();) {
       INews news = it.previous();
       it.remove();
       NewsDocument newsDoc = new NewsDocument(news);
@@ -120,7 +120,7 @@ public class Indexer {
   public synchronized void removeFromIndex(List<INews> entities) throws IOException {
 
     /* For each entity */
-    for (ListIterator<INews> it = entities.listIterator(entities.size()); it.hasPrevious(); ) {
+    for (ListIterator<INews> it = entities.listIterator(entities.size()); it.hasPrevious();) {
       INews news = it.previous();
       it.remove();
       Term term = createTerm(news);
@@ -221,33 +221,33 @@ public class Indexer {
     /* Listen to News-Events */
     fNewsListener = new NewsListener() {
       public void newsAdded(Set<NewsEvent> events) {
-        if (!NewsModel.TESTING)
+        if (!Owl.TESTING)
           fJobQueue.schedule(new IndexingTask(Indexer.this, events, IndexingTask.Type.ADD));
         else
           new IndexingTask(Indexer.this, events, IndexingTask.Type.ADD).run(new NullProgressMonitor());
       }
 
       public void newsUpdated(Set<NewsEvent> events) {
-        if (!NewsModel.TESTING)
+        if (!Owl.TESTING)
           fJobQueue.schedule(new IndexingTask(Indexer.this, events, IndexingTask.Type.UPDATE));
         else
           new IndexingTask(Indexer.this, events, IndexingTask.Type.UPDATE).run(new NullProgressMonitor());
       }
 
       public void newsDeleted(Set<NewsEvent> events) {
-        if (!NewsModel.TESTING)
+        if (!Owl.TESTING)
           fJobQueue.schedule(new IndexingTask(Indexer.this, events, IndexingTask.Type.DELETE));
         else
           new IndexingTask(Indexer.this, events, IndexingTask.Type.DELETE).run(new NullProgressMonitor());
       }
     };
 
-    NewsModel.getDefault().addNewsListener(fNewsListener);
+    Owl.getListenerService().addNewsListener(fNewsListener);
   }
 
   private void unregisterListeners() {
     if (fNewsListener != null)
-      NewsModel.getDefault().removeNewsListener(fNewsListener);
+      Owl.getListenerService().removeNewsListener(fNewsListener);
     fNewsListener = null;
   }
 
