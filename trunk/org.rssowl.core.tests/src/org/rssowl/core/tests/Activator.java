@@ -52,7 +52,7 @@ public class Activator extends Plugin {
   public void start(BundleContext context) throws Exception {
     super.start(context);
     Owl.TESTING = true;
-    Controller.getDefault().preUIStartup();
+    Controller.getDefault().startup();
   }
 
   /**
@@ -66,7 +66,7 @@ public class Activator extends Plugin {
 
   /**
    * Returns the shared instance.
-   * 
+   *
    * @return the shared instance
    */
   public static Activator getDefault() {
@@ -75,7 +75,7 @@ public class Activator extends Plugin {
 
   /**
    * Log an Error Message.
-   * 
+   *
    * @param msg The message to log as Error.
    * @param e The occuring Exception to log.
    */
