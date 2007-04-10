@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events.runnable;
 
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.events.FolderEvent;
 import org.rssowl.core.model.events.ModelEvent;
 
@@ -51,16 +51,16 @@ public class FolderEventRunnable extends EventRunnable<FolderEvent> {
   
   @Override
   protected final void firePersistEvents(Set<FolderEvent> persistEvents) {
-    NewsModel.getDefault().notifyFolderAdded(persistEvents);
+    Owl.getListenerService().notifyFolderAdded(persistEvents);
   }
 
   @Override
   protected final void fireRemoveEvents(Set<FolderEvent> removeEvents) {
-    NewsModel.getDefault().notifyFolderDeleted(removeEvents);
+    Owl.getListenerService().notifyFolderDeleted(removeEvents);
   }
 
   @Override
   protected final void fireUpdateEvents(Set<FolderEvent> updateEvents) {
-    NewsModel.getDefault().notifyFolderUpdated(updateEvents);
+    Owl.getListenerService().notifyFolderUpdated(updateEvents);
   }
 }

@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events.runnable;
 
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.events.LabelEvent;
 import org.rssowl.core.model.events.ModelEvent;
 
@@ -51,16 +51,16 @@ public final class LabelEventRunnable extends EventRunnable<LabelEvent> {
   
   @Override
   protected final void firePersistEvents(Set<LabelEvent> persistEvents) {
-    NewsModel.getDefault().notifyLabelAdded(persistEvents);
+    Owl.getListenerService().notifyLabelAdded(persistEvents);
   }
 
   @Override
   protected final void fireRemoveEvents(Set<LabelEvent> removeEvents) {
-    NewsModel.getDefault().notifyLabelDeleted(removeEvents);
+    Owl.getListenerService().notifyLabelDeleted(removeEvents);
   }
 
   @Override
   protected final void fireUpdateEvents(Set<LabelEvent> updateEvents) {
-    NewsModel.getDefault().notifyLabelUpdated(updateEvents);
+    Owl.getListenerService().notifyLabelUpdated(updateEvents);
   }
 }

@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.ISearchMark;
 
@@ -50,6 +50,6 @@ public final class SearchMarkReference extends MarkReference {
 
   @Override
   public ISearchMark resolve() throws PersistenceException {
-    return NewsModel.getDefault().getPersistenceLayer().getModelDAO().loadSearchMark(getId());
+    return Owl.getPersistenceService().getModelDAO().loadSearchMark(getId());
   }
 }

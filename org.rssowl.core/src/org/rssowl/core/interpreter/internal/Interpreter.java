@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.interpreter;
+package org.rssowl.core.interpreter.internal;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
@@ -35,8 +35,16 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.jdom.Document;
 import org.jdom.input.DOMBuilder;
 import org.rssowl.core.internal.Activator;
-import org.rssowl.core.interpreter.internal.DefaultInterpreterTypesFactory;
-import org.rssowl.core.interpreter.internal.DefaultSaxParserImpl;
+import org.rssowl.core.interpreter.IElementHandler;
+import org.rssowl.core.interpreter.IFormatInterpreter;
+import org.rssowl.core.interpreter.IInterpreterService;
+import org.rssowl.core.interpreter.IInterpreterTypesFactory;
+import org.rssowl.core.interpreter.INamespaceHandler;
+import org.rssowl.core.interpreter.ITypeImporter;
+import org.rssowl.core.interpreter.IXMLParser;
+import org.rssowl.core.interpreter.InterpreterException;
+import org.rssowl.core.interpreter.ParserException;
+import org.rssowl.core.interpreter.UnknownFormatException;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.util.ExtensionUtils;
@@ -62,10 +70,10 @@ import java.util.Map;
  * <li>TypesFactory allows to contribute your own Model to be used by the
  * Interpreter</li>
  * </ul>
- * 
+ *
  * @author bpasero
  */
-public class Interpreter {
+public class Interpreter implements IInterpreterService {
 
   /* ID for SAXParser Contribution */
   private static final String SAXPARSER_EXTENSION_POINT = "org.rssowl.core.SAXParser"; //$NON-NLS-1$
@@ -85,9 +93,6 @@ public class Interpreter {
   /* ID for ElementHandler Contributions */
   private static final String ELHANDLER_EXTENSION_POINT = "org.rssowl.core.ElementHandler"; //$NON-NLS-1$
 
-  /* Singleton Instance */
-  private static Interpreter fInstance;
-
   private Map<String, IFormatInterpreter> fFormatInterpreters;
   private Map<String, ITypeImporter> fTypeImporters;
   private Map<String, INamespaceHandler> fNamespaceHandlers;
@@ -95,20 +100,14 @@ public class Interpreter {
   private IInterpreterTypesFactory fTypesFactory;
   private IXMLParser fXMLParserImpl;
 
-  /* Interpreter only accessable via Singleton */
-  private Interpreter() {
+  /** */
+  public Interpreter() {
     startup();
   }
 
-  /**
-   * Parse the given InputStream into a <code>org.jdom.Document</code> and
-   * delegate the Interpretation to the contributed FormatInterpreters.
-   * 
-   * @param inS The InputStream to Interpret as <code>IFeed</code>.
-   * @param feed An instance of <code>IFeed</code> that stores the
-   * interpretion.
-   * @throws ParserException In case of an Error while Parsing.
-   * @throws InterpreterException In case of an Error while Interpreting.
+  /*
+   * @see org.rssowl.core.interpreter.IInterpreterService#interpret(java.io.InputStream,
+   * org.rssowl.core.model.persist.IFeed)
    */
   public void interpret(InputStream inS, IFeed feed) throws ParserException, InterpreterException {
     Document document = fXMLParserImpl.parse(inS);
@@ -116,14 +115,9 @@ public class Interpreter {
     interpretJDomDocument(document, feed);
   }
 
-  /**
-   * Interpret the given <code>org.w3c.dom.Document</code> as Feed by
-   * delegating the Interpretation to the contributed FormatInterpreters.
-   * 
-   * @param w3cDocument The Document to interpret as <code>IFeed</code>.
-   * @param feed An instance of <code>IFeed</code> that stores the
-   * interpretion.
-   * @throws InterpreterException In case of an Error while Interpreting.
+  /*
+   * @see org.rssowl.core.interpreter.IInterpreterService#interpretW3CDocument(org.w3c.dom.Document,
+   * org.rssowl.core.model.persist.IFeed)
    */
   public void interpretW3CDocument(org.w3c.dom.Document w3cDocument, IFeed feed) throws InterpreterException {
     DOMBuilder domBuilder = new DOMBuilder();
@@ -132,14 +126,9 @@ public class Interpreter {
     interpretJDomDocument(jDomDocument, feed);
   }
 
-  /**
-   * Interpret the given <code>org.jdom.Document</code> as Feed by delegating
-   * the Interpretation to the contributed FormatInterpreters.
-   * 
-   * @param document The Document to interpret as <code>IFeed</code>.
-   * @param feed An instance of <code>IFeed</code> that stores the
-   * interpretion.
-   * @throws InterpreterException In case of an Error while Interpreting.
+  /*
+   * @see org.rssowl.core.interpreter.IInterpreterService#interpretJDomDocument(org.jdom.Document,
+   * org.rssowl.core.model.persist.IFeed)
    */
   public void interpretJDomDocument(Document document, IFeed feed) throws InterpreterException {
 
@@ -158,13 +147,8 @@ public class Interpreter {
     fFormatInterpreters.get(format).interpret(document, feed);
   }
 
-  /**
-   * Imports the given Document as OPML into Types and returns them.
-   * 
-   * @param inS The InputStream to Interpret as Document.
-   * @return Returns the Types imported from the Document.
-   * @throws InterpreterException In case of an Error while Interpreting.
-   * @throws ParserException In case of an Error while Parsing.
+  /*
+   * @see org.rssowl.core.interpreter.IInterpreterService#importFrom(java.io.InputStream)
    */
   public List< ? extends IEntity> importFrom(InputStream inS) throws InterpreterException, ParserException {
     Activator.getDefault().logInfo("Importing the InputStream into a Type... [ org.rssowl.core.interpreter#importOPML(InputStream inS) ]"); //$NON-NLS-1$
@@ -185,49 +169,28 @@ public class Interpreter {
     return fTypeImporters.get(format).importFrom(document);
   }
 
-  /**
-   * Get the Factory responsible for creating the interpreter types.
-   * 
-   * @return The Factory responsible for creating the interpreter types.
+  /*
+   * @see org.rssowl.core.interpreter.IInterpreterService#getTypesFactory()
    */
   public IInterpreterTypesFactory getTypesFactory() {
     return fTypesFactory;
   }
 
-  /**
-   * Get the Namespace Handler for the given Namespace or NULL if not
-   * contributed.
-   * 
-   * @param namespaceUri The Namespace URI as String.
-   * @return The Namespace Handler for the given Namespace or NULL if not
-   * contributed.
+  /*
+   * @see org.rssowl.core.interpreter.IInterpreterService#getNamespaceHandler(java.lang.String)
    */
   public INamespaceHandler getNamespaceHandler(String namespaceUri) {
     return fNamespaceHandlers.get(namespaceUri);
   }
 
-  /**
-   * Get the Element Handler for the given Element and Namespace or NULL if not
-   * contributed.
-   * 
-   * @param elementName The Name of the Element.
-   * @param rootName The Name of the root element of the used Format.
-   * @return The Namespace Handler for the given Namespace or NULL if not
-   * contributed.
+  /*
+   * @see org.rssowl.core.interpreter.IInterpreterService#getElementHandler(java.lang.String,
+   * java.lang.String)
    */
   public IElementHandler getElementHandler(String elementName, String rootName) {
     if (fElementHandlers != null)
       return fElementHandlers.get(elementName.toLowerCase() + rootName.toLowerCase());
     return null;
-  }
-
-  /**
-   * @return The Singleton Instance.
-   */
-  public static Interpreter getDefault() {
-    if (fInstance == null)
-      fInstance = new Interpreter();
-    return fInstance;
   }
 
   private void startup() {

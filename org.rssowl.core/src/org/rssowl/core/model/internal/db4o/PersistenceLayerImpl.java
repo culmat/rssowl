@@ -24,18 +24,28 @@
 
 package org.rssowl.core.model.internal.db4o;
 
-import org.rssowl.core.model.dao.PersistenceLayer;
+import org.rssowl.core.model.dao.AbstractPersistenceService;
 import org.rssowl.core.model.dao.PersistenceException;
 
-public class PersistenceLayerImpl extends PersistenceLayer {
+/**
+ * @author bpasero
+ */
+public class PersistenceLayerImpl extends AbstractPersistenceService {
 
+  /** */
   public PersistenceLayerImpl() {
-    super();
+    startup();
   }
 
-  @Override
-  public void startup() throws PersistenceException {
-    super.startup();
+  /*
+   * Startup the persistence layer. In case of a Database, this would be the
+   * right place to create relations. Subclasses should override. @throws
+   * PersistenceException In case of an error while starting up the persistence
+   * layer.
+   */
+  private void startup() throws PersistenceException {
+
+    /* Startup DB and Model-Search */
     try {
       DBManager.getDefault().startup();
       getModelSearch().startup();
@@ -44,7 +54,9 @@ public class PersistenceLayerImpl extends PersistenceLayer {
     }
   }
 
-  @Override
+  /*
+   * @see org.rssowl.core.model.dao.IPersistService#shutdown()
+   */
   public void shutdown() throws PersistenceException {
     try {
       getIDGenerator().shutdown();
@@ -55,7 +67,9 @@ public class PersistenceLayerImpl extends PersistenceLayer {
     }
   }
 
-  @Override
+  /*
+   * @see org.rssowl.core.model.dao.IPersistService#recreateSchema()
+   */
   public void recreateSchema() throws PersistenceException {
     try {
       DBManager.getDefault().dropDatabase();

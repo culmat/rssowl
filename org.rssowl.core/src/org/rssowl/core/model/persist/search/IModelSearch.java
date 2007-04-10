@@ -24,8 +24,8 @@
 
 package org.rssowl.core.model.persist.search;
 
+import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.dao.PersistenceLayer;
 import org.rssowl.core.model.reference.NewsReference;
 
 import java.util.List;
@@ -90,7 +90,7 @@ public interface IModelSearch {
    * <code>PersistenceLayer#recreateSchema()</code>.
    *
    * @throws PersistenceException
-   * @see PersistenceLayer#recreateSchema()
+   * @see {@link IPersistenceService}#recreateSchema()
    */
   void clearIndex() throws PersistenceException;
 }

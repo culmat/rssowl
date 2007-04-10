@@ -27,10 +27,9 @@ package org.rssowl.core.interpreter.internal;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.rssowl.core.Owl;
 import org.rssowl.core.interpreter.ITypeImporter;
-import org.rssowl.core.interpreter.Interpreter;
 import org.rssowl.core.interpreter.InterpreterException;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
@@ -49,7 +48,7 @@ import java.util.List;
 /**
  * Importer for the popular OPML Format. Will create a new Folder that contains
  * all Folders and Feeds of the OPML.
- * 
+ *
  * @author bpasero
  */
 public class OPMLImporter implements ITypeImporter {
@@ -76,7 +75,7 @@ public class OPMLImporter implements ITypeImporter {
   }
 
   private List<IFolder> processBody(Element body) {
-    IFolder folder = Interpreter.getDefault().getTypesFactory().createFolder(null, "Imported from OPML");
+    IFolder folder = Owl.getInterpreter().getTypesFactory().createFolder(null, "Imported from OPML");
 
     /* Interpret Children */
     List< ? > feedChildren = body.getChildren();
@@ -128,12 +127,12 @@ public class OPMLImporter implements ITypeImporter {
 
     /* Outline is a Category */
     if (link == null && title != null) {
-      type = Interpreter.getDefault().getTypesFactory().createFolder((IFolder) parent, title);
+      type = Owl.getInterpreter().getTypesFactory().createFolder((IFolder) parent, title);
     }
 
     /* Outline is a BookMark */
     else {
-      IApplicationLayer applicationLayer = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer();
+      IApplicationLayer applicationLayer = Owl.getPersistenceService().getApplicationLayer();
       URI uri = link != null ? URIUtils.createURI(link) : null;
       if (uri != null) {
 
@@ -142,15 +141,15 @@ public class OPMLImporter implements ITypeImporter {
 
         /* Create a new Feed then */
         if (feedRef == null) {
-          IFeed feed = Interpreter.getDefault().getTypesFactory().createFeed(uri);
+          IFeed feed = Owl.getInterpreter().getTypesFactory().createFeed(uri);
           feed.setHomepage(homepage != null ? URIUtils.createURI(homepage) : null);
           feed.setDescription(description);
-          feed = NewsModel.getDefault().getPersistenceLayer().getModelDAO().saveFeed(feed);
+          feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
         }
 
         /* Create the BookMark */
         FeedLinkReference feedLinkRef = new FeedLinkReference(uri);
-        type = Interpreter.getDefault().getTypesFactory().createBookMark((IFolder) parent, feedLinkRef, title != null ? title : link);
+        type = Owl.getInterpreter().getTypesFactory().createBookMark((IFolder) parent, feedLinkRef, title != null ? title : link);
       }
     }
 

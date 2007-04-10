@@ -24,15 +24,15 @@
 
 package org.rssowl.core.util;
 
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.INews;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +44,7 @@ import java.util.List;
  * This class is a helper to perform a clean-up of News based on properties set
  * for the related BookMark. Clean-Up may occur by any of number, age and state
  * of News.
- * 
+ *
  * @author bpasero
  */
 public class RetentionStrategy {
@@ -54,7 +54,7 @@ public class RetentionStrategy {
 
   /**
    * Runs the Retention on the given <code>IFolder</code>.
-   * 
+   *
    * @param folder The <code>IFolder</code> to run the Retention on.
    */
   public static void process(IFolder folder) {
@@ -63,7 +63,7 @@ public class RetentionStrategy {
 
     /* Perform Deletion */
     if (newsToDelete.size() > 0)
-      NewsModel.getDefault().getPersistenceLayer().getApplicationLayer().setNewsState(newsToDelete, INews.State.DELETED, false, false);
+      Owl.getPersistenceService().getApplicationLayer().setNewsState(newsToDelete, INews.State.DELETED, false, false);
   }
 
   private static void internalProcess(IFolder folder, List<INews> newsToDelete) throws PersistenceException {
@@ -86,7 +86,7 @@ public class RetentionStrategy {
 
   /**
    * Runs the Retention on the given <code>IBookMark</code>.
-   * 
+   *
    * @param bookmark The <code>IBookMark</code> to run the Retention on.
    */
   public static void process(IBookMark bookmark) {
@@ -99,7 +99,7 @@ public class RetentionStrategy {
    * Runs the Retention on the given <code>IBookMark</code>. The second
    * argument speeds up this method, since it provides all the
    * <code>INews</code> belonging to the Feed the Bookmark is referencing.
-   * 
+   *
    * @param bookmark The <code>IBookMark</code> to run the Retention on.
    * @param news A List of <code>INews</code> belonging to the Feed the
    * Bookmark is referencing.
@@ -111,7 +111,7 @@ public class RetentionStrategy {
 
     /* Perform Deletion */
     if (newsToDelete.size() > 0)
-      NewsModel.getDefault().getPersistenceLayer().getApplicationLayer().setNewsState(newsToDelete, INews.State.DELETED, false, false);
+      Owl.getPersistenceService().getApplicationLayer().setNewsState(newsToDelete, INews.State.DELETED, false, false);
 
     return newsToDelete;
   }
@@ -123,15 +123,15 @@ public class RetentionStrategy {
    * Retention will not remove those to give the user a chance to read them.
    * This is important for Feeds that serve more News than the retention
    * strategy is set to keep.
-   * 
+   *
    * @param bookmark The <code>IBookMark</code> to run the Retention on.
    * @param feed The <code>IFeed</code> to run the Retention on.
    * @param addedNewsCount The number of added News. The Retention will not
    * remove the added News as part of its work to avoid removing News that the
    * user has never seen.
-   * @return Returns a List of <code>INews</code> whose state has been
-   * changed to DELETED during the process. It's important that the caller
-   * persists these changes to the persistence layer.
+   * @return Returns a List of <code>INews</code> whose state has been changed
+   * to DELETED during the process. It's important that the caller persists
+   * these changes to the persistence layer.
    */
   public static List<INews> process(IBookMark bookmark, IFeed feed, int addedNewsCount) {
     List<INews> newsToDelete = getNewsToDelete(bookmark, feed.getVisibleNews(), addedNewsCount);
@@ -141,14 +141,14 @@ public class RetentionStrategy {
 
     return newsToDelete;
   }
-  
+
   private static List<INews> getNewsToDelete(IBookMark bookmark, Collection<INews> targetNews) {
     return getNewsToDelete(bookmark, targetNews, -1);
   }
 
   private static List<INews> getNewsToDelete(IBookMark bookmark, Collection<INews> targetNews, int minCountToKeep) {
     List<INews> newsToDelete = new ArrayList<INews>();
-    IPreferencesScope prefs = NewsModel.getDefault().getEntityScope(bookmark);
+    IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(bookmark);
 
     /* Delete Read News if set */
     if (prefs.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE))

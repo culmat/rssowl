@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IAttachment;
 
@@ -50,6 +50,6 @@ public final class AttachmentReference extends ModelReference {
 
   @Override
   public IAttachment resolve() throws PersistenceException {
-    return NewsModel.getDefault().getPersistenceLayer().getModelDAO().loadAttachment(getId());
+    return Owl.getPersistenceService().getModelDAO().loadAttachment(getId());
   }
 }

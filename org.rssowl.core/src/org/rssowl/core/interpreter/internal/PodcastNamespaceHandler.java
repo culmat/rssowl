@@ -26,9 +26,9 @@ package org.rssowl.core.interpreter.internal;
 
 import org.jdom.Attribute;
 import org.jdom.Element;
+import org.rssowl.core.Owl;
 import org.rssowl.core.interpreter.IInterpreterTypesFactory;
 import org.rssowl.core.interpreter.INamespaceHandler;
-import org.rssowl.core.interpreter.Interpreter;
 import org.rssowl.core.model.persist.ICategory;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
@@ -61,7 +61,7 @@ public class PodcastNamespaceHandler implements INamespaceHandler {
    * org.rssowl.core.model.types.IExtendableType)
    */
   public void processElement(Element element, IPersistable type) {
-    IInterpreterTypesFactory factory = Interpreter.getDefault().getTypesFactory();
+    IInterpreterTypesFactory factory = Owl.getInterpreter().getTypesFactory();
 
     /* Category */
     if ("category".equals(element.getName())) {
@@ -91,7 +91,7 @@ public class PodcastNamespaceHandler implements INamespaceHandler {
   }
 
   private void processCategory(Element element, IPersistable type) {
-    IInterpreterTypesFactory factory = Interpreter.getDefault().getTypesFactory();
+    IInterpreterTypesFactory factory = Owl.getInterpreter().getTypesFactory();
 
     ICategory category = factory.createCategory((IEntity) type);
     List< ? > attributes = element.getAttributes();

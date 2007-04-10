@@ -39,5 +39,5 @@ public interface IPreferencesInitializer {
    * @param defaultScope The default-scope containing initial preferences. These
    * serve as the default-preferences for all other Scopes.
    */
-  void initialize(IPreferencesScope defaultScope);
+  void initialize(IPreferenceScope defaultScope);
 }

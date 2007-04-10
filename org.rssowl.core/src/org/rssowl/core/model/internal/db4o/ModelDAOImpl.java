@@ -24,7 +24,7 @@
 package org.rssowl.core.model.internal.db4o;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.AttachmentEvent;
@@ -78,7 +78,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 /**
  * An implementation of IModelDAO that simply delegates all the functionality
  * to DBManager.<p>
- * 
+ *
  * @author Ismael Juma (ismael@juma.me.uk)
  */
 public class ModelDAOImpl implements IModelDAO {
@@ -88,7 +88,7 @@ public class ModelDAOImpl implements IModelDAO {
   /**
    * Creates an instance of this class.
    */
-  public ModelDAOImpl() { 
+  public ModelDAOImpl() {
     DBManager.getDefault().addEntityStoreListener(new DatabaseListener() {
       public void databaseOpened(DatabaseEvent event) {
         fDb = event.getObjectContainer();
@@ -118,16 +118,16 @@ public class ModelDAOImpl implements IModelDAO {
       fWriteLock.unlock();
     }
   }
-  
+
   public final void deleteConditionalGet(IConditionalGet conditionalGet) {
     deleteObject(conditionalGet);
   }
-  
+
   public final void deleteNewsCounter() {
     NewsCounter newsCounter = loadNewsCounter();
     deleteObject(newsCounter);
   }
-  
+
   /*
    * @see org.rssowl.core.model.dao.IModelDAO#deleteBookMark(org.rssowl.core.model.reference.BookMarkReference)
    */
@@ -136,7 +136,7 @@ public class ModelDAOImpl implements IModelDAO {
     BookMarkEvent event = new BookMarkEvent(mark, null, true);
     deleteEntityAndFireEvents(event);
   }
-  
+
   /*
    * @see org.rssowl.core.model.dao.IModelDAO#deleteCategory(org.rssowl.core.model.reference.CategoryReference)
    */
@@ -154,12 +154,12 @@ public class ModelDAOImpl implements IModelDAO {
     FeedEvent event = new FeedEvent(feed, true);
     deleteEntityAndFireEvents(event);
   }
-  
+
   /*
    * @see org.rssowl.core.model.dao.IModelDAO#deleteFeed(org.rssowl.core.model.reference.FeedLinkReference)
    */
   public final void deleteFeed(FeedLinkReference reference) throws PersistenceException {
-    IFeed feed = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer().loadFeed(reference.getLink());
+    IFeed feed = Owl.getPersistenceService().getApplicationLayer().loadFeed(reference.getLink());
     FeedEvent event = new FeedEvent(feed, true);
     deleteEntityAndFireEvents(event);
   }
@@ -229,7 +229,7 @@ public class ModelDAOImpl implements IModelDAO {
     DBHelper.putEventTemplate(newsEvent);
     deleteEntityAndFireEvents(event);
   }
-  
+
   public final IConditionalGet loadConditionalGet(URI link) throws PersistenceException  {
     Assert.isNotNull(link, "link cannot be null"); //$NON-NLS-1$
     try {
@@ -248,7 +248,7 @@ public class ModelDAOImpl implements IModelDAO {
     }
     return null;
   }
-  
+
   public final NewsCounter loadNewsCounter() throws PersistenceException    {
     try {
       Query query = fDb.query();
@@ -258,11 +258,11 @@ public class ModelDAOImpl implements IModelDAO {
       ObjectSet<NewsCounter> set = query.execute();
       if (set.isEmpty())
         return null;
-      
+
       if (set.size() > 1)
         throw new IllegalStateException("Only one NewsCounter should exist, but " +
                 "there are: " + set.size());
-      
+
       NewsCounter counter = set.next();
       fDb.activate(counter, Integer.MAX_VALUE);
       return counter;
@@ -270,7 +270,7 @@ public class ModelDAOImpl implements IModelDAO {
       throw new PersistenceException(e);
     }
   }
-  
+
   /*
    * @see org.rssowl.core.model.dao.IModelDAO#loadAttachment(long)
    */
@@ -305,7 +305,7 @@ public class ModelDAOImpl implements IModelDAO {
     IFeed feed = loadEntity(IFeed.class,id);
     return feed;
   }
-  
+
   private <T extends IEntity>T loadEntity(Class<T> klass, long id)  {
     try {
       Query query = fDb.query();
@@ -360,7 +360,7 @@ public class ModelDAOImpl implements IModelDAO {
   public ISearchMark loadSearchMark(long id) throws PersistenceException {
     return loadEntity(ISearchMark.class, id);
   }
-  
+
   /*
    * @see org.rssowl.core.model.dao.IModelDAO#loadSearchCondition(long)
    */
@@ -380,7 +380,7 @@ public class ModelDAOImpl implements IModelDAO {
   private void saveAndCommit(ModelEvent event, boolean saveFully)  {
     saveAndCommit(event.getEntity(), saveFully);
   }
-  
+
   private void saveAndCommit(Object entity, boolean saveFully) {
     fWriteLock.lock();
     try {
@@ -402,7 +402,7 @@ public class ModelDAOImpl implements IModelDAO {
     saveAndCommit(event, updateFully);
     DBHelper.cleanUpAndFireEvents();
   }
-  
+
   /*
    * @see org.rssowl.core.model.dao.IModelDAO#saveBookMark(org.rssowl.core.model.types.IBookMark)
    */
@@ -437,7 +437,7 @@ public class ModelDAOImpl implements IModelDAO {
     DBHelper.cleanUpAndFireEvents();
     return feed;
   }
-  
+
   /*
    * @see org.rssowl.core.model.dao.IModelDAO#saveFolder(org.rssowl.core.model.types.IFolder)
    */
@@ -499,7 +499,7 @@ public class ModelDAOImpl implements IModelDAO {
     // NotSupportedOperation?
     return null;
   }
-  
+
   /*
    * @see org.rssowl.core.model.dao.IModelDAO#saveSearchCondition(org.rssowl.core.model.search.ISearchCondition)
    */
@@ -526,16 +526,16 @@ public class ModelDAOImpl implements IModelDAO {
     saveCommitAndFireEvents(event, false);
     return person;
   }
-  
+
   public IConditionalGet saveConditionalGet(IConditionalGet conditionalGet) throws PersistenceException {
     saveAndCommit(conditionalGet, true);
     return conditionalGet;
   }
-  
+
   public NewsCounter saveNewsCounter(NewsCounter newsCounter) throws PersistenceException   {
     if (!fDb.ext().isStored(newsCounter) && (loadNewsCounter() != null))
       throw new IllegalArgumentException("Only a single newsCounter can be stored");
-    
+
     saveAndCommit(newsCounter, true);
     return newsCounter;
   }

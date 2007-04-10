@@ -26,8 +26,8 @@ package org.rssowl.core.util;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.ISafeRunnable;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
-import org.rssowl.core.model.NewsModel;
 
 /**
  * Abstract implementation of <code>ISafeRunnable</code> that is logging any
@@ -46,9 +46,9 @@ public abstract class LoggingSafeRunnable implements ISafeRunnable {
   public void handleException(Throwable e) {
 
     /* In Testing, rethrow any RuntimeException */
-    if (NewsModel.TESTING && e instanceof RuntimeException)
+    if (Owl.TESTING && e instanceof RuntimeException)
       throw (RuntimeException) e;
-    else if (NewsModel.TESTING)
+    else if (Owl.TESTING)
       throw new RuntimeException(e.getMessage(), e);
 
     /* Log Exception */

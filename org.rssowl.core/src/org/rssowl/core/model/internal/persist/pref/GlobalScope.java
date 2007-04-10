@@ -25,9 +25,9 @@
 package org.rssowl.core.model.internal.persist.pref;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.persist.pref.IPreferencesDAO;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.persist.pref.PreferencesEvent;
 import org.rssowl.core.model.persist.pref.PreferencesListener;
 
@@ -37,27 +37,27 @@ import java.util.Properties;
 /**
  * Implementation of <code>IPreferencesScope</code> that asks the
  * <code>IPreferenesDAO</code> of the persistence layer for its Preferences.
- * 
+ *
  * @author bpasero
  */
-public class GlobalScope implements IPreferencesScope {
+public class GlobalScope implements IPreferenceScope {
   private Properties fCache;
-  private IPreferencesScope fParent;
+  private IPreferenceScope fParent;
   private IPreferencesDAO fPrefDao;
 
   /**
    * @param parent
    */
-  public GlobalScope(IPreferencesScope parent) {
+  public GlobalScope(IPreferenceScope parent) {
     fParent = parent;
     fCache = new Properties();
-    fPrefDao = NewsModel.getDefault().getPersistenceLayer().getPreferencesDAO();
+    fPrefDao = Owl.getPersistenceService().getPreferencesDAO();
 
     registerListeners();
   }
 
   private void registerListeners() {
-    NewsModel.getDefault().addPreferencesListener(new PreferencesListener() {
+    Owl.getListenerService().addPreferencesListener(new PreferencesListener() {
       public void preferenceAdded(PreferencesEvent event) {
         fCache.put(event.getKey(), event.getValue());
       }
@@ -75,7 +75,7 @@ public class GlobalScope implements IPreferencesScope {
   /*
    * @see org.rssowl.ui.internal.preferences.IPreferencesScope#getParent()
    */
-  public IPreferencesScope getParent() {
+  public IPreferenceScope getParent() {
     return fParent;
   }
 

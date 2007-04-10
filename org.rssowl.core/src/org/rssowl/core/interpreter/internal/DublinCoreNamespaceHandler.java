@@ -26,8 +26,8 @@ package org.rssowl.core.interpreter.internal;
 
 import org.jdom.Attribute;
 import org.jdom.Element;
+import org.rssowl.core.Owl;
 import org.rssowl.core.interpreter.INamespaceHandler;
-import org.rssowl.core.interpreter.Interpreter;
 import org.rssowl.core.model.persist.ICategory;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
@@ -93,7 +93,7 @@ public class DublinCoreNamespaceHandler implements INamespaceHandler {
 
     /* Creator / Publisher */
     else if ("creator".equals(name) || "publisher".equals(name)) { //$NON-NLS-1$ //$NON-NLS-2$
-      IPerson person = Interpreter.getDefault().getTypesFactory().createPerson(type);
+      IPerson person = Owl.getInterpreter().getTypesFactory().createPerson(type);
       person.setName(element.getText());
 
       if (type instanceof IFeed)
@@ -112,7 +112,7 @@ public class DublinCoreNamespaceHandler implements INamespaceHandler {
 
     /* Subject */
     else if ("subject".equals(name) && type instanceof IEntity) { //$NON-NLS-1$
-      ICategory category = Interpreter.getDefault().getTypesFactory().createCategory((IEntity) type);
+      ICategory category = Owl.getInterpreter().getTypesFactory().createCategory((IEntity) type);
       category.setName(element.getText());
 
       if (type instanceof IFeed)
@@ -123,14 +123,14 @@ public class DublinCoreNamespaceHandler implements INamespaceHandler {
 
     /* Identifier */
     else if ("identifier".equals(name) && type instanceof INews) { //$NON-NLS-1$
-      IGuid guid = Interpreter.getDefault().getTypesFactory().createGuid((INews) type);
+      IGuid guid = Owl.getInterpreter().getTypesFactory().createGuid((INews) type);
       guid.setValue(element.getText());
       ((INews) type).setGuid(guid);
     }
 
     /* Source */
     else if ("source".equals(name) && type instanceof INews) { //$NON-NLS-1$
-      ISource source = Interpreter.getDefault().getTypesFactory().createSource((INews) type);
+      ISource source = Owl.getInterpreter().getTypesFactory().createSource((INews) type);
       source.setLink(URIUtils.createURI(element.getText()));
       ((INews) type).setSource(source);
     }

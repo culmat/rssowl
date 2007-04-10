@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o;
 
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IDGenerator;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.events.AttachmentEvent;
@@ -183,7 +183,7 @@ public class EventManager {
     INewsGetter newsGetter = new INewsGetter() {
       public List<ISearchHit<INews>> getNews() {
         List<ISearchCondition> searchConditions = mark.getSearchConditions();
-        IModelSearch modelSearch = NewsModel.getDefault().getPersistenceLayer().getModelSearch();
+        IModelSearch modelSearch = Owl.getPersistenceService().getModelSearch();
         List<ISearchHit<NewsReference>> newsRefs = modelSearch.searchNews(searchConditions, mark.matchAllConditions());
         List<ISearchHit<INews>> newsList = new ArrayList<ISearchHit<INews>>(newsRefs.size());
         for (ISearchHit<NewsReference> newsRefHit : newsRefs) {
@@ -318,7 +318,7 @@ public class EventManager {
     for (INews news : ReverseIterator.createInstance(feed.getNews())) {
       fDb.delete(news);
     }
-    IModelDAO dao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
+    IModelDAO dao = Owl.getPersistenceService().getModelDAO();
     IConditionalGet conditionalGet = dao.loadConditionalGet(feed.getLink());
     if (conditionalGet != null)
       fDb.delete(conditionalGet);
@@ -527,7 +527,7 @@ public class EventManager {
 
   private void setId(IEntity entity) {
     if (entity.getId() == null) {
-      IDGenerator idGenerator = NewsModel.getDefault().getPersistenceLayer().getIDGenerator();
+      IDGenerator idGenerator = Owl.getPersistenceService().getIDGenerator();
       long id;
 
       if (idGenerator instanceof DB4OIDGenerator)

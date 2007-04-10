@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.internal.persist.pref;
 
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 
 import java.util.Properties;
 
@@ -36,7 +36,7 @@ import java.util.Properties;
  * 
  * @author bpasero
  */
-public class DefaultScope implements IPreferencesScope {
+public class DefaultScope implements IPreferenceScope {
 
   /* Default Values */
   private static final boolean BOOLEAN_DEFAULT = false;
@@ -48,7 +48,7 @@ public class DefaultScope implements IPreferencesScope {
   /*
    * @see org.rssowl.ui.internal.preferences.IPreferencesScope#getParent()
    */
-  public IPreferencesScope getParent() {
+  public IPreferenceScope getParent() {
     throw new RuntimeException("There can be no parent of the DefaultScope"); //$NON-NLS-1$
   }
 

@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.search.ISearchCondition;
 
@@ -50,6 +50,6 @@ public class SearchConditionReference extends ModelReference {
 
   @Override
   public ISearchCondition resolve() throws PersistenceException {
-    return NewsModel.getDefault().getPersistenceLayer().getModelDAO().loadSearchCondition(getId());
+    return Owl.getPersistenceService().getModelDAO().loadSearchCondition(getId());
   }
 }

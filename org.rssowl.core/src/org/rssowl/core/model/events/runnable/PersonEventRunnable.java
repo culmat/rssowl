@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events.runnable;
 
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.events.ModelEvent;
 import org.rssowl.core.model.events.PersonEvent;
 
@@ -51,16 +51,16 @@ public class PersonEventRunnable extends EventRunnable<PersonEvent>  {
   
   @Override
   protected final void firePersistEvents(Set<PersonEvent> persistEvents) {
-    NewsModel.getDefault().notifyPersonAdded(persistEvents);
+    Owl.getListenerService().notifyPersonAdded(persistEvents);
   }
 
   @Override
   protected final void fireRemoveEvents(Set<PersonEvent> removeEvents) {
-    NewsModel.getDefault().notifyPersonDeleted(removeEvents);
+    Owl.getListenerService().notifyPersonDeleted(removeEvents);
   }
 
   @Override
   protected final void fireUpdateEvents(Set<PersonEvent> updateEvents) {
-    NewsModel.getDefault().notifyPersonUpdated(updateEvents);
+    Owl.getListenerService().notifyPersonUpdated(updateEvents);
   }
 }

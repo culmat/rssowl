@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.ICategory;
 
@@ -50,6 +50,6 @@ public final class CategoryReference extends ModelReference {
 
   @Override
   public ICategory resolve() throws PersistenceException {
-    return NewsModel.getDefault().getPersistenceLayer().getModelDAO().loadCategory(getId());
+    return Owl.getPersistenceService().getModelDAO().loadCategory(getId());
   }
 }

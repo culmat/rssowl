@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o;
 
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.internal.persist.pref.Preference;
 import org.rssowl.core.model.internal.persist.pref.Preference.Type;
@@ -38,15 +38,15 @@ import java.util.List;
 
 /**
  * Default implementation of {@link IPreferencesDAO}.
- * 
+ *
  * {@inheritDoc}
- * 
+ *
  * @author Ismael Juma (ismael@juma.me.uk)
  */
 public class PreferencesDAOImpl implements IPreferencesDAO  {
-  
+
   private ObjectContainer fDb = DBManager.getDefault().getObjectContainer();
-  
+
   /**
    * Creates an instance of this class.
    */
@@ -60,14 +60,14 @@ public class PreferencesDAOImpl implements IPreferencesDAO  {
       }
     });
   }
-  
+
   public void putInteger(String key, int value) throws PersistenceException {
     Integer valueInteger = Integer.valueOf(value);
     Preference pref = new Preference(key, Type.INTEGER);
     pref.addValue(valueInteger.toString());
     savePreference(pref, valueInteger);
   }
-  
+
   public void putIntegers(String key, int[] values) throws PersistenceException {
     Preference pref = new Preference(key, Type.INTEGER_ARRAY);
     for (int value : values) {
@@ -75,7 +75,7 @@ public class PreferencesDAOImpl implements IPreferencesDAO  {
     }
     savePreference(pref, values);
   }
-  
+
   public void putLong(String key, long value) throws PersistenceException {
     Long valueLong = Long.valueOf(value);
     Preference pref = new Preference(key, Type.LONG);
@@ -94,7 +94,7 @@ public class PreferencesDAOImpl implements IPreferencesDAO  {
     pref.addValue(value);
     savePreference(pref, value);
   }
-  
+
   public void putStrings(String key, String[] values) throws PersistenceException {
     Preference pref = new Preference(key, Type.STRING_ARRAY);
     for (String value : values) {
@@ -102,15 +102,15 @@ public class PreferencesDAOImpl implements IPreferencesDAO  {
     }
     savePreference(pref, values);
   }
-  
-  public void putBoolean(String key, boolean value) 
+
+  public void putBoolean(String key, boolean value)
       throws PersistenceException {
     Boolean valueBoolean = Boolean.valueOf(value);
     Preference pref = new Preference(key, Type.BOOLEAN);
     pref.addValue(valueBoolean.toString());
     savePreference(pref, valueBoolean);
   }
-  
+
   @SuppressWarnings("unchecked")
   private Preference findPreference(String key)   {
     Query query = fDb.ext().query();
@@ -141,23 +141,23 @@ public class PreferencesDAOImpl implements IPreferencesDAO  {
       fDb.ext().set(preference, Integer.MAX_VALUE);
     }
     fDb.commit();
-    
-    PreferencesEvent event = new PreferencesEvent(preference.getKey(), 
+
+    PreferencesEvent event = new PreferencesEvent(preference.getKey(),
         originalObject);
     if (update) {
-      NewsModel.getDefault().notifyPreferencesUpdated(event);
+      Owl.getListenerService().notifyPreferencesUpdated(event);
     }
     else {
-      NewsModel.getDefault().notifyPreferenceAdded(event);
+      Owl.getListenerService().notifyPreferenceAdded(event);
     }
   }
- 
-  private Object getValues(String key) 
+
+  private Object getValues(String key)
       throws PersistenceException {
     Preference pref = findPreference(key);
     return getValues(pref);
   }
-  
+
   private Object getValues(Preference pref) {
     if (pref == null || pref.getValues().size() == 0) {
       return null;
@@ -181,7 +181,7 @@ public class PreferencesDAOImpl implements IPreferencesDAO  {
     }
     throw new IllegalStateException("unknown preference type found: " + pref.getType()); //$NON-NLS-1$
   }
-  
+
   private int[] getIntegerArray(List<String> values) {
     int[] intArray = new int[values.size()];
     for (int i = 0, c = values.size(); i < c; ++i) {
@@ -189,7 +189,7 @@ public class PreferencesDAOImpl implements IPreferencesDAO  {
     }
     return intArray;
   }
-  
+
   private long[] getLongArray(List<String> values) {
     long[] longArray = new long[values.size()];
     for (int i = 0, c = values.size(); i < c; ++i) {
@@ -209,19 +209,19 @@ public class PreferencesDAOImpl implements IPreferencesDAO  {
   public String[] getStrings(String key) throws PersistenceException {
     return (String[]) getValues(key);
   }
-  
+
   public Integer getInteger(String key) throws PersistenceException {
     return (Integer) getValues(key);
   }
-  
+
   public int[] getIntegers(String key) throws PersistenceException {
     return (int[]) getValues(key);
   }
-  
+
   public long[] getLongs(String key) throws PersistenceException {
     return (long[]) getValues(key);
   }
-  
+
   public Long getLong(String key) throws PersistenceException {
     return (Long) getValues(key);
   }
@@ -230,11 +230,11 @@ public class PreferencesDAOImpl implements IPreferencesDAO  {
     Preference pref = findPreference(key);
     if (pref == null)
       return false;
-    
+
     Object value = getValues(pref);
     fDb.delete(pref);
     fDb.commit();
-    NewsModel.getDefault().notifyPreferencesDeleted(new PreferencesEvent(key, 
+    Owl.getListenerService().notifyPreferencesDeleted(new PreferencesEvent(key,
         value));
     return true;
   }

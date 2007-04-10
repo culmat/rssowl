@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IPerson;
 
@@ -50,6 +50,6 @@ public final class PersonReference extends ModelReference {
 
   @Override
   public IPerson resolve() throws PersistenceException {
-    return NewsModel.getDefault().getPersistenceLayer().getModelDAO().loadPerson(getId());
+    return Owl.getPersistenceService().getModelDAO().loadPerson(getId());
   }
 }

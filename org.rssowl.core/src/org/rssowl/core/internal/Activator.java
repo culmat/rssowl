@@ -63,6 +63,9 @@ public class Activator extends Plugin {
 
     /* Load the Proxy Service */
     fProxyService = loadProxyService();
+
+    /* Activate Internal Owl */
+    InternalOwl.getDefault().startup();
   }
 
   private IProxyService loadProxyService() {
@@ -92,6 +95,11 @@ public class Activator extends Plugin {
    */
   @Override
   public void stop(BundleContext context) throws Exception {
+
+    /* Stop Internal Owl */
+    InternalOwl.getDefault().shutdown();
+
+    /* Proceed */
     super.stop(context);
     fContext = null;
     fPlugin = null;

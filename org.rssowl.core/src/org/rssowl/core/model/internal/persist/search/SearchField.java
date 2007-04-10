@@ -27,7 +27,7 @@ package org.rssowl.core.model.internal.persist.search;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.persist.IAttachment;
 import org.rssowl.core.model.persist.IBookMark;
@@ -450,7 +450,7 @@ public class SearchField implements ISearchField {
 
   /* Return the Label Values */
   private List<String> loadLabelValues() {
-    IApplicationLayer appLayer = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer();
+    IApplicationLayer appLayer = Owl.getPersistenceService().getApplicationLayer();
     List<ILabel> labels = appLayer.loadLabels();
 
     List<String> values = new ArrayList<String>(labels.size());

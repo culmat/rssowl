@@ -25,42 +25,42 @@
 package org.rssowl.core.model.internal.persist.pref;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.ISearchMark;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 
 import java.util.Arrays;
 
 /**
  * Implementation of <code>IPreferencesScope</code> that asks the given
  * instance of <code>IEntity</code> for its Preferences.
- * 
+ *
  * @author bpasero
  */
-public class EntityScope implements IPreferencesScope {
+public class EntityScope implements IPreferenceScope {
   private IEntity fEntity;
-  private IPreferencesScope fParent;
+  private IPreferenceScope fParent;
   private IModelDAO fDao;
 
   /**
    * @param entity
    * @param parent
    */
-  public EntityScope(IEntity entity, IPreferencesScope parent) {
+  public EntityScope(IEntity entity, IPreferenceScope parent) {
     Assert.isNotNull(entity, "entity cannot be null"); //$NON-NLS-1$
     fEntity = entity;
     fParent = parent;
-    fDao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
+    fDao = Owl.getPersistenceService().getModelDAO();
   }
 
   /*
    * @see org.rssowl.ui.internal.preferences.IPreferencesScope#getParent()
    */
-  public IPreferencesScope getParent() {
+  public IPreferenceScope getParent() {
     return fParent;
   }
 
