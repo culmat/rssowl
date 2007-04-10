@@ -113,6 +113,14 @@ public class WebBrowserView extends EditorPart {
     setGlobalActions();
   }
 
+  /**
+   * @return Returns the <code>CBrowser</code> being used in this Editor to
+   * display websites.
+   */
+  public CBrowser getBrowser() {
+    return fBrowser;
+  }
+
   private void createGlobalActions() {
 
     /* Select All */
