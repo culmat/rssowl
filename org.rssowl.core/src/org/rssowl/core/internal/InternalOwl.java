@@ -43,16 +43,16 @@ import org.rssowl.core.util.ExtensionUtils;
  *
  * @author bpasero
  */
-public class InternalOwl {
+public final class InternalOwl {
 
   /* The Singleton Instance */
-  private static InternalOwl fInstance = new InternalOwl();
+  private static final InternalOwl INSTANCE = new InternalOwl();
 
   /* Extension Point: Factory for Model Types */
-  private final String MODEL_TYPESFACTORY_EXTENSION_POINT = "org.rssowl.core.ModelTypesFactory"; //$NON-NLS-1$
+  private static final String MODEL_TYPESFACTORY_EXTENSION_POINT = "org.rssowl.core.ModelTypesFactory"; //$NON-NLS-1$
 
   /* Extension Point: Persistence Layer */
-  private final String PERSISTANCE_LAYER_EXTENSION_POINT = "org.rssowl.core.PersistanceLayer"; //$NON-NLS-1$
+  private static final String PERSISTANCE_LAYER_EXTENSION_POINT = "org.rssowl.core.PersistanceLayer"; //$NON-NLS-1$
 
   private IListenerService fListenerService;
   private IPreferenceService fPreferencesService;
@@ -83,7 +83,7 @@ public class InternalOwl {
    * @return
    */
   public static InternalOwl getDefault() {
-    return fInstance;
+    return INSTANCE;
   }
 
   /**
