@@ -30,20 +30,27 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationEvent;
 import org.eclipse.swt.browser.LocationListener;
+import org.eclipse.swt.browser.OpenWindowListener;
+import org.eclipse.swt.browser.WindowEvent;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.editors.browser.WebBrowserInput;
+import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 import org.rssowl.ui.internal.util.BrowserUtils;
 
 import java.net.URI;
@@ -254,6 +261,28 @@ public class CBrowser {
   }
 
   private void hookListeners() {
+
+    /* Listen to Open-Window-Changes */
+    fBrowser.addOpenWindowListener(new OpenWindowListener() {
+      public void open(WindowEvent event) {
+
+        /* Do not handle when external Browser is being used */
+        if (useExternalBrowser())
+          return;
+
+        /* Open Browser in new Tab */
+        WebBrowserInput input = new WebBrowserInput(URIUtils.ABOUT_BLANK);
+        IWorkbenchPage page = OwlUI.getPage();
+        if (page != null) {
+          try {
+            WebBrowserView browserView = (WebBrowserView) page.openEditor(input, WebBrowserView.EDITOR_ID, OpenStrategy.activateOnOpen());
+            event.browser = browserView.getBrowser().getControl();
+          } catch (PartInitException e) {
+            Activator.getDefault().getLog().log(e.getStatus());
+          }
+        }
+      }
+    });
 
     /* Listen to Location-Changes */
     fBrowser.addLocationListener(new LocationListener() {
