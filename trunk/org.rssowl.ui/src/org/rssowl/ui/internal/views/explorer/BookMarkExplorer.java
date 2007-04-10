@@ -104,7 +104,7 @@ import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.NewsService;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.StatusLineUpdater;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.EntityPropertyDialogAction;
@@ -250,7 +250,7 @@ public class BookMarkExplorer extends ViewPart {
     fViewer = new BookMarkViewer(this, parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
     fViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fViewer.getControl().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
-    fViewer.getControl().setFont(RSSOwlUI.getThemeFont(RSSOwlUI.BKMRK_EXPLORER_FONT_ID, SWT.NORMAL));
+    fViewer.getControl().setFont(OwlUI.getThemeFont(OwlUI.BKMRK_EXPLORER_FONT_ID, SWT.NORMAL));
 
     /* Setup Drag & Drop Support */
     initDragAndDrop();
@@ -635,7 +635,7 @@ public class BookMarkExplorer extends ViewPart {
                 changeSet(rootFolder);
             }
           };
-          selectBookMarkSet.setImageDescriptor(RSSOwlUI.BOOKMARK_SET); //$NON-NLS-1$
+          selectBookMarkSet.setImageDescriptor(OwlUI.BOOKMARK_SET); //$NON-NLS-1$
 
           if (fSelectedBookMarkSet.equals(rootFolder))
             selectBookMarkSet.setChecked(true);
@@ -685,7 +685,7 @@ public class BookMarkExplorer extends ViewPart {
             fViewer.refresh(false);
           }
         };
-        sortByName.setImageDescriptor(RSSOwlUI.getImageDescriptor("icons/elcl16/sort_alpha.gif")); //$NON-NLS-1$
+        sortByName.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/sort_alpha.gif")); //$NON-NLS-1$
         sortByName.setChecked(fSortByName);
         manager.add(sortByName);
 
@@ -703,7 +703,7 @@ public class BookMarkExplorer extends ViewPart {
           }
         };
         linkFeedView.setChecked(fLinkingEnabled);
-        linkFeedView.setImageDescriptor(RSSOwlUI.getImageDescriptor("icons/etool16/synced.gif"));
+        linkFeedView.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/synced.gif"));
         manager.add(linkFeedView);
 
         /* Allow Contributions */
@@ -735,9 +735,9 @@ public class BookMarkExplorer extends ViewPart {
       @Override
       public ImageDescriptor getImageDescriptor() {
         if (fBookMarkFilter.getType() == BookMarkFilter.Type.SHOW_ALL)
-          return RSSOwlUI.getImageDescriptor("icons/etool16/filter.gif"); //$NON-NLS-1$
+          return OwlUI.getImageDescriptor("icons/etool16/filter.gif"); //$NON-NLS-1$
 
-        return RSSOwlUI.getImageDescriptor("icons/etool16/filter_active.gif"); //$NON-NLS-1$
+        return OwlUI.getImageDescriptor("icons/etool16/filter_active.gif"); //$NON-NLS-1$
       }
     };
     bookmarkFilter.setId(FILTER_ACTION);
@@ -845,9 +845,9 @@ public class BookMarkExplorer extends ViewPart {
       @Override
       public ImageDescriptor getImageDescriptor() {
         if (fBookMarkGrouping.getType() == BookMarkGrouping.Type.NO_GROUPING)
-          return RSSOwlUI.getImageDescriptor("icons/etool16/group.gif"); //$NON-NLS-1$
+          return OwlUI.getImageDescriptor("icons/etool16/group.gif"); //$NON-NLS-1$
 
-        return RSSOwlUI.getImageDescriptor("icons/etool16/group_active.gif"); //$NON-NLS-1$
+        return OwlUI.getImageDescriptor("icons/etool16/group_active.gif"); //$NON-NLS-1$
       }
     };
     bookmarkGroup.setId(GROUP_ACTION);
@@ -924,8 +924,8 @@ public class BookMarkExplorer extends ViewPart {
       }
     };
     previousSet.setId(PREVIOUS_SET_ACTION);
-    previousSet.setImageDescriptor(RSSOwlUI.getImageDescriptor("icons/etool16/backward.gif")); //$NON-NLS-1$
-    previousSet.setDisabledImageDescriptor(RSSOwlUI.getImageDescriptor("icons/dtool16/backward.gif")); //$NON-NLS-1$
+    previousSet.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/backward.gif")); //$NON-NLS-1$
+    previousSet.setDisabledImageDescriptor(OwlUI.getImageDescriptor("icons/dtool16/backward.gif")); //$NON-NLS-1$
     fToolBarManager.add(previousSet);
 
     IAction nextSet = new Action("Next Bookmark-Set") {
@@ -942,8 +942,8 @@ public class BookMarkExplorer extends ViewPart {
       }
     };
     nextSet.setId(NEXT_SET_ACTION);
-    nextSet.setImageDescriptor(RSSOwlUI.getImageDescriptor("icons/etool16/forward.gif")); //$NON-NLS-1$
-    nextSet.setDisabledImageDescriptor(RSSOwlUI.getImageDescriptor("icons/dtool16/forward.gif")); //$NON-NLS-1$
+    nextSet.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/forward.gif")); //$NON-NLS-1$
+    nextSet.setDisabledImageDescriptor(OwlUI.getImageDescriptor("icons/dtool16/forward.gif")); //$NON-NLS-1$
     fToolBarManager.add(nextSet);
 
     /* Allow Contributions */
@@ -1007,7 +1007,7 @@ public class BookMarkExplorer extends ViewPart {
 
       @Override
       public ImageDescriptor getImageDescriptor() {
-        return RSSOwlUI.BOOKMARK;
+        return OwlUI.BOOKMARK;
       }
     });
 
@@ -1022,7 +1022,7 @@ public class BookMarkExplorer extends ViewPart {
 
       @Override
       public ImageDescriptor getImageDescriptor() {
-        return RSSOwlUI.SEARCHMARK;
+        return OwlUI.SEARCHMARK;
       }
     });
 
@@ -1038,7 +1038,7 @@ public class BookMarkExplorer extends ViewPart {
 
       @Override
       public ImageDescriptor getImageDescriptor() {
-        return RSSOwlUI.FOLDER;
+        return OwlUI.FOLDER;
       }
     });
 

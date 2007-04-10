@@ -50,7 +50,7 @@ import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.CBrowser;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 /**
@@ -168,8 +168,8 @@ public class BrowserBar {
       }
     };
     navBackward.setId(BACK_ACTION);
-    navBackward.setImageDescriptor(RSSOwlUI.getImageDescriptor("icons/etool16/backward.gif")); //$NON-NLS-1$
-    navBackward.setDisabledImageDescriptor(RSSOwlUI.getImageDescriptor("icons/dtool16/backward.gif")); //$NON-NLS-1$
+    navBackward.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/backward.gif")); //$NON-NLS-1$
+    navBackward.setDisabledImageDescriptor(OwlUI.getImageDescriptor("icons/dtool16/backward.gif")); //$NON-NLS-1$
     fNavigationToolBarManager.add(navBackward);
 
     /* Navigate Forward */
@@ -185,8 +185,8 @@ public class BrowserBar {
       }
     };
     navForward.setId(FORWARD_ACTION);
-    navForward.setImageDescriptor(RSSOwlUI.getImageDescriptor("icons/etool16/forward.gif")); //$NON-NLS-1$
-    navForward.setDisabledImageDescriptor(RSSOwlUI.getImageDescriptor("icons/dtool16/forward.gif")); //$NON-NLS-1$
+    navForward.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/forward.gif")); //$NON-NLS-1$
+    navForward.setDisabledImageDescriptor(OwlUI.getImageDescriptor("icons/dtool16/forward.gif")); //$NON-NLS-1$
     fNavigationToolBarManager.add(navForward);
 
     /* Stop */
@@ -196,7 +196,7 @@ public class BrowserBar {
         fBrowser.getControl().stop();
       }
     };
-    stopNav.setImageDescriptor(RSSOwlUI.getImageDescriptor("icons/etool16/cancel.gif")); //$NON-NLS-1$
+    stopNav.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/cancel.gif")); //$NON-NLS-1$
     fNavigationToolBarManager.add(stopNav);
 
     /* Reload */
@@ -206,7 +206,7 @@ public class BrowserBar {
         fBrowser.getControl().refresh();
       }
     };
-    reload.setImageDescriptor(RSSOwlUI.getImageDescriptor("icons/elcl16/reload.gif")); //$NON-NLS-1$
+    reload.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/reload.gif")); //$NON-NLS-1$
     fNavigationToolBarManager.add(reload);
 
     /* Home */
@@ -216,7 +216,7 @@ public class BrowserBar {
         fFeedView.getNewsBrowserControl().getViewer().home();
       }
     };
-    navHome.setImageDescriptor(RSSOwlUI.getImageDescriptor("icons/etool16/home.gif")); //$NON-NLS-1$
+    navHome.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/home.gif")); //$NON-NLS-1$
     fNavigationToolBarManager.add(navHome);
 
     fNavigationToolBarManager.createControl(parent);

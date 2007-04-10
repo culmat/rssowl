@@ -92,7 +92,7 @@ import org.rssowl.ui.internal.CColumnLayoutData;
 import org.rssowl.ui.internal.CTable;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeTypesStickyAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
@@ -247,7 +247,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Title Image */
-    setTitleImage(RSSOwlUI.getImage(fResources, "icons/elcl16/search.gif"));
+    setTitleImage(OwlUI.getImage(fResources, "icons/elcl16/search.gif"));
 
     /* Title Message */
     setMessage("You can use \'?\' for any character and \'*\' for any word in your search.", IMessageProvider.INFORMATION);
@@ -311,7 +311,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
       @Override
       public ImageDescriptor getImageDescriptor() {
-        return RSSOwlUI.SEARCHMARK;
+        return OwlUI.SEARCHMARK;
       }
     };
 
@@ -324,7 +324,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
         /* Create new Saved Search */
         MenuItem newSavedSearch = new MenuItem(menu, SWT.NONE);
         newSavedSearch.setText("New Saved Search...");
-        newSavedSearch.setImage(RSSOwlUI.getImage(fResources, "icons/etool16/add.gif"));
+        newSavedSearch.setImage(OwlUI.getImage(fResources, "icons/etool16/add.gif"));
         newSavedSearch.addSelectionListener(new SelectionAdapter() {
           @Override
           public void widgetSelected(SelectionEvent e) {
@@ -340,7 +340,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
         for (final ISearchMark searchMark : searchMarks) {
           MenuItem item = new MenuItem(menu, SWT.None);
           item.setText(searchMark.getName());
-          item.setImage(RSSOwlUI.getImage(fResources, RSSOwlUI.SEARCHMARK));
+          item.setImage(OwlUI.getImage(fResources, OwlUI.SEARCHMARK));
           item.addSelectionListener(new SelectionAdapter() {
 
             @Override
@@ -794,7 +794,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fViewer.getControl().setMenu(menu);
 
     /* Register with Part Site */
-    IWorkbenchWindow window = RSSOwlUI.getWindow();
+    IWorkbenchWindow window = OwlUI.getWindow();
     if (window != null) {
       IWorkbenchPart activePart = window.getPartService().getActivePart();
       if (activePart != null && activePart.getSite() != null)
@@ -886,7 +886,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     cal.set(2006, 12, 12, 12, 12, 12);
     String sampleDate = dF.format(cal.getTime());
 
-    DATE_COL_WIDTH = RSSOwlUI.getTextSize(fViewer.getTable(), RSSOwlUI.getBold(JFaceResources.DEFAULT_FONT), sampleDate).x;
+    DATE_COL_WIDTH = OwlUI.getTextSize(fViewer.getTable(), OwlUI.getBold(JFaceResources.DEFAULT_FONT), sampleDate).x;
     DATE_COL_WIDTH += 30; // Bounds of TableColumn requires more space
 
     return DATE_COL_WIDTH;

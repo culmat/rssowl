@@ -58,7 +58,7 @@ import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.JobTracker;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -179,7 +179,7 @@ public class FilterBar {
         getMenuCreator().getMenu(manager.getControl()).setVisible(true);
       }
     };
-    quickSearch.setImageDescriptor(RSSOwlUI.getImageDescriptor("icons/etool16/find.gif"));
+    quickSearch.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/find.gif"));
 
     quickSearch.setMenuCreator(new IMenuCreator() {
       public void dispose() {}
@@ -345,8 +345,8 @@ public class FilterBar {
   private void createLayoutBar() {
 
     /* Toggle Layout */
-    final ImageDescriptor horizontalImg = RSSOwlUI.getImageDescriptor("icons/etool16/horizontal.gif");
-    final ImageDescriptor verticalImg = RSSOwlUI.getImageDescriptor("icons/etool16/vertical.gif");
+    final ImageDescriptor horizontalImg = OwlUI.getImageDescriptor("icons/etool16/horizontal.gif");
+    final ImageDescriptor verticalImg = OwlUI.getImageDescriptor("icons/etool16/vertical.gif");
 
     /* Toggle Layout */
     IAction toggleLayout = new Action("Toggle Layout", IAction.AS_PUSH_BUTTON) {
@@ -365,12 +365,12 @@ public class FilterBar {
         return verticalImg;
       }
     };
-    toggleLayout.setImageDescriptor(RSSOwlUI.getImageDescriptor("icons/etool16/vertical.gif"));
+    toggleLayout.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/vertical.gif"));
     toggleLayout.setId(TOGGLE_LAYOUT_ACTION);
     fSecondToolBarManager.add(toggleLayout);
 
     /* Maximize / Minimize Browser */
-    final ImageDescriptor img = RSSOwlUI.getImageDescriptor("icons/etool16/browsermaximized.gif");
+    final ImageDescriptor img = OwlUI.getImageDescriptor("icons/etool16/browsermaximized.gif");
 
     IAction toggleMaximized = new Action("", IAction.AS_CHECK_BOX) {
 
@@ -420,9 +420,9 @@ public class FilterBar {
       @Override
       public ImageDescriptor getImageDescriptor() {
         if (filter.getType() == NewsFilter.Type.SHOW_ALL)
-          return RSSOwlUI.getImageDescriptor("icons/etool16/filter.gif"); //$NON-NLS-1$
+          return OwlUI.getImageDescriptor("icons/etool16/filter.gif"); //$NON-NLS-1$
 
-        return RSSOwlUI.getImageDescriptor("icons/etool16/filter_active.gif"); //$NON-NLS-1$
+        return OwlUI.getImageDescriptor("icons/etool16/filter_active.gif"); //$NON-NLS-1$
       }
     };
     newsFilterAction.setId(FILTER_ACTION);
@@ -568,9 +568,9 @@ public class FilterBar {
       @Override
       public ImageDescriptor getImageDescriptor() {
         if (grouping.getType() == NewsGrouping.Type.NO_GROUPING)
-          return RSSOwlUI.getImageDescriptor("icons/etool16/group.gif"); //$NON-NLS-1$
+          return OwlUI.getImageDescriptor("icons/etool16/group.gif"); //$NON-NLS-1$
 
-        return RSSOwlUI.getImageDescriptor("icons/etool16/group_active.gif"); //$NON-NLS-1$
+        return OwlUI.getImageDescriptor("icons/etool16/group_active.gif"); //$NON-NLS-1$
       }
     };
 

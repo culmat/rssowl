@@ -54,7 +54,7 @@ import org.rssowl.core.model.reference.SearchMarkReference;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.ILinkHandler;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 
 /**
  * Part of the FeedView to display News in a BrowserViewer.
@@ -222,7 +222,7 @@ public class NewsBrowserControl implements IFeedViewPart {
     /* Refresh Browser when Font Changes */
     fFontPropertyChangeListener = new IPropertyChangeListener() {
       public void propertyChange(PropertyChangeEvent event) {
-        if (!fViewer.getControl().isDisposed() && RSSOwlUI.NEWS_TEXT_FONT_ID.equals(event.getProperty()))
+        if (!fViewer.getControl().isDisposed() && OwlUI.NEWS_TEXT_FONT_ID.equals(event.getProperty()))
           ((Browser) fViewer.getControl()).refresh();
       }
     };

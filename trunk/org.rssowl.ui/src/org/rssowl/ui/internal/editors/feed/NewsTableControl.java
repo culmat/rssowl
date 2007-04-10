@@ -77,7 +77,7 @@ import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.CColumnLayoutData;
 import org.rssowl.ui.internal.CTree;
 import org.rssowl.ui.internal.EntityGroup;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.StatusLineUpdater;
 import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeTypesStickyAction;
@@ -219,7 +219,7 @@ public class NewsTableControl implements IFeedViewPart {
     fViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fViewer.setUseHashlookup(true);
     fViewer.getControl().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
-    fViewer.getControl().setFont(RSSOwlUI.getThemeFont(RSSOwlUI.HEADLINES_FONT_ID, SWT.NORMAL));
+    fViewer.getControl().setFont(OwlUI.getThemeFont(OwlUI.HEADLINES_FONT_ID, SWT.NORMAL));
 
     /* TODO This is a Workaround until we remember expanded Groups */
     fViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
@@ -327,7 +327,7 @@ public class NewsTableControl implements IFeedViewPart {
     cal.set(2006, 12, 12, 12, 12, 12);
     String sampleDate = dF.format(cal.getTime());
 
-    DATE_COL_WIDTH = RSSOwlUI.getTextSize(fCustomTree.getControl(), RSSOwlUI.getBold(JFaceResources.DEFAULT_FONT), sampleDate).x;
+    DATE_COL_WIDTH = OwlUI.getTextSize(fCustomTree.getControl(), OwlUI.getBold(JFaceResources.DEFAULT_FONT), sampleDate).x;
     DATE_COL_WIDTH += 30; // Bounds of TableColumn requires more space
 
     return DATE_COL_WIDTH;

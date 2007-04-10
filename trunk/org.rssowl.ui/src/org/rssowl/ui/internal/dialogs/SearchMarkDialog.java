@@ -55,7 +55,7 @@ import org.rssowl.core.model.persist.search.SearchSpecifier;
 import org.rssowl.core.model.reference.FolderReference;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.FolderChooser;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.search.SearchConditionList;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
@@ -197,7 +197,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Title Image */
-    setTitleImage(RSSOwlUI.getImage(fResources, "icons/elcl16/search.gif"));
+    setTitleImage(OwlUI.getImage(fResources, "icons/elcl16/search.gif"));
 
     /* Title Message */
     setMessage("You can use \'?\' for any character and \'*\' for any word in your search.", IMessageProvider.INFORMATION);

@@ -66,7 +66,7 @@ public class Activator extends AbstractUIPlugin {
 
   /**
    * Returns the shared instance.
-   * 
+   *
    * @return The shared instance.
    */
   public static Activator getDefault() {
@@ -76,7 +76,7 @@ public class Activator extends AbstractUIPlugin {
   /**
    * Returns an image descriptor for the image file at the given plug-in
    * relative path.
-   * 
+   *
    * @param path the path
    * @return the image descriptor
    */
@@ -86,7 +86,7 @@ public class Activator extends AbstractUIPlugin {
 
   /**
    * Log an Info Message.
-   * 
+   *
    * @param msg The message to log as Info.
    */
   public void logInfo(@SuppressWarnings("unused")
@@ -98,20 +98,20 @@ public class Activator extends AbstractUIPlugin {
 
   /**
    * Log an Error Message.
-   * 
+   *
    * @param msg The message to log as Error.
    * @param e The occuring Exception to log.
    */
   public void logError(String msg, Exception e) {
     if (msg == null)
       msg = ""; //$NON-NLS-1$
-    
+
     getLog().log(new Status(IStatus.ERROR, getBundle().getSymbolicName(), IStatus.ERROR, msg, e));
   }
 
   /**
    * Create a IStatus out of the given message and exception.
-   * 
+   *
    * @param msg The message describing the error.
    * @param e The Exception that occured.
    * @return An IStatus out of the given message and exception.

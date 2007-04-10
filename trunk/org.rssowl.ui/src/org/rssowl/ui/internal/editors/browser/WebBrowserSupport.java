@@ -32,7 +32,7 @@ import org.eclipse.ui.browser.AbstractWorkbenchBrowserSupport;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.BrowserUtils;
 
 import java.net.URL;
@@ -80,7 +80,7 @@ public class WebBrowserSupport extends AbstractWorkbenchBrowserSupport {
 
       private void openInternal(URL url) throws PartInitException {
         WebBrowserInput input = new WebBrowserInput(url.toExternalForm());
-        IWorkbenchPage page = RSSOwlUI.getPage();
+        IWorkbenchPage page = OwlUI.getPage();
         if (page != null)
           fBrowserView = page.openEditor(input, WebBrowserView.EDITOR_ID);
       }
@@ -93,7 +93,7 @@ public class WebBrowserSupport extends AbstractWorkbenchBrowserSupport {
        * @see org.eclipse.ui.browser.IWebBrowser#close()
        */
       public boolean close() {
-        IWorkbenchPage page = RSSOwlUI.getPage();
+        IWorkbenchPage page = OwlUI.getPage();
         if (page != null && fBrowserView != null)
           page.closeEditor(fBrowserView, false);
 

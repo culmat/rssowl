@@ -32,7 +32,7 @@ import org.eclipse.ui.PartInitException;
 import org.osgi.service.prefs.Preferences;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.Activator;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 
@@ -87,7 +87,7 @@ public class EditorUtils {
    * {@link IPreferenceScope} and then listen to changes of display-properties.
    */
   public static void updateFilterAndGrouping() {
-    IWorkbenchPage page = RSSOwlUI.getPage();
+    IWorkbenchPage page = OwlUI.getPage();
     if (page != null) {
       IEditorReference[] editorReferences = page.getEditorReferences();
       for (IEditorReference reference : editorReferences) {

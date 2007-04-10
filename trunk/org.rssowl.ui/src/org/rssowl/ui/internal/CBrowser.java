@@ -147,7 +147,7 @@ public class CBrowser {
 
           @Override
           public ImageDescriptor getImageDescriptor() {
-            return RSSOwlUI.getImageDescriptor("icons/etool16/backward.gif");
+            return OwlUI.getImageDescriptor("icons/etool16/backward.gif");
           }
         });
 
@@ -165,7 +165,7 @@ public class CBrowser {
 
           @Override
           public ImageDescriptor getImageDescriptor() {
-            return RSSOwlUI.getImageDescriptor("icons/etool16/forward.gif");
+            return OwlUI.getImageDescriptor("icons/etool16/forward.gif");
           }
         });
 
@@ -179,7 +179,7 @@ public class CBrowser {
 
           @Override
           public ImageDescriptor getImageDescriptor() {
-            return RSSOwlUI.getImageDescriptor("icons/elcl16/reload.gif");
+            return OwlUI.getImageDescriptor("icons/elcl16/reload.gif");
           }
         });
 
@@ -192,7 +192,7 @@ public class CBrowser {
 
           @Override
           public ImageDescriptor getImageDescriptor() {
-            return RSSOwlUI.getImageDescriptor("icons/etool16/cancel.gif");
+            return OwlUI.getImageDescriptor("icons/etool16/cancel.gif");
           }
         });
       }

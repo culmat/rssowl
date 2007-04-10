@@ -34,7 +34,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.ui.internal.Activator;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
@@ -77,7 +77,7 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
     private boolean navigateOnActiveFeedView() {
 
       /* Get active FeedView if any */
-      FeedView activeFeedView = RSSOwlUI.getActiveFeedView();
+      FeedView activeFeedView = OwlUI.getActiveFeedView();
 
       /* Run on active FeedView if any */
       if (fType.isNewsScoped() && activeFeedView != null) {
@@ -96,7 +96,7 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
     private boolean navigateOnOpenExplorer() {
 
       /* Try finding the open Explorer for BookMarks */
-      BookMarkExplorer bookmarkExplorer = RSSOwlUI.getOpenBookMarkExplorer();
+      BookMarkExplorer bookmarkExplorer = OwlUI.getOpenBookMarkExplorer();
       if (bookmarkExplorer == null)
         return false;
 

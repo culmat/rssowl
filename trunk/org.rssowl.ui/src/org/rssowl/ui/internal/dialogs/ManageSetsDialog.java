@@ -70,7 +70,7 @@ import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.CacheService;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.EntityPropertyDialogAction;
 import org.rssowl.ui.internal.actions.NewFolderAction;
@@ -178,7 +178,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
   protected Control createDialogArea(Composite parent) {
 
     /* Title Image */
-    setTitleImage(RSSOwlUI.getImage(fResources, "icons/elcl16/bkmrk_set_title.gif"));
+    setTitleImage(OwlUI.getImage(fResources, "icons/elcl16/bkmrk_set_title.gif"));
 
     /* Title Message */
     showInfo();
@@ -220,7 +220,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
 
       @Override
       public Image getImage(Object element) {
-        return RSSOwlUI.getImage(fResources, RSSOwlUI.BOOKMARK_SET);
+        return OwlUI.getImage(fResources, OwlUI.BOOKMARK_SET);
       }
     });
 
@@ -513,7 +513,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
     Shell shell = getShell();
 
     /* Minimum Size */
-    int minWidth = convertHorizontalDLUsToPixels(RSSOwlUI.MIN_DIALOG_WIDTH_DLU);
+    int minWidth = convertHorizontalDLUsToPixels(OwlUI.MIN_DIALOG_WIDTH_DLU);
     int minHeight = shell.computeSize(minWidth, SWT.DEFAULT).y;
 
     /* Required Size */

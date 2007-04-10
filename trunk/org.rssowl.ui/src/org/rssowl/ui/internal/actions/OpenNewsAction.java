@@ -40,7 +40,7 @@ import org.rssowl.core.model.reference.NewsReference;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.CacheService;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
@@ -102,7 +102,7 @@ public class OpenNewsAction extends Action {
   private void internalRun() {
 
     /* Require a Page */
-    IWorkbenchPage page = RSSOwlUI.getPage();
+    IWorkbenchPage page = OwlUI.getPage();
     if (page == null)
       return;
 

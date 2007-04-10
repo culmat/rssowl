@@ -55,7 +55,7 @@ import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.reference.FolderReference;
 import org.rssowl.ui.internal.FolderChooser;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
@@ -118,7 +118,7 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
       new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
       /* Title Image */
-      setTitleImage(RSSOwlUI.getImage(fResources, fRootMode ? "icons/elcl16/bkmrk_set_title.gif" : "icons/obj16/folder_wiz.gif"));
+      setTitleImage(OwlUI.getImage(fResources, fRootMode ? "icons/elcl16/bkmrk_set_title.gif" : "icons/obj16/folder_wiz.gif"));
 
       /* Title Message */
       setMessage("Please enter the name of the " + (fRootMode ? "Bookmark-Set" : "Folder"), IMessageProvider.INFORMATION);

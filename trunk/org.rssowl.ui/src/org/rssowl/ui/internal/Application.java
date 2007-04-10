@@ -184,7 +184,7 @@ public class Application implements IApplication {
 
   /* Focus the Application */
   private void restoreApplication() {
-    final Shell shell = RSSOwlUI.getPrimaryShell();
+    final Shell shell = OwlUI.getPrimaryShell();
     if (shell != null) {
       JobRunner.runInUIThread(shell, new Runnable() {
         public void run() {
@@ -208,7 +208,7 @@ public class Application implements IApplication {
   private void handleLinkSupplied(final String link) {
 
     /* Need a Shell */
-    final Shell shell = RSSOwlUI.getPrimaryShell();
+    final Shell shell = OwlUI.getPrimaryShell();
     if (shell == null)
       return;
 
@@ -224,7 +224,7 @@ public class Application implements IApplication {
 
         /* Display selected Feed since its existing already */
         else {
-          IWorkbenchPage page = RSSOwlUI.getPage();
+          IWorkbenchPage page = OwlUI.getPage();
           if (page != null) {
             try {
               page.openEditor(new FeedViewInput(existingBookMark), FeedView.ID, OpenStrategy.activateOnOpen());

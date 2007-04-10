@@ -35,7 +35,7 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.Owl;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.INews;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
@@ -72,7 +72,7 @@ public class MakeTypesStickyAction extends Action implements IWorkbenchWindowAct
 
   @Override
   public ImageDescriptor getImageDescriptor() {
-    return fFlag ? RSSOwlUI.NEWS_PIN : RSSOwlUI.NEWS_PINNED;
+    return fFlag ? OwlUI.NEWS_PIN : OwlUI.NEWS_PINNED;
   }
 
   private void init() {
