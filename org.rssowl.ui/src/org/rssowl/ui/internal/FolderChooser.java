@@ -201,7 +201,7 @@ public class FolderChooser extends Composite implements DisposeListener {
     toggleBar.setCursor(headerContainer.getDisplay().getSystemCursor(SWT.CURSOR_ARROW));
 
     ToolItem addFolderItem = new ToolItem(toggleBar, SWT.PUSH);
-    addFolderItem.setImage(RSSOwlUI.getImage(fResources, "icons/etool16/add_crop.gif"));
+    addFolderItem.setImage(OwlUI.getImage(fResources, "icons/etool16/add_crop.gif"));
     addFolderItem.setToolTipText("New Folder...");
     addFolderItem.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -211,7 +211,7 @@ public class FolderChooser extends Composite implements DisposeListener {
     });
 
     fToggleItem = new ToolItem(toggleBar, SWT.PUSH);
-    fToggleItem.setImage(RSSOwlUI.getImage(fResources, "icons/ovr16/arrow_down.gif"));
+    fToggleItem.setImage(OwlUI.getImage(fResources, "icons/ovr16/arrow_down.gif"));
     fToggleItem.setToolTipText("Show Folders");
     fToggleItem.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -336,14 +336,14 @@ public class FolderChooser extends Composite implements DisposeListener {
 
   private void onFolderSelected(IFolder folder) {
     fSelectedFolder = folder;
-    fFolderIcon.setImage(RSSOwlUI.getImage(fResources, folder));
+    fFolderIcon.setImage(OwlUI.getImage(fResources, folder));
     fFolderName.setText(folder.getName());
   }
 
   private void onToggle() {
     boolean excluded = ((GridData) fFolderViewerContainer.getLayoutData()).exclude;
 
-    fToggleItem.setImage(RSSOwlUI.getImage(fResources, excluded ? "icons/ovr16/arrow_up.gif" : "icons/ovr16/arrow_down.gif"));
+    fToggleItem.setImage(OwlUI.getImage(fResources, excluded ? "icons/ovr16/arrow_up.gif" : "icons/ovr16/arrow_down.gif"));
     fToggleItem.setToolTipText(excluded ? "Hide Folders" : "Show Folders");
 
     ((GridData) fFolderViewerContainer.getLayoutData()).exclude = !excluded;

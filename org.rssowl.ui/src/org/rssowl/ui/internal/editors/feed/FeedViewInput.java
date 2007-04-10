@@ -32,7 +32,7 @@ import org.eclipse.ui.IPersistableElement;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.ISearchMark;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 
 /**
  * @author bpasero
@@ -87,14 +87,14 @@ public class FeedViewInput implements IEditorInput {
   public ImageDescriptor getImageDescriptor() {
     if (fIsBookMark) {
       IBookMark bookmark = (IBookMark) fMark;
-      ImageDescriptor favicon = RSSOwlUI.getFavicon(bookmark);
+      ImageDescriptor favicon = OwlUI.getFavicon(bookmark);
       if (favicon != null)
         return favicon;
-      return RSSOwlUI.BOOKMARK;
+      return OwlUI.BOOKMARK;
     } else if (fMark instanceof ISearchMark)
-      return RSSOwlUI.SEARCHMARK;
+      return OwlUI.SEARCHMARK;
 
-    return RSSOwlUI.UNKNOWN;
+    return OwlUI.UNKNOWN;
   }
 
   /*

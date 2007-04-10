@@ -101,7 +101,7 @@ public class EditorDNDImpl extends DropTargetAdapter {
       if (obj instanceof IMark) {
         IMark mark = ((IMark) obj);
         try {
-          IWorkbenchPage page = RSSOwlUI.getPageAtCursor();
+          IWorkbenchPage page = OwlUI.getPageAtCursor();
           if (page != null) {
             page.openEditor(new FeedViewInput(mark), FeedView.ID, activateEditor);
             openedEditors++;

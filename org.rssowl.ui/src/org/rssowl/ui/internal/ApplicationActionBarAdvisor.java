@@ -230,7 +230,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
   /* Menu: Tools */
   private void createToolsMenu(IMenuManager menuBar) {
-    MenuManager toolsMenu = new MenuManager("&Tools", RSSOwlUI.M_TOOLS);
+    MenuManager toolsMenu = new MenuManager("&Tools", OwlUI.M_TOOLS);
     menuBar.add(toolsMenu);
 
     toolsMenu.add(new Separator());

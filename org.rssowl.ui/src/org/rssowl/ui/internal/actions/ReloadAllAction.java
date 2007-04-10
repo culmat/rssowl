@@ -33,7 +33,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
 
 import java.util.Set;
@@ -50,7 +50,7 @@ public class ReloadAllAction extends Action implements IWorkbenchWindowActionDel
    * Action to reload all BookMarks.
    */
   public ReloadAllAction() {
-    super("Update All", RSSOwlUI.getImageDescriptor("icons/elcl16/reload_all.gif"));
+    super("Update All", OwlUI.getImageDescriptor("icons/elcl16/reload_all.gif"));
   }
 
   /*

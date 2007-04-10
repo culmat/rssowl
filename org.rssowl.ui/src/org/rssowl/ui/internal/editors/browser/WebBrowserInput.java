@@ -27,7 +27,7 @@ package org.rssowl.ui.internal.editors.browser;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 
 /**
  * The <code>WebBrowserInput</code> is used as Input to the
@@ -63,7 +63,7 @@ public class WebBrowserInput implements IEditorInput {
    * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
    */
   public ImageDescriptor getImageDescriptor() {
-    return RSSOwlUI.getImageDescriptor("icons/eview16/webbrowser.gif");
+    return OwlUI.getImageDescriptor("icons/eview16/webbrowser.gif");
   }
 
   /*

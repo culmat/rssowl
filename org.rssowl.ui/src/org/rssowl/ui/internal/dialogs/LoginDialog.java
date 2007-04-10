@@ -44,7 +44,7 @@ import org.rssowl.core.connection.auth.ICredentialsProvider;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.net.URI;
@@ -148,7 +148,7 @@ public class LoginDialog extends TitleAreaDialog {
     composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
     /* Title Image */
-    setTitleImage(RSSOwlUI.getImage(fResources, "icons/elcl16/auth.gif"));
+    setTitleImage(OwlUI.getImage(fResources, "icons/elcl16/auth.gif"));
 
     /* Title Message */
     setMessage("Please enter Username and Password", IMessageProvider.INFORMATION);
@@ -247,7 +247,7 @@ public class LoginDialog extends TitleAreaDialog {
     Shell shell = getShell();
 
     /* Minimum Size */
-    int minWidth = convertHorizontalDLUsToPixels(RSSOwlUI.MIN_DIALOG_WIDTH_DLU);
+    int minWidth = convertHorizontalDLUsToPixels(OwlUI.MIN_DIALOG_WIDTH_DLU);
     int minHeight = shell.computeSize(minWidth, SWT.DEFAULT).y;
 
     /* Required Size */

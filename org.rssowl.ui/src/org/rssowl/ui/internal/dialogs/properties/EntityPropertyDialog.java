@@ -52,7 +52,7 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
 import org.rssowl.ui.internal.Application;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.HashSet;
@@ -246,7 +246,7 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
     Shell shell = getShell();
 
     /* Minimum Size */
-    int minWidth = convertHorizontalDLUsToPixels(RSSOwlUI.MIN_DIALOG_WIDTH_DLU);
+    int minWidth = convertHorizontalDLUsToPixels(OwlUI.MIN_DIALOG_WIDTH_DLU);
     int minHeight = shell.computeSize(minWidth, SWT.DEFAULT).y;
 
     /* Required Size */
@@ -277,11 +277,11 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
     if (message.length() == 0)
       fMessageImage.setImage(null);
     else if (type.equals(IPropertyDialogSite.MessageType.INFO))
-      fMessageImage.setImage(RSSOwlUI.getImage(fResources, RSSOwlUI.INFO));
+      fMessageImage.setImage(OwlUI.getImage(fResources, OwlUI.INFO));
     else if (type.equals(IPropertyDialogSite.MessageType.WARNING))
-      fMessageImage.setImage(RSSOwlUI.getImage(fResources, RSSOwlUI.WARNING));
+      fMessageImage.setImage(OwlUI.getImage(fResources, OwlUI.WARNING));
     else if (type.equals(IPropertyDialogSite.MessageType.ERROR))
-      fMessageImage.setImage(RSSOwlUI.getImage(fResources, RSSOwlUI.ERROR));
+      fMessageImage.setImage(OwlUI.getImage(fResources, OwlUI.ERROR));
 
     /* Update Message */
     fMessageText.setText(message);

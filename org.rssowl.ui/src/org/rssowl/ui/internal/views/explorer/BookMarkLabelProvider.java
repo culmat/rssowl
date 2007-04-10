@@ -41,7 +41,7 @@ import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.NewsService;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 
 import java.util.List;
 
@@ -79,21 +79,21 @@ public class BookMarkLabelProvider extends CellLabelProvider {
   private void createResources() {
 
     /* Images */
-    fBookmarkSetIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.BOOKMARK_SET);
-    fGroupIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.GROUP);
-    fFolderIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.FOLDER);
-    fFolderNewIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.FOLDER_NEW);
-    fBookMarkErrorIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.BOOKMARK_ERROR);
-    fBookMarkIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.BOOKMARK);
-    fSearchMarkIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.SEARCHMARK);
+    fBookmarkSetIcon = OwlUI.getImage(fResources, OwlUI.BOOKMARK_SET);
+    fGroupIcon = OwlUI.getImage(fResources, OwlUI.GROUP);
+    fFolderIcon = OwlUI.getImage(fResources, OwlUI.FOLDER);
+    fFolderNewIcon = OwlUI.getImage(fResources, OwlUI.FOLDER_NEW);
+    fBookMarkErrorIcon = OwlUI.getImage(fResources, OwlUI.BOOKMARK_ERROR);
+    fBookMarkIcon = OwlUI.getImage(fResources, OwlUI.BOOKMARK);
+    fSearchMarkIcon = OwlUI.getImage(fResources, OwlUI.SEARCHMARK);
 
     /* Fonts */
-    fBoldFont = RSSOwlUI.getThemeFont(RSSOwlUI.BKMRK_EXPLORER_FONT_ID, SWT.BOLD);
-    fDefaultFont = RSSOwlUI.getThemeFont(RSSOwlUI.BKMRK_EXPLORER_FONT_ID, SWT.NORMAL);
+    fBoldFont = OwlUI.getThemeFont(OwlUI.BKMRK_EXPLORER_FONT_ID, SWT.BOLD);
+    fDefaultFont = OwlUI.getThemeFont(OwlUI.BKMRK_EXPLORER_FONT_ID, SWT.NORMAL);
 
     /* Colors */
-    fStickyBgColor = RSSOwlUI.getColor(fResources, RSSOwlUI.STICKY_BG_COLOR);
-    fGroupFgColor = RSSOwlUI.getColor(fResources, RSSOwlUI.GROUP_FG_COLOR);
+    fStickyBgColor = OwlUI.getColor(fResources, OwlUI.STICKY_BG_COLOR);
+    fGroupFgColor = OwlUI.getColor(fResources, OwlUI.GROUP_FG_COLOR);
   }
 
   @Override
@@ -170,9 +170,9 @@ public class BookMarkLabelProvider extends CellLabelProvider {
 
       /* Show Favicon if available */
       else {
-        ImageDescriptor favicon = RSSOwlUI.getFavicon(bookmark);
+        ImageDescriptor favicon = OwlUI.getFavicon(bookmark);
         if (favicon != null)
-          cell.setImage(RSSOwlUI.getImage(fResources, favicon));
+          cell.setImage(OwlUI.getImage(fResources, favicon));
         else
           cell.setImage(fBookMarkIcon);
       }

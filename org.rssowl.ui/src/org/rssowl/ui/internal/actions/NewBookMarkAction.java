@@ -66,7 +66,7 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.FolderChooser;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
@@ -146,7 +146,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
       /* Title Image */
-      setTitleImage(RSSOwlUI.getImage(fResources, "icons/obj16/bkmrk_wiz.gif"));
+      setTitleImage(OwlUI.getImage(fResources, "icons/obj16/bkmrk_wiz.gif"));
 
       /* Title Message */
       setMessage("Please enter the name and link of the bookmark.", IMessageProvider.INFORMATION);

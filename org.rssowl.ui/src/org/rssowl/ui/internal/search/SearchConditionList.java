@@ -48,7 +48,7 @@ import org.rssowl.core.model.persist.search.ISearchCondition;
 import org.rssowl.core.model.persist.search.ISearchField;
 import org.rssowl.core.model.persist.search.SearchSpecifier;
 import org.rssowl.core.util.Pair;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;
@@ -270,8 +270,8 @@ public class SearchConditionList extends ScrolledComposite {
   }
 
   private void initResources() {
-    fAddIcon = RSSOwlUI.getImage(fResources, "icons/etool16/add.gif");
-    fDeleteIcon = RSSOwlUI.getImage(fResources, "icons/etool16/cancel.gif");
+    fAddIcon = OwlUI.getImage(fResources, "icons/etool16/add.gif");
+    fDeleteIcon = OwlUI.getImage(fResources, "icons/etool16/cancel.gif");
   }
 
   private void initComponents(List<ISearchCondition> conditions) {

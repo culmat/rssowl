@@ -230,7 +230,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   private void onMinimize() {
 
     /* Mark displayed News as Read on Minimize if set in Preferences */
-    IEditorPart activeEditor = RSSOwlUI.getActiveEditor();
+    IEditorPart activeEditor = OwlUI.getActiveEditor();
     if (activeEditor != null && activeEditor instanceof FeedView) {
       FeedView feedView = (FeedView) activeEditor;
       feedView.notifyUIEvent(FeedView.UIEvent.MINIMIZE);
@@ -241,7 +241,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   private void enableTray() {
 
     /* Only enable for Primary Window */
-    IWorkbenchWindow primaryWindow = RSSOwlUI.getPrimaryWindow();
+    IWorkbenchWindow primaryWindow = OwlUI.getPrimaryWindow();
     if (primaryWindow == null || !primaryWindow.equals(getWindowConfigurer().getWindow()))
       return;
 
@@ -261,7 +261,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       fTrayItem.setVisible(false);
 
     /* Apply Image */
-    fTrayItem.setImage(RSSOwlUI.getImage(fResources, RSSOwlUI.TRAY_OWL));
+    fTrayItem.setImage(OwlUI.getImage(fResources, OwlUI.TRAY_OWL));
 
     /* Minimize to Tray on Shell Iconify */
     fTrayShellListener = new ShellAdapter() {
@@ -332,7 +332,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
               return;
 
             fTrayTeasing = true;
-            fTrayItem.setImage(RSSOwlUI.getImage(fResources, RSSOwlUI.TRAY_OWL_TEASING));
+            fTrayItem.setImage(OwlUI.getImage(fResources, OwlUI.TRAY_OWL_TEASING));
           }
         });
       }
@@ -369,7 +369,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       fTrayItem.setVisible(false);
 
     if (fTrayTeasing)
-      fTrayItem.setImage(RSSOwlUI.getImage(fResources, RSSOwlUI.TRAY_OWL));
+      fTrayItem.setImage(OwlUI.getImage(fResources, OwlUI.TRAY_OWL));
 
     fTrayTeasing = false;
     fMinimizedToTray = false;

@@ -81,7 +81,7 @@ import java.util.Map;
  *
  * @author bpasero
  */
-public class RSSOwlUI {
+public class OwlUI {
 
   /** Top-Level Menu ID for "Tools" */
   public static final String M_TOOLS = "tools"; //$NON-NLS-1$

@@ -49,7 +49,7 @@ import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.EntityGroup;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.text.DateFormat;
@@ -95,24 +95,24 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
   private void createResources() {
 
     /* Colors */
-    fStickyBgColor = RSSOwlUI.getColor(fResources, RSSOwlUI.STICKY_BG_COLOR);
-    fGradientFgColor = RSSOwlUI.getColor(fResources, RSSOwlUI.GROUP_GRADIENT_FG_COLOR);
-    fGradientBgColor = RSSOwlUI.getColor(fResources, RSSOwlUI.GROUP_GRADIENT_BG_COLOR);
-    fGradientEndColor = RSSOwlUI.getColor(fResources, RSSOwlUI.GROUP_GRADIENT_END_COLOR);
-    fGroupFgColor = RSSOwlUI.getColor(fResources, RSSOwlUI.GROUP_FG_COLOR);
-    fGroupBgColor = RSSOwlUI.getColor(fResources, RSSOwlUI.GROUP_BG_COLOR);
+    fStickyBgColor = OwlUI.getColor(fResources, OwlUI.STICKY_BG_COLOR);
+    fGradientFgColor = OwlUI.getColor(fResources, OwlUI.GROUP_GRADIENT_FG_COLOR);
+    fGradientBgColor = OwlUI.getColor(fResources, OwlUI.GROUP_GRADIENT_BG_COLOR);
+    fGradientEndColor = OwlUI.getColor(fResources, OwlUI.GROUP_GRADIENT_END_COLOR);
+    fGroupFgColor = OwlUI.getColor(fResources, OwlUI.GROUP_FG_COLOR);
+    fGroupBgColor = OwlUI.getColor(fResources, OwlUI.GROUP_BG_COLOR);
 
     /* Icons */
-    fNewsUnreadIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.NEWS_STATE_UNREAD);
-    fNewsNewIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.NEWS_STATE_NEW);
-    fNewsUpdatedIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.NEWS_STATE_UPDATED);
-    fNewsReadIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.NEWS_STATE_READ);
-    fNewsStickyIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.NEWS_PINNED);
-    fNewsNonStickyIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.NEWS_PIN);
-    fGroupIcon = RSSOwlUI.getImage(fResources, RSSOwlUI.GROUP);
+    fNewsUnreadIcon = OwlUI.getImage(fResources, OwlUI.NEWS_STATE_UNREAD);
+    fNewsNewIcon = OwlUI.getImage(fResources, OwlUI.NEWS_STATE_NEW);
+    fNewsUpdatedIcon = OwlUI.getImage(fResources, OwlUI.NEWS_STATE_UPDATED);
+    fNewsReadIcon = OwlUI.getImage(fResources, OwlUI.NEWS_STATE_READ);
+    fNewsStickyIcon = OwlUI.getImage(fResources, OwlUI.NEWS_PINNED);
+    fNewsNonStickyIcon = OwlUI.getImage(fResources, OwlUI.NEWS_PIN);
+    fGroupIcon = OwlUI.getImage(fResources, OwlUI.GROUP);
 
     /* Fonts */
-    fBoldFont = RSSOwlUI.getThemeFont(RSSOwlUI.HEADLINES_FONT_ID, SWT.BOLD);
+    fBoldFont = OwlUI.getThemeFont(OwlUI.HEADLINES_FONT_ID, SWT.BOLD);
   }
 
   @Override
@@ -273,7 +273,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     else if (element instanceof INews) {
       ILabel label = ((INews) element).getLabel();
       if (label != null)
-        return RSSOwlUI.getColor(fResources, label);
+        return OwlUI.getColor(fResources, label);
     }
 
     return null;
@@ -331,7 +331,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
       /* Draw Rectangle */
       Color oldBackground = gc.getBackground();
-      gc.setBackground(RSSOwlUI.getColor(fResources, news.getLabel()));
+      gc.setBackground(OwlUI.getColor(fResources, news.getLabel()));
       gc.fillRectangle(0, itemRect.y, clArea.width, itemRect.height);
       gc.setBackground(oldBackground);
 

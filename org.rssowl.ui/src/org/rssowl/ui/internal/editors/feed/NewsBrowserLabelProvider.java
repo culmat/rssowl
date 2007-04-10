@@ -44,7 +44,7 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.ILinkHandler;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.io.IOException;
@@ -88,7 +88,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       fPropertyChangeListener = new IPropertyChangeListener() {
         public void propertyChange(PropertyChangeEvent event) {
           String property = event.getProperty();
-          if (RSSOwlUI.NEWS_TEXT_FONT_ID.equals(property))
+          if (OwlUI.NEWS_TEXT_FONT_ID.equals(property))
             createFonts();
         }
       };
@@ -106,7 +106,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   /* Init the Theme Font (from UI Thread) */
   private void createFonts() {
     int fontHeight = 10;
-    Font newsFont = RSSOwlUI.getThemeFont(RSSOwlUI.NEWS_TEXT_FONT_ID, SWT.NORMAL);
+    Font newsFont = OwlUI.getThemeFont(OwlUI.NEWS_TEXT_FONT_ID, SWT.NORMAL);
     FontData[] fontData = newsFont.getFontData();
     if (fontData.length > 0) {
       fNewsFontFamily = fontData[0].getName();

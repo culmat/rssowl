@@ -41,7 +41,7 @@ import org.eclipse.ui.IWorkbenchWindowPulldownDelegate;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.ui.internal.Activator;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 
 /**
  * @author bpasero
@@ -59,7 +59,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate {
 
     MenuItem newBookMark = new MenuItem(menu, SWT.PUSH);
     newBookMark.setText("Bookmark");
-    newBookMark.setImage(RSSOwlUI.getImage(fResources, RSSOwlUI.BOOKMARK));
+    newBookMark.setImage(OwlUI.getImage(fResources, OwlUI.BOOKMARK));
     newBookMark.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -73,7 +73,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate {
 
     MenuItem newSearchMark = new MenuItem(menu, SWT.PUSH);
     newSearchMark.setText("Saved Search");
-    newSearchMark.setImage(RSSOwlUI.getImage(fResources, RSSOwlUI.SEARCHMARK));
+    newSearchMark.setImage(OwlUI.getImage(fResources, OwlUI.SEARCHMARK));
     newSearchMark.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -89,7 +89,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate {
 
     MenuItem newFolder = new MenuItem(menu, SWT.PUSH);
     newFolder.setText("Folder");
-    newFolder.setImage(RSSOwlUI.getImage(fResources, RSSOwlUI.FOLDER));
+    newFolder.setImage(OwlUI.getImage(fResources, OwlUI.FOLDER));
     newFolder.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

@@ -67,7 +67,7 @@ import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.progress.WorkbenchJob;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.views.explorer.BookMarkFilter.SearchTarget;
 
@@ -134,7 +134,7 @@ class BookMarkSearchbar extends Composite {
     };
 
     clearTextAction.setToolTipText("Clear");
-    clearTextAction.setImageDescriptor(RSSOwlUI.getImageDescriptor("icons/etool16/clear.gif")); //$NON-NLS-1$
+    clearTextAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/clear.gif")); //$NON-NLS-1$
 
     fFilterToolBar.add(clearTextAction);
   }
@@ -231,7 +231,7 @@ class BookMarkSearchbar extends Composite {
       }
     });
 
-    filterTargetAction.setImageDescriptor(RSSOwlUI.getImageDescriptor("icons/etool16/find.gif"));
+    filterTargetAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/find.gif"));
     filterTargetManager.add(filterTargetAction);
 
     filterTargetManager.createControl(parent);

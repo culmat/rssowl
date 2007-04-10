@@ -33,7 +33,7 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.INews;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 
 import java.util.List;
 
@@ -78,7 +78,7 @@ public class CopyLinkAction implements IObjectActionDelegate {
 
     /* Set Contents to Clipboard */
     if (str.length() > 0)
-      RSSOwlUI.getClipboard().setContents(new Object[] { str.toString() }, new Transfer[] { TextTransfer.getInstance() });
+      OwlUI.getClipboard().setContents(new Object[] { str.toString() }, new Transfer[] { TextTransfer.getInstance() });
   }
 
   /*

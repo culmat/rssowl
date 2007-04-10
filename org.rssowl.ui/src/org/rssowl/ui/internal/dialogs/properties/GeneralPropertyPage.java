@@ -55,7 +55,7 @@ import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.RSSOwlUI;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.net.URI;
@@ -361,7 +361,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
             Owl.getPersistenceService().getModelDAO().deleteFeed(oldFeedRef);
 
           /* Delete the Favicon since the feed has changed */
-          RSSOwlUI.deleteImage(bookmark.getId());
+          OwlUI.deleteImage(bookmark.getId());
         }
 
         /* Supplied Feed Link not valid */

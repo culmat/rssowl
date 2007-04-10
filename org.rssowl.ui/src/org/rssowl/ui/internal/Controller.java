@@ -407,10 +407,10 @@ public class Controller {
       boolean deleteConditionalGet = (!conditionalGetIsNull && conditionalGet == null);
 
       /* Load the Favicon directly afterwards if required */
-      if (RSSOwlUI.getFavicon(bookmark) == null) {
+      if (OwlUI.getFavicon(bookmark) == null) {
         try {
           byte[] faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
-          RSSOwlUI.storeImage(bookmark.getId(), faviconBytes, RSSOwlUI.BOOKMARK);
+          OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK);
         } catch (UnknownFeedException e) {
           Activator.getDefault().getLog().log(e.getStatus());
         }
