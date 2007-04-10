@@ -47,15 +47,8 @@ import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.util.JobRunner;
 
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.BindException;
-import java.net.InetAddress;
-import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 import java.util.List;
 
 /**
@@ -78,19 +71,8 @@ public class Application implements IApplication {
    */
   public Object start(IApplicationContext context) throws Exception {
 
-    /* Start the Application Server */
+    /* Set Handshake-Handler to Application Server */
     ApplicationServer server = ApplicationServer.getDefault();
-    try {
-      server.startup();
-    }
-
-    /* Server alredady bound - perform hand-shake */
-    catch (BindException e) {
-      String link = parseLink(Platform.getCommandLineArgs());
-      doHandshake(link);
-    }
-
-    /* Server not yet bound - register hand-shake-handler */
     server.setHandshakeHandler(new ApplicationServer.HandshakeHandler() {
       public void handle(String token) {
         if (StringUtils.isSet(token)) {
@@ -152,34 +134,6 @@ public class Application implements IApplication {
     }
 
     return null;
-  }
-
-  /* Server already running. Pass a message to the running Server and exit. */
-  private void doHandshake(String message) {
-    try {
-      Socket socket = new Socket(InetAddress.getByName(ApplicationServer.LOCALHOST), ApplicationServer.DEFAULT_SOCKET_PORT);
-      PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
-      writer.println(StringUtils.isSet(message) ? message : ApplicationServer.STARTUP_HANDSHAKE);
-      writer.flush();
-
-      /*
-       * Send a message to the other running instance of RSSOwl and wait some
-       * time, so that is has a chance to read the message. After that, the
-       * other running instance will restore from taskbar or tray to show the
-       * user. Then exit this instance consequently.
-       */
-      try {
-        Thread.sleep(200);
-      } catch (InterruptedException e) {
-        System.exit(0);
-      } finally {
-        System.exit(0);
-      }
-    } catch (UnknownHostException e) {
-      Activator.getDefault().logError("handleSocketBound()", e);
-    } catch (IOException e) {
-      Activator.getDefault().logError("handleSocketBound()", e);
-    }
   }
 
   /* Focus the Application */
