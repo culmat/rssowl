@@ -74,6 +74,10 @@ import java.util.Set;
  * @author bpasero
  */
 public class FolderChooser extends Composite implements DisposeListener {
+
+  /* Delay in ms before updating Selection on Events */
+  private static final int SELECTION_DELAY = 20;
+
   private Composite fParent;
   private IFolder fSelectedFolder;
   private ResourceManager fResources;
@@ -137,7 +141,7 @@ public class FolderChooser extends Composite implements DisposeListener {
           return;
 
         /* Select added Folder */
-        JobRunner.runInUIThread(fFolderViewer.getControl(), new Runnable() {
+        JobRunner.runInUIThread(SELECTION_DELAY, fFolderViewer.getControl(), new Runnable() {
           public void run() {
             FolderEvent event = events.iterator().next();
             fFolderViewer.setSelection(new StructuredSelection(event.getEntity()));
@@ -295,7 +299,8 @@ public class FolderChooser extends Composite implements DisposeListener {
     fFolderViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
         IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-        onFolderSelected((IFolder) selection.getFirstElement());
+        if (!selection.isEmpty())
+          onFolderSelected((IFolder) selection.getFirstElement());
       }
     });
 
