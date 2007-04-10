@@ -32,7 +32,7 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PlatformUI;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.ui.internal.util.ModelUtils;
@@ -47,7 +47,7 @@ public class MarkUnreadAction extends Action implements IWorkbenchWindowActionDe
   private IStructuredSelection fSelection;
 
   /**
-   * 
+   *
    */
   public MarkUnreadAction() {}
 
@@ -80,7 +80,7 @@ public class MarkUnreadAction extends Action implements IWorkbenchWindowActionDe
 
     /* Mark Unread */
     if (news.size() > 0)
-      NewsModel.getDefault().getPersistenceLayer().getApplicationLayer().setNewsState(news, INews.State.UNREAD, true, false);
+      Owl.getPersistenceService().getApplicationLayer().setNewsState(news, INews.State.UNREAD, true, false);
   }
 
   /*

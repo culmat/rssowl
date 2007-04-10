@@ -33,12 +33,12 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.events.BookMarkAdapter;
 import org.rssowl.core.model.events.BookMarkEvent;
 import org.rssowl.core.model.persist.IBookMark;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.util.EditorUtils;
@@ -58,7 +58,7 @@ import java.util.Map.Entry;
  * TODO Re-Think the current strategy to ignore reloads on startup from Feeds
  * that are not set to update in a certain interval.
  * </p>
- * 
+ *
  * @author bpasero
  */
 public class FeedReloadService {
@@ -165,7 +165,7 @@ public class FeedReloadService {
     Set<IBookMark> bookmarks = Controller.getDefault().getCacheService().getBookMarks();
     final List<IBookMark> bookmarksToOpenOnStartup = new ArrayList<IBookMark>();
     for (IBookMark bookMark : bookmarks) {
-      IPreferencesScope entityPreferences = NewsModel.getDefault().getEntityScope(bookMark);
+      IPreferenceScope entityPreferences = Owl.getPreferenceService().getEntityScope(bookMark);
 
       /* BookMark is to reload in a certain Interval */
       if (entityPreferences.getBoolean(DefaultPreferences.BM_UPDATE_INTERVAL_STATE)) {
@@ -238,17 +238,17 @@ public class FeedReloadService {
       }
     };
 
-    NewsModel.getDefault().addBookMarkListener(fBookMarkListener);
+    Owl.getListenerService().addBookMarkListener(fBookMarkListener);
   }
 
   private void unregisterListeners() {
-    NewsModel.getDefault().removeBookMarkListener(fBookMarkListener);
+    Owl.getListenerService().removeBookMarkListener(fBookMarkListener);
   }
 
   private void onBookMarksAdded(Set<BookMarkEvent> events) {
     for (BookMarkEvent event : events) {
       IBookMark addedBookMark = event.getEntity();
-      IPreferencesScope entityPreferences = NewsModel.getDefault().getEntityScope(addedBookMark);
+      IPreferenceScope entityPreferences = Owl.getPreferenceService().getEntityScope(addedBookMark);
 
       Long interval = entityPreferences.getLong(DefaultPreferences.BM_UPDATE_INTERVAL);
       boolean autoUpdateState = entityPreferences.getBoolean(DefaultPreferences.BM_UPDATE_INTERVAL_STATE);
@@ -276,11 +276,11 @@ public class FeedReloadService {
    * Synchronizes the reload-service on the given BookMark. Performs no
    * operation in case the given bookmarks update-interval is matching the
    * stored one.
-   * 
+   *
    * @param updatedBookmark The Bookmark to synchronize with the reload-service.
    */
   public void sync(IBookMark updatedBookmark) {
-    IPreferencesScope entityPreferences = NewsModel.getDefault().getEntityScope(updatedBookmark);
+    IPreferenceScope entityPreferences = Owl.getPreferenceService().getEntityScope(updatedBookmark);
 
     Long oldInterval = fMapBookMarkToInterval.get(updatedBookmark);
     Long newInterval = entityPreferences.getLong(DefaultPreferences.BM_UPDATE_INTERVAL);

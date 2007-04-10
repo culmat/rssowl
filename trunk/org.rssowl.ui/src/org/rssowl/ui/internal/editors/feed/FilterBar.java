@@ -52,9 +52,9 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.actions.ActionFactory;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.ui.internal.Controller;
@@ -91,7 +91,7 @@ public class FilterBar {
   private Text fSearchInput;
   private Label fFilterLabel;
   private boolean fLayoutVertical;
-  private IPreferencesScope fGlobalPreferences;
+  private IPreferenceScope fGlobalPreferences;
   private boolean fMaximized;
 
   /**
@@ -103,7 +103,7 @@ public class FilterBar {
     fParent = parent;
     fLayoutVertical = feedView.fInitialLayoutVertical;
     fQuickSearchTracker = new JobTracker(500, false, true, ITask.Priority.SHORT);
-    fGlobalPreferences = NewsModel.getDefault().getGlobalScope();
+    fGlobalPreferences = Owl.getPreferenceService().getGlobalScope();
     fMaximized = fGlobalPreferences.getBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED);;
     createControl();
   }

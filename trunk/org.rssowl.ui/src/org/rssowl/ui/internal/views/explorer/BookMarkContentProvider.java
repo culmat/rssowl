@@ -30,7 +30,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.BookMarkEvent;
 import org.rssowl.core.model.events.BookMarkListener;
@@ -672,17 +672,17 @@ public class BookMarkContentProvider implements ITreeContentProvider {
     }
 
     /* Register Listeners */
-    NewsModel.getDefault().addFolderListener(fFolderListener);
-    NewsModel.getDefault().addBookMarkListener(fBookMarkListener);
-    NewsModel.getDefault().addSearchMarkListener(fSearchMarkListener);
-    NewsModel.getDefault().addNewsListener(fNewsListener);
+    Owl.getListenerService().addFolderListener(fFolderListener);
+    Owl.getListenerService().addBookMarkListener(fBookMarkListener);
+    Owl.getListenerService().addSearchMarkListener(fSearchMarkListener);
+    Owl.getListenerService().addNewsListener(fNewsListener);
   }
 
   private void unregisterListeners() {
-    NewsModel.getDefault().removeFolderListener(fFolderListener);
-    NewsModel.getDefault().removeBookMarkListener(fBookMarkListener);
-    NewsModel.getDefault().removeSearchMarkListener(fSearchMarkListener);
-    NewsModel.getDefault().removeNewsListener(fNewsListener);
+    Owl.getListenerService().removeFolderListener(fFolderListener);
+    Owl.getListenerService().removeBookMarkListener(fBookMarkListener);
+    Owl.getListenerService().removeSearchMarkListener(fSearchMarkListener);
+    Owl.getListenerService().removeNewsListener(fNewsListener);
   }
 
   /* Update Entities that are affected by the given NewsEvents */

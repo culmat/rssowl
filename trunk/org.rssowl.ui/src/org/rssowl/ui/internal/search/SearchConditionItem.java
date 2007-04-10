@@ -48,8 +48,8 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
-import org.rssowl.core.model.NewsModel;
-import org.rssowl.core.model.dao.PersistenceLayer;
+import org.rssowl.core.Owl;
+import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IModelTypesFactory;
 import org.rssowl.core.model.persist.INews;
@@ -93,7 +93,7 @@ public class SearchConditionItem extends Composite {
   private final ISearchCondition fCondition;
   private Object fInputValue;
   private IModelTypesFactory fFactory;
-  private PersistenceLayer fPersist;
+  private IPersistenceService fPersist;
   private boolean fModified;
 
   /* Viewer */
@@ -142,8 +142,8 @@ public class SearchConditionItem extends Composite {
   public SearchConditionItem(Composite parent, int style, ISearchCondition condition) {
     super(parent, style);
     fCondition = condition;
-    fFactory = NewsModel.getDefault().getTypesFactory();
-    fPersist = NewsModel.getDefault().getPersistenceLayer();
+    fFactory = Owl.getModelFactory();
+    fPersist = Owl.getPersistenceService();
 
     initComponents();
   }

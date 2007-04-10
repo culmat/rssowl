@@ -26,7 +26,7 @@ package org.rssowl.ui.internal.editors.feed;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.NewsAdapter;
 import org.rssowl.core.model.events.NewsEvent;
@@ -435,11 +435,11 @@ public class NewsContentProvider implements ITreeContentProvider {
       }
     };
 
-    NewsModel.getDefault().addNewsListener(fNewsListener);
+    Owl.getListenerService().addNewsListener(fNewsListener);
   }
 
   private void unregisterListeners() {
-    NewsModel.getDefault().removeNewsListener(fNewsListener);
+    Owl.getListenerService().removeNewsListener(fNewsListener);
   }
 
   private boolean isInputRelatedTo(INews news, boolean fromAdd) {

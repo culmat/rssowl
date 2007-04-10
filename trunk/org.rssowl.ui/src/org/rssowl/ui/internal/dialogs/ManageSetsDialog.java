@@ -57,7 +57,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.events.FolderAdapter;
 import org.rssowl.core.model.events.FolderEvent;
@@ -144,7 +144,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
       }
     };
 
-    NewsModel.getDefault().addFolderListener(fFolderListener);
+    Owl.getListenerService().addFolderListener(fFolderListener);
   }
 
   /*
@@ -159,7 +159,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
   }
 
   private void unregisterListeners() {
-    NewsModel.getDefault().removeFolderListener(fFolderListener);
+    Owl.getListenerService().removeFolderListener(fFolderListener);
   }
 
   /*
@@ -386,7 +386,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
   }
 
   private void perfromDrop(List< ? > draggedObjects, Object dropTarget) {
-    IApplicationLayer appLayer = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer();
+    IApplicationLayer appLayer = Owl.getPersistenceService().getApplicationLayer();
 
     /* Require a Folder as drop target */
     if (!(dropTarget instanceof IFolder))

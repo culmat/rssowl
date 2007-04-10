@@ -42,8 +42,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.rssowl.core.model.NewsModel;
-import org.rssowl.core.model.dao.PersistenceLayer;
+import org.rssowl.core.Owl;
+import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IModelTypesFactory;
@@ -82,7 +82,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
   private IDialogSettings fDialogSettings;
   private boolean fFirstTimeOpen;
   private IFolder fParent;
-  private PersistenceLayer fPersist;
+  private IPersistenceService fPersist;
   private List<ISearchCondition> fInitialSearchConditions;
   private boolean fInitialMatchAllConditions;
   private FolderChooser fFolderChooser;
@@ -109,7 +109,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fDialogSettings = Activator.getDefault().getDialogSettings();
     fFirstTimeOpen = (fDialogSettings.getSection(SETTINGS_SECTION) == null);
-    fPersist = NewsModel.getDefault().getPersistenceLayer();
+    fPersist = Owl.getPersistenceService();
 
     /* Use default Parent if required */
     if (fParent == null)
@@ -132,7 +132,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
     fParent = fFolderChooser.getFolder();
 
     /* Create new Searchmark */
-    ISearchMark searchMark = NewsModel.getDefault().getTypesFactory().createSearchMark(null, fParent, fNameInput.getText());
+    ISearchMark searchMark = Owl.getModelFactory().createSearchMark(null, fParent, fNameInput.getText());
     searchMark.setMatchAllConditions(fMatchAllRadio.getSelection());
 
     /* Create Conditions and save in DB */
@@ -258,7 +258,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
 
   private List<ISearchCondition> getDefaultConditions() {
     List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(1);
-    IModelTypesFactory factory = NewsModel.getDefault().getTypesFactory();
+    IModelTypesFactory factory = Owl.getModelFactory();
 
     ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
     ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS, "");

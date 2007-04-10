@@ -51,11 +51,10 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.rssowl.core.interpreter.Interpreter;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IApplicationLayer;
+import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.dao.PersistenceLayer;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
@@ -84,7 +83,7 @@ import java.util.Map;
 public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjectActionDelegate {
   private Shell fShell;
   private IFolder fParent;
-  private PersistenceLayer fPersist;
+  private IPersistenceService fPersist;
   private String fPreSetLink;
 
   private static class NewBookMarkDialog extends TitleAreaDialog {
@@ -234,7 +233,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
     fShell = shell;
     fParent = parent;
     fPreSetLink = preSetLink;
-    fPersist = NewsModel.getDefault().getPersistenceLayer();
+    fPersist = Owl.getPersistenceService();
   }
 
   /*
@@ -296,13 +295,13 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
 
       /* Create a new Feed then */
       if (feedRef == null) {
-        IFeed feed = Interpreter.getDefault().getTypesFactory().createFeed(uriObj);
+        IFeed feed = Owl.getInterpreter().getTypesFactory().createFeed(uriObj);
         feed = fPersist.getModelDAO().saveFeed(feed);
       }
 
       /* Create the BookMark */
       FeedLinkReference feedLinkRef = new FeedLinkReference(uriObj);
-      IBookMark bookmark = Interpreter.getDefault().getTypesFactory().createBookMark(parent, feedLinkRef, title);
+      IBookMark bookmark = Owl.getInterpreter().getTypesFactory().createBookMark(parent, feedLinkRef, title);
 
       /* Copy all Properties from Parent into this Mark */
       Map<String, ? > properties = parent.getProperties();

@@ -26,7 +26,7 @@ package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.ILabel;
@@ -51,7 +51,7 @@ public class LabelAction extends Action {
   public LabelAction(ILabel label, IStructuredSelection selection) {
     fLabel = label;
     fSelection = selection;
-    fAppLayer = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer();
+    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
   }
 
   @Override

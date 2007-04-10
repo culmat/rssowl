@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.persist.IBookMark;
@@ -85,8 +85,8 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
   public DeleteTypesAction(Shell shell, IStructuredSelection selection) {
     fShell = shell;
     fSelection = selection;
-    fModelDao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
-    fAppLayer = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer();
+    fModelDao = Owl.getPersistenceService().getModelDAO();
+    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
   }
 
   /*

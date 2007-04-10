@@ -51,12 +51,12 @@ import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.events.NewsAdapter;
 import org.rssowl.core.model.events.NewsEvent;
 import org.rssowl.core.model.events.runnable.EventType;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.persist.pref.PreferencesEvent;
 import org.rssowl.core.model.persist.pref.PreferencesListener;
 import org.rssowl.ui.internal.editors.feed.FeedView;
@@ -81,7 +81,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   private boolean fMinimizedToTray;
   private ApplicationActionBarAdvisor fActionBarAdvisor;
   private LocalResourceManager fResources;
-  private IPreferencesScope fPreferences;
+  private IPreferenceScope fPreferences;
 
   /* Listeners */
   private NewsAdapter fNewsListener;
@@ -133,7 +133,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   public void postWindowOpen() {
 
     /* Retrieve Preferences */
-    fPreferences = NewsModel.getDefault().getGlobalScope();
+    fPreferences = Owl.getPreferenceService().getGlobalScope();
 
     /* Hook TrayItem if supported on OS and 1st Window */
     if (fPreferences.getBoolean(DefaultPreferences.USE_SYSTEM_TRAY))
@@ -190,11 +190,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         onPreferencesChange(event, EventType.UPDATE);
       }
     };
-    NewsModel.getDefault().addPreferencesListener(fPrefListener);
+    Owl.getListenerService().addPreferencesListener(fPrefListener);
   }
 
   private void unregisterListeners() {
-    NewsModel.getDefault().removePreferencesListener(fPrefListener);
+    Owl.getListenerService().removePreferencesListener(fPrefListener);
   }
 
   private void onPreferencesChange(PreferencesEvent event, EventType type) {
@@ -203,7 +203,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     if (DefaultPreferences.USE_SYSTEM_TRAY.equals(event.getKey())) {
       boolean useTray;
       if (type == EventType.REMOVE)
-        useTray = NewsModel.getDefault().getDefaultScope().getBoolean(DefaultPreferences.USE_SYSTEM_TRAY);
+        useTray = Owl.getPreferenceService().getDefaultScope().getBoolean(DefaultPreferences.USE_SYSTEM_TRAY);
       else
         useTray = event.getBoolean();
 
@@ -222,7 +222,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       fTrayItem.dispose();
 
     if (fNewsListener != null)
-      NewsModel.getDefault().removeNewsListener(fNewsListener);
+      Owl.getListenerService().removeNewsListener(fNewsListener);
 
     fResources.dispose();
   }
@@ -337,7 +337,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         });
       }
     };
-    NewsModel.getDefault().addNewsListener(fNewsListener);
+    Owl.getListenerService().addNewsListener(fNewsListener);
   }
 
   /* Move to System Tray */
@@ -388,7 +388,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       fTrayItem.dispose();
 
     if (fNewsListener != null)
-      NewsModel.getDefault().removeNewsListener(fNewsListener);
+      Owl.getListenerService().removeNewsListener(fNewsListener);
 
     if (fTrayShellListener != null)
       getWindowConfigurer().getWindow().getShell().removeShellListener(fTrayShellListener);

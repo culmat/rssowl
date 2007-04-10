@@ -43,8 +43,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.actions.ActionFactory;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.ApplicationServer;
@@ -83,7 +83,7 @@ public class BrowserBar {
     fFeedView = feedView;
     fParent = parent;
 
-    fUseExternalBrowser = NewsModel.getDefault().getGlobalScope().getBoolean(DefaultPreferences.USE_EXTERNAL_BROWSER);
+    fUseExternalBrowser = Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.USE_EXTERNAL_BROWSER);
     createControl();
   }
 

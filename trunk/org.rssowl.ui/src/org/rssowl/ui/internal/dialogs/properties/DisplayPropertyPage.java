@@ -32,12 +32,12 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
 import org.rssowl.ui.internal.editors.feed.NewsFilter;
@@ -61,7 +61,7 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
   private Button fOpenSiteForNewsCheck;
 
   /* Settings */
-  private List<IPreferencesScope> fEntityPreferences;
+  private List<IPreferenceScope> fEntityPreferences;
   private int fPrefSelectedFilter;
   private int fPrefSelectedGroup;
   private boolean fPrefOpenSiteForNews;
@@ -76,9 +76,9 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
     fEntities = entities;
 
     /* Load Entity Preferences */
-    fEntityPreferences = new ArrayList<IPreferencesScope>(fEntities.size());
+    fEntityPreferences = new ArrayList<IPreferenceScope>(fEntities.size());
     for (IEntity entity : entities)
-      fEntityPreferences.add(NewsModel.getDefault().getEntityScope(entity));
+      fEntityPreferences.add(Owl.getPreferenceService().getEntityScope(entity));
 
     /* Load initial Settings */
     loadInitialSettings();
@@ -87,15 +87,15 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
   private void loadInitialSettings() {
 
     /* Take the first scope as initial values */
-    IPreferencesScope firstScope = fEntityPreferences.get(0);
+    IPreferenceScope firstScope = fEntityPreferences.get(0);
     fPrefSelectedFilter = firstScope.getInteger(DefaultPreferences.BM_NEWS_FILTERING);
     fPrefSelectedGroup = firstScope.getInteger(DefaultPreferences.BM_NEWS_GROUPING);
     fPrefOpenSiteForNews = firstScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS);
 
     /* For any other scope not sharing the initial values, use the default */
-    IPreferencesScope defaultScope = NewsModel.getDefault().getDefaultScope();
+    IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
     for (int i = 1; i < fEntityPreferences.size(); i++) {
-      IPreferencesScope otherScope = fEntityPreferences.get(i);
+      IPreferenceScope otherScope = fEntityPreferences.get(i);
 
       if (otherScope.getInteger(DefaultPreferences.BM_NEWS_FILTERING) != fPrefSelectedFilter)
         fPrefSelectedFilter = defaultScope.getInteger(DefaultPreferences.BM_NEWS_FILTERING);
@@ -161,7 +161,7 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
     fSettingsChanged = false;
 
     /* Update this Entity */
-    for (IPreferencesScope scope : fEntityPreferences) {
+    for (IPreferenceScope scope : fEntityPreferences) {
       if (updatePreferences(scope)) {
         IEntity entityToSave = fEntities.get(fEntityPreferences.indexOf(scope));
         entitiesToSave.add(entityToSave);
@@ -183,14 +183,14 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
     /* Update changes to Child-Marks */
     List<IMark> marks = folder.getMarks();
     for (IMark mark : marks) {
-      IPreferencesScope scope = NewsModel.getDefault().getEntityScope(mark);
+      IPreferenceScope scope = Owl.getPreferenceService().getEntityScope(mark);
       updatePreferences(scope);
     }
 
     /* Update changes to Child-Folders */
     List<IFolder> folders = folder.getFolders();
     for (IFolder childFolder : folders) {
-      IPreferencesScope scope = NewsModel.getDefault().getEntityScope(childFolder);
+      IPreferenceScope scope = Owl.getPreferenceService().getEntityScope(childFolder);
       updatePreferences(scope);
 
       /* Recursively Proceed */
@@ -198,7 +198,7 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
     }
   }
 
-  private boolean updatePreferences(IPreferencesScope scope) {
+  private boolean updatePreferences(IPreferenceScope scope) {
     boolean changed = false;
 
     /* Filter */

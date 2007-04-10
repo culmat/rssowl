@@ -30,8 +30,8 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.browser.AbstractWorkbenchBrowserSupport;
 import org.eclipse.ui.browser.IWebBrowser;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.ui.internal.RSSOwlUI;
 import org.rssowl.ui.internal.util.BrowserUtils;
 
@@ -75,7 +75,7 @@ public class WebBrowserSupport extends AbstractWorkbenchBrowserSupport {
       }
 
       private boolean useExternalBrowser() {
-        return NewsModel.getDefault().getGlobalScope().getBoolean(DefaultPreferences.USE_EXTERNAL_BROWSER);
+        return Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.USE_EXTERNAL_BROWSER);
       }
 
       private void openInternal(URL url) throws PartInitException {

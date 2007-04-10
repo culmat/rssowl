@@ -43,13 +43,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.editors.feed.NewsFilter;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
@@ -76,7 +76,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   private static final int HOURS_SCOPE = 1;
   private static final int DAYS_SCOPE = 2;
 
-  private IPreferencesScope fGlobalScope;
+  private IPreferenceScope fGlobalScope;
   private FeedReloadService fReloadService;
   private Button fUpdateCheck;
   private Combo fUpdateScopeCombo;
@@ -99,7 +99,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
   /** Leave for reflection */
   public FeedsPreferencePage() {
-    fGlobalScope = NewsModel.getDefault().getGlobalScope();
+    fGlobalScope = Owl.getPreferenceService().getGlobalScope();
     fReloadService = Controller.getDefault().getReloadService();
   }
 
@@ -498,7 +498,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   protected void performDefaults() {
     super.performDefaults();
 
-    IPreferencesScope defaultScope = NewsModel.getDefault().getDefaultScope();
+    IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
 
     /* General */
     fUpdateCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.BM_UPDATE_INTERVAL_STATE));

@@ -42,12 +42,12 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.BookMarkReference;
 import org.rssowl.core.model.reference.NewsReference;
 import org.rssowl.core.model.reference.SearchMarkReference;
@@ -66,7 +66,7 @@ public class NewsBrowserControl implements IFeedViewPart {
   private NewsBrowserViewer fViewer;
   private ISelectionListener fSelectionListener;
   private Object fInitialInput;
-  private IPreferencesScope fInputPreferences;
+  private IPreferenceScope fInputPreferences;
   private IPropertyChangeListener fFontPropertyChangeListener;
 
   /*
@@ -80,7 +80,7 @@ public class NewsBrowserControl implements IFeedViewPart {
    * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#onInputChanged(org.rssowl.ui.internal.editors.feed.FeedViewInput)
    */
   public void onInputChanged(FeedViewInput input) {
-    fInputPreferences = NewsModel.getDefault().getEntityScope(input.getMark());
+    fInputPreferences = Owl.getPreferenceService().getEntityScope(input.getMark());
   }
 
   /*
@@ -157,7 +157,7 @@ public class NewsBrowserControl implements IFeedViewPart {
     if (fInputPreferences.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS))
       return news.getLink().toString();
 
-    boolean openEmptyNews = NewsModel.getDefault().getGlobalScope().getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS);
+    boolean openEmptyNews = Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS);
     if (openEmptyNews && !StringUtils.isSet(news.getDescription()))
       return news.getLink().toString();
 

@@ -57,8 +57,8 @@ import org.eclipse.ui.IReusableEditor;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.EditorPart;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.events.BookMarkAdapter;
 import org.rssowl.core.model.events.BookMarkEvent;
@@ -71,7 +71,7 @@ import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.NewsReference;
 import org.rssowl.core.util.RetentionStrategy;
@@ -188,7 +188,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private SashForm fSashForm;
   private Label fTableBrowserSep;
   private LocalResourceManager fResourceManager;
-  private IPreferencesScope fPreferences;
+  private IPreferenceScope fPreferences;
   private long fOpenTime;
   private boolean fCreated;
   private Object fCacheJobIdentifier = new Object();
@@ -225,7 +225,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     fNewsService = Controller.getDefault().getNewsService();
 
     /* Load Settings */
-    fPreferences = NewsModel.getDefault().getGlobalScope();
+    fPreferences = Owl.getPreferenceService().getGlobalScope();
     loadSettings((FeedViewInput) input);
 
     /* Apply Input */
@@ -286,7 +286,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         }
       }
     };
-    NewsModel.getDefault().addBookMarkListener(fBookMarkListener);
+    Owl.getListenerService().addBookMarkListener(fBookMarkListener);
 
     /* Close Editor if Input was Deleted (SearchMark) */
     fSearchMarkListener = new SearchMarkAdapter() {
@@ -302,7 +302,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         }
       }
     };
-    NewsModel.getDefault().addSearchMarkListener(fSearchMarkListener);
+    Owl.getListenerService().addSearchMarkListener(fSearchMarkListener);
 
     /* Listen if Title Image is changing */
     fFeedListener = new FeedAdapter() {
@@ -335,13 +335,13 @@ public class FeedView extends EditorPart implements IReusableEditor {
         }
       }
     };
-    NewsModel.getDefault().addFeedListener(fFeedListener);
+    Owl.getListenerService().addFeedListener(fFeedListener);
   }
 
   private void loadSettings(FeedViewInput input) {
 
     /* Filter Settings */
-    IPreferencesScope preferences = NewsModel.getDefault().getEntityScope(input.getMark());
+    IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(input.getMark());
     int iVal = preferences.getInteger(DefaultPreferences.BM_NEWS_FILTERING);
     if (iVal >= 0)
       fInitialFilterType = NewsFilter.Type.values()[iVal];
@@ -591,13 +591,13 @@ public class FeedView extends EditorPart implements IReusableEditor {
    * Load Filter Settings for the Mark that is set as input if present
    * <p>
    * TODO Find a better solution once its possible to add listeners to
-   * {@link IPreferencesScope} and then listen to changes of display-properties.
+   * {@link IPreferenceScope} and then listen to changes of display-properties.
    * </p>
    *
    * @param refresh If TRUE, refresh the Viewer, FALSE otherwise.
    */
   public void updateFilterAndGrouping(boolean refresh) {
-    IPreferencesScope preferences = NewsModel.getDefault().getEntityScope(fInput.getMark());
+    IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(fInput.getMark());
     int iVal = preferences.getInteger(DefaultPreferences.BM_NEWS_FILTERING);
     if (iVal >= 0)
       fFilterBar.doFilter(NewsFilter.Type.values()[iVal], refresh, false);
@@ -656,7 +656,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
             newsToUpdate.add(newsItem);
         }
 
-        IApplicationLayer applicationLayer = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer();
+        IApplicationLayer applicationLayer = Owl.getPersistenceService().getApplicationLayer();
         applicationLayer.setNewsState(newsToUpdate, markRead ? INews.State.READ : INews.State.UNREAD, true, false);
 
         /* Retention Strategy */
@@ -710,9 +710,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
         mark.setLastVisitDate(new Date(System.currentTimeMillis()));
 
         if (mark instanceof IBookMark)
-          NewsModel.getDefault().getPersistenceLayer().getModelDAO().saveBookMark((IBookMark) mark);
+          Owl.getPersistenceService().getModelDAO().saveBookMark((IBookMark) mark);
         else if (mark instanceof ISearchMark)
-          NewsModel.getDefault().getPersistenceLayer().getModelDAO().saveSearchMark((ISearchMark) mark);
+          Owl.getPersistenceService().getModelDAO().saveSearchMark((ISearchMark) mark);
       }
     });
   }
@@ -814,9 +814,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
   private void unregisterListeners() {
     fEditorSite.getPage().removePartListener(fPartListener);
-    NewsModel.getDefault().removeBookMarkListener(fBookMarkListener);
-    NewsModel.getDefault().removeSearchMarkListener(fSearchMarkListener);
-    NewsModel.getDefault().removeFeedListener(fFeedListener);
+    Owl.getListenerService().removeBookMarkListener(fBookMarkListener);
+    Owl.getListenerService().removeSearchMarkListener(fSearchMarkListener);
+    Owl.getListenerService().removeFeedListener(fFeedListener);
   }
 
   /**

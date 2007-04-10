@@ -36,9 +36,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 
 /**
  * Container for all Preferences that have not yet been categorized.
@@ -46,14 +46,14 @@ import org.rssowl.core.model.persist.pref.IPreferencesScope;
  * @author bpasero
  */
 public class MiscPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
-  private IPreferencesScope fGlobalScope;
+  private IPreferenceScope fGlobalScope;
   private Button fMinimizeToTray;
   private Button fMoveToTrayOnExit;
   private Button fUseExternalBrowser;
 
   /** Leave for reflection */
   public MiscPreferencePage() {
-    fGlobalScope = NewsModel.getDefault().getGlobalScope();
+    fGlobalScope = Owl.getPreferenceService().getGlobalScope();
   }
 
   /**
@@ -136,7 +136,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   protected void performDefaults() {
     super.performDefaults();
 
-    IPreferencesScope defaultScope = NewsModel.getDefault().getDefaultScope();
+    IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
 
     fUseExternalBrowser.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_EXTERNAL_BROWSER));
     fMinimizeToTray.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_SYSTEM_TRAY));

@@ -86,8 +86,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.events.FolderAdapter;
 import org.rssowl.core.model.events.FolderEvent;
 import org.rssowl.core.model.events.FolderListener;
@@ -95,7 +95,7 @@ import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FolderReference;
 import org.rssowl.core.model.reference.ModelReference;
@@ -161,7 +161,7 @@ public class BookMarkExplorer extends ViewPart {
   private static final String FILTER_ACTION = "org.rssowl.ui.internal.views.explorer.FilterAction";
 
   /* Settings */
-  private IPreferencesScope fGlobalPreferences;
+  private IPreferenceScope fGlobalPreferences;
   private List<Long> fExpandedNodes;
   private boolean fBeginSearchOnTyping;
   private boolean fAlwaysShowSearch;
@@ -189,7 +189,6 @@ public class BookMarkExplorer extends ViewPart {
   private Set<IFolder> fRootFolders;
 
   /* Misc. */
-  private NewsModel fNewsModel;
   private IViewSite fViewSite;
   private FolderListener fFolderListener;
   private IPartListener2 fPartListener;
@@ -521,7 +520,7 @@ public class BookMarkExplorer extends ViewPart {
     fViewSite.getActionBars().getToolBarManager().find(NEXT_SET_ACTION).update(IAction.ENABLED);
 
     /* Save the new selected Set in Preferences */
-    fNewsModel.getPersistenceLayer().getPreferencesDAO().putLong(PREF_SELECTED_BOOKMARK_SET, fSelectedBookMarkSet.getId());
+    Owl.getPersistenceService().getPreferencesDAO().putLong(PREF_SELECTED_BOOKMARK_SET, fSelectedBookMarkSet.getId());
   }
 
   private void createSearchBar(final Composite parent) {
@@ -1095,7 +1094,7 @@ public class BookMarkExplorer extends ViewPart {
         }
       }
     };
-    fNewsModel.addFolderListener(fFolderListener);
+    Owl.getListenerService().addFolderListener(fFolderListener);
 
     /* Listen for Editors activated for the linking Feature */
     fPartListener = new IPartListener2() {
@@ -1132,7 +1131,7 @@ public class BookMarkExplorer extends ViewPart {
   }
 
   private void unregisterListeners() {
-    fNewsModel.removeFolderListener(fFolderListener);
+    Owl.getListenerService().removeFolderListener(fFolderListener);
     fViewSite.getPage().removePartListener(fPartListener);
   }
 
@@ -1248,9 +1247,8 @@ public class BookMarkExplorer extends ViewPart {
   public void init(IViewSite site) throws PartInitException {
     super.init(site);
     fViewSite = site;
-    fNewsModel = NewsModel.getDefault();
     fNewsService = Controller.getDefault().getNewsService();
-    fGlobalPreferences = fNewsModel.getGlobalScope();
+    fGlobalPreferences = Owl.getPreferenceService().getGlobalScope();
     fExpandedNodes = new ArrayList<Long>();
 
     /* Sort Root-Folders by ID */
@@ -1501,7 +1499,7 @@ public class BookMarkExplorer extends ViewPart {
     }
 
     /* Add the ID of the current selected Set to make it Unique */
-    fNewsModel.getPersistenceLayer().getPreferencesDAO().putLongs(PREF_EXPANDED_NODES + fSelectedBookMarkSet, elements);
+    Owl.getPersistenceService().getPreferencesDAO().putLongs(PREF_EXPANDED_NODES + fSelectedBookMarkSet, elements);
   }
 
   private void loadState() {
@@ -1514,7 +1512,7 @@ public class BookMarkExplorer extends ViewPart {
     fFilterType = BookMarkFilter.Type.values()[fGlobalPreferences.getInteger(DefaultPreferences.BE_FILTER_TYPE)];
     fGroupingType = BookMarkGrouping.Type.values()[fGlobalPreferences.getInteger(DefaultPreferences.BE_GROUP_TYPE)];
 
-    Long lValue = fNewsModel.getPersistenceLayer().getPreferencesDAO().getLong(PREF_SELECTED_BOOKMARK_SET);
+    Long lValue = Owl.getPersistenceService().getPreferencesDAO().getLong(PREF_SELECTED_BOOKMARK_SET);
     Assert.isTrue(fRootFolders.size() > 0, "Could not find any Bookmark Set!"); //$NON-NLS-1$
     if (lValue != null)
       fSelectedBookMarkSet = new FolderReference(lValue.longValue()).resolve();
@@ -1522,7 +1520,7 @@ public class BookMarkExplorer extends ViewPart {
       fSelectedBookMarkSet = getRootFolderAt(0);
 
       /* Save this to make sure subsequent calls succeed */
-      fNewsModel.getPersistenceLayer().getPreferencesDAO().putLong(PREF_SELECTED_BOOKMARK_SET, fSelectedBookMarkSet.getId());
+      Owl.getPersistenceService().getPreferencesDAO().putLong(PREF_SELECTED_BOOKMARK_SET, fSelectedBookMarkSet.getId());
     }
 
     /* Expanded Elements */
@@ -1531,7 +1529,7 @@ public class BookMarkExplorer extends ViewPart {
 
   /* Expanded Elements - Use ID of selected Set to make it Unique */
   private void loadExpandedElements() {
-    long values[] = fNewsModel.getPersistenceLayer().getPreferencesDAO().getLongs(PREF_EXPANDED_NODES + fSelectedBookMarkSet);
+    long values[] = Owl.getPersistenceService().getPreferencesDAO().getLongs(PREF_EXPANDED_NODES + fSelectedBookMarkSet);
     if (values != null) {
       for (long element : values)
         fExpandedNodes.add(element);

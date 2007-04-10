@@ -24,7 +24,7 @@
 
 package org.rssowl.ui.internal;
 
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.events.BookMarkEvent;
 import org.rssowl.core.model.events.BookMarkListener;
 import org.rssowl.core.model.events.FolderEvent;
@@ -143,9 +143,9 @@ public class CacheService {
     };
 
     /* Add Listeners */
-    NewsModel.getDefault().addFolderListener(fFolderListener);
-    NewsModel.getDefault().addBookMarkListener(fBookMarkListener);
-    NewsModel.getDefault().addSearchMarkListener(fSearchMarkListener);
+    Owl.getListenerService().addFolderListener(fFolderListener);
+    Owl.getListenerService().addBookMarkListener(fBookMarkListener);
+    Owl.getListenerService().addSearchMarkListener(fSearchMarkListener);
   }
 
   void stopService() {
@@ -153,9 +153,9 @@ public class CacheService {
   }
 
   private void unregisterListeners() {
-    NewsModel.getDefault().removeFolderListener(fFolderListener);
-    NewsModel.getDefault().removeBookMarkListener(fBookMarkListener);
-    NewsModel.getDefault().removeSearchMarkListener(fSearchMarkListener);
+    Owl.getListenerService().removeFolderListener(fFolderListener);
+    Owl.getListenerService().removeBookMarkListener(fBookMarkListener);
+    Owl.getListenerService().removeSearchMarkListener(fSearchMarkListener);
   }
 
   /**
@@ -212,7 +212,7 @@ public class CacheService {
   }
 
   void cacheRootFolders() {
-    List<IFolder> rootFolders = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer().loadRootFolders();
+    List<IFolder> rootFolders = Owl.getPersistenceService().getApplicationLayer().loadRootFolders();
     for (IFolder rootFolder : rootFolders) {
       cache(rootFolder);
     }

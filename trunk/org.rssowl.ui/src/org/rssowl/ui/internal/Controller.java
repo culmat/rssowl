@@ -35,20 +35,18 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
+import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
-import org.rssowl.core.connection.ConnectionManager;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.connection.UnknownFeedException;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.interpreter.Interpreter;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.interpreter.ParserException;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.dao.IModelDAO;
+import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.dao.PersistenceLayer;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IConditionalGet;
 import org.rssowl.core.model.persist.IEntity;
@@ -60,7 +58,7 @@ import org.rssowl.core.model.persist.IModelTypesFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.INews.State;
-import org.rssowl.core.model.persist.pref.IPreferencesScope;
+import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.persist.search.ISearchField;
 import org.rssowl.core.model.persist.search.SearchSpecifier;
 import org.rssowl.core.util.ITask;
@@ -202,8 +200,8 @@ public class Controller {
     fReloadFeedQueue = new JobQueue("Updating Feeds", MAX_CONCURRENT_RELOAD_JOBS, true, 0);
     fSaveFeedQueue = new JobQueue("Saving Feeds", MAX_CONCURRENT_SAVE_JOBS, false, 0);
     fEntityPropertyPages = loadEntityPropertyPages();
-    fModelDAO = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
-    fAppLayer = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer();
+    fModelDAO = Owl.getPersistenceService().getModelDAO();
+    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
   }
 
   private List<EntityPropertyPageWrapper> loadEntityPropertyPages() {
@@ -397,7 +395,7 @@ public class Controller {
       properties.put(IConnectionPropertyConstants.USE_PROXY, false /* bookmark.isProxyUsed() */);
 
       /* Load the Feed */
-      final Pair<IFeed, IConditionalGet> pairResult = ConnectionManager.getDefault().reload(feedLink, monitor, properties);
+      final Pair<IFeed, IConditionalGet> pairResult = Owl.getConnectionService().reload(feedLink, monitor, properties);
 
       /* Return on Cancelation or Shutdown */
       if (monitor.isCanceled() || fShuttingDown)
@@ -411,7 +409,7 @@ public class Controller {
       /* Load the Favicon directly afterwards if required */
       if (RSSOwlUI.getFavicon(bookmark) == null) {
         try {
-          byte[] faviconBytes = ConnectionManager.getDefault().getFeedIcon(feedLink);
+          byte[] faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
           RSSOwlUI.storeImage(bookmark.getId(), faviconBytes, RSSOwlUI.BOOKMARK);
         } catch (UnknownFeedException e) {
           Activator.getDefault().getLog().log(e.getStatus());
@@ -423,7 +421,7 @@ public class Controller {
         return Status.CANCEL_STATUS;
 
       /* Merge and Save Feed */
-      if (!NewsModel.TESTING) {
+      if (!Owl.TESTING) {
         final IConditionalGet finalConditionalGet = conditionalGet;
         final boolean finalDeleteConditionalGet = deleteConditionalGet;
         fSaveFeedQueue.schedule(new TaskAdapter() {
@@ -515,7 +513,7 @@ public class Controller {
 
       /* Create new */
       if (oldConditionalGet == null)
-        return NewsModel.getDefault().getTypesFactory().createConditionalGet(ifModifiedSince, feedLink, ifNoneMatch);
+        return Owl.getModelFactory().createConditionalGet(ifModifiedSince, feedLink, ifNoneMatch);
 
       /* Else: Update old */
       oldConditionalGet.setHeaders(ifModifiedSince, ifNoneMatch);
@@ -531,23 +529,20 @@ public class Controller {
    */
   public void preUIStartup() {
 
-    /* Init Database */
-    NewsModel.getDefault().getPersistenceLayer().startup();
-
     /* Create Relations and Import Default Feeds if required */
-    if (!NewsModel.TESTING) {
+    if (!Owl.TESTING) {
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
 
           /* First check wether this action is required */
-          Boolean firstStartToken = NewsModel.getDefault().getPersistenceLayer().getPreferencesDAO().getBoolean(FIRST_START_TOKEN);
+          Boolean firstStartToken = Owl.getPersistenceService().getPreferencesDAO().getBoolean(FIRST_START_TOKEN);
           if (firstStartToken != null)
             return;
 
           onFirstStartup();
 
           /* Mark this as the first start */
-          NewsModel.getDefault().getPersistenceLayer().getPreferencesDAO().putBoolean(FIRST_START_TOKEN, true);
+          Owl.getPersistenceService().getPreferencesDAO().putBoolean(FIRST_START_TOKEN, true);
         }
       });
     }
@@ -556,17 +551,11 @@ public class Controller {
     fCacheService = new CacheService();
     fCacheService.cacheRootFolders();
 
-    /* Init Connection */
-    ConnectionManager.getDefault().startup();
-
-    /* Init Interpreter */
-    Interpreter.getDefault();
-
     /* Create the News-Service */
     fNewsService = new NewsService();
 
     /* Create the Context Service */
-    if (!NewsModel.TESTING)
+    if (!Owl.TESTING)
       fContextService = new ContextService();
   }
 
@@ -576,7 +565,7 @@ public class Controller {
   public void postUIStartup() {
 
     /* Create the Feed-Reload Service */
-    if (!NewsModel.TESTING)
+    if (!Owl.TESTING)
       fFeedReloadService = new FeedReloadService();
   }
 
@@ -601,7 +590,7 @@ public class Controller {
     fShuttingDown = true;
 
     /* Stop the Feed Reload Service */
-    if (!NewsModel.TESTING)
+    if (!Owl.TESTING)
       fFeedReloadService.stopService();
 
     /* Cancel the reload queue */
@@ -609,9 +598,6 @@ public class Controller {
 
     /* Stop the Cache-Service */
     fCacheService.stopService();
-
-    /* Shutdown Connection Manager */
-    ConnectionManager.getDefault().shutdown();
 
     return true;
   }
@@ -630,9 +616,6 @@ public class Controller {
 
     /* Shutdown ApplicationServer */
     ApplicationServer.getDefault().shutdown();
-
-    /* Shutdown DataBase */
-    NewsModel.getDefault().getPersistenceLayer().shutdown();
   }
 
   private void onFirstStartup() throws PersistenceException, InterpreterException, ParserException {
@@ -647,8 +630,8 @@ public class Controller {
   private List<ILabel> addDefaultLabels() throws PersistenceException {
     List<ILabel> labels = new ArrayList<ILabel>();
 
-    IModelTypesFactory factory = NewsModel.getDefault().getTypesFactory();
-    IModelDAO modelDAO = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
+    IModelTypesFactory factory = Owl.getModelFactory();
+    IModelDAO modelDAO = Owl.getPersistenceService().getModelDAO();
 
     ILabel label = factory.createLabel(null, "Important");
     label.setColor("159,63,63");
@@ -682,17 +665,17 @@ public class Controller {
 
     /* Import Default Feeds */
     InputStream inS = getClass().getResourceAsStream("/default_feeds.xml"); //$NON-NLS-1$;
-    List< ? extends IEntity> types = Interpreter.getDefault().importFrom(inS);
+    List< ? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
     IFolder imported = (IFolder) types.get(0);
     imported.setName("Default"); //$NON-NLS-1$
 
     /* Create Default SearchMarks */
-    IModelTypesFactory factory = NewsModel.getDefault().getTypesFactory();
+    IModelTypesFactory factory = Owl.getModelFactory();
     String newsEntityName = INews.class.getName();
 
     /* SearchCondition: New and Updated News */
     {
-      ISearchMark mark = NewsModel.getDefault().getTypesFactory().createSearchMark(null, imported, "New and Updated News");
+      ISearchMark mark = Owl.getModelFactory().createSearchMark(null, imported, "New and Updated News");
 
       ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
       factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, State.NEW);
@@ -703,7 +686,7 @@ public class Controller {
 
     /* SearchCondition: Recent News */
     {
-      ISearchMark mark = NewsModel.getDefault().getTypesFactory().createSearchMark(null, imported, "Recent News");
+      ISearchMark mark = Owl.getModelFactory().createSearchMark(null, imported, "Recent News");
 
       ISearchField field1 = factory.createSearchField(INews.AGE_IN_DAYS, newsEntityName);
       factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS_LESS_THAN, 2);
@@ -711,7 +694,7 @@ public class Controller {
 
     /* SearchCondition: News with Attachments */
     {
-      ISearchMark mark = NewsModel.getDefault().getTypesFactory().createSearchMark(null, imported, "News with Attachments");
+      ISearchMark mark = Owl.getModelFactory().createSearchMark(null, imported, "News with Attachments");
 
       ISearchField field = factory.createSearchField(INews.HAS_ATTACHMENTS, newsEntityName);
       factory.createSearchCondition(null, mark, field, SearchSpecifier.IS, true);
@@ -719,7 +702,7 @@ public class Controller {
 
     /* SearchCondition: Sticky News */
     {
-      ISearchMark mark = NewsModel.getDefault().getTypesFactory().createSearchMark(null, imported, "Sticky News");
+      ISearchMark mark = Owl.getModelFactory().createSearchMark(null, imported, "Sticky News");
 
       ISearchField field = factory.createSearchField(INews.IS_FLAGGED, newsEntityName);
       factory.createSearchCondition(null, mark, field, SearchSpecifier.IS, true);
@@ -727,8 +710,8 @@ public class Controller {
 
     /* SearchCondition: News is Labeld */
     {
-      ISearchMark mark = NewsModel.getDefault().getTypesFactory().createSearchMark(null, imported, "Labeled News");
-      IPreferencesScope preferences = NewsModel.getDefault().getEntityScope(mark);
+      ISearchMark mark = Owl.getModelFactory().createSearchMark(null, imported, "Labeled News");
+      IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(mark);
       preferences.putInteger(DefaultPreferences.BM_NEWS_GROUPING, NewsGrouping.Type.GROUP_BY_LABEL.ordinal());
 
       for (ILabel label : labels) {
@@ -737,7 +720,7 @@ public class Controller {
       }
     }
 
-    NewsModel.getDefault().getPersistenceLayer().getModelDAO().saveFolder(imported);
+    Owl.getPersistenceService().getModelDAO().saveFolder(imported);
   }
 
   /**
@@ -746,18 +729,18 @@ public class Controller {
    * @param fileName
    */
   public void importFeeds(String fileName) {
-    PersistenceLayer persistenceLayer = NewsModel.getDefault().getPersistenceLayer();
+    IPersistenceService persistenceService = Owl.getPersistenceService();
     try {
 
       /* Import from File */
       File file = new File(fileName);
       InputStream inS = new FileInputStream(file);
-      List< ? extends IEntity> types = Interpreter.getDefault().importFrom(inS);
+      List< ? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
       IFolder importedContainer = (IFolder) types.get(0);
 
       /* Load the current selected Set */
-      Long selectedFolderID = persistenceLayer.getPreferencesDAO().getLong(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET);
-      IFolder rootFolder = persistenceLayer.getModelDAO().loadFolder(selectedFolderID);
+      Long selectedFolderID = persistenceService.getPreferencesDAO().getLong(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET);
+      IFolder rootFolder = persistenceService.getModelDAO().loadFolder(selectedFolderID);
 
       /* Reparent all imported folders into selected Set */
       List<IFolder> folders = importedContainer.getFolders();
@@ -774,7 +757,7 @@ public class Controller {
       }
 
       /* Save Set */
-      NewsModel.getDefault().getPersistenceLayer().getModelDAO().saveFolder(rootFolder);
+      Owl.getPersistenceService().getModelDAO().saveFolder(rootFolder);
     } catch (Exception e) {
       Activator.getDefault().logError("importDefaults()", e); //$NON-NLS-1$
     }

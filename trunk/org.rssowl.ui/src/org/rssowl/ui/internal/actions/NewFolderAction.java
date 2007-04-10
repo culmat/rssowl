@@ -48,10 +48,9 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.rssowl.core.interpreter.Interpreter;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
+import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.dao.PersistenceLayer;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.reference.FolderReference;
@@ -72,7 +71,7 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
   private Shell fShell;
   private IFolder fParent;
   private boolean fRootMode;
-  private PersistenceLayer fPersist;
+  private IPersistenceService fPersist;
 
   private class NewFolderDialog extends TitleAreaDialog {
     private Text fNameInput;
@@ -185,7 +184,7 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
   public NewFolderAction(Shell shell, IFolder parent) {
     fShell = shell;
     fParent = parent;
-    fPersist = NewsModel.getDefault().getPersistenceLayer();
+    fPersist = Owl.getPersistenceService();
   }
 
   /**
@@ -228,7 +227,7 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
 
       /* Create the Folder */
       if (fRootMode || parent != null) {
-        IFolder folder = Interpreter.getDefault().getTypesFactory().createFolder(parent, name);
+        IFolder folder = Owl.getInterpreter().getTypesFactory().createFolder(parent, name);
 
         /* Copy all Properties from Parent into this Mark */
         if (parent != null) {
