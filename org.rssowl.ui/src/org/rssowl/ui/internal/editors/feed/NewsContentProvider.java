@@ -306,7 +306,7 @@ public class NewsContentProvider implements ITreeContentProvider {
               return;
 
             /* Ask Group */
-            if (fGrouping.needsRefresh(INews.class, events)) {
+            if (fGrouping.needsRefresh(INews.class, events, false)) {
               fFeedView.refresh(true, false);
               return;
             }
@@ -372,7 +372,7 @@ public class NewsContentProvider implements ITreeContentProvider {
             }
 
             /* Ask Group */
-            if (fGrouping.needsRefresh(INews.class, events))
+            if (fGrouping.needsRefresh(INews.class, events, true))
               fFeedView.refresh(false, false);
 
             /* News got Updated */
@@ -428,7 +428,7 @@ public class NewsContentProvider implements ITreeContentProvider {
             }
 
             /* Ask Group */
-            if (fGrouping.needsRefresh(INews.class, events))
+            if (fGrouping.needsRefresh(INews.class, events, false))
               fFeedView.refresh(false, false);
           }
         });

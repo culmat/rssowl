@@ -107,7 +107,7 @@ public class NewsGrouping {
 
     /**
      * Returns a human-readable Name of this enum-value.
-     * 
+     *
      * @return A human-readable Name of this enum-value.
      */
     public String getName() {
@@ -186,7 +186,7 @@ public class NewsGrouping {
 
     /**
      * Returns a human-readable Name of this enum-value.
-     * 
+     *
      * @return A human-readable Name of this enum-value.
      */
     public String getName() {
@@ -204,14 +204,14 @@ public class NewsGrouping {
 
   /**
    * Set the Type of grouping as defined in the Type Enum
-   * 
+   *
    * @param type The type of grouping.
    */
   public void setType(Type type) {
     fType = type;
   }
 
-  boolean needsRefresh(Class< ? extends IEntity> entity, Set< ? extends ModelEvent> events) {
+  boolean needsRefresh(Class< ? extends IEntity> entity, Set< ? extends ModelEvent> events, boolean isUpdate) {
 
     /* In case the Grouping is not active at all */
     if (fType == Type.NO_GROUPING)
@@ -235,6 +235,8 @@ public class NewsGrouping {
         return ModelUtils.isCategoryChange(events);
       else if (fType == Type.GROUP_BY_LABEL)
         return ModelUtils.isLabelChange(events);
+      else if (fType == Type.GROUP_BY_FEED && isUpdate) //TODO To be reconsidered when News can be reparented
+        return false;
 
       return true;
     }
@@ -244,7 +246,7 @@ public class NewsGrouping {
 
   /**
    * Group the Input based on the selected Type
-   * 
+   *
    * @param input The Input to Group.
    * @return The Input grouped in an array of EntityGroup, as specified by the
    * Type of Group.
