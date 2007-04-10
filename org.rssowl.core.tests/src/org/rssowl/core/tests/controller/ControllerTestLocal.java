@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.internal.persist.Feed;
@@ -58,10 +58,10 @@ public class ControllerTestLocal {
    */
   @Before
   public void setUp() throws Exception {
-    fDao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
-    fAppLayer = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer();
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
-    NewsModel.getDefault().getPersistenceLayer().getModelSearch().shutdown();
+    fDao = Owl.getPersistenceService().getModelDAO();
+    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
+    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().getModelSearch().shutdown();
     Controller.getDefault().getNewsService().testDirtyShutdown();
   }
 
@@ -96,7 +96,7 @@ public class ControllerTestLocal {
     assertEquals(0, getNewCount(feed));
     assertEquals(0, getStickyCount(feed));
 
-    NewsModel.getDefault().getTypesFactory().createNews(null, feed, new Date()); //$NON-NLS-1$
+    Owl.getModelFactory().createNews(null, feed, new Date()); //$NON-NLS-1$
     feed = fDao.saveFeed(feed);
 
     assertEquals(1, getUnreadCount(feed));
@@ -137,10 +137,10 @@ public class ControllerTestLocal {
     /* Simulate Shutdown */
     service.stopService();
 
-    NewsModel.getDefault().getTypesFactory().createNews(null, feed, new Date()); //$NON-NLS-1$
+    Owl.getModelFactory().createNews(null, feed, new Date()); //$NON-NLS-1$
     feed = fDao.saveFeed(feed);
 
-    NewsModel.getDefault().getTypesFactory().createNews(null, feed, new Date()); //$NON-NLS-1$
+    Owl.getModelFactory().createNews(null, feed, new Date()); //$NON-NLS-1$
     feed = fDao.saveFeed(feed);
 
     assertEquals(2, getUnreadCount(feed));
@@ -163,15 +163,15 @@ public class ControllerTestLocal {
     assertEquals(2, getStickyCount(feed));
 
     /* Simulate Dirty Shutdown */
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
 
     feed = new Feed(new URI("http://www.rssowl.org/rssowl2dg/tests/manager/rss_2_0.xml")); //$NON-NLS-1$
     feed = fDao.saveFeed(feed);
 
-    NewsModel.getDefault().getTypesFactory().createNews(null, feed, new Date()); //$NON-NLS-1$
+    Owl.getModelFactory().createNews(null, feed, new Date()); //$NON-NLS-1$
     feed = fDao.saveFeed(feed);
 
-    NewsModel.getDefault().getTypesFactory().createNews(null, feed, new Date()); //$NON-NLS-1$
+    Owl.getModelFactory().createNews(null, feed, new Date()); //$NON-NLS-1$
     feed = fDao.saveFeed(feed);
 
     feed.getNews().get(0).setFlagged(true);
@@ -196,7 +196,7 @@ public class ControllerTestLocal {
     IFeed feed = new Feed(new URI("http://www.feed.com"));
     feed = fDao.saveFeed(feed);
 
-    INews news1 = NewsModel.getDefault().getTypesFactory().createNews(null, feed, new Date());
+    INews news1 = Owl.getModelFactory().createNews(null, feed, new Date());
     news1.setTitle("News Title #1");
     news1.setLink(new URI("http://www.link.com"));
     news1.setFlagged(true);
@@ -226,7 +226,7 @@ public class ControllerTestLocal {
     IFeed feed = new Feed(new URI("http://www.feed.com"));
     feed = fDao.saveFeed(feed);
 
-    INews news1 = NewsModel.getDefault().getTypesFactory().createNews(null, feed, new Date());
+    INews news1 = Owl.getModelFactory().createNews(null, feed, new Date());
     news1.setTitle("News Title #1");
     news1.setLink(new URI("http://www.link.com"));
     news1.setState(INews.State.READ);
@@ -266,7 +266,7 @@ public class ControllerTestLocal {
     IFeed feed = new Feed(new URI("http://www.feed.com"));
     feed = fDao.saveFeed(feed);
 
-    INews news1 = NewsModel.getDefault().getTypesFactory().createNews(null, feed, new Date());
+    INews news1 = Owl.getModelFactory().createNews(null, feed, new Date());
     news1.setTitle("News Title #1");
     news1.setLink(new URI("http://www.link.com"));
     news1.setFlagged(true);
@@ -295,7 +295,7 @@ public class ControllerTestLocal {
     IFeed feed = new Feed(new URI("http://www.feed.com"));
     feed = fDao.saveFeed(feed);
 
-    INews news1 = NewsModel.getDefault().getTypesFactory().createNews(null, feed, new Date());
+    INews news1 = Owl.getModelFactory().createNews(null, feed, new Date());
     news1.setTitle("News Title #1");
     news1.setLink(new URI("http://www.link.com"));
     news1.setState(INews.State.READ);
@@ -337,7 +337,7 @@ public class ControllerTestLocal {
     IFeed feed = new Feed(new URI("http://www.feed.com"));
     feed = fDao.saveFeed(feed);
 
-    INews news1 = NewsModel.getDefault().getTypesFactory().createNews(null, feed, new Date());
+    INews news1 = Owl.getModelFactory().createNews(null, feed, new Date());
     news1.setTitle("News Title #1");
     news1.setLink(new URI("http://www.link.com"));
     news1.setState(INews.State.UNREAD);

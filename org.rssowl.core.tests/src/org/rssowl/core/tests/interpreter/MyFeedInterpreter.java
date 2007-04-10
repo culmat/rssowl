@@ -27,7 +27,7 @@ package org.rssowl.core.tests.interpreter;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.rssowl.core.interpreter.Interpreter;
+import org.rssowl.core.Owl;
 import org.rssowl.core.interpreter.IFormatInterpreter;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.model.persist.IFeed;
@@ -84,7 +84,7 @@ public class MyFeedInterpreter implements IFormatInterpreter {
     feed.setLanguage(lang.getValue());
 
     Element newsElement = child.getChild("news"); //$NON-NLS-1$
-    INews news = Interpreter.getDefault().getTypesFactory().createNews(feed);
+    INews news = Owl.getInterpreter().getTypesFactory().createNews(feed);
     news.setTitle(newsElement.getChildText("titel")); //$NON-NLS-1$
     try {
       news.setLink(new URI(newsElement.getChildText("verweis"))); //$NON-NLS-1$

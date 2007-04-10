@@ -31,16 +31,15 @@ import static org.junit.Assert.assertNull;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Platform;
 import org.junit.Test;
+import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
-import org.rssowl.core.connection.ConnectionManager;
 import org.rssowl.core.connection.IConditionalGetCompatible;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
+import org.rssowl.core.connection.IConnectionService;
 import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.connection.auth.ICredentials;
 import org.rssowl.core.connection.auth.ICredentialsProvider;
 import org.rssowl.core.connection.auth.IProxyCredentials;
-import org.rssowl.core.interpreter.Interpreter;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.internal.persist.Feed;
 import org.rssowl.core.model.persist.IConditionalGet;
@@ -69,7 +68,7 @@ public class ConnectionTests {
   @Test
   @SuppressWarnings("nls")
   public void testProxyCredentialProvider() throws Exception {
-    ConnectionManager conManager = ConnectionManager.getDefault();
+    IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rdf.xml");
     IFeed feed = new Feed(feedUrl);
 
@@ -90,7 +89,7 @@ public class ConnectionTests {
   @Test
   @SuppressWarnings("nls")
   public void testProtectedFeed() throws Exception {
-    ConnectionManager conManager = ConnectionManager.getDefault();
+    IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rss.xml");
     ICredentialsProvider credProvider = conManager.getCredentialsProvider(feedUrl);
 
@@ -124,7 +123,7 @@ public class ConnectionTests {
     InputStream inS = conManager.openHTTPStream(feed.getLink(), null);
     assertNotNull(inS);
 
-    Interpreter.getDefault().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed);
     assertEquals("RSS 2.0", feed.getFormat());
   }
 
@@ -136,14 +135,14 @@ public class ConnectionTests {
   @Test
   @SuppressWarnings("nls")
   public void testHTTPFeed() throws Exception {
-    ConnectionManager conManager = ConnectionManager.getDefault();
+    IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/rss_2_0.xml");
     IFeed feed = new Feed(feedUrl);
 
     InputStream inS = conManager.openHTTPStream(feed.getLink(), null);
     assertNotNull(inS);
 
-    Interpreter.getDefault().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed);
     assertEquals("RSS 2.0", feed.getFormat());
   }
 
@@ -155,14 +154,14 @@ public class ConnectionTests {
   @Test
   @SuppressWarnings("nls")
   public void testHTTPSFeed() throws Exception {
-    ConnectionManager conManager = ConnectionManager.getDefault();
+    IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("https://sourceforge.net/export/rss2_projnews.php?group_id=141424&rss_fulltext=1");
     IFeed feed = new Feed(feedUrl);
 
     InputStream inS = conManager.openHTTPStream(feed.getLink(), null);
     assertNotNull(inS);
 
-    Interpreter.getDefault().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed);
     assertEquals("RSS 2.0", feed.getFormat());
   }
 
@@ -175,7 +174,7 @@ public class ConnectionTests {
   @SuppressWarnings("nls")
   public void testFILEFeed() throws Exception {
     URL pluginLocation = FileLocator.toFileURL(Platform.getBundle("org.rssowl.core.tests").getEntry("/"));
-    ConnectionManager conManager = ConnectionManager.getDefault();
+    IConnectionService conManager = Owl.getConnectionService();
     URL feedUrl = pluginLocation.toURI().resolve("data/interpreter/feed_rss.xml").toURL();
     IFeed feed = new Feed(feedUrl.toURI());
 
@@ -192,7 +191,7 @@ public class ConnectionTests {
   @Test
   @SuppressWarnings("nls")
   public void testConditionalGet() throws Exception {
-    ConnectionManager conManager = ConnectionManager.getDefault();
+    IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("http://rss.slashdot.org/Slashdot/slashdot/to");
     IFeed feed = new Feed(feedUrl);
     NotModifiedException e = null;
@@ -206,7 +205,7 @@ public class ConnectionTests {
       ifModifiedSince = ((IConditionalGetCompatible) inS).getIfModifiedSince();
       ifNoneMatch = ((IConditionalGetCompatible) inS).getIfNoneMatch();
     }
-    IConditionalGet conditionalGet = NewsModel.getDefault().getTypesFactory().createConditionalGet(ifModifiedSince, feedUrl, ifNoneMatch);
+    IConditionalGet conditionalGet = Owl.getModelFactory().createConditionalGet(ifModifiedSince, feedUrl, ifNoneMatch);
 
     Map<Object, Object> conProperties = new HashMap<Object, Object>();
     ifModifiedSince = conditionalGet.getIfModifiedSince();
@@ -234,7 +233,7 @@ public class ConnectionTests {
   @Test
   @SuppressWarnings("nls")
   public void testAuthCredentialProviderContribution() throws Exception {
-    ConnectionManager conManager = ConnectionManager.getDefault();
+    IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rdf.xml");
     IFeed feed = new Feed(feedUrl);
     AuthenticationRequiredException e = null;
@@ -254,11 +253,11 @@ public class ConnectionTests {
    */
   @Test
   public void testCredentialsDeleted() throws Exception {
-    ConnectionManager conManager = ConnectionManager.getDefault();
+    IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rdf.xml");
     IFeed feed = new Feed(feedUrl);
 
-    IModelDAO dao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
+    IModelDAO dao = Owl.getPersistenceService().getModelDAO();
     feed = dao.saveFeed(feed);
 
     ICredentials authCreds = new ICredentials() {

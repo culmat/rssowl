@@ -30,7 +30,7 @@ import static org.junit.Assert.assertNotNull;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Before;
 import org.junit.Test;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.internal.persist.BookMark;
 import org.rssowl.core.model.internal.persist.Feed;
@@ -57,8 +57,8 @@ public class MiscUITests {
    */
   @Before
   public void setUp() throws Exception {
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
-    NewsModel.getDefault().getPersistenceLayer().getModelSearch().shutdown();
+    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().getModelSearch().shutdown();
   }
 
   /**
@@ -66,7 +66,7 @@ public class MiscUITests {
    */
   @Test
   public void testFavicon() throws Exception {
-    IModelDAO dao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
+    IModelDAO dao = Owl.getPersistenceService().getModelDAO();
 
     /* Delete previously stored favicons */
     for (int i = 0; i < 5; i++)

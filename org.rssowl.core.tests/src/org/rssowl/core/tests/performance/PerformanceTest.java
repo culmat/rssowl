@@ -32,9 +32,8 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.junit.Before;
 import org.junit.Test;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.interpreter.Interpreter;
-import org.rssowl.core.model.NewsModel;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
@@ -109,11 +108,11 @@ public class PerformanceTest {
   @SuppressWarnings("nls")
   @Before
   public void setUp() throws Exception {
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
-    fModelSearch = NewsModel.getDefault().getPersistenceLayer().getModelSearch();
+    Owl.getPersistenceService().recreateSchema();
+    fModelSearch = Owl.getPersistenceService().getModelSearch();
     fModelSearch.shutdown();
-    fDao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
-    fAppLayer = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer();
+    fDao = Owl.getPersistenceService().getModelDAO();
+    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
     fPluginLocation = FileLocator.toFileURL(Platform.getBundle("org.rssowl.core.tests").getEntry("/")).toURI();
     fController = Controller.getDefault();
   }
@@ -132,11 +131,11 @@ public class PerformanceTest {
     System.out.println("Saving and Indexing " + FEEDS + " Feeds [Cold - " + 1 + " Jobs] took: " + TestUtils.executeAndWait(tasks, 1) + "ms");
 
     /* Warm-Start: Save and Index 216 Feeds */
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getSaveAndIndexFeedsTasks(ex);
     long l1 = TestUtils.executeAndWait(tasks, 1);
 
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getSaveAndIndexFeedsTasks(ex);
     long l2 = TestUtils.executeAndWait(tasks, 1);
 
@@ -144,11 +143,11 @@ public class PerformanceTest {
 
     /* Warm-Start: Save 216 Feeds (to calculate plain index time) */
     fModelSearch.shutdown();
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getSaveAndIndexFeedsTasks(ex);
     long l3 = TestUtils.executeAndWait(tasks, 1);
 
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getSaveAndIndexFeedsTasks(ex);
     long l4 = TestUtils.executeAndWait(tasks, 1);
 
@@ -188,7 +187,7 @@ public class PerformanceTest {
   public void searchNews() throws Exception {
     final List<Exception> ex = new ArrayList<Exception>();
     final int[] results = new int[] { 0 };
-    final IModelTypesFactory factory = NewsModel.getDefault().getTypesFactory();
+    final IModelTypesFactory factory = Owl.getModelFactory();
     List<ITask> tasks = new ArrayList<ITask>();
     fModelSearch.startup();
 
@@ -223,7 +222,7 @@ public class PerformanceTest {
     System.out.println("Searching [States (" + results[0] + " results, Occur.SHOULD, Cold)] in " + FEEDS + " Feeds took: " + l1 + "ms");
 
     /* Recreate */
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     fModelSearch.shutdown();
     fModelSearch.startup();
     saveFeedsHelper();
@@ -248,7 +247,7 @@ public class PerformanceTest {
     System.out.println("Searching [Entire News (" + results[0] + " results, Occur.SHOULD, Cold)] in " + FEEDS + " Feeds took: " + l2 + "ms");
 
     /* Recreate */
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     fModelSearch.shutdown();
     fModelSearch.startup();
     saveFeedsHelper();
@@ -282,7 +281,7 @@ public class PerformanceTest {
     System.out.println("Searching [Title, Author, Categories (" + results[0] + " results, Occur.SHOULD, Cold)] in " + FEEDS + " Feeds took: " + l3 + "ms");
 
     /* Recreate */
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     fModelSearch.shutdown();
     fModelSearch.startup();
     saveFeedsHelper();
@@ -316,7 +315,7 @@ public class PerformanceTest {
     System.out.println("Searching [Title, Author, Categories (" + results[0] + " results, Occur.MUST, Cold)] in " + FEEDS + " Feeds took: " + l4 + "ms");
 
     /* Recreate */
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     fModelSearch.shutdown();
     fModelSearch.startup();
     saveFeedsHelper();
@@ -347,7 +346,7 @@ public class PerformanceTest {
     System.out.println("Searching [Date Range (" + results[0] + " results, Occur.MUST, Cold)] in " + FEEDS + " Feeds took: " + l5 + "ms");
 
     /* Recreate */
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     fModelSearch.shutdown();
     fModelSearch.startup();
     saveFeedsHelper();
@@ -394,11 +393,11 @@ public class PerformanceTest {
     /* Cold-Start: Interpret 216 Feeds */
     System.out.println("Reloading Feeds (No Retention): " + FEEDS + " Feeds [Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getReloadFeedsTasks(false);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getReloadFeedsTasks(false);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -416,11 +415,11 @@ public class PerformanceTest {
     /* Cold-Start: Interpret 216 Feeds */
     System.out.println("Reloading Feeds (With Retention): " + FEEDS + " Feeds [Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getReloadFeedsTasks(true);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getReloadFeedsTasks(true);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -456,7 +455,7 @@ public class PerformanceTest {
         IBookMark bookmark = new BookMark(null, rootFolder, new FeedLinkReference(feed.getLink()), "Bookmark");
 
         if (withRetention)
-          NewsModel.getDefault().getEntityScope(bookmark).putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
+          Owl.getPreferenceService().getEntityScope(bookmark).putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
 
         rootFolder.addMark(bookmark);
         fDao.saveFolder(rootFolder);
@@ -502,11 +501,11 @@ public class PerformanceTest {
     System.out.println("Setting news state (Update Equivalent): " + FEEDS + " Feeds [Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
     /* Warm-Start: Interpret 216 Feeds */
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getSetNewsStateTask(true);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getSetNewsStateTask(true);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -559,11 +558,11 @@ public class PerformanceTest {
     System.out.println("Setting news state (Ignore Equivalent): " + FEEDS + " Feeds [Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
     /* Warm-Start: Interpret 216 Feeds */
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getSetNewsStateTask(false);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getSetNewsStateTask(false);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -589,7 +588,7 @@ public class PerformanceTest {
             IFeed feed = new Feed(feedLink);
 
             InputStream inS = loadFileProtocol(feed.getLink());
-            Interpreter.getDefault().interpret(inS, feed);
+            Owl.getInterpreter().interpret(inS, feed);
           } catch (Exception e) {
             ex.add(e);
           }
@@ -624,11 +623,11 @@ public class PerformanceTest {
     System.out.println("Saving " + FEEDS + " Feeds [Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
     /* Warm-Start: Save 216 Feeds */
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getSaveFeedsTasks(ex);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getSaveFeedsTasks(ex);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -869,11 +868,11 @@ public class PerformanceTest {
     System.out.println("Deleting " + FEEDS + " Feeds [Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
     /* Warm-Start: Delete 216 Feeds */
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getDeleteFeedsTasks(ex);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getDeleteFeedsTasks(ex);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -916,11 +915,11 @@ public class PerformanceTest {
     System.out.println("Updating " + FEEDS + " Feeds [Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
     /* Warm-Start: Update 216 Feeds */
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getUpdateFeedsTasks(ex);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getUpdateFeedsTasks(ex);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -974,7 +973,7 @@ public class PerformanceTest {
               feed.getNews().get(0).setDescription("Some new news description");
             }
 
-            NewsModel.getDefault().getTypesFactory().createNews(null, feed, new Date()).setTitle("The New News");
+            Owl.getModelFactory().createNews(null, feed, new Date()).setTitle("The New News");
 
             // Uncomment this line and comment out the next two to test the
             // performance of setting the id on a new entity to force
@@ -1008,11 +1007,11 @@ public class PerformanceTest {
     System.out.println("Saving/Resolving " + FEEDS / 2 + " Feeds [Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
     /* Warm-Start: Save and Resolve 216 Feeds */
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getResolveSaveFeedsTasks(ex);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
     tasks = getResolveSaveFeedsTasks(ex);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
@@ -1123,7 +1122,7 @@ public class PerformanceTest {
         IFeed feed = new Feed(feedLink);
 
         InputStream inS = loadFileProtocol(feed.getLink());
-        Interpreter.getDefault().interpret(inS, feed);
+        Owl.getInterpreter().interpret(inS, feed);
 
         feeds.add(feed);
       } catch (Exception e) {

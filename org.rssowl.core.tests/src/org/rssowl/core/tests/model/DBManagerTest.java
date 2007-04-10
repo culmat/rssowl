@@ -33,7 +33,7 @@ import static org.junit.Assert.fail;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
@@ -132,11 +132,11 @@ public class DBManagerTest {
    */
   @Before
   public void setUp() throws Exception {
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
-    NewsModel.getDefault().getPersistenceLayer().getModelSearch().shutdown();
-    fTypesFactory = NewsModel.getDefault().getTypesFactory();
-    fModelDAO = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
-    fAppLayer = NewsModel.getDefault().getPersistenceLayer().getApplicationLayer();
+    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().getModelSearch().shutdown();
+    fTypesFactory = Owl.getModelFactory();
+    fModelDAO = Owl.getPersistenceService().getModelDAO();
+    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
     fDb = DBManager.getDefault().getObjectContainer();
   }
   
@@ -269,7 +269,7 @@ public class DBManagerTest {
           assertTrue(updatedJohn[0].isIdentical(dbPerson));
         }
       };
-      NewsModel.getDefault().addPersonListener(personListener);
+      Owl.getListenerService().addPersonListener(personListener);
       long savedJohnId = fModelDAO.savePerson(initialJohn).getId().longValue();
       System.gc();
       IPerson savedJohn = fModelDAO.loadPerson(savedJohnId);
@@ -278,11 +278,11 @@ public class DBManagerTest {
       URI oldJohnEmail = savedJohn.getEmail();
       IPerson dan = createPersonDan(feed);
       dan.setEmail(oldJohnEmail);
-      NewsModel.getDefault().removePersonListener(personListener);
+      Owl.getListenerService().removePersonListener(personListener);
       fModelDAO.savePerson(dan);
       savedJohn.setEmail(createURI("anewemailaddress@gmail.com"));
       updatedJohn[0] = (Person) savedJohn;
-      NewsModel.getDefault().addPersonListener(personListener);
+      Owl.getListenerService().addPersonListener(personListener);
       fModelDAO.savePerson(savedJohn);
       assertTrue(personAddedCalled[0]);
       assertTrue(personUpdatedCalled[0]);
@@ -292,7 +292,7 @@ public class DBManagerTest {
       fail(e.getMessage());
     } finally {
       if (personListener != null) {
-        NewsModel.getDefault().removePersonListener(personListener);
+        Owl.getListenerService().removePersonListener(personListener);
       }
     }
 
@@ -511,7 +511,7 @@ public class DBManagerTest {
           assertTrue(updatedLabel[0].isIdentical(dbLabel));
         }
       };
-      NewsModel.getDefault().addLabelListener(labelListener);
+      Owl.getListenerService().addLabelListener(labelListener);
       long savedLabelId = fModelDAO.saveLabel(initialLabel).getId().longValue();
       System.gc();
       ILabel dbLabel = fModelDAO.loadLabel(savedLabelId);
@@ -527,7 +527,7 @@ public class DBManagerTest {
       fail(e.getMessage());
     } finally {
       if (labelListener != null) {
-        NewsModel.getDefault().removeLabelListener(labelListener);
+        Owl.getListenerService().removeLabelListener(labelListener);
       }
     }
 
@@ -575,7 +575,7 @@ public class DBManagerTest {
           assertTrue(updatedCategory[0].isIdentical(dbCategory));
         }
       };
-      NewsModel.getDefault().addCategoryListener(categoryListener);
+      Owl.getListenerService().addCategoryListener(categoryListener);
       fModelDAO.saveCategory(initialCategory[0]);
       assertTrue(categoryAddedCalled[0]);
       assertTrue(categoryUpdatedCalled[0]);
@@ -584,7 +584,7 @@ public class DBManagerTest {
       fail(e.getMessage());
     } finally {
       if (categoryListener != null) {
-        NewsModel.getDefault().removeCategoryListener(categoryListener);
+        Owl.getListenerService().removeCategoryListener(categoryListener);
       }
     }
   }
@@ -628,7 +628,7 @@ public class DBManagerTest {
           }
         }
       };
-      NewsModel.getDefault().addFolderListener(folderListener);
+      Owl.getListenerService().addFolderListener(folderListener);
       fModelDAO.saveFolder(initialFolder);
       assertTrue(folderAddedCalled[0]);
       assertTrue(folderUpdatedCalled[0]);
@@ -637,7 +637,7 @@ public class DBManagerTest {
       fail(e.getMessage());
     } finally {
       if (folderListener != null) {
-        NewsModel.getDefault().removeFolderListener(folderListener);
+        Owl.getListenerService().removeFolderListener(folderListener);
       }
     }
   }
@@ -701,7 +701,7 @@ public class DBManagerTest {
           }
         }
       };
-      NewsModel.getDefault().addFolderListener(folderListener);
+      Owl.getListenerService().addFolderListener(folderListener);
       fModelDAO.saveFolder(initialFolder[0]);
       assertTrue(folderAddedCalled[0]);
       assertTrue(folderUpdatedCalled[0]);
@@ -710,7 +710,7 @@ public class DBManagerTest {
       fail(e.getMessage());
     } finally {
       if (folderListener != null) {
-        NewsModel.getDefault().removeFolderListener(folderListener);
+        Owl.getListenerService().removeFolderListener(folderListener);
       }
     }
   }
@@ -743,13 +743,13 @@ public class DBManagerTest {
           }
         }
       };
-      NewsModel.getDefault().addFolderListener(folderListener);
+      Owl.getListenerService().addFolderListener(folderListener);
       fModelDAO.saveFolder(initialFolder[0]);
     } catch (PersistenceException e) {
       fail(e.getMessage());
     } finally {
       if (folderListener != null) {
-        NewsModel.getDefault().removeFolderListener(folderListener);
+        Owl.getListenerService().removeFolderListener(folderListener);
       }
     }
   }
@@ -852,7 +852,7 @@ public class DBManagerTest {
           assertTrue(updatedBookMark[0].isIdentical(dbBookMark));
         }
       };
-      NewsModel.getDefault().addBookMarkListener(bookMarkListener);
+      Owl.getListenerService().addBookMarkListener(bookMarkListener);
       fModelDAO.saveBookMark(initialBookMark);
       assertTrue(bookMarkAddedCalled[0]);
       assertTrue(bookMarkUpdatedCalled[0]);
@@ -862,7 +862,7 @@ public class DBManagerTest {
 
     finally {
       if (bookMarkListener != null) {
-        NewsModel.getDefault().removeBookMarkListener(bookMarkListener);
+        Owl.getListenerService().removeBookMarkListener(bookMarkListener);
       }
     }
   }
@@ -903,7 +903,7 @@ public class DBManagerTest {
           assertTrue(updatedSearchMark[0].isIdentical(dbSearchMark));
         }
       };
-      NewsModel.getDefault().addSearchMarkListener(searchMarkListener);
+      Owl.getListenerService().addSearchMarkListener(searchMarkListener);
       fModelDAO.saveSearchMark(initialSearchMark);
       assertTrue(searchMarkAddedCalled[0]);
       assertTrue(searchMarkUpdatedCalled[0]);
@@ -913,7 +913,7 @@ public class DBManagerTest {
 
     finally {
       if (searchMarkListener != null) {
-        NewsModel.getDefault().removeSearchMarkListener(searchMarkListener);
+        Owl.getListenerService().removeSearchMarkListener(searchMarkListener);
       }
     }
   }
@@ -958,11 +958,11 @@ public class DBManagerTest {
           assertEquals(1, attachmentsSize);
         }
       };
-      NewsModel.getDefault().addNewsListener(newsListener);
+      Owl.getListenerService().addNewsListener(newsListener);
       fModelDAO.saveNews(newsRef.resolve());
     } finally {
       if (newsListener != null)
-        NewsModel.getDefault().removeNewsListener(newsListener);
+        Owl.getListenerService().removeNewsListener(newsListener);
     }
   }
 
@@ -1020,7 +1020,7 @@ public class DBManagerTest {
           assertTrue(updatedNews[0].isIdentical(dbNews));
         }
       };
-      NewsModel.getDefault().addNewsListener(newsListener);
+      Owl.getListenerService().addNewsListener(newsListener);
       fModelDAO.saveNews(initialNews);
       assertTrue(NewsAddedCalled[0]);
       assertTrue(NewsUpdatedCalled[0]);
@@ -1029,7 +1029,7 @@ public class DBManagerTest {
       fail(e.getMessage());
     } finally {
       if (newsListener != null) {
-        NewsModel.getDefault().removeNewsListener(newsListener);
+        Owl.getListenerService().removeNewsListener(newsListener);
       }
     }
   }
@@ -1354,7 +1354,7 @@ public class DBManagerTest {
           assertTrue(updatedFeed[0].isIdentical(dbFeed));
         }
       };
-      NewsModel.getDefault().addFeedListener(feedListener);
+      Owl.getListenerService().addFeedListener(feedListener);
       fModelDAO.saveFeed(initialFeed);
       assertTrue(feedAddedCalled[0]);
       assertTrue(feedUpdatedCalled[0]);
@@ -1363,7 +1363,7 @@ public class DBManagerTest {
       fail(e.getMessage());
     } finally {
       if (feedListener != null) {
-        NewsModel.getDefault().removeFeedListener(feedListener);
+        Owl.getListenerService().removeFeedListener(feedListener);
       }
     }
   }
@@ -1419,14 +1419,14 @@ public class DBManagerTest {
         }
 
       };
-      NewsModel.getDefault().addFeedListener(feedListener);
+      Owl.getListenerService().addFeedListener(feedListener);
       fModelDAO.saveFeed(initialFeed);
       fModelDAO.deleteFeed(new FeedReference(updatedFeed[0].getId()));
     } catch (PersistenceException e) {
       fail(e.getMessage());
     } finally {
       if (feedListener != null) {
-        NewsModel.getDefault().removeFeedListener(feedListener);
+        Owl.getListenerService().removeFeedListener(feedListener);
       }
     }
   }
@@ -1468,18 +1468,18 @@ public class DBManagerTest {
           fail("No events should have been fired, but NewsListener#newsUpdated() was called.");
         }
       };
-      NewsModel.getDefault().addNewsListener(newsListener);
+      Owl.getListenerService().addNewsListener(newsListener);
       List<INews> newsList = new ArrayList<INews>();
       newsList.add(news);
       fAppLayer.setNewsState(newsList, State.NEW, true, false);
-      NewsModel.getDefault().removeNewsListener(newsListener);
+      Owl.getListenerService().removeNewsListener(newsListener);
       fModelDAO.deleteNews(new NewsReference(news.getId()));
       fModelDAO.deleteFeed(new FeedReference(feed.getId()));
     } catch (PersistenceException e) {
       fail(e.getMessage());
     } finally {
       if (newsListener != null) {
-        NewsModel.getDefault().removeNewsListener(newsListener);
+        Owl.getListenerService().removeNewsListener(newsListener);
       }
     }
   }
@@ -1636,7 +1636,7 @@ public class DBManagerTest {
         newsRef[0] = new NewsReference(events.iterator().next().getEntity().getId());
       }
     };
-    NewsModel.getDefault().addNewsListener(newsAdapter);
+    Owl.getListenerService().addNewsListener(newsAdapter);
 
     final News initialNews1 = (News) createNews(feed1);
     initialNews1.setGuid(null);
@@ -1672,7 +1672,7 @@ public class DBManagerTest {
       fail(e.getMessage());
       return;
     } finally {
-      NewsModel.getDefault().removeNewsListener(newsAdapter);
+      Owl.getListenerService().removeNewsListener(newsAdapter);
     }
     try {
       List<INews> newsList1 = new ArrayList<INews>();
@@ -1781,7 +1781,7 @@ public class DBManagerTest {
         newsRef[0] = new NewsReference(events.iterator().next().getEntity().getId());
       }
     };
-    NewsModel.getDefault().addNewsListener(newsAdapter);
+    Owl.getListenerService().addNewsListener(newsAdapter);
     INews newsItem1 = null;
     NewsReference newsRef1 = null;
 
@@ -1809,7 +1809,7 @@ public class DBManagerTest {
       fail(e.getMessage());
       return;
     } finally {
-      NewsModel.getDefault().removeNewsListener(newsAdapter);
+      Owl.getListenerService().removeNewsListener(newsAdapter);
     }
     try {
       List<INews> newsList1 = new ArrayList<INews>();

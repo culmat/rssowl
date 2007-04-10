@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 import org.eclipse.jface.viewers.Viewer;
 import org.junit.Before;
 import org.junit.Test;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
@@ -82,10 +82,10 @@ public class FolderMarkGroupFilterTest {
   @Before
   public void setUp() throws Exception {
     Controller.getDefault().getNewsService().testDirtyShutdown();
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
-    NewsModel.getDefault().getPersistenceLayer().getModelSearch().shutdown();
-    fFactory = NewsModel.getDefault().getTypesFactory();
-    fDao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
+    Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().getModelSearch().shutdown();
+    fFactory = Owl.getModelFactory();
+    fDao = Owl.getPersistenceService().getModelDAO();
     fGrouping = new BookMarkGrouping();
     fFiltering = new BookMarkFilter();
 

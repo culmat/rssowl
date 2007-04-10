@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IAttachment;
@@ -79,13 +79,13 @@ public class ModelSearchTest {
    */
   @Before
   public void setUp() throws Exception {
-    fModelSearch = NewsModel.getDefault().getPersistenceLayer().getModelSearch();
-    fDao = NewsModel.getDefault().getPersistenceLayer().getModelDAO();
-    fFactory = NewsModel.getDefault().getTypesFactory();
+    fModelSearch = Owl.getPersistenceService().getModelSearch();
+    fDao = Owl.getPersistenceService().getModelDAO();
+    fFactory = Owl.getModelFactory();
     fNewsEntityName = INews.class.getName();
 
     fModelSearch.startup();
-    NewsModel.getDefault().getPersistenceLayer().recreateSchema();
+    Owl.getPersistenceService().recreateSchema();
   }
 
   /**

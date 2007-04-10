@@ -30,7 +30,7 @@ import static org.junit.Assert.assertNotNull;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.junit.Test;
-import org.rssowl.core.model.NewsModel;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.ILabel;
@@ -57,9 +57,9 @@ public class EntityPropertyPageTests implements IEntityPropertyPage {
   @SuppressWarnings("null")
   @Test
   public void testEntityPropertyPage() throws Exception {
-    ILabel entity1 = NewsModel.getDefault().getTypesFactory().createLabel(null, "Label1");
-    ILabel entity2 = NewsModel.getDefault().getTypesFactory().createLabel(null, "Label2");
-    IFeed entity3 = NewsModel.getDefault().getTypesFactory().createFeed(null, new URI("http://www.link.com"));
+    ILabel entity1 = Owl.getModelFactory().createLabel(null, "Label1");
+    ILabel entity2 = Owl.getModelFactory().createLabel(null, "Label2");
+    IFeed entity3 = Owl.getModelFactory().createFeed(null, new URI("http://www.link.com"));
 
     /* Case 1: Single Selection */
     {
