@@ -65,7 +65,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.rssowl.ui.internal.dialogs.properties.IEntityPropertyPage"/>
+                  <meta.attribute kind="java" basedOn="org.rssowl.ui.dialogs.properties.IEntityPropertyPage"/>
                </appInfo>
             </annotation>
          </attribute>
@@ -106,7 +106,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.rssowl.core.model.types.IEntity"/>
+                  <meta.attribute kind="java" basedOn="org.rssowl.core.model.persist.IEntity"/>
                </appInfo>
             </annotation>
          </attribute>
