@@ -411,6 +411,10 @@ public class Controller {
       conditionalGet = updateConditionalGet(feedLink, conditionalGet, pairResult.getSecond());
       boolean deleteConditionalGet = (!conditionalGetIsNull && conditionalGet == null);
 
+      /* Return on Cancelation or Shutdown */
+      if (monitor.isCanceled() || fShuttingDown)
+        return Status.CANCEL_STATUS;
+
       /* Load the Favicon directly afterwards if required */
       if (OwlUI.getFavicon(bookmark) == null) {
         try {
