@@ -12,7 +12,7 @@
 
    <element name="extension">
       <complexType>
-      	<sequence>
+         <sequence>
             <element ref="preferencesdao"/>
          </sequence>
          <attribute name="point" type="string" use="required">
@@ -50,7 +50,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.rssowl.core.model.preferences.IPreferencesDAO"/>
+                  <meta.attribute kind="java" basedOn="org.rssowl.core.model.persist.pref.IPreferencesDAO"/>
                </appInfo>
             </annotation>
          </attribute>

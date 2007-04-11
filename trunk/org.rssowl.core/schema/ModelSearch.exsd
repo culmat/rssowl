@@ -55,7 +55,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.rssowl.core.model.search.IModelSearch"/>
+                  <meta.attribute kind="java" basedOn="org.rssowl.core.model.persist.search.IModelSearch"/>
                </appInfo>
             </annotation>
          </attribute>

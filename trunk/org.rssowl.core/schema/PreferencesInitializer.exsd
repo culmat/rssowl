@@ -50,7 +50,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.rssowl.core.model.preferences.IPreferencesInitializer"/>
+                  <meta.attribute kind="java" basedOn="org.rssowl.core.model.persist.pref.IPreferencesInitializer"/>
                </appInfo>
             </annotation>
          </attribute>

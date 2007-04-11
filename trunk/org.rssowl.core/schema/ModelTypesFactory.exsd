@@ -55,7 +55,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.rssowl.core.model.types.IModelTypesFactory"/>
+                  <meta.attribute kind="java" basedOn="org.rssowl.core.model.persist.IModelTypesFactory"/>
                </appInfo>
             </annotation>
          </attribute>
