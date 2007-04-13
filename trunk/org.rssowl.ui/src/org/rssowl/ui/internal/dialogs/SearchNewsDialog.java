@@ -319,6 +319,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
       public void dispose() {}
 
       public Menu getMenu(Control parent) {
+        Set<ISearchMark> searchMarks = Controller.getDefault().getCacheService().getSearchMarks();
         Menu menu = new Menu(parent);
 
         /* Create new Saved Search */
@@ -333,10 +334,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
         });
 
         /* Separator */
-        new MenuItem(menu, SWT.SEPARATOR);
+        if (searchMarks.size() > 0)
+          new MenuItem(menu, SWT.SEPARATOR);
 
         /* Show Existing Saved Searches */
-        Set<ISearchMark> searchMarks = Controller.getDefault().getCacheService().getSearchMarks();
         for (final ISearchMark searchMark : searchMarks) {
           MenuItem item = new MenuItem(menu, SWT.None);
           item.setText(searchMark.getName());
