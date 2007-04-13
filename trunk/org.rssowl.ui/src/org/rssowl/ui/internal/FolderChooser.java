@@ -322,8 +322,9 @@ public class FolderChooser extends Composite implements DisposeListener {
       }
     });
 
-    /* Select the input Folder */
+    /* Select the input Folder and expand */
     fFolderViewer.setSelection(new StructuredSelection(fSelectedFolder));
+    fFolderViewer.setExpandedState(fSelectedFolder, true);
 
     /* Add Menu: "New Folder" */
     MenuManager menuManager = new MenuManager();
