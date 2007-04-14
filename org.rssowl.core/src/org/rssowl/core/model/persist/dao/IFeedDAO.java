@@ -26,7 +26,13 @@ package org.rssowl.core.model.persist.dao;
 import org.rssowl.core.model.events.FeedEvent;
 import org.rssowl.core.model.events.FeedListener;
 import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.reference.FeedReference;
+
+import java.net.URI;
 
 public interface IFeedDAO<T extends IFeed> extends IEntityDAO<T, FeedListener, FeedEvent>   {
 
+  T load(URI link);
+  
+  FeedReference loadReference(URI link);
 }

@@ -112,19 +112,19 @@ public class DBHelper {
   }
   
   @SuppressWarnings("unchecked")
-  private static ObjectSet<IFeed> getFeedSet(ObjectContainer db, URI link){
+  private static ObjectSet<Feed> getFeedSet(ObjectContainer db, URI link){
     Query query = db.query();
     query.constrain(Feed.class);
     query.descend("fLinkText").constrain(link.toString()); //$NON-NLS-1$
-    ObjectSet<IFeed> set = query.execute();
+    ObjectSet<Feed> set = query.execute();
     return set;
   }
 
-  static final IFeed loadFeed(ObjectContainer db, URI link, Integer activationDepth) {
+  public static final Feed loadFeed(ObjectContainer db, URI link, Integer activationDepth) {
     try {
-      ObjectSet<IFeed> set = getFeedSet(db, link);
+      ObjectSet<Feed> set = getFeedSet(db, link);
       if (set.hasNext()) {
-        IFeed feed = set.next();
+        Feed feed = set.next();
         if (activationDepth != null)
           db.ext().activate(feed, activationDepth.intValue());
 
