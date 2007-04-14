@@ -28,7 +28,7 @@
    </extension>
    <extension
          point="org.rssowl.core.PreferencesDAO">
-      <preferencesdao class="org.rssowl.core.model.internal.db4o.PreferencesDAOImpl"/>
+      <preferencesdao class="org.rssowl.core.model.internal.db4o.dao.PreferencesDAOImpl"/>
    </extension>
    <extension
          point="org.rssowl.core.ApplicationLayer">
