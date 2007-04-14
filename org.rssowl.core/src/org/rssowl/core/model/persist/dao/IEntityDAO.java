@@ -25,7 +25,10 @@ package org.rssowl.core.model.persist.dao;
 
 import org.rssowl.core.model.events.EntityListener;
 import org.rssowl.core.model.events.ModelEvent;
+import org.rssowl.core.model.events.runnable.EventType;
 import org.rssowl.core.model.persist.IEntity;
+
+import java.util.Set;
 
 /**
  * Base interface for all IEntity DAOs.
@@ -39,4 +42,6 @@ public interface IEntityDAO<T extends IEntity, L extends EntityListener<E>,
   public void addEntityListener(L listener);
   
   public void removeEntityListener(L listener);
+  
+  public void fireEvents(Set<E> events, EventType eventType);
 }
