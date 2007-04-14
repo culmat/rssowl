@@ -1113,14 +1113,14 @@ public class ModelTest3 {
       final boolean searchConditionEvents[] = new boolean[3];
       final SearchConditionReference searchConditionReference[] = new SearchConditionReference[1];
       searchConditionListener = new SearchConditionListener() {
-        public void searchConditionAdded(Set<SearchConditionEvent> events) {
+        public void entitiesAdded(Set<SearchConditionEvent> events) {
           for (SearchConditionEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             searchConditionEvents[0] = true;
           }
         }
 
-        public void searchConditionDeleted(Set<SearchConditionEvent> events) {
+        public void entitiesDeleted(Set<SearchConditionEvent> events) {
           for (SearchConditionEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             if (searchConditionReference[0].references(event.getEntity()))
@@ -1128,7 +1128,7 @@ public class ModelTest3 {
           }
         }
 
-        public void searchConditionUpdated(Set<SearchConditionEvent> events) {
+        public void entitiesUpdated(Set<SearchConditionEvent> events) {
           for (SearchConditionEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             if (searchConditionReference[0].references(event.getEntity()))

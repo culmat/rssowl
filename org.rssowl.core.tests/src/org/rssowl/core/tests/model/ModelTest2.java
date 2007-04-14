@@ -272,7 +272,7 @@ public class ModelTest2 {
 
       searchConditionListener = new SearchConditionAdapter() {
         @Override
-        public void searchConditionAdded(Set<SearchConditionEvent> events) {
+        public void entitiesAdded(Set<SearchConditionEvent> events) {
           for (SearchConditionEvent event : events) {
             assertFalse("Expected this Event to be no Root Event", event.isRoot());
 
@@ -974,7 +974,7 @@ public class ModelTest2 {
 
       searchConditionListener = new SearchConditionAdapter() {
         @Override
-        public void searchConditionDeleted(Set<SearchConditionEvent> events) {
+        public void entitiesDeleted(Set<SearchConditionEvent> events) {
           for (SearchConditionEvent event : events) {
             ISearchCondition searchCondition = event.getEntity();
 
