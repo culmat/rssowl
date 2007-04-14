@@ -117,23 +117,15 @@ public class NewsGroupHandler implements IProtocolHandler {
   /* The Default Encoding of mime4j */
   private static final String DEFAULT_ENCODING = "us-ascii";
 
-  private IModelTypesFactory fTypesFactory;
-
-  /**
-   * Leave public constructor for reflection.
-   */
-  public NewsGroupHandler() {
-    fTypesFactory = Owl.getModelFactory();
-  }
-
   /*
    * @see org.rssowl.core.connection.IProtocolHandler#reload(java.net.URI,
    * org.eclipse.core.runtime.IProgressMonitor, java.util.Map)
    */
   public Pair<IFeed, IConditionalGet> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException {
+    IModelTypesFactory factory = Owl.getModelFactory();
 
     /* Create a new empty feed from the existing one */
-    IFeed feed = fTypesFactory.createFeed(null, link);
+    IFeed feed = factory.createFeed(null, link);
 
     /* Retrieve last article pointer */
     Integer lastArticleId = getLastArticleId(properties);
@@ -247,7 +239,7 @@ public class NewsGroupHandler implements IProtocolHandler {
     /* Create Conditional Get Object */
     IConditionalGet conditionalGet = null;
     if (lastArticleId != null)
-      conditionalGet = fTypesFactory.createConditionalGet(null, link, String.valueOf(lastArticleId));
+      conditionalGet = factory.createConditionalGet(null, link, String.valueOf(lastArticleId));
 
     return Pair.create(feed, conditionalGet);
   }
@@ -277,7 +269,8 @@ public class NewsGroupHandler implements IProtocolHandler {
     if (articleReader == null)
       return;
 
-    final INews news = fTypesFactory.createNews(null, feed, new Date());
+    IModelTypesFactory factory = Owl.getModelFactory();
+    final INews news = factory.createNews(null, feed, new Date());
     final Map<String, StringBuilder> mimeToContent = new HashMap<String, StringBuilder>();
 
     /* Create parser for this message */
@@ -427,7 +420,7 @@ public class NewsGroupHandler implements IProtocolHandler {
   }
 
   private void interpretFrom(INews news, String value) {
-    IPerson person = fTypesFactory.createPerson(null, news);
+    IPerson person = Owl.getModelFactory().createPerson(null, news);
     value = value.trim();
 
     /* Complex value */
@@ -486,7 +479,7 @@ public class NewsGroupHandler implements IProtocolHandler {
   }
 
   private void interpretMessageId(INews news, String value) {
-    IGuid guid = fTypesFactory.createGuid(news, value.trim());
+    IGuid guid = Owl.getModelFactory().createGuid(news, value.trim());
     news.setGuid(guid);
     news.setInReplyTo(value);
   }
