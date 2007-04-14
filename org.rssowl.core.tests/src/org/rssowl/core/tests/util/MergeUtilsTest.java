@@ -67,7 +67,7 @@ public class MergeUtilsTest {
   }
   
   /**
-   * Tests {@link MergeUtils#merge(List, List, org.rssowl.core.model.persist.IExtendableType)}.
+   * Tests {@link MergeUtils#merge(List, List, org.rssowl.core.model.persist.IPersistable)}.
    */
   @Test
   public void testCollectionMergeWithNullExistingListAndNullNewParent() {
@@ -77,7 +77,7 @@ public class MergeUtilsTest {
   }
   
   /**
-   * Tests {@link MergeUtils#mergeProperties(org.rssowl.core.model.persist.IExtendableType, org.rssowl.core.model.persist.IExtendableType)}.
+   * Tests {@link MergeUtils#mergeProperties(org.rssowl.core.model.persist.IEntity, org.rssowl.core.model.persist.IEntity)}.
    */
   @Test
   public void testMergeProperties() {
