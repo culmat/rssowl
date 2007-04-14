@@ -26,7 +26,6 @@ package org.rssowl.core.model.internal.persist.pref;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.persist.pref.IPreferencesDAO;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.persist.pref.PreferencesEvent;
 import org.rssowl.core.model.persist.pref.PreferencesListener;
@@ -43,7 +42,6 @@ import java.util.Properties;
 public class GlobalScope implements IPreferenceScope {
   private Properties fCache;
   private IPreferenceScope fParent;
-  private IPreferencesDAO fPrefDao;
 
   /**
    * @param parent
@@ -51,7 +49,6 @@ public class GlobalScope implements IPreferenceScope {
   public GlobalScope(IPreferenceScope parent) {
     fParent = parent;
     fCache = new Properties();
-    fPrefDao = Owl.getPersistenceService().getPreferencesDAO();
 
     registerListeners();
   }
@@ -90,7 +87,7 @@ public class GlobalScope implements IPreferenceScope {
    * @see org.rssowl.ui.internal.preferences.IPreferencesNode#delete(java.lang.String)
    */
   public void delete(String key) {
-    fPrefDao.delete(key);
+    Owl.getPersistenceService().getPreferencesDAO().delete(key);
   }
 
   /*
@@ -105,7 +102,7 @@ public class GlobalScope implements IPreferenceScope {
       return (Boolean) cachedRes;
 
     /* Consult the Persistence Layer */
-    res = fPrefDao.getBoolean(key);
+    res = Owl.getPersistenceService().getPreferencesDAO().getBoolean(key);
 
     /* Ask Parent */
     if (res == null)
@@ -130,7 +127,7 @@ public class GlobalScope implements IPreferenceScope {
       return (Integer) cachedRes;
 
     /* Consult the Persistence Layer */
-    res = fPrefDao.getInteger(key);
+    res = Owl.getPersistenceService().getPreferencesDAO().getInteger(key);
 
     /* Ask Parent */
     if (res == null)
@@ -155,7 +152,7 @@ public class GlobalScope implements IPreferenceScope {
       return (int[]) cachedRes;
 
     /* Consult the Persistence Layer */
-    res = fPrefDao.getIntegers(key);
+    res = Owl.getPersistenceService().getPreferencesDAO().getIntegers(key);
 
     /* Ask Parent */
     if (res == null)
@@ -180,7 +177,7 @@ public class GlobalScope implements IPreferenceScope {
       return (Long) cachedRes;
 
     /* Consult the Persistence Layer */
-    res = fPrefDao.getLong(key);
+    res = Owl.getPersistenceService().getPreferencesDAO().getLong(key);
 
     /* Ask Parent */
     if (res == null)
@@ -205,7 +202,7 @@ public class GlobalScope implements IPreferenceScope {
       return (long[]) cachedRes;
 
     /* Consult the Persistence Layer */
-    res = fPrefDao.getLongs(key);
+    res = Owl.getPersistenceService().getPreferencesDAO().getLongs(key);
 
     /* Ask Parent */
     if (res == null)
@@ -230,7 +227,7 @@ public class GlobalScope implements IPreferenceScope {
       return (String) cachedRes;
 
     /* Consult the Persistence Layer */
-    res = fPrefDao.getString(key);
+    res = Owl.getPersistenceService().getPreferencesDAO().getString(key);
 
     /* Ask Parent */
     if (res == null)
@@ -255,7 +252,7 @@ public class GlobalScope implements IPreferenceScope {
       return (String[]) cachedRes;
 
     /* Consult the Persistence Layer */
-    res = fPrefDao.getStrings(key);
+    res = Owl.getPersistenceService().getPreferencesDAO().getStrings(key);
 
     /* Ask Parent */
     if (res == null)
@@ -285,7 +282,7 @@ public class GlobalScope implements IPreferenceScope {
     }
 
     /* Save to DB */
-    fPrefDao.putBoolean(key, value);
+    Owl.getPersistenceService().getPreferencesDAO().putBoolean(key, value);
   }
 
   /*
@@ -305,7 +302,7 @@ public class GlobalScope implements IPreferenceScope {
     }
 
     /* Save to DB */
-    fPrefDao.putInteger(key, value);
+    Owl.getPersistenceService().getPreferencesDAO().putInteger(key, value);
   }
 
   /*
@@ -326,7 +323,7 @@ public class GlobalScope implements IPreferenceScope {
     }
 
     /* Save to DB */
-    fPrefDao.putIntegers(key, values);
+    Owl.getPersistenceService().getPreferencesDAO().putIntegers(key, values);
   }
 
   /*
@@ -346,7 +343,7 @@ public class GlobalScope implements IPreferenceScope {
     }
 
     /* Save to DB */
-    fPrefDao.putLong(key, value);
+    Owl.getPersistenceService().getPreferencesDAO().putLong(key, value);
   }
 
   /*
@@ -367,7 +364,7 @@ public class GlobalScope implements IPreferenceScope {
     }
 
     /* Save to DB */
-    fPrefDao.putLongs(key, values);
+    Owl.getPersistenceService().getPreferencesDAO().putLongs(key, values);
   }
 
   /*
@@ -388,7 +385,7 @@ public class GlobalScope implements IPreferenceScope {
     }
 
     /* Save to DB */
-    fPrefDao.putString(key, value);
+    Owl.getPersistenceService().getPreferencesDAO().putString(key, value);
   }
 
   /*
@@ -409,7 +406,7 @@ public class GlobalScope implements IPreferenceScope {
     }
 
     /* Save to DB */
-    fPrefDao.putStrings(key, values);
+    Owl.getPersistenceService().getPreferencesDAO().putStrings(key, values);
   }
 
   private boolean cached(String key, Object value) {
