@@ -23,29 +23,52 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.events.BookMarkEvent;
-import org.rssowl.core.model.events.BookMarkListener;
-import org.rssowl.core.model.internal.persist.BookMark;
+import org.rssowl.core.model.persist.NewsCounter;
 
-public final class BookMarkDAOImpl extends AbstractEntityDAO<BookMark, BookMarkListener,
-    BookMarkEvent>  {
+import java.util.Collection;
 
-  public BookMarkDAOImpl() {
-    super(BookMark.class);
+public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter>  {
+
+  public NewsCounterDAOImpl() {
+    super(NewsCounter.class);
+  }
+  
+  public final NewsCounter load() {
+    Collection<NewsCounter> newsCounters = loadAll();
+    if (newsCounters.isEmpty())
+      return null;
+    
+    if (newsCounters.size() > 1)
+      throw new IllegalStateException("Only one NewsCounter should exist, but " +
+          "there are: " + newsCounters.size());
+    
+    return newsCounters.iterator().next();
+  }
+  
+  @Override
+  public final NewsCounter load(long id) {
+    throw new UnsupportedOperationException();
+  }
+  
+  @Override
+  public final <C extends Collection<NewsCounter>> C saveAll(C entities)  {
+    if (entities.size() > 1) {
+      throw new IllegalArgumentException("Only a single newsCounter can be stored");
+    }
+    return super.saveAll(entities);
   }
 
   @Override
-  protected final BookMarkEvent createDeleteEventTemplate(BookMark entity) {
-    return createSaveEventTemplate(entity);
-  }
-
-  @Override
-  protected final BookMarkEvent createSaveEventTemplate(BookMark entity) {
-    return new BookMarkEvent(entity, null, true);
+  protected final void doSave(NewsCounter entity) {
+    if (!fDb.ext().isStored(entity) && (load() != null))
+      throw new IllegalArgumentException("Only a single newsCounter can be stored");
+    
+    super.doSave(entity);
   }
 
   @Override
   protected final boolean isSaveFully() {
-    return false;
+    return true;
   }
+
 }

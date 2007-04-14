@@ -23,25 +23,31 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.events.BookMarkEvent;
-import org.rssowl.core.model.events.BookMarkListener;
-import org.rssowl.core.model.internal.persist.BookMark;
+import org.rssowl.core.model.events.FeedEvent;
+import org.rssowl.core.model.events.FeedListener;
+import org.rssowl.core.model.internal.db4o.DBHelper;
+import org.rssowl.core.model.internal.persist.Feed;
 
-public final class BookMarkDAOImpl extends AbstractEntityDAO<BookMark, BookMarkListener,
-    BookMarkEvent>  {
+public final class FeedDAOImpl extends AbstractEntityDAO<Feed, FeedListener,
+    FeedEvent>  {
 
-  public BookMarkDAOImpl() {
-    super(BookMark.class);
+  public FeedDAOImpl() {
+    super(Feed.class);
+  }
+  
+  @Override
+  protected final void doSave(Feed entity) {
+    DBHelper.saveFeed(fDb, entity);
   }
 
   @Override
-  protected final BookMarkEvent createDeleteEventTemplate(BookMark entity) {
+  protected final FeedEvent createDeleteEventTemplate(Feed entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final BookMarkEvent createSaveEventTemplate(BookMark entity) {
-    return new BookMarkEvent(entity, null, true);
+  protected final FeedEvent createSaveEventTemplate(Feed entity) {
+    return new FeedEvent(entity, true);
   }
 
   @Override

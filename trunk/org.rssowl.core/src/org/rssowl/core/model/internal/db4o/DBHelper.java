@@ -136,7 +136,7 @@ public class DBHelper {
     }
   }
 
-  static void saveAndCascadeNews(ObjectContainer db, INews news, boolean root) {
+  public static final void saveAndCascadeNews(ObjectContainer db, INews news, boolean root) {
     INews oldNews = db.ext().peekPersisted(news, 2, true);
     if (oldNews != null || root) {
       ModelEvent event = new NewsEvent(oldNews, news, root);
