@@ -25,25 +25,25 @@ package org.rssowl.core.model.persist.dao;
 
 public abstract class DAOFactory {
 
-  public abstract IAttachmentDAO<?> createAttachmentDAO();
+  public abstract IAttachmentDAO createAttachmentDAO();
   
-  public abstract IBookMarkDAO<?> createBookMarkDAO();
+  public abstract IBookMarkDAO createBookMarkDAO();
   
-  public abstract ICategoryDAO<?> createCategoryDAO();
+  public abstract ICategoryDAO createCategoryDAO();
   
-  public abstract IFeedDAO<?> createFeedDAO();
+  public abstract IFeedDAO createFeedDAO();
   
-  public abstract IFolderDAO<?> createFolderDAO();
+  public abstract IFolderDAO createFolderDAO();
   
   public abstract INewsCounterDAO createNewsCounterDAO();
   
-  public abstract INewsDAO<?> createNewsDAO();
+  public abstract INewsDAO createNewsDAO();
   
-  public abstract IPersonDAO<?> createPersonDAO();
+  public abstract IPersonDAO createPersonDAO();
   
   public abstract IPreferencesDAO createPreferencesDAO();
   
-  public abstract ISearchConditionDAO<?> createSearchConditionDAO();
+  public abstract ISearchConditionDAO createSearchConditionDAO();
   
-  public abstract ISearchMarkDAO<?> createSearchMarkDAO();
+  public abstract ISearchMarkDAO createSearchMarkDAO();
 }

@@ -27,6 +27,6 @@ import org.rssowl.core.model.events.FolderEvent;
 import org.rssowl.core.model.events.FolderListener;
 import org.rssowl.core.model.persist.IFolder;
 
-public interface IFolderDAO<T extends IFolder> extends IEntityDAO<T, FolderListener, FolderEvent>   {
+public interface IFolderDAO extends IEntityDAO<IFolder, FolderListener, FolderEvent>   {
   // No new methods
 }

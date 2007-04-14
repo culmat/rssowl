@@ -28,28 +28,29 @@ import org.rssowl.core.model.events.AttachmentListener;
 import org.rssowl.core.model.events.NewsEvent;
 import org.rssowl.core.model.internal.db4o.DBHelper;
 import org.rssowl.core.model.internal.persist.Attachment;
+import org.rssowl.core.model.persist.IAttachment;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.dao.IAttachmentDAO;
 
-public final class AttachmentDAOImpl extends AbstractEntityDAO<Attachment,
-    AttachmentListener, AttachmentEvent> implements IAttachmentDAO<Attachment>  {
+public final class AttachmentDAOImpl extends AbstractEntityDAO<IAttachment,
+    AttachmentListener, AttachmentEvent> implements IAttachmentDAO  {
 
   public AttachmentDAOImpl() {
     super(Attachment.class);
   }
 
   @Override
-  protected final AttachmentEvent createDeleteEventTemplate(Attachment entity) {
+  protected final AttachmentEvent createDeleteEventTemplate(IAttachment entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final AttachmentEvent createSaveEventTemplate(Attachment entity) {
+  protected final AttachmentEvent createSaveEventTemplate(IAttachment entity) {
     return new AttachmentEvent(entity, true);
   }
   
   @Override
-  public final void doDelete(Attachment entity) {
+  public final void doDelete(IAttachment entity) {
     //TODO Not sure about this, but let's do it for now to help us track a bug
     //in NewsService where never having a newsUpdated with a null oldNews is
     //helpful

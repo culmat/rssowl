@@ -25,7 +25,17 @@
 package org.rssowl.core.model.dao;
 
 import org.rssowl.core.model.persist.dao.DAOFactory;
+import org.rssowl.core.model.persist.dao.IAttachmentDAO;
+import org.rssowl.core.model.persist.dao.IBookMarkDAO;
+import org.rssowl.core.model.persist.dao.ICategoryDAO;
+import org.rssowl.core.model.persist.dao.IFeedDAO;
+import org.rssowl.core.model.persist.dao.IFolderDAO;
+import org.rssowl.core.model.persist.dao.INewsCounterDAO;
+import org.rssowl.core.model.persist.dao.INewsDAO;
+import org.rssowl.core.model.persist.dao.IPersonDAO;
 import org.rssowl.core.model.persist.dao.IPreferencesDAO;
+import org.rssowl.core.model.persist.dao.ISearchConditionDAO;
+import org.rssowl.core.model.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.model.persist.search.IModelSearch;
 
 /**
@@ -41,6 +51,26 @@ import org.rssowl.core.model.persist.search.IModelSearch;
 public interface IPersistenceService {
 
   DAOFactory getDAOFactory();
+  
+  IAttachmentDAO getAttachmentDAO();
+
+  IBookMarkDAO getBookMarkDAO();
+
+  ICategoryDAO getCategoryDAO();
+
+  IFeedDAO getFeedDAO();
+
+  IFolderDAO getFolderDAO();
+
+  INewsCounterDAO getNewsCounterDAO();
+
+  INewsDAO getNewsDAO();
+
+  IPersonDAO getPersonDAO();
+
+  ISearchConditionDAO getSearchConditionDAO();
+
+  ISearchMarkDAO getSearchMarkDAO();
   
   /**
    * <p>

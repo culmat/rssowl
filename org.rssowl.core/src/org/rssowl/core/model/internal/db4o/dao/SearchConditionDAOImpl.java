@@ -27,21 +27,22 @@ import org.rssowl.core.model.events.SearchConditionEvent;
 import org.rssowl.core.model.events.SearchConditionListener;
 import org.rssowl.core.model.internal.persist.search.SearchCondition;
 import org.rssowl.core.model.persist.dao.ISearchConditionDAO;
+import org.rssowl.core.model.persist.search.ISearchCondition;
 
-public final class SearchConditionDAOImpl extends AbstractEntityDAO<SearchCondition,
-    SearchConditionListener, SearchConditionEvent> implements ISearchConditionDAO<SearchCondition>  {
+public final class SearchConditionDAOImpl extends AbstractEntityDAO<ISearchCondition,
+    SearchConditionListener, SearchConditionEvent> implements ISearchConditionDAO  {
 
   public SearchConditionDAOImpl() {
     super(SearchCondition.class);
   }
   
   @Override
-  protected final SearchConditionEvent createDeleteEventTemplate(SearchCondition entity) {
+  protected final SearchConditionEvent createDeleteEventTemplate(ISearchCondition entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final SearchConditionEvent createSaveEventTemplate(SearchCondition entity) {
+  protected final SearchConditionEvent createSaveEventTemplate(ISearchCondition entity) {
     return new SearchConditionEvent(entity, true);
   }
 

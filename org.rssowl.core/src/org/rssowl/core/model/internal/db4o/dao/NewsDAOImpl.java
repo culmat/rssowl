@@ -30,25 +30,25 @@ import org.rssowl.core.model.internal.persist.News;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.dao.INewsDAO;
 
-public final class NewsDAOImpl extends AbstractEntityDAO<News, NewsListener, NewsEvent>
-    implements INewsDAO<News>   {
+public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, NewsEvent>
+    implements INewsDAO   {
 
   public NewsDAOImpl() {
     super(News.class);
   }
   
   @Override
-  protected final void doSave(News entity) {
+  protected final void doSave(INews entity) {
     DBHelper.saveAndCascadeNews(fDb, entity, true);
   }
 
   @Override
-  protected final NewsEvent createDeleteEventTemplate(News entity) {
+  protected final NewsEvent createDeleteEventTemplate(INews entity) {
     return new NewsEvent(null, entity, true);
   }
 
   @Override
-  protected final NewsEvent createSaveEventTemplate(News entity) {
+  protected final NewsEvent createSaveEventTemplate(INews entity) {
     INews oldNews = fDb.ext().peekPersisted(entity, 2, true);
     return new NewsEvent(oldNews, entity, true);
   }

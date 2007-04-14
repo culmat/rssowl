@@ -78,16 +78,16 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
   private DAOFactory fDAOFactory;
   
   private IPreferencesDAO fPreferencesDAO;
-  private IAttachmentDAO<?> fAttachmentDAO;
-  private IBookMarkDAO<?> fBookMarkDAO;
-  private ICategoryDAO<?> fCategoryDAO;
-  private IFeedDAO<?> fFeedDAO;
-  private IFolderDAO<?> fFolderDAO;
+  private IAttachmentDAO fAttachmentDAO;
+  private IBookMarkDAO fBookMarkDAO;
+  private ICategoryDAO fCategoryDAO;
+  private IFeedDAO fFeedDAO;
+  private IFolderDAO fFolderDAO;
   private INewsCounterDAO fNewsCounterDAO;
-  private INewsDAO<?> fNewsDAO;
-  private IPersonDAO<?> fPersonDAO;
-  private ISearchConditionDAO<?> fSearchConditionDAO;
-  private ISearchMarkDAO<?> fSearchMarkDAO;
+  private INewsDAO fNewsDAO;
+  private IPersonDAO fPersonDAO;
+  private ISearchConditionDAO fSearchConditionDAO;
+  private ISearchMarkDAO fSearchMarkDAO;
 
   /** */
   protected AbstractPersistenceService() {
@@ -102,6 +102,16 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
     getPreferencesDAO();
     getApplicationLayer();
     getIDGenerator();
+    getAttachmentDAO();
+    getBookMarkDAO();
+    getCategoryDAO();
+    getFeedDAO();
+    getFolderDAO();
+    getNewsCounterDAO();
+    getNewsDAO();
+    getPersonDAO();
+    getSearchConditionDAO();
+    getSearchMarkDAO();
   }
   
   /*
@@ -164,35 +174,35 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
     return fPreferencesDAO;
   }
 
-  public IAttachmentDAO<?> getAttachmentDAO() {
+  public IAttachmentDAO getAttachmentDAO() {
     if (fAttachmentDAO == null)
       fAttachmentDAO = getDAOFactory().createAttachmentDAO();
     
     return fAttachmentDAO;
   }
 
-  public IBookMarkDAO<?> getBookMarkDAO() {
+  public IBookMarkDAO getBookMarkDAO() {
     if (fBookMarkDAO == null)
       fBookMarkDAO = getDAOFactory().createBookMarkDAO();
     
     return fBookMarkDAO;
   }
 
-  public ICategoryDAO<?> getCategoryDAO() {
+  public ICategoryDAO getCategoryDAO() {
     if (fCategoryDAO == null)
       fCategoryDAO = getDAOFactory().createCategoryDAO();
     
     return fCategoryDAO;
   }
 
-  public IFeedDAO<?> getFeedDAO() {
+  public IFeedDAO getFeedDAO() {
     if (fFeedDAO == null)
       fFeedDAO = getDAOFactory().createFeedDAO();
     
     return fFeedDAO;
   }
 
-  public IFolderDAO<?> getFolderDAO() {
+  public IFolderDAO getFolderDAO() {
     if (fFolderDAO == null)
       fFolderDAO = getDAOFactory().createFolderDAO();
     
@@ -206,28 +216,28 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
     return fNewsCounterDAO;
   }
 
-  public INewsDAO<?> getNewsDAO() {
+  public INewsDAO getNewsDAO() {
     if (fNewsDAO == null)
       fNewsDAO = getDAOFactory().createNewsDAO();
     
     return fNewsDAO;
   }
 
-  public IPersonDAO<?> getPersonDAO() {
+  public IPersonDAO getPersonDAO() {
     if (fPersonDAO == null)
       fPersonDAO = getDAOFactory().createPersonDAO();
     
     return fPersonDAO;
   }
 
-  public ISearchConditionDAO<?> getSearchConditionDAO() {
+  public ISearchConditionDAO getSearchConditionDAO() {
     if (fSearchConditionDAO == null)
       fSearchConditionDAO = getDAOFactory().createSearchConditionDAO();
     
     return fSearchConditionDAO;
   }
 
-  public ISearchMarkDAO<?> getSearchMarkDAO() {
+  public ISearchMarkDAO getSearchMarkDAO() {
     if (fSearchMarkDAO == null)
       fSearchMarkDAO = getDAOFactory().createSearchMarkDAO();
     

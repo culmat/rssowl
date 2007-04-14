@@ -39,27 +39,27 @@ import org.rssowl.core.model.persist.dao.ISearchMarkDAO;
 public final class DAOFactoryImpl extends DAOFactory  {
 
   @Override
-  public final IAttachmentDAO<?> createAttachmentDAO() {
+  public final IAttachmentDAO createAttachmentDAO() {
     return new AttachmentDAOImpl();
   }
 
   @Override
-  public IBookMarkDAO<?> createBookMarkDAO() {
+  public IBookMarkDAO createBookMarkDAO() {
     return new BookMarkDAOImpl();
   }
 
   @Override
-  public ICategoryDAO<?> createCategoryDAO() {
+  public ICategoryDAO createCategoryDAO() {
     return new CategoryDAOImpl();
   }
 
   @Override
-  public IFeedDAO<?> createFeedDAO() {
+  public IFeedDAO createFeedDAO() {
     return new FeedDAOImpl();
   }
 
   @Override
-  public IFolderDAO<?> createFolderDAO() {
+  public IFolderDAO createFolderDAO() {
     return new FolderDAOImpl();
   }
 
@@ -69,12 +69,12 @@ public final class DAOFactoryImpl extends DAOFactory  {
   }
 
   @Override
-  public INewsDAO<?> createNewsDAO() {
+  public INewsDAO createNewsDAO() {
     return new NewsDAOImpl();
   }
 
   @Override
-  public IPersonDAO<?> createPersonDAO() {
+  public IPersonDAO createPersonDAO() {
     return new PersonDAOImpl();
   }
 
@@ -84,12 +84,12 @@ public final class DAOFactoryImpl extends DAOFactory  {
   }
 
   @Override
-  public ISearchConditionDAO<?> createSearchConditionDAO() {
+  public ISearchConditionDAO createSearchConditionDAO() {
     return new SearchConditionDAOImpl();
   }
 
   @Override
-  public ISearchMarkDAO<?> createSearchMarkDAO() {
+  public ISearchMarkDAO createSearchMarkDAO() {
     return new SearchMarkDAOImpl();
   }
 }

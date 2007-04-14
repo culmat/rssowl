@@ -33,25 +33,25 @@ import org.rssowl.core.model.reference.FeedReference;
 
 import java.net.URI;
 
-public final class FeedDAOImpl extends AbstractEntityDAO<Feed, FeedListener,
-    FeedEvent> implements IFeedDAO<Feed>  {
+public final class FeedDAOImpl extends AbstractEntityDAO<IFeed, FeedListener,
+    FeedEvent> implements IFeedDAO  {
 
   public FeedDAOImpl() {
     super(Feed.class);
   }
   
   @Override
-  protected final void doSave(Feed entity) {
+  protected final void doSave(IFeed entity) {
     DBHelper.saveFeed(fDb, entity);
   }
 
   @Override
-  protected final FeedEvent createDeleteEventTemplate(Feed entity) {
+  protected final FeedEvent createDeleteEventTemplate(IFeed entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final FeedEvent createSaveEventTemplate(Feed entity) {
+  protected final FeedEvent createSaveEventTemplate(IFeed entity) {
     return new FeedEvent(entity, true);
   }
 

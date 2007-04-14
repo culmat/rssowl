@@ -30,9 +30,9 @@ import org.rssowl.core.model.reference.FeedReference;
 
 import java.net.URI;
 
-public interface IFeedDAO<T extends IFeed> extends IEntityDAO<T, FeedListener, FeedEvent>   {
+public interface IFeedDAO extends IEntityDAO<IFeed, FeedListener, FeedEvent>   {
 
-  T load(URI link);
+  IFeed load(URI link);
   
   FeedReference loadReference(URI link);
 }

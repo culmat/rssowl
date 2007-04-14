@@ -27,6 +27,6 @@ import org.rssowl.core.model.events.SearchMarkEvent;
 import org.rssowl.core.model.events.SearchMarkListener;
 import org.rssowl.core.model.persist.ISearchMark;
 
-public interface ISearchMarkDAO<T extends ISearchMark> extends IEntityDAO<T, SearchMarkListener, SearchMarkEvent> {
+public interface ISearchMarkDAO extends IEntityDAO<ISearchMark, SearchMarkListener, SearchMarkEvent> {
   // No new methods
 }

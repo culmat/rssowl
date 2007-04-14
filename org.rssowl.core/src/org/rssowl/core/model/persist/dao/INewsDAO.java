@@ -27,6 +27,6 @@ import org.rssowl.core.model.events.NewsEvent;
 import org.rssowl.core.model.events.NewsListener;
 import org.rssowl.core.model.persist.INews;
 
-public interface INewsDAO<T extends INews> extends IEntityDAO<T, NewsListener, NewsEvent>    {
+public interface INewsDAO extends IEntityDAO<INews, NewsListener, NewsEvent>    {
 
 }

@@ -26,22 +26,23 @@ package org.rssowl.core.model.internal.db4o.dao;
 import org.rssowl.core.model.events.SearchMarkEvent;
 import org.rssowl.core.model.events.SearchMarkListener;
 import org.rssowl.core.model.internal.persist.SearchMark;
+import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.dao.ISearchMarkDAO;
 
-public final class SearchMarkDAOImpl extends AbstractEntityDAO<SearchMark,
-    SearchMarkListener, SearchMarkEvent> implements ISearchMarkDAO<SearchMark>    {
+public final class SearchMarkDAOImpl extends AbstractEntityDAO<ISearchMark,
+    SearchMarkListener, SearchMarkEvent> implements ISearchMarkDAO    {
 
   public SearchMarkDAOImpl() {
     super(SearchMark.class);
   }
   
   @Override
-  protected final SearchMarkEvent createDeleteEventTemplate(SearchMark entity) {
+  protected final SearchMarkEvent createDeleteEventTemplate(ISearchMark entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final SearchMarkEvent createSaveEventTemplate(SearchMark entity) {
+  protected final SearchMarkEvent createSaveEventTemplate(ISearchMark entity) {
     return new SearchMarkEvent(entity, null, true);
   }
 

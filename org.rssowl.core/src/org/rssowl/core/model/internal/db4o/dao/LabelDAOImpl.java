@@ -26,22 +26,23 @@ package org.rssowl.core.model.internal.db4o.dao;
 import org.rssowl.core.model.events.LabelEvent;
 import org.rssowl.core.model.events.LabelListener;
 import org.rssowl.core.model.internal.persist.Label;
+import org.rssowl.core.model.persist.ILabel;
 import org.rssowl.core.model.persist.dao.ILabelDAO;
 
-public final class LabelDAOImpl extends AbstractEntityDAO<Label, LabelListener,
-    LabelEvent> implements ILabelDAO<Label> {
+public final class LabelDAOImpl extends AbstractEntityDAO<ILabel, LabelListener,
+    LabelEvent> implements ILabelDAO {
 
   public LabelDAOImpl() {
     super(Label.class);
   }
 
   @Override
-  protected final LabelEvent createDeleteEventTemplate(Label entity) {
+  protected final LabelEvent createDeleteEventTemplate(ILabel entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final LabelEvent createSaveEventTemplate(Label entity) {
+  protected final LabelEvent createSaveEventTemplate(ILabel entity) {
     return new LabelEvent(entity, true);
   }
 

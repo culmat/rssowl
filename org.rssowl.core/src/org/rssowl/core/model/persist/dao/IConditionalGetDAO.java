@@ -25,6 +25,6 @@ package org.rssowl.core.model.persist.dao;
 
 import org.rssowl.core.model.persist.IConditionalGet;
 
-public interface IConditionalGetDAO<T extends IConditionalGet> extends IPersistableDAO<T>  {
+public interface IConditionalGetDAO extends IPersistableDAO<IConditionalGet>  {
   // No new methods
 }

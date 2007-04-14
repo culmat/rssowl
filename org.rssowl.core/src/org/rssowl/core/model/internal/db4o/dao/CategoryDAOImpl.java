@@ -26,22 +26,23 @@ package org.rssowl.core.model.internal.db4o.dao;
 import org.rssowl.core.model.events.CategoryEvent;
 import org.rssowl.core.model.events.CategoryListener;
 import org.rssowl.core.model.internal.persist.Category;
+import org.rssowl.core.model.persist.ICategory;
 import org.rssowl.core.model.persist.dao.ICategoryDAO;
 
-public final class CategoryDAOImpl extends AbstractEntityDAO<Category,
-    CategoryListener, CategoryEvent> implements ICategoryDAO<Category>   {
+public final class CategoryDAOImpl extends AbstractEntityDAO<ICategory,
+    CategoryListener, CategoryEvent> implements ICategoryDAO   {
 
   public CategoryDAOImpl() {
     super(Category.class);
   }
   
   @Override
-  protected final CategoryEvent createDeleteEventTemplate(Category entity) {
+  protected final CategoryEvent createDeleteEventTemplate(ICategory entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final CategoryEvent createSaveEventTemplate(Category entity) {
+  protected final CategoryEvent createSaveEventTemplate(ICategory entity) {
     return new CategoryEvent(entity, true);
   }
 

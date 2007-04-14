@@ -26,22 +26,23 @@ package org.rssowl.core.model.internal.db4o.dao;
 import org.rssowl.core.model.events.BookMarkEvent;
 import org.rssowl.core.model.events.BookMarkListener;
 import org.rssowl.core.model.internal.persist.BookMark;
+import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.dao.IBookMarkDAO;
 
-public final class BookMarkDAOImpl extends AbstractEntityDAO<BookMark, BookMarkListener,
-    BookMarkEvent> implements IBookMarkDAO<BookMark>  {
+public final class BookMarkDAOImpl extends AbstractEntityDAO<IBookMark, BookMarkListener,
+    BookMarkEvent> implements IBookMarkDAO  {
 
   public BookMarkDAOImpl() {
     super(BookMark.class);
   }
 
   @Override
-  protected final BookMarkEvent createDeleteEventTemplate(BookMark entity) {
+  protected final BookMarkEvent createDeleteEventTemplate(IBookMark entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final BookMarkEvent createSaveEventTemplate(BookMark entity) {
+  protected final BookMarkEvent createSaveEventTemplate(IBookMark entity) {
     return new BookMarkEvent(entity, null, true);
   }
 

@@ -26,22 +26,23 @@ package org.rssowl.core.model.internal.db4o.dao;
 import org.rssowl.core.model.events.FolderEvent;
 import org.rssowl.core.model.events.FolderListener;
 import org.rssowl.core.model.internal.persist.Folder;
+import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.dao.IFolderDAO;
 
-public final class FolderDAOImpl extends AbstractEntityDAO<Folder, FolderListener,
-    FolderEvent> implements IFolderDAO<Folder>   {
+public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListener,
+    FolderEvent> implements IFolderDAO   {
 
   public FolderDAOImpl() {
     super(Folder.class);
   }
 
   @Override
-  protected final FolderEvent createDeleteEventTemplate(Folder entity) {
+  protected final FolderEvent createDeleteEventTemplate(IFolder entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final FolderEvent createSaveEventTemplate(Folder entity) {
+  protected final FolderEvent createSaveEventTemplate(IFolder entity) {
     return new FolderEvent(entity, null, true);
   }
 
