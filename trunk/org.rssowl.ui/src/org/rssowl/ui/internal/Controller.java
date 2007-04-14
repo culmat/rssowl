@@ -685,7 +685,11 @@ public class Controller {
   //
   //    /* Shutdown ApplicationServer */
   //    ApplicationServer.getDefault().shutdown();
+  //
+  //    /* Shutdown DataBase */
+  //    NewsModel.getDefault().getPersistenceLayer().shutdown();
   //  }
+
   private void onFirstStartup() throws PersistenceException, InterpreterException, ParserException {
 
     /* Add Default Labels */
