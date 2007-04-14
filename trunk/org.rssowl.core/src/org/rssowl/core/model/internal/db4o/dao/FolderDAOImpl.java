@@ -23,11 +23,19 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
+import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.FolderEvent;
 import org.rssowl.core.model.events.FolderListener;
 import org.rssowl.core.model.internal.persist.Folder;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.dao.IFolderDAO;
+
+import com.db4o.ObjectSet;
+import com.db4o.ext.Db4oException;
+import com.db4o.query.Query;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListener,
     FolderEvent> implements IFolderDAO   {
@@ -49,6 +57,19 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
   @Override
   protected final boolean isSaveFully() {
     return false;
+  }
+
+  public Collection<IFolder> loadRoot() {
+    try {
+      Query query = fDb.query();
+      query.constrain(fEntityClass);
+      query.descend("fParent").constrain(null); //$NON-NLS-1$
+      ObjectSet<IFolder> folders = getObjectSet(query);
+      activateAll(folders);
+      return new ArrayList<IFolder>(folders);
+    } catch (Db4oException e) {
+      throw new PersistenceException(e);
+    }
   }
 
 }

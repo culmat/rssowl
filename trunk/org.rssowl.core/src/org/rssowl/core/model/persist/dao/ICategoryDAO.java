@@ -23,10 +23,24 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.persist.dao;
 
+import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.CategoryEvent;
 import org.rssowl.core.model.events.CategoryListener;
 import org.rssowl.core.model.persist.ICategory;
 
+import java.util.Set;
+
 public interface ICategoryDAO extends IEntityDAO<ICategory, CategoryListener, CategoryEvent> {
-  // No new methods
+  
+  /**
+   * Loads a sorted <code>Set</code> of category names for all categories that
+   * are persisted and have non-null names.
+   * 
+   * @return a sorted <code>Set</code> of Strings containing all categories
+   * that are persisted in the persistence layer.
+   * @throws PersistenceException In case of an error while accessing the
+   * persistance layer implementation.
+   */
+  Set<String> loadAllNames();
+  
 }

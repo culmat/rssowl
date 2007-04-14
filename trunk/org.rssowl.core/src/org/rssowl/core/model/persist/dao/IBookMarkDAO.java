@@ -26,9 +26,12 @@ package org.rssowl.core.model.persist.dao;
 import org.rssowl.core.model.events.BookMarkEvent;
 import org.rssowl.core.model.events.BookMarkListener;
 import org.rssowl.core.model.persist.IBookMark;
-import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.reference.FeedLinkReference;
+
+import java.util.List;
 
 public interface IBookMarkDAO extends IEntityDAO<IBookMark,
     BookMarkListener, BookMarkEvent> {
-  // No new methods
+  
+  List<IBookMark> loadAll(FeedLinkReference feedRef);
 }

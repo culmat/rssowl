@@ -53,66 +53,24 @@ import java.util.Set;
 public interface IApplicationLayer {
 
   /**
-   * Loads and returns all the feeds available in the persistence layer.
+   * Handles all the persistence-related operations for a feed that has been
+   * provided by the interpreter. This includes:
+   * <li>Merging the contents of the interpreted feed with the currently saved
+   * one.</li>
+   * <li>Running the retention policy.</li>
+   * <li>Updating the ConditionalGet object associated with the feed.</li>
    *
-   * @return a list of all feeds in the persistence layer.
-   * @throws PersistenceException In case of an error while loading the Types.
+   * @param bookMark The BookMark that contains the feed that has been reloaded.
+   * @param interpretedFeed The IFeed object that has been supplied by the
+   * interpreter based on its online contents.
+   * @param conditionalGet IConditionalObject associated with the IFeed or
+   * <code>null</code> if there isn't one.
+   * @param deleteConditionalGet if <code>true</code> an existing
+   * IConditionalGet object associated with the IFeed will be deleted as part of
+   * this operation.
    */
-  List<IFeed> loadAllFeeds();
-
-  /**
-   * Loads and returns all the bookmarks available in the system.
-   * <p>
-   * TODO No longer being used!
-   * </p>
-   *
-   * @param activateFully if <code>true</code>, the marks are fully
-   * activated. Otherwise, the default is used.
-   * @return a list of all bookmarks in the system.
-   * @throws PersistenceException In case of an error while loading the Types.
-   */
-  List<IBookMark> loadAllBookMarks(boolean activateFully) throws PersistenceException;
-
-  /**
-   * Get all bookmarks that reference the given Feed.
-   *
-   * @param feedRef A reference to the Feed of interest.
-   * @return Returns a List of <code>BookMarkReference</code> that point to
-   * the given Feed.
-   * @throws PersistenceException In case of an error while loading the Types.
-   */
-  List<IBookMark> loadBookMarks(FeedLinkReference feedRef) throws PersistenceException;
-
-  /**
-   * Loads all Folders from the persistance layer, that do not have any parent
-   * Folder, making them the root-leveld Folders.
-   *
-   * @return A List containing references to all Folders that do not have any
-   * parent Folder or <code>NULL</code> in case no root-leveld Folders are
-   * available.
-   * @throws PersistenceException In case of an error while accessing the
-   * persistance layer implementation.
-   */
-  List<IFolder> loadRootFolders() throws PersistenceException;
-
-  /**
-   * Deletes all folder items in <code>folders</code> and their respective
-   * children from the persistence layer.
-   *
-   * @param folders list containing items to be deleted.
-   * @throws PersistenceException In case of an error while loading the Types.
-   */
-  void deleteFolders(List<IFolder> folders) throws PersistenceException;
-
-  /**
-   * Loads all Labels from the persistence layer.
-   *
-   * @return A List containing all Labels.
-   * @throws PersistenceException In case of an error while accessing the
-   * persistance layer implementation.
-   */
-  List<ILabel> loadLabels() throws PersistenceException;
-
+  void handleFeedReload(IBookMark bookMark, IFeed interpretedFeed, IConditionalGet conditionalGet, boolean deleteConditionalGet);
+  
   /**
    * <p>
    * If <code>foldersInfos</code> is not null, performs the reparenting of the
@@ -135,7 +93,61 @@ public interface IApplicationLayer {
    * @throws PersistenceException In case of an error while loading the Types.
    */
   void reparent(List<ReparentInfo<IFolder, IFolder>> folderInfos, List<ReparentInfo<IMark, IFolder>> markInfos) throws PersistenceException;
+  
+  //FIXME Available elsewhere, may remove
+  /**
+   * Loads and returns all the feeds available in the persistence layer.
+   *
+   * @return a list of all feeds in the persistence layer.
+   * @throws PersistenceException In case of an error while loading the Types.
+   */
+  List<IFeed> loadAllFeeds();
 
+  //FIXME Available elsewhere, may remove
+  /**
+   * Get all bookmarks that reference the given Feed.
+   *
+   * @param feedRef A reference to the Feed of interest.
+   * @return Returns a List of <code>BookMarkReference</code> that point to
+   * the given Feed.
+   * @throws PersistenceException In case of an error while loading the Types.
+   */
+  List<IBookMark> loadBookMarks(FeedLinkReference feedRef) throws PersistenceException;
+
+  //FIXME Available elsewhere, may remove
+  /**
+   * Loads all Folders from the persistance layer, that do not have any parent
+   * Folder, making them the root-leveld Folders.
+   *
+   * @return A List containing references to all Folders that do not have any
+   * parent Folder or <code>NULL</code> in case no root-leveld Folders are
+   * available.
+   * @throws PersistenceException In case of an error while accessing the
+   * persistance layer implementation.
+   */
+  List<IFolder> loadRootFolders() throws PersistenceException;
+
+  //FIXME Available elsewhere, may remove
+  /**
+   * Deletes all folder items in <code>folders</code> and their respective
+   * children from the persistence layer.
+   *
+   * @param folders list containing items to be deleted.
+   * @throws PersistenceException In case of an error while loading the Types.
+   */
+  void deleteFolders(List<IFolder> folders) throws PersistenceException;
+
+  //FIXME Available elsewhere, may remove
+  /**
+   * Loads all Labels from the persistence layer.
+   *
+   * @return A List containing all Labels.
+   * @throws PersistenceException In case of an error while accessing the
+   * persistance layer implementation.
+   */
+  List<ILabel> loadLabels() throws PersistenceException;
+
+  //FIXME Available elsewhere, may remove
   /**
    * Returns a <code>FeedReference</code> that points to a IFeed with the
    * given <code>link</code> in the persistance layer.
@@ -148,6 +160,7 @@ public interface IApplicationLayer {
    */
   FeedReference loadFeedReference(URI link) throws PersistenceException;
 
+  //FIXME Available elsewhere, may remove
   /**
    * Loads a <code>IFeed</code> with the given <code>link</code> from the
    * persistance layer.
@@ -160,6 +173,7 @@ public interface IApplicationLayer {
    */
   IFeed loadFeed(URI link) throws PersistenceException;
 
+  //FIXME Available elsewhere, may remove
   /**
    * Sets the state of all the news items contained in <code>news</code> to
    * <code>state</code>. In addition, if <code>affectEquivalentNews</code>
@@ -178,6 +192,7 @@ public interface IApplicationLayer {
    */
   void setNewsState(List<INews> news, INews.State state, boolean afffectEquivalentNews, boolean force) throws PersistenceException;
 
+  //FIXME Available elsewhere, may remove
   /**
    * Saves all the news items in <code>newsList</code>. This method should be
    * used instead of {@link IModelDAO#saveNews(INews)} when the caller has a set
@@ -194,25 +209,7 @@ public interface IApplicationLayer {
    */
   List<INews> saveNews(List<INews> newsList) throws PersistenceException;
 
-  /**
-   * Handles all the persistence-related operations for a feed that has been
-   * provided by the interpreter. This includes:
-   * <li>Merging the contents of the interpreted feed with the currently saved
-   * one.</li>
-   * <li>Running the retention policy.</li>
-   * <li>Updating the ConditionalGet object associated with the feed.</li>
-   *
-   * @param bookMark The BookMark that contains the feed that has been reloaded.
-   * @param interpretedFeed The IFeed object that has been supplied by the
-   * interpreter based on its online contents.
-   * @param conditionalGet IConditionalObject associated with the IFeed or
-   * <code>null</code> if there isn't one.
-   * @param deleteConditionalGet if <code>true</code> an existing
-   * IConditionalGet object associated with the IFeed will be deleted as part of
-   * this operation.
-   */
-  void handleFeedReload(IBookMark bookMark, IFeed interpretedFeed, IConditionalGet conditionalGet, boolean deleteConditionalGet);
-
+  //FIXME Available elsewhere, may remove
   /**
    * Loads a sorted <code>Set</code> of Strings containing all categories that
    * are persisted in the persistence layer.
@@ -224,6 +221,7 @@ public interface IApplicationLayer {
    */
   Set<String> loadCategories();
 
+  //FIXME Available elsewhere, may remove
   /**
    * Loads a sorted <code>Set</code> of Strings containing all authors that
    * are persisted in the persistence layer.

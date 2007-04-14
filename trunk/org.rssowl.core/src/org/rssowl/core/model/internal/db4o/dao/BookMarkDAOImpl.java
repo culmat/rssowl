@@ -23,11 +23,20 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
+import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.BookMarkEvent;
 import org.rssowl.core.model.events.BookMarkListener;
 import org.rssowl.core.model.internal.persist.BookMark;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.dao.IBookMarkDAO;
+import org.rssowl.core.model.reference.FeedLinkReference;
+
+import com.db4o.ObjectSet;
+import com.db4o.ext.Db4oException;
+import com.db4o.query.Query;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public final class BookMarkDAOImpl extends AbstractEntityDAO<IBookMark, BookMarkListener,
     BookMarkEvent> implements IBookMarkDAO  {
@@ -49,5 +58,18 @@ public final class BookMarkDAOImpl extends AbstractEntityDAO<IBookMark, BookMark
   @Override
   protected final boolean isSaveFully() {
     return false;
+  }
+  
+  public final List<IBookMark> loadAll(FeedLinkReference feedRef) {
+    try {
+      Query query = fDb.query();
+      query.constrain(fEntityClass);
+      query.descend("fFeedLink").constrain(feedRef.getLink().toString()); //$NON-NLS-1$
+      ObjectSet<IBookMark> marks = getObjectSet(query);
+      activateAll(marks);
+      return new ArrayList<IBookMark>(marks);
+    } catch (Db4oException e) {
+      throw new PersistenceException(e);
+    }
   }
 }

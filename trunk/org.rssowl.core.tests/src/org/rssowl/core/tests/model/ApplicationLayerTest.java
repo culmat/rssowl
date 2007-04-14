@@ -57,6 +57,7 @@ import org.rssowl.core.model.persist.IModelTypesFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.INews.State;
+import org.rssowl.core.model.persist.dao.IBookMarkDAO;
 import org.rssowl.core.model.reference.BookMarkReference;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FeedReference;
@@ -70,6 +71,7 @@ import org.rssowl.ui.internal.NewsService;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -729,8 +731,8 @@ public class ApplicationLayerTest {
     IFeed feed = fFactory.createFeed(null, new URI("http://www.myfeed.com"));
     fDao.saveFeed(feed);
 
-    List<IBookMark> emptyBookmarks = fAppLayer.loadAllBookMarks(false);
-    emptyBookmarks = fAppLayer.loadAllBookMarks(true);
+    IBookMarkDAO markDAO = Owl.getPersistenceService().getBookMarkDAO();
+    Collection<IBookMark> emptyBookmarks = markDAO.loadAll();
     assertEquals(0, emptyBookmarks.size());
 
     IFolder root1 = fFactory.createFolder(null, null, "Root 1");
@@ -747,10 +749,10 @@ public class ApplicationLayerTest {
     BookMarkReference bookmarkRef2 = new BookMarkReference(fDao.saveBookMark(bookmark2).getId());
     BookMarkReference bookmarkRef3 = new BookMarkReference(fDao.saveBookMark(bookmark3).getId());
 
-    List<IBookMark> filledBookmarks = fAppLayer.loadAllBookMarks(true);
+    Collection<IBookMark> filledBookmarks = markDAO.loadAll();
     assertEquals(3, filledBookmarks.size());
 
-    filledBookmarks = fAppLayer.loadAllBookMarks(false);
+    filledBookmarks = markDAO.loadAll();
     assertEquals(3, filledBookmarks.size());
 
     for (IBookMark mark : filledBookmarks) {
@@ -781,16 +783,15 @@ public class ApplicationLayerTest {
     root1 = null;
     System.gc();
 
-    List<IBookMark> marks = fAppLayer.loadAllBookMarks(true);
+    IBookMarkDAO markDAO = Owl.getPersistenceService().getBookMarkDAO();
+    Collection<IBookMark> marks = markDAO.loadAll();
     assertEquals(1, marks.size());
-    assertEquals(folderName, marks.get(0).getFolder().getName());
+    assertEquals(folderName, marks.iterator().next().getFolder().getName());
     marks = null;
     System.gc();
 
-    marks = fAppLayer.loadAllBookMarks(false);
+    marks = markDAO.loadAll();
     assertEquals(1, marks.size());
-    //TODO Using an activation depth of 1 seems to be buggy. Using 2 for now
-    //    assertNull(marks.get(0).getFolder().getName());
   }
 
   /**

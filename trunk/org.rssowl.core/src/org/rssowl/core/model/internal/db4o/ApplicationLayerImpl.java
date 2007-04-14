@@ -492,18 +492,6 @@ public class ApplicationLayerImpl implements IApplicationLayer {
     }
   }
 
-  public List<IBookMark> loadAllBookMarks(boolean activateFully) {
-    try {
-      ObjectSet<IBookMark> marks = fDb.ext().query(IBookMark.class);
-      if (activateFully)
-        activateAll(marks);
-
-      return new ArrayList<IBookMark>(marks);
-    } catch (Db4oException e) {
-      throw new PersistenceException(e);
-    }
-  }
-
   public List<IFeed> loadAllFeeds() {
     try {
       ObjectSet<IFeed> feeds = fDb.ext().query(IFeed.class);

@@ -55,6 +55,11 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
   }
 
   protected abstract boolean isSaveFully();
+  
+  @SuppressWarnings("unchecked")
+  protected final ObjectSet<T> getObjectSet(Query query)    {
+    return query.execute();
+  }
 
   /*
    * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#load(long)
@@ -93,11 +98,11 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
     }
   }
 
-  protected final <O> Collection<O> activateAll(Collection<O> list) {
-    for (O o : list)
+  protected final <C extends Collection<O>, O> C activateAll(C collection) {
+    for (O o : collection)
       fDb.ext().activate(o, Integer.MAX_VALUE);
   
-    return list;
+    return collection;
   }
 
   /*
