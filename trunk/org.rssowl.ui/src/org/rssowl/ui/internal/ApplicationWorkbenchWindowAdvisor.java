@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal;
 
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -59,6 +60,7 @@ import org.rssowl.core.model.events.runnable.EventType;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.persist.pref.PreferencesEvent;
 import org.rssowl.core.model.persist.pref.PreferencesListener;
+import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.util.JobRunner;
 
@@ -131,20 +133,24 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
    */
   @Override
   public void postWindowOpen() {
+    SafeRunner.run(new LoggingSafeRunnable() {
+      public void run() throws Exception {
 
-    /* Retrieve Preferences */
-    fPreferences = Owl.getPreferenceService().getGlobalScope();
+        /* Retrieve Preferences */
+        fPreferences = Owl.getPreferenceService().getGlobalScope();
 
-    /* Hook TrayItem if supported on OS and 1st Window */
-    if (fPreferences.getBoolean(DefaultPreferences.USE_SYSTEM_TRAY))
-      enableTray();
+        /* Hook TrayItem if supported on OS and 1st Window */
+        if (fPreferences.getBoolean(DefaultPreferences.USE_SYSTEM_TRAY))
+          enableTray();
 
-    /* Win only: Allow Scroll over Cursor-Control */
-    if (Application.IS_WINDOWS)
-      hookFocuslessScrolling(getWindowConfigurer().getWindow().getShell().getDisplay());
+        /* Win only: Allow Scroll over Cursor-Control */
+        if (Application.IS_WINDOWS)
+          hookFocuslessScrolling(getWindowConfigurer().getWindow().getShell().getDisplay());
 
-    /* Register Listeners */
-    registerListeners();
+        /* Register Listeners */
+        registerListeners();
+      }
+    });
   }
 
   /*
@@ -152,14 +158,19 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
    */
   @Override
   public boolean preWindowShellClose() {
+    final boolean[] res = new boolean[] { true };
+    SafeRunner.run(new LoggingSafeRunnable() {
+      public void run() throws Exception {
 
-    /* Check if Prefs tell to move to tray */
-    if (fPreferences.getBoolean(DefaultPreferences.TRAY_ON_EXIT)) {
-      getWindowConfigurer().getWindow().getShell().notifyListeners(SWT.Iconify, new Event());
-      return false;
-    }
+        /* Check if Prefs tell to move to tray */
+        if (fPreferences.getBoolean(DefaultPreferences.TRAY_ON_EXIT)) {
+          getWindowConfigurer().getWindow().getShell().notifyListeners(SWT.Iconify, new Event());
+          res[0] = false;
+        }
+      }
+    });
 
-    return super.preWindowShellClose();
+    return res[0];
   }
 
   boolean isMinimizedToTray() {
