@@ -30,6 +30,7 @@ import org.rssowl.core.model.persist.dao.IBookMarkDAO;
 import org.rssowl.core.model.persist.dao.ICategoryDAO;
 import org.rssowl.core.model.persist.dao.IFeedDAO;
 import org.rssowl.core.model.persist.dao.IFolderDAO;
+import org.rssowl.core.model.persist.dao.ILabelDAO;
 import org.rssowl.core.model.persist.dao.INewsCounterDAO;
 import org.rssowl.core.model.persist.dao.INewsDAO;
 import org.rssowl.core.model.persist.dao.IPersonDAO;
@@ -71,6 +72,8 @@ public interface IPersistenceService {
   ISearchConditionDAO getSearchConditionDAO();
 
   ISearchMarkDAO getSearchMarkDAO();
+  
+  ILabelDAO getLabelDAO();
   
   /**
    * <p>

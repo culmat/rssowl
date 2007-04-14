@@ -46,4 +46,6 @@ public abstract class DAOFactory {
   public abstract ISearchConditionDAO createSearchConditionDAO();
   
   public abstract ISearchMarkDAO createSearchMarkDAO();
+
+  public abstract ILabelDAO createLabelDAO();
 }
