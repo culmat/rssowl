@@ -27,6 +27,6 @@ import org.rssowl.core.model.events.PersonEvent;
 import org.rssowl.core.model.events.PersonListener;
 import org.rssowl.core.model.persist.IPerson;
 
-public interface IPersonDAO<T extends IPerson> extends IEntityDAO<T, PersonListener, PersonEvent> {
+public interface IPersonDAO extends IEntityDAO<IPerson, PersonListener, PersonEvent> {
 
 }

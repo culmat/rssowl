@@ -27,7 +27,7 @@ import org.rssowl.core.model.events.AttachmentEvent;
 import org.rssowl.core.model.events.AttachmentListener;
 import org.rssowl.core.model.persist.IAttachment;
 
-public interface IAttachmentDAO<T extends IAttachment> extends IEntityDAO<T,
+public interface IAttachmentDAO extends IEntityDAO<IAttachment,
     AttachmentListener, AttachmentEvent>   {
   // No new methods
 }

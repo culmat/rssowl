@@ -28,6 +28,6 @@ import org.rssowl.core.model.events.SearchConditionEvent;
 import org.rssowl.core.model.events.SearchConditionListener;
 import org.rssowl.core.model.persist.search.ISearchCondition;
 
-public interface ISearchConditionDAO<T extends ISearchCondition> extends IEntityDAO<T, SearchConditionListener, SearchConditionEvent> {
+public interface ISearchConditionDAO extends IEntityDAO<ISearchCondition, SearchConditionListener, SearchConditionEvent> {
   // No new methods
 }

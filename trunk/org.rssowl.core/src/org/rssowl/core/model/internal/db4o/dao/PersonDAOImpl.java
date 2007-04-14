@@ -26,22 +26,23 @@ package org.rssowl.core.model.internal.db4o.dao;
 import org.rssowl.core.model.events.PersonEvent;
 import org.rssowl.core.model.events.PersonListener;
 import org.rssowl.core.model.internal.persist.Person;
+import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.model.persist.dao.IPersonDAO;
 
-public class PersonDAOImpl extends AbstractEntityDAO<Person, PersonListener,
-    PersonEvent> implements IPersonDAO<Person>  {
+public class PersonDAOImpl extends AbstractEntityDAO<IPerson, PersonListener,
+    PersonEvent> implements IPersonDAO  {
 
   public PersonDAOImpl() {
     super(Person.class);
   }
   
   @Override
-  protected PersonEvent createDeleteEventTemplate(Person entity) {
+  protected PersonEvent createDeleteEventTemplate(IPerson entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final PersonEvent createSaveEventTemplate(Person entity) {
+  protected final PersonEvent createSaveEventTemplate(IPerson entity) {
     return new PersonEvent(entity, true);
   }
 

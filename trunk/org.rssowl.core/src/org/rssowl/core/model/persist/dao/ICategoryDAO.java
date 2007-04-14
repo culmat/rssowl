@@ -27,7 +27,6 @@ import org.rssowl.core.model.events.CategoryEvent;
 import org.rssowl.core.model.events.CategoryListener;
 import org.rssowl.core.model.persist.ICategory;
 
-public interface ICategoryDAO<T extends ICategory> extends IEntityDAO<T,
-    CategoryListener, CategoryEvent>    {
+public interface ICategoryDAO extends IEntityDAO<ICategory, CategoryListener, CategoryEvent> {
   // No new methods
 }

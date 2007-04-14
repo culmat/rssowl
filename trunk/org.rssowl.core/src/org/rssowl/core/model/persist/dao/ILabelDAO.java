@@ -27,6 +27,6 @@ import org.rssowl.core.model.events.LabelEvent;
 import org.rssowl.core.model.events.LabelListener;
 import org.rssowl.core.model.persist.ILabel;
 
-public interface ILabelDAO<T extends ILabel> extends IEntityDAO<T, LabelListener, LabelEvent>   {
+public interface ILabelDAO extends IEntityDAO<ILabel, LabelListener, LabelEvent>   {
   // No new methods
 }

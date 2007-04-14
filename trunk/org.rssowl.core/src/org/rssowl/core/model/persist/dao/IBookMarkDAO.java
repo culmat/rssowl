@@ -28,7 +28,7 @@ import org.rssowl.core.model.events.BookMarkListener;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 
-public interface IBookMarkDAO<T extends IBookMark> extends IEntityDAO<T,
+public interface IBookMarkDAO extends IEntityDAO<IBookMark,
     BookMarkListener, BookMarkEvent> {
   // No new methods
 }

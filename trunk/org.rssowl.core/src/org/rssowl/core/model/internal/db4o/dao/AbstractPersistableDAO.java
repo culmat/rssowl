@@ -44,12 +44,12 @@ import java.util.concurrent.locks.ReadWriteLock;
 public abstract class AbstractPersistableDAO<T extends IPersistable> implements
     IPersistableDAO<T> {
 
-  protected final Class<T> fEntityClass;
+  protected final Class<? extends T> fEntityClass;
   protected ReadWriteLock fLock;
   protected Lock fWriteLock;
   protected ObjectContainer fDb;
 
-  public AbstractPersistableDAO(Class<T> entityClass) {
+  public AbstractPersistableDAO(Class<? extends T> entityClass) {
     Assert.isNotNull(entityClass, "entityClass");
     fEntityClass = entityClass;
   }
@@ -84,7 +84,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
    */
   public Collection<T> loadAll() {
     try {
-      ObjectSet<T> entities = fDb.query(fEntityClass);
+      ObjectSet<? extends T> entities = fDb.query(fEntityClass);
       activateAll(entities);
   
       return new ArrayList<T>(entities);
@@ -168,7 +168,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
    */
   public long countAll() {
     try {
-      ObjectSet<T> entities = fDb.query(fEntityClass);
+      ObjectSet<? extends T> entities = fDb.query(fEntityClass);
       return entities.size();
     } catch (Db4oException e) {
       throw new PersistenceException(e);
