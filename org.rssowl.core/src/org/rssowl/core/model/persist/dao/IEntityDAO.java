@@ -21,48 +21,22 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o.dao;
+package org.rssowl.core.model.persist.dao;
 
-import org.rssowl.core.model.events.AttachmentEvent;
-import org.rssowl.core.model.events.AttachmentListener;
-import org.rssowl.core.model.events.NewsEvent;
-import org.rssowl.core.model.internal.db4o.DBHelper;
-import org.rssowl.core.model.internal.persist.Attachment;
-import org.rssowl.core.model.persist.INews;
-import org.rssowl.core.model.persist.dao.IAttachmentDAO;
+import org.rssowl.core.model.events.EntityListener;
+import org.rssowl.core.model.events.ModelEvent;
+import org.rssowl.core.model.persist.IEntity;
 
-public final class AttachmentDAOImpl extends AbstractEntityDAO<Attachment,
-    AttachmentListener, AttachmentEvent> implements IAttachmentDAO<Attachment>  {
+/**
+ * Base interface for all IEntity DAOs.
+ * @param <T> 
+ * @param <L> 
+ * @param <E> 
+ */
+public interface IEntityDAO<T extends IEntity, L extends EntityListener<E>,
+    E extends ModelEvent> extends IPersistableDAO<T> {
 
-  public AttachmentDAOImpl() {
-    super(Attachment.class);
-  }
-
-  @Override
-  protected final AttachmentEvent createDeleteEventTemplate(Attachment entity) {
-    return createSaveEventTemplate(entity);
-  }
-
-  @Override
-  protected final AttachmentEvent createSaveEventTemplate(Attachment entity) {
-    return new AttachmentEvent(entity, true);
-  }
+  public void addEntityListener(L listener);
   
-  @Override
-  public final void doDelete(Attachment entity) {
-    //TODO Not sure about this, but let's do it for now to help us track a bug
-    //in NewsService where never having a newsUpdated with a null oldNews is
-    //helpful
-    INews news = entity.getNews();
-    INews oldNews = fDb.ext().peekPersisted(news, 2, true);
-    NewsEvent newsEvent = new NewsEvent(oldNews, news, false);
-    DBHelper.putEventTemplate(newsEvent);
-    super.doDelete(entity);
-  }
-
-  @Override
-  protected final boolean isSaveFully() {
-    return false;
-  }
-
+  public void removeEntityListener(L listener);
 }

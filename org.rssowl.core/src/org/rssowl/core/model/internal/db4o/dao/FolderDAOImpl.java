@@ -26,9 +26,10 @@ package org.rssowl.core.model.internal.db4o.dao;
 import org.rssowl.core.model.events.FolderEvent;
 import org.rssowl.core.model.events.FolderListener;
 import org.rssowl.core.model.internal.persist.Folder;
+import org.rssowl.core.model.persist.dao.IFolderDAO;
 
 public final class FolderDAOImpl extends AbstractEntityDAO<Folder, FolderListener,
-    FolderEvent>    {
+    FolderEvent> implements IFolderDAO<Folder>   {
 
   public FolderDAOImpl() {
     super(Folder.class);

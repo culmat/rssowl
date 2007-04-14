@@ -31,15 +31,23 @@ import org.rssowl.core.model.internal.db4o.DBManager;
 import org.rssowl.core.model.internal.db4o.DatabaseEvent;
 import org.rssowl.core.model.internal.db4o.DatabaseListener;
 import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.dao.IEntityDAO;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * A db4o abstract implementation of EntityDAO.
+ * 
+ * @param <T> Type of concrete implementation of IEntity.
+ * @param <L> Type of EntityListener.
+ * @param <E> Type of ModelEvent.
+ */
 public abstract class AbstractEntityDAO<T extends IEntity,
     L extends EntityListener<E>, E extends ModelEvent>
-    extends AbstractPersistableDAO<T> {
+    extends AbstractPersistableDAO<T> implements IEntityDAO<T, L, E>{
 
   private final List<L> entityListeners = new CopyOnWriteArrayList<L>();
   /**
@@ -107,11 +115,11 @@ public abstract class AbstractEntityDAO<T extends IEntity,
     }
   }
   
-  public void addLifeCycleListener(L listener) {
+  public void addEntityListener(L listener) {
     entityListeners.add(listener);
   }
   
-  public void removeLifeCycleListener(L listener) {
+  public void removeEntityListener(L listener) {
     entityListeners.remove(listener);
   }
 }

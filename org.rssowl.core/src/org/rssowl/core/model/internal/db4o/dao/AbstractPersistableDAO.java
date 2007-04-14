@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.internal.db4o.DBHelper;
 import org.rssowl.core.model.persist.IPersistable;
+import org.rssowl.core.model.persist.dao.IPersistableDAO;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
@@ -40,7 +41,8 @@ import java.util.Collections;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
-public abstract class AbstractPersistableDAO<T extends IPersistable> {
+public abstract class AbstractPersistableDAO<T extends IPersistable> implements
+    IPersistableDAO<T> {
 
   protected final Class<T> fEntityClass;
   protected ReadWriteLock fLock;
@@ -54,6 +56,9 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> {
 
   protected abstract boolean isSaveFully();
 
+  /*
+   * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#load(long)
+   */
   public T load(long id) {
     try {
       Query query = fDb.query();
@@ -74,6 +79,9 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> {
     return null;
   }
 
+  /*
+   * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#loadAll()
+   */
   public Collection<T> loadAll() {
     try {
       ObjectSet<T> entities = fDb.query(fEntityClass);
@@ -92,11 +100,17 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> {
     return list;
   }
 
+  /*
+   * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#save(T)
+   */
   public T save(T object) {
     saveAll(Collections.singletonList(object));
     return object;
   }
   
+  /*
+   * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#saveAll(C)
+   */
   public <C extends Collection<T>> C saveAll(C objects) {
     fWriteLock.lock();
     try {
@@ -120,6 +134,9 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> {
       fDb.set(entity);
   }
 
+  /*
+   * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#delete(T)
+   */
   public void delete(T object) {
     deleteAll(Collections.singletonList(object));
   }
@@ -128,6 +145,9 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> {
     fDb.delete(entity);
   }
 
+  /*
+   * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#deleteAll(java.util.Collection)
+   */
   public void deleteAll(Collection<T> objects) {
     fWriteLock.lock();
     try {
@@ -143,6 +163,9 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> {
     DBHelper.cleanUpAndFireEvents();
   }
 
+  /*
+   * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#countAll()
+   */
   public long countAll() {
     try {
       ObjectSet<T> entities = fDb.query(fEntityClass);

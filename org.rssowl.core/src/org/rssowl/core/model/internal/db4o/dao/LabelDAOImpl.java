@@ -26,9 +26,10 @@ package org.rssowl.core.model.internal.db4o.dao;
 import org.rssowl.core.model.events.LabelEvent;
 import org.rssowl.core.model.events.LabelListener;
 import org.rssowl.core.model.internal.persist.Label;
+import org.rssowl.core.model.persist.dao.ILabelDAO;
 
 public final class LabelDAOImpl extends AbstractEntityDAO<Label, LabelListener,
-    LabelEvent> {
+    LabelEvent> implements ILabelDAO<Label> {
 
   public LabelDAOImpl() {
     super(Label.class);
