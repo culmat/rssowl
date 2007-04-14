@@ -28,10 +28,12 @@ import org.eclipse.core.net.proxy.IProxyService;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.rssowl.core.util.LoggingSafeRunnable;
 
 /**
  * The main plugin class to be used in the desktop.
@@ -62,10 +64,18 @@ public class Activator extends Plugin {
     fVersion = (String) fPlugin.getBundle().getHeaders().get("Bundle-Version"); //$NON-NLS-1$
 
     /* Load the Proxy Service */
-    fProxyService = loadProxyService();
+    SafeRunner.run(new LoggingSafeRunnable() {
+      public void run() throws Exception {
+        fProxyService = loadProxyService();
+      }
+    });
 
     /* Activate Internal Owl */
-    InternalOwl.getDefault().startup();
+    SafeRunner.run(new LoggingSafeRunnable() {
+      public void run() throws Exception {
+        InternalOwl.getDefault().startup();
+      }
+    });
   }
 
   private IProxyService loadProxyService() {
@@ -97,7 +107,11 @@ public class Activator extends Plugin {
   public void stop(BundleContext context) throws Exception {
 
     /* Stop Internal Owl */
-    InternalOwl.getDefault().shutdown();
+    SafeRunner.run(new LoggingSafeRunnable() {
+      public void run() throws Exception {
+        InternalOwl.getDefault().shutdown();
+      }
+    });
 
     /* Proceed */
     super.stop(context);
