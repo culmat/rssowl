@@ -27,9 +27,10 @@ import org.rssowl.core.model.events.FeedEvent;
 import org.rssowl.core.model.events.FeedListener;
 import org.rssowl.core.model.internal.db4o.DBHelper;
 import org.rssowl.core.model.internal.persist.Feed;
+import org.rssowl.core.model.persist.dao.IFeedDAO;
 
 public final class FeedDAOImpl extends AbstractEntityDAO<Feed, FeedListener,
-    FeedEvent>  {
+    FeedEvent> implements IFeedDAO<Feed>  {
 
   public FeedDAOImpl() {
     super(Feed.class);

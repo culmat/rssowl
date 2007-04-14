@@ -26,9 +26,10 @@ package org.rssowl.core.model.internal.db4o.dao;
 import org.rssowl.core.model.events.PersonEvent;
 import org.rssowl.core.model.events.PersonListener;
 import org.rssowl.core.model.internal.persist.Person;
+import org.rssowl.core.model.persist.dao.IPersonDAO;
 
 public class PersonDAOImpl extends AbstractEntityDAO<Person, PersonListener,
-    PersonEvent>{
+    PersonEvent> implements IPersonDAO<Person>  {
 
   public PersonDAOImpl() {
     super(Person.class);

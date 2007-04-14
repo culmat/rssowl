@@ -28,8 +28,10 @@ import org.rssowl.core.model.events.NewsListener;
 import org.rssowl.core.model.internal.db4o.DBHelper;
 import org.rssowl.core.model.internal.persist.News;
 import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.dao.INewsDAO;
 
-public final class NewsDAOImpl extends AbstractEntityDAO<News, NewsListener, NewsEvent> {
+public final class NewsDAOImpl extends AbstractEntityDAO<News, NewsListener, NewsEvent>
+    implements INewsDAO<News>   {
 
   public NewsDAOImpl() {
     super(News.class);

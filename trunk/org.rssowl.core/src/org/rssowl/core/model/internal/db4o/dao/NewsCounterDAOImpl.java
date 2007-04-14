@@ -24,10 +24,12 @@
 package org.rssowl.core.model.internal.db4o.dao;
 
 import org.rssowl.core.model.persist.NewsCounter;
+import org.rssowl.core.model.persist.dao.INewsCounterDAO;
 
 import java.util.Collection;
 
-public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter>  {
+public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter>
+    implements INewsCounterDAO  {
 
   public NewsCounterDAOImpl() {
     super(NewsCounter.class);

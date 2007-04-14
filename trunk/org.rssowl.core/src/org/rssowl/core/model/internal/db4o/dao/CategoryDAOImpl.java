@@ -26,9 +26,10 @@ package org.rssowl.core.model.internal.db4o.dao;
 import org.rssowl.core.model.events.CategoryEvent;
 import org.rssowl.core.model.events.CategoryListener;
 import org.rssowl.core.model.internal.persist.Category;
+import org.rssowl.core.model.persist.dao.ICategoryDAO;
 
 public final class CategoryDAOImpl extends AbstractEntityDAO<Category,
-    CategoryListener, CategoryEvent>    {
+    CategoryListener, CategoryEvent> implements ICategoryDAO<Category>   {
 
   public CategoryDAOImpl() {
     super(Category.class);

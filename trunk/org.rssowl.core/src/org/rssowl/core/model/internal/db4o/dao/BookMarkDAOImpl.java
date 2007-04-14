@@ -26,9 +26,10 @@ package org.rssowl.core.model.internal.db4o.dao;
 import org.rssowl.core.model.events.BookMarkEvent;
 import org.rssowl.core.model.events.BookMarkListener;
 import org.rssowl.core.model.internal.persist.BookMark;
+import org.rssowl.core.model.persist.dao.IBookMarkDAO;
 
 public final class BookMarkDAOImpl extends AbstractEntityDAO<BookMark, BookMarkListener,
-    BookMarkEvent>  {
+    BookMarkEvent> implements IBookMarkDAO<BookMark>  {
 
   public BookMarkDAOImpl() {
     super(BookMark.class);

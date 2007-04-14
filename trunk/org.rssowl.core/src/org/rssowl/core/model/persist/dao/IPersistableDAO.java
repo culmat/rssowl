@@ -21,48 +21,58 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.events.AttachmentEvent;
-import org.rssowl.core.model.events.AttachmentListener;
-import org.rssowl.core.model.events.NewsEvent;
-import org.rssowl.core.model.internal.db4o.DBHelper;
-import org.rssowl.core.model.internal.persist.Attachment;
-import org.rssowl.core.model.persist.INews;
-import org.rssowl.core.model.persist.dao.IAttachmentDAO;
+package org.rssowl.core.model.persist.dao;
 
-public final class AttachmentDAOImpl extends AbstractEntityDAO<Attachment,
-    AttachmentListener, AttachmentEvent> implements IAttachmentDAO<Attachment>  {
+import org.rssowl.core.model.dao.PersistenceException;
+import org.rssowl.core.model.persist.IPersistable;
 
-  public AttachmentDAOImpl() {
-    super(Attachment.class);
-  }
+import java.util.Collection;
 
-  @Override
-  protected final AttachmentEvent createDeleteEventTemplate(Attachment entity) {
-    return createSaveEventTemplate(entity);
-  }
+/**
+ * The base interface that provides methods for saving, loading and deleting
+ * IPersistables.
+ * 
+ * @param <T> The type of the IPersistable that the implementation of this interface
+ * can handle.
+ */
+public interface IPersistableDAO<T extends IPersistable> {
 
-  @Override
-  protected final AttachmentEvent createSaveEventTemplate(Attachment entity) {
-    return new AttachmentEvent(entity, true);
-  }
-  
-  @Override
-  public final void doDelete(Attachment entity) {
-    //TODO Not sure about this, but let's do it for now to help us track a bug
-    //in NewsService where never having a newsUpdated with a null oldNews is
-    //helpful
-    INews news = entity.getNews();
-    INews oldNews = fDb.ext().peekPersisted(news, 2, true);
-    NewsEvent newsEvent = new NewsEvent(oldNews, news, false);
-    DBHelper.putEventTemplate(newsEvent);
-    super.doDelete(entity);
-  }
+  /**
+   * Loads the persistable with <code>id</code> from the persistence system
+   * and returns it. If no persistable with the provided id exists,
+   * <code>null</code> is returned.
+   * 
+   * @param id The id of the persistable to load from the persistence system.
+   * @return the persistable with <code>id</code> or <code>null</code> in
+   * case none exists.
+   */
+  T load(long id);
 
-  @Override
-  protected final boolean isSaveFully() {
-    return false;
-  }
+  Collection<T> loadAll();
 
+  /**
+   * Saves <code>persistable</code> to the persistence system. This method
+   * handles new and existing perstistables. In other words, it will add or
+   * update the persistable as appropriate.
+   * 
+   * @param persistable The persistable to update.
+   * @return The persistable saved.
+   * @throws PersistenceException In case of an error while trying to perform
+   * the operation.
+   */
+  T save(T persistable);
+
+  <C extends Collection<T>> C saveAll(C objects);
+
+  /**
+   * Deletes <code>persistable</code> from the persistence system.
+   * 
+   * @param persistable The persistable to delete.
+   */
+  void delete(T persistable);
+
+  void deleteAll(Collection<T> objects);
+
+  long countAll();
 }

@@ -24,8 +24,10 @@
 package org.rssowl.core.model.internal.db4o.dao;
 
 import org.rssowl.core.model.internal.persist.ConditionalGet;
+import org.rssowl.core.model.persist.dao.IConditionalGetDAO;
 
-public final class ConditionalGetDAOImpl extends AbstractPersistableDAO<ConditionalGet>   {
+public final class ConditionalGetDAOImpl extends AbstractPersistableDAO<ConditionalGet>
+    implements IConditionalGetDAO<ConditionalGet>  {
 
   public ConditionalGetDAOImpl() {
     super(ConditionalGet.class);

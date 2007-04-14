@@ -26,9 +26,10 @@ package org.rssowl.core.model.internal.db4o.dao;
 import org.rssowl.core.model.events.SearchConditionEvent;
 import org.rssowl.core.model.events.SearchConditionListener;
 import org.rssowl.core.model.internal.persist.search.SearchCondition;
+import org.rssowl.core.model.persist.dao.ISearchConditionDAO;
 
 public final class SearchConditionDAOImpl extends AbstractEntityDAO<SearchCondition,
-    SearchConditionListener, SearchConditionEvent>  {
+    SearchConditionListener, SearchConditionEvent> implements ISearchConditionDAO<SearchCondition>  {
 
   public SearchConditionDAOImpl() {
     super(SearchCondition.class);
