@@ -33,7 +33,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.persist.pref.IPreferencesDAO;
+import org.rssowl.core.model.persist.dao.IPreferencesDAO;
 import org.rssowl.core.model.persist.pref.PreferencesEvent;
 import org.rssowl.core.model.persist.pref.PreferencesListener;
 import org.rssowl.core.tests.TestUtils;
