@@ -4,7 +4,6 @@
    <extension-point id="ModelTypesFactory" name="Model Types Factory" schema="schema/ModelTypesFactory.exsd"/>
    <extension-point id="ModelDAO" name="Model Data Access Objects" schema="schema/ModelDAO.exsd"/>
    <extension-point id="ModelSearch" name="Model Search" schema="schema/ModelSearch.exsd"/>
-   <extension-point id="PreferencesDAO" name="Preferences DAO" schema="schema/PreferencesDAO.exsd"/>
    <extension-point id="PersistanceLayer" name="Persistance Layer" schema="schema/PersistanceLayer.exsd"/>
    <extension-point id="ApplicationLayer" name="Application Layer" schema="schema/ApplicationLayer.exsd"/>
    <extension-point id="PreferencesInitializer" name="Preferences Initializer" schema="schema/PreferencesInitializer.exsd"/>
@@ -18,6 +17,7 @@
    <extension-point id="ProtocolHandler" name="Protocol Handler" schema="schema/ProtocolHandler.exsd"/>
    <extension-point id="CredentialsProvider" name="Credentials Provider" schema="schema/CredentialsProvider.exsd"/>
    <extension-point id="SSLHandler" name="SSL Handler" schema="schema/SSLHandler.exsd"/>
+   <extension-point id="DAOFactory" name="DAO Factory" schema="schema/DAOFactory.exsd"/>
    <extension
          point="org.rssowl.core.PersistanceLayer">
       <persistancelayer class="org.rssowl.core.model.internal.db4o.PersistenceServiceImpl"/>
@@ -25,10 +25,6 @@
    <extension
          point="org.rssowl.core.ModelDAO">
       <modeldao class="org.rssowl.core.model.internal.db4o.ModelDAOImpl"/>
-   </extension>
-   <extension
-         point="org.rssowl.core.PreferencesDAO">
-      <preferencesdao class="org.rssowl.core.model.internal.db4o.dao.PreferencesDAOImpl"/>
    </extension>
    <extension
          point="org.rssowl.core.ApplicationLayer">
@@ -103,5 +99,11 @@
       <preferencesInitializer
             class="org.rssowl.core.internal.DefaultPreferences">
       </preferencesInitializer>
+   </extension>
+   <extension
+         point="org.rssowl.core.DAOFactory">
+      <daofactory
+            class="org.rssowl.core.model.internal.db4o.dao.DAOFactoryImpl">
+      </daofactory>
    </extension>
 </plugin>

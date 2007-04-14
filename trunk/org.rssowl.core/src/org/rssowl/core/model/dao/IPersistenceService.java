@@ -24,6 +24,7 @@
 
 package org.rssowl.core.model.dao;
 
+import org.rssowl.core.model.persist.dao.DAOFactory;
 import org.rssowl.core.model.persist.dao.IPreferencesDAO;
 import org.rssowl.core.model.persist.search.IModelSearch;
 
@@ -39,6 +40,8 @@ import org.rssowl.core.model.persist.search.IModelSearch;
  */
 public interface IPersistenceService {
 
+  DAOFactory getDAOFactory();
+  
   /**
    * <p>
    * Get the Implementation of <code>IModelDAO</code> that allows to add,
