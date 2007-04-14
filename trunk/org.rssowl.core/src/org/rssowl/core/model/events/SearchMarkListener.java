@@ -24,7 +24,6 @@
 
 package org.rssowl.core.model.events;
 
-import java.util.Set;
 
 /**
  * A Listener being notified whenever the type <code>ISearchMark</code> was
@@ -32,29 +31,6 @@ import java.util.Set;
  * 
  * @author bpasero
  */
-public interface SearchMarkListener {
-
-  /**
-   * @param events unmodifiable set of Event objects containing additional
-   * information like the Type that is affected.
-   */
-  void searchMarkAdded(Set<SearchMarkEvent> events);
-
-  /**
-   * <p>
-   * Note: The resolved type from the event is no longer stored in the
-   * persistance layer. It is <em>not</em> recommended to use the resolved
-   * type for future operations in that layer.
-   * </p>
-   * 
-   * @param events unmodifiable set of Event objects containing additional
-   * information like the Type that is affected.
-   */
-  void searchMarkDeleted(Set<SearchMarkEvent> events);
-
-  /**
-   * @param events unmodifiable set of Event objects containing additional
-   * information like the Type that is affected.
-   */
-  void searchMarkUpdated(Set<SearchMarkEvent> events);
+public interface SearchMarkListener extends EntityListener<SearchMarkEvent> {
+  // No new methods
 }

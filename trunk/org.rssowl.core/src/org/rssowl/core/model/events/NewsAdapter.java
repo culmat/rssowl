@@ -35,18 +35,18 @@ import java.util.Set;
 public class NewsAdapter implements NewsListener {
 
   /*
-   * @see org.rssowl.core.model.events.NewsListener#newsAdded(java.util.List)
+   * @see org.rssowl.core.model.events.NewsListener#entitiesAdded(java.util.List)
    */
-  public void newsAdded(Set<NewsEvent> events) { }
+  public void entitiesAdded(Set<NewsEvent> events) { }
 
   /*
    * @see org.rssowl.core.model.events.NewsListener#newsDeleted(java.util.List)
    */
-  public void newsDeleted(Set<NewsEvent> events) { }
+  public void entitiesDeleted(Set<NewsEvent> events) { }
 
   /*
    * @see org.rssowl.core.model.events.NewsListener#newsUpdated(java.util.List)
    */
-  public void newsUpdated(Set<NewsEvent> events) { }
+  public void entitiesUpdated(Set<NewsEvent> events) { }
 
 }

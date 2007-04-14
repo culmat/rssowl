@@ -23,21 +23,10 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events;
 
-import org.rssowl.core.model.persist.IEntity;
+import java.util.Set;
 
-/**
- * The listener interface for receiving entity loaded events. This is
- * mainly intended for DAO objects that need to perform some processing
- * after the entity is loaded but before it is used.
- * 
- * @author Ismael Juma (ismael@juma.me.uk)
- * @param <T> Type of the entity that this listener is interested in receiving
- * events for.
- */
-public interface LoadListener<T extends IEntity> {
-  /**
-   * Invoked when an entity is loaded.
-   * @param entity IEntity that was loaded.
-   */
-  void entityLoaded(T entity);
+public interface EntityListener<E extends ModelEvent> {
+  public void entitiesAdded(Set<E> events);
+  public void entitiesDeleted(Set<E> events);
+  public void entitiesUpdated(Set<E> events);
 }

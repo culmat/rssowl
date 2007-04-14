@@ -621,15 +621,15 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     /* Listen to News-Events */
     fNewsListener = new NewsListener() {
-      public void newsAdded(Set<NewsEvent> events) {
+      public void entitiesAdded(Set<NewsEvent> events) {
       /* Ignore */
       }
 
-      public void newsUpdated(Set<NewsEvent> events) {
+      public void entitiesUpdated(Set<NewsEvent> events) {
         onNewsEvent(events);
       }
 
-      public void newsDeleted(Set<NewsEvent> events) {
+      public void entitiesDeleted(Set<NewsEvent> events) {
         onNewsEvent(events);
       }
     };

@@ -280,7 +280,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* News got Added */
       @Override
-      public void newsAdded(final Set<NewsEvent> events) {
+      public void entitiesAdded(final Set<NewsEvent> events) {
         JobRunner.runInUIThread(fFeedView.getEditorControl(), new Runnable() {
           public void run() {
             List<INews> addedNews = null;
@@ -324,7 +324,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* News got Updated */
       @Override
-      public void newsUpdated(final Set<NewsEvent> events) {
+      public void entitiesUpdated(final Set<NewsEvent> events) {
         JobRunner.runInUIThread(fFeedView.getEditorControl(), new Runnable() {
           public void run() {
             List<INews> deletedNews = null;
@@ -392,7 +392,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* News got Deleted */
       @Override
-      public void newsDeleted(final Set<NewsEvent> events) {
+      public void entitiesDeleted(final Set<NewsEvent> events) {
         JobRunner.runInUIThread(fFeedView.getEditorControl(), new Runnable() {
           public void run() {
             List<INews> deletedNews = null;

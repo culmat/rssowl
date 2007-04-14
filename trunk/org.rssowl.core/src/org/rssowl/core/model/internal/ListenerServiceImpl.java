@@ -100,7 +100,7 @@ public class ListenerServiceImpl implements IListenerService {
       final AttachmentListener listener = (AttachmentListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.attachmentAdded(events);
+          listener.entitiesAdded(events);
         }
       });
     }
@@ -115,7 +115,7 @@ public class ListenerServiceImpl implements IListenerService {
       final AttachmentListener listener = (AttachmentListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.attachmentDeleted(events);
+          listener.entitiesDeleted(events);
         }
       });
     }
@@ -130,7 +130,7 @@ public class ListenerServiceImpl implements IListenerService {
       final AttachmentListener listener = (AttachmentListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.attachmentUpdated(events);
+          listener.entitiesUpdated(events);
         }
       });
     }
@@ -163,7 +163,7 @@ public class ListenerServiceImpl implements IListenerService {
       final BookMarkListener listener = (BookMarkListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.bookMarkAdded(events);
+          listener.entitiesAdded(events);
         }
       });
     }
@@ -182,7 +182,7 @@ public class ListenerServiceImpl implements IListenerService {
       final BookMarkListener listener = (BookMarkListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.bookMarkDeleted(events);
+          listener.entitiesDeleted(events);
         }
       });
     }
@@ -201,7 +201,7 @@ public class ListenerServiceImpl implements IListenerService {
       final BookMarkListener listener = (BookMarkListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.bookMarkUpdated(events);
+          listener.entitiesUpdated(events);
         }
       });
     }
@@ -230,7 +230,7 @@ public class ListenerServiceImpl implements IListenerService {
       final CategoryListener listener = (CategoryListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.categoryAdded(events);
+          listener.entitiesAdded(events);
         }
       });
     }
@@ -245,7 +245,7 @@ public class ListenerServiceImpl implements IListenerService {
       final CategoryListener listener = (CategoryListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.categoryDeleted(events);
+          listener.entitiesDeleted(events);
         }
       });
     }
@@ -260,7 +260,7 @@ public class ListenerServiceImpl implements IListenerService {
       final CategoryListener listener = (CategoryListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.categoryUpdated(events);
+          listener.entitiesUpdated(events);
         }
       });
     }
@@ -292,7 +292,7 @@ public class ListenerServiceImpl implements IListenerService {
       final FeedListener listener = (FeedListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.feedAdded(events);
+          listener.entitiesAdded(events);
         }
       });
     }
@@ -310,7 +310,7 @@ public class ListenerServiceImpl implements IListenerService {
       final FeedListener listener = (FeedListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.feedDeleted(events);
+          listener.entitiesDeleted(events);
         }
       });
     }
@@ -328,7 +328,7 @@ public class ListenerServiceImpl implements IListenerService {
       final FeedListener listener = (FeedListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.feedUpdated(events);
+          listener.entitiesUpdated(events);
         }
       });
     }
@@ -361,7 +361,7 @@ public class ListenerServiceImpl implements IListenerService {
       final FolderListener listener = (FolderListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.folderAdded(events);
+          listener.entitiesAdded(events);
         }
       });
     }
@@ -380,7 +380,7 @@ public class ListenerServiceImpl implements IListenerService {
       final FolderListener listener = (FolderListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.folderDeleted(events);
+          listener.entitiesDeleted(events);
         }
       });
     }
@@ -399,7 +399,7 @@ public class ListenerServiceImpl implements IListenerService {
       final FolderListener listener = (FolderListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.folderUpdated(events);
+          listener.entitiesUpdated(events);
         }
       });
     }
@@ -428,7 +428,7 @@ public class ListenerServiceImpl implements IListenerService {
       final LabelListener listener = (LabelListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.labelAdded(events);
+          listener.entitiesAdded(events);
         }
       });
     }
@@ -443,7 +443,7 @@ public class ListenerServiceImpl implements IListenerService {
       final LabelListener listener = (LabelListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.labelDeleted(events);
+          listener.entitiesDeleted(events);
         }
       });
     }
@@ -458,7 +458,7 @@ public class ListenerServiceImpl implements IListenerService {
       final LabelListener listener = (LabelListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.labelUpdated(events);
+          listener.entitiesUpdated(events);
         }
       });
     }
@@ -479,7 +479,7 @@ public class ListenerServiceImpl implements IListenerService {
   }
 
   /*
-   * @see org.rssowl.core.model.IListenerService#notifyNewsAdded(java.util.Set)
+   * @see org.rssowl.core.model.IListenerService#notifyentitiesAdded(java.util.Set)
    */
   @SuppressWarnings("nls")
   public void notifyNewsAdded(final Set<NewsEvent> events) {
@@ -490,7 +490,7 @@ public class ListenerServiceImpl implements IListenerService {
       final NewsListener listener = (NewsListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.newsAdded(events);
+          listener.entitiesAdded(events);
         }
       });
     }
@@ -508,7 +508,7 @@ public class ListenerServiceImpl implements IListenerService {
       final NewsListener listener = (NewsListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.newsDeleted(events);
+          listener.entitiesDeleted(events);
         }
       });
     }
@@ -526,7 +526,7 @@ public class ListenerServiceImpl implements IListenerService {
       final NewsListener listener = (NewsListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.newsUpdated(events);
+          listener.entitiesUpdated(events);
         }
       });
     }
@@ -555,7 +555,7 @@ public class ListenerServiceImpl implements IListenerService {
       final PersonListener listener = (PersonListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.personAdded(events);
+          listener.entitiesAdded(events);
         }
       });
     }
@@ -570,7 +570,7 @@ public class ListenerServiceImpl implements IListenerService {
       final PersonListener listener = (PersonListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.personDeleted(events);
+          listener.entitiesDeleted(events);
         }
       });
     }
@@ -585,7 +585,7 @@ public class ListenerServiceImpl implements IListenerService {
       final PersonListener listener = (PersonListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.personUpdated(events);
+          listener.entitiesUpdated(events);
         }
       });
     }
@@ -617,7 +617,7 @@ public class ListenerServiceImpl implements IListenerService {
       final SearchMarkListener listener = (SearchMarkListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.searchMarkAdded(events);
+          listener.entitiesAdded(events);
         }
       });
     }
@@ -635,7 +635,7 @@ public class ListenerServiceImpl implements IListenerService {
       final SearchMarkListener listener = (SearchMarkListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.searchMarkDeleted(events);
+          listener.entitiesDeleted(events);
         }
       });
     }
@@ -653,7 +653,7 @@ public class ListenerServiceImpl implements IListenerService {
       final SearchMarkListener listener = (SearchMarkListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.searchMarkUpdated(events);
+          listener.entitiesUpdated(events);
         }
       });
     }

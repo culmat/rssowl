@@ -1060,7 +1060,7 @@ public class BookMarkExplorer extends ViewPart {
     fFolderListener = new FolderAdapter() {
 
       @Override
-      public void folderAdded(Set<FolderEvent> events) {
+      public void entitiesAdded(Set<FolderEvent> events) {
         for (FolderEvent event : events) {
           if (event.getEntity().getParent() == null) {
             fRootFolders.add(event.getEntity());
@@ -1072,7 +1072,7 @@ public class BookMarkExplorer extends ViewPart {
       }
 
       @Override
-      public void folderDeleted(Set<FolderEvent> events) {
+      public void entitiesDeleted(Set<FolderEvent> events) {
         for (FolderEvent event : events) {
           IFolder deletedFolder = event.getEntity();
           IFolder parentFolder = event.getEntity().getParent();

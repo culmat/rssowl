@@ -223,17 +223,17 @@ public class FeedReloadService {
     fBookMarkListener = new BookMarkAdapter() {
 
       @Override
-      public void bookMarkAdded(Set<BookMarkEvent> events) {
+      public void entitiesAdded(Set<BookMarkEvent> events) {
         onBookMarksAdded(events);
       }
 
       @Override
-      public void bookMarkUpdated(Set<BookMarkEvent> events) {
+      public void entitiesUpdated(Set<BookMarkEvent> events) {
         onBookMarksUpdated(events);
       }
 
       @Override
-      public void bookMarkDeleted(Set<BookMarkEvent> events) {
+      public void entitiesDeleted(Set<BookMarkEvent> events) {
         onBookMarksDeleted(events);
       }
     };

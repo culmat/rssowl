@@ -223,7 +223,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
     fFolderListener = new FolderListener() {
 
       /* Folders got updated */
-      public void folderUpdated(final Set<FolderEvent> events) {
+      public void entitiesUpdated(final Set<FolderEvent> events) {
         JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
           public void run() {
             Set<IFolder> updatedFolders = null;
@@ -309,7 +309,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
       }
 
       /* Folders got deleted */
-      public void folderDeleted(final Set<FolderEvent> events) {
+      public void entitiesDeleted(final Set<FolderEvent> events) {
         JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
           public void run() {
 
@@ -352,7 +352,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
       }
 
       /* Folders got added */
-      public void folderAdded(final Set<FolderEvent> events) {
+      public void entitiesAdded(final Set<FolderEvent> events) {
         JobRunner.runInUIThread(SELECTION_DELAY, fViewer.getControl(), new Runnable() {
           public void run() {
 
@@ -375,7 +375,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
     fBookMarkListener = new BookMarkListener() {
 
       /* BookMarks got Updated */
-      public void bookMarkUpdated(final Set<BookMarkEvent> events) {
+      public void entitiesUpdated(final Set<BookMarkEvent> events) {
         JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
           public void run() {
             Set<IBookMark> updatedBookMarks = null;
@@ -450,7 +450,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
       }
 
       /* BookMarks got Deleted */
-      public void bookMarkDeleted(final Set<BookMarkEvent> events) {
+      public void entitiesDeleted(final Set<BookMarkEvent> events) {
         JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
           public void run() {
 
@@ -493,7 +493,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
       }
 
       /* BookMarks got Added */
-      public void bookMarkAdded(Set<BookMarkEvent> events) {
+      public void entitiesAdded(Set<BookMarkEvent> events) {
 
         /* Reveal and Select if single Entity added */
         if (events.size() == 1) {
@@ -512,7 +512,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
       fSearchMarkListener = new SearchMarkListener() {
 
         /* SearchMarks got Updated */
-        public void searchMarkUpdated(final Set<SearchMarkEvent> events) {
+        public void entitiesUpdated(final Set<SearchMarkEvent> events) {
           JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
             public void run() {
               Set<ISearchMark> updatedSearchMarks = null;
@@ -578,7 +578,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
         }
 
         /* SearchMarks got Deleted */
-        public void searchMarkDeleted(final Set<SearchMarkEvent> events) {
+        public void entitiesDeleted(final Set<SearchMarkEvent> events) {
           JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
             public void run() {
               Set<ISearchMark> removedSearchMarks = null;
@@ -612,7 +612,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
         }
 
         /* SearchMarks got Added */
-        public void searchMarkAdded(Set<SearchMarkEvent> events) {
+        public void entitiesAdded(Set<SearchMarkEvent> events) {
 
           /* Reveal and Select if single Entity added */
           if (events.size() == 1) {
@@ -630,7 +630,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
       fNewsListener = new NewsAdapter() {
 
         @Override
-        public void newsAdded(final Set<NewsEvent> events) {
+        public void entitiesAdded(final Set<NewsEvent> events) {
           JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
             public void run() {
 
@@ -650,7 +650,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
         }
 
         @Override
-        public void newsUpdated(final Set<NewsEvent> events) {
+        public void entitiesUpdated(final Set<NewsEvent> events) {
           JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
             public void run() {
 

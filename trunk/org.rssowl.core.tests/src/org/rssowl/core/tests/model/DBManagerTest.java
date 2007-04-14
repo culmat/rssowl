@@ -252,7 +252,7 @@ public class DBManagerTest {
     try {
       personListener = new PersonAdapter() {
         @Override
-        public void personAdded(Set<PersonEvent> events) {
+        public void entitiesAdded(Set<PersonEvent> events) {
           for (PersonEvent event : events) {
             personAddedCalled[0] = true;
             Person dbPerson = (Person) event.getEntity();
@@ -262,7 +262,7 @@ public class DBManagerTest {
         }
 
         @Override
-        public void personUpdated(Set<PersonEvent> events) {
+        public void entitiesUpdated(Set<PersonEvent> events) {
           PersonEvent event = events.iterator().next();
           personUpdatedCalled[0] = true;
           Person dbPerson = (Person) event.getEntity();
@@ -494,7 +494,7 @@ public class DBManagerTest {
     try {
       labelListener = new LabelAdapter() {
         @Override
-        public void labelAdded(Set<LabelEvent> events) {
+        public void entitiesAdded(Set<LabelEvent> events) {
           for (LabelEvent event : events) {
             labelAddedCalled[0] = true;
             Label dbLabel = (Label) event.getEntity();
@@ -504,7 +504,7 @@ public class DBManagerTest {
         }
 
         @Override
-        public void labelUpdated(Set<LabelEvent> events) {
+        public void entitiesUpdated(Set<LabelEvent> events) {
           LabelEvent event = events.iterator().next();
           labelUpdatedCalled[0] = true;
           Label dbLabel = (Label) event.getEntity();
@@ -552,7 +552,7 @@ public class DBManagerTest {
     try {
       categoryListener = new CategoryAdapter() {
         @Override
-        public void categoryAdded(Set<CategoryEvent> events) {
+        public void entitiesAdded(Set<CategoryEvent> events) {
           CategoryEvent event = events.iterator().next();
           try {
             categoryAddedCalled[0] = true;
@@ -568,7 +568,7 @@ public class DBManagerTest {
         }
 
         @Override
-        public void categoryUpdated(Set<CategoryEvent> events) {
+        public void entitiesUpdated(Set<CategoryEvent> events) {
           CategoryEvent event = events.iterator().next();
           categoryUpdatedCalled[0] = true;
           Category dbCategory = (Category) event.getEntity();
@@ -602,7 +602,7 @@ public class DBManagerTest {
     try {
       folderListener = new FolderAdapter() {
         @Override
-        public void folderAdded(Set<FolderEvent> events) {
+        public void entitiesAdded(Set<FolderEvent> events) {
           for (FolderEvent event : events) {
             try {
               folderAddedCalled[0] = true;
@@ -620,7 +620,7 @@ public class DBManagerTest {
         }
 
         @Override
-        public void folderUpdated(Set<FolderEvent> events) {
+        public void entitiesUpdated(Set<FolderEvent> events) {
           for (FolderEvent event : events) {
             folderUpdatedCalled[0] = true;
             Folder dbFolder = (Folder) event.getEntity();
@@ -672,7 +672,7 @@ public class DBManagerTest {
     try {
       folderListener = new FolderAdapter() {
         @Override
-        public void folderAdded(Set<FolderEvent> events) {
+        public void entitiesAdded(Set<FolderEvent> events) {
           for (FolderEvent event : events) {
             try {
               folderAddedCalled[0] = true;
@@ -689,7 +689,7 @@ public class DBManagerTest {
         }
 
         @Override
-        public void folderUpdated(Set<FolderEvent> events) {
+        public void entitiesUpdated(Set<FolderEvent> events) {
           for (FolderEvent event : events) {
             /* Ignore event from parent */
             if (!folderName[0].equals(event.getEntity().getName())) {
@@ -733,7 +733,7 @@ public class DBManagerTest {
     try {
       folderListener = new FolderAdapter() {
         @Override
-        public void folderAdded(Set<FolderEvent> events) {
+        public void entitiesAdded(Set<FolderEvent> events) {
           for (FolderEvent event : events) {
             if (folderName[0].equals(event.getEntity().getName())) {
               assertEquals(true, event.isRoot());
@@ -829,7 +829,7 @@ public class DBManagerTest {
       final boolean[] bookMarkUpdatedCalled = new boolean[] { false };
       bookMarkListener = new BookMarkAdapter() {
         @Override
-        public void bookMarkAdded(Set<BookMarkEvent> events) {
+        public void entitiesAdded(Set<BookMarkEvent> events) {
           BookMarkEvent event = events.iterator().next();
           try {
             bookMarkAddedCalled[0] = true;
@@ -845,7 +845,7 @@ public class DBManagerTest {
         }
 
         @Override
-        public void bookMarkUpdated(Set<BookMarkEvent> events) {
+        public void entitiesUpdated(Set<BookMarkEvent> events) {
           BookMarkEvent event = events.iterator().next();
           bookMarkUpdatedCalled[0] = true;
           BookMark dbBookMark = (BookMark) event.getEntity();
@@ -880,7 +880,7 @@ public class DBManagerTest {
       final boolean[] searchMarkUpdatedCalled = new boolean[] { false };
       searchMarkListener = new SearchMarkAdapter() {
         @Override
-        public void searchMarkAdded(Set<SearchMarkEvent> events) {
+        public void entitiesAdded(Set<SearchMarkEvent> events) {
           SearchMarkEvent event = events.iterator().next();
           try {
             searchMarkAddedCalled[0] = true;
@@ -896,7 +896,7 @@ public class DBManagerTest {
         }
 
         @Override
-        public void searchMarkUpdated(Set<SearchMarkEvent> events) {
+        public void entitiesUpdated(Set<SearchMarkEvent> events) {
           SearchMarkEvent event = events.iterator().next();
           searchMarkUpdatedCalled[0] = true;
           SearchMark dbSearchMark = (SearchMark) event.getEntity();
@@ -952,7 +952,7 @@ public class DBManagerTest {
       assertEquals(1, newsRef.resolve().getAttachments().size());
       newsListener = new NewsAdapter() {
         @Override
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           assertEquals(1, events.size());
           int attachmentsSize = events.iterator().next().getOldNews().getAttachments().size();
           assertEquals(1, attachmentsSize);
@@ -990,7 +990,7 @@ public class DBManagerTest {
     try {
       newsListener = new NewsAdapter() {
         @Override
-        public void newsAdded(Set<NewsEvent> events) {
+        public void entitiesAdded(Set<NewsEvent> events) {
           NewsEvent event = events.iterator().next();
           try {
             NewsAddedCalled[0] = true;
@@ -1013,7 +1013,7 @@ public class DBManagerTest {
         }
 
         @Override
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           NewsEvent event = events.iterator().next();
           NewsUpdatedCalled[0] = true;
           News dbNews = (News) event.getEntity();
@@ -1322,7 +1322,7 @@ public class DBManagerTest {
     try {
       feedListener = new FeedAdapter() {
         @Override
-        public void feedAdded(Set<FeedEvent> events) {
+        public void entitiesAdded(Set<FeedEvent> events) {
           FeedEvent event = events.iterator().next();
           try {
             feedAddedCalled[0] = true;
@@ -1347,7 +1347,7 @@ public class DBManagerTest {
         }
 
         @Override
-        public void feedUpdated(Set<FeedEvent> events) {
+        public void entitiesUpdated(Set<FeedEvent> events) {
           FeedEvent event = events.iterator().next();
           feedUpdatedCalled[0] = true;
           Feed dbFeed = (Feed) event.getEntity();
@@ -1387,7 +1387,7 @@ public class DBManagerTest {
     try {
       feedListener = new FeedAdapter() {
         @Override
-        public void feedAdded(Set<FeedEvent> events) {
+        public void entitiesAdded(Set<FeedEvent> events) {
           try {
             FeedEvent event = events.iterator().next();
             Feed dbFeed = (Feed) event.getEntity();
@@ -1404,7 +1404,7 @@ public class DBManagerTest {
         }
 
         @Override
-        public void feedUpdated(Set<FeedEvent> events) {
+        public void entitiesUpdated(Set<FeedEvent> events) {
           try {
             FeedEvent event = events.iterator().next();
             // TODO Add method to load entities without using the cache and
@@ -1456,15 +1456,15 @@ public class DBManagerTest {
     NewsListener newsListener = null;
     try {
       newsListener = new NewsListener() {
-        public void newsAdded(Set<NewsEvent> events) {
-          fail("No events should have been fired, but NewsListener#newsAdded() was called");
+        public void entitiesAdded(Set<NewsEvent> events) {
+          fail("No events should have been fired, but NewsListener#entitiesAdded() was called");
         }
 
-        public void newsDeleted(Set<NewsEvent> events) {
+        public void entitiesDeleted(Set<NewsEvent> events) {
           fail("No events should have been fired, but NewsListener#newsDeleted() was called.");
         }
 
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           fail("No events should have been fired, but NewsListener#newsUpdated() was called.");
         }
       };
@@ -1631,7 +1631,7 @@ public class DBManagerTest {
     final NewsReference[] newsRef = new NewsReference[1];
     newsAdapter = new NewsAdapter() {
       @Override
-      public void newsAdded(Set<NewsEvent> events) {
+      public void entitiesAdded(Set<NewsEvent> events) {
         assertEquals(1, events.size());
         newsRef[0] = new NewsReference(events.iterator().next().getEntity().getId());
       }
@@ -1776,7 +1776,7 @@ public class DBManagerTest {
 
     newsAdapter = new NewsAdapter() {
       @Override
-      public void newsAdded(Set<NewsEvent> events) {
+      public void entitiesAdded(Set<NewsEvent> events) {
         assertEquals(1, events.size());
         newsRef[0] = new NewsReference(events.iterator().next().getEntity().getId());
       }

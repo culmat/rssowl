@@ -277,7 +277,7 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
       final int eventsCounter[] = new int[] { 0 };
       bookmarkListener = new BookMarkAdapter() {
         @Override
-        public void bookMarkUpdated(Set<BookMarkEvent> events) {
+        public void entitiesUpdated(Set<BookMarkEvent> events) {
           eventsCounter[0]++;
         }
       };

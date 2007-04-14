@@ -142,15 +142,15 @@ public class ReloadTestLocal {
       final int addedCounter[] = new int[] { 0 };
       final int updatedCounter[] = new int[] { 0 };
       newsListener = new NewsListener() {
-        public void newsAdded(Set<NewsEvent> events) {
+        public void entitiesAdded(Set<NewsEvent> events) {
           addedCounter[0] += events.size();
         }
 
-        public void newsDeleted(Set<NewsEvent> events) {
+        public void entitiesDeleted(Set<NewsEvent> events) {
           fail("Did not expect this Event");
         }
 
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           updatedCounter[0] += events.size();
         }
       };
@@ -219,15 +219,15 @@ public class ReloadTestLocal {
       final int addedCounter[] = new int[] { 0 };
       final int updatedCounter[] = new int[] { 0 };
       newsListener = new NewsListener() {
-        public void newsAdded(Set<NewsEvent> events) {
+        public void entitiesAdded(Set<NewsEvent> events) {
           addedCounter[0] += events.size();
         }
 
-        public void newsDeleted(Set<NewsEvent> events) {
+        public void entitiesDeleted(Set<NewsEvent> events) {
           fail("Did not expect this Event");
         }
 
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           updatedCounter[0] += events.size();
         }
       };
@@ -294,15 +294,15 @@ public class ReloadTestLocal {
       final int addedCounter[] = new int[] { 0 };
       final int updatedCounter[] = new int[] { 0 };
       newsListener = new NewsListener() {
-        public void newsAdded(Set<NewsEvent> events) {
+        public void entitiesAdded(Set<NewsEvent> events) {
           addedCounter[0] += events.size();
         }
 
-        public void newsDeleted(Set<NewsEvent> events) {
+        public void entitiesDeleted(Set<NewsEvent> events) {
           fail("Did not expect this Event");
         }
 
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           updatedCounter[0] += events.size();
         }
       };
@@ -369,15 +369,15 @@ public class ReloadTestLocal {
       final int addedCounter[] = new int[] { 0 };
       final int updatedCounter[] = new int[] { 0 };
       newsListener = new NewsListener() {
-        public void newsAdded(Set<NewsEvent> events) {
+        public void entitiesAdded(Set<NewsEvent> events) {
           addedCounter[0] += events.size();
         }
 
-        public void newsDeleted(Set<NewsEvent> events) {
+        public void entitiesDeleted(Set<NewsEvent> events) {
           fail("Did not expect this Event");
         }
 
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           updatedCounter[0] += events.size();
         }
       };
@@ -460,15 +460,15 @@ public class ReloadTestLocal {
       final int addedCounter[] = new int[] { 0 };
       final int updatedCounter[] = new int[] { 0 };
       newsListener = new NewsListener() {
-        public void newsAdded(Set<NewsEvent> events) {
+        public void entitiesAdded(Set<NewsEvent> events) {
           addedCounter[0] += events.size();
         }
 
-        public void newsDeleted(Set<NewsEvent> events) {
+        public void entitiesDeleted(Set<NewsEvent> events) {
           fail("Did not expect this Event");
         }
 
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           updatedCounter[0] += events.size();
         }
       };
@@ -557,15 +557,15 @@ public class ReloadTestLocal {
       final int addedCounter[] = new int[] { 0 };
       final int updatedCounter[] = new int[] { 0 };
       newsListener = new NewsListener() {
-        public void newsAdded(Set<NewsEvent> events) {
+        public void entitiesAdded(Set<NewsEvent> events) {
           addedCounter[0] += events.size();
         }
 
-        public void newsDeleted(Set<NewsEvent> events) {
+        public void entitiesDeleted(Set<NewsEvent> events) {
           fail("Did not expect this Event");
         }
 
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           updatedCounter[0] += events.size();
         }
       };
@@ -654,15 +654,15 @@ public class ReloadTestLocal {
       final int addedCounter[] = new int[] { 0 };
       final int updatedCounter[] = new int[] { 0 };
       newsListener = new NewsListener() {
-        public void newsAdded(Set<NewsEvent> events) {
+        public void entitiesAdded(Set<NewsEvent> events) {
           addedCounter[0] += events.size();
         }
 
-        public void newsDeleted(Set<NewsEvent> events) {
+        public void entitiesDeleted(Set<NewsEvent> events) {
           fail("Did not expect this Event");
         }
 
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           updatedCounter[0] += events.size();
         }
       };
@@ -781,15 +781,15 @@ public class ReloadTestLocal {
       final int addedCounter[] = new int[] { 0 };
       final int updatedCounter[] = new int[] { 0 };
       newsListener = new NewsListener() {
-        public void newsAdded(Set<NewsEvent> events) {
+        public void entitiesAdded(Set<NewsEvent> events) {
           addedCounter[0] += events.size();
         }
 
-        public void newsDeleted(Set<NewsEvent> events) {
+        public void entitiesDeleted(Set<NewsEvent> events) {
           fail("Did not expect this Event");
         }
 
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           updatedCounter[0] += events.size();
         }
       };
@@ -908,15 +908,15 @@ public class ReloadTestLocal {
       final int addedCounter[] = new int[] { 0 };
       final int updatedCounter[] = new int[] { 0 };
       newsListener = new NewsListener() {
-        public void newsAdded(Set<NewsEvent> events) {
+        public void entitiesAdded(Set<NewsEvent> events) {
           addedCounter[0] += events.size();
         }
 
-        public void newsDeleted(Set<NewsEvent> events) {
+        public void entitiesDeleted(Set<NewsEvent> events) {
           fail("Did not expect this Event");
         }
 
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           updatedCounter[0] += events.size();
         }
       };
@@ -1033,15 +1033,15 @@ public class ReloadTestLocal {
       final int addedCounter[] = new int[] { 0 };
       final int updatedCounter[] = new int[] { 0 };
       newsListener = new NewsListener() {
-        public void newsAdded(Set<NewsEvent> events) {
+        public void entitiesAdded(Set<NewsEvent> events) {
           addedCounter[0] += events.size();
         }
 
-        public void newsDeleted(Set<NewsEvent> events) {
+        public void entitiesDeleted(Set<NewsEvent> events) {
           fail("Did not expect this Event");
         }
 
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           updatedCounter[0] += events.size();
         }
       };
@@ -1210,15 +1210,15 @@ public class ReloadTestLocal {
       final int updatedCounter[] = new int[] { 0 };
       final int removedCounter[] = new int[] { 0 };
       newsListener = new NewsListener() {
-        public void newsAdded(Set<NewsEvent> events) {
+        public void entitiesAdded(Set<NewsEvent> events) {
           addedCounter[0] += events.size();
         }
 
-        public void newsDeleted(Set<NewsEvent> events) {
+        public void entitiesDeleted(Set<NewsEvent> events) {
           removedCounter[0] += events.size();
         }
 
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           updatedCounter[0] += events.size();
         }
       };
@@ -1306,15 +1306,15 @@ public class ReloadTestLocal {
       final int addedCounter[] = new int[] { 0 };
       final int updatedCounter[] = new int[] { 0 };
       newsListener = new NewsListener() {
-        public void newsAdded(Set<NewsEvent> events) {
+        public void entitiesAdded(Set<NewsEvent> events) {
           addedCounter[0] += events.size();
         }
 
-        public void newsDeleted(Set<NewsEvent> events) {
+        public void entitiesDeleted(Set<NewsEvent> events) {
           fail("Did not expect this Event");
         }
 
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           updatedCounter[0] += events.size();
         }
       };
@@ -1363,7 +1363,7 @@ public class ReloadTestLocal {
       InMemoryProtocolHandler.FEED = generateFeed("Title", "http://www.link.de", null, null, "Hello World Changed", "ijuma", "http://www.download.de", "mp3");
       oldNewsListener = new NewsAdapter() {
         @Override
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           assertEquals(1, events.size());
           int attachmentsSize = events.iterator().next().getOldNews().getAttachments().size();
           assertEquals(1, attachmentsSize);
@@ -1405,13 +1405,13 @@ public class ReloadTestLocal {
       final int addedCounter[] = new int[] { 0 };
       final int updatedCounter[] = new int[] { 0 };
       attachmentListener = new AttachmentListener() {
-        public void attachmentAdded(Set<AttachmentEvent> events) {
+        public void entitiesAdded(Set<AttachmentEvent> events) {
           addedCounter[0]++;
         }
 
-        public void attachmentDeleted(Set<AttachmentEvent> events) {}
+        public void entitiesDeleted(Set<AttachmentEvent> events) {}
 
-        public void attachmentUpdated(Set<AttachmentEvent> events) {
+        public void entitiesUpdated(Set<AttachmentEvent> events) {
           updatedCounter[0]++;
         }
       };

@@ -220,21 +220,21 @@ public class Indexer {
 
     /* Listen to News-Events */
     fNewsListener = new NewsListener() {
-      public void newsAdded(Set<NewsEvent> events) {
+      public void entitiesAdded(Set<NewsEvent> events) {
         if (!Owl.TESTING)
           fJobQueue.schedule(new IndexingTask(Indexer.this, events, IndexingTask.Type.ADD));
         else
           new IndexingTask(Indexer.this, events, IndexingTask.Type.ADD).run(new NullProgressMonitor());
       }
 
-      public void newsUpdated(Set<NewsEvent> events) {
+      public void entitiesUpdated(Set<NewsEvent> events) {
         if (!Owl.TESTING)
           fJobQueue.schedule(new IndexingTask(Indexer.this, events, IndexingTask.Type.UPDATE));
         else
           new IndexingTask(Indexer.this, events, IndexingTask.Type.UPDATE).run(new NullProgressMonitor());
       }
 
-      public void newsDeleted(Set<NewsEvent> events) {
+      public void entitiesDeleted(Set<NewsEvent> events) {
         if (!Owl.TESTING)
           fJobQueue.schedule(new IndexingTask(Indexer.this, events, IndexingTask.Type.DELETE));
         else

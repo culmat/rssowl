@@ -123,12 +123,12 @@ public class ModelTest1 {
     final boolean[] folderUpdatedCalled = new boolean[1];
     FolderListener listener = new FolderAdapter() {
       @Override
-      public void folderAdded(Set<FolderEvent> events) {
+      public void entitiesAdded(Set<FolderEvent> events) {
         fail("Unexpected folder added event");
       }
 
       @Override
-      public void folderDeleted(Set<FolderEvent> events) {
+      public void entitiesDeleted(Set<FolderEvent> events) {
         assertEquals(2, events.size());
         for (FolderEvent event : events) {
           IFolder folder = event.getEntity();
@@ -140,7 +140,7 @@ public class ModelTest1 {
       }
 
       @Override
-      public void folderUpdated(Set<FolderEvent> events) {
+      public void entitiesUpdated(Set<FolderEvent> events) {
         assertEquals(2, events.size());
         for (FolderEvent event : events) {
           Long id = event.getEntity().getId();
@@ -241,7 +241,7 @@ public class ModelTest1 {
 
     NewsListener newsListener = new NewsAdapter() {
       @Override
-      public void newsUpdated(Set<NewsEvent> events) {
+      public void entitiesUpdated(Set<NewsEvent> events) {
         assertEquals(1, events.size());
         NewsEvent event = events.iterator().next();
         assertEquals(true, event.getEntity().equals(savedNews));
@@ -257,7 +257,7 @@ public class ModelTest1 {
     }
     newsListener = new NewsAdapter() {
       @Override
-      public void newsUpdated(Set<NewsEvent> events) {
+      public void entitiesUpdated(Set<NewsEvent> events) {
         assertEquals(1, events.size());
         NewsEvent event = events.iterator().next();
         assertEquals(savedNews.getId(), event.getEntity().getId());
@@ -298,7 +298,7 @@ public class ModelTest1 {
 
     NewsListener newsListener = new NewsAdapter() {
       @Override
-      public void newsUpdated(Set<NewsEvent> events) {
+      public void entitiesUpdated(Set<NewsEvent> events) {
         assertEquals(1, events.size());
         NewsEvent event = events.iterator().next();
         assertEquals(savedNewsId, event.getEntity().getId());
@@ -314,7 +314,7 @@ public class ModelTest1 {
     }
     newsListener = new NewsAdapter() {
       @Override
-      public void newsUpdated(Set<NewsEvent> events) {
+      public void entitiesUpdated(Set<NewsEvent> events) {
         assertEquals(1, events.size());
         NewsEvent event = events.iterator().next();
         assertEquals(savedNewsId, event.getEntity().getId());
@@ -676,15 +676,15 @@ public class ModelTest1 {
 
     final boolean[] folderUpdatedCalled = new boolean[1];
     FolderListener folderListener = new FolderListener() {
-      public void folderAdded(Set<FolderEvent> events) {
+      public void entitiesAdded(Set<FolderEvent> events) {
         fail("folderAdded should not be called");
       }
 
-      public void folderDeleted(Set<FolderEvent> events) {
+      public void entitiesDeleted(Set<FolderEvent> events) {
         fail("folderDeleted should not be called");
       }
 
-      public void folderUpdated(Set<FolderEvent> events) {
+      public void entitiesUpdated(Set<FolderEvent> events) {
         assertEquals(1, events.size());
         assertEquals(true, events.iterator().next().getEntity().equals(savedFolder));
         folderUpdatedCalled[0] = true;

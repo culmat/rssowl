@@ -201,24 +201,24 @@ public class NewsService {
   private void registerListeners() {
     Owl.getListenerService().addNewsListener(new NewsAdapter() {
       @Override
-      public void newsAdded(Set<NewsEvent> events) {
+      public void entitiesAdded(Set<NewsEvent> events) {
         onNewsAdded(events);
       }
 
       @Override
-      public void newsUpdated(Set<NewsEvent> events) {
+      public void entitiesUpdated(Set<NewsEvent> events) {
         onNewsUpdated(events);
       }
 
       @Override
-      public void newsDeleted(Set<NewsEvent> events) {
+      public void entitiesDeleted(Set<NewsEvent> events) {
         onNewsDeleted(events);
       }
     });
 
     Owl.getListenerService().addFeedListener(new FeedAdapter() {
       @Override
-      public void feedDeleted(Set<FeedEvent> events) {
+      public void entitiesDeleted(Set<FeedEvent> events) {
         onFeedDeleted(events);
       }
     });

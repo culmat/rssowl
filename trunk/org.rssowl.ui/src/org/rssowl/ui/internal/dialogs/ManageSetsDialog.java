@@ -133,7 +133,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
   private void registerListeners() {
     fFolderListener = new FolderAdapter() {
       @Override
-      public void folderAdded(Set<FolderEvent> events) {
+      public void entitiesAdded(Set<FolderEvent> events) {
         for (FolderEvent folderEvent : events) {
           IFolder folder = folderEvent.getEntity();
           if (folder.getParent() == null) {

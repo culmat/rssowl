@@ -37,15 +37,15 @@ public class LabelAdapter implements LabelListener {
   /*
    * @see org.rssowl.core.model.events.LabelListener#labelAdded(java.util.List)
    */
-  public void labelAdded(Set<LabelEvent> events) { }
+  public void entitiesAdded(Set<LabelEvent> events) { }
 
   /*
    * @see org.rssowl.core.model.events.LabelListener#labelDeleted(java.util.List)
    */
-  public void labelDeleted(Set<LabelEvent> events) { }
+  public void entitiesDeleted(Set<LabelEvent> events) { }
 
   /*
    * @see org.rssowl.core.model.events.LabelListener#labelUpdated(java.util.List)
    */
-  public void labelUpdated(Set<LabelEvent> events) { }
+  public void entitiesUpdated(Set<LabelEvent> events) { }
 }
