@@ -24,7 +24,18 @@
 
 package org.rssowl.core.model.dao;
 
+import org.rssowl.core.model.persist.dao.DAOFactory;
+import org.rssowl.core.model.persist.dao.IAttachmentDAO;
+import org.rssowl.core.model.persist.dao.IBookMarkDAO;
+import org.rssowl.core.model.persist.dao.ICategoryDAO;
+import org.rssowl.core.model.persist.dao.IFeedDAO;
+import org.rssowl.core.model.persist.dao.IFolderDAO;
+import org.rssowl.core.model.persist.dao.INewsCounterDAO;
+import org.rssowl.core.model.persist.dao.INewsDAO;
+import org.rssowl.core.model.persist.dao.IPersonDAO;
 import org.rssowl.core.model.persist.dao.IPreferencesDAO;
+import org.rssowl.core.model.persist.dao.ISearchConditionDAO;
+import org.rssowl.core.model.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.model.persist.search.IModelSearch;
 import org.rssowl.core.util.ExtensionUtils;
 
@@ -54,17 +65,29 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
   /* ID for Model Search Contribution */
   private static final String MODEL_SEARCH_EXTENSION_POINT = "org.rssowl.core.ModelSearch"; //$NON-NLS-1$
 
-  /* ID for Preferences DAO Contribution */
-  private static final String MODEL_PREFERENCES_EXTENSION_POINT = "org.rssowl.core.PreferencesDAO"; //$NON-NLS-1$
-
   /* ID for ID Generator Contribution */
   private static final String MODEL_ID_GENERATOR_EXTENSION_POINT = "org.rssowl.core.IDGenerator"; //$NON-NLS-1$
 
+  /* ID for DAO Factory Contribution */
+  private static final String MODEL_DAO_FACTORY_EXTENSION_POINT = "org.rssowl.core.DAOFactory";
+  
   private IModelDAO fModelDAO;
   private IModelSearch fModelSearch;
-  private IPreferencesDAO fPreferencesDAO;
   private IApplicationLayer fApplicationLayer;
   private IDGenerator fIDGenerator;
+  private DAOFactory fDAOFactory;
+  
+  private IPreferencesDAO fPreferencesDAO;
+  private IAttachmentDAO<?> fAttachmentDAO;
+  private IBookMarkDAO<?> fBookMarkDAO;
+  private ICategoryDAO<?> fCategoryDAO;
+  private IFeedDAO<?> fFeedDAO;
+  private IFolderDAO<?> fFolderDAO;
+  private INewsCounterDAO fNewsCounterDAO;
+  private INewsDAO<?> fNewsDAO;
+  private IPersonDAO<?> fPersonDAO;
+  private ISearchConditionDAO<?> fSearchConditionDAO;
+  private ISearchMarkDAO<?> fSearchMarkDAO;
 
   /** */
   protected AbstractPersistenceService() {
@@ -79,6 +102,16 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
     getPreferencesDAO();
     getApplicationLayer();
     getIDGenerator();
+  }
+  
+  /*
+   * @see org.rssowl.core.model.dao.IPersistenceService#getDAOFactory()
+   */
+  public DAOFactory getDAOFactory() {
+    if (fDAOFactory == null)
+      fDAOFactory = (DAOFactory) ExtensionUtils.loadSingletonExecutableExtension(MODEL_DAO_FACTORY_EXTENSION_POINT);
+    
+    return fDAOFactory;
   }
 
   /*
@@ -126,8 +159,78 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
    */
   public IPreferencesDAO getPreferencesDAO() {
     if (fPreferencesDAO == null)
-      fPreferencesDAO = (IPreferencesDAO) ExtensionUtils.loadSingletonExecutableExtension(MODEL_PREFERENCES_EXTENSION_POINT);
+      fPreferencesDAO = getDAOFactory().createPreferencesDAO();
 
     return fPreferencesDAO;
+  }
+
+  public IAttachmentDAO<?> getAttachmentDAO() {
+    if (fAttachmentDAO == null)
+      fAttachmentDAO = getDAOFactory().createAttachmentDAO();
+    
+    return fAttachmentDAO;
+  }
+
+  public IBookMarkDAO<?> getBookMarkDAO() {
+    if (fBookMarkDAO == null)
+      fBookMarkDAO = getDAOFactory().createBookMarkDAO();
+    
+    return fBookMarkDAO;
+  }
+
+  public ICategoryDAO<?> getCategoryDAO() {
+    if (fCategoryDAO == null)
+      fCategoryDAO = getDAOFactory().createCategoryDAO();
+    
+    return fCategoryDAO;
+  }
+
+  public IFeedDAO<?> getFeedDAO() {
+    if (fFeedDAO == null)
+      fFeedDAO = getDAOFactory().createFeedDAO();
+    
+    return fFeedDAO;
+  }
+
+  public IFolderDAO<?> getFolderDAO() {
+    if (fFolderDAO == null)
+      fFolderDAO = getDAOFactory().createFolderDAO();
+    
+    return fFolderDAO;
+  }
+
+  public INewsCounterDAO getNewsCounterDAO() {
+    if (fNewsCounterDAO == null)
+      fNewsCounterDAO = getDAOFactory().createNewsCounterDAO();
+    
+    return fNewsCounterDAO;
+  }
+
+  public INewsDAO<?> getNewsDAO() {
+    if (fNewsDAO == null)
+      fNewsDAO = getDAOFactory().createNewsDAO();
+    
+    return fNewsDAO;
+  }
+
+  public IPersonDAO<?> getPersonDAO() {
+    if (fPersonDAO == null)
+      fPersonDAO = getDAOFactory().createPersonDAO();
+    
+    return fPersonDAO;
+  }
+
+  public ISearchConditionDAO<?> getSearchConditionDAO() {
+    if (fSearchConditionDAO == null)
+      fSearchConditionDAO = getDAOFactory().createSearchConditionDAO();
+    
+    return fSearchConditionDAO;
+  }
+
+  public ISearchMarkDAO<?> getSearchMarkDAO() {
+    if (fSearchMarkDAO == null)
+      fSearchMarkDAO = getDAOFactory().createSearchMarkDAO();
+    
+    return fSearchMarkDAO;
   }
 }
