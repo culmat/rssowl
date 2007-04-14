@@ -37,15 +37,15 @@ public class PersonAdapter implements PersonListener {
   /*
    * @see org.rssowl.core.model.events.PersonListener#personAdded(java.util.List)
    */
-  public void personAdded(Set<PersonEvent> events) { }
+  public void entitiesAdded(Set<PersonEvent> events) { }
 
   /*
    * @see org.rssowl.core.model.events.PersonListener#personDeleted(java.util.List)
    */
-  public void personDeleted(Set<PersonEvent> events) { }
+  public void entitiesDeleted(Set<PersonEvent> events) { }
 
   /*
    * @see org.rssowl.core.model.events.PersonListener#personUpdated(java.util.List)
    */
-  public void personUpdated(Set<PersonEvent> events) { }
+  public void entitiesUpdated(Set<PersonEvent> events) { }
 }

@@ -26,7 +26,7 @@ package org.rssowl.core.model.internal.db4o;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.SafeRunner;
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.events.LifeCycleListener;
+import org.rssowl.core.model.events.EntityListener;
 import org.rssowl.core.model.events.ModelEvent;
 import org.rssowl.core.model.persist.IPersistable;
 import org.rssowl.core.util.LoggingSafeRunnable;
@@ -46,9 +46,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
 public abstract class EntityDAO<T extends IPersistable,
-    L extends LifeCycleListener<E>, E extends ModelEvent> {
+    L extends EntityListener<E>, E extends ModelEvent> {
 
-  private final List<L> lifeCycleListeners = new CopyOnWriteArrayList<L>();
+  private final List<L> entityListeners = new CopyOnWriteArrayList<L>();
   private final Class<T> fEntityClass;
 
   private ReadWriteLock fLock;
@@ -182,40 +182,40 @@ public abstract class EntityDAO<T extends IPersistable,
   }
   
   protected void fireAddEvents(final Set<E> events) {
-    for (final L listener : lifeCycleListeners) {
+    for (final L listener : entityListeners) {
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.entityAdded(events);
+          listener.entitiesAdded(events);
         }
       });
     }
   }
   
   protected void fireUpdateEvents(final Set<E> events) {
-    for (final L listener : lifeCycleListeners) {
+    for (final L listener : entityListeners) {
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.entityUpdated(events);
+          listener.entitiesUpdated(events);
         }
       });
     }
   }
   
   protected void fireDeleteEvents(final Set<E> events) {
-    for (final L listener : lifeCycleListeners) {
+    for (final L listener : entityListeners) {
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.entityDeleted(events);
+          listener.entitiesDeleted(events);
         }
       });
     }
   }
   
   public void addLifeCycleListener(L listener) {
-    lifeCycleListeners.add(listener);
+    entityListeners.add(listener);
   }
   
   public void removeLifeCycleListener(L listener) {
-    lifeCycleListeners.remove(listener);
+    entityListeners.remove(listener);
   }
 }

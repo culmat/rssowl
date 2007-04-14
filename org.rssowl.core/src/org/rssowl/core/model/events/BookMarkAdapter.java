@@ -37,15 +37,15 @@ public class BookMarkAdapter implements BookMarkListener {
   /*
    * @see org.rssowl.core.model.events.BookMarkListener#bookMarkAdded(java.util.List)
    */
-  public void bookMarkAdded(Set<BookMarkEvent> events) { }
+  public void entitiesAdded(Set<BookMarkEvent> events) { }
 
   /*
    * @see org.rssowl.core.model.events.BookMarkListener#bookMarkDeleted(java.util.List)
    */
-  public void bookMarkDeleted(Set<BookMarkEvent> events) { }
+  public void entitiesDeleted(Set<BookMarkEvent> events) { }
 
   /*
    * @see org.rssowl.core.model.events.BookMarkListener#bookMarkUpdated(java.util.List)
    */
-  public void bookMarkUpdated(Set<BookMarkEvent> events) { }
+  public void entitiesUpdated(Set<BookMarkEvent> events) { }
 }

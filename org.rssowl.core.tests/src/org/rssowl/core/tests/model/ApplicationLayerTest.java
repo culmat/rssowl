@@ -182,7 +182,7 @@ public class ApplicationLayerTest {
 
       newsListener = new NewsAdapter() {
         @Override
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           assertEquals(1, events.size());
           assertNotNull(events.iterator().next().getOldNews());
         }
@@ -224,7 +224,7 @@ public class ApplicationLayerTest {
       final boolean[] newsUpdatedCalled = new boolean[1];
       newsListener = new NewsAdapter() {
         @Override
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           newsUpdatedCalled[0] = true;
           assertEquals(2, events.size());
         }
@@ -271,7 +271,7 @@ public class ApplicationLayerTest {
       final boolean[] newsUpdatedCalled = new boolean[1];
       newsListener = new NewsAdapter() {
         @Override
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           newsUpdatedCalled[0] = true;
           assertEquals(2, events.size());
           for (NewsEvent event : events) {
@@ -352,7 +352,7 @@ public class ApplicationLayerTest {
 
     NewsListener newsListener = new NewsAdapter() {
       @Override
-      public void newsUpdated(Set<NewsEvent> events) {
+      public void entitiesUpdated(Set<NewsEvent> events) {
         assertEquals(1, events.size());
         NewsEvent event = events.iterator().next();
         assertEquals(true, event.getEntity().equals(savedNews));
@@ -368,7 +368,7 @@ public class ApplicationLayerTest {
     }
     newsListener = new NewsAdapter() {
       @Override
-      public void newsUpdated(Set<NewsEvent> events) {
+      public void entitiesUpdated(Set<NewsEvent> events) {
         assertEquals(1, events.size());
         NewsEvent event = events.iterator().next();
         assertEquals(savedNews.getId().longValue(), event.getEntity().getId());
@@ -480,7 +480,7 @@ public class ApplicationLayerTest {
     final boolean newsUpdatedCalled[] = new boolean[1];
     NewsListener newsListener = new NewsAdapter() {
       @Override
-      public void newsUpdated(Set<NewsEvent> events) {
+      public void entitiesUpdated(Set<NewsEvent> events) {
         assertEquals(newsUpdatedCalled[0], false);
         newsUpdatedCalled[0] = true;
         assertEquals(newsList.size(), events.size());
@@ -539,15 +539,15 @@ public class ApplicationLayerTest {
 
       final boolean[] folderUpdateEventOccurred = new boolean[1];
       folderListener = new FolderListener() {
-        public void folderAdded(Set<FolderEvent> events) {
+        public void entitiesAdded(Set<FolderEvent> events) {
           fail("Unexpected event");
         }
 
-        public void folderDeleted(Set<FolderEvent> events) {
+        public void entitiesDeleted(Set<FolderEvent> events) {
           fail("Unexpected event");
         }
 
-        public void folderUpdated(Set<FolderEvent> events) {
+        public void entitiesUpdated(Set<FolderEvent> events) {
           folderUpdateEventOccurred[0] = true;
           assertEquals(7, events.size());
           boolean foundFolder = false;
@@ -565,15 +565,15 @@ public class ApplicationLayerTest {
       };
       final boolean[] bookMarkUpdateEventOccurred = new boolean[1];
       bookMarkListener = new BookMarkListener() {
-        public void bookMarkAdded(Set<BookMarkEvent> events) {
+        public void entitiesAdded(Set<BookMarkEvent> events) {
           fail("Unexpected event");
         }
 
-        public void bookMarkDeleted(Set<BookMarkEvent> events) {
+        public void entitiesDeleted(Set<BookMarkEvent> events) {
           fail("Unexpected event");
         }
 
-        public void bookMarkUpdated(Set<BookMarkEvent> events) {
+        public void entitiesUpdated(Set<BookMarkEvent> events) {
           bookMarkUpdateEventOccurred[0] = true;
           assertEquals(1, events.size());
           BookMarkEvent event = events.iterator().next();
@@ -586,15 +586,15 @@ public class ApplicationLayerTest {
 
       final boolean[] searchMarkUpdateEventOccurred = new boolean[1];
       searchMarkListener = new SearchMarkListener() {
-        public void searchMarkAdded(Set<SearchMarkEvent> events) {
+        public void entitiesAdded(Set<SearchMarkEvent> events) {
           fail("Unexpected event");
         }
 
-        public void searchMarkDeleted(Set<SearchMarkEvent> events) {
+        public void entitiesDeleted(Set<SearchMarkEvent> events) {
           fail("Unexpected event");
         }
 
-        public void searchMarkUpdated(Set<SearchMarkEvent> events) {
+        public void entitiesUpdated(Set<SearchMarkEvent> events) {
           searchMarkUpdateEventOccurred[0] = true;
           assertEquals(1, events.size());
           SearchMarkEvent event = events.iterator().next();
@@ -928,15 +928,15 @@ public class ApplicationLayerTest {
       assertEquals(news3.resolve().getState(), INews.State.NEW);
 
       newsListener = new NewsListener() {
-        public void newsAdded(Set<NewsEvent> events) {
+        public void entitiesAdded(Set<NewsEvent> events) {
           fail("Unexpected Event");
         }
 
-        public void newsDeleted(Set<NewsEvent> events) {
+        public void entitiesDeleted(Set<NewsEvent> events) {
           fail("Unexpected Event");
         }
 
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           assertEquals(2, events.size());
           for (NewsEvent event : events)
             assertEquals(true, event.isRoot());
@@ -1004,15 +1004,15 @@ public class ApplicationLayerTest {
       final long news2ID = feed2.getNews().get(0).getId();
 
       newsListener = new NewsListener() {
-        public void newsAdded(Set<NewsEvent> events) {
+        public void entitiesAdded(Set<NewsEvent> events) {
           fail("Unexpected Event!");
         }
 
-        public void newsDeleted(Set<NewsEvent> events) {
+        public void entitiesDeleted(Set<NewsEvent> events) {
           fail("Unexpected Event!");
         }
 
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           assertEquals(2, events.size());
           for (NewsEvent event : events) {
             INews news = event.getEntity();

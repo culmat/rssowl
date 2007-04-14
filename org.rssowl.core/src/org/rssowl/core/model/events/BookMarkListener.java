@@ -24,7 +24,6 @@
 
 package org.rssowl.core.model.events;
 
-import java.util.Set;
 
 /**
  * A Listener being notified whenever the type <code>IBookMark</code> was
@@ -32,29 +31,6 @@ import java.util.Set;
  * 
  * @author bpasero
  */
-public interface BookMarkListener {
-
-  /**
-   * @param events an unmodifiable set of Event objects containing additional 
-   * information like the Type that is affected.
-   */
-  void bookMarkAdded(Set<BookMarkEvent> events);
-
-  /**
-   * <p>
-   * Note: The resolved type from the event is no longer stored in the
-   * persistance layer. It is <em>not</em> recommended to use the resolved
-   * type for future operations in that layer.
-   * </p>
-   * 
-   * @param events an unmodifiable set of Event objects containing additional 
-   * information like the Type that is affected.
-   */
-  void bookMarkDeleted(Set<BookMarkEvent> events);
-
-  /**
-   * @param events an unmodifiable set Event object containing additional 
-   * information like the Type that is affected.
-   */
-  void bookMarkUpdated(Set<BookMarkEvent> events);
+public interface BookMarkListener extends EntityListener<BookMarkEvent> {
+  //No new methods
 }

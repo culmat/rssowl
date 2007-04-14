@@ -275,7 +275,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     /* Close Editor if Input was Deleted (BookMark) */
     fBookMarkListener = new BookMarkAdapter() {
       @Override
-      public void bookMarkDeleted(Set<BookMarkEvent> events) {
+      public void entitiesDeleted(Set<BookMarkEvent> events) {
         for (BookMarkEvent event : events) {
           IBookMark mark = event.getEntity();
           if (mark.getId().equals(fInput.getMark().getId())) {
@@ -291,7 +291,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     /* Close Editor if Input was Deleted (SearchMark) */
     fSearchMarkListener = new SearchMarkAdapter() {
       @Override
-      public void searchMarkDeleted(Set<SearchMarkEvent> events) {
+      public void entitiesDeleted(Set<SearchMarkEvent> events) {
         for (SearchMarkEvent event : events) {
           ISearchMark mark = event.getEntity();
           if (fInput.getMark().getId().equals(mark.getId())) {
@@ -307,7 +307,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     /* Listen if Title Image is changing */
     fFeedListener = new FeedAdapter() {
       @Override
-      public void feedUpdated(Set<FeedEvent> events) {
+      public void entitiesUpdated(Set<FeedEvent> events) {
 
         /* Not supported for Searchmarks */
         if (fInput.getMark() instanceof ISearchMark || events.size() == 0)

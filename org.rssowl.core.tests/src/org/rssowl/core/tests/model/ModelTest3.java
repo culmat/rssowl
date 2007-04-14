@@ -915,7 +915,7 @@ public class ModelTest3 {
 
       newsListener = new NewsAdapter() {
         @Override
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           for (NewsEvent event : events) {
             INews news = event.getEntity();
             if (news.getLink().equals(news1Link))
@@ -981,14 +981,14 @@ public class ModelTest3 {
       folderListener = new FolderListener() {
         boolean updateEventOccurred = false;
 
-        public void folderAdded(Set<FolderEvent> events) {
+        public void entitiesAdded(Set<FolderEvent> events) {
           for (FolderEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             folderEvents[0] = true;
           }
         }
 
-        public void folderDeleted(Set<FolderEvent> events) {
+        public void entitiesDeleted(Set<FolderEvent> events) {
           for (FolderEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             if (folderReference[0].references(event.getEntity()))
@@ -996,7 +996,7 @@ public class ModelTest3 {
           }
         }
 
-        public void folderUpdated(Set<FolderEvent> events) {
+        public void entitiesUpdated(Set<FolderEvent> events) {
           for (FolderEvent event : events) {
             if (updateEventOccurred)
               return;
@@ -1047,7 +1047,7 @@ public class ModelTest3 {
       final boolean searchMarkEvents[] = new boolean[3];
       final SearchMarkReference searchMarkReference[] = new SearchMarkReference[1];
       searchMarkListener = new SearchMarkListener() {
-        public void searchMarkAdded(Set<SearchMarkEvent> events) {
+        public void entitiesAdded(Set<SearchMarkEvent> events) {
           for (SearchMarkEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             assertEquals(folderRef.getId(), event.getEntity().getFolder().getId());
@@ -1055,7 +1055,7 @@ public class ModelTest3 {
           }
         }
 
-        public void searchMarkDeleted(Set<SearchMarkEvent> events) {
+        public void entitiesDeleted(Set<SearchMarkEvent> events) {
           for (SearchMarkEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             assertEquals(folderRef.getId(), event.getEntity().getFolder().getId());
@@ -1064,7 +1064,7 @@ public class ModelTest3 {
           }
         }
 
-        public void searchMarkUpdated(Set<SearchMarkEvent> events) {
+        public void entitiesUpdated(Set<SearchMarkEvent> events) {
           for (SearchMarkEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             assertEquals(folderRef.getId(), event.getEntity().getFolder().getId());
@@ -1179,7 +1179,7 @@ public class ModelTest3 {
       final boolean bookMarkEvents[] = new boolean[3];
       final BookMarkReference bookMarkReference[] = new BookMarkReference[1];
       bookMarkListener = new BookMarkListener() {
-        public void bookMarkAdded(Set<BookMarkEvent> events) {
+        public void entitiesAdded(Set<BookMarkEvent> events) {
           for (BookMarkEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             assertEquals(folderRef.getId(), event.getEntity().getFolder().getId());
@@ -1187,7 +1187,7 @@ public class ModelTest3 {
           }
         }
 
-        public void bookMarkDeleted(Set<BookMarkEvent> events) {
+        public void entitiesDeleted(Set<BookMarkEvent> events) {
           for (BookMarkEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             assertEquals(folderRef.getId(), event.getEntity().getFolder().getId());
@@ -1196,7 +1196,7 @@ public class ModelTest3 {
           }
         }
 
-        public void bookMarkUpdated(Set<BookMarkEvent> events) {
+        public void entitiesUpdated(Set<BookMarkEvent> events) {
           for (BookMarkEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             assertEquals(folderRef.getId(), event.getEntity().getFolder().getId());
@@ -1242,14 +1242,14 @@ public class ModelTest3 {
       final boolean feedEvents[] = new boolean[3];
       final FeedReference feedReference[] = new FeedReference[1];
       feedListener = new FeedListener() {
-        public void feedAdded(Set<FeedEvent> events) {
+        public void entitiesAdded(Set<FeedEvent> events) {
           for (FeedEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             feedEvents[0] = true;
           }
         }
 
-        public void feedDeleted(Set<FeedEvent> events) {
+        public void entitiesDeleted(Set<FeedEvent> events) {
           for (FeedEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             if (feedReference[0].references(event.getEntity()))
@@ -1257,7 +1257,7 @@ public class ModelTest3 {
           }
         }
 
-        public void feedUpdated(Set<FeedEvent> events) {
+        public void entitiesUpdated(Set<FeedEvent> events) {
           for (FeedEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             if (feedReference[0].references(event.getEntity()))
@@ -1304,7 +1304,7 @@ public class ModelTest3 {
       final boolean newsEvents[] = new boolean[3];
       final NewsReference newsReference[] = new NewsReference[1];
       newsListener = new NewsListener() {
-        public void newsAdded(Set<NewsEvent> events) {
+        public void entitiesAdded(Set<NewsEvent> events) {
           for (NewsEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             assertLinkEquals(feed.getLink(), event.getEntity().getFeedReference().getLink());
@@ -1312,7 +1312,7 @@ public class ModelTest3 {
           }
         }
 
-        public void newsDeleted(Set<NewsEvent> events) {
+        public void entitiesDeleted(Set<NewsEvent> events) {
           for (NewsEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             assertLinkEquals(feed.getLink(), event.getEntity().getFeedReference().getLink());
@@ -1321,7 +1321,7 @@ public class ModelTest3 {
           }
         }
 
-        public void newsUpdated(Set<NewsEvent> events) {
+        public void entitiesUpdated(Set<NewsEvent> events) {
           for (NewsEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             assertLinkEquals(feed.getLink(), event.getEntity().getFeedReference().getLink());
@@ -1376,7 +1376,7 @@ public class ModelTest3 {
       final AttachmentReference attachmentReference[] = new AttachmentReference[1];
       attachmentListener = new AttachmentAdapter() {
         @Override
-        public void attachmentAdded(Set<AttachmentEvent> events) {
+        public void entitiesAdded(Set<AttachmentEvent> events) {
           for (AttachmentEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             attachmentEvents[0] = true;
@@ -1384,7 +1384,7 @@ public class ModelTest3 {
         }
 
         @Override
-        public void attachmentDeleted(Set<AttachmentEvent> events) {
+        public void entitiesDeleted(Set<AttachmentEvent> events) {
           for (AttachmentEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             if (attachmentReference[0].references(event.getEntity()))
@@ -1393,7 +1393,7 @@ public class ModelTest3 {
         }
 
         @Override
-        public void attachmentUpdated(Set<AttachmentEvent> events) {
+        public void entitiesUpdated(Set<AttachmentEvent> events) {
           for (AttachmentEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             if (attachmentReference[0].references(event.getEntity()))
@@ -1444,7 +1444,7 @@ public class ModelTest3 {
       final boolean categoryEvents[] = new boolean[6];
       final CategoryReference categoryReference[] = new CategoryReference[2];
       categoryListener = new CategoryListener() {
-        public void categoryAdded(Set<CategoryEvent> events) {
+        public void entitiesAdded(Set<CategoryEvent> events) {
           for (CategoryEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             if (categoryEvents[0])
@@ -1453,7 +1453,7 @@ public class ModelTest3 {
           }
         }
 
-        public void categoryDeleted(Set<CategoryEvent> events) {
+        public void entitiesDeleted(Set<CategoryEvent> events) {
           for (CategoryEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             if (categoryReference[0].references(event.getEntity()))
@@ -1463,7 +1463,7 @@ public class ModelTest3 {
           }
         }
 
-        public void categoryUpdated(Set<CategoryEvent> events) {
+        public void entitiesUpdated(Set<CategoryEvent> events) {
           for (CategoryEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             if (categoryReference[0].references(event.getEntity()))
@@ -1524,7 +1524,7 @@ public class ModelTest3 {
       final boolean personEvents[] = new boolean[6];
       final PersonReference personReference[] = new PersonReference[2];
       personListener = new PersonListener() {
-        public void personAdded(Set<PersonEvent> events) {
+        public void entitiesAdded(Set<PersonEvent> events) {
           for (PersonEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             if (personEvents[0])
@@ -1533,7 +1533,7 @@ public class ModelTest3 {
           }
         }
 
-        public void personDeleted(Set<PersonEvent> events) {
+        public void entitiesDeleted(Set<PersonEvent> events) {
           for (PersonEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             if (personReference[0].references(event.getEntity()))
@@ -1543,7 +1543,7 @@ public class ModelTest3 {
           }
         }
 
-        public void personUpdated(Set<PersonEvent> events) {
+        public void entitiesUpdated(Set<PersonEvent> events) {
           for (PersonEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             if (personReference[0].references(event.getEntity()))
@@ -1598,14 +1598,14 @@ public class ModelTest3 {
       final boolean labelEvents[] = new boolean[3];
       final LabelReference labelReference[] = new LabelReference[1];
       labelListener = new LabelListener() {
-        public void labelAdded(Set<LabelEvent> events) {
+        public void entitiesAdded(Set<LabelEvent> events) {
           for (LabelEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             labelEvents[0] = true;
           }
         }
 
-        public void labelDeleted(Set<LabelEvent> events) {
+        public void entitiesDeleted(Set<LabelEvent> events) {
           for (LabelEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             if (labelReference[0].references(event.getEntity()))
@@ -1613,7 +1613,7 @@ public class ModelTest3 {
           }
         }
 
-        public void labelUpdated(Set<LabelEvent> events) {
+        public void entitiesUpdated(Set<LabelEvent> events) {
           for (LabelEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
             if (labelReference[0].references(event.getEntity()))
@@ -1749,12 +1749,12 @@ public class ModelTest3 {
 
       feedListener = new NewsAdapter() {
         @Override
-        public void newsAdded(Set<NewsEvent> events) {
+        public void entitiesAdded(Set<NewsEvent> events) {
           addedEvent[0] = true;
         }
 
         @Override
-        public void newsDeleted(Set<NewsEvent> events) {
+        public void entitiesDeleted(Set<NewsEvent> events) {
           deletedEvent[0] = true;
         }
       };
@@ -1994,7 +1994,7 @@ public class ModelTest3 {
       final long rootFolderId = root.getId();
       FolderListener folderListener = new FolderAdapter() {
         @Override
-        public void folderUpdated(Set<FolderEvent> events) {
+        public void entitiesUpdated(Set<FolderEvent> events) {
           for (FolderEvent event : events) {
             if (event.getEntity().getId() == rootFolderId)
               assertTrue(event.isRoot());
@@ -2113,7 +2113,7 @@ public class ModelTest3 {
 
       folderListener = new FolderAdapter() {
         @Override
-        public void folderUpdated(Set<FolderEvent> events) {
+        public void entitiesUpdated(Set<FolderEvent> events) {
           for (FolderEvent folderEvent : events) {
             IFolder folder = folderEvent.getEntity();
             if (folder.getName().startsWith("Folder"))

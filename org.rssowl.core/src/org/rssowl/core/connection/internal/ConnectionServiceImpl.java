@@ -112,7 +112,7 @@ public class ConnectionServiceImpl implements IConnectionService {
   private void registerListeners() {
     fFeedListener = new FeedAdapter() {
       @Override
-      public void feedDeleted(Set<FeedEvent> events) {
+      public void entitiesDeleted(Set<FeedEvent> events) {
         for (FeedEvent feedEvent : events) {
           URI feedLink = feedEvent.getEntity().getLink();
           try {

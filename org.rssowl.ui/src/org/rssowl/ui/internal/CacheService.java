@@ -73,7 +73,7 @@ public class CacheService {
     fFolderListener = new FolderListener() {
 
       /* Folders got added */
-      public void folderAdded(Set<FolderEvent> events) {
+      public void entitiesAdded(Set<FolderEvent> events) {
         for (FolderEvent folderEvent : events) {
           IFolder folder = folderEvent.getEntity();
           if (folder.getParent() == null)
@@ -82,7 +82,7 @@ public class CacheService {
       }
 
       /* Folders got Deleted */
-      public void folderDeleted(Set<FolderEvent> events) {
+      public void entitiesDeleted(Set<FolderEvent> events) {
         for (FolderEvent folderEvent : events) {
           IFolder folder = folderEvent.getEntity();
           if (folder.getParent() == null)
@@ -91,7 +91,7 @@ public class CacheService {
       }
 
       /* Folders got Updated */
-      public void folderUpdated(Set<FolderEvent> events) {
+      public void entitiesUpdated(Set<FolderEvent> events) {
       /* Not handled */
       }
     };
@@ -100,21 +100,21 @@ public class CacheService {
     fBookMarkListener = new BookMarkListener() {
 
       /* BookMarks got Added */
-      public void bookMarkAdded(Set<BookMarkEvent> events) {
+      public void entitiesAdded(Set<BookMarkEvent> events) {
         for (BookMarkEvent bookMarkEvent : events) {
           fBookMarks.add(bookMarkEvent.getEntity());
         }
       }
 
       /* Bookmarks got Deleted */
-      public void bookMarkDeleted(Set<BookMarkEvent> events) {
+      public void entitiesDeleted(Set<BookMarkEvent> events) {
         for (BookMarkEvent bookMarkEvent : events) {
           fBookMarks.remove(bookMarkEvent.getEntity());
         }
       }
 
       /* Bookmarks got Updated */
-      public void bookMarkUpdated(Set<BookMarkEvent> events) {
+      public void entitiesUpdated(Set<BookMarkEvent> events) {
       /* Not handled */
       }
     };
@@ -123,21 +123,21 @@ public class CacheService {
     fSearchMarkListener = new SearchMarkListener() {
 
       /* SearchMark got Added */
-      public void searchMarkAdded(Set<SearchMarkEvent> events) {
+      public void entitiesAdded(Set<SearchMarkEvent> events) {
         for (SearchMarkEvent searchMarkEvent : events) {
           fSearchMarks.add(searchMarkEvent.getEntity());
         }
       }
 
       /* SearchMark got Deleted */
-      public void searchMarkDeleted(Set<SearchMarkEvent> events) {
+      public void entitiesDeleted(Set<SearchMarkEvent> events) {
         for (SearchMarkEvent searchMarkEvent : events) {
           fSearchMarks.remove(searchMarkEvent.getEntity());
         }
       }
 
       /* SearchMark got Updated */
-      public void searchMarkUpdated(Set<SearchMarkEvent> events) {
+      public void entitiesUpdated(Set<SearchMarkEvent> events) {
       /* Not handled */
       }
     };

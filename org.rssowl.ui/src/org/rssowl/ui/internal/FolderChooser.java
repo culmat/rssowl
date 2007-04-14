@@ -121,7 +121,7 @@ public class FolderChooser extends Composite implements DisposeListener {
   private void registerListeners() {
     fFolderListener = new FolderAdapter() {
       @Override
-      public void folderUpdated(final Set<FolderEvent> events) {
+      public void entitiesUpdated(final Set<FolderEvent> events) {
         if (events.isEmpty())
           return;
 
@@ -136,7 +136,7 @@ public class FolderChooser extends Composite implements DisposeListener {
       }
 
       @Override
-      public void folderAdded(final Set<FolderEvent> events) {
+      public void entitiesAdded(final Set<FolderEvent> events) {
         if (events.isEmpty())
           return;
 

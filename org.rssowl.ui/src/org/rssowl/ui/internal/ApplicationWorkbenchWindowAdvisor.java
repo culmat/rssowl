@@ -323,7 +323,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     fNewsListener = new NewsAdapter() {
 
       @Override
-      public void newsAdded(Set<NewsEvent> events) {
+      public void entitiesAdded(Set<NewsEvent> events) {
         JobRunner.runInUIThread(fTrayItem, new Runnable() {
           public void run() {
 

@@ -37,15 +37,15 @@ public class FolderAdapter implements FolderListener {
   /*
    * @see org.rssowl.core.model.events.FolderListener#folderAdded(java.util.List)
    */
-  public void folderAdded(Set<FolderEvent> events) { }
+  public void entitiesAdded(Set<FolderEvent> events) { }
 
   /*
    * @see org.rssowl.core.model.events.FolderListener#folderDeleted(java.util.List)
    */
-  public void folderDeleted(Set<FolderEvent> events) { }
+  public void entitiesDeleted(Set<FolderEvent> events) { }
 
   /*
    * @see org.rssowl.core.model.events.FolderListener#folderUpdated(java.util.List)
    */
-  public void folderUpdated(Set<FolderEvent> events) { }
+  public void entitiesUpdated(Set<FolderEvent> events) { }
 }

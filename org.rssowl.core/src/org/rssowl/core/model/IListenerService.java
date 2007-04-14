@@ -103,19 +103,16 @@ public interface IListenerService {
   /**
    * @param events The <code>ModelEvent</code> for the affected type.
    */
-  @SuppressWarnings("nls")
   void notifyBookMarkAdded(final Set<BookMarkEvent> events);
 
   /**
    * @param events The <code>ModelEvent</code> for the affected type.
    */
-  @SuppressWarnings("nls")
   void notifyBookMarkDeleted(final Set<BookMarkEvent> events);
 
   /**
    * @param events The <code>ModelEvent</code> for the affected type.
    */
-  @SuppressWarnings("nls")
   void notifyBookMarkUpdated(final Set<BookMarkEvent> events);
 
   /**
@@ -156,19 +153,16 @@ public interface IListenerService {
   /**
    * @param events The <code>ModelEvent</code> for the affected type.
    */
-  @SuppressWarnings("nls")
   void notifyFeedAdded(final Set<FeedEvent> events);
 
   /**
    * @param events The <code>ModelEvent</code> for the affected type.
    */
-  @SuppressWarnings("nls")
   void notifyFeedDeleted(final Set<FeedEvent> events);
 
   /**
    * @param events The <code>ModelEvent</code> for the affected type.
    */
-  @SuppressWarnings("nls")
   void notifyFeedUpdated(final Set<FeedEvent> events);
 
   /**
@@ -184,19 +178,16 @@ public interface IListenerService {
   /**
    * @param events The <code>ModelEvent</code> for the affected type.
    */
-  @SuppressWarnings("nls")
   void notifyFolderAdded(final Set<FolderEvent> events);
 
   /**
    * @param events The <code>ModelEvent</code> for the affected type.
    */
-  @SuppressWarnings("nls")
   void notifyFolderDeleted(final Set<FolderEvent> events);
 
   /**
    * @param events The <code>ModelEvent</code> for the affected type.
    */
-  @SuppressWarnings("nls")
   void notifyFolderUpdated(final Set<FolderEvent> events);
 
   /**
@@ -237,19 +228,16 @@ public interface IListenerService {
   /**
    * @param events The <code>ModelEvent</code> for the affected type.
    */
-  @SuppressWarnings("nls")
   void notifyNewsAdded(final Set<NewsEvent> events);
 
   /**
    * @param events The <code>ModelEvent</code> for the affected type.
    */
-  @SuppressWarnings("nls")
   void notifyNewsDeleted(final Set<NewsEvent> events);
 
   /**
    * @param events The <code>ModelEvent</code> for the affected type.
    */
-  @SuppressWarnings("nls")
   void notifyNewsUpdated(final Set<NewsEvent> events);
 
   /**

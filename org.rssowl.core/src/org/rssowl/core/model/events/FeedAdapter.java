@@ -35,18 +35,18 @@ import java.util.Set;
 public class FeedAdapter implements FeedListener {
 
   /*
-   * @see org.rssowl.core.model.events.FeedListener#feedAdded(java.util.List)
+   * @see org.rssowl.core.model.events.FeedListener#entitiesAdded(java.util.List)
    */
-  public void feedAdded(Set<FeedEvent> events) { }
+  public void entitiesAdded(Set<FeedEvent> events) { }
 
   /*
-   * @see org.rssowl.core.model.events.FeedListener#feedDeleted(java.util.List)
+   * @see org.rssowl.core.model.events.FeedListener#entitiesDeleted(java.util.List)
    */
-  public void feedDeleted(Set<FeedEvent> events) { }
+  public void entitiesDeleted(Set<FeedEvent> events) { }
 
   /*
-   * @see org.rssowl.core.model.events.FeedListener#feedUpdated(java.util.List)
+   * @see org.rssowl.core.model.events.FeedListener#entitiesUpdated(java.util.List)
    */
-  public void feedUpdated(Set<FeedEvent> events) { }
+  public void entitiesUpdated(Set<FeedEvent> events) { }
 
 }
