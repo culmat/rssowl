@@ -27,7 +27,11 @@ import org.rssowl.core.model.events.FeedEvent;
 import org.rssowl.core.model.events.FeedListener;
 import org.rssowl.core.model.internal.db4o.DBHelper;
 import org.rssowl.core.model.internal.persist.Feed;
+import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.dao.IFeedDAO;
+import org.rssowl.core.model.reference.FeedReference;
+
+import java.net.URI;
 
 public final class FeedDAOImpl extends AbstractEntityDAO<Feed, FeedListener,
     FeedEvent> implements IFeedDAO<Feed>  {
@@ -54,5 +58,19 @@ public final class FeedDAOImpl extends AbstractEntityDAO<Feed, FeedListener,
   @Override
   protected final boolean isSaveFully() {
     return false;
+  }
+
+  public final Feed load(URI link) {
+    return DBHelper.loadFeed(fDb, link, Integer.MAX_VALUE);
+  }
+
+  // FIXME Not sure if this makes sense anymore. If we decide to keep it, try
+  // to make it more efficient
+  public final FeedReference loadReference(URI link) {
+    IFeed feed = DBHelper.loadFeed(fDb, link, null);
+    if (feed == null) {
+      return null;
+    }
+    return new FeedReference(feed.getId());
   }
 }
