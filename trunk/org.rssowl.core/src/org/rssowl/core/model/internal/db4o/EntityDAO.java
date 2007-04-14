@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.SafeRunner;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.LifeCycleListener;
 import org.rssowl.core.model.events.ModelEvent;
-import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IPersistable;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
