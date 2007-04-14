@@ -28,6 +28,10 @@ import org.rssowl.core.model.events.CategoryListener;
 import org.rssowl.core.model.internal.persist.Category;
 import org.rssowl.core.model.persist.ICategory;
 import org.rssowl.core.model.persist.dao.ICategoryDAO;
+import org.rssowl.core.util.StringUtils;
+
+import java.util.Set;
+import java.util.TreeSet;
 
 public final class CategoryDAOImpl extends AbstractEntityDAO<ICategory,
     CategoryListener, CategoryEvent> implements ICategoryDAO   {
@@ -49,5 +53,15 @@ public final class CategoryDAOImpl extends AbstractEntityDAO<ICategory,
   @Override
   protected final boolean isSaveFully() {
     return false;
+  }
+
+  public final Set<String> loadAllNames() {
+    Set<String> names = new TreeSet<String>();
+    for (ICategory category : loadAll()) {
+      String name = StringUtils.safeTrim(category.getName());
+      if (StringUtils.isSet(name))
+        names.add(category.getName().trim());
+    }
+    return names;
   }
 }

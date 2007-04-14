@@ -23,10 +23,27 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.persist.dao;
 
+import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.PersonEvent;
 import org.rssowl.core.model.events.PersonListener;
 import org.rssowl.core.model.persist.IPerson;
 
+import java.util.Set;
+
 public interface IPersonDAO extends IEntityDAO<IPerson, PersonListener, PersonEvent> {
 
+  /**
+   * Loads a sorted <code>Set</code> of author names or emails for all IPerson instances
+   * that are persisted and have either a non-null name or email.
+   * 
+   * The author's name is given preference, but if it's <code>null</code> and
+   * the email is not <code>null</code>, the email is used.
+   *
+   * @return a sorted <code>Set</code> of Strings containing all authors that
+   * are persisted in the persistence layer.
+   * @throws PersistenceException In case of an error while accessing the
+   * persistance layer implementation.
+   */
+  Set<String> loadAllNames();
+  
 }

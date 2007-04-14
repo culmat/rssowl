@@ -23,10 +23,25 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.persist.dao;
 
+import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.FolderEvent;
 import org.rssowl.core.model.events.FolderListener;
 import org.rssowl.core.model.persist.IFolder;
 
+import java.util.Collection;
+
 public interface IFolderDAO extends IEntityDAO<IFolder, FolderListener, FolderEvent>   {
-  // No new methods
+  
+  /**
+   * Loads all Folders from the persistance layer that do not have any parent
+   * Folder (in other words root folders).
+   *
+   * @return A Collection containing all Folders that do not have any
+   * parent Folder.
+   * @throws PersistenceException In case of an error while accessing the
+   * persistance layer implementation.
+   */
+  Collection<IFolder> loadRoot();
+  
+  
 }

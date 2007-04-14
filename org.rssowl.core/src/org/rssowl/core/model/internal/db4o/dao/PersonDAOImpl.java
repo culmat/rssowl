@@ -23,11 +23,18 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
+import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.PersonEvent;
 import org.rssowl.core.model.events.PersonListener;
 import org.rssowl.core.model.internal.persist.Person;
 import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.model.persist.dao.IPersonDAO;
+import org.rssowl.core.util.StringUtils;
+
+import com.db4o.ext.Db4oException;
+
+import java.util.Set;
+import java.util.TreeSet;
 
 public class PersonDAOImpl extends AbstractEntityDAO<IPerson, PersonListener,
     PersonEvent> implements IPersonDAO  {
@@ -49,5 +56,22 @@ public class PersonDAOImpl extends AbstractEntityDAO<IPerson, PersonListener,
   @Override
   protected final boolean isSaveFully() {
     return false;
+  }
+
+  public Set<String> loadAllNames() {
+    try {
+      Set<String> strings = new TreeSet<String>();
+      for (IPerson person : loadAll()) {
+        String name = StringUtils.safeTrim(person.getName());
+        if (StringUtils.isSet(name))
+          strings.add(name);
+        else if (person.getEmail() != null)
+          strings.add(person.getEmail().toString());
+      }
+
+      return strings;
+    } catch (Db4oException e) {
+      throw new PersistenceException(e);
+    }
   }
 }
