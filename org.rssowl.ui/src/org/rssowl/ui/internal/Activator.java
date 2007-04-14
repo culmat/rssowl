@@ -26,10 +26,12 @@ package org.rssowl.ui.internal;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+import org.rssowl.core.util.LoggingSafeRunnable;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -73,10 +75,18 @@ public class Activator extends AbstractUIPlugin {
     super.start(context);
 
     /* Start internal Server (chance that System.exit() gets called!) */
-    startServer();
+    SafeRunner.run(new LoggingSafeRunnable() {
+      public void run() throws Exception {
+        startServer();
+      }
+    });
 
     /* Propagate startup to Controller */
-    Controller.getDefault().startup();
+    SafeRunner.run(new LoggingSafeRunnable() {
+      public void run() throws Exception {
+        Controller.getDefault().startup();
+      }
+    });
   }
 
   /* Start the Application Server */
@@ -178,7 +188,11 @@ public class Activator extends AbstractUIPlugin {
   public void stop(BundleContext context) throws Exception {
 
     /* Propagate shutdown to Controller */
-    Controller.getDefault().shutdown();
+    SafeRunner.run(new LoggingSafeRunnable() {
+      public void run() throws Exception {
+        Controller.getDefault().shutdown();
+      }
+    });
 
     /* Proceed */
     super.stop(context);
