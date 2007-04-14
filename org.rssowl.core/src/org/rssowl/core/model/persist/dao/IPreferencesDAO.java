@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.model.persist.pref;
+package org.rssowl.core.model.persist.dao;
 
 import org.rssowl.core.model.dao.PersistenceException;
 

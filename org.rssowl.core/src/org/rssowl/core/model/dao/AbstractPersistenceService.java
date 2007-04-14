@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.dao;
 
-import org.rssowl.core.model.persist.pref.IPreferencesDAO;
+import org.rssowl.core.model.persist.dao.IPreferencesDAO;
 import org.rssowl.core.model.persist.search.IModelSearch;
 import org.rssowl.core.util.ExtensionUtils;
 
