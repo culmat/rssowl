@@ -23,29 +23,29 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.events.BookMarkEvent;
-import org.rssowl.core.model.events.BookMarkListener;
-import org.rssowl.core.model.internal.persist.BookMark;
+import org.rssowl.core.model.events.SearchConditionEvent;
+import org.rssowl.core.model.events.SearchConditionListener;
+import org.rssowl.core.model.internal.persist.search.SearchCondition;
 
-public final class BookMarkDAOImpl extends AbstractEntityDAO<BookMark, BookMarkListener,
-    BookMarkEvent>  {
+public final class SearchConditionDAOImpl extends AbstractEntityDAO<SearchCondition,
+    SearchConditionListener, SearchConditionEvent>  {
 
-  public BookMarkDAOImpl() {
-    super(BookMark.class);
+  public SearchConditionDAOImpl() {
+    super(SearchCondition.class);
   }
-
+  
   @Override
-  protected final BookMarkEvent createDeleteEventTemplate(BookMark entity) {
+  protected final SearchConditionEvent createDeleteEventTemplate(SearchCondition entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final BookMarkEvent createSaveEventTemplate(BookMark entity) {
-    return new BookMarkEvent(entity, null, true);
+  protected final SearchConditionEvent createSaveEventTemplate(SearchCondition entity) {
+    return new SearchConditionEvent(entity, true);
   }
 
   @Override
   protected final boolean isSaveFully() {
-    return false;
+    return true;
   }
 }

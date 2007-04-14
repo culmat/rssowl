@@ -23,29 +23,17 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.events.BookMarkEvent;
-import org.rssowl.core.model.events.BookMarkListener;
-import org.rssowl.core.model.internal.persist.BookMark;
+import org.rssowl.core.model.internal.persist.ConditionalGet;
 
-public final class BookMarkDAOImpl extends AbstractEntityDAO<BookMark, BookMarkListener,
-    BookMarkEvent>  {
+public final class ConditionalGetDAOImpl extends AbstractPersistableDAO<ConditionalGet>   {
 
-  public BookMarkDAOImpl() {
-    super(BookMark.class);
-  }
-
-  @Override
-  protected final BookMarkEvent createDeleteEventTemplate(BookMark entity) {
-    return createSaveEventTemplate(entity);
-  }
-
-  @Override
-  protected final BookMarkEvent createSaveEventTemplate(BookMark entity) {
-    return new BookMarkEvent(entity, null, true);
+  public ConditionalGetDAOImpl() {
+    super(ConditionalGet.class);
   }
 
   @Override
   protected final boolean isSaveFully() {
-    return false;
+    return true;
   }
+
 }

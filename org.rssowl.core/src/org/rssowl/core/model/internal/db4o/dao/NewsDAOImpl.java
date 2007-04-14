@@ -23,29 +23,37 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.events.BookMarkEvent;
-import org.rssowl.core.model.events.BookMarkListener;
-import org.rssowl.core.model.internal.persist.BookMark;
+import org.rssowl.core.model.events.NewsEvent;
+import org.rssowl.core.model.events.NewsListener;
+import org.rssowl.core.model.internal.db4o.DBHelper;
+import org.rssowl.core.model.internal.persist.News;
+import org.rssowl.core.model.persist.INews;
 
-public final class BookMarkDAOImpl extends AbstractEntityDAO<BookMark, BookMarkListener,
-    BookMarkEvent>  {
+public final class NewsDAOImpl extends AbstractEntityDAO<News, NewsListener, NewsEvent> {
 
-  public BookMarkDAOImpl() {
-    super(BookMark.class);
+  public NewsDAOImpl() {
+    super(News.class);
+  }
+  
+  @Override
+  protected final void doSave(News entity) {
+    DBHelper.saveAndCascadeNews(fDb, entity, true);
   }
 
   @Override
-  protected final BookMarkEvent createDeleteEventTemplate(BookMark entity) {
-    return createSaveEventTemplate(entity);
+  protected final NewsEvent createDeleteEventTemplate(News entity) {
+    return new NewsEvent(null, entity, true);
   }
 
   @Override
-  protected final BookMarkEvent createSaveEventTemplate(BookMark entity) {
-    return new BookMarkEvent(entity, null, true);
+  protected final NewsEvent createSaveEventTemplate(News entity) {
+    INews oldNews = fDb.ext().peekPersisted(entity, 2, true);
+    return new NewsEvent(oldNews, entity, true);
   }
 
   @Override
   protected final boolean isSaveFully() {
     return false;
   }
+
 }

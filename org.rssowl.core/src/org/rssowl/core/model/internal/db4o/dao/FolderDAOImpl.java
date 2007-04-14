@@ -23,29 +23,30 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.events.BookMarkEvent;
-import org.rssowl.core.model.events.BookMarkListener;
-import org.rssowl.core.model.internal.persist.BookMark;
+import org.rssowl.core.model.events.FolderEvent;
+import org.rssowl.core.model.events.FolderListener;
+import org.rssowl.core.model.internal.persist.Folder;
 
-public final class BookMarkDAOImpl extends AbstractEntityDAO<BookMark, BookMarkListener,
-    BookMarkEvent>  {
+public final class FolderDAOImpl extends AbstractEntityDAO<Folder, FolderListener,
+    FolderEvent>    {
 
-  public BookMarkDAOImpl() {
-    super(BookMark.class);
+  public FolderDAOImpl() {
+    super(Folder.class);
   }
 
   @Override
-  protected final BookMarkEvent createDeleteEventTemplate(BookMark entity) {
+  protected final FolderEvent createDeleteEventTemplate(Folder entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final BookMarkEvent createSaveEventTemplate(BookMark entity) {
-    return new BookMarkEvent(entity, null, true);
+  protected final FolderEvent createSaveEventTemplate(Folder entity) {
+    return new FolderEvent(entity, null, true);
   }
 
   @Override
   protected final boolean isSaveFully() {
     return false;
   }
+
 }

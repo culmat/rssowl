@@ -23,25 +23,25 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.events.BookMarkEvent;
-import org.rssowl.core.model.events.BookMarkListener;
-import org.rssowl.core.model.internal.persist.BookMark;
+import org.rssowl.core.model.events.CategoryEvent;
+import org.rssowl.core.model.events.CategoryListener;
+import org.rssowl.core.model.internal.persist.Category;
 
-public final class BookMarkDAOImpl extends AbstractEntityDAO<BookMark, BookMarkListener,
-    BookMarkEvent>  {
+public final class CategoryDAOImpl extends AbstractEntityDAO<Category,
+    CategoryListener, CategoryEvent>    {
 
-  public BookMarkDAOImpl() {
-    super(BookMark.class);
+  public CategoryDAOImpl() {
+    super(Category.class);
   }
-
+  
   @Override
-  protected final BookMarkEvent createDeleteEventTemplate(BookMark entity) {
+  protected final CategoryEvent createDeleteEventTemplate(Category entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final BookMarkEvent createSaveEventTemplate(BookMark entity) {
-    return new BookMarkEvent(entity, null, true);
+  protected final CategoryEvent createSaveEventTemplate(Category entity) {
+    return new CategoryEvent(entity, true);
   }
 
   @Override
