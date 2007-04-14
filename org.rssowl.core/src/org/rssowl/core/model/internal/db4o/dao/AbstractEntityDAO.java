@@ -21,13 +21,17 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o;
+package org.rssowl.core.model.internal.db4o.dao;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.SafeRunner;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.EntityListener;
 import org.rssowl.core.model.events.ModelEvent;
+import org.rssowl.core.model.internal.db4o.DBHelper;
+import org.rssowl.core.model.internal.db4o.DBManager;
+import org.rssowl.core.model.internal.db4o.DatabaseEvent;
+import org.rssowl.core.model.internal.db4o.DatabaseListener;
 import org.rssowl.core.model.persist.IPersistable;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
@@ -45,7 +49,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
-public abstract class EntityDAO<T extends IPersistable,
+public abstract class AbstractEntityDAO<T extends IPersistable,
     L extends EntityListener<E>, E extends ModelEvent> {
 
   private final List<L> entityListeners = new CopyOnWriteArrayList<L>();
@@ -58,7 +62,7 @@ public abstract class EntityDAO<T extends IPersistable,
   /**
    * Creates an instance of this class.
    */
-  public EntityDAO(Class<T> entityClass) {
+  public AbstractEntityDAO(Class<T> entityClass) {
     Assert.isNotNull(entityClass, "entityClass");
     fEntityClass = entityClass;
     DBManager.getDefault().addEntityStoreListener(new DatabaseListener() {

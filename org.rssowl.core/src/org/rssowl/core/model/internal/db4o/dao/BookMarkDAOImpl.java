@@ -21,16 +21,16 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o;
+package org.rssowl.core.model.internal.db4o.dao;
 
 import org.rssowl.core.model.events.BookMarkEvent;
 import org.rssowl.core.model.events.BookMarkListener;
 import org.rssowl.core.model.internal.persist.BookMark;
 
-public class BookMarkDAO extends EntityDAO<BookMark, BookMarkListener,
+public class BookMarkDAOImpl extends AbstractEntityDAO<BookMark, BookMarkListener,
     BookMarkEvent>  {
 
-  public BookMarkDAO() {
+  public BookMarkDAOImpl() {
     super(BookMark.class);
   }
 

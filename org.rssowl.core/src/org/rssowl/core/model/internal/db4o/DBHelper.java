@@ -62,12 +62,12 @@ public class DBHelper {
     }
   }
 
-  static final void putEventTemplate(ModelEvent modelEvent) {
+  public static final void putEventTemplate(ModelEvent modelEvent) {
     int id = System.identityHashCode(modelEvent.getEntity());
     EventsMap.getInstance().putEventTemplate(id, modelEvent);
   }
   
-  static final void saveFeed(ObjectContainer db, IFeed feed) {
+  public static final void saveFeed(ObjectContainer db, IFeed feed) {
     if (feed.getId() == null && feedExists(db, feed.getLink()))
         throw new IllegalArgumentException("This feed already exists, but it has no id."); //$NON-NLS-1$
     
