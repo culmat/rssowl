@@ -23,9 +23,11 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.SafeRunner;
 import org.rssowl.core.model.events.EntityListener;
 import org.rssowl.core.model.events.ModelEvent;
+import org.rssowl.core.model.events.runnable.EventType;
 import org.rssowl.core.model.internal.db4o.DBHelper;
 import org.rssowl.core.model.internal.db4o.DBManager;
 import org.rssowl.core.model.internal.db4o.DatabaseEvent;
@@ -85,31 +87,24 @@ public abstract class AbstractEntityDAO<T extends IEntity,
     super.doDelete(entity);
   }
   
-  protected void fireAddEvents(final Set<E> events) {
+  public final void fireEvents(final Set<E> events, final EventType eventType) {
+    Assert.isNotNull(eventType, "eventType");
     for (final L listener : entityListeners) {
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.entitiesAdded(events);
-        }
-      });
-    }
-  }
-  
-  protected void fireUpdateEvents(final Set<E> events) {
-    for (final L listener : entityListeners) {
-      SafeRunner.run(new LoggingSafeRunnable() {
-        public void run() throws Exception {
-          listener.entitiesUpdated(events);
-        }
-      });
-    }
-  }
-  
-  protected void fireDeleteEvents(final Set<E> events) {
-    for (final L listener : entityListeners) {
-      SafeRunner.run(new LoggingSafeRunnable() {
-        public void run() throws Exception {
-          listener.entitiesDeleted(events);
+          switch (eventType) {
+            case PERSIST:
+              listener.entitiesAdded(events);
+              break;
+            case UPDATE:
+              listener.entitiesUpdated(events);
+              break;
+            case REMOVE:
+              listener.entitiesDeleted(events);
+              break;
+            default:
+              throw new IllegalArgumentException("eventType unknown: " + eventType);
+          }
         }
       });
     }
