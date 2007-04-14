@@ -727,7 +727,7 @@ public class ListenerServiceImpl implements IListenerService {
       final SearchConditionListener listener = (SearchConditionListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.searchConditionAdded(events);
+          listener.entitiesAdded(events);
         }
       });
     }
@@ -742,7 +742,7 @@ public class ListenerServiceImpl implements IListenerService {
       final SearchConditionListener listener = (SearchConditionListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.searchConditionDeleted(events);
+          listener.entitiesDeleted(events);
         }
       });
     }
@@ -757,7 +757,7 @@ public class ListenerServiceImpl implements IListenerService {
       final SearchConditionListener listener = (SearchConditionListener) element;
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.searchConditionUpdated(events);
+          listener.entitiesUpdated(events);
         }
       });
     }

@@ -37,15 +37,15 @@ public class SearchConditionAdapter implements SearchConditionListener {
   /*
    * @see org.rssowl.core.model.events.SearchConditionListener#searchConditionAdded(java.util.List)
    */
-  public void searchConditionAdded(Set<SearchConditionEvent> events) { }
+  public void entitiesAdded(Set<SearchConditionEvent> events) { }
 
   /*
    * @see org.rssowl.core.model.events.SearchConditionListener#searchConditionDeleted(java.util.List)
    */
-  public void searchConditionDeleted(Set<SearchConditionEvent> events) { }
+  public void entitiesDeleted(Set<SearchConditionEvent> events) { }
 
   /*
    * @see org.rssowl.core.model.events.SearchConditionListener#searchConditionUpdated(java.util.List)
    */
-  public void searchConditionUpdated(Set<SearchConditionEvent> events) { }
+  public void entitiesUpdated(Set<SearchConditionEvent> events) { }
 }
