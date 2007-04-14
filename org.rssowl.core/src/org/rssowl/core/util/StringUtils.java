@@ -40,6 +40,17 @@ public class StringUtils {
   private StringUtils() {
   // Protect default constructor
   }
+  
+  /**
+   * If <code>string</code> is <code>null</code>, returns <code>null</code>.
+   * Otherwise, returns the result of {@link String#trim()}.
+   * 
+   * @param string String to be trimmed or <code>null</code>.
+   * @return <code>null</code> or trimmed String.
+   */
+  public static final String safeTrim(String string) {
+    return string == null ? null : string.trim();
+  }
 
   /**
    * Returns TRUE in case the given String has a value that is not "" or
