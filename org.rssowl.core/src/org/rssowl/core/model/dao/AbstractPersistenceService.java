@@ -30,6 +30,7 @@ import org.rssowl.core.model.persist.dao.IBookMarkDAO;
 import org.rssowl.core.model.persist.dao.ICategoryDAO;
 import org.rssowl.core.model.persist.dao.IFeedDAO;
 import org.rssowl.core.model.persist.dao.IFolderDAO;
+import org.rssowl.core.model.persist.dao.ILabelDAO;
 import org.rssowl.core.model.persist.dao.INewsCounterDAO;
 import org.rssowl.core.model.persist.dao.INewsDAO;
 import org.rssowl.core.model.persist.dao.IPersonDAO;
@@ -88,6 +89,7 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
   private IPersonDAO fPersonDAO;
   private ISearchConditionDAO fSearchConditionDAO;
   private ISearchMarkDAO fSearchMarkDAO;
+  private ILabelDAO fLabelDAO;
 
   /** */
   protected AbstractPersistenceService() {
@@ -112,6 +114,7 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
     getPersonDAO();
     getSearchConditionDAO();
     getSearchMarkDAO();
+    getLabelDAO();
   }
   
   /*
@@ -242,5 +245,12 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
       fSearchMarkDAO = getDAOFactory().createSearchMarkDAO();
     
     return fSearchMarkDAO;
+  }
+  
+  public ILabelDAO getLabelDAO() {
+    if (fLabelDAO == null)
+      fLabelDAO = getDAOFactory().createLabelDAO();
+    
+    return fLabelDAO;
   }
 }
