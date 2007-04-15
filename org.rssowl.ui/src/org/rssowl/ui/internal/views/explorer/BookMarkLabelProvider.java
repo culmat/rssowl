@@ -28,6 +28,8 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.DecorationOverlayIcon;
+import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -55,6 +57,9 @@ public class BookMarkLabelProvider extends CellLabelProvider {
 
   /* News Service */
   private NewsService fNewsService;
+
+  /* Define whether to indicate *new* News in Bookmarks */
+  private static final boolean INDICATE_NEW = true;
 
   /* Commonly used Resources */
   private Image fFolderIcon;
@@ -141,6 +146,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       FeedLinkReference feedLinkRef = bookmark.getFeedLinkReference();
       unreadNewsCount = getUnreadNewsCount(feedLinkRef);
       int stickyNewsCount = getStickyNewsCount(feedLinkRef);
+      boolean hasNew = getNewNewsCount(bookmark.getFeedLinkReference()) != 0;
 
       /* Font */
       if (unreadNewsCount > 0)
@@ -163,18 +169,39 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       /* Reset Foreground */
       cell.setForeground(null);
 
-      /* Error Icon if required */
+      /* Load the FavIcon */
+      ImageDescriptor favicon = OwlUI.getFavicon(bookmark);
+
+      /* Indicate Error */
       if (bookmark.isErrorLoading()) {
-        cell.setImage(fBookMarkErrorIcon);
+
+        /* Overlay with Error Icon if required */
+        if (favicon != null) {
+          Image faviconImg = OwlUI.getImage(fResources, favicon);
+          DecorationOverlayIcon overlay = new DecorationOverlayIcon(faviconImg, OwlUI.getImageDescriptor("icons/ovr16/error.gif"), IDecoration.BOTTOM_RIGHT);
+          cell.setImage(OwlUI.getImage(fResources, overlay));
+        }
+
+        /* Default Error Icon */
+        else {
+          cell.setImage(fBookMarkErrorIcon);
+        }
       }
 
-      /* Show Favicon if available */
+      /* Use normal Icon */
       else {
-        ImageDescriptor favicon = OwlUI.getFavicon(bookmark);
-        if (favicon != null)
-          cell.setImage(OwlUI.getImage(fResources, favicon));
-        else
-          cell.setImage(fBookMarkIcon);
+        Image icon = favicon != null ? OwlUI.getImage(fResources, favicon) : fBookMarkIcon;
+
+        /* Overlay if News are *new* */
+        if (hasNew && INDICATE_NEW) {
+          DecorationOverlayIcon overlay = new DecorationOverlayIcon(icon, OwlUI.getImageDescriptor("icons/ovr16/new.gif"), IDecoration.BOTTOM_RIGHT);
+          cell.setImage(OwlUI.getImage(fResources, overlay));
+        }
+
+        /* Don't overlay */
+        else {
+          cell.setImage(icon);
+        }
       }
     }
 
