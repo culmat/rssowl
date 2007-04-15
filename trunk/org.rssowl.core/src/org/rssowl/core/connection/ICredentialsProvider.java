@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.connection.auth;
+package org.rssowl.core.connection;
 
 import java.net.URI;
 

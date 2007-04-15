@@ -22,22 +22,25 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.connection.auth;
+package org.rssowl.core.connection;
+
+import org.eclipse.core.runtime.IStatus;
 
 /**
- * Credentials to be used to authenticate on a Proxy Server.
+ * Checked Exception thrown in case of an error while retrieving Credentials for
+ * Authentication or Proxy.
  * 
  * @author bpasero
  */
-public interface IProxyCredentials extends ICredentials {
+public class CredentialsException extends ConnectionException {
 
   /**
-   * @return The Proxy Host to use for Connections.
+   * Creates a new exception with the given status object. The message of the
+   * given status is used as the exception message.
+   * 
+   * @param status the status object to be associated with this exception
    */
-  String getHost();
-
-  /**
-   * @return The Proxy Port to use for Connections.
-   */
-  int getPort();
+  public CredentialsException(IStatus status) {
+    super(status);
+  }
 }

@@ -22,27 +22,22 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.connection.auth;
+package org.rssowl.core.connection;
 
 /**
- * Credentials to be used to authenticate on a certain URL.
+ * Credentials to be used to authenticate on a Proxy Server.
  * 
  * @author bpasero
  */
-public interface ICredentials {
+public interface IProxyCredentials extends ICredentials {
 
   /**
-   * @return The Username to use for Authentication.
+   * @return The Proxy Host to use for Connections.
    */
-  String getUsername();
+  String getHost();
 
   /**
-   * @return The Password to use for Authentication.
+   * @return The Proxy Port to use for Connections.
    */
-  String getPassword();
-
-  /**
-   * @return The optional Domain to use for Authentication.
-   */
-  String getDomain();
+  int getPort();
 }

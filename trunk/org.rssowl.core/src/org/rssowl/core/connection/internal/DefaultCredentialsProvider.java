@@ -22,12 +22,16 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.connection.auth;
+package org.rssowl.core.connection.internal;
 
 import org.eclipse.core.net.proxy.IProxyData;
 import org.eclipse.core.net.proxy.IProxyService;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
+import org.rssowl.core.connection.CredentialsException;
+import org.rssowl.core.connection.ICredentials;
+import org.rssowl.core.connection.ICredentialsProvider;
+import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.internal.Activator;
 
 import java.net.MalformedURLException;
