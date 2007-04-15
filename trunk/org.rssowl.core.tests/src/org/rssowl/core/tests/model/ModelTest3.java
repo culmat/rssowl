@@ -67,7 +67,7 @@ import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.ILabel;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.model.persist.ISearchMark;
@@ -102,7 +102,7 @@ import java.util.Set;
  */
 @SuppressWarnings("nls")
 public class ModelTest3 {
-  private IModelTypesFactory fFactory;
+  private IModelFactory fFactory;
   private IModelDAO fDao;
 
   /**

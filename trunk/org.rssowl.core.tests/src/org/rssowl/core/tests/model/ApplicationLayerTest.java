@@ -53,7 +53,7 @@ import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.ILabel;
 import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.INews.State;
@@ -84,7 +84,7 @@ import java.util.Set;
  */
 @SuppressWarnings("nls")
 public class ApplicationLayerTest {
-  private IModelTypesFactory fFactory;
+  private IModelFactory fFactory;
   private IModelDAO fDao;
   private IApplicationLayer fAppLayer;
 

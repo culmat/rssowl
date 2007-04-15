@@ -82,7 +82,7 @@ import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IImage;
 import org.rssowl.core.model.persist.ILabel;
 import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPersistable;
 import org.rssowl.core.model.persist.IPerson;
@@ -122,7 +122,7 @@ import java.util.Set;
 public class DBManagerTest {
 
   private static final String NOT_IDENTICAL_MESSAGE = "Item in the database is not identical to initial item.";
-  private IModelTypesFactory fTypesFactory;
+  private IModelFactory fTypesFactory;
   private IModelDAO fModelDAO;
   private IApplicationLayer fAppLayer;
   private ObjectContainer fDb;
