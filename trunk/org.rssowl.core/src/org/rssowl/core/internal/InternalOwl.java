@@ -34,7 +34,7 @@ import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.internal.ListenerServiceImpl;
 import org.rssowl.core.model.internal.persist.DefaultModelTypesFactory;
 import org.rssowl.core.model.internal.persist.pref.PreferenceServiceImpl;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.pref.IPreferenceService;
 import org.rssowl.core.util.ExtensionUtils;
 
@@ -60,7 +60,7 @@ public final class InternalOwl {
   private IConnectionService fConnectionService;
   private IInterpreterService fInterpreterService;
   private IPersistenceService fPersistenceService;
-  private IModelTypesFactory fModelFactory;
+  private IModelFactory fModelFactory;
   private boolean fStarted;
 
   private InternalOwl() {}
@@ -137,14 +137,14 @@ public final class InternalOwl {
   /**
    * @return
    */
-  public IModelTypesFactory getModelFactory() {
+  public IModelFactory getModelFactory() {
     Assert.isTrue(fStarted, "InternalOwl has not yet finished initialization");
     return fModelFactory;
   }
 
   /* Load Model Types Factory contribution */
-  private IModelTypesFactory loadTypesFactory() {
-    IModelTypesFactory defaultFactory = new DefaultModelTypesFactory();
-    return (IModelTypesFactory) ExtensionUtils.loadSingletonExecutableExtension(MODEL_TYPESFACTORY_EXTENSION_POINT, defaultFactory);
+  private IModelFactory loadTypesFactory() {
+    IModelFactory defaultFactory = new DefaultModelTypesFactory();
+    return (IModelFactory) ExtensionUtils.loadSingletonExecutableExtension(MODEL_TYPESFACTORY_EXTENSION_POINT, defaultFactory);
   }
 }

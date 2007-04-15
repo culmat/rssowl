@@ -37,7 +37,7 @@ import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IGuid;
 import org.rssowl.core.model.persist.IImage;
 import org.rssowl.core.model.persist.ILabel;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPersistable;
 import org.rssowl.core.model.persist.IPerson;
@@ -58,7 +58,7 @@ import java.util.Date;
  *
  * @author Ismael Juma (ismael@juma.me.uk)
  */
-public class DefaultModelTypesFactory implements IModelTypesFactory {
+public class DefaultModelTypesFactory implements IModelFactory {
 
   /*
    * @see org.rssowl.core.model.types.IModelTypesFactory#createNews(java.lang.Long,

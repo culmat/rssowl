@@ -39,7 +39,7 @@ import java.util.Date;
  *
  * @author Ismael Juma (ismael@juma.uk)
  */
-public interface IModelTypesFactory {
+public interface IModelFactory {
 
   /**
    * Creates a new instance of INews with the provided parameters. The News is
