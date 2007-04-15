@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Text;
 import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.search.ISearchCondition;
@@ -92,7 +92,7 @@ public class SearchConditionItem extends Composite {
   /* Model */
   private final ISearchCondition fCondition;
   private Object fInputValue;
-  private IModelTypesFactory fFactory;
+  private IModelFactory fFactory;
   private IPersistenceService fPersist;
   private boolean fModified;
 

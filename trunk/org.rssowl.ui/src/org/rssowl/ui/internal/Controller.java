@@ -54,7 +54,7 @@ import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.ILabel;
 import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.INews.State;
@@ -702,7 +702,7 @@ public class Controller {
   private List<ILabel> addDefaultLabels() throws PersistenceException {
     List<ILabel> labels = new ArrayList<ILabel>();
 
-    IModelTypesFactory factory = Owl.getModelFactory();
+    IModelFactory factory = Owl.getModelFactory();
     IModelDAO modelDAO = Owl.getPersistenceService().getModelDAO();
 
     ILabel label = factory.createLabel(null, "Important");
@@ -742,7 +742,7 @@ public class Controller {
     imported.setName("Default"); //$NON-NLS-1$
 
     /* Create Default SearchMarks */
-    IModelTypesFactory factory = Owl.getModelFactory();
+    IModelFactory factory = Owl.getModelFactory();
     String newsEntityName = INews.class.getName();
 
     /* SearchCondition: New and Updated News */
