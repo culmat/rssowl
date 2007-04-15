@@ -42,7 +42,7 @@ public final class BookMarkDAOImpl extends AbstractEntityDAO<IBookMark, BookMark
     BookMarkEvent> implements IBookMarkDAO  {
 
   public BookMarkDAOImpl() {
-    super(BookMark.class);
+    super(BookMark.class, false);
   }
 
   @Override
@@ -55,11 +55,6 @@ public final class BookMarkDAOImpl extends AbstractEntityDAO<IBookMark, BookMark
     return new BookMarkEvent(entity, null, true);
   }
 
-  @Override
-  protected final boolean isSaveFully() {
-    return false;
-  }
-  
   public final List<IBookMark> loadAll(FeedLinkReference feedRef) {
     try {
       Query query = fDb.query();

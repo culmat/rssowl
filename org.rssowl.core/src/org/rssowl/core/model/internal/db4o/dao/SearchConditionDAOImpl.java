@@ -33,7 +33,7 @@ public final class SearchConditionDAOImpl extends AbstractEntityDAO<ISearchCondi
     SearchConditionListener, SearchConditionEvent> implements ISearchConditionDAO  {
 
   public SearchConditionDAOImpl() {
-    super(SearchCondition.class);
+    super(SearchCondition.class, true);
   }
   
   @Override
@@ -44,10 +44,5 @@ public final class SearchConditionDAOImpl extends AbstractEntityDAO<ISearchCondi
   @Override
   protected final SearchConditionEvent createSaveEventTemplate(ISearchCondition entity) {
     return new SearchConditionEvent(entity, true);
-  }
-
-  @Override
-  protected final boolean isSaveFully() {
-    return true;
   }
 }

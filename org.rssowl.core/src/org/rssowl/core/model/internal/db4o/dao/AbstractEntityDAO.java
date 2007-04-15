@@ -55,8 +55,8 @@ public abstract class AbstractEntityDAO<T extends IEntity,
   /**
    * Creates an instance of this class.
    */
-  public AbstractEntityDAO(Class<? extends T> entityClass) {
-    super(entityClass);
+  public AbstractEntityDAO(Class<? extends T> entityClass, boolean saveFully) {
+    super(entityClass, saveFully);
     DBManager.getDefault().addEntityStoreListener(new DatabaseListener() {
       public void databaseOpened(DatabaseEvent event) {
         fDb = event.getObjectContainer();

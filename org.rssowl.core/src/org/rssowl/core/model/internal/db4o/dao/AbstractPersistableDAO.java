@@ -45,16 +45,17 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
     IPersistableDAO<T> {
 
   protected final Class<? extends T> fEntityClass;
+  protected final boolean fSaveFully;
+  
   protected ReadWriteLock fLock;
   protected Lock fWriteLock;
   protected ObjectContainer fDb;
 
-  public AbstractPersistableDAO(Class<? extends T> entityClass) {
+  public AbstractPersistableDAO(Class<? extends T> entityClass, boolean saveFully) {
     Assert.isNotNull(entityClass, "entityClass");
     fEntityClass = entityClass;
+    fSaveFully = saveFully;
   }
-
-  protected abstract boolean isSaveFully();
   
   @SuppressWarnings("unchecked")
   protected final ObjectSet<T> getObjectSet(Query query)    {
@@ -133,7 +134,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
   }
 
   protected void doSave(T entity) {
-    if (isSaveFully())
+    if (fSaveFully)
       fDb.ext().set(entity, Integer.MAX_VALUE);
     else
       fDb.set(entity);

@@ -31,12 +31,6 @@ public final class ConditionalGetDAOImpl extends AbstractPersistableDAO<IConditi
     implements IConditionalGetDAO   {
 
   public ConditionalGetDAOImpl() {
-    super(ConditionalGet.class);
+    super(ConditionalGet.class, true);
   }
-
-  @Override
-  protected final boolean isSaveFully() {
-    return true;
-  }
-
 }

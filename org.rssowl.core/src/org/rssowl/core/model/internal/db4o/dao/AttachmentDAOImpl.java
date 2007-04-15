@@ -36,7 +36,7 @@ public final class AttachmentDAOImpl extends AbstractEntityDAO<IAttachment,
     AttachmentListener, AttachmentEvent> implements IAttachmentDAO  {
 
   public AttachmentDAOImpl() {
-    super(Attachment.class);
+    super(Attachment.class, false);
   }
 
   @Override
@@ -60,10 +60,4 @@ public final class AttachmentDAOImpl extends AbstractEntityDAO<IAttachment,
     DBHelper.putEventTemplate(newsEvent);
     super.doDelete(entity);
   }
-
-  @Override
-  protected final boolean isSaveFully() {
-    return false;
-  }
-
 }

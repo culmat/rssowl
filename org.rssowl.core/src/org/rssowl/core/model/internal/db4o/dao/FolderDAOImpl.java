@@ -41,7 +41,7 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
     FolderEvent> implements IFolderDAO   {
 
   public FolderDAOImpl() {
-    super(Folder.class);
+    super(Folder.class, false);
   }
 
   @Override
@@ -52,11 +52,6 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
   @Override
   protected final FolderEvent createSaveEventTemplate(IFolder entity) {
     return new FolderEvent(entity, null, true);
-  }
-
-  @Override
-  protected final boolean isSaveFully() {
-    return false;
   }
 
   public Collection<IFolder> loadRoot() {

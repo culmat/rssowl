@@ -33,7 +33,7 @@ public final class LabelDAOImpl extends AbstractEntityDAO<ILabel, LabelListener,
     LabelEvent> implements ILabelDAO {
 
   public LabelDAOImpl() {
-    super(Label.class);
+    super(Label.class, false);
   }
 
   @Override
@@ -44,10 +44,5 @@ public final class LabelDAOImpl extends AbstractEntityDAO<ILabel, LabelListener,
   @Override
   protected final LabelEvent createSaveEventTemplate(ILabel entity) {
     return new LabelEvent(entity, true);
-  }
-
-  @Override
-  protected final boolean isSaveFully() {
-    return false;
   }
 }

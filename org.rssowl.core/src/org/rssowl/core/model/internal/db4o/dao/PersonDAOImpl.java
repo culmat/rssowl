@@ -40,7 +40,7 @@ public class PersonDAOImpl extends AbstractEntityDAO<IPerson, PersonListener,
     PersonEvent> implements IPersonDAO  {
 
   public PersonDAOImpl() {
-    super(Person.class);
+    super(Person.class, false);
   }
   
   @Override
@@ -51,11 +51,6 @@ public class PersonDAOImpl extends AbstractEntityDAO<IPerson, PersonListener,
   @Override
   protected final PersonEvent createSaveEventTemplate(IPerson entity) {
     return new PersonEvent(entity, true);
-  }
-
-  @Override
-  protected final boolean isSaveFully() {
-    return false;
   }
 
   public Set<String> loadAllNames() {
