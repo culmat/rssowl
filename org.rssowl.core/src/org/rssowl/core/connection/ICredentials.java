@@ -22,26 +22,27 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.connection.auth;
-
-import org.eclipse.core.runtime.IStatus;
-import org.rssowl.core.connection.ConnectionException;
+package org.rssowl.core.connection;
 
 /**
- * Checked Exception thrown in case of an error while retrieving Credentials for
- * Authentication or Proxy.
+ * Credentials to be used to authenticate on a certain URL.
  * 
  * @author bpasero
  */
-public class CredentialsException extends ConnectionException {
+public interface ICredentials {
 
   /**
-   * Creates a new exception with the given status object. The message of the
-   * given status is used as the exception message.
-   * 
-   * @param status the status object to be associated with this exception
+   * @return The Username to use for Authentication.
    */
-  public CredentialsException(IStatus status) {
-    super(status);
-  }
+  String getUsername();
+
+  /**
+   * @return The Password to use for Authentication.
+   */
+  String getPassword();
+
+  /**
+   * @return The optional Domain to use for Authentication.
+   */
+  String getDomain();
 }
