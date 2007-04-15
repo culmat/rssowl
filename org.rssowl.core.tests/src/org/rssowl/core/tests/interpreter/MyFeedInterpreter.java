@@ -35,12 +35,13 @@ import org.rssowl.core.model.persist.INews;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
 /**
  * Part of the Interpreter Test Suite.
- * 
+ *
  * @author bpasero
  */
 public class MyFeedInterpreter implements IFormatInterpreter {
@@ -84,7 +85,7 @@ public class MyFeedInterpreter implements IFormatInterpreter {
     feed.setLanguage(lang.getValue());
 
     Element newsElement = child.getChild("news"); //$NON-NLS-1$
-    INews news = Owl.getInterpreter().getTypesFactory().createNews(feed);
+    INews news = Owl.getModelFactory().createNews(null, feed, new Date());
     news.setTitle(newsElement.getChildText("titel")); //$NON-NLS-1$
     try {
       news.setLink(new URI(newsElement.getChildText("verweis"))); //$NON-NLS-1$
@@ -92,7 +93,5 @@ public class MyFeedInterpreter implements IFormatInterpreter {
     }
 
     news.setDescription(newsElement.getChildText("beschreibung")); //$NON-NLS-1$
-
-    feed.addNews(news);
   }
 }

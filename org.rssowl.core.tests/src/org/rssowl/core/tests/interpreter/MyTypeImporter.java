@@ -48,7 +48,7 @@ import java.util.List;
 
 /**
  * Part of the Interpreter Test Suite.
- * 
+ *
  * @author bpasero
  */
 public class MyTypeImporter implements ITypeImporter {
@@ -75,7 +75,7 @@ public class MyTypeImporter implements ITypeImporter {
   }
 
   private List<IEntity> processBody(Element body) {
-    IFolder folder = Owl.getInterpreter().getTypesFactory().createFolder(null, "Imported"); //$NON-NLS-1$
+    IFolder folder = Owl.getModelFactory().createFolder(null, null, "Imported"); //$NON-NLS-1$
 
     /* Interpret Children */
     List< ? > feedChildren = body.getChildren();
@@ -127,7 +127,7 @@ public class MyTypeImporter implements ITypeImporter {
 
     /* Outline is a Category */
     if (link == null && title != null) {
-      type = Owl.getInterpreter().getTypesFactory().createFolder((IFolder) parent, title);
+      type = Owl.getModelFactory().createFolder(null, (IFolder) parent, title);
     }
 
     /* Outline is a BookMark */
@@ -141,14 +141,14 @@ public class MyTypeImporter implements ITypeImporter {
 
         /* Create a new Feed then */
         if (feedRef == null) {
-          IFeed feed = Owl.getInterpreter().getTypesFactory().createFeed(uri);
+          IFeed feed = Owl.getModelFactory().createFeed(null, uri);
           feed.setHomepage(homepage != null ? createURI(homepage) : null);
           feed.setDescription(description);
           feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
         }
 
         /* Create the BookMark */
-        type = Owl.getInterpreter().getTypesFactory().createBookMark((IFolder) parent, new FeedLinkReference(uri), title != null ? title : link);
+        type = Owl.getModelFactory().createBookMark(null, (IFolder) parent, new FeedLinkReference(uri), title != null ? title : link);
       }
     }
 
@@ -170,7 +170,7 @@ public class MyTypeImporter implements ITypeImporter {
 
   /**
    * Try to create an URI from the given String.
-   * 
+   *
    * @param str The String to interpret as URI.
    * @return The URI or NULL in case of the String does not match the URI
    * Syntax.
