@@ -75,7 +75,7 @@ public class OPMLImporter implements ITypeImporter {
   }
 
   private List<IFolder> processBody(Element body) {
-    IFolder folder = Owl.getInterpreter().getTypesFactory().createFolder(null, "Imported from OPML");
+    IFolder folder = Owl.getModelFactory().createFolder(null, null, "Imported from OPML");
 
     /* Interpret Children */
     List< ? > feedChildren = body.getChildren();
@@ -127,7 +127,7 @@ public class OPMLImporter implements ITypeImporter {
 
     /* Outline is a Category */
     if (link == null && title != null) {
-      type = Owl.getInterpreter().getTypesFactory().createFolder((IFolder) parent, title);
+      type = Owl.getModelFactory().createFolder(null, (IFolder) parent, title);
     }
 
     /* Outline is a BookMark */
@@ -141,7 +141,7 @@ public class OPMLImporter implements ITypeImporter {
 
         /* Create a new Feed then */
         if (feedRef == null) {
-          IFeed feed = Owl.getInterpreter().getTypesFactory().createFeed(uri);
+          IFeed feed = Owl.getModelFactory().createFeed(null, uri);
           feed.setHomepage(homepage != null ? URIUtils.createURI(homepage) : null);
           feed.setDescription(description);
           feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
@@ -149,7 +149,7 @@ public class OPMLImporter implements ITypeImporter {
 
         /* Create the BookMark */
         FeedLinkReference feedLinkRef = new FeedLinkReference(uri);
-        type = Owl.getInterpreter().getTypesFactory().createBookMark((IFolder) parent, feedLinkRef, title != null ? title : link);
+        type = Owl.getModelFactory().createBookMark(null, (IFolder) parent, feedLinkRef, title != null ? title : link);
       }
     }
 

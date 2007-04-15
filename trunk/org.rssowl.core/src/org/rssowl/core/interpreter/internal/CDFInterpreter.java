@@ -40,7 +40,7 @@ import java.util.List;
 
 /**
  * Interpreter for the Channel Definition Format.
- * 
+ *
  * @author bpasero
  */
 public class CDFInterpreter extends BasicInterpreter {
@@ -111,10 +111,7 @@ public class CDFInterpreter extends BasicInterpreter {
   }
 
   private void processItem(Element element, IFeed feed) {
-    INews news = Owl.getInterpreter().getTypesFactory().createNews(feed);
-
-    /* Support sorting by natural order of items as appearing in the feed */
-    news.setReceiveDate(new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
+    INews news = Owl.getModelFactory().createNews(null, feed, new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
 
     String baseUrl = feed.getHomepage() != null ? feed.getHomepage().toString() : ""; //$NON-NLS-1$
 
@@ -162,8 +159,5 @@ public class CDFInterpreter extends BasicInterpreter {
         processNamespaceAttributes(child, news);
       }
     }
-
-    /* Apply to type */
-    feed.addNews(news);
   }
 }

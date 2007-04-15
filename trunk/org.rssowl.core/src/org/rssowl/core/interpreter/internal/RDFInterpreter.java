@@ -40,7 +40,7 @@ import java.util.List;
 
 /**
  * Interpreter for all RDF Formats.
- * 
+ *
  * @author bpasero
  */
 public class RDFInterpreter extends BasicInterpreter {
@@ -137,7 +137,7 @@ public class RDFInterpreter extends BasicInterpreter {
   }
 
   private void processTextInput(Element element, IFeed feed) {
-    ITextInput input = Owl.getInterpreter().getTypesFactory().createTextInput(feed);
+    ITextInput input = Owl.getModelFactory().createTextInput(feed);
 
     /* Check wether the Attributes are to be processed by a Contribution */
     processNamespaceAttributes(element, input);
@@ -178,13 +178,10 @@ public class RDFInterpreter extends BasicInterpreter {
         processNamespaceAttributes(child, input);
       }
     }
-
-    /* Apply to type */
-    feed.setTextInput(input);
   }
 
   private void processImage(Element element, IFeed feed) {
-    IImage image = Owl.getInterpreter().getTypesFactory().createImage(feed);
+    IImage image = Owl.getModelFactory().createImage(feed);
 
     /* Check wether the Attributes are to be processed by a Contribution */
     processNamespaceAttributes(element, image);
@@ -221,16 +218,10 @@ public class RDFInterpreter extends BasicInterpreter {
         processNamespaceAttributes(child, image);
       }
     }
-
-    /* Apply to type */
-    feed.setImage(image);
   }
 
   private void processItem(Element element, IFeed feed) {
-    INews news = Owl.getInterpreter().getTypesFactory().createNews(feed);
-
-    /* Support sorting by natural order of items as appearing in the feed */
-    news.setReceiveDate(new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
+    INews news = Owl.getModelFactory().createNews(null, feed, new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
 
     /* Check wether the Attributes are to be processed by a Contribution */
     processNamespaceAttributes(element, news);
@@ -265,8 +256,5 @@ public class RDFInterpreter extends BasicInterpreter {
         processNamespaceAttributes(child, news);
       }
     }
-
-    /* Apply to type */
-    feed.addNews(news);
   }
 }

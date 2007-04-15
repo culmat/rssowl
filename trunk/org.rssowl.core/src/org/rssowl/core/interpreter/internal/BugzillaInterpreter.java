@@ -42,7 +42,7 @@ import java.util.List;
 
 /**
  * Interpreter for the bugzilla format.
- * 
+ *
  * @author kay.patzwald
  */
 public class BugzillaInterpreter extends BasicInterpreter {
@@ -117,9 +117,8 @@ public class BugzillaInterpreter extends BasicInterpreter {
       else if ("reporter".equals(name)) { //$NON-NLS-1$
         URI uri = URIUtils.createURI(child.getText());
         if (uri != null) {
-          IPerson person = Owl.getInterpreter().getTypesFactory().createPerson(feed);
+          IPerson person = Owl.getModelFactory().createPerson(null, feed);
           person.setEmail(uri);
-          feed.setAuthor(person);
         }
       }
 
@@ -142,13 +141,7 @@ public class BugzillaInterpreter extends BasicInterpreter {
   }
 
   private void processDescription(Element element, IFeed feed) {
-    INews news = Owl.getInterpreter().getTypesFactory().createNews(feed);
-
-    /* Support sorting by natural order of items as appearing in the feed */
-    news.setReceiveDate(new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
-
-    /* Apply to Type */
-    feed.addNews(news);
+    INews news = Owl.getModelFactory().createNews(null, feed, new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
 
     /* Check wether the Attributes are to be processed by a Contribution */
     processNamespaceAttributes(element, feed);
@@ -169,9 +162,8 @@ public class BugzillaInterpreter extends BasicInterpreter {
       else if ("who".equals(name)) { //$NON-NLS-1$
         URI uri = URIUtils.createURI(child.getText());
         if (uri != null) {
-          IPerson person = Owl.getInterpreter().getTypesFactory().createPerson(news);
+          IPerson person = Owl.getModelFactory().createPerson(null, news);
           person.setEmail(uri);
-          news.setAuthor(person);
         }
         news.setTitle("Comment from " + child.getText());
       }

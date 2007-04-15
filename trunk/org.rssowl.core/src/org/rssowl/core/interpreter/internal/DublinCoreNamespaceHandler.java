@@ -31,7 +31,6 @@ import org.rssowl.core.interpreter.INamespaceHandler;
 import org.rssowl.core.model.persist.ICategory;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
-import org.rssowl.core.model.persist.IGuid;
 import org.rssowl.core.model.persist.IImage;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPersistable;
@@ -47,7 +46,7 @@ import org.rssowl.core.util.URIUtils;
  * Namespace Prefix: dc<br>
  * Namespace URI: http://purl.org/dc/elements/1.1/
  * </p>
- * 
+ *
  * @author bpasero
  */
 public class DublinCoreNamespaceHandler implements INamespaceHandler {
@@ -93,13 +92,8 @@ public class DublinCoreNamespaceHandler implements INamespaceHandler {
 
     /* Creator / Publisher */
     else if ("creator".equals(name) || "publisher".equals(name)) { //$NON-NLS-1$ //$NON-NLS-2$
-      IPerson person = Owl.getInterpreter().getTypesFactory().createPerson(type);
+      IPerson person = Owl.getModelFactory().createPerson(null, type);
       person.setName(element.getText());
-
-      if (type instanceof IFeed)
-        ((IFeed) type).setAuthor(person);
-      else if (type instanceof INews)
-        ((INews) type).setAuthor(person);
     }
 
     /* Language */
@@ -112,27 +106,19 @@ public class DublinCoreNamespaceHandler implements INamespaceHandler {
 
     /* Subject */
     else if ("subject".equals(name) && type instanceof IEntity) { //$NON-NLS-1$
-      ICategory category = Owl.getInterpreter().getTypesFactory().createCategory((IEntity) type);
+      ICategory category = Owl.getModelFactory().createCategory(null, (IEntity) type);
       category.setName(element.getText());
-
-      if (type instanceof IFeed)
-        ((IFeed) type).addCategory(category);
-      else if (type instanceof INews)
-        ((INews) type).addCategory(category);
     }
 
     /* Identifier */
     else if ("identifier".equals(name) && type instanceof INews) { //$NON-NLS-1$
-      IGuid guid = Owl.getInterpreter().getTypesFactory().createGuid((INews) type);
-      guid.setValue(element.getText());
-      ((INews) type).setGuid(guid);
+      Owl.getModelFactory().createGuid((INews) type, element.getText());
     }
 
     /* Source */
     else if ("source".equals(name) && type instanceof INews) { //$NON-NLS-1$
-      ISource source = Owl.getInterpreter().getTypesFactory().createSource((INews) type);
+      ISource source = Owl.getModelFactory().createSource((INews) type);
       source.setLink(URIUtils.createURI(element.getText()));
-      ((INews) type).setSource(source);
     }
   }
 

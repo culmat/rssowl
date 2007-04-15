@@ -30,7 +30,6 @@ import org.jdom.Element;
 import org.rssowl.core.Owl;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.INews;
-import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.model.persist.ISource;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.URIUtils;
@@ -42,7 +41,7 @@ import java.util.List;
 
 /**
  * Interpreter for all OPML Formats.
- * 
+ *
  * @author bpasero
  */
 public class OPMLInterpreter extends BasicInterpreter {
@@ -132,24 +131,23 @@ public class OPMLInterpreter extends BasicInterpreter {
 
       /* Owner EMail */
       else if ("owneremail".equals(name)) { //$NON-NLS-1$
-        if (feed.getAuthor() == null) {
-          IPerson person = Owl.getInterpreter().getTypesFactory().createPerson(feed);
-          feed.setAuthor(person);
-        }
+        if (feed.getAuthor() == null)
+          Owl.getModelFactory().createPerson(null, feed);
 
         URI uri = URIUtils.createURI(child.getText());
         if (uri != null)
           feed.getAuthor().setEmail(uri);
+
         processNamespaceAttributes(child, feed.getAuthor());
       }
 
       /* Owner Name - Dont set if EMail present already */
       else if ("ownername".equals(name)) { //$NON-NLS-1$
-        if (feed.getAuthor() == null) {
-          IPerson person = Owl.getInterpreter().getTypesFactory().createPerson(feed);
-          feed.setAuthor(person);
-        }
+        if (feed.getAuthor() == null)
+          Owl.getModelFactory().createPerson(null, feed);
+
         feed.getAuthor().setName(child.getText());
+
         processNamespaceAttributes(child, feed.getAuthor());
       }
     }
@@ -177,13 +175,7 @@ public class OPMLInterpreter extends BasicInterpreter {
   }
 
   private void processOutline(Element element, IFeed feed) {
-    INews news = Owl.getInterpreter().getTypesFactory().createNews(feed);
-
-    /* Support sorting by natural order of items as appearing in the feed */
-    news.setReceiveDate(new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
-
-    /* Apply to Type */
-    feed.addNews(news);
+    INews news = Owl.getModelFactory().createNews(null, feed, new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
 
     /* Interpret Attributes */
     List< ? > outlineAttributes = element.getAttributes();
@@ -217,9 +209,8 @@ public class OPMLInterpreter extends BasicInterpreter {
       else if ("xmlurl".equals(name)) { //$NON-NLS-1$
         URI uri = URIUtils.createURI(attribute.getValue());
         if (uri != null) {
-          ISource source = Owl.getInterpreter().getTypesFactory().createSource(news);
+          ISource source = Owl.getModelFactory().createSource(news);
           source.setLink(uri);
-          news.setSource(source);
         }
       }
 

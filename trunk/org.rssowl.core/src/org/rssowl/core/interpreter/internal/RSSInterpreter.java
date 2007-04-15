@@ -50,7 +50,7 @@ import java.util.List;
 
 /**
  * Interpreter for the three major RSS Formats 0.91, 0.92 and 2.0.
- * 
+ *
  * @author bpasero
  */
 public class RSSInterpreter extends BasicInterpreter {
@@ -176,9 +176,8 @@ public class RSSInterpreter extends BasicInterpreter {
 
       /* Managing Editor */
       else if ("managingeditor".equals(name)) { //$NON-NLS-1$
-        IPerson person = Owl.getInterpreter().getTypesFactory().createPerson(feed);
+        IPerson person = Owl.getModelFactory().createPerson(null, feed);
         person.setName(child.getText());
-        feed.setAuthor(person);
 
         processNamespaceAttributes(child, person);
       }
@@ -265,7 +264,7 @@ public class RSSInterpreter extends BasicInterpreter {
   }
 
   private void processCloud(Element element, IFeed feed) {
-    ICloud cloud = Owl.getInterpreter().getTypesFactory().createCloud(feed);
+    ICloud cloud = Owl.getModelFactory().createCloud(feed);
 
     /* Interpret Attributes */
     List< ? > cloudAttributes = element.getAttributes();
@@ -300,13 +299,10 @@ public class RSSInterpreter extends BasicInterpreter {
       else if ("protocol".equals(name)) //$NON-NLS-1$
         cloud.setProtocol(attribute.getValue());
     }
-
-    /* Apply to type */
-    feed.setCloud(cloud);
   }
 
   private void processCategory(Element element, IEntity type) {
-    ICategory category = Owl.getInterpreter().getTypesFactory().createCategory(type);
+    ICategory category = Owl.getModelFactory().createCategory(null, type);
     category.setName(element.getText());
 
     /* Interpret Attributes */
@@ -323,16 +319,10 @@ public class RSSInterpreter extends BasicInterpreter {
       else if ("domain".equals(name)) //$NON-NLS-1$
         category.setDomain(attribute.getValue());
     }
-
-    /* Apply to type */
-    if (type instanceof IFeed)
-      ((IFeed) type).addCategory(category);
-    else if (type instanceof INews)
-      ((INews) type).addCategory(category);
   }
 
   private void processImage(Element element, IFeed feed) {
-    IImage image = Owl.getInterpreter().getTypesFactory().createImage(feed);
+    IImage image = Owl.getModelFactory().createImage(feed);
 
     /* Check wether the Attributes are to be processed by a Contribution */
     processNamespaceAttributes(element, image);
@@ -391,16 +381,10 @@ public class RSSInterpreter extends BasicInterpreter {
         processNamespaceAttributes(child, image);
       }
     }
-
-    /* Apply to type */
-    feed.setImage(image);
   }
 
   private void processItems(Element element, IFeed feed) {
-    INews news = Owl.getInterpreter().getTypesFactory().createNews(feed);
-
-    /* Support sorting by natural order of items as appearing in the feed */
-    news.setReceiveDate(new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
+    INews news = Owl.getModelFactory().createNews(null, feed, new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
 
     /* Check wether the Attributes are to be processed by a Contribution */
     processNamespaceAttributes(element, news);
@@ -443,9 +427,8 @@ public class RSSInterpreter extends BasicInterpreter {
 
       /* Author */
       else if ("author".equals(name)) { //$NON-NLS-1$
-        IPerson person = Owl.getInterpreter().getTypesFactory().createPerson(news);
+        IPerson person = Owl.getModelFactory().createPerson(null, news);
         person.setName(child.getText());
-        news.setAuthor(person);
 
         processNamespaceAttributes(child, person);
       }
@@ -472,13 +455,10 @@ public class RSSInterpreter extends BasicInterpreter {
       else if ("source".equals(name)) //$NON-NLS-1$
         processSource(child, news);
     }
-
-    /* Apply to type */
-    feed.addNews(news);
   }
 
   private void processEnclosure(Element element, INews news) {
-    IAttachment attachment = Owl.getInterpreter().getTypesFactory().createAttachment(news);
+    IAttachment attachment = Owl.getModelFactory().createAttachment(null, news);
 
     /* Interpret Attributes */
     List< ? > attachmentAttributes = element.getAttributes();
@@ -491,7 +471,7 @@ public class RSSInterpreter extends BasicInterpreter {
         continue;
 
       /* URL */
-      else if ("url".equals(name)) {//$NON-NLS-1$ 
+      else if ("url".equals(name)) {//$NON-NLS-1$
         URI uri = URIUtils.createURI(attribute.getValue());
         if (uri != null)
           attachment.setLink(uri);
@@ -508,13 +488,10 @@ public class RSSInterpreter extends BasicInterpreter {
           attachment.setLength(length);
       }
     }
-
-    /* Apply to type */
-    news.addAttachment(attachment);
   }
 
   private void processSource(Element element, INews news) {
-    ISource source = Owl.getInterpreter().getTypesFactory().createSource(news);
+    ISource source = Owl.getModelFactory().createSource(news);
     source.setName(element.getText());
 
     /* Check wether the Attributes are to be processed by a Contribution */
@@ -537,14 +514,10 @@ public class RSSInterpreter extends BasicInterpreter {
           source.setLink(uri);
       }
     }
-
-    /* Apply to type */
-    news.setSource(source);
   }
 
   private void processGuid(Element element, INews news) {
-    IGuid guid = Owl.getInterpreter().getTypesFactory().createGuid(news);
-    guid.setValue(element.getText());
+    IGuid guid = Owl.getModelFactory().createGuid(news, element.getText());
 
     /* Check wether the Attributes are to be processed by a Contribution */
     processNamespaceAttributes(element, guid);
@@ -563,13 +536,10 @@ public class RSSInterpreter extends BasicInterpreter {
       else if ("ispermalink".equals(name)) //$NON-NLS-1$
         guid.setPermaLink(Boolean.parseBoolean(attribute.getValue()));
     }
-
-    /* Apply to type */
-    news.setGuid(guid);
   }
 
   private void processTextInput(Element element, IFeed feed) {
-    ITextInput input = Owl.getInterpreter().getTypesFactory().createTextInput(feed);
+    ITextInput input = Owl.getModelFactory().createTextInput(feed);
 
     /* Check wether the Attributes are to be processed by a Contribution */
     processNamespaceAttributes(element, input);
@@ -610,8 +580,5 @@ public class RSSInterpreter extends BasicInterpreter {
         processNamespaceAttributes(child, input);
       }
     }
-
-    /* Apply to type */
-    feed.setTextInput(input);
   }
 }
