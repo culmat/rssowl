@@ -399,6 +399,20 @@ public class Controller {
       /* TODO Send state of proxy usage */
       properties.put(IConnectionPropertyConstants.USE_PROXY, false /* bookmark.isProxyUsed() */);
 
+      /* Load the Favicon now to show even on error */
+      if (OwlUI.getFavicon(bookmark) == null) {
+        try {
+          byte[] faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
+          OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK);
+        } catch (UnknownFeedException e) {
+          Activator.getDefault().getLog().log(e.getStatus());
+        }
+      }
+
+      /* Return on Cancelation or Shutdown */
+      if (monitor.isCanceled() || fShuttingDown)
+        return Status.CANCEL_STATUS;
+
       /* Load the Feed */
       final Pair<IFeed, IConditionalGet> pairResult = Owl.getConnectionService().reload(feedLink, monitor, properties);
 
@@ -410,20 +424,6 @@ public class Controller {
       boolean conditionalGetIsNull = (conditionalGet == null);
       conditionalGet = updateConditionalGet(feedLink, conditionalGet, pairResult.getSecond());
       boolean deleteConditionalGet = (!conditionalGetIsNull && conditionalGet == null);
-
-      /* Return on Cancelation or Shutdown */
-      if (monitor.isCanceled() || fShuttingDown)
-        return Status.CANCEL_STATUS;
-
-      /* Load the Favicon directly afterwards if required */
-      if (OwlUI.getFavicon(bookmark) == null) {
-        try {
-          byte[] faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
-          OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK);
-        } catch (UnknownFeedException e) {
-          Activator.getDefault().getLog().log(e.getStatus());
-        }
-      }
 
       /* Return on Cancelation or Shutdown */
       if (monitor.isCanceled() || fShuttingDown)
@@ -689,7 +689,6 @@ public class Controller {
   //    /* Shutdown DataBase */
   //    NewsModel.getDefault().getPersistenceLayer().shutdown();
   //  }
-
   private void onFirstStartup() throws PersistenceException, InterpreterException, ParserException {
 
     /* Add Default Labels */
