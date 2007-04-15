@@ -295,13 +295,13 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
 
       /* Create a new Feed then */
       if (feedRef == null) {
-        IFeed feed = Owl.getInterpreter().getTypesFactory().createFeed(uriObj);
+        IFeed feed = Owl.getModelFactory().createFeed(null, uriObj);
         feed = fPersist.getModelDAO().saveFeed(feed);
       }
 
       /* Create the BookMark */
       FeedLinkReference feedLinkRef = new FeedLinkReference(uriObj);
-      IBookMark bookmark = Owl.getInterpreter().getTypesFactory().createBookMark(parent, feedLinkRef, title);
+      IBookMark bookmark = Owl.getModelFactory().createBookMark(null, parent, feedLinkRef, title);
 
       /* Copy all Properties from Parent into this Mark */
       Map<String, ? > properties = parent.getProperties();
