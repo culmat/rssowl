@@ -49,7 +49,6 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.NativeFSLockFactory;
-import org.rssowl.contrib.search.Activator;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.INews;
