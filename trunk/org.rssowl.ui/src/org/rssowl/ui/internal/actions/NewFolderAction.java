@@ -227,7 +227,7 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
 
       /* Create the Folder */
       if (fRootMode || parent != null) {
-        IFolder folder = Owl.getInterpreter().getTypesFactory().createFolder(parent, name);
+        IFolder folder = Owl.getModelFactory().createFolder(null, parent, name);
 
         /* Copy all Properties from Parent into this Mark */
         if (parent != null) {
