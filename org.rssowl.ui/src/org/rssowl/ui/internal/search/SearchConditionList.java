@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.rssowl.core.Owl;
 import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.INews.State;
@@ -340,7 +340,7 @@ public class SearchConditionList extends ScrolledComposite {
   }
 
   private ISearchCondition getDefaultCondition() {
-    IModelTypesFactory factory = Owl.getModelFactory();
+    IModelFactory factory = Owl.getModelFactory();
 
     ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
     ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS, "");
@@ -435,7 +435,7 @@ public class SearchConditionList extends ScrolledComposite {
   }
 
   private ISearchCondition createCondition(ISearchCondition current) {
-    IModelTypesFactory factory = Owl.getModelFactory();
+    IModelFactory factory = Owl.getModelFactory();
     ISearchField field = factory.createSearchField(current.getField().getId(), current.getField().getEntityName());
     return factory.createSearchCondition(field, current.getSpecifier(), "");
   }

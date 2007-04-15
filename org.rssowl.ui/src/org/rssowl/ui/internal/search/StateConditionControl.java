@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.INews.State;
@@ -60,7 +60,7 @@ public class StateConditionControl extends Composite {
   private Button fUpdatedState;
   private Button fReadState;
   private Button fDeletedState;
-  private IModelTypesFactory fFactory;
+  private IModelFactory fFactory;
   private EnumSet<State> fSelectedStates;
   private boolean fModified;
   private final String fNewsEntity = INews.class.getName();

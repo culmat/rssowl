@@ -35,7 +35,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.search.ISearchCondition;
 import org.rssowl.core.model.persist.search.ISearchField;
@@ -70,7 +70,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private ApplicationServer fServer;
   private String fId;
   private boolean fBlockRefresh;
-  private IModelTypesFactory fFactory;
+  private IModelFactory fFactory;
 
   /* This viewer's sorter. <code>null</code> means there is no sorter. */
   private ViewerComparator fSorter;

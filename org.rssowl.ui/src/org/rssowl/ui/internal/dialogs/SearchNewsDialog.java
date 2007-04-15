@@ -77,7 +77,7 @@ import org.rssowl.core.model.events.NewsEvent;
 import org.rssowl.core.model.events.NewsListener;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.ILabel;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.search.IModelSearch;
@@ -895,7 +895,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
   private List<ISearchCondition> getDefaultConditions() {
     List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(1);
-    IModelTypesFactory factory = Owl.getModelFactory();
+    IModelFactory factory = Owl.getModelFactory();
 
     ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
     ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS, "");
