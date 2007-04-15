@@ -52,7 +52,7 @@ import java.util.List;
 
 /**
  * Interpreter for all Atom Formats.
- * 
+ *
  * @author bpasero
  */
 public class AtomInterpreter extends BasicInterpreter {
@@ -127,11 +127,10 @@ public class AtomInterpreter extends BasicInterpreter {
 
       /* Logo */
       else if ("logo".equals(name)) { //$NON-NLS-1$
-        IImage image = Owl.getInterpreter().getTypesFactory().createImage(feed);
+        IImage image = Owl.getModelFactory().createImage(feed);
         URI uri = URIUtils.createURI(child.getText());
         if (uri != null)
           image.setLink(uri);
-        feed.setImage(image);
 
         processNamespaceAttributes(child, image);
       }
@@ -169,11 +168,8 @@ public class AtomInterpreter extends BasicInterpreter {
   }
 
   private void processEntry(Element element, IFeed feed) {
-    INews news = Owl.getInterpreter().getTypesFactory().createNews(feed);
+    INews news = Owl.getModelFactory().createNews(null, feed, new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
     news.setBase(feed.getBase());
-
-    /* Support sorting by natural order of items as appearing in the feed */
-    news.setReceiveDate(new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
 
     /* Check wether the Attributes are to be processed by a Contribution */
     processNamespaceAttributes(element, news);
@@ -214,9 +210,7 @@ public class AtomInterpreter extends BasicInterpreter {
 
       /* Id */
       else if ("id".equals(name)) { //$NON-NLS-1$
-        IGuid guid = Owl.getInterpreter().getTypesFactory().createGuid(news);
-        guid.setValue(child.getText());
-        news.setGuid(guid);
+        IGuid guid = Owl.getModelFactory().createGuid(news, child.getText());
 
         processNamespaceAttributes(child, guid);
       }
@@ -235,7 +229,7 @@ public class AtomInterpreter extends BasicInterpreter {
 
         /* Enclosure */
         else if ("enclosure".equals(rel)) { //$NON-NLS-1$
-          IAttachment attachment = Owl.getInterpreter().getTypesFactory().createAttachment(news);
+          IAttachment attachment = Owl.getModelFactory().createAttachment(null, news);
 
           URI uri = URIUtils.createURI(child.getAttributeValue("href")); //$NON-NLS-1$
           if (uri != null)
@@ -243,7 +237,6 @@ public class AtomInterpreter extends BasicInterpreter {
           attachment.setType(child.getAttributeValue("type")); //$NON-NLS-1$
           attachment.setLength(StringUtils.stringToInt(child.getAttributeValue("length"))); //$NON-NLS-1$
 
-          news.addAttachment(attachment);
           processNamespaceAttributes(child, attachment);
         }
       }
@@ -260,9 +253,6 @@ public class AtomInterpreter extends BasicInterpreter {
       else if ("author".equals(name)) //$NON-NLS-1$
         processAuthor(child, news);
     }
-
-    /* Apply to type */
-    feed.addNews(news);
   }
 
   private String getContent(Element element) {
@@ -313,7 +303,7 @@ public class AtomInterpreter extends BasicInterpreter {
   }
 
   private void processSource(Element element, INews news) {
-    ISource source = Owl.getInterpreter().getTypesFactory().createSource(news);
+    ISource source = Owl.getModelFactory().createSource(news);
 
     /* Check wether the Attributes are to be processed by a Contribution */
     processNamespaceAttributes(element, source);
@@ -350,13 +340,10 @@ public class AtomInterpreter extends BasicInterpreter {
         processNamespaceAttributes(child, source);
       }
     }
-
-    /* Apply to type */
-    news.setSource(source);
   }
 
   private void processCategory(Element element, IEntity type) {
-    ICategory category = Owl.getInterpreter().getTypesFactory().createCategory(type);
+    ICategory category = Owl.getModelFactory().createCategory(null, type);
 
     /* Interpret Attributes */
     List< ? > categoryAttributes = element.getAttributes();
@@ -381,16 +368,10 @@ public class AtomInterpreter extends BasicInterpreter {
       else if ("label".equals(name)) //$NON-NLS-1$
         category.setName(attribute.getValue());
     }
-
-    /* Add to Type */
-    if (type instanceof INews)
-      ((INews) type).addCategory(category);
-    else if (type instanceof IFeed)
-      ((IFeed) type).addCategory(category);
   }
 
   private void processAuthor(Element element, IPersistable type) {
-    IPerson person = Owl.getInterpreter().getTypesFactory().createPerson(type);
+    IPerson person = Owl.getModelFactory().createPerson(null, type);
 
     /* Check wether the Attributes are to be processed by a Contribution */
     processNamespaceAttributes(element, person);
@@ -427,11 +408,5 @@ public class AtomInterpreter extends BasicInterpreter {
         processNamespaceAttributes(child, person);
       }
     }
-
-    /* Add to Type */
-    if (type instanceof IFeed)
-      ((IFeed) type).setAuthor(person);
-    else if (type instanceof INews)
-      ((INews) type).setAuthor(person);
   }
 }

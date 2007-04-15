@@ -38,7 +38,6 @@ import org.rssowl.core.internal.Activator;
 import org.rssowl.core.interpreter.IElementHandler;
 import org.rssowl.core.interpreter.IFormatInterpreter;
 import org.rssowl.core.interpreter.IInterpreterService;
-import org.rssowl.core.interpreter.IInterpreterTypesFactory;
 import org.rssowl.core.interpreter.INamespaceHandler;
 import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.interpreter.IXMLParser;
@@ -67,8 +66,6 @@ import java.util.Map;
  * <li>FormatInterpreter allow to contribute Interpreters based on a XML Format</li>
  * <li>NamespaceHandler allow to contribute processing for Namespaces</li>
  * <li>ElementHandler allow to contribute custom processing for Elements</li>
- * <li>TypesFactory allows to contribute your own Model to be used by the
- * Interpreter</li>
  * </ul>
  *
  * @author bpasero
@@ -84,9 +81,6 @@ public class InterpreterServiceImpl implements IInterpreterService {
   /* ID for TypeImporter Contributions */
   private static final String TYPEIMPORTER_EXTENSION_POINT = "org.rssowl.core.TypeImporter"; //$NON-NLS-1$
 
-  /* ID for InterpreterTypesFactory Contributions */
-  private static final String INTERPRETER_TYPESFACTORY_EXTENSION_POINT = "org.rssowl.core.InterpreterTypesFactory"; //$NON-NLS-1$
-
   /* ID for NamespaceHandler Contributions */
   private static final String NSHANDLER_EXTENSION_POINT = "org.rssowl.core.NamespaceHandler"; //$NON-NLS-1$
 
@@ -97,7 +91,7 @@ public class InterpreterServiceImpl implements IInterpreterService {
   private Map<String, ITypeImporter> fTypeImporters;
   private Map<String, INamespaceHandler> fNamespaceHandlers;
   private Map<String, IElementHandler> fElementHandlers;
-  private IInterpreterTypesFactory fTypesFactory;
+  //  private IModelTypesFactory fTypesFactory;
   private IXMLParser fXMLParserImpl;
 
   /** */
@@ -170,13 +164,6 @@ public class InterpreterServiceImpl implements IInterpreterService {
   }
 
   /*
-   * @see org.rssowl.core.interpreter.IInterpreterService#getTypesFactory()
-   */
-  public IInterpreterTypesFactory getTypesFactory() {
-    return fTypesFactory;
-  }
-
-  /*
    * @see org.rssowl.core.interpreter.IInterpreterService#getNamespaceHandler(java.lang.String)
    */
   public INamespaceHandler getNamespaceHandler(String namespaceUri) {
@@ -223,10 +210,6 @@ public class InterpreterServiceImpl implements IInterpreterService {
     /* Load Type Importers */
     fTypeImporters = new HashMap<String, ITypeImporter>();
     loadTypeImporters();
-
-    /* Load Types Factory */
-    fTypesFactory = loadTypesFactory();
-    Assert.isNotNull(fTypesFactory);
 
     /* Load Namespace Handlers */
     fNamespaceHandlers = new HashMap<String, INamespaceHandler>();
@@ -278,12 +261,6 @@ public class InterpreterServiceImpl implements IInterpreterService {
         Activator.getDefault().getLog().log(e.getStatus());
       }
     }
-  }
-
-  /* Load Interpreter Types Factory contribution */
-  private IInterpreterTypesFactory loadTypesFactory() {
-    IInterpreterTypesFactory defaultFactory = new DefaultInterpreterTypesFactory();
-    return (IInterpreterTypesFactory) ExtensionUtils.loadSingletonExecutableExtension(INTERPRETER_TYPESFACTORY_EXTENSION_POINT, defaultFactory);
   }
 
   private void loadFormatInterpreters() {

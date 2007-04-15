@@ -9,7 +9,6 @@
    <extension-point id="PreferencesInitializer" name="Preferences Initializer" schema="schema/PreferencesInitializer.exsd"/>
    <extension-point id="IDGenerator" name="ID Generator" schema="schema/IDGenerator.exsd"/>
    <extension-point id="FormatInterpreter" name="Format Interpreter" schema="schema/FormatInterpreter.exsd"/>
-   <extension-point id="InterpreterTypesFactory" name="Interpreter Types Factory" schema="schema/InterpreterTypesFactory.exsd"/>
    <extension-point id="NamespaceHandler" name="Namespace Handler" schema="schema/NamespaceHandler.exsd"/>
    <extension-point id="ElementHandler" name="Element Handler" schema="schema/ElementHandler.exsd"/>
    <extension-point id="XMLParser" name="XML Parser" schema="schema/XMLParser.exsd"/>

@@ -97,13 +97,6 @@ public interface IInterpreterService {
   List< ? extends IEntity> importFrom(InputStream inS) throws InterpreterException, ParserException;
 
   /**
-   * Get the Factory responsible for creating the interpreter types.
-   *
-   * @return The Factory responsible for creating the interpreter types.
-   */
-  IInterpreterTypesFactory getTypesFactory();
-
-  /**
    * Get the Namespace Handler for the given Namespace or NULL if not
    * contributed.
    *

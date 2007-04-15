@@ -27,12 +27,10 @@ package org.rssowl.core.interpreter.internal;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.rssowl.core.Owl;
-import org.rssowl.core.interpreter.IInterpreterTypesFactory;
 import org.rssowl.core.interpreter.INamespaceHandler;
 import org.rssowl.core.model.persist.ICategory;
 import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.IFeed;
-import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.IModelTypesFactory;
 import org.rssowl.core.model.persist.IPersistable;
 import org.rssowl.core.model.persist.IPerson;
 
@@ -61,7 +59,7 @@ public class PodcastNamespaceHandler implements INamespaceHandler {
    * org.rssowl.core.model.types.IExtendableType)
    */
   public void processElement(Element element, IPersistable type) {
-    IInterpreterTypesFactory factory = Owl.getInterpreter().getTypesFactory();
+    IModelTypesFactory factory = Owl.getModelFactory();
 
     /* Category */
     if ("category".equals(element.getName())) {
@@ -80,20 +78,15 @@ public class PodcastNamespaceHandler implements INamespaceHandler {
 
     /* Author */
     else if ("author".equals(element.getName())) {
-      IPerson person = factory.createPerson(type);
+      IPerson person = factory.createPerson(null, type);
       person.setName(element.getText());
-
-      if (type instanceof IFeed)
-        ((IFeed) type).setAuthor(person);
-      else if (type instanceof INews)
-        ((INews) type).setAuthor(person);
     }
   }
 
   private void processCategory(Element element, IPersistable type) {
-    IInterpreterTypesFactory factory = Owl.getInterpreter().getTypesFactory();
+    IModelTypesFactory factory = Owl.getModelFactory();
 
-    ICategory category = factory.createCategory((IEntity) type);
+    ICategory category = factory.createCategory(null, (IEntity) type);
     List< ? > attributes = element.getAttributes();
     for (Iterator< ? > iter = attributes.iterator(); iter.hasNext();) {
       Attribute attribute = (Attribute) iter.next();
@@ -104,11 +97,5 @@ public class PodcastNamespaceHandler implements INamespaceHandler {
         break;
       }
     }
-
-    /* Apply to type */
-    if (type instanceof IFeed)
-      ((IFeed) type).addCategory(category);
-    else if (type instanceof INews)
-      ((INews) type).addCategory(category);
   }
 }
