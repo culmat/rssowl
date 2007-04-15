@@ -29,7 +29,7 @@ import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.interpreter.IInterpreterService;
 import org.rssowl.core.model.IListenerService;
 import org.rssowl.core.model.dao.IPersistenceService;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.pref.IPreferenceService;
 
 /**
@@ -80,7 +80,7 @@ public class Owl {
   /**
    * @return
    */
-  public static IModelTypesFactory getModelFactory() {
+  public static IModelFactory getModelFactory() {
     return InternalOwl.getDefault().getModelFactory();
   }
 }

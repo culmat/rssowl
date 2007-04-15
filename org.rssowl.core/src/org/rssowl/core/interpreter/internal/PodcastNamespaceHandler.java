@@ -30,7 +30,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.interpreter.INamespaceHandler;
 import org.rssowl.core.model.persist.ICategory;
 import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.IPersistable;
 import org.rssowl.core.model.persist.IPerson;
 
@@ -59,7 +59,7 @@ public class PodcastNamespaceHandler implements INamespaceHandler {
    * org.rssowl.core.model.types.IExtendableType)
    */
   public void processElement(Element element, IPersistable type) {
-    IModelTypesFactory factory = Owl.getModelFactory();
+    IModelFactory factory = Owl.getModelFactory();
 
     /* Category */
     if ("category".equals(element.getName())) {
@@ -84,7 +84,7 @@ public class PodcastNamespaceHandler implements INamespaceHandler {
   }
 
   private void processCategory(Element element, IPersistable type) {
-    IModelTypesFactory factory = Owl.getModelFactory();
+    IModelFactory factory = Owl.getModelFactory();
 
     ICategory category = factory.createCategory(null, (IEntity) type);
     List< ? > attributes = element.getAttributes();
