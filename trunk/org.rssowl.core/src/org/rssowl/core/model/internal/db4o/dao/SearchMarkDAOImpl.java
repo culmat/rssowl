@@ -33,7 +33,7 @@ public final class SearchMarkDAOImpl extends AbstractEntityDAO<ISearchMark,
     SearchMarkListener, SearchMarkEvent> implements ISearchMarkDAO    {
 
   public SearchMarkDAOImpl() {
-    super(SearchMark.class);
+    super(SearchMark.class, false);
   }
   
   @Override
@@ -45,10 +45,4 @@ public final class SearchMarkDAOImpl extends AbstractEntityDAO<ISearchMark,
   protected final SearchMarkEvent createSaveEventTemplate(ISearchMark entity) {
     return new SearchMarkEvent(entity, null, true);
   }
-
-  @Override
-  protected final boolean isSaveFully() {
-    return false;
-  }
-
 }

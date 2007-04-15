@@ -46,7 +46,7 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
     implements INewsDAO   {
 
   public NewsDAOImpl() {
-    super(News.class);
+    super(News.class, false);
   }
   
   @Override
@@ -63,11 +63,6 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
   protected final NewsEvent createSaveEventTemplate(INews entity) {
     INews oldNews = fDb.ext().peekPersisted(entity, 2, true);
     return new NewsEvent(oldNews, entity, true);
-  }
-
-  @Override
-  protected final boolean isSaveFully() {
-    return false;
   }
 
   public void setState(Collection<INews> news, State state, boolean affectEquivalentNews, boolean force) throws PersistenceException {

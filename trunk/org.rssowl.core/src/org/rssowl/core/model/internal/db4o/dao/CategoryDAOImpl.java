@@ -37,7 +37,7 @@ public final class CategoryDAOImpl extends AbstractEntityDAO<ICategory,
     CategoryListener, CategoryEvent> implements ICategoryDAO   {
 
   public CategoryDAOImpl() {
-    super(Category.class);
+    super(Category.class, false);
   }
   
   @Override
@@ -48,11 +48,6 @@ public final class CategoryDAOImpl extends AbstractEntityDAO<ICategory,
   @Override
   protected final CategoryEvent createSaveEventTemplate(ICategory entity) {
     return new CategoryEvent(entity, true);
-  }
-
-  @Override
-  protected final boolean isSaveFully() {
-    return false;
   }
 
   public final Set<String> loadAllNames() {

@@ -37,7 +37,7 @@ public final class FeedDAOImpl extends AbstractEntityDAO<IFeed, FeedListener,
     FeedEvent> implements IFeedDAO  {
 
   public FeedDAOImpl() {
-    super(Feed.class);
+    super(Feed.class, false);
   }
   
   @Override
@@ -53,11 +53,6 @@ public final class FeedDAOImpl extends AbstractEntityDAO<IFeed, FeedListener,
   @Override
   protected final FeedEvent createSaveEventTemplate(IFeed entity) {
     return new FeedEvent(entity, true);
-  }
-
-  @Override
-  protected final boolean isSaveFully() {
-    return false;
   }
 
   public final Feed load(URI link) {

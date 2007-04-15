@@ -32,7 +32,7 @@ public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter
     implements INewsCounterDAO  {
 
   public NewsCounterDAOImpl() {
-    super(NewsCounter.class);
+    super(NewsCounter.class, true);
   }
   
   public final NewsCounter load() {
@@ -66,11 +66,6 @@ public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter
       throw new IllegalArgumentException("Only a single newsCounter can be stored");
     
     super.doSave(entity);
-  }
-
-  @Override
-  protected final boolean isSaveFully() {
-    return true;
   }
 
 }
