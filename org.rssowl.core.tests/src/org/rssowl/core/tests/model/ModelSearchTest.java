@@ -38,7 +38,7 @@ import org.rssowl.core.model.persist.ICategory;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.ILabel;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.model.persist.ISource;
@@ -70,7 +70,7 @@ public class ModelSearchTest {
   private static final Long DAY = 1000 * 3600 * 24L;
 
   private IModelDAO fDao;
-  private IModelTypesFactory fFactory;
+  private IModelFactory fFactory;
   private IModelSearch fModelSearch;
   private String fNewsEntityName;
 

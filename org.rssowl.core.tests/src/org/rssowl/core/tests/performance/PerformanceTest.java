@@ -52,7 +52,7 @@ import org.rssowl.core.model.persist.IGuid;
 import org.rssowl.core.model.persist.IImage;
 import org.rssowl.core.model.persist.ILabel;
 import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPersistable;
 import org.rssowl.core.model.persist.IPerson;
@@ -187,7 +187,7 @@ public class PerformanceTest {
   public void searchNews() throws Exception {
     final List<Exception> ex = new ArrayList<Exception>();
     final int[] results = new int[] { 0 };
-    final IModelTypesFactory factory = Owl.getModelFactory();
+    final IModelFactory factory = Owl.getModelFactory();
     List<ITask> tasks = new ArrayList<ITask>();
     fModelSearch.startup();
 

@@ -35,7 +35,7 @@ import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.reference.FeedLinkReference;
@@ -64,7 +64,7 @@ public class FolderMarkGroupFilterTest {
   private static final long DAY = 24 * 60 * 60 * 1000;
   private static final long WEEK = 7 * DAY;
 
-  private IModelTypesFactory fFactory;
+  private IModelFactory fFactory;
   private IModelDAO fDao;
   private BookMarkGrouping fGrouping;
   private BookMarkFilter fFiltering;

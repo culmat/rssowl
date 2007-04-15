@@ -36,7 +36,7 @@ import org.rssowl.core.model.events.BookMarkListener;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.pref.IPreferencesInitializer;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.FeedLinkReference;
@@ -58,7 +58,7 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
   private static final String TEST_LONGS = "testLongs";
   private static final String TEST_STRING = "testString";
   private static final String TEST_STRINGS = "testStrings";
-  private IModelTypesFactory fFactory;
+  private IModelFactory fFactory;
   private IModelDAO fDao;
 
   /**

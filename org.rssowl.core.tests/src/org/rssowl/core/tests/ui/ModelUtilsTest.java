@@ -48,7 +48,7 @@ import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.ILabel;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.model.reference.FeedLinkReference;
@@ -70,7 +70,7 @@ import java.util.Set;
  * @author bpasero
  */
 public class ModelUtilsTest {
-  private IModelTypesFactory fFactory;
+  private IModelFactory fFactory;
   private IModelDAO fDao;
 
   /**

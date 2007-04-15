@@ -71,7 +71,7 @@ import org.rssowl.core.model.persist.ICategory;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.model.persist.ISearchMark;
@@ -101,7 +101,7 @@ import java.util.Set;
  * @author bpasero
  */
 public class ModelTest2 {
-  private IModelTypesFactory fFactory;
+  private IModelFactory fFactory;
   private IModelDAO fDao;
   private IApplicationLayer fAppLayer;
 

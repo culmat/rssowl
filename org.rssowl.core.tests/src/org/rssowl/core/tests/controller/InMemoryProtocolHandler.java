@@ -35,7 +35,7 @@ import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.model.persist.IConditionalGet;
 import org.rssowl.core.model.persist.IFeed;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.util.Pair;
 
 import java.io.ByteArrayInputStream;
@@ -59,7 +59,7 @@ public class InMemoryProtocolHandler implements IProtocolHandler {
    * org.eclipse.core.runtime.IProgressMonitor, java.util.Map)
    */
   public Pair<IFeed, IConditionalGet> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException {
-    IModelTypesFactory typesFactory = Owl.getModelFactory();
+    IModelFactory typesFactory = Owl.getModelFactory();
 
     /* Create a new empty feed from the existing one */
     IFeed feed = typesFactory.createFeed(null, link);
@@ -97,7 +97,7 @@ public class InMemoryProtocolHandler implements IProtocolHandler {
   }
 
   private IConditionalGet getConditionalGet(URI link, InputStream inS) {
-    IModelTypesFactory typesFactory = Owl.getModelFactory();
+    IModelFactory typesFactory = Owl.getModelFactory();
 
     if (inS instanceof IConditionalGetCompatible) {
       String ifModifiedSince = ((IConditionalGetCompatible) inS).getIfModifiedSince();

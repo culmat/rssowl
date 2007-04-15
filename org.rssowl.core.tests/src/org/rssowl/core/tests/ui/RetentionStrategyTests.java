@@ -37,7 +37,7 @@ import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.BookMarkReference;
@@ -63,7 +63,7 @@ public class RetentionStrategyTests {
   /* One Hour in millis */
   private static final long HOUR = 60 * 60 * 1000;
 
-  private IModelTypesFactory fFactory;
+  private IModelFactory fFactory;
   private IModelDAO fDao;
 
   /**
