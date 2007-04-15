@@ -46,7 +46,7 @@ import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.model.persist.IConditionalGet;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IGuid;
-import org.rssowl.core.model.persist.IModelTypesFactory;
+import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.util.DateUtils;
@@ -122,7 +122,7 @@ public class NewsGroupHandler implements IProtocolHandler {
    * org.eclipse.core.runtime.IProgressMonitor, java.util.Map)
    */
   public Pair<IFeed, IConditionalGet> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException {
-    IModelTypesFactory factory = Owl.getModelFactory();
+    IModelFactory factory = Owl.getModelFactory();
 
     /* Create a new empty feed from the existing one */
     IFeed feed = factory.createFeed(null, link);
@@ -269,7 +269,7 @@ public class NewsGroupHandler implements IProtocolHandler {
     if (articleReader == null)
       return;
 
-    IModelTypesFactory factory = Owl.getModelFactory();
+    IModelFactory factory = Owl.getModelFactory();
     final INews news = factory.createNews(null, feed, new Date());
     final Map<String, StringBuilder> mimeToContent = new HashMap<String, StringBuilder>();
 
