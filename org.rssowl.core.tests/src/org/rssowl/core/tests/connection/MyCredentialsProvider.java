@@ -24,10 +24,10 @@
 
 package org.rssowl.core.tests.connection;
 
-import org.rssowl.core.connection.auth.CredentialsException;
-import org.rssowl.core.connection.auth.DefaultCredentialsProvider;
-import org.rssowl.core.connection.auth.ICredentials;
-import org.rssowl.core.connection.auth.IProxyCredentials;
+import org.rssowl.core.connection.CredentialsException;
+import org.rssowl.core.connection.ICredentials;
+import org.rssowl.core.connection.IProxyCredentials;
+import org.rssowl.core.connection.internal.DefaultCredentialsProvider;
 
 import java.net.URI;
 
