@@ -90,7 +90,7 @@ public interface IPersistenceService {
 
   /**
    * Gets the implementation of <code>IDGenerator</code> that generates IDs
-   * that have not yet been used by the persistence layer. The implementation if
+   * that have not yet been used by the persistence layer. The implementation is
    * looked up using the "org.rssowl.core.model.IDGenerator" extension point.
    *
    * @return An implementation of IDGenerator.
