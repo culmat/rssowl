@@ -33,15 +33,21 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.search.ISearchCondition;
+import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
+import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.search.SearchConditionList;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -55,6 +61,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
   private Button fMatchAllRadio;
   private SearchConditionList fSearchConditionList;
   private Button fMatchAnyRadio;
+  private FolderChooser fFolderChooser;
 
   /*
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#init(org.rssowl.ui.dialogs.properties.IPropertyDialogSite,
@@ -81,6 +88,16 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     fNameInput = new Text(container, SWT.BORDER);
     fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     fNameInput.setText(fSearchMark.getName());
+
+    /* Location */
+    Label locationLabel = new Label(container, SWT.None);
+    locationLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
+    locationLabel.setText("Location: ");
+
+    fFolderChooser = new FolderChooser(container, fSearchMark.getFolder(), SWT.BORDER);
+    fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
+    fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
     Composite radioContainer = new Composite(container, SWT.None);
     radioContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
@@ -165,6 +182,11 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#finish()
    */
   public void finish() {
-  //TODO Need to rerun the Query in the Searchmark to reflect changes
+
+    /* Reparent if necessary */
+    if (fSearchMark.getFolder() != fFolderChooser.getFolder()) {
+      ReparentInfo<IMark, IFolder> reparent = new ReparentInfo<IMark, IFolder>(fSearchMark, fFolderChooser.getFolder(), null, null);
+      Owl.getPersistenceService().getApplicationLayer().reparent(null, Collections.singletonList(reparent));
+    }
   }
 }

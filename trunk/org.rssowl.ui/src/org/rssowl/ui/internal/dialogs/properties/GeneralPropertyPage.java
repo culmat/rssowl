@@ -51,10 +51,12 @@ import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FeedReference;
+import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -85,6 +87,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
   private List<IEntity> fEntities;
   private Text fNameInput;
   private Text fFeedInput;
+  private FolderChooser fFolderChooser;
   private Button fOpenOnStartupCheck;
   private boolean fReloadRequired;
   private boolean fSettingsChanged;
@@ -181,6 +184,19 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       }
     }
 
+    /* Location */
+    IFolder sameParent = getSameParent(fEntities);
+    if (sameParent != null) {
+      Label locationLabel = new Label(container, SWT.None);
+      locationLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
+      locationLabel.setText("Location: ");
+
+      fFolderChooser = new FolderChooser(container, sameParent, SWT.BORDER);
+      fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
+      fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    }
+
     /* Separator */
     if (fEntities.size() == 1)
       new Label(container, SWT.NONE).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
@@ -232,6 +248,20 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     fOpenOnStartupCheck.setSelection(fPrefOpenOnStartup);
 
     return container;
+  }
+
+  private IFolder getSameParent(List<IEntity> entities) {
+    IFolder parent = null;
+
+    for (IEntity entity : entities) {
+      IFolder folder = (entity instanceof IMark) ? ((IMark) entity).getFolder() : ((IFolder) entity).getParent();
+      if (parent == null)
+        parent = folder;
+      else if (parent != folder)
+        return null;
+    }
+
+    return parent;
   }
 
   private int getUpdateIntervalScope() {
@@ -382,10 +412,37 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
    * @see org.rssowl.ui.internal.dialogs.properties.IEntityPropertyPage#finish()
    */
   public void finish() {
+    IApplicationLayer appLayer = Owl.getPersistenceService().getApplicationLayer();
 
     /* Reload if required */
     if (fReloadRequired && fEntities.size() == 1)
       Controller.getDefault().reloadQueued((IBookMark) fEntities.get(0), getWorkbenchShell());
+
+    /* Reparent if necessary */
+    IFolder sameParent = getSameParent(fEntities);
+    if (sameParent != null && sameParent != fFolderChooser.getFolder()) {
+      List<ReparentInfo<IMark, IFolder>> markReparenting = new ArrayList<ReparentInfo<IMark, IFolder>>();
+      List<ReparentInfo<IFolder, IFolder>> folderReparenting = new ArrayList<ReparentInfo<IFolder, IFolder>>();
+      for (IEntity entity : fEntities) {
+
+        /* Check BookMark */
+        if (entity instanceof IBookMark) {
+          IBookMark bookmark = (IBookMark) entity;
+          ReparentInfo<IMark, IFolder> reparent = new ReparentInfo<IMark, IFolder>(bookmark, fFolderChooser.getFolder(), null, null);
+          markReparenting.add(reparent);
+        }
+
+        /* Check Folder */
+        else if (entity instanceof IFolder) {
+          IFolder folder = (IFolder) entity;
+          ReparentInfo<IFolder, IFolder> reparent = new ReparentInfo<IFolder, IFolder>(folder, fFolderChooser.getFolder(), null, null);
+          folderReparenting.add(reparent);
+        }
+      }
+
+      /* Perform Reparenting */
+      appLayer.reparent(folderReparenting, markReparenting);
+    }
   }
 
   private Shell getWorkbenchShell() {
