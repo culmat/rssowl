@@ -71,6 +71,7 @@ public interface IApplicationLayer {
    */
   void handleFeedReload(IBookMark bookMark, IFeed interpretedFeed, IConditionalGet conditionalGet, boolean deleteConditionalGet);
   
+  //FIXME Available elsewhere, may remove
   /**
    * <p>
    * If <code>foldersInfos</code> is not null, performs the reparenting of the

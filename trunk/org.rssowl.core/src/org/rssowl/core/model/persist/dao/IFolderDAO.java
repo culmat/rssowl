@@ -27,8 +27,11 @@ import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.FolderEvent;
 import org.rssowl.core.model.events.FolderListener;
 import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.IMark;
+import org.rssowl.core.util.ReparentInfo;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface IFolderDAO extends IEntityDAO<IFolder, FolderListener, FolderEvent>   {
   
@@ -43,5 +46,28 @@ public interface IFolderDAO extends IEntityDAO<IFolder, FolderListener, FolderEv
    */
   Collection<IFolder> loadRoot();
   
+  /**
+   * <p>
+   * If <code>foldersInfos</code> is not null, performs the reparenting of the
+   * folders as described by them. The <code>FolderEvent</code>s issued will
+   * have a filled <code>oldParent</code> property to indicate that
+   * reparenting took place.
+   * </p>
+   * <p>
+   * If <code>markInfos</code> is not null, performs the reparenting of the
+   * marks as described by them. Depending on the type of the mark,
+   * BookMarkEvents or SearchMarkEvents will be issed. They will contain a
+   * non-null <code>oldParent</code> property to indicate that reparenting
+   * took place.
+   * </p>
+   *
+   * @param folderInfos <code>null</code> or list of ReparentInfo objects
+   * describing the reparenting details for a list of folders.
+   * @param markInfos <code>null</code> or list of ReparentInfo objects
+   * describing the reparenting details for a list of marks.
+   * @throws PersistenceException In case of an error while loading the Types.
+   */
+  void reparent(List<ReparentInfo<IFolder, IFolder>> folderInfos,
+      List<ReparentInfo<IMark, IFolder>> markInfos) throws PersistenceException;
   
 }
