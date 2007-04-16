@@ -88,6 +88,7 @@ public class FolderChooser extends Composite implements DisposeListener {
   private Label fFolderName;
   private int fViewerHeight;
   private FolderAdapter fFolderListener;
+  private ToolBar fAddFolderBar;
 
   /**
    * @param parent
@@ -201,12 +202,18 @@ public class FolderChooser extends Composite implements DisposeListener {
       }
     });
 
-    ToolBar toggleBar = new ToolBar(headerContainer, SWT.FLAT);
-    toggleBar.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
-    toggleBar.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-    toggleBar.setCursor(headerContainer.getDisplay().getSystemCursor(SWT.CURSOR_ARROW));
+    Composite toolbarContainer = new Composite(headerContainer, SWT.NONE);
+    toolbarContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 1, false));
+    toolbarContainer.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
+    toolbarContainer.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
-    ToolItem addFolderItem = new ToolItem(toggleBar, SWT.PUSH);
+    fAddFolderBar = new ToolBar(toolbarContainer, SWT.FLAT);
+    fAddFolderBar.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
+    fAddFolderBar.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    fAddFolderBar.setCursor(headerContainer.getDisplay().getSystemCursor(SWT.CURSOR_ARROW));
+    fAddFolderBar.setVisible(false);
+
+    ToolItem addFolderItem = new ToolItem(fAddFolderBar, SWT.PUSH);
     addFolderItem.setImage(OwlUI.getImage(fResources, "icons/etool16/add_crop.gif"));
     addFolderItem.setToolTipText("New Folder...");
     addFolderItem.addSelectionListener(new SelectionAdapter() {
@@ -215,6 +222,11 @@ public class FolderChooser extends Composite implements DisposeListener {
         onNewFolder();
       }
     });
+
+    ToolBar toggleBar = new ToolBar(toolbarContainer, SWT.FLAT);
+    toggleBar.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
+    toggleBar.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    toggleBar.setCursor(headerContainer.getDisplay().getSystemCursor(SWT.CURSOR_ARROW));
 
     fToggleItem = new ToolItem(toggleBar, SWT.PUSH);
     fToggleItem.setImage(OwlUI.getImage(fResources, "icons/ovr16/arrow_down.gif"));
@@ -368,6 +380,8 @@ public class FolderChooser extends Composite implements DisposeListener {
 
     ((GridData) fFolderViewerContainer.getLayoutData()).exclude = !excluded;
     fFolderViewerContainer.getShell().layout();
+
+    fAddFolderBar.setVisible(excluded);
 
     Point size = fFolderViewerContainer.getShell().getSize();
     fFolderViewerContainer.getShell().setSize(size.x, size.y + (excluded ? fViewerHeight : -fViewerHeight));
