@@ -25,6 +25,8 @@ package org.rssowl.core.model.persist.dao;
 
 import org.rssowl.core.model.persist.IConditionalGet;
 
+import java.net.URI;
+
 public interface IConditionalGetDAO extends IPersistableDAO<IConditionalGet>  {
-  // No new methods
+  IConditionalGet load(URI link);
 }
