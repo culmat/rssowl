@@ -29,7 +29,6 @@ import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.events.AttachmentEvent;
 import org.rssowl.core.model.events.BookMarkEvent;
 import org.rssowl.core.model.events.CategoryEvent;
-import org.rssowl.core.model.events.EventsMap;
 import org.rssowl.core.model.events.FeedEvent;
 import org.rssowl.core.model.events.FolderEvent;
 import org.rssowl.core.model.events.LabelEvent;

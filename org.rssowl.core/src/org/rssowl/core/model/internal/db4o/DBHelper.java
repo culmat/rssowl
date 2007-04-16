@@ -24,7 +24,6 @@
 package org.rssowl.core.model.internal.db4o;
 
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.events.EventsMap;
 import org.rssowl.core.model.events.FeedEvent;
 import org.rssowl.core.model.events.ModelEvent;
 import org.rssowl.core.model.events.NewsEvent;
