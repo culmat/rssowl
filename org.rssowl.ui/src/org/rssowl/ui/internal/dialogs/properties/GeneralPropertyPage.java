@@ -30,6 +30,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -155,12 +156,14 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
    * @see org.rssowl.ui.internal.dialogs.properties.IEntityPropertyPage#createContents(org.eclipse.swt.widgets.Composite)
    */
   public Control createContents(Composite parent) {
+    boolean separateFromTop = false;
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(LayoutUtils.createGridLayout(2, 10, 10));
 
     /* Fields for single Selection */
     if (fEntities.size() == 1) {
       IEntity entity = fEntities.get(0);
+      separateFromTop = true;
 
       /* Name */
       Label nameLabel = new Label(container, SWT.None);
@@ -187,6 +190,8 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     /* Location */
     IFolder sameParent = getSameParent(fEntities);
     if (sameParent != null) {
+      separateFromTop = true;
+
       Label locationLabel = new Label(container, SWT.None);
       locationLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
       locationLabel.setText("Location: ");
@@ -197,14 +202,13 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
     }
 
-    /* Separator */
-    if (fEntities.size() == 1)
-      new Label(container, SWT.NONE).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-
     /* Other Settings */
     Composite otherSettingsContainer = new Composite(container, SWT.NONE);
     otherSettingsContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
     otherSettingsContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, true, 2, 1));
+
+    if (separateFromTop)
+      ((GridLayout) otherSettingsContainer.getLayout()).marginTop = 15;
 
     /* Auto-Reload */
     Composite autoReloadContainer = new Composite(otherSettingsContainer, SWT.NONE);
