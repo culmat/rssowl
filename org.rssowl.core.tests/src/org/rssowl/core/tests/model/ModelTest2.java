@@ -996,7 +996,7 @@ public class ModelTest2 {
 
       /* Asserts Follow */
       assertEquals(0, fAppLayer.loadRootFolders().size());
-      assertEquals(0, Owl.getPersistenceService().getBookMarkDAO().loadAll().size());
+      assertEquals(0, Owl.getPersistenceService().getDAOService().getBookMarkDAO().loadAll().size());
       assertTrue("Expected one feedDeleted event", feedEventsIssued[0]);
       for (int i = 0; i < folderEventsIssued.length; i++) {
         if (!folderEventsIssued[i])
