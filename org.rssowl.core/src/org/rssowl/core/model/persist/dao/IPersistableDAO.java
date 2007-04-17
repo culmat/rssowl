@@ -75,4 +75,6 @@ public interface IPersistableDAO<T extends IPersistable> {
   void deleteAll(Collection<T> objects);
 
   long countAll();
+  
+  Class<? extends T> getEntityClass();
 }
