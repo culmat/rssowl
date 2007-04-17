@@ -25,7 +25,7 @@ package org.rssowl.core.model.persist.dao;
 
 import org.rssowl.core.model.persist.NewsCounter;
 
-public interface INewsCounterDAO {
+public interface INewsCounterDAO extends IPersistableDAO<NewsCounter>   {
   NewsCounter load();
   NewsCounter save(NewsCounter counter);
 }
