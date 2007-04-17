@@ -23,29 +23,37 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.persist.dao;
 
-public abstract class DAOFactory {
+import org.rssowl.core.model.persist.IPersistable;
 
-  public abstract IAttachmentDAO createAttachmentDAO();
-  
-  public abstract IBookMarkDAO createBookMarkDAO();
-  
-  public abstract ICategoryDAO createCategoryDAO();
-  
-  public abstract IFeedDAO createFeedDAO();
-  
-  public abstract IFolderDAO createFolderDAO();
-  
-  public abstract INewsCounterDAO createNewsCounterDAO();
-  
-  public abstract INewsDAO createNewsDAO();
-  
-  public abstract IPersonDAO createPersonDAO();
-  
-  public abstract IPreferencesDAO createPreferencesDAO();
-  
-  public abstract ISearchConditionDAO createSearchConditionDAO();
-  
-  public abstract ISearchMarkDAO createSearchMarkDAO();
+public abstract class DAOService {
 
-  public abstract ILabelDAO createLabelDAO();
+  public abstract <T extends IPersistableDAO<?>> T getDAO(Class<T> daoInterface);
+  
+  public abstract <T extends IPersistableDAO<? super P>, P extends IPersistable> T getDAOFromEntity(Class<P> persistableClass);
+  
+  public abstract IAttachmentDAO getAttachmentDAO();
+  
+  public abstract IBookMarkDAO getBookMarkDAO();
+  
+  public abstract ICategoryDAO getCategoryDAO();
+  
+  public abstract IFeedDAO getFeedDAO();
+  
+  public abstract IFolderDAO getFolderDAO();
+  
+  public abstract INewsCounterDAO getNewsCounterDAO();
+  
+  public abstract INewsDAO getNewsDAO();
+  
+  public abstract IPersonDAO getPersonDAO();
+  
+  public abstract IPreferencesDAO getPreferencesDAO();
+  
+  public abstract ISearchConditionDAO getSearchConditionDAO();
+  
+  public abstract ISearchMarkDAO getSearchMarkDAO();
+
+  public abstract ILabelDAO getLabelDAO();
+  
+  public abstract IConditionalGetDAO getConditionalGetDAO();
 }

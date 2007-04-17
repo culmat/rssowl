@@ -102,7 +102,7 @@
    <extension
          point="org.rssowl.core.DAOFactory">
       <daofactory
-            class="org.rssowl.core.model.internal.db4o.dao.DAOFactoryImpl">
+            class="org.rssowl.core.model.internal.db4o.dao.DAOServiceImpl">
       </daofactory>
    </extension>
 </plugin>
