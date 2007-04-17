@@ -731,7 +731,7 @@ public class ApplicationLayerTest {
     IFeed feed = fFactory.createFeed(null, new URI("http://www.myfeed.com"));
     fDao.saveFeed(feed);
 
-    IBookMarkDAO markDAO = Owl.getPersistenceService().getBookMarkDAO();
+    IBookMarkDAO markDAO = Owl.getPersistenceService().getDAOService().getBookMarkDAO();
     Collection<IBookMark> emptyBookmarks = markDAO.loadAll();
     assertEquals(0, emptyBookmarks.size());
 
@@ -783,7 +783,7 @@ public class ApplicationLayerTest {
     root1 = null;
     System.gc();
 
-    IBookMarkDAO markDAO = Owl.getPersistenceService().getBookMarkDAO();
+    IBookMarkDAO markDAO = Owl.getPersistenceService().getDAOService().getBookMarkDAO();
     Collection<IBookMark> marks = markDAO.loadAll();
     assertEquals(1, marks.size());
     assertEquals(folderName, marks.iterator().next().getFolder().getName());
