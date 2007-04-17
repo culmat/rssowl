@@ -25,12 +25,19 @@
 package org.rssowl.ui.internal;
 
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.operation.ModalContext;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.IWorkbenchConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchAdvisor;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 import org.rssowl.core.util.LoggingSafeRunnable;
+
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * @author bpasero
@@ -164,7 +171,6 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     //        Controller.getDefault().postUIStartup();
     //      }
     //    });
-
     /* Run Runnable if provided */
     if (fRunAfterUIStartup != null) {
       SafeRunner.run(new LoggingSafeRunnable() {
@@ -212,26 +218,27 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
   public void postShutdown() {
     super.postShutdown();
 
-    //      /* We dont want to block the UI Thread while shutting down */
-    //      try {
-    //        IRunnableWithProgress shutdownRunnable = new IRunnableWithProgress() {
-    //          public void run(IProgressMonitor monitor) {
-    //
-    //            /* Shutdown Controller */
-    //            SafeRunner.run(new LoggingSafeRunnable() {
-    //              public void run() throws Exception {
-    //                Controller.getDefault().postUIShutdown();
-    //              }
-    //            });
-    //          }
-    //        };
-    //
-    //        /* Run in a seperate Thread */
-    //        ModalContext.run(shutdownRunnable, true, new NullProgressMonitor(), PlatformUI.getWorkbench().getDisplay());
-    //      } catch (InvocationTargetException e1) {
-    //        Activator.getDefault().logError(e1.getMessage(), e1);
-    //      } catch (InterruptedException e1) {
-    //        Activator.getDefault().logError(e1.getMessage(), e1);
-    //      }
+    //TODO Comment this code out
+    /* We dont want to block the UI Thread while shutting down */
+    try {
+      IRunnableWithProgress shutdownRunnable = new IRunnableWithProgress() {
+        public void run(IProgressMonitor monitor) {
+
+          /* Shutdown Controller */
+          SafeRunner.run(new LoggingSafeRunnable() {
+            public void run() throws Exception {
+              Controller.getDefault().shutdown();
+            }
+          });
+        }
+      };
+
+      /* Run in a seperate Thread */
+      ModalContext.run(shutdownRunnable, true, new NullProgressMonitor(), PlatformUI.getWorkbench().getDisplay());
+    } catch (InvocationTargetException e1) {
+      Activator.getDefault().logError(e1.getMessage(), e1);
+    } catch (InterruptedException e1) {
+      Activator.getDefault().logError(e1.getMessage(), e1);
+    }
   }
 }

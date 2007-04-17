@@ -41,6 +41,7 @@ import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.connection.UnknownFeedException;
 import org.rssowl.core.internal.DefaultPreferences;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.interpreter.ParserException;
 import org.rssowl.core.model.dao.IApplicationLayer;
@@ -566,6 +567,24 @@ public class Controller {
     /* Create the Feed-Reload Service */
     if (!Owl.TESTING)
       fFeedReloadService = new FeedReloadService();
+
+    //TODO NotificationPopup
+    //    Owl.getListenerService().addNewsListener(new NewsAdapter() {
+    //      @Override
+    //      public void entitiesAdded(final Set<NewsEvent> events) {
+    //        JobRunner.runInUIThread(OwlUI.getPrimaryShell(), new Runnable() {
+    //          public void run() {
+    //            List<INews> news = new ArrayList<INews>();
+    //            for (NewsEvent event : events) {
+    //              news.add(event.getEntity());
+    //            }
+    //
+    //            NotificationPopup popup = new NotificationPopup();
+    //            popup.showNews(news);
+    //          }
+    //        });
+    //      }
+    //    });
   }
 
   /**
@@ -592,6 +611,9 @@ public class Controller {
 
     /* Shutdown ApplicationServer */
     ApplicationServer.getDefault().shutdown();
+
+    //TODO Comment this code out
+    InternalOwl.getDefault().shutdown();
   }
 
   /**
