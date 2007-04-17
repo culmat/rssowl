@@ -106,13 +106,13 @@ public class Activator extends Plugin {
   @Override
   public void stop(BundleContext context) throws Exception {
 
+    //TODO Comment this code in
     /* Stop Internal Owl */
-    SafeRunner.run(new LoggingSafeRunnable() {
-      public void run() throws Exception {
-        InternalOwl.getDefault().shutdown();
-      }
-    });
-
+    //    SafeRunner.run(new LoggingSafeRunnable() {
+    //      public void run() throws Exception {
+    //        InternalOwl.getDefault().shutdown();
+    //      }
+    //    });
     /* Proceed */
     super.stop(context);
     fContext = null;
