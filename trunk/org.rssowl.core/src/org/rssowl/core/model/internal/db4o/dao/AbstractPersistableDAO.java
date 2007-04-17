@@ -57,6 +57,10 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
     fSaveFully = saveFully;
   }
   
+  public final Class<? extends T> getEntityClass()    {
+    return fEntityClass;
+  }
+  
   @SuppressWarnings("unchecked")
   protected final ObjectSet<T> getObjectSet(Query query)    {
     return query.execute();
