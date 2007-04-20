@@ -29,6 +29,7 @@ import org.rssowl.core.model.persist.ICategory;
 import org.rssowl.core.model.persist.IConditionalGet;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.ILabel;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPersistable;
 import org.rssowl.core.model.persist.IPerson;
@@ -82,6 +83,7 @@ public final class DAOServiceImpl extends DAOService  {
     fEntityDaoClassesToDaosMap.put(IConditionalGetDAO.class, fConditionalGetDAO);
     fEntityDaoClassesToDaosMap.put(IFeedDAO.class, fFeedDAO);
     fEntityDaoClassesToDaosMap.put(IFolderDAO.class, fFolderDAO);
+    fEntityDaoClassesToDaosMap.put(ILabelDAO.class, fLabelDAO);
     fEntityDaoClassesToDaosMap.put(INewsCounterDAO.class, fNewsCounterDAO);
     fEntityDaoClassesToDaosMap.put(INewsDAO.class, fNewsDAO);
     fEntityDaoClassesToDaosMap.put(IPersonDAO.class, fPersonDAO);
@@ -100,6 +102,7 @@ public final class DAOServiceImpl extends DAOService  {
     fEntityInterfacesToDaosMap.put(IConditionalGet.class, fConditionalGetDAO);
     fEntityInterfacesToDaosMap.put(IFeed.class, fFeedDAO);
     fEntityInterfacesToDaosMap.put(IFolder.class, fFolderDAO);
+    fEntityInterfacesToDaosMap.put(ILabel.class, fLabelDAO);
     fEntityInterfacesToDaosMap.put(NewsCounter.class, fNewsCounterDAO);
     fEntityInterfacesToDaosMap.put(INews.class, fNewsDAO);
     fEntityInterfacesToDaosMap.put(IPerson.class, fPersonDAO);
