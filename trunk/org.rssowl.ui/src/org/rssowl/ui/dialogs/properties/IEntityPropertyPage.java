@@ -35,14 +35,14 @@ import java.util.Set;
  * Instances of <code>IEntityPropertyPage</code> provide a Property-Page for
  * entites. These pages are created in the Property-Dialog and participate in
  * the dialog lifecycle.
- * 
+ *
  * @author bpasero
  */
 public interface IEntityPropertyPage {
 
   /**
    * Initializes this page with the selected Entities of the Property-Dialog.
-   * 
+   *
    * @param site The dialog-site providing some useful methods.
    * @param entities The selected Entities of this Property-Dialog.
    */
@@ -51,15 +51,20 @@ public interface IEntityPropertyPage {
   /**
    * Creates and returns the SWT control for the customized body of this
    * property page under the given parent composite.
-   * 
+   *
    * @param parent the parent composite
    * @return the new control
    */
   Control createContents(Composite parent);
 
   /**
+   * Asks to focus the given <code>IEntityPropertyPage</code>.
+   */
+  void setFocus();
+
+  /**
    * Notifies that the OK button of this page's container has been pressed.
-   * 
+   *
    * @param entitiesToSave A Set of <code>IEntity</code>s which are to be
    * saved. This way of collecting entities for saving avoids the situation
    * where two different pages wants to save the same entity.

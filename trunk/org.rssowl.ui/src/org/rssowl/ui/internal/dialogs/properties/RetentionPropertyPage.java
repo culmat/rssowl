@@ -185,6 +185,11 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
   }
 
   /*
+   * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#setFocus()
+   */
+  public void setFocus() {}
+
+  /*
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#performOk(java.util.Set)
    */
   public boolean performOk(Set<IEntity> entitiesToSave) {
