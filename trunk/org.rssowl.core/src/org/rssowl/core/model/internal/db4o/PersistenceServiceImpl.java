@@ -34,7 +34,6 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
 
   /** */
   public PersistenceServiceImpl() {
-    startup();
   }
 
   /*
@@ -43,8 +42,9 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
    * PersistenceException In case of an error while starting up the persistence
    * layer.
    */
-  private void startup() throws PersistenceException {
-
+  @Override
+  public void startup() throws PersistenceException {
+    super.startup();
     /* Startup DB and Model-Search */
     try {
       DBManager.getDefault().startup();

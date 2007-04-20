@@ -40,6 +40,8 @@ import org.rssowl.core.model.persist.search.IModelSearch;
  */
 public interface IPersistenceService {
 
+  void startup();
+  
   DAOService getDAOService();
   
   /**
