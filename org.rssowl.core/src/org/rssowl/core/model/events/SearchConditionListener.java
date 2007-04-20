@@ -24,6 +24,8 @@
 
 package org.rssowl.core.model.events;
 
+import org.rssowl.core.model.persist.search.ISearchCondition;
+
 
 /**
  * A Listener being notified whenever the type <code>ISearchCondition</code>
@@ -31,6 +33,6 @@ package org.rssowl.core.model.events;
  * 
  * @author bpasero
  */
-public interface SearchConditionListener extends EntityListener<SearchConditionEvent>   {
+public interface SearchConditionListener extends EntityListener<SearchConditionEvent, ISearchCondition>   {
   // No new methods
 }

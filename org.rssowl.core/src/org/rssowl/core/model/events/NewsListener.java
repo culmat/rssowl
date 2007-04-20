@@ -24,6 +24,8 @@
 
 package org.rssowl.core.model.events;
 
+import org.rssowl.core.model.persist.INews;
+
 
 /**
  * A Listener being notified whenever the type <code>INews</code> was added,
@@ -31,6 +33,6 @@ package org.rssowl.core.model.events;
  * 
  * @author bpasero
  */
-public interface NewsListener extends EntityListener<NewsEvent> {
+public interface NewsListener extends EntityListener<NewsEvent, INews> {
   // No new methods
 }

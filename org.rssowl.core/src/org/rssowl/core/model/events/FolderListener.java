@@ -24,6 +24,8 @@
 
 package org.rssowl.core.model.events;
 
+import org.rssowl.core.model.persist.IFolder;
+
 
 /**
  * A Listener being notified whenever the type <code>IFolder</code> was added,
@@ -31,6 +33,6 @@ package org.rssowl.core.model.events;
  * 
  * @author bpasero
  */
-public interface FolderListener extends EntityListener<FolderEvent> {
+public interface FolderListener extends EntityListener<FolderEvent, IFolder> {
   // No new methods added
 }

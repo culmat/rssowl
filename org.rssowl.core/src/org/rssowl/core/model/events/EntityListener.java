@@ -23,9 +23,11 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events;
 
+import org.rssowl.core.model.persist.IEntity;
+
 import java.util.Set;
 
-public interface EntityListener<E extends ModelEvent> {
+public interface EntityListener<E extends ModelEvent, T extends IEntity> {
   public void entitiesAdded(Set<E> events);
   public void entitiesDeleted(Set<E> events);
   public void entitiesUpdated(Set<E> events);

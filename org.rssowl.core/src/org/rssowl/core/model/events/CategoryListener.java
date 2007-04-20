@@ -24,6 +24,8 @@
 
 package org.rssowl.core.model.events;
 
+import org.rssowl.core.model.persist.ICategory;
+
 
 /**
  * A Listener being notified whenever the type <code>ICategory</code> was
@@ -31,6 +33,6 @@ package org.rssowl.core.model.events;
  * 
  * @author bpasero
  */
-public interface CategoryListener extends EntityListener<CategoryEvent> {
+public interface CategoryListener extends EntityListener<CategoryEvent, ICategory> {
   // No new methods
 }

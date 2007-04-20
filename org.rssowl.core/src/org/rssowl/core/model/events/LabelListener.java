@@ -24,6 +24,8 @@
 
 package org.rssowl.core.model.events;
 
+import org.rssowl.core.model.persist.ILabel;
+
 
 /**
  * A Listener being notified whenever the type <code>ILabel</code> was added,
@@ -31,6 +33,6 @@ package org.rssowl.core.model.events;
  * 
  * @author bpasero
  */
-public interface LabelListener extends EntityListener<LabelEvent>   {
+public interface LabelListener extends EntityListener<LabelEvent, ILabel>   {
   // No new methods
 }
