@@ -24,7 +24,6 @@
 
 package org.rssowl.core.internal;
 
-import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.connection.IConnectionService;
 import org.rssowl.core.connection.internal.ConnectionServiceImpl;
 import org.rssowl.core.interpreter.IInterpreterService;
@@ -77,17 +76,24 @@ public final class InternalOwl {
     fStarted = true;
   }
 
-  /** */
-  public void shutdown() {
-    fConnectionService.shutdown();
-    fPersistenceService.shutdown();
-  }
-
   /**
    * @return
    */
   public static InternalOwl getDefault() {
     return INSTANCE;
+  }
+
+  /**
+   * @return
+   */
+  public boolean isStarted() {
+    return fStarted;
+  }
+
+  /** */
+  public void shutdown() {
+    fConnectionService.shutdown();
+    fPersistenceService.shutdown();
   }
 
   /**
@@ -101,7 +107,6 @@ public final class InternalOwl {
    * @return
    */
   public IPreferenceService getPreferenceService() {
-    Assert.isTrue(fStarted, "InternalOwl has not yet finished initialization");
     return fPreferencesService;
   }
 
@@ -109,7 +114,6 @@ public final class InternalOwl {
    * @return
    */
   public IPersistenceService getPersistenceService() {
-    Assert.isTrue(fStarted, "InternalOwl has not yet finished initialization");
     return fPersistenceService;
   }
 
@@ -122,7 +126,6 @@ public final class InternalOwl {
    * @return
    */
   public IConnectionService getConnectionService() {
-    Assert.isTrue(fStarted, "InternalOwl has not yet finished initialization");
     return fConnectionService;
   }
 
@@ -130,7 +133,6 @@ public final class InternalOwl {
    * @return
    */
   public IInterpreterService getInterpreter() {
-    Assert.isTrue(fStarted, "InternalOwl has not yet finished initialization");
     return fInterpreterService;
   }
 
@@ -138,7 +140,6 @@ public final class InternalOwl {
    * @return
    */
   public IModelFactory getModelFactory() {
-    Assert.isTrue(fStarted, "InternalOwl has not yet finished initialization");
     return fModelFactory;
   }
 
