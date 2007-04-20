@@ -24,6 +24,7 @@
 
 package org.rssowl.core;
 
+import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.connection.IConnectionService;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.interpreter.IInterpreterService;
@@ -53,6 +54,7 @@ public class Owl {
    * @return
    */
   public static IPreferenceService getPreferenceService() {
+    Assert.isTrue(InternalOwl.getDefault().isStarted(), "The Owl facade  has not yet finished initialization");
     return InternalOwl.getDefault().getPreferenceService();
   }
 
@@ -60,6 +62,7 @@ public class Owl {
    * @return
    */
   public static IPersistenceService getPersistenceService() {
+    Assert.isTrue(InternalOwl.getDefault().isStarted(), "The Owl facade  has not yet finished initialization");
     return InternalOwl.getDefault().getPersistenceService();
   }
 
@@ -67,6 +70,7 @@ public class Owl {
    * @return
    */
   public static IConnectionService getConnectionService() {
+    Assert.isTrue(InternalOwl.getDefault().isStarted(), "The Owl facade  has not yet finished initialization");
     return InternalOwl.getDefault().getConnectionService();
   }
 
@@ -74,6 +78,7 @@ public class Owl {
    * @return
    */
   public static IInterpreterService getInterpreter() {
+    Assert.isTrue(InternalOwl.getDefault().isStarted(), "The Owl facade  has not yet finished initialization");
     return InternalOwl.getDefault().getInterpreter();
   }
 
@@ -81,6 +86,7 @@ public class Owl {
    * @return
    */
   public static IModelFactory getModelFactory() {
+    Assert.isTrue(InternalOwl.getDefault().isStarted(), "The Owl facade  has not yet finished initialization");
     return InternalOwl.getDefault().getModelFactory();
   }
 }
