@@ -43,6 +43,7 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
@@ -50,11 +51,15 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -62,6 +67,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -111,6 +117,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -146,20 +153,21 @@ public class SearchNewsDialog extends TitleAreaDialog {
   /* TODO Developer's flag to enable / disable COD */
   private static final boolean USE_CUSTOM_OWNER_DRAWN = true;
 
-  /* Indices of Columns in the Tree-Viewer */
-  private static final int COL_TITLE = 0;
-  private static final int COL_STICKY = 4;
+  /* Indices of Columns in the Table-Viewer */
+  private static final int COL_RELEVANCE = 0;
+  private static final int COL_TITLE = 1;
+  private static final int COL_STICKY = 5;
 
   /* Viewer and Controls */
   private Button fMatchAllRadio;
   private Button fMatchAnyRadio;
   private SearchConditionList fSearchConditionList;
   private TableViewer fViewer;
-  private NewsComparator fNewsSorter;
+  private ScoredNewsComparator fNewsSorter;
   private Label fStatusLabel;
 
   /* Misc. */
-  private NewsTableControl.Columns fInitialSortColumn = NewsTableControl.Columns.DATE;
+  private NewsTableControl.Columns fInitialSortColumn = NewsTableControl.Columns.SCORE;
   private boolean fInitialAscending;
   private LocalResourceManager fResources;
   private IDialogSettings fDialogSettings;
@@ -171,6 +179,207 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private List<ISearchCondition> fInitialConditions;
   private boolean fRunSearch;
   private boolean fMatchAllConditions;
+
+  /* Container for a search result */
+  private static class ScoredNews {
+    private INews fNews;
+    private Float fScore;
+    private Relevance fRelevance;
+
+    ScoredNews(INews news, Float score, Relevance relevance) {
+      fNews = news;
+      fScore = score;
+      fRelevance = relevance;
+    }
+
+    INews getNews() {
+      return fNews;
+    }
+
+    Float getScore() {
+      return fScore;
+    }
+
+    Relevance getRelevance() {
+      return fRelevance;
+    }
+
+    /*
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+      return fNews.hashCode();
+    }
+
+    /*
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+      return fNews.equals(obj);
+    }
+  }
+
+  /* ScoredNews Relevance */
+  private enum Relevance {
+
+    /** Indicates Low Relevance */
+    LOW,
+
+    /** Indicates Medium Relevance */
+    MEDIUM,
+
+    /** Indicates High Relevance */
+    HIGH;
+  }
+
+  /* Comparator for Scored News */
+  private static class ScoredNewsComparator extends ViewerComparator implements Comparator<ScoredNews> {
+    private NewsComparator fNewsComparator = new NewsComparator();
+
+    /*
+     * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer,
+     * java.lang.Object, java.lang.Object)
+     */
+    @Override
+    public int compare(Viewer viewer, Object e1, Object e2) {
+
+      /* Unlikely to happen */
+      if (!(e1 instanceof ScoredNews) || !(e2 instanceof ScoredNews))
+        return 0;
+
+      /* Proceed comparing Scored News */
+      return compare((ScoredNews) e1, (ScoredNews) e2);
+    }
+
+    /*
+     * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
+     */
+    public int compare(ScoredNews news1, ScoredNews news2) {
+
+      /* Not sorting by Score */
+      if (fNewsComparator.getSortBy() != NewsTableControl.Columns.SCORE)
+        return fNewsComparator.compare(news1.getNews(), news2.getNews());
+
+      /* Sort by Score */
+      int result = news1.getScore().compareTo(news2.getScore());
+      return fNewsComparator.isAscending() ? result : result * -1;
+    }
+
+    void setAscending(boolean ascending) {
+      fNewsComparator.setAscending(ascending);
+    }
+
+    void setSortBy(Columns sortColumn) {
+      fNewsComparator.setSortBy(sortColumn);
+    }
+
+    Columns getSortBy() {
+      return fNewsComparator.getSortBy();
+    }
+
+    boolean isAscending() {
+      return fNewsComparator.isAscending();
+    }
+  }
+
+  /* LabelProvider for Scored News */
+  private static class ScoredNewsLabelProvider extends NewsTableLabelProvider {
+    private Image fHighRelevanceIcon;
+    private Image fMediumRelevanceIcon;
+    private Image fLowRelevanceIcon;
+
+    ScoredNewsLabelProvider() {
+      createResources();
+    }
+
+    private void createResources() {
+      fHighRelevanceIcon = OwlUI.getImage(fResources, "icons/obj16/high.gif");
+      fMediumRelevanceIcon = OwlUI.getImage(fResources, "icons/obj16/medium.gif");
+      fLowRelevanceIcon = OwlUI.getImage(fResources, "icons/obj16/low.gif");
+    }
+
+    /*
+     * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#update(org.eclipse.jface.viewers.ViewerCell)
+     */
+    @Override
+    public void update(ViewerCell cell) {
+      ScoredNews scoredNews = (ScoredNews) cell.getElement();
+
+      /* Text */
+      cell.setText(getColumnText(scoredNews.getNews(), cell.getColumnIndex() - 1));
+
+      /* Image */
+      cell.setImage(getColumnImage(scoredNews, cell.getColumnIndex()));
+
+      /* Font */
+      cell.setFont(getFont(scoredNews.getNews(), cell.getColumnIndex() - 1));
+
+      /* Foreground */
+      Color foreground = getForeground(scoredNews.getNews(), cell.getColumnIndex() - 1);
+
+      /* TODO This is required to invalidate + redraw the entire TableItem! */
+      if (USE_CUSTOM_OWNER_DRAWN) {
+        Item item = (Item) cell.getItem();
+        if (item instanceof TableItem)
+          ((TableItem) cell.getItem()).setForeground(foreground);
+      } else
+        cell.setForeground(foreground);
+
+      /* Background */
+      cell.setBackground(getBackground(scoredNews.getNews(), cell.getColumnIndex() - 1));
+    }
+
+    /*
+     * @see org.rssowl.ui.internal.editors.feed.NewsTableLabelProvider#getColumnImage(java.lang.Object,
+     * int)
+     */
+    @Override
+    protected Image getColumnImage(Object element, int columnIndex) {
+
+      /* Relevance Column */
+      if (columnIndex == COL_RELEVANCE) {
+        ScoredNews scoredNews = (ScoredNews) element;
+        if (scoredNews.getRelevance() == Relevance.HIGH)
+          return fHighRelevanceIcon;
+        else if (scoredNews.getRelevance() == Relevance.MEDIUM)
+          return fMediumRelevanceIcon;
+
+        return fLowRelevanceIcon;
+      }
+
+      /* Any other Column */
+      return super.getColumnImage(((ScoredNews) element).getNews(), columnIndex - 1);
+    }
+
+    /*
+     * @see org.rssowl.ui.internal.editors.feed.NewsTableLabelProvider#erase(org.eclipse.swt.widgets.Event,
+     * java.lang.Object)
+     */
+    @Override
+    protected void erase(Event event, Object element) {
+      super.erase(event, ((ScoredNews) element).getNews());
+    }
+
+    /*
+     * @see org.rssowl.ui.internal.editors.feed.NewsTableLabelProvider#paint(org.eclipse.swt.widgets.Event,
+     * java.lang.Object)
+     */
+    @Override
+    protected void paint(Event event, Object element) {
+      super.paint(event, ((ScoredNews) element).getNews());
+    }
+
+    /*
+     * @see org.rssowl.ui.internal.editors.feed.NewsTableLabelProvider#measure(org.eclipse.swt.widgets.Event,
+     * java.lang.Object)
+     */
+    @Override
+    protected void measure(Event event, Object element) {
+      super.measure(event, ((ScoredNews) element).getNews());
+    }
+  }
 
   /**
    * @param parentShell
@@ -462,18 +671,39 @@ public class SearchNewsDialog extends TitleAreaDialog {
     getShell().setCursor(getShell().getDisplay().getSystemCursor(SWT.CURSOR_APPSTARTING));
 
     JobRunner.runUIUpdater(new UIBackgroundJob(getShell()) {
-      private List<INews> fResult = null;
+      private List<ScoredNews> fResult = null;
 
       @Override
       protected void runInBackground(IProgressMonitor monitor) {
 
         /* Perform Search in the Background */
         List<ISearchHit<NewsReference>> searchHits = fModelSearch.searchNews(conditions, matchAllConditions);
-        fResult = new ArrayList<INews>(searchHits.size());
+        fResult = new ArrayList<ScoredNews>(searchHits.size());
+
+        /* Retrieve maximum raw relevance */
+        Float maxRelevanceScore = 0f;
+        for (ISearchHit<NewsReference> searchHit : searchHits) {
+          Float relevanceRaw = searchHit.getRelevance();
+          maxRelevanceScore = Math.max(maxRelevanceScore, relevanceRaw);
+        }
+
+        /* Calculate Thresholds */
+        Float mediumRelThreshold = maxRelevanceScore / 3f * 1f;
+        Float highRelThreshold = maxRelevanceScore / 3f * 2f;
+
+        /* Fill Results with Relevance */
         for (ISearchHit<NewsReference> searchHit : searchHits) {
           INews news = searchHit.getResult().resolve();
-          if (news != null) //TODO Remove once Bug 173 is fixed
-            fResult.add(news);
+          if (news != null) {//TODO Remove once Bug 173 is fixed
+            Float relevanceRaw = searchHit.getRelevance();
+            Relevance relevance = Relevance.LOW;
+            if (relevanceRaw > highRelThreshold)
+              relevance = Relevance.HIGH;
+            else if (relevanceRaw > mediumRelThreshold)
+              relevance = Relevance.MEDIUM;
+
+            fResult.add(new ScoredNews(news, relevanceRaw, relevance));
+          }
         }
       }
 
@@ -536,7 +766,13 @@ public class SearchNewsDialog extends TitleAreaDialog {
     CTable customTable = new CTable(tableContainer, style);
 
     /* Viewer */
-    fViewer = new TableViewer(customTable.getControl());
+    fViewer = new TableViewer(customTable.getControl()) {
+      @Override
+      public ISelection getSelection() {
+        StructuredSelection selection = (StructuredSelection) super.getSelection();
+        return convertToNews(selection);
+      }
+    };
     fViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fViewer.setUseHashlookup(true);
     fViewer.getControl().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
@@ -551,10 +787,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Create LabelProvider (Custom Owner Drawn enabled!) */
     if (USE_CUSTOM_OWNER_DRAWN)
       OwnerDrawLabelProvider.setUpOwnerDraw(fViewer);
-    fViewer.setLabelProvider(new NewsTableLabelProvider());
+    fViewer.setLabelProvider(new ScoredNewsLabelProvider());
 
     /* Create Sorter */
-    fNewsSorter = new NewsComparator();
+    fNewsSorter = new ScoredNewsComparator();
     fNewsSorter.setAscending(fInitialAscending);
     fNewsSorter.setSortBy(fInitialSortColumn);
     fViewer.setComparator(fNewsSorter);
@@ -564,6 +800,18 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     /* Register Listeners */
     registerListeners();
+  }
+
+  /* Convert Selection to INews */
+  private ISelection convertToNews(StructuredSelection selection) {
+    List< ? > selectedElements = selection.toList();
+    List<INews> selectedNews = new ArrayList<INews>();
+    for (Object selectedElement : selectedElements) {
+      ScoredNews scoredNews = (ScoredNews) selectedElement;
+      selectedNews.add(scoredNews.getNews());
+    }
+
+    return new StructuredSelection(selectedNews);
   }
 
   private void registerListeners() {
@@ -613,7 +861,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
           }
 
           /* Since Virtual Style is set, we have to sort the model manually */
-          Collections.sort(((List<INews>) fViewer.getInput()), fNewsSorter);
+          Collections.sort(((List<ScoredNews>) fViewer.getInput()), fNewsSorter);
           fViewer.refresh(false);
         }
       });
@@ -646,7 +894,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     List< ? > input = (List< ? >) fViewer.getInput();
     for (NewsEvent event : events) {
       for (Object object : input) {
-        INews news = (INews) object;
+        INews news = ((ScoredNews) object).getNews();
 
         /* News is part of the list, refresh and return */
         if (news.equals(event.getEntity())) {
@@ -674,8 +922,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
       Object data = item.getData();
 
       /* Toggle State between Read / Unread */
-      if (data instanceof INews) {
-        INews news = (INews) data;
+      if (data instanceof ScoredNews) {
+        INews news = ((ScoredNews) data).getNews();
         INews.State newState = (news.getState() == INews.State.READ) ? INews.State.UNREAD : INews.State.READ;
         setNewsState(new ArrayList<INews>(Arrays.asList(new INews[] { news })), newState);
       }
@@ -686,8 +934,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
       Object data = item.getData();
 
       /* Toggle State between Sticky / Not Sticky */
-      if (data instanceof INews) {
-        new MakeTypesStickyAction(new StructuredSelection(data)).run();
+      if (data instanceof ScoredNews) {
+        new MakeTypesStickyAction(new StructuredSelection(((ScoredNews) data).getNews())).run();
       }
     }
   }
@@ -725,8 +973,16 @@ public class SearchNewsDialog extends TitleAreaDialog {
     if (selection.isEmpty())
       return;
 
+    /* Convert Selection to INews */
+    List< ? > selectedElements = selection.toList();
+    List<INews> selectedNews = new ArrayList<INews>();
+    for (Object selectedElement : selectedElements) {
+      ScoredNews scoredNews = (ScoredNews) selectedElement;
+      selectedNews.add(scoredNews.getNews());
+    }
+
     /* Open News */
-    new OpenNewsAction(selection, getShell()).run();
+    new OpenNewsAction(new StructuredSelection(selectedNews), getShell()).run();
   }
 
   private void hookContextualMenu() {
@@ -805,8 +1061,17 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
   private void createColumns(CTable customTable) {
 
+    /* Score Column */
+    TableViewerColumn col = new TableViewerColumn(fViewer, SWT.CENTER);
+    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 24), null, null, true, true);
+    col.getColumn().setData(COL_ID, NewsTableControl.Columns.SCORE);
+    col.getColumn().setToolTipText("Relevance");
+    if (fInitialSortColumn == NewsTableControl.Columns.SCORE) {
+      customTable.getControl().setSortColumn(col.getColumn());
+    }
+
     /* Headline Column */
-    TableViewerColumn col = new TableViewerColumn(fViewer, SWT.LEFT);
+    col = new TableViewerColumn(fViewer, SWT.LEFT);
     customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 60), "Title", null, true, true);
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.TITLE);
     if (fInitialSortColumn == NewsTableControl.Columns.TITLE) {
@@ -865,11 +1130,11 @@ public class SearchNewsDialog extends TitleAreaDialog {
   }
 
   private Object[] getVisibleNews(List< ? > elements) {
-    List<INews> news = new ArrayList<INews>();
+    List<ScoredNews> news = new ArrayList<ScoredNews>();
 
     for (Object element : elements) {
-      if (element instanceof INews && ((INews) element).isVisible())
-        news.add((INews) element);
+      if (element instanceof ScoredNews && ((ScoredNews) element).getNews().isVisible())
+        news.add((ScoredNews) element);
     }
 
     return news.toArray();

@@ -134,7 +134,10 @@ public class NewsTableControl implements IFeedViewPart {
     CATEGORY(true, true),
 
     /** Sticky-State of the News */
-    STICKY(false, false);
+    STICKY(false, false),
+
+    /** Score of a News */
+    SCORE(false, false);
 
     boolean fPrefersAcending;
     boolean fShowSortIndicator;
