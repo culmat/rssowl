@@ -61,7 +61,9 @@ import java.util.List;
  * @author bpasero
  */
 public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
-  private LocalResourceManager fResources;
+
+  /** Resource Manager to use */
+  protected LocalResourceManager fResources;
 
   /* Date Formatter for News */
   private DateFormat fDateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
@@ -115,6 +117,9 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     fBoldFont = OwlUI.getThemeFont(OwlUI.HEADLINES_FONT_ID, SWT.BOLD);
   }
 
+  /*
+   * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#update(org.eclipse.jface.viewers.ViewerCell)
+   */
   @Override
   public void update(ViewerCell cell) {
 
@@ -132,7 +137,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
     /* TODO This is required to invalidate + redraw the entire TableItem! */
     if (NewsTableControl.USE_CUSTOM_OWNER_DRAWN) {
-      Item item = (Item)cell.getItem();
+      Item item = (Item) cell.getItem();
       if (item instanceof TreeItem)
         ((TreeItem) cell.getItem()).setForeground(foreground);
       else if (item instanceof TableItem)
@@ -144,7 +149,12 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     cell.setBackground(getBackground(cell.getElement(), cell.getColumnIndex()));
   }
 
-  private String getColumnText(Object element, int columnIndex) {
+  /**
+   * @param element
+   * @param columnIndex
+   * @return String
+   */
+  protected String getColumnText(Object element, int columnIndex) {
     String text = null;
 
     /* Handle News */
@@ -192,7 +202,12 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     return text != null ? StringUtils.normalizeString(text) : null;
   }
 
-  private Image getColumnImage(Object element, int columnIndex) {
+  /**
+   * @param element
+   * @param columnIndex
+   * @return Image
+   */
+  protected Image getColumnImage(Object element, int columnIndex) {
 
     /* News */
     if (element instanceof INews) {
@@ -226,7 +241,12 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     return null;
   }
 
-  private Font getFont(Object element, @SuppressWarnings("unused")
+  /**
+   * @param element
+   * @param columnIndex
+   * @return Font
+   */
+  protected Font getFont(Object element, @SuppressWarnings("unused")
   int columnIndex) {
 
     /* Use a Bold Font for Unread News */
@@ -248,7 +268,12 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     return null;
   }
 
-  private Color getBackground(Object element, @SuppressWarnings("unused")
+  /**
+   * @param element
+   * @param columnIndex
+   * @return Color
+   */
+  protected Color getBackground(Object element, @SuppressWarnings("unused")
   int columnIndex) {
 
     /* Handle INews */
@@ -262,7 +287,12 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     return null;
   }
 
-  private Color getForeground(Object element, @SuppressWarnings("unused")
+  /**
+   * @param element
+   * @param columnIndex
+   * @return Color
+   */
+  protected Color getForeground(Object element, @SuppressWarnings("unused")
   int columnIndex) {
 
     /* Handle EntityGroup */
