@@ -69,10 +69,9 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
 
   /** */
   protected AbstractPersistenceService() {
-    startup();
   }
 
-  private void startup() throws PersistenceException {
+  public void startup() throws PersistenceException {
 
     /* Initialize these Singletons */
     getModelDAO();
