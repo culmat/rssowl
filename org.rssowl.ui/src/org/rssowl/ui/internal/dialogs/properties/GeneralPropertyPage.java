@@ -258,8 +258,10 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#setFocus()
    */
   public void setFocus() {
-    if (fNameInput != null)
+    if (fNameInput != null) {
       fNameInput.setFocus();
+      fNameInput.selectAll();
+    }
   }
 
   private IFolder getSameParent(List<IEntity> entities) {
