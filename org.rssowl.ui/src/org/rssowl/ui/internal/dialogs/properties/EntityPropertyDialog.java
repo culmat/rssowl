@@ -196,6 +196,10 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
       item.setControl(pageWrapper.getPage().createContents(fTabFolder));
     }
 
+    /* Focus first Page */
+    if (!fPages.isEmpty())
+      fPages.iterator().next().getPage().setFocus();
+
     /* Message Area */
     fMessageImage = new Label(composite, SWT.None);
     fMessageImage.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));

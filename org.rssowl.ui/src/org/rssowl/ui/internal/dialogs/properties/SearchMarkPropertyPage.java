@@ -127,6 +127,14 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
   }
 
   /*
+   * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#setFocus()
+   */
+  public void setFocus() {
+    if (fNameInput != null)
+      fNameInput.setFocus();
+  }
+
+  /*
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#performOk(java.util.Set)
    */
   public boolean performOk(Set<IEntity> entitiesToSave) {
