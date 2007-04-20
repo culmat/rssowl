@@ -24,6 +24,8 @@
 
 package org.rssowl.core.model.events;
 
+import org.rssowl.core.model.persist.IFeed;
+
 
 /**
  * A Listener being notified whenever the type <code>IFeed</code> was added,
@@ -31,6 +33,6 @@ package org.rssowl.core.model.events;
  * 
  * @author bpasero
  */
-public interface FeedListener extends EntityListener<FeedEvent> {
+public interface FeedListener extends EntityListener<FeedEvent, IFeed> {
   //No new methods
 }

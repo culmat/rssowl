@@ -24,6 +24,8 @@
 
 package org.rssowl.core.model.events;
 
+import org.rssowl.core.model.persist.IPerson;
+
 
 /**
  * A Listener being notified whenever the type <code>IPerson</code> was added,
@@ -31,6 +33,6 @@ package org.rssowl.core.model.events;
  * 
  * @author bpasero
  */
-public interface PersonListener extends EntityListener<PersonEvent> {
+public interface PersonListener extends EntityListener<PersonEvent, IPerson> {
   //No new methods
 }

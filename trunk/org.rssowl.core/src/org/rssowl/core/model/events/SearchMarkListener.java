@@ -24,6 +24,8 @@
 
 package org.rssowl.core.model.events;
 
+import org.rssowl.core.model.persist.ISearchMark;
+
 
 /**
  * A Listener being notified whenever the type <code>ISearchMark</code> was
@@ -31,6 +33,6 @@ package org.rssowl.core.model.events;
  * 
  * @author bpasero
  */
-public interface SearchMarkListener extends EntityListener<SearchMarkEvent> {
+public interface SearchMarkListener extends EntityListener<SearchMarkEvent, ISearchMark> {
   // No new methods
 }

@@ -24,6 +24,8 @@
 
 package org.rssowl.core.model.events;
 
+import org.rssowl.core.model.persist.IBookMark;
+
 
 /**
  * A Listener being notified whenever the type <code>IBookMark</code> was
@@ -31,6 +33,6 @@ package org.rssowl.core.model.events;
  * 
  * @author bpasero
  */
-public interface BookMarkListener extends EntityListener<BookMarkEvent> {
+public interface BookMarkListener extends EntityListener<BookMarkEvent, IBookMark> {
   //No new methods
 }

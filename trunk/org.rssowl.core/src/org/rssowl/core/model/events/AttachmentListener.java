@@ -24,6 +24,8 @@
 
 package org.rssowl.core.model.events;
 
+import org.rssowl.core.model.persist.IAttachment;
+
 
 /**
  * A Listener being notified whenever the type <code>IAttachment</code> was
@@ -31,6 +33,6 @@ package org.rssowl.core.model.events;
  * 
  * @author bpasero
  */
-public interface AttachmentListener extends EntityListener<AttachmentEvent>  {
+public interface AttachmentListener extends EntityListener<AttachmentEvent, IAttachment>  {
   // No new methods
 }
