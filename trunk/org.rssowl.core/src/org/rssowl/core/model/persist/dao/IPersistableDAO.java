@@ -63,7 +63,7 @@ public interface IPersistableDAO<T extends IPersistable> {
    */
   T save(T persistable);
 
-  <C extends Collection<T>> C saveAll(C objects);
+  void saveAll(Collection<T> persistables);
 
   /**
    * Deletes <code>persistable</code> from the persistence system.

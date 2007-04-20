@@ -36,7 +36,7 @@ import java.util.Set;
  * @param <L> 
  * @param <E> 
  */
-public interface IEntityDAO<T extends IEntity, L extends EntityListener<E>,
+public interface IEntityDAO<T extends IEntity, L extends EntityListener<E, T>,
     E extends ModelEvent> extends IPersistableDAO<T> {
 
   public void addEntityListener(L listener);

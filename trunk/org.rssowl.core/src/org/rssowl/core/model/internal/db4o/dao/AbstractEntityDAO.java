@@ -29,9 +29,6 @@ import org.rssowl.core.model.events.EntityListener;
 import org.rssowl.core.model.events.ModelEvent;
 import org.rssowl.core.model.events.runnable.EventType;
 import org.rssowl.core.model.internal.db4o.DBHelper;
-import org.rssowl.core.model.internal.db4o.DBManager;
-import org.rssowl.core.model.internal.db4o.DatabaseEvent;
-import org.rssowl.core.model.internal.db4o.DatabaseListener;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.dao.IEntityDAO;
 import org.rssowl.core.util.LoggingSafeRunnable;
@@ -48,25 +45,19 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @param <E> Type of ModelEvent.
  */
 public abstract class AbstractEntityDAO<T extends IEntity,
-    L extends EntityListener<E>, E extends ModelEvent>
+    L extends EntityListener<E, T>, E extends ModelEvent>
     extends AbstractPersistableDAO<T> implements IEntityDAO<T, L, E>{
 
   private final List<L> entityListeners = new CopyOnWriteArrayList<L>();
+  
   /**
    * Creates an instance of this class.
+   * 
+   * @param entityClass
+   * @param saveFully
    */
   public AbstractEntityDAO(Class<? extends T> entityClass, boolean saveFully) {
     super(entityClass, saveFully);
-    DBManager.getDefault().addEntityStoreListener(new DatabaseListener() {
-      public void databaseOpened(DatabaseEvent event) {
-        fDb = event.getObjectContainer();
-        fLock = event.getLock();
-        fWriteLock = fLock.writeLock();
-      }
-      public void databaseClosed(DatabaseEvent event) {
-        fDb = null;
-      }
-    });
   }
   
   protected abstract E createSaveEventTemplate(T entity);
