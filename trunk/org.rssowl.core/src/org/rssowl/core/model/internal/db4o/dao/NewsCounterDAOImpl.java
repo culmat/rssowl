@@ -35,6 +35,19 @@ public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter
     super(NewsCounter.class, true);
   }
   
+  public final void delete() {
+    super.delete(load());
+  }
+  
+  @Override
+  public final void delete(NewsCounter newsCounter) {
+    if (!newsCounter.equals(load()))
+      throw new IllegalArgumentException("Only a single newsCounter should be used. " +
+      		"Trying to delete a non-existent one.");
+    
+    super.delete(newsCounter);
+  }
+  
   public final NewsCounter load() {
     Collection<NewsCounter> newsCounters = loadAll();
     if (newsCounters.isEmpty())
@@ -53,11 +66,11 @@ public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter
   }
   
   @Override
-  public final <C extends Collection<NewsCounter>> C saveAll(C entities)  {
+  public final void saveAll(Collection<NewsCounter> entities)  {
     if (entities.size() > 1) {
       throw new IllegalArgumentException("Only a single newsCounter can be stored");
     }
-    return super.saveAll(entities);
+    super.saveAll(entities);
   }
 
   @Override
