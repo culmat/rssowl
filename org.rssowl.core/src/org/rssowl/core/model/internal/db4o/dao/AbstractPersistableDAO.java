@@ -27,6 +27,9 @@ package org.rssowl.core.model.internal.db4o.dao;
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.internal.db4o.DBHelper;
+import org.rssowl.core.model.internal.db4o.DBManager;
+import org.rssowl.core.model.internal.db4o.DatabaseEvent;
+import org.rssowl.core.model.internal.db4o.DatabaseListener;
 import org.rssowl.core.model.persist.IPersistable;
 import org.rssowl.core.model.persist.dao.IPersistableDAO;
 
@@ -55,6 +58,16 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
     Assert.isNotNull(entityClass, "entityClass");
     fEntityClass = entityClass;
     fSaveFully = saveFully;
+    DBManager.getDefault().addEntityStoreListener(new DatabaseListener() {
+      public void databaseOpened(DatabaseEvent event) {
+        fDb = event.getObjectContainer();
+        fLock = event.getLock();
+        fWriteLock = fLock.writeLock();
+      }
+      public void databaseClosed(DatabaseEvent event) {
+        fDb = null;
+      }
+    });
   }
   
   public final Class<? extends T> getEntityClass()    {
@@ -121,7 +134,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
   /*
    * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#saveAll(C)
    */
-  public <C extends Collection<T>> C saveAll(C objects) {
+  public void saveAll(Collection<T> objects) {
     fWriteLock.lock();
     try {
       for (T object : objects) {
@@ -134,7 +147,6 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
       fWriteLock.unlock();
     }
     DBHelper.cleanUpAndFireEvents();
-    return objects;
   }
 
   protected void doSave(T entity) {
