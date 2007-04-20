@@ -187,13 +187,13 @@ public class Activator extends AbstractUIPlugin {
   @Override
   public void stop(BundleContext context) throws Exception {
 
-    //TODO Comment this code in
     /* Propagate shutdown to Controller */
-    //    SafeRunner.run(new LoggingSafeRunnable() {
-    //      public void run() throws Exception {
-    //        Controller.getDefault().shutdown();
-    //      }
-    //    });
+    SafeRunner.run(new LoggingSafeRunnable() {
+      public void run() throws Exception {
+        Controller.getDefault().shutdown();
+      }
+    });
+
     /* Proceed */
     super.stop(context);
     fgPlugin = null;
