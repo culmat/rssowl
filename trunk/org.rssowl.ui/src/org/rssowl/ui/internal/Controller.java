@@ -399,20 +399,6 @@ public class Controller {
       /* TODO Send state of proxy usage */
       properties.put(IConnectionPropertyConstants.USE_PROXY, false /* bookmark.isProxyUsed() */);
 
-      /* Load the Favicon now to show even on error */
-      if (OwlUI.getFavicon(bookmark) == null) {
-        try {
-          byte[] faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
-          OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK);
-        } catch (UnknownFeedException e) {
-          Activator.getDefault().getLog().log(e.getStatus());
-        }
-      }
-
-      /* Return on Cancelation or Shutdown */
-      if (monitor.isCanceled() || fShuttingDown)
-        return Status.CANCEL_STATUS;
-
       /* Load the Feed */
       final Pair<IFeed, IConditionalGet> pairResult = Owl.getConnectionService().reload(feedLink, monitor, properties);
 
@@ -424,6 +410,20 @@ public class Controller {
       boolean conditionalGetIsNull = (conditionalGet == null);
       conditionalGet = updateConditionalGet(feedLink, conditionalGet, pairResult.getSecond());
       boolean deleteConditionalGet = (!conditionalGetIsNull && conditionalGet == null);
+
+      /* Return on Cancelation or Shutdown */
+      if (monitor.isCanceled() || fShuttingDown)
+        return Status.CANCEL_STATUS;
+
+      /* Load the Favicon directly afterwards if required */
+      if (OwlUI.getFavicon(bookmark) == null) {
+        try {
+          byte[] faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
+          OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK);
+        } catch (UnknownFeedException e) {
+          Activator.getDefault().getLog().log(e.getStatus());
+        }
+      }
 
       /* Return on Cancelation or Shutdown */
       if (monitor.isCanceled() || fShuttingDown)
@@ -476,6 +476,16 @@ public class Controller {
       /* Feed's Content has not modified since */
       else if (e instanceof NotModifiedException) {
         return Status.OK_STATUS;
+      }
+
+      /* Load the Favicon directly afterwards if required */
+      else if ((e instanceof InterpreterException || e instanceof ParserException) && OwlUI.getFavicon(bookmark) == null && !fShuttingDown) {
+        try {
+          byte[] faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
+          OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK);
+        } catch (UnknownFeedException exe) {
+          Activator.getDefault().getLog().log(exe.getStatus());
+        }
       }
 
       return createErrorStatus(e.getStatus(), bookmark, feedLink);
