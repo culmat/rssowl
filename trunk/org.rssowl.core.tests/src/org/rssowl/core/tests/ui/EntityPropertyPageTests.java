@@ -46,7 +46,7 @@ import java.util.Set;
 
 /**
  * Tests about contributing Entity-Property-Pages
- * 
+ *
  * @author bpasero
  */
 public class EntityPropertyPageTests implements IEntityPropertyPage {
@@ -155,4 +155,6 @@ public class EntityPropertyPageTests implements IEntityPropertyPage {
   public boolean performOk(Set<IEntity> entitiesToSave) {
     return false;
   }
+
+  public void setFocus() {}
 }
