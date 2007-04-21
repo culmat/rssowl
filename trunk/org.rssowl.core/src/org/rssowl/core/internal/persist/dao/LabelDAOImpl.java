@@ -21,25 +21,28 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o;
+package org.rssowl.core.internal.persist.dao;
 
-public final class Counter {
-  private long fValue;
-  
-  public Counter() {
-    // Default constructor
-  }
-  
-  public long increment(int amount) {
-    fValue += amount;
-    return fValue;
-  }
-  
-  public final long getValue() {
-    return fValue;
+import org.rssowl.core.internal.persist.Label;
+import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.dao.ILabelDAO;
+import org.rssowl.core.persist.events.LabelEvent;
+import org.rssowl.core.persist.events.LabelListener;
+
+public final class LabelDAOImpl extends AbstractEntityDAO<ILabel, LabelListener,
+    LabelEvent> implements ILabelDAO {
+
+  public LabelDAOImpl() {
+    super(Label.class, false);
   }
 
-  public void setValue(long value) {
-    this.fValue = value;
+  @Override
+  protected final LabelEvent createDeleteEventTemplate(ILabel entity) {
+    return createSaveEventTemplate(entity);
+  }
+
+  @Override
+  protected final LabelEvent createSaveEventTemplate(ILabel entity) {
+    return new LabelEvent(entity, true);
   }
 }

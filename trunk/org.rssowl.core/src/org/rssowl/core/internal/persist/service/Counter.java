@@ -21,27 +21,25 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o;
+package org.rssowl.core.internal.persist.service;
 
-import com.db4o.ObjectContainer;
-
-import java.util.concurrent.locks.ReadWriteLock;
-
-public final class DatabaseEvent {
+public final class Counter {
+  private long fValue;
   
-  private final ObjectContainer fObjectContainer;
-  private final ReadWriteLock fLock;
-  
-  public DatabaseEvent(ObjectContainer objectContainer, ReadWriteLock lock) {
-    fObjectContainer = objectContainer;
-    fLock = lock;
+  public Counter() {
+    // Default constructor
   }
   
-  public final ObjectContainer getObjectContainer() {
-    return fObjectContainer;
+  public long increment(int amount) {
+    fValue += amount;
+    return fValue;
   }
   
-  public final ReadWriteLock getLock() {
-    return fLock;
+  public final long getValue() {
+    return fValue;
+  }
+
+  public void setValue(long value) {
+    this.fValue = value;
   }
 }

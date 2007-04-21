@@ -21,43 +21,51 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o.dao;
+package org.rssowl.core.internal.persist.dao;
 
-import org.rssowl.core.internal.persist.Attachment;
-import org.rssowl.core.model.internal.db4o.DBHelper;
-import org.rssowl.core.persist.IAttachment;
-import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.dao.IAttachmentDAO;
-import org.rssowl.core.persist.events.AttachmentEvent;
-import org.rssowl.core.persist.events.AttachmentListener;
-import org.rssowl.core.persist.events.NewsEvent;
+import org.rssowl.core.internal.persist.Feed;
+import org.rssowl.core.internal.persist.service.DBHelper;
+import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.dao.IFeedDAO;
+import org.rssowl.core.persist.events.FeedEvent;
+import org.rssowl.core.persist.events.FeedListener;
+import org.rssowl.core.persist.reference.FeedReference;
 
-public final class AttachmentDAOImpl extends AbstractEntityDAO<IAttachment,
-    AttachmentListener, AttachmentEvent> implements IAttachmentDAO  {
+import java.net.URI;
 
-  public AttachmentDAOImpl() {
-    super(Attachment.class, false);
+public final class FeedDAOImpl extends AbstractEntityDAO<IFeed, FeedListener,
+    FeedEvent> implements IFeedDAO  {
+
+  public FeedDAOImpl() {
+    super(Feed.class, false);
+  }
+  
+  @Override
+  protected final void doSave(IFeed entity) {
+    DBHelper.saveFeed(fDb, entity);
   }
 
   @Override
-  protected final AttachmentEvent createDeleteEventTemplate(IAttachment entity) {
+  protected final FeedEvent createDeleteEventTemplate(IFeed entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final AttachmentEvent createSaveEventTemplate(IAttachment entity) {
-    return new AttachmentEvent(entity, true);
+  protected final FeedEvent createSaveEventTemplate(IFeed entity) {
+    return new FeedEvent(entity, true);
   }
-  
-  @Override
-  public final void doDelete(IAttachment entity) {
-    //TODO Not sure about this, but let's do it for now to help us track a bug
-    //in NewsService where never having a newsUpdated with a null oldNews is
-    //helpful
-    INews news = entity.getNews();
-    INews oldNews = fDb.ext().peekPersisted(news, 2, true);
-    NewsEvent newsEvent = new NewsEvent(oldNews, news, false);
-    DBHelper.putEventTemplate(newsEvent);
-    super.doDelete(entity);
+
+  public final Feed load(URI link) {
+    return DBHelper.loadFeed(fDb, link, Integer.MAX_VALUE);
+  }
+
+  // FIXME Not sure if this makes sense anymore. If we decide to keep it, try
+  // to make it more efficient
+  public final FeedReference loadReference(URI link) {
+    IFeed feed = DBHelper.loadFeed(fDb, link, null);
+    if (feed == null) {
+      return null;
+    }
+    return new FeedReference(feed.getId());
   }
 }

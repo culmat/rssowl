@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.model.internal.db4o;
+package org.rssowl.core.internal.persist.service;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;

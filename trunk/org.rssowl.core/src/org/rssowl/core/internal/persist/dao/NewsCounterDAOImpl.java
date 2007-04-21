@@ -21,28 +21,64 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o.dao;
+package org.rssowl.core.internal.persist.dao;
 
-import org.rssowl.core.internal.persist.SearchMark;
-import org.rssowl.core.persist.ISearchMark;
-import org.rssowl.core.persist.dao.ISearchMarkDAO;
-import org.rssowl.core.persist.events.SearchMarkEvent;
-import org.rssowl.core.persist.events.SearchMarkListener;
+import org.rssowl.core.persist.NewsCounter;
+import org.rssowl.core.persist.dao.INewsCounterDAO;
 
-public final class SearchMarkDAOImpl extends AbstractEntityDAO<ISearchMark,
-    SearchMarkListener, SearchMarkEvent> implements ISearchMarkDAO    {
+import java.util.Collection;
 
-  public SearchMarkDAOImpl() {
-    super(SearchMark.class, false);
+public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter>
+    implements INewsCounterDAO  {
+
+  public NewsCounterDAOImpl() {
+    super(NewsCounter.class, true);
+  }
+  
+  public final void delete() {
+    super.delete(load());
   }
   
   @Override
-  protected final SearchMarkEvent createDeleteEventTemplate(ISearchMark entity) {
-    return createSaveEventTemplate(entity);
+  public final void delete(NewsCounter newsCounter) {
+    if (!newsCounter.equals(load()))
+      throw new IllegalArgumentException("Only a single newsCounter should be used. " +
+      		"Trying to delete a non-existent one.");
+    
+    super.delete(newsCounter);
+  }
+  
+  public final NewsCounter load() {
+    Collection<NewsCounter> newsCounters = loadAll();
+    if (newsCounters.isEmpty())
+      return null;
+    
+    if (newsCounters.size() > 1)
+      throw new IllegalStateException("Only one NewsCounter should exist, but " +
+          "there are: " + newsCounters.size());
+    
+    return newsCounters.iterator().next();
+  }
+  
+  @Override
+  public final NewsCounter load(long id) {
+    throw new UnsupportedOperationException();
+  }
+  
+  @Override
+  public final void saveAll(Collection<NewsCounter> entities)  {
+    if (entities.size() > 1) {
+      throw new IllegalArgumentException("Only a single newsCounter can be stored");
+    }
+    super.saveAll(entities);
   }
 
   @Override
-  protected final SearchMarkEvent createSaveEventTemplate(ISearchMark entity) {
-    return new SearchMarkEvent(entity, null, true);
+  protected final void doSave(NewsCounter entity) {
+    if (!fDb.ext().isStored(entity) && (load() != null))
+      throw new IllegalArgumentException("Only a single newsCounter can be stored");
+    
+    super.doSave(entity);
   }
+
 }

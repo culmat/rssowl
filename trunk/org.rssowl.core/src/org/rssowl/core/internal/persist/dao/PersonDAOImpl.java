@@ -21,48 +21,50 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o.dao;
+package org.rssowl.core.internal.persist.dao;
 
-import org.rssowl.core.internal.persist.BookMark;
-import org.rssowl.core.persist.IBookMark;
-import org.rssowl.core.persist.dao.IBookMarkDAO;
-import org.rssowl.core.persist.events.BookMarkEvent;
-import org.rssowl.core.persist.events.BookMarkListener;
-import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.internal.persist.Person;
+import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.dao.IPersonDAO;
+import org.rssowl.core.persist.events.PersonEvent;
+import org.rssowl.core.persist.events.PersonListener;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.StringUtils;
 
-import com.db4o.ObjectSet;
 import com.db4o.ext.Db4oException;
-import com.db4o.query.Query;
 
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Set;
+import java.util.TreeSet;
 
-public final class BookMarkDAOImpl extends AbstractEntityDAO<IBookMark, BookMarkListener,
-    BookMarkEvent> implements IBookMarkDAO  {
+public class PersonDAOImpl extends AbstractEntityDAO<IPerson, PersonListener,
+    PersonEvent> implements IPersonDAO  {
 
-  public BookMarkDAOImpl() {
-    super(BookMark.class, false);
+  public PersonDAOImpl() {
+    super(Person.class, false);
   }
-
+  
   @Override
-  protected final BookMarkEvent createDeleteEventTemplate(IBookMark entity) {
+  protected PersonEvent createDeleteEventTemplate(IPerson entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final BookMarkEvent createSaveEventTemplate(IBookMark entity) {
-    return new BookMarkEvent(entity, null, true);
+  protected final PersonEvent createSaveEventTemplate(IPerson entity) {
+    return new PersonEvent(entity, true);
   }
 
-  public final Collection<IBookMark> loadAll(FeedLinkReference feedRef) {
+  public Set<String> loadAllNames() {
     try {
-      Query query = fDb.query();
-      query.constrain(fEntityClass);
-      query.descend("fFeedLink").constrain(feedRef.getLink().toString()); //$NON-NLS-1$
-      ObjectSet<IBookMark> marks = getObjectSet(query);
-      activateAll(marks);
-      return new ArrayList<IBookMark>(marks);
+      Set<String> strings = new TreeSet<String>();
+      for (IPerson person : loadAll()) {
+        String name = StringUtils.safeTrim(person.getName());
+        if (StringUtils.isSet(name))
+          strings.add(name);
+        else if (person.getEmail() != null)
+          strings.add(person.getEmail().toString());
+      }
+
+      return strings;
     } catch (Db4oException e) {
       throw new PersistenceException(e);
     }

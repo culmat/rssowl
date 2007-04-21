@@ -18,7 +18,7 @@
    <extension-point id="DAOFactory" name="DAO Factory" schema="schema/DAOFactory.exsd"/>
    <extension
          point="org.rssowl.core.PersistenceService">
-      <persistanceservice class="org.rssowl.core.model.internal.db4o.PersistenceServiceImpl"/>
+      <persistanceservice class="org.rssowl.core.internal.persist.service.PersistenceServiceImpl"/>
    </extension>
    <extension
          point="org.rssowl.core.ApplicationService">
@@ -27,7 +27,7 @@
    <extension
          point="org.rssowl.core.IDGenerator">
       <idgenerator
-            class="org.rssowl.core.model.internal.db4o.DB4OIDGenerator">
+            class="org.rssowl.core.internal.persist.service.DB4OIDGenerator">
       </idgenerator>
    </extension>
 	<extension
@@ -97,7 +97,7 @@
    <extension
          point="org.rssowl.core.DAOFactory">
       <daofactory
-            class="org.rssowl.core.model.internal.db4o.dao.DAOServiceImpl">
+            class="org.rssowl.core.internal.persist.dao.DAOServiceImpl">
       </daofactory>
    </extension>
 </plugin>

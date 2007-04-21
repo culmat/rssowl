@@ -21,11 +21,11 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o.dao;
+package org.rssowl.core.internal.persist.dao;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.internal.persist.Folder;
-import org.rssowl.core.model.internal.db4o.DBHelper;
+import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;

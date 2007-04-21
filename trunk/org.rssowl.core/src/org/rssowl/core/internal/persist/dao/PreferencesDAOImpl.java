@@ -21,14 +21,14 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o.dao;
+package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.Preference;
 import org.rssowl.core.internal.persist.pref.Preference.Type;
-import org.rssowl.core.model.internal.db4o.DBManager;
-import org.rssowl.core.model.internal.db4o.DatabaseEvent;
-import org.rssowl.core.model.internal.db4o.DatabaseListener;
+import org.rssowl.core.internal.persist.service.DBManager;
+import org.rssowl.core.internal.persist.service.DatabaseEvent;
+import org.rssowl.core.internal.persist.service.DatabaseListener;
 import org.rssowl.core.persist.dao.IPreferencesDAO;
 import org.rssowl.core.persist.pref.PreferencesEvent;
 import org.rssowl.core.persist.service.PersistenceException;
