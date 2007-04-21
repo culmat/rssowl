@@ -35,7 +35,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IApplicationLayer;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.BookMarkAdapter;
 import org.rssowl.core.model.events.BookMarkEvent;
@@ -89,19 +88,16 @@ import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.ISource;
 import org.rssowl.core.model.persist.INews.State;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
+import org.rssowl.core.model.persist.dao.IConditionalGetDAO;
+import org.rssowl.core.model.persist.dao.IFeedDAO;
+import org.rssowl.core.model.persist.dao.INewsDAO;
 import org.rssowl.core.model.persist.search.ISearchCondition;
 import org.rssowl.core.model.persist.search.ISearchField;
 import org.rssowl.core.model.persist.search.SearchSpecifier;
-import org.rssowl.core.model.reference.BookMarkReference;
-import org.rssowl.core.model.reference.CategoryReference;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FeedReference;
-import org.rssowl.core.model.reference.FolderReference;
-import org.rssowl.core.model.reference.LabelReference;
 import org.rssowl.core.model.reference.NewsReference;
-import org.rssowl.core.model.reference.PersonReference;
-import org.rssowl.core.model.reference.SearchConditionReference;
-import org.rssowl.core.model.reference.SearchMarkReference;
 import org.rssowl.core.tests.TestUtils;
 
 import com.db4o.ObjectContainer;
@@ -123,7 +119,6 @@ public class DBManagerTest {
 
   private static final String NOT_IDENTICAL_MESSAGE = "Item in the database is not identical to initial item.";
   private IModelFactory fTypesFactory;
-  private IModelDAO fModelDAO;
   private IApplicationLayer fAppLayer;
   private ObjectContainer fDb;
 
@@ -135,7 +130,6 @@ public class DBManagerTest {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
     fTypesFactory = Owl.getModelFactory();
-    fModelDAO = Owl.getPersistenceService().getModelDAO();
     fAppLayer = Owl.getPersistenceService().getApplicationLayer();
     fDb = DBManager.getDefault().getObjectContainer();
   }
@@ -148,16 +142,16 @@ public class DBManagerTest {
   public void testDeleteSearchCondition() {
     IFolder folder = fTypesFactory.createFolder(null, null, "Folder");
     ISearchMark searchMark = fTypesFactory.createSearchMark(null, folder, "Mark");
-    fModelDAO.saveFolder(folder);
+    DynamicDAO.save(folder);
     ISearchField searchField = fTypesFactory.createSearchField(0, "SomeEntity");
     ISearchCondition searchCondition = fTypesFactory.createSearchCondition(null,
         searchMark, searchField, SearchSpecifier.BEGINS_WITH, "value");
-    fModelDAO.saveSearchMark(searchMark);
-    assertNotNull(fModelDAO.loadSearchCondition(searchCondition.getId()));
+    DynamicDAO.save(searchMark);
+    assertNotNull(DynamicDAO.load(ISearchCondition.class, searchCondition.getId()));
     long searchFieldId = fDb.ext().getID(searchCondition.getField());
     assertNotNull(fDb.ext().getByID(searchFieldId));
-    fModelDAO.deleteSearchCondition(new SearchConditionReference(searchCondition.getId()));
-    assertNull(fModelDAO.loadSearchCondition(searchCondition.getId()));
+    DynamicDAO.delete(searchCondition);
+    assertNull(DynamicDAO.load(ISearchCondition.class, searchCondition.getId()));
     assertNull(fDb.ext().getByID(searchFieldId));
     assertEquals(0, searchMark.getSearchConditions().size());
   }
@@ -173,19 +167,19 @@ public class DBManagerTest {
     ISearchField searchField = fTypesFactory.createSearchField(0, "SomeEntity");
     ISearchCondition searchCondition = fTypesFactory.createSearchCondition(null,
         searchMark, searchField, SearchSpecifier.BEGINS_WITH, "value");
-    fModelDAO.saveFolder(folder);
-    assertNotNull(fModelDAO.loadSearchMark(searchMark.getId()));
-    assertNotNull(fModelDAO.loadSearchCondition(searchCondition.getId()));
+    DynamicDAO.save(folder);
+    assertNotNull(DynamicDAO.load(ISearchMark.class, searchMark.getId()));
+    assertNotNull(DynamicDAO.load(ISearchCondition.class, searchCondition.getId()));
     long searchFieldId = fDb.ext().getID(searchCondition.getField());
     assertNotNull(fDb.ext().getByID(searchFieldId));
-    fModelDAO.deleteSearchMark(new SearchMarkReference(searchMark.getId()));
-    assertNull(fModelDAO.loadSearchMark(searchMark.getId()));
-    assertNull(fModelDAO.loadSearchCondition(searchCondition.getId()));
+    DynamicDAO.delete(searchMark);
+    assertNull(DynamicDAO.load(ISearchMark.class, searchMark.getId()));
+    assertNull(DynamicDAO.load(ISearchCondition.class, searchCondition.getId()));
     assertNull(fDb.ext().getByID(searchFieldId));
   }
 
   private ICategory createFeedCategory() throws PersistenceException {
-    IFeed feed = fModelDAO.saveFeed(createFeed());
+    IFeed feed = DynamicDAO.save(createFeed());
     ICategory category = fTypesFactory.createCategory(null, feed);
     category.setName("categoryName");
     category.setDomain("some/domain");
@@ -194,8 +188,8 @@ public class DBManagerTest {
   }
 
   private ICategory createNewsCategory() throws PersistenceException {
-    IFeed feed = fModelDAO.saveFeed(createFeed());
-    INews news = fModelDAO.saveNews(createNews(feed));
+    IFeed feed = DynamicDAO.save(createFeed());
+    INews news = DynamicDAO.save(createNews(feed));
     ICategory category = fTypesFactory.createCategory(null, news);
     category.setName("categoryName");
     category.setDomain("some/domain");
@@ -204,12 +198,12 @@ public class DBManagerTest {
   }
 
   private IBookMark createBookMark() throws PersistenceException {
-    IFolder folder = fModelDAO.saveFolder(createFolder());
+    IFolder folder = DynamicDAO.save(createFolder());
     return createBookMark(folder);
   }
 
   private ISearchMark createSearchMark() throws PersistenceException {
-    IFolder folder = fModelDAO.saveFolder(createFolder());
+    IFolder folder = DynamicDAO.save(createFolder());
     return createSearchMark(folder);
   }
 
@@ -217,7 +211,7 @@ public class DBManagerTest {
     IFeed feed = createFeed();
     IFeed savedFeed = fAppLayer.loadFeed(feed.getLink());
     if (savedFeed == null)
-      savedFeed = fModelDAO.saveFeed(feed);
+      savedFeed = DynamicDAO.save(feed);
 
     IBookMark bookMark = fTypesFactory.createBookMark(null, folder, new FeedLinkReference(savedFeed.getLink()), "Default bookmark");
     bookMark.setLastVisitDate(createDate());
@@ -269,30 +263,30 @@ public class DBManagerTest {
           assertTrue(updatedJohn[0].isIdentical(dbPerson));
         }
       };
-      Owl.getListenerService().addPersonListener(personListener);
-      long savedJohnId = fModelDAO.savePerson(initialJohn).getId().longValue();
+      DynamicDAO.addEntityListener(IPerson.class, personListener);
+      long savedJohnId = DynamicDAO.save(initialJohn).getId().longValue();
       System.gc();
-      IPerson savedJohn = fModelDAO.loadPerson(savedJohnId);
+      IPerson savedJohn = DynamicDAO.load(IPerson.class, savedJohnId);
       initialJohn.setId(savedJohn.getId());
       assertTrue(initialJohn.isIdentical(savedJohn));
       URI oldJohnEmail = savedJohn.getEmail();
       IPerson dan = createPersonDan(feed);
       dan.setEmail(oldJohnEmail);
-      Owl.getListenerService().removePersonListener(personListener);
-      fModelDAO.savePerson(dan);
+      DynamicDAO.removeEntityListener(IPerson.class, personListener);
+      DynamicDAO.save(dan);
       savedJohn.setEmail(createURI("anewemailaddress@gmail.com"));
       updatedJohn[0] = (Person) savedJohn;
-      Owl.getListenerService().addPersonListener(personListener);
-      fModelDAO.savePerson(savedJohn);
+      DynamicDAO.addEntityListener(IPerson.class, personListener);
+      DynamicDAO.save(savedJohn);
       assertTrue(personAddedCalled[0]);
       assertTrue(personUpdatedCalled[0]);
-      fModelDAO.deletePerson(new PersonReference(updatedJohn[0].getId()));
+      DynamicDAO.delete(updatedJohn[0]);
 
     } catch (PersistenceException e) {
       fail(e.getMessage());
     } finally {
       if (personListener != null) {
-        Owl.getListenerService().removePersonListener(personListener);
+        DynamicDAO.removeEntityListener(IPerson.class, personListener);
       }
     }
 
@@ -305,7 +299,7 @@ public class DBManagerTest {
    */
   @Test
   public void testNewsMergeLink() throws Exception {
-    IFeed feed = fModelDAO.saveFeed(createFeed());
+    IFeed feed = DynamicDAO.save(createFeed());
     INews news = fTypesFactory.createNews(null, feed, new Date());
     news.setLink(createURI("http://www.uri.com"));
 
@@ -329,7 +323,7 @@ public class DBManagerTest {
    */
   @Test
   public void testNewsSetLink() throws Exception {
-    IFeed feed = fModelDAO.saveFeed(createFeed());
+    IFeed feed = DynamicDAO.save(createFeed());
     INews news = fTypesFactory.createNews(null, feed, new Date());
     URI uri = createURI("http://uri.com");
     news.setLink(uri);
@@ -354,14 +348,14 @@ public class DBManagerTest {
   @Test
   public void testDeleteNews() throws PersistenceException {
     IFeed feed = createFeed();
-    feed = fModelDAO.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
     INews news = createNews(feed);
-    news = fModelDAO.saveNews(news);
+    news = DynamicDAO.save(news);
     Long newsId = news.getId();
-    fModelDAO.deleteNews(new NewsReference(newsId));
-    feed = fModelDAO.loadFeed(feed.getId());
+    DynamicDAO.delete(new NewsReference(newsId).resolve());
+    feed = DynamicDAO.load(IFeed.class, feed.getId());
     assertEquals(0, feed.getNews().size());
-    assertNull(fModelDAO.loadNews(newsId));
+    assertNull(DynamicDAO.load(INews.class, newsId));
   }
 
   /**
@@ -372,14 +366,14 @@ public class DBManagerTest {
     try {
       // Save root folders
       IFolder folder1 = createFolder();
-      folder1 = fModelDAO.saveFolder(folder1);
+      folder1 = DynamicDAO.save(folder1);
 
       IFolder folder2 = fTypesFactory.createFolder(null, null, "AnotherFolder");
-      folder2 = fModelDAO.saveFolder(folder2);
+      folder2 = DynamicDAO.save(folder2);
 
       // Save non-root folder
       IFolder nonRootFolder = createFolderWithParent();
-      fModelDAO.saveFolder(nonRootFolder);
+      DynamicDAO.save(nonRootFolder);
 
       List<IFolder> rootFolderRefs = fAppLayer.loadRootFolders();
       assertEquals(3, rootFolderRefs.size());
@@ -400,8 +394,8 @@ public class DBManagerTest {
   public void testAddAndDeleteBookMark() {
     try {
       IBookMark bookMark = createBookMark();
-      bookMark = fModelDAO.saveBookMark(bookMark);
-      fModelDAO.deleteBookMark(new BookMarkReference(bookMark.getId()));
+      bookMark = DynamicDAO.save(bookMark);
+      DynamicDAO.delete(bookMark);
     } catch (PersistenceException e) {
       fail(e.getMessage());
     }
@@ -415,8 +409,8 @@ public class DBManagerTest {
   public void testAddAndDeleteFeedCategory() {
     try {
       ICategory category = createFeedCategory();
-      ICategory savedCategory = fModelDAO.saveCategory(category);
-      fModelDAO.deleteCategory(new CategoryReference(savedCategory.getId()));
+      ICategory savedCategory = DynamicDAO.save(category);
+      DynamicDAO.delete(savedCategory);
     } catch (PersistenceException e) {
       fail(e.getMessage());
     }
@@ -430,8 +424,8 @@ public class DBManagerTest {
   public void testAddAndDeleteNewsCategory() {
     try {
       ICategory category = createNewsCategory();
-      ICategory savedCategory = fModelDAO.saveCategory(category);
-      fModelDAO.deleteCategory(new CategoryReference(savedCategory.getId()));
+      ICategory savedCategory = DynamicDAO.save(category);
+      DynamicDAO.delete(savedCategory);
     } catch (PersistenceException e) {
       fail(e.getMessage());
     }
@@ -445,7 +439,7 @@ public class DBManagerTest {
   // public void testAddAndGetFeedCategory() {
   // try {
   // Category category = (Category) createFeedCategory();
-  // CategoryReference ref = fModelDAO.saveCategory(category);
+  // CategoryReference ref = DynamicDAO.save(category);
   // List<ICategory> categories = fModelDAO.loadCategories();
   // assertEquals(1, categories.size());
   // category.setId(categories.get(0).getId());
@@ -511,23 +505,23 @@ public class DBManagerTest {
           assertTrue(updatedLabel[0].isIdentical(dbLabel));
         }
       };
-      Owl.getListenerService().addLabelListener(labelListener);
-      long savedLabelId = fModelDAO.saveLabel(initialLabel).getId().longValue();
+      DynamicDAO.addEntityListener(ILabel.class, labelListener);
+      long savedLabelId = DynamicDAO.save(initialLabel).getId().longValue();
       System.gc();
-      ILabel dbLabel = fModelDAO.loadLabel(savedLabelId);
+      ILabel dbLabel = DynamicDAO.load(ILabel.class, savedLabelId);
       initialLabel.setId(dbLabel.getId());
       assertTrue(initialLabel.isIdentical(dbLabel));
       dbLabel.setColor("255,255,137");
       updatedLabel[0] = (Label) dbLabel;
-      fModelDAO.saveLabel(dbLabel);
+      DynamicDAO.save(dbLabel);
       assertTrue(labelAddedCalled[0]);
       assertTrue(labelUpdatedCalled[0]);
-      fModelDAO.deleteLabel(new LabelReference(updatedLabel[0].getId()));
+      DynamicDAO.delete(updatedLabel[0]);
     } catch (PersistenceException e) {
       fail(e.getMessage());
     } finally {
       if (labelListener != null) {
-        Owl.getListenerService().removeLabelListener(labelListener);
+        DynamicDAO.removeEntityListener(ILabel.class, labelListener);
       }
     }
 
@@ -561,7 +555,7 @@ public class DBManagerTest {
             assertTrue(initialCategory[0].isIdentical(dbCategory));
             dbCategory.setDomain("newDomain/newDomain");
             updatedCategory[0] = dbCategory;
-            fModelDAO.saveCategory(dbCategory);
+            DynamicDAO.save(dbCategory);
           } catch (PersistenceException e) {
             fail(e.getMessage());
           }
@@ -575,16 +569,16 @@ public class DBManagerTest {
           assertTrue(updatedCategory[0].isIdentical(dbCategory));
         }
       };
-      Owl.getListenerService().addCategoryListener(categoryListener);
-      fModelDAO.saveCategory(initialCategory[0]);
+      DynamicDAO.addEntityListener(ICategory.class, categoryListener);
+      DynamicDAO.save(initialCategory[0]);
       assertTrue(categoryAddedCalled[0]);
       assertTrue(categoryUpdatedCalled[0]);
-      fModelDAO.deleteCategory(new CategoryReference(updatedCategory[0].getId()));
+      DynamicDAO.delete(updatedCategory[0]);
     } catch (PersistenceException e) {
       fail(e.getMessage());
     } finally {
       if (categoryListener != null) {
-        Owl.getListenerService().removeCategoryListener(categoryListener);
+        DynamicDAO.removeEntityListener(ICategory.class, categoryListener);
       }
     }
   }
@@ -612,7 +606,7 @@ public class DBManagerTest {
               dbFolder.setBlogrollLink(createURI("http://www.newuri.com"));
               dbFolder.setName("New name");
               updatedFolder[0] = dbFolder;
-              fModelDAO.saveFolder(dbFolder);
+              DynamicDAO.save(dbFolder);
             } catch (PersistenceException e) {
               fail(e.getMessage());
             }
@@ -628,23 +622,23 @@ public class DBManagerTest {
           }
         }
       };
-      Owl.getListenerService().addFolderListener(folderListener);
-      fModelDAO.saveFolder(initialFolder);
+      DynamicDAO.addEntityListener(IFolder.class, folderListener);
+      DynamicDAO.save(initialFolder);
       assertTrue(folderAddedCalled[0]);
       assertTrue(folderUpdatedCalled[0]);
-      fModelDAO.deleteFolder(new FolderReference(updatedFolder[0].getId()));
+      DynamicDAO.delete(updatedFolder[0]);
     } catch (PersistenceException e) {
       fail(e.getMessage());
     } finally {
       if (folderListener != null) {
-        Owl.getListenerService().removeFolderListener(folderListener);
+        DynamicDAO.removeEntityListener(IFolder.class, folderListener);
       }
     }
   }
 
   private IFolder createFolderWithParent() throws PersistenceException {
     IFolder parentFolder = createFolder();
-    parentFolder = fModelDAO.saveFolder(parentFolder);
+    parentFolder = DynamicDAO.save(parentFolder);
     IFolder folder = fTypesFactory.createFolder(null, parentFolder, "MainFolder");
     folder.setBlogrollLink(createURI("http://www.rssowl.com"));
     folder.setProperty("skey", "svalue");
@@ -681,7 +675,7 @@ public class DBManagerTest {
               assertTrue(initialFolder[0].isIdentical(dbFolder));
               dbFolder.setBlogrollLink(createURI("http://www.newuri.com"));
               updatedFolder[0] = dbFolder;
-              fModelDAO.saveFolder(dbFolder);
+              DynamicDAO.save(dbFolder);
             } catch (PersistenceException e) {
               fail(e.getMessage());
             }
@@ -701,16 +695,16 @@ public class DBManagerTest {
           }
         }
       };
-      Owl.getListenerService().addFolderListener(folderListener);
-      fModelDAO.saveFolder(initialFolder[0]);
+      DynamicDAO.addEntityListener(IFolder.class, folderListener);
+      DynamicDAO.save(initialFolder[0]);
       assertTrue(folderAddedCalled[0]);
       assertTrue(folderUpdatedCalled[0]);
-      fModelDAO.deleteFolder(new FolderReference(updatedFolder[0].getId()));
+      DynamicDAO.delete(updatedFolder[0]);
     } catch (PersistenceException e) {
       fail(e.getMessage());
     } finally {
       if (folderListener != null) {
-        Owl.getListenerService().removeFolderListener(folderListener);
+        DynamicDAO.removeEntityListener(IFolder.class, folderListener);
       }
     }
   }
@@ -743,13 +737,13 @@ public class DBManagerTest {
           }
         }
       };
-      Owl.getListenerService().addFolderListener(folderListener);
-      fModelDAO.saveFolder(initialFolder[0]);
+      DynamicDAO.addEntityListener(IFolder.class, folderListener);
+      DynamicDAO.save(initialFolder[0]);
     } catch (PersistenceException e) {
       fail(e.getMessage());
     } finally {
       if (folderListener != null) {
-        Owl.getListenerService().removeFolderListener(folderListener);
+        DynamicDAO.removeEntityListener(IFolder.class, folderListener);
       }
     }
   }
@@ -797,8 +791,8 @@ public class DBManagerTest {
    */
   @Test(expected = IllegalArgumentException.class)
   public void testSaveFeedTwice() throws PersistenceException {
-    fModelDAO.saveFeed(createFeed());
-    fModelDAO.saveFeed(createFeed());
+    DynamicDAO.save(createFeed());
+    DynamicDAO.save(createFeed());
   }
 
   /**
@@ -808,9 +802,9 @@ public class DBManagerTest {
   @Test
   public void testSaveFeedTwiceAfterMerging() {
     try {
-      IFeed savedFeed = fModelDAO.saveFeed(createFeed());
+      IFeed savedFeed = DynamicDAO.save(createFeed());
       savedFeed.merge(createFeed());
-      fModelDAO.saveFeed(savedFeed);
+      DynamicDAO.save(savedFeed);
     } catch (PersistenceException e) {
       TestUtils.fail(e);
     }
@@ -838,7 +832,7 @@ public class DBManagerTest {
             assertTrue(initialBookMark.isIdentical(dbBookMark));
             dbBookMark.setName("Another name");
             updatedBookMark[0] = dbBookMark;
-            fModelDAO.saveBookMark(dbBookMark);
+            DynamicDAO.save(dbBookMark);
           } catch (PersistenceException e) {
             fail(e.getMessage());
           }
@@ -852,8 +846,8 @@ public class DBManagerTest {
           assertTrue(updatedBookMark[0].isIdentical(dbBookMark));
         }
       };
-      Owl.getListenerService().addBookMarkListener(bookMarkListener);
-      fModelDAO.saveBookMark(initialBookMark);
+      DynamicDAO.addEntityListener(IBookMark.class, bookMarkListener);
+      DynamicDAO.save(initialBookMark);
       assertTrue(bookMarkAddedCalled[0]);
       assertTrue(bookMarkUpdatedCalled[0]);
     } catch (PersistenceException e) {
@@ -862,7 +856,7 @@ public class DBManagerTest {
 
     finally {
       if (bookMarkListener != null) {
-        Owl.getListenerService().removeBookMarkListener(bookMarkListener);
+        DynamicDAO.removeEntityListener(IBookMark.class, bookMarkListener);
       }
     }
   }
@@ -889,7 +883,7 @@ public class DBManagerTest {
             assertTrue(initialSearchMark.isIdentical(dbSearchMark));
             dbSearchMark.setName("Another name");
             updatedSearchMark[0] = dbSearchMark;
-            fModelDAO.saveSearchMark(dbSearchMark);
+            DynamicDAO.save(dbSearchMark);
           } catch (PersistenceException e) {
             fail(e.getMessage());
           }
@@ -903,8 +897,8 @@ public class DBManagerTest {
           assertTrue(updatedSearchMark[0].isIdentical(dbSearchMark));
         }
       };
-      Owl.getListenerService().addSearchMarkListener(searchMarkListener);
-      fModelDAO.saveSearchMark(initialSearchMark);
+      DynamicDAO.addEntityListener(ISearchMark.class, searchMarkListener);
+      DynamicDAO.save(initialSearchMark);
       assertTrue(searchMarkAddedCalled[0]);
       assertTrue(searchMarkUpdatedCalled[0]);
     } catch (PersistenceException e) {
@@ -913,7 +907,7 @@ public class DBManagerTest {
 
     finally {
       if (searchMarkListener != null) {
-        Owl.getListenerService().removeSearchMarkListener(searchMarkListener);
+        DynamicDAO.removeEntityListener(ISearchMark.class, searchMarkListener);
       }
     }
   }
@@ -942,10 +936,10 @@ public class DBManagerTest {
       for (IAttachment attachment : attachments)
         news.removeAttachment(attachment);
 
-      fModelDAO.saveFeed(feed);
+      DynamicDAO.save(feed);
       NewsReference newsRef = new NewsReference(feed.getNews().get(0).getId());
       fTypesFactory.createAttachment(null, news);
-      fModelDAO.saveFeed(feed);
+      DynamicDAO.save(feed);
       feed = null;
       news = null;
       System.gc();
@@ -958,11 +952,11 @@ public class DBManagerTest {
           assertEquals(1, attachmentsSize);
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
-      fModelDAO.saveNews(newsRef.resolve());
+      DynamicDAO.addEntityListener(INews.class, newsListener);
+      DynamicDAO.save(newsRef.resolve());
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
 
@@ -973,7 +967,7 @@ public class DBManagerTest {
   public void testAddUpdateAndGetNews() {
     final IFeed feed;
     try {
-      feed = fModelDAO.saveFeed(createFeed());
+      feed = DynamicDAO.save(createFeed());
     } catch (PersistenceException e) {
       fail(e.getMessage());
       return;
@@ -1006,7 +1000,7 @@ public class DBManagerTest {
             dbNews.setDescription("The description has been changed in the news");
             dbNews.setState(State.UNREAD);
             updatedNews[0] = dbNews;
-            fModelDAO.saveNews(dbNews);
+            DynamicDAO.save(dbNews);
           } catch (PersistenceException e) {
             fail(e.getMessage());
           }
@@ -1020,34 +1014,34 @@ public class DBManagerTest {
           assertTrue(updatedNews[0].isIdentical(dbNews));
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
-      fModelDAO.saveNews(initialNews);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
+      DynamicDAO.save(initialNews);
       assertTrue(NewsAddedCalled[0]);
       assertTrue(NewsUpdatedCalled[0]);
-      fModelDAO.deleteNews(new NewsReference(updatedNews[0].getId()));
+      DynamicDAO.delete(updatedNews[0]);
     } catch (PersistenceException e) {
       fail(e.getMessage());
     } finally {
       if (newsListener != null) {
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
       }
     }
   }
 
   /**
-   * Tests that {@link IModelDAO#saveFeed(IFeed)} cascades the complex
+   * Tests that {@link IFeedDAO#save(IFeed)} cascades the complex
    * types of INews appropriately.
    */
   @Test
   public void testSaveFeedNewsCascadeWithGC() {
     IFeed feed = createFeed();
     INews news = createNews(feed);
-    fModelDAO.saveFeed(feed);
+    DynamicDAO.save(feed);
     String authorName = news.getAuthor().getName();
     URI attachmentLink = news.getAttachments().get(0).getLink();
     String categoryName = news.getCategories().get(0).getName();
     URI sourceLink = news.getSource().getLink();
-    fModelDAO.saveNews(news);
+    DynamicDAO.save(news);
     NewsReference newsRef = new NewsReference(news.getId());
     feed = null;
     news = null;
@@ -1059,7 +1053,7 @@ public class DBManagerTest {
     categoryName = categoryName + " changed";
     sourceLink = createURI(sourceLink.toString() + "/new");
     updateNews(authorName, attachmentLink, categoryName, sourceLink, news);
-    fModelDAO.saveFeed(news.getFeedReference().resolve());
+    DynamicDAO.save(news.getFeedReference().resolve());
     news = null;
     System.gc();
     news = newsRef.resolve();
@@ -1067,19 +1061,19 @@ public class DBManagerTest {
   }
 
   /**
-   * Tests that {@link IModelDAO#saveNews(INews)} cascades the complex
+   * Tests that {@link INewsDAO#save(INews)} cascades the complex
    * types appropriately.
    */
   @Test
   public void testSaveNewsCascadeWithGC() {
     IFeed feed = createFeed();
-    fModelDAO.saveFeed(feed);
+    DynamicDAO.save(feed);
     INews news = createNews(feed);
     String authorName = news.getAuthor().getName();
     URI attachmentLink = news.getAttachments().get(0).getLink();
     String categoryName = news.getCategories().get(0).getName();
     URI sourceLink = news.getSource().getLink();
-    fModelDAO.saveNews(news);
+    DynamicDAO.save(news);
     NewsReference newsRef = new NewsReference(news.getId());
     feed = null;
     news = null;
@@ -1091,7 +1085,7 @@ public class DBManagerTest {
     categoryName = categoryName + " changed";
     sourceLink = createURI(sourceLink.toString() + "/new");
     updateNews(authorName, attachmentLink, categoryName, sourceLink, news);
-    fModelDAO.saveNews(news);
+    DynamicDAO.save(news);
     news = null;
     System.gc();
     news = newsRef.resolve();
@@ -1105,7 +1099,7 @@ public class DBManagerTest {
   @Test
   public void testSaveNewsListCascadeWithGC() {
     IFeed feed = createFeed();
-    fModelDAO.saveFeed(feed);
+    DynamicDAO.save(feed);
     INews news = createNews(feed);
     String authorName = news.getAuthor().getName();
     URI attachmentLink = news.getAttachments().get(0).getLink();
@@ -1209,17 +1203,17 @@ public class DBManagerTest {
     IFeed feed = createFeed();
 
     /* Need to save this without the news first */
-    fModelDAO.saveFeed(feed);
+    DynamicDAO.save(feed);
 
     createNews(feed);
-    fModelDAO.saveFeed(feed);
+    DynamicDAO.save(feed);
 
     long feedId = feed.getId();
     feed = null;
     System.gc();
-    IFeed savedFeed = fModelDAO.loadFeed(feedId);
+    IFeed savedFeed = DynamicDAO.load(IFeed.class, feedId);
     assertEquals(1, savedFeed.getNews().size());
-    fModelDAO.deleteFeed(new FeedReference(feedId));
+    DynamicDAO.delete(new FeedReference(feedId).resolve());
   }
 
   /**
@@ -1230,12 +1224,12 @@ public class DBManagerTest {
     IFeed feed = createFeed();
     createNews(feed);
     fTypesFactory.createNews(null, feed, new Date());
-    fModelDAO.saveFeed(feed);
+    DynamicDAO.save(feed);
 
     FeedReference feedRef = new FeedReference(feed.getId());
     System.gc();
-    fModelDAO.deleteFeed(feedRef);
-    assertNull(fModelDAO.loadFeed(feedRef.getId()));
+    DynamicDAO.delete(feedRef.resolve());
+    assertNull(DynamicDAO.load(IFeed.class, feedRef.getId()));
   }
 
   /**
@@ -1245,15 +1239,15 @@ public class DBManagerTest {
   public void testDeleteFeedDeletesConditionalGet() throws Exception {
     IFeed feed = createFeed();
 
-    fModelDAO.saveFeed(feed);
+    DynamicDAO.save(feed);
 
     IConditionalGet conditionalGet = fTypesFactory.createConditionalGet("2005/11/04", feed.getLink(), null);
 
-    fModelDAO.saveConditionalGet(conditionalGet);
+    DynamicDAO.save(conditionalGet);
 
-    fModelDAO.deleteFeed(new FeedReference(feed.getId()));
-    assertNull(fModelDAO.loadFeed(feed.getId()));
-    assertNull(fModelDAO.loadConditionalGet(feed.getLink()));
+    DynamicDAO.delete(feed);
+    assertNull(DynamicDAO.load(IFeed.class, feed.getId()));
+    assertNull(DynamicDAO.getDAO(IConditionalGetDAO.class).load(feed.getLink()));
   }
 
   /**
@@ -1262,15 +1256,15 @@ public class DBManagerTest {
   @Test
   public void testAddUpdateAndGetConditionalGet() {
     IFeed feed = createFeed();
-    fModelDAO.saveFeed(feed);
+    DynamicDAO.save(feed);
 
     final String ifModifiedSince = "2005/11/04";
     final String ifNoneMatch = "2005/05/12";
     IConditionalGet conditionalGet = fTypesFactory.createConditionalGet(ifModifiedSince, feed.getLink(), ifNoneMatch);
-    fModelDAO.saveConditionalGet(conditionalGet);
+    DynamicDAO.save(conditionalGet);
     conditionalGet = null;
     System.gc();
-    conditionalGet = fModelDAO.loadConditionalGet(feed.getLink());
+    conditionalGet = DynamicDAO.getDAO(IConditionalGetDAO.class).load(feed.getLink());
     assertEquals(ifModifiedSince, conditionalGet.getIfModifiedSince());
     assertEquals(ifNoneMatch, conditionalGet.getIfNoneMatch());
     assertEquals(feed.getLink().toString(), conditionalGet.getLink().toString());
@@ -1283,9 +1277,9 @@ public class DBManagerTest {
   public void testAddAndDeleteFeed() {
     try {
       IFeed feed = createFeed();
-      feed = fModelDAO.saveFeed(feed);
-      fModelDAO.deleteFeed(new FeedReference(feed.getId()));
-      assertNull(fModelDAO.loadFeed(feed.getId()));
+      feed = DynamicDAO.save(feed);
+      DynamicDAO.delete(new FeedReference(feed.getId()).resolve());
+      assertNull(DynamicDAO.load(IFeed.class, feed.getId()));
     } catch (PersistenceException e) {
       fail(e.getMessage());
     }
@@ -1298,9 +1292,9 @@ public class DBManagerTest {
   public void testAddAndDeleteFeed2() {
     try {
       IFeed feed = createFeed();
-      feed = fModelDAO.saveFeed(feed);
-      fModelDAO.deleteFeed(new FeedLinkReference(feed.getLink()));
-      assertNull(fModelDAO.loadFeed(feed.getId()));
+      feed = DynamicDAO.save(feed);
+      DynamicDAO.delete(feed);
+      assertNull(DynamicDAO.load(IFeed.class, feed.getId()));
     } catch (PersistenceException e) {
       fail(e.getMessage());
     }
@@ -1340,7 +1334,7 @@ public class DBManagerTest {
             dbFeed.getImage().setDescription("Some new description");
             dbFeed.getImage().setTitle("yet another title");
             updatedFeed[0] = dbFeed;
-            fModelDAO.saveFeed(dbFeed);
+            DynamicDAO.save(dbFeed);
           } catch (PersistenceException e) {
             fail(e.getMessage());
           }
@@ -1354,16 +1348,16 @@ public class DBManagerTest {
           assertTrue(updatedFeed[0].isIdentical(dbFeed));
         }
       };
-      Owl.getListenerService().addFeedListener(feedListener);
-      fModelDAO.saveFeed(initialFeed);
+      DynamicDAO.addEntityListener(IFeed.class, feedListener);
+      DynamicDAO.save(initialFeed);
       assertTrue(feedAddedCalled[0]);
       assertTrue(feedUpdatedCalled[0]);
-      fModelDAO.deleteFeed(new FeedReference(updatedFeed[0].getId()));
+      DynamicDAO.delete(updatedFeed[0]);
     } catch (PersistenceException e) {
       fail(e.getMessage());
     } finally {
       if (feedListener != null) {
-        Owl.getListenerService().removeFeedListener(feedListener);
+        DynamicDAO.removeEntityListener(IFeed.class, feedListener);
       }
     }
   }
@@ -1397,7 +1391,7 @@ public class DBManagerTest {
             dbFeed.getImage().setTitle("yet another title");
             dbFeed.getImage().setHomepage(createURI("http://www.newimageuri.com"));
             updatedFeed[0] = dbFeed;
-            fModelDAO.saveFeed(dbFeed);
+            DynamicDAO.save(dbFeed);
           } catch (PersistenceException e) {
             TestUtils.fail(e);
           }
@@ -1419,14 +1413,14 @@ public class DBManagerTest {
         }
 
       };
-      Owl.getListenerService().addFeedListener(feedListener);
-      fModelDAO.saveFeed(initialFeed);
-      fModelDAO.deleteFeed(new FeedReference(updatedFeed[0].getId()));
+      DynamicDAO.addEntityListener(IFeed.class, feedListener);
+      DynamicDAO.save(initialFeed);
+      DynamicDAO.delete(updatedFeed[0]);
     } catch (PersistenceException e) {
       fail(e.getMessage());
     } finally {
       if (feedListener != null) {
-        Owl.getListenerService().removeFeedListener(feedListener);
+        DynamicDAO.removeEntityListener(IFeed.class, feedListener);
       }
     }
   }
@@ -1439,7 +1433,7 @@ public class DBManagerTest {
   public void testNewsManagerSetSameStateWithQuery() {
     final IFeed feed;
     try {
-      feed = fModelDAO.saveFeed(createFeed());
+      feed = DynamicDAO.save(createFeed());
     } catch (PersistenceException e) {
       fail(e.getMessage());
       return;
@@ -1448,7 +1442,7 @@ public class DBManagerTest {
     initialNews.setState(State.NEW);
     INews news = null;
     try {
-      news = fModelDAO.saveNews(initialNews);
+      news = DynamicDAO.save(initialNews);
     } catch (PersistenceException e) {
       fail(e.getMessage());
       return;
@@ -1468,18 +1462,18 @@ public class DBManagerTest {
           fail("No events should have been fired, but NewsListener#newsUpdated() was called.");
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
       List<INews> newsList = new ArrayList<INews>();
       newsList.add(news);
       fAppLayer.setNewsState(newsList, State.NEW, true, false);
-      Owl.getListenerService().removeNewsListener(newsListener);
-      fModelDAO.deleteNews(new NewsReference(news.getId()));
-      fModelDAO.deleteFeed(new FeedReference(feed.getId()));
+      DynamicDAO.removeEntityListener(INews.class, newsListener);
+      DynamicDAO.delete(news);
+      DynamicDAO.delete(feed);
     } catch (PersistenceException e) {
       fail(e.getMessage());
     } finally {
       if (newsListener != null) {
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
       }
     }
   }
@@ -1491,7 +1485,7 @@ public class DBManagerTest {
   public void testNewsManagerSetState() {
     final IFeed feed;
     try {
-      feed = fModelDAO.saveFeed(createFeed());
+      feed = DynamicDAO.save(createFeed());
     } catch (PersistenceException e) {
       fail(e.getMessage());
       return;
@@ -1501,7 +1495,7 @@ public class DBManagerTest {
     INews newsItem = null;
     NewsReference newsRef = null;
     try {
-      newsItem = fModelDAO.saveNews(initialNews);
+      newsItem = DynamicDAO.save(initialNews);
       newsRef = new NewsReference(newsItem.getId());
     } catch (PersistenceException e) {
       fail(e.getMessage());
@@ -1533,8 +1527,8 @@ public class DBManagerTest {
       news = newsRef.resolve();
       assertEquals(State.NEW, news.getState());
 
-      fModelDAO.deleteNews(newsRef);
-      fModelDAO.deleteFeed(new FeedReference(feed.getId()));
+      DynamicDAO.delete(newsRef.resolve());
+      DynamicDAO.delete(feed);
     } catch (PersistenceException e) {
       fail(e.getMessage());
     }
@@ -1549,12 +1543,12 @@ public class DBManagerTest {
   @Test
   public void testFoldersOrder() throws PersistenceException {
     IFolder root = createFolder();
-    root = fModelDAO.saveFolder(root);
+    root = DynamicDAO.save(root);
     for (int i = 0; i < 10; ++i) {
       IFolder child = createFolder(root);
       child.setName(String.valueOf(i));
     }
-    root = fModelDAO.saveFolder(root);
+    root = DynamicDAO.save(root);
     int counter = 0;
     for (IFolder child : root.getFolders()) {
       String name = String.valueOf(counter++);
@@ -1571,7 +1565,7 @@ public class DBManagerTest {
   @Test
   public void testMarksOrder() throws PersistenceException {
     IFolder root = createFolder();
-    root = fModelDAO.saveFolder(root);
+    root = DynamicDAO.save(root);
     int count = 10;
     for (int i = 0; i < count; ++i) {
       IBookMark child = createBookMark(root);
@@ -1582,7 +1576,7 @@ public class DBManagerTest {
       ISearchMark child = createSearchMark(root);
       child.setName(String.valueOf(i));
     }
-    root = fModelDAO.saveFolder(root);
+    root = DynamicDAO.save(root);
     int counter = 0;
     for (IMark child : root.getMarks()) {
       String name = String.valueOf(counter++);
@@ -1619,10 +1613,10 @@ public class DBManagerTest {
     IFeed feed2;
     NewsAdapter newsAdapter;
     try {
-      feed1 = fModelDAO.saveFeed(createFeed());
+      feed1 = DynamicDAO.save(createFeed());
       IFeed tempFeed = createFeed("http://adifferentlink.com");
       tempFeed.setTitle("A different title");
-      feed2 = fModelDAO.saveFeed(tempFeed);
+      feed2 = DynamicDAO.save(tempFeed);
     } catch (PersistenceException e) {
       fail(e.getMessage());
       return;
@@ -1636,7 +1630,7 @@ public class DBManagerTest {
         newsRef[0] = new NewsReference(events.iterator().next().getEntity().getId());
       }
     };
-    Owl.getListenerService().addNewsListener(newsAdapter);
+    DynamicDAO.addEntityListener(INews.class, newsAdapter);
 
     final News initialNews1 = (News) createNews(feed1);
     initialNews1.setGuid(null);
@@ -1653,11 +1647,11 @@ public class DBManagerTest {
 
     NewsReference newsRef3 = null;
     try {
-      fModelDAO.saveFeed(feed1);
+      DynamicDAO.save(feed1);
       newsRef1 = newsRef[0];
       newsItem1 = newsRef1.resolve();
 
-      feed2 = fModelDAO.saveFeed(feed2);
+      feed2 = DynamicDAO.save(feed2);
       newsRef2 = newsRef[0];
       newsItem2 = newsRef2.resolve();
 
@@ -1666,13 +1660,13 @@ public class DBManagerTest {
       initialNews3.setGuid(null);
       initialNews3.setLink(null);
       initialNews3.setState(State.NEW);
-      fModelDAO.saveFeed(feed2);
+      DynamicDAO.save(feed2);
       newsRef3 = newsRef[0];
     } catch (PersistenceException e) {
       fail(e.getMessage());
       return;
     } finally {
-      Owl.getListenerService().removeNewsListener(newsAdapter);
+      DynamicDAO.removeEntityListener(INews.class, newsAdapter);
     }
     try {
       List<INews> newsList1 = new ArrayList<INews>();
@@ -1738,10 +1732,10 @@ public class DBManagerTest {
       assertEquals(State.NEW, news2.getState());
       assertEquals(State.NEW, news3.getState());
 
-      fModelDAO.deleteNews(newsRef1);
-      fModelDAO.deleteNews(newsRef2);
-      fModelDAO.deleteFeed(new FeedReference(feed1.getId()));
-      fModelDAO.deleteFeed(new FeedReference(feed2.getId()));
+      DynamicDAO.delete(newsRef1.resolve());
+      DynamicDAO.delete(newsRef2.resolve());
+      DynamicDAO.delete(feed1);
+      DynamicDAO.delete(feed2);
     } catch (PersistenceException e) {
       fail(e.getMessage());
     }
@@ -1759,10 +1753,10 @@ public class DBManagerTest {
     IFeed feed2;
     NewsListener newsAdapter = null;
     try {
-      feed1 = fModelDAO.saveFeed(createFeed());
+      feed1 = DynamicDAO.save(createFeed());
       IFeed tempFeed = createFeed("http://adifferentlink.com");
       tempFeed.setTitle("A different title");
-      feed2 = fModelDAO.saveFeed(tempFeed);
+      feed2 = DynamicDAO.save(tempFeed);
     } catch (PersistenceException e) {
       fail(e.getMessage());
       return;
@@ -1781,7 +1775,7 @@ public class DBManagerTest {
         newsRef[0] = new NewsReference(events.iterator().next().getEntity().getId());
       }
     };
-    Owl.getListenerService().addNewsListener(newsAdapter);
+    DynamicDAO.addEntityListener(INews.class, newsAdapter);
     INews newsItem1 = null;
     NewsReference newsRef1 = null;
 
@@ -1790,11 +1784,11 @@ public class DBManagerTest {
 
     NewsReference newsRef3 = null;
     try {
-      fModelDAO.saveFeed(feed1);
+      DynamicDAO.save(feed1);
       newsRef1 = newsRef[0];
       newsItem1 = newsRef1.resolve();
 
-      feed2 = fModelDAO.saveFeed(feed2);
+      feed2 = DynamicDAO.save(feed2);
       newsRef2 = newsRef[0];
       newsItem2 = newsRef2.resolve();
 
@@ -1803,13 +1797,13 @@ public class DBManagerTest {
       initialNews3.setGuid(null);
       initialNews3.setLink(null);
       initialNews3.setState(State.NEW);
-      fModelDAO.saveFeed(feed2);
+      DynamicDAO.save(feed2);
       newsRef3 = newsRef[0];
     } catch (PersistenceException e) {
       fail(e.getMessage());
       return;
     } finally {
-      Owl.getListenerService().removeNewsListener(newsAdapter);
+      DynamicDAO.removeEntityListener(INews.class, newsAdapter);
     }
     try {
       List<INews> newsList1 = new ArrayList<INews>();
@@ -1875,10 +1869,10 @@ public class DBManagerTest {
       assertEquals(State.NEW, news2.getState());
       assertEquals(State.NEW, news3.getState());
 
-      fModelDAO.deleteNews(newsRef1);
-      fModelDAO.deleteNews(newsRef2);
-      fModelDAO.deleteFeed(new FeedReference(feed1.getId()));
-      fModelDAO.deleteFeed(new FeedReference(feed2.getId()));
+      DynamicDAO.delete(newsRef1.resolve());
+      DynamicDAO.delete(newsRef2.resolve());
+      DynamicDAO.delete(feed1);
+      DynamicDAO.delete(feed2);
     } catch (PersistenceException e) {
       fail(e.getMessage());
     }
@@ -1889,55 +1883,40 @@ public class DBManagerTest {
    */
   @Test
   public void testNewsManagerSetStateWithGuidNull() {
-    final IFeed feed;
-    try {
-      feed = fModelDAO.saveFeed(createFeed());
-    } catch (PersistenceException e) {
-      fail(e.getMessage());
-      return;
-    }
+    final IFeed feed = DynamicDAO.save(createFeed());
     final News initialNews = (News) createNews(feed);
     initialNews.setState(State.NEW);
     initialNews.setGuid(null);
     INews newsItem = null;
     NewsReference newsRef = null;
-    try {
-      newsItem = fModelDAO.saveNews(initialNews);
-      newsRef = new NewsReference(newsItem.getId());
-    } catch (PersistenceException e) {
-      fail(e.getMessage());
-      return;
-    }
-    try {
-      List<INews> newsList = new ArrayList<INews>();
-      newsList.add(newsItem);
-      fAppLayer.setNewsState(newsList, State.UPDATED, true, false);
-      INews news = newsRef.resolve();
-      assertEquals(State.UPDATED, news.getState());
-      fAppLayer.setNewsState(newsList, State.DELETED, true, false);
-      news = newsRef.resolve();
-      assertEquals(State.DELETED, news.getState());
-      fAppLayer.setNewsState(newsList, State.HIDDEN, true, false);
-      news = newsRef.resolve();
-      assertEquals(State.HIDDEN, news.getState());
-      fAppLayer.setNewsState(newsList, State.READ, true, false);
-      news = newsRef.resolve();
-      assertEquals(State.READ, news.getState());
-      fAppLayer.setNewsState(newsList, State.UNREAD, true, false);
-      news = newsRef.resolve();
-      assertEquals(State.UNREAD, news.getState());
-      fAppLayer.setNewsState(newsList, State.NEW, true, false);
-      news = newsRef.resolve();
-      assertEquals(State.NEW, news.getState());
-      // Make sure it doesn't change when we set it to the same
-      fAppLayer.setNewsState(newsList, State.NEW, true, false);
-      news = newsRef.resolve();
-      assertEquals(State.NEW, news.getState());
+    newsItem = DynamicDAO.save(initialNews);
+    newsRef = new NewsReference(newsItem.getId());
+    List<INews> newsList = new ArrayList<INews>();
+    newsList.add(newsItem);
+    fAppLayer.setNewsState(newsList, State.UPDATED, true, false);
+    INews news = newsRef.resolve();
+    assertEquals(State.UPDATED, news.getState());
+    fAppLayer.setNewsState(newsList, State.DELETED, true, false);
+    news = newsRef.resolve();
+    assertEquals(State.DELETED, news.getState());
+    fAppLayer.setNewsState(newsList, State.HIDDEN, true, false);
+    news = newsRef.resolve();
+    assertEquals(State.HIDDEN, news.getState());
+    fAppLayer.setNewsState(newsList, State.READ, true, false);
+    news = newsRef.resolve();
+    assertEquals(State.READ, news.getState());
+    fAppLayer.setNewsState(newsList, State.UNREAD, true, false);
+    news = newsRef.resolve();
+    assertEquals(State.UNREAD, news.getState());
+    fAppLayer.setNewsState(newsList, State.NEW, true, false);
+    news = newsRef.resolve();
+    assertEquals(State.NEW, news.getState());
+    // Make sure it doesn't change when we set it to the same
+    fAppLayer.setNewsState(newsList, State.NEW, true, false);
+    news = newsRef.resolve();
+    assertEquals(State.NEW, news.getState());
 
-      fModelDAO.deleteNews(newsRef);
-      fModelDAO.deleteFeed(new FeedReference(feed.getId()));
-    } catch (PersistenceException e) {
-      fail(e.getMessage());
-    }
+    DynamicDAO.delete(newsRef.resolve());
+    DynamicDAO.delete(feed);
   }
 }

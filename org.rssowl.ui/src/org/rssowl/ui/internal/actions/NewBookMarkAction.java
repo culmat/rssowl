@@ -52,13 +52,13 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IApplicationLayer;
-import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
+import org.rssowl.core.model.persist.dao.IFeedDAO;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FeedReference;
 import org.rssowl.core.model.reference.FolderReference;
@@ -83,7 +83,6 @@ import java.util.Map;
 public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjectActionDelegate {
   private Shell fShell;
   private IFolder fParent;
-  private IPersistenceService fPersist;
   private String fPreSetLink;
 
   private static class NewBookMarkDialog extends TitleAreaDialog {
@@ -233,7 +232,6 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
     fShell = shell;
     fParent = parent;
     fPreSetLink = preSetLink;
-    fPersist = Owl.getPersistenceService();
   }
 
   /*
@@ -287,16 +285,17 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       String title = dialog.fName;
       parent = dialog.getFolder();
 
-      IApplicationLayer applicationLayer = fPersist.getApplicationLayer();
       URI uriObj = new URI(dialog.fLink.trim());
 
+      IFeedDAO feedDAO = DynamicDAO.getDAO(IFeedDAO.class);
+      
       /* Check if a Feed with the URL already exists */
-      FeedReference feedRef = applicationLayer.loadFeedReference(uriObj);
+      FeedReference feedRef = feedDAO.loadReference(uriObj);
 
       /* Create a new Feed then */
       if (feedRef == null) {
         IFeed feed = Owl.getModelFactory().createFeed(null, uriObj);
-        feed = fPersist.getModelDAO().saveFeed(feed);
+        feed = feedDAO.save(feed);
       }
 
       /* Create the BookMark */
@@ -309,7 +308,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       for (Map.Entry<String, ? > property : properties.entrySet())
         bookmark.setProperty(property.getKey(), property.getValue());
 
-      parent = fPersist.getModelDAO().saveFolder(parent);
+      parent = DynamicDAO.save(parent);
 
       /* Auto-Reload added BookMark */
       for (IMark mark : parent.getMarks()) {
@@ -352,7 +351,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
   }
 
   private IFolder getParent() throws PersistenceException {
-    Long selectedRootFolderID = fPersist.getPreferencesDAO().getLong(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET);
+    Long selectedRootFolderID = Owl.getPersistenceService().getDAOService().getPreferencesDAO().getLong(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET);
 
     /* Check if available Parent is still valid */
     if (fParent != null) {

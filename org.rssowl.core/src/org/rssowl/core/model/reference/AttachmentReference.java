@@ -24,7 +24,6 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IAttachment;
 
@@ -45,11 +44,11 @@ public final class AttachmentReference extends ModelReference {
    * persistance layer.
    */
   public AttachmentReference(long id) {
-    super(id);
+    super(id, IAttachment.class);
   }
-
+  
   @Override
   public IAttachment resolve() throws PersistenceException {
-    return Owl.getPersistenceService().getModelDAO().loadAttachment(getId());
+    return (IAttachment) super.resolve();
   }
 }

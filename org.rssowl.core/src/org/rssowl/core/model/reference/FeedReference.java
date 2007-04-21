@@ -24,7 +24,6 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IFeed;
 
@@ -45,11 +44,11 @@ public final class FeedReference extends ModelReference {
    * persistance layer.
    */
   public FeedReference(long id) {
-    super(id);
+    super(id, IFeed.class);
   }
-
+  
   @Override
   public IFeed resolve() throws PersistenceException {
-    return Owl.getPersistenceService().getModelDAO().loadFeed(getId());
+    return (IFeed) super.resolve();
   }
 }

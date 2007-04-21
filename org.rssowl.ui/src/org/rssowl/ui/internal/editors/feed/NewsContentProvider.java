@@ -36,6 +36,7 @@ import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.search.ISearchHit;
 import org.rssowl.core.model.reference.BookMarkReference;
 import org.rssowl.core.model.reference.FeedLinkReference;
@@ -435,11 +436,11 @@ public class NewsContentProvider implements ITreeContentProvider {
       }
     };
 
-    Owl.getListenerService().addNewsListener(fNewsListener);
+    DynamicDAO.addEntityListener(INews.class, fNewsListener);
   }
 
   private void unregisterListeners() {
-    Owl.getListenerService().removeNewsListener(fNewsListener);
+    DynamicDAO.removeEntityListener(INews.class, fNewsListener);
   }
 
   private boolean isInputRelatedTo(INews news, boolean fromAdd) {

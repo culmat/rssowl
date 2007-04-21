@@ -24,7 +24,6 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IBookMark;
 
@@ -45,11 +44,11 @@ public final class BookMarkReference extends MarkReference {
    * persistance layer.
    */
   public BookMarkReference(long id) {
-    super(id);
+    super(id, IBookMark.class);
   }
-
+  
   @Override
   public IBookMark resolve() throws PersistenceException {
-    return Owl.getPersistenceService().getModelDAO().loadBookMark(getId());
+    return (IBookMark) super.resolve();
   }
 }

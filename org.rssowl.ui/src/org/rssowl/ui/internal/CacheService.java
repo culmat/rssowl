@@ -35,6 +35,7 @@ import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.reference.FeedLinkReference;
 
 import java.util.Collections;
@@ -141,11 +142,11 @@ public class CacheService {
       /* Not handled */
       }
     };
-
+    
     /* Add Listeners */
-    Owl.getListenerService().addFolderListener(fFolderListener);
-    Owl.getListenerService().addBookMarkListener(fBookMarkListener);
-    Owl.getListenerService().addSearchMarkListener(fSearchMarkListener);
+    DynamicDAO.addEntityListener(IFolder.class, fFolderListener);
+    DynamicDAO.addEntityListener(IBookMark.class, fBookMarkListener);
+    DynamicDAO.addEntityListener(ISearchMark.class, fSearchMarkListener);
   }
 
   void stopService() {
@@ -153,9 +154,9 @@ public class CacheService {
   }
 
   private void unregisterListeners() {
-    Owl.getListenerService().removeFolderListener(fFolderListener);
-    Owl.getListenerService().removeBookMarkListener(fBookMarkListener);
-    Owl.getListenerService().removeSearchMarkListener(fSearchMarkListener);
+    DynamicDAO.removeEntityListener(IFolder.class, fFolderListener);
+    DynamicDAO.removeEntityListener(IBookMark.class, fBookMarkListener);
+    DynamicDAO.removeEntityListener(ISearchMark.class, fSearchMarkListener);
   }
 
   /**

@@ -30,12 +30,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IApplicationLayer;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.internal.persist.Feed;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.reference.FeedLinkReference;
-import org.rssowl.core.model.reference.NewsReference;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.NewsService;
 
@@ -50,7 +49,6 @@ import java.util.List;
  * @author bpasero
  */
 public class ControllerTestLocal {
-  private IModelDAO fDao;
   private IApplicationLayer fAppLayer;
 
   /**
@@ -58,7 +56,6 @@ public class ControllerTestLocal {
    */
   @Before
   public void setUp() throws Exception {
-    fDao = Owl.getPersistenceService().getModelDAO();
     fAppLayer = Owl.getPersistenceService().getApplicationLayer();
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
@@ -90,14 +87,14 @@ public class ControllerTestLocal {
     NewsService service = Controller.getDefault().getNewsService();
 
     IFeed feed = new Feed(new URI("http://www.rssowl.org/rssowl2dg/tests/manager/rss_2_0.xml")); //$NON-NLS-1$
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     assertEquals(0, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
     assertEquals(0, getStickyCount(feed));
 
     Owl.getModelFactory().createNews(null, feed, new Date()); //$NON-NLS-1$
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     assertEquals(1, getUnreadCount(feed));
     assertEquals(1, getNewCount(feed));
@@ -110,7 +107,7 @@ public class ControllerTestLocal {
 
     fAppLayer.setNewsState(feed.getNews(), INews.State.UNREAD, true, false);
     feed.getNews().get(0).setFlagged(true);
-    fDao.saveNews(feed.getNews().get(0));
+    DynamicDAO.save(feed.getNews().get(0));
 
     assertEquals(1, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
@@ -127,7 +124,7 @@ public class ControllerTestLocal {
     assertEquals(1, getStickyCount(feed));
 
     feed.getNews().get(0).setFlagged(false);
-    fDao.saveNews(feed.getNews().get(0));
+    DynamicDAO.save(feed.getNews().get(0));
     fAppLayer.setNewsState(feed.getNews(), INews.State.READ, true, false);
 
     assertEquals(0, getUnreadCount(feed));
@@ -138,10 +135,10 @@ public class ControllerTestLocal {
     service.stopService();
 
     Owl.getModelFactory().createNews(null, feed, new Date()); //$NON-NLS-1$
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     Owl.getModelFactory().createNews(null, feed, new Date()); //$NON-NLS-1$
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     assertEquals(2, getUnreadCount(feed));
     assertEquals(2, getNewCount(feed));
@@ -150,7 +147,7 @@ public class ControllerTestLocal {
     fAppLayer.setNewsState(feed.getNews(), INews.State.READ, true, false);
     feed.getNews().get(0).setFlagged(true);
     feed.getNews().get(1).setFlagged(true);
-    fDao.saveFeed(feed);
+    DynamicDAO.save(feed);
 
     assertEquals(0, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
@@ -166,17 +163,17 @@ public class ControllerTestLocal {
     Owl.getPersistenceService().recreateSchema();
 
     feed = new Feed(new URI("http://www.rssowl.org/rssowl2dg/tests/manager/rss_2_0.xml")); //$NON-NLS-1$
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     Owl.getModelFactory().createNews(null, feed, new Date()); //$NON-NLS-1$
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     Owl.getModelFactory().createNews(null, feed, new Date()); //$NON-NLS-1$
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     feed.getNews().get(0).setFlagged(true);
     feed.getNews().get(1).setFlagged(true);
-    fDao.saveFeed(feed);
+    DynamicDAO.save(feed);
 
     service.testDirtyShutdown();
 
@@ -194,21 +191,21 @@ public class ControllerTestLocal {
   @Test
   public void testNewsServiceWithUpdatedNews() throws Exception {
     IFeed feed = new Feed(new URI("http://www.feed.com"));
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     INews news1 = Owl.getModelFactory().createNews(null, feed, new Date());
     news1.setTitle("News Title #1");
     news1.setLink(new URI("http://www.link.com"));
     news1.setFlagged(true);
 
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     assertEquals(1, getUnreadCount(feed));
     assertEquals(1, getNewCount(feed));
     assertEquals(1, getStickyCount(feed));
 
     feed.getNews().get(0).setTitle("News Title Updated #1");
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     assertEquals(1, getUnreadCount(feed));
     assertEquals(1, getNewCount(feed));
@@ -224,14 +221,14 @@ public class ControllerTestLocal {
   @Test
   public void testNewsServiceWithUpdatedNews2() throws Exception {
     IFeed feed = new Feed(new URI("http://www.feed.com"));
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     INews news1 = Owl.getModelFactory().createNews(null, feed, new Date());
     news1.setTitle("News Title #1");
     news1.setLink(new URI("http://www.link.com"));
     news1.setState(INews.State.READ);
 
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     assertEquals(0, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
@@ -240,7 +237,7 @@ public class ControllerTestLocal {
     feed.getNews().get(0).setTitle("News Title Updated #1");
     feed.getNews().get(0).setState(INews.State.UPDATED);
     feed.getNews().get(0).setFlagged(true);
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     assertEquals(1, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
@@ -248,7 +245,7 @@ public class ControllerTestLocal {
     assertEquals(1, getStickyCount(feed));
 
     feed.getNews().get(0).setState(INews.State.READ);
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     assertEquals(0, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
@@ -264,20 +261,20 @@ public class ControllerTestLocal {
   @Test
   public void testNewsServiceWithDeletedNews() throws Exception {
     IFeed feed = new Feed(new URI("http://www.feed.com"));
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     INews news1 = Owl.getModelFactory().createNews(null, feed, new Date());
     news1.setTitle("News Title #1");
     news1.setLink(new URI("http://www.link.com"));
     news1.setFlagged(true);
 
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     assertEquals(1, getUnreadCount(feed));
     assertEquals(1, getNewCount(feed));
     assertEquals(1, getStickyCount(feed));
 
-    fDao.deleteNews(new NewsReference(feed.getNews().get(0).getId()));
+    DynamicDAO.delete(feed.getNews().get(0));
 
     assertEquals(0, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
@@ -293,14 +290,14 @@ public class ControllerTestLocal {
   @Test
   public void testNewsServiceWithDeletedNews2() throws Exception {
     IFeed feed = new Feed(new URI("http://www.feed.com"));
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     INews news1 = Owl.getModelFactory().createNews(null, feed, new Date());
     news1.setTitle("News Title #1");
     news1.setLink(new URI("http://www.link.com"));
     news1.setState(INews.State.READ);
 
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     assertEquals(0, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
@@ -309,7 +306,7 @@ public class ControllerTestLocal {
     feed.getNews().get(0).setTitle("News Title Updated #1");
     feed.getNews().get(0).setState(INews.State.UPDATED);
     feed.getNews().get(0).setFlagged(true);
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     assertEquals(1, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
@@ -317,9 +314,9 @@ public class ControllerTestLocal {
     assertEquals(INews.State.UPDATED, feed.getNews().get(0).getState());
 
     feed.getNews().get(0).setState(INews.State.READ);
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
-    fDao.deleteNews(new NewsReference(feed.getNews().get(0).getId()));
+    DynamicDAO.delete(feed.getNews().get(0));
 
     assertEquals(0, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
@@ -335,7 +332,7 @@ public class ControllerTestLocal {
   @Test
   public void testNewsServiceWithApplicationLayerSaveNews() throws Exception {
     IFeed feed = new Feed(new URI("http://www.feed.com"));
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     INews news1 = Owl.getModelFactory().createNews(null, feed, new Date());
     news1.setTitle("News Title #1");
@@ -343,7 +340,7 @@ public class ControllerTestLocal {
     news1.setState(INews.State.UNREAD);
     news1.setFlagged(true);
 
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     assertEquals(1, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));

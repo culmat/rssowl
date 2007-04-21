@@ -2,7 +2,6 @@
 <?eclipse version="3.0"?>
 <plugin>
    <extension-point id="ModelTypesFactory" name="Model Types Factory" schema="schema/ModelTypesFactory.exsd"/>
-   <extension-point id="ModelDAO" name="Model Data Access Objects" schema="schema/ModelDAO.exsd"/>
    <extension-point id="ModelSearch" name="Model Search" schema="schema/ModelSearch.exsd"/>
    <extension-point id="PersistanceLayer" name="Persistance Layer" schema="schema/PersistanceLayer.exsd"/>
    <extension-point id="ApplicationLayer" name="Application Layer" schema="schema/ApplicationLayer.exsd"/>
@@ -20,10 +19,6 @@
    <extension
          point="org.rssowl.core.PersistanceLayer">
       <persistancelayer class="org.rssowl.core.model.internal.db4o.PersistenceServiceImpl"/>
-   </extension>
-   <extension
-         point="org.rssowl.core.ModelDAO">
-      <modeldao class="org.rssowl.core.model.internal.db4o.ModelDAOImpl"/>
    </extension>
    <extension
          point="org.rssowl.core.ApplicationLayer">

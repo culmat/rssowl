@@ -23,11 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events.runnable;
 
-import org.rssowl.core.Owl;
-import org.rssowl.core.model.events.ModelEvent;
 import org.rssowl.core.model.events.SearchConditionEvent;
-
-import java.util.Set;
 
 /**
  * Provides a way to fire a SearchConditionEventRunnable in the future.
@@ -42,26 +38,6 @@ public class SearchConditionEventRunnable extends
    * Creates a new instance of this object.
    */
   public SearchConditionEventRunnable() {
-    super();
-  }
-  
-  @Override
-  public Class< ? extends ModelEvent> getEventClass() {
-    return SearchConditionEvent.class;
-  }
-  
-  @Override
-  protected final void firePersistEvents(Set<SearchConditionEvent> persistEvents) {
-    Owl.getListenerService().notifySearchConditionAdded(persistEvents);
-  }
-
-  @Override
-  protected final void fireRemoveEvents(Set<SearchConditionEvent> removeEvents) {
-    Owl.getListenerService().notifySearchConditionDeleted(removeEvents);
-  }
-
-  @Override
-  protected final void fireUpdateEvents(Set<SearchConditionEvent> updateEvents) {
-    Owl.getListenerService().notifySearchConditionUpdated(updateEvents);
+    super(SearchConditionEvent.class, getDAOService().getSearchConditionDAO());
   }
 }

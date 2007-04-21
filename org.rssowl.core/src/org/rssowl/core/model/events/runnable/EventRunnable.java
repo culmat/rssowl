@@ -23,7 +23,11 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events.runnable;
 
+import org.eclipse.core.runtime.Assert;
+import org.rssowl.core.Owl;
 import org.rssowl.core.model.events.ModelEvent;
+import org.rssowl.core.model.persist.dao.DAOService;
+import org.rssowl.core.model.persist.dao.IEntityDAO;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,12 +52,23 @@ public abstract class EventRunnable<T extends ModelEvent> implements Runnable   
   private Set<T> fRemoveEvents;
   
   private Set<T> fUpdateEvents;
+  
+  private final Class<T> fEventClass;
+  private final IEntityDAO<?, ?, T> fEntityDAO;
 
   /**
    * Creates an instance of this class.
+   * @param eventClass 
    */
-  protected EventRunnable() {
-    // Default constructor
+  protected EventRunnable(Class<T> eventClass, IEntityDAO<?, ?, T> entityDAO) {
+    Assert.isNotNull(eventClass, "eventClass");
+    Assert.isNotNull(entityDAO, "entityDAO");
+    fEventClass = eventClass;
+    fEntityDAO = entityDAO;
+  }
+  
+  protected static final DAOService getDAOService() {
+    return Owl.getPersistenceService().getDAOService();
   }
 
   /**
@@ -62,20 +77,18 @@ public abstract class EventRunnable<T extends ModelEvent> implements Runnable   
    */
   public final void run() {
     if (shouldFirePersistEvents())
-      firePersistEvents(Collections.unmodifiableSet(fPersistEvents));
+      fireEvents(fPersistEvents, EventType.PERSIST);
 
     if (shouldFireRemoveEvents())
-      fireRemoveEvents(Collections.unmodifiableSet(fRemoveEvents));
+      fireEvents(fRemoveEvents, EventType.REMOVE);
     
     if (shouldFireUpdateEvents())
-      fireUpdateEvents(Collections.unmodifiableSet(fUpdateEvents));
+      fireEvents(fUpdateEvents, EventType.UPDATE);
   }
   
-  protected abstract void firePersistEvents(Set<T> persistEvents);
-  
-  protected abstract void fireRemoveEvents(Set<T> removeEvents);
-  
-  protected abstract void fireUpdateEvents(Set<T> updateEvents);
+  private void fireEvents(Set<T> persistEvents, EventType eventType) {
+    fEntityDAO.fireEvents(Collections.unmodifiableSet(persistEvents), eventType);
+  }
   
   @SuppressWarnings("unchecked")
   public final void addCheckedPersistEvent(ModelEvent event) {
@@ -83,7 +96,9 @@ public abstract class EventRunnable<T extends ModelEvent> implements Runnable   
     addPersistEvent((T) event);
   }
   
-  public abstract Class<? extends ModelEvent> getEventClass();
+  private Class<? extends ModelEvent> getEventClass()   {
+    return fEventClass;
+  }
   
   private void checkEventType(Class<?> expectedClass, ModelEvent eventReceived)    {
     if (!expectedClass.isInstance(eventReceived))

@@ -30,7 +30,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
@@ -38,6 +37,7 @@ import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.ui.internal.Controller;
@@ -65,7 +65,6 @@ public class FolderMarkGroupFilterTest {
   private static final long WEEK = 7 * DAY;
 
   private IModelFactory fFactory;
-  private IModelDAO fDao;
   private BookMarkGrouping fGrouping;
   private BookMarkFilter fFiltering;
   private Date fLastWeek;
@@ -85,7 +84,6 @@ public class FolderMarkGroupFilterTest {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
     fFactory = Owl.getModelFactory();
-    fDao = Owl.getPersistenceService().getModelDAO();
     fGrouping = new BookMarkGrouping();
     fFiltering = new BookMarkFilter();
 
@@ -105,7 +103,7 @@ public class FolderMarkGroupFilterTest {
   @Test
   public void testFolderMarkGrouping() throws Exception {
     IFeed feed = fFactory.createFeed(null, new URI("http://www.link.com"));
-    fDao.saveFeed(feed);
+    DynamicDAO.save(feed);
 
     IFolder root = fFactory.createFolder(null, null, "Root");
 
@@ -274,11 +272,11 @@ public class FolderMarkGroupFilterTest {
     feed1.setDescription("This is the bar.");
     fFactory.createNews(null, feed1, new Date());
     fFactory.createNews(null, feed1, new Date()).setState(INews.State.UNREAD);
-    fDao.saveFeed(feed1);
+    DynamicDAO.save(feed1);
 
     IFeed feed2 = fFactory.createFeed(null, new URI("http://www.bar.com"));
     feed2.setDescription("This is the foo.");
-    fDao.saveFeed(feed2);
+    DynamicDAO.save(feed2);
 
     IFolder root = fFactory.createFolder(null, null, "Root");
 

@@ -24,7 +24,6 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IPerson;
 
@@ -45,11 +44,11 @@ public final class PersonReference extends ModelReference {
    * persistance layer.
    */
   public PersonReference(long id) {
-    super(id);
+    super(id, IPerson.class);
   }
-
+  
   @Override
   public IPerson resolve() throws PersistenceException {
-    return Owl.getPersistenceService().getModelDAO().loadPerson(getId());
+    return (IPerson) super.resolve();
   }
 }

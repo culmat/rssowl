@@ -35,7 +35,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IApplicationLayer;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.events.FolderAdapter;
 import org.rssowl.core.model.events.FolderEvent;
 import org.rssowl.core.model.events.FolderListener;
@@ -55,18 +54,13 @@ import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPersistable;
 import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.INews.State;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
+import org.rssowl.core.model.persist.dao.IFeedDAO;
+import org.rssowl.core.model.persist.dao.INewsDAO;
 import org.rssowl.core.model.persist.search.ISearchField;
 import org.rssowl.core.model.persist.search.ISearchValueType;
 import org.rssowl.core.model.persist.search.SearchSpecifier;
-import org.rssowl.core.model.reference.AttachmentReference;
-import org.rssowl.core.model.reference.BookMarkReference;
-import org.rssowl.core.model.reference.CategoryReference;
 import org.rssowl.core.model.reference.FeedLinkReference;
-import org.rssowl.core.model.reference.FolderReference;
-import org.rssowl.core.model.reference.NewsReference;
-import org.rssowl.core.model.reference.PersonReference;
-import org.rssowl.core.model.reference.SearchConditionReference;
-import org.rssowl.core.model.reference.SearchMarkReference;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -84,7 +78,6 @@ import java.util.Set;
  */
 public class ModelTest1 {
   private IModelFactory fFactory;
-  private IModelDAO fDao;
   private IApplicationLayer fAppLayer;
 
   /**
@@ -95,7 +88,6 @@ public class ModelTest1 {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
     fFactory = Owl.getModelFactory();
-    fDao = Owl.getPersistenceService().getModelDAO();
     fAppLayer = Owl.getPersistenceService().getApplicationLayer();
   }
 
@@ -111,7 +103,7 @@ public class ModelTest1 {
     fFactory.createFolder(null, folder, "Child folder #1");
     fFactory.createFolder(null, folder, "Child folder #2");
     fFactory.createFolder(null, folder, "Child folder #3");
-    final IFolder savedFolder = fDao.saveFolder(folder);
+    final IFolder savedFolder = DynamicDAO.save(folder);
     final IFolder savedChildFolder1 = savedFolder.getFolders().get(0);
     final IFolder savedChildFolder2 = savedFolder.getFolders().get(1);
     final IFolder savedChildFolder3 = savedFolder.getFolders().get(2);
@@ -151,13 +143,13 @@ public class ModelTest1 {
         folderUpdatedCalled[0] = true;
       }
     };
-    Owl.getListenerService().addFolderListener(listener);
+    DynamicDAO.addEntityListener(IFolder.class, listener);
     try {
       fAppLayer.deleteFolders(foldersToRemove);
       assertEquals(true, folderDeletedCalled[0]);
       assertEquals(true, folderUpdatedCalled[0]);
     } finally {
-      Owl.getListenerService().removeFolderListener(listener);
+      DynamicDAO.removeEntityListener(IFolder.class, listener);
     }
   }
 
@@ -171,11 +163,11 @@ public class ModelTest1 {
     String key = "key";
     String value = "value";
     folder.setProperty(key, value);
-    fDao.saveFolder(folder);
+    DynamicDAO.save(folder);
 
     String newValue = "newValue";
     folder.setProperty(key, newValue);
-    fDao.saveFolder(folder);
+    DynamicDAO.save(folder);
 
     folder = null;
     System.gc();
@@ -219,7 +211,7 @@ public class ModelTest1 {
   }
 
   /**
-   * Tests that {@link IModelDAO#saveFeed(IFeed)} sets the current and old state
+   * Tests that {@link IFeedDAO#save(IFeed)} sets the current and old state
    * correctly in the news when firing a newsUpdated event.
    *
    * @throws Exception
@@ -227,14 +219,14 @@ public class ModelTest1 {
   @Test
   public void testSaveFeedSetsCurrentAndOldStateInNews() throws Exception {
     IFeed feed = new Feed(new URI("http://www.feed.com"));
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     INews news = fFactory.createNews(null, feed, new Date());
     news.setTitle("News Title #1");
     news.setLink(new URI("http://www.link.com"));
     news.setState(INews.State.UNREAD);
 
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     final INews savedNews = feed.getNews().get(0);
     savedNews.setTitle("News Title Updated #1");
@@ -249,11 +241,11 @@ public class ModelTest1 {
         assertEquals(State.UNREAD, event.getEntity().getState());
       }
     };
-    Owl.getListenerService().addNewsListener(newsListener);
+    DynamicDAO.addEntityListener(INews.class, newsListener);
     try {
-      feed = fDao.saveFeed(feed);
+      feed = DynamicDAO.save(feed);
     } finally {
-      Owl.getListenerService().removeNewsListener(newsListener);
+      DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
     newsListener = new NewsAdapter() {
       @Override
@@ -265,17 +257,17 @@ public class ModelTest1 {
         assertEquals(State.UPDATED, event.getEntity().getState());
       }
     };
-    Owl.getListenerService().addNewsListener(newsListener);
+    DynamicDAO.addEntityListener(INews.class, newsListener);
     feed.getNews().get(0).setState(State.UPDATED);
     try {
-      feed = fDao.saveFeed(feed);
+      feed = DynamicDAO.save(feed);
     } finally {
-      Owl.getListenerService().removeNewsListener(newsListener);
+      DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
 
   /**
-   * Tests that {@link IModelDAO#saveNews(INews)} sets the current and old state
+   * Tests that {@link INewsDAO#save(INews)} sets the current and old state
    * correctly when firing a newsUpdated event.
    *
    * @throws Exception
@@ -283,14 +275,14 @@ public class ModelTest1 {
   @Test
   public void testSaveNewsSetsCurrentAndOldState() throws Exception {
     IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com"));
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     INews news = fFactory.createNews(null, feed, new Date());
     news.setTitle("News Title #1");
     news.setLink(new URI("http://www.link.com"));
     news.setState(INews.State.UNREAD);
 
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     INews savedNews = feed.getNews().get(0);
     final Long savedNewsId = savedNews.getId();
@@ -306,11 +298,11 @@ public class ModelTest1 {
         assertEquals(State.UNREAD, event.getEntity().getState());
       }
     };
-    Owl.getListenerService().addNewsListener(newsListener);
+    DynamicDAO.addEntityListener(INews.class, newsListener);
     try {
-      savedNews = fDao.saveNews(savedNews);
+      savedNews = DynamicDAO.save(savedNews);
     } finally {
-      Owl.getListenerService().removeNewsListener(newsListener);
+      DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
     newsListener = new NewsAdapter() {
       @Override
@@ -322,12 +314,12 @@ public class ModelTest1 {
         assertEquals(State.UPDATED, event.getEntity().getState());
       }
     };
-    Owl.getListenerService().addNewsListener(newsListener);
+    DynamicDAO.addEntityListener(INews.class, newsListener);
     savedNews.setState(State.UPDATED);
     try {
-      fDao.saveNews(savedNews);
+      DynamicDAO.save(savedNews);
     } finally {
-      Owl.getListenerService().removeNewsListener(newsListener);
+      DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
 
@@ -361,7 +353,7 @@ public class ModelTest1 {
   @Test
   public void testGetNewsByStatesAndGetVisibleNews() throws Exception {
     IFeed feed = createFeed("http://feed1.com");
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     int newNewsCount = 4;
     List<INews> newNews = new ArrayList<INews>();
@@ -544,9 +536,9 @@ public class ModelTest1 {
   public void testRemoveNewsWithoutFeed() throws Exception {
     IFeed feed = createFeed("http://www.rssowl.org");
     fFactory.createNews(null, feed, new Date());
-    IFeed savedFeed = fDao.saveFeed(feed);
-    fDao.deleteNews(new NewsReference(feed.getNews().get(0).getId()));
-    savedFeed = fDao.loadFeed(savedFeed.getId());
+    IFeed savedFeed = DynamicDAO.save(feed);
+    DynamicDAO.delete(feed.getNews().get(0));
+    savedFeed = DynamicDAO.load(IFeed.class, savedFeed.getId());
     assertNotNull(savedFeed);
   }
 
@@ -562,10 +554,10 @@ public class ModelTest1 {
     ISearchMark searchMark = fFactory.createSearchMark(null, folder, "Mark");
     ISearchField searchField = fFactory.createSearchField(0, INews.class.getName());
     fFactory.createSearchCondition(null, searchMark, searchField, SearchSpecifier.BEGINS_WITH, "Some value");
-    IFolder savedFolder = fDao.saveFolder(folder);
+    IFolder savedFolder = DynamicDAO.save(folder);
     ISearchMark savedMark = (ISearchMark) savedFolder.getMarks().get(0);
-    fDao.deleteSearchCondition(new SearchConditionReference(savedMark.getSearchConditions().get(0).getId()));
-    assertNotNull(fDao.loadSearchMark(savedMark.getId()));
+    DynamicDAO.delete(savedMark.getSearchConditions().get(0));
+    assertNotNull(DynamicDAO.load(ISearchMark.class, savedMark.getId()));
   }
 
   /**
@@ -576,12 +568,12 @@ public class ModelTest1 {
   @Test
   public void testRemovePersonWithoutNews() throws Exception {
     IFeed feed = createFeed("http://www.rssowl.org");
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
     INews news = fFactory.createNews(null, feed, new Date());
     fFactory.createPerson(null, news);
-    INews savedNews = fDao.saveNews(news);
-    fDao.deletePerson(new PersonReference(savedNews.getAuthor().getId()));
-    savedNews = fDao.loadNews(savedNews.getId());
+    INews savedNews = DynamicDAO.save(news);
+    DynamicDAO.delete((savedNews.getAuthor()));
+    savedNews = DynamicDAO.load(INews.class, savedNews.getId());
     assertNotNull(savedNews);
   }
 
@@ -594,9 +586,9 @@ public class ModelTest1 {
   public void testRemovePersonWithoutFeed() throws Exception {
     IFeed feed = createFeed("http://www.rssowl.org");
     fFactory.createPerson(null, feed);
-    IFeed savedFeed = fDao.saveFeed(feed);
-    fDao.deletePerson(new PersonReference(savedFeed.getAuthor().getId()));
-    savedFeed = fDao.loadFeed(savedFeed.getId());
+    IFeed savedFeed = DynamicDAO.save(feed);
+    DynamicDAO.delete(savedFeed.getAuthor());
+    savedFeed = DynamicDAO.load(IFeed.class, savedFeed.getId());
     assertNotNull(savedFeed);
   }
 
@@ -608,12 +600,12 @@ public class ModelTest1 {
   @Test
   public void testRemoveCategoryWithoutNews() throws Exception {
     IFeed feed = createFeed("http://www.rssowl.org");
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
     INews news = fFactory.createNews(null, feed, new Date());
     fFactory.createCategory(null, news);
-    INews savedNews = fDao.saveNews(news);
-    fDao.deleteCategory(new CategoryReference(news.getCategories().get(0).getId()));
-    savedNews = fDao.loadNews(savedNews.getId());
+    INews savedNews = DynamicDAO.save(news);
+    DynamicDAO.delete(news.getCategories().get(0));
+    savedNews = DynamicDAO.load(INews.class, savedNews.getId());
     assertNotNull(savedNews);
   }
 
@@ -626,9 +618,9 @@ public class ModelTest1 {
   public void testRemoveCategoryWithoutFeed() throws Exception {
     IFeed feed = createFeed("http://www.rssowl.org");
     fFactory.createCategory(null, feed);
-    IFeed savedFeed = fDao.saveFeed(feed);
-    fDao.deleteCategory(new CategoryReference(feed.getCategories().get(0).getId()));
-    savedFeed = fDao.loadFeed(savedFeed.getId());
+    IFeed savedFeed = DynamicDAO.save(feed);
+    DynamicDAO.delete(feed.getCategories().get(0));
+    savedFeed = DynamicDAO.load(IFeed.class, savedFeed.getId());
     assertNotNull(savedFeed);
   }
 
@@ -641,10 +633,10 @@ public class ModelTest1 {
   public void testRemoveFolderWithoutParentFolder() throws Exception {
     IFolder folder = fFactory.createFolder(null, null, "Folder");
     fFactory.createFolder(null, folder, "Child folder");
-    IFolder savedFolder = fDao.saveFolder(folder);
+    IFolder savedFolder = DynamicDAO.save(folder);
     IFolder savedChildFolder = savedFolder.getFolders().get(0);
-    fDao.deleteFolder(new FolderReference(savedChildFolder.getId()));
-    assertNotNull(fDao.loadFolder(savedFolder.getId()));
+    DynamicDAO.delete(savedChildFolder);
+    assertNotNull(DynamicDAO.load(IFolder.class, savedFolder.getId()));
   }
 
   /**
@@ -656,10 +648,10 @@ public class ModelTest1 {
   public void testRemoveSearchMarkWithoutFolder() throws Exception {
     IFolder folder = fFactory.createFolder(null, null, "Folder");
     fFactory.createSearchMark(null, folder, "Mark");
-    IFolder savedFolder = fDao.saveFolder(folder);
+    IFolder savedFolder = DynamicDAO.save(folder);
     ISearchMark savedMark = (ISearchMark) savedFolder.getMarks().get(0);
-    fDao.deleteSearchMark(new SearchMarkReference(savedMark.getId()));
-    assertNotNull(fDao.loadFolder(savedFolder.getId()));
+    DynamicDAO.delete(savedMark);
+    assertNotNull(DynamicDAO.load(IFolder.class, savedFolder.getId()));
   }
 
   /**
@@ -672,7 +664,7 @@ public class ModelTest1 {
   public void testRemoveSearchUpdatesFolder() throws Exception {
     IFolder folder = fFactory.createFolder(null, null, "Folder");
     fFactory.createSearchMark(null, folder, "Mark");
-    final IFolder savedFolder = fDao.saveFolder(folder);
+    final IFolder savedFolder = DynamicDAO.save(folder);
 
     final boolean[] folderUpdatedCalled = new boolean[1];
     FolderListener folderListener = new FolderListener() {
@@ -690,13 +682,13 @@ public class ModelTest1 {
         folderUpdatedCalled[0] = true;
       }
     };
-    Owl.getListenerService().addFolderListener(folderListener);
+    DynamicDAO.addEntityListener(IFolder.class, folderListener);
     try {
       ISearchMark savedMark = (ISearchMark) savedFolder.getMarks().get(0);
-      fDao.deleteSearchMark(new SearchMarkReference(savedMark.getId()));
+      DynamicDAO.delete(savedMark);
       assertTrue("folderUpdated was not called", folderUpdatedCalled[0]);
     } finally {
-      Owl.getListenerService().removeFolderListener(folderListener);
+      DynamicDAO.removeEntityListener(IFolder.class, folderListener);
     }
   }
 
@@ -709,12 +701,12 @@ public class ModelTest1 {
   public void testRemoveBookMarkWithoutFolder() throws Exception {
     IFolder folder = fFactory.createFolder(null, null, "Folder");
     IFeed feed = createFeed("http://www.someurl.com");
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
     fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "Mark");
-    IFolder savedFolder = fDao.saveFolder(folder);
+    IFolder savedFolder = DynamicDAO.save(folder);
     IBookMark savedMark = (IBookMark) savedFolder.getMarks().get(0);
-    fDao.deleteBookMark(new BookMarkReference(savedMark.getId()));
-    assertNotNull(fDao.loadFolder(savedFolder.getId()));
+    DynamicDAO.delete(savedMark);
+    assertNotNull(DynamicDAO.load(IFolder.class, savedFolder.getId()));
   }
 
   /**
@@ -725,12 +717,12 @@ public class ModelTest1 {
   @Test
   public void testRemoveAttachmentWithoutNews() throws Exception {
     IFeed feed = createFeed("http://www.rssowl.org");
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
     INews news = fFactory.createNews(null, feed, new Date());
     fFactory.createAttachment(null, news);
-    INews savedNews = fDao.saveNews(news);
-    fDao.deleteAttachment(new AttachmentReference(news.getAttachments().get(0).getId()));
-    savedNews = fDao.loadNews(savedNews.getId());
+    INews savedNews = DynamicDAO.save(news);
+    DynamicDAO.delete(news.getAttachments().get(0));
+    savedNews = DynamicDAO.load(INews.class, savedNews.getId());
     assertNotNull(savedNews);
   }
 
@@ -746,21 +738,21 @@ public class ModelTest1 {
     {
       IFolder folder = fFactory.createFolder(null, null, "Folder");
       IFeed feed = createFeed("http://www.someurl.com");
-      feed = fDao.saveFeed(feed);
+      feed = DynamicDAO.save(feed);
       fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "Mark");
-      IFolder savedFolder = fDao.saveFolder(folder);
+      IFolder savedFolder = DynamicDAO.save(folder);
       IBookMark savedMark = (IBookMark) savedFolder.getMarks().get(0);
       IFeed savedFeed = savedMark.getFeedLinkReference().resolve();
-      fDao.deleteBookMark(new BookMarkReference(savedMark.getId()));
-      assertNull("Feed must also be deleted since no more bookmarks reference it", fDao.loadFeed(savedFeed.getId()));
+      DynamicDAO.delete(savedMark);
+      assertNull("Feed must also be deleted since no more bookmarks reference it", DynamicDAO.load(IFeed.class, savedFeed.getId()));
     }
     {
       IFolder folder = fFactory.createFolder(null, null, "AnotherFolder");
       IFeed feed = createFeed("http://www.anotherurl.com");
-      feed = fDao.saveFeed(feed);
+      feed = DynamicDAO.save(feed);
       fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "Mark1");
       fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "Mark2");
-      IFolder savedFolder = fDao.saveFolder(folder);
+      IFolder savedFolder = DynamicDAO.save(folder);
       IBookMark savedMark1 = (IBookMark) savedFolder.getMarks().get(0);
       IBookMark savedMark2 = (IBookMark) savedFolder.getMarks().get(1);
       if (savedMark1.getName().equals("Mark2")) {
@@ -769,10 +761,10 @@ public class ModelTest1 {
         savedMark2 = tempMark;
       }
       IFeed savedFeed = savedMark1.getFeedLinkReference().resolve();
-      fDao.deleteBookMark(new BookMarkReference(savedMark1.getId()));
-      assertNotNull("Feed must not be deleted since one bookmark references it", fDao.loadFeed(savedFeed.getId()));
-      fDao.deleteBookMark(new BookMarkReference(savedMark2.getId()));
-      assertNull("Feed must also be deleted since no more bookmarks reference it", fDao.loadFeed(savedFeed.getId()));
+      DynamicDAO.delete(savedMark1);
+      assertNotNull("Feed must not be deleted since one bookmark references it", DynamicDAO.load(IFeed.class, savedFeed.getId()));
+      DynamicDAO.delete(savedMark2);
+      assertNull("Feed must also be deleted since no more bookmarks reference it", DynamicDAO.load(IFeed.class, savedFeed.getId()));
     }
   }
 

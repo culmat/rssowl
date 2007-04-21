@@ -24,7 +24,6 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.search.ISearchCondition;
 
@@ -45,11 +44,11 @@ public class SearchConditionReference extends ModelReference {
    * persistance layer.
    */
   public SearchConditionReference(long id) {
-    super(id);
+    super(id, ISearchCondition.class);
   }
-
+  
   @Override
   public ISearchCondition resolve() throws PersistenceException {
-    return Owl.getPersistenceService().getModelDAO().loadSearchCondition(getId());
+    return (ISearchCondition) super.resolve();
   }
 }

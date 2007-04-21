@@ -29,16 +29,17 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.events.BookMarkAdapter;
 import org.rssowl.core.model.events.BookMarkEvent;
 import org.rssowl.core.model.events.BookMarkListener;
+import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.IModelFactory;
-import org.rssowl.core.model.persist.pref.IPreferencesInitializer;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
+import org.rssowl.core.model.persist.pref.IPreferencesInitializer;
 import org.rssowl.core.model.reference.FeedLinkReference;
 
 import java.net.URI;
@@ -59,7 +60,6 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
   private static final String TEST_STRING = "testString";
   private static final String TEST_STRINGS = "testStrings";
   private IModelFactory fFactory;
-  private IModelDAO fDao;
 
   /**
    * @throws Exception
@@ -69,7 +69,6 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
     fFactory = Owl.getModelFactory();
-    fDao = Owl.getPersistenceService().getModelDAO();
   }
 
   /**
@@ -145,11 +144,11 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
    */
   @Test
   public final void testEntityScope() throws Exception {
-    IFolder folder = fDao.saveFolder(fFactory.createFolder(null, null, "Root"));
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
     IFeed feed = fFactory.createFeed(null, new URI("http://www.link.com"));
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
     fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark");
-    folder = fDao.saveFolder(folder);
+    folder = DynamicDAO.save(folder);
 
     IPreferenceScope entityScope = Owl.getPreferenceService().getEntityScope(folder);
 
@@ -224,10 +223,10 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
    */
   @Test
   public final void testEntityScopeChangeWithGC() throws Exception {
-    IFolder folder = fDao.saveFolder(fFactory.createFolder(null, null, "Root"));
+    IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
     IFeed feed = fFactory.createFeed(null, new URI("http://www.link.com"));
-    feed = fDao.saveFeed(feed);
-    folder = fDao.saveFolder(folder);
+    feed = DynamicDAO.save(feed);
+    folder = DynamicDAO.save(folder);
 
     IPreferenceScope entityScope = Owl.getPreferenceService().getEntityScope(folder);
 
@@ -268,11 +267,11 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
   public final void testEntityScopeUpdateEvents() throws Exception {
     BookMarkListener bookmarkListener = null;
     try {
-      IFolder folder = fDao.saveFolder(fFactory.createFolder(null, null, "Root"));
+      IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
       IFeed feed = fFactory.createFeed(null, new URI("http://www.link.com"));
-      feed = fDao.saveFeed(feed);
+      feed = DynamicDAO.save(feed);
       fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark");
-      folder = fDao.saveFolder(folder);
+      folder = DynamicDAO.save(folder);
 
       final int eventsCounter[] = new int[] { 0 };
       bookmarkListener = new BookMarkAdapter() {
@@ -281,7 +280,7 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
           eventsCounter[0]++;
         }
       };
-      Owl.getListenerService().addBookMarkListener(bookmarkListener);
+      DynamicDAO.addEntityListener(IBookMark.class, bookmarkListener);
 
       IMark mark = folder.getMarks().get(0);
 
@@ -297,7 +296,7 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
       assertEquals(2, eventsCounter[0]);
     } finally {
       if (bookmarkListener != null)
-        Owl.getListenerService().removeBookMarkListener(bookmarkListener);
+        DynamicDAO.removeEntityListener(IBookMark.class, bookmarkListener);
     }
   }
 

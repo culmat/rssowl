@@ -35,7 +35,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
-import org.rssowl.core.Owl;
 import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.IConnectionService;
@@ -45,10 +44,12 @@ import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.connection.UnknownFeedException;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.model.events.FeedAdapter;
 import org.rssowl.core.model.events.FeedEvent;
 import org.rssowl.core.model.persist.IConditionalGet;
 import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.util.ExtensionUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
@@ -130,7 +131,8 @@ public class ConnectionServiceImpl implements IConnectionService {
       }
     };
 
-    Owl.getListenerService().addFeedListener(fFeedListener);
+    /* We register listeners as part of initialisation, we must use InternalOwl */
+    InternalOwl.getDefault().getPersistenceService().getDAOService().getFeedDAO().addEntityListener(fFeedListener);
   }
 
   /*
@@ -141,7 +143,7 @@ public class ConnectionServiceImpl implements IConnectionService {
   }
 
   private void unregisterListeners() {
-    Owl.getListenerService().removeFeedListener(fFeedListener);
+    DynamicDAO.removeEntityListener(IFeed.class, fFeedListener);
   }
 
   /*

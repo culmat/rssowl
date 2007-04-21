@@ -24,7 +24,6 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.ILabel;
 
@@ -45,11 +44,11 @@ public final class LabelReference extends ModelReference {
    * persistance layer.
    */
   public LabelReference(long id) {
-    super(id);
+    super(id, ILabel.class);
   }
-
+  
   @Override
   public ILabel resolve() throws PersistenceException {
-    return Owl.getPersistenceService().getModelDAO().loadLabel(getId());
+    return (ILabel) super.resolve();
   }
 }

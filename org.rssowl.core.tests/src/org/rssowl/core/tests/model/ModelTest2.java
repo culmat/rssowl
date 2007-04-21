@@ -35,7 +35,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IApplicationLayer;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.AttachmentAdapter;
 import org.rssowl.core.model.events.AttachmentEvent;
@@ -75,6 +74,7 @@ import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.search.ISearchCondition;
 import org.rssowl.core.model.persist.search.ISearchField;
 import org.rssowl.core.model.persist.search.SearchSpecifier;
@@ -102,7 +102,6 @@ import java.util.Set;
  */
 public class ModelTest2 {
   private IModelFactory fFactory;
-  private IModelDAO fDao;
   private IApplicationLayer fAppLayer;
 
   /**
@@ -113,7 +112,6 @@ public class ModelTest2 {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
     fFactory = Owl.getModelFactory();
-    fDao = Owl.getPersistenceService().getModelDAO();
     fAppLayer = Owl.getPersistenceService().getApplicationLayer();
   }
 
@@ -170,7 +168,7 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addFolderListener(folderListener);
+      DynamicDAO.addEntityListener(IFolder.class, folderListener);
 
       /* Check BookMark Added */
       final IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com"));
@@ -188,10 +186,10 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addFeedListener(feedListener);
+      DynamicDAO.addEntityListener(IFeed.class, feedListener);
 
       /* Save Feed since a IBookMark now doesn't contain a feed */
-      fDao.saveFeed(feed);
+      DynamicDAO.save(feed);
 
       final IBookMark bookMark1 = fFactory.createBookMark(null, root, new FeedLinkReference(feed.getLink()), "Root BookMark");
       final IBookMark bookMark2 = fFactory.createBookMark(null, rootChild, new FeedLinkReference(feed.getLink()), "Root Child BookMark");
@@ -225,7 +223,7 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addBookMarkListener(bookMarkListener);
+      DynamicDAO.addEntityListener(IBookMark.class, bookMarkListener);
 
       /* Check SearchMark Added */
       final ISearchMark searchMark1 = fFactory.createSearchMark(null, root, "Root SearchMark");
@@ -260,7 +258,7 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addSearchMarkListener(searchMarkListener);
+      DynamicDAO.addEntityListener(ISearchMark.class, searchMarkListener);
 
       /* Check SearchCondition Added */
       ISearchField field1 = fFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
@@ -290,10 +288,10 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addSearchConditionListener(searchConditionListener);
+      DynamicDAO.addEntityListener(ISearchCondition.class, searchConditionListener);
 
       /* Save Folder */
-      fDao.saveFolder(root);
+      DynamicDAO.save(root);
 
       /* Asserts Follow */
       assertTrue("Expected one feedAdded event", feedEventsIssued[0]);
@@ -321,15 +319,15 @@ public class ModelTest2 {
       TestUtils.fail(e);
     } finally {
       if (folderListener != null)
-        Owl.getListenerService().removeFolderListener(folderListener);
+        DynamicDAO.removeEntityListener(IFolder.class, folderListener);
       if (bookMarkListener != null)
-        Owl.getListenerService().removeBookMarkListener(bookMarkListener);
+        DynamicDAO.removeEntityListener(IBookMark.class, bookMarkListener);
       if (searchMarkListener != null)
-        Owl.getListenerService().removeSearchMarkListener(searchMarkListener);
+        DynamicDAO.removeEntityListener(ISearchMark.class, searchMarkListener);
       if (feedListener != null)
-        Owl.getListenerService().removeFeedListener(feedListener);
+        DynamicDAO.removeEntityListener(IFeed.class, feedListener);
       if (searchConditionListener != null)
-        Owl.getListenerService().removeSearchConditionListener(searchConditionListener);
+        DynamicDAO.removeEntityListener(ISearchCondition.class, searchConditionListener);
     }
   }
 
@@ -372,7 +370,7 @@ public class ModelTest2 {
         }
       };
 
-      Owl.getListenerService().addFeedListener(feedListener);
+      DynamicDAO.addEntityListener(IFeed.class, feedListener);
 
       /* Check News Added */
       final INews news1 = fFactory.createNews(null, feed, new Date());
@@ -412,7 +410,7 @@ public class ModelTest2 {
             newsReceivedFromFeed[0] = true;
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       /* Check Attachment Added */
       final IAttachment attachment1 = fFactory.createAttachment(null, news1);
@@ -442,7 +440,7 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addAttachmentListener(attachmentListener);
+      DynamicDAO.addEntityListener(IAttachment.class, attachmentListener);
 
       /* Check Person Added */
       final IPerson person1 = fFactory.createPerson(null, feed);
@@ -467,7 +465,7 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addPersonListener(personListener);
+      DynamicDAO.addEntityListener(IPerson.class, personListener);
 
       /* Check Category Added */
       final ICategory category1 = fFactory.createCategory(null, news1);
@@ -492,10 +490,10 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addCategoryListener(categoryListener);
+      DynamicDAO.addEntityListener(ICategory.class, categoryListener);
 
       /* Save Feed */
-      fDao.saveFeed(feed);
+      DynamicDAO.save(feed);
 
       /* Asserts Follow */
       assertTrue("Missed feedAdded Event in FeedListener!", feedAdded[0]);
@@ -524,15 +522,15 @@ public class ModelTest2 {
       TestUtils.fail(e);
     } finally {
       if (feedListener != null)
-        Owl.getListenerService().removeFeedListener(feedListener);
+        DynamicDAO.removeEntityListener(IFeed.class, feedListener);
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
       if (attachmentListener != null)
-        Owl.getListenerService().removeAttachmentListener(attachmentListener);
+        DynamicDAO.removeEntityListener(IAttachment.class, attachmentListener);
       if (personListener != null)
-        Owl.getListenerService().removePersonListener(personListener);
+        DynamicDAO.removeEntityListener(IPerson.class, personListener);
       if (categoryListener != null)
-        Owl.getListenerService().removeCategoryListener(categoryListener);
+        DynamicDAO.removeEntityListener(ICategory.class, categoryListener);
     }
   }
 
@@ -550,7 +548,7 @@ public class ModelTest2 {
     CategoryListener categoryListener = null;
     try {
       IFeed feed = fFactory.createFeed(null, new URI("http://www.foobar.com"));
-      FeedReference feedReference = new FeedReference(fDao.saveFeed(feed).getId());
+      FeedReference feedReference = new FeedReference(DynamicDAO.save(feed).getId());
 
       /* Check News Added */
       final INews news = fFactory.createNews(null, feedReference.resolve(), new Date());
@@ -572,7 +570,7 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       /* Check Author Added */
       final IPerson person = fFactory.createPerson(null, news);
@@ -588,7 +586,7 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addPersonListener(personListener);
+      DynamicDAO.addEntityListener(IPerson.class, personListener);
 
       /* Check Attachments Added */
       final IAttachment attachment1 = fFactory.createAttachment(null, news);
@@ -615,7 +613,7 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addAttachmentListener(attachmentListener);
+      DynamicDAO.addEntityListener(IAttachment.class, attachmentListener);
 
       /* Check Category Added */
       final ICategory category = fFactory.createCategory(null, news);
@@ -631,9 +629,9 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addCategoryListener(categoryListener);
+      DynamicDAO.addEntityListener(ICategory.class, categoryListener);
 
-      fDao.saveNews(news);
+      DynamicDAO.save(news);
 
       /* Asserts Follow */
       assertTrue("Missed newsReceived Event in NewsListener!", newsAdded[0]);
@@ -648,13 +646,13 @@ public class ModelTest2 {
       TestUtils.fail(e);
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
       if (attachmentListener != null)
-        Owl.getListenerService().removeAttachmentListener(attachmentListener);
+        DynamicDAO.removeEntityListener(IAttachment.class, attachmentListener);
       if (personListener != null)
-        Owl.getListenerService().removePersonListener(personListener);
+        DynamicDAO.removeEntityListener(IPerson.class, personListener);
       if (categoryListener != null)
-        Owl.getListenerService().removeCategoryListener(categoryListener);
+        DynamicDAO.removeEntityListener(ICategory.class, categoryListener);
     }
   }
 
@@ -670,7 +668,7 @@ public class ModelTest2 {
     AttachmentListener attachmentListener = null;
     try {
       IFeed feed = fFactory.createFeed(null, new URI("http://www.foobar.com"));
-      FeedReference feedReference = new FeedReference(fDao.saveFeed(feed).getId());
+      FeedReference feedReference = new FeedReference(DynamicDAO.save(feed).getId());
 
       /* Check News Added */
       final INews news = fFactory.createNews(null, feedReference.resolve(), new Date());
@@ -679,7 +677,7 @@ public class ModelTest2 {
       attachment0.setLink(new URI("http://www.attachment1.com"));
       final IAttachment attachment1 = fFactory.createAttachment(null, news);
       attachment1.setLink(new URI("http://www.attachment1.com"));
-      fDao.saveFeed(feed);
+      DynamicDAO.save(feed);
       NewsReference newsRef = new NewsReference(feed.getNews().get(0).getId());
       AttachmentReference attachmentRef0 = new AttachmentReference(news.getAttachments().get(0).getId());
       AttachmentReference attachmentRef1 = new AttachmentReference(news.getAttachments().get(1).getId());
@@ -708,7 +706,7 @@ public class ModelTest2 {
           fail("Unexpected event");
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       /* Check Attachments Added */
       final boolean attachmentDeleted[] = new boolean[2];
@@ -727,22 +725,22 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addAttachmentListener(attachmentListener);
+      DynamicDAO.addEntityListener(IAttachment.class, attachmentListener);
 
-      fDao.deleteFeed(new FeedReference(feed.getId()));
-      assertNull(fDao.loadFeed(feed.getId()));
-      assertNull(fDao.loadNews(newsRef.getId()));
-      assertNull(fDao.loadAttachment(attachmentRef0.getId()));
-      assertNull(fDao.loadAttachment(attachmentRef1.getId()));
+      DynamicDAO.delete(feed);
+      assertNull(DynamicDAO.load(IFeed.class, feed.getId()));
+      assertNull(DynamicDAO.load(INews.class, newsRef.getId()));
+      assertNull(DynamicDAO.load(IAttachment.class, attachmentRef0.getId()));
+      assertNull(DynamicDAO.load(IAttachment.class, attachmentRef1.getId()));
 
       assertTrue("Missed newsDeleted Event in NewsListener!", newsDeleted[0]);
       assertTrue("Missed attachmentDeleted Event in PersonListener!", attachmentDeleted[0]);
       assertTrue("Missed attachmentDeleted Event in PersonListener!", attachmentDeleted[1]);
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
       if (attachmentListener != null)
-        Owl.getListenerService().removeAttachmentListener(attachmentListener);
+        DynamicDAO.removeEntityListener(IAttachment.class, attachmentListener);
     }
   }
 
@@ -756,14 +754,14 @@ public class ModelTest2 {
     try {
       final URI feedURI = new URI("http://www.foobar.com");
       IFeed feed = fFactory.createFeed(null, feedURI);
-      FeedReference feedReference = new FeedReference(fDao.saveFeed(feed).getId());
+      FeedReference feedReference = new FeedReference(DynamicDAO.save(feed).getId());
 
       /* Check News Added */
       final INews news = fFactory.createNews(null, feedReference.resolve(), new Date());
       news.setTitle("News Title");
       final IAttachment attachment1 = fFactory.createAttachment(null, news);
       attachment1.setLink(new URI("http://www.attachment1.com"));
-      fDao.saveNews(news);
+      DynamicDAO.save(news);
 
       final boolean[] newsUpdated = new boolean[1];
       newsListener = new NewsAdapter() {
@@ -779,7 +777,7 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       /* Check Attachments Added */
       final boolean attachmentDeleted[] = new boolean[1];
@@ -796,20 +794,20 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addAttachmentListener(attachmentListener);
+      DynamicDAO.addEntityListener(IAttachment.class, attachmentListener);
 
-      AttachmentReference attachmentRef = new AttachmentReference(news.getAttachments().get(0).getId());
-      fDao.deleteAttachment(attachmentRef);
+      IAttachment attachment = news.getAttachments().get(0);
+      DynamicDAO.delete(attachment);
 
-      assertNull(fDao.loadAttachment(attachmentRef.getId()));
+      assertNull(DynamicDAO.load(IAttachment.class, attachment.getId()));
       /* Asserts Follow */
       assertTrue("Missed newsUpdated Event in NewsListener!", newsUpdated[0]);
       assertTrue("Missed attachmentDeleted Event in PersonListener!", attachmentDeleted[0]);
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
       if (attachmentListener != null)
-        Owl.getListenerService().removeAttachmentListener(attachmentListener);
+        DynamicDAO.removeEntityListener(IAttachment.class, attachmentListener);
     }
   }
 
@@ -829,22 +827,22 @@ public class ModelTest2 {
     try {
       /* Check Folder Deleted */
       IFolder root = fFactory.createFolder(null, null, "Root");
-      root = fDao.saveFolder(root);
+      root = DynamicDAO.save(root);
       final FolderReference rootRef = new FolderReference(root.getId());
       fFactory.createFolder(null, root, "Root Child");
-      root = fDao.saveFolder(root);
+      root = DynamicDAO.save(root);
       IFolder rootChild = root.getFolders().get(0);
       fFactory.createFolder(null, rootChild, "Root Child Child #1");
-      rootChild = fDao.saveFolder(rootChild);
+      rootChild = DynamicDAO.save(rootChild);
       FolderReference rootChildRef = new FolderReference(rootChild.getId());
       IFolder rootChildChild1 = rootChild.getFolders().get(0);
       FolderReference rootChildChild1Ref = new FolderReference(rootChildChild1.getId());
       fFactory.createFolder(null, rootChild, "Root Child Child #2");
-      rootChild = fDao.saveFolder(rootChild);
+      rootChild = DynamicDAO.save(rootChild);
       IFolder rootChildChild2 = rootChild.getFolders().get(1);
       FolderReference rootChildChild2Ref = new FolderReference(rootChildChild2.getId());
       fFactory.createFolder(null, rootChildChild1, "Root Child Child #1 Child");
-      rootChildChild1 = fDao.saveFolder(rootChildChild1);
+      rootChildChild1 = DynamicDAO.save(rootChildChild1);
       IFolder rootChildChild1Child = rootChildChild1.getFolders().get(0);
       FolderReference rootChildChild1ChildRef = new FolderReference(rootChildChild1Child.getId());
 
@@ -866,22 +864,22 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addFolderListener(folderListener);
+      DynamicDAO.addEntityListener(IFolder.class, folderListener);
 
       /* Check BookMark Deleted */
       final IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com"));
-      final FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+      final FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
       IBookMark bookMark1 = fFactory.createBookMark(null, rootRef.resolve(), new FeedLinkReference(feed.getLink()), "Root BookMark");
-      root = fDao.saveFolder(bookMark1.getFolder());
+      root = DynamicDAO.save(bookMark1.getFolder());
       final BookMarkReference bookMarkRef1 = new BookMarkReference(root.getMarks().get(0).getId());
 
       IBookMark bookMark2 = fFactory.createBookMark(null, rootChildRef.resolve(), new FeedLinkReference(feed.getLink()), "Root Child BookMark");
-      rootChild = fDao.saveFolder(bookMark2.getFolder());
+      rootChild = DynamicDAO.save(bookMark2.getFolder());
       final BookMarkReference bookMarkRef2 = new BookMarkReference(rootChild.getMarks().get(0).getId());
 
       IBookMark bookMark3 = fFactory.createBookMark(null, rootChildChild1Ref.resolve(), new FeedLinkReference(feed.getLink()), "Root Child Child #1 BookMark");
-      rootChildChild1 = fDao.saveFolder(bookMark3.getFolder());
+      rootChildChild1 = DynamicDAO.save(bookMark3.getFolder());
       final BookMarkReference bookMarkRef3 = new BookMarkReference(rootChildChild1.getMarks().get(0).getId());
 
       final boolean bookMarkEventsIssued[] = new boolean[3];
@@ -904,7 +902,7 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addBookMarkListener(bookMarkListener);
+      DynamicDAO.addEntityListener(IBookMark.class, bookMarkListener);
 
       feedListener = new FeedAdapter() {
         @Override
@@ -916,21 +914,21 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addFeedListener(feedListener);
+      DynamicDAO.addEntityListener(IFeed.class, feedListener);
 
       /* Check SearchMark Deleted */
       ISearchMark searchMark1 = fFactory.createSearchMark(null, rootRef.resolve(), "Root SearchMark");
-      root = fDao.saveFolder(searchMark1.getFolder());
+      root = DynamicDAO.save(searchMark1.getFolder());
       searchMark1 = (ISearchMark) root.getMarks().get(root.getMarks().size() - 1);
       final SearchMarkReference searchMarkRef1 = new SearchMarkReference(searchMark1.getId());
 
       ISearchMark searchMark2 = fFactory.createSearchMark(null, rootChildRef.resolve(), "Root Child SearchMark");
-      rootChild = fDao.saveFolder(searchMark2.getFolder());
+      rootChild = DynamicDAO.save(searchMark2.getFolder());
       searchMark2 = (ISearchMark) rootChild.getMarks().get(rootChild.getMarks().size() - 1);
       final SearchMarkReference searchMarkRef2 = new SearchMarkReference(searchMark2.getId());
 
       ISearchMark searchMark3 = fFactory.createSearchMark(null, rootChildChild1ChildRef.resolve(), "Root Child Child #1 Child SearchMark");
-      rootChildChild1Child = fDao.saveFolder(searchMark3.getFolder());
+      rootChildChild1Child = DynamicDAO.save(searchMark3.getFolder());
       searchMark3 = (ISearchMark) rootChildChild1Child.getMarks().get(rootChildChild1Child.getMarks().size() - 1);
       final SearchMarkReference searchMarkRef3 = new SearchMarkReference(searchMark3.getId());
 
@@ -953,21 +951,21 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addSearchMarkListener(searchMarkListener);
+      DynamicDAO.addEntityListener(ISearchMark.class, searchMarkListener);
 
       /* Check SearchCondition Deleted */
       ISearchField field1 = fFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
 
       fFactory.createSearchCondition(null, searchMark1, field1, SearchSpecifier.CONTAINS, "Foo");
-      searchMark1 = fDao.saveSearchMark(searchMark1);
+      searchMark1 = DynamicDAO.save(searchMark1);
       final SearchConditionReference conditionRef1 = new SearchConditionReference(searchMark1.getSearchConditions().get(0).getId());
 
       fFactory.createSearchCondition(null, searchMark2, field1, SearchSpecifier.IS, "Bar");
-      searchMark2 = fDao.saveSearchMark(searchMark2);
+      searchMark2 = DynamicDAO.save(searchMark2);
       final SearchConditionReference conditionRef2 = new SearchConditionReference(searchMark2.getSearchConditions().get(0).getId());
 
       fFactory.createSearchCondition(null, searchMark3, field1, SearchSpecifier.IS_NOT, "Foo Bar");
-      searchMark3 = fDao.saveSearchMark(searchMark3);
+      searchMark3 = DynamicDAO.save(searchMark3);
       final SearchConditionReference conditionRef3 = new SearchConditionReference(searchMark3.getSearchConditions().get(0).getId());
 
       final boolean searchConditionEventsIssued[] = new boolean[3];
@@ -989,14 +987,14 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addSearchConditionListener(searchConditionListener);
+      DynamicDAO.addEntityListener(ISearchCondition.class, searchConditionListener);
 
       /* Delete Root Folder */
-      fDao.deleteFolder(rootRef);
+      DynamicDAO.delete(rootRef.resolve());
 
       /* Asserts Follow */
       assertEquals(0, fAppLayer.loadRootFolders().size());
-      assertEquals(0, Owl.getPersistenceService().getDAOService().getBookMarkDAO().loadAll().size());
+      assertEquals(0, DynamicDAO.loadAll(IBookMark.class).size());
       assertTrue("Expected one feedDeleted event", feedEventsIssued[0]);
       for (int i = 0; i < folderEventsIssued.length; i++) {
         if (!folderEventsIssued[i])
@@ -1019,15 +1017,15 @@ public class ModelTest2 {
       }
     } finally {
       if (folderListener != null)
-        Owl.getListenerService().removeFolderListener(folderListener);
+        DynamicDAO.removeEntityListener(IFolder.class, folderListener);
       if (bookMarkListener != null)
-        Owl.getListenerService().removeBookMarkListener(bookMarkListener);
+        DynamicDAO.removeEntityListener(IBookMark.class, bookMarkListener);
       if (searchMarkListener != null)
-        Owl.getListenerService().removeSearchMarkListener(searchMarkListener);
+        DynamicDAO.removeEntityListener(ISearchMark.class, searchMarkListener);
       if (feedListener != null)
-        Owl.getListenerService().removeFeedListener(feedListener);
+        DynamicDAO.removeEntityListener(IFeed.class, feedListener);
       if (searchConditionListener != null)
-        Owl.getListenerService().removeSearchConditionListener(searchConditionListener);
+        DynamicDAO.removeEntityListener(ISearchCondition.class, searchConditionListener);
     }
   }
 
@@ -1051,7 +1049,7 @@ public class ModelTest2 {
       final IFeed feed = fFactory.createFeed(null, new URI("http://www.foobar.com"));
       final IPerson person1 = fFactory.createPerson(null, feed);
       person1.setName("Person1");
-      final FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+      final FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
       final PersonReference personRef1 = new PersonReference(feedRef.resolve().getAuthor().getId());
       final boolean feedDeleted[] = new boolean[1];
       final boolean newsDeletedFromFeed[] = new boolean[1];
@@ -1067,7 +1065,7 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addFeedListener(feedListener);
+      DynamicDAO.addEntityListener(IFeed.class, feedListener);
 
       /* Check News Deleted */
       final INews news1 = fFactory.createNews(null, feedRef.resolve(), new Date());
@@ -1086,9 +1084,9 @@ public class ModelTest2 {
           newsRef[0] = new NewsReference(events.iterator().next().getEntity().getId());
         }
       };
-      Owl.getListenerService().addNewsListener(newsAdapter);
+      DynamicDAO.addEntityListener(INews.class, newsAdapter);
       /* Must save parent because it gets changed during creation of news */
-      fDao.saveFeed(feedRef.resolve());
+      DynamicDAO.save(feedRef.resolve());
       final NewsReference newsRef1 = newsRef[0];
       final PersonReference personRef2 = new PersonReference(newsRef1.resolve().getAuthor().getId());
 
@@ -1098,7 +1096,7 @@ public class ModelTest2 {
       fFactory.createSource(news2).setLink(new URI("http://www.source2.com"));
       fFactory.createGuid(news2, "Guid2");
       /* Must save parent because it gets changed during creation of news */
-      fDao.saveFeed(feedRef.resolve());
+      DynamicDAO.save(feedRef.resolve());
       final NewsReference newsRef2 = newsRef[0];
 
       final INews news3 = fFactory.createNews(null, feedRef.resolve(), new Date());
@@ -1107,7 +1105,7 @@ public class ModelTest2 {
       fFactory.createSource(news3).setLink(new URI("http://www.source3.com"));
       fFactory.createGuid(news3, "Guid3");
       /* Must save parent because it gets changed during creation of news */
-      fDao.saveFeed(feedRef.resolve());
+      DynamicDAO.save(feedRef.resolve());
       final NewsReference newsRef3 = newsRef[0];
 
       final boolean newsDeleted[] = new boolean[3];
@@ -1133,15 +1131,15 @@ public class ModelTest2 {
             newsDeletedFromFeed[0] = true;
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       /* Check Attachment Deleted */
       final IAttachment attachment1 = fFactory.createAttachment(null, newsRef1.resolve());
-      final AttachmentReference attachmentRef1 = new AttachmentReference(fDao.saveAttachment(attachment1).getId());
+      final AttachmentReference attachmentRef1 = new AttachmentReference(DynamicDAO.save(attachment1).getId());
       final IAttachment attachment2 = fFactory.createAttachment(null, newsRef2.resolve());
-      final AttachmentReference attachmentRef2 = new AttachmentReference(fDao.saveAttachment(attachment2).getId());
+      final AttachmentReference attachmentRef2 = new AttachmentReference(DynamicDAO.save(attachment2).getId());
       final IAttachment attachment3 = fFactory.createAttachment(null, newsRef3.resolve());
-      final AttachmentReference attachmentRef3 = new AttachmentReference(fDao.saveAttachment(attachment3).getId());
+      final AttachmentReference attachmentRef3 = new AttachmentReference(DynamicDAO.save(attachment3).getId());
 
       final boolean attachmentDeleted[] = new boolean[3];
       attachmentListener = new AttachmentAdapter() {
@@ -1163,7 +1161,7 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addAttachmentListener(attachmentListener);
+      DynamicDAO.addEntityListener(IAttachment.class, attachmentListener);
 
       /* Check Person Deleted */
       final boolean personDeleted[] = new boolean[2];
@@ -1182,13 +1180,13 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addPersonListener(personListener);
+      DynamicDAO.addEntityListener(IPerson.class, personListener);
 
       /* Check Category Deleted */
       final ICategory category1 = fFactory.createCategory(null, newsRef1.resolve());
-      final CategoryReference categoryRef1 = new CategoryReference(fDao.saveCategory(category1).getId());
+      final CategoryReference categoryRef1 = new CategoryReference(DynamicDAO.save(category1).getId());
       final ICategory category2 = fFactory.createCategory(null, newsRef2.resolve());
-      final CategoryReference categoryRef2 = new CategoryReference(fDao.saveCategory(category2).getId());
+      final CategoryReference categoryRef2 = new CategoryReference(DynamicDAO.save(category2).getId());
 
       final boolean categoryDeleted[] = new boolean[2];
       categoryListener = new CategoryAdapter() {
@@ -1207,10 +1205,10 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addCategoryListener(categoryListener);
+      DynamicDAO.addEntityListener(ICategory.class, categoryListener);
 
       /* Delete Feed */
-      fDao.deleteFeed(feedRef);
+      DynamicDAO.delete(feedRef.resolve());
 
       /* Asserts Follow */
       assertTrue("Missed feedDeleted Event in FeedListener!", feedDeleted[0]);
@@ -1239,17 +1237,17 @@ public class ModelTest2 {
       TestUtils.fail(e);
     } finally {
       if (newsAdapter != null)
-        Owl.getListenerService().removeNewsListener(newsAdapter);
+        DynamicDAO.removeEntityListener(INews.class, newsAdapter);
       if (feedListener != null)
-        Owl.getListenerService().removeFeedListener(feedListener);
+        DynamicDAO.removeEntityListener(IFeed.class, feedListener);
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
       if (attachmentListener != null)
-        Owl.getListenerService().removeAttachmentListener(attachmentListener);
+        DynamicDAO.removeEntityListener(IAttachment.class, attachmentListener);
       if (personListener != null)
-        Owl.getListenerService().removePersonListener(personListener);
+        DynamicDAO.removeEntityListener(IPerson.class, personListener);
       if (categoryListener != null)
-        Owl.getListenerService().removeCategoryListener(categoryListener);
+        DynamicDAO.removeEntityListener(ICategory.class, categoryListener);
     }
   }
 
@@ -1269,7 +1267,7 @@ public class ModelTest2 {
 
       /* Store a Feed */
       IFeed feed = fFactory.createFeed(null, new URI("http://www.foobar.com"));
-      FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+      FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
       /* Create a News */
       final INews news = fFactory.createNews(null, feedRef.resolve(), new Date());
@@ -1284,13 +1282,13 @@ public class ModelTest2 {
       fFactory.createAttachment(null, news);
 
       /* Save News */
-      final NewsReference newsRef = new NewsReference(fDao.saveNews(news).getId());
+      final NewsReference newsRef = new NewsReference(DynamicDAO.save(news).getId());
 
-      final PersonReference personRef = new PersonReference(fDao.loadNews(newsRef.getId()).getAuthor().getId());
-      final AttachmentReference attachmentRef1 = new AttachmentReference(fDao.loadNews(newsRef.getId()).getAttachments().get(0).getId());
-      final AttachmentReference attachmentRef2 = new AttachmentReference(fDao.loadNews(newsRef.getId()).getAttachments().get(1).getId());
-      final AttachmentReference attachmentRef3 = new AttachmentReference(fDao.loadNews(newsRef.getId()).getAttachments().get(2).getId());
-      final CategoryReference categoryRef = new CategoryReference(fDao.loadNews(newsRef.getId()).getCategories().get(0).getId());
+      final PersonReference personRef = new PersonReference(DynamicDAO.load(INews.class, newsRef.getId()).getAuthor().getId());
+      final AttachmentReference attachmentRef1 = new AttachmentReference(DynamicDAO.load(INews.class, newsRef.getId()).getAttachments().get(0).getId());
+      final AttachmentReference attachmentRef2 = new AttachmentReference(DynamicDAO.load(INews.class, newsRef.getId()).getAttachments().get(1).getId());
+      final AttachmentReference attachmentRef3 = new AttachmentReference(DynamicDAO.load(INews.class, newsRef.getId()).getAttachments().get(2).getId());
+      final CategoryReference categoryRef = new CategoryReference(DynamicDAO.load(INews.class, newsRef.getId()).getCategories().get(0).getId());
 
       /* Check News Deleted */
       final boolean newsDeleted[] = new boolean[1];
@@ -1310,7 +1308,7 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       /* Check Author Deleted */
       final boolean personDeleted[] = new boolean[1];
@@ -1324,7 +1322,7 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addPersonListener(personListener);
+      DynamicDAO.addEntityListener(IPerson.class, personListener);
 
       /* Check Attachments Deleted */
       final boolean attachmentDeleted[] = new boolean[3];
@@ -1345,7 +1343,7 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addAttachmentListener(attachmentListener);
+      DynamicDAO.addEntityListener(IAttachment.class, attachmentListener);
 
       /* Check Category Deleted */
       final boolean categoryDeleted[] = new boolean[1];
@@ -1359,10 +1357,10 @@ public class ModelTest2 {
           }
         }
       };
-      Owl.getListenerService().addCategoryListener(categoryListener);
+      DynamicDAO.addEntityListener(ICategory.class, categoryListener);
 
       /* Delete News */
-      fDao.deleteNews(newsRef);
+      DynamicDAO.delete(newsRef.resolve());
 
       /* Asserts Follow */
       assertTrue("Missed newsDeleted Event in NewsListener!", newsDeleted[0]);
@@ -1377,13 +1375,13 @@ public class ModelTest2 {
       TestUtils.fail(e);
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
       if (attachmentListener != null)
-        Owl.getListenerService().removeAttachmentListener(attachmentListener);
+        DynamicDAO.removeEntityListener(IAttachment.class, attachmentListener);
       if (personListener != null)
-        Owl.getListenerService().removePersonListener(personListener);
+        DynamicDAO.removeEntityListener(IPerson.class, personListener);
       if (categoryListener != null)
-        Owl.getListenerService().removeCategoryListener(categoryListener);
+        DynamicDAO.removeEntityListener(ICategory.class, categoryListener);
     }
   }
 }

@@ -31,7 +31,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IAttachment;
 import org.rssowl.core.model.persist.ICategory;
@@ -43,6 +42,7 @@ import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.model.persist.ISource;
 import org.rssowl.core.model.persist.INews.State;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.search.IModelSearch;
 import org.rssowl.core.model.persist.search.ISearchCondition;
 import org.rssowl.core.model.persist.search.ISearchField;
@@ -69,7 +69,6 @@ public class ModelSearchTest {
   /* One Day in Millis */
   private static final Long DAY = 1000 * 3600 * 24L;
 
-  private IModelDAO fDao;
   private IModelFactory fFactory;
   private IModelSearch fModelSearch;
   private String fNewsEntityName;
@@ -80,7 +79,6 @@ public class ModelSearchTest {
   @Before
   public void setUp() throws Exception {
     fModelSearch = Owl.getPersistenceService().getModelSearch();
-    fDao = Owl.getPersistenceService().getModelDAO();
     fFactory = Owl.getModelFactory();
     fNewsEntityName = INews.class.getName();
 
@@ -167,7 +165,7 @@ public class ModelSearchTest {
       ICategory news5cat2 = fFactory.createCategory(null, news5);
       news5cat2.setName("Java");
 
-      fDao.saveFeed(feed);
+      DynamicDAO.save(feed);
 
       /* Wait for Indexer */
       waitForIndexer();
@@ -535,7 +533,7 @@ public class ModelSearchTest {
       ICategory news5cat2 = fFactory.createCategory(null, news5);
       news5cat2.setName("Java");
 
-      fDao.saveFeed(feed);
+      DynamicDAO.save(feed);
 
       /* Wait for Indexer */
       waitForIndexer();
@@ -868,7 +866,7 @@ public class ModelSearchTest {
       ISource source5 = fFactory.createSource(news5);
       source5.setName("Source for News 5");
 
-      fDao.saveFeed(feed);
+      DynamicDAO.save(feed);
 
       /* Wait for Indexer */
       waitForIndexer();
@@ -1116,7 +1114,7 @@ public class ModelSearchTest {
       ISource source5 = fFactory.createSource(news5);
       source5.setName("Source for News 5");
 
-      fDao.saveFeed(feed);
+      DynamicDAO.save(feed);
 
       /* Wait for Indexer */
       waitForIndexer();
@@ -1352,7 +1350,7 @@ public class ModelSearchTest {
       ICategory news5cat2 = fFactory.createCategory(null, news5);
       news5cat2.setName("Java");
 
-      fDao.saveFeed(feed);
+      DynamicDAO.save(feed);
 
       /* Wait for Indexer */
       waitForIndexer();
@@ -1594,7 +1592,7 @@ public class ModelSearchTest {
       ICategory news5cat2 = fFactory.createCategory(null, news5);
       news5cat2.setName("Java");
 
-      fDao.saveFeed(feed);
+      DynamicDAO.save(feed);
 
       /* Wait for Indexer */
       waitForIndexer();
@@ -1824,7 +1822,7 @@ public class ModelSearchTest {
       INews news5 = createNews(feed, " Bar", "http://www.news.com/news2.html", State.NEW);
       news5.setPublishDate(d5);
 
-      fDao.saveFeed(feed);
+      DynamicDAO.save(feed);
 
       /* Wait for Indexer */
       waitForIndexer();
@@ -1911,7 +1909,7 @@ public class ModelSearchTest {
       INews news5 = createNews(feed, " Bar", "http://www.news.com/news2.html", State.NEW);
       news5.setPublishDate(d5);
 
-      fDao.saveFeed(feed);
+      DynamicDAO.save(feed);
 
       /* Wait for Indexer */
       waitForIndexer();
@@ -2004,7 +2002,7 @@ public class ModelSearchTest {
       INews news5 = createNews(feed, null, "http://www.news.com/news5.html", State.NEW);
       news5.setRating(10);
 
-      fDao.saveFeed(feed);
+      DynamicDAO.save(feed);
 
       /* Wait for Indexer */
       waitForIndexer();
@@ -2120,7 +2118,7 @@ public class ModelSearchTest {
       INews news5 = createNews(feed, null, "http://www.news.com/news5.html", State.NEW);
       news5.setRating(10);
 
-      fDao.saveFeed(feed);
+      DynamicDAO.save(feed);
 
       /* Wait for Indexer */
       waitForIndexer();
@@ -2259,7 +2257,7 @@ public class ModelSearchTest {
       ISource source5 = fFactory.createSource(news5);
       source5.setName("Source for News 5");
 
-      fDao.saveFeed(feed);
+      DynamicDAO.save(feed);
 
       /* Wait for Indexer */
       waitForIndexer();
@@ -2361,7 +2359,7 @@ public class ModelSearchTest {
       ISource source5 = fFactory.createSource(news5);
       source5.setName("Source for News 5");
 
-      fDao.saveFeed(feed);
+      DynamicDAO.save(feed);
 
       /* Wait for Indexer */
       waitForIndexer();
@@ -2536,7 +2534,7 @@ public class ModelSearchTest {
     ISource source5 = fFactory.createSource(news5);
     source5.setName("Source for News 5");
 
-    fDao.saveFeed(feed);
+    DynamicDAO.save(feed);
 
     /* Wait for Indexer */
     waitForIndexer();
@@ -2719,8 +2717,8 @@ public class ModelSearchTest {
     INews news3 = createNews(feed2, "First News of Feed Two", "http://www.news.com/news3.html", State.NEW);
     INews news4 = createNews(feed2, "Second News of Feed Two", "http://www.news.com/news4.html", State.HIDDEN);
 
-    fDao.saveFeed(feed1);
-    fDao.saveFeed(feed2);
+    DynamicDAO.save(feed1);
+    DynamicDAO.save(feed2);
 
     /* Wait for Indexer */
     waitForIndexer();

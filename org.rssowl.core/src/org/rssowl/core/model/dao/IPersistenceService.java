@@ -45,19 +45,6 @@ public interface IPersistenceService {
   DAOService getDAOService();
   
   /**
-   * <p>
-   * Get the Implementation of <code>IModelDAO</code> that allows to add,
-   * update and delete model types. The implementation is looked up using the
-   * "org.rssowl.core.model.ModelDAO" Extension Point.
-   * </p>
-   * Subclasses may override to provide their own implementation.
-   *
-   * @return Returns the Implementation of <code>IModelDAO</code> that allows
-   * to add, update and delete model types.
-   */
-  IModelDAO getModelDAO();
-
-  /**
    * Gets the implementation of <code>IDGenerator</code> that generates IDs
    * that have not yet been used by the persistence layer. The implementation is
    * looked up using the "org.rssowl.core.model.IDGenerator" extension point.

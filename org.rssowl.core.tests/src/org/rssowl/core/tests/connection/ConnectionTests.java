@@ -40,10 +40,10 @@ import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.connection.NotModifiedException;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.internal.persist.Feed;
 import org.rssowl.core.model.persist.IConditionalGet;
 import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.util.Pair;
 
@@ -257,8 +257,7 @@ public class ConnectionTests {
     URI feedUrl = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rdf.xml");
     IFeed feed = new Feed(feedUrl);
 
-    IModelDAO dao = Owl.getPersistenceService().getModelDAO();
-    feed = dao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     ICredentials authCreds = new ICredentials() {
       public String getDomain() {
@@ -278,7 +277,7 @@ public class ConnectionTests {
 
     assertNotNull(conManager.getAuthCredentials(feedUrl));
 
-    dao.deleteFeed(new FeedLinkReference(feedUrl));
+    DynamicDAO.delete(new FeedLinkReference(feedUrl).resolve());
 
     assertNull(conManager.getAuthCredentials(feedUrl));
   }

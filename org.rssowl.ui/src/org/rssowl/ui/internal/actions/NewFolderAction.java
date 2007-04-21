@@ -49,10 +49,10 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.reference.FolderReference;
 import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.OwlUI;
@@ -71,7 +71,6 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
   private Shell fShell;
   private IFolder fParent;
   private boolean fRootMode;
-  private IPersistenceService fPersist;
 
   private class NewFolderDialog extends TitleAreaDialog {
     private Text fNameInput;
@@ -184,7 +183,6 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
   public NewFolderAction(Shell shell, IFolder parent) {
     fShell = shell;
     fParent = parent;
-    fPersist = Owl.getPersistenceService();
   }
 
   /**
@@ -236,7 +234,7 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
             folder.setProperty(property.getKey(), property.getValue());
         }
 
-        fPersist.getModelDAO().saveFolder(fRootMode ? folder : parent);
+        DynamicDAO.save(fRootMode ? folder : parent);
       }
     }
   }
@@ -272,7 +270,7 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
   }
 
   private IFolder getParent() throws PersistenceException {
-    Long selectedRootFolderID = fPersist.getPreferencesDAO().getLong(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET);
+    Long selectedRootFolderID = Owl.getPersistenceService().getDAOService().getPreferencesDAO().getLong(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET);
 
     /* Check if available Parent is still valid */
     if (fParent != null) {

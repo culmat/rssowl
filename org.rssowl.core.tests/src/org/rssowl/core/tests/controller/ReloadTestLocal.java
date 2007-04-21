@@ -33,7 +33,6 @@ import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.model.dao.IApplicationLayer;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.AttachmentEvent;
 import org.rssowl.core.model.events.AttachmentListener;
@@ -41,10 +40,12 @@ import org.rssowl.core.model.events.NewsAdapter;
 import org.rssowl.core.model.events.NewsEvent;
 import org.rssowl.core.model.events.NewsListener;
 import org.rssowl.core.model.internal.persist.Feed;
+import org.rssowl.core.model.persist.IAttachment;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FeedReference;
@@ -105,7 +106,7 @@ public class ReloadTestLocal {
   @SuppressWarnings("all")
   public void testInMemoryFeed() throws Exception {
     IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-    feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+    feed = DynamicDAO.save(feed);
     assertEquals(0, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
 
@@ -131,7 +132,7 @@ public class ReloadTestLocal {
     NewsListener newsListener = null;
     try {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      feed = DynamicDAO.save(feed);
       assertEquals(0, getUnreadCount(feed));
       assertEquals(0, getNewCount(feed));
 
@@ -154,7 +155,7 @@ public class ReloadTestLocal {
           updatedCounter[0] += events.size();
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       /* First Reload */
       InMemoryProtocolHandler.FEED = generateFeed("Title", null, null, null);
@@ -198,7 +199,7 @@ public class ReloadTestLocal {
       assertEquals(3, updatedCounter[0]);
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
 
@@ -208,7 +209,7 @@ public class ReloadTestLocal {
     NewsListener newsListener = null;
     try {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      feed = DynamicDAO.save(feed);
       assertEquals(0, getUnreadCount(feed));
       assertEquals(0, getNewCount(feed));
 
@@ -231,7 +232,7 @@ public class ReloadTestLocal {
           updatedCounter[0] += events.size();
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       /* First Reload */
       InMemoryProtocolHandler.FEED = generateFeed(null, "http://www.link.de", null, null);
@@ -273,7 +274,7 @@ public class ReloadTestLocal {
       assertEquals(3, updatedCounter[0]);
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
 
@@ -283,7 +284,7 @@ public class ReloadTestLocal {
     NewsListener newsListener = null;
     try {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      feed = DynamicDAO.save(feed);
       assertEquals(0, getUnreadCount(feed));
       assertEquals(0, getNewCount(feed));
 
@@ -306,7 +307,7 @@ public class ReloadTestLocal {
           updatedCounter[0] += events.size();
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       /* First Reload */
       InMemoryProtocolHandler.FEED = generateFeed(null, null, "http://www.guid.de", null);
@@ -348,7 +349,7 @@ public class ReloadTestLocal {
       assertEquals(3, updatedCounter[0]);
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
 
@@ -358,7 +359,7 @@ public class ReloadTestLocal {
     NewsListener newsListener = null;
     try {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      feed = DynamicDAO.save(feed);
       assertEquals(0, getUnreadCount(feed));
       assertEquals(0, getNewCount(feed));
 
@@ -381,7 +382,7 @@ public class ReloadTestLocal {
           updatedCounter[0] += events.size();
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       /* First Reload */
       InMemoryProtocolHandler.FEED = generateFeed("Title", "http://www.link.de", null, null);
@@ -439,7 +440,7 @@ public class ReloadTestLocal {
       assertEquals(4, updatedCounter[0]);
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
 
@@ -449,7 +450,7 @@ public class ReloadTestLocal {
     NewsListener newsListener = null;
     try {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      feed = DynamicDAO.save(feed);
       assertEquals(0, getUnreadCount(feed));
       assertEquals(0, getNewCount(feed));
 
@@ -472,7 +473,7 @@ public class ReloadTestLocal {
           updatedCounter[0] += events.size();
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       /* First Reload */
       InMemoryProtocolHandler.FEED = generateFeed("Title", null, "http://www.guid.de", null);
@@ -530,7 +531,7 @@ public class ReloadTestLocal {
       assertEquals(4, updatedCounter[0]);
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
 
@@ -546,7 +547,7 @@ public class ReloadTestLocal {
     NewsListener newsListener = null;
     try {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      feed = DynamicDAO.save(feed);
       assertEquals(0, getUnreadCount(feed));
       assertEquals(0, getNewCount(feed));
 
@@ -569,7 +570,7 @@ public class ReloadTestLocal {
           updatedCounter[0] += events.size();
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       long now = System.currentTimeMillis();
 
@@ -633,7 +634,7 @@ public class ReloadTestLocal {
       assertEquals(4, updatedCounter[0]);
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
 
@@ -643,7 +644,7 @@ public class ReloadTestLocal {
     NewsListener newsListener = null;
     try {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      feed = DynamicDAO.save(feed);
       assertEquals(0, getUnreadCount(feed));
       assertEquals(0, getNewCount(feed));
 
@@ -666,7 +667,7 @@ public class ReloadTestLocal {
           updatedCounter[0] += events.size();
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       long now = System.currentTimeMillis();
 
@@ -760,7 +761,7 @@ public class ReloadTestLocal {
       assertEquals(7, updatedCounter[0]);
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
 
@@ -770,7 +771,7 @@ public class ReloadTestLocal {
     NewsListener newsListener = null;
     try {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      feed = DynamicDAO.save(feed);
       assertEquals(0, getUnreadCount(feed));
       assertEquals(0, getNewCount(feed));
 
@@ -793,7 +794,7 @@ public class ReloadTestLocal {
           updatedCounter[0] += events.size();
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       long now = System.currentTimeMillis();
 
@@ -887,7 +888,7 @@ public class ReloadTestLocal {
       assertEquals(7, updatedCounter[0]);
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
 
@@ -897,7 +898,7 @@ public class ReloadTestLocal {
     NewsListener newsListener = null;
     try {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      feed = DynamicDAO.save(feed);
       assertEquals(0, getUnreadCount(feed));
       assertEquals(0, getNewCount(feed));
 
@@ -920,7 +921,7 @@ public class ReloadTestLocal {
           updatedCounter[0] += events.size();
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       long now = System.currentTimeMillis();
 
@@ -1012,7 +1013,7 @@ public class ReloadTestLocal {
       assertEquals(7, updatedCounter[0]);
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
 
@@ -1022,7 +1023,7 @@ public class ReloadTestLocal {
     NewsListener newsListener = null;
     try {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      feed = DynamicDAO.save(feed);
       assertEquals(0, getUnreadCount(feed));
       assertEquals(0, getNewCount(feed));
 
@@ -1045,7 +1046,7 @@ public class ReloadTestLocal {
           updatedCounter[0] += events.size();
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       long now = System.currentTimeMillis();
 
@@ -1188,7 +1189,7 @@ public class ReloadTestLocal {
       assertEquals(12, updatedCounter[0]);
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
 
@@ -1198,7 +1199,7 @@ public class ReloadTestLocal {
     NewsListener newsListener = null;
     try {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      feed = DynamicDAO.save(feed);
       assertEquals(0, getUnreadCount(feed));
       assertEquals(0, getNewCount(feed));
 
@@ -1222,7 +1223,7 @@ public class ReloadTestLocal {
           updatedCounter[0] += events.size();
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       /* First Reload */
       InMemoryProtocolHandler.FEED = generateFeed("Title", "http://www.link.de", null, fDateFormat.format(System.currentTimeMillis()));
@@ -1284,7 +1285,7 @@ public class ReloadTestLocal {
       assertEquals(1, removedCounter[0]);
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
 
@@ -1295,7 +1296,7 @@ public class ReloadTestLocal {
     NewsListener oldNewsListener = null;
     try {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      feed = DynamicDAO.save(feed);
       assertEquals(0, getUnreadCount(feed));
       assertEquals(0, getNewCount(feed));
 
@@ -1318,7 +1319,7 @@ public class ReloadTestLocal {
           updatedCounter[0] += events.size();
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
       /* First Reload */
       InMemoryProtocolHandler.FEED = generateFeed("Title", "http://www.link.de", null, null, "Hello World", "bpasero", null, "mp3");
@@ -1369,9 +1370,9 @@ public class ReloadTestLocal {
           assertEquals(1, attachmentsSize);
         }
       };
-      Owl.getListenerService().addNewsListener(oldNewsListener);
+      DynamicDAO.addEntityListener(INews.class, oldNewsListener);
       fController.reload(bookmark, null, new NullProgressMonitor());
-      Owl.getListenerService().removeNewsListener(oldNewsListener);
+      DynamicDAO.removeEntityListener(INews.class, oldNewsListener);
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(1, getUnreadCount(feed));
       assertEquals(0, getNewCount(feed));
@@ -1384,9 +1385,9 @@ public class ReloadTestLocal {
       assertEquals(3, updatedCounter[0]);
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
       if (oldNewsListener != null)
-        Owl.getListenerService().removeNewsListener(oldNewsListener);
+        DynamicDAO.removeEntityListener(INews.class, oldNewsListener);
     }
   }
 
@@ -1396,7 +1397,7 @@ public class ReloadTestLocal {
     AttachmentListener attachmentListener = null;
     try {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      feed = DynamicDAO.save(feed);
 
       FeedReference feedRef = new FeedReference(feed.getId());
 
@@ -1415,7 +1416,7 @@ public class ReloadTestLocal {
           updatedCounter[0]++;
         }
       };
-      Owl.getListenerService().addAttachmentListener(attachmentListener);
+      DynamicDAO.addEntityListener(IAttachment.class, attachmentListener);
 
       /* First Reload */
       InMemoryProtocolHandler.FEED = generateFeedWithEnclosure("Title", null, "http://www.mp3.com/me.mp3", "wav");
@@ -1429,7 +1430,7 @@ public class ReloadTestLocal {
       assertEquals(1, updatedCounter[0]);
     } finally {
       if (attachmentListener != null)
-        Owl.getListenerService().removeAttachmentListener(attachmentListener);
+        DynamicDAO.removeEntityListener(IAttachment.class, attachmentListener);
     }
   }
 
@@ -1445,7 +1446,7 @@ public class ReloadTestLocal {
   @SuppressWarnings("all")
   public void testNewsServiceWithReloadBookMarkAndCleanup() throws Exception {
     IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-    feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+    feed = DynamicDAO.save(feed);
     assertEquals(0, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
 
@@ -1485,7 +1486,7 @@ public class ReloadTestLocal {
     /* Duplicate News with: Title */
     {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      feed = DynamicDAO.save(feed);
 
       FeedReference feedRef = new FeedReference(feed.getId());
 
@@ -1494,13 +1495,13 @@ public class ReloadTestLocal {
       InMemoryProtocolHandler.FEED = generateFeedWithDuplicateNews("News Title", null, null, null, "Description", null, null, null);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
-      Owl.getPersistenceService().getModelDAO().deleteFeed(feedRef);
+      DynamicDAO.delete(feedRef.resolve());
     }
 
     /* Duplicate News with: Title, Link */
     {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      feed = DynamicDAO.save(feed);
 
       FeedReference feedRef = new FeedReference(feed.getId());
 
@@ -1509,13 +1510,13 @@ public class ReloadTestLocal {
       InMemoryProtocolHandler.FEED = generateFeedWithDuplicateNews("News Title", "http://www.link.com", null, null, "Description", null, null, null);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
-      Owl.getPersistenceService().getModelDAO().deleteFeed(feedRef);
+      DynamicDAO.delete(feedRef.resolve());
     }
 
     /* Duplicate News with: Title, Guid */
     {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      feed = DynamicDAO.save(feed);
 
       FeedReference feedRef = new FeedReference(feed.getId());
 
@@ -1524,13 +1525,13 @@ public class ReloadTestLocal {
       InMemoryProtocolHandler.FEED = generateFeedWithDuplicateNews("News Title", null, "http://www.link.com", null, "Description", null, null, null);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
-      Owl.getPersistenceService().getModelDAO().deleteFeed(feedRef);
+      DynamicDAO.delete(feedRef.resolve());
     }
 
     /* Duplicate News with: Title, Link, Guid */
     {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+      feed = DynamicDAO.save(feed);
 
       FeedReference feedRef = new FeedReference(feed.getId());
 
@@ -1539,7 +1540,7 @@ public class ReloadTestLocal {
       InMemoryProtocolHandler.FEED = generateFeedWithDuplicateNews("News Title", "http://www.link.com", "http://www.guid.com", null, "Description", null, null, null);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
-      Owl.getPersistenceService().getModelDAO().deleteFeed(feedRef);
+      DynamicDAO.delete(feedRef.resolve());
     }
   }
 
@@ -1646,9 +1647,8 @@ public class ReloadTestLocal {
   }
 
   private IBookMark createBookMark(IFeed feed) throws PersistenceException {
-    IModelDAO dao = Owl.getPersistenceService().getModelDAO();
-    IFolder folder = dao.saveFolder(Owl.getModelFactory().createFolder(null, null, "Root"));
+    IFolder folder = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
 
-    return dao.saveBookMark(Owl.getModelFactory().createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark"));
+    return DynamicDAO.save(Owl.getModelFactory().createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark"));
   }
 }

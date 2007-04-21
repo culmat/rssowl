@@ -38,14 +38,13 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.TransferData;
-import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IApplicationLayer;
-import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
+import org.rssowl.core.model.persist.dao.IFolderDAO;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.RegExUtils;
 import org.rssowl.core.util.ReparentInfo;
@@ -65,7 +64,7 @@ import java.util.List;
  */
 public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceListener {
   private final BookMarkExplorer fExplorer;
-  private final IPersistenceService fPersistence;
+  private final IFolderDAO fFolderDAO;
 
   /**
    * @param explorer
@@ -74,7 +73,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
   protected BookMarkDNDImpl(BookMarkExplorer explorer, Viewer viewer) {
     super(viewer);
     fExplorer = explorer;
-    fPersistence = Owl.getPersistenceService();
+    fFolderDAO = DynamicDAO.getDAO(IFolderDAO.class);
   }
 
   /*
@@ -395,7 +394,6 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     Object dropTarget = getCurrentTarget();
     int location = getCurrentLocation();
 
-    final IApplicationLayer appLayer = fPersistence.getApplicationLayer();
     IFolder parentFolder = null;
     boolean requireSave = false;
     boolean after = (location == ViewerDropAdapter.LOCATION_AFTER);
@@ -488,7 +486,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     if (folderReparenting != null || markReparenting != null) {
       BusyIndicator.showWhile(getViewer().getControl().getDisplay(), new Runnable() {
         public void run() {
-          appLayer.reparent(finalFolderReparenting, finalMarkReparenting);
+          fFolderDAO.reparent(finalFolderReparenting, finalMarkReparenting);
         }
       });
     }
@@ -507,6 +505,6 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
 
     /* Save the Folder if required */
     if (requireSave)
-      fPersistence.getModelDAO().saveFolder(parentFolder);
+      fFolderDAO.save(parentFolder);
   }
 }

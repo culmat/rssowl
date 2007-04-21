@@ -23,11 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events.runnable;
 
-import org.rssowl.core.Owl;
 import org.rssowl.core.model.events.CategoryEvent;
-import org.rssowl.core.model.events.ModelEvent;
-
-import java.util.Set;
 
 /**
  * Provides a way to fire a CategoryEvent in the future.
@@ -41,26 +37,6 @@ public class CategoryEventRunnable extends EventRunnable<CategoryEvent> {
    * Creates a new instance of this object.
    */
   public CategoryEventRunnable() {
-    super();
-  }
-
-  @Override
-  public Class< ? extends ModelEvent> getEventClass() {
-    return CategoryEvent.class;
-  }
-  
-  @Override
-  protected final void firePersistEvents(Set<CategoryEvent> persistEvents) {
-    Owl.getListenerService().notifyCategoryAdded(persistEvents);
-  }
-
-  @Override
-  protected final void fireRemoveEvents(Set<CategoryEvent> removeEvents) {
-    Owl.getListenerService().notifyCategoryDeleted(removeEvents);
-  }
-
-  @Override
-  protected final void fireUpdateEvents(Set<CategoryEvent> updateEvents) {
-    Owl.getListenerService().notifyCategoryUpdated(updateEvents);
+    super(CategoryEvent.class, getDAOService().getCategoryDAO());
   }
 }

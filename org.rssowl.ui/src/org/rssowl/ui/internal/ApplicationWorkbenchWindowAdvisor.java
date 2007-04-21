@@ -57,6 +57,8 @@ import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.model.events.NewsAdapter;
 import org.rssowl.core.model.events.NewsEvent;
 import org.rssowl.core.model.events.runnable.EventType;
+import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.persist.pref.PreferencesEvent;
 import org.rssowl.core.model.persist.pref.PreferencesListener;
@@ -233,7 +235,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       fTrayItem.dispose();
 
     if (fNewsListener != null)
-      Owl.getListenerService().removeNewsListener(fNewsListener);
+      DynamicDAO.removeEntityListener(INews.class, fNewsListener);
 
     fResources.dispose();
   }
@@ -348,7 +350,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         });
       }
     };
-    Owl.getListenerService().addNewsListener(fNewsListener);
+    DynamicDAO.addEntityListener(INews.class, fNewsListener);
   }
 
   /* Move to System Tray */
@@ -399,7 +401,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       fTrayItem.dispose();
 
     if (fNewsListener != null)
-      Owl.getListenerService().removeNewsListener(fNewsListener);
+      DynamicDAO.removeEntityListener(INews.class, fNewsListener);
 
     if (fTrayShellListener != null)
       getWindowConfigurer().getWindow().getShell().removeShellListener(fTrayShellListener);

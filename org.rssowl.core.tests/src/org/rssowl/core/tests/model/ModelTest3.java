@@ -34,7 +34,6 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.AttachmentAdapter;
 import org.rssowl.core.model.events.AttachmentEvent;
@@ -72,6 +71,7 @@ import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.INews.State;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.search.ISearchCondition;
 import org.rssowl.core.model.persist.search.ISearchField;
 import org.rssowl.core.model.persist.search.SearchSpecifier;
@@ -103,7 +103,6 @@ import java.util.Set;
 @SuppressWarnings("nls")
 public class ModelTest3 {
   private IModelFactory fFactory;
-  private IModelDAO fDao;
 
   /**
    * @throws Exception
@@ -113,7 +112,6 @@ public class ModelTest3 {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
     fFactory = Owl.getModelFactory();
-    fDao = Owl.getPersistenceService().getModelDAO();
   }
 
   private IFeed createFeed(String url) throws URISyntaxException {
@@ -135,7 +133,7 @@ public class ModelTest3 {
     IFeed feed = createFeed(url);
     final String newsTitle = "News Title Case_1";
     fFactory.createNews(null, feed, new Date()).setTitle(newsTitle);
-    FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+    FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
     /*
      * Recreate the feed because the existing one got changed when it was saved
@@ -149,7 +147,7 @@ public class ModelTest3 {
 
     IFeed mergedFeed = feedRef.resolve();
     mergedFeed.merge(feed);
-    feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+    feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
     assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
     assertEquals("Existing News State changed unexpectedly!", INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
@@ -162,7 +160,7 @@ public class ModelTest3 {
 
     mergedFeed = feedRef.resolve();
     mergedFeed.merge(feed);
-    feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+    feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
     assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
     assertEquals("Existing News State changed unexpectedly!", INews.State.DELETED, feedRef.resolve().getNews().get(0).getState());
 
@@ -175,7 +173,7 @@ public class ModelTest3 {
 
     mergedFeed = feedRef.resolve();
     mergedFeed.merge(feed);
-    feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+    feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
     assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
     assertEquals("Existing News State changed unexpectedly!", INews.State.HIDDEN, feedRef.resolve().getNews().get(0).getState());
 
@@ -188,7 +186,7 @@ public class ModelTest3 {
 
     mergedFeed = feedRef.resolve();
     mergedFeed.merge(feed);
-    feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+    feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
     assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
     assertEquals("Existing News State changed unexpectedly!", INews.State.READ, feedRef.resolve().getNews().get(0).getState());
 
@@ -201,7 +199,7 @@ public class ModelTest3 {
 
     mergedFeed = feedRef.resolve();
     mergedFeed.merge(feed);
-    feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+    feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
     assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
     assertEquals("Existing News State changed unexpectedly!", INews.State.UNREAD, feedRef.resolve().getNews().get(0).getState());
 
@@ -214,7 +212,7 @@ public class ModelTest3 {
 
     mergedFeed = feedRef.resolve();
     mergedFeed.merge(feed);
-    feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+    feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
     assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
     assertEquals("Existing News State changed unexpectedly!", INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
 
@@ -230,7 +228,7 @@ public class ModelTest3 {
 
     mergedFeed = feedRef.resolve();
     mergedFeed.merge(feed);
-    feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+    feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
     assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
     assertEquals("Existing News State changed unexpectedly!", INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
   }
@@ -249,7 +247,7 @@ public class ModelTest3 {
     IFeed feed = createFeed(url);
     final String newsTitle = "News Title Case_1";
     fFactory.createNews(null, feed, new Date()).setTitle(newsTitle);
-    FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+    FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
     /*
      * Recreate the feed because the existing one got changed when it was saved
@@ -263,7 +261,7 @@ public class ModelTest3 {
 
     IFeed mergedFeed = feedRef.resolve();
     mergedFeed.merge(feed);
-    feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+    feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
     assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
     assertEquals("Existing News State changed unexpectedly!", INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
@@ -292,7 +290,7 @@ public class ModelTest3 {
     dbFeed.getNews().get(0).setState(State.HIDDEN);
     mergedFeed = feedRef.resolve();
     mergedFeed.merge(feed);
-    feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+    feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
     assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
     assertEquals("Existing News State changed unexpectedly!", INews.State.HIDDEN, feedRef.resolve().getNews().get(0).getState());
   }
@@ -316,12 +314,12 @@ public class ModelTest3 {
       news.setTitle("News Title Case_4");
       news.setPublishDate(new Date(time));
       news.setDescription(description);
-      FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+      FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
       /* Mark News Read */
       news = feedRef.resolve().getNews().get(0);
       news.setState(INews.State.READ);
-      fDao.saveNews(news);
+      DynamicDAO.save(news);
 
       /* b) Add the same News with updated Description */
       feed = createFeed(url);
@@ -331,7 +329,7 @@ public class ModelTest3 {
       news.setDescription(description + "updated");
       IFeed mergedFeed = feedRef.resolve();
       mergedFeed.merge(feed);
-      feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+      feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
       assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
       assertEquals("Existing News State is not READ!", INews.State.READ, feedRef.resolve().getNews().get(0).getState());
     }
@@ -346,12 +344,12 @@ public class ModelTest3 {
       news.setTitle("News Title Case_5");
       news.setLink(new URI("http://www.news-case5.com/index.html"));
       news.setPublishDate(new Date(time));
-      FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+      FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
       /* Mark News Read */
       news = feedRef.resolve().getNews().get(0);
       news.setState(INews.State.READ);
-      fDao.saveNews(news);
+      DynamicDAO.save(news);
 
       /* c) Add the same News with updated description */
       feed = createFeed(url);
@@ -362,7 +360,7 @@ public class ModelTest3 {
       news.setDescription(description + "updated#2");
       IFeed mergedFeed = feedRef.resolve();
       mergedFeed.merge(feed);
-      feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+      feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
       assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
       assertEquals("Existing News State is not UPDATED!", INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
     }
@@ -377,12 +375,12 @@ public class ModelTest3 {
       news.setTitle("News Title Case_6");
       news.setGuid(fFactory.createGuid(news, "News_Case_6_Guid"));
       news.setPublishDate(new Date(time));
-      FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+      FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
       /* Mark News Read */
       news = feedRef.resolve().getNews().get(0);
       news.setState(INews.State.READ);
-      fDao.saveNews(news);
+      DynamicDAO.save(news);
 
       /* d) Add the same News with updated description */
       feed = createFeed(url);
@@ -392,7 +390,7 @@ public class ModelTest3 {
       news.setDescription(description + "updated#3");
       IFeed mergedFeed = feedRef.resolve();
       mergedFeed.merge(feed);
-      feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+      feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
       assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
       assertEquals("Existing News State is not READ!", INews.State.READ, feedRef.resolve().getNews().get(0).getState());
     }
@@ -408,12 +406,12 @@ public class ModelTest3 {
       news.setLink(new URI("http://www.news-case8.com/index.html"));
       news.setGuid(fFactory.createGuid(news, "News_Case_8_Guid"));
       news.setPublishDate(new Date(time));
-      FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+      FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
       /* Mark News Read */
       news = feedRef.resolve().getNews().get(0);
       news.setState(INews.State.READ);
-      fDao.saveNews(news);
+      DynamicDAO.save(news);
 
       /* d) Add the same News with updated Publish Date */
       feed = createFeed(url);
@@ -425,7 +423,7 @@ public class ModelTest3 {
       news.setDescription(description + "updated#4");
       IFeed mergedFeed = feedRef.resolve();
       mergedFeed.merge(feed);
-      feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+      feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
       assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
       assertEquals("Existing News State is not READ!", INews.State.READ, feedRef.resolve().getNews().get(0).getState());
     }
@@ -448,7 +446,7 @@ public class ModelTest3 {
         String url = "http://www.feed-case1.com";
         IFeed feed = createFeed(url);
         fFactory.createNews(null, feed, new Date()).setTitle("News Title Case_1");
-        FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+        FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
         /*
          * Recreate the feed because the existing one got changed when it was
@@ -460,7 +458,7 @@ public class ModelTest3 {
         fFactory.createNews(null, feed, new Date()).setTitle("News Title Case_1");
         IFeed mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
         assertEquals("Existing News State changed unexpectedly!", INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
       }
@@ -473,7 +471,7 @@ public class ModelTest3 {
         INews news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_2");
         news.setLink(new URI("http://www.news-case2.com/index.html"));
-        FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+        FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
         /* a) Add the same News */
         feed = createFeed(url);
@@ -482,14 +480,14 @@ public class ModelTest3 {
         news.setLink(new URI("http://www.news-case2.com/index.html"));
         IFeed mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
         assertEquals("Existing News State changed unexpectedly!", INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
         /* Mark News Read */
         news = feedRef.resolve().getNews().get(0);
         news.setState(INews.State.READ);
-        fDao.saveNews(news);
+        DynamicDAO.save(news);
 
         /* b) Add the same News with updated Title */
         feed = createFeed(url);
@@ -498,7 +496,7 @@ public class ModelTest3 {
         news.setLink(new URI("http://www.news-case2.com/index.html"));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
         assertEquals("Existing News State is not UPDATED!", INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
       }
@@ -511,7 +509,7 @@ public class ModelTest3 {
         INews news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_3");
         news.setGuid(fFactory.createGuid(news, "News_Case_3_Guid"));
-        FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+        FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
         /* a) Add the same News */
         feed = createFeed(url);
@@ -520,14 +518,14 @@ public class ModelTest3 {
         news.setGuid(fFactory.createGuid(news, "News_Case_3_Guid"));
         IFeed mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
         assertEquals("Existing News State changed unexpectedly!", INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
         /* Mark News Read */
         news = feedRef.resolve().getNews().get(0);
         news.setState(INews.State.READ);
-        fDao.saveNews(news);
+        DynamicDAO.save(news);
 
         /* b) Add the same News with updated Title */
         feed = createFeed(url);
@@ -536,7 +534,7 @@ public class ModelTest3 {
         news.setGuid(fFactory.createGuid(news, "News_Case_3_Guid"));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
         assertEquals("Existing News State is not UPDATED!", INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
       }
@@ -550,7 +548,7 @@ public class ModelTest3 {
         INews news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_4");
         news.setPublishDate(new Date(time));
-        FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+        FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
         /* a) Add the same News */
         feed = createFeed(url);
@@ -559,14 +557,14 @@ public class ModelTest3 {
         news.setPublishDate(new Date(time));
         IFeed mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
         assertEquals("Existing News State changed unexpectedly!", INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
         /* Mark News Read */
         news = feedRef.resolve().getNews().get(0);
         news.setState(INews.State.READ);
-        fDao.saveNews(news);
+        DynamicDAO.save(news);
 
         /* b) Add the same News with updated Publish Date */
         feed = createFeed(url);
@@ -575,7 +573,7 @@ public class ModelTest3 {
         news.setPublishDate(new Date(System.currentTimeMillis() + 1000));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
         assertEquals("Existing News State is not READ!", INews.State.READ, feedRef.resolve().getNews().get(0).getState());
       }
@@ -590,7 +588,7 @@ public class ModelTest3 {
         news.setTitle("News Title Case_5");
         news.setLink(new URI("http://www.news-case5.com/index.html"));
         news.setPublishDate(new Date(time));
-        FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+        FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
         /* a) Add the same News */
         feed = createFeed(url);
@@ -600,14 +598,14 @@ public class ModelTest3 {
         news.setPublishDate(new Date(time));
         IFeed mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
         assertEquals("Existing News State changed unexpectedly!", INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
         /* Mark News Read */
         news = feedRef.resolve().getNews().get(0);
         news.setState(INews.State.READ);
-        fDao.saveNews(news);
+        DynamicDAO.save(news);
 
         /* b) Add the same News with updated Title */
         feed = createFeed(url);
@@ -617,14 +615,14 @@ public class ModelTest3 {
         news.setPublishDate(new Date(time));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
         assertEquals("Existing News State is not UPDATED!", INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
 
         /* Mark News Read */
         news = feedRef.resolve().getNews().get(0);
         news.setState(INews.State.READ);
-        fDao.saveNews(news);
+        DynamicDAO.save(news);
 
         /* c) Add the same News with updated Publish Date */
         feed = createFeed(url);
@@ -634,7 +632,7 @@ public class ModelTest3 {
         news.setPublishDate(new Date(System.currentTimeMillis() + 1000));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
         assertEquals("Existing News State is not READ!", INews.State.READ, feedRef.resolve().getNews().get(0).getState());
       }
@@ -649,7 +647,7 @@ public class ModelTest3 {
         news.setTitle("News Title Case_6");
         news.setGuid(fFactory.createGuid(news, "News_Case_6_Guid"));
         news.setPublishDate(new Date(time));
-        FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+        FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
         /* a) Add the same News */
         feed = createFeed(url);
@@ -659,14 +657,14 @@ public class ModelTest3 {
         news.setPublishDate(new Date(time));
         IFeed mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
         assertEquals("Existing News State changed unexpectedly!", INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
         /* Mark News Read */
         news = feedRef.resolve().getNews().get(0);
         news.setState(INews.State.READ);
-        fDao.saveNews(news);
+        DynamicDAO.save(news);
 
         /* b) Add the same News with updated Title */
         feed = createFeed(url);
@@ -676,7 +674,7 @@ public class ModelTest3 {
         news.setPublishDate(new Date(time));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
         assertEquals("Existing News State is not UPDATED!", INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
 
@@ -688,13 +686,13 @@ public class ModelTest3 {
         news.setPublishDate(new Date(time));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Expected two News in this Feed!", 2, feedRef.resolve().getNews().size());
 
         /* Mark News Read */
         news = feedRef.resolve().getNews().get(0);
         news.setState(INews.State.READ);
-        fDao.saveNews(news);
+        DynamicDAO.save(news);
 
         /* d) Add the same News with updated Publish Date */
         feed = createFeed(url);
@@ -704,7 +702,7 @@ public class ModelTest3 {
         news.setPublishDate(new Date(time + 1000));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 2, feedRef.resolve().getNews().size());
 
         List<INews> newsRefs = feedRef.resolve().getNews();
@@ -723,7 +721,7 @@ public class ModelTest3 {
         news.setTitle("News Title Case_7");
         news.setGuid(fFactory.createGuid(news, "News_Case_7_Guid"));
         news.setLink(new URI("http://www.news-case7.com/index.html"));
-        FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+        FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
         /* a) Add the same News */
         feed = createFeed(url);
@@ -733,14 +731,14 @@ public class ModelTest3 {
         news.setLink(new URI("http://www.news-case7.com/index.html"));
         IFeed mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
         assertEquals("Existing News State changed unexpectedly!", INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
         /* Mark News Read */
         news = feedRef.resolve().getNews().get(0);
         news.setState(INews.State.READ);
-        fDao.saveNews(news);
+        DynamicDAO.save(news);
 
         /* b) Add the same News with updated Title */
         feed = createFeed(url);
@@ -750,14 +748,14 @@ public class ModelTest3 {
         news.setLink(new URI("http://www.news-case7.com/index.html"));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
         assertEquals("Existing News State is not UPDATED!", INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
 
         /* Mark News Read */
         news = feedRef.resolve().getNews().get(0);
         news.setState(INews.State.READ);
-        fDao.saveNews(news);
+        DynamicDAO.save(news);
 
         /* c) Add the same News with updated URL */
         feed = createFeed(url);
@@ -767,7 +765,7 @@ public class ModelTest3 {
         news.setLink(new URI("http://www.news-case7.com/index-updated.html"));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
         assertEquals("Existing News State is not READ!", INews.State.READ, feedRef.resolve().getNews().get(0).getState());
 
@@ -779,7 +777,7 @@ public class ModelTest3 {
         news.setLink(new URI("http://www.news-case7.com/index.html"));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Expected two News in this Feed!", 2, feedRef.resolve().getNews().size());
       }
 
@@ -794,7 +792,7 @@ public class ModelTest3 {
         news.setLink(new URI("http://www.news-case8.com/index.html"));
         news.setGuid(fFactory.createGuid(news, "News_Case_8_Guid"));
         news.setPublishDate(new Date(time));
-        FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+        FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
         /* a) Add the same News */
         feed = createFeed(url);
@@ -805,14 +803,14 @@ public class ModelTest3 {
         news.setPublishDate(new Date(time));
         IFeed mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
         assertEquals("Existing News State changed unexpectedly!", INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
         /* Mark News Read */
         news = feedRef.resolve().getNews().get(0);
         news.setState(INews.State.READ);
-        fDao.saveNews(news);
+        DynamicDAO.save(news);
 
         /* b) Add the same News with updated Title */
         feed = createFeed(url);
@@ -823,14 +821,14 @@ public class ModelTest3 {
         news.setPublishDate(new Date(time));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 1, feedRef.resolve().getNews().size());
         assertEquals("Existing News State is not UPDATED!", INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
 
         /* Mark News Read */
         news = feedRef.resolve().getNews().get(0);
         news.setState(INews.State.READ);
-        fDao.saveNews(news);
+        DynamicDAO.save(news);
 
         /* c) Add the same News with updated Guid */
         feed = createFeed(url);
@@ -841,13 +839,13 @@ public class ModelTest3 {
         news.setPublishDate(new Date(time));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Expected two News in this Feed!", 2, feedRef.resolve().getNews().size());
 
         /* Mark News Read */
         news = feedRef.resolve().getNews().get(0);
         news.setState(INews.State.READ);
-        fDao.saveNews(news);
+        DynamicDAO.save(news);
 
         /* d) Add the same News with updated Publish Date */
         feed = createFeed(url);
@@ -858,7 +856,7 @@ public class ModelTest3 {
         news.setPublishDate(new Date(System.currentTimeMillis() + 1000));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
-        feedRef = new FeedReference(fDao.saveFeed(mergedFeed).getId());
+        feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
         assertEquals("Same News was added twice!", 2, feedRef.resolve().getNews().size());
 
         List<INews> newsRefs = feedRef.resolve().getNews();
@@ -899,16 +897,16 @@ public class ModelTest3 {
       news1.setLink(news1Link);
       news2.setLink(news2Link);
       news3.setLink(news3Link);
-      FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+      FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
-      assertEquals(3, fDao.loadFeed(feedRef.getId()).getNews().size());
+      assertEquals(3, DynamicDAO.load(IFeed.class, feedRef.getId()).getNews().size());
 
       /* Mark 2 News as Deleted and save News */
-      news1 = fDao.loadFeed(feedRef.getId()).getNews().get(0);
+      news1 = DynamicDAO.load(IFeed.class, feedRef.getId()).getNews().get(0);
       news1.setState(INews.State.DELETED);
-      news2 = fDao.loadFeed(feedRef.getId()).getNews().get(1);
+      news2 = DynamicDAO.load(IFeed.class, feedRef.getId()).getNews().get(1);
       news2.setState(INews.State.DELETED);
-      news3 = fDao.loadFeed(feedRef.getId()).getNews().get(2);
+      news3 = DynamicDAO.load(IFeed.class, feedRef.getId()).getNews().get(2);
       news3.setState(INews.State.READ);
 
       final boolean newsUpdatedEvents[] = new boolean[2];
@@ -925,15 +923,16 @@ public class ModelTest3 {
           }
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
 
-      NewsReference newsReference1 = new NewsReference(fDao.saveNews(news1).getId());
-      NewsReference newsReference2 = new NewsReference(fDao.saveNews(news2).getId());
-      NewsReference newsReference3 = new NewsReference(fDao.saveNews(news3).getId());
+      DynamicDAO.addEntityListener(INews.class, newsListener);
 
-      assertEquals(INews.State.DELETED, fDao.loadFeed(feedRef.getId()).getNews().get(0).getState());
-      assertEquals(INews.State.DELETED, fDao.loadFeed(feedRef.getId()).getNews().get(1).getState());
-      assertEquals(INews.State.READ, fDao.loadFeed(feedRef.getId()).getNews().get(2).getState());
+      NewsReference newsReference1 = new NewsReference(DynamicDAO.save(news1).getId());
+      NewsReference newsReference2 = new NewsReference(DynamicDAO.save(news2).getId());
+      NewsReference newsReference3 = new NewsReference(DynamicDAO.save(news3).getId());
+
+      assertEquals(INews.State.DELETED, DynamicDAO.load(IFeed.class, feedRef.getId()).getNews().get(0).getState());
+      assertEquals(INews.State.DELETED, DynamicDAO.load(IFeed.class, feedRef.getId()).getNews().get(1).getState());
+      assertEquals(INews.State.READ, DynamicDAO.load(IFeed.class, feedRef.getId()).getNews().get(2).getState());
 
       /* Check Deleted News now being Deleted from DB */
       IFeed emptyFeed = fFactory.createFeed(null, new URI("http://www.feed.com"));
@@ -948,17 +947,17 @@ public class ModelTest3 {
       System.gc();
 
       /* Asserts follow */
-      assertEquals(1, fDao.loadFeed(feedRef.getId()).getNews().size());
-      assertNull(fDao.loadNews(newsReference1.getId()));
-      assertNull(fDao.loadNews(newsReference2.getId()));
-      assertNotNull(fDao.loadNews(newsReference3.getId()));
+      assertEquals(1, DynamicDAO.load(IFeed.class, feedRef.getId()).getNews().size());
+      assertNull(DynamicDAO.load(INews.class, newsReference1.getId()));
+      assertNull(DynamicDAO.load(INews.class, newsReference2.getId()));
+      assertNotNull(DynamicDAO.load(INews.class, newsReference3.getId()));
 
       for (int i = 0; i < newsUpdatedEvents.length; i++)
         if (!newsUpdatedEvents[i])
           fail("Missing newsUpdated event in NewsListener!");
     } finally {
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
 
@@ -973,7 +972,7 @@ public class ModelTest3 {
     FolderListener folderListener = null;
     try {
       /* Add */
-      final FolderReference rootFolder = new FolderReference(fDao.saveFolder(fFactory.createFolder(null, null, "Root")).getId());
+      final FolderReference rootFolder = new FolderReference(DynamicDAO.save(fFactory.createFolder(null, null, "Root")).getId());
 
       IFolder folder = fFactory.createFolder(null, rootFolder.resolve(), "Folder");
       final boolean folderEvents[] = new boolean[3];
@@ -1009,16 +1008,16 @@ public class ModelTest3 {
           }
         }
       };
-      Owl.getListenerService().addFolderListener(folderListener);
-      folderReference[0] = new FolderReference(fDao.saveFolder(folder).getId());
+      DynamicDAO.addEntityListener(IFolder.class, folderListener);
+      folderReference[0] = new FolderReference(DynamicDAO.save(folder).getId());
 
       /* Update */
       folder = folderReference[0].resolve();
       folder.setName("Folder Updated");
-      fDao.saveFolder(folder);
+      DynamicDAO.save(folder);
 
       /* Delete */
-      fDao.deleteFolder(folderReference[0]);
+      DynamicDAO.delete(folderReference[0].resolve());
 
       /* Asserts Follow */
       assertTrue("Missing folderAdded Event", folderEvents[0]);
@@ -1027,7 +1026,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (folderListener != null)
-        Owl.getListenerService().removeFolderListener(folderListener);
+        DynamicDAO.removeEntityListener(IFolder.class, folderListener);
     }
   }
 
@@ -1042,7 +1041,7 @@ public class ModelTest3 {
     SearchMarkListener searchMarkListener = null;
     try {
       /* Add */
-      final FolderReference folderRef = new FolderReference(fDao.saveFolder(fFactory.createFolder(null, null, "Folder")).getId());
+      final FolderReference folderRef = new FolderReference(DynamicDAO.save(fFactory.createFolder(null, null, "Folder")).getId());
       ISearchMark searchMark = fFactory.createSearchMark(null, folderRef.resolve(), "SearchMark");
       final boolean searchMarkEvents[] = new boolean[3];
       final SearchMarkReference searchMarkReference[] = new SearchMarkReference[1];
@@ -1073,16 +1072,16 @@ public class ModelTest3 {
           }
         }
       };
-      Owl.getListenerService().addSearchMarkListener(searchMarkListener);
-      searchMarkReference[0] = new SearchMarkReference(fDao.saveSearchMark(searchMark).getId());
+      DynamicDAO.addEntityListener(ISearchMark.class, searchMarkListener);
+      searchMarkReference[0] = new SearchMarkReference(DynamicDAO.save(searchMark).getId());
 
       /* Update */
       searchMark = searchMarkReference[0].resolve();
       searchMark.setName("SearchMark Updated");
-      fDao.saveSearchMark(searchMark);
+      DynamicDAO.save(searchMark);
 
       /* Delete */
-      fDao.deleteSearchMark(searchMarkReference[0]);
+      DynamicDAO.delete(searchMarkReference[0].resolve());
 
       /* Asserts Follow */
       assertTrue("Missing searchMarkAdded Event", searchMarkEvents[0]);
@@ -1091,7 +1090,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (searchMarkListener != null)
-        Owl.getListenerService().removeSearchMarkListener(searchMarkListener);
+        DynamicDAO.removeEntityListener(ISearchMark.class, searchMarkListener);
     }
   }
 
@@ -1106,8 +1105,8 @@ public class ModelTest3 {
     SearchConditionListener searchConditionListener = null;
     try {
       /* Add */
-      FolderReference folderRef = new FolderReference(fDao.saveFolder(fFactory.createFolder(null, null, "Folder")).getId());
-      SearchMarkReference searchMarkRef = new SearchMarkReference(fDao.saveSearchMark(fFactory.createSearchMark(null, folderRef.resolve(), "SearchMark")).getId());
+      FolderReference folderRef = new FolderReference(DynamicDAO.save(fFactory.createFolder(null, null, "Folder")).getId());
+      SearchMarkReference searchMarkRef = new SearchMarkReference(DynamicDAO.save(fFactory.createSearchMark(null, folderRef.resolve(), "SearchMark")).getId());
       ISearchField field = fFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
       ISearchCondition searchCondition = fFactory.createSearchCondition(null, searchMarkRef.resolve(), field, SearchSpecifier.CONTAINS, "Foo");
       final boolean searchConditionEvents[] = new boolean[3];
@@ -1136,17 +1135,17 @@ public class ModelTest3 {
           }
         }
       };
-      Owl.getListenerService().addSearchConditionListener(searchConditionListener);
-      searchConditionReference[0] = new SearchConditionReference(fDao.saveSearchCondition(searchCondition).getId());
+      DynamicDAO.addEntityListener(ISearchCondition.class, searchConditionListener);
+      searchConditionReference[0] = new SearchConditionReference(DynamicDAO.save(searchCondition).getId());
 
       /* Update */
       searchCondition = searchConditionReference[0].resolve();
       searchCondition.setValue("Bar");
       searchCondition.setSpecifier(SearchSpecifier.CONTAINS_NOT);
-      fDao.saveSearchCondition(searchCondition);
+      DynamicDAO.save(searchCondition);
 
       /* Delete */
-      fDao.deleteSearchCondition(searchConditionReference[0]);
+      DynamicDAO.delete(searchConditionReference[0].resolve());
 
       /* Asserts Follow */
       assertTrue("Missing searchConditionAdded Event", searchConditionEvents[0]);
@@ -1154,9 +1153,9 @@ public class ModelTest3 {
       assertTrue("Missing searchConditionDeleted Event", searchConditionEvents[1]);
 
     } finally {
-      Owl.getListenerService().removeSearchConditionListener(searchConditionListener);
+      DynamicDAO.removeEntityListener(ISearchCondition.class, searchConditionListener);
       if (searchConditionListener != null)
-        Owl.getListenerService().removeSearchConditionListener(searchConditionListener);
+        DynamicDAO.removeEntityListener(ISearchCondition.class, searchConditionListener);
     }
 
   }
@@ -1173,8 +1172,8 @@ public class ModelTest3 {
     try {
       IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com"));
       /* Add */
-      fDao.saveFeed(feed);
-      final FolderReference folderRef = new FolderReference(fDao.saveFolder(fFactory.createFolder(null, null, "Folder")).getId());
+      DynamicDAO.save(feed);
+      final FolderReference folderRef = new FolderReference(DynamicDAO.save(fFactory.createFolder(null, null, "Folder")).getId());
       IBookMark bookMark = fFactory.createBookMark(null, folderRef.resolve(), new FeedLinkReference(feed.getLink()), "BookMark");
       final boolean bookMarkEvents[] = new boolean[3];
       final BookMarkReference bookMarkReference[] = new BookMarkReference[1];
@@ -1205,16 +1204,16 @@ public class ModelTest3 {
           }
         }
       };
-      Owl.getListenerService().addBookMarkListener(bookMarkListener);
-      bookMarkReference[0] = new BookMarkReference(fDao.saveBookMark(bookMark).getId());
+      DynamicDAO.addEntityListener(IBookMark.class, bookMarkListener);
+      bookMarkReference[0] = new BookMarkReference(DynamicDAO.save(bookMark).getId());
 
       /* Update */
       bookMark = bookMarkReference[0].resolve();
       bookMark.setName("BookMark Updated");
-      fDao.saveBookMark(bookMark);
+      DynamicDAO.save(bookMark);
 
       /* Delete */
-      fDao.deleteBookMark(bookMarkReference[0]);
+      DynamicDAO.delete(bookMarkReference[0].resolve());
 
       /* Asserts Follow */
       assertTrue("Missing bookMarkAdded Event", bookMarkEvents[0]);
@@ -1224,7 +1223,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (bookMarkListener != null)
-        Owl.getListenerService().removeBookMarkListener(bookMarkListener);
+        DynamicDAO.removeEntityListener(IBookMark.class, bookMarkListener);
     }
   }
 
@@ -1265,16 +1264,16 @@ public class ModelTest3 {
           }
         }
       };
-      Owl.getListenerService().addFeedListener(feedListener);
-      feedReference[0] = new FeedReference(fDao.saveFeed(feed).getId());
+      DynamicDAO.addEntityListener(IFeed.class, feedListener);
+      feedReference[0] = new FeedReference(DynamicDAO.save(feed).getId());
 
       /* Update */
       feed = feedReference[0].resolve();
       feed.setTitle("Feed Updated");
-      fDao.saveFeed(feed);
+      DynamicDAO.save(feed);
 
       /* Delete */
-      fDao.deleteFeed(feedReference[0]);
+      DynamicDAO.delete(feedReference[0].resolve());
 
       /* Asserts Follow */
       assertTrue("Missing feedAdded Event", feedEvents[0]);
@@ -1284,7 +1283,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (feedListener != null)
-        Owl.getListenerService().removeFeedListener(feedListener);
+        DynamicDAO.removeEntityListener(IFeed.class, feedListener);
     }
   }
 
@@ -1298,7 +1297,7 @@ public class ModelTest3 {
     NewsListener newsListener = null;
     try {
       /* Add */
-      final IFeed feed = fDao.saveFeed(fFactory.createFeed(null, new URI("http://www.feed.com")));
+      final IFeed feed = DynamicDAO.save(fFactory.createFeed(null, new URI("http://www.feed.com")));
       INews news = fFactory.createNews(null, feed, new Date());
       news.setTitle("News");
       final boolean newsEvents[] = new boolean[3];
@@ -1330,16 +1329,16 @@ public class ModelTest3 {
           }
         }
       };
-      Owl.getListenerService().addNewsListener(newsListener);
-      newsReference[0] = new NewsReference(fDao.saveNews(news).getId());
+      DynamicDAO.addEntityListener(INews.class, newsListener);
+      newsReference[0] = new NewsReference(DynamicDAO.save(news).getId());
 
       /* Update */
       news = newsReference[0].resolve();
       news.setTitle("News Updated");
-      fDao.saveNews(news);
+      DynamicDAO.save(news);
 
       /* Delete */
-      fDao.deleteNews(newsReference[0]);
+      DynamicDAO.delete(newsReference[0].resolve());
 
       /* Asserts Follow */
       assertTrue("Missing newsAdded Event", newsEvents[0]);
@@ -1349,7 +1348,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (newsListener != null)
-        Owl.getListenerService().removeNewsListener(newsListener);
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
 
@@ -1368,8 +1367,8 @@ public class ModelTest3 {
     AttachmentListener attachmentListener = null;
     try {
       /* Add */
-      FeedReference feedRef = new FeedReference(fDao.saveFeed(fFactory.createFeed(null, new URI("http://www.feed1.com"))).getId());
-      NewsReference newsRef = new NewsReference(fDao.saveNews(fFactory.createNews(null, feedRef.resolve(), new Date())).getId());
+      FeedReference feedRef = new FeedReference(DynamicDAO.save(fFactory.createFeed(null, new URI("http://www.feed1.com"))).getId());
+      NewsReference newsRef = new NewsReference(DynamicDAO.save(fFactory.createNews(null, feedRef.resolve(), new Date())).getId());
       IAttachment attachment = fFactory.createAttachment(null, newsRef.resolve());
       attachment.setLink(new URI("http://www.attachment.com"));
       final boolean attachmentEvents[] = new boolean[3];
@@ -1401,16 +1400,16 @@ public class ModelTest3 {
           }
         }
       };
-      Owl.getListenerService().addAttachmentListener(attachmentListener);
-      attachmentReference[0] = new AttachmentReference(fDao.saveAttachment(attachment).getId());
+      DynamicDAO.addEntityListener(IAttachment.class, attachmentListener);
+      attachmentReference[0] = new AttachmentReference(DynamicDAO.save(attachment).getId());
 
       /* Update */
       attachment = attachmentReference[0].resolve();
       attachment.setType("MP3");
-      fDao.saveAttachment(attachment);
+      DynamicDAO.save(attachment);
 
       /* Delete */
-      fDao.deleteAttachment(attachmentReference[0]);
+      DynamicDAO.delete(attachmentReference[0].resolve());
 
       /* Asserts Follow */
       assertTrue("Missing attachmentAdded Event", attachmentEvents[0]);
@@ -1420,7 +1419,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (attachmentListener != null)
-        Owl.getListenerService().removeAttachmentListener(attachmentListener);
+        DynamicDAO.removeEntityListener(IAttachment.class, attachmentListener);
     }
   }
 
@@ -1435,8 +1434,8 @@ public class ModelTest3 {
     CategoryListener categoryListener = null;
     try {
       /* Add */
-      FeedReference feedRef = new FeedReference(fDao.saveFeed(fFactory.createFeed(null, new URI("http://www.feed2.com"))).getId());
-      NewsReference newsRef = new NewsReference(fDao.saveNews(fFactory.createNews(null, feedRef.resolve(), new Date())).getId());
+      FeedReference feedRef = new FeedReference(DynamicDAO.save(fFactory.createFeed(null, new URI("http://www.feed2.com"))).getId());
+      NewsReference newsRef = new NewsReference(DynamicDAO.save(fFactory.createNews(null, feedRef.resolve(), new Date())).getId());
       ICategory category1 = fFactory.createCategory(null, feedRef.resolve());
       category1.setName("Category");
       ICategory category2 = fFactory.createCategory(null, newsRef.resolve());
@@ -1473,21 +1472,21 @@ public class ModelTest3 {
           }
         }
       };
-      Owl.getListenerService().addCategoryListener(categoryListener);
-      categoryReference[0] = new CategoryReference(fDao.saveCategory(category1).getId());
-      categoryReference[1] = new CategoryReference(fDao.saveCategory(category2).getId());
+      DynamicDAO.addEntityListener(ICategory.class, categoryListener);
+      categoryReference[0] = new CategoryReference(DynamicDAO.save(category1).getId());
+      categoryReference[1] = new CategoryReference(DynamicDAO.save(category2).getId());
 
       /* Update */
       category1 = categoryReference[0].resolve();
       category1.setName("Category Updated");
       category2 = categoryReference[1].resolve();
       category2.setName("Category Updated");
-      fDao.saveCategory(category1);
-      fDao.saveCategory(category2);
+      DynamicDAO.save(category1);
+      DynamicDAO.save(category2);
 
       /* Delete */
-      fDao.deleteCategory(categoryReference[0]);
-      fDao.deleteCategory(categoryReference[1]);
+      DynamicDAO.delete(categoryReference[0].resolve());
+      DynamicDAO.delete(categoryReference[1].resolve());
 
       /* Asserts Follow */
       assertTrue("Missing categoryAdded Event", categoryEvents[0]);
@@ -1500,7 +1499,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (categoryListener != null)
-        Owl.getListenerService().removeCategoryListener(categoryListener);
+        DynamicDAO.removeEntityListener(ICategory.class, categoryListener);
     }
   }
 
@@ -1515,8 +1514,8 @@ public class ModelTest3 {
     PersonListener personListener = null;
     try {
       /* Add */
-      FeedReference feedRef = new FeedReference(fDao.saveFeed(fFactory.createFeed(null, new URI("http://www.feed4.com"))).getId());
-      NewsReference newsRef = new NewsReference(fDao.saveNews(fFactory.createNews(null, feedRef.resolve(), new Date())).getId());
+      FeedReference feedRef = new FeedReference(DynamicDAO.save(fFactory.createFeed(null, new URI("http://www.feed4.com"))).getId());
+      NewsReference newsRef = new NewsReference(DynamicDAO.save(fFactory.createNews(null, feedRef.resolve(), new Date())).getId());
       IPerson person1 = fFactory.createPerson(null, feedRef.resolve());
       person1.setName("Person1");
       IPerson person2 = fFactory.createPerson(null, newsRef.resolve());
@@ -1553,21 +1552,21 @@ public class ModelTest3 {
           }
         }
       };
-      Owl.getListenerService().addPersonListener(personListener);
-      personReference[0] = new PersonReference(fDao.savePerson(person1).getId());
-      personReference[1] = new PersonReference(fDao.savePerson(person2).getId());
+      DynamicDAO.addEntityListener(IPerson.class, personListener);
+      personReference[0] = new PersonReference(DynamicDAO.save(person1).getId());
+      personReference[1] = new PersonReference(DynamicDAO.save(person2).getId());
 
       /* Update */
       person1 = personReference[0].resolve();
       person1.setName("Person Updated");
       person2 = personReference[1].resolve();
       person2.setName("Person Updated");
-      fDao.savePerson(person1);
-      fDao.savePerson(person2);
+      DynamicDAO.save(person1);
+      DynamicDAO.save(person2);
 
       /* Delete */
-      fDao.deletePerson(personReference[0]);
-      fDao.deletePerson(personReference[1]);
+      DynamicDAO.delete(personReference[0].resolve());
+      DynamicDAO.delete(personReference[1].resolve());
 
       /* Asserts Follow */
       assertTrue("Missing personAdded Event", personEvents[0]);
@@ -1580,7 +1579,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (personListener != null)
-        Owl.getListenerService().removePersonListener(personListener);
+        DynamicDAO.removeEntityListener(IPerson.class, personListener);
     }
   }
 
@@ -1621,16 +1620,16 @@ public class ModelTest3 {
           }
         }
       };
-      Owl.getListenerService().addLabelListener(labelListener);
-      labelReference[0] = new LabelReference(fDao.saveLabel(label).getId());
+      DynamicDAO.addEntityListener(ILabel.class, labelListener);
+      labelReference[0] = new LabelReference(DynamicDAO.save(label).getId());
 
       /* Update */
       label = labelReference[0].resolve();
       label.setColor("255,255,128");
-      fDao.saveLabel(label);
+      DynamicDAO.save(label);
 
       /* Delete */
-      fDao.deleteLabel(labelReference[0]);
+      DynamicDAO.delete(labelReference[0].resolve());
 
       /* Asserts Follow */
       assertTrue("Missing labelAdded Event", labelEvents[0]);
@@ -1640,7 +1639,7 @@ public class ModelTest3 {
     } finally {
       /* Cleanup */
       if (labelListener != null)
-        Owl.getListenerService().removeLabelListener(labelListener);
+        DynamicDAO.removeEntityListener(ILabel.class, labelListener);
     }
   }
 
@@ -1660,7 +1659,7 @@ public class ModelTest3 {
       folder.setProperty("Boolean", true);
       folder.setProperty("Double", 2.2D);
       folder.setProperty("Float", 3.3F);
-      FolderReference folderRef = new FolderReference(fDao.saveFolder(folder).getId());
+      FolderReference folderRef = new FolderReference(DynamicDAO.save(folder).getId());
       folder = folderRef.resolve();
       assertEquals("Foo", folder.getProperty("String"));
       assertEquals(1, folder.getProperty("Integer"));
@@ -1675,7 +1674,7 @@ public class ModelTest3 {
       feed.setProperty("Boolean", true);
       feed.setProperty("Double", 2.2D);
       feed.setProperty("Float", 3.3F);
-      FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+      FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
       feed = feedRef.resolve();
       assertEquals("Foo", feed.getProperty("String"));
       assertEquals(1, feed.getProperty("Integer"));
@@ -1690,7 +1689,7 @@ public class ModelTest3 {
       bookMark.setProperty("Boolean", true);
       bookMark.setProperty("Double", 2.2D);
       bookMark.setProperty("Float", 3.3F);
-      BookMarkReference bookMarkRef = new BookMarkReference(fDao.saveBookMark(bookMark).getId());
+      BookMarkReference bookMarkRef = new BookMarkReference(DynamicDAO.save(bookMark).getId());
       bookMark = bookMarkRef.resolve();
       assertEquals("Foo", bookMark.getProperty("String"));
       assertEquals(1, bookMark.getProperty("Integer"));
@@ -1705,7 +1704,7 @@ public class ModelTest3 {
       news.setProperty("Boolean", true);
       news.setProperty("Double", 2.2D);
       news.setProperty("Float", 3.3F);
-      NewsReference newsRef = new NewsReference(fDao.saveNews(news).getId());
+      NewsReference newsRef = new NewsReference(DynamicDAO.save(news).getId());
       news = newsRef.resolve();
       assertEquals("Foo", news.getProperty("String"));
       assertEquals(1, news.getProperty("Integer"));
@@ -1721,7 +1720,7 @@ public class ModelTest3 {
       attachment.setProperty("Boolean", true);
       attachment.setProperty("Double", 2.2D);
       attachment.setProperty("Float", 3.3F);
-      AttachmentReference attachmentRef = new AttachmentReference(fDao.saveAttachment(attachment).getId());
+      AttachmentReference attachmentRef = new AttachmentReference(DynamicDAO.save(attachment).getId());
       attachment = attachmentRef.resolve();
       assertEquals("Foo", attachment.getProperty("String"));
       assertEquals(1, attachment.getProperty("Integer"));
@@ -1758,10 +1757,10 @@ public class ModelTest3 {
           deletedEvent[0] = true;
         }
       };
-      Owl.getListenerService().addNewsListener(feedListener);
+      DynamicDAO.addEntityListener(INews.class, feedListener);
 
-      feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
-      Owl.getPersistenceService().getModelDAO().deleteFeed(new FeedReference(feed.getId()));
+      feed = DynamicDAO.save(feed);
+      DynamicDAO.delete(feed);
 
       if (addedEvent[0])
         fail("Unexpected newsAdded Event for Feed with 0 News");
@@ -1772,7 +1771,7 @@ public class ModelTest3 {
       TestUtils.fail(e);
     } finally {
       if (feedListener != null)
-        Owl.getListenerService().removeNewsListener(feedListener);
+        DynamicDAO.removeEntityListener(INews.class, feedListener);
     }
   }
 
@@ -1788,7 +1787,7 @@ public class ModelTest3 {
     Owl.getModelFactory().createNews(null, feed, new Date());
     Owl.getModelFactory().createNews(null, feed, new Date());
 
-    FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+    FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
     NewsReference news1 = new NewsReference(feedRef.resolve().getNews().get(0).getId());
     NewsReference news2 = new NewsReference(feedRef.resolve().getNews().get(1).getId());
@@ -1805,7 +1804,7 @@ public class ModelTest3 {
     for (NewsReference reference : news) {
       INews newsitem = reference.resolve();
       newsitem.setState(INews.State.UNREAD);
-      fDao.saveNews(newsitem);
+      DynamicDAO.save(newsitem);
     }
 
     assertEquals(news1.resolve().getState(), INews.State.UNREAD);
@@ -1815,7 +1814,7 @@ public class ModelTest3 {
     for (NewsReference reference : news) {
       INews newsitem = reference.resolve();
       newsitem.setState(INews.State.READ);
-      fDao.saveNews(newsitem);
+      DynamicDAO.save(newsitem);
     }
 
     assertEquals(news1.resolve().getState(), INews.State.READ);
@@ -1825,7 +1824,7 @@ public class ModelTest3 {
     for (NewsReference reference : news) {
       INews newsitem = reference.resolve();
       newsitem.setState(INews.State.DELETED);
-      fDao.saveNews(newsitem);
+      DynamicDAO.save(newsitem);
     }
 
     assertEquals(news1.resolve().getState(), INews.State.DELETED);
@@ -1840,41 +1839,41 @@ public class ModelTest3 {
   @Test
   public void testLoadNewsStates() throws Exception {
     IFeed feed = Owl.getModelFactory().createFeed(null, new URI("http://www.feed.com"));
-    FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+    FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
     for (int i = 0; i < 5; i++) {
       INews news = Owl.getModelFactory().createNews(null, feed, new Date());
-      fDao.saveNews(news);
+      DynamicDAO.save(news);
       news.setState(INews.State.NEW);
-      fDao.saveNews(news);
+      DynamicDAO.save(news);
     }
 
     for (int i = 0; i < 4; i++) {
       INews news = Owl.getModelFactory().createNews(null, feed, new Date());
-      fDao.saveNews(news);
+      DynamicDAO.save(news);
       news.setState(INews.State.UPDATED);
-      fDao.saveNews(news);
+      DynamicDAO.save(news);
     }
 
     for (int i = 0; i < 3; i++) {
       INews news = Owl.getModelFactory().createNews(null, feed, new Date());
-      fDao.saveNews(news);
+      DynamicDAO.save(news);
       news.setState(INews.State.UNREAD);
-      fDao.saveNews(news);
+      DynamicDAO.save(news);
     }
 
     for (int i = 0; i < 2; i++) {
       INews news = Owl.getModelFactory().createNews(null, feed, new Date());
-      fDao.saveNews(news);
+      DynamicDAO.save(news);
       news.setState(INews.State.READ);
-      fDao.saveNews(news);
+      DynamicDAO.save(news);
     }
 
     for (int i = 0; i < 1; i++) {
       INews news = Owl.getModelFactory().createNews(null, feed, new Date());
-      fDao.saveNews(news);
+      DynamicDAO.save(news);
       news.setState(INews.State.HIDDEN);
-      fDao.saveNews(news);
+      DynamicDAO.save(news);
     }
 
     int newCount = 0, updatedCount = 0, unreadCount = 0, readCount = 0, hiddenCount = 0;
@@ -1918,21 +1917,21 @@ public class ModelTest3 {
     /* Folder, BookMark, Feed, News (Folder Deleted) */
     {
       IFolder root = fFactory.createFolder(null, null, "Root");
-      root = fDao.saveFolder(root);
+      root = DynamicDAO.save(root);
 
       IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com"));
       fFactory.createNews(null, feed, new Date());
-      FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+      FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
       IBookMark mark = fFactory.createBookMark(null, root, new FeedLinkReference(feed.getLink()), "BookMark");
-      root = fDao.saveFolder(root);
+      root = DynamicDAO.save(root);
       mark = (IBookMark) root.getMarks().get(0);
 
       assertEquals(1, new FeedReference(feed.getId()).resolve().getNews().size());
 
       NewsReference newsRef = new NewsReference(feedRef.resolve().getNews().get(0).getId());
 
-      fDao.deleteFolder(new FolderReference(root.getId()));
+      DynamicDAO.delete(root);
 
       assertNull("Expected this Entity to be NULL", new FolderReference(root.getId()).resolve());
       assertNull("Expected this Entity to be NULL", new BookMarkReference(mark.getId()).resolve());
@@ -1943,24 +1942,24 @@ public class ModelTest3 {
     /* Root Folder, Folder, BookMark, Feed, News (Folder Deleted) */
     {
       IFolder root = fFactory.createFolder(null, null, "Root");
-      root = fDao.saveFolder(root);
+      root = DynamicDAO.save(root);
 
       IFolder folder = fFactory.createFolder(null, root, "Folder");
-      folder = fDao.saveFolder(folder);
+      folder = DynamicDAO.save(folder);
 
       IFeed feed = fFactory.createFeed(null, new URI("http://www.feed2.com"));
       fFactory.createNews(null, feed, new Date());
-      FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+      FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
       IBookMark mark = fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark");
-      folder = fDao.saveFolder(folder);
+      folder = DynamicDAO.save(folder);
       mark = (IBookMark) folder.getMarks().get(0);
 
       assertEquals(1, new FeedReference(feed.getId()).resolve().getNews().size());
 
       NewsReference newsRef = new NewsReference(feedRef.resolve().getNews().get(0).getId());
 
-      fDao.deleteFolder(new FolderReference(folder.getId()));
+      DynamicDAO.delete(folder);
 
       assertNull("Expected this Entity to be NULL", new FolderReference(folder.getId()).resolve());
       assertNull("Expected this Entity to be NULL", new BookMarkReference(mark.getId()).resolve());
@@ -1971,17 +1970,17 @@ public class ModelTest3 {
     /* Root Folder, Folder, BookMark, Feed, News (Folder Deleted #2) */
     {
       IFolder root = fFactory.createFolder(null, null, "Root");
-      root = fDao.saveFolder(root);
+      root = DynamicDAO.save(root);
 
       IFolder folder = fFactory.createFolder(null, root, "Folder");
-      folder = fDao.saveFolder(folder);
+      folder = DynamicDAO.save(folder);
 
       IFeed feed = fFactory.createFeed(null, new URI("http://www.feed3.com"));
       fFactory.createNews(null, feed, new Date());
-      FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+      FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
       IBookMark mark = fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark");
-      folder = fDao.saveFolder(folder);
+      folder = DynamicDAO.save(folder);
       mark = (IBookMark) folder.getMarks().get(0);
 
       assertEquals(1, new FeedReference(feed.getId()).resolve().getNews().size());
@@ -1989,7 +1988,7 @@ public class ModelTest3 {
       NewsReference newsRef = new NewsReference(feedRef.resolve().getNews().get(0).getId());
 
       /* Delete by calling delete */
-      fDao.deleteFolder(new FolderReference(folder.getId()));
+      DynamicDAO.delete(folder);
 
       final long rootFolderId = root.getId();
       FolderListener folderListener = new FolderAdapter() {
@@ -2003,11 +2002,11 @@ public class ModelTest3 {
           }
         }
       };
-      Owl.getListenerService().addFolderListener(folderListener);
+      DynamicDAO.addEntityListener(IFolder.class, folderListener);
       try {
-        fDao.saveFolder(root);
+        DynamicDAO.save(root);
       } finally {
-        Owl.getListenerService().removeFolderListener(folderListener);
+        DynamicDAO.removeEntityListener(IFolder.class, folderListener);
       }
 
       assertNull("Expected this Entity to be NULL", new FolderReference(folder.getId()).resolve());
@@ -2019,21 +2018,21 @@ public class ModelTest3 {
     /* Folder, BookMark, Feed, News (BookMark Deleted) */
     {
       IFolder root = fFactory.createFolder(null, null, "Root");
-      root = fDao.saveFolder(root);
+      root = DynamicDAO.save(root);
 
       IFeed feed = fFactory.createFeed(null, new URI("http://www.feed4.com"));
       fFactory.createNews(null, feed, new Date());
-      FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+      FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
       IBookMark mark = fFactory.createBookMark(null, root, new FeedLinkReference(feed.getLink()), "BookMark");
-      root = fDao.saveFolder(root);
+      root = DynamicDAO.save(root);
       mark = (IBookMark) root.getMarks().get(0);
 
       assertEquals(1, new FeedReference(feed.getId()).resolve().getNews().size());
 
       NewsReference newsRef = new NewsReference(feedRef.resolve().getNews().get(0).getId());
 
-      fDao.deleteBookMark(new BookMarkReference(mark.getId()));
+      DynamicDAO.delete(mark);
 
       assertNull("Expected this Entity to be NULL", new BookMarkReference(mark.getId()).resolve());
       assertNull("Expected this Entity to be NULL", feedRef.resolve());
@@ -2043,14 +2042,14 @@ public class ModelTest3 {
     /* Folder, BookMark, Feed, News (BookMark Deleted #2) */
     {
       IFolder root = fFactory.createFolder(null, null, "Root");
-      root = fDao.saveFolder(root);
+      root = DynamicDAO.save(root);
 
       IFeed feed = fFactory.createFeed(null, new URI("http://www.feed5.com"));
       fFactory.createNews(null, feed, new Date());
-      FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+      FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
       IBookMark mark = fFactory.createBookMark(null, root, new FeedLinkReference(feed.getLink()), "BookMark");
-      root = fDao.saveFolder(root);
+      root = DynamicDAO.save(root);
       mark = (IBookMark) root.getMarks().get(0);
 
       assertEquals(1, new FeedReference(feed.getId()).resolve().getNews().size());
@@ -2058,7 +2057,7 @@ public class ModelTest3 {
       NewsReference newsRef = new NewsReference(feedRef.resolve().getNews().get(0).getId());
 
       /* Delete by calling delete */
-      fDao.deleteBookMark(new BookMarkReference(mark.getId()));
+      DynamicDAO.delete(mark);
 
       assertNull("Expected this Entity to be NULL", new BookMarkReference(mark.getId()).resolve());
       assertNull("Expected this Entity to be NULL", feedRef.resolve());
@@ -2069,13 +2068,13 @@ public class ModelTest3 {
     {
       IFeed feed = fFactory.createFeed(null, new URI("http://www.feed6.com"));
       fFactory.createNews(null, feed, new Date());
-      FeedReference feedRef = new FeedReference(fDao.saveFeed(feed).getId());
+      FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
       assertEquals(1, new FeedReference(feed.getId()).resolve().getNews().size());
 
       NewsReference newsRef = new NewsReference(feedRef.resolve().getNews().get(0).getId());
 
-      fDao.deleteFeed(feedRef);
+      DynamicDAO.delete(feedRef.resolve());
 
       assertNull("Expected this Entity to be NULL", feedRef.resolve());
       assertNull("Expected this Entity to be NULL", newsRef.resolve());
@@ -2092,22 +2091,22 @@ public class ModelTest3 {
 
     try {
       IFolder root = fFactory.createFolder(null, null, "Root");
-      root = fDao.saveFolder(root);
+      root = DynamicDAO.save(root);
 
       IFolder folder1 = fFactory.createFolder(null, root, "Folder #1");
-      root = fDao.saveFolder(root);
+      root = DynamicDAO.save(root);
       folder1 = root.getFolders().get(0);
 
       IFolder folder2 = fFactory.createFolder(null, root, "Folder #2");
-      root = fDao.saveFolder(root);
+      root = DynamicDAO.save(root);
       folder2 = root.getFolders().get(1);
 
       IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com"));
       fFactory.createNews(null, feed, new Date());
-      fDao.saveFeed(feed);
+      DynamicDAO.save(feed);
 
       fFactory.createBookMark(null, folder1, new FeedLinkReference(feed.getLink()), "BookMark");
-      folder1 = fDao.saveFolder(folder1);
+      folder1 = DynamicDAO.save(folder1);
 
       assertEquals(1, new FeedReference(feed.getId()).resolve().getNews().size());
 
@@ -2122,14 +2121,14 @@ public class ModelTest3 {
         }
       };
 
-      Owl.getListenerService().addFolderListener(folderListener);
+      DynamicDAO.addEntityListener(IFolder.class, folderListener);
 
       root.removeFolder(folder1);
       root.removeFolder(folder2);
-      fDao.saveFolder(root);
+      DynamicDAO.save(root);
     } finally {
       if (folderListener != null)
-        Owl.getListenerService().removeFolderListener(folderListener);
+        DynamicDAO.removeEntityListener(IFolder.class, folderListener);
     }
   }
 }

@@ -30,7 +30,6 @@ import org.eclipse.jface.viewers.Viewer;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.persist.IAttachment;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
@@ -38,6 +37,7 @@ import org.rssowl.core.model.persist.ILabel;
 import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPerson;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.editors.feed.NewsFilter;
@@ -62,7 +62,6 @@ public class NewsGroupFilterTest {
   private static final long WEEK = 7 * DAY;
 
   private IModelFactory fFactory;
-  private IModelDAO fDao;
   private NewsGrouping fGrouping;
   private NewsFilter fFiltering;
   private Date fToday;
@@ -79,7 +78,6 @@ public class NewsGroupFilterTest {
   @Before
   public void setUp() throws Exception {
     fFactory = Owl.getModelFactory();
-    fDao = Owl.getPersistenceService().getModelDAO();
     fGrouping = new NewsGrouping();
     fFiltering = new NewsFilter();
     fToday = new Date(DateUtils.getToday().getTimeInMillis() + 1000);
@@ -99,7 +97,7 @@ public class NewsGroupFilterTest {
   public void testNewsGrouping() throws Exception {
     IFeed feed = fFactory.createFeed(null, new URI("http://www.link.com"));
     feed.setTitle("Feed Name");
-    fDao.saveFeed(feed);
+    DynamicDAO.save(feed);
     
 
     INews news1 = fFactory.createNews(null, feed, new Date());

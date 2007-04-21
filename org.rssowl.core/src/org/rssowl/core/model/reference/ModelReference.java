@@ -26,6 +26,8 @@ package org.rssowl.core.model.reference;
 
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
+import org.rssowl.core.model.persist.dao.IPersistableDAO;
 
 /**
  * A <code>ModelReference</code> is a potential lightweight representation of
@@ -36,7 +38,8 @@ import org.rssowl.core.model.persist.IEntity;
  */
 public abstract class ModelReference {
   private final long fId;
-
+  private final IPersistableDAO<IEntity> fDAO;
+  
   /**
    * Instantiates a new leightweight reference. Any resolve()-call will be
    * passed to the <code>IModelDAO</code> to load the heavyweight type from
@@ -44,9 +47,13 @@ public abstract class ModelReference {
    * 
    * @param id The ID of the type to use for loading the type from the
    * persistance layer.
+   * @param entityClass the class of the Entity that this reference points
+   * to. This may be the interface (e.g. INews.class) or the result of calling
+   * IEntity#getClass().
    */
-  protected ModelReference(long id) {
+  protected ModelReference(long id, Class<? extends IEntity> entityClass) {
     fId = id;
+    fDAO = DynamicDAO.getDAOFromEntity(entityClass);
   }
 
   /**
@@ -66,7 +73,9 @@ public abstract class ModelReference {
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
    */
-  public abstract IEntity resolve() throws PersistenceException;
+  public IEntity resolve() throws PersistenceException  {
+    return fDAO.load(fId);
+  }
   
   /**
    * Returns <code>true</code> if calling {@link #resolve()} on this reference 

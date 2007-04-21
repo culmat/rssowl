@@ -68,9 +68,11 @@ import org.rssowl.core.model.events.FeedEvent;
 import org.rssowl.core.model.events.SearchMarkAdapter;
 import org.rssowl.core.model.events.SearchMarkEvent;
 import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.NewsReference;
@@ -286,7 +288,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         }
       }
     };
-    Owl.getListenerService().addBookMarkListener(fBookMarkListener);
+    DynamicDAO.addEntityListener(IBookMark.class, fBookMarkListener);
 
     /* Close Editor if Input was Deleted (SearchMark) */
     fSearchMarkListener = new SearchMarkAdapter() {
@@ -302,7 +304,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         }
       }
     };
-    Owl.getListenerService().addSearchMarkListener(fSearchMarkListener);
+    DynamicDAO.addEntityListener(ISearchMark.class, fSearchMarkListener);
 
     /* Listen if Title Image is changing */
     fFeedListener = new FeedAdapter() {
@@ -335,7 +337,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         }
       }
     };
-    Owl.getListenerService().addFeedListener(fFeedListener);
+    DynamicDAO.addEntityListener(IFeed.class, fFeedListener);
   }
 
   private void loadSettings(FeedViewInput input) {
@@ -709,10 +711,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         mark.setPopularity(mark.getPopularity() + 1);
         mark.setLastVisitDate(new Date(System.currentTimeMillis()));
 
-        if (mark instanceof IBookMark)
-          Owl.getPersistenceService().getModelDAO().saveBookMark((IBookMark) mark);
-        else if (mark instanceof ISearchMark)
-          Owl.getPersistenceService().getModelDAO().saveSearchMark((ISearchMark) mark);
+        DynamicDAO.save(mark);
       }
     });
   }
@@ -814,9 +813,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
   private void unregisterListeners() {
     fEditorSite.getPage().removePartListener(fPartListener);
-    Owl.getListenerService().removeBookMarkListener(fBookMarkListener);
-    Owl.getListenerService().removeSearchMarkListener(fSearchMarkListener);
-    Owl.getListenerService().removeFeedListener(fFeedListener);
+    DynamicDAO.removeEntityListener(IBookMark.class, fBookMarkListener);
+    DynamicDAO.removeEntityListener(ISearchMark.class, fSearchMarkListener);
+    DynamicDAO.removeEntityListener(IFeed.class, fFeedListener);
   }
 
   /**

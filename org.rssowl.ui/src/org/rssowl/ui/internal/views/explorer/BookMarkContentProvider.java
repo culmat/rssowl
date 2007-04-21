@@ -47,6 +47,7 @@ import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
@@ -672,17 +673,17 @@ public class BookMarkContentProvider implements ITreeContentProvider {
     }
 
     /* Register Listeners */
-    Owl.getListenerService().addFolderListener(fFolderListener);
-    Owl.getListenerService().addBookMarkListener(fBookMarkListener);
-    Owl.getListenerService().addSearchMarkListener(fSearchMarkListener);
-    Owl.getListenerService().addNewsListener(fNewsListener);
+    DynamicDAO.addEntityListener(IFolder.class, fFolderListener);
+    DynamicDAO.addEntityListener(IBookMark.class, fBookMarkListener);
+    DynamicDAO.addEntityListener(ISearchMark.class, fSearchMarkListener);
+    DynamicDAO.addEntityListener(INews.class, fNewsListener);
   }
 
   private void unregisterListeners() {
-    Owl.getListenerService().removeFolderListener(fFolderListener);
-    Owl.getListenerService().removeBookMarkListener(fBookMarkListener);
-    Owl.getListenerService().removeSearchMarkListener(fSearchMarkListener);
-    Owl.getListenerService().removeNewsListener(fNewsListener);
+    DynamicDAO.removeEntityListener(IFolder.class, fFolderListener);
+    DynamicDAO.removeEntityListener(IBookMark.class, fBookMarkListener);
+    DynamicDAO.removeEntityListener(ISearchMark.class, fSearchMarkListener);
+    DynamicDAO.removeEntityListener(INews.class, fNewsListener);
   }
 
   /* Update Entities that are affected by the given NewsEvents */

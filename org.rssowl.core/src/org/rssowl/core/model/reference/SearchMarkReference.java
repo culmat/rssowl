@@ -24,7 +24,6 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.ISearchMark;
 
@@ -45,11 +44,11 @@ public final class SearchMarkReference extends MarkReference {
    * persistance layer.
    */
   public SearchMarkReference(long id) {
-    super(id);
+    super(id, ISearchMark.class);
   }
-
+  
   @Override
   public ISearchMark resolve() throws PersistenceException {
-    return Owl.getPersistenceService().getModelDAO().loadSearchMark(getId());
+    return (ISearchMark) super.resolve();
   }
 }

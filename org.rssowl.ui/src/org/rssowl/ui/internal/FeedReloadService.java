@@ -38,6 +38,7 @@ import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.model.events.BookMarkAdapter;
 import org.rssowl.core.model.events.BookMarkEvent;
 import org.rssowl.core.model.persist.IBookMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
@@ -238,11 +239,11 @@ public class FeedReloadService {
       }
     };
 
-    Owl.getListenerService().addBookMarkListener(fBookMarkListener);
+    DynamicDAO.addEntityListener(IBookMark.class, fBookMarkListener);
   }
 
   private void unregisterListeners() {
-    Owl.getListenerService().removeBookMarkListener(fBookMarkListener);
+    DynamicDAO.removeEntityListener(IBookMark.class, fBookMarkListener);
   }
 
   private void onBookMarksAdded(Set<BookMarkEvent> events) {
