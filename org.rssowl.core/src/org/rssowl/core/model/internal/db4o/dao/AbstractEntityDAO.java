@@ -65,17 +65,15 @@ public abstract class AbstractEntityDAO<T extends IEntity,
   protected abstract E createDeleteEventTemplate(T entity);
   
   @Override
-  protected void doSave(T entity) {
+  protected void preSave(T entity) {
     E event = createSaveEventTemplate(entity);
     DBHelper.putEventTemplate(event);
-    super.doSave(entity);
   }
   
   @Override
-  protected void doDelete(T entity) {
+  protected void preDelete(T entity) {
     E event = createDeleteEventTemplate(entity);
     DBHelper.putEventTemplate(event);
-    super.doDelete(entity);
   }
   
   public final void fireEvents(final Set<E> events, final EventType eventType) {

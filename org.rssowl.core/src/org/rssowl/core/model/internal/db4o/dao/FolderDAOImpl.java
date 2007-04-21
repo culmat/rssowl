@@ -63,6 +63,25 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
   protected final FolderEvent createSaveEventTemplate(IFolder entity) {
     return new FolderEvent(entity, null, true);
   }
+  
+//  public void deleteFolders(List<IFolder> folders) {
+//    fWriteLock.lock();
+//    try {
+//      for (IFolder folder : folders) {
+//        FolderEvent event = new FolderEvent(folder, null, true);
+//        DBHelper.putEventTemplate(event);
+//      }
+//      for (IFolder folder : folders)
+//        fDb.delete(folder);
+//
+//      fDb.commit();
+//    } catch (Db4oException e) {
+//      throw new PersistenceException(e);
+//    } finally {
+//      fWriteLock.unlock();
+//    }
+//    DBHelper.cleanUpAndFireEvents();
+//  }
 
   public Collection<IFolder> loadRoots() {
     try {
