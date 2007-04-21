@@ -25,10 +25,7 @@
 package org.rssowl.core.model.internal.persist.pref;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.IFolder;
-import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 

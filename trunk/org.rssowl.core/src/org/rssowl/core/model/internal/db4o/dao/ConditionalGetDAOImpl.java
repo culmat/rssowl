@@ -29,7 +29,6 @@ import org.rssowl.core.model.internal.persist.ConditionalGet;
 import org.rssowl.core.model.persist.IConditionalGet;
 import org.rssowl.core.model.persist.dao.IConditionalGetDAO;
 
-import com.db4o.ObjectSet;
 import com.db4o.ext.Db4oException;
 import com.db4o.query.Query;
 
