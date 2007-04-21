@@ -22,61 +22,81 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.contrib.nntp.internal;
+package org.rssowl.contrib.internal.nntp;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
-import org.osgi.framework.BundleContext;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 
 /**
- * The activator class controls the plug-in life cycle
+ * The <code>ReaderInputStream</code> is an instance of
+ * <code>InputStream</code> wrapping around a Reader. This allows using any
+ * Reader in APIs where streams are required.
+ * 
+ * @author bpasero
  */
-public class Activator extends Plugin {
-
-  /* The shared instance */
-  private static Activator fPlugin;
+public class ReaderInputStream extends InputStream {
+  private Reader fReader;
 
   /**
-   * The constructor
+   * Creates a new instance of <code>ReaderInputStream</code> wrapping around
+   * a <code>Reader</code>.
+   * 
+   * @param reader The <code>Reader</code> to wrap around.
    */
-  public Activator() {}
-
-  /*
-   * @see org.eclipse.core.runtime.Plugin#start(org.osgi.framework.BundleContext)
-   */
-  @Override
-  public void start(BundleContext context) throws Exception {
-    super.start(context);
-    fPlugin = this;
+  public ReaderInputStream(Reader reader) {
+    fReader = reader;
   }
 
   /*
-   * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
+   * @see java.io.InputStream#read()
    */
   @Override
-  public void stop(BundleContext context) throws Exception {
-    fPlugin = null;
-    super.stop(context);
+  public int read() throws IOException {
+    return fReader.read();
   }
 
-  /**
-   * Returns the shared instance
-   * 
-   * @return the shared instance
+  /*
+   * @see java.io.InputStream#close()
    */
-  public static Activator getDefault() {
-    return fPlugin;
+  @Override
+  public void close() throws IOException {
+    fReader.close();
   }
 
-  /**
-   * Create a Error IStatus out of the given message and exception.
-   * 
-   * @param msg The message describing the error.
-   * @param e The Exception that occured.
-   * @return An IStatus out of the given message and exception.
+  /*
+   * @see java.io.InputStream#mark(int)
    */
-  public IStatus createErrorStatus(String msg, Exception e) {
-    return new Status(IStatus.ERROR, getBundle().getSymbolicName(), IStatus.ERROR, msg, e);
+  @Override
+  public synchronized void mark(int readlimit) {
+    try {
+      fReader.mark(readlimit);
+    } catch (IOException e) {
+      /* Ignore */
+    }
+  }
+
+  /*
+   * @see java.io.InputStream#markSupported()
+   */
+  @Override
+  public boolean markSupported() {
+    return fReader.markSupported();
+  }
+
+  /*
+   * @see java.io.InputStream#reset()
+   */
+  @Override
+  public synchronized void reset() throws IOException {
+    fReader.reset();
+  }
+
+  /*
+   * @see java.io.InputStream#skip(long)
+   */
+  @Override
+  public long skip(long n) throws IOException {
+    return fReader.skip(n);
   }
 }

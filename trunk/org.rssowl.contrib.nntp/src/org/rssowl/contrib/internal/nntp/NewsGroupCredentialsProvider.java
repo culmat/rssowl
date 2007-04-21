@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.contrib.nntp.internal;
+package org.rssowl.contrib.internal.nntp;
 
 import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.ICredentials;
