@@ -138,6 +138,9 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
     fWriteLock.lock();
     try {
       for (T object : objects) {
+        preSave(object);
+      }
+      for (T object : objects) {
         doSave(object);
       }
       fDb.commit();
@@ -147,6 +150,10 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
       fWriteLock.unlock();
     }
     DBHelper.cleanUpAndFireEvents();
+  }
+
+  protected void preSave(T persistable) {
+    // Do nothing by default
   }
 
   protected void doSave(T entity) {
@@ -174,6 +181,9 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
     fWriteLock.lock();
     try {
       for (T object : objects) {
+        preDelete(object);
+      }
+      for (T object : objects) {
         doDelete(object);
       }
       fDb.commit();
@@ -183,6 +193,10 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
       fWriteLock.unlock();
     }
     DBHelper.cleanUpAndFireEvents();
+  }
+
+  protected void preDelete(T persistable) {
+    // Do nothing by default
   }
 
   /*
