@@ -38,7 +38,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 
 /**
  * Container for all Preferences that have not yet been categorized.

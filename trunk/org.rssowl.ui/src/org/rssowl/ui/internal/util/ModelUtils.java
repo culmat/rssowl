@@ -25,15 +25,15 @@
 package org.rssowl.ui.internal.util;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.rssowl.core.model.events.ModelEvent;
-import org.rssowl.core.model.events.NewsEvent;
-import org.rssowl.core.model.persist.ICategory;
-import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.IFolder;
-import org.rssowl.core.model.persist.ILabel;
-import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.persist.INews;
-import org.rssowl.core.model.persist.IPerson;
+import org.rssowl.core.persist.ICategory;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.events.ModelEvent;
+import org.rssowl.core.persist.events.NewsEvent;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.EntityGroup;

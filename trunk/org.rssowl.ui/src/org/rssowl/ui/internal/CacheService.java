@@ -25,18 +25,18 @@
 package org.rssowl.ui.internal;
 
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.events.BookMarkEvent;
-import org.rssowl.core.model.events.BookMarkListener;
-import org.rssowl.core.model.events.FolderEvent;
-import org.rssowl.core.model.events.FolderListener;
-import org.rssowl.core.model.events.SearchMarkEvent;
-import org.rssowl.core.model.events.SearchMarkListener;
-import org.rssowl.core.model.persist.IBookMark;
-import org.rssowl.core.model.persist.IFolder;
-import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.persist.ISearchMark;
-import org.rssowl.core.model.persist.dao.DynamicDAO;
-import org.rssowl.core.model.reference.FeedLinkReference;
+import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.events.BookMarkEvent;
+import org.rssowl.core.persist.events.BookMarkListener;
+import org.rssowl.core.persist.events.FolderEvent;
+import org.rssowl.core.persist.events.FolderListener;
+import org.rssowl.core.persist.events.SearchMarkEvent;
+import org.rssowl.core.persist.events.SearchMarkListener;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 
 import java.util.Collection;
 import java.util.Collections;

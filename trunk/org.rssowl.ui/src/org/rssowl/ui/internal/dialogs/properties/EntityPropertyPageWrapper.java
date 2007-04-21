@@ -27,7 +27,7 @@ package org.rssowl.ui.internal.dialogs.properties;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
-import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.internal.Activator;
 

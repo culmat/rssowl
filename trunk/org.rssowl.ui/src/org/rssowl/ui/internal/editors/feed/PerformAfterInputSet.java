@@ -25,7 +25,7 @@
 package org.rssowl.ui.internal.editors.feed;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.reference.NewsReference;
+import org.rssowl.core.persist.reference.NewsReference;
 
 /**
  * The <code>PerformAfterInputSet</code> class is defining an action that is

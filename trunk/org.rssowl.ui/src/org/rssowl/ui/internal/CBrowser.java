@@ -46,7 +46,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.editors.browser.WebBrowserInput;

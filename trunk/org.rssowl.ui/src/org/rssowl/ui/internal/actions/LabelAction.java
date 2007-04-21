@@ -26,10 +26,10 @@ package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.ILabel;
-import org.rssowl.core.model.persist.INews;
-import org.rssowl.core.model.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;

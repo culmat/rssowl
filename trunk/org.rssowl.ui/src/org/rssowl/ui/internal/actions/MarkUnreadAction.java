@@ -33,8 +33,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.INews;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;

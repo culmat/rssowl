@@ -30,7 +30,7 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.osgi.service.prefs.Preferences;
-import org.rssowl.core.model.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.FeedView;

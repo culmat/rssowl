@@ -33,7 +33,7 @@ import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
-import org.rssowl.core.model.persist.IMark;
+import org.rssowl.core.persist.IMark;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.util.EditorUtils;

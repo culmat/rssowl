@@ -31,8 +31,8 @@ import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
-import org.rssowl.core.model.persist.IBookMark;
-import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.INews;
 import org.rssowl.ui.internal.OwlUI;
 
 import java.util.List;
