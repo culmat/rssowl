@@ -27,7 +27,7 @@ package org.rssowl.contrib.internal.nntp;
 import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.IProxyCredentials;
-import org.rssowl.core.internal.connection.DefaultCredentialsProvider;
+import org.rssowl.core.connection.PlatformCredentialsProvider;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -44,7 +44,7 @@ import java.net.URISyntaxException;
  *
  * @author bpasero
  */
-public class NewsGroupCredentialsProvider extends DefaultCredentialsProvider {
+public class NewsGroupCredentialsProvider extends PlatformCredentialsProvider {
 
   /*
    * @see org.rssowl.core.connection.internal.DefaultCredentialsProvider#deleteAuthCredentials(java.net.URI)
