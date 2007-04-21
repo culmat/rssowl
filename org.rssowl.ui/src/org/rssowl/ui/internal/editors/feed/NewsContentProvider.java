@@ -26,7 +26,6 @@ package org.rssowl.ui.internal.editors.feed;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
-import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IMark;
@@ -41,6 +40,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.persist.search.ISearchHit;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.util.JobRunner;
