@@ -36,7 +36,7 @@ import com.db4o.ext.Db4oException;
 import com.db4o.query.Query;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 public final class BookMarkDAOImpl extends AbstractEntityDAO<IBookMark, BookMarkListener,
     BookMarkEvent> implements IBookMarkDAO  {
@@ -55,7 +55,7 @@ public final class BookMarkDAOImpl extends AbstractEntityDAO<IBookMark, BookMark
     return new BookMarkEvent(entity, null, true);
   }
 
-  public final List<IBookMark> loadAll(FeedLinkReference feedRef) {
+  public final Collection<IBookMark> loadAll(FeedLinkReference feedRef) {
     try {
       Query query = fDb.query();
       query.constrain(fEntityClass);
