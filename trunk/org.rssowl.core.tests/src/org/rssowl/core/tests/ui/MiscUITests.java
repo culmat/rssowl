@@ -31,14 +31,13 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.internal.persist.BookMark;
 import org.rssowl.core.model.internal.persist.Feed;
 import org.rssowl.core.model.internal.persist.Folder;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
-import org.rssowl.core.model.reference.BookMarkReference;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
@@ -66,8 +65,6 @@ public class MiscUITests {
    */
   @Test
   public void testFavicon() throws Exception {
-    IModelDAO dao = Owl.getPersistenceService().getModelDAO();
-
     /* Delete previously stored favicons */
     for (int i = 0; i < 5; i++)
       OwlUI.deleteImage(i);
@@ -77,8 +74,8 @@ public class MiscUITests {
     IBookMark bookmark = new BookMark(null, root, new FeedLinkReference(feed.getLink()), "Bookmark");
     root.addMark(bookmark);
 
-    feed = dao.saveFeed(feed);
-    root = dao.saveFolder(root);
+    feed = DynamicDAO.save(feed);
+    root = DynamicDAO.save(root);
 
     assertEquals(null, OwlUI.getFavicon(bookmark));
 
@@ -86,7 +83,7 @@ public class MiscUITests {
 
     assertNotNull(OwlUI.getFavicon(bookmark));
 
-    dao.deleteBookMark(new BookMarkReference(bookmark.getId()));
+    DynamicDAO.delete(bookmark);
 
     // Not yet implemented
     // assertEquals(null, RSSOwlUI.getFavicon(bookmark));

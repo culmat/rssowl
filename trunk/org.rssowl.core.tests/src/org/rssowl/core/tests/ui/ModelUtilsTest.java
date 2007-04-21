@@ -32,7 +32,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.events.ModelEvent;
 import org.rssowl.core.model.events.NewsEvent;
 import org.rssowl.core.model.internal.persist.BookMark;
@@ -51,6 +50,7 @@ import org.rssowl.core.model.persist.ILabel;
 import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPerson;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
@@ -71,7 +71,6 @@ import java.util.Set;
  */
 public class ModelUtilsTest {
   private IModelFactory fFactory;
-  private IModelDAO fDao;
 
   /**
    * @throws Exception
@@ -81,7 +80,6 @@ public class ModelUtilsTest {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
     fFactory = Owl.getModelFactory();
-    fDao = Owl.getPersistenceService().getModelDAO();
   }
 
   /**
@@ -127,7 +125,7 @@ public class ModelUtilsTest {
   @Test
   public void testRelax() throws Exception {
     IFeed feed = fFactory.createFeed(null, new URI("http://www.link.com"));
-    feed = fDao.saveFeed(feed);
+    feed = DynamicDAO.save(feed);
 
     IFolder root1 = fFactory.createFolder(null, null, "Root 1");
     IFolder subRoot = fFactory.createFolder(null, root1, "Sub Root 1");

@@ -24,7 +24,6 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.INews;
 
@@ -45,11 +44,11 @@ public final class NewsReference extends ModelReference {
    * persistance layer.
    */
   public NewsReference(long id) {
-    super(id);
+    super(id, INews.class);
   }
-
+  
   @Override
   public INews resolve() throws PersistenceException {
-    return Owl.getPersistenceService().getModelDAO().loadNews(getId());
+    return (INews) super.resolve();
   }
 }

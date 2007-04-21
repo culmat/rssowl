@@ -23,11 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events.runnable;
 
-import org.rssowl.core.Owl;
-import org.rssowl.core.model.events.ModelEvent;
 import org.rssowl.core.model.events.PersonEvent;
-
-import java.util.Set;
 
 /**
  * Provides a way to fire a PersonEvent in the future.
@@ -41,26 +37,6 @@ public class PersonEventRunnable extends EventRunnable<PersonEvent>  {
    * Creates a new instance of this object.
    */
   public PersonEventRunnable() {
-    super();
-  }
-
-  @Override
-  public Class< ? extends ModelEvent> getEventClass() {
-    return PersonEvent.class;
-  }
-  
-  @Override
-  protected final void firePersistEvents(Set<PersonEvent> persistEvents) {
-    Owl.getListenerService().notifyPersonAdded(persistEvents);
-  }
-
-  @Override
-  protected final void fireRemoveEvents(Set<PersonEvent> removeEvents) {
-    Owl.getListenerService().notifyPersonDeleted(removeEvents);
-  }
-
-  @Override
-  protected final void fireUpdateEvents(Set<PersonEvent> updateEvents) {
-    Owl.getListenerService().notifyPersonUpdated(updateEvents);
+    super(PersonEvent.class, getDAOService().getPersonDAO());
   }
 }

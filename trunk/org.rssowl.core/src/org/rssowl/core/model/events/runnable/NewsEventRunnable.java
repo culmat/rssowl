@@ -23,11 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events.runnable;
 
-import org.rssowl.core.Owl;
-import org.rssowl.core.model.events.ModelEvent;
 import org.rssowl.core.model.events.NewsEvent;
-
-import java.util.Set;
 
 /**
  * Provides a way to fire one or more NewsEvents in the future.
@@ -41,26 +37,6 @@ public class NewsEventRunnable extends EventRunnable<NewsEvent> {
    * Creates a new instance of this object.
    */
   public NewsEventRunnable() {
-    super();
-  }
-
-  @Override
-  public Class< ? extends ModelEvent> getEventClass() {
-    return NewsEvent.class;
-  }
-  
-  @Override
-  protected final void firePersistEvents(Set<NewsEvent> persistEvents) {
-    Owl.getListenerService().notifyNewsAdded(persistEvents);
-  }
-
-  @Override
-  protected final void fireRemoveEvents(Set<NewsEvent> removeEvents) {
-    Owl.getListenerService().notifyNewsDeleted(removeEvents);
-  }
-
-  @Override
-  protected final void fireUpdateEvents(Set<NewsEvent> updateEvents) {
-    Owl.getListenerService().notifyNewsUpdated(updateEvents);
+    super(NewsEvent.class, getDAOService().getNewsDAO());
   }
 }

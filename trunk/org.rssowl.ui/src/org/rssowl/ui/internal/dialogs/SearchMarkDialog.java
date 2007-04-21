@@ -49,6 +49,7 @@ import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.search.ISearchCondition;
 import org.rssowl.core.model.persist.search.ISearchField;
 import org.rssowl.core.model.persist.search.SearchSpecifier;
@@ -137,7 +138,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
 
     /* Create Conditions and save in DB */
     fSearchConditionList.createConditions(searchMark);
-    fPersist.getModelDAO().saveFolder(fParent);
+    DynamicDAO.save(fParent);
 
     super.okPressed();
   }

@@ -44,8 +44,6 @@ import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.interpreter.ParserException;
 import org.rssowl.core.model.dao.IApplicationLayer;
-import org.rssowl.core.model.dao.IModelDAO;
-import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IConditionalGet;
@@ -58,6 +56,12 @@ import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.INews.State;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
+import org.rssowl.core.model.persist.dao.IBookMarkDAO;
+import org.rssowl.core.model.persist.dao.IConditionalGetDAO;
+import org.rssowl.core.model.persist.dao.IFolderDAO;
+import org.rssowl.core.model.persist.dao.ILabelDAO;
+import org.rssowl.core.model.persist.dao.IPreferencesDAO;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.persist.search.ISearchField;
 import org.rssowl.core.model.persist.search.SearchSpecifier;
@@ -143,7 +147,11 @@ public class Controller {
 
   /* Misc. */
   private IApplicationLayer fAppLayer;
-  private IModelDAO fModelDAO;
+  private IBookMarkDAO fBookMarkDAO;
+  private IFolderDAO fFolderDAO;
+  private IConditionalGetDAO fConditionalGetDAO;
+  private IPreferencesDAO fPrefsDAO;
+  private ILabelDAO fLabelDao;
 
   /* Task to perform Reload-Operations */
   private class ReloadTask implements ITask {
@@ -200,7 +208,11 @@ public class Controller {
     fReloadFeedQueue = new JobQueue("Updating Feeds", MAX_CONCURRENT_RELOAD_JOBS, true, 0);
     fSaveFeedQueue = new JobQueue("Saving Feeds", MAX_CONCURRENT_SAVE_JOBS, false, 0);
     fEntityPropertyPages = loadEntityPropertyPages();
-    fModelDAO = Owl.getPersistenceService().getModelDAO();
+    fBookMarkDAO = DynamicDAO.getDAO(IBookMarkDAO.class);
+    fConditionalGetDAO = DynamicDAO.getDAO(IConditionalGetDAO.class);
+    fFolderDAO = DynamicDAO.getDAO(IFolderDAO.class);
+    fLabelDao = DynamicDAO.getDAO(ILabelDAO.class);
+    fPrefsDAO = Owl.getPersistenceService().getDAOService().getPreferencesDAO();
     fAppLayer = Owl.getPersistenceService().getApplicationLayer();
   }
 
@@ -379,7 +391,7 @@ public class Controller {
         return Status.CANCEL_STATUS;
 
       /* Load Conditional Get for the URL */
-      IConditionalGet conditionalGet = fModelDAO.loadConditionalGet(feedLink);
+      IConditionalGet conditionalGet = fConditionalGetDAO.load(feedLink);
 
       /* Define Properties for Connection */
       Map<Object, Object> properties = new HashMap<Object, Object>();
@@ -465,7 +477,7 @@ public class Controller {
             /* Update Error Flag if user hit Cancel */
             else if (!fShuttingDown && !monitor.isCanceled() && !bookmark.isErrorLoading()) {
               bookmark.setErrorLoading(true);
-              fModelDAO.saveBookMark(bookmark);
+              fBookMarkDAO.save(bookmark);
             }
           }
         });
@@ -506,13 +518,13 @@ public class Controller {
     /* Reset Error-Loading flag if necessary */
     if (bookmark.isErrorLoading() && (ex == null || ex instanceof NotModifiedException)) {
       bookmark.setErrorLoading(false);
-      fModelDAO.saveBookMark(bookmark);
+      fBookMarkDAO.save(bookmark);
     }
 
     /* Set Error-Loading flag if necessary */
     else if (!bookmark.isErrorLoading() && ex != null && !(ex instanceof NotModifiedException) && !(ex instanceof AuthenticationRequiredException)) {
       bookmark.setErrorLoading(true);
-      fModelDAO.saveBookMark(bookmark);
+      fBookMarkDAO.save(bookmark);
     }
   }
 
@@ -554,14 +566,14 @@ public class Controller {
         public void run() throws Exception {
 
           /* First check wether this action is required */
-          Boolean firstStartToken = Owl.getPersistenceService().getPreferencesDAO().getBoolean(FIRST_START_TOKEN);
+          Boolean firstStartToken = fPrefsDAO.getBoolean(FIRST_START_TOKEN);
           if (firstStartToken != null)
             return;
 
           onFirstStartup();
 
           /* Mark this as the first start */
-          Owl.getPersistenceService().getPreferencesDAO().putBoolean(FIRST_START_TOKEN, true);
+          fPrefsDAO.putBoolean(FIRST_START_TOKEN, true);
         }
       });
     }
@@ -578,7 +590,7 @@ public class Controller {
       fFeedReloadService = new FeedReloadService();
 
     //TODO NotificationPopup
-    //    Owl.getListenerService().addNewsListener(new NewsAdapter() {
+    //    DynamicDAO.addEntityListener(INews.class, new NewsAdapter() {
     //      @Override
     //      public void entitiesAdded(final Set<NewsEvent> events) {
     //        JobRunner.runInUIThread(OwlUI.getPrimaryShell(), new Runnable() {
@@ -732,32 +744,31 @@ public class Controller {
     List<ILabel> labels = new ArrayList<ILabel>();
 
     IModelFactory factory = Owl.getModelFactory();
-    IModelDAO modelDAO = Owl.getPersistenceService().getModelDAO();
 
     ILabel label = factory.createLabel(null, "Important");
     label.setColor("159,63,63");
     labels.add(label);
-    modelDAO.saveLabel(label);
+    fLabelDao.save(label);
 
     label = factory.createLabel(null, "Work");
     label.setColor("255,153,0");
     labels.add(label);
-    modelDAO.saveLabel(label);
+    fLabelDao.save(label);
 
     label = factory.createLabel(null, "Personal");
     label.setColor("0,153,0");
     labels.add(label);
-    modelDAO.saveLabel(label);
+    fLabelDao.save(label);
 
     label = factory.createLabel(null, "To Do");
     label.setColor("51,51,255");
     labels.add(label);
-    modelDAO.saveLabel(label);
+    fLabelDao.save(label);
 
     label = factory.createLabel(null, "Later");
     label.setColor("151,53,151");
     labels.add(label);
-    modelDAO.saveLabel(label);
+    fLabelDao.save(label);
 
     return labels;
   }
@@ -821,7 +832,7 @@ public class Controller {
       }
     }
 
-    Owl.getPersistenceService().getModelDAO().saveFolder(imported);
+    fFolderDAO.save(imported);
   }
 
   /**
@@ -830,7 +841,6 @@ public class Controller {
    * @param fileName
    */
   public void importFeeds(String fileName) {
-    IPersistenceService persistenceService = Owl.getPersistenceService();
     try {
 
       /* Import from File */
@@ -840,8 +850,8 @@ public class Controller {
       IFolder importedContainer = (IFolder) types.get(0);
 
       /* Load the current selected Set */
-      Long selectedFolderID = persistenceService.getPreferencesDAO().getLong(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET);
-      IFolder rootFolder = persistenceService.getModelDAO().loadFolder(selectedFolderID);
+      Long selectedFolderID = fPrefsDAO.getLong(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET);
+      IFolder rootFolder = fFolderDAO.load(selectedFolderID);
 
       /* Reparent all imported folders into selected Set */
       List<IFolder> folders = importedContainer.getFolders();
@@ -858,7 +868,7 @@ public class Controller {
       }
 
       /* Save Set */
-      Owl.getPersistenceService().getModelDAO().saveFolder(rootFolder);
+      fFolderDAO.save(rootFolder);
     } catch (Exception e) {
       Activator.getDefault().logError("importDefaults()", e); //$NON-NLS-1$
     }

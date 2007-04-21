@@ -95,6 +95,7 @@ import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FolderReference;
@@ -1097,7 +1098,7 @@ public class BookMarkExplorer extends ViewPart {
         }
       }
     };
-    Owl.getListenerService().addFolderListener(fFolderListener);
+    DynamicDAO.addEntityListener(IFolder.class, fFolderListener);
 
     /* Listen for Editors activated for the linking Feature */
     fPartListener = new IPartListener2() {
@@ -1134,7 +1135,7 @@ public class BookMarkExplorer extends ViewPart {
   }
 
   private void unregisterListeners() {
-    Owl.getListenerService().removeFolderListener(fFolderListener);
+    DynamicDAO.removeEntityListener(IFolder.class, fFolderListener);
     fViewSite.getPage().removePartListener(fPartListener);
   }
 

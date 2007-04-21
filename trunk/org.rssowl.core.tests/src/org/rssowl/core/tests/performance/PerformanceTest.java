@@ -35,7 +35,6 @@ import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.model.dao.IApplicationLayer;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.internal.persist.BookMark;
 import org.rssowl.core.model.internal.persist.Feed;
@@ -58,6 +57,7 @@ import org.rssowl.core.model.persist.IPersistable;
 import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.model.persist.ISource;
 import org.rssowl.core.model.persist.ITextInput;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.search.IModelSearch;
 import org.rssowl.core.model.persist.search.ISearchCondition;
 import org.rssowl.core.model.persist.search.ISearchField;
@@ -96,7 +96,6 @@ public class PerformanceTest {
   /* Number of Jobs per JobQueue */
   private static final int JOBS = 10;
 
-  private IModelDAO fDao;
   private URI fPluginLocation;
   private IApplicationLayer fAppLayer;
   private Controller fController;
@@ -111,7 +110,6 @@ public class PerformanceTest {
     Owl.getPersistenceService().recreateSchema();
     fModelSearch = Owl.getPersistenceService().getModelSearch();
     fModelSearch.shutdown();
-    fDao = Owl.getPersistenceService().getModelDAO();
     fAppLayer = Owl.getPersistenceService().getApplicationLayer();
     fPluginLocation = FileLocator.toFileURL(Platform.getBundle("org.rssowl.core.tests").getEntry("/")).toURI();
     fController = Controller.getDefault();
@@ -167,7 +165,7 @@ public class PerformanceTest {
       tasks.add(new TaskAdapter() {
         public IStatus run(IProgressMonitor monitor) {
           try {
-            fDao.saveFeed(feed);
+            DynamicDAO.save(feed);
           } catch (Exception e) {
             ex.add(e);
           }
@@ -450,7 +448,7 @@ public class PerformanceTest {
           }
         }
 
-        feed = fDao.saveFeed(feed);
+        feed = DynamicDAO.save(feed);
 
         IBookMark bookmark = new BookMark(null, rootFolder, new FeedLinkReference(feed.getLink()), "Bookmark");
 
@@ -458,7 +456,7 @@ public class PerformanceTest {
           Owl.getPreferenceService().getEntityScope(bookmark).putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
 
         rootFolder.addMark(bookmark);
-        fDao.saveFolder(rootFolder);
+        DynamicDAO.save(rootFolder);
       } catch (Exception e) {
         Activator.getDefault().logError(e.getMessage(), e);
       }
@@ -518,7 +516,7 @@ public class PerformanceTest {
     List<IFeed> feeds = interpretFeedsHelper();
     List<IFeed> savedFeeds = new ArrayList<IFeed>(feeds.size());
     for (IFeed feed : feeds)
-      savedFeeds.add(fDao.saveFeed(feed));
+      savedFeeds.add(DynamicDAO.save(feed));
 
     final List<FeedLinkReference> feedRefs = new ArrayList<FeedLinkReference>();
     for (IFeed feed : feeds) {
@@ -645,7 +643,7 @@ public class PerformanceTest {
       tasks.add(new TaskAdapter() {
         public IStatus run(IProgressMonitor monitor) {
           try {
-            fDao.saveFeed(feed);
+            DynamicDAO.save(feed);
           } catch (Exception e) {
             ex.add(e);
           }
@@ -890,7 +888,7 @@ public class PerformanceTest {
       tasks.add(new TaskAdapter() {
         public IStatus run(IProgressMonitor monitor) {
           try {
-            fDao.deleteFeed(feedRef);
+            DynamicDAO.delete(feedRef.resolve());
           } catch (Exception e) {
             ex.add(e);
           }
@@ -936,7 +934,7 @@ public class PerformanceTest {
     List<IFeed> feeds = interpretFeedsHelper();
     List<IFeed> savedFeeds = new ArrayList<IFeed>(feeds.size());
     for (IFeed feed : feeds)
-      savedFeeds.add(fDao.saveFeed(feed));
+      savedFeeds.add(DynamicDAO.save(feed));
 
     /* Interpret them again for updates */
     List<IFeed> newFeeds = interpretFeedsHelper();
@@ -964,7 +962,7 @@ public class PerformanceTest {
             // full feed before the merge
             // existingFeed[0] =
             // feedManager.loadFullEntity(existingFeed[0].getId());
-            existingFeed[0] = fDao.loadFeed(existingFeed[0].getId());
+            existingFeed[0] = DynamicDAO.load(IFeed.class, existingFeed[0].getId());
             feed.setCopyright("The new Copyright");
             feed.setDescription("The Description has changed as well");
             feed.setPublishDate(new Date());
@@ -978,10 +976,10 @@ public class PerformanceTest {
             // Uncomment this line and comment out the next two to test the
             // performance of setting the id on a new entity to force
             // an update
-            // fDao.saveFeed(feed);
+            // DynamicDAO.save(feed);
 
             existingFeed[0].merge(feed);
-            fDao.saveFeed(existingFeed[0]);
+            DynamicDAO.save(existingFeed[0]);
           } catch (Exception e) {
             ex.add(e);
           }
@@ -1029,7 +1027,7 @@ public class PerformanceTest {
     final List<IFeed> feeds = interpretFeedsHelper();
     final int limit = feeds.size() / 2;
     for (int i = 0; i < limit; i++)
-      feedRefs.add(new FeedReference(fDao.saveFeed(feeds.get(i)).getId()));
+      feedRefs.add(new FeedReference(DynamicDAO.save(feeds.get(i)).getId()));
 
     /* Tasks to resolve Feeds */
     for (int i = 0; i < limit; i++) {
@@ -1040,7 +1038,7 @@ public class PerformanceTest {
         tasks.add(new TaskAdapter() {
           public IStatus run(IProgressMonitor monitor) {
             try {
-              fDao.saveFeed(feeds.get(a + limit));
+              DynamicDAO.save(feeds.get(a + limit));
             } catch (Exception e) {
               ex.add(e);
             }
@@ -1108,7 +1106,7 @@ public class PerformanceTest {
     List<IFeed> feeds = interpretFeedsHelper();
     List<FeedReference> feedRefs = new ArrayList<FeedReference>();
     for (IFeed feed : feeds)
-      feedRefs.add(new FeedReference(fDao.saveFeed(feed).getId()));
+      feedRefs.add(new FeedReference(DynamicDAO.save(feed).getId()));
 
     return feedRefs;
   }

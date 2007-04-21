@@ -86,6 +86,7 @@ import org.rssowl.core.model.persist.ILabel;
 import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.search.IModelSearch;
 import org.rssowl.core.model.persist.search.ISearchCondition;
 import org.rssowl.core.model.persist.search.ISearchField;
@@ -881,7 +882,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
         onNewsEvent(events);
       }
     };
-    Owl.getListenerService().addNewsListener(fNewsListener);
+    DynamicDAO.addEntityListener(INews.class, fNewsListener);
   }
 
   private void onNewsEvent(Set<NewsEvent> events) {
@@ -965,7 +966,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   }
 
   private void unregisterListeners() {
-    Owl.getListenerService().removeNewsListener(fNewsListener);
+    DynamicDAO.removeEntityListener(INews.class, fNewsListener);
   }
 
   private void onMouseDoubleClick(DoubleClickEvent event) {

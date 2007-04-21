@@ -23,11 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events.runnable;
 
-import org.rssowl.core.Owl;
 import org.rssowl.core.model.events.AttachmentEvent;
-import org.rssowl.core.model.events.ModelEvent;
-
-import java.util.Set;
 
 /**
  * Provides a way to fire a AttachmentEvent in the future.
@@ -41,26 +37,6 @@ public class AttachmentEventRunnable extends EventRunnable<AttachmentEvent> {
    * Creates a new instance of this object.
    */
   public AttachmentEventRunnable() {
-    super();
-  }
-    
-  @Override
-  public Class< ? extends ModelEvent> getEventClass() {
-    return AttachmentEvent.class;
-  }
-
-  @Override
-  protected final void firePersistEvents(Set<AttachmentEvent> persistEvents) {
-    Owl.getListenerService().notifyAttachmentAdded(persistEvents);
-  }
-
-  @Override
-  protected final void fireRemoveEvents(Set<AttachmentEvent> removeEvents) {
-    Owl.getListenerService().notifyAttachmentDeleted(removeEvents);
-  }
-
-  @Override
-  protected final void fireUpdateEvents(Set<AttachmentEvent> updateEvents) {
-    Owl.getListenerService().notifyAttachmentUpdated(updateEvents);
+    super(AttachmentEvent.class, getDAOService().getAttachmentDAO());
   }
 }

@@ -26,7 +26,6 @@ package org.rssowl.ui.internal;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.events.FeedAdapter;
 import org.rssowl.core.model.events.FeedEvent;
 import org.rssowl.core.model.events.NewsAdapter;
@@ -35,6 +34,8 @@ import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.NewsCounter;
 import org.rssowl.core.model.persist.NewsCounterItem;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
+import org.rssowl.core.model.persist.dao.INewsCounterDAO;
 import org.rssowl.core.model.reference.FeedLinkReference;
 
 import java.net.URI;
@@ -62,10 +63,10 @@ public class NewsService {
   /* The Counter for various aspects of News, the key is the feed link */
   private NewsCounter fCounter;
 
-  private IModelDAO fModelDao;
+  private INewsCounterDAO fNewsCounterDao;
 
   NewsService() {
-    fModelDao = Owl.getPersistenceService().getModelDAO();
+    fNewsCounterDao = DynamicDAO.getDAO(INewsCounterDAO.class);
     fCounter = loadCounter();
     registerListeners();
   }
@@ -148,7 +149,7 @@ public class NewsService {
   private synchronized NewsCounter loadCounter() {
 
     /* Load from DB */
-    NewsCounter counter = fModelDao.loadNewsCounter();
+    NewsCounter counter = fNewsCounterDao.load();
 
     /* Perform initial counting */
     if (counter == null)
@@ -156,7 +157,7 @@ public class NewsService {
 
     /* Delete it to force recount on dirty shutdown */
     else
-      fModelDao.deleteNewsCounter();
+      fNewsCounterDao.delete();
 
     return counter;
   }
@@ -195,11 +196,11 @@ public class NewsService {
   }
 
   private void saveState() {
-    fModelDao.saveNewsCounter(fCounter);
+    fNewsCounterDao.save(fCounter);
   }
 
   private void registerListeners() {
-    Owl.getListenerService().addNewsListener(new NewsAdapter() {
+    DynamicDAO.addEntityListener(INews.class, new NewsAdapter() {
       @Override
       public void entitiesAdded(Set<NewsEvent> events) {
         onNewsAdded(events);
@@ -216,7 +217,7 @@ public class NewsService {
       }
     });
 
-    Owl.getListenerService().addFeedListener(new FeedAdapter() {
+    DynamicDAO.addEntityListener(IFeed.class, new FeedAdapter() {
       @Override
       public void entitiesDeleted(Set<FeedEvent> events) {
         onFeedDeleted(events);

@@ -41,12 +41,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
-import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IModelDAO;
-import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.IFolder;
-import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
@@ -71,7 +67,6 @@ import java.util.TreeSet;
  */
 public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite {
   private List<IEntity> fEntities;
-  private IModelDAO fModelDAO;
   private String fTitle;
   private Set<EntityPropertyPageWrapper> fPages = new TreeSet<EntityPropertyPageWrapper>();
   private Label fMessageText;
@@ -87,7 +82,6 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
     super(parentShell);
     fEntities = entities;
     fResources = new LocalResourceManager(JFaceResources.getResources());
-    fModelDAO = Owl.getPersistenceService().getModelDAO();
   }
 
   /**
@@ -141,14 +135,8 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
     /* Save Entities while showing Busy-Cursor */
     BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
       public void run() {
-        for (IEntity entity : entitiesToSave) {
-          if (entity instanceof IFolder)
-            fModelDAO.saveFolder((IFolder) entity);
-          else if (entity instanceof IBookMark)
-            fModelDAO.saveBookMark((IBookMark) entity);
-          else if (entity instanceof ISearchMark)
-            fModelDAO.saveSearchMark((ISearchMark) entity);
-        }
+        for (IEntity entity : entitiesToSave)
+          DynamicDAO.save(entity);
       }
     });
 

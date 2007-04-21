@@ -49,6 +49,7 @@ import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FeedReference;
@@ -390,7 +391,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
           /* This is a new Feed, so create it! */
           if (feedRef == null) {
             IFeed feed = Owl.getModelFactory().createFeed(null, newFeedLink);
-            feed = Owl.getPersistenceService().getModelDAO().saveFeed(feed);
+            feed = DynamicDAO.save(feed);
           }
 
           /* Remember the old Reference */
@@ -402,7 +403,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
 
           /* Check if the old reference can be deleted now */
           if (applicationLayer.loadBookMarks(oldFeedRef).size() == 1)
-            Owl.getPersistenceService().getModelDAO().deleteFeed(oldFeedRef);
+            DynamicDAO.delete(oldFeedRef.resolve());
 
           /* Delete the Favicon since the feed has changed */
           OwlUI.deleteImage(bookmark.getId());

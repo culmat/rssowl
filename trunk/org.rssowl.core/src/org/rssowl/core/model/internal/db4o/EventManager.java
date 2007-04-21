@@ -25,7 +25,6 @@ package org.rssowl.core.model.internal.db4o;
 
 import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IDGenerator;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.events.AttachmentEvent;
 import org.rssowl.core.model.events.BookMarkEvent;
 import org.rssowl.core.model.events.CategoryEvent;
@@ -52,6 +51,7 @@ import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.INewsGetter;
 import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.dao.IConditionalGetDAO;
 import org.rssowl.core.model.persist.search.IModelSearch;
 import org.rssowl.core.model.persist.search.ISearchCondition;
 import org.rssowl.core.model.persist.search.ISearchHit;
@@ -120,9 +120,25 @@ public class EventManager {
   private static final String PARENT_DELETED_KEY = "rssowl.db4o.EventManager.parentDeleted"; //$NON-NLS-1$
   private final static EventManager INSTANCE = new EventManager();
   private ObjectContainer fDb;
+  private IConditionalGetDAO fConditionalGetDAO;
+  private IDGenerator fIDGenerator;
 
   private EventManager() {
     initEntityStoreListener();
+  }
+  
+  private IDGenerator getIDGenerator() {
+    if (fIDGenerator == null)
+      fIDGenerator = Owl.getPersistenceService().getIDGenerator();
+    
+    return fIDGenerator;
+  }
+  
+  private IConditionalGetDAO getConditionalGetDAO() {
+    if (fConditionalGetDAO == null)
+      fConditionalGetDAO = Owl.getPersistenceService().getDAOService().getConditionalGetDAO();
+    
+    return fConditionalGetDAO;
   }
 
   private void initEventRegistry() {
@@ -317,8 +333,7 @@ public class EventManager {
     for (INews news : ReverseIterator.createInstance(feed.getNews())) {
       fDb.delete(news);
     }
-    IModelDAO dao = Owl.getPersistenceService().getModelDAO();
-    IConditionalGet conditionalGet = dao.loadConditionalGet(feed.getLink());
+    IConditionalGet conditionalGet = getConditionalGetDAO().load(feed.getLink());
     if (conditionalGet != null)
       fDb.delete(conditionalGet);
 
@@ -526,9 +541,9 @@ public class EventManager {
 
   private void setId(IEntity entity) {
     if (entity.getId() == null) {
-      IDGenerator idGenerator = Owl.getPersistenceService().getIDGenerator();
       long id;
 
+      IDGenerator idGenerator = getIDGenerator();
       if (idGenerator instanceof DB4OIDGenerator)
         id = ((DB4OIDGenerator) idGenerator).getNext(false);
       else

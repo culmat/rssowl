@@ -23,11 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events.runnable;
 
-import org.rssowl.core.Owl;
 import org.rssowl.core.model.events.LabelEvent;
-import org.rssowl.core.model.events.ModelEvent;
-
-import java.util.Set;
 
 /**
  * Provides a way to fire a LabelEvent in the future.
@@ -41,26 +37,6 @@ public final class LabelEventRunnable extends EventRunnable<LabelEvent> {
    * Creates a new instance of this object.
    */
   public LabelEventRunnable() {
-    super();
-  }
-
-  @Override
-  public Class< ? extends ModelEvent> getEventClass() {
-    return LabelEvent.class;
-  }
-  
-  @Override
-  protected final void firePersistEvents(Set<LabelEvent> persistEvents) {
-    Owl.getListenerService().notifyLabelAdded(persistEvents);
-  }
-
-  @Override
-  protected final void fireRemoveEvents(Set<LabelEvent> removeEvents) {
-    Owl.getListenerService().notifyLabelDeleted(removeEvents);
-  }
-
-  @Override
-  protected final void fireUpdateEvents(Set<LabelEvent> updateEvents) {
-    Owl.getListenerService().notifyLabelUpdated(updateEvents);
+    super(LabelEvent.class, getDAOService().getLabelDAO());
   }
 }

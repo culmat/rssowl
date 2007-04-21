@@ -29,12 +29,23 @@ import org.rssowl.core.model.events.ModelEvent;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IPersistable;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public final class DynamicDAO {
 
-  private static final DAOService DAO_SERVICE = Owl.getPersistenceService().getDAOService();
-
+  private static DAOService DAO_SERVICE;
+  
+  private synchronized static final DAOService getDAOService() {
+    if (DAO_SERVICE == null)
+      DAO_SERVICE = Owl.getPersistenceService().getDAOService();
+    
+    return DAO_SERVICE;
+  }
+  
   public static <T extends IPersistable> T load(Class<T> persistableClass, long id) {
     IPersistableDAO<T> dao = getDAOFromEntity(persistableClass);
     return dao.load(id);
@@ -50,12 +61,29 @@ public final class DynamicDAO {
     return dao.save(persistable);
   }
   
-  public static <C extends Collection<T>, T extends IPersistable> C saveAll(C persistables) {
+  public static <T extends IPersistable> void saveAll(Collection<T> persistables) {
     if (persistables.size() == 0)
-      return persistables;
+      return;
     
-    IPersistableDAO<T> dao = (IPersistableDAO<T>) getDAOFromEntity(persistables.iterator().next().getClass());
-    return dao.saveAll(persistables);
+    Map<Class< ? extends IPersistable>, List<T>> persistablesMap = getPersistablesMap(persistables);
+    for (Map.Entry<Class<? extends IPersistable>, List<T>> entry : persistablesMap.entrySet()) {
+      IPersistableDAO<T> dao = (IPersistableDAO<T>) getDAOFromEntity(entry.getKey());
+      dao.saveAll(entry.getValue());
+    }
+  }
+
+  private static <T extends IPersistable> Map<Class<? extends IPersistable>, List<T>> getPersistablesMap(Collection<T> persistables) {
+    Map<Class<? extends IPersistable>, List<T>> persistablesMap = new LinkedHashMap<Class<? extends IPersistable>, List<T>>(3);
+    for (T persistable : persistables) {
+      Class<? extends IPersistable> persistableClass = persistable.getClass();
+      List<T> persistableList = persistablesMap.get(persistableClass);
+      if (persistableList == null) {
+        persistableList = new ArrayList<T>(persistables.size());
+        persistablesMap.put(persistableClass, persistableList);
+      }
+      persistableList.add(persistable);
+    }
+    return persistablesMap;
   }
   
   public static <T extends IPersistable> void delete(T persistable) {
@@ -63,12 +91,15 @@ public final class DynamicDAO {
     dao.delete(persistable);
   }
   
-  public static <T extends IPersistable> void deleteAll(Collection<T> objects) {
-    if (objects.size() == 0)
+  public static <T extends IPersistable> void deleteAll(Collection<T> persistables) {
+    if (persistables.size() == 0)
       return;
     
-    IPersistableDAO<T> dao = (IPersistableDAO<T>) getDAOFromEntity(objects.iterator().next().getClass());
-    dao.deleteAll(objects);
+    Map<Class< ? extends IPersistable>, List<T>> persistablesMap = getPersistablesMap(persistables);
+    for (Map.Entry<Class<? extends IPersistable>, List<T>> entry : persistablesMap.entrySet()) {
+      IPersistableDAO<T> dao = (IPersistableDAO<T>) getDAOFromEntity(entry.getKey());
+      dao.deleteAll(entry.getValue());
+    }
   }
 
   public static <T extends IPersistable> void countAll(Class<T> persistableClass) {
@@ -76,14 +107,14 @@ public final class DynamicDAO {
     dao.countAll();
   }
   
-  public static <T extends IEntity, L extends EntityListener<E>, E extends ModelEvent>
+  public static <T extends IEntity, L extends EntityListener<E, T>, E extends ModelEvent>
       void addEntityListener(Class<T> entityClass, L listener) {
     
     IEntityDAO<T, L, E> dao = (IEntityDAO<T, L, E>) getDAOFromEntity(entityClass);
     dao.addEntityListener(listener);
   }
   
-  public static <T extends IEntity, L extends EntityListener<E>, E extends ModelEvent>
+  public static <T extends IEntity, L extends EntityListener<E, T>, E extends ModelEvent>
       void removeEntityListener(Class<T> entityClass, L listener) {
 
     IEntityDAO<T, L, E> dao = (IEntityDAO<T, L, E>) getDAOFromEntity(entityClass);
@@ -91,10 +122,10 @@ public final class DynamicDAO {
   }
   
   public static <D extends IPersistableDAO<T>, T extends IPersistable> D getDAO(Class<D> daoInterface)    {
-    return DAO_SERVICE.getDAO(daoInterface);
+    return getDAOService().getDAO(daoInterface);
   }
   
   public static <T extends IPersistable> IPersistableDAO<T> getDAOFromEntity(Class<? extends T> persistableClass)  {
-    return DAO_SERVICE.getDAOFromEntity(persistableClass);
+    return getDAOService().getDAOFromEntity(persistableClass);
   }
 }

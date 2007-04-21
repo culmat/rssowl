@@ -24,7 +24,6 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IMark;
 
 /**
@@ -42,14 +41,9 @@ public abstract class MarkReference extends ModelReference {
    * 
    * @param id The ID of the type to use for loading the type from the
    * persistance layer.
+   * @param markClass the class of the IMark (e.g. IBookMark.class).
    */
-  public MarkReference(long id) {
-    super(id);
+  public MarkReference(long id, Class<? extends IMark> markClass) {
+    super(id, markClass);
   }
-
-  /*
-   * @see org.rssowl.core.model.reference.ModelReference#resolve()
-   */
-  @Override
-  public abstract IMark resolve() throws PersistenceException;
 }

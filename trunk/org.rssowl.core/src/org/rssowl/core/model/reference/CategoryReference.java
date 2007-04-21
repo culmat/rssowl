@@ -24,7 +24,6 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.ICategory;
 
@@ -45,11 +44,11 @@ public final class CategoryReference extends ModelReference {
    * persistance layer.
    */
   public CategoryReference(long id) {
-    super(id);
+    super(id, ICategory.class);
   }
-
+  
   @Override
   public ICategory resolve() throws PersistenceException {
-    return Owl.getPersistenceService().getModelDAO().loadCategory(getId());
+    return (ICategory) super.resolve();
   }
 }

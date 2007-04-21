@@ -25,12 +25,11 @@
 package org.rssowl.core.model.internal.persist.pref;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 
 import java.util.Arrays;
@@ -44,7 +43,6 @@ import java.util.Arrays;
 public class EntityScope implements IPreferenceScope {
   private IEntity fEntity;
   private IPreferenceScope fParent;
-  private IModelDAO fDao;
 
   /**
    * @param entity
@@ -54,7 +52,6 @@ public class EntityScope implements IPreferenceScope {
     Assert.isNotNull(entity, "entity cannot be null"); //$NON-NLS-1$
     fEntity = entity;
     fParent = parent;
-    fDao = Owl.getPersistenceService().getModelDAO();
   }
 
   /*
@@ -68,12 +65,7 @@ public class EntityScope implements IPreferenceScope {
    * @see org.rssowl.ui.internal.preferences.IPreferencesScope#flush()
    */
   public void flush() {
-    if (fEntity instanceof IFolder)
-      fDao.saveFolder((IFolder) fEntity);
-    else if (fEntity instanceof IBookMark)
-      fDao.saveBookMark((IBookMark) fEntity);
-    else if (fEntity instanceof ISearchMark)
-      fDao.saveSearchMark((ISearchMark) fEntity);
+    DynamicDAO.save(fEntity);
   }
 
   /*

@@ -23,11 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events.runnable;
 
-import org.rssowl.core.Owl;
 import org.rssowl.core.model.events.BookMarkEvent;
-import org.rssowl.core.model.events.ModelEvent;
-
-import java.util.Set;
 
 /**
  * Provides a way to fire a BookMarkEvent in the future.
@@ -41,26 +37,6 @@ public class BookMarkEventRunnable extends EventRunnable<BookMarkEvent> {
    * Creates a new instance of this object.
    */
   public BookMarkEventRunnable() {
-    super();
-  }
-
-  @Override
-  public Class< ? extends ModelEvent> getEventClass() {
-    return BookMarkEvent.class;
-  }
-  
-  @Override
-  protected final void firePersistEvents(Set<BookMarkEvent> persistEvents) {
-    Owl.getListenerService().notifyBookMarkAdded(persistEvents);
-  }
-
-  @Override
-  protected final void fireRemoveEvents(Set<BookMarkEvent> removeEvents) {
-    Owl.getListenerService().notifyBookMarkDeleted(removeEvents);
-  }
-
-  @Override
-  protected final void fireUpdateEvents(Set<BookMarkEvent> updateEvents) {
-    Owl.getListenerService().notifyBookMarkUpdated(updateEvents);
+    super(BookMarkEvent.class, getDAOService().getBookMarkDAO());
   }
 }

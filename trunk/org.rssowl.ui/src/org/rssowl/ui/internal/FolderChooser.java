@@ -59,6 +59,7 @@ import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.model.events.FolderAdapter;
 import org.rssowl.core.model.events.FolderEvent;
 import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.ui.internal.actions.NewFolderAction;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -151,7 +152,7 @@ public class FolderChooser extends Composite implements DisposeListener {
       }
     };
 
-    Owl.getListenerService().addFolderListener(fFolderListener);
+    DynamicDAO.addEntityListener(IFolder.class, fFolderListener);
   }
 
   private void expand(IFolder folder) {
@@ -163,7 +164,7 @@ public class FolderChooser extends Composite implements DisposeListener {
   }
 
   private void unregisterListeners() {
-    Owl.getListenerService().removeFolderListener(fFolderListener);
+    DynamicDAO.removeEntityListener(IFolder.class, fFolderListener);
   }
 
   private void initComponents() {

@@ -65,6 +65,7 @@ import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.ui.internal.Application;
@@ -144,7 +145,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
       }
     };
 
-    Owl.getListenerService().addFolderListener(fFolderListener);
+    DynamicDAO.addEntityListener(IFolder.class, fFolderListener);
   }
 
   /*
@@ -159,7 +160,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
   }
 
   private void unregisterListeners() {
-    Owl.getListenerService().removeFolderListener(fFolderListener);
+    DynamicDAO.removeEntityListener(IFolder.class, fFolderListener);
   }
 
   /*

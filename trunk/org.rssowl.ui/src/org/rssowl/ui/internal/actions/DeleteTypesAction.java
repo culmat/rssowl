@@ -36,21 +36,19 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
-import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IApplicationLayer;
-import org.rssowl.core.model.dao.IModelDAO;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
-import org.rssowl.core.model.reference.BookMarkReference;
-import org.rssowl.core.model.reference.SearchMarkReference;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
+import org.rssowl.core.model.persist.dao.INewsDAO;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -60,8 +58,7 @@ import java.util.List;
  */
 public class DeleteTypesAction extends Action implements IObjectActionDelegate {
   private IStructuredSelection fSelection;
-  private IModelDAO fModelDao;
-  private IApplicationLayer fAppLayer;
+  private INewsDAO fNewsDAO;
   private Shell fShell;
   private boolean fConfirmed;
 
@@ -85,8 +82,7 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
   public DeleteTypesAction(Shell shell, IStructuredSelection selection) {
     fShell = shell;
     fSelection = selection;
-    fModelDao = Owl.getPersistenceService().getModelDAO();
-    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
+    fNewsDAO = DynamicDAO.getDAO(INewsDAO.class);
   }
 
   /*
@@ -187,48 +183,25 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
     /* Separate News */
     List<INews> newsToDelete = null;
 
-    /* Separate Folder */
-    List<IFolder> foldersToDelete = null;
-
-    /* Delete each Entity */
-    for (IEntity element : entities) {
-
-      /* Separate Folder */
-      if (element instanceof IFolder) {
-        if (foldersToDelete == null)
-          foldersToDelete = new ArrayList<IFolder>();
-
-        foldersToDelete.add((IFolder) element);
-      }
-
-      /* Delete BookMark */
-      if (element instanceof IBookMark) {
-        IBookMark bookmark = (IBookMark) element;
-        fModelDao.deleteBookMark(new BookMarkReference(bookmark.getId()));
-      }
-
-      /* Delete SearchMark */
-      else if (element instanceof ISearchMark) {
-        ISearchMark searchmark = (ISearchMark) element;
-        fModelDao.deleteSearchMark(new SearchMarkReference(searchmark.getId()));
-      }
-
+    /* Extract News */
+    for (Iterator<IEntity> it = entities.iterator(); it.hasNext(); ) {
+      IEntity element = it.next();
       /* Separate News */
-      else if (element instanceof INews) {
+      if (element instanceof INews) {
         if (newsToDelete == null)
           newsToDelete = new ArrayList<INews>();
 
+        it.remove();
         newsToDelete.add((INews) element);
       }
     }
 
-    /* Delete Folders in single Transaction */
-    if (foldersToDelete != null)
-      fAppLayer.deleteFolders(foldersToDelete);
+    /* Delete Folders and Marks in single Transaction */
+    DynamicDAO.deleteAll(entities);
 
     /* Delete News in single Transaction */
     if (newsToDelete != null)
-      fAppLayer.setNewsState(newsToDelete, INews.State.DELETED, false, false);
+      fNewsDAO.setState(newsToDelete, INews.State.DELETED, false, false);
   }
 
   /**

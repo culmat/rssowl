@@ -23,11 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events.runnable;
 
-import org.rssowl.core.Owl;
-import org.rssowl.core.model.events.ModelEvent;
 import org.rssowl.core.model.events.SearchMarkEvent;
-
-import java.util.Set;
 
 /**
  * Provides a way to fire a SearchMarkEvent in the future.
@@ -41,26 +37,6 @@ public class SearchMarkEventRunnable extends EventRunnable<SearchMarkEvent>  {
    * Creates a new instance of this object.
    */
   public SearchMarkEventRunnable() {
-    super();
-  }
-
-  @Override
-  public Class< ? extends ModelEvent> getEventClass() {
-    return SearchMarkEvent.class;
-  }
-  
-  @Override
-  protected final void firePersistEvents(Set<SearchMarkEvent> persistEvents) {
-    Owl.getListenerService().notifySearchMarkAdded(persistEvents);
-  }
-
-  @Override
-  protected final void fireRemoveEvents(Set<SearchMarkEvent> removeEvents) {
-    Owl.getListenerService().notifySearchMarkDeleted(removeEvents);
-  }
-
-  @Override
-  protected final void fireUpdateEvents(Set<SearchMarkEvent> updateEvents) {
-    Owl.getListenerService().notifySearchMarkUpdated(updateEvents);
+    super(SearchMarkEvent.class, getDAOService().getSearchMarkDAO());
   }
 }

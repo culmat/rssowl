@@ -61,7 +61,6 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
   /* ID for DAO Factory Contribution */
   private static final String MODEL_DAO_FACTORY_EXTENSION_POINT = "org.rssowl.core.DAOFactory";
 
-  private IModelDAO fModelDAO;
   private IModelSearch fModelSearch;
   private IApplicationLayer fApplicationLayer;
   private IDGenerator fIDGenerator;
@@ -73,8 +72,6 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
 
   public void startup() throws PersistenceException {
 
-    /* Initialize these Singletons */
-    getModelDAO();
     getModelSearch();
     getApplicationLayer();
     getIDGenerator();
@@ -109,16 +106,6 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
       fIDGenerator = (IDGenerator) ExtensionUtils.loadSingletonExecutableExtension(MODEL_ID_GENERATOR_EXTENSION_POINT);
 
     return fIDGenerator;
-  }
-
-  /*
-   * @see org.rssowl.core.model.dao.IPersistenceService#getModelDAO()
-   */
-  public IModelDAO getModelDAO() {
-    if (fModelDAO == null)
-      fModelDAO = (IModelDAO) ExtensionUtils.loadSingletonExecutableExtension(MODEL_DAO_EXTENSION_POINT);
-
-    return fModelDAO;
   }
 
   /*

@@ -23,11 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.events.runnable;
 
-import org.rssowl.core.Owl;
 import org.rssowl.core.model.events.FeedEvent;
-import org.rssowl.core.model.events.ModelEvent;
-
-import java.util.Set;
 
 /**
  * Provides a way to fire a FeedEvent in the future.
@@ -41,26 +37,6 @@ public class FeedEventRunnable extends EventRunnable<FeedEvent> {
    * Creates a new instance of this object.
    */
   public FeedEventRunnable() {
-    super();
-  }
-
-  @Override
-  public Class< ? extends ModelEvent> getEventClass() {
-    return FeedEvent.class;
-  }
-  
-  @Override
-  protected final void firePersistEvents(Set<FeedEvent> persistEvents) {
-    Owl.getListenerService().notifyFeedAdded(persistEvents);
-  }
-
-  @Override
-  protected final void fireRemoveEvents(Set<FeedEvent> removeEvents) {
-    Owl.getListenerService().notifyFeedDeleted(removeEvents);
-  }
-
-  @Override
-  protected final void fireUpdateEvents(Set<FeedEvent> updateEvents) {
-    Owl.getListenerService().notifyFeedUpdated(updateEvents);
+    super(FeedEvent.class, getDAOService().getFeedDAO());
   }
 }

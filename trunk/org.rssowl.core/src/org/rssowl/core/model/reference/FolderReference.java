@@ -24,7 +24,6 @@
 
 package org.rssowl.core.model.reference;
 
-import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IFolder;
 
@@ -45,11 +44,11 @@ public final class FolderReference extends ModelReference {
    * persistance layer.
    */
   public FolderReference(long id) {
-    super(id);
+    super(id, IFolder.class);
   }
-
+  
   @Override
   public IFolder resolve() throws PersistenceException {
-    return Owl.getPersistenceService().getModelDAO().loadFolder(getId());
+    return (IFolder) super.resolve();
   }
 }

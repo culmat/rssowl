@@ -13,6 +13,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.NewsEvent;
 import org.rssowl.core.model.events.NewsListener;
@@ -241,12 +242,14 @@ public class Indexer {
       }
     };
 
-    Owl.getListenerService().addNewsListener(fNewsListener);
+    /* We register listeners as part of initialisation, we must use InternalOwl */
+    InternalOwl.getDefault().getPersistenceService().getDAOService().getNewsDAO().addEntityListener(fNewsListener);
   }
 
   private void unregisterListeners() {
     if (fNewsListener != null)
-      Owl.getListenerService().removeNewsListener(fNewsListener);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().removeEntityListener(fNewsListener);
+    
     fNewsListener = null;
   }
 
