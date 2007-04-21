@@ -42,6 +42,7 @@ import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.connection.IProxyCredentials;
+import org.rssowl.core.connection.PlatformCredentialsProvider;
 import org.rssowl.core.connection.UnknownFeedException;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
@@ -286,7 +287,7 @@ public class ConnectionServiceImpl implements IConnectionService {
     }
 
     /* Add provider for default protocols if not yet present */
-    ICredentialsProvider defaultProvider = new DefaultCredentialsProvider();
+    ICredentialsProvider defaultProvider = new PlatformCredentialsProvider();
     for (String defaultProtocol : DEFAULT_PROTOCOLS) {
       if (!fCredentialsProvider.containsKey(defaultProtocol))
         fCredentialsProvider.put(defaultProtocol, defaultProvider);
