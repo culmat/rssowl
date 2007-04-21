@@ -26,11 +26,10 @@ package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.ILabel;
 import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
@@ -42,7 +41,6 @@ import java.util.List;
 public class LabelAction extends Action {
   private ILabel fLabel;
   private IStructuredSelection fSelection;
-  private IApplicationLayer fAppLayer;
 
   /**
    * @param label
@@ -51,7 +49,6 @@ public class LabelAction extends Action {
   public LabelAction(ILabel label, IStructuredSelection selection) {
     fLabel = label;
     fSelection = selection;
-    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
   }
 
   @Override
@@ -79,7 +76,7 @@ public class LabelAction extends Action {
 
       /* Save */
       if (news.size() > 0)
-        fAppLayer.saveNews(news);
+        DynamicDAO.saveAll(news);
     }
   }
 }

@@ -58,7 +58,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.events.FolderAdapter;
 import org.rssowl.core.model.events.FolderEvent;
 import org.rssowl.core.model.persist.IBookMark;
@@ -387,7 +386,6 @@ public class ManageSetsDialog extends TitleAreaDialog {
   }
 
   private void perfromDrop(List< ? > draggedObjects, Object dropTarget) {
-    IApplicationLayer appLayer = Owl.getPersistenceService().getApplicationLayer();
 
     /* Require a Folder as drop target */
     if (!(dropTarget instanceof IFolder))
@@ -426,7 +424,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
 
     /* Perform reparenting */
     if (folderReparenting != null || markReparenting != null) {
-      appLayer.reparent(folderReparenting, markReparenting);
+      Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(folderReparenting, markReparenting);
       fViewer.setSelection(fViewer.getSelection());
     }
   }

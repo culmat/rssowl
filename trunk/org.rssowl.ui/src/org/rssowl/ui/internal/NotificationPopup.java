@@ -46,7 +46,6 @@ import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.reference.FeedLinkReference;
@@ -55,6 +54,7 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +103,6 @@ public class NotificationPopup extends PopupDialog {
   private List<INews> fNews = new ArrayList<INews>();
   private ResourceManager fResources;
   private Map<FeedLinkReference, IBookMark> fMapFeedToBookmark;
-  private IApplicationLayer fApplicationLayer;
   private Color fPopupBorderColor;
   private Color fPopupOuterCircleColor;
   private Color fPopupInnerCircleColor;
@@ -150,7 +149,7 @@ public class NotificationPopup extends PopupDialog {
     if (fMapFeedToBookmark.containsKey(feedRef))
       bookmark = fMapFeedToBookmark.get(feedRef);
     else {
-      List<IBookMark> bookmarks = fApplicationLayer.loadBookMarks(feedRef);
+      Collection<IBookMark> bookmarks = Owl.getPersistenceService().getDAOService().getBookMarkDAO().loadAll(feedRef);
       bookmark = null;//        bookmark = bookmarks.get(0);
       //        fMapFeedToBookmark.put(feedRef, bookmark);
     }
@@ -216,7 +215,6 @@ public class NotificationPopup extends PopupDialog {
     super(new Shell(PlatformUI.getWorkbench().getDisplay()), PopupDialog.INFOPOPUP_SHELLSTYLE | SWT.ON_TOP, false, false, false, false, null, null);
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fMapFeedToBookmark = new HashMap<FeedLinkReference, IBookMark>();
-    fApplicationLayer = Owl.getPersistenceService().getApplicationLayer();
 
     initResources();
   }

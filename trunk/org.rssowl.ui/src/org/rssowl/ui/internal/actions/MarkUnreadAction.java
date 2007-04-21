@@ -80,7 +80,7 @@ public class MarkUnreadAction extends Action implements IWorkbenchWindowActionDe
 
     /* Mark Unread */
     if (news.size() > 0)
-      Owl.getPersistenceService().getApplicationLayer().setNewsState(news, INews.State.UNREAD, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(news, INews.State.UNREAD, true, false);
   }
 
   /*

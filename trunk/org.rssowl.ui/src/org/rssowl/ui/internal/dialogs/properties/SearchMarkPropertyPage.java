@@ -196,7 +196,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     /* Reparent if necessary */
     if (fSearchMark.getFolder() != fFolderChooser.getFolder()) {
       ReparentInfo<IMark, IFolder> reparent = new ReparentInfo<IMark, IFolder>(fSearchMark, fFolderChooser.getFolder(), null, null);
-      Owl.getPersistenceService().getApplicationLayer().reparent(null, Collections.singletonList(reparent));
+      Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(null, Collections.singletonList(reparent));
     }
   }
 }

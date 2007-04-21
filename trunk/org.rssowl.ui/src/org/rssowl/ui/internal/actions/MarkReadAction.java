@@ -166,7 +166,7 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
       boolean affectEquivalentNews = !equalsRootFolders(folders);
 
       /* Peform Op */
-      Owl.getPersistenceService().getApplicationLayer().setNewsState(news, INews.State.READ, affectEquivalentNews, true);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(news, INews.State.READ, affectEquivalentNews, true);
     }
   }
 

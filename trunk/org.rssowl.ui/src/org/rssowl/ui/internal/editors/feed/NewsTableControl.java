@@ -68,6 +68,7 @@ import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.ILabel;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.ModelReference;
 import org.rssowl.core.model.reference.SearchMarkReference;
@@ -91,6 +92,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -602,7 +604,7 @@ public class NewsTableControl implements IFeedViewPart {
         labelMenu.add(labelNone);
         labelMenu.add(new Separator());
 
-        List<ILabel> labels = Owl.getPersistenceService().getApplicationLayer().loadLabels();
+        Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
         for (final ILabel label : labels) {
           IAction labelAction = new Action(label.getName(), IAction.AS_RADIO_BUTTON) {
             @Override
@@ -660,6 +662,6 @@ public class NewsTableControl implements IFeedViewPart {
   }
 
   private void setNewsState(List<INews> news, INews.State state) {
-    Owl.getPersistenceService().getApplicationLayer().setNewsState(news, state, true, false);
+    Owl.getPersistenceService().getDAOService().getNewsDAO().setState(news, state, true, false);
   }
 }

@@ -59,7 +59,6 @@ import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.EditorPart;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.events.BookMarkAdapter;
 import org.rssowl.core.model.events.BookMarkEvent;
 import org.rssowl.core.model.events.BookMarkListener;
@@ -73,6 +72,7 @@ import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.dao.DynamicDAO;
+import org.rssowl.core.model.persist.dao.INewsDAO;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.NewsReference;
@@ -658,8 +658,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
             newsToUpdate.add(newsItem);
         }
 
-        IApplicationLayer applicationLayer = Owl.getPersistenceService().getApplicationLayer();
-        applicationLayer.setNewsState(newsToUpdate, markRead ? INews.State.READ : INews.State.UNREAD, true, false);
+        INewsDAO newsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
+        newsDao.setState(newsToUpdate, markRead ? INews.State.READ : INews.State.UNREAD, true, false);
 
         /* Retention Strategy */
         if (bookmark != null)
