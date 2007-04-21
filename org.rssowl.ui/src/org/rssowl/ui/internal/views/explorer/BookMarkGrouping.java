@@ -25,11 +25,11 @@
 package org.rssowl.ui.internal.views.explorer;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.persist.IBookMark;
-import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.IFolder;
-import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;

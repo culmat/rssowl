@@ -35,10 +35,10 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.persist.IBookMark;
-import org.rssowl.core.model.persist.IFolder;
-import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 

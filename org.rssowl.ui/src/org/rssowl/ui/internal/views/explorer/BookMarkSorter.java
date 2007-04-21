@@ -26,8 +26,8 @@ package org.rssowl.ui.internal.views.explorer;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
-import org.rssowl.core.model.persist.IFolder;
-import org.rssowl.core.model.persist.IMark;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IMark;
 import org.rssowl.ui.internal.EntityGroup;
 
 import java.util.Date;

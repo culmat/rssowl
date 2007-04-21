@@ -32,9 +32,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.INews;
-import org.rssowl.core.model.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.ModelUtils;
 

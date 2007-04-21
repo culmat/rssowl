@@ -29,8 +29,8 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
-import org.rssowl.core.model.persist.IBookMark;
-import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.INews;
 import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 

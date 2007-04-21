@@ -25,7 +25,7 @@
 package org.rssowl.ui.internal;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.persist.IEntity;
 
 /**
  * Instances of <code>EntityGroupItem</code> act as a wrapper arround a
