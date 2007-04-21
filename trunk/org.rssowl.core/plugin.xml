@@ -18,11 +18,11 @@
    <extension-point id="DAOFactory" name="DAO Factory" schema="schema/DAOFactory.exsd"/>
    <extension
          point="org.rssowl.core.PersistenceService">
-      <persistancelayer class="org.rssowl.core.model.internal.db4o.PersistenceServiceImpl"/>
+      <persistanceservice class="org.rssowl.core.model.internal.db4o.PersistenceServiceImpl"/>
    </extension>
    <extension
          point="org.rssowl.core.ApplicationService">
-      <applicationlayer class="org.rssowl.core.model.internal.db4o.ApplicationServiceImpl"/>
+      <applicationservice class="org.rssowl.core.model.internal.db4o.ApplicationServiceImpl"/>
    </extension>
    <extension
          point="org.rssowl.core.IDGenerator">

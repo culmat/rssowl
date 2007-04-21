@@ -3,7 +3,7 @@
 <schema targetNamespace="org.rssowl.core.model">
 <annotation>
       <appInfo>
-         <meta.schema plugin="org.rssowl.core.model" id="PersistanceLayer" name="Persistance Layer"/>
+         <meta.schema plugin="org.rssowl.core.model" id="PersistanceService" name="Persistance Service"/>
       </appInfo>
       <documentation>
          [Enter description of this extension point.]
@@ -13,7 +13,7 @@
    <element name="extension">
       <complexType>
          <sequence>
-            <element ref="persistancelayer"/>
+            <element ref="persistanceservice"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -42,7 +42,7 @@
       </complexType>
    </element>
 
-   <element name="persistancelayer">
+   <element name="persistanceservice">
       <complexType>
          <attribute name="class" type="string" use="required">
             <annotation>

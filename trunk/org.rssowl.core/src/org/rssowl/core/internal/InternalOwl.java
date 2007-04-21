@@ -52,11 +52,11 @@ public final class InternalOwl {
   /* Extension Point: Factory for Model Types */
   private static final String MODEL_TYPESFACTORY_EXTENSION_POINT = "org.rssowl.core.ModelTypesFactory"; //$NON-NLS-1$
 
-  /* Extension Point: Persistence Layer */
-  private static final String PERSISTANCE_LAYER_EXTENSION_POINT = "org.rssowl.core.PersistenceService"; //$NON-NLS-1$
+  /* Extension Point: Persistence Service */
+  private static final String PERSISTANCE_SERVICE_EXTENSION_POINT = "org.rssowl.core.PersistenceService"; //$NON-NLS-1$
 
-  /* ID for Application Layer Contribution */
-  private static final String MODEL_APPLICATION_LAYER_EXTENSION_POINT = "org.rssowl.core.ApplicationService"; //$NON-NLS-1$
+  /* ID for Application Service Contribution */
+  private static final String MODEL_APPLICATION_SERVICE_EXTENSION_POINT = "org.rssowl.core.ApplicationService"; //$NON-NLS-1$
 
   private IListenerService fListenerService = new ListenerServiceImpl();
   private IPreferenceService fPreferencesService;
@@ -111,7 +111,7 @@ public final class InternalOwl {
   }
 
   private IApplicationService loadApplicationService() {
-    return (IApplicationService) ExtensionUtils.loadSingletonExecutableExtension(MODEL_APPLICATION_LAYER_EXTENSION_POINT);
+    return (IApplicationService) ExtensionUtils.loadSingletonExecutableExtension(MODEL_APPLICATION_SERVICE_EXTENSION_POINT);
   }
 
   /**
@@ -137,7 +137,7 @@ public final class InternalOwl {
 
   /* Load the contributed persistence service */
   private IPersistenceService loadPersistenceService() {
-    return (IPersistenceService) ExtensionUtils.loadSingletonExecutableExtension(PERSISTANCE_LAYER_EXTENSION_POINT);
+    return (IPersistenceService) ExtensionUtils.loadSingletonExecutableExtension(PERSISTANCE_SERVICE_EXTENSION_POINT);
   }
 
   /**
