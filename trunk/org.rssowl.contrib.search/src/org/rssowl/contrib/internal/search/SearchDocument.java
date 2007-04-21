@@ -9,10 +9,10 @@ import org.apache.lucene.document.DateTools.Resolution;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.persist.IAttachment;
-import org.rssowl.core.model.persist.ICategory;
-import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.IPerson;
+import org.rssowl.core.persist.IAttachment;
+import org.rssowl.core.persist.ICategory;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.util.HTMLStripReader;
 
 import java.io.StringReader;
