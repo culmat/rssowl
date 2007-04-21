@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.internal.persist.search.SearchCondition;
+import org.rssowl.core.internal.persist.search.SearchCondition;
 import org.rssowl.core.persist.dao.ISearchConditionDAO;
 import org.rssowl.core.persist.events.SearchConditionEvent;
 import org.rssowl.core.persist.events.SearchConditionListener;

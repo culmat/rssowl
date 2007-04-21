@@ -24,7 +24,7 @@
 
 package org.rssowl.core.persist;
 
-import org.rssowl.core.model.internal.persist.MergeResult;
+import org.rssowl.core.internal.persist.MergeResult;
 
 /**
  * Types that are capable of being merged, provide an implementation of

@@ -23,10 +23,10 @@
  **  **********************************************************************  */
 package org.rssowl.core.persist.dao;
 
-import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.events.PersonEvent;
 import org.rssowl.core.persist.events.PersonListener;
+import org.rssowl.core.persist.service.PersistenceException;
 
 import java.util.Set;
 

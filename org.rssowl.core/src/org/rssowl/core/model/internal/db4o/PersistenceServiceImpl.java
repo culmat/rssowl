@@ -24,8 +24,8 @@
 
 package org.rssowl.core.model.internal.db4o;
 
-import org.rssowl.core.model.dao.AbstractPersistenceService;
-import org.rssowl.core.model.dao.PersistenceException;
+import org.rssowl.core.persist.service.AbstractPersistenceService;
+import org.rssowl.core.persist.service.PersistenceException;
 
 /**
  * @author bpasero

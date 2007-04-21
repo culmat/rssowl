@@ -24,10 +24,10 @@
 
 package org.rssowl.core.persist.reference;
 
-import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPersistableDAO;
+import org.rssowl.core.persist.service.PersistenceException;
 
 /**
  * A <code>ModelReference</code> is a potential lightweight representation of

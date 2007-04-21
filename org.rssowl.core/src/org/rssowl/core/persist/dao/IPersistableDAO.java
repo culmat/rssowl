@@ -24,8 +24,8 @@
 
 package org.rssowl.core.persist.dao;
 
-import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.persist.IPersistable;
+import org.rssowl.core.persist.service.PersistenceException;
 
 import java.util.Collection;
 

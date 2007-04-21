@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.internal.persist.Label;
+import org.rssowl.core.internal.persist.Label;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.dao.ILabelDAO;
 import org.rssowl.core.persist.events.LabelEvent;

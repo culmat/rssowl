@@ -24,7 +24,7 @@
 
 package org.rssowl.core.persist.dao;
 
-import org.rssowl.core.model.dao.PersistenceException;
+import org.rssowl.core.persist.service.PersistenceException;
 
 /**
  * The <code>IPreferencesDAO</code> offers methods to store and retrieve

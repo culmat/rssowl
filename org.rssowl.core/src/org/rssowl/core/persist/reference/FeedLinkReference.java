@@ -26,8 +26,8 @@ package org.rssowl.core.persist.reference;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.service.PersistenceException;
 
 import java.net.URI;
 

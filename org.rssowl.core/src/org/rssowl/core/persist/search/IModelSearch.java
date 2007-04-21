@@ -24,9 +24,9 @@
 
 package org.rssowl.core.persist.search;
 
-import org.rssowl.core.model.dao.IPersistenceService;
-import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.persist.service.IPersistenceService;
+import org.rssowl.core.persist.service.PersistenceException;
 
 import java.util.List;
 

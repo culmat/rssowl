@@ -25,7 +25,7 @@
 package org.rssowl.core.persist;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.internal.persist.Persistable;
+import org.rssowl.core.internal.persist.Persistable;
 
 /**
  * <p>

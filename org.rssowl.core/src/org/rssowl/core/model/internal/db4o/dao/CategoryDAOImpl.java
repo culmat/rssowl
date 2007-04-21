@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.internal.persist.Category;
+import org.rssowl.core.internal.persist.Category;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.dao.ICategoryDAO;
 import org.rssowl.core.persist.events.CategoryEvent;
