@@ -27,8 +27,6 @@ package org.rssowl.core.model.internal.persist.search;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
-import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.persist.IAttachment;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.ICategory;
@@ -40,11 +38,13 @@ import org.rssowl.core.model.persist.IMark;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.IPerson;
 import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.search.ISearchField;
 import org.rssowl.core.model.persist.search.ISearchValueType;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -450,8 +450,7 @@ public class SearchField implements ISearchField {
 
   /* Return the Label Values */
   private List<String> loadLabelValues() {
-    IApplicationLayer appLayer = Owl.getPersistenceService().getApplicationLayer();
-    List<ILabel> labels = appLayer.loadLabels();
+    Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
 
     List<String> values = new ArrayList<String>(labels.size());
     for (ILabel label : labels) {

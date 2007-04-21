@@ -63,7 +63,7 @@ public class RetentionStrategy {
 
     /* Perform Deletion */
     if (newsToDelete.size() > 0)
-      Owl.getPersistenceService().getApplicationLayer().setNewsState(newsToDelete, INews.State.DELETED, false, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsToDelete, INews.State.DELETED, false, false);
   }
 
   private static void internalProcess(IFolder folder, List<INews> newsToDelete) throws PersistenceException {
@@ -111,7 +111,7 @@ public class RetentionStrategy {
 
     /* Perform Deletion */
     if (newsToDelete.size() > 0)
-      Owl.getPersistenceService().getApplicationLayer().setNewsState(newsToDelete, INews.State.DELETED, false, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsToDelete, INews.State.DELETED, false, false);
 
     return newsToDelete;
   }

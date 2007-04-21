@@ -30,13 +30,13 @@ import org.jdom.Element;
 import org.rssowl.core.Owl;
 import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.interpreter.InterpreterException;
-import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IPersistable;
 import org.rssowl.core.model.persist.dao.DynamicDAO;
+import org.rssowl.core.model.persist.dao.IFeedDAO;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FeedReference;
 import org.rssowl.core.util.URIUtils;
@@ -133,12 +133,12 @@ public class OPMLImporter implements ITypeImporter {
 
     /* Outline is a BookMark */
     else {
-      IApplicationLayer applicationLayer = Owl.getPersistenceService().getApplicationLayer();
       URI uri = link != null ? URIUtils.createURI(link) : null;
       if (uri != null) {
 
         /* Check if a Feed with the URL already exists */
-        FeedReference feedRef = applicationLayer.loadFeedReference(uri);
+        IFeedDAO feedDao = Owl.getPersistenceService().getDAOService().getFeedDAO();
+        FeedReference feedRef = feedDao.loadReference(uri);
 
         /* Create a new Feed then */
         if (feedRef == null) {

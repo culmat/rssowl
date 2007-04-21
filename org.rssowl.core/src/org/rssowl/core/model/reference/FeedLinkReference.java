@@ -40,7 +40,7 @@ public final class FeedLinkReference {
 
   /**
    * Creates an instance of this object for a Feed with link <code>link</code>.
-   * 
+   *
    * @param link The link of the Feed that this object references. This cannot
    * be null.
    */
@@ -60,19 +60,19 @@ public final class FeedLinkReference {
    * Loads the Feed that this reference points to from the persistence layer and
    * returns it. It may return <code>null</code> if the feed has been deleted
    * from the persistence layer.
-   * 
+   *
    * @return the IFeed this object references.
    * @throws PersistenceException In case an error occurs while accessing the
    * persistence layer.
    */
   public final IFeed resolve() throws PersistenceException {
-    return Owl.getPersistenceService().getApplicationLayer().loadFeed(fLink);
+    return Owl.getPersistenceService().getDAOService().getFeedDAO().load(fLink);
   }
 
   /**
    * Returns <code>true</code> if calling {@link #resolve()} on this reference
    * will return an entity equal to <code>feed</code>.
-   * 
+   *
    * @param feed The IFeed to compare to.
    * @return <code>true</code> if this object references <code>feed</code>
    * or <code>false</code> otherwise.
