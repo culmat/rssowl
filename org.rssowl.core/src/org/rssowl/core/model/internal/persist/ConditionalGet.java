@@ -25,7 +25,7 @@
 package org.rssowl.core.model.internal.persist;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.persist.IConditionalGet;
+import org.rssowl.core.persist.IConditionalGet;
 
 import java.net.URI;
 import java.net.URISyntaxException;

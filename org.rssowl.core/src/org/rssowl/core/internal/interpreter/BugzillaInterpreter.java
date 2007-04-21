@@ -28,9 +28,9 @@ import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.persist.IFeed;
-import org.rssowl.core.model.persist.INews;
-import org.rssowl.core.model.persist.IPerson;
+import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.URIUtils;
 

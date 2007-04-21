@@ -23,14 +23,14 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.events.AttachmentEvent;
-import org.rssowl.core.model.events.AttachmentListener;
-import org.rssowl.core.model.events.NewsEvent;
 import org.rssowl.core.model.internal.db4o.DBHelper;
 import org.rssowl.core.model.internal.persist.Attachment;
-import org.rssowl.core.model.persist.IAttachment;
-import org.rssowl.core.model.persist.INews;
-import org.rssowl.core.model.persist.dao.IAttachmentDAO;
+import org.rssowl.core.persist.IAttachment;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.dao.IAttachmentDAO;
+import org.rssowl.core.persist.events.AttachmentEvent;
+import org.rssowl.core.persist.events.AttachmentListener;
+import org.rssowl.core.persist.events.NewsEvent;
 
 public final class AttachmentDAOImpl extends AbstractEntityDAO<IAttachment,
     AttachmentListener, AttachmentEvent> implements IAttachmentDAO  {

@@ -26,9 +26,9 @@ package org.rssowl.core.model.internal.persist.pref;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.persist.pref.IPreferenceScope;
-import org.rssowl.core.model.persist.pref.PreferencesEvent;
-import org.rssowl.core.model.persist.pref.PreferencesListener;
+import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.pref.PreferencesEvent;
+import org.rssowl.core.persist.pref.PreferencesListener;
 
 import java.util.Arrays;
 import java.util.Properties;

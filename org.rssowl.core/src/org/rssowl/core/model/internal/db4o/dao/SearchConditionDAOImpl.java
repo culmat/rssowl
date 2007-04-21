@@ -23,11 +23,11 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.events.SearchConditionEvent;
-import org.rssowl.core.model.events.SearchConditionListener;
 import org.rssowl.core.model.internal.persist.search.SearchCondition;
-import org.rssowl.core.model.persist.dao.ISearchConditionDAO;
-import org.rssowl.core.model.persist.search.ISearchCondition;
+import org.rssowl.core.persist.dao.ISearchConditionDAO;
+import org.rssowl.core.persist.events.SearchConditionEvent;
+import org.rssowl.core.persist.events.SearchConditionListener;
+import org.rssowl.core.persist.search.ISearchCondition;
 
 public final class SearchConditionDAOImpl extends AbstractEntityDAO<ISearchCondition,
     SearchConditionListener, SearchConditionEvent> implements ISearchConditionDAO  {

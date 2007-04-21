@@ -24,8 +24,8 @@
 
 package org.rssowl.core.model.internal.persist;
 
-import org.rssowl.core.model.persist.ITextInput;
-import org.rssowl.core.model.reference.FeedReference;
+import org.rssowl.core.persist.ITextInput;
+import org.rssowl.core.persist.reference.FeedReference;
 
 import java.net.URI;
 

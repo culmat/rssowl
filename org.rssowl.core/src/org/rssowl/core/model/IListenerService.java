@@ -24,8 +24,8 @@
 
 package org.rssowl.core.model;
 
-import org.rssowl.core.model.persist.pref.PreferencesEvent;
-import org.rssowl.core.model.persist.pref.PreferencesListener;
+import org.rssowl.core.persist.pref.PreferencesEvent;
+import org.rssowl.core.persist.pref.PreferencesListener;
 
 /**
  * @author bpasero

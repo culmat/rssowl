@@ -25,10 +25,10 @@
 package org.rssowl.core.util;
 
 import org.rssowl.core.model.internal.persist.ComplexMergeResult;
-import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.IPersistable;
-import org.rssowl.core.model.persist.MergeCapable;
-import org.rssowl.core.model.persist.Reparentable;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IPersistable;
+import org.rssowl.core.persist.MergeCapable;
+import org.rssowl.core.persist.Reparentable;
 
 import java.util.ArrayList;
 import java.util.Comparator;

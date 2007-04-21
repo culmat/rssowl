@@ -23,11 +23,11 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.events.CategoryEvent;
-import org.rssowl.core.model.events.CategoryListener;
 import org.rssowl.core.model.internal.persist.Category;
-import org.rssowl.core.model.persist.ICategory;
-import org.rssowl.core.model.persist.dao.ICategoryDAO;
+import org.rssowl.core.persist.ICategory;
+import org.rssowl.core.persist.dao.ICategoryDAO;
+import org.rssowl.core.persist.events.CategoryEvent;
+import org.rssowl.core.persist.events.CategoryListener;
 import org.rssowl.core.util.StringUtils;
 
 import java.util.Set;

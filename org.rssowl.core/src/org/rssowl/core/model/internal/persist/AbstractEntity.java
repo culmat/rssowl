@@ -25,7 +25,7 @@
 package org.rssowl.core.model.internal.persist;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.persist.IEntity;
+import org.rssowl.core.persist.IEntity;
 
 import java.io.Serializable;
 import java.util.Collections;
@@ -88,7 +88,7 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
    * 
    * @param key The unique identifier of the Property.
    * @param value The value of the Property.
-   * @see org.rssowl.core.model.persist.IEntity#setProperty(java.lang.String,
+   * @see org.rssowl.core.persist.IEntity#setProperty(java.lang.String,
    * java.lang.Object)
    */
   public void setProperty(String key, Object value) {

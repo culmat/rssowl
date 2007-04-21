@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.internal.persist;
 
-import org.rssowl.core.model.persist.IGuid;
+import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.util.MergeUtils;
 
 /**

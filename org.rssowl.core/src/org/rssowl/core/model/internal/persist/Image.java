@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.internal.persist;
 
-import org.rssowl.core.model.persist.IImage;
+import org.rssowl.core.persist.IImage;
 import org.rssowl.core.util.MergeUtils;
 
 import java.net.URI;

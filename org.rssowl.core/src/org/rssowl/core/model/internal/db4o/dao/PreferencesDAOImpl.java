@@ -30,8 +30,8 @@ import org.rssowl.core.model.internal.db4o.DatabaseEvent;
 import org.rssowl.core.model.internal.db4o.DatabaseListener;
 import org.rssowl.core.model.internal.persist.pref.Preference;
 import org.rssowl.core.model.internal.persist.pref.Preference.Type;
-import org.rssowl.core.model.persist.dao.IPreferencesDAO;
-import org.rssowl.core.model.persist.pref.PreferencesEvent;
+import org.rssowl.core.persist.dao.IPreferencesDAO;
+import org.rssowl.core.persist.pref.PreferencesEvent;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;

@@ -24,12 +24,12 @@
 package org.rssowl.core.model.internal.db4o.dao;
 
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.events.BookMarkEvent;
-import org.rssowl.core.model.events.BookMarkListener;
 import org.rssowl.core.model.internal.persist.BookMark;
-import org.rssowl.core.model.persist.IBookMark;
-import org.rssowl.core.model.persist.dao.IBookMarkDAO;
-import org.rssowl.core.model.reference.FeedLinkReference;
+import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.dao.IBookMarkDAO;
+import org.rssowl.core.persist.events.BookMarkEvent;
+import org.rssowl.core.persist.events.BookMarkListener;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 
 import com.db4o.ObjectSet;
 import com.db4o.ext.Db4oException;

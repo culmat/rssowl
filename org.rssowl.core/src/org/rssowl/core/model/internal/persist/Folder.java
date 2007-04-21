@@ -25,8 +25,8 @@
 package org.rssowl.core.model.internal.persist;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.persist.IFolder;
-import org.rssowl.core.model.persist.IMark;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IMark;
 
 import java.net.URI;
 import java.util.ArrayList;

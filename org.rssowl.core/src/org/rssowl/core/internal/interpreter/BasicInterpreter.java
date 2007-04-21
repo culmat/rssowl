@@ -30,7 +30,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.interpreter.IElementHandler;
 import org.rssowl.core.interpreter.IFormatInterpreter;
 import org.rssowl.core.interpreter.INamespaceHandler;
-import org.rssowl.core.model.persist.IPersistable;
+import org.rssowl.core.persist.IPersistable;
 
 import java.util.Iterator;
 import java.util.List;

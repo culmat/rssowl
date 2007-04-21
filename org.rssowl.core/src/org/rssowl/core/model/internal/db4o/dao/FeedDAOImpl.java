@@ -23,13 +23,13 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.events.FeedEvent;
-import org.rssowl.core.model.events.FeedListener;
 import org.rssowl.core.model.internal.db4o.DBHelper;
 import org.rssowl.core.model.internal.persist.Feed;
-import org.rssowl.core.model.persist.IFeed;
-import org.rssowl.core.model.persist.dao.IFeedDAO;
-import org.rssowl.core.model.reference.FeedReference;
+import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.dao.IFeedDAO;
+import org.rssowl.core.persist.events.FeedEvent;
+import org.rssowl.core.persist.events.FeedListener;
+import org.rssowl.core.persist.reference.FeedReference;
 
 import java.net.URI;
 

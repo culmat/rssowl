@@ -27,9 +27,9 @@ package org.rssowl.core.internal.interpreter;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.rssowl.core.interpreter.INamespaceHandler;
-import org.rssowl.core.model.persist.IFeed;
-import org.rssowl.core.model.persist.INews;
-import org.rssowl.core.model.persist.IPersistable;
+import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.util.URIUtils;
 
 import java.net.URI;
