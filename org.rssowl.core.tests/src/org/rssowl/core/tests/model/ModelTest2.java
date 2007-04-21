@@ -34,8 +34,7 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.internal.persist.Folder;
+import org.rssowl.core.internal.persist.Folder;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
@@ -87,6 +86,7 @@ import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.persist.search.ISearchCondition;
 import org.rssowl.core.persist.search.ISearchField;
 import org.rssowl.core.persist.search.SearchSpecifier;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.tests.TestUtils;
 
 import java.net.URI;

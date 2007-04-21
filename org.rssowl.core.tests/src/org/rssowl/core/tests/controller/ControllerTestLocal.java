@@ -29,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.internal.persist.Feed;
+import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;

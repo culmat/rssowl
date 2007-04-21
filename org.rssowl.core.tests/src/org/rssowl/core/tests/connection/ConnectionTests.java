@@ -40,7 +40,7 @@ import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.connection.NotModifiedException;
-import org.rssowl.core.model.internal.persist.Feed;
+import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.dao.DynamicDAO;

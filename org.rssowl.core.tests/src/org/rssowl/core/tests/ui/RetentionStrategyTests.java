@@ -30,7 +30,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
@@ -43,6 +42,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FolderReference;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.RetentionStrategy;
 

@@ -28,8 +28,8 @@ import org.junit.Assert;
 import org.rssowl.core.IApplicationService;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.ApplicationServiceImpl;
-import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.internal.persist.MergeResult;
+import org.rssowl.core.internal.persist.MergeResult;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.ITask;
 
 import java.lang.reflect.InvocationTargetException;

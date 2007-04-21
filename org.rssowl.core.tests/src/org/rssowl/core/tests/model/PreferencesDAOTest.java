@@ -32,10 +32,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.persist.dao.IPreferencesDAO;
 import org.rssowl.core.persist.pref.PreferencesEvent;
 import org.rssowl.core.persist.pref.PreferencesListener;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.tests.TestUtils;
 
 import java.util.Arrays;
