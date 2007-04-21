@@ -34,7 +34,6 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.AttachmentAdapter;
 import org.rssowl.core.model.events.AttachmentEvent;
@@ -102,7 +101,6 @@ import java.util.Set;
  */
 public class ModelTest2 {
   private IModelFactory fFactory;
-  private IApplicationLayer fAppLayer;
 
   /**
    * @throws Exception
@@ -112,7 +110,6 @@ public class ModelTest2 {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
     fFactory = Owl.getModelFactory();
-    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
   }
 
   /**
@@ -993,7 +990,7 @@ public class ModelTest2 {
       DynamicDAO.delete(rootRef.resolve());
 
       /* Asserts Follow */
-      assertEquals(0, fAppLayer.loadRootFolders().size());
+      assertEquals(0, Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoot().size());
       assertEquals(0, DynamicDAO.loadAll(IBookMark.class).size());
       assertTrue("Expected one feedDeleted event", feedEventsIssued[0]);
       for (int i = 0; i < folderEventsIssued.length; i++) {

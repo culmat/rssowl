@@ -29,11 +29,11 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.internal.persist.Feed;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.dao.DynamicDAO;
+import org.rssowl.core.model.persist.dao.INewsDAO;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.NewsService;
@@ -49,14 +49,12 @@ import java.util.List;
  * @author bpasero
  */
 public class ControllerTestLocal {
-  private IApplicationLayer fAppLayer;
 
   /**
    * @throws Exception
    */
   @Before
   public void setUp() throws Exception {
-    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
     Controller.getDefault().getNewsService().testDirtyShutdown();
@@ -84,6 +82,7 @@ public class ControllerTestLocal {
    */
   @Test
   public void testNewsService() throws Exception {
+    INewsDAO newsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
     NewsService service = Controller.getDefault().getNewsService();
 
     IFeed feed = new Feed(new URI("http://www.rssowl.org/rssowl2dg/tests/manager/rss_2_0.xml")); //$NON-NLS-1$
@@ -100,12 +99,12 @@ public class ControllerTestLocal {
     assertEquals(1, getNewCount(feed));
     assertEquals(0, getStickyCount(feed));
 
-    fAppLayer.setNewsState(feed.getNews(), INews.State.READ, true, false);
+    newsDao.setState(feed.getNews(), INews.State.READ, true, false);
     assertEquals(0, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
     assertEquals(0, getStickyCount(feed));
 
-    fAppLayer.setNewsState(feed.getNews(), INews.State.UNREAD, true, false);
+    newsDao.setState(feed.getNews(), INews.State.UNREAD, true, false);
     feed.getNews().get(0).setFlagged(true);
     DynamicDAO.save(feed.getNews().get(0));
 
@@ -113,19 +112,19 @@ public class ControllerTestLocal {
     assertEquals(0, getNewCount(feed));
     assertEquals(1, getStickyCount(feed));
 
-    fAppLayer.setNewsState(feed.getNews(), INews.State.READ, true, false);
+    newsDao.setState(feed.getNews(), INews.State.READ, true, false);
     assertEquals(0, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
     assertEquals(1, getStickyCount(feed));
 
-    fAppLayer.setNewsState(feed.getNews(), INews.State.UPDATED, true, false);
+    newsDao.setState(feed.getNews(), INews.State.UPDATED, true, false);
     assertEquals(1, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
     assertEquals(1, getStickyCount(feed));
 
     feed.getNews().get(0).setFlagged(false);
     DynamicDAO.save(feed.getNews().get(0));
-    fAppLayer.setNewsState(feed.getNews(), INews.State.READ, true, false);
+    newsDao.setState(feed.getNews(), INews.State.READ, true, false);
 
     assertEquals(0, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
@@ -144,7 +143,7 @@ public class ControllerTestLocal {
     assertEquals(2, getNewCount(feed));
     assertEquals(0, getStickyCount(feed));
 
-    fAppLayer.setNewsState(feed.getNews(), INews.State.READ, true, false);
+    newsDao.setState(feed.getNews(), INews.State.READ, true, false);
     feed.getNews().get(0).setFlagged(true);
     feed.getNews().get(1).setFlagged(true);
     DynamicDAO.save(feed);
@@ -153,7 +152,7 @@ public class ControllerTestLocal {
     assertEquals(0, getNewCount(feed));
     assertEquals(2, getStickyCount(feed));
 
-    fAppLayer.setNewsState(feed.getNews(), INews.State.UNREAD, true, false);
+    newsDao.setState(feed.getNews(), INews.State.UNREAD, true, false);
 
     assertEquals(3, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
@@ -351,7 +350,7 @@ public class ControllerTestLocal {
     List<INews> news = new ArrayList<INews>();
     news.add(feed.getNews().get(0));
 
-    fAppLayer.saveNews(news);
+    DynamicDAO.saveAll(news);
 
     assertEquals(1, getUnreadCount(feed));
     assertEquals(0, getNewCount(feed));
