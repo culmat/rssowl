@@ -29,6 +29,7 @@ import org.rssowl.core.connection.IConnectionService;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.interpreter.IInterpreterService;
 import org.rssowl.core.model.IListenerService;
+import org.rssowl.core.model.dao.IApplicationService;
 import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.pref.IPreferenceService;
@@ -42,6 +43,23 @@ public class Owl {
 
   /** Flag indicating wether the Controller is accessed from a Test */
   public static boolean TESTING = false;
+
+  /**
+   * <p>
+   * Get the Implementation of <code>IApplicationService</code> that contains
+   * special Methods which are used through the Application and access the
+   * persistence layer. The implementation is looked up using the
+   * "org.rssowl.core.model.ApplicationService" Extension Point.
+   * </p>
+   * Subclasses may override to provide their own implementation.
+   *
+   * @return Returns the Implementation of <code>I</code> that contains
+   * special Methods which are used through the Application and access the
+   * persistence layer.
+   */
+  public static IApplicationService getApplicationService() {
+    return InternalOwl.getDefault().getApplicationService();
+  }
 
   /**
    * @return

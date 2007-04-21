@@ -41,9 +41,9 @@ import org.rssowl.core.model.persist.search.IModelSearch;
 public interface IPersistenceService {
 
   void startup();
-  
+
   DAOService getDAOService();
-  
+
   /**
    * Gets the implementation of <code>IDGenerator</code> that generates IDs
    * that have not yet been used by the persistence layer. The implementation is
@@ -53,21 +53,6 @@ public interface IPersistenceService {
    * @see IDGenerator
    */
   IDGenerator getIDGenerator();
-
-  /**
-   * <p>
-   * Get the Implementation of <code>IApplicationLayer</code> that contains
-   * special Methods which are used through the Application and access the
-   * persistence layer. The implementation is looked up using the
-   * "org.rssowl.core.model.ApplicationLayer" Extension Point.
-   * </p>
-   * Subclasses may override to provide their own implementation.
-   *
-   * @return Returns the Implementation of <code>IApplicationLayer</code> that
-   * contains special Methods which are used through the Application and access
-   * the persistence layer.
-   */
-  IApplicationService getApplicationLayer();
 
   /**
    * <p>

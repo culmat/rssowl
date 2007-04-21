@@ -29,6 +29,7 @@ import org.rssowl.core.connection.internal.ConnectionServiceImpl;
 import org.rssowl.core.interpreter.IInterpreterService;
 import org.rssowl.core.interpreter.internal.InterpreterServiceImpl;
 import org.rssowl.core.model.IListenerService;
+import org.rssowl.core.model.dao.IApplicationService;
 import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.internal.ListenerServiceImpl;
 import org.rssowl.core.model.internal.persist.DefaultModelTypesFactory;
@@ -54,11 +55,15 @@ public final class InternalOwl {
   /* Extension Point: Persistence Layer */
   private static final String PERSISTANCE_LAYER_EXTENSION_POINT = "org.rssowl.core.PersistenceService"; //$NON-NLS-1$
 
+  /* ID for Application Layer Contribution */
+  private static final String MODEL_APPLICATION_LAYER_EXTENSION_POINT = "org.rssowl.core.ApplicationService"; //$NON-NLS-1$
+
   private IListenerService fListenerService = new ListenerServiceImpl();
   private IPreferenceService fPreferencesService;
   private IConnectionService fConnectionService;
   private IInterpreterService fInterpreterService;
   private IPersistenceService fPersistenceService;
+  private IApplicationService fApplicationService;
   private IModelFactory fModelFactory;
   private boolean fStarted;
 
@@ -68,6 +73,7 @@ public final class InternalOwl {
   public void startup() {
     fModelFactory = loadTypesFactory();
     fPersistenceService = loadPersistenceService();
+    fApplicationService = loadApplicationService();
     fPersistenceService.startup();
     fConnectionService = new ConnectionServiceImpl();
     fInterpreterService = new InterpreterServiceImpl();
@@ -95,6 +101,17 @@ public final class InternalOwl {
   public void shutdown() {
     fConnectionService.shutdown();
     fPersistenceService.shutdown();
+  }
+
+  /**
+   * @return
+   */
+  public IApplicationService getApplicationService() {
+    return fApplicationService;
+  }
+
+  private IApplicationService loadApplicationService() {
+    return (IApplicationService) ExtensionUtils.loadSingletonExecutableExtension(MODEL_APPLICATION_LAYER_EXTENSION_POINT);
   }
 
   /**
