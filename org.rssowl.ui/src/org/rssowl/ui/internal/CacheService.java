@@ -38,6 +38,7 @@ import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.reference.FeedLinkReference;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -142,7 +143,7 @@ public class CacheService {
       /* Not handled */
       }
     };
-    
+
     /* Add Listeners */
     DynamicDAO.addEntityListener(IFolder.class, fFolderListener);
     DynamicDAO.addEntityListener(IBookMark.class, fBookMarkListener);
@@ -213,7 +214,7 @@ public class CacheService {
   }
 
   void cacheRootFolders() {
-    List<IFolder> rootFolders = Owl.getPersistenceService().getApplicationLayer().loadRootFolders();
+    Collection<IFolder> rootFolders = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoot();
     for (IFolder rootFolder : rootFolders) {
       cache(rootFolder);
     }

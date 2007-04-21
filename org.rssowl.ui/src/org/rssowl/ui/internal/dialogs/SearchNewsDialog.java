@@ -117,6 +117,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -1032,7 +1033,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
         labelMenu.add(labelNone);
         labelMenu.add(new Separator());
 
-        List<ILabel> labels = Owl.getPersistenceService().getApplicationLayer().loadLabels();
+        Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
         for (final ILabel label : labels) {
           IAction labelAction = new Action(label.getName(), IAction.AS_RADIO_BUTTON) {
             @Override
@@ -1213,6 +1214,6 @@ public class SearchNewsDialog extends TitleAreaDialog {
   }
 
   private void setNewsState(List<INews> news, INews.State state) {
-    Owl.getPersistenceService().getApplicationLayer().setNewsState(news, state, true, false);
+    Owl.getPersistenceService().getDAOService().getNewsDAO().setState(news, state, true, false);
   }
 }

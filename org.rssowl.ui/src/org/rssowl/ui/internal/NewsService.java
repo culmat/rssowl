@@ -25,7 +25,6 @@
 package org.rssowl.ui.internal;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.Owl;
 import org.rssowl.core.model.events.FeedAdapter;
 import org.rssowl.core.model.events.FeedEvent;
 import org.rssowl.core.model.events.NewsAdapter;
@@ -39,6 +38,7 @@ import org.rssowl.core.model.persist.dao.INewsCounterDAO;
 import org.rssowl.core.model.reference.FeedLinkReference;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -164,7 +164,7 @@ public class NewsService {
 
   private NewsCounter countAll() {
     NewsCounter newsCounter = new NewsCounter();
-    List<IFeed> feeds = Owl.getPersistenceService().getApplicationLayer().loadAllFeeds();
+    Collection<IFeed> feeds = DynamicDAO.loadAll(IFeed.class);
     for (IFeed feed : feeds)
       newsCounter.put(feed.getLink(), count(feed));
 

@@ -32,9 +32,9 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.rssowl.core.Owl;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.ModelUtils;
 
@@ -114,7 +114,7 @@ public class MakeTypesStickyAction extends Action implements IWorkbenchWindowAct
     }
 
     /* Save List of INews */
-    Owl.getPersistenceService().getApplicationLayer().saveNews(news);
+    DynamicDAO.saveAll(news);
 
     /* Update in case this action is rerun on the same selection */
     fFlag = !fFlag;

@@ -36,7 +36,6 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.reference.FeedLinkReference;
@@ -49,7 +48,7 @@ import org.rssowl.ui.internal.util.JobRunner;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * This class controls all aspects of the application's execution
@@ -202,13 +201,12 @@ public class Application implements IApplication {
     }
 
     /* Check if a BookMark exists for the Link */
-    IApplicationLayer appLayer = Owl.getPersistenceService().getApplicationLayer();
-    IFeed feed = appLayer.loadFeed(linkAsURI);
+    IFeed feed = Owl.getPersistenceService().getDAOService().getFeedDAO().load(linkAsURI);
     if (feed != null) {
       FeedLinkReference feedRef = new FeedLinkReference(feed.getLink());
-      final List<IBookMark> bookMarks = appLayer.loadBookMarks(feedRef);
+      final Collection<IBookMark> bookMarks = Owl.getPersistenceService().getDAOService().getBookMarkDAO().loadAll(feedRef);
       if (bookMarks.size() > 0)
-        return bookMarks.get(0);
+        return bookMarks.iterator().next();
     }
 
     return null;

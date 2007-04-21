@@ -49,11 +49,11 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IModelFactory;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.ISearchMark;
+import org.rssowl.core.model.persist.dao.DAOService;
 import org.rssowl.core.model.persist.search.ISearchCondition;
 import org.rssowl.core.model.persist.search.ISearchField;
 import org.rssowl.core.model.persist.search.ISearchValueType;
@@ -93,7 +93,7 @@ public class SearchConditionItem extends Composite {
   private final ISearchCondition fCondition;
   private Object fInputValue;
   private IModelFactory fFactory;
-  private IPersistenceService fPersist;
+  private DAOService fDaoService;
   private boolean fModified;
 
   /* Viewer */
@@ -143,7 +143,7 @@ public class SearchConditionItem extends Composite {
     super(parent, style);
     fCondition = condition;
     fFactory = Owl.getModelFactory();
-    fPersist = Owl.getPersistenceService();
+    fDaoService = Owl.getPersistenceService().getDAOService();
 
     initComponents();
   }
@@ -421,9 +421,9 @@ public class SearchConditionItem extends Composite {
               if (!text.isDisposed()) {
                 Set<String> values;
                 if (field.getId() == INews.CATEGORIES)
-                  values = fPersist.getApplicationLayer().loadCategories();
+                  values = fDaoService.getCategoryDAO().loadAllNames();
                 else
-                  values = fPersist.getApplicationLayer().loadAuthors();
+                  values = fDaoService.getPersonDAO().loadAllNames();
 
                 /* Apply Proposals */
                 if (!text.isDisposed())

@@ -34,7 +34,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFolder;
@@ -44,6 +43,7 @@ import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -56,7 +56,6 @@ import java.util.Set;
 public class ReloadTypesAction extends Action implements IObjectActionDelegate {
   private IStructuredSelection fSelection;
   private Shell fShell;
-  private IApplicationLayer fAppLayer;
 
   /**
    * Keep default constructor for reflection.
@@ -79,7 +78,6 @@ public class ReloadTypesAction extends Action implements IObjectActionDelegate {
     Assert.isNotNull(selection);
     fSelection = selection;
     fShell = shell;
-    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
   }
 
   /*
@@ -116,9 +114,9 @@ public class ReloadTypesAction extends Action implements IObjectActionDelegate {
 
       else if (selection instanceof INews) {
         INews news = (INews) selection;
-        List<IBookMark> relatedBookmarks = fAppLayer.loadBookMarks(news.getFeedReference());
+        Collection<IBookMark> relatedBookmarks = Owl.getPersistenceService().getDAOService().getBookMarkDAO().loadAll(news.getFeedReference());
         if (relatedBookmarks.size() > 0)
-          selectedBookMarks.add(relatedBookmarks.get(0));
+          selectedBookMarks.add(relatedBookmarks.iterator().next());
       }
 
       else if (selection instanceof EntityGroup) {

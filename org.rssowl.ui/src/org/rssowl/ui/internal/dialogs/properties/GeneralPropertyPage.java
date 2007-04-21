@@ -43,12 +43,12 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.IMark;
+import org.rssowl.core.model.persist.dao.DAOService;
 import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.FeedLinkReference;
@@ -379,14 +379,14 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       /* Check for changed Feed */
       if (!bookmark.getFeedLinkReference().getLink().toString().equals(uriAsString)) {
         try {
-          IApplicationLayer applicationLayer = Owl.getPersistenceService().getApplicationLayer();
+          DAOService daoService = Owl.getPersistenceService().getDAOService();
 
           /* Create URL */
           URI newFeedLink = new URI(uriAsString.trim());
           fReloadRequired = true;
 
           /* Try to load this Feed from the DB (might be existing already) */
-          FeedReference feedRef = applicationLayer.loadFeedReference(newFeedLink);
+          FeedReference feedRef = daoService.getFeedDAO().loadReference(newFeedLink);
 
           /* This is a new Feed, so create it! */
           if (feedRef == null) {
@@ -402,7 +402,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
           entitiesToSave.add(bookmark);
 
           /* Check if the old reference can be deleted now */
-          if (applicationLayer.loadBookMarks(oldFeedRef).size() == 1)
+          if (daoService.getBookMarkDAO().loadAll(oldFeedRef).size() == 1)
             DynamicDAO.delete(oldFeedRef.resolve());
 
           /* Delete the Favicon since the feed has changed */
@@ -427,7 +427,6 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
    * @see org.rssowl.ui.internal.dialogs.properties.IEntityPropertyPage#finish()
    */
   public void finish() {
-    IApplicationLayer appLayer = Owl.getPersistenceService().getApplicationLayer();
 
     /* Reload if required */
     if (fReloadRequired && fEntities.size() == 1)
@@ -456,7 +455,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       }
 
       /* Perform Reparenting */
-      appLayer.reparent(folderReparenting, markReparenting);
+      Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(folderReparenting, markReparenting);
     }
   }
 
