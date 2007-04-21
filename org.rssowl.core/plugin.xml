@@ -33,59 +33,59 @@
 	<extension
          point="org.rssowl.core.FormatInterpreter">
       <formatInterpreter
-            class="org.rssowl.core.interpreter.internal.RSSInterpreter"
+            class="org.rssowl.core.internal.interpreter.RSSInterpreter"
             rootElement="rss"/>
       <formatInterpreter
-            class="org.rssowl.core.interpreter.internal.RDFInterpreter"
+            class="org.rssowl.core.internal.interpreter.RDFInterpreter"
             rootElement="rdf"/>
       <formatInterpreter
-            class="org.rssowl.core.interpreter.internal.AtomInterpreter"
+            class="org.rssowl.core.internal.interpreter.AtomInterpreter"
             rootElement="feed"/>
       <formatInterpreter
-            class="org.rssowl.core.interpreter.internal.OPMLInterpreter"
+            class="org.rssowl.core.internal.interpreter.OPMLInterpreter"
             rootElement="opml"/>
       <formatInterpreter
-            class="org.rssowl.core.interpreter.internal.CDFInterpreter"
+            class="org.rssowl.core.internal.interpreter.CDFInterpreter"
             rootElement="channel"/>
       <formatInterpreter
-            class="org.rssowl.core.interpreter.internal.BugzillaInterpreter"
+            class="org.rssowl.core.internal.interpreter.BugzillaInterpreter"
             rootElement="bugzilla"/>
    </extension>
    <extension
          point="org.rssowl.core.NamespaceHandler">
       <namespaceHandler
-            class="org.rssowl.core.interpreter.internal.DublinCoreNamespaceHandler"
+            class="org.rssowl.core.internal.interpreter.DublinCoreNamespaceHandler"
             namespaceURI="http://purl.org/dc/elements/1.1/"/>
       <namespaceHandler
-            class="org.rssowl.core.interpreter.internal.SyndicationNamespaceHandler"
+            class="org.rssowl.core.internal.interpreter.SyndicationNamespaceHandler"
             namespaceURI="http://purl.org/rss/1.0/modules/syndication/"/>
       <namespaceHandler
-            class="org.rssowl.core.interpreter.internal.ContentNamespaceHandler"
+            class="org.rssowl.core.internal.interpreter.ContentNamespaceHandler"
             namespaceURI="http://purl.org/rss/1.0/modules/content/"/>
       <namespaceHandler
-            class="org.rssowl.core.interpreter.internal.XMLNamespaceHandler"
+            class="org.rssowl.core.internal.interpreter.XMLNamespaceHandler"
             namespaceURI="http://www.w3.org/XML/1998/namespace"/>
       <namespaceHandler
-            class="org.rssowl.core.interpreter.internal.PodcastNamespaceHandler"
+            class="org.rssowl.core.internal.interpreter.PodcastNamespaceHandler"
             namespaceURI="http://www.itunes.com/dtds/podcast-1.0.dtd">
       </namespaceHandler>
    </extension>
    <extension
          point="org.rssowl.core.TypeImporter">
       <typeImporter
-            class="org.rssowl.core.interpreter.internal.OPMLImporter"
+            class="org.rssowl.core.internal.interpreter.OPMLImporter"
             rootElement="opml"/>
    </extension>
    <extension
          point="org.rssowl.core.ProtocolHandler">
       <protocolHandler
-            class="org.rssowl.core.connection.internal.DefaultProtocolHandler"
+            class="org.rssowl.core.internal.connection.DefaultProtocolHandler"
             protocol="http"/>
       <protocolHandler
-            class="org.rssowl.core.connection.internal.DefaultProtocolHandler"
+            class="org.rssowl.core.internal.connection.DefaultProtocolHandler"
             protocol="https"/>
       <protocolHandler
-            class="org.rssowl.core.connection.internal.DefaultProtocolHandler"
+            class="org.rssowl.core.internal.connection.DefaultProtocolHandler"
             protocol="file"/>
    </extension>
    <extension

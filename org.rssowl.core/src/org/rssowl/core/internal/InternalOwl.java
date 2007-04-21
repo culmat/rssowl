@@ -25,9 +25,9 @@
 package org.rssowl.core.internal;
 
 import org.rssowl.core.connection.IConnectionService;
-import org.rssowl.core.connection.internal.ConnectionServiceImpl;
+import org.rssowl.core.internal.connection.ConnectionServiceImpl;
+import org.rssowl.core.internal.interpreter.InterpreterServiceImpl;
 import org.rssowl.core.interpreter.IInterpreterService;
-import org.rssowl.core.interpreter.internal.InterpreterServiceImpl;
 import org.rssowl.core.model.IListenerService;
 import org.rssowl.core.model.dao.IApplicationService;
 import org.rssowl.core.model.dao.IPersistenceService;

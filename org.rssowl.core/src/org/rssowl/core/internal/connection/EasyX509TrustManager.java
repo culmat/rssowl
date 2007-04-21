@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.connection.internal;
+package org.rssowl.core.internal.connection;
 
 import java.security.KeyStore;
 import java.security.KeyStoreException;
