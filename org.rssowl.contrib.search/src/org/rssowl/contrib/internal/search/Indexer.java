@@ -14,11 +14,11 @@ import org.apache.lucene.store.Directory;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.InternalOwl;
-import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.events.NewsEvent;
 import org.rssowl.core.persist.events.NewsListener;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.JobQueue;
 
 import java.io.IOException;
