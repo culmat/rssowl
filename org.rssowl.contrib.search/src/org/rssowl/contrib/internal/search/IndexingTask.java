@@ -27,8 +27,8 @@ package org.rssowl.contrib.internal.search;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.rssowl.core.model.events.NewsEvent;
-import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.events.NewsEvent;
 import org.rssowl.core.util.ITask;
 
 import java.io.IOException;
