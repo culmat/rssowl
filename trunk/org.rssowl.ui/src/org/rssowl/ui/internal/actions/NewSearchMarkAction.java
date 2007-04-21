@@ -33,11 +33,11 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IPersistenceService;
-import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.reference.FolderReference;
+import org.rssowl.core.persist.service.IPersistenceService;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.ui.internal.dialogs.SearchMarkDialog;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
