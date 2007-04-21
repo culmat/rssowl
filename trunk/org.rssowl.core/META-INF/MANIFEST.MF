@@ -16,10 +16,10 @@ Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Bundle-ClassPath: .
 Export-Package: org.rssowl.core,
  org.rssowl.core.connection,
- org.rssowl.core.connection.internal,
  org.rssowl.core.internal,
+ org.rssowl.core.internal.connection,
+ org.rssowl.core.internal.interpreter,
  org.rssowl.core.interpreter,
- org.rssowl.core.interpreter.internal,
  org.rssowl.core.model,
  org.rssowl.core.model.dao,
  org.rssowl.core.model.events,

@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.interpreter.internal;
+package org.rssowl.core.internal.interpreter;
 
 import org.jdom.Document;
 import org.jdom.JDOMException;

@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.connection.internal;
+package org.rssowl.core.internal.connection;
 
 import org.apache.commons.httpclient.protocol.SecureProtocolSocketFactory;
 import org.eclipse.core.runtime.Assert;

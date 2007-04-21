@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.interpreter.internal;
+package org.rssowl.core.internal.interpreter;
 
 import org.jdom.Attribute;
 import org.jdom.Element;
