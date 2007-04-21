@@ -29,8 +29,8 @@ import static org.junit.Assert.assertNotNull;
 
 import org.junit.Test;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.interpreter.UnknownFormatException;
-import org.rssowl.core.model.internal.persist.Feed;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.util.DateUtils;

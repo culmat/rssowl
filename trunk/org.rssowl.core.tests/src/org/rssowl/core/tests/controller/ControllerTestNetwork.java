@@ -30,8 +30,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.internal.persist.Feed;
+import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
@@ -39,6 +38,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.NewsService;
 
