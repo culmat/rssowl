@@ -4,7 +4,7 @@
 
    <extension
          point="org.rssowl.core.ModelSearch">
-      <modelsearch class="org.rssowl.contrib.search.internal.ModelSearchImpl"/>
+      <modelsearch class="org.rssowl.contrib.internal.search.ModelSearchImpl"/>
    </extension>
 
 </plugin>

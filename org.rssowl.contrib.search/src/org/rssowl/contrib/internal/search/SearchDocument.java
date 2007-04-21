@@ -1,5 +1,5 @@
 
-package org.rssowl.contrib.search.internal;
+package org.rssowl.contrib.internal.search;
 
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;

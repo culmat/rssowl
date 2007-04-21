@@ -22,34 +22,22 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.contrib.search.internal;
+package org.rssowl.contrib.internal.search;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.CharTokenizer;
 import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.WhitespaceTokenizer;
 
 import java.io.Reader;
 
 /**
- * The <code>LowercaseDelimiterAnalyzer</code> will tokenize the input by the
- * given delimiter char. In addition, all <code>Token</code>s get lowercased.
+ * The <code>LowercaseWhitespaceAnalyzer</code> will tokenize the input by
+ * whitespaces. In addition, all <code>Token</code>s get lowercased.
  *
  * @author bpasero
  */
-public class LowercaseDelimiterAnalyzer extends Analyzer {
-  private final char fDelim;
-
-  /**
-   * The <code>LowercaseDelimiterAnalyzer</code> will tokenize the input by
-   * the given delimiter char. In addition, all <code>Token</code>s get
-   * lowercased.
-   *
-   * @param delim the char that is used to separate tokens.
-   */
-  public LowercaseDelimiterAnalyzer(char delim) {
-    fDelim = delim;
-  }
+public class LowercaseWhitespaceAnalyzer extends Analyzer {
 
   /*
    * @see org.apache.lucene.analysis.KeywordAnalyzer#tokenStream(java.lang.String,
@@ -57,17 +45,7 @@ public class LowercaseDelimiterAnalyzer extends Analyzer {
    */
   @Override
   public TokenStream tokenStream(String fieldName, Reader reader) {
-
-    /* Split at delim Char */
-    TokenStream result = new CharTokenizer(reader) {
-
-      @Override
-      protected boolean isTokenChar(char c) {
-        return c != fDelim;
-      }
-    };
-
-    /* Lowercase */
+    TokenStream result = new WhitespaceTokenizer(reader);
     result = new LowerCaseFilter(result);
 
     return result;
