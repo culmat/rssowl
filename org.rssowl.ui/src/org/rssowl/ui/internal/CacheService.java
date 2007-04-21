@@ -214,7 +214,7 @@ public class CacheService {
   }
 
   void cacheRootFolders() {
-    Collection<IFolder> rootFolders = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoot();
+    Collection<IFolder> rootFolders = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoots();
     for (IFolder rootFolder : rootFolders) {
       cache(rootFolder);
     }
