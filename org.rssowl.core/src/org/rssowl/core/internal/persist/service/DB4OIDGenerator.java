@@ -21,7 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o;
+package org.rssowl.core.internal.persist.service;
 
 import org.rssowl.core.persist.service.IDGenerator;
 

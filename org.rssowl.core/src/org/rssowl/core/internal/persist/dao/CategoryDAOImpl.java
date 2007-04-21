@@ -21,51 +21,42 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o.dao;
+package org.rssowl.core.internal.persist.dao;
 
-import org.rssowl.core.internal.persist.Feed;
-import org.rssowl.core.model.internal.db4o.DBHelper;
-import org.rssowl.core.persist.IFeed;
-import org.rssowl.core.persist.dao.IFeedDAO;
-import org.rssowl.core.persist.events.FeedEvent;
-import org.rssowl.core.persist.events.FeedListener;
-import org.rssowl.core.persist.reference.FeedReference;
+import org.rssowl.core.internal.persist.Category;
+import org.rssowl.core.persist.ICategory;
+import org.rssowl.core.persist.dao.ICategoryDAO;
+import org.rssowl.core.persist.events.CategoryEvent;
+import org.rssowl.core.persist.events.CategoryListener;
+import org.rssowl.core.util.StringUtils;
 
-import java.net.URI;
+import java.util.Set;
+import java.util.TreeSet;
 
-public final class FeedDAOImpl extends AbstractEntityDAO<IFeed, FeedListener,
-    FeedEvent> implements IFeedDAO  {
+public final class CategoryDAOImpl extends AbstractEntityDAO<ICategory,
+    CategoryListener, CategoryEvent> implements ICategoryDAO   {
 
-  public FeedDAOImpl() {
-    super(Feed.class, false);
+  public CategoryDAOImpl() {
+    super(Category.class, false);
   }
   
   @Override
-  protected final void doSave(IFeed entity) {
-    DBHelper.saveFeed(fDb, entity);
-  }
-
-  @Override
-  protected final FeedEvent createDeleteEventTemplate(IFeed entity) {
+  protected final CategoryEvent createDeleteEventTemplate(ICategory entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final FeedEvent createSaveEventTemplate(IFeed entity) {
-    return new FeedEvent(entity, true);
+  protected final CategoryEvent createSaveEventTemplate(ICategory entity) {
+    return new CategoryEvent(entity, true);
   }
 
-  public final Feed load(URI link) {
-    return DBHelper.loadFeed(fDb, link, Integer.MAX_VALUE);
-  }
-
-  // FIXME Not sure if this makes sense anymore. If we decide to keep it, try
-  // to make it more efficient
-  public final FeedReference loadReference(URI link) {
-    IFeed feed = DBHelper.loadFeed(fDb, link, null);
-    if (feed == null) {
-      return null;
+  public final Set<String> loadAllNames() {
+    Set<String> names = new TreeSet<String>();
+    for (ICategory category : loadAll()) {
+      String name = StringUtils.safeTrim(category.getName());
+      if (StringUtils.isSet(name))
+        names.add(category.getName().trim());
     }
-    return new FeedReference(feed.getId());
+    return names;
   }
 }

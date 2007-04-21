@@ -21,52 +21,28 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o.dao;
+package org.rssowl.core.internal.persist.dao;
 
-import org.rssowl.core.internal.persist.Person;
-import org.rssowl.core.persist.IPerson;
-import org.rssowl.core.persist.dao.IPersonDAO;
-import org.rssowl.core.persist.events.PersonEvent;
-import org.rssowl.core.persist.events.PersonListener;
-import org.rssowl.core.persist.service.PersistenceException;
-import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.internal.persist.SearchMark;
+import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.dao.ISearchMarkDAO;
+import org.rssowl.core.persist.events.SearchMarkEvent;
+import org.rssowl.core.persist.events.SearchMarkListener;
 
-import com.db4o.ext.Db4oException;
+public final class SearchMarkDAOImpl extends AbstractEntityDAO<ISearchMark,
+    SearchMarkListener, SearchMarkEvent> implements ISearchMarkDAO    {
 
-import java.util.Set;
-import java.util.TreeSet;
-
-public class PersonDAOImpl extends AbstractEntityDAO<IPerson, PersonListener,
-    PersonEvent> implements IPersonDAO  {
-
-  public PersonDAOImpl() {
-    super(Person.class, false);
+  public SearchMarkDAOImpl() {
+    super(SearchMark.class, false);
   }
   
   @Override
-  protected PersonEvent createDeleteEventTemplate(IPerson entity) {
+  protected final SearchMarkEvent createDeleteEventTemplate(ISearchMark entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final PersonEvent createSaveEventTemplate(IPerson entity) {
-    return new PersonEvent(entity, true);
-  }
-
-  public Set<String> loadAllNames() {
-    try {
-      Set<String> strings = new TreeSet<String>();
-      for (IPerson person : loadAll()) {
-        String name = StringUtils.safeTrim(person.getName());
-        if (StringUtils.isSet(name))
-          strings.add(name);
-        else if (person.getEmail() != null)
-          strings.add(person.getEmail().toString());
-      }
-
-      return strings;
-    } catch (Db4oException e) {
-      throw new PersistenceException(e);
-    }
+  protected final SearchMarkEvent createSaveEventTemplate(ISearchMark entity) {
+    return new SearchMarkEvent(entity, null, true);
   }
 }

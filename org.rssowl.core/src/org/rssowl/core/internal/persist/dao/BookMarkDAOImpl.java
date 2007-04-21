@@ -21,42 +21,50 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o.dao;
+package org.rssowl.core.internal.persist.dao;
 
-import org.rssowl.core.internal.persist.Category;
-import org.rssowl.core.persist.ICategory;
-import org.rssowl.core.persist.dao.ICategoryDAO;
-import org.rssowl.core.persist.events.CategoryEvent;
-import org.rssowl.core.persist.events.CategoryListener;
-import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.internal.persist.BookMark;
+import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.dao.IBookMarkDAO;
+import org.rssowl.core.persist.events.BookMarkEvent;
+import org.rssowl.core.persist.events.BookMarkListener;
+import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.persist.service.PersistenceException;
 
-import java.util.Set;
-import java.util.TreeSet;
+import com.db4o.ObjectSet;
+import com.db4o.ext.Db4oException;
+import com.db4o.query.Query;
 
-public final class CategoryDAOImpl extends AbstractEntityDAO<ICategory,
-    CategoryListener, CategoryEvent> implements ICategoryDAO   {
+import java.util.ArrayList;
+import java.util.Collection;
 
-  public CategoryDAOImpl() {
-    super(Category.class, false);
+public final class BookMarkDAOImpl extends AbstractEntityDAO<IBookMark, BookMarkListener,
+    BookMarkEvent> implements IBookMarkDAO  {
+
+  public BookMarkDAOImpl() {
+    super(BookMark.class, false);
   }
-  
+
   @Override
-  protected final CategoryEvent createDeleteEventTemplate(ICategory entity) {
+  protected final BookMarkEvent createDeleteEventTemplate(IBookMark entity) {
     return createSaveEventTemplate(entity);
   }
 
   @Override
-  protected final CategoryEvent createSaveEventTemplate(ICategory entity) {
-    return new CategoryEvent(entity, true);
+  protected final BookMarkEvent createSaveEventTemplate(IBookMark entity) {
+    return new BookMarkEvent(entity, null, true);
   }
 
-  public final Set<String> loadAllNames() {
-    Set<String> names = new TreeSet<String>();
-    for (ICategory category : loadAll()) {
-      String name = StringUtils.safeTrim(category.getName());
-      if (StringUtils.isSet(name))
-        names.add(category.getName().trim());
+  public final Collection<IBookMark> loadAll(FeedLinkReference feedRef) {
+    try {
+      Query query = fDb.query();
+      query.constrain(fEntityClass);
+      query.descend("fFeedLink").constrain(feedRef.getLink().toString()); //$NON-NLS-1$
+      ObjectSet<IBookMark> marks = getObjectSet(query);
+      activateAll(marks);
+      return new ArrayList<IBookMark>(marks);
+    } catch (Db4oException e) {
+      throw new PersistenceException(e);
     }
-    return names;
   }
 }

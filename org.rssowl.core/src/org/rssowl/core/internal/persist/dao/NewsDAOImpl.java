@@ -21,10 +21,10 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o.dao;
+package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.News;
-import org.rssowl.core.model.internal.db4o.DBHelper;
+import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.INewsDAO;

@@ -21,40 +21,9 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o.dao;
+package org.rssowl.core.internal.persist.service;
 
-import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.internal.persist.ConditionalGet;
-import org.rssowl.core.persist.IConditionalGet;
-import org.rssowl.core.persist.dao.IConditionalGetDAO;
-import org.rssowl.core.persist.service.PersistenceException;
-
-import com.db4o.ext.Db4oException;
-import com.db4o.query.Query;
-
-import java.net.URI;
-
-public final class ConditionalGetDAOImpl extends AbstractPersistableDAO<IConditionalGet>
-    implements IConditionalGetDAO   {
-
-  public ConditionalGetDAOImpl() {
-    super(ConditionalGet.class, true);
-  }
-
-  public IConditionalGet load(URI link) {
-    Assert.isNotNull(link, "link cannot be null"); //$NON-NLS-1$
-    try {
-      Query query = fDb.query();
-      query.constrain(fEntityClass);
-      query.descend("fLink").constrain(link.toString()); //$NON-NLS-1$
-
-      for (IConditionalGet entity : getObjectSet(query)) {
-        fDb.activate(entity, Integer.MAX_VALUE);
-        return entity;
-      }
-    } catch (Db4oException e) {
-      throw new PersistenceException(e);
-    }
-    return null;
-  }
+public interface DatabaseListener {
+  public void databaseOpened(DatabaseEvent event);
+  public void databaseClosed(DatabaseEvent event);
 }

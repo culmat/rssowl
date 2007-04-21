@@ -21,7 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o.dao;
+package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.search.SearchCondition;
 import org.rssowl.core.persist.dao.ISearchConditionDAO;

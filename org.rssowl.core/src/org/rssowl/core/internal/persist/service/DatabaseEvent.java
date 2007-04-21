@@ -21,28 +21,27 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o.dao;
+package org.rssowl.core.internal.persist.service;
 
-import org.rssowl.core.internal.persist.Label;
-import org.rssowl.core.persist.ILabel;
-import org.rssowl.core.persist.dao.ILabelDAO;
-import org.rssowl.core.persist.events.LabelEvent;
-import org.rssowl.core.persist.events.LabelListener;
+import com.db4o.ObjectContainer;
 
-public final class LabelDAOImpl extends AbstractEntityDAO<ILabel, LabelListener,
-    LabelEvent> implements ILabelDAO {
+import java.util.concurrent.locks.ReadWriteLock;
 
-  public LabelDAOImpl() {
-    super(Label.class, false);
+public final class DatabaseEvent {
+  
+  private final ObjectContainer fObjectContainer;
+  private final ReadWriteLock fLock;
+  
+  public DatabaseEvent(ObjectContainer objectContainer, ReadWriteLock lock) {
+    fObjectContainer = objectContainer;
+    fLock = lock;
   }
-
-  @Override
-  protected final LabelEvent createDeleteEventTemplate(ILabel entity) {
-    return createSaveEventTemplate(entity);
+  
+  public final ObjectContainer getObjectContainer() {
+    return fObjectContainer;
   }
-
-  @Override
-  protected final LabelEvent createSaveEventTemplate(ILabel entity) {
-    return new LabelEvent(entity, true);
+  
+  public final ReadWriteLock getLock() {
+    return fLock;
   }
 }

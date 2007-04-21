@@ -21,64 +21,43 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.model.internal.db4o.dao;
+package org.rssowl.core.internal.persist.dao;
 
-import org.rssowl.core.persist.NewsCounter;
-import org.rssowl.core.persist.dao.INewsCounterDAO;
+import org.rssowl.core.internal.persist.Attachment;
+import org.rssowl.core.internal.persist.service.DBHelper;
+import org.rssowl.core.persist.IAttachment;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.dao.IAttachmentDAO;
+import org.rssowl.core.persist.events.AttachmentEvent;
+import org.rssowl.core.persist.events.AttachmentListener;
+import org.rssowl.core.persist.events.NewsEvent;
 
-import java.util.Collection;
+public final class AttachmentDAOImpl extends AbstractEntityDAO<IAttachment,
+    AttachmentListener, AttachmentEvent> implements IAttachmentDAO  {
 
-public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter>
-    implements INewsCounterDAO  {
-
-  public NewsCounterDAOImpl() {
-    super(NewsCounter.class, true);
-  }
-  
-  public final void delete() {
-    super.delete(load());
-  }
-  
-  @Override
-  public final void delete(NewsCounter newsCounter) {
-    if (!newsCounter.equals(load()))
-      throw new IllegalArgumentException("Only a single newsCounter should be used. " +
-      		"Trying to delete a non-existent one.");
-    
-    super.delete(newsCounter);
-  }
-  
-  public final NewsCounter load() {
-    Collection<NewsCounter> newsCounters = loadAll();
-    if (newsCounters.isEmpty())
-      return null;
-    
-    if (newsCounters.size() > 1)
-      throw new IllegalStateException("Only one NewsCounter should exist, but " +
-          "there are: " + newsCounters.size());
-    
-    return newsCounters.iterator().next();
-  }
-  
-  @Override
-  public final NewsCounter load(long id) {
-    throw new UnsupportedOperationException();
-  }
-  
-  @Override
-  public final void saveAll(Collection<NewsCounter> entities)  {
-    if (entities.size() > 1) {
-      throw new IllegalArgumentException("Only a single newsCounter can be stored");
-    }
-    super.saveAll(entities);
+  public AttachmentDAOImpl() {
+    super(Attachment.class, false);
   }
 
   @Override
-  protected final void doSave(NewsCounter entity) {
-    if (!fDb.ext().isStored(entity) && (load() != null))
-      throw new IllegalArgumentException("Only a single newsCounter can be stored");
-    
-    super.doSave(entity);
+  protected final AttachmentEvent createDeleteEventTemplate(IAttachment entity) {
+    return createSaveEventTemplate(entity);
   }
 
+  @Override
+  protected final AttachmentEvent createSaveEventTemplate(IAttachment entity) {
+    return new AttachmentEvent(entity, true);
+  }
+  
+  @Override
+  public final void doDelete(IAttachment entity) {
+    //TODO Not sure about this, but let's do it for now to help us track a bug
+    //in NewsService where never having a newsUpdated with a null oldNews is
+    //helpful
+    INews news = entity.getNews();
+    INews oldNews = fDb.ext().peekPersisted(news, 2, true);
+    NewsEvent newsEvent = new NewsEvent(oldNews, news, false);
+    DBHelper.putEventTemplate(newsEvent);
+    super.doDelete(entity);
+  }
 }
