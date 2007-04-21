@@ -34,7 +34,7 @@ import java.util.Collection;
 import java.util.List;
 
 public interface IFolderDAO extends IEntityDAO<IFolder, FolderListener, FolderEvent>   {
-  
+
   /**
    * Loads all Folders from the persistance layer that do not have any parent
    * Folder (in other words root folders).
@@ -44,8 +44,8 @@ public interface IFolderDAO extends IEntityDAO<IFolder, FolderListener, FolderEv
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
    */
-  Collection<IFolder> loadRoot();
-  
+  Collection<IFolder> loadRoots();
+
   /**
    * <p>
    * If <code>foldersInfos</code> is not null, performs the reparenting of the
@@ -69,5 +69,5 @@ public interface IFolderDAO extends IEntityDAO<IFolder, FolderListener, FolderEv
    */
   void reparent(List<ReparentInfo<IFolder, IFolder>> folderInfos,
       List<ReparentInfo<IMark, IFolder>> markInfos) throws PersistenceException;
-  
+
 }

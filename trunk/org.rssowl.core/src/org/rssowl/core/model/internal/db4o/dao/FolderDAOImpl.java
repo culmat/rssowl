@@ -64,7 +64,7 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
     return new FolderEvent(entity, null, true);
   }
 
-  public Collection<IFolder> loadRoot() {
+  public Collection<IFolder> loadRoots() {
     try {
       Query query = fDb.query();
       query.constrain(fEntityClass);
