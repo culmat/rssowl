@@ -26,8 +26,8 @@ package org.rssowl.core.model.internal.db4o.dao;
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.internal.persist.ConditionalGet;
-import org.rssowl.core.model.persist.IConditionalGet;
-import org.rssowl.core.model.persist.dao.IConditionalGetDAO;
+import org.rssowl.core.persist.IConditionalGet;
+import org.rssowl.core.persist.dao.IConditionalGetDAO;
 
 import com.db4o.ext.Db4oException;
 import com.db4o.query.Query;

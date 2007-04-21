@@ -24,8 +24,8 @@
 
 package org.rssowl.core.internal;
 
-import org.rssowl.core.model.persist.pref.IPreferencesInitializer;
-import org.rssowl.core.model.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.pref.IPreferencesInitializer;
 
 /**
  * An instance of <code>IPreferencesInitializer</code> responsible for

@@ -23,8 +23,8 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o;
 
-import org.rssowl.core.model.events.ModelEvent;
-import org.rssowl.core.model.events.runnable.EventRunnable;
+import org.rssowl.core.persist.events.ModelEvent;
+import org.rssowl.core.persist.events.runnable.EventRunnable;
 
 import java.util.ArrayList;
 import java.util.Collections;

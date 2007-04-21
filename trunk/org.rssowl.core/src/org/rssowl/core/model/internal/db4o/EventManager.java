@@ -25,38 +25,38 @@ package org.rssowl.core.model.internal.db4o;
 
 import org.rssowl.core.Owl;
 import org.rssowl.core.model.dao.IDGenerator;
-import org.rssowl.core.model.events.AttachmentEvent;
-import org.rssowl.core.model.events.BookMarkEvent;
-import org.rssowl.core.model.events.CategoryEvent;
-import org.rssowl.core.model.events.FeedEvent;
-import org.rssowl.core.model.events.FolderEvent;
-import org.rssowl.core.model.events.LabelEvent;
-import org.rssowl.core.model.events.ModelEvent;
-import org.rssowl.core.model.events.NewsEvent;
-import org.rssowl.core.model.events.PersonEvent;
-import org.rssowl.core.model.events.SearchConditionEvent;
-import org.rssowl.core.model.events.SearchMarkEvent;
 import org.rssowl.core.model.internal.persist.BookMark;
 import org.rssowl.core.model.internal.persist.Feed;
-import org.rssowl.core.model.persist.IAttachment;
-import org.rssowl.core.model.persist.IBookMark;
-import org.rssowl.core.model.persist.ICategory;
-import org.rssowl.core.model.persist.IConditionalGet;
-import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.IFeed;
-import org.rssowl.core.model.persist.IFolder;
-import org.rssowl.core.model.persist.ILabel;
-import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.persist.INews;
-import org.rssowl.core.model.persist.INewsGetter;
-import org.rssowl.core.model.persist.IPerson;
-import org.rssowl.core.model.persist.ISearchMark;
-import org.rssowl.core.model.persist.dao.IConditionalGetDAO;
-import org.rssowl.core.model.persist.search.IModelSearch;
-import org.rssowl.core.model.persist.search.ISearchCondition;
-import org.rssowl.core.model.persist.search.ISearchHit;
-import org.rssowl.core.model.reference.FeedLinkReference;
-import org.rssowl.core.model.reference.NewsReference;
+import org.rssowl.core.persist.IAttachment;
+import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.ICategory;
+import org.rssowl.core.persist.IConditionalGet;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsGetter;
+import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.dao.IConditionalGetDAO;
+import org.rssowl.core.persist.events.AttachmentEvent;
+import org.rssowl.core.persist.events.BookMarkEvent;
+import org.rssowl.core.persist.events.CategoryEvent;
+import org.rssowl.core.persist.events.FeedEvent;
+import org.rssowl.core.persist.events.FolderEvent;
+import org.rssowl.core.persist.events.LabelEvent;
+import org.rssowl.core.persist.events.ModelEvent;
+import org.rssowl.core.persist.events.NewsEvent;
+import org.rssowl.core.persist.events.PersonEvent;
+import org.rssowl.core.persist.events.SearchConditionEvent;
+import org.rssowl.core.persist.events.SearchMarkEvent;
+import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.persist.search.IModelSearch;
+import org.rssowl.core.persist.search.ISearchCondition;
+import org.rssowl.core.persist.search.ISearchHit;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
@@ -126,18 +126,18 @@ public class EventManager {
   private EventManager() {
     initEntityStoreListener();
   }
-  
+
   private IDGenerator getIDGenerator() {
     if (fIDGenerator == null)
       fIDGenerator = Owl.getPersistenceService().getIDGenerator();
-    
+
     return fIDGenerator;
   }
-  
+
   private IConditionalGetDAO getConditionalGetDAO() {
     if (fConditionalGetDAO == null)
       fConditionalGetDAO = Owl.getPersistenceService().getDAOService().getConditionalGetDAO();
-    
+
     return fConditionalGetDAO;
   }
 
@@ -567,7 +567,7 @@ public class EventManager {
 
   //TODO Change this name to better reflect what it does. It just says that the
   //given object will be updated or deleted during the transaction
-  final void addItemBeingDeleted(Object entity) {
+  public final void addItemBeingDeleted(Object entity) {
     Set<Object> entities = fItemsBeingDeleted.get();
     if (entities == null) {
       entities = new HashSet<Object>(3);

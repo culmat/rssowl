@@ -24,15 +24,15 @@
 package org.rssowl.core.model.internal.db4o;
 
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.events.FeedEvent;
-import org.rssowl.core.model.events.ModelEvent;
-import org.rssowl.core.model.events.NewsEvent;
-import org.rssowl.core.model.events.runnable.EventRunnable;
 import org.rssowl.core.model.internal.persist.Feed;
-import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.IFeed;
-import org.rssowl.core.model.persist.INews;
-import org.rssowl.core.model.persist.IPersistable;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.IPersistable;
+import org.rssowl.core.persist.events.FeedEvent;
+import org.rssowl.core.persist.events.ModelEvent;
+import org.rssowl.core.persist.events.NewsEvent;
+import org.rssowl.core.persist.events.runnable.EventRunnable;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
@@ -51,7 +51,7 @@ public class DBHelper {
     EventManager.getInstance().clear();
     fireEvents(eventNotifiers);
   }
-  
+
   public static final void fireEvents(List<EventRunnable> eventNotifiers) {
     if (eventNotifiers == null) {
       return;
@@ -65,26 +65,26 @@ public class DBHelper {
     int id = System.identityHashCode(modelEvent.getEntity());
     EventsMap.getInstance().putEventTemplate(id, modelEvent);
   }
-  
+
   public static final void saveFeed(ObjectContainer db, IFeed feed) {
     if (feed.getId() == null && feedExists(db, feed.getLink()))
         throw new IllegalArgumentException("This feed already exists, but it has no id."); //$NON-NLS-1$
-    
+
     ModelEvent feedEventTemplate = new FeedEvent(feed, true);
     DBHelper.putEventTemplate(feedEventTemplate);
     saveAndCascadeAllNews(db, feed.getNews(), false);
     saveEntities(db, feed.getCategories());
     saveEntity(db, feed.getAuthor());
     saveEntity(db, feed.getImage());
-    
+
     db.ext().set(feed, 2);
   }
-  
+
   private static void saveEntity(ObjectContainer db, IPersistable entity) {
     if (entity != null)
       db.set(entity);
   }
-  
+
 
   private static void saveEntities(ObjectContainer db, List<? extends IEntity> entities) {
     for (IEntity entity : entities)
@@ -96,8 +96,8 @@ public class DBHelper {
     for (INews news : newsCollection)
       saveAndCascadeNews(db, news, root);
   }
-  
-  static void saveNews(ObjectContainer db, INews news) {
+
+  public static final void saveNews(ObjectContainer db, INews news) {
     INews oldNews = db.ext().peekPersisted(news, 2, true);
     if (oldNews != null) {
       ModelEvent newsEventTemplate = new NewsEvent(oldNews, news, false);
@@ -105,11 +105,11 @@ public class DBHelper {
     }
     db.ext().set(news, 2);
   }
-  
+
   static final boolean feedExists(ObjectContainer db, URI link) {
     return getFeedSet(db, link).hasNext();
   }
-  
+
   @SuppressWarnings("unchecked")
   private static ObjectSet<Feed> getFeedSet(ObjectContainer db, URI link){
     Query query = db.query();

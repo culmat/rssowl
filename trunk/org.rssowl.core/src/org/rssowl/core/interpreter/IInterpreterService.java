@@ -25,8 +25,8 @@
 package org.rssowl.core.interpreter;
 
 import org.jdom.Document;
-import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IFeed;
 
 import java.io.InputStream;
 import java.util.List;

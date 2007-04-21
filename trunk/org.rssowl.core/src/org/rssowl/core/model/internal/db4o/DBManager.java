@@ -34,7 +34,7 @@ import org.rssowl.core.model.internal.persist.Folder;
 import org.rssowl.core.model.internal.persist.News;
 import org.rssowl.core.model.internal.persist.SearchMark;
 import org.rssowl.core.model.internal.persist.pref.Preference;
-import org.rssowl.core.model.persist.NewsCounter;
+import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
 import com.db4o.Db4o;

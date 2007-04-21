@@ -24,8 +24,8 @@
 
 package org.rssowl.core.model.internal.persist;
 
-import org.rssowl.core.model.persist.ICloud;
-import org.rssowl.core.model.reference.FeedReference;
+import org.rssowl.core.persist.ICloud;
+import org.rssowl.core.persist.reference.FeedReference;
 
 /**
  * Adapter Implementation of this Type. Methods of interest should be overriden

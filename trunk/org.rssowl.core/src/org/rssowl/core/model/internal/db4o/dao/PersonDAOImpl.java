@@ -24,11 +24,11 @@
 package org.rssowl.core.model.internal.db4o.dao;
 
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.events.PersonEvent;
-import org.rssowl.core.model.events.PersonListener;
 import org.rssowl.core.model.internal.persist.Person;
-import org.rssowl.core.model.persist.IPerson;
-import org.rssowl.core.model.persist.dao.IPersonDAO;
+import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.dao.IPersonDAO;
+import org.rssowl.core.persist.events.PersonEvent;
+import org.rssowl.core.persist.events.PersonListener;
 import org.rssowl.core.util.StringUtils;
 
 import com.db4o.ext.Db4oException;

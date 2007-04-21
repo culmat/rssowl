@@ -25,8 +25,8 @@
 package org.rssowl.core.model.internal.persist;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.persist.IAttachment;
-import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.persist.IAttachment;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.util.MergeUtils;
 
 import java.net.URI;

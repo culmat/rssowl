@@ -25,7 +25,7 @@
 package org.rssowl.core.interpreter;
 
 import org.jdom.Document;
-import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.persist.IFeed;
 
 /**
  * This interface allows to contribute Interpreters for various XML Formats. The

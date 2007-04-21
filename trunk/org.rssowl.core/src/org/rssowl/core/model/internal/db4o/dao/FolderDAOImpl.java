@@ -25,17 +25,17 @@ package org.rssowl.core.model.internal.db4o.dao;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.events.BookMarkEvent;
-import org.rssowl.core.model.events.FolderEvent;
-import org.rssowl.core.model.events.FolderListener;
-import org.rssowl.core.model.events.SearchMarkEvent;
 import org.rssowl.core.model.internal.db4o.DBHelper;
 import org.rssowl.core.model.internal.persist.Folder;
-import org.rssowl.core.model.persist.IBookMark;
-import org.rssowl.core.model.persist.IFolder;
-import org.rssowl.core.model.persist.IMark;
-import org.rssowl.core.model.persist.ISearchMark;
-import org.rssowl.core.model.persist.dao.IFolderDAO;
+import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.dao.IFolderDAO;
+import org.rssowl.core.persist.events.BookMarkEvent;
+import org.rssowl.core.persist.events.FolderEvent;
+import org.rssowl.core.persist.events.FolderListener;
+import org.rssowl.core.persist.events.SearchMarkEvent;
 import org.rssowl.core.util.ReparentInfo;
 
 import com.db4o.ObjectSet;

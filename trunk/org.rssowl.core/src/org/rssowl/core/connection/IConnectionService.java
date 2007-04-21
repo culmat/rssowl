@@ -27,8 +27,8 @@ package org.rssowl.core.connection;
 import org.apache.commons.httpclient.protocol.SecureProtocolSocketFactory;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.rssowl.core.model.persist.IConditionalGet;
-import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.persist.IConditionalGet;
+import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.util.Pair;
 
 import java.io.InputStream;

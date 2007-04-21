@@ -25,7 +25,7 @@
 package org.rssowl.core.interpreter;
 
 import org.jdom.Element;
-import org.rssowl.core.model.persist.IPersistable;
+import org.rssowl.core.persist.IPersistable;
 
 /**
  * The Element Handler allows to contribute processing of Elements for a Format.

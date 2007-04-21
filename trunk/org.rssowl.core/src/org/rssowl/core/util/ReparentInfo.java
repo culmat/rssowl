@@ -25,7 +25,7 @@
 package org.rssowl.core.util;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.dao.IApplicationService;
+import org.rssowl.core.IApplicationService;
 
 /**
  * An object that holds information regarding a reparenting operation.

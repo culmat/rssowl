@@ -22,7 +22,7 @@
    </extension>
    <extension
          point="org.rssowl.core.ApplicationService">
-      <applicationservice class="org.rssowl.core.model.internal.db4o.ApplicationServiceImpl"/>
+      <applicationservice class="org.rssowl.core.internal.ApplicationServiceImpl"/>
    </extension>
    <extension
          point="org.rssowl.core.IDGenerator">

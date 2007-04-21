@@ -27,11 +27,11 @@ package org.rssowl.core.model.internal;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.rssowl.core.model.IListenerService;
-import org.rssowl.core.model.events.ModelEvent;
-import org.rssowl.core.model.events.runnable.EventType;
-import org.rssowl.core.model.persist.IPersistable;
-import org.rssowl.core.model.persist.pref.PreferencesEvent;
-import org.rssowl.core.model.persist.pref.PreferencesListener;
+import org.rssowl.core.persist.IPersistable;
+import org.rssowl.core.persist.events.ModelEvent;
+import org.rssowl.core.persist.events.runnable.EventType;
+import org.rssowl.core.persist.pref.PreferencesEvent;
+import org.rssowl.core.persist.pref.PreferencesListener;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
 import java.util.Set;

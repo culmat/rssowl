@@ -27,10 +27,10 @@ package org.rssowl.core.internal.interpreter;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.persist.IFeed;
-import org.rssowl.core.model.persist.IImage;
-import org.rssowl.core.model.persist.INews;
-import org.rssowl.core.model.persist.ITextInput;
+import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IImage;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.ITextInput;
 import org.rssowl.core.util.URIUtils;
 
 import java.net.URI;

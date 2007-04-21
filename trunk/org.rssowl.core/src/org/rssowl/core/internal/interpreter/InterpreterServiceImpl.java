@@ -44,8 +44,8 @@ import org.rssowl.core.interpreter.IXMLParser;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.interpreter.ParserException;
 import org.rssowl.core.interpreter.UnknownFormatException;
-import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.IFeed;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.util.ExtensionUtils;
 
 import java.io.InputStream;

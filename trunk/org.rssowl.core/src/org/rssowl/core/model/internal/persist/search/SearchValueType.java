@@ -27,7 +27,7 @@ package org.rssowl.core.model.internal.persist.search;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
-import org.rssowl.core.model.persist.search.ISearchValueType;
+import org.rssowl.core.persist.search.ISearchValueType;
 
 import java.util.List;
 

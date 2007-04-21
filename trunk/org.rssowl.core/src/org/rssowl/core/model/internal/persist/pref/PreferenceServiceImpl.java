@@ -29,10 +29,10 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.rssowl.core.internal.Activator;
-import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.pref.IPreferencesInitializer;
-import org.rssowl.core.model.persist.pref.IPreferenceScope;
-import org.rssowl.core.model.persist.pref.IPreferenceService;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.pref.IPreferenceService;
+import org.rssowl.core.persist.pref.IPreferencesInitializer;
 
 /**
  * @author bpasero

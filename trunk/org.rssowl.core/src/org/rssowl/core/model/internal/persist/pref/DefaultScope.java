@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.internal.persist.pref;
 
-import org.rssowl.core.model.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 
 import java.util.Properties;
 

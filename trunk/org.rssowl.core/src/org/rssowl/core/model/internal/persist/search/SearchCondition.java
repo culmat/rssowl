@@ -26,9 +26,9 @@ package org.rssowl.core.model.internal.persist.search;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.model.internal.persist.AbstractEntity;
-import org.rssowl.core.model.persist.search.ISearchCondition;
-import org.rssowl.core.model.persist.search.ISearchField;
-import org.rssowl.core.model.persist.search.SearchSpecifier;
+import org.rssowl.core.persist.search.ISearchCondition;
+import org.rssowl.core.persist.search.ISearchField;
+import org.rssowl.core.persist.search.SearchSpecifier;
 
 /**
  * <p>

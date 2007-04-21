@@ -26,7 +26,7 @@ package org.rssowl.core.interpreter;
 
 import org.jdom.Attribute;
 import org.jdom.Element;
-import org.rssowl.core.model.persist.IPersistable;
+import org.rssowl.core.persist.IPersistable;
 
 /**
  * The Namespace Handler allows to contribute processing of Namespaces. Use this

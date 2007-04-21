@@ -25,12 +25,12 @@ package org.rssowl.core.model.internal.db4o.dao;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.SafeRunner;
-import org.rssowl.core.model.events.EntityListener;
-import org.rssowl.core.model.events.ModelEvent;
-import org.rssowl.core.model.events.runnable.EventType;
 import org.rssowl.core.model.internal.db4o.DBHelper;
-import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.dao.IEntityDAO;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.dao.IEntityDAO;
+import org.rssowl.core.persist.events.EntityListener;
+import org.rssowl.core.persist.events.ModelEvent;
+import org.rssowl.core.persist.events.runnable.EventType;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
 import java.util.List;

@@ -24,14 +24,14 @@
 package org.rssowl.core.model.internal.db4o.dao;
 
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.events.ModelEvent;
-import org.rssowl.core.model.events.NewsEvent;
-import org.rssowl.core.model.events.NewsListener;
 import org.rssowl.core.model.internal.db4o.DBHelper;
 import org.rssowl.core.model.internal.persist.News;
-import org.rssowl.core.model.persist.INews;
-import org.rssowl.core.model.persist.INews.State;
-import org.rssowl.core.model.persist.dao.INewsDAO;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INews.State;
+import org.rssowl.core.persist.dao.INewsDAO;
+import org.rssowl.core.persist.events.ModelEvent;
+import org.rssowl.core.persist.events.NewsEvent;
+import org.rssowl.core.persist.events.NewsListener;
 
 import com.db4o.ext.Db4oException;
 import com.db4o.query.Query;

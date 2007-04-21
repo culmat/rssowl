@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.persist;
 
-import org.rssowl.core.model.persist.MergeCapable;
+import org.rssowl.core.persist.MergeCapable;
 
 /**
  * Contains the details of a complex merge operation. Examples of a complex

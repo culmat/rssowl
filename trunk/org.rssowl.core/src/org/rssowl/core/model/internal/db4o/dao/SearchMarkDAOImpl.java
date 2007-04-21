@@ -23,11 +23,11 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.events.SearchMarkEvent;
-import org.rssowl.core.model.events.SearchMarkListener;
 import org.rssowl.core.model.internal.persist.SearchMark;
-import org.rssowl.core.model.persist.ISearchMark;
-import org.rssowl.core.model.persist.dao.ISearchMarkDAO;
+import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.dao.ISearchMarkDAO;
+import org.rssowl.core.persist.events.SearchMarkEvent;
+import org.rssowl.core.persist.events.SearchMarkListener;
 
 public final class SearchMarkDAOImpl extends AbstractEntityDAO<ISearchMark,
     SearchMarkListener, SearchMarkEvent> implements ISearchMarkDAO    {

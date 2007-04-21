@@ -23,8 +23,8 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.persist.NewsCounter;
-import org.rssowl.core.model.persist.dao.INewsCounterDAO;
+import org.rssowl.core.persist.NewsCounter;
+import org.rssowl.core.persist.dao.INewsCounterDAO;
 
 import java.util.Collection;
 

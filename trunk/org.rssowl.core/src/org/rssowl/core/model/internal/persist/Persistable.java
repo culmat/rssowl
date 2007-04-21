@@ -26,7 +26,7 @@ package org.rssowl.core.model.internal.persist;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
-import org.rssowl.core.model.persist.IPersistable;
+import org.rssowl.core.persist.IPersistable;
 
 import java.net.URI;
 import java.net.URISyntaxException;

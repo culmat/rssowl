@@ -30,8 +30,8 @@ import org.rssowl.core.model.internal.db4o.DBHelper;
 import org.rssowl.core.model.internal.db4o.DBManager;
 import org.rssowl.core.model.internal.db4o.DatabaseEvent;
 import org.rssowl.core.model.internal.db4o.DatabaseListener;
-import org.rssowl.core.model.persist.IPersistable;
-import org.rssowl.core.model.persist.dao.IPersistableDAO;
+import org.rssowl.core.persist.IPersistable;
+import org.rssowl.core.persist.dao.IPersistableDAO;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;

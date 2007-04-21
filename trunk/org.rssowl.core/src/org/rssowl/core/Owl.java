@@ -29,10 +29,9 @@ import org.rssowl.core.connection.IConnectionService;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.interpreter.IInterpreterService;
 import org.rssowl.core.model.IListenerService;
-import org.rssowl.core.model.dao.IApplicationService;
 import org.rssowl.core.model.dao.IPersistenceService;
-import org.rssowl.core.model.persist.IModelFactory;
-import org.rssowl.core.model.persist.pref.IPreferenceService;
+import org.rssowl.core.persist.IModelFactory;
+import org.rssowl.core.persist.pref.IPreferenceService;
 
 /**
  * The <code>Owl</code> class is the main facade to all API in RSSOwl.

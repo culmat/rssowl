@@ -25,9 +25,9 @@
 package org.rssowl.core.model.internal.persist.pref;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.dao.DynamicDAO;
-import org.rssowl.core.model.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 
 import java.util.Arrays;
 
