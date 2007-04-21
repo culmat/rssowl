@@ -33,9 +33,9 @@ import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.IConditionalGetCompatible;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IProtocolHandler;
-import org.rssowl.core.model.persist.IConditionalGet;
-import org.rssowl.core.model.persist.IFeed;
-import org.rssowl.core.model.persist.IModelFactory;
+import org.rssowl.core.persist.IConditionalGet;
+import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.util.Pair;
 
 import java.io.ByteArrayInputStream;

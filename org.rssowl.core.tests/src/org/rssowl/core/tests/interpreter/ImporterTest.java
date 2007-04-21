@@ -31,10 +31,10 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.persist.IBookMark;
-import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.IFeed;
-import org.rssowl.core.model.persist.IFolder;
+import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFolder;
 
 import java.io.InputStream;
 import java.net.URI;

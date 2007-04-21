@@ -31,9 +31,9 @@ import org.rssowl.core.model.internal.persist.Category;
 import org.rssowl.core.model.internal.persist.ComplexMergeResult;
 import org.rssowl.core.model.internal.persist.Label;
 import org.rssowl.core.model.internal.persist.Person;
-import org.rssowl.core.model.persist.ICategory;
-import org.rssowl.core.model.persist.ILabel;
-import org.rssowl.core.model.persist.IPerson;
+import org.rssowl.core.persist.ICategory;
+import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.util.MergeUtils;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ import java.util.List;
 public class MergeUtilsTest {
 
   /**
-   * Tests {@link MergeUtils#merge(org.rssowl.core.model.persist.MergeCapable, org.rssowl.core.model.persist.MergeCapable)}.
+   * Tests {@link MergeUtils#merge(org.rssowl.core.persist.MergeCapable, org.rssowl.core.persist.MergeCapable)}.
    */
   @Test
   public void testSingleItemMergeWithNullDestination() {
@@ -56,7 +56,7 @@ public class MergeUtilsTest {
   }
   
   /**
-   * Tests {@link MergeUtils#merge(org.rssowl.core.model.persist.MergeCapable, org.rssowl.core.model.persist.MergeCapable)}.
+   * Tests {@link MergeUtils#merge(org.rssowl.core.persist.MergeCapable, org.rssowl.core.persist.MergeCapable)}.
    */
   @Test
   public void testSingleItemMergeWithNonNullDestinationAndNullOrigin() {
@@ -67,7 +67,7 @@ public class MergeUtilsTest {
   }
   
   /**
-   * Tests {@link MergeUtils#merge(List, List, org.rssowl.core.model.persist.IPersistable)}.
+   * Tests {@link MergeUtils#merge(List, List, org.rssowl.core.persist.IPersistable)}.
    */
   @Test
   public void testCollectionMergeWithNullExistingListAndNullNewParent() {
@@ -77,7 +77,7 @@ public class MergeUtilsTest {
   }
   
   /**
-   * Tests {@link MergeUtils#mergeProperties(org.rssowl.core.model.persist.IEntity, org.rssowl.core.model.persist.IEntity)}.
+   * Tests {@link MergeUtils#mergeProperties(org.rssowl.core.persist.IEntity, org.rssowl.core.persist.IEntity)}.
    */
   @Test
   public void testMergeProperties() {

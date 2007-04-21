@@ -34,11 +34,11 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.model.internal.persist.BookMark;
 import org.rssowl.core.model.internal.persist.Feed;
 import org.rssowl.core.model.internal.persist.Folder;
-import org.rssowl.core.model.persist.IBookMark;
-import org.rssowl.core.model.persist.IFeed;
-import org.rssowl.core.model.persist.IFolder;
-import org.rssowl.core.model.persist.dao.DynamicDAO;
-import org.rssowl.core.model.reference.FeedLinkReference;
+import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 

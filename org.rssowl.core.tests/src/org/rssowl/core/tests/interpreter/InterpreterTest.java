@@ -31,8 +31,8 @@ import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.interpreter.UnknownFormatException;
 import org.rssowl.core.model.internal.persist.Feed;
-import org.rssowl.core.model.persist.IFeed;
-import org.rssowl.core.model.persist.INews;
+import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.util.DateUtils;
 import org.xml.sax.InputSource;
 

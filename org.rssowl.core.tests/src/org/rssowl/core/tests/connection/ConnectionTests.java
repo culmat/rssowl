@@ -41,10 +41,10 @@ import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.model.internal.persist.Feed;
-import org.rssowl.core.model.persist.IConditionalGet;
-import org.rssowl.core.model.persist.IFeed;
-import org.rssowl.core.model.persist.dao.DynamicDAO;
-import org.rssowl.core.model.reference.FeedLinkReference;
+import org.rssowl.core.persist.IConditionalGet;
+import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.Pair;
 
 import java.io.InputStream;
