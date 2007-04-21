@@ -87,7 +87,7 @@ import java.util.Set;
 @SuppressWarnings("nls")
 public class ApplicationLayerTest {
   private IModelFactory fFactory;
-  private IApplicationService fAppLayer;
+  private IApplicationService fAppService;
 
   /**
    * @throws Exception
@@ -98,7 +98,7 @@ public class ApplicationLayerTest {
     Owl.getPersistenceService().getModelSearch().shutdown();
     Controller.getDefault().getNewsService().testDirtyShutdown();
     fFactory = Owl.getModelFactory();
-    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
+    fAppService = Owl.getApplicationService();
   }
 
   /**
@@ -119,7 +119,7 @@ public class ApplicationLayerTest {
     IFolder folder = fFactory.createFolder(null, null, "Folder");
     IBookMark mark0 = fFactory.createBookMark(null, folder, new FeedLinkReference(feed0.getLink()), "Mark0");
     DynamicDAO.save(folder);
-    fAppLayer.handleFeedReload(mark0, feed0, null, false);
+    fAppService.handleFeedReload(mark0, feed0, null, false);
 
     IFeed feed1 = fFactory.createFeed(null, new URI("http://www.feed1.com"));
     DynamicDAO.save(feed1);
@@ -129,7 +129,7 @@ public class ApplicationLayerTest {
     feed1 = fFactory.createFeed(null, new URI("http://www.feed1.com"));
     INews news1 = fFactory.createNews(null, feed1, new Date());
     news1.setLink(newsLink);
-    fAppLayer.handleFeedReload(mark1, feed1, null, false);
+    fAppService.handleFeedReload(mark1, feed1, null, false);
 
     assertEquals(INews.State.READ, DynamicDAO.load(INews.class, news1.getId()).getState());
   }
@@ -153,7 +153,7 @@ public class ApplicationLayerTest {
     news.setState(INews.State.READ);
 
     Owl.getPreferenceService().getEntityScope(mark).putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
-    fAppLayer.handleFeedReload(mark, emptyFeed, null, false);
+    fAppService.handleFeedReload(mark, emptyFeed, null, false);
 
     assertEquals(0, feed.getVisibleNews().size());
     assertEquals(INews.State.DELETED, DynamicDAO.load(INews.class, news.getId()).getState());
@@ -190,7 +190,7 @@ public class ApplicationLayerTest {
         }
       };
       DynamicDAO.addEntityListener(INews.class, newsListener);
-      fAppLayer.handleFeedReload(mark, emptyFeed, null, false);
+      fAppService.handleFeedReload(mark, emptyFeed, null, false);
     } finally {
       if (newsListener != null)
         DynamicDAO.removeEntityListener(INews.class, newsListener);
