@@ -27,7 +27,7 @@ package org.rssowl.contrib.internal.nntp;
 import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.IProxyCredentials;
-import org.rssowl.core.connection.internal.DefaultCredentialsProvider;
+import org.rssowl.core.internal.connection.DefaultCredentialsProvider;
 
 import java.net.URI;
 import java.net.URISyntaxException;
