@@ -45,7 +45,7 @@ import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.Person;
 import org.rssowl.core.internal.persist.SearchMark;
 import org.rssowl.core.internal.persist.Source;
-import org.rssowl.core.model.internal.db4o.DBManager;
+import org.rssowl.core.internal.persist.service.DBManager;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
