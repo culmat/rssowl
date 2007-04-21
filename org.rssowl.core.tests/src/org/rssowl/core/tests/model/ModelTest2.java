@@ -990,7 +990,7 @@ public class ModelTest2 {
       DynamicDAO.delete(rootRef.resolve());
 
       /* Asserts Follow */
-      assertEquals(0, Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoot().size());
+      assertEquals(0, Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoots().size());
       assertEquals(0, DynamicDAO.loadAll(IBookMark.class).size());
       assertTrue("Expected one feedDeleted event", feedEventsIssued[0]);
       for (int i = 0; i < folderEventsIssued.length; i++) {
