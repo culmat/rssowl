@@ -30,11 +30,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.model.internal.persist.Feed;
-import org.rssowl.core.model.persist.IFeed;
-import org.rssowl.core.model.persist.INews;
-import org.rssowl.core.model.persist.dao.DynamicDAO;
-import org.rssowl.core.model.persist.dao.INewsDAO;
-import org.rssowl.core.model.reference.FeedLinkReference;
+import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.NewsService;
 

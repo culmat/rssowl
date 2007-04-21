@@ -27,8 +27,8 @@ package org.rssowl.core.tests.interpreter;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.rssowl.core.interpreter.INamespaceHandler;
-import org.rssowl.core.model.persist.IEntity;
-import org.rssowl.core.model.persist.IPersistable;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IPersistable;
 
 /**
  * @author bpasero

@@ -25,10 +25,10 @@
 package org.rssowl.core.tests;
 
 import org.junit.Assert;
+import org.rssowl.core.IApplicationService;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IApplicationService;
+import org.rssowl.core.internal.ApplicationServiceImpl;
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.internal.db4o.ApplicationServiceImpl;
 import org.rssowl.core.model.internal.persist.MergeResult;
 import org.rssowl.core.util.ITask;
 
