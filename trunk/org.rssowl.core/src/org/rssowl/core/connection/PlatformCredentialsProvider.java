@@ -22,16 +22,12 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.internal.connection;
+package org.rssowl.core.connection;
 
 import org.eclipse.core.net.proxy.IProxyData;
 import org.eclipse.core.net.proxy.IProxyService;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Platform;
-import org.rssowl.core.connection.CredentialsException;
-import org.rssowl.core.connection.ICredentials;
-import org.rssowl.core.connection.ICredentialsProvider;
-import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.internal.Activator;
 
 import java.net.MalformedURLException;
@@ -44,11 +40,11 @@ import java.util.Set;
 
 /**
  * The default implementation of the ICredentialsProvider retrieves
- * authentication Credentials from the Platform. *
+ * authentication Credentials from the Platform.
  *
  * @author bpasero
  */
-public class DefaultCredentialsProvider implements ICredentialsProvider {
+public class PlatformCredentialsProvider implements ICredentialsProvider {
 
   /* Unique Key to store Usernames */
   private static final String USERNAME = "org.rssowl.core.connection.auth.Username"; //$NON-NLS-1$
