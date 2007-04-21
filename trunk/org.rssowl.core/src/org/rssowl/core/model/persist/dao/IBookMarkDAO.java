@@ -28,10 +28,10 @@ import org.rssowl.core.model.events.BookMarkListener;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.reference.FeedLinkReference;
 
-import java.util.List;
+import java.util.Collection;
 
 public interface IBookMarkDAO extends IEntityDAO<IBookMark,
     BookMarkListener, BookMarkEvent> {
   
-  List<IBookMark> loadAll(FeedLinkReference feedRef);
+  Collection<IBookMark> loadAll(FeedLinkReference feedRef);
 }
