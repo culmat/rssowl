@@ -34,7 +34,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.dao.IApplicationLayer;
+import org.rssowl.core.model.dao.IApplicationService;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.BookMarkEvent;
 import org.rssowl.core.model.events.BookMarkListener;
@@ -87,7 +87,7 @@ import java.util.Set;
 @SuppressWarnings("nls")
 public class ApplicationLayerTest {
   private IModelFactory fFactory;
-  private IApplicationLayer fAppLayer;
+  private IApplicationService fAppLayer;
 
   /**
    * @throws Exception

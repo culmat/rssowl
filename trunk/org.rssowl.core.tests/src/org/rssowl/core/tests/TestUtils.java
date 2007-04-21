@@ -26,9 +26,9 @@ package org.rssowl.core.tests;
 
 import org.junit.Assert;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IApplicationLayer;
+import org.rssowl.core.model.dao.IApplicationService;
 import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.internal.db4o.ApplicationLayerImpl;
+import org.rssowl.core.model.internal.db4o.ApplicationServiceImpl;
 import org.rssowl.core.model.internal.persist.MergeResult;
 import org.rssowl.core.util.ITask;
 
@@ -58,9 +58,9 @@ public class TestUtils {
    * @throws InvocationTargetException
    */
   public static void saveFeed(MergeResult mergeResult) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
-    Method m = ApplicationLayerImpl.class.getDeclaredMethod("saveFeed", MergeResult.class);
+    Method m = ApplicationServiceImpl.class.getDeclaredMethod("saveFeed", MergeResult.class);
     m.setAccessible(true);
-    IApplicationLayer appLayer = Owl.getPersistenceService().getApplicationLayer();
+    IApplicationService appLayer = Owl.getPersistenceService().getApplicationLayer();
     m.invoke(appLayer, mergeResult);
   }
 
