@@ -60,8 +60,8 @@ public class TestUtils {
   public static void saveFeed(MergeResult mergeResult) throws SecurityException, NoSuchMethodException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
     Method m = ApplicationServiceImpl.class.getDeclaredMethod("saveFeed", MergeResult.class);
     m.setAccessible(true);
-    IApplicationService appLayer = Owl.getPersistenceService().getApplicationLayer();
-    m.invoke(appLayer, mergeResult);
+    IApplicationService appService = Owl.getApplicationService();
+    m.invoke(appService, mergeResult);
   }
 
   /**
