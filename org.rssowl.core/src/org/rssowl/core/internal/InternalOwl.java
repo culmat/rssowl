@@ -52,7 +52,7 @@ public final class InternalOwl {
   private static final String MODEL_TYPESFACTORY_EXTENSION_POINT = "org.rssowl.core.ModelTypesFactory"; //$NON-NLS-1$
 
   /* Extension Point: Persistence Layer */
-  private static final String PERSISTANCE_LAYER_EXTENSION_POINT = "org.rssowl.core.PersistanceLayer"; //$NON-NLS-1$
+  private static final String PERSISTANCE_LAYER_EXTENSION_POINT = "org.rssowl.core.PersistenceService"; //$NON-NLS-1$
 
   private IListenerService fListenerService = new ListenerServiceImpl();
   private IPreferenceService fPreferencesService;

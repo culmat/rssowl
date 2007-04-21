@@ -29,17 +29,13 @@ import org.rssowl.core.model.persist.IConditionalGet;
 import org.rssowl.core.model.persist.IFeed;
 
 /**
- * The <code>IApplicationLayer</code> interface is providing methods that
+ * The <code>IApplicationService</code> interface is providing methods that
  * access the Persistance Layer as required by the Application. It is very
  * important that implementors optimize the performance of all methods.
- * <p>
- * TODO There is some methods in here which are no longer used or only
- * referenced from Test-Cases. Before releasing, make sure to remove them!
- * </p>
  *
  * @author bpasero
  */
-public interface IApplicationLayer {
+public interface IApplicationService {
 
   /**
    * Handles all the persistence-related operations for a feed that has been

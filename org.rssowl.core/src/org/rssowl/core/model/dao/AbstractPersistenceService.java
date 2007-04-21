@@ -47,10 +47,7 @@ import org.rssowl.core.util.ExtensionUtils;
 public abstract class AbstractPersistenceService implements IPersistenceService {
 
   /* ID for Application Layer Contribution */
-  private static final String MODEL_APPLICATION_LAYER_EXTENSION_POINT = "org.rssowl.core.ApplicationLayer"; //$NON-NLS-1$
-
-  /* ID for Model DAO Contribution */
-  private static final String MODEL_DAO_EXTENSION_POINT = "org.rssowl.core.ModelDAO"; //$NON-NLS-1$
+  private static final String MODEL_APPLICATION_LAYER_EXTENSION_POINT = "org.rssowl.core.ApplicationService"; //$NON-NLS-1$
 
   /* ID for Model Search Contribution */
   private static final String MODEL_SEARCH_EXTENSION_POINT = "org.rssowl.core.ModelSearch"; //$NON-NLS-1$
@@ -62,7 +59,7 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
   private static final String MODEL_DAO_FACTORY_EXTENSION_POINT = "org.rssowl.core.DAOFactory";
 
   private IModelSearch fModelSearch;
-  private IApplicationLayer fApplicationLayer;
+  private IApplicationService fApplicationLayer;
   private IDGenerator fIDGenerator;
   private DAOService fDAOService;
 
@@ -91,9 +88,9 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
   /*
    * @see org.rssowl.core.model.dao.IPersistenceService#getApplicationLayer()
    */
-  public IApplicationLayer getApplicationLayer() {
+  public IApplicationService getApplicationLayer() {
     if (fApplicationLayer == null)
-      fApplicationLayer = (IApplicationLayer) ExtensionUtils.loadSingletonExecutableExtension(MODEL_APPLICATION_LAYER_EXTENSION_POINT);
+      fApplicationLayer = (IApplicationService) ExtensionUtils.loadSingletonExecutableExtension(MODEL_APPLICATION_LAYER_EXTENSION_POINT);
 
     return fApplicationLayer;
   }

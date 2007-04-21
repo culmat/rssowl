@@ -67,7 +67,7 @@ public interface IPersistenceService {
    * contains special Methods which are used through the Application and access
    * the persistence layer.
    */
-  IApplicationLayer getApplicationLayer();
+  IApplicationService getApplicationLayer();
 
   /**
    * <p>

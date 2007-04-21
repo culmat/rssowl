@@ -25,7 +25,7 @@
 package org.rssowl.core.util;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.model.dao.IApplicationLayer;
+import org.rssowl.core.model.dao.IApplicationService;
 
 /**
  * An object that holds information regarding a reparenting operation.
@@ -33,7 +33,7 @@ import org.rssowl.core.model.dao.IApplicationLayer;
  * @param <T> The type of the object that will have its parent changed. 
  * @param <P> The type of the parent.
  * 
- * @see IApplicationLayer#reparent(java.util.List, java.util.List)
+ * @see IApplicationService#reparent(java.util.List, java.util.List)
  * 
  */
 public class ReparentInfo<T, P> {
