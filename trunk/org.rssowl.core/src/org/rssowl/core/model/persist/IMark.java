@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.persist;
 
-import org.rssowl.core.model.dao.IApplicationLayer;
+import org.rssowl.core.model.dao.IApplicationService;
 
 import java.util.Date;
 
@@ -117,11 +117,11 @@ public interface IMark extends IEntity  {
   /**
    * Sets the parent folder to <code>folder</code>. Note that this method
    * should not be used under normal circumstances. Instead call
-   * {@link IApplicationLayer#reparent(java.util.List, java.util.List)} to ensure that
+   * {@link IApplicationService#reparent(java.util.List, java.util.List)} to ensure that
    * the event is correctly populated with the old parent.
    * 
    * @param folder new folder parent.
-   * @see IApplicationLayer#reparent(java.util.List, java.util.List)
+   * @see IApplicationService#reparent(java.util.List, java.util.List)
    */
   void setFolder(IFolder folder);
 }

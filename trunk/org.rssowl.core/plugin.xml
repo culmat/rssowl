@@ -3,8 +3,8 @@
 <plugin>
    <extension-point id="ModelTypesFactory" name="Model Types Factory" schema="schema/ModelTypesFactory.exsd"/>
    <extension-point id="ModelSearch" name="Model Search" schema="schema/ModelSearch.exsd"/>
-   <extension-point id="PersistanceLayer" name="Persistance Layer" schema="schema/PersistanceLayer.exsd"/>
-   <extension-point id="ApplicationLayer" name="Application Layer" schema="schema/ApplicationLayer.exsd"/>
+   <extension-point id="PersistenceService" name="Persistence Service" schema="schema/PersistenceService.exsd"/>
+   <extension-point id="ApplicationService" name="Application Service" schema="schema/ApplicationService.exsd"/>
    <extension-point id="PreferencesInitializer" name="Preferences Initializer" schema="schema/PreferencesInitializer.exsd"/>
    <extension-point id="IDGenerator" name="ID Generator" schema="schema/IDGenerator.exsd"/>
    <extension-point id="FormatInterpreter" name="Format Interpreter" schema="schema/FormatInterpreter.exsd"/>
@@ -17,12 +17,12 @@
    <extension-point id="SSLHandler" name="SSL Handler" schema="schema/SSLHandler.exsd"/>
    <extension-point id="DAOFactory" name="DAO Factory" schema="schema/DAOFactory.exsd"/>
    <extension
-         point="org.rssowl.core.PersistanceLayer">
+         point="org.rssowl.core.PersistenceService">
       <persistancelayer class="org.rssowl.core.model.internal.db4o.PersistenceServiceImpl"/>
    </extension>
    <extension
-         point="org.rssowl.core.ApplicationLayer">
-      <applicationlayer class="org.rssowl.core.model.internal.db4o.ApplicationLayerImpl"/>
+         point="org.rssowl.core.ApplicationService">
+      <applicationlayer class="org.rssowl.core.model.internal.db4o.ApplicationServiceImpl"/>
    </extension>
    <extension
          point="org.rssowl.core.IDGenerator">

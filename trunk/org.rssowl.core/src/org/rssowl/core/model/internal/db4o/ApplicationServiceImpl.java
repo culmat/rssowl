@@ -24,7 +24,7 @@
 
 package org.rssowl.core.model.internal.db4o;
 
-import org.rssowl.core.model.dao.IApplicationLayer;
+import org.rssowl.core.model.dao.IApplicationService;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.internal.persist.MergeResult;
 import org.rssowl.core.model.internal.persist.News;
@@ -48,9 +48,9 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
 /**
- * db4o implementation of IApplicationLayer
+ * db4o implementation of IApplicationService
  */
-public class ApplicationLayerImpl implements IApplicationLayer {
+public class ApplicationServiceImpl implements IApplicationService {
   private ObjectContainer fDb = DBManager.getDefault().getObjectContainer();
   private ReadWriteLock fLock;
   private Lock fWriteLock;
@@ -58,7 +58,7 @@ public class ApplicationLayerImpl implements IApplicationLayer {
   /**
    * Creates an instance of this class.
    */
-  public ApplicationLayerImpl() {
+  public ApplicationServiceImpl() {
     DBManager.getDefault().addEntityStoreListener(new DatabaseListener() {
       public void databaseOpened(DatabaseEvent event) {
         fDb = event.getObjectContainer();
