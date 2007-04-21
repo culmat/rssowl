@@ -5,7 +5,7 @@
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
 
-package org.rssowl.contrib.search.internal;
+package org.rssowl.contrib.internal.search;
 
 import org.rssowl.core.model.persist.search.ISearchHit;
 
