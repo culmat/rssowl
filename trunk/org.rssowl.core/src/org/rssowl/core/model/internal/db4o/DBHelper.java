@@ -23,8 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o;
 
-import org.rssowl.core.model.dao.PersistenceException;
-import org.rssowl.core.model.internal.persist.Feed;
+import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
@@ -33,6 +32,7 @@ import org.rssowl.core.persist.events.FeedEvent;
 import org.rssowl.core.persist.events.ModelEvent;
 import org.rssowl.core.persist.events.NewsEvent;
 import org.rssowl.core.persist.events.runnable.EventRunnable;
+import org.rssowl.core.persist.service.PersistenceException;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;

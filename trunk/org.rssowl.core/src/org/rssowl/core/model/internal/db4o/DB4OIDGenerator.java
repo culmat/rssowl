@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o;
 
-import org.rssowl.core.model.dao.IDGenerator;
+import org.rssowl.core.persist.service.IDGenerator;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;

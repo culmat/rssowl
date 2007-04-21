@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
-import org.rssowl.core.model.internal.persist.SearchMark;
+import org.rssowl.core.internal.persist.SearchMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.events.SearchMarkEvent;

@@ -24,7 +24,7 @@
 
 package org.rssowl.core.persist;
 
-import org.rssowl.core.model.internal.persist.Persistable;
+import org.rssowl.core.internal.persist.Persistable;
 
 import java.net.URI;
 import java.util.HashMap;

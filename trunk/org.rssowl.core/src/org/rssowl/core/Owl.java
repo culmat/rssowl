@@ -28,10 +28,9 @@ import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.connection.IConnectionService;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.interpreter.IInterpreterService;
-import org.rssowl.core.model.IListenerService;
-import org.rssowl.core.model.dao.IPersistenceService;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.pref.IPreferenceService;
+import org.rssowl.core.persist.service.IPersistenceService;
 
 /**
  * The <code>Owl</code> class is the main facade to all API in RSSOwl.

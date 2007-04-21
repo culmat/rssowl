@@ -24,9 +24,8 @@
 package org.rssowl.core.model.internal.db4o;
 
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IDGenerator;
-import org.rssowl.core.model.internal.persist.BookMark;
-import org.rssowl.core.model.internal.persist.Feed;
+import org.rssowl.core.internal.persist.BookMark;
+import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
@@ -57,6 +56,7 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.search.IModelSearch;
 import org.rssowl.core.persist.search.ISearchCondition;
 import org.rssowl.core.persist.search.ISearchHit;
+import org.rssowl.core.persist.service.IDGenerator;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;

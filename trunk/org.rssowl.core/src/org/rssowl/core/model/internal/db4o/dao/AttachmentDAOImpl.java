@@ -23,8 +23,8 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
+import org.rssowl.core.internal.persist.Attachment;
 import org.rssowl.core.model.internal.db4o.DBHelper;
-import org.rssowl.core.model.internal.persist.Attachment;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.IAttachmentDAO;

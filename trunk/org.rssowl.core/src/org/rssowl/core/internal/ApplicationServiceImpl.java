@@ -25,19 +25,19 @@
 package org.rssowl.core.internal;
 
 import org.rssowl.core.IApplicationService;
-import org.rssowl.core.model.dao.PersistenceException;
+import org.rssowl.core.internal.persist.MergeResult;
+import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.model.internal.db4o.DBHelper;
 import org.rssowl.core.model.internal.db4o.DBManager;
 import org.rssowl.core.model.internal.db4o.DatabaseEvent;
 import org.rssowl.core.model.internal.db4o.DatabaseListener;
 import org.rssowl.core.model.internal.db4o.EventManager;
-import org.rssowl.core.model.internal.persist.MergeResult;
-import org.rssowl.core.model.internal.persist.News;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.RetentionStrategy;
 
 import com.db4o.ObjectContainer;

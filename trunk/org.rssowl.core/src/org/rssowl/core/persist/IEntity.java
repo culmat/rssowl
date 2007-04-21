@@ -24,7 +24,7 @@
 
 package org.rssowl.core.persist;
 
-import org.rssowl.core.model.dao.IDGenerator;
+import org.rssowl.core.persist.service.IDGenerator;
 
 import java.util.Map;
 

@@ -24,8 +24,8 @@
 
 package org.rssowl.core.persist.reference;
 
-import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.persist.ICategory;
+import org.rssowl.core.persist.service.PersistenceException;
 
 /**
  * Implementation of the <code>ModelReference</code> for the Type

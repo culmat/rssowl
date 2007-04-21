@@ -23,8 +23,8 @@
  **  **********************************************************************  */
 package org.rssowl.core.model.internal.db4o.dao;
 
+import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.model.internal.db4o.DBHelper;
-import org.rssowl.core.model.internal.persist.Feed;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.dao.IFeedDAO;
 import org.rssowl.core.persist.events.FeedEvent;

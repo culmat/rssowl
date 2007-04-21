@@ -25,17 +25,16 @@
 package org.rssowl.core.internal;
 
 import org.rssowl.core.IApplicationService;
+import org.rssowl.core.IListenerService;
 import org.rssowl.core.connection.IConnectionService;
 import org.rssowl.core.internal.connection.ConnectionServiceImpl;
 import org.rssowl.core.internal.interpreter.InterpreterServiceImpl;
+import org.rssowl.core.internal.persist.DefaultModelTypesFactory;
+import org.rssowl.core.internal.persist.pref.PreferenceServiceImpl;
 import org.rssowl.core.interpreter.IInterpreterService;
-import org.rssowl.core.model.IListenerService;
-import org.rssowl.core.model.dao.IPersistenceService;
-import org.rssowl.core.model.internal.ListenerServiceImpl;
-import org.rssowl.core.model.internal.persist.DefaultModelTypesFactory;
-import org.rssowl.core.model.internal.persist.pref.PreferenceServiceImpl;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.pref.IPreferenceService;
+import org.rssowl.core.persist.service.IPersistenceService;
 import org.rssowl.core.util.ExtensionUtils;
 
 /**
