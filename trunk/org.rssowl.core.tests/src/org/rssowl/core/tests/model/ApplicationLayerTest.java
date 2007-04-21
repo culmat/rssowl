@@ -866,7 +866,7 @@ public class ApplicationLayerTest {
     FolderReference root2Ref = new FolderReference(DynamicDAO.save(root2).getId());
     FolderReference root3Ref = new FolderReference(DynamicDAO.save(root3).getId());
 
-    Collection<IFolder> rootFolders = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoot();
+    Collection<IFolder> rootFolders = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoots();
     assertEquals(3, rootFolders.size());
     for (IFolder folder : rootFolders) {
       if (root1Ref.resolve().equals(folder))
@@ -892,7 +892,7 @@ public class ApplicationLayerTest {
     root1 = null;
     System.gc();
 
-    Collection<IFolder> rootFolders = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoot();
+    Collection<IFolder> rootFolders = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoots();
     assertEquals(1, rootFolders.size());
     IFolder folder = rootFolders.iterator().next();
     assertEquals(1, folder.getFolders().size());

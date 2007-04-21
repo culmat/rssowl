@@ -371,7 +371,7 @@ public class DBManagerTest {
       IFolder nonRootFolder = createFolderWithParent();
       DynamicDAO.save(nonRootFolder);
 
-      Collection<IFolder> rootFolderRefs = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoot();
+      Collection<IFolder> rootFolderRefs = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoots();
       assertEquals(3, rootFolderRefs.size());
 
       for (IFolder rootFolder : rootFolderRefs) {

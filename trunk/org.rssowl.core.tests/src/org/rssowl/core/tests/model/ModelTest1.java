@@ -168,7 +168,7 @@ public class ModelTest1 {
 
     folder = null;
     System.gc();
-    folder = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoot().iterator().next();
+    folder = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoots().iterator().next();
     assertEquals(newValue, folder.getProperty(key));
   }
 
