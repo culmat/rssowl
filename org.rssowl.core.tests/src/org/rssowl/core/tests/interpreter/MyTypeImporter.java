@@ -30,7 +30,6 @@ import org.jdom.Element;
 import org.rssowl.core.Owl;
 import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.interpreter.InterpreterException;
-import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IEntity;
 import org.rssowl.core.model.persist.IFeed;
@@ -133,12 +132,11 @@ public class MyTypeImporter implements ITypeImporter {
 
     /* Outline is a BookMark */
     else {
-      IApplicationLayer applicationLayer = Owl.getPersistenceService().getApplicationLayer();
       URI uri = createURI(link);
       if (uri != null) {
 
         /* Check if a Feed with the URL already exists */
-        FeedReference feedRef = applicationLayer.loadFeedReference(uri);
+        FeedReference feedRef = Owl.getPersistenceService().getDAOService().getFeedDAO().loadReference(uri);
 
         /* Create a new Feed then */
         if (feedRef == null) {

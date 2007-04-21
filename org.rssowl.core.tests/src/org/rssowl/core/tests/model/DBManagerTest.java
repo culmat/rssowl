@@ -34,7 +34,6 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.BookMarkAdapter;
 import org.rssowl.core.model.events.BookMarkEvent;
@@ -106,6 +105,7 @@ import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -119,7 +119,6 @@ public class DBManagerTest {
 
   private static final String NOT_IDENTICAL_MESSAGE = "Item in the database is not identical to initial item.";
   private IModelFactory fTypesFactory;
-  private IApplicationLayer fAppLayer;
   private ObjectContainer fDb;
 
   /**
@@ -130,13 +129,12 @@ public class DBManagerTest {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
     fTypesFactory = Owl.getModelFactory();
-    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
     fDb = DBManager.getDefault().getObjectContainer();
   }
-  
+
   /**
-   * Tests that deleting a search condition removes it and its search field
-   * from the database.
+   * Tests that deleting a search condition removes it and its search field from
+   * the database.
    */
   @Test
   public void testDeleteSearchCondition() {
@@ -144,8 +142,7 @@ public class DBManagerTest {
     ISearchMark searchMark = fTypesFactory.createSearchMark(null, folder, "Mark");
     DynamicDAO.save(folder);
     ISearchField searchField = fTypesFactory.createSearchField(0, "SomeEntity");
-    ISearchCondition searchCondition = fTypesFactory.createSearchCondition(null,
-        searchMark, searchField, SearchSpecifier.BEGINS_WITH, "value");
+    ISearchCondition searchCondition = fTypesFactory.createSearchCondition(null, searchMark, searchField, SearchSpecifier.BEGINS_WITH, "value");
     DynamicDAO.save(searchMark);
     assertNotNull(DynamicDAO.load(ISearchCondition.class, searchCondition.getId()));
     long searchFieldId = fDb.ext().getID(searchCondition.getField());
@@ -155,18 +152,17 @@ public class DBManagerTest {
     assertNull(fDb.ext().getByID(searchFieldId));
     assertEquals(0, searchMark.getSearchConditions().size());
   }
-  
+
   /**
-   * Tests that deleting a search mark removes it from the database and
-   * cascades it appropriately to its children.
+   * Tests that deleting a search mark removes it from the database and cascades
+   * it appropriately to its children.
    */
   @Test
   public void testDeleteSearchMark() {
     IFolder folder = fTypesFactory.createFolder(null, null, "Folder");
     ISearchMark searchMark = fTypesFactory.createSearchMark(null, folder, "Mark");
     ISearchField searchField = fTypesFactory.createSearchField(0, "SomeEntity");
-    ISearchCondition searchCondition = fTypesFactory.createSearchCondition(null,
-        searchMark, searchField, SearchSpecifier.BEGINS_WITH, "value");
+    ISearchCondition searchCondition = fTypesFactory.createSearchCondition(null, searchMark, searchField, SearchSpecifier.BEGINS_WITH, "value");
     DynamicDAO.save(folder);
     assertNotNull(DynamicDAO.load(ISearchMark.class, searchMark.getId()));
     assertNotNull(DynamicDAO.load(ISearchCondition.class, searchCondition.getId()));
@@ -209,7 +205,7 @@ public class DBManagerTest {
 
   private IBookMark createBookMark(IFolder folder) throws PersistenceException {
     IFeed feed = createFeed();
-    IFeed savedFeed = fAppLayer.loadFeed(feed.getLink());
+    IFeed savedFeed = Owl.getPersistenceService().getDAOService().getFeedDAO().load(feed.getLink());
     if (savedFeed == null)
       savedFeed = DynamicDAO.save(feed);
 
@@ -375,7 +371,7 @@ public class DBManagerTest {
       IFolder nonRootFolder = createFolderWithParent();
       DynamicDAO.save(nonRootFolder);
 
-      List<IFolder> rootFolderRefs = fAppLayer.loadRootFolders();
+      Collection<IFolder> rootFolderRefs = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoot();
       assertEquals(3, rootFolderRefs.size());
 
       for (IFolder rootFolder : rootFolderRefs) {
@@ -1029,8 +1025,8 @@ public class DBManagerTest {
   }
 
   /**
-   * Tests that {@link IFeedDAO#save(IFeed)} cascades the complex
-   * types of INews appropriately.
+   * Tests that {@link IFeedDAO#save(IFeed)} cascades the complex types of INews
+   * appropriately.
    */
   @Test
   public void testSaveFeedNewsCascadeWithGC() {
@@ -1061,8 +1057,8 @@ public class DBManagerTest {
   }
 
   /**
-   * Tests that {@link INewsDAO#save(INews)} cascades the complex
-   * types appropriately.
+   * Tests that {@link INewsDAO#save(INews)} cascades the complex types
+   * appropriately.
    */
   @Test
   public void testSaveNewsCascadeWithGC() {
@@ -1093,7 +1089,7 @@ public class DBManagerTest {
   }
 
   /**
-   * Tests that {@link IApplicationLayer#saveNews(List)} cascades the complex
+   * Tests that {@link DynamicDAO#saveAll(Collection)} cascades the complex
    * types appropriately.
    */
   @Test
@@ -1105,7 +1101,7 @@ public class DBManagerTest {
     URI attachmentLink = news.getAttachments().get(0).getLink();
     String categoryName = news.getCategories().get(0).getName();
     URI sourceLink = news.getSource().getLink();
-    fAppLayer.saveNews(Collections.singletonList(news));
+    DynamicDAO.saveAll(Collections.singletonList(news));
     NewsReference newsRef = new NewsReference(news.getId());
     feed = null;
     news = null;
@@ -1117,7 +1113,7 @@ public class DBManagerTest {
     categoryName = categoryName + " changed";
     sourceLink = createURI(sourceLink.toString() + "/new");
     updateNews(authorName, attachmentLink, categoryName, sourceLink, news);
-    fAppLayer.saveNews(Collections.singletonList(news));
+    DynamicDAO.saveAll(Collections.singletonList(news));
     news = null;
     System.gc();
     news = newsRef.resolve();
@@ -1131,8 +1127,7 @@ public class DBManagerTest {
     news.getSource().setLink(sourceLink);
   }
 
-  private void assertNewsEquals(String categoryName, URI attachmentLink,
-      String authorName, URI sourceLink, INews news) {
+  private void assertNewsEquals(String categoryName, URI attachmentLink, String authorName, URI sourceLink, INews news) {
     assertNotNull(news);
     assertEquals(1, news.getCategories().size());
     assertEquals(categoryName, news.getCategories().get(0).getName());
@@ -1465,7 +1460,7 @@ public class DBManagerTest {
       DynamicDAO.addEntityListener(INews.class, newsListener);
       List<INews> newsList = new ArrayList<INews>();
       newsList.add(news);
-      fAppLayer.setNewsState(newsList, State.NEW, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.NEW, true, false);
       DynamicDAO.removeEntityListener(INews.class, newsListener);
       DynamicDAO.delete(news);
       DynamicDAO.delete(feed);
@@ -1479,7 +1474,7 @@ public class DBManagerTest {
   }
 
   /**
-   * Tests {@link IApplicationLayer#setNewsState(List, State, boolean, boolean)}
+   * Tests {@link INewsDAO#setState(Collection, State, boolean, boolean)}
    */
   @Test
   public void testNewsManagerSetState() {
@@ -1504,26 +1499,26 @@ public class DBManagerTest {
     try {
       List<INews> newsList = new ArrayList<INews>();
       newsList.add(newsItem);
-      fAppLayer.setNewsState(newsList, State.UPDATED, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.UPDATED, true, false);
       INews news = newsRef.resolve();
       assertEquals(State.UPDATED, news.getState());
-      fAppLayer.setNewsState(newsList, State.DELETED, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.DELETED, true, false);
       news = newsRef.resolve();
       assertEquals(State.DELETED, news.getState());
-      fAppLayer.setNewsState(newsList, State.HIDDEN, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.HIDDEN, true, false);
       news = newsRef.resolve();
       assertEquals(State.HIDDEN, news.getState());
-      fAppLayer.setNewsState(newsList, State.READ, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.READ, true, false);
       news = newsRef.resolve();
       assertEquals(State.READ, news.getState());
-      fAppLayer.setNewsState(newsList, State.UNREAD, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.UNREAD, true, false);
       news = newsRef.resolve();
       assertEquals(State.UNREAD, news.getState());
-      fAppLayer.setNewsState(newsList, State.NEW, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.NEW, true, false);
       news = newsRef.resolve();
       assertEquals(State.NEW, news.getState());
       // Make sure it doesn't change when we set it to the same
-      fAppLayer.setNewsState(newsList, State.NEW, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.NEW, true, false);
       news = newsRef.resolve();
       assertEquals(State.NEW, news.getState());
 
@@ -1602,8 +1597,7 @@ public class DBManagerTest {
   }
 
   /**
-   * Tests that
-   * {@link IApplicationLayer#setNewsState(List, State, boolean, boolean)}
+   * Tests that {@link INewsDAO#setState(Collection, State, boolean, boolean)}
    * changes the state in news that have the same link but are in different
    * feeds.
    */
@@ -1675,7 +1669,7 @@ public class DBManagerTest {
       List<INews> newsList2 = new ArrayList<INews>();
       newsList2.add(newsItem2);
 
-      fAppLayer.setNewsState(newsList1, State.UPDATED, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList1, State.UPDATED, true, false);
       INews news1 = newsRef1.resolve();
       INews news2 = newsRef2.resolve();
       INews news3 = newsRef3.resolve();
@@ -1683,7 +1677,7 @@ public class DBManagerTest {
       assertEquals(State.UPDATED, news2.getState());
       assertEquals(State.NEW, news3.getState());
 
-      fAppLayer.setNewsState(newsList2, State.DELETED, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList2, State.DELETED, true, false);
       news1 = newsRef1.resolve();
       news2 = newsRef2.resolve();
       news3 = newsRef3.resolve();
@@ -1691,7 +1685,7 @@ public class DBManagerTest {
       assertEquals(State.DELETED, news2.getState());
       assertEquals(State.NEW, news3.getState());
 
-      fAppLayer.setNewsState(newsList1, State.HIDDEN, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList1, State.HIDDEN, true, false);
       news1 = newsRef1.resolve();
       news2 = newsRef2.resolve();
       news3 = newsRef3.resolve();
@@ -1699,7 +1693,7 @@ public class DBManagerTest {
       assertEquals(State.HIDDEN, news2.getState());
       assertEquals(State.NEW, news3.getState());
 
-      fAppLayer.setNewsState(newsList2, State.READ, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList2, State.READ, true, false);
       news1 = newsRef1.resolve();
       news2 = newsRef2.resolve();
       news3 = newsRef3.resolve();
@@ -1707,7 +1701,7 @@ public class DBManagerTest {
       assertEquals(State.READ, news2.getState());
       assertEquals(State.NEW, news3.getState());
 
-      fAppLayer.setNewsState(newsList1, State.UNREAD, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList1, State.UNREAD, true, false);
       news1 = newsRef1.resolve();
       news2 = newsRef2.resolve();
       news3 = newsRef3.resolve();
@@ -1715,7 +1709,7 @@ public class DBManagerTest {
       assertEquals(State.UNREAD, news2.getState());
       assertEquals(State.NEW, news3.getState());
 
-      fAppLayer.setNewsState(newsList2, State.NEW, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList2, State.NEW, true, false);
       news1 = newsRef1.resolve();
       news2 = newsRef2.resolve();
       news3 = newsRef3.resolve();
@@ -1724,7 +1718,7 @@ public class DBManagerTest {
       assertEquals(State.NEW, news3.getState());
 
       // Make sure it doesn't change when we set it to the same
-      fAppLayer.setNewsState(newsList1, State.NEW, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList1, State.NEW, true, false);
       news1 = newsRef1.resolve();
       news2 = newsRef2.resolve();
       news3 = newsRef3.resolve();
@@ -1742,8 +1736,7 @@ public class DBManagerTest {
   }
 
   /**
-   * Tests that
-   * {@link IApplicationLayer#setNewsState(List, State, boolean, boolean)}
+   * Tests that {@link INewsDAO#setState(Collection, State, boolean, boolean)}
    * changes the state in news that have the same guid but are in different
    * feeds.
    */
@@ -1812,7 +1805,7 @@ public class DBManagerTest {
       List<INews> newsList2 = new ArrayList<INews>();
       newsList2.add(newsItem2);
 
-      fAppLayer.setNewsState(newsList1, State.UPDATED, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList1, State.UPDATED, true, false);
       INews news1 = newsRef1.resolve();
       INews news2 = newsRef2.resolve();
       INews news3 = newsRef3.resolve();
@@ -1820,7 +1813,7 @@ public class DBManagerTest {
       assertEquals(State.UPDATED, news2.getState());
       assertEquals(State.NEW, news3.getState());
 
-      fAppLayer.setNewsState(newsList2, State.DELETED, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList2, State.DELETED, true, false);
       news1 = newsRef1.resolve();
       news2 = newsRef2.resolve();
       news3 = newsRef3.resolve();
@@ -1828,7 +1821,7 @@ public class DBManagerTest {
       assertEquals(State.DELETED, news2.getState());
       assertEquals(State.NEW, news3.getState());
 
-      fAppLayer.setNewsState(newsList1, State.HIDDEN, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList1, State.HIDDEN, true, false);
       news1 = newsRef1.resolve();
       news2 = newsRef2.resolve();
       news3 = newsRef3.resolve();
@@ -1836,7 +1829,7 @@ public class DBManagerTest {
       assertEquals(State.HIDDEN, news2.getState());
       assertEquals(State.NEW, news3.getState());
 
-      fAppLayer.setNewsState(newsList2, State.READ, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList2, State.READ, true, false);
       news1 = newsRef1.resolve();
       news2 = newsRef2.resolve();
       news3 = newsRef3.resolve();
@@ -1844,7 +1837,7 @@ public class DBManagerTest {
       assertEquals(State.READ, news2.getState());
       assertEquals(State.NEW, news3.getState());
 
-      fAppLayer.setNewsState(newsList1, State.UNREAD, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList1, State.UNREAD, true, false);
       news1 = newsRef1.resolve();
       news2 = newsRef2.resolve();
       news3 = newsRef3.resolve();
@@ -1852,7 +1845,7 @@ public class DBManagerTest {
       assertEquals(State.UNREAD, news2.getState());
       assertEquals(State.NEW, news3.getState());
 
-      fAppLayer.setNewsState(newsList2, State.NEW, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList2, State.NEW, true, false);
       news1 = newsRef1.resolve();
       news2 = newsRef2.resolve();
       news3 = newsRef3.resolve();
@@ -1861,7 +1854,7 @@ public class DBManagerTest {
       assertEquals(State.NEW, news3.getState());
 
       // Make sure it doesn't change when we set it to the same
-      fAppLayer.setNewsState(newsList1, State.NEW, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList1, State.NEW, true, false);
       news1 = newsRef1.resolve();
       news2 = newsRef2.resolve();
       news3 = newsRef3.resolve();
@@ -1879,7 +1872,7 @@ public class DBManagerTest {
   }
 
   /**
-   * Tests {@link IApplicationLayer#setNewsState(List, State, boolean, boolean)}.
+   * Tests {@link INewsDAO#setState(Collection, State, boolean, boolean)}.
    */
   @Test
   public void testNewsManagerSetStateWithGuidNull() {
@@ -1893,26 +1886,26 @@ public class DBManagerTest {
     newsRef = new NewsReference(newsItem.getId());
     List<INews> newsList = new ArrayList<INews>();
     newsList.add(newsItem);
-    fAppLayer.setNewsState(newsList, State.UPDATED, true, false);
+    Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.UPDATED, true, false);
     INews news = newsRef.resolve();
     assertEquals(State.UPDATED, news.getState());
-    fAppLayer.setNewsState(newsList, State.DELETED, true, false);
+    Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.DELETED, true, false);
     news = newsRef.resolve();
     assertEquals(State.DELETED, news.getState());
-    fAppLayer.setNewsState(newsList, State.HIDDEN, true, false);
+    Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.HIDDEN, true, false);
     news = newsRef.resolve();
     assertEquals(State.HIDDEN, news.getState());
-    fAppLayer.setNewsState(newsList, State.READ, true, false);
+    Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.READ, true, false);
     news = newsRef.resolve();
     assertEquals(State.READ, news.getState());
-    fAppLayer.setNewsState(newsList, State.UNREAD, true, false);
+    Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.UNREAD, true, false);
     news = newsRef.resolve();
     assertEquals(State.UNREAD, news.getState());
-    fAppLayer.setNewsState(newsList, State.NEW, true, false);
+    Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.NEW, true, false);
     news = newsRef.resolve();
     assertEquals(State.NEW, news.getState());
     // Make sure it doesn't change when we set it to the same
-    fAppLayer.setNewsState(newsList, State.NEW, true, false);
+    Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, State.NEW, true, false);
     news = newsRef.resolve();
     assertEquals(State.NEW, news.getState());
 

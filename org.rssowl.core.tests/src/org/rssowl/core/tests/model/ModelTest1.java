@@ -34,7 +34,6 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
-import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.events.FolderAdapter;
 import org.rssowl.core.model.events.FolderEvent;
 import org.rssowl.core.model.events.FolderListener;
@@ -78,7 +77,6 @@ import java.util.Set;
  */
 public class ModelTest1 {
   private IModelFactory fFactory;
-  private IApplicationLayer fAppLayer;
 
   /**
    * @throws Exception
@@ -88,7 +86,6 @@ public class ModelTest1 {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
     fFactory = Owl.getModelFactory();
-    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
   }
 
   /**
@@ -145,7 +142,7 @@ public class ModelTest1 {
     };
     DynamicDAO.addEntityListener(IFolder.class, listener);
     try {
-      fAppLayer.deleteFolders(foldersToRemove);
+      DynamicDAO.deleteAll(foldersToRemove);
       assertEquals(true, folderDeletedCalled[0]);
       assertEquals(true, folderUpdatedCalled[0]);
     } finally {
@@ -171,7 +168,7 @@ public class ModelTest1 {
 
     folder = null;
     System.gc();
-    folder = fAppLayer.loadRootFolders().get(0);
+    folder = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoot().iterator().next();
     assertEquals(newValue, folder.getProperty(key));
   }
 

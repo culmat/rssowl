@@ -34,7 +34,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.internal.persist.BookMark;
 import org.rssowl.core.model.internal.persist.Feed;
@@ -97,7 +96,6 @@ public class PerformanceTest {
   private static final int JOBS = 10;
 
   private URI fPluginLocation;
-  private IApplicationLayer fAppLayer;
   private Controller fController;
   private IModelSearch fModelSearch;
 
@@ -110,7 +108,6 @@ public class PerformanceTest {
     Owl.getPersistenceService().recreateSchema();
     fModelSearch = Owl.getPersistenceService().getModelSearch();
     fModelSearch.shutdown();
-    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
     fPluginLocation = FileLocator.toFileURL(Platform.getBundle("org.rssowl.core.tests").getEntry("/")).toURI();
     fController = Controller.getDefault();
   }
@@ -535,7 +532,7 @@ public class PerformanceTest {
           news.addAll(feedRef.resolve().getNews());
         }
 
-        fAppLayer.setNewsState(news, INews.State.HIDDEN, udateEquivalent, false);
+        Owl.getPersistenceService().getDAOService().getNewsDAO().setState(news, INews.State.HIDDEN, udateEquivalent, false);
 
         return Status.OK_STATUS;
       }

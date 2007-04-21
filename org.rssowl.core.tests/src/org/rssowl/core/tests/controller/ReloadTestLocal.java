@@ -32,7 +32,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
-import org.rssowl.core.model.dao.IApplicationLayer;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.events.AttachmentEvent;
 import org.rssowl.core.model.events.AttachmentListener;
@@ -46,6 +45,7 @@ import org.rssowl.core.model.persist.IFeed;
 import org.rssowl.core.model.persist.IFolder;
 import org.rssowl.core.model.persist.INews;
 import org.rssowl.core.model.persist.dao.DynamicDAO;
+import org.rssowl.core.model.persist.dao.INewsDAO;
 import org.rssowl.core.model.persist.pref.IPreferenceScope;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FeedReference;
@@ -83,9 +83,9 @@ import java.util.Set;
 public class ReloadTestLocal {
   private NewsService fService;
   private Controller fController;
-  private IApplicationLayer fApplicationLayer;
   private SimpleDateFormat fDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz"); //$NON-NLS-1$
   private Random fRand = new Random();
+  private INewsDAO fNewsDao;
 
   /**
    * @throws Exception
@@ -99,7 +99,7 @@ public class ReloadTestLocal {
 
     fService = Controller.getDefault().getNewsService();
     fController = Controller.getDefault();
-    fApplicationLayer = Owl.getPersistenceService().getApplicationLayer();
+    fNewsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
   }
 
   @Test
@@ -167,7 +167,7 @@ public class ReloadTestLocal {
       assertEquals(1, addedCounter[0]);
 
       /* Set to Unread */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
       assertEquals(1, updatedCounter[0]);
 
       /* Second Reload with different Title */
@@ -189,7 +189,7 @@ public class ReloadTestLocal {
       }
 
       /* Set to Read */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       assertEquals(3, updatedCounter[0]);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(2, feedRef.resolve().getNews().size());
@@ -243,7 +243,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Unread */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
 
       /* Second Reload with different Link */
       InMemoryProtocolHandler.FEED = generateFeed(null, "http://www.link_other.de", null, null);
@@ -261,7 +261,7 @@ public class ReloadTestLocal {
       }
 
       /* Set to Read */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(2, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -318,7 +318,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Unread */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
 
       /* Second Reload with different Guid */
       InMemoryProtocolHandler.FEED = generateFeed(null, null, "http://www.guid_other.de", null);
@@ -336,7 +336,7 @@ public class ReloadTestLocal {
       }
 
       /* Set to Read */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(2, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -393,7 +393,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Unread */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
 
       /* Second Reload with updated Title */
       InMemoryProtocolHandler.FEED = generateFeed("Title *updated*", "http://www.link.de", null, null);
@@ -404,7 +404,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -427,7 +427,7 @@ public class ReloadTestLocal {
       }
 
       /* Set to Read */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(2, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -484,7 +484,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Unread */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
 
       /* Second Reload with updated Title */
       InMemoryProtocolHandler.FEED = generateFeed("Title *updated*", null, "http://www.guid.de", null);
@@ -495,7 +495,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -518,7 +518,7 @@ public class ReloadTestLocal {
       }
 
       /* Set to Read */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(2, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -584,7 +584,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Unread */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
 
       /* Second Reload with updated description */
       long ms = now + 100000;
@@ -597,7 +597,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.UNREAD, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -621,7 +621,7 @@ public class ReloadTestLocal {
       }
 
       /* Set to Read */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(2, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -680,7 +680,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Unread */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
 
       /* Second Reload with updated Title */
       InMemoryProtocolHandler.FEED = generateFeed("Title *updated*", "http://www.link.de", null, fDateFormat.format(now));
@@ -691,7 +691,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -708,7 +708,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.READ, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -725,7 +725,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -748,7 +748,7 @@ public class ReloadTestLocal {
       }
 
       /* Set to Read */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(2, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -807,7 +807,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Unread */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
 
       /* Second Reload with updated Title */
       InMemoryProtocolHandler.FEED = generateFeed("Title *updated*", null, "http://www.guid.de", fDateFormat.format(now));
@@ -818,7 +818,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -835,7 +835,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.READ, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -852,7 +852,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -875,7 +875,7 @@ public class ReloadTestLocal {
       }
 
       /* Set to Read */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(2, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -934,7 +934,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Unread */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
 
       /* Second Reload with updated Title */
       InMemoryProtocolHandler.FEED = generateFeed("Title *updated*", "http://www.link.de", "http://www.guid.de", null);
@@ -945,7 +945,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -961,7 +961,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.READ, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -977,7 +977,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -1000,7 +1000,7 @@ public class ReloadTestLocal {
       }
 
       /* Set to Read */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(2, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -1059,7 +1059,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Unread */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
 
       /* Second Reload with updated Title */
       InMemoryProtocolHandler.FEED = generateFeed("Title *updated*", "http://www.link.de", "http://www.guid.de", fDateFormat.format(now));
@@ -1070,7 +1070,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -1086,7 +1086,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.READ, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -1103,7 +1103,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.READ, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -1119,7 +1119,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -1136,7 +1136,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -1153,7 +1153,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.UPDATED, feedRef.resolve().getNews().get(0).getState());
 
       /* Set to Read and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -1176,7 +1176,7 @@ public class ReloadTestLocal {
       }
 
       /* Set to Read */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.READ, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.READ, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
       assertEquals(2, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
@@ -1234,7 +1234,7 @@ public class ReloadTestLocal {
       assertEquals(INews.State.NEW, feedRef.resolve().getNews().get(0).getState());
 
       /* Delete News (set to Hidden) */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.HIDDEN, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.HIDDEN, true, false);
       assertEquals(1, feedRef.resolve().getNews().size());
       assertEquals(0, getUnreadCount(feed));
       assertEquals(0, getNewCount(feed));
@@ -1264,7 +1264,7 @@ public class ReloadTestLocal {
       news = feedRef.resolve().getNews();
       for (INews newsItem : news) {
         if ("http://www.link.de".equals(newsItem.getLink().toString()))
-          fApplicationLayer.setNewsState(new ArrayList<INews>(Arrays.asList(newsItem)), INews.State.DELETED, true, false);
+          fNewsDao.setState(new ArrayList<INews>(Arrays.asList(newsItem)), INews.State.DELETED, true, false);
       }
 
       news = feedRef.resolve().getNews();
@@ -1332,7 +1332,7 @@ public class ReloadTestLocal {
       assertEquals("bpasero", feedRef.resolve().getNews().get(0).getAuthor().getName());
 
       /* Set to Unread */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
       assertEquals(1, updatedCounter[0]);
 
       /* Second Reload - changed Description */
@@ -1346,7 +1346,7 @@ public class ReloadTestLocal {
       assertEquals(2, updatedCounter[0]);
 
       /* Set to Unread and Reload */
-      fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
+      fNewsDao.setState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
       fController.reload(bookmark, null, new NullProgressMonitor());
 
       /* This Reload - added Enclosure */
@@ -1465,7 +1465,7 @@ public class ReloadTestLocal {
     assertEquals(1, getNewCount(feed));
 
     /* Set to UNREAD */
-    fApplicationLayer.setNewsState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
+    fNewsDao.setState(feedRef.resolve().getNews(), INews.State.UNREAD, true, false);
     assertEquals(0, getNewCount(feed));
 
     /* Second Reload */

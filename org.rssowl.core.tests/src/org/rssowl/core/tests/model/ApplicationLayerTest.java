@@ -58,6 +58,8 @@ import org.rssowl.core.model.persist.ISearchMark;
 import org.rssowl.core.model.persist.INews.State;
 import org.rssowl.core.model.persist.dao.DynamicDAO;
 import org.rssowl.core.model.persist.dao.IBookMarkDAO;
+import org.rssowl.core.model.persist.dao.IFeedDAO;
+import org.rssowl.core.model.persist.dao.IFolderDAO;
 import org.rssowl.core.model.reference.BookMarkReference;
 import org.rssowl.core.model.reference.FeedLinkReference;
 import org.rssowl.core.model.reference.FeedReference;
@@ -230,7 +232,7 @@ public class ApplicationLayerTest {
         }
       };
       DynamicDAO.addEntityListener(INews.class, newsListener);
-      fAppLayer.setNewsState(newsList, INews.State.NEW, true, true);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, INews.State.NEW, true, true);
       assertEquals(true, newsUpdatedCalled[0]);
     } finally {
       if (newsListener != null)
@@ -285,7 +287,7 @@ public class ApplicationLayerTest {
         }
       };
       DynamicDAO.addEntityListener(INews.class, newsListener);
-      fAppLayer.setNewsState(newsList, INews.State.READ, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, INews.State.READ, true, false);
       assertEquals(true, newsUpdatedCalled[0]);
     } finally {
       if (newsListener != null)
@@ -327,8 +329,8 @@ public class ApplicationLayerTest {
   }
 
   /**
-   * Tests that {@link IApplicationLayer#saveNews(List)} sets the current and
-   * old state correctly when firing a newsUpdated event.
+   * Tests that {@link DynamicDAO#saveAll(Collection)} sets the current and old
+   * state correctly when firing a newsUpdated event.
    *
    * @throws Exception
    */
@@ -347,7 +349,7 @@ public class ApplicationLayerTest {
     final INews savedNews = feed.getNews().get(0);
     savedNews.setTitle("News Title Updated #1");
 
-    List<INews> newsList = new ArrayList<INews>();
+    Collection<INews> newsList = new ArrayList<INews>();
     newsList.add(savedNews);
 
     NewsListener newsListener = new NewsAdapter() {
@@ -362,7 +364,7 @@ public class ApplicationLayerTest {
     };
     DynamicDAO.addEntityListener(INews.class, newsListener);
     try {
-      newsList = fAppLayer.saveNews(newsList);
+      DynamicDAO.saveAll(newsList);
     } finally {
       DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
@@ -377,16 +379,16 @@ public class ApplicationLayerTest {
       }
     };
     DynamicDAO.addEntityListener(INews.class, newsListener);
-    newsList.get(0).setState(State.UPDATED);
+    newsList.iterator().next().setState(State.UPDATED);
     try {
-      fAppLayer.saveNews(newsList);
+      DynamicDAO.saveAll(newsList);
     } finally {
       DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
 
   /**
-   * Tests {@link IApplicationLayer#loadFeedReference(URI)}.
+   * Tests {@link IFeedDAO#loadReference(URI)}.
    *
    * @throws Exception
    */
@@ -400,13 +402,13 @@ public class ApplicationLayerTest {
     IFeed feed2 = new Feed(feed2Url);
     feed2 = DynamicDAO.save(feed2);
 
-    assertEquals(feed1.getId().longValue(), fAppLayer.loadFeedReference(feed1Url).getId());
+    assertEquals(feed1.getId().longValue(), Owl.getPersistenceService().getDAOService().getFeedDAO().loadReference(feed1Url).getId());
 
-    assertEquals(feed2.getId().longValue(), fAppLayer.loadFeedReference(feed2Url).getId());
+    assertEquals(feed2.getId().longValue(), Owl.getPersistenceService().getDAOService().getFeedDAO().loadReference(feed2Url).getId());
   }
 
   /**
-   * Tests {@link IApplicationLayer#loadFeed(URI)}.
+   * Tests {@link IFeedDAO#load(URI)}.
    *
    * @throws Exception
    */
@@ -420,12 +422,12 @@ public class ApplicationLayerTest {
     IFeed feed2 = new Feed(feed2Url);
     feed2 = DynamicDAO.save(feed2);
 
-    assertEquals(feed1, fAppLayer.loadFeed(feed1Url));
-    assertEquals(feed2, fAppLayer.loadFeed(feed2Url));
+    assertEquals(feed1, Owl.getPersistenceService().getDAOService().getFeedDAO().load(feed1Url));
+    assertEquals(feed2, Owl.getPersistenceService().getDAOService().getFeedDAO().load(feed2Url));
   }
 
   /**
-   * Tests {@link IApplicationLayer#loadFeed(URI)}.
+   * Tests {@link IFeedDAO#load(URI)}.
    *
    * @throws Exception
    */
@@ -438,14 +440,14 @@ public class ApplicationLayerTest {
     long newsId = feed1.getNews().get(0).getId();
     feed1 = null;
     System.gc();
-    feed1 = fAppLayer.loadFeed(feed1Url);
+    feed1 = Owl.getPersistenceService().getDAOService().getFeedDAO().load(feed1Url);
     assertNotNull(feed1);
     assertEquals(1, feed1.getNews().size());
     assertEquals(newsId, feed1.getNews().get(0).getId());
   }
 
   /**
-   * Tests {@link IApplicationLayer#saveNews(List)}.
+   * Tests {@link DynamicDAO#saveAll(Collection)}.
    *
    * @throws Exception
    */
@@ -499,8 +501,7 @@ public class ApplicationLayerTest {
     };
     DynamicDAO.addEntityListener(INews.class, newsListener);
     try {
-      List<INews> savedNews = fAppLayer.saveNews(newsList);
-      assertEquals(newsList, savedNews);
+      DynamicDAO.saveAll(newsList);
     } finally {
       DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
@@ -508,7 +509,7 @@ public class ApplicationLayerTest {
   }
 
   /**
-   * Test {@link IApplicationLayer#reparent(List, List)}
+   * Test {@link IFolderDAO#reparent(List, List)}
    *
    * @throws Exception
    */
@@ -615,7 +616,7 @@ public class ApplicationLayerTest {
       List<ReparentInfo<IMark, IFolder>> markInfos = new ArrayList<ReparentInfo<IMark, IFolder>>();
       markInfos.add(new ReparentInfo<IMark, IFolder>(bookMark, newMarkParent, null, null));
       markInfos.add(new ReparentInfo<IMark, IFolder>(searchMark, newMarkParent, null, null));
-      fAppLayer.reparent(folderInfos, markInfos);
+      Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(folderInfos, markInfos);
 
       /* Asserts Follow */
 
@@ -664,7 +665,7 @@ public class ApplicationLayerTest {
     DynamicDAO.save(feed);
     FeedLinkReference feedLinkRef = new FeedLinkReference(feed.getLink());
 
-    List<IBookMark> emptyBookmarks = fAppLayer.loadBookMarks(feedLinkRef);
+    Collection<IBookMark> emptyBookmarks = Owl.getPersistenceService().getDAOService().getBookMarkDAO().loadAll(feedLinkRef);
     assertEquals(0, emptyBookmarks.size());
 
     IFolder root1 = fFactory.createFolder(null, null, "Root 1");
@@ -681,7 +682,7 @@ public class ApplicationLayerTest {
     BookMarkReference bookmarkRef2 = new BookMarkReference(DynamicDAO.save(bookmark2).getId());
     BookMarkReference bookmarkRef3 = new BookMarkReference(DynamicDAO.save(bookmark3).getId());
 
-    List<IBookMark> filledBookmarks = fAppLayer.loadBookMarks(feedLinkRef);
+    Collection<IBookMark> filledBookmarks = Owl.getPersistenceService().getDAOService().getBookMarkDAO().loadAll(feedLinkRef);
     assertEquals(3, filledBookmarks.size());
     for (IBookMark mark : filledBookmarks) {
       if (bookmarkRef1.resolve().equals(mark))
@@ -714,9 +715,9 @@ public class ApplicationLayerTest {
 
     feed = DynamicDAO.load(IFeed.class, feedId);
     FeedLinkReference feedLinkRef = new FeedLinkReference(feed.getLink());
-    List<IBookMark> marks = fAppLayer.loadBookMarks(feedLinkRef);
+    Collection<IBookMark> marks = Owl.getPersistenceService().getDAOService().getBookMarkDAO().loadAll(feedLinkRef);
     assertEquals(1, marks.size());
-    assertEquals(folderName, marks.get(0).getFolder().getName());
+    assertEquals(folderName, marks.iterator().next().getFolder().getName());
     marks = null;
     System.gc();
   }
@@ -809,7 +810,7 @@ public class ApplicationLayerTest {
     label3.setColor("0,153,0");
     DynamicDAO.save(label3);
 
-    List<ILabel> labels = fAppLayer.loadLabels();
+    Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
 
     assertEquals(3, labels.size());
     for (ILabel label : labels) {
@@ -841,10 +842,10 @@ public class ApplicationLayerTest {
     label1 = null;
     System.gc();
 
-    List<ILabel> labels = fAppLayer.loadLabels();
+    Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
 
     assertEquals(1, labels.size());
-    assertEquals(colour, labels.get(0).getColor());
+    assertEquals(colour, labels.iterator().next().getColor());
   }
 
   /**
@@ -865,7 +866,7 @@ public class ApplicationLayerTest {
     FolderReference root2Ref = new FolderReference(DynamicDAO.save(root2).getId());
     FolderReference root3Ref = new FolderReference(DynamicDAO.save(root3).getId());
 
-    List<IFolder> rootFolders = fAppLayer.loadRootFolders();
+    Collection<IFolder> rootFolders = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoot();
     assertEquals(3, rootFolders.size());
     for (IFolder folder : rootFolders) {
       if (root1Ref.resolve().equals(folder))
@@ -891,9 +892,9 @@ public class ApplicationLayerTest {
     root1 = null;
     System.gc();
 
-    List<IFolder> rootFolders = fAppLayer.loadRootFolders();
+    Collection<IFolder> rootFolders = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoot();
     assertEquals(1, rootFolders.size());
-    IFolder folder = rootFolders.get(0);
+    IFolder folder = rootFolders.iterator().next();
     assertEquals(1, folder.getFolders().size());
     assertEquals(childFolderName, folder.getFolders().get(0).getName());
   }
@@ -943,19 +944,19 @@ public class ApplicationLayerTest {
       };
       DynamicDAO.addEntityListener(INews.class, newsListener);
 
-      fAppLayer.setNewsState(news, INews.State.UNREAD, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(news, INews.State.UNREAD, true, false);
 
       assertEquals(news1.resolve().getState(), INews.State.UNREAD);
       assertEquals(news2.resolve().getState(), INews.State.UNREAD);
       assertEquals(news3.resolve().getState(), INews.State.NEW);
 
-      fAppLayer.setNewsState(news, INews.State.READ, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(news, INews.State.READ, true, false);
 
       assertEquals(news1.resolve().getState(), INews.State.READ);
       assertEquals(news2.resolve().getState(), INews.State.READ);
       assertEquals(news3.resolve().getState(), INews.State.NEW);
 
-      fAppLayer.setNewsState(news, INews.State.DELETED, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(news, INews.State.DELETED, true, false);
 
       assertEquals(news1.resolve().getState(), INews.State.DELETED);
       assertEquals(news2.resolve().getState(), INews.State.DELETED);
@@ -1028,7 +1029,7 @@ public class ApplicationLayerTest {
       };
       DynamicDAO.addEntityListener(INews.class, newsListener);
 
-      fAppLayer.setNewsState(Arrays.asList(new INews[] { new NewsReference(news1ID).resolve() }), INews.State.READ, true, false);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(Arrays.asList(new INews[] { new NewsReference(news1ID).resolve() }), INews.State.READ, true, false);
 
       assertEquals(1, service.getUnreadCount(news1.getFeedReference()));
       assertEquals(1, service.getNewCount(news1.getFeedReference()));

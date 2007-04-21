@@ -241,7 +241,7 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
     entityScope = null;
     System.gc();
 
-    folder = Owl.getPersistenceService().getApplicationLayer().loadRootFolders().get(0);
+    folder = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoot().iterator().next();
     entityScope = Owl.getPreferenceService().getEntityScope(folder);
 
     assertEquals(true, entityScope.getBoolean(TEST_BOOLEAN_INITIAL_FALSE));
@@ -254,7 +254,7 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
     entityScope = null;
     System.gc();
 
-    folder = Owl.getPersistenceService().getApplicationLayer().loadRootFolders().get(0);
+    folder = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoot().iterator().next();
     entityScope = Owl.getPreferenceService().getEntityScope(folder);
 
     assertEquals(false, entityScope.getBoolean(TEST_BOOLEAN_INITIAL_FALSE));
