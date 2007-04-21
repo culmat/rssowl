@@ -169,7 +169,8 @@ public class ApplicationServer {
     try {
       fSocket.close();
     } catch (IOException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      if (Activator.getDefault() != null)
+        Activator.getDefault().logError(e.getMessage(), e);
     }
   }
 
@@ -388,7 +389,7 @@ public class ApplicationServer {
             if (StringUtils.isSet(message))
               safeProcess(socket, message);
           } catch (IOException e) {
-            if (!Controller.getDefault().isShuttingDown())
+            if (Activator.getDefault() != null)
               Activator.getDefault().logInfo(e.getMessage());
           }
 
@@ -400,7 +401,8 @@ public class ApplicationServer {
               if (buffReader != null)
                 buffReader.close();
             } catch (Exception e) {
-              Activator.getDefault().logInfo(e.getMessage());
+              if (Activator.getDefault() != null)
+                Activator.getDefault().logInfo(e.getMessage());
             }
 
             /* Close the Socket */
@@ -408,7 +410,8 @@ public class ApplicationServer {
               if (socket != null)
                 socket.close();
             } catch (Exception e) {
-              Activator.getDefault().logInfo(e.getMessage());
+              if (Activator.getDefault() != null)
+                Activator.getDefault().logInfo(e.getMessage());
             }
           }
         }
@@ -590,7 +593,8 @@ public class ApplicationServer {
       /* End HTML */
       writer.write("\n  </body>\n</html>");
     } catch (IOException e) {
-      Activator.getDefault().logInfo(e.getMessage());
+      if (Activator.getDefault() != null)
+        Activator.getDefault().logInfo(e.getMessage());
     }
 
     /* Cleanup */
@@ -599,7 +603,8 @@ public class ApplicationServer {
         try {
           writer.close();
         } catch (IOException e) {
-          Activator.getDefault().logInfo(e.getMessage());
+          if (Activator.getDefault() != null)
+            Activator.getDefault().logInfo(e.getMessage());
         }
       }
     }
