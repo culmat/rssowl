@@ -43,7 +43,7 @@ import org.rssowl.core.connection.UnknownFeedException;
 import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.interpreter.ParserException;
-import org.rssowl.core.model.dao.IApplicationLayer;
+import org.rssowl.core.model.dao.IApplicationService;
 import org.rssowl.core.model.dao.PersistenceException;
 import org.rssowl.core.model.persist.IBookMark;
 import org.rssowl.core.model.persist.IConditionalGet;
@@ -146,7 +146,7 @@ public class Controller {
   private ContextService fContextService;
 
   /* Misc. */
-  private IApplicationLayer fAppLayer;
+  private IApplicationService fAppLayer;
   private IBookMarkDAO fBookMarkDAO;
   private IFolderDAO fFolderDAO;
   private IConditionalGetDAO fConditionalGetDAO;
