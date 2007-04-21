@@ -146,7 +146,7 @@ public class Controller {
   private ContextService fContextService;
 
   /* Misc. */
-  private IApplicationService fAppLayer;
+  private IApplicationService fAppService;
   private IBookMarkDAO fBookMarkDAO;
   private IFolderDAO fFolderDAO;
   private IConditionalGetDAO fConditionalGetDAO;
@@ -213,7 +213,7 @@ public class Controller {
     fFolderDAO = DynamicDAO.getDAO(IFolderDAO.class);
     fLabelDao = DynamicDAO.getDAO(ILabelDAO.class);
     fPrefsDAO = Owl.getPersistenceService().getDAOService().getPreferencesDAO();
-    fAppLayer = Owl.getPersistenceService().getApplicationLayer();
+    fAppService = Owl.getApplicationService();
   }
 
   private List<EntityPropertyPageWrapper> loadEntityPropertyPages() {
@@ -447,12 +447,12 @@ public class Controller {
         final boolean finalDeleteConditionalGet = deleteConditionalGet;
         fSaveFeedQueue.schedule(new TaskAdapter() {
           public IStatus run(IProgressMonitor monitor) {
-            fAppLayer.handleFeedReload(bookmark, pairResult.getFirst(), finalConditionalGet, finalDeleteConditionalGet);
+            fAppService.handleFeedReload(bookmark, pairResult.getFirst(), finalConditionalGet, finalDeleteConditionalGet);
             return Status.OK_STATUS;
           }
         });
       } else {
-        fAppLayer.handleFeedReload(bookmark, pairResult.getFirst(), conditionalGet, deleteConditionalGet);
+        fAppService.handleFeedReload(bookmark, pairResult.getFirst(), conditionalGet, deleteConditionalGet);
       }
     }
 
