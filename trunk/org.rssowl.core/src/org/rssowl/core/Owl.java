@@ -37,7 +37,7 @@ import org.rssowl.core.persist.service.IPersistenceService;
  *
  * @author bpasero
  */
-public class Owl {
+public final class Owl {
 
   /** Flag indicating wether the Controller is accessed from a Test */
   public static boolean TESTING = false;
