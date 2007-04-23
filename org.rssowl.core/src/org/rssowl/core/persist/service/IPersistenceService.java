@@ -25,29 +25,57 @@
 package org.rssowl.core.persist.service;
 
 import org.rssowl.core.persist.dao.DAOService;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IEntityDAO;
 import org.rssowl.core.persist.dao.IPreferencesDAO;
 import org.rssowl.core.persist.search.IModelSearch;
 
 /**
- * <p>
- * The <code>IPersistenceService</code> is a contributable class that handles
- * addition, update, deletion and search of the various Model Types in the
- * application.
- * </p>
+ * Provides access to ther persistence layer of RSSOwl. This layer is
+ * contributable via the PersistenceService extension point provided by this
+ * plugin. The work that is done by the layer includes:
+ * <ul>
+ * <li>Controlling the lifecycle of the persistence layer</li>
+ * <li>Providing the DAOService that contains DAOs for each persistable entity</li>
+ * <li>Providing the model search to perform full-text searching</li>
+ * </ul>
  *
- * @see AbstractPersistenceService
  * @author bpasero
+ * @see AbstractPersistenceService
+ * @see DAOService
+ * @see IModelSearch
  */
 public interface IPersistenceService {
 
+  /**
+   * Startup the persistence layer. In case of a Database, this would be the
+   * right place to open the connection.
+   */
   void startup();
 
+  /**
+   * Gets the implementation of <code>DAOService</code> that provides access
+   * to all DAOs per entity in RSSOwl. DAOs allow to load and save entities as
+   * well as some more advanced operations (e.g. reparenting for folders). The
+   * implementation is looked up using the DAOService extension point.
+   * <p>
+   * Note that for most simple operations like saving or loading entities, using
+   * <code>DynamicDAO</code> requires less code.
+   * </p>
+   *
+   * @return Returns the implementation of <code>DAOService</code> that
+   * provides access to all DAOs per entity in RSSOwl. DAOs allow to load and
+   * save entities as well as some more advanced operations (e.g. reparenting
+   * for folders).
+   * @see IEntityDAO
+   * @see DynamicDAO
+   */
   DAOService getDAOService();
 
   /**
    * Gets the implementation of <code>IDGenerator</code> that generates IDs
    * that have not yet been used by the persistence layer. The implementation is
-   * looked up using the "org.rssowl.core.model.IDGenerator" extension point.
+   * looked up using the IDGenerator extension point.
    *
    * @return An implementation of IDGenerator.
    * @see IDGenerator
@@ -58,7 +86,7 @@ public interface IPersistenceService {
    * <p>
    * Get the Implementation of <code>IPreferencesDAO</code> that allows to
    * add, update and delete preferences. The implementation is looked up using
-   * the "org.rssowl.core.model.PreferencesDAO" Extension Point.
+   * the PreferencesDAO Extension Point.
    * </p>
    * Subclasses may override to provide their own implementation.
    *
@@ -70,8 +98,8 @@ public interface IPersistenceService {
   /**
    * <p>
    * Get the Implementation of <code>IModelSearch</code> that allows to search
-   * model types. The implementation is looked up using the
-   * "org.rssowl.core.model.ModelSearch" Extension Point.
+   * model types. The implementation is looked up using the ModelSearch
+   * Extension Point.
    * </p>
    * Subclasses may override to provide their own implementation.
    *

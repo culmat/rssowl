@@ -32,23 +32,27 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * <p>
- * Main class of the Interpreter. A contributed or default-JDKs XML-Parser is
- * used to parse the given InputStream into a <code>org.jdom.Document</code>.
- * The Document is then passed to the Contribution responsible for the given
- * Format.
- * </p>
- * The following kind of Extensions are possible:
+ * Provides access to the interpreter service of RSSOwl. This service provides
+ * API to convert a stream of data into a model representation. In the common
+ * case of a XML stream this involves using a XML-Parser and creating the model
+ * out of the content. Various extension points allow to customize the behavor
+ * of the interpreter:
  * <ul>
- * <li>SAXParser allows to contribute the XML Parser to be used</li>
- * <li>FormatInterpreter allow to contribute Interpreters based on a XML Format</li>
- * <li>NamespaceHandler allow to contribute processing for Namespaces</li>
- * <li>ElementHandler allow to contribute custom processing for Elements</li>
- * <li>TypesFactory allows to contribute your own Model to be used by the
- * Interpreter</li>
+ * <li>Contribute a new format interpreter using the FormatInterpreter
+ * extension point. This allows to display any XML in RSSOwl as Feed.</li>
+ * <li>Contribute a new namespace handler using the NamespaceHandler extension
+ * point. This allows to properly handle any new namespace in RSSOwl.</li>
+ * <li>Contribute a new element handler using the ElementHandler extension
+ * point. This makes RSSOwl understand new elements or even attributes.</li>
+ * <li>Contribute a new xml parser using the XMLParser extension point if you
+ * are not happy with the default one.</li>
  * </ul>
  *
  * @author bpasero
+ * @see IFormatInterpreter
+ * @see IElementHandler
+ * @see INamespaceHandler
+ * @see IXMLParser
  */
 public interface IInterpreterService {
 

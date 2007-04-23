@@ -27,10 +27,12 @@ package org.rssowl.core.persist;
 import org.eclipse.core.runtime.IAdaptable;
 
 /**
- * The super-type of all Elements.
- * 
+ * Instances of <code>IPersistable</code> represent types in RSSOwl that are
+ * persisted in the persistence layer. Every <code>IPersistable</code> is
+ * <code>IAdaptable</code>.
+ *
  * @author bpasero
+ * @see IAdaptable
+ * @see IEntity
  */
-public interface IPersistable extends IAdaptable {
-
-}
+public interface IPersistable extends IAdaptable {}

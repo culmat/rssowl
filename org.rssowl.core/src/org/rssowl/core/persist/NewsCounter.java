@@ -31,35 +31,61 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * The <code>NewsCounter</code> stores and provides access to
+ * <code>NewsCounterItem</code>. The key being used is a <code>URI</code>.
  * <p>
  * TODO Consider contributing the NewsCounter from org.rssowl.ui if its only
  * used from that bundle.
  * </p>
+ *
+ * @see NewsCounterItem
  */
 public class NewsCounter extends Persistable implements IPersistable {
+  private Map<String, NewsCounterItem> fCountersMap;
 
-  private Map<String, NewsCounterItem> countersMap;
-
+  /** Leave default constructor for reflection. */
   public NewsCounter() {}
 
-  public synchronized void put(URI feedLink, NewsCounterItem item) {
-    if (countersMap == null)
-      countersMap = new HashMap<String, NewsCounterItem>();
+  /**
+   * Stores the given NewsCounterItem using the given URI as key.
+   *
+   * @param link The <code>URI</code> being used to identify the
+   * <code>NewsCounterItem</code>.
+   * @param item The <code>NewsCounterItem</code> to store.
+   */
+  public synchronized void put(URI link, NewsCounterItem item) {
+    if (fCountersMap == null)
+      fCountersMap = new HashMap<String, NewsCounterItem>();
 
-    countersMap.put(feedLink.toString(), item);
+    fCountersMap.put(link.toString(), item);
   }
 
-  public synchronized NewsCounterItem get(URI feedLink) {
-    if (countersMap == null)
+  /**
+   * Retrieves the NewsCounterItem stored for the given URI or NULL if none.
+   *
+   * @param link The <code>URI</code> being used to identify the
+   * <code>NewsCounterItem</code>.
+   * @return Returns the <code>NewsCounterItem</code> for the given URI or
+   * NULL if none.
+   */
+  public synchronized NewsCounterItem get(URI link) {
+    if (fCountersMap == null)
       return null;
 
-    return countersMap.get(feedLink.toString());
+    return fCountersMap.get(link.toString());
   }
 
-  public synchronized NewsCounterItem remove(URI feedLink) {
-    if (countersMap == null)
+  /**
+   * Removes the NewsCounterItem identified by the given URI and returns it.
+   *
+   * @param link The <code>URI</code> being used to identify the
+   * <code>NewsCounterItem</code>.
+   * @return Returns the <code>NewsCounterItem</code> that was removed.
+   */
+  public synchronized NewsCounterItem remove(URI link) {
+    if (fCountersMap == null)
       return null;
 
-    return countersMap.remove(feedLink.toString());
+    return fCountersMap.remove(link.toString());
   }
 }

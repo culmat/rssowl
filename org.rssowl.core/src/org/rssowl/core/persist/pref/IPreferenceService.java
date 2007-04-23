@@ -21,12 +21,27 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.pref;
 
 import org.rssowl.core.persist.IEntity;
 
 /**
+ * <p>
+ * Provides access to the scoped preferences service in RSSOwl. There is three
+ * levels of preferences: Default, Global and Entity. Any preference that is not
+ * set at the one scope will be looked up in the parent scope until the Default
+ * scope is reached. This allows to easily override the preferences for all
+ * entities without having to define the preferences per entity.
+ * </p>
+ * <p>
+ * You can define default preferences by using the PreferencesInitializer
+ * extension point provided by this plugin.
+ * </p>
+ *
  * @author bpasero
+ * @see IPreferenceScope
+ * @see IPreferencesInitializer
  */
 public interface IPreferenceService {
 
@@ -37,7 +52,7 @@ public interface IPreferenceService {
    *
    * @return The Default Scope for Preferences.
    */
-   IPreferenceScope getDefaultScope() ;
+  IPreferenceScope getDefaultScope();
 
   /**
    * The global scope stores global preferences. Most entity-scopes will be
@@ -45,7 +60,7 @@ public interface IPreferenceService {
    *
    * @return The Global Scope for Preferences.
    */
-   IPreferenceScope getGlobalScope();
+  IPreferenceScope getGlobalScope();
 
   /**
    * The entity scope stores preferences in the given entity itself.
@@ -53,5 +68,5 @@ public interface IPreferenceService {
    * @param entity The Entity to be used for the Scope.
    * @return The Entity Scope for Preferences as defined by the given Entity.
    */
-  IPreferenceScope getEntityScope(IEntity entity) ;
+  IPreferenceScope getEntityScope(IEntity entity);
 }

@@ -21,14 +21,47 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.events;
 
 import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.dao.DynamicDAO;
 
 import java.util.Set;
 
+/**
+ * Instances of <code>EntityListener</code> can be used to be notified when a
+ * certain <code>IEntity</code> is added, updated or deleted. Use the
+ * <code>DynamicDAO</code> facade to register listeners.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ * @param <E> A subclass of <code>ModelEvent</code>
+ * @param <T> A subclass of <code>IEntity</code>
+ * @see DynamicDAO
+ */
 public interface EntityListener<E extends ModelEvent, T extends IEntity> {
+
+  /**
+   * Called when <code>IEntity</code>s have been added.
+   *
+   * @param events A collection of <code>ModelEvent</code>s describing the
+   * added entities.
+   */
   public void entitiesAdded(Set<E> events);
+
+  /**
+   * Called when <code>IEntity</code>s have been deleted.
+   *
+   * @param events A collection of <code>ModelEvent</code>s describing the
+   * deleted entities.
+   */
   public void entitiesDeleted(Set<E> events);
+
+  /**
+   * Called when <code>IEntity</code>s have been updated.
+   *
+   * @param events A collection of <code>ModelEvent</code>s describing the
+   * updated entities.
+   */
   public void entitiesUpdated(Set<E> events);
 }

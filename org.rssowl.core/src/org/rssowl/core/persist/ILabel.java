@@ -24,7 +24,6 @@
 
 package org.rssowl.core.persist;
 
-
 /**
  * A Label for a News. Some predefined Labels could be "Important", "Work",
  * "Personal", "Todo". Labels should be added by the user and be shown in a

@@ -28,56 +28,87 @@ import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.internal.persist.Persistable;
 
 /**
+ * Instances of <code>NewsCounterItem</code> store number values and are kept
+ * by a <code>NewsCounter</code>. They provide leightweight access to certain
+ * information of a <code>IFeed</code> entity.
  * <p>
  * TODO Consider contributing the NewsCounter from org.rssowl.ui if its only
  * used from that bundle.
  * </p>
+ *
+ * @see NewsCounter
  */
-public final class NewsCounterItem extends Persistable implements IPersistable {
-  private int newCounter;
-  private int unreadCounter;
-  private int stickyCounter;
+public final class NewsCounterItem extends Persistable {
+  private int fNewCounter;
+  private int fUnreadCounter;
+  private int fStickyCounter;
 
-  public NewsCounterItem() {
+  /** Default constructor for reflection */
+  public NewsCounterItem() {}
 
-  }
-
+  /**
+   * @return Returns the value of *new* News contained in the feed.
+   */
   public final int getNewCounter() {
-    return newCounter;
+    return fNewCounter;
   }
 
+  /**
+   * Increment the value of *new* News contained in the feed.
+   */
   public final void incrementNewCounter() {
-    ++newCounter;
+    ++fNewCounter;
   }
 
+  /**
+   * Decrement the value of *new* News contained in the feed.
+   */
   public final void decrementNewCounter() {
-    Assert.isTrue(newCounter > 0, "newCounter must not be negative"); //$NON-NLS-1$
-    --newCounter;
+    Assert.isTrue(fNewCounter > 0, "newCounter must not be negative"); //$NON-NLS-1$
+    --fNewCounter;
   }
 
+  /**
+   * @return Returns the value of *unread* News contained in the feed.
+   */
   public final int getUnreadCounter() {
-    return unreadCounter;
+    return fUnreadCounter;
   }
 
+  /**
+   * Increment the value of *unread* News contained in the feed.
+   */
   public final void incrementUnreadCounter() {
-    ++unreadCounter;
+    ++fUnreadCounter;
   }
 
+  /**
+   * Decrement the value of *unread* News contained in the feed.
+   */
   public final void decrementUnreadCounter() {
-    Assert.isTrue(unreadCounter > 0, "unreadCounter must not be negative"); //$NON-NLS-1$
-    --unreadCounter;
+    Assert.isTrue(fUnreadCounter > 0, "unreadCounter must not be negative"); //$NON-NLS-1$
+    --fUnreadCounter;
   }
 
+  /**
+   * @return Returns the value of *sticky* News contained in the feed.
+   */
   public final int getStickyCounter() {
-    return stickyCounter;
+    return fStickyCounter;
   }
 
+  /**
+   * Increment the value of *sticky* News contained in the feed.
+   */
   public final void incrementStickyCounter() {
-    ++stickyCounter;
+    ++fStickyCounter;
   }
 
+  /**
+   * Decrement the value of *sticky* News contained in the feed.
+   */
   public final void decrementStickyCounter() {
-    Assert.isTrue(stickyCounter > 0, "stickyCounter must not be negative"); //$NON-NLS-1$
-    --stickyCounter;
+    Assert.isTrue(fStickyCounter > 0, "stickyCounter must not be negative"); //$NON-NLS-1$
+    --fStickyCounter;
   }
 }

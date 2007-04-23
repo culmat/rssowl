@@ -93,7 +93,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
 
   /** One of the fields in this type described as constant */
   public static final int CATEGORIES = 17;
-  
+
   /** Used by the skipDays Element */
   static final List<String> DAYS = new ArrayList<String>(Arrays.asList(new String[] { "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday" })); //$NON-NLS-1$ //$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
 
@@ -137,27 +137,27 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
   static final int YEARLY = 4;
 
   /**
-   * Convenience method that returns all the news from the feed that are visible.
-   * The news that are visible are the ones in any of the following states:
-   * 
+   * Convenience method that returns all the news from the feed that are
+   * visible. The news that are visible are the ones in any of the following
+   * states:
    * <li>{@linkplain INews.State#NEW}</code></li>
    * <li>{@linkplain INews.State#UNREAD}</li>
    * <li>{@linkplain INews.State#UPDATED}</li>
    * <li>{@linkplain INews.State#READ}</li>
-   * 
-   * <p> Note: unlike the list returned from {@link #getNews()}, this one can be
+   * <p>
+   * Note: unlike the list returned from {@link #getNews()}, this one can be
    * modified by the caller safely.
    * 
    * @return the visible news in the feed.
    * @see #getNewsByStates(EnumSet)
    */
   List<INews> getVisibleNews();
-  
+
   /**
-   * Returns the list of news from the feed that are in the same state as
-   * one of the elements of <code>states</code>.
-   * 
-   * <p> Note: unlike the list returned from {@link #getNews()}, this one can be
+   * Returns the list of news from the feed that are in the same state as one of
+   * the elements of <code>states</code>.
+   * <p>
+   * Note: unlike the list returned from {@link #getNews()}, this one can be
    * modified by the caller safely.
    * 
    * @param states Set containing all the allowable news states in the returned
@@ -167,7 +167,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * @see INews.State
    */
   List<INews> getNewsByStates(EnumSet<INews.State> states);
-  
+
   /**
    * Identify the Feed's Format, for example "RSS" or "Atom".
    * 
@@ -751,9 +751,9 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
   URI getLink();
 
   /**
-   * In addition to {@link #merge(IFeed)}, it also removes all the
-   * news that are not in <code>objectToMerge</code> and have a state
-   * of DELETED from this feed and returns them.
+   * In addition to {@link #merge(IFeed)}, it also removes all the news that
+   * are not in <code>objectToMerge</code> and have a state of DELETED from
+   * this feed and returns them.
    * 
    * @param objectToMerge
    * @param cleanUp
@@ -763,12 +763,11 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
 
   /**
    * Removes <code>news</code> from the feed if such news exists in the feed.
-   * Otherwise, the method does nothing.
+   * Otherwise, the method does nothing. In general, it's not necessary to use
+   * this. Instead, the state of the news should be changed to
+   * <code>DELETED</code> and they will be removed as part of
+   * <code>mergeAndCleanUp</code>.
    * 
-   * In general, it's not necessary to use this. Instead, the state
-   * of the news should be changed to <code>DELETED</code> and they will be
-   * removed as part of <code>mergeAndCleanUp</code>.
-   *  
    * @param news to delete.
    * @return <code>true</code> if feed contained the given news.
    * @see INews#setState(org.rssowl.core.persist.INews.State)
