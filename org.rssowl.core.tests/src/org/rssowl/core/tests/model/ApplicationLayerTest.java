@@ -27,6 +27,7 @@ package org.rssowl.core.tests.model;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -37,7 +38,9 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.MergeResult;
+import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.ILabel;
@@ -343,6 +346,12 @@ public class ApplicationLayerTest {
     news.setTitle("News Title #1");
     news.setLink(new URI("http://www.link.com"));
     news.setState(INews.State.UNREAD);
+    
+    final ICategory category = fFactory.createCategory(null, news);
+    category.setName("Category name");
+    
+    final IAttachment attachment = fFactory.createAttachment(null, news);
+    attachment.setLink(new URI("http://attachment.com"));
 
     feed = DynamicDAO.save(feed);
 
@@ -358,8 +367,13 @@ public class ApplicationLayerTest {
         assertEquals(1, events.size());
         NewsEvent event = events.iterator().next();
         assertEquals(true, event.getEntity().equals(savedNews));
-        assertEquals(State.UNREAD, event.getOldNews().getState());
+        INews oldNews = event.getOldNews();
+        assertEquals(State.UNREAD, oldNews.getState());
         assertEquals(State.UNREAD, event.getEntity().getState());
+        assertEquals(category.getName(), oldNews.getCategories().get(0).getName());
+        IAttachment oldAttachment = oldNews.getAttachments().get(0);
+        assertEquals(attachment.getLink(), oldAttachment.getLink());
+        assertNull(oldAttachment.getNews());
       }
     };
     DynamicDAO.addEntityListener(INews.class, newsListener);
