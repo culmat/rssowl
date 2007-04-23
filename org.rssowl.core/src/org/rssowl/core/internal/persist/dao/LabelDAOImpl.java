@@ -26,8 +26,8 @@ package org.rssowl.core.internal.persist.dao;
 import org.rssowl.core.internal.persist.Label;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.dao.ILabelDAO;
-import org.rssowl.core.persist.events.LabelEvent;
-import org.rssowl.core.persist.events.LabelListener;
+import org.rssowl.core.persist.event.LabelEvent;
+import org.rssowl.core.persist.event.LabelListener;
 
 public final class LabelDAOImpl extends AbstractEntityDAO<ILabel, LabelListener,
     LabelEvent> implements ILabelDAO {

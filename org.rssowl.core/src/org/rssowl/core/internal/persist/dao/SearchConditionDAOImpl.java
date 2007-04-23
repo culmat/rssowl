@@ -25,8 +25,8 @@ package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.search.SearchCondition;
 import org.rssowl.core.persist.dao.ISearchConditionDAO;
-import org.rssowl.core.persist.events.SearchConditionEvent;
-import org.rssowl.core.persist.events.SearchConditionListener;
+import org.rssowl.core.persist.event.SearchConditionEvent;
+import org.rssowl.core.persist.event.SearchConditionListener;
 import org.rssowl.core.persist.search.ISearchCondition;
 
 public final class SearchConditionDAOImpl extends AbstractEntityDAO<ISearchCondition,

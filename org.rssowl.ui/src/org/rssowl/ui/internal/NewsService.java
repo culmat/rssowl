@@ -31,10 +31,10 @@ import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.NewsCounterItem;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsCounterDAO;
-import org.rssowl.core.persist.events.FeedAdapter;
-import org.rssowl.core.persist.events.FeedEvent;
-import org.rssowl.core.persist.events.NewsAdapter;
-import org.rssowl.core.persist.events.NewsEvent;
+import org.rssowl.core.persist.event.FeedAdapter;
+import org.rssowl.core.persist.event.FeedEvent;
+import org.rssowl.core.persist.event.NewsAdapter;
+import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 
 import java.net.URI;

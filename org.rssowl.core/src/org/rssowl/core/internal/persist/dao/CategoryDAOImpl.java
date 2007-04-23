@@ -26,8 +26,8 @@ package org.rssowl.core.internal.persist.dao;
 import org.rssowl.core.internal.persist.Category;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.dao.ICategoryDAO;
-import org.rssowl.core.persist.events.CategoryEvent;
-import org.rssowl.core.persist.events.CategoryListener;
+import org.rssowl.core.persist.event.CategoryEvent;
+import org.rssowl.core.persist.event.CategoryListener;
 import org.rssowl.core.util.StringUtils;
 
 import java.util.Set;

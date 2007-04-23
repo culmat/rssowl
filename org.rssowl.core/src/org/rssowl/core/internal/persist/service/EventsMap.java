@@ -23,8 +23,8 @@
  **  **********************************************************************  */
 package org.rssowl.core.internal.persist.service;
 
-import org.rssowl.core.persist.events.ModelEvent;
-import org.rssowl.core.persist.events.runnable.EventRunnable;
+import org.rssowl.core.persist.event.ModelEvent;
+import org.rssowl.core.persist.event.runnable.EventRunnable;
 
 import java.util.ArrayList;
 import java.util.Collections;

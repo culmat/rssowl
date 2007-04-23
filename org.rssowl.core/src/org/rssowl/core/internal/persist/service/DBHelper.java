@@ -28,10 +28,10 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPersistable;
-import org.rssowl.core.persist.events.FeedEvent;
-import org.rssowl.core.persist.events.ModelEvent;
-import org.rssowl.core.persist.events.NewsEvent;
-import org.rssowl.core.persist.events.runnable.EventRunnable;
+import org.rssowl.core.persist.event.FeedEvent;
+import org.rssowl.core.persist.event.ModelEvent;
+import org.rssowl.core.persist.event.NewsEvent;
+import org.rssowl.core.persist.event.runnable.EventRunnable;
 import org.rssowl.core.persist.service.PersistenceException;
 
 import com.db4o.ObjectContainer;

@@ -28,9 +28,9 @@ import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.IAttachmentDAO;
-import org.rssowl.core.persist.events.AttachmentEvent;
-import org.rssowl.core.persist.events.AttachmentListener;
-import org.rssowl.core.persist.events.NewsEvent;
+import org.rssowl.core.persist.event.AttachmentEvent;
+import org.rssowl.core.persist.event.AttachmentListener;
+import org.rssowl.core.persist.event.NewsEvent;
 
 public final class AttachmentDAOImpl extends AbstractEntityDAO<IAttachment,
     AttachmentListener, AttachmentEvent> implements IAttachmentDAO  {

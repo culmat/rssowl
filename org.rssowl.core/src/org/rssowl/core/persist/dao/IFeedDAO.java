@@ -24,8 +24,8 @@
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.IFeed;
-import org.rssowl.core.persist.events.FeedEvent;
-import org.rssowl.core.persist.events.FeedListener;
+import org.rssowl.core.persist.event.FeedEvent;
+import org.rssowl.core.persist.event.FeedListener;
 import org.rssowl.core.persist.reference.FeedReference;
 
 import java.net.URI;

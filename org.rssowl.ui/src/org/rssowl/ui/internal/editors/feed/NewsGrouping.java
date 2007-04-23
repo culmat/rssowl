@@ -31,7 +31,7 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
-import org.rssowl.core.persist.events.ModelEvent;
+import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.EntityGroup;

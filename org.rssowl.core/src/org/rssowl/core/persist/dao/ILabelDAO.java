@@ -24,8 +24,8 @@
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.ILabel;
-import org.rssowl.core.persist.events.LabelEvent;
-import org.rssowl.core.persist.events.LabelListener;
+import org.rssowl.core.persist.event.LabelEvent;
+import org.rssowl.core.persist.event.LabelListener;
 
 public interface ILabelDAO extends IEntityDAO<ILabel, LabelListener, LabelEvent>   {
   // No new methods

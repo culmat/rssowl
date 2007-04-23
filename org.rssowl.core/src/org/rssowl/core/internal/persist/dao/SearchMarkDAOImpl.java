@@ -26,8 +26,8 @@ package org.rssowl.core.internal.persist.dao;
 import org.rssowl.core.internal.persist.SearchMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
-import org.rssowl.core.persist.events.SearchMarkEvent;
-import org.rssowl.core.persist.events.SearchMarkListener;
+import org.rssowl.core.persist.event.SearchMarkEvent;
+import org.rssowl.core.persist.event.SearchMarkListener;
 
 public final class SearchMarkDAOImpl extends AbstractEntityDAO<ISearchMark,
     SearchMarkListener, SearchMarkEvent> implements ISearchMarkDAO    {
