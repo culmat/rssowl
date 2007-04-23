@@ -24,8 +24,8 @@
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.IBookMark;
-import org.rssowl.core.persist.events.BookMarkEvent;
-import org.rssowl.core.persist.events.BookMarkListener;
+import org.rssowl.core.persist.event.BookMarkEvent;
+import org.rssowl.core.persist.event.BookMarkListener;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 
 import java.util.Collection;

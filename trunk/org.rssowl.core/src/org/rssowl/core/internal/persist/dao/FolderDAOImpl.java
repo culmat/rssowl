@@ -31,10 +31,10 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.IFolderDAO;
-import org.rssowl.core.persist.events.BookMarkEvent;
-import org.rssowl.core.persist.events.FolderEvent;
-import org.rssowl.core.persist.events.FolderListener;
-import org.rssowl.core.persist.events.SearchMarkEvent;
+import org.rssowl.core.persist.event.BookMarkEvent;
+import org.rssowl.core.persist.event.FolderEvent;
+import org.rssowl.core.persist.event.FolderListener;
+import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.ReparentInfo;
 

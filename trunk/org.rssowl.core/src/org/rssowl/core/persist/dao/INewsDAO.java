@@ -24,8 +24,8 @@
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.events.NewsEvent;
-import org.rssowl.core.persist.events.NewsListener;
+import org.rssowl.core.persist.event.NewsEvent;
+import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.service.PersistenceException;
 
 import java.util.Collection;

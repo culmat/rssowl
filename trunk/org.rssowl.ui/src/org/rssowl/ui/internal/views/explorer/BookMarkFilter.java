@@ -33,7 +33,7 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
-import org.rssowl.core.persist.events.ModelEvent;
+import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.NewsService;

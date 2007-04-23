@@ -26,8 +26,8 @@ package org.rssowl.core.persist.dao;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IPersistable;
-import org.rssowl.core.persist.events.EntityListener;
-import org.rssowl.core.persist.events.ModelEvent;
+import org.rssowl.core.persist.event.EntityListener;
+import org.rssowl.core.persist.event.ModelEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;

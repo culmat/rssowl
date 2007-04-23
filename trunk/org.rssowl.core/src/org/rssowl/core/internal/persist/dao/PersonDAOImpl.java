@@ -26,8 +26,8 @@ package org.rssowl.core.internal.persist.dao;
 import org.rssowl.core.internal.persist.Person;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.dao.IPersonDAO;
-import org.rssowl.core.persist.events.PersonEvent;
-import org.rssowl.core.persist.events.PersonListener;
+import org.rssowl.core.persist.event.PersonEvent;
+import org.rssowl.core.persist.event.PersonListener;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.StringUtils;
 

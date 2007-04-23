@@ -24,8 +24,8 @@
 
 package org.rssowl.core.persist.dao;
 
-import org.rssowl.core.persist.events.SearchConditionEvent;
-import org.rssowl.core.persist.events.SearchConditionListener;
+import org.rssowl.core.persist.event.SearchConditionEvent;
+import org.rssowl.core.persist.event.SearchConditionListener;
 import org.rssowl.core.persist.search.ISearchCondition;
 
 public interface ISearchConditionDAO extends IEntityDAO<ISearchCondition, SearchConditionListener, SearchConditionEvent> {

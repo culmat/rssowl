@@ -28,9 +28,9 @@ import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.INewsDAO;
-import org.rssowl.core.persist.events.ModelEvent;
-import org.rssowl.core.persist.events.NewsEvent;
-import org.rssowl.core.persist.events.NewsListener;
+import org.rssowl.core.persist.event.ModelEvent;
+import org.rssowl.core.persist.event.NewsEvent;
+import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.service.PersistenceException;
 
 import com.db4o.ext.Db4oException;

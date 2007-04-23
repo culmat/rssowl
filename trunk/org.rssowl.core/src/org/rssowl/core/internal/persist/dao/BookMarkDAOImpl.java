@@ -26,8 +26,8 @@ package org.rssowl.core.internal.persist.dao;
 import org.rssowl.core.internal.persist.BookMark;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
-import org.rssowl.core.persist.events.BookMarkEvent;
-import org.rssowl.core.persist.events.BookMarkListener;
+import org.rssowl.core.persist.event.BookMarkEvent;
+import org.rssowl.core.persist.event.BookMarkListener;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.service.PersistenceException;
 
