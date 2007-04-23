@@ -26,13 +26,11 @@ package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.ui.internal.util.ModelUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,30 +51,19 @@ public class LabelAction extends Action {
 
   @Override
   public void run() {
-    if (!fSelection.isEmpty()) {
-      List<IEntity> entities = ModelUtils.getEntities(fSelection);
-      List<INews> news = new ArrayList<INews>();
-      for (IEntity entity : entities) {
-        if (entity instanceof INews) {
-          INews newsItem = (INews) entity;
-
-          /* Apply Label */
-          ILabel label = newsItem.getLabel();
-          if (label == null && fLabel != null)
-            newsItem.setLabel(fLabel);
-          else if (label != null && fLabel == null)
-            newsItem.setLabel(null);
-          else if (label != null && fLabel != null && !fLabel.equals(label))
-            newsItem.setLabel(fLabel);
-
-          /* Add to List */
-          news.add((INews) entity);
-        }
-      }
-
-      /* Save */
-      if (news.size() > 0)
-        DynamicDAO.saveAll(news);
+    List<INews> newsList = ModelUtils.getEntities(fSelection, INews.class);
+    for (INews newsItem : newsList) {
+      /* Apply Label */
+      ILabel label = newsItem.getLabel();
+      if (label == null && fLabel != null)
+        newsItem.setLabel(fLabel);
+      else if (label != null && fLabel == null)
+        newsItem.setLabel(null);
+      else if (label != null && fLabel != null && !fLabel.equals(label))
+        newsItem.setLabel(fLabel);
     }
+
+    /* Save */
+    DynamicDAO.saveAll(newsList);
   }
 }

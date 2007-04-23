@@ -118,6 +118,50 @@ public class ModelUtilsTest {
     assertEquals(1, l2);
     assertEquals(1, l3);
   }
+  
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testGetEntitiesFromSelectionWithClass() throws Exception {
+    ILabel label1 = fFactory.createLabel(null, "Label 1");
+    ILabel label2 = fFactory.createLabel(null, "Label 2");
+    ILabel label3 = fFactory.createLabel(null, "Label 3");
+    IFeed feed1 = fFactory.createFeed(null, new URI("http://www.news.com"));
+
+    EntityGroup group = new EntityGroup(1, "Group");
+    new EntityGroupItem(group, label2);
+    new EntityGroupItem(group, label3);
+
+    Object selectedItems[] = new Object[] { label1, feed1, group };
+
+    IStructuredSelection sel = new StructuredSelection(selectedItems);
+    List<ILabel> labels = ModelUtils.getEntities(sel, ILabel.class);
+
+    assertEquals(3, labels.size());
+
+    int l1 = 0, l2 = 0, l3 = 0;
+
+    for (IEntity entity : labels) {
+      assertTrue(entity instanceof ILabel);
+      if ("Label 1".equals(((ILabel) entity).getName()))
+        l1++;
+      else if ("Label 2".equals(((ILabel) entity).getName()))
+        l2++;
+      else if ("Label 3".equals(((ILabel) entity).getName()))
+        l3++;
+    }
+    assertEquals(1, l1);
+    assertEquals(1, l2);
+    assertEquals(1, l3);
+    
+    List<IFeed> feeds = ModelUtils.getEntities(sel, IFeed.class);
+    assertEquals(1, feeds.size());
+    assertEquals(feed1, feeds.get(0));
+    
+    List<INews> newsList = ModelUtils.getEntities(sel, INews.class);
+    assertEquals(0, newsList.size());
+  }
 
   /**
    * @throws Exception

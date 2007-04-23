@@ -32,12 +32,11 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PlatformUI;
-import org.rssowl.core.Owl;
-import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.ui.internal.util.ModelUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -68,19 +67,9 @@ public class MarkUnreadAction extends Action implements IWorkbenchWindowActionDe
   @Override
   public void run() {
 
-    /* Only consider Entities */
-    List<IEntity> entities = ModelUtils.getEntities(fSelection);
-    List<INews> news = new ArrayList<INews>();
-
-    /* Separate News */
-    for (IEntity element : entities) {
-      if (element instanceof INews)
-        news.add((INews) element);
-    }
-
-    /* Mark Unread */
-    if (news.size() > 0)
-      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(news, INews.State.UNREAD, true, false);
+    /* Only consider INews */
+    List<INews> newsList = ModelUtils.getEntities(fSelection, INews.class);
+    DynamicDAO.getDAO(INewsDAO.class).setState(newsList, INews.State.UNREAD, true, false);
   }
 
   /*
