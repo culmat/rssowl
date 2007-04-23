@@ -77,6 +77,36 @@ public class ModelUtils {
 
     return entities;
   }
+  
+  /**
+   * @param <T>
+   * @param selection
+   * @param entityClass
+   * @return A List of Entities that are instances of <code>entityClass</code>
+   * from the given selection. In case the selection contains an instanceof
+   * <code>EntityGroup</code>, only the content of the group is considered.
+   */
+  public static <T extends IEntity> List<T> getEntities(IStructuredSelection selection, Class<T> entityClass) {
+    if (selection.isEmpty())
+      return new ArrayList<T>(0);
+
+    List< ? > elements = selection.toList();
+    List<T> entities = new ArrayList<T>(elements.size());
+
+    for (Object object : elements) {
+      if (entityClass.isInstance(object))
+        entities.add(entityClass.cast(object));
+      else if (object instanceof EntityGroup) {
+        List<EntityGroupItem> items = ((EntityGroup) object).getItems();
+        for (EntityGroupItem item : items) {
+          if (entityClass.isInstance(item.getEntity()))
+            entities.add(entityClass.cast(item.getEntity()));
+        }
+      }
+    }
+
+    return entities;
+  }
 
   /**
    * Delete any Folder and Mark that is child of the given Folder
@@ -329,12 +359,10 @@ public class ModelUtils {
   public static Set<ILabel> getLabels(IStructuredSelection selection) {
     Set<ILabel> labels = new HashSet<ILabel>(5);
 
-    List<IEntity> entities = getEntities(selection);
-    for (IEntity entity : entities) {
-      if (entity instanceof INews) {
-        ILabel newsLabel = ((INews) entity).getLabel();
-        labels.add(newsLabel);
-      }
+    List<INews> newsList = getEntities(selection, INews.class);
+    for (INews news : newsList) {
+      ILabel newsLabel = news.getLabel();
+      labels.add(newsLabel);
     }
 
     return labels;
