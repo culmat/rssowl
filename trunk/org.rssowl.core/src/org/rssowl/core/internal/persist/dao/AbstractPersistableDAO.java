@@ -135,6 +135,9 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
    * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#saveAll(C)
    */
   public void saveAll(Collection<T> objects) {
+    if (objects.isEmpty())
+      return;
+    
     fWriteLock.lock();
     try {
       for (T object : objects) {
@@ -178,6 +181,9 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
    * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#deleteAll(java.util.Collection)
    */
   public void deleteAll(Collection<T> objects) {
+    if (objects.isEmpty())
+      return;
+    
     fWriteLock.lock();
     try {
       for (T object : objects) {
