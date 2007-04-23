@@ -26,14 +26,13 @@ package org.rssowl.core.persist;
 
 import java.net.URI;
 
-
 /**
  * This Interface provides the API to implement the Conditional GET mechanism as
  * used by HTTP.
  * 
  * @author bpasero
  */
-public interface IConditionalGet extends IPersistable   {
+public interface IConditionalGet extends IPersistable {
 
   /**
    * @return the link that this object refers to.

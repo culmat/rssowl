@@ -28,7 +28,7 @@ import org.rssowl.core.persist.pref.PreferencesEvent;
 import org.rssowl.core.persist.pref.PreferencesListener;
 
 /**
- * @author bpasero
+ * TODO Remove me
  */
 public interface IListenerService {
 

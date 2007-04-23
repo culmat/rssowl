@@ -31,7 +31,7 @@ import org.rssowl.core.persist.IFeed;
 /**
  * The <code>IApplicationService</code> interface is providing methods that
  * access the Persistance Layer as required by the Application. It is very
- * important that implementors optimize the performance of all methods.
+ * important that implementors optimize the performance of all these methods.
  *
  * @author bpasero
  */

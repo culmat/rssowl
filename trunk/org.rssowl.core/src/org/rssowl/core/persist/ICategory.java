@@ -24,10 +24,9 @@
 
 package org.rssowl.core.persist;
 
-
 /**
  * The super-type of all Category Elements in Feeds.
- * 
+ *
  * @author bpasero
  */
 public interface ICategory extends IEntity, MergeCapable<ICategory> {
@@ -48,7 +47,7 @@ public interface ICategory extends IEntity, MergeCapable<ICategory> {
    * <li>Atom</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param name The Name of the Category to set.
    */
   void setName(String name);
@@ -65,7 +64,7 @@ public interface ICategory extends IEntity, MergeCapable<ICategory> {
    * <li>Atom</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param domain The categorization taxonomy to set.
    */
   void setDomain(String domain);
@@ -74,14 +73,14 @@ public interface ICategory extends IEntity, MergeCapable<ICategory> {
    * A String that identifies a categorization taxonomy. The value of the
    * element is a forward-slash-separated string that identifies a hierarchic
    * location in the indicated taxonomy.
-   * 
+   *
    * @return Returns the domain of this category.
    */
   String getDomain();
 
   /**
    * The Name of this Category.
-   * 
+   *
    * @return Returns the name of this category.
    */
   String getName();

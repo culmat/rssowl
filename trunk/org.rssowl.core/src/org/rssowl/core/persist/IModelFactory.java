@@ -33,10 +33,10 @@ import java.net.URI;
 import java.util.Date;
 
 /**
- * The Factory used by the database to create the model. The implementation is
- * contributable via an extension point in case a different set of concrete
- * objects are required.
- *
+ * Provides access to the model factory of RSSOwl. This factory is used
+ * everywhere when new entities are created. The factory can be replaced using
+ * the ModelFactory extension point.
+ * 
  * @author Ismael Juma (ismael@juma.uk)
  */
 public interface IModelFactory {
@@ -44,7 +44,7 @@ public interface IModelFactory {
   /**
    * Creates a new instance of INews with the provided parameters. The News is
    * automatically added to the given Feed.
-   *
+   * 
    * @param id The unique ID of the News.
    * @param feed The Feed this News belongs to.
    * @param receiveDate The Date this News was received.
@@ -55,7 +55,7 @@ public interface IModelFactory {
   /**
    * Creates a new instance of IPerson with the provided parameters. The new
    * Person is automatically added to the given Type.
-   *
+   * 
    * @param id The unique ID of the Person.
    * @param parentRef The Type this Person belongs to.
    * @return A new instance of IPerson with the provided parameters.
@@ -65,7 +65,7 @@ public interface IModelFactory {
   /**
    * Creates a new instance of IImage with the provided parameters. The new
    * Image is automatically added to the given Feed.
-   *
+   * 
    * @param feed The Feed this image belongs to.
    * @return A new instance of IImage with the provided parameters.
    */
@@ -74,7 +74,7 @@ public interface IModelFactory {
   /**
    * Creates a new instance of IAttachment with the provided parameters. The new
    * Attachment is automatically added to the given News.
-   *
+   * 
    * @param id The unique ID of the Attachment.
    * @param news The News this Attachment belongs to.
    * @return A new instance of IAttachment with the provided parameters.
@@ -83,7 +83,7 @@ public interface IModelFactory {
 
   /**
    * Creates a new instance of ICategory with the provided parameters.
-   *
+   * 
    * @param id The unique ID of the Category.
    * @param parent The Type this Category belongs to.
    * @return A new instance ICategory with the provided parameters.
@@ -93,7 +93,7 @@ public interface IModelFactory {
   /**
    * Creates a new instance of ISource with the provided parameters. The new
    * Source is automatically added to the given News.
-   *
+   * 
    * @param news The News this Source belongs to.
    * @return A new instance ISource with the provided parameters.
    */
@@ -102,7 +102,7 @@ public interface IModelFactory {
   /**
    * Creates a new instance of Guid with the provided parameters. The new Guid
    * is automatically added to the given News.
-   *
+   * 
    * @param news The News this Guid belongs to.
    * @param value The identifier of the Guid.
    * @return A new instance of IGuid with the provided parameters.
@@ -112,7 +112,7 @@ public interface IModelFactory {
   /**
    * Creates a new instance of ICloud with the provided parameters. The new
    * Cloud is automatically set to the given feed.
-   *
+   * 
    * @param feed The Feed this Cloud belongs to.
    * @return A new instance of ICloud with the provided parameters.
    */
@@ -121,7 +121,7 @@ public interface IModelFactory {
   /**
    * Creates a new instance of ITextInput with the provided parameters. The new
    * TextInput is automatically set to the given feed.
-   *
+   * 
    * @param feed The Feed this TextInput belongs to.
    * @return A new instance of ITextInput with the provided parameters.
    */
@@ -129,7 +129,7 @@ public interface IModelFactory {
 
   /**
    * Creates a new instance of IFeed with the provided parameters.
-   *
+   * 
    * @param id The unique ID of the Feed.
    * @param link The URI of this Feed, where to retrieve the News from.
    * @return A new instance of IFeed with the provided parameters.
@@ -140,7 +140,7 @@ public interface IModelFactory {
    * Creates a new instance of IFolder with the provided parameters. The new
    * Folder is automatically added to the given parent folder, unless its
    * <code>NULL</code> or not cached.
-   *
+   * 
    * @param id The unique id of the Folder.
    * @param parent A parent Folder, or <code>NULL</code> if this is root
    * Folder.
@@ -151,7 +151,7 @@ public interface IModelFactory {
 
   /**
    * Creates a new instance of ILabel with the provided parameters.
-   *
+   * 
    * @param id The unique ID of this Label.
    * @param name The Name of this Label.
    * @return a new instance of ILabel with the provided parameters.
@@ -161,7 +161,7 @@ public interface IModelFactory {
   /**
    * Creates a new instance of ISearchMark with the provided parameters. The new
    * SearchMark is automatically added to the given parent folder.
-   *
+   * 
    * @param id The unique id of the ISearchMark.
    * @param folder The parent Folder.
    * @param name The Name of the ISearchMark.
@@ -172,7 +172,7 @@ public interface IModelFactory {
   /**
    * Creates a new instance of IBookMark with the provided parameters. The new
    * BookMark is automatically added to the given parent folder.
-   *
+   * 
    * @param id The unique id of the BookMark.
    * @param folder The parent Folder
    * @param feedRef The reference to the feed this BookMark is related to.
@@ -185,7 +185,7 @@ public interface IModelFactory {
    * Creates a new instance of ISearchCondition with the provided parameters.
    * The new SearchCondition is automatically added to the given parent
    * SearchMark.
-   *
+   * 
    * @param id The unique id of the SearchCondition.
    * @param searchMark The SearckMark this type belongs to.
    * @param field The SearchField this SearchCondition is targeting.
@@ -204,7 +204,7 @@ public interface IModelFactory {
 
   /**
    * Creates a new instance of ISearchCondition with the provided parameters.
-   *
+   * 
    * @param field The SearchField this SearchCondition is targeting.
    * @param specifier The specifier tells about how the value should match the
    * target field.
@@ -218,7 +218,7 @@ public interface IModelFactory {
 
   /**
    * Creates a new instance of ISearchField with the provided parameters.
-   *
+   * 
    * @param id The unique id of the searchfield as defined in the given
    * <code>class</code> through constants.
    * @param entityName The fully qualified Name of the <code>IEntity</code>
@@ -229,7 +229,7 @@ public interface IModelFactory {
 
   /**
    * Creates an instance of IConditionalGet with the provided parameters.
-   *
+   * 
    * @param ifModifiedSince the If-Modified Header to be sent as
    * If-Modified-Since Request Header.
    * @param link the link that this object refers to.

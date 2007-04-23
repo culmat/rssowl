@@ -33,7 +33,21 @@ import java.util.Map;
  * application. Any entity is <em>uniquely</em> identified by its ID.
  * Implementors have to make sure, that no entity of any kind will ever have the
  * same ID as another entity.
- * 
+ * <p>
+ * Compared to a simple <code>IPersistable</code> like <code>IImage</code>,
+ * an entity adds the following features:
+ * <ul>
+ * <li>Identified by a unique ID that allows to load the entity from the
+ * persistence layer</li>
+ * <li> A Map allowing to store Properties. The content of the Map is stored
+ * into the DataBase and thereby kept persistant in case they are Serializable.
+ * This is done using Java's Serialization Feature and it is strongly
+ * recommended not to use the Properties to store complex Objects. It is very
+ * good to use with Strings or primitive Arrays. For any complex type, please
+ * consider to extend the DataBase with a new relation to store your data.</li>
+ * </ul>
+ * </p>
+ *
  * @see IDGenerator
  * @author bpasero
  */
@@ -44,7 +58,7 @@ public interface IEntity extends IPersistable {
    * <code>ISearchField<code> to represent a search over all fields of the given Type.
    */
   public static final int ALL_FIELDS = -1;
-  
+
   /**
    * Set a Property identified by a unique Key to this Model. This Method can be
    * used to extend the Model with values, for example in case the interpreted
@@ -58,7 +72,7 @@ public interface IEntity extends IPersistable {
    * classes, for instance "org.yourproject.yourpackage.YourProperty" in order
    * to avoid overriding another key that was set by a different person.
    * </p>
-   * 
+   *
    * @param key The unique identifier of the Property.
    * @param value The value of the Property.
    */
@@ -66,7 +80,7 @@ public interface IEntity extends IPersistable {
 
   /**
    * Get a Property from this Map or NULL if not existing for the given Key.
-   * 
+   *
    * @param key The unique identifier of the Property.
    * @return The value of the Property or NULL if no value is stored for the
    * given key.
@@ -75,7 +89,7 @@ public interface IEntity extends IPersistable {
 
   /**
    * Removes a Property from this Map.
-   * 
+   *
    * @param key The unique identifier of the Property.
    * @return The value of the Property or NULL if no value is stored for the
    * given key.
@@ -84,7 +98,7 @@ public interface IEntity extends IPersistable {
 
   /**
    * Get the Map containing all Properties of this Type.
-   * 
+   *
    * @return The Map containing all Properties of this Type.
    */
   Map<String, ? > getProperties();
@@ -92,7 +106,7 @@ public interface IEntity extends IPersistable {
   /**
    * Get the unique id for this object. Implementors have to make sure, that no
    * entity of any kind will ever have the same ID as another entity.
-   * 
+   *
    * @return Unique id for the object.
    */
   Long getId();
@@ -100,7 +114,7 @@ public interface IEntity extends IPersistable {
   /**
    * Sets the unique id for this object. Implementors have to make sure, that no
    * entity of any kind will ever have the same ID as another entity.
-   * 
+   *
    * @param id Unique id for the object.
    */
   void setId(Long id);

@@ -36,10 +36,18 @@ import java.net.URI;
 import java.util.Map;
 
 /**
- * The ConnectionManager is the main class of the connection plugin. It is
- * responsible to retrieve the contents of a Feed by supplying an InputStream.
+ * Provides access to the connection service of RSSOwl. This service provides
+ * API to load data from the internet (e.g. loading the contents of a feed). It
+ * is also the central place to ask for credentials if a resource requires
+ * authentication. Several extension points allow to customize the behavor of
+ * this service, including the ability to register <code>IProtocolHandler</code>
+ * to define the lookup process on per protocol basis or contributing
+ * <code>ICredentialsProvider</code> to define how credentials should be
+ * stored and retrieved.
  *
  * @author bpasero
+ * @see IProtocolHandler
+ * @see ICredentialsProvider
  */
 public interface IConnectionService {
 

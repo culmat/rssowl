@@ -37,7 +37,7 @@ import org.rssowl.core.util.LoggingSafeRunnable;
 import java.util.Set;
 
 /**
- * @author bpasero
+ * TODO Remove me
  */
 public class ListenerServiceImpl implements IListenerService {
 

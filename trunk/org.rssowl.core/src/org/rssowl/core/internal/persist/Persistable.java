@@ -32,20 +32,14 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 /**
- * The abstract super-type of all Model Objects. It offers the following
- * features:
+ * The abstract super-type of all Model Objects that are persisted. It offers
+ * the following features:
  * <ul>
  * <li>Lookup for <code>org.eclipse.core.runtime.IAdaptable</code> Adapters
  * using the Platform's Adapter Registry. This allows dynamic API extension on
  * Runtime without touching the Model Object's source.</li>
- * <li> A Map allowing to store Properties. The content of the Map is stored
- * into the DataBase and thereby kept persistant in case they are Serializable.
- * This is done using Java's Serialization Feature and it is strongly
- * recommended not to use the Properties to store complex Objects. It is very
- * good to use with Strings or primitive Arrays. For any complex type, please
- * consider to extend the DataBase with a new relation to store your data.</li>
  * </ul>
- * 
+ *
  * @author bpasero
  */
 public abstract class Persistable implements IPersistable {
@@ -58,7 +52,7 @@ public abstract class Persistable implements IPersistable {
    * If <code>uri</code> is <code>null</code>, returns <code>null</code>.
    * Otherwise, tries to create a URI from <code>uri</code> and throws an
    * IllegalStateException if this fails.
-   * 
+   *
    * @param uri
    * @return a URI created from <code>uri</code>.
    * @throws IllegalStateException
@@ -77,29 +71,29 @@ public abstract class Persistable implements IPersistable {
   /**
    * Returns the text representation of <code>uri</code> if <code>uri</code>
    * is not <code>null</code>. Returns <code>null</code> otherwise.
-   * 
+   *
    * @param uri
    * @return the text representation of <code>uri</code> or <code>null</code>.
    */
   protected final String getURIText(URI uri) {
     return uri == null ? null : uri.toString();
   }
-  
+
   /**
    * Copies the contents of <code>listMergeResult</code> into
    * <code>mergeResult</code> and returns whether there were any structural
    * changes in <code>listMergeResult</code>.
-   * 
+   *
    * @param mergeResult
    * @param listMergeResult
-   * @return <code>true</code> if there were structural changes in 
+   * @return <code>true</code> if there were structural changes in
    * <code>listMergeResult</code>. Returns <code>false</code> otherwise.
    */
-  protected final boolean processListMergeResult(MergeResult mergeResult, ComplexMergeResult<?> listMergeResult) {
+  protected final boolean processListMergeResult(MergeResult mergeResult, ComplexMergeResult< ? > listMergeResult) {
     mergeResult.addAll(listMergeResult);
     if (listMergeResult.isStructuralChange())
       return true;
-    
+
     return false;
   }
 
@@ -114,7 +108,7 @@ public abstract class Persistable implements IPersistable {
    * invoke the method on their superclass to ensure that the Platform's adapter
    * manager is consulted).
    * </p>
-   * 
+   *
    * @param adapter the class to adapt to
    * @return the adapted object or <code>null</code>
    * @see IAdaptable#getAdapter(Class)

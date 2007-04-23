@@ -31,7 +31,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
  * to define a position for a <code>Feed</code> inside the hierarchy of
  * Folders. The user may define some properties, e.g. how often to reload the
  * related Feed.
- * 
+ *
  * @author bpasero
  */
 public interface IBookMark extends IMark {
@@ -64,10 +64,10 @@ public interface IBookMark extends IMark {
    * @return a reference to the link of the feed that this mark is related to.
    */
   FeedLinkReference getFeedLinkReference();
-  
+
   /**
    * Sets the reference to the link of the feed that this mark is related to.
-   * 
+   *
    * @param feedLinkRef
    */
   void setFeedLinkReference(FeedLinkReference feedLinkRef);
