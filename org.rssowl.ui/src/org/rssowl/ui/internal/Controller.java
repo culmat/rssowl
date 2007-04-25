@@ -585,10 +585,6 @@ public class Controller {
     /* Create the News-Service */
     fNewsService = new NewsService();
 
-    /* Create the Feed-Reload Service */
-    if (!Owl.TESTING)
-      fFeedReloadService = new FeedReloadService();
-
     //TODO NotificationPopup
     //    DynamicDAO.addEntityListener(INews.class, new NewsAdapter() {
     //      @Override
@@ -671,15 +667,17 @@ public class Controller {
   //    if (!Owl.TESTING)
   //      fContextService = new ContextService();
   //  }
+
   /**
    * This method is called just after the windows have been opened.
    */
-  //  public void postUIStartup() {
-  //
-  //    /* Create the Feed-Reload Service */
-  //    if (!Owl.TESTING)
-  //      fFeedReloadService = new FeedReloadService();
-  //  }
+  public void postUIStartup() {
+
+    /* Create the Feed-Reload Service */
+    if (!Owl.TESTING)
+      fFeedReloadService = new FeedReloadService();
+  }
+
   /**
    * Returns wether the application is in process of shutting down.
    *
