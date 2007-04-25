@@ -794,6 +794,19 @@ public class BookMarkExplorer extends ViewPart {
           }
         });
 
+        /* Filter: Sticky */
+        final MenuItem showSticky = new MenuItem(menu, SWT.RADIO);
+        showSticky.setText("Show Sticky");
+        showSticky.setSelection(BookMarkFilter.Type.SHOW_STICKY == fBookMarkFilter.getType());
+        showSticky.addSelectionListener(new SelectionAdapter() {
+
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            if (showSticky.getSelection() && fBookMarkFilter.getType() != BookMarkFilter.Type.SHOW_STICKY)
+              doFilter(BookMarkFilter.Type.SHOW_STICKY);
+          }
+        });
+
         /* Separator */
         new MenuItem(menu, SWT.SEPARATOR);
 
