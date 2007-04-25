@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.rssowl.core.util.LoggingSafeRunnable;
@@ -85,6 +86,17 @@ public class Activator extends AbstractUIPlugin {
     SafeRunner.run(new LoggingSafeRunnable() {
       public void run() throws Exception {
         Controller.getDefault().startup();
+      }
+    });
+
+    /* Propagate post-ui startup to Controller */
+    SafeRunner.run(new LoggingSafeRunnable() {
+      public void run() throws Exception {
+        Display.getDefault().asyncExec(new Runnable() {
+          public void run() {
+            Controller.getDefault().postUIStartup();
+          }
+        });
       }
     });
   }
