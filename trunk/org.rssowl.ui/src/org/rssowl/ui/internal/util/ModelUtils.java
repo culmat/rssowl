@@ -47,7 +47,7 @@ import java.util.Set;
 
 /**
  * Helper class for various Model-Transformations required by the UI.
- * 
+ *
  * @author bpasero
  */
 public class ModelUtils {
@@ -77,7 +77,7 @@ public class ModelUtils {
 
     return entities;
   }
-  
+
   /**
    * @param <T>
    * @param selection
@@ -110,7 +110,7 @@ public class ModelUtils {
 
   /**
    * Delete any Folder and Mark that is child of the given Folder
-   * 
+   *
    * @param folder
    * @param entities
    */
@@ -132,7 +132,7 @@ public class ModelUtils {
   /**
    * Returns a Headline for the given News. In general this will be the Title of
    * the News, but if not provided, parts of the Content will be taken instead.
-   * 
+   *
    * @param news The News to get the Headline from.
    * @return the Headline of the given News or "No Headline" if none.
    */
@@ -161,7 +161,7 @@ public class ModelUtils {
   /**
    * Normalizes the given Title by removing various kinds of response codes
    * (e.g. Re).
-   * 
+   *
    * @param title The title to normalize.
    * @return Returns the normalized Title (that is, response codes have been
    * removed).
@@ -247,6 +247,27 @@ public class ModelUtils {
         boolean currentStateNew = INews.State.NEW.equals(newsEvent.getEntity().getState());
 
         if (oldStateNew != currentStateNew)
+          return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * @param events
+   * @return <code>TRUE</code> in case the Sticky-State of the given News
+   * changed its value for any of the given Events, <code>FALSE</code>
+   * otherwise.
+   */
+  public static boolean isStickyStateChange(Set< ? extends ModelEvent> events) {
+    for (ModelEvent event : events) {
+      if (event instanceof NewsEvent) {
+        NewsEvent newsEvent = (NewsEvent) event;
+        boolean oldSticky = (newsEvent.getOldNews() != null) ? newsEvent.getOldNews().isFlagged() : false;
+        boolean currentSticky = newsEvent.getEntity().isFlagged();
+
+        if (oldSticky != currentSticky)
           return true;
       }
     }

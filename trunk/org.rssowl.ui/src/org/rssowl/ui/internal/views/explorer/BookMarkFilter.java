@@ -52,7 +52,7 @@ import java.util.Set;
  * <p>
  * Note: Inline StringMatcher from 3.2 final as it is internal API.
  * </p>
- * 
+ *
  * @author bpasero
  */
 public class BookMarkFilter extends ViewerFilter {
@@ -73,7 +73,10 @@ public class BookMarkFilter extends ViewerFilter {
     SHOW_ERRONEOUS,
 
     /** Show never visited Feeds */
-    SHOW_NEVER_VISITED
+    SHOW_NEVER_VISITED,
+
+    /** Show sticky Feeds */
+    SHOW_STICKY
   }
 
   /** Possible Search Targets */
@@ -130,7 +133,7 @@ public class BookMarkFilter extends ViewerFilter {
   /**
    * Get the Target of the Search. The Target is describing which elements to
    * search when a Text-Search is performed.
-   * 
+   *
    * @return Returns the SearchTarget of the Search as described in the
    * <code>SearchTarget</code> enumeration.
    */
@@ -141,7 +144,7 @@ public class BookMarkFilter extends ViewerFilter {
   /**
    * Set the Target of the Search. The Target is describing which elements to
    * search when a Text-Search is performed.
-   * 
+   *
    * @param searchTarget The SearchTarget of the Search as described in the
    * <code>SearchTarget</code> enumeration.
    */
@@ -152,7 +155,7 @@ public class BookMarkFilter extends ViewerFilter {
   /**
    * Set the Type of this Filter. The Type is describing which elements are
    * filtered.
-   * 
+   *
    * @param type The Type of this Filter as described in the <code>Type</code>
    * enumeration.
    */
@@ -164,7 +167,7 @@ public class BookMarkFilter extends ViewerFilter {
   /**
    * Get the Type of this Filter. The Type is describing which elements are
    * filtered.
-   * 
+   *
    * @return Returns the Type of this Filter as described in the
    * <code>Type</code> enumeration.
    */
@@ -175,7 +178,7 @@ public class BookMarkFilter extends ViewerFilter {
   /**
    * The pattern string for which this filter should select elements in the
    * viewer.
-   * 
+   *
    * @param patternString
    */
   public void setPattern(String patternString) {
@@ -187,7 +190,7 @@ public class BookMarkFilter extends ViewerFilter {
 
   /**
    * Answers whether the given String matches the pattern.
-   * 
+   *
    * @param string the String to test
    * @return whether the string matches the pattern
    */
@@ -223,6 +226,8 @@ public class BookMarkFilter extends ViewerFilter {
         return ModelUtils.isNewStateChange(events);
       else if (fType == Type.SHOW_UNREAD)
         return ModelUtils.isReadStateChange(events);
+      else if (fType == Type.SHOW_STICKY)
+        return ModelUtils.isStickyStateChange(events);
     }
 
     return false;
@@ -234,7 +239,7 @@ public class BookMarkFilter extends ViewerFilter {
    * the tree based on whether the provided filter text matches the text of the
    * given element's text, or that of it's children (if the element has any).
    * Subclasses may override this method.
-   * 
+   *
    * @param viewer the tree viewer in which the element resides
    * @param element the element in the tree to check for a match
    * @return true if the element matches the filter pattern
@@ -248,7 +253,7 @@ public class BookMarkFilter extends ViewerFilter {
    * tree. For example, if a tree has items that are categorized, the category
    * itself may not be a valid selection since it is used merely to organize the
    * elements.
-   * 
+   *
    * @param element
    * @return true if this element is eligible for automatic selection
    */
@@ -260,7 +265,7 @@ public class BookMarkFilter extends ViewerFilter {
    * Check if the parent (category) is a match to the filter text. The default
    * behavior returns true if the element has at least one child element that is
    * a match with the filter text. Subclasses may override this method.
-   * 
+   *
    * @param viewer the viewer that contains the element
    * @param element the tree element to check
    * @return true if the given element has children that matches the filter text
@@ -281,7 +286,7 @@ public class BookMarkFilter extends ViewerFilter {
    * Check if the current (leaf) element is a match with the filter text. The
    * default behavior checks that the label of the element is a match.
    * Subclasses should override this method.
-   * 
+   *
    * @param viewer the viewer that contains the element
    * @param element the tree element to check
    * @return true if the given element's label matches the filter text
@@ -310,9 +315,15 @@ public class BookMarkFilter extends ViewerFilter {
       }
 
       /* Show: Unread Feeds */
-      if (fType == Type.SHOW_UNREAD) {
+      else if (fType == Type.SHOW_UNREAD) {
         IBookMark bookmark = (IBookMark) element;
         return hasUnreadNews(bookmark.getFeedLinkReference());
+      }
+
+      /* Show: Sticky Feeds */
+      else if (fType == Type.SHOW_STICKY) {
+        IBookMark bookmark = (IBookMark) element;
+        return hasStickyNews(bookmark.getFeedLinkReference());
       }
 
       /* Show: Feeds that had an Error while loading */
@@ -366,6 +377,10 @@ public class BookMarkFilter extends ViewerFilter {
     return fNewsService.getUnreadCount(feedRef) > 0;
   }
 
+  private boolean hasStickyNews(FeedLinkReference feedRef) {
+    return fNewsService.getStickyCount(feedRef) > 0;
+  }
+
   private boolean hasNewNews(FeedLinkReference feedRef) {
     return fNewsService.getNewCount(feedRef) > 0;
   }
@@ -373,7 +388,7 @@ public class BookMarkFilter extends ViewerFilter {
   /**
    * Take the given filter text and break it down into words using a
    * BreakIterator.
-   * 
+   *
    * @param text
    * @return an array of words
    */
@@ -426,7 +441,7 @@ public class BookMarkFilter extends ViewerFilter {
   /**
    * Return whether or not if any of the words in text satisfy the match
    * critera.
-   * 
+   *
    * @param text the text to match
    * @return boolean <code>true</code> if one of the words in text satisifes
    * the match criteria.
