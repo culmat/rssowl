@@ -217,6 +217,10 @@
 		<outline text="Microsoft Security Bulletins" xmlUrl="http://www.microsoft.com/technet/security/bulletin/secrss.aspx" />
 		<outline text="MAKE: Blog" xmlUrl="http://www.makezine.com/blog/index.rdf" />
 		<outline text="Planet Mozilla" xmlUrl="http://planet.mozilla.org/rss20.xml" />
+		<outline text="Planet GNOME" xmlUrl="http://planet.gnome.org/rss20.xml" />
+		<outline text="Planet Classpath" xmlUrl="http://planet.classpath.org/rss20.xml" />
+		<outline text="Fedora People" xmlUrl="http://planet.fedoraproject.org/rss20.xml" />
+		<outline text="Planet Debian" xmlUrl="http://planet.debian.org/rss20.xml" />
 		<outline text="Mozillazine" xmlUrl="http://planet.mozillazine.org/rss20.xml" />
 		<outline text="Programming Languages">
 		<outline text="PHPBuilder.com" xmlUrl="http://phpbuilder.com/rss_feed.php?type=articles&amp;limit=20" />
