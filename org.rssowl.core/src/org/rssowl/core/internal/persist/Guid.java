@@ -30,7 +30,7 @@ import org.rssowl.core.util.MergeUtils;
 /**
  * Simple Implementation of this Type. Data is kept in fields and all Methods
  * are functional to set/get this Data.
- * 
+ *
  * @author bpasero
  */
 public class Guid extends Persistable implements IGuid {
@@ -40,7 +40,7 @@ public class Guid extends Persistable implements IGuid {
   private boolean fIsPermaLink;
 
   /**
-   * Constructor used by <code>DefaultModelTypesFactory</code>
+   * Constructor used by <code>DefaultModelFactory</code>
    */
   public Guid() {}
 
@@ -90,7 +90,7 @@ public class Guid extends Persistable implements IGuid {
 
   /**
    * Compare the given type with this type for identity.
-   * 
+   *
    * @param guid to be compared.
    * @return whether this object and <code>guid</code> are identical. It
    * compares all the fields.
@@ -125,7 +125,7 @@ public class Guid extends Persistable implements IGuid {
     MergeResult mergeResult = new MergeResult();
     if (updated)
       mergeResult.addUpdatedObject(this);
-    
+
     return mergeResult;
   }
 }

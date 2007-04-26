@@ -53,18 +53,18 @@ import java.util.List;
  * <li>IsNew: The News has not been read and was not yet looked at</li>
  * <li>IsDeleted: The News has been deleted by the user or system</li>
  * </ul>
- * 
+ *
  * @author bpasero
  */
 public class News extends AbstractEntity implements INews {
 
   private String fTitle;
-  
+
   private transient URI fLink;
   private String fLinkText;
-  
+
   private String fBaseUri;
-  
+
   private Date fReceiveDate;
   private Date fPublishDate;
   private Date fModifiedDate;
@@ -80,7 +80,7 @@ public class News extends AbstractEntity implements INews {
   private String fGuidValue;
   private boolean fGuidIsPermaLink;
   private transient IGuid fGuid;
-  
+
   private ISource fSource;
 
   private ILabel fLabel;
@@ -94,10 +94,10 @@ public class News extends AbstractEntity implements INews {
   private List<ICategory> fCategories;
 
 
-  
+
   /**
-   * Constructor used by <code>DefaultModelTypesFactory</code>
-   * 
+   * Constructor used by <code>DefaultModelFactory</code>
+   *
    * @param feed The Feed this News is belonging to.
    */
   public News(IFeed feed) {
@@ -112,7 +112,7 @@ public class News extends AbstractEntity implements INews {
    * <p>
    * TODO Consider whether feed can be null
    * </p>
-   * 
+   *
    * @param id The unique id of the News.
    * @param feed The Feed this News belongs to.
    * @param receiveDate The Date this News was received.
@@ -131,23 +131,23 @@ public class News extends AbstractEntity implements INews {
   protected News() {
   // As per javadoc
   }
-  
+
   private <T>Boolean isEquivalentCompare(T o1, T o2) {
     if ((o1 == null) && (o2 == null))
       return null;
 
     return Boolean.valueOf(equals(o1, o2));
   }
-  
+
   private boolean equals(Object o1, Object o2) {
     return o1 == null ? o2 == null : o1.equals(o2);
   }
-  
+
   public synchronized boolean isEquivalent(INews other) {
     Assert.isNotNull(other, "other cannot be null"); //$NON-NLS-1$
     String guidValue = (getGuid() == null ? null : getGuid().getValue());
-    
-    String otherGuidValue = (other.getGuid() == null ? null : 
+
+    String otherGuidValue = (other.getGuid() == null ? null :
       other.getGuid().getValue());
 
     Boolean guidMatch = isEquivalentCompare(guidValue, otherGuidValue);
@@ -168,11 +168,11 @@ public class News extends AbstractEntity implements INews {
     }
     if (!getFeedReference().equals(other.getFeedReference()))
       return false;
-    
+
     Boolean titleMatch = isEquivalentCompare(getTitle(), other.getTitle());
     if (titleMatch != null && titleMatch.equals(Boolean.TRUE))
       return true;
-    
+
     return false;
   }
 
@@ -241,7 +241,7 @@ public class News extends AbstractEntity implements INews {
     }
     return fLink;
   }
-  
+
   /*
    * @see org.rssowl.core.model.types.INews#setLink(java.lang.String)
    */
@@ -291,7 +291,7 @@ public class News extends AbstractEntity implements INews {
     }
     return fFeedLinkReference;
   }
-  
+
   /*
    * @see org.rssowl.core.model.types.INews#setReceiveDate(java.util.Date)
    */
@@ -328,7 +328,7 @@ public class News extends AbstractEntity implements INews {
   public synchronized void setSource(ISource source) {
     fSource = source;
   }
-  
+
   /*
    * @see org.rssowl.core.model.types.INews#setInReplyTo(java.lang.String)
    */
@@ -426,7 +426,7 @@ public class News extends AbstractEntity implements INews {
   public synchronized List<ICategory> getCategories() {
     if (fCategories == null)
       return Collections.emptyList();
-    
+
     return Collections.unmodifiableList(fCategories);
   }
 
@@ -445,7 +445,7 @@ public class News extends AbstractEntity implements INews {
   public synchronized State getState() {
     if (fState == null)
       fState = INews.State.values()[fStateOrdinal];
-    
+
     return fState;
   }
 
@@ -469,14 +469,14 @@ public class News extends AbstractEntity implements INews {
   public synchronized ISource getSource() {
     return fSource;
   }
-  
+
   /*
    * @see org.rssowl.core.model.types.INews#getInReplyTo()
    */
   public String getInReplyTo() {
     return fInReplyTo;
   }
-  
+
   /*
    * @see org.rssowl.core.model.types.INews#isVisible()
    */
@@ -501,7 +501,7 @@ public class News extends AbstractEntity implements INews {
 
   /**
    * Returns a String describing the state of this Entity.
-   * 
+   *
    * @return A String describing the state of this Entity.
    */
   @SuppressWarnings("nls")
@@ -547,7 +547,7 @@ public class News extends AbstractEntity implements INews {
 
     return str.toString();
   }
-  
+
   /**
    * @param news
    * @return whether <code>news</code> is identical to this object.
@@ -556,7 +556,7 @@ public class News extends AbstractEntity implements INews {
   public synchronized boolean isIdentical(INews news) {
     if (news == null)
       return false;
-    
+
     synchronized (news) {
       if (this == news)
         return true;
@@ -566,22 +566,22 @@ public class News extends AbstractEntity implements INews {
 
       News n = (News) news;
 
-      return getId().equals(n.getId()) && 
-          fFeedLink.equals(n.fFeedLink) && 
+      return getId().equals(n.getId()) &&
+          fFeedLink.equals(n.fFeedLink) &&
           simpleFieldsEqual(news) &&
-          (fReceiveDate == null ? n.fReceiveDate == null : fReceiveDate.equals(n.fReceiveDate)) && 
-          (getGuid() == null ? n.getGuid() == null : getGuid().equals(n.getGuid())) && 
+          (fReceiveDate == null ? n.fReceiveDate == null : fReceiveDate.equals(n.fReceiveDate)) &&
+          (getGuid() == null ? n.getGuid() == null : getGuid().equals(n.getGuid())) &&
           (fSource == null ? n.fSource == null : fSource.equals(n.fSource)) &&
           (fInReplyTo == null ? n.fInReplyTo == null : fInReplyTo.equals(n.fInReplyTo)) &&
           (fLabel == null ? n.fLabel == null : fLabel.equals(n.fLabel)) &&
           (getAuthor() == null ? n.getAuthor() == null : getAuthor().equals(n.getAuthor())) &&
-          getAttachments().equals(n.getAttachments()) && 
-          getCategories().equals(n.getCategories()) && 
-          getState() == n.getState() && fIsFlagged == n.fIsFlagged && fRating == n.fRating && 
+          getAttachments().equals(n.getAttachments()) &&
+          getCategories().equals(n.getCategories()) &&
+          getState() == n.getState() && fIsFlagged == n.fIsFlagged && fRating == n.fRating &&
           (getProperties() == null ? n.getProperties() == null : getProperties().equals(n.getProperties()));
     }
   }
-  
+
   private boolean simpleFieldsEqual(INews news) {
     return MergeUtils.equals(getBase(), news.getBase()) &&
         MergeUtils.equals(fComments, news.getComments()) &&
@@ -624,7 +624,7 @@ public class News extends AbstractEntity implements INews {
       return result;
     }
   }
-  
+
   private boolean mergeState(INews news) {
     State thisState = getState();
     State otherState = news.getState();
@@ -638,18 +638,18 @@ public class News extends AbstractEntity implements INews {
     }
     return false;
   }
-  
+
   //FIXME Need to consolidate description comparison so that we only do it once
   //per merge.
   private boolean isUpdated(INews news) {
     State thisState = getState();
     if (thisState != State.READ && thisState != State.UNREAD)
       return false;
-    
+
     String title = news.getTitle();
     if (!(fTitle == null ? title == null : fTitle.equals(title)))
       return true;
-    
+
     return false;
   }
 
@@ -680,7 +680,7 @@ public class News extends AbstractEntity implements INews {
         }
         return -1;
       }
-      
+
     };
     ComplexMergeResult<List<ICategory>> mergeResult = MergeUtils.merge(fCategories, categories, comparator, null);
     fCategories = mergeResult.getMergedObject();
@@ -704,8 +704,8 @@ public class News extends AbstractEntity implements INews {
   public synchronized void setParent(IFeed feed) {
     Assert.isNotNull(feed, "feed"); //$NON-NLS-1$
     this.fFeedLink = feed.getLink().toString();
-    
-    /* 
+
+    /*
      * Current value is not valid anymore, but don't create a new one until
      * getFeedReference is called.
      */

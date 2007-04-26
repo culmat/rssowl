@@ -32,7 +32,7 @@ import java.net.URI;
 /**
  * Simple Implementation of this Type. Data is kept in fields and all Methods
  * are functional to set/get this Data.
- * 
+ *
  * @author bpasero
  */
 public class Image extends Persistable implements IImage {
@@ -44,14 +44,14 @@ public class Image extends Persistable implements IImage {
   private String fDescription;
 
   /**
-   * Constructor used by <code>DefaultModelTypesFactory</code>
+   * Constructor used by <code>DefaultModelFactory</code>
    */
   public Image() {}
 
   /**
    * Creates an instance of this object with the provided <code>id</code> and
    * <code>feedReference</code>.
-   * 
+   *
    * @param link The Link of the Image to display it.
    */
   public Image(URI link) {
@@ -167,9 +167,9 @@ public class Image extends Persistable implements IImage {
 
     Image i = (Image) image;
 
-    return (fLink == null ? i.fLink == null : fLink.equals(i.fLink)) && 
-           (fDescription == null ? i.fDescription == null : fDescription.equals(i.fDescription)) && 
-           fHeight == i.fHeight && fWidth == i.fWidth && (fHomepage == null ? i.fHomepage == null : fHomepage.equals(i.fHomepage)) && 
+    return (fLink == null ? i.fLink == null : fLink.equals(i.fLink)) &&
+           (fDescription == null ? i.fDescription == null : fDescription.equals(i.fDescription)) &&
+           fHeight == i.fHeight && fWidth == i.fWidth && (fHomepage == null ? i.fHomepage == null : fHomepage.equals(i.fHomepage)) &&
            (fTitle == null ? i.fTitle == null : fTitle.equals(i.fTitle));
   }
 
@@ -181,14 +181,14 @@ public class Image extends Persistable implements IImage {
 
   /**
    * Returns a String describing the state of this Entity.
-   * 
+   *
    * @return A String describing the state of this Entity.
    */
   @SuppressWarnings("nls")
   public String toLongString() {
     return super.toString() + "Link = " + fLink + ", Title = " + fTitle + ", Homepage = " + fHomepage + ", Width = " + fWidth + ", Height = " + fHeight + ", Description = " + fDescription + ")";
   }
-  
+
   private boolean simpleFieldsEqual(IImage image) {
     return fHeight == image.getHeight() &&
         MergeUtils.equals(getHomepage(), image.getHomepage()) &&
@@ -212,7 +212,7 @@ public class Image extends Persistable implements IImage {
     MergeResult mergeResult = new MergeResult();
     if (updated)
       mergeResult.addUpdatedObject(this);
-      
+
     return mergeResult;
   }
 }

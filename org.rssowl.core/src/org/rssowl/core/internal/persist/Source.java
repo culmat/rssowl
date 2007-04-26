@@ -32,7 +32,7 @@ import java.net.URI;
 /**
  * Simple Implementation of this Type. Data is kept in fields and all Methods
  * are functional to set/get this Data.
- * 
+ *
  * @author bpasero
  */
 public class Source extends Persistable implements ISource {
@@ -42,13 +42,13 @@ public class Source extends Persistable implements ISource {
   private String fName;
 
   /**
-   * Constructor used by <code>DefaultModelTypesFactory</code>
+   * Constructor used by <code>DefaultModelFactory</code>
    */
   public Source() {}
 
   /**
    * Creates a new Source Type.
-   * 
+   *
    * @param link The Link of the Feed that this News came from.
    */
   public Source(URI link) {
@@ -94,7 +94,7 @@ public class Source extends Persistable implements ISource {
       return false;
 
     Source s = (Source) source;
-    
+
     return (fLink == null ? s.fLink == null : getLink().equals(s.getLink())) &&
         (fName == null ? s.fName == null : fName.equals(s.fName));
   }
@@ -123,7 +123,7 @@ public class Source extends Persistable implements ISource {
     MergeResult mergeResult = new MergeResult();
     if (updated)
       mergeResult.addUpdatedObject(this);
-    
+
     return mergeResult;
   }
 }

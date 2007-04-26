@@ -34,7 +34,7 @@ import java.net.URI;
 /**
  * An attachment to the News. This for example could be a News having a Podcast
  * attached.
- * 
+ *
  * @author bpasero
  */
 public class Attachment extends AbstractEntity implements IAttachment {
@@ -51,8 +51,8 @@ public class Attachment extends AbstractEntity implements IAttachment {
   }
 
   /**
-   * Constructor used by <code>DefaultModelTypesFactory</code>
-   * 
+   * Constructor used by <code>DefaultModelFactory</code>
+   *
    * @param news The News this attachment is belonging to.
    */
   public Attachment(INews news) {
@@ -66,7 +66,7 @@ public class Attachment extends AbstractEntity implements IAttachment {
    * <p>
    * TODO Consider whether we should accept a null news parameter
    * </p>
-   * 
+   *
    * @param id The unique ID of this Type.
    * @param news The News this attachment is belonging to.
    */
@@ -134,7 +134,7 @@ public class Attachment extends AbstractEntity implements IAttachment {
 
   /**
    * Returns a String describing the state of this Entity.
-   * 
+   *
    * @return A String describing the state of this Entity.
    */
   @SuppressWarnings("nls")
@@ -144,7 +144,7 @@ public class Attachment extends AbstractEntity implements IAttachment {
 
   /**
    * Compare the given type with this type for identity.
-   * 
+   *
    * @param attachment to be compared.
    * @return whether this object and <code>attachment</code> are identical. It
    * compares all the fields.
@@ -162,7 +162,7 @@ public class Attachment extends AbstractEntity implements IAttachment {
       return getId() == a.getId() && fNews.equals(a.fNews) && (fLink == null ? a.fLink == null : fLink.equals(a.fLink)) && (fType == null ? a.fType == null : fType.equals(a.fType)) && fLength == a.fLength && (getProperties() == null ? a.getProperties() == null : getProperties().equals(a.getProperties()));
     }
   }
-  
+
   /*
    * @see org.rssowl.core.model.types.MergeCapable#merge(java.lang.Object)
    */
@@ -177,7 +177,7 @@ public class Attachment extends AbstractEntity implements IAttachment {
       ComplexMergeResult<?> result = MergeUtils.mergeProperties(this, objectToMerge);
       if (updated || result.isStructuralChange())
         result.addUpdatedObject(this);
-      
+
       return result;
     }
   }

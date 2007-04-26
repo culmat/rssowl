@@ -91,7 +91,6 @@ public class InterpreterServiceImpl implements IInterpreterService {
   private Map<String, ITypeImporter> fTypeImporters;
   private Map<String, INamespaceHandler> fNamespaceHandlers;
   private Map<String, IElementHandler> fElementHandlers;
-  //  private IModelTypesFactory fTypesFactory;
   private IXMLParser fXMLParserImpl;
 
   /** */

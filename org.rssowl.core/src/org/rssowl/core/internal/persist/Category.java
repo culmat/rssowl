@@ -30,7 +30,7 @@ import org.rssowl.core.util.MergeUtils;
 
 /**
  * Each Feed and News may be related to one or more Categories.
- * 
+ *
  * @author bpasero
  */
 public class Category extends AbstractEntity implements ICategory {
@@ -38,7 +38,7 @@ public class Category extends AbstractEntity implements ICategory {
   private String fDomain;
 
   /**
-   * Constructor used by <code>DefaultModelTypesFactory</code>
+   * Constructor used by <code>DefaultModelFactory</code>
    */
   public Category() {
     super(null);
@@ -46,7 +46,7 @@ public class Category extends AbstractEntity implements ICategory {
 
   /**
    * Creates a new Category with the given ID.
-   * 
+   *
    * @param id The unique ID of this type.
    */
   public Category(Long id) {
@@ -83,7 +83,7 @@ public class Category extends AbstractEntity implements ICategory {
 
   /**
    * Compare the given type with this type for identity.
-   * 
+   *
    * @param category to be compared.
    * @return whether this object and <code>category</code> are identical. It
    * compares all the fields.
@@ -96,7 +96,7 @@ public class Category extends AbstractEntity implements ICategory {
       return false;
 
     Category c = (Category) category;
-    
+
     return getId() == c.getId()
         && (fDomain == null ? c.fDomain == null : fDomain.equals(c.fDomain))
         && fName.equals(c.fName)
@@ -112,7 +112,7 @@ public class Category extends AbstractEntity implements ICategory {
 
   /**
    * Returns a String describing the state of this Entity.
-   * 
+   *
    * @return A String describing the state of this Entity.
    */
   @SuppressWarnings("nls")
@@ -129,9 +129,9 @@ public class Category extends AbstractEntity implements ICategory {
     fName = objectToMerge.getName();
     MergeUtils.mergeProperties(this, objectToMerge);
     ComplexMergeResult<?> result = MergeUtils.mergeProperties(this, objectToMerge);
-    if (updated || result.isStructuralChange()) 
+    if (updated || result.isStructuralChange())
       result.addUpdatedObject(this);
-    
+
     return result;
   }
 }
