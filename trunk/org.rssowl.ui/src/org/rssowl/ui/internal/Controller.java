@@ -408,9 +408,6 @@ public class Controller {
           properties.put(IConnectionPropertyConstants.IF_NONE_MATCH, ifNoneMatch);
       }
 
-      /* TODO Send state of proxy usage */
-      properties.put(IConnectionPropertyConstants.USE_PROXY, false /* bookmark.isProxyUsed() */);
-
       /* Load the Feed */
       final Pair<IFeed, IConditionalGet> pairResult = Owl.getConnectionService().reload(feedLink, monitor, properties);
 
@@ -667,7 +664,6 @@ public class Controller {
   //    if (!Owl.TESTING)
   //      fContextService = new ContextService();
   //  }
-
   /**
    * This method is called just after the windows have been opened.
    */
