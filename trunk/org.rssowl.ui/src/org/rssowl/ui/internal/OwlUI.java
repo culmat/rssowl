@@ -27,6 +27,8 @@ package org.rssowl.ui.internal;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.resource.ColorDescriptor;
+import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.DeviceResourceException;
 import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -164,20 +166,20 @@ public class OwlUI {
   /** Group Gradient End Color */
   public static final RGB GROUP_GRADIENT_END_COLOR = new RGB(200, 200, 200);
 
-  /** Sticky Background Color */
-  public static final RGB STICKY_BG_COLOR = new RGB(255, 255, 128);
-
   /** Minimum width of Dialogs in Dialog Units */
   public static final int MIN_DIALOG_WIDTH_DLU = 320;
 
-  /** News-Text Font Key */
+  /** News-Text Font Id */
   public static final String NEWS_TEXT_FONT_ID = "org.rssowl.ui.NewsTextFont";
 
-  /** Headlines Font Key */
+  /** Headlines Font Id */
   public static final String HEADLINES_FONT_ID = "org.rssowl.ui.HeadlinesFont";
 
-  /** BookMark Explorer Font Key */
+  /** BookMark Explorer Font Id */
   public static final String BKMRK_EXPLORER_FONT_ID = "org.rssowl.ui.BookmarkExplorerFont";
+
+  /** Sticky Background Color */
+  public static final String STICKY_BG_COLOR_ID = "org.rssowl.ui.StickyBGColor";
 
   /* Used to cache Image-Descriptors for Favicons */
   private static final Map<Long, ImageDescriptor> FAVICO_CACHE = new HashMap<Long, ImageDescriptor>();
@@ -315,6 +317,19 @@ public class OwlUI {
   }
 
   /**
+   * @param manager
+   * @param descriptor
+   * @return Color
+   */
+  public static Color getColor(ResourceManager manager, ColorDescriptor descriptor) {
+    try {
+      return manager.createColor(descriptor);
+    } catch (DeviceResourceException e) {
+      return manager.getDevice().getSystemColor(SWT.COLOR_BLACK);
+    }
+  }
+
+  /**
    * @param resources
    * @param label
    * @return Color
@@ -367,6 +382,33 @@ public class OwlUI {
     }
 
     return getFont(key);
+  }
+
+  /**
+   * @param key
+   * @param manager
+   * @param defaultColor
+   * @return Font
+   */
+  public static Color getThemeColor(String key, ResourceManager manager, RGB defaultColor) {
+    ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
+    if (colorRegistry != null)
+      return getColor(manager, colorRegistry.getColorDescriptor(key));
+
+    return getColor(manager, defaultColor);
+  }
+
+  /**
+   * @param key
+   * @param defaultRGB
+   * @return Font
+   */
+  public static RGB getThemeRGB(String key, RGB defaultRGB) {
+    ColorRegistry colorRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
+    if (colorRegistry != null)
+      return colorRegistry.getRGB(key);
+
+    return defaultRGB;
   }
 
   /**

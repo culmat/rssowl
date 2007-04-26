@@ -24,13 +24,13 @@
 
 package org.rssowl.ui.internal.editors.feed;
 
-import org.eclipse.jface.resource.FontRegistry;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.ICategory;
@@ -61,15 +61,17 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private DateFormat fDateFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT);
 
   private String fNewsFontFamily;
-  private String normalFontCSS;
-  private String smallFontCSS;
-  private String biggerFontCSS;
-  private String biggestFontCSS;
+  private String fNormalFontCSS;
+  private String fSmallFontCSS;
+  private String fBiggerFontCSS;
+  private String fBiggestFontCSS;
+  private String fStickyBGColorCSS;
   private IPropertyChangeListener fPropertyChangeListener;
 
   /** Creates a new Browser LabelProvider for News */
   public NewsBrowserLabelProvider() {
     createFonts();
+    createColors();
     registerListeners();
   }
 
@@ -83,24 +85,24 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   }
 
   private void registerListeners() {
-    FontRegistry fontRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getFontRegistry();
-    if (fontRegistry != null) {
-      fPropertyChangeListener = new IPropertyChangeListener() {
-        public void propertyChange(PropertyChangeEvent event) {
-          String property = event.getProperty();
-          if (OwlUI.NEWS_TEXT_FONT_ID.equals(property))
-            createFonts();
-        }
-      };
 
-      fontRegistry.addListener(fPropertyChangeListener);
-    }
+    /* Create Property Listener */
+    fPropertyChangeListener = new IPropertyChangeListener() {
+      public void propertyChange(PropertyChangeEvent event) {
+        String property = event.getProperty();
+        if (OwlUI.NEWS_TEXT_FONT_ID.equals(property))
+          createFonts();
+        else if (OwlUI.STICKY_BG_COLOR_ID.equals(property))
+          createColors();
+      }
+    };
+
+    /* Add it to listen to Theme Events */
+    PlatformUI.getWorkbench().getThemeManager().addPropertyChangeListener(fPropertyChangeListener);
   }
 
   private void unregisterListeners() {
-    FontRegistry fontRegistry = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getFontRegistry();
-    if (fontRegistry != null && fPropertyChangeListener != null)
-      fontRegistry.removeListener(fPropertyChangeListener);
+    PlatformUI.getWorkbench().getThemeManager().removePropertyChangeListener(fPropertyChangeListener);
   }
 
   /* Init the Theme Font (from UI Thread) */
@@ -119,10 +121,16 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     int biggest = bigger + 6;
 
     String fontUnit = "pt";
-    normalFontCSS = "font-size: " + normal + fontUnit + ";";
-    smallFontCSS = "font-size: " + small + fontUnit + ";";
-    biggerFontCSS = "font-size: " + bigger + fontUnit + ";";
-    biggestFontCSS = "font-size: " + biggest + fontUnit + ";";
+    fNormalFontCSS = "font-size: " + normal + fontUnit + ";";
+    fSmallFontCSS = "font-size: " + small + fontUnit + ";";
+    fBiggerFontCSS = "font-size: " + bigger + fontUnit + ";";
+    fBiggestFontCSS = "font-size: " + biggest + fontUnit + ";";
+  }
+
+  /* Init the Theme Color (from UI Thread) */
+  private void createColors() {
+    RGB stickyRgb = OwlUI.getThemeRGB(OwlUI.STICKY_BG_COLOR_ID, new RGB(255, 255, 128));
+    fStickyBGColorCSS = "background-color: rgb(" + stickyRgb.red + "," + stickyRgb.green + "," + stickyRgb.blue + ");";
   }
 
   /*
@@ -162,7 +170,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("img { border: none; }\n");
 
     /* Group */
-    writer.append("div.group { color: #678; ").append(biggestFontCSS).append(" font-weight: bold; padding: 0 15px 5px 15px; }\n");
+    writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; padding: 0 15px 5px 15px; }\n");
 
     /* Main DIV per Item */
     writer.write("div.newsitem { margin: 10px 10px 30px 10px; border: dotted 1px silver; }\n");
@@ -171,7 +179,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("div.header { padding: 10px; background-color: #eee; }\n");
     writer.write("div.content { \n");
     writer.write("   padding: 15px 10px 15px 10px; border-top: dotted 1px silver; \n");
-    writer.append("  background-color: #fff; clear: both; ").append(normalFontCSS).append("\n");
+    writer.append("  background-color: #fff; clear: both; ").append(fNormalFontCSS).append("\n");
     writer.write("}\n");
     writer.write("div.footer { background-color: rgb(248,248,248); padding: 5px 10px 5px 10px; line-height: 20px; border-top: dotted 1px silver; }\n");
 
@@ -179,59 +187,59 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("div.content p { margin-top: 0; padding-top: 0; margin-left: 0; padding-left: 0; }\n");
 
     /* Title */
-    writer.append("div.title { padding-bottom: 6px; ").append(biggerFontCSS).append(" }\n");
+    writer.append("div.title { padding-bottom: 6px; ").append(fBiggerFontCSS).append(" }\n");
 
     writer.write("div.title a { color: #009; text-decoration: none; }\n");
     writer.write("div.title a.unread { font-weight: bold; }\n");
-    writer.write("div.title a.readsticky { background-color: rgb(255,255,128); }\n");
-    writer.write("div.title a.unreadsticky { font-weight: bold; background-color: rgb(255,255,128); }\n");
+    writer.append("div.title a.readsticky { ").append(fStickyBGColorCSS).append(" }\n");
+    writer.append("div.title a.unreadsticky { font-weight: bold; ").append(fStickyBGColorCSS).append(" }\n");
     writer.write("div.title a:hover { color: #009; text-decoration: underline; }\n");
     writer.write("div.title a:visited { color: #009; text-decoration: underline; }\n");
 
     writer.write("div.title span.unread { font-weight: bold; }\n");
-    writer.write("div.title span.readsticky { background-color: rgb(255,255,128); }\n");
-    writer.write("div.title span.unreadsticky { font-weight: bold; background-color: rgb(255,255,128); }\n");
+    writer.append("div.title span.readsticky { ").append(fStickyBGColorCSS).append(" }\n");
+    writer.append("div.title span.unreadsticky { font-weight: bold; ").append(fStickyBGColorCSS).append(" }\n");
 
     /* Date */
-    writer.append("div.date { float: left; ").append(smallFontCSS).append(" }\n");
+    writer.append("div.date { float: left; ").append(fSmallFontCSS).append(" }\n");
 
     /* Author */
-    writer.append("div.author { text-align: right; ").append(smallFontCSS).append(" }\n");
+    writer.append("div.author { text-align: right; ").append(fSmallFontCSS).append(" }\n");
 
     /* Attachments */
-    writer.append("div.attachments { clear: both; ").append(smallFontCSS).append(" }\n");
+    writer.append("div.attachments { clear: both; ").append(fSmallFontCSS).append(" }\n");
     writer.write("div.attachments span.label { float: left; padding-right: 5px; }\n");
     writer.write("div.attachments a { color: #009; text-decoration: none; }\n");
     writer.write("div.attachments a:visited { color: #009; text-decoration: none; }\n");
     writer.write("div.attachments a:hover { text-decoration: underline; }\n");
 
     /* Label */
-    writer.append("div.label { clear: both; ").append(smallFontCSS).append(" }\n");
+    writer.append("div.label { clear: both; ").append(fSmallFontCSS).append(" }\n");
     writer.write("div.label span.label {float: left; padding-right: 5px; }\n");
 
     /* Categories */
-    writer.append("div.categories { clear: both; ").append(smallFontCSS).append(" }\n");
+    writer.append("div.categories { clear: both; ").append(fSmallFontCSS).append(" }\n");
     writer.write("div.categories span.label { float: left; padding-right: 5px; }\n");
     writer.write("div.categories a { color: #009; text-decoration: none; }\n");
     writer.write("div.categories a:visited { color: #009; text-decoration: none; }\n");
     writer.write("div.categories a:hover { text-decoration: underline; }\n");
 
     /* Source */
-    writer.append("div.source { clear: both; ").append(smallFontCSS).append(" }\n");
+    writer.append("div.source { clear: both; ").append(fSmallFontCSS).append(" }\n");
     writer.write("div.source span.label {float: left; padding-right: 5px; }\n");
     writer.write("div.source a { color: #009; text-decoration: none; }\n");
     writer.write("div.source a:visited { color: #009; text-decoration: none; }\n");
     writer.write("div.source a:hover { text-decoration: underline; }\n");
 
     /* Comments */
-    writer.append("div.comments { clear: both; ").append(smallFontCSS).append(" }\n");
+    writer.append("div.comments { clear: both; ").append(fSmallFontCSS).append(" }\n");
     writer.write("div.comments span.label {float: left; padding-right: 5px; }\n");
     writer.write("div.comments a { color: #009; text-decoration: none; }\n");
     writer.write("div.comments a:visited { color: #009; text-decoration: none; }\n");
     writer.write("div.comments a:hover { text-decoration: underline; }\n");
 
     /* Search Related */
-    writer.append("div.searchrelated { clear: both; ").append(smallFontCSS).append(" }\n");
+    writer.append("div.searchrelated { clear: both; ").append(fSmallFontCSS).append(" }\n");
     writer.write("div.searchrelated span.label {float: left; padding-right: 5px; }\n");
     writer.write("div.searchrelated a { color: #009; text-decoration: none; }\n");
     writer.write("div.searchrelated a:visited { color: #009; text-decoration: none; }\n");

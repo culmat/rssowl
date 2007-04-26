@@ -67,7 +67,7 @@ public class NewsBrowserControl implements IFeedViewPart {
   private ISelectionListener fSelectionListener;
   private Object fInitialInput;
   private IPreferenceScope fInputPreferences;
-  private IPropertyChangeListener fFontPropertyChangeListener;
+  private IPropertyChangeListener fPropertyChangeListener;
 
   /*
    * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#init(org.eclipse.ui.IEditorSite)
@@ -220,18 +220,21 @@ public class NewsBrowserControl implements IFeedViewPart {
     });
 
     /* Refresh Browser when Font Changes */
-    fFontPropertyChangeListener = new IPropertyChangeListener() {
+    fPropertyChangeListener = new IPropertyChangeListener() {
       public void propertyChange(PropertyChangeEvent event) {
-        if (!fViewer.getControl().isDisposed() && OwlUI.NEWS_TEXT_FONT_ID.equals(event.getProperty()))
+        if (fViewer.getControl().isDisposed())
+          return;
+
+        if (OwlUI.NEWS_TEXT_FONT_ID.equals(event.getProperty()) || OwlUI.STICKY_BG_COLOR_ID.equals(event.getProperty()))
           ((Browser) fViewer.getControl()).refresh();
       }
     };
-    PlatformUI.getWorkbench().getThemeManager().addPropertyChangeListener(fFontPropertyChangeListener);
+    PlatformUI.getWorkbench().getThemeManager().addPropertyChangeListener(fPropertyChangeListener);
   }
 
   private void unregisterListeners() {
     fEditorSite.getPage().removePostSelectionListener(fSelectionListener);
-    PlatformUI.getWorkbench().getThemeManager().removePropertyChangeListener(fFontPropertyChangeListener);
+    PlatformUI.getWorkbench().getThemeManager().removePropertyChangeListener(fPropertyChangeListener);
   }
 
   /*

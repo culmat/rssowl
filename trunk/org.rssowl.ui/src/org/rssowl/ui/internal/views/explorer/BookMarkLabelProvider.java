@@ -35,6 +35,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.RGB;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
@@ -97,7 +98,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     fDefaultFont = OwlUI.getThemeFont(OwlUI.BKMRK_EXPLORER_FONT_ID, SWT.NORMAL);
 
     /* Colors */
-    fStickyBgColor = OwlUI.getColor(fResources, OwlUI.STICKY_BG_COLOR);
+    fStickyBgColor = OwlUI.getThemeColor(OwlUI.STICKY_BG_COLOR_ID, fResources, new RGB(255, 255, 128));
     fGroupFgColor = OwlUI.getColor(fResources, OwlUI.GROUP_FG_COLOR);
   }
 
