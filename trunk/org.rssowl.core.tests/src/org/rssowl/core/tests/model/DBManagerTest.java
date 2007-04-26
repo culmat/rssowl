@@ -430,40 +430,30 @@ public class DBManagerTest {
   /**
    * Adds, retrieves and checks if the added object matches the retrieved one.
    */
-  // FIXME Need the method loadCategories in a public interface
-  // @Test
-  // public void testAddAndGetFeedCategory() {
-  // try {
-  // Category category = (Category) createFeedCategory();
-  // CategoryReference ref = DynamicDAO.save(category);
-  // List<ICategory> categories = fModelDAO.loadCategories();
-  // assertEquals(1, categories.size());
-  // category.setId(categories.get(0).getId());
-  // assertTrue(category.isIdentical(categories.get(0)));
-  // manager.deleteCategory(ref);
-  // } catch (PersistenceLayerException e) {
-  // fail(e.getMessage());
-  // }
-  // }
+  @Test
+  public void testAddAndGetFeedCategory() {
+    Category category = (Category) createFeedCategory();
+    DynamicDAO.save(category);
+    Collection<ICategory> categories = DynamicDAO.loadAll(ICategory.class);
+    assertEquals(1, categories.size());
+    category.setId(categories.iterator().next().getId());
+    assertTrue(category.isIdentical(categories.iterator().next()));
+    DynamicDAO.deleteAll(categories);
+  }
+
   /**
    * Adds, retrieves and checks if the added object matches the retrieved one.
    */
-  // FIXME Need the method loadCategories in a public interface
-  // @Test
-  // public void testAddAndGetNewsCategory() {
-  // try {
-  // Category category = (Category) createNewsCategory();
-  // CategoryManager manager = fManagers.getCategoryManager();
-  // CategoryReference ref = manager.saveCategory(category);
-  // List<ICategory> categories = manager.loadCategories();
-  // assertEquals(1, categories.size());
-  // category.setId(categories.get(0).getId());
-  // assertTrue(category.isIdentical(categories.get(0)));
-  // manager.deleteCategory(ref);
-  // } catch (PersistenceLayerException e) {
-  // fail(e.getMessage());
-  // }
-  // }
+  public void testAddAndGetNewsCategory() {
+    Category category = (Category) createNewsCategory();
+    DynamicDAO.save(category);
+    Collection<ICategory> categories = DynamicDAO.loadAll(ICategory.class);
+    assertEquals(1, categories.size());
+    category.setId(categories.iterator().next().getId());
+    assertTrue(category.isIdentical(categories.iterator().next()));
+    DynamicDAO.deleteAll(categories);
+  }
+
   private ILabel createLabel() {
     ILabel label = fTypesFactory.createLabel(null, "someLabel");
     label.setColor("200,100,009");
