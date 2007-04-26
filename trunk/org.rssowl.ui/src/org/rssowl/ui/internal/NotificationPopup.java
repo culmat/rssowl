@@ -28,6 +28,8 @@ import org.eclipse.jface.dialogs.PopupDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
+import org.eclipse.jface.util.OpenStrategy;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.MouseAdapter;
@@ -44,12 +46,21 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.ui.internal.editors.feed.FeedView;
+import org.rssowl.ui.internal.editors.feed.FeedViewInput;
+import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
+import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 
@@ -92,7 +103,7 @@ import java.util.Map;
 public class NotificationPopup extends PopupDialog {
 
   /* Max. Number of News being displayed in the Popup */
-  private static final int MAX_NEWS = 8;
+  //private static final int MAX_NEWS = 8;
 
   /* Max. Title Length per News */
   private static final int MAX_TITLE_LENGTH = 50;
@@ -150,8 +161,9 @@ public class NotificationPopup extends PopupDialog {
       bookmark = fMapFeedToBookmark.get(feedRef);
     else {
       Collection<IBookMark> bookmarks = Owl.getPersistenceService().getDAOService().getBookMarkDAO().loadAll(feedRef);
-      bookmark = null;//        bookmark = bookmarks.get(0);
-      //        fMapFeedToBookmark.put(feedRef, bookmark);
+      //      bookmark = null;
+      bookmark = bookmarks.iterator().next();
+      fMapFeedToBookmark.put(feedRef, bookmark);
     }
 
     final CLabel newsLabel = new CLabel(fInnerContentCircle, SWT.NONE);
@@ -179,33 +191,33 @@ public class NotificationPopup extends PopupDialog {
     newsLabel.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseUp(MouseEvent e) {
-      //        IWorkbenchPage page = OwlUI.getPage();
-      //        if (page != null) {
-      //
-      //          /* First try if the Bookmark is already visible */
-      //          IEditorReference editorRef = EditorUtils.findEditor(page.getEditorReferences(), bookmark);
-      //          if (editorRef != null) {
-      //            IEditorPart editor = editorRef.getEditor(false);
-      //            if (editor instanceof FeedView) {
-      //              ((FeedView) editor).setSelection(new StructuredSelection(news));
-      //              close();
-      //              page.activate(editor);
-      //              return;
-      //            }
-      //          }
-      //
-      //          /* Otherwise Open */
-      //          boolean activateEditor = OpenStrategy.activateOnOpen();
-      //          FeedViewInput input = new FeedViewInput(bookmark, PerformAfterInputSet.selectNews(new NewsReference(news.getId())));
-      //          try {
-      //            OwlUI.getPage().openEditor(input, FeedView.ID, activateEditor);
-      //          } catch (PartInitException ex) {
-      //            Activator.getDefault().getLog().log(ex.getStatus());
-      //          }
-      //        }
-      //
-      //        /* Close Popup */
-      //        close();
+        IWorkbenchPage page = OwlUI.getPage();
+        if (page != null) {
+
+          /* First try if the Bookmark is already visible */
+          IEditorReference editorRef = EditorUtils.findEditor(page.getEditorReferences(), bookmark);
+          if (editorRef != null) {
+            IEditorPart editor = editorRef.getEditor(false);
+            if (editor instanceof FeedView) {
+              ((FeedView) editor).setSelection(new StructuredSelection(news));
+              close();
+              page.activate(editor);
+              return;
+            }
+          }
+
+          /* Otherwise Open */
+          boolean activateEditor = OpenStrategy.activateOnOpen();
+          FeedViewInput input = new FeedViewInput(bookmark, PerformAfterInputSet.selectNews(new NewsReference(news.getId())));
+          try {
+            OwlUI.getPage().openEditor(input, FeedView.ID, activateEditor);
+          } catch (PartInitException ex) {
+            Activator.getDefault().getLog().log(ex.getStatus());
+          }
+        }
+
+        /* Close Popup */
+        close();
       }
     });
   }
