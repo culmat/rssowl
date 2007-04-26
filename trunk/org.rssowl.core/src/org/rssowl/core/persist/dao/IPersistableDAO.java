@@ -47,9 +47,9 @@ public interface IPersistableDAO<T extends IPersistable> {
    * @return the persistable with <code>id</code> or <code>null</code> in
    * case none exists.
    */
-  T load(long id);
+  T load(long id) throws PersistenceException;;
 
-  Collection<T> loadAll();
+  Collection<T> loadAll() throws PersistenceException;;
 
   /**
    * Saves <code>persistable</code> to the persistence system. This method
@@ -61,20 +61,20 @@ public interface IPersistableDAO<T extends IPersistable> {
    * @throws PersistenceException In case of an error while trying to perform
    * the operation.
    */
-  T save(T persistable);
+  T save(T persistable) throws PersistenceException;;
 
-  void saveAll(Collection<T> persistables);
+  void saveAll(Collection<T> persistables) throws PersistenceException;;
 
   /**
    * Deletes <code>persistable</code> from the persistence system.
    *
    * @param persistable The persistable to delete.
    */
-  void delete(T persistable);
+  void delete(T persistable) throws PersistenceException;;
 
-  void deleteAll(Collection<T> objects);
+  void deleteAll(Collection<T> objects) throws PersistenceException;;
 
-  long countAll();
+  long countAll() throws PersistenceException;;
 
   Class< ? extends T> getEntityClass();
 }

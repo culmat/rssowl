@@ -50,7 +50,7 @@ public interface IFolderDAO extends IEntityDAO<IFolder, FolderListener, FolderEv
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
    */
-  Collection<IFolder> loadRoots();
+  Collection<IFolder> loadRoots() throws PersistenceException;;
 
   /**
    * <p>

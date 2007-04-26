@@ -37,7 +37,7 @@ import java.util.Map;
 /**
  * This interface allows to contribute Handlers for Protocols. The application
  * is calling the contributor that is matching the URL's protocol.
- * 
+ *
  * @author bpasero
  */
 public interface IProtocolHandler {
@@ -45,7 +45,7 @@ public interface IProtocolHandler {
   /**
    * Reloads a <code>IFeed</code> with its News from the given
    * <code>URL</code> and returns it.
-   * 
+   *
    * @param link The Link to the Feed as <code>URI</code>.
    * @param monitor The Progress-Monitor used from the callee.
    * @param properties A Map of properties that can be used to transport custom
@@ -59,10 +59,12 @@ public interface IProtocolHandler {
 
   /**
    * Get the Feed Icon for the given Link. For instance, this could be the
-   * favicon associated with the host providing the Feed.
-   * 
+   * favicon associated with the host providing the Feed. Will return
+   * <code>NULL</code> if no icon can be found.
+   *
    * @param link The Link to the Feed as <code>URI</code>.
-   * @return Returns an Icon for the given Link as byte-array.
+   * @return Returns an Icon for the given Link as byte-array or
+   * <code>NULL</code> if none.
    */
   byte[] getFeedIcon(URI link);
 
@@ -79,7 +81,7 @@ public interface IProtocolHandler {
    * </p>
    * <strong>Example of a implementation where the default Handler should not be
    * used or is not present:</strong>
-   * 
+   *
    * <pre>
    *   public URLStreamHandler getURLStreamHandler() throws ConnectionException {
    *     return new AbstractURLStreamHandlerService() {
@@ -87,9 +89,9 @@ public interface IProtocolHandler {
    *     }
    *   }
    * </pre>
-   * 
+   *
    * Or as an alternative:
-   * 
+   *
    * <pre>
    *   public URLStreamHandler getURLStreamHandler() throws ConnectionException {
    *     return new URLStreamHandlerService() {
@@ -97,16 +99,16 @@ public interface IProtocolHandler {
    *     }
    *   }
    * </pre>
-   * 
+   *
    * <strong>Example of a implementation where the default Handler should be
    * used:</strong>
-   * 
+   *
    * <pre>
    *   public URLStreamHandler getURLStreamHandler() throws ConnectionException {
    *     return null;
    *   }
    * </pre>
-   * 
+   *
    * @return The handler used by <code>java.net.URL</code> for the contributed
    * Protocol or NULL if the default Handler of the JDK shall be used. Note that
    * you have to supply a Handler in case the contributed Protocol does not have
