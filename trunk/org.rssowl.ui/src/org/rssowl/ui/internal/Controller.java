@@ -104,7 +104,7 @@ import java.util.Set;
 public class Controller {
 
   /* Extension-Points */
-  private static final String ENTITY_PROPERTY_PAGE_EXTENSION_POINT = "org.rssowl.ui.entityPropertyPage"; //$NON-NLS-1$
+  private static final String ENTITY_PROPERTY_PAGE_EXTENSION_POINT = "org.rssowl.ui.EntityPropertyPage"; //$NON-NLS-1$
 
   /* The Singleton Instance */
   private static Controller fInstance;
@@ -231,7 +231,7 @@ public class Controller {
         boolean handlesMultipleEntities = Boolean.valueOf(element.getAttribute("handlesMultipleEntities"));
 
         List<Class< ? >> targetEntities = new ArrayList<Class< ? >>();
-        IConfigurationElement[] entityTargets = element.getChildren("entityTarget");
+        IConfigurationElement[] entityTargets = element.getChildren("targetEntity");
         for (IConfigurationElement entityTarget : entityTargets)
           targetEntities.add(Class.forName(entityTarget.getAttribute("class")));
 
