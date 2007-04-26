@@ -47,5 +47,5 @@ public interface ICategoryDAO extends IEntityDAO<ICategory, CategoryListener, Ca
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
    */
-  Set<String> loadAllNames();
+  Set<String> loadAllNames() throws PersistenceException;
 }
