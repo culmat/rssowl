@@ -53,15 +53,15 @@ import java.net.URI;
 import java.util.Date;
 
 /**
- * Default implementation of IModelTypesFactory. It instantiates the concrete
- * classes provided in the {@link org.rssowl.core.internal.persist} package.
+ * Default implementation of IModelFactory. It instantiates the concrete classes
+ * provided in the {@link org.rssowl.core.internal.persist} package.
  *
  * @author Ismael Juma (ismael@juma.me.uk)
  */
-public class DefaultModelTypesFactory implements IModelFactory {
+public class DefaultModelFactory implements IModelFactory {
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createNews(java.lang.Long,
+   * @see org.rssowl.core.model.types.IModelFactory#createNews(java.lang.Long,
    * org.rssowl.core.model.types.IFeed, java.util.Date)
    */
   public INews createNews(Long id, IFeed feed, Date receiveDate) {
@@ -73,7 +73,7 @@ public class DefaultModelTypesFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createPerson(long,
+   * @see org.rssowl.core.model.types.IModelFactory#createPerson(long,
    * org.rssowl.core.model.reference.ModelReference)
    */
   public IPerson createPerson(Long id, IPersistable parentRef) {
@@ -89,7 +89,7 @@ public class DefaultModelTypesFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createImage(org.rssowl.core.model.types.IFeed)
+   * @see org.rssowl.core.model.types.IModelFactory#createImage(org.rssowl.core.model.types.IFeed)
    */
   public IImage createImage(IFeed feed) {
     Image image = new Image();
@@ -101,7 +101,7 @@ public class DefaultModelTypesFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createAttachment(long,
+   * @see org.rssowl.core.model.types.IModelFactory#createAttachment(long,
    * java.net.URI, org.rssowl.core.model.reference.NewsReference)
    */
   public IAttachment createAttachment(Long id, INews news) {
@@ -112,7 +112,7 @@ public class DefaultModelTypesFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createCategory(java.lang.Long,
+   * @see org.rssowl.core.model.types.IModelFactory#createCategory(java.lang.Long,
    * org.rssowl.core.model.types.IEntity)
    */
   public ICategory createCategory(Long id, IEntity parent) {
@@ -128,7 +128,7 @@ public class DefaultModelTypesFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createSource(org.rssowl.core.model.types.INews)
+   * @see org.rssowl.core.model.types.IModelFactory#createSource(org.rssowl.core.model.types.INews)
    */
   public ISource createSource(final INews news) {
     Source source = new Source();
@@ -140,7 +140,7 @@ public class DefaultModelTypesFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createGuid(org.rssowl.core.model.types.INews,
+   * @see org.rssowl.core.model.types.IModelFactory#createGuid(org.rssowl.core.model.types.INews,
    * java.lang.String)
    */
   public IGuid createGuid(final INews news, String value) {
@@ -153,7 +153,7 @@ public class DefaultModelTypesFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createCloud(org.rssowl.core.model.types.IFeed)
+   * @see org.rssowl.core.model.types.IModelFactory#createCloud(org.rssowl.core.model.types.IFeed)
    */
   public ICloud createCloud(IFeed feed) {
     CloudAdapter cloud = new CloudAdapter();
@@ -165,7 +165,7 @@ public class DefaultModelTypesFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createTextInput(org.rssowl.core.model.types.IFeed)
+   * @see org.rssowl.core.model.types.IModelFactory#createTextInput(org.rssowl.core.model.types.IFeed)
    */
   public ITextInput createTextInput(IFeed feed) {
     TextInputAdapter textInput = new TextInputAdapter();
@@ -177,7 +177,7 @@ public class DefaultModelTypesFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createFeed(java.lang.Long,
+   * @see org.rssowl.core.model.types.IModelFactory#createFeed(java.lang.Long,
    * java.net.URI)
    */
   public IFeed createFeed(Long id, URI link) {
@@ -185,7 +185,7 @@ public class DefaultModelTypesFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createFolder(long,
+   * @see org.rssowl.core.model.types.IModelFactory#createFolder(long,
    * java.lang.String, org.rssowl.core.model.reference.FolderReference)
    */
   public IFolder createFolder(Long id, IFolder parent, String name) {
@@ -199,7 +199,7 @@ public class DefaultModelTypesFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createLabel(long,
+   * @see org.rssowl.core.model.types.IModelFactory#createLabel(long,
    * java.lang.String)
    */
   public ILabel createLabel(Long id, String name) {
@@ -207,7 +207,7 @@ public class DefaultModelTypesFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createSearchMark(long,
+   * @see org.rssowl.core.model.types.IModelFactory#createSearchMark(long,
    * java.lang.String, org.rssowl.core.model.reference.FolderReference)
    */
   public ISearchMark createSearchMark(Long id, IFolder folder, String name) {
@@ -220,7 +220,7 @@ public class DefaultModelTypesFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createBookMark(java.lang.Long,
+   * @see org.rssowl.core.model.types.IModelFactory#createBookMark(java.lang.Long,
    * org.rssowl.core.model.types.IFolder,
    * org.rssowl.core.model.reference.FeedLinkReference, java.lang.String)
    */
@@ -234,7 +234,7 @@ public class DefaultModelTypesFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createSearchCondition(java.lang.Long,
+   * @see org.rssowl.core.model.types.IModelFactory#createSearchCondition(java.lang.Long,
    * org.rssowl.core.model.types.ISearchMark,
    * org.rssowl.core.model.search.ISearchField,
    * org.rssowl.core.model.search.SearchSpecifier, java.lang.Object)
@@ -248,7 +248,7 @@ public class DefaultModelTypesFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createSearchCondition(org.rssowl.core.model.search.ISearchField,
+   * @see org.rssowl.core.model.types.IModelFactory#createSearchCondition(org.rssowl.core.model.search.ISearchField,
    * org.rssowl.core.model.search.SearchSpecifier, java.lang.Object)
    */
   public ISearchCondition createSearchCondition(ISearchField field, SearchSpecifier specifier, Object value) {
@@ -256,7 +256,7 @@ public class DefaultModelTypesFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createSearchField(int,
+   * @see org.rssowl.core.model.types.IModelFactory#createSearchField(int,
    * java.lang.String)
    */
   public ISearchField createSearchField(int id, String entityName) {
@@ -264,7 +264,7 @@ public class DefaultModelTypesFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IModelTypesFactory#createConditionalGet(java.lang.String,
+   * @see org.rssowl.core.model.types.IModelFactory#createConditionalGet(java.lang.String,
    * java.net.URI, java.lang.String)
    */
   public IConditionalGet createConditionalGet(String ifModifiedSince, URI link, String ifNoneMatch) {

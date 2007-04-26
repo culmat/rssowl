@@ -29,7 +29,7 @@ import org.rssowl.core.IListenerService;
 import org.rssowl.core.connection.IConnectionService;
 import org.rssowl.core.internal.connection.ConnectionServiceImpl;
 import org.rssowl.core.internal.interpreter.InterpreterServiceImpl;
-import org.rssowl.core.internal.persist.DefaultModelTypesFactory;
+import org.rssowl.core.internal.persist.DefaultModelFactory;
 import org.rssowl.core.internal.persist.pref.PreferenceServiceImpl;
 import org.rssowl.core.interpreter.IInterpreterService;
 import org.rssowl.core.persist.IModelFactory;
@@ -49,7 +49,7 @@ public final class InternalOwl {
   private static final InternalOwl INSTANCE = new InternalOwl();
 
   /* Extension Point: Factory for Model Types */
-  private static final String MODEL_TYPESFACTORY_EXTENSION_POINT = "org.rssowl.core.ModelTypesFactory"; //$NON-NLS-1$
+  private static final String MODEL_TYPESFACTORY_EXTENSION_POINT = "org.rssowl.core.ModelFactory"; //$NON-NLS-1$
 
   /* Extension Point: Persistence Service */
   private static final String PERSISTANCE_SERVICE_EXTENSION_POINT = "org.rssowl.core.PersistenceService"; //$NON-NLS-1$
@@ -162,7 +162,7 @@ public final class InternalOwl {
 
   /* Load Model Types Factory contribution */
   private IModelFactory loadTypesFactory() {
-    IModelFactory defaultFactory = new DefaultModelTypesFactory();
+    IModelFactory defaultFactory = new DefaultModelFactory();
     return (IModelFactory) ExtensionUtils.loadSingletonExecutableExtension(MODEL_TYPESFACTORY_EXTENSION_POINT, defaultFactory);
   }
 }

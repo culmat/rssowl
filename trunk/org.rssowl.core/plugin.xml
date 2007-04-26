@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-   <extension-point id="ModelTypesFactory" name="Model Types Factory" schema="schema/ModelTypesFactory.exsd"/>
+   <extension-point id="ModelFactory" name="Model Factory" schema="schema/ModelFactory.exsd"/>
    <extension-point id="ModelSearch" name="Model Search" schema="schema/ModelSearch.exsd"/>
    <extension-point id="PersistenceService" name="Persistence Service" schema="schema/PersistenceService.exsd"/>
    <extension-point id="ApplicationService" name="Application Service" schema="schema/ApplicationService.exsd"/>
