@@ -427,7 +427,17 @@ public class Controller {
       /* Load the Favicon directly afterwards if required */
       if (OwlUI.getFavicon(bookmark) == null) {
         try {
-          byte[] faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
+          byte[] faviconBytes = null;
+
+          /* First try using the Homepage of the Feed */
+          if (pairResult.getFirst().getHomepage() != null)
+            faviconBytes = Owl.getConnectionService().getFeedIcon(pairResult.getFirst().getHomepage());
+
+          /* Then try with Feed address itself */
+          if (faviconBytes == null)
+            faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
+
+          /* Store locally */
           OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK);
         } catch (UnknownFeedException e) {
           Activator.getDefault().getLog().log(e.getStatus());
