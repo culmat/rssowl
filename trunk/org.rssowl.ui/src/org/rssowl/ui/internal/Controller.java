@@ -430,8 +430,9 @@ public class Controller {
           byte[] faviconBytes = null;
 
           /* First try using the Homepage of the Feed */
-          if (pairResult.getFirst().getHomepage() != null)
-            faviconBytes = Owl.getConnectionService().getFeedIcon(pairResult.getFirst().getHomepage());
+          URI homepage = pairResult.getFirst().getHomepage();
+          if (homepage != null && StringUtils.isSet(homepage.toString()))
+            faviconBytes = Owl.getConnectionService().getFeedIcon(homepage);
 
           /* Then try with Feed address itself */
           if (faviconBytes == null)
