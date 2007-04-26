@@ -15,7 +15,7 @@
    <extension-point id="ProtocolHandler" name="Protocol Handler" schema="schema/ProtocolHandler.exsd"/>
    <extension-point id="CredentialsProvider" name="Credentials Provider" schema="schema/CredentialsProvider.exsd"/>
    <extension-point id="SSLHandler" name="SSL Handler" schema="schema/SSLHandler.exsd"/>
-   <extension-point id="DAOFactory" name="DAO Factory" schema="schema/DAOFactory.exsd"/>
+   <extension-point id="DAOService" name="DAO Service" schema="schema/DAOService.exsd"/>
    <extension
          point="org.rssowl.core.PersistenceService">
       <persistanceservice class="org.rssowl.core.internal.persist.service.PersistenceServiceImpl"/>
@@ -95,9 +95,9 @@
       </preferencesInitializer>
    </extension>
    <extension
-         point="org.rssowl.core.DAOFactory">
-      <daofactory
+         point="org.rssowl.core.DAOService">
+      <daoservice
             class="org.rssowl.core.internal.persist.dao.DAOServiceImpl">
-      </daofactory>
+      </daoservice>
    </extension>
 </plugin>
