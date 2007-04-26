@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.eclipse.core.runtime.Assert;
@@ -47,9 +48,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListener,
-    FolderEvent> implements IFolderDAO   {
+/**
+ * A data-access-object for <code>IFolder</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListener, FolderEvent> implements IFolderDAO {
 
+  /** Default constructor using the specific IPersistable for this DAO */
   public FolderDAOImpl() {
     super(Folder.class, false);
   }
@@ -63,25 +69,25 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
   protected final FolderEvent createSaveEventTemplate(IFolder entity) {
     return new FolderEvent(entity, null, true);
   }
-  
-//  public void deleteFolders(List<IFolder> folders) {
-//    fWriteLock.lock();
-//    try {
-//      for (IFolder folder : folders) {
-//        FolderEvent event = new FolderEvent(folder, null, true);
-//        DBHelper.putEventTemplate(event);
-//      }
-//      for (IFolder folder : folders)
-//        fDb.delete(folder);
-//
-//      fDb.commit();
-//    } catch (Db4oException e) {
-//      throw new PersistenceException(e);
-//    } finally {
-//      fWriteLock.unlock();
-//    }
-//    DBHelper.cleanUpAndFireEvents();
-//  }
+
+  //  public void deleteFolders(List<IFolder> folders) {
+  //    fWriteLock.lock();
+  //    try {
+  //      for (IFolder folder : folders) {
+  //        FolderEvent event = new FolderEvent(folder, null, true);
+  //        DBHelper.putEventTemplate(event);
+  //      }
+  //      for (IFolder folder : folders)
+  //        fDb.delete(folder);
+  //
+  //      fDb.commit();
+  //    } catch (Db4oException e) {
+  //      throw new PersistenceException(e);
+  //    } finally {
+  //      fWriteLock.unlock();
+  //    }
+  //    DBHelper.cleanUpAndFireEvents();
+  //  }
 
   public Collection<IFolder> loadRoots() {
     try {
@@ -95,9 +101,8 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
       throw new PersistenceException(e);
     }
   }
-  
-  public final void reparent(List<ReparentInfo<IFolder, IFolder>> folderInfos,
-      List<ReparentInfo<IMark, IFolder>> markInfos) {
+
+  public final void reparent(List<ReparentInfo<IFolder, IFolder>> folderInfos, List<ReparentInfo<IMark, IFolder>> markInfos) {
 
     Assert.isLegal(folderInfos != null || markInfos != null, "Either folderInfos or markInfos must be non-null"); //$NON-NLS-1$
     fWriteLock.lock();
@@ -142,7 +147,7 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
     DBHelper.cleanUpAndFireEvents();
 
   }
-  
+
   private List<FolderEvent> createFolderEvents(List<ReparentInfo<IFolder, IFolder>> folderInfos) {
     if (folderInfos == null)
       return Collections.emptyList();
@@ -193,9 +198,7 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
     parent.addMark(child);
   }
 
-  private void fillMarkEvents(List<ReparentInfo<IMark, IFolder>> markInfos,
-      List<BookMarkEvent> bookMarkEvents, List<SearchMarkEvent> searchMarkEvents) {
-
+  private void fillMarkEvents(List<ReparentInfo<IMark, IFolder>> markInfos, List<BookMarkEvent> bookMarkEvents, List<SearchMarkEvent> searchMarkEvents) {
     for (ReparentInfo<IMark, IFolder> markInfo : markInfos) {
       IMark mark = markInfo.getObject();
       IFolder newParent = markInfo.getNewParent();
@@ -214,13 +217,11 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
         BookMarkEvent event = new BookMarkEvent((IBookMark) mark, oldParent, true);
         bookMarkEvents.add(event);
         DBHelper.putEventTemplate(event);
-      }
-      else if (mark instanceof ISearchMark) {
+      } else if (mark instanceof ISearchMark) {
         SearchMarkEvent event = new SearchMarkEvent((ISearchMark) mark, oldParent, true);
         searchMarkEvents.add(event);
         DBHelper.putEventTemplate(event);
-      }
-      else
+      } else
         throw new IllegalArgumentException("Uknown mark subclass found: " + mark.getClass()); //$NON-NLS-1$
 
     }

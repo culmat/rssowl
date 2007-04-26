@@ -6,7 +6,7 @@
          <meta.schema plugin="org.rssowl.core.model" id="PreferencesInitializer" name="PreferencesInitializer"/>
       </appInfo>
       <documentation>
-         
+         The preferences initializer allows to define initial preferences in RSSOwl. Use this extension point if you want to provide your own preferences.
       </documentation>
    </annotation>
 
@@ -50,7 +50,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.rssowl.core.model.persist.pref.IPreferencesInitializer"/>
+                  <meta.attribute kind="java" basedOn="org.rssowl.core.persist.pref.IPreferencesInitializer"/>
                </appInfo>
             </annotation>
          </attribute>

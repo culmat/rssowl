@@ -28,6 +28,11 @@ import org.rssowl.core.persist.event.SearchConditionEvent;
 import org.rssowl.core.persist.event.SearchConditionListener;
 import org.rssowl.core.persist.search.ISearchCondition;
 
+/**
+ * A data-access-object for <code>ISearchCondition</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
 public interface ISearchConditionDAO extends IEntityDAO<ISearchCondition, SearchConditionListener, SearchConditionEvent> {
   // No new methods
 }

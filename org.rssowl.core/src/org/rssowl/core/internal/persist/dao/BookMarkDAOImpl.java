@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.BookMark;
@@ -38,9 +39,14 @@ import com.db4o.query.Query;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public final class BookMarkDAOImpl extends AbstractEntityDAO<IBookMark, BookMarkListener,
-    BookMarkEvent> implements IBookMarkDAO  {
+/**
+ * A data-access-object for <code>IBookMark</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public final class BookMarkDAOImpl extends AbstractEntityDAO<IBookMark, BookMarkListener, BookMarkEvent> implements IBookMarkDAO {
 
+  /** Default constructor using the specific IPersistable for this DAO */
   public BookMarkDAOImpl() {
     super(BookMark.class, false);
   }

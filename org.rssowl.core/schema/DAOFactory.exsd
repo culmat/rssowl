@@ -55,7 +55,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.rssowl.core.model.persist.dao.DAOFactory"/>
+                  <meta.attribute kind="java" basedOn="org.rssowl.core.persist.dao.DAOService"/>
                </appInfo>
             </annotation>
          </attribute>

@@ -6,7 +6,7 @@
          <meta.schema plugin="org.rssowl.core.model" id="ModelSearch" name="Model Search"/>
       </appInfo>
       <documentation>
-         
+         The model search extension point provides an implementation of the interface for performing full-text queries in the data that RSSOwl is gathering.
       </documentation>
    </annotation>
 
@@ -55,7 +55,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.rssowl.core.model.persist.search.IModelSearch"/>
+                  <meta.attribute kind="java" basedOn="org.rssowl.core.persist.search.IModelSearch"/>
                </appInfo>
             </annotation>
          </attribute>

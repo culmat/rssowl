@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.SearchMark;
@@ -29,13 +30,18 @@ import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.event.SearchMarkListener;
 
-public final class SearchMarkDAOImpl extends AbstractEntityDAO<ISearchMark,
-    SearchMarkListener, SearchMarkEvent> implements ISearchMarkDAO    {
+/**
+ * A data-access-object for <code>ISearchMark</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public final class SearchMarkDAOImpl extends AbstractEntityDAO<ISearchMark, SearchMarkListener, SearchMarkEvent> implements ISearchMarkDAO {
 
+  /** Default constructor using the specific IPersistable for this DAO */
   public SearchMarkDAOImpl() {
     super(SearchMark.class, false);
   }
-  
+
   @Override
   protected final SearchMarkEvent createDeleteEventTemplate(ISearchMark entity) {
     return createSaveEventTemplate(entity);

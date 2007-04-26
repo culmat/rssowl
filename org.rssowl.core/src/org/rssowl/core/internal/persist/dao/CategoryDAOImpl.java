@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.Category;
@@ -33,13 +34,18 @@ import org.rssowl.core.util.StringUtils;
 import java.util.Set;
 import java.util.TreeSet;
 
-public final class CategoryDAOImpl extends AbstractEntityDAO<ICategory,
-    CategoryListener, CategoryEvent> implements ICategoryDAO   {
+/**
+ * A data-access-object for <code>ICategory</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public final class CategoryDAOImpl extends AbstractEntityDAO<ICategory, CategoryListener, CategoryEvent> implements ICategoryDAO {
 
+  /** Default constructor using the specific IPersistable for this DAO */
   public CategoryDAOImpl() {
     super(Category.class, false);
   }
-  
+
   @Override
   protected final CategoryEvent createDeleteEventTemplate(ICategory entity) {
     return createSaveEventTemplate(entity);

@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.search.SearchCondition;
@@ -29,13 +30,18 @@ import org.rssowl.core.persist.event.SearchConditionEvent;
 import org.rssowl.core.persist.event.SearchConditionListener;
 import org.rssowl.core.persist.search.ISearchCondition;
 
-public final class SearchConditionDAOImpl extends AbstractEntityDAO<ISearchCondition,
-    SearchConditionListener, SearchConditionEvent> implements ISearchConditionDAO  {
+/**
+ * A data-access-object for <code>ISearchCondition</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public final class SearchConditionDAOImpl extends AbstractEntityDAO<ISearchCondition, SearchConditionListener, SearchConditionEvent> implements ISearchConditionDAO {
 
+  /** Default constructor using the specific IPersistable for this DAO */
   public SearchConditionDAOImpl() {
     super(SearchCondition.class, true);
   }
-  
+
   @Override
   protected final SearchConditionEvent createDeleteEventTemplate(ISearchCondition entity) {
     return createSaveEventTemplate(entity);

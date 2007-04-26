@@ -21,13 +21,18 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.event.AttachmentEvent;
 import org.rssowl.core.persist.event.AttachmentListener;
 
-public interface IAttachmentDAO extends IEntityDAO<IAttachment,
-    AttachmentListener, AttachmentEvent>   {
+/**
+ * A data-access-object for <code>IAttachment</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public interface IAttachmentDAO extends IEntityDAO<IAttachment, AttachmentListener, AttachmentEvent> {
   // No new methods
 }

@@ -62,7 +62,7 @@
          <attribute name="rootElement" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The root element of the XML document this importer should be responsible for.
                </documentation>
             </annotation>
          </attribute>

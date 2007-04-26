@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.IFeed;
@@ -30,9 +31,29 @@ import org.rssowl.core.persist.reference.FeedReference;
 
 import java.net.URI;
 
-public interface IFeedDAO extends IEntityDAO<IFeed, FeedListener, FeedEvent>   {
+/**
+ * A data-access-object for <code>IFeed</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public interface IFeedDAO extends IEntityDAO<IFeed, FeedListener, FeedEvent> {
 
+  /**
+   * Loads the <code>IFeed</code> that points to the given <code>URI</code>.
+   *
+   * @param link The Link to load the <code>IFeed</code> for.
+   * @return Returns the <code>IFeed</code> that points to the given
+   * <code>URI</code>.
+   */
   IFeed load(URI link);
-  
+
+  /**
+   * Loads the <code>FeedReference</code> that points to the given
+   * <code>URI</code>.
+   *
+   * @param link The Link to load the <code>FeedReference</code> for.
+   * @return Returns the <code>FeedReference</code> that points to the given
+   * <code>URI</code>.
+   */
   FeedReference loadReference(URI link);
 }

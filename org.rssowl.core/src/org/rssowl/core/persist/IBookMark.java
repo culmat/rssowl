@@ -37,16 +37,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 public interface IBookMark extends IMark {
 
   /** One of the fields in this type described as constant */
-  public static final int PROXY_USED = 6;
-
-  /** One of the fields in this type described as constant */
-  public static final int UPDATE_INTERVAL = 7;
-
-  /** One of the fields in this type described as constant */
-  public static final int IS_ERROR_LOADING = 8;
-
-  /** One of the fields in this type described as constant */
-  public static final int LOAD_ON_STARTUP = 9;
+  public static final int IS_ERROR_LOADING = 4;
 
   /**
    * @return TRUE in case the last time this BookMark's Feed was reloading

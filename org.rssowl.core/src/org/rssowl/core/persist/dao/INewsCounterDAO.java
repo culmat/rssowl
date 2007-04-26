@@ -21,12 +21,21 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.NewsCounter;
 
-public interface INewsCounterDAO extends IPersistableDAO<NewsCounter>   {
+/**
+ * A data-access-object for <code>NewsCounter</code>.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public interface INewsCounterDAO extends IPersistableDAO<NewsCounter> {
+
   NewsCounter load();
+
   void delete();
+
   NewsCounter save(NewsCounter counter);
 }

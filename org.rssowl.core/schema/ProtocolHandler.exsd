@@ -6,7 +6,7 @@
          <meta.schema plugin="org.rssowl.core.connection" id="ProtocolHandler" name="Protocol Handler"/>
       </appInfo>
       <documentation>
-         
+         The protocol handler is responsible for retrieving a feed out of a URI with a certain protocol. By default, RSSOwl is providing protocol handler for http, https and file in order to properly download feeds from the internet. Use this extension point either to override the default behavor when downloading feeds, or to support other protocols like mail or ftp. 
       </documentation>
    </annotation>
 
@@ -52,7 +52,7 @@
          <attribute name="protocol" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The protocol this handler should be responsible for (e.g. http or https).
                </documentation>
             </annotation>
          </attribute>
@@ -101,7 +101,7 @@
          <meta.section type="implementation"/>
       </appInfo>
       <documentation>
-         
+         Note that you should also use the CredentialsProvider extension point for the protocol that is handled by this handler in order to provide credentials in case a resource requires authentication.
       </documentation>
    </annotation>
 

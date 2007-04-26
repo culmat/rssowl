@@ -32,9 +32,9 @@ import java.util.Collection;
 /**
  * The base interface that provides methods for saving, loading and deleting
  * IPersistables.
- * 
- * @param <T> The type of the IPersistable that the implementation of this interface
- * can handle.
+ *
+ * @param <T> The type of the IPersistable that the implementation of this
+ * interface can handle.
  */
 public interface IPersistableDAO<T extends IPersistable> {
 
@@ -42,7 +42,7 @@ public interface IPersistableDAO<T extends IPersistable> {
    * Loads the persistable with <code>id</code> from the persistence system
    * and returns it. If no persistable with the provided id exists,
    * <code>null</code> is returned.
-   * 
+   *
    * @param id The id of the persistable to load from the persistence system.
    * @return the persistable with <code>id</code> or <code>null</code> in
    * case none exists.
@@ -55,7 +55,7 @@ public interface IPersistableDAO<T extends IPersistable> {
    * Saves <code>persistable</code> to the persistence system. This method
    * handles new and existing perstistables. In other words, it will add or
    * update the persistable as appropriate.
-   * 
+   *
    * @param persistable The persistable to update.
    * @return The persistable saved.
    * @throws PersistenceException In case of an error while trying to perform
@@ -67,7 +67,7 @@ public interface IPersistableDAO<T extends IPersistable> {
 
   /**
    * Deletes <code>persistable</code> from the persistence system.
-   * 
+   *
    * @param persistable The persistable to delete.
    */
   void delete(T persistable);
@@ -75,6 +75,6 @@ public interface IPersistableDAO<T extends IPersistable> {
   void deleteAll(Collection<T> objects);
 
   long countAll();
-  
-  Class<? extends T> getEntityClass();
+
+  Class< ? extends T> getEntityClass();
 }

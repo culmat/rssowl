@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.IBookMark;
@@ -30,8 +31,20 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 
 import java.util.Collection;
 
-public interface IBookMarkDAO extends IEntityDAO<IBookMark,
-    BookMarkListener, BookMarkEvent> {
-  
+/**
+ * A data-access-object for <code>IBookMark</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public interface IBookMarkDAO extends IEntityDAO<IBookMark, BookMarkListener, BookMarkEvent> {
+
+  /**
+   * Loads all <code>IBookMark</code>s from the database that reference the
+   * given feed.
+   *
+   * @param feedRef A reference to the feed of interest.
+   * @return Returns a Collection of all <code>IBookMark</code>s that
+   * reference the given feed.
+   */
   Collection<IBookMark> loadAll(FeedLinkReference feedRef);
 }
