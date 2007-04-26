@@ -56,25 +56,25 @@
             rootElement="myimport"/>
    </extension>
    <extension
-         point="org.rssowl.ui.entityPropertyPage">
+         point="org.rssowl.ui.EntityPropertyPage">
       <entityPropertyPage
             class="org.rssowl.core.tests.ui.EntityPropertyPageTests"
             handlesMultipleEntities="true"
             id="org.rssowl.core.tests.ui.EntityPropertyPageTests1"
             name="TestPage1"
             order="0">
-         <entityTarget
+         <targetEntity
                class="org.rssowl.core.persist.ILabel">
-         </entityTarget>
+         </targetEntity>
       </entityPropertyPage>
       <entityPropertyPage
             class="org.rssowl.core.tests.ui.EntityPropertyPageTests"
             id="org.rssowl.core.tests.ui.EntityPropertyPageTests2"
             name="TestPage2"
             order="10">
-         <entityTarget
+         <targetEntity
                class="org.rssowl.core.persist.ILabel">
-         </entityTarget>
+         </targetEntity>
       </entityPropertyPage>
       <entityPropertyPage
             class="org.rssowl.core.tests.ui.EntityPropertyPageTests"
@@ -82,12 +82,12 @@
             id="org.rssowl.core.tests.ui.EntityPropertyPageTests3"
             name="TestPage3"
             order="20">
-         <entityTarget
+         <targetEntity
                class="org.rssowl.core.persist.ILabel">
-         </entityTarget>
-         <entityTarget
+         </targetEntity>
+         <targetEntity
                class="org.rssowl.core.persist.IFeed">
-         </entityTarget>
+         </targetEntity>
       </entityPropertyPage>
    </extension>
    <extension
