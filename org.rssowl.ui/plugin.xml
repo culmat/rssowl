@@ -1019,6 +1019,15 @@
             The bookmark explorer font is used in the bookmark explorer to display all folders, bookmarks and saved searches.
          </description>
       </fontDefinition>
+      <colorDefinition
+            categoryId="org.rssowl.ui.ThemeCategory"
+            id="org.rssowl.ui.StickyBGColor"
+            label="Sticky News Background"
+            value="255,255,128">
+         <description>
+            The sticky news background color is used as background color for all sticky news including the bookmark that the news is belonging to.
+         </description>
+      </colorDefinition>
    </extension>
    <extension
          point="org.eclipse.ui.browserSupport">
