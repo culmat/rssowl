@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-   <extension-point id="entityPropertyPage" name="Entity Property Page" schema="schema/entityPropertyPage.exsd"/>
+   <extension-point id="EntityPropertyPage" name="Entity Property Page" schema="schema/EntityPropertyPage.exsd"/>
 
    <extension
          id="rssowl"
@@ -915,19 +915,19 @@
       </editor>
    </extension>
    <extension
-         point="org.rssowl.ui.entityPropertyPage">
+         point="org.rssowl.ui.EntityPropertyPage">
       <entityPropertyPage
             class="org.rssowl.ui.internal.dialogs.properties.GeneralPropertyPage"
             handlesMultipleEntities="true"
             id="org.rssowl.ui.internal.dialogs.properties.GeneralPropertyPage"
             name="General"
             order="0">
-         <entityTarget
+         <targetEntity
                class="org.rssowl.core.persist.IFolder">
-         </entityTarget>
-         <entityTarget
+         </targetEntity>
+         <targetEntity
                class="org.rssowl.core.persist.IBookMark">
-         </entityTarget>
+         </targetEntity>
       </entityPropertyPage>
       <entityPropertyPage
             class="org.rssowl.ui.internal.dialogs.properties.RetentionPropertyPage"
@@ -935,12 +935,12 @@
             id="org.rssowl.ui.internal.dialogs.properties.RetentionPropertyPage"
             name="Clean Up"
             order="2">
-         <entityTarget
+         <targetEntity
                class="org.rssowl.core.persist.IFolder">
-         </entityTarget>
-         <entityTarget
+         </targetEntity>
+         <targetEntity
                class="org.rssowl.core.persist.IBookMark">
-         </entityTarget>
+         </targetEntity>
       </entityPropertyPage>
       <entityPropertyPage
             class="org.rssowl.ui.internal.dialogs.properties.DisplayPropertyPage"
@@ -948,15 +948,15 @@
             id="org.rssowl.ui.internal.dialogs.properties.DisplayPropertyPage"
             name="Display"
             order="1">
-         <entityTarget
+         <targetEntity
                class="org.rssowl.core.persist.IFolder">
-         </entityTarget>
-         <entityTarget
+         </targetEntity>
+         <targetEntity
                class="org.rssowl.core.persist.IBookMark">
-         </entityTarget>
-         <entityTarget
+         </targetEntity>
+         <targetEntity
                class="org.rssowl.core.persist.ISearchMark">
-         </entityTarget>
+         </targetEntity>
       </entityPropertyPage>
       <entityPropertyPage
             class="org.rssowl.ui.internal.dialogs.properties.SearchMarkPropertyPage"
@@ -964,9 +964,9 @@
             id="org.rssowl.ui.internal.dialogs.properties.SearchMarkPropertyPage"
             name="General"
             order="0">
-         <entityTarget
+         <targetEntity
                class="org.rssowl.core.persist.ISearchMark">
-         </entityTarget>
+         </targetEntity>
       </entityPropertyPage>
    </extension>
    <extension
