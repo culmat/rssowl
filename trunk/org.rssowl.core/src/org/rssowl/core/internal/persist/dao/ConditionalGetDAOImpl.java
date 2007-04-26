@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.eclipse.core.runtime.Assert;
@@ -34,9 +35,14 @@ import com.db4o.query.Query;
 
 import java.net.URI;
 
-public final class ConditionalGetDAOImpl extends AbstractPersistableDAO<IConditionalGet>
-    implements IConditionalGetDAO   {
+/**
+ * A data-access-object for <code>IConditionalGet</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public final class ConditionalGetDAOImpl extends AbstractPersistableDAO<IConditionalGet> implements IConditionalGetDAO {
 
+  /** Default constructor using the specific IPersistable for this DAO */
   public ConditionalGetDAOImpl() {
     super(ConditionalGet.class, true);
   }

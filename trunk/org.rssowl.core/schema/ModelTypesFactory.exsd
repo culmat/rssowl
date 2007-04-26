@@ -6,7 +6,7 @@
          <meta.schema plugin="org.rssowl.core.model" id="ModelTypesFactory" name="Model Types Factory"/>
       </appInfo>
       <documentation>
-         
+         The model factory is being used everywhere where model objects are created in RSSOwl. Use this extension point if you want to provide your own implementation of the model that is being used in RSSOwl.
       </documentation>
    </annotation>
 
@@ -55,7 +55,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn="org.rssowl.core.model.persist.IModelTypesFactory"/>
+                  <meta.attribute kind="java" basedOn="org.rssowl.core.persist.IModelFactory"/>
                </appInfo>
             </annotation>
          </attribute>

@@ -6,7 +6,7 @@
          <meta.schema plugin="org.rssowl.contrib.httpclient" id="SSLHandler" name="SSL Handler"/>
       </appInfo>
       <documentation>
-         
+         By default, RSSOwl will not validate SSL connections. Use this extension point to implement SSL certificate validation and more if required.
       </documentation>
    </annotation>
 

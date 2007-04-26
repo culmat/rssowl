@@ -169,20 +169,12 @@ public class SearchField implements ISearchField {
           return "Date of creation";
         case (IMark.NAME):
           return "Name";
-        case (IMark.OPENS_ON_STARTUP):
-          return "Opens on Startup";
         case (IMark.LAST_VISIT_DATE):
           return "Last visit";
         case (IMark.POPULARITY):
           return "Number of Visits";
-        case (IBookMark.PROXY_USED):
-          return "Proxy Used";
-        case (IBookMark.UPDATE_INTERVAL):
-          return "Update Interval in Minutes";
         case (IBookMark.IS_ERROR_LOADING):
           return "Error while Loading";
-        case (IBookMark.LOAD_ON_STARTUP):
-          return "Load on Startup";
       }
     }
 
@@ -195,8 +187,6 @@ public class SearchField implements ISearchField {
           return "Date of creation";
         case (IMark.NAME):
           return "Name";
-        case (IMark.OPENS_ON_STARTUP):
-          return "Opens on Startup";
         case (IMark.LAST_VISIT_DATE):
           return "Last visit";
         case (IMark.POPULARITY):
@@ -342,19 +332,11 @@ public class SearchField implements ISearchField {
       switch (fField) {
         case (IMark.CREATION_DATE):
           return SearchValueType.DATETIME;
-        case (IMark.OPENS_ON_STARTUP):
-          return SearchValueType.BOOLEAN;
         case (IMark.LAST_VISIT_DATE):
           return SearchValueType.DATETIME;
         case (IMark.POPULARITY):
           return SearchValueType.INTEGER;
-        case (IBookMark.PROXY_USED):
-          return SearchValueType.BOOLEAN;
-        case (IBookMark.UPDATE_INTERVAL):
-          return SearchValueType.INTEGER;
         case (IBookMark.IS_ERROR_LOADING):
-          return SearchValueType.BOOLEAN;
-        case (IBookMark.LOAD_ON_STARTUP):
           return SearchValueType.BOOLEAN;
       }
     }
@@ -364,8 +346,6 @@ public class SearchField implements ISearchField {
       switch (fField) {
         case (IMark.CREATION_DATE):
           return SearchValueType.DATETIME;
-        case (IMark.OPENS_ON_STARTUP):
-          return SearchValueType.BOOLEAN;
         case (IMark.LAST_VISIT_DATE):
           return SearchValueType.DATETIME;
         case (IMark.POPULARITY):

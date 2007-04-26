@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.INews;
@@ -30,7 +31,12 @@ import org.rssowl.core.persist.service.PersistenceException;
 
 import java.util.Collection;
 
-public interface INewsDAO extends IEntityDAO<INews, NewsListener, NewsEvent>    {
+/**
+ * A data-access-object for <code>INews</code>.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public interface INewsDAO extends IEntityDAO<INews, NewsListener, NewsEvent> {
 
   /**
    * Sets the state of all the news items contained in <code>news</code> to
@@ -40,7 +46,8 @@ public interface INewsDAO extends IEntityDAO<INews, NewsListener, NewsEvent>    
    * is equal to <code>state</code> will not be changed or updated in the
    * persistence layer.
    *
-   * @param news A Collection of <code>INews</code> whose state should be changed.
+   * @param news A Collection of <code>INews</code> whose state should be
+   * changed.
    * @param state The state to set the news items to.
    * @param affectEquivalentNews If set to <code>TRUE</code> the state of
    * equivalent news in other feeds will also be changed to <code>state</code>
@@ -48,5 +55,5 @@ public interface INewsDAO extends IEntityDAO<INews, NewsListener, NewsEvent>    
    * those News that match the given state.
    * @throws PersistenceException
    */
-  void setState(Collection<INews> news, INews.State state, boolean affectEquivalentNews, boolean force) throws PersistenceException; 
+  void setState(Collection<INews> news, INews.State state, boolean affectEquivalentNews, boolean force) throws PersistenceException;
 }

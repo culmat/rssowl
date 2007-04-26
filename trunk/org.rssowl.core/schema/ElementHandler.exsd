@@ -6,7 +6,7 @@
          <meta.schema plugin="org.rssowl.core.interpreter" id="ElementHandler" name="Element Handler"/>
       </appInfo>
       <documentation>
-         
+         The element handler is responsible for handling a certain element in a XML document which is identified by its root element. Use this extension point if you want to override the interpretation of certain elements in existing format interpreters. Note that if you want to introduce new elements to an existing format, you should define your own namespace and use the namespace handler extension point.
       </documentation>
    </annotation>
 
@@ -62,14 +62,14 @@
          <attribute name="elementName" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The name of the element this handler is responsible for. This refers to the name of the element as it appears in the XML document.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="rootElement" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The root element of the XML document this handler should be responsible for. This is a required field to restrict the handler to certain, known XML documents.
                </documentation>
             </annotation>
          </attribute>

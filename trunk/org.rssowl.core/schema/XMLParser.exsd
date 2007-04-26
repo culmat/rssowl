@@ -6,7 +6,7 @@
          <meta.schema plugin="org.rssowl.core.interpreter" id="SAXParser" name="SAX Parser"/>
       </appInfo>
       <documentation>
-         
+         By default, RSSOwl will use the XML parser supplied by the Java Runtime. Use this extension point to use a custom XML parser that knows how to parse a XML document.
       </documentation>
    </annotation>
 

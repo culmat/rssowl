@@ -21,12 +21,27 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.IConditionalGet;
 
 import java.net.URI;
 
-public interface IConditionalGetDAO extends IPersistableDAO<IConditionalGet>  {
+/**
+ * A data-access-object for <code>IConditionalGet</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public interface IConditionalGetDAO extends IPersistableDAO<IConditionalGet> {
+
+  /**
+   * Loads the <code>IConditionalGet</code> that belongs to the given
+   * <code>URI</code>.
+   *
+   * @param link The Link of interest.
+   * @return Returns the <code>IConditionalGet</code> that belongs to the
+   * given <code>URI</code>.
+   */
   IConditionalGet load(URI link);
 }

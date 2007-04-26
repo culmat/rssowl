@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.IFolder;
@@ -33,14 +34,19 @@ import org.rssowl.core.util.ReparentInfo;
 import java.util.Collection;
 import java.util.List;
 
-public interface IFolderDAO extends IEntityDAO<IFolder, FolderListener, FolderEvent>   {
+/**
+ * A data-access-object for <code>IFolder</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public interface IFolderDAO extends IEntityDAO<IFolder, FolderListener, FolderEvent> {
 
   /**
    * Loads all Folders from the persistance layer that do not have any parent
    * Folder (in other words root folders).
    *
-   * @return A Collection containing all Folders that do not have any
-   * parent Folder.
+   * @return A Collection containing all Folders that do not have any parent
+   * Folder.
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
    */
@@ -67,7 +73,5 @@ public interface IFolderDAO extends IEntityDAO<IFolder, FolderListener, FolderEv
    * describing the reparenting details for a list of marks.
    * @throws PersistenceException In case of an error while loading the Types.
    */
-  void reparent(List<ReparentInfo<IFolder, IFolder>> folderInfos,
-      List<ReparentInfo<IMark, IFolder>> markInfos) throws PersistenceException;
-
+  void reparent(List<ReparentInfo<IFolder, IFolder>> folderInfos, List<ReparentInfo<IMark, IFolder>> markInfos) throws PersistenceException;
 }

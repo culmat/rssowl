@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.News;
@@ -42,13 +43,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, NewsEvent>
-    implements INewsDAO   {
+/**
+ * A data-access-object for <code>INews</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, NewsEvent> implements INewsDAO {
 
+  /** Default constructor using the specific IPersistable for this DAO */
   public NewsDAOImpl() {
     super(News.class, false);
   }
-  
+
   @Override
   protected final void doSave(INews entity) {
     DBHelper.saveAndCascadeNews(fDb, entity, true);
@@ -91,15 +97,13 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
               throw createIllegalException("No news were found with guid: " + //$NON-NLS-1$
                   newsItem.getGuid().getValue(), newsItem);
             }
-          }
-          else if (newsItem.getLink() != null) {
+          } else if (newsItem.getLink() != null) {
             equivalentNews = getNewsFromLink(newsItem);
             if (equivalentNews.isEmpty()) {
               throw createIllegalException("No news were found with link: " + //$NON-NLS-1$
                   newsItem.getLink().toString(), newsItem);
             }
-          }
-          else
+          } else
             equivalentNews = Collections.singletonList(newsItem);
 
           changedNews.addAll(setState(equivalentNews, state, force));
@@ -124,30 +128,30 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
       fDb.ext().set(news, 1);
     }
   }
-  
+
   private RuntimeException createIllegalException(String message, INews newsItem) {
     News dbNews = (News) fDb.ext().peekPersisted(newsItem, 2, true);
     if (dbNews == null)
       return new IllegalArgumentException("The news has been deleted from the persistence layer: " + newsItem);
 
-    return new IllegalStateException(message + ". This news in the db looks like: "  //$NON-NLS-1$
+    return new IllegalStateException(message + ". This news in the db looks like: " //$NON-NLS-1$
         + dbNews.toLongString());
   }
-  
+
   private List<INews> getNewsFromGuid(INews newsItem) {
     Query query = fDb.query();
     query.constrain(fEntityClass);
     query.descend("fGuidValue").constrain(newsItem.getGuid().getValue()); //$NON-NLS-1$
     return activateAll(getObjectSet(query));
   }
-  
+
   private List<INews> getNewsFromLink(INews newsItem) {
     Query query = fDb.query();
     query.constrain(fEntityClass);
     query.descend("fLinkText").constrain(newsItem.getLink().toString()); //$NON-NLS-1$
     return activateAll(getObjectSet(query));
   }
-  
+
   private Set<INews> setState(Collection<INews> news, State state, boolean force) {
     Set<INews> changedNews = new HashSet<INews>(news.size());
     for (INews newsItem : news) {

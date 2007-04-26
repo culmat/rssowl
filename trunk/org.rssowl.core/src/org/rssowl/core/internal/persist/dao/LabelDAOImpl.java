@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.Label;
@@ -29,9 +30,14 @@ import org.rssowl.core.persist.dao.ILabelDAO;
 import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.event.LabelListener;
 
-public final class LabelDAOImpl extends AbstractEntityDAO<ILabel, LabelListener,
-    LabelEvent> implements ILabelDAO {
+/**
+ * A data-access-object for <code>ILabel</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public final class LabelDAOImpl extends AbstractEntityDAO<ILabel, LabelListener, LabelEvent> implements ILabelDAO {
 
+  /** Default constructor using the specific IPersistable for this DAO */
   public LabelDAOImpl() {
     super(Label.class, false);
   }

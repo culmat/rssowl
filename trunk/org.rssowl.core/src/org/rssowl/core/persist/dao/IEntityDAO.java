@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.IEntity;
@@ -31,17 +32,42 @@ import org.rssowl.core.persist.event.runnable.EventType;
 import java.util.Set;
 
 /**
- * Base interface for all IEntity DAOs.
- * @param <T> 
- * @param <L> 
- * @param <E> 
+ * The <code>IEntityDAO</code> is the base interface for all entity data
+ * access objects. It provides methods to register and remove entity-listeners
+ * as well as a method to notify them.
+ *
+ * @param <T> A subclass of <code>IEntity</code>
+ * @param <L> A subclass of <code>EntityListener</code>
+ * @param <E> A subclass of <code>ModelEvent</code>
  */
-public interface IEntityDAO<T extends IEntity, L extends EntityListener<E, T>,
-    E extends ModelEvent> extends IPersistableDAO<T> {
+public interface IEntityDAO<T extends IEntity, L extends EntityListener<E, T>, E extends ModelEvent> extends IPersistableDAO<T> {
 
+  /**
+   * Adds a listener to the collection of listeners who will be notified
+   * whenever entities of type <code>T extends IEntity</code> get added,
+   * updated or removed.
+   *
+   * @param listener The listener that will be added to the collection of
+   * listeners for the given Entity.
+   */
   public void addEntityListener(L listener);
-  
+
+  /**
+   * Removes a listener from the collection of listeners who will be notified
+   * whenever entities of type <code>T extends IEntity</code> get added,
+   * updated or removed.
+   *
+   * @param listener The listener that will be removed from the collection of
+   * listeners for the given Entity.
+   */
   public void removeEntityListener(L listener);
-  
+
+  /**
+   * Notifies all listeners that listen on the given type of event that one of
+   * the <code>EventType</code> has occured.
+   *
+   * @param events A Set of Events that describe the given event type.
+   * @param eventType One of the supported event types (add, update or remove).
+   */
   public void fireEvents(Set<E> events, EventType eventType);
 }

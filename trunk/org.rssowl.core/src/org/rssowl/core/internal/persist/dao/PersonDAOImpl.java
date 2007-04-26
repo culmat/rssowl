@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.Person;
@@ -36,13 +37,18 @@ import com.db4o.ext.Db4oException;
 import java.util.Set;
 import java.util.TreeSet;
 
-public class PersonDAOImpl extends AbstractEntityDAO<IPerson, PersonListener,
-    PersonEvent> implements IPersonDAO  {
+/**
+ * A data-access-object for <code>IPerson</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public class PersonDAOImpl extends AbstractEntityDAO<IPerson, PersonListener, PersonEvent> implements IPersonDAO {
 
+  /** Default constructor using the specific IPersistable for this DAO */
   public PersonDAOImpl() {
     super(Person.class, false);
   }
-  
+
   @Override
   protected PersonEvent createDeleteEventTemplate(IPerson entity) {
     return createSaveEventTemplate(entity);

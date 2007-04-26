@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.IPerson;
@@ -30,14 +31,18 @@ import org.rssowl.core.persist.service.PersistenceException;
 
 import java.util.Set;
 
+/**
+ * A data-access-object for <code>IPerson</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
 public interface IPersonDAO extends IEntityDAO<IPerson, PersonListener, PersonEvent> {
 
   /**
-   * Loads a sorted <code>Set</code> of author names or emails for all IPerson instances
-   * that are persisted and have either a non-null name or email.
-   * 
-   * The author's name is given preference, but if it's <code>null</code> and
-   * the email is not <code>null</code>, the email is used.
+   * Loads a sorted <code>Set</code> of author names or emails for all IPerson
+   * instances that are persisted and have either a non-null name or email. The
+   * author's name is given preference, but if it's <code>null</code> and the
+   * email is not <code>null</code>, the email is used.
    *
    * @return a sorted <code>Set</code> of Strings containing all authors that
    * are persisted in the persistence layer.
@@ -45,5 +50,4 @@ public interface IPersonDAO extends IEntityDAO<IPerson, PersonListener, PersonEv
    * persistance layer implementation.
    */
   Set<String> loadAllNames();
-  
 }

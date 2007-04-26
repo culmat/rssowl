@@ -44,16 +44,10 @@ public interface IMark extends IEntity {
   public static final int CREATION_DATE = 1;
 
   /** One of the fields in this type described as constant */
-  public static final int LAST_OPENED = 2;
+  public static final int LAST_VISIT_DATE = 2;
 
   /** One of the fields in this type described as constant */
-  public static final int OPENS_ON_STARTUP = 3;
-
-  /** One of the fields in this type described as constant */
-  public static final int LAST_VISIT_DATE = 4;
-
-  /** One of the fields in this type described as constant */
-  public static final int POPULARITY = 5;
+  public static final int POPULARITY = 3;
 
   /**
    * @return How often this Feed has been visited by the User.

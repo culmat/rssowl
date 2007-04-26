@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.Attachment;
@@ -32,9 +33,14 @@ import org.rssowl.core.persist.event.AttachmentEvent;
 import org.rssowl.core.persist.event.AttachmentListener;
 import org.rssowl.core.persist.event.NewsEvent;
 
-public final class AttachmentDAOImpl extends AbstractEntityDAO<IAttachment,
-    AttachmentListener, AttachmentEvent> implements IAttachmentDAO  {
+/**
+ * A data-access-object for <code>IAttachment</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public final class AttachmentDAOImpl extends AbstractEntityDAO<IAttachment, AttachmentListener, AttachmentEvent> implements IAttachmentDAO {
 
+  /** Default constructor using the specific IPersistable for this DAO */
   public AttachmentDAOImpl() {
     super(Attachment.class, false);
   }
@@ -48,7 +54,7 @@ public final class AttachmentDAOImpl extends AbstractEntityDAO<IAttachment,
   protected final AttachmentEvent createSaveEventTemplate(IAttachment entity) {
     return new AttachmentEvent(entity, true);
   }
-  
+
   @Override
   public final void doDelete(IAttachment entity) {
     //TODO Not sure about this, but let's do it for now to help us track a bug

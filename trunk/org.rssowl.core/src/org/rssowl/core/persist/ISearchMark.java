@@ -39,10 +39,13 @@ import java.util.List;
 public interface ISearchMark extends IMark {
 
   /** One of the fields in this type described as constant */
-  public static final int MATCHING_NEWS = 6;
+  public static final int MATCHING_NEWS = 4;
 
   /** One of the fields in this type described as constant */
-  public static final int SEARCH_CONDITIONS = 7;
+  public static final int SEARCH_CONDITIONS = 5;
+
+  /** One of the fields in this type described as constant */
+  public static final int MATCH_ALL_CONDITIONS = 6;
 
   /**
    * TODO Tmp API, see Bug #108

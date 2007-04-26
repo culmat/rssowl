@@ -30,7 +30,7 @@ import org.rssowl.core.persist.service.PersistenceException;
  * The <code>IPreferencesDAO</code> offers methods to store and retrieve
  * Preferences, simply by providing a Key-Value-Pair. The underlying persistance
  * layer is responsible for how the Values are stored.
- * 
+ *
  * @author bpasero
  */
 public interface IPreferencesDAO {
@@ -38,7 +38,7 @@ public interface IPreferencesDAO {
   /**
    * Stores a <code>boolean</code> value under the given key into the
    * persistance layer or updates it, if it is already present.
-   * 
+   *
    * @param key The key under which the value is stored.
    * @param value The <code>boolean</code> value that is to be stored.
    * @throws PersistenceException In case of an error while accessing the
@@ -49,7 +49,7 @@ public interface IPreferencesDAO {
   /**
    * Retrieves a <code>Boolean</code> value from the persistance layer, or
    * <code>NULL</code> if not present.
-   * 
+   *
    * @param key The Key under which the value is stored.
    * @return The <code>Boolean</code> value or <code>NULL</code> if not
    * existant for the given key.
@@ -61,7 +61,7 @@ public interface IPreferencesDAO {
   /**
    * Stores a <code>String</code> value under the given key into the
    * persistance layer or updates it, if it is already present.
-   * 
+   *
    * @param key The key under which the value is stored.
    * @param value The <code>String</code> value that is to be stored.
    * @throws PersistenceException In case of an error while accessing the
@@ -72,7 +72,7 @@ public interface IPreferencesDAO {
   /**
    * Retrieves a <code>String</code> value from the persistance layer, or
    * <code>NULL</code> if not present.
-   * 
+   *
    * @param key The Key under which the value is stored.
    * @return The <code>String</code> value or <code>NULL</code> if not
    * existant for the given key.
@@ -88,7 +88,7 @@ public interface IPreferencesDAO {
    * Note: The underlying persistence solution is making sure to keep the order
    * of Items inside the Array when saving and loading.
    * </p>
-   * 
+   *
    * @param key The key under which the value is stored.
    * @param values The <code>String</code> array that is to be stored.
    * @throws PersistenceException In case of an error while accessing the
@@ -103,7 +103,7 @@ public interface IPreferencesDAO {
    * Note: The underlying persistence solution is making sure to keep the order
    * of Items inside the Array when saving and loading.
    * </p>
-   * 
+   *
    * @param key The Key under which the value is stored.
    * @return The <code>String</code> array or <code>NULL</code> if not
    * existant for the given key.
@@ -115,7 +115,7 @@ public interface IPreferencesDAO {
   /**
    * Stores a <code>int</code> value under the given key into the persistance
    * layer or updates it, if it is already present.
-   * 
+   *
    * @param key The key under which the value is stored.
    * @param value The <code>int</code> value that is to be stored.
    * @throws PersistenceException In case of an error while accessing the
@@ -126,7 +126,7 @@ public interface IPreferencesDAO {
   /**
    * Retrieves a <code>Integer</code> value from the persistance layer, or
    * <code>NULL</code> if not present.
-   * 
+   *
    * @param key The Key under which the value is stored.
    * @return The <code>Integer</code> value or <code>NULL</code> if not
    * existant for the given key.
@@ -138,7 +138,7 @@ public interface IPreferencesDAO {
   /**
    * Stores a <code>long</code> value under the given key into the persistance
    * layer or updates it, if it is already present.
-   * 
+   *
    * @param key The key under which the value is stored.
    * @param value The <code>long</code> value that is to be stored.
    * @throws PersistenceException In case of an error while accessing the
@@ -149,7 +149,7 @@ public interface IPreferencesDAO {
   /**
    * Retrieves a <code>Long</code> value from the persistance layer, or
    * <code>NULL</code> if not present.
-   * 
+   *
    * @param key The Key under which the value is stored.
    * @return The <code>Long</code> value or <code>NULL</code> if not
    * existant for the given key.
@@ -165,18 +165,18 @@ public interface IPreferencesDAO {
    * Note: The underlying persistence solution is making sure to keep the order
    * of Items inside the Array when saving and loading.
    * </p>
-   * 
+   *
    * @param key The key under which the value is stored.
    * @param values The <code>long</code> array that is to be stored.
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer.
    */
   void putLongs(String key, long values[]) throws PersistenceException;
-  
+
   /**
    * Stores a <code>int</code> array under the given key into the persistance
    * layer or updates it, if it is already present.
-   * 
+   *
    * @param key The key under which the value is stored.
    * @param values The <code>int</code> array that is to be stored.
    * @throws PersistenceException In case of an error while accessing the
@@ -191,7 +191,7 @@ public interface IPreferencesDAO {
    * Note: The underlying persistence solution is making sure to keep the order
    * of Items inside the Array when saving and loading.
    * </p>
-   * 
+   *
    * @param key The Key under which the value is stored.
    * @return The <code>long</code> array or <code>NULL</code> if not
    * existant for the given key.
@@ -199,14 +199,14 @@ public interface IPreferencesDAO {
    * persistance layer.
    */
   long[] getLongs(String key) throws PersistenceException;
-  
+
   /**
    * Retrieves a <code>int</code> array from the persistance layer, or
    * <code>NULL</code> if not present.
-   * 
+   *
    * @param key The Key under which the value is stored.
-   * @return The <code>int</code> array or <code>NULL</code> if not
-   * existant for the given key.
+   * @return The <code>int</code> array or <code>NULL</code> if not existant
+   * for the given key.
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer.
    */
@@ -215,8 +215,9 @@ public interface IPreferencesDAO {
   /**
    * If the persistence layer contains a preference with a key that matches
    * <code>key</code>, the preference is deleted and <code>true</code> is
-   * returned. Otherwise, no action is taken and <code>false</code> is returned.
-   * 
+   * returned. Otherwise, no action is taken and <code>false</code> is
+   * returned.
+   *
    * @param key The key under which the value is stored.
    * @return <code>true</code> if a preference exists with key matching
    * <code>key</code>. <code>false</code> otherwise.

@@ -6,7 +6,7 @@
          <meta.schema plugin="org.rssowl.core.interpreter" id="NamespaceHandler" name="Namespace Handler"/>
       </appInfo>
       <documentation>
-         
+         The namespace handler is responsible for handling elements and attributes that use a certain namespace. Use this extension point if you added new elements to an existing format using your own namespace or to let RSSOwl handle certain established namespaces that enrich the existing feed formats.
       </documentation>
    </annotation>
 
@@ -52,7 +52,7 @@
          <attribute name="namespaceURI" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The unique URI of the namespace this handler is responsible for.
                </documentation>
             </annotation>
          </attribute>
@@ -83,7 +83,17 @@
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
-         
+         The following is an example of the extension point that registers a namespace
+handler for the dublin core namespace commonly used in RSS feeds: 
+&lt;p&gt;
+&lt;pre&gt;
+&lt;extension point=&quot;org.rssowl.core.NamespaceHandler&quot;&gt;
+   &lt;namespaceHandler
+      class=&quot;org.rssowl.core.internal.interpreter.DublinCoreNamespaceHandler&quot;
+      namespaceURI=&quot;http://purl.org/dc/elements/1.1/&quot;/&gt;
+&lt;/extension&gt;
+&lt;/pre&gt;
+&lt;/p&gt;
       </documentation>
    </annotation>
 

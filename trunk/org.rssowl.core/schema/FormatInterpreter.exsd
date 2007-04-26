@@ -6,7 +6,7 @@
          <meta.schema plugin="org.rssowl.core.interpreter" id="FormatInterpreter" name="Format Interpreter"/>
       </appInfo>
       <documentation>
-         
+         A format interpreter knows how to interprete a XML document of a certain format. The format is identified by the name of the root element. Use this extension point if you want to let RSSOwl handle new formats, e.g. being able to display an XML event log as feed.
       </documentation>
    </annotation>
 
@@ -62,7 +62,7 @@
          <attribute name="rootElement" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The root element of the XML document this handler should be responsible for.
                </documentation>
             </annotation>
          </attribute>
@@ -83,7 +83,17 @@
          <meta.section type="examples"/>
       </appInfo>
       <documentation>
-         
+         The following is an example of the extension point that registers a format
+interpreter for RSS documents: 
+&lt;p&gt;
+&lt;pre&gt;
+&lt;extension point=&quot;org.rssowl.core.FormatInterpreter&quot;&gt;
+   &lt;formatInterpreter
+      class=&quot;org.rssowl.core.internal.interpreter.RSSInterpreter&quot;
+      rootElement=&quot;rss&quot;/&gt;
+&lt;/extension&gt; 
+&lt;/pre&gt;
+&lt;/p&gt;
       </documentation>
    </annotation>
 

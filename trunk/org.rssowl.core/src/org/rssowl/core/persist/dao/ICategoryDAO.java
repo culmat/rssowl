@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.ICategory;
@@ -30,17 +31,21 @@ import org.rssowl.core.persist.service.PersistenceException;
 
 import java.util.Set;
 
+/**
+ * A data-access-object for <code>ICategory</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
 public interface ICategoryDAO extends IEntityDAO<ICategory, CategoryListener, CategoryEvent> {
-  
+
   /**
    * Loads a sorted <code>Set</code> of category names for all categories that
    * are persisted and have non-null names.
-   * 
+   *
    * @return a sorted <code>Set</code> of Strings containing all categories
    * that are persisted in the persistence layer.
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
    */
   Set<String> loadAllNames();
-  
 }

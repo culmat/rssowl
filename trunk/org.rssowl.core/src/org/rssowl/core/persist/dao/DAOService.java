@@ -21,39 +21,48 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.IPersistable;
 
+/**
+ * The <code>DAOService</code> is an abstract class that provides getter to
+ * the data access objects of all <code>IPersistable</code> model types in
+ * RSSOwl. This service can be contributed by using the DAOService extension
+ * point provided in this bundle.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
 public abstract class DAOService {
 
-  public abstract <T extends IPersistableDAO<?>> T getDAO(Class<T> daoInterface);
-  
-  public abstract <T extends IPersistableDAO<? super P>, P extends IPersistable> T getDAOFromEntity(Class<P> persistableClass);
-  
+  public abstract <T extends IPersistableDAO< ? >> T getDAO(Class<T> daoInterface);
+
+  public abstract <T extends IPersistableDAO< ? super P>, P extends IPersistable> T getDAOFromEntity(Class<P> persistableClass);
+
   public abstract IAttachmentDAO getAttachmentDAO();
-  
+
   public abstract IBookMarkDAO getBookMarkDAO();
-  
+
   public abstract ICategoryDAO getCategoryDAO();
-  
+
   public abstract IFeedDAO getFeedDAO();
-  
+
   public abstract IFolderDAO getFolderDAO();
-  
+
   public abstract INewsCounterDAO getNewsCounterDAO();
-  
+
   public abstract INewsDAO getNewsDAO();
-  
+
   public abstract IPersonDAO getPersonDAO();
-  
+
   public abstract IPreferencesDAO getPreferencesDAO();
-  
+
   public abstract ISearchConditionDAO getSearchConditionDAO();
-  
+
   public abstract ISearchMarkDAO getSearchMarkDAO();
 
   public abstract ILabelDAO getLabelDAO();
-  
+
   public abstract IConditionalGetDAO getConditionalGetDAO();
 }

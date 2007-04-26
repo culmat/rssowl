@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.Feed;
@@ -33,13 +34,18 @@ import org.rssowl.core.persist.reference.FeedReference;
 
 import java.net.URI;
 
-public final class FeedDAOImpl extends AbstractEntityDAO<IFeed, FeedListener,
-    FeedEvent> implements IFeedDAO  {
+/**
+ * A data-access-object for <code>IFeed</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public final class FeedDAOImpl extends AbstractEntityDAO<IFeed, FeedListener, FeedEvent> implements IFeedDAO {
 
+  /** Default constructor using the specific IPersistable for this DAO */
   public FeedDAOImpl() {
     super(Feed.class, false);
   }
-  
+
   @Override
   protected final void doSave(IFeed entity) {
     DBHelper.saveFeed(fDb, entity);

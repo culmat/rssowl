@@ -21,12 +21,18 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.event.SearchMarkListener;
 
+/**
+ * A data-access-object for <code>ISearchMark</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
 public interface ISearchMarkDAO extends IEntityDAO<ISearchMark, SearchMarkListener, SearchMarkEvent> {
   // No new methods
 }
