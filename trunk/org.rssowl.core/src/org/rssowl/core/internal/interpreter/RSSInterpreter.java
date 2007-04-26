@@ -135,7 +135,13 @@ public class RSSInterpreter extends BasicInterpreter {
       /* Link */
       else if ("link".equals(name)) { //$NON-NLS-1$
         URI uri = URIUtils.createURI(child.getText());
-        if (uri != null)
+
+        /*
+         * Do not use the URI if it is empty. This is a workaround for
+         * FeedBurner feeds that use a Atom 1.0 Link Element in place of an RSS
+         * feed which RSSOwl 2 is not yet able to handle on this scope.
+         */
+        if (uri != null && StringUtils.isSet(uri.toString()))
           feed.setHomepage(uri);
         processNamespaceAttributes(child, feed);
       }
