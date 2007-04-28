@@ -62,6 +62,7 @@ import org.rssowl.ui.internal.OwlUI;
  * @author bpasero
  */
 public class NewsBrowserControl implements IFeedViewPart {
+  private static final String LOCALHOST = "127.0.0.1";
   private IEditorSite fEditorSite;
   private NewsBrowserViewer fViewer;
   private ISelectionListener fSelectionListener;
@@ -199,7 +200,7 @@ public class NewsBrowserControl implements IFeedViewPart {
       public void changed(StatusTextEvent event) {
 
         /* Don't show Status for the Handler Protocol */
-        if (event.text != null && !event.text.contains(ILinkHandler.HANDLER_PROTOCOL))
+        if (event.text != null && !event.text.contains(ILinkHandler.HANDLER_PROTOCOL) && !event.text.contains(LOCALHOST))
           fEditorSite.getActionBars().getStatusLineManager().setMessage(event.text);
       }
     });
