@@ -56,13 +56,13 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.IPreferencesDAO;
+import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.event.NewsAdapter;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.runnable.EventType;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.core.persist.pref.PreferencesEvent;
-import org.rssowl.core.persist.pref.PreferencesListener;
+import org.rssowl.core.persist.pref.PreferenceEvent;
+import org.rssowl.core.persist.pref.PreferenceListener;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -91,7 +91,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   /* Listeners */
   private NewsAdapter fNewsListener;
   private ShellListener fTrayShellListener;
-  private PreferencesListener fPrefListener;
+  private PreferenceListener fPrefListener;
 
   /**
    * @param configurer
@@ -191,28 +191,28 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     });
 
     /* Listen on Preferences Changes */
-    fPrefListener = new PreferencesListener() {
-      public void entitiesAdded(Set<PreferencesEvent> events) {
+    fPrefListener = new PreferenceListener() {
+      public void entitiesAdded(Set<PreferenceEvent> events) {
         onPreferencesChange(events, EventType.PERSIST);
       }
 
-      public void entitiesDeleted(Set<PreferencesEvent> events) {
+      public void entitiesDeleted(Set<PreferenceEvent> events) {
         onPreferencesChange(events, EventType.REMOVE);
       }
 
-      public void entitiesUpdated(Set<PreferencesEvent> events) {
+      public void entitiesUpdated(Set<PreferenceEvent> events) {
         onPreferencesChange(events, EventType.UPDATE);
       }
     };
-    DynamicDAO.getDAO(IPreferencesDAO.class).addEntityListener(fPrefListener);
+    DynamicDAO.getDAO(IPreferenceDAO.class).addEntityListener(fPrefListener);
   }
 
   private void unregisterListeners() {
-    DynamicDAO.getDAO(IPreferencesDAO.class).removeEntityListener(fPrefListener);
+    DynamicDAO.getDAO(IPreferenceDAO.class).removeEntityListener(fPrefListener);
   }
 
-  private void onPreferencesChange(Set<PreferencesEvent> events, EventType type) {
-    for (PreferencesEvent event : events) {
+  private void onPreferencesChange(Set<PreferenceEvent> events, EventType type) {
+    for (PreferenceEvent event : events) {
       /* Tray Preference Change */
       if (DefaultPreferences.USE_SYSTEM_TRAY.equals(event.getEntity().getKey())) {
         boolean useTray;

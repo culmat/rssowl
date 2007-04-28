@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.persist.event.runnable;
 
-import org.rssowl.core.persist.pref.PreferencesEvent;
+import org.rssowl.core.persist.pref.PreferenceEvent;
 
 
 /**
@@ -31,12 +31,12 @@ import org.rssowl.core.persist.pref.PreferencesEvent;
  * 
  * @see EventRunnable
  */
-public class PreferenceEventRunnable extends EventRunnable<PreferencesEvent>    {
+public class PreferenceEventRunnable extends EventRunnable<PreferenceEvent>    {
 
   /**
    * Creates a new instance of this object.
    */
   public PreferenceEventRunnable() {
-    super(PreferencesEvent.class, getDAOService().getPreferencesDAO());
+    super(PreferenceEvent.class, getDAOService().getPreferencesDAO());
   }
 }

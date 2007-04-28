@@ -48,7 +48,7 @@ import org.rssowl.core.persist.dao.INewsCounterDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.dao.IPersistableDAO;
 import org.rssowl.core.persist.dao.IPersonDAO;
-import org.rssowl.core.persist.dao.IPreferencesDAO;
+import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.dao.ISearchConditionDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.search.ISearchCondition;
@@ -58,7 +58,7 @@ import java.util.Map;
 
 public final class DAOServiceImpl extends DAOService  {
 
-  private final IPreferencesDAO fPreferencesDAO = new PreferencesDAOImpl();
+  private final IPreferenceDAO fPreferencesDAO = new PreferencesDAOImpl();
   private final IAttachmentDAO fAttachmentDAO = new AttachmentDAOImpl();
   private final IBookMarkDAO fBookMarkDAO = new BookMarkDAOImpl();
   private final ICategoryDAO fCategoryDAO = new CategoryDAOImpl();
@@ -90,7 +90,7 @@ public final class DAOServiceImpl extends DAOService  {
     fEntityDaoClassesToDaosMap.put(IPersonDAO.class, fPersonDAO);
     fEntityDaoClassesToDaosMap.put(ISearchConditionDAO.class, fSearchConditionDAO);
     fEntityDaoClassesToDaosMap.put(ISearchMarkDAO.class, fSearchMarkDAO);
-    fEntityDaoClassesToDaosMap.put(IPreferencesDAO.class, fPreferencesDAO);
+    fEntityDaoClassesToDaosMap.put(IPreferenceDAO.class, fPreferencesDAO);
 
     for (Object value : fEntityDaoClassesToDaosMap.values()) {
       IPersistableDAO<?> dao = (IPersistableDAO<?>) value;
@@ -117,7 +117,7 @@ public final class DAOServiceImpl extends DAOService  {
   }
 
   @Override
-  public final IPreferencesDAO getPreferencesDAO() {
+  public final IPreferenceDAO getPreferencesDAO() {
     return fPreferencesDAO;
   }
 

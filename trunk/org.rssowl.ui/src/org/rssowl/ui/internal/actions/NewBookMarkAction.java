@@ -58,7 +58,7 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFeedDAO;
-import org.rssowl.core.persist.dao.IPreferencesDAO;
+import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.persist.reference.FolderReference;
@@ -352,7 +352,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
   }
 
   private IFolder getParent() throws PersistenceException {
-    Long selectedRootFolderID = DynamicDAO.getDAO(IPreferencesDAO.class).load(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET).getLong();
+    Long selectedRootFolderID = DynamicDAO.getDAO(IPreferenceDAO.class).load(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET).getLong();
 
     /* Check if available Parent is still valid */
     if (fParent != null) {

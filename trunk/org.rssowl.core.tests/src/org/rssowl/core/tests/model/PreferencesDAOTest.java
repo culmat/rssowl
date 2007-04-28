@@ -35,9 +35,9 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.IPreferencesDAO;
-import org.rssowl.core.persist.pref.PreferencesEvent;
-import org.rssowl.core.persist.pref.PreferencesListener;
+import org.rssowl.core.persist.dao.IPreferenceDAO;
+import org.rssowl.core.persist.pref.PreferenceEvent;
+import org.rssowl.core.persist.pref.PreferenceListener;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -48,7 +48,7 @@ import java.util.Set;
  */
 @SuppressWarnings("nls")
 public class PreferencesDAOTest {
-  private IPreferencesDAO fDao;
+  private IPreferenceDAO fDao;
   private IModelFactory fFactory;
 
   /**
@@ -58,7 +58,7 @@ public class PreferencesDAOTest {
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
-    fDao = DynamicDAO.getDAO(IPreferencesDAO.class);
+    fDao = DynamicDAO.getDAO(IPreferenceDAO.class);
     fFactory = Owl.getModelFactory();
   }
 
@@ -445,7 +445,7 @@ public class PreferencesDAOTest {
    */
   @Test
   public void testPreferenceEvents() throws Exception {
-    PreferencesListener prefListener = null;
+    PreferenceListener prefListener = null;
     try {
       final String key1 = "key1";
       boolean value1 = true;
@@ -464,10 +464,10 @@ public class PreferencesDAOTest {
       final boolean updatedEvents[] = new boolean[4];
       final boolean deletionEvents[] = new boolean[4];
 
-      prefListener = new PreferencesListener() {
-        public void entitiesAdded(Set<PreferencesEvent> events) {
+      prefListener = new PreferenceListener() {
+        public void entitiesAdded(Set<PreferenceEvent> events) {
           assertEquals(1, events.size());
-          PreferencesEvent event = events.iterator().next();
+          PreferenceEvent event = events.iterator().next();
           String key = event.getEntity().getKey();
           if (key1.equals(key))
             additionEvents[0] = event.getEntity().getBoolean().booleanValue();
@@ -479,9 +479,9 @@ public class PreferencesDAOTest {
             additionEvents[3] = Arrays.equals(event.getEntity().getStrings(), new String[] { "1", "2", "3", "4" });
         }
 
-        public void entitiesUpdated(Set<PreferencesEvent> events) {
+        public void entitiesUpdated(Set<PreferenceEvent> events) {
           assertEquals(1, events.size());
-          PreferencesEvent event = events.iterator().next();
+          PreferenceEvent event = events.iterator().next();
           String key = event.getEntity().getKey();
           if (key1.equals(key))
             updatedEvents[0] = !event.getEntity().getBoolean().booleanValue();
@@ -493,9 +493,9 @@ public class PreferencesDAOTest {
             updatedEvents[3] = Arrays.equals(event.getEntity().getStrings(), new String[] { "4", "3", "2", "1" });
         }
 
-        public void entitiesDeleted(Set<PreferencesEvent> events) {
+        public void entitiesDeleted(Set<PreferenceEvent> events) {
           assertEquals(1, events.size());
-          PreferencesEvent event = events.iterator().next();
+          PreferenceEvent event = events.iterator().next();
           String key = event.getEntity().getKey();
           if (key1.equals(key))
             deletionEvents[0] = true;

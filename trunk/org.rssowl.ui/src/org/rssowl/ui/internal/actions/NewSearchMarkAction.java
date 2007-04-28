@@ -35,7 +35,7 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.IPreferencesDAO;
+import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.ui.internal.dialogs.SearchMarkDialog;
@@ -120,7 +120,7 @@ public class NewSearchMarkAction implements IWorkbenchWindowActionDelegate, IObj
   }
 
   private IFolder getParent() throws PersistenceException {
-    IPreferencesDAO prefDAO = DynamicDAO.getDAO(IPreferencesDAO.class);
+    IPreferenceDAO prefDAO = DynamicDAO.getDAO(IPreferenceDAO.class);
     Long selectedRootFolderID = prefDAO.load(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET).getLong();
 
     /* Check if available Parent is still valid */

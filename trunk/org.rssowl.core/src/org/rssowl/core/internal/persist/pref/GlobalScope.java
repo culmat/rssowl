@@ -28,10 +28,10 @@ import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.IPreference;
-import org.rssowl.core.persist.dao.IPreferencesDAO;
+import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.core.persist.pref.PreferencesEvent;
-import org.rssowl.core.persist.pref.PreferencesListener;
+import org.rssowl.core.persist.pref.PreferenceEvent;
+import org.rssowl.core.persist.pref.PreferenceListener;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -48,7 +48,7 @@ import java.util.Set;
 public class GlobalScope implements IPreferenceScope {
   private Map<String, IPreference> fCache;
   private IPreferenceScope fParent;
-  private IPreferencesDAO fPreferenceDAO;
+  private IPreferenceDAO fPreferenceDAO;
 
   /**
    * @param parent
@@ -61,19 +61,19 @@ public class GlobalScope implements IPreferenceScope {
   }
 
   private void registerListeners() {
-    fPreferenceDAO.addEntityListener(new PreferencesListener() {
-      public void entitiesAdded(Set<PreferencesEvent> events) {
-        for (PreferencesEvent event : events)
+    fPreferenceDAO.addEntityListener(new PreferenceListener() {
+      public void entitiesAdded(Set<PreferenceEvent> events) {
+        for (PreferenceEvent event : events)
           fCache.put(event.getEntity().getKey(), event.getEntity());
       }
 
-      public void entitiesDeleted(Set<PreferencesEvent> events) {
-        for (PreferencesEvent event : events)
+      public void entitiesDeleted(Set<PreferenceEvent> events) {
+        for (PreferenceEvent event : events)
           fCache.remove(event.getEntity().getKey());
       }
 
-      public void entitiesUpdated(Set<PreferencesEvent> events) {
-        for (PreferencesEvent event : events)
+      public void entitiesUpdated(Set<PreferenceEvent> events) {
+        for (PreferenceEvent event : events)
           fCache.put(event.getEntity().getKey(), event.getEntity());
       }
     });

@@ -61,7 +61,7 @@ import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.dao.IConditionalGetDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
-import org.rssowl.core.persist.dao.IPreferencesDAO;
+import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.search.ISearchField;
 import org.rssowl.core.persist.search.SearchSpecifier;
@@ -151,7 +151,7 @@ public class Controller {
   private IBookMarkDAO fBookMarkDAO;
   private IFolderDAO fFolderDAO;
   private IConditionalGetDAO fConditionalGetDAO;
-  private IPreferencesDAO fPrefsDAO;
+  private IPreferenceDAO fPrefsDAO;
   private ILabelDAO fLabelDao;
 
   private IModelFactory fFactory;

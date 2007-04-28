@@ -24,34 +24,15 @@
 
 package org.rssowl.core.persist.pref;
 
-import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IPreference;
-import org.rssowl.core.persist.event.ModelEvent;
-import org.rssowl.core.persist.event.runnable.PreferenceEventRunnable;
+import org.rssowl.core.persist.event.EntityListener;
 
 /**
- * An Event-Object being used to notify Listeners, whenever a Preference was
- * added, updated or deleted in the persistance layer.
+ * A Listener that is notified whenever a Preference is added, updated or deleted
+ * in the persistance layer.
  * 
  * @author bpasero
  */
-public class PreferencesEvent extends ModelEvent    {
-
-  /**
-   * @param preference The preference affected by this event.
-   */
-  public PreferencesEvent(IPreference preference) {
-    super(preference);
-    Assert.isNotNull(preference, "The preference must not be null"); //$NON-NLS-1$
-  }
-  
-  @Override
-  public final IPreference getEntity() {
-    return (IPreference) super.getEntity();
-  }
-
-  @Override
-  public PreferenceEventRunnable createEventRunnable() {
-    return new PreferenceEventRunnable();
-  }
+public interface PreferenceListener extends EntityListener<PreferenceEvent, IPreference> {
+  // No new methods
 }

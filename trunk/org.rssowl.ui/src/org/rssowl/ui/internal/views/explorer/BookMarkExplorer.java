@@ -94,7 +94,7 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.IPreferencesDAO;
+import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.event.FolderAdapter;
 import org.rssowl.core.persist.event.FolderEvent;
 import org.rssowl.core.persist.event.FolderListener;
@@ -523,7 +523,7 @@ public class BookMarkExplorer extends ViewPart {
     fViewSite.getActionBars().getToolBarManager().find(NEXT_SET_ACTION).update(IAction.ENABLED);
 
     /* Save the new selected Set in Preferences */
-    IPreferencesDAO prefDAO = DynamicDAO.getDAO(IPreferencesDAO.class);
+    IPreferenceDAO prefDAO = DynamicDAO.getDAO(IPreferenceDAO.class);
     IPreference pref = prefDAO.loadOrCreate(PREF_SELECTED_BOOKMARK_SET);
     pref.putLongs(fSelectedBookMarkSet.getId());
     prefDAO.save(pref);
@@ -1522,7 +1522,7 @@ public class BookMarkExplorer extends ViewPart {
     /* Add the ID of the current selected Set to make it Unique */
     String key = PREF_EXPANDED_NODES + fSelectedBookMarkSet;
     
-    IPreferencesDAO prefDAO = DynamicDAO.getDAO(IPreferencesDAO.class);
+    IPreferenceDAO prefDAO = DynamicDAO.getDAO(IPreferenceDAO.class);
     IPreference pref = prefDAO.loadOrCreate(key);
     pref.putLongs(elements);
     prefDAO.save(pref);
@@ -1538,7 +1538,7 @@ public class BookMarkExplorer extends ViewPart {
     fFilterType = BookMarkFilter.Type.values()[fGlobalPreferences.getInteger(DefaultPreferences.BE_FILTER_TYPE)];
     fGroupingType = BookMarkGrouping.Type.values()[fGlobalPreferences.getInteger(DefaultPreferences.BE_GROUP_TYPE)];
 
-    IPreferencesDAO prefDAO = DynamicDAO.getDAO(IPreferencesDAO.class);
+    IPreferenceDAO prefDAO = DynamicDAO.getDAO(IPreferenceDAO.class);
     IPreference pref = prefDAO.load(PREF_SELECTED_BOOKMARK_SET);
     Assert.isTrue(fRootFolders.size() > 0, "Could not find any Bookmark Set!"); //$NON-NLS-1$
     if (pref != null)
@@ -1558,7 +1558,7 @@ public class BookMarkExplorer extends ViewPart {
 
   /* Expanded Elements - Use ID of selected Set to make it Unique */
   private void loadExpandedElements() {
-    IPreference pref = DynamicDAO.getDAO(IPreferencesDAO.class).load(PREF_EXPANDED_NODES);
+    IPreference pref = DynamicDAO.getDAO(IPreferenceDAO.class).load(PREF_EXPANDED_NODES);
     if (pref != null) {
       for (long element : pref.getLongs())
         fExpandedNodes.add(element);

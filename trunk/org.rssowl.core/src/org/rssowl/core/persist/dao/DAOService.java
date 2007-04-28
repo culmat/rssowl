@@ -56,7 +56,7 @@ public abstract class DAOService {
 
   public abstract IPersonDAO getPersonDAO();
 
-  public abstract IPreferencesDAO getPreferencesDAO();
+  public abstract IPreferenceDAO getPreferencesDAO();
 
   public abstract ISearchConditionDAO getSearchConditionDAO();
 
