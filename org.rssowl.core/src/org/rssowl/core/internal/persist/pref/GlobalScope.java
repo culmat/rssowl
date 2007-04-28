@@ -466,7 +466,7 @@ public class GlobalScope implements IPreferenceScope {
   }
 
   private boolean cached(String key, Object value) {
-    //FIXME Fix this
+    //FIXME Fix this, bug #429
     return false;
 //    IPreference cachedRes = fCache.get(key);
 //    if (cachedRes == null)
