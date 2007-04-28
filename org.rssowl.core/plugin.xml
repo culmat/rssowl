@@ -127,4 +127,10 @@
             class="org.rssowl.core.internal.connection.EasySSLProtocolSocketFactory">
       </sslhandler>
    </extension>
+   <extension
+         point="org.rssowl.core.XMLParser">
+      <xmlparser
+            class="org.rssowl.core.internal.interpreter.DefaultSaxParserImpl">
+      </xmlparser>
+   </extension>
 </plugin>
