@@ -42,7 +42,6 @@ import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.connection.IProxyCredentials;
-import org.rssowl.core.connection.PlatformCredentialsProvider;
 import org.rssowl.core.connection.UnknownFeedException;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
@@ -78,9 +77,6 @@ public class ConnectionServiceImpl implements IConnectionService {
 
   /* Extension Point: SSL Handler */
   private static final String SSL_HANDLER_EXTENSION_POINT = "org.rssowl.core.SSLHandler"; //$NON-NLS-1$
-
-  /* Some protocols supported by default */
-  private static final String[] DEFAULT_PROTOCOLS = new String[] { "http", "https", "file" };
 
   private Map<String, IProtocolHandler> fProtocolHandler;
   private Map<String, ICredentialsProvider> fCredentialsProvider;
@@ -275,7 +271,8 @@ public class ConnectionServiceImpl implements IConnectionService {
         String protocol = element.getAttribute("protocol"); //$NON-NLS-1$
 
         /* Let 3d-Party contributions override our contributions */
-        if (fCredentialsProvider.containsKey(protocol) && element.getNamespaceIdentifier().contains(ExtensionUtils.RSSOWL_NAMESPACE))
+        String nsId = element.getNamespaceIdentifier();
+        if (fCredentialsProvider.containsKey(protocol) && nsId.contains(ExtensionUtils.RSSOWL_NAMESPACE) && !nsId.contains(ExtensionUtils.RSSOWL_TESTS_NAMESPACE))
           continue;
 
         fCredentialsProvider.put(protocol, (ICredentialsProvider) element.createExecutableExtension("class"));//$NON-NLS-1$
@@ -284,13 +281,6 @@ public class ConnectionServiceImpl implements IConnectionService {
       } catch (CoreException e) {
         Activator.getDefault().getLog().log(e.getStatus());
       }
-    }
-
-    /* Add provider for default protocols if not yet present */
-    ICredentialsProvider defaultProvider = new PlatformCredentialsProvider();
-    for (String defaultProtocol : DEFAULT_PROTOCOLS) {
-      if (!fCredentialsProvider.containsKey(defaultProtocol))
-        fCredentialsProvider.put(defaultProtocol, defaultProvider);
     }
   }
 

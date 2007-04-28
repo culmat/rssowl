@@ -100,4 +100,19 @@
             class="org.rssowl.core.internal.persist.dao.DAOServiceImpl">
       </daoservice>
    </extension>
+   <extension
+         point="org.rssowl.core.CredentialsProvider">
+      <credentialsProvider
+            class="org.rssowl.core.connection.PlatformCredentialsProvider"
+            protocol="http">
+      </credentialsProvider>
+      <credentialsProvider
+            class="org.rssowl.core.connection.PlatformCredentialsProvider"
+            protocol="https">
+      </credentialsProvider>
+      <credentialsProvider
+            class="org.rssowl.core.connection.PlatformCredentialsProvider"
+            protocol="file">
+      </credentialsProvider>
+   </extension>
 </plugin>
