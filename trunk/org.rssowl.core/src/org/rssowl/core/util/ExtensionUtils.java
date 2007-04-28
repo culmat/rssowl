@@ -33,13 +33,16 @@ import org.rssowl.core.internal.Activator;
 /**
  * Utility class to work with the <code>IExtensionRegistry</code> of the
  * platform in order to handle contributions.
- * 
+ *
  * @author bpasero
  */
 public class ExtensionUtils {
 
   /** The RSSOwl Namespace for extension points */
   public static final String RSSOWL_NAMESPACE = "org.rssowl"; //$NON-NLS-1$
+
+  /** The RSSOwl Namespace for extension points */
+  public static final String RSSOWL_TESTS_NAMESPACE = "org.rssowl.core.tests"; //$NON-NLS-1$
 
   /* Attribute for executable extensions */
   private static final String EXECUTABLE_ATTRIBUTE = "class"; //$NON-NLS-1$
@@ -48,7 +51,7 @@ public class ExtensionUtils {
    * Returns the result of creating an executable extension from the "class"
    * attribute of the first contribution that matches the given extension point.
    * Third-Party contributions will be chosen over the default contribution.
-   * 
+   *
    * @param extensionPoint The fully qualified identifier of the extension point
    * to use (e.g. "org.rssowl.core.ApplicationLayer")
    * @return Returns the result of creating an executable extension from the
@@ -66,7 +69,7 @@ public class ExtensionUtils {
    * attribute of the first contribution that matches the given extension point.
    * Third-Party contributions will be chosen over the default contribution. If
    * no contribution is found, the default is returned if provided.
-   * 
+   *
    * @param extensionPoint The fully qualified identifier of the extension point
    * to use (e.g. "org.rssowl.core.ApplicationLayer")
    * @param defaultExecutable The default executable that should be returned if
