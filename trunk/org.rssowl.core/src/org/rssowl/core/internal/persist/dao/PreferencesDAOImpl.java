@@ -27,8 +27,8 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.Preference;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
-import org.rssowl.core.persist.pref.PreferenceEvent;
-import org.rssowl.core.persist.pref.PreferenceListener;
+import org.rssowl.core.persist.event.PreferenceEvent;
+import org.rssowl.core.persist.event.PreferenceListener;
 import org.rssowl.core.persist.service.PersistenceException;
 
 import com.db4o.ObjectSet;

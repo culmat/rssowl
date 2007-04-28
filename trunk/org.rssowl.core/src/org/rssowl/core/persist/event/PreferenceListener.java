@@ -22,30 +22,16 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.persist.pref;
+package org.rssowl.core.persist.event;
 
-import java.util.Set;
+import org.rssowl.core.persist.IPreference;
 
 /**
- * Provides an empty implementation of <code>PreferenceListener</code>.
- * Useful if the client only needs to implement a subset of the interface.
+ * A Listener that is notified whenever a Preference is added, updated or deleted
+ * in the persistance layer.
  * 
  * @author bpasero
  */
-public class PreferencesAdapter implements PreferenceListener {
-
-  /*
-   * @see org.rssowl.core.model.preferences.PreferencesListener#entitiesAdded(org.rssowl.core.model.preferences.PreferencesEvent)
-   */
-  public void entitiesAdded(Set<PreferenceEvent> event) {}
-
-  /*
-   * @see org.rssowl.core.model.preferences.PreferencesListener#entitiesUpdated(org.rssowl.core.model.preferences.PreferencesEvent)
-   */
-  public void entitiesUpdated(Set<PreferenceEvent> event) {}
-
-  /*
-   * @see org.rssowl.core.model.preferences.PreferencesListener#entitiesDeleted(org.rssowl.core.model.preferences.PreferencesEvent)
-   */
-  public void entitiesDeleted(Set<PreferenceEvent> event) {}
+public interface PreferenceListener extends EntityListener<PreferenceEvent, IPreference> {
+  // No new methods
 }

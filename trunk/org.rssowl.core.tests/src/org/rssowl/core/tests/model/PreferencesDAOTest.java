@@ -36,8 +36,8 @@ import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
-import org.rssowl.core.persist.pref.PreferenceEvent;
-import org.rssowl.core.persist.pref.PreferenceListener;
+import org.rssowl.core.persist.event.PreferenceEvent;
+import org.rssowl.core.persist.event.PreferenceListener;
 
 import java.util.Arrays;
 import java.util.Set;

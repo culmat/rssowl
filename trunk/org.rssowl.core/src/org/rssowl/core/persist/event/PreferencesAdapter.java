@@ -22,51 +22,30 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.persist.pref;
+package org.rssowl.core.persist.event;
 
-import org.rssowl.core.persist.IEntity;
+import java.util.Set;
 
 /**
- * <p>
- * Provides access to the scoped preferences service in RSSOwl. There is three
- * levels of preferences: Default, Global and Entity. Any preference that is not
- * set at the one scope will be looked up in the parent scope until the Default
- * scope is reached. This allows to easily override the preferences for all
- * entities without having to define the preferences per entity.
- * </p>
- * <p>
- * You can define default preferences by using the PreferencesInitializer
- * extension point provided by this plugin.
- * </p>
- *
+ * Provides an empty implementation of <code>PreferenceListener</code>.
+ * Useful if the client only needs to implement a subset of the interface.
+ * 
  * @author bpasero
- * @see IPreferenceScope
- * @see IPreferencesInitializer
  */
-public interface IPreferenceService {
+public class PreferencesAdapter implements PreferenceListener {
 
-  /**
-   * The default scope can be used to intialize default preferences. It is the
-   * most-outer Scope with no parent scope at all. None of the values stored in
-   * the default scope is persisted.
-   *
-   * @return The Default Scope for Preferences.
+  /*
+   * @see org.rssowl.core.model.preferences.PreferencesListener#entitiesAdded(org.rssowl.core.model.preferences.PreferencesEvent)
    */
-  IPreferenceScope getDefaultScope();
+  public void entitiesAdded(Set<PreferenceEvent> event) {}
 
-  /**
-   * The global scope stores global preferences. Most entity-scopes will be
-   * initialized with the values of the global scope.
-   *
-   * @return The Global Scope for Preferences.
+  /*
+   * @see org.rssowl.core.model.preferences.PreferencesListener#entitiesUpdated(org.rssowl.core.model.preferences.PreferencesEvent)
    */
-  IPreferenceScope getGlobalScope();
+  public void entitiesUpdated(Set<PreferenceEvent> event) {}
 
-  /**
-   * The entity scope stores preferences in the given entity itself.
-   *
-   * @param entity The Entity to be used for the Scope.
-   * @return The Entity Scope for Preferences as defined by the given Entity.
+  /*
+   * @see org.rssowl.core.model.preferences.PreferencesListener#entitiesDeleted(org.rssowl.core.model.preferences.PreferencesEvent)
    */
-  IPreferenceScope getEntityScope(IEntity entity);
+  public void entitiesDeleted(Set<PreferenceEvent> event) {}
 }

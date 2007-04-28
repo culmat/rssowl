@@ -22,36 +22,53 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.persist.pref;
+package org.rssowl.core.persist.service;
 
-import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.persist.IPreference;
-import org.rssowl.core.persist.event.ModelEvent;
-import org.rssowl.core.persist.event.runnable.PreferenceEventRunnable;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.pref.IPreferencesInitializer;
 
 /**
- * An Event-Object being used to notify Listeners, whenever a Preference was
- * added, updated or deleted in the persistance layer.
- * 
+ * <p>
+ * Provides access to the scoped preferences service in RSSOwl. There is three
+ * levels of preferences: Default, Global and Entity. Any preference that is not
+ * set at the one scope will be looked up in the parent scope until the Default
+ * scope is reached. This allows to easily override the preferences for all
+ * entities without having to define the preferences per entity.
+ * </p>
+ * <p>
+ * You can define default preferences by using the PreferencesInitializer
+ * extension point provided by this plugin.
+ * </p>
+ *
  * @author bpasero
+ * @see IPreferenceScope
+ * @see IPreferencesInitializer
  */
-public class PreferenceEvent extends ModelEvent    {
+public interface IPreferenceService {
 
   /**
-   * @param preference The preference affected by this event.
+   * The default scope can be used to intialize default preferences. It is the
+   * most-outer Scope with no parent scope at all. None of the values stored in
+   * the default scope is persisted.
+   *
+   * @return The Default Scope for Preferences.
    */
-  public PreferenceEvent(IPreference preference) {
-    super(preference);
-    Assert.isNotNull(preference, "The preference must not be null"); //$NON-NLS-1$
-  }
-  
-  @Override
-  public final IPreference getEntity() {
-    return (IPreference) super.getEntity();
-  }
+  IPreferenceScope getDefaultScope();
 
-  @Override
-  public PreferenceEventRunnable createEventRunnable() {
-    return new PreferenceEventRunnable();
-  }
+  /**
+   * The global scope stores global preferences. Most entity-scopes will be
+   * initialized with the values of the global scope.
+   *
+   * @return The Global Scope for Preferences.
+   */
+  IPreferenceScope getGlobalScope();
+
+  /**
+   * The entity scope stores preferences in the given entity itself.
+   *
+   * @param entity The Entity to be used for the Scope.
+   * @return The Entity Scope for Preferences as defined by the given Entity.
+   */
+  IPreferenceScope getEntityScope(IEntity entity);
 }
