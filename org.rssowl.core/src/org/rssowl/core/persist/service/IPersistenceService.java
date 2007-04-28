@@ -27,7 +27,6 @@ package org.rssowl.core.persist.service;
 import org.rssowl.core.persist.dao.DAOService;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IEntityDAO;
-import org.rssowl.core.persist.dao.IPreferencesDAO;
 import org.rssowl.core.persist.search.IModelSearch;
 
 /**
@@ -81,19 +80,6 @@ public interface IPersistenceService {
    * @see IDGenerator
    */
   IDGenerator getIDGenerator();
-
-  /**
-   * <p>
-   * Get the Implementation of <code>IPreferencesDAO</code> that allows to
-   * add, update and delete preferences. The implementation is looked up using
-   * the PreferencesDAO Extension Point.
-   * </p>
-   * Subclasses may override to provide their own implementation.
-   *
-   * @return Returns the Implementation of <code>IPreferencesDAO</code> that
-   * allows to add, update and delete preferences.
-   */
-  IPreferencesDAO getPreferencesDAO();
 
   /**
    * <p>

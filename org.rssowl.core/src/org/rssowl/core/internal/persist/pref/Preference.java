@@ -24,21 +24,17 @@
 package org.rssowl.core.internal.persist.pref;
 
 import org.eclipse.core.runtime.Assert;
+import org.rssowl.core.internal.persist.AbstractEntity;
+import org.rssowl.core.persist.IPreference;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.Arrays;
 
-public final class Preference {
-  public enum Type { 
-    BOOLEAN, INTEGER, LONG, STRING, LONG_ARRAY, STRING_ARRAY, INTEGER_ARRAY;
-  }
-  
+public final class Preference extends AbstractEntity implements IPreference {
   private String fKey;
   
-  private List<String> fValues;
-  
   private Type fType;
+  private String[] fValues;
+  private transient Object fCachedValues;
   
   /**
    * Provided for deserialization purposes.
@@ -46,37 +42,204 @@ public final class Preference {
   protected Preference() {
   }
   
-  public Preference(String key, Type type) {
+  public Preference(String key) {
     Assert.isNotNull(key, "key cannot be null"); //$NON-NLS-1$
-    Assert.isNotNull(type, "Type cannot be null"); //$NON-NLS-1$
     this.fKey = key;
-    this.fType = type;
   }
   
-  public final String getKey() {
+  /*
+   * @see org.rssowl.core.internal.persist.pref.T#getKey()
+   */
+  public synchronized final String getKey() {
     return fKey;
   }
   
-  public final void addValue(String value) {
-    Assert.isNotNull(value, "value cannot be null"); //$NON-NLS-1$
-    if (fValues == null) {
-      fValues = new ArrayList<String>();
-    }
-    fValues.add(value);
+  public synchronized final Type getType() {
+    return fType;
   }
   
-  public final List<String> getValues() {
-    if (fValues == null)
-      return Collections.emptyList();
+  /*
+   * @see org.rssowl.core.internal.persist.pref.T#getBoolean()
+   */
+  public synchronized final Boolean getBoolean() {
+    boolean[] values = getBooleans();
+    if (values != null && values.length > 0)
+      return values[0];
     
-    return Collections.unmodifiableList(fValues);
+    return null;
   }
   
-  public final void removeValue(int index) {
-    fValues.remove(index);
+  /*
+   * @see org.rssowl.core.internal.persist.pref.T#getBooleans()
+   */
+  public synchronized final boolean[] getBooleans() {
+    if (fValues == null)
+      return null;
+    checkType(Type.BOOLEAN);
+    
+    boolean[] cachedValues = (boolean[]) fCachedValues;
+    if (fCachedValues != null)
+      return Arrays.copyOf(cachedValues, cachedValues.length);
+    
+    cachedValues = new boolean[fValues.length];
+    int index = 0;
+    for (String value : fValues) {
+      cachedValues[index++] = Boolean.valueOf(value);
+    }
+    fCachedValues = cachedValues;
+    return Arrays.copyOf(cachedValues, cachedValues.length);
+  }
+  
+  private void checkType(Type type) {
+    Assert.isLegal(fType == type, "The type of the Preference is not of the expected " +
+        "type. It should be: " + fType + ", but it is: " + type);
   }
 
-  public Type getType() {
-    return fType;
+  /*
+   * @see org.rssowl.core.internal.persist.pref.T#getInteger()
+   */
+  public synchronized final Integer getInteger() {
+    int[] values = getIntegers();
+    if (values != null && values.length > 0)
+      return values[0];
+    
+    return null;
+  }
+  
+  /*
+   * @see org.rssowl.core.internal.persist.pref.T#getIntegers()
+   */
+  public synchronized final int[] getIntegers() {
+    if (fValues == null)
+      return null;
+    checkType(Type.INTEGER);
+    
+    int[] cachedValues = (int[]) fCachedValues;
+    if (fCachedValues != null)
+      return Arrays.copyOf(cachedValues, cachedValues.length);
+    
+    cachedValues = new int[fValues.length];
+    int index = 0;
+    for (String value : fValues) {
+      cachedValues[index++] = Integer.valueOf(value);
+    }
+    fCachedValues = cachedValues;
+    return Arrays.copyOf(cachedValues, cachedValues.length);
+  }
+  
+  /*
+   * @see org.rssowl.core.internal.persist.pref.T#getLong()
+   */
+  public synchronized final Long getLong() {
+    long[] values = getLongs();
+    if (values != null && values.length > 0)
+      return values[0];
+    
+    return null;
+  }
+  
+  /*
+   * @see org.rssowl.core.internal.persist.pref.T#getLongs()
+   */
+  public synchronized final long[] getLongs()   { 
+    if (fValues == null)
+      return null;
+    checkType(Type.LONG);
+    
+    long[] cachedValues = (long[]) fCachedValues;
+    if (fCachedValues != null)
+      return Arrays.copyOf(cachedValues, cachedValues.length);
+    
+    cachedValues = new long[fValues.length];
+    int index = 0;
+    for (String value : fValues) {
+      cachedValues[index++] = Long.valueOf(value);
+    }
+    fCachedValues = cachedValues;
+    return Arrays.copyOf(cachedValues, cachedValues.length);
+  }
+  
+  /*
+   * @see org.rssowl.core.internal.persist.pref.T#getString()
+   */
+  public synchronized final String getString() {
+    String[] values = getStrings();
+    if (values != null && values.length > 0)
+      return values[0];
+    
+    return null;
+  }
+  
+  /*
+   * @see org.rssowl.core.internal.persist.pref.T#getStrings()
+   */
+  public synchronized final String[] getStrings() {
+    if (fValues == null)
+      return null;
+    checkType(Type.STRING);
+    
+    return Arrays.copyOf(fValues, fValues.length);
+  }
+  
+  public synchronized final void putStrings(String ... strings) {
+    if (strings == null) {
+      clear();
+      return;
+    }
+    fType = Type.STRING;
+    String[] cachedValues = Arrays.copyOf(strings, strings.length);
+    fCachedValues = cachedValues;
+    fValues = cachedValues;
+  }
+
+  public synchronized final void putLongs(long ... longs) {
+    if (longs == null) {
+      clear();
+      return;
+    }
+    fType = Type.LONG;
+    long[] cachedValues = Arrays.copyOf(longs, longs.length);
+    fCachedValues = cachedValues;
+    fValues = new String[cachedValues.length];
+    int index = 0;
+    for (long cachedValue : cachedValues) {
+      fValues[index++] = String.valueOf(cachedValue);
+    }
+  }
+  
+  public synchronized final void putIntegers(int ... integers) {
+    if (integers == null) {
+      clear();
+      return;
+    }
+    fType = Type.INTEGER;
+    int[] cachedValues = Arrays.copyOf(integers, integers.length);
+    fCachedValues = cachedValues;
+    fValues = new String[cachedValues.length];
+    int index = 0;
+    for (int cachedValue : cachedValues) {
+      fValues[index++] = String.valueOf(cachedValue);
+    }
+  }
+  
+  public synchronized final void putBooleans(boolean ... booleans) {
+    if (booleans == null) {
+      clear();
+      return;
+    }
+    fType = Type.BOOLEAN;
+    boolean[] cachedValues = Arrays.copyOf(booleans, booleans.length);
+    fCachedValues = cachedValues;
+    fValues = new String[cachedValues.length];
+    int index = 0;
+    for (boolean cachedValue : cachedValues) {
+      fValues[index++] = String.valueOf(cachedValue);
+    }
+  }
+
+  public synchronized final void clear() {
+    fValues = null;
+    fType = null;
+    fCachedValues = null;
   }
 }

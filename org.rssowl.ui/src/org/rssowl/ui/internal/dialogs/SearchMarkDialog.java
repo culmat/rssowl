@@ -49,11 +49,11 @@ import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IPreferencesDAO;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.search.ISearchCondition;
 import org.rssowl.core.persist.search.ISearchField;
 import org.rssowl.core.persist.search.SearchSpecifier;
-import org.rssowl.core.persist.service.IPersistenceService;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.OwlUI;
@@ -83,7 +83,6 @@ public class SearchMarkDialog extends TitleAreaDialog {
   private IDialogSettings fDialogSettings;
   private boolean fFirstTimeOpen;
   private IFolder fParent;
-  private IPersistenceService fPersist;
   private List<ISearchCondition> fInitialSearchConditions;
   private boolean fInitialMatchAllConditions;
   private FolderChooser fFolderChooser;
@@ -110,7 +109,6 @@ public class SearchMarkDialog extends TitleAreaDialog {
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fDialogSettings = Activator.getDefault().getDialogSettings();
     fFirstTimeOpen = (fDialogSettings.getSection(SETTINGS_SECTION) == null);
-    fPersist = Owl.getPersistenceService();
 
     /* Use default Parent if required */
     if (fParent == null)
@@ -144,7 +142,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
   }
 
   private IFolder getDefaultParent() {
-    Long selectedRootFolderID = fPersist.getPreferencesDAO().getLong(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET);
+    Long selectedRootFolderID = DynamicDAO.getDAO(IPreferencesDAO.class).load(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET).getLong();
     return new FolderReference(selectedRootFolderID).resolve();
   }
 

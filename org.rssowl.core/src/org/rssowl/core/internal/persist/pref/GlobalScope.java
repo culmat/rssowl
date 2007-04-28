@@ -26,12 +26,18 @@ package org.rssowl.core.internal.persist.pref;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.InternalOwl;
+import org.rssowl.core.persist.IPreference;
+import org.rssowl.core.persist.dao.IPreferencesDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.pref.PreferencesEvent;
 import org.rssowl.core.persist.pref.PreferencesListener;
 
 import java.util.Arrays;
-import java.util.Properties;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementation of <code>IPreferencesScope</code> that asks the
@@ -40,31 +46,35 @@ import java.util.Properties;
  * @author bpasero
  */
 public class GlobalScope implements IPreferenceScope {
-  private Properties fCache;
+  private Map<String, IPreference> fCache;
   private IPreferenceScope fParent;
+  private IPreferencesDAO fPreferenceDAO;
 
   /**
    * @param parent
    */
   public GlobalScope(IPreferenceScope parent) {
     fParent = parent;
-    fCache = new Properties();
-
+    fCache = Collections.synchronizedMap(new HashMap<String, IPreference>());
+    fPreferenceDAO = InternalOwl.getDefault().getPersistenceService().getDAOService().getPreferencesDAO();
     registerListeners();
   }
 
   private void registerListeners() {
-    Owl.getListenerService().addPreferencesListener(new PreferencesListener() {
-      public void preferenceAdded(PreferencesEvent event) {
-        fCache.put(event.getKey(), event.getValue());
+    fPreferenceDAO.addEntityListener(new PreferencesListener() {
+      public void entitiesAdded(Set<PreferencesEvent> events) {
+        for (PreferencesEvent event : events)
+          fCache.put(event.getEntity().getKey(), event.getEntity());
       }
 
-      public void preferenceDeleted(PreferencesEvent event) {
-        fCache.remove(event.getKey());
+      public void entitiesDeleted(Set<PreferencesEvent> events) {
+        for (PreferencesEvent event : events)
+          fCache.remove(event.getEntity().getKey());
       }
 
-      public void preferenceUpdated(PreferencesEvent event) {
-        fCache.put(event.getKey(), event.getValue());
+      public void entitiesUpdated(Set<PreferencesEvent> events) {
+        for (PreferencesEvent event : events)
+          fCache.put(event.getEntity().getKey(), event.getEntity());
       }
     });
   }
@@ -87,182 +97,215 @@ public class GlobalScope implements IPreferenceScope {
    * @see org.rssowl.ui.internal.preferences.IPreferencesNode#delete(java.lang.String)
    */
   public void delete(String key) {
-    Owl.getPersistenceService().getPreferencesDAO().delete(key);
+    fPreferenceDAO.delete(key);
   }
 
   /*
    * @see org.rssowl.core.model.preferences.IPreferencesNode#getBoolean(java.lang.String)
    */
   public boolean getBoolean(String key) {
-    Boolean res = null;
-
     /* Consult Cache */
-    Object cachedRes = fCache.get(key);
-    if (cachedRes != null)
-      return (Boolean) cachedRes;
+    IPreference cachedPref = fCache.get(key);
+    if (cachedPref != null && cachedPref.getBoolean() != null)
+      return cachedPref.getBoolean();
 
     /* Consult the Persistence Layer */
-    res = Owl.getPersistenceService().getPreferencesDAO().getBoolean(key);
+    IPreference pref = load(key);
+    
+    if (pref != null && pref.getBoolean() != null) {
+      fCache.put(key, pref);
+      return pref.getBoolean();
+    }
 
     /* Ask Parent */
-    if (res == null)
-      res = fParent.getBoolean(key);
+    boolean parentValue = fParent.getBoolean(key);
+    
+    /* Cache value from parent */
+    pref = Owl.getModelFactory().createPreference(key);
+    pref.putBooleans(parentValue);
+    fCache.put(key, pref);
 
-    /* Cache Value */
-    if (res != null)
-      fCache.put(key, res);
-
-    return res;
+    return parentValue;
+  }
+  
+  private IPreference load(String key) {
+    return fPreferenceDAO.load(key);
   }
 
   /*
    * @see org.rssowl.core.model.preferences.IPreferencesNode#getInteger(java.lang.String)
    */
   public int getInteger(String key) {
-    Integer res = null;
-
     /* Consult Cache */
-    Object cachedRes = fCache.get(key);
-    if (cachedRes != null)
-      return (Integer) cachedRes;
+    IPreference cachedPref = fCache.get(key);
+    if (cachedPref != null && cachedPref.getInteger() != null)
+      return cachedPref.getInteger();
 
     /* Consult the Persistence Layer */
-    res = Owl.getPersistenceService().getPreferencesDAO().getInteger(key);
+    IPreference pref = load(key);
+    
+    if (pref != null && pref.getInteger() != null) {
+      fCache.put(key, pref);
+      return pref.getInteger();
+    }
 
     /* Ask Parent */
-    if (res == null)
-      res = fParent.getInteger(key);
+    int parentValue = fParent.getInteger(key);
+    
+    /* Cache value from parent */
+    pref = Owl.getModelFactory().createPreference(key);
+    pref.putIntegers(parentValue);
+    fCache.put(key, pref);
 
-    /* Cache Value */
-    if (res != null)
-      fCache.put(key, res);
-
-    return res;
+    return parentValue;
   }
 
   /*
    * @see org.rssowl.core.model.preferences.IPreferencesNode#getIntegers(java.lang.String)
    */
   public int[] getIntegers(String key) {
-    int[] res = null;
-
     /* Consult Cache */
-    Object cachedRes = fCache.get(key);
-    if (cachedRes != null)
-      return (int[]) cachedRes;
+    IPreference cachedPref = fCache.get(key);
+    if (cachedPref != null && cachedPref.getIntegers() != null)
+      return cachedPref.getIntegers();
 
     /* Consult the Persistence Layer */
-    res = Owl.getPersistenceService().getPreferencesDAO().getIntegers(key);
+    IPreference pref = load(key);
+    
+    if (pref != null && pref.getIntegers() != null) {
+      fCache.put(key, pref);
+      return pref.getIntegers();
+    }
 
     /* Ask Parent */
-    if (res == null)
-      res = fParent.getIntegers(key);
+    int[] parentValue = fParent.getIntegers(key);
+    
+    /* Cache value from parent */
+    if (parentValue != null) {
+      pref = Owl.getModelFactory().createPreference(key);
+      pref.putIntegers(parentValue);
+      fCache.put(key, pref);
+    }
 
-    /* Cache Value */
-    if (res != null)
-      fCache.put(key, res);
-
-    return res;
+    return parentValue;
   }
 
   /*
    * @see org.rssowl.core.model.preferences.IPreferencesNode#getLong(java.lang.String)
    */
   public long getLong(String key) {
-    Long res = null;
-
     /* Consult Cache */
-    Object cachedRes = fCache.get(key);
-    if (cachedRes != null)
-      return (Long) cachedRes;
+    IPreference cachedPref = fCache.get(key);
+    if (cachedPref != null && cachedPref.getLong() != null)
+      return cachedPref.getLong();
 
     /* Consult the Persistence Layer */
-    res = Owl.getPersistenceService().getPreferencesDAO().getLong(key);
+    IPreference pref = load(key);
+    
+    if (pref != null && pref.getLong() != null) {
+      fCache.put(key, pref);
+      return pref.getLong();
+    }
 
     /* Ask Parent */
-    if (res == null)
-      res = fParent.getLong(key);
+    long parentValue = fParent.getLong(key);
+    
+    /* Cache value from parent */
+    pref = Owl.getModelFactory().createPreference(key);
+    pref.putLongs(parentValue);
+    fCache.put(key, pref);
 
-    /* Cache Value */
-    if (res != null)
-      fCache.put(key, res);
-
-    return res;
+    return parentValue;
   }
 
   /*
    * @see org.rssowl.core.model.preferences.IPreferencesNode#getLongs(java.lang.String)
    */
   public long[] getLongs(String key) {
-    long[] res = null;
-
     /* Consult Cache */
-    Object cachedRes = fCache.get(key);
-    if (cachedRes != null)
-      return (long[]) cachedRes;
+    IPreference cachedPref = fCache.get(key);
+    if (cachedPref != null && cachedPref.getLongs() != null)
+      return cachedPref.getLongs();
 
     /* Consult the Persistence Layer */
-    res = Owl.getPersistenceService().getPreferencesDAO().getLongs(key);
+    IPreference pref = load(key);
+    
+    if (pref != null && pref.getLongs() != null) {
+      fCache.put(key, pref);
+      return pref.getLongs();
+    }
 
     /* Ask Parent */
-    if (res == null)
-      res = fParent.getLongs(key);
+    long[] parentValue = fParent.getLongs(key);
+    
+    /* Cache value from parent */
+    if (parentValue != null) {
+      pref = Owl.getModelFactory().createPreference(key);
+      pref.putLongs(parentValue);
+      fCache.put(key, pref);
+    }
 
-    /* Cache Value */
-    if (res != null)
-      fCache.put(key, res);
-
-    return res;
+    return parentValue;
   }
 
   /*
    * @see org.rssowl.core.model.preferences.IPreferencesNode#getString(java.lang.String)
    */
   public String getString(String key) {
-    String res = null;
-
     /* Consult Cache */
-    Object cachedRes = fCache.get(key);
-    if (cachedRes != null)
-      return (String) cachedRes;
+    IPreference cachedPref = fCache.get(key);
+    if (cachedPref != null && cachedPref.getString() != null)
+      return cachedPref.getString();
 
     /* Consult the Persistence Layer */
-    res = Owl.getPersistenceService().getPreferencesDAO().getString(key);
+    IPreference pref = load(key);
+    
+    if (pref != null && pref.getString() != null) {
+      fCache.put(key, pref);
+      return pref.getString();
+    }
 
     /* Ask Parent */
-    if (res == null)
-      res = fParent.getString(key);
+    String parentValue = fParent.getString(key);
+    
+    /* Cache value from parent */
+    if (parentValue != null) {
+      pref = Owl.getModelFactory().createPreference(key);
+      pref.putStrings(parentValue);
+      fCache.put(key, pref);
+    }
 
-    /* Cache Value */
-    if (res != null)
-      fCache.put(key, res);
-
-    return res;
+    return parentValue;
   }
 
   /*
    * @see org.rssowl.core.model.preferences.IPreferencesNode#getStrings(java.lang.String)
    */
   public String[] getStrings(String key) {
-    String[] res = null;
-
     /* Consult Cache */
-    Object cachedRes = fCache.get(key);
-    if (cachedRes != null)
-      return (String[]) cachedRes;
+    IPreference cachedPref = fCache.get(key);
+    if (cachedPref != null && cachedPref.getStrings() != null)
+      return cachedPref.getStrings();
 
     /* Consult the Persistence Layer */
-    res = Owl.getPersistenceService().getPreferencesDAO().getStrings(key);
+    IPreference pref = load(key);
+    
+    if (pref != null && pref.getStrings() != null) {
+      fCache.put(key, pref);
+      return pref.getStrings();
+    }
 
     /* Ask Parent */
-    if (res == null)
-      res = fParent.getStrings(key);
+    String[] parentValue = fParent.getStrings(key);
+    
+    /* Cache value from parent */
+    if (parentValue != null) {
+      pref = Owl.getModelFactory().createPreference(key);
+      pref.putStrings(parentValue);
+      fCache.put(key, pref);
+    }
 
-    /* Cache Value */
-    if (res != null)
-      fCache.put(key, res);
-
-    return res;
+    return parentValue;
   }
 
   /*
@@ -282,7 +325,9 @@ public class GlobalScope implements IPreferenceScope {
     }
 
     /* Save to DB */
-    Owl.getPersistenceService().getPreferencesDAO().putBoolean(key, value);
+    IPreference pref = fPreferenceDAO.loadOrCreate(key);
+    pref.putBooleans(value);
+    fPreferenceDAO.save(pref);
   }
 
   /*
@@ -302,7 +347,9 @@ public class GlobalScope implements IPreferenceScope {
     }
 
     /* Save to DB */
-    Owl.getPersistenceService().getPreferencesDAO().putInteger(key, value);
+    IPreference pref = fPreferenceDAO.loadOrCreate(key);
+    pref.putIntegers(value);
+    fPreferenceDAO.save(pref);
   }
 
   /*
@@ -323,7 +370,9 @@ public class GlobalScope implements IPreferenceScope {
     }
 
     /* Save to DB */
-    Owl.getPersistenceService().getPreferencesDAO().putIntegers(key, values);
+    IPreference pref = fPreferenceDAO.loadOrCreate(key);
+    pref.putIntegers(values);
+    fPreferenceDAO.save(pref);
   }
 
   /*
@@ -331,7 +380,6 @@ public class GlobalScope implements IPreferenceScope {
    * long)
    */
   public void putLong(String key, long value) {
-
     /* Check if value is already up-to-date */
     if (cached(key, value))
       return;
@@ -343,7 +391,9 @@ public class GlobalScope implements IPreferenceScope {
     }
 
     /* Save to DB */
-    Owl.getPersistenceService().getPreferencesDAO().putLong(key, value);
+    IPreference pref = fPreferenceDAO.loadOrCreate(key);
+    pref.putLongs(value);
+    fPreferenceDAO.save(pref);
   }
 
   /*
@@ -364,7 +414,9 @@ public class GlobalScope implements IPreferenceScope {
     }
 
     /* Save to DB */
-    Owl.getPersistenceService().getPreferencesDAO().putLongs(key, values);
+    IPreference pref = fPreferenceDAO.loadOrCreate(key);
+    pref.putLongs(values);
+    fPreferenceDAO.save(pref);
   }
 
   /*
@@ -385,7 +437,9 @@ public class GlobalScope implements IPreferenceScope {
     }
 
     /* Save to DB */
-    Owl.getPersistenceService().getPreferencesDAO().putString(key, value);
+    IPreference pref = fPreferenceDAO.loadOrCreate(key);
+    pref.putStrings(value);
+    fPreferenceDAO.save(pref);
   }
 
   /*
@@ -406,17 +460,21 @@ public class GlobalScope implements IPreferenceScope {
     }
 
     /* Save to DB */
-    Owl.getPersistenceService().getPreferencesDAO().putStrings(key, values);
+    IPreference pref = fPreferenceDAO.loadOrCreate(key);
+    pref.putStrings(values);
+    fPreferenceDAO.save(pref);
   }
 
   private boolean cached(String key, Object value) {
-    Object cachedRes = fCache.get(key);
-    if (cachedRes == null)
-      return false;
-
-    if (value instanceof Object[])
-      return Arrays.equals((Object[]) cachedRes, (Object[]) value);
-
-    return cachedRes.equals(value);
+    //FIXME Fix this
+    return false;
+//    IPreference cachedRes = fCache.get(key);
+//    if (cachedRes == null)
+//      return false;
+//
+//    if (value instanceof Object[])
+//      return Arrays.equals((Object[]) cachedRes, (Object[]) value);
+//
+//    return cachedRes.equals(value);
   }
 }

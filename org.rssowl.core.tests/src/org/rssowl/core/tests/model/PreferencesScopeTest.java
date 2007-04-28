@@ -285,12 +285,12 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
       IMark mark = folder.getMarks().get(0);
 
       IPreferenceScope bookmarkScope = Owl.getPreferenceService().getEntityScope(mark);
-      bookmarkScope.putString("key1", "value1");
+      bookmarkScope.putString("key10", "value1");
       bookmarkScope.flush();
 
       assertEquals(1, eventsCounter[0]);
 
-      bookmarkScope.putString("key2", "value2");
+      bookmarkScope.putString("key20", "value2");
       bookmarkScope.flush();
 
       assertEquals(2, eventsCounter[0]);

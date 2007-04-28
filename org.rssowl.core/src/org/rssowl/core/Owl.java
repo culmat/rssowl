@@ -75,13 +75,6 @@ public final class Owl {
   }
 
   /**
-   * TODO Remove me
-   */
-  public static IListenerService getListenerService() {
-    return InternalOwl.getDefault().getListenerService();
-  }
-
-  /**
    * <p>
    * Provides access to the scoped preferences service in RSSOwl. There is three
    * levels of preferences: Default, Global and Entity. Any preference that is

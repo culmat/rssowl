@@ -67,13 +67,15 @@ public abstract class AbstractEntityDAO<T extends IEntity,
   @Override
   protected void preSave(T entity) {
     E event = createSaveEventTemplate(entity);
-    DBHelper.putEventTemplate(event);
+    if (event != null)
+      DBHelper.putEventTemplate(event);
   }
   
   @Override
   protected void preDelete(T entity) {
     E event = createDeleteEventTemplate(entity);
-    DBHelper.putEventTemplate(event);
+    if (event != null)
+      DBHelper.putEventTemplate(event);
   }
   
   public final void fireEvents(final Set<E> events, final EventType eventType) {
@@ -106,4 +108,35 @@ public abstract class AbstractEntityDAO<T extends IEntity,
   public void removeEntityListener(L listener) {
     entityListeners.remove(listener);
   }
+  
+  /* Debugging code copied from old ListenerServiceImpl. Not being used atm */
+//  @SuppressWarnings("nls")
+//  private void logEvents(Set< ? extends ModelEvent> events, EventType eventType) {
+//    if (DEBUG) {
+//      String eventTypeString = null;
+//      switch (eventType) {
+//        case PERSIST:
+//          eventTypeString = " Added ("; //$NON-NLS-1$
+//          break;
+//        case UPDATE:
+//          eventTypeString = " Updated ("; //$NON-NLS-1$
+//          break;
+//        case REMOVE:
+//          eventTypeString = " Removed ("; //$NON-NLS-1$
+//          break;
+//      }
+//      IPersistable type = null;
+//      ModelEvent event = events.iterator().next();
+//      if (eventType != EventType.REMOVE)
+//        type = event.getEntity();
+//
+//      String typeName = type == null ? "" : type.getClass().getSimpleName();
+//      String typeString = type == null ? "" : type.toString();
+//
+//      if (events.size() > 0 && typeName == "")
+//        typeName = events.iterator().next().getClass().getSimpleName();
+//
+//      System.out.println(typeName + eventTypeString + typeString + ", events = " + events.size() + ", isRoot = " + event.isRoot() + ")");
+//    }
+//  }
 }

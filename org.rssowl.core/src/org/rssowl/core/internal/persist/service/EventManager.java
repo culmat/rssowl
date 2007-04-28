@@ -38,6 +38,7 @@ import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsGetter;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.IConditionalGetDAO;
 import org.rssowl.core.persist.event.AttachmentEvent;
@@ -51,6 +52,7 @@ import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.PersonEvent;
 import org.rssowl.core.persist.event.SearchConditionEvent;
 import org.rssowl.core.persist.event.SearchMarkEvent;
+import org.rssowl.core.persist.pref.PreferencesEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.search.IModelSearch;
@@ -519,6 +521,10 @@ public class EventManager {
     else if (entity instanceof ISearchCondition) {
       ISearchCondition searchCond = (ISearchCondition) entity;
       modelEvent = new SearchConditionEvent(searchCond, root);
+    }
+    else if (entity instanceof IPreference) {
+      IPreference pref = (IPreference) entity;
+      modelEvent = new PreferencesEvent(pref);
     }
     return modelEvent;
   }
