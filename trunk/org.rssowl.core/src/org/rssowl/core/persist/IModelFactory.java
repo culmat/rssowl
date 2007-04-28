@@ -241,4 +241,11 @@ public interface IModelFactory {
    * null.
    */
   IConditionalGet createConditionalGet(String ifModifiedSince, URI link, String ifNoneMatch);
+  
+  /**
+   * Creates an instance of IPreference with the provided key.
+   * @param key String that uniquely identifies the IPreference.
+   * @return a new instance of IPreference.
+   */
+  IPreference createPreference(String key);
 }

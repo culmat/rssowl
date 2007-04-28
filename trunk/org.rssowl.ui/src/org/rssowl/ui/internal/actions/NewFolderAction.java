@@ -52,6 +52,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IPreferencesDAO;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.ui.internal.FolderChooser;
@@ -270,7 +271,7 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
   }
 
   private IFolder getParent() throws PersistenceException {
-    Long selectedRootFolderID = Owl.getPersistenceService().getDAOService().getPreferencesDAO().getLong(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET);
+    Long selectedRootFolderID = DynamicDAO.getDAO(IPreferencesDAO.class).load(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET).getLong();
 
     /* Check if available Parent is still valid */
     if (fParent != null) {

@@ -24,29 +24,15 @@
 
 package org.rssowl.core.persist.pref;
 
+import org.rssowl.core.persist.IPreference;
+import org.rssowl.core.persist.event.EntityListener;
+
 /**
- * A Listener being notified whenever a Preference was added, updated or deleted
+ * A Listener that is notified whenever a Preference is added, updated or deleted
  * in the persistance layer.
  * 
  * @author bpasero
  */
-public interface PreferencesListener {
-
-  /**
-   * @param event Event object containing additional information like the Key
-   * and Value of the preference that was added.
-   */
-  void preferenceAdded(PreferencesEvent event);
-
-  /**
-   * @param event Event object containing additional information like the Key
-   * and Value of the preference that was updated.
-   */
-  void preferenceUpdated(PreferencesEvent event);
-
-  /**
-   * @param event Event object containing additional information like the Key
-   * and Value of the preference that was deleted.
-   */
-  void preferenceDeleted(PreferencesEvent event);
+public interface PreferencesListener extends EntityListener<PreferencesEvent, IPreference> {
+  // No new methods
 }

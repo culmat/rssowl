@@ -33,6 +33,7 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.dao.DAOService;
@@ -89,12 +90,12 @@ public final class DAOServiceImpl extends DAOService  {
     fEntityDaoClassesToDaosMap.put(IPersonDAO.class, fPersonDAO);
     fEntityDaoClassesToDaosMap.put(ISearchConditionDAO.class, fSearchConditionDAO);
     fEntityDaoClassesToDaosMap.put(ISearchMarkDAO.class, fSearchMarkDAO);
+    fEntityDaoClassesToDaosMap.put(IPreferencesDAO.class, fPreferencesDAO);
 
     for (Object value : fEntityDaoClassesToDaosMap.values()) {
       IPersistableDAO<?> dao = (IPersistableDAO<?>) value;
       putInEntityClassesToDaosMap(dao);
     }
-    fEntityDaoClassesToDaosMap.put(IPreferencesDAO.class, fPreferencesDAO);
     
     fEntityInterfacesToDaosMap.put(IAttachment.class, fAttachmentDAO);
     fEntityInterfacesToDaosMap.put(IBookMark.class, fBookMarkDAO);
@@ -108,7 +109,7 @@ public final class DAOServiceImpl extends DAOService  {
     fEntityInterfacesToDaosMap.put(IPerson.class, fPersonDAO);
     fEntityInterfacesToDaosMap.put(ISearchCondition.class, fSearchConditionDAO);
     fEntityInterfacesToDaosMap.put(ISearchMark.class, fSearchMarkDAO);
-    
+    fEntityInterfacesToDaosMap.put(IPreference.class, fPreferencesDAO);
   }
 
   private void putInEntityClassesToDaosMap(IPersistableDAO<?> dao) {

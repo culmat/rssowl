@@ -24,6 +24,8 @@
 
 package org.rssowl.core.persist.pref;
 
+import java.util.Set;
+
 /**
  * Provides an empty implementation of <code>PreferencesListener</code>.
  * Useful if the client only needs to implement a subset of the interface.
@@ -33,17 +35,17 @@ package org.rssowl.core.persist.pref;
 public class PreferencesAdapter implements PreferencesListener {
 
   /*
-   * @see org.rssowl.core.model.preferences.PreferencesListener#preferencesAdded(org.rssowl.core.model.preferences.PreferencesEvent)
+   * @see org.rssowl.core.model.preferences.PreferencesListener#entitiesAdded(org.rssowl.core.model.preferences.PreferencesEvent)
    */
-  public void preferenceAdded(PreferencesEvent event) {}
+  public void entitiesAdded(Set<PreferencesEvent> event) {}
 
   /*
-   * @see org.rssowl.core.model.preferences.PreferencesListener#preferencesUpdated(org.rssowl.core.model.preferences.PreferencesEvent)
+   * @see org.rssowl.core.model.preferences.PreferencesListener#entitiesUpdated(org.rssowl.core.model.preferences.PreferencesEvent)
    */
-  public void preferenceUpdated(PreferencesEvent event) {}
+  public void entitiesUpdated(Set<PreferencesEvent> event) {}
 
   /*
-   * @see org.rssowl.core.model.preferences.PreferencesListener#preferencesDeleted(org.rssowl.core.model.preferences.PreferencesEvent)
+   * @see org.rssowl.core.model.preferences.PreferencesListener#entitiesDeleted(org.rssowl.core.model.preferences.PreferencesEvent)
    */
-  public void preferenceDeleted(PreferencesEvent event) {}
+  public void entitiesDeleted(Set<PreferencesEvent> event) {}
 }

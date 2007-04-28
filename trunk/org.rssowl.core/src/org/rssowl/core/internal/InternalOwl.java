@@ -25,7 +25,6 @@
 package org.rssowl.core.internal;
 
 import org.rssowl.core.IApplicationService;
-import org.rssowl.core.IListenerService;
 import org.rssowl.core.connection.IConnectionService;
 import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.connection.IProtocolHandler;
@@ -66,7 +65,6 @@ public final class InternalOwl {
   /* ID for Application Service Contribution */
   private static final String MODEL_APPLICATION_SERVICE_EXTENSION_POINT = "org.rssowl.core.ApplicationService"; //$NON-NLS-1$
 
-  private IListenerService fListenerService = new ListenerServiceImpl();
   private IPreferenceService fPreferencesService;
   private IConnectionService fConnectionService;
   private IInterpreterService fInterpreterService;
@@ -131,13 +129,6 @@ public final class InternalOwl {
 
   private IApplicationService loadApplicationService() {
     return (IApplicationService) ExtensionUtils.loadSingletonExecutableExtension(MODEL_APPLICATION_SERVICE_EXTENSION_POINT);
-  }
-
-  /**
-   * TODO Remove me
-   */
-  public IListenerService getListenerService() {
-    return fListenerService;
   }
 
   /**

@@ -25,7 +25,6 @@
 package org.rssowl.core.persist.service;
 
 import org.rssowl.core.persist.dao.DAOService;
-import org.rssowl.core.persist.dao.IPreferencesDAO;
 import org.rssowl.core.persist.search.IModelSearch;
 import org.rssowl.core.util.ExtensionUtils;
 
@@ -96,12 +95,5 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
       fModelSearch = (IModelSearch) ExtensionUtils.loadSingletonExecutableExtension(MODEL_SEARCH_EXTENSION_POINT);
 
     return fModelSearch;
-  }
-
-  /*
-   * @see org.rssowl.core.model.dao.IPersistenceService#getPreferencesDAO()
-   */
-  public IPreferencesDAO getPreferencesDAO() {
-    return fDAOService.getPreferencesDAO();
   }
 }

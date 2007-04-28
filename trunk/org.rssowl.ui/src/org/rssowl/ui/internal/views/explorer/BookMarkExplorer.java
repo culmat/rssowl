@@ -92,7 +92,9 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IPreferencesDAO;
 import org.rssowl.core.persist.event.FolderAdapter;
 import org.rssowl.core.persist.event.FolderEvent;
 import org.rssowl.core.persist.event.FolderListener;
@@ -521,7 +523,10 @@ public class BookMarkExplorer extends ViewPart {
     fViewSite.getActionBars().getToolBarManager().find(NEXT_SET_ACTION).update(IAction.ENABLED);
 
     /* Save the new selected Set in Preferences */
-    Owl.getPersistenceService().getPreferencesDAO().putLong(PREF_SELECTED_BOOKMARK_SET, fSelectedBookMarkSet.getId());
+    IPreferencesDAO prefDAO = DynamicDAO.getDAO(IPreferencesDAO.class);
+    IPreference pref = prefDAO.loadOrCreate(PREF_SELECTED_BOOKMARK_SET);
+    pref.putLongs(fSelectedBookMarkSet.getId());
+    prefDAO.save(pref);
   }
 
   private void createSearchBar(final Composite parent) {
@@ -1514,9 +1519,13 @@ public class BookMarkExplorer extends ViewPart {
       elements[i] = (Long) element;
       i++;
     }
-
     /* Add the ID of the current selected Set to make it Unique */
-    Owl.getPersistenceService().getPreferencesDAO().putLongs(PREF_EXPANDED_NODES + fSelectedBookMarkSet, elements);
+    String key = PREF_EXPANDED_NODES + fSelectedBookMarkSet;
+    
+    IPreferencesDAO prefDAO = DynamicDAO.getDAO(IPreferencesDAO.class);
+    IPreference pref = prefDAO.loadOrCreate(key);
+    pref.putLongs(elements);
+    prefDAO.save(pref);
   }
 
   private void loadState() {
@@ -1529,15 +1538,18 @@ public class BookMarkExplorer extends ViewPart {
     fFilterType = BookMarkFilter.Type.values()[fGlobalPreferences.getInteger(DefaultPreferences.BE_FILTER_TYPE)];
     fGroupingType = BookMarkGrouping.Type.values()[fGlobalPreferences.getInteger(DefaultPreferences.BE_GROUP_TYPE)];
 
-    Long lValue = Owl.getPersistenceService().getPreferencesDAO().getLong(PREF_SELECTED_BOOKMARK_SET);
+    IPreferencesDAO prefDAO = DynamicDAO.getDAO(IPreferencesDAO.class);
+    IPreference pref = prefDAO.load(PREF_SELECTED_BOOKMARK_SET);
     Assert.isTrue(fRootFolders.size() > 0, "Could not find any Bookmark Set!"); //$NON-NLS-1$
-    if (lValue != null)
-      fSelectedBookMarkSet = new FolderReference(lValue.longValue()).resolve();
+    if (pref != null)
+      fSelectedBookMarkSet = new FolderReference(pref.getLong().longValue()).resolve();
     else {
       fSelectedBookMarkSet = getRootFolderAt(0);
 
       /* Save this to make sure subsequent calls succeed */
-      Owl.getPersistenceService().getPreferencesDAO().putLong(PREF_SELECTED_BOOKMARK_SET, fSelectedBookMarkSet.getId());
+      pref = Owl.getModelFactory().createPreference(PREF_SELECTED_BOOKMARK_SET);
+      pref.putLongs(fSelectedBookMarkSet.getId());
+      prefDAO.save(pref);
     }
 
     /* Expanded Elements */
@@ -1546,9 +1558,9 @@ public class BookMarkExplorer extends ViewPart {
 
   /* Expanded Elements - Use ID of selected Set to make it Unique */
   private void loadExpandedElements() {
-    long values[] = Owl.getPersistenceService().getPreferencesDAO().getLongs(PREF_EXPANDED_NODES + fSelectedBookMarkSet);
-    if (values != null) {
-      for (long element : values)
+    IPreference pref = DynamicDAO.getDAO(IPreferencesDAO.class).load(PREF_EXPANDED_NODES);
+    if (pref != null) {
+      for (long element : pref.getLongs())
         fExpandedNodes.add(element);
     }
   }

@@ -25,6 +25,9 @@
 package org.rssowl.core.persist.pref;
 
 import org.eclipse.core.runtime.Assert;
+import org.rssowl.core.persist.IPreference;
+import org.rssowl.core.persist.event.ModelEvent;
+import org.rssowl.core.persist.event.runnable.PreferenceEventRunnable;
 
 /**
  * An Event-Object being used to notify Listeners, whenever a Preference was
@@ -32,86 +35,23 @@ import org.eclipse.core.runtime.Assert;
  * 
  * @author bpasero
  */
-public class PreferencesEvent {
-  private Object fValue;
-  private String fKey;
+public class PreferencesEvent extends ModelEvent    {
 
   /**
-   * @param key The Key of the Preferences as identifier
-   * @param value The Value of the Preferences
+   * @param preference The preference affected by this event.
    */
-  public PreferencesEvent(String key, Object value) {
-    Assert.isNotNull(key, "The Key must not be NULL"); //$NON-NLS-1$
-    Assert.isNotNull(value, "The Value must not be NULL"); //$NON-NLS-1$
-    fKey = key;
-    fValue = value;
+  public PreferencesEvent(IPreference preference) {
+    super(preference);
+    Assert.isNotNull(preference, "The preference must not be null"); //$NON-NLS-1$
+  }
+  
+  @Override
+  public final IPreference getEntity() {
+    return (IPreference) super.getEntity();
   }
 
-  /**
-   * Get the value of the Preference.
-   * 
-   * @return The Value of the Preference.
-   */
-  public Object getValue() {
-    return fValue;
-  }
-
-  /**
-   * Get the value of the Preference as <code>Boolean</code>.
-   * 
-   * @return The Value of the Preference as <code>Boolean</code>.
-   */
-  public Boolean getBoolean() {
-    Assert.isTrue(fValue instanceof Boolean, "The Value is not of the type Boolean"); //$NON-NLS-1$
-    return ((Boolean) fValue);
-  }
-
-  /**
-   * Get the value of the Preference as <code>Integer</code>.
-   * 
-   * @return The Value of the Preference as <code>Integer</code>.
-   */
-  public Integer getInteger() {
-    Assert.isTrue(fValue instanceof Integer, "The Value is not of the type Integer"); //$NON-NLS-1$
-    return ((Integer) fValue);
-  }
-
-  /**
-   * Get the value of the Preference as <code>Long</code>.
-   * 
-   * @return The Value of the Preference as <code>Long</code>.
-   */
-  public Long getLong() {
-    Assert.isTrue(fValue instanceof Long, "The Value is not of the type Long"); //$NON-NLS-1$
-    return ((Long) fValue);
-  }
-
-  /**
-   * Get the value of the Preference as <code>String</code>.
-   * 
-   * @return The Value of the Preference as <code>String</code>.
-   */
-  public String getString() {
-    Assert.isTrue(fValue instanceof String, "The Value is not of the type String"); //$NON-NLS-1$
-    return (String) fValue;
-  }
-
-  /**
-   * Get the value of the Preference as <code>String[]</code>.
-   * 
-   * @return The Value of the Preference as <code>String[]</code>.
-   */
-  public String[] getStrings() {
-    Assert.isTrue(fValue instanceof String[], "The Value is not of the type String[]"); //$NON-NLS-1$
-    return (String[]) fValue;
-  }
-
-  /**
-   * Get the Key of the Preference.
-   * 
-   * @return The Key of the Preference.
-   */
-  public String getKey() {
-    return fKey;
+  @Override
+  public PreferenceEventRunnable createEventRunnable() {
+    return new PreferenceEventRunnable();
   }
 }

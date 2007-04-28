@@ -53,6 +53,7 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -153,6 +154,8 @@ public class Controller {
   private IPreferencesDAO fPrefsDAO;
   private ILabelDAO fLabelDao;
 
+  private IModelFactory fFactory;
+
   /* Task to perform Reload-Operations */
   private class ReloadTask implements ITask {
     private final Long fId;
@@ -214,6 +217,7 @@ public class Controller {
     fLabelDao = DynamicDAO.getDAO(ILabelDAO.class);
     fPrefsDAO = Owl.getPersistenceService().getDAOService().getPreferencesDAO();
     fAppService = Owl.getApplicationService();
+    fFactory = Owl.getModelFactory();
   }
 
   private List<EntityPropertyPageWrapper> loadEntityPropertyPages() {
@@ -553,7 +557,7 @@ public class Controller {
 
       /* Create new */
       if (oldConditionalGet == null)
-        return Owl.getModelFactory().createConditionalGet(ifModifiedSince, feedLink, ifNoneMatch);
+        return fFactory.createConditionalGet(ifModifiedSince, feedLink, ifNoneMatch);
 
       /* Else: Update old */
       oldConditionalGet.setHeaders(ifModifiedSince, ifNoneMatch);
@@ -575,14 +579,14 @@ public class Controller {
         public void run() throws Exception {
 
           /* First check wether this action is required */
-          Boolean firstStartToken = fPrefsDAO.getBoolean(FIRST_START_TOKEN);
+          IPreference firstStartToken = fPrefsDAO.load(FIRST_START_TOKEN);
           if (firstStartToken != null)
             return;
 
           onFirstStartup();
 
           /* Mark this as the first start */
-          fPrefsDAO.putBoolean(FIRST_START_TOKEN, true);
+          fPrefsDAO.save(fFactory.createPreference(FIRST_START_TOKEN));
         }
       });
     }
@@ -749,29 +753,27 @@ public class Controller {
   private List<ILabel> addDefaultLabels() throws PersistenceException {
     List<ILabel> labels = new ArrayList<ILabel>();
 
-    IModelFactory factory = Owl.getModelFactory();
-
-    ILabel label = factory.createLabel(null, "Important");
+    ILabel label = fFactory.createLabel(null, "Important");
     label.setColor("159,63,63");
     labels.add(label);
     fLabelDao.save(label);
 
-    label = factory.createLabel(null, "Work");
+    label = fFactory.createLabel(null, "Work");
     label.setColor("255,153,0");
     labels.add(label);
     fLabelDao.save(label);
 
-    label = factory.createLabel(null, "Personal");
+    label = fFactory.createLabel(null, "Personal");
     label.setColor("0,153,0");
     labels.add(label);
     fLabelDao.save(label);
 
-    label = factory.createLabel(null, "To Do");
+    label = fFactory.createLabel(null, "To Do");
     label.setColor("51,51,255");
     labels.add(label);
     fLabelDao.save(label);
 
-    label = factory.createLabel(null, "Later");
+    label = fFactory.createLabel(null, "Later");
     label.setColor("151,53,151");
     labels.add(label);
     fLabelDao.save(label);
@@ -788,53 +790,52 @@ public class Controller {
     imported.setName("Default"); //$NON-NLS-1$
 
     /* Create Default SearchMarks */
-    IModelFactory factory = Owl.getModelFactory();
     String newsEntityName = INews.class.getName();
 
     /* SearchCondition: New and Updated News */
     {
-      ISearchMark mark = Owl.getModelFactory().createSearchMark(null, imported, "New and Updated News");
+      ISearchMark mark = fFactory.createSearchMark(null, imported, "New and Updated News");
 
-      ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
-      factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, State.NEW);
+      ISearchField field1 = fFactory.createSearchField(INews.STATE, newsEntityName);
+      fFactory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, State.NEW);
 
-      ISearchField field2 = factory.createSearchField(INews.STATE, newsEntityName);
-      factory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, State.UPDATED);
+      ISearchField field2 = fFactory.createSearchField(INews.STATE, newsEntityName);
+      fFactory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, State.UPDATED);
     }
 
     /* SearchCondition: Recent News */
     {
-      ISearchMark mark = Owl.getModelFactory().createSearchMark(null, imported, "Recent News");
+      ISearchMark mark = fFactory.createSearchMark(null, imported, "Recent News");
 
-      ISearchField field1 = factory.createSearchField(INews.AGE_IN_DAYS, newsEntityName);
-      factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS_LESS_THAN, 2);
+      ISearchField field1 = fFactory.createSearchField(INews.AGE_IN_DAYS, newsEntityName);
+      fFactory.createSearchCondition(null, mark, field1, SearchSpecifier.IS_LESS_THAN, 2);
     }
 
     /* SearchCondition: News with Attachments */
     {
-      ISearchMark mark = Owl.getModelFactory().createSearchMark(null, imported, "News with Attachments");
+      ISearchMark mark = fFactory.createSearchMark(null, imported, "News with Attachments");
 
-      ISearchField field = factory.createSearchField(INews.HAS_ATTACHMENTS, newsEntityName);
-      factory.createSearchCondition(null, mark, field, SearchSpecifier.IS, true);
+      ISearchField field = fFactory.createSearchField(INews.HAS_ATTACHMENTS, newsEntityName);
+      fFactory.createSearchCondition(null, mark, field, SearchSpecifier.IS, true);
     }
 
     /* SearchCondition: Sticky News */
     {
-      ISearchMark mark = Owl.getModelFactory().createSearchMark(null, imported, "Sticky News");
+      ISearchMark mark = fFactory.createSearchMark(null, imported, "Sticky News");
 
-      ISearchField field = factory.createSearchField(INews.IS_FLAGGED, newsEntityName);
-      factory.createSearchCondition(null, mark, field, SearchSpecifier.IS, true);
+      ISearchField field = fFactory.createSearchField(INews.IS_FLAGGED, newsEntityName);
+      fFactory.createSearchCondition(null, mark, field, SearchSpecifier.IS, true);
     }
 
     /* SearchCondition: News is Labeld */
     {
-      ISearchMark mark = Owl.getModelFactory().createSearchMark(null, imported, "Labeled News");
+      ISearchMark mark = fFactory.createSearchMark(null, imported, "Labeled News");
       IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(mark);
       preferences.putInteger(DefaultPreferences.BM_NEWS_GROUPING, NewsGrouping.Type.GROUP_BY_LABEL.ordinal());
 
       for (ILabel label : labels) {
-        ISearchField field = factory.createSearchField(INews.LABEL, newsEntityName);
-        factory.createSearchCondition(null, mark, field, SearchSpecifier.IS, label.getName());
+        ISearchField field = fFactory.createSearchField(INews.LABEL, newsEntityName);
+        fFactory.createSearchCondition(null, mark, field, SearchSpecifier.IS, label.getName());
       }
     }
 
@@ -856,7 +857,7 @@ public class Controller {
       IFolder importedContainer = (IFolder) types.get(0);
 
       /* Load the current selected Set */
-      Long selectedFolderID = fPrefsDAO.getLong(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET);
+      Long selectedFolderID = fPrefsDAO.load(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET).getLong();
       IFolder rootFolder = fFolderDAO.load(selectedFolderID);
 
       /* Reparent all imported folders into selected Set */

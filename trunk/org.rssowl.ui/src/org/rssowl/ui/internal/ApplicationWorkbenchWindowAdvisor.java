@@ -56,6 +56,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IPreferencesDAO;
 import org.rssowl.core.persist.event.NewsAdapter;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.runnable.EventType;
@@ -191,39 +192,40 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     /* Listen on Preferences Changes */
     fPrefListener = new PreferencesListener() {
-      public void preferenceAdded(PreferencesEvent event) {
-        onPreferencesChange(event, EventType.PERSIST);
+      public void entitiesAdded(Set<PreferencesEvent> events) {
+        onPreferencesChange(events, EventType.PERSIST);
       }
 
-      public void preferenceDeleted(PreferencesEvent event) {
-        onPreferencesChange(event, EventType.REMOVE);
+      public void entitiesDeleted(Set<PreferencesEvent> events) {
+        onPreferencesChange(events, EventType.REMOVE);
       }
 
-      public void preferenceUpdated(PreferencesEvent event) {
-        onPreferencesChange(event, EventType.UPDATE);
+      public void entitiesUpdated(Set<PreferencesEvent> events) {
+        onPreferencesChange(events, EventType.UPDATE);
       }
     };
-    Owl.getListenerService().addPreferencesListener(fPrefListener);
+    DynamicDAO.getDAO(IPreferencesDAO.class).addEntityListener(fPrefListener);
   }
 
   private void unregisterListeners() {
-    Owl.getListenerService().removePreferencesListener(fPrefListener);
+    DynamicDAO.getDAO(IPreferencesDAO.class).removeEntityListener(fPrefListener);
   }
 
-  private void onPreferencesChange(PreferencesEvent event, EventType type) {
+  private void onPreferencesChange(Set<PreferencesEvent> events, EventType type) {
+    for (PreferencesEvent event : events) {
+      /* Tray Preference Change */
+      if (DefaultPreferences.USE_SYSTEM_TRAY.equals(event.getEntity().getKey())) {
+        boolean useTray;
+        if (type == EventType.REMOVE)
+          useTray = Owl.getPreferenceService().getDefaultScope().getBoolean(DefaultPreferences.USE_SYSTEM_TRAY);
+        else
+          useTray = event.getEntity().getBoolean();
 
-    /* Tray Preference Change */
-    if (DefaultPreferences.USE_SYSTEM_TRAY.equals(event.getKey())) {
-      boolean useTray;
-      if (type == EventType.REMOVE)
-        useTray = Owl.getPreferenceService().getDefaultScope().getBoolean(DefaultPreferences.USE_SYSTEM_TRAY);
-      else
-        useTray = event.getBoolean();
-
-      if (useTray && !fTrayEnabled)
-        enableTray();
-      else if (fTrayEnabled)
-        disableTray();
+        if (useTray && !fTrayEnabled)
+          enableTray();
+        else if (fTrayEnabled)
+          disableTray();
+      }
     }
   }
 

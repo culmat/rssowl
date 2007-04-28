@@ -24,6 +24,7 @@
 
 package org.rssowl.core.internal.persist;
 
+import org.rssowl.core.internal.persist.pref.Preference;
 import org.rssowl.core.internal.persist.search.SearchCondition;
 import org.rssowl.core.internal.persist.search.SearchField;
 import org.rssowl.core.persist.IAttachment;
@@ -41,6 +42,7 @@ import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.ITextInput;
@@ -269,5 +271,9 @@ public class DefaultModelFactory implements IModelFactory {
    */
   public IConditionalGet createConditionalGet(String ifModifiedSince, URI link, String ifNoneMatch) {
     return new ConditionalGet(ifModifiedSince, link, ifNoneMatch);
+  }
+
+  public IPreference createPreference(String key) {
+    return new Preference(key);
   }
 }
