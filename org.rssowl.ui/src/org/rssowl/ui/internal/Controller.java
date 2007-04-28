@@ -131,6 +131,9 @@ public class Controller {
   /* News-Service */
   private NewsService fNewsService;
 
+  /* Notification Service */
+  private NotificationService fNotificationService;
+
   /* Feed-Reload Service */
   private FeedReloadService fFeedReloadService;
 
@@ -153,7 +156,6 @@ public class Controller {
   private IConditionalGetDAO fConditionalGetDAO;
   private IPreferenceDAO fPrefsDAO;
   private ILabelDAO fLabelDao;
-
   private IModelFactory fFactory;
 
   /* Task to perform Reload-Operations */
@@ -598,23 +600,8 @@ public class Controller {
     /* Create the News-Service */
     fNewsService = new NewsService();
 
-    //TODO NotificationPopup
-    //    DynamicDAO.addEntityListener(INews.class, new NewsAdapter() {
-    //      @Override
-    //      public void entitiesAdded(final Set<NewsEvent> events) {
-    //        JobRunner.runInUIThread(OwlUI.getPrimaryShell(), new Runnable() {
-    //          public void run() {
-    //            List<INews> news = new ArrayList<INews>();
-    //            for (NewsEvent event : events) {
-    //              news.add(event.getEntity());
-    //            }
-    //
-    //            NotificationPopup popup = new NotificationPopup();
-    //            popup.showNews(news);
-    //          }
-    //        });
-    //      }
-    //    });
+    /* Create the Notification Service */
+    fNotificationService = new NotificationService();
   }
 
   /**
@@ -638,6 +625,9 @@ public class Controller {
 
     /* Stop the News-Service */
     fNewsService.stopService();
+
+    /* Stop the Notification Service */
+    fNotificationService.stopService();
 
     /* Shutdown ApplicationServer */
     ApplicationServer.getDefault().shutdown();

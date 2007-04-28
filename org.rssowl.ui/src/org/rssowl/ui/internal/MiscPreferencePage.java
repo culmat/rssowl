@@ -33,12 +33,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.ui.internal.util.LayoutUtils;
 
 /**
  * Container for all Preferences that have not yet been categorized.
@@ -50,6 +52,9 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   private Button fMinimizeToTray;
   private Button fMoveToTrayOnExit;
   private Button fUseExternalBrowser;
+  private Button fNotificationOnlyFromTray;
+  private Button fShowNotificationPopup;
+  private Button fNotificationIsSticky;
 
   /** Leave for reflection */
   public MiscPreferencePage() {
@@ -75,8 +80,14 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   protected Control createContents(Composite parent) {
     Composite container = createComposite(parent);
 
+    /* System Tray Group */
+    Group trayGroup = new Group(container, SWT.None);
+    trayGroup.setText("System Tray");
+    trayGroup.setLayout(LayoutUtils.createGridLayout(1));
+    trayGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
     /* Enable / Disable Tray */
-    fMinimizeToTray = new Button(container, SWT.CHECK);
+    fMinimizeToTray = new Button(trayGroup, SWT.CHECK);
     fMinimizeToTray.setText("Minimize to the system tray");
     fMinimizeToTray.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_SYSTEM_TRAY));
     fMinimizeToTray.addSelectionListener(new SelectionAdapter() {
@@ -87,7 +98,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     });
 
     /* Move to Tray on Close */
-    fMoveToTrayOnExit = new Button(container, SWT.CHECK);
+    fMoveToTrayOnExit = new Button(trayGroup, SWT.CHECK);
     fMoveToTrayOnExit.setText("Move to the system tray when closing the window");
     fMoveToTrayOnExit.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_EXIT));
     fMoveToTrayOnExit.setEnabled(fMinimizeToTray.getSelection());
@@ -95,8 +106,47 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     /* Separator */
     new Label(container, SWT.NONE);
 
+    /* Notification Group */
+    Group notificationGroup = new Group(container, SWT.None);
+    notificationGroup.setText("Notification Popup");
+    notificationGroup.setLayout(LayoutUtils.createGridLayout(1));
+    notificationGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+    /* Show Notification Popup */
+    fShowNotificationPopup = new Button(notificationGroup, SWT.CHECK);
+    fShowNotificationPopup.setText("Show notification on incoming news");
+    fShowNotificationPopup.setSelection(fGlobalScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP));
+    fShowNotificationPopup.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        fNotificationOnlyFromTray.setEnabled(fShowNotificationPopup.getSelection());
+        fNotificationIsSticky.setEnabled(fShowNotificationPopup.getSelection());
+      }
+    });
+
+    /* Only from Tray */
+    fNotificationOnlyFromTray = new Button(notificationGroup, SWT.CHECK);
+    fNotificationOnlyFromTray.setText("Show notification only when minimized to the system tray");
+    fNotificationOnlyFromTray.setSelection(fGlobalScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_FROM_TRAY));
+    fNotificationOnlyFromTray.setEnabled(fShowNotificationPopup.getSelection());
+
+    /* Sticky Notification Popup */
+    fNotificationIsSticky = new Button(notificationGroup, SWT.CHECK);
+    fNotificationIsSticky.setText("Leave notification open until closed manually");
+    fNotificationIsSticky.setSelection(fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP));
+    fNotificationIsSticky.setEnabled(fShowNotificationPopup.getSelection());
+
+    /* Separator */
+    new Label(container, SWT.NONE);
+
+    /* Browser Group */
+    Group browserGroup = new Group(container, SWT.None);
+    browserGroup.setText("Browser");
+    browserGroup.setLayout(LayoutUtils.createGridLayout(1));
+    browserGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
     /* Open Links Internal / External */
-    fUseExternalBrowser = new Button(container, SWT.CHECK);
+    fUseExternalBrowser = new Button(browserGroup, SWT.CHECK);
     fUseExternalBrowser.setText("Use external browser");
     fUseExternalBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_EXTERNAL_BROWSER));
 
@@ -125,6 +175,9 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fGlobalScope.putBoolean(DefaultPreferences.USE_EXTERNAL_BROWSER, fUseExternalBrowser.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.USE_SYSTEM_TRAY, fMinimizeToTray.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_EXIT, fMoveToTrayOnExit.getSelection());
+    fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP, fShowNotificationPopup.getSelection());
+    fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_FROM_TRAY, fNotificationOnlyFromTray.getSelection());
+    fGlobalScope.putBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP, fNotificationIsSticky.getSelection());
 
     return super.performOk();
   }
@@ -142,5 +195,10 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fMinimizeToTray.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_SYSTEM_TRAY));
     fMoveToTrayOnExit.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_EXIT));
     fMoveToTrayOnExit.setEnabled(fMinimizeToTray.getSelection());
+    fShowNotificationPopup.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP));
+    fNotificationOnlyFromTray.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_FROM_TRAY));
+    fNotificationOnlyFromTray.setEnabled(fShowNotificationPopup.getSelection());
+    fNotificationIsSticky.setSelection(defaultScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP));
+    fNotificationIsSticky.setEnabled(fShowNotificationPopup.getSelection());
   }
 }
