@@ -24,6 +24,10 @@
 
 package org.rssowl.core.persist.dao;
 
+import org.rssowl.core.persist.IModelFactory;
+import org.rssowl.core.persist.IPreference;
+import org.rssowl.core.persist.pref.PreferencesEvent;
+import org.rssowl.core.persist.pref.PreferencesListener;
 import org.rssowl.core.persist.service.PersistenceException;
 
 /**
@@ -33,185 +37,33 @@ import org.rssowl.core.persist.service.PersistenceException;
  *
  * @author bpasero
  */
-public interface IPreferencesDAO {
+public interface IPreferencesDAO extends IEntityDAO<IPreference, PreferencesListener, PreferencesEvent> {
 
   /**
-   * Stores a <code>boolean</code> value under the given key into the
-   * persistance layer or updates it, if it is already present.
-   *
-   * @param key The key under which the value is stored.
-   * @param value The <code>boolean</code> value that is to be stored.
-   * @throws PersistenceException In case of an error while accessing the
-   * persistance layer.
+   * If a IPreference with <code>key</code> exists in the persistence system,
+   * it is loaded and returned. Otherwise, <code>null</code> is returned.
+   * 
+   * @param key The key of the required IPreference.
+   * @return a IPreference with the given key.
+   * @throws PersistenceException If an error occurs while trying to retrieve
+   * the object from the persistence system.
    */
-  void putBoolean(String key, boolean value) throws PersistenceException;
-
+  IPreference load(String key) throws PersistenceException;
+  
   /**
-   * Retrieves a <code>Boolean</code> value from the persistance layer, or
-   * <code>NULL</code> if not present.
-   *
-   * @param key The Key under which the value is stored.
-   * @return The <code>Boolean</code> value or <code>NULL</code> if not
-   * existant for the given key.
-   * @throws PersistenceException In case of an error while accessing the
-   * persistance layer.
+   * If a IPreference with <code>key</code> exists in the persistence system,
+   * loads it and returns it. Otherwise, creates a new IPreference with
+   * <code>key</code> and returns it.
+   * 
+   * @param key The key that uniquely identified the IPreference.
+   * @return An existing or newly created IPreference object.
+   * @throws PersistenceException If an error occurs while trying to retrieve
+   * the object from the persistence system.
+   * @see #load(String)
+   * @see IModelFactory#createPreference(String)
    */
-  Boolean getBoolean(String key) throws PersistenceException;
-
-  /**
-   * Stores a <code>String</code> value under the given key into the
-   * persistance layer or updates it, if it is already present.
-   *
-   * @param key The key under which the value is stored.
-   * @param value The <code>String</code> value that is to be stored.
-   * @throws PersistenceException In case of an error while accessing the
-   * persistance layer.
-   */
-  void putString(String key, String value) throws PersistenceException;
-
-  /**
-   * Retrieves a <code>String</code> value from the persistance layer, or
-   * <code>NULL</code> if not present.
-   *
-   * @param key The Key under which the value is stored.
-   * @return The <code>String</code> value or <code>NULL</code> if not
-   * existant for the given key.
-   * @throws PersistenceException In case of an error while accessing the
-   * persistance layer.
-   */
-  String getString(String key) throws PersistenceException;
-
-  /**
-   * Stores a <code>String</code> array under the given key into the
-   * persistance layer or updates it, if it is already present.
-   * <p>
-   * Note: The underlying persistence solution is making sure to keep the order
-   * of Items inside the Array when saving and loading.
-   * </p>
-   *
-   * @param key The key under which the value is stored.
-   * @param values The <code>String</code> array that is to be stored.
-   * @throws PersistenceException In case of an error while accessing the
-   * persistance layer.
-   */
-  void putStrings(String key, String values[]) throws PersistenceException;
-
-  /**
-   * Retrieves a <code>String</code> array from the persistance layer, or
-   * <code>NULL</code> if not present.
-   * <p>
-   * Note: The underlying persistence solution is making sure to keep the order
-   * of Items inside the Array when saving and loading.
-   * </p>
-   *
-   * @param key The Key under which the value is stored.
-   * @return The <code>String</code> array or <code>NULL</code> if not
-   * existant for the given key.
-   * @throws PersistenceException In case of an error while accessing the
-   * persistance layer.
-   */
-  String[] getStrings(String key) throws PersistenceException;
-
-  /**
-   * Stores a <code>int</code> value under the given key into the persistance
-   * layer or updates it, if it is already present.
-   *
-   * @param key The key under which the value is stored.
-   * @param value The <code>int</code> value that is to be stored.
-   * @throws PersistenceException In case of an error while accessing the
-   * persistance layer.
-   */
-  void putInteger(String key, int value) throws PersistenceException;
-
-  /**
-   * Retrieves a <code>Integer</code> value from the persistance layer, or
-   * <code>NULL</code> if not present.
-   *
-   * @param key The Key under which the value is stored.
-   * @return The <code>Integer</code> value or <code>NULL</code> if not
-   * existant for the given key.
-   * @throws PersistenceException In case of an error while accessing the
-   * persistance layer.
-   */
-  Integer getInteger(String key) throws PersistenceException;
-
-  /**
-   * Stores a <code>long</code> value under the given key into the persistance
-   * layer or updates it, if it is already present.
-   *
-   * @param key The key under which the value is stored.
-   * @param value The <code>long</code> value that is to be stored.
-   * @throws PersistenceException In case of an error while accessing the
-   * persistance layer.
-   */
-  void putLong(String key, long value) throws PersistenceException;
-
-  /**
-   * Retrieves a <code>Long</code> value from the persistance layer, or
-   * <code>NULL</code> if not present.
-   *
-   * @param key The Key under which the value is stored.
-   * @return The <code>Long</code> value or <code>NULL</code> if not
-   * existant for the given key.
-   * @throws PersistenceException In case of an error while accessing the
-   * persistance layer.
-   */
-  Long getLong(String key) throws PersistenceException;
-
-  /**
-   * Stores a <code>long</code> array under the given key into the persistance
-   * layer or updates it, if it is already present.
-   * <p>
-   * Note: The underlying persistence solution is making sure to keep the order
-   * of Items inside the Array when saving and loading.
-   * </p>
-   *
-   * @param key The key under which the value is stored.
-   * @param values The <code>long</code> array that is to be stored.
-   * @throws PersistenceException In case of an error while accessing the
-   * persistance layer.
-   */
-  void putLongs(String key, long values[]) throws PersistenceException;
-
-  /**
-   * Stores a <code>int</code> array under the given key into the persistance
-   * layer or updates it, if it is already present.
-   *
-   * @param key The key under which the value is stored.
-   * @param values The <code>int</code> array that is to be stored.
-   * @throws PersistenceException In case of an error while accessing the
-   * persistance layer.
-   */
-  void putIntegers(String key, int values[]) throws PersistenceException;
-
-  /**
-   * Retrieves a <code>long</code> array from the persistance layer, or
-   * <code>NULL</code> if not present.
-   * <p>
-   * Note: The underlying persistence solution is making sure to keep the order
-   * of Items inside the Array when saving and loading.
-   * </p>
-   *
-   * @param key The Key under which the value is stored.
-   * @return The <code>long</code> array or <code>NULL</code> if not
-   * existant for the given key.
-   * @throws PersistenceException In case of an error while accessing the
-   * persistance layer.
-   */
-  long[] getLongs(String key) throws PersistenceException;
-
-  /**
-   * Retrieves a <code>int</code> array from the persistance layer, or
-   * <code>NULL</code> if not present.
-   *
-   * @param key The Key under which the value is stored.
-   * @return The <code>int</code> array or <code>NULL</code> if not existant
-   * for the given key.
-   * @throws PersistenceException In case of an error while accessing the
-   * persistance layer.
-   */
-  int[] getIntegers(String key) throws PersistenceException;
-
+  IPreference loadOrCreate(String key) throws PersistenceException;
+  
   /**
    * If the persistence layer contains a preference with a key that matches
    * <code>key</code>, the preference is deleted and <code>true</code> is
