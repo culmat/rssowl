@@ -30,7 +30,7 @@ import org.rssowl.core.persist.pref.IPreferencesInitializer;
 /**
  * An instance of <code>IPreferencesInitializer</code> responsible for
  * defining the default preferences of RSSOwl.
- * 
+ *
  * @author bpasero
  */
 public class DefaultPreferences implements IPreferencesInitializer {
@@ -130,6 +130,15 @@ public class DefaultPreferences implements IPreferencesInitializer {
 
   /** Global: Open Website instead of showing News when description is empty */
   public static final String BM_OPEN_SITE_FOR_EMPTY_NEWS = "org.rssowl.pref.OpenSiteForEmptyNews";
+
+  /** Global: Show Notification Popup */
+  public static final String SHOW_NOTIFICATION_POPUP = "org.rssowl.pref.ShowNotificationPoup";
+
+  /** Global: Show Notification Popup only from Tray */
+  public static final String SHOW_NOTIFICATION_POPUP_ONLY_FROM_TRAY = "org.rssowl.pref.ShowNotificationPoupOnlyFromTray";
+
+  /** Global: Leave Notification Popup open until closed */
+  public static final String STICKY_NOTIFICATION_POPUP = "org.rssowl.pref.StickyNotificationPoup";
 
   /*
    * @see org.rssowl.core.model.preferences.IPreferencesInitializer#initialize(org.rssowl.core.model.preferences.IPreferencesScope)
