@@ -47,6 +47,7 @@ import org.rssowl.ui.internal.util.JobRunner;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -164,7 +165,10 @@ public class FeedReloadService {
 
     /* Query Update Intervals and reload/open state */
     Set<IBookMark> bookmarks = Controller.getDefault().getCacheService().getBookMarks();
+
+    final Set<IBookMark> bookmarksToReloadOnStartup = new HashSet<IBookMark>();
     final List<IBookMark> bookmarksToOpenOnStartup = new ArrayList<IBookMark>();
+
     for (IBookMark bookMark : bookmarks) {
       IPreferenceScope entityPreferences = Owl.getPreferenceService().getEntityScope(bookMark);
 
@@ -175,12 +179,21 @@ public class FeedReloadService {
 
         /* BookMark is to reload on startup */
         if (entityPreferences.getBoolean(DefaultPreferences.BM_RELOAD_ON_STARTUP))
-          Controller.getDefault().reloadQueued(bookMark, null);
+          bookmarksToReloadOnStartup.add(bookMark);
       }
 
       /* BookMark is to open on startup */
       if (entityPreferences.getBoolean(DefaultPreferences.BM_OPEN_ON_STARTUP))
         bookmarksToOpenOnStartup.add(bookMark);
+    }
+
+    /* Reload the ones that reload on startup */
+    if (!bookmarksToReloadOnStartup.isEmpty()) {
+      JobRunner.runInUIThread(null, new Runnable() {
+        public void run() {
+          Controller.getDefault().reloadQueued(bookmarksToReloadOnStartup, null);
+        }
+      });
     }
 
     /* Initialize the Jobs that manages Updates */

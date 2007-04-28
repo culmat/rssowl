@@ -439,7 +439,8 @@ public class Controller {
             faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
 
           /* Store locally */
-          OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK);
+          if (!monitor.isCanceled() && !fShuttingDown)
+            OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK);
         } catch (UnknownFeedException e) {
           Activator.getDefault().getLog().log(e.getStatus());
         }
