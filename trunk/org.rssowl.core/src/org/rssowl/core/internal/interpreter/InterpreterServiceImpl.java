@@ -73,7 +73,7 @@ import java.util.Map;
 public class InterpreterServiceImpl implements IInterpreterService {
 
   /* ID for SAXParser Contribution */
-  private static final String SAXPARSER_EXTENSION_POINT = "org.rssowl.core.SAXParser"; //$NON-NLS-1$
+  private static final String SAXPARSER_EXTENSION_POINT = "org.rssowl.core.XMLParser"; //$NON-NLS-1$
 
   /* ID for FormatInterpreter Contributions */
   private static final String FORMATINTERPRETER_EXTENSION_POINT = "org.rssowl.core.FormatInterpreter"; //$NON-NLS-1$
@@ -306,7 +306,6 @@ public class InterpreterServiceImpl implements IInterpreterService {
 
   /* Load XML Parser contribution */
   private IXMLParser loadXMLParserImpl() {
-    IXMLParser defaultParser = new DefaultSaxParserImpl();
-    return (IXMLParser) ExtensionUtils.loadSingletonExecutableExtension(SAXPARSER_EXTENSION_POINT, defaultParser);
+    return (IXMLParser) ExtensionUtils.loadSingletonExecutableExtension(SAXPARSER_EXTENSION_POINT);
   }
 }
