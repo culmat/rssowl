@@ -286,8 +286,7 @@ public class ConnectionServiceImpl implements IConnectionService {
 
   /* Load SSLHandler Contribution */
   private SecureProtocolSocketFactory loadSSLHandler() {
-    SecureProtocolSocketFactory defaultFactory = new EasySSLProtocolSocketFactory();
-    return (SecureProtocolSocketFactory) ExtensionUtils.loadSingletonExecutableExtension(SSL_HANDLER_EXTENSION_POINT, defaultFactory);
+    return (SecureProtocolSocketFactory) ExtensionUtils.loadSingletonExecutableExtension(SSL_HANDLER_EXTENSION_POINT);
   }
 
   private void registerURLStreamHandlers() {
