@@ -27,8 +27,6 @@ import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.internal.persist.AbstractEntity;
 import org.rssowl.core.persist.IPreference;
 
-import java.util.Arrays;
-
 public final class Preference extends AbstractEntity implements IPreference {
   private String fKey;
   
@@ -79,7 +77,7 @@ public final class Preference extends AbstractEntity implements IPreference {
     
     boolean[] cachedValues = (boolean[]) fCachedValues;
     if (fCachedValues != null)
-      return Arrays.copyOf(cachedValues, cachedValues.length);
+      return copyOf(cachedValues);
     
     cachedValues = new boolean[fValues.length];
     int index = 0;
@@ -87,12 +85,36 @@ public final class Preference extends AbstractEntity implements IPreference {
       cachedValues[index++] = Boolean.valueOf(value);
     }
     fCachedValues = cachedValues;
-    return Arrays.copyOf(cachedValues, cachedValues.length);
+    return copyOf(cachedValues);
   }
   
   private void checkType(Type type) {
     Assert.isLegal(fType == type, "The type of the Preference is not of the expected " +
         "type. It should be: " + fType + ", but it is: " + type);
+  }
+  
+  private boolean[] copyOf(boolean[] original) {
+    boolean[] copy = new boolean[original.length];
+    System.arraycopy(original, 0, copy, 0, original.length);
+    return copy;
+  }
+  
+  private int[] copyOf(int[] original) {
+    int[] copy = new int[original.length];
+    System.arraycopy(original, 0, copy, 0, original.length);
+    return copy;
+  }
+  
+  private long[] copyOf(long[] original) {
+    long[] copy = new long[original.length];
+    System.arraycopy(original, 0, copy, 0, original.length);
+    return copy;
+  }
+  
+  private String[] copyOf(String[] original) {
+    String[] copy = new String[original.length];
+    System.arraycopy(original, 0, copy, 0, original.length);
+    return copy;
   }
 
   /*
@@ -116,7 +138,7 @@ public final class Preference extends AbstractEntity implements IPreference {
     
     int[] cachedValues = (int[]) fCachedValues;
     if (fCachedValues != null)
-      return Arrays.copyOf(cachedValues, cachedValues.length);
+      return copyOf(cachedValues);
     
     cachedValues = new int[fValues.length];
     int index = 0;
@@ -124,7 +146,7 @@ public final class Preference extends AbstractEntity implements IPreference {
       cachedValues[index++] = Integer.valueOf(value);
     }
     fCachedValues = cachedValues;
-    return Arrays.copyOf(cachedValues, cachedValues.length);
+    return copyOf(cachedValues);
   }
   
   /*
@@ -148,7 +170,7 @@ public final class Preference extends AbstractEntity implements IPreference {
     
     long[] cachedValues = (long[]) fCachedValues;
     if (fCachedValues != null)
-      return Arrays.copyOf(cachedValues, cachedValues.length);
+      return copyOf(cachedValues);
     
     cachedValues = new long[fValues.length];
     int index = 0;
@@ -156,7 +178,7 @@ public final class Preference extends AbstractEntity implements IPreference {
       cachedValues[index++] = Long.valueOf(value);
     }
     fCachedValues = cachedValues;
-    return Arrays.copyOf(cachedValues, cachedValues.length);
+    return copyOf(cachedValues);
   }
   
   /*
@@ -178,7 +200,7 @@ public final class Preference extends AbstractEntity implements IPreference {
       return null;
     checkType(Type.STRING);
     
-    return Arrays.copyOf(fValues, fValues.length);
+    return copyOf(fValues);
   }
   
   public synchronized final void putStrings(String ... strings) {
@@ -187,7 +209,7 @@ public final class Preference extends AbstractEntity implements IPreference {
       return;
     }
     fType = Type.STRING;
-    String[] cachedValues = Arrays.copyOf(strings, strings.length);
+    String[] cachedValues = copyOf(strings);
     fCachedValues = cachedValues;
     fValues = cachedValues;
   }
@@ -198,7 +220,7 @@ public final class Preference extends AbstractEntity implements IPreference {
       return;
     }
     fType = Type.LONG;
-    long[] cachedValues = Arrays.copyOf(longs, longs.length);
+    long[] cachedValues = copyOf(longs);
     fCachedValues = cachedValues;
     fValues = new String[cachedValues.length];
     int index = 0;
@@ -213,7 +235,7 @@ public final class Preference extends AbstractEntity implements IPreference {
       return;
     }
     fType = Type.INTEGER;
-    int[] cachedValues = Arrays.copyOf(integers, integers.length);
+    int[] cachedValues = copyOf(integers);
     fCachedValues = cachedValues;
     fValues = new String[cachedValues.length];
     int index = 0;
@@ -228,7 +250,7 @@ public final class Preference extends AbstractEntity implements IPreference {
       return;
     }
     fType = Type.BOOLEAN;
-    boolean[] cachedValues = Arrays.copyOf(booleans, booleans.length);
+    boolean[] cachedValues = copyOf(booleans);
     fCachedValues = cachedValues;
     fValues = new String[cachedValues.length];
     int index = 0;
