@@ -49,7 +49,7 @@ import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.IPreferencesDAO;
+import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.search.ISearchCondition;
 import org.rssowl.core.persist.search.ISearchField;
@@ -142,7 +142,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
   }
 
   private IFolder getDefaultParent() {
-    Long selectedRootFolderID = DynamicDAO.getDAO(IPreferencesDAO.class).load(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET).getLong();
+    Long selectedRootFolderID = DynamicDAO.getDAO(IPreferenceDAO.class).load(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET).getLong();
     return new FolderReference(selectedRootFolderID).resolve();
   }
 

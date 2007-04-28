@@ -26,18 +26,18 @@ package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.IPreference;
-import org.rssowl.core.persist.pref.PreferencesEvent;
-import org.rssowl.core.persist.pref.PreferencesListener;
+import org.rssowl.core.persist.pref.PreferenceEvent;
+import org.rssowl.core.persist.pref.PreferenceListener;
 import org.rssowl.core.persist.service.PersistenceException;
 
 /**
- * The <code>IPreferencesDAO</code> offers methods to store and retrieve
+ * The <code>IPreferenceDAO</code> offers methods to store and retrieve
  * Preferences, simply by providing a Key-Value-Pair. The underlying persistance
  * layer is responsible for how the Values are stored.
  *
  * @author bpasero
  */
-public interface IPreferencesDAO extends IEntityDAO<IPreference, PreferencesListener, PreferencesEvent> {
+public interface IPreferenceDAO extends IEntityDAO<IPreference, PreferenceListener, PreferenceEvent> {
 
   /**
    * If a IPreference with <code>key</code> exists in the persistence system,

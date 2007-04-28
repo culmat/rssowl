@@ -52,7 +52,7 @@ import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.PersonEvent;
 import org.rssowl.core.persist.event.SearchConditionEvent;
 import org.rssowl.core.persist.event.SearchMarkEvent;
-import org.rssowl.core.persist.pref.PreferencesEvent;
+import org.rssowl.core.persist.pref.PreferenceEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.search.IModelSearch;
@@ -524,7 +524,7 @@ public class EventManager {
     }
     else if (entity instanceof IPreference) {
       IPreference pref = (IPreference) entity;
-      modelEvent = new PreferencesEvent(pref);
+      modelEvent = new PreferenceEvent(pref);
     }
     return modelEvent;
   }

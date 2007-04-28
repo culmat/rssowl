@@ -26,22 +26,22 @@ package org.rssowl.core.internal.persist.dao;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.Preference;
 import org.rssowl.core.persist.IPreference;
-import org.rssowl.core.persist.dao.IPreferencesDAO;
-import org.rssowl.core.persist.pref.PreferencesEvent;
-import org.rssowl.core.persist.pref.PreferencesListener;
+import org.rssowl.core.persist.dao.IPreferenceDAO;
+import org.rssowl.core.persist.pref.PreferenceEvent;
+import org.rssowl.core.persist.pref.PreferenceListener;
 import org.rssowl.core.persist.service.PersistenceException;
 
 import com.db4o.ObjectSet;
 import com.db4o.query.Query;
 
 /**
- * Default implementation of {@link IPreferencesDAO}.
+ * Default implementation of {@link IPreferenceDAO}.
  *
  * {@inheritDoc}
  *
  * @author Ismael Juma (ismael@juma.me.uk)
  */
-public class PreferencesDAOImpl extends AbstractEntityDAO<IPreference, PreferencesListener, PreferencesEvent> implements IPreferencesDAO  {
+public class PreferencesDAOImpl extends AbstractEntityDAO<IPreference, PreferenceListener, PreferenceEvent> implements IPreferenceDAO  {
 
   /**
    * Creates an instance of this class.
@@ -70,12 +70,12 @@ public class PreferencesDAOImpl extends AbstractEntityDAO<IPreference, Preferenc
   }
 
   @Override
-  protected PreferencesEvent createDeleteEventTemplate(IPreference entity) {
+  protected PreferenceEvent createDeleteEventTemplate(IPreference entity) {
     return null;
   }
 
   @Override
-  protected PreferencesEvent createSaveEventTemplate(IPreference entity) {
+  protected PreferenceEvent createSaveEventTemplate(IPreference entity) {
     return null;
   }
 
