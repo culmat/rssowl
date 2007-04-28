@@ -27,13 +27,22 @@ package org.rssowl.core.internal;
 import org.rssowl.core.IApplicationService;
 import org.rssowl.core.IListenerService;
 import org.rssowl.core.connection.IConnectionService;
+import org.rssowl.core.connection.ICredentialsProvider;
+import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.internal.connection.ConnectionServiceImpl;
 import org.rssowl.core.internal.interpreter.InterpreterServiceImpl;
-import org.rssowl.core.internal.persist.DefaultModelFactory;
 import org.rssowl.core.internal.persist.pref.PreferenceServiceImpl;
+import org.rssowl.core.interpreter.IElementHandler;
+import org.rssowl.core.interpreter.IFormatInterpreter;
 import org.rssowl.core.interpreter.IInterpreterService;
+import org.rssowl.core.interpreter.INamespaceHandler;
+import org.rssowl.core.interpreter.IXMLParser;
 import org.rssowl.core.persist.IModelFactory;
+import org.rssowl.core.persist.dao.DAOService;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.pref.IPreferenceService;
+import org.rssowl.core.persist.pref.IPreferencesInitializer;
+import org.rssowl.core.persist.search.IModelSearch;
 import org.rssowl.core.persist.service.IPersistenceService;
 import org.rssowl.core.util.ExtensionUtils;
 
@@ -83,27 +92,38 @@ public final class InternalOwl {
   }
 
   /**
-   * @return
+   * @return Returns the singleton instance of <code>InternalOwl</code>.
    */
   public static InternalOwl getDefault() {
     return INSTANCE;
   }
 
   /**
-   * @return
+   * @return Returns <code>TRUE</code> if this facade has been started and
+   * finished initialization.
    */
   public boolean isStarted() {
     return fStarted;
   }
 
-  /** */
+  /** Shutdown the Services managed by this Facade */
   public void shutdown() {
     fConnectionService.shutdown();
     fPersistenceService.shutdown();
   }
 
   /**
-   * @return
+   * <p>
+   * Get the Implementation of <code>IApplicationService</code> that contains
+   * special Methods which are used through the Application and access the
+   * persistence layer. The implementation is looked up using the
+   * "org.rssowl.core.model.ApplicationService" Extension Point.
+   * </p>
+   * Subclasses may override to provide their own implementation.
+   *
+   * @return Returns the Implementation of <code>IApplicationService</code>
+   * that contains special Methods which are used through the Application and
+   * access the persistence layer.
    */
   public IApplicationService getApplicationService() {
     return fApplicationService;
@@ -114,21 +134,48 @@ public final class InternalOwl {
   }
 
   /**
-   * @return
+   * TODO Remove me
    */
   public IListenerService getListenerService() {
     return fListenerService;
   }
 
   /**
-   * @return
+   * <p>
+   * Provides access to the scoped preferences service in RSSOwl. There is three
+   * levels of preferences: Default, Global and Entity. Any preference that is
+   * not set at the one scope will be looked up in the parent scope until the
+   * Default scope is reached. This allows to easily override the preferences
+   * for all entities without having to define the preferences per entity.
+   * </p>
+   * <p>
+   * You can define default preferences by using the PreferencesInitializer
+   * extension point provided by this plugin.
+   * </p>
+   *
+   * @return Returns the IPreferenceService that provides access to the scoped
+   * preferences system in RSSOwl.
+   * @see IPreferenceScope
+   * @see IPreferencesInitializer
    */
   public IPreferenceService getPreferenceService() {
     return fPreferencesService;
   }
 
   /**
-   * @return
+   * Provides access to ther persistence layer of RSSOwl. This layer is
+   * contributable via the PersistenceService extension point provided by this
+   * plugin. The work that is done by the layer includes:
+   * <ul>
+   * <li>Controlling the lifecycle of the persistence layer</li>
+   * <li>Providing the DAOService that contains DAOs for each persistable
+   * entity</li>
+   * <li>Providing the model search to perform full-text searching</li>
+   * </ul>
+   *
+   * @return Returns the service responsible for all persistence related tasks.
+   * @see DAOService
+   * @see IModelSearch
    */
   public IPersistenceService getPersistenceService() {
     return fPersistenceService;
@@ -140,21 +187,57 @@ public final class InternalOwl {
   }
 
   /**
-   * @return
+   * Provides access to the connection service of RSSOwl. This service provides
+   * API to load data from the internet (e.g. loading the contents of a feed).
+   * It is also the central place to ask for credentials if a resource requires
+   * authentication. Several extension points allow to customize the behavor of
+   * this service, including the ability to register
+   * <code>IProtocolHandler</code> to define the lookup process on per
+   * protocol basis or contributing <code>ICredentialsProvider</code> to
+   * define how credentials should be stored and retrieved.
+   *
+   * @return Returns the service responsible for all connection related tasks.
+   * @see IProtocolHandler
+   * @see ICredentialsProvider
    */
   public IConnectionService getConnectionService() {
     return fConnectionService;
   }
 
   /**
-   * @return
+   * Provides access to the interpreter service of RSSOwl. This service provides
+   * API to convert a stream of data into a model representation. In the common
+   * case of a XML stream this involves using a XML-Parser and creating the
+   * model out of the content. Various extension points allow to customize the
+   * behavor of the interpreter:
+   * <ul>
+   * <li>Contribute a new format interpreter using the FormatInterpreter
+   * extension point. This allows to display any XML in RSSOwl as Feed.</li>
+   * <li>Contribute a new namespace handler using the NamespaceHandler
+   * extension point. This allows to properly handle any new namespace in
+   * RSSOwl.</li>
+   * <li>Contribute a new element handler using the ElementHandler extension
+   * point. This makes RSSOwl understand new elements or even attributes.</li>
+   * <li>Contribute a new xml parser using the XMLParser extension point if you
+   * are not happy with the default one.</li>
+   * </ul>
+   *
+   * @return Returns the service responsible for interpreting a resource.
+   * @see IFormatInterpreter
+   * @see IElementHandler
+   * @see INamespaceHandler
+   * @see IXMLParser
    */
   public IInterpreterService getInterpreter() {
     return fInterpreterService;
   }
 
   /**
-   * @return
+   * Provides access to the model factory of RSSOwl. This factory is used
+   * everywhere when new entities are created. The factory can be replaced using
+   * the ModelFactory extension point.
+   *
+   * @return Returns the model factory that is used to create model types.
    */
   public IModelFactory getModelFactory() {
     return fModelFactory;
@@ -162,7 +245,6 @@ public final class InternalOwl {
 
   /* Load Model Types Factory contribution */
   private IModelFactory loadTypesFactory() {
-    IModelFactory defaultFactory = new DefaultModelFactory();
-    return (IModelFactory) ExtensionUtils.loadSingletonExecutableExtension(MODEL_TYPESFACTORY_EXTENSION_POINT, defaultFactory);
+    return (IModelFactory) ExtensionUtils.loadSingletonExecutableExtension(MODEL_TYPESFACTORY_EXTENSION_POINT);
   }
 }

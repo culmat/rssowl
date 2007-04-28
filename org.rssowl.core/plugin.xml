@@ -115,4 +115,10 @@
             protocol="file">
       </credentialsProvider>
    </extension>
+   <extension
+         point="org.rssowl.core.ModelFactory">
+      <modelFactory
+            class="org.rssowl.core.internal.persist.DefaultModelFactory">
+      </modelFactory>
+   </extension>
 </plugin>
