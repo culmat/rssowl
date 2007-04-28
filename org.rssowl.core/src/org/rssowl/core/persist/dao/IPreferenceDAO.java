@@ -26,8 +26,8 @@ package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.IPreference;
-import org.rssowl.core.persist.pref.PreferenceEvent;
-import org.rssowl.core.persist.pref.PreferenceListener;
+import org.rssowl.core.persist.event.PreferenceEvent;
+import org.rssowl.core.persist.event.PreferenceListener;
 import org.rssowl.core.persist.service.PersistenceException;
 
 /**

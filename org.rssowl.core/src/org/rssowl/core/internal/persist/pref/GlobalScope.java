@@ -29,9 +29,9 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
+import org.rssowl.core.persist.event.PreferenceEvent;
+import org.rssowl.core.persist.event.PreferenceListener;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.core.persist.pref.PreferenceEvent;
-import org.rssowl.core.persist.pref.PreferenceListener;
 
 import java.util.Arrays;
 import java.util.Collections;

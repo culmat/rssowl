@@ -30,7 +30,7 @@ import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.internal.connection.ConnectionServiceImpl;
 import org.rssowl.core.internal.interpreter.InterpreterServiceImpl;
-import org.rssowl.core.internal.persist.pref.PreferenceServiceImpl;
+import org.rssowl.core.internal.persist.service.PreferenceServiceImpl;
 import org.rssowl.core.interpreter.IElementHandler;
 import org.rssowl.core.interpreter.IFormatInterpreter;
 import org.rssowl.core.interpreter.IInterpreterService;
@@ -39,10 +39,10 @@ import org.rssowl.core.interpreter.IXMLParser;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.dao.DAOService;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.core.persist.pref.IPreferenceService;
 import org.rssowl.core.persist.pref.IPreferencesInitializer;
 import org.rssowl.core.persist.search.IModelSearch;
 import org.rssowl.core.persist.service.IPersistenceService;
+import org.rssowl.core.persist.service.IPreferenceService;
 import org.rssowl.core.util.ExtensionUtils;
 
 /**

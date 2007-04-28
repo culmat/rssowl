@@ -23,7 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.persist.event.runnable;
 
-import org.rssowl.core.persist.pref.PreferenceEvent;
+import org.rssowl.core.persist.event.PreferenceEvent;
 
 
 /**

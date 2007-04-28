@@ -22,17 +22,20 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.internal.persist.pref;
+package org.rssowl.core.internal.persist.service;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.internal.persist.pref.DefaultScope;
+import org.rssowl.core.internal.persist.pref.EntityScope;
+import org.rssowl.core.internal.persist.pref.GlobalScope;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.core.persist.pref.IPreferenceService;
 import org.rssowl.core.persist.pref.IPreferencesInitializer;
+import org.rssowl.core.persist.service.IPreferenceService;
 
 /**
  * @author bpasero
