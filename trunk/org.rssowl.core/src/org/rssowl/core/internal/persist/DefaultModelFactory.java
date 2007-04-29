@@ -24,8 +24,6 @@
 
 package org.rssowl.core.internal.persist;
 
-import org.rssowl.core.internal.persist.search.SearchCondition;
-import org.rssowl.core.internal.persist.search.SearchField;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
@@ -42,12 +40,12 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.IPreference;
+import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.ITextInput;
 import org.rssowl.core.persist.reference.FeedLinkReference;
-import org.rssowl.core.persist.search.ISearchCondition;
-import org.rssowl.core.persist.search.ISearchField;
 import org.rssowl.core.persist.search.SearchSpecifier;
 
 import java.net.URI;

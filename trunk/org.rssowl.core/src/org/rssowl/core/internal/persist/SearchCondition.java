@@ -22,12 +22,11 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.internal.persist.search;
+package org.rssowl.core.internal.persist;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.internal.persist.AbstractEntity;
-import org.rssowl.core.persist.search.ISearchCondition;
-import org.rssowl.core.persist.search.ISearchField;
+import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.search.SearchSpecifier;
 
 /**

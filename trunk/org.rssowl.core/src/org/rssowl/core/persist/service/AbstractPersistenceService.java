@@ -25,7 +25,6 @@
 package org.rssowl.core.persist.service;
 
 import org.rssowl.core.persist.dao.DAOService;
-import org.rssowl.core.persist.search.IModelSearch;
 import org.rssowl.core.util.ExtensionUtils;
 
 /**

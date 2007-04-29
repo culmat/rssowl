@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.internal.persist.search;
+package org.rssowl.core.internal.persist;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IAdaptable;
@@ -37,10 +37,10 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.search.ISearchField;
-import org.rssowl.core.persist.search.ISearchValueType;
 
 import java.util.ArrayList;
 import java.util.Arrays;

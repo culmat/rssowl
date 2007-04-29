@@ -22,62 +22,71 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.persist.search;
+package org.rssowl.core.persist;
 
-import org.eclipse.core.runtime.IAdaptable;
+
+import java.util.List;
 
 /**
  * <p>
- * Instances of <code>ISearchField</code> describe the target field for a
- * search condition. The field is described by its identifier in the system and
- * a human-readable name, used in the UI.
+ * Instances of <code>ISearchValueType</code> describe the data-type for a
+ * search-field. Most types reflect well known ones as used in relational
+ * databases. They are helpful to validate a search-value for a given field and
+ * to perform the search in the persistance layer.
  * </p>
  * <p>
- * A call to <code>getSearchValueType()</code> will give Information of the
- * data-type the field is using. This information can be used for validating the
- * search-value and to perform the search in the persistance layer.
+ * In case the data-type is <code>ENUM</code>, a call to
+ * <code>getEnumValues()</code> has to be used in order to retrieve the valid
+ * search-values.
  * </p>
  *
  * @author bpasero
  */
-public interface ISearchField extends IAdaptable {
+public interface ISearchValueType extends IPersistable {
+
+  /** The most open type. Anything allowed here */
+  public static final int STRING = 0;
+
+  /** A Date containing of Year, Month and Day */
+  public static final int DATE = 1;
+
+  /** A Time containing of Hour, Minute and Second */
+  public static final int TIME = 2;
+
+  /** A Timestamp giving info on Date and Time */
+  public static final int DATETIME = 3;
+
+  /** The Integer Type */
+  public static final int INTEGER = 4;
+
+  /** Matching any Number, either Float or Integer */
+  public static final int NUMBER = 5;
+
+  /** The Boolean Type can only have TRUE or FALSE */
+  public static final int BOOLEAN = 6;
+
+  /** Enumeration of allowed Strings specififed by <code>getEnumValues()</code> */
+  public static final int ENUM = 7;
+
+  /** A Link (usually not tokenized) */
+  public static final int LINK = 8;
 
   /**
-   * The ID of the search field is uniquely identifying it. It is important that
-   * the ID matches the value of the related constant in the affected type.
-   * <p>
-   * Example: In case the search-field is from the type <code>INews</code> and
-   * targeting a News' Title-Field, a call to <code>getFieldID()</code> should
-   * return <code>INews.TITLE</code>
-   * </p>
+   * Get the Type, which is one of the Type as defined in this interface.
    *
-   * @return Returns the ID of the search field, uniquely identifying it.
+   * @return Returns one of the Type as defined in this interface.
    */
   int getId();
 
   /**
-   * The fully qualified Name of the Entity this <code>ISearchField</code> is
-   * referring to.
+   * Get a List of allowed Strings for this ENUM type.
+   * <p>
+   * This Method should <em>only</em> return values in case
+   * <code>getSearchValueType()</code> returns
+   * <code>ISearchValueType.ENUM</code>
+   * </p>
    *
-   * @return The fully qualified Name of the Entity this
-   * <code>ISearchField</code> is referring to.
+   * @return Returns a List of allowed Strings for this ENUM type.
    */
-  String getEntityName();
-
-  /**
-   * The name of a field is used to represent it in human-readable form inside
-   * the UI.
-   *
-   * @return Returns a human-readable representation of this field.
-   */
-  String getName();
-
-  /**
-   * The search-value-type is dependant on this field. For example some fields
-   * require a Date or Time as search-value ("Publish Date"). This information
-   * can also be used to perform the search in the persistance layer.
-   *
-   * @return Returns the search-value-type related to this field.
-   */
-  ISearchValueType getSearchValueType();
+  List<String> getEnumValues();
 }

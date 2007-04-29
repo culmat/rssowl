@@ -31,10 +31,10 @@ import org.eclipse.swt.widgets.Label;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.INews.State;
-import org.rssowl.core.persist.search.ISearchCondition;
-import org.rssowl.core.persist.search.ISearchField;
 import org.rssowl.core.persist.search.SearchSpecifier;
 import org.rssowl.ui.internal.util.LayoutUtils;
 

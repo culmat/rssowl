@@ -24,8 +24,8 @@
 
 package org.rssowl.core.persist.event;
 
+import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.event.runnable.SearchConditionEventRunnable;
-import org.rssowl.core.persist.search.ISearchCondition;
 
 /**
  * <p>

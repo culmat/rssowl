@@ -39,15 +39,15 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.NewsReference;
-import org.rssowl.core.persist.search.IModelSearch;
-import org.rssowl.core.persist.search.ISearchCondition;
-import org.rssowl.core.persist.search.ISearchField;
 import org.rssowl.core.persist.search.ISearchHit;
 import org.rssowl.core.persist.search.SearchSpecifier;
+import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.tests.TestUtils;
 

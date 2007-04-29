@@ -22,10 +22,10 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.persist.search;
+package org.rssowl.core.persist;
 
-import org.rssowl.core.internal.persist.search.SearchField;
-import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.internal.persist.SearchField;
+import org.rssowl.core.persist.search.SearchSpecifier;
 
 /**
  * <p>

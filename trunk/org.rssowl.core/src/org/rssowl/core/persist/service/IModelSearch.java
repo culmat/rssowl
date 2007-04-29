@@ -22,11 +22,11 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.persist.search;
+package org.rssowl.core.persist.service;
 
+import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.reference.NewsReference;
-import org.rssowl.core.persist.service.IPersistenceService;
-import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.persist.search.ISearchHit;
 
 import java.util.List;
 
