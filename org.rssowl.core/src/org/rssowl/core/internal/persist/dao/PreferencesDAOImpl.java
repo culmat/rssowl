@@ -30,6 +30,7 @@ import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.event.PreferenceEvent;
 import org.rssowl.core.persist.event.PreferenceListener;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.persist.service.UniqueConstraintException;
 
 import com.db4o.ObjectSet;
 import com.db4o.query.Query;
@@ -52,11 +53,10 @@ public class PreferencesDAOImpl extends AbstractEntityDAO<IPreference, Preferenc
 
   @Override
   protected void doSave(IPreference entity) {
-    //TODO Add UniqueConstraintViolation exception and use it from
-    //saveFeed and saveNewsCounter
     IPreference pref = load(entity.getKey());
     if (pref != null && pref != entity)
-        throw new IllegalArgumentException("preference with the provided key already exists");
+      throw new UniqueConstraintException("key", entity);
+    
     super.doSave(entity);
   }
 
