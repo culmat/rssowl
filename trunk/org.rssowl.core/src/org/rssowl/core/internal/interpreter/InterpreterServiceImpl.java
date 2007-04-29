@@ -144,7 +144,6 @@ public class InterpreterServiceImpl implements IInterpreterService {
    * @see org.rssowl.core.interpreter.IInterpreterService#importFrom(java.io.InputStream)
    */
   public List< ? extends IEntity> importFrom(InputStream inS) throws InterpreterException, ParserException {
-    Activator.getDefault().logInfo("Importing the InputStream into a Type... [ org.rssowl.core.interpreter#importOPML(InputStream inS) ]"); //$NON-NLS-1$
     Document document = fXMLParserImpl.parse(inS);
 
     /* A Root Element is required */

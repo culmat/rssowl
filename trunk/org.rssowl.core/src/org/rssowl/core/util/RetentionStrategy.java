@@ -25,7 +25,7 @@
 package org.rssowl.core.util;
 
 import org.rssowl.core.Owl;
-import org.rssowl.core.internal.DefaultPreferences;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
