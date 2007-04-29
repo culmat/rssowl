@@ -24,7 +24,7 @@
 
 package org.rssowl.core.persist;
 
-import org.rssowl.core.persist.search.ISearchHit;
+import org.rssowl.core.util.ISearchHit;
 
 import java.util.List;
 

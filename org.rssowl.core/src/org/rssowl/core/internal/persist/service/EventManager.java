@@ -56,9 +56,9 @@ import org.rssowl.core.persist.event.SearchConditionEvent;
 import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
-import org.rssowl.core.persist.search.ISearchHit;
 import org.rssowl.core.persist.service.IDGenerator;
 import org.rssowl.core.persist.service.IModelSearch;
+import org.rssowl.core.util.ISearchHit;
 
 import com.db4o.ObjectContainer;
 import com.db4o.events.Event4;

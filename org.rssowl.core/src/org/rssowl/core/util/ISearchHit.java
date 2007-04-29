@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.persist.search;
+package org.rssowl.core.util;
 
 /**
  * TODO API is in Progress.

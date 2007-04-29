@@ -26,7 +26,7 @@ package org.rssowl.core.persist.service;
 
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.reference.NewsReference;
-import org.rssowl.core.persist.search.ISearchHit;
+import org.rssowl.core.util.ISearchHit;
 
 import java.util.List;
 
