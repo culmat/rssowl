@@ -51,12 +51,12 @@ import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.NativeFSLockFactory;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.reference.NewsReference;
-import org.rssowl.core.persist.search.IModelSearch;
-import org.rssowl.core.persist.search.ISearchCondition;
 import org.rssowl.core.persist.search.ISearchHit;
-import org.rssowl.core.persist.search.ISearchValueType;
 import org.rssowl.core.persist.search.SearchSpecifier;
+import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.PersistenceException;
 
 import java.io.IOException;

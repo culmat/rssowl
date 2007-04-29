@@ -28,8 +28,8 @@ import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsGetter;
+import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
-import org.rssowl.core.persist.search.ISearchCondition;
 import org.rssowl.core.persist.search.ISearchHit;
 
 import java.util.ArrayList;

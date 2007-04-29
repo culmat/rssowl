@@ -34,6 +34,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.IPreference;
+import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.dao.DAOService;
@@ -51,7 +52,6 @@ import org.rssowl.core.persist.dao.IPersonDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.dao.ISearchConditionDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
-import org.rssowl.core.persist.search.ISearchCondition;
 
 import java.util.HashMap;
 import java.util.Map;

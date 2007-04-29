@@ -24,11 +24,11 @@
 
 package org.rssowl.core.internal.persist.dao;
 
-import org.rssowl.core.internal.persist.search.SearchCondition;
+import org.rssowl.core.internal.persist.SearchCondition;
+import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.dao.ISearchConditionDAO;
 import org.rssowl.core.persist.event.SearchConditionEvent;
 import org.rssowl.core.persist.event.SearchConditionListener;
-import org.rssowl.core.persist.search.ISearchCondition;
 
 /**
  * A data-access-object for <code>ISearchCondition</code>s.

@@ -24,7 +24,7 @@
 
 package org.rssowl.core.persist.reference;
 
-import org.rssowl.core.persist.search.ISearchCondition;
+import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.service.PersistenceException;
 
 /**
