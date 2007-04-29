@@ -54,7 +54,7 @@ public final class ConditionalGetDAOImpl extends AbstractPersistableDAO<IConditi
       query.constrain(fEntityClass);
       query.descend("fLink").constrain(link.toString()); //$NON-NLS-1$
 
-      for (IConditionalGet entity : getObjectSet(query)) {
+      for (IConditionalGet entity : getList(query)) {
         fDb.activate(entity, Integer.MAX_VALUE);
         return entity;
       }

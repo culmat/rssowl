@@ -39,7 +39,6 @@ import org.rssowl.core.util.LoggingSafeRunnable;
 
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
-import com.db4o.ObjectSet;
 import com.db4o.config.Configuration;
 import com.db4o.config.ObjectClass;
 import com.db4o.config.ObjectField;
@@ -47,6 +46,7 @@ import com.db4o.config.QueryEvaluationMode;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -166,8 +166,8 @@ public class DBManager {
         fObjectContainer.activate(pref, Integer.MAX_VALUE);
         db.ext().set(pref, Integer.MAX_VALUE);
       }
-      ObjectSet<Counter> counterSet = fObjectContainer.query(Counter.class);
-      Counter counter = counterSet.next();
+      List<Counter> counterSet = fObjectContainer.query(Counter.class);
+      Counter counter = counterSet.iterator().next();
       fObjectContainer.activate(counter, Integer.MAX_VALUE);
       db.ext().set(counter, Integer.MAX_VALUE);
 

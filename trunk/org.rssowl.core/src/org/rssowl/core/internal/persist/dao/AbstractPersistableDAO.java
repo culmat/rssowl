@@ -34,13 +34,13 @@ import org.rssowl.core.persist.dao.IPersistableDAO;
 import org.rssowl.core.persist.service.PersistenceException;
 
 import com.db4o.ObjectContainer;
-import com.db4o.ObjectSet;
 import com.db4o.ext.Db4oException;
 import com.db4o.query.Query;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
@@ -75,31 +75,8 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
   }
   
   @SuppressWarnings("unchecked")
-  protected final ObjectSet<T> getObjectSet(Query query)    {
+  protected final List<T> getList(Query query)    {
     return query.execute();
-  }
-
-  /*
-   * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#load(long)
-   */
-  public T load(long id) {
-    try {
-      Query query = fDb.query();
-      query.constrain(fEntityClass);
-      query.descend("fId").constrain(Long.valueOf(id)); //$NON-NLS-1$
-  
-      @SuppressWarnings("unchecked")
-      ObjectSet<T> set = query.execute();
-      for (T entity : set) {
-        // TODO Activate completely by default for now. Must decide how to deal
-        // with this.
-        fDb.activate(entity, Integer.MAX_VALUE);
-        return entity;
-      }
-    } catch (Db4oException e) {
-      throw new PersistenceException(e);
-    }
-    return null;
   }
 
   /*
@@ -107,7 +84,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
    */
   public Collection<T> loadAll() {
     try {
-      ObjectSet<? extends T> entities = fDb.query(fEntityClass);
+      List<? extends T> entities = fDb.query(fEntityClass);
       activateAll(entities);
   
       return new ArrayList<T>(entities);
@@ -210,7 +187,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
    */
   public long countAll() {
     try {
-      ObjectSet<? extends T> entities = fDb.query(fEntityClass);
+      List<? extends T> entities = fDb.query(fEntityClass);
       return entities.size();
     } catch (Db4oException e) {
       throw new PersistenceException(e);

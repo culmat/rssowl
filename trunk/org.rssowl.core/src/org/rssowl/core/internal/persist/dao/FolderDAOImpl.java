@@ -39,7 +39,6 @@ import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.ReparentInfo;
 
-import com.db4o.ObjectSet;
 import com.db4o.ext.Db4oException;
 import com.db4o.query.Query;
 
@@ -94,7 +93,7 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
       Query query = fDb.query();
       query.constrain(fEntityClass);
       query.descend("fParent").constrain(null); //$NON-NLS-1$
-      ObjectSet<IFolder> folders = getObjectSet(query);
+      List<IFolder> folders = getList(query);
       activateAll(folders);
       return new ArrayList<IFolder>(folders);
     } catch (Db4oException e) {
