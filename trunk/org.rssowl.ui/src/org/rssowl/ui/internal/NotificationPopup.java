@@ -65,6 +65,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.DateUtils;
+import org.rssowl.ui.internal.OwlUI.OSTheme;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
@@ -119,7 +120,6 @@ public class NotificationPopup extends PopupDialog {
   private Map<FeedLinkReference, IBookMark> fMapFeedToBookmark;
   private Color fPopupBorderColor;
   private Color fPopupOuterCircleColor;
-  private Color fPopupInnerCircleColor;
   private Image fCloseImageNormal;
   private Image fCloseImageActive;
   private Image fCloseImagePressed;
@@ -351,9 +351,32 @@ public class NotificationPopup extends PopupDialog {
   private void initResources() {
 
     /* Colors */
-    fPopupBorderColor = OwlUI.getColor(fResources, new RGB(125, 177, 251));
-    fPopupOuterCircleColor = OwlUI.getColor(fResources, new RGB(73, 135, 234));
-    fPopupInnerCircleColor = OwlUI.getColor(fResources, new RGB(241, 240, 234));
+    OSTheme osTheme = OwlUI.getOSTheme(getParentShell().getDisplay());
+    switch (osTheme) {
+      case WINDOWS_BLUE:
+        fPopupBorderColor = OwlUI.getColor(fResources, new RGB(125, 177, 251));
+        fPopupOuterCircleColor = OwlUI.getColor(fResources, new RGB(73, 135, 234));
+        break;
+
+      case WINDOWS_SILVER:
+        fPopupBorderColor = getParentShell().getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY);
+        fPopupOuterCircleColor = getParentShell().getDisplay().getSystemColor(SWT.COLOR_TITLE_BACKGROUND);
+        break;
+
+      case WINDOWS_OLIVE:
+        fPopupBorderColor = getParentShell().getDisplay().getSystemColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT);
+        fPopupOuterCircleColor = getParentShell().getDisplay().getSystemColor(SWT.COLOR_TITLE_BACKGROUND);
+        break;
+
+      case WINDOWS_CLASSIC:
+        fPopupBorderColor = getParentShell().getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY);
+        fPopupOuterCircleColor = getParentShell().getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT);
+        break;
+
+      default:
+        fPopupBorderColor = getParentShell().getDisplay().getSystemColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT);
+        fPopupOuterCircleColor = getParentShell().getDisplay().getSystemColor(SWT.COLOR_TITLE_BACKGROUND);
+    }
 
     /* Icons */
     fCloseImageNormal = OwlUI.getImage(fResources, "icons/etool16/close_normal.gif");
@@ -453,7 +476,6 @@ public class NotificationPopup extends PopupDialog {
     fInnerContentCircle = new Composite(middleContentCircle, SWT.NO_FOCUS);
     fInnerContentCircle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fInnerContentCircle.setLayout(LayoutUtils.createGridLayout(1, 5, 5, 0));
-    fInnerContentCircle.setBackground(fPopupInnerCircleColor);
     fInnerContentCircle.addMouseTrackListener(fMouseTrackListner);
 
     return outerCircle;

@@ -196,6 +196,67 @@ public class OwlUI {
   /* Shared Clipboard instance */
   private static Clipboard fgClipboard;
 
+  /* Cache the OSTheme once retrieved */
+  private static OSTheme fgCachedOSTheme;
+
+  /** An enumeration of Operating System Themes */
+  enum OSTheme {
+
+    /** Windows XP Blue */
+    WINDOWS_BLUE,
+
+    /** Windows XP Silver */
+    WINDOWS_SILVER,
+
+    /** Windows XP Olive */
+    WINDOWS_OLIVE,
+
+    /** Windows Classic */
+    WINDOWS_CLASSIC,
+
+    /** Any other Theme */
+    OTHER
+  }
+
+  /**
+   * Returns the <code>OSTheme</code> that is currently being used.
+   *
+   * @param display An instance of the SWT <code>Display</code> used for
+   * determining the used theme.
+   * @return Returns the <code>OSTheme</code> that is currently being used.
+   */
+  public static OSTheme getOSTheme(Display display) {
+
+    /* Check Cached version first */
+    if (fgCachedOSTheme != null)
+      return fgCachedOSTheme;
+
+    RGB widgetBackground = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRGB();
+    RGB listSelection = display.getSystemColor(SWT.COLOR_LIST_SELECTION).getRGB();
+
+    /* Theme: Windows Blue */
+    if (widgetBackground.equals(new RGB(236, 233, 216)) && listSelection.equals(new RGB(49, 106, 197)))
+      fgCachedOSTheme = OSTheme.WINDOWS_BLUE;
+
+    /* Theme: Windows Classic */
+    else if (widgetBackground.equals(new RGB(212, 208, 200)) && listSelection.equals(new RGB(10, 36, 106)))
+      fgCachedOSTheme = OSTheme.WINDOWS_CLASSIC;
+
+    /* Theme: Windows Silver */
+    else if (widgetBackground.equals(new RGB(224, 223, 227)) && listSelection.equals(new RGB(178, 180, 191)))
+      fgCachedOSTheme = OSTheme.WINDOWS_SILVER;
+
+    /* Theme: Windows Olive */
+    else if (widgetBackground.equals(new RGB(236, 233, 216)) && listSelection.equals(new RGB(147, 160, 112)))
+      fgCachedOSTheme = OSTheme.WINDOWS_OLIVE;
+
+    /* Any other Theme */
+    else
+      fgCachedOSTheme = OSTheme.OTHER;
+
+    return fgCachedOSTheme;
+  }
+
   /**
    * Get the shared instance of <code>Clipboard</code>.
    *
