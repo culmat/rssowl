@@ -47,6 +47,7 @@ import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.AttachmentAdapter;
 import org.rssowl.core.persist.event.AttachmentEvent;
@@ -85,7 +86,6 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.reference.PersonReference;
 import org.rssowl.core.persist.reference.SearchConditionReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
-import org.rssowl.core.persist.search.SearchSpecifier;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.tests.TestUtils;
 
