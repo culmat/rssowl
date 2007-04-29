@@ -21,10 +21,9 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.internal.persist.pref;
+package org.rssowl.core.internal.persist;
 
 import org.eclipse.core.runtime.Assert;
-import org.rssowl.core.internal.persist.AbstractEntity;
 import org.rssowl.core.persist.IPreference;
 
 public final class Preference extends AbstractEntity implements IPreference {

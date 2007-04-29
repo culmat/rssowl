@@ -24,7 +24,6 @@
 
 package org.rssowl.core.internal.persist;
 
-import org.rssowl.core.internal.persist.pref.Preference;
 import org.rssowl.core.internal.persist.search.SearchCondition;
 import org.rssowl.core.internal.persist.search.SearchField;
 import org.rssowl.core.persist.IAttachment;
