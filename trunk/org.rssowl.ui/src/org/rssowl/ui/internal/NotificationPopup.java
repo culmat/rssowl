@@ -143,6 +143,7 @@ public class NotificationPopup extends PopupDialog {
   private UIJob fAutoCloser;
   private MouseTrackListener fMouseTrackListner;
   private IPreferenceScope fGlobalScope;
+  private int fVisibleNewsCount;
 
   /**
    * Opens the <code>NotificationPopup</code> if not yet opened and shows the
@@ -155,21 +156,21 @@ public class NotificationPopup extends PopupDialog {
 
     /* Not yet opened */
     if (fgInstance == null) {
-      fgInstance = new NotificationPopup();
+      fgInstance = new NotificationPopup(news.size());
       fgInstance.open();
-
     }
 
     /* Show News */
     fgInstance.makeVisible(news);
   }
 
-  private NotificationPopup() {
+  private NotificationPopup(int visibleNewsCount) {
     super(new Shell(PlatformUI.getWorkbench().getDisplay()), PopupDialog.INFOPOPUP_SHELLSTYLE | SWT.ON_TOP, false, false, false, false, null, null);
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fMapFeedToBookmark = new HashMap<FeedLinkReference, IBookMark>();
     fBoldFont = OwlUI.getBold("");
     fGlobalScope = Owl.getPreferenceService().getGlobalScope();
+    fVisibleNewsCount = (visibleNewsCount > MAX_NEWS) ? MAX_NEWS : visibleNewsCount;
     createAutoCloser();
     createMouseTrackListener();
 
@@ -195,12 +196,14 @@ public class NotificationPopup extends PopupDialog {
     fMouseTrackListner = new MouseTrackAdapter() {
       @Override
       public void mouseEnter(MouseEvent e) {
-        fAutoCloser.cancel();
+        if (!fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP))
+          fAutoCloser.cancel();
       }
 
       @Override
       public void mouseExit(MouseEvent e) {
-        fAutoCloser.schedule(AUTO_CLOSE_TIME);
+        if (!fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP))
+          fAutoCloser.schedule(AUTO_CLOSE_TIME);
       }
     };
   }
@@ -243,12 +246,24 @@ public class NotificationPopup extends PopupDialog {
     }
 
     /* Show News */
+    int oldVisibleNewsCount = fVisibleNewsCount;
+    fVisibleNewsCount = 0;
     for (int i = 0; i < MAX_NEWS && i < fRecentNews.size(); i++) {
       renderNews(fRecentNews.get(i));
+      fVisibleNewsCount++;
     }
 
     /* Layout */
     fOuterContentCircle.layout(true, true);
+
+    /* Update Shell Bounds */
+    Point oldSize = getShell().getSize();
+    int labelHeight = fTitleCircleLabel.computeSize(DEFAULT_WIDTH, SWT.DEFAULT).y;
+    int newHeight = oldSize.y + (fVisibleNewsCount - oldVisibleNewsCount) * labelHeight;
+
+    Point newSize = new Point(oldSize.x, newHeight);
+    Point newLocation = getInitialLocation(newSize);
+    getShell().setBounds(newLocation.x, newLocation.y, newSize.x, newSize.y);
   }
 
   private void renderNews(final INews news) {
@@ -474,7 +489,7 @@ public class NotificationPopup extends PopupDialog {
     int initialHeight = getShell().computeSize(DEFAULT_WIDTH, SWT.DEFAULT).y;
     int labelHeight = fTitleCircleLabel.computeSize(DEFAULT_WIDTH, SWT.DEFAULT).y;
 
-    return new Point(DEFAULT_WIDTH, initialHeight + MAX_NEWS * labelHeight);
+    return new Point(DEFAULT_WIDTH, initialHeight + fVisibleNewsCount * labelHeight);
   }
 
   /**
