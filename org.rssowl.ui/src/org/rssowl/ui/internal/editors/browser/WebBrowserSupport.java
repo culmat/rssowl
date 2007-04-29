@@ -31,7 +31,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.browser.AbstractWorkbenchBrowserSupport;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.rssowl.core.Owl;
-import org.rssowl.core.internal.DefaultPreferences;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.BrowserUtils;
 
