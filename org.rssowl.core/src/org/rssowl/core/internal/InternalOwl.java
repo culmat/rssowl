@@ -65,13 +65,13 @@ public final class InternalOwl {
   /* ID for Application Service Contribution */
   private static final String MODEL_APPLICATION_SERVICE_EXTENSION_POINT = "org.rssowl.core.ApplicationService"; //$NON-NLS-1$
 
-  private IPreferenceService fPreferencesService;
-  private IConnectionService fConnectionService;
-  private IInterpreterService fInterpreterService;
-  private IPersistenceService fPersistenceService;
-  private IApplicationService fApplicationService;
-  private IModelFactory fModelFactory;
-  private boolean fStarted;
+  private volatile IPreferenceService fPreferencesService;
+  private volatile IConnectionService fConnectionService;
+  private volatile IInterpreterService fInterpreterService;
+  private volatile IPersistenceService fPersistenceService;
+  private volatile IApplicationService fApplicationService;
+  private volatile IModelFactory fModelFactory;
+  private volatile boolean fStarted;
 
   private InternalOwl() {}
 
