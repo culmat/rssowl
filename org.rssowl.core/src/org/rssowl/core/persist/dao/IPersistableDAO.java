@@ -38,17 +38,6 @@ import java.util.Collection;
  */
 public interface IPersistableDAO<T extends IPersistable> {
 
-  /**
-   * Loads the persistable with <code>id</code> from the persistence system
-   * and returns it. If no persistable with the provided id exists,
-   * <code>null</code> is returned.
-   *
-   * @param id The id of the persistable to load from the persistence system.
-   * @return the persistable with <code>id</code> or <code>null</code> in
-   * case none exists.
-   */
-  T load(long id) throws PersistenceException;;
-
   Collection<T> loadAll() throws PersistenceException;;
 
   /**
