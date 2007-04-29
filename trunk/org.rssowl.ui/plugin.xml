@@ -1028,6 +1028,14 @@
             The sticky news background color is used as background color for all sticky news including the bookmark that the news is belonging to.
          </description>
       </colorDefinition>
+      <fontDefinition
+            categoryId="org.rssowl.ui.ThemeCategory"
+            id="org.rssowl.ui.NotificationPopupFont"
+            label="Notification Popup Font">
+         <description>
+            The notification popup font is used in the notification when news are coming in.
+         </description>
+      </fontDefinition>
    </extension>
    <extension
          point="org.eclipse.ui.browserSupport">
