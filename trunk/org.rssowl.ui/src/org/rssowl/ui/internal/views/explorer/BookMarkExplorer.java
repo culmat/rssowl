@@ -196,6 +196,7 @@ public class BookMarkExplorer extends ViewPart {
   private FolderListener fFolderListener;
   private IPartListener2 fPartListener;
   private NewsService fNewsService;
+  private IPreferenceDAO fPrefDAO;
 
   /*
    * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
@@ -523,10 +524,9 @@ public class BookMarkExplorer extends ViewPart {
     fViewSite.getActionBars().getToolBarManager().find(NEXT_SET_ACTION).update(IAction.ENABLED);
 
     /* Save the new selected Set in Preferences */
-    IPreferenceDAO prefDAO = DynamicDAO.getDAO(IPreferenceDAO.class);
-    IPreference pref = prefDAO.loadOrCreate(PREF_SELECTED_BOOKMARK_SET);
+    IPreference pref = fPrefDAO.loadOrCreate(PREF_SELECTED_BOOKMARK_SET);
     pref.putLongs(fSelectedBookMarkSet.getId());
-    prefDAO.save(pref);
+    fPrefDAO.save(pref);
   }
 
   private void createSearchBar(final Composite parent) {
@@ -1271,6 +1271,7 @@ public class BookMarkExplorer extends ViewPart {
     fViewSite = site;
     fNewsService = Controller.getDefault().getNewsService();
     fGlobalPreferences = Owl.getPreferenceService().getGlobalScope();
+    fPrefDAO = DynamicDAO.getDAO(IPreferenceDAO.class);
     fExpandedNodes = new ArrayList<Long>();
 
     /* Sort Root-Folders by ID */
@@ -1521,11 +1522,10 @@ public class BookMarkExplorer extends ViewPart {
     }
     /* Add the ID of the current selected Set to make it Unique */
     String key = PREF_EXPANDED_NODES + fSelectedBookMarkSet;
-    
-    IPreferenceDAO prefDAO = DynamicDAO.getDAO(IPreferenceDAO.class);
-    IPreference pref = prefDAO.loadOrCreate(key);
+
+    IPreference pref = fPrefDAO.loadOrCreate(key);
     pref.putLongs(elements);
-    prefDAO.save(pref);
+    fPrefDAO.save(pref);
   }
 
   private void loadState() {
@@ -1538,8 +1538,7 @@ public class BookMarkExplorer extends ViewPart {
     fFilterType = BookMarkFilter.Type.values()[fGlobalPreferences.getInteger(DefaultPreferences.BE_FILTER_TYPE)];
     fGroupingType = BookMarkGrouping.Type.values()[fGlobalPreferences.getInteger(DefaultPreferences.BE_GROUP_TYPE)];
 
-    IPreferenceDAO prefDAO = DynamicDAO.getDAO(IPreferenceDAO.class);
-    IPreference pref = prefDAO.load(PREF_SELECTED_BOOKMARK_SET);
+    IPreference pref = fPrefDAO.load(PREF_SELECTED_BOOKMARK_SET);
     Assert.isTrue(fRootFolders.size() > 0, "Could not find any Bookmark Set!"); //$NON-NLS-1$
     if (pref != null)
       fSelectedBookMarkSet = new FolderReference(pref.getLong().longValue()).resolve();
@@ -1549,7 +1548,7 @@ public class BookMarkExplorer extends ViewPart {
       /* Save this to make sure subsequent calls succeed */
       pref = Owl.getModelFactory().createPreference(PREF_SELECTED_BOOKMARK_SET);
       pref.putLongs(fSelectedBookMarkSet.getId());
-      prefDAO.save(pref);
+      fPrefDAO.save(pref);
     }
 
     /* Expanded Elements */
@@ -1558,7 +1557,7 @@ public class BookMarkExplorer extends ViewPart {
 
   /* Expanded Elements - Use ID of selected Set to make it Unique */
   private void loadExpandedElements() {
-    IPreference pref = DynamicDAO.getDAO(IPreferenceDAO.class).load(PREF_EXPANDED_NODES);
+    IPreference pref = fPrefDAO.load(PREF_EXPANDED_NODES + fSelectedBookMarkSet);
     if (pref != null) {
       for (long element : pref.getLongs())
         fExpandedNodes.add(element);
