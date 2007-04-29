@@ -86,27 +86,15 @@ import java.util.Map;
  * TODO
  * <ul>
  * <li>Can not use PopupDialog because Shell needs Display as parent</li>
- * <li>Find solution for showing > 8 News</li>
- * <li>Implement Service that manages lifecycle of Popup and is able to batch
- * incoming News</li>
  * <li>Consider an option per Mark/Folder to enable/disable Notification</li>
  * <li>Implement animation (take from SystemTrayAlert)</li>
  * <li>Add preferences (respect use animation, sticky until close, number of
  * news)</li>
  * <li>Enrich Popup toolbar with "Make Sticky" and a dropdown with "Options",
  * "Mark Read" etc...</li>
- * <li>Consider having buttons right to a link to open external (like Wiki!) Or
- * respect Mod Click!</li>
- * <li>Do not couple Notification with System-Tray?!</li>
  * <li>Use OS background color</li>
- * <li>Restore Shell from Tray / force active</li>
- * <li>Sort news by date to show most recent on top (at least initially)</li>
- * <li>"Feed-Title has N new News" (in FD, very leightweight, shows scrollbar
- * after a while if too many items are present)</li>
- * <li>Don't move away when mouse is over tooltip</li>
  * <li>Consider 2 modes: Stacked (3/10 with arrows and showing description) and
  * Grouped (N Headlines at once)</li>
- * <li>Make sure that the popup is always having the same horizontal width</li>
  * <li>Provide own font for alert (default font size)</li>
  * </ul>
  *
