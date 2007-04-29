@@ -26,7 +26,6 @@ package org.rssowl.ui.internal;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
@@ -73,8 +72,8 @@ public class NewsService {
   /* The Counter for various aspects of News, the key is the feed link */
   private NewsCounter fCounter;
 
-  /* Number of Feeds before Progress is shown */
-  private static final int PROGRESS_VISIBLE_THRESHOLD = 100;
+  /* Delay before Progress is shown */
+  private static final int SHOW_PROGRESS_THRESHOLD = 2000;
 
   private INewsCounterDAO fNewsCounterDao;
 
@@ -82,14 +81,6 @@ public class NewsService {
   private class NewsServiceProgressMonitorDialog extends ProgressMonitorDialog {
     NewsServiceProgressMonitorDialog(Shell parent) {
       super(parent);
-    }
-
-    /*
-     * @see org.eclipse.jface.dialogs.ProgressMonitorDialog#getInitialSize()
-     */
-    @Override
-    protected Point getInitialSize() {
-      return new Point(380, 200);
     }
 
     /*
@@ -205,43 +196,41 @@ public class NewsService {
 
   private NewsCounter countAll() {
     final NewsCounter newsCounter = new NewsCounter();
+    final long start = System.currentTimeMillis();
     final Collection<IFeed> feeds = DynamicDAO.loadAll(IFeed.class);
 
-    /* Runnable with logic to count the states of all News */
+    final ProgressMonitorDialog dialog = new NewsServiceProgressMonitorDialog(new Shell(Display.getDefault(), SWT.NONE));
+    dialog.setOpenOnRun(false);
+
+    /* Runnable will open the Dialog after SHOW_PROGRESS_THRESHOLD ms */
     IRunnableWithProgress runnable = new IRunnableWithProgress() {
+      private boolean fDialogOpened;
+
       public void run(IProgressMonitor monitor) {
-        monitor.beginTask("RSSOwl was not shut down properly. Please wait...", feeds.size());
+        monitor.beginTask("RSSOwl was not shutdown properly. Restoring data, please wait...", feeds.size());
 
         for (IFeed feed : feeds) {
           newsCounter.put(feed.getLink(), count(feed));
           monitor.worked(1);
+
+          /* Open the Dialog if exceeded SHOW_PROGRESS_THRESHOLD ms */
+          if (System.currentTimeMillis() - start > SHOW_PROGRESS_THRESHOLD && !fDialogOpened) {
+            dialog.open();
+            fDialogOpened = true;
+          }
         }
 
         monitor.done();
       }
     };
 
-    /* Count with showing Progress */
-    if (feeds.size() >= PROGRESS_VISIBLE_THRESHOLD && !Controller.fgFirstStartup) {
-      ProgressMonitorDialog dialog = new NewsServiceProgressMonitorDialog(new Shell(Display.getDefault(), SWT.NONE));
-      try {
-        dialog.run(false, false, runnable);
-      } catch (InvocationTargetException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
-      } catch (InterruptedException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
-      }
-    }
-
-    /* Don't show Progress */
-    else {
-      try {
-        runnable.run(new NullProgressMonitor());
-      } catch (InvocationTargetException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
-      } catch (InterruptedException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
-      }
+    /* Execute the Runnable */
+    try {
+      dialog.run(false, false, runnable);
+    } catch (InvocationTargetException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    } catch (InterruptedException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
     }
 
     return newsCounter;
