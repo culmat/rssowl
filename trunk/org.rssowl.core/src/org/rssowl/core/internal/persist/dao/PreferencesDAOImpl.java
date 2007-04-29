@@ -24,7 +24,7 @@
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.Owl;
-import org.rssowl.core.internal.persist.pref.Preference;
+import org.rssowl.core.internal.persist.Preference;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.event.PreferenceEvent;
