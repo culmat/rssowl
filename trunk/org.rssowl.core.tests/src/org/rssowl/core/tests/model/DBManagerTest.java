@@ -97,6 +97,7 @@ import org.rssowl.core.persist.search.ISearchCondition;
 import org.rssowl.core.persist.search.ISearchField;
 import org.rssowl.core.persist.search.SearchSpecifier;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.persist.service.UniqueConstraintException;
 import org.rssowl.core.tests.TestUtils;
 
 import com.db4o.ObjectContainer;
@@ -771,11 +772,11 @@ public class DBManagerTest {
 
   /**
    * Saves the same feed twice without merging. Should throw an
-   * IllegalArgumentException.
+   * UniqueConstraintException.
    *
    * @throws PersistenceException
    */
-  @Test(expected = IllegalArgumentException.class)
+  @Test(expected = UniqueConstraintException.class)
   public void testSaveFeedTwice() throws PersistenceException {
     DynamicDAO.save(createFeed());
     DynamicDAO.save(createFeed());
