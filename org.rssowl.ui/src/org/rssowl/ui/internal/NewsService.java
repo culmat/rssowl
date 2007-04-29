@@ -25,6 +25,15 @@
 package org.rssowl.ui.internal;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.NewsCounter;
@@ -37,6 +46,7 @@ import org.rssowl.core.persist.event.NewsAdapter;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
@@ -63,7 +73,38 @@ public class NewsService {
   /* The Counter for various aspects of News, the key is the feed link */
   private NewsCounter fCounter;
 
+  /* Number of Feeds before Progress is shown */
+  private static final int PROGRESS_VISIBLE_THRESHOLD = 100;
+
   private INewsCounterDAO fNewsCounterDao;
+
+  /* Subclass of a Progress Monitor Dialog to show progress after a Crash */
+  private class NewsServiceProgressMonitorDialog extends ProgressMonitorDialog {
+    NewsServiceProgressMonitorDialog(Shell parent) {
+      super(parent);
+    }
+
+    /*
+     * @see org.eclipse.jface.dialogs.ProgressMonitorDialog#getInitialSize()
+     */
+    @Override
+    protected Point getInitialSize() {
+      return new Point(380, 200);
+    }
+
+    /*
+     * @see org.eclipse.jface.dialogs.Dialog#getInitialLocation(org.eclipse.swt.graphics.Point)
+     */
+    @Override
+    protected Point getInitialLocation(Point initialSize) {
+      Rectangle displayBounds = getParentShell().getDisplay().getPrimaryMonitor().getBounds();
+      Point shellSize = getInitialSize();
+      int x = displayBounds.x + (displayBounds.width - shellSize.x) >> 1;
+      int y = displayBounds.y + (displayBounds.height - shellSize.y) >> 1;
+
+      return new Point(x, y);
+    }
+  }
 
   NewsService() {
     fNewsCounterDao = DynamicDAO.getDAO(INewsCounterDAO.class);
@@ -163,10 +204,45 @@ public class NewsService {
   }
 
   private NewsCounter countAll() {
-    NewsCounter newsCounter = new NewsCounter();
-    Collection<IFeed> feeds = DynamicDAO.loadAll(IFeed.class);
-    for (IFeed feed : feeds)
-      newsCounter.put(feed.getLink(), count(feed));
+    final NewsCounter newsCounter = new NewsCounter();
+    final Collection<IFeed> feeds = DynamicDAO.loadAll(IFeed.class);
+
+    /* Runnable with logic to count the states of all News */
+    IRunnableWithProgress runnable = new IRunnableWithProgress() {
+      public void run(IProgressMonitor monitor) {
+        monitor.beginTask("RSSOwl was not shut down properly. Please wait...", feeds.size());
+
+        for (IFeed feed : feeds) {
+          newsCounter.put(feed.getLink(), count(feed));
+          monitor.worked(1);
+        }
+
+        monitor.done();
+      }
+    };
+
+    /* Count with showing Progress */
+    if (feeds.size() >= PROGRESS_VISIBLE_THRESHOLD) {
+      ProgressMonitorDialog dialog = new NewsServiceProgressMonitorDialog(new Shell(Display.getDefault(), SWT.NONE));
+      try {
+        dialog.run(false, false, runnable);
+      } catch (InvocationTargetException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      } catch (InterruptedException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
+    }
+
+    /* Don't show Progress */
+    else {
+      try {
+        runnable.run(new NullProgressMonitor());
+      } catch (InvocationTargetException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      } catch (InterruptedException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
+    }
 
     return newsCounter;
   }
