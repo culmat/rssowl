@@ -86,17 +86,13 @@ import java.util.Map;
 /**
  * TODO
  * <ul>
- * <li>Can not use PopupDialog because Shell needs Display as parent</li>
  * <li>Consider an option per Mark/Folder to enable/disable Notification</li>
  * <li>Implement animation (take from SystemTrayAlert)</li>
- * <li>Add preferences (respect use animation, sticky until close, number of
- * news)</li>
+ * <li>Add preferences (respect use animation, number of news)</li>
  * <li>Enrich Popup toolbar with "Make Sticky" and a dropdown with "Options",
  * "Mark Read" etc...</li>
- * <li>Use OS background color</li>
  * <li>Consider 2 modes: Stacked (3/10 with arrows and showing description) and
  * Grouped (N Headlines at once)</li>
- * <li>Provide own font for alert (default font size)</li>
  * </ul>
  *
  * @author bpasero
