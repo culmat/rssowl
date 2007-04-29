@@ -33,6 +33,7 @@ import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.runnable.EventRunnable;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.persist.service.UniqueConstraintException;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
@@ -68,7 +69,7 @@ public class DBHelper {
 
   public static final void saveFeed(ObjectContainer db, IFeed feed) {
     if (feed.getId() == null && feedExists(db, feed.getLink()))
-        throw new IllegalArgumentException("This feed already exists, but it has no id."); //$NON-NLS-1$
+      throw new UniqueConstraintException("link", feed);
 
     ModelEvent feedEventTemplate = new FeedEvent(feed, true);
     DBHelper.putEventTemplate(feedEventTemplate);
