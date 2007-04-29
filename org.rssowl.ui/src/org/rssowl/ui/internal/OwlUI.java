@@ -178,6 +178,9 @@ public class OwlUI {
   /** BookMark Explorer Font Id */
   public static final String BKMRK_EXPLORER_FONT_ID = "org.rssowl.ui.BookmarkExplorerFont";
 
+  /** Notification Popup Font Id */
+  public static final String NOTIFICATION_POPUP_FONT_ID = "org.rssowl.ui.NotificationPopupFont";
+
   /** Sticky Background Color */
   public static final String STICKY_BG_COLOR_ID = "org.rssowl.ui.StickyBGColor";
 

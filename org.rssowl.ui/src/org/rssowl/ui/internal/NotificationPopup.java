@@ -126,7 +126,7 @@ public class NotificationPopup extends PopupDialog {
   private CLabel fTitleCircleLabel;
   private Composite fInnerContentCircle;
   private Composite fOuterContentCircle;
-  private Font fBoldFont;
+  private Font fBoldTextFont;
   private int fNewsCounter;
   private UIJob fAutoCloser;
   private MouseTrackListener fMouseTrackListner;
@@ -156,7 +156,7 @@ public class NotificationPopup extends PopupDialog {
     super(new Shell(PlatformUI.getWorkbench().getDisplay()), PopupDialog.INFOPOPUP_SHELLSTYLE | SWT.ON_TOP, false, false, false, false, null, null);
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fMapFeedToBookmark = new HashMap<FeedLinkReference, IBookMark>();
-    fBoldFont = OwlUI.getBold("");
+    fBoldTextFont = OwlUI.getThemeFont(OwlUI.NOTIFICATION_POPUP_FONT_ID, SWT.BOLD);
     fGlobalScope = Owl.getPreferenceService().getGlobalScope();
     fVisibleNewsCount = (visibleNewsCount > MAX_NEWS) ? MAX_NEWS : visibleNewsCount;
     createAutoCloser();
@@ -274,7 +274,7 @@ public class NotificationPopup extends PopupDialog {
     newsLabel.setCursor(newsLabel.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
     newsLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     newsLabel.setText(ModelUtils.getHeadline(news));
-    newsLabel.setFont(fBoldFont);
+    newsLabel.setFont(fBoldTextFont);
     newsLabel.addMouseTrackListener(fMouseTrackListner);
 
     /* Paint text blue on mouse-enter */
@@ -397,7 +397,7 @@ public class NotificationPopup extends PopupDialog {
     fTitleCircleLabel = new CLabel(titleCircle, SWT.NO_FOCUS);
     fTitleCircleLabel.setImage(OwlUI.getImage(fResources, "icons/product/16x16.gif"));
     fTitleCircleLabel.setText("RSSOwl");
-    fTitleCircleLabel.setFont(fBoldFont);
+    fTitleCircleLabel.setFont(fBoldTextFont);
     fTitleCircleLabel.setBackground(titleCircle.getBackground());
     fTitleCircleLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     fTitleCircleLabel.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_WHITE));
