@@ -222,7 +222,7 @@ public class NewsService {
     };
 
     /* Count with showing Progress */
-    if (feeds.size() >= PROGRESS_VISIBLE_THRESHOLD) {
+    if (feeds.size() >= PROGRESS_VISIBLE_THRESHOLD && !Controller.fgFirstStartup) {
       ProgressMonitorDialog dialog = new NewsServiceProgressMonitorDialog(new Shell(Display.getDefault(), SWT.NONE));
       try {
         dialog.run(false, false, runnable);
