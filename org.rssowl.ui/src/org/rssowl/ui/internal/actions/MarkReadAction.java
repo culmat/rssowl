@@ -41,7 +41,7 @@ import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.core.persist.search.ISearchHit;
+import org.rssowl.core.util.ISearchHit;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.util.JobRunner;
