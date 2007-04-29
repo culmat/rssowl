@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.actions.ActionFactory;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.DefaultPreferences;
@@ -93,6 +94,7 @@ public class FilterBar {
   private boolean fLayoutVertical;
   private IPreferenceScope fGlobalPreferences;
   private boolean fMaximized;
+  private ToolBarManager fFilterToolBar;
 
   /**
    * @param feedView
@@ -163,7 +165,7 @@ public class FilterBar {
   /* Quick Search */
   private void createQuickSearch(Composite parent) {
     Composite searchContainer = new Composite(parent, SWT.NONE);
-    searchContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
+    searchContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0, 0, 0, false));
     ((GridLayout) searchContainer.getLayout()).marginTop = 1;
     searchContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
     ((GridData) searchContainer.getLayoutData()).widthHint = 180;
@@ -303,14 +305,11 @@ public class FilterBar {
     fSearchInput.addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
 
-        /* Hint is visible - ignore */
-        if (fSearchInput.getData() != null)
-          return;
-
         /* Clear Search immediately */
         if (fSearchInput.getText().length() == 0 && fFeedView.getFilter().isPatternSet()) {
           fFeedView.getFilter().setPattern(fSearchInput.getText());
           fFeedView.refresh(true, false);
+          setClearBarVisible(false);
         }
 
         /* Run Search in JobTracker */
@@ -319,6 +318,7 @@ public class FilterBar {
             public IStatus run(IProgressMonitor monitor) {
               fFeedView.getFilter().setPattern(fSearchInput.getText());
               fFeedView.refresh(true, false);
+              setClearBarVisible(true);
               return Status.OK_STATUS;
             }
           });
@@ -339,6 +339,39 @@ public class FilterBar {
         fFeedView.getEditorSite().getActionBars().getGlobalActionHandler(ActionFactory.PASTE.getId()).setEnabled(false);
       }
     });
+
+    /* Clear Button */
+    ToolBar toolBar = new ToolBar(searchContainer, SWT.FLAT | SWT.HORIZONTAL);
+    fFilterToolBar = new ToolBarManager(toolBar);
+    fFilterToolBar.getControl().setBackground(parent.getBackground());
+    fFilterToolBar.getControl().setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
+
+    /* Initially Hide */
+    ((GridData) toolBar.getLayoutData()).exclude = true;
+    toolBar.setVisible(false);
+
+    IAction clearTextAction = new Action("", IAction.AS_PUSH_BUTTON) {//$NON-NLS-1$
+      @Override
+      public void run() {
+        clearQuickSearch();
+      }
+    };
+
+    clearTextAction.setToolTipText("Clear");
+    clearTextAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/clear.gif")); //$NON-NLS-1$
+
+    fFilterToolBar.add(clearTextAction);
+
+    fFilterToolBar.update(false);
+    fFilterToolBar.getControl().setVisible(false);
+  }
+
+  void setClearBarVisible(boolean visible) {
+    if (fFilterToolBar != null && ((GridData) fFilterToolBar.getControl().getLayoutData()).exclude == visible) {
+      ((GridData) fFilterToolBar.getControl().getLayoutData()).exclude = !visible;
+      fFilterToolBar.getControl().setVisible(visible);
+      fFilterToolBar.getControl().getParent().layout();
+    }
   }
 
   /* Layout */
