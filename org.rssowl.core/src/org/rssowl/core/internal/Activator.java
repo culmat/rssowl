@@ -147,18 +147,6 @@ public class Activator extends Plugin {
   }
 
   /**
-   * Log an Information Message.
-   *
-   * @param msg The message to log as INFO.
-   */
-  public void logInfo(String msg) {
-  // if (msg == null)
-  // msg = ""; //$NON-NLS-1$
-  // getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(),
-  // IStatus.OK, msg, null));
-  }
-
-  /**
    * Log an Error Message.
    *
    * @param msg The message to log as Error.
