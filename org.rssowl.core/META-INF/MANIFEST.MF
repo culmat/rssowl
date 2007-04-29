@@ -30,6 +30,5 @@ Export-Package: org.rssowl.core,
  org.rssowl.core.persist.event.runnable,
  org.rssowl.core.persist.pref,
  org.rssowl.core.persist.reference,
- org.rssowl.core.persist.search,
  org.rssowl.core.persist.service,
  org.rssowl.core.util
