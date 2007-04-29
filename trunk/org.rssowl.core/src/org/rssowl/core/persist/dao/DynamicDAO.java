@@ -47,28 +47,30 @@ public final class DynamicDAO {
     return DAO_SERVICE;
   }
 
-  public static <T extends IPersistable> T load(Class<T> persistableClass, long id) {
-    IPersistableDAO<T> dao = getDAOFromEntity(persistableClass);
+  public static <T extends IEntity> T load(Class<T> persistableClass, long id) {
+    IEntityDAO<T, ?, ?> dao = getDAOFromEntity(persistableClass);
     return dao.load(id);
   }
 
   public static <T extends IPersistable> Collection<T> loadAll(Class<T> persistableClass) {
-    IPersistableDAO<T> dao = getDAOFromEntity(persistableClass);
+    IPersistableDAO<T> dao = getDAOFromPersistable(persistableClass);
     return dao.loadAll();
   }
 
+  @SuppressWarnings("unchecked")
   public static <T extends IPersistable> T save(T persistable) {
-    IPersistableDAO<T> dao = (IPersistableDAO<T>) getDAOFromEntity(persistable.getClass());
+    IPersistableDAO<T> dao = (IPersistableDAO<T>) getDAOFromPersistable(persistable.getClass());
     return dao.save(persistable);
   }
 
+  @SuppressWarnings("unchecked")
   public static <T extends IPersistable> void saveAll(Collection<T> persistables) {
     if (persistables.size() == 0)
       return;
 
     Map<Class< ? extends IPersistable>, List<T>> persistablesMap = getPersistablesMap(persistables);
     for (Map.Entry<Class< ? extends IPersistable>, List<T>> entry : persistablesMap.entrySet()) {
-      IPersistableDAO<T> dao = (IPersistableDAO<T>) getDAOFromEntity(entry.getKey());
+      IPersistableDAO<T> dao = (IPersistableDAO<T>) getDAOFromPersistable(entry.getKey());
       dao.saveAll(entry.getValue());
     }
   }
@@ -88,7 +90,7 @@ public final class DynamicDAO {
   }
 
   public static <T extends IPersistable> void delete(T persistable) {
-    IPersistableDAO<T> dao = (IPersistableDAO<T>) getDAOFromEntity(persistable.getClass());
+    IPersistableDAO<T> dao = (IPersistableDAO<T>) getDAOFromPersistable(persistable.getClass());
     dao.delete(persistable);
   }
 
@@ -98,25 +100,24 @@ public final class DynamicDAO {
 
     Map<Class< ? extends IPersistable>, List<T>> persistablesMap = getPersistablesMap(persistables);
     for (Map.Entry<Class< ? extends IPersistable>, List<T>> entry : persistablesMap.entrySet()) {
-      IPersistableDAO<T> dao = (IPersistableDAO<T>) getDAOFromEntity(entry.getKey());
+      IPersistableDAO<T> dao = (IPersistableDAO<T>) getDAOFromPersistable(entry.getKey());
       dao.deleteAll(entry.getValue());
     }
   }
 
   public static <T extends IPersistable> void countAll(Class<T> persistableClass) {
-    IPersistableDAO<T> dao = getDAOFromEntity(persistableClass);
+    IPersistableDAO<T> dao = getDAOFromPersistable(persistableClass);
     dao.countAll();
   }
 
   public static <T extends IEntity, L extends EntityListener<E, T>, E extends ModelEvent> void addEntityListener(Class<T> entityClass, L listener) {
-
-    IEntityDAO<T, L, E> dao = (IEntityDAO<T, L, E>) getDAOFromEntity(entityClass);
+    IEntityDAO<T, L, E> dao = (IEntityDAO<T, L, E>) getDAOFromPersistable(entityClass);
     dao.addEntityListener(listener);
   }
 
   public static <T extends IEntity, L extends EntityListener<E, T>, E extends ModelEvent> void removeEntityListener(Class<T> entityClass, L listener) {
 
-    IEntityDAO<T, L, E> dao = (IEntityDAO<T, L, E>) getDAOFromEntity(entityClass);
+    IEntityDAO<T, L, E> dao = (IEntityDAO<T, L, E>) getDAOFromPersistable(entityClass);
     dao.removeEntityListener(listener);
   }
 
@@ -124,7 +125,11 @@ public final class DynamicDAO {
     return getDAOService().getDAO(daoInterface);
   }
 
-  public static <T extends IPersistable> IPersistableDAO<T> getDAOFromEntity(Class< ? extends T> persistableClass) {
-    return getDAOService().getDAOFromEntity(persistableClass);
+  public static <T extends IPersistable> IPersistableDAO<T> getDAOFromPersistable(Class< ? extends T> persistableClass) {
+    return getDAOService().getDAOFromPersistable(persistableClass);
+  }
+  
+  public static <T extends IEntity> IEntityDAO<T, ?, ?> getDAOFromEntity(Class< ? extends T> entityClass)  {
+    return getDAOService().getDAOFromPersistable(entityClass);
   }
 }
