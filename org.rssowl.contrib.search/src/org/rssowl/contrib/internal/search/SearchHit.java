@@ -7,7 +7,7 @@
 
 package org.rssowl.contrib.internal.search;
 
-import org.rssowl.core.persist.search.ISearchHit;
+import org.rssowl.core.util.ISearchHit;
 
 /**
  * TODO API is in Progress.
