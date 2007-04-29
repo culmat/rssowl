@@ -30,7 +30,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsGetter;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
-import org.rssowl.core.persist.search.ISearchHit;
+import org.rssowl.core.util.ISearchHit;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -40,7 +40,7 @@ import java.util.Map;
  *
  * @see NewsCounterItem
  */
-public class NewsCounter extends Persistable implements IPersistable {
+public class NewsCounter extends Persistable {
   private Map<String, NewsCounterItem> fCountersMap;
 
   /** Leave default constructor for reflection. */

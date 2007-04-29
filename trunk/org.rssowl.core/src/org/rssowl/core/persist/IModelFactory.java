@@ -25,7 +25,6 @@
 package org.rssowl.core.persist;
 
 import org.rssowl.core.persist.reference.FeedLinkReference;
-import org.rssowl.core.persist.search.SearchSpecifier;
 
 import java.net.URI;
 import java.util.Date;

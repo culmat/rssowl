@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.persist.search;
+package org.rssowl.core.persist;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
@@ -35,7 +35,7 @@ import org.eclipse.core.runtime.Platform;
  *
  * @author bpasero
  */
-public enum SearchSpecifier implements IAdaptable {
+public enum SearchSpecifier implements IPersistable {
 
   /** Target must match Value */
   IS,

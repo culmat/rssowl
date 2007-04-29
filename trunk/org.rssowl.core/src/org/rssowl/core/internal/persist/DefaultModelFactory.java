@@ -45,8 +45,8 @@ import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.ITextInput;
+import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.reference.FeedLinkReference;
-import org.rssowl.core.persist.search.SearchSpecifier;
 
 import java.net.URI;
 import java.util.Date;
