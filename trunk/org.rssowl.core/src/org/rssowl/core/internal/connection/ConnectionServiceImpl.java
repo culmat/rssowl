@@ -50,6 +50,7 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.FeedAdapter;
 import org.rssowl.core.persist.event.FeedEvent;
+import org.rssowl.core.persist.event.FeedListener;
 import org.rssowl.core.util.ExtensionUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
@@ -78,18 +79,20 @@ public class ConnectionServiceImpl implements IConnectionService {
   /* Extension Point: SSL Handler */
   private static final String SSL_HANDLER_EXTENSION_POINT = "org.rssowl.core.SSLHandler"; //$NON-NLS-1$
 
-  private Map<String, IProtocolHandler> fProtocolHandler;
-  private Map<String, ICredentialsProvider> fCredentialsProvider;
-  private SecureProtocolSocketFactory fSecureProtocolSocketFactory;
-  private FeedAdapter fFeedListener;
+  private final Map<String, IProtocolHandler> fProtocolHandler;
+  private final Map<String, ICredentialsProvider> fCredentialsProvider;
+  private final SecureProtocolSocketFactory fSecureProtocolSocketFactory;
+  private final FeedListener fFeedListener;
 
   /** */
   public ConnectionServiceImpl() {
     fProtocolHandler = new HashMap<String, IProtocolHandler>();
     fCredentialsProvider = new HashMap<String, ICredentialsProvider>();
-
+    
     /* Init */
+    fFeedListener = createFeedListener();
     startup();
+    fSecureProtocolSocketFactory = loadSSLHandler();
   }
 
   private void startup() {
@@ -97,7 +100,7 @@ public class ConnectionServiceImpl implements IConnectionService {
     /* Load Contributions */
     loadProtocolHandlers();
     loadCredentialsProvider();
-    fSecureProtocolSocketFactory = loadSSLHandler();
+
 
     /* Register URL Stream Handlers to OSGI */
     registerURLStreamHandlers();
@@ -105,9 +108,9 @@ public class ConnectionServiceImpl implements IConnectionService {
     /* Register Listeners */
     registerListeners();
   }
-
-  private void registerListeners() {
-    fFeedListener = new FeedAdapter() {
+  
+  private FeedListener createFeedListener() {
+    return new FeedAdapter() {
       @Override
       public void entitiesDeleted(Set<FeedEvent> events) {
         for (FeedEvent feedEvent : events) {
@@ -127,7 +130,9 @@ public class ConnectionServiceImpl implements IConnectionService {
         }
       }
     };
+  }
 
+  private void registerListeners() {
     /* We register listeners as part of initialisation, we must use InternalOwl */
     InternalOwl.getDefault().getPersistenceService().getDAOService().getFeedDAO().addEntityListener(fFeedListener);
   }

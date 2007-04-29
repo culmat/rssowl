@@ -87,11 +87,11 @@ public class InterpreterServiceImpl implements IInterpreterService {
   /* ID for ElementHandler Contributions */
   private static final String ELHANDLER_EXTENSION_POINT = "org.rssowl.core.ElementHandler"; //$NON-NLS-1$
 
-  private Map<String, IFormatInterpreter> fFormatInterpreters;
-  private Map<String, ITypeImporter> fTypeImporters;
-  private Map<String, INamespaceHandler> fNamespaceHandlers;
-  private Map<String, IElementHandler> fElementHandlers;
-  private IXMLParser fXMLParserImpl;
+  private volatile Map<String, IFormatInterpreter> fFormatInterpreters;
+  private volatile Map<String, ITypeImporter> fTypeImporters;
+  private volatile Map<String, INamespaceHandler> fNamespaceHandlers;
+  private volatile Map<String, IElementHandler> fElementHandlers;
+  private volatile IXMLParser fXMLParserImpl;
 
   /** */
   public InterpreterServiceImpl() {

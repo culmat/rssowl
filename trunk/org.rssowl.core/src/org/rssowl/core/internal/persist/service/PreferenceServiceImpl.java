@@ -46,11 +46,13 @@ public class PreferenceServiceImpl implements IPreferenceService {
   private static final String PREFERENCES_INITIALIZER_EXTENSION_POINT = "org.rssowl.core.PreferencesInitializer"; //$NON-NLS-1$
 
   /* Scoped Preferences */
-  private IPreferenceScope fDefaultScope;
-  private IPreferenceScope fGlobalScope;
+  private final IPreferenceScope fDefaultScope;
+  private final IPreferenceScope fGlobalScope;
 
   /** */
   public PreferenceServiceImpl() {
+    fDefaultScope = new DefaultScope();
+    fGlobalScope = new GlobalScope(fDefaultScope);
     initScopedPreferences();
   }
 
@@ -77,9 +79,6 @@ public class PreferenceServiceImpl implements IPreferenceService {
 
   /* Init scoped preferences */
   private void initScopedPreferences() {
-    fDefaultScope = new DefaultScope();
-    fGlobalScope = new GlobalScope(fDefaultScope);
-
     /* Pass Service through Initializers */
     IExtensionRegistry reg = Platform.getExtensionRegistry();
     IConfigurationElement elements[] = reg.getConfigurationElementsFor(PREFERENCES_INITIALIZER_EXTENSION_POINT);

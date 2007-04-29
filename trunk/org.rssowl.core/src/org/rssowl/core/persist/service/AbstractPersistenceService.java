@@ -54,9 +54,9 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
   /* ID for DAO Factory Contribution */
   private static final String MODEL_DAO_FACTORY_EXTENSION_POINT = "org.rssowl.core.DAOService";
 
-  private IModelSearch fModelSearch;
-  private IDGenerator fIDGenerator;
-  private DAOService fDAOService;
+  private volatile IModelSearch fModelSearch;
+  private volatile IDGenerator fIDGenerator;
+  private volatile DAOService fDAOService;
 
   /** */
   protected AbstractPersistenceService() {}
