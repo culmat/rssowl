@@ -629,7 +629,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Search */
     Button searchButton = createButton(buttonBar, BUTTON_SEARCH, "Search", true);
     ((GridData) searchButton.getLayoutData()).horizontalAlignment = SWT.END;
-    ((GridData) searchButton.getLayoutData()).grabExcessHorizontalSpace = true;
+    ((GridData) searchButton.getLayoutData()).grabExcessHorizontalSpace = false;
 
     /* Clear */
     createButton(buttonBar, BUTTON_CLEAR, "Clear", false);
