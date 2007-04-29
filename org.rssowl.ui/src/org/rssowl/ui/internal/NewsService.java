@@ -207,19 +207,26 @@ public class NewsService {
       private boolean fDialogOpened;
 
       public void run(IProgressMonitor monitor) {
-        monitor.beginTask("RSSOwl was not shutdown properly. Restoring data, please wait...", feeds.size());
-
+        int worked = 0;
         for (IFeed feed : feeds) {
           newsCounter.put(feed.getLink(), count(feed));
-          monitor.worked(1);
 
           /* Open the Dialog if exceeded SHOW_PROGRESS_THRESHOLD ms */
           if (System.currentTimeMillis() - start > SHOW_PROGRESS_THRESHOLD && !fDialogOpened) {
             dialog.open();
+            monitor.beginTask("RSSOwl was not shutdown properly. Restoring data, please wait...", feeds.size() - worked);
             fDialogOpened = true;
           }
+
+          /* Worked a bit again... */
+          if (fDialogOpened)
+            monitor.worked(1);
+
+          /* Remember the worked items */
+          worked++;
         }
 
+        /* Completed */
         monitor.done();
       }
     };
