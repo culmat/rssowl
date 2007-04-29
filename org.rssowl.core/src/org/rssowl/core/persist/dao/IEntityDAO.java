@@ -51,9 +51,11 @@ public interface IEntityDAO<T extends IEntity, L extends EntityListener<E, T>, E
    * @param id The id of the persistable to load from the persistence system.
    * @return the persistable with <code>id</code> or <code>null</code> in
    * case none exists.
+   * @throws PersistenceException In case of an error while loading the
+   * persistable.
    */
   T load(long id) throws PersistenceException;;
-  
+
   /**
    * Adds a listener to the collection of listeners who will be notified
    * whenever entities of type <code>T extends IEntity</code> get added,
