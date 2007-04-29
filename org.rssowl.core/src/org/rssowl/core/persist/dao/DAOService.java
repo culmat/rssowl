@@ -38,7 +38,7 @@ public abstract class DAOService {
 
   public abstract <T extends IPersistableDAO< ? >> T getDAO(Class<T> daoInterface);
 
-  public abstract <T extends IPersistableDAO< ? super P>, P extends IPersistable> T getDAOFromEntity(Class<P> persistableClass);
+  public abstract <T extends IPersistableDAO< ? super P>, P extends IPersistable> T getDAOFromPersistable(Class<P> persistableClass);
 
   public abstract IAttachmentDAO getAttachmentDAO();
 

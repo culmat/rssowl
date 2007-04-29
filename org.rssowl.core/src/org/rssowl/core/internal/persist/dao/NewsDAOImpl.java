@@ -142,14 +142,14 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
     Query query = fDb.query();
     query.constrain(fEntityClass);
     query.descend("fGuidValue").constrain(newsItem.getGuid().getValue()); //$NON-NLS-1$
-    return activateAll(getObjectSet(query));
+    return activateAll(getList(query));
   }
 
   private List<INews> getNewsFromLink(INews newsItem) {
     Query query = fDb.query();
     query.constrain(fEntityClass);
     query.descend("fLinkText").constrain(newsItem.getLink().toString()); //$NON-NLS-1$
-    return activateAll(getObjectSet(query));
+    return activateAll(getList(query));
   }
 
   private Set<INews> setState(Collection<INews> news, State state, boolean force) {

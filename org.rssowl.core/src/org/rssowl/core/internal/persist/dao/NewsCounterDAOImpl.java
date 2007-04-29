@@ -65,11 +65,6 @@ public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter
   }
 
   @Override
-  public final NewsCounter load(long id) {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override
   public final void saveAll(Collection<NewsCounter> entities) {
     if (entities.size() > 1) {
       throw new IllegalArgumentException("Only a single newsCounter can be stored");

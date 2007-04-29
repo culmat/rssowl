@@ -31,7 +31,11 @@ import org.rssowl.core.persist.dao.IEntityDAO;
 import org.rssowl.core.persist.event.EntityListener;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.runnable.EventType;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.LoggingSafeRunnable;
+
+import com.db4o.ext.Db4oException;
+import com.db4o.query.Query;
 
 import java.util.List;
 import java.util.Set;
@@ -63,6 +67,28 @@ public abstract class AbstractEntityDAO<T extends IEntity,
   protected abstract E createSaveEventTemplate(T entity);
 
   protected abstract E createDeleteEventTemplate(T entity);
+  
+  /*
+   * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#load(long)
+   */
+  public T load(long id) {
+    try {
+      Query query = fDb.query();
+      query.constrain(fEntityClass);
+      query.descend("fId").constrain(Long.valueOf(id)); //$NON-NLS-1$
+  
+      List<T> set = getList(query);
+      for (T entity : set) {
+        // TODO Activate completely by default for now. Must decide how to deal
+        // with this.
+        fDb.activate(entity, Integer.MAX_VALUE);
+        return entity;
+      }
+    } catch (Db4oException e) {
+      throw new PersistenceException(e);
+    }
+    return null;
+  }
   
   @Override
   protected void preSave(T entity) {

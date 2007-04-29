@@ -189,7 +189,7 @@ public final class DAOServiceImpl extends DAOService  {
   
   @SuppressWarnings("unchecked")
   @Override
-  public final <T extends IPersistableDAO<? super P>, P extends IPersistable> T getDAOFromEntity(Class<P> persistableClass) {
+  public final <T extends IPersistableDAO<? super P>, P extends IPersistable> T getDAOFromPersistable(Class<P> persistableClass) {
     if (persistableClass.isInterface()) {
       Object value = fEntityInterfacesToDaosMap.get(persistableClass);
       return (T) value;

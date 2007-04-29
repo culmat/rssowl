@@ -26,7 +26,8 @@ package org.rssowl.core.internal.persist.service;
 import org.rssowl.core.persist.service.IDGenerator;
 
 import com.db4o.ObjectContainer;
-import com.db4o.ObjectSet;
+
+import java.util.List;
 
 /**
  * db4o implementation of IDGenerator.
@@ -116,9 +117,9 @@ public class DB4OIDGenerator implements IDGenerator {
   }
   
   private Counter loadCounter() {
-    ObjectSet<Counter> counterSet = fDb.ext().query(Counter.class);
-    if (counterSet.hasNext())
-      return counterSet.next();
+    List<Counter> counters = fDb.ext().query(Counter.class);
+    if (!counters.isEmpty())
+      return counters.iterator().next();
       
     return null;
   }

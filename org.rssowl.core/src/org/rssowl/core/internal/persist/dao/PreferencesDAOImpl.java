@@ -32,8 +32,9 @@ import org.rssowl.core.persist.event.PreferenceListener;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.persist.service.UniqueConstraintException;
 
-import com.db4o.ObjectSet;
 import com.db4o.query.Query;
+
+import java.util.List;
 
 /**
  * Default implementation of {@link IPreferenceDAO}.
@@ -83,10 +84,10 @@ public class PreferencesDAOImpl extends AbstractEntityDAO<IPreference, Preferenc
     Query query = fDb.query();
     query.constrain(fEntityClass);
     query.descend("fKey").constrain(key);
-    ObjectSet<IPreference> prefs = getObjectSet(query);
+    List<IPreference> prefs = getList(query);
     activateAll(prefs);
-    if (prefs.hasNext()) {
-      return prefs.next();
+    if (!prefs.isEmpty()) {
+      return prefs.iterator().next();
     }
     return null;
   }

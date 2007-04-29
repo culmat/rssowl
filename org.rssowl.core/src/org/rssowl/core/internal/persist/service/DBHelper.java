@@ -36,7 +36,6 @@ import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.persist.service.UniqueConstraintException;
 
 import com.db4o.ObjectContainer;
-import com.db4o.ObjectSet;
 import com.db4o.ext.Db4oException;
 import com.db4o.query.Query;
 
@@ -108,23 +107,23 @@ public class DBHelper {
   }
 
   static final boolean feedExists(ObjectContainer db, URI link) {
-    return getFeedSet(db, link).hasNext();
+    return !getFeeds(db, link).isEmpty();
   }
 
   @SuppressWarnings("unchecked")
-  private static ObjectSet<Feed> getFeedSet(ObjectContainer db, URI link){
+  private static List<Feed> getFeeds(ObjectContainer db, URI link){
     Query query = db.query();
     query.constrain(Feed.class);
     query.descend("fLinkText").constrain(link.toString()); //$NON-NLS-1$
-    ObjectSet<Feed> set = query.execute();
+    List<Feed> set = query.execute();
     return set;
   }
 
   public static final Feed loadFeed(ObjectContainer db, URI link, Integer activationDepth) {
     try {
-      ObjectSet<Feed> set = getFeedSet(db, link);
-      if (set.hasNext()) {
-        Feed feed = set.next();
+      List<Feed> feeds = getFeeds(db, link);
+      if (!feeds.isEmpty()) {
+        Feed feed = feeds.iterator().next();
         if (activationDepth != null)
           db.ext().activate(feed, activationDepth.intValue());
 

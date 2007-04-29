@@ -28,6 +28,7 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.event.EntityListener;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.runnable.EventType;
+import org.rssowl.core.persist.service.PersistenceException;
 
 import java.util.Set;
 
@@ -42,6 +43,17 @@ import java.util.Set;
  */
 public interface IEntityDAO<T extends IEntity, L extends EntityListener<E, T>, E extends ModelEvent> extends IPersistableDAO<T> {
 
+  /**
+   * Loads the persistable with <code>id</code> from the persistence system
+   * and returns it. If no persistable with the provided id exists,
+   * <code>null</code> is returned.
+   *
+   * @param id The id of the persistable to load from the persistence system.
+   * @return the persistable with <code>id</code> or <code>null</code> in
+   * case none exists.
+   */
+  T load(long id) throws PersistenceException;;
+  
   /**
    * Adds a listener to the collection of listeners who will be notified
    * whenever entities of type <code>T extends IEntity</code> get added,

@@ -61,7 +61,6 @@ import org.rssowl.core.persist.search.ISearchHit;
 import org.rssowl.core.persist.service.IDGenerator;
 
 import com.db4o.ObjectContainer;
-import com.db4o.ObjectSet;
 import com.db4o.events.Event4;
 import com.db4o.events.EventArgs;
 import com.db4o.events.EventListener4;
@@ -287,11 +286,11 @@ public class EventManager {
     Query query = fDb.query();
     query.constrain(ISearchMark.class);
     query.descend("fSearchConditions").constrain(searchCondition);
-    ObjectSet<ISearchMark> set = query.execute();
-    if (set.size() != 1)
+    List<ISearchMark> marks = query.execute();
+    if (marks.size() != 1)
       throw new IllegalStateException("searchCondition has less than or more than 1 parent ISearchMark");
 
-    return set.get(0);
+    return marks.get(0);
   }
 
   private void cascadeNewsDeletion(INews news) {
@@ -426,7 +425,7 @@ public class EventManager {
     query.constrain(Feed.class);
     query.descend("fLinkText").constrain(mark.getFeedLinkReference().getLink().toString()); //$NON-NLS-1$
     @SuppressWarnings("unchecked")
-    ObjectSet<IFeed> feeds = query.execute();
+    List<IFeed> feeds = query.execute();
     for (IFeed feed : feeds) {
       if(onlyBookMarkReference(feed)) {
         fDb.delete(feed);
@@ -441,7 +440,7 @@ public class EventManager {
     query.descend("fFeedLink").constrain(feed.getLink().toString()); //$NON-NLS-1$
 
     @SuppressWarnings("unchecked")
-    ObjectSet<IBookMark> marks = query.execute();
+    List<IBookMark> marks = query.execute();
 
     if (marks.size() == 1) {
       return true;

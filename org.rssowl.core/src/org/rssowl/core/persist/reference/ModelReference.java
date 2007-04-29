@@ -26,7 +26,7 @@ package org.rssowl.core.persist.reference;
 
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.IPersistableDAO;
+import org.rssowl.core.persist.dao.IEntityDAO;
 import org.rssowl.core.persist.service.PersistenceException;
 
 /**
@@ -38,7 +38,7 @@ import org.rssowl.core.persist.service.PersistenceException;
  */
 public abstract class ModelReference {
   private final long fId;
-  private final IPersistableDAO<IEntity> fDAO;
+  private final IEntityDAO<?, ?, ?> fDAO;
   
   /**
    * Instantiates a new leightweight reference. Any resolve()-call will be
