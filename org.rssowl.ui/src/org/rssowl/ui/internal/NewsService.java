@@ -41,8 +41,8 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsCounterDAO;
 import org.rssowl.core.persist.event.FeedAdapter;
 import org.rssowl.core.persist.event.FeedEvent;
-import org.rssowl.core.persist.event.NewsAdapter;
 import org.rssowl.core.persist.event.NewsEvent;
+import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 
 import java.lang.reflect.InvocationTargetException;
@@ -272,18 +272,15 @@ public class NewsService {
   }
 
   private void registerListeners() {
-    DynamicDAO.addEntityListener(INews.class, new NewsAdapter() {
-      @Override
+    DynamicDAO.addEntityListener(INews.class, new NewsListener() {
       public void entitiesAdded(Set<NewsEvent> events) {
         onNewsAdded(events);
       }
 
-      @Override
       public void entitiesUpdated(Set<NewsEvent> events) {
         onNewsUpdated(events);
       }
 
-      @Override
       public void entitiesDeleted(Set<NewsEvent> events) {
         onNewsDeleted(events);
       }
