@@ -39,7 +39,7 @@ import java.util.List;
  * 
  * @author bpasero
  */
-public interface IFolder extends IEntity, Reparentable<IFolder> {
+public interface IFolder extends IFolderChild, Reparentable<IFolder> {
 
   /** One of the fields in this type described as constant */
   public static final int NAME = 0;
@@ -52,6 +52,22 @@ public interface IFolder extends IEntity, Reparentable<IFolder> {
 
   /** One of the fields in this type described as constant */
   public static final int FOLDERS = 3;
+
+  /**
+   * Get a list of the children contained in this folder. Typically, these
+   * children will be of type IMark or IFolder.
+   * 
+   * @return a list of children contained in this folder.
+   * <p>
+   * Note: The returned List should not be modified. The default implementation
+   * returns an unmodifiable List using
+   * <code>Collections.unmodifiableList()</code>. Trying to modify the List
+   * will result in <code>UnsupportedOperationException</code>.
+   * </p>
+   * @see #getMarks()
+   * @see #getFolders()
+   */
+  List<IFolderChild> getChildren();
 
   /**
    * Adds an instance of <code>IMark</code> as Child to this Folder.
