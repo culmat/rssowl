@@ -34,8 +34,6 @@ import org.rssowl.core.internal.persist.Folder;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.Preference;
 import org.rssowl.core.internal.persist.SearchMark;
-import org.rssowl.core.internal.persist.migration.ConfigurationFactory;
-import org.rssowl.core.internal.persist.migration.Migration20M5M6;
 import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
