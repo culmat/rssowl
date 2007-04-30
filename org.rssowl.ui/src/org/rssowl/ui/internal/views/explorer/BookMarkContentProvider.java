@@ -33,6 +33,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
@@ -93,9 +94,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
 
       /* No Grouping */
       if (!fBookmarkGrouping.isActive()) {
-        Collection<IEntity> elements = new ArrayList<IEntity>();
-        elements.addAll(rootFolder.getFolders());
-        elements.addAll(rootFolder.getMarks());
+        Collection<IFolderChild> elements = rootFolder.getChildren();
 
         /* Return Children */
         return elements.toArray();
@@ -119,9 +118,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
     /* Return Children of Folder */
     if (parentElement instanceof IFolder) {
       IFolder parent = (IFolder) parentElement;
-      Collection<IEntity> children = new ArrayList<IEntity>();
-      children.addAll(parent.getFolders());
-      children.addAll(parent.getMarks());
+      Collection<IFolderChild> children = parent.getChildren();
 
       return children.toArray();
     }
@@ -173,7 +170,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
   public boolean hasChildren(Object element) {
     if (element instanceof IFolder) {
       IFolder folder = (IFolder) element;
-      return folder.getMarks().size() > 0 || folder.getFolders().size() > 0;
+      return folder.getChildren().size() > 0;
     }
 
     else if (element instanceof EntityGroup)

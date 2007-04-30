@@ -195,7 +195,7 @@ public class ModelTreeNode implements ITreeNode {
 
     /* Ask Folder */
     if (fFolder != null)
-      return fFolder.getFolders().size() > 0 || fFolder.getMarks().size() > 0;
+      return fFolder.getChildren().size() > 0;
 
     /* Marks dont have Children */
     return false;
