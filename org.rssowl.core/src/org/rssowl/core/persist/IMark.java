@@ -35,7 +35,7 @@ import java.util.Date;
  *
  * @author bpasero
  */
-public interface IMark extends IEntity {
+public interface IMark extends IFolderChild {
 
   /** One of the fields in this type described as constant */
   public static final int NAME = 0;

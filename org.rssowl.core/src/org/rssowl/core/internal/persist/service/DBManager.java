@@ -43,6 +43,8 @@ import com.db4o.config.Configuration;
 import com.db4o.config.ObjectClass;
 import com.db4o.config.ObjectField;
 import com.db4o.config.QueryEvaluationMode;
+import com.db4o.defragment.Defragment;
+import com.db4o.defragment.DefragmentConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -141,6 +143,17 @@ public class DBManager {
     fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
 //    copyDatabase();
   }
+  
+  @SuppressWarnings("unused")
+  private void defragment(Configuration config) throws DBException {
+    DefragmentConfig defragConfig = new DefragmentConfig(getDBFilePath());
+    defragConfig.db4oConfig(config);
+    try {
+      Defragment.defrag(defragConfig);
+    } catch (IOException e) {
+      throw new DBException(Activator.getDefault().createErrorStatus("Error creating database", e));
+    }
+  }
 
   /**
    * Creates a copy of the database that has all essential data structures.
@@ -227,8 +240,7 @@ public class DBManager {
 
   private void configureFolder(Configuration config) {
     ObjectClass oc = config.objectClass(Folder.class);
-    oc.objectField("fFolders").cascadeOnUpdate(true); //$NON-NLS-1$
-    oc.objectField("fMarks").cascadeOnUpdate(true); //$NON-NLS-1$
+    oc.objectField("fChildren").cascadeOnUpdate(true); //$NON-NLS-1$
   }
 
   private void configureNews(Configuration config) {
