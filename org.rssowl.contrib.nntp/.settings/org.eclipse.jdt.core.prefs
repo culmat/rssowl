@@ -1,4 +1,4 @@
-#Sat Mar 24 18:53:06 CET 2007
+#Mon Apr 30 22:19:50 CEST 2007
 eclipse.preferences.version=1
 org.eclipse.jdt.core.builder.cleanOutputFolder=clean
 org.eclipse.jdt.core.builder.duplicateResourceTask=warning
@@ -233,7 +233,7 @@ org.eclipse.jdt.core.formatter.insert_space_after_opening_paren_in_while=do not 
 org.eclipse.jdt.core.formatter.insert_space_after_postfix_operator=do not insert
 org.eclipse.jdt.core.formatter.insert_space_after_prefix_operator=do not insert
 org.eclipse.jdt.core.formatter.insert_space_after_question_in_conditional=insert
-org.eclipse.jdt.core.formatter.insert_space_after_question_in_wildcard=insert
+org.eclipse.jdt.core.formatter.insert_space_after_question_in_wildcard=do not insert
 org.eclipse.jdt.core.formatter.insert_space_after_semicolon_in_for=insert
 org.eclipse.jdt.core.formatter.insert_space_after_unary_operator=do not insert
 org.eclipse.jdt.core.formatter.insert_space_before_and_in_type_parameter=insert
@@ -319,7 +319,7 @@ org.eclipse.jdt.core.formatter.insert_space_before_parenthesized_expression_in_t
 org.eclipse.jdt.core.formatter.insert_space_before_postfix_operator=do not insert
 org.eclipse.jdt.core.formatter.insert_space_before_prefix_operator=do not insert
 org.eclipse.jdt.core.formatter.insert_space_before_question_in_conditional=insert
-org.eclipse.jdt.core.formatter.insert_space_before_question_in_wildcard=insert
+org.eclipse.jdt.core.formatter.insert_space_before_question_in_wildcard=do not insert
 org.eclipse.jdt.core.formatter.insert_space_before_semicolon=do not insert
 org.eclipse.jdt.core.formatter.insert_space_before_semicolon_in_for=do not insert
 org.eclipse.jdt.core.formatter.insert_space_before_unary_operator=do not insert
@@ -336,11 +336,14 @@ org.eclipse.jdt.core.formatter.keep_empty_array_initializer_on_one_line=true
 org.eclipse.jdt.core.formatter.keep_imple_if_on_one_line=false
 org.eclipse.jdt.core.formatter.keep_then_statement_on_same_line=false
 org.eclipse.jdt.core.formatter.lineSplit=800
+org.eclipse.jdt.core.formatter.never_indent_block_comments_on_first_column=true
+org.eclipse.jdt.core.formatter.never_indent_line_comments_on_first_column=true
 org.eclipse.jdt.core.formatter.number_of_blank_lines_at_beginning_of_method_body=0
 org.eclipse.jdt.core.formatter.number_of_empty_lines_to_preserve=1
 org.eclipse.jdt.core.formatter.put_empty_statement_on_new_line=false
 org.eclipse.jdt.core.formatter.tabulation.char=space
 org.eclipse.jdt.core.formatter.tabulation.size=2
 org.eclipse.jdt.core.formatter.use_tabs_only_for_leading_indentations=false
+org.eclipse.jdt.core.formatter.wrap_before_binary_operator=false
 org.eclipse.jdt.core.incompatibleJDKLevel=ignore
 org.eclipse.jdt.core.incompleteClasspath=error
