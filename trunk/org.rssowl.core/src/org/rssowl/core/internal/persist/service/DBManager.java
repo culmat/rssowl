@@ -34,6 +34,8 @@ import org.rssowl.core.internal.persist.Folder;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.Preference;
 import org.rssowl.core.internal.persist.SearchMark;
+import org.rssowl.core.internal.persist.migration.ConfigurationFactory;
+import org.rssowl.core.internal.persist.migration.Migration20M5M6;
 import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
@@ -95,12 +97,8 @@ public class DBManager {
     }
   }
 
-  private ObjectContainer createObjectContainer(boolean dbExists) {
-    //TODO We can use dbExists to configure our parameters for a more
-    //efficient startup. For example, the following could be used. We'd have
-    //to include a file when we need to evolve the schema or something similar
-    //Db4o.configure().detectSchemaChanges(false)
-    fObjectContainer = Db4o.openFile(getDBFilePath());
+  private ObjectContainer createObjectContainer(Configuration config) {
+    fObjectContainer = Db4o.openFile(config, getDBFilePath());
     fObjectContainer.ext().configure().queries().evaluationMode(QueryEvaluationMode.IMMEDIATE);
     return fObjectContainer;
   }
@@ -121,7 +119,14 @@ public class DBManager {
   }
 
   public void createDatabase() throws DBException {
-    configure();
+//    ConfigurationFactory configFactory = new ConfigurationFactory() {
+//      public Configuration createConfiguration() {
+//        return DBManager.this.createConfiguration();
+//      }
+//    };
+//    new Migration20M5M6(configFactory, getDBFilePath());
+    
+    Configuration config = createConfiguration();
     File dbExistsFile = getDBExistsFile();
     boolean dbExists = dbExistsFile.exists();
     if (!dbExists) {
@@ -133,7 +138,7 @@ public class DBManager {
       }
     }
 
-    fObjectContainer = createObjectContainer(dbExists);
+    fObjectContainer = createObjectContainer(config);
 
     fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
 //    copyDatabase();
@@ -174,49 +179,62 @@ public class DBManager {
       db.commit();
   }
 
-  private void configure() {
-    Configuration globalConfig = Db4o.configure();
-    globalConfig.callbacks(false);
-//    globalConfig.blockSize(8);
-//    globalConfig.bTreeCacheHeight(0);
-//    globalConfig.bTreeNodeSize(100);
-//    globalConfig.diagnostic().addListener(new DiagnosticListener() {
+  private Configuration createConfiguration() {
+    Configuration config = Db4o.newConfiguration();
+    //TODO We can use dbExists to configure our parameters for a more
+    //efficient startup. For example, the following could be used. We'd have
+    //to include a file when we need to evolve the schema or something similar
+    //config.detectSchemaChanges(false)
+    
+//    config.blockSize(8);
+//    config.bTreeCacheHeight(0);
+//    config.bTreeNodeSize(100);
+//    config.diagnostic().addListener(new DiagnosticListener() {
 //      public void onDiagnostic(Diagnostic d) {
 //        System.out.println(d);
 //      }
 //    });
-//    globalConfig.messageLevel(3);
-    globalConfig.activationDepth(2);
-    globalConfig.flushFileBuffers(false);
-    globalConfig.callConstructors(true);
-    globalConfig.exceptionsOnNotStorable(true);
-    globalConfig.objectClass(AbstractEntity.class).objectField("fId").indexed(true); //$NON-NLS-1$
-    globalConfig.objectClass(AbstractEntity.class).objectField("fId").cascadeOnActivate(true); //$NON-NLS-1$
-    globalConfig.objectClass(AbstractEntity.class).objectField("fProperties").cascadeOnUpdate(true); //$NON-NLS-1$
-    globalConfig.objectClass(BookMark.class).objectField("fFeedLink").indexed(true); //$NON-NLS-1$
-    globalConfig.objectClass(ConditionalGet.class).objectField("fLink").indexed(true); //$NON-NLS-1$
-    configureFeed();
-    configureNews();
-    configureSearchMark();
-    configureFolder();
-    globalConfig.objectClass(NewsCounter.class).cascadeOnDelete(true);
-    globalConfig.objectClass(Preference.class).cascadeOnDelete(true);
-    globalConfig.objectClass(Preference.class).objectField("fKey").indexed(true); //$NON-NLS-1$
+//    config.messageLevel(3);
+
+	config.callbacks(false);
+    config.activationDepth(2);
+    config.flushFileBuffers(false);
+    config.callConstructors(true);
+    config.exceptionsOnNotStorable(true);
+    configureAbstractEntity(config);
+    config.objectClass(BookMark.class).objectField("fFeedLink").indexed(true); //$NON-NLS-1$
+    config.objectClass(ConditionalGet.class).objectField("fLink").indexed(true); //$NON-NLS-1$
+    configureFeed(config);
+    configureNews(config);
+    configureSearchMark(config);
+    configureFolder(config);
+    config.objectClass(NewsCounter.class).cascadeOnDelete(true);
+    config.objectClass(Preference.class).cascadeOnDelete(true);
+    config.objectClass(Preference.class).objectField("fKey").indexed(true); //$NON-NLS-1$
+    return config;
   }
 
-  private void configureSearchMark() {
-    ObjectClass oc = Db4o.configure().objectClass(SearchMark.class);
+  private void configureAbstractEntity(Configuration config) {
+    ObjectClass abstractEntityClass = config.objectClass(AbstractEntity.class);
+    ObjectField idField = abstractEntityClass.objectField("fId");
+    idField.indexed(true); //$NON-NLS-1$
+    idField.cascadeOnActivate(true); //$NON-NLS-1$
+    abstractEntityClass.objectField("fProperties").cascadeOnUpdate(true); //$NON-NLS-1$
+  }
+
+  private void configureSearchMark(Configuration config) {
+    ObjectClass oc = config.objectClass(SearchMark.class);
     oc.objectField("fSearchConditions").cascadeOnUpdate(true); //$NON-NLS-1$
   }
 
-  private void configureFolder() {
-    ObjectClass oc = Db4o.configure().objectClass(Folder.class);
+  private void configureFolder(Configuration config) {
+    ObjectClass oc = config.objectClass(Folder.class);
     oc.objectField("fFolders").cascadeOnUpdate(true); //$NON-NLS-1$
     oc.objectField("fMarks").cascadeOnUpdate(true); //$NON-NLS-1$
   }
 
-  private void configureNews() {
-    ObjectClass oc = Db4o.configure().objectClass(News.class);
+  private void configureNews(Configuration config) {
+    ObjectClass oc = config.objectClass(News.class);
 
     oc.objectField("fTitle").cascadeOnActivate(true); //$NON-NLS-1$
 
@@ -225,8 +243,8 @@ public class DBManager {
     oc.objectField("fGuidValue").indexed(true); //$NON-NLS-1$
   }
 
-  private void configureFeed() {
-    ObjectClass oc = Db4o.configure().objectClass(Feed.class);
+  private void configureFeed(Configuration config)  {
+    ObjectClass oc = config.objectClass(Feed.class);
 
     ObjectField linkText = oc.objectField("fLinkText"); //$NON-NLS-1$
     linkText.indexed(true);
