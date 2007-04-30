@@ -24,7 +24,6 @@
 
 package org.rssowl.core.persist;
 
-import org.rssowl.core.internal.persist.SearchField;
 
 /**
  * <p>
@@ -109,7 +108,7 @@ public interface ISearchCondition extends IEntity   {
   /**
    * @param field Sets the field this search condition is affecting.
    */
-  void setField(SearchField field);
+  void setField(ISearchField field);
 
   /**
    * @param specifier Sets the specifier describing how the search condition is

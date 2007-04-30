@@ -144,7 +144,7 @@ public class SearchCondition extends AbstractEntity implements ISearchCondition 
   /*
    * @see org.rssowl.core.model.search.ISearchCondition#setField(org.rssowl.core.model.internal.search.SearchField)
    */
-  public void setField(SearchField field) {
+  public void setField(ISearchField field) {
     fField = field;
   }
 
