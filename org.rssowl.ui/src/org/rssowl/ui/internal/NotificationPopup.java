@@ -310,6 +310,14 @@ public class NotificationPopup extends PopupDialog {
     if (page != null) {
       Shell shell = page.getWorkbenchWindow().getShell();
 
+      /* Restore from Tray or Minimization if required */
+      if (ApplicationWorkbenchAdvisor.fPrimaryApplicationWorkbenchWindowAdvisor.isMinimizedToTray())
+        ApplicationWorkbenchAdvisor.fPrimaryApplicationWorkbenchWindowAdvisor.restoreFromTray(shell);
+      else if (shell.getMinimized()) {
+        shell.setMinimized(false);
+        shell.forceActive();
+      }
+
       /* First try if the Bookmark is already visible */
       IEditorReference editorRef = EditorUtils.findEditor(page.getEditorReferences(), bookmark);
       if (editorRef != null) {
@@ -329,14 +337,6 @@ public class NotificationPopup extends PopupDialog {
         } catch (PartInitException ex) {
           Activator.getDefault().getLog().log(ex.getStatus());
         }
-      }
-
-      /* Restore from Tray or Minimization if required */
-      if (ApplicationWorkbenchAdvisor.fPrimaryApplicationWorkbenchWindowAdvisor.isMinimizedToTray())
-        ApplicationWorkbenchAdvisor.fPrimaryApplicationWorkbenchWindowAdvisor.restoreFromTray(shell);
-      else if (shell.getMinimized()) {
-        shell.setMinimized(false);
-        shell.forceActive();
       }
     }
 
