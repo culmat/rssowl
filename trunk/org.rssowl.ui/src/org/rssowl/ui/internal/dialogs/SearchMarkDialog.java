@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Text;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
@@ -83,6 +84,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
   private IDialogSettings fDialogSettings;
   private boolean fFirstTimeOpen;
   private IFolder fParent;
+  private IMark fPosition;
   private List<ISearchCondition> fInitialSearchConditions;
   private boolean fInitialMatchAllConditions;
   private FolderChooser fFolderChooser;
@@ -90,20 +92,23 @@ public class SearchMarkDialog extends TitleAreaDialog {
   /**
    * @param shell
    * @param parent
+   * @param position
    */
-  public SearchMarkDialog(Shell shell, IFolder parent) {
-    this(shell, parent, null, false);
+  public SearchMarkDialog(Shell shell, IFolder parent, IMark position) {
+    this(shell, parent, position, null, false);
   }
 
   /**
    * @param shell
    * @param parent
+   * @param position
    * @param conditions
    * @param matchAllConditions
    */
-  public SearchMarkDialog(Shell shell, IFolder parent, List<ISearchCondition> conditions, boolean matchAllConditions) {
+  public SearchMarkDialog(Shell shell, IFolder parent, IMark position, List<ISearchCondition> conditions, boolean matchAllConditions) {
     super(shell);
     fParent = parent;
+    fPosition = position;
     fInitialMatchAllConditions = matchAllConditions;
     fInitialSearchConditions = conditions;
     fResources = new LocalResourceManager(JFaceResources.getResources());
@@ -131,7 +136,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
     fParent = fFolderChooser.getFolder();
 
     /* Create new Searchmark */
-    ISearchMark searchMark = Owl.getModelFactory().createSearchMark(null, fParent, fNameInput.getText());
+    ISearchMark searchMark = Owl.getModelFactory().createSearchMark(null, fParent, fNameInput.getText(), fPosition, fPosition != null ? true : null);
     searchMark.setMatchAllConditions(fMatchAllRadio.getSelection());
 
     /* Create Conditions and save in DB */

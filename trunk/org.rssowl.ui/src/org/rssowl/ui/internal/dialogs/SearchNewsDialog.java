@@ -752,7 +752,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private void onSave() {
     List<ISearchCondition> conditions = fSearchConditionList.createConditions();
 
-    SearchMarkDialog dialog = new SearchMarkDialog((Shell) getShell().getParent(), null, conditions, fMatchAllRadio.getSelection());
+    SearchMarkDialog dialog = new SearchMarkDialog((Shell) getShell().getParent(), null, null, conditions, fMatchAllRadio.getSelection());
     dialog.open();
   }
 

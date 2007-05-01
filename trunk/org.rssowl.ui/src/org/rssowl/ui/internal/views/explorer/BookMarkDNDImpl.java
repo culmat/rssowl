@@ -375,10 +375,13 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
             else
               parent = null;
 
+            /* Determine Position */
+            final IMark position = (IMark) ((dropTarget instanceof IMark) ? dropTarget : null);
+
             /* Open Dialog to add new BookMark (asyncly!) */
             JobRunner.runInUIThread(getViewer().getControl(), new Runnable() {
               public void run() {
-                new NewBookMarkAction(getViewer().getControl().getShell(), parent, urls.get(0)).run(null);
+                new NewBookMarkAction(getViewer().getControl().getShell(), parent, position, urls.get(0)).run(null);
               }
             });
           }

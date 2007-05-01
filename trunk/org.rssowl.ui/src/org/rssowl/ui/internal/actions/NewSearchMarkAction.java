@@ -50,19 +50,22 @@ import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 public class NewSearchMarkAction implements IWorkbenchWindowActionDelegate, IObjectActionDelegate {
   private Shell fShell;
   private IFolder fParent;
+  private IMark fPosition;
 
   /** Keep for Reflection */
   public NewSearchMarkAction() {
-    this(null, null);
+    this(null, null, null);
   }
 
   /**
    * @param shell
    * @param parent
+   * @param position
    */
-  public NewSearchMarkAction(Shell shell, IFolder parent) {
+  public NewSearchMarkAction(Shell shell, IFolder parent, IMark position) {
     fShell = shell;
     fParent = parent;
+    fPosition = position;
   }
 
   /*
@@ -85,7 +88,7 @@ public class NewSearchMarkAction implements IWorkbenchWindowActionDelegate, IObj
   }
 
   private void internalRun() throws PersistenceException {
-    SearchMarkDialog dialog = new SearchMarkDialog(fShell, getParent());
+    SearchMarkDialog dialog = new SearchMarkDialog(fShell, getParent(), fPosition);
     dialog.open();
   }
 
@@ -97,6 +100,7 @@ public class NewSearchMarkAction implements IWorkbenchWindowActionDelegate, IObj
 
     /* Delete the old Selection */
     fParent = null;
+    fPosition = null;
 
     /* Check Selection */
     if (selection instanceof IStructuredSelection) {
@@ -105,8 +109,10 @@ public class NewSearchMarkAction implements IWorkbenchWindowActionDelegate, IObj
         Object firstElement = structSel.getFirstElement();
         if (firstElement instanceof IFolder)
           fParent = (IFolder) firstElement;
-        else if (firstElement instanceof IMark)
+        else if (firstElement instanceof IMark) {
           fParent = ((IMark) firstElement).getFolder();
+          fPosition = ((IMark) firstElement);
+        }
       }
     }
   }

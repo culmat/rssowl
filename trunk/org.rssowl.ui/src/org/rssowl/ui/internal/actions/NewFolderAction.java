@@ -71,6 +71,7 @@ import java.util.Map;
 public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectActionDelegate {
   private Shell fShell;
   private IFolder fParent;
+  private IMark fPosition;
   private boolean fRootMode;
 
   private class NewFolderDialog extends TitleAreaDialog {
@@ -174,16 +175,18 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
 
   /** Keep for Reflection */
   public NewFolderAction() {
-    this(null, null);
+    this(null, null, null);
   }
 
   /**
    * @param shell
    * @param parent
+   * @param position
    */
-  public NewFolderAction(Shell shell, IFolder parent) {
+  public NewFolderAction(Shell shell, IFolder parent, IMark position) {
     fShell = shell;
     fParent = parent;
+    fPosition = position;
   }
 
   /**
@@ -226,7 +229,7 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
 
       /* Create the Folder */
       if (fRootMode || parent != null) {
-        IFolder folder = Owl.getModelFactory().createFolder(null, parent, name);
+        IFolder folder = Owl.getModelFactory().createFolder(null, parent, name, fPosition, fPosition != null ? true : null);
 
         /* Copy all Properties from Parent into this Mark */
         if (parent != null) {
@@ -248,6 +251,7 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
 
     /* Delete the old Selection */
     fParent = null;
+    fPosition = null;
 
     /* Check Selection */
     if (selection instanceof IStructuredSelection) {
@@ -256,8 +260,10 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
         Object firstElement = structSel.getFirstElement();
         if (firstElement instanceof IFolder)
           fParent = (IFolder) firstElement;
-        else if (firstElement instanceof IMark)
+        else if (firstElement instanceof IMark) {
           fParent = ((IMark) firstElement).getFolder();
+          fPosition = ((IMark)firstElement);
+        }
       }
     }
   }

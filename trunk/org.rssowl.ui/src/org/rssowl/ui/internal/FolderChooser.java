@@ -363,7 +363,7 @@ public class FolderChooser extends Composite implements DisposeListener {
 
     /* Create new Folder */
     IStructuredSelection selection = (IStructuredSelection) fFolderViewer.getSelection();
-    NewFolderAction action = new NewFolderAction(fFolderViewer.getTree().getShell(), (IFolder) selection.getFirstElement());
+    NewFolderAction action = new NewFolderAction(fFolderViewer.getTree().getShell(), (IFolder) selection.getFirstElement(), null);
     action.run(null);
   }
 

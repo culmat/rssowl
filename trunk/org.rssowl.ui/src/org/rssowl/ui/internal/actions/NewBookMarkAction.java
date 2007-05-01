@@ -90,6 +90,7 @@ import java.util.Map;
 public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjectActionDelegate {
   private Shell fShell;
   private IFolder fParent;
+  private IMark fPosition;
   private String fPreSetLink;
 
   private static class NewBookMarkDialog extends TitleAreaDialog {
@@ -245,26 +246,29 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
 
   /** Keep for Reflection */
   public NewBookMarkAction() {
-    this(null, null);
+    this(null, null, null);
   }
 
   /**
    * @param shell
    * @param parent
+   * @param position
    */
-  public NewBookMarkAction(Shell shell, IFolder parent) {
-    this(shell, parent, null);
+  public NewBookMarkAction(Shell shell, IFolder parent, IMark position) {
+    this(shell, parent, position, null);
   }
 
   /**
    * @param shell
    * @param parent
+   * @param position
    * @param preSetLink
    */
-  public NewBookMarkAction(Shell shell, IFolder parent, String preSetLink) {
+  public NewBookMarkAction(Shell shell, IFolder parent, IMark position, String preSetLink) {
     fShell = shell;
     fParent = parent;
     fPreSetLink = preSetLink;
+    fPosition = position;
   }
 
   /*
@@ -333,7 +337,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
 
       /* Create the BookMark */
       FeedLinkReference feedLinkRef = new FeedLinkReference(uriObj);
-      IBookMark bookmark = Owl.getModelFactory().createBookMark(null, parent, feedLinkRef, title);
+      IBookMark bookmark = Owl.getModelFactory().createBookMark(null, parent, feedLinkRef, title, fPosition, fPosition != null ? true : null);
 
       /* Copy all Properties from Parent into this Mark */
       Map<String, ?> properties = parent.getProperties();
@@ -361,6 +365,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
 
     /* Delete the old Selection */
     fParent = null;
+    fPosition = null;
 
     /* Check Selection */
     if (selection instanceof IStructuredSelection) {
@@ -369,8 +374,10 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
         Object firstElement = structSel.getFirstElement();
         if (firstElement instanceof IFolder)
           fParent = (IFolder) firstElement;
-        else if (firstElement instanceof IMark)
+        else if (firstElement instanceof IMark) {
           fParent = ((IMark) firstElement).getFolder();
+          fPosition = ((IMark) firstElement);
+        }
       }
     }
   }

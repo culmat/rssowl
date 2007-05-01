@@ -172,7 +172,7 @@ public class Application implements IApplication {
 
         /* Open Dialog to add this new BookMark */
         if (existingBookMark == null) {
-          new NewBookMarkAction(shell, null, link).run(null);
+          new NewBookMarkAction(shell, null, null, link).run(null);
         }
 
         /* Display selected Feed since its existing already */
