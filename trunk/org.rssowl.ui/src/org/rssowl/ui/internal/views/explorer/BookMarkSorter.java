@@ -27,6 +27,7 @@ package org.rssowl.ui.internal.views.explorer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.ui.internal.EntityGroup;
 
@@ -66,24 +67,35 @@ public class BookMarkSorter extends ViewerComparator {
     return fType;
   }
 
+  /*
+   * @see org.eclipse.jface.viewers.ViewerComparator#compare(org.eclipse.jface.viewers.Viewer,
+   * java.lang.Object, java.lang.Object)
+   */
   @Override
   public int compare(Viewer viewer, Object e1, Object e2) {
 
+    /* Skip Sort for two Folder Childs if default sorting */
+    if (fType == Type.DEFAULT_SORTING && e1 instanceof IFolderChild && e2 instanceof IFolderChild)
+      return SKIP_SORT;
+
     /* Compare two Folders */
-    if (e1 instanceof IFolder && e2 instanceof IFolder)
+    else if (e1 instanceof IFolder && e2 instanceof IFolder)
       return compareFolders((IFolder) e1, (IFolder) e2);
 
     /* Compare two Marks */
     else if (e1 instanceof IMark && e2 instanceof IMark)
       return compareMarks((IMark) e1, (IMark) e2);
 
-    /* Compare two ViewerGroups */
+    /* Compare two EntityGroups */
     else if (e1 instanceof EntityGroup && e2 instanceof EntityGroup)
       return compareGroups((EntityGroup) e1, (EntityGroup) e2);
 
     return super.compare(viewer, e1, e2);
   }
 
+  /*
+   * @see org.eclipse.jface.viewers.ViewerComparator#category(java.lang.Object)
+   */
   @Override
   public int category(Object element) {
 
@@ -95,6 +107,8 @@ public class BookMarkSorter extends ViewerComparator {
   }
 
   private int compareFolders(IFolder folder1, IFolder folder2) {
+
+    /* Sort by Name */
     if (fType == Type.SORT_BY_NAME)
       return folder1.getName().compareTo(folder2.getName());
 

@@ -1,13 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <opml version="1.1">
 	<body>
-		<outline text="EclipseCon 2007" xmlUrl="http://www.eclipsecon.org/2007/feeds/atom.xml" />
-		<outline text="Dilbert Blog" xmlUrl="http://dilbertblog.typepad.com/the_dilbert_blog/atom.xml" />
-		<outline text="Eclipse News" xmlUrl="http://www.eclipse.org/home/eclipsenews.rss" />
-		<outline text="Planet Eclipse" xmlUrl="http://www.planeteclipse.org/planet/atom.xml" />
-		<outline text="EclipseZone: News" xmlUrl="http://www.eclipsezone.com/forumRSS/18112.xml" />
-		<outline text="EclipseZone: Tips" xmlUrl="http://www.eclipsezone.com/forumRSS/18111.xml" />
-		<outline text="Eclipse Podcasts" xmlUrl="http://feeds.feedburner.com/ezpodcast" />
 		<outline text="Business">
 		<outline text="Forbes.com Business News" xmlUrl="http://www.forbes.com/business/index.xml" />
 		<outline text="Moreover - Entrepreneur news" xmlUrl="http://www.moreover.com/cgi-local/page?o=rss002&amp;c=entrepreneur%20news&amp;wiz=2277468" />
@@ -20,7 +13,6 @@
 		<outline text="WSJ.com: Today's Free Features" xmlUrl="http://online.wsj.com/xml/rss/0,,3_7077,00.xml" />
 		</outline>
 		<outline text="Computers">
-		<outline text="OS News" xmlUrl="http://www.osnews.com/files/recent.rdf" />
 		<outline text="Mac">
 		<outline text="digg - tech news / apple / dig" xmlUrl="http://digg.com/rss/indexappledig.xml" />
 		<outline text="Editors' Notes Weblog" xmlUrl="http://www.macworld.com/weblogs/editors/rss.xml" />
@@ -50,13 +42,9 @@
 		<outline text="Linux Journal" xmlUrl="http://www.linuxjournal.com/news.rss" />
 		<outline text="Linux Weekly News" xmlUrl="http://lwn.net/headlines/rss" />
 		</outline>
+		<outline text="OS News" xmlUrl="http://www.osnews.com/files/recent.rdf" />
 		</outline>
 		<outline text="Entertainment">
-		<outline text="Quotes of the Day" xmlUrl="http://www.quotationspage.com/data/qotd.rss" />
-		<outline text="Gawker" xmlUrl="http://www.gawker.com/index.xml" />
-		<outline text="Ask Yahoo!" xmlUrl="http://ask.yahoo.com/ask/index.xml" />
-		<outline text="The Movie Blog" xmlUrl="http://www.themovieblog.com/index.rdf" />
-		<outline text="CC Insider" xmlUrl="http://ccinsider.comedycentral.com/cc_insider/atom.xml" />
 		<outline text="Books">
 		<outline text="Variety.com" xmlUrl="http://www.variety.com/rss.asp?categoryid=1010" />
 		<outline text="NYT Book Review" xmlUrl="http://radio.weblogs.com/0124132/staplerfeeds/nytbook.xml" />
@@ -86,6 +74,11 @@
 		<outline text="Stargate Blog" xmlUrl="http://blog.scifi.com/stargate/index.rdf" />
 		<outline text="Sci-Fi Storm" xmlUrl="http://scifistorm.org/scifistorm.rdf" />
 		</outline>
+		<outline text="Quotes of the Day" xmlUrl="http://www.quotationspage.com/data/qotd.rss" />
+		<outline text="Gawker" xmlUrl="http://www.gawker.com/index.xml" />
+		<outline text="Ask Yahoo!" xmlUrl="http://ask.yahoo.com/ask/index.xml" />
+		<outline text="The Movie Blog" xmlUrl="http://www.themovieblog.com/index.rdf" />
+		<outline text="CC Insider" xmlUrl="http://ccinsider.comedycentral.com/cc_insider/atom.xml" />
 		</outline>
 		<outline text="Food">
 		<outline text="Bay Area Bites" xmlUrl="http://www.kqed.org/weblog/food/atom.xml" />
@@ -190,6 +183,28 @@
 		<outline text="ESPN.com" xmlUrl="http://sports.espn.go.com/espn/rss/news" />
 		</outline>
 		<outline text="Technology">
+		<outline text="Programming Languages">
+		<outline text="PHPBuilder.com" xmlUrl="http://phpbuilder.com/rss_feed.php?type=articles&amp;limit=20" />
+		<outline text="PHP News" xmlUrl="http://www.php.net/news.rss" />
+		<outline text="Java" xmlUrl="http://servlet.java.sun.com/syndication/rss_java_highlights-newsknowledge-20.xml" />
+		<outline text="Servlets.com" xmlUrl="http://www.servlets.com/blog/index.rss" />
+		<outline text="Codewalkers" xmlUrl="http://codewalkers.com/tutorials.rdf" />
+		<outline text="JavaScript Tips" xmlUrl="http://www.webreference.com/js/tips/channels/last1515.rdf" />
+		</outline>
+		<outline text="Security">
+		<outline text="Computer World Security Knowledge Center" xmlUrl="http://www.computerworld.com/news/xml/0,5000,73,00.xml" />
+		<outline text="Computer World Security Holes" xmlUrl="http://www.computerworld.com/news/xml/0,5000,584,00.xml" />
+		<outline text="Computer World Firewalls" xmlUrl="http://www.computerworld.com/news/xml/0,5000,591,00.xml" />
+		<outline text="Computer World Hacking News" xmlUrl="http://www.computerworld.com/news/xml/0,5000,583,00.xml" />
+		</outline>
+		<outline text="Wireless">
+		<outline text="Computer World Mobile" xmlUrl="http://www.computerworld.com/news/xml/0,5000,68,00.xml" />
+		<outline text="Wireless Unleashed" xmlUrl="http://wirelessunleashed.com/index.rdf" />
+		<outline text="The RFID Weblog" xmlUrl="http://www.rfid-weblog.com/index.rdf" />
+		<outline text="Wireless Business Applications" xmlUrl="http://wirelessbusiness.blogs.com/weblog/index.rdf" />
+		<outline text="WiFi Planet" xmlUrl="http://www.wi-fiplanet.com/icom_includes/feeds/80211/xml_front-news-10.xml" />
+		<outline text="InfoWorld: Wireless" xmlUrl="http://www.infoworld.com/rss/wireless.rdf" />
+		</outline>
 		<outline text="Digital Photography Review" xmlUrl="http://www.dpreview.com/news/dpr.rdf" />
 		<outline text="eWEEK Technology News" xmlUrl="http://rssnewsapps.ziffdavis.com/tech.xml" />
 		<outline text="Engadget" xmlUrl="http://www.engadget.com/rss.xml" />
@@ -222,28 +237,6 @@
 		<outline text="Fedora People" xmlUrl="http://planet.fedoraproject.org/rss20.xml" />
 		<outline text="Planet Debian" xmlUrl="http://planet.debian.org/rss20.xml" />
 		<outline text="Mozillazine" xmlUrl="http://planet.mozillazine.org/rss20.xml" />
-		<outline text="Programming Languages">
-		<outline text="PHPBuilder.com" xmlUrl="http://phpbuilder.com/rss_feed.php?type=articles&amp;limit=20" />
-		<outline text="PHP News" xmlUrl="http://www.php.net/news.rss" />
-		<outline text="Java" xmlUrl="http://servlet.java.sun.com/syndication/rss_java_highlights-newsknowledge-20.xml" />
-		<outline text="Servlets.com" xmlUrl="http://www.servlets.com/blog/index.rss" />
-		<outline text="Codewalkers" xmlUrl="http://codewalkers.com/tutorials.rdf" />
-		<outline text="JavaScript Tips" xmlUrl="http://www.webreference.com/js/tips/channels/last1515.rdf" />
-		</outline>
-		<outline text="Security">
-		<outline text="Computer World Security Knowledge Center" xmlUrl="http://www.computerworld.com/news/xml/0,5000,73,00.xml" />
-		<outline text="Computer World Security Holes" xmlUrl="http://www.computerworld.com/news/xml/0,5000,584,00.xml" />
-		<outline text="Computer World Firewalls" xmlUrl="http://www.computerworld.com/news/xml/0,5000,591,00.xml" />
-		<outline text="Computer World Hacking News" xmlUrl="http://www.computerworld.com/news/xml/0,5000,583,00.xml" />
-		</outline>
-		<outline text="Wireless">
-		<outline text="Computer World Mobile" xmlUrl="http://www.computerworld.com/news/xml/0,5000,68,00.xml" />
-		<outline text="Wireless Unleashed" xmlUrl="http://wirelessunleashed.com/index.rdf" />
-		<outline text="The RFID Weblog" xmlUrl="http://www.rfid-weblog.com/index.rdf" />
-		<outline text="Wireless Business Applications" xmlUrl="http://wirelessbusiness.blogs.com/weblog/index.rdf" />
-		<outline text="WiFi Planet" xmlUrl="http://www.wi-fiplanet.com/icom_includes/feeds/80211/xml_front-news-10.xml" />
-		<outline text="InfoWorld: Wireless" xmlUrl="http://www.infoworld.com/rss/wireless.rdf" />
-		</outline>
 		</outline>
 		<outline text="Weblogs">
 		<outline text="Google Sightseeing" xmlUrl="http://googlesightseeing.com/feed" />
@@ -262,5 +255,12 @@
 		<outline text="Spamusement" xmlUrl="http://spamusement.com/rss" />
 		<outline text="Pandagon" xmlUrl="http://pandagon.net/feed" />
 		</outline>
+		<outline text="EclipseCon 2007" xmlUrl="http://www.eclipsecon.org/2007/feeds/atom.xml" />
+		<outline text="Dilbert Blog" xmlUrl="http://dilbertblog.typepad.com/the_dilbert_blog/atom.xml" />
+		<outline text="Eclipse News" xmlUrl="http://www.eclipse.org/home/eclipsenews.rss" />
+		<outline text="Planet Eclipse" xmlUrl="http://www.planeteclipse.org/planet/atom.xml" />
+		<outline text="EclipseZone: News" xmlUrl="http://www.eclipsezone.com/forumRSS/18112.xml" />
+		<outline text="EclipseZone: Tips" xmlUrl="http://www.eclipsezone.com/forumRSS/18111.xml" />
+		<outline text="Eclipse Podcasts" xmlUrl="http://feeds.feedburner.com/ezpodcast" />
 	</body>
 </opml>

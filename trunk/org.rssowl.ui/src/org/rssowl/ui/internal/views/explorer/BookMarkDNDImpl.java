@@ -41,6 +41,7 @@ import org.eclipse.swt.dnd.TransferData;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -95,7 +96,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
 
   private ISelection getNormalizedSelection() {
     IStructuredSelection selection = (IStructuredSelection) getViewer().getSelection();
-    List< ? > selectedObjects = selection.toList();
+    List<?> selectedObjects = selection.toList();
 
     /* Retrieve dragged Marks / Folders and separate */
     List<IEntity> draggedEntities = new ArrayList<IEntity>(selectedObjects.size());
@@ -141,7 +142,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
   private void setTextData(DragSourceEvent event) {
     StringBuilder str = new StringBuilder("");
     IStructuredSelection selection = (IStructuredSelection) getViewer().getSelection();
-    List< ? > selectedObjects = selection.toList();
+    List<?> selectedObjects = selection.toList();
     for (Object selectedObject : selectedObjects) {
 
       /* IFolder */
@@ -238,7 +239,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
         public void run() throws Exception {
           ISelection selection = LocalSelectionTransfer.getTransfer().getSelection();
           if (selection instanceof IStructuredSelection) {
-            List< ? > draggedObjects = ((IStructuredSelection) selection).toList();
+            List<?> draggedObjects = ((IStructuredSelection) selection).toList();
             result[0] = isValidDrop((IEntity) target, draggedObjects);
           }
         }
@@ -255,7 +256,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     return false;
   }
 
-  private boolean isValidDrop(IEntity dropTarget, List< ? > draggedObjects) {
+  private boolean isValidDrop(IEntity dropTarget, List<?> draggedObjects) {
 
     /* Check validity for each dragged Object */
     for (Object draggedObject : draggedObjects) {
@@ -298,8 +299,8 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       }
     }
 
-    /* Do not allow Re-Ordering over IMarks */
-    if (dropTarget instanceof IMark) {
+    /* Do not allow Re-Ordering over IMarks (when sorting or grouping) */
+    if ((fExplorer.isSortByNameEnabled() || fExplorer.isGroupingEnabled()) && dropTarget instanceof IMark) {
       IMark target = (IMark) dropTarget;
       if (target.getFolder().getFolders().contains(dragSource))
         return false;
@@ -328,8 +329,8 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       }
     }
 
-    /* Do not allow Re-Ordering over IFolder */
-    if (dropTarget instanceof IFolder && (loc == LOCATION_AFTER || loc == LOCATION_BEFORE)) {
+    /* Do not allow Re-Ordering over IFolder (when sorting or grouping) */
+    if ((fExplorer.isSortByNameEnabled() || fExplorer.isGroupingEnabled()) && dropTarget instanceof IFolder && (loc == LOCATION_AFTER || loc == LOCATION_BEFORE)) {
       IFolder target = (IFolder) dropTarget;
       if (target.getParent().getMarks().contains(dragSource))
         return false;
@@ -349,7 +350,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
           IStructuredSelection selection = (IStructuredSelection) data;
-          List< ? > draggedObjects = selection.toList();
+          List<?> draggedObjects = selection.toList();
           perfromDrop(draggedObjects);
         }
       });
@@ -390,7 +391,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     return false;
   }
 
-  private void perfromDrop(List< ? > draggedObjects) {
+  private void perfromDrop(List<?> draggedObjects) {
     Object dropTarget = getCurrentTarget();
     int location = getCurrentLocation();
 
@@ -423,8 +424,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       return;
 
     /* Separate into Reparented Marks and Folders and Re-Orders */
-    List<IMark> markReordering = null;
-    List<IFolder> folderReordering = null;
+    List<IFolderChild> childReordering = null;
     List<ReparentInfo<IFolder, IFolder>> folderReparenting = null;
     List<ReparentInfo<IMark, IFolder>> markReparenting = null;
 
@@ -449,9 +449,9 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
 
         /* Re-Ordering in same Parent */
         else {
-          if (folderReordering == null)
-            folderReordering = new ArrayList<IFolder>(draggedObjects.size());
-          folderReordering.add(draggedFolder);
+          if (childReordering == null)
+            childReordering = new ArrayList<IFolderChild>(draggedObjects.size());
+          childReordering.add(draggedFolder);
         }
       }
 
@@ -473,9 +473,9 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
 
         /* Re-Ordering in same Parent */
         else {
-          if (markReordering == null)
-            markReordering = new ArrayList<IMark>(draggedObjects.size());
-          markReordering.add(draggedMark);
+          if (childReordering == null)
+            childReordering = new ArrayList<IFolderChild>(draggedObjects.size());
+          childReordering.add(draggedMark);
         }
       }
     }
@@ -491,15 +491,9 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       });
     }
 
-    /* Perform Re-Ordering on Marks */
-    if (markReordering != null && dropTarget instanceof IMark) {
-      parentFolder.reorderMarks(markReordering, (IMark) dropTarget, after);
-      requireSave = true;
-    }
-
-    /* Perform Re-Ordering on Folders */
-    if (folderReordering != null && dropTarget instanceof IFolder) {
-      parentFolder.reorderFolders(folderReordering, (IFolder) dropTarget, after);
+    /* Perform Re-Ordering on Children */
+    if (childReordering != null) {
+      parentFolder.reorderChildren(childReordering, (IFolderChild) dropTarget, after);
       requireSave = true;
     }
 
