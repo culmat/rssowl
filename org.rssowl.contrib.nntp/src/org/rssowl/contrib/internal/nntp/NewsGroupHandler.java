@@ -56,7 +56,6 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -86,9 +85,6 @@ public class NewsGroupHandler implements IProtocolHandler {
 
   /* The Default Connection Timeout */
   private static final int DEFAULT_CON_TIMEOUT = 30000;
-
-  /* Timeout for loading a Favicon */
-  private static final int FAVICON_CON_TIMEOUT = 5000;
 
   /* The number of news to download on a first reload */
   private static final int INITIAL_NEWS = 50;
@@ -546,42 +542,31 @@ public class NewsGroupHandler implements IProtocolHandler {
   /* Load a possible Favicon from the given Feed */
   byte[] loadFavicon(URI link, boolean rewriteHost) {
     try {
-
-      /* Define Properties for Connection */
-      Map<Object, Object> properties = new HashMap<Object, Object>();
-      properties.put(IConnectionPropertyConstants.CON_TIMEOUT, FAVICON_CON_TIMEOUT);
-
-      /* Load Favicon */
       URI faviconLink = URIUtils.toFaviconUrl(link, rewriteHost);
       if (faviconLink == null)
         return null;
 
-      InputStream fis = Owl.getConnectionService().openHTTPStream(faviconLink, properties);
-
-      ByteArrayOutputStream fos = new ByteArrayOutputStream();
-      byte buffer[] = new byte[0xffff];
-      int nbytes;
-
-      while ((nbytes = fis.read(buffer)) != -1)
-        fos.write(buffer, 0, nbytes);
-
-      return fos.toByteArray();
+      /* Pass to HTTP Protocol Handler */
+      return Owl.getConnectionService().getFeedIcon(faviconLink);
     } catch (URISyntaxException e) {
       /* Ignore */
     } catch (ConnectionException e) {
-
-      /* Try rewriting the Host to obtain the Favicon */
-      if (!rewriteHost) {
-        String exceptionName = e.getClass().getName();
-
-        /* Only retry in case this is a generic ConnectionException */
-        if (ConnectionException.class.getName().equals(exceptionName))
-          return loadFavicon(link, true);
-      }
-    } catch (IOException e) {
       /* Ignore */
     }
 
     return null;
+  }
+
+  /*
+   * @see org.rssowl.core.connection.IProtocolHandler#getLabel(java.net.URI)
+   */
+  @SuppressWarnings("unused")
+  public String getLabel(URI link) throws ConnectionException {
+    String path = link.getPath();
+
+    if (StringUtils.isSet(path))
+      return path.replace("/", "");
+
+    return link.toString();
   }
 }
