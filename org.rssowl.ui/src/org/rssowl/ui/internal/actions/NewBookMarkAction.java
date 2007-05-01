@@ -36,6 +36,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.events.ModifyEvent;
@@ -93,7 +94,6 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
 
   private static class NewBookMarkDialog extends TitleAreaDialog {
     private String fInitialLinkValue;
-    private String fInitialNameValue;
     private Text fLinkInput;
     private Text fNameInput;
     private ResourceManager fResources;
@@ -107,21 +107,12 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       fFolder = folder;
       fInitialLinkValue = initialLinkValue;
       fResources = new LocalResourceManager(JFaceResources.getResources());
-
-      if (fInitialLinkValue != null) {
-        try {
-          URI uri = new URI(fInitialLinkValue);
-          fInitialNameValue = uri.getHost();
-        } catch (URISyntaxException e) {
-          /* Ignore */
-        }
-      }
     }
 
     @Override
     public void create() {
       super.create();
-      getButton(IDialogConstants.OK_ID).setEnabled(fInitialNameValue != null);
+      getButton(IDialogConstants.OK_ID).setEnabled(false);
     }
 
     @Override
@@ -181,7 +172,6 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
       fNameInput = new Text(nameContainer, SWT.SINGLE);
-      fNameInput.setText(fInitialNameValue != null ? fInitialNameValue : "");
       fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
       fNameInput.addModifyListener(new ModifyListener() {
         public void modifyText(ModifyEvent e) {
@@ -193,7 +183,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       grabTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
       ToolItem grabTitleItem = new ToolItem(grabTitleBar, SWT.PUSH);
-      grabTitleItem.setImage(OwlUI.getImage(fResources, "icons/etool16/refresh.gif"));
+      grabTitleItem.setImage(OwlUI.getImage(fResources, "icons/etool16/info.gif"));
       grabTitleItem.setToolTipText("Load name from feed");
       grabTitleItem.addSelectionListener(new SelectionAdapter() {
         @Override
@@ -217,16 +207,20 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
 
     private void onGrabTitle() {
       if (StringUtils.isSet(fLinkInput.getText())) {
-        try {
-          URI link = new URI(fLinkInput.getText());
-          String label = Owl.getConnectionService().getLabel(link);
-          if (StringUtils.isSet(label))
-            fNameInput.setText(label);
-        } catch (ConnectionException e) {
-          /* Ignore */
-        } catch (URISyntaxException e) {
-          /* Ignore */
-        }
+        BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
+          public void run() {
+            try {
+              URI link = new URI(fLinkInput.getText());
+              String label = Owl.getConnectionService().getLabel(link);
+              if (StringUtils.isSet(label))
+                fNameInput.setText(label);
+            } catch (ConnectionException e) {
+              /* Ignore */
+            } catch (URISyntaxException e) {
+              /* Ignore */
+            }
+          }
+        });
       }
     }
 
