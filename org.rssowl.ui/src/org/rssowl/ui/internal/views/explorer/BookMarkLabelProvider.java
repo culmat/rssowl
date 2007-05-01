@@ -38,7 +38,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
-import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.ui.internal.Controller;
@@ -267,23 +267,19 @@ public class BookMarkLabelProvider extends CellLabelProvider {
   private int getNewsCount(IFolder folder, boolean unread) {
     int count = 0;
 
-    /* Go through BookMarks */
-    List<IMark> marks = folder.getMarks();
-    for (IMark mark : marks) {
-      if (mark instanceof IBookMark) {
-        IBookMark bookmark = (IBookMark) mark;
+    /* Go through all Folders and Marks */
+    List<IFolderChild> children = folder.getChildren();
+    for (IFolderChild child : children) {
+      if (child instanceof IBookMark) {
+        IBookMark bookmark = (IBookMark) child;
 
         if (unread)
           count += getUnreadNewsCount(bookmark.getFeedLinkReference());
         else
           count += getNewNewsCount(bookmark.getFeedLinkReference());
-      }
+      } else if (child instanceof IFolder)
+        count += getNewsCount((IFolder) child, unread);
     }
-
-    /* Go through Child-Folders */
-    List<IFolder> folders = folder.getFolders();
-    for (IFolder childFolder : folders)
-      count += getNewsCount(childFolder, unread);
 
     return count;
   }

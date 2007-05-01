@@ -37,7 +37,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
-import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -177,15 +177,13 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
 
   /* TODO This Method is currently ignoring SearchMarks */
   private void fillNews(IFolder folder, List<INews> news, Map<IBookMark, List<INews>> bookMarkNewsMap) {
-    List<IMark> marks = folder.getMarks();
-    for (IMark mark : marks) {
-      if (mark instanceof IBookMark)
-        fillNews((IBookMark) mark, news, bookMarkNewsMap);
+    List<IFolderChild> children = folder.getChildren();
+    for (IFolderChild child : children) {
+      if (child instanceof IBookMark)
+        fillNews((IBookMark) child, news, bookMarkNewsMap);
+      else if (child instanceof IFolder)
+        fillNews((IFolder) child, news, bookMarkNewsMap);
     }
-
-    List<IFolder> childFolders = folder.getFolders();
-    for (IFolder childFolder : childFolders)
-      fillNews(childFolder, news, bookMarkNewsMap);
   }
 
   private void fillNews(IBookMark bookmark, List<INews> news, Map<IBookMark, List<INews>> bookMarkNewsMap) {
