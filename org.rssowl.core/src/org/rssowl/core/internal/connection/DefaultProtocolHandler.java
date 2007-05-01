@@ -58,16 +58,20 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 /**
@@ -466,5 +470,141 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     else if ("carbon".equals(Platform.getOS())) //$NON-NLS-1$
       return "RSSOwl/" + version + " (Macintosh; U; " + "en)"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     return "RSSOwl/" + version; //$NON-NLS-1$
+  }
+
+  /*
+   * @see org.rssowl.core.connection.IProtocolHandler#getLabel(java.net.URI)
+   */
+  public String getLabel(URI link) throws ConnectionException {
+    String title = "";
+
+    InputStream inS = openStream(link, null);
+    try {
+
+      /* Buffered Stream to support mark and reset */
+      BufferedInputStream bufIns = new BufferedInputStream(inS);
+      bufIns.mark(8192);
+
+      /* Try to read Encoding out of XML Document */
+      String encoding = getEncodingFromXML(new InputStreamReader(bufIns));
+
+      /* Avoid lowercase UTF-8 notation */
+      if ("utf-8".equalsIgnoreCase(encoding))
+        encoding = "UTF-8";
+
+      /* Reset the Stream to its beginning */
+      bufIns.reset();
+
+      /* Grab Title using supplied Encoding */
+      if (StringUtils.isSet(encoding))
+        title = getTitleFromFeed(new BufferedReader(new InputStreamReader(bufIns, encoding)));
+
+      /* Grab Title using Default Encoding */
+      else
+        title = getTitleFromFeed(new BufferedReader(new InputStreamReader(bufIns)));
+
+      /* Remove the title tags (also delete attributes in title tag) */
+      title = title.replaceAll("<title[^>]*>", "");
+      title = title.replaceAll("</title>", "");
+    } catch (IOException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    }
+
+    /* Finally close the Stream */
+    finally {
+
+      /* Close Stream */
+      try {
+        inS.close();
+      } catch (IOException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
+    }
+
+    return title;
+  }
+
+  /* Tries to read the encoding information from the given InputReader */
+  private String getEncodingFromXML(InputStreamReader inputReader) throws IOException {
+    String encoding = null;
+
+    /* Read the first line or until the Tag is closed */
+    StringBuffer strBuf = new StringBuffer();
+    char c;
+    while ((c = (char) inputReader.read()) != -1) {
+
+      /* Append all Characters, except for closing Tag or CR */
+      if (c != '>' && c != '\n' && c != '\r')
+        strBuf.append(c);
+
+      /* Closing Tag is the last one to append */
+      else if (c == '>') {
+        strBuf.append(c);
+        break;
+      }
+
+      /* End of Line or Tag reached */
+      else
+        break;
+    }
+
+    /* Save the first Line */
+    String firstLine = strBuf.toString();
+
+    /* Look if Encoding is supplied */
+    if (firstLine.indexOf("encoding") >= 0) {
+
+      /* Extract the Encoding Value */
+      String regEx = "<\\?.*encoding=[\"'](.*)[\"'].*\\?>";
+      Pattern pattern = Pattern.compile(regEx);
+      Matcher match = pattern.matcher(firstLine);
+
+      /* Get first matching String */
+      if (match.find())
+        return match.group(1);
+    }
+    return encoding;
+  }
+
+  /* Tries to find the title information from the given Reader */
+  private String getTitleFromFeed(BufferedReader inputReader) throws IOException {
+    String title = "";
+    String firstLine;
+    boolean titleFound = false;
+
+    /* Read the file until the Title is found or EOF is reached */
+    while (true) {
+
+      /* Will throw an IOException on EOF reached */
+      firstLine = inputReader.readLine();
+
+      /* EOF reached */
+      if (firstLine == null)
+        break;
+
+      /* If the line contains the title, break loop */
+      if (firstLine.indexOf("<title") >= 0 && firstLine.indexOf("</title>") >= 0) {
+        title = firstLine.trim();
+        titleFound = true;
+        break;
+      }
+    }
+
+    /* Return if no title was found */
+    if (!titleFound)
+      return title;
+
+    /* Extract the title String */
+    String regEx = "<title[^>]*>[^<]*</title>";
+    Pattern pattern = Pattern.compile(regEx);
+    Matcher match = pattern.matcher(title);
+
+    /* Get first matching String */
+    if (match.find())
+      title = match.group();
+
+    // TODO Decode possible XML special chars (entities)
+
+    return title;
   }
 }
