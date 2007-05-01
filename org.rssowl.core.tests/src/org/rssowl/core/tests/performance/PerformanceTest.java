@@ -452,7 +452,7 @@ public class PerformanceTest {
         if (withRetention)
           Owl.getPreferenceService().getEntityScope(bookmark).putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
 
-        rootFolder.addMark(bookmark);
+        rootFolder.addMark(bookmark, null, false);
         DynamicDAO.save(rootFolder);
       } catch (Exception e) {
         Activator.getDefault().logError(e.getMessage(), e);

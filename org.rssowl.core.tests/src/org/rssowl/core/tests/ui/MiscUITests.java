@@ -72,7 +72,7 @@ public class MiscUITests {
     IFeed feed = new Feed(new URI("http://www.rssowl.org/node/feed"));
     IFolder root = new Folder(null, null, "Root");
     IBookMark bookmark = new BookMark(null, root, new FeedLinkReference(feed.getLink()), "Bookmark");
-    root.addMark(bookmark);
+    root.addMark(bookmark, null, false);
 
     feed = DynamicDAO.save(feed);
     root = DynamicDAO.save(root);
