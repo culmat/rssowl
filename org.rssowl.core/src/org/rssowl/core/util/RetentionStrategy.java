@@ -29,7 +29,7 @@ import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
-import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.service.PersistenceException;
@@ -68,20 +68,16 @@ public class RetentionStrategy {
 
   private static void internalProcess(IFolder folder, List<INews> newsToDelete) throws PersistenceException {
 
-    /* BookMarks */
-    List<IMark> marks = folder.getMarks();
-    for (IMark mark : marks) {
-      if (mark instanceof IBookMark) {
-        IBookMark bookmark = (IBookMark) mark;
+    /* Recursively go through Children of the Folder */
+    List<IFolderChild> childs = folder.getChildren();
+    for (IFolderChild child : childs) {
+      if (child instanceof IBookMark) {
+        IBookMark bookmark = (IBookMark) child;
         List<INews> visibleNews = bookmark.getFeedLinkReference().resolve().getVisibleNews();
         newsToDelete.addAll(getNewsToDelete(bookmark, visibleNews));
-      }
+      } else if (child instanceof IFolder)
+        internalProcess((IFolder) child, newsToDelete);
     }
-
-    /* Recursively go through Child Folders */
-    List<IFolder> childFolders = folder.getFolders();
-    for (IFolder childFolder : childFolders)
-      internalProcess(childFolder, newsToDelete);
   }
 
   /**
