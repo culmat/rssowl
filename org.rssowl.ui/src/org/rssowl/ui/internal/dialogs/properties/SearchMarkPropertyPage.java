@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Text;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
@@ -195,7 +196,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
 
     /* Reparent if necessary */
     if (fSearchMark.getFolder() != fFolderChooser.getFolder()) {
-      ReparentInfo<IMark, IFolder> reparent = new ReparentInfo<IMark, IFolder>(fSearchMark, fFolderChooser.getFolder(), null, null);
+      ReparentInfo<IMark, IFolder, IFolderChild> reparent = new ReparentInfo<IMark, IFolder, IFolderChild>(fSearchMark, fFolderChooser.getFolder(), null, null);
       Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(null, Collections.singletonList(reparent));
     }
   }

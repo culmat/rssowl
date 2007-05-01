@@ -60,6 +60,7 @@ import org.eclipse.swt.widgets.Table;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -323,7 +324,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
             public void run() throws Exception {
               ISelection selection = LocalSelectionTransfer.getTransfer().getSelection();
               if (selection instanceof IStructuredSelection) {
-                List< ? > draggedObjects = ((IStructuredSelection) selection).toList();
+                List<?> draggedObjects = ((IStructuredSelection) selection).toList();
                 result[0] = isValidDrop(draggedObjects, target);
               }
             }
@@ -341,7 +342,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
           SafeRunner.run(new LoggingSafeRunnable() {
             public void run() throws Exception {
               IStructuredSelection selection = (IStructuredSelection) data;
-              List< ? > draggedObjects = selection.toList();
+              List<?> draggedObjects = selection.toList();
               perfromDrop(draggedObjects, getCurrentTarget());
             }
           });
@@ -357,7 +358,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
     fViewer.addDropSupport(ops, transfers, dropAdapter);
   }
 
-  private boolean isValidDrop(List< ? > draggedObjects, Object dropTarget) {
+  private boolean isValidDrop(List<?> draggedObjects, Object dropTarget) {
 
     /* Require Folder as Target */
     if (!(dropTarget instanceof IFolder))
@@ -385,7 +386,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
     return true;
   }
 
-  private void perfromDrop(List< ? > draggedObjects, Object dropTarget) {
+  private void perfromDrop(List<?> draggedObjects, Object dropTarget) {
 
     /* Require a Folder as drop target */
     if (!(dropTarget instanceof IFolder))
@@ -394,8 +395,8 @@ public class ManageSetsDialog extends TitleAreaDialog {
     IFolder dropFolder = (IFolder) dropTarget;
 
     /* Separate into Reparented Marks and Folders */
-    List<ReparentInfo<IFolder, IFolder>> folderReparenting = null;
-    List<ReparentInfo<IMark, IFolder>> markReparenting = null;
+    List<ReparentInfo<IFolder, IFolder, IFolderChild>> folderReparenting = null;
+    List<ReparentInfo<IMark, IFolder, IFolderChild>> markReparenting = null;
 
     /* For each dragged Object */
     for (Object object : draggedObjects) {
@@ -404,9 +405,9 @@ public class ManageSetsDialog extends TitleAreaDialog {
 
         /* Reparenting to new Parent */
         if (folderReparenting == null)
-          folderReparenting = new ArrayList<ReparentInfo<IFolder, IFolder>>(draggedObjects.size());
+          folderReparenting = new ArrayList<ReparentInfo<IFolder, IFolder, IFolderChild>>(draggedObjects.size());
 
-        ReparentInfo<IFolder, IFolder> reparentInfo = new ReparentInfo<IFolder, IFolder>(draggedFolder, dropFolder, null, null);
+        ReparentInfo<IFolder, IFolder, IFolderChild> reparentInfo = ReparentInfo.create(draggedFolder, dropFolder, null, null);
         folderReparenting.add(reparentInfo);
       }
 
@@ -415,9 +416,9 @@ public class ManageSetsDialog extends TitleAreaDialog {
 
         /* Reparenting to new Parent */
         if (markReparenting == null)
-          markReparenting = new ArrayList<ReparentInfo<IMark, IFolder>>(draggedObjects.size());
+          markReparenting = new ArrayList<ReparentInfo<IMark, IFolder, IFolderChild>>(draggedObjects.size());
 
-        ReparentInfo<IMark, IFolder> reparentInfo = new ReparentInfo<IMark, IFolder>(draggedMark, dropFolder, null, null);
+        ReparentInfo<IMark, IFolder, IFolderChild> reparentInfo = ReparentInfo.create(draggedMark, dropFolder, null, null);
         markReparenting.add(reparentInfo);
       }
     }

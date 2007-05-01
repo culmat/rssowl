@@ -861,14 +861,14 @@ public class Controller {
       List<IFolder> folders = importedContainer.getFolders();
       for (IFolder folder : folders) {
         folder.setParent(rootFolder);
-        rootFolder.addFolder(folder);
+        rootFolder.addFolder(folder, null, null);
       }
 
       /* Reparent all imported marks into selected Set */
       List<IMark> marks = importedContainer.getMarks();
       for (IMark mark : marks) {
         mark.setFolder(rootFolder);
-        rootFolder.addMark(mark);
+        rootFolder.addMark(mark, null, null);
       }
 
       /* Save Set */

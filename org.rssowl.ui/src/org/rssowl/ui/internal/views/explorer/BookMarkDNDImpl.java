@@ -393,6 +393,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
 
   private void perfromDrop(List<?> draggedObjects) {
     Object dropTarget = getCurrentTarget();
+    IFolderChild position = dropTarget != null ? (IFolderChild) dropTarget : null;
     int location = getCurrentLocation();
 
     IFolder parentFolder = null;
@@ -425,8 +426,8 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
 
     /* Separate into Reparented Marks and Folders and Re-Orders */
     List<IFolderChild> childReordering = null;
-    List<ReparentInfo<IFolder, IFolder>> folderReparenting = null;
-    List<ReparentInfo<IMark, IFolder>> markReparenting = null;
+    List<ReparentInfo<IFolder, IFolder, IFolderChild>> folderReparenting = null;
+    List<ReparentInfo<IMark, IFolder, IFolderChild>> markReparenting = null;
 
     /* For each dragged Object */
     for (Object object : draggedObjects) {
@@ -438,12 +439,9 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
         /* Reparenting to new Parent */
         if (!draggedFolder.getParent().equals(parentFolder)) {
           if (folderReparenting == null)
-            folderReparenting = new ArrayList<ReparentInfo<IFolder, IFolder>>(draggedObjects.size());
+            folderReparenting = new ArrayList<ReparentInfo<IFolder, IFolder, IFolderChild>>(draggedObjects.size());
 
-          IFolder position = (dropTarget instanceof IFolder && !on) ? (IFolder) dropTarget : null;
-          Boolean afterB = (position != null) ? after : null;
-          ReparentInfo<IFolder, IFolder> reparentInfo = new ReparentInfo<IFolder, IFolder>(draggedFolder, parentFolder, position, afterB);
-
+          ReparentInfo<IFolder, IFolder, IFolderChild> reparentInfo = ReparentInfo.create(draggedFolder, parentFolder, position, after);
           folderReparenting.add(reparentInfo);
         }
 
@@ -462,12 +460,9 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
         /* Reparenting to new Parent */
         if (!draggedMark.getFolder().equals(parentFolder)) {
           if (markReparenting == null)
-            markReparenting = new ArrayList<ReparentInfo<IMark, IFolder>>(draggedObjects.size());
+            markReparenting = new ArrayList<ReparentInfo<IMark, IFolder, IFolderChild>>(draggedObjects.size());
 
-          IMark position = (dropTarget instanceof IMark) ? (IMark) dropTarget : null;
-          Boolean afterB = (position != null) ? after : null;
-          ReparentInfo<IMark, IFolder> reparentInfo = new ReparentInfo<IMark, IFolder>(draggedMark, parentFolder, position, afterB);
-
+          ReparentInfo<IMark, IFolder, IFolderChild> reparentInfo = ReparentInfo.create(draggedMark, parentFolder, position, after);
           markReparenting.add(reparentInfo);
         }
 
@@ -481,8 +476,8 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     }
 
     /* Perform reparenting */
-    final List<ReparentInfo<IFolder, IFolder>> finalFolderReparenting = folderReparenting;
-    final List<ReparentInfo<IMark, IFolder>> finalMarkReparenting = markReparenting;
+    final List<ReparentInfo<IFolder, IFolder, IFolderChild>> finalFolderReparenting = folderReparenting;
+    final List<ReparentInfo<IMark, IFolder, IFolderChild>> finalMarkReparenting = markReparenting;
     if (folderReparenting != null || markReparenting != null) {
       BusyIndicator.showWhile(getViewer().getControl().getDisplay(), new Runnable() {
         public void run() {
