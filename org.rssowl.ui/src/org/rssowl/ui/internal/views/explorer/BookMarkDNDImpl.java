@@ -399,7 +399,12 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     boolean requireSave = false;
     boolean on = (location == ViewerDropAdapter.LOCATION_ON);
 
-    IFolderChild position = dropTarget != null && !on ? (IFolderChild) dropTarget : null;
+    IFolderChild position = dropTarget != null ? (IFolderChild) dropTarget : null;
+
+    /* Fix invalid Position */
+    if (on && dropTarget instanceof IFolder)
+      position = null;
+
     Boolean after = (location == ViewerDropAdapter.LOCATION_AFTER);
     if (position == null)
       after = null;
@@ -491,7 +496,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
 
     /* Perform Re-Ordering on Children */
     if (childReordering != null) {
-      parentFolder.reorderChildren(childReordering, position, after);
+      parentFolder.reorderChildren(childReordering, (IFolderChild)dropTarget, after);
       requireSave = true;
     }
 
