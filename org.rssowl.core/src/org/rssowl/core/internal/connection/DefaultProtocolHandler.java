@@ -555,7 +555,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     if (firstLine.indexOf("encoding") >= 0) {
 
       /* Extract the Encoding Value */
-      String regEx = "<\\?.*encoding=[\"'](.*)[\"'].*\\?>";
+      String regEx = "<\\?.*encoding=[\"']([^\\s]*)[\"'].*\\?>";
       Pattern pattern = Pattern.compile(regEx);
       Matcher match = pattern.matcher(firstLine);
 
