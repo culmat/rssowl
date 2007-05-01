@@ -74,8 +74,14 @@ public interface IFolder extends IFolderChild, Reparentable<IFolder> {
    *
    * @param mark An instance of <code>IMark</code> to be added as Child to
    * this Folder.
+   * @param position The new Position identified by a <code>IFolderChild</code>
+   * contained in this folder or <code>NULL</code> to add the mark as last
+   * element.
+   * @param after If <code>true</code>, move the folders to a one index after
+   * the given position. May be <code>NULL</code> if the position is not
+   * provided.
    */
-  void addMark(IMark mark);
+  void addMark(IMark mark, IFolderChild position, Boolean after);
 
   /**
    * Moves a List of <code>IFolderChild</code> contained in this Folder to a
@@ -83,12 +89,13 @@ public interface IFolder extends IFolderChild, Reparentable<IFolder> {
    *
    * @param children The List of <code>IFolderChild</code> being moved to a
    * new position.
-   * @param position The new Position identified by a <code>IFolder</code>
+   * @param position The new Position identified by a <code>IFolderChild</code>
    * contained in this folder.
    * @param after If <code>true</code>, move the folders to a one index after
-   * the given position.
+   * the given position. May be <code>NULL</code> if the position is not
+   * provided.
    */
-  void reorderChildren(List<? extends IFolderChild> children, IFolderChild position, boolean after);
+  void reorderChildren(List<? extends IFolderChild> children, IFolderChild position, Boolean after);
 
   /**
    * Removes an instance of <code>IMark</code> from this Folder.
@@ -118,8 +125,14 @@ public interface IFolder extends IFolderChild, Reparentable<IFolder> {
    *
    * @param folder An instance of <code>IFolder</code> to be added to this
    * Folder.
+   * @param position The new Position identified by a <code>IFolderChild</code>
+   * contained in this folder or <code>NULL</code> to add the mark as last
+   * element.
+   * @param after If <code>true</code>, move the folders to a one index after
+   * the given position. May be <code>NULL</code> if the position is not
+   * provided.
    */
-  void addFolder(IFolder folder);
+  void addFolder(IFolder folder, IFolderChild position, Boolean after);
 
   /**
    * Get a list of the sub-folders contained in this folder.

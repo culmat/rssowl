@@ -32,6 +32,7 @@ import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.IImage;
 import org.rssowl.core.persist.ILabel;
@@ -188,11 +189,20 @@ public class DefaultModelFactory implements IModelFactory {
    * java.lang.String, org.rssowl.core.model.reference.FolderReference)
    */
   public IFolder createFolder(Long id, IFolder parent, String name) {
+    return createFolder(id, parent, name, null, null);
+  }
+
+  /*
+   * @see org.rssowl.core.persist.IModelFactory#createFolder(java.lang.Long,
+   * org.rssowl.core.persist.IFolder, java.lang.String,
+   * org.rssowl.core.persist.IFolderChild, boolean)
+   */
+  public IFolder createFolder(Long id, IFolder parent, String name, IFolderChild position, Boolean after) {
     Folder folder = new Folder(id, parent, name);
 
     /* Automatically add to the Folder */
     if (parent != null)
-      parent.addFolder(folder);
+      parent.addFolder(folder, position, after);
 
     return folder;
   }
@@ -210,10 +220,19 @@ public class DefaultModelFactory implements IModelFactory {
    * java.lang.String, org.rssowl.core.model.reference.FolderReference)
    */
   public ISearchMark createSearchMark(Long id, IFolder folder, String name) {
+    return createSearchMark(id, folder, name, null, null);
+  }
+
+  /*
+   * @see org.rssowl.core.persist.IModelFactory#createSearchMark(java.lang.Long,
+   * org.rssowl.core.persist.IFolder, java.lang.String,
+   * org.rssowl.core.persist.IFolderChild, boolean)
+   */
+  public ISearchMark createSearchMark(Long id, IFolder folder, String name, IFolderChild position, Boolean after) {
     SearchMark searchMark = new SearchMark(id, folder, name);
 
     /* Automatically add to the Folder */
-    folder.addMark(searchMark);
+    folder.addMark(searchMark, position, after);
 
     return searchMark;
   }
@@ -224,10 +243,20 @@ public class DefaultModelFactory implements IModelFactory {
    * org.rssowl.core.model.reference.FeedLinkReference, java.lang.String)
    */
   public IBookMark createBookMark(Long id, IFolder folder, FeedLinkReference feedRef, String name) {
+    return createBookMark(id, folder, feedRef, name, null, null);
+  }
+
+  /*
+   * @see org.rssowl.core.persist.IModelFactory#createBookMark(java.lang.Long,
+   * org.rssowl.core.persist.IFolder,
+   * org.rssowl.core.persist.reference.FeedLinkReference, java.lang.String,
+   * org.rssowl.core.persist.IFolderChild, boolean)
+   */
+  public IBookMark createBookMark(Long id, IFolder folder, FeedLinkReference feedRef, String name, IFolderChild position, Boolean after) {
     BookMark bookMark = new BookMark(id, folder, feedRef, name);
 
     /* Automatically add to the Folder */
-    folder.addMark(bookMark);
+    folder.addMark(bookMark, position, after);
 
     return bookMark;
   }

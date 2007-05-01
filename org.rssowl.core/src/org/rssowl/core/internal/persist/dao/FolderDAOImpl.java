@@ -29,6 +29,7 @@ import org.rssowl.core.internal.persist.Folder;
 import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.IFolderDAO;
@@ -101,7 +102,7 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
     }
   }
 
-  public final void reparent(List<ReparentInfo<IFolder, IFolder>> folderInfos, List<ReparentInfo<IMark, IFolder>> markInfos) {
+  public final void reparent(List<ReparentInfo<IFolder, IFolder, IFolderChild>> folderInfos, List<ReparentInfo<IMark, IFolder, IFolderChild>> markInfos) {
 
     Assert.isLegal(folderInfos != null || markInfos != null, "Either folderInfos or markInfos must be non-null"); //$NON-NLS-1$
     fWriteLock.lock();
@@ -147,19 +148,19 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
 
   }
 
-  private List<FolderEvent> createFolderEvents(List<ReparentInfo<IFolder, IFolder>> folderInfos) {
+  private List<FolderEvent> createFolderEvents(List<ReparentInfo<IFolder, IFolder, IFolderChild>> folderInfos) {
     if (folderInfos == null)
       return Collections.emptyList();
 
     List<FolderEvent> folderEvents = new ArrayList<FolderEvent>(folderInfos.size());
-    for (ReparentInfo<IFolder, IFolder> folderInfo : folderInfos) {
+    for (ReparentInfo<IFolder, IFolder, IFolderChild> folderInfo : folderInfos) {
       IFolder folder = folderInfo.getObject();
       IFolder newParent = folderInfo.getNewParent();
       IFolder oldParent = folder.getParent();
-      IFolder newPosition = folderInfo.getNewPosition();
+      IFolderChild newPosition = folderInfo.getNewPosition();
       synchronized (folder) {
         removeFolderFromParent(folder);
-        addFolder(newParent, folder);
+        addFolder(newParent, folder, newPosition, folderInfo.isAfter());
         if (newPosition != null) {
           List<IFolder> folderList = new ArrayList<IFolder>(1);
           folderList.add(folder);
@@ -173,11 +174,11 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
     return folderEvents;
   }
 
-  private void addFolder(IFolder parent, IFolder child) {
+  private void addFolder(IFolder parent, IFolder child, IFolderChild position, Boolean after) {
     child.setParent(parent);
     /* The new parent may be null. It becomes a root folder */
     if (parent != null)
-      parent.addFolder(child);
+      parent.addFolder(child, position, after);
   }
 
   private IFolder removeFolderFromParent(IFolder folder) {
@@ -192,20 +193,20 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
     return oldParent;
   }
 
-  private void addMarkToFolder(IFolder parent, IMark child) {
+  private void addMarkToFolder(IFolder parent, IMark child, IFolderChild position, Boolean after) {
     child.setFolder(parent);
-    parent.addMark(child);
+    parent.addMark(child, position, after);
   }
 
-  private void fillMarkEvents(List<ReparentInfo<IMark, IFolder>> markInfos, List<BookMarkEvent> bookMarkEvents, List<SearchMarkEvent> searchMarkEvents) {
-    for (ReparentInfo<IMark, IFolder> markInfo : markInfos) {
+  private void fillMarkEvents(List<ReparentInfo<IMark, IFolder, IFolderChild>> markInfos, List<BookMarkEvent> bookMarkEvents, List<SearchMarkEvent> searchMarkEvents) {
+    for (ReparentInfo<IMark, IFolder, IFolderChild> markInfo : markInfos) {
       IMark mark = markInfo.getObject();
       IFolder newParent = markInfo.getNewParent();
       IFolder oldParent = mark.getFolder();
-      IMark newPosition = markInfo.getNewPosition();
+      IFolderChild newPosition = markInfo.getNewPosition();
       synchronized (mark) {
         removeMarkFromParent(mark);
-        addMarkToFolder(newParent, mark);
+        addMarkToFolder(newParent, mark, newPosition, markInfo.isAfter());
         if (newPosition != null) {
           List<IMark> markList = new ArrayList<IMark>(1);
           markList.add(mark);
