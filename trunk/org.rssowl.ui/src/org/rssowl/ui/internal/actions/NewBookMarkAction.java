@@ -88,6 +88,7 @@ import java.util.Map;
  * @author bpasero
  */
 public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjectActionDelegate {
+  private static final String HTTP = "http://";
   private Shell fShell;
   private IFolder fParent;
   private IMark fPosition;
@@ -156,7 +157,15 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       l2.setText("Link: ");
 
       fLinkInput = new Text(container, SWT.SINGLE | SWT.BORDER);
-      fLinkInput.setText(fInitialLinkValue != null ? fInitialLinkValue : "http://");
+
+      if (StringUtils.isSet(fInitialLinkValue) && !fInitialLinkValue.equals(HTTP)) {
+        fLinkInput.setText(fInitialLinkValue);
+        fLinkInput.selectAll();
+      } else {
+        fLinkInput.setText(HTTP);
+        fLinkInput.setSelection(HTTP.length());
+      }
+
       fLinkInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
       fLinkInput.addModifyListener(new ModifyListener() {
         public void modifyText(ModifyEvent e) {
@@ -304,7 +313,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       String data = (String) cb.getContents(transfer);
       data = (data != null) ? data.trim() : fPreSetLink;
       cb.dispose();
-      initial = "http://";
+      initial = HTTP;
 
       if (URIUtils.looksLikeLink(data)) {
         if (!data.contains("://"))
