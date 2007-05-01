@@ -49,6 +49,7 @@ import org.rssowl.ui.internal.OwlUI;
 public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate {
   private Shell fShell;
   private IFolder fParent;
+  private IMark fPosition;
   private LocalResourceManager fResources = new LocalResourceManager(JFaceResources.getResources());
 
   /*
@@ -137,6 +138,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate {
 
     /* Delete the old Selection */
     fParent = null;
+    fPosition = null;
 
     /* Check Selection */
     if (selection instanceof IStructuredSelection) {
@@ -145,21 +147,23 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate {
         Object firstElement = structSel.getFirstElement();
         if (firstElement instanceof IFolder)
           fParent = (IFolder) firstElement;
-        else if (firstElement instanceof IMark)
+        else if (firstElement instanceof IMark) {
           fParent = ((IMark) firstElement).getFolder();
+          fPosition = ((IMark) firstElement);
+        }
       }
     }
   }
 
   private void addBookmark() {
-    new NewBookMarkAction(fShell, fParent).run(null);
+    new NewBookMarkAction(fShell, fParent, fPosition).run(null);
   }
 
   private void addFolder() {
-    new NewFolderAction(fShell, fParent).run(null);
+    new NewFolderAction(fShell, fParent, fPosition).run(null);
   }
 
   private void addSearchMark() {
-    new NewSearchMarkAction(fShell, fParent).run(null);
+    new NewSearchMarkAction(fShell, fParent, fPosition).run(null);
   }
 }

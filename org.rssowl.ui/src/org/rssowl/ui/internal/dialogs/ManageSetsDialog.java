@@ -432,7 +432,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
 
   private void onAdd() {
     showInfo();
-    NewFolderAction newFolderAction = new NewFolderAction(getShell(), null);
+    NewFolderAction newFolderAction = new NewFolderAction(getShell(), null, null);
     newFolderAction.setRootMode(true);
     newFolderAction.run(null);
     fViewer.refresh();

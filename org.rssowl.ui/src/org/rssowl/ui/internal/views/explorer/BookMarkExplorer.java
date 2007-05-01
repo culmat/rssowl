@@ -385,7 +385,7 @@ public class BookMarkExplorer extends ViewPart {
 
   private void onOpen() {
     IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
-    List< ? > list = selection.toList();
+    List<?> list = selection.toList();
     boolean activateEditor = OpenStrategy.activateOnOpen();
     int openedEditors = 0;
     int maxOpenEditors = EditorUtils.getOpenEditorLimit();
@@ -1024,7 +1024,8 @@ public class BookMarkExplorer extends ViewPart {
       public void run() {
         IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
         IFolder parent = getParent(selection);
-        new NewBookMarkAction(fViewSite.getShell(), parent).run(null);
+        IMark position = (IMark) ((selection.getFirstElement() instanceof IMark) ? selection.getFirstElement() : null);
+        new NewBookMarkAction(fViewSite.getShell(), parent, position).run(null);
       }
 
       @Override
@@ -1039,7 +1040,8 @@ public class BookMarkExplorer extends ViewPart {
       public void run() {
         IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
         IFolder parent = getParent(selection);
-        new NewSearchMarkAction(fViewSite.getShell(), parent).run(null);
+        IMark position = (IMark) ((selection.getFirstElement() instanceof IMark) ? selection.getFirstElement() : null);
+        new NewSearchMarkAction(fViewSite.getShell(), parent, position).run(null);
       }
 
       @Override
@@ -1055,7 +1057,8 @@ public class BookMarkExplorer extends ViewPart {
       public void run() {
         IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
         IFolder parent = getParent(selection);
-        new NewFolderAction(fViewSite.getShell(), parent).run(null);
+        IMark position = (IMark) ((selection.getFirstElement() instanceof IMark) ? selection.getFirstElement() : null);
+        new NewFolderAction(fViewSite.getShell(), parent, position).run(null);
       }
 
       @Override
