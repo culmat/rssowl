@@ -48,7 +48,7 @@ import java.util.Map;
 
 /**
  * Protocol-Handler to return a Feed from In-Memory.
- * 
+ *
  * @author bpasero
  */
 public class InMemoryProtocolHandler implements IProtocolHandler {
@@ -123,5 +123,13 @@ public class InMemoryProtocolHandler implements IProtocolHandler {
         return null;
       }
     };
+  }
+
+  /*
+   * @see org.rssowl.core.connection.IProtocolHandler#getLabel(java.net.URI)
+   */
+  @SuppressWarnings("unused")
+  public String getLabel(URI link) throws ConnectionException {
+    throw new UnsupportedOperationException();
   }
 }
