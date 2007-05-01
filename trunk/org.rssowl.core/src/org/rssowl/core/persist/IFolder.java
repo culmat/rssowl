@@ -36,7 +36,7 @@ import java.util.List;
  * to synchronize its contents from a remote OPML file that contains a number of
  * Feeds.
  * </p>
- * 
+ *
  * @author bpasero
  */
 public interface IFolder extends IFolderChild, Reparentable<IFolder> {
@@ -56,7 +56,7 @@ public interface IFolder extends IFolderChild, Reparentable<IFolder> {
   /**
    * Get a list of the children contained in this folder. Typically, these
    * children will be of type IMark or IFolder.
-   * 
+   *
    * @return a list of children contained in this folder.
    * <p>
    * Note: The returned List should not be modified. The default implementation
@@ -71,41 +71,28 @@ public interface IFolder extends IFolderChild, Reparentable<IFolder> {
 
   /**
    * Adds an instance of <code>IMark</code> as Child to this Folder.
-   * 
+   *
    * @param mark An instance of <code>IMark</code> to be added as Child to
    * this Folder.
    */
   void addMark(IMark mark);
 
   /**
-   * Moves a List of <code>IMark</code> contained in this Folder to a new
-   * position.
-   * 
-   * @param marks The List of <code>IMark</code> being moved to a new
-   * position.
-   * @param position The new Position identified by a <code>IMark</code>
-   * contained in this folder.
-   * @param after If <code>true</code>, move the marks to a one index after
-   * the given position.
-   */
-  void reorderMarks(List<IMark> marks, IMark position, boolean after);
-
-  /**
-   * Moves a List of <code>IFolder</code> contained in this Folder to a new
-   * position.
-   * 
-   * @param folders The List of <code>IFolder</code> being moved to a new
-   * position.
+   * Moves a List of <code>IFolderChild</code> contained in this Folder to a
+   * new position.
+   *
+   * @param children The List of <code>IFolderChild</code> being moved to a
+   * new position.
    * @param position The new Position identified by a <code>IFolder</code>
    * contained in this folder.
    * @param after If <code>true</code>, move the folders to a one index after
    * the given position.
    */
-  void reorderFolders(List<IFolder> folders, IFolder position, boolean after);
+  void reorderChildren(List<? extends IFolderChild> children, IFolderChild position, boolean after);
 
   /**
    * Removes an instance of <code>IMark</code> from this Folder.
-   * 
+   *
    * @param mark An instance of <code>IMark</code> to be removed from this
    * Folder.
    */
@@ -114,7 +101,7 @@ public interface IFolder extends IFolderChild, Reparentable<IFolder> {
   /**
    * Get a list of marks contained in this folder. Typically, these marks may be
    * of type ISearchMark and/or IBookMark.
-   * 
+   *
    * @return a list of marks contained in this folder. Typically, these marks
    * may be of type ISearchMark and/or IBookMark.
    * <p>
@@ -128,7 +115,7 @@ public interface IFolder extends IFolderChild, Reparentable<IFolder> {
 
   /**
    * Adds an instance of <code>IFolder</code> as Child to this Folder.
-   * 
+   *
    * @param folder An instance of <code>IFolder</code> to be added to this
    * Folder.
    */
@@ -136,7 +123,7 @@ public interface IFolder extends IFolderChild, Reparentable<IFolder> {
 
   /**
    * Get a list of the sub-folders contained in this folder.
-   * 
+   *
    * @return a list of sub-folders of this folder.
    * <p>
    * Note: The returned List should not be modified. The default Implementation
@@ -149,35 +136,35 @@ public interface IFolder extends IFolderChild, Reparentable<IFolder> {
 
   /**
    * Get the parent folder or null if no parent folder exists.
-   * 
+   *
    * @return the parent folder or null if no parent folder exists.
    */
   IFolder getParent();
 
   /**
    * Get the Name of this Folder.
-   * 
+   *
    * @return the name of the folder.
    */
   String getName();
 
   /**
    * Set the Name of this Folder.
-   * 
+   *
    * @param name the name of the folder to set.
    */
   void setName(String name);
 
   /**
    * Get the Link to the Blogroll this Folder is pointing to.
-   * 
+   *
    * @return Returns the Link to the Blogroll this Folder is pointing to.
    */
   URI getBlogrollLink();
 
   /**
    * Set the Link to the Blogroll this Folder is pointing to.
-   * 
+   *
    * @param blogrollLink the Link to the Blogroll this Folder is pointing to.
    */
   void setBlogrollLink(URI blogrollLink);
@@ -185,7 +172,7 @@ public interface IFolder extends IFolderChild, Reparentable<IFolder> {
   /**
    * Removes an instance of <code>IFolder</code> that is equal to
    * <code>folder</code> from the list of child folders.
-   * 
+   *
    * @param folder An instance of <code>IFolder</code> to be removed.
    */
   void removeFolder(IFolder folder);
