@@ -25,6 +25,7 @@
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.event.FolderEvent;
 import org.rssowl.core.persist.event.FolderListener;
@@ -73,5 +74,5 @@ public interface IFolderDAO extends IEntityDAO<IFolder, FolderListener, FolderEv
    * describing the reparenting details for a list of marks.
    * @throws PersistenceException In case of an error while loading the Types.
    */
-  void reparent(List<ReparentInfo<IFolder, IFolder>> folderInfos, List<ReparentInfo<IMark, IFolder>> markInfos) throws PersistenceException;
+  void reparent(List<ReparentInfo<IFolder, IFolder, IFolderChild>> folderInfos, List<ReparentInfo<IMark, IFolder, IFolderChild>> markInfos) throws PersistenceException;
 }

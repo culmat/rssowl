@@ -86,12 +86,13 @@ public class Folder extends AbstractEntity implements IFolder {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IFolder#addMark(org.rssowl.core.model.reference.MarkReference)
+   * @see org.rssowl.core.persist.IFolder#addMark(org.rssowl.core.persist.IMark,
+   * org.rssowl.core.persist.IFolderChild, boolean)
    */
-  public void addMark(IMark mark) {
+  public void addMark(IMark mark, IFolderChild position, Boolean after) {
     Assert.isNotNull(mark, "Exception adding NULL as Mark into Folder"); //$NON-NLS-1$
     Assert.isTrue(equals(mark.getFolder()), "The Mark has a different Folder set!"); //$NON-NLS-1$
-    fChildren.add(mark);
+    addChild(mark, position, after);
   }
 
   /*
@@ -103,16 +104,48 @@ public class Folder extends AbstractEntity implements IFolder {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IFolder#addFolder(org.rssowl.core.model.reference.FolderReference)
+   * @see org.rssowl.core.persist.IFolder#addFolder(org.rssowl.core.persist.IFolder,
+   * org.rssowl.core.persist.IFolderChild, boolean)
    */
-  public void addFolder(IFolder folder) {
+  public void addFolder(IFolder folder, IFolderChild position, Boolean after) {
     Assert.isNotNull(folder, "Exception adding NULL as Child Folder into Parent Folder"); //$NON-NLS-1$
     Assert.isTrue(equals(folder.getParent()), "The Folder has a different Parent Folder set!"); //$NON-NLS-1$
-    fChildren.add(folder);
+    addChild(folder, position, after);
   }
 
+  /*
+   * @see org.rssowl.core.persist.IFolder#getChildren()
+   */
   public List<IFolderChild> getChildren() {
     return Collections.unmodifiableList(fChildren);
+  }
+
+  private void addChild(IFolderChild child, IFolderChild position, Boolean after) {
+
+    /* Mask Null */
+    after = (after == null) ? Boolean.FALSE : after;
+
+    /* Add to end of List if Position is unknown */
+    if (position == null)
+      fChildren.add(child);
+
+    /* Position is provided */
+    else {
+      int index = fChildren.indexOf(position);
+      Assert.isTrue(index >= 0);
+
+      /* Insert to end of List */
+      if (index == fChildren.size() && after)
+        fChildren.add(child);
+
+      /* Insert after Position */
+      else if (after)
+        fChildren.add(index + 1, child);
+
+      /* Insert before Position */
+      else
+        fChildren.add(index, child);
+    }
   }
 
   /*
@@ -123,7 +156,7 @@ public class Folder extends AbstractEntity implements IFolder {
     return Collections.unmodifiableList(folders);
   }
 
-  private <T> List<T> extractTypes(Class<T> type, List<? super T> list)    {
+  private <T> List<T> extractTypes(Class<T> type, List<? super T> list) {
     List<T> types = new ArrayList<T>(list.size());
     for (Object object : list) {
       if (type.isInstance(object))
@@ -193,9 +226,12 @@ public class Folder extends AbstractEntity implements IFolder {
    * @see org.rssowl.core.persist.IFolder#reorderChildren(java.util.List,
    * org.rssowl.core.persist.IFolderChild, boolean)
    */
-  public void reorderChildren(List<? extends IFolderChild> children, IFolderChild position, boolean after) {
+  public void reorderChildren(List<? extends IFolderChild> children, IFolderChild position, Boolean after) {
     Assert.isTrue(fChildren.contains(position));
     Assert.isTrue(fChildren.containsAll(children));
+
+    /* Mask Null */
+    after = (after == null) ? Boolean.FALSE : after;
 
     /* First, remove the given Marks */
     fChildren.removeAll(children);
@@ -210,7 +246,7 @@ public class Folder extends AbstractEntity implements IFolder {
     else if (after)
       fChildren.addAll(index + 1, children);
 
-    /* Insert to before Position */
+    /* Insert before Position */
     else
       fChildren.addAll(index, children);
   }
