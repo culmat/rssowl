@@ -53,7 +53,7 @@ public class Folder extends AbstractEntity implements IFolder {
   private String fBlogrollLink;
   private IFolder fParent;
   private List<IFolderChild> fChildren;
-  
+
   //FIXME Remove these fMarks and fFolders after M6 is released
   @SuppressWarnings("unused")
   private List<IMark> fMarks;
@@ -110,11 +110,11 @@ public class Folder extends AbstractEntity implements IFolder {
     Assert.isTrue(equals(folder.getParent()), "The Folder has a different Parent Folder set!"); //$NON-NLS-1$
     fChildren.add(folder);
   }
-  
+
   public List<IFolderChild> getChildren() {
     return Collections.unmodifiableList(fChildren);
   }
-  
+
   /*
    * @see org.rssowl.core.model.types.IFolder#getFolders()
    */
@@ -122,7 +122,7 @@ public class Folder extends AbstractEntity implements IFolder {
     List<IFolder> folders = extractTypes(IFolder.class, fChildren);
     return Collections.unmodifiableList(folders);
   }
-  
+
   private <T> List<T> extractTypes(Class<T> type, List<? super T> list)    {
     List<T> types = new ArrayList<T>(list.size());
     for (Object object : list) {
@@ -190,22 +190,10 @@ public class Folder extends AbstractEntity implements IFolder {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IFolder#reorderFolders(java.util.List,
-   * org.rssowl.core.model.types.IFolder, boolean)
+   * @see org.rssowl.core.persist.IFolder#reorderChildren(java.util.List,
+   * org.rssowl.core.persist.IFolderChild, boolean)
    */
-  public void reorderFolders(List<IFolder> folders, IFolder position, boolean after) {
-    reorderFolderChildren(folders, position, after);
-  }
-
-  /*
-   * @see org.rssowl.core.model.types.IFolder#reorderMarks(java.util.List,
-   * org.rssowl.core.model.types.IMark, boolean)
-   */
-  public void reorderMarks(List<IMark> marks, IMark position, boolean after) {
-    reorderFolderChildren(marks, position, after);
-  }
-
-  private void reorderFolderChildren(List<? extends IFolderChild> children, IFolderChild position, boolean after) {
+  public void reorderChildren(List<? extends IFolderChild> children, IFolderChild position, boolean after) {
     Assert.isTrue(fChildren.contains(position));
     Assert.isTrue(fChildren.containsAll(children));
 

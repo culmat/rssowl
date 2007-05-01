@@ -126,7 +126,7 @@ public class OPMLImporter implements ITypeImporter {
         description = attribute.getValue();
     }
 
-    /* Outline is a Category */
+    /* Outline is a Folder */
     if (link == null && title != null) {
       type = Owl.getModelFactory().createFolder(null, (IFolder) parent, title);
     }

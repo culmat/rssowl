@@ -163,7 +163,7 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
         if (newPosition != null) {
           List<IFolder> folderList = new ArrayList<IFolder>(1);
           folderList.add(folder);
-          newParent.reorderFolders(folderList, newPosition, folderInfo.isAfter().booleanValue());
+          newParent.reorderChildren(folderList, newPosition, folderInfo.isAfter().booleanValue());
         }
       }
       FolderEvent eventTemplate = new FolderEvent(folder, oldParent, true);
@@ -209,7 +209,7 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
         if (newPosition != null) {
           List<IMark> markList = new ArrayList<IMark>(1);
           markList.add(mark);
-          newParent.reorderMarks(markList, newPosition, markInfo.isAfter().booleanValue());
+          newParent.reorderChildren(markList, newPosition, markInfo.isAfter().booleanValue());
         }
       }
       if (mark instanceof IBookMark) {
