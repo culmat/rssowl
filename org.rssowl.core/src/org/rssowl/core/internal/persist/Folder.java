@@ -132,10 +132,9 @@ public class Folder extends AbstractEntity implements IFolder {
     /* Position is provided */
     else {
       int index = fChildren.indexOf(position);
-      Assert.isTrue(index >= 0);
 
       /* Insert to end of List */
-      if (index == fChildren.size() && after)
+      if (index < 0 || (index == fChildren.size() && after))
         fChildren.add(child);
 
       /* Insert after Position */
