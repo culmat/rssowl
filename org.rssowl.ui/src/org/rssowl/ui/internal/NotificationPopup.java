@@ -86,6 +86,8 @@ import java.util.Map;
 /**
  * TODO
  * <ul>
+ * <li>Consider batching new News in NotificationService for a couple of
+ * seconds before showing the popup to avoid size growing</li>
  * <li>Consider an option per Mark/Folder to enable/disable Notification</li>
  * <li>Implement animation (take from SystemTrayAlert)</li>
  * <li>Add preferences (respect use animation, number of news)</li>
@@ -106,7 +108,7 @@ public class NotificationPopup extends PopupDialog {
   private static final int DEFAULT_WIDTH = 400;
 
   /* Time after the popup is closed automatically */
-  private static final int AUTO_CLOSE_TIME = 6000;
+  private static final int AUTO_CLOSE_TIME = 8000;
 
   /* Singleton instance */
   private static NotificationPopup fgInstance;
