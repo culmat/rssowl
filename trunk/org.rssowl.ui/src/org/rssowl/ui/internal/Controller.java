@@ -38,6 +38,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.rssowl.core.IApplicationService;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
+import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.connection.UnknownFeedException;
@@ -513,7 +514,7 @@ public class Controller {
         try {
           byte[] faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
           OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK);
-        } catch (UnknownFeedException exe) {
+        } catch (ConnectionException exe) {
           Activator.getDefault().getLog().log(exe.getStatus());
         }
       }

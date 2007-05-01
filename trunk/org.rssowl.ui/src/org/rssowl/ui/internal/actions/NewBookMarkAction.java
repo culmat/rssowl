@@ -40,6 +40,8 @@ import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -47,11 +49,14 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.Owl;
+import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
@@ -155,18 +160,6 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       container.setLayout(LayoutUtils.createGridLayout(2, 5, 5));
       container.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
-      Label l1 = new Label(container, SWT.NONE);
-      l1.setText("Name: ");
-
-      fNameInput = new Text(container, SWT.SINGLE | SWT.BORDER);
-      fNameInput.setText(fInitialNameValue != null ? fInitialNameValue : "");
-      fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-      fNameInput.addModifyListener(new ModifyListener() {
-        public void modifyText(ModifyEvent e) {
-          validateInput();
-        }
-      });
-
       Label l2 = new Label(container, SWT.NONE);
       l2.setText("Link: ");
 
@@ -176,6 +169,36 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       fLinkInput.addModifyListener(new ModifyListener() {
         public void modifyText(ModifyEvent e) {
           validateInput();
+        }
+      });
+
+      Label l1 = new Label(container, SWT.NONE);
+      l1.setText("Name: ");
+
+      Composite nameContainer = new Composite(container, SWT.BORDER);
+      nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      nameContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+      nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+      fNameInput = new Text(nameContainer, SWT.SINGLE);
+      fNameInput.setText(fInitialNameValue != null ? fInitialNameValue : "");
+      fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+      fNameInput.addModifyListener(new ModifyListener() {
+        public void modifyText(ModifyEvent e) {
+          validateInput();
+        }
+      });
+
+      ToolBar grabTitleBar = new ToolBar(nameContainer, SWT.FLAT);
+      grabTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+      ToolItem grabTitleItem = new ToolItem(grabTitleBar, SWT.PUSH);
+      grabTitleItem.setImage(OwlUI.getImage(fResources, "icons/etool16/refresh.gif"));
+      grabTitleItem.setToolTipText("Load name from feed");
+      grabTitleItem.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          onGrabTitle();
         }
       });
 
@@ -190,6 +213,21 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
       return container;
+    }
+
+    private void onGrabTitle() {
+      if (StringUtils.isSet(fLinkInput.getText())) {
+        try {
+          URI link = new URI(fLinkInput.getText());
+          String label = Owl.getConnectionService().getLabel(link);
+          if (StringUtils.isSet(label))
+            fNameInput.setText(label);
+        } catch (ConnectionException e) {
+          /* Ignore */
+        } catch (URISyntaxException e) {
+          /* Ignore */
+        }
+      }
     }
 
     @Override
@@ -289,7 +327,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       URI uriObj = new URI(dialog.fLink.trim());
 
       IFeedDAO feedDAO = DynamicDAO.getDAO(IFeedDAO.class);
-      
+
       /* Check if a Feed with the URL already exists */
       FeedReference feedRef = feedDAO.loadReference(uriObj);
 
@@ -304,9 +342,9 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       IBookMark bookmark = Owl.getModelFactory().createBookMark(null, parent, feedLinkRef, title);
 
       /* Copy all Properties from Parent into this Mark */
-      Map<String, ? > properties = parent.getProperties();
+      Map<String, ?> properties = parent.getProperties();
 
-      for (Map.Entry<String, ? > property : properties.entrySet())
+      for (Map.Entry<String, ?> property : properties.entrySet())
         bookmark.setProperty(property.getKey(), property.getValue());
 
       parent = DynamicDAO.save(parent);
