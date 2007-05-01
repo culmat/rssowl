@@ -40,6 +40,7 @@ import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.connection.NotModifiedException;
+import org.rssowl.core.internal.connection.DefaultProtocolHandler;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
@@ -97,7 +98,7 @@ public class ConnectionTests {
     AuthenticationRequiredException e = null;
 
     try {
-      conManager.openHTTPStream(feed.getLink(), null);
+      new DefaultProtocolHandler().openStream(feed.getLink(), null);
     } catch (AuthenticationRequiredException e1) {
       e = e1;
     }
@@ -120,7 +121,7 @@ public class ConnectionTests {
 
     credProvider.setAuthCredentials(credentials, feedUrl);
 
-    InputStream inS = conManager.openHTTPStream(feed.getLink(), null);
+    InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
     assertNotNull(inS);
 
     Owl.getInterpreter().interpret(inS, feed);
@@ -135,11 +136,10 @@ public class ConnectionTests {
   @Test
   @SuppressWarnings("nls")
   public void testHTTPFeed() throws Exception {
-    IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/rss_2_0.xml");
     IFeed feed = new Feed(feedUrl);
 
-    InputStream inS = conManager.openHTTPStream(feed.getLink(), null);
+    InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
     assertNotNull(inS);
 
     Owl.getInterpreter().interpret(inS, feed);
@@ -154,11 +154,10 @@ public class ConnectionTests {
   @Test
   @SuppressWarnings("nls")
   public void testHTTPSFeed() throws Exception {
-    IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("https://sourceforge.net/export/rss2_projnews.php?group_id=141424&rss_fulltext=1");
     IFeed feed = new Feed(feedUrl);
 
-    InputStream inS = conManager.openHTTPStream(feed.getLink(), null);
+    InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
     assertNotNull(inS);
 
     Owl.getInterpreter().interpret(inS, feed);
@@ -191,12 +190,11 @@ public class ConnectionTests {
   @Test
   @SuppressWarnings("nls")
   public void testConditionalGet() throws Exception {
-    IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("http://rss.slashdot.org/Slashdot/slashdot/to");
     IFeed feed = new Feed(feedUrl);
     NotModifiedException e = null;
 
-    InputStream inS = conManager.openHTTPStream(feed.getLink(), null);
+    InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
     assertNotNull(inS);
 
     String ifModifiedSince = null;
@@ -217,7 +215,7 @@ public class ConnectionTests {
       conProperties.put(IConnectionPropertyConstants.IF_NONE_MATCH, ifNoneMatch);
 
     try {
-      conManager.openHTTPStream(feed.getLink(), conProperties);
+      new DefaultProtocolHandler().openStream(feed.getLink(), conProperties);
     } catch (NotModifiedException e1) {
       e = e1;
     }
@@ -240,7 +238,7 @@ public class ConnectionTests {
 
     try {
       conManager.getCredentialsProvider(feedUrl).deleteProxyCredentials(feedUrl); //Disable Proxy
-      conManager.openHTTPStream(feed.getLink(), null);
+      new DefaultProtocolHandler().openStream(feed.getLink(), null);
     } catch (AuthenticationRequiredException e1) {
       e = e1;
     }
