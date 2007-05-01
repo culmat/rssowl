@@ -47,6 +47,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.dao.DAOService;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -435,21 +436,21 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     /* Reparent if necessary */
     IFolder sameParent = getSameParent(fEntities);
     if (sameParent != null && sameParent != fFolderChooser.getFolder()) {
-      List<ReparentInfo<IMark, IFolder>> markReparenting = new ArrayList<ReparentInfo<IMark, IFolder>>();
-      List<ReparentInfo<IFolder, IFolder>> folderReparenting = new ArrayList<ReparentInfo<IFolder, IFolder>>();
+      List<ReparentInfo<IMark, IFolder, IFolderChild>> markReparenting = new ArrayList<ReparentInfo<IMark, IFolder, IFolderChild>>();
+      List<ReparentInfo<IFolder, IFolder, IFolderChild>> folderReparenting = new ArrayList<ReparentInfo<IFolder, IFolder, IFolderChild>>();
       for (IEntity entity : fEntities) {
 
         /* Check BookMark */
         if (entity instanceof IBookMark) {
           IBookMark bookmark = (IBookMark) entity;
-          ReparentInfo<IMark, IFolder> reparent = new ReparentInfo<IMark, IFolder>(bookmark, fFolderChooser.getFolder(), null, null);
+          ReparentInfo<IMark, IFolder, IFolderChild> reparent = new ReparentInfo<IMark, IFolder, IFolderChild>(bookmark, fFolderChooser.getFolder(), null, null);
           markReparenting.add(reparent);
         }
 
         /* Check Folder */
         else if (entity instanceof IFolder) {
           IFolder folder = (IFolder) entity;
-          ReparentInfo<IFolder, IFolder> reparent = new ReparentInfo<IFolder, IFolder>(folder, fFolderChooser.getFolder(), null, null);
+          ReparentInfo<IFolder, IFolder, IFolderChild> reparent = new ReparentInfo<IFolder, IFolder, IFolderChild>(folder, fFolderChooser.getFolder(), null, null);
           folderReparenting.add(reparent);
         }
       }
