@@ -43,6 +43,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IModelFactory;
@@ -346,10 +347,10 @@ public class ApplicationLayerTest {
     news.setTitle("News Title #1");
     news.setLink(new URI("http://www.link.com"));
     news.setState(INews.State.UNREAD);
-    
+
     final ICategory category = fFactory.createCategory(null, news);
     category.setName("Category name");
-    
+
     final IAttachment attachment = fFactory.createAttachment(null, news);
     attachment.setLink(new URI("http://attachment.com"));
 
@@ -624,12 +625,12 @@ public class ApplicationLayerTest {
       DynamicDAO.addEntityListener(IBookMark.class, bookMarkListener);
       DynamicDAO.addEntityListener(ISearchMark.class, searchMarkListener);
 
-      ReparentInfo<IFolder, IFolder> folderInfo = new ReparentInfo<IFolder, IFolder>(folder, newFolderParent, null, null);
-      List<ReparentInfo<IFolder, IFolder>> folderInfos = Collections.singletonList(folderInfo);
+      ReparentInfo<IFolder, IFolder, IFolderChild> folderInfo = new ReparentInfo<IFolder, IFolder, IFolderChild>(folder, newFolderParent, null, null);
+      List<ReparentInfo<IFolder, IFolder, IFolderChild>> folderInfos = Collections.singletonList(folderInfo);
 
-      List<ReparentInfo<IMark, IFolder>> markInfos = new ArrayList<ReparentInfo<IMark, IFolder>>();
-      markInfos.add(new ReparentInfo<IMark, IFolder>(bookMark, newMarkParent, null, null));
-      markInfos.add(new ReparentInfo<IMark, IFolder>(searchMark, newMarkParent, null, null));
+      List<ReparentInfo<IMark, IFolder, IFolderChild>> markInfos = new ArrayList<ReparentInfo<IMark, IFolder, IFolderChild>>();
+      markInfos.add(new ReparentInfo<IMark, IFolder, IFolderChild>(bookMark, newMarkParent, null, null));
+      markInfos.add(new ReparentInfo<IMark, IFolder, IFolderChild>(searchMark, newMarkParent, null, null));
       Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(folderInfos, markInfos);
 
       /* Asserts Follow */

@@ -118,7 +118,7 @@ public class ModelUtilsTest {
     assertEquals(1, l2);
     assertEquals(1, l3);
   }
-  
+
   /**
    * @throws Exception
    */
@@ -154,11 +154,11 @@ public class ModelUtilsTest {
     assertEquals(1, l1);
     assertEquals(1, l2);
     assertEquals(1, l3);
-    
+
     List<IFeed> feeds = ModelUtils.getEntities(sel, IFeed.class);
     assertEquals(1, feeds.size());
     assertEquals(feed1, feeds.get(0));
-    
+
     List<INews> newsList = ModelUtils.getEntities(sel, INews.class);
     assertEquals(0, newsList.size());
   }
@@ -690,22 +690,22 @@ public class ModelUtilsTest {
 
     /* Sub Root 1 */
     IFolder subRootFolder1 = new Folder(null, root, "SubRootFolder1");
-    root.addFolder(subRootFolder1);
+    root.addFolder(subRootFolder1, null, false);
 
     IFolder subRoot1Folder1 = new Folder(null, subRootFolder1, "SubRoot1Folder1");
-    subRootFolder1.addFolder(subRoot1Folder1);
+    subRootFolder1.addFolder(subRoot1Folder1, null, false);
 
     IFolder subRoot11Folder1 = new Folder(null, subRoot1Folder1, "SubRoot11Folder1");
-    subRoot1Folder1.addFolder(subRoot11Folder1);
+    subRoot1Folder1.addFolder(subRoot11Folder1, null, false);
 
     IBookMark subRoot11Mark1 = new BookMark(null, subRoot1Folder1, feed, "SubRoot11Mark1");
-    subRoot1Folder1.addMark(subRoot11Mark1);
+    subRoot1Folder1.addMark(subRoot11Mark1, null, false);
 
     IBookMark subRoot1Mark1 = new BookMark(null, subRootFolder1, feed, "SubRoot1Mark1");
-    subRootFolder1.addMark(subRoot1Mark1);
+    subRootFolder1.addMark(subRoot1Mark1, null, false);
 
     IBookMark subRoot1Mark2 = new BookMark(null, subRootFolder1, feed, "SubRoot1Mark2");
-    subRootFolder1.addMark(subRoot1Mark2);
+    subRootFolder1.addMark(subRoot1Mark2, null, false);
 
     /* Begin Testing */
     assertEquals(true, ModelUtils.hasChildRelation(root, subRootFolder1));

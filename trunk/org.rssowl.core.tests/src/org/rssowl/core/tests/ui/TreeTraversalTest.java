@@ -215,40 +215,40 @@ public class TreeTraversalTest {
 
     /* Sub Root 1 */
     IFolder subRootFolder1 = new Folder(null, root, "SubRootFolder1");
-    root.addFolder(subRootFolder1);
+    root.addFolder(subRootFolder1, null, false);
 
     IFolder subRoot1Folder1 = new Folder(null, subRootFolder1, "SubRoot1Folder1");
-    subRootFolder1.addFolder(subRoot1Folder1);
+    subRootFolder1.addFolder(subRoot1Folder1, null, false);
 
-    subRoot1Folder1.addFolder(new Folder(null, subRoot1Folder1, "SubRoot11Folder1"));
-    subRoot1Folder1.addMark(new BookMark(null, subRoot1Folder1, feed, "SubRoot11Mark1"));
+    subRoot1Folder1.addFolder(new Folder(null, subRoot1Folder1, "SubRoot11Folder1"), null, false);
+    subRoot1Folder1.addMark(new BookMark(null, subRoot1Folder1, feed, "SubRoot11Mark1"), null, false);
 
-    subRootFolder1.addMark(new BookMark(null, subRootFolder1, feed, "SubRoot1Mark1"));
-    subRootFolder1.addMark(new BookMark(null, subRootFolder1, feed, "SubRoot1Mark2"));
+    subRootFolder1.addMark(new BookMark(null, subRootFolder1, feed, "SubRoot1Mark1"), null, false);
+    subRootFolder1.addMark(new BookMark(null, subRootFolder1, feed, "SubRoot1Mark2"), null, false);
 
     /* Sub Root 2 */
     IFolder subRootFolder2 = new Folder(null, root, "SubRootFolder2");
-    root.addFolder(subRootFolder2);
+    root.addFolder(subRootFolder2, null, false);
 
-    subRootFolder2.addMark(new BookMark(null, subRootFolder2, feed, "SubRoot2Mark1"));
+    subRootFolder2.addMark(new BookMark(null, subRootFolder2, feed, "SubRoot2Mark1"), null, false);
 
     IFolder subRoot2Folder1 = new Folder(null, subRootFolder2, "SubRoot2Folder1");
-    subRootFolder2.addFolder(subRoot2Folder1);
+    subRootFolder2.addFolder(subRoot2Folder1, null, false);
 
     IFolder subRoot21Folder1 = new Folder(null, subRoot2Folder1, "SubRoot21Folder1");
-    subRoot2Folder1.addFolder(subRoot21Folder1);
+    subRoot2Folder1.addFolder(subRoot21Folder1, null, false);
 
     IBookMark subRoot211Mark1 = new BookMark(null, subRoot21Folder1, feed, "SubRoot211Mark1");
-    subRoot21Folder1.addMark(subRoot211Mark1);
+    subRoot21Folder1.addMark(subRoot211Mark1, null, false);
 
     /* Sub Root 3 */
     IFolder subRootFolder3 = new Folder(null, root, "SubRootFolder1");
-    root.addFolder(subRootFolder3);
+    root.addFolder(subRootFolder3, null, false);
 
     IFolder subRoot3Folder1 = new Folder(null, subRootFolder3, "SubRoot3Folder1");
-    subRootFolder3.addFolder(subRoot3Folder1);
+    subRootFolder3.addFolder(subRoot3Folder1, null, false);
 
-    subRoot3Folder1.addMark(new BookMark(null, subRoot3Folder1, feed, "SubRoot31Mark1"));
+    subRoot3Folder1.addMark(new BookMark(null, subRoot3Folder1, feed, "SubRoot31Mark1"), null, false);
 
     return beginFromRoot ? new ModelTreeNode(root) : new ModelTreeNode(subRoot211Mark1);
   }
