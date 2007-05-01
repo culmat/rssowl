@@ -21,19 +21,21 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist;
 
 /**
  * The base interface for IFolder children. It's basically a named IEntity.
- * 
+ *
  * @see IFolder#getChildren()
  * @see IFolder
  * @see IEntity
  */
-public interface IFolderChild extends IEntity   {
+public interface IFolderChild extends IEntity {
+
   /**
    * Returns the name of this child.
-   * 
+   *
    * @return the name of this child.
    */
   String getName();
