@@ -25,7 +25,6 @@
 package org.rssowl.core.internal.connection;
 
 import org.apache.commons.httpclient.protocol.SecureProtocolSocketFactory;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
@@ -55,7 +54,6 @@ import org.rssowl.core.util.ExtensionUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -88,7 +86,7 @@ public class ConnectionServiceImpl implements IConnectionService {
   public ConnectionServiceImpl() {
     fProtocolHandler = new HashMap<String, IProtocolHandler>();
     fCredentialsProvider = new HashMap<String, ICredentialsProvider>();
-    
+
     /* Init */
     fFeedListener = createFeedListener();
     startup();
@@ -101,14 +99,13 @@ public class ConnectionServiceImpl implements IConnectionService {
     loadProtocolHandlers();
     loadCredentialsProvider();
 
-
     /* Register URL Stream Handlers to OSGI */
     registerURLStreamHandlers();
 
     /* Register Listeners */
     registerListeners();
   }
-  
+
   private FeedListener createFeedListener() {
     return new FeedAdapter() {
       @Override
@@ -149,13 +146,18 @@ public class ConnectionServiceImpl implements IConnectionService {
   }
 
   /*
-   * @see org.rssowl.core.connection.IConnectionService#openHTTPStream(java.net.URI,
-   * java.util.Map)
+   * @see org.rssowl.core.connection.IConnectionService#getLabel(java.net.URI)
    */
-  public InputStream openHTTPStream(URI link, Map<Object, Object> properties) throws ConnectionException {
-    Assert.isTrue("http".equals(link.getScheme()) || "https".equals(link.getScheme()));
+  public String getLabel(URI link) throws ConnectionException {
+    String protocol = link.getScheme();
+    IProtocolHandler handler = fProtocolHandler.get(protocol);
 
-    return new DefaultProtocolHandler().openStream(link, properties);
+    /* Handler present */
+    if (handler != null)
+      return handler.getLabel(link);
+
+    /* No Handler present */
+    throw new UnknownFeedException(Activator.getDefault().createErrorStatus("Could not find a matching ProtocolHandler for: " + protocol, null)); //$NON-NLS-1$
   }
 
   /*
@@ -175,13 +177,13 @@ public class ConnectionServiceImpl implements IConnectionService {
       return handler.reload(link, monitor, properties);
 
     /* No Handler present */
-    throw new UnknownFeedException(Activator.getDefault().createErrorStatus("Could not find a matching FeedHandler for: " + protocol, null)); //$NON-NLS-1$
+    throw new UnknownFeedException(Activator.getDefault().createErrorStatus("Could not find a matching ProtocolHandler for: " + protocol, null)); //$NON-NLS-1$
   }
 
   /*
    * @see org.rssowl.core.connection.IConnectionService#getFeedIcon(java.net.URI)
    */
-  public byte[] getFeedIcon(URI link) throws UnknownFeedException {
+  public byte[] getFeedIcon(URI link) throws ConnectionException {
     String protocol = link.getScheme();
     IProtocolHandler handler = fProtocolHandler.get(protocol);
 
@@ -190,7 +192,7 @@ public class ConnectionServiceImpl implements IConnectionService {
       return handler.getFeedIcon(link);
 
     /* No Handler present */
-    throw new UnknownFeedException(Activator.getDefault().createErrorStatus("Could not find a matching FeedHandler for: " + protocol, null)); //$NON-NLS-1$
+    throw new UnknownFeedException(Activator.getDefault().createErrorStatus("Could not find a matching ProtocolHandler for: " + protocol, null)); //$NON-NLS-1$
   }
 
   /*

@@ -65,8 +65,23 @@ public interface IProtocolHandler {
    * @param link The Link to the Feed as <code>URI</code>.
    * @return Returns an Icon for the given Link as byte-array or
    * <code>NULL</code> if none.
+   * @throws ConnectionException Checked Exception to be used in case of any
+   * Exception.
    */
-  byte[] getFeedIcon(URI link);
+  byte[] getFeedIcon(URI link) throws ConnectionException;
+
+  /**
+   * Returns a Label that can be used to present the resource identified by the
+   * given <code>URI</code>. For instance, if the resource is a feed, this
+   * method should return the Title of the feed.
+   *
+   * @param link The <code>URI</code> identifying the resource.
+   * @return Returns a Label that can be used to present the resource identified
+   * by the given <code>URI</code>.
+   * @throws ConnectionException Checked Exception to be used in case of any
+   * Exception.
+   */
+  String getLabel(URI link) throws ConnectionException;
 
   /**
    * <p>

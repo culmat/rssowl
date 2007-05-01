@@ -31,7 +31,6 @@ import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.util.Pair;
 
-import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
 
@@ -57,23 +56,6 @@ public interface IConnectionService {
   void shutdown();
 
   /**
-   * Load the Contents of the given HTTP/HTTPS - URL by connecting to it. The
-   * given <code>HashMap</code> may be used to define connection related
-   * properties as defined in <code>IConnectionPropertyConstants</code> for
-   * example.
-   *
-   * @param link The URL to Load.
-   * @param properties Connection related properties as defined in
-   * <code>IConnectionPropertyConstants</code> for example.
-   * @return The Content of the URL as InputStream.
-   * @throws ConnectionException In case of an error while loading the Feed or
-   * in case no suitable ProtocolHandler is present.
-   * @see AuthenticationRequiredException
-   * @see NotModifiedException
-   */
-  InputStream openHTTPStream(URI link, Map<Object, Object> properties) throws ConnectionException;
-
-  /**
    * Reloads a <code>IFeed</code> with its News from the given
    * <code>URL</code> and returns it.
    *
@@ -85,6 +67,7 @@ public interface IConnectionService {
    * @throws CoreException In case of an Exception while loading the Feed from
    * the URL.
    * @see IConnectionPropertyConstants
+   * @see UnknownFeedException
    */
   Pair<IFeed, IConditionalGet> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException;
 
@@ -94,10 +77,24 @@ public interface IConnectionService {
    *
    * @param link The Link to the Feed as <code>URI</code>.
    * @return Returns an Icon for the given Link as byte-array.
-   * @throws UnknownFeedException In case of a missing Feed-Handler for the
-   * given Link.
+   * @throws ConnectionException Checked Exception to be used in case of any
+   * Exception.
+   * @see UnknownFeedException
    */
-  byte[] getFeedIcon(URI link) throws UnknownFeedException;
+  byte[] getFeedIcon(URI link) throws ConnectionException;
+
+  /**
+   * Returns a Label that can be used to present the resource identified by the
+   * given <code>URI</code>. For instance, if the resource is a feed, this
+   * method should return the Title of the feed.
+   *
+   * @param link The <code>URI</code> identifying the resource.
+   * @return Returns a Label that can be used to present the resource identified
+   * by the given <code>URI</code>.
+   * @throws ConnectionException Checked Exception to be used in case of any
+   * Exception.
+   */
+  String getLabel(URI link) throws ConnectionException;
 
   /**
    * Returns the Credentials-Provider capable of returning Credentials for
