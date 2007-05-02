@@ -24,6 +24,8 @@
 
 package org.rssowl.core.persist;
 
+import org.rssowl.core.persist.dao.IFolderDAO;
+
 /**
  * The base interface for IFolder children. It's basically a named IEntity.
  *
@@ -31,7 +33,7 @@ package org.rssowl.core.persist;
  * @see IFolder
  * @see IEntity
  */
-public interface IFolderChild extends IEntity {
+public interface IFolderChild extends IEntity, Reparentable<IFolder> {
 
   /**
    * Returns the name of this child.
@@ -39,4 +41,29 @@ public interface IFolderChild extends IEntity {
    * @return the name of this child.
    */
   String getName();
+  
+  /**
+   * Returns the parent folder of this child or <code>null</code> if the child
+   * has no parent. Some implementations of this interface may be stricter and
+   * never return <code>null</code>. If that's the case, they should specify
+   * that in their documentation.
+   * 
+   * @return the parent of this child or <code>null</code>.
+   */
+  IFolder getParent();
+  
+  /**
+   * Sets the parent folder to <code>folder</code>. Some implementations of
+   * this interface may be stricter and not accept <code>null</code>. If
+   * that's the case, they should specify that in their documentation.
+   * <p>
+   * Note that this method should not be used under normal circumstances.
+   * Instead call {@link IFolderDAO#reparent(java.util.List)} to ensure that the
+   * event is correctly populated with the old parent.
+   * </p>
+   * 
+   * @param folder new folder parent.
+   * @see IFolderDAO#reparent(java.util.List)
+   */
+  void setParent(IFolder folder);
 }
