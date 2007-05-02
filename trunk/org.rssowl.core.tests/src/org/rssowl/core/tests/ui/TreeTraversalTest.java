@@ -158,7 +158,7 @@ public class TreeTraversalTest {
   public void testTreeTraversalFromLeafWithoutFilter() throws Exception {
     ITreeNode startingNode = getStartingNode(false);
 
-    IFolder rootFolder = ((IBookMark) startingNode.getData()).getFolder().getParent().getParent().getParent();
+    IFolder rootFolder = ((IBookMark) startingNode.getData()).getParent().getParent().getParent().getParent();
 
     IFolder subRootFolder2 = rootFolder.getFolders().get(1);
     IBookMark subRoot2Mark1 = (IBookMark) subRootFolder2.getMarks().get(0);
@@ -188,7 +188,7 @@ public class TreeTraversalTest {
   public void testTreeTraversalFromLeafWithFilter() throws Exception {
     ITreeNode startingNode = getStartingNode(false);
 
-    IFolder rootFolder = ((IBookMark) startingNode.getData()).getFolder().getParent().getParent().getParent();
+    IFolder rootFolder = ((IBookMark) startingNode.getData()).getParent().getParent().getParent().getParent();
 
     IFolder subRootFolder2 = rootFolder.getFolders().get(1);
     IBookMark subRoot2Mark1 = (IBookMark) subRootFolder2.getMarks().get(0);

@@ -26,7 +26,6 @@ package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
-import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.event.FolderEvent;
 import org.rssowl.core.persist.event.FolderListener;
 import org.rssowl.core.persist.service.PersistenceException;
@@ -55,24 +54,16 @@ public interface IFolderDAO extends IEntityDAO<IFolder, FolderListener, FolderEv
 
   /**
    * <p>
-   * If <code>foldersInfos</code> is not null, performs the reparenting of the
-   * folders as described by them. The <code>FolderEvent</code>s issued will
-   * have a filled <code>oldParent</code> property to indicate that
+   * Performs the reparenting of the folder children as described by
+   * <code>reparentInfos</code>. Depending on the type of children,
+   * FolderEvents, BookMarkEvents or SearchMarkEvents will be issed. They will
+   * contain a non-null <code>oldParent</code> property to indicate that
    * reparenting took place.
    * </p>
-   * <p>
-   * If <code>markInfos</code> is not null, performs the reparenting of the
-   * marks as described by them. Depending on the type of the mark,
-   * BookMarkEvents or SearchMarkEvents will be issed. They will contain a
-   * non-null <code>oldParent</code> property to indicate that reparenting
-   * took place.
-   * </p>
-   *
-   * @param folderInfos <code>null</code> or list of ReparentInfo objects
-   * describing the reparenting details for a list of folders.
-   * @param markInfos <code>null</code> or list of ReparentInfo objects
-   * describing the reparenting details for a list of marks.
+   * 
+   * @param reparentInfos A non-null list of ReparentInfo objects
+   * describing the reparenting details for a list of IFolderChild objects.
    * @throws PersistenceException In case of an error while loading the Types.
    */
-  void reparent(List<ReparentInfo<IFolder, IFolder, IFolderChild>> folderInfos, List<ReparentInfo<IMark, IFolder, IFolderChild>> markInfos) throws PersistenceException;
+  void reparent(List<ReparentInfo<IFolderChild, IFolder>> reparentInfos) throws PersistenceException;
 }

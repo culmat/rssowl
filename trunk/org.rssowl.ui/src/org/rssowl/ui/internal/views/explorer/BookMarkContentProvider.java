@@ -157,7 +157,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
       /* Parent Folder of Mark */
       else if (element instanceof IMark) {
         IMark mark = (IMark) element;
-        return mark.getFolder();
+        return mark.getParent();
       }
     }
 
@@ -423,12 +423,12 @@ public class BookMarkContentProvider implements ITreeContentProvider {
                   /* Reparent while keeping the Selection */
                   ISelection selection = fViewer.getSelection();
                   fViewer.remove(oldParent, new Object[] { reparentedBookMark });
-                  fViewer.refresh(reparentedBookMark.getFolder(), false);
+                  fViewer.refresh(reparentedBookMark.getParent(), false);
                   fViewer.setSelection(selection);
 
                   /* Remember to update parents */
                   parentsToUpdate.add(oldParent);
-                  parentsToUpdate.add(reparentedBookMark.getFolder());
+                  parentsToUpdate.add(reparentedBookMark.getParent());
                 }
               } finally {
                 fViewer.getControl().getParent().setRedraw(true);
@@ -480,7 +480,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
             /* Update Read-State counters on Parents */
             if (!fBookmarkGrouping.isActive()) {
               for (BookMarkEvent event : events) {
-                IFolder eventParent = event.getEntity().getFolder();
+                IFolder eventParent = event.getEntity().getParent();
                 if (eventParent != null && eventParent.getParent() != null)
                   updateFolderAndParents(eventParent);
               }
@@ -497,7 +497,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
           final BookMarkEvent event = events.iterator().next();
           JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
             public void run() {
-              expand(event.getEntity().getFolder());
+              expand(event.getEntity().getParent());
             }
           });
         }
@@ -559,7 +559,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
                     /* Reparent while keeping the Selection */
                     ISelection selection = fViewer.getSelection();
                     fViewer.remove(oldParent, new Object[] { reparentedSearchMark });
-                    fViewer.refresh(reparentedSearchMark.getFolder(), false);
+                    fViewer.refresh(reparentedSearchMark.getParent(), false);
                     fViewer.setSelection(selection);
                   }
                 } finally {
@@ -616,7 +616,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
             final SearchMarkEvent event = events.iterator().next();
             JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
               public void run() {
-                expand(event.getEntity().getFolder());
+                expand(event.getEntity().getParent());
               }
             });
           }
@@ -725,7 +725,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
     /* Determine Parent Folder */
     IFolder parent = null;
     if (entity instanceof IMark)
-      parent = ((IMark) entity).getFolder();
+      parent = ((IMark) entity).getParent();
     else if (entity instanceof IFolder)
       parent = ((IFolder) entity).getParent();
 

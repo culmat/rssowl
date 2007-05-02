@@ -47,19 +47,23 @@ public abstract class Mark extends AbstractEntity implements IMark {
   private Date fLastVisitDate;
   private int fPopularity;
 
+  private IFolder fParent;
+  
+  //FIXME Remove after M6
+  @SuppressWarnings("unused")
   private IFolder fFolder;
 
   /**
    * Store ID, Name and Folder for this Mark.
    * 
    * @param id The unique id of this type.
-   * @param folder The Folder this Mark belongs to.
+   * @param parent The Folder this Mark belongs to.
    * @param name The Name of this Mark.
    */
-  protected Mark(Long id, IFolder folder, String name) {
+  protected Mark(Long id, IFolder parent, String name) {
     super(id);
-    Assert.isNotNull(folder, "The type Mark requires a Folder that is not NULL"); //$NON-NLS-1$
-    fFolder = folder;
+    Assert.isNotNull(parent, "The type Mark requires a Folder that is not NULL"); //$NON-NLS-1$
+    fParent = parent;
     Assert.isNotNull(name, "The type Mark requires a Name that is not NULL"); //$NON-NLS-1$
     fName = name;
   }
@@ -128,24 +132,22 @@ public abstract class Mark extends AbstractEntity implements IMark {
     fName = name;
   }
 
-  /*
-   * @see org.rssowl.core.model.types.IMark#getFolder()
-   */
-  public IFolder getFolder() {
-    return fFolder;
+  public IFolder getParent() {
+    return fParent;
+  }
+  
+  public void setParent(IFolder parent) {
+    Assert.isNotNull(parent, "parent");
+    fParent = parent;
   }
 
   /**
    * @return a uncached reference to the parent folder.
    */
   protected FolderReference getFolderReference() {
-    return getFolder() == null ? null : new FolderReference(getFolder().getId());
+    return getParent() == null ? null : new FolderReference(getParent().getId());
   }
   
-  public void setFolder(IFolder folder) {
-    fFolder = folder;
-  }
-
   @Override
   @SuppressWarnings("nls")
   public String toString() {
@@ -163,6 +165,6 @@ public abstract class Mark extends AbstractEntity implements IMark {
     if (getLastVisitDate() != null)
       retValue = retValue + (DateFormat.getDateTimeInstance().format(getLastVisitDate()));
 
-    return retValue + ", Belongs to Folder = " + fFolder.getId() + ", ";
+    return retValue + ", Belongs to Folder = " + fParent.getId() + ", ";
   }
 }

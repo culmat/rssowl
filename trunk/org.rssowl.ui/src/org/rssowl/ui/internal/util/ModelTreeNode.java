@@ -102,7 +102,7 @@ public class ModelTreeNode implements ITreeNode {
   public ITreeNode getNextSibling() {
 
     /* Get Parent */
-    IFolder parent = (fFolder != null ? fFolder.getParent() : fMark.getFolder());
+    IFolder parent = (fFolder != null ? fFolder.getParent() : fMark.getParent());
 
     /* Item is not Root-Leveld */
     if (parent != null) {
@@ -145,7 +145,7 @@ public class ModelTreeNode implements ITreeNode {
 
     /* Obtain from Mark */
     if (fMark != null)
-      return new ModelTreeNode(fMark.getFolder());
+      return new ModelTreeNode(fMark.getParent());
 
     return null;
   }
@@ -156,7 +156,7 @@ public class ModelTreeNode implements ITreeNode {
   public ITreeNode getPreviousSibling() {
 
     /* Get Parent */
-    IFolder parent = (fFolder != null ? fFolder.getParent() : fMark.getFolder());
+    IFolder parent = (fFolder != null ? fFolder.getParent() : fMark.getParent());
 
     /* Item is not Root-Leveld */
     if (parent != null) {

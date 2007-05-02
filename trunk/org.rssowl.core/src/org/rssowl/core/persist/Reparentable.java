@@ -34,7 +34,9 @@ package org.rssowl.core.persist;
 public interface Reparentable<T> {
 
   /**
-   * Set the new parent to the Object.
+   * Set the new parent to the Object. Some implementations of this interface
+   * may be stricter and not accept <code>null</code>. If that's the case,
+   * they should specify that in their documentation.
    * 
    * @param newParent the new parent of the Object to set.
    */

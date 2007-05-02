@@ -389,45 +389,24 @@ public class ManageSetsDialog extends TitleAreaDialog {
   private void perfromDrop(List<?> draggedObjects, Object dropTarget) {
 
     /* Require a Folder as drop target */
-    if (!(dropTarget instanceof IFolder))
+    if (!(dropTarget instanceof IFolder) || draggedObjects.isEmpty())
       return;
 
     IFolder dropFolder = (IFolder) dropTarget;
 
-    /* Separate into Reparented Marks and Folders */
-    List<ReparentInfo<IFolder, IFolder, IFolderChild>> folderReparenting = null;
-    List<ReparentInfo<IMark, IFolder, IFolderChild>> markReparenting = null;
+    List<ReparentInfo<IFolderChild, IFolder>> reparenting = new ArrayList<ReparentInfo<IFolderChild, IFolder>>(draggedObjects.size());
 
     /* For each dragged Object */
     for (Object object : draggedObjects) {
-      if (object instanceof IFolder) {
-        IFolder draggedFolder = (IFolder) object;
-
-        /* Reparenting to new Parent */
-        if (folderReparenting == null)
-          folderReparenting = new ArrayList<ReparentInfo<IFolder, IFolder, IFolderChild>>(draggedObjects.size());
-
-        ReparentInfo<IFolder, IFolder, IFolderChild> reparentInfo = ReparentInfo.create(draggedFolder, dropFolder, null, null);
-        folderReparenting.add(reparentInfo);
-      }
-
-      else if (object instanceof IMark) {
-        IMark draggedMark = (IMark) object;
-
-        /* Reparenting to new Parent */
-        if (markReparenting == null)
-          markReparenting = new ArrayList<ReparentInfo<IMark, IFolder, IFolderChild>>(draggedObjects.size());
-
-        ReparentInfo<IMark, IFolder, IFolderChild> reparentInfo = ReparentInfo.create(draggedMark, dropFolder, null, null);
-        markReparenting.add(reparentInfo);
+      if (object instanceof IFolder || object instanceof IMark) {
+        IFolderChild draggedFolderChild = (IFolderChild) object;
+        reparenting.add(ReparentInfo.create(draggedFolderChild, dropFolder, null, null));
       }
     }
 
     /* Perform reparenting */
-    if (folderReparenting != null || markReparenting != null) {
-      Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(folderReparenting, markReparenting);
-      fViewer.setSelection(fViewer.getSelection());
-    }
+    Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(reparenting);
+    fViewer.setSelection(fViewer.getSelection());
   }
 
   private void onAdd() {

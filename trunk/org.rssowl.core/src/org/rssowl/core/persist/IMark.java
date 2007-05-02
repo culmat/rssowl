@@ -100,22 +100,28 @@ public interface IMark extends IFolderChild {
    * @param name The Name of this Mark.
    */
   void setName(String name);
-
+  
   /**
-   * The parent Folder this Mark belongs to.
-   *
-   * @return the parent folder.
+   * Returns the parent of this IMark. This method should never return
+   * <code>null</code>.
+   * 
+   * @return the parent of this child.
    */
-  IFolder getFolder();
-
+  IFolder getParent();
+  
   /**
-   * Sets the parent folder to <code>folder</code>. Note that this method
-   * should not be used under normal circumstances. Instead call
-   * {@link IFolderDAO#reparent(java.util.List, java.util.List)} to ensure that
-   * the event is correctly populated with the old parent.
-   *
-   * @param folder new folder parent.
-   * @see IFolderDAO#reparent(java.util.List, java.util.List)
+   * Sets the parent folder to <code>folder</code>. <code>folder</code> should
+   * not be <code>null</code>.
+   * 
+   * <p>
+   * Note that this method should not be used under normal circumstances.
+   * Instead call {@link IFolderDAO#reparent(java.util.List)} to ensure that the
+   * event is correctly populated with the old parent.
+   * </p>
+   * 
+   * @param folder new folder parent. This should never be null.
+   * @see IFolderDAO#reparent(java.util.List)
    */
-  void setFolder(IFolder folder);
+  void setParent(IFolder folder);
+
 }

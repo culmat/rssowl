@@ -70,25 +70,6 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
     return new FolderEvent(entity, null, true);
   }
 
-  //  public void deleteFolders(List<IFolder> folders) {
-  //    fWriteLock.lock();
-  //    try {
-  //      for (IFolder folder : folders) {
-  //        FolderEvent event = new FolderEvent(folder, null, true);
-  //        DBHelper.putEventTemplate(event);
-  //      }
-  //      for (IFolder folder : folders)
-  //        fDb.delete(folder);
-  //
-  //      fDb.commit();
-  //    } catch (Db4oException e) {
-  //      throw new PersistenceException(e);
-  //    } finally {
-  //      fWriteLock.unlock();
-  //    }
-  //    DBHelper.cleanUpAndFireEvents();
-  //  }
-
   public Collection<IFolder> loadRoots() {
     try {
       Query query = fDb.query();
@@ -102,20 +83,17 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
     }
   }
 
-  public final void reparent(List<ReparentInfo<IFolder, IFolder, IFolderChild>> folderInfos, List<ReparentInfo<IMark, IFolder, IFolderChild>> markInfos) {
-
-    Assert.isLegal(folderInfos != null || markInfos != null, "Either folderInfos or markInfos must be non-null"); //$NON-NLS-1$
+  public final void reparent(List<ReparentInfo<IFolderChild, IFolder>> reparentInfos) {
+    Assert.isNotNull(reparentInfos, "reparentInfos"); //$NON-NLS-1$
+    if (reparentInfos.isEmpty())
+      return;
+    
     fWriteLock.lock();
     try {
-      List<FolderEvent> folderEvents = createFolderEvents(folderInfos);
-
-      List<BookMarkEvent> bookMarkEvents = Collections.emptyList();
-      List<SearchMarkEvent> searchMarkEvents = Collections.emptyList();
-      if (markInfos != null) {
-        bookMarkEvents = new ArrayList<BookMarkEvent>(markInfos.size() * (2 / 3));
-        searchMarkEvents = new ArrayList<SearchMarkEvent>(markInfos.size() / 3);
-        fillMarkEvents(markInfos, bookMarkEvents, searchMarkEvents);
-      }
+      List<FolderEvent> folderEvents = new ArrayList<FolderEvent>(3);
+      List<BookMarkEvent> bookMarkEvents = new ArrayList<BookMarkEvent>(3);
+      List<SearchMarkEvent> searchMarkEvents = new ArrayList<SearchMarkEvent>(3);
+      fillFolderChildEvents(reparentInfos, folderEvents, bookMarkEvents, searchMarkEvents);
 
       for (FolderEvent event : folderEvents) {
         fDb.set(event.getOldParent());
@@ -128,13 +106,13 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
 
       for (BookMarkEvent event : bookMarkEvents) {
         fDb.set(event.getOldParent());
-        IFolder newParent = event.getEntity().getFolder();
+        IFolder newParent = event.getEntity().getParent();
         fDb.set(newParent);
       }
 
       for (SearchMarkEvent event : searchMarkEvents) {
         fDb.set(event.getOldParent());
-        IFolder newParent = event.getEntity().getFolder();
+        IFolder newParent = event.getEntity().getParent();
         fDb.set(newParent);
       }
 
@@ -148,32 +126,6 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
 
   }
 
-  private List<FolderEvent> createFolderEvents(List<ReparentInfo<IFolder, IFolder, IFolderChild>> folderInfos) {
-    if (folderInfos == null)
-      return Collections.emptyList();
-
-    List<FolderEvent> folderEvents = new ArrayList<FolderEvent>(folderInfos.size());
-    for (ReparentInfo<IFolder, IFolder, IFolderChild> folderInfo : folderInfos) {
-      IFolder folder = folderInfo.getObject();
-      IFolder newParent = folderInfo.getNewParent();
-      IFolder oldParent = folder.getParent();
-      IFolderChild newPosition = folderInfo.getNewPosition();
-      synchronized (folder) {
-        removeFolderFromParent(folder);
-        addFolder(newParent, folder, newPosition, folderInfo.isAfter());
-        if (newPosition != null) {
-          List<IFolder> folderList = new ArrayList<IFolder>(1);
-          folderList.add(folder);
-          newParent.reorderChildren(folderList, newPosition, folderInfo.isAfter().booleanValue());
-        }
-      }
-      FolderEvent eventTemplate = new FolderEvent(folder, oldParent, true);
-      folderEvents.add(eventTemplate);
-      DBHelper.putEventTemplate(eventTemplate);
-    }
-    return folderEvents;
-  }
-
   private void addFolder(IFolder parent, IFolder child, IFolderChild position, Boolean after) {
     child.setParent(parent);
     /* The new parent may be null. It becomes a root folder */
@@ -181,49 +133,59 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
       parent.addFolder(child, position, after);
   }
 
-  private IFolder removeFolderFromParent(IFolder folder) {
-    IFolder oldParent = folder.getParent();
-    oldParent.removeFolder(folder);
-    return oldParent;
-  }
-
-  private IFolder removeMarkFromParent(IMark mark) {
-    IFolder oldParent = mark.getFolder();
-    oldParent.removeMark(mark);
+  private IFolder removeChildFromFolder(IFolderChild folderChild) {
+    IFolder oldParent = folderChild.getParent();
+    oldParent.removeChild(folderChild);
     return oldParent;
   }
 
   private void addMarkToFolder(IFolder parent, IMark child, IFolderChild position, Boolean after) {
-    child.setFolder(parent);
+    child.setParent(parent);
     parent.addMark(child, position, after);
   }
 
-  private void fillMarkEvents(List<ReparentInfo<IMark, IFolder, IFolderChild>> markInfos, List<BookMarkEvent> bookMarkEvents, List<SearchMarkEvent> searchMarkEvents) {
-    for (ReparentInfo<IMark, IFolder, IFolderChild> markInfo : markInfos) {
-      IMark mark = markInfo.getObject();
-      IFolder newParent = markInfo.getNewParent();
-      IFolder oldParent = mark.getFolder();
-      IFolderChild newPosition = markInfo.getNewPosition();
-      synchronized (mark) {
-        removeMarkFromParent(mark);
-        addMarkToFolder(newParent, mark, newPosition, markInfo.isAfter());
-        if (newPosition != null) {
-          List<IMark> markList = new ArrayList<IMark>(1);
-          markList.add(mark);
-          newParent.reorderChildren(markList, newPosition, markInfo.isAfter().booleanValue());
+  private void fillFolderChildEvents(List<ReparentInfo<IFolderChild, IFolder>> reparentInfos, List<FolderEvent> folderEvents, List<BookMarkEvent> bookMarkEvents, List<SearchMarkEvent> searchMarkEvents) {
+    for (ReparentInfo<IFolderChild, IFolder> reparentInfo : reparentInfos) {
+      IFolderChild child = reparentInfo.getObject();
+      IFolder newParent = reparentInfo.getNewParent();
+      IFolder oldParent = child.getParent();
+      IFolderChild newPosition = reparentInfo.getNewPosition();
+      if (child instanceof IFolder) {
+        IFolder folder = (IFolder) child;
+        synchronized (folder) {
+          removeChildFromFolder(folder);
+          addFolder(newParent, folder, newPosition, reparentInfo.isAfter());
+          if (newPosition != null) {
+            List<IFolder> folderList = Collections.singletonList(folder);
+            newParent.reorderChildren(folderList, newPosition, reparentInfo.isAfter().booleanValue());
+          }
         }
+        FolderEvent eventTemplate = new FolderEvent(folder, oldParent, true);
+        folderEvents.add(eventTemplate);
+        DBHelper.putEventTemplate(eventTemplate);
+      } else if (child instanceof IMark) {
+        IMark mark = (IMark) child;
+        synchronized (mark) {
+          removeChildFromFolder(mark);
+          addMarkToFolder(newParent, mark, newPosition, reparentInfo.isAfter());
+          if (newPosition != null) {
+            List<IMark> markList = Collections.singletonList(mark);
+            newParent.reorderChildren(markList, newPosition, reparentInfo.isAfter().booleanValue());
+          }
+        }
+        if (mark instanceof IBookMark) {
+          BookMarkEvent event = new BookMarkEvent((IBookMark) mark, oldParent, true);
+          bookMarkEvents.add(event);
+          DBHelper.putEventTemplate(event);
+        } else if (mark instanceof ISearchMark) {
+          SearchMarkEvent event = new SearchMarkEvent((ISearchMark) mark, oldParent, true);
+          searchMarkEvents.add(event);
+          DBHelper.putEventTemplate(event);
+        } else
+          throw new IllegalArgumentException("Unknown IMark subclass found: " + child.getClass());
+      } else {
+        throw new IllegalArgumentException("Unknown IFolderChild subclass found: " + child.getClass());
       }
-      if (mark instanceof IBookMark) {
-        BookMarkEvent event = new BookMarkEvent((IBookMark) mark, oldParent, true);
-        bookMarkEvents.add(event);
-        DBHelper.putEventTemplate(event);
-      } else if (mark instanceof ISearchMark) {
-        SearchMarkEvent event = new SearchMarkEvent((ISearchMark) mark, oldParent, true);
-        searchMarkEvents.add(event);
-        DBHelper.putEventTemplate(event);
-      } else
-        throw new IllegalArgumentException("Uknown mark subclass found: " + mark.getClass()); //$NON-NLS-1$
-
     }
   }
 }

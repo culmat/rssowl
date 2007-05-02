@@ -867,7 +867,7 @@ public class Controller {
       /* Reparent all imported marks into selected Set */
       List<IMark> marks = importedContainer.getMarks();
       for (IMark mark : marks) {
-        mark.setFolder(rootFolder);
+        mark.setParent(rootFolder);
         rootFolder.addMark(mark, null, null);
       }
 

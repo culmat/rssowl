@@ -1582,7 +1582,7 @@ public class BookMarkExplorer extends ViewPart {
       if (obj instanceof IFolder)
         return (IFolder) obj;
       else if (obj instanceof IMark)
-        return ((IMark) obj).getFolder();
+        return ((IMark) obj).getParent();
     }
 
     /* Default is selected Set */

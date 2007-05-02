@@ -353,7 +353,7 @@ public class EventManager {
   private void removeFromParentFolderAndCascade(IFolder folder) {
     IFolder parentFolder = folder.getParent();
     if (parentFolder != null) {
-      parentFolder.removeFolder(folder);
+      parentFolder.removeChild(folder);
       fDb.set(parentFolder);
     }
     for (IFolder child : ReverseIterator.createInstance(folder.getFolders())) {
@@ -383,8 +383,8 @@ public class EventManager {
   }
 
   private void removeFromParentFolder(IMark mark) {
-    IFolder parentFolder = mark.getFolder();
-    parentFolder.removeMark(mark);
+    IFolder parentFolder = mark.getParent();
+    parentFolder.removeChild(mark);
     if (mark.getProperty(PARENT_DELETED_KEY) == null)
       fDb.set(parentFolder);
     else {

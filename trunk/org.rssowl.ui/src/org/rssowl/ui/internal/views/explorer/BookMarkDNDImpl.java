@@ -302,7 +302,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     /* Do not allow Re-Ordering over IMarks (when sorting or grouping) */
     if ((fExplorer.isSortByNameEnabled() || fExplorer.isGroupingEnabled()) && dropTarget instanceof IMark) {
       IMark target = (IMark) dropTarget;
-      if (target.getFolder().getChildren().contains(dragSource))
+      if (target.getParent().getChildren().contains(dragSource))
         return false;
     }
 
@@ -317,14 +317,14 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     int loc = getCurrentLocation();
 
     /* Do not allow dropping on same Parent */
-    if (loc == LOCATION_ON && dragSource.getFolder().equals(dropTarget))
+    if (loc == LOCATION_ON && dragSource.getParent().equals(dropTarget))
       return false;
 
     /* Do not allow Re-Ordering of Entities if sort by name */
     if (fExplorer.isSortByNameEnabled()) {
       if (dropTarget instanceof IMark) {
         IMark target = (IMark) dropTarget;
-        if (target.getFolder().getChildren().contains(dragSource))
+        if (target.getParent().getChildren().contains(dragSource))
           return false;
       }
     }
@@ -371,7 +371,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
             if (dropTarget instanceof IFolder)
               parent = (IFolder) dropTarget;
             else if (dropTarget instanceof IMark)
-              parent = ((IMark) dropTarget).getFolder();
+              parent = ((IMark) dropTarget).getParent();
             else
               parent = null;
 
@@ -428,71 +428,48 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     /* Target is a Mark */
     else if (dropTarget instanceof IMark) {
       IMark dropMark = (IMark) dropTarget;
-      parentFolder = dropMark.getFolder();
+      parentFolder = dropMark.getParent();
     }
 
     /* Require a Parent-Folder */
     if (parentFolder == null)
       return;
 
-    /* Separate into Reparented Marks and Folders and Re-Orders */
+    /* Separate into Reparented FolderChildren and Re-Orders */
     List<IFolderChild> childReordering = null;
-    List<ReparentInfo<IFolder, IFolder, IFolderChild>> folderReparenting = null;
-    List<ReparentInfo<IMark, IFolder, IFolderChild>> markReparenting = null;
+    List<ReparentInfo<IFolderChild, IFolder>> reparenting = null;
 
     /* For each dragged Object */
     for (Object object : draggedObjects) {
 
-      /* Dragged Folder */
-      if (object instanceof IFolder) {
-        IFolder draggedFolder = (IFolder) object;
+      /* Dragged Folder or Mark */
+      if (object instanceof IFolder || object instanceof IMark) {
+        IFolderChild draggedFolderChild = (IFolderChild) object;
 
         /* Reparenting to new Parent */
-        if (!draggedFolder.getParent().equals(parentFolder)) {
-          if (folderReparenting == null)
-            folderReparenting = new ArrayList<ReparentInfo<IFolder, IFolder, IFolderChild>>(draggedObjects.size());
+        if (!draggedFolderChild.getParent().equals(parentFolder)) {
+          if (reparenting == null)
+            reparenting = new ArrayList<ReparentInfo<IFolderChild, IFolder>>(draggedObjects.size());
 
-          ReparentInfo<IFolder, IFolder, IFolderChild> reparentInfo = ReparentInfo.create(draggedFolder, parentFolder, position, after);
-          folderReparenting.add(reparentInfo);
+          ReparentInfo<IFolderChild, IFolder> reparentInfo = ReparentInfo.create(draggedFolderChild, parentFolder, position, after);
+          reparenting.add(reparentInfo);
         }
 
         /* Re-Ordering in same Parent */
         else {
           if (childReordering == null)
             childReordering = new ArrayList<IFolderChild>(draggedObjects.size());
-          childReordering.add(draggedFolder);
-        }
-      }
-
-      /* Dragged Mark */
-      else if (object instanceof IMark) {
-        IMark draggedMark = (IMark) object;
-
-        /* Reparenting to new Parent */
-        if (!draggedMark.getFolder().equals(parentFolder)) {
-          if (markReparenting == null)
-            markReparenting = new ArrayList<ReparentInfo<IMark, IFolder, IFolderChild>>(draggedObjects.size());
-
-          ReparentInfo<IMark, IFolder, IFolderChild> reparentInfo = ReparentInfo.create(draggedMark, parentFolder, position, after);
-          markReparenting.add(reparentInfo);
-        }
-
-        /* Re-Ordering in same Parent */
-        else {
-          if (childReordering == null)
-            childReordering = new ArrayList<IFolderChild>(draggedObjects.size());
-          childReordering.add(draggedMark);
+          childReordering.add(draggedFolderChild);
         }
       }
     }
 
     /* Perform reparenting */
-    final List<ReparentInfo<IFolder, IFolder, IFolderChild>> finalFolderReparenting = folderReparenting;
-    final List<ReparentInfo<IMark, IFolder, IFolderChild>> finalMarkReparenting = markReparenting;
-    if (folderReparenting != null || markReparenting != null) {
+    if (reparenting != null) {
+      final List<ReparentInfo<IFolderChild, IFolder>> finalReparenting = reparenting;
       BusyIndicator.showWhile(getViewer().getControl().getDisplay(), new Runnable() {
         public void run() {
-          fFolderDAO.reparent(finalFolderReparenting, finalMarkReparenting);
+          fFolderDAO.reparent(finalReparenting);
         }
       });
     }
