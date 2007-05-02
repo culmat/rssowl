@@ -270,9 +270,9 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     IFolder parent = null;
 
     for (IEntity entity : entities) {
-      //TODO The previous code assumed that this was either a IFolder or
-      //IMark, so I am now casting directly to IFolderChild. I would recommend
-      //passing a List of IFolderChild instead of IEntity
+      if (!(entity instanceof IFolderChild))
+        return null;
+
       IFolderChild folderChild = (IFolderChild) entity;
       IFolder folder = folderChild.getParent();
       if (parent == null)
