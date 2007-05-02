@@ -198,7 +198,14 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       locationLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
       locationLabel.setText("Location: ");
 
-      fFolderChooser = new FolderChooser(container, sameParent, SWT.BORDER);
+      /* Exclude Folders that are selected from Chooser */
+      List<IFolder> excludes = new ArrayList<IFolder>();
+      for (IEntity entity : fEntities) {
+        if (entity instanceof IFolder)
+          excludes.add((IFolder) entity);
+      }
+
+      fFolderChooser = new FolderChooser(container, sameParent, excludes, SWT.BORDER);
       fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
       fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
       fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
