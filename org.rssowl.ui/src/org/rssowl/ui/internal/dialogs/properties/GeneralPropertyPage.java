@@ -27,6 +27,7 @@ package org.rssowl.ui.internal.dialogs.properties;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -39,9 +40,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
+import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
@@ -55,6 +59,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.util.ReparentInfo;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
@@ -167,25 +172,56 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       IEntity entity = fEntities.get(0);
       separateFromTop = true;
 
-      /* Name */
-      Label nameLabel = new Label(container, SWT.None);
-      nameLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-      nameLabel.setText("Name: ");
-
-      fNameInput = new Text(container, SWT.BORDER);
-      fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-      fNameInput.setText(getName(entity));
-
       /* Link */
       if (entity instanceof IBookMark) {
         Label feedLabel = new Label(container, SWT.None);
         feedLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
-        feedLabel.setText("Feed: ");
+        feedLabel.setText("Link: ");
 
         fFeedInput = new Text(container, SWT.BORDER);
         fFeedInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
         fFeedInput.setText(((IBookMark) entity).getFeedLinkReference().getLink().toString());
         ((GridData) fFeedInput.getLayoutData()).widthHint = fSite.getHorizontalPixels(IDialogConstants.ENTRY_FIELD_WIDTH);
+
+        /* Name */
+        Label nameLabel = new Label(container, SWT.None);
+        nameLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
+        nameLabel.setText("Name: ");
+
+        Composite nameContainer = new Composite(container, SWT.BORDER);
+        nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+        nameContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+        nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+        fNameInput = new Text(nameContainer, SWT.NONE);
+        fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+        fNameInput.setText(getName(entity));
+
+        ToolBar grabTitleBar = new ToolBar(nameContainer, SWT.FLAT);
+        grabTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+        ToolItem grabTitleItem = new ToolItem(grabTitleBar, SWT.PUSH);
+        grabTitleItem.setImage(OwlUI.getImage(fSite.getResourceManager(), "icons/etool16/info.gif"));
+        grabTitleItem.setToolTipText("Load name from feed");
+        grabTitleItem.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            onGrabTitle();
+          }
+        });
+      }
+
+      /* Other */
+      else {
+
+        /* Name */
+        Label nameLabel = new Label(container, SWT.None);
+        nameLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
+        nameLabel.setText("Name: ");
+
+        fNameInput = new Text(container, SWT.BORDER);
+        fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+        fNameInput.setText(getName(entity));
       }
     }
 
@@ -263,11 +299,33 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     return container;
   }
 
+  private void onGrabTitle() {
+    if (StringUtils.isSet(fFeedInput.getText())) {
+      BusyIndicator.showWhile(fFeedInput.getDisplay(), new Runnable() {
+        public void run() {
+          try {
+            URI link = new URI(fFeedInput.getText());
+            String label = Owl.getConnectionService().getLabel(link);
+            if (StringUtils.isSet(label))
+              fNameInput.setText(label);
+          } catch (ConnectionException e) {
+            /* Ignore */
+          } catch (URISyntaxException e) {
+            /* Ignore */
+          }
+        }
+      });
+    }
+  }
+
   /*
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#setFocus()
    */
   public void setFocus() {
-    if (fNameInput != null) {
+    if (fFeedInput != null) {
+      fFeedInput.setFocus();
+      fFeedInput.selectAll();
+    } else if (fNameInput != null) {
       fNameInput.setFocus();
       fNameInput.selectAll();
     }
