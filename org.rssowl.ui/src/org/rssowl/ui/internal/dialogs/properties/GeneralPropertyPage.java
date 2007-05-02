@@ -270,7 +270,11 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     IFolder parent = null;
 
     for (IEntity entity : entities) {
-      IFolder folder = (entity instanceof IMark) ? ((IMark) entity).getFolder() : ((IFolder) entity).getParent();
+      //TODO The previous code assumed that this was either a IFolder or
+      //IMark, so I am now casting directly to IFolderChild. I would recommend
+      //passing a List of IFolderChild instead of IEntity
+      IFolderChild folderChild = (IFolderChild) entity;
+      IFolder folder = folderChild.getParent();
       if (parent == null)
         parent = folder;
       else if (parent != folder)
@@ -436,27 +440,17 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     /* Reparent if necessary */
     IFolder sameParent = getSameParent(fEntities);
     if (sameParent != null && sameParent != fFolderChooser.getFolder()) {
-      List<ReparentInfo<IMark, IFolder, IFolderChild>> markReparenting = new ArrayList<ReparentInfo<IMark, IFolder, IFolderChild>>();
-      List<ReparentInfo<IFolder, IFolder, IFolderChild>> folderReparenting = new ArrayList<ReparentInfo<IFolder, IFolder, IFolderChild>>();
+      List<ReparentInfo<IFolderChild, IFolder>> reparenting = new ArrayList<ReparentInfo<IFolderChild, IFolder>>();
       for (IEntity entity : fEntities) {
-
-        /* Check BookMark */
-        if (entity instanceof IBookMark) {
-          IBookMark bookmark = (IBookMark) entity;
-          ReparentInfo<IMark, IFolder, IFolderChild> reparent = new ReparentInfo<IMark, IFolder, IFolderChild>(bookmark, fFolderChooser.getFolder(), null, null);
-          markReparenting.add(reparent);
-        }
-
-        /* Check Folder */
-        else if (entity instanceof IFolder) {
-          IFolder folder = (IFolder) entity;
-          ReparentInfo<IFolder, IFolder, IFolderChild> reparent = new ReparentInfo<IFolder, IFolder, IFolderChild>(folder, fFolderChooser.getFolder(), null, null);
-          folderReparenting.add(reparent);
+        /* Check BookMark and Folder */
+        if (entity instanceof IBookMark || entity instanceof IFolder) {
+          IFolderChild folderChild = (IFolderChild) entity;
+          reparenting.add(ReparentInfo.create(folderChild, fFolderChooser.getFolder(), null, null));
         }
       }
 
       /* Perform Reparenting */
-      Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(folderReparenting, markReparenting);
+      Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(reparenting);
     }
   }
 

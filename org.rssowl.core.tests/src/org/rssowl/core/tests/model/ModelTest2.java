@@ -203,11 +203,11 @@ public class ModelTest2 {
             IBookMark bookMark = event.getEntity();
 
             if ("Root BookMark".equals(bookMark.getName()))
-              assertEquals("Root", bookMark.getFolder().getName());
+              assertEquals("Root", bookMark.getParent().getName());
             else if ("Root Child BookMark".equals(bookMark.getName()))
-              assertEquals("Root Child", bookMark.getFolder().getName());
+              assertEquals("Root Child", bookMark.getParent().getName());
             else if ("Root Child Child #1 BookMark".equals(bookMark.getName()))
-              assertEquals("Root Child Child #1 Child", bookMark.getFolder().getName());
+              assertEquals("Root Child Child #1 Child", bookMark.getParent().getName());
 
             if (bookMark.getName().equals(bookMark1.getName()))
               bookMarkEventsIssued[0] = true;
@@ -238,11 +238,11 @@ public class ModelTest2 {
             ISearchMark searchMark = event.getEntity();
 
             if ("Root SearchMark".equals(searchMark.getName()))
-              assertEquals("Root", searchMark.getFolder().getName());
+              assertEquals("Root", searchMark.getParent().getName());
             else if ("Root Child SearchMark".equals(searchMark.getName()))
-              assertEquals("Root Child", searchMark.getFolder().getName());
+              assertEquals("Root Child", searchMark.getParent().getName());
             else if ("Root Child Child #1 SearchMark".equals(searchMark.getName()))
-              assertEquals("Root Child Child #1 Child", searchMark.getFolder().getName());
+              assertEquals("Root Child Child #1 Child", searchMark.getParent().getName());
 
             if (searchMark.getName().equals(searchMark1.getName()))
               searchMarkEventsIssued[0] = true;
@@ -868,15 +868,15 @@ public class ModelTest2 {
       final FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
       IBookMark bookMark1 = fFactory.createBookMark(null, rootRef.resolve(), new FeedLinkReference(feed.getLink()), "Root BookMark");
-      root = DynamicDAO.save(bookMark1.getFolder());
+      root = DynamicDAO.save(bookMark1.getParent());
       final BookMarkReference bookMarkRef1 = new BookMarkReference(root.getMarks().get(0).getId());
 
       IBookMark bookMark2 = fFactory.createBookMark(null, rootChildRef.resolve(), new FeedLinkReference(feed.getLink()), "Root Child BookMark");
-      rootChild = DynamicDAO.save(bookMark2.getFolder());
+      rootChild = DynamicDAO.save(bookMark2.getParent());
       final BookMarkReference bookMarkRef2 = new BookMarkReference(rootChild.getMarks().get(0).getId());
 
       IBookMark bookMark3 = fFactory.createBookMark(null, rootChildChild1Ref.resolve(), new FeedLinkReference(feed.getLink()), "Root Child Child #1 BookMark");
-      rootChildChild1 = DynamicDAO.save(bookMark3.getFolder());
+      rootChildChild1 = DynamicDAO.save(bookMark3.getParent());
       final BookMarkReference bookMarkRef3 = new BookMarkReference(rootChildChild1.getMarks().get(0).getId());
 
       final boolean bookMarkEventsIssued[] = new boolean[3];
@@ -915,17 +915,17 @@ public class ModelTest2 {
 
       /* Check SearchMark Deleted */
       ISearchMark searchMark1 = fFactory.createSearchMark(null, rootRef.resolve(), "Root SearchMark");
-      root = DynamicDAO.save(searchMark1.getFolder());
+      root = DynamicDAO.save(searchMark1.getParent());
       searchMark1 = (ISearchMark) root.getMarks().get(root.getMarks().size() - 1);
       final SearchMarkReference searchMarkRef1 = new SearchMarkReference(searchMark1.getId());
 
       ISearchMark searchMark2 = fFactory.createSearchMark(null, rootChildRef.resolve(), "Root Child SearchMark");
-      rootChild = DynamicDAO.save(searchMark2.getFolder());
+      rootChild = DynamicDAO.save(searchMark2.getParent());
       searchMark2 = (ISearchMark) rootChild.getMarks().get(rootChild.getMarks().size() - 1);
       final SearchMarkReference searchMarkRef2 = new SearchMarkReference(searchMark2.getId());
 
       ISearchMark searchMark3 = fFactory.createSearchMark(null, rootChildChild1ChildRef.resolve(), "Root Child Child #1 Child SearchMark");
-      rootChildChild1Child = DynamicDAO.save(searchMark3.getFolder());
+      rootChildChild1Child = DynamicDAO.save(searchMark3.getParent());
       searchMark3 = (ISearchMark) rootChildChild1Child.getMarks().get(rootChildChild1Child.getMarks().size() - 1);
       final SearchMarkReference searchMarkRef3 = new SearchMarkReference(searchMark3.getId());
 

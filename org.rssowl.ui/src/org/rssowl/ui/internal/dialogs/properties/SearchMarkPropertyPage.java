@@ -37,7 +37,6 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
-import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.util.ReparentInfo;
@@ -95,7 +94,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     locationLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
     locationLabel.setText("Location: ");
 
-    fFolderChooser = new FolderChooser(container, fSearchMark.getFolder(), SWT.BORDER);
+    fFolderChooser = new FolderChooser(container, fSearchMark.getParent(), SWT.BORDER);
     fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
     fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -195,9 +194,9 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
   public void finish() {
 
     /* Reparent if necessary */
-    if (fSearchMark.getFolder() != fFolderChooser.getFolder()) {
-      ReparentInfo<IMark, IFolder, IFolderChild> reparent = new ReparentInfo<IMark, IFolder, IFolderChild>(fSearchMark, fFolderChooser.getFolder(), null, null);
-      Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(null, Collections.singletonList(reparent));
+    if (fSearchMark.getParent() != fFolderChooser.getFolder()) {
+      ReparentInfo<IFolderChild, IFolder> reparent = new ReparentInfo<IFolderChild, IFolder>(fSearchMark, fFolderChooser.getFolder(), null, null);
+      Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(Collections.singletonList(reparent));
     }
   }
 }

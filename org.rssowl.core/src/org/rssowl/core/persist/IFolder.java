@@ -39,7 +39,7 @@ import java.util.List;
  *
  * @author bpasero
  */
-public interface IFolder extends IFolderChild, Reparentable<IFolder> {
+public interface IFolder extends IFolderChild   {
 
   /** One of the fields in this type described as constant */
   public static final int NAME = 0;
@@ -68,6 +68,17 @@ public interface IFolder extends IFolderChild, Reparentable<IFolder> {
    * @see #getFolders()
    */
   List<IFolderChild> getChildren();
+  
+  /**
+   * Of there is an instance of <code>IFolderChild</code> that is equal to
+   * <code>child</code> in the list of children, removes it and returns
+   * <code>true</code>. Otherwise, returns <code>false</code>.
+   * 
+   * @param child An instance of <code>IFolderChild</code> to be removed.
+   * @return <code>true</code> if a child is removed from children,
+   * <code>false</code> otherwise.
+   */
+  boolean removeChild(IFolderChild child);
 
   /**
    * Adds an instance of <code>IMark</code> as Child to this Folder.
@@ -96,14 +107,6 @@ public interface IFolder extends IFolderChild, Reparentable<IFolder> {
    * provided.
    */
   void reorderChildren(List<? extends IFolderChild> children, IFolderChild position, Boolean after);
-
-  /**
-   * Removes an instance of <code>IMark</code> from this Folder.
-   *
-   * @param mark An instance of <code>IMark</code> to be removed from this
-   * Folder.
-   */
-  void removeMark(IMark mark);
 
   /**
    * Get a list of marks contained in this folder. Typically, these marks may be
@@ -148,13 +151,6 @@ public interface IFolder extends IFolderChild, Reparentable<IFolder> {
   List<IFolder> getFolders();
 
   /**
-   * Get the parent folder or null if no parent folder exists.
-   *
-   * @return the parent folder or null if no parent folder exists.
-   */
-  IFolder getParent();
-
-  /**
    * Get the Name of this Folder.
    *
    * @return the name of the folder.
@@ -181,12 +177,4 @@ public interface IFolder extends IFolderChild, Reparentable<IFolder> {
    * @param blogrollLink the Link to the Blogroll this Folder is pointing to.
    */
   void setBlogrollLink(URI blogrollLink);
-
-  /**
-   * Removes an instance of <code>IFolder</code> that is equal to
-   * <code>folder</code> from the list of child folders.
-   *
-   * @param folder An instance of <code>IFolder</code> to be removed.
-   */
-  void removeFolder(IFolder folder);
 }

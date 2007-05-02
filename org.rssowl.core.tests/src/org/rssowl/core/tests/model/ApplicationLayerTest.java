@@ -45,7 +45,6 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
-import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
@@ -524,7 +523,7 @@ public class ApplicationLayerTest {
   }
 
   /**
-   * Test {@link IFolderDAO#reparent(List, List)}
+   * Test {@link IFolderDAO#reparent(List)}
    *
    * @throws Exception
    */
@@ -596,7 +595,7 @@ public class ApplicationLayerTest {
           assertEquals(bookMark, event.getEntity());
           assertTrue("Expected this Event to be Root Event", event.isRoot());
           assertEquals(oldMarkParent, event.getOldParent());
-          assertEquals(newMarkParent, event.getEntity().getFolder());
+          assertEquals(newMarkParent, event.getEntity().getParent());
         }
       };
 
@@ -617,7 +616,7 @@ public class ApplicationLayerTest {
           assertEquals(searchMark, event.getEntity());
           assertTrue("Expected this Event to be Root Event", event.isRoot());
           assertEquals(oldMarkParent, event.getOldParent());
-          assertEquals(newMarkParent, event.getEntity().getFolder());
+          assertEquals(newMarkParent, event.getEntity().getParent());
         }
       };
 
@@ -625,13 +624,12 @@ public class ApplicationLayerTest {
       DynamicDAO.addEntityListener(IBookMark.class, bookMarkListener);
       DynamicDAO.addEntityListener(ISearchMark.class, searchMarkListener);
 
-      ReparentInfo<IFolder, IFolder, IFolderChild> folderInfo = new ReparentInfo<IFolder, IFolder, IFolderChild>(folder, newFolderParent, null, null);
-      List<ReparentInfo<IFolder, IFolder, IFolderChild>> folderInfos = Collections.singletonList(folderInfo);
+      List<ReparentInfo<IFolderChild, IFolder>> reparentInfos = new ArrayList<ReparentInfo<IFolderChild, IFolder>>();
+      reparentInfos.add(new ReparentInfo<IFolderChild, IFolder>(folder, newFolderParent, null, null));
+      reparentInfos.add(new ReparentInfo<IFolderChild, IFolder>(bookMark, newMarkParent, null, null));
+      reparentInfos.add(new ReparentInfo<IFolderChild, IFolder>(searchMark, newMarkParent, null, null));
 
-      List<ReparentInfo<IMark, IFolder, IFolderChild>> markInfos = new ArrayList<ReparentInfo<IMark, IFolder, IFolderChild>>();
-      markInfos.add(new ReparentInfo<IMark, IFolder, IFolderChild>(bookMark, newMarkParent, null, null));
-      markInfos.add(new ReparentInfo<IMark, IFolder, IFolderChild>(searchMark, newMarkParent, null, null));
-      Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(folderInfos, markInfos);
+      Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(reparentInfos);
 
       /* Asserts Follow */
 
@@ -648,8 +646,8 @@ public class ApplicationLayerTest {
       assertEquals(0, oldMarkParent.getMarks().size());
       assertTrue(newMarkParent.getMarks().contains(bookMark));
       assertTrue(newMarkParent.getMarks().contains(searchMark));
-      assertEquals(newMarkParent, bookMark.getFolder());
-      assertEquals(newMarkParent, searchMark.getFolder());
+      assertEquals(newMarkParent, bookMark.getParent());
+      assertEquals(newMarkParent, searchMark.getParent());
       assertEquals(2, newMarkParent.getMarks().size());
 
       /* Events fired */
@@ -732,7 +730,7 @@ public class ApplicationLayerTest {
     FeedLinkReference feedLinkRef = new FeedLinkReference(feed.getLink());
     Collection<IBookMark> marks = Owl.getPersistenceService().getDAOService().getBookMarkDAO().loadAll(feedLinkRef);
     assertEquals(1, marks.size());
-    assertEquals(folderName, marks.iterator().next().getFolder().getName());
+    assertEquals(folderName, marks.iterator().next().getParent().getName());
     marks = null;
     System.gc();
   }
@@ -800,7 +798,7 @@ public class ApplicationLayerTest {
     IBookMarkDAO markDAO = DynamicDAO.getDAO(IBookMarkDAO.class);
     Collection<IBookMark> marks = markDAO.loadAll();
     assertEquals(1, marks.size());
-    assertEquals(folderName, marks.iterator().next().getFolder().getName());
+    assertEquals(folderName, marks.iterator().next().getParent().getName());
     marks = null;
     System.gc();
 

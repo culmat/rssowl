@@ -34,13 +34,12 @@ import org.rssowl.core.persist.dao.IFolderDAO;
  * @param
  * <P>
  * The type of the parent.
- * @param <L> The type of the position
- * @see IFolderDAO#reparent(java.util.List, java.util.List)
+ * @see IFolderDAO#reparent(java.util.List)
  */
-public class ReparentInfo<T, P, L> {
+public class ReparentInfo<T, P> {
   private final T object;
   private final P newParent;
-  private final L newPosition;
+  private final T newPosition;
   private final Boolean after;
 
   /**
@@ -52,7 +51,6 @@ public class ReparentInfo<T, P, L> {
    * @param
    * <P>
    * The type of the parent.
-   * @param <L> The type of the position
    * @param object Non-null object to be reparented.
    * @param newParent Non-null new parent of <code>object</code>.
    * @param newPosition Neighbour of <code>object</code> in
@@ -63,8 +61,8 @@ public class ReparentInfo<T, P, L> {
    * <code>newPosition</code> is <code>null</code> and non-null otherwise.
    * @return ReparentInfo instance.
    */
-  public final static <T, P, L> ReparentInfo<T, P, L> create(T object, P newParent, L newPosition, Boolean after) {
-    return new ReparentInfo<T, P, L>(object, newParent, newPosition, after);
+  public final static <T, P> ReparentInfo<T, P> create(T object, P newParent, T newPosition, Boolean after) {
+    return new ReparentInfo<T, P>(object, newParent, newPosition, after);
   }
 
   /**
@@ -79,7 +77,7 @@ public class ReparentInfo<T, P, L> {
    * in <code>newParent</code>. Has to be <code>null</code> if
    * <code>newPosition</code> is <code>null</code> and non-null otherwise.
    */
-  public ReparentInfo(T object, P newParent, L newPosition, Boolean after) {
+  public ReparentInfo(T object, P newParent, T newPosition, Boolean after) {
     Assert.isNotNull(object, "object cannot be null"); //$NON-NLS-1$
     Assert.isNotNull(newParent, "newParent cannot be null"); //$NON-NLS-1$
     if (newPosition == null)
@@ -113,7 +111,7 @@ public class ReparentInfo<T, P, L> {
    * <code>object</code> in <code>newParent</code>. May be
    * <code>null</code>.
    */
-  public final L getNewPosition() {
+  public final T getNewPosition() {
     return newPosition;
   }
 

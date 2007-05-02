@@ -490,10 +490,10 @@ public class ModelUtils {
 
     else if (entityToCheck instanceof IMark) {
       IMark mark = (IMark) entityToCheck;
-      if (mark.getFolder().equals(parent))
+      if (mark.getParent().equals(parent))
         return true;
 
-      return hasChildRelation(parent, mark.getFolder());
+      return hasChildRelation(parent, mark.getParent());
     }
 
     return false;

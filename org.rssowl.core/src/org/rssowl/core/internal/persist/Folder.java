@@ -91,7 +91,7 @@ public class Folder extends AbstractEntity implements IFolder {
    */
   public void addMark(IMark mark, IFolderChild position, Boolean after) {
     Assert.isNotNull(mark, "Exception adding NULL as Mark into Folder"); //$NON-NLS-1$
-    Assert.isTrue(equals(mark.getFolder()), "The Mark has a different Folder set!"); //$NON-NLS-1$
+    Assert.isTrue(equals(mark.getParent()), "The Mark has a different Folder set!"); //$NON-NLS-1$
     addChild(mark, position, after);
   }
 
@@ -118,6 +118,11 @@ public class Folder extends AbstractEntity implements IFolder {
    */
   public List<IFolderChild> getChildren() {
     return Collections.unmodifiableList(fChildren);
+  }
+  
+
+  public boolean removeChild(IFolderChild child) {
+    return fChildren.remove(child);
   }
 
   private void addChild(IFolderChild child, IFolderChild position, Boolean after) {
@@ -191,20 +196,6 @@ public class Folder extends AbstractEntity implements IFolder {
    */
   public IFolder getParent() {
     return fParent;
-  }
-
-  /*
-   * @see org.rssowl.core.model.types.IFolder#removeMark(org.rssowl.core.model.types.IMark)
-   */
-  public void removeMark(IMark mark) {
-    fChildren.remove(mark);
-  }
-
-  /*
-   * @see org.rssowl.core.model.types.IFolder#removeFolder(org.rssowl.core.model.types.IFolder)
-   */
-  public void removeFolder(IFolder folder) {
-    fChildren.remove(folder);
   }
 
   /*

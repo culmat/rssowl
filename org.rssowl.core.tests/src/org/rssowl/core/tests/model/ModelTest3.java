@@ -1049,7 +1049,7 @@ public class ModelTest3 {
         public void entitiesAdded(Set<SearchMarkEvent> events) {
           for (SearchMarkEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
-            assertEquals(folderRef.getId(), event.getEntity().getFolder().getId());
+            assertEquals(folderRef.getId(), event.getEntity().getParent().getId());
             searchMarkEvents[0] = true;
           }
         }
@@ -1057,7 +1057,7 @@ public class ModelTest3 {
         public void entitiesDeleted(Set<SearchMarkEvent> events) {
           for (SearchMarkEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
-            assertEquals(folderRef.getId(), event.getEntity().getFolder().getId());
+            assertEquals(folderRef.getId(), event.getEntity().getParent().getId());
             if (searchMarkReference[0].references(event.getEntity()))
               searchMarkEvents[1] = true;
           }
@@ -1066,7 +1066,7 @@ public class ModelTest3 {
         public void entitiesUpdated(Set<SearchMarkEvent> events) {
           for (SearchMarkEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
-            assertEquals(folderRef.getId(), event.getEntity().getFolder().getId());
+            assertEquals(folderRef.getId(), event.getEntity().getParent().getId());
             if (searchMarkReference[0].references(event.getEntity()))
               searchMarkEvents[2] = true;
           }
@@ -1181,7 +1181,7 @@ public class ModelTest3 {
         public void entitiesAdded(Set<BookMarkEvent> events) {
           for (BookMarkEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
-            assertEquals(folderRef.getId(), event.getEntity().getFolder().getId());
+            assertEquals(folderRef.getId(), event.getEntity().getParent().getId());
             bookMarkEvents[0] = true;
           }
         }
@@ -1189,7 +1189,7 @@ public class ModelTest3 {
         public void entitiesDeleted(Set<BookMarkEvent> events) {
           for (BookMarkEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
-            assertEquals(folderRef.getId(), event.getEntity().getFolder().getId());
+            assertEquals(folderRef.getId(), event.getEntity().getParent().getId());
             if (bookMarkReference[0].references(event.getEntity()))
               bookMarkEvents[1] = true;
           }
@@ -1198,7 +1198,7 @@ public class ModelTest3 {
         public void entitiesUpdated(Set<BookMarkEvent> events) {
           for (BookMarkEvent event : events) {
             assertTrue("Expected this Event to be Root Event", event.isRoot());
-            assertEquals(folderRef.getId(), event.getEntity().getFolder().getId());
+            assertEquals(folderRef.getId(), event.getEntity().getParent().getId());
             if (bookMarkReference[0].references(event.getEntity()))
               bookMarkEvents[2] = true;
           }
@@ -2123,8 +2123,8 @@ public class ModelTest3 {
 
       DynamicDAO.addEntityListener(IFolder.class, folderListener);
 
-      root.removeFolder(folder1);
-      root.removeFolder(folder2);
+      root.removeChild(folder1);
+      root.removeChild(folder2);
       DynamicDAO.save(root);
     } finally {
       if (folderListener != null)

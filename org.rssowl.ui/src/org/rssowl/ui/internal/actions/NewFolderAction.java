@@ -261,7 +261,7 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
         if (firstElement instanceof IFolder)
           fParent = (IFolder) firstElement;
         else if (firstElement instanceof IMark) {
-          fParent = ((IMark) firstElement).getFolder();
+          fParent = ((IMark) firstElement).getParent();
           fPosition = ((IMark)firstElement);
         }
       }
