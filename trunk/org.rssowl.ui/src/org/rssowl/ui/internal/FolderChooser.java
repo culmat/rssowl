@@ -39,6 +39,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -65,6 +66,7 @@ import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkLabelProvider;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -90,6 +92,7 @@ public class FolderChooser extends Composite implements DisposeListener {
   private int fViewerHeight;
   private FolderAdapter fFolderListener;
   private ToolBar fAddFolderBar;
+  private List<IFolder> fExcludes;
 
   /**
    * @param parent
@@ -97,9 +100,20 @@ public class FolderChooser extends Composite implements DisposeListener {
    * @param style
    */
   public FolderChooser(Composite parent, IFolder initial, int style) {
+    this(parent, initial, null, style);
+  }
+
+  /**
+   * @param parent
+   * @param initial
+   * @param excludes
+   * @param style
+   */
+  public FolderChooser(Composite parent, IFolder initial, List<IFolder> excludes, int style) {
     super(parent, style);
     fParent = parent;
     fSelectedFolder = initial;
+    fExcludes = excludes;
     fResources = new LocalResourceManager(JFaceResources.getResources(), parent);
 
     initComponents();
@@ -267,6 +281,17 @@ public class FolderChooser extends Composite implements DisposeListener {
           return f1.getName().compareTo(f2.getName());
         }
       });
+
+    /* Filter excluded Folders */
+    fFolderViewer.addFilter(new ViewerFilter() {
+      @Override
+      public boolean select(Viewer viewer, Object parentElement, Object element) {
+        if (fExcludes == null)
+          return true;
+
+        return !fExcludes.contains(element) && !fExcludes.contains(parentElement);
+      }
+    });
 
     fFolderViewer.setContentProvider(new ITreeContentProvider() {
       public Object[] getElements(Object inputElement) {
