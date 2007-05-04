@@ -180,6 +180,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     return fMinimizedToTray;
   }
 
+  boolean isMinimized() {
+    return getWindowConfigurer().getWindow().getShell().getMinimized();
+  }
+
   private void registerListeners() {
 
     /* Add Shell sListener */
