@@ -135,7 +135,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
   public static final String SHOW_NOTIFICATION_POPUP = "org.rssowl.pref.ShowNotificationPoup";
 
   /** Global: Show Notification Popup only from Tray */
-  public static final String SHOW_NOTIFICATION_POPUP_ONLY_FROM_TRAY = "org.rssowl.pref.ShowNotificationPoupOnlyFromTray";
+  public static final String SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED = "org.rssowl.pref.ShowNotificationPoupOnlyWhenMinimized";
 
   /** Global: Leave Notification Popup open until closed */
   public static final String STICKY_NOTIFICATION_POPUP = "org.rssowl.pref.StickyNotificationPoup";
