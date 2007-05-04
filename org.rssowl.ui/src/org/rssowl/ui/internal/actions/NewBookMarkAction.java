@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.actions;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -36,7 +37,6 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.events.ModifyEvent;
@@ -74,7 +74,9 @@ import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
+import org.rssowl.ui.internal.util.UIBackgroundJob;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.net.URI;
@@ -217,18 +219,28 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
 
     private void onGrabTitle() {
       if (StringUtils.isSet(fLinkInput.getText())) {
-        BusyIndicator.showWhile(getShell().getDisplay(), new Runnable() {
-          public void run() {
+        getShell().setCursor(getShell().getDisplay().getSystemCursor(SWT.CURSOR_APPSTARTING));
+        final String linkText = fLinkInput.getText();
+        JobRunner.runUIUpdater(new UIBackgroundJob(getShell()) {
+          private String fLabel;
+
+          @Override
+          protected void runInBackground(IProgressMonitor monitor) {
             try {
-              URI link = new URI(fLinkInput.getText());
-              String label = Owl.getConnectionService().getLabel(link);
-              if (StringUtils.isSet(label))
-                fNameInput.setText(label);
+              URI link = new URI(linkText);
+              fLabel = Owl.getConnectionService().getLabel(link);
             } catch (ConnectionException e) {
               /* Ignore */
             } catch (URISyntaxException e) {
               /* Ignore */
             }
+          }
+
+          @Override
+          protected void runInUI(IProgressMonitor monitor) {
+            if (StringUtils.isSet(fLabel))
+              fNameInput.setText(fLabel);
+            getShell().setCursor(null);
           }
         });
       }

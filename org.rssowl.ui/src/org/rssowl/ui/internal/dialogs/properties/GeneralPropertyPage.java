@@ -25,9 +25,9 @@
 package org.rssowl.ui.internal.dialogs.properties;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -66,7 +66,9 @@ import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
+import org.rssowl.ui.internal.util.UIBackgroundJob;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -301,18 +303,28 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
 
   private void onGrabTitle() {
     if (StringUtils.isSet(fFeedInput.getText())) {
-      BusyIndicator.showWhile(fFeedInput.getDisplay(), new Runnable() {
-        public void run() {
+      fFeedInput.getShell().setCursor(fFeedInput.getDisplay().getSystemCursor(SWT.CURSOR_APPSTARTING));
+      final String linkText = fFeedInput.getText();
+      JobRunner.runUIUpdater(new UIBackgroundJob(fFeedInput.getShell()) {
+        private String fLabel;
+
+        @Override
+        protected void runInBackground(IProgressMonitor monitor) {
           try {
-            URI link = new URI(fFeedInput.getText());
-            String label = Owl.getConnectionService().getLabel(link);
-            if (StringUtils.isSet(label))
-              fNameInput.setText(label);
+            URI link = new URI(linkText);
+            fLabel = Owl.getConnectionService().getLabel(link);
           } catch (ConnectionException e) {
             /* Ignore */
           } catch (URISyntaxException e) {
             /* Ignore */
           }
+        }
+
+        @Override
+        protected void runInUI(IProgressMonitor monitor) {
+          if (StringUtils.isSet(fLabel))
+            fNameInput.setText(fLabel);
+          fFeedInput.getShell().setCursor(null);
         }
       });
     }
