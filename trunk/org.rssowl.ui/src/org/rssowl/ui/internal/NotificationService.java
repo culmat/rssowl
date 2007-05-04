@@ -41,6 +41,9 @@ import java.util.Set;
  * The <code>NotificationService</code> listens on News being downloaded and
  * opens the <code>NotificationPopup</code> to show them in case the
  * preferences are set to show notifications.
+ * <p>
+ * TODO Don't add as listener if notification is disabled in preferences
+ * </p>
  *
  * @author bpasero
  */
@@ -72,14 +75,17 @@ public class NotificationService {
     if (!fGlobalScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP))
       return;
 
-    /* Return if Notification should only show when minimized to Tray */
-    boolean minimizedToTray = ApplicationWorkbenchAdvisor.fPrimaryApplicationWorkbenchWindowAdvisor.isMinimizedToTray();
-    if (!minimizedToTray && fGlobalScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_FROM_TRAY))
-      return;
-
     /* Show Notification in UI Thread */
     JobRunner.runInUIThread(OwlUI.getPrimaryShell(), new Runnable() {
       public void run() {
+
+        /* Return if Notification should only show when minimized */
+        ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fPrimaryApplicationWorkbenchWindowAdvisor;
+        boolean minimized = advisor.isMinimizedToTray() || advisor.isMinimized();
+        if (!minimized && fGlobalScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED))
+          return;
+
+        /* Extract News */
         List<INews> news = new ArrayList<INews>();
         for (NewsEvent event : events)
           news.add(event.getEntity());
