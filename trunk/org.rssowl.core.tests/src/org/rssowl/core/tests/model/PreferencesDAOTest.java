@@ -28,6 +28,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertArrayEquals;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -76,15 +77,15 @@ public class PreferencesDAOTest {
     IPreference pref = fDao.loadOrCreate(key1);
     pref.putBooleans(true);
     fDao.save(pref);
-    
+
     pref = fDao.loadOrCreate(key2);
     pref.putBooleans(true);
     fDao.save(pref);
-    
+
     pref = fDao.loadOrCreate(key3);
     pref.putBooleans(false);
     fDao.save(pref);
-    
+
     assertEquals(Boolean.TRUE, fDao.load(key1).getBoolean());
     assertEquals(Boolean.TRUE, fDao.load(key2).getBoolean());
     assertEquals(Boolean.FALSE, fDao.load(key3).getBoolean());
@@ -148,22 +149,22 @@ public class PreferencesDAOTest {
     fDao.save(pref2);
     fDao.save(pref3);
 
-    assertEquals(value1, fDao.load(key1).getStrings());
-    assertEquals(value2, fDao.load(key2).getStrings());
-    assertEquals(value3, fDao.load(key3).getStrings());
+    assertArrayEquals(value1, fDao.load(key1).getStrings());
+    assertArrayEquals(value2, fDao.load(key2).getStrings());
+    assertArrayEquals(value3, fDao.load(key3).getStrings());
 
     value2 = new String[] { "newvalue1.1", "newvalue1.2", "newvalue1.3" };
     pref2.putStrings(value2);
     fDao.save(pref2);
 
-    assertEquals(value1, fDao.load(key1).getStrings());
-    assertEquals(value2, fDao.load(key2).getStrings());
-    assertEquals(value3, fDao.load(key3).getStrings());
+    assertArrayEquals(value1, fDao.load(key1).getStrings());
+    assertArrayEquals(value2, fDao.load(key2).getStrings());
+    assertArrayEquals(value3, fDao.load(key3).getStrings());
   }
 
   /**
    * Test adding and getting Longs Preferences.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -179,11 +180,11 @@ public class PreferencesDAOTest {
     IPreference pref = fDao.loadOrCreate(key1);
     pref.putLongs(value1);
     fDao.save(pref);
-    
+
     pref = fDao.loadOrCreate(key2);
     pref.putLongs(value2);
     fDao.save(pref);
-    
+
     pref = fDao.loadOrCreate(key3);
     pref.putLongs(value3);
     fDao.save(pref);
@@ -204,7 +205,7 @@ public class PreferencesDAOTest {
 
   /**
    * Test adding and getting Ints Preferences.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -220,11 +221,11 @@ public class PreferencesDAOTest {
     IPreference pref = fFactory.createPreference(key1);
     pref.putIntegers(value1);
     fDao.save(pref);
-    
+
     pref = fFactory.createPreference(key2);
     pref.putIntegers(value2);
     fDao.save(pref);
-    
+
     pref = fFactory.createPreference(key3);
     pref.putIntegers(value3);
     fDao.save(pref);
@@ -245,7 +246,7 @@ public class PreferencesDAOTest {
 
   /**
    * Test adding and getting Long Preferences.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -261,15 +262,15 @@ public class PreferencesDAOTest {
     IPreference pref = fFactory.createPreference(key1);
     pref.putLongs(value1);
     fDao.save(pref);
-    
+
     pref = fFactory.createPreference(key2);
     pref.putLongs(value2);
     fDao.save(pref);
-    
+
     pref = fFactory.createPreference(key3);
     pref.putLongs(value3);
     fDao.save(pref);
-    
+
     assertEquals(Long.valueOf(value1), fDao.load(key1).getLong());
     assertEquals(Long.valueOf(value2), fDao.load(key2).getLong());
     assertEquals(Long.valueOf(value3), fDao.load(key3).getLong());
@@ -285,7 +286,7 @@ public class PreferencesDAOTest {
 
   /**
    * Test adding and getting String Preference.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -301,11 +302,11 @@ public class PreferencesDAOTest {
     IPreference pref = fFactory.createPreference(key1);
     pref.putStrings(value1);
     fDao.save(pref);
-    
+
     pref = fFactory.createPreference(key2);
     pref.putStrings(value2);
     fDao.save(pref);
-    
+
     pref = fFactory.createPreference(key3);
     pref.putStrings(value3);
     fDao.save(pref);
@@ -326,7 +327,7 @@ public class PreferencesDAOTest {
 
   /**
    * Test adding and getting Integer Preferences.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -342,11 +343,11 @@ public class PreferencesDAOTest {
     IPreference pref = fFactory.createPreference(key1);
     pref.putIntegers(value1);
     fDao.save(pref);
-    
+
     pref = fFactory.createPreference(key2);
     pref.putIntegers(value2);
     fDao.save(pref);
-    
+
     pref = fFactory.createPreference(key3);
     pref.putIntegers(value3);
     fDao.save(pref);
@@ -366,7 +367,7 @@ public class PreferencesDAOTest {
 
   /**
    * Test Deleting Preferences
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -383,37 +384,37 @@ public class PreferencesDAOTest {
     IPreference pref = fFactory.createPreference(key1);
     pref.putBooleans(value1);
     fDao.save(pref);
- 
+
     pref = fFactory.createPreference(key2);
     pref.putStrings(value2);
     fDao.save(pref);
-    
+
     pref = fFactory.createPreference(key3);
     pref.putIntegers(value3);
     fDao.save(pref);
-    
+
     pref = fFactory.createPreference(key4);
     pref.putStrings(value4);
     fDao.save(pref);
-    
+
     assertEquals(Boolean.valueOf(value1), fDao.load(key1).getBoolean());
     assertEquals(value2, fDao.load(key2).getString());
     assertEquals(Integer.valueOf(value3), fDao.load(key3).getInteger());
-    assertEquals(value4, fDao.load(key4).getStrings());
+    assertArrayEquals(value4, fDao.load(key4).getStrings());
 
     boolean deleted = fDao.delete(key3);
     assertTrue(deleted);
     assertEquals(Boolean.valueOf(value1), fDao.load(key1).getBoolean());
     assertEquals(value2, fDao.load(key2).getString());
     assertNull("key3 should be null, but it is: " + key3, fDao.load(key3));
-    assertEquals(value4, fDao.load(key4).getStrings());
+    assertArrayEquals(value4, fDao.load(key4).getStrings());
 
     deleted = fDao.delete(key1);
     assertTrue(deleted);
     assertNull(fDao.load(key1));
     assertEquals(value2, fDao.load(key2).getString());
     assertNull(fDao.load(key3));
-    assertEquals(value4, fDao.load(key4).getStrings());
+    assertArrayEquals(value4, fDao.load(key4).getStrings());
 
     /* Call delete on key that has already been deleted */
     deleted = fDao.delete(key1);
@@ -421,7 +422,7 @@ public class PreferencesDAOTest {
     assertNull(fDao.load(key1));
     assertEquals(value2, fDao.load(key2).getString());
     assertNull(fDao.load(key3));
-    assertEquals(value4, fDao.load(key4).getStrings());
+    assertArrayEquals(value4, fDao.load(key4).getStrings());
 
     deleted = fDao.delete(key4);
     assertTrue(deleted);
@@ -440,7 +441,7 @@ public class PreferencesDAOTest {
 
   /**
    * Test the Events for getting Add, Update and Delete Events.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -517,7 +518,7 @@ public class PreferencesDAOTest {
       pref = fFactory.createPreference(key2);
       pref.putIntegers(value2);
       fDao.save(pref);
-      
+
       pref = fFactory.createPreference(key3);
       pref.putStrings(value3);
       fDao.save(pref);
@@ -530,7 +531,7 @@ public class PreferencesDAOTest {
       pref = fDao.loadOrCreate(key1);
       pref.putBooleans(false);
       fDao.save(pref);
-      
+
       pref = fDao.loadOrCreate(key2);
       pref.putIntegers(0);
       fDao.save(pref);
@@ -538,7 +539,7 @@ public class PreferencesDAOTest {
       pref = fDao.loadOrCreate(key3);
       pref.putStrings("updated_value");
       fDao.save(pref);
-      
+
       pref = fDao.loadOrCreate(key4);
       pref.putStrings("4", "3", "2", "1");
       fDao.save(pref);
@@ -618,6 +619,6 @@ public class PreferencesDAOTest {
     pref.putStrings(updatedStrings);
     fDao.save(pref);
     String[] savedStrings = fDao.load(key).getStrings();
-    assertEquals(updatedStrings, savedStrings);
+    assertArrayEquals(updatedStrings, savedStrings);
   }
 }
