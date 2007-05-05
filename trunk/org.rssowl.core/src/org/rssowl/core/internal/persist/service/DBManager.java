@@ -34,7 +34,9 @@ import org.rssowl.core.internal.persist.Folder;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.Preference;
 import org.rssowl.core.internal.persist.SearchMark;
+import org.rssowl.core.internal.persist.migration.Migrations;
 import org.rssowl.core.persist.NewsCounter;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
 import com.db4o.Db4o;
@@ -46,15 +48,22 @@ import com.db4o.config.QueryEvaluationMode;
 import com.db4o.defragment.Defragment;
 import com.db4o.defragment.DefragmentConfig;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DBManager {
-
-  private static final String DATABASE_EXISTS_FILE_NAME = "databaseExists"; //$NON-NLS-1$
+  private static final String FORMAT_FILE_NAME = "format";
   private static DBManager fInstance;
   private ObjectContainer fObjectContainer;
   private final ReadWriteLock fLock = new ReentrantReadWriteLock();
@@ -72,10 +81,10 @@ public class DBManager {
   /**
    * Load and initialize the contributed DataBase.
    *
-   * @throws DBException In case of an error while initializing and loading the
+   * @throws PersistenceException In case of an error while initializing and loading the
    * contributed DataBase.
    */
-  public void startup() throws DBException {
+  public void startup() throws PersistenceException {
     /* Initialise */
     EventManager.getInstance();
 
@@ -108,9 +117,9 @@ public class DBManager {
     return filePath;
   }
 
-  private File getDBExistsFile() {
+  private File getDBFormatFile() {
     File dir = new File(Activator.getDefault().getStateLocation().toOSString());
-    File existsFile = new File(dir + DATABASE_EXISTS_FILE_NAME);
+    File existsFile = new File(dir, FORMAT_FILE_NAME);
     return existsFile;
   }
 
@@ -118,24 +127,11 @@ public class DBManager {
     fEntityStoreListeners.remove(listener);
   }
 
-  public void createDatabase() throws DBException {
-//    ConfigurationFactory configFactory = new ConfigurationFactory() {
-//      public Configuration createConfiguration() {
-//        return DBManager.this.createConfiguration();
-//      }
-//    };
-//    new Migration20M5M6(configFactory, getDBFilePath());
-    
+  public void createDatabase() throws PersistenceException {
     Configuration config = createConfiguration();
-    File dbExistsFile = getDBExistsFile();
-    boolean dbExists = dbExistsFile.exists();
-    if (!dbExists) {
-      try {
-        dbExistsFile.createNewFile();
-      } catch (IOException ioe) {
-        throw new DBException(Activator.getDefault().createErrorStatus(
-            "Error creating database", ioe)); //$NON-NLS-1$
-      }
+    int workspaceVersion = getWorkspaceFormatVersion();
+    if (workspaceVersion != getCurrentFormatVersion()) {
+      migrate(workspaceVersion, getCurrentFormatVersion());
     }
 
     fObjectContainer = createObjectContainer(config);
@@ -144,21 +140,148 @@ public class DBManager {
 //    copyDatabase();
   }
   
+  private void migrate(int workspaceFormat, int currentFormat) {
+  ConfigurationFactory configFactory = new ConfigurationFactory() {
+      public Configuration createConfiguration() {
+        return DBManager.this.createConfiguration();
+      }
+    };
+    Migration migration = new Migrations().getMigration(workspaceFormat, currentFormat);
+    if (migration == null) {
+      throw new PersistenceException("No migration found for originFormat: " +
+          workspaceFormat + ", and destinationFormat: " + currentFormat);
+    }
+    
+    /* Create a copy of the db file to use for the migration */
+    File dbFile = new File(getDBFilePath());
+    String migDbFileName = getDBFilePath() + ".mig";
+    File migDbFile = new File(migDbFileName);
+    copyFile(dbFile, migDbFile);
+    
+    /* Migrate the copy */
+    migration.migrate(configFactory, migDbFileName);
+    
+    /* 
+     * Copy the db file to a permanent back where the file name includes
+     * the workspaceFormat number.
+     */
+    File backupDbFile = new File(getDBFilePath() + ".bak." + workspaceFormat);
+    copyFile(dbFile, backupDbFile);
+    
+    File migFormatFile = new File(getDBFormatFile().getAbsolutePath() + ".mig");
+    copyFile(getDBFormatFile(), migFormatFile);
+    setFormatVersion(migFormatFile);
+    migFormatFile.renameTo(getDBFormatFile());
+
+    /* Finally, rename the actual db file */
+    migDbFile.renameTo(dbFile);
+  }
+  
+  private void copyFile(File originFile, File destinationFile) {
+    FileInputStream inputStream = null;
+    FileOutputStream outputStream = null;
+    try {
+      inputStream = new FileInputStream(originFile);
+      FileChannel srcChannel = inputStream.getChannel();
+
+      if (!destinationFile.exists())
+        destinationFile.createNewFile();
+      
+      outputStream = new FileOutputStream(destinationFile);
+      FileChannel dstChannel = outputStream.getChannel();
+
+      dstChannel.transferFrom(srcChannel, 0, srcChannel.size());
+
+    } catch (IOException e) {
+      throw new PersistenceException(e);
+    } finally {
+      closeCloseable(inputStream);
+      closeCloseable(outputStream);
+    }
+  }
+
+  private int getWorkspaceFormatVersion() {
+    boolean dbFileExists = new File(getDBFilePath()).exists();
+    File formatFile = getDBFormatFile();
+    boolean formatFileExists = formatFile.exists();
+    if (dbFileExists) {
+      /* Assume that it's M5a if no format file exists, but a db file exists */
+      if (!formatFileExists)
+        return 0;
+
+      BufferedReader reader = null;
+      try {
+        reader = new BufferedReader(new FileReader(formatFile));
+        String versionText = reader.readLine();
+        try {
+          int version = Integer.parseInt(versionText);
+          return version;
+        } catch (NumberFormatException e) {
+          throw new PersistenceException("Format file does not contain a number as the version", e);
+        }
+      } catch (IOException e) {
+        throw new PersistenceException(e);
+      } finally {
+        closeCloseable(reader);
+      }
+    }
+    /*
+     * In case there is no database file, we just set the version as the current
+     * version.
+     */
+    if (!formatFileExists) {
+      try {
+        formatFile.createNewFile();
+      } catch (IOException ioe) {
+        throw new PersistenceException("Error creating database", ioe); //$NON-NLS-1$
+      }
+    }
+    setFormatVersion(formatFile);
+    return getCurrentFormatVersion();
+  }
+  
+  private void closeCloseable(Closeable closeable) {
+    if (closeable != null)
+      try {
+        closeable.close();
+      } catch (IOException e) {
+        Activator.getDefault().logError("Failed to close stream.", e);
+      }
+  }
+
+  private void setFormatVersion(File formatFile) {
+    BufferedWriter writer = null;
+    try {
+      writer = new BufferedWriter(new FileWriter(formatFile));
+      String s = String.valueOf(getCurrentFormatVersion());
+      writer.write(s);
+      writer.flush();
+    } catch (IOException e) {
+      throw new PersistenceException(e);
+    } finally {
+      closeCloseable(writer);
+    }
+  }
+
+  private int getCurrentFormatVersion() {
+    return 1;
+  }
+  
   @SuppressWarnings("unused")
-  private void defragment(Configuration config) throws DBException {
+  private void defragment(Configuration config) {
     DefragmentConfig defragConfig = new DefragmentConfig(getDBFilePath());
     defragConfig.db4oConfig(config);
     try {
       Defragment.defrag(defragConfig);
     } catch (IOException e) {
-      throw new DBException(Activator.getDefault().createErrorStatus("Error creating database", e));
+      throw new PersistenceException("Error creating database", e);
     }
   }
 
   /**
    * Creates a copy of the database that has all essential data structures.
    * At the moment, this means not copying NewsCounter and
-   * IConditionalGets since they will be repopulated eventually.
+   * IConditionalGets since they will be re-populated eventually.
    *
    * TODO Allow new db file name to be set
    * TODO Allow replacing old db with copy
@@ -266,10 +389,10 @@ public class DBManager {
   /**
    * Shutdown the contributed Database.
    *
-   * @throws DBException In case of an error while shutting down the contributed
+   * @throws PersistenceException In case of an error while shutting down the contributed
    * DataBase.
    */
-  public void shutdown() throws DBException {
+  public void shutdown() throws PersistenceException {
     fLock.writeLock().lock();
     try {
       fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), false);
@@ -280,21 +403,21 @@ public class DBManager {
     }
   }
 
-  public void dropDatabase() throws DBException {
+  public void dropDatabase() throws PersistenceException {
     SafeRunner.run(new LoggingSafeRunnable() {
       public void run() throws Exception {
         shutdown();
         if (!new File(getDBFilePath()).delete()) {
           Activator.getDefault().logError("Failed to delete db file", null); //$NON-NLS-1$
         }
-        if (!getDBExistsFile().delete()) {
-          Activator.getDefault().logError("Failed to delete dbExistsFile", null); //$NON-NLS-1$
+        if (!getDBFormatFile().delete()) {
+          Activator.getDefault().logError("Failed to delete db format file", null); //$NON-NLS-1$
         }
       }
     });
   }
 
-  public final ObjectContainer getObjectContainer() {
+  private final ObjectContainer getObjectContainer() {
     return fObjectContainer;
   }
 }
