@@ -31,6 +31,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.NewsAdapter;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.BatchedBuffer;
 import org.rssowl.ui.internal.util.JobRunner;
 
 import java.util.ArrayList;
@@ -41,18 +42,27 @@ import java.util.Set;
  * The <code>NotificationService</code> listens on News being downloaded and
  * opens the <code>NotificationPopup</code> to show them in case the
  * preferences are set to show notifications.
- * <p>
- * TODO Don't add as listener if notification is disabled in preferences
- * </p>
  *
  * @author bpasero
  */
 public class NotificationService {
+
+  /* Batch News-Events for every 5 seconds */
+  private static final int BATCH_INTERVAL = 5000;
+
   private NewsAdapter fNewsAdapter;
   private IPreferenceScope fGlobalScope;
+  private BatchedBuffer<NewsEvent> fBatchedBuffer;
 
   /** Creates a new Notification Service */
   public NotificationService() {
+    BatchedBuffer.Receiver<NewsEvent> receiver = new BatchedBuffer.Receiver<NewsEvent>() {
+      public void receive(Set<NewsEvent> objects) {
+        showNews(objects);
+      }
+    };
+
+    fBatchedBuffer = new BatchedBuffer<NewsEvent>(receiver, BATCH_INTERVAL);
     fGlobalScope = Owl.getPreferenceService().getGlobalScope();
     startService();
   }
@@ -74,6 +84,17 @@ public class NotificationService {
     /* Return if Notification is disabled */
     if (!fGlobalScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP))
       return;
+
+    /* Add into Buffer */
+    if (!NotificationPopup.isVisible())
+      fBatchedBuffer.addAll(events);
+
+    /* Show Directly */
+    else
+      showNews(events);
+  }
+
+  private void showNews(final Set<NewsEvent> events) {
 
     /* Show Notification in UI Thread */
     JobRunner.runInUIThread(OwlUI.getPrimaryShell(), new Runnable() {
