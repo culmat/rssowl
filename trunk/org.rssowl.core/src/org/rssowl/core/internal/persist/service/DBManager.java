@@ -416,7 +416,7 @@ public class DBManager {
     });
   }
 
-  private final ObjectContainer getObjectContainer() {
+  public final ObjectContainer getObjectContainer() {
     return fObjectContainer;
   }
 }
