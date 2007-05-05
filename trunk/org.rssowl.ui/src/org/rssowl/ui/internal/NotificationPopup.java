@@ -86,8 +86,6 @@ import java.util.Map;
 /**
  * TODO
  * <ul>
- * <li>Consider batching new News in NotificationService for a couple of
- * seconds before showing the popup to avoid size growing</li>
  * <li>Consider an option per Mark/Folder to enable/disable Notification</li>
  * <li>Implement animation (take from SystemTrayAlert)</li>
  * <li>Add preferences (respect use animation, number of news)</li>
@@ -148,6 +146,17 @@ public class NotificationPopup extends PopupDialog {
 
     /* Show News */
     fgInstance.makeVisible(news);
+  }
+
+  /**
+   * Returns <code>TRUE</code> if this popup is visible and <code>FALSE</code>
+   * otherwise. Can safely be called from a non-ui <code>Thread</code>.
+   *
+   * @return Returns <code>TRUE</code> if this popup is visible and
+   * <code>FALSE</code> otherwise.
+   */
+  public static synchronized boolean isVisible() {
+    return fgInstance != null;
   }
 
   private NotificationPopup(int visibleNewsCount) {
