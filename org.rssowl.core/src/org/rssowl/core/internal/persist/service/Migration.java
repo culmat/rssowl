@@ -21,28 +21,29 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-
 package org.rssowl.core.internal.persist.service;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
-
 /**
- * A checked exception representing a problem that takes place while updating or
- * querying the database. Contains a status object describing the cause of the
- * exception.
- * 
- * @author Ismael Juma (ismael@juma.me.uk)
+ * Implementors of this interface are able to migrate the database data from
+ * one format version to another. 
  */
-public class DBException extends CoreException {
-
+public interface Migration {
   /**
-   * Creates a new exception with the given status object. The message of the
-   * given status is used as the exception message.
-   * 
-   * @param status the status object to be associated with this exception
+   * @return the format version that the implementor can migrate from.
    */
-  public DBException(IStatus status) {
-    super(status);
-  }
+  int getOriginFormat();
+  
+  /**
+   * @return the format version that the implementor can migrate to.
+   */
+  int getDestinationFormat();
+  
+  /**
+   * Perform the migration. Implementors are responsible for making sure
+   * that all object containers are closed at the end of the script.
+   * 
+   * @param configFactory
+   * @param dbFileName
+   */
+  void migrate(ConfigurationFactory configFactory, String dbFileName);
 }

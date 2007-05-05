@@ -46,37 +46,25 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
   public void startup() throws PersistenceException {
     super.startup();
     /* Startup DB and Model-Search */
-    try {
-      DBManager.getDefault().startup();
-      getModelSearch().startup();
-    } catch (DBException e) {
-      throw new PersistenceException(e.getMessage());
-    }
+    DBManager.getDefault().startup();
+    getModelSearch().startup();
   }
 
   /*
    * @see org.rssowl.core.model.dao.IPersistService#shutdown()
    */
   public void shutdown() throws PersistenceException {
-    try {
-      getIDGenerator().shutdown();
-      getModelSearch().shutdown();
-      DBManager.getDefault().shutdown();
-    } catch (DBException e) {
-      throw new PersistenceException(e.getMessage());
-    }
+    getIDGenerator().shutdown();
+    getModelSearch().shutdown();
+    DBManager.getDefault().shutdown();
   }
 
   /*
    * @see org.rssowl.core.model.dao.IPersistService#recreateSchema()
    */
   public void recreateSchema() throws PersistenceException {
-    try {
-      DBManager.getDefault().dropDatabase();
-      DBManager.getDefault().createDatabase();
-      getModelSearch().clearIndex();
-    } catch (DBException e) {
-      throw new PersistenceException(e.getMessage());
-    }
+    DBManager.getDefault().dropDatabase();
+    DBManager.getDefault().createDatabase();
+    getModelSearch().clearIndex();
   }
 }
