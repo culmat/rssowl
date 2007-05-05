@@ -141,33 +141,32 @@ public class DBManager {
   }
   
   private void migrate(int workspaceFormat, int currentFormat) {
-  ConfigurationFactory configFactory = new ConfigurationFactory() {
+    ConfigurationFactory configFactory = new ConfigurationFactory() {
       public Configuration createConfiguration() {
         return DBManager.this.createConfiguration();
       }
     };
     Migration migration = new Migrations().getMigration(workspaceFormat, currentFormat);
     if (migration == null) {
-      throw new PersistenceException("No migration found for originFormat: " +
-          workspaceFormat + ", and destinationFormat: " + currentFormat);
+      throw new PersistenceException("No migration found for originFormat: " + workspaceFormat + ", and destinationFormat: " + currentFormat);
     }
-    
+
     /* Create a copy of the db file to use for the migration */
     File dbFile = new File(getDBFilePath());
     String migDbFileName = getDBFilePath() + ".mig";
     File migDbFile = new File(migDbFileName);
     copyFile(dbFile, migDbFile);
-    
+
     /* Migrate the copy */
     migration.migrate(configFactory, migDbFileName);
-    
-    /* 
-     * Copy the db file to a permanent back where the file name includes
-     * the workspaceFormat number.
+
+    /*
+     * Copy the db file to a permanent back where the file name includes the
+     * workspaceFormat number.
      */
     File backupDbFile = new File(getDBFilePath() + ".bak." + workspaceFormat);
     copyFile(dbFile, backupDbFile);
-    
+
     File migFormatFile = new File(getDBFormatFile().getAbsolutePath() + ".mig");
     copyFile(getDBFormatFile(), migFormatFile);
     setFormatVersion(migFormatFile);
