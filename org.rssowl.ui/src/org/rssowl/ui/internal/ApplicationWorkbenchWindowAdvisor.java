@@ -227,7 +227,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
         if (useTray && !fTrayEnabled)
           enableTray();
-        else if (fTrayEnabled)
+        else if (!useTray && fTrayEnabled)
           disableTray();
       }
     }
