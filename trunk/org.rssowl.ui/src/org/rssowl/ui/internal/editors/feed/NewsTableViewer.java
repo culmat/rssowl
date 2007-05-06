@@ -35,7 +35,7 @@ import org.rssowl.ui.internal.util.TreeItemAdapter;
 
 /**
  * The actual TreeViewer responsible for displaying the Headlines of a Feed.
- * 
+ *
  * @author Ismael Juma (ismael@juma.me.uk)
  * @author bpasero
  */
@@ -84,9 +84,9 @@ public class NewsTableViewer extends TreeViewer {
       return;
     }
 
-    /* Look for the biggest Index of all selected Elements */
-    int maxSelectedIndex = -1;
-    TreeItemAdapter parentOfMaxSelected = new TreeItemAdapter(tree);
+    /* Look for the minimal Index of all selected Elements */
+    int minSelectedIndex = Integer.MAX_VALUE;
+    TreeItemAdapter parentOfMinSelected = new TreeItemAdapter(tree);
 
     /* For each selected Element */
     Object[] selectedElements = selection.toArray();
@@ -97,9 +97,9 @@ public class NewsTableViewer extends TreeViewer {
         TreeItemAdapter parent = new TreeItemAdapter(item).getParent();
 
         int index = parent.indexOf(item);
-        maxSelectedIndex = Math.max(maxSelectedIndex, index);
-        if (index == maxSelectedIndex)
-          parentOfMaxSelected.setItem(parent.getItem());
+        minSelectedIndex = Math.min(minSelectedIndex, index);
+        if (index == minSelectedIndex)
+          parentOfMinSelected.setItem(parent.getItem());
       }
     }
 
@@ -109,12 +109,12 @@ public class NewsTableViewer extends TreeViewer {
     Object data = null;
 
     /* Restore selection to next Element */
-    if (parentOfMaxSelected.getItemCount() > maxSelectedIndex)
-      data = parentOfMaxSelected.getItem(maxSelectedIndex).getData();
+    if (parentOfMinSelected.getItemCount() > minSelectedIndex)
+      data = parentOfMinSelected.getItem(minSelectedIndex).getData();
 
     /* Restore selection to last Element */
-    else if (parentOfMaxSelected.getItemCount() > 0)
-      data = parentOfMaxSelected.getItem(parentOfMaxSelected.getItemCount() - 1).getData();
+    else if (parentOfMinSelected.getItemCount() > 0)
+      data = parentOfMinSelected.getItem(parentOfMinSelected.getItemCount() - 1).getData();
 
     if (data != null)
       setSelection(new StructuredSelection(data));
