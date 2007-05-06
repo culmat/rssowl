@@ -189,6 +189,10 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
       fSearchConditionList.createConditions(fSearchMark);
     }
 
+    /* Re-Run search if conditions changed */
+    if (fSearchChanged)
+      Controller.getDefault().getSavedSearchService().updateSavedSearches(Collections.singleton(fSearchMark));
+
     return true;
   }
 
@@ -202,9 +206,5 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
       ReparentInfo<IFolderChild, IFolder> reparent = new ReparentInfo<IFolderChild, IFolder>(fSearchMark, fFolderChooser.getFolder(), null, null);
       Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(Collections.singletonList(reparent));
     }
-
-    /* Re-Run search if conditions changed */
-    if (fSearchChanged)
-      Controller.getDefault().getSavedSearchService().updateSavedSearches(Collections.singleton(fSearchMark));
   }
 }

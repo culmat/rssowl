@@ -92,7 +92,9 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPreference;
+import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.event.FolderAdapter;
@@ -129,6 +131,7 @@ import org.rssowl.ui.internal.util.WidgetTreeNode;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -1489,15 +1492,20 @@ public class BookMarkExplorer extends ViewPart {
   private boolean isValidNavigation(ITreeNode node, boolean unread) {
     Object data = node.getData();
 
-    /* Require a BookMark (TODO SearchMark!) */
-    if (!(data instanceof IBookMark))
-      return false;
-
     /* Check if bookmark has unread if set as flag */
-    IBookMark bookmark = (IBookMark) data;
-    FeedLinkReference feedRef = bookmark.getFeedLinkReference();
-    if (unread && fNewsService.getUnreadCount(feedRef) <= 0)
-      return false;
+    if (data instanceof IBookMark) {
+      IBookMark bookmark = (IBookMark) data;
+      FeedLinkReference feedRef = bookmark.getFeedLinkReference();
+      if (unread && fNewsService.getUnreadCount(feedRef) <= 0)
+        return false;
+    }
+
+    /* Check if searchmark has unread if set as flag */
+    else if (data instanceof ISearchMark) {
+      ISearchMark searchmark = (ISearchMark) data;
+      if (unread && searchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) == 0)
+        return false;
+    }
 
     return true;
   }
