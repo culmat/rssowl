@@ -24,8 +24,9 @@
 
 package org.rssowl.core.persist;
 
-import org.rssowl.core.util.ISearchHit;
+import org.rssowl.core.persist.reference.NewsReference;
 
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -47,23 +48,55 @@ public interface ISearchMark extends IMark {
   public static final int MATCH_ALL_CONDITIONS = 6;
 
   /**
-   * TODO Tmp API, see Bug #108
+   * Sets the result of this search mark. The result is a List of
+   * <code>NewsReference</code> that may be <code>NULL</code> if not results
+   * are matching the search. In addition, a <code>INews.State</code> has to
+   * be provided in order to quickly resolve the state information out of the
+   * matching news.
    *
-   * @param newsGetter
+   * @param news A List of <code>NewsReference</code> that may be
+   * <code>NULL</code> if not results are matching the search.
+   * @param state The <code>INews.State</code> of the news that match the
+   * search.
+   * @return Returns <code>TRUE</code> if the new result differs from the
+   * existing one and <code>FALSE</code> otherwise.
    */
-  void setNewsGetter(INewsGetter newsGetter);
+  boolean setResult(List<NewsReference> news, INews.State state);
 
   /**
-   * @return All Elements of the type <code>ISearchHit&lt;INews&gt;</code>
-   * matching this SearchMark.
-   * <p>
-   * Note: The returned List should not be modified. The default Implementation
-   * returns an unmodifiable List using
-   * <code>Collections.unmodifiableList()</code>. Trying to modify the List
-   * will result in <code>UnsupportedOperationException</code>.
-   * </p>
+   * Returns a List of all news that match this search mark's conditions. To
+   * reduce the memory impact of this method, the news are returned as
+   * <code>NewsReference</code>.
+   *
+   * @return Returns a List of all news that match this search mark's
+   * conditions. To reduce the memory impact of this method, the news are
+   * returned as <code>NewsReference</code>.
    */
-  List<ISearchHit<INews>> getMatchingNews();
+  List<NewsReference> getResult();
+
+  /**
+   * Returns a List of all news that match this search mark's conditions and the
+   * provided <code>INews.State</code>. To reduce the memory impact of this
+   * method, the news are returned as <code>NewsReference</code>.
+   *
+   * @param states A Set of <code>INews.State</code> that the resulting news
+   * must have.
+   * @return Returns a List of all news that match this search mark's conditions
+   * and the provided <code>INews.State</code>. To reduce the memory impact
+   * of this method, the news are returned as <code>NewsReference</code>.
+   */
+  List<NewsReference> getResult(EnumSet<INews.State> states);
+
+  /**
+   * Returns the number of news that match this search mark's conditions and the
+   * provided <code>INews.State</code>.
+   *
+   * @param states A Set of <code>INews.State</code> that the resulting news
+   * must have.
+   * @return Returns the number of news that match this search mark's conditions
+   * and the provided <code>INews.State</code>.
+   */
+  int getResultCount(EnumSet<INews.State> states);
 
   /**
    * Adds a <code>ISearchCondition</code> to the list of conditions this

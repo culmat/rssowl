@@ -26,13 +26,22 @@ package org.rssowl.core.persist.event;
 
 import org.rssowl.core.persist.ISearchMark;
 
+import java.util.Set;
 
 /**
  * A Listener being notified whenever the type <code>ISearchMark</code> was
- * added, updated or deleted in the persistance layer.
- * 
+ * added, updated or deleted in the persistance layer. In addition, a method is
+ * provided to notify about results changed.
+ *
  * @author bpasero
  */
 public interface SearchMarkListener extends EntityListener<SearchMarkEvent, ISearchMark> {
-  // No new methods
+
+  /**
+   * Called when the results of a <code>ISearchMark</code> have changed.
+   *
+   * @param events A Set of SearchMarkEvents identifying the searchmarks that
+   * provide new results.
+   */
+  void resultsChanged(Set<SearchMarkEvent> events);
 }

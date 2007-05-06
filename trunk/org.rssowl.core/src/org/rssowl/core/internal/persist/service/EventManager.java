@@ -36,7 +36,6 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.INewsGetter;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearchCondition;
@@ -55,10 +54,7 @@ import org.rssowl.core.persist.event.PreferenceEvent;
 import org.rssowl.core.persist.event.SearchConditionEvent;
 import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
-import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IDGenerator;
-import org.rssowl.core.persist.service.IModelSearch;
-import org.rssowl.core.util.ISearchHit;
 
 import com.db4o.ObjectContainer;
 import com.db4o.events.Event4;
@@ -69,7 +65,6 @@ import com.db4o.events.EventRegistryFactory;
 import com.db4o.events.ObjectEventArgs;
 import com.db4o.query.Query;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -173,46 +168,11 @@ public class EventManager {
       }
     };
 
-    EventListener4 activatedListener = new EventListener4() {
-      public void onEvent(Event4 e, EventArgs args) {
-        processActivatedEvent(args);
-      }
-    };
-
     eventRegistry.created().addListener(createdListener);
     eventRegistry.creating().addListener(creatingListener);
     eventRegistry.updated().addListener(updatedListener);
     eventRegistry.deleting().addListener(deletingListener);
     eventRegistry.deleted().addListener(deletedListener);
-    eventRegistry.activated().addListener(activatedListener);
-  }
-
-  private void processActivatedEvent(EventArgs args) {
-    IEntity entity = getEntity(args);
-    if (entity == null)
-      return;
-
-    setSearchMarkGetter(entity);
-  }
-
-  private INewsGetter createNewsGetter(final ISearchMark mark) {
-    INewsGetter newsGetter = new INewsGetter() {
-      public List<ISearchHit<INews>> getNews() {
-        List<ISearchCondition> searchConditions = mark.getSearchConditions();
-        IModelSearch modelSearch = Owl.getPersistenceService().getModelSearch();
-        List<ISearchHit<NewsReference>> newsRefs = modelSearch.searchNews(searchConditions, mark.matchAllConditions());
-        List<ISearchHit<INews>> newsList = new ArrayList<ISearchHit<INews>>(newsRefs.size());
-        for (ISearchHit<NewsReference> newsRefHit : newsRefs) {
-          INews news = newsRefHit.getResult().resolve();
-          if (news != null) { //TODO Remove once Bug 173 is fixed
-            ISearchHit<INews> searchHit = modelSearch.createSearchHit(news, newsRefHit.getRelevance());
-            newsList.add(searchHit);
-          }
-        }
-        return newsList;
-      }
-    };
-    return newsGetter;
   }
 
   private void processUpdatedEvent(EventArgs args) {
@@ -223,7 +183,6 @@ public class EventManager {
     ModelEvent event = createModelEvent(entity);
     if (event != null)
       EventsMap.getInstance().putUpdateEvent(event);
-
   }
 
   private void processCreatingEvent(EventArgs args) {
@@ -231,16 +190,6 @@ public class EventManager {
 
     if (entity != null)
       setId(entity);
-
-    setSearchMarkGetter(entity);
-
-  }
-
-  private void setSearchMarkGetter(IEntity entity) {
-    if (entity instanceof ISearchMark) {
-      ISearchMark mark = (ISearchMark) entity;
-      mark.setNewsGetter(createNewsGetter(mark));
-    }
   }
 
   private void processCreatedEvent(EventArgs args) {
