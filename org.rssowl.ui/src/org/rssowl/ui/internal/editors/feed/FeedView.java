@@ -96,6 +96,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -305,7 +306,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       }
 
       @Override
-      public void resultsChanged(Set<SearchMarkEvent> events) {
+      public void entitiesUpdated(Set<SearchMarkEvent> events) {
         for (SearchMarkEvent event : events) {
           if (event.getEntity().equals(fInput.getMark())) {
             JobRunner.runUIUpdater(new UIBackgroundJob(fParent) {
@@ -1220,10 +1221,12 @@ public class FeedView extends EditorPart implements IReusableEditor {
    */
   public boolean navigate(boolean respectSelection, boolean newsScoped, boolean next, boolean unread) {
 
-    /* TODO Support Searchmarks! */
-    if (unread && fInput.getMark() instanceof ISearchMark)
-      return false;
-    else if (unread && fInput.getMark() instanceof IBookMark) {
+    /* Check for unread counter */
+    if (unread && fInput.getMark() instanceof ISearchMark) {
+      ISearchMark searchmark = (ISearchMark) fInput.getMark();
+      if (searchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) == 0)
+        return false;
+    } else if (unread && fInput.getMark() instanceof IBookMark) {
       IBookMark bookmark = (IBookMark) fInput.getMark();
       if (fNewsService.getUnreadCount(bookmark.getFeedLinkReference()) == 0)
         return false;
