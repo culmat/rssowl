@@ -43,7 +43,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * A db4o abstract implementation of EntityDAO.
- * 
+ *
  * @param <T> Type of concrete implementation of IEntity.
  * @param <L> Type of EntityListener.
  * @param <E> Type of ModelEvent.
@@ -52,22 +52,23 @@ public abstract class AbstractEntityDAO<T extends IEntity,
     L extends EntityListener<E, T>, E extends ModelEvent>
     extends AbstractPersistableDAO<T> implements IEntityDAO<T, L, E>{
 
-  private final List<L> entityListeners = new CopyOnWriteArrayList<L>();
-  
+  /** The List of Listeners for this DAO */
+  protected final List<L> fEntityListeners = new CopyOnWriteArrayList<L>();
+
   /**
    * Creates an instance of this class.
-   * 
+   *
    * @param entityClass
    * @param saveFully
    */
   public AbstractEntityDAO(Class<? extends T> entityClass, boolean saveFully) {
     super(entityClass, saveFully);
   }
-  
+
   protected abstract E createSaveEventTemplate(T entity);
 
   protected abstract E createDeleteEventTemplate(T entity);
-  
+
   /*
    * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#load(long)
    */
@@ -76,7 +77,7 @@ public abstract class AbstractEntityDAO<T extends IEntity,
       Query query = fDb.query();
       query.constrain(fEntityClass);
       query.descend("fId").constrain(Long.valueOf(id)); //$NON-NLS-1$
-  
+
       List<T> set = getList(query);
       for (T entity : set) {
         // TODO Activate completely by default for now. Must decide how to deal
@@ -89,24 +90,24 @@ public abstract class AbstractEntityDAO<T extends IEntity,
     }
     return null;
   }
-  
+
   @Override
   protected void preSave(T entity) {
     E event = createSaveEventTemplate(entity);
     if (event != null)
       DBHelper.putEventTemplate(event);
   }
-  
+
   @Override
   protected void preDelete(T entity) {
     E event = createDeleteEventTemplate(entity);
     if (event != null)
       DBHelper.putEventTemplate(event);
   }
-  
+
   public final void fireEvents(final Set<E> events, final EventType eventType) {
     Assert.isNotNull(eventType, "eventType");
-    for (final L listener : entityListeners) {
+    for (final L listener : fEntityListeners) {
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
           switch (eventType) {
@@ -126,15 +127,15 @@ public abstract class AbstractEntityDAO<T extends IEntity,
       });
     }
   }
-  
+
   public void addEntityListener(L listener) {
-    entityListeners.add(listener);
+    fEntityListeners.add(listener);
   }
-  
+
   public void removeEntityListener(L listener) {
-    entityListeners.remove(listener);
+    fEntityListeners.remove(listener);
   }
-  
+
   /* Debugging code copied from old ListenerServiceImpl. Not being used atm */
 //  @SuppressWarnings("nls")
 //  private void logEvents(Set< ? extends ModelEvent> events, EventType eventType) {

@@ -30,6 +30,8 @@ import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.event.SearchMarkListener;
 
+import java.util.Set;
+
 /**
  * A data-access-object for <code>ISearchMark</code>s.
  *
@@ -50,5 +52,11 @@ public final class SearchMarkDAOImpl extends AbstractEntityDAO<ISearchMark, Sear
   @Override
   protected final SearchMarkEvent createSaveEventTemplate(ISearchMark entity) {
     return new SearchMarkEvent(entity, null, true);
+  }
+
+  public void fireResultsChanged(Set<SearchMarkEvent> events) {
+    for (SearchMarkListener listener : fEntityListeners) {
+      listener.resultsChanged(events);
+    }
   }
 }

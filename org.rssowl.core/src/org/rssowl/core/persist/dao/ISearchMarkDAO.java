@@ -28,11 +28,21 @@ import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.event.SearchMarkListener;
 
+import java.util.Set;
+
 /**
  * A data-access-object for <code>ISearchMark</code>s.
  *
  * @author Ismael Juma (ismael@juma.me.uk)
  */
 public interface ISearchMarkDAO extends IEntityDAO<ISearchMark, SearchMarkListener, SearchMarkEvent> {
-  // No new methods
+
+  /**
+   * Notify <code>SearchMarkListener</code> that the results of a Set of
+   * SearchMarks have changed.
+   *
+   * @param events The Set of SearchMarkEvents identifying the searchmarks of
+   * this event.
+   */
+  void fireResultsChanged(Set<SearchMarkEvent> events);
 }

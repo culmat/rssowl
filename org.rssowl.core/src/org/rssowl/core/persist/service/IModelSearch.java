@@ -29,6 +29,7 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.ISearchHit;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * The central interface for searching types from the persistance layer. The
@@ -78,9 +79,11 @@ public interface IModelSearch {
    * @param result a Reference to the Type that is a Hit of the Search.
    * @param relevance the relevance of this Search Hit or
    * <code>UNKNOWN_RELEVANCE</code> in case unknown.
+   * @param data A Map of any data that can be used to carry over additional
+   * information.
    * @return an instance of ISearchHit with the provided parameters.
    */
-  <T> ISearchHit<T> createSearchHit(T result, float relevance);
+  <T> ISearchHit<T> createSearchHit(T result, float relevance, Map<?, ?> data);
 
   /**
    * Deletes all the information that is stored in the search index. This must
@@ -93,4 +96,22 @@ public interface IModelSearch {
    * @see {@link IPersistenceService}#recreateSchema()
    */
   void clearIndex() throws PersistenceException;
+
+  /**
+   * Adds a Listener to the list of Listeners that will be notified on index
+   * events.
+   *
+   * @param listener The Listener to add to the list of Listeners that will be
+   * notified on index events.
+   */
+  void addIndexListener(IndexListener listener);
+
+  /**
+   * Removes the Listener from the list of Listeners that will be notified on
+   * index events.
+   *
+   * @param listener The Listener to remove from the list of Listeners that will
+   * be notified on index events.
+   */
+  void removeIndexListener(IndexListener listener);
 }

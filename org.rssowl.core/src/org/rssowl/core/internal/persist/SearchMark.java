@@ -27,13 +27,13 @@ package org.rssowl.core.internal.persist;
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.INewsGetter;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
-import org.rssowl.core.util.ISearchHit;
+import org.rssowl.core.persist.reference.NewsReference;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -44,10 +44,12 @@ import java.util.List;
  * @author bpasero
  */
 public class SearchMark extends Mark implements ISearchMark {
-  private transient INewsGetter fNewsGetter;
-
   private List<ISearchCondition> fSearchConditions;
   private boolean fMatchAllConditions;
+
+  private transient long[] fMatchingReadNews = new long[0];
+  private transient long[] fMatchingUnreadUpdatedNews = new long[0];
+  private transient long[] fMatchingNewNews = new long[0];
 
   /**
    * Creates a new Element of the type SearchMark. A SearchMark is only visually
@@ -71,18 +73,97 @@ public class SearchMark extends Mark implements ISearchMark {
   }
 
   /*
-   * @see org.rssowl.core.model.types.ISearchMark#setNewsGetter(org.rssowl.core.model.types.INewsGetter)
+   * @see org.rssowl.core.persist.ISearchMark#setResult(java.util.List, org.rssowl.core.persist.INews.State)
    */
-  public void setNewsGetter(INewsGetter newsGetter) {
-    fNewsGetter = newsGetter;
+  public boolean setResult(List<NewsReference> news, INews.State state) {
+    long[] bucket = new long[news != null ? news.size() : 0];
+    boolean changed = true;
+
+    /* Read News */
+    if (state == INews.State.READ) {
+      if (fMatchingReadNews.length == 0 && bucket.length == 0)
+        changed = false;
+
+      fMatchingReadNews = bucket;
+    }
+
+    /* Unread or Updated News */
+    else if (state == INews.State.UNREAD || state == INews.State.UPDATED) {
+      if (fMatchingUnreadUpdatedNews.length == 0 && bucket.length == 0)
+        changed = false;
+
+      fMatchingUnreadUpdatedNews = bucket;
+    }
+
+    /* New News */
+    else if (state == INews.State.NEW) {
+      if (fMatchingNewNews.length == 0 && bucket.length == 0)
+        changed = false;
+
+      fMatchingNewNews = bucket;
+    }
+
+    /* Fill Bucket */
+    for (int i = 0; news != null && i < news.size(); i++) {
+      bucket[i] = news.get(i).getId();
+    }
+
+    return changed;
   }
 
   /*
-   * @see org.rssowl.core.model.types.ISearchMark#getMatchingNews()
+   * @see org.rssowl.core.persist.ISearchMark#getMatchingNews()
    */
-  public List<ISearchHit<INews>> getMatchingNews() {
-    //TODO Consider some sort of caching
-    return fNewsGetter.getNews();
+  public List<NewsReference> getResult() {
+    return getResult(EnumSet.of(INews.State.READ, INews.State.UNREAD, INews.State.NEW, INews.State.UPDATED));
+  }
+
+  /*
+   * @see org.rssowl.core.persist.ISearchMark#getMatchingNews(java.util.EnumSet)
+   */
+  public List<NewsReference> getResult(EnumSet<INews.State> states) {
+    List<NewsReference> result = new ArrayList<NewsReference>(getResultCount(states));
+
+    /* Add Read News */
+    if (states.contains(INews.State.READ)) {
+      for (long id : fMatchingReadNews)
+        result.add(new NewsReference(id));
+    }
+
+    /* Add Unread News */
+    if (states.contains(INews.State.UNREAD) || states.contains(INews.State.UPDATED)) {
+      for (long id : fMatchingUnreadUpdatedNews)
+        result.add(new NewsReference(id));
+    }
+
+    /* Add New News */
+    if (states.contains(INews.State.NEW)) {
+      for (long id : fMatchingNewNews)
+        result.add(new NewsReference(id));
+    }
+
+    return result;
+  }
+
+  /*
+   * @see org.rssowl.core.persist.ISearchMark#getMatchingNewsCount(java.util.EnumSet)
+   */
+  public int getResultCount(EnumSet<INews.State> states) {
+    int count = 0;
+
+    /* Read News */
+    if (states.contains(INews.State.READ))
+      count += fMatchingReadNews.length;
+
+    /* Unread or Updated News */
+    if (states.contains(INews.State.UNREAD) || states.contains(INews.State.UPDATED))
+      count += fMatchingUnreadUpdatedNews.length;
+
+    /* New News */
+    if (states.contains(INews.State.NEW))
+      count += fMatchingNewNews.length;
+
+    return count;
   }
 
   /*
@@ -143,7 +224,6 @@ public class SearchMark extends Mark implements ISearchMark {
       getPopularity() == s.getPopularity() && fMatchAllConditions == s.matchAllConditions() &&
       (getProperties() == null ? s.getProperties() == null : getProperties().equals(s.getProperties()));
   }
-
 
   /**
    * Returns a String describing the state of this Entity.

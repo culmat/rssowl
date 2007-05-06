@@ -22,39 +22,19 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.util;
+package org.rssowl.core.persist.service;
 
 /**
- * Instances of <code>ISearchHit</code> are the result of running a query in
- * the <code>IModelSearch</code>. Every hit provides the result identified by
- * <code>T</code>, the relevance score and allows to receive additional data
- * in a generic way.
+ * The <code>IndexListener</code> is listening on events that make the Index
+ * of the <code>IModelSearch</code> implementation update.
  *
- * @author ijuma
  * @author bpasero
- * @param <T> The type of Object this Hit provides.
  */
-public interface ISearchHit<T> {
-
-  /** Indicator for an unknown relevance */
-  public static final float UNKNOWN_RELEVANCE = -1.0f;
+public interface IndexListener {
 
   /**
-   * @return Returns a Reference to the Type that is a Hit of the Search.
+   * Notifies that the Index of the <code>IModelSearch</code> implementation
+   * has been updated (e.g. new entities indexed or existing entities updated).
    */
-  T getResult();
-
-  /**
-   * @return Returns the relevance of this Search Hit or
-   * <code>UNKNOWN_RELEVANCE</code> in case unknown.
-   */
-  float getRelevance();
-
-  /**
-   * @param key The key to identify the data that is to be retrieved. Must not
-   * be <code>NULL</code>.
-   * @return Returns the data associated with the key or <code>NULL</code> if
-   * none.
-   */
-  Object getData(Object key);
+  void indexUpdated();
 }
