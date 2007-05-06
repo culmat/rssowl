@@ -70,6 +70,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
   private Image fBookMarkErrorIcon;
   private Image fBookMarkIcon;
   private Image fSearchMarkIcon;
+  private Image fSearchMarkNewIcon;
   private Image fGroupIcon;
   private Image fBookmarkSetIcon;
   private Color fStickyBgColor;
@@ -94,6 +95,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     fBookMarkErrorIcon = OwlUI.getImage(fResources, OwlUI.BOOKMARK_ERROR);
     fBookMarkIcon = OwlUI.getImage(fResources, OwlUI.BOOKMARK);
     fSearchMarkIcon = OwlUI.getImage(fResources, OwlUI.SEARCHMARK);
+    fSearchMarkNewIcon = OwlUI.getImage(fResources, OwlUI.SEARCHMARK_NEW);
 
     /* Fonts */
     fBoldFont = OwlUI.getThemeFont(OwlUI.BKMRK_EXPLORER_FONT_ID, SWT.BOLD);
@@ -215,18 +217,8 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       boolean hasNew = searchmark.getResultCount(EnumSet.of(INews.State.NEW)) != 0;
 
       /* Image */
-      Image icon = fSearchMarkIcon;
-
-      /* Overlay if News are *new* */
-      if (hasNew && INDICATE_NEW) {
-        DecorationOverlayIcon overlay = new DecorationOverlayIcon(icon, OwlUI.getImageDescriptor("icons/ovr16/new.gif"), IDecoration.BOTTOM_RIGHT);
-        cell.setImage(OwlUI.getImage(fResources, overlay));
-      }
-
-      /* Don't overlay */
-      else {
-        cell.setImage(icon);
-      }
+      Image icon = hasNew && INDICATE_NEW ? fSearchMarkNewIcon : fSearchMarkIcon;
+      cell.setImage(icon);
 
       /* Font */
       if (unreadNewsCount > 0)
