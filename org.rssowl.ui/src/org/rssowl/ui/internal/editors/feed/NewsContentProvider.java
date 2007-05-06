@@ -40,7 +40,6 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.persist.service.PersistenceException;
-import org.rssowl.core.util.ISearchHit;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -244,9 +243,10 @@ public class NewsContentProvider implements ITreeContentProvider {
       /* Obtain this SearchMark's News */
       else if (mark instanceof ISearchMark) {
         ISearchMark searchMark = (ISearchMark) mark;
-        List<ISearchHit<INews>> matchingNews = searchMark.getMatchingNews();
-        for (ISearchHit<INews> searchHit : matchingNews)
-          news.add(searchHit.getResult());
+        List<NewsReference> matchingNews = searchMark.getResult();
+        for (NewsReference newsRef : matchingNews) {
+          news.add(newsRef.resolve());
+        }
       }
     }
 

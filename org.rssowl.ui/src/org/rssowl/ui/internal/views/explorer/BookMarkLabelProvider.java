@@ -39,6 +39,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.ui.internal.Controller;
@@ -46,6 +47,7 @@ import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.NewsService;
 import org.rssowl.ui.internal.OwlUI;
 
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -209,15 +211,34 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     /* Create Label for a SearchMark */
     else if (element instanceof ISearchMark) {
       ISearchMark searchmark = (ISearchMark) element;
+      unreadNewsCount = searchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
+      boolean hasNew = searchmark.getResultCount(EnumSet.of(INews.State.NEW)) != 0;
 
       /* Image */
-      cell.setImage(fSearchMarkIcon);
+      Image icon = fSearchMarkIcon;
 
-      /* Text */
-      cell.setText(searchmark.getName());
+      /* Overlay if News are *new* */
+      if (hasNew && INDICATE_NEW) {
+        DecorationOverlayIcon overlay = new DecorationOverlayIcon(icon, OwlUI.getImageDescriptor("icons/ovr16/new.gif"), IDecoration.BOTTOM_RIGHT);
+        cell.setImage(OwlUI.getImage(fResources, overlay));
+      }
+
+      /* Don't overlay */
+      else {
+        cell.setImage(icon);
+      }
 
       /* Font */
-      cell.setFont(fDefaultFont);
+      if (unreadNewsCount > 0)
+        cell.setFont(fBoldFont);
+      else
+        cell.setFont(fDefaultFont);
+
+      /* Text */
+      StringBuilder str = new StringBuilder(searchmark.getName());
+      if (unreadNewsCount > 0)
+        str.append(" (").append(unreadNewsCount).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+      cell.setText(str.toString());
 
       /* Reset Foreground */
       cell.setForeground(null);

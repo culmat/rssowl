@@ -142,6 +142,11 @@ public class CacheService {
       public void entitiesUpdated(Set<SearchMarkEvent> events) {
       /* Not handled */
       }
+
+      /* Results Changed */
+      public void resultsChanged(Set<SearchMarkEvent> events) {
+      /* Not handled */
+      }
     };
 
     /* Add Listeners */

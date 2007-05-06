@@ -621,6 +621,21 @@ public class BookMarkContentProvider implements ITreeContentProvider {
             });
           }
         }
+
+        /* SearchMark result changed */
+        public void resultsChanged(final Set<SearchMarkEvent> events) {
+          JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
+            public void run() {
+              Set<ISearchMark> updatedSearchMarks = new HashSet<ISearchMark>(events.size());
+              for (SearchMarkEvent event : events) {
+                updatedSearchMarks.add(event.getEntity());
+              }
+
+              fViewer.update(updatedSearchMarks.toArray(), null);
+            }
+          });
+
+        }
       };
 
       /* News Listener */

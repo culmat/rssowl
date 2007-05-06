@@ -41,7 +41,7 @@ import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.core.util.ISearchHit;
+import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -194,12 +194,9 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
   }
 
   private void fillNews(ISearchMark searchmark, List<INews> news) {
-    List<ISearchHit<INews>> matchingNews = searchmark.getMatchingNews();
-    for (ISearchHit<INews> searchHit : matchingNews) {
-      INews newsitem = searchHit.getResult();
-      INews.State state = newsitem.getState();
-      if (state.equals(INews.State.UNREAD) || state.equals(INews.State.UPDATED) || state.equals(INews.State.NEW))
-        news.add(searchHit.getResult());
+    List<NewsReference> matchingNews = searchmark.getResult(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
+    for (NewsReference newsRef : matchingNews) {
+      news.add(newsRef.resolve());
     }
   }
 
