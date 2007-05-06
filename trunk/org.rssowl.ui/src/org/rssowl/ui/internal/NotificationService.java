@@ -30,6 +30,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.NewsAdapter;
 import org.rssowl.core.persist.event.NewsEvent;
+import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.BatchedBuffer;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -50,9 +51,9 @@ public class NotificationService {
   /* Batch News-Events for every 5 seconds */
   private static final int BATCH_INTERVAL = 5000;
 
-  private NewsAdapter fNewsAdapter;
-  private IPreferenceScope fGlobalScope;
-  private BatchedBuffer<NewsEvent> fBatchedBuffer;
+  private final NewsListener fNewsAdapter;
+  private final IPreferenceScope fGlobalScope;
+  private final BatchedBuffer<NewsEvent> fBatchedBuffer;
 
   /** Creates a new Notification Service */
   public NotificationService() {
@@ -64,19 +65,20 @@ public class NotificationService {
 
     fBatchedBuffer = new BatchedBuffer<NewsEvent>(receiver, BATCH_INTERVAL);
     fGlobalScope = Owl.getPreferenceService().getGlobalScope();
-    startService();
+    fNewsAdapter = registerListeners();
   }
 
   /* Startup this Service */
-  private void startService() {
-    fNewsAdapter = new NewsAdapter() {
+  private NewsListener registerListeners() {
+    NewsListener listener = new NewsAdapter() {
       @Override
       public void entitiesAdded(final Set<NewsEvent> events) {
         onNewsAdded(events);
       }
     };
 
-    DynamicDAO.addEntityListener(INews.class, fNewsAdapter);
+    DynamicDAO.addEntityListener(INews.class, listener);
+    return listener;
   }
 
   private void onNewsAdded(final Set<NewsEvent> events) {
