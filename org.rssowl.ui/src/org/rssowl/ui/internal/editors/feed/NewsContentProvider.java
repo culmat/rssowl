@@ -35,6 +35,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.NewsAdapter;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
+import org.rssowl.core.persist.event.runnable.EventType;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
@@ -289,7 +290,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
             /* Filter News which are from a different Feed than displayed */
             for (NewsEvent event : events) {
-              if (isInputRelatedTo(event.getEntity(), true)) {
+              if (isInputRelatedTo(event.getEntity(), EventType.PERSIST)) {
                 if (addedNews == null)
                   addedNews = new ArrayList<INews>();
 
@@ -334,7 +335,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
             /* Filter News which are from a different Feed than displayed */
             for (NewsEvent event : events) {
-              if (isInputRelatedTo(event.getEntity(), false)) {
+              if (isInputRelatedTo(event.getEntity(), EventType.UPDATE)) {
                 INews news = event.getEntity();
 
                 /* News got Deleted */
@@ -402,7 +403,7 @@ public class NewsContentProvider implements ITreeContentProvider {
             /* Filter News which are from a different Feed or invisible */
             for (NewsEvent event : events) {
               INews news = event.getEntity();
-              if (news.isVisible() && isInputRelatedTo(news, false)) {
+              if (news.isVisible() && isInputRelatedTo(news, EventType.REMOVE)) {
                 if (deletedNews == null)
                   deletedNews = new ArrayList<INews>();
                 deletedNews.add(news);
@@ -444,7 +445,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     DynamicDAO.removeEntityListener(INews.class, fNewsListener);
   }
 
-  private boolean isInputRelatedTo(INews news, boolean fromAdd) {
+  private boolean isInputRelatedTo(INews news, EventType type) {
     for (IMark mark : fInput) {
 
       /* Check if BookMark references the News' Feed */
@@ -455,7 +456,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       }
 
       /* TODO This is a workaround! */
-      else if (!fromAdd && mark instanceof ISearchMark) {
+      else if (type != EventType.PERSIST && mark instanceof ISearchMark) {
         return true;
       }
     }
