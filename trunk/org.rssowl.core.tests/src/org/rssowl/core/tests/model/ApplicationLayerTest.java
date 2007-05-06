@@ -618,6 +618,10 @@ public class ApplicationLayerTest {
           assertEquals(oldMarkParent, event.getOldParent());
           assertEquals(newMarkParent, event.getEntity().getParent());
         }
+
+        public void resultsChanged(Set<SearchMarkEvent> events) {
+          fail("Unexpected event");
+        }
       };
 
       DynamicDAO.addEntityListener(IFolder.class, folderListener);

@@ -1071,6 +1071,10 @@ public class ModelTest3 {
               searchMarkEvents[2] = true;
           }
         }
+
+        public void resultsChanged(Set<SearchMarkEvent> events) {
+          fail("Unexpected event");
+        }
       };
       DynamicDAO.addEntityListener(ISearchMark.class, searchMarkListener);
       searchMarkReference[0] = new SearchMarkReference(DynamicDAO.save(searchMark).getId());
