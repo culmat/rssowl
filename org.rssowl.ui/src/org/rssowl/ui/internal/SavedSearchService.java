@@ -58,7 +58,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SavedSearchService {
 
   /* Time in millies before updating the saved searches on an index event */
-  private static final int BATCH_INTERVAL = 500;
+  private static final int BATCH_INTERVAL = 5000;
 
   private final Job fBatchJob;
   private final IndexListener fIndexListener;
