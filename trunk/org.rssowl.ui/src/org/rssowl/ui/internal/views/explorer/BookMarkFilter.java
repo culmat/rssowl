@@ -42,6 +42,7 @@ import org.rssowl.ui.internal.util.StringMatcher;
 
 import java.text.BreakIterator;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -201,7 +202,7 @@ public class BookMarkFilter extends ViewerFilter {
     return fMatcher.match(string);
   }
 
-  boolean needsRefresh(Class< ? extends IEntity> entity, Set< ? extends ModelEvent> events) {
+  boolean needsRefresh(Class<? extends IEntity> entity, Set<? extends ModelEvent> events) {
 
     /* In case the Filter is not active at all */
     if (fMatcher == null && fType == Type.SHOW_ALL)
@@ -217,8 +218,13 @@ public class BookMarkFilter extends ViewerFilter {
     }
 
     /* Searchmark Event */
-    else if (entity.equals(ISearchMark.class))
-      return fMatcher != null;
+    else if (entity.equals(ISearchMark.class)) {
+      if (fMatcher != null)
+        return true;
+
+      if (fType == Type.SHOW_NEW || fType == Type.SHOW_UNREAD)
+        return true;
+    }
 
     /* News Event */
     else if (entity.equals(INews.class)) {
@@ -296,10 +302,10 @@ public class BookMarkFilter extends ViewerFilter {
 
     /* Element is a BookMark */
     if (element instanceof IBookMark) {
+      IBookMark bookmark = (IBookMark) element;
 
       /* First check the Pattern */
       if (fMatcher != null) {
-        IBookMark bookmark = (IBookMark) element;
         if (!wordMatches(bookmark))
           return false;
       }
@@ -309,42 +315,32 @@ public class BookMarkFilter extends ViewerFilter {
         return true;
 
       /* Show: Feeds with New News */
-      if (fType == Type.SHOW_NEW) {
-        IBookMark bookmark = (IBookMark) element;
+      if (fType == Type.SHOW_NEW)
         return hasNewNews(bookmark.getFeedLinkReference());
-      }
 
       /* Show: Unread Feeds */
-      else if (fType == Type.SHOW_UNREAD) {
-        IBookMark bookmark = (IBookMark) element;
+      else if (fType == Type.SHOW_UNREAD)
         return hasUnreadNews(bookmark.getFeedLinkReference());
-      }
 
       /* Show: Sticky Feeds */
-      else if (fType == Type.SHOW_STICKY) {
-        IBookMark bookmark = (IBookMark) element;
+      else if (fType == Type.SHOW_STICKY)
         return hasStickyNews(bookmark.getFeedLinkReference());
-      }
 
       /* Show: Feeds that had an Error while loading */
-      else if (fType == Type.SHOW_ERRONEOUS) {
-        IBookMark bookmark = (IBookMark) element;
+      else if (fType == Type.SHOW_ERRONEOUS)
         return bookmark.isErrorLoading();
-      }
 
       /* Show: Never visited Marks */
-      else if (fType == Type.SHOW_NEVER_VISITED) {
-        IBookMark bookmark = (IBookMark) element;
+      else if (fType == Type.SHOW_NEVER_VISITED)
         return bookmark.getPopularity() <= 0;
-      }
     }
 
     /* Element is a SearchMark */
     else if (element instanceof ISearchMark) {
+      ISearchMark mark = (ISearchMark) element;
 
       /* First check the Pattern */
       if (fMatcher != null) {
-        ISearchMark mark = (ISearchMark) element;
         if (!wordMatches(mark))
           return false;
       }
@@ -354,20 +350,16 @@ public class BookMarkFilter extends ViewerFilter {
         return true;
 
       /* Show: New News */
-      else if (fType == Type.SHOW_NEW) {
-        // TODO Implement
-      }
+      else if (fType == Type.SHOW_NEW)
+        return mark.getResultCount(EnumSet.of(INews.State.NEW)) > 0;
 
       /* Show: Unread News */
-      else if (fType == Type.SHOW_UNREAD) {
-        // TODO Implement
-      }
+      else if (fType == Type.SHOW_UNREAD)
+        return mark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) > 0;
 
       /* Show: Never visited Marks */
-      else if (fType == Type.SHOW_NEVER_VISITED) {
-        ISearchMark searchmark = (ISearchMark) element;
-        return searchmark.getPopularity() <= 0;
-      }
+      else if (fType == Type.SHOW_NEVER_VISITED)
+        return mark.getPopularity() <= 0;
     }
 
     return false;
