@@ -1510,6 +1510,10 @@ public class BookMarkExplorer extends ViewPart {
         return false;
     }
 
+    /* Folders are no valid navigation nodes */
+    else if (data instanceof IFolder)
+      return false;
+
     return true;
   }
 
