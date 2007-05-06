@@ -56,6 +56,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.search.SearchConditionList;
@@ -63,6 +64,7 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -142,6 +144,9 @@ public class SearchMarkDialog extends TitleAreaDialog {
     /* Create Conditions and save in DB */
     fSearchConditionList.createConditions(searchMark);
     DynamicDAO.save(fParent);
+
+    /* Update the Search */
+    Controller.getDefault().getSavedSearchService().updateSavedSearches(Collections.singleton(searchMark));
 
     super.okPressed();
   }
