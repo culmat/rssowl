@@ -29,7 +29,6 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.ISearchHit;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * The central interface for searching types from the persistance layer. The
@@ -70,20 +69,6 @@ public interface IModelSearch {
    * @throws PersistenceException
    */
   void startup() throws PersistenceException;
-
-  /**
-   * Creates a <code>ISearchHit</code> with the provided parameters and
-   * returns it.
-   *
-   * @param <T> The result type.
-   * @param result a Reference to the Type that is a Hit of the Search.
-   * @param relevance the relevance of this Search Hit or
-   * <code>UNKNOWN_RELEVANCE</code> in case unknown.
-   * @param data A Map of any data that can be used to carry over additional
-   * information.
-   * @return an instance of ISearchHit with the provided parameters.
-   */
-  <T> ISearchHit<T> createSearchHit(T result, float relevance, Map<?, ?> data);
 
   /**
    * Deletes all the information that is stored in the search index. This must
