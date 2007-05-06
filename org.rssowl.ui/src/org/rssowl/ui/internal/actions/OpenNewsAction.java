@@ -160,7 +160,7 @@ public class OpenNewsAction extends Action {
 
           /* Otherwise open the Input in a new Editor */
           else
-            feedview = (FeedView) page.openEditor(fvInput, FeedView.ID, false);
+            feedview = (FeedView) page.openEditor(fvInput, FeedView.ID, true);
 
           openedEditors++;
           lastOpenedEditor = feedview;
