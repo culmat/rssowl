@@ -89,7 +89,7 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
    * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
    */
   public void run(IAction action) {
-    if (confirmed()) {
+    if (!fSelection.isEmpty() && confirmed()) {
       BusyIndicator.showWhile(PlatformUI.getWorkbench().getDisplay(), new Runnable() {
         public void run() {
           internalRun();
@@ -103,7 +103,7 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
    */
   @Override
   public void run() {
-    if (confirmed()) {
+    if (!fSelection.isEmpty() && confirmed()) {
       BusyIndicator.showWhile(PlatformUI.getWorkbench().getDisplay(), new Runnable() {
         public void run() {
           internalRun();
