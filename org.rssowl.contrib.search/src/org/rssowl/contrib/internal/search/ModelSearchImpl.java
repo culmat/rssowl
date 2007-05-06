@@ -56,6 +56,7 @@ import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
+import org.rssowl.core.persist.service.IndexListener;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.ISearchHit;
 
@@ -64,8 +65,11 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * The central interface for searching types from the persistence layer. The
@@ -95,11 +99,17 @@ public class ModelSearchImpl implements IModelSearch {
   /* One Day in Millis */
   private static final Long DAY = 1000 * 3600 * 24L;
 
+  /* Cached News States */
+  private static final INews.State[] NEWS_STATES = INews.State.values();
+
   private IndexSearcher fSearcher;
   private Indexer fIndexer;
   private Directory fDirectory;
+  private final List<IndexListener> fIndexListeners;
 
-  public ModelSearchImpl() {}
+  public ModelSearchImpl() {
+    fIndexListeners = new CopyOnWriteArrayList<IndexListener>();
+  }
 
   /*
    * @see org.rssowl.core.model.search.IModelSearch#startup()
@@ -113,7 +123,7 @@ public class ModelSearchImpl implements IModelSearch {
       }
 
       if (fIndexer == null)
-        fIndexer = new Indexer(fDirectory);
+        fIndexer = new Indexer(this, fDirectory);
       else
         fIndexer.initIfNecessary();
 
@@ -226,13 +236,18 @@ public class ModelSearchImpl implements IModelSearch {
 
       /* Build Result */
       List<ISearchHit<NewsReference>> resultList = new ArrayList<ISearchHit<NewsReference>>(hits.length());
-      for (Iterator< ? > it = hits.iterator(); it.hasNext();) {
+      for (Iterator<?> it = hits.iterator(); it.hasNext();) {
         Hit hit = (Hit) it.next();
-        String idText = hit.get(SearchDocument.ENTITY_ID_TEXT);
-        long id = Long.valueOf(idText);
+
+        /* Receive Stored Fields */
+        long newsId = Long.valueOf(hit.get(SearchDocument.ENTITY_ID_TEXT));
+        INews.State newsState = NEWS_STATES[Integer.parseInt(hit.get(NewsDocument.STATE_ID_TEXT))];
+
+        Map<Integer, INews.State> data = new HashMap<Integer, INews.State>(1);
+        data.put(INews.STATE, newsState);
 
         /* Add to List */
-        resultList.add(new SearchHit<NewsReference>(new NewsReference(id), hit.getScore()));
+        resultList.add(new SearchHit<NewsReference>(new NewsReference(newsId), hit.getScore(), data));
       }
 
       return resultList;
@@ -372,7 +387,7 @@ public class ModelSearchImpl implements IModelSearch {
     /* Retrieve Value */
     String value;
     if (condition.getValue() instanceof Enum)
-      value = String.valueOf(((Enum< ? >) condition.getValue()).ordinal());
+      value = String.valueOf(((Enum<?>) condition.getValue()).ordinal());
     else
       value = String.valueOf(condition.getValue());
 
@@ -439,7 +454,7 @@ public class ModelSearchImpl implements IModelSearch {
   private Query createTermQuery(ISearchCondition condition) {
     String value;
     if (condition.getValue() instanceof Enum)
-      value = String.valueOf(((Enum< ? >) condition.getValue()).ordinal());
+      value = String.valueOf(((Enum<?>) condition.getValue()).ordinal());
     else
       value = String.valueOf(condition.getValue());
 
@@ -554,11 +569,11 @@ public class ModelSearchImpl implements IModelSearch {
   }
 
   /*
-   * @see org.rssowl.core.model.search.IModelSearch#createSearchCondition(java.lang.Object,
-   * float)
+   * @see org.rssowl.core.persist.service.IModelSearch#createSearchHit(java.lang.Object,
+   * float, java.util.Map)
    */
-  public <T> ISearchHit<T> createSearchHit(T result, float relevance) {
-    return new SearchHit<T>(result, relevance);
+  public <T> ISearchHit<T> createSearchHit(T result, float relevance, Map<?, ?> data) {
+    return new SearchHit<T>(result, relevance, data);
   }
 
   private static String prepareForParsing(String s) {
@@ -573,5 +588,26 @@ public class ModelSearchImpl implements IModelSearch {
       sb.append(c);
     }
     return sb.toString();
+  }
+
+  /*
+   * @see org.rssowl.core.persist.service.IModelSearch#addIndexListener(org.rssowl.core.persist.service.IndexListener)
+   */
+  public void addIndexListener(IndexListener listener) {
+    fIndexListeners.add(listener);
+  }
+
+  /*
+   * @see org.rssowl.core.persist.service.IModelSearch#removeIndexListener(org.rssowl.core.persist.service.IndexListener)
+   */
+  public void removeIndexListener(IndexListener listener) {
+    fIndexListeners.remove(listener);
+  }
+
+  /* Notify that the index has been updated */
+  protected void notifyIndexUpdated() {
+    for (IndexListener listener : fIndexListeners) {
+      listener.indexUpdated();
+    }
   }
 }
