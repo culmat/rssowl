@@ -626,6 +626,12 @@ public class BookMarkContentProvider implements ITreeContentProvider {
         public void resultsChanged(final Set<SearchMarkEvent> events) {
           JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
             public void run() {
+
+              /* Ask Filter for a refresh */
+              if (fBookmarkFilter.needsRefresh(ISearchMark.class, events))
+                fViewer.refresh(false);
+
+              /* Update SearchMarks */
               Set<ISearchMark> updatedSearchMarks = new HashSet<ISearchMark>(events.size());
               for (SearchMarkEvent event : events) {
                 updatedSearchMarks.add(event.getEntity());
