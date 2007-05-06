@@ -245,7 +245,9 @@ public class NewsContentProvider implements ITreeContentProvider {
         ISearchMark searchMark = (ISearchMark) mark;
         List<NewsReference> matchingNews = searchMark.getResult();
         for (NewsReference newsRef : matchingNews) {
-          news.add(newsRef.resolve());
+          INews resolvedNews = newsRef.resolve();
+          if (resolvedNews != null) //TODO Remove once Bug 173 is fixed
+            news.add(resolvedNews);
         }
       }
     }

@@ -196,7 +196,9 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
   private void fillNews(ISearchMark searchmark, List<INews> news) {
     List<NewsReference> matchingNews = searchmark.getResult(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
     for (NewsReference newsRef : matchingNews) {
-      news.add(newsRef.resolve());
+      INews resolvedNews = newsRef.resolve();
+      if (resolvedNews != null) //TODO Remove once Bug 173 is fixed
+        news.add(resolvedNews);
     }
   }
 
