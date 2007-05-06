@@ -138,6 +138,9 @@ public class Controller {
   /* Notification Service */
   private NotificationService fNotificationService;
 
+  /* Saved Search Service */
+  private SavedSearchService fSavedSearchService;
+
   /* Feed-Reload Service */
   private FeedReloadService fFeedReloadService;
 
@@ -161,6 +164,7 @@ public class Controller {
   private IPreferenceDAO fPrefsDAO;
   private ILabelDAO fLabelDao;
   private IModelFactory fFactory;
+
 
   /* Task to perform Reload-Operations */
   private class ReloadTask implements ITask {
@@ -240,7 +244,7 @@ public class Controller {
         int order = Integer.valueOf(element.getAttribute("order"));
         boolean handlesMultipleEntities = Boolean.valueOf(element.getAttribute("handlesMultipleEntities"));
 
-        List<Class< ? >> targetEntities = new ArrayList<Class< ? >>();
+        List<Class<?>> targetEntities = new ArrayList<Class<?>>();
         IConfigurationElement[] entityTargets = element.getChildren("targetEntity");
         for (IConfigurationElement entityTarget : entityTargets)
           targetEntities.add(Class.forName(entityTarget.getAttribute("class")));
@@ -272,7 +276,7 @@ public class Controller {
     Set<EntityPropertyPageWrapper> pages = new HashSet<EntityPropertyPageWrapper>();
 
     /* Retrieve Class-Objects from Entities */
-    Set<Class< ? extends IEntity>> entityClasses = new HashSet<Class< ? extends IEntity>>();
+    Set<Class<? extends IEntity>> entityClasses = new HashSet<Class<? extends IEntity>>();
     for (IEntity entity : entities)
       entityClasses.add(entity.getClass());
 
@@ -606,6 +610,9 @@ public class Controller {
 
     /* Create the Notification Service */
     fNotificationService = new NotificationService();
+
+    /* Create the Saved Search Service */
+    fSavedSearchService = new SavedSearchService();
   }
 
   /**
@@ -632,6 +639,9 @@ public class Controller {
 
     /* Stop the Notification Service */
     fNotificationService.stopService();
+
+    /* Stop the Saved Search Service */
+    fSavedSearchService.stopService();
 
     /* Shutdown ApplicationServer */
     ApplicationServer.getDefault().shutdown();
@@ -782,7 +792,7 @@ public class Controller {
 
     /* Import Default Feeds */
     InputStream inS = getClass().getResourceAsStream("/default_feeds.xml"); //$NON-NLS-1$;
-    List< ? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
+    List<? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
     IFolder imported = (IFolder) types.get(0);
     imported.setName("Default"); //$NON-NLS-1$
 
@@ -850,7 +860,7 @@ public class Controller {
       /* Import from File */
       File file = new File(fileName);
       InputStream inS = new FileInputStream(file);
-      List< ? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
+      List<? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
       IFolder importedContainer = (IFolder) types.get(0);
 
       /* Load the current selected Set */
