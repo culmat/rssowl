@@ -42,6 +42,7 @@ import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.search.SearchConditionList;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -62,6 +63,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
   private SearchConditionList fSearchConditionList;
   private Button fMatchAnyRadio;
   private FolderChooser fFolderChooser;
+  private boolean fSearchChanged;
 
   /*
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#init(org.rssowl.ui.dialogs.properties.IPropertyDialogSite,
@@ -169,11 +171,13 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     if (fSearchMark.matchAllConditions() != fMatchAllRadio.getSelection()) {
       fSearchMark.setMatchAllConditions(fMatchAllRadio.getSelection());
       entitiesToSave.add(fSearchMark);
+      fSearchChanged = true;
     }
 
     /* Update Conditions (TODO Could be optimized to not replace all conditions) */
     if (fSearchConditionList.isModified()) {
       entitiesToSave.add(fSearchMark);
+      fSearchChanged = true;
 
       /* Remove Old Conditions */
       List<ISearchCondition> oldConditions = new ArrayList<ISearchCondition>(fSearchMark.getSearchConditions());
@@ -198,5 +202,9 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
       ReparentInfo<IFolderChild, IFolder> reparent = new ReparentInfo<IFolderChild, IFolder>(fSearchMark, fFolderChooser.getFolder(), null, null);
       Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(Collections.singletonList(reparent));
     }
+
+    /* Re-Run search if conditions changed */
+    if (fSearchChanged)
+      Controller.getDefault().getSavedSearchService().updateSavedSearches(Collections.singleton(fSearchMark));
   }
 }

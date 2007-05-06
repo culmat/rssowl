@@ -303,6 +303,13 @@ public class Controller {
   }
 
   /**
+   * @return Returns the savedSearchService.
+   */
+  public SavedSearchService getSavedSearchService() {
+    return fSavedSearchService;
+  }
+
+  /**
    * @return Returns the contextService.
    */
   public ContextService getContextService() {

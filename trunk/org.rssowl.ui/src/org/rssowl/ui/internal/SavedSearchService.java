@@ -127,8 +127,16 @@ public class SavedSearchService {
   }
 
   private void updateSavedSearches() {
-    IModelSearch modelSearch = Owl.getPersistenceService().getModelSearch();
     Set<ISearchMark> searchMarks = Controller.getDefault().getCacheService().getSearchMarks();
+    updateSavedSearches(searchMarks);
+  }
+
+  /**
+   * @param searchMarks The Set of <code>ISearchMark</code> to update the
+   * results in.
+   */
+  public void updateSavedSearches(Set<ISearchMark> searchMarks) {
+    IModelSearch modelSearch = Owl.getPersistenceService().getModelSearch();
     Set<SearchMarkEvent> events = new HashSet<SearchMarkEvent>(searchMarks.size());
 
     /* For each Search Mark */
