@@ -238,10 +238,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
     setGlobalActions();
 
     /* Register Listeners */
-    hookListeners();
+    registerListeners();
   }
 
-  private void hookListeners() {
+  private void registerListeners() {
     fPartListener = new IPartListener2() {
 
       /* Mark *new* News as *unread* */
@@ -290,7 +290,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     };
     DynamicDAO.addEntityListener(IBookMark.class, fBookMarkListener);
 
-    /* Close Editor if Input was Deleted (SearchMark) */
+    /* Close Editor if Input was Deleted & Update on results Changed */
     fSearchMarkListener = new SearchMarkAdapter() {
       @Override
       public void entitiesDeleted(Set<SearchMarkEvent> events) {
@@ -299,6 +299,32 @@ public class FeedView extends EditorPart implements IReusableEditor {
           if (fInput.getMark().getId().equals(mark.getId())) {
             fEditorSite.getPage().closeEditor(FeedView.this, false);
             fInput.setDeleted();
+            break;
+          }
+        }
+      }
+
+      @Override
+      public void resultsChanged(Set<SearchMarkEvent> events) {
+        for (SearchMarkEvent event : events) {
+          if (event.getEntity().equals(fInput.getMark())) {
+            JobRunner.runUIUpdater(new UIBackgroundJob(fParent) {
+              @Override
+              protected void runInBackground(IProgressMonitor monitor) {
+                fContentProvider.refreshCache(new IMark[] { fInput.getMark() });
+              }
+
+              @Override
+              protected void runInUI(IProgressMonitor monitor) {
+                refresh(true, true);
+              }
+
+              @Override
+              public boolean belongsTo(Object family) {
+                return fCacheJobIdentifier.equals(family);
+              }
+            });
+
             break;
           }
         }
@@ -511,7 +537,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     /* Remove Filter if selection is hidden */
     if (fNewsFilter.getType() != NewsFilter.Type.SHOW_ALL) {
       boolean unfilter = false;
-      List< ? > elements = selection.toList();
+      List<?> elements = selection.toList();
       for (Object element : elements) {
 
         /* Resolve the actual News */
