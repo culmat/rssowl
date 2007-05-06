@@ -9,20 +9,27 @@ package org.rssowl.contrib.internal.search;
 
 import org.rssowl.core.util.ISearchHit;
 
+import java.util.Map;
+
 /**
- * TODO API is in Progress.
+ * Instances of <code>ISearchHit</code> are the result of running a query in
+ * the <code>IModelSearch</code>. Every hit provides the result identified by
+ * <code>T</code>, the relevance score and allows to receive additional data
+ * in a generic way.
  *
  * @author ijuma
  * @author bpasero
- * @param <T>
+ * @param <T> The type of Object this Hit provides.
  */
 public class SearchHit<T> implements ISearchHit<T> {
-  private T fResult;
-  private float fRelevance;
+  private final T fResult;
+  private final float fRelevance;
+  private final Map<?, ?> fData;
 
-  SearchHit(T result, float relevance) {
+  SearchHit(T result, float relevance, Map<?, ?> data) {
     fResult = result;
     fRelevance = relevance;
+    fData = data;
   }
 
   /*
@@ -37,5 +44,12 @@ public class SearchHit<T> implements ISearchHit<T> {
    */
   public T getResult() {
     return fResult;
+  }
+
+  /*
+   * @see org.rssowl.core.util.ISearchHit#getData(java.lang.Object)
+   */
+  public Object getData(Object key) {
+    return fData != null ? fData.get(key) : null;
   }
 }

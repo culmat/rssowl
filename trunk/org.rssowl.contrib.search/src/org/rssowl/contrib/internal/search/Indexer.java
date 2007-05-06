@@ -48,6 +48,7 @@ public class Indexer {
   private final JobQueue fJobQueue;
   private NewsListener fNewsListener;
   private boolean fFlushRequired;
+  private final ModelSearchImpl fSearch;
 
   /* The Default Analyzer */
   private static class DefaultAnalyzer extends KeywordAnalyzer {
@@ -66,10 +67,12 @@ public class Indexer {
   }
 
   /**
+   * @param search
    * @param directory
    * @throws PersistenceException
    */
-  public Indexer(Directory directory) throws PersistenceException {
+  public Indexer(ModelSearchImpl search, Directory directory) throws PersistenceException {
+    fSearch = search;
     fIndexDirectory = directory;
     fJobQueue = new JobQueue("Updating Feeds", MAX_INDEX_JOBS_COUNT, true, INDEX_JOB_PROGRESS_DELAY);
 
@@ -109,6 +112,10 @@ public class Indexer {
         Activator.getDefault().getLog().log(Activator.getDefault().createErrorStatus(e.getMessage(), e));
       }
     }
+
+    /* Notify Listeners */
+    if (fFlushRequired)
+      fSearch.notifyIndexUpdated();
   }
 
   /**
@@ -129,6 +136,9 @@ public class Indexer {
 
     /* Mark as in need for a flush */
     fFlushRequired = true;
+
+    /* Notify Listeners */
+    fSearch.notifyIndexUpdated();
   }
 
   /**
@@ -249,7 +259,7 @@ public class Indexer {
   private void unregisterListeners() {
     if (fNewsListener != null)
       Owl.getPersistenceService().getDAOService().getNewsDAO().removeEntityListener(fNewsListener);
-    
+
     fNewsListener = null;
   }
 

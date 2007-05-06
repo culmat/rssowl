@@ -16,6 +16,9 @@ import java.util.List;
  */
 public class NewsDocument extends SearchDocument<INews> {
 
+  /* State ID as String */
+  static final String STATE_ID_TEXT = String.valueOf(INews.STATE);
+
   /**
    * @param type
    */
@@ -48,8 +51,8 @@ public class NewsDocument extends SearchDocument<INews> {
     addField(fields, createDateField(INews.MODIFIED_DATE, news.getModifiedDate(), Store.NO));
     addField(fields, createDateField(INews.AGE_IN_DAYS, DateUtils.getRecentDate(news), Store.NO));
 
-    /* Add States */
-    addField(fields, createEnumField(INews.STATE, news.getState(), Store.NO));
+    /* Add States (actually store INews.State in Index) */
+    addField(fields, createEnumField(INews.STATE, news.getState(), Store.YES));
     addField(fields, createBooleanField(INews.IS_FLAGGED, news.isFlagged(), Store.NO));
     addField(fields, createLongField(INews.RATING, news.getRating(), Store.NO));
 
