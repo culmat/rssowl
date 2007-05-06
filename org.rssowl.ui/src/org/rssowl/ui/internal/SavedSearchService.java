@@ -57,8 +57,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class SavedSearchService {
 
-  /* Time in millies before updating the saved searches on an index event */
-  private static final int BATCH_INTERVAL = 5000;
+  /* Time in millies before updating the saved searches (long) */
+  private static final int BATCH_INTERVAL_LONG = 2000;
+
+  /* Time in millies before updating the saved searches (short) */
+  private static final int BATCH_INTERVAL_SHORT = 200;
+
+  /* Number of updated documents before using the long batch interval */
+  private static final int SHORT_THRESHOLD = 1;
 
   private final Job fBatchJob;
   private final IndexListener fIndexListener;
@@ -96,8 +102,8 @@ public class SavedSearchService {
 
   private IndexListener registerListeners() {
     IndexListener listener = new IndexListener() {
-      public void indexUpdated() {
-        onIndexUpdated();
+      public void indexUpdated(int docCount) {
+        onIndexUpdated(docCount);
       }
     };
 
@@ -109,7 +115,7 @@ public class SavedSearchService {
     Owl.getPersistenceService().getModelSearch().removeIndexListener(fIndexListener);
   }
 
-  private void onIndexUpdated() {
+  private void onIndexUpdated(int docCount) {
 
     /* Batch is in process - return */
     if (fBatchInProcess.get())
@@ -117,7 +123,7 @@ public class SavedSearchService {
 
     /* Start a new Batch */
     fBatchInProcess.set(true);
-    fBatchJob.schedule(BATCH_INTERVAL);
+    fBatchJob.schedule(docCount > SHORT_THRESHOLD ? BATCH_INTERVAL_LONG : BATCH_INTERVAL_SHORT);
   }
 
   private void updateSavedSearches() {
