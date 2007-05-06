@@ -1152,7 +1152,10 @@ public class BookMarkExplorer extends ViewPart {
 
       public void partHidden(IWorkbenchPartReference ref) {}
 
-      public void partInputChanged(IWorkbenchPartReference ref) {}
+      public void partInputChanged(IWorkbenchPartReference ref) {
+        if (ref.getPart(true) instanceof IEditorPart)
+          editorActivated(fViewSite.getPage().getActiveEditor());
+      }
     };
 
     fViewSite.getPage().addPartListener(fPartListener);
