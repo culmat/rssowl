@@ -74,7 +74,7 @@ public class Indexer {
   public Indexer(ModelSearchImpl search, Directory directory) throws PersistenceException {
     fSearch = search;
     fIndexDirectory = directory;
-    fJobQueue = new JobQueue("Updating Feeds", MAX_INDEX_JOBS_COUNT, true, INDEX_JOB_PROGRESS_DELAY);
+    fJobQueue = new JobQueue("Updating Saved Searches", MAX_INDEX_JOBS_COUNT, true, INDEX_JOB_PROGRESS_DELAY);
 
     init();
   }
