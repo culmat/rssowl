@@ -568,14 +568,6 @@ public class ModelSearchImpl implements IModelSearch {
     }
   }
 
-  /*
-   * @see org.rssowl.core.persist.service.IModelSearch#createSearchHit(java.lang.Object,
-   * float, java.util.Map)
-   */
-  public <T> ISearchHit<T> createSearchHit(T result, float relevance, Map<?, ?> data) {
-    return new SearchHit<T>(result, relevance, data);
-  }
-
   private static String prepareForParsing(String s) {
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < s.length(); i++) {
