@@ -86,6 +86,7 @@ public class Indexer {
    * @param isUpdate
    */
   public synchronized void index(List<INews> entities, boolean isUpdate) {
+    int docCount = 0;
 
     /* For each Event */
     for (ListIterator<INews> it = entities.listIterator(entities.size()); it.hasPrevious();) {
@@ -94,6 +95,7 @@ public class Indexer {
       NewsDocument newsDoc = new NewsDocument(news);
       try {
         if (newsDoc.addFields()) {
+          docCount++;
 
           /* Update Event */
           if (isUpdate) {
@@ -115,7 +117,7 @@ public class Indexer {
 
     /* Notify Listeners */
     if (fFlushRequired)
-      fSearch.notifyIndexUpdated();
+      fSearch.notifyIndexUpdated(docCount);
   }
 
   /**
@@ -125,6 +127,7 @@ public class Indexer {
    * @throws IOException
    */
   public synchronized void removeFromIndex(List<INews> entities) throws IOException {
+    int docCount = 0;
 
     /* For each entity */
     for (ListIterator<INews> it = entities.listIterator(entities.size()); it.hasPrevious();) {
@@ -132,13 +135,14 @@ public class Indexer {
       it.remove();
       Term term = createTerm(news);
       fIndexWriter.deleteDocuments(term);
+      docCount++;
     }
 
     /* Mark as in need for a flush */
     fFlushRequired = true;
 
     /* Notify Listeners */
-    fSearch.notifyIndexUpdated();
+    fSearch.notifyIndexUpdated(docCount);
   }
 
   /**

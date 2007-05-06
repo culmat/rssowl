@@ -605,9 +605,9 @@ public class ModelSearchImpl implements IModelSearch {
   }
 
   /* Notify that the index has been updated */
-  protected void notifyIndexUpdated() {
+  protected void notifyIndexUpdated(int docCount) {
     for (IndexListener listener : fIndexListeners) {
-      listener.indexUpdated();
+      listener.indexUpdated(docCount);
     }
   }
 }
