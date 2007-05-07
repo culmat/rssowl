@@ -87,12 +87,13 @@ import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
-import org.rssowl.core.util.ISearchHit;
+import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.CColumnLayoutData;
@@ -184,18 +185,32 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
   /* Container for a search result */
   private static class ScoredNews {
-    private INews fNews;
+    private NewsReference fNewsRef;
+    private INews fResolvedNews;
     private Float fScore;
     private Relevance fRelevance;
+    private final State fState;
 
-    ScoredNews(INews news, Float score, Relevance relevance) {
-      fNews = news;
+    ScoredNews(NewsReference newsRef, INews.State state, Float score, Relevance relevance) {
+      fNewsRef = newsRef;
+      fState = state;
       fScore = score;
       fRelevance = relevance;
     }
 
     INews getNews() {
-      return fNews;
+      if (fResolvedNews == null)
+        fResolvedNews = fNewsRef.resolve();
+
+      return fResolvedNews;
+    }
+
+    INews.State getState() {
+      return fState;
+    }
+
+    NewsReference getNewsReference() {
+      return fNewsRef;
     }
 
     Float getScore() {
@@ -204,22 +219,6 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     Relevance getRelevance() {
       return fRelevance;
-    }
-
-    /*
-     * @see java.lang.Object#hashCode()
-     */
-    @Override
-    public int hashCode() {
-      return fNews.hashCode();
-    }
-
-    /*
-     * @see java.lang.Object#equals(java.lang.Object)
-     */
-    @Override
-    public boolean equals(Object obj) {
-      return fNews.equals(obj);
     }
   }
 
@@ -679,12 +678,12 @@ public class SearchNewsDialog extends TitleAreaDialog {
       protected void runInBackground(IProgressMonitor monitor) {
 
         /* Perform Search in the Background */
-        List<ISearchHit<NewsReference>> searchHits = fModelSearch.searchNews(conditions, matchAllConditions);
+        List<SearchHit<NewsReference>> searchHits = fModelSearch.searchNews(conditions, matchAllConditions);
         fResult = new ArrayList<ScoredNews>(searchHits.size());
 
         /* Retrieve maximum raw relevance */
         Float maxRelevanceScore = 0f;
-        for (ISearchHit<NewsReference> searchHit : searchHits) {
+        for (SearchHit<NewsReference> searchHit : searchHits) {
           Float relevanceRaw = searchHit.getRelevance();
           maxRelevanceScore = Math.max(maxRelevanceScore, relevanceRaw);
         }
@@ -694,18 +693,17 @@ public class SearchNewsDialog extends TitleAreaDialog {
         Float highRelThreshold = maxRelevanceScore / 3f * 2f;
 
         /* Fill Results with Relevance */
-        for (ISearchHit<NewsReference> searchHit : searchHits) {
-          INews news = searchHit.getResult().resolve();
-          if (news != null) {//TODO Remove once Bug 173 is fixed
-            Float relevanceRaw = searchHit.getRelevance();
-            Relevance relevance = Relevance.LOW;
-            if (relevanceRaw > highRelThreshold)
-              relevance = Relevance.HIGH;
-            else if (relevanceRaw > mediumRelThreshold)
-              relevance = Relevance.MEDIUM;
+        for (SearchHit<NewsReference> searchHit : searchHits) {
+          //TODO Test if News-Reference is resolvable (bug 173)
+          Float relevanceRaw = searchHit.getRelevance();
+          Relevance relevance = Relevance.LOW;
+          if (relevanceRaw > highRelThreshold)
+            relevance = Relevance.HIGH;
+          else if (relevanceRaw > mediumRelThreshold)
+            relevance = Relevance.MEDIUM;
 
-            fResult.add(new ScoredNews(news, relevanceRaw, relevance));
-          }
+          INews.State state = (State) searchHit.getData(INews.STATE);
+          fResult.add(new ScoredNews(searchHit.getResult(), state, relevanceRaw, relevance));
         }
       }
 
@@ -713,7 +711,6 @@ public class SearchNewsDialog extends TitleAreaDialog {
       protected void runInUI(IProgressMonitor monitor) {
 
         /* Set Input (sorted) to Viewer */
-        Collections.sort(fResult, fNewsSorter);
         fViewer.setInput(fResult);
 
         /* Update Status Label */
@@ -806,7 +803,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
   /* Convert Selection to INews */
   private ISelection convertToNews(StructuredSelection selection) {
-    List< ? > selectedElements = selection.toList();
+    List<?> selectedElements = selection.toList();
     List<INews> selectedNews = new ArrayList<INews>();
     for (Object selectedElement : selectedElements) {
       ScoredNews scoredNews = (ScoredNews) selectedElement;
@@ -880,35 +877,65 @@ public class SearchNewsDialog extends TitleAreaDialog {
       }
 
       public void entitiesDeleted(Set<NewsEvent> events) {
-        onNewsEvent(events);
+      /* Ignore */
       }
     };
     DynamicDAO.addEntityListener(INews.class, fNewsListener);
   }
 
-  private void onNewsEvent(Set<NewsEvent> events) {
+  private void onNewsEvent(final Set<NewsEvent> events) {
 
     /* No Result set yet */
     if (fViewer.getInput() == null)
       return;
 
-    /* Search if news is part of result */
-    List< ? > input = (List< ? >) fViewer.getInput();
-    for (NewsEvent event : events) {
-      for (Object object : input) {
-        INews news = ((ScoredNews) object).getNews();
+    /* Check for Update / Deleted News */
+    JobRunner.runUIUpdater(new UIBackgroundJob(getShell()) {
+      private List<ScoredNews> fDeletedScoredNews;
+      private List<ScoredNews> fUpdatedScoredNews;
 
-        /* News is part of the list, refresh and return */
-        if (news.equals(event.getEntity())) {
-          JobRunner.runInUIThread(getShell(), new Runnable() {
-            public void run() {
-              fViewer.refresh();
+      @Override
+      protected void runInBackground(IProgressMonitor monitor) {
+        List<?> input = (List<?>) fViewer.getInput();
+        for (NewsEvent event : events) {
+          for (Object object : input) {
+            ScoredNews scoredNews = ((ScoredNews) object);
+            NewsReference newsRef = scoredNews.getNewsReference();
+
+            /* News is part of the list */
+            if (newsRef.references(event.getEntity())) {
+              INews news = event.getEntity();
+
+              /* News got Deleted */
+              if (!news.isVisible()) {
+                if (fDeletedScoredNews == null)
+                  fDeletedScoredNews = new ArrayList<ScoredNews>();
+                fDeletedScoredNews.add(scoredNews);
+              }
+
+              /* News got Updated */
+              else {
+                if (fUpdatedScoredNews == null)
+                  fUpdatedScoredNews = new ArrayList<ScoredNews>();
+                fUpdatedScoredNews.add(scoredNews);
+              }
             }
-          });
-          return;
+          }
         }
       }
-    }
+
+      @Override
+      protected void runInUI(IProgressMonitor monitor) {
+
+        /* News got Deleted */
+        if (fDeletedScoredNews != null)
+          fViewer.remove(fDeletedScoredNews.toArray());
+
+        /* News got Updated */
+        if (fUpdatedScoredNews != null)
+          fViewer.update(fUpdatedScoredNews.toArray(), null);
+      }
+    });
   }
 
   private void onMouseDown(Event event) {
@@ -976,7 +1003,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
       return;
 
     /* Convert Selection to INews */
-    List< ? > selectedElements = selection.toList();
+    List<?> selectedElements = selection.toList();
     List<INews> selectedNews = new ArrayList<INews>();
     for (Object selectedElement : selectedElements) {
       ScoredNews scoredNews = (ScoredNews) selectedElement;
@@ -1119,8 +1146,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private IStructuredContentProvider getContentProvider() {
     return new IStructuredContentProvider() {
       public Object[] getElements(Object inputElement) {
-        if (inputElement instanceof List< ? >)
-          return getVisibleNews((List< ? >) inputElement);
+        if (inputElement instanceof List<?>)
+          return getVisibleNews((List<?>) inputElement);
 
         return new Object[0];
       }
@@ -1131,12 +1158,15 @@ public class SearchNewsDialog extends TitleAreaDialog {
     };
   }
 
-  private Object[] getVisibleNews(List< ? > elements) {
+  private Object[] getVisibleNews(List<?> elements) {
     List<ScoredNews> news = new ArrayList<ScoredNews>();
 
     for (Object element : elements) {
-      if (element instanceof ScoredNews && ((ScoredNews) element).getNews().isVisible())
-        news.add((ScoredNews) element);
+      if (element instanceof ScoredNews) {
+        ScoredNews scoredNews = (ScoredNews) element;
+        if (scoredNews.getState() != INews.State.HIDDEN && scoredNews.getState() != INews.State.DELETED)
+          news.add((ScoredNews) element);
+      }
     }
 
     return news.toArray();
