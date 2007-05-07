@@ -69,12 +69,12 @@ public class SavedSearchService {
   private final Job fBatchJob;
   private final IndexListener fIndexListener;
   private final AtomicBoolean fBatchInProcess = new AtomicBoolean(false);
+  private final AtomicBoolean fUpdatedOnce = new AtomicBoolean(false);
 
   /** Creates and Starts this Service */
   public SavedSearchService() {
     fBatchJob = createBatchJob();
     fIndexListener = registerListeners();
-    updateSavedSearches();
   }
 
   private Job createBatchJob() {
@@ -86,7 +86,7 @@ public class SavedSearchService {
         /* Update all saved searches */
         SafeRunner.run(new LoggingSafeRunnable() {
           public void run() throws Exception {
-            updateSavedSearches();
+            updateSavedSearches(true);
           }
         });
 
@@ -126,7 +126,16 @@ public class SavedSearchService {
     fBatchJob.schedule(docCount > SHORT_THRESHOLD ? BATCH_INTERVAL_LONG : BATCH_INTERVAL_SHORT);
   }
 
-  private void updateSavedSearches() {
+  /**
+   * Update the results of all <code>ISearchMark</code>s stored in RSSOwl.
+   *
+   * @param force If set to <code>TRUE</code>, update saved searches even if
+   * done before.
+   */
+  public void updateSavedSearches(boolean force) {
+    if (!force && fUpdatedOnce.get())
+      return;
+
     Set<ISearchMark> searchMarks = Controller.getDefault().getCacheService().getSearchMarks();
     updateSavedSearches(searchMarks);
   }
@@ -136,6 +145,7 @@ public class SavedSearchService {
    * results in.
    */
   public void updateSavedSearches(Set<ISearchMark> searchMarks) {
+    fUpdatedOnce.set(true);
     IModelSearch modelSearch = Owl.getPersistenceService().getModelSearch();
     Set<SearchMarkEvent> events = new HashSet<SearchMarkEvent>(searchMarks.size());
 
