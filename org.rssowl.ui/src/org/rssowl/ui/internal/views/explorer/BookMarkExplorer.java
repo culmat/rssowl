@@ -125,6 +125,7 @@ import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.ITreeNode;
+import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.ModelTreeNode;
 import org.rssowl.ui.internal.util.TreeTraversal;
 import org.rssowl.ui.internal.util.WidgetTreeNode;
@@ -295,6 +296,13 @@ public class BookMarkExplorer extends ViewPart {
 
     /* Set the initial Input based on selected Bookmark Set */
     fViewer.setInput(fSelectedBookMarkSet);
+
+    /* Update Saved Searches if not yet done */
+    JobRunner.runInBackgroundThread(50, new Runnable() {
+      public void run() {
+        Controller.getDefault().getSavedSearchService().updateSavedSearches(false);
+      }
+    });
 
     /* Enable "Link to FeedView" */
     fViewer.addPostSelectionChangedListener(new ISelectionChangedListener() {
