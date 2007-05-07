@@ -66,6 +66,13 @@ public class NotificationService {
     fBatchedBuffer = new BatchedBuffer<NewsEvent>(receiver, BATCH_INTERVAL);
     fGlobalScope = Owl.getPreferenceService().getGlobalScope();
     fNewsAdapter = registerListeners();
+
+    /* Access the popup in the UI Thread to avoid an Exception later */
+    JobRunner.runInUIThread(null, new Runnable() {
+      public void run() {
+        NotificationPopup.isVisible();
+      }
+    });
   }
 
   /* Startup this Service */
