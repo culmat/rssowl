@@ -257,13 +257,6 @@ litigation.
          unpack="false"/>
 
    <plugin
-         id="org.rssowl.contrib.search"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
          id="org.rssowl.lib.db4o"
          download-size="0"
          install-size="0"
@@ -332,5 +325,11 @@ litigation.
          install-size="0"
          version="0.0.0"
          unpack="false"/>
+
+   <plugin
+         id="org.rssowl.lib.lucene"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
 
 </feature>
