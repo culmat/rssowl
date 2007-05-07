@@ -9,7 +9,8 @@ Require-Bundle: org.eclipse.core.runtime,
  org.rssowl.lib.db4o,
  org.rssowl.lib.jdom,
  org.rssowl.lib.httpclient,
- org.eclipse.core.net
+ org.eclipse.core.net,
+ org.rssowl.lib.lucene
 Eclipse-LazyStart: true
 Bundle-Vendor: RSSOwl.org
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
@@ -21,7 +22,9 @@ Export-Package: org.rssowl.core,
  org.rssowl.core.internal.interpreter,
  org.rssowl.core.internal.persist,
  org.rssowl.core.internal.persist.dao,
+ org.rssowl.core.internal.persist.migration,
  org.rssowl.core.internal.persist.pref,
+ org.rssowl.core.internal.persist.search,
  org.rssowl.core.internal.persist.service,
  org.rssowl.core.interpreter,
  org.rssowl.core.persist,

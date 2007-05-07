@@ -12,13 +12,14 @@ import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.rssowl.contrib.internal.search.Activator;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
+import org.rssowl.core.persist.event.runnable.EventType;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.JobQueue;
 
@@ -72,7 +73,7 @@ public class Indexer {
    * @param directory
    * @throws PersistenceException
    */
-  public Indexer(ModelSearchImpl search, Directory directory) throws PersistenceException {
+  Indexer(ModelSearchImpl search, Directory directory) throws PersistenceException {
     fSearch = search;
     fIndexDirectory = directory;
     fJobQueue = new JobQueue("Updating Saved Searches", MAX_INDEX_JOBS_COUNT, true, INDEX_JOB_PROGRESS_DELAY);
@@ -83,10 +84,10 @@ public class Indexer {
   /**
    * TODO Provide generic method that can deal with any entity!
    *
-   * @param events
+   * @param entities
    * @param isUpdate
    */
-  public synchronized void index(List<INews> entities, boolean isUpdate) {
+  synchronized void index(List<INews> entities, boolean isUpdate) {
     int docCount = 0;
 
     /* For each Event */
@@ -124,10 +125,10 @@ public class Indexer {
   /**
    * TODO Provide generic method that can deal with any Event!
    *
-   * @param events
+   * @param entities
    * @throws IOException
    */
-  public synchronized void removeFromIndex(List<INews> entities) throws IOException {
+  synchronized void removeFromIndex(List<INews> entities) throws IOException {
     int docCount = 0;
 
     /* For each entity */
@@ -149,7 +150,7 @@ public class Indexer {
   /**
    * @throws IOException
    */
-  public synchronized void flushIfNecessary() throws IOException {
+  synchronized void flushIfNecessary() throws IOException {
     if (fFlushRequired)
       fIndexWriter.flush();
 
@@ -159,7 +160,7 @@ public class Indexer {
   /**
    * @throws IOException
    */
-  public synchronized void shutdown() throws IOException {
+  synchronized void shutdown() throws IOException {
     unregisterListeners();
     dispose();
   }
@@ -169,8 +170,10 @@ public class Indexer {
    * be called if the information stored in the persistence layer has been
    * cleared with a method that does not issue events for the elements that are
    * removed.
+   *
+   * @throws IOException
    */
-  public synchronized void clearIndex() throws IOException {
+  synchronized void clearIndex() throws IOException {
     dispose();
     if (IndexReader.indexExists(fIndexDirectory))
       fIndexWriter = createIndexWriter(fIndexDirectory, true);
@@ -183,7 +186,7 @@ public class Indexer {
    * @return Returns the <code>Analyzer</code> that is used for all
    * analyzation of Fields and Queries.
    */
-  public Analyzer createAnalyzer() {
+  Analyzer createAnalyzer() {
     PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper(new DefaultAnalyzer());
 
     /* Standard (Lowercase, Letter, Stop,...) */
@@ -212,7 +215,7 @@ public class Indexer {
     registerListeners();
   }
 
-  public synchronized void initIfNecessary() {
+  synchronized void initIfNecessary() {
     if (fIndexWriter == null)
       init();
   }
@@ -237,23 +240,23 @@ public class Indexer {
     fNewsListener = new NewsListener() {
       public void entitiesAdded(Set<NewsEvent> events) {
         if (!Owl.TESTING)
-          fJobQueue.schedule(new IndexingTask(Indexer.this, events, IndexingTask.Type.ADD));
+          fJobQueue.schedule(new IndexingTask(Indexer.this, events, EventType.PERSIST));
         else
-          new IndexingTask(Indexer.this, events, IndexingTask.Type.ADD).run(new NullProgressMonitor());
+          new IndexingTask(Indexer.this, events, EventType.PERSIST).run(new NullProgressMonitor());
       }
 
       public void entitiesUpdated(Set<NewsEvent> events) {
         if (!Owl.TESTING)
-          fJobQueue.schedule(new IndexingTask(Indexer.this, events, IndexingTask.Type.UPDATE));
+          fJobQueue.schedule(new IndexingTask(Indexer.this, events, EventType.UPDATE));
         else
-          new IndexingTask(Indexer.this, events, IndexingTask.Type.UPDATE).run(new NullProgressMonitor());
+          new IndexingTask(Indexer.this, events, EventType.UPDATE).run(new NullProgressMonitor());
       }
 
       public void entitiesDeleted(Set<NewsEvent> events) {
         if (!Owl.TESTING)
-          fJobQueue.schedule(new IndexingTask(Indexer.this, events, IndexingTask.Type.DELETE));
+          fJobQueue.schedule(new IndexingTask(Indexer.this, events, EventType.REMOVE));
         else
-          new IndexingTask(Indexer.this, events, IndexingTask.Type.DELETE).run(new NullProgressMonitor());
+          new IndexingTask(Indexer.this, events, EventType.REMOVE).run(new NullProgressMonitor());
       }
     };
 

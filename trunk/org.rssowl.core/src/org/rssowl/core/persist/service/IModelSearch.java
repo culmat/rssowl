@@ -26,7 +26,7 @@ package org.rssowl.core.persist.service;
 
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.reference.NewsReference;
-import org.rssowl.core.util.ISearchHit;
+import org.rssowl.core.util.SearchHit;
 
 import java.util.List;
 
@@ -53,7 +53,7 @@ public interface IModelSearch {
    * no type is matching the search, an empty <code>List</code> is returned.
    * @throws PersistenceException In case of an error while searching.
    */
-  List<ISearchHit<NewsReference>> searchNews(List<ISearchCondition> conditions, boolean matchAllConditions) throws PersistenceException;
+  List<SearchHit<NewsReference>> searchNews(List<ISearchCondition> conditions, boolean matchAllConditions) throws PersistenceException;
 
   /**
    * Releases all resources used by the implementor of this interface. The

@@ -49,7 +49,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.NativeFSLockFactory;
-import org.rssowl.contrib.internal.search.Activator;
+import org.rssowl.core.internal.Activator;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
@@ -59,7 +59,7 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IndexListener;
 import org.rssowl.core.persist.service.PersistenceException;
-import org.rssowl.core.util.ISearchHit;
+import org.rssowl.core.util.SearchHit;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -106,11 +106,7 @@ public class ModelSearchImpl implements IModelSearch {
   private IndexSearcher fSearcher;
   private Indexer fIndexer;
   private Directory fDirectory;
-  private final List<IndexListener> fIndexListeners;
-
-  public ModelSearchImpl() {
-    fIndexListeners = new CopyOnWriteArrayList<IndexListener>();
-  }
+  private final List<IndexListener> fIndexListeners = new CopyOnWriteArrayList<IndexListener>();
 
   /*
    * @see org.rssowl.core.model.search.IModelSearch#startup()
@@ -151,7 +147,7 @@ public class ModelSearchImpl implements IModelSearch {
    * @see org.rssowl.core.model.search.IModelSearch#searchNews(java.util.List,
    * boolean)
    */
-  public List<ISearchHit<NewsReference>> searchNews(List<ISearchCondition> conditions, boolean matchAllConditions) throws PersistenceException {
+  public List<SearchHit<NewsReference>> searchNews(List<ISearchCondition> conditions, boolean matchAllConditions) throws PersistenceException {
 
     /* Make sure the searcher is in sync */
     isSearcherCurrent();
@@ -236,7 +232,7 @@ public class ModelSearchImpl implements IModelSearch {
       }
 
       /* Build Result */
-      List<ISearchHit<NewsReference>> resultList = new ArrayList<ISearchHit<NewsReference>>(hits.length());
+      List<SearchHit<NewsReference>> resultList = new ArrayList<SearchHit<NewsReference>>(hits.length());
       for (Iterator<?> it = hits.iterator(); it.hasNext();) {
         Hit hit = (Hit) it.next();
 
@@ -597,8 +593,7 @@ public class ModelSearchImpl implements IModelSearch {
     fIndexListeners.remove(listener);
   }
 
-  /* Notify that the index has been updated */
-  protected void notifyIndexUpdated(int docCount) {
+  void notifyIndexUpdated(int docCount) {
     for (IndexListener listener : fIndexListeners) {
       listener.indexUpdated(docCount);
     }

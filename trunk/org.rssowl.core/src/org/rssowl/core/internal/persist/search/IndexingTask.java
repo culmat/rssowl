@@ -27,9 +27,10 @@ package org.rssowl.core.internal.persist.search;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.rssowl.contrib.internal.search.Activator;
+import org.rssowl.core.internal.Activator;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.event.NewsEvent;
+import org.rssowl.core.persist.event.runnable.EventType;
 import org.rssowl.core.util.ITask;
 
 import java.io.IOException;
@@ -47,20 +48,15 @@ import java.util.Set;
  */
 public final class IndexingTask implements ITask {
   private final Indexer fIndexer;
-  private final Type fTaskType;
+  private final EventType fTaskType;
   private final List<INews> fNews;
 
-  /* Indexing Task Types */
-  enum Type {
-    ADD, UPDATE, DELETE
-  }
-
-  IndexingTask(Indexer indexer, Set<NewsEvent> events, Type taskType) {
+  IndexingTask(Indexer indexer, Set<NewsEvent> events, EventType taskType) {
     fIndexer = indexer;
     fNews = new ArrayList<INews>(events.size());
     for (NewsEvent event : events)
       fNews.add(event.getEntity());
-    
+
     fTaskType = taskType;
   }
 
@@ -85,7 +81,7 @@ public final class IndexingTask implements ITask {
     switch (fTaskType) {
 
       /* Add the Entities of the Events to the Index */
-      case ADD:
+      case PERSIST:
         addToIndex();
         break;
 
@@ -95,7 +91,7 @@ public final class IndexingTask implements ITask {
         break;
 
       /* Delete the Entities of the Events from the Index */
-      case DELETE:
+      case REMOVE:
         deleteFromIndex();
         break;
     }

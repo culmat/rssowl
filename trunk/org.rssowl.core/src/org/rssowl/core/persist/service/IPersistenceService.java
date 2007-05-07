@@ -83,10 +83,9 @@ public interface IPersistenceService {
   /**
    * <p>
    * Get the Implementation of <code>IModelSearch</code> that allows to search
-   * model types. The implementation is looked up using the ModelSearch
-   * Extension Point.
+   * model types. The implementation is provided using Apache Lucene as
+   * full-text-search engine.
    * </p>
-   * Subclasses may override to provide their own implementation.
    *
    * @return Returns the Implementation of <code>IModelSearch</code> that
    * allows to search model types.
