@@ -39,8 +39,8 @@ import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IndexListener;
-import org.rssowl.core.util.ISearchHit;
 import org.rssowl.core.util.LoggingSafeRunnable;
+import org.rssowl.core.util.SearchHit;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -143,14 +143,14 @@ public class SavedSearchService {
     for (ISearchMark searchMark : searchMarks) {
 
       /* Execute the search */
-      List<ISearchHit<NewsReference>> results = modelSearch.searchNews(searchMark.getSearchConditions(), searchMark.matchAllConditions());
+      List<SearchHit<NewsReference>> results = modelSearch.searchNews(searchMark.getSearchConditions(), searchMark.matchAllConditions());
 
       /* Fill Result into Buckets */
       List<NewsReference> readNews = null;
       List<NewsReference> unreadNews = null;
       List<NewsReference> newNews = null;
 
-      for (ISearchHit<NewsReference> searchHit : results) {
+      for (SearchHit<NewsReference> searchHit : results) {
         INews.State state = (State) searchHit.getData(INews.STATE);
 
         /* Read News */
