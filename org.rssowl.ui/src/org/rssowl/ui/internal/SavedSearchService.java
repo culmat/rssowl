@@ -61,7 +61,7 @@ public class SavedSearchService {
   private static final int BATCH_INTERVAL_LONG = 2000;
 
   /* Time in millies before updating the saved searches (short) */
-  private static final int BATCH_INTERVAL_SHORT = 200;
+  private static final int BATCH_INTERVAL_SHORT = 100;
 
   /* Number of updated documents before using the long batch interval */
   private static final int SHORT_THRESHOLD = 1;
@@ -70,6 +70,7 @@ public class SavedSearchService {
   private final IndexListener fIndexListener;
   private final AtomicBoolean fBatchInProcess = new AtomicBoolean(false);
   private final AtomicBoolean fUpdatedOnce = new AtomicBoolean(false);
+  private final AtomicBoolean fForceQuickUpdate = new AtomicBoolean(false);
 
   /** Creates and Starts this Service */
   public SavedSearchService() {
@@ -82,6 +83,7 @@ public class SavedSearchService {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
         fBatchInProcess.set(false);
+        fForceQuickUpdate.set(false);
 
         /* Update all saved searches */
         SafeRunner.run(new LoggingSafeRunnable() {
@@ -123,7 +125,16 @@ public class SavedSearchService {
 
     /* Start a new Batch */
     fBatchInProcess.set(true);
-    fBatchJob.schedule(docCount > SHORT_THRESHOLD ? BATCH_INTERVAL_LONG : BATCH_INTERVAL_SHORT);
+    fBatchJob.schedule(docCount <= SHORT_THRESHOLD || fForceQuickUpdate.get() ? BATCH_INTERVAL_SHORT : BATCH_INTERVAL_LONG);
+  }
+
+  /**
+   * Tells this Service to rapidly update all saved searches when the next
+   * indexing is done. This can be called after an atomic operation (e.g.
+   * Marking some News as read) to force a quick update on all saved searches.
+   */
+  public void forceQuickUpdate() {
+    fForceQuickUpdate.set(true);
   }
 
   /**

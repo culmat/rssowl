@@ -165,6 +165,9 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
       /* Only affect equivalent News if not all News are affected */
       boolean affectEquivalentNews = !equalsRootFolders(folders);
 
+      /* Mark Saved Search Service as in need for a quick Update */
+      Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+
       /* Peform Op */
       Owl.getPersistenceService().getDAOService().getNewsDAO().setState(news, INews.State.READ, affectEquivalentNews, true);
     }
