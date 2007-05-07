@@ -49,7 +49,7 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.tests.TestUtils;
-import org.rssowl.core.util.ISearchHit;
+import org.rssowl.core.util.SearchHit;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -175,7 +175,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.STATE, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, State.READ);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1);
       }
 
@@ -184,7 +184,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.STATE, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, State.DELETED);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertEquals(0, result.size());
       }
 
@@ -195,7 +195,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.RATING, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, 10);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news2);
 
         /* Age in Days */
@@ -225,7 +225,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.RATING, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, 15);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertEquals(0, result.size());
 
         /* Age in Days */
@@ -249,7 +249,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, "apple");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3);
 
         field = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
@@ -298,7 +298,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, "Pasero Benjamin");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertEquals(0, result.size());
 
         /* Categories */
@@ -333,7 +333,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.PUBLISH_DATE, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, news4Date);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news4);
       }
 
@@ -343,7 +343,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.PUBLISH_DATE, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, wrongDate);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertEquals(0, result.size());
       }
 
@@ -352,7 +352,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.IS_FLAGGED, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, true);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news5);
 
         /* Attachments */
@@ -368,7 +368,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.IS_FLAGGED, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, false);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3, news4);
 
         /* Attachments */
@@ -386,7 +386,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.LINK, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, "http://www.news.com/news1.html");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1);
 
         field = fFactory.createSearchField(INews.LINK, fNewsEntityName);
@@ -429,7 +429,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.LINK, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, "http://www.news.com/news6.html");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertEquals(0, result.size());
 
         field = fFactory.createSearchField(INews.LINK, fNewsEntityName);
@@ -543,7 +543,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.STATE, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_NOT, State.READ);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news2, news3, news4, news5);
       }
 
@@ -552,7 +552,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.STATE, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_NOT, State.DELETED);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3, news4, news5);
       }
 
@@ -563,7 +563,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.RATING, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_NOT, 10);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news3, news4, news5);
       }
 
@@ -574,7 +574,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.RATING, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_NOT, 15);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3, news4, news5);
       }
 
@@ -585,7 +585,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_NOT, "apple");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news4, news5);
 
         field = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
@@ -634,7 +634,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_NOT, "Pasero Benjamin");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3, news4, news5);
 
         /* Categories */
@@ -669,7 +669,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.PUBLISH_DATE, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_NOT, news4Date);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3, news5);
       }
 
@@ -679,7 +679,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.PUBLISH_DATE, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_NOT, wrongDate);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3, news4, news5);
       }
 
@@ -688,7 +688,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.IS_FLAGGED, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_NOT, true);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3, news4);
 
         /* Attachments */
@@ -704,7 +704,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.IS_FLAGGED, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_NOT, false);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news5);
 
         /* Attachments */
@@ -722,7 +722,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.LINK, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_NOT, "http://www.news.com/news1.html");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news2, news3, news4, news5);
 
         field = fFactory.createSearchField(INews.LINK, fNewsEntityName);
@@ -765,7 +765,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.LINK, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_NOT, "http://www.news.com/news6.html");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3, news4, news5);
 
         field = fFactory.createSearchField(INews.LINK, fNewsEntityName);
@@ -878,7 +878,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "foo bar");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3, news4);
 
         field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
@@ -995,7 +995,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "barfoo");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertEquals(0, result.size());
 
         field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
@@ -1126,7 +1126,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_NOT, "foo bar");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news5);
 
         field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
@@ -1237,7 +1237,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_NOT, "barfoo");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3, news4, news5);
 
         field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
@@ -1362,7 +1362,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.BEGINS_WITH, "app");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3);
 
         field = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
@@ -1411,7 +1411,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.BEGINS_WITH, "Pasero Benj");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertEquals(0, result.size());
 
         /* Categories */
@@ -1455,7 +1455,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.LINK, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.BEGINS_WITH, "http://www.news.com/news1");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1);
 
         field = fFactory.createSearchField(INews.LINK, fNewsEntityName);
@@ -1498,7 +1498,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.LINK, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.BEGINS_WITH, "http://www.news.com/news6");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertEquals(0, result.size());
 
         field = fFactory.createSearchField(INews.LINK, fNewsEntityName);
@@ -1604,7 +1604,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.ENDS_WITH, "ple");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3);
 
         field = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
@@ -1653,7 +1653,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.ENDS_WITH, "ero Benj");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertEquals(0, result.size());
 
         /* Categories */
@@ -1697,7 +1697,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.LINK, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.ENDS_WITH, "news.com/news1.html");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1);
 
         field = fFactory.createSearchField(INews.LINK, fNewsEntityName);
@@ -1740,7 +1740,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.LINK, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.ENDS_WITH, "news.com/news6.ht,ö");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertEquals(0, result.size());
 
         field = fFactory.createSearchField(INews.LINK, fNewsEntityName);
@@ -1832,7 +1832,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.PUBLISH_DATE, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_BEFORE, d5);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3, news4);
 
         field = fFactory.createSearchField(INews.PUBLISH_DATE, fNewsEntityName);
@@ -1859,7 +1859,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.PUBLISH_DATE, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_BEFORE, d1);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertEquals(0, result.size());
       }
     } catch (PersistenceException e) {
@@ -1919,7 +1919,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.PUBLISH_DATE, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_AFTER, new Date(0));
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3, news4, news5);
 
         field = fFactory.createSearchField(INews.PUBLISH_DATE, fNewsEntityName);
@@ -1952,7 +1952,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.PUBLISH_DATE, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_AFTER, d5);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertEquals(0, result.size());
       }
     } catch (PersistenceException e) {
@@ -2013,7 +2013,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.RATING, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_GREATER_THAN, 0);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3, news4, news5);
 
         field = fFactory.createSearchField(INews.RATING, fNewsEntityName);
@@ -2055,7 +2055,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.RATING, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_GREATER_THAN, 10);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertEquals(0, result.size());
 
         /* Age in Days */
@@ -2129,7 +2129,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.RATING, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, 12);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3, news4, news5);
 
         field = fFactory.createSearchField(INews.RATING, fNewsEntityName);
@@ -2182,7 +2182,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.RATING, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, 2);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertEquals(0, result.size());
 
         /* Age in Days */
@@ -2267,7 +2267,7 @@ public class ModelSearchTest {
         ISearchField field = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
         ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.SIMILIAR_TO, "Pajero");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news3, news4);
 
         field = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
@@ -2378,7 +2378,7 @@ public class ModelSearchTest {
         ISearchField field3 = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
         ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS, "Benjamin Pasero");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
         assertSame(result, news1, news3, news5);
       }
 
@@ -2392,7 +2392,7 @@ public class ModelSearchTest {
         ISearchField field2 = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
         ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS, "test@rssowl.org");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), true);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), true);
         assertEquals(0, result.size());
       }
 
@@ -2413,7 +2413,7 @@ public class ModelSearchTest {
         ISearchField field4 = fFactory.createSearchField(INews.LINK, fNewsEntityName);
         ISearchCondition cond4 = fFactory.createSearchCondition(field4, SearchSpecifier.BEGINS_WITH, "http://www.news.com/");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), true);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), true);
         assertSame(result, news3);
       }
 
@@ -2434,7 +2434,7 @@ public class ModelSearchTest {
         ISearchField field4 = fFactory.createSearchField(INews.HAS_ATTACHMENTS, fNewsEntityName);
         ISearchCondition cond4 = fFactory.createSearchCondition(field4, SearchSpecifier.IS, true);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), true);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), true);
         assertSame(result, news2);
       }
 
@@ -2455,7 +2455,7 @@ public class ModelSearchTest {
         ISearchField field4 = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
         ISearchCondition cond4 = fFactory.createSearchCondition(field4, SearchSpecifier.CONTAINS, "pasero");
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), true);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), true);
         assertSame(result, news2, news3, news4);
       }
 
@@ -2473,7 +2473,7 @@ public class ModelSearchTest {
         ISearchField field3 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
         ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS, INews.State.UPDATED);
 
-        List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
         assertSame(result, news2, news3, news4, news5);
       }
     } catch (PersistenceException e) {
@@ -2559,7 +2559,7 @@ public class ModelSearchTest {
       ISearchField field5 = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
       ISearchCondition cond5 = fFactory.createSearchCondition(field5, SearchSpecifier.IS, "Benjamin Pasero");
 
-      List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4, cond5), false);
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4, cond5), false);
       assertSame(result, news3);
     }
 
@@ -2583,7 +2583,7 @@ public class ModelSearchTest {
       ISearchField field5 = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
       ISearchCondition cond5 = fFactory.createSearchCondition(field5, SearchSpecifier.CONTAINS, "Benjamin Pasero");
 
-      List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4, cond5), true);
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4, cond5), true);
       assertSame(result, news3);
     }
 
@@ -2601,7 +2601,7 @@ public class ModelSearchTest {
       ISearchField field3 = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
       ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS_NOT, "Benjamin Pasero");
 
-      List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), true);
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), true);
       assertSame(result, news2);
     }
 
@@ -2625,7 +2625,7 @@ public class ModelSearchTest {
       ISearchField field5 = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
       ISearchCondition cond5 = fFactory.createSearchCondition(field5, SearchSpecifier.IS, "apple");
 
-      List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4, cond5), true);
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4, cond5), true);
       assertSame(result, news3);
     }
 
@@ -2653,7 +2653,7 @@ public class ModelSearchTest {
       ISearchField field6 = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
       ISearchCondition cond6 = fFactory.createSearchCondition(field6, SearchSpecifier.IS_NOT, "slashdot");
 
-      List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4, cond5, cond6), true);
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4, cond5, cond6), true);
       assertEquals(0, result.size());
     }
 
@@ -2674,7 +2674,7 @@ public class ModelSearchTest {
       ISearchField field4 = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
       ISearchCondition cond4 = fFactory.createSearchCondition(field4, SearchSpecifier.IS_NOT, "windows");
 
-      List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), true);
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), true);
       assertSame(result, news2);
     }
 
@@ -2695,7 +2695,7 @@ public class ModelSearchTest {
       ISearchField field4 = fFactory.createSearchField(INews.AGE_IN_DAYS, fNewsEntityName);
       ISearchCondition cond4 = fFactory.createSearchCondition(field4, SearchSpecifier.IS_LESS_THAN, 5);
 
-      List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), true);
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), true);
       assertSame(result, news3);
     }
   }
@@ -2734,7 +2734,7 @@ public class ModelSearchTest {
       ISearchField field2 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
       ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS_NOT, "http://www.feed.com/feed1.xml");
 
-      List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), false);
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), false);
       assertSame(result, news1, news3, news4);
     }
 
@@ -2753,7 +2753,7 @@ public class ModelSearchTest {
       ISearchField field3 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
       ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS_NOT, "http://www.feed.com/feed2.xml");
 
-      List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
       assertSame(result, news1, news2, news3, news4);
     }
 
@@ -2772,7 +2772,7 @@ public class ModelSearchTest {
       ISearchField field3 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
       ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS_NOT, "http://www.feed.com/feed2.xml");
 
-      List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
       assertSame(result, news1);
     }
 
@@ -2787,7 +2787,7 @@ public class ModelSearchTest {
       ISearchField field2 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
       ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS_NOT, "http://www.feed.com/feed1.xml");
 
-      List<ISearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), true);
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), true);
       assertSame(result, news3);
     }
   }
@@ -2809,13 +2809,13 @@ public class ModelSearchTest {
     return new ArrayList<ISearchCondition>(Arrays.asList(condition));
   }
 
-  private void assertSame(List<ISearchHit<NewsReference>> result, INews... news) {
+  private void assertSame(List<SearchHit<NewsReference>> result, INews... news) {
     if (result.size() != news.length)
       fail("Results don't have the same number of Elements (" + news.length + " expected, " + result.size() + " actual)!");
 
     for (INews newsitem : news) {
       boolean found = false;
-      for (ISearchHit<NewsReference> hit : result) {
+      for (SearchHit<NewsReference> hit : result) {
         if (hit.getResult().getId() == newsitem.getId()) {
           found = true;
           break;
