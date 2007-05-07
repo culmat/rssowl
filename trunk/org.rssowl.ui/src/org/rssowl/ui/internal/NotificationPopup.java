@@ -150,7 +150,8 @@ public class NotificationPopup extends PopupDialog {
 
   /**
    * Returns <code>TRUE</code> if this popup is visible and <code>FALSE</code>
-   * otherwise. Can safely be called from a non-ui <code>Thread</code>.
+   * otherwise. Can safely be called from a non-ui <code>Thread</code> but
+   * beware the static initializer in Dialog this class extends!.
    *
    * @return Returns <code>TRUE</code> if this popup is visible and
    * <code>FALSE</code> otherwise.
