@@ -44,6 +44,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.util.ModelUtils;
 
@@ -114,7 +115,7 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
 
   private boolean confirmed() {
     StringBuilder message = new StringBuilder("Are you sure you want to delete ");
-    List< ? > elements = fSelection.toList();
+    List<?> elements = fSelection.toList();
 
     /* One Element */
     if (elements.size() == 1) {
@@ -184,8 +185,9 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
     List<INews> newsToDelete = null;
 
     /* Extract News */
-    for (Iterator<IEntity> it = entities.iterator(); it.hasNext(); ) {
+    for (Iterator<IEntity> it = entities.iterator(); it.hasNext();) {
       IEntity element = it.next();
+
       /* Separate News */
       if (element instanceof INews) {
         if (newsToDelete == null)
@@ -195,6 +197,9 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
         newsToDelete.add((INews) element);
       }
     }
+
+    /* Mark Saved Search Service as in need for a quick Update */
+    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
 
     /* Delete Folders and Marks in single Transaction */
     DynamicDAO.deleteAll(entities);
