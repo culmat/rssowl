@@ -194,7 +194,7 @@ public abstract class SearchDocument<T extends IEntity> {
    * @param store
    * @return
    */
-  protected Field createEnumField(int fieldConstant, Enum< ? > value, Store store) {
+  protected Field createEnumField(int fieldConstant, Enum<?> value, Store store) {
     if (value == null)
       return null;
 

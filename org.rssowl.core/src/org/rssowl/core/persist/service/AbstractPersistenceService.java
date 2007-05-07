@@ -24,6 +24,7 @@
 
 package org.rssowl.core.persist.service;
 
+import org.rssowl.core.internal.persist.search.ModelSearchImpl;
 import org.rssowl.core.persist.dao.DAOService;
 import org.rssowl.core.util.ExtensionUtils;
 
@@ -36,16 +37,12 @@ import org.rssowl.core.util.ExtensionUtils;
  * <p>
  * Contributors have to implement the Methods startup() and shutdown(), but may
  * chose to leave the others as provided in this abstract class. This default
- * implementation uses extension-points to lookup ModelDAO, ModelSearch and
- * PreferencesDAO.
+ * implementation uses extension-points to lookup ModelDAO and PreferencesDAO.
  * </p>
  *
  * @author bpasero
  */
 public abstract class AbstractPersistenceService implements IPersistenceService {
-
-  /* ID for Model Search Contribution */
-  private static final String MODEL_SEARCH_EXTENSION_POINT = "org.rssowl.core.ModelSearch"; //$NON-NLS-1$
 
   /* ID for ID Generator Contribution */
   private static final String MODEL_ID_GENERATOR_EXTENSION_POINT = "org.rssowl.core.IDGenerator"; //$NON-NLS-1$
@@ -91,7 +88,7 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
    */
   public IModelSearch getModelSearch() {
     if (fModelSearch == null)
-      fModelSearch = (IModelSearch) ExtensionUtils.loadSingletonExecutableExtension(MODEL_SEARCH_EXTENSION_POINT);
+      fModelSearch = new ModelSearchImpl();
 
     return fModelSearch;
   }

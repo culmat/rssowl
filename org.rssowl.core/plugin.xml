@@ -2,7 +2,6 @@
 <?eclipse version="3.0"?>
 <plugin>
    <extension-point id="ModelFactory" name="Model Factory" schema="schema/ModelFactory.exsd"/>
-   <extension-point id="ModelSearch" name="Model Search" schema="schema/ModelSearch.exsd"/>
    <extension-point id="PersistenceService" name="Persistence Service" schema="schema/PersistenceService.exsd"/>
    <extension-point id="ApplicationService" name="Application Service" schema="schema/ApplicationService.exsd"/>
    <extension-point id="PreferencesInitializer" name="Preferences Initializer" schema="schema/PreferencesInitializer.exsd"/>
