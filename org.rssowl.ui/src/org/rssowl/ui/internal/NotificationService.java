@@ -55,6 +55,9 @@ public class NotificationService {
   private final IPreferenceScope fGlobalScope;
   private final BatchedBuffer<NewsEvent> fBatchedBuffer;
 
+  /* Singleton instance */
+  private static NotificationPopup fgNotificationPopup;
+
   /** Creates a new Notification Service */
   public NotificationService() {
     BatchedBuffer.Receiver<NewsEvent> receiver = new BatchedBuffer.Receiver<NewsEvent>() {
@@ -66,13 +69,15 @@ public class NotificationService {
     fBatchedBuffer = new BatchedBuffer<NewsEvent>(receiver, BATCH_INTERVAL);
     fGlobalScope = Owl.getPreferenceService().getGlobalScope();
     fNewsAdapter = registerListeners();
+  }
 
-    /* Access the popup in the UI Thread to avoid an Exception later */
-    JobRunner.runInUIThread(null, new Runnable() {
-      public void run() {
-        NotificationPopup.isVisible();
-      }
-    });
+  /** Shutdown this Service */
+  public void stopService() {
+    DynamicDAO.removeEntityListener(INews.class, fNewsAdapter);
+  }
+
+  private boolean isPopupVisible() {
+    return fgNotificationPopup != null;
   }
 
   /* Startup this Service */
@@ -95,7 +100,7 @@ public class NotificationService {
       return;
 
     /* Add into Buffer */
-    if (!NotificationPopup.isVisible())
+    if (!isPopupVisible())
       fBatchedBuffer.addAll(events);
 
     /* Show Directly */
@@ -103,9 +108,8 @@ public class NotificationService {
       showNews(events);
   }
 
+  /* Show Notification in UI Thread */
   private void showNews(final Set<NewsEvent> events) {
-
-    /* Show Notification in UI Thread */
     JobRunner.runInUIThread(OwlUI.getPrimaryShell(), new Runnable() {
       public void run() {
 
@@ -121,13 +125,30 @@ public class NotificationService {
           news.add(event.getEntity());
 
         /* Show News in Popup */
-        NotificationPopup.showNews(news);
+        showNewsInPopup(news);
       }
     });
   }
 
-  /** Shutdown this Service */
-  public void stopService() {
-    DynamicDAO.removeEntityListener(INews.class, fNewsAdapter);
+  /*
+   * Opens the <code>NotificationPopup</code> if not yet opened and shows the
+   * given List of News.
+   */
+  private synchronized void showNewsInPopup(List<INews> news) {
+
+    /* Not yet opened */
+    if (fgNotificationPopup == null) {
+      fgNotificationPopup = new NotificationPopup(news.size()) {
+        @Override
+        public boolean close() {
+          fgNotificationPopup = null;
+          return super.close();
+        }
+      };
+      fgNotificationPopup.open();
+    }
+
+    /* Show News */
+    fgNotificationPopup.makeVisible(news);
   }
 }

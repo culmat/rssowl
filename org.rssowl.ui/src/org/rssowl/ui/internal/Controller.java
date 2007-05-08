@@ -165,6 +165,7 @@ public class Controller {
   private ILabelDAO fLabelDao;
   private IModelFactory fFactory;
 
+
   /* Task to perform Reload-Operations */
   private class ReloadTask implements ITask {
     private final Long fId;
@@ -614,6 +615,9 @@ public class Controller {
     /* Create the News-Service */
     fNewsService = new NewsService();
 
+    /* Create the Notification Service */
+    fNotificationService = new NotificationService();
+
     /* Create the Saved Search Service */
     fSavedSearchService = new SavedSearchService();
   }
@@ -691,9 +695,6 @@ public class Controller {
    * This method is called just after the windows have been opened.
    */
   public void postUIStartup() {
-
-    /* Create the Notification Service */
-    fNotificationService = new NotificationService();
 
     /* Create the Feed-Reload Service */
     if (!Owl.TESTING)
