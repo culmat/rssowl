@@ -14,10 +14,6 @@
 			<property name="type" value="feature" />
 			<property name="id" value="org.rssowl.contrib.nntp" />
 		</ant>
-		<ant antfile="${genericTargets}" target="${target}">
-			<property name="type" value="feature" />
-			<property name="id" value="org.rssowl.tests" />
-		</ant>
 		
 	</target>
 
@@ -35,11 +31,6 @@
 		</ant>
 	</target>
 	<target name="assemble.org.rssowl.contrib.nntp">
-		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
-			<property name="zipargs" value="" />
-		</ant>
-	</target>
-	<target name="assemble.org.rssowl.tests">
 		<ant antfile="${assembleScriptName}" dir="${buildDirectory}">
 			<property name="zipargs" value="" />
 		</ant>
