@@ -108,9 +108,6 @@ public class NotificationPopup extends PopupDialog {
   /* Time after the popup is closed automatically */
   private static final int AUTO_CLOSE_TIME = 8000;
 
-  /* Singleton instance */
-  private static NotificationPopup fgInstance;
-
   private List<INews> fRecentNews = new ArrayList<INews>();
   private ResourceManager fResources;
   private Map<FeedLinkReference, IBookMark> fMapFeedToBookmark;
@@ -129,38 +126,7 @@ public class NotificationPopup extends PopupDialog {
   private IPreferenceScope fGlobalScope;
   private int fVisibleNewsCount;
 
-  /**
-   * Opens the <code>NotificationPopup</code> if not yet opened and shows the
-   * given List of News.
-   *
-   * @param news The <code>List</code> of news that should be shown in the
-   * popup.
-   */
-  public static synchronized void showNews(List<INews> news) {
-
-    /* Not yet opened */
-    if (fgInstance == null) {
-      fgInstance = new NotificationPopup(news.size());
-      fgInstance.open();
-    }
-
-    /* Show News */
-    fgInstance.makeVisible(news);
-  }
-
-  /**
-   * Returns <code>TRUE</code> if this popup is visible and <code>FALSE</code>
-   * otherwise. Can safely be called from a non-ui <code>Thread</code> but
-   * beware the static initializer in Dialog this class extends!.
-   *
-   * @return Returns <code>TRUE</code> if this popup is visible and
-   * <code>FALSE</code> otherwise.
-   */
-  public static synchronized boolean isVisible() {
-    return fgInstance != null;
-  }
-
-  private NotificationPopup(int visibleNewsCount) {
+  NotificationPopup(int visibleNewsCount) {
     super(new Shell(PlatformUI.getWorkbench().getDisplay()), PopupDialog.INFOPOPUP_SHELLSTYLE | SWT.ON_TOP, false, false, false, false, null, null);
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fMapFeedToBookmark = new HashMap<FeedLinkReference, IBookMark>();
@@ -204,7 +170,7 @@ public class NotificationPopup extends PopupDialog {
     };
   }
 
-  private void makeVisible(List<INews> newsList) {
+  void makeVisible(List<INews> newsList) {
 
     /* Cancel Auto Closer and reschedule */
     if (!fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP)) {
@@ -525,7 +491,6 @@ public class NotificationPopup extends PopupDialog {
    */
   @Override
   public boolean close() {
-    fgInstance = null;
     fResources.dispose();
     return super.close();
   }
