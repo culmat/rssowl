@@ -28,8 +28,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
-import junit.framework.JUnit4TestAdapter;
-
 /**
  * Test-Suite for Core- and UI-Tests.
  *
@@ -43,12 +41,12 @@ import junit.framework.JUnit4TestAdapter;
   UITests.class })
 public class AllTests {
 
-  /**
-   * Support JUnit3 as well
-   *
-   * @return the Test for JUnit3 to function properly.
-   */
-  public static junit.framework.Test suite() {
-    return new JUnit4TestAdapter(AllTests.class);
-  }
+//  /**
+//   * Support JUnit3 as well
+//   *
+//   * @return the Test for JUnit3 to function properly.
+//   */
+//  public static junit.framework.Test suite() {
+//    return new JUnit4TestAdapter(AllTests.class);
+//  }
 }
