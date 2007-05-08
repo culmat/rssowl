@@ -87,6 +87,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   private ApplicationActionBarAdvisor fActionBarAdvisor;
   private LocalResourceManager fResources;
   private IPreferenceScope fPreferences;
+  private boolean fBlockIconifyEvent;
 
   /* Listeners */
   private NewsAdapter fNewsListener;
@@ -190,7 +191,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     getWindowConfigurer().getWindow().getShell().addShellListener(new ShellAdapter() {
       @Override
       public void shellIconified(ShellEvent e) {
-        onMinimize();
+        if (!fBlockIconifyEvent)
+          onMinimize();
       }
     });
 
@@ -287,7 +289,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       @Override
       public void shellIconified(ShellEvent e) {
-        moveToTray(shell);
+        if (!fBlockIconifyEvent)
+          moveToTray(shell);
       }
     };
     shell.addShellListener(fTrayShellListener);
@@ -363,7 +366,19 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   private void moveToTray(Shell shell) {
     if (Application.IS_WINDOWS)
       fTrayItem.setVisible(true);
-    shell.setVisible(false);
+
+    /*
+     * Bug in SWT: For some reason, calling setVisible(false) here will result
+     * in a second Iconify Event. The fix is to disable processing of this event
+     * meanwhile.
+     */
+    fBlockIconifyEvent = true;
+    try {
+      shell.setVisible(false);
+    } finally {
+      fBlockIconifyEvent = false;
+    }
+
     fMinimizedToTray = true;
 
     /*
