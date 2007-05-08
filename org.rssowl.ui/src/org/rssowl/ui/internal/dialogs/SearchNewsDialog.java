@@ -415,6 +415,15 @@ public class SearchNewsDialog extends TitleAreaDialog {
    */
   @Override
   public boolean close() {
+
+    /*
+     * Workaround for Eclipse Bug 186025: The Virtual Manager is not cleared
+     * when the TableViewer is disposed. Due to the hookListener() call, a
+     * reference to the TableViewer is held in Memory, so we need to explicitly
+     * clear the virtual manager.
+     */
+    fViewer.setItemCount(0);
+
     boolean res = super.close();
     fResources.dispose();
     unregisterListeners();
