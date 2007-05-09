@@ -33,8 +33,7 @@ import org.rssowl.core.persist.service.PersistenceException;
 public class PersistenceServiceImpl extends AbstractPersistenceService {
 
   /** */
-  public PersistenceServiceImpl() {
-  }
+  public PersistenceServiceImpl() {}
 
   /*
    * Startup the persistence layer. In case of a Database, this would be the
@@ -45,18 +44,24 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
   @Override
   public void startup() throws PersistenceException {
     super.startup();
+
     /* Startup DB and Model-Search */
     DBManager.getDefault().startup();
     getModelSearch().startup();
   }
 
   /*
-   * @see org.rssowl.core.model.dao.IPersistService#shutdown()
+   * @see org.rssowl.core.persist.service.IPersistenceService#shutdown(boolean)
    */
-  public void shutdown() throws PersistenceException {
-    getIDGenerator().shutdown();
-    getModelSearch().shutdown();
+  public void shutdown(boolean emergency) throws PersistenceException {
+    if (!emergency)
+      getIDGenerator().shutdown();
+
+    /* db4o has priority over the search shutdown */
     DBManager.getDefault().shutdown();
+
+    /* Shutdown model search */
+    getModelSearch().shutdown();
   }
 
   /*

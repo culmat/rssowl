@@ -107,7 +107,7 @@ public final class InternalOwl {
   /** Shutdown the Services managed by this Facade */
   public void shutdown() {
     fConnectionService.shutdown();
-    fPersistenceService.shutdown();
+    fPersistenceService.shutdown(false);
   }
 
   /**

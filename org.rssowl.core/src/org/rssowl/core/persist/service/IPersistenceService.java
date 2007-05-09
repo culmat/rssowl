@@ -96,10 +96,13 @@ public interface IPersistenceService {
    * Shutdown the persistence layer. In case of a Database, this would be the
    * right place to save the relations.
    *
+   * @param emergency If set to <code>TRUE</code>, this method is called from
+   * a shutdown hook that got triggered from a non-normal shutdown (e.g. System
+   * Shutdown).
    * @throws PersistenceException In case of an error while starting up the
    * persistence layer.
    */
-  void shutdown() throws PersistenceException;
+  void shutdown(boolean emergency) throws PersistenceException;
 
   /**
    * Recreate the Schema of the persistence layer. In case of a Database, this
