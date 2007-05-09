@@ -628,75 +628,46 @@ public class Controller {
   /**
    * Tells the Controller to stop. This method is called automatically from osgi
    * as soon as the org.rssowl.ui bundle gets stopped.
+   *
+   * @param emergency If set to <code>TRUE</code>, this method is called from
+   * a shutdown hook that got triggered from a non-normal shutdown (e.g. System
+   * Shutdown).
    */
-  public void shutdown() {
+  public void shutdown(boolean emergency) {
+    fShuttingDown = true;
 
     /* Stop the Feed Reload Service */
-    if (!Owl.TESTING)
+    if (!Owl.TESTING && !emergency)
       fFeedReloadService.stopService();
 
     /* Cancel the reload queue */
-    fReloadFeedQueue.cancel(false);
+    if (!emergency)
+      fReloadFeedQueue.cancel(false);
 
     /* Stop the Cache-Service */
-    if (!Owl.TESTING)
+    if (!Owl.TESTING && !emergency)
       fCacheService.stopService();
 
     /* Cancel the feed-save queue (join) */
-    fSaveFeedQueue.cancel(true);
+    if (!emergency)
+      fSaveFeedQueue.cancel(true);
 
     /* Stop the News-Service */
     fNewsService.stopService();
 
     /* Stop the Notification Service */
-    if (!Owl.TESTING)
+    if (!Owl.TESTING && !emergency)
       fNotificationService.stopService();
 
     /* Stop the Saved Search Service */
-    if (!Owl.TESTING)
+    if (!Owl.TESTING && !emergency)
       fSavedSearchService.stopService();
 
     /* Shutdown ApplicationServer */
-    ApplicationServer.getDefault().shutdown();
-
-    //    InternalOwl.getDefault().shutdown();
+    if (!emergency)
+      ApplicationServer.getDefault().shutdown();
   }
 
-  /**
-   * This method is called after the workbench has been initialized and just
-   * before the first window is about to be opened.
-   */
-  //  public void preUIStartup() {
-  //
-  //    /* Create Relations and Import Default Feeds if required */
-  //    if (!Owl.TESTING) {
-  //      SafeRunner.run(new LoggingSafeRunnable() {
-  //        public void run() throws Exception {
-  //
-  //          /* First check wether this action is required */
-  //          Boolean firstStartToken = Owl.getPersistenceService().getPreferencesDAO().getBoolean(FIRST_START_TOKEN);
-  //          if (firstStartToken != null)
-  //            return;
-  //
-  //          onFirstStartup();
-  //
-  //          /* Mark this as the first start */
-  //          Owl.getPersistenceService().getPreferencesDAO().putBoolean(FIRST_START_TOKEN, true);
-  //        }
-  //      });
-  //    }
-  //
-  //    /* Create the Cache-Service */
-  //    fCacheService = new CacheService();
-  //    fCacheService.cacheRootFolders();
-  //
-  //    /* Create the News-Service */
-  //    fNewsService = new NewsService();
-  //
-  //    /* Create the Context Service */
-  //    if (!Owl.TESTING)
-  //      fContextService = new ContextService();
-  //  }
   /**
    * This method is called just after the windows have been opened.
    */
@@ -727,37 +698,9 @@ public class Controller {
   public boolean preUIShutdown() {
     fShuttingDown = true;
 
-    //    /* Stop the Feed Reload Service */
-    //    if (!Owl.TESTING)
-    //      fFeedReloadService.stopService();
-    //
-    //    /* Cancel the reload queue */
-    //    fReloadFeedQueue.cancel(false);
-    //
-    //    /* Stop the Cache-Service */
-    //    fCacheService.stopService();
-
     return true;
   }
 
-  /**
-   * This method is called during workbench shutdown after all windows have been
-   * closed.
-   */
-  //  public void postUIShutdown() {
-  //
-  //    /* Cancel the feed-save queue (join) */
-  //    fSaveFeedQueue.cancel(true);
-  //
-  //    /* Stop the News-Service */
-  //    fNewsService.stopService();
-  //
-  //    /* Shutdown ApplicationServer */
-  //    ApplicationServer.getDefault().shutdown();
-  //
-  //    /* Shutdown DataBase */
-  //    NewsModel.getDefault().getPersistenceLayer().shutdown();
-  //  }
   private void onFirstStartup() throws PersistenceException, InterpreterException, ParserException {
 
     /* Add Default Labels */
