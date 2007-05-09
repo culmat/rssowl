@@ -32,6 +32,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+import org.rssowl.core.Owl;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
 import java.io.IOException;
@@ -59,7 +60,10 @@ public class Activator extends AbstractUIPlugin {
   /* The compiled pattern to match an URL */
   private static final Pattern URL_REGEX_PATTERN = Pattern.compile(URL_REGEX);
 
+  /* Singleton Instance of this Plugin */
   private static Activator fgPlugin;
+
+  private Thread fShutdownHook;
 
   /**
    * The constructor.
@@ -74,6 +78,29 @@ public class Activator extends AbstractUIPlugin {
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
+
+    /* Register a Shutdown Hook */
+    fShutdownHook = new Thread() {
+      @Override
+      public void run() {
+
+        /* Shutdown UI */
+        SafeRunner.run(new LoggingSafeRunnable() {
+          public void run() throws Exception {
+            Controller.getDefault().shutdown(true);
+          }
+        });
+
+        /* Shutdown Core */
+        SafeRunner.run(new LoggingSafeRunnable() {
+          public void run() throws Exception {
+            Owl.getPersistenceService().shutdown(true);
+          }
+        });
+      }
+    };
+    fShutdownHook.setPriority(Thread.MAX_PRIORITY);
+    Runtime.getRuntime().addShutdownHook(fShutdownHook);
 
     /* Start internal Server (chance that System.exit() gets called!) */
     SafeRunner.run(new LoggingSafeRunnable() {
@@ -199,10 +226,13 @@ public class Activator extends AbstractUIPlugin {
   @Override
   public void stop(BundleContext context) throws Exception {
 
+    /* Remove Shutdown Hook first that would run too otherwise */
+    Runtime.getRuntime().removeShutdownHook(fShutdownHook);
+
     /* Propagate shutdown to Controller */
     SafeRunner.run(new LoggingSafeRunnable() {
       public void run() throws Exception {
-        Controller.getDefault().shutdown();
+        Controller.getDefault().shutdown(false);
       }
     });
 

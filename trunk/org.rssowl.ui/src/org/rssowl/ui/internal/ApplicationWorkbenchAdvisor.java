@@ -122,29 +122,6 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
   }
 
   /**
-   * This method is called after the workbench has been initialized and just
-   * before the first window is about to be opened.
-   * <p>
-   * <cite>This is a good place to configure settings that affect the
-   * perspectives, views, and editors to be shown, for example, when overriding
-   * the initial perspective</cite>
-   * </p>
-   *
-   * @see org.eclipse.ui.application.WorkbenchAdvisor#preStartup()
-   */
-  @Override
-  public void preStartup() {
-    super.preStartup();
-
-    //      /* Init Manager - The Main Controller */
-    //      SafeRunner.run(new LoggingSafeRunnable() {
-    //        public void run() throws Exception {
-    //          Controller.getDefault().preUIStartup();
-    //        }
-    //      });
-  }
-
-  /**
    * This method is called just after the windows have been opened.
    * <p>
    * <cite>Performs arbitrary actions after the Workbench windows have been
@@ -158,12 +135,6 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
   public void postStartup() {
     super.postStartup();
 
-    /* Deliver to Controller */
-    //    SafeRunner.run(new LoggingSafeRunnable() {
-    //      public void run() throws Exception {
-    //        Controller.getDefault().postUIStartup();
-    //      }
-    //    });
     /* Run Runnable if provided */
     if (fRunAfterUIStartup != null) {
       SafeRunner.run(new LoggingSafeRunnable() {
@@ -201,36 +172,4 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     return res[0];
   }
 
-  /**
-   * This method is called during workbench shutdown after all windows have been
-   * closed. Good for saving Workbench state and free resources or connections.
-   *
-   * @see org.eclipse.ui.application.WorkbenchAdvisor#postShutdown()
-   */
-  @Override
-  public void postShutdown() {
-    super.postShutdown();
-
-    /* We dont want to block the UI Thread while shutting down */
-    //    try {
-    //      IRunnableWithProgress shutdownRunnable = new IRunnableWithProgress() {
-    //        public void run(IProgressMonitor monitor) {
-    //
-    //          /* Shutdown Controller */
-    //          SafeRunner.run(new LoggingSafeRunnable() {
-    //            public void run() throws Exception {
-    //              Controller.getDefault().shutdown();
-    //            }
-    //          });
-    //        }
-    //      };
-    //
-    //      /* Run in a seperate Thread */
-    //      ModalContext.run(shutdownRunnable, true, new NullProgressMonitor(), PlatformUI.getWorkbench().getDisplay());
-    //    } catch (InvocationTargetException e1) {
-    //      Activator.getDefault().logError(e1.getMessage(), e1);
-    //    } catch (InterruptedException e1) {
-    //      Activator.getDefault().logError(e1.getMessage(), e1);
-    //    }
-  }
 }
