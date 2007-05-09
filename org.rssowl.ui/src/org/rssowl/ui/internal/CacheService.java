@@ -61,7 +61,11 @@ public class CacheService {
   private BookMarkListener fBookMarkListener;
   private SearchMarkListener fSearchMarkListener;
 
-  CacheService() {
+  /**
+   * Registers Listeners to cache the entities that are of interest for this
+   * Service.
+   */
+  public CacheService() {
     fRootFolders = Collections.synchronizedSet(new HashSet<IFolder>());
     fBookMarks = Collections.synchronizedSet(new HashSet<IBookMark>());
     fSearchMarks = Collections.synchronizedSet(new HashSet<ISearchMark>());

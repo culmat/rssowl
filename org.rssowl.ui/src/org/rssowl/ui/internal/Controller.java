@@ -165,7 +165,6 @@ public class Controller {
   private ILabelDAO fLabelDao;
   private IModelFactory fFactory;
 
-
   /* Task to perform Reload-Operations */
   private class ReloadTask implements ITask {
     private final Long fId;
@@ -609,17 +608,21 @@ public class Controller {
     }
 
     /* Create the Cache-Service */
-    fCacheService = new CacheService();
-    fCacheService.cacheRootFolders();
+    if (!Owl.TESTING) {
+      fCacheService = new CacheService();
+      fCacheService.cacheRootFolders();
+    }
 
     /* Create the News-Service */
     fNewsService = new NewsService();
 
     /* Create the Notification Service */
-    fNotificationService = new NotificationService();
+    if (!Owl.TESTING)
+      fNotificationService = new NotificationService();
 
     /* Create the Saved Search Service */
-    fSavedSearchService = new SavedSearchService();
+    if (!Owl.TESTING)
+      fSavedSearchService = new SavedSearchService();
   }
 
   /**
@@ -636,7 +639,8 @@ public class Controller {
     fReloadFeedQueue.cancel(false);
 
     /* Stop the Cache-Service */
-    fCacheService.stopService();
+    if (!Owl.TESTING)
+      fCacheService.stopService();
 
     /* Cancel the feed-save queue (join) */
     fSaveFeedQueue.cancel(true);
@@ -645,10 +649,12 @@ public class Controller {
     fNewsService.stopService();
 
     /* Stop the Notification Service */
-    fNotificationService.stopService();
+    if (!Owl.TESTING)
+      fNotificationService.stopService();
 
     /* Stop the Saved Search Service */
-    fSavedSearchService.stopService();
+    if (!Owl.TESTING)
+      fSavedSearchService.stopService();
 
     /* Shutdown ApplicationServer */
     ApplicationServer.getDefault().shutdown();
