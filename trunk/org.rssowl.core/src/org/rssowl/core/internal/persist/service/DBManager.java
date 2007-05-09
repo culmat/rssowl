@@ -139,7 +139,7 @@ public class DBManager {
     fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
 //    copyDatabase();
   }
-  
+
   private void migrate(int workspaceFormat, int currentFormat) {
     ConfigurationFactory configFactory = new ConfigurationFactory() {
       public Configuration createConfiguration() {
@@ -175,7 +175,7 @@ public class DBManager {
     /* Finally, rename the actual db file */
     migDbFile.renameTo(dbFile);
   }
-  
+
   private void copyFile(File originFile, File destinationFile) {
     FileInputStream inputStream = null;
     FileOutputStream outputStream = null;
@@ -185,7 +185,7 @@ public class DBManager {
 
       if (!destinationFile.exists())
         destinationFile.createNewFile();
-      
+
       outputStream = new FileOutputStream(destinationFile);
       FileChannel dstChannel = outputStream.getChannel();
 
@@ -238,7 +238,7 @@ public class DBManager {
     setFormatVersion(formatFile);
     return getCurrentFormatVersion();
   }
-  
+
   private void closeCloseable(Closeable closeable) {
     if (closeable != null)
       try {
@@ -265,7 +265,7 @@ public class DBManager {
   private int getCurrentFormatVersion() {
     return 1;
   }
-  
+
   @SuppressWarnings("unused")
   private void defragment(Configuration config) {
     DefragmentConfig defragConfig = new DefragmentConfig(getDBFilePath());
@@ -318,7 +318,7 @@ public class DBManager {
     //efficient startup. For example, the following could be used. We'd have
     //to include a file when we need to evolve the schema or something similar
     //config.detectSchemaChanges(false)
-    
+
 //    config.blockSize(8);
 //    config.bTreeCacheHeight(0);
 //    config.bTreeNodeSize(100);
@@ -329,6 +329,7 @@ public class DBManager {
 //    });
 //    config.messageLevel(3);
 
+    config.automaticShutDown(false);
 	config.callbacks(false);
     config.activationDepth(2);
     config.flushFileBuffers(false);
