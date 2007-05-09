@@ -79,6 +79,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.rssowl.core.Owl;
+import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
@@ -159,6 +160,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   /* Indices of Columns in the Table-Viewer */
   private static final int COL_RELEVANCE = 0;
   private static final int COL_TITLE = 1;
+  private static final int COL_CATEGORY = 4;
   private static final int COL_STICKY = 5;
 
   /* Viewer and Controls */
@@ -309,7 +311,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
       ScoredNews scoredNews = (ScoredNews) cell.getElement();
 
       /* Text */
-      cell.setText(getColumnText(scoredNews.getNews(), cell.getColumnIndex() - 1));
+      if (cell.getColumnIndex() == COL_CATEGORY)
+        cell.setText(getCategories(scoredNews.getNews()));
+      else
+        cell.setText(getColumnText(scoredNews.getNews(), cell.getColumnIndex() - 1));
 
       /* Image */
       cell.setImage(getColumnImage(scoredNews, cell.getColumnIndex()));
@@ -330,6 +335,22 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
       /* Background */
       cell.setBackground(getBackground(scoredNews.getNews(), cell.getColumnIndex() - 1));
+    }
+
+    private String getCategories(INews news) {
+      StringBuilder builder = new StringBuilder();
+      List<ICategory> categories = news.getCategories();
+      for (ICategory category : categories) {
+        if (category.getName() != null)
+          builder.append(category.getName()).append(", ");
+        else if (category.getDomain() != null)
+          builder.append(category.getDomain()).append(", ");
+      }
+
+      if (builder.length() > 0)
+        return builder.substring(0, builder.length() - 2);
+
+      return builder.toString();
     }
 
     /*
