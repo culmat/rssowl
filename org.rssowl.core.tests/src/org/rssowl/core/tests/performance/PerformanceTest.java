@@ -55,9 +55,11 @@ import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.ITextInput;
 import org.rssowl.core.persist.SearchSpecifier;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
@@ -67,7 +69,9 @@ import org.rssowl.core.tests.Activator;
 import org.rssowl.core.tests.TestUtils;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.TaskAdapter;
+import org.rssowl.ui.internal.CacheService;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.SavedSearchService;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -110,6 +114,282 @@ public class PerformanceTest {
     fModelSearch.shutdown();
     fPluginLocation = FileLocator.toFileURL(Platform.getBundle("org.rssowl.core.tests").getEntry("/")).toURI();
     fController = Controller.getDefault();
+  }
+
+  /**
+   * @throws Exception
+   */
+  @SuppressWarnings("nls")
+  @Test
+  public void savedSearchServiceTest() throws Exception {
+    final List<Exception> ex = new ArrayList<Exception>();
+    fModelSearch.startup();
+
+    /* Cold-Start: Run Saved Search Service on 216 Feeds */
+    List<ITask> tasks = getSavedSearchServiceTestTasks(ex);
+    System.out.println("Running Saved Search Service on " + FEEDS + " Feeds [Cold - " + 1 + " Jobs] took: " + TestUtils.executeAndWait(tasks, 1) + "ms");
+
+    /* Warm-Start: Run Saved Search Service on 216 Feeds */
+    Owl.getPersistenceService().recreateSchema();
+    tasks = getSavedSearchServiceTestTasks(ex);
+    long l1 = TestUtils.executeAndWait(tasks, 1);
+
+    Owl.getPersistenceService().recreateSchema();
+    tasks = getSavedSearchServiceTestTasks(ex);
+    long l2 = TestUtils.executeAndWait(tasks, 1);
+
+    System.out.println("Running Saved Search Service on " + FEEDS + " Feeds [Warm - " + 1 + " Jobs] took: " + (l1 + l2) / 2 + "ms");
+
+    if (ex.size() > 0)
+      throw ex.get(0);
+  }
+
+  List<ITask> getSavedSearchServiceTestTasks(final List<Exception> ex) {
+    List<ITask> tasks = new ArrayList<ITask>();
+
+    /* Create Services */
+    final CacheService cacheService = new CacheService();
+
+    /* Create Saved Searches */
+    createSavedSearches();
+
+    /* Save some Feeds first */
+    saveFeedsHelper();
+
+    final SavedSearchService smService = new SavedSearchService();
+
+    tasks.add(new TaskAdapter() {
+      public IStatus run(IProgressMonitor monitor) {
+        try {
+          smService.updateSavedSearches(cacheService.getSearchMarks());
+          smService.stopService();
+        } catch (Exception e) {
+          ex.add(e);
+        }
+        return Status.OK_STATUS;
+      }
+    });
+
+    return tasks;
+  }
+
+  @SuppressWarnings("unused")
+  private void createSavedSearches() {
+    IFolder folder = Owl.getModelFactory().createFolder(null, null, "Default");
+    IModelFactory factory = Owl.getModelFactory();
+
+    /* Create Default SearchMarks */
+    String newsEntityName = INews.class.getName();
+
+    /* SearchCondition: New and Updated News */
+    {
+      ISearchMark mark = factory.createSearchMark(null, folder, "New and Updated News");
+
+      ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
+      factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, State.NEW);
+
+      ISearchField field2 = factory.createSearchField(INews.STATE, newsEntityName);
+      factory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, State.UPDATED);
+    }
+
+    /* SearchCondition: Recent News */
+    {
+      ISearchMark mark = factory.createSearchMark(null, folder, "Recent News");
+
+      ISearchField field1 = factory.createSearchField(INews.AGE_IN_DAYS, newsEntityName);
+      factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS_LESS_THAN, 2);
+    }
+
+    /* SearchCondition: News with Attachments */
+    {
+      ISearchMark mark = factory.createSearchMark(null, folder, "News with Attachments");
+
+      ISearchField field = factory.createSearchField(INews.HAS_ATTACHMENTS, newsEntityName);
+      factory.createSearchCondition(null, mark, field, SearchSpecifier.IS, true);
+    }
+
+    /* SearchCondition: Sticky News */
+    {
+      ISearchMark mark = factory.createSearchMark(null, folder, "Sticky News");
+
+      ISearchField field = factory.createSearchField(INews.IS_FLAGGED, newsEntityName);
+      factory.createSearchCondition(null, mark, field, SearchSpecifier.IS, true);
+    }
+
+    /*
+     * Condition : +(State IS *new* OR State is *unread* OR State IS *updated*)
+     * AND +((Entire News contains "Foo") OR Author is "Benjamin Pasero")
+     */
+    {
+      ISearchMark mark = factory.createSearchMark(null, folder, "Complex Search");
+
+      ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, INews.State.NEW);
+
+      ISearchField field2 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond2 = factory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, INews.State.UNREAD);
+
+      ISearchField field3 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond3 = factory.createSearchCondition(null, mark, field3, SearchSpecifier.IS, INews.State.UPDATED);
+
+      ISearchField field4 = factory.createSearchField(IEntity.ALL_FIELDS, newsEntityName);
+      ISearchCondition cond4 = factory.createSearchCondition(null, mark, field4, SearchSpecifier.CONTAINS, "Foo");
+
+      ISearchField field5 = factory.createSearchField(INews.AUTHOR, newsEntityName);
+      ISearchCondition cond5 = factory.createSearchCondition(null, mark, field5, SearchSpecifier.IS, "Benjamin Pasero");
+    }
+
+    /*
+     * Condition : +(State IS *new* OR State is *unread* OR State IS *updated*)
+     * AND (Entire News contains "Foo") AND (Author is "Benjamin Pasero")
+     */
+    {
+      ISearchMark mark = factory.createSearchMark(null, folder, "Complex Search");
+
+      ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, INews.State.NEW);
+
+      ISearchField field2 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond2 = factory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, INews.State.UNREAD);
+
+      ISearchField field3 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond3 = factory.createSearchCondition(null, mark, field3, SearchSpecifier.IS, INews.State.UPDATED);
+
+      ISearchField field4 = factory.createSearchField(IEntity.ALL_FIELDS, newsEntityName);
+      ISearchCondition cond4 = factory.createSearchCondition(null, mark, field4, SearchSpecifier.CONTAINS, "Foo");
+
+      ISearchField field5 = factory.createSearchField(INews.AUTHOR, newsEntityName);
+      ISearchCondition cond5 = factory.createSearchCondition(null, mark, field5, SearchSpecifier.CONTAINS, "Benjamin Pasero");
+    }
+
+    /*
+     * Condition : (Entire News contains "Foo") AND (Title contains "Bar") AND
+     * (Author is not "Benjamin Pasero")
+     */
+    {
+      ISearchMark mark = factory.createSearchMark(null, folder, "Complex Search");
+
+      ISearchField field1 = factory.createSearchField(IEntity.ALL_FIELDS, newsEntityName);
+      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.CONTAINS, "fafa");
+
+      ISearchField field2 = factory.createSearchField(INews.TITLE, newsEntityName);
+      ISearchCondition cond2 = factory.createSearchCondition(null, mark, field2, SearchSpecifier.CONTAINS, "Bar");
+
+      ISearchField field3 = factory.createSearchField(INews.AUTHOR, newsEntityName);
+      ISearchCondition cond3 = factory.createSearchCondition(null, mark, field3, SearchSpecifier.IS_NOT, "Benjamin Pasero");
+    }
+
+    /*
+     * Condition : +(State IS *new* OR State is *unread* OR State IS *updated*)
+     * AND (Category IS Windows) AND (Category IS Apple)
+     */
+    {
+      ISearchMark mark = factory.createSearchMark(null, folder, "Complex Search");
+
+      ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, INews.State.NEW);
+
+      ISearchField field2 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond2 = factory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, INews.State.UNREAD);
+
+      ISearchField field3 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond3 = factory.createSearchCondition(null, mark, field3, SearchSpecifier.IS, INews.State.UPDATED);
+
+      ISearchField field4 = factory.createSearchField(INews.CATEGORIES, newsEntityName);
+      ISearchCondition cond4 = factory.createSearchCondition(null, mark, field4, SearchSpecifier.IS, "windows");
+
+      ISearchField field5 = factory.createSearchField(INews.CATEGORIES, newsEntityName);
+      ISearchCondition cond5 = factory.createSearchCondition(null, mark, field5, SearchSpecifier.IS, "apple");
+    }
+
+    /*
+     * Condition : +(State IS *new* OR State is *unread* OR State IS *updated*)
+     * AND (Category IS Windows) AND (Category IS Apple) AND (Category IS NOT
+     * Slashdot)
+     */
+    {
+      ISearchMark mark = factory.createSearchMark(null, folder, "Complex Search");
+
+      ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, INews.State.NEW);
+
+      ISearchField field2 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond2 = factory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, INews.State.UNREAD);
+
+      ISearchField field3 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond3 = factory.createSearchCondition(null, mark, field3, SearchSpecifier.IS, INews.State.UPDATED);
+
+      ISearchField field4 = factory.createSearchField(INews.CATEGORIES, newsEntityName);
+      ISearchCondition cond4 = factory.createSearchCondition(null, mark, field4, SearchSpecifier.IS, "windows");
+
+      ISearchField field5 = factory.createSearchField(INews.CATEGORIES, newsEntityName);
+      ISearchCondition cond5 = factory.createSearchCondition(null, mark, field5, SearchSpecifier.IS, "apple");
+
+      ISearchField field6 = factory.createSearchField(INews.CATEGORIES, newsEntityName);
+      ISearchCondition cond6 = factory.createSearchCondition(null, mark, field6, SearchSpecifier.IS_NOT, "slashdot");
+    }
+
+    /*
+     * Condition : +(State IS *new* OR State is *unread* OR State IS *updated*)
+     * AND (Category IS NOT Windows)
+     */
+    {
+      ISearchMark mark = factory.createSearchMark(null, folder, "Complex Search");
+
+      ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, INews.State.NEW);
+
+      ISearchField field2 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond2 = factory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, INews.State.UNREAD);
+
+      ISearchField field3 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond3 = factory.createSearchCondition(null, mark, field3, SearchSpecifier.IS, INews.State.UPDATED);
+
+      ISearchField field4 = factory.createSearchField(INews.CATEGORIES, newsEntityName);
+      ISearchCondition cond4 = factory.createSearchCondition(null, mark, field4, SearchSpecifier.IS_NOT, "windows");
+    }
+
+    /*
+     * Condition : +(State IS *new* OR State is *unread* OR State IS *updated*)
+     * AND (Age is Less than 5 Days)
+     */
+    {
+      ISearchMark mark = factory.createSearchMark(null, folder, "Complex Search");
+
+      ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, INews.State.NEW);
+
+      ISearchField field2 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond2 = factory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, INews.State.UNREAD);
+
+      ISearchField field3 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond3 = factory.createSearchCondition(null, mark, field3, SearchSpecifier.IS, INews.State.UPDATED);
+
+      ISearchField field4 = factory.createSearchField(INews.AGE_IN_DAYS, newsEntityName);
+      ISearchCondition cond4 = factory.createSearchCondition(null, mark, field4, SearchSpecifier.IS_LESS_THAN, 5);
+    }
+
+    /*
+     * Condition 5: (State IS *new* OR State is *unread* OR State IS *updated*)
+     * AND All_Fields CONTAINS foo
+     */
+    {
+      ISearchMark mark = factory.createSearchMark(null, folder, "Complex Search");
+
+      ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, INews.State.NEW);
+
+      ISearchField field2 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond2 = factory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, INews.State.UNREAD);
+
+      ISearchField field3 = factory.createSearchField(INews.STATE, newsEntityName);
+      ISearchCondition cond3 = factory.createSearchCondition(null, mark, field3, SearchSpecifier.IS, INews.State.UPDATED);
+
+      ISearchField field4 = factory.createSearchField(IEntity.ALL_FIELDS, newsEntityName);
+      ISearchCondition cond4 = factory.createSearchCondition(null, mark, field4, SearchSpecifier.CONTAINS, "pasero");
+    }
+
+    DynamicDAO.save(folder);
   }
 
   /**
@@ -1132,14 +1412,13 @@ public class PerformanceTest {
     if (type instanceof IEntity) {
       IEntity entity = (IEntity) type;
       entity.getId();
-      Map<String, ? > properties = entity.getProperties();
+      Map<String, ?> properties = entity.getProperties();
       if (properties != null) {
         Set<String> keys = properties.keySet();
         for (String string : keys)
           properties.get(string);
       }
     }
-
 
     if (type instanceof IFeed) {
       IFeed feed = (IFeed) type;
