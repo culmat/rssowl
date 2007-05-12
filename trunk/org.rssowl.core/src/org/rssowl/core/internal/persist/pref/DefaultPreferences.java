@@ -45,10 +45,10 @@ public class DefaultPreferences implements IPreferencesInitializer {
   public static final String USE_EXTERNAL_BROWSER = "org.rssowl.pref.UseExternalBrowser";
 
   /** Global: Minimize to the system tray */
-  public static final String USE_SYSTEM_TRAY = "org.rssowl.pref.UseSystemTray";
+  public static final String TRAY_ON_MINIMIZE = "org.rssowl.pref.UseSystemTray";
 
   /** Global: Minimize to the system tray on Shell Close */
-  public static final String TRAY_ON_EXIT = "org.rssowl.pref.TrayOnExit";
+  public static final String TRAY_ON_CLOSE = "org.rssowl.pref.TrayOnExit";
 
   /** Global: Mark Read state */
   public static final String MARK_READ_STATE = "org.rssowl.pref.MarkReadState";
@@ -168,7 +168,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putBoolean(MARK_READ_ON_MINIMIZE, false);
     defaultScope.putBoolean(MARK_FEED_READ_ON_CHANGE, false);
     defaultScope.putBoolean(USE_EXTERNAL_BROWSER, true);
-    defaultScope.putBoolean(USE_SYSTEM_TRAY, false);
+    defaultScope.putBoolean(TRAY_ON_MINIMIZE, false);
     defaultScope.putBoolean(MARK_READ_STATE, true);
     defaultScope.putInteger(MARK_READ_IN_MILLIS, 0);
     defaultScope.putBoolean(BM_OPEN_SITE_FOR_EMPTY_NEWS, false);
