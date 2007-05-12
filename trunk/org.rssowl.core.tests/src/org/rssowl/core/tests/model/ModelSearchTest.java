@@ -57,6 +57,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -173,7 +174,7 @@ public class ModelSearchTest {
       /* Condition 1a: Enum (match) */
       {
         ISearchField field = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, State.READ);
+        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, EnumSet.of(State.READ));
 
         List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1);
@@ -182,7 +183,7 @@ public class ModelSearchTest {
       /* Condition 1b: Enum (no match) */
       {
         ISearchField field = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, State.DELETED);
+        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, EnumSet.of(State.DELETED));
 
         List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertEquals(0, result.size());
@@ -541,7 +542,7 @@ public class ModelSearchTest {
       /* Condition 1a: Enum */
       {
         ISearchField field = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_NOT, State.READ);
+        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_NOT, EnumSet.of(State.READ));
 
         List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news2, news3, news4, news5);
@@ -550,7 +551,7 @@ public class ModelSearchTest {
       /* Condition 1b: Enum */
       {
         ISearchField field = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_NOT, State.DELETED);
+        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS_NOT, EnumSet.of(State.DELETED));
 
         List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
         assertSame(result, news1, news2, news3, news4, news5);
@@ -2423,18 +2424,12 @@ public class ModelSearchTest {
        */
       {
         ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-        ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, INews.State.NEW);
+        ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED));
 
-        ISearchField field2 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-        ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS, INews.State.UNREAD);
+        ISearchField field2 = fFactory.createSearchField(INews.HAS_ATTACHMENTS, fNewsEntityName);
+        ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS, true);
 
-        ISearchField field3 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-        ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS, INews.State.UPDATED);
-
-        ISearchField field4 = fFactory.createSearchField(INews.HAS_ATTACHMENTS, fNewsEntityName);
-        ISearchCondition cond4 = fFactory.createSearchCondition(field4, SearchSpecifier.IS, true);
-
-        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), true);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), true);
         assertSame(result, news2);
       }
 
@@ -2444,18 +2439,12 @@ public class ModelSearchTest {
        */
       {
         ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-        ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, INews.State.NEW);
+        ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED));
 
-        ISearchField field2 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-        ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS, INews.State.UNREAD);
+        ISearchField field2 = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+        ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.CONTAINS, "pasero");
 
-        ISearchField field3 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-        ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS, INews.State.UPDATED);
-
-        ISearchField field4 = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
-        ISearchCondition cond4 = fFactory.createSearchCondition(field4, SearchSpecifier.CONTAINS, "pasero");
-
-        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), true);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), true);
         assertSame(result, news2, news3, news4);
       }
 
@@ -2465,15 +2454,9 @@ public class ModelSearchTest {
        */
       {
         ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-        ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, INews.State.NEW);
+        ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED));
 
-        ISearchField field2 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-        ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS, INews.State.UNREAD);
-
-        ISearchField field3 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-        ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS, INews.State.UPDATED);
-
-        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), false);
         assertSame(result, news2, news3, news4, news5);
       }
     } catch (PersistenceException e) {
@@ -2545,21 +2528,15 @@ public class ModelSearchTest {
      */
     {
       ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, INews.State.NEW);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED));
 
-      ISearchField field2 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS, INews.State.UNREAD);
+      ISearchField field2 = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.CONTAINS, "Foo");
 
-      ISearchField field3 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS, INews.State.UPDATED);
+      ISearchField field3 = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+      ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS, "Benjamin Pasero");
 
-      ISearchField field4 = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
-      ISearchCondition cond4 = fFactory.createSearchCondition(field4, SearchSpecifier.CONTAINS, "Foo");
-
-      ISearchField field5 = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
-      ISearchCondition cond5 = fFactory.createSearchCondition(field5, SearchSpecifier.IS, "Benjamin Pasero");
-
-      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4, cond5), false);
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
       assertSame(result, news3);
     }
 
@@ -2569,21 +2546,15 @@ public class ModelSearchTest {
      */
     {
       ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, INews.State.NEW);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED));
 
-      ISearchField field2 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS, INews.State.UNREAD);
+      ISearchField field2 = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.CONTAINS, "Foo");
 
-      ISearchField field3 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS, INews.State.UPDATED);
+      ISearchField field3 = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+      ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.CONTAINS, "Benjamin Pasero");
 
-      ISearchField field4 = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
-      ISearchCondition cond4 = fFactory.createSearchCondition(field4, SearchSpecifier.CONTAINS, "Foo");
-
-      ISearchField field5 = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
-      ISearchCondition cond5 = fFactory.createSearchCondition(field5, SearchSpecifier.CONTAINS, "Benjamin Pasero");
-
-      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4, cond5), true);
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), true);
       assertSame(result, news3);
     }
 
@@ -2611,13 +2582,7 @@ public class ModelSearchTest {
      */
     {
       ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, INews.State.NEW);
-
-      ISearchField field2 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS, INews.State.UNREAD);
-
-      ISearchField field3 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS, INews.State.UPDATED);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED));
 
       ISearchField field4 = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
       ISearchCondition cond4 = fFactory.createSearchCondition(field4, SearchSpecifier.IS, "windows");
@@ -2625,7 +2590,7 @@ public class ModelSearchTest {
       ISearchField field5 = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
       ISearchCondition cond5 = fFactory.createSearchCondition(field5, SearchSpecifier.IS, "apple");
 
-      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4, cond5), true);
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond4, cond5), true);
       assertSame(result, news3);
     }
 
@@ -2636,13 +2601,7 @@ public class ModelSearchTest {
      */
     {
       ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, INews.State.NEW);
-
-      ISearchField field2 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS, INews.State.UNREAD);
-
-      ISearchField field3 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS, INews.State.UPDATED);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED));
 
       ISearchField field4 = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
       ISearchCondition cond4 = fFactory.createSearchCondition(field4, SearchSpecifier.IS, "windows");
@@ -2653,7 +2612,7 @@ public class ModelSearchTest {
       ISearchField field6 = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
       ISearchCondition cond6 = fFactory.createSearchCondition(field6, SearchSpecifier.IS_NOT, "slashdot");
 
-      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4, cond5, cond6), true);
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond4, cond5, cond6), true);
       assertEquals(0, result.size());
     }
 
@@ -2663,18 +2622,12 @@ public class ModelSearchTest {
      */
     {
       ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, INews.State.NEW);
-
-      ISearchField field2 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS, INews.State.UNREAD);
-
-      ISearchField field3 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS, INews.State.UPDATED);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED));
 
       ISearchField field4 = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
       ISearchCondition cond4 = fFactory.createSearchCondition(field4, SearchSpecifier.IS_NOT, "windows");
 
-      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), true);
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond4), true);
       assertSame(result, news2);
     }
 
@@ -2684,18 +2637,12 @@ public class ModelSearchTest {
      */
     {
       ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, INews.State.NEW);
-
-      ISearchField field2 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS, INews.State.UNREAD);
-
-      ISearchField field3 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS, INews.State.UPDATED);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED));
 
       ISearchField field4 = fFactory.createSearchField(INews.AGE_IN_DAYS, fNewsEntityName);
       ISearchCondition cond4 = fFactory.createSearchCondition(field4, SearchSpecifier.IS_LESS_THAN, 5);
 
-      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), true);
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond4), true);
       assertSame(result, news3);
     }
   }
@@ -2764,7 +2711,7 @@ public class ModelSearchTest {
      */
     {
       ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, INews.State.UNREAD);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(State.UNREAD));
 
       ISearchField field2 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
       ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS_NOT, "http://www.feed.com/feed1.xml");
