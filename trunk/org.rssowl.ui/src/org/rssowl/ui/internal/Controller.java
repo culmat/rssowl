@@ -58,7 +58,6 @@ import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
-import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.dao.IConditionalGetDAO;
@@ -84,6 +83,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -760,10 +760,7 @@ public class Controller {
       ISearchMark mark = fFactory.createSearchMark(null, imported, "New and Updated News");
 
       ISearchField field1 = fFactory.createSearchField(INews.STATE, newsEntityName);
-      fFactory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, State.NEW);
-
-      ISearchField field2 = fFactory.createSearchField(INews.STATE, newsEntityName);
-      fFactory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, State.UPDATED);
+      fFactory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, INews.State.UPDATED));
     }
 
     /* SearchCondition: Recent News */

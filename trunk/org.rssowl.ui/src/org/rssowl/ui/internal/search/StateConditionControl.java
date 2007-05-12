@@ -25,22 +25,18 @@
 package org.rssowl.ui.internal.search;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.rssowl.core.Owl;
-import org.rssowl.core.persist.IModelFactory;
+import org.eclipse.swt.widgets.Event;
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.ISearchCondition;
-import org.rssowl.core.persist.ISearchField;
-import org.rssowl.core.persist.ISearchMark;
-import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.List;
 
 /**
  * The <code>StateConditionControl</code> is a <code>Composite</code>
@@ -59,11 +55,8 @@ public class StateConditionControl extends Composite {
   private Button fUnreadState;
   private Button fUpdatedState;
   private Button fReadState;
-  private Button fDeletedState;
-  private IModelFactory fFactory;
   private EnumSet<State> fSelectedStates;
   private boolean fModified;
-  private final String fNewsEntity = INews.class.getName();
 
   /**
    * @param parent The parent Composite.
@@ -74,55 +67,39 @@ public class StateConditionControl extends Composite {
   StateConditionControl(Composite parent, int style, EnumSet<INews.State> selectedStates) {
     super(parent, style);
     fSelectedStates = selectedStates;
-    fFactory = Owl.getModelFactory();
 
     initComponents();
   }
 
-  /**
-   * @return Returns a List of <code>ISearchCondition</code> representing the
-   * selected states.
-   * @see StateConditionControl#createConditions(ISearchMark)
-   */
-  List<ISearchCondition> createConditions() {
-    return createConditions(null);
-  }
+  EnumSet<INews.State> getSelection() {
+    EnumSet<INews.State> set = null;
 
-  /**
-   * @param searchmark The parent of the <code>ISearchCondition</code>s that
-   * are being created.
-   * @return Returns a List of <code>ISearchCondition</code> representing the
-   * selected states.
-   * @see StateConditionControl#createConditions()
-   */
-  List<ISearchCondition> createConditions(ISearchMark searchmark) {
-    List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(5);
+    if (fNewState.getSelection()) {
+      set = EnumSet.of(INews.State.NEW);
+    }
 
-    if (fNewState.getSelection())
-      conditions.add(createStateCondition(searchmark, INews.State.NEW));
+    if (fUnreadState.getSelection()) {
+      if (set == null)
+        set = EnumSet.of(INews.State.UNREAD);
+      else
+        set.add(INews.State.UNREAD);
+    }
 
-    if (fUnreadState.getSelection())
-      conditions.add(createStateCondition(searchmark, INews.State.UNREAD));
+    if (fUpdatedState.getSelection()) {
+      if (set == null)
+        set = EnumSet.of(INews.State.UPDATED);
+      else
+        set.add(INews.State.UPDATED);
+    }
 
-    if (fUpdatedState.getSelection())
-      conditions.add(createStateCondition(searchmark, INews.State.UPDATED));
+    if (fReadState.getSelection()) {
+      if (set == null)
+        set = EnumSet.of(INews.State.READ);
+      else
+        set.add(INews.State.READ);
+    }
 
-    if (fReadState.getSelection())
-      conditions.add(createStateCondition(searchmark, INews.State.READ));
-
-    if (fDeletedState.getSelection())
-      conditions.add(createStateCondition(searchmark, INews.State.HIDDEN));
-
-    return conditions;
-  }
-
-  private ISearchCondition createStateCondition(ISearchMark searchmark, INews.State state) {
-    ISearchField field = fFactory.createSearchField(INews.STATE, fNewsEntity);
-
-    if (searchmark != null)
-      return fFactory.createSearchCondition(null, searchmark, field, SearchSpecifier.IS, state);
-
-    return fFactory.createSearchCondition(field, SearchSpecifier.IS, state);
+    return set;
   }
 
   /**
@@ -138,7 +115,6 @@ public class StateConditionControl extends Composite {
     fUnreadState.setSelection(selectedStates != null && selectedStates.contains(INews.State.UNREAD));
     fUpdatedState.setSelection(selectedStates != null && selectedStates.contains(INews.State.UPDATED));
     fReadState.setSelection(selectedStates != null && selectedStates.contains(INews.State.READ));
-    fDeletedState.setSelection(selectedStates != null && selectedStates.contains(INews.State.HIDDEN));
   }
 
   /**
@@ -167,49 +143,52 @@ public class StateConditionControl extends Composite {
     if (fSelectedStates.contains(INews.State.READ) != fReadState.getSelection())
       return true;
 
-    if (fSelectedStates.contains(INews.State.HIDDEN) != fDeletedState.getSelection())
-      return true;
-
     return false;
   }
 
   boolean hasSelected() {
-    return fNewState.getSelection() || fUnreadState.getSelection() || fUpdatedState.getSelection() || fReadState.getSelection() || fDeletedState.getSelection();
+    return fNewState.getSelection() || fUnreadState.getSelection() || fUpdatedState.getSelection() || fReadState.getSelection();
   }
 
   private void initComponents() {
 
     /* Apply Gridlayout */
-    setLayout(LayoutUtils.createGridLayout(6));
-
-    /* Label */
-    Label controlLabel = new Label(this, SWT.NONE);
-    controlLabel.setText("Status of News: ");
+    setLayout(LayoutUtils.createGridLayout(4, 0, 0));
 
     /* State: New */
     fNewState = new Button(this, SWT.CHECK);
     fNewState.setText("New");
     fNewState.setSelection(fSelectedStates != null && fSelectedStates.contains(INews.State.NEW));
+    fNewState.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
     /* State: Unread */
     fUnreadState = new Button(this, SWT.CHECK);
     fUnreadState.setText("Unread");
     fUnreadState.setSelection(fSelectedStates != null && fSelectedStates.contains(INews.State.UNREAD));
+    fUnreadState.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
     /* State: Updated */
     fUpdatedState = new Button(this, SWT.CHECK);
     fUpdatedState.setText("Updated");
     fUpdatedState.setSelection(fSelectedStates != null && fSelectedStates.contains(INews.State.UPDATED));
+    fUpdatedState.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
     /* State: Read */
     fReadState = new Button(this, SWT.CHECK);
     fReadState.setText("Read");
     fReadState.setSelection(fSelectedStates != null && fSelectedStates.contains(INews.State.READ));
+    fReadState.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
-    /* State: Deleted */
-    fDeletedState = new Button(this, SWT.CHECK);
-    fDeletedState.setText("Deleted");
-    fDeletedState.setSelection(fSelectedStates != null && fSelectedStates.contains(INews.State.HIDDEN));
-    fDeletedState.setVisible(false);
+    /* Selection Listener to issue modify events */
+    SelectionListener selectionListener = new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        notifyListeners(SWT.Modify, new Event());
+      }
+    };
+    fNewState.addSelectionListener(selectionListener);
+    fUnreadState.addSelectionListener(selectionListener);
+    fUpdatedState.addSelectionListener(selectionListener);
+    fReadState.addSelectionListener(selectionListener);
   }
 }

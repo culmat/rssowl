@@ -65,6 +65,7 @@ import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -269,20 +270,12 @@ public class SearchMarkDialog extends TitleAreaDialog {
     List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(1);
     IModelFactory factory = Owl.getModelFactory();
 
-    ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
-    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS, "");
+    ISearchField field = factory.createSearchField(INews.STATE, INews.class.getName());
+    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
     conditions.add(condition);
 
-    field = factory.createSearchField(INews.STATE, INews.class.getName());
-    condition = factory.createSearchCondition(field, SearchSpecifier.IS, INews.State.NEW);
-    conditions.add(condition);
-
-    field = factory.createSearchField(INews.STATE, INews.class.getName());
-    condition = factory.createSearchCondition(field, SearchSpecifier.IS, INews.State.UNREAD);
-    conditions.add(condition);
-
-    field = factory.createSearchField(INews.STATE, INews.class.getName());
-    condition = factory.createSearchCondition(field, SearchSpecifier.IS, INews.State.UPDATED);
+    field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
+    condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS, "");
     conditions.add(condition);
 
     return conditions;
