@@ -83,6 +83,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -186,10 +187,7 @@ public class PerformanceTest {
       ISearchMark mark = factory.createSearchMark(null, folder, "New and Updated News");
 
       ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
-      factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, State.NEW);
-
-      ISearchField field2 = factory.createSearchField(INews.STATE, newsEntityName);
-      factory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, State.UPDATED);
+      factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, EnumSet.of(State.NEW));
     }
 
     /* SearchCondition: Recent News */
@@ -224,13 +222,7 @@ public class PerformanceTest {
       ISearchMark mark = factory.createSearchMark(null, folder, "Complex Search");
 
       ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, INews.State.NEW);
-
-      ISearchField field2 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond2 = factory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, INews.State.UNREAD);
-
-      ISearchField field3 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond3 = factory.createSearchCondition(null, mark, field3, SearchSpecifier.IS, INews.State.UPDATED);
+      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, State.UNREAD, State.UPDATED));
 
       ISearchField field4 = factory.createSearchField(IEntity.ALL_FIELDS, newsEntityName);
       ISearchCondition cond4 = factory.createSearchCondition(null, mark, field4, SearchSpecifier.CONTAINS, "Foo");
@@ -247,13 +239,7 @@ public class PerformanceTest {
       ISearchMark mark = factory.createSearchMark(null, folder, "Complex Search");
 
       ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, INews.State.NEW);
-
-      ISearchField field2 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond2 = factory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, INews.State.UNREAD);
-
-      ISearchField field3 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond3 = factory.createSearchCondition(null, mark, field3, SearchSpecifier.IS, INews.State.UPDATED);
+      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, State.UNREAD, State.UPDATED));
 
       ISearchField field4 = factory.createSearchField(IEntity.ALL_FIELDS, newsEntityName);
       ISearchCondition cond4 = factory.createSearchCondition(null, mark, field4, SearchSpecifier.CONTAINS, "Foo");
@@ -287,13 +273,7 @@ public class PerformanceTest {
       ISearchMark mark = factory.createSearchMark(null, folder, "Complex Search");
 
       ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, INews.State.NEW);
-
-      ISearchField field2 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond2 = factory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, INews.State.UNREAD);
-
-      ISearchField field3 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond3 = factory.createSearchCondition(null, mark, field3, SearchSpecifier.IS, INews.State.UPDATED);
+      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, State.UNREAD, State.UPDATED));
 
       ISearchField field4 = factory.createSearchField(INews.CATEGORIES, newsEntityName);
       ISearchCondition cond4 = factory.createSearchCondition(null, mark, field4, SearchSpecifier.IS, "windows");
@@ -311,13 +291,7 @@ public class PerformanceTest {
       ISearchMark mark = factory.createSearchMark(null, folder, "Complex Search");
 
       ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, INews.State.NEW);
-
-      ISearchField field2 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond2 = factory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, INews.State.UNREAD);
-
-      ISearchField field3 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond3 = factory.createSearchCondition(null, mark, field3, SearchSpecifier.IS, INews.State.UPDATED);
+      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, State.UNREAD, State.UPDATED));
 
       ISearchField field4 = factory.createSearchField(INews.CATEGORIES, newsEntityName);
       ISearchCondition cond4 = factory.createSearchCondition(null, mark, field4, SearchSpecifier.IS, "windows");
@@ -337,13 +311,7 @@ public class PerformanceTest {
       ISearchMark mark = factory.createSearchMark(null, folder, "Complex Search");
 
       ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, INews.State.NEW);
-
-      ISearchField field2 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond2 = factory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, INews.State.UNREAD);
-
-      ISearchField field3 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond3 = factory.createSearchCondition(null, mark, field3, SearchSpecifier.IS, INews.State.UPDATED);
+      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, State.UNREAD, State.UPDATED));
 
       ISearchField field4 = factory.createSearchField(INews.CATEGORIES, newsEntityName);
       ISearchCondition cond4 = factory.createSearchCondition(null, mark, field4, SearchSpecifier.IS_NOT, "windows");
@@ -357,13 +325,7 @@ public class PerformanceTest {
       ISearchMark mark = factory.createSearchMark(null, folder, "Complex Search");
 
       ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, INews.State.NEW);
-
-      ISearchField field2 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond2 = factory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, INews.State.UNREAD);
-
-      ISearchField field3 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond3 = factory.createSearchCondition(null, mark, field3, SearchSpecifier.IS, INews.State.UPDATED);
+      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, State.UNREAD, State.UPDATED));
 
       ISearchField field4 = factory.createSearchField(INews.AGE_IN_DAYS, newsEntityName);
       ISearchCondition cond4 = factory.createSearchCondition(null, mark, field4, SearchSpecifier.IS_LESS_THAN, 5);
@@ -377,13 +339,7 @@ public class PerformanceTest {
       ISearchMark mark = factory.createSearchMark(null, folder, "Complex Search");
 
       ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, INews.State.NEW);
-
-      ISearchField field2 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond2 = factory.createSearchCondition(null, mark, field2, SearchSpecifier.IS, INews.State.UNREAD);
-
-      ISearchField field3 = factory.createSearchField(INews.STATE, newsEntityName);
-      ISearchCondition cond3 = factory.createSearchCondition(null, mark, field3, SearchSpecifier.IS, INews.State.UPDATED);
+      ISearchCondition cond1 = factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, State.UNREAD, State.UPDATED));
 
       ISearchField field4 = factory.createSearchField(IEntity.ALL_FIELDS, newsEntityName);
       ISearchCondition cond4 = factory.createSearchCondition(null, mark, field4, SearchSpecifier.CONTAINS, "pasero");
@@ -475,16 +431,7 @@ public class PerformanceTest {
         List<ISearchCondition> conditions = new ArrayList<ISearchCondition>();
 
         ISearchField field1 = factory.createSearchField(INews.STATE, INews.class.getName());
-        conditions.add(factory.createSearchCondition(field1, SearchSpecifier.IS, INews.State.NEW));
-
-        ISearchField field2 = factory.createSearchField(INews.STATE, INews.class.getName());
-        conditions.add(factory.createSearchCondition(field2, SearchSpecifier.IS, INews.State.UNREAD));
-
-        ISearchField field3 = factory.createSearchField(INews.STATE, INews.class.getName());
-        conditions.add(factory.createSearchCondition(field3, SearchSpecifier.IS, INews.State.UPDATED));
-
-        ISearchField field4 = factory.createSearchField(INews.STATE, INews.class.getName());
-        conditions.add(factory.createSearchCondition(field4, SearchSpecifier.IS, INews.State.READ));
+        conditions.add(factory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, State.UNREAD, State.UPDATED, State.READ)));
 
         results[0] = fModelSearch.searchNews(conditions, false).size();
 
@@ -632,13 +579,7 @@ public class PerformanceTest {
         List<ISearchCondition> conditions = new ArrayList<ISearchCondition>();
 
         ISearchField field1 = factory.createSearchField(INews.STATE, INews.class.getName());
-        conditions.add(factory.createSearchCondition(field1, SearchSpecifier.IS, INews.State.NEW));
-
-        ISearchField field2 = factory.createSearchField(INews.STATE, INews.class.getName());
-        conditions.add(factory.createSearchCondition(field2, SearchSpecifier.IS, INews.State.UNREAD));
-
-        ISearchField field3 = factory.createSearchField(INews.STATE, INews.class.getName());
-        conditions.add(factory.createSearchCondition(field3, SearchSpecifier.IS, INews.State.UPDATED));
+        conditions.add(factory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
 
         ISearchField field4 = factory.createSearchField(INews.HAS_ATTACHMENTS, INews.class.getName());
         conditions.add(factory.createSearchCondition(field4, SearchSpecifier.IS, true));
