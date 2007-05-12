@@ -55,6 +55,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.SearchSpecifier;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IndexListener;
@@ -66,6 +67,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -157,17 +159,18 @@ public class ModelSearchImpl implements IModelSearch {
       BooleanQuery bQuery = new BooleanQuery();
 
       /* Handle State-Field separately (group) */
-      BooleanQuery stateQuery = null;
+      BooleanQuery statesQuery = null;
       for (ISearchCondition condition : conditions) {
         if (requiresStateGrouping(condition)) {
 
           /* Create and add new BooleanQuery for State */
-          if (stateQuery == null) {
-            stateQuery = new BooleanQuery();
-            bQuery.add(stateQuery, Occur.MUST);
+          if (statesQuery == null) {
+            statesQuery = new BooleanQuery();
+            bQuery.add(statesQuery, Occur.MUST);
           }
 
-          stateQuery.add(createBooleanClause(condition, false));
+          /* Add Boolean Clause per State */
+          addStateClause(statesQuery, condition);
         }
       }
 
@@ -253,8 +256,24 @@ public class ModelSearchImpl implements IModelSearch {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  private void addStateClause(BooleanQuery statesQuery, ISearchCondition condition) {
+    String fieldName = String.valueOf(INews.STATE);
+    Occur occur = condition.getSpecifier().isNegation() ? Occur.MUST_NOT : Occur.SHOULD;
+    EnumSet<INews.State> newsStates = (EnumSet<State>) condition.getValue();
+    for (INews.State state : newsStates) {
+      String value = String.valueOf(state.ordinal());
+      TermQuery stateQuery = new TermQuery(new Term(fieldName, value));
+      statesQuery.add(new BooleanClause(stateQuery, occur));
+    }
+
+    /* Check if the match-all-docs query is required */
+    if (newsStates.size() == 1 && condition.getSpecifier().isNegation())
+      statesQuery.add(new BooleanClause(new MatchAllDocsQuery(), Occur.MUST));
+  }
+
   private boolean requiresStateGrouping(ISearchCondition condition) {
-    return condition.getField().getId() == INews.STATE && condition.getSpecifier() == SearchSpecifier.IS;
+    return condition.getField().getId() == INews.STATE;
   }
 
   //TODO Think about a better performing solution here!
