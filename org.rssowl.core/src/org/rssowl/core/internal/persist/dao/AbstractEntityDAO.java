@@ -68,27 +68,41 @@ public abstract class AbstractEntityDAO<T extends IEntity,
   protected abstract E createSaveEventTemplate(T entity);
 
   protected abstract E createDeleteEventTemplate(T entity);
-
+  
+  public boolean exists(long id) {
+    try {
+      return !(loadList(id).isEmpty());
+    } catch (Db4oException e) {
+      throw new PersistenceException(e);
+    }
+  }
+  
   /*
    * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#load(long)
    */
   public T load(long id) {
     try {
-      Query query = fDb.query();
-      query.constrain(fEntityClass);
-      query.descend("fId").constrain(Long.valueOf(id)); //$NON-NLS-1$
+      List<T> list = loadList(id);
+      if (list.isEmpty())
+        return null;
+      if (list.size() > 1)
+        throw new IllegalStateException("There should only be a single entity for a given id, but there are: " + list.size());
 
-      List<T> set = getList(query);
-      for (T entity : set) {
-        // TODO Activate completely by default for now. Must decide how to deal
-        // with this.
-        fDb.activate(entity, Integer.MAX_VALUE);
-        return entity;
-      }
+      T entity = list.get(0);
+      // TODO Activate completely by default for now. Must decide how to deal
+      // with this.
+      fDb.activate(entity, Integer.MAX_VALUE);
+      return entity;
     } catch (Db4oException e) {
       throw new PersistenceException(e);
     }
-    return null;
+  }
+
+  private List<T> loadList(long id) throws Db4oException   {
+    Query query = fDb.query();
+    query.constrain(fEntityClass);
+    query.descend("fId").constrain(Long.valueOf(id)); //$NON-NLS-1$
+    return getList(query);
   }
 
   @Override

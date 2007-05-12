@@ -47,8 +47,13 @@ public final class DynamicDAO {
     return DAO_SERVICE;
   }
 
-  public static <T extends IEntity> T load(Class<T> persistableClass, long id) {
-    IEntityDAO<T, ?, ?> dao = getDAOFromEntity(persistableClass);
+  public static boolean exists(Class<? extends IEntity> entityClass, long id) {
+    IEntityDAO<?, ?, ?> dao = getDAOFromEntity(entityClass);
+    return dao.exists(id);
+  }
+
+  public static <T extends IEntity> T load(Class<T> entityClass, long id) {
+    IEntityDAO<T, ?, ?> dao = getDAOFromEntity(entityClass);
     return dao.load(id);
   }
 
@@ -128,7 +133,7 @@ public final class DynamicDAO {
   public static <T extends IPersistable> IPersistableDAO<T> getDAOFromPersistable(Class< ? extends T> persistableClass) {
     return getDAOService().getDAOFromPersistable(persistableClass);
   }
-  
+
   public static <T extends IEntity> IEntityDAO<T, ?, ?> getDAOFromEntity(Class< ? extends T> entityClass)  {
     return getDAOService().getDAOFromPersistable(entityClass);
   }
