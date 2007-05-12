@@ -128,7 +128,7 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
     /** News is ready to be deleted from the Database */
     DELETED;
 
-    private static final Set<State> VISIBLE_STATES = Collections.unmodifiableSet(EnumSet.of(NEW, READ, UNREAD, UPDATED));
+    private static final transient Set<State> VISIBLE_STATES = EnumSet.of(NEW, READ, UNREAD, UPDATED);
 
     /**
      * Returns an unmodifiable set containing the visible states (all of them
@@ -138,7 +138,7 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
      * apart from HIDDEN and DELETED).
      */
     public static final Set<State> getVisible() {
-      return VISIBLE_STATES;
+      return Collections.unmodifiableSet(VISIBLE_STATES);
     }
   };
 
