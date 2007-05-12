@@ -525,9 +525,9 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Create a new SearchMark"
+            description="Create a new Saved Search"
             id="org.rssowl.ui.actions.NewSearchMark"
-            name="New SearchMark">
+            name="New Saved Search">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
