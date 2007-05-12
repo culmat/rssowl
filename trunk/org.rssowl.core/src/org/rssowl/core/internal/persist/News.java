@@ -482,7 +482,7 @@ public class News extends AbstractEntity implements INews {
    */
   public synchronized boolean isVisible() {
     INews.State state = getState();
-    return state == State.NEW || state == State.UPDATED || state == State.UNREAD || state == State.READ;
+    return State.getVisible().contains(state);
   }
 
   @SuppressWarnings("nls")
