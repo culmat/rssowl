@@ -150,6 +150,12 @@ public class SearchNewsDialog extends TitleAreaDialog {
   /* Workaround for unknown Dateo-Col Width */
   private static int DATE_COL_WIDTH = -1;
 
+  /* Number of News to preload before showing as result */
+  private static final int NUM_PRELOADED = 20;
+
+  /* Count number of open Dialogs */
+  private static int fgOpenDialogCount;
+
   /* Button IDs */
   private static final int BUTTON_SEARCH = 1000;
   private static final int BUTTON_CLEAR = 1001;
@@ -432,10 +438,20 @@ public class SearchNewsDialog extends TitleAreaDialog {
   }
 
   /*
+   * @see org.eclipse.jface.window.Window#open()
+   */
+  @Override
+  public int open() {
+    fgOpenDialogCount++;
+    return super.open();
+  }
+
+  /*
    * @see org.eclipse.jface.dialogs.TrayDialog#close()
    */
   @Override
   public boolean close() {
+    fgOpenDialogCount--;
 
     /*
      * Workaround for Eclipse Bug 186025: The Virtual Manager is not cleared
@@ -735,6 +751,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
           INews.State state = (State) searchHit.getData(INews.STATE);
           fResult.add(new ScoredNews(searchHit.getResult(), state, relevanceRaw, relevance));
         }
+
+        /* Preload some results that are known to be shown initially */
+        preload(fResult);
       }
 
       @Override
@@ -759,6 +778,12 @@ public class SearchNewsDialog extends TitleAreaDialog {
         getButton(BUTTON_SEARCH).setFocus();
       }
     });
+  }
+
+  private void preload(List<ScoredNews> list) {
+    for (int i = 0; i < list.size() && i < NUM_PRELOADED; i++) {
+      list.get(i).getNews();
+    }
   }
 
   private void onClear() {
@@ -1270,6 +1295,14 @@ public class SearchNewsDialog extends TitleAreaDialog {
       Point bestSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
       getShell().setSize(Math.max(bestSize.x, minWidth), bestSize.y);
       LayoutUtils.positionShell(getShell(), false);
+    }
+
+    /* Move a bit to bottom right if multiple dialogs are open at the same time */
+    if (fgOpenDialogCount > 1) {
+      Point location = getShell().getLocation();
+      location.x += 20 * (fgOpenDialogCount - 1);
+      location.y += 20 * (fgOpenDialogCount - 1);
+      getShell().setLocation(location);
     }
   }
 
