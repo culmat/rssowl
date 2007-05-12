@@ -1338,6 +1338,7 @@ public class DBManagerTest {
       DynamicDAO.save(initialFeed);
       assertTrue(feedAddedCalled[0]);
       assertTrue(feedUpdatedCalled[0]);
+      assertTrue(DynamicDAO.exists(IFeed.class, initialFeed.getId()));
       DynamicDAO.delete(updatedFeed[0]);
     } catch (PersistenceException e) {
       fail(e.getMessage());
