@@ -95,6 +95,13 @@ public class JobRunner {
   }
 
   /**
+   * @param runnable
+   */
+  public static void runDelayedInBackgroundThread(final Runnable runnable) {
+    runInBackgroundThread(DELAY, runnable);
+  }
+
+  /**
    * @param delay
    * @param runnable
    */
