@@ -33,8 +33,8 @@ import org.rssowl.core.persist.reference.NewsReference;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The SearchMark is acting like virtual folders in Thunderbird. The user is
@@ -53,7 +53,7 @@ public class SearchMark extends Mark implements ISearchMark {
 
   /**
    * Creates a new Element of the type SearchMark. A SearchMark is only visually
-   * representated in case it was added to a Folder. Make sure to add it to a
+   * represented in case it was added to a Folder. Make sure to add it to a
    * Folder using <code>Folder#addMark(Mark)</code>
    *
    * @param id The unique ID of this SearchMark.
@@ -62,7 +62,7 @@ public class SearchMark extends Mark implements ISearchMark {
    */
   public SearchMark(Long id, IFolder folder, String name) {
     super(id, folder, name);
-    fSearchConditions = new ArrayList<ISearchCondition>();
+    fSearchConditions = new ArrayList<ISearchCondition>(5);
   }
 
   /**
@@ -76,7 +76,10 @@ public class SearchMark extends Mark implements ISearchMark {
    * @see org.rssowl.core.persist.ISearchMark#setResult(java.util.List, org.rssowl.core.persist.INews.State)
    */
   public boolean setResult(List<NewsReference> news, INews.State state) {
-    long[] bucket = new long[news != null ? news.size() : 0];
+    Assert.isNotNull(news, "news");
+    Assert.isNotNull(state, "state");
+
+    long[] bucket = new long[news.size()];
     boolean changed = true;
 
     /* Read News */
@@ -104,7 +107,7 @@ public class SearchMark extends Mark implements ISearchMark {
     }
 
     /* Fill Bucket */
-    for (int i = 0; news != null && i < news.size(); i++) {
+    for (int i = 0; i < news.size(); i++) {
       bucket[i] = news.get(i).getId();
     }
 
@@ -115,13 +118,13 @@ public class SearchMark extends Mark implements ISearchMark {
    * @see org.rssowl.core.persist.ISearchMark#getMatchingNews()
    */
   public List<NewsReference> getResult() {
-    return getResult(EnumSet.of(INews.State.READ, INews.State.UNREAD, INews.State.NEW, INews.State.UPDATED));
+    return getResult(INews.State.getVisible());
   }
 
   /*
    * @see org.rssowl.core.persist.ISearchMark#getMatchingNews(java.util.EnumSet)
    */
-  public List<NewsReference> getResult(EnumSet<INews.State> states) {
+  public List<NewsReference> getResult(Set<INews.State> states) {
     List<NewsReference> result = new ArrayList<NewsReference>(getResultCount(states));
 
     /* Add Read News */
@@ -146,9 +149,10 @@ public class SearchMark extends Mark implements ISearchMark {
   }
 
   /*
-   * @see org.rssowl.core.persist.ISearchMark#getMatchingNewsCount(java.util.EnumSet)
+   * @see org.rssowl.core.persist.ISearchMark#getMatchingNewsCount(java.util.Set)
    */
-  public int getResultCount(EnumSet<INews.State> states) {
+  public int getResultCount(Set<INews.State> states) {
+    Assert.isNotNull(states, "states");
     int count = 0;
 
     /* Read News */
