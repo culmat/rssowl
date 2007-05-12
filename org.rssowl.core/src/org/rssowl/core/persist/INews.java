@@ -27,8 +27,11 @@ package org.rssowl.core.persist;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The super-type of all News Elements in Feeds.
@@ -124,6 +127,19 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
 
     /** News is ready to be deleted from the Database */
     DELETED;
+
+    private static final Set<State> VISIBLE_STATES = Collections.unmodifiableSet(EnumSet.of(NEW, READ, UNREAD, UPDATED));
+
+    /**
+     * Returns an unmodifiable set containing the visible states (all of them
+     * apart from HIDDEN and DELETED).
+     *
+     * @return an unmodifiable set containing the visible states (all of them
+     * apart from HIDDEN and DELETED).
+     */
+    public static final Set<State> getVisible() {
+      return VISIBLE_STATES;
+    }
   };
 
   /**
