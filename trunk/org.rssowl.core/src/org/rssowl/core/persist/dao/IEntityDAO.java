@@ -44,6 +44,18 @@ import java.util.Set;
 public interface IEntityDAO<T extends IEntity, L extends EntityListener<E, T>, E extends ModelEvent> extends IPersistableDAO<T> {
 
   /**
+   * Returns <code>true</code> if there's an entity with <code>id</code>
+   * in the persistence system. Returns <code>false</code> otherwise.
+   * 
+   * @param id The id to be checked.
+   * @return <code>true</code> if there's an entity with <code>id</code>
+   * in the persistence system. Returns <code>false</code> otherwise.
+   * @throws PersistenceException In case of an error while accessing the
+   * persistence system.
+   */
+  boolean exists(long id) throws PersistenceException;
+  
+  /**
    * Loads the persistable with <code>id</code> from the persistence system
    * and returns it. If no persistable with the provided id exists,
    * <code>null</code> is returned.
