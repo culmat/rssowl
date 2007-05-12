@@ -88,6 +88,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   private LocalResourceManager fResources;
   private IPreferenceScope fPreferences;
   private boolean fBlockIconifyEvent;
+  private boolean fMinimizeFromClose;
 
   /* Listeners */
   private NewsAdapter fNewsListener;
@@ -144,7 +145,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         fPreferences = Owl.getPreferenceService().getGlobalScope();
 
         /* Hook TrayItem if supported on OS and 1st Window */
-        if (fPreferences.getBoolean(DefaultPreferences.USE_SYSTEM_TRAY))
+        if (fPreferences.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE) || fPreferences.getBoolean(DefaultPreferences.TRAY_ON_CLOSE))
           enableTray();
 
         /* Win only: Allow Scroll over Cursor-Control */
@@ -167,9 +168,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       public void run() throws Exception {
 
         /* Check if Prefs tell to move to tray */
-        if (fPreferences.getBoolean(DefaultPreferences.USE_SYSTEM_TRAY) && fPreferences.getBoolean(DefaultPreferences.TRAY_ON_EXIT)) {
+        if (fPreferences.getBoolean(DefaultPreferences.TRAY_ON_CLOSE)) {
+          fMinimizeFromClose = true;
           getWindowConfigurer().getWindow().getShell().notifyListeners(SWT.Iconify, new Event());
           res[0] = false;
+          fMinimizeFromClose = false;
         }
       }
     });
@@ -218,23 +221,54 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   }
 
   private void onPreferencesChange(Set<PreferenceEvent> events, EventType type) {
-    for (PreferenceEvent event : events) {
-      /* Tray Preference Change */
-      if (DefaultPreferences.USE_SYSTEM_TRAY.equals(event.getEntity().getKey())) {
-        boolean useTray;
-        if (type == EventType.REMOVE)
-          useTray = Owl.getPreferenceService().getDefaultScope().getBoolean(DefaultPreferences.USE_SYSTEM_TRAY);
-        else
-          useTray = event.getEntity().getBoolean();
+    IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
+    boolean useTray = false;
+    boolean affectsTray = false;
 
-        if (useTray && !fTrayEnabled)
-          enableTray();
-        else if (!useTray && fTrayEnabled)
-          disableTray();
+    for (PreferenceEvent event : events) {
+      String key = event.getEntity().getKey();
+
+      /* Tray Preference Change: Tray on Minimize */
+      if (DefaultPreferences.TRAY_ON_MINIMIZE.equals(key)) {
+        affectsTray = true;
+        if (type == EventType.REMOVE)
+          useTray = defaultScope.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE) || fPreferences.getBoolean(DefaultPreferences.TRAY_ON_CLOSE);
+        else
+          useTray = event.getEntity().getBoolean() || fPreferences.getBoolean(DefaultPreferences.TRAY_ON_CLOSE);
+      }
+
+      /* Tray Preference Change: Tray on Close */
+      else if (DefaultPreferences.TRAY_ON_CLOSE.equals(key)) {
+        affectsTray = true;
+        if (type == EventType.REMOVE)
+          useTray = defaultScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE) || fPreferences.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE);
+        else
+          useTray = event.getEntity().getBoolean() || fPreferences.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE);
+      }
+
+      /* Enable Tray */
+      if (affectsTray && useTray && !fTrayEnabled) {
+        JobRunner.runInUIThread(null, new Runnable() {
+          public void run() {
+            enableTray();
+          }
+        });
+      }
+
+      /* Disable Tray */
+      else if (affectsTray && !useTray && fTrayEnabled) {
+        JobRunner.runInUIThread(null, new Runnable() {
+          public void run() {
+            disableTray();
+          }
+        });
       }
     }
   }
 
+  /*
+   * @see org.eclipse.ui.application.WorkbenchWindowAdvisor#dispose()
+   */
   @Override
   public void dispose() {
     unregisterListeners();
@@ -284,12 +318,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     /* Apply Image */
     fTrayItem.setImage(OwlUI.getImage(fResources, OwlUI.TRAY_OWL));
 
-    /* Minimize to Tray on Shell Iconify */
+    /* Minimize to Tray on Shell Iconify if set */
     fTrayShellListener = new ShellAdapter() {
 
       @Override
       public void shellIconified(ShellEvent e) {
-        if (!fBlockIconifyEvent)
+        if (!fBlockIconifyEvent && (fMinimizeFromClose || fPreferences.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE)))
           moveToTray(shell);
       }
     };

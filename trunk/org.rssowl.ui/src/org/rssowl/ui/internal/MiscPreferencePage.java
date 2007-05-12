@@ -89,19 +89,12 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     /* Enable / Disable Tray */
     fMinimizeToTray = new Button(trayGroup, SWT.CHECK);
     fMinimizeToTray.setText("Minimize to the system tray");
-    fMinimizeToTray.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_SYSTEM_TRAY));
-    fMinimizeToTray.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        fMoveToTrayOnExit.setEnabled(fMinimizeToTray.getSelection());
-      }
-    });
+    fMinimizeToTray.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE));
 
     /* Move to Tray on Close */
     fMoveToTrayOnExit = new Button(trayGroup, SWT.CHECK);
     fMoveToTrayOnExit.setText("Move to the system tray when closing the window");
-    fMoveToTrayOnExit.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_EXIT));
-    fMoveToTrayOnExit.setEnabled(fMinimizeToTray.getSelection());
+    fMoveToTrayOnExit.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
 
     /* Separator */
     new Label(container, SWT.NONE);
@@ -173,8 +166,8 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   @Override
   public boolean performOk() {
     fGlobalScope.putBoolean(DefaultPreferences.USE_EXTERNAL_BROWSER, fUseExternalBrowser.getSelection());
-    fGlobalScope.putBoolean(DefaultPreferences.USE_SYSTEM_TRAY, fMinimizeToTray.getSelection());
-    fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_EXIT, fMoveToTrayOnExit.getSelection());
+    fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_MINIMIZE, fMinimizeToTray.getSelection());
+    fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_CLOSE, fMoveToTrayOnExit.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP, fShowNotificationPopup.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED, fNotificationOnlyFromTray.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP, fNotificationIsSticky.getSelection());
@@ -192,9 +185,8 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
 
     fUseExternalBrowser.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_EXTERNAL_BROWSER));
-    fMinimizeToTray.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_SYSTEM_TRAY));
-    fMoveToTrayOnExit.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_EXIT));
-    fMoveToTrayOnExit.setEnabled(fMinimizeToTray.getSelection());
+    fMinimizeToTray.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE));
+    fMoveToTrayOnExit.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
     fShowNotificationPopup.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP));
     fNotificationOnlyFromTray.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED));
     fNotificationOnlyFromTray.setEnabled(fShowNotificationPopup.getSelection());
