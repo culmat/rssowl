@@ -242,7 +242,7 @@ public class SearchField implements ISearchField {
         case (INews.IS_FLAGGED):
           return "Is Sticky";
         case (INews.STATE):
-          return "News-State";
+          return "State of News";
         case (INews.LABEL):
           return "Label";
         case (INews.RATING):
