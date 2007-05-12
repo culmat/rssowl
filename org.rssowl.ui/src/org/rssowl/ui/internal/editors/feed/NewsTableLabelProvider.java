@@ -365,6 +365,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
       gc.setBackground(OwlUI.getColor(fResources, news.getLabel()));
       gc.fillRectangle(0, itemRect.y, clArea.width, itemRect.height);
       gc.setBackground(oldBackground);
+      gc.setForeground(scrollable.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
       /* Mark as Selected being handled */
       event.detail &= ~SWT.SELECTED;
