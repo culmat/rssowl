@@ -46,13 +46,10 @@ import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
-import org.rssowl.core.persist.INews.State;
-import org.rssowl.core.util.Pair;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -70,7 +67,6 @@ public class SearchConditionList extends ScrolledComposite {
   private Image fDeleteIcon;
   private boolean fModified;
   private int fVisibleItemCount = 3;
-  private StateConditionControl fStateConditionControl;
 
   /**
    * @param parent The parent Composite.
@@ -107,9 +103,6 @@ public class SearchConditionList extends ScrolledComposite {
    * value, and <code>FALSE</code> otherwise.
    */
   public boolean isEmpty() {
-    if (fStateConditionControl.hasSelected())
-      return false;
-
     for (SearchConditionItem item : fItems) {
       if (item.hasValue())
         return false;
@@ -127,13 +120,7 @@ public class SearchConditionList extends ScrolledComposite {
 
     /* Compute from Condition Item */
     if (fVisibleItemCount > 0 && fItems.size() > 0) {
-      int itemHeight = fItems.get(0).computeSize(wHint, hHint).y + 2;
-      point.y = fVisibleItemCount * itemHeight;
-    }
-
-    /* Compute from State Control */
-    else if (fVisibleItemCount > 0) {
-      int itemHeight = fStateConditionControl.computeSize(wHint, hHint).y + 8;
+      int itemHeight = fItems.get(0).computeSize(wHint, hHint).y + 4;
       point.y = fVisibleItemCount * itemHeight;
     }
 
@@ -155,9 +142,6 @@ public class SearchConditionList extends ScrolledComposite {
           removeItem(itemToRemove);
         }
       }
-
-      /* Clear State Control */
-      fStateConditionControl.select(null);
 
       /* Add default */
       addItem(getDefaultCondition());
@@ -196,10 +180,7 @@ public class SearchConditionList extends ScrolledComposite {
   public List<ISearchCondition> createConditions(ISearchMark searchmark) {
     List<ISearchCondition> conditions = new ArrayList<ISearchCondition>();
 
-    /* State Conditions */
-    conditions.addAll(fStateConditionControl.createConditions(searchmark));
-
-    /* Non State Conditions */
+    /* For each Item */
     for (SearchConditionItem item : fItems) {
       ISearchCondition condition = item.createCondition(searchmark, true);
       if (condition != null)
@@ -216,16 +197,9 @@ public class SearchConditionList extends ScrolledComposite {
    * this List.
    */
   public void showConditions(List<ISearchCondition> conditions) {
-
-    /* Split Conditions (state / non state) */
-    Pair<EnumSet<State>, List<ISearchCondition>> pair = splitConditions(conditions);
-
     fModified = true;
     setRedraw(false);
     try {
-
-      /* Update State Control */
-      fStateConditionControl.select(pair.getFirst());
 
       /* Remove all */
       List<SearchConditionItem> itemsToRemove = new ArrayList<SearchConditionItem>(fItems);
@@ -234,9 +208,9 @@ public class SearchConditionList extends ScrolledComposite {
         removeItem(itemToRemove);
       }
 
-      /* Add non-state Conditions */
-      if (pair.getSecond() != null) {
-        for (ISearchCondition condition : pair.getSecond())
+      /* Add Conditions */
+      if (conditions != null) {
+        for (ISearchCondition condition : conditions)
           addItem(condition);
       }
     } finally {
@@ -258,9 +232,6 @@ public class SearchConditionList extends ScrolledComposite {
     if (fModified)
       return true;
 
-    if (fStateConditionControl.isModified())
-      return true;
-
     for (SearchConditionItem item : fItems) {
       if (item.isModified())
         return true;
@@ -276,9 +247,6 @@ public class SearchConditionList extends ScrolledComposite {
 
   private void initComponents(List<ISearchCondition> conditions) {
 
-    /* Split Conditions (state / non state) */
-    Pair<EnumSet<State>, List<ISearchCondition>> pair = splitConditions(conditions);
-
     /* Adjust Scrolled Composite */
     setLayout(new GridLayout(1, false));
     setExpandHorizontal(true);
@@ -291,52 +259,14 @@ public class SearchConditionList extends ScrolledComposite {
     fContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     setContent(fContainer);
 
-    /* Add the State Condition Control */
-    addStateConditionControl(pair.getFirst());
-
-    /* Add other Conditions */
-    if (pair.getSecond() != null) {
-      for (ISearchCondition condition : pair.getSecond())
+    /* Add Conditions */
+    if (conditions != null) {
+      for (ISearchCondition condition : conditions)
         addItem(condition);
     }
 
     /* Update Size */
     updateSize();
-  }
-
-  private void addStateConditionControl(EnumSet<State> selectedStates) {
-
-    /* Add the State Condition Control */
-    Composite stateControlContainer = new Composite(fContainer, SWT.NONE);
-    stateControlContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
-    stateControlContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
-    fStateConditionControl = new StateConditionControl(stateControlContainer, SWT.NONE, selectedStates);
-
-    ToolBar buttonBar = new ToolBar(stateControlContainer, SWT.FLAT);
-    buttonBar.setLayoutData(new GridData(SWT.END, SWT.CENTER, true, false));
-
-    /* Button to add Condition */
-    ToolItem addButton = new ToolItem(buttonBar, SWT.PUSH);
-    addButton.setImage(fAddIcon);
-    addButton.setToolTipText("Add Condition");
-    addButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        addItem(getDefaultCondition(), 0).focusInput();
-      }
-    });
-
-    /* Button to reset State Control */
-    ToolItem deleteButton = new ToolItem(buttonBar, SWT.PUSH);
-    deleteButton.setImage(fDeleteIcon);
-    deleteButton.setToolTipText("Reset Condition");
-    deleteButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        fStateConditionControl.select(null);
-      }
-    });
   }
 
   private ISearchCondition getDefaultCondition() {
@@ -381,6 +311,7 @@ public class SearchConditionList extends ScrolledComposite {
     /* Button to delete Condition */
     ToolItem deleteButton = new ToolItem(buttonBar, SWT.PUSH);
     deleteButton.setImage(fDeleteIcon);
+    deleteButton.setEnabled(index > 0);
     deleteButton.setToolTipText("Delete Condition");
     deleteButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -456,39 +387,5 @@ public class SearchConditionList extends ScrolledComposite {
 
   private void updateSize() {
     setMinSize(fContainer.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-  }
-
-  private Pair<EnumSet<INews.State>, List<ISearchCondition>> splitConditions(List<ISearchCondition> conditions) {
-    String newsEntity = INews.class.getName();
-    List<INews.State> stateConditions = null;
-    List<ISearchCondition> otherConditons = null;
-
-    /* For each Condition */
-    for (ISearchCondition condition : conditions) {
-      ISearchField field = condition.getField();
-
-      /* State Condition */
-      if (newsEntity.equals(field.getEntityName()) && field.getId() == INews.STATE) {
-        if (stateConditions == null)
-          stateConditions = new ArrayList<INews.State>();
-
-        stateConditions.add((State) condition.getValue());
-      }
-
-      /* Other Condition */
-      else {
-        if (otherConditons == null)
-          otherConditons = new ArrayList<ISearchCondition>();
-
-        otherConditons.add(condition);
-      }
-    }
-
-    /* Build States EnumSet */
-    EnumSet<INews.State> states = null;
-    if (stateConditions != null)
-      states = EnumSet.copyOf(stateConditions);
-
-    return Pair.create(states, otherConditons);
   }
 }

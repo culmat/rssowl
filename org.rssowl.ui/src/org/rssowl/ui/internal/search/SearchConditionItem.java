@@ -39,7 +39,9 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -57,6 +59,7 @@ import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.SearchSpecifier;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DAOService;
 import org.rssowl.core.util.Pair;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -66,6 +69,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -180,7 +184,12 @@ public class SearchConditionItem extends Composite {
   private void initComponents() {
 
     /* Layout */
-    setLayout(LayoutUtils.createGridLayout(3, 5, 5, 5, 10, true));
+    FormLayout layout = new FormLayout();
+    layout.marginLeft = 5;
+    layout.marginRight = 5;
+    layout.marginTop = 5;
+    layout.marginBottom = 5;
+    setLayout(layout);
 
     /* 1.) Create Field Combo */
     createFieldCombo();
@@ -194,7 +203,12 @@ public class SearchConditionItem extends Composite {
 
   private void createFieldCombo() {
     Combo fieldCombo = new Combo(this, SWT.BORDER | SWT.READ_ONLY);
-    fieldCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+    FormData formData = new FormData();
+    formData.left = new FormAttachment(0);
+    formData.right = new FormAttachment(30, -10);
+    fieldCombo.setLayoutData(formData);
+
     fieldCombo.setVisibleItemCount(100);
 
     fFieldViewer = new ComboViewer(fieldCombo);
@@ -215,8 +229,12 @@ public class SearchConditionItem extends Composite {
 
   private void createSpecifierCombo() {
     Combo specifierCombo = new Combo(this, SWT.BORDER | SWT.READ_ONLY);
-    specifierCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     specifierCombo.setVisibleItemCount(100);
+
+    FormData formData = new FormData();
+    formData.left = new FormAttachment(30);
+    formData.right = new FormAttachment(50);
+    specifierCombo.setLayoutData(formData);
 
     fSpecifierViewer = new ComboViewer(specifierCombo);
     fSpecifierViewer.setContentProvider(new ComboContentProvider());
@@ -257,8 +275,14 @@ public class SearchConditionItem extends Composite {
 
   private void createInputField() {
     fInputFieldContainer = new Composite(this, SWT.None);
-    fInputFieldContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fInputFieldContainer.setLayout(LayoutUtils.createFillLayout(true, 0, 0));
+
+    FormData formData = new FormData();
+    formData.left = new FormAttachment(50, 10);
+    formData.right = new FormAttachment(100);
+    formData.top = new FormAttachment(0);
+    formData.bottom = new FormAttachment(100);
+    fInputFieldContainer.setLayoutData(formData);
 
     updateInputField(fInputFieldContainer, fCondition.getField(), fCondition.getValue());
 
@@ -274,6 +298,7 @@ public class SearchConditionItem extends Composite {
     });
   }
 
+  @SuppressWarnings("unchecked")
   private void updateInputField(Composite inputField, final ISearchField field, final Object input) {
 
     /* Dispose any old Children first */
@@ -282,166 +307,189 @@ public class SearchConditionItem extends Composite {
       child.dispose();
     }
 
+    /* Specially treat News-State */
+    if (field.getId() == INews.STATE) {
+      final StateConditionControl stateConditionControl = new StateConditionControl(inputField, SWT.NONE, null);
+      stateConditionControl.addListener(SWT.Modify, new Listener() {
+        public void handleEvent(Event event) {
+          fInputValue = stateConditionControl.getSelection();
+
+          if (fInputValue == null && input != null || (fInputValue != null && !fInputValue.equals(input)))
+            fModified = true;
+        }
+      });
+
+      /* Pre-Select input if given */
+      Object presetInput = (input == null) ? fInputValue : input;
+      if (presetInput != null && presetInput instanceof EnumSet)
+        stateConditionControl.select((EnumSet<State>) presetInput);
+
+      /* Update Input Value */
+      fInputValue = stateConditionControl.getSelection();
+    }
+
     /* Create new Input Field based on search-value-type */
-    switch (field.getSearchValueType().getId()) {
+    else {
+      switch (field.getSearchValueType().getId()) {
 
-      /* Type: Boolean */
-      case ISearchValueType.BOOLEAN: {
-        final Combo combo = new Combo(inputField, SWT.BORDER | SWT.READ_ONLY);
-        combo.add("true");
-        combo.add("false");
-        combo.addListener(SWT.Modify, new Listener() {
-          public void handleEvent(Event event) {
-            fInputValue = Boolean.valueOf(combo.getItem(combo.getSelectionIndex()));
+        /* Type: Boolean */
+        case ISearchValueType.BOOLEAN: {
+          final Combo combo = new Combo(inputField, SWT.BORDER | SWT.READ_ONLY);
+          combo.add("true");
+          combo.add("false");
+          combo.addListener(SWT.Modify, new Listener() {
+            public void handleEvent(Event event) {
+              fInputValue = Boolean.valueOf(combo.getItem(combo.getSelectionIndex()));
 
-            if (!fInputValue.equals(input))
-              fModified = true;
-          }
-        });
-
-        /* Pre-Select input if given */
-        Object presetInput = (input == null) ? fInputValue : input;
-        if (presetInput != null && presetInput instanceof Boolean)
-          combo.select(((Boolean) presetInput) ? 0 : 1);
-        else
-          combo.select(0);
-
-        /* Update Input Value */
-        fInputValue = Boolean.valueOf(combo.getItem(combo.getSelectionIndex()));
-
-        break;
-      }
-
-        /* Type: Date / Time */
-      case ISearchValueType.DATE:
-      case ISearchValueType.TIME:
-      case ISearchValueType.DATETIME: {
-        final Calendar cal = Calendar.getInstance();
-        final DateTime datetime = new DateTime(inputField, SWT.DATE);
-        datetime.addListener(SWT.Selection, new Listener() {
-          public void handleEvent(Event event) {
-            cal.set(Calendar.DATE, datetime.getDay());
-            cal.set(Calendar.MONTH, datetime.getMonth());
-            cal.set(Calendar.YEAR, datetime.getYear());
-
-            fInputValue = cal.getTime();
-
-            if (!fInputValue.equals(input))
-              fModified = true;
-          }
-        });
-
-        /* Pre-Select input if given */
-        Object presetInput = (input == null) ? fInputValue : input;
-        if (presetInput != null && presetInput instanceof Date)
-          cal.setTime((Date) presetInput);
-
-        datetime.setDay(cal.get(Calendar.DATE));
-        datetime.setMonth(cal.get(Calendar.MONTH));
-        datetime.setYear(cal.get(Calendar.YEAR));
-
-        /* Update Input Value */
-        fInputValue = cal.getTime();
-
-        break;
-      }
-
-        /* Type: Enumeration */
-      case ISearchValueType.ENUM: {
-        final Text text = new Text(inputField, SWT.BORDER);
-        text.addListener(SWT.Modify, new Listener() {
-          public void handleEvent(Event event) {
-            fInputValue = text.getText();
-
-            if (!fInputValue.equals(input))
-              fModified = true;
-          }
-        });
-
-        /* Provide Auto-Complete Field */
-        hookAutoComplete(text, field.getSearchValueType().getEnumValues());
-
-        /* Pre-Select input if given */
-        String inputValue = (input != null ? input.toString() : null);
-        if (inputValue != null)
-          text.setText(inputValue);
-
-        /* Update Input Value */
-        fInputValue = text.getText();
-
-        break;
-      }
-
-        /* Type: Number */
-      case ISearchValueType.NUMBER:
-      case ISearchValueType.INTEGER: {
-        final Spinner spinner = new Spinner(inputField, SWT.BORDER);
-        spinner.setMinimum(0);
-        spinner.setMaximum(1000);
-        spinner.addListener(SWT.Modify, new Listener() {
-          public void handleEvent(Event event) {
-            fInputValue = spinner.getSelection();
-
-            if (!fInputValue.equals(input))
-              fModified = true;
-          }
-        });
-
-        /* Pre-Select input if given */
-        Object presetInput = (input == null) ? fInputValue : input;
-        if (presetInput != null && presetInput instanceof Integer)
-          spinner.setSelection((Integer) presetInput);
-
-        /* Update Input Value */
-        fInputValue = spinner.getSelection();
-
-        break;
-      }
-
-        /* Type: String */
-      case ISearchValueType.STRING:
-      case ISearchValueType.LINK: {
-        final Text text = new Text(inputField, SWT.BORDER);
-        text.addListener(SWT.Modify, new Listener() {
-          public void handleEvent(Event event) {
-            fInputValue = text.getText();
-
-            if (!fInputValue.equals(input))
-              fModified = true;
-          }
-        });
-
-        /* Provide auto-complete for Categories and Authors */
-        if (field.getId() == INews.CATEGORIES || field.getId() == INews.AUTHOR) {
-          final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = hookAutoComplete(text, null);
-
-          /* Load proposals in the Background */
-          JobRunner.runInBackgroundThread(new Runnable() {
-            public void run() {
-              if (!text.isDisposed()) {
-                Set<String> values;
-                if (field.getId() == INews.CATEGORIES)
-                  values = fDaoService.getCategoryDAO().loadAllNames();
-                else
-                  values = fDaoService.getPersonDAO().loadAllNames();
-
-                /* Apply Proposals */
-                if (!text.isDisposed())
-                  applyProposals(values, pair.getFirst(), pair.getSecond());
-              }
+              if (!fInputValue.equals(input))
+                fModified = true;
             }
           });
+
+          /* Pre-Select input if given */
+          Object presetInput = (input == null) ? fInputValue : input;
+          if (presetInput != null && presetInput instanceof Boolean)
+            combo.select(((Boolean) presetInput) ? 0 : 1);
+          else
+            combo.select(0);
+
+          /* Update Input Value */
+          fInputValue = Boolean.valueOf(combo.getItem(combo.getSelectionIndex()));
+
+          break;
         }
 
-        /* Pre-Select input if given */
-        Object presetInput = (input == null && fInputValue instanceof String) ? fInputValue : input;
-        if (presetInput != null)
-          text.setText(presetInput.toString());
+          /* Type: Date / Time */
+        case ISearchValueType.DATE:
+        case ISearchValueType.TIME:
+        case ISearchValueType.DATETIME: {
+          final Calendar cal = Calendar.getInstance();
+          final DateTime datetime = new DateTime(inputField, SWT.DATE);
+          datetime.addListener(SWT.Selection, new Listener() {
+            public void handleEvent(Event event) {
+              cal.set(Calendar.DATE, datetime.getDay());
+              cal.set(Calendar.MONTH, datetime.getMonth());
+              cal.set(Calendar.YEAR, datetime.getYear());
 
-        /* Update Input Value */
-        fInputValue = text.getText();
+              fInputValue = cal.getTime();
 
-        break;
+              if (!fInputValue.equals(input))
+                fModified = true;
+            }
+          });
+
+          /* Pre-Select input if given */
+          Object presetInput = (input == null) ? fInputValue : input;
+          if (presetInput != null && presetInput instanceof Date)
+            cal.setTime((Date) presetInput);
+
+          datetime.setDay(cal.get(Calendar.DATE));
+          datetime.setMonth(cal.get(Calendar.MONTH));
+          datetime.setYear(cal.get(Calendar.YEAR));
+
+          /* Update Input Value */
+          fInputValue = cal.getTime();
+
+          break;
+        }
+
+          /* Type: Enumeration */
+        case ISearchValueType.ENUM: {
+          final Text text = new Text(inputField, SWT.BORDER);
+          text.addListener(SWT.Modify, new Listener() {
+            public void handleEvent(Event event) {
+              fInputValue = text.getText();
+
+              if (!fInputValue.equals(input))
+                fModified = true;
+            }
+          });
+
+          /* Provide Auto-Complete Field */
+          hookAutoComplete(text, field.getSearchValueType().getEnumValues());
+
+          /* Pre-Select input if given */
+          String inputValue = (input != null ? input.toString() : null);
+          if (inputValue != null)
+            text.setText(inputValue);
+
+          /* Update Input Value */
+          fInputValue = text.getText();
+
+          break;
+        }
+
+          /* Type: Number */
+        case ISearchValueType.NUMBER:
+        case ISearchValueType.INTEGER: {
+          final Spinner spinner = new Spinner(inputField, SWT.BORDER);
+          spinner.setMinimum(0);
+          spinner.setMaximum(1000);
+          spinner.addListener(SWT.Modify, new Listener() {
+            public void handleEvent(Event event) {
+              fInputValue = spinner.getSelection();
+
+              if (!fInputValue.equals(input))
+                fModified = true;
+            }
+          });
+
+          /* Pre-Select input if given */
+          Object presetInput = (input == null) ? fInputValue : input;
+          if (presetInput != null && presetInput instanceof Integer)
+            spinner.setSelection((Integer) presetInput);
+
+          /* Update Input Value */
+          fInputValue = spinner.getSelection();
+
+          break;
+        }
+
+          /* Type: String */
+        case ISearchValueType.STRING:
+        case ISearchValueType.LINK: {
+          final Text text = new Text(inputField, SWT.BORDER);
+          text.addListener(SWT.Modify, new Listener() {
+            public void handleEvent(Event event) {
+              fInputValue = text.getText();
+
+              if (!fInputValue.equals(input))
+                fModified = true;
+            }
+          });
+
+          /* Provide auto-complete for Categories and Authors */
+          if (field.getId() == INews.CATEGORIES || field.getId() == INews.AUTHOR) {
+            final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = hookAutoComplete(text, null);
+
+            /* Load proposals in the Background */
+            JobRunner.runDelayedInBackgroundThread(new Runnable() {
+              public void run() {
+                if (!text.isDisposed()) {
+                  Set<String> values;
+                  if (field.getId() == INews.CATEGORIES)
+                    values = fDaoService.getCategoryDAO().loadAllNames();
+                  else
+                    values = fDaoService.getPersonDAO().loadAllNames();
+
+                  /* Apply Proposals */
+                  if (!text.isDisposed())
+                    applyProposals(values, pair.getFirst(), pair.getSecond());
+                }
+              }
+            });
+          }
+
+          /* Pre-Select input if given */
+          Object presetInput = (input == null && fInputValue instanceof String) ? fInputValue : input;
+          if (presetInput != null)
+            text.setText(presetInput.toString());
+
+          /* Update Input Value */
+          fInputValue = text.getText();
+
+          break;
+        }
       }
     }
 
@@ -518,6 +566,7 @@ public class SearchConditionItem extends Composite {
     /* Return all Fields of News */
     if (INews.class.getName().equals(entityName)) {
       fields.add(fFactory.createSearchField(IEntity.ALL_FIELDS, entityName));
+      fields.add(fFactory.createSearchField(INews.STATE, entityName));
       fields.add(fFactory.createSearchField(INews.TITLE, entityName));
       fields.add(fFactory.createSearchField(INews.DESCRIPTION, entityName));
       fields.add(fFactory.createSearchField(INews.AUTHOR, entityName));
@@ -553,7 +602,7 @@ public class SearchConditionItem extends Composite {
       if (fieldId != IEntity.ALL_FIELDS && fieldId != INews.TITLE && fieldId != INews.DESCRIPTION && fieldId != INews.ATTACHMENTS_CONTENT && fieldId != INews.AUTHOR) {
         specifiers.add(SearchSpecifier.IS);
 
-        if (fieldId != INews.AGE_IN_DAYS)
+        if (fieldId != INews.AGE_IN_DAYS && fieldId != INews.STATE)
           specifiers.add(SearchSpecifier.IS_NOT);
       }
 
