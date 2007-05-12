@@ -36,8 +36,8 @@ public interface IndexListener {
    * Notifies that the Index of the <code>IModelSearch</code> implementation
    * has been updated (e.g. new entities indexed or existing entities updated).
    *
-   * @param docCount The number of documents that have been updated in the
+   * @param entitiesCount The number of entities that have been updated in the
    * index.
    */
-  void indexUpdated(int docCount);
+  void indexUpdated(int entitiesCount);
 }

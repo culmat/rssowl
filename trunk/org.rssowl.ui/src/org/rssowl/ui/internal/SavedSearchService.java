@@ -43,6 +43,7 @@ import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.SearchHit;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -118,14 +119,11 @@ public class SavedSearchService {
   }
 
   private void onIndexUpdated(int docCount) {
-
-    /* Batch is in process - return */
-    if (fBatchInProcess.get())
+    /* Start a new Batch if one is not in progress */
+    if (!fBatchInProcess.getAndSet(true)) {
+      fBatchJob.schedule((docCount <= SHORT_THRESHOLD || fForceQuickUpdate.get()) ? BATCH_INTERVAL_SHORT : BATCH_INTERVAL_LONG);
       return;
-
-    /* Start a new Batch */
-    fBatchInProcess.set(true);
-    fBatchJob.schedule(docCount <= SHORT_THRESHOLD || fForceQuickUpdate.get() ? BATCH_INTERVAL_SHORT : BATCH_INTERVAL_LONG);
+    }
   }
 
   /**
@@ -167,16 +165,16 @@ public class SavedSearchService {
       List<SearchHit<NewsReference>> results = modelSearch.searchNews(searchMark.getSearchConditions(), searchMark.matchAllConditions());
 
       /* Fill Result into Buckets */
-      List<NewsReference> readNews = null;
-      List<NewsReference> unreadNews = null;
-      List<NewsReference> newNews = null;
+      List<NewsReference> readNews = Collections.emptyList();
+      List<NewsReference> unreadNews = Collections.emptyList();
+      List<NewsReference> newNews = Collections.emptyList();
 
       for (SearchHit<NewsReference> searchHit : results) {
         INews.State state = (State) searchHit.getData(INews.STATE);
 
         /* Read News */
         if (state == INews.State.READ) {
-          if (readNews == null)
+          if (readNews.isEmpty())
             readNews = new ArrayList<NewsReference>(results.size() / 3);
 
           readNews.add(searchHit.getResult());
@@ -184,7 +182,7 @@ public class SavedSearchService {
 
         /* Unread or Updated News */
         else if (state == INews.State.UNREAD || state == INews.State.UPDATED) {
-          if (unreadNews == null)
+          if (unreadNews.isEmpty())
             unreadNews = new ArrayList<NewsReference>(results.size() / 3);
 
           unreadNews.add(searchHit.getResult());
@@ -192,7 +190,7 @@ public class SavedSearchService {
 
         /* New News */
         else if (state == INews.State.NEW) {
-          if (newNews == null)
+          if (newNews.isEmpty())
             newNews = new ArrayList<NewsReference>(results.size() / 3);
 
           newNews.add(searchHit.getResult());

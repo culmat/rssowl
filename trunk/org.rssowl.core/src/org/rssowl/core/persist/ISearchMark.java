@@ -26,13 +26,13 @@ package org.rssowl.core.persist;
 
 import org.rssowl.core.persist.reference.NewsReference;
 
-import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 /**
- * The SearchMark is acting like virtual folders in Thunderbird. The user is
- * defining some criterias, e.g. "mozilla" as part of a news-title, and all News
- * that matches this criteria will be related to this SearchMark.
+ * A SearchMark acts like a virtual folder. The user defines some criteria, e.g.
+ * "hardware" as part of the news title, and all News items that match this
+ * criteria will be associated to this SearchMark.
  *
  * @author bpasero
  */
@@ -48,14 +48,12 @@ public interface ISearchMark extends IMark {
   public static final int MATCH_ALL_CONDITIONS = 6;
 
   /**
-   * Sets the result of this search mark. The result is a List of
-   * <code>NewsReference</code> that may be <code>NULL</code> if not results
-   * are matching the search. In addition, a <code>INews.State</code> has to
+   * Sets the result of this search mark. The result is a non-null List of
+   * <code>NewsReference</code>. In addition, a <code>INews.State</code> has to
    * be provided in order to quickly resolve the state information out of the
    * matching news.
    *
-   * @param news A List of <code>NewsReference</code> that may be
-   * <code>NULL</code> if not results are matching the search.
+   * @param news A non-null List of <code>NewsReference</code>.
    * @param state The <code>INews.State</code> of the news that match the
    * search.
    * @return Returns <code>TRUE</code> if the new result differs from the
@@ -64,9 +62,9 @@ public interface ISearchMark extends IMark {
   boolean setResult(List<NewsReference> news, INews.State state);
 
   /**
-   * Returns a List of all news that match this search mark's conditions. To
-   * reduce the memory impact of this method, the news are returned as
-   * <code>NewsReference</code>.
+   * Returns a List of all visible news that match this search mark's
+   * conditions. To reduce the memory impact of this method, the news are
+   * returned as <code>NewsReference</code>.
    *
    * @return Returns a List of all news that match this search mark's
    * conditions. To reduce the memory impact of this method, the news are
@@ -79,24 +77,24 @@ public interface ISearchMark extends IMark {
    * provided <code>INews.State</code>. To reduce the memory impact of this
    * method, the news are returned as <code>NewsReference</code>.
    *
-   * @param states A Set of <code>INews.State</code> that the resulting news
-   * must have.
+   * @param states A Set (typically an EnumSet) of <code>INews.State</code>
+   * that the resulting news must have.
    * @return Returns a List of all news that match this search mark's conditions
    * and the provided <code>INews.State</code>. To reduce the memory impact
    * of this method, the news are returned as <code>NewsReference</code>.
    */
-  List<NewsReference> getResult(EnumSet<INews.State> states);
+  List<NewsReference> getResult(Set<INews.State> states);
 
   /**
    * Returns the number of news that match this search mark's conditions and the
    * provided <code>INews.State</code>.
    *
-   * @param states A Set of <code>INews.State</code> that the resulting news
-   * must have.
+   * @param states A Set (typically an EnumSet) of <code>INews.State</code>
+   * that the resulting news must have.
    * @return Returns the number of news that match this search mark's conditions
    * and the provided <code>INews.State</code>.
    */
-  int getResultCount(EnumSet<INews.State> states);
+  int getResultCount(Set<INews.State> states);
 
   /**
    * Adds a <code>ISearchCondition</code> to the list of conditions this
