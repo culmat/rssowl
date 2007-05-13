@@ -234,7 +234,7 @@ public class SearchField implements ISearchField {
         case (INews.SOURCE):
           return "Source";
         case (INews.HAS_ATTACHMENTS):
-          return "Has Attachments";
+          return "Has Attachment";
         case (INews.ATTACHMENTS_CONTENT):
           return "Attachment";
         case (INews.CATEGORIES):
