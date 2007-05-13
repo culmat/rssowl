@@ -57,8 +57,8 @@ public class SearchHit<T> {
   }
 
   /**
-   * @param key The key to identify the data that is to be retrieved. Must not
-   * be <code>NULL</code>.
+   * @param key The key to identify the data that is to be retrieved.
+   *
    * @return Returns the data associated with the key or <code>NULL</code> if
    * none.
    */
