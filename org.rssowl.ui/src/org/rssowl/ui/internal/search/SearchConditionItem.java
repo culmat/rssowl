@@ -584,7 +584,7 @@ public class SearchConditionItem extends Composite {
       fields.add(fFactory.createSearchField(INews.LINK, entityName));
       fields.add(fFactory.createSearchField(INews.IS_FLAGGED, entityName));
       fields.add(fFactory.createSearchField(INews.LABEL, entityName));
-      fields.add(fFactory.createSearchField(INews.RATING, entityName));
+      //      fields.add(fFactory.createSearchField(INews.RATING, entityName));
       fields.add(fFactory.createSearchField(INews.FEED, entityName));
     }
 
