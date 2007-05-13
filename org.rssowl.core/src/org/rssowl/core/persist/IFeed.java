@@ -138,8 +138,8 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
 
   /**
    * Convenience method that returns all the news from the feed that are
-   * visible. The news that are visible are the ones returned by
-   * {@link INews.State#getVisible()}.
+   * visible. The news that are visible are the ones whose state matches any of
+   * the states returned by {@link INews.State#getVisible()}.
    * <p>
    * Note: unlike the list returned from {@link #getNews()}, this one can be
    * modified by the caller safely.
