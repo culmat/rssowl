@@ -1222,11 +1222,11 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
   private Object[] getVisibleNews(List<?> elements) {
     List<ScoredNews> news = new ArrayList<ScoredNews>();
-
+    Set<INews.State> visibleStates = INews.State.getVisible();
     for (Object element : elements) {
       if (element instanceof ScoredNews) {
         ScoredNews scoredNews = (ScoredNews) element;
-        if (scoredNews.getState() != INews.State.HIDDEN && scoredNews.getState() != INews.State.DELETED)
+        if (visibleStates.contains(scoredNews.getState()))
           news.add((ScoredNews) element);
       }
     }
