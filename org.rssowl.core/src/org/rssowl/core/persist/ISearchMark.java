@@ -25,6 +25,7 @@
 package org.rssowl.core.persist;
 
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.util.Pair;
 
 import java.util.List;
 import java.util.Set;
@@ -48,18 +49,17 @@ public interface ISearchMark extends IMark {
   public static final int MATCH_ALL_CONDITIONS = 6;
 
   /**
-   * Sets the result of this search mark. The result is a non-null List of
-   * <code>NewsReference</code>. In addition, a <code>INews.State</code> has to
-   * be provided in order to quickly resolve the state information out of the
-   * matching news.
+   * Sets the result of this search mark. The results are represented by a list
+   * of Pairs containing a non-null List of <code>NewsReference</code> and the
+   * <code>INews.State.</code> of the news that match the search.
    *
-   * @param news A non-null List of <code>NewsReference</code>.
-   * @param state The <code>INews.State</code> of the news that match the
-   * search.
+   * @param results The results represented by a list of Pairs containing a
+   * non-null List of <code>NewsReference</code> and the
+   * <code>INews.State.</code> of the news that match the search.
    * @return Returns <code>TRUE</code> if the new result differs from the
    * existing one and <code>FALSE</code> otherwise.
    */
-  boolean setResult(List<NewsReference> news, INews.State state);
+  boolean setResult(List<Pair<List<NewsReference>, INews.State>> results);
 
   /**
    * Returns a List of all visible news that match this search mark's

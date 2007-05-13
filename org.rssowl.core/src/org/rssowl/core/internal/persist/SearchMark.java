@@ -30,8 +30,10 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -73,42 +75,49 @@ public class SearchMark extends Mark implements ISearchMark {
   }
 
   /*
-   * @see org.rssowl.core.persist.ISearchMark#setResult(java.util.List, org.rssowl.core.persist.INews.State)
+   * @see org.rssowl.core.persist.ISearchMark#setResult(java.util.List)
    */
-  public boolean setResult(List<NewsReference> news, INews.State state) {
-    Assert.isNotNull(news, "news");
-    Assert.isNotNull(state, "state");
+  public boolean setResult(List<Pair<List<NewsReference>, INews.State>> results) {
+    boolean changed = false;
 
-    long[] bucket = new long[news.size()];
-    boolean changed = true;
+    /* For each Result */
+    for (Pair<List<NewsReference>, INews.State> result : results) {
+      List<NewsReference> news = result.getFirst();
+      INews.State state = result.getSecond();
 
-    /* Read News */
-    if (state == INews.State.READ) {
-      if (fMatchingReadNews.length == 0 && bucket.length == 0)
-        changed = false;
+      Assert.isNotNull(news, "news");
+      Assert.isNotNull(state, "state");
 
-      fMatchingReadNews = bucket;
-    }
+      long[] bucket = new long[news.size()];
 
-    /* Unread or Updated News */
-    else if (state == INews.State.UNREAD || state == INews.State.UPDATED) {
-      if (fMatchingUnreadUpdatedNews.length == 0 && bucket.length == 0)
-        changed = false;
+      /* Fill Bucket */
+      for (int i = 0; i < news.size(); i++) {
+        bucket[i] = news.get(i).getId();
+      }
 
-      fMatchingUnreadUpdatedNews = bucket;
-    }
+      /* Read News */
+      if (state == INews.State.READ) {
+        if (!changed)
+          changed = !Arrays.equals(fMatchingReadNews, bucket);
 
-    /* New News */
-    else if (state == INews.State.NEW) {
-      if (fMatchingNewNews.length == 0 && bucket.length == 0)
-        changed = false;
+        fMatchingReadNews = bucket;
+      }
 
-      fMatchingNewNews = bucket;
-    }
+      /* Unread or Updated News */
+      else if (state == INews.State.UNREAD || state == INews.State.UPDATED) {
+        if (!changed)
+          changed = !Arrays.equals(fMatchingUnreadUpdatedNews, bucket);
 
-    /* Fill Bucket */
-    for (int i = 0; i < news.size(); i++) {
-      bucket[i] = news.get(i).getId();
+        fMatchingUnreadUpdatedNews = bucket;
+      }
+
+      /* New News */
+      else if (state == INews.State.NEW) {
+        if (!changed)
+          changed = !Arrays.equals(fMatchingNewNews, bucket);
+
+        fMatchingNewNews = bucket;
+      }
     }
 
     return changed;
@@ -222,11 +231,7 @@ public class SearchMark extends Mark implements ISearchMark {
 
     SearchMark s = (SearchMark) searchMark;
 
-    return getId() == s.getId() && (getParent() == null ? s.getParent() == null : getParent().equals(s.getParent())) &&
-      (fSearchConditions == null ? s.fSearchConditions == null : fSearchConditions.equals(s.fSearchConditions)) &&
-      (getLastVisitDate() == null ? s.getLastVisitDate() == null : getLastVisitDate().equals(s.getLastVisitDate())) &&
-      getPopularity() == s.getPopularity() && fMatchAllConditions == s.matchAllConditions() &&
-      (getProperties() == null ? s.getProperties() == null : getProperties().equals(s.getProperties()));
+    return getId() == s.getId() && (getParent() == null ? s.getParent() == null : getParent().equals(s.getParent())) && (fSearchConditions == null ? s.fSearchConditions == null : fSearchConditions.equals(s.fSearchConditions)) && (getLastVisitDate() == null ? s.getLastVisitDate() == null : getLastVisitDate().equals(s.getLastVisitDate())) && getPopularity() == s.getPopularity() && fMatchAllConditions == s.matchAllConditions() && (getProperties() == null ? s.getProperties() == null : getProperties().equals(s.getProperties()));
   }
 
   /**
