@@ -48,6 +48,7 @@ import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
@@ -248,7 +249,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       /* Enable Tray */
       if (affectsTray && useTray && !fTrayEnabled) {
-        JobRunner.runInUIThread(null, new Runnable() {
+        PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
           public void run() {
             enableTray();
           }
@@ -257,7 +258,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       /* Disable Tray */
       else if (affectsTray && !useTray && fTrayEnabled) {
-        JobRunner.runInUIThread(null, new Runnable() {
+        PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
           public void run() {
             disableTray();
           }
