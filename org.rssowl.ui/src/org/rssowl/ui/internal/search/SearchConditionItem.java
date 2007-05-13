@@ -62,6 +62,7 @@ import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DAOService;
 import org.rssowl.core.util.Pair;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -458,19 +459,21 @@ public class SearchConditionItem extends Composite {
             }
           });
 
-          /* Provide auto-complete for Categories and Authors */
-          if (field.getId() == INews.CATEGORIES || field.getId() == INews.AUTHOR) {
+          /* Provide auto-complete for Categories, Authors and Feeds */
+          if (field.getId() == INews.CATEGORIES || field.getId() == INews.AUTHOR || field.getId() == INews.FEED) {
             final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = hookAutoComplete(text, null);
 
             /* Load proposals in the Background */
             JobRunner.runDelayedInBackgroundThread(new Runnable() {
               public void run() {
                 if (!text.isDisposed()) {
-                  Set<String> values;
+                  Set<String> values = null;
                   if (field.getId() == INews.CATEGORIES)
                     values = fDaoService.getCategoryDAO().loadAllNames();
-                  else
+                  else if (field.getId() == INews.AUTHOR)
                     values = fDaoService.getPersonDAO().loadAllNames();
+                  else if (field.getId() == INews.FEED)
+                    values = Controller.getDefault().getCacheService().getFeedLinks();
 
                   /* Apply Proposals */
                   if (!text.isDisposed())

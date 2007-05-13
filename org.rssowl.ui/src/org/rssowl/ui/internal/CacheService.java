@@ -191,6 +191,21 @@ public class CacheService {
   }
 
   /**
+   * Returns a Set of all Links that are added as Bookmarks.
+   *
+   * @return Returns a Set of all Links that are added as Bookmarks.
+   */
+  public Set<String> getFeedLinks() {
+    Set<String> links = new HashSet<String>(fBookMarks.size());
+
+    for (IBookMark bookmark : fBookMarks) {
+      links.add(bookmark.getFeedLinkReference().getLink().toString());
+    }
+
+    return links;
+  }
+
+  /**
    * Returns an unmodifiable Set of all <code>ISearchMark</code>s stored in
    * the persistence layer.
    *
