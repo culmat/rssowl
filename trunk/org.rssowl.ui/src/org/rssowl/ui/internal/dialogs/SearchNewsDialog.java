@@ -90,6 +90,7 @@ import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.reference.NewsReference;
@@ -190,6 +191,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private List<ISearchCondition> fInitialConditions;
   private boolean fRunSearch;
   private boolean fMatchAllConditions;
+  private INewsDAO fNewsDao;
 
   /* Container for a search result */
   private static class ScoredNews {
@@ -435,6 +437,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fInitialConditions = conditions;
     fMatchAllConditions = matchAllConditions;
     fRunSearch = runSearch;
+    fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
   }
 
   /*
@@ -740,7 +743,11 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
         /* Fill Results with Relevance */
         for (SearchHit<NewsReference> searchHit : searchHits) {
-          //TODO Test if News-Reference is resolvable (bug 173)
+
+          /* Have to test if Entity really exists (bug 173) */
+          if (!fNewsDao.exists(searchHit.getResult().getId()))
+            continue;
+
           Float relevanceRaw = searchHit.getRelevance();
           Relevance relevance = Relevance.LOW;
           if (relevanceRaw > highRelThreshold)
