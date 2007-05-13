@@ -30,20 +30,19 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.reference.NewsReference;
-import org.rssowl.core.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * The SearchMark is acting like virtual folders in Thunderbird. The user is
- * defining some criterias, e.g. "mozilla" as part of a news-title, and all News
- * that matches this criteria will be related to this SearchMark.
+ * Default implementation of {@link ISearchMark}.
  *
  * @author bpasero
+ * @see ISearchMark
  */
 public class SearchMark extends Mark implements ISearchMark {
   private List<ISearchCondition> fSearchConditions;
@@ -74,16 +73,19 @@ public class SearchMark extends Mark implements ISearchMark {
   // As per javadoc
   }
 
+
   /*
    * @see org.rssowl.core.persist.ISearchMark#setResult(java.util.List)
    */
-  public boolean setResult(List<Pair<List<NewsReference>, INews.State>> results) {
+  public boolean setResult(Map<INews.State, List<NewsReference>> results) {
+    Assert.isNotNull(results, "results");
+
     boolean changed = false;
 
     /* For each Result */
-    for (Pair<List<NewsReference>, INews.State> result : results) {
-      List<NewsReference> news = result.getFirst();
-      INews.State state = result.getSecond();
+    for (Map.Entry<INews.State, List<NewsReference>> result : results.entrySet()) {
+      List<NewsReference> news = result.getValue();
+      INews.State state = result.getKey();
 
       Assert.isNotNull(news, "news");
       Assert.isNotNull(state, "state");
