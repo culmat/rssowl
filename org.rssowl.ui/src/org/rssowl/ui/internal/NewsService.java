@@ -44,6 +44,7 @@ import org.rssowl.core.persist.event.FeedEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -256,7 +257,7 @@ public class NewsService {
 
     List<INews> newsList = feed.getVisibleNews();
     for (INews news : newsList) {
-      if (isUnread(news.getState()))
+      if (ModelUtils.isUnread(news.getState()))
         counterItem.incrementUnreadCounter();
       if (INews.State.NEW.equals(news.getState()))
         counterItem.incrementNewCounter();
@@ -311,7 +312,7 @@ public class NewsService {
         /* Update Counter */
         if (news.getState() == INews.State.NEW)
           counter.incrementNewCounter();
-        if (isUnread(news.getState()))
+        if (ModelUtils.isUnread(news.getState()))
           counter.incrementUnreadCounter();
         if (news.isFlagged())
           counter.incrementStickyCounter();
@@ -330,7 +331,7 @@ public class NewsService {
           /* Update Counter */
           if (news.getState() == INews.State.NEW)
             counter.decrementNewCounter();
-          if (isUnread(news.getState()))
+          if (ModelUtils.isUnread(news.getState()))
             counter.decrementUnreadCounter();
           if (news.isFlagged())
             counter.decrementStickyCounter();
@@ -346,8 +347,8 @@ public class NewsService {
       Assert.isNotNull(oldNews, "oldNews cannot be null on newsUpdated");
       FeedLinkReference feedRef = currentNews.getFeedReference();
 
-      boolean oldStateUnread = isUnread(oldNews.getState());
-      boolean currentStateUnread = isUnread(currentNews.getState());
+      boolean oldStateUnread = ModelUtils.isUnread(oldNews.getState());
+      boolean currentStateUnread = ModelUtils.isUnread(currentNews.getState());
 
       boolean oldStateNew = INews.State.NEW.equals(oldNews.getState());
       boolean currentStateNew = INews.State.NEW.equals(currentNews.getState());
@@ -400,9 +401,5 @@ public class NewsService {
 
   private void removeFromCounter(URI feedLink) {
     fCounter.remove(feedLink);
-  }
-
-  private boolean isUnread(INews.State state) {
-    return state == INews.State.NEW || state == INews.State.UPDATED || state == INews.State.UNREAD;
   }
 }
