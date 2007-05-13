@@ -40,13 +40,14 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IndexListener;
 import org.rssowl.core.util.LoggingSafeRunnable;
-import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.SearchHit;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -200,12 +201,12 @@ public class SavedSearchService {
       }
 
       /* Set result to SearchMark */
-      List<Pair<List<NewsReference>, INews.State>> pairedResults = new ArrayList<Pair<List<NewsReference>, State>>(3);
-      pairedResults.add(Pair.create(newNews, INews.State.NEW));
-      pairedResults.add(Pair.create(unreadNews, INews.State.UNREAD));
-      pairedResults.add(Pair.create(readNews, INews.State.READ));
+      Map<INews.State, List<NewsReference>> resultsMap = new EnumMap<INews.State, List<NewsReference>>(INews.State.class);
+      resultsMap.put(INews.State.NEW, newNews);
+      resultsMap.put(INews.State.UNREAD, unreadNews);
+      resultsMap.put(INews.State.READ, readNews);
 
-      boolean changed = searchMark.setResult(pairedResults);
+      boolean changed = searchMark.setResult(resultsMap);
 
       /* Create Event to indicate changed results if any */
       if (changed)
