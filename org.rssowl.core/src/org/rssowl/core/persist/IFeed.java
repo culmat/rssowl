@@ -35,7 +35,7 @@ import java.util.List;
 
 /**
  * The super-type of all Feed Elements.
- * 
+ *
  * @author bpasero
  */
 public interface IFeed extends IEntity, MergeCapable<IFeed> {
@@ -138,18 +138,15 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
 
   /**
    * Convenience method that returns all the news from the feed that are
-   * visible. The news that are visible are the ones in any of the following
-   * states:
-   * <li>{@linkplain INews.State#NEW}</code></li>
-   * <li>{@linkplain INews.State#UNREAD}</li>
-   * <li>{@linkplain INews.State#UPDATED}</li>
-   * <li>{@linkplain INews.State#READ}</li>
+   * visible. The news that are visible are the ones returned by
+   * {@link INews.State#getVisible()}.
    * <p>
    * Note: unlike the list returned from {@link #getNews()}, this one can be
    * modified by the caller safely.
-   * 
+   *
    * @return the visible news in the feed.
    * @see #getNewsByStates(EnumSet)
+   * @see INews.State#getVisible()
    */
   List<INews> getVisibleNews();
 
@@ -159,7 +156,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <p>
    * Note: unlike the list returned from {@link #getNews()}, this one can be
    * modified by the caller safely.
-   * 
+   *
    * @param states Set containing all the allowable news states in the returned
    * list.
    * @return List containing INews that match any of the given states.
@@ -170,7 +167,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
 
   /**
    * Identify the Feed's Format, for example "RSS" or "Atom".
-   * 
+   *
    * @param format The Format this Feed was created from.
    */
   void setFormat(String format);
@@ -190,7 +187,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>Dublin Core Namespace</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param title The Name of the Feed to set.
    */
   void setTitle(String title);
@@ -209,7 +206,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>Dublin Core Namespace</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param description The Phrase or sentence describing the Feed to set.
    */
   void setDescription(String description);
@@ -227,7 +224,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>CDF</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param link The Link to the HTML website corresponding to the Feed to set.
    */
   void setHomepage(URI link);
@@ -247,7 +244,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>Dublin Core Namespace</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param language The language the Feed is written in to set.
    */
   void setLanguage(String language);
@@ -266,7 +263,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>CDF</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param news The News contained in this Feed.
    */
   void addNews(INews news);
@@ -281,7 +278,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>RSS 2.0</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param rating The PICS rating for the Feed to set.
    */
   void setRating(String rating);
@@ -297,7 +294,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>Atom</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param image The Image for the Feed to set.
    */
   void setImage(IImage image);
@@ -312,7 +309,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>RSS 2.0</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param input A text input box for the Feed to set.
    */
   void setTextInput(ITextInput input);
@@ -329,7 +326,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>Dublin Core Namespace</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param copyright The Copyright notice for content in the Feed to set.
    */
   void setCopyright(String copyright);
@@ -348,7 +345,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>Dublin Core Namespace</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param pubDate The ation date for the content in the Feed to set.
    */
   void setPublishDate(Date pubDate);
@@ -367,7 +364,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>CDF</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param lastBuildDate The last time the content of the Feed changed to set.
    */
   void setLastBuildDate(Date lastBuildDate);
@@ -382,7 +379,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>OPML 1.0</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param lastModifiedDate The Date of last modification.
    */
   void setLastModifiedDate(Date lastModifiedDate);
@@ -397,7 +394,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>Dublin Core Namespace</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param category Add a Category this Feed belongs to.
    */
   void addCategory(ICategory category);
@@ -411,7 +408,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>Atom</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param generator The String indicating the program used to generate the
    * Feed to set.
    */
@@ -426,7 +423,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>RSS 2.0</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param ttl The Time to live to set.
    */
   void setTTL(int ttl);
@@ -442,7 +439,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>RSS 2.0</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param docs The Link to the Docs to set.
    */
   void setDocs(URI docs);
@@ -457,7 +454,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>OPML 1.0</li>
    * <li>Dublin Core Namespace</li>
    * </ul>
-   * 
+   *
    * @param author The Author or Editor of the Feed.
    */
   void setAuthor(IPerson author);
@@ -473,7 +470,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>RSS 2.0</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param webmaster The Email address for person responsible for technical
    * issues relating to the Feed to set.
    */
@@ -493,7 +490,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>RSS 2.0</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param hour Add an Hour to the list of hours that the Feed shall not be
    * loaded.
    */
@@ -513,7 +510,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>RSS 2.0</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param day Add a Day to the list of Days that the Feed shall not be loaded.
    * The integer points to one of the days as defined by IFeed.
    */
@@ -533,7 +530,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>RSS 2.0</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param cloud The Cloud to set for this Feed.
    */
   void setCloud(ICloud cloud);
@@ -548,7 +545,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>Syndication Namespace</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param updatePeriod On of the constants defined in <code>IFeed</code> for
    * Update Periods.
    */
@@ -566,7 +563,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>Syndication Namespace</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param updateFrequency The frequency of updates in relation to the update
    * period.
    */
@@ -582,7 +579,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>Syndication Namespace</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param updateBase The base date to be used in concert with updatePeriod and
    * updateFrequency to set.
    */
@@ -596,7 +593,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * <li>XML Namespace</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param baseUri
    */
   void setBase(URI baseUri);
@@ -754,7 +751,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * In addition to {@link #merge(IFeed)}, it also removes all the news that
    * are not in <code>objectToMerge</code> and have a state of DELETED from
    * this feed and returns them.
-   * 
+   *
    * @param objectToMerge
    * @param cleanUp
    * @return the list of INews that have been removed from this feed. To
@@ -767,7 +764,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * this. Instead, the state of the news should be changed to
    * <code>DELETED</code> and they will be removed as part of
    * <code>mergeAndCleanUp</code>.
-   * 
+   *
    * @param news to delete.
    * @return <code>true</code> if feed contained the given news.
    * @see INews#setState(org.rssowl.core.persist.INews.State)
