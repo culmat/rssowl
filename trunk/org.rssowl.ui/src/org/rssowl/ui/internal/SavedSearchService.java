@@ -105,8 +105,8 @@ public class SavedSearchService {
 
   private IndexListener registerListeners() {
     IndexListener listener = new IndexListener() {
-      public void indexUpdated(int docCount) {
-        onIndexUpdated(docCount);
+      public void indexUpdated(int entitiesCount) {
+        onIndexUpdated(entitiesCount);
       }
     };
 
@@ -118,10 +118,11 @@ public class SavedSearchService {
     Owl.getPersistenceService().getModelSearch().removeIndexListener(fIndexListener);
   }
 
-  private void onIndexUpdated(int docCount) {
+  private void onIndexUpdated(int entitiesCount) {
+
     /* Start a new Batch if one is not in progress */
     if (!fBatchInProcess.getAndSet(true)) {
-      fBatchJob.schedule((docCount <= SHORT_THRESHOLD || fForceQuickUpdate.get()) ? BATCH_INTERVAL_SHORT : BATCH_INTERVAL_LONG);
+      fBatchJob.schedule((entitiesCount <= SHORT_THRESHOLD || fForceQuickUpdate.get()) ? BATCH_INTERVAL_SHORT : BATCH_INTERVAL_LONG);
       return;
     }
   }
@@ -215,7 +216,8 @@ public class SavedSearchService {
     }
 
     /* Notify Listeners (TODO Optimize if nothing changed!) */
-    DynamicDAO.getDAO(ISearchMarkDAO.class).fireResultsChanged(events);
+    if (!events.isEmpty())
+      DynamicDAO.getDAO(ISearchMarkDAO.class).fireResultsChanged(events);
   }
 
   /** Stops this service and unregisters any listeners added. */
