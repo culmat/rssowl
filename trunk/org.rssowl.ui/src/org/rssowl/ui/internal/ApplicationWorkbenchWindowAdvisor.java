@@ -295,6 +295,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   /* Enable System-Tray Support */
   private void enableTray() {
 
+    /* Avoid that this is being called redundantly */
+    if (fTrayEnabled)
+      return;
+
     /* Only enable for Primary Window */
     IWorkbenchWindow primaryWindow = OwlUI.getPrimaryWindow();
     if (primaryWindow == null || !primaryWindow.equals(getWindowConfigurer().getWindow()))
@@ -445,6 +449,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
   /* Disable System-Tray Support */
   private void disableTray() {
+
+    /* Avoid that this is being called redundantly */
+    if (!fTrayEnabled)
+      return;
 
     /* First make sure to have the Window restored */
     restoreFromTray(getWindowConfigurer().getWindow().getShell());
