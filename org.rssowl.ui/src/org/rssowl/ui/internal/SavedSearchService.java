@@ -40,6 +40,7 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IndexListener;
 import org.rssowl.core.util.LoggingSafeRunnable;
+import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.SearchHit;
 
 import java.util.ArrayList;
@@ -199,23 +200,19 @@ public class SavedSearchService {
       }
 
       /* Set result to SearchMark */
-      boolean changed = false;
+      List<Pair<List<NewsReference>, INews.State>> pairedResults = new ArrayList<Pair<List<NewsReference>, State>>(3);
+      pairedResults.add(Pair.create(newNews, INews.State.NEW));
+      pairedResults.add(Pair.create(unreadNews, INews.State.UNREAD));
+      pairedResults.add(Pair.create(readNews, INews.State.READ));
 
-      if (searchMark.setResult(readNews, INews.State.READ))
-        changed = true;
-
-      if (searchMark.setResult(unreadNews, INews.State.UNREAD))
-        changed = true;
-
-      if (searchMark.setResult(newNews, INews.State.NEW))
-        changed = true;
+      boolean changed = searchMark.setResult(pairedResults);
 
       /* Create Event to indicate changed results if any */
       if (changed)
         events.add(new SearchMarkEvent(searchMark, null, true));
     }
 
-    /* Notify Listeners (TODO Optimize if nothing changed!) */
+    /* Notify Listeners */
     if (!events.isEmpty())
       DynamicDAO.getDAO(ISearchMarkDAO.class).fireResultsChanged(events);
   }
