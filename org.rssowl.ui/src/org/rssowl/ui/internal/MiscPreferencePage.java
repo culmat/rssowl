@@ -86,14 +86,21 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     trayGroup.setLayout(LayoutUtils.createGridLayout(1));
     trayGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
+    Label trayLabel = new Label(trayGroup, SWT.NONE);
+    trayLabel.setText("Move to the System Tray");
+
+    Composite trayOptionsContainer = new Composite(trayGroup, SWT.NONE);
+    trayOptionsContainer.setLayout(LayoutUtils.createGridLayout(1, 10, 0));
+    trayOptionsContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
     /* Enable / Disable Tray */
-    fMinimizeToTray = new Button(trayGroup, SWT.CHECK);
-    fMinimizeToTray.setText("Minimize to the system tray");
+    fMinimizeToTray = new Button(trayOptionsContainer, SWT.CHECK);
+    fMinimizeToTray.setText("when minimizing RSSOwl");
     fMinimizeToTray.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE));
 
     /* Move to Tray on Close */
-    fMoveToTrayOnExit = new Button(trayGroup, SWT.CHECK);
-    fMoveToTrayOnExit.setText("Move to the system tray when closing the window");
+    fMoveToTrayOnExit = new Button(trayOptionsContainer, SWT.CHECK);
+    fMoveToTrayOnExit.setText("when closing RSSOwl");
     fMoveToTrayOnExit.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
 
     /* Separator */
