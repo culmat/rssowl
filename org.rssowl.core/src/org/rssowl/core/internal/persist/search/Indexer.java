@@ -147,19 +147,17 @@ public class Indexer {
     fSearch.notifyIndexUpdated(docCount);
   }
 
-  /**
-   * @throws IOException
-   */
-  synchronized void flushIfNecessary() throws IOException {
+  synchronized boolean flushIfNecessary() throws IOException {
+    boolean flushed = fFlushRequired;
+
     if (fFlushRequired)
       fIndexWriter.flush();
 
     fFlushRequired = false;
+
+    return flushed;
   }
 
-  /**
-   * @throws IOException
-   */
   synchronized void shutdown() throws IOException {
     unregisterListeners();
     dispose();

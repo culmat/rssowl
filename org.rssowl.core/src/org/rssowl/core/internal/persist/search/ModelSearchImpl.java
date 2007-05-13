@@ -28,6 +28,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.DateTools;
+import org.apache.lucene.document.Document;
 import org.apache.lucene.document.NumberTools;
 import org.apache.lucene.document.DateTools.Resolution;
 import org.apache.lucene.index.Term;
@@ -35,13 +36,12 @@ import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.ConstantScoreRangeQuery;
 import org.apache.lucene.search.FuzzyQuery;
-import org.apache.lucene.search.Hit;
-import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.HitCollector;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.RangeQuery;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.search.BooleanClause.Occur;
@@ -69,7 +69,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -77,10 +76,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 /**
  * The central interface for searching types from the persistence layer. The
  * implementation is contributable via extension-point mechanism.
- * <p>
- * TODO Consider using the <code>HitCollector</code> for collecting results
- * from a search because Lucene will re-run the search for any result > 100.
- * </p>
  *
  * @author ijuma
  * @author bpasero
@@ -228,26 +223,32 @@ public class ModelSearchImpl implements IModelSearch {
           fieldQuery.add(new BooleanClause(new MatchAllDocsQuery(), Occur.MUST));
       }
 
+      /* Use custom hit collector for performance reasons */
+      final List<SearchHit<NewsReference>> resultList = new ArrayList<SearchHit<NewsReference>>();
+      HitCollector collector = new HitCollector() {
+        @Override
+        public void collect(int doc, float score) {
+          try {
+            Document document = fSearcher.doc(doc);
+
+            /* Receive Stored Fields */
+            long newsId = Long.valueOf(document.get(SearchDocument.ENTITY_ID_TEXT));
+            INews.State newsState = NEWS_STATES[Integer.parseInt(document.get(NewsDocument.STATE_ID_TEXT))];
+
+            Map<Integer, INews.State> data = new HashMap<Integer, INews.State>(1);
+            data.put(INews.STATE, newsState);
+
+            /* Add to List */
+            resultList.add(new SearchHit<NewsReference>(new NewsReference(newsId), score, data));
+          } catch (IOException e) {
+            Activator.getDefault().logError(e.getMessage(), e);
+          }
+        }
+      };
+
       /* Perform the Search */
-      Hits hits;
       synchronized (this) {
-        hits = fSearcher.search(bQuery);
-      }
-
-      /* Build Result */
-      List<SearchHit<NewsReference>> resultList = new ArrayList<SearchHit<NewsReference>>(hits.length());
-      for (Iterator<?> it = hits.iterator(); it.hasNext();) {
-        Hit hit = (Hit) it.next();
-
-        /* Receive Stored Fields */
-        long newsId = Long.valueOf(hit.get(SearchDocument.ENTITY_ID_TEXT));
-        INews.State newsState = NEWS_STATES[Integer.parseInt(hit.get(NewsDocument.STATE_ID_TEXT))];
-
-        Map<Integer, INews.State> data = new HashMap<Integer, INews.State>(1);
-        data.put(INews.STATE, newsState);
-
-        /* Add to List */
-        resultList.add(new SearchHit<NewsReference>(new NewsReference(newsId), hit.getScore(), data));
+        fSearcher.search(bQuery, collector);
       }
 
       return resultList;
@@ -285,25 +286,26 @@ public class ModelSearchImpl implements IModelSearch {
     TokenStream tokenStream = analyzer.tokenStream(String.valueOf(IEntity.ALL_FIELDS), new StringReader(value));
     Token token = null;
     while ((token = tokenStream.next()) != null) {
+      String termText = token.termText();
 
       /* Contained in Title */
-      WildcardQuery titleQuery = new WildcardQuery(new Term(String.valueOf(INews.TITLE), token.termText()));
+      WildcardQuery titleQuery = new WildcardQuery(new Term(String.valueOf(INews.TITLE), termText));
       allFieldsQuery.add(new BooleanClause(titleQuery, Occur.SHOULD));
 
       /* Contained in Description */
-      WildcardQuery descriptionQuery = new WildcardQuery(new Term(String.valueOf(INews.DESCRIPTION), token.termText()));
+      WildcardQuery descriptionQuery = new WildcardQuery(new Term(String.valueOf(INews.DESCRIPTION), termText));
       allFieldsQuery.add(new BooleanClause(descriptionQuery, Occur.SHOULD));
 
       /* Contained in Attachment */
-      WildcardQuery attachmentQuery = new WildcardQuery(new Term(String.valueOf(INews.ATTACHMENTS_CONTENT), token.termText()));
+      WildcardQuery attachmentQuery = new WildcardQuery(new Term(String.valueOf(INews.ATTACHMENTS_CONTENT), termText));
       allFieldsQuery.add(new BooleanClause(attachmentQuery, Occur.SHOULD));
 
       /* Matches Author */
-      WildcardQuery authorQuery = new WildcardQuery(new Term(String.valueOf(INews.AUTHOR), token.termText()));
+      WildcardQuery authorQuery = new WildcardQuery(new Term(String.valueOf(INews.AUTHOR), termText));
       allFieldsQuery.add(new BooleanClause(authorQuery, Occur.SHOULD));
 
       /* Matches Category */
-      WildcardQuery categoryQuery = new WildcardQuery(new Term(String.valueOf(INews.CATEGORIES), token.termText()));
+      WildcardQuery categoryQuery = new WildcardQuery(new Term(String.valueOf(INews.CATEGORIES), termText));
       allFieldsQuery.add(new BooleanClause(categoryQuery, Occur.SHOULD));
     }
 
@@ -382,14 +384,14 @@ public class ModelSearchImpl implements IModelSearch {
         Term lowerBound = new Term(fieldname, MIN_DATE);
         Term upperBound = new Term(fieldname, value);
 
-        return new RangeQuery(lowerBound, upperBound, false);
+        return new ConstantScoreRangeQuery(fieldname, lowerBound.text(), upperBound.text(), false, false);
       }
 
       case IS_LESS_THAN: {
         Term lowerBound = new Term(fieldname, value);
         Term upperBound = new Term(fieldname, MAX_DATE);
 
-        return new RangeQuery(lowerBound, upperBound, false);
+        return new ConstantScoreRangeQuery(fieldname, lowerBound.text(), upperBound.text(), false, false);
       }
     }
 
@@ -494,14 +496,14 @@ public class ModelSearchImpl implements IModelSearch {
         Term lowerBound = new Term(fieldname, value);
         Term upperBound = new Term(fieldname, MAX_DATE);
 
-        return new RangeQuery(lowerBound, upperBound, false);
+        return new ConstantScoreRangeQuery(fieldname, lowerBound.text(), upperBound.text(), false, false);
       }
 
       case IS_BEFORE: {
         Term lowerBound = new Term(fieldname, MIN_DATE);
         Term upperBound = new Term(fieldname, value);
 
-        return new RangeQuery(lowerBound, upperBound, false);
+        return new ConstantScoreRangeQuery(fieldname, lowerBound.text(), upperBound.text(), false, false);
       }
     }
 
@@ -522,14 +524,14 @@ public class ModelSearchImpl implements IModelSearch {
         Term lowerBound = new Term(fieldname, value);
         Term upperBound = new Term(fieldname, MAX_NUMBER);
 
-        return new RangeQuery(lowerBound, upperBound, false);
+        return new ConstantScoreRangeQuery(fieldname, lowerBound.text(), upperBound.text(), false, false);
       }
 
       case IS_LESS_THAN: {
         Term lowerBound = new Term(fieldname, MIN_NUMBER);
         Term upperBound = new Term(fieldname, value);
 
-        return new RangeQuery(lowerBound, upperBound, false);
+        return new ConstantScoreRangeQuery(fieldname, lowerBound.text(), upperBound.text(), false, false);
       }
     }
 
@@ -538,14 +540,14 @@ public class ModelSearchImpl implements IModelSearch {
 
   private synchronized void isSearcherCurrent() throws PersistenceException {
     try {
-      fIndexer.flushIfNecessary();
+      boolean flushed = fIndexer.flushIfNecessary();
 
       /* Create searcher if not yet done */
       if (fSearcher == null)
         fSearcher = new IndexSearcher(fDirectory);
 
       /* Re-Create searcher if no longer current */
-      else if (!fSearcher.getIndexReader().isCurrent()) {
+      else if (flushed) {
         fSearcher.close();
         fSearcher = new IndexSearcher(fDirectory);
       }
