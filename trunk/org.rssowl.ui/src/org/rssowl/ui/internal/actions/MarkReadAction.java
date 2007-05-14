@@ -44,6 +44,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.NewsService;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.ModelUtils;
 
@@ -61,6 +62,7 @@ import java.util.Map.Entry;
  */
 public class MarkReadAction extends Action implements IWorkbenchWindowActionDelegate {
   private IStructuredSelection fSelection;
+  private NewsService fNewsService;
 
   /**
    *
@@ -74,6 +76,7 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
    */
   public MarkReadAction(IStructuredSelection selection) {
     fSelection = selection;
+    fNewsService = Controller.getDefault().getNewsService();
   }
 
   /*
@@ -182,11 +185,15 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
   private void fillNews(IFolder folder, List<INews> news, Map<IBookMark, List<INews>> bookMarkNewsMap) {
     List<IFolderChild> children = folder.getChildren();
     for (IFolderChild child : children) {
-      if (child instanceof IBookMark)
+      if (child instanceof IBookMark && containsUnread(((IBookMark) child)))
         fillNews((IBookMark) child, news, bookMarkNewsMap);
       else if (child instanceof IFolder)
         fillNews((IFolder) child, news, bookMarkNewsMap);
     }
+  }
+
+  private boolean containsUnread(IBookMark mark) {
+    return fNewsService.getUnreadCount(mark.getFeedLinkReference()) != 0;
   }
 
   private void fillNews(IBookMark bookmark, List<INews> news, Map<IBookMark, List<INews>> bookMarkNewsMap) {
