@@ -39,9 +39,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -183,14 +182,8 @@ public class SearchConditionItem extends Composite {
   }
 
   private void initComponents() {
-
-    /* Layout */
-    FormLayout layout = new FormLayout();
-    layout.marginLeft = 5;
-    layout.marginRight = 5;
-    layout.marginTop = 5;
-    layout.marginBottom = 5;
-    setLayout(layout);
+    setLayout(LayoutUtils.createGridLayout(3, 5, 5));
+    ((GridLayout) getLayout()).horizontalSpacing = 10;
 
     /* 1.) Create Field Combo */
     createFieldCombo();
@@ -204,12 +197,7 @@ public class SearchConditionItem extends Composite {
 
   private void createFieldCombo() {
     Combo fieldCombo = new Combo(this, SWT.BORDER | SWT.READ_ONLY);
-
-    FormData formData = new FormData();
-    formData.left = new FormAttachment(0);
-    formData.right = new FormAttachment(30, -10);
-    fieldCombo.setLayoutData(formData);
-
+    fieldCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
     fieldCombo.setVisibleItemCount(100);
 
     fFieldViewer = new ComboViewer(fieldCombo);
@@ -230,12 +218,9 @@ public class SearchConditionItem extends Composite {
 
   private void createSpecifierCombo() {
     Combo specifierCombo = new Combo(this, SWT.BORDER | SWT.READ_ONLY);
+    specifierCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
+    ((GridData) specifierCombo.getLayoutData()).widthHint = 80;
     specifierCombo.setVisibleItemCount(100);
-
-    FormData formData = new FormData();
-    formData.left = new FormAttachment(30);
-    formData.right = new FormAttachment(50);
-    specifierCombo.setLayoutData(formData);
 
     fSpecifierViewer = new ComboViewer(specifierCombo);
     fSpecifierViewer.setContentProvider(new ComboContentProvider());
@@ -277,13 +262,8 @@ public class SearchConditionItem extends Composite {
   private void createInputField() {
     fInputFieldContainer = new Composite(this, SWT.None);
     fInputFieldContainer.setLayout(LayoutUtils.createFillLayout(true, 0, 0));
-
-    FormData formData = new FormData();
-    formData.left = new FormAttachment(50, 10);
-    formData.right = new FormAttachment(100);
-    formData.top = new FormAttachment(0);
-    formData.bottom = new FormAttachment(100);
-    fInputFieldContainer.setLayoutData(formData);
+    fInputFieldContainer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    ((GridData) fInputFieldContainer.getLayoutData()).widthHint = 220;
 
     updateInputField(fInputFieldContainer, fCondition.getField(), fCondition.getValue());
 
