@@ -811,6 +811,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private void onSave() {
     List<ISearchCondition> conditions = fSearchConditionList.createConditions();
 
+    /* Add default if empty */
+    if (conditions.isEmpty())
+      conditions.addAll(getDefaultConditions());
+
     SearchMarkDialog dialog = new SearchMarkDialog((Shell) getShell().getParent(), null, null, conditions, fMatchAllRadio.getSelection());
     dialog.open();
   }
