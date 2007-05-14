@@ -744,7 +744,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
         /* Fill Results with Relevance */
         for (SearchHit<NewsReference> searchHit : searchHits) {
 
-          /* Have to test if Entity really exists (bug 173) */
+          /* TODO Have to test if Entity really exists (bug 173) */
           if (!fNewsDao.exists(searchHit.getResult().getId()))
             continue;
 
