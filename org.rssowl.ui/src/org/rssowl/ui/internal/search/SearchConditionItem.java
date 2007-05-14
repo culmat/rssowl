@@ -477,6 +477,8 @@ public class SearchConditionItem extends Composite {
     }
 
     /* Update Layout */
+    inputField.getParent().layout();
+    inputField.getParent().update();
     inputField.layout();
     inputField.update();
   }
