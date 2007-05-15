@@ -79,7 +79,7 @@ public class NewsService {
   private INewsCounterDAO fNewsCounterDao;
 
   /* Subclass of a Progress Monitor Dialog to show progress after a Crash */
-  private class NewsServiceProgressMonitorDialog extends ProgressMonitorDialog {
+  private static class NewsServiceProgressMonitorDialog extends ProgressMonitorDialog {
     NewsServiceProgressMonitorDialog(Shell parent) {
       super(parent);
     }
