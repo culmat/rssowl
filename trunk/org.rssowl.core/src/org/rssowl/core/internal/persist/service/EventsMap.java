@@ -33,43 +33,43 @@ import java.util.List;
 import java.util.Map;
 
 public class EventsMap {
-  
+
   private static final EventsMap INSTANCE = new EventsMap();
-  
+
   private static class InternalMap extends HashMap<Class<? extends ModelEvent>, EventRunnable<? extends ModelEvent>>{
     InternalMap(){
       super();
     }
   }
-  
+
   private ThreadLocal<InternalMap> fEvents = new ThreadLocal<InternalMap>();
 
-  private ThreadLocal<Map<Integer, ModelEvent>> fEventTemplatesMap = 
+  private ThreadLocal<Map<Integer, ModelEvent>> fEventTemplatesMap =
     new ThreadLocal<Map<Integer, ModelEvent>>();
 
   private EventsMap() {
     // Enforce singleton pattern
   }
-  
+
   public final static EventsMap getInstance() {
     return INSTANCE;
   }
-  
+
   public final void putPersistEvent(ModelEvent event) {
     EventRunnable< ? extends ModelEvent> eventRunnable = getEventRunnable(event);
     eventRunnable.addCheckedPersistEvent(event);
   }
-  
+
   public final void putUpdateEvent(ModelEvent event) {
     EventRunnable< ? extends ModelEvent> eventRunnable = getEventRunnable(event);
     eventRunnable.addCheckedUpdateEvent(event);
   }
-  
+
   public final void putRemoveEvent(ModelEvent event) {
     EventRunnable< ? extends ModelEvent> eventRunnable = getEventRunnable(event);
     eventRunnable.addCheckedRemoveEvent(event);
   }
-  
+
   private EventRunnable< ? extends ModelEvent> getEventRunnable(ModelEvent event) {
     InternalMap map = fEvents.get();
     if (map == null) {
@@ -84,29 +84,29 @@ public class EventsMap {
     }
     return eventRunnable;
   }
-  
+
   public EventRunnable<? extends ModelEvent> removeEventRunnable(Class<? extends ModelEvent> klass) {
     InternalMap map = fEvents.get();
     if (map == null)
       return null;
-    
+
     EventRunnable<? extends ModelEvent> runnable = map.remove(klass);
     return runnable;
   }
-  
-  public List<EventRunnable> removeEventRunnables()    {
+
+  public List<EventRunnable<?>> removeEventRunnables()    {
     InternalMap map = fEvents.get();
     if (map == null)
-      return new ArrayList<EventRunnable>(0);
-    
-    List<EventRunnable> eventRunnables = new ArrayList<EventRunnable>(map.size());
+      return new ArrayList<EventRunnable<?>>(0);
+
+    List<EventRunnable<?>> eventRunnables = new ArrayList<EventRunnable<?>>(map.size());
     for (Map.Entry<Class<? extends ModelEvent>, EventRunnable<? extends ModelEvent>> entry : map.entrySet()) {
       eventRunnables.add(entry.getValue());
     }
     map.clear();
     return eventRunnables;
   }
-  
+
   public void putEventTemplate(int id, ModelEvent event) {
     Map<Integer, ModelEvent> map = fEventTemplatesMap.get();
     if (map == null) {
@@ -120,7 +120,7 @@ public class EventsMap {
     Map<Integer, ModelEvent> map = fEventTemplatesMap.get();
     if (map == null)
       return Collections.emptyMap();
-    
+
     return Collections.unmodifiableMap(fEventTemplatesMap.get());
   }
 
