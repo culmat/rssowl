@@ -28,19 +28,21 @@ import org.rssowl.core.persist.MergeCapable;
 /**
  * Contains the details of a complex merge operation. Examples of a complex
  * merge operation are one involving two List of items or two Maps.
+ *
+ * This object is not thread-safe.
+ *
  * @param <T> The type of the merged object.
- * 
  * @see MergeCapable
  * @see MergeResult
  */
-public class ComplexMergeResult<T> extends MergeResult    {
+public final class ComplexMergeResult<T> extends MergeResult    {
 
   private boolean fStructuralChange;
   private final T fMergedObject;
 
   /**
    * Creates an instance of this object and returns it.
-   * 
+   *
    * @param <T> The type of the merged object.
    * @param mergedObject The merged object.
    * @return an instance of this class.
@@ -48,10 +50,10 @@ public class ComplexMergeResult<T> extends MergeResult    {
   public static <T> ComplexMergeResult<T> create(T mergedObject) {
     return new ComplexMergeResult<T>(mergedObject);
   }
-  
+
   /**
    * Creates an instance of this object and returns it.
-   * 
+   *
    * @param <T> The type of the merged object.
    * @param mergedObject The merged object.
    * @param structuralChange Whether a structuralChange took place as a result
@@ -63,11 +65,11 @@ public class ComplexMergeResult<T> extends MergeResult    {
     mergeResult.setStructuralChange(structuralChange);
     return mergeResult;
   }
-  
+
   private ComplexMergeResult(T result) {
     fMergedObject = result;
   }
-  
+
   /**
    * @return <code>true</code> if there was a structural change as part of the
    * merge. An example of a structural change is an item being removed from,
@@ -79,13 +81,13 @@ public class ComplexMergeResult<T> extends MergeResult    {
 
   /**
    * Sets the structuralChange property.
-   * 
+   *
    * @param structuralChange Value of the structuralChange property.
    */
   public final void setStructuralChange(boolean structuralChange) {
     fStructuralChange = structuralChange;
   }
-  
+
   /**
    * @return the merged object.
    */

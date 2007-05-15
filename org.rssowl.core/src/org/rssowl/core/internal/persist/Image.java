@@ -24,6 +24,7 @@
 
 package org.rssowl.core.internal.persist;
 
+import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IImage;
 import org.rssowl.core.util.MergeUtils;
 
@@ -62,7 +63,7 @@ public class Image extends Persistable implements IImage {
   /*
    * @see org.rssowl.core.model.types.IImage#setLink(java.net.URI)
    */
-  public void setLink(URI link) {
+  public synchronized void setLink(URI link) {
     if (link != null)
       fLink = link.toString();
   }
@@ -70,82 +71,82 @@ public class Image extends Persistable implements IImage {
   /*
    * @see org.rssowl.core.model.types.IImage#setTitle(java.lang.String)
    */
-  public void setTitle(String title) {
+  public synchronized void setTitle(String title) {
     fTitle = title;
   }
 
   /*
    * @see org.rssowl.core.model.types.IImage#setHomepage(java.net.URI)
    */
-  public void setHomepage(URI homepage) {
+  public synchronized void setHomepage(URI homepage) {
     fHomepage = getURIText(homepage);
   }
 
   /*
    * @see org.rssowl.core.model.types.IImage#setWidth(int)
    */
-  public void setWidth(int width) {
+  public synchronized void setWidth(int width) {
     fWidth = width;
   }
 
   /*
    * @see org.rssowl.core.model.types.IImage#setHeight(int)
    */
-  public void setHeight(int height) {
+  public synchronized void setHeight(int height) {
     fHeight = height;
   }
 
   /*
    * @see org.rssowl.core.model.types.IImage#setDescription(java.lang.String)
    */
-  public void setDescription(String description) {
+  public synchronized void setDescription(String description) {
     fDescription = description;
   }
 
   /*
    * @see org.rssowl.core.model.types.IImage#getDescription()
    */
-  public String getDescription() {
+  public synchronized String getDescription() {
     return fDescription;
   }
 
   /*
    * @see org.rssowl.core.model.types.IImage#getHeight()
    */
-  public int getHeight() {
+  public synchronized int getHeight() {
     return fHeight;
   }
 
   /*
    * @see org.rssowl.core.model.types.IImage#getHomepage()
    */
-  public URI getHomepage() {
+  public synchronized URI getHomepage() {
     return createURI(fHomepage);
   }
 
   /*
    * @see org.rssowl.core.model.types.IImage#getTitle()
    */
-  public String getTitle() {
+  public synchronized String getTitle() {
     return fTitle;
   }
 
   /*
    * @see org.rssowl.core.model.types.IImage#getLink()
    */
-  public URI getLink() {
+  public synchronized URI getLink() {
     return createURI(fLink);
   }
 
   /*
    * @see org.rssowl.core.model.types.IImage#getWidth()
    */
-  public int getWidth() {
+  public synchronized int getWidth() {
     return fWidth;
   }
 
   @Override
-  public int hashCode() {
+  public synchronized int hashCode() {
     final int PRIME = 31;
     int result = 1;
     result = PRIME * result + ((fDescription == null) ? 0 : fDescription.hashCode());
@@ -158,24 +159,26 @@ public class Image extends Persistable implements IImage {
   }
 
   @Override
-  public boolean equals(Object image) {
+  public synchronized boolean equals(Object image) {
     if (this == image)
       return true;
 
     if (!(image instanceof Image))
       return false;
 
-    Image i = (Image) image;
+    synchronized (image) {
+      Image i = (Image) image;
 
-    return (fLink == null ? i.fLink == null : fLink.equals(i.fLink)) &&
-           (fDescription == null ? i.fDescription == null : fDescription.equals(i.fDescription)) &&
-           fHeight == i.fHeight && fWidth == i.fWidth && (fHomepage == null ? i.fHomepage == null : fHomepage.equals(i.fHomepage)) &&
-           (fTitle == null ? i.fTitle == null : fTitle.equals(i.fTitle));
+      return (fLink == null ? i.fLink == null : fLink.equals(i.fLink)) &&
+          (fDescription == null ? i.fDescription == null : fDescription.equals(i.fDescription)) &&
+          fHeight == i.fHeight && fWidth == i.fWidth && (fHomepage == null ? i.fHomepage == null : fHomepage.equals(i.fHomepage)) &&
+          (fTitle == null ? i.fTitle == null : fTitle.equals(i.fTitle));
+    }
   }
 
   @SuppressWarnings("nls")
   @Override
-  public String toString() {
+  public synchronized String toString() {
     return super.toString() + "Link = " + fLink + ")";
   }
 
@@ -185,7 +188,7 @@ public class Image extends Persistable implements IImage {
    * @return A String describing the state of this Entity.
    */
   @SuppressWarnings("nls")
-  public String toLongString() {
+  public synchronized String toLongString() {
     return super.toString() + "Link = " + fLink + ", Title = " + fTitle + ", Homepage = " + fHomepage + ", Width = " + fWidth + ", Height = " + fHeight + ", Description = " + fDescription + ")";
   }
 
@@ -201,18 +204,21 @@ public class Image extends Persistable implements IImage {
   /*
    * @see org.rssowl.core.model.types.MergeCapable#merge(java.lang.Object)
    */
-  public MergeResult merge(IImage objectToMerge) {
-    boolean updated = !simpleFieldsEqual(objectToMerge);
-    fHeight = objectToMerge.getHeight();
-    setHomepage(objectToMerge.getHomepage());
-    fTitle = objectToMerge.getTitle();
-    setLink(objectToMerge.getLink());
-    fWidth = objectToMerge.getWidth();
-    fDescription = objectToMerge.getDescription();
-    MergeResult mergeResult = new MergeResult();
-    if (updated)
-      mergeResult.addUpdatedObject(this);
+  public synchronized MergeResult merge(IImage objectToMerge) {
+    Assert.isNotNull(objectToMerge);
+    synchronized (objectToMerge) {
+      boolean updated = !simpleFieldsEqual(objectToMerge);
+      fHeight = objectToMerge.getHeight();
+      setHomepage(objectToMerge.getHomepage());
+      fTitle = objectToMerge.getTitle();
+      setLink(objectToMerge.getLink());
+      fWidth = objectToMerge.getWidth();
+      fDescription = objectToMerge.getDescription();
+      MergeResult mergeResult = new MergeResult();
+      if (updated)
+        mergeResult.addUpdatedObject(this);
 
-    return mergeResult;
+      return mergeResult;
+    }
   }
 }

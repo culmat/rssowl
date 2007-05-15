@@ -24,6 +24,7 @@
 
 package org.rssowl.core.internal.persist;
 
+import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.util.MergeUtils;
 
@@ -54,33 +55,33 @@ public class Guid extends Persistable implements IGuid {
   /*
    * @see org.rssowl.core.model.types.IGuid#setValue(java.lang.String)
    */
-  public void setValue(String value) {
+  public synchronized void setValue(String value) {
     fValue = value;
   }
 
   /*
    * @see org.rssowl.core.model.types.IGuid#setPermaLink(boolean)
    */
-  public void setPermaLink(boolean isPermaLink) {
+  public synchronized void setPermaLink(boolean isPermaLink) {
     fIsPermaLink = isPermaLink;
   }
 
   /*
    * @see org.rssowl.core.model.types.IGuid#isPermaLink()
    */
-  public boolean isPermaLink() {
+  public synchronized boolean isPermaLink() {
     return fIsPermaLink;
   }
 
   /*
    * @see org.rssowl.core.model.types.IGuid#getValue()
    */
-  public String getValue() {
+  public synchronized String getValue() {
     return fValue;
   }
 
   @Override
-  public int hashCode() {
+  public synchronized int hashCode() {
     final int PRIME = 31;
     int result = 1;
     result = PRIME * result + (fIsPermaLink ? 1231 : 1237);
@@ -96,36 +97,41 @@ public class Guid extends Persistable implements IGuid {
    * compares all the fields.
    */
   @Override
-  public boolean equals(Object guid) {
+  public synchronized boolean equals(Object guid) {
     if (this == guid)
       return true;
 
     if (!(guid instanceof Guid))
       return false;
 
-    Guid g = (Guid) guid;
+    synchronized (guid) {
+      Guid g = (Guid) guid;
 
-    return (fValue == null ? g.fValue == null : fValue.equals(g.fValue)) && fIsPermaLink == g.isPermaLink();
+      return (fValue == null ? g.fValue == null : fValue.equals(g.fValue)) && fIsPermaLink == g.isPermaLink();
+    }
   }
 
   @Override
   @SuppressWarnings("nls")
-  public String toString() {
+  public synchronized String toString() {
     return super.toString() + "Value = " + fValue + ", IsPermaLink = " + fIsPermaLink + ")";
   }
 
   /*
    * @see org.rssowl.core.model.types.MergeCapable#merge(java.lang.Object)
    */
-  public MergeResult merge(IGuid objectToMerge) {
-    boolean updated = fIsPermaLink != objectToMerge.isPermaLink();
-    fIsPermaLink = objectToMerge.isPermaLink();
-    updated |= !MergeUtils.equals(fValue, objectToMerge.getValue());
-    fValue = objectToMerge.getValue();
-    MergeResult mergeResult = new MergeResult();
-    if (updated)
-      mergeResult.addUpdatedObject(this);
+  public synchronized MergeResult merge(IGuid objectToMerge) {
+    Assert.isNotNull(objectToMerge);
+    synchronized (objectToMerge) {
+      boolean updated = fIsPermaLink != objectToMerge.isPermaLink();
+      fIsPermaLink = objectToMerge.isPermaLink();
+      updated |= !MergeUtils.equals(fValue, objectToMerge.getValue());
+      fValue = objectToMerge.getValue();
+      MergeResult mergeResult = new MergeResult();
+      if (updated)
+        mergeResult.addUpdatedObject(this);
 
-    return mergeResult;
+      return mergeResult;
+    }
   }
 }

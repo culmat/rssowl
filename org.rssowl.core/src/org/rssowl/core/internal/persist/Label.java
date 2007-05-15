@@ -32,7 +32,7 @@ import org.rssowl.core.util.StringUtils;
  * A Label for a News. Some predefined Labels could be "Important", "Work",
  * "Personal", "Todo". Labels should be added by the user and be shown in a
  * custom Color. Labels could also be used to represent AmphetaRate ratings.
- * 
+ *
  * @author bpasero
  */
 public class Label extends AbstractEntity implements ILabel {
@@ -42,7 +42,7 @@ public class Label extends AbstractEntity implements ILabel {
 
   /**
    * Creates a new Element of type Label.
-   * 
+   *
    * @param id The unique ID of this Label.
    * @param name The Name of this Label.
    */
@@ -51,7 +51,7 @@ public class Label extends AbstractEntity implements ILabel {
     Assert.isNotNull(name, "The type Label requires a Name that is not NULL"); //$NON-NLS-1$
     fName = name;
   }
-  
+
   /**
    * Default constructor for deserialization
    */
@@ -62,14 +62,14 @@ public class Label extends AbstractEntity implements ILabel {
   /*
    * @see org.rssowl.core.model.types.impl.ILabel#getColor()
    */
-  public String getColor() {
+  public synchronized String getColor() {
     return fColor;
   }
 
   /*
    * @see org.rssowl.core.model.types.ILabel#setColor(java.lang.String)
    */
-  public void setColor(String color) {
+  public synchronized void setColor(String color) {
     Assert.isLegal(StringUtils.isValidRGB(color), "Color must be using the format \"R,G,B\", for example \"255,255,127\""); //$NON-NLS-1$
     fColor = color;
   }
@@ -77,42 +77,44 @@ public class Label extends AbstractEntity implements ILabel {
   /*
    * @see org.rssowl.core.model.types.impl.ILabel#getName()
    */
-  public String getName() {
+  public synchronized String getName() {
     return fName;
   }
 
   /*
    * @see org.rssowl.core.model.types.ILabel#setName(java.lang.String)
    */
-  public void setName(String name) {
+  public synchronized void setName(String name) {
     Assert.isNotNull(name, "The type Label requires a Name that is not NULL"); //$NON-NLS-1$
     fName = name;
   }
-  
+
   /**
    * Compare the given type with this type for identity.
-   * 
+   *
    * @param label to be compared.
    * @return whether this object and <code>label</code> are identical. It
    * compares all the fields.
    */
-  public boolean isIdentical(ILabel label) {
+  public synchronized boolean isIdentical(ILabel label) {
     if (this == label)
       return true;
 
-    if (label instanceof Label == false)
+    if (!(label instanceof Label))
       return false;
 
-    Label l = (Label) label;
-    
-    return getId() == l.getId() && fName.equals(l.fName) &&
-        (fColor == null ? l.fColor == null : fColor.equals(l.fColor)) && 
-        (getProperties() == null ? l.getProperties() == null : getProperties().equals(l.getProperties()));
+    synchronized (label) {
+      Label l = (Label) label;
+
+      return getId() == l.getId() && fName.equals(l.fName) &&
+          (fColor == null ? l.fColor == null : fColor.equals(l.fColor)) &&
+          (getProperties() == null ? l.getProperties() == null : getProperties().equals(l.getProperties()));
+    }
   }
-  
+
   @Override
   @SuppressWarnings("nls")
-  public String toString() {
+  public synchronized String toString() {
     return super.toString() + "Name = " + fName + ", Color = " + fColor + ")";
   }
 }

@@ -49,7 +49,7 @@ import java.util.List;
  * that matches a certain Link. A Feed is created whenever a
  * <code>BookMark</code> was created on a Link that is not yet present as a
  * Feed in the database.
- * 
+ *
  * @author bpasero
  */
 public class Feed extends AbstractEntity implements IFeed {
@@ -70,14 +70,14 @@ public class Feed extends AbstractEntity implements IFeed {
   private Date fLastModifiedDate;
   private int fTTL;
   private String fFormat;
-  
+
   private String fBaseUri;
 
   private transient URI fLink;
   private String fLinkText;
 
   private IImage fImage;
-  
+
   private IPerson fAuthor;
 
   private List<INews> fNews;
@@ -89,7 +89,7 @@ public class Feed extends AbstractEntity implements IFeed {
    * the GUI by a relation of one to many to Elements of the type
    * <code>BookMark</code>. The id property of the created object will be
    * IExtendableType.NO_ID.
-   * 
+   *
    * @param link The unique Link of this Feed pointing to the location to
    * retrieve <code>News</code>
    */
@@ -101,7 +101,7 @@ public class Feed extends AbstractEntity implements IFeed {
    * Creates a new Element of the type Feed. A Feed is visually represented in
    * the GUI by a relation of one to many to Elements of the type
    * <code>BookMark</code>
-   * 
+   *
    * @param id The unique id of this Feed.
    * @param link The unique Link of this Feed pointing to the location to
    * retrieve <code>News</code>
@@ -155,7 +155,7 @@ public class Feed extends AbstractEntity implements IFeed {
   public synchronized URI getLink() {
     if (fLink == null && fLinkText != null)
       fLink = createURI(fLinkText);
-    
+
     return fLink;
   }
 
@@ -416,7 +416,7 @@ public class Feed extends AbstractEntity implements IFeed {
 
   /**
    * Compare the given type with this type for identity.
-   * 
+   *
    * @param feed to be compared.
    * @return whether this object and <code>feed</code> are identical. It
    * compares all the fields.
@@ -428,28 +428,30 @@ public class Feed extends AbstractEntity implements IFeed {
     if (!(feed instanceof Feed))
       return false;
 
-    Feed f = (Feed) feed;
+    synchronized (feed) {
+      Feed f = (Feed) feed;
 
-    return getId() == f.getId() && (fAuthor == null ? f.fAuthor == null : fAuthor.equals(f.fAuthor)) 
-        && (fCategories == null ? f.fCategories == null : fCategories.equals(f.fCategories))
-        && (fCopyright == null ? f.fCopyright == null : fCopyright.equals(f.fCopyright))
-        && (fDescription == null ? f.fDescription == null : fDescription.equals(f.fDescription))
-        && (getDocs() == null ? f.getDocs() == null : getDocs().equals(f.getDocs()))
-        && (fFormat == null ? f.fFormat == null : fFormat.equals(f.fFormat))
-        && (fGenerator == null ? f.fGenerator == null : fGenerator.equals(f.fGenerator))
-        && (getHomepage() == null ? f.getHomepage() == null : getHomepage().equals(f.getHomepage()))
-        && (getBase() == null ? f.getBase() == null : getBase().equals(f.getBase()))
-        && (fImage == null ? f.fImage == null : fImage.equals(f.fImage))
-        && (fLanguage == null ? f.fLanguage == null : fLanguage.equals(f.fLanguage))
-        && (fLastBuildDate == null ? f.fLastBuildDate == null : fLastBuildDate.equals(f.fLastBuildDate))
-        && (fLastModifiedDate == null ? f.fLastModifiedDate == null : fLastModifiedDate.equals(f.fLastModifiedDate))
-        && (getLink() == null ? f.getLink() == null : getLink().toString().equals(f.getLink() != null ? f.getLink().toString() : null))
-        && (fNews == null ? f.fNews == null : new HashSet<INews>(fNews).equals(new HashSet<INews>(f.fNews)))
-        && (fPublishDate == null ? f.fPublishDate == null : fPublishDate.equals(f.fPublishDate))
-        && (fTitle == null ? f.fTitle == null : fTitle.equals(f.fTitle))
-        && fTTL == f.fTTL
-        && (fWebmaster == null ? f.fWebmaster == null : fWebmaster.equals(f.fWebmaster))
-        && (getProperties() == null ? f.getProperties() == null : getProperties().equals(f.getProperties()));
+      return getId() == f.getId() && (fAuthor == null ? f.fAuthor == null : fAuthor.equals(f.fAuthor))
+          && (fCategories == null ? f.fCategories == null : fCategories.equals(f.fCategories))
+          && (fCopyright == null ? f.fCopyright == null : fCopyright.equals(f.fCopyright))
+          && (fDescription == null ? f.fDescription == null : fDescription.equals(f.fDescription))
+          && (getDocs() == null ? f.getDocs() == null : getDocs().equals(f.getDocs()))
+          && (fFormat == null ? f.fFormat == null : fFormat.equals(f.fFormat))
+          && (fGenerator == null ? f.fGenerator == null : fGenerator.equals(f.fGenerator))
+          && (getHomepage() == null ? f.getHomepage() == null : getHomepage().equals(f.getHomepage()))
+          && (getBase() == null ? f.getBase() == null : getBase().equals(f.getBase()))
+          && (fImage == null ? f.fImage == null : fImage.equals(f.fImage))
+          && (fLanguage == null ? f.fLanguage == null : fLanguage.equals(f.fLanguage))
+          && (fLastBuildDate == null ? f.fLastBuildDate == null : fLastBuildDate.equals(f.fLastBuildDate))
+          && (fLastModifiedDate == null ? f.fLastModifiedDate == null : fLastModifiedDate.equals(f.fLastModifiedDate))
+          && (getLink() == null ? f.getLink() == null : getLink().toString().equals(f.getLink() != null ? f.getLink().toString() : null))
+          && (fNews == null ? f.fNews == null : new HashSet<INews>(fNews).equals(new HashSet<INews>(f.fNews)))
+          && (fPublishDate == null ? f.fPublishDate == null : fPublishDate.equals(f.fPublishDate))
+          && (fTitle == null ? f.fTitle == null : fTitle.equals(f.fTitle))
+          && fTTL == f.fTTL
+          && (fWebmaster == null ? f.fWebmaster == null : fWebmaster.equals(f.fWebmaster))
+          && (getProperties() == null ? f.getProperties() == null : getProperties().equals(f.getProperties()));
+    }
   }
 
   @SuppressWarnings("nls")
@@ -468,7 +470,7 @@ public class Feed extends AbstractEntity implements IFeed {
 
   /**
    * Returns a String describing the state of this Entity.
-   * 
+   *
    * @return A String describing the state of this Entity.
    */
   @SuppressWarnings("nls")
@@ -711,14 +713,17 @@ public class Feed extends AbstractEntity implements IFeed {
    */
   public void setUpdatePeriod(int updatePeriod) {}
 
-  public MergeResult mergeAndCleanUp(IFeed objectToMerge) {
-    return merge(objectToMerge, true);
+  public synchronized MergeResult mergeAndCleanUp(IFeed objectToMerge) {
+    Assert.isNotNull(objectToMerge);
+    synchronized (objectToMerge) {
+      return merge(objectToMerge, true);
+    }
   }
 
   private MergeResult merge(IFeed objectToMerge, boolean cleanUp) {
     Assert.isLegal(getLink().toString().equals(objectToMerge.getLink().toString()),
         "Only feeds with the same link can be merged."); //$NON-NLS-1$
-    
+
     MergeResult result = new MergeResult();
     boolean updated = processListMergeResult(result, mergeNews(objectToMerge.getNews(), cleanUp));
     updated |= processListMergeResult(result, mergeCategories(objectToMerge.getCategories()));
@@ -740,7 +745,7 @@ public class Feed extends AbstractEntity implements IFeed {
     fTitle = objectToMerge.getTitle();
     fTTL = objectToMerge.getTTL();
     fWebmaster = objectToMerge.getWebmaster();
-    
+
     ComplexMergeResult<?> propertiesResult = MergeUtils.mergeProperties(this, objectToMerge);
     if (updated || propertiesResult.isStructuralChange()) {
       result.addUpdatedObject(this);
@@ -768,7 +773,9 @@ public class Feed extends AbstractEntity implements IFeed {
 
   public synchronized MergeResult merge(IFeed objectToMerge) {
     Assert.isNotNull(objectToMerge);
-    return merge(objectToMerge, false);
+    synchronized (objectToMerge) {
+      return merge(objectToMerge, false);
+    }
   }
 
   private ComplexMergeResult<IPerson> mergeAuthor(IPerson author) {
@@ -786,7 +793,7 @@ public class Feed extends AbstractEntity implements IFeed {
         }
         return -1;
       }
-      
+
     };
     ComplexMergeResult<List<ICategory>> mergeResult = MergeUtils.merge(fCategories, categories, comparator, null);
     fCategories = mergeResult.getMergedObject();
@@ -815,7 +822,7 @@ public class Feed extends AbstractEntity implements IFeed {
         newsListCopy.remove(existingNewsIndex);
       } else if ((newsToCleanUp != null) && (existingNews.getState() == INews.State.DELETED))
         newsToCleanUp.add(Integer.valueOf(i));
-    
+
     }
     if (newsToCleanUp != null) {
       for (int i = newsToCleanUp.size() - 1; i >= 0; --i) {
@@ -823,7 +830,7 @@ public class Feed extends AbstractEntity implements IFeed {
         mergeResult.addRemovedObject(news);
         mergeResult.setStructuralChange(true);
       }
-      
+
     }
     for (INews news : newsListCopy) {
       news.setParent(this);
@@ -833,7 +840,7 @@ public class Feed extends AbstractEntity implements IFeed {
     }
     return mergeResult;
   }
-  
+
   private List<INews> copyWithoutDuplicates(List<INews> newsList) {
     List<INews> newsListCopy = new ArrayList<INews>(newsList.size());
     for (INews outerNews : newsList) {

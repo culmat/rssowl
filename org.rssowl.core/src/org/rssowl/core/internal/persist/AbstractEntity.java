@@ -54,14 +54,14 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
   /*
    * @see org.rssowl.core.model.types.IEntity#getId()
    */
-  public Long getId() {
+  public synchronized Long getId() {
     return fId;
   }
 
   /*
    * @see org.rssowl.core.model.types.IEntity#setId(java.lang.Long)
    */
-  public void setId(Long id) {
+  public synchronized void setId(Long id) {
     Assert.isNotNull(id, "id cannot be null"); //$NON-NLS-1$
     if (id.equals(fId))
       return;
@@ -85,50 +85,50 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
    * classes, for instance "org.yourproject.yourpackage.YourProperty" in order
    * to avoid overriding another key that was set by a different person.
    * </p>
-   * 
+   *
    * @param key The unique identifier of the Property.
    * @param value The value of the Property.
    * @see org.rssowl.core.persist.IEntity#setProperty(java.lang.String,
    * java.lang.Object)
    */
-  public void setProperty(String key, Object value) {
+  public synchronized void setProperty(String key, Object value) {
     Assert.isNotNull(key, "Using NULL as Key is not permitted!"); //$NON-NLS-1$
     if (fProperties == null)
       fProperties = new HashMap<String, Serializable>();
-  
+
     /* Ignore any value not being a subtype of Serializable */
     if (value instanceof Serializable)
       fProperties.put(key, (Serializable) value);
   }
 
-  public Object getProperty(String key) {
+  public synchronized Object getProperty(String key) {
     Assert.isNotNull(key, "Using NULL as Key is not permitted!"); //$NON-NLS-1$
     if (fProperties == null)
       return null;
-  
+
     return fProperties.get(key);
   }
 
-  public Object removeProperty(String key) {
+  public synchronized Object removeProperty(String key) {
     Assert.isNotNull(key, "Using NULL as Key is not permitted!"); //$NON-NLS-1$
     if (fProperties == null)
       return null;
-  
+
     return fProperties.remove(key);
   }
 
-  public Map<String, ? > getProperties() {
+  public synchronized Map<String, ? > getProperties() {
     if (fProperties == null)
       return Collections.emptyMap();
-  
+
     return Collections.unmodifiableMap(fProperties);
   }
-  
+
   /*
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
-  public boolean equals(Object obj) {
+  public synchronized boolean equals(Object obj) {
     if (this == obj)
       return true;
 
@@ -146,7 +146,7 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
    * @see java.lang.Object#hashCode()
    */
   @Override
-  public int hashCode() {
+  public synchronized int hashCode() {
     if (fId == null)
       return super.hashCode();
 
@@ -158,7 +158,7 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
    */
   @Override
   @SuppressWarnings("nls")
-  public String toString() {
+  public synchronized String toString() {
     String name = super.toString();
     int index = name.lastIndexOf('.');
     if (index != -1)

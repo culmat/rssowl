@@ -24,6 +24,7 @@
 
 package org.rssowl.core.internal.persist;
 
+import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.util.MergeUtils;
 
@@ -59,14 +60,14 @@ public class Source extends Persistable implements ISource {
   /*
    * @see org.rssowl.core.model.types.ISource#setName(java.lang.String)
    */
-  public void setName(String name) {
+  public synchronized void setName(String name) {
     fName = name;
   }
 
   /*
    * @see org.rssowl.core.model.types.ISource#setLink(java.net.URI)
    */
-  public void setLink(URI link) {
+  public synchronized void setLink(URI link) {
     if (link != null)
       fLink = link.toString();
   }
@@ -74,33 +75,35 @@ public class Source extends Persistable implements ISource {
   /*
    * @see org.rssowl.core.model.types.ISource#getName()
    */
-  public String getName() {
+  public synchronized String getName() {
     return fName;
   }
 
   /*
    * @see org.rssowl.core.model.types.ISource#getLink()
    */
-  public URI getLink() {
+  public synchronized URI getLink() {
     return createURI(fLink);
   }
 
   @Override
-  public boolean equals(Object source) {
+  public synchronized boolean equals(Object source) {
     if (this == source)
       return true;
 
     if (!(source instanceof Source))
       return false;
 
-    Source s = (Source) source;
+    synchronized (source) {
+      Source s = (Source) source;
 
-    return (fLink == null ? s.fLink == null : getLink().equals(s.getLink())) &&
-        (fName == null ? s.fName == null : fName.equals(s.fName));
+      return (fLink == null ? s.fLink == null : getLink().equals(s.getLink())) &&
+          (fName == null ? s.fName == null : fName.equals(s.fName));
+    }
   }
 
   @Override
-  public int hashCode() {
+  public synchronized int hashCode() {
     final int PRIME = 31;
     int result = 1;
     result = PRIME * result + ((fName == null) ? 0 : fName.hashCode());
@@ -110,20 +113,23 @@ public class Source extends Persistable implements ISource {
 
   @Override
   @SuppressWarnings("nls")
-  public String toString() {
+  public synchronized String toString() {
     return super.toString() + "Link = " + fLink + ", Name = " + fName + ")";
   }
 
-  public MergeResult merge(ISource objectToMerge) {
-    boolean updated = !MergeUtils.equals(fName, objectToMerge.getName());
-    fName = objectToMerge.getName();
-    updated |= !MergeUtils.equals(getLink(), objectToMerge.getLink());
-    setLink(objectToMerge.getLink());
+  public synchronized MergeResult merge(ISource objectToMerge) {
+    Assert.isNotNull(objectToMerge);
+    synchronized (objectToMerge) {
+      boolean updated = !MergeUtils.equals(fName, objectToMerge.getName());
+      fName = objectToMerge.getName();
+      updated |= !MergeUtils.equals(getLink(), objectToMerge.getLink());
+      setLink(objectToMerge.getLink());
 
-    MergeResult mergeResult = new MergeResult();
-    if (updated)
-      mergeResult.addUpdatedObject(this);
+      MergeResult mergeResult = new MergeResult();
+      if (updated)
+        mergeResult.addUpdatedObject(this);
 
-    return mergeResult;
+      return mergeResult;
+    }
   }
 }

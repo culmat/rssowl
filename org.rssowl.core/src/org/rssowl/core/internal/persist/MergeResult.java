@@ -36,11 +36,13 @@ import java.util.Set;
  * Contains the details of a merge operation. This can be useful
  * to only perform persistence related operations on the objects that
  * have changed as part of the merge.
- * 
+ *
+ * This object is not thread-safe.
+ *
  * @see MergeCapable
  */
 public class MergeResult {
-  
+
   private Set<Object> fRemovedObjects;
   private Set<Object> fUpdatedObjects;
 
@@ -53,7 +55,7 @@ public class MergeResult {
 
   /**
    * Returns a set of objects that were removed as part of a merge operation.
-   * 
+   *
    * @return Set of objects.
    */
   public final Set<Object> getRemovedObjects() {
@@ -66,7 +68,7 @@ public class MergeResult {
   /**
    * Returns a set of objects that were added or updated as part of a merge
    * operation.
-   * 
+   *
    * @return Set of objects.
    */
   public final Set<Object> getUpdatedObjects() {
@@ -78,7 +80,7 @@ public class MergeResult {
 
   /**
    * Adds all of the contents of <code>mergeResult</code> into this object.
-   * 
+   *
    * @param mergeResult MergeResult to copy all items from.
    */
   public final void addAll(MergeResult mergeResult) {
@@ -98,13 +100,13 @@ public class MergeResult {
 
   /**
    * Adds an object that was added or updated as part of a merge operation.
-   * 
+   *
    * @param object Object to add.
    */
   public final void addUpdatedObject(Object object) {
     if (getRemovedObjects().contains(object))
       return;
-    
+
     if (fUpdatedObjects == null)
       fUpdatedObjects = new HashSet<Object>(3);
 
@@ -119,7 +121,7 @@ public class MergeResult {
 
   /**
    * Adds an object that was removed as part of a merge operation.
-   * 
+   *
    * @param object Object to be added.
    */
   public final void addRemovedObject(Object object) {
@@ -129,7 +131,7 @@ public class MergeResult {
 
     if (getUpdatedObjects().contains(object))
       fUpdatedObjects.remove(object);
-    
+
     fRemovedObjects.add(object);
   }
 
