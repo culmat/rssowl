@@ -94,11 +94,13 @@ public final class DynamicDAO {
     return persistablesMap;
   }
 
+  @SuppressWarnings("unchecked")
   public static <T extends IPersistable> void delete(T persistable) {
     IPersistableDAO<T> dao = (IPersistableDAO<T>) getDAOFromPersistable(persistable.getClass());
     dao.delete(persistable);
   }
 
+  @SuppressWarnings("unchecked")
   public static <T extends IPersistable> void deleteAll(Collection<T> persistables) {
     if (persistables.size() == 0)
       return;
