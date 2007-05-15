@@ -40,7 +40,7 @@ public class ConditionalGet extends Persistable implements IConditionalGet {
 
   /**
    * Creates an instance of this object.
-   * 
+   *
    * @param ifModifiedSince the If-Modified Header to be sent as
    * If-Modified-Since Request Header.
    * @param link the link that this object refers to.
@@ -72,7 +72,7 @@ public class ConditionalGet extends Persistable implements IConditionalGet {
   /*
    * @see org.rssowl.core.model.internal.db4o.IConditionalGet#getFeedLink()
    */
-  public URI getLink() {
+  public synchronized URI getLink() {
     try {
       return new URI(fLink);
     } catch (URISyntaxException e) {
@@ -83,18 +83,18 @@ public class ConditionalGet extends Persistable implements IConditionalGet {
   /*
    * @see org.rssowl.core.model.internal.db4o.IConditionalGet#getIfModifiedSince()
    */
-  public String getIfModifiedSince() {
+  public synchronized String getIfModifiedSince() {
     return fIfModifiedSince;
   }
 
   /*
    * @see org.rssowl.core.model.internal.db4o.IConditionalGet#getIfNoneMatch()
    */
-  public String getIfNoneMatch() {
+  public synchronized String getIfNoneMatch() {
     return fIfNoneMatch;
   }
 
-  public void setHeaders(String ifModifiedSince, String ifNoneMatch) {
+  public synchronized void setHeaders(String ifModifiedSince, String ifNoneMatch) {
     internalSetHeaders(ifModifiedSince, ifNoneMatch);
   }
 }

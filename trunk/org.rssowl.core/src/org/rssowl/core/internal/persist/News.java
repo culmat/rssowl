@@ -47,7 +47,7 @@ import java.util.List;
 
 /**
  * A News is a single entry inside a Feed. The attributes IsRead, IsNew and
- * IsDeleted describe the lifecycle of a News:
+ * IsDeleted describe the life-cycle of a News:
  * <ul>
  * <li>IsRead: The News has been marked read</li>
  * <li>IsNew: The News has not been read and was not yet looked at</li>
@@ -332,7 +332,7 @@ public class News extends AbstractEntity implements INews {
   /*
    * @see org.rssowl.core.model.types.INews#setInReplyTo(java.lang.String)
    */
-  public void setInReplyTo(String guid) {
+  public synchronized void setInReplyTo(String guid) {
     fInReplyTo = guid;
   }
 
@@ -473,7 +473,7 @@ public class News extends AbstractEntity implements INews {
   /*
    * @see org.rssowl.core.model.types.INews#getInReplyTo()
    */
-  public String getInReplyTo() {
+  public synchronized String getInReplyTo() {
     return fInReplyTo;
   }
 
@@ -552,18 +552,14 @@ public class News extends AbstractEntity implements INews {
    * @param news
    * @return whether <code>news</code> is identical to this object.
    */
-  //TODO Consider not casting to News since this is now part of INews.
   public synchronized boolean isIdentical(INews news) {
-    if (news == null)
+    if (this == news)
+      return true;
+
+    if (!(news instanceof News))
       return false;
 
     synchronized (news) {
-      if (this == news)
-        return true;
-
-      if (news instanceof News == false)
-        return false;
-
       News n = (News) news;
 
       return getId().equals(n.getId()) &&

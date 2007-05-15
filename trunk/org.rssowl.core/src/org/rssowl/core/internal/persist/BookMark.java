@@ -37,7 +37,7 @@ import java.net.URISyntaxException;
  * to define a position for a <code>Feed</code> inside the hierarchy of
  * Folders. The user may define some properties, e.g. how often to reload the
  * related Feed.
- * 
+ *
  * @author bpasero
  */
 public class BookMark extends Mark implements IBookMark {
@@ -47,9 +47,9 @@ public class BookMark extends Mark implements IBookMark {
 
   /**
    * Creates a new Element of the type BookMark. A BookMark is only visually
-   * representated in case it was added to a Folder. Make sure to add it to a
+   * represented in case it was added to a Folder. Make sure to add it to a
    * Folder using <code>Folder#addMark(Mark)</code>
-   * 
+   *
    * @param id The unique ID of this type.
    * @param folder The Folder this BookMark belongs to.
    * @param feedRef The reference to the feed this BookMark is related to.
@@ -72,21 +72,21 @@ public class BookMark extends Mark implements IBookMark {
   /*
    * @see org.rssowl.core.model.types.IFeed#isErrorLoading()
    */
-  public boolean isErrorLoading() {
+  public synchronized boolean isErrorLoading() {
     return fIsErrorLoading;
   }
 
   /*
    * @see org.rssowl.core.model.types.IFeed#setErrorLoading(boolean)
    */
-  public void setErrorLoading(boolean isErrorLoading) {
+  public synchronized void setErrorLoading(boolean isErrorLoading) {
     fIsErrorLoading = isErrorLoading;
   }
 
   /*
    * @see org.rssowl.core.model.types.IBookMark#getFeedLinkReference()
    */
-  public FeedLinkReference getFeedLinkReference() {
+  public synchronized FeedLinkReference getFeedLinkReference() {
     if (fFeedLinkReference == null) {
       try {
         fFeedLinkReference = new FeedLinkReference(new URI(fFeedLink));
@@ -100,7 +100,7 @@ public class BookMark extends Mark implements IBookMark {
   /*
    * @see org.rssowl.core.model.types.IBookMark#setFeedLinkReference(org.rssowl.core.model.reference.FeedLinkReference)
    */
-  public void setFeedLinkReference(FeedLinkReference feedLinkRef) {
+  public synchronized void setFeedLinkReference(FeedLinkReference feedLinkRef) {
     Assert.isNotNull(feedLinkRef, "link cannot be null"); //$NON-NLS-1$
     fFeedLinkReference = feedLinkRef;
     fFeedLink = feedLinkRef.getLink().toString();
@@ -108,39 +108,41 @@ public class BookMark extends Mark implements IBookMark {
 
   /**
    * Compare the given type with this type for identity.
-   * 
+   *
    * @param bookMark to be compared.
    * @return whether this object and <code>bookMark</code> are identical. It
    * compares all the fields.
    */
-  public boolean isIdentical(IBookMark bookMark) {
+  public synchronized boolean isIdentical(IBookMark bookMark) {
     if (this == bookMark)
       return true;
 
-    if (bookMark instanceof BookMark == false)
+    if (!(bookMark instanceof BookMark))
       return false;
 
-    BookMark b = (BookMark) bookMark;
-    
-    return getId() == b.getId() &&
-        (getParent() == null ? b.getParent() == null : getParent().equals(b.getParent())) &&
-        (getCreationDate() == null ? b.getCreationDate() == null : getCreationDate().equals(b.getCreationDate())) &&
-        (getName() == null ? b.getName() == null : getName().equals(b.getName())) &&
-        (getLastVisitDate() == null ? b.getLastVisitDate() == null : getLastVisitDate().equals(b.getLastVisitDate())) &&
-        getPopularity() == b.getPopularity() &&
-        fIsErrorLoading == b.fIsErrorLoading &&
-        (getProperties() == null ? b.getProperties() == null : getProperties().equals(b.getProperties()));
+    synchronized (bookMark) {
+      BookMark b = (BookMark) bookMark;
+
+      return getId() == b.getId() &&
+          (getParent() == null ? b.getParent() == null : getParent().equals(b.getParent())) &&
+          (getCreationDate() == null ? b.getCreationDate() == null : getCreationDate().equals(b.getCreationDate())) &&
+          (getName() == null ? b.getName() == null : getName().equals(b.getName())) &&
+          (getLastVisitDate() == null ? b.getLastVisitDate() == null : getLastVisitDate().equals(b.getLastVisitDate())) &&
+          getPopularity() == b.getPopularity() &&
+          fIsErrorLoading == b.fIsErrorLoading &&
+          (getProperties() == null ? b.getProperties() == null : getProperties().equals(b.getProperties()));
+    }
   }
 
   @SuppressWarnings("nls")
   @Override
-  public String toLongString() {
+  public synchronized String toLongString() {
     return super.toString() + ", Is Error Loading: " + fIsErrorLoading + ", Belongs " + "to Feed = " + fFeedLink + ")";
   }
 
   @Override
   @SuppressWarnings("nls")
-  public String toString() {
+  public synchronized String toString() {
     return super.toString() + "Belongs to Feed = " + fFeedLink + ")";
   }
 }

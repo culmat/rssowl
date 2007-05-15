@@ -36,7 +36,7 @@ import java.util.Date;
  * The abstract super-type of <code>BookMark</code> and
  * <code>SearchMark</code>. Used to associate Bookmarks and Searchmarks with
  * a Folder. These Elements are considered to be leaves of the Tree.
- * 
+ *
  * @author bpasero
  */
 public abstract class Mark extends AbstractEntity implements IMark {
@@ -48,14 +48,14 @@ public abstract class Mark extends AbstractEntity implements IMark {
   private int fPopularity;
 
   private IFolder fParent;
-  
+
   //FIXME Remove after M6
   @SuppressWarnings("unused")
   private IFolder fFolder;
 
   /**
    * Store ID, Name and Folder for this Mark.
-   * 
+   *
    * @param id The unique id of this type.
    * @param parent The Folder this Mark belongs to.
    * @param name The Name of this Mark.
@@ -78,65 +78,65 @@ public abstract class Mark extends AbstractEntity implements IMark {
   /*
    * @see org.rssowl.core.model.types.IFeed#getLastVisitDate()
    */
-  public Date getLastVisitDate() {
+  public synchronized Date getLastVisitDate() {
     return fLastVisitDate;
   }
 
   /*
    * @see org.rssowl.core.model.types.IFeed#setLastVisitDate(java.util.Date)
    */
-  public void setLastVisitDate(Date lastVisitDate) {
+  public synchronized void setLastVisitDate(Date lastVisitDate) {
     fLastVisitDate = lastVisitDate;
   }
 
   /*
    * @see org.rssowl.core.model.types.IFeed#getPopularity()
    */
-  public int getPopularity() {
+  public synchronized int getPopularity() {
     return fPopularity;
   }
 
   /*
    * @see org.rssowl.core.model.types.IFeed#setPopularity(int)
    */
-  public void setPopularity(int popularity) {
+  public synchronized void setPopularity(int popularity) {
     fPopularity = popularity;
   }
 
   /*
    * @see org.rssowl.core.model.types.IMark#getCreationDate()
    */
-  public Date getCreationDate() {
+  public synchronized Date getCreationDate() {
     return fCreationDate;
   }
 
   /*
    * @see org.rssowl.core.model.types.IMark#setCreationDate(java.util.Date)
    */
-  public void setCreationDate(Date creationDate) {
+  public synchronized void setCreationDate(Date creationDate) {
     fCreationDate = creationDate;
   }
 
   /*
    * @see org.rssowl.core.model.types.IMark#getName()
    */
-  public String getName() {
+  public synchronized String getName() {
     return fName;
   }
 
   /*
    * @see org.rssowl.core.model.types.IMark#setName(java.lang.String)
    */
-  public void setName(String name) {
+  public synchronized void setName(String name) {
     Assert.isNotNull(name, "The type Mark requires a Name that is not NULL"); //$NON-NLS-1$
     fName = name;
   }
 
-  public IFolder getParent() {
+  public synchronized IFolder getParent() {
     return fParent;
   }
-  
-  public void setParent(IFolder parent) {
+
+  public synchronized void setParent(IFolder parent) {
     Assert.isNotNull(parent, "parent");
     fParent = parent;
   }
@@ -147,20 +147,20 @@ public abstract class Mark extends AbstractEntity implements IMark {
   protected FolderReference getFolderReference() {
     return getParent() == null ? null : new FolderReference(getParent().getId());
   }
-  
+
   @Override
   @SuppressWarnings("nls")
-  public String toString() {
+  public synchronized String toString() {
     return super.toString() + "Name = " + fName + ", ";
   }
 
   /**
    * Returns a String describing the state of this Entity.
-   * 
+   *
    * @return A String describing the state of this Entity.
    */
   @SuppressWarnings("nls")
-  public String toLongString() {
+  public synchronized String toLongString() {
     String retValue = super.toString() + "Name = " + fName + ", Creation Date = " + fCreationDate + ", Popularity: " + getPopularity();
     if (getLastVisitDate() != null)
       retValue = retValue + (DateFormat.getDateTimeInstance().format(getLastVisitDate()));

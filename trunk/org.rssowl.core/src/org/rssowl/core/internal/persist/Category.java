@@ -56,28 +56,28 @@ public class Category extends AbstractEntity implements ICategory {
   /*
    * @see org.rssowl.core.model.types.ICategory#setName(java.lang.String)
    */
-  public void setName(String name) {
+  public synchronized void setName(String name) {
     fName = name;
   }
 
   /*
    * @see org.rssowl.core.model.types.ICategory#setDomain(java.lang.String)
    */
-  public void setDomain(String domain) {
+  public synchronized void setDomain(String domain) {
     fDomain = domain;
   }
 
   /*
    * @see org.rssowl.core.model.types.ICategory#getDomain()
    */
-  public String getDomain() {
+  public synchronized String getDomain() {
     return fDomain;
   }
 
   /*
    * @see org.rssowl.core.model.types.ICategory#getName()
    */
-  public String getName() {
+  public synchronized String getName() {
     return fName;
   }
 
@@ -88,25 +88,27 @@ public class Category extends AbstractEntity implements ICategory {
    * @return whether this object and <code>category</code> are identical. It
    * compares all the fields.
    */
-  public boolean isIdentical(ICategory category) {
+  public synchronized boolean isIdentical(ICategory category) {
     if (category == this)
       return true;
 
-    if (category instanceof Category == false)
+    if (!(category instanceof Category))
       return false;
 
-    Category c = (Category) category;
+    synchronized (category) {
+      Category c = (Category) category;
 
-    return getId() == c.getId()
-        && (fDomain == null ? c.fDomain == null : fDomain.equals(c.fDomain))
-        && fName.equals(c.fName)
-        && (getProperties() == null ? c.getProperties() == null :
-          getProperties().equals(c.getProperties()));
+      return getId() == c.getId()
+          && (fDomain == null ? c.fDomain == null : fDomain.equals(c.fDomain))
+          && fName.equals(c.fName)
+          && (getProperties() == null ? c.getProperties() == null :
+              getProperties().equals(c.getProperties()));
+    }
   }
 
   @SuppressWarnings("nls")
   @Override
-  public String toString() {
+  public synchronized String toString() {
     return super.toString() + "Name = " + fName + ")";
   }
 
@@ -116,22 +118,24 @@ public class Category extends AbstractEntity implements ICategory {
    * @return A String describing the state of this Entity.
    */
   @SuppressWarnings("nls")
-  public String toLongString() {
+  public synchronized String toLongString() {
     return super.toString() + "Name = " + fName + ", Domain = " + fDomain + ")";
   }
 
-  public MergeResult merge(ICategory objectToMerge) {
+  public synchronized MergeResult merge(ICategory objectToMerge) {
     Assert.isNotNull(objectToMerge, "objectToMerge");
-    boolean updated = false;
-    updated |= !MergeUtils.equals(fDomain, objectToMerge.getDomain());
-    fDomain = objectToMerge.getDomain();
-    updated |= !MergeUtils.equals(fName, objectToMerge.getName());
-    fName = objectToMerge.getName();
-    MergeUtils.mergeProperties(this, objectToMerge);
-    ComplexMergeResult<?> result = MergeUtils.mergeProperties(this, objectToMerge);
-    if (updated || result.isStructuralChange())
-      result.addUpdatedObject(this);
+    synchronized (objectToMerge) {
+      boolean updated = false;
+      updated |= !MergeUtils.equals(fDomain, objectToMerge.getDomain());
+      fDomain = objectToMerge.getDomain();
+      updated |= !MergeUtils.equals(fName, objectToMerge.getName());
+      fName = objectToMerge.getName();
+      MergeUtils.mergeProperties(this, objectToMerge);
+      ComplexMergeResult<?> result = MergeUtils.mergeProperties(this, objectToMerge);
+      if (updated || result.isStructuralChange())
+        result.addUpdatedObject(this);
 
-    return result;
+      return result;
+    }
   }
 }

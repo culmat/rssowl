@@ -91,14 +91,14 @@ public class SearchValueType implements ISearchValueType {
   /*
    * @see org.rssowl.core.model.search.ISearchValueType#getSearchValueType()
    */
-  public int getId() {
+  public synchronized int getId() {
     return fType;
   }
 
   /*
    * @see org.rssowl.core.model.search.ISearchValueType#getEnumValues()
    */
-  public List<String> getEnumValues() {
+  public synchronized List<String> getEnumValues() {
     return fEnumValues;
   }
 
@@ -125,25 +125,27 @@ public class SearchValueType implements ISearchValueType {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public synchronized boolean equals(Object obj) {
     if (this == obj)
       return true;
 
     if ((obj == null) || (obj.getClass() != getClass()))
       return false;
 
-    SearchValueType s = (SearchValueType) obj;
+    synchronized (obj) {
+      SearchValueType s = (SearchValueType) obj;
 
-    /* Compare Enum of Values if types are ENUM */
-    if (fType == ENUM && s.fType == ENUM)
-      return fEnumValues.equals(s.fEnumValues);
+      /* Compare Enum of Values if types are ENUM */
+      if (fType == ENUM && s.fType == ENUM)
+        return fEnumValues.equals(s.fEnumValues);
 
-    /* Compare Type */
-    return fType == s.fType;
+      /* Compare Type */
+      return fType == s.fType;
+    }
   }
 
   @Override
-  public int hashCode() {
+  public synchronized int hashCode() {
     if (fType != ENUM)
       return ((fType * getClass().hashCode() + 17)) * 37;
     return fEnumValues.hashCode();
@@ -151,7 +153,7 @@ public class SearchValueType implements ISearchValueType {
 
   @Override
   @SuppressWarnings("nls")
-  public String toString() {
+  public synchronized String toString() {
     String type;
     switch (fType) {
       case ISearchValueType.BOOLEAN:

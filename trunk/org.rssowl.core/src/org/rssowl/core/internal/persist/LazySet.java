@@ -29,6 +29,7 @@ import org.rssowl.core.persist.IEntity;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -38,7 +39,7 @@ public final class LazySet<E extends IEntity> implements Set<E>   {
 
   private final Set<Long> fIds;
   private final ObjectContainer fObjectContainer;
-  
+
   public LazySet(ObjectSet<? extends E> entities, ObjectContainer objectContainer) {
     Assert.isNotNull(entities, "entities");
     Assert.isNotNull(objectContainer, "objectContainer");
@@ -49,13 +50,13 @@ public final class LazySet<E extends IEntity> implements Set<E>   {
     }
     fObjectContainer = objectContainer;
   }
-  
+
   public Object[] toArray() {
     Object[] array = new Object[size()];
     int index = 0;
     for (E e : this)
       array[index++] = e;
-    
+
     return array;
   }
 
@@ -64,15 +65,15 @@ public final class LazySet<E extends IEntity> implements Set<E>   {
     int size = size();
     T[] array = a;
     if (a.length < size)
-      array = (T[]) java.lang.reflect.Array.newInstance(a.getClass().getComponentType(), size);
-    
+      array = (T[]) Array.newInstance(a.getClass().getComponentType(), size);
+
     int index = 0;
     for (E e : this)
       array[index++] = (T) e;
-    
+
     return array;
   }
-  
+
   public Iterator<E> iterator() {
     return new Iterator<E>() {
       private Iterator<Long> fDelegateIterator = fIds.iterator();
@@ -92,7 +93,7 @@ public final class LazySet<E extends IEntity> implements Set<E>   {
       }
     };
   }
-  
+
   public boolean add(E e) {
     throw new UnsupportedOperationException();
   }

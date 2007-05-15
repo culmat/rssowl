@@ -56,7 +56,7 @@ import java.util.List;
  * <p>
  * A call to <code>getSearchValueType()</code> will give Information of the
  * data-type the field is using. This information can be used for validating the
- * search-value and to perform the search in the persistance layer.
+ * search-value and to perform the search in the persistence layer.
  * </p>
  *
  * @author bpasero
@@ -90,21 +90,21 @@ public class SearchField implements ISearchField {
   /*
    * @see org.rssowl.core.model.search.ISearchField#getField()
    */
-  public int getId() {
+  public synchronized int getId() {
     return fField;
   }
 
   /*
    * @see org.rssowl.core.model.search.ISearchField#getEntityName()
    */
-  public String getEntityName() {
+  public synchronized String getEntityName() {
     return fEntityName;
   }
 
   /*
    * @see org.rssowl.core.model.search.ISearchField#getName()
    */
-  public String getName() {
+  public synchronized String getName() {
 
     /* Field from the Type IAttachment */
     if (fEntityName.equals(IAttachment.class.getName())) {
@@ -305,7 +305,7 @@ public class SearchField implements ISearchField {
   /*
    * @see org.rssowl.core.model.search.ISearchField#getAllowedSearchTerm()
    */
-  public ISearchValueType getSearchValueType() {
+  public synchronized ISearchValueType getSearchValueType() {
 
     /* Field from the Type IAttachment */
     if (fEntityName.equals(IAttachment.class.getName())) {
@@ -463,26 +463,28 @@ public class SearchField implements ISearchField {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public synchronized boolean equals(Object obj) {
     if (this == obj)
       return true;
 
     if ((obj == null) || (obj.getClass() != getClass()))
       return false;
 
-    SearchField f = (SearchField) obj;
-    return fField == f.fField && fEntityName.equals(f.fEntityName);
+    synchronized (obj) {
+      SearchField f = (SearchField) obj;
+      return fField == f.fField && fEntityName.equals(f.fEntityName);
+    }
   }
 
   @Override
-  public int hashCode() {
+  public synchronized int hashCode() {
     int typeHashCode = fEntityName == null ? 0 : fEntityName.hashCode();
     return (((fField + 2) * typeHashCode + 17)) * 37;
   }
 
   @Override
   @SuppressWarnings("nls")
-  public String toString() {
+  public synchronized String toString() {
     return super.toString() + "(Field = " + fField + ", Class = " + fEntityName + ", Name = " + getName() + ", Search-Value-Type = " + getSearchValueType() + ")";
   }
 }

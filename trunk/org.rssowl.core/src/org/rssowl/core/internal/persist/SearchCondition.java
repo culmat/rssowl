@@ -36,17 +36,17 @@ import org.rssowl.core.persist.SearchSpecifier;
  * value of <code>isAndSearch()</code>, such as:
  * <ul>
  * <li>If TRUE, News have to match this Condition</li>
- * <li>If FALSE, News that dont match this Condition have to match at least any
+ * <li>If FALSE, News that don't match this Condition have to match at least any
  * other Condition that returns FALSE, or ALL Conditions that return TRUE on a
  * call to <code>isAndSearch()</code></li>
  * </ul>
  * </p>
  * <p>
  * The condition contains the affected <code>ISearchField</code>, which maps
- * to a specific Field in the persistance layer.
+ * to a specific Field in the persistence layer.
  * </p>
  * <p>
- * The specififer maps to an Enumeration of possible values. They describe how
+ * The specifier maps to an Enumeration of possible values. They describe how
  * the Search-Value should be used while searching. Some values are "is", "is
  * not" and "begins with".
  * </p>
@@ -55,7 +55,7 @@ import org.rssowl.core.persist.SearchSpecifier;
  * this condition.
  * </p>
  * <p>
- * Example of a SearchCondition: "Title is'nt 'RSSOwl'"<br>
+ * Example of a SearchCondition: "Title isn't 'RSSOwl'"<br>
  * where:
  * <ul>
  * <li>Title belongs to <code>ISearchField</code></li>
@@ -66,7 +66,7 @@ import org.rssowl.core.persist.SearchSpecifier;
  * <p>
  * A group of search-conditions may or may not be related to a
  * <code>ISearchMark</code>. If they are related, that basically means that
- * the search is stored in the persistance-layer and is displayed in the List of
+ * the search is stored in the persistence-layer and is displayed in the List of
  * Marks.
  * </p>
  *
@@ -123,42 +123,42 @@ public class SearchCondition extends AbstractEntity implements ISearchCondition 
   /*
    * @see org.rssowl.core.model.search.ISearchCondition#getField()
    */
-  public ISearchField getField() {
+  public synchronized ISearchField getField() {
     return fField;
   }
 
   /*
    * @see org.rssowl.core.model.search.ISearchCondition#getSpecifier()
    */
-  public SearchSpecifier getSpecifier() {
+  public synchronized SearchSpecifier getSpecifier() {
     return fSpecifier;
   }
 
   /*
    * @see org.rssowl.core.model.search.ISearchCondition#getValue()
    */
-  public Object getValue() {
+  public synchronized Object getValue() {
     return fValue;
   }
 
   /*
    * @see org.rssowl.core.model.search.ISearchCondition#setField(org.rssowl.core.model.internal.search.SearchField)
    */
-  public void setField(ISearchField field) {
+  public synchronized void setField(ISearchField field) {
     fField = field;
   }
 
   /*
    * @see org.rssowl.core.model.search.ISearchCondition#setSpecifier(org.rssowl.core.model.search.SearchSpecifier)
    */
-  public void setSpecifier(SearchSpecifier specifier) {
+  public synchronized void setSpecifier(SearchSpecifier specifier) {
     fSpecifier = specifier;
   }
 
   /*
    * @see org.rssowl.core.model.search.ISearchCondition#setValue(java.lang.String)
    */
-  public void setValue(String value) {
+  public synchronized void setValue(String value) {
     fValue = value;
   }
 
@@ -169,23 +169,25 @@ public class SearchCondition extends AbstractEntity implements ISearchCondition 
    * @return whether this object and <code>searchcondition</code> are
    * identical. It compares all the fields.
    */
-  public boolean isIdentical(ISearchCondition searchCondition) {
+  public synchronized boolean isIdentical(ISearchCondition searchCondition) {
     if (this == searchCondition)
       return true;
 
-    if (searchCondition instanceof SearchCondition == false)
+    if (!(searchCondition instanceof SearchCondition))
       return false;
 
-    SearchCondition s = (SearchCondition) searchCondition;
+    synchronized (searchCondition) {
+      SearchCondition s = (SearchCondition) searchCondition;
 
-    return  getId() == s.getId() &&
-            fField.equals(s.fField) && fSpecifier.equals(s.fSpecifier) &&
-            fValue.equals(s.fValue) && (getProperties() == null ? s.getProperties() == null : getProperties().equals(s.getProperties()));
+      return  getId() == s.getId() &&
+          fField.equals(s.fField) && fSpecifier.equals(s.fSpecifier) &&
+          fValue.equals(s.fValue) && (getProperties() == null ? s.getProperties() == null : getProperties().equals(s.getProperties()));
+    }
   }
 
   @Override
   @SuppressWarnings("nls")
-  public String toString() {
+  public synchronized String toString() {
     return super.toString() + "Search-Field = " + fField + ", Search-Specifier = " + fSpecifier.name() + ", Search-Value = " + fValue + ")";
   }
 }

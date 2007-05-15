@@ -89,7 +89,7 @@ public class Folder extends AbstractEntity implements IFolder {
    * @see org.rssowl.core.persist.IFolder#addMark(org.rssowl.core.persist.IMark,
    * org.rssowl.core.persist.IFolderChild, boolean)
    */
-  public void addMark(IMark mark, IFolderChild position, Boolean after) {
+  public synchronized void addMark(IMark mark, IFolderChild position, Boolean after) {
     Assert.isNotNull(mark, "Exception adding NULL as Mark into Folder"); //$NON-NLS-1$
     Assert.isTrue(equals(mark.getParent()), "The Mark has a different Folder set!"); //$NON-NLS-1$
     addChild(mark, position, after);
@@ -98,7 +98,7 @@ public class Folder extends AbstractEntity implements IFolder {
   /*
    * @see org.rssowl.core.model.types.IFolder#getMarks()
    */
-  public List<IMark> getMarks() {
+  public synchronized List<IMark> getMarks() {
     List<IMark> marks = extractTypes(IMark.class, fChildren);
     return Collections.unmodifiableList(marks);
   }
@@ -107,7 +107,7 @@ public class Folder extends AbstractEntity implements IFolder {
    * @see org.rssowl.core.persist.IFolder#addFolder(org.rssowl.core.persist.IFolder,
    * org.rssowl.core.persist.IFolderChild, boolean)
    */
-  public void addFolder(IFolder folder, IFolderChild position, Boolean after) {
+  public synchronized void addFolder(IFolder folder, IFolderChild position, Boolean after) {
     Assert.isNotNull(folder, "Exception adding NULL as Child Folder into Parent Folder"); //$NON-NLS-1$
     Assert.isTrue(equals(folder.getParent()), "The Folder has a different Parent Folder set!"); //$NON-NLS-1$
     addChild(folder, position, after);
@@ -116,12 +116,12 @@ public class Folder extends AbstractEntity implements IFolder {
   /*
    * @see org.rssowl.core.persist.IFolder#getChildren()
    */
-  public List<IFolderChild> getChildren() {
+  public synchronized List<IFolderChild> getChildren() {
     return Collections.unmodifiableList(fChildren);
   }
-  
 
-  public boolean removeChild(IFolderChild child) {
+
+  public synchronized boolean removeChild(IFolderChild child) {
     return fChildren.remove(child);
   }
 
@@ -155,7 +155,7 @@ public class Folder extends AbstractEntity implements IFolder {
   /*
    * @see org.rssowl.core.model.types.IFolder#getFolders()
    */
-  public List<IFolder> getFolders() {
+  public synchronized List<IFolder> getFolders() {
     List<IFolder> folders = extractTypes(IFolder.class, fChildren);
     return Collections.unmodifiableList(folders);
   }
@@ -172,21 +172,21 @@ public class Folder extends AbstractEntity implements IFolder {
   /*
    * @see org.rssowl.core.model.types.IFolder#setBlogrollLink(java.net.URI)
    */
-  public void setBlogrollLink(URI blogrollLink) {
+  public synchronized void setBlogrollLink(URI blogrollLink) {
     fBlogrollLink = getURIText(blogrollLink);
   }
 
   /*
    * @see org.rssowl.core.model.types.IFolder#getName()
    */
-  public String getName() {
+  public synchronized String getName() {
     return fName;
   }
 
   /*
    * @see org.rssowl.core.model.types.IFolder#setName(java.lang.String)
    */
-  public void setName(String name) {
+  public synchronized void setName(String name) {
     Assert.isNotNull(name, "The type Folder requires a Name that is not NULL"); //$NON-NLS-1$
     fName = name;
   }
@@ -194,21 +194,21 @@ public class Folder extends AbstractEntity implements IFolder {
   /*
    * @see org.rssowl.core.model.types.IFolder#getParent()
    */
-  public IFolder getParent() {
+  public synchronized IFolder getParent() {
     return fParent;
   }
 
   /*
    * @see org.rssowl.core.model.types.Reparentable#setParent(java.lang.Object)
    */
-  public void setParent(IFolder newParent) {
+  public synchronized void setParent(IFolder newParent) {
     fParent = newParent;
   }
 
   /*
    * @see org.rssowl.core.model.types.IFolder#getBlogrollLink()
    */
-  public URI getBlogrollLink() {
+  public synchronized URI getBlogrollLink() {
     return createURI(fBlogrollLink);
   }
 
@@ -216,7 +216,7 @@ public class Folder extends AbstractEntity implements IFolder {
    * @see org.rssowl.core.persist.IFolder#reorderChildren(java.util.List,
    * org.rssowl.core.persist.IFolderChild, boolean)
    */
-  public void reorderChildren(List<? extends IFolderChild> children, IFolderChild position, Boolean after) {
+  public synchronized void reorderChildren(List<? extends IFolderChild> children, IFolderChild position, Boolean after) {
     Assert.isTrue(fChildren.contains(position));
     Assert.isTrue(fChildren.containsAll(children));
 
@@ -248,25 +248,27 @@ public class Folder extends AbstractEntity implements IFolder {
    * @return whether this object and <code>folder</code> are identical. It
    * compares all the fields.
    */
-  public boolean isIdentical(IFolder folder) {
+  public synchronized boolean isIdentical(IFolder folder) {
     if (this == folder)
       return true;
 
-    if (folder instanceof Folder == false)
+    if (!(folder instanceof Folder == false))
       return false;
 
-    Folder f = (Folder) folder;
+    synchronized (folder) {
+      Folder f = (Folder) folder;
 
-    return  getId() == f.getId() && (fParent == null ? f.fParent == null : fParent.equals(f.fParent)) &&
-            (fName == null ? f.fName == null : fName.equals(f.fName)) &&
-            (getBlogrollLink() == null ? f.getBlogrollLink() == null : getBlogrollLink().equals(f.getBlogrollLink())) &&
-            (fChildren == null ? f.fChildren == null : fChildren.equals(f.fChildren)) &&
-            (getProperties() == null ? f.getProperties() == null : getProperties().equals(f.getProperties()));
+      return  getId() == f.getId() && (fParent == null ? f.fParent == null : fParent.equals(f.fParent)) &&
+          (fName == null ? f.fName == null : fName.equals(f.fName)) &&
+          (getBlogrollLink() == null ? f.getBlogrollLink() == null : getBlogrollLink().equals(f.getBlogrollLink())) &&
+          (fChildren == null ? f.fChildren == null : fChildren.equals(f.fChildren)) &&
+          (getProperties() == null ? f.getProperties() == null : getProperties().equals(f.getProperties()));
+    }
   }
 
   @SuppressWarnings("nls")
   @Override
-  public String toString() {
+  public synchronized String toString() {
     return super.toString() + "Name = " + fName + ")";
   }
 
@@ -276,7 +278,7 @@ public class Folder extends AbstractEntity implements IFolder {
    * @return A String describing the state of this Entity.
    */
   @SuppressWarnings("nls")
-  public String toLongString() {
+  public synchronized String toLongString() {
     return super.toString() + "Name = " + fName + ", Blogroll Link = " + fBlogrollLink + ", Children = " + fChildren.toString() + ", Parent Folder = " + (fParent != null ? fParent.getId() : "none") + ")";
   }
 }
