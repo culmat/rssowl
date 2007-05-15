@@ -75,7 +75,7 @@ public class MiscUITests {
     root.addMark(bookmark, null, false);
 
     feed = DynamicDAO.save(feed);
-    root = DynamicDAO.save(root);
+    DynamicDAO.save(root);
 
     assertEquals(null, OwlUI.getFavicon(bookmark));
 

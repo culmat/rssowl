@@ -255,7 +255,7 @@ public class ConnectionTests {
     URI feedUrl = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rdf.xml");
     IFeed feed = new Feed(feedUrl);
 
-    feed = DynamicDAO.save(feed);
+    DynamicDAO.save(feed);
 
     ICredentials authCreds = new ICredentials() {
       public String getDomain() {

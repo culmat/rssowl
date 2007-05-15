@@ -223,7 +223,7 @@ public class ApplicationLayerTest {
       fFactory.createNews(null, feed2, new Date());
 
       DynamicDAO.save(feed1);
-      feed2 = DynamicDAO.save(feed2);
+      DynamicDAO.save(feed2);
       List<INews> newsList = new ArrayList<INews>(1);
       newsList.add(news2);
       final boolean[] newsUpdatedCalled = new boolean[1];

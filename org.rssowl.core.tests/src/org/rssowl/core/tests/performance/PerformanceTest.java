@@ -300,7 +300,7 @@ public class PerformanceTest {
       ISearchCondition cond5 = factory.createSearchCondition(null, mark, field5, SearchSpecifier.IS, "apple");
 
       ISearchField field6 = factory.createSearchField(INews.CATEGORIES, newsEntityName);
-      ISearchCondition cond6 = factory.createSearchCondition(null, mark, field6, SearchSpecifier.IS_NOT, "slashdot");
+      factory.createSearchCondition(null, mark, field6, SearchSpecifier.IS_NOT, "slashdot");
     }
 
     /*

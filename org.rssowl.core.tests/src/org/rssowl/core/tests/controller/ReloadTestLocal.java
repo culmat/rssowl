@@ -923,8 +923,6 @@ public class ReloadTestLocal {
       };
       DynamicDAO.addEntityListener(INews.class, newsListener);
 
-      long now = System.currentTimeMillis();
-
       /* First Reload */
       InMemoryProtocolHandler.FEED = generateFeed("Title", "http://www.link.de", "http://www.guid.de", null);
       fController.reload(bookmark, null, new NullProgressMonitor());
@@ -1398,8 +1396,6 @@ public class ReloadTestLocal {
     try {
       IFeed feed = new Feed(new URI("inmemory://rss_2_0.xml")); //$NON-NLS-1$
       feed = DynamicDAO.save(feed);
-
-      FeedReference feedRef = new FeedReference(feed.getId());
 
       IBookMark bookmark = createBookMark(feed);
 
