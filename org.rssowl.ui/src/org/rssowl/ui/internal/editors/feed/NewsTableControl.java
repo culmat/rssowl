@@ -329,7 +329,7 @@ public class NewsTableControl implements IFeedViewPart {
     /* Calculate and Cache */
     DateFormat dF = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
     Calendar cal = Calendar.getInstance();
-    cal.set(2006, 12, 12, 12, 12, 12);
+    cal.set(2006, Calendar.DECEMBER, 12, 12, 12, 12);
     String sampleDate = dF.format(cal.getTime());
 
     DATE_COL_WIDTH = OwlUI.getTextSize(fCustomTree.getControl(), OwlUI.getBold(JFaceResources.DEFAULT_FONT), sampleDate).x;
