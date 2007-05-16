@@ -530,16 +530,17 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
     /* Read the first line or until the Tag is closed */
     StringBuffer strBuf = new StringBuffer();
-    char c;
-    while ((c = (char) inputReader.read()) != -1) {
+    int c;
+    while ((c = inputReader.read()) != -1) {
+      char character = (char)c;
 
       /* Append all Characters, except for closing Tag or CR */
-      if (c != '>' && c != '\n' && c != '\r')
-        strBuf.append(c);
+      if (character != '>' && character != '\n' && character != '\r')
+        strBuf.append(character);
 
       /* Closing Tag is the last one to append */
-      else if (c == '>') {
-        strBuf.append(c);
+      else if (character == '>') {
+        strBuf.append(character);
         break;
       }
 
