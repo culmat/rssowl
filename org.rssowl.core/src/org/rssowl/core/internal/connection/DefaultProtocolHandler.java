@@ -529,7 +529,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     String encoding = null;
 
     /* Read the first line or until the Tag is closed */
-    StringBuffer strBuf = new StringBuffer();
+    StringBuilder strBuf = new StringBuilder();
     int c;
     while ((c = inputReader.read()) != -1) {
       char character = (char)c;
