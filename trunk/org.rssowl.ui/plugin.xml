@@ -415,24 +415,6 @@
       </page>
    </extension>
    <extension
-         point="org.eclipse.ui.importWizards">
-      <wizard
-            category="org.rssowl.ui.category2"
-            class="org.eclipse.ui.ExtensionFactory:preferencesImportWizard"
-            icon="icons/obj16/importpref_obj.gif"
-            id="org.rssowl.ui.importWizards.ImportPreferences"
-            name="Preferences"/>
-   </extension>
-   <extension
-         point="org.eclipse.ui.exportWizards">
-      <wizard
-            category="/org.rssowl.ui.exportWizards.category.General"
-            class="org.eclipse.ui.ExtensionFactory:preferencesExportWizard"
-            icon="icons/obj16/importpref_obj.gif"
-            id="org.rssowl.ui.exportWizards.ExportPreferences"
-            name="Preferences"/>
-   </extension>
-   <extension
          point="org.eclipse.ui.keywords">
       <keyword
             id="org.rssowl.ui.preferences.keywords.General"
