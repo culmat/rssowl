@@ -289,8 +289,9 @@ public class NotificationPopup extends PopupDialog {
       Shell shell = page.getWorkbenchWindow().getShell();
 
       /* Restore from Tray or Minimization if required */
-      if (ApplicationWorkbenchAdvisor.fPrimaryApplicationWorkbenchWindowAdvisor.isMinimizedToTray())
-        ApplicationWorkbenchAdvisor.fPrimaryApplicationWorkbenchWindowAdvisor.restoreFromTray(shell);
+      ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
+      if (advisor != null && advisor.isMinimizedToTray())
+        advisor.restoreFromTray(shell);
       else if (shell.getMinimized()) {
         shell.setMinimized(false);
         shell.forceActive();

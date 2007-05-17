@@ -114,8 +114,8 @@ public class NotificationService {
       public void run() {
 
         /* Return if Notification should only show when minimized */
-        ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fPrimaryApplicationWorkbenchWindowAdvisor;
-        boolean minimized = advisor.isMinimizedToTray() || advisor.isMinimized();
+        ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
+        boolean minimized = advisor != null && (advisor.isMinimizedToTray() || advisor.isMinimized());
         if (!minimized && fGlobalScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED))
           return;
 
