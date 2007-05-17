@@ -341,6 +341,6 @@ public class CBrowser {
   }
 
   private boolean useExternalBrowser() {
-    return fPreferences.getBoolean(DefaultPreferences.USE_EXTERNAL_BROWSER);
+    return fPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER) || fPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER);
   }
 }

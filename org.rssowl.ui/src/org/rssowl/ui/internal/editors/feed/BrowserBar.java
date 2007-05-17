@@ -45,6 +45,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.actions.ActionFactory;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.ApplicationServer;
@@ -83,7 +84,8 @@ public class BrowserBar {
     fFeedView = feedView;
     fParent = parent;
 
-    fUseExternalBrowser = Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.USE_EXTERNAL_BROWSER);
+    IPreferenceScope globalScope = Owl.getPreferenceService().getGlobalScope();
+    fUseExternalBrowser = globalScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER) || globalScope.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER);
     createControl();
   }
 
