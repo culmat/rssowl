@@ -71,7 +71,7 @@ public enum SearchSpecifier implements IPersistable {
   SIMILIAR_TO;
 
   /**
-   * Get a human-readable representation of the specififer to be used in the UI
+   * Get a human-readable representation of the specifier to be used in the UI
    * for example.
    *
    * @return Returns a human-readable representation of the specifier.
@@ -99,7 +99,7 @@ public enum SearchSpecifier implements IPersistable {
       case IS_LESS_THAN:
         return "is less than";
       case SIMILIAR_TO:
-        return "is similiar to";
+        return "is similar to";
       default:
         return super.toString();
     }
