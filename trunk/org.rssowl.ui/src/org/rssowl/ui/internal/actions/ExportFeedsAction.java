@@ -36,9 +36,12 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
@@ -46,6 +49,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -55,6 +61,7 @@ import java.util.List;
  */
 public class ExportFeedsAction extends Action implements IWorkbenchWindowActionDelegate {
   private Shell fShell;
+  private DateFormat fDateFormat = DateFormat.getDateInstance();
 
   /*
    * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
@@ -108,7 +115,7 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
   private void exportToOPML(File file, IFolder root) throws IOException, PersistenceException {
     OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
     writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-    writer.write("<opml version=\"1.1\">\n");
+    writer.write("<opml version=\"1.1\" xmlns:rssowl=\"http://www.rssowl.org\">\n");
     writer.write("<body>\n");
 
     exportToOPML(root, writer);
@@ -122,21 +129,80 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
   private void exportToOPML(IFolder folder, OutputStreamWriter writer) throws IOException, PersistenceException {
     List<IMark> marks = folder.getMarks();
     for (IMark mark : marks) {
+      String name = escape(mark.getName());
+
+      /* Export BookMark */
       if (mark instanceof IBookMark) {
-        String name = mark.getName().replaceAll("&", "&amp;");
-        String link = ((IBookMark) mark).getFeedLinkReference().getLink().toString().replaceAll("&", "&amp;");
+        String link = escape(((IBookMark) mark).getFeedLinkReference().getLink().toString());
 
         writer.write("<outline text=\"" + name + "\" xmlUrl=\"" + link + "\" />\n");
+      }
+
+      /* Export SearchMark */
+      else if (mark instanceof ISearchMark) {
+        ISearchMark searchMark = (ISearchMark) mark;
+        List<ISearchCondition> conditions = searchMark.getSearchConditions();
+
+        writer.write("<rssowl:savedsearch name=\"" + name + "\" matchAllConditions=\"" + searchMark.matchAllConditions() + "\">\n");
+        for (ISearchCondition condition : conditions) {
+          writer.write("\t<rssowl:searchcondition>\n");
+          writer.write(toXML(condition));
+          writer.write("\t</rssowl:searchcondition>\n");
+        }
+        writer.write("</rssowl:savedsearch>\n\n");
       }
     }
 
     List<IFolder> childFolders = folder.getFolders();
     for (IFolder childFolder : childFolders) {
-      String name = childFolder.getName().replaceAll("&", "&amp;");
+      String name = escape(childFolder.getName());
       writer.write("<outline text=\"" + name + "\">\n");
       exportToOPML(childFolder, writer);
       writer.write("</outline>\n");
     }
+  }
+
+  private String escape(String str) {
+    str = StringUtils.replaceAll(str, "&", "&amp;");
+    str = StringUtils.replaceAll(str, "<", "&lt;");
+    str = StringUtils.replaceAll(str, ">", "&gt;");
+
+    return str;
+  }
+
+  private String toXML(ISearchCondition condition) {
+    StringBuilder str = new StringBuilder();
+
+    /* Search Specifier */
+    str.append("\t\t<rssowl:searchspecifier id=\"" + condition.getSpecifier().ordinal() + "\" />\n");
+
+    /* Single Value */
+    if (!EnumSet.class.isAssignableFrom(condition.getValue().getClass()))
+      str.append("\t\t<rssowl:searchvalue value=\"" + getValueString(condition) + "\" type=\"" + condition.getField().getSearchValueType().getId() + "\" />\n");
+
+    /* Multiple Values */
+    else {
+      EnumSet<?> values = ((EnumSet<?>) condition.getValue());
+
+      str.append("\t\t<rssowl:searchvalue type=\"" + condition.getField().getSearchValueType().getId() + "\">\n");
+
+      for (Enum<?> enumValue : values)
+        str.append("\t\t\t<rssowl:newsstate value=\"" + enumValue.ordinal() + "\" />\n");
+
+      str.append("\t\t</rssowl:searchvalue>\n");
+    }
+
+    /* Search Field */
+    str.append("\t\t<rssowl:searchfield id=\"" + condition.getField().getId() + "\" entity=\"" + condition.getField().getEntityName() + "\" />\n");
+
+    return str.toString();
+  }
+
+  private String getValueString(ISearchCondition condition) {
+    if (condition.getValue() instanceof Date)
+      return fDateFormat.format((Date) condition.getValue());
+
+    return escape(condition.getValue().toString());
   }
 
   /*

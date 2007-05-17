@@ -32,10 +32,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.util.JobRunner;
 
 /**
  * TODO This is just for Developers Purposes!
- * 
+ *
  * @author bpasero
  */
 public class ImportFeedsAction extends Action implements IWorkbenchWindowActionDelegate {
@@ -66,8 +67,16 @@ public class ImportFeedsAction extends Action implements IWorkbenchWindowActionD
     dialog.setText("Import Feeds from OPML");
     dialog.setFilterExtensions(new String[] { "*.opml", "*.xml", "*.*" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     String string = dialog.open();
-    if (string != null)
+    if (string != null) {
       Controller.getDefault().importFeeds(string);
+
+      /* Force to rerun saved searches */
+      JobRunner.runDelayedInBackgroundThread(new Runnable() {
+        public void run() {
+          Controller.getDefault().getSavedSearchService().updateSavedSearches(true);
+        }
+      });
+    }
   }
 
   /*
