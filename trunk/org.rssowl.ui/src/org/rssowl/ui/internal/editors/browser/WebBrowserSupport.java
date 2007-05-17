@@ -32,6 +32,7 @@ import org.eclipse.ui.browser.AbstractWorkbenchBrowserSupport;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.BrowserUtils;
 
@@ -75,7 +76,8 @@ public class WebBrowserSupport extends AbstractWorkbenchBrowserSupport {
       }
 
       private boolean useExternalBrowser() {
-        return Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.USE_EXTERNAL_BROWSER);
+        IPreferenceScope globalScope = Owl.getPreferenceService().getGlobalScope();
+        return globalScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER) || globalScope.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER);
       }
 
       private void openInternal(URL url) throws PartInitException {

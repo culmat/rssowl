@@ -33,8 +33,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.rssowl.core.Owl;
@@ -51,10 +53,14 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   private IPreferenceScope fGlobalScope;
   private Button fMinimizeToTray;
   private Button fMoveToTrayOnExit;
-  private Button fUseExternalBrowser;
   private Button fNotificationOnlyFromTray;
   private Button fShowNotificationPopup;
   private Button fNotificationIsSticky;
+  private Text fCustomBrowserInput;
+  private Button fUseCustomExternalBrowser;
+  private Button fUseDefaultExternalBrowser;
+  private Button fUseInternalBrowser;
+  private Button fCustomBrowserSearchButton;
 
   /** Leave for reflection */
   public MiscPreferencePage() {
@@ -79,6 +85,63 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   @Override
   protected Control createContents(Composite parent) {
     Composite container = createComposite(parent);
+
+    /* Browser Group */
+    Group browserGroup = new Group(container, SWT.None);
+    browserGroup.setText("Browser");
+    browserGroup.setLayout(LayoutUtils.createGridLayout(2));
+    browserGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+    /* Use internal Browser */
+    fUseInternalBrowser = new Button(browserGroup, SWT.RADIO);
+    fUseInternalBrowser.setText("Use internal Browser");
+    fUseInternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
+
+    /* Use default external Browser */
+    fUseDefaultExternalBrowser = new Button(browserGroup, SWT.RADIO);
+    fUseDefaultExternalBrowser.setText("Use default external Browser");
+    fUseDefaultExternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
+    fUseDefaultExternalBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER));
+
+    /* Use custom external Browser */
+    fUseCustomExternalBrowser = new Button(browserGroup, SWT.RADIO);
+    fUseCustomExternalBrowser.setText("Use the following external Browser:");
+    fUseCustomExternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
+    fUseCustomExternalBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER));
+    fUseCustomExternalBrowser.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        fCustomBrowserInput.setEnabled(fUseCustomExternalBrowser.getSelection());
+        fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
+      }
+    });
+
+    fUseInternalBrowser.setSelection(!fUseDefaultExternalBrowser.getSelection() && !fUseCustomExternalBrowser.getSelection());
+
+    fCustomBrowserInput = new Text(browserGroup, SWT.BORDER);
+    fCustomBrowserInput.setEnabled(fUseCustomExternalBrowser.getSelection());
+    fCustomBrowserInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+
+    String customBrowserValue = fGlobalScope.getString(DefaultPreferences.CUSTOM_BROWSER_PATH);
+    if (customBrowserValue != null)
+      fCustomBrowserInput.setText(customBrowserValue);
+
+    fCustomBrowserSearchButton = new Button(browserGroup, SWT.PUSH);
+    fCustomBrowserSearchButton.setText("Search...");
+    fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
+    fCustomBrowserSearchButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
+        dialog.setFileName(fCustomBrowserInput.getText());
+        String path = dialog.open();
+        if (path != null)
+          fCustomBrowserInput.setText(path);
+      }
+    });
+
+    /* Separator */
+    new Label(container, SWT.NONE);
 
     /* System Tray Group */
     Group trayGroup = new Group(container, SWT.None);
@@ -139,20 +202,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     /* Separator */
     new Label(container, SWT.NONE);
 
-    /* Browser Group */
-    Group browserGroup = new Group(container, SWT.None);
-    browserGroup.setText("Browser");
-    browserGroup.setLayout(LayoutUtils.createGridLayout(1));
-    browserGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
-    /* Open Links Internal / External */
-    fUseExternalBrowser = new Button(browserGroup, SWT.CHECK);
-    fUseExternalBrowser.setText("Use external browser");
-    fUseExternalBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_EXTERNAL_BROWSER));
-
-    /* Separator */
-    new Label(container, SWT.NONE);
-
     return container;
   }
 
@@ -172,12 +221,15 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
    */
   @Override
   public boolean performOk() {
-    fGlobalScope.putBoolean(DefaultPreferences.USE_EXTERNAL_BROWSER, fUseExternalBrowser.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_MINIMIZE, fMinimizeToTray.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_CLOSE, fMoveToTrayOnExit.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP, fShowNotificationPopup.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED, fNotificationOnlyFromTray.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP, fNotificationIsSticky.getSelection());
+
+    fGlobalScope.putBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER, fUseDefaultExternalBrowser.getSelection());
+    fGlobalScope.putBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER, fUseCustomExternalBrowser.getSelection());
+    fGlobalScope.putString(DefaultPreferences.CUSTOM_BROWSER_PATH, fCustomBrowserInput.getText());
 
     return super.performOk();
   }
@@ -191,7 +243,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
 
     IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
 
-    fUseExternalBrowser.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_EXTERNAL_BROWSER));
     fMinimizeToTray.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE));
     fMoveToTrayOnExit.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
     fShowNotificationPopup.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP));
@@ -199,5 +250,12 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fNotificationOnlyFromTray.setEnabled(fShowNotificationPopup.getSelection());
     fNotificationIsSticky.setSelection(defaultScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP));
     fNotificationIsSticky.setEnabled(fShowNotificationPopup.getSelection());
+
+    fUseDefaultExternalBrowser.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER));
+    fUseCustomExternalBrowser.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER));
+    fUseInternalBrowser.setSelection(!fUseDefaultExternalBrowser.getSelection() && !fUseDefaultExternalBrowser.getSelection());
+
+    fCustomBrowserInput.setEnabled(fUseCustomExternalBrowser.getSelection());
+    fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
   }
 }

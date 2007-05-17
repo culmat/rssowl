@@ -25,6 +25,8 @@
 package org.rssowl.ui.internal.util;
 
 import org.eclipse.swt.program.Program;
+import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
@@ -49,7 +51,7 @@ public class BrowserUtils {
 
   /**
    * Open a link in the external browser
-   * 
+   *
    * @param href Any URL
    */
   public static void openLink(String href) {
@@ -69,14 +71,19 @@ public class BrowserUtils {
     if (localHref.contains(" "))
       localHref = "\"" + localHref + "\"";
 
-    /* Open default browser */
-    useDefaultBrowser(localHref);
+    /* Open Default External Browser */
+    if (!Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER))
+      useDefaultBrowser(localHref);
+
+    /* Open Custom External Browser */
+    else
+      useCustomBrowser(localHref);
   }
 
   /**
    * Open the default Mail Application with the given Subject and Body for a new
    * Mail.
-   * 
+   *
    * @param subject The Subject of the new Mail or NULL if none.
    * @param body The Body of the new Mail or NULL if none.
    */
@@ -93,7 +100,7 @@ public class BrowserUtils {
 
   /**
    * Open the webbrowser on Linux or Solaris
-   * 
+   *
    * @param href An URL
    * @return Process The process that was executed
    */
@@ -124,16 +131,16 @@ public class BrowserUtils {
   /**
    * Use default browser to display the URL
    */
-  private static void useDefaultBrowser(final String localHref) {
+  private static void useDefaultBrowser(final String link) {
 
     /* Try Program-API first */
-    if (Program.launch(localHref))
+    if (Program.launch(link))
       return;
 
     /* Launch default browser on Mac */
     if (Application.IS_MAC) {
       try {
-        Process proc = Runtime.getRuntime().exec("/usr/bin/open " + localHref);
+        Process proc = Runtime.getRuntime().exec("/usr/bin/open " + link);
 
         /* Let StreamGobbler handle error message */
         StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
@@ -163,7 +170,7 @@ public class BrowserUtils {
 
             /* The default browser was successfully launched once, use again */
             if (webBrowserSuccessfullyOpened) {
-              Process proc = Runtime.getRuntime().exec(webBrowser + " -remote openURL(" + localHref + ")");
+              Process proc = Runtime.getRuntime().exec(webBrowser + " -remote openURL(" + link + ")");
 
               /* Let StreamGobbler handle error message */
               StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
@@ -178,7 +185,7 @@ public class BrowserUtils {
 
             /* The default browser was not yet launched, try NS and Mozilla */
             else {
-              Process proc = openWebBrowser(localHref);
+              Process proc = openWebBrowser(link);
               webBrowserSuccessfullyOpened = true;
 
               if (proc != null) {
@@ -215,5 +222,45 @@ public class BrowserUtils {
       launcher.setDaemon(true);
       launcher.start();
     }
+  }
+
+  private static void useCustomBrowser(final String link) {
+    String browser = Owl.getPreferenceService().getGlobalScope().getString(DefaultPreferences.CUSTOM_BROWSER_PATH);
+    final String executable = browser + " " + link;
+
+    /* Launch custom browser in seperate thread */
+    Thread launcher = new Thread("Browser Launcher") {
+      @Override
+      public void run() {
+
+        /* Execute custom browser */
+        try {
+          Process proc = Runtime.getRuntime().exec(executable);
+
+          /* Let StreamGobbler handle error message */
+          StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
+
+          /* Let StreamGobbler handle output */
+          StreamGobbler outputGobbler = new StreamGobbler(proc.getInputStream());
+
+          /* Flush both error and output streams */
+          errorGobbler.schedule();
+          outputGobbler.schedule();
+
+          /* Wait for the process to terminate */
+          proc.waitFor();
+        } catch (IOException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+
+          /* Use default browser if custom browser is not working */
+          useDefaultBrowser(link);
+
+        } catch (InterruptedException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+        }
+      }
+    };
+    launcher.setDaemon(true);
+    launcher.start();
   }
 }
