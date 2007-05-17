@@ -24,6 +24,7 @@
 
 package org.rssowl.core.persist.service;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.SearchHit;
@@ -33,9 +34,6 @@ import java.util.List;
 /**
  * The central interface for searching types from the persistance layer. The
  * implementation is contributable via extension-point mechanism.
- * <p>
- * TODO Add more search-methods as needed.
- * </p>
  *
  * @author bpasero
  */
@@ -81,6 +79,20 @@ public interface IModelSearch {
    * @see {@link IPersistenceService}#recreateSchema()
    */
   void clearIndex() throws PersistenceException;
+
+  /**
+   * Causes the underlying Index to re-index all entities. First the index is
+   * removed by calling {@link IModelSearch#clearIndex()} and then each entity
+   * that is participating in the Search loaded and indexed. Note that this is a
+   * cpu- and memory-intensive operation, thats why a
+   * <code>IProgressMonitor</code> is passed in to track progress and support
+   * cancelation.
+   *
+   * @param monitor An instance of <code>IProgressMonitor</code> to track
+   * progress and support cancelation during the operation.
+   * @throws PersistenceException
+   */
+  void reindexAll(IProgressMonitor monitor) throws PersistenceException;
 
   /**
    * Adds a Listener to the list of Listeners that will be notified on index
