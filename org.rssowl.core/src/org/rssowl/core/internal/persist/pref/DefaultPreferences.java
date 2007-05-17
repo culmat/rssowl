@@ -41,8 +41,14 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Mark feed as read when feed changes */
   public static final String MARK_FEED_READ_ON_CHANGE = "org.rssowl.pref.MarkFeedReadOnChange";
 
-  /** Global: Use external browser */
-  public static final String USE_EXTERNAL_BROWSER = "org.rssowl.pref.UseExternalBrowser";
+  /** Global: Use default external browser */
+  public static final String USE_DEFAULT_EXTERNAL_BROWSER = "org.rssowl.pref.UseExternalBrowser";
+
+  /** Global: Use custom external browser */
+  public static final String USE_CUSTOM_EXTERNAL_BROWSER = "org.rssowl.pref.UseCustomExternalBrowser";
+
+  /** Global: Path to the custom Browser */
+  public static final String CUSTOM_BROWSER_PATH = "org.rssowl.pref.CustomBrowserPath";
 
   /** Global: Minimize to the system tray */
   public static final String TRAY_ON_MINIMIZE = "org.rssowl.pref.UseSystemTray";
@@ -167,7 +173,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
   private void initGlobalDefaults(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(MARK_READ_ON_MINIMIZE, false);
     defaultScope.putBoolean(MARK_FEED_READ_ON_CHANGE, false);
-    defaultScope.putBoolean(USE_EXTERNAL_BROWSER, true);
+    defaultScope.putBoolean(USE_DEFAULT_EXTERNAL_BROWSER, true);
     defaultScope.putBoolean(TRAY_ON_MINIMIZE, false);
     defaultScope.putBoolean(MARK_READ_STATE, true);
     defaultScope.putInteger(MARK_READ_IN_MILLIS, 0);
