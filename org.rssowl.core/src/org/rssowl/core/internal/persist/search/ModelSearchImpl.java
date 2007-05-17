@@ -627,7 +627,7 @@ public class ModelSearchImpl implements IModelSearch {
   /*
    * @see org.rssowl.core.persist.service.IModelSearch#reindexAll(org.eclipse.core.runtime.IProgressMonitor)
    */
-  public void reindexAll(IProgressMonitor monitor) throws PersistenceException {
+  public synchronized void reindexAll(IProgressMonitor monitor) throws PersistenceException {
     Collection<IFeed> feeds = DynamicDAO.loadAll(IFeed.class);
     monitor.beginTask("Re-Indexing all News", feeds.size());
 
