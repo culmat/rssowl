@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.PopupDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
@@ -243,13 +244,15 @@ public class NotificationPopup extends PopupDialog {
 
     /* Use a CCLabel per News */
     final CCLabel newsLabel = new CCLabel(fInnerContentCircle, SWT.NONE);
-    newsLabel.setImage(OwlUI.getImage(fResources, OwlUI.getFavicon(bookmark)));
     newsLabel.setBackground(fInnerContentCircle.getBackground());
     newsLabel.setCursor(newsLabel.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
     newsLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     newsLabel.setText(ModelUtils.getHeadline(news));
     newsLabel.setFont(fBoldTextFont);
     newsLabel.addMouseTrackListener(fMouseTrackListner);
+
+    ImageDescriptor favicon = OwlUI.getFavicon(bookmark);
+    newsLabel.setImage(OwlUI.getImage(fResources, favicon != null ? favicon : OwlUI.BOOKMARK));
 
     /* Paint text blue on mouse-enter */
     newsLabel.addMouseTrackListener(new MouseTrackAdapter() {
