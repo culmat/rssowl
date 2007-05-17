@@ -143,8 +143,9 @@ public class Application implements IApplication {
         public void run() {
 
           /* Restore from Tray */
-          if (fWorkbenchAdvisor.getPrimaryWorkbenchWindowAdvisor().isMinimizedToTray()) {
-            fWorkbenchAdvisor.getPrimaryWorkbenchWindowAdvisor().restoreFromTray(shell);
+          ApplicationWorkbenchWindowAdvisor advisor = fWorkbenchAdvisor.getPrimaryWorkbenchWindowAdvisor();
+          if (advisor != null && advisor.isMinimizedToTray()) {
+            advisor.restoreFromTray(shell);
           }
 
           /* Force Active and De-Iconify */

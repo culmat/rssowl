@@ -41,7 +41,7 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
   private static final String PERSPECTIVE_ID = "org.rssowl.ui.perspective"; //$NON-NLS-1$
 
   /* Keep a static reference to the primary Workbench Window Advisor */
-  static ApplicationWorkbenchWindowAdvisor fPrimaryApplicationWorkbenchWindowAdvisor;
+  static ApplicationWorkbenchWindowAdvisor fgPrimaryApplicationWorkbenchWindowAdvisor;
 
   private final Runnable fRunAfterUIStartup;
 
@@ -61,15 +61,15 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
     ApplicationWorkbenchWindowAdvisor advisor = new ApplicationWorkbenchWindowAdvisor(configurer);
 
     /* Store primary advisor if not yet done */
-    if (fPrimaryApplicationWorkbenchWindowAdvisor == null)
-      fPrimaryApplicationWorkbenchWindowAdvisor = advisor;
+    if (fgPrimaryApplicationWorkbenchWindowAdvisor == null)
+      fgPrimaryApplicationWorkbenchWindowAdvisor = advisor;
 
     return advisor;
   }
 
   /* Provide access to the primary WorkbenchWindowAdvisor */
   ApplicationWorkbenchWindowAdvisor getPrimaryWorkbenchWindowAdvisor() {
-    return fPrimaryApplicationWorkbenchWindowAdvisor;
+    return fgPrimaryApplicationWorkbenchWindowAdvisor;
   }
 
   /**
