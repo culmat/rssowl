@@ -49,13 +49,16 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.NativeFSLockFactory;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
+import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IndexListener;
@@ -66,6 +69,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -618,5 +622,28 @@ public class ModelSearchImpl implements IModelSearch {
     for (IndexListener listener : fIndexListeners) {
       listener.indexUpdated(docCount);
     }
+  }
+
+  /*
+   * @see org.rssowl.core.persist.service.IModelSearch#reindexAll(org.eclipse.core.runtime.IProgressMonitor)
+   */
+  public void reindexAll(IProgressMonitor monitor) throws PersistenceException {
+    Collection<IFeed> feeds = DynamicDAO.loadAll(IFeed.class);
+    monitor.beginTask("Re-Indexing all News", feeds.size());
+
+    /* Delete the Index first */
+    clearIndex();
+
+    /* Re-Index all Entities: News */
+    for (IFeed feed : feeds) {
+      if (monitor.isCanceled())
+        break;
+
+      fIndexer.index(new ArrayList<INews>(feed.getNews()), false);
+      monitor.worked(1);
+    }
+
+    /* Finished */
+    monitor.done();
   }
 }
