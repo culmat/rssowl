@@ -454,7 +454,7 @@
             label="open view switch"/>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Miscellaneous"
-            label="mark read minimize tray external browser feed">
+            label="minimize tray external browser feed notification alert popup">
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Feeds"
