@@ -27,14 +27,21 @@ package org.rssowl.core.internal.interpreter;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.Activator;
 import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPersistable;
+import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.ISearchValueType;
+import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFeedDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
@@ -42,7 +49,11 @@ import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.util.URIUtils;
 
 import java.net.URI;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -53,17 +64,18 @@ import java.util.List;
  * @author bpasero
  */
 public class OPMLImporter implements ITypeImporter {
+  private DateFormat fDateFormat = DateFormat.getDateInstance();
 
   /*
    * @see org.rssowl.core.interpreter.ITypeImporter#importFrom(org.jdom.Document)
    */
   @SuppressWarnings("unused")
-  public List< ? extends IEntity> importFrom(Document document) throws InterpreterException {
+  public List<? extends IEntity> importFrom(Document document) throws InterpreterException {
     Element root = document.getRootElement();
 
     /* Interpret Children */
-    List< ? > feedChildren = root.getChildren();
-    for (Iterator< ? > iter = feedChildren.iterator(); iter.hasNext();) {
+    List<?> feedChildren = root.getChildren();
+    for (Iterator<?> iter = feedChildren.iterator(); iter.hasNext();) {
       Element child = (Element) iter.next();
       String name = child.getName().toLowerCase();
 
@@ -79,17 +91,120 @@ public class OPMLImporter implements ITypeImporter {
     IFolder folder = Owl.getModelFactory().createFolder(null, null, "Imported from OPML");
 
     /* Interpret Children */
-    List< ? > feedChildren = body.getChildren();
-    for (Iterator< ? > iter = feedChildren.iterator(); iter.hasNext();) {
+    List<?> feedChildren = body.getChildren();
+    for (Iterator<?> iter = feedChildren.iterator(); iter.hasNext();) {
       Element child = (Element) iter.next();
       String name = child.getName().toLowerCase();
 
       /* Process Outline */
       if ("outline".equals(name)) //$NON-NLS-1$
         processOutline(child, folder);
+
+      else if ("savedsearch".equals(name))
+        processSavedSearch(child, folder);
     }
 
     return Collections.singletonList(folder);
+  }
+
+  private void processSavedSearch(Element savedSearchElement, IFolder folder) {
+    Namespace namespace = Namespace.getNamespace("rssowl", "http://www.rssowl.org");
+
+    String name = savedSearchElement.getAttributeValue("name");
+    boolean matchAllConditions = Boolean.parseBoolean(savedSearchElement.getAttributeValue("matchAllConditions"));
+
+    ISearchMark searchmark = Owl.getModelFactory().createSearchMark(null, folder, name);
+    searchmark.setMatchAllConditions(matchAllConditions);
+
+    List<?> conditions = savedSearchElement.getChildren("searchcondition", namespace);
+    for (int i = 0; i < conditions.size(); i++) {
+      try {
+        Element condition = (Element) conditions.get(i);
+
+        /* Search Specifier */
+        Element specifierElement = condition.getChild("searchspecifier", namespace);
+        SearchSpecifier searchSpecifier = SearchSpecifier.values()[Integer.parseInt(specifierElement.getAttributeValue("id"))];
+
+        /* Search Value */
+        Element valueElement = condition.getChild("searchvalue", namespace);
+        Object value = getValue(valueElement, namespace);
+
+        /* Search Field */
+        Element fieldElement = condition.getChild("searchfield", namespace);
+        String fieldId = fieldElement.getAttributeValue("id");
+        String entityName = fieldElement.getAttributeValue("entity");
+        ISearchField searchField = Owl.getModelFactory().createSearchField(Integer.parseInt(fieldId), entityName);
+
+        searchmark.addSearchCondition(Owl.getModelFactory().createSearchCondition(searchField, searchSpecifier, value));
+      } catch (NumberFormatException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      } catch (ParseException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
+    }
+  }
+
+  private Object getValue(Element valueElement, Namespace namespace) throws ParseException {
+    Object value = null;
+    int valueType = Integer.parseInt(valueElement.getAttributeValue("type"));
+
+    /* Treat set of News States separately */
+    List<?> newsStateElements = valueElement.getChildren("newsstate", namespace);
+    if (newsStateElements.size() > 0) {
+      List<INews.State> states = new ArrayList<INews.State>(newsStateElements.size());
+      for (int i = 0; i < newsStateElements.size(); i++) {
+        Element newsStateElement = (Element) newsStateElements.get(i);
+        int ordinal = Integer.parseInt(newsStateElement.getAttributeValue("value"));
+        states.add(INews.State.values()[ordinal]);
+      }
+
+      value = EnumSet.copyOf(states);
+    }
+
+    /* Any other Value */
+    else {
+      String valueAsString = valueElement.getAttributeValue("value");
+
+      switch (valueType) {
+        case ISearchValueType.BOOLEAN:
+          value = Boolean.parseBoolean(valueAsString);
+          break;
+
+        case ISearchValueType.STRING:
+          value = valueAsString;
+          break;
+
+        case ISearchValueType.LINK:
+          value = valueAsString;
+          break;
+
+        case ISearchValueType.INTEGER:
+          value = Integer.parseInt(valueAsString);
+          break;
+
+        case ISearchValueType.NUMBER:
+          value = Integer.parseInt(valueAsString);
+          break;
+
+        case ISearchValueType.DATE:
+          value = fDateFormat.parse(valueAsString);
+          break;
+
+        case ISearchValueType.DATETIME:
+          value = fDateFormat.parse(valueAsString);
+          break;
+
+        case ISearchValueType.TIME:
+          value = fDateFormat.parse(valueAsString);
+          break;
+
+        case ISearchValueType.ENUM:
+          value = valueAsString;
+          break;
+      }
+    }
+
+    return value;
   }
 
   private void processOutline(Element outline, IPersistable parent) {
@@ -100,8 +215,8 @@ public class OPMLImporter implements ITypeImporter {
     String description = null;
 
     /* Interpret Attributes */
-    List< ? > attributes = outline.getAttributes();
-    for (Iterator< ? > iter = attributes.iterator(); iter.hasNext();) {
+    List<?> attributes = outline.getAttributes();
+    for (Iterator<?> iter = attributes.iterator(); iter.hasNext();) {
       Attribute attribute = (Attribute) iter.next();
       String name = attribute.getName();
 
@@ -159,8 +274,8 @@ public class OPMLImporter implements ITypeImporter {
       return;
 
     /* Recursivley Interpret Children */
-    List< ? > feedChildren = outline.getChildren();
-    for (Iterator< ? > iter = feedChildren.iterator(); iter.hasNext();) {
+    List<?> feedChildren = outline.getChildren();
+    for (Iterator<?> iter = feedChildren.iterator(); iter.hasNext();) {
       Element child = (Element) iter.next();
       String name = child.getName().toLowerCase();
 
