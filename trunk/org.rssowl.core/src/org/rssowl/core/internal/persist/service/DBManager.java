@@ -39,6 +39,7 @@ import org.rssowl.core.internal.persist.Preference;
 import org.rssowl.core.internal.persist.SearchMark;
 import org.rssowl.core.internal.persist.migration.Migrations;
 import org.rssowl.core.persist.NewsCounter;
+import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
@@ -140,7 +141,6 @@ public class DBManager {
     fObjectContainer = createObjectContainer(config);
 
     fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
-//    copyDatabase();
   }
 
   private void migrate(int workspaceFormat, int currentFormat) {
@@ -181,8 +181,11 @@ public class DBManager {
     /* Finally, rename the actual db file */
     migDbFile.renameTo(dbFile);
 
-    if (reindexRequired)
-      InternalOwl.getDefault().getPersistenceService().getModelSearch().reindexAll(progressMonitor);
+    if (reindexRequired) {
+      IModelSearch modelSearch = InternalOwl.getDefault().getPersistenceService().getModelSearch();
+      modelSearch.startup();
+      modelSearch.reindexAll(progressMonitor);
+    }
   }
 
   private void copyFile(File originFile, File destinationFile) {
