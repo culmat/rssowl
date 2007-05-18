@@ -134,16 +134,25 @@ public class DBManager {
   public void createDatabase() throws PersistenceException {
     Configuration config = createConfiguration();
     int workspaceVersion = getWorkspaceFormatVersion();
+    boolean reindexRequired = false;
+
+    //FIXME Use a better progress monitor
+    IProgressMonitor progressMonitor = new NullProgressMonitor();
     if (workspaceVersion != getCurrentFormatVersion()) {
-      migrate(workspaceVersion, getCurrentFormatVersion());
+      reindexRequired = migrate(workspaceVersion, getCurrentFormatVersion(), progressMonitor);
     }
 
     fObjectContainer = createObjectContainer(config);
 
     fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
+    if (reindexRequired) {
+      IModelSearch modelSearch = InternalOwl.getDefault().getPersistenceService().getModelSearch();
+      modelSearch.startup();
+      modelSearch.reindexAll(progressMonitor);
+    }
   }
 
-  private void migrate(int workspaceFormat, int currentFormat) {
+  private boolean migrate(int workspaceFormat, int currentFormat, IProgressMonitor progressMonitor) {
     ConfigurationFactory configFactory = new ConfigurationFactory() {
       public Configuration createConfiguration() {
         return DBManager.this.createConfiguration();
@@ -159,9 +168,6 @@ public class DBManager {
     String migDbFileName = getDBFilePath() + ".mig";
     File migDbFile = new File(migDbFileName);
     copyFile(dbFile, migDbFile);
-
-    //FIXME Use a better progress monitor
-    IProgressMonitor progressMonitor = new NullProgressMonitor();
 
     /* Migrate the copy */
     boolean reindexRequired = migration.migrate(configFactory, migDbFileName, progressMonitor);
@@ -181,11 +187,7 @@ public class DBManager {
     /* Finally, rename the actual db file */
     migDbFile.renameTo(dbFile);
 
-    if (reindexRequired) {
-      IModelSearch modelSearch = InternalOwl.getDefault().getPersistenceService().getModelSearch();
-      modelSearch.startup();
-      modelSearch.reindexAll(progressMonitor);
-    }
+    return reindexRequired;
   }
 
   private void copyFile(File originFile, File destinationFile) {
