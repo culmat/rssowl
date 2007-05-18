@@ -64,6 +64,10 @@ public interface IModelSearch {
   void shutdown() throws PersistenceException;
 
   /**
+   * Makes the <code>IModelSearch</code> capable of indexing entities and
+   * returning results. <br>
+   * Note that this method can be called multiple times with no side-effects.
+   *
    * @throws PersistenceException
    */
   void startup() throws PersistenceException;
