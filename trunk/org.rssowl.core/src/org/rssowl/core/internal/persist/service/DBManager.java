@@ -158,7 +158,8 @@ public class DBManager {
     copyFile(dbFile, migDbFile);
 
     /* Migrate the copy */
-    migration.migrate(configFactory, migDbFileName);
+    //FIXME Pass a real progress monitor
+    migration.migrate(configFactory, migDbFileName, null);
 
     /*
      * Copy the db file to a permanent back where the file name includes the

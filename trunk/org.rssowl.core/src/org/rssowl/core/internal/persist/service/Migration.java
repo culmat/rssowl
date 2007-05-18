@@ -23,27 +23,30 @@
  **  **********************************************************************  */
 package org.rssowl.core.internal.persist.service;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+
 /**
  * Implementors of this interface are able to migrate the database data from
- * one format version to another. 
+ * one format version to another.
  */
 public interface Migration {
   /**
    * @return the format version that the implementor can migrate from.
    */
   int getOriginFormat();
-  
+
   /**
    * @return the format version that the implementor can migrate to.
    */
   int getDestinationFormat();
-  
+
   /**
    * Perform the migration. Implementors are responsible for making sure
    * that all object containers are closed at the end of the script.
-   * 
+   *
    * @param configFactory
    * @param dbFileName
+   * @param progressMonitor
    */
-  void migrate(ConfigurationFactory configFactory, String dbFileName);
+  void migrate(ConfigurationFactory configFactory, String dbFileName, IProgressMonitor progressMonitor);
 }
