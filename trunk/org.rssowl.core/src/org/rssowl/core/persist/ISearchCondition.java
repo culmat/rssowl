@@ -24,7 +24,6 @@
 
 package org.rssowl.core.persist;
 
-
 /**
  * <p>
  * Instances of <code>ISearchCondition</code> are grouped under a single
@@ -68,7 +67,7 @@ package org.rssowl.core.persist;
  *
  * @author bpasero
  */
-public interface ISearchCondition extends IEntity   {
+public interface ISearchCondition extends IEntity {
 
   /**
    * Instances of <code>ISearchField</code> describe the affected field of
@@ -97,7 +96,7 @@ public interface ISearchCondition extends IEntity   {
    * <li>Number</li>
    * <li>Boolean</li>
    * <li>Date</li>
-   * <li>Enum</li>
+   * <li>EnumSet</li>
    * </ul>
    *
    * @return Returns the target Query-Value for matching News on the given
@@ -117,6 +116,17 @@ public interface ISearchCondition extends IEntity   {
   void setSpecifier(SearchSpecifier specifier);
 
   /**
+   * Sets the value of this search-condition. The value is the target
+   * Query-Value for matching News on the given search field. Depending on the
+   * Search-Field, this can be any of:
+   * <ul>
+   * <li>String</li>
+   * <li>Number</li>
+   * <li>Boolean</li>
+   * <li>Date</li>
+   * <li>EnumSet</li>
+   * </ul>
+   *
    * @param value Sets the target String for matching News on the given search
    * field.
    */
