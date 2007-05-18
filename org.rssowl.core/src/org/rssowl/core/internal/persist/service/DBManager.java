@@ -23,9 +23,12 @@
  **  **********************************************************************  */
 package org.rssowl.core.internal.persist.service;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.AbstractEntity;
 import org.rssowl.core.internal.persist.BookMark;
 import org.rssowl.core.internal.persist.ConditionalGet;
@@ -157,9 +160,11 @@ public class DBManager {
     File migDbFile = new File(migDbFileName);
     copyFile(dbFile, migDbFile);
 
+    //FIXME Use a better progress monitor
+    IProgressMonitor progressMonitor = new NullProgressMonitor();
+
     /* Migrate the copy */
-    //FIXME Pass a real progress monitor
-    migration.migrate(configFactory, migDbFileName, null);
+    boolean reindexRequired = migration.migrate(configFactory, migDbFileName, progressMonitor);
 
     /*
      * Copy the db file to a permanent back where the file name includes the
@@ -175,6 +180,9 @@ public class DBManager {
 
     /* Finally, rename the actual db file */
     migDbFile.renameTo(dbFile);
+
+    if (reindexRequired)
+      InternalOwl.getDefault().getPersistenceService().getModelSearch().reindexAll(progressMonitor);
   }
 
   private void copyFile(File originFile, File destinationFile) {
