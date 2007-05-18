@@ -40,8 +40,6 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
-import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.RetentionStrategy;
@@ -65,7 +63,6 @@ import java.util.Map.Entry;
 public class MarkReadAction extends Action implements IWorkbenchWindowActionDelegate {
   private IStructuredSelection fSelection;
   private NewsService fNewsService;
-  private INewsDAO fNewsDAO;
 
   /**
    *
@@ -80,7 +77,6 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
   public MarkReadAction(IStructuredSelection selection) {
     fSelection = selection;
     fNewsService = Controller.getDefault().getNewsService();
-    fNewsDAO = DynamicDAO.getDAO(INewsDAO.class);
   }
 
   /*
