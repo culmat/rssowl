@@ -131,9 +131,9 @@ public class OPMLImporter implements ITypeImporter {
 
         /* Search Field */
         Element fieldElement = condition.getChild("searchfield", namespace);
-        String fieldId = fieldElement.getAttributeValue("id");
+        String fieldName = fieldElement.getAttributeValue("name");
         String entityName = fieldElement.getAttributeValue("entity");
-        ISearchField searchField = Owl.getModelFactory().createSearchField(Integer.parseInt(fieldId), entityName);
+        ISearchField searchField = Owl.getModelFactory().createSearchField(getFieldID(fieldName), entityName);
 
         searchmark.addSearchCondition(Owl.getModelFactory().createSearchCondition(searchField, searchSpecifier, value));
       } catch (NumberFormatException e) {
@@ -142,6 +142,70 @@ public class OPMLImporter implements ITypeImporter {
         Activator.getDefault().logError(e.getMessage(), e);
       }
     }
+  }
+
+  private int getFieldID(String fieldName) {
+    if ("allFields".equals(fieldName))
+      return IEntity.ALL_FIELDS;
+
+    if ("title".equals(fieldName))
+      return INews.TITLE;
+
+    if ("link".equals(fieldName))
+      return INews.LINK;
+
+    if ("description".equals(fieldName))
+      return INews.DESCRIPTION;
+
+    if ("publishDate".equals(fieldName))
+      return INews.PUBLISH_DATE;
+
+    if ("modifiedDate".equals(fieldName))
+      return INews.MODIFIED_DATE;
+
+    if ("receiveDate".equals(fieldName))
+      return INews.RECEIVE_DATE;
+
+    if ("author".equals(fieldName))
+      return INews.AUTHOR;
+
+    if ("comments".equals(fieldName))
+      return INews.COMMENTS;
+
+    if ("guid".equals(fieldName))
+      return INews.GUID;
+
+    if ("source".equals(fieldName))
+      return INews.SOURCE;
+
+    if ("hasAttachments".equals(fieldName))
+      return INews.HAS_ATTACHMENTS;
+
+    if ("attachments".equals(fieldName))
+      return INews.ATTACHMENTS_CONTENT;
+
+    if ("categories".equals(fieldName))
+      return INews.CATEGORIES;
+
+    if ("isFlagged".equals(fieldName))
+      return INews.IS_FLAGGED;
+
+    if ("state".equals(fieldName))
+      return INews.STATE;
+
+    if ("label".equals(fieldName))
+      return INews.LABEL;
+
+    if ("rating".equals(fieldName))
+      return INews.RATING;
+
+    if ("feed".equals(fieldName))
+      return INews.FEED;
+
+    if ("ageInDays".equals(fieldName))
+      return INews.AGE_IN_DAYS;
+
+    return IEntity.ALL_FIELDS;
   }
 
   private Object getValue(Element valueElement, Namespace namespace) throws ParseException {
