@@ -47,6 +47,9 @@ public interface Migration {
    * @param configFactory
    * @param dbFileName
    * @param progressMonitor
+   *
+   * @return <code>true</code> if the Lucene index should be re-indexed or
+   * <code>false</code> otherwise.
    */
-  void migrate(ConfigurationFactory configFactory, String dbFileName, IProgressMonitor progressMonitor);
+  boolean migrate(ConfigurationFactory configFactory, String dbFileName, IProgressMonitor progressMonitor);
 }
