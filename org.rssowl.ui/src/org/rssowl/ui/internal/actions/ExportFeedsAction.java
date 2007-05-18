@@ -34,8 +34,10 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -193,9 +195,56 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
     }
 
     /* Search Field */
-    str.append("\t\t<rssowl:searchfield id=\"" + condition.getField().getId() + "\" entity=\"" + condition.getField().getEntityName() + "\" />\n");
+    str.append("\t\t<rssowl:searchfield name=\"" + getSearchFieldName(condition.getField().getId()) + "\" entity=\"" + condition.getField().getEntityName() + "\" />\n");
 
     return str.toString();
+  }
+
+  private String getSearchFieldName(int fieldId) {
+    switch (fieldId) {
+      case (IEntity.ALL_FIELDS):
+        return "allFields";
+      case (INews.TITLE):
+        return "title";
+      case (INews.LINK):
+        return "link";
+      case (INews.DESCRIPTION):
+        return "description";
+      case (INews.PUBLISH_DATE):
+        return "publishDate";
+      case (INews.MODIFIED_DATE):
+        return "modifiedDate";
+      case (INews.RECEIVE_DATE):
+        return "receiveDate";
+      case (INews.AUTHOR):
+        return "author";
+      case (INews.COMMENTS):
+        return "comments";
+      case (INews.GUID):
+        return "guid";
+      case (INews.SOURCE):
+        return "source";
+      case (INews.HAS_ATTACHMENTS):
+        return "hasAttachments";
+      case (INews.ATTACHMENTS_CONTENT):
+        return "attachments";
+      case (INews.CATEGORIES):
+        return "categories";
+      case (INews.IS_FLAGGED):
+        return "isFlagged";
+      case (INews.STATE):
+        return "state";
+      case (INews.LABEL):
+        return "label";
+      case (INews.RATING):
+        return "rating";
+      case (INews.FEED):
+        return "feed";
+      case (INews.AGE_IN_DAYS):
+        return "ageInDays";
+      default:
+        return "allFields";
+    }
   }
 
   private String getValueString(ISearchCondition condition) {
