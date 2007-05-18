@@ -51,6 +51,7 @@ import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.NativeFSLockFactory;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
@@ -58,7 +59,6 @@ import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
-import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IndexListener;
@@ -628,7 +628,8 @@ public class ModelSearchImpl implements IModelSearch {
    * @see org.rssowl.core.persist.service.IModelSearch#reindexAll(org.eclipse.core.runtime.IProgressMonitor)
    */
   public synchronized void reindexAll(IProgressMonitor monitor) throws PersistenceException {
-    Collection<IFeed> feeds = DynamicDAO.loadAll(IFeed.class);
+    /* May be used before Owl is completely set-up */
+    Collection<IFeed> feeds = InternalOwl.getDefault().getPersistenceService().getDAOService().getFeedDAO().loadAll();
     monitor.beginTask("Re-Indexing all News", feeds.size());
 
     /* Delete the Index first */
