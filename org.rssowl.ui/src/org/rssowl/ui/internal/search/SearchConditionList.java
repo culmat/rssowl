@@ -311,7 +311,6 @@ public class SearchConditionList extends ScrolledComposite {
     /* Button to delete Condition */
     ToolItem deleteButton = new ToolItem(buttonBar, SWT.PUSH);
     deleteButton.setImage(fDeleteIcon);
-    deleteButton.setEnabled(index > 0);
     deleteButton.setToolTipText("Delete Condition");
     deleteButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -361,6 +360,10 @@ public class SearchConditionList extends ScrolledComposite {
         itemContainer.dispose();
         removeItem(item);
         fModified = true;
+
+        /* Restore Default if required */
+        if (fItems.size() == 0)
+          addItem(getDefaultCondition()).focusInput();
       }
     });
   }
