@@ -388,6 +388,8 @@ public class DBManager {
     /* Indexes */
     oc.objectField("fLinkText").indexed(true); //$NON-NLS-1$
     oc.objectField("fGuidValue").indexed(true); //$NON-NLS-1$
+    oc.objectField("fFeedLink").indexed(true); //$NON-NLS-1$
+    oc.objectField("fStateOrdinal").indexed(true); //$NON-NLS-1$
   }
 
   private void configureFeed(Configuration config)  {

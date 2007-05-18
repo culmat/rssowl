@@ -24,6 +24,7 @@
 
 package org.rssowl.core.internal.persist.dao;
 
+import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.persist.INews;
@@ -32,13 +33,17 @@ import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.service.PersistenceException;
 
 import com.db4o.ext.Db4oException;
+import com.db4o.query.Constraint;
 import com.db4o.query.Query;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -161,5 +166,34 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
       }
     }
     return changedNews;
+  }
+
+  public Collection<INews> loadAll(FeedLinkReference feedRef, Set<State> states) {
+    Assert.isNotNull(feedRef, "feedRef");
+    Assert.isNotNull(states, "states");
+    if (states.isEmpty())
+      return new ArrayList<INews>(0);
+
+    try {
+      Query query = fDb.query();
+      query.constrain(News.class);
+      query.descend("fFeedLink").constrain(feedRef.getLink().toString());
+      if (!states.containsAll(EnumSet.allOf(INews.State.class))) {
+        Constraint constraint = null;
+        for (INews.State state : states) {
+          if (constraint == null)
+            constraint = query.descend("fStateOrdinal").constrain(state.ordinal());
+          else
+            constraint = query.descend("fStateOrdinal").constrain(state.ordinal()).or(constraint);
+        }
+      }
+
+      Collection<INews> news = getList(query);
+      activateAll(news);
+
+      return new ArrayList<INews>(news);
+    } catch (Db4oException e) {
+      throw new PersistenceException(e);
+    }
   }
 }

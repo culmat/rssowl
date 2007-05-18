@@ -27,9 +27,11 @@ package org.rssowl.core.persist.dao;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.service.PersistenceException;
 
 import java.util.Collection;
+import java.util.Set;
 
 /**
  * A data-access-object for <code>INews</code>.
@@ -56,4 +58,16 @@ public interface INewsDAO extends IEntityDAO<INews, NewsListener, NewsEvent> {
    * @throws PersistenceException
    */
   void setState(Collection<INews> news, INews.State state, boolean affectEquivalentNews, boolean force) throws PersistenceException;
+
+  /**
+   * Loads all the news that have a feedReference equal to <code>feedRef</code>
+   * and state matching any of <code>states</code>.
+   *
+   * @param feedRef A non-null FeedLinkReference.
+   * @param states A non-null Set (typically EnumSet) containing the all the acceptable states for
+   * the returns INews items.
+   * @return A Collection of INews with <code>feedRef</code> and any of
+   * <code>states</code>.
+   */
+  Collection<INews> loadAll(FeedLinkReference feedRef, Set<INews.State> states);
 }

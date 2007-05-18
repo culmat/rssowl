@@ -53,6 +53,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.dao.IFeedDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.event.BookMarkEvent;
 import org.rssowl.core.persist.event.BookMarkListener;
 import org.rssowl.core.persist.event.FolderEvent;
@@ -67,7 +68,6 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.reference.NewsReference;
-import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.tests.TestUtils;
 import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.ui.internal.Controller;
@@ -79,6 +79,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -253,17 +254,17 @@ public class ApplicationLayerTest {
   public void testSetNewsStateWithEquivalentNewsHasNewsEventEntityActivated() throws Exception {
     NewsListener newsListener = null;
     try {
-      IFeed feed1 = Owl.getModelFactory().createFeed(null, new URI("http://www.feed.com"));
-      IFeed feed2 = Owl.getModelFactory().createFeed(null, new URI("http://www.feed2.com"));
+      IFeed feed1 = fFactory.createFeed(null, new URI("http://www.feed.com"));
+      IFeed feed2 = fFactory.createFeed(null, new URI("http://www.feed2.com"));
 
-      INews news1 = Owl.getModelFactory().createNews(null, feed1, new Date());
+      INews news1 = fFactory.createNews(null, feed1, new Date());
       news1.setLink(new URI("www.link.com"));
 
-      INews news2 = Owl.getModelFactory().createNews(null, feed2, new Date());
+      INews news2 = fFactory.createNews(null, feed2, new Date());
       news2.setLink(new URI("www.link.com"));
 
-      Owl.getModelFactory().createNews(null, feed1, new Date());
-      Owl.getModelFactory().createNews(null, feed2, new Date());
+      fFactory.createNews(null, feed1, new Date());
+      fFactory.createNews(null, feed2, new Date());
 
       DynamicDAO.save(feed1);
       feed2 = DynamicDAO.save(feed2);
@@ -919,15 +920,15 @@ public class ApplicationLayerTest {
   /**
    * @throws Exception
    */
-  @SuppressWarnings("nls")
+  
   @Test
   public void testSetNewsState() throws Exception {
     NewsListener newsListener = null;
     try {
-      IFeed feed = Owl.getModelFactory().createFeed(null, new URI("http://www.feed.com"));
-      Owl.getModelFactory().createNews(null, feed, new Date());
-      Owl.getModelFactory().createNews(null, feed, new Date());
-      Owl.getModelFactory().createNews(null, feed, new Date());
+      IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com"));
+      fFactory.createNews(null, feed, new Date());
+      fFactory.createNews(null, feed, new Date());
+      fFactory.createNews(null, feed, new Date());
 
       Feed savedFeed = (Feed) DynamicDAO.save(feed);
       assertTrue(savedFeed.isIdentical(DynamicDAO.load(IFeed.class, savedFeed.getId())));
@@ -978,12 +979,71 @@ public class ApplicationLayerTest {
       assertEquals(news1.resolve().getState(), INews.State.DELETED);
       assertEquals(news2.resolve().getState(), INews.State.DELETED);
       assertEquals(news3.resolve().getState(), INews.State.NEW);
-    } catch (PersistenceException e) {
-      TestUtils.fail(e);
     } finally {
       if (newsListener != null)
         DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
+  }
+  
+  /**
+   * Tests {@link INewsDAO#loadAll(FeedLinkReference, Set)}.
+   * @throws Exception 
+   */
+  
+  @Test
+  public void testLoadAllNewsByFeedAndState() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com"));
+    INews news = fFactory.createNews(null, feed, new Date());
+    FeedLinkReference feedRef = news.getFeedReference();
+    news.setState(INews.State.HIDDEN);
+    fFactory.createNews(null, feed, new Date()).setState(INews.State.UNREAD);
+    fFactory.createNews(null, feed, new Date()).setState(INews.State.UPDATED);
+    DynamicDAO.save(feed);
+    
+    IFeed anotherFeed = fFactory.createFeed(null, new URI("http://www.anotherfeed.com"));
+    INews anotherNews = fFactory.createNews(null, anotherFeed, new Date());
+    FeedLinkReference anotherFeedRef = anotherNews.getFeedReference();
+    fFactory.createNews(null, anotherFeed, new Date());
+    fFactory.createNews(null, anotherFeed, new Date()).setState(INews.State.DELETED);
+    DynamicDAO.save(anotherFeed);
+
+    INewsDAO newsDao = DynamicDAO.getDAO(INewsDAO.class);
+    
+    /* All states */
+    Collection<INews> newsCollection = newsDao.loadAll(feedRef, EnumSet.allOf(INews.State.class));
+    assertEquals(feed.getNews().size(), newsCollection.size());
+    for (INews newsItem : feed.getNews())
+      assertEquals(true, newsCollection.contains(newsItem));
+    
+    newsCollection = newsDao.loadAll(anotherFeedRef, EnumSet.allOf(INews.State.class));
+    assertEquals(anotherFeed.getNews().size(), newsCollection.size());
+    for (INews newsItem : anotherFeed.getNews())
+      assertEquals(true, newsCollection.contains(newsItem));
+
+    /* Two matching states */
+    newsCollection = newsDao.loadAll(feedRef, EnumSet.of(INews.State.UNREAD, INews.State.UPDATED));
+    assertEquals(2, newsCollection.size());
+    assertEquals(true, newsCollection.contains(feed.getNews().get(1)));
+    assertEquals(true, newsCollection.contains(feed.getNews().get(2)));
+
+    /* One matching state */
+    newsCollection = newsDao.loadAll(anotherFeedRef, EnumSet.of(INews.State.DELETED));
+    assertEquals(1, newsCollection.size());
+    assertEquals(anotherFeed.getNews().get(2), newsCollection.iterator().next());
+    
+    /* No matching state */
+    newsCollection = newsDao.loadAll(feedRef, EnumSet.of(INews.State.DELETED));
+    assertEquals(0, newsCollection.size());
+
+    /* One state with two matches and two states with no matches */
+    newsCollection = newsDao.loadAll(anotherFeedRef, EnumSet.of(INews.State.NEW, INews.State.HIDDEN, INews.State.UPDATED));
+    assertEquals(2, newsCollection.size());
+    assertEquals(true, newsCollection.contains(anotherFeed.getNews().get(0)));
+    assertEquals(true, newsCollection.contains(anotherFeed.getNews().get(1)));
+    
+    /* Empty states */
+    newsCollection = newsDao.loadAll(feedRef, EnumSet.noneOf(INews.State.class));
+    assertEquals(0, newsCollection.size());
   }
 
   /**
@@ -995,17 +1055,17 @@ public class ApplicationLayerTest {
     try {
       NewsService service = Controller.getDefault().getNewsService();
 
-      IFeed feed1 = Owl.getModelFactory().createFeed(null, new URI("http://www.feed.com"));
-      IFeed feed2 = Owl.getModelFactory().createFeed(null, new URI("http://www.feed2.com"));
+      IFeed feed1 = fFactory.createFeed(null, new URI("http://www.feed.com"));
+      IFeed feed2 = fFactory.createFeed(null, new URI("http://www.feed2.com"));
 
-      INews news1 = Owl.getModelFactory().createNews(null, feed1, new Date());
+      INews news1 = fFactory.createNews(null, feed1, new Date());
       news1.setLink(new URI("www.link.com"));
 
-      INews news2 = Owl.getModelFactory().createNews(null, feed2, new Date());
+      INews news2 = fFactory.createNews(null, feed2, new Date());
       news2.setLink(new URI("www.link.com"));
 
-      Owl.getModelFactory().createNews(null, feed1, new Date());
-      Owl.getModelFactory().createNews(null, feed2, new Date());
+      fFactory.createNews(null, feed1, new Date());
+      fFactory.createNews(null, feed2, new Date());
 
       feed1 = DynamicDAO.save(feed1);
       feed2 = DynamicDAO.save(feed2);
