@@ -741,8 +741,15 @@ public class SearchNewsDialog extends TitleAreaDialog {
         Float mediumRelThreshold = maxRelevanceScore / 3f * 1f;
         Float highRelThreshold = maxRelevanceScore / 3f * 2f;
 
+        Set<State> visibleStates = State.getVisible();
+
         /* Fill Results with Relevance */
         for (SearchHit<NewsReference> searchHit : searchHits) {
+
+          /* Only add visible News for now */
+          INews.State state = (State) searchHit.getData(INews.STATE);
+          if (!visibleStates.contains(state))
+            continue;
 
           /* TODO Have to test if Entity really exists (bug 173) */
           if (!fNewsDao.exists(searchHit.getResult().getId()))
@@ -755,7 +762,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
           else if (relevanceRaw > mediumRelThreshold)
             relevance = Relevance.MEDIUM;
 
-          INews.State state = (State) searchHit.getData(INews.STATE);
+          /* Add to result */
           fResult.add(new ScoredNews(searchHit.getResult(), state, relevanceRaw, relevance));
         }
 
