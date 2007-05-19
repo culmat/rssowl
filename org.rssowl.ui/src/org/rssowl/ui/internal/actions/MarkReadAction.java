@@ -35,11 +35,12 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
-import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.RetentionStrategy;
@@ -49,6 +50,7 @@ import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,6 +65,7 @@ import java.util.Map.Entry;
 public class MarkReadAction extends Action implements IWorkbenchWindowActionDelegate {
   private IStructuredSelection fSelection;
   private NewsService fNewsService;
+  private INewsDAO fNewsDao;
 
   /**
    *
@@ -77,6 +80,7 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
   public MarkReadAction(IStructuredSelection selection) {
     fSelection = selection;
     fNewsService = Controller.getDefault().getNewsService();
+    fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
   }
 
   /*
@@ -117,13 +121,13 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
       }
     }
 
-    /* Relax */
+    /* Normalize */
     if (folders != null)
       for (IFolder folder : folders)
         ModelUtils.normalize(folder, entities);
 
     /* Use Map for follow-up Retention */
-    Map<IBookMark, List<INews>> retentionHelperMap = new HashMap<IBookMark, List<INews>>();
+    Map<IBookMark, Collection<INews>> retentionHelperMap = new HashMap<IBookMark, Collection<INews>>();
 
     /* Retrieve affected News */
     List<INews> news = new ArrayList<INews>();
@@ -144,22 +148,19 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
     }
 
     /* See if Retention is required for each BookMark */
-    Set<Entry<IBookMark, List<INews>>> entries = retentionHelperMap.entrySet();
-    for (Entry<IBookMark, List<INews>> entry : entries) {
+    Set<Entry<IBookMark, Collection<INews>>> entries = retentionHelperMap.entrySet();
+    for (Entry<IBookMark, Collection<INews>> entry : entries) {
       IBookMark bookmark = entry.getKey();
-      IPreferenceScope bookMarkPreferences = Owl.getPreferenceService().getEntityScope(bookmark);
 
       /* Delete News that are now marked as Read */
-      if (bookMarkPreferences.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE)) {
-        List<INews> deletedNews = RetentionStrategy.process(bookmark, entry.getValue());
+      List<INews> deletedNews = RetentionStrategy.process(bookmark, entry.getValue());
 
-        /*
-         * This is an optimization to the process. Any News that is marked as
-         * read is getting deleted here. Thus, there is no need in marking the
-         * News as Read.
-         */
-        news.removeAll(deletedNews);
-      }
+      /*
+       * This is an optimization to the process. Any News that is marked as read
+       * is getting deleted here. Thus, there is no need in marking the News as
+       * Read.
+       */
+      news.removeAll(deletedNews);
     }
 
     /* Mark News Read */
@@ -182,7 +183,7 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
   }
 
   /* TODO This Method is currently ignoring SearchMarks */
-  private void fillNews(IFolder folder, List<INews> news, Map<IBookMark, List<INews>> bookMarkNewsMap) {
+  private void fillNews(IFolder folder, List<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap) {
     List<IFolderChild> children = folder.getChildren();
     for (IFolderChild child : children) {
       if (child instanceof IBookMark && containsUnread(((IBookMark) child)))
@@ -196,11 +197,21 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
     return fNewsService.getUnreadCount(mark.getFeedLinkReference()) != 0;
   }
 
-  private void fillNews(IBookMark bookmark, List<INews> news, Map<IBookMark, List<INews>> bookMarkNewsMap) {
-    IFeed feed = bookmark.getFeedLinkReference().resolve();
+  private void fillNews(IBookMark bookmark, List<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap) {
+    IPreferenceScope bookMarkPrefs = Owl.getPreferenceService().getEntityScope(bookmark);
+    boolean requiresRetention = bookMarkPrefs.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE);
 
-    news.addAll(feed.getNewsByStates(EnumSet.of(INews.State.UNREAD, INews.State.UPDATED, INews.State.NEW)));
-    bookMarkNewsMap.put(bookmark, feed.getVisibleNews());
+    /* Retention on read News required, load *read* as well */
+    if (requiresRetention) {
+      Collection<INews> feedsNews = fNewsDao.loadAll(bookmark.getFeedLinkReference(), INews.State.getVisible());
+      news.addAll(feedsNews);
+      bookMarkNewsMap.put(bookmark, feedsNews);
+    }
+
+    /* No retention required, just load the ones being affected */
+    else {
+      news.addAll(fNewsDao.loadAll(bookmark.getFeedLinkReference(), EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
+    }
   }
 
   private void fillNews(ISearchMark searchmark, List<INews> news) {
