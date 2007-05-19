@@ -40,7 +40,7 @@ import org.rssowl.ui.internal.util.ViewerOpenStrategy;
 /**
  * A Subclass of <code>TreeViewer</code> to display Folders and all kinds of
  * Marks in the "BookMark Explorer".
- * 
+ *
  * @author bpasero
  */
 public class BookMarkViewer extends TreeViewer {
@@ -74,6 +74,14 @@ public class BookMarkViewer extends TreeViewer {
     } finally {
       getControl().getParent().setRedraw(true);
     }
+  }
+
+  @Override
+  public void refresh(Object element) {
+    super.refresh(element);
+
+    /* TODO Revisit later */
+    fExplorer.restoreExpandedElements();
   }
 
   /*
@@ -125,7 +133,7 @@ public class BookMarkViewer extends TreeViewer {
 
   /*
    * Overrides the open-listener to work with the ViewerOpenStrategy.
-   * 
+   *
    * @see org.eclipse.jface.viewers.StructuredViewer#addOpenListener(org.eclipse.jface.viewers.IOpenListener)
    */
   @Override
