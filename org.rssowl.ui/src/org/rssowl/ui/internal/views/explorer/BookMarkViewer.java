@@ -66,6 +66,9 @@ public class BookMarkViewer extends TreeViewer {
     super.createChildren(widget);
   }
 
+  /*
+   * @see org.eclipse.jface.viewers.StructuredViewer#refresh(boolean)
+   */
   @Override
   public void refresh(boolean updateLabels) {
     getControl().getParent().setRedraw(false);
@@ -76,9 +79,16 @@ public class BookMarkViewer extends TreeViewer {
     }
   }
 
+  /*
+   * @see org.eclipse.jface.viewers.ColumnViewer#refresh(java.lang.Object)
+   */
   @Override
   public void refresh(Object element) {
     super.refresh(element);
+
+    /* Avoid restoring expanded elements on refresh() */
+    if (element == getRoot())
+      return;
 
     /* TODO Revisit later */
     fExplorer.restoreExpandedElements();
