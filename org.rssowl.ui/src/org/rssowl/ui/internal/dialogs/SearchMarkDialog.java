@@ -56,6 +56,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.OwlUI;
@@ -293,8 +294,13 @@ public class SearchMarkDialog extends TitleAreaDialog {
     super.initializeBounds();
 
     if (fFirstTimeOpen) {
-      Point bestSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
-      getShell().setSize(bestSize.x, bestSize.y);
+      Point requiredSize = getShell().computeSize(SWT.DEFAULT, SWT.DEFAULT);
+
+      /* Bug in SWT: The preferred width of the state condition is wrong */
+      if (Application.IS_LINUX)
+        requiredSize.x = requiredSize.x + 100;
+
+      getShell().setSize(requiredSize);
       LayoutUtils.positionShell(getShell(), false);
     }
   }
