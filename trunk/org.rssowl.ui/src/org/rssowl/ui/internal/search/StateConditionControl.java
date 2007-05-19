@@ -56,7 +56,6 @@ public class StateConditionControl extends Composite {
   private Button fUpdatedState;
   private Button fReadState;
   private EnumSet<State> fSelectedStates;
-  private boolean fModified;
 
   /**
    * @param parent The parent Composite.
@@ -110,40 +109,10 @@ public class StateConditionControl extends Composite {
    * <code>NULL</code> if none.
    */
   void select(EnumSet<INews.State> selectedStates) {
-    fModified = true;
     fNewState.setSelection(selectedStates != null && selectedStates.contains(INews.State.NEW));
     fUnreadState.setSelection(selectedStates != null && selectedStates.contains(INews.State.UNREAD));
     fUpdatedState.setSelection(selectedStates != null && selectedStates.contains(INews.State.UPDATED));
     fReadState.setSelection(selectedStates != null && selectedStates.contains(INews.State.READ));
-  }
-
-  /**
-   * Optimization: In order to check weather conditions in the list have been
-   * modified, this method can be used
-   *
-   * @return Returns <code>TRUE</code> if the list of conditions was modified
-   * and <code>FALSE</code> otherwise.
-   */
-  boolean isModified() {
-    if (fModified)
-      return true;
-
-    if (fSelectedStates == null)
-      return hasSelected();
-
-    if (fSelectedStates.contains(INews.State.NEW) != fNewState.getSelection())
-      return true;
-
-    if (fSelectedStates.contains(INews.State.UNREAD) != fUnreadState.getSelection())
-      return true;
-
-    if (fSelectedStates.contains(INews.State.UPDATED) != fUpdatedState.getSelection())
-      return true;
-
-    if (fSelectedStates.contains(INews.State.READ) != fReadState.getSelection())
-      return true;
-
-    return false;
   }
 
   boolean hasSelected() {

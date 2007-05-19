@@ -72,20 +72,6 @@ public class CTree {
   }
 
   /**
-   * @param layoutData
-   * @param text
-   * @param image
-   * @param moveable
-   * @param resizable
-   * @return TreeColumn
-   */
-  public TreeColumn createColumn(CColumnLayoutData layoutData, String text, Image image, boolean moveable, boolean resizable) {
-    TreeColumn col = new TreeColumn(fTree, SWT.LEFT);
-    manageColumn(col, layoutData, text, image, moveable, resizable);
-    return col;
-  }
-
-  /**
    * @param col
    * @param layoutData
    * @param text
