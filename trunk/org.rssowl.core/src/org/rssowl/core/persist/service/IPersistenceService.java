@@ -27,6 +27,7 @@ package org.rssowl.core.persist.service;
 import org.rssowl.core.persist.dao.DAOService;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IEntityDAO;
+import org.rssowl.core.util.LongOperationMonitor;
 
 /**
  * Provides access to ther persistence layer of RSSOwl. This layer is
@@ -48,8 +49,9 @@ public interface IPersistenceService {
   /**
    * Startup the persistence layer. In case of a Database, this would be the
    * right place to open the connection.
+   * @param monitor
    */
-  void startup();
+  void startup(LongOperationMonitor monitor);
 
   /**
    * Gets the implementation of <code>DAOService</code> that provides access

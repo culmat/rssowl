@@ -25,8 +25,8 @@ package org.rssowl.core.internal.persist.service;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ListenerList;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.SubMonitor;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.AbstractEntity;
@@ -42,6 +42,7 @@ import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.LoggingSafeRunnable;
+import org.rssowl.core.util.LongOperationMonitor;
 
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
@@ -84,15 +85,16 @@ public class DBManager {
 
   /**
    * Load and initialize the contributed DataBase.
+   * @param monitor
    *
    * @throws PersistenceException In case of an error while initializing and loading the
    * contributed DataBase.
    */
-  public void startup() throws PersistenceException {
+  public void startup(LongOperationMonitor monitor) throws PersistenceException {
     /* Initialise */
     EventManager.getInstance();
 
-    createDatabase();
+    createDatabase(monitor);
   }
 
   public void addEntityStoreListener(DatabaseListener listener) {
@@ -131,24 +133,39 @@ public class DBManager {
     fEntityStoreListeners.remove(listener);
   }
 
-  public void createDatabase() throws PersistenceException {
+  public void createDatabase(LongOperationMonitor progressMonitor) throws PersistenceException {
     Configuration config = createConfiguration();
     int workspaceVersion = getWorkspaceFormatVersion();
     boolean reindexRequired = false;
 
-    //FIXME Use a better progress monitor
-    IProgressMonitor progressMonitor = new NullProgressMonitor();
-    if (workspaceVersion != getCurrentFormatVersion()) {
-      reindexRequired = migrate(workspaceVersion, getCurrentFormatVersion(), progressMonitor);
-    }
+    SubMonitor subMonitor = null;
+    try {
+      if (workspaceVersion != getCurrentFormatVersion()) {
+        progressMonitor.beginLongOperation();
+        subMonitor = SubMonitor.convert(progressMonitor, 100);
+        reindexRequired = migrate(workspaceVersion, getCurrentFormatVersion(), subMonitor.newChild(10));
+      }
 
-    fObjectContainer = createObjectContainer(config);
+      fObjectContainer = createObjectContainer(config);
 
-    fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
-    if (reindexRequired) {
-      IModelSearch modelSearch = InternalOwl.getDefault().getPersistenceService().getModelSearch();
-      modelSearch.startup();
-      modelSearch.reindexAll(progressMonitor);
+      fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
+
+      /*
+       * If reindexRequired is true, subMonitor is guaranteed to be non-null,
+       * but we have the check anyway to
+       */
+      if (subMonitor != null && reindexRequired) {
+        IModelSearch modelSearch = InternalOwl.getDefault().getPersistenceService().getModelSearch();
+        modelSearch.startup();
+        modelSearch.reindexAll(subMonitor.newChild(90));
+      }
+    } finally {
+      /*
+       * If we perform the migration, the subMonitor is not null. Otherwise we
+       * don't show progress.
+       */
+      if (subMonitor != null)
+        progressMonitor.done();
     }
   }
 

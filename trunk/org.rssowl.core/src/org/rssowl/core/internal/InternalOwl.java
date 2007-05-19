@@ -81,7 +81,7 @@ public final class InternalOwl {
     fModelFactory = loadTypesFactory();
     fPersistenceService = loadPersistenceService();
     fApplicationService = loadApplicationService();
-    fPersistenceService.startup();
+    fPersistenceService.startup(monitor);
     fConnectionService = new ConnectionServiceImpl();
     fInterpreterService = new InterpreterServiceImpl();
     fPreferencesService = new PreferenceServiceImpl();

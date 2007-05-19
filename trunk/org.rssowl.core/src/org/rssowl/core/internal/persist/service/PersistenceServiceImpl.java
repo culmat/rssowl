@@ -24,8 +24,10 @@
 
 package org.rssowl.core.internal.persist.service;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rssowl.core.persist.service.AbstractPersistenceService;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.LongOperationMonitor;
 
 /**
  * @author bpasero
@@ -42,11 +44,11 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
    * layer.
    */
   @Override
-  public void startup() throws PersistenceException {
-    super.startup();
+  public void startup(LongOperationMonitor monitor) throws PersistenceException {
+    super.startup(monitor);
 
     /* Startup DB and Model-Search */
-    DBManager.getDefault().startup();
+    DBManager.getDefault().startup(monitor);
     getModelSearch().startup();
   }
 
@@ -69,7 +71,12 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
    */
   public void recreateSchema() throws PersistenceException {
     DBManager.getDefault().dropDatabase();
-    DBManager.getDefault().createDatabase();
+    DBManager.getDefault().createDatabase(new LongOperationMonitor(new NullProgressMonitor()) {
+      @Override
+      public void beginLongOperation() {
+        //Do nothing
+      }
+    });
     getModelSearch().clearIndex();
   }
 }
