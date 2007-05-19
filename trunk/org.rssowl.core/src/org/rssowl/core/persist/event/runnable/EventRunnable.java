@@ -36,29 +36,31 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Base class for runnables that fire one event. These runnables are useful
- * when one wants to specify an event to be called in the future. Another
- * possible use is to fire the event in an event loop.
- * 
- * @param <T> A subclass of ModelReference that establishes the type of the
- * first parameter accepted by the constructor.
- * 
+ * Base class for runnables that fire events. These runnables are useful
+ * when one wants to specify a Set of events to be fired in the future. Another
+ * possible use is to fire the events in an event loop.
+ *
+ * @param <T> A subclass of ModelEvent that establishes the event type that this
+ * class represents.
+ *
  * @author Ismael Juma (ismael@juma.me.uk)
  */
 public abstract class EventRunnable<T extends ModelEvent> implements Runnable   {
-  
+
   private Set<T> fPersistEvents;
-  
+
   private Set<T> fRemoveEvents;
-  
+
   private Set<T> fUpdateEvents;
-  
+
   private final Class<T> fEventClass;
   private final IEntityDAO<?, ?, T> fEntityDAO;
 
   /**
    * Creates an instance of this class.
-   * @param eventClass 
+   * @param eventClass The subclass of ModelEvent represented by this runnable.
+   * @param entityDAO The entityDAO to be used for firing the events in this
+   * runnable.
    */
   protected EventRunnable(Class<T> eventClass, IEntityDAO<?, ?, T> entityDAO) {
     Assert.isNotNull(eventClass, "eventClass");
@@ -66,7 +68,10 @@ public abstract class EventRunnable<T extends ModelEvent> implements Runnable   
     fEventClass = eventClass;
     fEntityDAO = entityDAO;
   }
-  
+
+  /**
+   * @return the current {@link DAOService} instance.
+   */
   protected static final DAOService getDAOService() {
     return Owl.getPersistenceService().getDAOService();
   }
@@ -81,122 +86,184 @@ public abstract class EventRunnable<T extends ModelEvent> implements Runnable   
 
     if (shouldFireRemoveEvents())
       fireEvents(fRemoveEvents, EventType.REMOVE);
-    
+
     if (shouldFireUpdateEvents())
       fireEvents(fUpdateEvents, EventType.UPDATE);
   }
-  
+
   private void fireEvents(Set<T> persistEvents, EventType eventType) {
     fEntityDAO.fireEvents(Collections.unmodifiableSet(persistEvents), eventType);
   }
-  
+
+  /**
+   * Checks if {@code event} is an instance of {@code T} and if so calls
+   * {@code addPersistEvent}.
+   *
+   * @param event Persist event to be added.
+   * @throws IllegalArgumentException if {@code event} is not an instance of
+   * {@code T}.
+   */
   @SuppressWarnings("unchecked")
   public final void addCheckedPersistEvent(ModelEvent event) {
     checkEventType(getEventClass(), event);
     addPersistEvent((T) event);
   }
-  
+
   private Class<? extends ModelEvent> getEventClass()   {
     return fEventClass;
   }
-  
+
   private void checkEventType(Class<?> expectedClass, ModelEvent eventReceived)    {
     if (!expectedClass.isInstance(eventReceived))
       throw new IllegalArgumentException("event must be of type: " +  //$NON-NLS-1$
           expectedClass + ", but it is of type: " + eventReceived.getClass()); //$NON-NLS-1$
   }
 
+  /**
+   * Checks if {@code event} is an instance of {@code T} and if so calls
+   * {@code addRemoveEvent}.
+   *
+   * @param event Remove event to be added.
+   * @throws IllegalArgumentException if {@code event} is not an instance of
+   * {@code T}.
+   */
   @SuppressWarnings("unchecked")
   public final void addCheckedRemoveEvent(ModelEvent event) {
     checkEventType(getEventClass(), event);
     addRemoveEvent((T) event);
   }
-  
+
+  /**
+   * Checks if {@code event} is an instance of {@code T} and if so calls
+   * {@code addUpdateEvent}.
+   *
+   * @param event Update event to be added.
+   * @throws IllegalArgumentException if {@code event} is not an instance of
+   * {@code T}.
+   */
   @SuppressWarnings("unchecked")
   public final void addCheckedUpdateEvent(ModelEvent event) {
     checkEventType(getEventClass(), event);
     addUpdateEvent((T) event);
   }
-  
+
+  /**
+   * Adds {@code event} to the list of persist events.
+   *
+   * @param event Persist event to be added.
+   */
   public final void addPersistEvent(T event) {
     if (fPersistEvents == null)
       fPersistEvents = new HashSet<T>(3);
-    
+
     if (removeEventsContains(event))
       return;
-    
+
     fPersistEvents.add(event);
   }
-  
+
   private boolean removeEventsContains(ModelEvent event) {
     return fRemoveEvents != null && fRemoveEvents.contains(event);
   }
-  
+
   private boolean persistEventsContains(ModelEvent event) {
     return fPersistEvents != null && fPersistEvents.contains(event);
   }
-  
+
+  /**
+   * Adds {@code event} to the list of remove events.
+   *
+   * @param event Remove event to be added.
+   */
   public final void addRemoveEvent(T event) {
     if (fRemoveEvents == null)
       fRemoveEvents = new HashSet<T>(3);
-    
+
     if (fUpdateEvents != null)
       fUpdateEvents.remove(event);
     if (fPersistEvents != null)
       fPersistEvents.remove(event);
-    
+
     fRemoveEvents.add(event);
   }
-  
+
+  /**
+   * Adds {@code event} to the list of update events.
+   *
+   * @param event Update event to be added.
+   */
   public final void addUpdateEvent(T event) {
     if (fUpdateEvents == null)
       fUpdateEvents = new HashSet<T>(3);
 
     if (removeEventsContains(event) || persistEventsContains(event))
       return;
-    
+
     fUpdateEvents.add(event);
   }
-  
+
+  /**
+   * Returns a list of all events stored in this runnable.
+   *
+   * @return a list of all events stored in this runnable.
+   */
   public final List<T> getAllEvents() {
-    List<T> allEvents = new ArrayList<T>(fPersistEvents.size() + 
+    List<T> allEvents = new ArrayList<T>(fPersistEvents.size() +
         fRemoveEvents.size() + fUpdateEvents.size());
     allEvents.addAll(fPersistEvents);
     allEvents.addAll(fRemoveEvents);
     allEvents.addAll(fUpdateEvents);
     return allEvents;
   }
-  
+
   private boolean shouldFirePersistEvents() {
     return (fPersistEvents != null) && (fPersistEvents.size() > 0);
   }
-  
+
   private boolean shouldFireUpdateEvents() {
     return (fUpdateEvents != null) && (fUpdateEvents.size() > 0);
   }
-  
+
   private boolean shouldFireRemoveEvents() {
     return (fRemoveEvents != null) && (fRemoveEvents.size() > 0);
   }
 
+  /**
+   * Returns an unmodifiable list containing the persist events stored in
+   * this runnable.
+   *
+   * @return an unmodifiable list of persist events.
+   */
   public final Set<T> getPersistEvents() {
     if (fPersistEvents == null)
       return Collections.emptySet();
-    
+
     return Collections.unmodifiableSet(fPersistEvents);
   }
 
+  /**
+   * Returns an unmodifiable list containing the remove events stored in
+   * this runnable.
+   *
+   * @return an unmodifiable list of remove events.
+   */
   public final Set<T> getRemoveEvents() {
     if (fRemoveEvents == null)
       return Collections.emptySet();
-    
+
     return Collections.unmodifiableSet(fRemoveEvents);
   }
 
+  /**
+   * Returns an unmodifiable list containing the update events stored in
+   * this runnable.
+   *
+   * @return an unmodifiable list of update events.
+   */
   public final Set<T> getUpdateEvents() {
     if (fUpdateEvents == null)
       return Collections.emptySet();
-      
+
     return Collections.unmodifiableSet(fUpdateEvents);
   }
 }
