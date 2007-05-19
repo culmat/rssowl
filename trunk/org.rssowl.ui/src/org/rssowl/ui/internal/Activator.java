@@ -32,6 +32,8 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -145,7 +147,17 @@ public class Activator extends AbstractUIPlugin {
   private void startCore() {
 
     /* Dialog to show progress */
-    final ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell(Display.getDefault()));
+    final ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell(Display.getDefault())) {
+      @Override
+      protected Point getInitialLocation(Point initialSize) {
+        Rectangle displayBounds = getParentShell().getDisplay().getPrimaryMonitor().getBounds();
+        Point shellSize = getInitialSize();
+        int x = displayBounds.x + (displayBounds.width - shellSize.x) >> 1;
+        int y = displayBounds.y + (displayBounds.height - shellSize.y) >> 1;
+
+        return new Point(x, y);
+      }
+    };
     dialog.setOpenOnRun(false);
 
     /* Runnable to start core */
