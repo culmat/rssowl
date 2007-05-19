@@ -39,6 +39,7 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -201,16 +202,21 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
     IPreferenceScope bookMarkPrefs = Owl.getPreferenceService().getEntityScope(bookmark);
     boolean requiresRetention = bookMarkPrefs.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE);
 
+    final EnumSet<State> enumSet = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
     /* Retention on read News required, load *read* as well */
     if (requiresRetention) {
       Collection<INews> feedsNews = fNewsDao.loadAll(bookmark.getFeedLinkReference(), INews.State.getVisible());
-      news.addAll(feedsNews);
+      for (INews newsItem : feedsNews) {
+        /* Do not add READ news */
+        if (enumSet.contains(newsItem.getState()))
+          news.add(newsItem);
+      }
       bookMarkNewsMap.put(bookmark, feedsNews);
     }
 
     /* No retention required, just load the ones being affected */
     else {
-      news.addAll(fNewsDao.loadAll(bookmark.getFeedLinkReference(), EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
+      news.addAll(fNewsDao.loadAll(bookmark.getFeedLinkReference(), enumSet));
     }
   }
 
