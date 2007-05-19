@@ -47,6 +47,7 @@ public interface IPersistableDAO<T extends IPersistable> {
    * persistence service.
    * @throws PersistenceException In case of an error while trying to perform
    * the operation.
+   * @see DynamicDAO#loadAll(Class)
    */
   Collection<T> loadAll() throws PersistenceException;
 
@@ -60,6 +61,7 @@ public interface IPersistableDAO<T extends IPersistable> {
    * @throws PersistenceException In case of an error while trying to perform
    * the operation.
    * @see IPersistableDAO#saveAll(Collection)
+   * @see DynamicDAO#save(IPersistable)
    */
   T save(T persistable) throws PersistenceException;
 
@@ -73,6 +75,7 @@ public interface IPersistableDAO<T extends IPersistable> {
    * @throws PersistenceException In case of an error while trying to perform
    * the operation.
    * @see IPersistableDAO#save(IPersistable)
+   * @see DynamicDAO#saveAll(Collection)
    */
   void saveAll(Collection<T> persistables) throws PersistenceException;
 
@@ -83,6 +86,7 @@ public interface IPersistableDAO<T extends IPersistable> {
    * @throws PersistenceException In case of an error while trying to perform
    * the operation.
    * @see IPersistableDAO#deleteAll(Collection)
+   * @see DynamicDAO#delete(IPersistable)
    */
   void delete(T persistable) throws PersistenceException;
 
@@ -94,6 +98,7 @@ public interface IPersistableDAO<T extends IPersistable> {
    * @throws PersistenceException In case of an error while trying to perform
    * the operation.
    * @see IPersistableDAO#delete(IPersistable)
+   * @see DynamicDAO#deleteAll(Collection)
    */
   void deleteAll(Collection<T> persistables) throws PersistenceException;
 
@@ -105,6 +110,7 @@ public interface IPersistableDAO<T extends IPersistable> {
    * responsible for from the persistence layer.
    * @throws PersistenceException In case of an error while trying to perform
    * the operation.
+   * @see DynamicDAO#countAll(Class)
    */
   long countAll() throws PersistenceException;
 
