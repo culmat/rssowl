@@ -76,7 +76,12 @@ public final class InternalOwl {
 
   private InternalOwl() {}
 
-  /** <em>Never</em> change the ordering of this method's calls! */
+  /**
+   * <em>Never</em> change the ordering of this method's calls!
+   *
+   * @param monitor A progress monitor to report progress on long running
+   * operations (e.g. migration).
+   */
   public void startup(LongOperationMonitor monitor) {
     fModelFactory = loadTypesFactory();
     fPersistenceService = loadPersistenceService();
