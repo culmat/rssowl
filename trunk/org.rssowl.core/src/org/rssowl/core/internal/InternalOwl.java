@@ -44,6 +44,7 @@ import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IPersistenceService;
 import org.rssowl.core.persist.service.IPreferenceService;
 import org.rssowl.core.util.ExtensionUtils;
+import org.rssowl.core.util.LongOperationMonitor;
 
 /**
  * The <code>InternalOwl</code> is being used from the public <code>Owl</code>
@@ -76,7 +77,7 @@ public final class InternalOwl {
   private InternalOwl() {}
 
   /** <em>Never</em> change the ordering of this method's calls! */
-  public void startup() {
+  public void startup(LongOperationMonitor monitor) {
     fModelFactory = loadTypesFactory();
     fPersistenceService = loadPersistenceService();
     fApplicationService = loadApplicationService();

@@ -70,12 +70,12 @@ public class Activator extends Plugin {
       }
     });
 
-    /* Activate Internal Owl */
-    SafeRunner.run(new LoggingSafeRunnable() {
-      public void run() throws Exception {
-        InternalOwl.getDefault().startup();
-      }
-    });
+    /* Activate Internal Owl (Done by UI in M6) */
+    //    SafeRunner.run(new LoggingSafeRunnable() {
+    //      public void run() throws Exception {
+    //        InternalOwl.getDefault().startup();
+    //      }
+    //    });
   }
 
   private IProxyService loadProxyService() {
