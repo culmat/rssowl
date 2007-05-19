@@ -2523,8 +2523,8 @@ public class ModelSearchTest {
     waitForIndexer();
 
     /*
-     * Condition 1: +(State IS *new* OR State is *unread* OR State IS *updated*)
-     * AND +((Entire News contains "Foo") OR Author is "Benjamin Pasero")
+     * Condition 1: (State IS *new* OR State is *unread* OR State IS *updated*)
+     * OR (Entire News contains "Foo") OR (Author is "Benjamin Pasero")
      */
     {
       ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
@@ -2537,7 +2537,7 @@ public class ModelSearchTest {
       ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS, "Benjamin Pasero");
 
       List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
-      assertSame(result, news3);
+      assertSame(result, news1, news2, news3);
     }
 
     /*
@@ -2720,7 +2720,22 @@ public class ModelSearchTest {
       ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS_NOT, "http://www.feed.com/feed2.xml");
 
       List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
-      assertSame(result, news1);
+      assertSame(result, news1, news2, news3, news4);
+    }
+
+    /*
+     * Condition 3a: State is Unread AND Feed is not
+     * "http://www.feed.com/feed1.xml"
+     */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(State.HIDDEN));
+
+      ISearchField field2 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
+      ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS_NOT, "http://www.feed.com/feed1.xml");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), true);
+      assertSame(result, news4);
     }
 
     /*
