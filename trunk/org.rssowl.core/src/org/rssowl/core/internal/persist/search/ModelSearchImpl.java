@@ -165,7 +165,7 @@ public class ModelSearchImpl implements IModelSearch {
           /* Create and add new BooleanQuery for State */
           if (statesQuery == null) {
             statesQuery = new BooleanQuery();
-            bQuery.add(statesQuery, Occur.MUST);
+            bQuery.add(statesQuery, matchAllConditions ? Occur.MUST : Occur.SHOULD);
           }
 
           /* Add Boolean Clause per State */
@@ -184,7 +184,7 @@ public class ModelSearchImpl implements IModelSearch {
         /* Create and add new BooleanQuery for other Fields */
         if (fieldQuery == null) {
           fieldQuery = new BooleanQuery();
-          bQuery.add(fieldQuery, Occur.MUST);
+          bQuery.add(fieldQuery, matchAllConditions ? Occur.MUST : Occur.SHOULD);
         }
 
         /* Create the Clause */
