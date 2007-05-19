@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
 import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.StringUtils;
@@ -244,8 +245,21 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
     /* Required Size */
     Point requiredSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 
+    /* Bug in SWT: The preferred width of the state condition is wrong */
+    if (Application.IS_LINUX && displaysSavedSearch())
+      requiredSize.x = requiredSize.x + 100;
+
     shell.setSize(Math.max(minWidth, requiredSize.x), Math.max(minHeight, requiredSize.y));
     LayoutUtils.positionShell(shell, true);
+  }
+
+  private boolean displaysSavedSearch() {
+    for (IEntity entity : fEntities) {
+      if (entity instanceof ISearchMark)
+        return true;
+    }
+
+    return false;
   }
 
   /*
