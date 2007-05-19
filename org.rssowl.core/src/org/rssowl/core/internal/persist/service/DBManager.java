@@ -209,10 +209,23 @@ public class DBManager {
       throw new PersistenceException("Error creating database", ioe); //$NON-NLS-1$
     }
     setFormatVersion(migFormatFile);
-    migFormatFile.renameTo(dbFormatFile);
+
+    /* If rename fails, fall-back to delete and rename */
+    if (!migFormatFile.renameTo(dbFormatFile)) {
+      dbFormatFile.delete();
+      if (!migFormatFile.renameTo(dbFormatFile)) {
+        throw new PersistenceException("Failed to migrate data.");
+      }
+    }
 
     /* Finally, rename the actual db file */
-    migDbFile.renameTo(dbFile);
+    /* If rename fails, fall-back to delete and rename */
+    if (!migDbFile.renameTo(dbFile)) {
+      dbFile.delete();
+      if (!migDbFile.renameTo(dbFile)) {
+        throw new PersistenceException("Failed to migrate data.");
+      }
+    }
 
     return reindexRequired;
   }
