@@ -24,20 +24,27 @@
 
 package org.rssowl.ui.internal;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.InternalOwl;
+import org.rssowl.core.util.LongOperationMonitor;
 import org.rssowl.core.util.LoggingSafeRunnable;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.lang.reflect.InvocationTargetException;
 import java.net.BindException;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
@@ -102,6 +109,13 @@ public class Activator extends AbstractUIPlugin {
     fShutdownHook.setPriority(Thread.MAX_PRIORITY);
     Runtime.getRuntime().addShutdownHook(fShutdownHook);
 
+    /* Activate the Core Bundle */
+    SafeRunner.run(new LoggingSafeRunnable() {
+      public void run() throws Exception {
+        startCore();
+      }
+    });
+
     /* Start internal Server (chance that System.exit() gets called!) */
     SafeRunner.run(new LoggingSafeRunnable() {
       public void run() throws Exception {
@@ -126,6 +140,41 @@ public class Activator extends AbstractUIPlugin {
         });
       }
     });
+  }
+
+  private void startCore() {
+
+    /* Dialog to show progress */
+    final ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell(Display.getDefault()));
+    dialog.setOpenOnRun(false);
+
+    /* Runnable to start core */
+    IRunnableWithProgress runnable = new IRunnableWithProgress() {
+      public void run(IProgressMonitor monitor) {
+        LongOperationMonitor callbackMonitor = new LongOperationMonitor(monitor) {
+          @Override
+          public void beginLongOperation() {
+            Display.getDefault().syncExec(new Runnable() {
+              public void run() {
+                dialog.open();
+              }
+            });
+          }
+        };
+
+        /* Start Core */
+        InternalOwl.getDefault().startup(callbackMonitor);
+      }
+    };
+
+    /* Execute the Runnable */
+    try {
+      dialog.run(false, false, runnable);
+    } catch (InvocationTargetException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    } catch (InterruptedException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    }
   }
 
   /* Start the Application Server */
