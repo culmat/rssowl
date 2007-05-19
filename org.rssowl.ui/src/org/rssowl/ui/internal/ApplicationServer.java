@@ -184,15 +184,6 @@ public class ApplicationServer {
     return fSocket != null;
   }
 
-  /**
-   * Returns the port this application server is listening on.
-   *
-   * @return the port this application server is listening on.
-   */
-  public int getPort() {
-    return fPort;
-  }
-
   /* Registers the Handler for Hand-Shaking on startup */
   void setHandshakeHandler(HandshakeHandler handler) {
     fHandshakeHandler = handler;

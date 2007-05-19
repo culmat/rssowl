@@ -51,7 +51,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
@@ -73,9 +72,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -114,12 +111,6 @@ public class OwlUI {
 
   /** Group */
   public static final ImageDescriptor GROUP = Activator.getImageDescriptor("icons/obj16/group.gif"); //$NON-NLS-1$
-
-  /** Unread News Toggle */
-  public static final ImageDescriptor NEWS_UNREAD = Activator.getImageDescriptor("icons/obj16/unread.gif"); //$NON-NLS-1$
-
-  /** Read News Toggle */
-  public static final ImageDescriptor NEWS_READ = Activator.getImageDescriptor("icons/obj16/read.gif"); //$NON-NLS-1$
 
   /** News: Unread */
   public static final ImageDescriptor NEWS_STATE_UNREAD = Activator.getImageDescriptor("icons/obj16/news_unread.gif"); //$NON-NLS-1$
@@ -788,35 +779,6 @@ public class OwlUI {
       return page.getActiveEditor();
 
     return null;
-  }
-
-  /**
-   * Returns a collection of all opened <code>FeedView</code>s in the first
-   * Workbench-Window that was found. The active Window is thereby preferred.
-   *
-   * @return a collection of all opened <code>FeedView</code>s in the first
-   * Workbench-Window that was found.
-   */
-  public static List<FeedView> getOpenFeedViews() {
-    List<FeedView> feedViews = null;
-
-    IWorkbenchPage page = getPage();
-    if (page != null) {
-      IEditorReference[] editorRefs = page.getEditorReferences();
-      for (IEditorReference editorRef : editorRefs) {
-        if (editorRef.getId().equals(FeedView.ID)) {
-          IEditorPart editor = editorRef.getEditor(true);
-          if (editor instanceof FeedView) {
-            if (feedViews == null)
-              feedViews = new ArrayList<FeedView>();
-
-            feedViews.add((FeedView) editor);
-          }
-        }
-      }
-    }
-
-    return (feedViews == null) ? new ArrayList<FeedView>(0) : feedViews;
   }
 
   /**

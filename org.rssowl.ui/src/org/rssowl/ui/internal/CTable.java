@@ -72,20 +72,6 @@ public class CTable {
   }
 
   /**
-   * @param layoutData
-   * @param text
-   * @param image
-   * @param moveable
-   * @param resizable
-   * @return TableColumn
-   */
-  public TableColumn createColumn(CColumnLayoutData layoutData, String text, Image image, boolean moveable, boolean resizable) {
-    TableColumn col = new TableColumn(fTable, SWT.LEFT);
-    manageColumn(col, layoutData, text, image, moveable, resizable);
-    return col;
-  }
-
-  /**
    * @param col
    * @param layoutData
    * @param text

@@ -92,13 +92,6 @@ public class BrowserBar {
   /**
    * @param browser
    */
-  public void setBrowser(CBrowser browser) {
-    fBrowser = browser;
-  }
-
-  /**
-   * @param browser
-   */
   public void init(CBrowser browser) {
     fBrowser = browser;
     registerListeners();
