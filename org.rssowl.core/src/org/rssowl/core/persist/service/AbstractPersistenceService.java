@@ -27,6 +27,7 @@ package org.rssowl.core.persist.service;
 import org.rssowl.core.internal.persist.search.ModelSearchImpl;
 import org.rssowl.core.persist.dao.DAOService;
 import org.rssowl.core.util.ExtensionUtils;
+import org.rssowl.core.util.LongOperationMonitor;
 
 /**
  * <p>
@@ -57,7 +58,7 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
   /** */
   protected AbstractPersistenceService() {}
 
-  public void startup() throws PersistenceException {
+  public void startup(LongOperationMonitor monitor) throws PersistenceException {
     getModelSearch();
     getIDGenerator();
     getDAOService();
