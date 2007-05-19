@@ -49,5 +49,5 @@ public interface IPersonDAO extends IEntityDAO<IPerson, PersonListener, PersonEv
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
    */
-  Set<String> loadAllNames() throws PersistenceException;;
+  Set<String> loadAllNames() throws PersistenceException;
 }
