@@ -36,33 +36,122 @@ import org.rssowl.core.persist.IPersistable;
  */
 public abstract class DAOService {
 
-  public abstract <T extends IPersistableDAO< ? >> T getDAO(Class<T> daoInterface);
+  /**
+   * Returns the instance of <code>IPersistableDAO</code> matching the given
+   * class of <code>IPersistableDAO</code>.
+   *
+   * @param <T> A concrete subclass of <code>IPersistableDAO</code>
+   * @param daoInterface The <code>Class</code> to lookup an instance of
+   * <code>IPersistableDAO</code> for.
+   * @return Returns the instance of <code>IPersistableDAO</code> matching the
+   * given class of <code>IPersistableDAO</code>.
+   */
+  public abstract <T extends IPersistableDAO<?>> T getDAO(Class<T> daoInterface);
 
-  public abstract <T extends IPersistableDAO< ? super P>, P extends IPersistable> T getDAOFromPersistable(Class<P> persistableClass);
+  /**
+   * Returns the instance of <code>IPersistableDAO</code> responsible for the
+   * given <code>IPersistable</code>.
+   *
+   * @param <T> A concrete subclass of <code>IPersistableDAO</code>
+   * @param
+   * <P>
+   * A concrete subclass of <code>IPersistable</code> to load the responsible
+   * DAO for.
+   * @param persistableClass The <code>Class</code> of the
+   * <code>IPersistable</code> to load the responsible DAO for.
+   * @return Returns the instance of <code>IPersistableDAO</code> responsible
+   * for the given <code>IPersistable</code>.
+   */
+  public abstract <T extends IPersistableDAO<? super P>, P extends IPersistable> T getDAOFromPersistable(Class<P> persistableClass);
 
+  /**
+   * @return Returns the instance of <code>IEntityDAO</code> responsible for
+   * <code>IAttachment</code>.
+   * @see DynamicDAO#getDAO(Class)#getDAO(Class)
+   */
   public abstract IAttachmentDAO getAttachmentDAO();
 
+  /**
+   * @return Returns the instance of <code>IEntityDAO</code> responsible for
+   * <code>IBookMark</code>.
+   * @see DynamicDAO#getDAO(Class)
+   */
   public abstract IBookMarkDAO getBookMarkDAO();
 
+  /**
+   * @return Returns the instance of <code>IEntityDAO</code> responsible for
+   * <code>ICategory</code>.
+   * @see DynamicDAO#getDAO(Class)
+   */
   public abstract ICategoryDAO getCategoryDAO();
 
+  /**
+   * @return Returns the instance of <code>IEntityDAO</code> responsible for
+   * <code>IFeed</code>.
+   * @see DynamicDAO#getDAO(Class)
+   */
   public abstract IFeedDAO getFeedDAO();
 
+  /**
+   * @return Returns the instance of <code>IEntityDAO</code> responsible for
+   * <code>IFolder</code>.
+   * @see DynamicDAO#getDAO(Class)
+   */
   public abstract IFolderDAO getFolderDAO();
 
+  /**
+   * @return Returns the instance of <code>IEntityDAO</code> responsible for
+   * <code>INewsCounter</code>.
+   * @see DynamicDAO#getDAO(Class)
+   */
   public abstract INewsCounterDAO getNewsCounterDAO();
 
+  /**
+   * @return Returns the instance of <code>IEntityDAO</code> responsible for
+   * <code>INews</code>.
+   * @see DynamicDAO#getDAO(Class)
+   */
   public abstract INewsDAO getNewsDAO();
 
+  /**
+   * @return Returns the instance of <code>IEntityDAO</code> responsible for
+   * <code>IPerson</code>.
+   * @see DynamicDAO#getDAO(Class)
+   */
   public abstract IPersonDAO getPersonDAO();
 
+  /**
+   * @return Returns the instance of <code>IEntityDAO</code> responsible for
+   * <code>IPreference</code>.
+   * @see DynamicDAO#getDAO(Class)
+   */
   public abstract IPreferenceDAO getPreferencesDAO();
 
+  /**
+   * @return Returns the instance of <code>IEntityDAO</code> responsible for
+   * <code>ISearchCondition</code>.
+   * @see DynamicDAO#getDAO(Class)
+   */
   public abstract ISearchConditionDAO getSearchConditionDAO();
 
+  /**
+   * @return Returns the instance of <code>IEntityDAO</code> responsible for
+   * <code>ISearchMark</code>.
+   * @see DynamicDAO#getDAO(Class)
+   */
   public abstract ISearchMarkDAO getSearchMarkDAO();
 
+  /**
+   * @return Returns the instance of <code>IEntityDAO</code> responsible for
+   * <code>ILabel</code>.
+   * @see DynamicDAO#getDAO(Class)
+   */
   public abstract ILabelDAO getLabelDAO();
 
+  /**
+   * @return Returns the instance of <code>IEntityDAO</code> responsible for
+   * <code>IConditionalGet</code>.
+   * @see DynamicDAO#getDAO(Class)
+   */
   public abstract IConditionalGetDAO getConditionalGetDAO();
 }
