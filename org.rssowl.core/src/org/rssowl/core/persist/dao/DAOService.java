@@ -67,7 +67,7 @@ public abstract class DAOService {
   /**
    * @return Returns the instance of <code>IEntityDAO</code> responsible for
    * <code>IAttachment</code>.
-   * @see DynamicDAO#getDAO(Class)#getDAO(Class)
+   * @see DynamicDAO#getDAO(Class)
    */
   public abstract IAttachmentDAO getAttachmentDAO();
 
