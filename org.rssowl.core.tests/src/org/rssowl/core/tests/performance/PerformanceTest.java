@@ -61,6 +61,7 @@ import org.rssowl.core.persist.ITextInput;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.persist.service.IModelSearch;
@@ -710,50 +711,133 @@ public class PerformanceTest {
    */
   @SuppressWarnings("nls")
   @Test
-  public void setNewsStateWithEquiUpdate() throws Exception {
-    List<ITask> tasks = getSetNewsStateTask(true);
+  public void setAllNewsStateWithEquiUpdateAndResolveFeed() throws Exception {
+    List<ITask> tasks = getSetNewsStateTask(true, true, true);
 
     /* Cold-Start: Interpret 216 Feeds */
-    System.out.println("Setting news state (Update Equivalent): " + FEEDS + " Feeds [Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
+    String message = "Setting all news state by resolving feed (Update Equivalent): " + FEEDS + " Feeds ";
+    System.out.println(message + "[Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
     /* Warm-Start: Interpret 216 Feeds */
     Owl.getPersistenceService().recreateSchema();
-    tasks = getSetNewsStateTask(true);
+    tasks = getSetNewsStateTask(true, true, true);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
     Owl.getPersistenceService().recreateSchema();
-    tasks = getSetNewsStateTask(true);
+    tasks = getSetNewsStateTask(true, true, true);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
-    System.out.println("Setting news state (Update Equivalent): " + FEEDS + " Feeds [Warm - " + JOBS + " Jobs] took: " + (l1 + l2) / 2 + "ms\n");
+    System.out.println(message + "[Warm - " + JOBS + " Jobs] took: " + (l1 + l2) / 2 + "ms/n");
+  }
+  
+  /**
+   * @throws Exception
+   */
+  @SuppressWarnings("nls")
+  @Test
+  public void setNewsStateWithEquiUpdateAndResolveFeed() throws Exception {
+    List<ITask> tasks = getSetNewsStateTask(true, true, false);
+
+    /* Cold-Start: Interpret 216 Feeds */
+    String message = "Setting 1/5 news state by resolving feed (Update Equivalent): " + FEEDS + " Feeds ";
+    System.out.println(message + "[Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
+
+    /* Warm-Start: Interpret 216 Feeds */
+    Owl.getPersistenceService().recreateSchema();
+    tasks = getSetNewsStateTask(true, true, false);
+    long l1 = TestUtils.executeAndWait(tasks, JOBS);
+
+    Owl.getPersistenceService().recreateSchema();
+    tasks = getSetNewsStateTask(true, true, false);
+    long l2 = TestUtils.executeAndWait(tasks, JOBS);
+
+    System.out.println(message + "[Warm - " + JOBS + " Jobs] took: " + (l1 + l2) / 2 + "ms/n");
+  }
+  
+  /**
+   * @throws Exception
+   */
+  @SuppressWarnings("nls")
+  @Test
+  public void setAllNewsStateWithEquiUpdate() throws Exception {
+    List<ITask> tasks = getSetNewsStateTask(true, false, true);
+
+    /* Cold-Start: Interpret 216 Feeds */
+    String message = "Setting all news state (Update Equivalent): " + FEEDS + " Feeds ";
+    System.out.println(message + "[Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
+
+    /* Warm-Start: Interpret 216 Feeds */
+    Owl.getPersistenceService().recreateSchema();
+    tasks = getSetNewsStateTask(true, false, true);
+    long l1 = TestUtils.executeAndWait(tasks, JOBS);
+
+    Owl.getPersistenceService().recreateSchema();
+    tasks = getSetNewsStateTask(true, false, true);
+    long l2 = TestUtils.executeAndWait(tasks, JOBS);
+
+    System.out.println(message + "[Warm - " + JOBS + " Jobs] took: " + (l1 + l2) / 2 + "ms/n");
+  }
+  
+  /**
+   * @throws Exception
+   */
+  @SuppressWarnings("nls")
+  @Test
+  public void setNewsStateWithEquiUpdate() throws Exception {
+    List<ITask> tasks = getSetNewsStateTask(true, false, false);
+
+    /* Cold-Start: Interpret 216 Feeds */
+    String message = "Setting 1/5 news state (Update Equivalent): " + FEEDS + " Feeds ";
+    System.out.println(message + "[Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
+
+    /* Warm-Start: Interpret 216 Feeds */
+    Owl.getPersistenceService().recreateSchema();
+    tasks = getSetNewsStateTask(true, false, false);
+    long l1 = TestUtils.executeAndWait(tasks, JOBS);
+
+    Owl.getPersistenceService().recreateSchema();
+    tasks = getSetNewsStateTask(true, false, false);
+    long l2 = TestUtils.executeAndWait(tasks, JOBS);
+
+    System.out.println(message + "[Warm - " + JOBS + " Jobs] took: " + (l1 + l2) / 2 + "ms/n");
   }
 
-  private List<ITask> getSetNewsStateTask(final boolean udateEquivalent) {
+  private List<ITask> getSetNewsStateTask(final boolean updateEquivalent, final boolean resolveFeed, boolean allNewsNew) {
 
+    final EnumSet<INews.State> unreadStates = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
     /* Save some Feeds first */
     List<IFeed> feeds = interpretFeedsHelper();
-    List<IFeed> savedFeeds = new ArrayList<IFeed>(feeds.size());
-    for (IFeed feed : feeds)
-      savedFeeds.add(DynamicDAO.save(feed));
-
     final List<FeedLinkReference> feedRefs = new ArrayList<FeedLinkReference>();
     for (IFeed feed : feeds) {
-      feedRefs.add(new FeedLinkReference(feed.getLink()));
+      List<INews> news = feed.getNews();
+      if (!allNewsNew && (!news.isEmpty())) {
+        /* Make 4/5 of the INews READ */
+        int endIndex = news.size() * 4 / 5;
+        for (int i = 0; i < endIndex; ++i) {
+          news.get(i).setState(INews.State.READ);
+        }
+      }
+      feedRefs.add(new FeedLinkReference(DynamicDAO.save(feed).getLink()));
     }
 
     feeds = null;
-    savedFeeds = null;
     System.gc();
 
+    final INewsDAO newsDAO = DynamicDAO.getDAO(INewsDAO.class);
     List<ITask> tasks = new ArrayList<ITask>();
     tasks.add(new TaskAdapter() {
       public IStatus run(IProgressMonitor monitor) {
         List<INews> news = new ArrayList<INews>();
         for (FeedLinkReference feedRef : feedRefs) {
-          news.addAll(feedRef.resolve().getNews());
+          if (resolveFeed) {
+            news.addAll(feedRef.resolve().getNewsByStates(unreadStates));
+          }
+          else {
+            news.addAll(newsDAO.loadAll(feedRef, unreadStates));
+          }
         }
 
-        Owl.getPersistenceService().getDAOService().getNewsDAO().setState(news, INews.State.HIDDEN, udateEquivalent, false);
+        newsDAO.setState(news, INews.State.HIDDEN, updateEquivalent, false);
 
         return Status.OK_STATUS;
       }
@@ -761,25 +845,25 @@ public class PerformanceTest {
 
     return tasks;
   }
-
+  
   /**
    * @throws Exception
    */
   @SuppressWarnings("nls")
   @Test
   public void setNewsStateWithoutEquiUpdate() throws Exception {
-    List<ITask> tasks = getSetNewsStateTask(false);
+    List<ITask> tasks = getSetNewsStateTask(false, true, true);
 
     /* Cold-Start: Interpret 216 Feeds */
     System.out.println("Setting news state (Ignore Equivalent): " + FEEDS + " Feeds [Cold - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
     /* Warm-Start: Interpret 216 Feeds */
     Owl.getPersistenceService().recreateSchema();
-    tasks = getSetNewsStateTask(false);
+    tasks = getSetNewsStateTask(false, true, true);
     long l1 = TestUtils.executeAndWait(tasks, JOBS);
 
     Owl.getPersistenceService().recreateSchema();
-    tasks = getSetNewsStateTask(false);
+    tasks = getSetNewsStateTask(false, true, true);
     long l2 = TestUtils.executeAndWait(tasks, JOBS);
 
     System.out.println("Setting news state (Ignore Equivalent): " + FEEDS + " Feeds [Warm - " + JOBS + " Jobs] took: " + (l1 + l2) / 2 + "ms\n");
@@ -1328,7 +1412,7 @@ public class PerformanceTest {
 
     return feedRefs;
   }
-
+  
   @SuppressWarnings("nls")
   private List<IFeed> interpretFeedsHelper() {
     List<IFeed> feeds = new ArrayList<IFeed>();
