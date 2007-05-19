@@ -415,7 +415,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
    * @param parentShell
    */
   public SearchNewsDialog(Shell parentShell) {
-    this(parentShell, null, false, false);
+    this(parentShell, null, true, false);
   }
 
   /**
