@@ -196,10 +196,20 @@ public class DBManager {
     File backupDbFile = new File(getDBFilePath() + ".bak." + workspaceFormat);
     copyFile(dbFile, backupDbFile);
 
-    File migFormatFile = new File(getDBFormatFile().getAbsolutePath() + ".mig");
-    copyFile(getDBFormatFile(), migFormatFile);
+    File dbFormatFile = getDBFormatFile();
+    File migFormatFile = new File(dbFormatFile.getAbsolutePath() + ".mig");
+    try {
+      if (!migFormatFile.exists()) {
+        migFormatFile.createNewFile();
+      }
+      if (!dbFormatFile.exists()) {
+        dbFormatFile.createNewFile();
+      }
+    } catch (IOException ioe) {
+      throw new PersistenceException("Error creating database", ioe); //$NON-NLS-1$
+    }
     setFormatVersion(migFormatFile);
-    migFormatFile.renameTo(getDBFormatFile());
+    migFormatFile.renameTo(dbFormatFile);
 
     /* Finally, rename the actual db file */
     migDbFile.renameTo(dbFile);
