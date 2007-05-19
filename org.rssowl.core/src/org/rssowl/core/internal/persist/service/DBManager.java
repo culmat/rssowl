@@ -142,7 +142,7 @@ public class DBManager {
     try {
       if (workspaceVersion != getCurrentFormatVersion()) {
         progressMonitor.beginLongOperation();
-        subMonitor = SubMonitor.convert(progressMonitor, 100);
+        subMonitor = SubMonitor.convert(progressMonitor, "Please wait while RSSOwl migrates data to the new version", 100);
         reindexRequired = migrate(workspaceVersion, getCurrentFormatVersion(), subMonitor.newChild(10));
       }
 
