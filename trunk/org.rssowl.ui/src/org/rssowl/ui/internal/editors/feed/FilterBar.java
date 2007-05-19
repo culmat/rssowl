@@ -106,7 +106,7 @@ public class FilterBar {
     fLayoutVertical = feedView.fInitialLayoutVertical;
     fQuickSearchTracker = new JobTracker(500, false, true, ITask.Priority.SHORT);
     fGlobalPreferences = Owl.getPreferenceService().getGlobalScope();
-    fMaximized = fGlobalPreferences.getBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED);;
+    fMaximized = fGlobalPreferences.getBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED);
     createControl();
   }
 
