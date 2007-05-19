@@ -46,7 +46,7 @@ public interface IEntityDAO<T extends IEntity, L extends EntityListener<E, T>, E
   /**
    * Returns <code>true</code> if there's an entity with <code>id</code>
    * in the persistence system. Returns <code>false</code> otherwise.
-   * 
+   *
    * @param id The id to be checked.
    * @return <code>true</code> if there's an entity with <code>id</code>
    * in the persistence system. Returns <code>false</code> otherwise.
@@ -54,7 +54,7 @@ public interface IEntityDAO<T extends IEntity, L extends EntityListener<E, T>, E
    * persistence system.
    */
   boolean exists(long id) throws PersistenceException;
-  
+
   /**
    * Loads the persistable with <code>id</code> from the persistence system
    * and returns it. If no persistable with the provided id exists,
@@ -66,7 +66,7 @@ public interface IEntityDAO<T extends IEntity, L extends EntityListener<E, T>, E
    * @throws PersistenceException In case of an error while loading the
    * persistable.
    */
-  T load(long id) throws PersistenceException;;
+  T load(long id) throws PersistenceException;
 
   /**
    * Adds a listener to the collection of listeners who will be notified

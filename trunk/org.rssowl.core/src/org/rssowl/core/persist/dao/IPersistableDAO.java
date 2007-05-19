@@ -38,7 +38,17 @@ import java.util.Collection;
  */
 public interface IPersistableDAO<T extends IPersistable> {
 
-  Collection<T> loadAll() throws PersistenceException;;
+  /**
+   * Loads a <code>Collection</code> of all <code>IPersistable</code> this
+   * DAO is responsible for from the persistence service.
+   *
+   * @return Returns a <code>Collection</code> of all
+   * <code>IPersistable</code> this DAO is responsible for from the
+   * persistence service.
+   * @throws PersistenceException In case of an error while trying to perform
+   * the operation.
+   */
+  Collection<T> loadAll() throws PersistenceException;
 
   /**
    * Saves <code>persistable</code> to the persistence system. This method
@@ -49,21 +59,57 @@ public interface IPersistableDAO<T extends IPersistable> {
    * @return The persistable saved.
    * @throws PersistenceException In case of an error while trying to perform
    * the operation.
+   * @see IPersistableDAO#saveAll(Collection)
    */
-  T save(T persistable) throws PersistenceException;;
+  T save(T persistable) throws PersistenceException;
 
-  void saveAll(Collection<T> persistables) throws PersistenceException;;
+  /**
+   * Saves the given Collection of <code>persistable</code>s to the
+   * persistence system in a single operation. This method handles new and
+   * existing perstistables. In other words, it will add or update the
+   * persistable as appropriate.
+   *
+   * @param persistables The persistables to save.
+   * @throws PersistenceException In case of an error while trying to perform
+   * the operation.
+   * @see IPersistableDAO#save(IPersistable)
+   */
+  void saveAll(Collection<T> persistables) throws PersistenceException;
 
   /**
    * Deletes <code>persistable</code> from the persistence system.
    *
    * @param persistable The persistable to delete.
+   * @throws PersistenceException In case of an error while trying to perform
+   * the operation.
+   * @see IPersistableDAO#deleteAll(Collection)
    */
-  void delete(T persistable) throws PersistenceException;;
+  void delete(T persistable) throws PersistenceException;
 
-  void deleteAll(Collection<T> objects) throws PersistenceException;;
+  /**
+   * Deletes the given Collection of <code>persistable</code>s from the
+   * persistence system in a single operation.
+   *
+   * @param persistables The persistables to delete.
+   * @throws PersistenceException In case of an error while trying to perform
+   * the operation.
+   * @see IPersistableDAO#delete(IPersistable)
+   */
+  void deleteAll(Collection<T> persistables) throws PersistenceException;
 
-  long countAll() throws PersistenceException;;
+  /**
+   * Counts the number of all <code>IPersistable</code> this DAO is
+   * responsible for from the persistence layer.
+   *
+   * @return Returns the number of all <code>IPersistable</code> this DAO is
+   * responsible for from the persistence layer.
+   * @throws PersistenceException In case of an error while trying to perform
+   * the operation.
+   */
+  long countAll() throws PersistenceException;
 
-  Class< ? extends T> getEntityClass();
+  /**
+   * @return Returns the <code>Class</code> this DAO is responsible for.
+   */
+  Class<? extends T> getEntityClass();
 }
