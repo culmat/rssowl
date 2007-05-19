@@ -41,22 +41,38 @@ public abstract class SearchDocument<T extends IEntity> {
   private final Document fDocument;
   private final T fType;
 
+  /**
+   * @param type
+   */
   public SearchDocument(T type) {
     Assert.isLegal(type != null);
     fType = type;
     fDocument = new Document();
   }
 
+  /**
+   * @return T
+   */
   public final T getType() {
     return fType;
   }
 
+  /**
+   * @return Document
+   */
   public final Document getDocument() {
     return fDocument;
   }
 
+  /**
+   * @return boolean
+   */
   public abstract boolean addFields();
 
+  /**
+   * @param fields
+   * @return boolean
+   */
   protected boolean addFieldsToDocument(List<Field> fields) {
     if (fields.size() == 0)
       return false;
@@ -68,6 +84,11 @@ public abstract class SearchDocument<T extends IEntity> {
     return true;
   }
 
+  /**
+   * @param fields
+   * @param field
+   * @return boolean
+   */
   protected boolean addField(List<Field> fields, Field field) {
     if (field == null)
       return false;
@@ -80,7 +101,7 @@ public abstract class SearchDocument<T extends IEntity> {
    * Creates a new <code>Field</code> representing the entities ID this
    * Document wraps around.
    *
-   * @return
+   * @return Field
    */
   protected Field createDocumentIDField() {
     return new Field(ENTITY_ID_TEXT, String.valueOf(getType().getId()), Store.YES, Index.UN_TOKENIZED);
@@ -89,7 +110,10 @@ public abstract class SearchDocument<T extends IEntity> {
   /**
    * Creates a new <code>Field</code> from the given ID value.
    *
-   * @return
+   * @param fieldConstant
+   * @param entity
+   * @param store
+   * @return Field
    */
   protected Field createIDField(int fieldConstant, IEntity entity, Store store) {
     return new Field(String.valueOf(fieldConstant), String.valueOf(entity.getId()), store, Index.UN_TOKENIZED);
@@ -101,7 +125,7 @@ public abstract class SearchDocument<T extends IEntity> {
    * @param fieldConstant
    * @param value
    * @param store
-   * @return
+   * @return Field
    */
   protected Field createLongField(int fieldConstant, long value, Store store) {
     String valueText = NumberTools.longToString(value);
@@ -114,7 +138,7 @@ public abstract class SearchDocument<T extends IEntity> {
    * @param fieldConstant
    * @param value
    * @param store
-   * @return
+   * @return Field
    */
   protected Field createBooleanField(int fieldConstant, boolean value, Store store) {
     return new Field(String.valueOf(fieldConstant), String.valueOf(value), store, Index.UN_TOKENIZED);
@@ -126,7 +150,7 @@ public abstract class SearchDocument<T extends IEntity> {
    * @param fieldConstant
    * @param value
    * @param store
-   * @return
+   * @return Field
    */
   protected Field createDateField(int fieldConstant, Date value, Store store) {
     if (value == null)
@@ -143,7 +167,7 @@ public abstract class SearchDocument<T extends IEntity> {
    * @param value
    * @param store
    * @param index
-   * @return
+   * @return Field
    */
   protected Field createURIField(int fieldConstant, URI value, Store store, Index index) {
     if (value == null)
@@ -159,7 +183,7 @@ public abstract class SearchDocument<T extends IEntity> {
    * @param value
    * @param store
    * @param index
-   * @return
+   * @return Field
    */
   protected Field createStringField(int fieldConstant, String value, Store store, Index index) {
     if (value == null)
@@ -175,9 +199,7 @@ public abstract class SearchDocument<T extends IEntity> {
    *
    * @param fieldConstant
    * @param value
-   * @param store
-   * @param index
-   * @return
+   * @return Field
    */
   protected Field createHTMLField(int fieldConstant, String value) {
     if (value == null)
@@ -192,7 +214,7 @@ public abstract class SearchDocument<T extends IEntity> {
    * @param fieldConstant
    * @param value
    * @param store
-   * @return
+   * @return Field
    */
   protected Field createEnumField(int fieldConstant, Enum<?> value, Store store) {
     if (value == null)
@@ -206,7 +228,7 @@ public abstract class SearchDocument<T extends IEntity> {
    * @param person
    * @param store
    * @param index
-   * @return
+   * @return Field
    */
   protected Field createPersonField(int fieldConstant, IPerson person, Store store, Index index) {
     if (person == null)
@@ -223,6 +245,13 @@ public abstract class SearchDocument<T extends IEntity> {
     return null;
   }
 
+  /**
+   * @param fieldConstant
+   * @param categories
+   * @param store
+   * @param index
+   * @return Field
+   */
   protected Field createCategoriesField(int fieldConstant, List<ICategory> categories, Store store, Index index) {
     if (categories == null || categories.size() == 0)
       return null;
@@ -240,6 +269,13 @@ public abstract class SearchDocument<T extends IEntity> {
     return null;
   }
 
+  /**
+   * @param fieldConstant
+   * @param attachments
+   * @param store
+   * @param index
+   * @return Field
+   */
   protected Field createAttachmentsField(int fieldConstant, List<IAttachment> attachments, Store store, Index index) {
     if (attachments == null || attachments.size() == 0)
       return null;

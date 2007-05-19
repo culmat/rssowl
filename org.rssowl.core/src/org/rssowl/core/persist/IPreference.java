@@ -24,38 +24,119 @@
 
 package org.rssowl.core.persist;
 
-
+/**
+ * Instances of <code>IPreference</code> are capable of storing a certain
+ * preference value (of the Type String, Long, Integer or Boolean) under a
+ * certain Key. The value can either be a single one or an array.
+ *
+ * @author bpasero
+ */
 public interface IPreference extends IEntity {
 
-  public enum Type { BOOLEAN, INTEGER, LONG, STRING };
-  
+  /** The Type of Preference Value */
+  public enum Type {
+
+    /** A Boolean Value */
+    BOOLEAN,
+
+    /** An Integer Value */
+    INTEGER,
+
+    /** A Long Value */
+    LONG,
+
+    /** A String Value */
+    STRING
+  };
+
+  /**
+   * @return Returns the Key that maps to the value of this Preference.
+   */
   String getKey();
-  
+
+  /**
+   * @return Returns the Type of the Value of this Preference.
+   */
   Type getType();
 
+  /**
+   * @return Returns the <code>Boolean</code> value from this Preference, or
+   * <code>NULL</code> if the value is from a different Type.
+   */
   Boolean getBoolean();
 
+  /**
+   * @return Returns the <code>boolean[]</code> value from this Preference, or
+   * <code>NULL</code> if the value is from a different Type.
+   */
   boolean[] getBooleans();
 
+  /**
+   * @return Returns the <code>Integer</code> value from this Preference, or
+   * <code>NULL</code> if the value is from a different Type.
+   */
   Integer getInteger();
 
+  /**
+   * @return Returns the <code>int[]</code> value from this Preference, or
+   * <code>NULL</code> if the value is from a different Type.
+   */
   int[] getIntegers();
 
+  /**
+   * @return Returns the <code>Long</code> value from this Preference, or
+   * <code>NULL</code> if the value is from a different Type.
+   */
   Long getLong();
 
+  /**
+   * @return Returns the <code>long[]</code> value from this Preference, or
+   * <code>NULL</code> if the value is from a different Type.
+   */
   long[] getLongs();
 
+  /**
+   * @return Returns the <code>String</code> value from this Preference, or
+   * <code>NULL</code> if the value is from a different Type.
+   */
   String getString();
 
+  /**
+   * @return Returns the <code>String[]</code> value from this Preference, or
+   * <code>NULL</code> if the value is from a different Type.
+   */
   String[] getStrings();
-  
-  void putStrings(String ... strings);
 
-  void putLongs(long ... longs);
+  /**
+   * Stores the given values into this Preference.
+   *
+   * @param strings The <code>String</code>s to add as preference value.
+   */
+  void putStrings(String... strings);
 
-  void putIntegers(int ... integers);
+  /**
+   * Stores the given values into this Preference.
+   *
+   * @param longs The <code>long</code>s to add as preference value.
+   */
+  void putLongs(long... longs);
 
-  void putBooleans(boolean ... booleans);
+  /**
+   * Stores the given values into this Preference.
+   *
+   * @param integers The <code>int</code>s to add as preference value.
+   */
+  void putIntegers(int... integers);
 
+  /**
+   * Stores the given values into this Preference.
+   *
+   * @param booleans The <code>boolean</code>s to add as preference value.
+   */
+  void putBooleans(boolean... booleans);
+
+  /**
+   * Clears the stored value from this preference.
+   */
   void clear();
 }

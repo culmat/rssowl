@@ -21,40 +21,48 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IPreference;
 
+/**
+ * Instances of <code>IPreference</code> are capable of storing a certain
+ * preference value (of the Type String, Long, or Boolean) under a certain Key.
+ *
+ * @author bpasero
+ */
 public final class Preference extends AbstractEntity implements IPreference {
   private String fKey;
-  
   private Type fType;
   private String[] fValues;
   private transient Object fCachedValues;
-  
+
   /**
    * Provided for deserialization purposes.
    */
-  protected Preference() {
-  }
-  
+  protected Preference() {}
+
+  /**
+   * @param key
+   */
   public Preference(String key) {
     Assert.isNotNull(key, "key cannot be null"); //$NON-NLS-1$
     this.fKey = key;
   }
-  
+
   /*
    * @see org.rssowl.core.internal.persist.pref.T#getKey()
    */
   public synchronized final String getKey() {
     return fKey;
   }
-  
+
   public synchronized final Type getType() {
     return fType;
   }
-  
+
   /*
    * @see org.rssowl.core.internal.persist.pref.T#getBoolean()
    */
@@ -62,10 +70,10 @@ public final class Preference extends AbstractEntity implements IPreference {
     boolean[] values = getBooleans();
     if (values != null && values.length > 0)
       return values[0];
-    
+
     return null;
   }
-  
+
   /*
    * @see org.rssowl.core.internal.persist.pref.T#getBooleans()
    */
@@ -73,11 +81,11 @@ public final class Preference extends AbstractEntity implements IPreference {
     if (fValues == null)
       return null;
     checkType(Type.BOOLEAN);
-    
+
     boolean[] cachedValues = (boolean[]) fCachedValues;
     if (fCachedValues != null)
       return copyOf(cachedValues);
-    
+
     cachedValues = new boolean[fValues.length];
     int index = 0;
     for (String value : fValues) {
@@ -86,30 +94,29 @@ public final class Preference extends AbstractEntity implements IPreference {
     fCachedValues = cachedValues;
     return copyOf(cachedValues);
   }
-  
+
   private void checkType(Type type) {
-    Assert.isLegal(fType == type, "The type of the Preference is not of the expected " +
-        "type. It should be: " + fType + ", but it is: " + type);
+    Assert.isLegal(fType == type, "The type of the Preference is not of the expected " + "type. It should be: " + fType + ", but it is: " + type);
   }
-  
+
   private boolean[] copyOf(boolean[] original) {
     boolean[] copy = new boolean[original.length];
     System.arraycopy(original, 0, copy, 0, original.length);
     return copy;
   }
-  
+
   private int[] copyOf(int[] original) {
     int[] copy = new int[original.length];
     System.arraycopy(original, 0, copy, 0, original.length);
     return copy;
   }
-  
+
   private long[] copyOf(long[] original) {
     long[] copy = new long[original.length];
     System.arraycopy(original, 0, copy, 0, original.length);
     return copy;
   }
-  
+
   private String[] copyOf(String[] original) {
     String[] copy = new String[original.length];
     System.arraycopy(original, 0, copy, 0, original.length);
@@ -123,10 +130,10 @@ public final class Preference extends AbstractEntity implements IPreference {
     int[] values = getIntegers();
     if (values != null && values.length > 0)
       return values[0];
-    
+
     return null;
   }
-  
+
   /*
    * @see org.rssowl.core.internal.persist.pref.T#getIntegers()
    */
@@ -134,11 +141,11 @@ public final class Preference extends AbstractEntity implements IPreference {
     if (fValues == null)
       return null;
     checkType(Type.INTEGER);
-    
+
     int[] cachedValues = (int[]) fCachedValues;
     if (fCachedValues != null)
       return copyOf(cachedValues);
-    
+
     cachedValues = new int[fValues.length];
     int index = 0;
     for (String value : fValues) {
@@ -147,7 +154,7 @@ public final class Preference extends AbstractEntity implements IPreference {
     fCachedValues = cachedValues;
     return copyOf(cachedValues);
   }
-  
+
   /*
    * @see org.rssowl.core.internal.persist.pref.T#getLong()
    */
@@ -155,22 +162,22 @@ public final class Preference extends AbstractEntity implements IPreference {
     long[] values = getLongs();
     if (values != null && values.length > 0)
       return values[0];
-    
+
     return null;
   }
-  
+
   /*
    * @see org.rssowl.core.internal.persist.pref.T#getLongs()
    */
-  public synchronized final long[] getLongs()   { 
+  public synchronized final long[] getLongs() {
     if (fValues == null)
       return null;
     checkType(Type.LONG);
-    
+
     long[] cachedValues = (long[]) fCachedValues;
     if (fCachedValues != null)
       return copyOf(cachedValues);
-    
+
     cachedValues = new long[fValues.length];
     int index = 0;
     for (String value : fValues) {
@@ -179,7 +186,7 @@ public final class Preference extends AbstractEntity implements IPreference {
     fCachedValues = cachedValues;
     return copyOf(cachedValues);
   }
-  
+
   /*
    * @see org.rssowl.core.internal.persist.pref.T#getString()
    */
@@ -187,10 +194,10 @@ public final class Preference extends AbstractEntity implements IPreference {
     String[] values = getStrings();
     if (values != null && values.length > 0)
       return values[0];
-    
+
     return null;
   }
-  
+
   /*
    * @see org.rssowl.core.internal.persist.pref.T#getStrings()
    */
@@ -198,11 +205,11 @@ public final class Preference extends AbstractEntity implements IPreference {
     if (fValues == null)
       return null;
     checkType(Type.STRING);
-    
+
     return copyOf(fValues);
   }
-  
-  public synchronized final void putStrings(String ... strings) {
+
+  public synchronized final void putStrings(String... strings) {
     if (strings == null) {
       clear();
       return;
@@ -213,7 +220,7 @@ public final class Preference extends AbstractEntity implements IPreference {
     fValues = cachedValues;
   }
 
-  public synchronized final void putLongs(long ... longs) {
+  public synchronized final void putLongs(long... longs) {
     if (longs == null) {
       clear();
       return;
@@ -227,8 +234,8 @@ public final class Preference extends AbstractEntity implements IPreference {
       fValues[index++] = String.valueOf(cachedValue);
     }
   }
-  
-  public synchronized final void putIntegers(int ... integers) {
+
+  public synchronized final void putIntegers(int... integers) {
     if (integers == null) {
       clear();
       return;
@@ -242,8 +249,8 @@ public final class Preference extends AbstractEntity implements IPreference {
       fValues[index++] = String.valueOf(cachedValue);
     }
   }
-  
-  public synchronized final void putBooleans(boolean ... booleans) {
+
+  public synchronized final void putBooleans(boolean... booleans) {
     if (booleans == null) {
       clear();
       return;
