@@ -39,11 +39,11 @@ import java.util.Collection;
 public interface IPersistableDAO<T extends IPersistable> {
 
   /**
-   * Loads a <code>Collection</code> of all <code>IPersistable</code> this
+   * Loads a <code>Collection</code> of all <code>IPersistable</code>s this
    * DAO is responsible for from the persistence service.
    *
    * @return Returns a <code>Collection</code> of all
-   * <code>IPersistable</code> this DAO is responsible for from the
+   * <code>IPersistable</code>s this DAO is responsible for from the
    * persistence service.
    * @throws PersistenceException In case of an error while trying to perform
    * the operation.
@@ -53,10 +53,10 @@ public interface IPersistableDAO<T extends IPersistable> {
 
   /**
    * Saves <code>persistable</code> to the persistence system. This method
-   * handles new and existing perstistables. In other words, it will add or
+   * handles new and existing persistables. In other words, it will add or
    * update the persistable as appropriate.
    *
-   * @param persistable The persistable to update.
+   * @param persistable The persistable to save.
    * @return The persistable saved.
    * @throws PersistenceException In case of an error while trying to perform
    * the operation.
@@ -68,7 +68,7 @@ public interface IPersistableDAO<T extends IPersistable> {
   /**
    * Saves the given Collection of <code>persistable</code>s to the
    * persistence system in a single operation. This method handles new and
-   * existing perstistables. In other words, it will add or update the
+   * existing persistables. In other words, it will add or update the
    * persistable as appropriate.
    *
    * @param persistables The persistables to save.
@@ -103,11 +103,11 @@ public interface IPersistableDAO<T extends IPersistable> {
   void deleteAll(Collection<T> persistables) throws PersistenceException;
 
   /**
-   * Counts the number of all <code>IPersistable</code> this DAO is
-   * responsible for from the persistence layer.
+   * Counts the number of <code>IPersistable</code>s this DAO is
+   * responsible for stored in the persistence layer.
    *
-   * @return Returns the number of all <code>IPersistable</code> this DAO is
-   * responsible for from the persistence layer.
+   * @return The number of <code>IPersistable</code>s this DAO is
+   * responsible for stored in the persistence layer.
    * @throws PersistenceException In case of an error while trying to perform
    * the operation.
    * @see DynamicDAO#countAll(Class)
