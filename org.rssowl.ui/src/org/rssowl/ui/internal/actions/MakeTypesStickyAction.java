@@ -34,6 +34,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.ModelUtils;
 
@@ -103,6 +104,9 @@ public class MakeTypesStickyAction extends Action implements IWorkbenchWindowAct
     for (INews newsItem : newsList) {
       newsItem.setFlagged(fFlag);
     }
+
+    /* Mark Saved Search Service as in need for a quick Update */
+    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
 
     /* Save List of INews */
     DynamicDAO.saveAll(newsList);
