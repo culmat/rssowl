@@ -35,6 +35,7 @@ import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.List;
@@ -66,6 +67,9 @@ public class MarkUnreadAction extends Action implements IWorkbenchWindowActionDe
    */
   @Override
   public void run() {
+
+    /* Mark Saved Search Service as in need for a quick Update */
+    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
 
     /* Only consider INews */
     List<INews> newsList = ModelUtils.getEntities(fSelection, INews.class);

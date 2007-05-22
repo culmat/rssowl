@@ -29,6 +29,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.List;
@@ -62,6 +63,9 @@ public class LabelAction extends Action {
       else if (label != null && fLabel != null && !fLabel.equals(label))
         newsItem.setLabel(fLabel);
     }
+
+    /* Mark Saved Search Service as in need for a quick Update */
+    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
 
     /* Save */
     DynamicDAO.saveAll(newsList);
