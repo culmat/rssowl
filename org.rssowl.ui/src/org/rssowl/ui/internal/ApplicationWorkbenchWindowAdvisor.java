@@ -127,7 +127,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     configurer.setShowMenuBar(true);
     configurer.setShowFastViewBars(true);
     configurer.setShowProgressIndicator(true);
-    configurer.setTitle("RSSOwl - Next Generation"); //$NON-NLS-1$
+    configurer.setTitle("RSSOwl"); //$NON-NLS-1$
 
     /* Apply DND Support for Editor Area */
     configurer.addEditorAreaTransfer(LocalSelectionTransfer.getTransfer());
