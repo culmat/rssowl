@@ -49,7 +49,6 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
-import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.ModelUtils;
@@ -349,7 +348,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     GC gc = event.gc;
 
     /* Handle selected News (Linux: Note Bug 444) */
-    if ((event.detail & SWT.SELECTED) != 0 && !Application.IS_LINUX) {
+    if ((event.detail & SWT.SELECTED) != 0) {
 
       /* Some conditions under which we don't override the selection color */
       if (news.getLabel() == null || !scrollable.isFocusControl())
