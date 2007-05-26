@@ -74,7 +74,6 @@ import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.TaskAdapter;
-import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.CColumnLayoutData;
 import org.rssowl.ui.internal.CTree;
@@ -112,7 +111,7 @@ public class NewsTableControl implements IFeedViewPart {
   private static int DATE_COL_WIDTH = -1;
 
   /* TODO Developer's flag to enable / disable COD */
-  static final boolean USE_CUSTOM_OWNER_DRAWN = !Application.IS_WINDOWS; //TODO Enable me in M6
+  static final boolean USE_CUSTOM_OWNER_DRAWN = true;
 
   /* Indices of Columns in the Tree-Viewer */
   static final int COL_TITLE = 0;
