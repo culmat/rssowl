@@ -24,7 +24,9 @@
 
 package org.rssowl.ui.internal;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
@@ -40,8 +42,8 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.InternalOwl;
-import org.rssowl.core.util.LongOperationMonitor;
 import org.rssowl.core.util.LoggingSafeRunnable;
+import org.rssowl.core.util.LongOperationMonitor;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -88,6 +90,22 @@ public class Activator extends AbstractUIPlugin {
   public void start(BundleContext context) throws Exception {
     super.start(context);
 
+    /*
+     * Start internal Server (chance that System.exit() gets called!). It is cruicial
+     * that no class from org.rssowl.core is loaded to avoid that a second instance
+     * that is launching, starts up the core for a second time.
+     */
+    SafeRunner.run(new ISafeRunnable() {
+      public void run() throws Exception {
+        startServer();
+      }
+
+      public void handleException(Throwable e) {
+        if (e instanceof CoreException)
+          Activator.getDefault().getLog().log(((CoreException) e).getStatus());
+      }
+    });
+
     /* Register a Shutdown Hook */
     fShutdownHook = new Thread() {
       @Override
@@ -115,13 +133,6 @@ public class Activator extends AbstractUIPlugin {
     SafeRunner.run(new LoggingSafeRunnable() {
       public void run() throws Exception {
         startCore();
-      }
-    });
-
-    /* Start internal Server (chance that System.exit() gets called!) */
-    SafeRunner.run(new LoggingSafeRunnable() {
-      public void run() throws Exception {
-        startServer();
       }
     });
 
