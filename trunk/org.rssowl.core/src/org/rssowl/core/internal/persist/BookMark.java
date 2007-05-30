@@ -29,9 +29,6 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 /**
  * A usual bookmark as seen in Firefox or other Browsers. The Bookmark is used
  * to define a position for a <code>Feed</code> inside the hierarchy of
@@ -87,13 +84,9 @@ public class BookMark extends Mark implements IBookMark {
    * @see org.rssowl.core.model.types.IBookMark#getFeedLinkReference()
    */
   public synchronized FeedLinkReference getFeedLinkReference() {
-    if (fFeedLinkReference == null) {
-      try {
-        fFeedLinkReference = new FeedLinkReference(new URI(fFeedLink));
-      } catch (URISyntaxException e) {
-        throw new IllegalStateException("Malformed URI was stored somehow: " + fFeedLink); //$NON-NLS-1$
-      }
-    }
+    if (fFeedLinkReference == null)
+      fFeedLinkReference = new FeedLinkReference(createURI(fFeedLink));
+
     return fFeedLinkReference;
   }
 
