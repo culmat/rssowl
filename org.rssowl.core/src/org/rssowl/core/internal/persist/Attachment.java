@@ -43,6 +43,8 @@ public class Attachment extends AbstractEntity implements IAttachment {
   private String fType;
   private INews fNews;
 
+  private transient URI fLinkURI;
+
   /**
    * Default constructor provided for deserialization
    */
@@ -115,15 +117,24 @@ public class Attachment extends AbstractEntity implements IAttachment {
    * @see org.rssowl.core.model.types.IAttachment#setLink(java.net.URI)
    */
   public synchronized void setLink(URI link) {
-    if (link != null)
+    if (link == null) {
+      fLinkURI = null;
+      fLink = null;
+    }
+    else {
+      fLinkURI = link;
       fLink = link.toString();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.IAttachment#getLink()
    */
   public synchronized URI getLink() {
-    return createURI(fLink);
+    if (fLinkURI == null && fLink != null)
+      fLinkURI = createURI(fLink);
+
+    return fLinkURI;
   }
 
   @SuppressWarnings("nls")
