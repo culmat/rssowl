@@ -9,7 +9,7 @@
          RSSOwl 2.0 Preview
 
 Version: 2.0.0
-Build id: Milestone 5a (2007-03-25)
+Build id: Milestone 7 (Nightly)
 
 (c) Copyright RSSOwl contributors and others 2005, 2007.  All rights reserved.
 Visit http://www.rssowl.org
@@ -33,6 +33,7 @@ Visit http://www.rssowl.org
          <bmp/>
       </win>
    </launcher>
+
 
    <vm>
    </vm>
@@ -80,7 +81,7 @@ Visit http://www.rssowl.org
 
    <features>
       <feature id="org.rssowl" version="2.0.0.qualifier"/>
-      <feature id="org.eclipse.rcp" version="3.3.0.v20070405a-8w8eDpEbsN3VpGNZ28IQRGc"/>
+      <feature id="org.eclipse.rcp" version="3.3.0.v20070531a-8y8eDpEbsN3X4tUtj8KWHG"/>
    </features>
 
 </product>
