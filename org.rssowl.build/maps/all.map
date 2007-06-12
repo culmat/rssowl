@@ -1,9 +1,0 @@
-feature@org.rssowl=COPY,C:/Development/Eclipse/WS/rssowl,org.rssowl
-plugin@org.rssowl.lib.jdom=COPY,C:/Development/Eclipse/WS/rssowl,org.rssowl.lib.jdom
-plugin@org.rssowl.ui=COPY,C:/Development/Eclipse/WS/rssowl,org.rssowl.ui
-plugin@org.rssowl.lib.db4o=COPY,C:/Development/Eclipse/WS/rssowl,org.rssowl.lib.db4o
-plugin@org.rssowl.core=COPY,C:/Development/Eclipse/WS/rssowl,org.rssowl.core
-plugin@org.rssowl.lib.httpclient=COPY,C:/Development/Eclipse/WS/rssowl,org.rssowl.lib.httpclient
-plugin@org.rssowl.lib.lucene=COPY,C:/Development/Eclipse/WS/rssowl,org.rssowl.lib.lucene
-feature@org.rssowl.contrib.nntp=COPY,C:/Development/Eclipse/WS/rssowl,org.rssowl.nntp
-plugin@org.rssowl.contrib.nntp=COPY,C:/Development/Eclipse/WS/rssowl,org.rssowl.contrib.nntp
