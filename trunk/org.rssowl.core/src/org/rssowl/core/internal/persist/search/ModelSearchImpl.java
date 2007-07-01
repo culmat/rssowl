@@ -441,7 +441,7 @@ public class ModelSearchImpl implements IModelSearch {
 
         /* Wildcard-Query with trailing '*' */
       case BEGINS_WITH: {
-        value = new StringBuilder(value.toLowerCase()).append("*").toString();
+        value = value.toLowerCase() + "*";
         Term term = new Term(fieldname, value);
         WildcardQuery query = new WildcardQuery(term);
         return query;
@@ -449,7 +449,7 @@ public class ModelSearchImpl implements IModelSearch {
 
         /* Wildcard-Query with leading '*' */
       case ENDS_WITH: {
-        value = new StringBuilder("*").append(value.toLowerCase()).toString();
+        value = "*" + value.toLowerCase();
         Term term = new Term(fieldname, value);
         return new WildcardQuery(term);
       }
