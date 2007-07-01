@@ -1110,9 +1110,9 @@ public class ModelTest3 {
     try {
       /* Add */
       FolderReference folderRef = new FolderReference(DynamicDAO.save(fFactory.createFolder(null, null, "Folder")).getId());
-      SearchMarkReference searchMarkRef = new SearchMarkReference(DynamicDAO.save(fFactory.createSearchMark(null, folderRef.resolve(), "SearchMark")).getId());
+      ISearchMark searchMark = DynamicDAO.save(fFactory.createSearchMark(null, folderRef.resolve(), "SearchMark"));
       ISearchField field = fFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
-      ISearchCondition searchCondition = fFactory.createSearchCondition(null, searchMarkRef.resolve(), field, SearchSpecifier.CONTAINS, "Foo");
+      ISearchCondition searchCondition = fFactory.createSearchCondition(null, searchMark, field, SearchSpecifier.CONTAINS, "Foo");
       final boolean searchConditionEvents[] = new boolean[3];
       final SearchConditionReference searchConditionReference[] = new SearchConditionReference[1];
       searchConditionListener = new SearchConditionListener() {
@@ -1141,6 +1141,10 @@ public class ModelTest3 {
       };
       DynamicDAO.addEntityListener(ISearchCondition.class, searchConditionListener);
       searchConditionReference[0] = new SearchConditionReference(DynamicDAO.save(searchCondition).getId());
+      DynamicDAO.removeEntityListener(ISearchCondition.class, searchConditionListener);
+      DynamicDAO.save(searchMark);
+      searchMark = null;
+      System.gc();
 
       /* Update */
       searchCondition = searchConditionReference[0].resolve();
