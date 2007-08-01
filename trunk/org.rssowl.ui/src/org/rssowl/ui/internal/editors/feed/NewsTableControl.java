@@ -251,6 +251,7 @@ public class NewsTableControl implements IFeedViewPart {
     TreeViewerColumn col = new TreeViewerColumn(fViewer, SWT.LEFT);
     fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 60), "Title", null, true, true);
     col.getColumn().setData(COL_ID, Columns.TITLE);
+    col.getColumn().setMoveable(false);
     if (fInitialSortColumn == Columns.TITLE) {
       fCustomTree.getControl().setSortColumn(col.getColumn());
       fCustomTree.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
@@ -261,6 +262,7 @@ public class NewsTableControl implements IFeedViewPart {
     col = new TreeViewerColumn(fViewer, SWT.LEFT);
     fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, width), "Date", null, true, true);
     col.getColumn().setData(COL_ID, Columns.DATE);
+    col.getColumn().setMoveable(false);
     if (fInitialSortColumn == Columns.DATE) {
       fCustomTree.getControl().setSortColumn(col.getColumn());
       fCustomTree.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
@@ -270,6 +272,7 @@ public class NewsTableControl implements IFeedViewPart {
     col = new TreeViewerColumn(fViewer, SWT.LEFT);
     fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20), "Author", null, true, true);
     col.getColumn().setData(COL_ID, Columns.AUTHOR);
+    col.getColumn().setMoveable(false);
     if (fInitialSortColumn == Columns.AUTHOR) {
       fCustomTree.getControl().setSortColumn(col.getColumn());
       fCustomTree.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
@@ -279,6 +282,7 @@ public class NewsTableControl implements IFeedViewPart {
     col = new TreeViewerColumn(fViewer, SWT.LEFT);
     fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20), "Category", null, true, true);
     col.getColumn().setData(COL_ID, Columns.CATEGORY);
+    col.getColumn().setMoveable(false);
     if (fInitialSortColumn == Columns.CATEGORY) {
       fCustomTree.getControl().setSortColumn(col.getColumn());
       fCustomTree.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
@@ -288,6 +292,7 @@ public class NewsTableControl implements IFeedViewPart {
     col = new TreeViewerColumn(fViewer, SWT.LEFT);
     fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 18), null, null, true, false);
     col.getColumn().setData(COL_ID, Columns.STICKY);
+    col.getColumn().setMoveable(false);
     col.getColumn().setToolTipText("Sticky State");
 
     /* Apply ContentProvider */
