@@ -239,7 +239,7 @@ litigation.
       <import plugin="org.eclipse.update.ui"/>
       <import plugin="org.eclipse.update.core"/>
       <import plugin="org.eclipse.core.net"/>
-      <import feature="org.eclipse.rcp" version="3.3.0.v20070405a-8w8eDpEbsN3VpGNZ28IQRGc"/>
+      <import feature="org.eclipse.rcp" version="3.3.0.v20070607-8y8eE8NEbsN3X_fjWS8HPNG"/>
    </requires>
 
    <plugin
