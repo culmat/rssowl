@@ -45,6 +45,7 @@ import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.io.File;
@@ -105,7 +106,8 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
         }
 
         /* Proceed Exporting */
-        Long selectedRootFolderID = DynamicDAO.getDAO(IPreferenceDAO.class).load(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET).getLong();
+        String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
+        Long selectedRootFolderID = DynamicDAO.getDAO(IPreferenceDAO.class).load(selectedBookMarkSetPref).getLong();
         IFolder selectedRootFolder = DynamicDAO.load(IFolder.class, selectedRootFolderID);
         exportToOPML(file, selectedRootFolder);
       } catch (IOException e) {

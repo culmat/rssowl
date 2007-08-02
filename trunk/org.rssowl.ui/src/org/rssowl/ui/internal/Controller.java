@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 import org.rssowl.core.IApplicationService;
@@ -72,6 +73,7 @@ import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TaskAdapter;
+import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyPageWrapper;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
@@ -479,6 +481,11 @@ public class Controller {
             fAppService.handleFeedReload(bookmark, pairResult.getFirst(), finalConditionalGet, finalDeleteConditionalGet);
             return Status.OK_STATUS;
           }
+
+          @Override
+          public String getName() {
+            return "Updating Feeds";
+          }
         });
       } else {
         fAppService.handleFeedReload(bookmark, pairResult.getFirst(), conditionalGet, deleteConditionalGet);
@@ -817,11 +824,14 @@ public class Controller {
       IFolder importedContainer = (IFolder) types.get(0);
 
       /* Load the current selected Set */
-      Long selectedFolderID = fPrefsDAO.load(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET).getLong();
+      String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
+      Long selectedFolderID = fPrefsDAO.load(selectedBookMarkSetPref).getLong();
       IFolder rootFolder = fFolderDAO.load(selectedFolderID);
+      List<IEntity> entitiesToReload = new ArrayList<IEntity>();
 
       /* Reparent all imported folders into selected Set */
       List<IFolder> folders = importedContainer.getFolders();
+      entitiesToReload.addAll(folders);
       for (IFolder folder : folders) {
         folder.setParent(rootFolder);
         rootFolder.addFolder(folder, null, null);
@@ -829,6 +839,7 @@ public class Controller {
 
       /* Reparent all imported marks into selected Set */
       List<IMark> marks = importedContainer.getMarks();
+      entitiesToReload.addAll(marks);
       for (IMark mark : marks) {
         mark.setParent(rootFolder);
         rootFolder.addMark(mark, null, null);
@@ -836,6 +847,9 @@ public class Controller {
 
       /* Save Set */
       fFolderDAO.save(rootFolder);
+
+      /* Reload imported Feeds */
+      new ReloadTypesAction(new StructuredSelection(entitiesToReload), OwlUI.getPrimaryShell()).run();
     } catch (Exception e) {
       Activator.getDefault().logError("importDefaults()", e); //$NON-NLS-1$
     }

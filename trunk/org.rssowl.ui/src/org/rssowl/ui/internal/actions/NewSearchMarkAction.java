@@ -38,6 +38,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.SearchMarkDialog;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
@@ -126,8 +127,8 @@ public class NewSearchMarkAction implements IWorkbenchWindowActionDelegate, IObj
   }
 
   private IFolder getParent() throws PersistenceException {
-    IPreferenceDAO prefDAO = DynamicDAO.getDAO(IPreferenceDAO.class);
-    Long selectedRootFolderID = prefDAO.load(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET).getLong();
+    String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
+    Long selectedRootFolderID = DynamicDAO.getDAO(IPreferenceDAO.class).load(selectedBookMarkSetPref).getLong();
 
     /* Check if available Parent is still valid */
     if (fParent != null) {

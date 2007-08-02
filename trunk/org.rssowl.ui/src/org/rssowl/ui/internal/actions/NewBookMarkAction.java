@@ -436,7 +436,8 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
   }
 
   private IFolder getParent() throws PersistenceException {
-    Long selectedRootFolderID = DynamicDAO.getDAO(IPreferenceDAO.class).load(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET).getLong();
+    String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
+    Long selectedRootFolderID = DynamicDAO.getDAO(IPreferenceDAO.class).load(selectedBookMarkSetPref).getLong();
 
     /* Check if available Parent is still valid */
     if (fParent != null) {
