@@ -19,10 +19,11 @@ Visit http://www.rssowl.org
    <configIni use="custom" path="/org.rssowl.ui/config.ini"/>
 
    <launcherArgs>
-      <vmArgs>-Xms40m -Xmx192m</vmArgs>
+      <vmArgs>-Xms40m -Xmx192m -Dosgi.requiredJavaVersion=1.5</vmArgs>
    </launcherArgs>
 
    <windowImages i16="/org.rssowl.ui/icons/product/16x16.gif" i32="/org.rssowl.ui/icons/product/32x32.gif" i48="/org.rssowl.ui/icons/product/48x48.gif" i64="/org.rssowl.ui/icons/product/64x64.gif" i128="/org.rssowl.ui/icons/product/128x128.gif"/>
+
 
    <launcher name="RSSOwl">
       <linux icon="/org.rssowl.ui/icons/product/rssowl.xpm"/>
