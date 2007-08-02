@@ -1147,6 +1147,7 @@ public class ModelTest3 {
       System.gc();
 
       /* Update */
+      DynamicDAO.addEntityListener(ISearchCondition.class, searchConditionListener);
       searchCondition = searchConditionReference[0].resolve();
       searchCondition.setValue("Bar");
       searchCondition.setSpecifier(SearchSpecifier.CONTAINS_NOT);
