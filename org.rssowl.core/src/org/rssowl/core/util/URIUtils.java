@@ -148,7 +148,16 @@ public class URIUtils {
    */
   public static URI createURI(String str) {
     try {
+
+      /* Remove surrounding whitespaces */
       str = str.trim();
+
+      /* Take first token not containing any whitespace */
+      if (str.contains(" ")) {
+        String[] split = str.split(" ");
+        if (split.length > 0)
+          str = split[0];
+      }
 
       /* Remove trailing slash if any */
       if (str.length() > 0 && str.charAt(str.length() - 1) == '/')
