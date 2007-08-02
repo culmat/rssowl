@@ -174,7 +174,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       public void run() throws Exception {
 
         /* Check if Prefs tell to move to tray */
-        if (fPreferences.getBoolean(DefaultPreferences.TRAY_ON_CLOSE)) {
+        if (ApplicationWorkbenchWindowAdvisor.this.equals(ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor) && fPreferences.getBoolean(DefaultPreferences.TRAY_ON_CLOSE)) {
           fMinimizeFromClose = true;
           getWindowConfigurer().getWindow().getShell().notifyListeners(SWT.Iconify, new Event());
           res[0] = false;
