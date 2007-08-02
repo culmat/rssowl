@@ -535,7 +535,8 @@ public class BookMarkExplorer extends ViewPart {
     fViewSite.getActionBars().getToolBarManager().find(NEXT_SET_ACTION).update(IAction.ENABLED);
 
     /* Save the new selected Set in Preferences */
-    IPreference pref = fPrefDAO.loadOrCreate(PREF_SELECTED_BOOKMARK_SET);
+    int windowIndex = OwlUI.getWindowIndex(fViewSite.getWorkbenchWindow());
+    IPreference pref = fPrefDAO.loadOrCreate(PREF_SELECTED_BOOKMARK_SET + windowIndex);
     pref.putLongs(fSelectedBookMarkSet.getId());
     fPrefDAO.save(pref);
   }
@@ -1564,7 +1565,8 @@ public class BookMarkExplorer extends ViewPart {
     fFilterType = BookMarkFilter.Type.values()[fGlobalPreferences.getInteger(DefaultPreferences.BE_FILTER_TYPE)];
     fGroupingType = BookMarkGrouping.Type.values()[fGlobalPreferences.getInteger(DefaultPreferences.BE_GROUP_TYPE)];
 
-    IPreference pref = fPrefDAO.load(PREF_SELECTED_BOOKMARK_SET);
+    int windowIndex = OwlUI.getWindowIndex(fViewSite.getWorkbenchWindow());
+    IPreference pref = fPrefDAO.load(PREF_SELECTED_BOOKMARK_SET + windowIndex);
     Assert.isTrue(fRootFolders.size() > 0, "Could not find any Bookmark Set!"); //$NON-NLS-1$
     if (pref != null)
       fSelectedBookMarkSet = new FolderReference(pref.getLong().longValue()).resolve();
@@ -1572,7 +1574,7 @@ public class BookMarkExplorer extends ViewPart {
       fSelectedBookMarkSet = getRootFolderAt(0);
 
       /* Save this to make sure subsequent calls succeed */
-      pref = Owl.getModelFactory().createPreference(PREF_SELECTED_BOOKMARK_SET);
+      pref = Owl.getModelFactory().createPreference(PREF_SELECTED_BOOKMARK_SET + windowIndex);
       pref.putLongs(fSelectedBookMarkSet.getId());
       fPrefDAO.save(pref);
     }
