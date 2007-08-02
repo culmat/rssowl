@@ -56,6 +56,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Minimize to the system tray on Shell Close */
   public static final String TRAY_ON_CLOSE = "org.rssowl.pref.TrayOnExit";
 
+  /** Global: Minimize to the system tray on Application Start */
+  public static final String TRAY_ON_START = "org.rssowl.pref.TrayOnStart";
+
   /** Global: Mark Read state */
   public static final String MARK_READ_STATE = "org.rssowl.pref.MarkReadState";
 
