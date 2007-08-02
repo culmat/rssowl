@@ -153,7 +153,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     fMaxCountSpinner.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
     fMaxCountSpinner.setEnabled(fDeleteNewsByCountCheck.getSelection());
     fMaxCountSpinner.setMinimum(0);
-    fMaxCountSpinner.setMaximum(1000);
+    fMaxCountSpinner.setMaximum(99999);
     fMaxCountSpinner.setSelection(fPrefDeleteNewsByCountValue);
 
     /* Delete by Age */
@@ -172,7 +172,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     fMaxAgeSpinner.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
     fMaxAgeSpinner.setEnabled(fDeleteNewsByAgeCheck.getSelection());
     fMaxAgeSpinner.setMinimum(0);
-    fMaxAgeSpinner.setMaximum(1000);
+    fMaxAgeSpinner.setMaximum(99999);
     fMaxAgeSpinner.setSelection(fPrefDeleteNewsByAgeValue);
 
     /* Delete by State */

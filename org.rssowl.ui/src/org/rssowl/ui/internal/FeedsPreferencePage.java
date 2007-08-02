@@ -304,7 +304,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fDeleteNewsByCountValue.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
     fDeleteNewsByCountValue.setEnabled(fDeleteNewsByCountCheck.getSelection());
     fDeleteNewsByCountValue.setMinimum(0);
-    fDeleteNewsByCountValue.setMaximum(1000);
+    fDeleteNewsByCountValue.setMaximum(99999);
     fDeleteNewsByCountValue.setSelection(fGlobalScope.getInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE));
 
     /* Delete by Age */
@@ -323,7 +323,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fDeleteNewsByAgeValue.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
     fDeleteNewsByAgeValue.setEnabled(fDeleteNewsByAgeCheck.getSelection());
     fDeleteNewsByAgeValue.setMinimum(0);
-    fDeleteNewsByAgeValue.setMaximum(1000);
+    fDeleteNewsByAgeValue.setMaximum(99999);
     fDeleteNewsByAgeValue.setSelection(fGlobalScope.getInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE));
 
     /* Delete by State */
