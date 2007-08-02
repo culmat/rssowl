@@ -529,7 +529,7 @@ public class Controller {
         }
       }
 
-      return createErrorStatus(e.getStatus(), bookmark, feedLink);
+      return createWarningStatus(e.getStatus(), bookmark, feedLink);
     }
 
     /* Save Error State to the Bookmark if present */
@@ -841,15 +841,15 @@ public class Controller {
     }
   }
 
-  private IStatus createErrorStatus(IStatus error, IBookMark bookmark, URI feedLink) {
+  private IStatus createWarningStatus(IStatus status, IBookMark bookmark, URI feedLink) {
     StringBuilder msg = new StringBuilder();
     msg.append("Error loading '").append(bookmark.getName()).append("'");
 
-    if (StringUtils.isSet(error.getMessage()))
-      msg.append("\nProblem: ").append(error.getMessage());
+    if (StringUtils.isSet(status.getMessage()))
+      msg.append("\nProblem: ").append(status.getMessage());
 
     msg.append("\nLink: ").append(feedLink);
 
-    return new Status(error.getSeverity(), error.getPlugin(), error.getCode(), msg.toString(), error.getException());
+    return new Status(IStatus.WARNING, status.getPlugin(), status.getCode(), msg.toString(), status.getException());
   }
 }
