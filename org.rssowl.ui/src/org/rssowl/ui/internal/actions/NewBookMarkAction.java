@@ -57,6 +57,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.Owl;
+import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
@@ -74,6 +75,7 @@ import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.UIBackgroundJob;
@@ -200,7 +202,11 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       grabTitleItem.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
-          onGrabTitle();
+          try {
+            onGrabTitle();
+          } catch (URISyntaxException ex) {
+            Activator.getDefault().logError(ex.getMessage(), ex);
+          }
         }
       });
 
@@ -217,22 +223,37 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       return container;
     }
 
-    private void onGrabTitle() {
+    private void onGrabTitle() throws URISyntaxException {
       if (StringUtils.isSet(fLinkInput.getText())) {
         getShell().setCursor(getShell().getDisplay().getSystemCursor(SWT.CURSOR_APPSTARTING));
         final String linkText = fLinkInput.getText();
+        final URI link = new URI(linkText);
         JobRunner.runUIUpdater(new UIBackgroundJob(getShell()) {
           private String fLabel;
 
           @Override
           protected void runInBackground(IProgressMonitor monitor) {
             try {
-              URI link = new URI(linkText);
               fLabel = Owl.getConnectionService().getLabel(link);
             } catch (ConnectionException e) {
-              /* Ignore */
-            } catch (URISyntaxException e) {
-              /* Ignore */
+
+              /* Authentication Required */
+              if (e instanceof AuthenticationRequiredException && getShell() != null && !getShell().isDisposed()) {
+                JobRunner.runInUIThread(getShell(), new Runnable() {
+                  public void run() {
+
+                    /* Show Login Dialog */
+                    LoginDialog login = new LoginDialog(getShell(), link);
+                    if (login.open() == Window.OK) {
+                      try {
+                        onGrabTitle();
+                      } catch (URISyntaxException e) {
+                        Activator.getDefault().logError(e.getMessage(), e);
+                      }
+                    }
+                  }
+                });
+              }
             }
           }
 
@@ -240,6 +261,9 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
           protected void runInUI(IProgressMonitor monitor) {
             if (StringUtils.isSet(fLabel))
               fNameInput.setText(fLabel);
+            else
+              setMessage("Unable to load name from feed.", IMessageProvider.WARNING);
+
             getShell().setCursor(null);
           }
         });
