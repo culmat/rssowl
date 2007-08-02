@@ -368,4 +368,15 @@ public class Activator extends AbstractUIPlugin {
   public IStatus createErrorStatus(String msg, Exception e) {
     return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), IStatus.ERROR, msg, e);
   }
+
+  /**
+   * Create a IStatus out of the given message and exception.
+   *
+   * @param msg The message describing the info.
+   * @param e The Exception that occured.
+   * @return An IStatus out of the given message and exception.
+   */
+  public IStatus createInfoStatus(String msg, Exception e) {
+    return new Status(IStatus.INFO, Activator.getDefault().getBundle().getSymbolicName(), IStatus.INFO, msg, e);
+  }
 }
