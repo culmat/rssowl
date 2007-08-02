@@ -153,7 +153,8 @@ public class SearchMarkDialog extends TitleAreaDialog {
   }
 
   private IFolder getDefaultParent() {
-    Long selectedRootFolderID = DynamicDAO.getDAO(IPreferenceDAO.class).load(BookMarkExplorer.PREF_SELECTED_BOOKMARK_SET).getLong();
+    String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
+    Long selectedRootFolderID = DynamicDAO.getDAO(IPreferenceDAO.class).load(selectedBookMarkSetPref).getLong();
     return new FolderReference(selectedRootFolderID).resolve();
   }
 

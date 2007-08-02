@@ -81,6 +81,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartReference;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
@@ -159,8 +160,8 @@ public class BookMarkExplorer extends ViewPart {
   private static final String NEXT_SET_ACTION = "org.rssowl.ui.internal.views.explorer.NextSetAction"; //$NON-NLS-1$
   private static final String PREVIOUS_SET_ACTION = "org.rssowl.ui.internal.views.explorer.PreviousSetAction"; //$NON-NLS-1$
 
-  /** Local Setting Constants */
-  public static final String PREF_SELECTED_BOOKMARK_SET = "org.rssowl.ui.internal.views.explorer.SelectedBookMarkSet"; //$NON-NLS-1$
+  /* Local Setting Constants */
+  private static final String PREF_SELECTED_BOOKMARK_SET = "org.rssowl.ui.internal.views.explorer.SelectedBookMarkSet"; //$NON-NLS-1$
   private static final String PREF_EXPANDED_NODES = "org.rssowl.ui.internal.views.explorer.ExpandedNodes"; //$NON-NLS-1$
 
   /* Local Actions */
@@ -201,6 +202,19 @@ public class BookMarkExplorer extends ViewPart {
   private IPartListener2 fPartListener;
   private NewsService fNewsService;
   private IPreferenceDAO fPrefDAO;
+
+  /**
+   * Returns the preferences key for the selected bookmark set for the given
+   * workbench window.
+   *
+   * @param window the active workbench window.
+   * @return the preferences key for the selected bookmark set for the given
+   * workbench window.
+   */
+  public static String getSelectedBookMarkSetPref(IWorkbenchWindow window) {
+    int windowIndex = OwlUI.getWindowIndex(window);
+    return PREF_SELECTED_BOOKMARK_SET + windowIndex;
+  }
 
   /*
    * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
@@ -535,8 +549,7 @@ public class BookMarkExplorer extends ViewPart {
     fViewSite.getActionBars().getToolBarManager().find(NEXT_SET_ACTION).update(IAction.ENABLED);
 
     /* Save the new selected Set in Preferences */
-    int windowIndex = OwlUI.getWindowIndex(fViewSite.getWorkbenchWindow());
-    IPreference pref = fPrefDAO.loadOrCreate(PREF_SELECTED_BOOKMARK_SET + windowIndex);
+    IPreference pref = fPrefDAO.loadOrCreate(getSelectedBookMarkSetPref(fViewSite.getWorkbenchWindow()));
     pref.putLongs(fSelectedBookMarkSet.getId());
     fPrefDAO.save(pref);
   }
@@ -1565,8 +1578,8 @@ public class BookMarkExplorer extends ViewPart {
     fFilterType = BookMarkFilter.Type.values()[fGlobalPreferences.getInteger(DefaultPreferences.BE_FILTER_TYPE)];
     fGroupingType = BookMarkGrouping.Type.values()[fGlobalPreferences.getInteger(DefaultPreferences.BE_GROUP_TYPE)];
 
-    int windowIndex = OwlUI.getWindowIndex(fViewSite.getWorkbenchWindow());
-    IPreference pref = fPrefDAO.load(PREF_SELECTED_BOOKMARK_SET + windowIndex);
+    String selectedBookMarkSetPref = getSelectedBookMarkSetPref(fViewSite.getWorkbenchWindow());
+    IPreference pref = fPrefDAO.load(selectedBookMarkSetPref);
     Assert.isTrue(fRootFolders.size() > 0, "Could not find any Bookmark Set!"); //$NON-NLS-1$
     if (pref != null)
       fSelectedBookMarkSet = new FolderReference(pref.getLong().longValue()).resolve();
@@ -1574,7 +1587,7 @@ public class BookMarkExplorer extends ViewPart {
       fSelectedBookMarkSet = getRootFolderAt(0);
 
       /* Save this to make sure subsequent calls succeed */
-      pref = Owl.getModelFactory().createPreference(PREF_SELECTED_BOOKMARK_SET + windowIndex);
+      pref = Owl.getModelFactory().createPreference(selectedBookMarkSetPref);
       pref.putLongs(fSelectedBookMarkSet.getId());
       fPrefDAO.save(pref);
     }
