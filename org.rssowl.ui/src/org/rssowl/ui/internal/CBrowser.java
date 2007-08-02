@@ -112,7 +112,7 @@ public class CBrowser {
         browser = new Browser(parent, style | SWT.MOZILLA);
       } catch (SWTError e) {
         fgMozillaAvailable = false;
-        Activator.getDefault().getLog().log(Activator.getDefault().createErrorStatus(e.getMessage(), null));
+        Activator.getDefault().getLog().log(Activator.getDefault().createInfoStatus(e.getMessage(), null));
       }
     }
 
