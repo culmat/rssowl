@@ -465,9 +465,11 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
      * blank page (or wrong page), re-set the input.
      */
     String inputUrl = fServer.toUrl(fId, fInput);
-    if (inputUrl.equals(fBrowser.getControl().getUrl()))
+    String browserUrl = fBrowser.getControl().getUrl();
+    boolean resetInput = browserUrl.length() == 0 || URIUtils.ABOUT_BLANK.equals(browserUrl);
+    if (inputUrl.equals(browserUrl))
       refresh(); // TODO Optimize
-    else if (fServer.isDisplayOperation(inputUrl))
+    else if (fServer.isDisplayOperation(inputUrl) && resetInput)
       fBrowser.setUrl(inputUrl);
   }
 
