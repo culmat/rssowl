@@ -218,7 +218,7 @@ public class Controller {
 
   private Controller() {
     fReloadFeedQueue = new JobQueue("Updating Feeds", MAX_CONCURRENT_RELOAD_JOBS, true, 0);
-    fSaveFeedQueue = new JobQueue("Saving Feeds", MAX_CONCURRENT_SAVE_JOBS, false, 0);
+    fSaveFeedQueue = new JobQueue("Updating Feeds", MAX_CONCURRENT_SAVE_JOBS, true, 0);
     fEntityPropertyPages = loadEntityPropertyPages();
     fBookMarkDAO = DynamicDAO.getDAO(IBookMarkDAO.class);
     fConditionalGetDAO = DynamicDAO.getDAO(IConditionalGetDAO.class);
