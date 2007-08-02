@@ -135,7 +135,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
     FEED_CHANGE,
 
     /** Application Minimized */
-    MINIMIZE
+    MINIMIZE,
+
+    /** Application Closing */
+    CLOSE
   }
 
   /* Editor Data */
@@ -661,38 +664,54 @@ public class FeedView extends EditorPart implements IReusableEditor {
     if (news == null || !fInput.exists())
       return;
 
-    /* Handle seen News */
-    JobRunner.runInBackgroundThread(HANDLE_NEWS_SEEN_DELAY, new Runnable() {
-      public void run() {
+    /* Mark *new* News as read when closing */
+    if (event == UIEvent.CLOSE) {
 
-        /* Application might be in process of closing */
-        if (Controller.getDefault().isShuttingDown())
-          return;
-
-        /* Check settings if mark as read should be performed */
-        boolean markRead = false;
-        if (event == UIEvent.FEED_CHANGE)
-          markRead = fPreferences.getBoolean(DefaultPreferences.MARK_FEED_READ_ON_CHANGE);
-        else if (event == UIEvent.MINIMIZE)
-          markRead = fPreferences.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE);
-
-        /* Perform the State Change */
-        List<INews> newsToUpdate = new ArrayList<INews>();
-        for (INews newsItem : news) {
-          if (newsItem.getState() == INews.State.NEW)
-            newsToUpdate.add(newsItem);
-          else if (markRead && (newsItem.getState() == INews.State.UPDATED || newsItem.getState() == INews.State.UNREAD))
-            newsToUpdate.add(newsItem);
-        }
-
-        INewsDAO newsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
-        newsDao.setState(newsToUpdate, markRead ? INews.State.READ : INews.State.UNREAD, true, false);
-
-        /* Retention Strategy */
-        if (bookmark != null)
-          RetentionStrategy.process(bookmark, news);
+      /* Perform the State Change */
+      List<INews> newsToUpdate = new ArrayList<INews>();
+      for (INews newsItem : news) {
+        if (newsItem.getState() == INews.State.NEW)
+          newsToUpdate.add(newsItem);
       }
-    });
+
+      INewsDAO newsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
+      newsDao.setState(newsToUpdate, INews.State.UNREAD, true, false);
+    }
+
+    /* Handle seen News: Feed Change or Minimize Event */
+    else {
+      JobRunner.runInBackgroundThread(HANDLE_NEWS_SEEN_DELAY, new Runnable() {
+        public void run() {
+
+          /* Application might be in process of closing */
+          if (Controller.getDefault().isShuttingDown())
+            return;
+
+          /* Check settings if mark as read should be performed */
+          boolean markRead = false;
+          if (event == UIEvent.FEED_CHANGE)
+            markRead = fPreferences.getBoolean(DefaultPreferences.MARK_FEED_READ_ON_CHANGE);
+          else if (event == UIEvent.MINIMIZE)
+            markRead = fPreferences.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE);
+
+          /* Perform the State Change */
+          List<INews> newsToUpdate = new ArrayList<INews>();
+          for (INews newsItem : news) {
+            if (newsItem.getState() == INews.State.NEW)
+              newsToUpdate.add(newsItem);
+            else if (markRead && (newsItem.getState() == INews.State.UPDATED || newsItem.getState() == INews.State.UNREAD))
+              newsToUpdate.add(newsItem);
+          }
+
+          INewsDAO newsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
+          newsDao.setState(newsToUpdate, markRead ? INews.State.READ : INews.State.UNREAD, true, false);
+
+          /* Retention Strategy */
+          if (bookmark != null)
+            RetentionStrategy.process(bookmark, news);
+        }
+      });
+    }
   }
 
   /* React on the Input being set */

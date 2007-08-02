@@ -180,6 +180,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
           res[0] = false;
           fMinimizeFromClose = false;
         }
+
+        /* Notify any open feedview about closing application */
+        else {
+          onClose();
+        }
       }
     });
 
@@ -295,6 +300,16 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     if (activeEditor != null && activeEditor instanceof FeedView) {
       FeedView feedView = (FeedView) activeEditor;
       feedView.notifyUIEvent(FeedView.UIEvent.MINIMIZE);
+    }
+  }
+
+  private void onClose() {
+
+    /* Mark new News as Unread on Close */
+    IEditorPart activeEditor = OwlUI.getActiveEditor();
+    if (activeEditor != null && activeEditor instanceof FeedView) {
+      FeedView feedView = (FeedView) activeEditor;
+      feedView.notifyUIEvent(FeedView.UIEvent.CLOSE);
     }
   }
 
