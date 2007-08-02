@@ -1162,7 +1162,6 @@ public class ModelTest3 {
       assertTrue("Missing searchConditionDeleted Event", searchConditionEvents[1]);
 
     } finally {
-      DynamicDAO.removeEntityListener(ISearchCondition.class, searchConditionListener);
       if (searchConditionListener != null)
         DynamicDAO.removeEntityListener(ISearchCondition.class, searchConditionListener);
     }
