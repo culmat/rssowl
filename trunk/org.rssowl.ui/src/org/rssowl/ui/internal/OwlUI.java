@@ -741,6 +741,26 @@ public class OwlUI {
   }
 
   /**
+   * Attempts to return the index of the given workbench window or
+   * <code>-1</code> if none.
+   *
+   * @param window the {@link IWorkbenchWindow} to get the index in the stack of
+   * windows that are open.
+   * @return the index of the given workbench window or <code>-1</code> if
+   * none.
+   */
+  public static int getWindowIndex(IWorkbenchWindow window) {
+    if (window != null) {
+      IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
+      for (int i = 0; i < windows.length; i++)
+        if (windows[i].equals(window))
+          return i;
+    }
+
+    return 0;
+  }
+
+  /**
    * Attempts to find the <code>IWorkbenchPage</code> from the
    * Workbench-Window the mouse is currently over from the PlatformUI facade.
    * Otherwise, returns <code>NULL</code> if none.
