@@ -52,6 +52,7 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 public class MiscPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
   private IPreferenceScope fGlobalScope;
   private Button fMinimizeToTray;
+  private Button fMoveToTrayOnStart;
   private Button fMoveToTrayOnExit;
   private Button fNotificationOnlyFromTray;
   private Button fShowNotificationPopup;
@@ -161,6 +162,11 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fMinimizeToTray.setText("when minimizing RSSOwl");
     fMinimizeToTray.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE));
 
+    /* Move to Tray on Start */
+    fMoveToTrayOnStart = new Button(trayOptionsContainer, SWT.CHECK);
+    fMoveToTrayOnStart.setText("when starting RSSOwl");
+    fMoveToTrayOnStart.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_START));
+
     /* Move to Tray on Close */
     fMoveToTrayOnExit = new Button(trayOptionsContainer, SWT.CHECK);
     fMoveToTrayOnExit.setText("when closing RSSOwl");
@@ -222,6 +228,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   @Override
   public boolean performOk() {
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_MINIMIZE, fMinimizeToTray.getSelection());
+    fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_START, fMoveToTrayOnStart.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_CLOSE, fMoveToTrayOnExit.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP, fShowNotificationPopup.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED, fNotificationOnlyFromTray.getSelection());
@@ -244,6 +251,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
 
     fMinimizeToTray.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE));
+    fMoveToTrayOnStart.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_START));
     fMoveToTrayOnExit.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
     fShowNotificationPopup.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP));
     fNotificationOnlyFromTray.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED));

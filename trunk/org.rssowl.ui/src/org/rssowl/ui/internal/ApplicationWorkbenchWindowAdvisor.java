@@ -125,36 +125,41 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     configurer.setShowPerspectiveBar(false);
     configurer.setShowStatusLine(true);
     configurer.setShowMenuBar(true);
-    configurer.setShowFastViewBars(true);
+    configurer.setShowFastViewBars(false);
     configurer.setShowProgressIndicator(true);
     configurer.setTitle("RSSOwl"); //$NON-NLS-1$
 
     /* Apply DND Support for Editor Area */
     configurer.addEditorAreaTransfer(LocalSelectionTransfer.getTransfer());
     configurer.configureEditorAreaDropListener(new EditorDNDImpl());
+
+    /* Retrieve Preferences */
+    fPreferences = Owl.getPreferenceService().getGlobalScope();
   }
 
-  /**
+  /*
    * @see org.eclipse.ui.application.WorkbenchWindowAdvisor#postWindowOpen()
    */
   @Override
   public void postWindowOpen() {
     SafeRunner.run(new LoggingSafeRunnable() {
       public void run() throws Exception {
-
-        /* Retrieve Preferences */
-        fPreferences = Owl.getPreferenceService().getGlobalScope();
+        Shell shell = getWindowConfigurer().getWindow().getShell();
 
         /* Hook TrayItem if supported on OS and 1st Window */
-        if (fPreferences.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE) || fPreferences.getBoolean(DefaultPreferences.TRAY_ON_CLOSE))
+        if (fPreferences.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE) || fPreferences.getBoolean(DefaultPreferences.TRAY_ON_CLOSE) || fPreferences.getBoolean(DefaultPreferences.TRAY_ON_START))
           enableTray();
 
         /* Win only: Allow Scroll over Cursor-Control */
         if (Application.IS_WINDOWS)
-          hookFocuslessScrolling(getWindowConfigurer().getWindow().getShell().getDisplay());
+          hookFocuslessScrolling(shell.getDisplay());
 
         /* Register Listeners */
         registerListeners();
+
+        /* Move to Tray if set */
+        if (fPreferences.getBoolean(DefaultPreferences.TRAY_ON_START))
+          moveToTray(shell);
       }
     });
   }
