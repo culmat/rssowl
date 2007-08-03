@@ -49,7 +49,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
 
   protected final Class<? extends T> fEntityClass;
   protected final boolean fSaveFully;
-  
+
   protected ReadWriteLock fLock;
   protected Lock fWriteLock;
   protected ObjectContainer fDb;
@@ -69,11 +69,24 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
       }
     });
   }
-  
+
   public final Class<? extends T> getEntityClass()    {
     return fEntityClass;
   }
-  
+
+  protected final T getSingleResult(Query query) {
+    List<T> result = getList(query);
+    int resultSize = result.size();
+    if (resultSize == 0) {
+      return null;
+    }
+    if (resultSize == 1) {
+      return result.get(0);
+    }
+    throw new IllegalStateException("Expected a single result, but got: "
+        + resultSize);
+  }
+
   @SuppressWarnings("unchecked")
   protected final List<T> getList(Query query)    {
     return query.execute();
@@ -86,7 +99,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
     try {
       List<? extends T> entities = fDb.query(fEntityClass);
       activateAll(entities);
-  
+
       return new ArrayList<T>(entities);
     } catch (Db4oException e) {
       throw new PersistenceException(e);
@@ -96,7 +109,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
   protected final <C extends Collection<O>, O> C activateAll(C collection) {
     for (O o : collection)
       fDb.ext().activate(o, Integer.MAX_VALUE);
-  
+
     return collection;
   }
 
@@ -107,14 +120,14 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
     saveAll(Collections.singletonList(object));
     return object;
   }
-  
+
   /*
    * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#saveAll(C)
    */
   public void saveAll(Collection<T> objects) {
     if (objects.isEmpty())
       return;
-    
+
     fWriteLock.lock();
     try {
       for (T object : objects) {
@@ -160,7 +173,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
   public void deleteAll(Collection<T> objects) {
     if (objects.isEmpty())
       return;
-    
+
     fWriteLock.lock();
     try {
       for (T object : objects) {

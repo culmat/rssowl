@@ -25,10 +25,13 @@
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.SearchMark;
+import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.event.SearchMarkListener;
+
+import com.db4o.query.Query;
 
 import java.util.Set;
 
@@ -58,5 +61,12 @@ public final class SearchMarkDAOImpl extends AbstractEntityDAO<ISearchMark, Sear
     for (SearchMarkListener listener : fEntityListeners) {
       listener.resultsChanged(events);
     }
+  }
+
+  public ISearchMark load(ISearchCondition searchCondition) {
+    Query query = fDb.query();
+    query.constrain(fEntityClass);
+    query.descend("fSearchConditions").constrain(searchCondition);
+    return getSingleResult(query);
   }
 }
