@@ -282,6 +282,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       boolean valid = fLinkInput.getText().length() > 0 && fNameInput.getText().length() > 0;
       Control button = getButton(IDialogConstants.OK_ID);
       button.setEnabled(valid);
+      setMessage("Please enter the name and link of the bookmark.", IMessageProvider.INFORMATION);
     }
 
     IFolder getFolder() {
