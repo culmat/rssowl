@@ -24,6 +24,7 @@
 
 package org.rssowl.core.persist.dao;
 
+import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.event.SearchMarkListener;
@@ -45,4 +46,15 @@ public interface ISearchMarkDAO extends IEntityDAO<ISearchMark, SearchMarkListen
    * this event.
    */
   void fireResultsChanged(Set<SearchMarkEvent> events);
+
+  /**
+   * Loads the {@code ISearchMark} that contains {@code searchCondition}.
+   * and returns it. If {@code searchCondition} is not contained in any
+   * ISearchMark, {@code null} is returned.
+   *
+   * @param searchCondition non-null ISearchCondition for which we want to find
+   * the parent ISearchMark.
+   * @return ISearchMark containing {@code searchCondition} or {@code null}.
+   */
+  ISearchMark load(ISearchCondition searchCondition);
 }
