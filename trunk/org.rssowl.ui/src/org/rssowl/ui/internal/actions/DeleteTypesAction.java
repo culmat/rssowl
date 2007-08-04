@@ -27,7 +27,6 @@ package org.rssowl.ui.internal.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -36,6 +35,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
+import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
@@ -44,8 +45,10 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
+import org.rssowl.ui.internal.dialogs.ConfirmDeleteDialog;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
@@ -62,6 +65,7 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
   private INewsDAO fNewsDAO;
   private Shell fShell;
   private boolean fConfirmed;
+  private IPreferenceScope fPreferences;
 
   /**
    * Keep default constructor for reflection.
@@ -84,6 +88,7 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
     fShell = shell;
     fSelection = selection;
     fNewsDAO = DynamicDAO.getDAO(INewsDAO.class);
+    fPreferences = Owl.getPreferenceService().getGlobalScope();
   }
 
   /*
@@ -114,8 +119,26 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
   }
 
   private boolean confirmed() {
-    StringBuilder message = new StringBuilder("Are you sure you want to delete ");
+    String confirmPrefKey = null;
     List<?> elements = fSelection.toList();
+    for (Object element : elements) {
+      if (element instanceof INews || element instanceof EntityGroup) {
+        confirmPrefKey = DefaultPreferences.CONFIRM_DELETE_NEWS;
+        break;
+      }
+    }
+
+    /* Create Dialog and open if confirmation required */
+    if (confirmPrefKey == null || fPreferences.getBoolean(confirmPrefKey)) {
+      ConfirmDeleteDialog dialog = new ConfirmDeleteDialog(fShell, "Confirm Delete", "This action can not be undone", getMessage(elements), confirmPrefKey);
+      return dialog.open() == IDialogConstants.OK_ID;
+    }
+
+    return true;
+  }
+
+  private String getMessage(List<?> elements) {
+    StringBuilder message = new StringBuilder("Are you sure you want to delete ");
 
     /* One Element */
     if (elements.size() == 1) {
@@ -137,10 +160,7 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
       message.append("the selected elements?");
     }
 
-    /* Create Dialog and open */
-    String[] buttons = new String[] { "Delete", IDialogConstants.CANCEL_LABEL };
-    MessageDialog dialog = new MessageDialog(fShell, "Confirm Delete", null, message.toString(), MessageDialog.QUESTION, buttons, 0);
-    return dialog.open() == 0;
+    return message.toString();
   }
 
   /*

@@ -62,6 +62,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   private Button fUseDefaultExternalBrowser;
   private Button fUseInternalBrowser;
   private Button fCustomBrowserSearchButton;
+  private Button fConfirmDeleteNews;
 
   /** Leave for reflection */
   public MiscPreferencePage() {
@@ -141,9 +142,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
       }
     });
 
-    /* Separator */
-    new Label(container, SWT.NONE);
-
     /* System Tray Group */
     Group trayGroup = new Group(container, SWT.None);
     trayGroup.setText("System Tray");
@@ -171,9 +169,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fMoveToTrayOnExit = new Button(trayOptionsContainer, SWT.CHECK);
     fMoveToTrayOnExit.setText("when closing RSSOwl");
     fMoveToTrayOnExit.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
-
-    /* Separator */
-    new Label(container, SWT.NONE);
 
     /* Notification Group */
     Group notificationGroup = new Group(container, SWT.None);
@@ -205,8 +200,16 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fNotificationIsSticky.setSelection(fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP));
     fNotificationIsSticky.setEnabled(fShowNotificationPopup.getSelection());
 
-    /* Separator */
-    new Label(container, SWT.NONE);
+    /* Confirmation Group */
+    Group confirmationGroup = new Group(container, SWT.None);
+    confirmationGroup.setText("Ask for confirmation");
+    confirmationGroup.setLayout(LayoutUtils.createGridLayout(1));
+    confirmationGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+    /* Confirm Delete News */
+    fConfirmDeleteNews = new Button(confirmationGroup, SWT.CHECK);
+    fConfirmDeleteNews.setText("when deleting News");
+    fConfirmDeleteNews.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CONFIRM_DELETE_NEWS));
 
     return container;
   }
@@ -238,6 +241,8 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fGlobalScope.putBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER, fUseCustomExternalBrowser.getSelection());
     fGlobalScope.putString(DefaultPreferences.CUSTOM_BROWSER_PATH, fCustomBrowserInput.getText());
 
+    fGlobalScope.putBoolean(DefaultPreferences.CONFIRM_DELETE_NEWS, fConfirmDeleteNews.getSelection());
+
     return super.performOk();
   }
 
@@ -265,5 +270,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
 
     fCustomBrowserInput.setEnabled(fUseCustomExternalBrowser.getSelection());
     fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
+
+    fConfirmDeleteNews.setSelection(defaultScope.getBoolean(DefaultPreferences.CONFIRM_DELETE_NEWS));
   }
 }
