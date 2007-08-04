@@ -119,7 +119,7 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
       new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
       /* Title Image */
-      setTitleImage(OwlUI.getImage(fResources, fRootMode ? "icons/elcl16/bkmrk_set_title.gif" : "icons/obj16/folder_wiz.gif"));
+      setTitleImage(OwlUI.getImage(fResources, fRootMode ? "icons/wizban/bkmrk_set_title.gif" : "icons/wizban/folder_wiz.gif"));
 
       /* Title Message */
       setMessage("Please enter the name of the " + (fRootMode ? "Bookmark-Set" : "Folder"), IMessageProvider.INFORMATION);

@@ -148,7 +148,7 @@ public class LoginDialog extends TitleAreaDialog {
     composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
     /* Title Image */
-    setTitleImage(OwlUI.getImage(fResources, "icons/elcl16/auth.gif"));
+    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/auth.gif"));
 
     /* Title Message */
     setMessage("Please enter Username and Password", IMessageProvider.INFORMATION);
