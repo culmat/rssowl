@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IReusableEditor;
@@ -257,23 +258,41 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
       /* Hook into Global Actions for this Editor */
       public void partBroughtToTop(IWorkbenchPartReference partRef) {
-        if (FeedView.this.equals(partRef.getPart(false)))
+        if (FeedView.this.equals(partRef.getPart(false))) {
           setGlobalActions();
+          OwlUI.updateWindowTitle(fInput != null ? new IMark[] { fInput.getMark() } : null);
+        }
       }
 
-      public void partClosed(IWorkbenchPartReference partRef) {}
+      public void partClosed(IWorkbenchPartReference partRef) {
+        IEditorReference[] editors = partRef.getPage().getEditorReferences();
+        if (editors.length == 0 && FeedView.this.equals(partRef.getPart(false)))
+          OwlUI.updateWindowTitle(null);
+      }
 
       public void partDeactivated(IWorkbenchPartReference partRef) {}
 
-      public void partActivated(IWorkbenchPartReference partRef) {}
+      public void partActivated(IWorkbenchPartReference partRef) {
+        if (FeedView.this.equals(partRef.getPart(false)))
+          OwlUI.updateWindowTitle(fInput != null ? new IMark[] { fInput.getMark() } : null);
+      }
 
-      public void partInputChanged(IWorkbenchPartReference partRef) {}
+      public void partInputChanged(IWorkbenchPartReference partRef) {
+        if (FeedView.this.equals(partRef.getPart(false)))
+          OwlUI.updateWindowTitle(fInput != null ? new IMark[] { fInput.getMark() } : null);
+      }
 
       public void partOpened(IWorkbenchPartReference partRef) {
         fOpenTime = System.currentTimeMillis();
+
+        if (FeedView.this.equals(partRef.getPart(false)))
+          OwlUI.updateWindowTitle(fInput != null ? new IMark[] { fInput.getMark() } : null);
       }
 
-      public void partVisible(IWorkbenchPartReference partRef) {}
+      public void partVisible(IWorkbenchPartReference partRef) {
+        if (FeedView.this.equals(partRef.getPart(false)))
+          OwlUI.updateWindowTitle(fInput != null ? new IMark[] { fInput.getMark() } : null);
+      }
     };
 
     fEditorSite.getPage().addPartListener(fPartListener);
