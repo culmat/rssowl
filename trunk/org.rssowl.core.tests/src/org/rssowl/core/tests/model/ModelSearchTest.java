@@ -2754,6 +2754,85 @@ public class ModelSearchTest {
     }
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSearchNewsWithUppercaseInFeedLink() throws Exception {
+
+    /* First add some Types */
+    IFeed feed1 = fFactory.createFeed(null, new URI("http://rss.golem.de/rss.php?feed=RSS0.91"));
+    IFeed feed2 = fFactory.createFeed(null, new URI("http://192.168.158.4:8080/rssFailed"));
+
+    INews news1 = createNews(feed1, "First News of Feed One", "http://www.news.com/news1.html", State.UNREAD);
+    INews news2 = createNews(feed1, "Second News of Feed One", "http://www.news.com/news2.html", State.NEW);
+
+    INews news3 = createNews(feed2, "First News of Feed Two", "http://www.news.com/news3.html", State.NEW);
+    INews news4 = createNews(feed2, "Second News of Feed Two", "http://www.news.com/news4.html", State.HIDDEN);
+
+    DynamicDAO.save(feed1);
+    DynamicDAO.save(feed2);
+
+    /* Wait for Indexer */
+    waitForIndexer();
+
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, "http://rss.golem.de/rss.php?feed=RSS0.91");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertSame(result, news1, news2);
+    }
+
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.BEGINS_WITH, "http://rss.golem.de/rss.php?feed=RSS0.9");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertSame(result, news1, news2);
+    }
+
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.BEGINS_WITH, "http://rss.golem.de/rss.php?feed=RSS0");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertSame(result, news1, news2);
+    }
+
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.BEGINS_WITH, "http://rss.golem.de/rss.php?feed=");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertSame(result, news1, news2);
+    }
+
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.BEGINS_WITH, "http://rss.golem.de/rss.php?");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertSame(result, news1, news2);
+    }
+
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, "http://192.168.158.4:8080/rssFailed");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertSame(result, news3, news4);
+    }
+
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.BEGINS_WITH, "http://192.168.158.4:8080/rssF");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertSame(result, news3, news4);
+    }
+  }
+
   private INews createNews(IFeed feed, String title, String link, INews.State state) throws URISyntaxException {
     INews news = fFactory.createNews(null, feed, new Date(System.currentTimeMillis()));
     news.setState(state);
