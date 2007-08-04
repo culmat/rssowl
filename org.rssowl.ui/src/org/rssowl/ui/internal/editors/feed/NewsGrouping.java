@@ -31,6 +31,7 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
@@ -240,6 +241,10 @@ public class NewsGrouping {
 
       return true;
     }
+
+    /* Return TRUE in this case for now */
+    else if (entity.equals(ISearchMark.class))
+      return true;
 
     return false;
   }

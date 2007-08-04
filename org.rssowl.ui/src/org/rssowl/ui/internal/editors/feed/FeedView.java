@@ -352,32 +352,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
           }
         }
       }
-
-      @Override
-      public void resultsChanged(Set<SearchMarkEvent> events) {
-        for (SearchMarkEvent event : events) {
-          if (event.getEntity().equals(fInput.getMark())) {
-            JobRunner.runUIUpdater(new UIBackgroundJob(fParent) {
-              @Override
-              protected void runInBackground(IProgressMonitor monitor) {
-                fContentProvider.refreshCache(new IMark[] { fInput.getMark() }, true);
-              }
-
-              @Override
-              protected void runInUI(IProgressMonitor monitor) {
-                refresh(true, true);
-              }
-
-              @Override
-              public boolean belongsTo(Object family) {
-                return fCacheJobIdentifier.equals(family);
-              }
-            });
-
-            break;
-          }
-        }
-      }
     };
     DynamicDAO.addEntityListener(ISearchMark.class, fSearchMarkListener);
 
