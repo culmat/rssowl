@@ -148,7 +148,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
       new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
       /* Title Image */
-      setTitleImage(OwlUI.getImage(fResources, "icons/obj16/bkmrk_wiz.gif"));
+      setTitleImage(OwlUI.getImage(fResources, "icons/wizban/bkmrk_wiz.gif"));
 
       /* Title Message */
       setMessage("Please enter the name and link of the bookmark.", IMessageProvider.INFORMATION);

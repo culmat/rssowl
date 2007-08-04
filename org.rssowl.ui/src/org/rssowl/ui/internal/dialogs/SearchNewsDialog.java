@@ -506,7 +506,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Title Image */
-    setTitleImage(OwlUI.getImage(fResources, "icons/elcl16/search.gif"));
+    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/search.gif"));
 
     /* Title Message */
     setMessage("You can use \'?\' for any character and \'*\' for any word in your search.", IMessageProvider.INFORMATION);

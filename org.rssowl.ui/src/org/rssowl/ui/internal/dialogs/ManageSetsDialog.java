@@ -179,7 +179,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
   protected Control createDialogArea(Composite parent) {
 
     /* Title Image */
-    setTitleImage(OwlUI.getImage(fResources, "icons/elcl16/bkmrk_set_title.gif"));
+    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/bkmrk_set_title.gif"));
 
     /* Title Message */
     showInfo();
