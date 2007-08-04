@@ -41,6 +41,8 @@ import java.util.List;
  * <code>CTreeLayoutData</code> to Columns of the underlying Table. The
  * Wrapper is making sure to avoid horizontal scrollbars if possible.
  *
+ * TODO Delete if this is no longer used!
+ *
  * @author bpasero
  */
 public class CTable {
