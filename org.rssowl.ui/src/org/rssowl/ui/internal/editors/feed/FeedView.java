@@ -334,7 +334,33 @@ public class FeedView extends EditorPart implements IReusableEditor {
             JobRunner.runUIUpdater(new UIBackgroundJob(fParent) {
               @Override
               protected void runInBackground(IProgressMonitor monitor) {
-                fContentProvider.refreshCache(new IMark[] { fInput.getMark() });
+                fContentProvider.refreshCache(new IMark[] { fInput.getMark() }, false);
+              }
+
+              @Override
+              protected void runInUI(IProgressMonitor monitor) {
+                refresh(true, true);
+              }
+
+              @Override
+              public boolean belongsTo(Object family) {
+                return fCacheJobIdentifier.equals(family);
+              }
+            });
+
+            break;
+          }
+        }
+      }
+
+      @Override
+      public void resultsChanged(Set<SearchMarkEvent> events) {
+        for (SearchMarkEvent event : events) {
+          if (event.getEntity().equals(fInput.getMark())) {
+            JobRunner.runUIUpdater(new UIBackgroundJob(fParent) {
+              @Override
+              protected void runInBackground(IProgressMonitor monitor) {
+                fContentProvider.refreshCache(new IMark[] { fInput.getMark() }, true);
               }
 
               @Override
@@ -797,7 +823,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       protected void runInBackground(IProgressMonitor monitor) {
         fBgMonitor = monitor;
         if (!monitor.isCanceled())
-          fContentProvider.refreshCache(new IMark[] { mark });
+          fContentProvider.refreshCache(new IMark[] { mark }, false);
       }
 
       @Override

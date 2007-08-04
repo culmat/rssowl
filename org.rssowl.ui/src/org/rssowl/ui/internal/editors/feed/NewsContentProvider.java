@@ -212,7 +212,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     return fGrouping.getType() != NewsGrouping.Type.NO_GROUPING;
   }
 
-  void refreshCache(IMark[] input) throws PersistenceException {
+  void refreshCache(IMark[] input, boolean onlyAdd) throws PersistenceException {
 
     /* Update Input */
     fInput = input;
@@ -224,7 +224,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     /* Clear old Data if required */
     if (fCachedNews == null)
       fCachedNews = new HashSet<INews>();
-    else
+    else if (!onlyAdd)
       fCachedNews.clear();
 
     /* Check if ContentProvider was already disposed */
@@ -246,6 +246,12 @@ public class NewsContentProvider implements ITreeContentProvider {
         ISearchMark searchMark = (ISearchMark) mark;
         List<NewsReference> matchingNews = searchMark.getResult();
         for (NewsReference newsRef : matchingNews) {
+
+          /* Avoid to resolve an already shown News */
+          if (onlyAdd && hasCachedNews(newsRef))
+            continue;
+
+          /* Resolve and Add News */
           INews resolvedNews = newsRef.resolve();
           if (resolvedNews != null) //TODO Remove once Bug 173 is fixed
             news.add(resolvedNews);
@@ -265,6 +271,18 @@ public class NewsContentProvider implements ITreeContentProvider {
 
   synchronized boolean hasCachedNews() {
     return fCachedNews != null && !fCachedNews.isEmpty();
+  }
+
+  private boolean hasCachedNews(NewsReference ref) {
+    if (fCachedNews == null)
+      return false;
+
+    for (INews news : fCachedNews) {
+      if (ref.references(news))
+        return true;
+    }
+
+    return false;
   }
 
   private synchronized INews obtainFromCache(NewsReference ref) {
