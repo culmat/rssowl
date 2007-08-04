@@ -16,7 +16,7 @@
     <target name="svn.co">
     	<property name="target.dir" value="${element.id}"/>
      	<svn javahl="false" username="${pluginbuilder.svn.user}" password="${pluginbuilder.svn.password}">
-  			<checkout revision="${fetchTag}" url="${pluginbuilder.svn.url}/${project.name}" destPath="${buildDirectory}/${target}/${target.dir}" />
+  			<checkout revision="${fetchTag}" url="${url}/${project.name}" destPath="${buildDirectory}/${target}/${target.dir}" />
   		</svn> 
 	</target>    
 

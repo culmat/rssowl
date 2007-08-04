@@ -15,8 +15,11 @@
 	<property name="buildLabel" value="${buildType}-${version.full}" />
 	<property name="buildId" value="${version.full}" />
 	
-	<condition property="isCVS" value="true">
-		<equals arg1="${pluginbuilder.is.cvs}" arg2="true"/>
+	<condition property="isCVSOrCopy" value="true">
+		<or>
+			<equals arg1="${pluginbuilder.is.cvs}" arg2="true"/>
+			<equals arg1="${pluginbuilder.is.copy}" arg2="true"/>
+		</or>
 	</condition>
 	<condition property="isSVN" value="true">
 		<equals arg1="${pluginbuilder.is.svn}" arg2="true"/>
@@ -49,7 +52,7 @@
 	<!-- Check out map files from correct repository -->
 	<!-- Replace values for cvsRoot, package and mapVersionTag as desired. -->
 	<!-- ===================================================================== -->
-	<target name="getMapFiles" if="isCVS">
+	<target name="getMapFiles" if="isCVSOrCopy">
 		<echo message="Copying map files."/>
 		<copy todir="${buildDirectory}/maps">
 			<fileset dir="${buildHome}/maps" includes="*.map"></fileset>
@@ -152,9 +155,12 @@
 	<!-- ===================================================================== -->
 	<!-- Steps to do after the build is done. -->
 	<!-- ===================================================================== -->
+	<property name="buildResultsDirectory" value="${buildDirectory}/results" />
 	<target name="postBuild" depends="-prepareBuildResultsDirectory" unless="no.postBuild">
 		<antcall target="runTests"/>
-		<antcall target="package"/>
+		<copy todir="${buildResultsDirectory}" flatten="true">
+			<fileset dir="${buildDirectory}" includes="${buildType}-**/*.zip" />
+		</copy>
 		<condition property="is.External.Postbuild">
 			<available file="${buildHome}/build-files/postBuild.xml"/>
 		</condition>
@@ -163,7 +169,6 @@
 	<!-- ===================================================================== -->
 	<!-- Run tests. -->
 	<!-- ===================================================================== -->
-	<property name="buildResultsDirectory" value="${buildDirectory}/results" />
 	<target name="runTests" if="isRunTests">
 		<property name="automatedTestsHome" location="${buildHome}/build-files/automatedTests"/>
 
@@ -177,11 +182,6 @@
 	<target name="-prepareBuildResultsDirectory">
 		<echo message="Creating ${buildResultsDirectory}" />
 		<mkdir dir="${buildResultsDirectory}" />	
-	</target>
-	<target name="package">
-		<copy todir="${buildResultsDirectory}" flatten="true">
-			<fileset dir="${buildDirectory}" includes="${buildType}-**/*.zip" />
-		</copy>
 	</target>
 
 	<!--======================================================-->

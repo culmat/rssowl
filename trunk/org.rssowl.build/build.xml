@@ -3,6 +3,7 @@
       If you modify this script it is likely that the build will not work on the server
 -->
 <project name="Build Facade" default="main">
+	<taskdef resource="org/pluginbuilder/anttasks/pluginbuildertasks.properties" classpath="build-files/pluginbuilder-anttasks.jar" />
 	
 	<property file="build_local.properties" />
 	<property name="eclipse.installation.dir" value="${eclipseDir}"/>
@@ -46,29 +47,13 @@
 		<available type="dir" file="${eclipseDir}/plugins" property="eclipseDir.plugins.exists"/>
 		<fail message="Could not find directory ${eclipseDir}/plugins. Please check eclipseDir in build_local.properties" unless="eclipseDir.plugins.exists"/>
 		
-		<!-- determine buildfile -->
-		<dirset  dir="${eclipseDir}/plugins" includes="org.eclipse.pde.build_*/scripts" id="pde.plugin.path" />
-		<pathconvert property="scriptdir" refid="pde.plugin.path" />
-		<condition property="isfound.scriptdir">
-			<not>
-				<equals arg1="${scriptdir}" arg2=""/>
-			</not>
-		</condition>
-		<fail message="Could not find directory org.eclipse.pde.build_*/scripts in ${eclipseDir}/plugins. PDE not installed?" unless="isfound.scriptdir"/>
-		
-		<property name="regularbuildfile" value="${scriptdir}/build.xml"/>
+		<!-- determine buildfiles -->
+		<BundleFileLocator eclipseInstallationRoot="${eclipseDir}" bundleId="org.eclipse.pde.build" filePath="scripts/build.xml" property="regularbuildfile" />		
+		<dirname file="${regularbuildfile}" property="scriptdir"/>
 		<property name="productbuildfile" value="${scriptdir}/productBuild/productBuild.xml"/>
 	
-		<!-- TODO: there could be several launcher jars -->
-		<fileset dir="${eclipseDir}" includes="**/org.eclipse.equinox.launcher_*" id="equinox.jar.path" />
-		<pathconvert property="equinoxjar" refid="equinox.jar.path" />
-		<condition property="equinoxjar.isset">
-			<not>
-				<equals arg1="${equinoxjar}" arg2=""/>
-			</not>
-		</condition>
-		<fail message="Could not find equinox launcher jar in ${eclipseDir}. Not using Eclipse 3.3M5 or later?" unless="equinoxjar.isset"/>
-		
+		<!-- determine launcher -->
+		<BundleFileLocator eclipseInstallationRoot="${eclipseDir}" bundleId="org.eclipse.equinox.launcher" property="equinoxjar" />		
 
 	</target>
 	
@@ -152,11 +137,21 @@
 				<pathelement location="${equinoxjar}" />
 			</classpath>
 		</java>
-	    <echo>${build.stderr}</echo>
+		
+		<!-- save stderr for scrutinizing later -->
+		<echo file="${buildDirectory}/stderr.txt">${build.stderr}</echo>
+		
+		<echo taskname="stderr">${build.stderr}</echo>
+		
 		<condition property="is.build.error" value="true">
 			<contains string="${build.stderr}" substring="BUILD FAILED"/>
 		</condition>
-		<fail message="PDE Build failed" if="is.build.error"/>
+		<!-- Note that the fail task throws an exception which will be intercepted
+		     from calling antcalls. During that processing the status will 
+		     be lost and set to 1. Therefor ethe processing of TESTS FAILED which should 
+		     return an exit status of 2 can only take place in main targets. --> 
+		<fail message="PDE Build failed" if="is.build.error" status="1"/>
+
 	</target>
 	
 	<target name="main-cc"
@@ -167,9 +162,19 @@
 		<antcall target="-build"/>
 	</target>
 	
-	<target name="main" description="Run the main target of customTargets.xml.">
+	<target name="main" description="Run the main target of customTargets.xml. Return status 0,1,2 for Success, Build Failure and Test Failure">
 		<property name="buildTarget" value="main"/>
 		<antcall target="-build"/>
+
+		<!-- this must be done in a top level target because otherwise the 
+		     status would not get throuhg. If fail is called somewhere within
+		     an antcall the created exception will be caught which would result
+		     in a return status of 1 -->
+		<loadfile srcFile="${buildDirectory}/stderr.txt" property="build.stderr"/>
+		<condition property="is.tests.failed" value="true">
+			<contains string="${build.stderr}" substring="TESTS FAILED"/>
+		</condition>
+		<fail message="Tests failed" if="is.tests.failed" status="2"/>		
 	</target>
 
 	<target name="fetch" description="Run the fetch target of customTargets.xml.">
@@ -195,6 +200,22 @@
 	<target name="postBuild" description="Run the postBuild target of customTargets.xml.">
 		<property name="buildTarget" value="postBuild"/>
 		<antcall target="-build"/>
+		<!-- see main for a description why this must take place here. It is very ugly -->
+		<loadfile srcFile="${buildDirectory}/stderr.txt" property="build.stderr"/>
+		<condition property="is.tests.failed" value="true">
+			<contains string="${build.stderr}" substring="TESTS FAILED"/>
+		</condition>
+		<fail message="Tests failed" if="is.tests.failed" status="2"/>
+	</target>
+	
+	<target name="buildProperties" description="Print out derived properties for the current build." depends="-properties">
+		<fail message="You have to set the property 'buildPropertiesFile' if calling buildProperties" unless="buildPropertiesFile"/>
+		<condition property="subdir" value="nightly" else="releases">
+			<equals arg1="${buildType}" arg2="N"/>
+		</condition>
+		<echo file="${buildPropertiesFile}">relativeServerResultsDir: ${subdir}
+version.full: ${version.full}
+version.qualifier: ${version.qualifier}</echo>
 	</target>
 
 </project>
