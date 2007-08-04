@@ -38,9 +38,12 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.layout.TableColumnLayout;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.viewers.ColumnPixelData;
+import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -98,8 +101,6 @@ import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
-import org.rssowl.ui.internal.CColumnLayoutData;
-import org.rssowl.ui.internal.CTable;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
@@ -775,6 +776,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
         /* Set Input (sorted) to Viewer */
         fViewer.setInput(fResult);
+        fViewer.getTable().getParent().layout();
 
         /* Update Status Label */
         int size = fResult.size();
@@ -807,6 +809,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fMatchAllRadio.setSelection(false);
     fMatchAnyRadio.setSelection(true);
     fViewer.setInput(Collections.emptyList());
+    fViewer.getTable().getParent().layout();
 
     /* Unset Error Message */
     setErrorMessage(null);
@@ -831,14 +834,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Container for Table */
     Composite tableContainer = new Composite(bottomSashContent, SWT.NONE);
     tableContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    tableContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
-
-    /* Custom Table */
-    int style = SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL;
-    CTable customTable = new CTable(tableContainer, style);
 
     /* Viewer */
-    fViewer = new TableViewer(customTable.getControl()) {
+    int style = SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER | SWT.VIRTUAL;
+    fViewer = new TableViewer(tableContainer, style) {
       @Override
       public ISelection getSelection() {
         StructuredSelection selection = (StructuredSelection) super.getSelection();
@@ -851,7 +850,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fViewer.getTable().setHeaderVisible(true);
 
     /* Create the Columns */
-    createColumns(customTable);
+    createColumns();
 
     /* Apply ContentProvider */
     fViewer.setContentProvider(getContentProvider());
@@ -1161,57 +1160,70 @@ public class SearchNewsDialog extends TitleAreaDialog {
     }
   }
 
-  private void createColumns(CTable customTable) {
+  private void createColumns() {
+    TableColumnLayout layout = new TableColumnLayout();
+    fViewer.getControl().getParent().setLayout(layout);
 
     /* Score Column */
     TableViewerColumn col = new TableViewerColumn(fViewer, SWT.CENTER);
-    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 24), null, null, true, true);
+    layout.setColumnData(col.getColumn(), new ColumnPixelData(24));
+    col.getColumn().setMoveable(false);
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.SCORE);
     col.getColumn().setToolTipText("Relevance");
     if (fInitialSortColumn == NewsTableControl.Columns.SCORE) {
-      customTable.getControl().setSortColumn(col.getColumn());
+      fViewer.getTable().setSortColumn(col.getColumn());
     }
 
     /* Headline Column */
     col = new TableViewerColumn(fViewer, SWT.LEFT);
-    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 60), "Title", null, true, true);
+    layout.setColumnData(col.getColumn(), new ColumnWeightData(60));
+    col.getColumn().setMoveable(false);
+    col.getColumn().setText("Title");
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.TITLE);
     if (fInitialSortColumn == NewsTableControl.Columns.TITLE) {
-      customTable.getControl().setSortColumn(col.getColumn());
-      customTable.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
+      fViewer.getTable().setSortColumn(col.getColumn());
+      fViewer.getTable().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
     }
 
     /* Date Column */
     int width = getInitialDateColumnWidth();
     col = new TableViewerColumn(fViewer, SWT.LEFT);
-    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, width), "Date", null, true, true);
+    layout.setColumnData(col.getColumn(), new ColumnPixelData(width));
+    col.getColumn().setMoveable(false);
+    col.getColumn().setText("Date");
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.DATE);
     if (fInitialSortColumn == NewsTableControl.Columns.DATE) {
-      customTable.getControl().setSortColumn(col.getColumn());
-      customTable.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
+      fViewer.getTable().setSortColumn(col.getColumn());
+      fViewer.getTable().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
     }
 
     /* Author Column */
     col = new TableViewerColumn(fViewer, SWT.LEFT);
-    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20), "Author", null, true, true);
+    layout.setColumnData(col.getColumn(), new ColumnWeightData(20));
+    col.getColumn().setMoveable(false);
+    col.getColumn().setText("Author");
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.AUTHOR);
     if (fInitialSortColumn == NewsTableControl.Columns.AUTHOR) {
-      customTable.getControl().setSortColumn(col.getColumn());
-      customTable.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
+      fViewer.getTable().setSortColumn(col.getColumn());
+      fViewer.getTable().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
     }
 
     /* Category Column */
     col = new TableViewerColumn(fViewer, SWT.LEFT);
-    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20), "Category", null, true, true);
+    layout.setColumnData(col.getColumn(), new ColumnWeightData(20));
+    col.getColumn().setMoveable(false);
+    col.getColumn().setText("Category");
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.CATEGORY);
     if (fInitialSortColumn == NewsTableControl.Columns.CATEGORY) {
-      customTable.getControl().setSortColumn(col.getColumn());
-      customTable.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
+      fViewer.getTable().setSortColumn(col.getColumn());
+      fViewer.getTable().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
     }
 
     /* Sticky Column */
     col = new TableViewerColumn(fViewer, SWT.LEFT);
-    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 18), null, null, true, false);
+    layout.setColumnData(col.getColumn(), new ColumnPixelData(18));
+    col.getColumn().setMoveable(false);
+    col.getColumn().setResizable(false);
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.STICKY);
     col.getColumn().setToolTipText("Sticky State");
   }
