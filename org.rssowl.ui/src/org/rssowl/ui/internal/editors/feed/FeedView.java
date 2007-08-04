@@ -82,7 +82,6 @@ import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.NewsService;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
-import org.rssowl.ui.internal.actions.MarkReadAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.actions.RetargetActions;
 import org.rssowl.ui.internal.util.ITreeNode;
@@ -186,7 +185,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private IAction fCutAction;
   private IAction fCopyAction;
   private IAction fPasteAction;
-  private IAction fMarkAllReadAction;
   private IAction fFindAction;
   private IAction fPrintAction;
 
@@ -436,14 +434,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
       }
     };
 
-    /* Mark All Read */
-    fMarkAllReadAction = new Action("Mark all News as Read") {
-      @Override
-      public void run() {
-        new MarkReadAction(new StructuredSelection(fInput.getMark())).run();
-      }
-    };
-
     /* Select All */
     fSelectAllAction = new Action() {
       @Override
@@ -530,7 +520,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     /* Define Retargetable Global Actions */
     fEditorSite.getActionBars().setGlobalActionHandler(RetargetActions.RELOAD, fReloadAction);
-    fEditorSite.getActionBars().setGlobalActionHandler(RetargetActions.MARK_ALL_READ, fMarkAllReadAction);
     fEditorSite.getActionBars().setGlobalActionHandler(RetargetActions.FIND, fFindAction);
     fEditorSite.getActionBars().setGlobalActionHandler(ActionFactory.SELECT_ALL.getId(), fSelectAllAction);
     fEditorSite.getActionBars().setGlobalActionHandler(ActionFactory.DELETE.getId(), fDeleteAction);

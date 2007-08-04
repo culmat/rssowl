@@ -63,7 +63,7 @@ import java.util.Map.Entry;
 /**
  * @author bpasero
  */
-public class MarkReadAction extends Action implements IWorkbenchWindowActionDelegate {
+public class MarkTypesReadAction extends Action implements IWorkbenchWindowActionDelegate {
   private IStructuredSelection fSelection;
   private NewsService fNewsService;
   private INewsDAO fNewsDao;
@@ -71,14 +71,14 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
   /**
    *
    */
-  public MarkReadAction() {
+  public MarkTypesReadAction() {
     this(StructuredSelection.EMPTY);
   }
 
   /**
    * @param selection
    */
-  public MarkReadAction(IStructuredSelection selection) {
+  public MarkTypesReadAction(IStructuredSelection selection) {
     fSelection = selection;
     fNewsService = Controller.getDefault().getNewsService();
     fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
@@ -90,7 +90,7 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
   public void run(IAction action) {
     JobRunner.runInBackgroundWithBusyIndicator(new Runnable() {
       public void run() {
-        MarkReadAction.this.internalRun();
+        MarkTypesReadAction.this.internalRun();
       }
     });
   }
@@ -102,7 +102,7 @@ public class MarkReadAction extends Action implements IWorkbenchWindowActionDele
   public void run() {
     JobRunner.runInBackgroundWithBusyIndicator(new Runnable() {
       public void run() {
-        MarkReadAction.this.internalRun();
+        MarkTypesReadAction.this.internalRun();
       }
     });
   }

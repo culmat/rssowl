@@ -261,27 +261,31 @@
             label="News"
             visible="true">
          <action
-               allowLabelUpdate="true"
+               class="org.rssowl.ui.internal.actions.MarkAllNewsReadAction"
                definitionId="org.rssowl.ui.MarkAllRead"
                icon="icons/elcl16/mark_all_read.gif"
                id="org.rssowl.ui.MarkAllRead"
-               label="Mark All Read"
+               label="Mark All News as Read"
                menubarPath="news/mark"
-               retarget="true"
                style="push"
-               toolbarPath="news/mark"/>
+               toolbarPath="news/mark">
+         </action>
          <action
-               class="org.rssowl.ui.internal.actions.MarkReadAction"
+               class="org.rssowl.ui.internal.actions.MarkNewsReadAction"
                definitionId="org.rssowl.ui.actions.MarkRead"
                disabledIcon="icons/dlcl16/mark_read.gif"
                enablesFor="+"
                icon="icons/elcl16/mark_read.gif"
                id="org.rssowl.ui.actions.MarkRead"
-               label="&amp;Mark Read"
+               label="Mark News as Read"
                menubarPath="news/mark"
                style="push"
                toolbarPath="news/mark"
-               tooltip="Mark selected Items as Read"/>
+               tooltip="Mark News as Read">
+            <selection
+                  class="org.rssowl.core.persist.INews">
+            </selection>
+         </action>
          <action
                class="org.rssowl.ui.internal.actions.ReloadAllAction"
                definitionId="org.rssowl.ui.actions.ReloadAll"
@@ -691,7 +695,7 @@
             id="org.rssowl.ui.MarkReadContribution"
             objectClass="java.lang.Object">
          <action
-               class="org.rssowl.ui.internal.actions.MarkReadAction"
+               class="org.rssowl.ui.internal.actions.MarkTypesReadAction"
                definitionId="org.rssowl.ui.actions.MarkRead"
                enablesFor="+"
                icon="icons/elcl16/mark_read.gif"

@@ -114,7 +114,6 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.StatusLineUpdater;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.EntityPropertyDialogAction;
-import org.rssowl.ui.internal.actions.MarkReadAction;
 import org.rssowl.ui.internal.actions.NewBookMarkAction;
 import org.rssowl.ui.internal.actions.NewFolderAction;
 import org.rssowl.ui.internal.actions.NewSearchMarkAction;
@@ -1227,15 +1226,6 @@ public class BookMarkExplorer extends ViewPart {
       @Override
       public void run() {
         new ReloadTypesAction((IStructuredSelection) fViewer.getSelection(), fViewSite.getShell()).run();
-      }
-    });
-
-    /* Mark All Read */
-    fViewSite.getActionBars().setGlobalActionHandler(RetargetActions.MARK_ALL_READ, new Action("Mark all Folders as Read") {
-      @Override
-      public void run() {
-        IFolder root = fSelectedBookMarkSet;
-        new MarkReadAction(new StructuredSelection(root)).run();
       }
     });
 
