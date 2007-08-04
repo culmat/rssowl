@@ -59,6 +59,7 @@ import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FolderReference;
@@ -855,5 +856,22 @@ public class OwlUI {
       return window.getShell();
 
     return null;
+  }
+
+  /**
+   * Update the current active window title based on the given array of
+   * {@link IMark}.
+   *
+   * @param shownInput the input that is currently visible in RSSOwl.
+   */
+  public static void updateWindowTitle(IMark[] shownInput) {
+    IWorkbenchWindow window = getWindow();
+    if (window != null) {
+      String title = "RSSOwl";
+      if (shownInput != null && shownInput.length > 0)
+        title = shownInput[0].getName() + " - " + title;
+
+      window.getShell().setText(title);
+    }
   }
 }
