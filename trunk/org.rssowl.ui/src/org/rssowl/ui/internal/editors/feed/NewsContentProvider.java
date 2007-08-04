@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.editors.feed;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.rssowl.core.persist.IBookMark;
@@ -35,6 +36,8 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.NewsAdapter;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
+import org.rssowl.core.persist.event.SearchMarkAdapter;
+import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.event.runnable.EventType;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
@@ -44,6 +47,7 @@ import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.util.JobRunner;
+import org.rssowl.ui.internal.util.UIBackgroundJob;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,6 +64,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   private NewsTableViewer fTableViewer;
   private NewsGrouping fGrouping;
   private NewsListener fNewsListener;
+  private SearchMarkAdapter fSearchMarkListener;
   private IMark[] fInput;
   private FeedView fFeedView;
   private boolean fDisposed;
@@ -212,7 +217,9 @@ public class NewsContentProvider implements ITreeContentProvider {
     return fGrouping.getType() != NewsGrouping.Type.NO_GROUPING;
   }
 
-  void refreshCache(IMark[] input, boolean onlyAdd) throws PersistenceException {
+  /* Returns the news that have been added since the last refresh */
+  List<INews> refreshCache(IMark[] input, boolean onlyAdd) throws PersistenceException {
+    List<INews> addedNews = Collections.emptyList();
 
     /* Update Input */
     fInput = input;
@@ -229,16 +236,16 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* Check if ContentProvider was already disposed */
     if (fDisposed)
-      return;
+      return addedNews;
 
     /* Obtain the News */
-    Collection<INews> news = new ArrayList<INews>();
+    addedNews = new ArrayList<INews>();
     for (IMark mark : input) {
 
       /* Obtain this BookMark's Feed */
       if (mark instanceof IBookMark) {
         IFeed feed = ((IBookMark) mark).getFeedLinkReference().resolve();
-        news.addAll(feed.getVisibleNews());
+        addedNews.addAll(feed.getVisibleNews());
       }
 
       /* Obtain this SearchMark's News */
@@ -254,15 +261,17 @@ public class NewsContentProvider implements ITreeContentProvider {
           /* Resolve and Add News */
           INews resolvedNews = newsRef.resolve();
           if (resolvedNews != null) //TODO Remove once Bug 173 is fixed
-            news.add(resolvedNews);
+            addedNews.add(resolvedNews);
         }
       }
     }
 
     /* Add into Cache */
     synchronized (this) {
-      fCachedNews.addAll(news);
+      fCachedNews.addAll(addedNews);
     }
+
+    return addedNews;
   }
 
   synchronized Set<INews> getCachedNews() {
@@ -295,6 +304,56 @@ public class NewsContentProvider implements ITreeContentProvider {
   }
 
   private void registerListeners() {
+
+    /* Saved Search Listener */
+    fSearchMarkListener = new SearchMarkAdapter() {
+      @Override
+      public void resultsChanged(final Set<SearchMarkEvent> events) {
+        for (SearchMarkEvent event : events) {
+          ISearchMark searchMark = event.getEntity();
+
+          for (final IMark inputMark : fInput) {
+            if (inputMark.equals(searchMark)) {
+              JobRunner.runUIUpdater(new UIBackgroundJob(fFeedView.getEditorControl()) {
+                private List<INews> fAddedNews;
+
+                @Override
+                protected void runInBackground(IProgressMonitor monitor) {
+                  fAddedNews = refreshCache(new IMark[] { inputMark }, true);
+                }
+
+                @Override
+                protected void runInUI(IProgressMonitor monitor) {
+
+                  /* Event not interesting for us or we are disposed */
+                  if (fAddedNews == null || fAddedNews.size() == 0)
+                    return;
+
+                  /* Ask Group */
+                  if (fGrouping.needsRefresh(ISearchMark.class, events, false)) {
+                    fFeedView.refresh(true, false);
+                    return;
+                  }
+
+                  /* Add to Table-Viewer if Visible */
+                  if (fFeedView.isTableViewerVisible())
+                    fTableViewer.add(fTableViewer.getInput(), fAddedNews.toArray());
+
+                  /* Add to Browser-Viewer if showing entire Feed */
+                  if (fBrowserViewer.getInput() instanceof BookMarkReference)
+                    fBrowserViewer.add(fBrowserViewer.getInput(), fAddedNews.toArray());
+                }
+              });
+
+              /* Done */
+              return;
+            }
+          }
+        }
+      }
+    };
+
+    DynamicDAO.addEntityListener(ISearchMark.class, fSearchMarkListener);
 
     /* News Listener */
     fNewsListener = new NewsAdapter() {
@@ -461,6 +520,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
   private void unregisterListeners() {
     DynamicDAO.removeEntityListener(INews.class, fNewsListener);
+    DynamicDAO.removeEntityListener(ISearchMark.class, fSearchMarkListener);
   }
 
   private boolean isInputRelatedTo(INews news, EventType type) {
