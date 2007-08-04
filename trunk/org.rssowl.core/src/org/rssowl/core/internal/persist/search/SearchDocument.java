@@ -173,7 +173,7 @@ public abstract class SearchDocument<T extends IEntity> {
     if (value == null)
       return null;
 
-    return new Field(String.valueOf(fieldConstant), value.toString(), store, index);
+    return new Field(String.valueOf(fieldConstant), value.toString().toLowerCase(), store, index);
   }
 
   /**
