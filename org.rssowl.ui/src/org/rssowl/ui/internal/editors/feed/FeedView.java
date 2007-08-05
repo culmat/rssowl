@@ -313,6 +313,23 @@ public class FeedView extends EditorPart implements IReusableEditor {
           }
         }
       }
+
+      @Override
+      public void entitiesUpdated(Set<BookMarkEvent> events) {
+        for (BookMarkEvent event : events) {
+          final IBookMark mark = event.getEntity();
+          if (mark.getId().equals(fInput.getMark().getId())) {
+            JobRunner.runInUIThread(fParent, new Runnable() {
+              public void run() {
+                setPartName(mark.getName());
+                OwlUI.updateWindowTitle(new IMark[] { fInput.getMark() });
+              }
+            });
+
+            break;
+          }
+        }
+      }
     };
     DynamicDAO.addEntityListener(IBookMark.class, fBookMarkListener);
 
@@ -325,6 +342,23 @@ public class FeedView extends EditorPart implements IReusableEditor {
           if (fInput.getMark().getId().equals(mark.getId())) {
             fEditorSite.getPage().closeEditor(FeedView.this, false);
             fInput.setDeleted();
+            break;
+          }
+        }
+      }
+
+      @Override
+      public void entitiesUpdated(Set<SearchMarkEvent> events) {
+        for (SearchMarkEvent event : events) {
+          final ISearchMark mark = event.getEntity();
+          if (mark.getId().equals(fInput.getMark().getId())) {
+            JobRunner.runInUIThread(fParent, new Runnable() {
+              public void run() {
+                setPartName(mark.getName());
+                OwlUI.updateWindowTitle(new IMark[] { fInput.getMark() });
+              }
+            });
+
             break;
           }
         }
