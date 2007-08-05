@@ -33,12 +33,9 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.layout.TreeColumnLayout;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
-import org.eclipse.jface.viewers.ColumnPixelData;
-import org.eclipse.jface.viewers.ColumnWeightData;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IElementComparer;
@@ -60,7 +57,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorSite;
@@ -79,6 +75,8 @@ import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
+import org.rssowl.ui.internal.CColumnLayoutData;
+import org.rssowl.ui.internal.CTree;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.StatusLineUpdater;
@@ -184,6 +182,7 @@ public class NewsTableControl implements IFeedViewPart {
   private JobTracker fNewsStateTracker;
   private NewsTableViewer fViewer;
   private ISelectionChangedListener fSelectionChangeListener;
+  private CTree fCustomTree;
   private LocalResourceManager fResources;
   private NewsComparator fNewsSorter;
   private Cursor fHandCursor;
@@ -218,11 +217,11 @@ public class NewsTableControl implements IFeedViewPart {
   public NewsTableViewer createViewer(Composite parent) {
     int style = SWT.MULTI | SWT.FULL_SELECTION;
 
-    Composite treeContainer = new Composite(parent, SWT.NONE);
-    treeContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    fCustomTree = new CTree(parent, style);
+    fCustomTree.getControl().setHeaderVisible(true);
 
-    fViewer = new NewsTableViewer(new Tree(treeContainer, style));
-    fViewer.getTree().setHeaderVisible(true);
+    fViewer = new NewsTableViewer(fCustomTree.getControl());
+    fViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fViewer.setUseHashlookup(true);
     fViewer.getControl().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
     fViewer.getControl().setFont(OwlUI.getThemeFont(OwlUI.HEADLINES_FONT_ID, SWT.NORMAL));
@@ -247,58 +246,51 @@ public class NewsTableControl implements IFeedViewPart {
    * org.eclipse.jface.viewers.ViewerFilter)
    */
   public void initViewer(IStructuredContentProvider contentProvider, ViewerFilter filter) {
-    TreeColumnLayout layout = new TreeColumnLayout();
-    fViewer.getTree().getParent().setLayout(layout);
 
     /* Headline Column */
     TreeViewerColumn col = new TreeViewerColumn(fViewer, SWT.LEFT);
-    layout.setColumnData(col.getColumn(), new ColumnWeightData(60));
-    col.getColumn().setText("Title");
+    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 60), "Title", null, true, true);
     col.getColumn().setData(COL_ID, Columns.TITLE);
     col.getColumn().setMoveable(false);
     if (fInitialSortColumn == Columns.TITLE) {
-      fViewer.getTree().setSortColumn(col.getColumn());
-      fViewer.getTree().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
+      fCustomTree.getControl().setSortColumn(col.getColumn());
+      fCustomTree.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
     }
 
     /* Date Column */
     int width = getInitialDateColumnWidth();
     col = new TreeViewerColumn(fViewer, SWT.LEFT);
-    layout.setColumnData(col.getColumn(), new ColumnPixelData(width));
-    col.getColumn().setText("Date");
+    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, width), "Date", null, true, true);
     col.getColumn().setData(COL_ID, Columns.DATE);
     col.getColumn().setMoveable(false);
     if (fInitialSortColumn == Columns.DATE) {
-      fViewer.getTree().setSortColumn(col.getColumn());
-      fViewer.getTree().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
+      fCustomTree.getControl().setSortColumn(col.getColumn());
+      fCustomTree.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
     }
 
     /* Author Column */
     col = new TreeViewerColumn(fViewer, SWT.LEFT);
-    layout.setColumnData(col.getColumn(), new ColumnWeightData(20));
-    col.getColumn().setText("Author");
+    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20), "Author", null, true, true);
     col.getColumn().setData(COL_ID, Columns.AUTHOR);
     col.getColumn().setMoveable(false);
     if (fInitialSortColumn == Columns.AUTHOR) {
-      fViewer.getTree().setSortColumn(col.getColumn());
-      fViewer.getTree().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
+      fCustomTree.getControl().setSortColumn(col.getColumn());
+      fCustomTree.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
     }
 
     /* Category Column */
     col = new TreeViewerColumn(fViewer, SWT.LEFT);
-    layout.setColumnData(col.getColumn(), new ColumnWeightData(20));
-    col.getColumn().setText("Category");
+    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20), "Category", null, true, true);
     col.getColumn().setData(COL_ID, Columns.CATEGORY);
     col.getColumn().setMoveable(false);
     if (fInitialSortColumn == Columns.CATEGORY) {
-      fViewer.getTree().setSortColumn(col.getColumn());
-      fViewer.getTree().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
+      fCustomTree.getControl().setSortColumn(col.getColumn());
+      fCustomTree.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
     }
 
     /* Sticky Column */
     col = new TreeViewerColumn(fViewer, SWT.LEFT);
-    layout.setColumnData(col.getColumn(), new ColumnPixelData(18));
-    col.getColumn().setResizable(false);
+    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 18), null, null, true, false);
     col.getColumn().setData(COL_ID, Columns.STICKY);
     col.getColumn().setMoveable(false);
     col.getColumn().setToolTipText("Sticky State");
@@ -345,7 +337,7 @@ public class NewsTableControl implements IFeedViewPart {
     cal.set(2006, Calendar.DECEMBER, 12, 12, 12, 12);
     String sampleDate = dF.format(cal.getTime());
 
-    DATE_COL_WIDTH = OwlUI.getTextSize(fViewer.getTree(), OwlUI.getBold(JFaceResources.DEFAULT_FONT), sampleDate).x;
+    DATE_COL_WIDTH = OwlUI.getTextSize(fCustomTree.getControl(), OwlUI.getBold(JFaceResources.DEFAULT_FONT), sampleDate).x;
     DATE_COL_WIDTH += 30; // Bounds of TableColumn requires more space
 
     return DATE_COL_WIDTH;
@@ -372,21 +364,21 @@ public class NewsTableControl implements IFeedViewPart {
     fViewer.addPostSelectionChangedListener(fSelectionChangeListener);
 
     /* Perform Action on Mouse-Down */
-    fViewer.getTree().addListener(SWT.MouseDown, new Listener() {
+    fCustomTree.getControl().addListener(SWT.MouseDown, new Listener() {
       public void handleEvent(Event event) {
         onMouseDown(event);
       }
     });
 
     /* Update Cursor on Mouse-Move */
-    fViewer.getTree().addListener(SWT.MouseMove, new Listener() {
+    fCustomTree.getControl().addListener(SWT.MouseMove, new Listener() {
       public void handleEvent(Event event) {
         onMouseMove(event);
       }
     });
 
     /* Enable Sorting adding listeners to Columns */
-    TreeColumn[] columns = fViewer.getTree().getColumns();
+    TreeColumn[] columns = fCustomTree.getControl().getColumns();
     for (final TreeColumn column : columns) {
       column.addSelectionListener(new SelectionAdapter() {
         @Override
@@ -401,10 +393,10 @@ public class NewsTableControl implements IFeedViewPart {
 
           /* Indicate Sort-Column in UI for Columns that have a certain width */
           if (newSortBy.showSortIndicator()) {
-            fViewer.getTree().setSortColumn(column);
-            fViewer.getTree().setSortDirection(ascending ? SWT.UP : SWT.DOWN);
+            fCustomTree.getControl().setSortColumn(column);
+            fCustomTree.getControl().setSortDirection(ascending ? SWT.UP : SWT.DOWN);
           } else {
-            fViewer.getTree().setSortColumn(null);
+            fCustomTree.getControl().setSortColumn(null);
           }
 
           fViewer.refresh(false);
@@ -468,7 +460,7 @@ public class NewsTableControl implements IFeedViewPart {
   private void onMouseDown(Event event) {
     boolean disableTrackerTemporary = false;
     Point p = new Point(event.x, event.y);
-    TreeItem item = fViewer.getTree().getItem(p);
+    TreeItem item = fCustomTree.getControl().getItem(p);
 
     /* Problem - return */
     if (item == null || item.isDisposed())
@@ -515,12 +507,12 @@ public class NewsTableControl implements IFeedViewPart {
 
   private void onMouseMove(Event event) {
     Point p = new Point(event.x, event.y);
-    TreeItem item = fViewer.getTree().getItem(p);
+    TreeItem item = fCustomTree.getControl().getItem(p);
 
     /* Problem / Group hovered - reset */
     if (item == null || item.isDisposed() || item.getData() instanceof EntityGroup) {
-      if (fShowsHandCursor && !fViewer.getTree().isDisposed()) {
-        fViewer.getTree().setCursor(null);
+      if (fShowsHandCursor && !fCustomTree.getControl().isDisposed()) {
+        fCustomTree.getControl().setCursor(null);
         fShowsHandCursor = false;
       }
       return;
@@ -529,10 +521,10 @@ public class NewsTableControl implements IFeedViewPart {
     /* Show Hand-Cursor if action can be performed */
     boolean changeToHandCursor = item.getImageBounds(COL_TITLE).contains(p) || item.getImageBounds(COL_STICKY).contains(p);
     if (!fShowsHandCursor && changeToHandCursor) {
-      fViewer.getTree().setCursor(fHandCursor);
+      fCustomTree.getControl().setCursor(fHandCursor);
       fShowsHandCursor = true;
     } else if (fShowsHandCursor && !changeToHandCursor) {
-      fViewer.getTree().setCursor(null);
+      fCustomTree.getControl().setCursor(null);
       fShowsHandCursor = false;
     }
   }
@@ -648,8 +640,6 @@ public class NewsTableControl implements IFeedViewPart {
       fViewer.setInput(new SearchMarkReference(((ISearchMark) input).getId()));
     else
       fViewer.setInput(input);
-
-    fViewer.getTree().getParent().layout();
   }
 
   /*
