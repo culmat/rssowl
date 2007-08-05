@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IMark;
@@ -38,6 +39,14 @@ import org.rssowl.ui.internal.OwlUI;
  * @author bpasero
  */
 public class FeedViewInput implements IEditorInput {
+
+  /* Used to restore Editor if required */
+  private static final String FACTORY_ID = "org.rssowl.ui.FeedViewFactory";
+  private static final String RESTORE_QUALIFIER = "/instance/org.eclipse.ui.workbench/";
+  private static final String RESTORE_KEY = "USE_IPERSISTABLE_EDITORS";
+  static final String BOOKMARK_INPUT_ID = "org.rssowl.ui.internal.editors.feed.BookMarkInputId";
+  static final String SEARCHMARK_INPUT_ID = "org.rssowl.ui.internal.editors.feed.SearchMarkInputId";
+
   private IMark fMark;
   private boolean fIsDeleted;
   private boolean fIsBookMark;
@@ -108,7 +117,22 @@ public class FeedViewInput implements IEditorInput {
    * @see org.eclipse.ui.IEditorInput#getPersistable()
    */
   public IPersistableElement getPersistable() {
-    return null;
+    boolean restore = Platform.getPreferencesService().getBoolean(RESTORE_QUALIFIER, RESTORE_KEY, true, null);
+    if (!restore)
+      return null;
+
+    return new IPersistableElement() {
+      public String getFactoryId() {
+        return FACTORY_ID;
+      }
+
+      public void saveState(IMemento memento) {
+        if (fMark instanceof IBookMark)
+          memento.putString(BOOKMARK_INPUT_ID, String.valueOf(fMark.getId()));
+        else if (fMark instanceof ISearchMark)
+          memento.putString(SEARCHMARK_INPUT_ID, String.valueOf(fMark.getId()));
+      }
+    };
   }
 
   /*
