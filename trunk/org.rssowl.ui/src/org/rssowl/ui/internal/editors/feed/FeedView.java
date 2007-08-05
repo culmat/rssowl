@@ -64,14 +64,18 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
+import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.event.BookMarkAdapter;
 import org.rssowl.core.persist.event.BookMarkEvent;
 import org.rssowl.core.persist.event.BookMarkListener;
 import org.rssowl.core.persist.event.FeedAdapter;
 import org.rssowl.core.persist.event.FeedEvent;
+import org.rssowl.core.persist.event.SearchConditionEvent;
+import org.rssowl.core.persist.event.SearchConditionListener;
 import org.rssowl.core.persist.event.SearchMarkAdapter;
 import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -168,6 +172,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private BookMarkListener fBookMarkListener;
   private SearchMarkAdapter fSearchMarkListener;
   private FeedAdapter fFeedListener;
+  private SearchConditionListener fSearchConditionListener;
 
   /* Settings */
   NewsFilter.Type fInitialFilterType;
@@ -324,11 +329,29 @@ public class FeedView extends EditorPart implements IReusableEditor {
           }
         }
       }
+    };
+    DynamicDAO.addEntityListener(ISearchMark.class, fSearchMarkListener);
 
-      @Override
-      public void entitiesUpdated(Set<SearchMarkEvent> events) {
-        for (SearchMarkEvent event : events) {
-          if (event.getEntity().equals(fInput.getMark())) {
+    /* Refresh on Condition Changes if SearchMark showing */
+    fSearchConditionListener = new SearchConditionListener() {
+      public void entitiesAdded(Set<SearchConditionEvent> events) {
+        refreshIfRequired(events);
+      }
+
+      public void entitiesDeleted(Set<SearchConditionEvent> events) {
+        refreshIfRequired(events);
+      }
+
+      public void entitiesUpdated(Set<SearchConditionEvent> events) {
+        refreshIfRequired(events);
+      }
+
+      private void refreshIfRequired(Set<SearchConditionEvent> events) {
+        ISearchMarkDAO dao = DynamicDAO.getDAO(ISearchMarkDAO.class);
+        for (SearchConditionEvent event : events) {
+          ISearchCondition condition = event.getEntity();
+          ISearchMark searchMark = dao.load(condition);
+          if (searchMark != null && searchMark.equals(fInput.getMark())) {
             JobRunner.runUIUpdater(new UIBackgroundJob(fParent) {
               @Override
               protected void runInBackground(IProgressMonitor monitor) {
@@ -351,7 +374,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         }
       }
     };
-    DynamicDAO.addEntityListener(ISearchMark.class, fSearchMarkListener);
+    DynamicDAO.addEntityListener(ISearchCondition.class, fSearchConditionListener);
 
     /* Listen if Title Image is changing */
     fFeedListener = new FeedAdapter() {
@@ -762,10 +785,16 @@ public class FeedView extends EditorPart implements IReusableEditor {
         }
 
         /* Update some fields due to displaying the mark */
-        mark.setPopularity(mark.getPopularity() + 1);
-        mark.setLastVisitDate(new Date(System.currentTimeMillis()));
+        if (mark instanceof ISearchMark) {
+          DynamicDAO.getDAO(ISearchMarkDAO.class).visited((ISearchMark) mark);
+        }
 
-        DynamicDAO.save(mark);
+        /* TODO Fixme once IBookMarkDAO.visited() is implemented */
+        else {
+          mark.setPopularity(mark.getPopularity() + 1);
+          mark.setLastVisitDate(new Date(System.currentTimeMillis()));
+          DynamicDAO.save(mark);
+        }
       }
     });
   }
@@ -870,6 +899,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     DynamicDAO.removeEntityListener(IBookMark.class, fBookMarkListener);
     DynamicDAO.removeEntityListener(ISearchMark.class, fSearchMarkListener);
     DynamicDAO.removeEntityListener(IFeed.class, fFeedListener);
+    DynamicDAO.removeEntityListener(ISearchCondition.class, fSearchConditionListener);
   }
 
   /**
