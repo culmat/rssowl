@@ -707,6 +707,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Make sure Conditions are provided */
     if (fSearchConditionList.isEmpty()) {
       setErrorMessage("Please specify your search by defining some conditions below.");
+      fSearchConditionList.focusInput();
       return;
     }
 
@@ -792,6 +793,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
         getShell().setCursor(null);
         getShell().setDefaultButton(getButton(BUTTON_SEARCH));
         getButton(BUTTON_SEARCH).setFocus();
+
+        /* Move Focus back to last Search Condition Element */
+        fSearchConditionList.focusInput();
       }
     });
   }
