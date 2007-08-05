@@ -36,7 +36,6 @@ import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.Folder;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.Preference;
-import org.rssowl.core.internal.persist.SearchMark;
 import org.rssowl.core.internal.persist.migration.Migrations;
 import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.service.IModelSearch;
@@ -394,7 +393,6 @@ public class DBManager {
     config.objectClass(ConditionalGet.class).objectField("fLink").indexed(true); //$NON-NLS-1$
     configureFeed(config);
     configureNews(config);
-    configureSearchMark(config);
     configureFolder(config);
     config.objectClass(NewsCounter.class).cascadeOnDelete(true);
     config.objectClass(Preference.class).cascadeOnDelete(true);
@@ -408,11 +406,6 @@ public class DBManager {
     idField.indexed(true); //$NON-NLS-1$
     idField.cascadeOnActivate(true); //$NON-NLS-1$
     abstractEntityClass.objectField("fProperties").cascadeOnUpdate(true); //$NON-NLS-1$
-  }
-
-  private void configureSearchMark(Configuration config) {
-    ObjectClass oc = config.objectClass(SearchMark.class);
-    oc.objectField("fSearchConditions").cascadeOnUpdate(true); //$NON-NLS-1$
   }
 
   private void configureFolder(Configuration config) {

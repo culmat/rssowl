@@ -57,4 +57,13 @@ public interface ISearchMarkDAO extends IEntityDAO<ISearchMark, SearchMarkListen
    * @return ISearchMark containing {@code searchCondition} or {@code null}.
    */
   ISearchMark load(ISearchCondition searchCondition);
+
+  /**
+   * Records a visit to the mark and saves it to the database. This method is
+   * guaranteed not to change the search conditions contained in {@code mark}
+   * and such no {@code SearchConditionEvent}s will be issued as a result.
+   *
+   * @param mark ISearchMark that has been visited.
+   */
+  void visited(ISearchMark mark);
 }

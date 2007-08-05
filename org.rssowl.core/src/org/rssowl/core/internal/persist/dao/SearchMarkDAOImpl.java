@@ -25,14 +25,18 @@
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.SearchMark;
+import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.event.SearchMarkListener;
+import org.rssowl.core.persist.service.PersistenceException;
 
+import com.db4o.ext.Db4oException;
 import com.db4o.query.Query;
 
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -44,7 +48,7 @@ public final class SearchMarkDAOImpl extends AbstractEntityDAO<ISearchMark, Sear
 
   /** Default constructor using the specific IPersistable for this DAO */
   public SearchMarkDAOImpl() {
-    super(SearchMark.class, false);
+    super(SearchMark.class, true);
   }
 
   @Override
@@ -68,5 +72,21 @@ public final class SearchMarkDAOImpl extends AbstractEntityDAO<ISearchMark, Sear
     query.constrain(fEntityClass);
     query.descend("fSearchConditions").constrain(searchCondition);
     return getSingleResult(query);
+  }
+
+  public void visited(ISearchMark mark) {
+    fWriteLock.lock();
+    try {
+      mark.setLastVisitDate(new Date());
+      mark.setPopularity(mark.getPopularity() + 1);
+      preSave(mark);
+      fDb.ext().set(mark, 1);
+      fDb.commit();
+    } catch (Db4oException e) {
+      throw new PersistenceException(e);
+    } finally {
+      fWriteLock.unlock();
+    }
+    DBHelper.cleanUpAndFireEvents();
   }
 }

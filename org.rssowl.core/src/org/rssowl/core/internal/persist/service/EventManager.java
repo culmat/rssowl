@@ -222,7 +222,7 @@ public class EventManager {
   }
 
   private void cascadeSearchConditionDeletion(ISearchCondition searchCondition) {
-    ISearchMark searchMark = getSearchMark(searchCondition);
+    ISearchMark searchMark = loadSearchMark(searchCondition);
     if (!itemsBeingDeletedContains(searchMark)) {
       if (searchMark.removeSearchCondition(searchCondition))
         fDb.ext().set(searchMark, 2);
@@ -231,15 +231,13 @@ public class EventManager {
   }
 
   @SuppressWarnings("unchecked")
-  private ISearchMark getSearchMark(ISearchCondition searchCondition) {
-    Query query = fDb.query();
-    query.constrain(ISearchMark.class);
-    query.descend("fSearchConditions").constrain(searchCondition);
-    List<ISearchMark> marks = query.execute();
-    if (marks.size() != 1)
+  private ISearchMark loadSearchMark(ISearchCondition searchCondition) {
+    ISearchMark mark = Owl.getPersistenceService().getDAOService().getSearchMarkDAO().load(searchCondition);
+
+    if (mark == null)
       throw new IllegalStateException("searchCondition has less than or more than 1 parent ISearchMark");
 
-    return marks.get(0);
+    return mark;
   }
 
   private void cascadeNewsDeletion(INews news) {
