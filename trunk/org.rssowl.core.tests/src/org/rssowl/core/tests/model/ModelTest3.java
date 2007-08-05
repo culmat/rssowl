@@ -2142,6 +2142,9 @@ public class ModelTest3 {
     }
   }
   
+  /**
+   * Tests {@link ISearchMarkDAO#load(ISearchCondition)}.
+   */
   @Test
   public void testLoadFromSearchCondition() {
     /* Add */
@@ -2178,5 +2181,61 @@ public class ModelTest3 {
     assertEquals(searchMark0Id, searchMark0.getId());
     
     assertEquals(searchMark1, dao.load(searchCondition2));
+  }
+  
+  /**
+   * Tests {@link ISearchMarkDAO#visited(ISearchMark)}.
+   * @throws Exception
+   */
+  @Test
+  public void testVisited() throws Exception {
+    SearchConditionListener listener = new SearchConditionListener() {
+      public void entitiesAdded(Set<SearchConditionEvent> events) {
+        fail("Unexpected event");
+      }
+
+      public void entitiesDeleted(Set<SearchConditionEvent> events) {
+        fail("Unexpected event");
+      }
+
+      public void entitiesUpdated(Set<SearchConditionEvent> events) {
+        fail("Unexpected event");
+      }
+    };
+    try {
+      /* Add */
+      IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Folder"));
+
+      ISearchMark searchMark = DynamicDAO.save(fFactory.createSearchMark(null, folder, "SearchMark 0"));
+      ISearchField field0 = fFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
+      fFactory.createSearchCondition(null, searchMark, field0, SearchSpecifier.CONTAINS, "Foo");
+
+      ISearchField field1 = fFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
+      fFactory.createSearchCondition(null, searchMark, field1, SearchSpecifier.BEGINS_WITH, "Bar");
+
+      DynamicDAO.save(searchMark);
+
+      SearchMarkReference searchMarkRef = new SearchMarkReference(searchMark.getId());
+      int popularity = searchMark.getPopularity();
+      Date lastVisitDate = searchMark.getLastVisitDate();
+      
+      if (lastVisitDate == null) {
+        lastVisitDate = new Date();
+      }
+      Thread.sleep(10);
+
+      ISearchMarkDAO dao = DynamicDAO.getDAO(ISearchMarkDAO.class);
+      DynamicDAO.addEntityListener(ISearchCondition.class, listener);
+      dao.visited(searchMark);
+      searchMark = null;
+      System.gc();
+
+      searchMark = searchMarkRef.resolve();
+      assertEquals(popularity + 1, searchMark.getPopularity());
+      assertTrue(searchMark.getLastVisitDate().compareTo(lastVisitDate) > 0);
+      assertTrue(searchMark.getLastVisitDate().compareTo(new Date()) < 0);
+    } finally {
+      DynamicDAO.removeEntityListener(ISearchCondition.class, listener);
+    }
   }
 }
