@@ -147,6 +147,8 @@ public class DBManager {
 
       fObjectContainer = createObjectContainer(config);
 
+      //copyDatabase();
+
       fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
 
       /*
@@ -341,8 +343,8 @@ public class DBManager {
    */
   @SuppressWarnings("unused")
   private void copyDatabase() {
-      ObjectContainer db = Db4o.openFile(getDBFilePath() + "50");
-      db.ext().configure().queries().evaluationMode(QueryEvaluationMode.IMMEDIATE);
+      ObjectContainer db = Db4o.openFile(createConfiguration(),
+          getDBFilePath() + "50");
       for (Folder type : fObjectContainer.query(Folder.class))  {
         fObjectContainer.activate(type, Integer.MAX_VALUE);
         if (type.getParent() == null) {
@@ -363,6 +365,7 @@ public class DBManager {
       db.ext().set(counter, Integer.MAX_VALUE);
 
       db.commit();
+      db.close();
   }
 
   private Configuration createConfiguration() {
