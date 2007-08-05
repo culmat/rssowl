@@ -1048,4 +1048,11 @@
             default="true">
       </support>
    </extension>
+   <extension
+         point="org.eclipse.ui.elementFactories">
+      <factory
+            class="org.rssowl.ui.internal.editors.feed.FeedViewFactory"
+            id="org.rssowl.ui.FeedViewFactory">
+      </factory>
+   </extension>
 </plugin>
