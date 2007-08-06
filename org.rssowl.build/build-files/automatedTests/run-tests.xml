@@ -22,7 +22,8 @@
 		<echo message="Installing plug-ins for testing" />
 		
 		<unzip dest="${test.eclipse.base}">
-			<fileset dir="." includes="eclipse-test-framework*.zip" />
+			<!--<fileset dir="." includes="eclipse-test-framework*.zip" />-->
+			<fileset dir="." includes="eclipse-test-framework-3.3RC3_Junit4.zip" />
 		</unzip>
 		<unzip dest="${test.eclipse.host}">
 			<fileset dir="." includes="org.pluginbuilder.autotestsuite*.zip" />
@@ -41,14 +42,14 @@
 
 
 	<!-- Example target which demonstrates how to run a test suite with the Eclipse test fwk.
-		Note that it is not needed if you use the autotestsuite
+		Note that it is not needed if you use the autotestsuite-->
 	
 	<target name="-runTestSuite" description="Should be called from allTests.xml only">
-		<ant target="ui-test" antfile="${test.library.xml}" dir="${test.eclipse.host}">
-			<comment use -clean because plug-ins have been unzipped into the eclipse folder comment>
+		<ant target="core-test" antfile="${test.library.xml}" dir="${test.eclipse.host}">
+			<!--<comment use -clean because plug-ins have been unzipped into the eclipse folder comment>-->
 			<property name="data-dir" value="${test.workspace} -clean" />
-    		<property name="plugin-name" value="<your plugin id>" />
-    		<property name="classname" value="<the class which defines the suite>" />
+    		<property name="plugin-name" value="org.rssowl.core.tests" />
+    		<property name="classname" value="org.rssowl.core.tests.AllTests" />
 			<property name="eclipse-home" value="${test.eclipse.host}" />
 		</ant>
 	</target>
@@ -56,7 +57,7 @@
 	<target name="run" depends="-init,-runTestSuite" description="Run manually defined tests and create a report.">
 		<delete dir="${test.result.dir}" />
 		<mkdir dir="${test.result.dir}/xml" />
-		<comment collect creates an aggregated report file in ${test.eclipse.host} comment>
+		<!--<comment collect creates an aggregated report file in ${test.eclipse.host} comment>-->
 		<ant target="collect" antfile="${test.library.xml}" dir="${test.eclipse.host}">
 			<property name="includes" value="*.xml" />
 			<property name="output-file" value="${test.aggregated.report}" />
@@ -65,9 +66,9 @@
 		<style style="${basedir}/JUNIT.XSL" basedir="${test.result.dir}/xml" destdir="${test.result.dir}/html" />
 
 	</target>
-	-->
 	
-	<target name="run" depends="-init,-runAutoTests" description="Run all tests using the autotestsuite and create xml and html reports.">
+	
+	<!--<target name="run" depends="-init,-runAutoTests" description="Run all tests using the autotestsuite and create xml and html reports.">
 
 		<junitreport todir="${test.result.dir}/xml" tofile="${test.aggregated.report}">
 			<fileset dir="${test.result.dir}/xml">
@@ -79,7 +80,7 @@
 
 		<style style="${junit.xsl.file}" basedir="${test.result.dir}/xml" includes="${test.aggregated.report}" destdir="${test.result.dir}/html" />
 		<antcall target="checkTestResultFileForErrors"/>
-	</target>
+	</target>-->
 	
 	<target name="-markErrorOrFailure" if="isErrorOrFailure">
 		<!-- Write Message to stderr and continue build, do not call fail and let the
