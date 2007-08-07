@@ -263,6 +263,7 @@
          <action
                class="org.rssowl.ui.internal.actions.MarkAllNewsReadAction"
                definitionId="org.rssowl.ui.MarkAllRead"
+               disabledIcon="icons/dlcl16/mark_all_read.gif"
                icon="icons/elcl16/mark_all_read.gif"
                id="org.rssowl.ui.MarkAllRead"
                label="Mark All News as Read"
