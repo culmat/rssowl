@@ -242,7 +242,7 @@ public class SearchConditionList extends ScrolledComposite {
 
   private void initResources() {
     fAddIcon = OwlUI.getImage(fResources, "icons/etool16/add.gif");
-    fDeleteIcon = OwlUI.getImage(fResources, "icons/etool16/cancel.gif");
+    fDeleteIcon = OwlUI.getImage(fResources, "icons/etool16/remove.gif");
   }
 
   private void initComponents(List<ISearchCondition> conditions) {
