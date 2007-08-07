@@ -72,6 +72,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -177,7 +178,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private SearchConditionList fSearchConditionList;
   private TableViewer fViewer;
   private ScoredNewsComparator fNewsSorter;
-  private Label fStatusLabel;
+  private Link fStatusLabel;
 
   /* Misc. */
   private NewsTableControl.Columns fInitialSortColumn = NewsTableControl.Columns.SCORE;
@@ -510,7 +511,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     setTitleImage(OwlUI.getImage(fResources, "icons/wizban/search.gif"));
 
     /* Title Message */
-    setMessage("You can use \'?\' for any character and \'*\' for any word in your search.", IMessageProvider.INFORMATION);
+    setMessage("You can use \'?\' for any character and \'*\' for any number of characters in your search.", IMessageProvider.INFORMATION);
 
     /* Sashform dividing search definition from results */
     SashForm sashForm = new SashForm(parent, SWT.VERTICAL | SWT.SMOOTH);
@@ -672,8 +673,14 @@ public class SearchNewsDialog extends TitleAreaDialog {
     buttonBar.setLayout(layout);
 
     /* Status Label */
-    fStatusLabel = new Label(buttonBar, SWT.NONE);
+    fStatusLabel = new Link(buttonBar, SWT.NONE);
     fStatusLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    fStatusLabel.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        onSave();
+      }
+    });
 
     /* Search */
     Button searchButton = createButton(buttonBar, BUTTON_SEARCH, "Search", true);
@@ -780,13 +787,18 @@ public class SearchNewsDialog extends TitleAreaDialog {
         fViewer.getTable().getParent().layout();
 
         /* Update Status Label */
+        String text;
         int size = fResult.size();
         if (size == 0)
-          fStatusLabel.setText("The search returned no results.");
+          text = "The search returned no results. ";
         else if (size == 1)
-          fStatusLabel.setText("The search returned " + fResult.size() + " result.");
+          text = "The search returned " + fResult.size() + " result. ";
         else
-          fStatusLabel.setText("The search returned " + fResult.size() + " results.");
+          text = "The search returned " + fResult.size() + " results. ";
+
+        text += "Click <a>here</a> to save this search.";
+        fStatusLabel.setText(text);
+        fStatusLabel.getParent().layout();
 
         /* Enable Buttons and update Cursor */
         getButton(BUTTON_SEARCH).setEnabled(true);
