@@ -639,8 +639,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     /* Handle Old being hidden now */
     if (fInput != null) {
-      if (fInput.getMark() instanceof IBookMark)
-        notifyUIEvent(UIEvent.FEED_CHANGE);
+      notifyUIEvent(UIEvent.FEED_CHANGE);
       rememberSelection();
     }
 
@@ -717,8 +716,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
    * <code>UIEvent</code> enumeration.
    */
   public void notifyUIEvent(final UIEvent event) {
+    final IMark inputMark = fInput.getMark();
+    final boolean isBookMark = inputMark instanceof IBookMark;
     final Collection<INews> news = fContentProvider.getCachedNews();
-    final IBookMark bookmark = (fInput.getMark() instanceof IBookMark) ? (IBookMark) fInput.getMark() : null;
 
     /*
      * News can be NULL at this moment, if the Job that is to refresh the cache
@@ -729,8 +729,11 @@ public class FeedView extends EditorPart implements IReusableEditor {
     if (news == null || !fInput.exists())
       return;
 
-    /* Mark *new* News as read when closing */
-    if (event == UIEvent.CLOSE) {
+    final boolean markReadOnFeedChange = fPreferences.getBoolean(DefaultPreferences.MARK_FEED_READ_ON_CHANGE);
+    final boolean markReadOnMinimize = fPreferences.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE);
+
+    /* Mark *new* News as read when closing the entire application */
+    if (event == UIEvent.CLOSE && isBookMark) {
 
       /* Perform the State Change */
       List<INews> newsToUpdate = new ArrayList<INews>();
@@ -743,8 +746,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
       newsDao.setState(newsToUpdate, INews.State.UNREAD, true, false);
     }
 
-    /* Handle seen News: Feed Change or Minimize Event */
-    else {
+    /* Handle seen News: Feed Change (also closing the feed view) or Minimize Event */
+    else if (isBookMark || (markReadOnFeedChange && event == UIEvent.FEED_CHANGE) || (markReadOnMinimize && event == UIEvent.MINIMIZE)) {
       JobRunner.runInBackgroundThread(HANDLE_NEWS_SEEN_DELAY, new Runnable() {
         public void run() {
 
@@ -755,9 +758,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
           /* Check settings if mark as read should be performed */
           boolean markRead = false;
           if (event == UIEvent.FEED_CHANGE)
-            markRead = fPreferences.getBoolean(DefaultPreferences.MARK_FEED_READ_ON_CHANGE);
+            markRead = markReadOnFeedChange;
           else if (event == UIEvent.MINIMIZE)
-            markRead = fPreferences.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE);
+            markRead = markReadOnMinimize;
 
           /* Perform the State Change */
           List<INews> newsToUpdate = new ArrayList<INews>();
@@ -768,12 +771,16 @@ public class FeedView extends EditorPart implements IReusableEditor {
               newsToUpdate.add(newsItem);
           }
 
+          /* Force quick update for SM */
+          if (!isBookMark)
+            Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+
           INewsDAO newsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
           newsDao.setState(newsToUpdate, markRead ? INews.State.READ : INews.State.UNREAD, true, false);
 
           /* Retention Strategy */
-          if (bookmark != null)
-            RetentionStrategy.process(bookmark, news);
+          if (isBookMark)
+            RetentionStrategy.process((IBookMark) inputMark, news);
         }
       });
     }
