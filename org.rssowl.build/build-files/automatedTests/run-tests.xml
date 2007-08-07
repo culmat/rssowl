@@ -65,6 +65,7 @@
 		<copy file="${test.eclipse.host}/${test.aggregated.report}" todir="${test.result.dir}/xml" />
 		<style style="${basedir}/JUNIT.XSL" basedir="${test.result.dir}/xml" destdir="${test.result.dir}/html" />
 
+		<antcall target="checkTestResultFileForErrors"/>
 	</target>
 	
 	
