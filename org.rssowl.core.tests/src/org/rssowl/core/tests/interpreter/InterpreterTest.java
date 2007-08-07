@@ -379,14 +379,14 @@ public class InterpreterTest {
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_atom.xml"));
     Owl.getInterpreter().interpret(inS, feed);
 
-    assertEquals("iso_title#öäüß", feed.getTitle());
-    assertEquals("iso_description#öäüß", feed.getDescription());
+    assertEquals("iso_title#\u00F6\u00E4\u00FC\u00DF", feed.getTitle());
+    assertEquals("iso_description#\u00F6\u00E4\u00FC\u00DF", feed.getDescription());
 
     assertEquals(1, feed.getNews().size());
 
     INews news1 = feed.getNews().get(0);
-    assertEquals("iso_item1.title#öäüß", news1.getTitle());
-    assertEquals("iso_item1.description#öäüß", news1.getDescription());
+    assertEquals("iso_item1.title#\u00F6\u00E4\u00FC\u00DF", news1.getTitle());
+    assertEquals("iso_item1.description#\u00F6\u00E4\u00FC\u00DF", news1.getDescription());
   }
 
   /**
@@ -401,14 +401,14 @@ public class InterpreterTest {
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_atom.xml"));
     Owl.getInterpreter().interpret(inS, feed);
 
-    assertEquals("entities_title#äöü&<>", feed.getTitle());
-    assertEquals("entities_description#äöü&<>", feed.getDescription());
+    assertEquals("entities_title#\u00F6\u00E4\u00FC\u00DF&<>", feed.getTitle());
+    assertEquals("entities_description#\u00F6\u00E4\u00FC\u00DF&<>", feed.getDescription());
 
     assertEquals(1, feed.getNews().size());
 
     INews news1 = feed.getNews().get(0);
-    assertEquals("entities_item1.title#äöü&<>", news1.getTitle());
-    assertEquals("entities_item1.description#äöü&<>", news1.getDescription());
+    assertEquals("entities_item1.title#\u00F6\u00E4\u00FC\u00DF&<>", news1.getTitle());
+    assertEquals("entities_item1.description#\u00F6\u00E4\u00FC\u00DF&<>", news1.getDescription());
   }
 
   /**
@@ -423,14 +423,14 @@ public class InterpreterTest {
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_atom.xml"));
     Owl.getInterpreter().interpret(inS, feed);
 
-    assertEquals("entities_title#äöü&<>", feed.getTitle());
-    assertEquals("entities_description#äöü&<>", feed.getDescription());
+    assertEquals("entities_title#\u00F6\u00E4\u00FC\u00DF&<>", feed.getTitle());
+    assertEquals("entities_description#\u00F6\u00E4\u00FC\u00DF&<>", feed.getDescription());
 
     assertEquals(1, feed.getNews().size());
 
     INews news1 = feed.getNews().get(0);
-    assertEquals("entities_item1.title#äöü&<>", news1.getTitle());
-    assertEquals("entities_item1.description#äöü&<>", news1.getDescription());
+    assertEquals("entities_item1.title#\u00F6\u00E4\u00FC\u00DF&<>", news1.getTitle());
+    assertEquals("entities_item1.description#\u00F6\u00E4\u00FC\u00DF&<>", news1.getDescription());
   }
 
   /**
