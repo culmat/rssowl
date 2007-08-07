@@ -401,14 +401,14 @@ public class InterpreterTest {
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_atom.xml"));
     Owl.getInterpreter().interpret(inS, feed);
 
-    assertEquals("entities_title#\u00F6\u00E4\u00FC\u00DF&<>", feed.getTitle());
-    assertEquals("entities_description#\u00F6\u00E4\u00FC\u00DF&<>", feed.getDescription());
+    assertEquals("entities_title#\u00F6\u00E4\u00FC&<>", feed.getTitle());
+    assertEquals("entities_description#\u00F6\u00E4\u00FC&<>", feed.getDescription());
 
     assertEquals(1, feed.getNews().size());
 
     INews news1 = feed.getNews().get(0);
-    assertEquals("entities_item1.title#\u00F6\u00E4\u00FC\u00DF&<>", news1.getTitle());
-    assertEquals("entities_item1.description#\u00F6\u00E4\u00FC\u00DF&<>", news1.getDescription());
+    assertEquals("entities_item1.title#\u00F6\u00E4\u00FC&<>", news1.getTitle());
+    assertEquals("entities_item1.description#\u00F6\u00E4\u00FC&<>", news1.getDescription());
   }
 
   /**
@@ -423,14 +423,14 @@ public class InterpreterTest {
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_atom.xml"));
     Owl.getInterpreter().interpret(inS, feed);
 
-    assertEquals("entities_title#\u00F6\u00E4\u00FC\u00DF&<>", feed.getTitle());
-    assertEquals("entities_description#\u00F6\u00E4\u00FC\u00DF&<>", feed.getDescription());
+    assertEquals("entities_title#\u00F6\u00E4\u00FC&<>", feed.getTitle());
+    assertEquals("entities_description#\u00F6\u00E4\u00FC&<>", feed.getDescription());
 
     assertEquals(1, feed.getNews().size());
 
     INews news1 = feed.getNews().get(0);
-    assertEquals("entities_item1.title#\u00F6\u00E4\u00FC\u00DF&<>", news1.getTitle());
-    assertEquals("entities_item1.description#\u00F6\u00E4\u00FC\u00DF&<>", news1.getDescription());
+    assertEquals("entities_item1.title#\u00F6\u00E4\u00FC&<>", news1.getTitle());
+    assertEquals("entities_item1.description#\u00F6\u00E4\u00FC&<>", news1.getDescription());
   }
 
   /**
