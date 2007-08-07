@@ -65,6 +65,7 @@ public class JobQueue {
   private final int fProgressDelay;
   private final String fName;
   private final boolean fShowProgress;
+  private boolean fIsUnknownProgress;
   private final ListenerList fListeners = new ListenerList();
 
   /* These fields are accessed from N Jobs concurrently */
@@ -103,6 +104,15 @@ public class JobQueue {
       fProgressJob = createProgressJob();
     else
       fProgressJob = null;
+  }
+
+  /**
+   * @param isUnknownProgress Sets the progress reporting of the progress Job
+   * used for this {@link JobQueue} to {@link IProgressMonitor#UNKNOWN} if
+   * <code>true</code>.
+   */
+  public void setUnknownProgress(boolean isUnknownProgress) {
+    fIsUnknownProgress = isUnknownProgress;
   }
 
   /**
@@ -332,7 +342,7 @@ public class JobQueue {
 
         /* Indicate Beginning if there is still work to do */
         if (!internalIsEmpty())
-          monitor.beginTask(fName, (int) TOTAL_PROGRESS_WORK_LOAD);
+          monitor.beginTask(fName, fIsUnknownProgress ? IProgressMonitor.UNKNOWN : (int) TOTAL_PROGRESS_WORK_LOAD);
 
         /* Update Progress while not Cancelled and not Done */
         while (!monitor.isCanceled() && !internalIsEmpty()) {
