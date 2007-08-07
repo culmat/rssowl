@@ -282,7 +282,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     return fCachedNews != null && !fCachedNews.isEmpty();
   }
 
-  private boolean hasCachedNews(NewsReference ref) {
+  private synchronized boolean hasCachedNews(NewsReference ref) {
     if (fCachedNews == null)
       return false;
 
