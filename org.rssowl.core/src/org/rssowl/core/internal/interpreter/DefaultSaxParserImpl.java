@@ -26,7 +26,6 @@ package org.rssowl.core.internal.interpreter;
 
 import org.jdom.Document;
 import org.jdom.JDOMException;
-import org.jdom.input.JDOMParseException;
 import org.jdom.input.SAXBuilder;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.interpreter.IXMLParser;
@@ -37,13 +36,12 @@ import org.xml.sax.ext.EntityResolver2;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 
 /**
  * Default Implementation of the ISAXParser Interface using the JDKs default XML
  * Parser. The implementation is smart enough to try the platforms default
  * encoding in case a first attempt of parsing the XML fails.
- * 
+ *
  * @author bpasero
  */
 public class DefaultSaxParserImpl implements IXMLParser {
@@ -98,29 +96,29 @@ public class DefaultSaxParserImpl implements IXMLParser {
       ex = e;
     }
 
-    /* Second Run - Try with Platform Default Encoding */
-    if (ex instanceof JDOMParseException) {
-
-      /* Try to reset the Stream to 0 */
-      boolean reset = false;
-      try {
-        keepAliveIns.reset();
-        reset = true;
-      } catch (IOException e) {
-        /* Reset Failed, do not override previous exception */
-      }
-
-      /* In case reset-operation was successfull */
-      if (reset) {
-        try {
-          document = builder.build(new InputStreamReader(keepAliveIns));
-        } catch (JDOMException e) {
-          ex = e;
-        } catch (IOException e) {
-          ex = e;
-        }
-      }
-    }
+//    /* Second Run - Try with Platform Default Encoding */
+//    if (ex instanceof JDOMParseException) {
+//
+//      /* Try to reset the Stream to 0 */
+//      boolean reset = false;
+//      try {
+//        keepAliveIns.reset();
+//        reset = true;
+//      } catch (IOException e) {
+//        /* Reset Failed, do not override previous exception */
+//      }
+//
+//      /* In case reset-operation was successfull */
+//      if (reset) {
+//        try {
+//          document = builder.build(new InputStreamReader(keepAliveIns));
+//        } catch (JDOMException e) {
+//          ex = e;
+//        } catch (IOException e) {
+//          ex = e;
+//        }
+//      }
+//    }
 
     /* Close Stream */
     try {
