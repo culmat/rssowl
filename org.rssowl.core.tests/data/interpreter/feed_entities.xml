@@ -27,14 +27,14 @@
 <!DOCTYPE Meta SYSTEM "http://www.null.dtd">
 <rss version="2.0">
 	<channel>
-		<title>entities_title#&auml;&ouml;&uuml;&amp;&lt;&gt;</title>
+		<title>entities_title#&ouml;&auml;&uuml;&amp;&lt;&gt;</title>
 	  	<link>entities_link</link>
-	  	<description>entities_description#&auml;&ouml;&uuml;&amp;&lt;&gt;</description>
+	  	<description>entities_description#&ouml;&auml;&uuml;&amp;&lt;&gt;</description>
 
 		<item>
-			<title>entities_item1.title#&auml;&ouml;&uuml;&amp;&lt;&gt;</title>
+			<title>entities_item1.title#&ouml;&auml;&uuml;&amp;&lt;&gt;</title>
 	        <link>entities_item1.link</link>
-	        <description>entities_item1.description#&auml;&ouml;&uuml;&amp;&lt;&gt;</description>
+	        <description>entities_item1.description#&ouml;&auml;&uuml;&amp;&lt;&gt;</description>
 		</item>
 	</channel>
 </rss>
