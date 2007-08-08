@@ -51,7 +51,6 @@ import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.ISearchConditionDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.event.AttachmentAdapter;
 import org.rssowl.core.persist.event.AttachmentEvent;
@@ -2141,7 +2140,7 @@ public class ModelTest3 {
         DynamicDAO.removeEntityListener(IFolder.class, folderListener);
     }
   }
-  
+
   /**
    * Tests {@link ISearchMarkDAO#load(ISearchCondition)}.
    */
@@ -2149,27 +2148,27 @@ public class ModelTest3 {
   public void testLoadFromSearchCondition() {
     /* Add */
     IFolder folder = DynamicDAO.save(fFactory.createFolder(null, null, "Folder"));
-    
+
     ISearchMark searchMark0 = DynamicDAO.save(fFactory.createSearchMark(null, folder, "SearchMark 0"));
     ISearchField field0 = fFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
     ISearchCondition searchCondition0 = fFactory.createSearchCondition(null, searchMark0, field0, SearchSpecifier.CONTAINS, "Foo");
     DynamicDAO.save(searchCondition0);
     SearchConditionReference searchCondRef0 = new SearchConditionReference(searchCondition0.getId());
-    
+
     ISearchField field1 = fFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
     ISearchCondition searchCondition1 = fFactory.createSearchCondition(null, searchMark0, field1, SearchSpecifier.BEGINS_WITH, "Bar");
     DynamicDAO.save(searchCondition1);
-    
+
     DynamicDAO.save(searchMark0);
     Long searchMark0Id = searchMark0.getId();
-    
+
     ISearchMark searchMark1 = DynamicDAO.save(fFactory.createSearchMark(null, folder, "SearchMark 1"));
     ISearchField field2 = fFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
     ISearchCondition searchCondition2 = fFactory.createSearchCondition(null, searchMark1, field2, SearchSpecifier.CONTAINS, "Foo");
     DynamicDAO.save(searchCondition2);
-    
+
     DynamicDAO.save(searchMark1);
-    
+
     searchMark0 = null;
     searchCondition0 = null;
     System.gc();
@@ -2179,10 +2178,10 @@ public class ModelTest3 {
     ISearchMarkDAO dao = DynamicDAO.getDAO(ISearchMarkDAO.class);
     searchMark0 = dao.load(searchCondition0);
     assertEquals(searchMark0Id, searchMark0.getId());
-    
+
     assertEquals(searchMark1, dao.load(searchCondition2));
   }
-  
+
   /**
    * Tests {@link ISearchMarkDAO#visited(ISearchMark)}.
    * @throws Exception
@@ -2218,7 +2217,7 @@ public class ModelTest3 {
       SearchMarkReference searchMarkRef = new SearchMarkReference(searchMark.getId());
       int popularity = searchMark.getPopularity();
       Date lastVisitDate = searchMark.getLastVisitDate();
-      
+
       if (lastVisitDate == null) {
         lastVisitDate = new Date();
       }
