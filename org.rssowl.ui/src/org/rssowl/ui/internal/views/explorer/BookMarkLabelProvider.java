@@ -77,9 +77,18 @@ public class BookMarkLabelProvider extends CellLabelProvider {
   private Color fGroupFgColor;
   private Font fBoldFont;
   private Font fDefaultFont;
+  private boolean fIndicateState;
 
   /** */
   public BookMarkLabelProvider() {
+    this(true);
+  }
+
+  /**
+   * @param indicateState
+   */
+  public BookMarkLabelProvider(boolean indicateState) {
+    fIndicateState = indicateState;
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fNewsService = Controller.getDefault().getNewsService();
     createResources();
@@ -111,12 +120,17 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     Object element = cell.getElement();
     int unreadNewsCount = 0;
     int newNewsCount = 0;
+    int stickyNewsCount = 0;
+    boolean hasNew = false;
 
     /* Create Label for a Folder */
     if (element instanceof IFolder) {
       IFolder folder = (IFolder) element;
-      unreadNewsCount = getNewsCount(folder, true);
-      newNewsCount = getNewsCount(folder, false);
+
+      if (fIndicateState) {
+        unreadNewsCount = getNewsCount(folder, true);
+        newNewsCount = getNewsCount(folder, false);
+      }
 
       /* Image */
       if (folder.getParent() == null)
@@ -149,9 +163,12 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     else if (element instanceof IBookMark) {
       IBookMark bookmark = (IBookMark) element;
       FeedLinkReference feedLinkRef = bookmark.getFeedLinkReference();
-      unreadNewsCount = getUnreadNewsCount(feedLinkRef);
-      int stickyNewsCount = getStickyNewsCount(feedLinkRef);
-      boolean hasNew = getNewNewsCount(bookmark.getFeedLinkReference()) != 0;
+
+      if (fIndicateState) {
+        unreadNewsCount = getUnreadNewsCount(feedLinkRef);
+        stickyNewsCount = getStickyNewsCount(feedLinkRef);
+        hasNew = getNewNewsCount(bookmark.getFeedLinkReference()) != 0;
+      }
 
       /* Font */
       if (unreadNewsCount > 0)
@@ -213,8 +230,11 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     /* Create Label for a SearchMark */
     else if (element instanceof ISearchMark) {
       ISearchMark searchmark = (ISearchMark) element;
-      unreadNewsCount = searchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
-      boolean hasNew = searchmark.getResultCount(EnumSet.of(INews.State.NEW)) != 0;
+
+      if (fIndicateState) {
+        unreadNewsCount = searchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
+        hasNew = searchmark.getResultCount(EnumSet.of(INews.State.NEW)) != 0;
+      }
 
       /* Image */
       Image icon = hasNew && INDICATE_NEW ? fSearchMarkNewIcon : fSearchMarkIcon;
