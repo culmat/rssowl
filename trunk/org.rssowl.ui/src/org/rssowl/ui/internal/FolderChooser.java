@@ -271,7 +271,7 @@ public class FolderChooser extends Composite implements DisposeListener {
     ((GridData) fFolderViewerContainer.getLayoutData()).exclude = true;
 
     /* Sort by Name if set so */
-    if (Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.BE_SORT_BY_NAME))
+    if (Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.BE_SORT_BY_NAME)) {
       fFolderViewer.setComparator(new ViewerComparator() {
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
@@ -281,6 +281,7 @@ public class FolderChooser extends Composite implements DisposeListener {
           return f1.getName().compareTo(f2.getName());
         }
       });
+    }
 
     /* Filter excluded Folders */
     fFolderViewer.addFilter(new ViewerFilter() {
@@ -331,7 +332,7 @@ public class FolderChooser extends Composite implements DisposeListener {
       public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
     });
 
-    fFolderViewer.setLabelProvider(new BookMarkLabelProvider());
+    fFolderViewer.setLabelProvider(new BookMarkLabelProvider(false));
     fFolderViewer.setInput(new Object());
 
     fFolderViewer.addSelectionChangedListener(new ISelectionChangedListener() {
