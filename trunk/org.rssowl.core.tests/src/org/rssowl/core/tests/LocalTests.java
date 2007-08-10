@@ -43,7 +43,7 @@ import org.rssowl.core.tests.util.MergeUtilsTest;
 
 /**
  * Test-Suite for Core-Tests that are not requiring Network-Access.
- * 
+ *
  * @author bpasero
  * @author Ismael Juma (ismael@juma.me.uk)
  */
