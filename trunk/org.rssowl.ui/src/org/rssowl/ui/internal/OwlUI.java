@@ -113,6 +113,9 @@ public class OwlUI {
   /** SearchMark (New) */
   public static final ImageDescriptor SEARCHMARK_NEW = Activator.getImageDescriptor("icons/obj16/searchmark_new.gif"); //$NON-NLS-1$
 
+  /** SearchMark (Empty) */
+  public static final ImageDescriptor SEARCHMARK_EMPTY = Activator.getImageDescriptor("icons/obj16/searchmark_empty.gif"); //$NON-NLS-1$
+
   /** Group */
   public static final ImageDescriptor GROUP = Activator.getImageDescriptor("icons/obj16/group.gif"); //$NON-NLS-1$
 
