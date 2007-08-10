@@ -97,6 +97,9 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
   /** One of the fields in this type described as constant */
   public static final int AGE_IN_DAYS = 18;
 
+  /** One of the fields in this type described as constant */
+  public static final int LOCATION = 19;
+
   /**
    * States of a INews being exclusive. Explanation follows:
    * <ul>

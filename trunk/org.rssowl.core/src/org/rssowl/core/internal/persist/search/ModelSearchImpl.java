@@ -52,13 +52,18 @@ import org.apache.lucene.store.NativeFSLockFactory;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
+import org.rssowl.core.persist.reference.BookMarkReference;
+import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IndexListener;
@@ -325,6 +330,10 @@ public class ModelSearchImpl implements IModelSearch {
     if (condition.getField().getId() == INews.AGE_IN_DAYS)
       query = createAgeClause(condition);
 
+    /* Separately handle this dynamic Query */
+    else if (condition.getField().getId() == INews.LOCATION)
+      query = createLocationClause(condition);
+
     /* Other Fields */
     else {
       try {
@@ -400,6 +409,61 @@ public class ModelSearchImpl implements IModelSearch {
     }
 
     throw new UnsupportedOperationException("Unsupported Specifier for Age Query");
+  }
+
+  /* This Clause needs to be generated dynamically */
+  private Query createLocationClause(ISearchCondition condition) {
+    BooleanQuery bQuery = new BooleanQuery();
+    Long[][] value = (Long[][]) condition.getValue();
+
+    /* Receive Folders */
+    for (int i = 0; value[0] != null && i < value[0].length; i++) {
+      try {
+        if (value[0][i] != null) {
+          IFolder folder = new FolderReference(value[0][i]).resolve();
+          addFolderLocationClause(bQuery, folder);
+        }
+      } catch (PersistenceException e) {
+        /* Ignore - Entity could have been deleted already */
+      }
+    }
+
+    /* Receive BookMarks */
+    for (int i = 0; value[1] != null && i < value[1].length; i++) {
+      try {
+        if (value[1][i] != null) {
+          IBookMark bookmark = new BookMarkReference(value[1][i]).resolve();
+          addBookMarkLocationClause(bQuery, bookmark);
+        }
+      } catch (PersistenceException e) {
+        /* Ignore - Entity could have been deleted already */
+      }
+    }
+
+    return bQuery;
+  }
+
+  private void addFolderLocationClause(BooleanQuery bQuery, IFolder folder) {
+    if (folder != null) {
+      List<IFolder> folders = folder.getFolders();
+      List<IMark> marks = folder.getMarks();
+
+      /* Child Folders */
+      for (IFolder childFolder : folders)
+        addFolderLocationClause(bQuery, childFolder);
+
+      /* BookMarks */
+      for (IMark mark : marks)
+        if (mark instanceof IBookMark)
+          addBookMarkLocationClause(bQuery, (IBookMark) mark);
+    }
+  }
+
+  private void addBookMarkLocationClause(BooleanQuery bQuery, IBookMark bookmark) {
+    if (bookmark != null) {
+      String feed = bookmark.getFeedLinkReference().getLink().toString().toLowerCase();
+      bQuery.add(new TermQuery(new Term(String.valueOf(INews.FEED), feed)), Occur.SHOULD);
+    }
   }
 
   private Query createStringQuery(ISearchCondition condition) throws ParseException, IOException {
