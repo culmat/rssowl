@@ -25,15 +25,20 @@
 package org.rssowl.ui.internal.util;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
+import org.rssowl.core.persist.reference.BookMarkReference;
+import org.rssowl.core.persist.reference.FolderReference;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.EntityGroup;
@@ -53,7 +58,95 @@ import java.util.Set;
 public class ModelUtils {
 
   /**
-   * @param selection
+   * @param entities A list of folder childs.
+   * @return Returns a multi-dimensional array where an array of {@link Long} is
+   * stored in the first index representing IDs of all {@link IFolder} in the
+   * list. The second index is an array of {@link Long} that represents the IDs
+   * of all {@link IBookMark} in the list. Returns <code>null</code> if the
+   * list of {@link IFolderChild} did not contain any folders or bookmarks.
+   */
+  public static Long[][] toPrimitive(List<IFolderChild> entities) {
+    List<Long> folderIds = null;
+    List<Long> bookmarkIds = null;
+
+    for (IEntity entity : entities) {
+
+      /* Folder */
+      if (entity instanceof IFolder) {
+        if (folderIds == null)
+          folderIds = new ArrayList<Long>();
+
+        folderIds.add(entity.getId());
+      }
+
+      /* BookMark */
+      else if (entity instanceof IBookMark) {
+        if (bookmarkIds == null)
+          bookmarkIds = new ArrayList<Long>();
+
+        bookmarkIds.add(entity.getId());
+      }
+
+      /* Other type not supported */
+      else
+        throw new IllegalArgumentException("Only Folders and Bookmars are allowed!");
+    }
+
+    Long[][] result = new Long[2][];
+
+    if (folderIds != null)
+      result[0] = folderIds.toArray(new Long[folderIds.size()]);
+
+    if (bookmarkIds != null)
+      result[1] = bookmarkIds.toArray(new Long[bookmarkIds.size()]);
+
+    if (folderIds == null && bookmarkIds == null)
+      return null;
+
+    return result;
+  }
+
+  /**
+   * @param primitives A multi-dimensional array where an array of {@link Long}
+   * is stored in the first index representing IDs of all {@link IFolder} in the
+   * list. The second index is an array of {@link Long} that represents the IDs
+   * of all {@link IBookMark} in the list.
+   * @return A list of folder childs.
+   */
+  public static List<IFolderChild> toEntities(Long[][] primitives) {
+    List<IFolderChild> childs = new ArrayList<IFolderChild>();
+
+    /* Folders */
+    for (int i = 0; primitives[0] != null && i < primitives[0].length; i++) {
+      try {
+        if (primitives[0][i] != null) {
+          IFolder folder = new FolderReference(primitives[0][i]).resolve();
+          if (folder != null)
+            childs.add(folder);
+        }
+      } catch (PersistenceException e) {
+        /* Ignore - Could be deleted already */
+      }
+    }
+
+    /* BookMarks */
+    for (int i = 0; primitives[1] != null && i < primitives[1].length; i++) {
+      try {
+        if (primitives[1][i] != null) {
+          IBookMark bookmark = new BookMarkReference(primitives[1][i]).resolve();
+          if (bookmark != null)
+            childs.add(bookmark);
+        }
+      } catch (PersistenceException e) {
+        /* Ignore - Could be deleted already */
+      }
+    }
+
+    return childs;
+  }
+
+  /**
+   * @param selection Any structured selection.
    * @return A List of Entities from the given Selection. In case the selection
    * contains an instanceof <code>EntityGroup</code>, only the content of the
    * group is considered.
@@ -62,7 +155,7 @@ public class ModelUtils {
     if (selection.isEmpty())
       return new ArrayList<IEntity>(0);
 
-    List< ? > elements = selection.toList();
+    List<?> elements = selection.toList();
     List<IEntity> entities = new ArrayList<IEntity>(elements.size());
 
     for (Object object : elements) {
@@ -73,6 +166,26 @@ public class ModelUtils {
         for (EntityGroupItem item : items)
           entities.add(item.getEntity());
       }
+    }
+
+    return entities;
+  }
+
+  /**
+   * @param selection Any structured selection.
+   * @return A List of {@link IFolderChild} from the given Selection containing
+   * {@link IFolder} and {@link IBookMark}.
+   */
+  public static List<IFolderChild> getFoldersAndBookMarks(IStructuredSelection selection) {
+    if (selection.isEmpty())
+      return new ArrayList<IFolderChild>(0);
+
+    List<?> elements = selection.toList();
+    List<IFolderChild> entities = new ArrayList<IFolderChild>(elements.size());
+
+    for (Object object : elements) {
+      if (object instanceof IFolder || object instanceof IBookMark)
+        entities.add((IFolderChild) object);
     }
 
     return entities;
@@ -90,7 +203,7 @@ public class ModelUtils {
     if (selection.isEmpty())
       return new ArrayList<T>(0);
 
-    List< ? > elements = selection.toList();
+    List<?> elements = selection.toList();
     List<T> entities = new ArrayList<T>(elements.size());
 
     for (Object object : elements) {
@@ -114,7 +227,7 @@ public class ModelUtils {
    * @param folder
    * @param entities
    */
-  public static void normalize(IFolder folder, List<IEntity> entities) {
+  public static void normalize(IFolder folder, List<? extends IEntity> entities) {
 
     /* Cleanup Marks */
     List<IMark> marks = folder.getMarks();
@@ -239,7 +352,7 @@ public class ModelUtils {
    * changed its value for any of the given Events, <code>FALSE</code>
    * otherwise.
    */
-  public static boolean isNewStateChange(Set< ? extends ModelEvent> events) {
+  public static boolean isNewStateChange(Set<? extends ModelEvent> events) {
     for (ModelEvent event : events) {
       if (event instanceof NewsEvent) {
         NewsEvent newsEvent = (NewsEvent) event;
@@ -260,7 +373,7 @@ public class ModelUtils {
    * changed its value for any of the given Events, <code>FALSE</code>
    * otherwise.
    */
-  public static boolean isStickyStateChange(Set< ? extends ModelEvent> events) {
+  public static boolean isStickyStateChange(Set<? extends ModelEvent> events) {
     for (ModelEvent event : events) {
       if (event instanceof NewsEvent) {
         NewsEvent newsEvent = (NewsEvent) event;
@@ -280,7 +393,7 @@ public class ModelUtils {
    * @return <code>TRUE</code> in case any state changed from NEW, UPDATED or
    * UNREAD to a different one, <code>FALSE</code> otherwise.
    */
-  public static boolean isReadStateChange(Set< ? extends ModelEvent> events) {
+  public static boolean isReadStateChange(Set<? extends ModelEvent> events) {
     for (ModelEvent event : events) {
       if (event instanceof NewsEvent) {
         NewsEvent newsEvent = (NewsEvent) event;
@@ -301,7 +414,7 @@ public class ModelUtils {
    * any unread-state (NEW, UPDATED, UNREAD) changed its value for any of the
    * given Events, <code>FALSE</code> otherwise.
    */
-  public static boolean isNewOrReadStateChange(Set< ? extends ModelEvent> events) {
+  public static boolean isNewOrReadStateChange(Set<? extends ModelEvent> events) {
     for (ModelEvent event : events) {
       if (event instanceof NewsEvent) {
         NewsEvent newsEvent = (NewsEvent) event;
@@ -336,7 +449,7 @@ public class ModelUtils {
    * @return <code>TRUE</code> in case any State changed for ther given
    * Events, <code>FALSE</code> otherwise.
    */
-  public static boolean isStateChange(Set< ? extends ModelEvent> events) {
+  public static boolean isStateChange(Set<? extends ModelEvent> events) {
     for (ModelEvent event : events) {
       if (event instanceof NewsEvent) {
         NewsEvent newsEvent = (NewsEvent) event;
@@ -354,7 +467,7 @@ public class ModelUtils {
    * @return <code>TRUE</code> in case any of the News got deleted and
    * <code>FALSE</code> otherwise.
    */
-  public static boolean gotDeleted(Set< ? extends ModelEvent> events) {
+  public static boolean gotDeleted(Set<? extends ModelEvent> events) {
     for (ModelEvent event : events) {
       if (event instanceof NewsEvent) {
         NewsEvent newsEvent = (NewsEvent) event;
@@ -394,7 +507,7 @@ public class ModelUtils {
    * @return <code>TRUE</code> in case any of the events tell about a change
    * in the Publish-Date of the News, <code>FALSE</code> otherwise.
    */
-  public static boolean isDateChange(Set< ? extends ModelEvent> events) {
+  public static boolean isDateChange(Set<? extends ModelEvent> events) {
     for (ModelEvent modelEvent : events) {
       if (modelEvent instanceof NewsEvent) {
         NewsEvent event = (NewsEvent) modelEvent;
@@ -414,7 +527,7 @@ public class ModelUtils {
    * @return <code>TRUE</code> in case any of the events tell about a change
    * in the Author of the News, <code>FALSE</code> otherwise.
    */
-  public static boolean isAuthorChange(Set< ? extends ModelEvent> events) {
+  public static boolean isAuthorChange(Set<? extends ModelEvent> events) {
     for (ModelEvent modelEvent : events) {
       if (modelEvent instanceof NewsEvent) {
         NewsEvent event = (NewsEvent) modelEvent;
@@ -436,7 +549,7 @@ public class ModelUtils {
    * @return <code>TRUE</code> in case any of the events tell about a change
    * in the Category of the News, <code>FALSE</code> otherwise.
    */
-  public static boolean isCategoryChange(Set< ? extends ModelEvent> events) {
+  public static boolean isCategoryChange(Set<? extends ModelEvent> events) {
     for (ModelEvent modelEvent : events) {
       if (modelEvent instanceof NewsEvent) {
         NewsEvent event = (NewsEvent) modelEvent;
@@ -456,7 +569,7 @@ public class ModelUtils {
    * @return <code>TRUE</code> in case any of the events tell about a change
    * in the Label of the News, <code>FALSE</code> otherwise.
    */
-  public static boolean isLabelChange(Set< ? extends ModelEvent> events) {
+  public static boolean isLabelChange(Set<? extends ModelEvent> events) {
     for (ModelEvent modelEvent : events) {
       if (modelEvent instanceof NewsEvent) {
         NewsEvent event = (NewsEvent) modelEvent;

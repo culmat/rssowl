@@ -33,9 +33,14 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.rssowl.core.Owl;
@@ -157,8 +162,17 @@ public class SearchConditionList extends ScrolledComposite {
    * Passes focus to the first item of this List.
    */
   public void focusInput() {
-    if (!fItems.isEmpty())
-      fItems.get(0).focusInput();
+    focusInput(0);
+  }
+
+  /**
+   * Passes focus to the Item in the list at the given index.
+   *
+   * @param index the index of the item to focus.
+   */
+  public void focusInput(int index) {
+    if (fItems.size() > index)
+      fItems.get(index).focusInput();
   }
 
   /**
@@ -294,17 +308,27 @@ public class SearchConditionList extends ScrolledComposite {
     item.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Create Button Box */
-    ToolBar buttonBar = new ToolBar(itemContainer, SWT.FLAT);
+    final ToolBar buttonBar = new ToolBar(itemContainer, SWT.FLAT);
     buttonBar.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
 
     /* Button to add Condition */
-    ToolItem addButton = new ToolItem(buttonBar, SWT.PUSH);
+    ToolItem addButton = new ToolItem(buttonBar, SWT.DROP_DOWN);
     addButton.setImage(fAddIcon);
     addButton.setToolTipText("Add Condition");
-    addButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        onAdd(item);
+
+    /* Add Menu */
+    final Menu conditionMenu = new Menu(buttonBar);
+    createConditionMenu(conditionMenu, item);
+    addButton.addListener(SWT.Selection, new Listener() {
+      public void handleEvent(Event event) {
+        if (event.detail == SWT.ARROW) {
+          Rectangle rect = item.getBounds();
+          Point pt = new Point(rect.x, rect.y + rect.height);
+          pt = buttonBar.toDisplay(pt);
+          conditionMenu.setLocation(pt.x, pt.y);
+          conditionMenu.setVisible(true);
+        } else
+          onAdd(item);
       }
     });
 
@@ -340,8 +364,126 @@ public class SearchConditionList extends ScrolledComposite {
     return item;
   }
 
+  private void createConditionMenu(Menu menu, SearchConditionItem item) {
+    IModelFactory factory = Owl.getModelFactory();
+    String news = INews.class.getName();
+
+    MenuItem mItem = new MenuItem(menu, SWT.PUSH);
+    mItem.setText("Entire News");
+    hookSelectionListener(mItem, item, factory.createSearchField(IEntity.ALL_FIELDS, news));
+
+    mItem = new MenuItem(menu, SWT.SEPARATOR);
+
+    mItem = new MenuItem(menu, SWT.PUSH);
+    mItem.setText("State");
+    hookSelectionListener(mItem, item, factory.createSearchField(INews.STATE, news));
+
+    mItem = new MenuItem(menu, SWT.PUSH);
+    mItem.setText("Location");
+    hookSelectionListener(mItem, item, factory.createSearchField(INews.LOCATION, news));
+
+    new MenuItem(menu, SWT.SEPARATOR);
+
+    mItem = new MenuItem(menu, SWT.PUSH);
+    mItem.setText("Title");
+    hookSelectionListener(mItem, item, factory.createSearchField(INews.TITLE, news));
+
+    mItem = new MenuItem(menu, SWT.PUSH);
+    mItem.setText("Description");
+    hookSelectionListener(mItem, item, factory.createSearchField(INews.DESCRIPTION, news));
+
+    mItem = new MenuItem(menu, SWT.PUSH);
+    mItem.setText("Author");
+    hookSelectionListener(mItem, item, factory.createSearchField(INews.AUTHOR, news));
+
+    mItem = new MenuItem(menu, SWT.PUSH);
+    mItem.setText("Category");
+    hookSelectionListener(mItem, item, factory.createSearchField(INews.CATEGORIES, news));
+
+    mItem = new MenuItem(menu, SWT.CASCADE);
+    mItem.setText("Date");
+
+    Menu dateMenu = new Menu(mItem);
+    mItem.setMenu(dateMenu);
+
+    mItem = new MenuItem(dateMenu, SWT.PUSH);
+    mItem.setText("Date Modified");
+    hookSelectionListener(mItem, item, factory.createSearchField(INews.MODIFIED_DATE, news));
+
+    mItem = new MenuItem(dateMenu, SWT.PUSH);
+    mItem.setText("Date Published");
+    hookSelectionListener(mItem, item, factory.createSearchField(INews.PUBLISH_DATE, news));
+
+    mItem = new MenuItem(dateMenu, SWT.PUSH);
+    mItem.setText("Date Received");
+    hookSelectionListener(mItem, item, factory.createSearchField(INews.RECEIVE_DATE, news));
+
+    new MenuItem(dateMenu, SWT.SEPARATOR);
+
+    mItem = new MenuItem(dateMenu, SWT.PUSH);
+    mItem.setText("Age in Days");
+    hookSelectionListener(mItem, item, factory.createSearchField(INews.AGE_IN_DAYS, news));
+
+    mItem = new MenuItem(menu, SWT.SEPARATOR);
+
+    mItem = new MenuItem(menu, SWT.CASCADE);
+    mItem.setText("Other");
+
+    Menu otherMenu = new Menu(mItem);
+    mItem.setMenu(otherMenu);
+
+    mItem = new MenuItem(otherMenu, SWT.PUSH);
+    mItem.setText("Has Attachments");
+    hookSelectionListener(mItem, item, factory.createSearchField(INews.HAS_ATTACHMENTS, news));
+
+    mItem = new MenuItem(otherMenu, SWT.PUSH);
+    mItem.setText("Attachment");
+    hookSelectionListener(mItem, item, factory.createSearchField(INews.ATTACHMENTS_CONTENT, news));
+
+    new MenuItem(otherMenu, SWT.SEPARATOR);
+
+    mItem = new MenuItem(otherMenu, SWT.PUSH);
+    mItem.setText("Source");
+    hookSelectionListener(mItem, item, factory.createSearchField(INews.SOURCE, news));
+
+    mItem = new MenuItem(otherMenu, SWT.PUSH);
+    mItem.setText("Link");
+    hookSelectionListener(mItem, item, factory.createSearchField(INews.LINK, news));
+
+    mItem = new MenuItem(otherMenu, SWT.PUSH);
+    mItem.setText("Is Sticky");
+    hookSelectionListener(mItem, item, factory.createSearchField(INews.IS_FLAGGED, news));
+
+    mItem = new MenuItem(otherMenu, SWT.PUSH);
+    mItem.setText("Feed");
+    hookSelectionListener(mItem, item, factory.createSearchField(INews.FEED, news));
+
+    mItem = new MenuItem(otherMenu, SWT.PUSH);
+    mItem.setText("Label");
+    hookSelectionListener(mItem, item, factory.createSearchField(INews.LABEL, news));
+  }
+
+  private void hookSelectionListener(MenuItem item, final SearchConditionItem condition, final ISearchField field) {
+    item.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        onAdd(condition, field);
+      }
+    });
+  }
+
   int indexOf(SearchConditionItem item) {
     return fItems.indexOf(item);
+  }
+
+  void onAdd(SearchConditionItem selectedItem, ISearchField field) {
+    ISearchCondition condition = createCondition(selectedItem.createCondition(null, false));
+    condition.setField(field);
+
+    SearchConditionItem addedItem = addItem(condition, indexOf(selectedItem) + 1);
+    addedItem.focusInput();
+
+    fModified = true;
   }
 
   void onAdd(SearchConditionItem selectedItem) {

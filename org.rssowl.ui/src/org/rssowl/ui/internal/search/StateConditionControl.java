@@ -33,7 +33,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.INews.State;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.EnumSet;
@@ -55,17 +54,13 @@ public class StateConditionControl extends Composite {
   private Button fUnreadState;
   private Button fUpdatedState;
   private Button fReadState;
-  private EnumSet<State> fSelectedStates;
 
   /**
    * @param parent The parent Composite.
    * @param style The Style as defined by SWT constants.
-   * @param selectedStates The states that are initially selected or
-   * <code>NULL</code> if none.
    */
-  StateConditionControl(Composite parent, int style, EnumSet<INews.State> selectedStates) {
+  StateConditionControl(Composite parent, int style) {
     super(parent, style);
-    fSelectedStates = selectedStates;
 
     initComponents();
   }
@@ -115,10 +110,6 @@ public class StateConditionControl extends Composite {
     fReadState.setSelection(selectedStates != null && selectedStates.contains(INews.State.READ));
   }
 
-  boolean hasSelected() {
-    return fNewState.getSelection() || fUnreadState.getSelection() || fUpdatedState.getSelection() || fReadState.getSelection();
-  }
-
   private void initComponents() {
 
     /* Apply Gridlayout */
@@ -127,25 +118,21 @@ public class StateConditionControl extends Composite {
     /* State: New */
     fNewState = new Button(this, SWT.CHECK);
     fNewState.setText("New");
-    fNewState.setSelection(fSelectedStates != null && fSelectedStates.contains(INews.State.NEW));
     fNewState.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
     /* State: Unread */
     fUnreadState = new Button(this, SWT.CHECK);
     fUnreadState.setText("Unread");
-    fUnreadState.setSelection(fSelectedStates != null && fSelectedStates.contains(INews.State.UNREAD));
     fUnreadState.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
     /* State: Updated */
     fUpdatedState = new Button(this, SWT.CHECK);
     fUpdatedState.setText("Updated");
-    fUpdatedState.setSelection(fSelectedStates != null && fSelectedStates.contains(INews.State.UPDATED));
     fUpdatedState.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
     /* State: Read */
     fReadState = new Button(this, SWT.CHECK);
     fReadState.setText("Read");
-    fReadState.setSelection(fSelectedStates != null && fSelectedStates.contains(INews.State.READ));
     fReadState.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
     /* Selection Listener to issue modify events */

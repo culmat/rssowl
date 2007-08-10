@@ -228,7 +228,12 @@ public class SearchConditionItem extends Composite {
     fSpecifierViewer.setInput(fCondition.getField());
 
     /* Select the Condition's Specifier */
-    fSpecifierViewer.setSelection(new StructuredSelection(fCondition.getSpecifier()));
+    if (fCondition.getSpecifier() != null)
+      fSpecifierViewer.setSelection(new StructuredSelection(fCondition.getSpecifier()));
+
+    /* Make sure to at least select the first item */
+    if (fSpecifierViewer.getSelection().isEmpty())
+      fSpecifierViewer.getCombo().select(0);
 
     /* Listen to Selection Changes in the Field-Viewer */
     fFieldViewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -290,7 +295,7 @@ public class SearchConditionItem extends Composite {
 
     /* Specially treat News-State */
     if (field.getId() == INews.STATE) {
-      final StateConditionControl stateConditionControl = new StateConditionControl(inputField, SWT.NONE, null);
+      final StateConditionControl stateConditionControl = new StateConditionControl(inputField, SWT.NONE);
       stateConditionControl.addListener(SWT.Modify, new Listener() {
         public void handleEvent(Event event) {
           fInputValue = stateConditionControl.getSelection();
@@ -307,6 +312,27 @@ public class SearchConditionItem extends Composite {
 
       /* Update Input Value */
       fInputValue = stateConditionControl.getSelection();
+    }
+
+    /* Specially treat News-Location */
+    else if (field.getId() == INews.LOCATION) {
+      final LocationConditionControl locationConditionControl = new LocationConditionControl(inputField, SWT.NONE);
+      locationConditionControl.addListener(SWT.Modify, new Listener() {
+        public void handleEvent(Event event) {
+          fInputValue = locationConditionControl.getSelection();
+
+          if (fInputValue == null && input != null || (fInputValue != null && !fInputValue.equals(input)))
+            fModified = true;
+        }
+      });
+
+      /* Pre-Select input if given */
+      Object presetInput = (input == null) ? fInputValue : input;
+      if (presetInput != null && presetInput instanceof Long[][])
+        locationConditionControl.select((Long[][]) presetInput);
+
+      /* Update Input Value */
+      fInputValue = locationConditionControl.getSelection();
     }
 
     /* Create new Input Field based on search-value-type */
@@ -552,6 +578,7 @@ public class SearchConditionItem extends Composite {
     if (INews.class.getName().equals(entityName)) {
       fields.add(fFactory.createSearchField(IEntity.ALL_FIELDS, entityName));
       fields.add(fFactory.createSearchField(INews.STATE, entityName));
+      fields.add(fFactory.createSearchField(INews.LOCATION, entityName));
       fields.add(fFactory.createSearchField(INews.TITLE, entityName));
       fields.add(fFactory.createSearchField(INews.DESCRIPTION, entityName));
       fields.add(fFactory.createSearchField(INews.AUTHOR, entityName));

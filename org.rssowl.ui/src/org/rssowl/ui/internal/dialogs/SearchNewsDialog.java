@@ -86,6 +86,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
@@ -425,13 +426,38 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
   /**
    * @param parentShell
-   * @param conditions A List of Conditions that should show initially.
+   * @param searchScope
+   */
+  public SearchNewsDialog(Shell parentShell, List<IFolderChild> searchScope) {
+    this(parentShell, toSearchConditions(searchScope), true, false);
+  }
+
+  private static List<ISearchCondition> toSearchConditions(List<IFolderChild> searchScope) {
+    IModelFactory factory = Owl.getModelFactory();
+    List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(2);
+
+    /* Add scope as condition if provided */
+    if (!searchScope.isEmpty()) {
+      ISearchField field = factory.createSearchField(INews.LOCATION, INews.class.getName());
+      conditions.add(factory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(searchScope)));
+    }
+
+    /* Add default condition as well */
+    ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
+    conditions.add(factory.createSearchCondition(field, SearchSpecifier.CONTAINS, ""));
+
+    return conditions;
+  }
+
+  /**
+   * @param parentShell
+   * @param initialConditions A List of Conditions that should show initially.
    * @param matchAllConditions If <code>TRUE</code>, require all conditions
    * to match, <code>FALSE</code> otherwise.
    * @param runSearch If <code>TRUE</code>, run the search after the dialog
    * opened.
    */
-  public SearchNewsDialog(Shell parentShell, List<ISearchCondition> conditions, boolean matchAllConditions, boolean runSearch) {
+  public SearchNewsDialog(Shell parentShell, List<ISearchCondition> initialConditions, boolean matchAllConditions, boolean runSearch) {
     super(parentShell);
 
     fResources = new LocalResourceManager(JFaceResources.getResources());
@@ -439,7 +465,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fFirstTimeOpen = (fDialogSettings.getSection(SETTINGS_SECTION) == null);
     fModelSearch = Owl.getPersistenceService().getModelSearch();
     fHandCursor = parentShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND);
-    fInitialConditions = conditions;
+    fInitialConditions = initialConditions;
     fMatchAllConditions = matchAllConditions;
     fRunSearch = runSearch;
     fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
@@ -541,7 +567,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     new Label(bottomSash, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.END, true, false));
 
     Composite bottomSashContent = new Composite(bottomSash, SWT.None);
-    bottomSashContent.setLayout(LayoutUtils.createGridLayout(1, 0, 2, 0, 0, false));
+    bottomSashContent.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
     bottomSashContent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
     /* Create Viewer for Results */
@@ -631,7 +657,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Container for Conditions */
     final Composite conditionsContainer = new Composite(container, SWT.NONE);
     conditionsContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-    conditionsContainer.setLayout(LayoutUtils.createGridLayout(2));
+    conditionsContainer.setLayout(LayoutUtils.createGridLayout(2, 5, 10));
     conditionsContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
     conditionsContainer.setBackgroundMode(SWT.INHERIT_FORCE);
     conditionsContainer.addPaintListener(new PaintListener() {
@@ -647,11 +673,17 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fSearchConditionList = new SearchConditionList(conditionsContainer, SWT.None, getDefaultConditions());
     fSearchConditionList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
     fSearchConditionList.setVisibleItemCount(3);
-    fSearchConditionList.focusInput();
 
     /* Show Initial Conditions if present */
     if (fInitialConditions != null)
       fSearchConditionList.showConditions(fInitialConditions);
+
+    /* Focus Input */
+    int index = 0;
+    if (fInitialConditions != null && fInitialConditions.size() == 2)
+      index = 1;
+
+    fSearchConditionList.focusInput(index);
   }
 
   /* Show conditions of the given searchmark */
@@ -679,14 +711,14 @@ public class SearchNewsDialog extends TitleAreaDialog {
     layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
     layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
 
-    Composite buttonBar = new Composite(parent, SWT.None);
+    Composite buttonBar = new Composite(parent, SWT.NONE);
     buttonBar.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     buttonBar.setLayout(layout);
 
     /* Status Label */
     fStatusLabel = new Link(buttonBar, SWT.NONE);
     fStatusLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-    ((GridData)fStatusLabel.getLayoutData()).heightHint = 20;
+    ((GridData) fStatusLabel.getLayoutData()).heightHint = 20;
     fStatusLabel.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

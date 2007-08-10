@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.views.explorer;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IMenuListener;
@@ -119,6 +120,7 @@ import org.rssowl.ui.internal.actions.NewFolderAction;
 import org.rssowl.ui.internal.actions.NewSearchMarkAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.actions.RetargetActions;
+import org.rssowl.ui.internal.actions.SearchInTypeAction;
 import org.rssowl.ui.internal.dialogs.ManageSetsDialog;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
@@ -1043,7 +1045,7 @@ public class BookMarkExplorer extends ViewPart {
     manager.add(newMenu);
 
     /* New BookMark */
-    newMenu.add(new Action("Bookmark") {
+    newMenu.add(new Action("Bookmark...") {
       @Override
       public void run() {
         IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
@@ -1059,7 +1061,7 @@ public class BookMarkExplorer extends ViewPart {
     });
 
     /* New Saved Search */
-    newMenu.add(new Action("Saved Search") {
+    newMenu.add(new Action("Saved Search...") {
       @Override
       public void run() {
         IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
@@ -1076,7 +1078,7 @@ public class BookMarkExplorer extends ViewPart {
 
     /* New Folder */
     newMenu.add(new Separator());
-    newMenu.add(new Action("Folder") {
+    newMenu.add(new Action("Folder...") {
       @Override
       public void run() {
         IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
@@ -1090,6 +1092,12 @@ public class BookMarkExplorer extends ViewPart {
         return OwlUI.FOLDER;
       }
     });
+
+    manager.add(new GroupMarker(IWorkbenchActionConstants.NEW_EXT));
+
+    /* Search News */
+    manager.add(new Separator());
+    manager.add(new SearchInTypeAction(fViewSite.getWorkbenchWindow(), fViewer));
 
     /* Allow Contributions */
     manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
