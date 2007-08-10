@@ -218,7 +218,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   }
 
   /* Returns the news that have been added since the last refresh */
-  List<INews> refreshCache(IMark[] input, boolean onlyAdd) throws PersistenceException {
+  synchronized List<INews> refreshCache(IMark[] input, boolean onlyAdd) throws PersistenceException {
     List<INews> addedNews = Collections.emptyList();
 
     /* Update Input */
@@ -375,7 +375,7 @@ public class NewsContentProvider implements ITreeContentProvider {
                 addedNews.add(news);
 
                 /* Update Cache */
-                synchronized (fCachedNews) {
+                synchronized (NewsContentProvider.this) {
                   fCachedNews.add(news);
                 }
               }
@@ -421,7 +421,7 @@ public class NewsContentProvider implements ITreeContentProvider {
                     deletedNews = new ArrayList<INews>();
                   deletedNews.add(news);
 
-                  synchronized (fCachedNews) {
+                  synchronized (NewsContentProvider.this) {
                     fCachedNews.remove(news);
                   }
                 }
@@ -485,7 +485,7 @@ public class NewsContentProvider implements ITreeContentProvider {
                   deletedNews = new ArrayList<INews>();
                 deletedNews.add(news);
 
-                synchronized (fCachedNews) {
+                synchronized (NewsContentProvider.this) {
                   fCachedNews.remove(news);
                 }
               }
