@@ -86,6 +86,9 @@ public class OwlUI {
   /** Top-Level Menu ID for "Tools" */
   public static final String M_TOOLS = "tools"; //$NON-NLS-1$
 
+  /** Top-Level Menu ID for "Mark" */
+  public static final String M_MARK = "mark"; //$NON-NLS-1$
+
   /** Default */
   public static final ImageDescriptor UNKNOWN = Activator.getImageDescriptor("icons/obj16/default.gif"); //$NON-NLS-1$
 

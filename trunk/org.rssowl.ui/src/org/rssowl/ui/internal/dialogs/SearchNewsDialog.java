@@ -1158,7 +1158,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
         manager.add(new Separator("internalopen"));
         manager.add(new GroupMarker("open"));
-        manager.add(new Separator("mark"));
+        manager.add(new Separator(OwlUI.M_MARK));
         manager.add(new Separator("edit"));
         manager.add(new Separator("copy"));
         manager.add(new Separator("label"));

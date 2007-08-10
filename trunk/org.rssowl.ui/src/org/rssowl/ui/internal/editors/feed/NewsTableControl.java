@@ -567,7 +567,7 @@ public class NewsTableControl implements IFeedViewPart {
       public void menuAboutToShow(IMenuManager manager) {
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
         manager.add(new Separator("open"));
-        manager.add(new Separator("mark"));
+        manager.add(new Separator(OwlUI.M_MARK));
         manager.add(new Separator("edit"));
         manager.add(new Separator("copy"));
         manager.add(new Separator("label"));

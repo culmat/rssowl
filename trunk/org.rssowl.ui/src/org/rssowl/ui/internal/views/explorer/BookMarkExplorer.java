@@ -1095,6 +1095,9 @@ public class BookMarkExplorer extends ViewPart {
 
     manager.add(new GroupMarker(IWorkbenchActionConstants.NEW_EXT));
 
+    /* Mark Read */
+    manager.add(new Separator(OwlUI.M_MARK));
+
     /* Search News */
     manager.add(new Separator());
     manager.add(new SearchInTypeAction(fViewSite.getWorkbenchWindow(), fViewer));
