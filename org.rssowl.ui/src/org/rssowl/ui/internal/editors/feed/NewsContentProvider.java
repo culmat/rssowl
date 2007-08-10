@@ -113,34 +113,40 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* This is a FeedReference */
       else if (object instanceof FeedLinkReference) {
-        Collection<INews> news = fCachedNews;
-        if (news != null) {
-          if (fGrouping.getType() == NewsGrouping.Type.NO_GROUPING)
-            elements.addAll(news);
-          else
-            elements.addAll(fGrouping.group(news));
+        synchronized (NewsContentProvider.this) {
+          Collection<INews> news = fCachedNews;
+          if (news != null) {
+            if (fGrouping.getType() == NewsGrouping.Type.NO_GROUPING)
+              elements.addAll(news);
+            else
+              elements.addAll(fGrouping.group(news));
+          }
         }
       }
 
       /* This is a Bookmark */
       else if (object instanceof BookMarkReference) {
-        Collection<INews> news = fCachedNews;
-        if (news != null) {
-          if (fGrouping.getType() == NewsGrouping.Type.NO_GROUPING)
-            elements.addAll(news);
-          else
-            elements.addAll(fGrouping.group(news));
+        synchronized (NewsContentProvider.this) {
+          Collection<INews> news = fCachedNews;
+          if (news != null) {
+            if (fGrouping.getType() == NewsGrouping.Type.NO_GROUPING)
+              elements.addAll(news);
+            else
+              elements.addAll(fGrouping.group(news));
+          }
         }
       }
 
       /* This is a SearchMark */
       else if (object instanceof SearchMarkReference) {
-        Collection<INews> news = fCachedNews;
-        if (news != null) {
-          if (fGrouping.getType() == NewsGrouping.Type.NO_GROUPING)
-            elements.addAll(news);
-          else
-            elements.addAll(fGrouping.group(news));
+        synchronized (NewsContentProvider.this) {
+          Collection<INews> news = fCachedNews;
+          if (news != null) {
+            if (fGrouping.getType() == NewsGrouping.Type.NO_GROUPING)
+              elements.addAll(news);
+            else
+              elements.addAll(fGrouping.group(news));
+          }
         }
       }
 
