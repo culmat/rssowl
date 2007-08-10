@@ -251,6 +251,8 @@ public class SearchField implements ISearchField {
           return "Feed";
         case (INews.AGE_IN_DAYS):
           return "Age in Days";
+        case (INews.LOCATION):
+          return "Location";
       }
     }
 

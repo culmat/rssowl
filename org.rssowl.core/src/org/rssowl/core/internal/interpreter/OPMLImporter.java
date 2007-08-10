@@ -205,6 +205,9 @@ public class OPMLImporter implements ITypeImporter {
     if ("ageInDays".equals(fieldName))
       return INews.AGE_IN_DAYS;
 
+    if ("location".equals(fieldName))
+      return INews.LOCATION;
+
     return IEntity.ALL_FIELDS;
   }
 
