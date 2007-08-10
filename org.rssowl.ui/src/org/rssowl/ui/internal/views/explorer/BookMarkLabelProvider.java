@@ -61,9 +61,6 @@ public class BookMarkLabelProvider extends CellLabelProvider {
   /* News Service */
   private NewsService fNewsService;
 
-  /* Define whether to indicate *new* News in Bookmarks */
-  private static final boolean INDICATE_NEW = true;
-
   /* Commonly used Resources */
   private Image fFolderIcon;
   private Image fFolderNewIcon;
@@ -71,6 +68,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
   private Image fBookMarkIcon;
   private Image fSearchMarkIcon;
   private Image fSearchMarkNewIcon;
+  private Image fSearchMarkEmptyIcon;
   private Image fGroupIcon;
   private Image fBookmarkSetIcon;
   private Color fStickyBgColor;
@@ -105,6 +103,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     fBookMarkIcon = OwlUI.getImage(fResources, OwlUI.BOOKMARK);
     fSearchMarkIcon = OwlUI.getImage(fResources, OwlUI.SEARCHMARK);
     fSearchMarkNewIcon = OwlUI.getImage(fResources, OwlUI.SEARCHMARK_NEW);
+    fSearchMarkEmptyIcon = OwlUI.getImage(fResources, OwlUI.SEARCHMARK_EMPTY);
 
     /* Fonts */
     fBoldFont = OwlUI.getThemeFont(OwlUI.BKMRK_EXPLORER_FONT_ID, SWT.BOLD);
@@ -215,7 +214,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
         Image icon = favicon != null ? OwlUI.getImage(fResources, favicon) : fBookMarkIcon;
 
         /* Overlay if News are *new* */
-        if (hasNew && INDICATE_NEW) {
+        if (hasNew) {
           DecorationOverlayIcon overlay = new DecorationOverlayIcon(icon, OwlUI.getImageDescriptor("icons/ovr16/new.gif"), IDecoration.BOTTOM_RIGHT);
           cell.setImage(OwlUI.getImage(fResources, overlay));
         }
@@ -230,14 +229,23 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     /* Create Label for a SearchMark */
     else if (element instanceof ISearchMark) {
       ISearchMark searchmark = (ISearchMark) element;
+      boolean hasMatchingNews = false;
 
       if (fIndicateState) {
         unreadNewsCount = searchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
         hasNew = searchmark.getResultCount(EnumSet.of(INews.State.NEW)) != 0;
+        hasMatchingNews = unreadNewsCount > 0 || searchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED, INews.State.READ)) != 0;
       }
 
       /* Image */
-      Image icon = hasNew && INDICATE_NEW ? fSearchMarkNewIcon : fSearchMarkIcon;
+      Image icon;
+      if (hasNew)
+        icon = fSearchMarkNewIcon;
+      else if (hasMatchingNews)
+        icon = fSearchMarkIcon;
+      else
+        icon = fSearchMarkEmptyIcon;
+
       cell.setImage(icon);
 
       /* Font */
