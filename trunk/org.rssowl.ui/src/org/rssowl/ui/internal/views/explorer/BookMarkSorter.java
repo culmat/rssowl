@@ -41,7 +41,8 @@ public class BookMarkSorter extends ViewerComparator {
   /* Return this is the sort should be skipped for two elements */
   private static final int SKIP_SORT = 0;
 
-  enum Type {
+  /** Sort Type */
+  public enum Type {
 
     /** Apply Default Sorting */
     DEFAULT_SORTING,
@@ -59,7 +60,10 @@ public class BookMarkSorter extends ViewerComparator {
   /* The current Sorter Type */
   private Type fType = Type.DEFAULT_SORTING;
 
-  void setType(BookMarkSorter.Type type) {
+  /**
+   * @param type the type of sorting as described by {@link BookMarkSorter.Type}
+   */
+  public void setType(BookMarkSorter.Type type) {
     fType = type;
   }
 

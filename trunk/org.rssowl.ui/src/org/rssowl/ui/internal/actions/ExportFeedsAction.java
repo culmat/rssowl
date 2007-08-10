@@ -177,6 +177,10 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
   private String toXML(ISearchCondition condition) {
     StringBuilder str = new StringBuilder();
 
+    /* TODO Support location Import/Export */
+    if (condition.getValue() instanceof Long[][])
+      return str.toString();
+
     /* Search Specifier */
     str.append("\t\t<rssowl:searchspecifier id=\"" + condition.getSpecifier().ordinal() + "\" />\n");
 
@@ -244,6 +248,8 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
         return "feed";
       case (INews.AGE_IN_DAYS):
         return "ageInDays";
+      case (INews.LOCATION):
+        return "location";
       default:
         return "allFields";
     }

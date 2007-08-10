@@ -41,7 +41,7 @@
                definitionId="org.rssowl.ui.actions.NewBookMark"
                icon="icons/obj16/bookmark.gif"
                id="org.rssowl.ui.actions.NewBookMark"
-               label="Bookmark"
+               label="Bookmark..."
                menubarPath="file/new_sub/bookmark"
                style="push">
          </action>
@@ -50,7 +50,7 @@
                definitionId="org.rssowl.ui.actions.NewSearchMark"
                icon="icons/obj16/searchmark.gif"
                id="org.rssowl.ui.actions.NewSearchMark"
-               label="Saved Search"
+               label="Saved Search..."
                menubarPath="file/new_sub/searchmark"
                style="push">
          </action>
@@ -59,7 +59,7 @@
                definitionId="org.rssowl.ui.actions.NewFolder"
                icon="icons/obj16/folder.gif"
                id="org.rssowl.ui.actions.NewFolder"
-               label="Folder"
+               label="Folder..."
                menubarPath="file/new_sub/folder"
                style="push">
          </action>
@@ -104,7 +104,7 @@
                definitionId="org.rssowl.ui.SearchNewsAction"
                icon="icons/obj16/searchmark.gif"
                id="org.rssowl.ui.SearchNewsAction"
-               label="Search News"
+               label="Search News..."
                menubarPath="edit/editEnd"
                style="push"
                toolbarPath="search">
