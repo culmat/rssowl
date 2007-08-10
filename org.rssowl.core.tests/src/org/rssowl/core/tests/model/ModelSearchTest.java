@@ -24,6 +24,7 @@
 
 package org.rssowl.core.tests.model;
 
+import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 
@@ -32,9 +33,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IAttachment;
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
@@ -45,11 +49,13 @@ import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.tests.TestUtils;
 import org.rssowl.core.util.SearchHit;
+import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -2830,6 +2836,145 @@ public class ModelSearchTest {
 
       List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
       assertSame(result, news3, news4);
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSearchNewsWithLocation() throws Exception {
+
+    /* First add some Types */
+    IFolder rootFolder = fFactory.createFolder(null, null, "Root");
+    DynamicDAO.save(rootFolder);
+
+    IFolder subFolder = fFactory.createFolder(null, rootFolder, "Sub Folder");
+    DynamicDAO.save(subFolder);
+
+    IFeed feed1 = fFactory.createFeed(null, new URI("http://www.testSearchNewsWithLocationFeed1.com"));
+    IFeed feed2 = fFactory.createFeed(null, new URI("http://www.testSearchNewsWithLocationFeed2.com"));
+    IFeed feed3 = fFactory.createFeed(null, new URI("http://www.testSearchNewsWithLocationFeed3.com"));
+
+    INews news1 = createNews(feed1, "First News of Feed One", "http://www.news.com/news1.html", State.UNREAD);
+    INews news2 = createNews(feed1, "Second News of Feed One", "http://www.news.com/news2.html", State.NEW);
+
+    INews news3 = createNews(feed2, "First News of Feed Two", "http://www.news.com/news3.html", State.READ);
+    INews news4 = createNews(feed2, "Second News of Feed Two", "http://www.news.com/news4.html", State.NEW);
+
+    INews news5 = createNews(feed3, "First News of Feed Three", "http://www.news.com/news5.html", State.UPDATED);
+    INews news6 = createNews(feed3, "Second News of Feed Three", "http://www.news.com/news6.html", State.NEW);
+
+    DynamicDAO.save(feed1);
+    DynamicDAO.save(feed2);
+    DynamicDAO.save(feed3);
+
+    IBookMark rootMark1 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed1.getLink()), "rootMark1");
+    DynamicDAO.save(rootMark1);
+
+    IBookMark subRootMark1 = fFactory.createBookMark(null, subFolder, new FeedLinkReference(feed2.getLink()), "subRootMark1");
+    DynamicDAO.save(subRootMark1);
+
+    IBookMark subRootMark2 = fFactory.createBookMark(null, subFolder, new FeedLinkReference(feed3.getLink()), "subRootMark2");
+    DynamicDAO.save(subRootMark2);
+
+    /* Wait for Indexer */
+    waitForIndexer();
+
+    /* Location IS Root Folder */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { rootFolder })));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertSame(result, news1, news2, news3, news4, news5, news6);
+    }
+
+    /* Location IS NOT Root Folder */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS_NOT, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { rootFolder })));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertTrue(result.isEmpty());
+    }
+
+    /* Location IS Sub Folder */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { subFolder })));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertSame(result, news3, news4, news5, news6);
+    }
+
+    /* Location IS NOT Sub Folder */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS_NOT, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { subFolder })));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertSame(result, news1, news2);
+    }
+
+    /* Location IS Bookmark 1 */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { rootMark1 })));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertSame(result, news1, news2);
+    }
+
+    /* Location IS NOT Bookmark 1 */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS_NOT, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { rootMark1 })));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertSame(result, news3, news4, news5, news6);
+    }
+
+    /* Location IS Bookmark1 OR Location IS Bookmark2 */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { rootMark1 })));
+
+      ISearchField field2 = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+      ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { subRootMark1 })));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), false);
+      assertSame(result, news1, news2, news3, news4);
+    }
+
+    /* Location IS (rootMark1, subMark2) */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { rootMark1, subRootMark2 })));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), false);
+      assertSame(result, news1, news2, news5, news6);
+    }
+
+    /* Location IS NOT (rootMark1, subMark2) */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS_NOT, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { rootMark1, subRootMark2 })));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), false);
+      assertSame(result, news3, news4);
+    }
+
+    /* Location IS Sub Folder AND State is *new* */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { subFolder })));
+
+      ISearchField field2 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
+      ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), true);
+      assertSame(result, news4, news6);
     }
   }
 

@@ -30,7 +30,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * Test-Suite for Core-Tests.
- * 
+ *
  * @author bpasero
  * @author Ismael Juma (ismael@juma.me.uk)
  */
