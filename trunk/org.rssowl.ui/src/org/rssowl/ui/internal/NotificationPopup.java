@@ -101,7 +101,7 @@ import java.util.Map;
 public class NotificationPopup extends PopupDialog {
 
   /* Max. Number of News being displayed in the Popup */
-  private static final int MAX_NEWS = 5;
+  private static final int MAX_NEWS = 30;
 
   /* Default Width of the Popup */
   private static final int DEFAULT_WIDTH = 400;
@@ -126,6 +126,7 @@ public class NotificationPopup extends PopupDialog {
   private MouseTrackListener fMouseTrackListner;
   private IPreferenceScope fGlobalScope;
   private int fVisibleNewsCount;
+  private int fNewsLimit;
 
   NotificationPopup(int visibleNewsCount) {
     super(new Shell(PlatformUI.getWorkbench().getDisplay()), PopupDialog.INFOPOPUP_SHELLSTYLE | SWT.ON_TOP, false, false, false, false, null, null);
@@ -133,7 +134,12 @@ public class NotificationPopup extends PopupDialog {
     fMapFeedToBookmark = new HashMap<FeedLinkReference, IBookMark>();
     fBoldTextFont = OwlUI.getThemeFont(OwlUI.NOTIFICATION_POPUP_FONT_ID, SWT.BOLD);
     fGlobalScope = Owl.getPreferenceService().getGlobalScope();
-    fVisibleNewsCount = (visibleNewsCount > MAX_NEWS) ? MAX_NEWS : visibleNewsCount;
+
+    fNewsLimit = fGlobalScope.getInteger(DefaultPreferences.LIMIT_NOTIFICATION_SIZE);
+    if (fNewsLimit <= 0)
+      fNewsLimit = MAX_NEWS;
+
+    fVisibleNewsCount = (visibleNewsCount > fNewsLimit) ? fNewsLimit : visibleNewsCount;
     createAutoCloser();
     createMouseTrackListener();
 
@@ -186,7 +192,7 @@ public class NotificationPopup extends PopupDialog {
     fTitleCircleLabel.setText("RSSOwl - " + fNewsCounter + " incoming News");
 
     /* Never show more than MAX_NEWS news */
-    if (fRecentNews.size() >= MAX_NEWS)
+    if (fRecentNews.size() >= fNewsLimit)
       return;
 
     /* Add to recent News List */
@@ -211,7 +217,7 @@ public class NotificationPopup extends PopupDialog {
     /* Show News */
     int oldVisibleNewsCount = fVisibleNewsCount;
     fVisibleNewsCount = 0;
-    for (int i = 0; i < MAX_NEWS && i < fRecentNews.size(); i++) {
+    for (int i = 0; i < fNewsLimit && i < fRecentNews.size(); i++) {
       renderNews(fRecentNews.get(i));
       fVisibleNewsCount++;
     }

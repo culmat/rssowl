@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -63,6 +64,8 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   private Button fUseInternalBrowser;
   private Button fCustomBrowserSearchButton;
   private Button fConfirmDeleteNews;
+  private Button fLimitNotificationCheck;
+  private Spinner fLimitNotificationSpinner;
 
   /** Leave for reflection */
   public MiscPreferencePage() {
@@ -185,8 +188,39 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
       public void widgetSelected(SelectionEvent e) {
         fNotificationOnlyFromTray.setEnabled(fShowNotificationPopup.getSelection());
         fNotificationIsSticky.setEnabled(fShowNotificationPopup.getSelection());
+        fLimitNotificationCheck.setEnabled(fShowNotificationPopup.getSelection());
+        fLimitNotificationSpinner.setEnabled(fLimitNotificationCheck.isEnabled() && fLimitNotificationCheck.getSelection());
       }
     });
+
+    /* Limit number of News showing in Notification */
+    Composite limitNewsContainer = new Composite(notificationGroup, SWT.None);
+    limitNewsContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0));
+
+    int notificationLimit = fGlobalScope.getInteger(DefaultPreferences.LIMIT_NOTIFICATION_SIZE);
+
+    fLimitNotificationCheck = new Button(limitNewsContainer, SWT.CHECK);
+    fLimitNotificationCheck.setText("Show a maximum of ");
+    fLimitNotificationCheck.setEnabled(fShowNotificationPopup.getSelection());
+    fLimitNotificationCheck.setSelection(notificationLimit >= 0);
+    fLimitNotificationCheck.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        fLimitNotificationSpinner.setEnabled(fLimitNotificationCheck.getSelection());
+      }
+    });
+
+    fLimitNotificationSpinner = new Spinner(limitNewsContainer, SWT.BORDER);
+    fLimitNotificationSpinner.setMinimum(1);
+    fLimitNotificationSpinner.setMaximum(30);
+    fLimitNotificationSpinner.setEnabled(fLimitNotificationCheck.isEnabled() && fLimitNotificationCheck.getSelection());
+    if (notificationLimit > 0)
+      fLimitNotificationSpinner.setSelection(notificationLimit);
+    else
+      fLimitNotificationSpinner.setSelection(notificationLimit * -1);
+
+    Label label = new Label(limitNewsContainer, SWT.None);
+    label.setText(" News inside the notification");
 
     /* Only from Tray */
     fNotificationOnlyFromTray = new Button(notificationGroup, SWT.CHECK);
@@ -233,9 +267,15 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_MINIMIZE, fMinimizeToTray.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_START, fMoveToTrayOnStart.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_CLOSE, fMoveToTrayOnExit.getSelection());
+
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP, fShowNotificationPopup.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED, fNotificationOnlyFromTray.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP, fNotificationIsSticky.getSelection());
+
+    if (fLimitNotificationCheck.getSelection())
+      fGlobalScope.putInteger(DefaultPreferences.LIMIT_NOTIFICATION_SIZE, fLimitNotificationSpinner.getSelection());
+    else
+      fGlobalScope.putInteger(DefaultPreferences.LIMIT_NOTIFICATION_SIZE, fLimitNotificationSpinner.getSelection() * -1);
 
     fGlobalScope.putBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER, fUseDefaultExternalBrowser.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER, fUseCustomExternalBrowser.getSelection());
@@ -258,11 +298,19 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fMinimizeToTray.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE));
     fMoveToTrayOnStart.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_START));
     fMoveToTrayOnExit.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
+
     fShowNotificationPopup.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP));
     fNotificationOnlyFromTray.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED));
     fNotificationOnlyFromTray.setEnabled(fShowNotificationPopup.getSelection());
     fNotificationIsSticky.setSelection(defaultScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP));
     fNotificationIsSticky.setEnabled(fShowNotificationPopup.getSelection());
+
+    int limitNotificationValue = defaultScope.getInteger(DefaultPreferences.LIMIT_NOTIFICATION_SIZE);
+    fLimitNotificationCheck.setSelection(limitNotificationValue >= 0);
+    if (limitNotificationValue >= 0)
+      fLimitNotificationSpinner.setSelection(limitNotificationValue);
+    fLimitNotificationCheck.setEnabled(fShowNotificationPopup.getSelection());
+    fLimitNotificationSpinner.setEnabled(fShowNotificationPopup.getSelection());
 
     fUseDefaultExternalBrowser.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER));
     fUseCustomExternalBrowser.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER));
