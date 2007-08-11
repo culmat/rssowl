@@ -149,6 +149,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Leave Notification Popup open until closed */
   public static final String STICKY_NOTIFICATION_POPUP = "org.rssowl.pref.StickyNotificationPoup";
 
+  /** Global: Limit number of News in notification */
+  public static final String LIMIT_NOTIFICATION_SIZE = "org.rssowl.pref.LimitNotificationPoup";
+
   /** Global: Confirm deleting a News */
   public static final String CONFIRM_DELETE_NEWS = "org.rssowl.pref.ConfirmDeleteNews";
 
@@ -185,6 +188,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putInteger(MARK_READ_IN_MILLIS, 0);
     defaultScope.putBoolean(BM_OPEN_SITE_FOR_EMPTY_NEWS, false);
     defaultScope.putBoolean(BE_ENABLE_LINKING, true);
+    defaultScope.putInteger(LIMIT_NOTIFICATION_SIZE, 5);
     defaultScope.putBoolean(CONFIRM_DELETE_NEWS, true);
   }
 
