@@ -24,11 +24,8 @@
 
 package org.rssowl.ui.internal.actions;
 
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.persist.INews;
 import org.rssowl.ui.internal.util.BrowserUtils;
 
@@ -37,23 +34,23 @@ import java.util.List;
 /**
  * @author bpasero
  */
-public class OpenInExternalBrowserAction implements IWorkbenchWindowActionDelegate {
+public class OpenInExternalBrowserAction extends Action {
   private IStructuredSelection fSelection;
 
-  /*
-   * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
+  /**
+   * @param selection
    */
-  public void dispose() {}
+  public OpenInExternalBrowserAction(IStructuredSelection selection) {
+    fSelection = selection;
+
+    setText("Open in External Browser");
+  }
 
   /*
-   * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
+   * @see org.eclipse.jface.action.Action#run()
    */
-  public void init(IWorkbenchWindow window) {}
-
-  /*
-   * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-   */
-  public void run(IAction action) {
+  @Override
+  public void run() {
     List<?> selection = fSelection.toList();
     for (Object object : selection) {
       if (object instanceof INews) {
@@ -62,13 +59,5 @@ public class OpenInExternalBrowserAction implements IWorkbenchWindowActionDelega
           BrowserUtils.openLink(news.getLink().toString());
       }
     }
-  }
-
-  /*
-   * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
-   */
-  public void selectionChanged(IAction action, ISelection selection) {
-    if (selection instanceof IStructuredSelection)
-      fSelection = (IStructuredSelection) selection;
   }
 }

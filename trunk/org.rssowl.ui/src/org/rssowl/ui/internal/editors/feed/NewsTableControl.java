@@ -83,6 +83,7 @@ import org.rssowl.ui.internal.StatusLineUpdater;
 import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeTypesStickyAction;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
+import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.JobTracker;
@@ -565,14 +566,20 @@ public class NewsTableControl implements IFeedViewPart {
     manager.setRemoveAllWhenShown(true);
     manager.addMenuListener(new IMenuListener() {
       public void menuAboutToShow(IMenuManager manager) {
+        IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
+
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
         manager.add(new Separator("open"));
+
+        /* Show only when internal browser is used */
+        if (!selection.isEmpty() && !fPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
+          manager.add(new OpenInExternalBrowserAction(selection));
+
         manager.add(new Separator(OwlUI.M_MARK));
         manager.add(new Separator("edit"));
         manager.add(new Separator("copy"));
         manager.add(new Separator("label"));
 
-        IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
 
         /* Need a Selection here */
         if (selection.isEmpty())
