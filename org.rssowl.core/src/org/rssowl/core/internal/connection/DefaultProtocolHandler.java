@@ -34,6 +34,7 @@ import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
@@ -261,7 +262,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       inS = openConnection(client, getMethod);
 
       /* Try to pipe the resulting stream into a GZipInputStream */
-      inS = pipeStream(inS, getMethod);
+      if (inS != null)
+        inS = pipeStream(inS, getMethod);
     } catch (IOException e) {
       throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
     }
@@ -421,11 +423,12 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     /* Execute the GET Method */
     client.executeMethod(getMethod);
 
-    /** Finally retrieve the InputStream from the respond body */
+    /* Finally retrieve the InputStream from the respond body */
     return getMethod.getResponseBodyAsStream();
   }
 
   private InputStream pipeStream(InputStream inputStream, GetMethod getMethod) throws IOException {
+    Assert.isNotNull(inputStream);
 
     /* Retrieve the Content Encoding */
     String contentEncoding = getMethod.getResponseHeader("Content-Encoding") != null ? getMethod.getResponseHeader("Content-Encoding").getValue() : null; //$NON-NLS-1$ //$NON-NLS-2$
@@ -435,7 +438,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
      * Return in case the Content Encoding is not given and the InputStream does
      * not support mark() and reset()
      */
-    if ((contentEncoding == null || !contentEncoding.equals("gzip")) && (inputStream == null || !inputStream.markSupported())) //$NON-NLS-1$
+    if ((contentEncoding == null || !contentEncoding.equals("gzip")) && !inputStream.markSupported()) //$NON-NLS-1$
       return inputStream;
 
     /* Content Encoding is set to gzip, so use the GZipInputStream */
@@ -444,7 +447,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     }
 
     /* Detect if the Stream is gzip encoded */
-    else if (inputStream != null && inputStream.markSupported()) {
+    else if (inputStream.markSupported()) {
       inputStream.mark(2);
       int id1 = inputStream.read();
       int id2 = inputStream.read();
@@ -532,7 +535,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     StringBuilder strBuf = new StringBuilder();
     int c;
     while ((c = inputReader.read()) != -1) {
-      char character = (char)c;
+      char character = (char) c;
 
       /* Append all Characters, except for closing Tag or CR */
       if (character != '>' && character != '\n' && character != '\r')
