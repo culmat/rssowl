@@ -29,7 +29,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
@@ -92,7 +91,7 @@ public class SavedSearchService {
         /* Update all saved searches */
         SafeRunner.run(new LoggingSafeRunnable() {
           public void run() throws Exception {
-            if (PlatformUI.isWorkbenchRunning())
+            if (!Controller.getDefault().isShuttingDown())
               updateSavedSearches(true);
           }
         });
