@@ -417,6 +417,16 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
   private boolean internalPerformSingle(Set<IEntity> entitiesToSave) {
     IEntity entity = fEntities.get(0);
 
+    /* Require a Link */
+    if (entity instanceof IBookMark && fFeedInput.getText().length() == 0) {
+      fSite.select(this);
+      fFeedInput.setFocus();
+
+      fSite.setMessage("Please enter a link for the bookmark.", IPropertyDialogSite.MessageType.ERROR);
+
+      return false;
+    }
+
     /* Require a Name */
     if (fNameInput.getText().length() == 0) {
       fSite.select(this);
