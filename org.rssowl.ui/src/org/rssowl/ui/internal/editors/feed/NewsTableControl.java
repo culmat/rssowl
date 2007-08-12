@@ -645,8 +645,8 @@ public class NewsTableControl implements IFeedViewPart {
         manager.add(new Separator("copy"));
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
 
-        /* Need a Selection here */
-        if (selection.isEmpty())
+        /* Need a good Selection here */
+        if (selection.isEmpty() || (selection.size() == 1 && selection.getFirstElement() instanceof EntityGroup))
           return;
 
         /* Show in Feed (only for searchmarks) */
