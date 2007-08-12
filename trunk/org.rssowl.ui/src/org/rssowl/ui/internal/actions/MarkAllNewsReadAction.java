@@ -1,13 +1,3 @@
-package org.rssowl.ui.internal.actions;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.editors.feed.FeedView;
-import org.rssowl.ui.internal.editors.feed.FeedViewInput;
-
 /*   **********************************************************************  **
  **   Copyright notice                                                       **
  **                                                                          **
@@ -32,20 +22,46 @@ import org.rssowl.ui.internal.editors.feed.FeedViewInput;
  **                                                                          **
  **  **********************************************************************  */
 
+package org.rssowl.ui.internal.actions;
+
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.editors.feed.FeedView;
+import org.rssowl.ui.internal.editors.feed.FeedViewInput;
+
 /**
  * @author bpasero
  */
-public class MarkAllNewsReadAction implements IWorkbenchWindowActionDelegate {
+public class MarkAllNewsReadAction extends Action implements IWorkbenchWindowActionDelegate {
+
+  /** Leave for reflection */
+  public MarkAllNewsReadAction() {
+    setText("All News as Read");
+    setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/mark_all_read.gif"));
+  }
 
   /*
-   * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+   * @see org.eclipse.jface.action.Action#run()
    */
-  public void run(IAction action) {
+  @Override
+  public void run() {
     FeedView activeFeedView = OwlUI.getActiveFeedView();
     if (activeFeedView != null) {
       FeedViewInput input = (FeedViewInput) activeFeedView.getEditorInput();
       new MarkTypesReadAction(new StructuredSelection(input.getMark())).run();
     }
+  }
+
+  /*
+   * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
+   */
+  public void run(IAction action) {
+    run();
   }
 
   /*
