@@ -771,8 +771,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
               newsToUpdate.add(newsItem);
           }
 
-          /* Force quick update for SM */
-          if (!isBookMark)
+          /* Force quick update on Feed-Change */
+          if (event == UIEvent.FEED_CHANGE && !newsToUpdate.isEmpty())
             Controller.getDefault().getSavedSearchService().forceQuickUpdate();
 
           INewsDAO newsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
