@@ -113,6 +113,10 @@ public class MarkNewsReadAction extends Action implements IWorkbenchWindowAction
   @Override
   public void run() {
 
+    /* Nothing to do */
+    if (fSelection.isEmpty())
+      return;
+
     /* Mark Read */
     if (fMarkRead)
       new MarkTypesReadAction(fSelection).run();

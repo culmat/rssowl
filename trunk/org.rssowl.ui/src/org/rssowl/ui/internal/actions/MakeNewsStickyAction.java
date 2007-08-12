@@ -121,6 +121,8 @@ public class MakeNewsStickyAction extends Action implements IWorkbenchWindowActi
   @Override
   public void run() {
     List<INews> newsList = ModelUtils.getEntities(fSelection, INews.class);
+    if (newsList.isEmpty())
+      return;
 
     /* Set Sticky State */
     for (INews newsItem : newsList) {

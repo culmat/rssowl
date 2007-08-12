@@ -50,11 +50,17 @@ public class LabelAction extends Action {
     fSelection = selection;
   }
 
+  /*
+   * @see org.eclipse.jface.action.Action#run()
+   */
   @Override
   public void run() {
     List<INews> newsList = ModelUtils.getEntities(fSelection, INews.class);
+    if (newsList.isEmpty())
+      return;
+
+    /* Apply Label */
     for (INews newsItem : newsList) {
-      /* Apply Label */
       ILabel label = newsItem.getLabel();
       if (label == null && fLabel != null)
         newsItem.setLabel(fLabel);
