@@ -84,6 +84,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolderChild;
@@ -99,6 +100,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.SearchHit;
@@ -111,6 +113,7 @@ import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeTypesStickyAction;
+import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.editors.feed.NewsComparator;
 import org.rssowl.ui.internal.editors.feed.NewsTableControl;
@@ -198,6 +201,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private boolean fRunSearch;
   private boolean fMatchAllConditions;
   private INewsDAO fNewsDao;
+  private IPreferenceScope fPreferences;
 
   /* Container for a search result */
   private static class ScoredNews {
@@ -460,6 +464,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   public SearchNewsDialog(Shell parentShell, List<ISearchCondition> initialConditions, boolean matchAllConditions, boolean runSearch) {
     super(parentShell);
 
+    fPreferences = Owl.getPreferenceService().getGlobalScope();
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fDialogSettings = Activator.getDefault().getDialogSettings();
     fFirstTimeOpen = (fDialogSettings.getSection(SETTINGS_SECTION) == null);
@@ -1155,15 +1160,20 @@ public class SearchNewsDialog extends TitleAreaDialog {
     manager.setRemoveAllWhenShown(true);
     manager.addMenuListener(new IMenuListener() {
       public void menuAboutToShow(IMenuManager manager) {
+        IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
+
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
         manager.add(new Separator("internalopen"));
         manager.add(new GroupMarker("open"));
+
+        /* Show only when internal browser is used */
+        if (!selection.isEmpty() && !fPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
+          manager.add(new OpenInExternalBrowserAction(selection));
+
         manager.add(new Separator(OwlUI.M_MARK));
         manager.add(new Separator("edit"));
         manager.add(new Separator("copy"));
         manager.add(new Separator("label"));
-
-        IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
 
         /* Need a Selection here */
         if (selection.isEmpty())

@@ -838,19 +838,6 @@
       </objectContribution>
       <objectContribution
             adaptable="false"
-            id="org.rssowl.ui.OpenInExternalBrowserContribution"
-            objectClass="org.rssowl.core.persist.INews">
-         <action
-               class="org.rssowl.ui.internal.actions.OpenInExternalBrowserAction"
-               definitionId="org.rssowl.ui.OpenInExternalBrowserAction"
-               enablesFor="+"
-               id="org.rssowl.ui.OpenInExternalBrowserAction"
-               label="Open in External Browser"
-               menubarPath="open"
-               style="push"/>
-      </objectContribution>
-      <objectContribution
-            adaptable="false"
             id="org.rssowl.ui.OpenInBrowserContribution"
             objectClass="org.rssowl.core.persist.INews">
          <action
