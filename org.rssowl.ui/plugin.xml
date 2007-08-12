@@ -315,15 +315,7 @@
                style="push"
                tooltip="Open Selected Items"/>
          <action
-               class="org.rssowl.ui.internal.actions.MarkUnreadAction"
-               definitionId="org.rssowl.ui.actions.MarkUnread"
-               enablesFor="+"
-               id="org.rssowl.ui.actions.MarkUnread"
-               label="&amp;Mark Un-Read"
-               style="push"
-               tooltip="Mark selected Items as Un-Read"/>
-         <action
-               class="org.rssowl.ui.internal.actions.MakeTypesStickyAction"
+               class="org.rssowl.ui.internal.actions.MakeNewsStickyAction"
                definitionId="org.rssowl.ui.actions.ToggleFlag"
                enablesFor="+"
                icon="icons/obj16/news_pin.gif"
@@ -490,11 +482,6 @@
             description="Mark all News as Read"
             id="org.rssowl.ui.MarkAllRead"
             name="Mark All Read"/>
-      <command
-            categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Mark selected Items as Un-Read"
-            id="org.rssowl.ui.actions.MarkUnread"
-            name="Mark Unread"/>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             description="Toggle Flag of Selected Items"
@@ -711,13 +698,6 @@
                <objectClass
                      name="org.rssowl.core.persist.IFolder">
                </objectClass>
-               <objectClass
-                     name="org.rssowl.core.persist.INews">
-               </objectClass>
-               <objectState
-                     name="entity.group.category"
-                     value="org.rssowl.ui.internal.editors.feed.NewsGrouping">
-               </objectState>
                <objectState
                      name="entity.group.category"
                      value="org.rssowl.ui.internal.views.explorer.BookMarkGrouping">
@@ -848,20 +828,6 @@
                label="Open in Browser"
                menubarPath="open"
                style="push"/>
-      </objectContribution>
-      <objectContribution
-            adaptable="false"
-            id="org.rssowl.ui.MarkUnreadContribution"
-            objectClass="org.rssowl.core.persist.INews">
-         <action
-               class="org.rssowl.ui.internal.actions.MarkUnreadAction"
-               definitionId="org.rssowl.ui.actions.MarkUnread"
-               enablesFor="+"
-               id="org.rssowl.ui.actions.MarkUnread"
-               label="&amp;Mark Unread"
-               menubarPath="mark"
-               style="push"
-               tooltip="Mark selected Items as Un-Read"/>
       </objectContribution>
       <objectContribution
             adaptable="false"

@@ -24,18 +24,110 @@
 
 package org.rssowl.ui.internal.actions;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.FeedView;
+import org.rssowl.ui.internal.util.ModelUtils;
+
+import java.util.EnumSet;
+import java.util.List;
 
 /**
  * @author bpasero
  */
-public class MarkNewsReadAction implements IWorkbenchWindowActionDelegate {
+public class MarkNewsReadAction extends Action implements IWorkbenchWindowActionDelegate {
+  private static final EnumSet<INews.State> STATES = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
+
+  private IStructuredSelection fSelection;
+  private boolean fMarkRead;
+
+  /** Leave for reflection */
+  public MarkNewsReadAction() {}
+
+  /**
+   * @param selection
+   */
+  public MarkNewsReadAction(IStructuredSelection selection) {
+    fSelection = selection;
+
+    init();
+  }
+
+  /*
+   * @see org.eclipse.jface.action.Action#getStyle()
+   */
+  @Override
+  public int getStyle() {
+    return IAction.AS_CHECK_BOX;
+  }
+
+  private void init() {
+    List<INews> entities = ModelUtils.getEntities(fSelection, INews.class);
+    for (INews entity : entities) {
+
+      /* News which is unread */
+      if (STATES.contains(entity.getState())) {
+        fMarkRead = true;
+        break;
+      }
+    }
+  }
+
+  /*
+   * @see org.eclipse.jface.action.Action#getText()
+   */
+  @Override
+  public String getText() {
+    return "News as &Read";
+  }
+
+  /*
+   * @see org.eclipse.jface.action.Action#isChecked()
+   */
+  @Override
+  public boolean isChecked() {
+    return !fMarkRead;
+  }
+
+  /*
+   * @see org.eclipse.jface.action.Action#getImageDescriptor()
+   */
+  @Override
+  public ImageDescriptor getImageDescriptor() {
+    return OwlUI.getImageDescriptor("icons/elcl16/mark_read.gif");
+  }
+
+  /*
+   * @see org.eclipse.jface.action.Action#run()
+   */
+  @Override
+  public void run() {
+
+    /* Mark Read */
+    if (fMarkRead)
+      new MarkTypesReadAction(fSelection).run();
+
+    /* Mark Unread */
+    else {
+
+      /* Mark Saved Search Service as in need for a quick Update */
+      Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+
+      /* Only consider INews */
+      List<INews> newsList = ModelUtils.getEntities(fSelection, INews.class);
+      DynamicDAO.getDAO(INewsDAO.class).setState(newsList, INews.State.UNREAD, true, false);
+    }
+  }
 
   /*
    * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)

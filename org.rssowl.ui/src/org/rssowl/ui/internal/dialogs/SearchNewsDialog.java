@@ -112,7 +112,8 @@ import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.LabelAction;
-import org.rssowl.ui.internal.actions.MakeTypesStickyAction;
+import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
+import org.rssowl.ui.internal.actions.MarkNewsReadAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.editors.feed.NewsComparator;
@@ -1105,7 +1106,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
       /* Toggle State between Sticky / Not Sticky */
       if (data instanceof ScoredNews) {
-        new MakeTypesStickyAction(new StructuredSelection(((ScoredNews) data).getNews())).run();
+        new MakeNewsStickyAction(new StructuredSelection(((ScoredNews) data).getNews())).run();
       }
     }
   }
@@ -1162,62 +1163,82 @@ public class SearchNewsDialog extends TitleAreaDialog {
       public void menuAboutToShow(IMenuManager manager) {
         IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
 
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-        manager.add(new Separator("internalopen"));
-        manager.add(new GroupMarker("open"));
+        /* Open */
+        {
 
-        /* Show only when internal browser is used */
-        if (!selection.isEmpty() && !fPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
-          manager.add(new OpenInExternalBrowserAction(selection));
+          /* Open in FeedView */
+          manager.add(new Separator("internalopen"));
+          if (!selection.isEmpty())
+            manager.appendToGroup("internalopen", new OpenNewsAction(selection, getShell()));
 
-        manager.add(new Separator(OwlUI.M_MARK));
+          manager.add(new GroupMarker("open"));
+
+          /* Show only when internal browser is used */
+          if (!selection.isEmpty() && !fPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
+            manager.add(new OpenInExternalBrowserAction(selection));
+        }
+
+        /* Mark / Label */
+        if (!selection.isEmpty()) {
+          manager.add(new Separator("mark"));
+
+          /* Mark */
+          MenuManager markMenu = new MenuManager("Mark", "mark");
+          manager.add(markMenu);
+
+          /* Mark as Read */
+          IAction action = new MarkNewsReadAction(selection);
+          action.setEnabled(!selection.isEmpty());
+          markMenu.add(action);
+
+          /* Sticky */
+          markMenu.add(new Separator());
+          action = new MakeNewsStickyAction(selection);
+          action.setEnabled(!selection.isEmpty());
+          markMenu.add(action);
+
+          /* Label */
+          if (!selection.isEmpty()) {
+
+            /* Label */
+            MenuManager labelMenu = new MenuManager("Label");
+            manager.appendToGroup("mark", labelMenu);
+
+            /* Retrieve selected Labels from Selection (including NULL!) */
+            Set<ILabel> selectedLabels = ModelUtils.getLabels(selection);
+            ILabel commonLabel = null;
+            if (selectedLabels.size() == 1)
+              commonLabel = selectedLabels.iterator().next();
+
+            IAction labelNone = new Action("None", IAction.AS_RADIO_BUTTON) {
+              @Override
+              public void run() {
+                new LabelAction(null, (IStructuredSelection) fViewer.getSelection()).run();
+              }
+            };
+            labelNone.setChecked(selectedLabels.size() == 0 || (selectedLabels.size() == 1 && commonLabel == null));
+
+            labelMenu.add(labelNone);
+            labelMenu.add(new Separator());
+
+            Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
+            for (final ILabel label : labels) {
+              IAction labelAction = new Action(label.getName(), IAction.AS_RADIO_BUTTON) {
+                @Override
+                public void run() {
+                  new LabelAction(label, (IStructuredSelection) fViewer.getSelection()).run();
+                }
+              };
+
+              labelAction.setChecked(label.equals(commonLabel));
+              labelMenu.add(labelAction);
+            }
+          }
+        }
+
         manager.add(new Separator("edit"));
         manager.add(new Separator("copy"));
-        manager.add(new Separator("label"));
-
-        /* Need a Selection here */
-        if (selection.isEmpty())
-          return;
-
-        /* Open in FeedView */
-        manager.appendToGroup("internalopen", new OpenNewsAction(selection, getShell()));
-
-        /* Sticky */
-        manager.appendToGroup("label", new MakeTypesStickyAction(selection));
-
-        /* Label */
-        MenuManager labelMenu = new MenuManager("Label");
-        manager.appendToGroup("label", labelMenu);
-
-        /* Retrieve selected Labels from Selection (including NULL!) */
-        Set<ILabel> selectedLabels = ModelUtils.getLabels(selection);
-        ILabel commonLabel = null;
-        if (selectedLabels.size() == 1)
-          commonLabel = selectedLabels.iterator().next();
-
-        IAction labelNone = new Action("None", IAction.AS_RADIO_BUTTON) {
-          @Override
-          public void run() {
-            new LabelAction(null, (IStructuredSelection) fViewer.getSelection()).run();
-          }
-        };
-        labelNone.setChecked(selectedLabels.size() == 0 || (selectedLabels.size() == 1 && commonLabel == null));
-
-        labelMenu.add(labelNone);
-        labelMenu.add(new Separator());
-
-        Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
-        for (final ILabel label : labels) {
-          IAction labelAction = new Action(label.getName(), IAction.AS_RADIO_BUTTON) {
-            @Override
-            public void run() {
-              new LabelAction(label, (IStructuredSelection) fViewer.getSelection()).run();
-            }
-          };
-
-          labelAction.setChecked(label.equals(commonLabel));
-          labelMenu.add(labelAction);
-        }
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
       }
     });
 
