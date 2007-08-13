@@ -50,9 +50,10 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
   protected final Class<? extends T> fEntityClass;
   protected final boolean fSaveFully;
 
-  protected ReadWriteLock fLock;
-  protected Lock fWriteLock;
-  protected ObjectContainer fDb;
+  protected volatile ReadWriteLock fLock;
+  protected volatile Lock fWriteLock;
+  protected volatile Lock fReadLock;
+  protected volatile ObjectContainer fDb;
 
   public AbstractPersistableDAO(Class<? extends T> entityClass, boolean saveFully) {
     Assert.isNotNull(entityClass, "entityClass");
@@ -63,6 +64,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
         fDb = event.getObjectContainer();
         fLock = event.getLock();
         fWriteLock = fLock.writeLock();
+        fReadLock = fLock.readLock();
       }
       public void databaseClosed(DatabaseEvent event) {
         fDb = null;
