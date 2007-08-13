@@ -49,12 +49,18 @@ public class NewsTableViewer extends TreeViewer {
     super(tree);
   }
 
+  /*
+   * @see org.eclipse.jface.viewers.StructuredViewer#refresh()
+   */
   @Override
   public void refresh() {
     if (!fBlockRefresh)
       super.refresh();
   }
 
+  /*
+   * @see org.eclipse.jface.viewers.TreeViewer#setContentProvider(org.eclipse.jface.viewers.IContentProvider)
+   */
   @Override
   public void setContentProvider(IContentProvider provider) {
     fBlockRefresh = true;
@@ -65,6 +71,9 @@ public class NewsTableViewer extends TreeViewer {
     }
   }
 
+  /*
+   * @see org.eclipse.jface.viewers.AbstractTreeViewer#remove(java.lang.Object[])
+   */
   @Override
   public void remove(final Object[] elements) {
     updateSelectionAfterDelete(new Runnable() {
