@@ -273,9 +273,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     }
 
     /* Add into Cache */
-    synchronized (this) {
-      fCachedNews.addAll(addedNews);
-    }
+    fCachedNews.addAll(addedNews);
 
     return addedNews;
   }
@@ -335,15 +333,8 @@ public class NewsContentProvider implements ITreeContentProvider {
                   if (fAddedNews == null || fAddedNews.size() == 0)
                     return;
 
-                  /* Ask Group */
-                  if (fGrouping.needsRefresh(ISearchMark.class, events, false)) {
-                    fFeedView.refresh(true, false);
-                    return;
-                  }
-
-                  /* Add to Table-Viewer if Visible */
-                  if (fFeedView.isTableViewerVisible())
-                    fTableViewer.add(fTableViewer.getInput(), fAddedNews.toArray());
+                  /* Refresh Viewer to reflect changes */
+                  fFeedView.refresh(true, false);
 
                   /* Add to Browser-Viewer if showing entire Feed */
                   if (fBrowserViewer.getInput() instanceof BookMarkReference)
