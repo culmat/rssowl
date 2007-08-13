@@ -45,14 +45,14 @@ import java.util.List;
 
 public class DBHelper {
 
-  public static final List<EventRunnable<?>> cleanUp() {
+  public static final List<EventRunnable<?>> cleanUpEvents() {
     List<EventRunnable<?>> eventNotifiers = EventsMap.getInstance().removeEventRunnables();
     EventsMap.getInstance().removeEventTemplatesMap();
     EventManager.getInstance().clear();
     return eventNotifiers;
   }
   public static final void cleanUpAndFireEvents() {
-    fireEvents(cleanUp());
+    fireEvents(cleanUpEvents());
   }
 
   public static final void fireEvents(List<EventRunnable<?>> eventNotifiers) {
