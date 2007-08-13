@@ -400,10 +400,18 @@ public class OwlUI {
    * @return Color
    */
   public static Color getColor(ResourceManager resources, ILabel label) {
-    String color[] = label.getColor().split(",");
-    RGB rgb = new RGB(Integer.parseInt(color[0]), Integer.parseInt(color[1]), Integer.parseInt(color[2]));
+    RGB rgb = getRGB(label);
 
     return getColor(resources, rgb);
+  }
+
+  /**
+   * @param label
+   * @return RGB
+   */
+  public static RGB getRGB(ILabel label) {
+    String color[] = label.getColor().split(",");
+    return new RGB(Integer.parseInt(color[0]), Integer.parseInt(color[1]), Integer.parseInt(color[2]));
   }
 
   /**

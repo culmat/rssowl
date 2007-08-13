@@ -69,6 +69,8 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.event.LabelAdapter;
+import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
@@ -191,6 +193,7 @@ public class NewsTableControl implements IFeedViewPart {
   private Cursor fHandCursor;
   private boolean fShowsHandCursor;
   private AtomicBoolean fBlockNewsStateTracker = new AtomicBoolean(false);
+  private LabelAdapter fLabelListener;
 
   /* Settings */
   private IPreferenceScope fPreferences;
@@ -406,6 +409,19 @@ public class NewsTableControl implements IFeedViewPart {
         }
       });
     }
+
+    /* Redraw on Label update */
+    fLabelListener = new LabelAdapter() {
+      @Override
+      public void entitiesUpdated(Set<LabelEvent> events) {
+        JobRunner.runInUIThread(fViewer.getTree(), new Runnable() {
+          public void run() {
+            fViewer.refresh(true);
+          }
+        });
+      }
+    };
+    DynamicDAO.addEntityListener(ILabel.class, fLabelListener);
   }
 
   private void onMouseDoubleClick(DoubleClickEvent event) {
@@ -698,6 +714,7 @@ public class NewsTableControl implements IFeedViewPart {
 
   private void unregisterListeners() {
     fViewer.removePostSelectionChangedListener(fSelectionChangeListener);
+    DynamicDAO.removeEntityListener(ILabel.class, fLabelListener);
   }
 
   private void setNewsState(List<INews> news, INews.State state) {
