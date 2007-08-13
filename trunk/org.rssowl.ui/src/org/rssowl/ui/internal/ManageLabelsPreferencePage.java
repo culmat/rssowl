@@ -68,8 +68,6 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.ui.internal.dialogs.ConfirmDeleteDialog;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
-import java.util.Collection;
-
 /**
  * @author bpasero
  */
@@ -331,6 +329,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
     final Button editButton = new Button(buttonBox, SWT.PUSH);
     editButton.setText("&Edit");
+    editButton.setEnabled(!fViewer.getSelection().isEmpty());
     setButtonLayoutData(editButton);
     editButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -341,6 +340,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
     final Button deleteButton = new Button(buttonBox, SWT.PUSH);
     deleteButton.setText("&Delete");
+    deleteButton.setEnabled(!fViewer.getSelection().isEmpty());
     setButtonLayoutData(deleteButton);
     deleteButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -365,7 +365,9 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
       ILabel newLabel = Owl.getModelFactory().createLabel(null, name);
       newLabel.setColor(color.red + "," + color.green + "," + color.blue);
-      fViewer.add(fViewer.getInput(), newLabel);
+      DynamicDAO.save(newLabel);
+
+      fViewer.refresh();
       fViewer.setSelection(new StructuredSelection(newLabel));
       fViewer.getTree().setFocus();
     }
@@ -411,7 +413,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
       ConfirmDeleteDialog dialog = new ConfirmDeleteDialog(getShell(), "Confirm Delete", "This action can not be undone", msg, null);
       if (dialog.open() == IDialogConstants.OK_ID) {
         DynamicDAO.delete(label);
-        fViewer.remove(label);
+        fViewer.refresh();
         fViewer.getTree().setFocus();
       }
     }
@@ -424,7 +426,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     /* Content Provider */
     fViewer.setContentProvider(new ITreeContentProvider() {
       public Object[] getElements(Object inputElement) {
-        return ((Collection<?>) inputElement).toArray();
+        return DynamicDAO.loadAll(ILabel.class).toArray();
       }
 
       public Object[] getChildren(Object parentElement) {
@@ -458,8 +460,8 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
       }
     });
 
-    /* Set Input */
-    fViewer.setInput(DynamicDAO.loadAll(ILabel.class));
+    /* Set dummy Input */
+    fViewer.setInput(new Object());
 
     /* Edit on Doubleclick */
     fViewer.addDoubleClickListener(new IDoubleClickListener() {
