@@ -41,6 +41,8 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -72,6 +74,10 @@ import java.util.Collection;
  * @author bpasero
  */
 public class ManageLabelsPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+
+  /** ID of the Page */
+  public static final String ID = "org.rssowl.ui.ManageLabels";
+
   private LocalResourceManager fResources;
   private TreeViewer fViewer;
 
@@ -85,6 +91,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     EDIT,
   };
 
+  /* A dialog to add or edit Labels */
   class LabelDialog extends Dialog {
     private final DialogMode fMode;
     private final ILabel fExistingLabel;
@@ -187,7 +194,19 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
       /* Spacer */
       new Label(parent, SWT.None).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
 
-      return super.createButtonBar(parent);
+      Control control = super.createButtonBar(parent);
+
+      /* Update OK Button based on Input */
+      fNameInput.addModifyListener(new ModifyListener() {
+        public void modifyText(ModifyEvent e) {
+          getButton(IDialogConstants.OK_ID).setEnabled(fNameInput.getText().length() > 0);
+        }
+      });
+
+      /* Udate now */
+      getButton(IDialogConstants.OK_ID).setEnabled(fNameInput.getText().length() > 0);
+
+      return control;
     }
 
     private void updateColorItem() {

@@ -61,6 +61,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
@@ -80,6 +81,7 @@ import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.CColumnLayoutData;
 import org.rssowl.ui.internal.CTree;
 import org.rssowl.ui.internal.EntityGroup;
+import org.rssowl.ui.internal.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.StatusLineUpdater;
 import org.rssowl.ui.internal.actions.LabelAction;
@@ -654,6 +656,14 @@ public class NewsTableControl implements IFeedViewPart {
               labelAction.setChecked(label.equals(commonLabel));
               labelMenu.add(labelAction);
             }
+
+            labelMenu.add(new Separator());
+            labelMenu.add(new Action("Organize...") {
+              @Override
+              public void run() {
+                PreferencesUtil.createPreferenceDialogOn(fViewer.getTree().getShell(), ManageLabelsPreferencePage.ID, null, null).open();
+              }
+            });
           }
         }
 
