@@ -51,7 +51,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.EditorPart;
 import org.rssowl.core.util.StringUtils;
@@ -98,9 +97,8 @@ public class WebBrowserView extends EditorPart {
    * @see org.eclipse.ui.part.EditorPart#init(org.eclipse.ui.IEditorSite,
    * org.eclipse.ui.IEditorInput)
    */
-  @SuppressWarnings("unused")
   @Override
-  public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+  public void init(IEditorSite site, IEditorInput input) {
     Assert.isTrue(input instanceof WebBrowserInput);
     fEditorSite = site;
     fInput = (WebBrowserInput) input;

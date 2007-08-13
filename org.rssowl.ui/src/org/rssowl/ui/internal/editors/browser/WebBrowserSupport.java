@@ -52,8 +52,7 @@ public class WebBrowserSupport extends AbstractWorkbenchBrowserSupport {
   /*
    * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(java.lang.String)
    */
-  @SuppressWarnings("unused")
-  public IWebBrowser createBrowser(final String browserId) throws PartInitException {
+  public IWebBrowser createBrowser(final String browserId) {
     Assert.isNotNull(browserId);
 
     /* Create WebBrowser and return */
@@ -115,7 +114,7 @@ public class WebBrowserSupport extends AbstractWorkbenchBrowserSupport {
    * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(int,
    * java.lang.String, java.lang.String, java.lang.String)
    */
-  public IWebBrowser createBrowser(int style, String browserId, String name, String tooltip) throws PartInitException {
+  public IWebBrowser createBrowser(int style, String browserId, String name, String tooltip) {
     return createBrowser(browserId);
   }
 
