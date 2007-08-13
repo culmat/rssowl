@@ -32,7 +32,7 @@ import java.net.URI;
 /**
  * Adapter Implementation of this Type. Methods of interest should be overriden
  * to keep the Data.
- * 
+ *
  * @author bpasero
  */
 public class TextInputAdapter extends Persistable implements ITextInput {
@@ -40,7 +40,6 @@ public class TextInputAdapter extends Persistable implements ITextInput {
   /**
    * This Type is not used in the model implementation!
    */
-  @SuppressWarnings("unused")
   public TextInputAdapter() {}
 
   /*
