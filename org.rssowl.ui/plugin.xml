@@ -410,6 +410,11 @@
                id="org.rssowl.ui.preferences.keywords.Miscellaneous">
          </keywordReference>
       </page>
+      <page
+            class="org.rssowl.ui.internal.ManageLabelsPreferencePage"
+            id="org.rssowl.ui.ManageLabels"
+            name="Manage Labels">
+      </page>
    </extension>
    <extension
          point="org.eclipse.ui.keywords">
