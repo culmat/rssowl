@@ -36,7 +36,7 @@ import javax.net.ssl.X509TrustManager;
 /**
  * EasyX509TrustManager unlike default {@link X509TrustManager} accepts
  * self-signed certificates.
- * 
+ *
  * @author <a href="mailto:adrian.sutton@ephox.com">Adrian Sutton </a>
  * @author <a href="mailto:oleg@ural.ru">Oleg Kalnichevski </a>
  */
@@ -45,7 +45,7 @@ public class EasyX509TrustManager implements X509TrustManager {
 
   /**
    * Constructor for EasyX509TrustManager.
-   * 
+   *
    * @param keystore In-memory collection of keys and certificates
    * @throws NoSuchAlgorithmException In case of an error
    * @throws KeyStoreException In case of an error
@@ -65,17 +65,13 @@ public class EasyX509TrustManager implements X509TrustManager {
    * @see javax.net.ssl.X509TrustManager#checkClientTrusted(java.security.cert.X509Certificate[],
    * java.lang.String)
    */
-  public void checkClientTrusted(X509Certificate[] chain, String authType) {
-    return;
-  }
+  public void checkClientTrusted(X509Certificate[] chain, String authType) {}
 
   /*
    * @see javax.net.ssl.X509TrustManager#checkServerTrusted(java.security.cert.X509Certificate[],
    * java.lang.String)
    */
-  public void checkServerTrusted(X509Certificate[] chain, String authType) {
-    return;
-  }
+  public void checkServerTrusted(X509Certificate[] chain, String authType) {}
 
   /*
    * @see X509TrustManager#getAcceptedIssuers()

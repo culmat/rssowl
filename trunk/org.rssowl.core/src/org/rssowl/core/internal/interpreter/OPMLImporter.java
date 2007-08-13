@@ -31,7 +31,6 @@ import org.jdom.Namespace;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.interpreter.ITypeImporter;
-import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
@@ -69,8 +68,7 @@ public class OPMLImporter implements ITypeImporter {
   /*
    * @see org.rssowl.core.interpreter.ITypeImporter#importFrom(org.jdom.Document)
    */
-  @SuppressWarnings("unused")
-  public List<? extends IEntity> importFrom(Document document) throws InterpreterException {
+  public List<? extends IEntity> importFrom(Document document) {
     Element root = document.getRootElement();
 
     /* Interpret Children */

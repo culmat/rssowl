@@ -212,8 +212,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
    *
    * @see org.rssowl.core.connection.IProtocolHandler#getURLStreamHandler()
    */
-  @SuppressWarnings("unused")
-  public URLStreamHandlerService getURLStreamHandler() throws ConnectionException {
+  public URLStreamHandlerService getURLStreamHandler() {
     return null;
   }
 

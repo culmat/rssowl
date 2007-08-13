@@ -46,12 +46,7 @@ public abstract class Mark extends AbstractEntity implements IMark {
   private Date fCreationDate;
   private Date fLastVisitDate;
   private int fPopularity;
-
   private IFolder fParent;
-
-  //FIXME Remove after M6
-  @SuppressWarnings("unused")
-  private IFolder fFolder;
 
   /**
    * Store ID, Name and Folder for this Mark.

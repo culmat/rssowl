@@ -54,12 +54,6 @@ public class Folder extends AbstractEntity implements IFolder {
   private IFolder fParent;
   private List<IFolderChild> fChildren;
 
-  //FIXME Remove these fMarks and fFolders after M6 is released
-  @SuppressWarnings("unused")
-  private List<IMark> fMarks;
-  @SuppressWarnings("unused")
-  private List<IFolder> fFolders;
-
   /**
    * Creates a new Folder with the given ID and Name as a Child of the given
    * FolderReference. In case the FolderReference is <code>NULL</code>, this
