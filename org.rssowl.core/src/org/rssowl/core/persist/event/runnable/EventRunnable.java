@@ -77,6 +77,18 @@ public abstract class EventRunnable<T extends ModelEvent> implements Runnable   
   }
 
   /**
+   * @return {@code true} is there are any events stored in this runnable.
+   */
+  public boolean isEmpty() {
+    return isEmpty(fPersistEvents) && isEmpty(fRemoveEvents) &&
+        isEmpty(fUpdateEvents);
+  }
+
+  private boolean isEmpty(Set<?> set) {
+    return set == null || set.isEmpty();
+  }
+
+  /**
    * Fires the event type defined by the eventType property appropriate
    * to T.
    */
