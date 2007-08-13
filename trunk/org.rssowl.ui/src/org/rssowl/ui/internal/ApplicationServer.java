@@ -213,8 +213,6 @@ public class ApplicationServer {
       } catch (BindException e) {
         if (i == (ports.size() - 1))
           throw e;
-      } catch (IOException e) {
-        throw e;
       }
     }
 
