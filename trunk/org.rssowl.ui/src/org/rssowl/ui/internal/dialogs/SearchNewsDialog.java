@@ -83,6 +83,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.ICategory;
@@ -98,6 +99,8 @@ import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
+import org.rssowl.core.persist.event.LabelAdapter;
+import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -110,6 +113,7 @@ import org.rssowl.ui.internal.CColumnLayoutData;
 import org.rssowl.ui.internal.CTable;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
+import org.rssowl.ui.internal.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
@@ -203,6 +207,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private boolean fMatchAllConditions;
   private INewsDAO fNewsDao;
   private IPreferenceScope fPreferences;
+  private LabelAdapter fLabelListener;
 
   /* Container for a search result */
   private static class ScoredNews {
@@ -1023,6 +1028,19 @@ public class SearchNewsDialog extends TitleAreaDialog {
       }
     };
     DynamicDAO.addEntityListener(INews.class, fNewsListener);
+
+    /* Redraw on Label update */
+    fLabelListener = new LabelAdapter() {
+      @Override
+      public void entitiesUpdated(Set<LabelEvent> events) {
+        JobRunner.runInUIThread(fViewer.getTable(), new Runnable() {
+          public void run() {
+            fViewer.refresh(true);
+          }
+        });
+      }
+    };
+    DynamicDAO.addEntityListener(ILabel.class, fLabelListener);
   }
 
   private void onNewsEvent(final Set<NewsEvent> events) {
@@ -1137,6 +1155,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
   private void unregisterListeners() {
     DynamicDAO.removeEntityListener(INews.class, fNewsListener);
+    DynamicDAO.removeEntityListener(ILabel.class, fLabelListener);
   }
 
   private void onMouseDoubleClick(DoubleClickEvent event) {
@@ -1233,6 +1252,14 @@ public class SearchNewsDialog extends TitleAreaDialog {
               labelAction.setChecked(label.equals(commonLabel));
               labelMenu.add(labelAction);
             }
+
+            labelMenu.add(new Separator());
+            labelMenu.add(new Action("Organize...") {
+              @Override
+              public void run() {
+                PreferencesUtil.createPreferenceDialogOn(fViewer.getTable().getShell(), ManageLabelsPreferencePage.ID, null, null).open();
+              }
+            });
           }
         }
 

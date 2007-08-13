@@ -413,7 +413,10 @@
       <page
             class="org.rssowl.ui.internal.ManageLabelsPreferencePage"
             id="org.rssowl.ui.ManageLabels"
-            name="Manage Labels">
+            name="Organize Labels">
+         <keywordReference
+               id="org.rssowl.ui.preferences.keywords.ManageLabels">
+         </keywordReference>
       </page>
    </extension>
    <extension
@@ -443,6 +446,10 @@
       <keyword
             id="org.rssowl.ui.preferences.keywords.Feeds"
             label="update reload display startup start-up auto automatic clean clean-up retention delete age maximum">
+      </keyword>
+      <keyword
+            id="org.rssowl.ui.preferences.keywords.ManageLabels"
+            label="label labels tag tags organize categorize category prioritize priority">
       </keyword>
    </extension>
    <extension
