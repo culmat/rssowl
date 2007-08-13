@@ -132,6 +132,7 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
     DELETED;
 
     private static final transient Set<State> VISIBLE_STATES = EnumSet.of(NEW, READ, UNREAD, UPDATED);
+    private static final transient State[] VALUES = values();
 
     /**
      * Returns an unmodifiable set containing the visible states (all of them
@@ -142,6 +143,16 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
      */
     public static final Set<State> getVisible() {
       return Collections.unmodifiableSet(VISIBLE_STATES);
+    }
+
+    /**
+     * Returns the {@code State} with the matching {@code ordinal}.
+     *
+     * @param ordinal identifying the State required.
+     * @return State with the provided ordinal.
+     */
+    public static final State getState(int ordinal) {
+      return VALUES[ordinal];
     }
   };
 

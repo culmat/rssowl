@@ -78,7 +78,6 @@ public class News extends AbstractEntity implements INews {
   private int fRating;
 
   private int fStateOrdinal = INews.State.NEW.ordinal();
-  private transient State fState;
 
   private String fGuidValue;
   private boolean fGuidIsPermaLink;
@@ -612,7 +611,6 @@ public class News extends AbstractEntity implements INews {
     fWriteLock.lock();
     try {
       fStateOrdinal = state.ordinal();
-      fState = state;
     } finally {
       fWriteLock.unlock();
     }
@@ -624,10 +622,7 @@ public class News extends AbstractEntity implements INews {
   public State getState() {
     fReadLock.lock();
     try {
-      if (fState == null)
-        fState = INews.State.values()[fStateOrdinal];
-
-      return fState;
+      return INews.State.getState(fStateOrdinal);
     } finally {
       fReadLock.unlock();
     }
@@ -774,7 +769,7 @@ public class News extends AbstractEntity implements INews {
 
     News n = (News) news;
     fReadLock.lock();
-    n.getReadLock();
+    n.getReadLock().lock();
     try {
       return getId().equals(n.getId()) &&
           fFeedLink.equals(n.fFeedLink) &&
