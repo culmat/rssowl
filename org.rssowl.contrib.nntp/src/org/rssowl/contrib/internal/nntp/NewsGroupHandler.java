@@ -560,8 +560,7 @@ public class NewsGroupHandler implements IProtocolHandler {
   /*
    * @see org.rssowl.core.connection.IProtocolHandler#getLabel(java.net.URI)
    */
-  @SuppressWarnings("unused")
-  public String getLabel(URI link) throws ConnectionException {
+  public String getLabel(URI link) {
     String path = link.getPath();
 
     if (StringUtils.isSet(path))
