@@ -44,6 +44,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * A News is a single entry inside a Feed. The attributes IsRead, IsNew and
@@ -93,7 +96,9 @@ public class News extends AbstractEntity implements INews {
   private List<IAttachment> fAttachments;
   private List<ICategory> fCategories;
 
-
+  private final transient ReadWriteLock fReadWriteLock = new ReentrantReadWriteLock();
+  private final transient Lock fWriteLock = fReadWriteLock.writeLock();
+  private final transient Lock fReadLock = fReadWriteLock.readLock();
 
   /**
    * Constructor used by <code>DefaultModelFactory</code>
@@ -132,6 +137,19 @@ public class News extends AbstractEntity implements INews {
   // As per javadoc
   }
 
+  /**
+   * Returns the Lock that is used by the public methods that do not
+   * modify this object.
+   *
+   * This method should only be used in very specific circumstances. Avoid
+   * if possible.
+   *
+   * @return Lock used during operations that do not modify this object.
+   */
+  public final Lock getReadLock() {
+    return fReadLock;
+  }
+
   private <T>Boolean isEquivalentCompare(T o1, T o2) {
     if ((o1 == null) && (o2 == null))
       return null;
@@ -143,101 +161,139 @@ public class News extends AbstractEntity implements INews {
     return o1 == null ? o2 == null : o1.equals(o2);
   }
 
-  public synchronized boolean isEquivalent(INews other) {
-    Assert.isNotNull(other, "other cannot be null"); //$NON-NLS-1$
-    String guidValue = (getGuid() == null ? null : getGuid().getValue());
+  public boolean isEquivalent(INews other) {
+    fReadLock.lock();
+    try {
+      Assert.isNotNull(other, "other cannot be null"); //$NON-NLS-1$
+      String guidValue = (getGuid() == null ? null : getGuid().getValue());
 
-    String otherGuidValue = (other.getGuid() == null ? null :
-      other.getGuid().getValue());
+      String otherGuidValue = (other.getGuid() == null ? null : other.getGuid().getValue());
 
-    Boolean guidMatch = isEquivalentCompare(guidValue, otherGuidValue);
-    if (guidMatch != null) {
-      if (guidMatch.equals(Boolean.TRUE))
+      Boolean guidMatch = isEquivalentCompare(guidValue, otherGuidValue);
+      if (guidMatch != null) {
+        if (guidMatch.equals(Boolean.TRUE))
+          return true;
+
+        return false;
+      }
+
+      URI newsItemLink = other.getLink();
+      Boolean linkMatch = isEquivalentCompare(getLink(), newsItemLink);
+      if (linkMatch != null) {
+        if (linkMatch.equals(Boolean.TRUE))
+          return true;
+
+        return false;
+      }
+      if (!getFeedReference().equals(other.getFeedReference()))
+        return false;
+
+      Boolean titleMatch = isEquivalentCompare(getTitle(), other.getTitle());
+      if (titleMatch != null && titleMatch.equals(Boolean.TRUE))
         return true;
 
       return false;
+    } finally {
+      fReadLock.unlock();
     }
-
-    URI newsItemLink = other.getLink();
-    Boolean linkMatch = isEquivalentCompare(getLink(), newsItemLink);
-    if (linkMatch != null) {
-      if (linkMatch.equals(Boolean.TRUE))
-        return true;
-
-      return false;
-    }
-    if (!getFeedReference().equals(other.getFeedReference()))
-      return false;
-
-    Boolean titleMatch = isEquivalentCompare(getTitle(), other.getTitle());
-    if (titleMatch != null && titleMatch.equals(Boolean.TRUE))
-      return true;
-
-    return false;
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#addAttachment(org.rssowl.core.model.types.IAttachment)
    */
-  public synchronized void addAttachment(IAttachment attachment) {
-    if (fAttachments == null)
-      fAttachments = new ArrayList<IAttachment>();
+  public void addAttachment(IAttachment attachment) {
+    fWriteLock.lock();
+    try {
+      if (fAttachments == null)
+        fAttachments = new ArrayList<IAttachment>();
 
-    Assert.isNotNull(attachment, "Exception adding NULL as Attachment into News"); //$NON-NLS-1$
+      Assert.isNotNull(attachment, "Exception adding NULL as Attachment into News"); //$NON-NLS-1$
 
-    /* Rule: Child needs to know about its new parent already! */
-    Assert.isTrue(equals(attachment.getNews()), "The Attachment has a different News set!"); //$NON-NLS-1$
-    fAttachments.add(attachment);
+      /* Rule: Child needs to know about its new parent already! */
+      Assert.isTrue(equals(attachment.getNews()), "The Attachment has a different News set!"); //$NON-NLS-1$
+      fAttachments.add(attachment);
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getAttachments()
    */
-  public synchronized List<IAttachment> getAttachments() {
-    if (fAttachments == null)
-      return Collections.emptyList();
-
-    return Collections.unmodifiableList(fAttachments);
+  public List<IAttachment> getAttachments() {
+    fReadLock.lock();
+    try {
+      if (fAttachments == null)
+        return Collections.emptyList();
+      return Collections.unmodifiableList(fAttachments);
+    } finally {
+      fReadLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getAuthor()
    */
-  public synchronized IPerson getAuthor() {
-    return fAuthor;
+  public IPerson getAuthor() {
+    fReadLock.lock();
+    try {
+      return fAuthor;
+    } finally {
+      fReadLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#setAuthor(org.rssowl.core.model.types.IPerson)
    */
-  public synchronized void setAuthor(IPerson author) {
-    fAuthor = author;
+  public void setAuthor(IPerson author) {
+    fWriteLock.lock();
+    try {
+      fAuthor = author;
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getDescription()
    */
-  public synchronized String getDescription() {
-    return fDescription;
+  public String getDescription() {
+    fReadLock.lock();
+    try {
+      return fDescription;
+    } finally {
+      fReadLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#setDescription(java.lang.String)
    */
-  public synchronized void setDescription(String description) {
-    fDescription = description;
+  public void setDescription(String description) {
+    fWriteLock.lock();
+    try {
+      fDescription = description;
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getLink()
    */
-  public synchronized URI getLink() {
-    if (fLink == null && fLinkText != null) {
-      try {
-        fLink = new URI(fLinkText);
-      } catch (URISyntaxException e) {
-        throw new IllegalStateException("Somehow an illegal URI was stored.", e); //$NON-NLS-1$
+  public URI getLink() {
+    fReadLock.lock();
+    try {
+      if (fLink == null && fLinkText != null) {
+        try {
+          fLink = new URI(fLinkText);
+        } catch (URISyntaxException e) {
+          throw new IllegalStateException("Somehow an illegal URI was stored.", e); //$NON-NLS-1$
+        }
       }
+    } finally {
+     fReadLock.unlock();
     }
     return fLink;
   }
@@ -245,257 +301,410 @@ public class News extends AbstractEntity implements INews {
   /*
    * @see org.rssowl.core.model.types.INews#setLink(java.lang.String)
    */
-  public synchronized void setLink(URI link) {
-    fLinkText = link == null ? null : link.toString();
-    fLink = link;
+  public void setLink(URI link) {
+    fWriteLock.lock();
+    try {
+      fLinkText = link == null ? null : link.toString();
+      fLink = link;
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getPublishDate()
    */
-  public synchronized Date getPublishDate() {
-    return fPublishDate;
+  public Date getPublishDate() {
+    fReadLock.lock();
+    try {
+      return fPublishDate;
+    } finally {
+      fReadLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#setPublishDate(java.util.Date)
    */
-  public synchronized void setPublishDate(Date publishDate) {
-    fPublishDate = publishDate;
+  public void setPublishDate(Date publishDate) {
+    fWriteLock.lock();
+    try {
+      fPublishDate = publishDate;
+    } finally	{
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getTitle()
    */
-  public synchronized String getTitle() {
-    return fTitle;
+  public String getTitle() {
+    fReadLock.lock();
+    try {
+      return fTitle;
+    } finally {
+      fReadLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#setTitle(java.lang.String)
    */
-  public synchronized void setTitle(String title) {
-    fTitle = title;
+  public void setTitle(String title) {
+    fWriteLock.lock();
+    try {
+      fTitle = title;
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getFeed()
    */
-  public synchronized FeedLinkReference getFeedReference() {
-    if (fFeedLinkReference == null) {
-      try {
-        fFeedLinkReference = new FeedLinkReference(new URI(fFeedLink));
-      } catch (URISyntaxException e) {
-        throw new IllegalStateException("A Malformed URI was stored somehow", e); //$NON-NLS-1$
+  public FeedLinkReference getFeedReference() {
+    fReadLock.lock();
+    try {
+      if (fFeedLinkReference == null) {
+        try {
+          fFeedLinkReference = new FeedLinkReference(new URI(fFeedLink));
+        } catch (URISyntaxException e) {
+          throw new IllegalStateException("A Malformed URI was stored somehow", e); //$NON-NLS-1$
+        }
       }
+      return fFeedLinkReference;
+    } finally {
+      fReadLock.unlock();
     }
-    return fFeedLinkReference;
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#setReceiveDate(java.util.Date)
    */
-  public synchronized void setReceiveDate(Date receiveDate) {
-    fReceiveDate = receiveDate;
+  public void setReceiveDate(Date receiveDate) {
+    fWriteLock.lock();
+    try {
+      fReceiveDate = receiveDate;
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getReceiveDate()
    */
-  public synchronized Date getReceiveDate() {
-    return fReceiveDate;
+  public Date getReceiveDate() {
+    fReadLock.lock();
+    try {
+      return fReceiveDate;
+    } finally {
+      fReadLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#setComments(java.lang.String)
    */
-  public synchronized void setComments(String comments) {
-    fComments = comments;
+  public void setComments(String comments) {
+    fWriteLock.lock();
+    try {
+      fComments = comments;
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#setGuid(org.rssowl.core.model.types.IGuid)
    */
-  public synchronized void setGuid(IGuid guid) {
-    fGuid = guid;
-    fGuidValue = (guid == null ? null : guid.getValue());
-    fGuidIsPermaLink = (guid == null ? false : guid.isPermaLink());
+  public void setGuid(IGuid guid) {
+    fWriteLock.lock();
+    try {
+      fGuid = guid;
+      fGuidValue = (guid == null ? null : guid.getValue());
+      fGuidIsPermaLink = (guid == null ? false : guid.isPermaLink());
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#setSource(org.rssowl.core.model.types.ISource)
    */
-  public synchronized void setSource(ISource source) {
-    fSource = source;
+  public void setSource(ISource source) {
+    fWriteLock.lock();
+    try {
+      fSource = source;
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#setInReplyTo(java.lang.String)
    */
-  public synchronized void setInReplyTo(String guid) {
-    fInReplyTo = guid;
+  public void setInReplyTo(String guid) {
+    fWriteLock.lock();
+    try {
+      fInReplyTo = guid;
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#setModifiedDate(java.util.Date)
    */
-  public synchronized void setModifiedDate(Date modifiedDate) {
-    fModifiedDate = modifiedDate;
+  public void setModifiedDate(Date modifiedDate) {
+    fWriteLock.lock();
+    try {
+      fModifiedDate = modifiedDate;
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getModifiedDate()
    */
-  public synchronized Date getModifiedDate() {
-    return fModifiedDate;
+  public Date getModifiedDate() {
+    fReadLock.lock();
+    try {
+      return fModifiedDate;
+    } finally {
+      fReadLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#addCategory(org.rssowl.core.model.types.ICategory)
    */
-  public synchronized void addCategory(ICategory category) {
-    if (fCategories == null)
-      fCategories = new ArrayList<ICategory>();
-
-    fCategories.add(category);
+  public void addCategory(ICategory category) {
+    fWriteLock.lock();
+    try {
+      if (fCategories == null)
+        fCategories = new ArrayList<ICategory>();
+      fCategories.add(category);
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getComments()
    */
-  public synchronized String getComments() {
-    return fComments;
+  public String getComments() {
+    fReadLock.lock();
+    try {
+      return fComments;
+    } finally {
+      fReadLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#isFlagged()
    */
-  public synchronized boolean isFlagged() {
-    return fIsFlagged;
+  public boolean isFlagged() {
+    fReadLock.lock();
+    try {
+      return fIsFlagged;
+    } finally {
+      fReadLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#setFlagged(boolean)
    */
-  public synchronized void setFlagged(boolean isFlagged) {
-    fIsFlagged = isFlagged;
+  public void setFlagged(boolean isFlagged) {
+    fWriteLock.lock();
+    try {
+      fIsFlagged = isFlagged;
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getLabel()
    */
-  public synchronized ILabel getLabel() {
-    return fLabel;
+  public ILabel getLabel() {
+    fReadLock.lock();
+    try {
+      return fLabel;
+    } finally {
+      fReadLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#setLabel(org.rssowl.core.model.types.impl.Label)
    */
-  public synchronized void setLabel(ILabel label) {
-    fLabel = label;
+  public void setLabel(ILabel label) {
+    fWriteLock.lock();
+    try {
+      fLabel = label;
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getGuid()
    */
-  public synchronized IGuid getGuid() {
-    if (fGuid == null && fGuidValue != null) {
-      fGuid = new Guid(fGuidValue);
-      fGuid.setPermaLink(fGuidIsPermaLink);
+  public IGuid getGuid() {
+    fReadLock.lock();
+    try {
+      if (fGuid == null && fGuidValue != null) {
+        fGuid = new Guid(fGuidValue);
+        fGuid.setPermaLink(fGuidIsPermaLink);
+      }
+      return fGuid;
+    } finally {
+      fReadLock.unlock();
     }
-    return fGuid;
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#setBase(java.net.URI)
    */
-  public synchronized void setBase(URI baseUri) {
-    fBaseUri = getURIText(baseUri);
+  public void setBase(URI baseUri) {
+    fWriteLock.lock();
+    try {
+      fBaseUri = getURIText(baseUri);
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getBase()
    */
-  public synchronized URI getBase() {
-    return createURI(fBaseUri);
+  public URI getBase() {
+    fReadLock.lock();
+    try {
+      return createURI(fBaseUri);
+    } finally {
+      fReadLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getCategories()
    */
-  public synchronized List<ICategory> getCategories() {
-    if (fCategories == null)
-      return Collections.emptyList();
-
-    return Collections.unmodifiableList(fCategories);
+  public List<ICategory> getCategories() {
+    fReadLock.lock();
+    try {
+      if (fCategories == null)
+        return Collections.emptyList();
+      return Collections.unmodifiableList(fCategories);
+    } finally {
+      fReadLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#setState(org.rssowl.core.model.types.INews.State)
    */
-  public synchronized void setState(State state) {
+  public void setState(State state) {
     Assert.isNotNull(state, "state cannot be null"); //$NON-NLS-1$
-    fStateOrdinal = state.ordinal();
-    fState = state;
+    fWriteLock.lock();
+    try {
+      fStateOrdinal = state.ordinal();
+      fState = state;
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getState()
    */
-  public synchronized State getState() {
-    if (fState == null)
-      fState = INews.State.values()[fStateOrdinal];
+  public State getState() {
+    fReadLock.lock();
+    try {
+      if (fState == null)
+        fState = INews.State.values()[fStateOrdinal];
 
-    return fState;
+      return fState;
+    } finally {
+      fReadLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#setRating(int)
    */
-  public synchronized void setRating(int rating) {
-    fRating = rating;
+  public void setRating(int rating) {
+    fWriteLock.lock();
+    try {
+      fRating = rating;
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getRating()
    */
-  public synchronized int getRating() {
-    return fRating;
+  public int getRating() {
+    fReadLock.lock();
+    try {
+      return fRating;
+    } finally {
+      fReadLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getSource()
    */
-  public synchronized ISource getSource() {
-    return fSource;
+  public ISource getSource() {
+    fReadLock.lock();
+    try {
+      return fSource;
+    } finally {
+      fReadLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#getInReplyTo()
    */
-  public synchronized String getInReplyTo() {
-    return fInReplyTo;
+  public String getInReplyTo() {
+    fReadLock.lock();
+    try {
+      return fInReplyTo;
+    } finally {
+      fReadLock.unlock();
+    }
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#isVisible()
    */
-  public synchronized boolean isVisible() {
+  public boolean isVisible() {
+    /* No need to lock since getState() has a read lock */
     INews.State state = getState();
     return State.getVisible().contains(state);
   }
 
   @SuppressWarnings("nls")
   @Override
-  public synchronized String toString() {
+  public String toString() {
     StringBuilder str = new StringBuilder();
     str.append("\n\n****************************** News ******************************\n");
-    str.append("\nNews ID: ").append(getId());
-    if (getTitle() != null)
-      str.append("\nTitle: ").append(getTitle());
-    if (getLink() != null)
-      str.append("\nLink: ").append(getLink());
-
+    fReadLock.lock();
+    try {
+      str.append("\nNews ID: ").append(getId());
+      if (getTitle() != null)
+        str.append("\nTitle: ").append(getTitle());
+      if (getLink() != null)
+        str.append("\nLink: ").append(getLink());
+    } finally {
+      fReadLock.unlock();
+    }
     return str.toString();
   }
 
@@ -505,46 +714,50 @@ public class News extends AbstractEntity implements INews {
    * @return A String describing the state of this Entity.
    */
   @SuppressWarnings("nls")
-  public synchronized String toLongString() {
+  public String toLongString() {
     StringBuilder str = new StringBuilder();
 
     str.append("\n\n****************************** News ******************************\n");
-    str.append("\nNews ID: ").append(getId());
-    if (fFeedLink != null)
-      str.append("\nFeed Link: ").append(fFeedLink);
-    str.append("\nState: ").append(getState());
-    if (getTitle() != null)
-      str.append("\nTitle: ").append(getTitle());
-    if (getLink() != null)
-      str.append("\nLink: ").append(getLink());
-    if (getBase() != null)
-      str.append("\nBase URI: ").append(getBase());
-    if (getDescription() != null)
-      str.append("\nDescription: ").append(getDescription());
-    str.append("\nRating: ").append(getRating());
-    if (getPublishDate() != null)
-      str.append("\nPublish Date: ").append(DateFormat.getDateTimeInstance().format(getPublishDate()));
-    if (getReceiveDate() != null)
-      str.append("\nReceive Date: ").append(DateFormat.getDateTimeInstance().format(getReceiveDate()));
-    if (getModifiedDate() != null)
-      str.append("\nModified Date: ").append(DateFormat.getDateTimeInstance().format(getModifiedDate()));
-    if (getAuthor() != null)
-      str.append("\nAuthor: ").append(getAuthor());
-    if (getComments() != null)
-      str.append("\nComments: ").append(getComments());
-    if (getGuid() != null)
-      str.append("\nGUID: ").append(getGuid());
-    if (getSource() != null)
-      str.append("\nSource: ").append(getSource());
-    if (getInReplyTo() != null)
-      str.append("\nIn Reply To: ").append(getInReplyTo());
-    if (getLabel() != null)
-      str.append("\nLabel: ").append(getLabel());
-    str.append("\nAttachments: ").append(getAttachments());
-    str.append("\nCategories: ").append(getCategories());
-    str.append("\nIs Flagged: ").append(fIsFlagged);
-    str.append("\nProperties: ").append(getProperties());
-
+    fReadLock.lock();
+    try {
+      str.append("\nNews ID: ").append(getId());
+      if (fFeedLink != null)
+        str.append("\nFeed Link: ").append(fFeedLink);
+      str.append("\nState: ").append(getState());
+      if (getTitle() != null)
+        str.append("\nTitle: ").append(getTitle());
+      if (getLink() != null)
+        str.append("\nLink: ").append(getLink());
+      if (getBase() != null)
+        str.append("\nBase URI: ").append(getBase());
+      if (getDescription() != null)
+        str.append("\nDescription: ").append(getDescription());
+      str.append("\nRating: ").append(getRating());
+      if (getPublishDate() != null)
+        str.append("\nPublish Date: ").append(DateFormat.getDateTimeInstance().format(getPublishDate()));
+      if (getReceiveDate() != null)
+        str.append("\nReceive Date: ").append(DateFormat.getDateTimeInstance().format(getReceiveDate()));
+      if (getModifiedDate() != null)
+        str.append("\nModified Date: ").append(DateFormat.getDateTimeInstance().format(getModifiedDate()));
+      if (getAuthor() != null)
+        str.append("\nAuthor: ").append(getAuthor());
+      if (getComments() != null)
+        str.append("\nComments: ").append(getComments());
+      if (getGuid() != null)
+        str.append("\nGUID: ").append(getGuid());
+      if (getSource() != null)
+        str.append("\nSource: ").append(getSource());
+      if (getInReplyTo() != null)
+        str.append("\nIn Reply To: ").append(getInReplyTo());
+      if (getLabel() != null)
+        str.append("\nLabel: ").append(getLabel());
+      str.append("\nAttachments: ").append(getAttachments());
+      str.append("\nCategories: ").append(getCategories());
+      str.append("\nIs Flagged: ").append(fIsFlagged);
+      str.append("\nProperties: ").append(getProperties());
+    } finally {
+      fReadLock.unlock();
+    }
     return str.toString();
   }
 
@@ -552,16 +765,17 @@ public class News extends AbstractEntity implements INews {
    * @param news
    * @return whether <code>news</code> is identical to this object.
    */
-  public synchronized boolean isIdentical(INews news) {
+  public boolean isIdentical(INews news) {
     if (this == news)
       return true;
 
     if (!(news instanceof News))
       return false;
 
-    synchronized (news) {
-      News n = (News) news;
-
+    News n = (News) news;
+    fReadLock.lock();
+    n.getReadLock();
+    try {
       return getId().equals(n.getId()) &&
           fFeedLink.equals(n.fFeedLink) &&
           simpleFieldsEqual(news) &&
@@ -575,7 +789,11 @@ public class News extends AbstractEntity implements INews {
           getCategories().equals(n.getCategories()) &&
           getState() == n.getState() && fIsFlagged == n.fIsFlagged && fRating == n.fRating &&
           (getProperties() == null ? n.getProperties() == null : getProperties().equals(n.getProperties()));
+    } finally {
+      fReadLock.unlock();
+      n.getReadLock().unlock();
     }
+
   }
 
   private boolean simpleFieldsEqual(INews news) {
@@ -589,9 +807,10 @@ public class News extends AbstractEntity implements INews {
         MergeUtils.equals(fTitle, news.getTitle());
   }
 
-  public synchronized MergeResult merge(INews news) {
+  public MergeResult merge(INews news) {
     Assert.isNotNull(news, "news cannot be null"); //$NON-NLS-1$
-    synchronized (news) {
+    fWriteLock.lock();
+    try {
       boolean updated = mergeState(news);
 
       MergeResult result = new MergeResult();
@@ -618,6 +837,8 @@ public class News extends AbstractEntity implements INews {
         result.addAll(propertiesResult);
       }
       return result;
+    } finally {
+      fWriteLock.unlock();
     }
   }
 
@@ -697,19 +918,29 @@ public class News extends AbstractEntity implements INews {
     return mergeResult;
   }
 
-  public synchronized void setParent(IFeed feed) {
+  public void setParent(IFeed feed) {
     Assert.isNotNull(feed, "feed"); //$NON-NLS-1$
-    this.fFeedLink = feed.getLink().toString();
+    fWriteLock.lock();
+    try {
+      this.fFeedLink = feed.getLink().toString();
 
-    /*
-     * Current value is not valid anymore, but don't create a new one until
-     * getFeedReference is called.
-     */
-    this.fFeedLinkReference = null;
+      /*
+       * Current value is not valid anymore, but don't create a new one until
+       * getFeedReference is called.
+       */
+      this.fFeedLinkReference = null;
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 
-  public synchronized void removeAttachment(IAttachment attachment) {
-    if (fAttachments != null)
-      fAttachments.remove(attachment);
+  public void removeAttachment(IAttachment attachment) {
+    fWriteLock.lock();
+    try {
+      if (fAttachments != null)
+        fAttachments.remove(attachment);
+    } finally {
+      fWriteLock.unlock();
+    }
   }
 }
