@@ -247,10 +247,10 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
       switch (fMode) {
         case ADD:
-          newShell.setText("Add a new Label");
+          newShell.setText("Add Label");
           break;
         case EDIT:
-          newShell.setText("Edit existing Label");
+          newShell.setText("Edit Label");
           break;
       }
     }
@@ -318,7 +318,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     buttonBox.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 
     Button addButton = new Button(buttonBox, SWT.PUSH);
-    addButton.setText("&Add");
+    addButton.setText("&Add...");
     setButtonLayoutData(addButton);
     addButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -328,7 +328,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     });
 
     final Button editButton = new Button(buttonBox, SWT.PUSH);
-    editButton.setText("&Edit");
+    editButton.setText("&Edit...");
     editButton.setEnabled(!fViewer.getSelection().isEmpty());
     setButtonLayoutData(editButton);
     editButton.addSelectionListener(new SelectionAdapter() {
@@ -369,8 +369,8 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
       fViewer.refresh();
       fViewer.setSelection(new StructuredSelection(newLabel));
-      fViewer.getTree().setFocus();
     }
+    fViewer.getTree().setFocus();
   }
 
   private void onEdit() {
@@ -397,11 +397,10 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
         if (changed) {
           DynamicDAO.save(label);
           fViewer.update(label, null);
-          fViewer.getTree().setFocus();
         }
       }
     }
-
+    fViewer.getTree().setFocus();
   }
 
   private void onDelete() {
@@ -414,9 +413,9 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
       if (dialog.open() == IDialogConstants.OK_ID) {
         DynamicDAO.delete(label);
         fViewer.refresh();
-        fViewer.getTree().setFocus();
       }
     }
+    fViewer.getTree().setFocus();
   }
 
   private void createViewer(Composite container) {
