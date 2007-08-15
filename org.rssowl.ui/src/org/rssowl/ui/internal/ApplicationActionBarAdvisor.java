@@ -24,20 +24,45 @@
 
 package org.rssowl.ui.internal;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ICoolBarManager;
+import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
+import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.ui.internal.actions.CopyLinkAction;
+import org.rssowl.ui.internal.actions.LabelAction;
+import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
+import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
+import org.rssowl.ui.internal.actions.MarkNewsReadAction;
+import org.rssowl.ui.internal.actions.OpenInBrowserAction;
+import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.ReloadAllAction;
+import org.rssowl.ui.internal.actions.SendLinkAction;
+import org.rssowl.ui.internal.editors.feed.FeedView;
+import org.rssowl.ui.internal.util.ModelUtils;
+
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * @author bpasero
@@ -142,6 +167,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     /* Go Menu */
     createGoMenu(menuBar);
 
+    /* News Menu */
+    createNewsMenu(menuBar);
+
     /* Allow Top-Level Menu Contributions here */
     menuBar.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 
@@ -226,6 +254,168 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     menuBar.add(viewMenu);
 
     viewMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+  }
+
+  /* Menu News */
+  private void createNewsMenu(IMenuManager menuBar) {
+    final IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
+
+    final MenuManager newsMenu = new MenuManager("&News", "news");
+    menuBar.add(newsMenu);
+    newsMenu.setRemoveAllWhenShown(true);
+
+    newsMenu.addMenuListener(new IMenuListener() {
+      public void menuAboutToShow(IMenuManager manager) {
+        final IStructuredSelection selection;
+
+        FeedView activeFeedView = OwlUI.getActiveFeedView();
+        if (activeFeedView != null)
+          selection = (IStructuredSelection) activeFeedView.getSite().getSelectionProvider().getSelection();
+        else
+          selection = StructuredSelection.EMPTY;
+
+        /* Open */
+        {
+          manager.add(new Separator("open"));
+
+          /* Open News in Browser */
+          manager.add(new Action("Open in Browser") {
+            @Override
+            public void run() {
+              new OpenInBrowserAction(selection).run();
+            }
+
+            @Override
+            public boolean isEnabled() {
+              return !selection.isEmpty();
+            }
+          });
+
+          /* Open Externally - Show only when internal browser is used */
+          if (!selection.isEmpty() && !preferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !preferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
+            manager.add(new OpenInExternalBrowserAction(selection));
+        }
+
+        /* Mark / Label */
+        {
+          manager.add(new Separator("mark"));
+
+          /* Mark */
+          {
+            MenuManager markMenu = new MenuManager("Mark", "mark");
+            manager.add(markMenu);
+
+
+            /* Mark as Read */
+            IAction action = new MarkNewsReadAction(selection);
+            action.setEnabled(!selection.isEmpty());
+            markMenu.add(action);
+
+            /* Mark All Read */
+            action = new MarkAllNewsReadAction();
+            action.setEnabled(!selection.isEmpty());
+            markMenu.add(action);
+
+            /* Sticky */
+            markMenu.add(new Separator());
+            action = new MakeNewsStickyAction(selection);
+            action.setEnabled(!selection.isEmpty());
+            markMenu.add(action);
+          }
+
+          /* Label */
+          {
+            MenuManager labelMenu = new MenuManager("Label");
+            manager.add(labelMenu);
+
+            /* Retrieve selected Labels from Selection (including NULL!) */
+            Set<ILabel> selectedLabels = ModelUtils.getLabels(selection);
+            ILabel commonLabel = null;
+            if (selectedLabels.size() == 1)
+              commonLabel = selectedLabels.iterator().next();
+
+            IAction labelNone = new Action("None", IAction.AS_RADIO_BUTTON) {
+              @Override
+              public void run() {
+                new LabelAction(null, selection).run();
+              }
+
+              @Override
+              public boolean isEnabled() {
+                return !selection.isEmpty();
+              }
+            };
+            labelNone.setChecked(selectedLabels.size() == 0 || (selectedLabels.size() == 1 && commonLabel == null));
+
+            labelMenu.add(labelNone);
+            labelMenu.add(new Separator());
+
+            Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
+            for (final ILabel label : labels) {
+              IAction labelAction = new Action(label.getName(), IAction.AS_RADIO_BUTTON) {
+                @Override
+                public void run() {
+                  new LabelAction(label, selection).run();
+                }
+
+                @Override
+                public boolean isEnabled() {
+                  return !selection.isEmpty();
+                }
+              };
+
+              labelAction.setChecked(label.equals(commonLabel));
+              labelMenu.add(labelAction);
+            }
+
+            labelMenu.add(new Separator());
+            labelMenu.add(new Action("Organize...") {
+              @Override
+              public void run() {
+                PreferencesUtil.createPreferenceDialogOn(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), ManageLabelsPreferencePage.ID, null, null).open();
+              }
+            });
+          }
+        }
+
+        /* Edit */
+        {
+          manager.add(new Separator("edit"));
+
+          /* Copy Link */
+          manager.add(new Action("Copy Link") {
+            @Override
+            public void run() {
+              IActionDelegate action = new CopyLinkAction();
+              action.selectionChanged(null, selection);
+              action.run(null);
+            }
+
+            @Override
+            public boolean isEnabled() {
+              return !selection.isEmpty();
+            }
+          });
+
+          /* Send Link */
+          manager.add(new Action("Send Link") {
+            @Override
+            public void run() {
+              IActionDelegate action = new SendLinkAction();
+              action.selectionChanged(null, selection);
+              action.run(null);
+            }
+
+            @Override
+            public boolean isEnabled() {
+              return !selection.isEmpty();
+            }
+          });
+        }
+
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+      }
+    });
   }
 
   /* Menu: Tools */
