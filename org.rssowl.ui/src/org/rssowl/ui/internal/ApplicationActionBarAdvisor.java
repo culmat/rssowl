@@ -34,6 +34,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IActionDelegate;
@@ -59,6 +60,7 @@ import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.ReloadAllAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.editors.feed.FeedView;
+import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.Collection;
@@ -305,7 +307,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             MenuManager markMenu = new MenuManager("Mark", "mark");
             manager.add(markMenu);
 
-
             /* Mark as Read */
             IAction action = new MarkNewsReadAction(selection);
             action.setEnabled(!selection.isEmpty());
@@ -477,7 +478,50 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     menuBar.add(helpMenu);
 
     helpMenu.add(new GroupMarker(IWorkbenchActionConstants.HELP_START));
+
+    /* Link to boreal.rssowl.org */
+    helpMenu.add(new Action("&Boreal Owl Help") {
+      @Override
+      public void run() {
+        BrowserUtils.openLink("http://boreal.rssowl.org");
+      }
+
+      @Override
+      public ImageDescriptor getImageDescriptor() {
+        return OwlUI.getImageDescriptor("icons/elcl16/help.gif");
+      }
+    });
+
     helpMenu.add(new Separator());
+
+    /* Report Bugs */
+    helpMenu.add(new Action("&Report Bugs") {
+      @Override
+      public void run() {
+        BrowserUtils.openLink("http://dev.rssowl.org");
+      }
+
+      @Override
+      public ImageDescriptor getImageDescriptor() {
+        return OwlUI.getImageDescriptor("icons/elcl16/bug.gif");
+      }
+    });
+
+    /* Homepage */
+    helpMenu.add(new Action("&Homepage") {
+      @Override
+      public void run() {
+        BrowserUtils.openLink("http://www.rssowl.org");
+      }
+    });
+
+    /* Mailing List */
+    helpMenu.add(new Action("&Mailinglist") {
+      @Override
+      public void run() {
+        BrowserUtils.openLink("https://lists.sourceforge.net/lists/listinfo/rssowl-boreal");
+      }
+    });
 
     // helpMenu.add(getAction(ActionFactory.INTRO.getId())); TODO Enable
     helpMenu.add(new Separator());
