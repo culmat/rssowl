@@ -586,7 +586,7 @@ public class NewsTableControl implements IFeedViewPart {
     manager.setRemoveAllWhenShown(true);
     manager.addMenuListener(new IMenuListener() {
       public void menuAboutToShow(IMenuManager manager) {
-        IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
+        final IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
 
         /* Open */
         {
@@ -636,7 +636,7 @@ public class NewsTableControl implements IFeedViewPart {
             IAction labelNone = new Action("None", IAction.AS_RADIO_BUTTON) {
               @Override
               public void run() {
-                new LabelAction(null, (IStructuredSelection) fViewer.getSelection()).run();
+                new LabelAction(null, selection).run();
               }
             };
             labelNone.setChecked(selectedLabels.size() == 0 || (selectedLabels.size() == 1 && commonLabel == null));
@@ -649,7 +649,7 @@ public class NewsTableControl implements IFeedViewPart {
               IAction labelAction = new Action(label.getName(), IAction.AS_RADIO_BUTTON) {
                 @Override
                 public void run() {
-                  new LabelAction(label, (IStructuredSelection) fViewer.getSelection()).run();
+                  new LabelAction(label, selection).run();
                 }
               };
 
