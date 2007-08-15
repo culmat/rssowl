@@ -267,7 +267,6 @@
                icon="icons/elcl16/mark_all_read.gif"
                id="org.rssowl.ui.MarkAllRead"
                label="Mark All News as Read"
-               menubarPath="news/mark"
                style="push"
                toolbarPath="news/mark">
          </action>
@@ -279,7 +278,6 @@
                icon="icons/elcl16/mark_read.gif"
                id="org.rssowl.ui.actions.MarkRead"
                label="Mark News as Read"
-               menubarPath="news/mark"
                style="push"
                toolbarPath="news/mark"
                tooltip="Mark News as Read">
@@ -293,7 +291,6 @@
                icon="icons/elcl16/reload_all.gif"
                id="org.rssowl.ui.actions.ReloadAll"
                label="Update All"
-               menubarPath="news/reload"
                style="push"
                toolbarPath="news/reload"/>
          <action
@@ -302,34 +299,15 @@
                icon="icons/elcl16/reload.gif"
                id="org.rssowl.ui.actions.Reload"
                label="Update"
-               menubarPath="news/reload"
                retarget="true"
                style="push"
                toolbarPath="news/reload"/>
-         <action
-               class="org.rssowl.ui.internal.actions.OpenInBrowserAction"
-               definitionId="org.rssowl.ui.OpenInBrowser"
-               enablesFor="+"
-               id="org.rssowl.ui.OpenInBrowser"
-               label="Open in Browser"
-               style="push"
-               tooltip="Open Selected Items"/>
-         <action
-               class="org.rssowl.ui.internal.actions.MakeNewsStickyAction"
-               definitionId="org.rssowl.ui.actions.ToggleFlag"
-               enablesFor="+"
-               icon="icons/obj16/news_pin.gif"
-               id="org.rssowl.ui.actions.ToggleFlag"
-               label="Toggle Sticky"
-               style="push"
-               tooltip="Toggle Flag of Selected Items"/>
          <menu
                id="news"
                label="News">
             <separator name="mark"/>
             <separator name="reload"/>
             <separator name="additions"/>
-            <separator name="devactions"/>
          </menu>
       </actionSet>
    </extension>
