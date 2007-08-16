@@ -29,6 +29,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -38,9 +40,10 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
+import org.eclipse.swt.widgets.TabFolder;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.rssowl.core.Owl;
@@ -97,11 +100,13 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   private Spinner fMarkReadAfterSpinner;
   private Button fMarkReadOnMinimize;
   private Button fMarkReadOnChange;
+  private LocalResourceManager fResources;
 
   /** Leave for reflection */
   public FeedsPreferencePage() {
     fGlobalScope = Owl.getPreferenceService().getGlobalScope();
     fReloadService = Controller.getDefault().getReloadService();
+    fResources = new LocalResourceManager(JFaceResources.getResources());
   }
 
   /*
@@ -110,37 +115,65 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   public void init(IWorkbench workbench) {}
 
   /*
+   * @see org.eclipse.jface.dialogs.DialogPage#dispose()
+   */
+  @Override
+  public void dispose() {
+    super.dispose();
+    fResources.dispose();
+  }
+
+  /*
    * @see org.eclipse.jface.preference.PreferencePage#createContents(org.eclipse.swt.widgets.Composite)
    */
   @Override
   protected Control createContents(Composite parent) {
     Composite container = createComposite(parent);
 
+    TabFolder tabFolder = new TabFolder(container, SWT.None);
+    tabFolder.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
     /* General */
-    createGeneralGroup(container);
+    createGeneralGroup(tabFolder);
 
     /* Reading */
-    createReadingGroup(container);
+    createReadingGroup(tabFolder);
 
     /* Display */
-    createDisplayGroup(container);
+    createDisplayGroup(tabFolder);
 
     /* Clean-Up */
-    createCleanUpGroup(container);
+    createCleanUpGroup(tabFolder);
+
+    /* Info Container */
+    Composite infoContainer = new Composite(container, SWT.None);
+    infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+
+    Label infoImg = new Label(infoContainer, SWT.NONE);
+    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
+    infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    Label infoText = new Label(infoContainer, SWT.WRAP);
+    infoText.setText("You can also define these properties per folder or bookmark.");
+    infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     return container;
   }
 
-  private void createGeneralGroup(Composite parent) {
-    Group group = new Group(parent, SWT.NONE);
-    group.setText("General");
+  private void createGeneralGroup(TabFolder parent) {
+    Composite group = new Composite(parent, SWT.NONE);
     group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     group.setLayout(LayoutUtils.createGridLayout(1));
+
+    TabItem item = new TabItem(parent, SWT.None);
+    item.setText("General");
+    item.setControl(group);
 
     /* Auto-Reload */
     Composite autoReloadContainer = new Composite(group, SWT.NONE);
     autoReloadContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0));
-    autoReloadContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, true));
+    autoReloadContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fUpdateCheck = new Button(autoReloadContainer, SWT.CHECK);
     fUpdateCheck.setText("Automatically update the feeds every ");
@@ -188,11 +221,14 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fOpenOnStartupCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_OPEN_ON_STARTUP));
   }
 
-  private void createReadingGroup(Composite parent) {
-    Group group = new Group(parent, SWT.NONE);
-    group.setText("Reading");
+  private void createReadingGroup(TabFolder parent) {
+    Composite group = new Composite(parent, SWT.NONE);
     group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     group.setLayout(LayoutUtils.createGridLayout(1));
+
+    TabItem item = new TabItem(parent, SWT.None);
+    item.setText("Reading");
+    item.setControl(group);
 
     /* Mark read after millis */
     Composite markReadAfterContainer = new Composite(group, SWT.None);
@@ -229,11 +265,14 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fMarkReadOnChange.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_FEED_READ_ON_CHANGE));
   }
 
-  private void createDisplayGroup(Composite parent) {
-    Group group = new Group(parent, SWT.NONE);
-    group.setText("Display");
+  private void createDisplayGroup(TabFolder parent) {
+    Composite group = new Composite(parent, SWT.NONE);
     group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     group.setLayout(LayoutUtils.createGridLayout(2));
+
+    TabItem item = new TabItem(parent, SWT.None);
+    item.setText("Display");
+    item.setControl(group);
 
     /* Filter Settings */
     Label filterLabel = new Label(group, SWT.None);
@@ -278,11 +317,14 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fOpenSiteForEmptyNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS));
   }
 
-  private void createCleanUpGroup(Composite parent) {
-    Group group = new Group(parent, SWT.NONE);
-    group.setText("Clean-Up");
+  private void createCleanUpGroup(TabFolder parent) {
+    Composite group = new Composite(parent, SWT.NONE);
     group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     group.setLayout(LayoutUtils.createGridLayout(2, 5, 5, 10, 5, false));
+
+    TabItem item = new TabItem(parent, SWT.None);
+    item.setText("Clean-Up");
+    item.setControl(group);
 
     /* Explanation Label */
     Label explanationLabel = new Label(group, SWT.WRAP);
