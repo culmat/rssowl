@@ -31,6 +31,7 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.service.PersistenceException;
 
@@ -145,6 +146,7 @@ public class RetentionStrategy {
   private static List<INews> getNewsToDelete(IBookMark bookmark, Collection<INews> targetNews, int minCountToKeep) {
     List<INews> newsToDelete = new ArrayList<INews>();
     IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(bookmark);
+    boolean keepUnread = prefs.getBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE);
 
     /* Delete Read News if set */
     if (prefs.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE))
@@ -152,11 +154,11 @@ public class RetentionStrategy {
 
     /* Delete by Age if set */
     if (prefs.getBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE))
-      fillNewsToDeleteByAge(targetNews, newsToDelete, prefs.getInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE));
+      fillNewsToDeleteByAge(targetNews, newsToDelete, prefs.getInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE), keepUnread);
 
     /* Delete by Count if set */
     if (prefs.getBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE))
-      fillNewsToDeleteByCount(targetNews, newsToDelete, Math.max(minCountToKeep, prefs.getInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE)));
+      fillNewsToDeleteByCount(targetNews, newsToDelete, Math.max(minCountToKeep, prefs.getInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE)), keepUnread);
 
     return newsToDelete;
   }
@@ -168,15 +170,19 @@ public class RetentionStrategy {
     }
   }
 
-  private static void fillNewsToDeleteByAge(Collection<INews> targetNews, List<INews> newsToDelete, int days) {
+  private static void fillNewsToDeleteByAge(Collection<INews> targetNews, List<INews> newsToDelete, int days, boolean keepUnread) {
     long maxAge = DateUtils.getToday().getTimeInMillis() - (days * DAY);
     for (INews newsItem : targetNews) {
-      if (!newsItem.isFlagged() && !newsToDelete.contains(newsItem) && DateUtils.getRecentDate(newsItem).getTime() <= maxAge)
+      State state = newsItem.getState();
+      boolean isUnread = (state == INews.State.NEW || state == INews.State.UPDATED || state == INews.State.UNREAD);
+
+      /* Keep Flagged and Unread (if set) */
+      if (!newsItem.isFlagged() && !(isUnread && keepUnread) && !newsToDelete.contains(newsItem) && DateUtils.getRecentDate(newsItem).getTime() <= maxAge)
         newsToDelete.add(newsItem);
     }
   }
 
-  private static void fillNewsToDeleteByCount(Collection<INews> targetNews, List<INews> newsToDelete, int limit) {
+  private static void fillNewsToDeleteByCount(Collection<INews> targetNews, List<INews> newsToDelete, int limit, boolean keepUnread) {
 
     /* Ignore News that are in List of Deleted News already */
     int actualSize = targetNews.size() - newsToDelete.size();
@@ -206,7 +212,11 @@ public class RetentionStrategy {
     int toDeleteValue = actualSize - limit;
     int deletedCounter = 0;
     for (i = 0; i < newsArray.length && deletedCounter != toDeleteValue; i++) {
-      if (!newsArray[i].isFlagged()) {
+      State state = newsArray[i].getState();
+      boolean isUnread = (state == INews.State.NEW || state == INews.State.UPDATED || state == INews.State.UNREAD);
+
+      /* Keep Flagged and Unread (if set) */
+      if (!newsArray[i].isFlagged() && !(isUnread && keepUnread)) {
         newsToDelete.add(newsArray[i]);
         deletedCounter++;
       }

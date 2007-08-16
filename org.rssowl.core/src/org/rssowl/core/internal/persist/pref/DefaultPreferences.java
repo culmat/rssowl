@@ -80,6 +80,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Retention Policy: Delete read News (boolean) */
   public static final String DEL_READ_NEWS_STATE = "org.rssowl.pref.DelReadNewsState";
 
+  /** Retention Policy: Never Delete Unread News (boolean) */
+  public static final String NEVER_DEL_UNREAD_NEWS_STATE = "org.rssowl.pref.NeverDelUnreadNewsState";
+
   /** BookMarks: Auto-Update Interval (integer) */
   public static final String BM_UPDATE_INTERVAL = "org.rssowl.pref.BMUpdateInterval";
 
