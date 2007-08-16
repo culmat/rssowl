@@ -87,6 +87,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   private Button fDeleteNewsByAgeCheck;
   private Spinner fDeleteNewsByAgeValue;
   private Button fDeleteReadNewsCheck;
+  private Button fNeverDeleteUnReadNewsCheck;
   private Button fReloadOnStartupCheck;
   private Combo fFilterCombo;
   private Combo fGroupCombo;
@@ -281,7 +282,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     Group group = new Group(parent, SWT.NONE);
     group.setText("Clean-Up");
     group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    group.setLayout(LayoutUtils.createGridLayout(2));
+    group.setLayout(LayoutUtils.createGridLayout(2, 5, 5, 10, 5, false));
 
     /* Explanation Label */
     Label explanationLabel = new Label(group, SWT.WRAP);
@@ -328,9 +329,15 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     /* Delete by State */
     fDeleteReadNewsCheck = new Button(group, SWT.CHECK);
-    fDeleteReadNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+    fDeleteReadNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
     fDeleteReadNewsCheck.setText("Always delete read news");
     fDeleteReadNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE));
+
+    /* Never Delete Unread State */
+    fNeverDeleteUnReadNewsCheck = new Button(group, SWT.CHECK);
+    fNeverDeleteUnReadNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
+    fNeverDeleteUnReadNewsCheck.setText("Never delete unread news");
+    fNeverDeleteUnReadNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE));
   }
 
   private Composite createComposite(Composite parent) {
@@ -430,8 +437,11 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     if (fGlobalScope.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE) != fDeleteReadNewsCheck.getSelection()) {
       fGlobalScope.putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, fDeleteReadNewsCheck.getSelection());
-      runCleanUp = fDeleteReadNewsCheck.getSelection();
+      if (fDeleteReadNewsCheck.getSelection())
+        runCleanUp = true;
     }
+
+    fGlobalScope.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, fNeverDeleteUnReadNewsCheck.getSelection());
 
     /* Run certain tasks now */
     finish(autoUpdateChange, displayChange, runCleanUp);
@@ -540,6 +550,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fDeleteNewsByAgeValue.setSelection(defaultScope.getInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE));
     fDeleteNewsByAgeValue.setEnabled(fDeleteNewsByAgeCheck.getSelection());
     fDeleteReadNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE));
+    fNeverDeleteUnReadNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE));
   }
 
   private int getUpdateIntervalScope() {
