@@ -387,12 +387,14 @@ public class SearchNewsDialog extends TitleAreaDialog {
       /* Relevance Column */
       if (columnIndex == COL_RELEVANCE) {
         ScoredNews scoredNews = (ScoredNews) element;
-        if (scoredNews.getRelevance() == Relevance.HIGH)
-          return fHighRelevanceIcon;
-        else if (scoredNews.getRelevance() == Relevance.MEDIUM)
-          return fMediumRelevanceIcon;
-
-        return fLowRelevanceIcon;
+        switch (scoredNews.getRelevance()) {
+          case HIGH:
+            return fHighRelevanceIcon;
+          case MEDIUM:
+            return fMediumRelevanceIcon;
+          case LOW:
+            return fLowRelevanceIcon;
+        }
       }
 
       /* Any other Column */
