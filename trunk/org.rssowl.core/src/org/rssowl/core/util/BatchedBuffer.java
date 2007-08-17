@@ -44,10 +44,10 @@ import java.util.Set;
  * @param <T> The type that will be buffered
  */
 public class BatchedBuffer<T> {
-  private int fBatchInterval;
-  private List<T> fBuffer;
-  private Job fBufferProcessor;
-  private Receiver<T> fReceiver;
+  private final int fBatchInterval;
+  private final List<T> fBuffer;
+  private final Job fBufferProcessor;
+  private final Receiver<T> fReceiver;
 
   /**
    * @param <T> The type that will be received from the

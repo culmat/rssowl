@@ -79,7 +79,7 @@ public class Activator extends Plugin {
   }
 
   private IProxyService loadProxyService() {
-    Bundle bundle = Platform.getBundle(CORE_NET_BUNDLE); //$NON-NLS-1$
+    Bundle bundle = Platform.getBundle(CORE_NET_BUNDLE); 
     if (bundle != null) {
       ServiceReference ref = bundle.getBundleContext().getServiceReference(IProxyService.class.getName());
       if (ref != null)

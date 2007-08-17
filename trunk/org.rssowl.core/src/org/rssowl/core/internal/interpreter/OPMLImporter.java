@@ -63,7 +63,7 @@ import java.util.List;
  * @author bpasero
  */
 public class OPMLImporter implements ITypeImporter {
-  private DateFormat fDateFormat = DateFormat.getDateInstance();
+  private final DateFormat fDateFormat = DateFormat.getDateInstance();
 
   /*
    * @see org.rssowl.core.interpreter.ITypeImporter#importFrom(org.jdom.Document)

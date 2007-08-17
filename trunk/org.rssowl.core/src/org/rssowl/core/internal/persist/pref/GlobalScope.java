@@ -46,9 +46,9 @@ import java.util.Set;
  * @author bpasero
  */
 public class GlobalScope implements IPreferenceScope {
-  private Map<String, IPreference> fCache;
-  private IPreferenceScope fParent;
-  private IPreferenceDAO fPreferenceDAO;
+  private final Map<String, IPreference> fCache;
+  private final IPreferenceScope fParent;
+  private final IPreferenceDAO fPreferenceDAO;
 
   /**
    * @param parent

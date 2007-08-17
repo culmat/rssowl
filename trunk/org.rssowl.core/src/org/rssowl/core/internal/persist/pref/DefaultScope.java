@@ -43,7 +43,7 @@ public class DefaultScope implements IPreferenceScope {
   private static final int INT_DEFAULT = 0;
   private static final long LONG_DEFAULT = 0L;
 
-  private Properties fDefaults = new Properties();
+  private final Properties fDefaults = new Properties();
 
   /*
    * @see org.rssowl.ui.internal.preferences.IPreferencesScope#getParent()
