@@ -155,6 +155,12 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Limit number of News in notification */
   public static final String LIMIT_NOTIFICATION_SIZE = "org.rssowl.pref.LimitNotificationPoup";
 
+  /** Global: Limit Notifier to Selected Elements */
+  public static final String LIMIT_NOTIFIER_TO_SELECTION = "org.rssowl.pref.LimitNotifierToSelection";
+
+  /** Global: Enable Notifier for Element */
+  public static final String ENABLE_NOTIFIER = "org.rssowl.pref.EnableNotifier";
+
   /** Global: Confirm deleting a News */
   public static final String CONFIRM_DELETE_NEWS = "org.rssowl.pref.ConfirmDeleteNews";
 
@@ -192,6 +198,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putBoolean(BM_OPEN_SITE_FOR_EMPTY_NEWS, false);
     defaultScope.putBoolean(BE_ENABLE_LINKING, true);
     defaultScope.putInteger(LIMIT_NOTIFICATION_SIZE, 5);
+    defaultScope.putBoolean(SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED, true);
     defaultScope.putBoolean(CONFIRM_DELETE_NEWS, true);
   }
 
