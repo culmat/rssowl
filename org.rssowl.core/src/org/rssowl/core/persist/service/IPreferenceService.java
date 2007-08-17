@@ -24,6 +24,8 @@
 
 package org.rssowl.core.persist.service;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.pref.IPreferencesInitializer;
@@ -63,6 +65,17 @@ public interface IPreferenceService {
    * @return The Global Scope for Preferences.
    */
   IPreferenceScope getGlobalScope();
+
+  /**
+   * The eclipse scope can be used to retrieve preferences that are stored in
+   * the Eclipse platform via {@link IEclipsePreferences} and
+   * {@link IPreferencesService}. It should only be used if the preference is
+   * interpreted by other Eclipse plugins. In any other case, use
+   * {@link #getGlobalScope()}.
+   *
+   * @return The Eclipse Scope for Preferences.
+   */
+  IPreferenceScope getEclipseScope();
 
   /**
    * The entity scope stores preferences in the given entity itself.
