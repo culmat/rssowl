@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.persist.pref.DefaultScope;
+import org.rssowl.core.internal.persist.pref.EclipseScope;
 import org.rssowl.core.internal.persist.pref.EntityScope;
 import org.rssowl.core.internal.persist.pref.GlobalScope;
 import org.rssowl.core.persist.IEntity;
@@ -48,11 +49,13 @@ public class PreferenceServiceImpl implements IPreferenceService {
   /* Scoped Preferences */
   private final IPreferenceScope fDefaultScope;
   private final IPreferenceScope fGlobalScope;
+  private final IPreferenceScope fEclipseScope;
 
   /** */
   public PreferenceServiceImpl() {
     fDefaultScope = new DefaultScope();
     fGlobalScope = new GlobalScope(fDefaultScope);
+    fEclipseScope = new EclipseScope(fDefaultScope);
     initScopedPreferences();
   }
 
@@ -71,6 +74,13 @@ public class PreferenceServiceImpl implements IPreferenceService {
   }
 
   /*
+   * @see org.rssowl.core.persist.service.IPreferenceService#getEclipseScope()
+   */
+  public IPreferenceScope getEclipseScope() {
+    return fEclipseScope;
+  }
+
+  /*
    * @see org.rssowl.core.model.persist.pref.IPreferencesService#getEntityScope(org.rssowl.core.model.persist.IEntity)
    */
   public IPreferenceScope getEntityScope(IEntity entity) {
@@ -79,6 +89,7 @@ public class PreferenceServiceImpl implements IPreferenceService {
 
   /* Init scoped preferences */
   private void initScopedPreferences() {
+
     /* Pass Service through Initializers */
     IExtensionRegistry reg = Platform.getExtensionRegistry();
     IConfigurationElement elements[] = reg.getConfigurationElementsFor(PREFERENCES_INITIALIZER_EXTENSION_POINT);

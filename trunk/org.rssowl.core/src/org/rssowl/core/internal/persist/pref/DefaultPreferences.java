@@ -164,6 +164,22 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Confirm deleting a News */
   public static final String CONFIRM_DELETE_NEWS = "org.rssowl.pref.ConfirmDeleteNews";
 
+  /**
+   * Eclipse Preferences Follow
+   */
+
+  /** Global Eclipse: Restore Tabs on startup */
+  public static final String ECLIPSE_RESTORE_TABS = "instance/org.eclipse.ui.workbench/USE_IPERSISTABLE_EDITORS";
+
+  /** Global Eclipse: Use multiple Tabs */
+  public static final String ECLIPSE_MULTIPLE_TABS = "instance/org.eclipse.ui.workbench/SHOW_MULTIPLE_EDITOR_TABS";
+
+  /** Global Eclipse: Autoclose Tabs */
+  public static final String ECLIPSE_AUTOCLOSE_TABS = "instance/org.eclipse.ui.workbench/REUSE_OPEN_EDITORS_BOOLEAN";
+
+  /** Global Eclipse: Autoclose Tabs Threshold */
+  public static final String ECLIPSE_AUTOCLOSE_TABS_THRESHOLD = "instance/org.eclipse.ui.workbench/REUSE_OPEN_EDITORS";
+
   /*
    * @see org.rssowl.core.model.preferences.IPreferencesInitializer#initialize(org.rssowl.core.model.preferences.IPreferencesScope)
    */
@@ -171,6 +187,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
 
     /* Default Globals */
     initGlobalDefaults(defaultScope);
+
+    /* Default Eclipse Globals */
+    initGlobalEclipseDefaults(defaultScope);
 
     /* Default Retention Policy */
     initRetentionDefaults(defaultScope);
@@ -199,6 +218,12 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putBoolean(BE_ENABLE_LINKING, true);
     defaultScope.putInteger(LIMIT_NOTIFICATION_SIZE, 5);
     defaultScope.putBoolean(CONFIRM_DELETE_NEWS, true);
+  }
+
+  private void initGlobalEclipseDefaults(IPreferenceScope defaultScope) {
+    defaultScope.putBoolean(ECLIPSE_RESTORE_TABS, true);
+    defaultScope.putBoolean(ECLIPSE_AUTOCLOSE_TABS, true);
+    defaultScope.putInteger(ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 1);
   }
 
   private void initRetentionDefaults(IPreferenceScope defaultScope) {
