@@ -336,7 +336,7 @@ public class BookMarkExplorer extends ViewPart {
     /* Hook Open Support */
     fViewer.addOpenListener(new IOpenListener() {
       public void open(OpenEvent event) {
-        onOpen();
+        BookMarkExplorer.this.open((IStructuredSelection) fViewer.getSelection());
       }
     });
 
@@ -409,8 +409,7 @@ public class BookMarkExplorer extends ViewPart {
     }
   }
 
-  private void onOpen() {
-    IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
+  void open(IStructuredSelection selection) {
     List<?> list = selection.toList();
     boolean activateEditor = OpenStrategy.activateOnOpen();
     int openedEditors = 0;
