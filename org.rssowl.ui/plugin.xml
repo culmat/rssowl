@@ -396,6 +396,14 @@
                id="org.rssowl.ui.preferences.keywords.ManageLabels">
          </keywordReference>
       </page>
+      <page
+            class="org.rssowl.ui.internal.NotifierPreferencesPage"
+            id="org.rssowl.ui.NotifierPreferences"
+            name="Notifier">
+         <keywordReference
+               id="org.rssowl.ui.preferences.keywords.Notifier">
+         </keywordReference>
+      </page>
    </extension>
    <extension
          point="org.eclipse.ui.keywords">
@@ -419,7 +427,7 @@
             label="open view switch"/>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Miscellaneous"
-            label="minimize tray external browser feed notification alert popup">
+            label="minimize tray external browser feed">
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Feeds"
@@ -428,6 +436,10 @@
       <keyword
             id="org.rssowl.ui.preferences.keywords.ManageLabels"
             label="label labels tag tags organize categorize category prioritize priority">
+      </keyword>
+      <keyword
+            id="org.rssowl.ui.preferences.keywords.Notifier"
+            label="notifier notification alert popup ">
       </keyword>
    </extension>
    <extension
