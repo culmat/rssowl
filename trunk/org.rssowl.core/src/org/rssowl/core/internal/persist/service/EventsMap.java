@@ -42,9 +42,9 @@ public class EventsMap {
     }
   }
 
-  private ThreadLocal<InternalMap> fEvents = new ThreadLocal<InternalMap>();
+  private final ThreadLocal<InternalMap> fEvents = new ThreadLocal<InternalMap>();
 
-  private ThreadLocal<Map<Integer, ModelEvent>> fEventTemplatesMap =
+  private final ThreadLocal<Map<Integer, ModelEvent>> fEventTemplatesMap =
     new ThreadLocal<Map<Integer, ModelEvent>>();
 
   private EventsMap() {
