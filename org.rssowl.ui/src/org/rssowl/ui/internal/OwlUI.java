@@ -51,10 +51,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
@@ -65,6 +67,7 @@ import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.ui.internal.editors.feed.FeedView;
+import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.io.ByteArrayInputStream;
@@ -829,6 +832,31 @@ public class OwlUI {
       IEditorPart activeEditor = page.getActiveEditor();
       if (activeEditor != null && activeEditor instanceof FeedView)
         return (FeedView) activeEditor;
+    }
+
+    return null;
+  }
+
+  /**
+   * Attempts to find the first <code>FeedView</code> from the active
+   * Workbench Window of the PlatformUI facade. Otherwise, returns <code>NULL</code>
+   * if none.
+   *
+   * @return the first <code>FeedView</code> from the active Workbench Window
+   * of the PlatformUI facade or <code>NULL</code> if none.
+   */
+  public static FeedView getFirstActiveFeedView() {
+    IWorkbenchPage page = getPage();
+    if (page != null) {
+      IEditorReference[] editorReferences = page.getEditorReferences();
+      for (IEditorReference editorReference : editorReferences) {
+        try {
+          if (editorReference.getEditorInput() instanceof FeedViewInput)
+            return (FeedView) editorReference.getEditor(true);
+        } catch (PartInitException e) {
+          /* Ignore Silently */
+        }
+      }
     }
 
     return null;

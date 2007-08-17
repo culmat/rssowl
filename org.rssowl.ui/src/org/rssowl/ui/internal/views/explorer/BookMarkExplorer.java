@@ -414,12 +414,24 @@ public class BookMarkExplorer extends ViewPart {
     boolean activateEditor = OpenStrategy.activateOnOpen();
     int openedEditors = 0;
     int maxOpenEditors = EditorUtils.getOpenEditorLimit();
+    boolean reuseFeedView = fGlobalPreferences.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW);
 
     /* Open Editors for the given Selection */
     for (int i = 0; i < list.size() && openedEditors < maxOpenEditors; i++) {
       Object object = list.get(i);
       if (object instanceof IMark) {
         IMark mark = ((IMark) object);
+
+        /* Open in existing Feedview if set */
+        if (reuseFeedView) {
+          FeedView activeFeedView = OwlUI.getFirstActiveFeedView();
+          if (activeFeedView != null) {
+            activeFeedView.setInput(new FeedViewInput(mark));
+            break;
+          }
+        }
+
+        /* Otherwise simply open */
         try {
           fViewSite.getPage().openEditor(new FeedViewInput(mark), FeedView.ID, activateEditor);
           openedEditors++;

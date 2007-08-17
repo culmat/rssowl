@@ -66,6 +66,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   private Button fAutoCloseTabsCheck;
   private Button fUseMultipleTabsCheck;
   private Button fReopenFeedsOnStartupCheck;
+  private Button fAlwaysReuseFeedView;
 
   /** Leave for reflection */
   public MiscPreferencePage() {
@@ -92,11 +93,11 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   protected Control createContents(Composite parent) {
     Composite container = createComposite(parent);
 
-    /* View Options */
-    createViewOptions(container);
-
     /* Browser Options */
     createBrowserOptions(container);
+
+    /* View Options */
+    createViewOptions(container);
 
     /* System Tray Options */
     createTrayOptions(container);
@@ -120,6 +121,10 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fReopenFeedsOnStartupCheck = new Button(viewGroup, SWT.CHECK);
     fReopenFeedsOnStartupCheck.setText("Re-Open last opened feeds on startup");
     fReopenFeedsOnStartupCheck.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS));
+
+    fAlwaysReuseFeedView = new Button(viewGroup, SWT.CHECK);
+    fAlwaysReuseFeedView.setText("Always open feeds in the same tab");
+    fAlwaysReuseFeedView.setSelection(fGlobalScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW));
 
     fUseMultipleTabsCheck = new Button(viewGroup, SWT.CHECK);
     fUseMultipleTabsCheck.setText("Show multiple tabs side by side");
@@ -266,6 +271,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   @Override
   public boolean performOk() {
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS, fReopenFeedsOnStartupCheck.getSelection());
+    fGlobalScope.putBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW, fAlwaysReuseFeedView.getSelection());
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, fUseMultipleTabsCheck.getSelection());
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS, fAutoCloseTabsCheck.getSelection());
     fEclipseScope.putInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, fAutoCloseTabsSpinner.getSelection());
@@ -293,6 +299,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
 
     fReopenFeedsOnStartupCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS));
+    fAlwaysReuseFeedView.setSelection(defaultScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW));
     fUseMultipleTabsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS));
     fAutoCloseTabsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS));
     fAutoCloseTabsSpinner.setSelection(defaultScope.getInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD));
