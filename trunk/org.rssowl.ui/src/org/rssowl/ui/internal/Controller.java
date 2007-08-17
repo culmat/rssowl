@@ -479,6 +479,12 @@ public class Controller {
         final boolean finalDeleteConditionalGet = deleteConditionalGet;
         fSaveFeedQueue.schedule(new TaskAdapter() {
           public IStatus run(IProgressMonitor monitor) {
+
+            /* Return on Cancelation or Shutdown */
+            if (monitor.isCanceled() || fShuttingDown)
+              return Status.CANCEL_STATUS;
+
+            /* Handle Feed Reload */
             fAppService.handleFeedReload(bookmark, pairResult.getFirst(), finalConditionalGet, finalDeleteConditionalGet);
             return Status.OK_STATUS;
           }
@@ -549,6 +555,8 @@ public class Controller {
   }
 
   private void updateErrorIndicator(final IBookMark bookmark, final IProgressMonitor monitor, CoreException ex) {
+
+    /* Return on Cancelation or Shutdown */
     if (monitor.isCanceled() || fShuttingDown)
       return;
 
