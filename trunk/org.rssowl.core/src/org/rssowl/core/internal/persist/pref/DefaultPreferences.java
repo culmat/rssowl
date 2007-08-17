@@ -164,6 +164,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Confirm deleting a News */
   public static final String CONFIRM_DELETE_NEWS = "org.rssowl.pref.ConfirmDeleteNews";
 
+  /** Global: Always reuse feed view */
+  public static final String ALWAYS_REUSE_FEEDVIEW = "org.rssowl.pref.AlwaysReuseFeedView";
+
   /**
    * Eclipse Preferences Follow
    */
