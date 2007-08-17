@@ -29,12 +29,17 @@ import org.eclipse.jface.util.IOpenEventListener;
 import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.IOpenListener;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.OpenEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
+import org.rssowl.ui.internal.util.TreeItemAdapter;
 import org.rssowl.ui.internal.util.ViewerOpenStrategy;
 
 /**
@@ -107,6 +112,18 @@ public class BookMarkViewer extends TreeViewer {
   }
 
   /*
+   * @see org.eclipse.jface.viewers.AbstractTreeViewer#remove(java.lang.Object[])
+   */
+  @Override
+  public void remove(final Object[] elements) {
+    updateSelectionAfterDelete(new Runnable() {
+      public void run() {
+        internalRemove(elements);
+      }
+    });
+  }
+
+  /*
    * @see org.eclipse.jface.viewers.Viewer#setSelection(org.eclipse.jface.viewers.ISelection)
    */
   @Override
@@ -168,6 +185,63 @@ public class BookMarkViewer extends TreeViewer {
           listener.open(event);
         }
       });
+    }
+  }
+
+  private void updateSelectionAfterDelete(Runnable runnable) {
+    Tree tree = (Tree) getControl();
+    IStructuredSelection selection = (IStructuredSelection) getSelection();
+
+    /* Nothing to do, since no selection */
+    if (selection.isEmpty()) {
+      runnable.run();
+      return;
+    }
+
+    /* Look for the minimal Index of all selected Elements */
+    int minSelectedIndex = Integer.MAX_VALUE;
+    TreeItemAdapter parentOfMinSelected = new TreeItemAdapter(tree);
+
+    /* For each selected Element */
+    Object[] selectedElements = selection.toArray();
+    for (Object selectedElement : selectedElements) {
+      Widget widget = findItem(selectedElement);
+      if (widget instanceof TreeItem) {
+        TreeItem item = (TreeItem) widget;
+        TreeItemAdapter parent = new TreeItemAdapter(item).getParent();
+
+        int index = parent.indexOf(item);
+        minSelectedIndex = Math.min(minSelectedIndex, index);
+        if (index == minSelectedIndex)
+          parentOfMinSelected.setItem(parent.getItem());
+      }
+    }
+
+    /* Perform Deletion */
+    runnable.run();
+
+    Object data = null;
+
+    /* Parent itself has been deleted */
+    if (parentOfMinSelected.getItem().isDisposed())
+      return;
+
+    /* Restore selection to next Element */
+    if (parentOfMinSelected.getItemCount() > minSelectedIndex)
+      data = parentOfMinSelected.getItem(minSelectedIndex).getData();
+
+    /* Restore selection to last Element */
+    else if (parentOfMinSelected.getItemCount() > 0)
+      data = parentOfMinSelected.getItem(parentOfMinSelected.getItemCount() - 1).getData();
+
+    /* Restore selection on actual Element */
+    else
+      data = parentOfMinSelected.getItem().getData();
+
+    /* Apply selection */
+    if (data != null) {
+      IStructuredSelection newSelection = new StructuredSelection(data);
+      setSelection(newSelection);
     }
   }
 }
