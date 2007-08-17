@@ -36,6 +36,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -51,6 +52,7 @@ import org.rssowl.ui.internal.util.LayoutUtils;
  */
 public class MiscPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
   private IPreferenceScope fGlobalScope;
+  private IPreferenceScope fEclipseScope;
   private Button fMinimizeToTray;
   private Button fMoveToTrayOnStart;
   private Button fMoveToTrayOnExit;
@@ -60,10 +62,15 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   private Button fUseInternalBrowser;
   private Button fCustomBrowserSearchButton;
   private Button fConfirmDeleteNews;
+  private Spinner fAutoCloseTabsSpinner;
+  private Button fAutoCloseTabsCheck;
+  private Button fUseMultipleTabsCheck;
+  private Button fReopenFeedsOnStartupCheck;
 
   /** Leave for reflection */
   public MiscPreferencePage() {
     fGlobalScope = Owl.getPreferenceService().getGlobalScope();
+    fEclipseScope = Owl.getPreferenceService().getEclipseScope();
   }
 
   /**
@@ -85,6 +92,105 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   protected Control createContents(Composite parent) {
     Composite container = createComposite(parent);
 
+    /* View Options */
+    createViewOptions(container);
+
+    /* Browser Options */
+    createBrowserOptions(container);
+
+    /* System Tray Options */
+    createTrayOptions(container);
+
+    /* Confirmation Options */
+    createConfirmationOptions(container);
+
+    return container;
+  }
+
+  private void createViewOptions(Composite container) {
+    Label label = new Label(container, SWT.NONE);
+    label.setText("View");
+    label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
+
+    /* View Group */
+    Composite viewGroup = new Composite(container, SWT.None);
+    viewGroup.setLayout(LayoutUtils.createGridLayout(1, 10, 5));
+    viewGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+    fReopenFeedsOnStartupCheck = new Button(viewGroup, SWT.CHECK);
+    fReopenFeedsOnStartupCheck.setText("Re-Open last opened feeds on startup");
+    fReopenFeedsOnStartupCheck.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS));
+
+    fUseMultipleTabsCheck = new Button(viewGroup, SWT.CHECK);
+    fUseMultipleTabsCheck.setText("Show multiple tabs side by side");
+    fUseMultipleTabsCheck.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS));
+
+    Composite autoCloseTabsContainer = new Composite(viewGroup, SWT.None);
+    autoCloseTabsContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0));
+
+    fAutoCloseTabsCheck = new Button(autoCloseTabsContainer, SWT.CHECK);
+    fAutoCloseTabsCheck.setText("Never show more than  ");
+    fAutoCloseTabsCheck.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS));
+    fAutoCloseTabsCheck.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        fAutoCloseTabsSpinner.setEnabled(fAutoCloseTabsCheck.getSelection());
+      }
+    });
+
+    fAutoCloseTabsSpinner = new Spinner(autoCloseTabsContainer, SWT.BORDER);
+    fAutoCloseTabsSpinner.setMinimum(1);
+    fAutoCloseTabsSpinner.setMaximum(100);
+    fAutoCloseTabsSpinner.setSelection(fEclipseScope.getInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD));
+    fAutoCloseTabsSpinner.setEnabled(fAutoCloseTabsCheck.getSelection());
+
+    label = new Label(autoCloseTabsContainer, SWT.None);
+    label.setText(fAutoCloseTabsSpinner.getSelection() == 1 ? " tab" : " tabs");
+  }
+
+  private void createConfirmationOptions(Composite container) {
+    Label label = new Label(container, SWT.NONE);
+    label.setText("Ask for confirmation");
+    label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
+
+    /* Confirmation Group */
+    Composite confirmationGroup = new Composite(container, SWT.None);
+    confirmationGroup.setLayout(LayoutUtils.createGridLayout(1, 10, 5));
+    confirmationGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+    /* Confirm Delete News */
+    fConfirmDeleteNews = new Button(confirmationGroup, SWT.CHECK);
+    fConfirmDeleteNews.setText("when deleting News");
+    fConfirmDeleteNews.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CONFIRM_DELETE_NEWS));
+  }
+
+  private void createTrayOptions(Composite container) {
+    Label label = new Label(container, SWT.NONE);
+    label.setText("Move to the System Tray");
+    label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
+
+    /* System Tray Group */
+    Composite trayGroup = new Composite(container, SWT.None);
+    trayGroup.setLayout(LayoutUtils.createGridLayout(1, 10, 5));
+    trayGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+    /* Enable / Disable Tray */
+    fMinimizeToTray = new Button(trayGroup, SWT.CHECK);
+    fMinimizeToTray.setText("when minimizing RSSOwl");
+    fMinimizeToTray.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE));
+
+    /* Move to Tray on Start */
+    fMoveToTrayOnStart = new Button(trayGroup, SWT.CHECK);
+    fMoveToTrayOnStart.setText("when starting RSSOwl");
+    fMoveToTrayOnStart.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_START));
+
+    /* Move to Tray on Close */
+    fMoveToTrayOnExit = new Button(trayGroup, SWT.CHECK);
+    fMoveToTrayOnExit.setText("when closing RSSOwl");
+    fMoveToTrayOnExit.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
+  }
+
+  private void createBrowserOptions(Composite container) {
     Label label = new Label(container, SWT.NONE);
     label.setText("Browser");
     label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
@@ -141,46 +247,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
           fCustomBrowserInput.setText(path);
       }
     });
-
-    label = new Label(container, SWT.NONE);
-    label.setText("Move to the System Tray");
-    label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
-
-    /* System Tray Group */
-    Composite trayGroup = new Composite(container, SWT.None);
-    trayGroup.setLayout(LayoutUtils.createGridLayout(1, 10, 5));
-    trayGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
-    /* Enable / Disable Tray */
-    fMinimizeToTray = new Button(trayGroup, SWT.CHECK);
-    fMinimizeToTray.setText("when minimizing RSSOwl");
-    fMinimizeToTray.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE));
-
-    /* Move to Tray on Start */
-    fMoveToTrayOnStart = new Button(trayGroup, SWT.CHECK);
-    fMoveToTrayOnStart.setText("when starting RSSOwl");
-    fMoveToTrayOnStart.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_START));
-
-    /* Move to Tray on Close */
-    fMoveToTrayOnExit = new Button(trayGroup, SWT.CHECK);
-    fMoveToTrayOnExit.setText("when closing RSSOwl");
-    fMoveToTrayOnExit.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
-
-    label = new Label(container, SWT.NONE);
-    label.setText("Ask for confirmation");
-    label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
-
-    /* Confirmation Group */
-    Composite confirmationGroup = new Composite(container, SWT.None);
-    confirmationGroup.setLayout(LayoutUtils.createGridLayout(1, 10, 5));
-    confirmationGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
-    /* Confirm Delete News */
-    fConfirmDeleteNews = new Button(confirmationGroup, SWT.CHECK);
-    fConfirmDeleteNews.setText("when deleting News");
-    fConfirmDeleteNews.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CONFIRM_DELETE_NEWS));
-
-    return container;
   }
 
   private Composite createComposite(Composite parent) {
@@ -199,6 +265,11 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
    */
   @Override
   public boolean performOk() {
+    fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS, fReopenFeedsOnStartupCheck.getSelection());
+    fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, fUseMultipleTabsCheck.getSelection());
+    fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS, fAutoCloseTabsCheck.getSelection());
+    fEclipseScope.putInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, fAutoCloseTabsSpinner.getSelection());
+
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_MINIMIZE, fMinimizeToTray.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_START, fMoveToTrayOnStart.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_CLOSE, fMoveToTrayOnExit.getSelection());
@@ -220,6 +291,12 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     super.performDefaults();
 
     IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
+
+    fReopenFeedsOnStartupCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS));
+    fUseMultipleTabsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS));
+    fAutoCloseTabsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS));
+    fAutoCloseTabsSpinner.setSelection(defaultScope.getInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD));
+    fAutoCloseTabsSpinner.setEnabled(fAutoCloseTabsCheck.getSelection());
 
     fMinimizeToTray.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE));
     fMoveToTrayOnStart.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_START));
