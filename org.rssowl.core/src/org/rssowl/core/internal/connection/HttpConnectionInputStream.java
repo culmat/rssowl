@@ -55,8 +55,8 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
   private static final String HEADER_RESPONSE_ETAG = "ETag"; //$NON-NLS-1$
   private static final String HEADER_RESPONSE_LAST_MODIFIED = "Last-Modified"; //$NON-NLS-1$
 
-  private GetMethod fGetMethod;
-  private IProgressMonitor fMonitor;
+  private final GetMethod fGetMethod;
+  private final IProgressMonitor fMonitor;
   private String fIfModifiedSince;
   private String fIfNoneMatch;
 

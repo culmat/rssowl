@@ -406,8 +406,8 @@ public class DBManager {
   private void configureAbstractEntity(Configuration config) {
     ObjectClass abstractEntityClass = config.objectClass(AbstractEntity.class);
     ObjectField idField = abstractEntityClass.objectField("fId");
-    idField.indexed(true); //$NON-NLS-1$
-    idField.cascadeOnActivate(true); //$NON-NLS-1$
+    idField.indexed(true); 
+    idField.cascadeOnActivate(true); 
     abstractEntityClass.objectField("fProperties").cascadeOnUpdate(true); //$NON-NLS-1$
   }
 

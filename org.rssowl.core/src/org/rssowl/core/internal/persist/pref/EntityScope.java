@@ -38,8 +38,8 @@ import java.util.Arrays;
  * @author bpasero
  */
 public class EntityScope implements IPreferenceScope {
-  private IEntity fEntity;
-  private IPreferenceScope fParent;
+  private final IEntity fEntity;
+  private final IPreferenceScope fParent;
 
   /**
    * @param entity

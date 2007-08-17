@@ -46,8 +46,8 @@ public class EclipseScope implements IPreferenceScope {
   private static final String ROOT_NAME = NODE_SEPARATOR;
 
   private final IPreferenceScope fParent;
-  private IPreferencesService fPrefService;
-  private IEclipsePreferences fRootNode;
+  private final IPreferencesService fPrefService;
+  private final IEclipsePreferences fRootNode;
 
   /**
    * @param parent

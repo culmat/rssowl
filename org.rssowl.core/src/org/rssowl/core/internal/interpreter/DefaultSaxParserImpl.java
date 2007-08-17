@@ -151,7 +151,7 @@ public class DefaultSaxParserImpl implements IXMLParser {
        * java.lang.String)
        */
       public InputSource getExternalSubset(String name, String baseURI) {
-        return new InputSource(getClass().getResourceAsStream(DEFAULT_DTD)); //$NON-NLS-1$
+        return new InputSource(getClass().getResourceAsStream(DEFAULT_DTD)); 
       }
 
       /*
@@ -167,7 +167,7 @@ public class DefaultSaxParserImpl implements IXMLParser {
        * java.lang.String, java.lang.String, java.lang.String)
        */
       public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId) {
-        return new InputSource(getClass().getResourceAsStream(DEFAULT_DTD)); //$NON-NLS-1$
+        return new InputSource(getClass().getResourceAsStream(DEFAULT_DTD)); 
       }
     });
 
