@@ -366,13 +366,6 @@
          <keywordReference id="org.rssowl.ui.preferences.keywords.ColorsAndFonts"/>
       </page>
       <page
-            category="org.eclipse.ui.preferencePages.Workbench"
-            class="org.eclipse.ui.ExtensionFactory:editorsPreferencePage"
-            id="org.rssowl.ui.preferences.Editors"
-            name="Editors">
-         <keywordReference id="org.rssowl.ui.preferences.keywords.Tabs"/>
-      </page>
-      <page
             class="org.rssowl.ui.internal.FeedsPreferencePage"
             id="org.rssowl.ui.FeedsPreferences"
             name="Feeds">
@@ -420,14 +413,11 @@
             id="org.rssowl.ui.preferences.keywords.ColorsAndFonts"
             label="presentation theme style"/>
       <keyword
-            id="org.rssowl.ui.preferences.keywords.Tabs"
-            label="editor"/>
-      <keyword
             id="org.rssowl.ui.preferences.keywords.Perspectives"
             label="open view switch"/>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Miscellaneous"
-            label="minimize tray external browser feed">
+            label="internal embedded systemtray confirm confirmation delete reopen open single multi tabs minimize tray external browser feed view ">
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Feeds"
