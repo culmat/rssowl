@@ -26,16 +26,19 @@ package org.rssowl.ui.internal;
 
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.NewsAdapter;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.BatchedBuffer;
 import org.rssowl.ui.internal.util.JobRunner;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -52,7 +55,7 @@ public class NotificationService {
   private static final int BATCH_INTERVAL = 5000;
 
   private final NewsListener fNewsAdapter;
-  private final IPreferenceScope fGlobalScope;
+  private final IPreferenceScope fGlobalPreferences;
   private final BatchedBuffer<NewsEvent> fBatchedBuffer;
 
   /* Singleton instance */
@@ -67,7 +70,7 @@ public class NotificationService {
     };
 
     fBatchedBuffer = new BatchedBuffer<NewsEvent>(receiver, BATCH_INTERVAL);
-    fGlobalScope = Owl.getPreferenceService().getGlobalScope();
+    fGlobalPreferences = Owl.getPreferenceService().getGlobalScope();
     fNewsAdapter = registerListeners();
   }
 
@@ -93,11 +96,26 @@ public class NotificationService {
     return listener;
   }
 
-  private void onNewsAdded(final Set<NewsEvent> events) {
+  private void onNewsAdded(Set<NewsEvent> events) {
 
     /* Return if Notification is disabled */
-    if (!fGlobalScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP))
+    if (!fGlobalPreferences.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP))
       return;
+
+    /* Filter Events if user decided to show Notifier only for selected Elements */
+    if (fGlobalPreferences.getBoolean(DefaultPreferences.LIMIT_NOTIFIER_TO_SELECTION)) {
+      List<FeedLinkReference> enabledFeeds = new ArrayList<FeedLinkReference>();
+
+      /* TODO This can be slow, try to optimize performance! */
+      Set<IBookMark> bookMarks = Controller.getDefault().getCacheService().getBookMarks();
+      for (IBookMark bookMark : bookMarks) {
+        IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(bookMark);
+        if (prefs.getBoolean(DefaultPreferences.ENABLE_NOTIFIER))
+          enabledFeeds.add(bookMark.getFeedLinkReference());
+      }
+
+      events = filterEvents(events, enabledFeeds);
+    }
 
     /* Add into Buffer */
     if (!isPopupVisible())
@@ -108,6 +126,17 @@ public class NotificationService {
       showNews(events);
   }
 
+  private Set<NewsEvent> filterEvents(Set<NewsEvent> events, List<FeedLinkReference> enabledFeeds) {
+    Set<NewsEvent> filteredEvents = new HashSet<NewsEvent>();
+
+    for (NewsEvent event : events) {
+      if (enabledFeeds.contains(event.getEntity().getFeedReference()))
+        filteredEvents.add(event);
+    }
+
+    return filteredEvents;
+  }
+
   /* Show Notification in UI Thread */
   private void showNews(final Set<NewsEvent> events) {
     JobRunner.runInUIThread(OwlUI.getPrimaryShell(), new Runnable() {
@@ -116,7 +145,7 @@ public class NotificationService {
         /* Return if Notification should only show when minimized */
         ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
         boolean minimized = advisor != null && (advisor.isMinimizedToTray() || advisor.isMinimized());
-        if (!minimized && fGlobalScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED))
+        if (!minimized && fGlobalPreferences.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED))
           return;
 
         /* Extract News */
