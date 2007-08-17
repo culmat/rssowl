@@ -143,33 +143,26 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     });
 
     label = new Label(container, SWT.NONE);
-    label.setText("System Tray");
+    label.setText("Move to the System Tray");
     label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
 
     /* System Tray Group */
     Composite trayGroup = new Composite(container, SWT.None);
-    trayGroup.setLayout(LayoutUtils.createGridLayout(1, 5, 5));
+    trayGroup.setLayout(LayoutUtils.createGridLayout(1, 10, 5));
     trayGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
-    Label trayLabel = new Label(trayGroup, SWT.NONE);
-    trayLabel.setText("Move to the System Tray");
-
-    Composite trayOptionsContainer = new Composite(trayGroup, SWT.NONE);
-    trayOptionsContainer.setLayout(LayoutUtils.createGridLayout(1, 10, 0));
-    trayOptionsContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
     /* Enable / Disable Tray */
-    fMinimizeToTray = new Button(trayOptionsContainer, SWT.CHECK);
+    fMinimizeToTray = new Button(trayGroup, SWT.CHECK);
     fMinimizeToTray.setText("when minimizing RSSOwl");
     fMinimizeToTray.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE));
 
     /* Move to Tray on Start */
-    fMoveToTrayOnStart = new Button(trayOptionsContainer, SWT.CHECK);
+    fMoveToTrayOnStart = new Button(trayGroup, SWT.CHECK);
     fMoveToTrayOnStart.setText("when starting RSSOwl");
     fMoveToTrayOnStart.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_START));
 
     /* Move to Tray on Close */
-    fMoveToTrayOnExit = new Button(trayOptionsContainer, SWT.CHECK);
+    fMoveToTrayOnExit = new Button(trayGroup, SWT.CHECK);
     fMoveToTrayOnExit.setText("when closing RSSOwl");
     fMoveToTrayOnExit.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
 
