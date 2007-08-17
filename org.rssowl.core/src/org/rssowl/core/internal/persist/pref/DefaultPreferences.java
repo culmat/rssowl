@@ -198,7 +198,6 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putBoolean(BM_OPEN_SITE_FOR_EMPTY_NEWS, false);
     defaultScope.putBoolean(BE_ENABLE_LINKING, true);
     defaultScope.putInteger(LIMIT_NOTIFICATION_SIZE, 5);
-    defaultScope.putBoolean(SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED, true);
     defaultScope.putBoolean(CONFIRM_DELETE_NEWS, true);
   }
 
