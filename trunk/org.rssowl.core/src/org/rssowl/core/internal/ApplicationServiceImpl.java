@@ -88,6 +88,10 @@ public class ApplicationServiceImpl implements IApplicationService {
       /* Resolve reloaded Feed */
       IFeed feed = bookMark.getFeedLinkReference().resolve();
 
+      /* Feed could have been deleted meanwhile! */
+      if (feed == null)
+        return;
+
       /* Copy over Properties to reloaded Feed to keep them */
       Map<String, ? > feedProperties = feed.getProperties();
       if (feedProperties != null) {
