@@ -47,7 +47,7 @@ import java.util.List;
  * @author bpasero
  */
 public class SearchValueType implements ISearchValueType {
-  private int fType;
+  private final int fType;
   private List<String> fEnumValues;
 
   /* Commonly used STRING Type */

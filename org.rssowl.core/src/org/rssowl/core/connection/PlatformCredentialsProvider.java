@@ -62,7 +62,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   private static final String SCHEME = ""; //$NON-NLS-1$
 
   /* A cache of non-protected Links */
-  private Set<String> fUnprotectedLinksCache = new HashSet<String>();
+  private final Set<String> fUnprotectedLinksCache = new HashSet<String>();
 
   /*
    * @see org.rssowl.core.connection.auth.ICredentialsProvider#getAuthCredentials(java.net.URI)

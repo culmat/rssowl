@@ -76,7 +76,7 @@ public final class LazySet<E extends IEntity> implements Set<E>   {
 
   public Iterator<E> iterator() {
     return new Iterator<E>() {
-      private Iterator<Long> fDelegateIterator = fIds.iterator();
+      private final Iterator<Long> fDelegateIterator = fIds.iterator();
       public boolean hasNext() {
         return fDelegateIterator.hasNext();
       }
