@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal;
 
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -34,7 +35,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
@@ -85,10 +85,13 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   protected Control createContents(Composite parent) {
     Composite container = createComposite(parent);
 
+    Label label = new Label(container, SWT.NONE);
+    label.setText("Browser");
+    label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
+
     /* Browser Group */
-    Group browserGroup = new Group(container, SWT.None);
-    browserGroup.setText("Browser");
-    browserGroup.setLayout(LayoutUtils.createGridLayout(2));
+    Composite browserGroup = new Composite(container, SWT.None);
+    browserGroup.setLayout(LayoutUtils.createGridLayout(2, 10, 5));
     browserGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Use internal Browser */
@@ -139,10 +142,13 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
       }
     });
 
+    label = new Label(container, SWT.NONE);
+    label.setText("System Tray");
+    label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
+
     /* System Tray Group */
-    Group trayGroup = new Group(container, SWT.None);
-    trayGroup.setText("System Tray");
-    trayGroup.setLayout(LayoutUtils.createGridLayout(1));
+    Composite trayGroup = new Composite(container, SWT.None);
+    trayGroup.setLayout(LayoutUtils.createGridLayout(1, 5, 5));
     trayGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     Label trayLabel = new Label(trayGroup, SWT.NONE);
@@ -167,10 +173,13 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fMoveToTrayOnExit.setText("when closing RSSOwl");
     fMoveToTrayOnExit.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
 
+    label = new Label(container, SWT.NONE);
+    label.setText("Ask for confirmation");
+    label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
+
     /* Confirmation Group */
-    Group confirmationGroup = new Group(container, SWT.None);
-    confirmationGroup.setText("Ask for confirmation");
-    confirmationGroup.setLayout(LayoutUtils.createGridLayout(1));
+    Composite confirmationGroup = new Composite(container, SWT.None);
+    confirmationGroup.setLayout(LayoutUtils.createGridLayout(1, 10, 5));
     confirmationGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Confirm Delete News */
