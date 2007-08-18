@@ -314,7 +314,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
             /* Mark All Read */
             action = new MarkAllNewsReadAction();
-            action.setEnabled(!selection.isEmpty());
+            action.setEnabled(activeFeedView != null);
             markMenu.add(action);
 
             /* Sticky */
