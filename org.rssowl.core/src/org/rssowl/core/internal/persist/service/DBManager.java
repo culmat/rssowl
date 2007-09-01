@@ -116,15 +116,20 @@ public class DBManager {
     return fObjectContainer;
   }
 
-  private final String getDBFilePath() {
+  private File getDefragmentFile() {
+    File dir = new File(Activator.getDefault().getStateLocation().toOSString());
+    return new File(dir, "defragment");
+  }
+
+  private String getDBFilePath() {
     String filePath = Activator.getDefault().getStateLocation().toOSString() + "/rssowl.db"; //$NON-NLS-1$
     return filePath;
   }
 
   private File getDBFormatFile() {
     File dir = new File(Activator.getDefault().getStateLocation().toOSString());
-    File existsFile = new File(dir, FORMAT_FILE_NAME);
-    return existsFile;
+    File formatFile = new File(dir, FORMAT_FILE_NAME);
+    return formatFile;
   }
 
   public void removeEntityStoreListener(DatabaseListener listener) {
@@ -144,9 +149,9 @@ public class DBManager {
         reindexRequired = migrate(workspaceVersion, getCurrentFormatVersion(), subMonitor.newChild(10));
       }
 
-      fObjectContainer = createObjectContainer(config);
+      defragmentIfNecessary();
 
-      //copyDatabase();
+      fObjectContainer = createObjectContainer(config);
 
       fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
 
@@ -320,15 +325,50 @@ public class DBManager {
     return 1;
   }
 
+  private void defragmentIfNecessary() {
+    File defragmentFile = getDefragmentFile();
+    if (!defragmentFile.exists()) {
+      return;
+    }
+
+    File file = new File(getDBFilePath());
+    File backupFile = getDBBackupFile();
+    if (!file.renameTo(backupFile)) {
+      throw new PersistenceException("Failed to rename file: " + file + " to: "
+          + backupFile);
+    }
+    copyDatabase(backupFile, file);
+    if (!defragmentFile.delete()) {
+      Activator.getDefault().logError("Failed to delete defragment file", null);
+    }
+  }
+
   @SuppressWarnings("unused")
-  private void defragment(Configuration config) {
-    DefragmentConfig defragConfig = new DefragmentConfig(getDBFilePath());
+  private void db4oDefrag(Configuration config, File defragmentFile) {
+    DefragmentConfig defragConfig = new DefragmentConfig(getDBFilePath(),
+        getDBBackupFile().getAbsolutePath());
     defragConfig.db4oConfig(config);
     try {
       Defragment.defrag(defragConfig);
+      defragmentFile.delete();
     } catch (IOException e) {
-      throw new PersistenceException("Error creating database", e);
+      //FIXME We should rename the original file back, continue start-up
+      //and notify the user about the failure to defragment. Also delete
+      //defragment file
+      throw new PersistenceException("A defragment was requested, but there was " +
+      		"an error performing it", e);
     }
+  }
+
+  private File getDBBackupFile() {
+    String dbFilePath = getDBFilePath();
+    String backupFilePath = dbFilePath + ".backup";
+    File backupFile = new File(backupFilePath);
+    int index = 1;
+    while (backupFile.exists()) {
+      backupFile = new File(backupFile + "." + index++);
+    }
+    return backupFile;
   }
 
   /**
@@ -336,38 +376,37 @@ public class DBManager {
    * At the moment, this means not copying NewsCounter and
    * IConditionalGets since they will be re-populated eventually.
    *
-   * TODO Allow new db file name to be set
-   * TODO Allow replacing old db with copy
-   * TODO Provide a full copy mode (that includes IConditionalGet an NewsCounter)
    */
   @SuppressWarnings("unused")
-  private void copyDatabase() {
-      ObjectContainer db = Db4o.openFile(createConfiguration(),
-          getDBFilePath() + "50");
-      for (Folder type : fObjectContainer.query(Folder.class))  {
-        fObjectContainer.activate(type, Integer.MAX_VALUE);
+  private static void copyDatabase(File source, File destination) {
+      ObjectContainer sourceDb = Db4o.openFile(createConfiguration(),
+          source.getAbsolutePath());
+      ObjectContainer destinationDb = Db4o.openFile(createConfiguration(),
+          destination.getAbsolutePath());
+      for (Folder type : sourceDb.query(Folder.class))  {
+        sourceDb.activate(type, Integer.MAX_VALUE);
         if (type.getParent() == null) {
-          db.ext().set(type, Integer.MAX_VALUE);
+          destinationDb.ext().set(type, Integer.MAX_VALUE);
         }
       }
-      for (Feed feed : fObjectContainer.query(Feed.class)) {
-        fObjectContainer.activate(feed, Integer.MAX_VALUE);
-        db.ext().set(feed, Integer.MAX_VALUE);
+      for (Feed feed : sourceDb.query(Feed.class)) {
+        sourceDb.activate(feed, Integer.MAX_VALUE);
+        destinationDb.ext().set(feed, Integer.MAX_VALUE);
       }
-      for (Preference pref : fObjectContainer.query(Preference.class)) {
-        fObjectContainer.activate(pref, Integer.MAX_VALUE);
-        db.ext().set(pref, Integer.MAX_VALUE);
+      for (Preference pref : sourceDb.query(Preference.class)) {
+        sourceDb.activate(pref, Integer.MAX_VALUE);
+        destinationDb.ext().set(pref, Integer.MAX_VALUE);
       }
-      List<Counter> counterSet = fObjectContainer.query(Counter.class);
+      List<Counter> counterSet = sourceDb.query(Counter.class);
       Counter counter = counterSet.iterator().next();
-      fObjectContainer.activate(counter, Integer.MAX_VALUE);
-      db.ext().set(counter, Integer.MAX_VALUE);
+      sourceDb.activate(counter, Integer.MAX_VALUE);
+      destinationDb.ext().set(counter, Integer.MAX_VALUE);
 
-      db.commit();
-      db.close();
+      destinationDb.commit();
+      destinationDb.close();
   }
 
-  private Configuration createConfiguration() {
+  private static Configuration createConfiguration() {
     Configuration config = Db4o.newConfiguration();
     //TODO We can use dbExists to configure our parameters for a more
     //efficient startup. For example, the following could be used. We'd have
@@ -403,20 +442,20 @@ public class DBManager {
     return config;
   }
 
-  private void configureAbstractEntity(Configuration config) {
+  private static void configureAbstractEntity(Configuration config) {
     ObjectClass abstractEntityClass = config.objectClass(AbstractEntity.class);
     ObjectField idField = abstractEntityClass.objectField("fId");
-    idField.indexed(true); 
-    idField.cascadeOnActivate(true); 
+    idField.indexed(true);
+    idField.cascadeOnActivate(true);
     abstractEntityClass.objectField("fProperties").cascadeOnUpdate(true); //$NON-NLS-1$
   }
 
-  private void configureFolder(Configuration config) {
+  private static void configureFolder(Configuration config) {
     ObjectClass oc = config.objectClass(Folder.class);
     oc.objectField("fChildren").cascadeOnUpdate(true); //$NON-NLS-1$
   }
 
-  private void configureNews(Configuration config) {
+  private static void configureNews(Configuration config) {
     ObjectClass oc = config.objectClass(News.class);
 
     oc.objectField("fTitle").cascadeOnActivate(true); //$NON-NLS-1$
@@ -428,7 +467,7 @@ public class DBManager {
     oc.objectField("fStateOrdinal").indexed(true); //$NON-NLS-1$
   }
 
-  private void configureFeed(Configuration config)  {
+  private static void configureFeed(Configuration config)  {
     ObjectClass oc = config.objectClass(Feed.class);
 
     ObjectField linkText = oc.objectField("fLinkText"); //$NON-NLS-1$
