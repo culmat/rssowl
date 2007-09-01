@@ -113,7 +113,6 @@ public class DBManager {
 
   private ObjectContainer createObjectContainer(Configuration config) {
     fObjectContainer = Db4o.openFile(config, getDBFilePath());
-    fObjectContainer.ext().configure().queries().evaluationMode(QueryEvaluationMode.IMMEDIATE);
     return fObjectContainer;
   }
 
@@ -385,6 +384,7 @@ public class DBManager {
 //    });
 //    config.messageLevel(3);
 
+    config.queries().evaluationMode(QueryEvaluationMode.IMMEDIATE);
     config.automaticShutDown(false);
 	config.callbacks(false);
     config.activationDepth(2);
