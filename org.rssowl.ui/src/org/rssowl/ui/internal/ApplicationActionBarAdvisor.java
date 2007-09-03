@@ -58,6 +58,7 @@ import org.rssowl.ui.internal.actions.MarkNewsReadAction;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.ReloadAllAction;
+import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.util.BrowserUtils;
@@ -412,6 +413,39 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
               return !selection.isEmpty();
             }
           });
+        }
+
+        /* Update */
+        {
+          manager.add(new Separator("reload"));
+
+          /* Update */
+          manager.add(new Action("Update") {
+            @Override
+            public void run() {
+              IActionDelegate action = new ReloadTypesAction();
+              action.selectionChanged(null, selection);
+              action.run(null);
+            }
+
+            @Override
+            public ImageDescriptor getImageDescriptor() {
+              return OwlUI.getImageDescriptor("icons/elcl16/reload.gif");
+            }
+
+            @Override
+            public ImageDescriptor getDisabledImageDescriptor() {
+              return OwlUI.getImageDescriptor("icons/dlcl16/reload.gif");
+            }
+
+            @Override
+            public boolean isEnabled() {
+              return !selection.isEmpty();
+            }
+          });
+
+          /* Update All */
+          manager.add(new ReloadAllAction());
         }
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
