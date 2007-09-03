@@ -96,7 +96,7 @@ public class NewsGroupCredentialsProvider extends PlatformCredentialsProvider {
     try {
       return new URI(link.getScheme(), link.getHost(), null, null);
     } catch (URISyntaxException e) {
-      Activator.getDefault().getLog().log(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+      Activator.log(e);
     }
 
     return link;

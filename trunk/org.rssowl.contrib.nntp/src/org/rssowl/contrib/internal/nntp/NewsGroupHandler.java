@@ -219,7 +219,7 @@ public class NewsGroupHandler implements IProtocolHandler {
 
     /* Wrap Exceptions */
     catch (IOException e) {
-      throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+      throw new ConnectionException(Activator.createErrorStatus(e.getMessage(), e));
     }
 
     /* Disconnect */
@@ -228,7 +228,7 @@ public class NewsGroupHandler implements IProtocolHandler {
         if (client.isConnected())
           client.disconnect();
       } catch (IOException e) {
-        throw new ConnectionException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+        throw new ConnectionException(Activator.createErrorStatus(e.getMessage(), e));
       }
     }
 
@@ -248,7 +248,7 @@ public class NewsGroupHandler implements IProtocolHandler {
       try {
         lastArticleId = Integer.parseInt((String) property);
       } catch (NumberFormatException e) {
-        Activator.getDefault().getLog().log(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+        Activator.log(e);
       }
     }
 
@@ -515,7 +515,7 @@ public class NewsGroupHandler implements IProtocolHandler {
 
   private void checkAuthenticationRequired(NNTPClient client) throws AuthenticationRequiredException {
     if (client.getReplyCode() == STATUS_AUTH_REQUIRED || client.getReplyCode() == STATUS_AUTH_REQUIRED_ALTERNATIVE)
-      throw new AuthenticationRequiredException(Activator.getDefault().createErrorStatus("Authentication required!", null)); //$NON-NLS-1$
+      throw new AuthenticationRequiredException(Activator.createErrorStatus("Authentication required!", null)); //$NON-NLS-1$
   }
 
   private void throwConnectionException(String msg, NNTPClient client) throws ConnectionException {
@@ -523,7 +523,7 @@ public class NewsGroupHandler implements IProtocolHandler {
     str.append(msg);
     str.append(" (").append(client.getReplyString()).append(")");
 
-    throw new ConnectionException(Activator.getDefault().createErrorStatus(str.toString(), null));
+    throw new ConnectionException(Activator.createErrorStatus(str.toString(), null));
   }
 
   /*
