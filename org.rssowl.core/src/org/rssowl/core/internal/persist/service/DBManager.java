@@ -34,6 +34,7 @@ import org.rssowl.core.internal.persist.BookMark;
 import org.rssowl.core.internal.persist.ConditionalGet;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.Folder;
+import org.rssowl.core.internal.persist.Label;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.Preference;
 import org.rssowl.core.internal.persist.migration.Migrations;
@@ -62,6 +63,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -383,6 +385,16 @@ public class DBManager {
           source.getAbsolutePath());
       ObjectContainer destinationDb = Db4o.openFile(createConfiguration(),
           destination.getAbsolutePath());
+
+      /*
+       * Keep labels in memory to avoid duplicate copies when cascading feed.
+       */
+      List<Label> labels = new ArrayList<Label>();
+      for (Label label : sourceDb.query(Label.class)) {
+        labels.add(label);
+        sourceDb.activate(label, Integer.MAX_VALUE);
+        destinationDb.ext().set(label, Integer.MAX_VALUE);
+      }
       for (Folder type : sourceDb.query(Folder.class))  {
         sourceDb.activate(type, Integer.MAX_VALUE);
         if (type.getParent() == null) {
