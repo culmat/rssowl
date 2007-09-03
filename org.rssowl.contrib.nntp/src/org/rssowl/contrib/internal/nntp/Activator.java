@@ -35,7 +35,10 @@ import org.osgi.framework.BundleContext;
 public class Activator extends Plugin {
 
   /* The shared instance */
-  private static Activator fPlugin;
+  private static Activator fgPlugin;
+
+  /* This plugins ID */
+  private static final String PLUGIN_ID = "org.rssowl.contrib.nntp";
 
   /**
    * The constructor
@@ -48,7 +51,7 @@ public class Activator extends Plugin {
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
-    fPlugin = this;
+    fgPlugin = this;
   }
 
   /*
@@ -56,27 +59,26 @@ public class Activator extends Plugin {
    */
   @Override
   public void stop(BundleContext context) throws Exception {
-    fPlugin = null;
+    fgPlugin = null;
     super.stop(context);
   }
 
   /**
-   * Returns the shared instance
-   * 
-   * @return the shared instance
+   * @param e the exception to log.
    */
-  public static Activator getDefault() {
-    return fPlugin;
+  public static void log(Exception e) {
+    if (fgPlugin != null)
+      fgPlugin.getLog().log(createErrorStatus(e.getMessage(), e));
   }
 
   /**
    * Create a Error IStatus out of the given message and exception.
-   * 
+   *
    * @param msg The message describing the error.
    * @param e The Exception that occured.
    * @return An IStatus out of the given message and exception.
    */
-  public IStatus createErrorStatus(String msg, Exception e) {
-    return new Status(IStatus.ERROR, getBundle().getSymbolicName(), IStatus.ERROR, msg, e);
+  public static IStatus createErrorStatus(String msg, Exception e) {
+    return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, msg, e);
   }
 }
