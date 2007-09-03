@@ -106,6 +106,7 @@ import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
+import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
@@ -137,6 +138,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -290,8 +292,16 @@ public class SearchNewsDialog extends TitleAreaDialog {
         return fNewsComparator.compare(news1.getNews(), news2.getNews());
 
       /* Sort by Score */
-      int result = news1.getScore().compareTo(news2.getScore());
-      return fNewsComparator.isAscending() ? result : result * -1;
+      if (!news1.getScore().equals(news2.getScore())) {
+        int result = news1.getScore().compareTo(news2.getScore());
+        return fNewsComparator.isAscending() ? result : result * -1;
+      }
+
+      /* Default: Sort by Date */
+      Date date1 = DateUtils.getRecentDate(news1.getNews());
+      Date date2 = DateUtils.getRecentDate(news2.getNews());
+
+      return date2.compareTo(date1);
     }
 
     void setAscending(boolean ascending) {
