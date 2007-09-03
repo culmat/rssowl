@@ -238,6 +238,12 @@ public class NewsGrouping {
         return ModelUtils.isLabelChange(events);
       else if (fType == Type.GROUP_BY_FEED && isUpdate) //TODO To be reconsidered when News can be reparented
         return false;
+      else if (fType == Type.GROUP_BY_TOPIC)
+        return ModelUtils.isTitleChange(events);
+      else if (fType == Type.GROUP_BY_STICKY)
+        return ModelUtils.isStickyStateChange(events);
+      else if (fType == Type.GROUP_BY_RATING)
+        return false;
 
       return true;
     }

@@ -587,6 +587,26 @@ public class ModelUtils {
   }
 
   /**
+   * @param events
+   * @return <code>TRUE</code> in case any of the events tell about a change
+   * in the Title of the News, <code>FALSE</code> otherwise.
+   */
+  public static boolean isTitleChange(Set<? extends ModelEvent> events) {
+    for (ModelEvent modelEvent : events) {
+      if (modelEvent instanceof NewsEvent) {
+        NewsEvent event = (NewsEvent) modelEvent;
+
+        String oldTopic = event.getOldNews() != null ? getHeadline(event.getOldNews()) : null;
+        String newTopic = getHeadline(event.getEntity());
+
+        if (!newTopic.equals(oldTopic))
+          return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * @param parent
    * @param entityToCheck
    * @return <code>TRUE</code> in case the given Entity is a child of the
