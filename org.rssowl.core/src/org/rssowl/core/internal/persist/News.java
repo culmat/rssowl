@@ -37,14 +37,12 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.MergeUtils;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -60,6 +58,43 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @author bpasero
  */
 public class News extends AbstractEntity implements INews {
+
+  static final class Lock {
+
+    private final transient ReadWriteLock fLock = new ReentrantReadWriteLock();
+    private volatile transient Thread fReadLockThread;
+
+    void acquireWriteLock() {
+      if (fReadLockThread == Thread.currentThread()) {
+        throw new IllegalStateException("Cannot acquire the write lock from the " +
+        		"same thread as the read lock.");
+      }
+      fLock.writeLock().lock();
+    }
+
+    void releaseWriteLock() {
+      fLock.writeLock().unlock();
+    }
+
+    void acquireReadLock() {
+      fLock.readLock().lock();
+    }
+
+    void acquireReadLockSpecial() {
+      fLock.readLock().lock();
+      fReadLockThread = Thread.currentThread();
+    }
+
+    void releaseReadLock() {
+      fLock.readLock().unlock();
+    }
+
+    void releaseReadLockSpecial() {
+      fReadLockThread = null;
+      fLock.readLock().unlock();
+    }
+
+  }
 
   private String fTitle;
 
@@ -95,9 +130,7 @@ public class News extends AbstractEntity implements INews {
   private List<IAttachment> fAttachments;
   private List<ICategory> fCategories;
 
-  private final transient ReadWriteLock fReadWriteLock = new ReentrantReadWriteLock();
-  private final transient Lock fWriteLock = fReadWriteLock.writeLock();
-  private final transient Lock fReadLock = fReadWriteLock.readLock();
+  private transient final Lock fLock = new Lock();
 
   /**
    * Constructor used by <code>DefaultModelFactory</code>
@@ -109,6 +142,7 @@ public class News extends AbstractEntity implements INews {
     Assert.isNotNull(feed, "The type News requires a Feed that is not NULL"); //$NON-NLS-1$
     fFeedLink = feed.getLink().toString();
     fReceiveDate = new Date();
+    init();
   }
 
   /**
@@ -127,6 +161,7 @@ public class News extends AbstractEntity implements INews {
     fFeedLink = feed.getLink().toString();
     Assert.isNotNull(receiveDate, "The type News requires a ReceiveDate that is not NULL"); //$NON-NLS-1$
     fReceiveDate = receiveDate;
+    init();
   }
 
   /**
@@ -134,6 +169,25 @@ public class News extends AbstractEntity implements INews {
    */
   protected News() {
   // As per javadoc
+  }
+
+  /**
+   * Initialises object after deserialization. Should not be used otherwise.
+   */
+  public final void init() {
+    fLock.acquireWriteLock();
+    try {
+      if (fLink == null) {
+        fLink = createURI(fLinkText);
+        fFeedLinkReference = new FeedLinkReference(createURI(fFeedLink));
+        if (fGuidValue != null) {
+          fGuid = new Guid(fGuidValue);
+          fGuid.setPermaLink(fGuidIsPermaLink);
+        }
+      }
+    } finally {
+      fLock.releaseWriteLock();
+    }
   }
 
   /**
@@ -145,8 +199,12 @@ public class News extends AbstractEntity implements INews {
    *
    * @return Lock used during operations that do not modify this object.
    */
-  public final Lock getReadLock() {
-    return fReadLock;
+  public final void acquireReadLockSpecial() {
+    fLock.acquireReadLockSpecial();
+  }
+
+  public final void releaseReadLockSpecial() {
+    fLock.releaseReadLockSpecial();
   }
 
   private <T>Boolean isEquivalentCompare(T o1, T o2) {
@@ -161,7 +219,7 @@ public class News extends AbstractEntity implements INews {
   }
 
   public boolean isEquivalent(INews other) {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       Assert.isNotNull(other, "other cannot be null"); //$NON-NLS-1$
       String guidValue = (getGuid() == null ? null : getGuid().getValue());
@@ -193,7 +251,7 @@ public class News extends AbstractEntity implements INews {
 
       return false;
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -201,7 +259,7 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#addAttachment(org.rssowl.core.model.types.IAttachment)
    */
   public void addAttachment(IAttachment attachment) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       if (fAttachments == null)
         fAttachments = new ArrayList<IAttachment>();
@@ -212,7 +270,7 @@ public class News extends AbstractEntity implements INews {
       Assert.isTrue(equals(attachment.getNews()), "The Attachment has a different News set!"); //$NON-NLS-1$
       fAttachments.add(attachment);
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -220,13 +278,13 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getAttachments()
    */
   public List<IAttachment> getAttachments() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       if (fAttachments == null)
         return Collections.emptyList();
       return Collections.unmodifiableList(fAttachments);
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -234,11 +292,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getAuthor()
    */
   public IPerson getAuthor() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       return fAuthor;
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -246,11 +304,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#setAuthor(org.rssowl.core.model.types.IPerson)
    */
   public void setAuthor(IPerson author) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       fAuthor = author;
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -258,11 +316,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getDescription()
    */
   public String getDescription() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       return fDescription;
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -270,11 +328,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#setDescription(java.lang.String)
    */
   public void setDescription(String description) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       fDescription = description;
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -282,31 +340,24 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getLink()
    */
   public URI getLink() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
-      if (fLink == null && fLinkText != null) {
-        try {
-          fLink = new URI(fLinkText);
-        } catch (URISyntaxException e) {
-          throw new IllegalStateException("Somehow an illegal URI was stored.", e); //$NON-NLS-1$
-        }
-      }
+      return fLink;
     } finally {
-     fReadLock.unlock();
+     fLock.releaseReadLock();
     }
-    return fLink;
   }
 
   /*
    * @see org.rssowl.core.model.types.INews#setLink(java.lang.String)
    */
   public void setLink(URI link) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       fLinkText = link == null ? null : link.toString();
       fLink = link;
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -314,11 +365,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getPublishDate()
    */
   public Date getPublishDate() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       return fPublishDate;
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -326,11 +377,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#setPublishDate(java.util.Date)
    */
   public void setPublishDate(Date publishDate) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       fPublishDate = publishDate;
     } finally	{
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -338,11 +389,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getTitle()
    */
   public String getTitle() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       return fTitle;
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -350,11 +401,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#setTitle(java.lang.String)
    */
   public void setTitle(String title) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       fTitle = title;
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -362,18 +413,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getFeed()
    */
   public FeedLinkReference getFeedReference() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
-      if (fFeedLinkReference == null) {
-        try {
-          fFeedLinkReference = new FeedLinkReference(new URI(fFeedLink));
-        } catch (URISyntaxException e) {
-          throw new IllegalStateException("A Malformed URI was stored somehow", e); //$NON-NLS-1$
-        }
-      }
       return fFeedLinkReference;
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -381,11 +425,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#setReceiveDate(java.util.Date)
    */
   public void setReceiveDate(Date receiveDate) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       fReceiveDate = receiveDate;
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -393,11 +437,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getReceiveDate()
    */
   public Date getReceiveDate() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       return fReceiveDate;
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -405,11 +449,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#setComments(java.lang.String)
    */
   public void setComments(String comments) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       fComments = comments;
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -417,13 +461,13 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#setGuid(org.rssowl.core.model.types.IGuid)
    */
   public void setGuid(IGuid guid) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       fGuid = guid;
       fGuidValue = (guid == null ? null : guid.getValue());
       fGuidIsPermaLink = (guid == null ? false : guid.isPermaLink());
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -431,11 +475,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#setSource(org.rssowl.core.model.types.ISource)
    */
   public void setSource(ISource source) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       fSource = source;
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -443,11 +487,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#setInReplyTo(java.lang.String)
    */
   public void setInReplyTo(String guid) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       fInReplyTo = guid;
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -455,11 +499,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#setModifiedDate(java.util.Date)
    */
   public void setModifiedDate(Date modifiedDate) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       fModifiedDate = modifiedDate;
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -467,11 +511,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getModifiedDate()
    */
   public Date getModifiedDate() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       return fModifiedDate;
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -479,13 +523,13 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#addCategory(org.rssowl.core.model.types.ICategory)
    */
   public void addCategory(ICategory category) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       if (fCategories == null)
         fCategories = new ArrayList<ICategory>();
       fCategories.add(category);
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -493,11 +537,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getComments()
    */
   public String getComments() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       return fComments;
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -505,11 +549,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#isFlagged()
    */
   public boolean isFlagged() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       return fIsFlagged;
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -517,11 +561,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#setFlagged(boolean)
    */
   public void setFlagged(boolean isFlagged) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       fIsFlagged = isFlagged;
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -529,11 +573,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getLabel()
    */
   public ILabel getLabel() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       return fLabel;
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -541,11 +585,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#setLabel(org.rssowl.core.model.types.impl.Label)
    */
   public void setLabel(ILabel label) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       fLabel = label;
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -553,15 +597,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getGuid()
    */
   public IGuid getGuid() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
-      if (fGuid == null && fGuidValue != null) {
-        fGuid = new Guid(fGuidValue);
-        fGuid.setPermaLink(fGuidIsPermaLink);
-      }
       return fGuid;
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -569,11 +609,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#setBase(java.net.URI)
    */
   public void setBase(URI baseUri) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       fBaseUri = getURIText(baseUri);
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -581,11 +621,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getBase()
    */
   public URI getBase() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       return createURI(fBaseUri);
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -593,13 +633,13 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getCategories()
    */
   public List<ICategory> getCategories() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       if (fCategories == null)
         return Collections.emptyList();
       return Collections.unmodifiableList(fCategories);
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -608,11 +648,11 @@ public class News extends AbstractEntity implements INews {
    */
   public void setState(State state) {
     Assert.isNotNull(state, "state cannot be null"); //$NON-NLS-1$
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       fStateOrdinal = state.ordinal();
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -620,11 +660,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getState()
    */
   public State getState() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       return INews.State.getState(fStateOrdinal);
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -632,11 +672,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#setRating(int)
    */
   public void setRating(int rating) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       fRating = rating;
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -644,11 +684,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getRating()
    */
   public int getRating() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       return fRating;
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -656,11 +696,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getSource()
    */
   public ISource getSource() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       return fSource;
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -668,11 +708,11 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#getInReplyTo()
    */
   public String getInReplyTo() {
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       return fInReplyTo;
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
   }
 
@@ -690,7 +730,7 @@ public class News extends AbstractEntity implements INews {
   public String toString() {
     StringBuilder str = new StringBuilder();
     str.append("\n\n****************************** News ******************************\n");
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       str.append("\nNews ID: ").append(getId());
       if (getTitle() != null)
@@ -698,7 +738,7 @@ public class News extends AbstractEntity implements INews {
       if (getLink() != null)
         str.append("\nLink: ").append(getLink());
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
     return str.toString();
   }
@@ -713,7 +753,7 @@ public class News extends AbstractEntity implements INews {
     StringBuilder str = new StringBuilder();
 
     str.append("\n\n****************************** News ******************************\n");
-    fReadLock.lock();
+    fLock.acquireReadLock();
     try {
       str.append("\nNews ID: ").append(getId());
       if (fFeedLink != null)
@@ -751,7 +791,7 @@ public class News extends AbstractEntity implements INews {
       str.append("\nIs Flagged: ").append(fIsFlagged);
       str.append("\nProperties: ").append(getProperties());
     } finally {
-      fReadLock.unlock();
+      fLock.releaseReadLock();
     }
     return str.toString();
   }
@@ -768,8 +808,8 @@ public class News extends AbstractEntity implements INews {
       return false;
 
     News n = (News) news;
-    fReadLock.lock();
-    n.getReadLock().lock();
+    fLock.acquireReadLock();
+    n.fLock.acquireReadLock();
     try {
       return getId().equals(n.getId()) &&
           fFeedLink.equals(n.fFeedLink) &&
@@ -785,8 +825,8 @@ public class News extends AbstractEntity implements INews {
           getState() == n.getState() && fIsFlagged == n.fIsFlagged && fRating == n.fRating &&
           (getProperties() == null ? n.getProperties() == null : getProperties().equals(n.getProperties()));
     } finally {
-      fReadLock.unlock();
-      n.getReadLock().unlock();
+      fLock.releaseReadLock();
+      n.fLock.releaseReadLock();
     }
 
   }
@@ -804,7 +844,7 @@ public class News extends AbstractEntity implements INews {
 
   public MergeResult merge(INews news) {
     Assert.isNotNull(news, "news cannot be null"); //$NON-NLS-1$
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       boolean updated = mergeState(news);
 
@@ -833,7 +873,7 @@ public class News extends AbstractEntity implements INews {
       }
       return result;
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
@@ -915,27 +955,22 @@ public class News extends AbstractEntity implements INews {
 
   public void setParent(IFeed feed) {
     Assert.isNotNull(feed, "feed"); //$NON-NLS-1$
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       this.fFeedLink = feed.getLink().toString();
-
-      /*
-       * Current value is not valid anymore, but don't create a new one until
-       * getFeedReference is called.
-       */
-      this.fFeedLinkReference = null;
+      this.fFeedLinkReference = new FeedLinkReference(feed.getLink());
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 
   public void removeAttachment(IAttachment attachment) {
-    fWriteLock.lock();
+    fLock.acquireWriteLock();
     try {
       if (fAttachments != null)
         fAttachments.remove(attachment);
     } finally {
-      fWriteLock.unlock();
+      fLock.releaseWriteLock();
     }
   }
 }

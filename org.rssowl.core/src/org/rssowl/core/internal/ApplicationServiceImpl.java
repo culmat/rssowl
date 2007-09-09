@@ -44,7 +44,6 @@ import com.db4o.ObjectContainer;
 import com.db4o.ext.Db4oException;
 import com.db4o.query.Query;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -84,50 +83,74 @@ public class ApplicationServiceImpl implements IApplicationService {
    */
   public final void handleFeedReload(IBookMark bookMark, IFeed emptyFeed, IConditionalGet conditionalGet, boolean deleteConditionalGet) {
     fWriteLock.lock();
+    MergeResult mergeResult = null;
     try {
-      /* Resolve reloaded Feed */
-      IFeed feed = bookMark.getFeedLinkReference().resolve();
+      try {
+        /* Resolve reloaded Feed */
+        IFeed feed = bookMark.getFeedLinkReference().resolve();
 
-      /* Feed could have been deleted meanwhile! */
-      if (feed == null)
-        return;
+        /* Feed could have been deleted meanwhile! */
+        if (feed == null)
+          return;
 
-      /* Copy over Properties to reloaded Feed to keep them */
-      Map<String, ? > feedProperties = feed.getProperties();
-      if (feedProperties != null) {
-        feedProperties.entrySet();
-        for (Map.Entry<String, ? > entry : feedProperties.entrySet())
-          emptyFeed.setProperty(entry.getKey(), entry.getValue());
+        /* Copy over Properties to reloaded Feed to keep them */
+        Map<String, ?> feedProperties = feed.getProperties();
+        if (feedProperties != null) {
+          feedProperties.entrySet();
+          for (Map.Entry<String, ?> entry : feedProperties.entrySet())
+            emptyFeed.setProperty(entry.getKey(), entry.getValue());
+        }
+
+        /* Merge with existing (remember number of added new news) */
+        List<INews> newNewsBeforeMerge = feed.getNewsByStates(EnumSet.of(INews.State.NEW));
+        mergeResult = feed.mergeAndCleanUp(emptyFeed);
+        List<INews> newNewsAdded = getNewNewsAdded(feed, newNewsBeforeMerge);
+        updateStateOfUnsavedNewNews(newNewsAdded);
+
+        /* Retention Policy */
+        List<INews> deletedNews = RetentionStrategy.process(bookMark, feed, newNewsAdded.size());
+
+        for (INews news : deletedNews)
+          mergeResult.addUpdatedObject(news);
+
+        lockNewsObjects(mergeResult);
+        saveFeed(mergeResult);
+
+        /* Update Conditional GET */
+        if (conditionalGet != null) {
+          if (deleteConditionalGet)
+            fDb.delete(conditionalGet);
+          else
+            fDb.ext().set(conditionalGet, 1);
+        }
+        fDb.commit();
+      } catch (Db4oException e) {
+        throw new PersistenceException(e);
+      } finally {
+        fWriteLock.unlock();
       }
-
-      /* Merge with existing (remember number of added new news) */
-      List<INews> newNewsBeforeMerge = feed.getNewsByStates(EnumSet.of(INews.State.NEW));
-      MergeResult mergeResult = feed.mergeAndCleanUp(emptyFeed);
-      List<INews> newNewsAdded = getNewNewsAdded(feed, newNewsBeforeMerge);
-      updateStateOfUnsavedNewNews(newNewsAdded);
-
-      /* Retention Policy */
-      List<INews> deletedNews = RetentionStrategy.process(bookMark, feed, newNewsAdded.size());
-
-      for (INews news : deletedNews)
-        mergeResult.addUpdatedObject(news);
-
-      saveFeed(mergeResult);
-
-      /* Update Conditional GET */
-      if (conditionalGet != null) {
-        if (deleteConditionalGet)
-          fDb.delete(conditionalGet);
-        else
-          fDb.ext().set(conditionalGet, 1);
-      }
-      fDb.commit();
-    } catch (Db4oException e) {
-      throw new PersistenceException(e);
+      DBHelper.cleanUpAndFireEvents();
     } finally {
-      fWriteLock.unlock();
+      unlockNewsObjects(mergeResult);
     }
-    DBHelper.cleanUpAndFireEvents();
+  }
+
+  private void lockNewsObjects(MergeResult mergeResult) {
+    for (Object object : mergeResult.getUpdatedObjects()) {
+      if (object instanceof News) {
+        ((News) object).acquireReadLockSpecial();
+      }
+    }
+  }
+
+  private void unlockNewsObjects(MergeResult mergeResult) {
+    if (mergeResult != null) {
+      for (Object object : mergeResult.getUpdatedObjects()) {
+        if (object instanceof News) {
+          ((News) object).releaseReadLockSpecial();
+        }
+      }
+    }
   }
 
   private List<INews> getNewNewsAdded(IFeed feed, List<INews> newNewsBeforeMerge) {
@@ -183,8 +206,7 @@ public class ApplicationServiceImpl implements IApplicationService {
       fDb.delete(o);
     }
 
-    List<Object> updatedEntities = new ArrayList<Object>(mergeResult.getUpdatedObjects());
-    for (Object o : updatedEntities) {
+    for (Object o : mergeResult.getUpdatedObjects()) {
       if (o instanceof INews)
         DBHelper.saveNews(fDb, (INews) o);
       else if (o instanceof IFeed)
