@@ -25,10 +25,17 @@
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.Label;
+import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
 import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.event.LabelListener;
+
+import com.db4o.query.Query;
+
+import java.util.List;
 
 /**
  * A data-access-object for <code>ILabel</code>s.
@@ -45,6 +52,20 @@ public final class LabelDAOImpl extends AbstractEntityDAO<ILabel, LabelListener,
   @Override
   protected final LabelEvent createDeleteEventTemplate(ILabel entity) {
     return createSaveEventTemplate(entity);
+  }
+
+  @Override
+  protected void doDelete(ILabel entity) {
+    Query query = fDb.query();
+    query.constrain(News.class);
+    query.descend("fLabels").constrain(entity);
+    @SuppressWarnings("unchecked")
+    List<INews> news = query.execute();
+    for (INews newsItem : news) {
+      newsItem.removeLabel(entity);
+    }
+    DynamicDAO.saveAll(news);
+    super.doDelete(entity);
   }
 
   @Override
