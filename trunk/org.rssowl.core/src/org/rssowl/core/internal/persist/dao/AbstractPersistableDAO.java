@@ -129,22 +129,34 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
   public void saveAll(Collection<T> objects) {
     if (objects.isEmpty())
       return;
-
-    fWriteLock.lock();
     try {
-      for (T object : objects) {
-        preSave(object);
+      preSaveAll(objects);
+      fWriteLock.lock();
+      try {
+        for (T object : objects) {
+          preSave(object);
+        }
+        for (T object : objects) {
+          doSave(object);
+        }
+        fDb.commit();
+      } catch (Db4oException e) {
+        throw new PersistenceException(e);
+      } finally {
+        fWriteLock.unlock();
       }
-      for (T object : objects) {
-        doSave(object);
-      }
-      fDb.commit();
-    } catch (Db4oException e) {
-      throw new PersistenceException(e);
+      DBHelper.cleanUpAndFireEvents();
     } finally {
-      fWriteLock.unlock();
+      postSaveAll(objects);
     }
-    DBHelper.cleanUpAndFireEvents();
+  }
+
+  protected void preSaveAll(Collection<T> objects) {
+    // Do nothing by default
+  }
+
+  protected void postSaveAll(Collection<T> objects) {
+    // Do nothing by default
   }
 
   protected void preSave(T persistable) {

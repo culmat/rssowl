@@ -26,6 +26,7 @@ package org.rssowl.core.internal.persist.service;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.BookMark;
 import org.rssowl.core.internal.persist.Feed;
+import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
@@ -168,11 +169,28 @@ public class EventManager {
       }
     };
 
+    EventListener4 activatedListener = new EventListener4() {
+      public void onEvent(Event4 e, EventArgs args) {
+        processActivated(args);
+      }
+    };
+
+    eventRegistry.activated().addListener(activatedListener);
     eventRegistry.created().addListener(createdListener);
     eventRegistry.creating().addListener(creatingListener);
     eventRegistry.updated().addListener(updatedListener);
     eventRegistry.deleting().addListener(deletingListener);
     eventRegistry.deleted().addListener(deletedListener);
+  }
+
+  private void processActivated(EventArgs args) {
+    IEntity entity = getEntity(args);
+    if (entity == null)
+      return;
+
+    if (entity instanceof News) {
+      ((News) entity).init();
+    }
   }
 
   private void processUpdatedEvent(EventArgs args) {

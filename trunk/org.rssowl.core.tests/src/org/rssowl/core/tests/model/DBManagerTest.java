@@ -973,24 +973,16 @@ public class DBManagerTest {
         @Override
         public void entitiesAdded(Set<NewsEvent> events) {
           NewsEvent event = events.iterator().next();
-          try {
-            NewsAddedCalled[0] = true;
-            initialFeed[0] = (Feed) initialNews.getFeedReference().resolve();
-            initialAuthor[0] = (Person) initialNews.getAuthor();
-            initialSource[0] = (Source) initialNews.getSource();
-            initialGuid[0] = (Guid) initialNews.getGuid();
-            News dbNews = (News) event.getEntity();
-            initialAuthor[0].setId(dbNews.getAuthor().getId());
-            initialAuthor[0].isIdentical(dbNews.getAuthor());
-            initialNews.setId(dbNews.getId());
-            assertTrue(initialNews.isIdentical(dbNews));
-            dbNews.setDescription("The description has been changed in the news");
-            dbNews.setState(State.UNREAD);
-            updatedNews[0] = dbNews;
-            DynamicDAO.save(dbNews);
-          } catch (PersistenceException e) {
-            fail(e.getMessage());
-          }
+          NewsAddedCalled[0] = true;
+          initialFeed[0] = (Feed) initialNews.getFeedReference().resolve();
+          initialAuthor[0] = (Person) initialNews.getAuthor();
+          initialSource[0] = (Source) initialNews.getSource();
+          initialGuid[0] = (Guid) initialNews.getGuid();
+          final News dbNews = (News) event.getEntity();
+          initialAuthor[0].setId(dbNews.getAuthor().getId());
+          initialAuthor[0].isIdentical(dbNews.getAuthor());
+          initialNews.setId(dbNews.getId());
+          assertTrue(initialNews.isIdentical(dbNews));
         }
 
         @Override
@@ -1002,7 +994,11 @@ public class DBManagerTest {
         }
       };
       DynamicDAO.addEntityListener(INews.class, newsListener);
-      DynamicDAO.save(initialNews);
+      INews news = DynamicDAO.save(initialNews);
+      news.setDescription("The description has been changed in the news");
+      news.setState(State.UNREAD);
+      updatedNews[0] = (News) news;
+      DynamicDAO.save(news);
       assertTrue(NewsAddedCalled[0]);
       assertTrue(NewsUpdatedCalled[0]);
       DynamicDAO.delete(updatedNews[0]);

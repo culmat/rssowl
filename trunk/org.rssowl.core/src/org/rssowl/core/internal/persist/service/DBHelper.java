@@ -24,6 +24,7 @@
 package org.rssowl.core.internal.persist.service;
 
 import org.rssowl.core.internal.persist.Feed;
+import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
@@ -100,8 +101,16 @@ public class DBHelper {
       saveAndCascadeNews(db, news, root);
   }
 
-  public static final void saveNews(ObjectContainer db, INews news) {
+  public static final INews peekPersistedNews(ObjectContainer db, INews news) {
     INews oldNews = db.ext().peekPersisted(news, 2, true);
+    if (oldNews instanceof News) {
+      ((News) oldNews).init();
+    }
+    return oldNews;
+  }
+
+  public static final void saveNews(ObjectContainer db, INews news) {
+    INews oldNews = peekPersistedNews(db, news);
     if (oldNews != null) {
       ModelEvent newsEventTemplate = new NewsEvent(oldNews, news, false);
       DBHelper.putEventTemplate(newsEventTemplate);
@@ -139,7 +148,7 @@ public class DBHelper {
   }
 
   public static final void saveAndCascadeNews(ObjectContainer db, INews news, boolean root) {
-    INews oldNews = db.ext().peekPersisted(news, 2, true);
+    INews oldNews = peekPersistedNews(db, news);
     if (oldNews != null || root) {
       ModelEvent event = new NewsEvent(oldNews, news, root);
       putEventTemplate(event);
