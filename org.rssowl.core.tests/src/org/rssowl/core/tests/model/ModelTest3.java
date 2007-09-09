@@ -2237,4 +2237,30 @@ public class ModelTest3 {
       DynamicDAO.removeEntityListener(ISearchCondition.class, listener);
     }
   }
+
+  /**
+   * Tests that deleting a label also removes it from all News containing it.
+   */
+  @Test
+  public void testDeleteLabelContainedInNews() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com"));
+    INews news = fFactory.createNews(null, feed, new Date());
+    ILabel label = fFactory.createLabel(null, "Label");
+    DynamicDAO.save(label);
+    news.addLabel(label);
+    DynamicDAO.save(feed);
+    assertEquals(1, news.getLabels().size());
+    DynamicDAO.delete(label);
+    assertEquals(0, news.getLabels().size());
+
+    label = fFactory.createLabel(null, "Another label");
+    DynamicDAO.save(label);
+    news.addLabel(label);
+    NewsReference newsRef = new NewsReference(news.getId());
+    news = null;
+    feed = null;
+    System.gc();
+    DynamicDAO.delete(label);
+    assertEquals(0, newsRef.resolve().getLabels().size());
+  }
 }

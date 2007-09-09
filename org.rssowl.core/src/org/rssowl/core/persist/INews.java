@@ -495,6 +495,28 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
   ILabel getLabel();
 
   /**
+   * @return An unmodifiable Set containing the Labels of this News.
+   */
+  Set<ILabel> getLabels();
+
+  /**
+   * Add {@code label} to this News if it's not present in the News yet.
+   *
+   * @param label Label to add.
+   * @return {@code true} if {@code label} was added to the INews or
+   * {@code false} if not.
+   */
+  boolean addLabel(ILabel label);
+
+  /**
+   * Remove {@code label} from this News if it's present in the News.
+   *
+   * @param label Label to remove.
+   * @return {@code true} if {@code label} was removed from this News.
+   */
+  boolean removeLabel(ILabel label);
+
+  /**
    * @param label The Label of this News.
    */
   void setLabel(ILabel label);

@@ -42,7 +42,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -120,6 +122,7 @@ public class News extends AbstractEntity implements INews {
 
   private ISource fSource;
 
+  //TODO Remove after M7
   private ILabel fLabel;
 
   private String fFeedLink;
@@ -129,6 +132,7 @@ public class News extends AbstractEntity implements INews {
 
   private List<IAttachment> fAttachments;
   private List<ICategory> fCategories;
+  private Set<ILabel> fLabels;
 
   private transient final Lock fLock = new Lock();
 
@@ -259,16 +263,52 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.model.types.INews#addAttachment(org.rssowl.core.model.types.IAttachment)
    */
   public void addAttachment(IAttachment attachment) {
+    Assert.isNotNull(attachment, "Exception adding NULL as Attachment into News"); //$NON-NLS-1$
     fLock.acquireWriteLock();
     try {
       if (fAttachments == null)
-        fAttachments = new ArrayList<IAttachment>();
-
-      Assert.isNotNull(attachment, "Exception adding NULL as Attachment into News"); //$NON-NLS-1$
+        fAttachments = new ArrayList<IAttachment>(2);
 
       /* Rule: Child needs to know about its new parent already! */
       Assert.isTrue(equals(attachment.getNews()), "The Attachment has a different News set!"); //$NON-NLS-1$
       fAttachments.add(attachment);
+    } finally {
+      fLock.releaseWriteLock();
+    }
+  }
+
+  public Set<ILabel> getLabels()    {
+    fLock.acquireReadLock();
+    try {
+      if (fLabels == null)
+        return Collections.emptySet();
+      return Collections.unmodifiableSet(fLabels);
+    } finally {
+      fLock.releaseReadLock();
+    }
+  }
+
+  public boolean addLabel(ILabel label) {
+    Assert.isNotNull(label, "label"); //$NON-NLS-1$
+    fLock.acquireWriteLock();
+    try {
+      if (fLabels == null)
+        fLabels = new HashSet<ILabel>(2);
+
+      return fLabels.add(label);
+    } finally {
+      fLock.releaseWriteLock();
+    }
+  }
+
+  public boolean removeLabel(ILabel label) {
+    Assert.isNotNull(label, "label"); //$NON-NLS-1$
+    fLock.acquireWriteLock();
+    try {
+      if (fLabels == null)
+        return false;
+
+      return fLabels.remove(label);
     } finally {
       fLock.releaseWriteLock();
     }
@@ -526,7 +566,7 @@ public class News extends AbstractEntity implements INews {
     fLock.acquireWriteLock();
     try {
       if (fCategories == null)
-        fCategories = new ArrayList<ICategory>();
+        fCategories = new ArrayList<ICategory>(3);
       fCategories.add(category);
     } finally {
       fLock.releaseWriteLock();
@@ -784,8 +824,7 @@ public class News extends AbstractEntity implements INews {
         str.append("\nSource: ").append(getSource());
       if (getInReplyTo() != null)
         str.append("\nIn Reply To: ").append(getInReplyTo());
-      if (getLabel() != null)
-        str.append("\nLabel: ").append(getLabel());
+      str.append("\nLabesl: ").append(getLabels());
       str.append("\nAttachments: ").append(getAttachments());
       str.append("\nCategories: ").append(getCategories());
       str.append("\nIs Flagged: ").append(fIsFlagged);

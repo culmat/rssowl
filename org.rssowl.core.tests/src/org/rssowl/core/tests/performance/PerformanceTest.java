@@ -729,7 +729,7 @@ public class PerformanceTest {
 
     System.out.println(message + "[Warm - " + JOBS + " Jobs] took: " + (l1 + l2) / 2 + "ms/n");
   }
-  
+
   /**
    * @throws Exception
    */
@@ -753,7 +753,7 @@ public class PerformanceTest {
 
     System.out.println(message + "[Warm - " + JOBS + " Jobs] took: " + (l1 + l2) / 2 + "ms/n");
   }
-  
+
   /**
    * @throws Exception
    */
@@ -777,7 +777,7 @@ public class PerformanceTest {
 
     System.out.println(message + "[Warm - " + JOBS + " Jobs] took: " + (l1 + l2) / 2 + "ms/n");
   }
-  
+
   /**
    * @throws Exception
    */
@@ -845,7 +845,7 @@ public class PerformanceTest {
 
     return tasks;
   }
-  
+
   /**
    * @throws Exception
    */
@@ -1094,48 +1094,7 @@ public class PerformanceTest {
     for (final FeedReference feedRef : feedRefs) {
       tasks.add(new TaskAdapter() {
         public IStatus run(IProgressMonitor monitor) {
-          try {
-            IFeed feed = feedRef.resolve();
-
-            if (feed.getAuthor() != null)
-              accessAllFields(feed.getAuthor());
-
-            List<ICategory> feedCats = feed.getCategories();
-            for (ICategory category : feedCats)
-              accessAllFields(category);
-
-            if (feed.getImage() != null)
-              accessAllFields(feed.getImage());
-
-            accessAllFields(feed);
-
-            Collection<INews> newsList = feed.getNews();
-            for (INews news : newsList) {
-              accessAllFields(news);
-
-              List<IAttachment> attachments = news.getAttachments();
-              for (IAttachment attachment : attachments)
-                accessAllFields(attachment);
-
-              if (news.getAuthor() != null)
-                accessAllFields(news.getAuthor());
-
-              List<ICategory> categories = news.getCategories();
-              for (ICategory category : categories)
-                accessAllFields(category);
-
-              if (news.getGuid() != null)
-                accessAllFields(news.getGuid());
-
-              if (news.getSource() != null)
-                accessAllFields(news.getSource());
-
-              if (news.getLabel() != null)
-                accessAllFields(news.getLabel());
-            }
-          } catch (Exception e) {
-            ex.add(e);
-          }
+          accessAllFields(ex, feedRef);
           return Status.OK_STATUS;
         }
       });
@@ -1153,6 +1112,51 @@ public class PerformanceTest {
 
     if (ex.size() > 0)
       throw ex.get(0);
+  }
+
+  private void accessAllFields(final List<Exception> ex, final FeedReference feedRef) {
+    try {
+      IFeed feed = feedRef.resolve();
+
+      if (feed.getAuthor() != null)
+        accessAllFields(feed.getAuthor());
+
+      List<ICategory> feedCats = feed.getCategories();
+      for (ICategory category : feedCats)
+        accessAllFields(category);
+
+      if (feed.getImage() != null)
+        accessAllFields(feed.getImage());
+
+      accessAllFields(feed);
+
+      Collection<INews> newsList = feed.getNews();
+      for (INews news : newsList) {
+        accessAllFields(news);
+
+        List<IAttachment> attachments = news.getAttachments();
+        for (IAttachment attachment : attachments)
+          accessAllFields(attachment);
+
+        if (news.getAuthor() != null)
+          accessAllFields(news.getAuthor());
+
+        List<ICategory> categories = news.getCategories();
+        for (ICategory category : categories)
+          accessAllFields(category);
+
+        if (news.getGuid() != null)
+          accessAllFields(news.getGuid());
+
+        if (news.getSource() != null)
+          accessAllFields(news.getSource());
+
+        for (ILabel label : news.getLabels())
+          accessAllFields(label);
+      }
+    } catch (Exception e) {
+      ex.add(e);
+    }
   }
 
   /**
@@ -1353,48 +1357,7 @@ public class PerformanceTest {
       if (a % 8 == 0) {
         tasks.add(new TaskAdapter() {
           public IStatus run(IProgressMonitor monitor) {
-            try {
-              IFeed feed = feedRefs.get(a).resolve();
-
-              if (feed.getAuthor() != null)
-                accessAllFields(feed.getAuthor());
-
-              List<ICategory> feedCats = feed.getCategories();
-              for (ICategory category : feedCats)
-                accessAllFields(category);
-
-              if (feed.getImage() != null)
-                accessAllFields(feed.getImage());
-
-              accessAllFields(feed);
-
-              Collection<INews> newsList = feed.getNews();
-              for (INews news : newsList) {
-                accessAllFields(news);
-
-                List<IAttachment> attachments = news.getAttachments();
-                for (IAttachment attachment : attachments)
-                  accessAllFields(attachment);
-
-                if (news.getAuthor() != null)
-                  accessAllFields(news.getAuthor());
-
-                List<ICategory> categories = news.getCategories();
-                for (ICategory category : categories)
-                  accessAllFields(category);
-
-                if (news.getGuid() != null)
-                  accessAllFields(news.getGuid());
-
-                if (news.getSource() != null)
-                  accessAllFields(news.getSource());
-
-                if (news.getLabel() != null)
-                  accessAllFields(news.getLabel());
-              }
-            } catch (Exception e) {
-              ex.add(e);
-            }
+            accessAllFields(ex, feedRefs.get(a));
             return Status.OK_STATUS;
           }
         });
@@ -1412,7 +1375,7 @@ public class PerformanceTest {
 
     return feedRefs;
   }
-  
+
   @SuppressWarnings("nls")
   private List<IFeed> interpretFeedsHelper() {
     List<IFeed> feeds = new ArrayList<IFeed>();
