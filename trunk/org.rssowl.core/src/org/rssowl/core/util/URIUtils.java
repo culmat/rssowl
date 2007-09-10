@@ -24,6 +24,8 @@
 
 package org.rssowl.core.util;
 
+import org.rssowl.core.internal.Activator;
+
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -48,6 +50,23 @@ public class URIUtils {
   /* This utility class constructor is hidden */
   private URIUtils() {
   // Protect default constructor
+  }
+
+  /**
+   * Will create a new {@link URI} out of the given one that only contains the
+   * Scheme and Host part.
+   *
+   * @param link The link to normalize.
+   * @return the normalized link.
+   */
+  public static URI normalizeUri(URI link) {
+    try {
+      return new URI(link.getScheme(), link.getHost(), null, null);
+    } catch (URISyntaxException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    }
+
+    return link;
   }
 
   /**
