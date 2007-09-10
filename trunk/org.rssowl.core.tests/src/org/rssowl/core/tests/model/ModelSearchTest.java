@@ -117,7 +117,7 @@ public class ModelSearchTest {
       ICategory news1cat1 = fFactory.createCategory(null, news1);
       news1cat1.setName("apple");
       ILabel label1 = fFactory.createLabel(null, "work");
-      news1.setLabel(label1);
+      news1.addLabel(label1);
       IAttachment att1news1 = fFactory.createAttachment(null, news1);
       att1news1.setLink(new URI("http://www.attachment.com/att1news1.file"));
       att1news1.setType("bin/mp3");
@@ -129,7 +129,7 @@ public class ModelSearchTest {
       ICategory news2cat2 = fFactory.createCategory(null, news2);
       news2cat2.setName("windows");
       ILabel label2 = fFactory.createLabel(null, "todo");
-      news2.setLabel(label2);
+      news2.addLabel(label2);
       IAttachment att1news2 = fFactory.createAttachment(null, news2);
       att1news2.setLink(new URI("http://www.attachment.com/att1news2.file"));
       att1news2.setType("bin/doc");
@@ -491,7 +491,7 @@ public class ModelSearchTest {
       ICategory news1cat1 = fFactory.createCategory(null, news1);
       news1cat1.setName("apple");
       ILabel label1 = fFactory.createLabel(null, "work");
-      news1.setLabel(label1);
+      news1.addLabel(label1);
       IAttachment att1news1 = fFactory.createAttachment(null, news1);
       att1news1.setLink(new URI("http://www.attachment.com/att1news1.file"));
       att1news1.setType("bin/mp3");
@@ -503,7 +503,7 @@ public class ModelSearchTest {
       ICategory news2cat2 = fFactory.createCategory(null, news2);
       news2cat2.setName("windows");
       ILabel label2 = fFactory.createLabel(null, "todo");
-      news2.setLabel(label2);
+      news2.addLabel(label2);
       IAttachment att1news2 = fFactory.createAttachment(null, news2);
       att1news2.setLink(new URI("http://www.attachment.com/att1news2.file"));
       att1news2.setType("bin/doc");
@@ -827,7 +827,7 @@ public class ModelSearchTest {
       ICategory news1cat1 = fFactory.createCategory(null, news1);
       news1cat1.setName("apple");
       ILabel label1 = fFactory.createLabel(null, "work");
-      news1.setLabel(label1);
+      news1.addLabel(label1);
       IAttachment att1news1 = fFactory.createAttachment(null, news1);
       att1news1.setLink(new URI("http://www.attachment.com/att1news1.file"));
       att1news1.setType("bin/mp3");
@@ -839,7 +839,7 @@ public class ModelSearchTest {
       ICategory news2cat2 = fFactory.createCategory(null, news2);
       news2cat2.setName("pasero");
       ILabel label2 = fFactory.createLabel(null, "todo");
-      news2.setLabel(label2);
+      news2.addLabel(label2);
       IAttachment att1news2 = fFactory.createAttachment(null, news2);
       att1news2.setLink(new URI("http://www.attachment.com/att1news2.file"));
       att1news2.setType("bin/doc");
@@ -1076,7 +1076,7 @@ public class ModelSearchTest {
       ICategory news1cat1 = fFactory.createCategory(null, news1);
       news1cat1.setName("apple");
       ILabel label1 = fFactory.createLabel(null, "work");
-      news1.setLabel(label1);
+      news1.addLabel(label1);
       IAttachment att1news1 = fFactory.createAttachment(null, news1);
       att1news1.setLink(new URI("http://www.attachment.com/att1news1.file"));
       att1news1.setType("bin/mp3");
@@ -1087,7 +1087,7 @@ public class ModelSearchTest {
       ICategory news2cat2 = fFactory.createCategory(null, news2);
       news2cat2.setName("pasero");
       ILabel label2 = fFactory.createLabel(null, "todo");
-      news2.setLabel(label2);
+      news2.addLabel(label2);
       IAttachment att1news2 = fFactory.createAttachment(null, news2);
       att1news2.setLink(new URI("http://www.attachment.com/att1news2.file"));
       att1news2.setType("bin/doc");
@@ -1318,7 +1318,7 @@ public class ModelSearchTest {
       ICategory news1cat1 = fFactory.createCategory(null, news1);
       news1cat1.setName("apple");
       ILabel label1 = fFactory.createLabel(null, "work");
-      news1.setLabel(label1);
+      news1.addLabel(label1);
 
       INews news2 = createNews(feed, " Bar", "http://www.news.com/news2.html", State.NEW);
       IPerson author2 = fFactory.createPerson(null, news2);
@@ -1328,7 +1328,7 @@ public class ModelSearchTest {
       ICategory news2cat2 = fFactory.createCategory(null, news2);
       news2cat2.setName("windows");
       ILabel label2 = fFactory.createLabel(null, "todo");
-      news2.setLabel(label2);
+      news2.addLabel(label2);
 
       INews news3 = createNews(feed, "Foo Bar", "http://www.news.com/news3.html", State.NEW);
       IPerson author3 = fFactory.createPerson(null, news3);
@@ -1560,7 +1560,7 @@ public class ModelSearchTest {
       ICategory news1cat1 = fFactory.createCategory(null, news1);
       news1cat1.setName("apple");
       ILabel label1 = fFactory.createLabel(null, "work");
-      news1.setLabel(label1);
+      news1.addLabel(label1);
 
       INews news2 = createNews(feed, " Bar", "http://www.news.com/news2.html", State.NEW);
       IPerson author2 = fFactory.createPerson(null, news2);
@@ -1570,7 +1570,7 @@ public class ModelSearchTest {
       ICategory news2cat2 = fFactory.createCategory(null, news2);
       news2cat2.setName("windows");
       ILabel label2 = fFactory.createLabel(null, "todo");
-      news2.setLabel(label2);
+      news2.addLabel(label2);
 
       INews news3 = createNews(feed, "Foo Bar", "http://www.news.com/news3.html", State.NEW);
       IPerson author3 = fFactory.createPerson(null, news3);
@@ -2219,7 +2219,7 @@ public class ModelSearchTest {
       ICategory news1cat1 = fFactory.createCategory(null, news1);
       news1cat1.setName("apple");
       ILabel label1 = fFactory.createLabel(null, "work");
-      news1.setLabel(label1);
+      news1.addLabel(label1);
       IAttachment att1news1 = fFactory.createAttachment(null, news1);
       att1news1.setLink(new URI("http://www.attachment.com/att1news1.file"));
       att1news1.setType("bin/mp3");
@@ -2231,7 +2231,7 @@ public class ModelSearchTest {
       ICategory news2cat2 = fFactory.createCategory(null, news2);
       news2cat2.setName("windows");
       ILabel label2 = fFactory.createLabel(null, "todo");
-      news2.setLabel(label2);
+      news2.addLabel(label2);
       IAttachment att1news2 = fFactory.createAttachment(null, news2);
       att1news2.setLink(new URI("http://www.attachment.com/att1news2.file"));
       att1news2.setType("bin/doc");
@@ -2321,7 +2321,7 @@ public class ModelSearchTest {
       ICategory news1cat1 = fFactory.createCategory(null, news1);
       news1cat1.setName("apple");
       ILabel label1 = fFactory.createLabel(null, "work");
-      news1.setLabel(label1);
+      news1.addLabel(label1);
       IAttachment att1news1 = fFactory.createAttachment(null, news1);
       att1news1.setLink(new URI("http://www.attachment.com/att1news1.file"));
       att1news1.setType("bin/mp3 Pasero");
@@ -2333,7 +2333,7 @@ public class ModelSearchTest {
       ICategory news2cat2 = fFactory.createCategory(null, news2);
       news2cat2.setName("pasero");
       ILabel label2 = fFactory.createLabel(null, "todo");
-      news2.setLabel(label2);
+      news2.addLabel(label2);
       IAttachment att1news2 = fFactory.createAttachment(null, news2);
       att1news2.setLink(new URI("http://www.attachment.com/att1news2.file"));
       att1news2.setType("bin/doc");
@@ -2485,7 +2485,7 @@ public class ModelSearchTest {
     ICategory news1cat1 = fFactory.createCategory(null, news1);
     news1cat1.setName("apple");
     ILabel label1 = fFactory.createLabel(null, "work");
-    news1.setLabel(label1);
+    news1.addLabel(label1);
 
     INews news2 = createNews(feed, " Bar", "http://www.news.com/news2.html", State.NEW);
     news2.setRating(10);
@@ -2494,7 +2494,7 @@ public class ModelSearchTest {
     ICategory news2cat2 = fFactory.createCategory(null, news2);
     news2cat2.setName("fafa");
     ILabel label2 = fFactory.createLabel(null, "todo");
-    news2.setLabel(label2);
+    news2.addLabel(label2);
     cal.setTimeInMillis(System.currentTimeMillis() - 5 * DAY);
     news2.setModifiedDate(cal.getTime());
 
@@ -2836,6 +2836,57 @@ public class ModelSearchTest {
 
       List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
       assertSame(result, news3, news4);
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  public void testSearchNewsWithMultipleLabels() throws Exception {
+
+    /* First add some Types */
+    IFolder rootFolder = fFactory.createFolder(null, null, "Root");
+    DynamicDAO.save(rootFolder);
+
+    IFolder subFolder = fFactory.createFolder(null, rootFolder, "Sub Folder");
+    DynamicDAO.save(subFolder);
+
+    IFeed feed1 = fFactory.createFeed(null, new URI("http://www.testSearchNewsWithLocationFeed1.com"));
+
+    ILabel label1 = fFactory.createLabel(null, "work");
+    ILabel label2 = fFactory.createLabel(null, "important");
+
+    INews news1 = createNews(feed1, "First News of Feed One", "http://www.news.com/news1.html", State.UNREAD);
+    news1.addLabel(label1);
+    news1.addLabel(label2);
+
+    INews news2 = createNews(feed1, "Second News of Feed One", "http://www.news.com/news2.html", State.NEW);
+    news2.addLabel(label2);
+
+    DynamicDAO.save(feed1);
+
+    IBookMark rootMark1 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed1.getLink()), "rootMark1");
+    DynamicDAO.save(rootMark1);
+
+    /* Wait for Indexer */
+    waitForIndexer();
+
+    /* Label IS "work" */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.LABEL, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, "work");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertSame(result, news1, news2);
+    }
+
+    /* Label IS "important" */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.LABEL, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, "important");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertSame(result, news1);
     }
   }
 

@@ -52,7 +52,7 @@ import java.util.List;
 
 /**
  * Test the News-Grouping and News-Filter of the FeedView.
- * 
+ *
  * @author bpasero
  */
 public class NewsGroupFilterTest {
@@ -98,7 +98,7 @@ public class NewsGroupFilterTest {
     IFeed feed = fFactory.createFeed(null, new URI("http://www.link.com"));
     feed.setTitle("Feed Name");
     DynamicDAO.save(feed);
-    
+
 
     INews news1 = fFactory.createNews(null, feed, new Date());
     news1.setTitle("News 1");
@@ -301,8 +301,8 @@ public class NewsGroupFilterTest {
     {
       ILabel label1 = fFactory.createLabel(null, "Label 1");
       ILabel label2 = fFactory.createLabel(null, "Label 2");
-      news6.setLabel(label1);
-      news7.setLabel(label2);
+      news6.addLabel(label1);
+      news7.addLabel(label2);
 
       fGrouping.setType(NewsGrouping.Type.GROUP_BY_LABEL);
       List<EntityGroup> group = fGrouping.group(input);
