@@ -328,13 +328,15 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
           /* Label */
           {
+            Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
+
             MenuManager labelMenu = new MenuManager("Label");
             manager.add(labelMenu);
 
             /* Retrieve Labels that all selected News contain */
             Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(selection);
 
-            IAction labelNone = new Action("Remove All Labels") {
+            IAction removeAllLabels = new Action("Remove All Labels") {
               @Override
               public void run() {
                 Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
@@ -342,10 +344,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
               }
             };
 
-            labelMenu.add(labelNone);
+            removeAllLabels.setEnabled(!labels.isEmpty());
+            labelMenu.add(removeAllLabels);
             labelMenu.add(new Separator());
 
-            Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
             for (final ILabel label : labels) {
               IAction labelAction = new Action(label.getName(), IAction.AS_CHECK_BOX) {
                 @Override
