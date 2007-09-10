@@ -35,6 +35,7 @@ import org.rssowl.core.util.ITask;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -57,6 +58,13 @@ public final class IndexingTask implements ITask {
     for (NewsEvent event : events)
       fNews.add(event.getEntity());
 
+    fTaskType = taskType;
+  }
+
+  IndexingTask(Indexer indexer, Collection<INews> news, EventType taskType) {
+    fIndexer = indexer;
+    fNews = new ArrayList<INews>(news.size());
+    fNews.addAll(news);
     fTaskType = taskType;
   }
 

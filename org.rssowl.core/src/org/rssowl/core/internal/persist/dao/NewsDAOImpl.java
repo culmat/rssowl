@@ -27,6 +27,7 @@ package org.rssowl.core.internal.persist.dao;
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.service.DBHelper;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.INewsDAO;
@@ -300,5 +301,14 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
     } catch (Db4oException e) {
       throw new PersistenceException(e);
     }
+  }
+
+  @SuppressWarnings("unchecked")
+  public Collection<INews> loadAll(ILabel label) {
+    Query query = fDb.query();
+    query.constrain(News.class);
+    query.descend("fLabels").constrain(label);
+
+    return query.execute();
   }
 }

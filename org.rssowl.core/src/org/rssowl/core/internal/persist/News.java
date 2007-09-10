@@ -610,30 +610,6 @@ public class News extends AbstractEntity implements INews {
   }
 
   /*
-   * @see org.rssowl.core.model.types.INews#getLabel()
-   */
-  public ILabel getLabel() {
-    fLock.acquireReadLock();
-    try {
-      return fLabel;
-    } finally {
-      fLock.releaseReadLock();
-    }
-  }
-
-  /*
-   * @see org.rssowl.core.model.types.INews#setLabel(org.rssowl.core.model.types.impl.Label)
-   */
-  public void setLabel(ILabel label) {
-    fLock.acquireWriteLock();
-    try {
-      fLabel = label;
-    } finally {
-      fLock.releaseWriteLock();
-    }
-  }
-
-  /*
    * @see org.rssowl.core.model.types.INews#getGuid()
    */
   public IGuid getGuid() {

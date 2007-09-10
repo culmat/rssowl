@@ -4,11 +4,13 @@ package org.rssowl.core.internal.persist.search;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.util.DateUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author ijuma
@@ -56,9 +58,11 @@ public class NewsDocument extends SearchDocument<INews> {
     addField(fields, createBooleanField(INews.IS_FLAGGED, news.isFlagged(), Store.NO));
     addField(fields, createLongField(INews.RATING, news.getRating(), Store.NO));
 
-    /* Add Label */
-    if (news.getLabel() != null)
-      addField(fields, createStringField(INews.LABEL, news.getLabel().getName().toLowerCase(), Store.NO, Index.UN_TOKENIZED));
+    /* Add Labels */
+    Set<ILabel> labels = news.getLabels();
+    for (ILabel label : labels) {
+      addField(fields, createStringField(INews.LABEL, label.getName().toLowerCase(), Store.NO, Index.UN_TOKENIZED));
+    }
 
     /* Add Source */
     if (news.getSource() != null) {
