@@ -28,9 +28,9 @@ import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.connection.PlatformCredentialsProvider;
+import org.rssowl.core.util.URIUtils;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
 /**
  * Subclass of <code>DefaultCredentialsProvider</code> normalizing any
@@ -63,7 +63,7 @@ public class NewsGroupCredentialsProvider extends PlatformCredentialsProvider {
    */
   @Override
   public ICredentials getAuthCredentials(URI link) {
-    return super.getAuthCredentials(normalizeUri(link));
+    return super.getAuthCredentials(URIUtils.normalizeUri(link));
   }
 
   /*
@@ -71,7 +71,7 @@ public class NewsGroupCredentialsProvider extends PlatformCredentialsProvider {
    */
   @Override
   public IProxyCredentials getProxyCredentials(URI link) {
-    return super.getProxyCredentials(normalizeUri(link));
+    return super.getProxyCredentials(URIUtils.normalizeUri(link));
   }
 
   /*
@@ -80,7 +80,7 @@ public class NewsGroupCredentialsProvider extends PlatformCredentialsProvider {
    */
   @Override
   public void setAuthCredentials(ICredentials credentials, URI link) throws CredentialsException {
-    super.setAuthCredentials(credentials, normalizeUri(link));
+    super.setAuthCredentials(credentials, URIUtils.normalizeUri(link));
   }
 
   /*
@@ -89,16 +89,6 @@ public class NewsGroupCredentialsProvider extends PlatformCredentialsProvider {
    */
   @Override
   public void setProxyCredentials(IProxyCredentials credentials, URI link) {
-    super.setProxyCredentials(credentials, normalizeUri(link));
-  }
-
-  private URI normalizeUri(URI link) {
-    try {
-      return new URI(link.getScheme(), link.getHost(), null, null);
-    } catch (URISyntaxException e) {
-      Activator.log(e);
-    }
-
-    return link;
+    super.setProxyCredentials(credentials, URIUtils.normalizeUri(link));
   }
 }
