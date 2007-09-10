@@ -24,6 +24,7 @@
 
 package org.rssowl.core.persist.dao;
 
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
@@ -64,10 +65,18 @@ public interface INewsDAO extends IEntityDAO<INews, NewsListener, NewsEvent> {
    * and state matching any of <code>states</code>.
    *
    * @param feedRef A non-null FeedLinkReference.
-   * @param states A non-null Set (typically EnumSet) containing the all the acceptable states for
-   * the returns INews items.
+   * @param states A non-null Set (typically EnumSet) containing the all the
+   * acceptable states for the returns INews items.
    * @return A Collection of INews with <code>feedRef</code> and any of
    * <code>states</code>.
    */
   Collection<INews> loadAll(FeedLinkReference feedRef, Set<INews.State> states);
+
+  /**
+   * Loads all the news that have the given <code>label</code> set.
+   *
+   * @param label A {@link ILabel} to lookup {@link INews} for.
+   * @return A Collection of INews with <code>label</code> set.
+   */
+  Collection<INews> loadAll(ILabel label);
 }

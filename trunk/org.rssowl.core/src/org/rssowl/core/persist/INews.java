@@ -490,11 +490,6 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
   void setFlagged(boolean isFlagged);
 
   /**
-   * @return The Label of this News.
-   */
-  ILabel getLabel();
-
-  /**
    * @return An unmodifiable Set containing the Labels of this News.
    */
   Set<ILabel> getLabels();
@@ -515,11 +510,6 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
    * @return {@code true} if {@code label} was removed from this News.
    */
   boolean removeLabel(ILabel label);
-
-  /**
-   * @param label The Label of this News.
-   */
-  void setLabel(ILabel label);
 
   /**
    * @return The feed that this object belongs to.

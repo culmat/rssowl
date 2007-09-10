@@ -16,7 +16,12 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
+import org.rssowl.core.persist.event.LabelAdapter;
+import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.event.runnable.EventType;
@@ -25,6 +30,7 @@ import org.rssowl.core.util.JobQueue;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Collection;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -49,6 +55,7 @@ public class Indexer {
 
   private final JobQueue fJobQueue;
   private NewsListener fNewsListener;
+  private LabelAdapter fLabelListener;
   private boolean fFlushRequired;
   private final ModelSearchImpl fSearch;
 
@@ -258,13 +265,34 @@ public class Indexer {
       }
     };
 
+    /* Listen to Label-Events */
+    fLabelListener = new LabelAdapter() {
+      @Override
+      public void entitiesUpdated(Set<LabelEvent> events) {
+
+        /* Re-Index all News when a containing Label updates */
+        for (LabelEvent labelEvent : events) {
+          ILabel updatedLabel = labelEvent.getEntity();
+          Collection<INews> news = DynamicDAO.getDAO(INewsDAO.class).loadAll(updatedLabel);
+          if (!Owl.TESTING)
+            fJobQueue.schedule(new IndexingTask(Indexer.this, news, EventType.UPDATE));
+          else
+            new IndexingTask(Indexer.this, news, EventType.UPDATE).run(new NullProgressMonitor());
+        }
+      }
+    };
+
     /* We register listeners as part of initialisation, we must use InternalOwl */
     InternalOwl.getDefault().getPersistenceService().getDAOService().getNewsDAO().addEntityListener(fNewsListener);
+    InternalOwl.getDefault().getPersistenceService().getDAOService().getLabelDAO().addEntityListener(fLabelListener);
   }
 
   private void unregisterListeners() {
     if (fNewsListener != null)
       Owl.getPersistenceService().getDAOService().getNewsDAO().removeEntityListener(fNewsListener);
+
+    if (fLabelListener != null)
+      Owl.getPersistenceService().getDAOService().getLabelDAO().removeEntityListener(fLabelListener);
 
     fNewsListener = null;
   }
