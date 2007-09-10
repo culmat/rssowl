@@ -645,20 +645,20 @@ public class ModelUtilsTest {
    * @throws Exception
    */
   @Test
-  public void testIsLabelChange() throws Exception {
+  public void testIsLabelChangeSingle() throws Exception {
     ILabel label1 = new Label(null, "Label1");
-    ILabel label2 = new Label(null, "Label1");
+    ILabel label2 = new Label(null, "Label2");
 
     IFeed feed = new Feed(new URI("http://www.link.com"));
     INews news1 = new News(null, feed, new Date());
-    news1.setLabel(label1);
+    news1.addLabel(label1);
 
     INews news2 = new News(null, feed, new Date());
-    news2.setLabel(label1);
+    news2.addLabel(label1);
 
     INews news3 = new News(null, feed, new Date());
     news3.setPublishDate(new Date(System.currentTimeMillis() + 1000));
-    news3.setLabel(label2);
+    news3.addLabel(label2);
 
     INews news4 = new News(null, feed, new Date());
 
@@ -667,17 +667,59 @@ public class ModelUtilsTest {
     feed.addNews(news3);
     feed.addNews(news4);
 
-    NewsEvent event1 = new NewsEvent(news1, news2, true);
-    assertEquals(false, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    NewsEvent event = new NewsEvent(news1, news2, true);
+    assertEquals(false, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
 
-    event1 = new NewsEvent(news1, news3, true);
-    assertEquals(true, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    event = new NewsEvent(news1, news3, true);
+    assertEquals(true, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
 
-    event1 = new NewsEvent(news1, news4, true);
-    assertEquals(true, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    event = new NewsEvent(news1, news4, true);
+    assertEquals(true, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
 
-    event1 = new NewsEvent(news4, news1, true);
-    assertEquals(true, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    event = new NewsEvent(news4, news1, true);
+    assertEquals(true, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testIsLabelChangeMulti() throws Exception {
+    ILabel label1 = new Label(null, "Label1");
+    ILabel label2 = new Label(null, "Label2");
+    ILabel label3 = new Label(null, "Label3");
+
+    IFeed feed = new Feed(new URI("http://www.link.com"));
+    INews news1 = new News(null, feed, new Date());
+    news1.addLabel(label1);
+    news1.addLabel(label3);
+
+    INews news2 = new News(null, feed, new Date());
+    news2.addLabel(label1);
+
+    INews news3 = new News(null, feed, new Date());
+    news3.setPublishDate(new Date(System.currentTimeMillis() + 1000));
+    news3.addLabel(label1);
+    news3.addLabel(label2);
+
+    INews news4 = new News(null, feed, new Date());
+
+    feed.addNews(news1);
+    feed.addNews(news2);
+    feed.addNews(news3);
+    feed.addNews(news4);
+
+    NewsEvent event = new NewsEvent(news1, news2, true);
+    assertEquals(true, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
+
+    event = new NewsEvent(news1, news3, true);
+    assertEquals(true, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
+
+    event = new NewsEvent(news1, news4, true);
+    assertEquals(true, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
+
+    event = new NewsEvent(news4, news1, true);
+    assertEquals(true, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
   }
 
   /**

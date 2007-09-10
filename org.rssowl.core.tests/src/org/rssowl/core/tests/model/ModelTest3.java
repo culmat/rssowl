@@ -2184,6 +2184,7 @@ public class ModelTest3 {
 
   /**
    * Tests {@link ISearchMarkDAO#visited(ISearchMark)}.
+   *
    * @throws Exception
    */
   @Test
@@ -2221,7 +2222,7 @@ public class ModelTest3 {
       if (lastVisitDate == null) {
         lastVisitDate = new Date();
       }
-      Thread.sleep(10);
+      Thread.sleep(100);
 
       ISearchMarkDAO dao = DynamicDAO.getDAO(ISearchMarkDAO.class);
       DynamicDAO.addEntityListener(ISearchCondition.class, listener);
@@ -2240,6 +2241,8 @@ public class ModelTest3 {
 
   /**
    * Tests that deleting a label also removes it from all News containing it.
+   *
+   * @throws Exception
    */
   @Test
   public void testDeleteLabelContainedInNews() throws Exception {
