@@ -32,22 +32,27 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.util.ModelUtils;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author bpasero
  */
 public class LabelAction extends Action {
-  private ILabel fLabel;
-  private IStructuredSelection fSelection;
+  private final Collection<ILabel> fLabels;
+  private final IStructuredSelection fSelection;
+  private final boolean fAddLabels;
 
   /**
-   * @param label
+   * @param labels
    * @param selection
+   * @param addLabels
    */
-  public LabelAction(ILabel label, IStructuredSelection selection) {
-    fLabel = label;
+  public LabelAction(Collection<ILabel> labels, IStructuredSelection selection, boolean addLabels) {
+    fLabels = labels;
     fSelection = selection;
+    fAddLabels = addLabels;
   }
 
   /*
@@ -59,15 +64,21 @@ public class LabelAction extends Action {
     if (newsList.isEmpty())
       return;
 
-    /* Apply Label */
+    /* For each News */
     for (INews newsItem : newsList) {
-      ILabel label = newsItem.getLabel();
-      if (label == null && fLabel != null)
-        newsItem.setLabel(fLabel);
-      else if (label != null && fLabel == null)
-        newsItem.setLabel(null);
-      else if (label != null && fLabel != null && !fLabel.equals(label))
-        newsItem.setLabel(fLabel);
+      Set<ILabel> newsLabels = newsItem.getLabels();
+
+      /* For each Label */
+      for (ILabel label : fLabels) {
+
+        /* Add Label */
+        if (fAddLabels && !newsLabels.contains(label))
+          newsItem.addLabel(label);
+
+        /* Remove Label */
+        else if (!fAddLabels && newsLabels.contains(label))
+          newsItem.removeLabel(label);
+      }
     }
 
     /* Mark Saved Search Service as in need for a quick Update */

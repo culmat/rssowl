@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.net.URI;
 import java.text.DateFormat;
+import java.util.Set;
 
 /**
  * @author bpasero
@@ -288,7 +289,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     boolean hasLink = news.getLink() != null;
     State state = news.getState();
     boolean isUnread = (state == State.NEW || state == State.UPDATED || state == State.UNREAD);
-    String color = (news.getLabel() != null) ? news.getLabel().getColor() : null;
+    String color = !news.getLabels().isEmpty() ? news.getLabels().iterator().next().getColor() : null;
 
     /* DIV: NewsItem */
     div(builder, "newsitem");
@@ -427,10 +428,9 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       }
 
       /* Label */
-      ILabel label = news.getLabel();
-      if (news.getLabel() != null) {
+      Set<ILabel> labels = news.getLabels();
+      if (!labels.isEmpty()) {
         hasFooter = true;
-        String name = label.getName();
 
         /* DIV: NewsItem/Footer/Label */
         div(footer, "label");
@@ -438,16 +438,19 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         /* Label */
         span(footer, "Label:", "label");
 
-        /* Append to Footer */
-        span(footer, name, "label", color);
+        /* Append Labels to Footer */
+        for (ILabel label : labels) {
+          String labelColor = label.getColor();
+          span(footer, label.getName(), "label", labelColor);
+        }
 
         /* Close: NewsItem/Footer/Label */
         close(footer, "div");
 
         /* Add to Search */
-        if (StringUtils.isSet(name)) {
-          String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.LABEL_HANDLER_ID + "?" + URIUtils.urlEncode(name);
-          link(search, link, name, "searchrelated");
+        for (ILabel label : labels) {
+          String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.LABEL_HANDLER_ID + "?" + URIUtils.urlEncode(label.getName());
+          link(search, link, label.getName(), "searchrelated");
           search.append(", ");
         }
       }

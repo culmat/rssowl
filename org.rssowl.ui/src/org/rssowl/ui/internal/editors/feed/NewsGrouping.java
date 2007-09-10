@@ -450,11 +450,11 @@ public class NewsGrouping {
     for (Object object : input) {
       if (object instanceof INews) {
         INews news = (INews) object;
-        ILabel label = news.getLabel();
+        Set<ILabel> labels = news.getLabels();
         EntityGroup group = gDefault;
 
-        if (label != null) {
-          String name = label.getName();
+        if (!labels.isEmpty()) {
+          String name = labels.iterator().next().getName();
           group = groupCache.get(name);
           if (group == null) {
             group = new EntityGroup(nextId++, GROUP_CATEGORY_ID, name);
