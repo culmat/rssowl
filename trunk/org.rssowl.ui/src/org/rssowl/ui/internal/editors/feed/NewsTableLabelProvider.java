@@ -56,6 +56,7 @@ import org.rssowl.ui.internal.util.ModelUtils;
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Ismael Juma (ismael@juma.me.uk)
@@ -302,9 +303,9 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
     /* Handle INews */
     else if (element instanceof INews) {
-      ILabel label = ((INews) element).getLabel();
-      if (label != null)
-        return OwlUI.getColor(fResources, label);
+      Set<ILabel> labels = ((INews) element).getLabels();
+      if (!labels.isEmpty())
+        return OwlUI.getColor(fResources, labels.iterator().next());
     }
 
     return null;
@@ -351,7 +352,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     if ((event.detail & SWT.SELECTED) != 0) {
 
       /* Some conditions under which we don't override the selection color */
-      if (news.getLabel() == null || !scrollable.isFocusControl())
+      if (news.getLabels().isEmpty() || !scrollable.isFocusControl())
         return;
 
       Rectangle clArea = scrollable.getClientArea();
@@ -362,7 +363,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
       /* Draw Rectangle */
       Color oldBackground = gc.getBackground();
-      gc.setBackground(OwlUI.getColor(fResources, news.getLabel()));
+      gc.setBackground(OwlUI.getColor(fResources, news.getLabels().iterator().next()));
       gc.fillRectangle(0, itemRect.y, clArea.width, itemRect.height);
       gc.setBackground(oldBackground);
       gc.setForeground(scrollable.getDisplay().getSystemColor(SWT.COLOR_WHITE));

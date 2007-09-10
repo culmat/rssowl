@@ -139,6 +139,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -1235,33 +1236,32 @@ public class SearchNewsDialog extends TitleAreaDialog {
             MenuManager labelMenu = new MenuManager("Label");
             manager.appendToGroup("mark", labelMenu);
 
-            /* Retrieve selected Labels from Selection (including NULL!) */
-            Set<ILabel> selectedLabels = ModelUtils.getLabels(selection);
-            ILabel commonLabel = null;
-            if (selectedLabels.size() == 1)
-              commonLabel = selectedLabels.iterator().next();
+            /* Retrieve Labels that all selected News contain */
+            Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(selection);
 
-            IAction labelNone = new Action("None", IAction.AS_RADIO_BUTTON) {
+            IAction labelNone = new Action("Remove All Labels") {
               @Override
               public void run() {
-                new LabelAction(null, (IStructuredSelection) fViewer.getSelection()).run();
+                Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
+                new LabelAction(labels, (IStructuredSelection) fViewer.getSelection(), false).run();
               }
             };
-            labelNone.setChecked(selectedLabels.size() == 0 || (selectedLabels.size() == 1 && commonLabel == null));
 
             labelMenu.add(labelNone);
             labelMenu.add(new Separator());
 
             Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
             for (final ILabel label : labels) {
-              IAction labelAction = new Action(label.getName(), IAction.AS_RADIO_BUTTON) {
+              IAction labelAction = new Action(label.getName(), IAction.AS_CHECK_BOX) {
                 @Override
                 public void run() {
-                  new LabelAction(label, (IStructuredSelection) fViewer.getSelection()).run();
+                  Set<ILabel> labels = new HashSet<ILabel>(1);
+                  labels.add(label);
+                  new LabelAction(labels, (IStructuredSelection) fViewer.getSelection(), isChecked()).run();
                 }
               };
 
-              labelAction.setChecked(label.equals(commonLabel));
+              labelAction.setChecked(selectedLabels.contains(label));
               labelMenu.add(labelAction);
             }
 

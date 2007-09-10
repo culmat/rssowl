@@ -486,20 +486,32 @@ public class ModelUtils {
   /**
    * @param selection Any list of selected <code>INews</code> or
    * <code>EntityGroup</code>.
-   * @return Returns a Set of <code>ILabel</code> that the given Selection had
-   * applied to. Note that the Set will contain a <code>NULL</code> value if
-   * any of the selected Objects did not had a Label set.
+   * @return Returns a Set of <code>ILabel</code> that <em>all entities</em>
+   * of the given Selection had applied to.
    */
-  public static Set<ILabel> getLabels(IStructuredSelection selection) {
-    Set<ILabel> labels = new HashSet<ILabel>(5);
+  public static Set<ILabel> getLabelsForAll(IStructuredSelection selection) {
+    Set<ILabel> labelsForAll = new HashSet<ILabel>(5);
 
-    List<INews> newsList = getEntities(selection, INews.class);
-    for (INews news : newsList) {
-      ILabel newsLabel = news.getLabel();
-      labels.add(newsLabel);
+    List<INews> selectedNews = getEntities(selection, INews.class);
+
+    /* For each selected News */
+    for (INews news : selectedNews) {
+      Set<ILabel> newsLabels = news.getLabels();
+
+      /* Only add Label if contained in all News */
+      LabelLoop: for (ILabel newsLabel : newsLabels) {
+        if (!labelsForAll.contains(newsLabel)) {
+          for (INews news2 : selectedNews) {
+            if (!news2.getLabels().contains(newsLabel))
+              break LabelLoop;
+          }
+
+          labelsForAll.add(newsLabel);
+        }
+      }
     }
 
-    return labels;
+    return labelsForAll;
   }
 
   /**
@@ -574,12 +586,10 @@ public class ModelUtils {
       if (modelEvent instanceof NewsEvent) {
         NewsEvent event = (NewsEvent) modelEvent;
 
-        ILabel oldLabel = event.getOldNews() != null ? event.getOldNews().getLabel() : null;
-        ILabel newLabel = event.getEntity().getLabel();
+        Set<ILabel> oldLabels = event.getOldNews() != null ? event.getOldNews().getLabels() : null;
+        Set<ILabel> newLabels = event.getEntity().getLabels();
 
-        if (newLabel != null && !newLabel.equals(oldLabel))
-          return true;
-        else if (oldLabel != null && !oldLabel.equals(newLabel))
+        if (!newLabels.equals(oldLabels))
           return true;
       }
     }

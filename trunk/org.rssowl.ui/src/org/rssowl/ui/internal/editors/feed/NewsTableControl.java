@@ -100,6 +100,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -627,33 +628,32 @@ public class NewsTableControl implements IFeedViewPart {
             MenuManager labelMenu = new MenuManager("Label");
             manager.appendToGroup("mark", labelMenu);
 
-            /* Retrieve selected Labels from Selection (including NULL!) */
-            Set<ILabel> selectedLabels = ModelUtils.getLabels(selection);
-            ILabel commonLabel = null;
-            if (selectedLabels.size() == 1)
-              commonLabel = selectedLabels.iterator().next();
+            /* Retrieve Labels that all selected News contain */
+            Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(selection);
 
-            IAction labelNone = new Action("None", IAction.AS_RADIO_BUTTON) {
+            IAction labelNone = new Action("Remove All Labels") {
               @Override
               public void run() {
-                new LabelAction(null, selection).run();
+                Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
+                new LabelAction(labels, selection, false).run();
               }
             };
-            labelNone.setChecked(selectedLabels.size() == 0 || (selectedLabels.size() == 1 && commonLabel == null));
 
             labelMenu.add(labelNone);
             labelMenu.add(new Separator());
 
             Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
             for (final ILabel label : labels) {
-              IAction labelAction = new Action(label.getName(), IAction.AS_RADIO_BUTTON) {
+              IAction labelAction = new Action(label.getName(), IAction.AS_CHECK_BOX) {
                 @Override
                 public void run() {
-                  new LabelAction(label, selection).run();
+                  Set<ILabel> labels = new HashSet<ILabel>(1);
+                  labels.add(label);
+                  new LabelAction(labels, selection, isChecked()).run();
                 }
               };
 
-              labelAction.setChecked(label.equals(commonLabel));
+              labelAction.setChecked(selectedLabels.contains(label));
               labelMenu.add(labelAction);
             }
 
