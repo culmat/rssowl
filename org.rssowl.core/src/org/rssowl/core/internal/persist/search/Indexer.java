@@ -274,10 +274,13 @@ public class Indexer {
         for (LabelEvent labelEvent : events) {
           ILabel updatedLabel = labelEvent.getEntity();
           Collection<INews> news = DynamicDAO.getDAO(INewsDAO.class).loadAll(updatedLabel);
-          if (!Owl.TESTING)
-            fJobQueue.schedule(new IndexingTask(Indexer.this, news, EventType.UPDATE));
-          else
-            new IndexingTask(Indexer.this, news, EventType.UPDATE).run(new NullProgressMonitor());
+
+          if (!news.isEmpty()) {
+            if (!Owl.TESTING)
+              fJobQueue.schedule(new IndexingTask(Indexer.this, news, EventType.UPDATE));
+            else
+              new IndexingTask(Indexer.this, news, EventType.UPDATE).run(new NullProgressMonitor());
+          }
         }
       }
     };
