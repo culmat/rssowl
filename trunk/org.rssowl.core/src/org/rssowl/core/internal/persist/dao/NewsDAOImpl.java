@@ -60,7 +60,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, NewsEvent> implements INewsDAO {
 
-  private final ExecutorService executorService = Executors.newFixedThreadPool(1);
+  private final ExecutorService fExecutorService = Executors.newFixedThreadPool(1);
 
   /** Default constructor using the specific IPersistable for this DAO */
   public NewsDAOImpl() {
@@ -163,7 +163,7 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
     final Lock setStateLock = new ReentrantLock();
     setStateLock.lock();
     final Condition condition = setStateLock.newCondition();
-    executorService.execute(new Runnable() {
+    fExecutorService.execute(new Runnable() {
       public void run() {
         Set<INews> changedNews = null;
         try {
