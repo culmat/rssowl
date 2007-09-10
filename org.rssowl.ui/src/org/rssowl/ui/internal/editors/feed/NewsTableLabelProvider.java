@@ -64,6 +64,10 @@ import java.util.Set;
  */
 public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
+  /* Some Colors of a Label */
+  private static final String LABEL_COLOR_BLACK = "0,0,0";
+  private static final String LABEL_COLOR_WHITE = "255,255,255";
+
   /** Resource Manager to use */
   protected LocalResourceManager fResources;
 
@@ -355,6 +359,10 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
       if (news.getLabels().isEmpty() || !scrollable.isFocusControl())
         return;
 
+      ILabel label = news.getLabels().iterator().next();
+      if (isInvalidLabelColor(label))
+        return;
+
       Rectangle clArea = scrollable.getClientArea();
       Rectangle itemRect = event.getBounds();
 
@@ -363,7 +371,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
       /* Draw Rectangle */
       Color oldBackground = gc.getBackground();
-      gc.setBackground(OwlUI.getColor(fResources, news.getLabels().iterator().next()));
+      gc.setBackground(OwlUI.getColor(fResources, label));
       gc.fillRectangle(0, itemRect.y, clArea.width, itemRect.height);
       gc.setBackground(oldBackground);
       gc.setForeground(scrollable.getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -389,6 +397,10 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
       /* Mark as Background being handled */
       event.detail &= ~SWT.BACKGROUND;
     }
+  }
+
+  private boolean isInvalidLabelColor(ILabel label) {
+    return label.getColor().equals(LABEL_COLOR_BLACK) || label.getColor().equals(LABEL_COLOR_WHITE);
   }
 
   private void eraseGroup(Event event, @SuppressWarnings("unused")
