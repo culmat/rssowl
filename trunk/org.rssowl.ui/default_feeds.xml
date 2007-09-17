@@ -103,12 +103,12 @@
 		<outline text="WebReference News" xmlUrl="http://www.webreference.com/webreference.rdf" />
 		</outline>
 		<outline text="Music">
-		<outline text="iTunes 25 Just Added Albums" xmlUrl="http://phobos.apple.com/webobjects/mzstore.woa/wpa/mrss/justadded/limit=25/rss.xml" />
+		<outline text="iTunes 25 Just Added Albums" xmlUrl="http://phobos.apple.com/WebObjects/MZStore.woa/wpa/MRSS/justadded/limit=25/rss.xml" />
 		<outline text="RollingStone.com Music News" xmlUrl="http://www.rollingstone.com/rssxml/music_news.xml" />
 		<outline text="VH1 News" xmlUrl="http://www.vh1.com/rss/news/latest.jhtml" />
 		<outline text="MTV News" xmlUrl="http://www.mtv.com/rss/news/latest.jhtml" />
 		<outline text="CMT News" xmlUrl="http://www.cmt.com/rss/news/latest.jhtml" />
-		<outline text="iTunes Top 25 Songs" xmlUrl="http://phobos.apple.com/webobjects/mzstore.woa/wpa/mrss/topsongs/limit=25/rss.xml" />
+		<outline text="iTunes Top 25 Songs" xmlUrl="http://phobos.apple.com/WebObjects/MZStore.woa/wpa/MRSS/topsongs/limit=25/rss.xml" />
 		</outline>
 		<outline text="News">
 		<outline text="Guardian Unlimited" xmlUrl="http://www.guardian.co.uk/rss/1,,,00.xml" />
@@ -152,7 +152,7 @@
 		<outline text="Physics Post" xmlUrl="http://physicspost.com/rss.php" />
 		<outline text="ScienceDaily Headlines" xmlUrl="http://www.sciencedaily.com/newsfeed.xml" />
 		<outline text="National Geographic News" xmlUrl="http://news.nationalgeographic.com/index.rss" />
-		<outline text="Tom's Astronomy Blog" xmlUrl="http://astroblog.captcrash.com/wp-rss2.php" />
+		<outline text="Tom's Astronomy Blog" xmlUrl="http://tomsastroblog.com/?feed=atom" />
 		<outline text="Scientific American - Official RSS Feed" xmlUrl="http://www.sciam.com/xml/sciam.xml" />
 		<outline text="SPACE.com" xmlUrl="http://www.space.com/syn/space.xml" />
 		<outline text="Minding the Planet" xmlUrl="http://novaspivack.typepad.com/nova_spivacks_weblog/atom.xml" />
@@ -194,7 +194,6 @@
 		<outline text="Security">
 		<outline text="Computer World Security Knowledge Center" xmlUrl="http://www.computerworld.com/news/xml/0,5000,73,00.xml" />
 		<outline text="Computer World Security Holes" xmlUrl="http://www.computerworld.com/news/xml/0,5000,584,00.xml" />
-		<outline text="Computer World Firewalls" xmlUrl="http://www.computerworld.com/news/xml/0,5000,591,00.xml" />
 		<outline text="Computer World Hacking News" xmlUrl="http://www.computerworld.com/news/xml/0,5000,583,00.xml" />
 		</outline>
 		<outline text="Wireless">
@@ -219,10 +218,10 @@
 		<outline text="KDE Dot News" xmlUrl="http://www.kde.org/dotkdeorg.rdf" />
 		<outline text="iPodlounge" xmlUrl="http://www.ipodlounge.com/index.xml" />
 		<outline text="Wired News" xmlUrl="http://www.wired.com/news_drop/netcenter/netcenter.rdf" />
-		<outline text="OSI News Weblog" xmlUrl="http://opensource.org/weblog/index.rss" />
+		<outline text="OSI News Weblog" xmlUrl="http://opensource.org/blog/feed" />
 		<outline text="digg - tech news" xmlUrl="http://digg.com/rss/index.xml" />
 		<outline text="CNET News" xmlUrl="http://rss.com.com/2547-12-0-20.xml" />
-		<outline text="Anand Tech" xmlUrl="http://www.anandtech.com/rss/newsfeed.cfm" />
+		<outline text="Anand Tech" xmlUrl="http://www.anandtech.com/rss/articlefeed.aspx" />
 		<outline text="ZDNet News - Front Door" xmlUrl="http://news.zdnet.com/2509-1_22-0-20.xml" />
 		<outline text="XML News" xmlUrl="http://www.xml.com/cs/xml/query/q/19" />
 		<outline text="The Register" xmlUrl="http://www.theregister.co.uk/tonys/slashdot.rdf" />
