@@ -7,6 +7,7 @@ import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
@@ -182,6 +183,16 @@ public class Indexer {
     dispose();
     if (IndexReader.indexExists(fIndexDirectory))
       fIndexWriter = createIndexWriter(fIndexDirectory, true);
+  }
+
+  /**
+   * Optimizes the Lucene Index.
+   *
+   * @throws CorruptIndexException
+   * @throws IOException
+   */
+  synchronized void optimize() throws CorruptIndexException, IOException  {
+    fIndexWriter.optimize();
   }
 
   /**
