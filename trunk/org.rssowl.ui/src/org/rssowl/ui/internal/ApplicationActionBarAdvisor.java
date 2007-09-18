@@ -450,6 +450,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     MenuManager toolsMenu = new MenuManager("&Tools", OwlUI.M_TOOLS);
     menuBar.add(toolsMenu);
 
+    toolsMenu.add(new GroupMarker("begin"));
     toolsMenu.add(new Separator());
     toolsMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
     toolsMenu.add(new Separator());
