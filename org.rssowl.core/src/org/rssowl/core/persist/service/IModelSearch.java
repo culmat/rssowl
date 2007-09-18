@@ -115,4 +115,11 @@ public interface IModelSearch {
    * be notified on index events.
    */
   void removeIndexListener(IndexListener listener);
+
+  /**
+   * Optimizes the search index.
+   *
+   * @throws PersistenceException
+   */
+  void optimize() throws PersistenceException;
 }

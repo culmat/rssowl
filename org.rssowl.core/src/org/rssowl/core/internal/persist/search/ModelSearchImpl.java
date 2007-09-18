@@ -31,6 +31,7 @@ import org.apache.lucene.document.DateTools;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.NumberTools;
 import org.apache.lucene.document.DateTools.Resolution;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -680,6 +681,19 @@ public class ModelSearchImpl implements IModelSearch {
    */
   public void removeIndexListener(IndexListener listener) {
     fIndexListeners.remove(listener);
+  }
+
+  /*
+   * @see org.rssowl.core.persist.service.IModelSearch#optimize()
+   */
+  public void optimize() {
+    try {
+      fIndexer.optimize();
+    } catch (CorruptIndexException e) {
+      throw new PersistenceException(e.getMessage(), e);
+    } catch (IOException e) {
+      throw new PersistenceException(e.getMessage(), e);
+    }
   }
 
   void notifyIndexUpdated(int docCount) {
