@@ -310,6 +310,18 @@
             <separator name="additions"/>
          </menu>
       </actionSet>
+      <actionSet
+            id="org.rssowl.ui.CleanUpSet"
+            label="Clean Up"
+            visible="true">
+         <action
+               class="org.rssowl.ui.internal.actions.CleanUpAction"
+               definitionId="org.rssowl.ui.CleanUpAction"
+               id="org.rssowl.ui.CleanUpAction"
+               label="Clean Up..."
+               menubarPath="tools/begin">
+         </action>
+      </actionSet>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -570,6 +582,11 @@
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.OpenInExternalBrowser"
             name="Open in External Browser">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.CleanUpAction"
+            name="Clean Up">
       </command>
    </extension>
    <extension
