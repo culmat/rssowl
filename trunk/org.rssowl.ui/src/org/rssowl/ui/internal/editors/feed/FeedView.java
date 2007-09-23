@@ -732,7 +732,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     final boolean markReadOnFeedChange = fPreferences.getBoolean(DefaultPreferences.MARK_FEED_READ_ON_CHANGE);
     final boolean markReadOnMinimize = fPreferences.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE);
 
-    /* Mark *new* News as read when closing the entire application */
+    /* Mark *new* News as unread when closing the entire application */
     if (event == UIEvent.CLOSE && isBookMark) {
 
       /* Perform the State Change */
