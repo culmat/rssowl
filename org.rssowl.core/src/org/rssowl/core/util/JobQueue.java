@@ -269,8 +269,10 @@ public class JobQueue {
               IStatus status = task.run(monitor);
 
               /* Log anything that is an Error or Warning */
-              if (status.getSeverity() == IStatus.ERROR || status.getSeverity() == IStatus.WARNING)
-                Activator.getDefault().getLog().log(status);
+              if (status.getSeverity() == IStatus.ERROR || status.getSeverity() == IStatus.WARNING) {
+                if (Activator.getDefault() != null)
+                  Activator.getDefault().getLog().log(status);
+              }
             }
           });
 
