@@ -130,7 +130,7 @@ public class DefaultSaxParserImpl implements IXMLParser {
     }
 
     /* In case of an exception */
-    if (ex != null && document == null)
+    if (ex != null && document == null && Activator.getDefault() != null)
       throw new ParserException(Activator.getDefault().createErrorStatus(ex.getMessage(), ex));
 
     /* Return Document */
@@ -151,7 +151,7 @@ public class DefaultSaxParserImpl implements IXMLParser {
        * java.lang.String)
        */
       public InputSource getExternalSubset(String name, String baseURI) {
-        return new InputSource(getClass().getResourceAsStream(DEFAULT_DTD)); 
+        return new InputSource(getClass().getResourceAsStream(DEFAULT_DTD));
       }
 
       /*
@@ -167,7 +167,7 @@ public class DefaultSaxParserImpl implements IXMLParser {
        * java.lang.String, java.lang.String, java.lang.String)
        */
       public InputSource resolveEntity(String name, String publicId, String baseURI, String systemId) {
-        return new InputSource(getClass().getResourceAsStream(DEFAULT_DTD)); 
+        return new InputSource(getClass().getResourceAsStream(DEFAULT_DTD));
       }
     });
 
