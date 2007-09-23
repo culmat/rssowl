@@ -26,6 +26,8 @@ package org.rssowl.ui.internal.dialogs.properties;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -33,6 +35,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
@@ -44,8 +48,10 @@ import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderChooser;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.search.SearchConditionList;
 import org.rssowl.ui.internal.util.LayoutUtils;
+import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,9 +93,27 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     nameLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
     nameLabel.setText("Name: ");
 
-    fNameInput = new Text(container, SWT.BORDER);
-    fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    Composite nameContainer = new Composite(container, SWT.BORDER);
+    nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    nameContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+    fNameInput = new Text(nameContainer, SWT.NONE);
+    fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     fNameInput.setText(fSearchMark.getName());
+
+    ToolBar generateTitleBar = new ToolBar(nameContainer, SWT.FLAT);
+    generateTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+    ToolItem generateTitleItem = new ToolItem(generateTitleBar, SWT.PUSH);
+    generateTitleItem.setImage(OwlUI.getImage(fSite.getResourceManager(), "icons/etool16/info.gif"));
+    generateTitleItem.setToolTipText("Create name from conditions");
+    generateTitleItem.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        onGenerateName();
+      }
+    });
 
     /* Location */
     Label locationLabel = new Label(container, SWT.None);
@@ -126,6 +150,16 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     fSearchConditionList.setVisibleItemCount(3);
 
     return container;
+  }
+
+  void onGenerateName() {
+    List<ISearchCondition> conditions = fSearchConditionList.createConditions();
+    String name = ModelUtils.getName(conditions, fMatchAllRadio.getSelection());
+
+    if (name.length() > 0) {
+      fNameInput.setText(name);
+      fNameInput.selectAll();
+    }
   }
 
   /*

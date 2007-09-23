@@ -34,6 +34,8 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.reference.BookMarkReference;
@@ -44,11 +46,15 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.Map.Entry;
 
 /**
  * Helper class for various Model-Transformations required by the UI.
@@ -56,6 +62,9 @@ import java.util.Set;
  * @author bpasero
  */
 public class ModelUtils {
+
+  /* Shared Date Format */
+  private static final DateFormat fDateFormat = DateFormat.getDateInstance();
 
   /**
    * @param entities A list of folder childs.
@@ -104,6 +113,108 @@ public class ModelUtils {
       return null;
 
     return result;
+  }
+
+  /**
+   * @param conditions The search conditions to find a human readable name for.
+   * @param matchAllConditions Either true or false depending on the search.
+   * @return A human readable name for all the conditions.
+   */
+  public static String getName(List<ISearchCondition> conditions, boolean matchAllConditions) {
+    StringBuilder name = new StringBuilder();
+
+    /* First group Conditions by Field */
+    Map<String, List<ISearchCondition>> mapFieldNameToConditions = new HashMap<String, List<ISearchCondition>>();
+    for (ISearchCondition condition : conditions) {
+
+      /* TODO Support Location Field */
+      if (condition.getField().getId() == INews.LOCATION)
+        continue;
+
+      String fieldName = condition.getField().getName();
+      String condValue = condition.getValue().toString();
+
+      if (condValue.length() > 0) {
+        List<ISearchCondition> fieldConditions = mapFieldNameToConditions.get(fieldName);
+        if (fieldConditions == null) {
+          fieldConditions = new ArrayList<ISearchCondition>();
+          mapFieldNameToConditions.put(fieldName, fieldConditions);
+        }
+
+        fieldConditions.add(condition);
+      }
+    }
+
+    /* For each Field Group */
+    Set<Entry<String, List<ISearchCondition>>> entries = mapFieldNameToConditions.entrySet();
+    for (Entry<String, List<ISearchCondition>> entry : entries) {
+      String prevSpecName = null;
+      String fieldName = entry.getKey();
+      List<ISearchCondition> fieldConditions = entry.getValue();
+      StringBuilder fieldExpression = new StringBuilder();
+
+      /* Append Field Name */
+      fieldExpression.append(fieldName).append(" ");
+
+      /* For each Field Condition */
+      for (ISearchCondition fieldCondition : fieldConditions) {
+        String condValue = fieldCondition.getValue().toString();
+        String specName = fieldCondition.getSpecifier().getName();
+        int typeId = fieldCondition.getField().getSearchValueType().getId();
+
+        /* Condition Value provided */
+        if (condValue.length() > 0) {
+
+          /* Append specifier if not identical with previous */
+          if (prevSpecName == null || !prevSpecName.equals(specName)) {
+            fieldExpression.append(specName).append(" ");
+            prevSpecName = specName;
+          }
+
+          /* Append Condition Value based on Type */
+          switch (typeId) {
+            case ISearchValueType.STRING:
+              fieldExpression.append("'").append(condValue).append("'");
+              break;
+            case ISearchValueType.LINK:
+              fieldExpression.append("'").append(condValue).append("'");
+              break;
+            case ISearchValueType.ENUM:
+              condValue = condValue.toLowerCase();
+              condValue = condValue.replace("[", "");
+              condValue = condValue.replace("]", "");
+
+              fieldExpression.append(condValue.toLowerCase());
+
+              break;
+            case ISearchValueType.DATE:
+              fieldExpression.append(fDateFormat.format(fieldCondition.getValue()));
+              break;
+            case ISearchValueType.TIME:
+              fieldExpression.append(fDateFormat.format(fieldCondition.getValue()));
+              break;
+            case ISearchValueType.DATETIME:
+              fieldExpression.append(fDateFormat.format(fieldCondition.getValue()));
+              break;
+
+            default:
+              fieldExpression.append(condValue);
+          }
+
+          fieldExpression.append(matchAllConditions ? " and " : " or ");
+        }
+      }
+
+      if (fieldExpression.length() > 0)
+        fieldExpression.delete(fieldExpression.length() - (matchAllConditions ? " and ".length() : " or ".length()), fieldExpression.length());
+
+      name.append(fieldExpression).append(matchAllConditions ? " and " : " or ");
+    }
+
+    if (name.length() > 0)
+      name.delete(name.length() - (matchAllConditions ? " and ".length() : " or ".length()), name.length());
+
+    return name.toString();
   }
 
   /**
