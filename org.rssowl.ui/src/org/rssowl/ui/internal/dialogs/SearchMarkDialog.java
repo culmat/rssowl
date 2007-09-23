@@ -33,6 +33,8 @@ import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -42,6 +44,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
@@ -62,6 +66,7 @@ import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.search.SearchConditionList;
 import org.rssowl.ui.internal.util.LayoutUtils;
+import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.util.ArrayList;
@@ -220,11 +225,36 @@ public class SearchMarkDialog extends TitleAreaDialog {
     Label nameLabel = new Label(container, SWT.NONE);
     nameLabel.setText("Name: ");
 
-    fNameInput = new Text(container, SWT.SINGLE | SWT.BORDER);
-    fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    Composite nameContainer = new Composite(container, SWT.BORDER);
+    nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    nameContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+    fNameInput = new Text(nameContainer, SWT.SINGLE);
+    fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+
+    /* Prefill Name out of Conditions if provided */
+    if (fInitialSearchConditions != null && !fInitialSearchConditions.isEmpty()) {
+      fNameInput.setText(ModelUtils.getName(fInitialSearchConditions, fInitialMatchAllConditions));
+      fNameInput.selectAll();
+    }
+
     fNameInput.addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
         validateInput();
+      }
+    });
+
+    ToolBar generateTitleBar = new ToolBar(nameContainer, SWT.FLAT);
+    generateTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+    ToolItem generateTitleItem = new ToolItem(generateTitleBar, SWT.PUSH);
+    generateTitleItem.setImage(OwlUI.getImage(fResources, "icons/etool16/info.gif"));
+    generateTitleItem.setToolTipText("Create name from conditions");
+    generateTitleItem.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        onGenerateName();
       }
     });
 
@@ -267,6 +297,16 @@ public class SearchMarkDialog extends TitleAreaDialog {
     return container;
   }
 
+  void onGenerateName() {
+    List<ISearchCondition> conditions = fSearchConditionList.createConditions();
+    String name = ModelUtils.getName(conditions, fMatchAllRadio.getSelection());
+
+    if (name.length() > 0) {
+      fNameInput.setText(name);
+      fNameInput.selectAll();
+    }
+  }
+
   private List<ISearchCondition> getDefaultConditions() {
     List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(1);
     IModelFactory factory = Owl.getModelFactory();
@@ -284,7 +324,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
   @Override
   protected void createButtonsForButtonBar(Composite parent) {
     super.createButtonsForButtonBar(parent);
-    getButton(IDialogConstants.OK_ID).setEnabled(false);
+    getButton(IDialogConstants.OK_ID).setEnabled(fNameInput.getText().length() > 0);
   }
 
   /*
