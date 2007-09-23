@@ -42,7 +42,6 @@ import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewerColumn;
@@ -308,9 +307,18 @@ public class NewsTableControl implements IFeedViewPart {
     fViewer.setContentProvider(contentProvider);
 
     /* Create LabelProvider (Custom Owner Drawn enabled!) */
-    if (USE_CUSTOM_OWNER_DRAWN)
-      OwnerDrawLabelProvider.setUpOwnerDraw(fViewer);
-    fViewer.setLabelProvider(new NewsTableLabelProvider());
+    final NewsTableLabelProvider newsTableLabelProvider = new NewsTableLabelProvider();
+    if (USE_CUSTOM_OWNER_DRAWN) {
+      fViewer.getControl().addListener(SWT.EraseItem, new Listener() {
+        public void handleEvent(Event event) {
+          Object element = event.item.getData();
+          newsTableLabelProvider.erase(event, element);
+        }
+      });
+    }
+
+    //OwnerDrawLabelProvider.setUpOwnerDraw(fViewer); Not being used due to performance reasons
+    fViewer.setLabelProvider(newsTableLabelProvider);
 
     /* Create Sorter */
     fNewsSorter = new NewsComparator();

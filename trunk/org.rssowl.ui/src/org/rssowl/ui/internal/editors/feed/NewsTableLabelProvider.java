@@ -337,7 +337,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
    * java.lang.Object)
    */
   @Override
-  protected void erase(Event event, Object element) {
+  public void erase(Event event, Object element) {
 
     /* Erase News */
     if (element instanceof INews)

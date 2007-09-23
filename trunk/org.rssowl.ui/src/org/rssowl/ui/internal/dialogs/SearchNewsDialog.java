@@ -46,7 +46,6 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -417,7 +416,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
      * java.lang.Object)
      */
     @Override
-    protected void erase(Event event, Object element) {
+    public void erase(Event event, Object element) {
       super.erase(event, ((ScoredNews) element).getNews());
     }
 
@@ -944,8 +943,17 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fViewer.setContentProvider(getContentProvider());
 
     /* Create LabelProvider (Custom Owner Drawn enabled!) */
-    if (USE_CUSTOM_OWNER_DRAWN)
-      OwnerDrawLabelProvider.setUpOwnerDraw(fViewer);
+    final NewsTableLabelProvider newsTableLabelProvider = new NewsTableLabelProvider();
+    if (USE_CUSTOM_OWNER_DRAWN) {
+      fViewer.getControl().addListener(SWT.EraseItem, new Listener() {
+        public void handleEvent(Event event) {
+          Object element = event.item.getData();
+          newsTableLabelProvider.erase(event, element);
+        }
+      });
+    }
+
+    //OwnerDrawLabelProvider.setUpOwnerDraw(fViewer); Not being used due to performance reasons
     fViewer.setLabelProvider(new ScoredNewsLabelProvider());
 
     /* Create Sorter */
