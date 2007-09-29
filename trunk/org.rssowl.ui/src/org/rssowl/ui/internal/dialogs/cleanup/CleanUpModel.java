@@ -84,7 +84,7 @@ class CleanUpModel {
   void generate() {
     String name = INews.class.getName();
     Set<IBookMark> bookmarksToDelete = new HashSet<IBookMark>();
-    Map<IBookMark, Collection<NewsReference>> newsToDelete = new HashMap<IBookMark, Collection<NewsReference>>();
+    Map<IBookMark, Set<NewsReference>> newsToDelete = new HashMap<IBookMark, Set<NewsReference>>();
 
     /* 1.) Delete BookMarks that have Last Visit > X Days ago */
     if (fOps.deleteFeedByLastVisit()) {
@@ -170,7 +170,7 @@ class CleanUpModel {
         conditions.add(stateCondition);
 
         List<SearchHit<NewsReference>> results = fModelSearch.searchNews(conditions, true);
-        List<NewsReference> newsOfMarkToDelete = new ArrayList<NewsReference>();
+        Set<NewsReference> newsOfMarkToDelete = new HashSet<NewsReference>();
         for (SearchHit<NewsReference> result : results) {
           NewsReference newsRef = result.getResult();
           if (!newsRefsToKeep.contains(newsRef))
@@ -205,15 +205,20 @@ class CleanUpModel {
         conditions.add(stateCond);
 
         List<SearchHit<NewsReference>> results = fModelSearch.searchNews(conditions, true);
-        List<NewsReference> newsOfMarkToDelete = new ArrayList<NewsReference>();
+        Set<NewsReference> newsOfMarkToDelete = new HashSet<NewsReference>();
         for (SearchHit<NewsReference> result : results) {
           NewsReference newsRef = result.getResult();
           if (!newsRefsToKeep.contains(newsRef))
             newsOfMarkToDelete.add(newsRef);
         }
 
-        if (!newsOfMarkToDelete.isEmpty())
-          newsToDelete.put(mark, newsOfMarkToDelete);
+        if (!newsOfMarkToDelete.isEmpty()) {
+          Collection<NewsReference> existingNewsOfMarkToDelete = newsToDelete.get(mark);
+          if (existingNewsOfMarkToDelete == null)
+            newsToDelete.put(mark, newsOfMarkToDelete);
+          else
+            existingNewsOfMarkToDelete.addAll(newsOfMarkToDelete);
+        }
       }
     }
 
@@ -226,8 +231,8 @@ class CleanUpModel {
       fTasks.add(task);
     }
 
-    Set<Entry<IBookMark, Collection<NewsReference>>> entries = newsToDelete.entrySet();
-    for (Entry<IBookMark, Collection<NewsReference>> entry : entries) {
+    Set<Entry<IBookMark, Set<NewsReference>>> entries = newsToDelete.entrySet();
+    for (Entry<IBookMark, Set<NewsReference>> entry : entries) {
       CleanUpTask task = new NewsTask(entry.getKey(), entry.getValue());
       fTasks.add(task);
     }
