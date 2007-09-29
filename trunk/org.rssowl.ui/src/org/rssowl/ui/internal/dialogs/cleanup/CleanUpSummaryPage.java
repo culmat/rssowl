@@ -158,7 +158,7 @@ public class CleanUpSummaryPage extends WizardPage {
 
       IRunnableWithProgress runnable = new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) {
-          monitor.beginTask("Please wait... Generating Summary", IProgressMonitor.UNKNOWN);
+          monitor.beginTask("Please wait while generating the preview...", IProgressMonitor.UNKNOWN);
           onGenerateSummary(operations, selection);
         }
       };

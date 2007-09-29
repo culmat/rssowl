@@ -100,7 +100,34 @@ class CleanUpModel {
 
     /* 2.) Delete BookMarks that have not updated in X Days */
     if (fOps.deleteFeedByLastUpdate()) {
-      //TODO Not yet supported
+      ISearchField locationField = fFactory.createSearchField(INews.LOCATION, name);
+      ISearchField ageInDaysField = fFactory.createSearchField(INews.AGE_IN_DAYS, name);
+
+      ISearchField stateField = fFactory.createSearchField(INews.STATE, name);
+      EnumSet<State> visibleStates = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED, INews.State.READ);
+      ISearchCondition stateCondition = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, visibleStates);
+
+      /* For each selected Bookmark */
+      for (IBookMark mark : fBookmarks) {
+
+        /* Ignore if Bookmark gets already deleted */
+        if (bookmarksToDelete.contains(mark))
+          continue;
+
+        Long[][] value = new Long[2][1];
+        value[1][0] = mark.getId();
+        ISearchCondition locationCond = fFactory.createSearchCondition(locationField, SearchSpecifier.IS, value);
+        ISearchCondition ageCond = fFactory.createSearchCondition(ageInDaysField, SearchSpecifier.IS_LESS_THAN, fOps.getLastUpdateDays());
+
+        List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(2);
+        conditions.add(locationCond);
+        conditions.add(ageCond);
+        conditions.add(stateCondition);
+
+        List<SearchHit<NewsReference>> results = fModelSearch.searchNews(conditions, true);
+        if (results.isEmpty())
+          bookmarksToDelete.add(mark);
+      }
     }
 
     /* 3.) Delete BookMarks that have Connection Error */
