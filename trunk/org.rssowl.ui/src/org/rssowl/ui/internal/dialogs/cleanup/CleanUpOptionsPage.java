@@ -70,17 +70,24 @@ public class CleanUpOptionsPage extends WizardPage {
   CleanUpOperations getOperations() {
 
     /* Feed Operations */
-    int lastVisitInDays = fDeleteFeedByLastVisitCheck.getSelection() ? fMaxLastVisitSpinner.getSelection() : 0;
-    int lastUpdateInDays = fDeleteFeedByLastUpdateCheck.getSelection() ? fMaxLastUpdateSpinner.getSelection() : 0;
+    boolean lastVisitInDaysState = fDeleteFeedByLastVisitCheck.getSelection();
+    int lastVisitInDays = fMaxLastVisitSpinner.getSelection();
+
+    boolean lastUpdateInDaysState = fDeleteFeedByLastUpdateCheck.getSelection();
+    int lastUpdateInDays = fMaxLastUpdateSpinner.getSelection();
     boolean deleteFeedsByConError = fDeleteConErrorFeedCheck.getSelection();
 
     /* News Operations */
-    int maxNewsCountPerFeed = fDeleteNewsByCountCheck.getSelection() ? fMaxCountSpinner.getSelection() : 0;
-    int maxNewsAge = fDeleteNewsByAgeCheck.getSelection() ? fMaxAgeSpinner.getSelection() : 0;
+    boolean maxNewsCountPerFeedState = fDeleteNewsByCountCheck.getSelection();
+    int maxNewsCountPerFeed = fMaxCountSpinner.getSelection();
+
+    boolean maxNewsAgeState = fDeleteNewsByAgeCheck.getSelection();
+    int maxNewsAge = fMaxAgeSpinner.getSelection();
+
     boolean deleteReadNews = fDeleteReadNewsCheck.getSelection();
     boolean keepUnreadNews = fNeverDeleteUnreadNewsCheck.getSelection();
 
-    return new CleanUpOperations(lastVisitInDays, lastUpdateInDays, deleteFeedsByConError, maxNewsCountPerFeed, maxNewsAge, deleteReadNews, keepUnreadNews);
+    return new CleanUpOperations(lastVisitInDaysState, lastVisitInDays, lastUpdateInDaysState, lastUpdateInDays, deleteFeedsByConError, maxNewsCountPerFeedState, maxNewsCountPerFeed, maxNewsAgeState, maxNewsAge, deleteReadNews, keepUnreadNews);
   }
 
   /*

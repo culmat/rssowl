@@ -32,28 +32,40 @@ package org.rssowl.ui.internal.dialogs.cleanup;
 class CleanUpOperations {
 
   /* Feed Operations */
+  private boolean fLastVisitInDaysState;
   private int fLastVisitInDays;
+
+  private boolean fLastUpdateInDaysState;
   private int fLastUpdateInDays;
+
   private boolean fDeleteFeedsByConError;
 
   /* News Operations */
+  private boolean fMaxNewsCountPerFeedState;
   private int fMaxNewsCountPerFeed;
+
+  private boolean fMaxNewsAgeState;
   private int fMaxNewsAge;
+
   private boolean fDeleteReadNews;
   private boolean fKeepUnreadNews;
 
-  CleanUpOperations(int lastVisitInDays, int lastUpdateInDays, boolean deleteFeedsByConError, int maxNewsCountPerFeed, int maxNewsAge, boolean deleteReadNews, boolean keepUnreadNews) {
+  CleanUpOperations(boolean lastVisitState, int lastVisitInDays, boolean lastUpdateState, int lastUpdateInDays, boolean deleteFeedsByConError, boolean maxNewsCountPerFeedState, int maxNewsCountPerFeed, boolean maxNewsAgeState, int maxNewsAge, boolean deleteReadNews, boolean keepUnreadNews) {
+    fLastVisitInDaysState = lastVisitState;
     fLastVisitInDays = lastVisitInDays;
+    fLastUpdateInDaysState = lastUpdateState;
     fLastUpdateInDays = lastUpdateInDays;
     fDeleteFeedsByConError = deleteFeedsByConError;
+    fMaxNewsCountPerFeedState = maxNewsCountPerFeedState;
     fMaxNewsCountPerFeed = maxNewsCountPerFeed;
+    fMaxNewsAgeState = maxNewsAgeState;
     fMaxNewsAge = maxNewsAge;
     fDeleteReadNews = deleteReadNews;
     fKeepUnreadNews = keepUnreadNews;
   }
 
   boolean deleteFeedByLastVisit() {
-    return fLastVisitInDays > 0;
+    return fLastVisitInDaysState;
   }
 
   int getLastVisitDays() {
@@ -61,7 +73,7 @@ class CleanUpOperations {
   }
 
   boolean deleteFeedByLastUpdate() {
-    return fLastUpdateInDays > 0;
+    return fLastUpdateInDaysState;
   }
 
   int getLastUpdateDays() {
@@ -73,7 +85,7 @@ class CleanUpOperations {
   }
 
   boolean deleteNewsByCount() {
-    return fMaxNewsCountPerFeed >= 0;
+    return fMaxNewsCountPerFeedState;
   }
 
   int getMaxNewsCountPerFeed() {
@@ -81,7 +93,7 @@ class CleanUpOperations {
   }
 
   boolean deleteNewsByAge() {
-    return fMaxNewsAge > 0;
+    return fMaxNewsAgeState;
   }
 
   int getMaxNewsAge() {
