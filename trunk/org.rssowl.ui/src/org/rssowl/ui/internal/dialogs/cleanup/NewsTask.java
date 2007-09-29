@@ -24,70 +24,63 @@
 
 package org.rssowl.ui.internal.dialogs.cleanup;
 
-import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.ui.internal.OwlUI;
 
+import java.util.Collection;
+
 /**
+ * An instance of <code>CleanUpTask</code> to delete a collection of
+ * {@link INews}.
+ *
  * @author bpasero
  */
-public class BackgroundTasksPage extends WizardPage {
-  private Button fDefragCheck;
-  private Button fOptimizeLucene;
+class NewsTask extends CleanUpTask {
+  private final Collection<NewsReference> fNews;
+  private ImageDescriptor fImage;
+  private String fLabel;
 
-  /**
-   * @param pageName
-   */
-  protected BackgroundTasksPage(String pageName) {
-    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/cleanup_wiz.gif"));
-    setMessage("This wizard will guide you through the steps of the Clean Up process.");
+  NewsTask(IBookMark container, Collection<NewsReference> news) {
+    Assert.isNotNull(container);
+    Assert.isNotNull(news);
+    Assert.isTrue(!news.isEmpty());
+
+    fNews = news;
+    init(container);
+  }
+
+  private void init(IBookMark container) {
+
+    /* Label */
+    fLabel = "Delete " + fNews.size() + " news from '" + container.getName() + "'";
+
+    /* Image */
+    fImage = OwlUI.getFavicon(container);
+    if (fImage == null)
+      fImage = OwlUI.BOOKMARK;
+  }
+
+  Collection<NewsReference> getNews() {
+    return fNews;
   }
 
   /*
-   * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
-   */
-  public void createControl(Composite parent) {
-    Composite control = new Composite(parent, SWT.NONE);
-    control.setLayout(new GridLayout(1, false));
-
-    /* Defragment Database */
-    fDefragCheck = new Button(control, SWT.CHECK);
-    fDefragCheck.setText("Defragment the database to make RSSOwl faster");
-    fDefragCheck.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        if (fDefragCheck.getSelection())
-          setMessage("Defragment will only take place after the next restart of RSSOwl", WARNING);
-        else
-          setMessage("This wizard will guide you through the steps of the Clean Up process.");
-      }
-    });
-
-    /* Optimize Lucene */
-    fOptimizeLucene = new Button(control, SWT.CHECK);
-    fOptimizeLucene.setText("Optimize the search index to make searches faster");
-
-    setControl(control);
-  }
-
-  boolean defragDatabase() {
-    return fDefragCheck.getSelection();
-  }
-
-  boolean optimizeLucene() {
-    return fOptimizeLucene.getSelection();
-  }
-
-  /*
-   * @see org.eclipse.jface.wizard.WizardPage#isPageComplete()
+   * @see org.rssowl.ui.internal.dialogs.cleanup.CleanUpTask#getImage()
    */
   @Override
-  public boolean isPageComplete() {
-    return isCurrentPage();
+  ImageDescriptor getImage() {
+    return fImage;
+  }
+
+  /*
+   * @see org.rssowl.ui.internal.dialogs.cleanup.CleanUpTask#getLabel()
+   */
+  @Override
+  String getLabel() {
+    return fLabel;
   }
 }
