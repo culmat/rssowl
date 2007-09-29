@@ -202,6 +202,9 @@ public class LocationConditionControl extends Composite {
           if (folder != null && !folder.getChildren().isEmpty()) {
             boolean expandedState = !fViewer.getExpandedState(folder);
             fViewer.setExpandedState(folder, expandedState);
+
+            if (expandedState && fViewer.getChecked(folder))
+              setChildsChecked(folder, true, true);
           }
         }
       });
