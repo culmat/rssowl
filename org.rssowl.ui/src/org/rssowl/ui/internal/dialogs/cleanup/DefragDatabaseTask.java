@@ -24,49 +24,29 @@
 
 package org.rssowl.ui.internal.dialogs.cleanup;
 
-import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.rssowl.ui.internal.OwlUI;
 
-class WelcomePage extends WizardPage {
+/**
+ * An instance of <code>CleanUpTask</code> to defragment the database.
+ *
+ * @author bpasero
+ */
+class DefragDatabaseTask extends CleanUpTask {
 
-  /**
-   * @param pageName
+  /*
+   * @see org.rssowl.ui.internal.dialogs.cleanup.CleanUpTask#getImage()
    */
-  protected WelcomePage(String pageName) {
-    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/cleanup_wiz.gif"));
-    setMessage("This wizard will guide you through the steps of the Clean Up process.");
+  @Override
+  ImageDescriptor getImage() {
+    return OwlUI.getImageDescriptor("icons/obj16/database.gif");
   }
 
   /*
-   * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
+   * @see org.rssowl.ui.internal.dialogs.cleanup.CleanUpTask#getLabel()
    */
-  public void createControl(Composite parent) {
-    Composite control = new Composite(parent, SWT.NONE);
-    control.setLayout(new GridLayout(3, false));
-
-    Label welcomeLabel = new Label(control, SWT.None);
-    welcomeLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-    StringBuilder str = new StringBuilder();
-    str.append("The clean up process will help you make the best out of RSSOwl. When the wizard is done it will support:");
-    str.append("\n\n - Delete Read News");
-    str.append("\n - Delete News from Feeds when count > N");
-    str.append("\n - Delete News from Feeds when age > N days");
-    str.append("\n\n - Delete Feeds & Bookmarks that haven't updated for a while");
-    str.append("\n - Delete Feeds & Bookmarks that the user did not visit for a while");
-
-    str.append("\n\n - Defragment the db4o DB");
-    str.append("\n - Optimize the Lucene Index");
-
-    str.append("\n\nPlease press next to begin the clean up process...");
-
-    welcomeLabel.setText(str.toString());
-
-    setControl(control);
+  @Override
+  String getLabel() {
+    return "Recommended: Improve performance of the database";
   }
 }
