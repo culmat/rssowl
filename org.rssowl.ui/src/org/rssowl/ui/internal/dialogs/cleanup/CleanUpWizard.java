@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.dialogs.cleanup;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.Wizard;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
@@ -36,6 +37,8 @@ import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.dialogs.ConfirmDeleteDialog;
 
 import java.io.File;
 import java.io.IOException;
@@ -84,9 +87,37 @@ public class CleanUpWizard extends Wizard {
 
     /* Receive Tasks */
     final List<CleanUpTask> tasks = fCleanUpSummaryPage.getTasks();
+
+    /* Show final confirmation prompt */
+    int bmCounter = 0;
+    int newsCounter = 0;
+    for (CleanUpTask task : tasks) {
+      if (task instanceof BookMarkTask)
+        bmCounter++;
+      else if (task instanceof NewsTask)
+        newsCounter+= ((NewsTask)task).getNews().size();
+    }
+
+    if (bmCounter != 0 || newsCounter != 0) {
+      String msg = "Are you sure you want to delete ";
+      String bmMsg = bmCounter > 1 ? bmCounter + " bookmarks" : bmCounter + " bookmark";
+      if (bmCounter != 0 && newsCounter != 0)
+        msg += bmMsg + " and " + newsCounter + " news?";
+      else if (bmCounter != 0)
+        msg += bmMsg + "?";
+      else
+        msg += newsCounter + " news?";
+
+      ConfirmDeleteDialog dialog = new ConfirmDeleteDialog(getShell(), "Confirm Delete", "This action can not be undone", msg, null);
+      if (dialog.open() != Window.OK)
+        return true;
+    }
+
+    /* Runnable that performs the tasks */
     IRunnableWithProgress runnable = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) {
-        monitor.beginTask("Please wait... Performing Clean Up", IProgressMonitor.UNKNOWN);
+        boolean optimizeSearch = false;
+        monitor.beginTask("Please wait while cleaning up...", IProgressMonitor.UNKNOWN);
 
         /* Perform Tasks */
         List<IBookMark> bookmarks = new ArrayList<IBookMark>();
@@ -108,7 +139,7 @@ public class CleanUpWizard extends Wizard {
 
           /* Optimize Lucene */
           else if (task instanceof OptimizeSearchTask)
-            Owl.getPersistenceService().getModelSearch().optimize();
+            optimizeSearch = true;
 
           /* Defrag Database */
           else if (task instanceof DefragDatabaseTask) {
@@ -119,11 +150,15 @@ public class CleanUpWizard extends Wizard {
               Activator.getDefault().logError(e.getMessage(), e);
             }
           }
-
         }
 
         /* Delete BookMarks */
+        Controller.getDefault().getSavedSearchService().forceQuickUpdate();
         DynamicDAO.deleteAll(bookmarks);
+
+        /* Optimize Search */
+        if (optimizeSearch)
+          Owl.getPersistenceService().getModelSearch().optimize();
 
         /* Save Operations */
         IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
