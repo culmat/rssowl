@@ -24,7 +24,6 @@ Visit http://www.rssowl.org
 
    <windowImages i16="/org.rssowl.ui/icons/product/16x16.gif" i32="/org.rssowl.ui/icons/product/32x32.gif" i48="/org.rssowl.ui/icons/product/48x48.gif" i64="/org.rssowl.ui/icons/product/64x64.gif" i128="/org.rssowl.ui/icons/product/128x128.gif"/>
 
-
    <launcher name="RSSOwl">
       <linux icon="/org.rssowl.ui/icons/product/rssowl.xpm"/>
       <macosx icon="/org.rssowl.ui/icons/product/rssowl.icns"/>
@@ -81,7 +80,7 @@ Visit http://www.rssowl.org
 
    <features>
       <feature id="org.rssowl" version="2.0.0.qualifier"/>
-      <feature id="org.eclipse.rcp" version="3.3.0.v20070607-8y8eE8NEbsN3X_fjWS8HPNG"/>
+      <feature id="org.eclipse.rcp" version="3.3.1.R33x_r20070802-8y8eE8sEV3Fz0z0GlHJrXvTAUS"/>
    </features>
 
 </product>
