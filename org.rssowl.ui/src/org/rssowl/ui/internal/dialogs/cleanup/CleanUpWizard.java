@@ -110,7 +110,7 @@ public class CleanUpWizard extends Wizard {
 
       ConfirmDeleteDialog dialog = new ConfirmDeleteDialog(getShell(), "Confirm Delete", "This action can not be undone", msg, null);
       if (dialog.open() != Window.OK)
-        return true;
+        return false;
     }
 
     /* Runnable that performs the tasks */
