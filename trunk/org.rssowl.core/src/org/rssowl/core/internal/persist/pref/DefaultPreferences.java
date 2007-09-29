@@ -167,6 +167,39 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Always reuse feed view */
   public static final String ALWAYS_REUSE_FEEDVIEW = "org.rssowl.pref.AlwaysReuseFeedView";
 
+  /** Global: Clean Up: Delete BMs by last visit (state) */
+  public static final String CLEAN_UP_BM_BY_LAST_VISIT_STATE = "org.rssowl.pref.CleanUpBMByLastVisitState";
+
+  /** Global: Clean Up: Delete BMs by last visit (value) */
+  public static final String CLEAN_UP_BM_BY_LAST_VISIT_VALUE = "org.rssowl.pref.CleanUpBMByLastVisitValue";
+
+  /** Global: Clean Up: Delete BMs by last update (state) */
+  public static final String CLEAN_UP_BM_BY_LAST_UPDATE_STATE = "org.rssowl.pref.CleanUpBMByLastUpdateState";
+
+  /** Global: Clean Up: Delete BMs by last update (value) */
+  public static final String CLEAN_UP_BM_BY_LAST_UPDATE_VALUE = "org.rssowl.pref.CleanUpBMByLastUpdateValue";
+
+  /** Global: Clean Up: Delete BMs with a connection error */
+  public static final String CLEAN_UP_BM_BY_CON_ERROR = "org.rssowl.pref.CleanUpBMByConError";
+
+  /** Global: Clean Up: Delete News > N (boolean) */
+  public static final String CLEAN_UP_NEWS_BY_COUNT_STATE = "org.rssowl.pref.CleanUpNewsByCountState";
+
+  /** Global: Clean Up: Delete News > N (int) */
+  public static final String CLEAN_UP_NEWS_BY_COUNT_VALUE = "org.rssowl.pref.CleanUpNewsByCountValue";
+
+  /** Global: Clean Up: Delete News > N Days (boolean) */
+  public static final String CLEAN_UP_NEWS_BY_AGE_STATE = "org.rssowl.pref.CleanUpNewsByAgeState";
+
+  /** Global: Clean Up: Delete News > N Days (int) */
+  public static final String CLEAN_UP_NEWS_BY_AGE_VALUE = "org.rssowl.pref.CleanUpNewsByAgeValue";
+
+  /** Global: Clean Up: Delete read News (boolean) */
+  public static final String CLEAN_UP_READ_NEWS_STATE = "org.rssowl.pref.CleanUpReadNewsState";
+
+  /** Global: Clean Up: Never Delete Unread News (boolean) */
+  public static final String CLEAN_UP_NEVER_DEL_UNREAD_NEWS_STATE = "org.rssowl.pref.CleanUpNeverDelUnreadNewsState";
+
   /**
    * Eclipse Preferences Follow
    */
