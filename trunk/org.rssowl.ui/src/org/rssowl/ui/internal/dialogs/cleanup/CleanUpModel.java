@@ -112,16 +112,30 @@ class CleanUpModel {
     }
 
     /* Receive Unread News first if required */
-    List<NewsReference> unreadNewsRefs = new ArrayList<NewsReference>();
+    List<NewsReference> newsRefsToKeep = new ArrayList<NewsReference>();
     boolean deleteNews = fOps.deleteNewsByAge() || fOps.deleteNewsByCount() || fOps.deleteReadNews();
-    if (deleteNews && fOps.keepUnreadNews()) {
-      ISearchField field = fFactory.createSearchField(INews.STATE, name);
-      EnumSet<State> unreadStates = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
-      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, unreadStates);
+    if (deleteNews) {
 
-      List<SearchHit<NewsReference>> results = fModelSearch.searchNews(Collections.singletonList(condition), false);
-      for (SearchHit<NewsReference> result : results)
-        unreadNewsRefs.add(result.getResult());
+      /* Keep Sticky News */
+      {
+        ISearchField field = fFactory.createSearchField(INews.IS_FLAGGED, name);
+        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, true);
+
+        List<SearchHit<NewsReference>> results = fModelSearch.searchNews(Collections.singletonList(condition), false);
+        for (SearchHit<NewsReference> result : results)
+          newsRefsToKeep.add(result.getResult());
+      }
+
+      /* Keep Unread News */
+      if (fOps.keepUnreadNews()) {
+        ISearchField field = fFactory.createSearchField(INews.STATE, name);
+        EnumSet<State> unreadStates = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
+        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, unreadStates);
+
+        List<SearchHit<NewsReference>> results = fModelSearch.searchNews(Collections.singletonList(condition), false);
+        for (SearchHit<NewsReference> result : results)
+          newsRefsToKeep.add(result.getResult());
+      }
     }
 
     /* 4.) Delete News that exceed a certain limit in a Feed */
@@ -159,7 +173,7 @@ class CleanUpModel {
         List<NewsReference> newsOfMarkToDelete = new ArrayList<NewsReference>();
         for (SearchHit<NewsReference> result : results) {
           NewsReference newsRef = result.getResult();
-          if (!unreadNewsRefs.contains(newsRef))
+          if (!newsRefsToKeep.contains(newsRef))
             newsOfMarkToDelete.add(newsRef);
         }
 
@@ -194,7 +208,8 @@ class CleanUpModel {
         List<NewsReference> newsOfMarkToDelete = new ArrayList<NewsReference>();
         for (SearchHit<NewsReference> result : results) {
           NewsReference newsRef = result.getResult();
-          newsOfMarkToDelete.add(newsRef);
+          if (!newsRefsToKeep.contains(newsRef))
+            newsOfMarkToDelete.add(newsRef);
         }
 
         if (!newsOfMarkToDelete.isEmpty())
