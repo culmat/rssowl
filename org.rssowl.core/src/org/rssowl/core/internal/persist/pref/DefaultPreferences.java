@@ -272,7 +272,10 @@ public class DefaultPreferences implements IPreferencesInitializer {
   }
 
   private void initCleanUpDefaults(IPreferenceScope defaultScope) {
+    defaultScope.putBoolean(CLEAN_UP_BM_BY_LAST_UPDATE_STATE, true);
     defaultScope.putInteger(CLEAN_UP_BM_BY_LAST_UPDATE_VALUE, 30);
+
+    defaultScope.putBoolean(CLEAN_UP_BM_BY_LAST_VISIT_STATE, true);
     defaultScope.putInteger(CLEAN_UP_BM_BY_LAST_VISIT_VALUE, 30);
 
     defaultScope.putInteger(CLEAN_UP_NEWS_BY_COUNT_VALUE, 200);
