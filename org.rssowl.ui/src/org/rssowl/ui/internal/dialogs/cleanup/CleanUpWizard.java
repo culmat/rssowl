@@ -40,8 +40,6 @@ import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.dialogs.ConfirmDeleteDialog;
 
-import java.io.File;
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -95,7 +93,7 @@ public class CleanUpWizard extends Wizard {
       if (task instanceof BookMarkTask)
         bmCounter++;
       else if (task instanceof NewsTask)
-        newsCounter+= ((NewsTask)task).getNews().size();
+        newsCounter += ((NewsTask) task).getNews().size();
     }
 
     if (bmCounter != 0 || newsCounter != 0) {
@@ -142,14 +140,8 @@ public class CleanUpWizard extends Wizard {
             optimizeSearch = true;
 
           /* Defrag Database */
-          else if (task instanceof DefragDatabaseTask) {
-            String stateLocation = org.rssowl.core.internal.Activator.getDefault().getStateLocation().toOSString();
-            try {
-              new File(stateLocation, "defragment").createNewFile();
-            } catch (IOException e) {
-              Activator.getDefault().logError(e.getMessage(), e);
-            }
-          }
+          else if (task instanceof DefragDatabaseTask)
+            Owl.getPersistenceService().optimizeOnNextStartup();
         }
 
         /* Delete BookMarks */
