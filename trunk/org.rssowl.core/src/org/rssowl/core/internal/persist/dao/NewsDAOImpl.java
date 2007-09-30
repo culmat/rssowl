@@ -119,7 +119,7 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
 
             List<INews> equivalentNews;
 
-            if (newsItem.getGuid() != null) {
+            if (newsItem.getGuid() != null && newsItem.getGuid().isPermaLink()) {
               equivalentNews = getNewsFromGuid(newsItem);
               if (equivalentNews.isEmpty()) {
                 throw createIllegalException("No news were found with guid: " + //$NON-NLS-1$

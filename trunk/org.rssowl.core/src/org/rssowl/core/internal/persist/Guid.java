@@ -28,6 +28,8 @@ import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.util.MergeUtils;
 
+import sun.misc.FpUtils;
+
 /**
  * Simple Implementation of this Type. Data is kept in fields and all Methods
  * are functional to set/get this Data.
@@ -50,6 +52,7 @@ public class Guid extends Persistable implements IGuid {
    */
   public Guid(String value) {
     fValue = value;
+    fIsPermaLink = true;
   }
 
   /*
