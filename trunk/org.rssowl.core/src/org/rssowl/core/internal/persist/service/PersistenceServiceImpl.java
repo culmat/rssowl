@@ -29,6 +29,8 @@ import org.rssowl.core.persist.service.AbstractPersistenceService;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.LongOperationMonitor;
 
+import java.io.IOException;
+
 /**
  * @author bpasero
  */
@@ -78,5 +80,13 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
       }
     });
     getModelSearch().clearIndex();
+  }
+
+  public void optimizeOnNextStartup() throws PersistenceException   {
+    try {
+      DBManager.getDefault().getDefragmentFile().createNewFile();
+    } catch (IOException e) {
+      throw new PersistenceException(e);
+    }
   }
 }

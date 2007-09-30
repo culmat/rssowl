@@ -118,7 +118,10 @@ public class DBManager {
     return fObjectContainer;
   }
 
-  private File getDefragmentFile() {
+  /**
+   * @return the File indicating whether defragment should be run or not.
+   */
+  public File getDefragmentFile() {
     File dir = new File(Activator.getDefault().getStateLocation().toOSString());
     return new File(dir, "defragment");
   }

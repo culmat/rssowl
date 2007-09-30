@@ -114,4 +114,16 @@ public interface IPersistenceService {
    * persistence layer.
    */
   void recreateSchema() throws PersistenceException;
+
+  /**
+   * Instructs the persistence service to schedule an optimization run during
+   * the next time the application is started. The actual optimization type
+   * is dependent on the persistence system being used and implementors are
+   * free to leave this as a no-op in case the the persistence system tunes
+   * itself automatically during runtime.
+   *
+   * @throws PersistenceException in case a problem occurs while trying to
+   * schedule this operation.
+   */
+  void optimizeOnNextStartup() throws PersistenceException;
 }
