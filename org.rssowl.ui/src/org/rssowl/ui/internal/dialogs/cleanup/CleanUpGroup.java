@@ -33,7 +33,7 @@ import java.util.List;
  *
  * @author bpasero
  */
-class CleanUpGroup {
+public class CleanUpGroup {
   List<CleanUpTask> fTasks;
   private final String fLabel;
 
@@ -46,7 +46,10 @@ class CleanUpGroup {
     fTasks.add(task);
   }
 
-  List<CleanUpTask> getTasks() {
+  /**
+   * @return Returns the list of clean up tasks for this group.
+   */
+  public List<CleanUpTask> getTasks() {
     return fTasks;
   }
 

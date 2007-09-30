@@ -34,7 +34,7 @@ import org.rssowl.ui.internal.OwlUI;
  *
  * @author bpasero
  */
-class BookMarkTask extends CleanUpTask {
+public class BookMarkTask extends CleanUpTask {
   private String fLabel;
   private ImageDescriptor fImage;
   private final IBookMark fMark;
@@ -58,7 +58,10 @@ class BookMarkTask extends CleanUpTask {
       fImage = OwlUI.BOOKMARK;
   }
 
-  IBookMark getMark() {
+  /**
+   * @return Returns the Bookmark that is to be deleted.
+   */
+  public IBookMark getMark() {
     return fMark;
   }
 

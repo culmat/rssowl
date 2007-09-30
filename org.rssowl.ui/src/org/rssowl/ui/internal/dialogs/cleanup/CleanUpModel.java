@@ -55,7 +55,7 @@ import java.util.Set;
  *
  * @author bpasero
  */
-class CleanUpModel {
+public class CleanUpModel {
 
   /* One Day in millis */
   private static final long DAY = 24 * 60 * 60 * 1000;
@@ -67,10 +67,13 @@ class CleanUpModel {
   private IModelSearch fModelSearch;
   private ISearchField fLocationField;
   private ISearchField fAgeInDaysField;
-
   private String fNewsName;
 
-  CleanUpModel(CleanUpOperations operations, Collection<IBookMark> bookmarks) {
+  /**
+   * @param operations
+   * @param bookmarks
+   */
+  public CleanUpModel(CleanUpOperations operations, Collection<IBookMark> bookmarks) {
     fOps = operations;
     fBookmarks = bookmarks;
     fTasks = new ArrayList<CleanUpGroup>();
@@ -83,8 +86,10 @@ class CleanUpModel {
     fNewsName = INews.class.getName();
   }
 
-  /* Returns the Task Groups */
-  List<CleanUpGroup> getTasks() {
+  /**
+   * @return Returns the Task Groups
+   */
+  public List<CleanUpGroup> getTasks() {
     return fTasks;
   }
 
@@ -94,7 +99,8 @@ class CleanUpModel {
     return fFactory.createSearchCondition(fLocationField, SearchSpecifier.IS, value);
   }
 
-  void generate() {
+  /** Calculate Tasks */
+  public void generate() {
     Set<IBookMark> bookmarksToDelete = new HashSet<IBookMark>();
     Map<IBookMark, Set<NewsReference>> newsToDelete = new HashMap<IBookMark, Set<NewsReference>>();
 
