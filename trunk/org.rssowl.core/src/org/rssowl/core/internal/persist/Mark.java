@@ -61,6 +61,7 @@ public abstract class Mark extends AbstractEntity implements IMark {
     fParent = parent;
     Assert.isNotNull(name, "The type Mark requires a Name that is not NULL"); //$NON-NLS-1$
     fName = name;
+    fCreationDate = new Date();
   }
 
   /**
