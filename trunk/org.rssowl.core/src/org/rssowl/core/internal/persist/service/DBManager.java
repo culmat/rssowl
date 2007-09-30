@@ -69,6 +69,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DBManager {
+  private static final int MAX_BACKUPS_COUNT = 3;
   private static final String FORMAT_FILE_NAME = "format";
   private static DBManager fInstance;
   private ObjectContainer fObjectContainer;
@@ -365,14 +366,45 @@ public class DBManager {
     }
   }
 
+  /**
+   * @return the File for the most recent back-up files and deletes and renames
+   * the other back-up files as appropriate.
+   */
   private File getDBBackupFile() {
     String dbFilePath = getDBFilePath();
-    String backupFilePath = dbFilePath + ".backup";
-    File backupFile = new File(backupFilePath);
-    int index = 1;
-    while (backupFile.exists()) {
-      backupFile = new File(backupFile + "." + index++);
+    final String backupFilePath = dbFilePath + ".backup";
+    final File backupFile = new File(backupFilePath);
+    int index = 0;
+    List<File> backupFiles = new ArrayList<File>(3);
+    File tempBackUpFile = backupFile;
+    while (tempBackUpFile.exists()) {
+      backupFiles.add(tempBackUpFile);
+      tempBackUpFile = new File(backupFilePath + "." + index++);
     }
+
+    /* We're creating a new back-up, so must leave one space available */
+    while (backupFiles.size() > (MAX_BACKUPS_COUNT - 1)) {
+      File fileToDelete = backupFiles.remove(backupFiles.size() - 1);
+      if (!fileToDelete.delete()) {
+        throw new PersistenceException("Failed to delete file: " + fileToDelete);
+      }
+    }
+
+    while (backupFiles.size() > 0) {
+      index = backupFiles.size() - 1;
+      File fileToRename = backupFiles.remove(index);
+      File newFile = new File(backupFilePath + "." + index);
+      if (!fileToRename.renameTo(newFile)) {
+        throw new PersistenceException("Failed to rename file from " + fileToRename + " to " + newFile);
+      }
+    }
+
+    if (backupFile.exists()) {
+      if (!backupFile.delete()) {
+        throw new PersistenceException("Failed to delete file: " + backupFile);
+      }
+    }
+
     return backupFile;
   }
 
