@@ -61,13 +61,13 @@ public class CleanUpWizard extends Wizard {
     setWindowTitle("Clean Up");
     setHelpAvailable(false);
 
-    /* Clean Up Options */
-    fCleanUpOptionsPage = new CleanUpOptionsPage("Clean Up Operations");
-    addPage(fCleanUpOptionsPage);
-
     /* Choose Feeds for Clean-Up */
     fFeedSelectionPage = new FeedSelectionPage("Choose Bookmarks");
     addPage(fFeedSelectionPage);
+
+    /* Clean Up Options */
+    fCleanUpOptionsPage = new CleanUpOptionsPage("Clean Up Operations");
+    addPage(fCleanUpOptionsPage);
 
     /* Clean Up Summary */
     fCleanUpSummaryPage = new CleanUpSummaryPage("Summary");
