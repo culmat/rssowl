@@ -62,7 +62,7 @@ public class CleanUpOptionsPage extends WizardPage {
    */
   protected CleanUpOptionsPage(String pageName) {
     super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/cleanup_wiz.gif"));
-    setMessage("Please choose the desired operations for clean up.");
+    setMessage("Please choose the desired operations that are used to clean up.");
     fGlobalScope = Owl.getPreferenceService().getGlobalScope();
   }
 
@@ -117,7 +117,7 @@ public class CleanUpOptionsPage extends WizardPage {
       fDeleteFeedByLastVisitCheck = new Button(container, SWT.CHECK);
       fDeleteFeedByLastVisitCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
       fDeleteFeedByLastVisitCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CLEAN_UP_BM_BY_LAST_VISIT_STATE));
-      fDeleteFeedByLastVisitCheck.setText("Delete bookmarks you have not visited for ");
+      fDeleteFeedByLastVisitCheck.setText("Delete bookmarks you have not displayed for ");
       fDeleteFeedByLastVisitCheck.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
