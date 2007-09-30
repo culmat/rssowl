@@ -76,6 +76,7 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
   @Override
   protected void preSaveAll(Collection<INews> objects) {
     for (INews news : objects) {
+      DBHelper.putEventTemplate(createSaveEventTemplate(news));
       ((News) news).acquireReadLockSpecial();
     }
   }
@@ -99,10 +100,6 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
   }
 
   public void setState(Collection<INews> news, State state, boolean affectEquivalentNews, boolean force) throws PersistenceException {
-    asyncSetState(news, state, affectEquivalentNews, force);
-    if (true) {
-      return;
-    }
     if (news.isEmpty())
       return;
     fWriteLock.lock();
@@ -205,6 +202,10 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
             changedNews = setState(news, state, force);
           }
           for (INews changedNewsItem : changedNews) {
+            //TODO Investigate why we add the news twice to the event runnable
+            //(we do the same in the finally block). This is harmless but
+            //wasteful. Also we should not release the news locks before firing
+            //the events.
             ((News) changedNewsItem).acquireReadLockSpecial();
             eventRunnable.addCheckedUpdateEvent(createSaveEventTemplate(changedNewsItem));
           }
