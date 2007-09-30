@@ -155,13 +155,7 @@ public class DBManager {
         reindexRequired = migrate(workspaceVersion, getCurrentFormatVersion(), subMonitor.newChild(10));
       }
 
-      if (subMonitor == null) {
-        progressMonitor.beginLongOperation();
-        subMonitor = SubMonitor.convert(progressMonitor, "Please wait while RSSOwl cleans up the database", 100);
-        defragmentIfNecessary(subMonitor.newChild(100));
-      } else {
-        defragmentIfNecessary(subMonitor.newChild(10));
-      }
+      defragmentIfNecessary(progressMonitor, subMonitor);
 
       fObjectContainer = createObjectContainer(config);
 
@@ -337,10 +331,18 @@ public class DBManager {
     return 1;
   }
 
-  private void defragmentIfNecessary(IProgressMonitor monitor) {
+  private void defragmentIfNecessary(LongOperationMonitor progressMonitor, SubMonitor subMonitor) {
     File defragmentFile = getDefragmentFile();
     if (!defragmentFile.exists()) {
       return;
+    }
+    IProgressMonitor monitor;
+    if (subMonitor == null) {
+      progressMonitor.beginLongOperation();
+      subMonitor = SubMonitor.convert(progressMonitor, "Please wait while RSSOwl cleans up the database", 100);
+      monitor = subMonitor.newChild(100);
+    } else {
+      monitor = subMonitor.newChild(10);
     }
 
     File file = new File(getDBFilePath());
