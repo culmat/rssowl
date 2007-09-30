@@ -39,7 +39,7 @@ import java.util.Collection;
  *
  * @author bpasero
  */
-class NewsTask extends CleanUpTask {
+public class NewsTask extends CleanUpTask {
   private final Collection<NewsReference> fNews;
   private ImageDescriptor fImage;
   private String fLabel;
@@ -66,7 +66,10 @@ class NewsTask extends CleanUpTask {
       fImage = OwlUI.BOOKMARK;
   }
 
-  Collection<NewsReference> getNews() {
+  /**
+   * @return Returns the News that are to be deleted.
+   */
+  public Collection<NewsReference> getNews() {
     return fNews;
   }
 

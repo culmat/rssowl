@@ -31,7 +31,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
  *
  * @author bpasero
  */
-abstract class CleanUpTask {
+public abstract class CleanUpTask {
   private final CleanUpGroup fGroup;
 
   /**

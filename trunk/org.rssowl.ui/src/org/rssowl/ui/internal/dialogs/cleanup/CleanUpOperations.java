@@ -29,7 +29,7 @@ package org.rssowl.ui.internal.dialogs.cleanup;
  *
  * @author bpasero
  */
-class CleanUpOperations {
+public class CleanUpOperations {
 
   /* Feed Operations */
   private boolean fLastVisitInDaysState;
@@ -50,7 +50,20 @@ class CleanUpOperations {
   private boolean fDeleteReadNews;
   private boolean fKeepUnreadNews;
 
-  CleanUpOperations(boolean lastVisitState, int lastVisitInDays, boolean lastUpdateState, int lastUpdateInDays, boolean deleteFeedsByConError, boolean maxNewsCountPerFeedState, int maxNewsCountPerFeed, boolean maxNewsAgeState, int maxNewsAge, boolean deleteReadNews, boolean keepUnreadNews) {
+  /**
+   * @param lastVisitState
+   * @param lastVisitInDays
+   * @param lastUpdateState
+   * @param lastUpdateInDays
+   * @param deleteFeedsByConError
+   * @param maxNewsCountPerFeedState
+   * @param maxNewsCountPerFeed
+   * @param maxNewsAgeState
+   * @param maxNewsAge
+   * @param deleteReadNews
+   * @param keepUnreadNews
+   */
+  public CleanUpOperations(boolean lastVisitState, int lastVisitInDays, boolean lastUpdateState, int lastUpdateInDays, boolean deleteFeedsByConError, boolean maxNewsCountPerFeedState, int maxNewsCountPerFeed, boolean maxNewsAgeState, int maxNewsAge, boolean deleteReadNews, boolean keepUnreadNews) {
     fLastVisitInDaysState = lastVisitState;
     fLastVisitInDays = lastVisitInDays;
     fLastUpdateInDaysState = lastUpdateState;
