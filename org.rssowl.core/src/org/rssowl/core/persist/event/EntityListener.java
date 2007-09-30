@@ -44,6 +44,14 @@ public interface EntityListener<E extends ModelEvent, T extends IEntity> {
   /**
    * Called when <code>IEntity</code>s have been added.
    *
+   * <p>
+   * Note that receivers of these events should _not_ update the entities
+   * contained in {@code events} in the same thread. This may cause an exception
+   * to be thrown or a deadlock to occur. If possible, updating the entities
+   * from within handlers should be avoided altogether, but otherwise a separate
+   * thread should be used for it.
+   * </p>
+   *
    * @param events A collection of <code>ModelEvent</code>s describing the
    * added entities.
    */
@@ -52,6 +60,14 @@ public interface EntityListener<E extends ModelEvent, T extends IEntity> {
   /**
    * Called when <code>IEntity</code>s have been deleted.
    *
+   * <p>
+   * Note that receivers of these events should _not_ update the entities
+   * contained in {@code events} in the same thread. This may cause an exception
+   * to be thrown or a deadlock to occur. If possible, updating the entities
+   * from within handlers should be avoided altogether, but otherwise a separate
+   * thread should be used for it.
+   * </p>
+   *
    * @param events A collection of <code>ModelEvent</code>s describing the
    * deleted entities.
    */
@@ -59,6 +75,14 @@ public interface EntityListener<E extends ModelEvent, T extends IEntity> {
 
   /**
    * Called when <code>IEntity</code>s have been updated.
+   *
+   * <p>
+   * Note that receivers of these events should _not_ update the entities
+   * contained in {@code events} in the same thread. This may cause an exception
+   * to be thrown or a deadlock to occur. If possible, updating the entities
+   * from within handlers should be avoided altogether, but otherwise a separate
+   * thread should be used for it.
+   * </p>
    *
    * @param events A collection of <code>ModelEvent</code>s describing the
    * updated entities.
