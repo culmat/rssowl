@@ -109,10 +109,9 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
   }
 
   protected final <C extends Collection<O>, O> C activateAll(C collection) {
-    for (O o : collection) {
-      if (!fDb.ext().isActive(o))
-        fDb.ext().activate(o, Integer.MAX_VALUE);
-    }
+    for (O o : collection)
+      fDb.ext().activate(o, Integer.MAX_VALUE);
+
     return collection;
   }
 
