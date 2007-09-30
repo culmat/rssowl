@@ -303,12 +303,11 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
     }
   }
 
-  @SuppressWarnings("unchecked")
   public Collection<INews> loadAll(ILabel label) {
     Query query = fDb.query();
     query.constrain(News.class);
     query.descend("fLabels").constrain(label);
 
-    return query.execute();
+    return getList(query);
   }
 }
