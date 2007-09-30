@@ -339,8 +339,15 @@ public class DBManager {
     IProgressMonitor monitor;
     if (subMonitor == null) {
       progressMonitor.beginLongOperation();
-      subMonitor = SubMonitor.convert(progressMonitor, "Please wait while RSSOwl cleans up the database", 100);
+      String monitorText = "Please wait while RSSOwl cleans up the database";
+      subMonitor = SubMonitor.convert(progressMonitor, monitorText, 100);
       monitor = subMonitor.newChild(100);
+
+      /*
+       * This should not be needed, but things don't work properly when it's
+       * not called.
+       */
+      monitor.beginTask(monitorText, 100);
     } else {
       monitor = subMonitor.newChild(10);
     }
