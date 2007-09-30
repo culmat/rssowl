@@ -68,7 +68,7 @@ public abstract class AbstractEntityDAO<T extends IEntity,
   protected abstract E createSaveEventTemplate(T entity);
 
   protected abstract E createDeleteEventTemplate(T entity);
-  
+
   public boolean exists(long id) {
     try {
       return !(loadList(id).isEmpty());
@@ -76,7 +76,7 @@ public abstract class AbstractEntityDAO<T extends IEntity,
       throw new PersistenceException(e);
     }
   }
-  
+
   /*
    * @see org.rssowl.core.model.internal.db4o.dao.PersistableDAO#load(long)
    */
@@ -91,7 +91,9 @@ public abstract class AbstractEntityDAO<T extends IEntity,
       T entity = list.get(0);
       // TODO Activate completely by default for now. Must decide how to deal
       // with this.
-      fDb.activate(entity, Integer.MAX_VALUE);
+      if (!fDb.ext().isActive(entity))
+        fDb.activate(entity, Integer.MAX_VALUE);
+
       return entity;
     } catch (Db4oException e) {
       throw new PersistenceException(e);
