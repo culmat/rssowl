@@ -155,7 +155,13 @@ public class DBManager {
         reindexRequired = migrate(workspaceVersion, getCurrentFormatVersion(), subMonitor.newChild(10));
       }
 
-      defragmentIfNecessary();
+      if (subMonitor == null) {
+        progressMonitor.beginLongOperation();
+        subMonitor = SubMonitor.convert(progressMonitor, "Please wait while RSSOwl cleans up the database", 100);
+        defragmentIfNecessary(subMonitor.newChild(100));
+      } else {
+        defragmentIfNecessary(subMonitor.newChild(10));
+      }
 
       fObjectContainer = createObjectContainer(config);
 
@@ -165,10 +171,10 @@ public class DBManager {
        * If reindexRequired is true, subMonitor is guaranteed to be non-null,
        * but we have the check anyway to
        */
-      if (subMonitor != null && reindexRequired) {
+      if (reindexRequired) {
         IModelSearch modelSearch = InternalOwl.getDefault().getPersistenceService().getModelSearch();
         modelSearch.startup();
-        modelSearch.reindexAll(subMonitor.newChild(90));
+        modelSearch.reindexAll(subMonitor.newChild(80));
       }
     } finally {
       /*
@@ -331,7 +337,7 @@ public class DBManager {
     return 1;
   }
 
-  private void defragmentIfNecessary() {
+  private void defragmentIfNecessary(IProgressMonitor monitor) {
     File defragmentFile = getDefragmentFile();
     if (!defragmentFile.exists()) {
       return;
@@ -343,7 +349,7 @@ public class DBManager {
       throw new PersistenceException("Failed to rename file: " + file + " to: "
           + backupFile);
     }
-    copyDatabase(backupFile, file);
+    copyDatabase(backupFile, file, monitor);
     if (!defragmentFile.delete()) {
       Activator.getDefault().logError("Failed to delete defragment file", null);
     }
@@ -412,10 +418,11 @@ public class DBManager {
    * Creates a copy of the database that has all essential data structures.
    * At the moment, this means not copying NewsCounter and
    * IConditionalGets since they will be re-populated eventually.
+   * @param monitor
    *
    */
   @SuppressWarnings("unused")
-  private static void copyDatabase(File source, File destination) {
+  private static void copyDatabase(File source, File destination, IProgressMonitor monitor) {
       ObjectContainer sourceDb = Db4o.openFile(createConfiguration(),
           source.getAbsolutePath());
       ObjectContainer destinationDb = Db4o.openFile(createConfiguration(),
@@ -430,20 +437,24 @@ public class DBManager {
         sourceDb.activate(label, Integer.MAX_VALUE);
         destinationDb.ext().set(label, Integer.MAX_VALUE);
       }
+      monitor.worked(5);
       for (Folder type : sourceDb.query(Folder.class))  {
         sourceDb.activate(type, Integer.MAX_VALUE);
         if (type.getParent() == null) {
           destinationDb.ext().set(type, Integer.MAX_VALUE);
         }
       }
+      monitor.worked(25);
       for (Feed feed : sourceDb.query(Feed.class)) {
         sourceDb.activate(feed, Integer.MAX_VALUE);
         destinationDb.ext().set(feed, Integer.MAX_VALUE);
       }
+      monitor.worked(55);
       for (Preference pref : sourceDb.query(Preference.class)) {
         sourceDb.activate(pref, Integer.MAX_VALUE);
         destinationDb.ext().set(pref, Integer.MAX_VALUE);
       }
+      monitor.worked(5);
       List<Counter> counterSet = sourceDb.query(Counter.class);
       Counter counter = counterSet.iterator().next();
       sourceDb.activate(counter, Integer.MAX_VALUE);
@@ -451,6 +462,7 @@ public class DBManager {
 
       destinationDb.commit();
       destinationDb.close();
+      monitor.worked(10);
   }
 
   private static Configuration createConfiguration() {
