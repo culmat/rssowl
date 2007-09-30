@@ -262,8 +262,8 @@ public class CleanUpSummaryPage extends WizardPage {
 
     /* Generate the Summary */
     if (visible) {
-      FeedSelectionPage feedSelectionPage = (FeedSelectionPage) getPreviousPage();
-      CleanUpOptionsPage cleanUpOptionsPage = (CleanUpOptionsPage) feedSelectionPage.getPreviousPage();
+      CleanUpOptionsPage cleanUpOptionsPage = (CleanUpOptionsPage) getPreviousPage();
+      FeedSelectionPage feedSelectionPage = (FeedSelectionPage) cleanUpOptionsPage.getPreviousPage();
 
       final Set<IBookMark> selection = feedSelectionPage.getSelection();
       final CleanUpOperations operations = cleanUpOptionsPage.getOperations();
