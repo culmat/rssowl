@@ -141,7 +141,7 @@ public class CleanUpOptionsPage extends WizardPage {
       fDeleteFeedByLastUpdateCheck = new Button(container, SWT.CHECK);
       fDeleteFeedByLastUpdateCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
       fDeleteFeedByLastUpdateCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CLEAN_UP_BM_BY_LAST_UPDATE_STATE));
-      fDeleteFeedByLastUpdateCheck.setText("Delete bookmarks that have not updated for ");
+      fDeleteFeedByLastUpdateCheck.setText("Delete bookmarks that have not been updated for ");
       fDeleteFeedByLastUpdateCheck.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
