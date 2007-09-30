@@ -230,6 +230,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
     /* Default Retention Policy */
     initRetentionDefaults(defaultScope);
 
+    /* Default Clean Up */
+    initCleanUpDefaults(defaultScope);
+
     /* Default Display Settings */
     initDisplayDefaults(defaultScope);
 
@@ -266,6 +269,14 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putBoolean(DEL_NEWS_BY_COUNT_STATE, true);
     defaultScope.putInteger(DEL_NEWS_BY_COUNT_VALUE, 200);
     defaultScope.putInteger(DEL_NEWS_BY_AGE_VALUE, 30);
+  }
+
+  private void initCleanUpDefaults(IPreferenceScope defaultScope) {
+    defaultScope.putInteger(CLEAN_UP_BM_BY_LAST_UPDATE_VALUE, 30);
+    defaultScope.putInteger(CLEAN_UP_BM_BY_LAST_VISIT_VALUE, 30);
+
+    defaultScope.putInteger(CLEAN_UP_NEWS_BY_COUNT_VALUE, 200);
+    defaultScope.putInteger(CLEAN_UP_NEWS_BY_AGE_VALUE, 30);
   }
 
   private void initDisplayDefaults(IPreferenceScope defaultScope) {
