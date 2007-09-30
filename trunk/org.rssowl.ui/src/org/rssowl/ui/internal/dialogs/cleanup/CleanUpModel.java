@@ -103,8 +103,13 @@ class CleanUpModel {
       long maxLastVisitDate = DateUtils.getToday().getTimeInMillis() - (days * DAY);
 
       for (IBookMark mark : fBookmarks) {
-        Date lastVisitDate = mark.getLastVisitDate();
-        if (lastVisitDate == null || lastVisitDate.getTime() <= maxLastVisitDate)
+        Date date = mark.getLastVisitDate();
+
+        /* Use Creation Date if mark was never visited */
+        if (date == null)
+          date = mark.getCreationDate();
+
+        if (date == null || date.getTime() <= maxLastVisitDate)
           bookmarksToDelete.add(mark);
       }
     }
