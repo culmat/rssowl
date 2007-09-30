@@ -170,24 +170,24 @@ public class CacheService {
   }
 
   /**
-   * Returns a Set of <code>IFolder</code>s, having no parent Folder set,
-   * thereby being Root-Folders.
+   * Returns an unmodifiable Set of <code>IFolder</code>s, having no parent
+   * Folder set, thereby being Root-Folders.
    *
-   * @return a Set of all Root-Folders.
+   * @return an unmodifiable Set of all Root-Folders.
    */
   public Set<IFolder> getRootFolders() {
-    return new HashSet<IFolder>(fRootFolders);
+    return Collections.unmodifiableSet(fRootFolders);
   }
 
   /**
-   * Returns a Set of all <code>IBookMark</code>s stored in the persistence
-   * layer.
+   * Returns an unmodifiable Set of all <code>IBookMark</code>s stored in the
+   * persistence layer.
    *
-   * @return a Set of all <code>IBookMark</code>s stored in the persistence
-   * layer.
+   * @return an unmodifiable Set of all <code>IBookMark</code>s stored in the
+   * persistence layer.
    */
   public Set<IBookMark> getBookMarks() {
-    return new HashSet<IBookMark>(fBookMarks);
+    return Collections.unmodifiableSet(fBookMarks);
   }
 
   /**
@@ -206,14 +206,14 @@ public class CacheService {
   }
 
   /**
-   * Returns a Set of all <code>ISearchMark</code>s stored in the persistence
-   * layer.
+   * Returns an unmodifiable Set of all <code>ISearchMark</code>s stored in
+   * the persistence layer.
    *
-   * @return a Set of all <code>ISearchMark</code>s stored in the persistence
-   * layer.
+   * @return an unmodifiable Set of all <code>ISearchMark</code>s stored in
+   * the persistence layer.
    */
   public Set<ISearchMark> getSearchMarks() {
-    return new HashSet<ISearchMark>(fSearchMarks);
+    return Collections.unmodifiableSet(fSearchMarks);
   }
 
   /**
