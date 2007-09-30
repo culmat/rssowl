@@ -48,7 +48,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 
 /**
  * Creates the collection of <code>CleanUpTask</code> that the user may choose
@@ -61,7 +60,7 @@ class CleanUpModel {
   /* One Day in millis */
   private static final long DAY = 24 * 60 * 60 * 1000;
 
-  private List<CleanUpTask> fTasks;
+  private List<CleanUpGroup> fTasks;
   private final CleanUpOperations fOps;
   private final Collection<IBookMark> fBookmarks;
   private IModelFactory fFactory;
@@ -69,20 +68,23 @@ class CleanUpModel {
   private ISearchField fLocationField;
   private ISearchField fAgeInDaysField;
 
+  private String fNewsName;
+
   CleanUpModel(CleanUpOperations operations, Collection<IBookMark> bookmarks) {
     fOps = operations;
     fBookmarks = bookmarks;
-    fTasks = new ArrayList<CleanUpTask>();
+    fTasks = new ArrayList<CleanUpGroup>();
     fFactory = Owl.getModelFactory();
     fModelSearch = Owl.getPersistenceService().getModelSearch();
 
     String newsName = INews.class.getName();
     fLocationField = fFactory.createSearchField(INews.LOCATION, newsName);
     fAgeInDaysField = fFactory.createSearchField(INews.AGE_IN_DAYS, newsName);
+    fNewsName = INews.class.getName();
   }
 
-  /* Returns the Tasks */
-  List<CleanUpTask> getTasks() {
+  /* Returns the Task Groups */
+  List<CleanUpGroup> getTasks() {
     return fTasks;
   }
 
@@ -93,12 +95,19 @@ class CleanUpModel {
   }
 
   void generate() {
-    String name = INews.class.getName();
     Set<IBookMark> bookmarksToDelete = new HashSet<IBookMark>();
     Map<IBookMark, Set<NewsReference>> newsToDelete = new HashMap<IBookMark, Set<NewsReference>>();
 
+    /* 0.) Create Recommended Tasks */
+    CleanUpGroup recommendedTasks = new CleanUpGroup("Recommended Operations");
+    recommendedTasks.addTask(new DefragDatabaseTask(recommendedTasks));
+    recommendedTasks.addTask(new OptimizeSearchTask(recommendedTasks));
+    fTasks.add(recommendedTasks);
+
     /* 1.) Delete BookMarks that have Last Visit > X Days ago */
     if (fOps.deleteFeedByLastVisit()) {
+      CleanUpGroup group = new CleanUpGroup("Bookmarks that have not been displayed for " + fOps.getLastVisitDays() + " days");
+
       int days = fOps.getLastVisitDays();
       long maxLastVisitDate = DateUtils.getToday().getTimeInMillis() - (days * DAY);
 
@@ -109,14 +118,21 @@ class CleanUpModel {
         if (date == null)
           date = mark.getCreationDate();
 
-        if (date == null || date.getTime() <= maxLastVisitDate)
+        if (date == null || date.getTime() <= maxLastVisitDate) {
           bookmarksToDelete.add(mark);
+          group.addTask(new BookMarkTask(group, mark));
+        }
       }
+
+      if (!group.isEmpty())
+        fTasks.add(group);
     }
 
     /* 2.) Delete BookMarks that have not updated in X Days */
     if (fOps.deleteFeedByLastUpdate()) {
-      ISearchField stateField = fFactory.createSearchField(INews.STATE, name);
+      CleanUpGroup group = new CleanUpGroup("Bookmarks that have not been updated for " + fOps.getLastUpdateDays() + " days");
+
+      ISearchField stateField = fFactory.createSearchField(INews.STATE, fNewsName);
       EnumSet<State> visibleStates = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED, INews.State.READ);
       ISearchCondition stateCondition = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, visibleStates);
       ISearchCondition ageCond = fFactory.createSearchCondition(fAgeInDaysField, SearchSpecifier.IS_LESS_THAN, fOps.getLastUpdateDays());
@@ -134,30 +150,43 @@ class CleanUpModel {
         conditions.add(stateCondition);
 
         List<SearchHit<NewsReference>> results = fModelSearch.searchNews(conditions, true);
-        if (results.isEmpty())
+        if (results.isEmpty()) {
           bookmarksToDelete.add(mark);
+          group.addTask(new BookMarkTask(group, mark));
+        }
       }
+
+      if (!group.isEmpty())
+        fTasks.add(group);
     }
 
     /* 3.) Delete BookMarks that have Connection Error */
     if (fOps.deleteFeedsByConError()) {
+      CleanUpGroup group = new CleanUpGroup("Bookmarks with a connection error");
+
       for (IBookMark mark : fBookmarks) {
-        if (!bookmarksToDelete.contains(mark) && mark.isErrorLoading())
+        if (!bookmarksToDelete.contains(mark) && mark.isErrorLoading()) {
           bookmarksToDelete.add(mark);
+          group.addTask(new BookMarkTask(group, mark));
+        }
       }
+
+      if (!group.isEmpty())
+        fTasks.add(group);
     }
 
     /* Reusable State Condition */
     EnumSet<State> states = fOps.keepUnreadNews() ? EnumSet.of(INews.State.READ) : EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED, INews.State.READ);
-    ISearchField stateField = fFactory.createSearchField(INews.STATE, name);
+    ISearchField stateField = fFactory.createSearchField(INews.STATE, fNewsName);
     ISearchCondition stateCondition = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, states);
 
     /* Reusable Sticky Condition */
-    ISearchField stickyField = fFactory.createSearchField(INews.IS_FLAGGED, name);
+    ISearchField stickyField = fFactory.createSearchField(INews.IS_FLAGGED, fNewsName);
     ISearchCondition stickyCondition = fFactory.createSearchCondition(stickyField, SearchSpecifier.IS_NOT, true);
 
     /* 4.) Delete News that exceed a certain limit in a Feed */
     if (fOps.deleteNewsByCount()) {
+      CleanUpGroup group = new CleanUpGroup("News exceeding a limit of " + fOps.getMaxNewsCountPerFeed() + " per feed");
 
       /* For each selected Bookmark */
       for (IBookMark mark : fBookmarks) {
@@ -192,15 +221,22 @@ class CleanUpModel {
           for (int i = 0; i < resolvedNews.size() && i < toDeleteValue; i++)
             newsOfMarkToDelete.add(new NewsReference(resolvedNews.get(i).getId()));
 
-          if (!newsOfMarkToDelete.isEmpty())
+          if (!newsOfMarkToDelete.isEmpty()) {
             newsToDelete.put(mark, newsOfMarkToDelete);
+            group.addTask(new NewsTask(group, mark, newsOfMarkToDelete));
+          }
         }
       }
+
+      if (!group.isEmpty())
+        fTasks.add(group);
     }
 
     /* 5.) Delete News with an age > X Days */
     if (fOps.deleteNewsByAge()) {
-      ISearchField ageInDaysField = fFactory.createSearchField(INews.AGE_IN_DAYS, name);
+      CleanUpGroup group = new CleanUpGroup("News older than " + fOps.getMaxNewsAge() + " days");
+
+      ISearchField ageInDaysField = fFactory.createSearchField(INews.AGE_IN_DAYS, fNewsName);
       ISearchCondition ageCond = fFactory.createSearchCondition(ageInDaysField, SearchSpecifier.IS_GREATER_THAN, fOps.getMaxNewsAge());
 
       /* For each selected Bookmark */
@@ -221,19 +257,35 @@ class CleanUpModel {
         for (SearchHit<NewsReference> result : results)
           newsOfMarkToDelete.add(result.getResult());
 
-        //TODO Keep separation in mind (subtract)
         if (!newsOfMarkToDelete.isEmpty()) {
           Collection<NewsReference> existingNewsOfMarkToDelete = newsToDelete.get(mark);
-          if (existingNewsOfMarkToDelete == null)
+
+          /* First time the Mark is treated */
+          if (existingNewsOfMarkToDelete == null) {
             newsToDelete.put(mark, newsOfMarkToDelete);
-          else
-            existingNewsOfMarkToDelete.addAll(newsOfMarkToDelete);
+            group.addTask(new NewsTask(group, mark, newsOfMarkToDelete));
+          }
+
+          /* Existing Mark */
+          else {
+            newsOfMarkToDelete.removeAll(existingNewsOfMarkToDelete);
+
+            if (!newsOfMarkToDelete.isEmpty()) {
+              existingNewsOfMarkToDelete.addAll(newsOfMarkToDelete);
+              group.addTask(new NewsTask(group, mark, newsOfMarkToDelete));
+            }
+          }
         }
       }
+
+      if (!group.isEmpty())
+        fTasks.add(group);
     }
 
     /* 6.) Delete Read News */
     if (fOps.deleteReadNews()) {
+      CleanUpGroup group = new CleanUpGroup("Read News");
+
       EnumSet<State> readState = EnumSet.of(INews.State.READ);
       ISearchCondition stateCond = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, readState);
 
@@ -254,30 +306,29 @@ class CleanUpModel {
         for (SearchHit<NewsReference> result : results)
           newsOfMarkToDelete.add(result.getResult());
 
-        //TODO Keep separation in mind (subtract)
         if (!newsOfMarkToDelete.isEmpty()) {
           Collection<NewsReference> existingNewsOfMarkToDelete = newsToDelete.get(mark);
-          if (existingNewsOfMarkToDelete == null)
+
+          /* First time the Mark is treated */
+          if (existingNewsOfMarkToDelete == null) {
             newsToDelete.put(mark, newsOfMarkToDelete);
-          else
-            existingNewsOfMarkToDelete.addAll(newsOfMarkToDelete);
+            group.addTask(new NewsTask(group, mark, newsOfMarkToDelete));
+          }
+
+          /* Existing Mark */
+          else {
+            newsOfMarkToDelete.removeAll(existingNewsOfMarkToDelete);
+
+            if (!newsOfMarkToDelete.isEmpty()) {
+              existingNewsOfMarkToDelete.addAll(newsOfMarkToDelete);
+              group.addTask(new NewsTask(group, mark, newsOfMarkToDelete));
+            }
+          }
         }
       }
-    }
 
-    /* Create Tasks */
-    fTasks.add(new DefragDatabaseTask());
-    fTasks.add(new OptimizeSearchTask());
-
-    for (IBookMark bookMarkToDelete : bookmarksToDelete) {
-      CleanUpTask task = new BookMarkTask(bookMarkToDelete);
-      fTasks.add(task);
-    }
-
-    Set<Entry<IBookMark, Set<NewsReference>>> entries = newsToDelete.entrySet();
-    for (Entry<IBookMark, Set<NewsReference>> entry : entries) {
-      CleanUpTask task = new NewsTask(entry.getKey(), entry.getValue());
-      fTasks.add(task);
+      if (!group.isEmpty())
+        fTasks.add(group);
     }
   }
 }

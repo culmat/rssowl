@@ -24,56 +24,36 @@
 
 package org.rssowl.ui.internal.dialogs.cleanup;
 
-import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.rssowl.core.persist.IBookMark;
-import org.rssowl.ui.internal.OwlUI;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * An instance of <code>CleanUpTask</code> to delete a {@link IBookMark}.
+ * A <code>CleanUpGroup</code> contains a list of <code>CleanUpTasks</code>
+ * to perform.
  *
  * @author bpasero
  */
-class BookMarkTask extends CleanUpTask {
-  private String fLabel;
-  private ImageDescriptor fImage;
-  private final IBookMark fMark;
+class CleanUpGroup {
+  List<CleanUpTask> fTasks;
+  private final String fLabel;
 
-  BookMarkTask(CleanUpGroup group, IBookMark mark) {
-    super(group);
-    Assert.isNotNull(mark);
-    fMark = mark;
-
-    init();
+  CleanUpGroup(String label) {
+    fLabel = label;
+    fTasks = new ArrayList<CleanUpTask>();
   }
 
-  private void init() {
-
-    /* Label */
-    fLabel = "Delete '" + fMark.getName() + "'";
-
-    /* Image */
-    fImage = OwlUI.getFavicon(fMark);
-    if (fImage == null)
-      fImage = OwlUI.BOOKMARK;
+  void addTask(CleanUpTask task) {
+    fTasks.add(task);
   }
 
-  IBookMark getMark() {
-    return fMark;
+  List<CleanUpTask> getTasks() {
+    return fTasks;
   }
 
-  /*
-   * @see org.rssowl.ui.internal.dialogs.cleanup.CleanUpTask#getImage()
-   */
-  @Override
-  ImageDescriptor getImage() {
-    return fImage;
+  boolean isEmpty() {
+    return fTasks.isEmpty();
   }
 
-  /*
-   * @see org.rssowl.ui.internal.dialogs.cleanup.CleanUpTask#getLabel()
-   */
-  @Override
   String getLabel() {
     return fLabel;
   }

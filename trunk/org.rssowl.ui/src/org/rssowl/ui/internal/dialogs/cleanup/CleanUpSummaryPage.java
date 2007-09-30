@@ -29,18 +29,27 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
-import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.CheckboxTableViewer;
+import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.IFontProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ITreeContentProvider;
+import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.TreeExpansionEvent;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.TreeItem;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
@@ -57,22 +66,35 @@ import java.util.Set;
  * @author bpasero
  */
 public class CleanUpSummaryPage extends WizardPage {
-  private CheckboxTableViewer fViewer;
+  private CheckboxTreeViewer fViewer;
   private ResourceManager fResources;
   private Button fSelectAll;
   private Button fDeselectAll;
 
   /* Summary Label Provider */
-  class SummaryLabelProvider extends LabelProvider {
+  class SummaryLabelProvider extends LabelProvider implements IFontProvider {
 
     @Override
     public String getText(Object element) {
+      if (element instanceof CleanUpGroup)
+        return ((CleanUpGroup) element).getLabel();
+
       return ((CleanUpTask) element).getLabel();
     }
 
     @Override
     public Image getImage(Object element) {
+      if (element instanceof CleanUpGroup)
+        return OwlUI.getImage(fResources, OwlUI.GROUP);
+
       return OwlUI.getImage(fResources, ((CleanUpTask) element).getImage());
+    }
+
+    public Font getFont(Object element) {
+      if (element instanceof CleanUpGroup)
+        return OwlUI.getBold(JFaceResources.DEFAULT_FONT);
+
+      return null;
     }
   }
 
@@ -90,7 +112,8 @@ public class CleanUpSummaryPage extends WizardPage {
     List<CleanUpTask> tasks = new ArrayList<CleanUpTask>(checkedElements.length);
 
     for (Object checkedElement : checkedElements)
-      tasks.add((CleanUpTask) checkedElement);
+      if (checkedElement instanceof CleanUpTask)
+        tasks.add((CleanUpTask) checkedElement);
 
     return tasks;
   }
@@ -103,15 +126,90 @@ public class CleanUpSummaryPage extends WizardPage {
     container.setLayout(new GridLayout(1, false));
 
     /* Viewer to select particular Tasks */
-    fViewer = CheckboxTableViewer.newCheckList(container, SWT.BORDER);
-    fViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    fViewer.getTable().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
+    fViewer = new CheckboxTreeViewer(container, SWT.BORDER);
+    fViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    fViewer.getTree().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
 
     /* ContentProvider */
-    fViewer.setContentProvider(new ArrayContentProvider());
+    fViewer.setContentProvider(new ITreeContentProvider() {
+      public Object[] getElements(Object inputElement) {
+        if (inputElement instanceof List<?>)
+          return ((List<?>) inputElement).toArray();
+
+        return new Object[0];
+      }
+
+      public Object[] getChildren(Object parentElement) {
+        if (parentElement instanceof CleanUpGroup) {
+          CleanUpGroup group = (CleanUpGroup) parentElement;
+          return group.getTasks().toArray();
+        }
+
+        return new Object[0];
+      }
+
+      public Object getParent(Object element) {
+        if (element instanceof CleanUpTask)
+          return ((CleanUpTask) element).getGroup();
+
+        return null;
+      }
+
+      public boolean hasChildren(Object element) {
+        return element instanceof CleanUpGroup;
+      }
+
+      public void dispose() {}
+
+      public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+    });
 
     /* LabelProvider */
     fViewer.setLabelProvider(new SummaryLabelProvider());
+
+    /* Listen on Doubleclick */
+    fViewer.addDoubleClickListener(new IDoubleClickListener() {
+      public void doubleClick(DoubleClickEvent event) {
+        IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+        CleanUpGroup group = selection.getFirstElement() instanceof CleanUpGroup ? (CleanUpGroup) selection.getFirstElement() : null;
+
+        /* Expand / Collapse Folder */
+        if (group != null) {
+          boolean expandedState = !fViewer.getExpandedState(group);
+          fViewer.setExpandedState(group, expandedState);
+
+          if (expandedState && fViewer.getChecked(group))
+            setChildsChecked(group, true, true);
+        }
+      }
+    });
+
+    /* Update Checks on Selection */
+    fViewer.getTree().addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        if (e.detail == SWT.CHECK) {
+          TreeItem item = (TreeItem) e.item;
+
+          if (item.getData() instanceof CleanUpGroup)
+            setChildsChecked((CleanUpGroup) item.getData(), item.getChecked(), true);
+
+          if (!item.getChecked() && item.getData() instanceof CleanUpTask)
+            setParentsChecked((CleanUpTask) item.getData(), false);
+        }
+      }
+    });
+
+    /* Update Checks on Expand */
+    fViewer.addTreeListener(new ITreeViewerListener() {
+      public void treeExpanded(TreeExpansionEvent event) {
+        boolean isChecked = fViewer.getChecked(event.getElement());
+        if (isChecked)
+          setChildsChecked((CleanUpGroup) event.getElement(), isChecked, false);
+      }
+
+      public void treeCollapsed(TreeExpansionEvent event) {}
+    });
 
     /* Select All / Deselect All */
     Composite buttonContainer = new Composite(container, SWT.NONE);
@@ -139,6 +237,20 @@ public class CleanUpSummaryPage extends WizardPage {
     });
 
     setControl(container);
+  }
+
+  private void setChildsChecked(CleanUpGroup cleanUpGroup, boolean checked, boolean onlyExpanded) {
+    if (!onlyExpanded || fViewer.getExpandedState(cleanUpGroup)) {
+      List<CleanUpTask> children = cleanUpGroup.getTasks();
+      for (CleanUpTask child : children)
+        fViewer.setChecked(child, checked);
+    }
+  }
+
+  private void setParentsChecked(CleanUpTask cleanUpTask, boolean checked) {
+    CleanUpGroup parent = cleanUpTask.getGroup();
+    if (parent != null)
+      fViewer.setChecked(parent, checked);
   }
 
   /*
@@ -178,9 +290,10 @@ public class CleanUpSummaryPage extends WizardPage {
     model.generate();
 
     /* Show in Viewer */
-    JobRunner.runInUIThread(fViewer.getTable(), new Runnable() {
+    JobRunner.runInUIThread(fViewer.getTree(), new Runnable() {
       public void run() {
         fViewer.setInput(model.getTasks());
+        fViewer.expandAll();
         fViewer.setAllChecked(true);
       }
     });

@@ -35,6 +35,10 @@ import org.rssowl.ui.internal.OwlUI;
  */
 class OptimizeSearchTask extends CleanUpTask {
 
+  OptimizeSearchTask(CleanUpGroup group) {
+    super(group);
+  }
+
   /*
    * @see org.rssowl.ui.internal.dialogs.cleanup.CleanUpTask#getImage()
    */
@@ -48,6 +52,6 @@ class OptimizeSearchTask extends CleanUpTask {
    */
   @Override
   String getLabel() {
-    return "Recommended: Improve performance of saved searches";
+    return "Improve performance of saved searches";
   }
 }
