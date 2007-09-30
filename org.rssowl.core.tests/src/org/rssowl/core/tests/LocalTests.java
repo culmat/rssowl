@@ -39,6 +39,7 @@ import org.rssowl.core.tests.model.ModelTest2;
 import org.rssowl.core.tests.model.ModelTest3;
 import org.rssowl.core.tests.model.PreferencesDAOTest;
 import org.rssowl.core.tests.model.PreferencesScopeTest;
+import org.rssowl.core.tests.persist.INewsTest;
 import org.rssowl.core.tests.util.MergeUtilsTest;
 
 /**
@@ -61,6 +62,7 @@ import org.rssowl.core.tests.util.MergeUtilsTest;
   ModelSearchTest.class,
   DBManagerTest.class,
   PreferencesScopeTest.class,
-  MergeUtilsTest.class
+  MergeUtilsTest.class,
+  INewsTest.class
 })
 public class LocalTests {}

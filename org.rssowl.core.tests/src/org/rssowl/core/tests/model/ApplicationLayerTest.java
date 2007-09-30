@@ -245,6 +245,53 @@ public class ApplicationLayerTest {
   }
 
   /**
+   * Tests that news with different Guid (permaLink == true) and same link
+   * are not considered equivalent during setState.
+   * @throws Exception
+   */
+  @Test
+  public void testSetNewsStateWithAffectEquivalentNewsAndGuidDifferentAndLinkEqual() throws Exception {
+    NewsListener newsListener = null;
+    try {
+      IFeed feed1 = fFactory.createFeed(null, new URI("http://www.feed.com"));
+      IFeed feed2 = fFactory.createFeed(null, new URI("http://www.feed2.com"));
+
+      INews news1 = fFactory.createNews(null, feed1, new Date());
+      news1.setGuid(fFactory.createGuid(news1, "guid1"));
+      news1.getGuid().setPermaLink(true);
+      news1.setLink(new URI("www.link.com"));
+
+      final INews news2 = fFactory.createNews(null, feed2, new Date());
+      news2.setGuid(fFactory.createGuid(news2, "guid2"));
+      news2.getGuid().setPermaLink(true);
+      news2.setLink(new URI("www.link.com"));
+
+      fFactory.createNews(null, feed1, new Date());
+      fFactory.createNews(null, feed2, new Date());
+
+      DynamicDAO.save(feed1);
+      DynamicDAO.save(feed2);
+      List<INews> newsList = new ArrayList<INews>(1);
+      newsList.add(news2);
+      final boolean[] newsUpdatedCalled = new boolean[1];
+      newsListener = new NewsAdapter() {
+        @Override
+        public void entitiesUpdated(Set<NewsEvent> events) {
+          newsUpdatedCalled[0] = true;
+          assertEquals(1, events.size());
+          assertEquals(news2, events.iterator().next().getEntity());
+        }
+      };
+      DynamicDAO.addEntityListener(INews.class, newsListener);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(newsList, INews.State.NEW, true, true);
+      assertEquals(true, newsUpdatedCalled[0]);
+    } finally {
+      if (newsListener != null)
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
+    }
+  }
+
+  /**
    * Tests that the all NewsEvents issued after a call to setNewsState are fully
    * activated even if there was an equivalent news that was not in memory.
    *
@@ -920,7 +967,6 @@ public class ApplicationLayerTest {
   /**
    * @throws Exception
    */
-  
   @Test
   public void testSetNewsState() throws Exception {
     NewsListener newsListener = null;
@@ -933,17 +979,17 @@ public class ApplicationLayerTest {
       Feed savedFeed = (Feed) DynamicDAO.save(feed);
       assertTrue(savedFeed.isIdentical(DynamicDAO.load(IFeed.class, savedFeed.getId())));
 
-      NewsReference news1 = new NewsReference(savedFeed.getNews().get(0).getId());
-      NewsReference news2 = new NewsReference(savedFeed.getNews().get(1).getId());
-      NewsReference news3 = new NewsReference(savedFeed.getNews().get(2).getId());
+      INews news1 = savedFeed.getNews().get(0);
+      INews news2 = savedFeed.getNews().get(1);
+      INews news3 = savedFeed.getNews().get(2);
 
       List<INews> news = new ArrayList<INews>();
-      news.add(news1.resolve());
-      news.add(news2.resolve());
+      news.add(news1);
+      news.add(news2);
 
-      assertEquals(news1.resolve().getState(), INews.State.NEW);
-      assertEquals(news2.resolve().getState(), INews.State.NEW);
-      assertEquals(news3.resolve().getState(), INews.State.NEW);
+      assertEquals(news1.getState(), INews.State.NEW);
+      assertEquals(news2.getState(), INews.State.NEW);
+      assertEquals(news3.getState(), INews.State.NEW);
 
       newsListener = new NewsListener() {
         public void entitiesAdded(Set<NewsEvent> events) {
@@ -964,32 +1010,32 @@ public class ApplicationLayerTest {
 
       Owl.getPersistenceService().getDAOService().getNewsDAO().setState(news, INews.State.UNREAD, true, false);
 
-      assertEquals(news1.resolve().getState(), INews.State.UNREAD);
-      assertEquals(news2.resolve().getState(), INews.State.UNREAD);
-      assertEquals(news3.resolve().getState(), INews.State.NEW);
+      assertEquals(news1.getState(), INews.State.UNREAD);
+      assertEquals(news2.getState(), INews.State.UNREAD);
+      assertEquals(news3.getState(), INews.State.NEW);
 
       Owl.getPersistenceService().getDAOService().getNewsDAO().setState(news, INews.State.READ, true, false);
 
-      assertEquals(news1.resolve().getState(), INews.State.READ);
-      assertEquals(news2.resolve().getState(), INews.State.READ);
-      assertEquals(news3.resolve().getState(), INews.State.NEW);
+      assertEquals(news1.getState(), INews.State.READ);
+      assertEquals(news2.getState(), INews.State.READ);
+      assertEquals(news3.getState(), INews.State.NEW);
 
       Owl.getPersistenceService().getDAOService().getNewsDAO().setState(news, INews.State.DELETED, true, false);
 
-      assertEquals(news1.resolve().getState(), INews.State.DELETED);
-      assertEquals(news2.resolve().getState(), INews.State.DELETED);
-      assertEquals(news3.resolve().getState(), INews.State.NEW);
+      assertEquals(news1.getState(), INews.State.DELETED);
+      assertEquals(news2.getState(), INews.State.DELETED);
+      assertEquals(news3.getState(), INews.State.NEW);
     } finally {
       if (newsListener != null)
         DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
   }
-  
+
   /**
    * Tests {@link INewsDAO#loadAll(FeedLinkReference, Set)}.
-   * @throws Exception 
+   * @throws Exception
    */
-  
+
   @Test
   public void testLoadAllNewsByFeedAndState() throws Exception {
     IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com"));
@@ -999,7 +1045,7 @@ public class ApplicationLayerTest {
     fFactory.createNews(null, feed, new Date()).setState(INews.State.UNREAD);
     fFactory.createNews(null, feed, new Date()).setState(INews.State.UPDATED);
     DynamicDAO.save(feed);
-    
+
     IFeed anotherFeed = fFactory.createFeed(null, new URI("http://www.anotherfeed.com"));
     INews anotherNews = fFactory.createNews(null, anotherFeed, new Date());
     FeedLinkReference anotherFeedRef = anotherNews.getFeedReference();
@@ -1008,13 +1054,13 @@ public class ApplicationLayerTest {
     DynamicDAO.save(anotherFeed);
 
     INewsDAO newsDao = DynamicDAO.getDAO(INewsDAO.class);
-    
+
     /* All states */
     Collection<INews> newsCollection = newsDao.loadAll(feedRef, EnumSet.allOf(INews.State.class));
     assertEquals(feed.getNews().size(), newsCollection.size());
     for (INews newsItem : feed.getNews())
       assertEquals(true, newsCollection.contains(newsItem));
-    
+
     newsCollection = newsDao.loadAll(anotherFeedRef, EnumSet.allOf(INews.State.class));
     assertEquals(anotherFeed.getNews().size(), newsCollection.size());
     for (INews newsItem : anotherFeed.getNews())
@@ -1030,7 +1076,7 @@ public class ApplicationLayerTest {
     newsCollection = newsDao.loadAll(anotherFeedRef, EnumSet.of(INews.State.DELETED));
     assertEquals(1, newsCollection.size());
     assertEquals(anotherFeed.getNews().get(2), newsCollection.iterator().next());
-    
+
     /* No matching state */
     newsCollection = newsDao.loadAll(feedRef, EnumSet.of(INews.State.DELETED));
     assertEquals(0, newsCollection.size());
@@ -1040,10 +1086,84 @@ public class ApplicationLayerTest {
     assertEquals(2, newsCollection.size());
     assertEquals(true, newsCollection.contains(anotherFeed.getNews().get(0)));
     assertEquals(true, newsCollection.contains(anotherFeed.getNews().get(1)));
-    
+
     /* Empty states */
     newsCollection = newsDao.loadAll(feedRef, EnumSet.noneOf(INews.State.class));
     assertEquals(0, newsCollection.size());
+  }
+
+  /**
+   * See bug #558 : Consider not using GUID if isPermaLink is false.
+   *
+   * <p>
+   * Tests that we consider a Guid#isPermaLink == false in the same way we
+   * consider a null Guid when calling INewsDao#setState with
+   * affectEquivalentNews == true. Note that this should happen no matter
+   * what happens in the comparison of Guid#getValue for both News.
+   * </p>
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testSetNewsStateWithGuidIsPermaLinkFalse() throws Exception {
+    NewsListener newsListener = null;
+    try {
+      IFeed feed1 = fFactory.createFeed(null, new URI("http://www.feed.com"));
+      IFeed feed2 = fFactory.createFeed(null, new URI("http://www.feed2.com"));
+      IFeed feed3 = fFactory.createFeed(null, new URI("http://www.feed3.com"));
+      IFeed feed4 = fFactory.createFeed(null, new URI("http://www.feed4.com"));
+
+      INews news1 = fFactory.createNews(null, feed1, new Date());
+      String link = "www.link.com";
+      news1.setGuid(fFactory.createGuid(news1, link));
+      news1.getGuid().setPermaLink(false);
+      news1.setLink(new URI(link));
+
+      INews news2 = fFactory.createNews(null, feed2, new Date());
+      news2.setGuid(fFactory.createGuid(news2, link));
+      news2.getGuid().setPermaLink(false);
+      news2.setLink(new URI(link));
+
+      INews news3 = fFactory.createNews(null, feed3, new Date());
+      news3.setGuid(fFactory.createGuid(news3, "http://www.anotherlink.com"));
+      news3.getGuid().setPermaLink(false);
+      news3.setLink(new URI(link));
+
+      INews news4 = fFactory.createNews(null, feed4, new Date());
+      news4.setGuid(fFactory.createGuid(news4, link));
+      news4.getGuid().setPermaLink(false);
+      news4.setLink(new URI("www.anotherlink2.com"));
+
+      /* Create one more news for each feed */
+      fFactory.createNews(null, feed1, new Date());
+      fFactory.createNews(null, feed2, new Date());
+      fFactory.createNews(null, feed3, new Date());
+      fFactory.createNews(null, feed4, new Date());
+
+      DynamicDAO.save(feed1);
+      DynamicDAO.save(feed2);
+      DynamicDAO.save(feed3);
+      DynamicDAO.save(feed4);
+
+      final List<INews> expectedUpdatedNews = Arrays.asList(news1, news2, news3);
+      final boolean[] newsUpdatedCalled = new boolean[1];
+      newsListener = new NewsAdapter() {
+        @Override
+        public void entitiesUpdated(Set<NewsEvent> events) {
+          newsUpdatedCalled[0] = true;
+          assertEquals(3, events.size());
+          for (NewsEvent event : events) {
+            assertTrue("Entity should not be updated: " + event.getEntity(), expectedUpdatedNews.contains(event.getEntity()));
+          }
+        }
+      };
+      DynamicDAO.addEntityListener(INews.class, newsListener);
+      Owl.getPersistenceService().getDAOService().getNewsDAO().setState(Collections.singleton(news2), INews.State.NEW, true, true);
+      assertEquals(true, newsUpdatedCalled[0]);
+    } finally {
+      if (newsListener != null)
+        DynamicDAO.removeEntityListener(INews.class, newsListener);
+    }
   }
 
   /**

@@ -238,9 +238,8 @@ public class News extends AbstractEntity implements INews {
     fLock.acquireReadLock();
     try {
       Assert.isNotNull(other, "other cannot be null"); //$NON-NLS-1$
-      String guidValue = (getGuid() == null ? null : getGuid().getValue());
-
-      String otherGuidValue = (other.getGuid() == null ? null : other.getGuid().getValue());
+      String guidValue = getGuidValueIfPermaLink(getGuid());
+      String otherGuidValue = getGuidValueIfPermaLink(other.getGuid());
 
       Boolean guidMatch = isEquivalentCompare(guidValue, otherGuidValue);
       if (guidMatch != null) {
@@ -269,6 +268,15 @@ public class News extends AbstractEntity implements INews {
     } finally {
       fLock.releaseReadLock();
     }
+  }
+
+  private static String getGuidValueIfPermaLink(IGuid guid) {
+    String guidValue;
+    if (guid == null || (!guid.isPermaLink()))
+      guidValue = null;
+    else
+      guidValue = guid.getValue();
+    return guidValue;
   }
 
   /*
