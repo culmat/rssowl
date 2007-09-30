@@ -176,18 +176,18 @@ public class CacheService {
    * @return a Set of all Root-Folders.
    */
   public Set<IFolder> getRootFolders() {
-    return Collections.unmodifiableSet(new HashSet<IFolder>(fRootFolders));
+    return new HashSet<IFolder>(fRootFolders);
   }
 
   /**
-   * Returns an unmodifiable Set of all <code>IBookMark</code>s stored in the
-   * persistence layer.
+   * Returns a Set of all <code>IBookMark</code>s stored in the persistence
+   * layer.
    *
-   * @return an unmodifiable Set of all <code>IBookMark</code>s stored in the
-   * persistence layer.
+   * @return a Set of all <code>IBookMark</code>s stored in the persistence
+   * layer.
    */
   public Set<IBookMark> getBookMarks() {
-    return Collections.unmodifiableSet(new HashSet<IBookMark>(fBookMarks));
+    return new HashSet<IBookMark>(fBookMarks);
   }
 
   /**
@@ -206,14 +206,14 @@ public class CacheService {
   }
 
   /**
-   * Returns an unmodifiable Set of all <code>ISearchMark</code>s stored in
-   * the persistence layer.
+   * Returns a Set of all <code>ISearchMark</code>s stored in the persistence
+   * layer.
    *
-   * @return an unmodifiable Set of all <code>ISearchMark</code>s stored in
-   * the persistence layer.
+   * @return a Set of all <code>ISearchMark</code>s stored in the persistence
+   * layer.
    */
   public Set<ISearchMark> getSearchMarks() {
-    return Collections.unmodifiableSet(new HashSet<ISearchMark>(fSearchMarks));
+    return new HashSet<ISearchMark>(fSearchMarks);
   }
 
   /**
