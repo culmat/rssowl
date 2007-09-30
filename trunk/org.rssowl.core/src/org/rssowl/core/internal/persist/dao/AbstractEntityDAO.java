@@ -26,7 +26,6 @@ package org.rssowl.core.internal.persist.dao;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.SafeRunner;
 import org.rssowl.core.internal.persist.service.DBHelper;
-import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.dao.IEntityDAO;
 import org.rssowl.core.persist.event.EntityListener;
@@ -92,9 +91,8 @@ public abstract class AbstractEntityDAO<T extends IEntity,
       T entity = list.get(0);
       // TODO Activate completely by default for now. Must decide how to deal
       // with this.
-      if (!(entity instanceof IBookMark)) {
-        fDb.activate(entity, Integer.MAX_VALUE);
-      }
+      fDb.activate(entity, Integer.MAX_VALUE);
+
       return entity;
     } catch (Db4oException e) {
       throw new PersistenceException(e);
