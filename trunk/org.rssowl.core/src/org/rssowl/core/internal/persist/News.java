@@ -195,18 +195,30 @@ public class News extends AbstractEntity implements INews {
   }
 
   /**
-   * Returns the Lock that is used by the public methods that do not
-   * modify this object.
+   * Acquires the read lock used by all non-mutating public methods of this
+   * object. This method also ensures that an IllegalStateException is thrown if
+   * the same thread tries to acquire the write lock (by calling one of the
+   * mutating methods) while still holding this read lock (to prevent deadlocks).
    *
-   * This method should only be used in very specific circumstances. Avoid
-   * if possible.
+   * <p>
+   * This method should only be used in very specific circumstances. Avoid if
+   * possible.
+   * </p>
    *
-   * @return Lock used during operations that do not modify this object.
+   * @see #releaseReadLockSpecial()
    */
   public final void acquireReadLockSpecial() {
     fLock.acquireReadLockSpecial();
   }
 
+  /**
+   * Releases the read lock acquired by calling
+   * {@link #acquireReadLockSpecial()}. It's very important to _always_ call
+   * this method after calling acquireReadLockSpecial. Typically this is
+   * achieved with a try/finally block.
+   *
+   * @see #acquireReadLockSpecial()
+   */
   public final void releaseReadLockSpecial() {
     fLock.releaseReadLockSpecial();
   }
