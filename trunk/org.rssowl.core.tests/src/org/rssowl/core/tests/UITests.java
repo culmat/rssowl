@@ -27,6 +27,7 @@ package org.rssowl.core.tests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.rssowl.core.tests.ui.CleanUpTests;
 import org.rssowl.core.tests.ui.EntityPropertyPageTests;
 import org.rssowl.core.tests.ui.FolderMarkGroupFilterTest;
 import org.rssowl.core.tests.ui.MiscUITests;
@@ -37,19 +38,20 @@ import org.rssowl.core.tests.ui.TreeTraversalTest;
 
 /**
  * Test-Suite for UI-Tests.
- * 
+ *
  * @author bpasero
  * @author Ismael Juma (ismael@juma.me.uk)
  */
 
 @RunWith(Suite.class)
-@SuiteClasses( { 
+@SuiteClasses( {
   EntityPropertyPageTests.class,
   RetentionStrategyTests.class,
   ModelUtilsTest.class,
   FolderMarkGroupFilterTest.class,
   NewsGroupFilterTest.class,
   TreeTraversalTest.class,
-  MiscUITests.class
+  MiscUITests.class,
+  CleanUpTests.class
 })
 public class UITests {}
