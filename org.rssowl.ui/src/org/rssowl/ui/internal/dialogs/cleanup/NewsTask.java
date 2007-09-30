@@ -44,7 +44,9 @@ class NewsTask extends CleanUpTask {
   private ImageDescriptor fImage;
   private String fLabel;
 
-  NewsTask(IBookMark container, Collection<NewsReference> news) {
+  NewsTask(CleanUpGroup group, IBookMark container, Collection<NewsReference> news) {
+    super(group);
+
     Assert.isNotNull(container);
     Assert.isNotNull(news);
     Assert.isTrue(!news.isEmpty());

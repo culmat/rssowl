@@ -32,6 +32,20 @@ import org.eclipse.jface.resource.ImageDescriptor;
  * @author bpasero
  */
 abstract class CleanUpTask {
+  private final CleanUpGroup fGroup;
+
+  /**
+   * Creates a new CleanUpTask
+   *
+   * @param group the parent of this Task.
+   */
+  protected CleanUpTask(CleanUpGroup group) {
+    fGroup = group;
+  }
+
+  CleanUpGroup getGroup() {
+    return fGroup;
+  }
 
   /* Returns the Label for the Task */
   abstract String getLabel();

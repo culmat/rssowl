@@ -34,6 +34,10 @@ import org.rssowl.ui.internal.OwlUI;
  */
 class DefragDatabaseTask extends CleanUpTask {
 
+  DefragDatabaseTask(CleanUpGroup group) {
+    super(group);
+  }
+
   /*
    * @see org.rssowl.ui.internal.dialogs.cleanup.CleanUpTask#getImage()
    */
@@ -47,6 +51,6 @@ class DefragDatabaseTask extends CleanUpTask {
    */
   @Override
   String getLabel() {
-    return "Recommended: Improve performance of the database";
+    return "Improve performance of the database";
   }
 }
