@@ -31,6 +31,7 @@ import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -43,12 +44,21 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Scrollable;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.ui.internal.Activator;
@@ -72,7 +82,18 @@ public class CleanUpSummaryPage extends WizardPage {
   private Button fDeselectAll;
 
   /* Summary Label Provider */
-  class SummaryLabelProvider extends LabelProvider implements IFontProvider {
+  class SummaryLabelProvider extends LabelProvider implements IFontProvider, IColorProvider {
+    private Color fGradientFgColor;
+    private Color fGradientBgColor;
+    private Color fGradientEndColor;
+    private Color fGroupFgColor;
+
+    SummaryLabelProvider() {
+      fGradientFgColor = OwlUI.getColor(fResources, OwlUI.GROUP_GRADIENT_FG_COLOR);
+      fGradientBgColor = OwlUI.getColor(fResources, OwlUI.GROUP_GRADIENT_BG_COLOR);
+      fGradientEndColor = OwlUI.getColor(fResources, OwlUI.GROUP_GRADIENT_END_COLOR);
+      fGroupFgColor = OwlUI.getColor(fResources, OwlUI.GROUP_FG_COLOR);
+    }
 
     @Override
     public String getText(Object element) {
@@ -95,6 +116,66 @@ public class CleanUpSummaryPage extends WizardPage {
         return OwlUI.getBold(JFaceResources.DEFAULT_FONT);
 
       return null;
+    }
+
+    public Color getBackground(Object element) {
+      return null;
+    }
+
+    public Color getForeground(Object element) {
+      if (element instanceof CleanUpGroup)
+        return fGroupFgColor;
+
+      return null;
+    }
+
+    void eraseGroup(Event event) {
+      Scrollable scrollable = (Scrollable) event.widget;
+      GC gc = event.gc;
+
+      Rectangle area = scrollable.getClientArea();
+      Rectangle rect = event.getBounds();
+
+      /* Paint the selection beyond the end of last column */
+      expandRegion(event, scrollable, gc, area);
+
+      /* Draw Gradient Rectangle */
+      Color oldForeground = gc.getForeground();
+      Color oldBackground = gc.getBackground();
+
+      /* Gradient */
+      gc.setForeground(fGradientFgColor);
+      gc.setBackground(fGradientBgColor);
+      gc.fillGradientRectangle(0, rect.y, area.width, rect.height, true);
+
+      /* Bottom Line */
+      gc.setForeground(fGradientEndColor);
+      gc.drawLine(0, rect.y + rect.height - 1, area.width, rect.y + rect.height - 1);
+
+      gc.setForeground(oldForeground);
+      gc.setBackground(oldBackground);
+
+      /* Mark as Background being handled */
+      event.detail &= ~SWT.BACKGROUND;
+    }
+
+    private void expandRegion(Event event, Scrollable scrollable, GC gc, Rectangle area) {
+      int columnCount;
+      if (scrollable instanceof Table)
+        columnCount = ((Table) scrollable).getColumnCount();
+      else
+        columnCount = ((Tree) scrollable).getColumnCount();
+
+      if (event.index == columnCount - 1 || columnCount == 0) {
+        int width = area.x + area.width - event.x;
+        if (width > 0) {
+          Region region = new Region();
+          gc.getClipping(region);
+          region.add(event.x, event.y, width, event.height);
+          gc.setClipping(region);
+          region.dispose();
+        }
+      }
     }
   }
 
@@ -126,7 +207,7 @@ public class CleanUpSummaryPage extends WizardPage {
     container.setLayout(new GridLayout(1, false));
 
     /* Viewer to select particular Tasks */
-    fViewer = new CheckboxTreeViewer(container, SWT.BORDER);
+    fViewer = new CheckboxTreeViewer(container, SWT.BORDER | SWT.FULL_SELECTION);
     fViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fViewer.getTree().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
 
@@ -165,7 +246,17 @@ public class CleanUpSummaryPage extends WizardPage {
     });
 
     /* LabelProvider */
-    fViewer.setLabelProvider(new SummaryLabelProvider());
+    final SummaryLabelProvider summaryLabelProvider = new SummaryLabelProvider();
+    fViewer.setLabelProvider(summaryLabelProvider);
+
+    /* Custom Owner Drawn Category */
+    fViewer.getControl().addListener(SWT.EraseItem, new Listener() {
+      public void handleEvent(Event event) {
+        Object element = event.item.getData();
+        if (element instanceof CleanUpGroup)
+          summaryLabelProvider.eraseGroup(event);
+      }
+    });
 
     /* Listen on Doubleclick */
     fViewer.addDoubleClickListener(new IDoubleClickListener() {
