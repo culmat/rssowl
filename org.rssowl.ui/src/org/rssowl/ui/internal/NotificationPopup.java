@@ -66,6 +66,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.DateUtils;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.OwlUI.OSTheme;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.editors.feed.FeedView;
@@ -253,7 +254,12 @@ public class NotificationPopup extends PopupDialog {
     newsLabel.setBackground(fInnerContentCircle.getBackground());
     newsLabel.setCursor(newsLabel.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
     newsLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    newsLabel.setText(ModelUtils.getHeadline(news));
+
+    String headline = ModelUtils.getHeadline(news);
+    if (headline.contains("&"))
+      headline = StringUtils.replaceAll(headline, "&", "&&");
+    newsLabel.setText(headline);
+
     newsLabel.setFont(fBoldTextFont);
     newsLabel.addMouseTrackListener(fMouseTrackListner);
 
