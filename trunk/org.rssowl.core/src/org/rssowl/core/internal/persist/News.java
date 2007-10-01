@@ -245,7 +245,7 @@ public class News extends AbstractEntity implements INews {
       //TODO Consider simplifying this after M7. The case where one news
       //has permaLink == true and the other has permaLink == false with the
       //same guidValue should not happen in practice.
-      if (guidMatch != null && guidMatch.equals(Boolean.FALSE) && getGuid().isPermaLink() && other.getGuid().isPermaLink())
+      if (guidMatch != null && guidMatch.equals(Boolean.FALSE) && (getGuid() == null || getGuid().isPermaLink()) && (other.getGuid() == null || other.getGuid().isPermaLink()))
         return false;
       else if (guidMatch != null && guidMatch.equals(Boolean.TRUE) && getGuid().isPermaLink() && other.getGuid().isPermaLink())
         return true;
