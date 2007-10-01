@@ -813,7 +813,7 @@ public class Feed extends AbstractEntity implements IFeed {
       newsToCleanUp = new ArrayList<Integer>(fNews.size() / 2);
     }
     ComplexMergeResult<List<INews>> mergeResult = ComplexMergeResult.create(newsListCopy);
-    for (int i = 0, c = fNews.size(); i < c; ++i) {
+    for (int i = fNews.size() - 1; i >= 0; --i) {
       INews existingNews = fNews.get(i);
       int existingNewsIndex = findNews(newsListCopy, existingNews);
 
@@ -822,10 +822,13 @@ public class Feed extends AbstractEntity implements IFeed {
         newsListCopy.remove(existingNewsIndex);
       } else if ((newsToCleanUp != null) && (existingNews.getState() == INews.State.DELETED))
         newsToCleanUp.add(Integer.valueOf(i));
-
     }
     if (newsToCleanUp != null) {
-      for (int i = newsToCleanUp.size() - 1; i >= 0; --i) {
+      /*
+       * indices are stored in decreasing order in newsToCleanUp so we iterate
+       * in increasing order.
+       */
+      for (int i = 0, c = newsToCleanUp.size(); i < c; ++i) {
         INews news = fNews.remove(newsToCleanUp.get(i).intValue());
         mergeResult.addRemovedObject(news);
         mergeResult.setStructuralChange(true);
