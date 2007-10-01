@@ -73,7 +73,7 @@ public class NewsFilter extends ViewerFilter {
 
     /**
      * Returns a human-readable Name of this enum-value.
-     * 
+     *
      * @return A human-readable Name of this enum-value.
      */
     public String getName() {
@@ -110,7 +110,7 @@ public class NewsFilter extends ViewerFilter {
 
     /**
      * Returns a human-readable Name of this enum-value.
-     * 
+     *
      * @return A human-readable Name of this enum-value.
      */
     public String getName() {
@@ -147,7 +147,7 @@ public class NewsFilter extends ViewerFilter {
    * the tree based on whether the provided filter text matches the text of the
    * given element's text, or that of it's children (if the element has any).
    * Subclasses may override this method.
-   * 
+   *
    * @param viewer the tree viewer in which the element resides
    * @param element the element in the tree to check for a match
    * @return true if the element matches the filter pattern
@@ -161,7 +161,7 @@ public class NewsFilter extends ViewerFilter {
    * tree. For example, if a tree has items that are categorized, the category
    * itself may not be a valid selection since it is used merely to organize the
    * elements.
-   * 
+   *
    * @param element
    * @return true if this element is eligible for automatic selection
    */
@@ -173,7 +173,7 @@ public class NewsFilter extends ViewerFilter {
    * Check if the parent (category) is a match to the filter text. The default
    * behavior returns true if the element has at least one child element that is
    * a match with the filter text. Subclasses may override this method.
-   * 
+   *
    * @param viewer the viewer that contains the element
    * @param element the tree element to check
    * @return true if the given element has children that matches the filter text
@@ -194,7 +194,7 @@ public class NewsFilter extends ViewerFilter {
    * Check if the current (leaf) element is a match with the filter text. The
    * default behavior checks that the label of the element is a match.
    * Subclasses should override this method.
-   * 
+   *
    * @param viewer the viewer that contains the element
    * @param element the tree element to check
    * @return true if the given element's label matches the filter text
@@ -209,38 +209,43 @@ public class NewsFilter extends ViewerFilter {
     /* Element is a News */
     if (element instanceof INews) {
       INews news = (INews) element;
+      INews.State state = news.getState();
+      boolean isMatch = false;
 
-      /* First check the Pattern */
-      if (fMatcher != null && !wordMatches(news)) {
-        return false;
+      switch (fType) {
+
+        /* Show: All */
+        case SHOW_ALL:
+          isMatch = true;
+          break;
+
+        /* Show New News */
+        case SHOW_NEW:
+          isMatch = (state == INews.State.NEW);
+          break;
+
+        /* Show Unread News */
+        case SHOW_UNREAD:
+          isMatch = (state == INews.State.UNREAD || state == INews.State.NEW || state == INews.State.UPDATED);
+          break;
+
+        /* Show Sticky News */
+        case SHOW_STICKY:
+          isMatch = news.isFlagged();
+          break;
+
+        /* Show Recent News (max 24h old) */
+        case SHOW_RECENT:
+          Date date = DateUtils.getRecentDate(news);
+          isMatch = (date.getTime() > (System.currentTimeMillis() - DateUtils.DAY));
+          break;
       }
 
-      /* Show: All */
-      if (fType == Type.SHOW_ALL)
-        return true;
+      /* Finally check the Pattern */
+      if (isMatch && fMatcher != null && !wordMatches(news))
+        isMatch = false;
 
-      /* Show New News */
-      else if (fType == Type.SHOW_NEW) {
-        INews.State state = news.getState();
-        return state == INews.State.NEW;
-      }
-
-      /* Show Unread News */
-      else if (fType == Type.SHOW_UNREAD) {
-        INews.State state = news.getState();
-        return state == INews.State.UNREAD || state == INews.State.NEW || state == INews.State.UPDATED;
-      }
-
-      /* Show Sticky News */
-      else if (fType == Type.SHOW_STICKY) {
-        return news.isFlagged();
-      }
-
-      /* Show Recent News (max 24h old) */
-      else if (fType == Type.SHOW_RECENT) {
-        Date date = DateUtils.getRecentDate(news);
-        return date.getTime() > (System.currentTimeMillis() - DateUtils.DAY);
-      }
+      return isMatch;
     }
 
     return false;
@@ -254,7 +259,7 @@ public class NewsFilter extends ViewerFilter {
   /**
    * Set the Type of this Filter. The Type is describing which elements are
    * filtered.
-   * 
+   *
    * @param type The Type of this Filter as described in the <code>Type</code>
    * enumeration.
    */
@@ -266,7 +271,7 @@ public class NewsFilter extends ViewerFilter {
   /**
    * Get the Type of this Filter. The Type is describing which elements are
    * filtered.
-   * 
+   *
    * @return Returns the Type of this Filter as described in the
    * <code>Type</code> enumeration.
    */
@@ -277,7 +282,7 @@ public class NewsFilter extends ViewerFilter {
   /**
    * Get the Target of the Search. The Target is describing which elements to
    * search when a Text-Search is performed.
-   * 
+   *
    * @return Returns the SearchTarget of the Search as described in the
    * <code>SearchTarget</code> enumeration.
    */
@@ -288,7 +293,7 @@ public class NewsFilter extends ViewerFilter {
   /**
    * Set the Target of the Search. The Target is describing which elements to
    * search when a Text-Search is performed.
-   * 
+   *
    * @param searchTarget The SearchTarget of the Search as described in the
    * <code>SearchTarget</code> enumeration.
    */
@@ -299,7 +304,7 @@ public class NewsFilter extends ViewerFilter {
   /**
    * The pattern string for which this filter should select elements in the
    * viewer.
-   * 
+   *
    * @param patternString
    */
   public void setPattern(String patternString) {
@@ -319,7 +324,7 @@ public class NewsFilter extends ViewerFilter {
 
   /**
    * Answers whether the given String matches the pattern.
-   * 
+   *
    * @param string the String to test
    * @return whether the string matches the pattern
    */
@@ -333,7 +338,7 @@ public class NewsFilter extends ViewerFilter {
   /**
    * Take the given filter text and break it down into words using a
    * BreakIterator.
-   * 
+   *
    * @param text
    * @return an array of words
    */
@@ -440,7 +445,7 @@ public class NewsFilter extends ViewerFilter {
   /**
    * Return whether or not if any of the words in text satisfy the match
    * critera.
-   * 
+   *
    * @param text the text to match
    * @return boolean <code>true</code> if one of the words in text satisifes
    * the match criteria.
