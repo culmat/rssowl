@@ -39,10 +39,11 @@ import org.rssowl.core.persist.event.SearchMarkListener;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A service that provides access to cached entities. The service ensures to
@@ -52,9 +53,14 @@ import java.util.Set;
  * @author bpasero
  */
 public class CacheService {
-  private Set<IFolder> fRootFolders;
-  private Set<IBookMark> fBookMarks;
-  private Set<ISearchMark> fSearchMarks;
+  private static final int CONCURRENT_WRITERS = 2;
+  private static final float LOAD_FACTOR = 0.75f;
+  private final Map<IFolder, Object> fRootFolders;
+  private final Map<IBookMark, Object> fBookMarks;
+  private final Map<ISearchMark, Object> fSearchMarks;
+
+  /* Dummy value to associate with an Object in the maps */
+  private static final Object PRESENT = new Object();
 
   /* Listeners */
   private FolderListener fFolderListener;
@@ -66,9 +72,9 @@ public class CacheService {
    * Service.
    */
   public CacheService() {
-    fRootFolders = Collections.synchronizedSet(new HashSet<IFolder>());
-    fBookMarks = Collections.synchronizedSet(new HashSet<IBookMark>());
-    fSearchMarks = Collections.synchronizedSet(new HashSet<ISearchMark>());
+    fRootFolders = new ConcurrentHashMap<IFolder, Object>(16, LOAD_FACTOR, CONCURRENT_WRITERS);
+    fBookMarks = new ConcurrentHashMap<IBookMark, Object>(32, LOAD_FACTOR, CONCURRENT_WRITERS);
+    fSearchMarks = new ConcurrentHashMap<ISearchMark, Object>(16, LOAD_FACTOR, CONCURRENT_WRITERS);
 
     registerListeners();
   }
@@ -83,7 +89,7 @@ public class CacheService {
         for (FolderEvent folderEvent : events) {
           IFolder folder = folderEvent.getEntity();
           if (folder.getParent() == null)
-            fRootFolders.add(folder);
+            fRootFolders.put(folder, PRESENT);
         }
       }
 
@@ -108,7 +114,7 @@ public class CacheService {
       /* BookMarks got Added */
       public void entitiesAdded(Set<BookMarkEvent> events) {
         for (BookMarkEvent bookMarkEvent : events) {
-          fBookMarks.add(bookMarkEvent.getEntity());
+          fBookMarks.put(bookMarkEvent.getEntity(), PRESENT);
         }
       }
 
@@ -131,7 +137,7 @@ public class CacheService {
       /* SearchMark got Added */
       public void entitiesAdded(Set<SearchMarkEvent> events) {
         for (SearchMarkEvent searchMarkEvent : events) {
-          fSearchMarks.add(searchMarkEvent.getEntity());
+          fSearchMarks.put(searchMarkEvent.getEntity(), PRESENT);
         }
       }
 
@@ -176,7 +182,7 @@ public class CacheService {
    * @return a Set of all Root-Folders.
    */
   public Set<IFolder> getRootFolders() {
-    return new HashSet<IFolder>(fRootFolders);
+    return fRootFolders.keySet();
   }
 
   /**
@@ -187,7 +193,7 @@ public class CacheService {
    * layer.
    */
   public Set<IBookMark> getBookMarks() {
-    return new HashSet<IBookMark>(fBookMarks);
+    return fBookMarks.keySet();
   }
 
   /**
@@ -198,7 +204,7 @@ public class CacheService {
   public Set<String> getFeedLinks() {
     Set<String> links = new HashSet<String>(fBookMarks.size());
 
-    for (IBookMark bookmark : fBookMarks) {
+    for (IBookMark bookmark : getBookMarks()) {
       links.add(bookmark.getFeedLinkReference().getLink().toString());
     }
 
@@ -213,7 +219,7 @@ public class CacheService {
    * layer.
    */
   public Set<ISearchMark> getSearchMarks() {
-    return new HashSet<ISearchMark>(fSearchMarks);
+    return fSearchMarks.keySet();
   }
 
   /**
@@ -227,11 +233,9 @@ public class CacheService {
   public Set<IBookMark> getBookMarks(FeedLinkReference feedRef) {
     Set<IBookMark> bookmarks = new HashSet<IBookMark>();
 
-    synchronized (this) {
-      for (IBookMark bookMark : fBookMarks) {
-        if (bookMark.getFeedLinkReference().equals(feedRef))
-          bookmarks.add(bookMark);
-      }
+    for (IBookMark bookMark : getBookMarks()) {
+      if (bookMark.getFeedLinkReference().equals(feedRef))
+        bookmarks.add(bookMark);
     }
 
     return bookmarks;
@@ -244,19 +248,19 @@ public class CacheService {
     }
   }
 
-  private synchronized void cache(IFolder folder) {
+  private void cache(IFolder folder) {
 
     /* Cache Root-Folders */
     if (folder.getParent() == null)
-      fRootFolders.add(folder);
+      fRootFolders.put(folder, PRESENT);
 
     /* Cache Marks */
     List<IMark> subMarks = folder.getMarks();
     for (IMark subMark : subMarks) {
       if (subMark instanceof IBookMark)
-        fBookMarks.add((IBookMark) subMark);
+        fBookMarks.put((IBookMark) subMark, PRESENT);
       else if (subMark instanceof ISearchMark)
-        fSearchMarks.add((ISearchMark) subMark);
+        fSearchMarks.put((ISearchMark) subMark, PRESENT);
     }
 
     /* Recursively refresh cache of sub-folders */
