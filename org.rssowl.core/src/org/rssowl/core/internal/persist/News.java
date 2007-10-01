@@ -942,7 +942,7 @@ public class News extends AbstractEntity implements INews {
 
   private ComplexMergeResult<IGuid> mergeGuid(IGuid guid) {
     ComplexMergeResult<IGuid> mergeResult = MergeUtils.merge(getGuid(), guid);
-    fGuid = mergeResult.getMergedObject();
+    setGuid(mergeResult.getMergedObject());
     return mergeResult;
   }
 
