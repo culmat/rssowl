@@ -238,16 +238,17 @@ public class News extends AbstractEntity implements INews {
     fLock.acquireReadLock();
     try {
       Assert.isNotNull(other, "other cannot be null"); //$NON-NLS-1$
-      String guidValue = getGuidValueIfPermaLink(getGuid());
-      String otherGuidValue = getGuidValueIfPermaLink(other.getGuid());
 
-      Boolean guidMatch = isEquivalentCompare(guidValue, otherGuidValue);
-      if (guidMatch != null) {
-        if (guidMatch.equals(Boolean.TRUE))
-          return true;
+      Boolean guidMatch = isEquivalentCompare(getGuidValue(getGuid()),
+          getGuidValue(other.getGuid()));
 
+      //TODO Consider simplifying this after M7. The case where one news
+      //has permaLink == true and the other has permaLink == false with the
+      //same guidValue should not happen in practice.
+      if (guidMatch != null && guidMatch.equals(Boolean.FALSE) && getGuid().isPermaLink() && other.getGuid().isPermaLink())
         return false;
-      }
+      else if (guidMatch != null && guidMatch.equals(Boolean.TRUE) && getGuid().isPermaLink() && other.getGuid().isPermaLink())
+        return true;
 
       URI newsItemLink = other.getLink();
       Boolean linkMatch = isEquivalentCompare(getLink(), newsItemLink);
@@ -270,13 +271,8 @@ public class News extends AbstractEntity implements INews {
     }
   }
 
-  private static String getGuidValueIfPermaLink(IGuid guid) {
-    String guidValue;
-    if (guid == null || (!guid.isPermaLink()))
-      guidValue = null;
-    else
-      guidValue = guid.getValue();
-    return guidValue;
+  private static String getGuidValue(IGuid guid) {
+    return guid == null ? null : guid.getValue();
   }
 
   /*

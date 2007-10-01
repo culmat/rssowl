@@ -95,6 +95,32 @@ public class INewsTest {
   }
 
   /**
+   * Tests that two INews with the same guid value and link are equivalent if
+   * one of them has isPermaLink == true and the other has isPermaLink == false.
+   * This is a backwards compatibility test. We may decide to remove it after
+   * M7.
+   *
+   * @throws URISyntaxException
+   */
+  @Test
+  public void testIsEquivalentWithGuidPermaLinkTrueAndPermaLinkFalse() throws URISyntaxException {
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com"));
+
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    String link = "www.link.com";
+    news1.setGuid(fFactory.createGuid(news1, link));
+    news1.getGuid().setPermaLink(true);
+    news1.setLink(new URI(link));
+
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setGuid(fFactory.createGuid(news2, link));
+    news2.getGuid().setPermaLink(false);
+    news2.setLink(new URI(link));
+
+    assertTrue(news1.isEquivalent(news2));
+  }
+
+  /**
    * Tests that calling INews#merge merges the permalink of the Guid correctly.
    * @throws Exception
    */
