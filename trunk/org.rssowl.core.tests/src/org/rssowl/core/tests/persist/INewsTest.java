@@ -23,15 +23,18 @@
  **  **********************************************************************  */
 package org.rssowl.core.tests.persist;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.rssowl.core.internal.persist.DefaultModelFactory;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 
+import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
@@ -89,5 +92,41 @@ public class INewsTest {
     assertFalse(news2.isEquivalent(news4));
 
     assertFalse(news3.isEquivalent(news4));
+  }
+
+  /**
+   * Tests that calling INews#merge merges the permalink of the Guid correctly.
+   * @throws Exception
+   */
+  @Test
+  public void testMergeGuidPermalink() throws Exception {
+    IFeed parent = fFactory.createFeed(null, new URI("http://www.feed.com"));
+    INews news = fFactory.createNews(null, parent, new Date());
+    IGuid guid = fFactory.createGuid(news, "www.news.com");
+    news.setGuid(guid);
+    guid.setPermaLink(true);
+
+    URI newsLink = new URI("http://www.news.com");
+    news.setLink(newsLink);
+    INews otherNews = fFactory.createNews(null, parent, new Date());
+    otherNews.setLink(newsLink);
+    IGuid otherGuid = fFactory.createGuid(otherNews, "www.news.com");
+    otherGuid.setPermaLink(false);
+
+    news.merge(otherNews);
+    assertEquals(false, news.getGuid().isPermaLink());
+
+    /* This test is specific to our News implementation */
+    assertEquals(false, getNewsFGuidIsPermaLink(news));
+  }
+
+  private boolean getNewsFGuidIsPermaLink(INews news) throws Exception  {
+    for (Field field : news.getClass().getDeclaredFields()) {
+      if (field.getName().equals("fGuidIsPermaLink")) {
+        field.setAccessible(true);
+        return (Boolean) field.get(news);
+      }
+    }
+    throw new IllegalStateException();
   }
 }
