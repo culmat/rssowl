@@ -303,63 +303,85 @@ public class BookMarkFilter extends ViewerFilter {
     /* Element is a BookMark */
     if (element instanceof IBookMark) {
       IBookMark bookmark = (IBookMark) element;
+      boolean isMatch = false;
 
-      /* First check the Pattern */
-      if (fMatcher != null) {
+      switch (fType) {
+
+        /* Show: All */
+        case SHOW_ALL:
+          isMatch = true;
+          break;
+
+        /* Show: Feeds with New News */
+        case SHOW_NEW:
+          isMatch = hasNewNews(bookmark.getFeedLinkReference());
+          break;
+
+        /* Show: Unread Feeds */
+        case SHOW_UNREAD:
+          isMatch = hasUnreadNews(bookmark.getFeedLinkReference());
+          break;
+
+        /* Show: Sticky Feeds */
+        case SHOW_STICKY:
+          isMatch = hasStickyNews(bookmark.getFeedLinkReference());
+          break;
+
+        /* Show: Feeds that had an Error while loading */
+        case SHOW_ERRONEOUS:
+          isMatch = bookmark.isErrorLoading();
+          break;
+
+        /* Show: Never visited Marks */
+        case SHOW_NEVER_VISITED:
+          isMatch = bookmark.getPopularity() <= 0;
+          break;
+      }
+
+      /* Finally check the Pattern */
+      if (isMatch && fMatcher != null) {
         if (!wordMatches(bookmark))
           return false;
       }
 
-      /* Show: All */
-      if (fType == Type.SHOW_ALL)
-        return true;
-
-      /* Show: Feeds with New News */
-      if (fType == Type.SHOW_NEW)
-        return hasNewNews(bookmark.getFeedLinkReference());
-
-      /* Show: Unread Feeds */
-      else if (fType == Type.SHOW_UNREAD)
-        return hasUnreadNews(bookmark.getFeedLinkReference());
-
-      /* Show: Sticky Feeds */
-      else if (fType == Type.SHOW_STICKY)
-        return hasStickyNews(bookmark.getFeedLinkReference());
-
-      /* Show: Feeds that had an Error while loading */
-      else if (fType == Type.SHOW_ERRONEOUS)
-        return bookmark.isErrorLoading();
-
-      /* Show: Never visited Marks */
-      else if (fType == Type.SHOW_NEVER_VISITED)
-        return bookmark.getPopularity() <= 0;
+      return isMatch;
     }
 
     /* Element is a SearchMark */
     else if (element instanceof ISearchMark) {
       ISearchMark mark = (ISearchMark) element;
+      boolean isMatch = false;
 
-      /* First check the Pattern */
-      if (fMatcher != null) {
+      switch (fType) {
+
+        /* Show: All */
+        case SHOW_ALL:
+          isMatch = true;
+          break;
+
+        /* Show: New News */
+        case SHOW_NEW:
+          isMatch = mark.getResultCount(EnumSet.of(INews.State.NEW)) > 0;
+          break;
+
+        /* Show: Unread News */
+        case SHOW_UNREAD:
+          isMatch = mark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) > 0;
+          break;
+
+        /* Show: Never visited Marks */
+        case SHOW_NEVER_VISITED:
+          isMatch = mark.getPopularity() <= 0;
+          break;
+      }
+
+      /* Finally check the Pattern */
+      if (isMatch && fMatcher != null) {
         if (!wordMatches(mark))
           return false;
       }
 
-      /* Show: All */
-      if (fType == Type.SHOW_ALL)
-        return true;
-
-      /* Show: New News */
-      else if (fType == Type.SHOW_NEW)
-        return mark.getResultCount(EnumSet.of(INews.State.NEW)) > 0;
-
-      /* Show: Unread News */
-      else if (fType == Type.SHOW_UNREAD)
-        return mark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) > 0;
-
-      /* Show: Never visited Marks */
-      else if (fType == Type.SHOW_NEVER_VISITED)
-        return mark.getPopularity() <= 0;
+      return isMatch;
     }
 
     return false;
