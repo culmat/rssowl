@@ -102,9 +102,12 @@ public interface IModelFactory {
    *
    * @param news The News this Guid belongs to.
    * @param value The identifier of the Guid.
+   * @param permaLink Indicates whether this guid is a permalink to the item.
+   * {@code null} indicates that the feed had no permaLink attribute. See
+   * {@link IGuid#isPermaLink()} for more information.
    * @return A new instance of IGuid with the provided parameters.
    */
-  IGuid createGuid(INews news, String value);
+  IGuid createGuid(INews news, String value, Boolean permaLink);
 
   /**
    * Creates a new instance of ICloud with the provided parameters. The new

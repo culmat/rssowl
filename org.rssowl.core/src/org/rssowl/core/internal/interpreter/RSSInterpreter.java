@@ -33,7 +33,6 @@ import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.ICloud;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
-import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.IImage;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
@@ -523,25 +522,28 @@ public class RSSInterpreter extends BasicInterpreter {
   }
 
   private void processGuid(Element element, INews news) {
-    IGuid guid = Owl.getModelFactory().createGuid(news, element.getText());
 
-    /* Check wether the Attributes are to be processed by a Contribution */
-    processNamespaceAttributes(element, guid);
+    //TODO We don't pass guid to contributions because it cannot be modified
+    //See bug #587 for a discussion about a soluton
+    /* Check whether the Attributes are to be processed by a Contribution */
+//    processNamespaceAttributes(element, guid);
 
+    Boolean permaLink = null;
     /* Interpret Attributes */
     List< ? > attributes = element.getAttributes();
     for (Iterator< ? > iter = attributes.iterator(); iter.hasNext();) {
       Attribute attribute = (Attribute) iter.next();
       String name = attribute.getName().toLowerCase();
 
-      /* Check wether this Attribute is to be processed by a Contribution */
-      if (processAttributeExtern(attribute, guid))
-        continue;
+//      /* Check whether this Attribute is to be processed by a Contribution */
+//      if (processAttributeExtern(attribute, guid))
+//        continue;
 
       /* Is Permalink */
-      else if ("ispermalink".equals(name)) //$NON-NLS-1$
-        guid.setPermaLink(Boolean.parseBoolean(attribute.getValue()));
+      if ("ispermalink".equals(name)) //$NON-NLS-1$
+        permaLink = Boolean.parseBoolean(attribute.getValue());
     }
+    Owl.getModelFactory().createGuid(news, element.getText(), permaLink);
   }
 
   private void processTextInput(Element element, IFeed feed) {

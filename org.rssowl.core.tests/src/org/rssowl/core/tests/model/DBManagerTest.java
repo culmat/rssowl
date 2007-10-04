@@ -1135,7 +1135,7 @@ public class DBManagerTest {
     news.setComments("One comment");
     news.setState(State.DELETED);
     news.setDescription("News description");
-    news.setGuid(fTypesFactory.createGuid(news, "someGUIDvalue"));
+    fTypesFactory.createGuid(news, "someGUIDvalue", null);
     news.setLink(createURI("http://www.somelocation.com/feed.rss"));
     news.setModifiedDate(createDate());
     news.setProperty("property", "value");

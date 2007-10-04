@@ -210,7 +210,7 @@ public class AtomInterpreter extends BasicInterpreter {
 
       /* Id */
       else if ("id".equals(name)) { //$NON-NLS-1$
-        IGuid guid = Owl.getModelFactory().createGuid(news, child.getText());
+        IGuid guid = Owl.getModelFactory().createGuid(news, child.getText(), null);
 
         processNamespaceAttributes(child, guid);
       }

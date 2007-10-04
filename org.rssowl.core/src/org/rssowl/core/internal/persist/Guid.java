@@ -24,65 +24,49 @@
 
 package org.rssowl.core.internal.persist;
 
-import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IGuid;
-import org.rssowl.core.util.MergeUtils;
 
 /**
- * Simple Implementation of this Type. Data is kept in fields and all Methods
- * are functional to set/get this Data.
+ * Immutable and thread-safe implementation of IGuid.
  *
  * @author bpasero
  */
-public class Guid extends Persistable implements IGuid {
+public final class Guid extends Persistable implements IGuid {
 
   /* Attributes */
-  private String fValue;
-  private boolean fIsPermaLink;
-
-  /**
-   * Provided for deserialization.
-   */
-  protected Guid() {}
+  private final String fValue;
+  private final boolean fIsPermaLink;
 
   /**
    * @param value The unique identifier.
+   * @param isPermaLink indicates whether this guid is a permalink to the item.
+   * {@code null} indicates that the feed had no permaLink attribute. See
+   * {@link #isPermaLink()} for more information.
    */
-  public Guid(String value) {
+  public Guid(String value, Boolean isPermaLink) {
     fValue = value;
-    fIsPermaLink = true;
-  }
-
-  /*
-   * @see org.rssowl.core.model.types.IGuid#setValue(java.lang.String)
-   */
-  public synchronized void setValue(String value) {
-    fValue = value;
-  }
-
-  /*
-   * @see org.rssowl.core.model.types.IGuid#setPermaLink(boolean)
-   */
-  public synchronized void setPermaLink(boolean isPermaLink) {
-    fIsPermaLink = isPermaLink;
+    if (isPermaLink == null)
+      fIsPermaLink = true;
+    else
+      fIsPermaLink = isPermaLink.booleanValue();
   }
 
   /*
    * @see org.rssowl.core.model.types.IGuid#isPermaLink()
    */
-  public synchronized boolean isPermaLink() {
+  public boolean isPermaLink() {
     return fIsPermaLink;
   }
 
   /*
    * @see org.rssowl.core.model.types.IGuid#getValue()
    */
-  public synchronized String getValue() {
+  public String getValue() {
     return fValue;
   }
 
   @Override
-  public synchronized int hashCode() {
+  public int hashCode() {
     final int PRIME = 31;
     int result = 1;
     result = PRIME * result + (fIsPermaLink ? 1231 : 1237);
@@ -98,7 +82,7 @@ public class Guid extends Persistable implements IGuid {
    * compares all the fields.
    */
   @Override
-  public synchronized boolean equals(Object guid) {
+  public boolean equals(Object guid) {
     if (this == guid)
       return true;
 
@@ -114,25 +98,7 @@ public class Guid extends Persistable implements IGuid {
 
   @Override
   @SuppressWarnings("nls")
-  public synchronized String toString() {
+  public String toString() {
     return super.toString() + "Value = " + fValue + ", IsPermaLink = " + fIsPermaLink + ")";
-  }
-
-  /*
-   * @see org.rssowl.core.model.types.MergeCapable#merge(java.lang.Object)
-   */
-  public synchronized MergeResult merge(IGuid objectToMerge) {
-    Assert.isNotNull(objectToMerge);
-    synchronized (objectToMerge) {
-      boolean updated = fIsPermaLink != objectToMerge.isPermaLink();
-      fIsPermaLink = objectToMerge.isPermaLink();
-      updated |= !MergeUtils.equals(fValue, objectToMerge.getValue());
-      fValue = objectToMerge.getValue();
-      MergeResult mergeResult = new MergeResult();
-      if (updated)
-        mergeResult.addUpdatedObject(this);
-
-      return mergeResult;
-    }
   }
 }

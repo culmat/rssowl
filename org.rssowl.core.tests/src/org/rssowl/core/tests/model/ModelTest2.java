@@ -1071,7 +1071,7 @@ public class ModelTest2 {
       final IPerson person2 = fFactory.createPerson(null, news1);
       person2.setName("Person2");
       fFactory.createSource(news1).setLink(new URI("http://www.source1.com"));
-      fFactory.createGuid(news1, "Guid1");
+      fFactory.createGuid(news1, "Guid1", null);
 
       final NewsReference[] newsRef = new NewsReference[1];
       newsAdapter = new NewsAdapter() {
@@ -1091,7 +1091,7 @@ public class ModelTest2 {
       news2.setTitle("News2 Title");
       news2.setLink(new URI("http://www.news.com/news2.html"));
       fFactory.createSource(news2).setLink(new URI("http://www.source2.com"));
-      fFactory.createGuid(news2, "Guid2");
+      fFactory.createGuid(news2, "Guid2", null);
       /* Must save parent because it gets changed during creation of news */
       DynamicDAO.save(feedRef.resolve());
       final NewsReference newsRef2 = newsRef[0];
@@ -1100,7 +1100,7 @@ public class ModelTest2 {
       news3.setTitle("News3 Title");
       news3.setLink(new URI("http://www.news.com/news3.html"));
       fFactory.createSource(news3).setLink(new URI("http://www.source3.com"));
-      fFactory.createGuid(news3, "Guid3");
+      fFactory.createGuid(news3, "Guid3", null);
       /* Must save parent because it gets changed during creation of news */
       DynamicDAO.save(feedRef.resolve());
       final NewsReference newsRef3 = newsRef[0];
@@ -1273,7 +1273,7 @@ public class ModelTest2 {
       person.setName("Person Name");
       fFactory.createCategory(null, news);
       fFactory.createSource(news);
-      fFactory.createGuid(news, "Guid Value");
+      fFactory.createGuid(news, "Guid Value", null);
       fFactory.createAttachment(null, news);
       fFactory.createAttachment(null, news);
       fFactory.createAttachment(null, news);

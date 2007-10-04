@@ -30,7 +30,6 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.rssowl.core.internal.persist.DefaultModelFactory;
 import org.rssowl.core.persist.IFeed;
-import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 
@@ -65,23 +64,19 @@ public class INewsTest {
 
     INews news1 = fFactory.createNews(null, feed, new Date());
     String link = "www.link.com";
-    news1.setGuid(fFactory.createGuid(news1, link));
-    news1.getGuid().setPermaLink(false);
+    fFactory.createGuid(news1, link, false);
     news1.setLink(new URI(link));
 
     INews news2 = fFactory.createNews(null, feed, new Date());
-    news2.setGuid(fFactory.createGuid(news2, link));
-    news2.getGuid().setPermaLink(false);
+    fFactory.createGuid(news2, link, false);
     news2.setLink(new URI(link));
 
     INews news3 = fFactory.createNews(null, feed, new Date());
-    news3.setGuid(fFactory.createGuid(news3, "http://www.anotherlink.com"));
-    news3.getGuid().setPermaLink(false);
+    fFactory.createGuid(news3, "http://www.anotherlink.com", false);
     news3.setLink(new URI(link));
 
     INews news4 = fFactory.createNews(null, feed, new Date());
-    news4.setGuid(fFactory.createGuid(news4, link));
-    news4.getGuid().setPermaLink(false);
+    fFactory.createGuid(news4, link, false);
     news4.setLink(new URI("www.anotherlink2.com"));
 
     assertTrue(news1.isEquivalent(news2));
@@ -108,13 +103,11 @@ public class INewsTest {
 
     INews news1 = fFactory.createNews(null, feed, new Date());
     String link = "www.link.com";
-    news1.setGuid(fFactory.createGuid(news1, link));
-    news1.getGuid().setPermaLink(true);
+    fFactory.createGuid(news1, link, true);
     news1.setLink(new URI(link));
 
     INews news2 = fFactory.createNews(null, feed, new Date());
-    news2.setGuid(fFactory.createGuid(news2, link));
-    news2.getGuid().setPermaLink(false);
+    fFactory.createGuid(news2, link, false);
     news2.setLink(new URI(link));
 
     assertTrue(news1.isEquivalent(news2));
@@ -123,6 +116,7 @@ public class INewsTest {
   /**
    * Tests isEquivalent when one of the Guids is null and the other has
    * permaLink == true.
+   * @throws URISyntaxException
    */
   @Test
   public void testIsEquivalentWithNullGuid() throws URISyntaxException {
@@ -130,8 +124,7 @@ public class INewsTest {
 
     INews news1 = fFactory.createNews(null, feed, new Date());
     String link = "www.link.com";
-    news1.setGuid(fFactory.createGuid(news1, link));
-    news1.getGuid().setPermaLink(true);
+    fFactory.createGuid(news1, link, true);
     news1.setLink(new URI(link));
 
     INews news2 = fFactory.createNews(null, feed, new Date());
@@ -148,16 +141,13 @@ public class INewsTest {
   public void testMergeGuidPermalink() throws Exception {
     IFeed parent = fFactory.createFeed(null, new URI("http://www.feed.com"));
     INews news = fFactory.createNews(null, parent, new Date());
-    IGuid guid = fFactory.createGuid(news, "www.news.com");
-    news.setGuid(guid);
-    guid.setPermaLink(true);
+    fFactory.createGuid(news, "www.news.com", true);
 
     URI newsLink = new URI("http://www.news.com");
     news.setLink(newsLink);
     INews otherNews = fFactory.createNews(null, parent, new Date());
     otherNews.setLink(newsLink);
-    IGuid otherGuid = fFactory.createGuid(otherNews, "www.news.com");
-    otherGuid.setPermaLink(false);
+    fFactory.createGuid(otherNews, "www.news.com", false);
 
     news.merge(otherNews);
     assertEquals(false, news.getGuid().isPermaLink());

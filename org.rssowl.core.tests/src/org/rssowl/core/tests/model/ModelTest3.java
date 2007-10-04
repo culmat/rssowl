@@ -374,7 +374,7 @@ public class ModelTest3 {
       IFeed feed = createFeed(url);
       INews news = fFactory.createNews(null, feed, new Date());
       news.setTitle("News Title Case_6");
-      news.setGuid(fFactory.createGuid(news, "News_Case_6_Guid"));
+      fFactory.createGuid(news, "News_Case_6_Guid", null);
       news.setPublishDate(new Date(time));
       FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
@@ -387,7 +387,7 @@ public class ModelTest3 {
       feed = createFeed(url);
       news = fFactory.createNews(null, feed, new Date());
       news.setTitle("News Title Case_6");
-      news.setGuid(fFactory.createGuid(news, "News_Case_6_Guid"));
+      fFactory.createGuid(news, "News_Case_6_Guid", null);
       news.setDescription(description + "updated#3");
       IFeed mergedFeed = feedRef.resolve();
       mergedFeed.merge(feed);
@@ -405,7 +405,7 @@ public class ModelTest3 {
       INews news = fFactory.createNews(null, feed, new Date());
       news.setTitle("News Title Case_8");
       news.setLink(new URI("http://www.news-case8.com/index.html"));
-      news.setGuid(fFactory.createGuid(news, "News_Case_8_Guid"));
+      fFactory.createGuid(news, "News_Case_8_Guid", null);
       news.setPublishDate(new Date(time));
       FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
@@ -419,7 +419,7 @@ public class ModelTest3 {
       news = fFactory.createNews(null, feed, new Date());
       news.setTitle("News Title Case_8");
       news.setLink(new URI("http://www.news-case8.com/index.html"));
-      news.setGuid(fFactory.createGuid(news, "News_Case_8_Guid"));
+      fFactory.createGuid(news, "News_Case_8_Guid", null);
       news.setPublishDate(new Date(System.currentTimeMillis() + 1000));
       news.setDescription(description + "updated#4");
       IFeed mergedFeed = feedRef.resolve();
@@ -509,14 +509,14 @@ public class ModelTest3 {
         IFeed feed = createFeed(url);
         INews news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_3");
-        news.setGuid(fFactory.createGuid(news, "News_Case_3_Guid"));
+        fFactory.createGuid(news, "News_Case_3_Guid", null);
         FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
         /* a) Add the same News */
         feed = createFeed(url);
         news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_3");
-        news.setGuid(fFactory.createGuid(news, "News_Case_3_Guid"));
+        fFactory.createGuid(news, "News_Case_3_Guid", null);
         IFeed mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
         feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
@@ -532,7 +532,7 @@ public class ModelTest3 {
         feed = createFeed(url);
         news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_3 Updated");
-        news.setGuid(fFactory.createGuid(news, "News_Case_3_Guid"));
+        fFactory.createGuid(news, "News_Case_3_Guid", null);
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
         feedRef = new FeedReference(DynamicDAO.save(mergedFeed).getId());
@@ -646,7 +646,7 @@ public class ModelTest3 {
         IFeed feed = createFeed(url);
         INews news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_6");
-        news.setGuid(fFactory.createGuid(news, "News_Case_6_Guid"));
+        fFactory.createGuid(news, "News_Case_6_Guid", null);
         news.setPublishDate(new Date(time));
         FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
@@ -654,7 +654,7 @@ public class ModelTest3 {
         feed = createFeed(url);
         news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_6");
-        news.setGuid(fFactory.createGuid(news, "News_Case_6_Guid"));
+        fFactory.createGuid(news, "News_Case_6_Guid", null);
         news.setPublishDate(new Date(time));
         IFeed mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
@@ -671,7 +671,7 @@ public class ModelTest3 {
         feed = createFeed(url);
         news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_6 Updated");
-        news.setGuid(fFactory.createGuid(news, "News_Case_6_Guid"));
+        fFactory.createGuid(news, "News_Case_6_Guid", null);
         news.setPublishDate(new Date(time));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
@@ -683,7 +683,7 @@ public class ModelTest3 {
         feed = createFeed(url);
         news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_6");
-        news.setGuid(fFactory.createGuid(news, "News_Case_6_Guid_Updated"));
+        fFactory.createGuid(news, "News_Case_6_Guid_Updated", null);
         news.setPublishDate(new Date(time));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
@@ -699,7 +699,7 @@ public class ModelTest3 {
         feed = createFeed(url);
         news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_6");
-        news.setGuid(fFactory.createGuid(news, "News_Case_6_Guid"));
+        fFactory.createGuid(news, "News_Case_6_Guid", null);
         news.setPublishDate(new Date(time + 1000));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
@@ -720,7 +720,7 @@ public class ModelTest3 {
         IFeed feed = createFeed(url);
         INews news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_7");
-        news.setGuid(fFactory.createGuid(news, "News_Case_7_Guid"));
+        fFactory.createGuid(news, "News_Case_7_Guid", null);
         news.setLink(new URI("http://www.news-case7.com/index.html"));
         FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
@@ -728,7 +728,7 @@ public class ModelTest3 {
         feed = createFeed(url);
         news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_7");
-        news.setGuid(fFactory.createGuid(news, "News_Case_7_Guid"));
+        fFactory.createGuid(news, "News_Case_7_Guid", null);
         news.setLink(new URI("http://www.news-case7.com/index.html"));
         IFeed mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
@@ -745,7 +745,7 @@ public class ModelTest3 {
         feed = createFeed(url);
         news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_7 Updated");
-        news.setGuid(fFactory.createGuid(news, "News_Case_7_Guid"));
+        fFactory.createGuid(news, "News_Case_7_Guid", null);
         news.setLink(new URI("http://www.news-case7.com/index.html"));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
@@ -762,7 +762,7 @@ public class ModelTest3 {
         feed = createFeed(url);
         news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_7 Updated");
-        news.setGuid(fFactory.createGuid(news, "News_Case_7_Guid"));
+        fFactory.createGuid(news, "News_Case_7_Guid", null);
         news.setLink(new URI("http://www.news-case7.com/index-updated.html"));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
@@ -774,7 +774,7 @@ public class ModelTest3 {
         feed = createFeed(url);
         news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_7");
-        news.setGuid(fFactory.createGuid(news, "News_Case_7_Guid_Updated"));
+        fFactory.createGuid(news, "News_Case_7_Guid_Updated", null);
         news.setLink(new URI("http://www.news-case7.com/index.html"));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
@@ -791,7 +791,7 @@ public class ModelTest3 {
         INews news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_8");
         news.setLink(new URI("http://www.news-case8.com/index.html"));
-        news.setGuid(fFactory.createGuid(news, "News_Case_8_Guid"));
+        fFactory.createGuid(news, "News_Case_8_Guid", null);
         news.setPublishDate(new Date(time));
         FeedReference feedRef = new FeedReference(DynamicDAO.save(feed).getId());
 
@@ -800,7 +800,7 @@ public class ModelTest3 {
         news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_8");
         news.setLink(new URI("http://www.news-case8.com/index.html"));
-        news.setGuid(fFactory.createGuid(news, "News_Case_8_Guid"));
+        fFactory.createGuid(news, "News_Case_8_Guid", null);
         news.setPublishDate(new Date(time));
         IFeed mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
@@ -818,7 +818,7 @@ public class ModelTest3 {
         news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_8 Updated");
         news.setLink(new URI("http://www.news-case8.com/index.html"));
-        news.setGuid(fFactory.createGuid(news, "News_Case_8_Guid"));
+        fFactory.createGuid(news, "News_Case_8_Guid", null);
         news.setPublishDate(new Date(time));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
@@ -836,7 +836,7 @@ public class ModelTest3 {
         news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_8");
         news.setLink(new URI("http://www.news-case8.com/index.html"));
-        news.setGuid(fFactory.createGuid(news, "News_Case_8_Guid_Updated"));
+        fFactory.createGuid(news, "News_Case_8_Guid_Updated", null);
         news.setPublishDate(new Date(time));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
@@ -853,7 +853,7 @@ public class ModelTest3 {
         news = fFactory.createNews(null, feed, new Date());
         news.setTitle("News Title Case_8");
         news.setLink(new URI("http://www.news-case8.com/index.html"));
-        news.setGuid(fFactory.createGuid(news, "News_Case_8_Guid"));
+        fFactory.createGuid(news, "News_Case_8_Guid", null);
         news.setPublishDate(new Date(System.currentTimeMillis() + 1000));
         mergedFeed = feedRef.resolve();
         mergedFeed.merge(feed);
