@@ -92,6 +92,12 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     createResources();
   }
 
+  void updateResources() {
+
+    /* Sticky Color */
+    fStickyBgColor = OwlUI.getThemeColor(OwlUI.STICKY_BG_COLOR_ID, fResources, new RGB(255, 255, 128));
+  }
+
   private void createResources() {
 
     /* Images */
@@ -114,6 +120,9 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     fGroupFgColor = OwlUI.getColor(fResources, OwlUI.GROUP_FG_COLOR);
   }
 
+  /*
+   * @see org.eclipse.jface.viewers.CellLabelProvider#update(org.eclipse.jface.viewers.ViewerCell)
+   */
   @Override
   public void update(ViewerCell cell) {
     Object element = cell.getElement();

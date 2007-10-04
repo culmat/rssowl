@@ -35,8 +35,10 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.util.OpenStrategy;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -203,6 +205,7 @@ public class BookMarkExplorer extends ViewPart {
   private IPartListener2 fPartListener;
   private NewsService fNewsService;
   private IPreferenceDAO fPrefDAO;
+  private IPropertyChangeListener fPropertyChangeListener;
 
   /**
    * Returns the preferences key for the selected bookmark set for the given
@@ -1202,11 +1205,26 @@ public class BookMarkExplorer extends ViewPart {
     };
 
     fViewSite.getPage().addPartListener(fPartListener);
+
+    /* Refresh Viewer when Sticky Color Changes */
+    fPropertyChangeListener = new IPropertyChangeListener() {
+      public void propertyChange(PropertyChangeEvent event) {
+        if (fViewer.getControl().isDisposed())
+          return;
+
+        if (OwlUI.STICKY_BG_COLOR_ID.equals(event.getProperty())) {
+          ((BookMarkLabelProvider) fLabelProvider).updateResources();
+          fViewer.refresh(true);
+        }
+      }
+    };
+    PlatformUI.getWorkbench().getThemeManager().addPropertyChangeListener(fPropertyChangeListener);
   }
 
   private void unregisterListeners() {
     DynamicDAO.removeEntityListener(IFolder.class, fFolderListener);
     fViewSite.getPage().removePartListener(fPartListener);
+    PlatformUI.getWorkbench().getThemeManager().removePropertyChangeListener(fPropertyChangeListener);
   }
 
   private void hookGlobalActions() {

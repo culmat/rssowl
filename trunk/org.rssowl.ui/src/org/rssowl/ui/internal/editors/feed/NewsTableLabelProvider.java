@@ -100,6 +100,12 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     createResources();
   }
 
+  void updateResources() {
+
+    /* Sticky Color */
+    fStickyBgColor = OwlUI.getThemeColor(OwlUI.STICKY_BG_COLOR_ID, fResources, new RGB(255, 255, 128));
+  }
+
   private void createResources() {
 
     /* Colors */

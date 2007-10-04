@@ -35,6 +35,8 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -60,6 +62,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
@@ -189,6 +192,7 @@ public class NewsTableControl implements IFeedViewPart {
   private JobTracker fNewsStateTracker;
   private NewsTableViewer fViewer;
   private ISelectionChangedListener fSelectionChangeListener;
+  private IPropertyChangeListener fPropertyChangeListener;
   private CTree fCustomTree;
   private LocalResourceManager fResources;
   private NewsComparator fNewsSorter;
@@ -433,6 +437,20 @@ public class NewsTableControl implements IFeedViewPart {
       }
     };
     DynamicDAO.addEntityListener(ILabel.class, fLabelListener);
+
+    /* Refresh Viewer when Sticky Color Changes */
+    fPropertyChangeListener = new IPropertyChangeListener() {
+      public void propertyChange(PropertyChangeEvent event) {
+        if (fViewer.getControl().isDisposed())
+          return;
+
+        if (OwlUI.STICKY_BG_COLOR_ID.equals(event.getProperty())) {
+          ((NewsTableLabelProvider) fViewer.getLabelProvider()).updateResources();
+          fViewer.refresh(true);
+        }
+      }
+    };
+    PlatformUI.getWorkbench().getThemeManager().addPropertyChangeListener(fPropertyChangeListener);
   }
 
   private void onMouseDoubleClick(DoubleClickEvent event) {
@@ -734,6 +752,7 @@ public class NewsTableControl implements IFeedViewPart {
   private void unregisterListeners() {
     fViewer.removePostSelectionChangedListener(fSelectionChangeListener);
     DynamicDAO.removeEntityListener(ILabel.class, fLabelListener);
+    PlatformUI.getWorkbench().getThemeManager().removePropertyChangeListener(fPropertyChangeListener);
   }
 
   private void setNewsState(List<INews> news, INews.State state) {
