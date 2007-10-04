@@ -588,6 +588,21 @@
             id="org.rssowl.ui.CleanUpAction"
             name="Clean Up">
       </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.SendLinkAction"
+            name="Send Link">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.CopyLinkAction"
+            name="Copy Link">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.OpenInBrowserAction"
+            name="Open in Browser">
+      </command>
    </extension>
    <extension
          id="product"
