@@ -143,8 +143,8 @@ public class DefaultModelFactory implements IModelFactory {
    * @see org.rssowl.core.model.types.IModelFactory#createGuid(org.rssowl.core.model.types.INews,
    * java.lang.String)
    */
-  public IGuid createGuid(final INews news, String value) {
-    Guid guid = new Guid(value);
+  public IGuid createGuid(final INews news, String value, Boolean permaLink) {
+    Guid guid = new Guid(value, permaLink);
 
     /* Automatically set to the News */
     news.setGuid(guid);

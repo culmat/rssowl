@@ -112,7 +112,7 @@ public class DublinCoreNamespaceHandler implements INamespaceHandler {
 
     /* Identifier */
     else if ("identifier".equals(name) && type instanceof INews) { //$NON-NLS-1$
-      Owl.getModelFactory().createGuid((INews) type, element.getText());
+      Owl.getModelFactory().createGuid((INews) type, element.getText(), null);
     }
 
     /* Source */

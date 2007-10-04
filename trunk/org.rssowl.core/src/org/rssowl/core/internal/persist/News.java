@@ -184,10 +184,8 @@ public class News extends AbstractEntity implements INews {
       if (fLink == null) {
         fLink = createURI(fLinkText);
         fFeedLinkReference = new FeedLinkReference(createURI(fFeedLink));
-        if (fGuidValue != null) {
-          fGuid = new Guid(fGuidValue);
-          fGuid.setPermaLink(fGuidIsPermaLink);
-        }
+        if (fGuidValue != null)
+          fGuid = new Guid(fGuidValue, fGuidIsPermaLink);
       }
     } finally {
       fLock.releaseWriteLock();
@@ -884,7 +882,7 @@ public class News extends AbstractEntity implements INews {
       updated |= processListMergeResult(result, mergeAttachments(news.getAttachments()));
       updated |= processListMergeResult(result, mergeCategories(news.getCategories()));
       updated |= processListMergeResult(result, mergeAuthor(news.getAuthor()));
-      updated |= processListMergeResult(result, mergeGuid(news.getGuid()));
+      updated |= mergeGuid(news.getGuid());
       updated |= processListMergeResult(result, mergeSource(news.getSource()));
       updated |= !simpleFieldsEqual(news);
 
@@ -936,10 +934,20 @@ public class News extends AbstractEntity implements INews {
     return false;
   }
 
-  private ComplexMergeResult<IGuid> mergeGuid(IGuid guid) {
-    ComplexMergeResult<IGuid> mergeResult = MergeUtils.merge(getGuid(), guid);
-    setGuid(mergeResult.getMergedObject());
-    return mergeResult;
+  private boolean mergeGuid(IGuid guid) {
+    if (fGuid == null && guid == null)
+      return false;
+
+    if ((fGuid == null && guid != null) || (!areGuidsIdentical(fGuid, guid))) {
+      setGuid(guid);
+      return true;
+    }
+
+    return false;
+  }
+
+  private boolean areGuidsIdentical(IGuid g0, IGuid g1) {
+    return g0.getValue().equals(g1.getValue()) && g0.isPermaLink() == g1.isPermaLink();
   }
 
   private ComplexMergeResult<ISource> mergeSource(ISource source) {

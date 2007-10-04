@@ -175,7 +175,7 @@ public class ApplicationLayerTest {
     try {
       IFeed feed = fFactory.createFeed(null, new URI("http://www.rssowl.org"));
       INews news = fFactory.createNews(null, feed, new Date());
-      news.setGuid(fFactory.createGuid(news, "newsguid"));
+      fFactory.createGuid(news, "newsguid", null);
       fFactory.createAttachment(null, news);
       IFolder folder = fFactory.createFolder(null, null, "Folder");
       IBookMark mark = fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "Mark");
@@ -184,7 +184,7 @@ public class ApplicationLayerTest {
 
       IFeed emptyFeed = fFactory.createFeed(null, feed.getLink());
       INews emptyNews = fFactory.createNews(null, emptyFeed, new Date());
-      emptyNews.setGuid(fFactory.createGuid(news, news.getGuid().getValue()));
+      fFactory.createGuid(emptyNews, news.getGuid().getValue(), null);
 
       newsListener = new NewsAdapter() {
         @Override
@@ -257,13 +257,11 @@ public class ApplicationLayerTest {
       IFeed feed2 = fFactory.createFeed(null, new URI("http://www.feed2.com"));
 
       INews news1 = fFactory.createNews(null, feed1, new Date());
-      news1.setGuid(fFactory.createGuid(news1, "guid1"));
-      news1.getGuid().setPermaLink(true);
+      fFactory.createGuid(news1, "guid1", true);
       news1.setLink(new URI("www.link.com"));
 
       final INews news2 = fFactory.createNews(null, feed2, new Date());
-      news2.setGuid(fFactory.createGuid(news2, "guid2"));
-      news2.getGuid().setPermaLink(true);
+      fFactory.createGuid(news2, "guid2", true);
       news2.setLink(new URI("www.link.com"));
 
       fFactory.createNews(null, feed1, new Date());
@@ -1115,23 +1113,19 @@ public class ApplicationLayerTest {
 
       INews news1 = fFactory.createNews(null, feed1, new Date());
       String link = "www.link.com";
-      news1.setGuid(fFactory.createGuid(news1, link));
-      news1.getGuid().setPermaLink(false);
+      fFactory.createGuid(news1, link, false);
       news1.setLink(new URI(link));
 
       INews news2 = fFactory.createNews(null, feed2, new Date());
-      news2.setGuid(fFactory.createGuid(news2, link));
-      news2.getGuid().setPermaLink(false);
+      fFactory.createGuid(news2, link, false);
       news2.setLink(new URI(link));
 
       INews news3 = fFactory.createNews(null, feed3, new Date());
-      news3.setGuid(fFactory.createGuid(news3, "http://www.anotherlink.com"));
-      news3.getGuid().setPermaLink(false);
+      fFactory.createGuid(news3, "http://www.anotherlink.com", false);
       news3.setLink(new URI(link));
 
       INews news4 = fFactory.createNews(null, feed4, new Date());
-      news4.setGuid(fFactory.createGuid(news4, link));
-      news4.getGuid().setPermaLink(false);
+      fFactory.createGuid(news4, link, false);
       news4.setLink(new URI("www.anotherlink2.com"));
 
       /* Create one more news for each feed */

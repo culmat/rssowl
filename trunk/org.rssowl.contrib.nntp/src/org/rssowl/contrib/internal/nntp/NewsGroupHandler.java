@@ -475,8 +475,7 @@ public class NewsGroupHandler implements IProtocolHandler {
   }
 
   private void interpretMessageId(INews news, String value) {
-    IGuid guid = Owl.getModelFactory().createGuid(news, value.trim());
-    news.setGuid(guid);
+    Owl.getModelFactory().createGuid(news, value.trim(), null);
     news.setInReplyTo(value);
   }
 
