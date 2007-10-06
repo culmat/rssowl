@@ -62,6 +62,7 @@ import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.persist.service.IModelSearch;
@@ -160,6 +161,7 @@ public class PerformanceTest {
 
     List<ITask> tasks = getRealWorldReloadTasks(feedFolder.getAbsolutePath());
 
+    System.gc();
     /* Initial Reload */
     System.out.println("Reloading Real Word Feeds: " + FEEDS + " Feeds [Initial - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
 
@@ -180,8 +182,13 @@ public class PerformanceTest {
       copy(zin, outS);
     }
 
+    System.gc();
     /* Second Reload */
     System.out.println("Reloading Real Word Feeds: " + FEEDS + " Feeds [Second - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
+ 
+    System.gc();
+	/* Third Reload */
+    System.out.println("Reloading Real Word Feeds: " + FEEDS + " Feeds [Third - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
   }
 
   private static void copy(ZipInputStream zis, OutputStream fos) {
@@ -220,7 +227,8 @@ public class PerformanceTest {
         feed = DynamicDAO.save(feed);
 
         IBookMark bookmark = new BookMark(null, rootFolder, new FeedLinkReference(feed.getLink()), "Bookmark");
-
+        IPreferenceScope entityScope = Owl.getPreferenceService().getEntityScope(bookmark);
+        entityScope.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 50);
         rootFolder.addMark(bookmark, null, false);
         DynamicDAO.save(rootFolder);
       } catch (Exception e) {
