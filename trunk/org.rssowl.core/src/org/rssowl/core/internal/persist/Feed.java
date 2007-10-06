@@ -37,6 +37,7 @@ import org.rssowl.core.util.MergeUtils;
 import java.net.URI;
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -808,9 +809,10 @@ public class Feed extends AbstractEntity implements IFeed {
 
   private ComplexMergeResult<List<INews>> mergeNews(List<INews> newsList, boolean cleanUp) {
     List<INews> newsListCopy = copyWithoutDuplicates(newsList);
-    List<Integer> newsToCleanUp = null;
+    int[] newsToCleanUp = null;
+    int newsToCleanUpSize = 0;
     if (cleanUp) {
-      newsToCleanUp = new ArrayList<Integer>(fNews.size() / 2);
+      newsToCleanUp = new int[fNews.size() / 2];
     }
     ComplexMergeResult<List<INews>> mergeResult = ComplexMergeResult.create(newsListCopy);
     for (int i = fNews.size() - 1; i >= 0; --i) {
@@ -820,18 +822,42 @@ public class Feed extends AbstractEntity implements IFeed {
       if (existingNewsIndex > -1) {
         mergeResult.addAll(existingNews.merge(newsListCopy.get(existingNewsIndex)));
         newsListCopy.remove(existingNewsIndex);
-      } else if ((newsToCleanUp != null) && (existingNews.getState() == INews.State.DELETED))
-        newsToCleanUp.add(Integer.valueOf(i));
+      } else if ((newsToCleanUp != null) && (existingNews.getState() == INews.State.DELETED)) {
+        newsToCleanUp = ensureCapacity(newsToCleanUp, newsToCleanUpSize + 1);
+        newsToCleanUp[newsToCleanUpSize++] = i;
+      }
     }
     if (newsToCleanUp != null) {
+      mergeResult.setStructuralChange(true);
+
       /*
-       * indices are stored in decreasing order in newsToCleanUp so we iterate
-       * in increasing order.
+       * These numbers were found through experimentation. It's possible that a
+       * better way to decide when to run this exists.
        */
-      for (int i = 0, c = newsToCleanUp.size(); i < c; ++i) {
-        INews news = fNews.remove(newsToCleanUp.get(i).intValue());
-        mergeResult.addRemovedObject(news);
-        mergeResult.setStructuralChange(true);
+      if (newsToCleanUpSize > 20 || (newsToCleanUpSize > 5 && (fNews.size() / newsToCleanUpSize < 5))) {
+        reverseArray(newsToCleanUp, newsToCleanUpSize);
+        for (int i = 0, c = fNews.size(), newIndex = 0; i < c; ++i) {
+          if (Arrays.binarySearch(newsToCleanUp, i) < 0) {
+            fNews.set(newIndex, fNews.get(i));
+            ++newIndex;
+          } else {
+            mergeResult.addRemovedObject(fNews.get(i));
+          }
+        }
+        int newSize = fNews.size() - newsToCleanUpSize;
+        for (int i = fNews.size() - 1; i >= newSize; --i) {
+          fNews.remove(i);
+        }
+      }
+      else {
+        /*
+         * indices are stored in decreasing order in newsToCleanUp so we iterate
+         * in increasing order.
+         */
+        for (int i = 0, c = newsToCleanUpSize; i < c; ++i) {
+          INews news = fNews.remove(newsToCleanUp[i]);
+          mergeResult.addRemovedObject(news);
+        }
       }
 
     }
@@ -842,6 +868,29 @@ public class Feed extends AbstractEntity implements IFeed {
       mergeResult.addUpdatedObject(news);
     }
     return mergeResult;
+  }
+
+  private void reverseArray(int[] newsToCleanUp, int newsToCleanUpSize) {
+    for (int left = 0, right = newsToCleanUpSize -1 ; left < right; left++, right--) {
+      int temp = newsToCleanUp[left];
+      newsToCleanUp[left]  = newsToCleanUp[right];
+      newsToCleanUp[right] = temp;
+    }
+  }
+
+  private int[] ensureCapacity(int[] array, int minCapacity) {
+    int oldCapacity = array.length;
+    if (minCapacity > oldCapacity) {
+      int oldData[] = array;
+      int newCapacity = (oldCapacity * 3) / 2 + 1;
+      if (newCapacity < minCapacity)
+        newCapacity = minCapacity;
+      // minCapacity is usually close to size, so this is a win:
+      int[] copy = new int[newCapacity];
+      System.arraycopy(array, 0, copy, 0, Math.min(oldData.length, newCapacity));
+      return copy;
+    }
+    return array;
   }
 
   private List<INews> copyWithoutDuplicates(List<INews> newsList) {
