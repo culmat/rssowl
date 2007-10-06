@@ -75,10 +75,14 @@ import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.SavedSearchService;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -89,6 +93,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * @author bpasero
@@ -116,6 +122,120 @@ public class PerformanceTest {
     fModelSearch.shutdown();
     fPluginLocation = FileLocator.toFileURL(Platform.getBundle("org.rssowl.core.tests").getEntry("/")).toURI();
     fController = Controller.getDefault();
+  }
+
+  /**
+   * @throws Exception
+   */
+  @SuppressWarnings("nls")
+  @Test
+  public void realWorldReloadTest() throws Exception {
+    File corpus1Folder = new File(fPluginLocation.resolve("data/performance/corpus_10-03-07"));
+    File corpus2Folder = new File(fPluginLocation.resolve("data/performance/corpus_10-06-07"));
+
+    /* Copy Feeds of corpus_10-03-07 to temp location */
+    File tmpFolder = new File(System.getProperty("java.io.tmpdir"));
+    File feedFolder = new File(tmpFolder.getAbsolutePath(), "rssowlfeeds");
+    feedFolder.mkdir();
+    feedFolder.deleteOnExit();
+
+    File zipFile = corpus1Folder.listFiles()[0];
+    FileInputStream fis = new FileInputStream(zipFile);
+    ZipInputStream zin = new ZipInputStream(new BufferedInputStream(fis));
+    ZipEntry entry;
+    while ((entry = zin.getNextEntry()) != null) {
+      File outputFile = new File(feedFolder, entry.getName());
+      outputFile.deleteOnExit();
+
+      FileOutputStream outS = new FileOutputStream(outputFile);
+      copy(zin, outS);
+    }
+
+    List<ITask> tasks = getRealWorldReloadTasks(feedFolder.getAbsolutePath());
+
+    /* Initial Reload */
+    System.out.println("Reloading Real Word Feeds: " + FEEDS + " Feeds [Initial - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
+
+    /* Copy Feeds of corpus_10-06-07 to temp location */
+    File[] feedFiles = feedFolder.listFiles();
+    for (File file : feedFiles) {
+      file.delete();
+    }
+
+    zipFile = corpus2Folder.listFiles()[0];
+    fis = new FileInputStream(zipFile);
+    zin = new ZipInputStream(new BufferedInputStream(fis));
+    while ((entry = zin.getNextEntry()) != null) {
+      File outputFile = new File(feedFolder, entry.getName());
+      outputFile.deleteOnExit();
+
+      FileOutputStream outS = new FileOutputStream(outputFile);
+      copy(zin, outS);
+    }
+
+    /* Second Reload */
+    System.out.println("Reloading Real Word Feeds: " + FEEDS + " Feeds [Second - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
+  }
+
+  private static void copy(ZipInputStream zis, OutputStream fos) {
+    try {
+      int count;
+      final int BUFFER = 2048;
+      byte data[] = new byte[BUFFER];
+
+      BufferedOutputStream dest = new BufferedOutputStream(fos, BUFFER);
+      while ((count = zis.read(data, 0, BUFFER)) != -1) {
+        dest.write(data, 0, count);
+      }
+
+      dest.flush();
+      dest.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private List<ITask> getRealWorldReloadTasks(String feedDirectory) {
+    List<ITask> tasks = new ArrayList<ITask>();
+
+    /* Create Folder with all Bookmarks */
+    IFolder rootFolder = new Folder(null, null, "Root");
+    for (int i = 1; i < FEEDS + 1; i++) {
+      try {
+        File file = new File(feedDirectory, i + ".xml");
+        if (!file.exists())
+          continue;
+
+        URI feedLink = file.toURI();
+
+        IFeed feed = new Feed(feedLink);
+
+        feed = DynamicDAO.save(feed);
+
+        IBookMark bookmark = new BookMark(null, rootFolder, new FeedLinkReference(feed.getLink()), "Bookmark");
+
+        rootFolder.addMark(bookmark, null, false);
+        DynamicDAO.save(rootFolder);
+      } catch (Exception e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
+    }
+
+    /* Create Tasks */
+    List<IMark> marks = rootFolder.getMarks();
+    for (IMark mark : marks) {
+      if (mark instanceof IBookMark) {
+        final IBookMark bookmark = (IBookMark) mark;
+
+        tasks.add(new TaskAdapter() {
+          public IStatus run(IProgressMonitor monitor) {
+            return fController.reload(bookmark, null, new NullProgressMonitor());
+          }
+        });
+      }
+    }
+
+    return tasks;
   }
 
   /**
@@ -831,8 +951,7 @@ public class PerformanceTest {
         for (FeedLinkReference feedRef : feedRefs) {
           if (resolveFeed) {
             news.addAll(feedRef.resolve().getNewsByStates(unreadStates));
-          }
-          else {
+          } else {
             news.addAll(newsDAO.loadAll(feedRef, unreadStates));
           }
         }
