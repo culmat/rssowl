@@ -77,6 +77,7 @@ import org.rssowl.ui.internal.SavedSearchService;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -102,7 +103,7 @@ import java.util.zip.ZipInputStream;
 public class PerformanceTest {
 
   /* Define the number of Feeds here (1 - 216) */
-  private static final int FEEDS = 200;
+  private static final int FEEDS = 20;
 
   /* Number of Jobs per JobQueue */
   private static final int JOBS = 10;
@@ -139,7 +140,13 @@ public class PerformanceTest {
     feedFolder.mkdir();
     feedFolder.deleteOnExit();
 
-    File zipFile = corpus1Folder.listFiles()[0];
+    FileFilter filter = new FileFilter() {
+      public boolean accept(File pathname) {
+       return pathname.getName().contains("zip");
+      }
+    };
+
+    File zipFile = corpus1Folder.listFiles(filter)[0];
     FileInputStream fis = new FileInputStream(zipFile);
     ZipInputStream zin = new ZipInputStream(new BufferedInputStream(fis));
     ZipEntry entry;
@@ -162,7 +169,7 @@ public class PerformanceTest {
       file.delete();
     }
 
-    zipFile = corpus2Folder.listFiles()[0];
+    zipFile = corpus2Folder.listFiles(filter)[0];
     fis = new FileInputStream(zipFile);
     zin = new ZipInputStream(new BufferedInputStream(fis));
     while ((entry = zin.getNextEntry()) != null) {
