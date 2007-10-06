@@ -103,7 +103,7 @@ import java.util.zip.ZipInputStream;
 public class PerformanceTest {
 
   /* Define the number of Feeds here (1 - 216) */
-  private static final int FEEDS = 20;
+  private static final int FEEDS = 200;
 
   /* Number of Jobs per JobQueue */
   private static final int JOBS = 10;
