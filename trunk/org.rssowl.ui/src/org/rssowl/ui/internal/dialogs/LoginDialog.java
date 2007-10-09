@@ -42,6 +42,7 @@ import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
@@ -67,14 +68,17 @@ public class LoginDialog extends TitleAreaDialog {
   private Text fUsername;
   private Text fPassword;
   private ICredentialsProvider fCredProvider;
+  private String fRealm;
 
   /**
    * @param parentShell
    * @param link
+   * @param realm
    */
-  public LoginDialog(Shell parentShell, URI link) {
+  public LoginDialog(Shell parentShell, URI link, String realm) {
     super(parentShell);
     fLink = link;
+    fRealm = realm;
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fCredProvider = Owl.getConnectionService().getCredentialsProvider(link);
   }
@@ -114,8 +118,15 @@ public class LoginDialog extends TitleAreaDialog {
       };
 
       try {
-        if (fCredProvider != null)
-          fCredProvider.setAuthCredentials(credentials, fLink);
+        if (fCredProvider != null) {
+
+          /* Store for URI */
+          fCredProvider.setAuthCredentials(credentials, fLink, null);
+
+          /* Also store for Realm */
+          if (fRealm != null)
+            fCredProvider.setAuthCredentials(credentials, URIUtils.normalizeUri(fLink, true), fRealm);
+        }
       } catch (CredentialsException e) {
         Activator.getDefault().getLog().log(e.getStatus());
       }
@@ -204,7 +215,7 @@ public class LoginDialog extends TitleAreaDialog {
     ICredentials authCredentials = null;
     try {
       if (fCredProvider != null)
-        authCredentials = fCredProvider.getAuthCredentials(fLink);
+        authCredentials = fCredProvider.getAuthCredentials(fLink, fRealm);
     } catch (CredentialsException e) {
       Activator.getDefault().getLog().log(e.getStatus());
     }

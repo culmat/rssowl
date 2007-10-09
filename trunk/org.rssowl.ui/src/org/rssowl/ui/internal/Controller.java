@@ -40,6 +40,7 @@ import org.rssowl.core.IApplicationService;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
+import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.connection.UnknownFeedException;
@@ -73,6 +74,7 @@ import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TaskAdapter;
+import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyPageWrapper;
@@ -92,6 +94,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * <p>
@@ -167,6 +171,7 @@ public class Controller {
   private IPreferenceDAO fPrefsDAO;
   private ILabelDAO fLabelDao;
   private IModelFactory fFactory;
+  private Lock fLoginDialogLock = new ReentrantLock();
 
   /* Task to perform Reload-Operations */
   private class ReloadTask implements ITask {
@@ -506,27 +511,46 @@ public class Controller {
 
       /* Authentication Required */
       if (e instanceof AuthenticationRequiredException && shell != null && !shell.isDisposed() && !fShuttingDown) {
-        JobRunner.runInUIThread(shell, new Runnable() {
-          public void run() {
 
-            /* Check for shutdown flag and return if required */
-            if (fShuttingDown || monitor.isCanceled())
-              return;
+        /* Only one Login Dialog at the same time */
+        fLoginDialogLock.lock();
+        try {
+          final AuthenticationRequiredException authEx = (AuthenticationRequiredException) e;
+          JobRunner.runSyncedInUIThread(shell, new Runnable() {
+            public void run() {
 
-            /* Show Login Dialog */
-            LoginDialog login = new LoginDialog(shell, feedLink);
-            if (login.open() == Window.OK && !fShuttingDown)
-              reloadQueued(bookmark, shell);
+              /* Check for shutdown flag and return if required */
+              if (fShuttingDown || monitor.isCanceled())
+                return;
 
-            /* Update Error Flag if user hit Cancel */
-            else if (!fShuttingDown && !monitor.isCanceled() && !bookmark.isErrorLoading()) {
-              bookmark.setErrorLoading(true);
-              fBookMarkDAO.save(bookmark);
+              /* Credentials might have been provided meanwhile in another dialog */
+              try {
+                URI normalizedUri = URIUtils.normalizeUri(feedLink, true);
+                if (!fShuttingDown && Owl.getConnectionService().getAuthCredentials(normalizedUri, authEx.getRealm()) != null) {
+                  reloadQueued(bookmark, shell);
+                  return;
+                }
+              } catch (CredentialsException exe) {
+                Activator.getDefault().getLog().log(exe.getStatus());
+              }
+
+              /* Show Login Dialog */
+              LoginDialog login = new LoginDialog(shell, feedLink, authEx.getRealm());
+              if (login.open() == Window.OK && !fShuttingDown)
+                reloadQueued(bookmark, shell);
+
+              /* Update Error Flag if user hit Cancel */
+              else if (!fShuttingDown && !monitor.isCanceled() && !bookmark.isErrorLoading()) {
+                bookmark.setErrorLoading(true);
+                fBookMarkDAO.save(bookmark);
+              }
             }
-          }
-        });
+          });
 
-        return Status.OK_STATUS;
+          return Status.OK_STATUS;
+        } finally {
+          fLoginDialogLock.unlock();
+        }
       }
 
       /* Feed's Content has not modified since */
