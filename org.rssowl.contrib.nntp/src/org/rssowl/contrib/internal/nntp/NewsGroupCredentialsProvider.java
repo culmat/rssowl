@@ -59,11 +59,12 @@ public class NewsGroupCredentialsProvider extends PlatformCredentialsProvider {
   public void deleteProxyCredentials(URI link) {}
 
   /*
-   * @see org.rssowl.core.connection.internal.DefaultCredentialsProvider#getAuthCredentials(java.net.URI)
+   * @see org.rssowl.core.connection.PlatformCredentialsProvider#getAuthCredentials(java.net.URI,
+   * java.lang.String)
    */
   @Override
-  public ICredentials getAuthCredentials(URI link) {
-    return super.getAuthCredentials(URIUtils.normalizeUri(link));
+  public ICredentials getAuthCredentials(URI link, String realm) {
+    return super.getAuthCredentials(URIUtils.normalizeUri(link), realm);
   }
 
   /*
@@ -75,12 +76,12 @@ public class NewsGroupCredentialsProvider extends PlatformCredentialsProvider {
   }
 
   /*
-   * @see org.rssowl.core.connection.internal.DefaultCredentialsProvider#setAuthCredentials(org.rssowl.core.connection.auth.ICredentials,
-   * java.net.URI)
+   * @see org.rssowl.core.connection.PlatformCredentialsProvider#setAuthCredentials(org.rssowl.core.connection.ICredentials,
+   * java.net.URI, java.lang.String)
    */
   @Override
-  public void setAuthCredentials(ICredentials credentials, URI link) throws CredentialsException {
-    super.setAuthCredentials(credentials, URIUtils.normalizeUri(link));
+  public void setAuthCredentials(ICredentials credentials, URI link, String realm) throws CredentialsException {
+    super.setAuthCredentials(credentials, URIUtils.normalizeUri(link), realm);
   }
 
   /*

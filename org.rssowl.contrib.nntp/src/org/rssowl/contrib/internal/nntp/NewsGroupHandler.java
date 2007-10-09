@@ -45,7 +45,6 @@ import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
-import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
@@ -492,7 +491,7 @@ public class NewsGroupHandler implements IProtocolHandler {
   }
 
   private void setupAuthentication(URI link, NNTPClient client) throws CredentialsException, IOException {
-    ICredentials authCredentials = Owl.getConnectionService().getAuthCredentials(link);
+    ICredentials authCredentials = Owl.getConnectionService().getAuthCredentials(link, null);
     if (authCredentials != null)
       client.authenticate(authCredentials.getUsername(), authCredentials.getPassword());
   }
@@ -514,7 +513,7 @@ public class NewsGroupHandler implements IProtocolHandler {
 
   private void checkAuthenticationRequired(NNTPClient client) throws AuthenticationRequiredException {
     if (client.getReplyCode() == STATUS_AUTH_REQUIRED || client.getReplyCode() == STATUS_AUTH_REQUIRED_ALTERNATIVE)
-      throw new AuthenticationRequiredException(Activator.createErrorStatus("Authentication required!", null)); //$NON-NLS-1$
+      throw new AuthenticationRequiredException(null, Activator.createErrorStatus("Authentication required!", null)); //$NON-NLS-1$
   }
 
   private void throwConnectionException(String msg, NNTPClient client) throws ConnectionException {
