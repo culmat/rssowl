@@ -97,12 +97,13 @@ public class MyCredentialsProvider extends PlatformCredentialsProvider {
   }
 
   /*
-   * @see org.rssowl.core.connection.auth.DefaultCredentialsProvider#deleteAuthCredentials(java.net.URI)
+   * @see org.rssowl.core.connection.PlatformCredentialsProvider#deleteAuthCredentials(java.net.URI,
+   * java.lang.String)
    */
   @Override
-  public void deleteAuthCredentials(URI link) throws CredentialsException {
+  public void deleteAuthCredentials(URI link, String realm) throws CredentialsException {
     fAuthDeleted = true;
-    super.deleteAuthCredentials(link);
+    super.deleteAuthCredentials(link, realm);
   }
 
   /*
