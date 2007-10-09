@@ -91,7 +91,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     }
 
     /* Cache as unprotected */
-    if (!fUnprotectedLinksCache.contains(link.toString() + realm != null ? realm : REALM))
+    if (!fUnprotectedLinksCache.contains(link.toString()))
       fUnprotectedLinksCache.add(link.toString());
 
     /* Credentials not provided */
@@ -101,7 +101,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   private Map<?, ?> getAuthorizationInfo(URI link, String realm) {
 
     /* Check Cache first */
-    if (fUnprotectedLinksCache.contains(link.toString() + realm != null ? realm : REALM))
+    if (fUnprotectedLinksCache.contains(link.toString()))
       return null;
 
     /* Return from Platform */
@@ -185,7 +185,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     }
 
     /* Uncache */
-    fUnprotectedLinksCache.remove(link.toString() + realm != null ? realm : REALM);
+    fUnprotectedLinksCache.remove(link.toString());
   }
 
   /*
@@ -208,14 +208,15 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   }
 
   /*
-   * @see org.rssowl.core.connection.auth.ICredentialsProvider#deleteAuthCredentials(java.net.URI)
+   * @see org.rssowl.core.connection.ICredentialsProvider#deleteAuthCredentials(java.net.URI,
+   * java.lang.String)
    */
-  public void deleteAuthCredentials(URI link) throws CredentialsException {
+  public void deleteAuthCredentials(URI link, String realm) throws CredentialsException {
 
     /* Remove from Platform */
     try {
       URL urlLink = link.toURL();
-      Platform.flushAuthorizationInfo(urlLink, REALM, SCHEME);
+      Platform.flushAuthorizationInfo(urlLink, realm != null ? realm : REALM, SCHEME);
     } catch (CoreException e) {
       throw new CredentialsException(e.getStatus());
     } catch (MalformedURLException e) {

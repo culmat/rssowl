@@ -86,10 +86,11 @@ public interface ICredentialsProvider {
    * Deletes the credentials for the given Link from the provider.
    *
    * @param link The Link pointing to authentication Credentials
+   * @param realm The Realm to delete the credentials from.
    * @throws CredentialsException Checked Exception to be used in case of any
    * Exception.
    */
-  void deleteAuthCredentials(URI link) throws CredentialsException;
+  void deleteAuthCredentials(URI link, String realm) throws CredentialsException;
 
   /**
    * Deletes the proxy-credentials for the given Link from the provider.
