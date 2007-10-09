@@ -148,7 +148,12 @@ public class DefaultProtocolHandler implements IProtocolHandler {
         credProvider.setAuthCredentials(authCredentials, link, null);
 
         /* Reopen Stream */
-        inS = internalOpenStream(link, normalizedUri, e.getRealm(), properties);
+        try {
+          inS = internalOpenStream(link, normalizedUri, e.getRealm(), properties);
+        } catch (AuthenticationRequiredException ex) {
+          Owl.getConnectionService().getCredentialsProvider(normalizedUri).deleteAuthCredentials(normalizedUri, e.getRealm());
+          throw ex;
+        }
       }
 
       /* Otherwise throw exception to callee */

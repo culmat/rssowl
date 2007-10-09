@@ -119,7 +119,7 @@ public class ConnectionServiceImpl implements IConnectionService {
 
               /* Delete Auth Credentials if provided */
               if (credentialsProvider != null && credentialsProvider.getAuthCredentials(feedLink, null) != null)
-                credentialsProvider.deleteAuthCredentials(feedLink);
+                credentialsProvider.deleteAuthCredentials(feedLink, null);
             }
           } catch (CredentialsException e) {
             Activator.getDefault().getLog().log(e.getStatus());
