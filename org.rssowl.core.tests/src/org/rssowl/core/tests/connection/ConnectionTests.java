@@ -119,7 +119,7 @@ public class ConnectionTests {
       }
     };
 
-    credProvider.setAuthCredentials(credentials, feedUrl);
+    credProvider.setAuthCredentials(credentials, feedUrl, null);
 
     InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
     assertNotNull(inS);
@@ -271,12 +271,12 @@ public class ConnectionTests {
       }
     };
 
-    conManager.getCredentialsProvider(feedUrl).setAuthCredentials(authCreds, feedUrl);
+    conManager.getCredentialsProvider(feedUrl).setAuthCredentials(authCreds, feedUrl, null);
 
-    assertNotNull(conManager.getAuthCredentials(feedUrl));
+    assertNotNull(conManager.getAuthCredentials(feedUrl, null));
 
     DynamicDAO.delete(new FeedLinkReference(feedUrl).resolve());
 
-    assertNull(conManager.getAuthCredentials(feedUrl));
+    assertNull(conManager.getAuthCredentials(feedUrl, null));
   }
 }
