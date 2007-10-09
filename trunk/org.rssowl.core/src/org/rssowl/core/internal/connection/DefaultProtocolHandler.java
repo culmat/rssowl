@@ -30,6 +30,7 @@ import org.apache.commons.httpclient.NTCredentials;
 import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.auth.AuthState;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.httpclient.protocol.Protocol;
@@ -46,6 +47,7 @@ import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.IConditionalGetCompatible;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.ICredentials;
+import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.connection.NotModifiedException;
@@ -122,7 +124,37 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       properties.put(IConnectionPropertyConstants.PROGRESS_MONITOR, monitor);
 
     /* Retrieve the InputStream out of the Feed's Link */
-    InputStream inS = openStream(link, properties);
+    InputStream inS = null;
+    try {
+      inS = openStream(link, properties);
+    }
+
+    /* Handle Authentication Required */
+    catch (AuthenticationRequiredException e) {
+
+      /* Realm required from here on */
+      if (e.getRealm() == null)
+        throw e;
+
+      /* Try to load credentials using Host / Port / Realm */
+      URI normalizedUri = URIUtils.normalizeUri(link, true);
+      ICredentials authCredentials = Owl.getConnectionService().getAuthCredentials(normalizedUri, e.getRealm());
+
+      /* Credentials based on Host / Port / Realm provided */
+      if (authCredentials != null) {
+
+        /* Store for plain URI too */
+        ICredentialsProvider credProvider = Owl.getConnectionService().getCredentialsProvider(link);
+        credProvider.setAuthCredentials(authCredentials, link, null);
+
+        /* Reopen Stream */
+        inS = internalOpenStream(link, normalizedUri, e.getRealm(), properties);
+      }
+
+      /* Otherwise throw exception to callee */
+      else
+        throw e;
+    }
 
     /* Retrieve Conditional Get if present */
     IConditionalGet conditionalGet = getConditionalGet(link, inS);
@@ -130,7 +162,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     /* Return on Cancelation or Shutdown */
     if (monitor.isCanceled()) {
       try {
-        inS.close();
+        if (inS != null)
+          inS.close();
       } catch (IOException e) {
         /* Ignore */
       }
@@ -233,6 +266,10 @@ public class DefaultProtocolHandler implements IProtocolHandler {
    * @see NotModifiedException
    */
   public InputStream openStream(URI link, Map<Object, Object> properties) throws ConnectionException {
+    return internalOpenStream(link, link, null, properties);
+  }
+
+  private InputStream internalOpenStream(URI link, URI authLink, String authRealm, Map<Object, Object> properties) throws ConnectionException {
 
     /* Handle File Protocol at first */
     if ("file".equals(link.getScheme()))
@@ -255,7 +292,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       setupProxy(link, client);
 
       /* Authentication if required */
-      setupAuthentication(link, client, getMethod);
+      setupAuthentication(authLink, authRealm, client, getMethod);
 
       /* Open the connection */
       inS = openConnection(client, getMethod);
@@ -268,8 +305,10 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     }
 
     /* In case authentication required / failed */
-    if (getMethod.getStatusCode() == HTTP_ERROR_AUTH_REQUIRED)
-      throw new AuthenticationRequiredException(Activator.getDefault().createErrorStatus("Authentication required!", null)); //$NON-NLS-1$
+    if (getMethod.getStatusCode() == HTTP_ERROR_AUTH_REQUIRED) {
+      AuthState hostAuthState = getMethod.getHostAuthState();
+      throw new AuthenticationRequiredException(hostAuthState != null ? hostAuthState.getRealm() : null, Activator.getDefault().createErrorStatus("Authentication required!", null)); //$NON-NLS-1$
+    }
 
     /* In case proxy-authentication required / failed */
     if (getMethod.getStatusCode() == HTTP_ERROR_PROXY_AUTH_REQUIRED)
@@ -305,8 +344,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     }
   }
 
-  private void setupAuthentication(URI link, HttpClient client, GetMethod getMethod) throws URIException, CredentialsException {
-    ICredentials authCredentials = Owl.getConnectionService().getAuthCredentials(link);
+  private void setupAuthentication(URI link, String realm, HttpClient client, GetMethod getMethod) throws URIException, CredentialsException {
+    ICredentials authCredentials = Owl.getConnectionService().getAuthCredentials(link, realm);
     if (authCredentials != null) {
       client.getParams().setAuthenticationPreemptive(true);
 

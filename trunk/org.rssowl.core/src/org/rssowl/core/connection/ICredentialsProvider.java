@@ -29,26 +29,28 @@ import java.net.URI;
 /**
  * This interface allows to contribute authentication and proxy Credentials for
  * the given Link and knows how to store credentials.
- * 
+ *
  * @author bpasero
  */
 public interface ICredentialsProvider {
 
   /**
    * Get the Credentials to be used to authenticate on the given Feed.
-   * 
+   *
    * @param link The Link to supply authentication Credentials for
+   * @param realm The Realm to get credentials for or <code>null</code> if
+   * none.
    * @return Credentials to use or NULL in case none are to be used for the
    * Feed.
    * @throws CredentialsException Checked Exception to be used in case of any
    * Exception.
    */
-  ICredentials getAuthCredentials(URI link) throws CredentialsException;
+  ICredentials getAuthCredentials(URI link, String realm) throws CredentialsException;
 
   /**
    * Get the Proxy-Credentials to be used to connect on the given Feed using a
    * Proxy Server.
-   * 
+   *
    * @param link The Link to supply proxy-authentication Credentials for
    * @return Credentials to use or NULL in case none are to be used for the
    * Feed.
@@ -59,18 +61,20 @@ public interface ICredentialsProvider {
 
   /**
    * Set the Credentials to be used to authenticate on the given Feed.
-   * 
+   *
    * @param credentials The Credentials to use for the given Link
    * @param link The Link to supply authentication Credentials for
+   * @param realm The Realm to set credentials for or <code>null</code> if
+   * none.
    * @throws CredentialsException Checked Exception to be used in case of any
    * Exception.
    */
-  void setAuthCredentials(ICredentials credentials, URI link) throws CredentialsException;
+  void setAuthCredentials(ICredentials credentials, URI link, String realm) throws CredentialsException;
 
   /**
    * Set the Proxy-Credentials to be used to connect on the given Feed using a
    * Proxy Server.
-   * 
+   *
    * @param credentials The Credentials to use for the given Link
    * @param link The Link to supply proxy-authentication Credentials for
    * @throws CredentialsException Checked Exception to be used in case of any
@@ -80,7 +84,7 @@ public interface ICredentialsProvider {
 
   /**
    * Deletes the credentials for the given Link from the provider.
-   * 
+   *
    * @param link The Link pointing to authentication Credentials
    * @throws CredentialsException Checked Exception to be used in case of any
    * Exception.
@@ -89,7 +93,7 @@ public interface ICredentialsProvider {
 
   /**
    * Deletes the proxy-credentials for the given Link from the provider.
-   * 
+   *
    * @param link The Link pointing to proxy-authentication Credentials
    * @throws CredentialsException Checked Exception to be used in case of any
    * Exception.
