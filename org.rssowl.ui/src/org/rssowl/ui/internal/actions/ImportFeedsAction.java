@@ -26,11 +26,13 @@ package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.util.JobRunner;
 
@@ -68,7 +70,11 @@ public class ImportFeedsAction extends Action implements IWorkbenchWindowActionD
     dialog.setFilterExtensions(new String[] { "*.opml", "*.xml", "*.*" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     String string = dialog.open();
     if (string != null) {
-      Controller.getDefault().importFeeds(string);
+      try {
+        Controller.getDefault().importFeeds(string);
+      } catch (Exception e) {
+        ErrorDialog.openError(fShell, "Error importing Feeds", "RSSOwl was unable to import '" + string + "'", Activator.getDefault().createErrorStatus(e.getMessage(), e));
+      }
 
       /* Force to rerun saved searches */
       JobRunner.runDelayedInBackgroundThread(new Runnable() {

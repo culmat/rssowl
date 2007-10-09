@@ -82,6 +82,7 @@ import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -822,46 +823,45 @@ public class Controller {
    * TODO Temporary
    *
    * @param fileName
+   * @throws FileNotFoundException In case of an error.
+   * @throws ParserException In case of an error.
+   * @throws InterpreterException In case of an error.
    */
-  public void importFeeds(String fileName) {
-    try {
+  public void importFeeds(String fileName) throws FileNotFoundException, InterpreterException, ParserException {
 
-      /* Import from File */
-      File file = new File(fileName);
-      InputStream inS = new FileInputStream(file);
-      List<? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
-      IFolder importedContainer = (IFolder) types.get(0);
+    /* Import from File */
+    File file = new File(fileName);
+    InputStream inS = new FileInputStream(file);
+    List<? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
+    IFolder importedContainer = (IFolder) types.get(0);
 
-      /* Load the current selected Set */
-      String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
-      Long selectedFolderID = fPrefsDAO.load(selectedBookMarkSetPref).getLong();
-      IFolder rootFolder = fFolderDAO.load(selectedFolderID);
-      List<IEntity> entitiesToReload = new ArrayList<IEntity>();
+    /* Load the current selected Set */
+    String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
+    Long selectedFolderID = fPrefsDAO.load(selectedBookMarkSetPref).getLong();
+    IFolder rootFolder = fFolderDAO.load(selectedFolderID);
+    List<IEntity> entitiesToReload = new ArrayList<IEntity>();
 
-      /* Reparent all imported folders into selected Set */
-      List<IFolder> folders = importedContainer.getFolders();
-      entitiesToReload.addAll(folders);
-      for (IFolder folder : folders) {
-        folder.setParent(rootFolder);
-        rootFolder.addFolder(folder, null, null);
-      }
-
-      /* Reparent all imported marks into selected Set */
-      List<IMark> marks = importedContainer.getMarks();
-      entitiesToReload.addAll(marks);
-      for (IMark mark : marks) {
-        mark.setParent(rootFolder);
-        rootFolder.addMark(mark, null, null);
-      }
-
-      /* Save Set */
-      fFolderDAO.save(rootFolder);
-
-      /* Reload imported Feeds */
-      new ReloadTypesAction(new StructuredSelection(entitiesToReload), OwlUI.getPrimaryShell()).run();
-    } catch (Exception e) {
-      Activator.getDefault().logError("importDefaults()", e); //$NON-NLS-1$
+    /* Reparent all imported folders into selected Set */
+    List<IFolder> folders = importedContainer.getFolders();
+    entitiesToReload.addAll(folders);
+    for (IFolder folder : folders) {
+      folder.setParent(rootFolder);
+      rootFolder.addFolder(folder, null, null);
     }
+
+    /* Reparent all imported marks into selected Set */
+    List<IMark> marks = importedContainer.getMarks();
+    entitiesToReload.addAll(marks);
+    for (IMark mark : marks) {
+      mark.setParent(rootFolder);
+      rootFolder.addMark(mark, null, null);
+    }
+
+    /* Save Set */
+    fFolderDAO.save(rootFolder);
+
+    /* Reload imported Feeds */
+    new ReloadTypesAction(new StructuredSelection(entitiesToReload), OwlUI.getPrimaryShell()).run();
   }
 
   private IStatus createWarningStatus(IStatus status, IBookMark bookmark, URI feedLink) {
