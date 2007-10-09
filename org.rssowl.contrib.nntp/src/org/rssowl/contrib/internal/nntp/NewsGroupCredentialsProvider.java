@@ -47,10 +47,11 @@ import java.net.URI;
 public class NewsGroupCredentialsProvider extends PlatformCredentialsProvider {
 
   /*
-   * @see org.rssowl.core.connection.internal.DefaultCredentialsProvider#deleteAuthCredentials(java.net.URI)
+   * @see org.rssowl.core.connection.PlatformCredentialsProvider#deleteAuthCredentials(java.net.URI,
+   * java.lang.String)
    */
   @Override
-  public void deleteAuthCredentials(URI link) {}
+  public void deleteAuthCredentials(URI link, String realm) {}
 
   /*
    * @see org.rssowl.core.connection.internal.DefaultCredentialsProvider#deleteProxyCredentials(java.net.URI)
