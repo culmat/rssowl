@@ -45,7 +45,7 @@ public class MyCredentialsProvider extends PlatformCredentialsProvider {
    */
   @Override
   @SuppressWarnings( { "nls", "unused" })
-  public ICredentials getAuthCredentials(URI link) {
+  public ICredentials getAuthCredentials(URI link, String realm) {
     if (!fAuthDeleted && link.toString().equals("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rdf.xml"))
       return new ICredentials() {
         public String getUsername() {
@@ -61,7 +61,7 @@ public class MyCredentialsProvider extends PlatformCredentialsProvider {
         }
       };
 
-    return super.getAuthCredentials(link);
+    return super.getAuthCredentials(link, realm);
   }
 
   /*
