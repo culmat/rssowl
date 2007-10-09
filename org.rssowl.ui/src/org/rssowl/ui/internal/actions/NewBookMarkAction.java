@@ -235,7 +235,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
           protected void runInBackground(IProgressMonitor monitor) {
             try {
               fLabel = Owl.getConnectionService().getLabel(link);
-            } catch (ConnectionException e) {
+            } catch (final ConnectionException e) {
 
               /* Authentication Required */
               if (e instanceof AuthenticationRequiredException && getShell() != null && !getShell().isDisposed()) {
@@ -243,7 +243,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
                   public void run() {
 
                     /* Show Login Dialog */
-                    LoginDialog login = new LoginDialog(getShell(), link);
+                    LoginDialog login = new LoginDialog(getShell(), link, ((AuthenticationRequiredException) e).getRealm());
                     if (login.open() == Window.OK) {
                       try {
                         onGrabTitle();
