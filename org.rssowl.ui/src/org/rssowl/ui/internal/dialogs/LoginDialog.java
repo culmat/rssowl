@@ -214,8 +214,14 @@ public class LoginDialog extends TitleAreaDialog {
   private void preload() {
     ICredentials authCredentials = null;
     try {
+
+      /* First try with full URI */
       if (fCredProvider != null)
         authCredentials = fCredProvider.getAuthCredentials(fLink, fRealm);
+
+      /* Second try with Host / Port / Realm */
+      if (fCredProvider != null && fRealm != null && authCredentials == null)
+        authCredentials = fCredProvider.getAuthCredentials(URIUtils.normalizeUri(fLink, true), fRealm);
     } catch (CredentialsException e) {
       Activator.getDefault().getLog().log(e.getStatus());
     }
