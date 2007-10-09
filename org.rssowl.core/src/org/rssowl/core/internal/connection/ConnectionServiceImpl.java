@@ -118,7 +118,7 @@ public class ConnectionServiceImpl implements IConnectionService {
               ICredentialsProvider credentialsProvider = fCredentialsProvider.get(protocol);
 
               /* Delete Auth Credentials if provided */
-              if (credentialsProvider != null && credentialsProvider.getAuthCredentials(feedLink) != null)
+              if (credentialsProvider != null && credentialsProvider.getAuthCredentials(feedLink, null) != null)
                 credentialsProvider.deleteAuthCredentials(feedLink);
             }
           } catch (CredentialsException e) {
@@ -210,9 +210,10 @@ public class ConnectionServiceImpl implements IConnectionService {
   }
 
   /*
-   * @see org.rssowl.core.connection.IConnectionService#getAuthCredentials(java.net.URI)
+   * @see org.rssowl.core.connection.IConnectionService#getAuthCredentials(java.net.URI,
+   * java.lang.String)
    */
-  public ICredentials getAuthCredentials(URI link) throws CredentialsException {
+  public ICredentials getAuthCredentials(URI link, String realm) throws CredentialsException {
     String protocol = link.getScheme();
 
     /* Require protocol */
@@ -225,7 +226,7 @@ public class ConnectionServiceImpl implements IConnectionService {
       throw new CredentialsException(Activator.getDefault().createErrorStatus("Could not find any credentials provider for protocol: " + protocol, null));
 
     /* Retrieve Credentials */
-    ICredentials credentials = credentialsProvider.getAuthCredentials(link);
+    ICredentials credentials = credentialsProvider.getAuthCredentials(link, realm);
     return credentials;
   }
 

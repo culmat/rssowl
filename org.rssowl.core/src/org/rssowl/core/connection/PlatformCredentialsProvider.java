@@ -65,12 +65,13 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   private final Set<String> fUnprotectedLinksCache = new HashSet<String>();
 
   /*
-   * @see org.rssowl.core.connection.auth.ICredentialsProvider#getAuthCredentials(java.net.URI)
+   * @see org.rssowl.core.connection.ICredentialsProvider#getAuthCredentials(java.net.URI,
+   * java.lang.String)
    */
-  public ICredentials getAuthCredentials(URI link) {
+  public ICredentials getAuthCredentials(URI link, String realm) {
 
     /* Retrieve Credentials */
-    final Map< ? , ? > authorizationInfo = getAuthorizationInfo(link);
+    final Map<?, ?> authorizationInfo = getAuthorizationInfo(link, realm);
 
     /* Credentials Provided */
     if (authorizationInfo != null) {
@@ -90,23 +91,23 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     }
 
     /* Cache as unprotected */
-    if (!fUnprotectedLinksCache.contains(link.toString()))
+    if (!fUnprotectedLinksCache.contains(link.toString() + realm != null ? realm : REALM))
       fUnprotectedLinksCache.add(link.toString());
 
     /* Credentials not provided */
     return null;
   }
 
-  private Map< ? , ? > getAuthorizationInfo(URI link) {
+  private Map<?, ?> getAuthorizationInfo(URI link, String realm) {
 
     /* Check Cache first */
-    if (fUnprotectedLinksCache.contains(link.toString()))
+    if (fUnprotectedLinksCache.contains(link.toString() + realm != null ? realm : REALM))
       return null;
 
     /* Return from Platform */
     try {
       URL urlLink = link.toURL();
-      return Platform.getAuthorizationInfo(urlLink, REALM, SCHEME);
+      return Platform.getAuthorizationInfo(urlLink, realm != null ? realm : REALM, SCHEME);
     } catch (MalformedURLException e) {
       return null;
     }
@@ -156,10 +157,10 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   }
 
   /*
-   * @see org.rssowl.core.connection.auth.ICredentialsProvider#setAuthCredentials(org.rssowl.core.connection.auth.ICredentials,
-   * java.net.URI)
+   * @see org.rssowl.core.connection.ICredentialsProvider#setAuthCredentials(org.rssowl.core.connection.ICredentials,
+   * java.net.URI, java.lang.String)
    */
-  public void setAuthCredentials(ICredentials credentials, URI link) throws CredentialsException {
+  public void setAuthCredentials(ICredentials credentials, URI link, String realm) throws CredentialsException {
 
     /* Create Credentials Map */
     Map<String, String> credMap = new HashMap<String, String>();
@@ -176,7 +177,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     /* Store in Platform */
     try {
       URL urlLink = link.toURL();
-      Platform.addAuthorizationInfo(urlLink, REALM, SCHEME, credMap);
+      Platform.addAuthorizationInfo(urlLink, realm != null ? realm : REALM, SCHEME, credMap);
     } catch (CoreException e) {
       throw new CredentialsException(e.getStatus());
     } catch (MalformedURLException e) {
@@ -184,7 +185,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     }
 
     /* Uncache */
-    fUnprotectedLinksCache.remove(link.toString());
+    fUnprotectedLinksCache.remove(link.toString() + realm != null ? realm : REALM);
   }
 
   /*

@@ -87,6 +87,9 @@ public interface IConnectionService {
    * Returns a Label that can be used to present the resource identified by the
    * given <code>URI</code>. For instance, if the resource is a feed, this
    * method should return the Title of the feed.
+   * <p>
+   * TODO Make the default implementation use authentication by realm too!
+   * </p>
    *
    * @param link The <code>URI</code> identifying the resource.
    * @return Returns a Label that can be used to present the resource identified
@@ -116,11 +119,13 @@ public interface IConnectionService {
    * Return the Authentication Credentials for the given Feed or NULL if none.
    *
    * @param link The Link to check present Authentication Credentials.
+   * @param realm The Realm to get credentials for or <code>null</code> if
+   * none.
    * @return the Authentication Credentials for the given Feed or NULL if none.
    * @throws CredentialsException In case of an error while retrieving
    * Credentials for the Feed.
    */
-  ICredentials getAuthCredentials(URI link) throws CredentialsException;
+  ICredentials getAuthCredentials(URI link, String realm) throws CredentialsException;
 
   /**
    * Return the Proxy Credentials for the given Feed or NULL if none.

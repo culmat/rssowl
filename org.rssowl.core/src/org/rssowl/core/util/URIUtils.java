@@ -60,7 +60,23 @@ public class URIUtils {
    * @return the normalized link.
    */
   public static URI normalizeUri(URI link) {
+    return normalizeUri(link, false);
+  }
+
+  /**
+   * Will create a new {@link URI} out of the given one that only contains the
+   * Scheme and Host part. If <code>withPort</code> is set to TRUE, the port
+   * will be part of the normalized URI too.
+   *
+   * @param link The link to normalize.
+   * @param withPort If set to <code>TRUE</code>, include the port in the
+   * normalized URI.
+   * @return the normalized link.
+   */
+  public static URI normalizeUri(URI link, boolean withPort) {
     try {
+      if (withPort)
+        return new URI(link.getScheme(), null, link.getHost(), link.getPort(), null, null, null);
       return new URI(link.getScheme(), link.getHost(), null, null);
     } catch (URISyntaxException e) {
       Activator.getDefault().logError(e.getMessage(), e);

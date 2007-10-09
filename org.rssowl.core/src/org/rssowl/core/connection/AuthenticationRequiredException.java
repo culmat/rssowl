@@ -29,18 +29,30 @@ import org.eclipse.core.runtime.IStatus;
 /**
  * Checked Exception thrown in case the connected Feed requires Authentication
  * and no matching Credentials are present.
- * 
+ *
  * @author bpasero
  */
 public class AuthenticationRequiredException extends ConnectionException {
+  private String fRealm;
 
   /**
    * Creates a new exception with the given status object. The message of the
    * given status is used as the exception message.
-   * 
+   *
+   * @param realm the Realm against authentication is required or
+   * <code>null</code> if none.
    * @param status the status object to be associated with this exception
    */
-  public AuthenticationRequiredException(IStatus status) {
+  public AuthenticationRequiredException(String realm, IStatus status) {
     super(status);
+    fRealm = realm;
+  }
+
+  /**
+   * @return Returns the Realm against authentication is required or
+   * <code>null</code> if none.
+   */
+  public String getRealm() {
+    return fRealm;
   }
 }
