@@ -170,6 +170,7 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
     str = StringUtils.replaceAll(str, "&", "&amp;");
     str = StringUtils.replaceAll(str, "<", "&lt;");
     str = StringUtils.replaceAll(str, ">", "&gt;");
+    str = StringUtils.replaceAll(str, "\"", "&#0034;");
 
     return str;
   }
