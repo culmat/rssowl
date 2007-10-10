@@ -95,6 +95,7 @@ import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPreference;
@@ -536,7 +537,18 @@ public class BookMarkExplorer extends ViewPart {
     IEditorInput editorInput = part.getEditorInput();
     if (editorInput instanceof FeedViewInput) {
       FeedViewInput feedViewInput = (FeedViewInput) editorInput;
-      fViewer.setSelection(new StructuredSelection(feedViewInput.getMark()), true);
+      IMark mark = feedViewInput.getMark();
+
+      /* Change Set if required */
+      IFolderChild child = mark;
+      while(child.getParent() != null)
+        child = child.getParent();
+
+      if (!fSelectedBookMarkSet.equals(child))
+        changeSet((IFolder) child);
+
+      /* Set Selection */
+      fViewer.setSelection(new StructuredSelection(mark), true);
     }
   }
 
