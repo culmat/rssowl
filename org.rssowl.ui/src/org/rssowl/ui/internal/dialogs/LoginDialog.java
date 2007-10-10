@@ -162,7 +162,10 @@ public class LoginDialog extends TitleAreaDialog {
     setTitleImage(OwlUI.getImage(fResources, "icons/wizban/auth.gif"));
 
     /* Title Message */
-    setMessage("Please enter Username and Password", IMessageProvider.INFORMATION);
+    if (fRealm != null)
+      setMessage("Enter Username and Password for '" + fRealm + "'", IMessageProvider.INFORMATION);
+    else
+      setMessage("Enter Username and Password", IMessageProvider.INFORMATION);
 
     /* Spacer */
     new Label(composite, SWT.NONE);
