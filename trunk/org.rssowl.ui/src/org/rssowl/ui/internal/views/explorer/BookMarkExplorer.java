@@ -541,7 +541,7 @@ public class BookMarkExplorer extends ViewPart {
 
       /* Change Set if required */
       IFolderChild child = mark;
-      while(child.getParent() != null)
+      while (child.getParent() != null)
         child = child.getParent();
 
       if (!fSelectedBookMarkSet.equals(child))
@@ -1185,8 +1185,15 @@ public class BookMarkExplorer extends ViewPart {
     /* Listen for Editors activated for the linking Feature */
     fPartListener = new IPartListener2() {
       public void partActivated(IWorkbenchPartReference ref) {
-        if (ref.getPart(true) instanceof IEditorPart)
-          editorActivated(fViewSite.getPage().getActiveEditor());
+        if (ref.getPart(true) instanceof IEditorPart) {
+
+          /* Workaround for Bug 573 */
+          JobRunner.runInUIThread(50, fViewer.getTree(), new Runnable() {
+            public void run() {
+              editorActivated(fViewSite.getPage().getActiveEditor());
+            }
+          });
+        }
       }
 
       public void partBroughtToTop(IWorkbenchPartReference ref) {
