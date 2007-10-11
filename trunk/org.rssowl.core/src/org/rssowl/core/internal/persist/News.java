@@ -233,7 +233,7 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.internal.persist.AbstractEntity#getId()
    */
   @Override
-  public synchronized Long getId() {
+  public Long getId() {
     fLock.acquireReadLock();
     try {
       return super.getId();
@@ -246,7 +246,7 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.internal.persist.AbstractEntity#equals(java.lang.Object)
    */
   @Override
-  public synchronized boolean equals(Object obj) {
+  public boolean equals(Object obj) {
     fLock.acquireReadLock();
     try {
       return super.equals(obj);
@@ -259,7 +259,7 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.internal.persist.AbstractEntity#hashCode()
    */
   @Override
-  public synchronized int hashCode() {
+  public int hashCode() {
     fLock.acquireReadLock();
     try {
       return super.hashCode();
@@ -272,7 +272,7 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.internal.persist.AbstractEntity#getProperties()
    */
   @Override
-  public synchronized Map<String, ?> getProperties() {
+  public Map<String, ?> getProperties() {
     fLock.acquireReadLock();
     try {
       return super.getProperties();
@@ -285,7 +285,7 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.internal.persist.AbstractEntity#getProperty(java.lang.String)
    */
   @Override
-  public synchronized Object getProperty(String key) {
+  public Object getProperty(String key) {
     fLock.acquireReadLock();
     try {
       return super.getProperty(key);
@@ -298,7 +298,7 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.internal.persist.AbstractEntity#removeProperty(java.lang.String)
    */
   @Override
-  public synchronized Object removeProperty(String key) {
+  public Object removeProperty(String key) {
     fLock.acquireWriteLock();
     try {
       return super.removeProperty(key);
@@ -311,7 +311,7 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.internal.persist.AbstractEntity#setId(java.lang.Long)
    */
   @Override
-  public synchronized void setId(Long id) {
+  public void setId(Long id) {
     fLock.acquireWriteLock();
     try {
       super.setId(id);
@@ -324,7 +324,7 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.internal.persist.AbstractEntity#setProperty(java.lang.String, java.lang.Object)
    */
   @Override
-  public synchronized void setProperty(String key, Object value) {
+  public void setProperty(String key, Object value) {
     fLock.acquireWriteLock();
     try {
       super.setProperty(key, value);
