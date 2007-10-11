@@ -44,6 +44,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -226,6 +227,110 @@ public class News extends AbstractEntity implements INews {
       return null;
 
     return Boolean.valueOf(equals(o1, o2));
+  }
+
+  /*
+   * @see org.rssowl.core.internal.persist.AbstractEntity#getId()
+   */
+  @Override
+  public synchronized Long getId() {
+    fLock.acquireReadLock();
+    try {
+      return super.getId();
+    } finally {
+      fLock.releaseReadLock();
+    }
+  }
+
+  /*
+   * @see org.rssowl.core.internal.persist.AbstractEntity#equals(java.lang.Object)
+   */
+  @Override
+  public synchronized boolean equals(Object obj) {
+    fLock.acquireReadLock();
+    try {
+      return super.equals(obj);
+    } finally {
+      fLock.releaseReadLock();
+    }
+  }
+
+  /*
+   * @see org.rssowl.core.internal.persist.AbstractEntity#hashCode()
+   */
+  @Override
+  public synchronized int hashCode() {
+    fLock.acquireReadLock();
+    try {
+      return super.hashCode();
+    } finally {
+      fLock.releaseReadLock();
+    }
+  }
+
+  /*
+   * @see org.rssowl.core.internal.persist.AbstractEntity#getProperties()
+   */
+  @Override
+  public synchronized Map<String, ?> getProperties() {
+    fLock.acquireReadLock();
+    try {
+      return super.getProperties();
+    } finally {
+      fLock.releaseReadLock();
+    }
+  }
+
+  /*
+   * @see org.rssowl.core.internal.persist.AbstractEntity#getProperty(java.lang.String)
+   */
+  @Override
+  public synchronized Object getProperty(String key) {
+    fLock.acquireReadLock();
+    try {
+      return super.getProperty(key);
+    } finally {
+      fLock.releaseReadLock();
+    }
+  }
+
+  /*
+   * @see org.rssowl.core.internal.persist.AbstractEntity#removeProperty(java.lang.String)
+   */
+  @Override
+  public synchronized Object removeProperty(String key) {
+    fLock.acquireWriteLock();
+    try {
+      return super.removeProperty(key);
+    } finally {
+      fLock.releaseWriteLock();
+    }
+  }
+
+  /*
+   * @see org.rssowl.core.internal.persist.AbstractEntity#setId(java.lang.Long)
+   */
+  @Override
+  public synchronized void setId(Long id) {
+    fLock.acquireWriteLock();
+    try {
+      super.setId(id);
+    } finally {
+      fLock.releaseWriteLock();
+    }
+  }
+
+  /*
+   * @see org.rssowl.core.internal.persist.AbstractEntity#setProperty(java.lang.String, java.lang.Object)
+   */
+  @Override
+  public synchronized void setProperty(String key, Object value) {
+    fLock.acquireWriteLock();
+    try {
+      super.setProperty(key, value);
+    } finally {
+      fLock.releaseWriteLock();
+    }
   }
 
   private boolean equals(Object o1, Object o2) {
