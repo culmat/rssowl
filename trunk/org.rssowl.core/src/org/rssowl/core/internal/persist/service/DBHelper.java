@@ -95,10 +95,17 @@ public class DBHelper {
       db.ext().set(entity, 1);
   }
 
-  static void saveAndCascadeAllNews(ObjectContainer db, Collection<INews> newsCollection,
-      boolean root) {
+  static void saveAndCascadeAllNews(ObjectContainer db, Collection<INews> newsCollection, boolean root) {
     for (INews news : newsCollection)
-      saveAndCascadeNews(db, news, root);
+      ((News) news).acquireReadLockSpecial();
+
+    try {
+      for (INews news : newsCollection)
+        saveAndCascadeNews(db, news, root);
+    } finally {
+      for (INews news : newsCollection)
+        ((News) news).releaseReadLockSpecial();
+    }
   }
 
   public static final INews peekPersistedNews(ObjectContainer db, INews news) {
