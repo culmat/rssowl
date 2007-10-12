@@ -40,11 +40,11 @@ public class StringUtils {
   private StringUtils() {
   // Protect default constructor
   }
-  
+
   /**
    * If <code>string</code> is <code>null</code>, returns <code>null</code>.
    * Otherwise, returns the result of {@link String#trim()}.
-   * 
+   *
    * @param string String to be trimmed or <code>null</code>.
    * @return <code>null</code> or trimmed String.
    */
@@ -162,8 +162,8 @@ public class StringUtils {
   }
 
   /**
-   * Checks wether the given String is of the Format "R,G,B" with each of the
-   * components being an parsable Integer.
+   * Checks whether the given String is of the Format "R,G,B" with each of the
+   * components being an parseable Integer.
    *
    * @param rgb The String to check for a Valid RGB Value.
    * @return <code>TRUE</code> if the given String is a valid RGB Value.
