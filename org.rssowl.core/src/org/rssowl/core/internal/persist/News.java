@@ -386,7 +386,7 @@ public class News extends AbstractEntity implements INews {
     fLock.acquireWriteLock();
     try {
       if (fAttachments == null)
-        fAttachments = new ArrayList<IAttachment>(2);
+        fAttachments = new ArrayList<IAttachment>(1);
 
       /* Rule: Child needs to know about its new parent already! */
       Assert.isTrue(equals(attachment.getNews()), "The Attachment has a different News set!"); //$NON-NLS-1$
@@ -412,7 +412,7 @@ public class News extends AbstractEntity implements INews {
     fLock.acquireWriteLock();
     try {
       if (fLabels == null)
-        fLabels = new HashSet<ILabel>(2);
+        fLabels = new HashSet<ILabel>(1);
 
       return fLabels.add(label);
     } finally {
@@ -685,7 +685,7 @@ public class News extends AbstractEntity implements INews {
     fLock.acquireWriteLock();
     try {
       if (fCategories == null)
-        fCategories = new ArrayList<ICategory>(3);
+        fCategories = new ArrayList<ICategory>(1);
       fCategories.add(category);
     } finally {
       fLock.releaseWriteLock();
