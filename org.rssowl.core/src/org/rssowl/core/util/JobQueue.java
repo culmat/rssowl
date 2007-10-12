@@ -36,10 +36,10 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.rssowl.core.internal.Activator;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -76,7 +76,7 @@ public class JobQueue {
   private final AtomicInteger fProgressShown = new AtomicInteger(0); // Number of Progress Shown
   private final AtomicInteger fProgressBuf = new AtomicInteger(0); // Buffer for the Progress Monitor
   private final AtomicInteger fScheduledJobs = new AtomicInteger(0); // Count number of running Jobs
-  private final Queue<ITask> fOpenTasksQueue = new ConcurrentLinkedQueue<ITask>();
+  private final BlockingQueue<ITask> fOpenTasksQueue;
 
   /**
    * Creates an instance of <code>JobQueue</code> that allows to add
@@ -86,18 +86,21 @@ public class JobQueue {
    * @param name A human-readable name that is displayed in the Progress-View
    * while the Queue is processed.
    * @param maxConcurrentJobs The maximum number of concurrent running Tasks.
+   * @param maxQueueSize The maximum number of tasks that this queue will accept
+   * before blocking.
    * @param showProgress If TRUE, show Progress of Jobs running from Queue.
    * @param progressDelay The time in milliseconds to wait before showing any
    * progress. This is useful in case the Tasks finish very quickly. Setting it
    * to 0 will show Progress instantly with no delay.
    */
-  public JobQueue(String name, int maxConcurrentJobs, boolean showProgress, int progressDelay) {
+  public JobQueue(String name, int maxConcurrentJobs, int maxQueueSize, boolean showProgress, int progressDelay) {
     Assert.isNotNull(name);
     Assert.isLegal(progressDelay >= 0, "JobQueue Progress delay is negative"); //$NON-NLS-1$
     fName = name;
     fMaxConcurrentJobs = maxConcurrentJobs;
     fShowProgress = showProgress;
     fProgressDelay = progressDelay;
+    fOpenTasksQueue = new LinkedBlockingQueue<ITask>(maxQueueSize);
 
     /* Eagerly create the Progress-Job if we need one */
     if (showProgress)
@@ -149,7 +152,7 @@ public class JobQueue {
   }
 
   /**
-   * Determines wether the given Task is already queued in this Queue. That is,
+   * Determines whether the given Task is already queued in this Queue. That is,
    * the Task is scheduled and did not yet run to completion.
    *
    * @param task The Task to check for being queued in this Queue.
@@ -162,38 +165,50 @@ public class JobQueue {
   }
 
   /**
-   * Adds the given Task into the Queue. The Task is processed in a
-   * <code>Job</code> once the number of parallel processed Tasks is below
-   * <code>MAX_SCHEDULED_JOBS</code>.
+   * Adds the given Task into the Queue waiting if necessary for space to become
+   * available. The Task is processed in a <code>Job</code> once the number of
+   * parallel processed Tasks is below <code>MAX_SCHEDULED_JOBS</code>.
    *
-   * @param task The Taskto add into this Queue.
+   * @param task The Task to add into this Queue.
+   *
+   * @return {@code true} if all the tasks were scheduled or {@code false}
+   * if some tasks were not scheduled because the current thread was
+   * interrupted.
    */
-  public void schedule(ITask task) {
-    List<ITask> tasks = new ArrayList<ITask>(1);
-    tasks.add(task);
-
-    schedule(tasks);
+  public boolean schedule(ITask task) {
+    return schedule(Collections.singletonList(task));
   }
 
   /**
-   * Adds the given List of Tasks into the Queue. Each Runnable is processed in
-   * a <code>Job</code> once the number of parallel processed Tasks is below
+   * Adds the given List of Tasks into the Queue waiting is necessary for space
+   * to become available. Each Runnable is processed in a <code>Job</code>
+   * once the number of parallel processed Tasks is below
    * <code>MAX_SCHEDULED_JOBS</code>.
    *
    * @param tasks The Tasks to add into this Queue.
+   * @return {@code true} if all the tasks were scheduled or {@code false}
+   * if some tasks were not scheduled because the current thread was
+   * interrupted.
    */
-  public void schedule(List<ITask> tasks) {
+  //TODO Consider returning the tasks that were not scheduled instead
+  public boolean schedule(List<ITask> tasks) {
     final int tasksSize = tasks.size();
 
     /* Ignore empty lists */
     if (tasksSize == 0)
-      return;
+      return true;
 
-    /* Add into List of open tasks */
-    fOpenTasksQueue.addAll(tasks);
+    for (ITask task : tasks) {
+      /* Add into List of open tasks */
+      try {
+        fOpenTasksQueue.put(task);
+        /* Adjust Total Work Counter */
+        fTotalWork.incrementAndGet();
+      } catch (InterruptedException e) {
+        return false;
+      }
+    }
 
-    /* Adjust Total Work Counter */
-    fTotalWork.addAndGet(tasksSize);
 
     /* Schedule Job if not yet done */
     if (!fProgressJobScheduled && fShowProgress) {
@@ -203,7 +218,7 @@ public class JobQueue {
 
     /* Optimisation: We are able to release the calling thread without locking. */
     if (fScheduledJobs.get() >= fMaxConcurrentJobs)
-      return;
+      return true;
 
     /* Start a new Job for each free Slot */
     for (int i = 0; i < tasksSize && !fOpenTasksQueue.isEmpty(); ++i) {
@@ -246,6 +261,7 @@ public class JobQueue {
       /* Schedule it immediately */
       job.schedule();
     }
+    return true;
   }
 
   /* Create a Job for a Task to handle */
@@ -370,10 +386,10 @@ public class JobQueue {
           }
         }
 
-        /* Always call done() even if canceld */
+        /* Always call done() even if canceled */
         monitor.done();
 
-        /* Task Processing has been canceld */
+        /* Task Processing has been canceled */
         if (monitor.isCanceled())
           Job.getJobManager().cancel(JobQueue.this);
 
@@ -387,7 +403,7 @@ public class JobQueue {
 
         notifyWorkDone();
 
-        /* Inform about cancelation if present */
+        /* Inform about cancellation if present */
         if (monitor.isCanceled() || interrupted)
           return Status.CANCEL_STATUS;
 

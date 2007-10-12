@@ -127,8 +127,12 @@ public class Controller {
   /* Max. number of concurrent Jobs for saving a Feed */
   private static final int MAX_CONCURRENT_SAVE_JOBS = 1;
 
+  /* Max number of jobs in the queue used for saving feeds before it blocks */
+  private static final int MAX_SAVE_QUEUE_SIZE = 1;
+
   /* Connection Timeouts in MS */
   private static final int FEED_CON_TIMEOUT = 30000;
+
 
   /* Flag indicating if RSSOwl is starting up for the first time */
   static boolean fgFirstStartup;
@@ -225,8 +229,8 @@ public class Controller {
   }
 
   private Controller() {
-    fReloadFeedQueue = new JobQueue("Updating Feeds", MAX_CONCURRENT_RELOAD_JOBS, true, 0);
-    fSaveFeedQueue = new JobQueue("Updating Feeds", MAX_CONCURRENT_SAVE_JOBS, true, 0);
+    fReloadFeedQueue = new JobQueue("Updating Feeds", MAX_CONCURRENT_RELOAD_JOBS, Integer.MAX_VALUE, true, 0);
+    fSaveFeedQueue = new JobQueue("Updating Feeds", MAX_CONCURRENT_SAVE_JOBS, MAX_SAVE_QUEUE_SIZE, true, 0);
     fSaveFeedQueue.setUnknownProgress(true);
     fEntityPropertyPages = loadEntityPropertyPages();
     fBookMarkDAO = DynamicDAO.getDAO(IBookMarkDAO.class);
