@@ -132,14 +132,53 @@ public class PerformanceTest {
   @SuppressWarnings("nls")
   @Test
   public void realWorldReloadTest() throws Exception {
+    /*
+     * We use 2 to simulate better how things happen. The queue for saving has a
+     * single job and there are multiple jobs for loading the online feed and
+     * interpreting. However, since the test infrastructure uses a single
+     */
+    int jobsCount = 2;
     File corpus1Folder = new File(fPluginLocation.resolve("data/performance/corpus_10-03-07"));
     File corpus2Folder = new File(fPluginLocation.resolve("data/performance/corpus_10-06-07"));
-
-    /* Copy Feeds of corpus_10-03-07 to temp location */
+    File corpus3Folder = new File(fPluginLocation.resolve("data/performance/corpus_10-09-07"));
     File tmpFolder = new File(System.getProperty("java.io.tmpdir"));
     File feedFolder = new File(tmpFolder.getAbsolutePath(), "rssowlfeeds");
     feedFolder.mkdir();
     feedFolder.deleteOnExit();
+
+    /* Copy Feeds of corpus_10-03-07 to temp location */
+    copyFeedFilesToTempLocation(corpus1Folder, feedFolder);
+    List<ITask> tasks = getRealWorldReloadTasks(feedFolder.getAbsolutePath());
+
+    System.gc();
+    /* Initial Reload */
+    System.out.println("Reloading Real Word Feeds: " + FEEDS + " Feeds [Initial - " + jobsCount + " Jobs] took: " + TestUtils.executeAndWait(tasks, jobsCount) + "ms");
+
+    /* Copy Feeds of corpus_10-06-07 to temp location */
+    copyFeedFilesToTempLocation(corpus2Folder, feedFolder);
+    System.gc();
+
+    /* Second Reload */
+    System.out.println("Reloading Real Word Feeds: " + FEEDS + " Feeds [Second - " + jobsCount + " Jobs] took: " + TestUtils.executeAndWait(tasks, jobsCount) + "ms");
+
+    /* Copy Feeds of corpus_10-06-09 to temp location */
+    copyFeedFilesToTempLocation(corpus3Folder, feedFolder);
+    System.gc();
+
+    System.out.println("Sleeping!");
+    Thread.sleep(5000);
+	/* Third Reload */
+    System.out.println("Reloading Real Word Feeds: " + FEEDS + " Feeds [Third - " + jobsCount + " Jobs] took: " + TestUtils.executeAndWait(tasks, jobsCount) + "ms");
+
+    System.out.println("Done!");
+    Thread.sleep(5000);
+  }
+
+  private void copyFeedFilesToTempLocation(File corpusFolder, File feedFolder) throws FileNotFoundException, IOException {
+    File[] feedFiles = feedFolder.listFiles();
+    for (File file : feedFiles) {
+      file.delete();
+    }
 
     FileFilter filter = new FileFilter() {
       public boolean accept(File pathname) {
@@ -147,7 +186,7 @@ public class PerformanceTest {
       }
     };
 
-    File zipFile = corpus1Folder.listFiles(filter)[0];
+    File zipFile = corpusFolder.listFiles(filter)[0];
     FileInputStream fis = new FileInputStream(zipFile);
     ZipInputStream zin = new ZipInputStream(new BufferedInputStream(fis));
     ZipEntry entry;
@@ -158,37 +197,6 @@ public class PerformanceTest {
       FileOutputStream outS = new FileOutputStream(outputFile);
       copy(zin, outS);
     }
-
-    List<ITask> tasks = getRealWorldReloadTasks(feedFolder.getAbsolutePath());
-
-    System.gc();
-    /* Initial Reload */
-    System.out.println("Reloading Real Word Feeds: " + FEEDS + " Feeds [Initial - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
-
-    /* Copy Feeds of corpus_10-06-07 to temp location */
-    File[] feedFiles = feedFolder.listFiles();
-    for (File file : feedFiles) {
-      file.delete();
-    }
-
-    zipFile = corpus2Folder.listFiles(filter)[0];
-    fis = new FileInputStream(zipFile);
-    zin = new ZipInputStream(new BufferedInputStream(fis));
-    while ((entry = zin.getNextEntry()) != null) {
-      File outputFile = new File(feedFolder, entry.getName());
-      outputFile.deleteOnExit();
-
-      FileOutputStream outS = new FileOutputStream(outputFile);
-      copy(zin, outS);
-    }
-
-    System.gc();
-    /* Second Reload */
-    System.out.println("Reloading Real Word Feeds: " + FEEDS + " Feeds [Second - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
- 
-    System.gc();
-	/* Third Reload */
-    System.out.println("Reloading Real Word Feeds: " + FEEDS + " Feeds [Third - " + JOBS + " Jobs] took: " + TestUtils.executeAndWait(tasks, JOBS) + "ms");
   }
 
   private static void copy(ZipInputStream zis, OutputStream fos) {
