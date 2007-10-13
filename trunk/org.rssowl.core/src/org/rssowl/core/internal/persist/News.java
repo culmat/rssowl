@@ -46,7 +46,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
@@ -64,7 +63,7 @@ public class News extends AbstractEntity implements INews {
 
   static final class Lock {
 
-    private final transient ReadWriteLock fLock = new ReentrantReadWriteLock();
+    private final transient ReentrantReadWriteLock fLock = new ReentrantReadWriteLock();
     private volatile transient Thread fReadLockThread;
 
     void acquireWriteLock() {
@@ -337,40 +336,41 @@ public class News extends AbstractEntity implements INews {
     return o1 == null ? o2 == null : o1.equals(o2);
   }
 
-  public boolean isEquivalent(INews other) {
+  public boolean isEquivalent(INews o) {
+    News other = (News) o;
     fLock.acquireReadLock();
+    other.fLock.acquireReadLock();
     try {
       Assert.isNotNull(other, "other cannot be null"); //$NON-NLS-1$
 
-      Boolean guidMatch = isEquivalentCompare(getGuidValue(getGuid()),
-          getGuidValue(other.getGuid()));
+      Boolean guidMatch = isEquivalentCompare(fGuidValue, other.fGuidValue);
 
       //TODO Consider simplifying this after M7. The case where one news
       //has permaLink == true and the other has permaLink == false with the
       //same guidValue should not happen in practice.
-      if (guidMatch != null && guidMatch.equals(Boolean.FALSE) && (getGuid() == null || getGuid().isPermaLink()) && (other.getGuid() == null || other.getGuid().isPermaLink()))
+      if (guidMatch != null && guidMatch.equals(Boolean.FALSE) && (fGuidValue == null || fGuidIsPermaLink) && (other.fGuidValue == null || other.fGuidIsPermaLink))
         return false;
-      else if (guidMatch != null && guidMatch.equals(Boolean.TRUE) && getGuid().isPermaLink() && other.getGuid().isPermaLink())
+      else if (guidMatch != null && guidMatch.equals(Boolean.TRUE) && fGuidIsPermaLink && other.fGuidIsPermaLink)
         return true;
 
-      URI newsItemLink = other.getLink();
-      Boolean linkMatch = isEquivalentCompare(getLink(), newsItemLink);
+      Boolean linkMatch = isEquivalentCompare(fLinkText, other.fLinkText);
       if (linkMatch != null) {
         if (linkMatch.equals(Boolean.TRUE))
           return true;
 
         return false;
       }
-      if (!getFeedReference().equals(other.getFeedReference()))
+      if (!fFeedLink.equals(other.fFeedLink))
         return false;
 
-      Boolean titleMatch = isEquivalentCompare(getTitle(), other.getTitle());
+      Boolean titleMatch = isEquivalentCompare(fTitle, other.fTitle);
       if (titleMatch != null && titleMatch.equals(Boolean.TRUE))
         return true;
 
       return false;
     } finally {
       fLock.releaseReadLock();
+      other.fLock.releaseReadLock();
     }
   }
 
