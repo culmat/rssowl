@@ -165,13 +165,8 @@ public class PerformanceTest {
     copyFeedFilesToTempLocation(corpus3Folder, feedFolder);
     System.gc();
 
-    System.out.println("Sleeping!");
-    Thread.sleep(5000);
 	/* Third Reload */
     System.out.println("Reloading Real Word Feeds: " + FEEDS + " Feeds [Third - " + jobsCount + " Jobs] took: " + TestUtils.executeAndWait(tasks, jobsCount) + "ms");
-
-    System.out.println("Done!");
-    Thread.sleep(5000);
   }
 
   private void copyFeedFilesToTempLocation(File corpusFolder, File feedFolder) throws FileNotFoundException, IOException {
