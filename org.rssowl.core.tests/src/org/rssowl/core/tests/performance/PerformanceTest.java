@@ -33,6 +33,7 @@ import org.eclipse.core.runtime.Status;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.BookMark;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.Folder;
@@ -119,6 +120,7 @@ public class PerformanceTest {
   @SuppressWarnings("nls")
   @Before
   public void setUp() throws Exception {
+    InternalOwl.PERF_TESTING = true;
     Owl.getPersistenceService().recreateSchema();
     fModelSearch = Owl.getPersistenceService().getModelSearch();
     fModelSearch.shutdown();
