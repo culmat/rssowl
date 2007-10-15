@@ -5,7 +5,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.osgi.framework.BundleContext;
-import org.rssowl.core.Owl;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.ui.internal.Controller;
 
 /*   **********************************************************************  **
@@ -51,7 +51,7 @@ public class Activator extends Plugin {
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
-    Owl.TESTING = true;
+    InternalOwl.TESTING = true;
     Controller.getDefault();
   }
 
