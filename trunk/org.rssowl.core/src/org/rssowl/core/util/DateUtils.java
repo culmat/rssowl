@@ -37,7 +37,7 @@ import java.util.TimeZone;
 
 /**
  * Utility Class for working with <code>Dates</code>.
- * 
+ *
  * @author bpasero
  */
 public class DateUtils {
@@ -73,12 +73,12 @@ public class DateUtils {
 
     return today;
   }
-  
+
   /**
    * Returns the first Date-Field from the given News that is not NULL. Tries
    * Modified-Date, Publish-Date, and Received-Date. The latter one is never
    * NULL so this Method will never return NULL at all.
-   * 
+   *
    * @param news The News to get the Date from.
    * @return Either Modified-Date, Publish-Date or Received-Date if the formers
    * are NULL.
@@ -96,7 +96,7 @@ public class DateUtils {
   /**
    * Tries different date formats to parse against the given string
    * representation to retrieve a valid Date object.
-   * 
+   *
    * @param strdate Date as String
    * @return Date The parsed Date
    */
@@ -189,29 +189,29 @@ public class DateUtils {
     COMMON_DATE_TIME_FORMATS.put(String.valueOf(DateFormat.FULL) + String.valueOf(DateFormat.FULL), DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL));
 
     /* Create Date Formats */
-    final String[] possibleDateFormats = { 
-        
+    final String[] possibleDateFormats = {
+
         /* RFC 1123 with 2-digit Year */
         "EEE, dd MMM yy HH:mm:ss z", //$NON-NLS-1$
 
         /* RFC 1123 with 4-digit Year */
         "EEE, dd MMM yyyy HH:mm:ss z", //$NON-NLS-1$
-        
+
         /* RFC 1123 with no Timezone */
         "EEE, dd MMM yy HH:mm:ss", //$NON-NLS-1$
 
         /* Variant of RFC 1123 */
         "EEE, MMM dd yy HH:mm:ss", //$NON-NLS-1$
-        
+
         /* RFC 1123 with no Seconds */
         "EEE, dd MMM yy HH:mm z", //$NON-NLS-1$
-        
+
         /* Variant of RFC 1123 */
         "EEE dd MMM yyyy HH:mm:ss", //$NON-NLS-1$
-        
+
         /* RFC 1123 with no Day */
         "dd MMM yy HH:mm:ss z", //$NON-NLS-1$
-        
+
         /* RFC 1123 with no Day or Seconds */
         "dd MMM yy HH:mm z", //$NON-NLS-1$
 
@@ -246,7 +246,7 @@ public class DateUtils {
         "yyyy-MM-dd'T'HH:mm'Z'", //$NON-NLS-1$
 
         /* European Date Format */
-        "dd-mm-yyyy HH:mm:ss", //$NON-NLS-1$
+        "dd-MM-yyyy HH:mm:ss", //$NON-NLS-1$
 
         /* RFC 1123 without Day Name */
         "dd MMM yyyy HH:mm:ss z", //$NON-NLS-1$
@@ -256,7 +256,7 @@ public class DateUtils {
 
         /* Simple Date Format */
         "yyyy-MM-dd", //$NON-NLS-1$
-        
+
         /* Simple Date Format */
         "MMM dd, yyyy" //$NON-NLS-1$
     };
