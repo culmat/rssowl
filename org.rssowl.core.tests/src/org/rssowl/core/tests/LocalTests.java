@@ -41,6 +41,7 @@ import org.rssowl.core.tests.model.PreferencesDAOTest;
 import org.rssowl.core.tests.model.PreferencesScopeTest;
 import org.rssowl.core.tests.persist.INewsTest;
 import org.rssowl.core.tests.util.MergeUtilsTest;
+import org.rssowl.core.tests.util.StringUtilsTest;
 
 /**
  * Test-Suite for Core-Tests that are not requiring Network-Access.
@@ -63,6 +64,7 @@ import org.rssowl.core.tests.util.MergeUtilsTest;
   DBManagerTest.class,
   PreferencesScopeTest.class,
   MergeUtilsTest.class,
-  INewsTest.class
+  INewsTest.class,
+  StringUtilsTest.class
 })
 public class LocalTests {}
