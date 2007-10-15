@@ -164,6 +164,7 @@ public class ApplicationLayerTest {
     System.gc();
 
     feed = feedRef.resolve();
+    assertEquals(1, feed.getNews().size());
     assertEquals(0, feed.getVisibleNews().size());
     assertEquals(INews.State.DELETED, DynamicDAO.load(INews.class, news.getId()).getState());
   }
