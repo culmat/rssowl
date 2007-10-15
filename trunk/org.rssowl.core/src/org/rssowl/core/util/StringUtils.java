@@ -25,7 +25,6 @@
 package org.rssowl.core.util;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringReader;
 
 /**
@@ -143,16 +142,15 @@ public class StringUtils {
       return str;
 
     int length = 0;
-    char result[] = new char[str.length()];
-    Reader stripReader = new HTMLStripReader(new StringReader(str));
+    char[] result = new char[str.length()];
+    HTMLStripReader stripReader = new HTMLStripReader(new StringReader(str));
     try {
-      char buf[] = new char[50];
-      int c;
 
-      while ((c = stripReader.read(buf)) != -1) {
-        System.arraycopy(buf, 0, result, length, c);
-        length += c;
-      }
+      length += stripReader.read(result);
+
+      if (stripReader.read() != -1)
+        throw new IllegalStateException("stripReader blocks before filling the result array");
+
     } catch (IOException e) {
       throw new RuntimeException(e);
     } finally {
