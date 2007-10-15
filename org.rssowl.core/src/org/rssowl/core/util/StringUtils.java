@@ -24,8 +24,8 @@
 
 package org.rssowl.core.util;
 
-import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 
 /**
@@ -82,11 +82,11 @@ public class StringUtils {
     if (str == null)
       return EMPTY_STRING;
 
-    char[] c = str.toCharArray();
-    char[] n = new char[c.length];
+    char[] n = new char[str.length()];
     boolean white = true;
     int pos = 0;
-    for (char element : c) {
+    for (int i = 0, c = str.length(); i < c; ++i) {
+      char element = str.charAt(i);
       if (" \t\n\r".indexOf(element) != -1) { //$NON-NLS-1$
         if (!white) {
           n[pos++] = ' ';
@@ -142,23 +142,28 @@ public class StringUtils {
     if (!StringUtils.isSet(str))
       return str;
 
-    StringBuilder result = new StringBuilder();
-    String line;
-    BufferedReader stripReader = new BufferedReader(new HTMLStripReader(new StringReader(str)));
+    int length = 0;
+    char result[] = new char[str.length()];
+    Reader stripReader = new HTMLStripReader(new StringReader(str));
     try {
-      while ((line = stripReader.readLine()) != null)
-        result.append(line);
+      char buf[] = new char[50];
+      int c;
+
+      while ((c = stripReader.read(buf)) != -1) {
+        System.arraycopy(buf, 0, result, length, c);
+        length += c;
+      }
     } catch (IOException e) {
-      /* Should really not happen */
+      throw new RuntimeException(e);
     } finally {
       try {
         stripReader.close();
       } catch (IOException e) {
-        /* Should really not happen */
+        throw new RuntimeException(e);
       }
     }
 
-    return result.toString();
+    return new String(result, 0, length);
   }
 
   /**
