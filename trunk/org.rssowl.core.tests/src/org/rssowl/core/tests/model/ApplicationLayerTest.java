@@ -150,6 +150,7 @@ public class ApplicationLayerTest {
     IFolder folder = fFactory.createFolder(null, null, "Folder");
     IBookMark mark = fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "Mark");
     DynamicDAO.save(feed);
+    FeedReference feedRef = new FeedReference(feed.getId());
     DynamicDAO.save(folder);
 
     IFeed emptyFeed = fFactory.createFeed(null, feed.getLink());
@@ -162,6 +163,7 @@ public class ApplicationLayerTest {
     feed = null;
     System.gc();
 
+    feed = feedRef.resolve();
     assertEquals(0, feed.getVisibleNews().size());
     assertEquals(INews.State.DELETED, DynamicDAO.load(INews.class, news.getId()).getState());
   }
