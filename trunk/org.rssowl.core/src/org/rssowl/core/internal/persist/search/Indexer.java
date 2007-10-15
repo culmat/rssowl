@@ -255,21 +255,21 @@ public class Indexer {
     /* Listen to News-Events */
     fNewsListener = new NewsListener() {
       public void entitiesAdded(Set<NewsEvent> events) {
-        if (!Owl.TESTING)
+        if (!InternalOwl.TESTING)
           fJobQueue.schedule(new IndexingTask(Indexer.this, events, EventType.PERSIST));
         else
           new IndexingTask(Indexer.this, events, EventType.PERSIST).run(new NullProgressMonitor());
       }
 
       public void entitiesUpdated(Set<NewsEvent> events) {
-        if (!Owl.TESTING)
+        if (!InternalOwl.TESTING)
           fJobQueue.schedule(new IndexingTask(Indexer.this, events, EventType.UPDATE));
         else
           new IndexingTask(Indexer.this, events, EventType.UPDATE).run(new NullProgressMonitor());
       }
 
       public void entitiesDeleted(Set<NewsEvent> events) {
-        if (!Owl.TESTING)
+        if (!InternalOwl.TESTING)
           fJobQueue.schedule(new IndexingTask(Indexer.this, events, EventType.REMOVE));
         else
           new IndexingTask(Indexer.this, events, EventType.REMOVE).run(new NullProgressMonitor());
@@ -287,7 +287,7 @@ public class Indexer {
           Collection<INews> news = DynamicDAO.getDAO(INewsDAO.class).loadAll(updatedLabel);
 
           if (!news.isEmpty()) {
-            if (!Owl.TESTING)
+            if (!InternalOwl.TESTING)
               fJobQueue.schedule(new IndexingTask(Indexer.this, news, EventType.UPDATE));
             else
               new IndexingTask(Indexer.this, news, EventType.UPDATE).run(new NullProgressMonitor());
