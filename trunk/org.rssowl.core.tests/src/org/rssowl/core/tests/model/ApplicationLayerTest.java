@@ -159,6 +159,9 @@ public class ApplicationLayerTest {
     Owl.getPreferenceService().getEntityScope(mark).putBoolean(DefaultPreferences.DEL_READ_NEWS_STATE, true);
     fAppService.handleFeedReload(mark, emptyFeed, null, false);
 
+    feed = null;
+    System.gc();
+
     assertEquals(0, feed.getVisibleNews().size());
     assertEquals(INews.State.DELETED, DynamicDAO.load(INews.class, news.getId()).getState());
   }
