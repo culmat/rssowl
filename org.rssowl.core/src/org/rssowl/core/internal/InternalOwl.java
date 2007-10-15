@@ -74,6 +74,12 @@ public final class InternalOwl {
   private volatile IModelFactory fModelFactory;
   private volatile boolean fStarted;
 
+  /** Flag indicating Performance-Tests are running */
+  public static boolean PERF_TESTING = false;
+
+  /** Flag indicating JUnit-Tests are running */
+  public static boolean TESTING = false;
+
   private InternalOwl() {}
 
   /**

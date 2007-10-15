@@ -54,9 +54,6 @@ import org.rssowl.core.persist.service.IPreferenceService;
  */
 public final class Owl {
 
-  /** Flag indicating wether the Controller is accessed from a Test */
-  public static boolean TESTING = false;
-
   /**
    * <p>
    * Get the Implementation of <code>IApplicationService</code> that contains
