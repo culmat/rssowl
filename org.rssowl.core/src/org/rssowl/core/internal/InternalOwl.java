@@ -75,10 +75,10 @@ public final class InternalOwl {
   private volatile boolean fStarted;
 
   /** Flag indicating Performance-Tests are running */
-  public static boolean PERF_TESTING = false;
+  public volatile static boolean PERF_TESTING = false;
 
   /** Flag indicating JUnit-Tests are running */
-  public static boolean TESTING = false;
+  public volatile static boolean TESTING = false;
 
   private InternalOwl() {}
 
