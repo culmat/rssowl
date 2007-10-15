@@ -44,6 +44,7 @@ import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.connection.UnknownFeedException;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.interpreter.ParserException;
@@ -458,7 +459,7 @@ public class Controller {
         return Status.CANCEL_STATUS;
 
       /* Load the Favicon directly afterwards if required */
-      if (OwlUI.getFavicon(bookmark) == null) {
+      if (!InternalOwl.PERF_TESTING && OwlUI.getFavicon(bookmark) == null) {
         try {
           byte[] faviconBytes = null;
 
@@ -484,7 +485,7 @@ public class Controller {
         return Status.CANCEL_STATUS;
 
       /* Merge and Save Feed */
-      if (!Owl.TESTING) {
+      if (!InternalOwl.TESTING) {
         final IConditionalGet finalConditionalGet = conditionalGet;
         final boolean finalDeleteConditionalGet = deleteConditionalGet;
         fSaveFeedQueue.schedule(new TaskAdapter() {
@@ -635,7 +636,7 @@ public class Controller {
   public void startup() {
 
     /* Create Relations and Import Default Feeds if required */
-    if (!Owl.TESTING) {
+    if (!InternalOwl.TESTING) {
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
 
@@ -653,7 +654,7 @@ public class Controller {
     }
 
     /* Create the Cache-Service */
-    if (!Owl.TESTING) {
+    if (!InternalOwl.TESTING) {
       fCacheService = new CacheService();
       fCacheService.cacheRootFolders();
     }
@@ -662,11 +663,11 @@ public class Controller {
     fNewsService = new NewsService();
 
     /* Create the Notification Service */
-    if (!Owl.TESTING)
+    if (!InternalOwl.TESTING)
       fNotificationService = new NotificationService();
 
     /* Create the Saved Search Service */
-    if (!Owl.TESTING)
+    if (!InternalOwl.TESTING)
       fSavedSearchService = new SavedSearchService();
   }
 
@@ -682,7 +683,7 @@ public class Controller {
     fShuttingDown = true;
 
     /* Stop the Feed Reload Service */
-    if (!Owl.TESTING && !emergency)
+    if (!InternalOwl.TESTING && !emergency)
       fFeedReloadService.stopService();
 
     /* Cancel the reload queue */
@@ -690,7 +691,7 @@ public class Controller {
       fReloadFeedQueue.cancel(false);
 
     /* Stop the Cache-Service */
-    if (!Owl.TESTING && !emergency)
+    if (!InternalOwl.TESTING && !emergency)
       fCacheService.stopService();
 
     /* Cancel the feed-save queue (join) */
@@ -701,11 +702,11 @@ public class Controller {
     fNewsService.stopService();
 
     /* Stop the Notification Service */
-    if (!Owl.TESTING && !emergency)
+    if (!InternalOwl.TESTING && !emergency)
       fNotificationService.stopService();
 
     /* Stop the Saved Search Service */
-    if (!Owl.TESTING && !emergency)
+    if (!InternalOwl.TESTING && !emergency)
       fSavedSearchService.stopService();
 
     /* Shutdown ApplicationServer */
@@ -719,7 +720,7 @@ public class Controller {
   public void postUIStartup() {
 
     /* Create the Feed-Reload Service */
-    if (!Owl.TESTING)
+    if (!InternalOwl.TESTING)
       fFeedReloadService = new FeedReloadService();
   }
 
