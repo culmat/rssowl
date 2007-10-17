@@ -124,42 +124,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       properties.put(IConnectionPropertyConstants.PROGRESS_MONITOR, monitor);
 
     /* Retrieve the InputStream out of the Feed's Link */
-    InputStream inS = null;
-    try {
-      inS = openStream(link, properties);
-    }
-
-    /* Handle Authentication Required */
-    catch (AuthenticationRequiredException e) {
-
-      /* Realm required from here on */
-      if (e.getRealm() == null)
-        throw e;
-
-      /* Try to load credentials using Host / Port / Realm */
-      URI normalizedUri = URIUtils.normalizeUri(link, true);
-      ICredentials authCredentials = Owl.getConnectionService().getAuthCredentials(normalizedUri, e.getRealm());
-
-      /* Credentials based on Host / Port / Realm provided */
-      if (authCredentials != null) {
-
-        /* Store for plain URI too */
-        ICredentialsProvider credProvider = Owl.getConnectionService().getCredentialsProvider(link);
-        credProvider.setAuthCredentials(authCredentials, link, null);
-
-        /* Reopen Stream */
-        try {
-          inS = internalOpenStream(link, normalizedUri, e.getRealm(), properties);
-        } catch (AuthenticationRequiredException ex) {
-          Owl.getConnectionService().getCredentialsProvider(normalizedUri).deleteAuthCredentials(normalizedUri, e.getRealm());
-          throw ex;
-        }
-      }
-
-      /* Otherwise throw exception to callee */
-      else
-        throw e;
-    }
+    InputStream inS = openStream(link, properties);
 
     /* Retrieve Conditional Get if present */
     IConditionalGet conditionalGet = getConditionalGet(link, inS);
@@ -271,7 +236,42 @@ public class DefaultProtocolHandler implements IProtocolHandler {
    * @see NotModifiedException
    */
   public InputStream openStream(URI link, Map<Object, Object> properties) throws ConnectionException {
-    return internalOpenStream(link, link, null, properties);
+
+    /* Retrieve the InputStream out of the Link */
+    try {
+      return internalOpenStream(link, link, null, properties);
+    }
+
+    /* Handle Authentication Required */
+    catch (AuthenticationRequiredException e) {
+
+      /* Realm required from here on */
+      if (e.getRealm() == null)
+        throw e;
+
+      /* Try to load credentials using Host / Port / Realm */
+      URI normalizedUri = URIUtils.normalizeUri(link, true);
+      ICredentials authCredentials = Owl.getConnectionService().getAuthCredentials(normalizedUri, e.getRealm());
+
+      /* Credentials based on Host / Port / Realm provided */
+      if (authCredentials != null) {
+
+        /* Store for plain URI too */
+        ICredentialsProvider credProvider = Owl.getConnectionService().getCredentialsProvider(link);
+        credProvider.setAuthCredentials(authCredentials, link, null);
+
+        /* Reopen Stream */
+        try {
+          return internalOpenStream(link, normalizedUri, e.getRealm(), properties);
+        } catch (AuthenticationRequiredException ex) {
+          Owl.getConnectionService().getCredentialsProvider(normalizedUri).deleteAuthCredentials(normalizedUri, e.getRealm());
+          throw ex;
+        }
+      }
+
+      /* Otherwise throw exception to callee */
+      throw e;
+    }
   }
 
   private InputStream internalOpenStream(URI link, URI authLink, String authRealm, Map<Object, Object> properties) throws ConnectionException {
