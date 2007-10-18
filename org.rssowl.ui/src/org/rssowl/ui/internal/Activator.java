@@ -34,8 +34,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
@@ -167,6 +170,19 @@ public class Activator extends AbstractUIPlugin {
         int y = displayBounds.y + (displayBounds.height - shellSize.y) >> 1;
 
         return new Point(x, y);
+      }
+
+      @Override
+      protected Point getInitialSize() {
+        int minWidth = 380;
+        int minHeight = getShell().computeSize(minWidth, SWT.DEFAULT).y;
+
+        return new Point(minWidth, minHeight);
+      }
+
+      @Override
+      protected Control createButtonBar(Composite parent) {
+        return null;
       }
     };
     dialog.setOpenOnRun(false);
