@@ -165,7 +165,7 @@ public class RetentionStrategy {
 
   private static void fillReadNewsToDelete(Collection<INews> targetNews, List<INews> newsToDelete) {
     for (INews newsItem : targetNews) {
-      if (!newsItem.isFlagged() && newsItem.getState() == INews.State.READ)
+      if (!shouldKeep(newsItem) && newsItem.getState() == INews.State.READ)
         newsToDelete.add(newsItem);
     }
   }
@@ -176,10 +176,15 @@ public class RetentionStrategy {
       State state = newsItem.getState();
       boolean isUnread = (state == INews.State.NEW || state == INews.State.UPDATED || state == INews.State.UNREAD);
 
-      /* Keep Flagged and Unread (if set) */
-      if (!newsItem.isFlagged() && !(isUnread && keepUnread) && !newsToDelete.contains(newsItem) && DateUtils.getRecentDate(newsItem).getTime() <= maxAge)
+      /* Keep Sticky and Unread (if set) */
+      if (!shouldKeep(newsItem) && !(isUnread && keepUnread) && !newsToDelete.contains(newsItem) && DateUtils.getRecentDate(newsItem).getTime() <= maxAge)
         newsToDelete.add(newsItem);
     }
+  }
+
+  /* Keep sticky news or news with a label */
+  private static boolean shouldKeep(INews news) {
+    return news.isFlagged() || !news.getLabels().isEmpty();
   }
 
   private static void fillNewsToDeleteByCount(Collection<INews> targetNews, List<INews> newsToDelete, int limit, boolean keepUnread) {
@@ -216,7 +221,7 @@ public class RetentionStrategy {
       boolean isUnread = (state == INews.State.NEW || state == INews.State.UPDATED || state == INews.State.UNREAD);
 
       /* Keep Flagged and Unread (if set) */
-      if (!newsArray[i].isFlagged() && !(isUnread && keepUnread)) {
+      if (!shouldKeep(newsArray[i]) && !(isUnread && keepUnread)) {
         newsToDelete.add(newsArray[i]);
         deletedCounter++;
       }
