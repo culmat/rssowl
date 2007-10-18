@@ -26,12 +26,15 @@ package org.rssowl.ui.internal.dialogs.cleanup;
 
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.ILabelDAO;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.DateUtils;
@@ -190,6 +193,14 @@ public class CleanUpModel {
     ISearchField stickyField = fFactory.createSearchField(INews.IS_FLAGGED, fNewsName);
     ISearchCondition stickyCondition = fFactory.createSearchCondition(stickyField, SearchSpecifier.IS_NOT, true);
 
+    /* Reusable Label Condition */
+    Collection<ILabel> labels = DynamicDAO.getDAO(ILabelDAO.class).loadAll();
+    ISearchField labelField = fFactory.createSearchField(INews.LABEL, fNewsName);
+    List<ISearchCondition> labelConditions = new ArrayList<ISearchCondition>(labels.size());
+    for (ILabel label : labels) {
+      labelConditions.add(fFactory.createSearchCondition(labelField, SearchSpecifier.IS_NOT, label.getName()));
+    }
+
     /* 4.) Delete News that exceed a certain limit in a Feed */
     if (fOps.deleteNewsByCount()) {
       CleanUpGroup group = new CleanUpGroup("News exceeding a limit of " + fOps.getMaxNewsCountPerFeed() + " per feed");
@@ -205,6 +216,7 @@ public class CleanUpModel {
         conditions.add(getLocationCondition(mark));
         conditions.add(stickyCondition);
         conditions.add(stateCondition);
+        conditions.addAll(labelConditions);
 
         /* Check if result count exceeds limit */
         List<SearchHit<NewsReference>> results = fModelSearch.searchNews(conditions, true);
@@ -257,6 +269,7 @@ public class CleanUpModel {
         conditions.add(ageCond);
         conditions.add(stateCondition);
         conditions.add(stickyCondition);
+        conditions.addAll(labelConditions);
 
         List<SearchHit<NewsReference>> results = fModelSearch.searchNews(conditions, true);
         Set<NewsReference> newsOfMarkToDelete = new HashSet<NewsReference>();
@@ -306,6 +319,7 @@ public class CleanUpModel {
         conditions.add(getLocationCondition(mark));
         conditions.add(stateCond);
         conditions.add(stickyCondition);
+        conditions.addAll(labelConditions);
 
         List<SearchHit<NewsReference>> results = fModelSearch.searchNews(conditions, true);
         Set<NewsReference> newsOfMarkToDelete = new HashSet<NewsReference>();
