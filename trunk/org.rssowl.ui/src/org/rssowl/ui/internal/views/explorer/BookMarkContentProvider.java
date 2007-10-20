@@ -547,9 +547,10 @@ public class BookMarkContentProvider implements ITreeContentProvider {
               else if (fBookmarkGrouping.needsRefresh(ISearchMark.class))
                 fViewer.refresh(false);
 
-              /* Handle reparented Folders */
+              /* Handle reparented SearchMarks */
               else if (reparentedSearchMarks != null) {
                 Set<Entry<ISearchMark, IFolder>> entries = reparentedSearchMarks.entrySet();
+                Set<IFolder> parentsToUpdate = new HashSet<IFolder>();
                 try {
                   fViewer.getControl().getParent().setRedraw(false);
                   for (Entry<ISearchMark, IFolder> entry : entries) {
@@ -561,10 +562,18 @@ public class BookMarkContentProvider implements ITreeContentProvider {
                     fViewer.remove(oldParent, new Object[] { reparentedSearchMark });
                     fViewer.refresh(reparentedSearchMark.getParent(), false);
                     fViewer.setSelection(selection);
+
+                    /* Remember to update parents */
+                    parentsToUpdate.add(oldParent);
+                    parentsToUpdate.add(reparentedSearchMark.getParent());
                   }
                 } finally {
                   fViewer.getControl().getParent().setRedraw(true);
                 }
+
+                /* Update old Parents of Reparented Bookmarks */
+                for (IFolder folder : parentsToUpdate)
+                  updateFolderAndParents(folder);
               }
 
               /* Handle Updated Searchmarks */
@@ -638,9 +647,12 @@ public class BookMarkContentProvider implements ITreeContentProvider {
               }
 
               fViewer.update(updatedSearchMarks.toArray(), null);
+
+              /* Update Parents */
+              for (ISearchMark searchMark : updatedSearchMarks)
+                updateFolderAndParents(searchMark.getParent());
             }
           });
-
         }
       };
 
