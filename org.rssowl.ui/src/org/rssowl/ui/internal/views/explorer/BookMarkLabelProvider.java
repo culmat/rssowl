@@ -320,6 +320,8 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     /* Go through all Folders and Marks */
     List<IFolderChild> children = folder.getChildren();
     for (IFolderChild child : children) {
+
+      /* BookMark */
       if (child instanceof IBookMark) {
         IBookMark bookmark = (IBookMark) child;
 
@@ -327,7 +329,20 @@ public class BookMarkLabelProvider extends CellLabelProvider {
           count += getUnreadNewsCount(bookmark.getFeedLinkReference());
         else
           count += getNewNewsCount(bookmark.getFeedLinkReference());
-      } else if (child instanceof IFolder)
+      }
+
+      /* SearchMark */
+      else if (child instanceof ISearchMark) {
+        ISearchMark searchmark = (ISearchMark) child;
+
+        if (unread)
+          count += searchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
+        else
+          count += searchmark.getResultCount(EnumSet.of(INews.State.NEW));
+      }
+
+      /* Folder */
+      else if (child instanceof IFolder)
         count += getNewsCount((IFolder) child, unread);
     }
 
