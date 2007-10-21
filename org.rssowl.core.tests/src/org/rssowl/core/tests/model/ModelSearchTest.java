@@ -3029,6 +3029,53 @@ public class ModelSearchTest {
     }
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testSearchEntireNewsWith_CONTAINS_Specifier() throws Exception {
+    try {
+
+      /* First add some Types */
+      IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
+
+      INews news1 = createNews(feed, "This is Radio no (DVD)", "http://www.news.com/news1.html", State.READ);
+
+      INews news2 = createNews(feed, " Bar", "http://www.news.com/news2.html", State.NEW);
+      news2.setDescription("This is a longer Radio no (DVD) description with <html><h2>included!</h2></html>");
+
+      DynamicDAO.save(feed);
+
+      /* Wait for Indexer */
+      waitForIndexer();
+
+      /* All Fields */
+      ISearchField field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "(DVD)");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+      assertSame(result, news1, news2);
+
+      field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      ISearchCondition condition1 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "(DVD)");
+      ISearchCondition condition2 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "no");
+
+      result = fModelSearch.searchNews(list(condition1, condition2), true);
+      assertSame(result, news1, news2);
+
+      field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      condition1 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "(DVD)");
+      condition2 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "no");
+      ISearchCondition condition3 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "RadIO");
+
+      result = fModelSearch.searchNews(list(condition1, condition2, condition3), true);
+      assertSame(result, news1, news2);
+    } catch (PersistenceException e) {
+      TestUtils.fail(e);
+    }
+  }
+
   private INews createNews(IFeed feed, String title, String link, INews.State state) throws URISyntaxException {
     INews news = fFactory.createNews(null, feed, new Date(System.currentTimeMillis()));
     news.setState(state);
