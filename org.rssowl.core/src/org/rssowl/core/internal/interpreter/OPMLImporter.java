@@ -51,7 +51,6 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
@@ -64,6 +63,7 @@ import java.util.List;
  */
 public class OPMLImporter implements ITypeImporter {
   private final DateFormat fDateFormat = DateFormat.getDateInstance();
+  private final Namespace fRSSOwlNamespace = Namespace.getNamespace("rssowl", "http://www.rssowl.org");
 
   /*
    * @see org.rssowl.core.interpreter.ITypeImporter#importFrom(org.jdom.Document)
@@ -86,7 +86,9 @@ public class OPMLImporter implements ITypeImporter {
   }
 
   private List<IFolder> processBody(Element body) {
-    IFolder folder = Owl.getModelFactory().createFolder(null, null, "Imported from OPML");
+    IFolder defaultRootFolder = Owl.getModelFactory().createFolder(null, null, "Default");
+    List<IFolder> rootFolders = new ArrayList<IFolder>();
+    rootFolders.add(defaultRootFolder);
 
     /* Interpret Children */
     List<?> feedChildren = body.getChildren();
@@ -96,39 +98,34 @@ public class OPMLImporter implements ITypeImporter {
 
       /* Process Outline */
       if ("outline".equals(name)) //$NON-NLS-1$
-        processOutline(child, folder);
-
-      else if ("savedsearch".equals(name))
-        processSavedSearch(child, folder);
+        processOutline(child, defaultRootFolder, rootFolders);
     }
 
-    return Collections.singletonList(folder);
+    return rootFolders;
   }
 
   private void processSavedSearch(Element savedSearchElement, IFolder folder) {
-    Namespace namespace = Namespace.getNamespace("rssowl", "http://www.rssowl.org");
-
     String name = savedSearchElement.getAttributeValue("name");
     boolean matchAllConditions = Boolean.parseBoolean(savedSearchElement.getAttributeValue("matchAllConditions"));
 
     ISearchMark searchmark = Owl.getModelFactory().createSearchMark(null, folder, name);
     searchmark.setMatchAllConditions(matchAllConditions);
 
-    List<?> conditions = savedSearchElement.getChildren("searchcondition", namespace);
+    List<?> conditions = savedSearchElement.getChildren("searchcondition", fRSSOwlNamespace);
     for (int i = 0; i < conditions.size(); i++) {
       try {
         Element condition = (Element) conditions.get(i);
 
         /* Search Specifier */
-        Element specifierElement = condition.getChild("searchspecifier", namespace);
+        Element specifierElement = condition.getChild("searchspecifier", fRSSOwlNamespace);
         SearchSpecifier searchSpecifier = SearchSpecifier.values()[Integer.parseInt(specifierElement.getAttributeValue("id"))];
 
         /* Search Value */
-        Element valueElement = condition.getChild("searchvalue", namespace);
-        Object value = getValue(valueElement, namespace);
+        Element valueElement = condition.getChild("searchvalue", fRSSOwlNamespace);
+        Object value = getValue(valueElement, fRSSOwlNamespace);
 
         /* Search Field */
-        Element fieldElement = condition.getChild("searchfield", namespace);
+        Element fieldElement = condition.getChild("searchfield", fRSSOwlNamespace);
         String fieldName = fieldElement.getAttributeValue("name");
         String entityName = fieldElement.getAttributeValue("entity");
         ISearchField searchField = Owl.getModelFactory().createSearchField(getFieldID(fieldName), entityName);
@@ -272,7 +269,7 @@ public class OPMLImporter implements ITypeImporter {
     return value;
   }
 
-  private void processOutline(Element outline, IPersistable parent) {
+  private void processOutline(Element outline, IPersistable parent, List<IFolder> setFolders) {
     IPersistable type = null;
     String title = null;
     String link = null;
@@ -306,9 +303,15 @@ public class OPMLImporter implements ITypeImporter {
         description = attribute.getValue();
     }
 
+    /* RSSOwl Namespace Attributes */
+    boolean isSet = Boolean.parseBoolean(outline.getAttributeValue("isSet", fRSSOwlNamespace));
+
     /* Outline is a Folder */
     if (link == null && title != null) {
-      type = Owl.getModelFactory().createFolder(null, (IFolder) parent, title);
+      type = Owl.getModelFactory().createFolder(null, isSet ? null : (IFolder) parent, title);
+
+      if (isSet)
+        setFolders.add((IFolder) type);
     }
 
     /* Outline is a BookMark */
@@ -346,7 +349,11 @@ public class OPMLImporter implements ITypeImporter {
 
       /* Process Outline */
       if ("outline".equals(name)) //$NON-NLS-1$
-        processOutline(child, type);
+        processOutline(child, type, setFolders);
+
+      /* Process Saved Search */
+      else if ("savedsearch".equals(name))
+        processSavedSearch(child, (IFolder) type);
     }
   }
 }
