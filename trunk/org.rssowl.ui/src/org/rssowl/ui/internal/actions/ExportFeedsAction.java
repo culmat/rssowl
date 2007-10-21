@@ -40,13 +40,10 @@ import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
-import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
-import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
+import org.rssowl.ui.internal.Controller;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -56,6 +53,7 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * TODO This is just for Developers Purposes!
@@ -106,23 +104,26 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
         }
 
         /* Proceed Exporting */
-        String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
-        Long selectedRootFolderID = DynamicDAO.getDAO(IPreferenceDAO.class).load(selectedBookMarkSetPref).getLong();
-        IFolder selectedRootFolder = DynamicDAO.load(IFolder.class, selectedRootFolderID);
-        exportToOPML(file, selectedRootFolder);
+        Set<IFolder> rootFolders = Controller.getDefault().getCacheService().getRootFolders();
+        exportToOPML(file, rootFolders);
       } catch (IOException e) {
         Activator.getDefault().logError(e.getMessage(), e);
       }
     }
   }
 
-  private void exportToOPML(File file, IFolder root) throws IOException, PersistenceException {
+  private void exportToOPML(File file, Set<IFolder> rootFolders) throws IOException, PersistenceException {
     OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
     writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
     writer.write("<opml version=\"1.1\" xmlns:rssowl=\"http://www.rssowl.org\">\n");
     writer.write("<body>\n");
 
-    exportToOPML(root, writer);
+    for (IFolder folder : rootFolders) {
+      String name = escape(folder.getName());
+      writer.write("<outline text=\"" + name + "\" rssowl:isSet=\"true\">\n");
+      exportToOPML(folder, writer);
+      writer.write("</outline>\n");
+    }
 
     writer.write("</body>\n");
     writer.write("</opml>\n");
