@@ -134,7 +134,6 @@ public class Controller {
   /* Connection Timeouts in MS */
   private static final int FEED_CON_TIMEOUT = 30000;
 
-
   /* Flag indicating if RSSOwl is starting up for the first time */
   static boolean fgFirstStartup;
 
@@ -857,40 +856,80 @@ public class Controller {
    * @throws InterpreterException In case of an error.
    */
   public void importFeeds(String fileName) throws FileNotFoundException, InterpreterException, ParserException {
+    List<IEntity> entitiesToReload = new ArrayList<IEntity>();
 
     /* Import from File */
     File file = new File(fileName);
     InputStream inS = new FileInputStream(file);
     List<? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
-    IFolder importedContainer = (IFolder) types.get(0);
+    IFolder defaultContainer = (IFolder) types.get(0);
 
     /* Load the current selected Set */
     String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
     Long selectedFolderID = fPrefsDAO.load(selectedBookMarkSetPref).getLong();
-    IFolder rootFolder = fFolderDAO.load(selectedFolderID);
-    List<IEntity> entitiesToReload = new ArrayList<IEntity>();
+    IFolder selectedRootFolder = fFolderDAO.load(selectedFolderID);
 
-    /* Reparent all imported folders into selected Set */
-    List<IFolder> folders = importedContainer.getFolders();
-    entitiesToReload.addAll(folders);
-    for (IFolder folder : folders) {
-      folder.setParent(rootFolder);
-      rootFolder.addFolder(folder, null, null);
+    /* Load all Root Folders */
+    Set<IFolder> rootFolders = fCacheService.getRootFolders();
+
+    /* 1.) Handle Folders and Marks from default Container */
+    {
+      reparentChildren(defaultContainer, selectedRootFolder);
+      entitiesToReload.addAll(defaultContainer.getChildren());
     }
 
-    /* Reparent all imported marks into selected Set */
-    List<IMark> marks = importedContainer.getMarks();
-    entitiesToReload.addAll(marks);
-    for (IMark mark : marks) {
-      mark.setParent(rootFolder);
-      rootFolder.addMark(mark, null, null);
-    }
+    /* 2.) Handle other Sets */
+    for (int i = 1; i < types.size(); i++) {
+      IFolder setFolder = (IFolder) types.get(i);
+      IFolder existingSetFolder = null;
 
-    /* Save Set */
-    fFolderDAO.save(rootFolder);
+      /* Check if set already exists */
+      for (IFolder rootFolder : rootFolders) {
+        if (rootFolder.getName().equals(setFolder.getName())) {
+          existingSetFolder = rootFolder;
+          break;
+        }
+      }
+
+      /* Reparent into Existing Set */
+      if (existingSetFolder != null) {
+        reparentChildren(setFolder, existingSetFolder);
+        entitiesToReload.addAll(existingSetFolder.getChildren());
+      }
+
+      /* Otherwise save as new Set */
+      else {
+        fFolderDAO.save(setFolder);
+        entitiesToReload.add(setFolder);
+      }
+    }
 
     /* Reload imported Feeds */
     new ReloadTypesAction(new StructuredSelection(entitiesToReload), OwlUI.getPrimaryShell()).run();
+  }
+
+  private void reparentChildren(IFolder from, IFolder to) {
+    boolean changed = false;
+
+    /* Reparent all imported folders into selected Set */
+    List<IFolder> folders = from.getFolders();
+    for (IFolder folder : folders) {
+      folder.setParent(to);
+      to.addFolder(folder, null, null);
+      changed = true;
+    }
+
+    /* Reparent all imported marks into selected Set */
+    List<IMark> marks = from.getMarks();
+    for (IMark mark : marks) {
+      mark.setParent(to);
+      to.addMark(mark, null, null);
+      changed = true;
+    }
+
+    /* Save Set */
+    if (changed)
+      fFolderDAO.save(to);
   }
 
   private IStatus createWarningStatus(IStatus status, IBookMark bookmark, URI feedLink) {
