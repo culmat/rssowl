@@ -148,6 +148,10 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
         ISearchMark searchMark = (ISearchMark) mark;
         List<ISearchCondition> conditions = searchMark.getSearchConditions();
 
+        /* TODO Bug 604: Support import / export of location conditions in SMs */
+        if (containsLocationCondition(searchMark))
+          continue;
+
         writer.write("<rssowl:savedsearch name=\"" + name + "\" matchAllConditions=\"" + searchMark.matchAllConditions() + "\">\n");
         for (ISearchCondition condition : conditions) {
           writer.write("\t<rssowl:searchcondition>\n");
@@ -167,6 +171,16 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
     }
   }
 
+  private boolean containsLocationCondition(ISearchMark mark) {
+    List<ISearchCondition> searchConditions = mark.getSearchConditions();
+    for (ISearchCondition condition : searchConditions) {
+      if (condition.getField().getId() == INews.LOCATION)
+        return true;
+    }
+
+    return false;
+  }
+
   private String escape(String str) {
     str = StringUtils.replaceAll(str, "&", "&amp;");
     str = StringUtils.replaceAll(str, "<", "&lt;");
@@ -178,10 +192,6 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
 
   private String toXML(ISearchCondition condition) {
     StringBuilder str = new StringBuilder();
-
-    /* TODO Support location Import/Export */
-    if (condition.getValue() instanceof Long[][])
-      return str.toString();
 
     /* Search Specifier */
     str.append("\t\t<rssowl:searchspecifier id=\"" + condition.getSpecifier().ordinal() + "\" />\n");
