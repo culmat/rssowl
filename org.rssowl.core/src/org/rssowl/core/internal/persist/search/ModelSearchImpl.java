@@ -25,6 +25,8 @@
 package org.rssowl.core.internal.persist.search;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.StopAnalyzer;
+import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.DateTools;
@@ -76,11 +78,13 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
@@ -109,6 +113,10 @@ public class ModelSearchImpl implements IModelSearch {
 
   /* Cached News States */
   private static final INews.State[] NEWS_STATES = INews.State.values();
+
+  /* A Set of Stop Words in English */
+  @SuppressWarnings( { "unchecked" })
+  private static final Set STOP_WORDS = Collections.synchronizedSet(StopFilter.makeStopSet(StopAnalyzer.ENGLISH_STOP_WORDS));
 
   private IndexSearcher fSearcher;
   private Indexer fIndexer;
@@ -181,6 +189,10 @@ public class ModelSearchImpl implements IModelSearch {
 
       /* Create a Query for each condition */
       BooleanQuery fieldQuery = null;
+      Analyzer analyzer;
+      synchronized (this) {
+        analyzer = fIndexer.createAnalyzer();
+      }
       for (ISearchCondition condition : conditions) {
 
         /* State Queries already handled */
@@ -196,9 +208,14 @@ public class ModelSearchImpl implements IModelSearch {
         /* Create the Clause */
         BooleanClause clause = null;
         if (condition.getField().getId() == IEntity.ALL_FIELDS)
-          clause = createAllNewsFieldsClause(condition, matchAllConditions);
+          clause = createAllNewsFieldsClause(analyzer, condition, matchAllConditions);
         else
-          clause = createBooleanClause(condition, matchAllConditions);
+          clause = createBooleanClause(analyzer, condition, matchAllConditions);
+
+        /* Check if the Clause has any valid Query */
+        Query query = clause.getQuery();
+        if (query instanceof BooleanQuery && ((BooleanQuery) query).clauses().isEmpty())
+          continue;
 
         /*
          * Specially treat this case where the specifier is a negation but any
@@ -288,34 +305,66 @@ public class ModelSearchImpl implements IModelSearch {
   }
 
   //TODO Think about a better performing solution here!
-  private BooleanClause createAllNewsFieldsClause(ISearchCondition condition, boolean matchAllConditions) throws IOException {
+  private BooleanClause createAllNewsFieldsClause(Analyzer analyzer, ISearchCondition condition, boolean matchAllConditions) throws IOException {
     BooleanQuery allFieldsQuery = new BooleanQuery();
     String value = String.valueOf(condition.getValue());
 
-    LowercaseWhitespaceAnalyzer analyzer = new LowercaseWhitespaceAnalyzer();
-    TokenStream tokenStream = analyzer.tokenStream(String.valueOf(IEntity.ALL_FIELDS), new StringReader(value));
+    /* Contained in Title */
+    String titleField = String.valueOf(INews.TITLE);
+    TokenStream tokenStream = analyzer.tokenStream(titleField, new StringReader(value));
     Token token = null;
     while ((token = tokenStream.next()) != null) {
       String termText = token.termText();
 
-      /* Contained in Title */
-      WildcardQuery titleQuery = new WildcardQuery(new Term(String.valueOf(INews.TITLE), termText));
+      WildcardQuery titleQuery = new WildcardQuery(new Term(titleField, termText));
       allFieldsQuery.add(new BooleanClause(titleQuery, Occur.SHOULD));
+    }
 
-      /* Contained in Description */
-      WildcardQuery descriptionQuery = new WildcardQuery(new Term(String.valueOf(INews.DESCRIPTION), termText));
+    /* Contained in Description */
+    String descriptionField = String.valueOf(INews.DESCRIPTION);
+    tokenStream = analyzer.tokenStream(descriptionField, new StringReader(value));
+    while ((token = tokenStream.next()) != null) {
+      String termText = token.termText();
+
+      WildcardQuery descriptionQuery = new WildcardQuery(new Term(descriptionField, termText));
       allFieldsQuery.add(new BooleanClause(descriptionQuery, Occur.SHOULD));
+    }
 
-      /* Contained in Attachment */
-      WildcardQuery attachmentQuery = new WildcardQuery(new Term(String.valueOf(INews.ATTACHMENTS_CONTENT), termText));
+    /* Contained in Attachment */
+    String attachmentField = String.valueOf(INews.ATTACHMENTS_CONTENT);
+    tokenStream = analyzer.tokenStream(attachmentField, new StringReader(value));
+    while ((token = tokenStream.next()) != null) {
+      String termText = token.termText();
+
+      WildcardQuery attachmentQuery = new WildcardQuery(new Term(attachmentField, termText));
       allFieldsQuery.add(new BooleanClause(attachmentQuery, Occur.SHOULD));
+    }
 
-      /* Matches Author */
-      WildcardQuery authorQuery = new WildcardQuery(new Term(String.valueOf(INews.AUTHOR), termText));
+    /* Matches Author */
+    String authorField = String.valueOf(INews.AUTHOR);
+    tokenStream = analyzer.tokenStream(authorField, new StringReader(value));
+    while ((token = tokenStream.next()) != null) {
+      String termText = token.termText();
+
+      /* Explicitly ignore Stop Words here */
+      if (STOP_WORDS.contains(termText))
+        continue;
+
+      WildcardQuery authorQuery = new WildcardQuery(new Term(authorField, termText));
       allFieldsQuery.add(new BooleanClause(authorQuery, Occur.SHOULD));
+    }
 
-      /* Matches Category */
-      WildcardQuery categoryQuery = new WildcardQuery(new Term(String.valueOf(INews.CATEGORIES), termText));
+    /* Matches Category */
+    String categoryField = String.valueOf(INews.CATEGORIES);
+    tokenStream = analyzer.tokenStream(categoryField, new StringReader(value));
+    while ((token = tokenStream.next()) != null) {
+      String termText = token.termText();
+
+      /* Explicitly ignore Stop Words here */
+      if (STOP_WORDS.contains(termText))
+        continue;
+
+      WildcardQuery categoryQuery = new WildcardQuery(new Term(categoryField, termText));
       allFieldsQuery.add(new BooleanClause(categoryQuery, Occur.SHOULD));
     }
 
@@ -324,7 +373,7 @@ public class ModelSearchImpl implements IModelSearch {
     return new BooleanClause(allFieldsQuery, occur);
   }
 
-  private BooleanClause createBooleanClause(ISearchCondition condition, boolean matchAllConditions) throws IOException {
+  private BooleanClause createBooleanClause(Analyzer analyzer, ISearchCondition condition, boolean matchAllConditions) throws IOException {
     Query query = null;
 
     /* Separately handle this dynamic Query */
@@ -349,7 +398,7 @@ public class ModelSearchImpl implements IModelSearch {
           case ISearchValueType.ENUM:
           case ISearchValueType.STRING:
           case ISearchValueType.LINK:
-            query = createStringQuery(condition);
+            query = createStringQuery(analyzer, condition);
             break;
 
           /* Date / Time / DateTime: Date Query (Ranged) */
@@ -467,7 +516,7 @@ public class ModelSearchImpl implements IModelSearch {
     }
   }
 
-  private Query createStringQuery(ISearchCondition condition) throws ParseException, IOException {
+  private Query createStringQuery(Analyzer analyzer, ISearchCondition condition) throws ParseException, IOException {
     SearchSpecifier specifier = condition.getSpecifier();
     String fieldname = String.valueOf(condition.getField().getId());
 
@@ -490,10 +539,6 @@ public class ModelSearchImpl implements IModelSearch {
         /* Let Query-Parser handle this */
       case CONTAINS:
       case CONTAINS_NOT: {
-        Analyzer analyzer;
-        synchronized (this) {
-          analyzer = fIndexer.createAnalyzer();
-        }
         QueryParser parser = new QueryParser(fieldname, analyzer);
         parser.setAllowLeadingWildcard(true);
 
@@ -523,8 +568,8 @@ public class ModelSearchImpl implements IModelSearch {
       case SIMILIAR_TO: {
         BooleanQuery similarityQuery = new BooleanQuery();
 
-        LowercaseWhitespaceAnalyzer analyzer = new LowercaseWhitespaceAnalyzer();
-        TokenStream tokenStream = analyzer.tokenStream(String.valueOf(IEntity.ALL_FIELDS), new StringReader(value));
+        LowercaseWhitespaceAnalyzer similarAnalyzer = new LowercaseWhitespaceAnalyzer();
+        TokenStream tokenStream = similarAnalyzer.tokenStream(String.valueOf(IEntity.ALL_FIELDS), new StringReader(value));
         Token token = null;
         while ((token = tokenStream.next()) != null) {
           Term term = new Term(fieldname, token.termText());
