@@ -73,6 +73,7 @@ public class ImportFeedsAction extends Action implements IWorkbenchWindowActionD
       try {
         Controller.getDefault().importFeeds(string);
       } catch (Exception e) {
+        Activator.getDefault().logError(e.getMessage(), e);
         ErrorDialog.openError(fShell, "Error importing Feeds", "RSSOwl was unable to import '" + string + "'", Activator.getDefault().createErrorStatus(e.getMessage(), e));
       }
 
