@@ -23,12 +23,14 @@
  **  **********************************************************************  */
 package org.rssowl.core.internal.persist.service;
 
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.runnable.EventRunnable;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,8 +46,8 @@ public class EventsMap {
 
   private final ThreadLocal<InternalMap> fEvents = new ThreadLocal<InternalMap>();
 
-  private final ThreadLocal<Map<Integer, ModelEvent>> fEventTemplatesMap =
-    new ThreadLocal<Map<Integer, ModelEvent>>();
+  private final ThreadLocal<Map<IEntity, ModelEvent>> fEventTemplatesMap =
+    new ThreadLocal<Map<IEntity, ModelEvent>>();
 
   private EventsMap() {
     // Enforce singleton pattern
@@ -107,25 +109,25 @@ public class EventsMap {
     return eventRunnables;
   }
 
-  public void putEventTemplate(int id, ModelEvent event) {
-    Map<Integer, ModelEvent> map = fEventTemplatesMap.get();
+  public void putEventTemplate(ModelEvent event) {
+    Map<IEntity, ModelEvent> map = fEventTemplatesMap.get();
     if (map == null) {
-      map = new HashMap<Integer, ModelEvent>();
+      map = new IdentityHashMap<IEntity, ModelEvent>();
       fEventTemplatesMap.set(map);
     }
-    map.put(id, event);
+    map.put(event.getEntity(), event);
   }
 
-  public final Map<Integer, ModelEvent> getEventTemplatesMap() {
-    Map<Integer, ModelEvent> map = fEventTemplatesMap.get();
+  public final Map<IEntity, ModelEvent> getEventTemplatesMap() {
+    Map<IEntity, ModelEvent> map = fEventTemplatesMap.get();
     if (map == null)
       return Collections.emptyMap();
 
     return Collections.unmodifiableMap(fEventTemplatesMap.get());
   }
 
-  public Map<Integer, ModelEvent> removeEventTemplatesMap() {
-    Map<Integer, ModelEvent> map = fEventTemplatesMap.get();
+  public Map<IEntity, ModelEvent> removeEventTemplatesMap() {
+    Map<IEntity, ModelEvent> map = fEventTemplatesMap.get();
     fEventTemplatesMap.remove();
     return map;
   }
