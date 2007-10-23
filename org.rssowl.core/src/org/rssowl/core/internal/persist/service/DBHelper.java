@@ -66,8 +66,7 @@ public class DBHelper {
   }
 
   public static final void putEventTemplate(ModelEvent modelEvent) {
-    int id = System.identityHashCode(modelEvent.getEntity());
-    EventsMap.getInstance().putEventTemplate(id, modelEvent);
+    EventsMap.getInstance().putEventTemplate(modelEvent);
   }
 
   public static final void saveFeed(ObjectContainer db, IFeed feed) {

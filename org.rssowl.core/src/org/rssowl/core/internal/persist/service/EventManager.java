@@ -435,8 +435,8 @@ public class EventManager {
 
   private ModelEvent createModelEvent(IEntity entity) {
     ModelEvent modelEvent = null;
-    Map<Integer, ModelEvent> templatesMap = EventsMap.getInstance().getEventTemplatesMap();
-    ModelEvent template = templatesMap.get(System.identityHashCode(entity));
+    Map<IEntity, ModelEvent> templatesMap = EventsMap.getInstance().getEventTemplatesMap();
+    ModelEvent template = templatesMap.get(entity);
     //TODO In some cases, the template is complete. We can save some object allocation
     //by reusing it.
 
