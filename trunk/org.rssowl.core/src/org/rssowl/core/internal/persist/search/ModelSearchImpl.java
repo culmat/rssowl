@@ -296,7 +296,7 @@ public class ModelSearchImpl implements IModelSearch {
     }
 
     /* Check if the match-all-docs query is required */
-    if (newsStates.size() == 1 && condition.getSpecifier().isNegation())
+    if (condition.getSpecifier().isNegation())
       statesQuery.add(new BooleanClause(new MatchAllDocsQuery(), Occur.MUST));
   }
 
