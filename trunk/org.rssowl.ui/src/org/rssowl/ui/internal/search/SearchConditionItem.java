@@ -614,7 +614,7 @@ public class SearchConditionItem extends Composite {
       if (fieldId != IEntity.ALL_FIELDS && fieldId != INews.TITLE && fieldId != INews.DESCRIPTION && fieldId != INews.ATTACHMENTS_CONTENT && fieldId != INews.AUTHOR) {
         specifiers.add(SearchSpecifier.IS);
 
-        if (fieldId != INews.AGE_IN_DAYS && fieldId != INews.STATE)
+        if (fieldId != INews.AGE_IN_DAYS)
           specifiers.add(SearchSpecifier.IS_NOT);
       }
 
