@@ -2758,6 +2758,27 @@ public class ModelSearchTest {
       List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), true);
       assertSame(result, news3);
     }
+
+    /*
+     * Condition 5: State is not *new* AND State is not *unread*
+     */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS_NOT, EnumSet.of(INews.State.NEW));
+
+      ISearchField field2 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
+      ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS_NOT, EnumSet.of(INews.State.UNREAD));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), true);
+      assertSame(result, news4);
+
+      /* Variant */
+      field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
+      cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS_NOT, EnumSet.of(INews.State.NEW, INews.State.UNREAD));
+
+      result = fModelSearch.searchNews(list(cond1), true);
+      assertSame(result, news4);
+    }
   }
 
   /**
