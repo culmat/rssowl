@@ -445,13 +445,13 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
      * when restoring from the Tray after it has been moved to tray with
      * Shell-Close. Force a layout() to avoid this issue.
      */
-    //shell.setLayoutDeferred(true);
+    shell.setLayoutDeferred(true);
   }
 
   /* Restore from System Tray */
   void restoreFromTray(Shell shell) {
     shell.setVisible(true);
-    //shell.setLayoutDeferred(false);
+    shell.setLayoutDeferred(false);
     shell.setActive();
 
     /* Un-Minimize if minimized */
