@@ -252,7 +252,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private void registerListeners() {
     fPartListener = new IPartListener2() {
 
-      /* Mark *new* News as *unread* */
+      /* Mark *new* News as *unread* ot *read* */
       public void partHidden(IWorkbenchPartReference partRef) {
         if (FeedView.this.equals(partRef.getPart(false)) && fInput.getMark() instanceof IBookMark)
           if (System.currentTimeMillis() - fOpenTime > HANDLE_NEWS_SEEN_DELAY)
@@ -286,10 +286,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
       }
 
       public void partOpened(IWorkbenchPartReference partRef) {
-        fOpenTime = System.currentTimeMillis();
-
-        if (FeedView.this.equals(partRef.getPart(false)))
+        if (FeedView.this.equals(partRef.getPart(false))) {
+          fOpenTime = System.currentTimeMillis();
           OwlUI.updateWindowTitle(fInput != null ? new IMark[] { fInput.getMark() } : null);
+        }
       }
 
       public void partVisible(IWorkbenchPartReference partRef) {
