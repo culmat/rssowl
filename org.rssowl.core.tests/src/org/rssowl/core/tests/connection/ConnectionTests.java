@@ -47,6 +47,7 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.Pair;
+import org.rssowl.core.util.URIUtils;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -91,19 +92,22 @@ public class ConnectionTests {
   @SuppressWarnings("nls")
   public void testProtectedFeed() throws Exception {
     IConnectionService conManager = Owl.getConnectionService();
-    URI feedUrl = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rss.xml");
-    ICredentialsProvider credProvider = conManager.getCredentialsProvider(feedUrl);
+    URI feedUrl1 = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rss.xml");
+    URI feedUrl2 = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/authrequired/feed_rss_copy.xml");
+    ICredentialsProvider credProvider = conManager.getCredentialsProvider(feedUrl1);
 
-    IFeed feed = new Feed(feedUrl);
+    IFeed feed1 = new Feed(feedUrl1);
+    IFeed feed2 = new Feed(feedUrl2);
     AuthenticationRequiredException e = null;
 
     try {
-      new DefaultProtocolHandler().openStream(feed.getLink(), null);
+      new DefaultProtocolHandler().openStream(feed1.getLink(), null);
     } catch (AuthenticationRequiredException e1) {
       e = e1;
     }
 
     assertNotNull(e);
+    e = null;
 
     ICredentials credentials = new ICredentials() {
       public String getDomain() {
@@ -119,13 +123,33 @@ public class ConnectionTests {
       }
     };
 
-    credProvider.setAuthCredentials(credentials, feedUrl, null);
+    credProvider.setAuthCredentials(credentials, feedUrl1, null);
 
-    InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
+    InputStream inS = new DefaultProtocolHandler().openStream(feed1.getLink(), null);
     assertNotNull(inS);
 
-    Owl.getInterpreter().interpret(inS, feed);
-    assertEquals("RSS 2.0", feed.getFormat());
+    Owl.getInterpreter().interpret(inS, feed1);
+    assertEquals("RSS 2.0", feed1.getFormat());
+
+    /* Test authentication by other realm is not working */
+    credProvider.setAuthCredentials(credentials, URIUtils.normalizeUri(feedUrl2, true), "Other Directory");
+
+    try {
+      new DefaultProtocolHandler().openStream(feed2.getLink(), null);
+    } catch (AuthenticationRequiredException e1) {
+      e = e1;
+    }
+
+    assertNotNull(e);
+
+    /* Test authentication by realm is working */
+    credProvider.setAuthCredentials(credentials, URIUtils.normalizeUri(feedUrl2, true), "Restricted Directory");
+
+    inS = new DefaultProtocolHandler().openStream(feed2.getLink(), null);
+    assertNotNull(inS);
+
+    Owl.getInterpreter().interpret(inS, feed2);
+    assertEquals("RSS 2.0", feed2.getFormat());
   }
 
   /**
