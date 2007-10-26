@@ -35,6 +35,7 @@ import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.DateUtils;
@@ -71,6 +72,7 @@ public class CleanUpModel {
   private ISearchField fLocationField;
   private ISearchField fAgeInDaysField;
   private String fNewsName;
+  private INewsDAO fNewsDao;
 
   /**
    * @param operations
@@ -82,6 +84,7 @@ public class CleanUpModel {
     fTasks = new ArrayList<CleanUpGroup>();
     fFactory = Owl.getModelFactory();
     fModelSearch = Owl.getPersistenceService().getModelSearch();
+    fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
 
     String newsName = INews.class.getName();
     fLocationField = fFactory.createSearchField(INews.LOCATION, newsName);
@@ -158,7 +161,7 @@ public class CleanUpModel {
         conditions.add(ageCond);
         conditions.add(stateCondition);
 
-        List<SearchHit<NewsReference>> results = fModelSearch.searchNews(conditions, true);
+        List<SearchHit<NewsReference>> results = filterInvalidResults(fModelSearch.searchNews(conditions, true));
         if (results.isEmpty()) {
           bookmarksToDelete.add(mark);
           group.addTask(new BookMarkTask(group, mark));
@@ -219,7 +222,7 @@ public class CleanUpModel {
         conditions.addAll(labelConditions);
 
         /* Check if result count exceeds limit */
-        List<SearchHit<NewsReference>> results = fModelSearch.searchNews(conditions, true);
+        List<SearchHit<NewsReference>> results = filterInvalidResults(fModelSearch.searchNews(conditions, true));
         if (results.size() > fOps.getMaxNewsCountPerFeed()) {
           int toDeleteValue = results.size() - fOps.getMaxNewsCountPerFeed();
 
@@ -271,7 +274,7 @@ public class CleanUpModel {
         conditions.add(stickyCondition);
         conditions.addAll(labelConditions);
 
-        List<SearchHit<NewsReference>> results = fModelSearch.searchNews(conditions, true);
+        List<SearchHit<NewsReference>> results = filterInvalidResults(fModelSearch.searchNews(conditions, true));
         Set<NewsReference> newsOfMarkToDelete = new HashSet<NewsReference>();
         for (SearchHit<NewsReference> result : results)
           newsOfMarkToDelete.add(result.getResult());
@@ -321,7 +324,7 @@ public class CleanUpModel {
         conditions.add(stickyCondition);
         conditions.addAll(labelConditions);
 
-        List<SearchHit<NewsReference>> results = fModelSearch.searchNews(conditions, true);
+        List<SearchHit<NewsReference>> results = filterInvalidResults(fModelSearch.searchNews(conditions, true));
         Set<NewsReference> newsOfMarkToDelete = new HashSet<NewsReference>();
         for (SearchHit<NewsReference> result : results)
           newsOfMarkToDelete.add(result.getResult());
@@ -350,5 +353,17 @@ public class CleanUpModel {
       if (!group.isEmpty())
         fTasks.add(group);
     }
+  }
+
+  /* TODO Have to test if Entity really exists (bug 337) */
+  private List<SearchHit<NewsReference>> filterInvalidResults(List<SearchHit<NewsReference>> results) {
+    List<SearchHit<NewsReference>> validResults = new ArrayList<SearchHit<NewsReference>>(results.size());
+
+    for (SearchHit<NewsReference> searchHit : results) {
+      if (fNewsDao.exists(searchHit.getResult().getId()))
+        validResults.add(searchHit);
+    }
+
+    return validResults;
   }
 }
