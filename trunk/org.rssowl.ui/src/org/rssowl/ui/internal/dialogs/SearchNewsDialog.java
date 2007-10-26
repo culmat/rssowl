@@ -827,7 +827,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
           if (!visibleStates.contains(state))
             continue;
 
-          /* TODO Have to test if Entity really exists (bug 173) */
+          /* TODO Have to test if Entity really exists (bug 337) */
           if (!fNewsDao.exists(searchHit.getResult().getId()))
             continue;
 
