@@ -374,10 +374,6 @@ public class News extends AbstractEntity implements INews {
     }
   }
 
-  private static String getGuidValue(IGuid guid) {
-    return guid == null ? null : guid.getValue();
-  }
-
   /*
    * @see org.rssowl.core.model.types.INews#addAttachment(org.rssowl.core.model.types.IAttachment)
    */
