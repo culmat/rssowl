@@ -74,11 +74,19 @@ public class RetentionStrategy {
     for (IFolderChild child : childs) {
       if (child instanceof IBookMark) {
         IBookMark bookmark = (IBookMark) child;
-        List<INews> visibleNews = bookmark.getFeedLinkReference().resolve().getVisibleNews();
-        newsToDelete.addAll(getNewsToDelete(bookmark, visibleNews));
+        if (requiresRetention(bookmark)) {
+          List<INews> visibleNews = bookmark.getFeedLinkReference().resolve().getVisibleNews();
+          newsToDelete.addAll(getNewsToDelete(bookmark, visibleNews));
+        }
       } else if (child instanceof IFolder)
         internalProcess((IFolder) child, newsToDelete);
     }
+  }
+
+  private static boolean requiresRetention(IBookMark bookmark) {
+    IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(bookmark);
+
+    return prefs.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE) || prefs.getBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE) || prefs.getBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE);
   }
 
   /**
@@ -87,9 +95,11 @@ public class RetentionStrategy {
    * @param bookmark The <code>IBookMark</code> to run the Retention on.
    */
   public static void process(IBookMark bookmark) {
-    IFeed feed = bookmark.getFeedLinkReference().resolve();
-    if (feed != null)
-      process(bookmark, feed.getVisibleNews());
+    if (requiresRetention(bookmark)) {
+      IFeed feed = bookmark.getFeedLinkReference().resolve();
+      if (feed != null)
+        process(bookmark, feed.getVisibleNews());
+    }
   }
 
   /**
