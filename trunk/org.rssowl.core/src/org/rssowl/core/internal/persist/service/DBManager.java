@@ -183,7 +183,7 @@ public class DBManager {
   private boolean migrate(int workspaceFormat, int currentFormat, IProgressMonitor progressMonitor) {
     ConfigurationFactory configFactory = new ConfigurationFactory() {
       public Configuration createConfiguration() {
-        return DBManager.this.createConfiguration();
+        return DBManager.createConfiguration();
       }
     };
     Migration migration = new Migrations().getMigration(workspaceFormat, currentFormat);
