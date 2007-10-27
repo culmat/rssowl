@@ -24,7 +24,9 @@
 
 package org.rssowl.ui.internal;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -451,9 +453,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   /* Restore from System Tray */
   void restoreFromTray(Shell shell) {
     shell.setVisible(true);
-    shell.setLayoutDeferred(false);
-    shell.setLayoutDeferred(false);
     shell.setActive();
+    shell.setLayoutDeferred(false);
+
+    String msg = "Layout Deferred: " + shell.isLayoutDeferred();
+    IStatus status = new Status(IStatus.INFO, Activator.getDefault().getBundle().getSymbolicName(),IStatus.OK, msg, null);
+    Activator.getDefault().getLog().log(status);
 
     /* Un-Minimize if minimized */
     if (shell.getMinimized())
