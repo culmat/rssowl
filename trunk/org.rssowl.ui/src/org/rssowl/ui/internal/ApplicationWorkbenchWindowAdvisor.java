@@ -452,6 +452,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   void restoreFromTray(Shell shell) {
     shell.setVisible(true);
     shell.setLayoutDeferred(false);
+    shell.setLayoutDeferred(false);
     shell.setActive();
 
     /* Un-Minimize if minimized */
