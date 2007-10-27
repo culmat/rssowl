@@ -941,6 +941,6 @@ public class Controller {
 
     msg.append("\nLink: ").append(feedLink);
 
-    return new Status(IStatus.WARNING, status.getPlugin(), status.getCode(), msg.toString(), status.getException());
+    return new Status(IStatus.WARNING, status.getPlugin(), status.getCode(), msg.toString(), null);
   }
 }
