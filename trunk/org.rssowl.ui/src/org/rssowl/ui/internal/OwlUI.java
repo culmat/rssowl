@@ -547,9 +547,14 @@ public class OwlUI {
    * @param id
    * @param bytes
    * @param defaultImage
+   * @param wHint
+   * @param hHint
    */
-  public static void storeImage(long id, byte[] bytes, ImageDescriptor defaultImage) {
+  public static void storeImage(long id, byte[] bytes, ImageDescriptor defaultImage, int wHint, int hHint) {
     Assert.isNotNull(defaultImage);
+    Assert.isLegal(wHint > 0);
+    Assert.isLegal(hHint > 0);
+
     ImageData imgData = null;
 
     /* Bytes Provided */
@@ -562,7 +567,7 @@ public class OwlUI {
 
         /* Look for the Icon with the best quality */
         if (imageDatas != null)
-          imgData = getBestQuality(imageDatas);
+          imgData = getBestQuality(imageDatas, wHint, hHint);
       } catch (SWTException e) {
         /* Ignore any Image-Format exceptions */
       } finally {
@@ -612,22 +617,35 @@ public class OwlUI {
   }
 
   /* Returns the ImageData with best Depth or Size */
-  private static ImageData getBestQuality(ImageData datas[]) {
+  private static ImageData getBestQuality(ImageData datas[], int wHint, int hHint) {
     ImageData bestSize = null;
     ImageData bestDepth = null;
     int maxDepth = -1;
     int maxSize = -1;
 
-    /* Foreach Image */
+    /* Foreach Image: Check best Depth */
     for (ImageData data : datas) {
       if (data.depth > maxDepth) {
         maxDepth = data.depth;
         bestDepth = data;
       }
+    }
 
-      if (data.width * data.height > maxSize) {
-        maxSize = data.width * data.height;
-        bestSize = data;
+    /* Foreach Image: Check best Size */
+    for (ImageData data : datas) {
+
+      /* Only consider best depth */
+      if (data.depth == maxDepth) {
+
+        /* Return if Size matches Hint */
+        if (data.width == wHint && data.height == hHint)
+          return data;
+
+        /* Otherwise look for bigges */
+        if (data.width * data.height > maxSize) {
+          maxSize = data.width * data.height;
+          bestSize = data;
+        }
       }
     }
 
@@ -839,8 +857,8 @@ public class OwlUI {
 
   /**
    * Attempts to find the first <code>FeedView</code> from the active
-   * Workbench Window of the PlatformUI facade. Otherwise, returns <code>NULL</code>
-   * if none.
+   * Workbench Window of the PlatformUI facade. Otherwise, returns
+   * <code>NULL</code> if none.
    *
    * @return the first <code>FeedView</code> from the active Workbench Window
    * of the PlatformUI facade or <code>NULL</code> if none.
