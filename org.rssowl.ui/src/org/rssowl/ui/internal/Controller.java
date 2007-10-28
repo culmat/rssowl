@@ -473,7 +473,7 @@ public class Controller {
 
           /* Store locally */
           if (!monitor.isCanceled() && !fShuttingDown)
-            OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK);
+            OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK, 16, 16);
         } catch (UnknownFeedException e) {
           Activator.getDefault().getLog().log(e.getStatus());
         }
@@ -566,7 +566,7 @@ public class Controller {
       else if ((e instanceof InterpreterException || e instanceof ParserException) && OwlUI.getFavicon(bookmark) == null && !fShuttingDown) {
         try {
           byte[] faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
-          OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK);
+          OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK, 16, 16);
         } catch (ConnectionException exe) {
           Activator.getDefault().getLog().log(exe.getStatus());
         }
