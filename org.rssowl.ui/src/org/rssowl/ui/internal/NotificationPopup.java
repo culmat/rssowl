@@ -40,12 +40,16 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -147,6 +151,35 @@ public class NotificationPopup extends PopupDialog {
     initResources();
   }
 
+  private void addRegion(Shell shell) {
+    Region region = new Region();
+    Point s = shell.getSize();
+
+    /* Add entire Shell */
+    region.add(0, 0, s.x, s.y);
+
+    /* Subtract Top-Left Corner */
+    region.subtract(0, 0, 5, 1);
+    region.subtract(0, 1, 3, 1);
+    region.subtract(0, 2, 2, 1);
+    region.subtract(0, 3, 1, 1);
+    region.subtract(0, 4, 1, 1);
+
+    /* Subtract Top-Right Corner */
+    region.subtract(s.x - 5, 0, 5, 1);
+    region.subtract(s.x - 3, 1, 3, 1);
+    region.subtract(s.x - 2, 2, 2, 1);
+    region.subtract(s.x - 1, 3, 1, 1);
+    region.subtract(s.x - 1, 4, 1, 1);
+
+    /* Dispose old first */
+    if (shell.getRegion() != null)
+      shell.getRegion().dispose();
+
+    /* Apply Region */
+    shell.setRegion(region);
+  }
+
   private void createAutoCloser() {
     fAutoCloser = new UIJob(PlatformUI.getWorkbench().getDisplay(), "") {
       @Override
@@ -234,6 +267,9 @@ public class NotificationPopup extends PopupDialog {
     Point newSize = new Point(oldSize.x, newHeight);
     Point newLocation = getInitialLocation(newSize);
     getShell().setBounds(newLocation.x, newLocation.y, newSize.x, newSize.y);
+
+    /* Add Region to Shell */
+    addRegion(getShell());
   }
 
   private void renderNews(final INews news) {
@@ -394,17 +430,47 @@ public class NotificationPopup extends PopupDialog {
     ((GridLayout) parent.getLayout()).marginHeight = 1;
 
     /* Outer Compositing holding the controlls */
-    Composite outerCircle = new Composite(parent, SWT.NO_FOCUS);
+    final Composite outerCircle = new Composite(parent, SWT.NO_FOCUS);
     outerCircle.setBackground(fPopupOuterCircleColor);
     outerCircle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     outerCircle.setLayout(LayoutUtils.createGridLayout(1, 0, 3, 3));
+    outerCircle.addPaintListener(new PaintListener() {
+      public void paintControl(PaintEvent e) {
+        Rectangle clArea = outerCircle.getClientArea();
+        GC gc = e.gc;
+        gc.setForeground(fPopupBorderColor);
+
+        /* Fill Top Left */
+        gc.drawPoint(2, 0);
+        gc.drawPoint(3, 0);
+        gc.drawPoint(1, 1);
+        gc.drawPoint(0, 2);
+
+        /* Fill Top Right */
+        gc.drawPoint(clArea.width - 4, 0);
+        gc.drawPoint(clArea.width - 3, 0);
+        gc.drawPoint(clArea.width - 2, 1);
+        gc.drawPoint(clArea.width - 1, 2);
+      }
+    });
 
     /* Title area containing label and close button */
-    Composite titleCircle = new Composite(outerCircle, SWT.NO_FOCUS);
+    final Composite titleCircle = new Composite(outerCircle, SWT.NO_FOCUS);
     titleCircle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     titleCircle.setBackground(outerCircle.getBackground());
     titleCircle.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    ((GridLayout) titleCircle.getLayout()).marginHeight = 1;
     titleCircle.addMouseTrackListener(fMouseTrackListner);
+    titleCircle.addPaintListener(new PaintListener() {
+      public void paintControl(PaintEvent e) {
+        Rectangle clArea = titleCircle.getClientArea();
+        GC gc = e.gc;
+        gc.setForeground(fPopupBorderColor);
+
+        gc.drawPoint(0, 0);
+        gc.drawPoint(clArea.width - 1, 0);
+      }
+    });
 
     /* Title Label displaying RSSOwl */
     fTitleCircleLabel = new CLabel(titleCircle, SWT.NO_FOCUS);
@@ -460,7 +526,7 @@ public class NotificationPopup extends PopupDialog {
     Composite middleContentCircle = new Composite(fOuterContentCircle, SWT.NO_FOCUS);
     middleContentCircle.setLayout(LayoutUtils.createGridLayout(1, 1, 1));
     middleContentCircle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    middleContentCircle.setBackground(getShell().getDisplay().getSystemColor(SWT.COLOR_BLACK));
+    middleContentCircle.setBackground(getShell().getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
 
     /* Inner composite containing the content controlls */
     fInnerContentCircle = new Composite(middleContentCircle, SWT.NO_FOCUS);
@@ -508,6 +574,9 @@ public class NotificationPopup extends PopupDialog {
   @Override
   public boolean close() {
     fResources.dispose();
+    if (getShell().getRegion() != null)
+      getShell().getRegion().dispose();
+
     return super.close();
   }
 }
