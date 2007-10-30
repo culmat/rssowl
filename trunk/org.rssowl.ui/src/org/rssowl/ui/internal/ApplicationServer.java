@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ContentViewer;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
@@ -45,7 +46,6 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserViewer;
-import org.rssowl.ui.internal.editors.feed.NewsContentProvider;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -459,7 +459,7 @@ public class ApplicationServer {
     /* Ask for ContentProvider of Viewer */
     ContentViewer viewer = fRegistry.get(viewerId);
     if (viewer instanceof NewsBrowserViewer && viewer.getContentProvider() != null) {
-      NewsContentProvider newsContentProvider = (NewsContentProvider) viewer.getContentProvider();
+      IStructuredContentProvider newsContentProvider = (IStructuredContentProvider) viewer.getContentProvider();
 
       /* Look for BookMarks that are to displayed */
       int displayBookMarkIndex = parameters.indexOf(OP_DISPLAY_BOOKMARK);
