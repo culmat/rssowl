@@ -369,7 +369,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * @return An flattend array of Objects.
    */
   public Object[] getFlattendChildren(Object input) {
-    if (input != null && getContentProvider() != null) {
+
+    /* Using NewsContentProvider */
+    if (input != null && getContentProvider() instanceof NewsContentProvider) {
       NewsContentProvider cp = (NewsContentProvider) getContentProvider();
 
       /*
@@ -410,6 +412,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       /* Grouping is not enabled, just return sorted Children */
       return getSortedChildren(input);
     }
+
+    /* Structured ContentProvider */
+    else if (input != null && getContentProvider() instanceof IStructuredContentProvider)
+      return getSortedChildren(input);
 
     /* No Element to show */
     return new Object[0];
