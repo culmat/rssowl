@@ -26,6 +26,8 @@ package org.rssowl.ui.internal.search;
 
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -415,6 +417,12 @@ public class SearchConditionItem extends Composite {
           /* Provide Auto-Complete Field */
           hookAutoComplete(text, field.getSearchValueType().getEnumValues());
 
+          /* Show UI Hint that Content Assist is available */
+          ControlDecoration controlDeco = new ControlDecoration(text, SWT.LEFT | SWT.TOP);
+          controlDeco.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
+          controlDeco.setDescriptionText("Content Assist Available (Press Arrow-Down Key)");
+          controlDeco.setShowOnlyOnFocus(true);
+
           /* Pre-Select input if given */
           String inputValue = (input != null ? input.toString() : null);
           if (inputValue != null)
@@ -487,6 +495,12 @@ public class SearchConditionItem extends Composite {
                 }
               }
             });
+
+            /* Show UI Hint that Content Assist is available */
+            ControlDecoration controlDeco = new ControlDecoration(text, SWT.LEFT | SWT.TOP);
+            controlDeco.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
+            controlDeco.setDescriptionText("Content Assist Available (Press Arrow-Down Key)");
+            controlDeco.setShowOnlyOnFocus(true);
           }
 
           /* Pre-Select input if given */
