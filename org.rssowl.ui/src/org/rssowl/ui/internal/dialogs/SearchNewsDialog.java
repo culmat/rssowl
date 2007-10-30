@@ -109,6 +109,7 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.SearchHit;
+import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.CColumnLayoutData;
@@ -663,7 +664,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fResultViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
         IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-        if (!selection.isEmpty())
+        if (!selection.isEmpty() && fIsPreviewVisible)
           fBrowserViewer.setInput(selection.getFirstElement());
       }
     });
@@ -676,11 +677,11 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     /* Radio to select Condition Matching */
     fMatchAllRadio = new Button(topControlsContainer, SWT.RADIO);
-    fMatchAllRadio.setText("Match all conditions");
+    fMatchAllRadio.setText("&Match all conditions");
     fMatchAllRadio.setSelection(fMatchAllConditions);
 
     fMatchAnyRadio = new Button(topControlsContainer, SWT.RADIO);
-    fMatchAnyRadio.setText("Match any condition");
+    fMatchAnyRadio.setText("Match any &condition");
     fMatchAnyRadio.setSelection(!fMatchAllConditions);
 
     /* ToolBar to add and select existing saved searches */
@@ -688,7 +689,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     /* Toggle Preview */
     final String previewActionId = "org.rssowl.ui.internal.dialogs.search.PreviewAction";
-    IAction previewAction = new Action("Toggle Preview", IAction.AS_CHECK_BOX) {
+    IAction previewAction = new Action("&Toggle Preview", IAction.AS_CHECK_BOX) {
       @Override
       public void run() {
         fIsPreviewVisible = !fIsPreviewVisible;
@@ -697,9 +698,14 @@ public class SearchNewsDialog extends TitleAreaDialog {
         fSashForm.layout();
         dialogToolBar.find(previewActionId).update(IAction.TOOL_TIP_TEXT);
 
-        /* Select and Show first News if required */
-        if (fIsPreviewVisible && fResultViewer.getSelection().isEmpty() && fResultViewer.getTable().getItemCount() > 0) {
-          fResultViewer.getTable().select(0);
+        /* Select and Show News if required */
+        if (fIsPreviewVisible && fResultViewer.getTable().getItemCount() > 0) {
+
+          /* Select first News if required */
+          if (fResultViewer.getSelection().isEmpty())
+            fResultViewer.getTable().select(0);
+
+          /* Set input and Focus */
           fBrowserViewer.setInput(((IStructuredSelection) fResultViewer.getSelection()).getFirstElement());
           fResultViewer.getTable().setFocus();
         }
@@ -726,7 +732,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     dialogToolBar.add(new Separator());
 
     /* Existing Saved Searches */
-    IAction savedSearches = new Action("Saved Searches", IAction.AS_DROP_DOWN_MENU) {
+    IAction savedSearches = new Action("&Saved Searches", IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
         getMenuCreator().getMenu(dialogToolBar.getControl()).setVisible(true);
@@ -1002,6 +1008,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fMatchAllRadio.setSelection(false);
     fMatchAnyRadio.setSelection(true);
     fResultViewer.setInput(Collections.emptyList());
+    fBrowserViewer.setInput(URIUtils.ABOUT_BLANK);
 
     /* Unset Error Message */
     setErrorMessage(null);
