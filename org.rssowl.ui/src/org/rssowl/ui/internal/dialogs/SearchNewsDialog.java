@@ -44,8 +44,10 @@ import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
@@ -120,6 +122,8 @@ import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MarkNewsReadAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
+import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider;
+import org.rssowl.ui.internal.editors.feed.NewsBrowserViewer;
 import org.rssowl.ui.internal.editors.feed.NewsComparator;
 import org.rssowl.ui.internal.editors.feed.NewsTableControl;
 import org.rssowl.ui.internal.editors.feed.NewsTableLabelProvider;
@@ -158,8 +162,17 @@ public class SearchNewsDialog extends TitleAreaDialog {
   /* Min width of the dialog in DLUs */
   private static final int DIALOG_MIN_WIDTH = 500;
 
+  /* Sash Weights when Preview is invisible */
+  private static final int[] TWO_SASH_WEIGHTS = new int[] { 50, 60, 0 };
+
+  /* Sash Weights when Preview is visible */
+  private static final int[] THREE_SASH_WEIGHTS = new int[] { 25, 25, 50 };
+
   /* Section for Dialogs Settings */
   private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.SearchNewsDialog";
+
+  /* Preference: State of showing Preview */
+  private static final String PREF_PREVIEW_VISIBLE = "org.rssowl.ui.internal.dialogs.search.PreviewVisible";
 
   /* ID to associate a Column with its ID */
   private static final String COL_ID = "org.rssowl.ui.internal.editors.feed.ColumnIdentifier";
@@ -190,9 +203,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private Button fMatchAllRadio;
   private Button fMatchAnyRadio;
   private SearchConditionList fSearchConditionList;
-  private TableViewer fViewer;
+  private TableViewer fResultViewer;
   private ScoredNewsComparator fNewsSorter;
   private Link fStatusLabel;
+  private NewsBrowserViewer fBrowserViewer;
 
   /* Misc. */
   private NewsTableControl.Columns fInitialSortColumn = NewsTableControl.Columns.SCORE;
@@ -210,6 +224,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private INewsDAO fNewsDao;
   private IPreferenceScope fPreferences;
   private LabelAdapter fLabelListener;
+  private boolean fIsPreviewVisible;
+  private SashForm fSashForm;
+  private Composite fBottomSash;
 
   /* Container for a search result */
   private static class ScoredNews {
@@ -486,6 +503,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fDialogSettings = Activator.getDefault().getDialogSettings();
     fFirstTimeOpen = (fDialogSettings.getSection(SETTINGS_SECTION) == null);
+    fIsPreviewVisible = fPreferences.getBoolean(PREF_PREVIEW_VISIBLE);
     fModelSearch = Owl.getPersistenceService().getModelSearch();
     fHandCursor = parentShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND);
     fInitialConditions = initialConditions;
@@ -508,6 +526,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
    */
   @Override
   public boolean close() {
+    fPreferences.putBoolean(PREF_PREVIEW_VISIBLE, fIsPreviewVisible);
     fgOpenDialogCount--;
 
     /*
@@ -516,7 +535,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
      * reference to the TableViewer is held in Memory, so we need to explicitly
      * clear the virtual manager.
      */
-    fViewer.setItemCount(0);
+    fResultViewer.setItemCount(0);
 
     boolean res = super.close();
     fResources.dispose();
@@ -566,12 +585,12 @@ public class SearchNewsDialog extends TitleAreaDialog {
     setMessage("You can use \'?\' for any character and \'*\' for any number of characters in your search.", IMessageProvider.INFORMATION);
 
     /* Sashform dividing search definition from results */
-    SashForm sashForm = new SashForm(parent, SWT.VERTICAL | SWT.SMOOTH);
-    sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-    sashForm.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    fSashForm = new SashForm(parent, SWT.VERTICAL | SWT.SMOOTH);
+    fSashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+    fSashForm.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
     /* Top Area */
-    Composite topSash = new Composite(sashForm, SWT.NONE);
+    Composite topSash = new Composite(fSashForm, SWT.NONE);
     topSash.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
 
     Composite topSashContent = new Composite(topSash, SWT.None);
@@ -581,22 +600,73 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Create Condition Controls */
     createConditionControls(topSashContent);
 
-    /* Create Sash */
-    Composite bottomSash = new Composite(sashForm, SWT.NONE);
-    bottomSash.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
-    sashForm.setWeights(new int[] { 50, 50 });
+    /* Create Center Sash */
+    Composite centerSash = new Composite(fSashForm, SWT.NONE);
+    centerSash.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
 
     /* Separator */
-    new Label(bottomSash, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.END, true, false));
+    new Label(centerSash, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.END, true, false));
 
-    Composite bottomSashContent = new Composite(bottomSash, SWT.None);
+    Composite centerSashContent = new Composite(centerSash, SWT.None);
+    centerSashContent.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
+    centerSashContent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+    /* Create Viewer for Results */
+    createResultViewer(centerSashContent);
+
+    /* Create Bottom Sash */
+    fBottomSash = new Composite(fSashForm, SWT.NONE);
+    fBottomSash.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
+    fBottomSash.setVisible(fIsPreviewVisible);
+
+    Composite bottomSashContent = new Composite(fBottomSash, SWT.None);
     bottomSashContent.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
     bottomSashContent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-    /* Create Viewer for Results */
-    createResultViewer(bottomSashContent);
+    /* Create Viewer for News Item */
+    createBrowserViewer(bottomSashContent);
 
-    return sashForm;
+    /* Set weight to SashForm */
+    fSashForm.setWeights(fIsPreviewVisible ? THREE_SASH_WEIGHTS : new int[] { 40, 60, 0 });
+
+    /* Separator */
+    new Label(fBottomSash, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.END, true, false));
+
+    return fSashForm;
+  }
+
+  private void createBrowserViewer(Composite bottomSashContent) {
+    fBrowserViewer = new NewsBrowserViewer(bottomSashContent, SWT.NONE);
+    fBrowserViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+    /* Create Content Provider */
+    fBrowserViewer.setContentProvider(new IStructuredContentProvider() {
+      public Object[] getElements(Object inputElement) {
+        if (inputElement instanceof Object[] && ((Object[]) inputElement).length > 0)
+          inputElement = ((Object[]) inputElement)[0];
+
+        if (inputElement instanceof NewsReference)
+          return new Object[] { ((NewsReference) inputElement).resolve() };
+
+        return new Object[] { inputElement };
+      }
+
+      public void dispose() {}
+
+      public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
+    });
+
+    /* Create LabelProvider */
+    fBrowserViewer.setLabelProvider(new NewsBrowserLabelProvider());
+
+    /* Set input when selection in result viewer changes */
+    fResultViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      public void selectionChanged(SelectionChangedEvent event) {
+        IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+        if (!selection.isEmpty())
+          fBrowserViewer.setInput(selection.getFirstElement());
+      }
+    });
   }
 
   private void createConditionControls(Composite container) {
@@ -616,6 +686,46 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* ToolBar to add and select existing saved searches */
     final ToolBarManager dialogToolBar = new ToolBarManager(SWT.RIGHT | SWT.FLAT);
 
+    /* Toggle Preview */
+    final String previewActionId = "org.rssowl.ui.internal.dialogs.search.PreviewAction";
+    IAction previewAction = new Action("Toggle Preview", IAction.AS_CHECK_BOX) {
+      @Override
+      public void run() {
+        fIsPreviewVisible = !fIsPreviewVisible;
+        fSashForm.setWeights(fIsPreviewVisible ? THREE_SASH_WEIGHTS : TWO_SASH_WEIGHTS);
+        fBottomSash.setVisible(fIsPreviewVisible);
+        fSashForm.layout();
+        dialogToolBar.find(previewActionId).update(IAction.TOOL_TIP_TEXT);
+
+        /* Select and Show first News if required */
+        if (fIsPreviewVisible && fResultViewer.getSelection().isEmpty() && fResultViewer.getTable().getItemCount() > 0) {
+          fResultViewer.getTable().select(0);
+          fBrowserViewer.setInput(((IStructuredSelection) fResultViewer.getSelection()).getFirstElement());
+          fResultViewer.getTable().setFocus();
+        }
+      }
+
+      @Override
+      public ImageDescriptor getImageDescriptor() {
+        return OwlUI.getImageDescriptor("icons/etool16/browsermaximized.gif");
+      }
+
+      @Override
+      public String getToolTipText() {
+        if (fIsPreviewVisible)
+          return "Hide Preview";
+
+        return "Show Preview";
+      }
+    };
+    previewAction.setId(previewActionId);
+    previewAction.setChecked(fIsPreviewVisible);
+    dialogToolBar.add(previewAction);
+
+    /* Separator */
+    dialogToolBar.add(new Separator());
+
+    /* Existing Saved Searches */
     IAction savedSearches = new Action("Saved Searches", IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
@@ -675,7 +785,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
     dialogToolBar.add(savedSearches);
     dialogToolBar.createControl(topControlsContainer);
     dialogToolBar.getControl().setLayoutData(new GridData(SWT.END, SWT.BEGINNING, true, false));
-    dialogToolBar.getControl().getItem(0).setText(savedSearches.getText());
+
+    dialogToolBar.getControl().getItem(0).setText(previewAction.getText());
+    dialogToolBar.getControl().getItem(2).setText(savedSearches.getText());
 
     /* Container for Conditions */
     final Composite conditionsContainer = new Composite(container, SWT.NONE);
@@ -850,7 +962,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
       protected void runInUI(IProgressMonitor monitor) {
 
         /* Set Input (sorted) to Viewer */
-        fViewer.setInput(fResult);
+        fResultViewer.setInput(fResult);
 
         /* Update Status Label */
         String text;
@@ -889,7 +1001,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fSearchConditionList.reset();
     fMatchAllRadio.setSelection(false);
     fMatchAnyRadio.setSelection(true);
-    fViewer.setInput(Collections.emptyList());
+    fResultViewer.setInput(Collections.emptyList());
 
     /* Unset Error Message */
     setErrorMessage(null);
@@ -909,10 +1021,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
     dialog.open();
   }
 
-  private void createResultViewer(Composite bottomSashContent) {
+  private void createResultViewer(Composite centerSashContent) {
 
     /* Container for Table */
-    Composite tableContainer = new Composite(bottomSashContent, SWT.NONE);
+    Composite tableContainer = new Composite(centerSashContent, SWT.NONE);
     tableContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     tableContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
 
@@ -921,31 +1033,31 @@ public class SearchNewsDialog extends TitleAreaDialog {
     CTable customTable = new CTable(tableContainer, style);
 
     /* Viewer */
-    fViewer = new TableViewer(customTable.getControl()) {
+    fResultViewer = new TableViewer(customTable.getControl()) {
       @Override
       public ISelection getSelection() {
         StructuredSelection selection = (StructuredSelection) super.getSelection();
         return convertToNews(selection);
       }
     };
-    fViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    fViewer.setUseHashlookup(true);
-    fViewer.getControl().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
-    fViewer.getTable().setHeaderVisible(true);
+    fResultViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    fResultViewer.setUseHashlookup(true);
+    fResultViewer.getControl().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
+    fResultViewer.getTable().setHeaderVisible(true);
 
     /* Separator */
-    new Label(bottomSashContent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    new Label(centerSashContent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Create the Columns */
     createColumns(customTable);
 
     /* Apply ContentProvider */
-    fViewer.setContentProvider(getContentProvider());
+    fResultViewer.setContentProvider(getContentProvider());
 
     /* Create LabelProvider (Custom Owner Drawn enabled!) */
     final NewsTableLabelProvider newsTableLabelProvider = new NewsTableLabelProvider();
     if (USE_CUSTOM_OWNER_DRAWN) {
-      fViewer.getControl().addListener(SWT.EraseItem, new Listener() {
+      fResultViewer.getControl().addListener(SWT.EraseItem, new Listener() {
         public void handleEvent(Event event) {
           Object element = event.item.getData();
           newsTableLabelProvider.erase(event, element);
@@ -954,13 +1066,13 @@ public class SearchNewsDialog extends TitleAreaDialog {
     }
 
     //OwnerDrawLabelProvider.setUpOwnerDraw(fViewer); Not being used due to performance reasons
-    fViewer.setLabelProvider(new ScoredNewsLabelProvider());
+    fResultViewer.setLabelProvider(new ScoredNewsLabelProvider());
 
     /* Create Sorter */
     fNewsSorter = new ScoredNewsComparator();
     fNewsSorter.setAscending(fInitialAscending);
     fNewsSorter.setSortBy(fInitialSortColumn);
-    fViewer.setComparator(fNewsSorter);
+    fResultViewer.setComparator(fNewsSorter);
 
     /* Hook Contextual Menu */
     hookContextualMenu();
@@ -984,28 +1096,28 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private void registerListeners() {
 
     /* Open selected News Links in Browser on doubleclick */
-    fViewer.addDoubleClickListener(new IDoubleClickListener() {
+    fResultViewer.addDoubleClickListener(new IDoubleClickListener() {
       public void doubleClick(DoubleClickEvent event) {
         onMouseDoubleClick(event);
       }
     });
 
     /* Perform Action on Mouse-Down */
-    fViewer.getControl().addListener(SWT.MouseDown, new Listener() {
+    fResultViewer.getControl().addListener(SWT.MouseDown, new Listener() {
       public void handleEvent(Event event) {
         onMouseDown(event);
       }
     });
 
     /* Update Cursor on Mouse-Move */
-    fViewer.getControl().addListener(SWT.MouseMove, new Listener() {
+    fResultViewer.getControl().addListener(SWT.MouseMove, new Listener() {
       public void handleEvent(Event event) {
         onMouseMove(event);
       }
     });
 
     /* Enable Sorting adding listeners to Columns */
-    TableColumn[] columns = fViewer.getTable().getColumns();
+    TableColumn[] columns = fResultViewer.getTable().getColumns();
     for (final TableColumn column : columns) {
       column.addSelectionListener(new SelectionAdapter() {
         @SuppressWarnings("unchecked")
@@ -1021,15 +1133,15 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
           /* Indicate Sort-Column in UI for Columns that have a certain width */
           if (newSortBy.showSortIndicator()) {
-            fViewer.getTable().setSortColumn(column);
-            fViewer.getTable().setSortDirection(ascending ? SWT.UP : SWT.DOWN);
+            fResultViewer.getTable().setSortColumn(column);
+            fResultViewer.getTable().setSortDirection(ascending ? SWT.UP : SWT.DOWN);
           } else {
-            fViewer.getTable().setSortColumn(null);
+            fResultViewer.getTable().setSortColumn(null);
           }
 
           /* Since Virtual Style is set, we have to sort the model manually */
-          Collections.sort(((List<ScoredNews>) fViewer.getInput()), fNewsSorter);
-          fViewer.refresh(false);
+          Collections.sort(((List<ScoredNews>) fResultViewer.getInput()), fNewsSorter);
+          fResultViewer.refresh(false);
         }
       });
     }
@@ -1054,9 +1166,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fLabelListener = new LabelAdapter() {
       @Override
       public void entitiesUpdated(Set<LabelEvent> events) {
-        JobRunner.runInUIThread(fViewer.getTable(), new Runnable() {
+        JobRunner.runInUIThread(fResultViewer.getTable(), new Runnable() {
           public void run() {
-            fViewer.refresh(true);
+            fResultViewer.refresh(true);
           }
         });
       }
@@ -1067,7 +1179,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private void onNewsEvent(final Set<NewsEvent> events) {
 
     /* No Result set yet */
-    if (fViewer.getInput() == null)
+    if (fResultViewer.getInput() == null)
       return;
 
     /* Check for Update / Deleted News */
@@ -1077,7 +1189,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
       @Override
       protected void runInBackground(IProgressMonitor monitor) {
-        List<?> input = (List<?>) fViewer.getInput();
+        List<?> input = (List<?>) fResultViewer.getInput();
         for (NewsEvent event : events) {
           for (Object object : input) {
             ScoredNews scoredNews = ((ScoredNews) object);
@@ -1110,18 +1222,18 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
         /* News got Deleted */
         if (fDeletedScoredNews != null)
-          fViewer.remove(fDeletedScoredNews.toArray());
+          fResultViewer.remove(fDeletedScoredNews.toArray());
 
         /* News got Updated */
         if (fUpdatedScoredNews != null)
-          fViewer.update(fUpdatedScoredNews.toArray(), null);
+          fResultViewer.update(fUpdatedScoredNews.toArray(), null);
       }
     });
   }
 
   private void onMouseDown(Event event) {
     Point p = new Point(event.x, event.y);
-    TableItem item = fViewer.getTable().getItem(p);
+    TableItem item = fResultViewer.getTable().getItem(p);
 
     /* Problem - return */
     if (item == null || item.isDisposed())
@@ -1152,12 +1264,12 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
   private void onMouseMove(Event event) {
     Point p = new Point(event.x, event.y);
-    TableItem item = fViewer.getTable().getItem(p);
+    TableItem item = fResultViewer.getTable().getItem(p);
 
     /* Problem / Group hovered - reset */
     if (item == null || item.isDisposed() || item.getData() instanceof EntityGroup) {
-      if (fShowsHandCursor && !fViewer.getControl().isDisposed()) {
-        fViewer.getControl().setCursor(null);
+      if (fShowsHandCursor && !fResultViewer.getControl().isDisposed()) {
+        fResultViewer.getControl().setCursor(null);
         fShowsHandCursor = false;
       }
       return;
@@ -1166,10 +1278,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Show Hand-Cursor if action can be performed */
     boolean changeToHandCursor = item.getImageBounds(COL_TITLE).contains(p) || item.getImageBounds(COL_STICKY).contains(p);
     if (!fShowsHandCursor && changeToHandCursor) {
-      fViewer.getControl().setCursor(fHandCursor);
+      fResultViewer.getControl().setCursor(fHandCursor);
       fShowsHandCursor = true;
     } else if (fShowsHandCursor && !changeToHandCursor) {
-      fViewer.getControl().setCursor(null);
+      fResultViewer.getControl().setCursor(null);
       fShowsHandCursor = false;
     }
   }
@@ -1201,7 +1313,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     manager.setRemoveAllWhenShown(true);
     manager.addMenuListener(new IMenuListener() {
       public void menuAboutToShow(IMenuManager manager) {
-        IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
+        IStructuredSelection selection = (IStructuredSelection) fResultViewer.getSelection();
 
         /* Open */
         {
@@ -1252,7 +1364,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
               @Override
               public void run() {
                 Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
-                new LabelAction(labels, (IStructuredSelection) fViewer.getSelection(), false).run();
+                new LabelAction(labels, (IStructuredSelection) fResultViewer.getSelection(), false).run();
               }
             };
 
@@ -1266,7 +1378,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
                 public void run() {
                   Set<ILabel> labels = new HashSet<ILabel>(1);
                   labels.add(label);
-                  new LabelAction(labels, (IStructuredSelection) fViewer.getSelection(), isChecked()).run();
+                  new LabelAction(labels, (IStructuredSelection) fResultViewer.getSelection(), isChecked()).run();
                 }
               };
 
@@ -1278,7 +1390,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
             labelMenu.add(new Action("Organize...") {
               @Override
               public void run() {
-                PreferencesUtil.createPreferenceDialogOn(fViewer.getTable().getShell(), ManageLabelsPreferencePage.ID, null, null).open();
+                PreferencesUtil.createPreferenceDialogOn(fResultViewer.getTable().getShell(), ManageLabelsPreferencePage.ID, null, null).open();
               }
             });
           }
@@ -1291,22 +1403,22 @@ public class SearchNewsDialog extends TitleAreaDialog {
     });
 
     /* Create and Register with Workbench */
-    Menu menu = manager.createContextMenu(fViewer.getControl());
-    fViewer.getControl().setMenu(menu);
+    Menu menu = manager.createContextMenu(fResultViewer.getControl());
+    fResultViewer.getControl().setMenu(menu);
 
     /* Register with Part Site */
     IWorkbenchWindow window = OwlUI.getWindow();
     if (window != null) {
       IWorkbenchPart activePart = window.getPartService().getActivePart();
       if (activePart != null && activePart.getSite() != null)
-        activePart.getSite().registerContextMenu(manager, fViewer);
+        activePart.getSite().registerContextMenu(manager, fResultViewer);
     }
   }
 
   private void createColumns(CTable customTable) {
 
     /* Score Column */
-    TableViewerColumn col = new TableViewerColumn(fViewer, SWT.CENTER);
+    TableViewerColumn col = new TableViewerColumn(fResultViewer, SWT.CENTER);
     customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 24), null, null, true, true);
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.SCORE);
     col.getColumn().setToolTipText("Relevance");
@@ -1315,7 +1427,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     }
 
     /* Headline Column */
-    col = new TableViewerColumn(fViewer, SWT.LEFT);
+    col = new TableViewerColumn(fResultViewer, SWT.LEFT);
     customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 60), "Title", null, true, true);
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.TITLE);
     if (fInitialSortColumn == NewsTableControl.Columns.TITLE) {
@@ -1325,7 +1437,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     /* Date Column */
     int width = getInitialDateColumnWidth();
-    col = new TableViewerColumn(fViewer, SWT.LEFT);
+    col = new TableViewerColumn(fResultViewer, SWT.LEFT);
     customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, width), "Date", null, true, true);
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.DATE);
     if (fInitialSortColumn == NewsTableControl.Columns.DATE) {
@@ -1334,7 +1446,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     }
 
     /* Author Column */
-    col = new TableViewerColumn(fViewer, SWT.LEFT);
+    col = new TableViewerColumn(fResultViewer, SWT.LEFT);
     customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20), "Author", null, true, true);
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.AUTHOR);
     if (fInitialSortColumn == NewsTableControl.Columns.AUTHOR) {
@@ -1343,7 +1455,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     }
 
     /* Category Column */
-    col = new TableViewerColumn(fViewer, SWT.LEFT);
+    col = new TableViewerColumn(fResultViewer, SWT.LEFT);
     customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20), "Category", null, true, true);
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.CATEGORY);
     if (fInitialSortColumn == NewsTableControl.Columns.CATEGORY) {
@@ -1352,7 +1464,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     }
 
     /* Sticky Column */
-    col = new TableViewerColumn(fViewer, SWT.LEFT);
+    col = new TableViewerColumn(fResultViewer, SWT.LEFT);
     customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 18), null, null, true, false);
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.STICKY);
     col.getColumn().setToolTipText("Sticky State");
@@ -1399,7 +1511,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     cal.set(2006, Calendar.DECEMBER, 12, 12, 12, 12);
     String sampleDate = dF.format(cal.getTime());
 
-    DATE_COL_WIDTH = OwlUI.getTextSize(fViewer.getTable(), OwlUI.getBold(JFaceResources.DEFAULT_FONT), sampleDate).x;
+    DATE_COL_WIDTH = OwlUI.getTextSize(fResultViewer.getTable(), OwlUI.getBold(JFaceResources.DEFAULT_FONT), sampleDate).x;
     DATE_COL_WIDTH += 30; // Bounds of TableColumn requires more space
 
     return DATE_COL_WIDTH;
