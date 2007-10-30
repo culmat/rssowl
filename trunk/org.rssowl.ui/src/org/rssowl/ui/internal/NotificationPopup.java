@@ -36,18 +36,16 @@ import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseTrackListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.GridData;
@@ -71,7 +69,6 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
-import org.rssowl.ui.internal.OwlUI.OSTheme;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
@@ -92,8 +89,7 @@ import java.util.Map;
 /**
  * TODO
  * <ul>
- * <li>Consider an option per Mark/Folder to enable/disable Notification</li>
- * <li>Implement animation (take from SystemTrayAlert)</li>
+ * <li>Implement animation (and transparency)</li>
  * <li>Add preferences (respect use animation, number of news)</li>
  * <li>Enrich Popup toolbar with "Make Sticky" and a dropdown with "Options",
  * "Mark Read" etc...</li>
@@ -117,8 +113,6 @@ public class NotificationPopup extends PopupDialog {
   private List<INews> fRecentNews = new ArrayList<INews>();
   private ResourceManager fResources;
   private Map<FeedLinkReference, IBookMark> fMapFeedToBookmark;
-  private Color fPopupBorderColor;
-  private Color fPopupOuterCircleColor;
   private Image fCloseImageNormal;
   private Image fCloseImageActive;
   private Image fCloseImagePressed;
@@ -132,6 +126,7 @@ public class NotificationPopup extends PopupDialog {
   private IPreferenceScope fGlobalScope;
   private int fVisibleNewsCount;
   private int fNewsLimit;
+  private NotifierColors fNotifierColors;
 
   NotificationPopup(int visibleNewsCount) {
     super(new Shell(PlatformUI.getWorkbench().getDisplay()), PopupDialog.INFOPOPUP_SHELLSTYLE | SWT.ON_TOP, false, false, false, false, null, null);
@@ -377,32 +372,7 @@ public class NotificationPopup extends PopupDialog {
   private void initResources() {
 
     /* Colors */
-    OSTheme osTheme = OwlUI.getOSTheme(getParentShell().getDisplay());
-    switch (osTheme) {
-      case WINDOWS_BLUE:
-        fPopupBorderColor = OwlUI.getColor(fResources, new RGB(125, 177, 251));
-        fPopupOuterCircleColor = OwlUI.getColor(fResources, new RGB(73, 135, 234));
-        break;
-
-      case WINDOWS_SILVER:
-        fPopupBorderColor = getParentShell().getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY);
-        fPopupOuterCircleColor = getParentShell().getDisplay().getSystemColor(SWT.COLOR_TITLE_BACKGROUND);
-        break;
-
-      case WINDOWS_OLIVE:
-        fPopupBorderColor = getParentShell().getDisplay().getSystemColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT);
-        fPopupOuterCircleColor = getParentShell().getDisplay().getSystemColor(SWT.COLOR_TITLE_BACKGROUND);
-        break;
-
-      case WINDOWS_CLASSIC:
-        fPopupBorderColor = getParentShell().getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY);
-        fPopupOuterCircleColor = getParentShell().getDisplay().getSystemColor(SWT.COLOR_TITLE_INACTIVE_BACKGROUND_GRADIENT);
-        break;
-
-      default:
-        fPopupBorderColor = getParentShell().getDisplay().getSystemColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT);
-        fPopupOuterCircleColor = getParentShell().getDisplay().getSystemColor(SWT.COLOR_TITLE_BACKGROUND);
-    }
+    fNotifierColors = new NotifierColors(getParentShell().getDisplay(), fResources);
 
     /* Icons */
     fCloseImageNormal = OwlUI.getImage(fResources, "icons/etool16/close_normal.gif");
@@ -415,7 +385,7 @@ public class NotificationPopup extends PopupDialog {
    */
   @Override
   protected Control createContents(Composite parent) {
-    getShell().setBackground(getShell().getDisplay().getSystemColor(SWT.COLOR_GRAY));
+    parent.setBackground(getParentShell().getDisplay().getSystemColor(SWT.COLOR_GRAY));
 
     return createDialogArea(parent);
   }
@@ -425,50 +395,64 @@ public class NotificationPopup extends PopupDialog {
    */
   @Override
   protected Control createDialogArea(Composite parent) {
-    parent.setBackground(fPopupBorderColor);
     ((GridLayout) parent.getLayout()).marginWidth = 1;
     ((GridLayout) parent.getLayout()).marginHeight = 1;
 
     /* Outer Compositing holding the controlls */
     final Composite outerCircle = new Composite(parent, SWT.NO_FOCUS);
-    outerCircle.setBackground(fPopupOuterCircleColor);
     outerCircle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    outerCircle.setLayout(LayoutUtils.createGridLayout(1, 0, 3, 3));
-    outerCircle.addPaintListener(new PaintListener() {
-      public void paintControl(PaintEvent e) {
-        Rectangle clArea = outerCircle.getClientArea();
-        GC gc = e.gc;
-        gc.setForeground(fPopupBorderColor);
+    outerCircle.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0));
+
+    /* Title area containing label and close button */
+    final Composite titleCircle = new Composite(outerCircle, SWT.NO_FOCUS);
+    titleCircle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+    titleCircle.setBackgroundMode(SWT.INHERIT_FORCE);
+    titleCircle.setLayout(LayoutUtils.createGridLayout(2, 3, 2));
+    titleCircle.addMouseTrackListener(fMouseTrackListner);
+    titleCircle.addControlListener(new ControlAdapter() {
+      @Override
+      public void controlResized(ControlEvent e) {
+        Rectangle clArea = titleCircle.getClientArea();
+        Image newBGImage = new Image(titleCircle.getDisplay(), clArea.width, clArea.height);
+        GC gc = new GC(newBGImage);
+
+        /* Gradient */
+        drawGradient(gc, clArea);
+
+        /* Fix Region Shape */
+        fixRegion(gc, clArea);
+
+        gc.dispose();
+
+        Image oldBGImage = titleCircle.getBackgroundImage();
+        titleCircle.setBackgroundImage(newBGImage);
+
+        if (oldBGImage != null)
+          oldBGImage.dispose();
+      }
+
+      private void drawGradient(GC gc, Rectangle clArea) {
+        gc.setForeground(fNotifierColors.getGradientBegin());
+        gc.setBackground(fNotifierColors.getGradientEnd());
+        gc.fillGradientRectangle(clArea.x, clArea.y, clArea.width, clArea.height, true);
+      }
+
+      private void fixRegion(GC gc, Rectangle clArea) {
+        gc.setForeground(getParentShell().getDisplay().getSystemColor(SWT.COLOR_GRAY));
 
         /* Fill Top Left */
         gc.drawPoint(2, 0);
         gc.drawPoint(3, 0);
         gc.drawPoint(1, 1);
         gc.drawPoint(0, 2);
+        gc.drawPoint(0, 3);
 
         /* Fill Top Right */
         gc.drawPoint(clArea.width - 4, 0);
         gc.drawPoint(clArea.width - 3, 0);
         gc.drawPoint(clArea.width - 2, 1);
         gc.drawPoint(clArea.width - 1, 2);
-      }
-    });
-
-    /* Title area containing label and close button */
-    final Composite titleCircle = new Composite(outerCircle, SWT.NO_FOCUS);
-    titleCircle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    titleCircle.setBackground(outerCircle.getBackground());
-    titleCircle.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
-    ((GridLayout) titleCircle.getLayout()).marginHeight = 1;
-    titleCircle.addMouseTrackListener(fMouseTrackListner);
-    titleCircle.addPaintListener(new PaintListener() {
-      public void paintControl(PaintEvent e) {
-        Rectangle clArea = titleCircle.getClientArea();
-        GC gc = e.gc;
-        gc.setForeground(fPopupBorderColor);
-
-        gc.drawPoint(0, 0);
-        gc.drawPoint(clArea.width - 1, 0);
+        gc.drawPoint(clArea.width - 1, 3);
       }
     });
 
@@ -477,15 +461,12 @@ public class NotificationPopup extends PopupDialog {
     fTitleCircleLabel.setImage(OwlUI.getImage(fResources, "icons/product/16x16.gif"));
     fTitleCircleLabel.setText("RSSOwl");
     fTitleCircleLabel.setFont(fBoldTextFont);
-    fTitleCircleLabel.setBackground(titleCircle.getBackground());
     fTitleCircleLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-    fTitleCircleLabel.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_WHITE));
     fTitleCircleLabel.addMouseTrackListener(fMouseTrackListner);
 
     /* CLabel to display a cross to close the popup */
     final CLabel closeButton = new CLabel(titleCircle, SWT.NO_FOCUS);
     closeButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
-    closeButton.setBackground(titleCircle.getBackground());
     closeButton.setImage(fCloseImageNormal);
     closeButton.setCursor(getShell().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
     closeButton.addMouseTrackListener(fMouseTrackListner);
@@ -518,21 +499,24 @@ public class NotificationPopup extends PopupDialog {
 
     /* Outer composite to hold content controlls */
     fOuterContentCircle = new Composite(outerCircle, SWT.NONE);
-    fOuterContentCircle.setLayout(LayoutUtils.createGridLayout(1, 3, 0));
+    fOuterContentCircle.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
     fOuterContentCircle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fOuterContentCircle.setBackground(outerCircle.getBackground());
 
     /* Middle composite to show a 1px black line around the content controlls */
     Composite middleContentCircle = new Composite(fOuterContentCircle, SWT.NO_FOCUS);
-    middleContentCircle.setLayout(LayoutUtils.createGridLayout(1, 1, 1));
+    middleContentCircle.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
+    ((GridLayout) middleContentCircle.getLayout()).marginTop = 1;
     middleContentCircle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    middleContentCircle.setBackground(getShell().getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+    middleContentCircle.setBackground(getParentShell().getDisplay().getSystemColor(SWT.COLOR_GRAY));
+    middleContentCircle.setBackground(fNotifierColors.getBorder());
 
     /* Inner composite containing the content controlls */
     fInnerContentCircle = new Composite(middleContentCircle, SWT.NO_FOCUS);
     fInnerContentCircle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fInnerContentCircle.setLayout(LayoutUtils.createGridLayout(1, 5, 5, 0));
     fInnerContentCircle.addMouseTrackListener(fMouseTrackListner);
+    fInnerContentCircle.setBackground(getShell().getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
     return outerCircle;
   }
