@@ -111,7 +111,7 @@ public class NewsBrowserControl implements IFeedViewPart {
     fViewer.setContentProvider(contentProvider);
 
     /* Create LabelProvider */
-    fViewer.setLabelProvider(new NewsBrowserLabelProvider());
+    fViewer.setLabelProvider(new NewsBrowserLabelProvider(fViewer));
 
     /* Create Comparator */
     fViewer.setComparator(new NewsComparator());
