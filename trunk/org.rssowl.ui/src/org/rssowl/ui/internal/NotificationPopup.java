@@ -244,7 +244,6 @@ public class NotificationPopup extends PopupDialog {
     }
 
     /* Show News */
-    int oldVisibleNewsCount = fVisibleNewsCount;
     fVisibleNewsCount = 0;
     for (int i = 0; i < fNewsLimit && i < fRecentNews.size(); i++) {
       renderNews(fRecentNews.get(i));
@@ -256,8 +255,7 @@ public class NotificationPopup extends PopupDialog {
 
     /* Update Shell Bounds */
     Point oldSize = getShell().getSize();
-    int labelHeight = fTitleCircleLabel.computeSize(DEFAULT_WIDTH, SWT.DEFAULT).y;
-    int newHeight = oldSize.y + (fVisibleNewsCount - oldVisibleNewsCount) * labelHeight;
+    int newHeight = getShell().computeSize(DEFAULT_WIDTH, SWT.DEFAULT).y;
 
     Point newSize = new Point(oldSize.x, newHeight);
     Point newLocation = getInitialLocation(newSize);
@@ -385,7 +383,7 @@ public class NotificationPopup extends PopupDialog {
    */
   @Override
   protected Control createContents(Composite parent) {
-    parent.setBackground(getParentShell().getDisplay().getSystemColor(SWT.COLOR_GRAY));
+    parent.setBackground(fNotifierColors.getBorder());
 
     return createDialogArea(parent);
   }
@@ -407,7 +405,7 @@ public class NotificationPopup extends PopupDialog {
     final Composite titleCircle = new Composite(outerCircle, SWT.NO_FOCUS);
     titleCircle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     titleCircle.setBackgroundMode(SWT.INHERIT_FORCE);
-    titleCircle.setLayout(LayoutUtils.createGridLayout(2, 3, 2));
+    titleCircle.setLayout(LayoutUtils.createGridLayout(2, 3, 0));
     titleCircle.addMouseTrackListener(fMouseTrackListner);
     titleCircle.addControlListener(new ControlAdapter() {
       @Override
@@ -438,7 +436,7 @@ public class NotificationPopup extends PopupDialog {
       }
 
       private void fixRegion(GC gc, Rectangle clArea) {
-        gc.setForeground(getParentShell().getDisplay().getSystemColor(SWT.COLOR_GRAY));
+        gc.setForeground(fNotifierColors.getBorder());
 
         /* Fill Top Left */
         gc.drawPoint(2, 0);
@@ -458,7 +456,7 @@ public class NotificationPopup extends PopupDialog {
 
     /* Title Label displaying RSSOwl */
     fTitleCircleLabel = new CLabel(titleCircle, SWT.NO_FOCUS);
-    fTitleCircleLabel.setImage(OwlUI.getImage(fResources, "icons/product/16x16.gif"));
+    fTitleCircleLabel.setImage(OwlUI.getImage(fResources, "icons/product/24x24.png"));
     fTitleCircleLabel.setText("RSSOwl");
     fTitleCircleLabel.setFont(fBoldTextFont);
     fTitleCircleLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
@@ -508,7 +506,6 @@ public class NotificationPopup extends PopupDialog {
     middleContentCircle.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
     ((GridLayout) middleContentCircle.getLayout()).marginTop = 1;
     middleContentCircle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    middleContentCircle.setBackground(getParentShell().getDisplay().getSystemColor(SWT.COLOR_GRAY));
     middleContentCircle.setBackground(fNotifierColors.getBorder());
 
     /* Inner composite containing the content controlls */
