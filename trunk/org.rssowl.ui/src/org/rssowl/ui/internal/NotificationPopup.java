@@ -110,6 +110,7 @@ public class NotificationPopup extends PopupDialog {
   /* Time after the popup is closed automatically */
   private static final int AUTO_CLOSE_TIME = 8000;
 
+  private Shell fShell;
   private List<INews> fRecentNews = new ArrayList<INews>();
   private ResourceManager fResources;
   private Map<FeedLinkReference, IBookMark> fMapFeedToBookmark;
@@ -254,15 +255,15 @@ public class NotificationPopup extends PopupDialog {
     fOuterContentCircle.layout(true, true);
 
     /* Update Shell Bounds */
-    Point oldSize = getShell().getSize();
-    int newHeight = getShell().computeSize(DEFAULT_WIDTH, SWT.DEFAULT).y;
+    Point oldSize = fShell.getSize();
+    int newHeight = fShell.computeSize(DEFAULT_WIDTH, SWT.DEFAULT).y;
 
     Point newSize = new Point(oldSize.x, newHeight);
     Point newLocation = getInitialLocation(newSize);
-    getShell().setBounds(newLocation.x, newLocation.y, newSize.x, newSize.y);
+    fShell.setBounds(newLocation.x, newLocation.y, newSize.x, newSize.y);
 
     /* Add Region to Shell */
-    addRegion(getShell());
+    addRegion(fShell);
   }
 
   private void renderNews(final INews news) {
@@ -383,6 +384,7 @@ public class NotificationPopup extends PopupDialog {
    */
   @Override
   protected Control createContents(Composite parent) {
+    fShell = parent.getShell();
     parent.setBackground(fNotifierColors.getBorder());
 
     return createDialogArea(parent);
@@ -466,7 +468,7 @@ public class NotificationPopup extends PopupDialog {
     final CLabel closeButton = new CLabel(titleCircle, SWT.NO_FOCUS);
     closeButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
     closeButton.setImage(fCloseImageNormal);
-    closeButton.setCursor(getShell().getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+    closeButton.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
     closeButton.addMouseTrackListener(fMouseTrackListner);
     closeButton.addMouseListener(new MouseAdapter() {
       @Override
@@ -513,7 +515,7 @@ public class NotificationPopup extends PopupDialog {
     fInnerContentCircle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fInnerContentCircle.setLayout(LayoutUtils.createGridLayout(1, 5, 5, 0));
     fInnerContentCircle.addMouseTrackListener(fMouseTrackListner);
-    fInnerContentCircle.setBackground(getShell().getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    fInnerContentCircle.setBackground(fShell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
     return outerCircle;
   }
@@ -533,7 +535,7 @@ public class NotificationPopup extends PopupDialog {
    */
   @Override
   protected Point getInitialSize() {
-    int initialHeight = getShell().computeSize(DEFAULT_WIDTH, SWT.DEFAULT).y;
+    int initialHeight = fShell.computeSize(DEFAULT_WIDTH, SWT.DEFAULT).y;
     int labelHeight = fTitleCircleLabel.computeSize(DEFAULT_WIDTH, SWT.DEFAULT).y;
 
     return new Point(DEFAULT_WIDTH, initialHeight + fVisibleNewsCount * labelHeight);
@@ -545,8 +547,8 @@ public class NotificationPopup extends PopupDialog {
    * @return Returns the Client Area of the primary Monitor.
    */
   private Rectangle getPrimaryClientArea() {
-    Monitor primaryMonitor = getShell().getDisplay().getPrimaryMonitor();
-    return (primaryMonitor != null) ? primaryMonitor.getClientArea() : getShell().getDisplay().getClientArea();
+    Monitor primaryMonitor = fShell.getDisplay().getPrimaryMonitor();
+    return (primaryMonitor != null) ? primaryMonitor.getClientArea() : fShell.getDisplay().getClientArea();
   }
 
   /*
@@ -555,8 +557,8 @@ public class NotificationPopup extends PopupDialog {
   @Override
   public boolean close() {
     fResources.dispose();
-    if (getShell().getRegion() != null)
-      getShell().getRegion().dispose();
+    if (fShell.getRegion() != null)
+      fShell.getRegion().dispose();
 
     return super.close();
   }
