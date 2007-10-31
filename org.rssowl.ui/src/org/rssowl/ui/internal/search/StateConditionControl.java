@@ -118,13 +118,13 @@ public class StateConditionControl extends Composite {
     /* State: New */
     fNewState = new Button(this, SWT.CHECK);
     fNewState.setText("New");
-    fNewState.setToolTipText("News that have not yet been read");
+    fNewState.setToolTipText("News that have not yet been seen");
     fNewState.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
     /* State: Unread */
     fUnreadState = new Button(this, SWT.CHECK);
     fUnreadState.setText("Unread");
-    fUnreadState.setToolTipText("News that have been read but marked unread again");
+    fUnreadState.setToolTipText("News that have been seen but not read");
     fUnreadState.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
     /* State: Updated */
