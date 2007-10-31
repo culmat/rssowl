@@ -681,7 +681,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fMatchAllRadio.setSelection(fMatchAllConditions);
 
     fMatchAnyRadio = new Button(topControlsContainer, SWT.RADIO);
-    fMatchAnyRadio.setText("Match any &condition");
+    fMatchAnyRadio.setText("Match any c&ondition");
     fMatchAnyRadio.setSelection(!fMatchAllConditions);
 
     /* ToolBar to add and select existing saved searches */
@@ -732,7 +732,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     dialogToolBar.add(new Separator());
 
     /* Existing Saved Searches */
-    IAction savedSearches = new Action("&Saved Searches", IAction.AS_DROP_DOWN_MENU) {
+    IAction savedSearches = new Action("S&aved Searches", IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
         getMenuCreator().getMenu(dialogToolBar.getControl()).setVisible(true);
@@ -868,12 +868,12 @@ public class SearchNewsDialog extends TitleAreaDialog {
     });
 
     /* Search */
-    Button searchButton = createButton(buttonBar, BUTTON_SEARCH, "Search", true);
+    Button searchButton = createButton(buttonBar, BUTTON_SEARCH, "&Search", true);
     ((GridData) searchButton.getLayoutData()).horizontalAlignment = SWT.END;
     ((GridData) searchButton.getLayoutData()).grabExcessHorizontalSpace = false;
 
     /* Clear */
-    createButton(buttonBar, BUTTON_CLEAR, "Clear", false);
+    createButton(buttonBar, BUTTON_CLEAR, "&Clear", false);
 
     return buttonBar;
   }
