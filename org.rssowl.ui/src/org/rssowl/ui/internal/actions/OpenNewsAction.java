@@ -48,7 +48,6 @@ import org.rssowl.ui.internal.util.EditorUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * The <code>OpenNewsAction</code> will open a given Selection of
@@ -136,16 +135,15 @@ public class OpenNewsAction extends Action {
       INews news = newsToOpen.get(i);
 
       /* Receive the first Bookmark belonging to the News and open it */
-      Set<IBookMark> bookmarks = fCacheService.getBookMarks(news.getFeedReference());
-      if (!bookmarks.isEmpty()) {
-        IBookMark mark = bookmarks.iterator().next();
+      IBookMark bookmark = fCacheService.getBookMark(news.getFeedReference());
+      if (bookmark != null) {
 
         /* Select this News in the FeedView */
         PerformAfterInputSet perform = PerformAfterInputSet.selectNews(new NewsReference(news.getId()));
         perform.setActivate(false);
 
         /* Open this Bookmark */
-        FeedViewInput fvInput = new FeedViewInput(mark, perform);
+        FeedViewInput fvInput = new FeedViewInput(bookmark, perform);
         try {
           FeedView feedview = null;
 
