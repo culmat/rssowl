@@ -50,6 +50,7 @@ import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -153,6 +154,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
   }
 
+  /*
+   * @see org.eclipse.jface.viewers.ContentViewer#setContentProvider(org.eclipse.jface.viewers.IContentProvider)
+   */
   @Override
   public void setContentProvider(IContentProvider contentProvider) {
     fBlockRefresh = true;
@@ -513,5 +517,16 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     for (Object element : elements) {
       Assert.isNotNull(element);
     }
+  }
+
+  /**
+   * TODO This is temporary API until Bug 627 is fixed using Lucene Token
+   * Positions.
+   *
+   * @return Returns a List of Strings that should get highlighted per News that
+   * is displayed.
+   */
+  protected List<String> getHighlightedWords() {
+    return Collections.emptyList();
   }
 }

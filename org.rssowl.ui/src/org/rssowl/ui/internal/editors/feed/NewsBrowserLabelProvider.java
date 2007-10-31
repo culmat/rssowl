@@ -42,15 +42,19 @@ import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.ExpandingReader;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.Writer;
 import java.net.URI;
 import java.text.DateFormat;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -61,6 +65,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   /* Date Formatter for News */
   private DateFormat fDateFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT);
 
+  /* TODO Experimenteal Search Result Highlight */
+  private static final String PRE_HIGHLIGHT = "<span style=\"background-color:rgb(255,255,0)\">";
+  private static final String POST_HIGHLIGHT = "</span>";
+
   private String fNewsFontFamily;
   private String fNormalFontCSS;
   private String fSmallFontCSS;
@@ -68,9 +76,15 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private String fBiggestFontCSS;
   private String fStickyBGColorCSS;
   private IPropertyChangeListener fPropertyChangeListener;
+  private NewsBrowserViewer fViewer;
 
-  /** Creates a new Browser LabelProvider for News */
-  public NewsBrowserLabelProvider() {
+  /**
+   * Creates a new Browser LabelProvider for News
+   *
+   * @param viewer
+   */
+  public NewsBrowserLabelProvider(NewsBrowserViewer viewer) {
+    fViewer = viewer;
     createFonts();
     createColors();
     registerListeners();
@@ -580,7 +594,26 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     /* Close: NewsItem */
     close(builder, "div");
 
-    return builder.toString();
+    String result = builder.toString();
+
+    /* TODO Experimental Highlight Support */
+    List<String> wordsToHighlight = fViewer.getHighlightedWords();
+    if (!wordsToHighlight.isEmpty()) {
+      StringBuilder highlightedResult = new StringBuilder(result.length());
+      ExpandingReader resultHighlightReader = new ExpandingReader(new StringReader(result), wordsToHighlight, PRE_HIGHLIGHT, POST_HIGHLIGHT, true);
+
+      int c = 0;
+      try {
+        while ((c = resultHighlightReader.read()) != -1)
+          highlightedResult.append((char) c);
+      } catch (IOException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
+
+      return highlightedResult.toString();
+    }
+
+    return result;
   }
 
   private void div(StringBuilder builder, String cssClass) {

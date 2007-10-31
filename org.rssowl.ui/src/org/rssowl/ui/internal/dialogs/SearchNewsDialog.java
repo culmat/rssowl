@@ -152,6 +152,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * The <code>SearchNewsDialog</code> allows to define a number of
@@ -235,6 +236,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private boolean fIsPreviewVisible;
   private SashForm fSashForm;
   private Composite fBottomSash;
+  private List<ISearchCondition> fCurrentSearchConditions;
 
   /* Container for a search result */
   private static class ScoredNews {
@@ -702,7 +704,30 @@ public class SearchNewsDialog extends TitleAreaDialog {
   }
 
   private void createBrowserViewer(Composite bottomSashContent) {
-    fBrowserViewer = new NewsBrowserViewer(bottomSashContent, SWT.NONE);
+    fBrowserViewer = new NewsBrowserViewer(bottomSashContent, SWT.NONE) {
+      @Override
+      protected List<String> getHighlightedWords() {
+        List<String> words = new ArrayList<String>(fCurrentSearchConditions.size());
+
+        /* Check Search Conditions for String-Values */
+        for (ISearchCondition cond : fCurrentSearchConditions) {
+          if (cond.getValue() instanceof String) {
+            String value = cond.getValue().toString();
+
+            /* TODO Wildcards are not yet supported */
+            if (value.contains("?") || value.contains("*"))
+              continue;
+
+            /* Split into Words */
+            StringTokenizer tokenizer = new StringTokenizer(value);
+            while (tokenizer.hasMoreElements())
+              words.add(tokenizer.nextElement().toString().toLowerCase());
+          }
+        }
+
+        return words;
+      }
+    };
     fBrowserViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
     /* Create Content Provider */
@@ -723,7 +748,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     });
 
     /* Create LabelProvider */
-    fBrowserViewer.setLabelProvider(new NewsBrowserLabelProvider());
+    fBrowserViewer.setLabelProvider(new NewsBrowserLabelProvider(fBrowserViewer));
 
     /* Set input when selection in result viewer changes */
     fResultViewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -972,7 +997,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     setErrorMessage(null);
 
     /* Create Conditions */
-    final List<ISearchCondition> conditions = fSearchConditionList.createConditions();
+    fCurrentSearchConditions = fSearchConditionList.createConditions();
     final boolean matchAllConditions = fMatchAllRadio.getSelection();
 
     /* Disable Buttons and update Cursor */
@@ -986,7 +1011,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
       protected void runInBackground(IProgressMonitor monitor) {
 
         /* Perform Search in the Background */
-        List<SearchHit<NewsReference>> searchHits = fModelSearch.searchNews(conditions, matchAllConditions);
+        List<SearchHit<NewsReference>> searchHits = fModelSearch.searchNews(fCurrentSearchConditions, matchAllConditions);
         fResult = new ArrayList<ScoredNews>(searchHits.size());
 
         /* Retrieve maximum raw relevance */
@@ -1056,6 +1081,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
         /* Move Focus back to last Search Condition Element */
         fSearchConditionList.focusInput();
+
+        /* Clear Browser Viewer */
+        fBrowserViewer.setInput(URIUtils.ABOUT_BLANK);
       }
     });
   }
