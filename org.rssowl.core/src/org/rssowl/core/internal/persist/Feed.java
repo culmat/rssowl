@@ -828,6 +828,9 @@ public class Feed extends AbstractEntity implements IFeed {
       }
     }
     if (newsToCleanUp != null) {
+      int[] tempNewsToCleanUp = new int[newsToCleanUpSize];
+      System.arraycopy(newsToCleanUp, 0, tempNewsToCleanUp, 0, newsToCleanUpSize);
+      newsToCleanUp = tempNewsToCleanUp;
       mergeResult.setStructuralChange(true);
 
       /*
