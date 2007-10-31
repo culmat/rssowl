@@ -241,6 +241,24 @@ public class CacheService {
     return bookmarks;
   }
 
+  /**
+   * Returns the first <code>IBookMark</code> that references the same feed as
+   * <code>feedRef</code> or <code>null</code> if none.
+   *
+   * @param feedRef The desired Feed.
+   * @return Returns the first <code>IBookMark</code> that references the
+   * given Feed or <code>null</code> if none.
+   */
+  public IBookMark getBookMark(FeedLinkReference feedRef) {
+    Set<IBookMark> bookMarks = getBookMarks();
+    for (IBookMark bookMark : bookMarks) {
+      if (bookMark.getFeedLinkReference().equals(feedRef))
+        return bookMark;
+    }
+
+    return null;
+  }
+
   void cacheRootFolders() {
     Collection<IFolder> rootFolders = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoots();
     for (IFolder rootFolder : rootFolders) {
