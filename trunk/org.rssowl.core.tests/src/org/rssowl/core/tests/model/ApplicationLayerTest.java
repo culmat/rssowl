@@ -170,6 +170,49 @@ public class ApplicationLayerTest {
   }
 
   /**
+   * Tests that Feed#mergeNews(List, boolean) works properly during
+   * handleFeedReload in the fast path when there are many news to be removed.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testHandleFeedReloadWithNewsToCleanUpBiggerThanTwenty() throws Exception  {
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.rssowl.org"));
+    int totalNews = 100;
+    for (int i = 0; i < totalNews; ++i) {
+      INews news = fFactory.createNews(null, feed, new Date());
+      news.setGuid(fFactory.createGuid(news, String.valueOf(i), true));
+    }
+    IFolder folder = fFactory.createFolder(null, null, "Folder");
+    IBookMark mark = fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "Mark");
+    DynamicDAO.save(feed);
+    FeedReference feedRef = new FeedReference(feed.getId());
+    DynamicDAO.save(folder);
+
+    int i = 0;
+    int deletedNewsCount = 40;
+    for (INews news : feed.getNews()) {
+      if (i == deletedNewsCount)
+        break;
+
+      news.setState(State.DELETED);
+      ++i;
+    }
+
+    IFeed emptyFeed = fFactory.createFeed(null, feed.getLink());
+
+    fAppService.handleFeedReload(mark, emptyFeed, null, false);
+
+    feed = null;
+    System.gc();
+
+    feed = feedRef.resolve();
+    int expectedNewsCount = totalNews - deletedNewsCount;
+    assertEquals(expectedNewsCount, feed.getNews().size());
+    assertEquals(expectedNewsCount, DynamicDAO.loadAll(INews.class).size());
+  }
+
+  /**
    * See bug #318 : If attachments are deleted as part of a reload, oldNews are
    * not filled in NewsEvent.
    *
