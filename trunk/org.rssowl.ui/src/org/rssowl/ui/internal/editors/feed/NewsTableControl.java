@@ -115,7 +115,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class NewsTableControl implements IFeedViewPart {
 
   /* ID to associate a Column with its ID */
-  private static final String COL_ID = "org.rssowl.ui.internal.editors.feed.ColumnIdentifier";
+  static final String COL_ID = "org.rssowl.ui.internal.editors.feed.ColumnIdentifier";
 
   /* Workaround for unknown Dateo-Col Width */
   private static int DATE_COL_WIDTH = -1;
@@ -149,7 +149,10 @@ public class NewsTableControl implements IFeedViewPart {
     STICKY(false, false),
 
     /** Score of a News */
-    SCORE(false, false);
+    SCORE(false, false),
+
+    /** Feed of a News */
+    FEED(true, false);
 
     boolean fPrefersAcending;
     boolean fShowSortIndicator;
