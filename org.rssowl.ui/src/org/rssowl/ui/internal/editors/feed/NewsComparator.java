@@ -29,6 +29,7 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 
@@ -39,7 +40,7 @@ import java.util.List;
 /**
  * Sorts the elements of the feed view based on the choices provided by the
  * user.
- * 
+ *
  * @author Ismael Juma (ismael@juma.me.uk)
  * @author bpasero
  */
@@ -116,11 +117,22 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
     else if (fSortBy == NewsTableControl.Columns.STICKY)
       result = compareByStickyness(news1.isFlagged(), news2.isFlagged());
 
+    /* Sort by Feed */
+    else if (fSortBy == NewsTableControl.Columns.FEED)
+      result = compareByFeed(news1.getFeedReference(), news2.getFeedReference());
+
     /* Fall Back to default sort if result is 0 */
     if (result == 0)
       result = compareByDate(news1, news2, true);
 
     return result;
+  }
+
+  private int compareByFeed(FeedLinkReference feed1, FeedLinkReference feed2) {
+    int result = feed1.getLink().compareTo(feed2.getLink());
+
+    /* Respect ascending / descending Order */
+    return fAscending ? result : result * -1;
   }
 
   private int compareByDate(INews news1, INews news2, boolean forceDescending) {

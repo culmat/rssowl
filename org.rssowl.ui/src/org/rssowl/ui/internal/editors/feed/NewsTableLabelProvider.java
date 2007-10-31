@@ -203,7 +203,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
               text = category.getDomain();
           }
           break;
-      }
+       }
     }
 
     /* Handle EntityGroup */

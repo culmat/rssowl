@@ -41,6 +41,8 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
@@ -54,6 +56,7 @@ import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.PaintEvent;
@@ -79,6 +82,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -87,6 +91,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolderChild;
@@ -105,6 +110,7 @@ import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.DateUtils;
@@ -197,8 +203,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
   /* Indices of Columns in the Table-Viewer */
   private static final int COL_RELEVANCE = 0;
   private static final int COL_TITLE = 1;
-  private static final int COL_CATEGORY = 4;
-  private static final int COL_STICKY = 5;
+  private static final int COL_FEED = 2;
+  private static final int COL_CATEGORY = 5;
+  private static final int COL_STICKY = 6;
 
   /* Viewer and Controls */
   private Button fMatchAllRadio;
@@ -365,17 +372,19 @@ public class SearchNewsDialog extends TitleAreaDialog {
       /* Text */
       if (cell.getColumnIndex() == COL_CATEGORY)
         cell.setText(getCategories(scoredNews.getNews()));
-      else
+      else if (cell.getColumnIndex() == COL_TITLE)
         cell.setText(getColumnText(scoredNews.getNews(), cell.getColumnIndex() - 1));
+      else
+        cell.setText(getColumnText(scoredNews.getNews(), cell.getColumnIndex() - 2));
 
       /* Image */
       cell.setImage(getColumnImage(scoredNews, cell.getColumnIndex()));
 
       /* Font */
-      cell.setFont(getFont(scoredNews.getNews(), cell.getColumnIndex() - 1));
+      cell.setFont(getFont(scoredNews.getNews(), cell.getColumnIndex() - 2));
 
       /* Foreground */
-      Color foreground = getForeground(scoredNews.getNews(), cell.getColumnIndex() - 1);
+      Color foreground = getForeground(scoredNews.getNews(), cell.getColumnIndex() - 2);
 
       /* TODO This is required to invalidate + redraw the entire TableItem! */
       if (USE_CUSTOM_OWNER_DRAWN) {
@@ -386,7 +395,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
         cell.setForeground(foreground);
 
       /* Background */
-      cell.setBackground(getBackground(scoredNews.getNews(), cell.getColumnIndex() - 1));
+      cell.setBackground(getBackground(scoredNews.getNews(), cell.getColumnIndex() - 2));
     }
 
     private String getCategories(INews news) {
@@ -425,8 +434,35 @@ public class SearchNewsDialog extends TitleAreaDialog {
         }
       }
 
+      /* Title Column */
+      else if (columnIndex == COL_TITLE)
+        return super.getColumnImage(((ScoredNews) element).getNews(), columnIndex - 1);
+
+      /* Feed Column */
+      else if (columnIndex == COL_FEED) {
+        ScoredNews scoredNews = (ScoredNews) element;
+        FeedLinkReference feedRef = scoredNews.getNews().getFeedReference();
+        IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(feedRef);
+        if (bookMark != null)
+          return OwlUI.getImage(fResources, OwlUI.getFavicon(bookMark));
+      }
+
       /* Any other Column */
-      return super.getColumnImage(((ScoredNews) element).getNews(), columnIndex - 1);
+      return super.getColumnImage(((ScoredNews) element).getNews(), columnIndex - 2);
+    }
+
+    /*
+     * @see org.eclipse.jface.viewers.CellLabelProvider#getToolTipText(java.lang.Object)
+     */
+    @Override
+    public String getToolTipText(Object element) {
+      ScoredNews scoredNews = (ScoredNews) element;
+      FeedLinkReference feedRef = scoredNews.getNews().getFeedReference();
+      IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(feedRef);
+      if (bookMark != null)
+        return bookMark.getName();
+
+      return null;
     }
 
     /*
@@ -454,6 +490,35 @@ public class SearchNewsDialog extends TitleAreaDialog {
     @Override
     protected void measure(Event event, Object element) {
       super.measure(event, ((ScoredNews) element).getNews());
+    }
+  }
+
+  /* Custom Tooltip Support for Feed Column */
+  private static class FeedColumnToolTipSupport extends ColumnViewerToolTipSupport {
+    FeedColumnToolTipSupport(ColumnViewer viewer, int style) {
+      super(viewer, style, false);
+    }
+
+    /*
+     * @see org.eclipse.jface.viewers.ColumnViewerToolTipSupport#getToolTipArea(org.eclipse.swt.widgets.Event)
+     */
+    @Override
+    protected Object getToolTipArea(Event event) {
+      Table table = (Table) event.widget;
+      Point point = new Point(event.x, event.y);
+      TableItem item = table.getItem(point);
+
+      /* Only valid for Feed Column */
+      if (item != null) {
+        if (item.getBounds(COL_FEED).contains(point))
+          return super.getToolTipArea(event);
+      }
+
+      return null;
+    }
+
+    public static void enableFor(ColumnViewer viewer) {
+      new FeedColumnToolTipSupport(viewer, ToolTip.NO_RECREATE);
     }
   }
 
@@ -1052,6 +1117,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fResultViewer.getControl().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
     fResultViewer.getTable().setHeaderVisible(true);
 
+    /* Custom Tooltips for Feed Column */
+    FeedColumnToolTipSupport.enableFor(fResultViewer);
+
     /* Separator */
     new Label(centerSashContent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
@@ -1062,7 +1130,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fResultViewer.setContentProvider(getContentProvider());
 
     /* Create LabelProvider (Custom Owner Drawn enabled!) */
-    final NewsTableLabelProvider newsTableLabelProvider = new NewsTableLabelProvider();
+    final NewsTableLabelProvider newsTableLabelProvider = new ScoredNewsLabelProvider();
     if (USE_CUSTOM_OWNER_DRAWN) {
       fResultViewer.getControl().addListener(SWT.EraseItem, new Listener() {
         public void handleEvent(Event event) {
@@ -1073,7 +1141,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     }
 
     //OwnerDrawLabelProvider.setUpOwnerDraw(fViewer); Not being used due to performance reasons
-    fResultViewer.setLabelProvider(new ScoredNewsLabelProvider());
+    fResultViewer.setLabelProvider(newsTableLabelProvider);
 
     /* Create Sorter */
     fNewsSorter = new ScoredNewsComparator();
@@ -1426,7 +1494,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     /* Score Column */
     TableViewerColumn col = new TableViewerColumn(fResultViewer, SWT.CENTER);
-    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 24), null, null, true, true);
+    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 24), null, null, true, false);
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.SCORE);
     col.getColumn().setToolTipText("Relevance");
     if (fInitialSortColumn == NewsTableControl.Columns.SCORE) {
@@ -1438,6 +1506,16 @@ public class SearchNewsDialog extends TitleAreaDialog {
     customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 60), "Title", null, true, true);
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.TITLE);
     if (fInitialSortColumn == NewsTableControl.Columns.TITLE) {
+      customTable.getControl().setSortColumn(col.getColumn());
+      customTable.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
+    }
+
+    /* Feed Column */
+    col = new TableViewerColumn(fResultViewer, SWT.LEFT);
+    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 18), null, null, true, false);
+    col.getColumn().setData(COL_ID, NewsTableControl.Columns.FEED);
+    col.getColumn().setToolTipText("Feed");
+    if (fInitialSortColumn == NewsTableControl.Columns.FEED) {
       customTable.getControl().setSortColumn(col.getColumn());
       customTable.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
     }
