@@ -108,7 +108,7 @@ public class ExpandingReader extends Reader {
         if (ch != -1)
           fPushed.append((char) ch);
 
-        fBuf = new StringBuilder();
+        fBuf.setLength(0);
 
         return next();
       }
@@ -146,7 +146,7 @@ public class ExpandingReader extends Reader {
     /* Reset Pushbackbuffer */
     else if (fPushbackOffset != 0) {
       fPushbackOffset = 0;
-      fPushed = new StringBuilder();
+      fPushed.setLength(0);
     }
 
     /* Read from Reader */
