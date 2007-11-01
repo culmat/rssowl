@@ -1084,8 +1084,18 @@ public class SearchNewsDialog extends TitleAreaDialog {
         /* Move Focus back to last Search Condition Element */
         fSearchConditionList.focusInput();
 
-        /* Clear Browser Viewer */
-        fBrowserViewer.setInput(URIUtils.ABOUT_BLANK);
+        /* Select First Result if Preview is visible */
+        if (fIsPreviewVisible && size > 0) {
+          fResultViewer.getTable().select(0);
+
+          /* Set input and Focus */
+          fBrowserViewer.setInput(((IStructuredSelection) fResultViewer.getSelection()).getFirstElement());
+          fResultViewer.getTable().setFocus();
+        }
+
+        /* Clear Browser Viewer otherwise */
+        else if (fIsPreviewVisible)
+          fBrowserViewer.setInput(URIUtils.ABOUT_BLANK);
       }
     });
   }
