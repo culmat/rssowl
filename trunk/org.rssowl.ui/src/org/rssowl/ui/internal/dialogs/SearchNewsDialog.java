@@ -59,6 +59,8 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.events.ControlAdapter;
+import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -171,7 +173,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private static final int DIALOG_MIN_WIDTH = 500;
 
   /* Sash Weights when Preview is invisible */
-  private static final int[] TWO_SASH_WEIGHTS = new int[] { 50, 60, 0 };
+  private static final int[] TWO_SASH_WEIGHTS = new int[] { 40, 60, 0 };
 
   /* Sash Weights when Preview is visible */
   private static final int[] THREE_SASH_WEIGHTS = new int[] { 25, 25, 50 };
@@ -181,6 +183,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
   /* Preference: State of showing Preview */
   private static final String PREF_PREVIEW_VISIBLE = "org.rssowl.ui.internal.dialogs.search.PreviewVisible";
+
+  /* Preference: Sash Weights */
+  private static final String PREF_SASH_WEIGHTS = "org.rssowl.ui.internal.dialogs.search.SashWeights";
 
   /* ID to associate a Column with its ID */
   private static final String COL_ID = "org.rssowl.ui.internal.editors.feed.ColumnIdentifier";
@@ -216,6 +221,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private ScoredNewsComparator fNewsSorter;
   private Link fStatusLabel;
   private NewsBrowserViewer fBrowserViewer;
+  private int[] fCachedWeights;
 
   /* Misc. */
   private NewsTableControl.Columns fInitialSortColumn = NewsTableControl.Columns.SCORE;
@@ -574,6 +580,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fDialogSettings = Activator.getDefault().getDialogSettings();
     fFirstTimeOpen = (fDialogSettings.getSection(SETTINGS_SECTION) == null);
     fIsPreviewVisible = fPreferences.getBoolean(PREF_PREVIEW_VISIBLE);
+    fCachedWeights = fPreferences.getIntegers(PREF_SASH_WEIGHTS);
     fModelSearch = Owl.getPersistenceService().getModelSearch();
     fHandCursor = parentShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND);
     fInitialConditions = initialConditions;
@@ -596,8 +603,12 @@ public class SearchNewsDialog extends TitleAreaDialog {
    */
   @Override
   public boolean close() {
-    fPreferences.putBoolean(PREF_PREVIEW_VISIBLE, fIsPreviewVisible);
     fgOpenDialogCount--;
+
+    /* Store Preferences */
+    fPreferences.putBoolean(PREF_PREVIEW_VISIBLE, fIsPreviewVisible);
+    if (fCachedWeights != null)
+      fPreferences.putIntegers(PREF_SASH_WEIGHTS, fCachedWeights);
 
     /*
      * Workaround for Eclipse Bug 186025: The Virtual Manager is not cleared
@@ -673,6 +684,13 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Create Center Sash */
     Composite centerSash = new Composite(fSashForm, SWT.NONE);
     centerSash.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
+    centerSash.addControlListener(new ControlAdapter() {
+
+      @Override
+      public void controlResized(ControlEvent e) {
+        fCachedWeights = fSashForm.getWeights();
+      }
+    });
 
     /* Separator */
     new Label(centerSash, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.END, true, false));
@@ -697,7 +715,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
     createBrowserViewer(bottomSashContent);
 
     /* Set weight to SashForm */
-    fSashForm.setWeights(fIsPreviewVisible ? THREE_SASH_WEIGHTS : new int[] { 40, 60, 0 });
+    if (fCachedWeights != null)
+      fSashForm.setWeights(fCachedWeights);
+    else
+      fSashForm.setWeights(fIsPreviewVisible ? THREE_SASH_WEIGHTS : TWO_SASH_WEIGHTS);
 
     /* Separator */
     new Label(fBottomSash, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.END, true, false));
