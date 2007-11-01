@@ -111,8 +111,15 @@ public class ExpandingReader extends Reader {
         fPushed.append(result);
 
         /* Also add current ch, if its not EOF */
-        if (ch != -1)
+        if (ch != -1) {
           fPushed.append((char) ch);
+
+          /* Skip Tags if required */
+          if (fSkipTags && ch == '<')
+            fInTags = true;
+          else if (fSkipTags && ch == '>')
+            fInTags = false;
+        }
 
         /* Reset Buffer */
         fBuf.setLength(0);
