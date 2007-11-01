@@ -65,6 +65,7 @@ public class MiscUITests {
    */
   @Test
   public void testFavicon() throws Exception {
+
     /* Delete previously stored favicons */
     for (int i = 0; i < 5; i++)
       OwlUI.deleteImage(i);
@@ -85,7 +86,6 @@ public class MiscUITests {
 
     DynamicDAO.delete(bookmark);
 
-    // Not yet implemented
-    // assertEquals(null, RSSOwlUI.getFavicon(bookmark));
+    assertEquals(null, OwlUI.getFavicon(bookmark));
   }
 }
