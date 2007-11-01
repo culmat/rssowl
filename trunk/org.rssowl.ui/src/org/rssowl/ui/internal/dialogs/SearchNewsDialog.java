@@ -1111,6 +1111,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
         /* Select First Result if Preview is visible */
         if (fIsPreviewVisible && size > 0) {
           fResultViewer.getTable().select(0);
+          fResultViewer.getTable().showSelection();
 
           /* Set input and Focus */
           Object selection = ((IStructuredSelection) fResultViewer.getSelection()).getFirstElement();
