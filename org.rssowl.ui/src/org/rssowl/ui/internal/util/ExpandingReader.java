@@ -102,16 +102,22 @@ public class ExpandingReader extends Reader {
       /* EOF or End of Word */
       if (ch == -1 || isWordTerminator(ch)) {
         String result = fBuf.toString();
+
+        /* Expand if required */
         if (shouldExpand(result))
           result = expand(result);
 
+        /* Fill to Pushback Buffer */
         fPushed.append(result);
 
+        /* Also add current ch, if its not EOF */
         if (ch != -1)
           fPushed.append((char) ch);
 
+        /* Reset Buffer */
         fBuf.setLength(0);
 
+        /* Read next from Pushback Buffer */
         return next();
       }
 
