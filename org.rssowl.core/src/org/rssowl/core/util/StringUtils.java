@@ -24,6 +24,8 @@
 
 package org.rssowl.core.util;
 
+import org.apache.lucene.analysis.StopAnalyzer;
+
 import java.io.IOException;
 import java.io.StringReader;
 
@@ -34,6 +36,12 @@ import java.io.StringReader;
  */
 public class StringUtils {
   private static final String EMPTY_STRING = ""; //$NON-NLS-1$
+
+  /**
+   * An array containing some common English words that are not usually useful
+   * for searching.
+   */
+  public static final String[] ENGLISH_STOP_WORDS = StopAnalyzer.ENGLISH_STOP_WORDS;
 
   /* This utility class constructor is hidden */
   private StringUtils() {
