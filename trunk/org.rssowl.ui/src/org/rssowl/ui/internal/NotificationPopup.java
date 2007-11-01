@@ -128,6 +128,7 @@ public class NotificationPopup extends PopupDialog {
   private int fVisibleNewsCount;
   private int fNewsLimit;
   private NotifierColors fNotifierColors;
+  private Region fLastUsedRegion;
 
   NotificationPopup(int visibleNewsCount) {
     super(new Shell(PlatformUI.getWorkbench().getDisplay()), PopupDialog.INFOPOPUP_SHELLSTYLE | SWT.ON_TOP, false, false, false, false, null, null);
@@ -174,6 +175,9 @@ public class NotificationPopup extends PopupDialog {
 
     /* Apply Region */
     shell.setRegion(region);
+
+    /* Remember to dispose later */
+    fLastUsedRegion = region;
   }
 
   private void createAutoCloser() {
@@ -331,16 +335,9 @@ public class NotificationPopup extends PopupDialog {
     /* Otherwise open Feedview and select the News */
     IWorkbenchPage page = OwlUI.getPage();
     if (page != null) {
-      Shell shell = page.getWorkbenchWindow().getShell();
 
-      /* Restore from Tray or Minimization if required */
-      ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
-      if (advisor != null && advisor.isMinimizedToTray())
-        advisor.restoreFromTray(shell);
-      else if (shell.getMinimized()) {
-        shell.setMinimized(false);
-        shell.forceActive();
-      }
+      /* Restore Window */
+      restoreWindow(page);
 
       /* First try if the Bookmark is already visible */
       IEditorReference editorRef = EditorUtils.findEditor(page.getEditorReferences(), bookmark);
@@ -366,6 +363,19 @@ public class NotificationPopup extends PopupDialog {
 
     /* Close Popup */
     close();
+  }
+
+  private void restoreWindow(IWorkbenchPage page) {
+    Shell applicationShell = page.getWorkbenchWindow().getShell();
+
+    /* Restore from Tray or Minimization if required */
+    ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
+    if (advisor != null && advisor.isMinimizedToTray())
+      advisor.restoreFromTray(applicationShell);
+    else if (applicationShell.getMinimized()) {
+      applicationShell.setMinimized(false);
+      applicationShell.forceActive();
+    }
   }
 
   private void initResources() {
@@ -463,6 +473,21 @@ public class NotificationPopup extends PopupDialog {
     fTitleCircleLabel.setFont(fBoldTextFont);
     fTitleCircleLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     fTitleCircleLabel.addMouseTrackListener(fMouseTrackListner);
+    fTitleCircleLabel.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+    fTitleCircleLabel.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseUp(MouseEvent e) {
+        IWorkbenchPage page = OwlUI.getPage();
+        if (page != null) {
+
+          /* Restore Window */
+          restoreWindow(page);
+
+          /* Close Notifier */
+          close();
+        }
+      }
+    });
 
     /* CLabel to display a cross to close the popup */
     final CLabel closeButton = new CLabel(titleCircle, SWT.NO_FOCUS);
@@ -557,8 +582,8 @@ public class NotificationPopup extends PopupDialog {
   @Override
   public boolean close() {
     fResources.dispose();
-    if (fShell.getRegion() != null)
-      fShell.getRegion().dispose();
+    if (fLastUsedRegion != null)
+      fLastUsedRegion.dispose();
 
     return super.close();
   }
