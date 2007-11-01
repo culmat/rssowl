@@ -117,6 +117,7 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.SearchHit;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
@@ -198,6 +199,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
   /* Count number of open Dialogs */
   private static int fgOpenDialogCount;
+
+  /* A Set of Stop Words in English */
+  private static final Set<String> STOP_WORDS = Collections.synchronizedSet(new HashSet<String>(Arrays.asList(StringUtils.ENGLISH_STOP_WORDS)));
 
   /* Button IDs */
   private static final int BUTTON_SEARCH = 1000;
@@ -743,8 +747,13 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
             /* Split into Words */
             StringTokenizer tokenizer = new StringTokenizer(value);
-            while (tokenizer.hasMoreElements())
-              words.add(tokenizer.nextElement().toString().toLowerCase());
+            while (tokenizer.hasMoreElements()) {
+              String nextWord = tokenizer.nextElement().toString().toLowerCase();
+
+              /* But ignore Stop Words */
+              if (!STOP_WORDS.contains(nextWord))
+                words.add(nextWord);
+            }
           }
         }
 
