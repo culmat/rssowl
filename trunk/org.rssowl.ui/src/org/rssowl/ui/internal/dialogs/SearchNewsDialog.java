@@ -445,8 +445,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
         ScoredNews scoredNews = (ScoredNews) element;
         FeedLinkReference feedRef = scoredNews.getNews().getFeedReference();
         IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(feedRef);
-        if (bookMark != null)
-          return OwlUI.getImage(fResources, OwlUI.getFavicon(bookMark));
+        if (bookMark != null) {
+          ImageDescriptor favicon = OwlUI.getFavicon(bookMark);
+          return OwlUI.getImage(fResources, favicon != null ? favicon : OwlUI.BOOKMARK);
+        }
       }
 
       /* Any other Column */
