@@ -65,6 +65,8 @@ public class ExpandingReader extends Reader {
   public ExpandingReader(Reader in, List<String> words, String preValue, String postValue, boolean skipTags) {
     Assert.isNotNull(in);
     Assert.isNotNull(words);
+    Assert.isNotNull(preValue);
+    Assert.isNotNull(postValue);
 
     fIn = in;
     fWordsToExpand = words;
