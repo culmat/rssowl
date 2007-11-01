@@ -781,7 +781,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     /* Toggle Preview */
     final String previewActionId = "org.rssowl.ui.internal.dialogs.search.PreviewAction";
-    IAction previewAction = new Action("&Toggle Preview", IAction.AS_CHECK_BOX) {
+    IAction previewAction = new Action("&Preview Results", IAction.AS_CHECK_BOX) {
       @Override
       public void run() {
         fIsPreviewVisible = !fIsPreviewVisible;
@@ -800,6 +800,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
           /* Set input and Focus */
           fBrowserViewer.setInput(((IStructuredSelection) fResultViewer.getSelection()).getFirstElement());
           fResultViewer.getTable().setFocus();
+
+          /* Make sure to show the selection */
+          fResultViewer.getTable().showSelection();
         }
       }
 
