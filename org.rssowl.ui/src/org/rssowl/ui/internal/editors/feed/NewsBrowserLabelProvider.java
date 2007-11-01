@@ -602,15 +602,16 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       StringBuilder highlightedResult = new StringBuilder(result.length());
       ExpandingReader resultHighlightReader = new ExpandingReader(new StringReader(result), wordsToHighlight, PRE_HIGHLIGHT, POST_HIGHLIGHT, true);
 
-      int c = 0;
+      int len = 0;
+      char[] buf = new char[1000];
       try {
-        while ((c = resultHighlightReader.read()) != -1)
-          highlightedResult.append((char) c);
+        while ((len = resultHighlightReader.read(buf)) != -1)
+          highlightedResult.append(buf, 0, len);
+
+        return highlightedResult.toString();
       } catch (IOException e) {
         Activator.getDefault().logError(e.getMessage(), e);
       }
-
-      return highlightedResult.toString();
     }
 
     return result;
