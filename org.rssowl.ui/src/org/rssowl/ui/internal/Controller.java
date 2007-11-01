@@ -67,6 +67,8 @@ import org.rssowl.core.persist.dao.IConditionalGetDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
+import org.rssowl.core.persist.event.BookMarkAdapter;
+import org.rssowl.core.persist.event.BookMarkEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.ITask;
@@ -176,6 +178,7 @@ public class Controller {
   private ILabelDAO fLabelDao;
   private IModelFactory fFactory;
   private Lock fLoginDialogLock = new ReentrantLock();
+  private BookMarkAdapter fBookMarkListener;
 
   /* Task to perform Reload-Operations */
   private class ReloadTask implements ITask {
@@ -240,6 +243,23 @@ public class Controller {
     fPrefsDAO = Owl.getPersistenceService().getDAOService().getPreferencesDAO();
     fAppService = Owl.getApplicationService();
     fFactory = Owl.getModelFactory();
+  }
+
+  private void registerListeners() {
+    fBookMarkListener = new BookMarkAdapter() {
+      @Override
+      public void entitiesDeleted(Set<BookMarkEvent> events) {
+        for (BookMarkEvent event : events) {
+          OwlUI.deleteImage(event.getEntity().getId());
+        }
+      }
+    };
+
+    DynamicDAO.addEntityListener(IBookMark.class, fBookMarkListener);
+  }
+
+  private void unregisterListeners() {
+    DynamicDAO.removeEntityListener(IBookMark.class, fBookMarkListener);
   }
 
   private List<EntityPropertyPageWrapper> loadEntityPropertyPages() {
@@ -668,6 +688,9 @@ public class Controller {
     /* Create the Saved Search Service */
     if (!InternalOwl.TESTING)
       fSavedSearchService = new SavedSearchService();
+
+    /* Register Listeners */
+    registerListeners();
   }
 
   /**
@@ -680,6 +703,9 @@ public class Controller {
    */
   public void shutdown(boolean emergency) {
     fShuttingDown = true;
+
+    /* Unregister Listeners */
+    unregisterListeners();
 
     /* Stop the Feed Reload Service */
     if (!InternalOwl.TESTING && !emergency)
