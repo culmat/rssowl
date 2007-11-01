@@ -1113,8 +1113,14 @@ public class SearchNewsDialog extends TitleAreaDialog {
           fResultViewer.getTable().select(0);
 
           /* Set input and Focus */
-          fBrowserViewer.setInput(((IStructuredSelection) fResultViewer.getSelection()).getFirstElement());
+          Object selection = ((IStructuredSelection) fResultViewer.getSelection()).getFirstElement();
+          boolean refresh = selection.equals(fBrowserViewer.getInput());
+
+          fBrowserViewer.setInput(selection);
           fResultViewer.getTable().setFocus();
+
+          if (refresh)
+            fBrowserViewer.refresh();
         }
 
         /* Clear Browser Viewer otherwise */
