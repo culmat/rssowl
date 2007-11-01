@@ -46,7 +46,7 @@ public class ExpandingReaderTests {
    * @throws Exception
    */
   @Test
-  public void testExpandingReaderSingleWordNoTags() throws Exception {
+  public void testSingleWordNoTags() throws Exception {
     String s = "Hello";
 
     List<String> words = Arrays.asList("World");
@@ -100,7 +100,7 @@ public class ExpandingReaderTests {
    * @throws Exception
    */
   @Test
-  public void testExpandingReaderSingleWordTags() throws Exception {
+  public void testSingleWordTags() throws Exception {
     String s = "<Hello>";
 
     List<String> words = Arrays.asList("World");
@@ -144,7 +144,7 @@ public class ExpandingReaderTests {
    * @throws Exception
    */
   @Test
-  public void testExpandingReaderMultipleWordsTags() throws Exception {
+  public void testMultipleWordsTags() throws Exception {
     String s = "<html>\n<body>\n\t<p>Hello <b>World</b> in <a href=\"http://www.rssowl.org\">RSSOwl.org</a></p></body></html>";
 
     List<String> words = Arrays.asList("world");
@@ -184,7 +184,7 @@ public class ExpandingReaderTests {
    * @throws Exception
    */
   @Test
-  public void testExpandingReaderMultipleWordsBrokenTags() throws Exception {
+  public void testMultipleWordsBrokenTags() throws Exception {
     String s = "<html\n<body>\n\t<p>Hello <b>World</b> in <a href=\"http://www.rssowl.org\">RSSOwl.org/a></p></body></html>";
 
     List<String> words = Arrays.asList("world");
@@ -224,7 +224,7 @@ public class ExpandingReaderTests {
    * @throws Exception
    */
   @Test
-  public void testExpandingReaderRealWorldExample1() throws Exception {
+  public void testRealWorldExample1() throws Exception {
     String s = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\r\n"
         + "<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\r\n"
         + "\r\n"
@@ -457,6 +457,27 @@ public class ExpandingReaderTests {
 
     ExpandingReader reader = new ExpandingReader(new StringReader(s), words, preExpand, postExpand, true);
     readFully(reader);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSingleCharTag() throws Exception {
+    String s = "<a>Foo</a>";
+
+    List<String> words = Arrays.asList("a");
+
+    String preExpand = "(";
+    String postExpand = ")";
+
+    boolean skipTags = true;
+
+    //1
+    ExpandingReader reader = new ExpandingReader(new StringReader(s), words, preExpand, postExpand, skipTags);
+    String result = readFully(reader);
+
+    assertEquals("<a>Foo</a>", result);
   }
 
   private String readFully(Reader reader) throws IOException {
