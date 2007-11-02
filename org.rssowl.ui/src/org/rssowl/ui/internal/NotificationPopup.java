@@ -42,10 +42,12 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.GridData;
@@ -64,6 +66,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
@@ -132,6 +135,9 @@ public class NotificationPopup extends PopupDialog {
   private int fNewsLimit;
   private NotifierColors fNotifierColors;
   private Region fLastUsedRegion;
+  private Image fNewsStickyIcon;
+  private Image fNewsNonStickyIcon;
+  private Color fStickyBgColor;
 
   NotificationPopup(int visibleNewsCount) {
     super(new Shell(PlatformUI.getWorkbench().getDisplay()), PopupDialog.INFOPOPUP_SHELLSTYLE | SWT.ON_TOP, false, false, false, false, null, null);
@@ -292,6 +298,29 @@ public class NotificationPopup extends PopupDialog {
     newsLabel.setCursor(newsLabel.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
     newsLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
+    /* Offer Label to mark news sticky */
+    final CCLabel markStickyLabel = new CCLabel(fInnerContentCircle, SWT.NONE);
+    markStickyLabel.setImage(fNewsNonStickyIcon);
+    markStickyLabel.setBackground(fInnerContentCircle.getBackground());
+    markStickyLabel.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+    markStickyLabel.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseDown(MouseEvent e) {
+        boolean newStateSticky = !news.isFlagged();
+
+        /* Update Background Color */
+        newsLabel.setBackground(newStateSticky ? fStickyBgColor : fInnerContentCircle.getBackground());
+        markStickyLabel.setBackground(newStateSticky ? fStickyBgColor : fInnerContentCircle.getBackground());
+
+        /* Update Image */
+        markStickyLabel.setImage(newStateSticky ? fNewsStickyIcon : fNewsNonStickyIcon);
+
+        /* Update and Save News */
+        news.setFlagged(newStateSticky);
+        DynamicDAO.save(news);
+      }
+    });
+
     String headline = ModelUtils.getHeadline(news);
     if (headline.contains("&"))
       headline = StringUtils.replaceAll(headline, "&", "&&");
@@ -385,11 +414,14 @@ public class NotificationPopup extends PopupDialog {
 
     /* Colors */
     fNotifierColors = new NotifierColors(getParentShell().getDisplay(), fResources);
+    fStickyBgColor = OwlUI.getThemeColor(OwlUI.STICKY_BG_COLOR_ID, fResources, new RGB(255, 255, 128));
 
     /* Icons */
     fCloseImageNormal = OwlUI.getImage(fResources, "icons/etool16/close_normal.gif");
     fCloseImageActive = OwlUI.getImage(fResources, "icons/etool16/close_active.gif");
     fCloseImagePressed = OwlUI.getImage(fResources, "icons/etool16/close_pressed.gif");
+    fNewsStickyIcon = OwlUI.getImage(fResources, OwlUI.NEWS_PINNED);
+    fNewsNonStickyIcon = OwlUI.getImage(fResources, OwlUI.NEWS_PIN);
   }
 
   /*
@@ -541,7 +573,9 @@ public class NotificationPopup extends PopupDialog {
     /* Inner composite containing the content controlls */
     fInnerContentCircle = new Composite(middleContentCircle, SWT.NO_FOCUS);
     fInnerContentCircle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    fInnerContentCircle.setLayout(LayoutUtils.createGridLayout(1, 5, 5, 0));
+    fInnerContentCircle.setLayout(LayoutUtils.createGridLayout(2, 0, 5, 0, 0, false));
+    ((GridLayout) fInnerContentCircle.getLayout()).marginLeft = 5;
+    ((GridLayout) fInnerContentCircle.getLayout()).marginRight = 2;
     fInnerContentCircle.addMouseTrackListener(fMouseTrackListner);
     fInnerContentCircle.setBackground(fShell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
