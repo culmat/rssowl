@@ -101,6 +101,9 @@ import java.util.Map;
  */
 public class NotificationPopup extends PopupDialog {
 
+  /* Height of a CLabel with 16px Icon inside */
+  private static final int CLABEL_HEIGHT = 22;
+
   /* Max. Number of News being displayed in the Popup */
   private static final int MAX_NEWS = 30;
 
@@ -561,9 +564,8 @@ public class NotificationPopup extends PopupDialog {
   @Override
   protected Point getInitialSize() {
     int initialHeight = fShell.computeSize(DEFAULT_WIDTH, SWT.DEFAULT).y;
-    int labelHeight = fTitleCircleLabel.computeSize(DEFAULT_WIDTH, SWT.DEFAULT).y;
 
-    return new Point(DEFAULT_WIDTH, initialHeight + fVisibleNewsCount * labelHeight);
+    return new Point(DEFAULT_WIDTH, initialHeight + fVisibleNewsCount * CLABEL_HEIGHT);
   }
 
   /**
