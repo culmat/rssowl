@@ -64,6 +64,11 @@ import org.eclipse.swt.widgets.Display;
  * </pre>
  *
  * <p>
+ * Compared to the CLabel this Widget is never removing the Icon when the
+ * available width is not enough. In addition, the ellipsis is not put into the
+ * center of the text, but at the end.
+ * </p>
+ * <p>
  * <dl>
  * <dt><b>Styles:</b>
  * <dd>LEFT, RIGHT, CENTER, SHADOW_IN, SHADOW_OUT, SHADOW_NONE</dd>
@@ -858,45 +863,35 @@ public class CCLabel extends Canvas {
 
   /**
    * Shorten the given text <code>t</code> so that its length doesn't exceed
-   * the given width. The default implementation replaces characters in the
-   * center of the original string with an ellipsis ("..."). Override if you
-   * need a different strategy.
+   * the given width. This implementation will add the ellipsis at the end of
+   * the text.
    *
    * @param gc the gc to use for text measurement
-   * @param t the text to shorten
+   * @param text the text to shorten
    * @param width the width to shorten the text to, in pixels
    * @return the shortened text
    */
-  protected String shortenText(GC gc, String t, int width) {
-    if (t == null)
-      return null;
-    int w = gc.textExtent(ELLIPSIS, DRAW_FLAGS).x;
-    if (width <= w)
-      return t;
-    int l = t.length();
-    int max = l / 2;
-    int min = 0;
-    int mid = (max + min) / 2 - 1;
-    if (mid <= 0)
-      return t;
-    while (min < mid && mid < max) {
-      String s1 = t.substring(0, mid);
-      String s2 = t.substring(l - mid, l);
-      int l1 = gc.textExtent(s1, DRAW_FLAGS).x;
-      int l2 = gc.textExtent(s2, DRAW_FLAGS).x;
-      if (l1 + w + l2 > width) {
-        max = mid;
-        mid = (max + min) / 2;
-      } else if (l1 + w + l2 < width) {
-        min = mid;
-        mid = (max + min) / 2;
-      } else {
-        min = max;
+  protected String shortenText(GC gc, String text, int width) {
+    if (text == null || text.length() == 0)
+      return text;
+
+    /* Calc Ellipsis Width */
+    int ellipsisWidth = gc.textExtent(ELLIPSIS, DRAW_FLAGS).x;
+    if (width <= ellipsisWidth)
+      return text;
+
+    String subStr = "";
+    for (int i = 1; i < text.length(); i++) {
+      subStr = text.substring(0, i);
+
+      int subStrWidth = gc.textExtent(subStr, DRAW_FLAGS).x;
+      if (subStrWidth + ellipsisWidth > width) {
+        subStr = text.substring(0, i - 2);
+        break;
       }
     }
-    if (mid == 0)
-      return t;
-    return t.substring(0, mid) + ELLIPSIS + t.substring(l - mid, l);
+
+    return subStr + ELLIPSIS;
   }
 
   private String[] splitString(String text) {
