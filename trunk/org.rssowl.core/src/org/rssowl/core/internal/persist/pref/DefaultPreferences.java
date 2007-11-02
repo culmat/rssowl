@@ -200,6 +200,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Clean Up: Never Delete Unread News (boolean) */
   public static final String CLEAN_UP_NEVER_DEL_UNREAD_NEWS_STATE = "org.rssowl.pref.CleanUpNeverDelUnreadNewsState";
 
+  /** Global: Search Dialog: State of showing Preview */
+  public static final String SEARCH_DIALOG_PREVIEW_VISIBLE = "org.rssowl.pref.SearchDialogPreviewVisible";
+
   /**
    * Eclipse Preferences Follow
    */
@@ -257,6 +260,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putBoolean(BE_ENABLE_LINKING, true);
     defaultScope.putInteger(LIMIT_NOTIFICATION_SIZE, 5);
     defaultScope.putBoolean(CONFIRM_DELETE_NEWS, true);
+    defaultScope.putBoolean(SEARCH_DIALOG_PREVIEW_VISIBLE, true);
   }
 
   private void initGlobalEclipseDefaults(IPreferenceScope defaultScope) {
