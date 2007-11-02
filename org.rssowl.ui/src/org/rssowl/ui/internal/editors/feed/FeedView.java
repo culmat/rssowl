@@ -204,6 +204,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private Object fCacheJobIdentifier = new Object();
   private ImageDescriptor fTitleImageDescriptor;
   private NewsService fNewsService;
+  private Label fBrowserSep;
 
   /*
    * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
@@ -592,8 +593,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
   }
 
   /**
-   * Sets the given <code>IStructuredSelection</code> to the News-Table showing
-   * in the FeedView. Will ignore the selection, if the Table is minimized.
+   * Sets the given <code>IStructuredSelection</code> to the News-Table
+   * showing in the FeedView. Will ignore the selection, if the Table is
+   * minimized.
    *
    * @param selection The Selection to show in the News-Table.
    */
@@ -960,6 +962,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     /* Horizontal Alignment */
     if ((orientation & SWT.VERTICAL) != 0) {
+      fBrowserSep.setVisible(fBrowserBar.isVisible());
       fSashForm.setOrientation(SWT.HORIZONTAL);
       fSashForm.setBackground(fSashForm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
       ((GridData) fTableBrowserSep.getLayoutData()).exclude = true;
@@ -968,6 +971,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     /* Vertical Alignment (default) */
     else {
+      fBrowserSep.setVisible(true);
       fSashForm.setOrientation(SWT.VERTICAL);
       fSashForm.setBackground(null);
       ((GridData) fTableBrowserSep.getLayoutData()).exclude = false;
@@ -999,6 +1003,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     /* Restore Table */
     else {
+      ((GridData) fBrowserSep.getLayoutData()).exclude = false;
       fSashForm.setMaximizedControl(null);
       fNewsTableControl.setPartInput(fInput.getMark());
       expandNewsTableViewerGroups(true, StructuredSelection.EMPTY);
@@ -1268,8 +1273,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
       fBrowserBar = new BrowserBar(this, fBrowserViewerControlContainer);
 
       /* Separate to Browser */
-      sep = new Label(fBrowserViewerControlContainer, SWT.SEPARATOR | SWT.HORIZONTAL);
-      sep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      fBrowserSep = new Label(fBrowserViewerControlContainer, SWT.SEPARATOR | SWT.HORIZONTAL);
+      fBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      ((GridData) fBrowserSep.getLayoutData()).exclude = fInitialBrowserMaximized && !fBrowserBar.isVisible();
+      fBrowserSep.setVisible(fBrowserBar.isVisible() || (fSashForm.getOrientation() & SWT.VERTICAL) != 0);
 
       fNewsBrowserControl = new NewsBrowserControl();
       fNewsBrowserControl.init(fEditorSite);

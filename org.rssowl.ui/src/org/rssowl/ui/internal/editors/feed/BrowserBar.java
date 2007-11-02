@@ -89,6 +89,10 @@ public class BrowserBar {
     createControl();
   }
 
+  boolean isVisible() {
+    return !fUseExternalBrowser;
+  }
+
   /**
    * @param browser
    */
