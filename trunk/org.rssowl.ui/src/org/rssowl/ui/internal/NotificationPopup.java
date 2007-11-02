@@ -299,7 +299,7 @@ public class NotificationPopup extends PopupDialog {
     newsLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     /* Offer Label to mark news sticky */
-    final CCLabel markStickyLabel = new CCLabel(fInnerContentCircle, SWT.NONE);
+    final CLabel markStickyLabel = new CLabel(fInnerContentCircle, SWT.NONE);
     markStickyLabel.setImage(fNewsNonStickyIcon);
     markStickyLabel.setBackground(fInnerContentCircle.getBackground());
     markStickyLabel.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
