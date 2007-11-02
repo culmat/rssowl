@@ -751,7 +751,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
               String nextWord = tokenizer.nextElement().toString().toLowerCase();
 
               /* But ignore Stop Words */
-              if (!STOP_WORDS.contains(nextWord))
+              if (!STOP_WORDS.contains(nextWord) && !words.contains(nextWord))
                 words.add(nextWord);
             }
           }
