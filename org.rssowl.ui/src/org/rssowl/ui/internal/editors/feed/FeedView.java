@@ -592,7 +592,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   }
 
   /**
-   * Sets the given <code>IStructuredSelection</code> to the News-Table showin
+   * Sets the given <code>IStructuredSelection</code> to the News-Table showing
    * in the FeedView. Will ignore the selection, if the Table is minimized.
    *
    * @param selection The Selection to show in the News-Table.
@@ -621,8 +621,14 @@ public class FeedView extends EditorPart implements IReusableEditor {
       }
 
       /* Remove Filter if selection is hidden */
-      if (unfilter)
-        fFilterBar.doFilter(NewsFilter.Type.SHOW_ALL, true, false);
+      if (unfilter) {
+        fNewsBrowserControl.getViewer().setBlockRefresh(true);
+        try {
+          fFilterBar.doFilter(NewsFilter.Type.SHOW_ALL, true, false);
+        } finally {
+          fNewsBrowserControl.getViewer().setBlockRefresh(false);
+        }
+      }
     }
 
     /* Apply selection to Table */
