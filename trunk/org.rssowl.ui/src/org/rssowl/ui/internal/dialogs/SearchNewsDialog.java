@@ -177,13 +177,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private static final int[] TWO_SASH_WEIGHTS = new int[] { 40, 60, 0 };
 
   /* Sash Weights when Preview is visible */
-  private static final int[] THREE_SASH_WEIGHTS = new int[] { 25, 25, 50 };
+  private static final int[] THREE_SASH_WEIGHTS = new int[] { 33, 33, 33 };
 
   /* Section for Dialogs Settings */
   private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.SearchNewsDialog";
-
-  /* Preference: State of showing Preview */
-  private static final String PREF_PREVIEW_VISIBLE = "org.rssowl.ui.internal.dialogs.search.PreviewVisible";
 
   /* Preference: Sash Weights */
   private static final String PREF_SASH_WEIGHTS = "org.rssowl.ui.internal.dialogs.search.SashWeights";
@@ -583,7 +580,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fDialogSettings = Activator.getDefault().getDialogSettings();
     fFirstTimeOpen = (fDialogSettings.getSection(SETTINGS_SECTION) == null);
-    fIsPreviewVisible = fPreferences.getBoolean(PREF_PREVIEW_VISIBLE);
+    fIsPreviewVisible = fPreferences.getBoolean(DefaultPreferences.SEARCH_DIALOG_PREVIEW_VISIBLE);
     fCachedWeights = fPreferences.getIntegers(PREF_SASH_WEIGHTS);
     fModelSearch = Owl.getPersistenceService().getModelSearch();
     fHandCursor = parentShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND);
@@ -610,7 +607,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fgOpenDialogCount--;
 
     /* Store Preferences */
-    fPreferences.putBoolean(PREF_PREVIEW_VISIBLE, fIsPreviewVisible);
+    fPreferences.putBoolean(DefaultPreferences.SEARCH_DIALOG_PREVIEW_VISIBLE, fIsPreviewVisible);
     if (fCachedWeights != null)
       fPreferences.putIntegers(PREF_SASH_WEIGHTS, fCachedWeights);
 
@@ -714,6 +711,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     Composite bottomSashContent = new Composite(fBottomSash, SWT.None);
     bottomSashContent.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
     bottomSashContent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    bottomSashContent.setBackground(bottomSashContent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
     /* Create Viewer for News Item */
     createBrowserViewer(bottomSashContent);
@@ -786,8 +784,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fResultViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
         IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-        if (!selection.isEmpty() && fIsPreviewVisible)
+        if (!selection.isEmpty() && fIsPreviewVisible) {
           fBrowserViewer.setInput(selection.getFirstElement());
+          hideBrowser(false);
+        }
       }
     });
   }
@@ -829,6 +829,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
           /* Set input and Focus */
           fBrowserViewer.setInput(((IStructuredSelection) fResultViewer.getSelection()).getFirstElement());
+          hideBrowser(false);
           fResultViewer.getTable().setFocus();
 
           /* Make sure to show the selection */
@@ -1127,6 +1128,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
           boolean refresh = selection.equals(fBrowserViewer.getInput());
 
           fBrowserViewer.setInput(selection);
+          hideBrowser(false);
           fResultViewer.getTable().setFocus();
 
           if (refresh)
@@ -1135,7 +1137,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
         /* Clear Browser Viewer otherwise */
         else if (fIsPreviewVisible)
-          fBrowserViewer.setInput(URIUtils.ABOUT_BLANK);
+          hideBrowser(true);
       }
     });
   }
@@ -1146,6 +1148,14 @@ public class SearchNewsDialog extends TitleAreaDialog {
     }
   }
 
+  private void hideBrowser(boolean hide) {
+    if (hide) {
+      fBrowserViewer.setInput(URIUtils.ABOUT_BLANK);
+      fBrowserViewer.getControl().setVisible(false);
+    } else
+      fBrowserViewer.getControl().setVisible(true);
+  }
+
   private void onClear() {
 
     /* Reset Conditions */
@@ -1153,7 +1163,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fMatchAllRadio.setSelection(false);
     fMatchAnyRadio.setSelection(true);
     fResultViewer.setInput(Collections.emptyList());
-    fBrowserViewer.setInput(URIUtils.ABOUT_BLANK);
+    hideBrowser(true);
 
     /* Unset Error Message */
     setErrorMessage(null);
