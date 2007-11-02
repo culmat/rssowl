@@ -104,6 +104,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fBrowser.addLinkHandler(LABEL_HANDLER_ID, this);
   }
 
+  void setBlockRefresh(boolean block) {
+    fBlockRefresh = block;
+  }
+
   /*
    * @see org.rssowl.ui.internal.ILinkHandler#handle(java.lang.String,
    * java.net.URI)
