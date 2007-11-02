@@ -42,6 +42,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
@@ -65,6 +66,7 @@ import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.search.SearchConditionList;
+import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
@@ -219,7 +221,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
     setMessage("You can use \'?\' for any character and \'*\' for any word in your search.", IMessageProvider.INFORMATION);
 
     Composite container = new Composite(parent, SWT.NONE);
-    container.setLayout(LayoutUtils.createGridLayout(2, 5, 10, 5, 5, false));
+    container.setLayout(LayoutUtils.createGridLayout(2, 5, 5, 5, 5, false));
     container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
     Label nameLabel = new Label(container, SWT.NONE);
@@ -319,13 +321,60 @@ public class SearchMarkDialog extends TitleAreaDialog {
   }
 
   /*
+   * @see org.eclipse.jface.dialogs.TrayDialog#createButtonBar(org.eclipse.swt.widgets.Composite)
+   */
+  @Override
+  protected Control createButtonBar(Composite parent) {
+    GridLayout layout = new GridLayout(1, false);
+    layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
+    layout.marginHeight = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN);
+    layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
+    layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
+
+    Composite buttonBar = new Composite(parent, SWT.NONE);
+    buttonBar.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    buttonBar.setLayout(layout);
+
+    /* Status Label */
+    Link previewLink = new Link(buttonBar, SWT.NONE);
+    previewLink.setText("Click <a>here</a> to preview the search results.");
+    previewLink.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    previewLink.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        onPreview();
+      }
+    });
+
+    /* OK */
+    Button okButton = createButton(buttonBar, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
+    ((GridData) okButton.getLayoutData()).horizontalAlignment = SWT.END;
+    ((GridData) okButton.getLayoutData()).grabExcessHorizontalSpace = true;
+    okButton.setEnabled(fNameInput.getText().length() > 0);
+
+    /* Cancel */
+    createButton(buttonBar, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
+
+    return buttonBar;
+  }
+
+  private void onPreview() {
+    final List<ISearchCondition> conditions = fSearchConditionList.createConditions();
+    if (!conditions.isEmpty()) {
+      JobRunner.runInUIThread(getShell(), new Runnable() {
+        public void run() {
+          SearchNewsDialog dialog = new SearchNewsDialog(getShell(), conditions, fMatchAllRadio.getSelection(), true);
+          dialog.open();
+        }
+      });
+    }
+  }
+
+  /*
    * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
    */
   @Override
-  protected void createButtonsForButtonBar(Composite parent) {
-    super.createButtonsForButtonBar(parent);
-    getButton(IDialogConstants.OK_ID).setEnabled(fNameInput.getText().length() > 0);
-  }
+  protected void createButtonsForButtonBar(Composite parent) {}
 
   /*
    * @see org.eclipse.jface.dialogs.Dialog#initializeBounds()
