@@ -248,7 +248,6 @@ public class EventManager {
     fDb.delete(searchCondition.getField());
   }
 
-  @SuppressWarnings("unchecked")
   private ISearchMark loadSearchMark(ISearchCondition searchCondition) {
     ISearchMark mark = Owl.getPersistenceService().getDAOService().getSearchMarkDAO().load(searchCondition);
 
