@@ -146,11 +146,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   public void postWindowOpen() {
     SafeRunner.run(new LoggingSafeRunnable() {
       public void run() throws Exception {
+        boolean trayEnabled = false;
         Shell shell = getWindowConfigurer().getWindow().getShell();
 
         /* Hook TrayItem if supported on OS and 1st Window */
         if (fPreferences.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE) || fPreferences.getBoolean(DefaultPreferences.TRAY_ON_CLOSE) || fPreferences.getBoolean(DefaultPreferences.TRAY_ON_START))
-          enableTray();
+          trayEnabled = enableTray();
 
         /* Win only: Allow Scroll over Cursor-Control */
         if (Application.IS_WINDOWS)
@@ -160,7 +161,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         registerListeners();
 
         /* Move to Tray if set */
-        if (fPreferences.getBoolean(DefaultPreferences.TRAY_ON_START))
+        if (trayEnabled && fPreferences.getBoolean(DefaultPreferences.TRAY_ON_START))
           moveToTray(shell);
       }
     });
@@ -316,23 +317,23 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   }
 
   /* Enable System-Tray Support */
-  private void enableTray() {
+  private boolean enableTray() {
 
     /* Avoid that this is being called redundantly */
     if (fTrayEnabled)
-      return;
+      return true;
 
     /* Only enable for Primary Window */
     IWorkbenchWindow primaryWindow = OwlUI.getPrimaryWindow();
     if (primaryWindow == null || !primaryWindow.equals(getWindowConfigurer().getWindow()))
-      return;
+      return false;
 
     final Shell shell = primaryWindow.getShell();
     final Tray tray = shell.getDisplay().getSystemTray();
 
     /* Tray not support on the OS */
     if (tray == null)
-      return;
+      return false;
 
     /* Create Item in Tray */
     fTrayItem = new TrayItem(tray, SWT.NONE);
@@ -421,6 +422,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       }
     };
     DynamicDAO.addEntityListener(INews.class, fNewsListener);
+
+    return true;
   }
 
   /* Move to System Tray */
@@ -457,7 +460,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     shell.setLayoutDeferred(false);
 
     String msg = "Layout Deferred: " + shell.isLayoutDeferred();
-    IStatus status = new Status(IStatus.INFO, Activator.getDefault().getBundle().getSymbolicName(),IStatus.OK, msg, null);
+    IStatus status = new Status(IStatus.INFO, Activator.getDefault().getBundle().getSymbolicName(), IStatus.OK, msg, null);
     Activator.getDefault().getLog().log(status);
 
     /* Un-Minimize if minimized */
