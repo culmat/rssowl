@@ -113,9 +113,6 @@ public class NotificationPopup extends PopupDialog {
   /* Default Width of the Popup */
   private static final int DEFAULT_WIDTH = 400;
 
-  /* Time after the popup is closed automatically */
-  private static final int AUTO_CLOSE_TIME = 8000;
-
   private Shell fShell;
   private List<INews> fRecentNews = new ArrayList<INews>();
   private ResourceManager fResources;
@@ -215,7 +212,7 @@ public class NotificationPopup extends PopupDialog {
       @Override
       public void mouseExit(MouseEvent e) {
         if (!fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP))
-          fAutoCloser.schedule(AUTO_CLOSE_TIME);
+          fAutoCloser.schedule(fGlobalScope.getInteger(DefaultPreferences.AUTOCLOSE_NOTIFICATION_VALUE) * 1000);
       }
     };
   }
@@ -225,7 +222,7 @@ public class NotificationPopup extends PopupDialog {
     /* Cancel Auto Closer and reschedule */
     if (!fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP)) {
       fAutoCloser.cancel();
-      fAutoCloser.schedule(AUTO_CLOSE_TIME);
+      fAutoCloser.schedule(fGlobalScope.getInteger(DefaultPreferences.AUTOCLOSE_NOTIFICATION_VALUE) * 1000);
     }
 
     /* Remember count of News */

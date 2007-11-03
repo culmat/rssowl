@@ -71,13 +71,14 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
   private IPreferenceScope fGlobalScope;
   private Button fNotificationOnlyFromTray;
   private Button fShowNotificationPopup;
-  private Button fNotificationIsSticky;
   private Button fLimitNotificationCheck;
   private Spinner fLimitNotificationSpinner;
   private CheckboxTreeViewer fViewer;
   private Button fDeselectAll;
   private Button fSelectAll;
   private Button fLimitNotifierToSelectionCheck;
+  private Spinner fAutoCloseNotifierSpinner;
+  private Button fAutoCloseNotifierCheck;
 
   /** Leave for reflection */
   public NotifierPreferencesPage() {
@@ -333,7 +334,8 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
       @Override
       public void widgetSelected(SelectionEvent e) {
         fNotificationOnlyFromTray.setEnabled(fShowNotificationPopup.getSelection());
-        fNotificationIsSticky.setEnabled(fShowNotificationPopup.getSelection());
+        fAutoCloseNotifierCheck.setEnabled(fShowNotificationPopup.getSelection());
+        fAutoCloseNotifierSpinner.setEnabled(fShowNotificationPopup.getSelection());
         fLimitNotificationCheck.setEnabled(fShowNotificationPopup.getSelection());
         fLimitNotificationSpinner.setEnabled(fLimitNotificationCheck.isEnabled() && fLimitNotificationCheck.getSelection());
         setLimitNotificationEnabled(fShowNotificationPopup.getSelection() && fLimitNotifierToSelectionCheck.getSelection());
@@ -343,7 +345,7 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
 
     /* Limit number of News showing in Notification */
     Composite limitNewsContainer = new Composite(notificationGroup, SWT.None);
-    limitNewsContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0));
+    limitNewsContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0, 0, 2, false));
 
     int notificationLimit = fGlobalScope.getInteger(DefaultPreferences.LIMIT_NOTIFICATION_SIZE);
 
@@ -376,11 +378,31 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
     fNotificationOnlyFromTray.setSelection(fGlobalScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED));
     fNotificationOnlyFromTray.setEnabled(fShowNotificationPopup.getSelection());
 
-    /* Sticky Notification Popup */
-    fNotificationIsSticky = new Button(notificationGroup, SWT.CHECK);
-    fNotificationIsSticky.setText("Leave notification open until closed manually");
-    fNotificationIsSticky.setSelection(fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP));
-    fNotificationIsSticky.setEnabled(fShowNotificationPopup.getSelection());
+    /* Auto Close Notifier */
+    Composite autoCloseContainer = new Composite(notificationGroup, SWT.None);
+    autoCloseContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0, 0, 2, false));
+
+    fAutoCloseNotifierCheck = new Button(autoCloseContainer, SWT.CHECK);
+    fAutoCloseNotifierCheck.setText("Close notification automatically after ");
+    fAutoCloseNotifierCheck.setEnabled(fShowNotificationPopup.getSelection());
+    fAutoCloseNotifierCheck.setSelection(!fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP));
+    fAutoCloseNotifierCheck.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        fAutoCloseNotifierSpinner.setEnabled(fAutoCloseNotifierCheck.getSelection());
+      }
+    });
+
+    int notificationAutoCloseValue = fGlobalScope.getInteger(DefaultPreferences.AUTOCLOSE_NOTIFICATION_VALUE);
+
+    fAutoCloseNotifierSpinner = new Spinner(autoCloseContainer, SWT.BORDER);
+    fAutoCloseNotifierSpinner.setMinimum(1);
+    fAutoCloseNotifierSpinner.setMaximum(99);
+    fAutoCloseNotifierSpinner.setEnabled(fAutoCloseNotifierCheck.isEnabled() && fAutoCloseNotifierCheck.getSelection());
+    fAutoCloseNotifierSpinner.setSelection(notificationAutoCloseValue);
+
+    label = new Label(autoCloseContainer, SWT.None);
+    label.setText(" seconds");
   }
 
   private Composite createComposite(Composite parent) {
@@ -401,7 +423,9 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
   public boolean performOk() {
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP, fShowNotificationPopup.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED, fNotificationOnlyFromTray.getSelection());
-    fGlobalScope.putBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP, fNotificationIsSticky.getSelection());
+
+    fGlobalScope.putBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP, !fAutoCloseNotifierCheck.getSelection());
+    fGlobalScope.putInteger(DefaultPreferences.AUTOCLOSE_NOTIFICATION_VALUE, fAutoCloseNotifierSpinner.getSelection());
 
     if (fLimitNotificationCheck.getSelection())
       fGlobalScope.putInteger(DefaultPreferences.LIMIT_NOTIFICATION_SIZE, fLimitNotificationSpinner.getSelection());
@@ -476,8 +500,12 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
     fShowNotificationPopup.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP));
     fNotificationOnlyFromTray.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED));
     fNotificationOnlyFromTray.setEnabled(fShowNotificationPopup.getSelection());
-    fNotificationIsSticky.setSelection(defaultScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP));
-    fNotificationIsSticky.setEnabled(fShowNotificationPopup.getSelection());
+
+    fAutoCloseNotifierCheck.setSelection(!defaultScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP));
+    fAutoCloseNotifierCheck.setEnabled(fShowNotificationPopup.getSelection());
+
+    fAutoCloseNotifierSpinner.setSelection(defaultScope.getInteger(DefaultPreferences.AUTOCLOSE_NOTIFICATION_VALUE));
+    fAutoCloseNotifierSpinner.setEnabled(fShowNotificationPopup.getSelection() && fAutoCloseNotifierCheck.getSelection());
 
     int limitNotificationValue = defaultScope.getInteger(DefaultPreferences.LIMIT_NOTIFICATION_SIZE);
     fLimitNotificationCheck.setSelection(limitNotificationValue >= 0);
