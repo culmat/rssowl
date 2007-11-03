@@ -131,7 +131,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fUseMultipleTabsCheck.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS));
 
     Composite autoCloseTabsContainer = new Composite(viewGroup, SWT.None);
-    autoCloseTabsContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0));
+    autoCloseTabsContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0, 0, 2, false));
 
     fAutoCloseTabsCheck = new Button(autoCloseTabsContainer, SWT.CHECK);
     fAutoCloseTabsCheck.setText("Never show more than  ");
