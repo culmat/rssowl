@@ -38,6 +38,8 @@ import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
+import org.eclipse.jface.viewers.ColumnViewer;
+import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IElementComparer;
@@ -48,6 +50,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -58,6 +61,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorSite;
@@ -75,6 +79,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.LabelAdapter;
 import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.ITask;
@@ -125,10 +130,11 @@ public class NewsTableControl implements IFeedViewPart {
 
   /* Indices of Columns in the Tree-Viewer */
   static final int COL_TITLE = 0;
-  static final int COL_PUBDATE = 1;
-  static final int COL_AUTHOR = 2;
-  static final int COL_CATEGORY = 3;
-  static final int COL_STICKY = 4;
+  static final int COL_FEED = 1;
+  static final int COL_PUBDATE = 2;
+  static final int COL_AUTHOR = 3;
+  static final int COL_CATEGORY = 4;
+  static final int COL_STICKY = 5;
 
   /** Supported Columns of the Viewer */
   public enum Columns {
@@ -191,6 +197,35 @@ public class NewsTableControl implements IFeedViewPart {
     }
   }
 
+  /* Custom Tooltip Support for Feed Column */
+  private static class FeedColumnToolTipSupport extends ColumnViewerToolTipSupport {
+    FeedColumnToolTipSupport(ColumnViewer viewer, int style) {
+      super(viewer, style, false);
+    }
+
+    /*
+     * @see org.eclipse.jface.viewers.ColumnViewerToolTipSupport#getToolTipArea(org.eclipse.swt.widgets.Event)
+     */
+    @Override
+    protected Object getToolTipArea(Event event) {
+      Tree tree = (Tree) event.widget;
+      Point point = new Point(event.x, event.y);
+      TreeItem item = tree.getItem(point);
+
+      /* Only valid for Feed Column */
+      if (item != null) {
+        if (item.getBounds(COL_FEED).contains(point))
+          return super.getToolTipArea(event);
+      }
+
+      return null;
+    }
+
+    public static void enableFor(ColumnViewer viewer) {
+      new FeedColumnToolTipSupport(viewer, ToolTip.NO_RECREATE);
+    }
+  }
+
   private IEditorSite fEditorSite;
   private JobTracker fNewsStateTracker;
   private NewsTableViewer fViewer;
@@ -241,6 +276,9 @@ public class NewsTableControl implements IFeedViewPart {
     fViewer.getControl().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
     fViewer.getControl().setFont(OwlUI.getThemeFont(OwlUI.HEADLINES_FONT_ID, SWT.NORMAL));
 
+    /* Custom Tooltip for Feed Column */
+    FeedColumnToolTipSupport.enableFor(fViewer);
+
     /* TODO This is a Workaround until we remember expanded Groups */
     fViewer.setAutoExpandLevel(AbstractTreeViewer.ALL_LEVELS);
 
@@ -264,7 +302,7 @@ public class NewsTableControl implements IFeedViewPart {
 
     /* Headline Column */
     TreeViewerColumn col = new TreeViewerColumn(fViewer, SWT.LEFT);
-    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 60), "Title", null, true, true);
+    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 60), "Title", null, false, true);
     col.getColumn().setData(COL_ID, Columns.TITLE);
     col.getColumn().setMoveable(false);
     if (fInitialSortColumn == Columns.TITLE) {
@@ -272,10 +310,21 @@ public class NewsTableControl implements IFeedViewPart {
       fCustomTree.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
     }
 
+    /* Feed Column (visible only for saved searches) */
+    col = new TreeViewerColumn(fViewer, SWT.LEFT);
+    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 18), null, null, false, false);
+    col.getColumn().setData(COL_ID, NewsTableControl.Columns.FEED);
+    col.getColumn().setToolTipText("Feed");
+    if (fInitialSortColumn == NewsTableControl.Columns.FEED) {
+      fCustomTree.getControl().setSortColumn(col.getColumn());
+      fCustomTree.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
+    }
+    fCustomTree.setVisible(col.getColumn(), false, false);
+
     /* Date Column */
     int width = getInitialDateColumnWidth();
     col = new TreeViewerColumn(fViewer, SWT.LEFT);
-    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, width), "Date", null, true, true);
+    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, width), "Date", null, false, true);
     col.getColumn().setData(COL_ID, Columns.DATE);
     col.getColumn().setMoveable(false);
     if (fInitialSortColumn == Columns.DATE) {
@@ -285,7 +334,7 @@ public class NewsTableControl implements IFeedViewPart {
 
     /* Author Column */
     col = new TreeViewerColumn(fViewer, SWT.LEFT);
-    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20), "Author", null, true, true);
+    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20), "Author", null, false, true);
     col.getColumn().setData(COL_ID, Columns.AUTHOR);
     col.getColumn().setMoveable(false);
     if (fInitialSortColumn == Columns.AUTHOR) {
@@ -295,7 +344,7 @@ public class NewsTableControl implements IFeedViewPart {
 
     /* Category Column */
     col = new TreeViewerColumn(fViewer, SWT.LEFT);
-    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20), "Category", null, true, true);
+    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20), "Category", null, false, true);
     col.getColumn().setData(COL_ID, Columns.CATEGORY);
     col.getColumn().setMoveable(false);
     if (fInitialSortColumn == Columns.CATEGORY) {
@@ -305,7 +354,7 @@ public class NewsTableControl implements IFeedViewPart {
 
     /* Sticky Column */
     col = new TreeViewerColumn(fViewer, SWT.LEFT);
-    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 18), null, null, true, false);
+    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 18), null, null, false, false);
     col.getColumn().setData(COL_ID, Columns.STICKY);
     col.getColumn().setMoveable(false);
     col.getColumn().setToolTipText("Sticky State");
@@ -314,7 +363,7 @@ public class NewsTableControl implements IFeedViewPart {
     fViewer.setContentProvider(contentProvider);
 
     /* Create LabelProvider (Custom Owner Drawn enabled!) */
-    final NewsTableLabelProvider newsTableLabelProvider = new NewsTableLabelProvider();
+    final NewsTableLabelProvider newsTableLabelProvider = new NewsTableLabelProvider(fViewer);
     if (USE_CUSTOM_OWNER_DRAWN) {
       fViewer.getControl().addListener(SWT.EraseItem, new Listener() {
         public void handleEvent(Event event) {
@@ -724,6 +773,23 @@ public class NewsTableControl implements IFeedViewPart {
    * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#setInput(java.lang.Object)
    */
   public void setPartInput(Object input) {
+    Object oldInput = fViewer.getInput();
+    Tree tree = fCustomTree.getControl();
+    TreeColumn feedColumn = tree.getColumn(COL_FEED);
+
+    /* Old: Bookmark, New: Saved Search */
+    if (oldInput instanceof FeedLinkReference && input instanceof ISearchMark)
+      fCustomTree.setVisible(feedColumn, true, true);
+
+    /* Old: Saved Search, New: Bookmark */
+    else if (oldInput instanceof SearchMarkReference && input instanceof IBookMark)
+      fCustomTree.setVisible(feedColumn, false, true);
+
+    /* Saved Search */
+    else if (input instanceof ISearchMark)
+      fCustomTree.setVisible(feedColumn, true, true);
+
+    /* Set Input to Viewer */
     if (input instanceof IBookMark)
       fViewer.setInput(((IBookMark) input).getFeedLinkReference());
     else if (input instanceof ISearchMark)
