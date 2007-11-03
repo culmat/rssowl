@@ -880,6 +880,7 @@ public class CCLabel extends Canvas {
     if (width <= ellipsisWidth)
       return text;
 
+    /* Create substring that fits available width */
     String subStr = "";
     for (int i = 1; i < text.length(); i++) {
       subStr = text.substring(0, i);
@@ -889,6 +890,12 @@ public class CCLabel extends Canvas {
         subStr = text.substring(0, i - 2);
         break;
       }
+    }
+
+    /* Try to trim at whitespace */
+    for (int i = subStr.length() - 1; i >= subStr.length() - 10; i--) {
+      if (subStr.charAt(i) == ' ')
+        return subStr.substring(0, i) + ELLIPSIS;
     }
 
     return subStr + ELLIPSIS;
