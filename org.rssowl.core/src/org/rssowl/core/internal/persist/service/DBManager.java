@@ -430,7 +430,6 @@ public class DBManager {
    * @param monitor
    *
    */
-  @SuppressWarnings("unused")
   private static void copyDatabase(File source, File destination, IProgressMonitor monitor) {
       ObjectContainer sourceDb = Db4o.openFile(createConfiguration(),
           source.getAbsolutePath());
