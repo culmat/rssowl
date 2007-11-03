@@ -27,3 +27,4 @@ Bundle-Vendor: RSSOwl.org
 Eclipse-LazyStart: true
 Bundle-Activator: org.rssowl.lib.httpclient.internal.Activator
 Require-Bundle: org.eclipse.core.runtime
+Bundle-RequiredExecutionEnvironment: J2SE-1.5

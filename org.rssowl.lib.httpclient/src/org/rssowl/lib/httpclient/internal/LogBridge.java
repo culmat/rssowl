@@ -30,7 +30,7 @@ import org.eclipse.core.runtime.IStatus;
 /**
  * Implementation of <code>Log</code> that writes error and fatal messages to
  * the Eclipse Log Mechanism.
- * 
+ *
  * @author bpasero
  */
 public class LogBridge implements Log {
@@ -40,11 +40,10 @@ public class LogBridge implements Log {
 
   /**
    * Keep for reflection
-   * 
+   *
    * @param str the class using this log
    */
-  public LogBridge(@SuppressWarnings("unused")
-  String str) {}
+  public LogBridge(String str) {}
 
   /*
    * @see org.apache.commons.logging.impl.NoOpLog#error(java.lang.Object,
