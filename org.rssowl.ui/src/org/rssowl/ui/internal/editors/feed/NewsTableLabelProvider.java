@@ -282,8 +282,13 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     }
 
     /* EntityGroup Image */
-    else if (element instanceof EntityGroup && columnIndex == NewsTableControl.COL_TITLE)
+    else if (element instanceof EntityGroup && columnIndex == NewsTableControl.COL_TITLE) {
+      EntityGroup group = (EntityGroup) element;
+      if (group.getImage() != null)
+        return OwlUI.getImage(fResources, group.getImage());
+
       return fGroupIcon;
+    }
 
     return null;
   }
