@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IActionFilter;
 import org.rssowl.core.persist.IEntity;
 
@@ -34,20 +35,22 @@ import java.util.List;
 /**
  * Instances of <code>EntityGroup</code> are the parent of a List of
  * <code>EntityGroupItem</code>s. They can be used in Viewer to categorize
- * Model-References. Thereby the Group offers a human readable Name to Display.
- * 
+ * Model-References. Thereby the Group offers a human readable Name to Display
+ * and an optional Image.
+ *
  * @author bpasero
  */
 public class EntityGroup implements IActionFilter {
   private long fId;
   private String fCategoryId;
   private String fName;
+  private ImageDescriptor fImage;
   List<EntityGroupItem> fItems;
 
   /**
    * Creates a new EntityGroup with the given ID. Note that inside one Viewer
    * there should <em>not</em> be two different ViewerGroups with the same ID.
-   * 
+   *
    * @param id The unique ID of the EntityGroup.
    * @param groupId A unique Identifier describing the Category of this Group.
    * The Category is used to decide wether contributed Actions should enable.
@@ -60,7 +63,7 @@ public class EntityGroup implements IActionFilter {
    * Creates a new EntityGroup with the given ID and Name. Note that inside one
    * Viewer there should <em>not</em> be two different ViewerGroups with the
    * same ID.
-   * 
+   *
    * @param id The unique ID of the EntityGroup.
    * @param groupId A unique Identifier describing the Category of this Group.
    * The Category is used to decide wether contributed Actions should enable.
@@ -113,6 +116,20 @@ public class EntityGroup implements IActionFilter {
       entities.add(groupItem.getEntity());
 
     return entities;
+  }
+
+  /**
+   * @param image The image to display this group in the UI.
+   */
+  public void setImage(ImageDescriptor image) {
+    fImage = image;
+  }
+
+  /**
+   * @return the image to display this group in the UI.
+   */
+  public ImageDescriptor getImage() {
+    return fImage;
   }
 
   /**

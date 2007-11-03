@@ -25,6 +25,8 @@
 package org.rssowl.ui.internal.editors.feed;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
@@ -33,10 +35,13 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.event.ModelEvent;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
@@ -212,7 +217,7 @@ public class NewsGrouping {
     fType = type;
   }
 
-  boolean needsRefresh(Class< ? extends IEntity> entity, Set< ? extends ModelEvent> events, boolean isUpdate) {
+  boolean needsRefresh(Class<? extends IEntity> entity, Set<? extends ModelEvent> events, boolean isUpdate) {
 
     /* In case the Grouping is not active at all */
     if (fType == Type.NO_GROUPING)
@@ -395,6 +400,14 @@ public class NewsGrouping {
         if (group == null) {
           String name = StringUtils.isSet(feed.getTitle()) ? feed.getTitle() : feed.getLink().toString();
           group = new EntityGroup(nextId++, GROUP_CATEGORY_ID, name);
+
+          ImageDescriptor feedIcon = null;
+          IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(new FeedLinkReference(feed.getLink()));
+          if (bookMark != null)
+            feedIcon = OwlUI.getFavicon(bookMark);
+          group.setImage(feedIcon != null ? feedIcon : OwlUI.BOOKMARK);
+
+          /* Cache */
           groupCache.put(feed.getId(), group);
         }
 
