@@ -40,8 +40,8 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
   /* Default Perspective */
   private static final String PERSPECTIVE_ID = "org.rssowl.ui.perspective"; //$NON-NLS-1$
 
-  /* Keep a static reference to the primary Workbench Window Advisor */
-  static ApplicationWorkbenchWindowAdvisor fgPrimaryApplicationWorkbenchWindowAdvisor;
+  /** Keep a static reference to the primary Workbench Window Advisor */
+  public static ApplicationWorkbenchWindowAdvisor fgPrimaryApplicationWorkbenchWindowAdvisor;
 
   private final Runnable fRunAfterUIStartup;
 
