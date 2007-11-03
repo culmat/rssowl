@@ -20,6 +20,7 @@ Export-Package: org.rssowl.ui.dialogs.properties,
  org.rssowl.ui.internal.dialogs.properties;x-internal:=true,
  org.rssowl.ui.internal.editors.browser;x-internal:=true,
  org.rssowl.ui.internal.editors.feed;x-internal:=true,
+ org.rssowl.ui.internal.notifier,
  org.rssowl.ui.internal.search;x-internal:=true,
  org.rssowl.ui.internal.util;x-internal:=true,
  org.rssowl.ui.internal.views.explorer;x-internal:=true
