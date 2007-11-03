@@ -24,9 +24,7 @@
 
 package org.rssowl.ui.internal;
 
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.ContributionItem;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
@@ -459,9 +457,16 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     shell.setActive();
     shell.setLayoutDeferred(false);
 
-    String msg = "Layout Deferred: " + shell.isLayoutDeferred();
-    IStatus status = new Status(IStatus.INFO, Activator.getDefault().getBundle().getSymbolicName(), IStatus.OK, msg, null);
-    Activator.getDefault().getLog().log(status);
+    /*
+     * TODO For some reason it seems to help to wait at this point to fix Bug 608
+     * (Layout problems restoring minimized RSSOwl from tray). Remove this code
+     * as soon as Eclipse Bug 180881 is fixed and setLayoutDeferred() is no longer
+     * used
+     */
+    try {
+      Thread.sleep(50);
+    } catch (InterruptedException e) {
+    }
 
     /* Un-Minimize if minimized */
     if (shell.getMinimized())
