@@ -334,7 +334,7 @@ public class NewsContentProvider implements ITreeContentProvider {
                     return;
 
                   /* Refresh Viewer to reflect changes */
-                  fFeedView.refresh(true, false);
+                  fFeedView.refresh(true, true); //TODO Seems some JFace Caching Problem here
 
                   /* Add to Browser-Viewer if showing entire Feed */
                   if (fBrowserViewer.getInput() instanceof BookMarkReference)
