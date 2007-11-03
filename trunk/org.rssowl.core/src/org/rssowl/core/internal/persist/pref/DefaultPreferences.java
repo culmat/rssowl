@@ -152,6 +152,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Leave Notification Popup open until closed */
   public static final String STICKY_NOTIFICATION_POPUP = "org.rssowl.pref.StickyNotificationPoup";
 
+  /** Global: Auto Close Time */
+  public static final String AUTOCLOSE_NOTIFICATION_VALUE = "org.rssowl.pref.AutoCloseNotificationPoupValue";
+
   /** Global: Limit number of News in notification */
   public static final String LIMIT_NOTIFICATION_SIZE = "org.rssowl.pref.LimitNotificationPoup";
 
@@ -261,6 +264,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putInteger(LIMIT_NOTIFICATION_SIZE, 5);
     defaultScope.putBoolean(CONFIRM_DELETE_NEWS, true);
     defaultScope.putBoolean(SEARCH_DIALOG_PREVIEW_VISIBLE, true);
+    defaultScope.putInteger(AUTOCLOSE_NOTIFICATION_VALUE, 8);
   }
 
   private void initGlobalEclipseDefaults(IPreferenceScope defaultScope) {
