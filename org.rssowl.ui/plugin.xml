@@ -402,7 +402,7 @@
          </keywordReference>
       </page>
       <page
-            class="org.rssowl.ui.internal.NotifierPreferencesPage"
+            class="org.rssowl.ui.internal.notifier.NotifierPreferencesPage"
             id="org.rssowl.ui.NotifierPreferences"
             name="Notifier">
          <keywordReference

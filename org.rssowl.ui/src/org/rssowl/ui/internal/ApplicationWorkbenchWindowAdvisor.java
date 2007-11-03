@@ -192,11 +192,17 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     return res[0];
   }
 
-  boolean isMinimizedToTray() {
+  /**
+   * @return TRUE if the Window is minimized to the tray.
+   */
+  public boolean isMinimizedToTray() {
     return fMinimizedToTray;
   }
 
-  boolean isMinimized() {
+  /**
+   * @return TRUE if the Window is minimized.
+   */
+  public boolean isMinimized() {
     return getWindowConfigurer().getWindow().getShell().getMinimized();
   }
 
@@ -451,8 +457,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     shell.setLayoutDeferred(true);
   }
 
-  /* Restore from System Tray */
-  void restoreFromTray(Shell shell) {
+  /**
+   * @param shell
+   */
+  public void restoreFromTray(Shell shell) {
     shell.setVisible(true);
     shell.setActive();
     shell.setLayoutDeferred(false);
