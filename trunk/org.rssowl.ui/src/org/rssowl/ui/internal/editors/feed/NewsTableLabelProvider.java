@@ -24,9 +24,11 @@
 
 package org.rssowl.ui.internal.editors.feed;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
+import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -43,12 +45,15 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.ModelUtils;
@@ -63,6 +68,7 @@ import java.util.Set;
  * @author bpasero
  */
 public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
+  private final StructuredViewer fViewer;
 
   /* Some Colors of a Label */
   private static final String LABEL_COLOR_BLACK = "0,0,0";
@@ -94,8 +100,13 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
   /* Pre-Cache some Fonts being used */
   private Font fBoldFont;
 
-  /** Creates a new instance of this LabelProvider */
-  public NewsTableLabelProvider() {
+  /**
+   * Creates a new instance of this LabelProvider
+   *
+   * @param viewer
+   */
+  public NewsTableLabelProvider(StructuredViewer viewer) {
+    fViewer = viewer;
     fResources = new LocalResourceManager(JFaceResources.getResources());
     createResources();
   }
@@ -161,6 +172,20 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     cell.setBackground(getBackground(cell.getElement(), cell.getColumnIndex()));
   }
 
+  /*
+   * @see org.eclipse.jface.viewers.CellLabelProvider#getToolTipText(java.lang.Object)
+   */
+  @Override
+  public String getToolTipText(Object element) {
+    INews news = (INews) element;
+    FeedLinkReference feedRef = news.getFeedReference();
+    IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(feedRef);
+    if (bookMark != null)
+      return bookMark.getName();
+
+    return null;
+  }
+
   /**
    * @param element
    * @param columnIndex
@@ -203,7 +228,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
               text = category.getDomain();
           }
           break;
-       }
+      }
     }
 
     /* Handle EntityGroup */
@@ -235,6 +260,16 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
           return fNewsUpdatedIcon;
         else if (news.getState() == INews.State.READ)
           return fNewsReadIcon;
+      }
+
+      /* Feed Column */
+      else if (columnIndex == NewsTableControl.COL_FEED && !(fViewer.getInput() instanceof FeedLinkReference)) {
+        FeedLinkReference feedRef = news.getFeedReference();
+        IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(feedRef);
+        if (bookMark != null) {
+          ImageDescriptor favicon = OwlUI.getFavicon(bookMark);
+          return OwlUI.getImage(fResources, favicon != null ? favicon : OwlUI.BOOKMARK);
+        }
       }
 
       /* Sticky State */

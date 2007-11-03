@@ -51,6 +51,7 @@ import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
 import org.eclipse.jface.viewers.Viewer;
@@ -361,7 +362,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
     private Image fMediumRelevanceIcon;
     private Image fLowRelevanceIcon;
 
-    ScoredNewsLabelProvider() {
+    ScoredNewsLabelProvider(StructuredViewer viewer) {
+      super(viewer);
       createResources();
     }
 
@@ -381,19 +383,17 @@ public class SearchNewsDialog extends TitleAreaDialog {
       /* Text */
       if (cell.getColumnIndex() == COL_CATEGORY)
         cell.setText(getCategories(scoredNews.getNews()));
-      else if (cell.getColumnIndex() == COL_TITLE)
-        cell.setText(getColumnText(scoredNews.getNews(), cell.getColumnIndex() - 1));
       else
-        cell.setText(getColumnText(scoredNews.getNews(), cell.getColumnIndex() - 2));
+        cell.setText(getColumnText(scoredNews.getNews(), cell.getColumnIndex() - 1));
 
       /* Image */
       cell.setImage(getColumnImage(scoredNews, cell.getColumnIndex()));
 
       /* Font */
-      cell.setFont(getFont(scoredNews.getNews(), cell.getColumnIndex() - 2));
+      cell.setFont(getFont(scoredNews.getNews(), cell.getColumnIndex() - 1));
 
       /* Foreground */
-      Color foreground = getForeground(scoredNews.getNews(), cell.getColumnIndex() - 2);
+      Color foreground = getForeground(scoredNews.getNews(), cell.getColumnIndex() - 1);
 
       /* TODO This is required to invalidate + redraw the entire TableItem! */
       if (USE_CUSTOM_OWNER_DRAWN) {
@@ -404,7 +404,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
         cell.setForeground(foreground);
 
       /* Background */
-      cell.setBackground(getBackground(scoredNews.getNews(), cell.getColumnIndex() - 2));
+      cell.setBackground(getBackground(scoredNews.getNews(), cell.getColumnIndex() - 1));
     }
 
     private String getCategories(INews news) {
@@ -443,23 +443,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
         }
       }
 
-      /* Title Column */
-      else if (columnIndex == COL_TITLE)
-        return super.getColumnImage(((ScoredNews) element).getNews(), columnIndex - 1);
-
-      /* Feed Column */
-      else if (columnIndex == COL_FEED) {
-        ScoredNews scoredNews = (ScoredNews) element;
-        FeedLinkReference feedRef = scoredNews.getNews().getFeedReference();
-        IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(feedRef);
-        if (bookMark != null) {
-          ImageDescriptor favicon = OwlUI.getFavicon(bookMark);
-          return OwlUI.getImage(fResources, favicon != null ? favicon : OwlUI.BOOKMARK);
-        }
-      }
-
       /* Any other Column */
-      return super.getColumnImage(((ScoredNews) element).getNews(), columnIndex - 2);
+      return super.getColumnImage(((ScoredNews) element).getNews(), columnIndex - 1);
     }
 
     /*
@@ -1220,7 +1205,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fResultViewer.setContentProvider(getContentProvider());
 
     /* Create LabelProvider (Custom Owner Drawn enabled!) */
-    final NewsTableLabelProvider newsTableLabelProvider = new ScoredNewsLabelProvider();
+    final NewsTableLabelProvider newsTableLabelProvider = new ScoredNewsLabelProvider(fResultViewer);
     if (USE_CUSTOM_OWNER_DRAWN) {
       fResultViewer.getControl().addListener(SWT.EraseItem, new Listener() {
         public void handleEvent(Event event) {

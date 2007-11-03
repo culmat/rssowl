@@ -96,6 +96,19 @@ public class CTree {
     return col;
   }
 
+  /**
+   * @param col
+   * @param visible
+   * @param update
+   */
+  public void setVisible(TreeColumn col, boolean visible, boolean update) {
+    CColumnLayoutData data = (CColumnLayoutData) col.getData(LAYOUT_DATA);
+    data.setHidden(!visible);
+
+    if (update)
+      onTreeResize();
+  }
+
   private void onTreeResize() {
     int totalWidth = fTree.getParent().getClientArea().width;
     totalWidth -= fTree.getBorderWidth() * 2;
@@ -119,8 +132,13 @@ public class CTree {
     for (TreeColumn column : fCols) {
       CColumnLayoutData data = (CColumnLayoutData) column.getData(LAYOUT_DATA);
 
+      /* Hide Column */
+      if (data.isHidden()) {
+        column.setWidth(0);
+      }
+
       /* Fixed with Default Width Hint */
-      if (data.getSize() == CColumnLayoutData.Size.FIXED && data.getWidthHint() == CColumnLayoutData.DEFAULT) {
+      else if (data.getSize() == CColumnLayoutData.Size.FIXED && data.getWidthHint() == CColumnLayoutData.DEFAULT) {
         column.pack();
         int width = column.getWidth();
         freeWidth -= width;

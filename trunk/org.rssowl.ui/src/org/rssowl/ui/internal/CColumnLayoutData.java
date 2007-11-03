@@ -26,9 +26,7 @@ package org.rssowl.ui.internal;
 
 /**
  * Layout-Information to be used with a <code>CTree</code> or
- * <code>CTable</code>.
- *
- * TODO Delete if this is no longer used!
+ * <code>CTable</code>. TODO Delete if this is no longer used!
  *
  * @author bpasero
  */
@@ -49,6 +47,7 @@ public class CColumnLayoutData {
 
   private Size fSize;
   private int fWHint;
+  private boolean fHidden;
 
   /**
    * @param size
@@ -71,5 +70,19 @@ public class CColumnLayoutData {
    */
   public int getWidthHint() {
     return fWHint;
+  }
+
+  /**
+   * @param hidden TRUE if the column should be hidden.
+   */
+  public void setHidden(boolean hidden) {
+    fHidden = hidden;
+  }
+
+  /**
+   * @return Returns TRUE if the column should be hidden.
+   */
+  public boolean isHidden() {
+    return fHidden;
   }
 }
