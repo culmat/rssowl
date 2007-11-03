@@ -186,6 +186,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
   /* Preference: Sash Weights */
   private static final String PREF_SASH_WEIGHTS = "org.rssowl.ui.internal.dialogs.search.SashWeights";
 
+  /* Preference: Column Order */
+  private static final String PREF_COL_ORDER = "org.rssowl.ui.internal.dialogs.search.ColumnOrder";
+
   /* ID to associate a Column with its ID */
   private static final String COL_ID = "org.rssowl.ui.internal.editors.feed.ColumnIdentifier";
 
@@ -224,6 +227,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private Link fStatusLabel;
   private NewsBrowserViewer fBrowserViewer;
   private int[] fCachedWeights;
+  private int[] fCachedColumnOrder;
 
   /* Misc. */
   private NewsTableControl.Columns fInitialSortColumn = NewsTableControl.Columns.SCORE;
@@ -567,6 +571,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fFirstTimeOpen = (fDialogSettings.getSection(SETTINGS_SECTION) == null);
     fIsPreviewVisible = fPreferences.getBoolean(DefaultPreferences.SEARCH_DIALOG_PREVIEW_VISIBLE);
     fCachedWeights = fPreferences.getIntegers(PREF_SASH_WEIGHTS);
+    fCachedColumnOrder = fPreferences.getIntegers(PREF_COL_ORDER);
     fModelSearch = Owl.getPersistenceService().getModelSearch();
     fHandCursor = parentShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND);
     fInitialConditions = initialConditions;
@@ -595,6 +600,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fPreferences.putBoolean(DefaultPreferences.SEARCH_DIALOG_PREVIEW_VISIBLE, fIsPreviewVisible);
     if (fCachedWeights != null)
       fPreferences.putIntegers(PREF_SASH_WEIGHTS, fCachedWeights);
+    if (fCachedColumnOrder != null)
+      fPreferences.putIntegers(PREF_COL_ORDER, fCachedColumnOrder);
 
     /*
      * Workaround for Eclipse Bug 186025: The Virtual Manager is not cleared
@@ -1628,6 +1635,21 @@ public class SearchNewsDialog extends TitleAreaDialog {
     customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 18), null, null, true, false);
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.STICKY);
     col.getColumn().setToolTipText("Sticky State");
+
+    /* Register Listener to remember Column Order */
+    TableColumn[] columns = fResultViewer.getTable().getColumns();
+    for (TableColumn column : columns) {
+      column.addControlListener(new ControlAdapter() {
+        @Override
+        public void controlMoved(ControlEvent e) {
+          fCachedColumnOrder = fResultViewer.getTable().getColumnOrder();
+        }
+      });
+    }
+
+    /* Apply Column Order if provided */
+    if (fCachedColumnOrder != null)
+      fResultViewer.getTable().setColumnOrder(fCachedColumnOrder);
   }
 
   private IStructuredContentProvider getContentProvider() {
