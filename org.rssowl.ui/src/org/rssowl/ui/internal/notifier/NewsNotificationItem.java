@@ -36,6 +36,7 @@ import org.eclipse.ui.PartInitException;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
@@ -49,6 +50,7 @@ import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 
+import java.net.URI;
 import java.util.Date;
 
 /**
@@ -58,14 +60,23 @@ import java.util.Date;
  * @author bpasero
  */
 public class NewsNotificationItem extends NotificationItem {
-  private final INews fNews;
+  private URI fNewsLink;
+  private FeedLinkReference fFeedReference;
+  private NewsReference fNewsReference;
+  private Date fRecentNewsDate;
+  private boolean fIsNewsSticky;
 
   /**
    * @param news The news that is to be displayed in the Notifier.
    */
   public NewsNotificationItem(INews news) {
     super(makeText(news), makeImage(news));
-    fNews = news;
+
+    fNewsLink = news.getLink();
+    fFeedReference = news.getFeedReference();
+    fNewsReference = new NewsReference(news.getId());
+    fRecentNewsDate = DateUtils.getRecentDate(news);
+    fIsNewsSticky = news.isFlagged();
   }
 
   private static ImageDescriptor makeImage(INews news) {
@@ -95,12 +106,12 @@ public class NewsNotificationItem extends NotificationItem {
 
     /* Open Link in Browser if Modifier Key is pressed */
     if ((e.stateMask & SWT.MOD1) != 0) {
-      new OpenInBrowserAction(new StructuredSelection(fNews)).run();
+      new OpenInBrowserAction(new StructuredSelection(fNewsLink)).run();
       return;
     }
 
     /* Otherwise open Feedview and select the News */
-    IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(fNews.getFeedReference());
+    IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(fFeedReference);
     IWorkbenchPage page = OwlUI.getPage();
     if (page != null) {
 
@@ -112,7 +123,7 @@ public class NewsNotificationItem extends NotificationItem {
       if (editorRef != null) {
         IEditorPart editor = editorRef.getEditor(false);
         if (editor instanceof FeedView) {
-          ((FeedView) editor).setSelection(new StructuredSelection(fNews));
+          ((FeedView) editor).setSelection(new StructuredSelection(fNewsReference));
           page.activate(editor);
         }
       }
@@ -120,7 +131,7 @@ public class NewsNotificationItem extends NotificationItem {
       /* Otherwise Open */
       else {
         boolean activateEditor = OpenStrategy.activateOnOpen();
-        FeedViewInput input = new FeedViewInput(bookMark, PerformAfterInputSet.selectNews(new NewsReference(fNews.getId())));
+        FeedViewInput input = new FeedViewInput(bookMark, PerformAfterInputSet.selectNews(fNewsReference));
         try {
           OwlUI.getPage().openEditor(input, FeedView.ID, activateEditor);
         } catch (PartInitException ex) {
@@ -143,7 +154,7 @@ public class NewsNotificationItem extends NotificationItem {
    */
   @Override
   public boolean isSticky() {
-    return fNews.isFlagged();
+    return fIsNewsSticky;
   }
 
   /*
@@ -151,8 +162,11 @@ public class NewsNotificationItem extends NotificationItem {
    */
   @Override
   public void setSticky(boolean sticky) {
-    fNews.setFlagged(!fNews.isFlagged());
-    DynamicDAO.save(fNews);
+    fIsNewsSticky = sticky;
+
+    INews news = fNewsReference.resolve();
+    news.setFlagged(sticky);
+    DynamicDAO.save(news);
   }
 
   /*
@@ -162,8 +176,8 @@ public class NewsNotificationItem extends NotificationItem {
 
     /* Compare with other News Item */
     if (o instanceof NewsNotificationItem) {
-      Date date1 = DateUtils.getRecentDate(fNews);
-      Date date2 = DateUtils.getRecentDate(((NewsNotificationItem) o).fNews);
+      Date date1 = fRecentNewsDate;
+      Date date2 = ((NewsNotificationItem) o).fRecentNewsDate;
 
       return date2.compareTo(date1);
     }

@@ -39,6 +39,7 @@ import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.List;
 
 /**
@@ -82,19 +83,23 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
    */
   @Override
   public void run() {
-    List< ? > selection = fSelection.toList();
+    List<?> selection = fSelection.toList();
     for (Object object : selection) {
-      if (object instanceof INews) {
-        INews news = (INews) object;
-        if (news.getLink() != null) {
-          IWorkbenchBrowserSupport browser = PlatformUI.getWorkbench().getBrowserSupport();
-          try {
-            browser.createBrowser(WebBrowserView.EDITOR_ID).openURL(news.getLink().toURL());
-          } catch (PartInitException e) {
-            Activator.getDefault().getLog().log(e.getStatus());
-          } catch (MalformedURLException e) {
-            Activator.getDefault().getLog().log(Activator.getDefault().createErrorStatus(e.getMessage(), e));
-          }
+      URI link = null;
+
+      if (object instanceof INews)
+        link = ((INews) object).getLink();
+      else if (object instanceof URI)
+        link = (URI) object;
+
+      if (link != null) {
+        IWorkbenchBrowserSupport browser = PlatformUI.getWorkbench().getBrowserSupport();
+        try {
+          browser.createBrowser(WebBrowserView.EDITOR_ID).openURL(link.toURL());
+        } catch (PartInitException e) {
+          Activator.getDefault().getLog().log(e.getStatus());
+        } catch (MalformedURLException e) {
+          Activator.getDefault().getLog().log(Activator.getDefault().createErrorStatus(e.getMessage(), e));
         }
       }
     }
