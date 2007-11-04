@@ -603,6 +603,11 @@
             id="org.rssowl.ui.OpenInBrowserAction"
             name="Open in Browser">
       </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.SortByNameAction"
+            name="Sort by Name">
+      </command>
    </extension>
    <extension
          id="product"
@@ -760,6 +765,24 @@
                      value="org.rssowl.ui.internal.views.explorer.BookMarkGrouping">
                </objectState>
             </or>
+         </visibility>
+      </objectContribution>
+      <objectContribution
+            adaptable="false"
+            id="org.rssowl.ui.SortByNameContribution"
+            objectClass="java.lang.Object">
+         <action
+               class="org.rssowl.ui.internal.actions.SortByNameAction"
+               definitionId="org.rssowl.ui.SortByNameAction"
+               enablesFor="1"
+               id="org.rssowl.ui.SortByNameAction"
+               label="&amp;Sort by Name"
+               menubarPath="edit">
+         </action>
+         <visibility>
+            <objectClass
+                  name="org.rssowl.core.persist.IFolder">
+            </objectClass>
          </visibility>
       </objectContribution>
       <objectContribution
