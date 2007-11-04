@@ -98,42 +98,48 @@ public class SearchMark extends Mark implements ISearchMark {
         bucket[i] = news.get(i).getId();
       }
 
-      /* Read News */
-      if (state == INews.State.READ) {
-        if (!changed)
-          changed = !Arrays.equals(fMatchingReadNews, bucket);
+      switch (state) {
+        /* Read News */
+        case READ:
+          if (!changed)
+            changed = !Arrays.equals(fMatchingReadNews, bucket);
 
-        fMatchingReadNews = bucket;
-      }
+          fMatchingReadNews = bucket;
+          break;
 
-      /* Unread or Updated News */
-      else if (state == INews.State.UNREAD || state == INews.State.UPDATED) {
-        if (!changed)
-          changed = !Arrays.equals(fMatchingUnreadUpdatedNews, bucket);
+        /* Unread or Updated News */
+        case UNREAD:
+        case UPDATED:
+          if (!changed)
+            changed = !Arrays.equals(fMatchingUnreadUpdatedNews, bucket);
 
-        fMatchingUnreadUpdatedNews = bucket;
-      }
+          fMatchingUnreadUpdatedNews = bucket;
+          break;
 
-      /* New News */
-      else if (state == INews.State.NEW) {
+        /* New News */
+        case NEW:
+          /* Count the number of added *new* News */
+          for (long lVal : bucket) {
+            if (Arrays.binarySearch(fMatchingNewNews, lVal) < 0)
+              newNewsDiff++;
+          }
 
-        /* Count the number of added *new* News */
-        for (long lVal : bucket) {
-          if (Arrays.binarySearch(fMatchingNewNews, lVal) < 0)
-            newNewsDiff++;
-        }
+          /* Also use for changed-flag */
+          if (newNewsDiff > 0)
+            changed = true;
 
-        /* Also use for changed-flag */
-        if (newNewsDiff > 0)
-          changed = true;
+          /*
+           * We need to sort the array to be able to do the binary search
+           * in future iterations. However, since we assign the array to
+           * fMatchingNewNews, we also need to sort the array in case we do
+           * Arrays.equals.
+           */
+          Arrays.sort(bucket);
+          if (!changed)
+            changed = !Arrays.equals(fMatchingNewNews, bucket);
 
-        if (!changed)
-          changed = !Arrays.equals(fMatchingNewNews, bucket);
-
-        fMatchingNewNews = bucket;
-
-        /* Sort Array for later binary search */
-        Arrays.sort(fMatchingNewNews);
+          fMatchingNewNews = bucket;
+          break;
       }
     }
 
