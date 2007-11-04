@@ -40,12 +40,12 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IndexListener;
 import org.rssowl.core.util.LoggingSafeRunnable;
+import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.SearchHit;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -220,12 +220,11 @@ public class SavedSearchService {
       resultsMap.put(INews.State.UNREAD, unreadNews);
       resultsMap.put(INews.State.READ, readNews);
 
-      /* Check if *new* news got added */
-      int newNewsCountDif = newNews.size() - searchMark.getResultCount(EnumSet.of(INews.State.NEW));
-      boolean isNewNewsAdded = !firstUpdate && !fromUserEvent && newNewsCountDif > 0;
-
       /* Set Result */
-      boolean changed = searchMark.setResult(resultsMap);
+      Pair<Boolean, Integer> result = searchMark.setResult(resultsMap);
+      boolean changed = result.getFirst();
+      int newNewsDiff = result.getSecond();
+      boolean isNewNewsAdded = !firstUpdate && !fromUserEvent && newNewsDiff > 0;
 
       /* Create Event to indicate changed results if any */
       if (changed)
