@@ -239,11 +239,13 @@ public class NewsTableControl implements IFeedViewPart {
   private boolean fShowsHandCursor;
   private AtomicBoolean fBlockNewsStateTracker = new AtomicBoolean(false);
   private LabelAdapter fLabelListener;
+  private IPreferenceScope fInputPreferences;
 
   /* Settings */
   private IPreferenceScope fPreferences;
   private Columns fInitialSortColumn = Columns.DATE;
   private boolean fInitialAscending = false;
+
 
   /*
    * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#init(org.eclipse.ui.IEditorSite)
@@ -259,7 +261,11 @@ public class NewsTableControl implements IFeedViewPart {
    * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#onInputChanged(org.rssowl.ui.internal.editors.feed.FeedViewInput)
    */
   public void onInputChanged(FeedViewInput input) {
-  /* Ignore */
+    fInputPreferences = Owl.getPreferenceService().getEntityScope(input.getMark());
+  }
+
+  IPreferenceScope getInputPreferences() {
+    return fInputPreferences;
   }
 
   /*
@@ -271,7 +277,7 @@ public class NewsTableControl implements IFeedViewPart {
     fCustomTree = new CTree(parent, style);
     fCustomTree.getControl().setHeaderVisible(true);
 
-    fViewer = new NewsTableViewer(fCustomTree.getControl());
+    fViewer = new NewsTableViewer(this, fCustomTree.getControl());
     fViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fViewer.setUseHashlookup(true);
     fViewer.getControl().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
