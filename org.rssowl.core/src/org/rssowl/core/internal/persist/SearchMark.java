@@ -30,6 +30,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -73,14 +74,14 @@ public class SearchMark extends Mark implements ISearchMark {
   // As per javadoc
   }
 
-
   /*
    * @see org.rssowl.core.persist.ISearchMark#setResult(java.util.List)
    */
-  public boolean setResult(Map<INews.State, List<NewsReference>> results) {
+  public Pair<Boolean, Integer> setResult(Map<INews.State, List<NewsReference>> results) {
     Assert.isNotNull(results, "results");
 
     boolean changed = false;
+    int newNewsDiff = 0;
 
     /* For each Result */
     for (Map.Entry<INews.State, List<NewsReference>> result : results.entrySet()) {
@@ -115,14 +116,28 @@ public class SearchMark extends Mark implements ISearchMark {
 
       /* New News */
       else if (state == INews.State.NEW) {
+
+        /* Count the number of added *new* News */
+        for (long lVal : bucket) {
+          if (Arrays.binarySearch(fMatchingNewNews, lVal) < 0)
+            newNewsDiff++;
+        }
+
+        /* Also use for changed-flag */
+        if (newNewsDiff > 0)
+          changed = true;
+
         if (!changed)
           changed = !Arrays.equals(fMatchingNewNews, bucket);
 
         fMatchingNewNews = bucket;
+
+        /* Sort Array for later binary search */
+        Arrays.sort(fMatchingNewNews);
       }
     }
 
-    return changed;
+    return Pair.create(changed, newNewsDiff);
   }
 
   /*
