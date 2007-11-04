@@ -40,6 +40,7 @@ import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -90,6 +91,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   private IPreferenceScope fPreferences;
   private boolean fBlockIconifyEvent;
   private boolean fMinimizeFromClose;
+  private Layout fCachedShellLayout;
 
   /* Listeners */
   private NewsAdapter fNewsListener;
@@ -452,29 +454,23 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     /*
      * Bug in Eclipse (#180881): For some reason the workbench-layout is broken,
      * when restoring from the Tray after it has been moved to tray with
-     * Shell-Close. Force a layout() to avoid this issue.
+     * Shell-Close. Disable layout() to avoid this when hiding the shell.
      */
-    shell.setLayoutDeferred(true);
+    fCachedShellLayout = shell.getLayout();
+    shell.setLayout(null);
   }
 
   /**
    * @param shell
    */
   public void restoreFromTray(Shell shell) {
+
+    /* Restore previous set Layout */
+    shell.setLayout(fCachedShellLayout);
+
+    /* Restore Shell */
     shell.setVisible(true);
     shell.setActive();
-    shell.setLayoutDeferred(false);
-
-    /*
-     * TODO For some reason it seems to help to wait at this point to fix Bug 608
-     * (Layout problems restoring minimized RSSOwl from tray). Remove this code
-     * as soon as Eclipse Bug 180881 is fixed and setLayoutDeferred() is no longer
-     * used
-     */
-    try {
-      Thread.sleep(50);
-    } catch (InterruptedException e) {
-    }
 
     /* Un-Minimize if minimized */
     if (shell.getMinimized())
