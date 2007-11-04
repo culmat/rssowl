@@ -454,7 +454,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
      * when restoring from the Tray after it has been moved to tray with
      * Shell-Close. Force a layout() to avoid this issue.
      */
-    shell.setLayoutDeferred(true);
+//    shell.setLayoutDeferred(true);
   }
 
   /**
@@ -463,7 +463,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   public void restoreFromTray(Shell shell) {
     shell.setVisible(true);
     shell.setActive();
-    shell.setLayoutDeferred(false);
+//    shell.setLayoutDeferred(false);
 
     /*
      * TODO For some reason it seems to help to wait at this point to fix Bug 608
