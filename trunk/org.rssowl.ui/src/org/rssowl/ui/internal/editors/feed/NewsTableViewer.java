@@ -31,6 +31,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.ui.internal.util.TreeItemAdapter;
 
 /**
@@ -41,12 +42,15 @@ import org.rssowl.ui.internal.util.TreeItemAdapter;
  */
 public class NewsTableViewer extends TreeViewer {
   private boolean fBlockRefresh;
+  private final NewsTableControl fNewsTableControl;
 
   /**
+   * @param newsTableControl
    * @param tree
    */
-  public NewsTableViewer(Tree tree) {
+  public NewsTableViewer(NewsTableControl newsTableControl, Tree tree) {
     super(tree);
+    fNewsTableControl = newsTableControl;
   }
 
   /*
@@ -125,7 +129,8 @@ public class NewsTableViewer extends TreeViewer {
     else if (parentOfMinSelected.getItemCount() > 0)
       data = parentOfMinSelected.getItem(parentOfMinSelected.getItemCount() - 1).getData();
 
-    if (data != null)
+    /* Set selection if clean-up is not enabled */
+    if (data != null && !fNewsTableControl.getInputPreferences().getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE))
       setSelection(new StructuredSelection(data));
   }
 }
