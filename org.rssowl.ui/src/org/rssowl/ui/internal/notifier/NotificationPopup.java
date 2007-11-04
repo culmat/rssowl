@@ -79,6 +79,8 @@ import java.util.List;
  * "Mark Read" etc...</li>
  * <li>Consider 2 modes: Stacked (3/10 with arrows and showing description) and
  * Grouped (N Headlines at once)</li>
+ * <li>SearchNotificationItems are not aggregated if the max. number of items
+ * is already showing</li>
  * </ul>
  *
  * @author bpasero
