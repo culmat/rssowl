@@ -59,11 +59,12 @@ public interface ISearchMark extends IMark {
    * EnumMap) of <code>INews.State</code> to a List of
    * <code>NewsReference</code>s that represent the news that match the
    * search.
-   * @return Returns a {@link Pair} where the {@link Boolean} indicates wheather
-   * the new result differs from the existing one and the {@link Integer}
-   * indicates the number of *new* news that where added with the new result.
+   * @return Returns a {@link Pair} where the first {@link Boolean} indicates
+   * wheather the new result differs from the existing one and the second
+   * {@link Boolean} indicates if there is any *new* news that where added with
+   * the new result.
    */
-  Pair<Boolean, Integer> setResult(Map<INews.State, List<NewsReference>> results);
+  Pair<Boolean, Boolean> setResult(Map<INews.State, List<NewsReference>> results);
 
   /**
    * Returns a List of all visible news that match this search mark's

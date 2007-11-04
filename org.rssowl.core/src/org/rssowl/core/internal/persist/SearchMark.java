@@ -77,11 +77,11 @@ public class SearchMark extends Mark implements ISearchMark {
   /*
    * @see org.rssowl.core.persist.ISearchMark#setResult(java.util.List)
    */
-  public Pair<Boolean, Integer> setResult(Map<INews.State, List<NewsReference>> results) {
+  public Pair<Boolean, Boolean> setResult(Map<INews.State, List<NewsReference>> results) {
     Assert.isNotNull(results, "results");
 
     boolean changed = false;
-    int newNewsDiff = 0;
+    boolean isNewNewsAdded = false;
 
     /* For each Result */
     for (Map.Entry<INews.State, List<NewsReference>> result : results.entrySet()) {
@@ -99,6 +99,7 @@ public class SearchMark extends Mark implements ISearchMark {
       }
 
       switch (state) {
+
         /* Read News */
         case READ:
           if (!changed)
@@ -118,14 +119,17 @@ public class SearchMark extends Mark implements ISearchMark {
 
         /* New News */
         case NEW:
-          /* Count the number of added *new* News */
+
+          /* Check for added *new* News */
           for (long lVal : bucket) {
-            if (Arrays.binarySearch(fMatchingNewNews, lVal) < 0)
-              newNewsDiff++;
+            if (Arrays.binarySearch(fMatchingNewNews, lVal) < 0) {
+              isNewNewsAdded = true;
+              break;
+            }
           }
 
           /* Also use for changed-flag */
-          if (newNewsDiff > 0)
+          if (isNewNewsAdded)
             changed = true;
 
           /*
@@ -143,7 +147,7 @@ public class SearchMark extends Mark implements ISearchMark {
       }
     }
 
-    return Pair.create(changed, newNewsDiff);
+    return Pair.create(changed, isNewNewsAdded);
   }
 
   /*
