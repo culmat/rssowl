@@ -128,4 +128,39 @@ public class SearchNotificationItem extends NotificationItem {
     /* Otherwise sort to top */
     return -1;
   }
+
+  /*
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((fSearchmark == null) ? 0 : fSearchmark.hashCode());
+    return result;
+  }
+
+  /*
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+
+    if (obj == null)
+      return false;
+
+    if (getClass() != obj.getClass())
+      return false;
+
+    SearchNotificationItem other = (SearchNotificationItem) obj;
+    if (fSearchmark == null) {
+      if (other.fSearchmark != null)
+        return false;
+    } else if (!fSearchmark.equals(other.fSearchmark))
+      return false;
+
+    return true;
+  }
 }

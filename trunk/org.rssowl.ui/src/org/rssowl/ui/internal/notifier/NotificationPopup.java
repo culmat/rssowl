@@ -197,7 +197,7 @@ public class NotificationPopup extends PopupDialog {
     };
   }
 
-  void makeVisible(Collection<NotificationItem> itemList) {
+  void makeVisible(Collection<NotificationItem> items) {
 
     /* Cancel Auto Closer and reschedule */
     if (!fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP)) {
@@ -206,7 +206,7 @@ public class NotificationPopup extends PopupDialog {
     }
 
     /* Remember count of Items */
-    fItemCounter += getNewsCount(itemList);
+    fItemCounter += getNewsCount(items);
 
     /* Update Title Label */
     if (fItemCounter > 0)
@@ -218,10 +218,14 @@ public class NotificationPopup extends PopupDialog {
     if (fRecentItems.size() >= fItemLimit)
       return;
 
-    /* Add to recent Items List */
-    fRecentItems.addAll(itemList);
+    /* Remove any old duplicate first */
+    for (NotificationItem item : items)
+      fRecentItems.remove(item);
 
-    /* Sort by Date */
+    /* Add to recent Items List */
+    fRecentItems.addAll(items);
+
+    /* Sort Items */
     Collections.sort(fRecentItems);
 
     /* Dispose old Items first */
