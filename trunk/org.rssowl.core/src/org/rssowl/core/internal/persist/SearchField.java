@@ -487,6 +487,16 @@ public class SearchField implements ISearchField {
   @Override
   @SuppressWarnings("nls")
   public synchronized String toString() {
+    return fEntityName + ": " + fField;
+  }
+
+  /**
+   * Returns a String describing the state of this Entity.
+   *
+   * @return A String describing the state of this Entity.
+   */
+  @SuppressWarnings("nls")
+  public synchronized String toLongString() {
     return super.toString() + "(Field = " + fField + ", Class = " + fEntityName + ", Name = " + getName() + ", Search-Value-Type = " + getSearchValueType() + ")";
   }
 }
