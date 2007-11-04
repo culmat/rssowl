@@ -221,14 +221,13 @@ public class SavedSearchService {
       resultsMap.put(INews.State.READ, readNews);
 
       /* Set Result */
-      Pair<Boolean, Integer> result = searchMark.setResult(resultsMap);
+      Pair<Boolean, Boolean> result = searchMark.setResult(resultsMap);
       boolean changed = result.getFirst();
-      int newNewsDiff = result.getSecond();
-      boolean isNewNewsAdded = !firstUpdate && !fromUserEvent && newNewsDiff > 0;
+      boolean newNewsAdded = result.getSecond();
 
       /* Create Event to indicate changed results if any */
       if (changed)
-        events.add(new SearchMarkEvent(searchMark, null, true, isNewNewsAdded));
+        events.add(new SearchMarkEvent(searchMark, null, true, !firstUpdate && !fromUserEvent && newNewsAdded));
     }
 
     /* Notify Listeners */
