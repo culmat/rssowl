@@ -39,7 +39,7 @@ import java.util.List;
  *
  * @author bpasero
  */
-public interface IFolder extends IFolderChild   {
+public interface IFolder extends IFolderChild {
 
   /** One of the fields in this type described as constant */
   public static final int NAME = 0;
@@ -68,12 +68,12 @@ public interface IFolder extends IFolderChild   {
    * @see #getFolders()
    */
   List<IFolderChild> getChildren();
-  
+
   /**
    * Of there is an instance of <code>IFolderChild</code> that is equal to
    * <code>child</code> in the list of children, removes it and returns
    * <code>true</code>. Otherwise, returns <code>false</code>.
-   * 
+   *
    * @param child An instance of <code>IFolderChild</code> to be removed.
    * @return <code>true</code> if a child is removed from children,
    * <code>false</code> otherwise.
@@ -107,6 +107,12 @@ public interface IFolder extends IFolderChild   {
    * provided.
    */
   void reorderChildren(List<? extends IFolderChild> children, IFolderChild position, Boolean after);
+
+  /**
+   * Sorts all {@link IFolderChild} contained in this folder by their names.
+   * Different kinds of {@link IFolderChild} get grouped together and not mixed.
+   */
+  void sort();
 
   /**
    * Get a list of marks contained in this folder. Typically, these marks may be
