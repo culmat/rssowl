@@ -25,6 +25,7 @@
 package org.rssowl.core.persist;
 
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.util.Pair;
 
 import java.util.List;
 import java.util.Map;
@@ -58,10 +59,11 @@ public interface ISearchMark extends IMark {
    * EnumMap) of <code>INews.State</code> to a List of
    * <code>NewsReference</code>s that represent the news that match the
    * search.
-   * @return Returns <code>TRUE</code> if the new result differs from the
-   * existing one and <code>FALSE</code> otherwise.
+   * @return Returns a {@link Pair} where the {@link Boolean} indicates wheather
+   * the new result differs from the existing one and the {@link Integer}
+   * indicates the number of *new* news that where added with the new result.
    */
-  boolean setResult(Map<INews.State, List<NewsReference>> results);
+  Pair<Boolean, Integer> setResult(Map<INews.State, List<NewsReference>> results);
 
   /**
    * Returns a List of all visible news that match this search mark's
