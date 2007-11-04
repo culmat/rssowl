@@ -121,6 +121,7 @@ import org.rssowl.core.util.SearchHit;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.CColumnLayoutData;
 import org.rssowl.ui.internal.CTable;
@@ -1594,7 +1595,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     /* Feed Column */
     col = new TableViewerColumn(fResultViewer, SWT.LEFT);
-    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 18), null, null, true, false);
+    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, Application.IS_LINUX ? 20 : 18), null, null, true, false);
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.FEED);
     col.getColumn().setToolTipText("Feed");
     if (fInitialSortColumn == NewsTableControl.Columns.FEED) {
