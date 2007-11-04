@@ -37,7 +37,7 @@ import org.rssowl.core.persist.event.runnable.SearchMarkEventRunnable;
  * In order to retrieve the Model-Object that is affected on the Event, use the
  * <code>resolve()</code> Method of the <code>ModelReference</code> stored
  * in this Event.
- * 
+ *
  * @author bpasero
  */
 public final class SearchMarkEvent extends ModelEvent {
@@ -45,20 +45,40 @@ public final class SearchMarkEvent extends ModelEvent {
   /* In case of Reparenting, remember the old parent */
   private final IFolder fOldParent;
 
+  /* Only for resultsChanged(): TRUE if *new* news where added */
+  private boolean fAddedNewNews;
+
   /**
    * Stores an instance of <code>ModelReference</code> and the Parent
    * Reference for the affected Type in this Event.
-   * 
-   * @param mark An instance of <code>ModelReference</code> for the
-   * affected Type.
+   *
+   * @param mark An instance of <code>ModelReference</code> for the affected
+   * Type.
    * @param oldParent If this Event informs about a Reparenting the old parent
    * is used to do updates in the UI, <code>NULL</code> otherwise.
    * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
    * <code>FALSE</code> otherwise.
    */
   public SearchMarkEvent(ISearchMark mark, IFolder oldParent, boolean isRoot) {
+    this(mark, oldParent, isRoot, false);
+  }
+
+  /**
+   * Stores an instance of <code>ModelReference</code> and the Parent
+   * Reference for the affected Type in this Event.
+   *
+   * @param mark An instance of <code>ModelReference</code> for the affected
+   * Type.
+   * @param oldParent If this Event informs about a Reparenting the old parent
+   * is used to do updates in the UI, <code>NULL</code> otherwise.
+   * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
+   * <code>FALSE</code> otherwise.
+   * @param addedNewNews TRUE if *new* news where added.
+   */
+  public SearchMarkEvent(ISearchMark mark, IFolder oldParent, boolean isRoot, boolean addedNewNews) {
     super(mark, isRoot);
     fOldParent = oldParent;
+    fAddedNewNews = addedNewNews;
   }
 
   /*
@@ -70,13 +90,20 @@ public final class SearchMarkEvent extends ModelEvent {
   }
 
   /**
+   * @return TRUE if *new* news where added from a resultsChanged() event.
+   */
+  public boolean isAddedNewNews() {
+    return fAddedNewNews;
+  }
+
+  /**
    * Get the previous Parent of this Type in case this Event informs about a
    * Reparenting.
    * <p>
    * Note that this Method <em>will</em> return <code>NULL</code> in any
    * case where the Event is not informing about reparenting!
    * </p>
-   * 
+   *
    * @return Returns the previous Parent of this Type in case this Event informs
    * about Reparenting. Otherwise this Method will return <code>NULL</code>.
    */
