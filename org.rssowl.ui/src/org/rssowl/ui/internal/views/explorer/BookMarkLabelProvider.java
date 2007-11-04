@@ -250,7 +250,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       Image icon;
       if (hasNew)
         icon = fSearchMarkNewIcon;
-      else if (hasMatchingNews)
+      else if (hasMatchingNews || !fIndicateState)
         icon = fSearchMarkIcon;
       else
         icon = fSearchMarkEmptyIcon;
