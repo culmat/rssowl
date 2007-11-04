@@ -33,7 +33,6 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -52,7 +51,6 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
-import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
@@ -180,14 +178,6 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
 
     /* LabelProvider */
     fViewer.setLabelProvider(new BookMarkLabelProvider(false));
-
-    /* Filter out any Search Marks */
-    fViewer.addFilter(new ViewerFilter() {
-      @Override
-      public boolean select(Viewer viewer, Object parentElement, Object element) {
-        return !(element instanceof ISearchMark);
-      }
-    });
 
     /* Listen on Doubleclick */
     fViewer.addDoubleClickListener(new IDoubleClickListener() {
@@ -345,13 +335,13 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
       }
     });
 
-    /* Limit number of News showing in Notification */
-    Composite limitNewsContainer = new Composite(notificationGroup, SWT.None);
-    limitNewsContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0, 0, 2, false));
+    /* Limit number of Items showing in Notification */
+    Composite limitItemsContainer = new Composite(notificationGroup, SWT.None);
+    limitItemsContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0, 0, 2, false));
 
     int notificationLimit = fGlobalScope.getInteger(DefaultPreferences.LIMIT_NOTIFICATION_SIZE);
 
-    fLimitNotificationCheck = new Button(limitNewsContainer, SWT.CHECK);
+    fLimitNotificationCheck = new Button(limitItemsContainer, SWT.CHECK);
     fLimitNotificationCheck.setText("Show a maximum of ");
     fLimitNotificationCheck.setEnabled(fShowNotificationPopup.getSelection());
     fLimitNotificationCheck.setSelection(notificationLimit >= 0);
@@ -362,7 +352,7 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
       }
     });
 
-    fLimitNotificationSpinner = new Spinner(limitNewsContainer, SWT.BORDER);
+    fLimitNotificationSpinner = new Spinner(limitItemsContainer, SWT.BORDER);
     fLimitNotificationSpinner.setMinimum(1);
     fLimitNotificationSpinner.setMaximum(30);
     fLimitNotificationSpinner.setEnabled(fLimitNotificationCheck.isEnabled() && fLimitNotificationCheck.getSelection());
@@ -371,7 +361,7 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
     else
       fLimitNotificationSpinner.setSelection(notificationLimit * -1);
 
-    Label label = new Label(limitNewsContainer, SWT.None);
+    Label label = new Label(limitItemsContainer, SWT.None);
     label.setText(" News inside the notification");
 
     /* Only from Tray */

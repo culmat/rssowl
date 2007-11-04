@@ -28,12 +28,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.PopupDialog;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
-import org.eclipse.jface.util.OpenStrategy;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.ControlAdapter;
@@ -56,43 +53,22 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
-import org.rssowl.core.persist.IBookMark;
-import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.core.persist.reference.FeedLinkReference;
-import org.rssowl.core.persist.reference.NewsReference;
-import org.rssowl.core.util.DateUtils;
-import org.rssowl.core.util.StringUtils;
-import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationWorkbenchAdvisor;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.CCLabel;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.actions.OpenInBrowserAction;
-import org.rssowl.ui.internal.editors.feed.FeedView;
-import org.rssowl.ui.internal.editors.feed.FeedViewInput;
-import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
-import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.LayoutUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * TODO
@@ -112,16 +88,15 @@ public class NotificationPopup extends PopupDialog {
   /* Height of a CLabel with 16px Icon inside */
   private static final int CLABEL_HEIGHT = 22;
 
-  /* Max. Number of News being displayed in the Popup */
-  private static final int MAX_NEWS = 30;
+  /* Max. Number of Items being displayed in the Popup */
+  private static final int MAX_ITEMS = 30;
 
   /* Default Width of the Popup */
   private static final int DEFAULT_WIDTH = 400;
 
   private Shell fShell;
-  private List<INews> fRecentNews = new ArrayList<INews>();
+  private List<NotificationItem> fRecentItems = new ArrayList<NotificationItem>();
   private ResourceManager fResources;
-  private Map<FeedLinkReference, IBookMark> fMapFeedToBookmark;
   private Image fCloseImageNormal;
   private Image fCloseImageActive;
   private Image fCloseImagePressed;
@@ -129,30 +104,30 @@ public class NotificationPopup extends PopupDialog {
   private Composite fInnerContentCircle;
   private Composite fOuterContentCircle;
   private Font fBoldTextFont;
-  private int fNewsCounter;
+  private int fItemCounter;
   private UIJob fAutoCloser;
   private MouseTrackListener fMouseTrackListner;
   private IPreferenceScope fGlobalScope;
-  private int fVisibleNewsCount;
-  private int fNewsLimit;
+  private int fVisibleItemsCount;
+  private int fItemLimit;
   private NotifierColors fNotifierColors;
   private Region fLastUsedRegion;
-  private Image fNewsStickyIcon;
-  private Image fNewsNonStickyIcon;
+  private Image fItemStickyIcon;
+  private Image fItemNonStickyIcon;
+  private Image fItemNonStickyDisabledIcon;
   private Color fStickyBgColor;
 
-  NotificationPopup(int visibleNewsCount) {
+  NotificationPopup(int visibleItemCount) {
     super(new Shell(PlatformUI.getWorkbench().getDisplay()), PopupDialog.INFOPOPUP_SHELLSTYLE | SWT.ON_TOP, false, false, false, false, null, null);
     fResources = new LocalResourceManager(JFaceResources.getResources());
-    fMapFeedToBookmark = new HashMap<FeedLinkReference, IBookMark>();
     fBoldTextFont = OwlUI.getThemeFont(OwlUI.NOTIFICATION_POPUP_FONT_ID, SWT.BOLD);
     fGlobalScope = Owl.getPreferenceService().getGlobalScope();
 
-    fNewsLimit = fGlobalScope.getInteger(DefaultPreferences.LIMIT_NOTIFICATION_SIZE);
-    if (fNewsLimit <= 0)
-      fNewsLimit = MAX_NEWS;
+    fItemLimit = fGlobalScope.getInteger(DefaultPreferences.LIMIT_NOTIFICATION_SIZE);
+    if (fItemLimit <= 0)
+      fItemLimit = MAX_ITEMS;
 
-    fVisibleNewsCount = (visibleNewsCount > fNewsLimit) ? fNewsLimit : visibleNewsCount;
+    fVisibleItemsCount = (visibleItemCount > fItemLimit) ? fItemLimit : visibleItemCount;
     createAutoCloser();
     createMouseTrackListener();
 
@@ -222,7 +197,7 @@ public class NotificationPopup extends PopupDialog {
     };
   }
 
-  void makeVisible(List<INews> newsList) {
+  void makeVisible(Collection<NotificationItem> itemList) {
 
     /* Cancel Auto Closer and reschedule */
     if (!fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP)) {
@@ -230,40 +205,36 @@ public class NotificationPopup extends PopupDialog {
       fAutoCloser.schedule(fGlobalScope.getInteger(DefaultPreferences.AUTOCLOSE_NOTIFICATION_VALUE) * 1000);
     }
 
-    /* Remember count of News */
-    fNewsCounter += newsList.size();
+    /* Remember count of Items */
+    fItemCounter += getNewsCount(itemList);
 
     /* Update Title Label */
-    fTitleCircleLabel.setText("RSSOwl - " + fNewsCounter + " incoming News");
+    if (fItemCounter > 0)
+      fTitleCircleLabel.setText("RSSOwl - " + fItemCounter + " incoming News");
+    else
+      fTitleCircleLabel.setText("RSSOwl - Incoming News");
 
-    /* Never show more than MAX_NEWS news */
-    if (fRecentNews.size() >= fNewsLimit)
+    /* Never show more than MAX_ITEMS items */
+    if (fRecentItems.size() >= fItemLimit)
       return;
 
-    /* Add to recent News List */
-    fRecentNews.addAll(newsList);
+    /* Add to recent Items List */
+    fRecentItems.addAll(itemList);
 
     /* Sort by Date */
-    Collections.sort(fRecentNews, new Comparator<INews>() {
-      public int compare(INews news1, INews news2) {
-        Date date1 = DateUtils.getRecentDate(news1);
-        Date date2 = DateUtils.getRecentDate(news2);
+    Collections.sort(fRecentItems);
 
-        return date2.compareTo(date1);
-      }
-    });
-
-    /* Dispose old News first */
+    /* Dispose old Items first */
     Control[] children = fInnerContentCircle.getChildren();
     for (Control child : children) {
       child.dispose();
     }
 
-    /* Show News */
-    fVisibleNewsCount = 0;
-    for (int i = 0; i < fNewsLimit && i < fRecentNews.size(); i++) {
-      renderNews(fRecentNews.get(i));
-      fVisibleNewsCount++;
+    /* Show Items */
+    fVisibleItemsCount = 0;
+    for (int i = 0; i < fItemLimit && i < fRecentItems.size(); i++) {
+      renderItem(fRecentItems.get(i));
+      fVisibleItemsCount++;
     }
 
     /* Layout */
@@ -281,122 +252,79 @@ public class NotificationPopup extends PopupDialog {
     addRegion(fShell);
   }
 
-  private void renderNews(final INews news) {
-    FeedLinkReference feedRef = news.getFeedReference();
+  private int getNewsCount(Collection<NotificationItem> items) {
+    int count = 0;
 
-    /* Retrieve Bookmark */
-    final IBookMark bookmark;
-    if (fMapFeedToBookmark.containsKey(feedRef))
-      bookmark = fMapFeedToBookmark.get(feedRef);
-    else {
-      Collection<IBookMark> bookmarks = Owl.getPersistenceService().getDAOService().getBookMarkDAO().loadAll(feedRef);
-      bookmark = bookmarks.iterator().next();
-      fMapFeedToBookmark.put(feedRef, bookmark);
+    for (NotificationItem item : items) {
+      if (item instanceof NewsNotificationItem)
+        count++;
     }
 
-    /* Use a CCLabel per News */
-    final CCLabel newsLabel = new CCLabel(fInnerContentCircle, SWT.NONE);
-    newsLabel.setBackground(fInnerContentCircle.getBackground());
-    newsLabel.setCursor(newsLabel.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-    newsLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+    return count;
+  }
 
-    /* Offer Label to mark news sticky */
+  private void renderItem(final NotificationItem item) {
+
+    /* Use a CCLabel per Item */
+    final CCLabel itemLabel = new CCLabel(fInnerContentCircle, SWT.NONE);
+    itemLabel.setBackground(fInnerContentCircle.getBackground());
+    itemLabel.setCursor(itemLabel.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+    itemLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+    /* Offer Label to mark item sticky */
     final CLabel markStickyLabel = new CLabel(fInnerContentCircle, SWT.NONE);
-    markStickyLabel.setImage(fNewsNonStickyIcon);
+    markStickyLabel.setImage(item.supportsSticky() ? fItemNonStickyIcon : fItemNonStickyDisabledIcon);
     markStickyLabel.setBackground(fInnerContentCircle.getBackground());
+    markStickyLabel.setEnabled(item.supportsSticky());
     markStickyLabel.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
     markStickyLabel.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseDown(MouseEvent e) {
-        boolean newStateSticky = !news.isFlagged();
+        boolean newStateSticky = !item.isSticky();
 
         /* Update Background Color */
-        newsLabel.setBackground(newStateSticky ? fStickyBgColor : fInnerContentCircle.getBackground());
+        itemLabel.setBackground(newStateSticky ? fStickyBgColor : fInnerContentCircle.getBackground());
         markStickyLabel.setBackground(newStateSticky ? fStickyBgColor : fInnerContentCircle.getBackground());
 
         /* Update Image */
-        markStickyLabel.setImage(newStateSticky ? fNewsStickyIcon : fNewsNonStickyIcon);
+        markStickyLabel.setImage(newStateSticky ? fItemStickyIcon : fItemNonStickyIcon);
 
-        /* Update and Save News */
-        news.setFlagged(newStateSticky);
-        DynamicDAO.save(news);
+        /* Apply state */
+        item.setSticky(newStateSticky);
       }
     });
 
-    String headline = ModelUtils.getHeadline(news);
-    if (headline.contains("&"))
-      headline = StringUtils.replaceAll(headline, "&", "&&");
-    newsLabel.setText(headline);
-
-    newsLabel.setFont(fBoldTextFont);
-    newsLabel.addMouseTrackListener(fMouseTrackListner);
-
-    ImageDescriptor favicon = OwlUI.getFavicon(bookmark);
-    newsLabel.setImage(OwlUI.getImage(fResources, favicon != null ? favicon : OwlUI.BOOKMARK));
+    itemLabel.setText(item.getText());
+    itemLabel.setFont(fBoldTextFont);
+    itemLabel.addMouseTrackListener(fMouseTrackListner);
+    itemLabel.setImage(OwlUI.getImage(fResources, item.getImage()));
 
     /* Paint text blue on mouse-enter */
-    newsLabel.addMouseTrackListener(new MouseTrackAdapter() {
+    itemLabel.addMouseTrackListener(new MouseTrackAdapter() {
 
       @Override
       public void mouseEnter(MouseEvent e) {
-        newsLabel.setForeground(newsLabel.getDisplay().getSystemColor(SWT.COLOR_BLUE));
+        itemLabel.setForeground(itemLabel.getDisplay().getSystemColor(SWT.COLOR_BLUE));
       }
 
       @Override
       public void mouseExit(MouseEvent e) {
-        newsLabel.setForeground(newsLabel.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+        itemLabel.setForeground(itemLabel.getDisplay().getSystemColor(SWT.COLOR_BLACK));
       }
     });
 
     /* Restore RSSOwl label is clicked */
-    newsLabel.addMouseListener(new MouseAdapter() {
+    itemLabel.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseUp(MouseEvent e) {
-        onOpen(bookmark, news, e);
+
+        /* Open Item */
+        item.open(e);
+
+        /* Close Popup */
+        close();
       }
     });
-  }
-
-  private void onOpen(IBookMark bookmark, INews news, MouseEvent e) {
-
-    /* Open Link in Browser if Modifier Key is pressed */
-    if ((e.stateMask & SWT.MOD1) != 0) {
-      new OpenInBrowserAction(new StructuredSelection(news)).run();
-      close();
-      return;
-    }
-
-    /* Otherwise open Feedview and select the News */
-    IWorkbenchPage page = OwlUI.getPage();
-    if (page != null) {
-
-      /* Restore Window */
-      restoreWindow(page);
-
-      /* First try if the Bookmark is already visible */
-      IEditorReference editorRef = EditorUtils.findEditor(page.getEditorReferences(), bookmark);
-      if (editorRef != null) {
-        IEditorPart editor = editorRef.getEditor(false);
-        if (editor instanceof FeedView) {
-          ((FeedView) editor).setSelection(new StructuredSelection(news));
-          page.activate(editor);
-        }
-      }
-
-      /* Otherwise Open */
-      else {
-        boolean activateEditor = OpenStrategy.activateOnOpen();
-        FeedViewInput input = new FeedViewInput(bookmark, PerformAfterInputSet.selectNews(new NewsReference(news.getId())));
-        try {
-          OwlUI.getPage().openEditor(input, FeedView.ID, activateEditor);
-        } catch (PartInitException ex) {
-          Activator.getDefault().getLog().log(ex.getStatus());
-        }
-      }
-    }
-
-    /* Close Popup */
-    close();
   }
 
   private void restoreWindow(IWorkbenchPage page) {
@@ -422,8 +350,9 @@ public class NotificationPopup extends PopupDialog {
     fCloseImageNormal = OwlUI.getImage(fResources, "icons/etool16/close_normal.gif");
     fCloseImageActive = OwlUI.getImage(fResources, "icons/etool16/close_active.gif");
     fCloseImagePressed = OwlUI.getImage(fResources, "icons/etool16/close_pressed.gif");
-    fNewsStickyIcon = OwlUI.getImage(fResources, OwlUI.NEWS_PINNED);
-    fNewsNonStickyIcon = OwlUI.getImage(fResources, OwlUI.NEWS_PIN);
+    fItemStickyIcon = OwlUI.getImage(fResources, OwlUI.NEWS_PINNED);
+    fItemNonStickyIcon = OwlUI.getImage(fResources, OwlUI.NEWS_PIN);
+    fItemNonStickyDisabledIcon = OwlUI.getImage(fResources, "icons/obj16/news_pin_disabled.gif");
   }
 
   /*
@@ -601,7 +530,7 @@ public class NotificationPopup extends PopupDialog {
   protected Point getInitialSize() {
     int initialHeight = fShell.computeSize(DEFAULT_WIDTH, SWT.DEFAULT).y;
 
-    return new Point(DEFAULT_WIDTH, initialHeight + fVisibleNewsCount * CLABEL_HEIGHT);
+    return new Point(DEFAULT_WIDTH, initialHeight + fVisibleItemsCount * CLABEL_HEIGHT);
   }
 
   /**

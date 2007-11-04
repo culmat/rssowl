@@ -45,6 +45,7 @@ import org.rssowl.core.util.SearchHit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -158,6 +159,8 @@ public class SavedSearchService {
    * results in.
    */
   public void updateSavedSearches(Set<ISearchMark> searchMarks) {
+    boolean firstUpdate = !fUpdatedOnce.get();
+
     fUpdatedOnce.set(true);
     IModelSearch modelSearch = Owl.getPersistenceService().getModelSearch();
     Set<SearchMarkEvent> events = new HashSet<SearchMarkEvent>(searchMarks.size());
@@ -207,11 +210,16 @@ public class SavedSearchService {
       resultsMap.put(INews.State.UNREAD, unreadNews);
       resultsMap.put(INews.State.READ, readNews);
 
+      /* Check if *new* news got added */
+      int newNewsCountDif = newNews.size() - searchMark.getResultCount(EnumSet.of(INews.State.NEW));
+      boolean isNewNewsAdded = !firstUpdate && newNewsCountDif > 0;
+
+      /* Set Result */
       boolean changed = searchMark.setResult(resultsMap);
 
       /* Create Event to indicate changed results if any */
       if (changed)
-        events.add(new SearchMarkEvent(searchMark, null, true));
+        events.add(new SearchMarkEvent(searchMark, null, true, isNewNewsAdded));
     }
 
     /* Notify Listeners */

@@ -934,4 +934,23 @@ public class OwlUI {
       window.getShell().setText(title);
     }
   }
+
+  /**
+   * A helper method that can be used to restore the application when its
+   * minimized.
+   *
+   * @param page the workbench page the application is running in.
+   */
+  public static void restoreWindow(IWorkbenchPage page) {
+    Shell applicationShell = page.getWorkbenchWindow().getShell();
+
+    /* Restore from Tray or Minimization if required */
+    ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
+    if (advisor != null && advisor.isMinimizedToTray())
+      advisor.restoreFromTray(applicationShell);
+    else if (applicationShell.getMinimized()) {
+      applicationShell.setMinimized(false);
+      applicationShell.forceActive();
+    }
+  }
 }
