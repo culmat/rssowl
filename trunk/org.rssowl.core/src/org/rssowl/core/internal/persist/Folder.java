@@ -32,6 +32,7 @@ import org.rssowl.core.persist.IMark;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -77,6 +78,27 @@ public class Folder extends AbstractEntity implements IFolder {
    */
   protected Folder() {
   // As per javadoc
+  }
+
+  /*
+   * @see org.rssowl.core.persist.IFolder#sort()
+   */
+  public void sort() {
+    Collections.sort(fChildren, new Comparator<IFolderChild>() {
+      public int compare(IFolderChild child1, IFolderChild child2) {
+
+        /* Sort by Name if classes equal */
+        if (child1.getClass().equals(child2.getClass()))
+          return child1.getName().toLowerCase().compareTo(child2.getName().toLowerCase());
+
+        /* Sort Marks to Bottom */
+        if (child1 instanceof IMark)
+          return 1;
+
+        /* Sort Folders to Top */
+        return -1;
+      }
+    });
   }
 
   /*
