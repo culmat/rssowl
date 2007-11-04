@@ -84,6 +84,7 @@ import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.TaskAdapter;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.CColumnLayoutData;
 import org.rssowl.ui.internal.CTree;
@@ -312,7 +313,7 @@ public class NewsTableControl implements IFeedViewPart {
 
     /* Feed Column (visible only for saved searches) */
     col = new TreeViewerColumn(fViewer, SWT.LEFT);
-    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 18), null, null, false, false);
+    fCustomTree.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FIXED, Application.IS_LINUX ? 20 : 18), null, null, false, false);
     col.getColumn().setData(COL_ID, NewsTableControl.Columns.FEED);
     col.getColumn().setToolTipText("Feed");
     if (fInitialSortColumn == NewsTableControl.Columns.FEED) {
