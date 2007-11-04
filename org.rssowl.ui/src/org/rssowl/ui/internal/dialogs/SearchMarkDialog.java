@@ -154,7 +154,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
     DynamicDAO.save(fParent);
 
     /* Update the Search */
-    Controller.getDefault().getSavedSearchService().updateSavedSearches(Collections.singleton(searchMark));
+    Controller.getDefault().getSavedSearchService().updateSavedSearches(Collections.singleton(searchMark), true);
 
     super.okPressed();
   }

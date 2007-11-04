@@ -159,6 +159,16 @@ public class SavedSearchService {
    * results in.
    */
   public void updateSavedSearches(Set<ISearchMark> searchMarks) {
+    updateSavedSearches(searchMarks, false);
+  }
+
+  /**
+   * @param searchMarks The Set of <code>ISearchMark</code> to update the
+   * results in.
+   * @param fromUserEvent Indicates wheather to update the saved searches due to
+   * a user initiated event or an automatic one.
+   */
+  public void updateSavedSearches(Set<ISearchMark> searchMarks, boolean fromUserEvent) {
     boolean firstUpdate = !fUpdatedOnce.get();
 
     fUpdatedOnce.set(true);
@@ -212,7 +222,7 @@ public class SavedSearchService {
 
       /* Check if *new* news got added */
       int newNewsCountDif = newNews.size() - searchMark.getResultCount(EnumSet.of(INews.State.NEW));
-      boolean isNewNewsAdded = !firstUpdate && newNewsCountDif > 0;
+      boolean isNewNewsAdded = !firstUpdate && !fromUserEvent && newNewsCountDif > 0;
 
       /* Set Result */
       boolean changed = searchMark.setResult(resultsMap);
