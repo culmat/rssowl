@@ -164,6 +164,6 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
     if (index != -1)
       name = name.substring(index + 1, name.length());
 
-    return name + " (Properties = " + getProperties() + ", ";
+    return name + " (id = " + fId + ", Properties = " + getProperties() + ", ";
   }
 }
