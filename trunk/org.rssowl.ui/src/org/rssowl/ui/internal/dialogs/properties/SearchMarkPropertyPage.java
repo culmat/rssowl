@@ -225,7 +225,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
 
     /* Re-Run search if conditions changed */
     if (fSearchChanged)
-      Controller.getDefault().getSavedSearchService().updateSavedSearches(Collections.singleton(fSearchMark));
+      Controller.getDefault().getSavedSearchService().updateSavedSearches(Collections.singleton(fSearchMark), true);
 
     return true;
   }
