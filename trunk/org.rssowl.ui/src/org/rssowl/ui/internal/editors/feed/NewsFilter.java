@@ -237,7 +237,7 @@ public class NewsFilter extends ViewerFilter {
         /* Show Recent News (max 24h old) */
         case SHOW_RECENT:
           Date date = DateUtils.getRecentDate(news);
-          isMatch = (date.getTime() > (System.currentTimeMillis() - DateUtils.DAY));
+          isMatch = (date.getTime() > (DateUtils.getToday().getTimeInMillis() - DateUtils.DAY));
           break;
       }
 
