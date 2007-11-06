@@ -519,8 +519,8 @@ public class NewsGroupFilterTest {
     {
       fFiltering.setType(NewsFilter.Type.SHOW_RECENT);
       List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
-      assertEquals(1, result.size());
-      assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { news1 })));
+      assertEquals(2, result.size());
+      assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { news1, news2 })));
     }
 
     /* Filter: Text Pattern (Headline) */
