@@ -703,7 +703,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Search Bar */
         manager.add(new Separator());
-        MenuManager searchMenu = new MenuManager("Search");
+        MenuManager searchMenu = new MenuManager("Find");
         manager.add(searchMenu);
 
         /* Search Bar - Always Show Bar */
