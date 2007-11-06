@@ -229,6 +229,12 @@ public class NotificationService {
 
   /* Show Notification in UI Thread */
   private void showItems(final Collection<NotificationItem> items) {
+
+    /* Ignore empty lists */
+    if (items.isEmpty())
+      return;
+
+    /* Make sure to run in UI Thread */
     JobRunner.runInUIThread(OwlUI.getPrimaryShell(), new Runnable() {
       public void run() {
 
