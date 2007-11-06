@@ -55,14 +55,28 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.ui.actions.ActionFactory;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.IModelFactory;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.dialogs.SearchMarkDialog;
+import org.rssowl.ui.internal.editors.feed.NewsFilter.Type;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.JobTracker;
 import org.rssowl.ui.internal.util.LayoutUtils;
+import org.rssowl.ui.internal.util.ModelUtils;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 
 /**
  * The FilterBar is the central control to filter News that are showing in the
@@ -536,6 +550,23 @@ public class FilterBar {
           }
         });
 
+        /* Only offer for IBookMark */
+        if (((FeedViewInput) fFeedView.getEditorInput()).getMark() instanceof IBookMark) {
+
+          /* Separator */
+          new MenuItem(menu, SWT.SEPARATOR);
+
+          /* Convert Filter to Saved Search */
+          final MenuItem createSavedSearch = new MenuItem(menu, SWT.RADIO);
+          createSavedSearch.setText("Save as new Search...");
+          createSavedSearch.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+              onCreateSavedSearch();
+            }
+          });
+        }
+
         return menu;
       }
 
@@ -543,6 +574,45 @@ public class FilterBar {
         return null;
       }
     });
+  }
+
+  private void onCreateSavedSearch() {
+    IModelFactory factory = Owl.getModelFactory();
+    List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(2);
+
+    /* Create Condition from Location */
+    List<IFolderChild> searchScope = new ArrayList<IFolderChild>(1);
+    searchScope.add(((FeedViewInput) fFeedView.getEditorInput()).getMark());
+    ISearchField field = factory.createSearchField(INews.LOCATION, INews.class.getName());
+    conditions.add(factory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(searchScope)));
+
+    /* Create Condition from Filter */
+    Type filterType = fFeedView.getFilter().getType();
+    switch (filterType) {
+      case SHOW_NEW:
+        field = factory.createSearchField(INews.STATE, INews.class.getName());
+        conditions.add(factory.createSearchCondition(field, SearchSpecifier.IS, EnumSet.of(INews.State.NEW)));
+        break;
+
+      case SHOW_RECENT:
+        field = factory.createSearchField(INews.AGE_IN_DAYS, INews.class.getName());
+        conditions.add(factory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, 2));
+        break;
+
+      case SHOW_STICKY:
+        field = factory.createSearchField(INews.IS_FLAGGED, INews.class.getName());
+        conditions.add(factory.createSearchCondition(field, SearchSpecifier.IS, true));
+        break;
+
+      case SHOW_UNREAD:
+        field = factory.createSearchField(INews.STATE, INews.class.getName());
+        conditions.add(factory.createSearchCondition(field, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
+        break;
+    }
+
+    /* Create and Show SM Dialog */
+    SearchMarkDialog dialog = new SearchMarkDialog(fParent.getShell(), null, null, conditions, true);
+    dialog.open();
   }
 
   void doFilter(final NewsFilter.Type type, boolean refresh, boolean saveSettings) {
