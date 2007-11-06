@@ -276,30 +276,6 @@ public class NotificationPopup extends PopupDialog {
     itemLabel.setBackground(fInnerContentCircle.getBackground());
     itemLabel.setCursor(itemLabel.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
     itemLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
-    /* Offer Label to mark item sticky */
-    final CLabel markStickyLabel = new CLabel(fInnerContentCircle, SWT.NONE);
-    markStickyLabel.setImage(item.supportsSticky() ? fItemNonStickyIcon : fItemNonStickyDisabledIcon);
-    markStickyLabel.setBackground(fInnerContentCircle.getBackground());
-    markStickyLabel.setEnabled(item.supportsSticky());
-    markStickyLabel.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-    markStickyLabel.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseDown(MouseEvent e) {
-        boolean newStateSticky = !item.isSticky();
-
-        /* Update Background Color */
-        itemLabel.setBackground(newStateSticky ? fStickyBgColor : fInnerContentCircle.getBackground());
-        markStickyLabel.setBackground(newStateSticky ? fStickyBgColor : fInnerContentCircle.getBackground());
-
-        /* Update Image */
-        markStickyLabel.setImage(newStateSticky ? fItemStickyIcon : fItemNonStickyIcon);
-
-        /* Apply state */
-        item.setSticky(newStateSticky);
-      }
-    });
-
     itemLabel.setText(item.getText());
     itemLabel.setFont(fBoldTextFont);
     itemLabel.addMouseTrackListener(fMouseTrackListner);
@@ -331,6 +307,36 @@ public class NotificationPopup extends PopupDialog {
         close();
       }
     });
+
+    /* Offer Label to mark item sticky */
+    final CLabel markStickyLabel = new CLabel(fInnerContentCircle, SWT.NONE);
+    markStickyLabel.setImage(item.supportsSticky() ? fItemNonStickyIcon : fItemNonStickyDisabledIcon);
+    markStickyLabel.setBackground(fInnerContentCircle.getBackground());
+    markStickyLabel.setEnabled(item.supportsSticky());
+    markStickyLabel.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+    markStickyLabel.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseDown(MouseEvent e) {
+        boolean newStateSticky = !item.isSticky();
+
+        /* Update Background Color */
+        itemLabel.setBackground(newStateSticky ? fStickyBgColor : fInnerContentCircle.getBackground());
+        markStickyLabel.setBackground(newStateSticky ? fStickyBgColor : fInnerContentCircle.getBackground());
+
+        /* Update Image */
+        markStickyLabel.setImage(newStateSticky ? fItemStickyIcon : fItemNonStickyIcon);
+
+        /* Apply state */
+        item.setSticky(newStateSticky);
+      }
+    });
+
+    /* Show Sticky if required */
+    if (item.supportsSticky() && item.isSticky()) {
+      itemLabel.setBackground(fStickyBgColor);
+      markStickyLabel.setBackground(fStickyBgColor);
+      markStickyLabel.setImage(fItemStickyIcon);
+    }
   }
 
   private void restoreWindow(IWorkbenchPage page) {
