@@ -232,24 +232,18 @@ public class NotificationPopup extends PopupDialog {
   }
 
   private void updateTitleLabel() {
+    int totalPages = (fDisplayedItems.size() / fItemLimit) + ((fDisplayedItems.size() % fItemLimit != 0) ? 1 : 0);
+    int currentPage = (fDisplayOffset / fItemLimit) + 1;
 
-    /* Items that add to Counter */
-    if (fItemCounter > 0) {
-      int totalPages = (fDisplayedItems.size() / fItemLimit) + ((fDisplayedItems.size() % fItemLimit != 0) ? 1 : 0);
-      int currentPage = (fDisplayOffset / fItemLimit) + 1;
+    String firstPart = fItemCounter > 0 ? (fItemCounter + " incoming News") : "Incoming News";
+    String secondPart = "";
 
-      /* No more than one page */
-      if (totalPages <= 1)
-        fTitleCircleLabel.setText(fItemCounter + " incoming News");
+    /* More than one page */
+    if (totalPages > 1)
+      secondPart = " - Page " + currentPage + " of " + totalPages;
 
-      /* More than one page */
-      else
-        fTitleCircleLabel.setText(fItemCounter + " incoming News - Page " + currentPage + " of " + totalPages);
-    }
-
-    /* No Items that add to counter */
-    else
-      fTitleCircleLabel.setText("Incoming News");
+    /* Apply Text */
+    fTitleCircleLabel.setText(firstPart + secondPart);
   }
 
   private void updateContents(int offset) {
