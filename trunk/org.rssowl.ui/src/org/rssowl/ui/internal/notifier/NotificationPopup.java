@@ -60,6 +60,7 @@ import org.eclipse.ui.progress.UIJob;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.ApplicationWorkbenchAdvisor;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.CCLabel;
@@ -361,7 +362,7 @@ public class NotificationPopup extends PopupDialog {
     /* Show excerpt of content if set */
     if (fGlobalScope.getBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER)) {
       String description = item.getDescription();
-      if (description != null && description.length() > 0) {
+      if (StringUtils.isSet(description)) {
         Composite descriptionContainer = new Composite(fInnerContentCircle, SWT.NONE);
         descriptionContainer.setLayout(LayoutUtils.createGridLayout(1));
         descriptionContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
