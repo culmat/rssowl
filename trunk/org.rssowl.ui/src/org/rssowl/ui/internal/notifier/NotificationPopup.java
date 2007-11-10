@@ -51,6 +51,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchPage;
@@ -76,8 +77,6 @@ import java.util.List;
  * <li>Add preferences (respect use animation, number of news)</li>
  * <li>Enrich Popup toolbar with "Make Sticky" and a dropdown with "Options",
  * "Mark Read" etc...</li>
- * <li>Consider 2 modes: Stacked (3/10 with arrows and showing description) and
- * Grouped (N Headlines at once)</li>
  * <li>SearchNotificationItems are not aggregated if the max. number of items
  * is already showing</li>
  * </ul>
@@ -355,6 +354,21 @@ public class NotificationPopup extends PopupDialog {
       itemLabel.setBackground(fStickyBgColor);
       markStickyLabel.setBackground(fStickyBgColor);
       markStickyLabel.setImage(fItemStickyIcon);
+    }
+
+    /* Show excerpt of content if set */
+    if (fGlobalScope.getBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER)) {
+      Composite descriptionContainer = new Composite(fInnerContentCircle, SWT.NONE);
+      descriptionContainer.setLayout(LayoutUtils.createGridLayout(1));
+      descriptionContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+      descriptionContainer.setBackground(fInnerContentCircle.getBackground());
+
+      Label descriptionText = new Label(descriptionContainer, SWT.WRAP);
+      descriptionText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+      descriptionText.setBackground(fInnerContentCircle.getBackground());
+
+      String description = item.getDescription();
+      descriptionText.setText(description != null ? description : "No content.");
     }
   }
 

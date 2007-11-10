@@ -79,6 +79,7 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
   private Button fLimitNotifierToSelectionCheck;
   private Spinner fAutoCloseNotifierSpinner;
   private Button fAutoCloseNotifierCheck;
+  private Button fShowExcerptCheck;
 
   /** Leave for reflection */
   public NotifierPreferencesPage() {
@@ -320,12 +321,13 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
 
     /* Show Notification Popup */
     fShowNotificationPopup = new Button(notificationGroup, SWT.CHECK);
-    fShowNotificationPopup.setText("Show notification on incoming news");
+    fShowNotificationPopup.setText("Show a notification on incoming news");
     fShowNotificationPopup.setSelection(fGlobalScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP));
     fShowNotificationPopup.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         fNotificationOnlyFromTray.setEnabled(fShowNotificationPopup.getSelection());
+        fShowExcerptCheck.setEnabled(fShowNotificationPopup.getSelection());
         fAutoCloseNotifierCheck.setEnabled(fShowNotificationPopup.getSelection());
         fAutoCloseNotifierSpinner.setEnabled(fShowNotificationPopup.getSelection());
         fLimitNotificationCheck.setEnabled(fShowNotificationPopup.getSelection());
@@ -362,7 +364,13 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
       fLimitNotificationSpinner.setSelection(notificationLimit * -1);
 
     Label label = new Label(limitItemsContainer, SWT.None);
-    label.setText(" News inside the notification");
+    label.setText(" news inside the notification");
+
+    /* Full Content */
+    fShowExcerptCheck = new Button(notificationGroup, SWT.CHECK);
+    fShowExcerptCheck.setText("Show an excerpt of the news content inside the notification");
+    fShowExcerptCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER));
+    fShowExcerptCheck.setEnabled(fShowNotificationPopup.getSelection());
 
     /* Only from Tray */
     fNotificationOnlyFromTray = new Button(notificationGroup, SWT.CHECK);
@@ -415,6 +423,7 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
   public boolean performOk() {
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP, fShowNotificationPopup.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED, fNotificationOnlyFromTray.getSelection());
+    fGlobalScope.putBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER, fShowExcerptCheck.getSelection());
 
     fGlobalScope.putBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP, !fAutoCloseNotifierCheck.getSelection());
     fGlobalScope.putInteger(DefaultPreferences.AUTOCLOSE_NOTIFICATION_VALUE, fAutoCloseNotifierSpinner.getSelection());
@@ -492,6 +501,9 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
     fShowNotificationPopup.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP));
     fNotificationOnlyFromTray.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED));
     fNotificationOnlyFromTray.setEnabled(fShowNotificationPopup.getSelection());
+
+    fShowExcerptCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER));
+    fShowExcerptCheck.setEnabled(fShowNotificationPopup.getSelection());
 
     fAutoCloseNotifierCheck.setSelection(!defaultScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP));
     fAutoCloseNotifierCheck.setEnabled(fShowNotificationPopup.getSelection());

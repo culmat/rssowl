@@ -60,11 +60,16 @@ import java.util.Date;
  * @author bpasero
  */
 public class NewsNotificationItem extends NotificationItem {
-  private URI fNewsLink;
-  private FeedLinkReference fFeedReference;
-  private NewsReference fNewsReference;
-  private Date fRecentNewsDate;
+
+  /* Max. length of the Description Excerpt */
+  private static final int MAX_DESCRIPTION_LENGTH = 500;
+
+  private final URI fNewsLink;
+  private final FeedLinkReference fFeedReference;
+  private final NewsReference fNewsReference;
+  private final Date fRecentNewsDate;
   private boolean fIsNewsSticky;
+  private String fCachedDescriptionExcerpt;
 
   /**
    * @param news The news that is to be displayed in the Notifier.
@@ -77,6 +82,20 @@ public class NewsNotificationItem extends NotificationItem {
     fNewsReference = new NewsReference(news.getId());
     fRecentNewsDate = DateUtils.getRecentDate(news);
     fIsNewsSticky = news.isFlagged();
+  }
+
+  private String extractDescriptionExcerpt(INews news) {
+    if (news.getDescription() == null || news.getDescription().length() == 0)
+      return "No content.";
+
+    String content = StringUtils.stripTags(news.getDescription());
+    content = StringUtils.normalizeString(content);
+    content = StringUtils.smartTrim(content, MAX_DESCRIPTION_LENGTH);
+
+    if (content.contains("&"))
+      content = StringUtils.replaceAll(content, "&", "&&");
+
+    return content.length() > 0 ? content : "No content.";
   }
 
   private static ImageDescriptor makeImage(INews news) {
@@ -96,6 +115,17 @@ public class NewsNotificationItem extends NotificationItem {
       headline = StringUtils.replaceAll(headline, "&", "&&");
 
     return headline;
+  }
+
+  /*
+   * @see org.rssowl.ui.internal.notifier.NotificationItem#getDescription()
+   */
+  @Override
+  public String getDescription() {
+    if (fCachedDescriptionExcerpt == null)
+      fCachedDescriptionExcerpt = extractDescriptionExcerpt(fNewsReference.resolve());
+
+    return fCachedDescriptionExcerpt;
   }
 
   /*
