@@ -39,6 +39,8 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.MouseTrackAdapter;
 import org.eclipse.swt.events.MouseTrackListener;
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
@@ -363,10 +365,20 @@ public class NotificationPopup extends PopupDialog {
     if (fGlobalScope.getBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER)) {
       String description = item.getDescription();
       if (StringUtils.isSet(description)) {
-        Composite descriptionContainer = new Composite(fInnerContentCircle, SWT.NONE);
+        final Composite descriptionContainer = new Composite(fInnerContentCircle, SWT.NONE);
         descriptionContainer.setLayout(LayoutUtils.createGridLayout(1));
+        ((GridLayout) descriptionContainer.getLayout()).marginBottom = 5;
         descriptionContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
         descriptionContainer.setBackground(fInnerContentCircle.getBackground());
+        descriptionContainer.addPaintListener(new PaintListener() {
+          public void paintControl(PaintEvent e) {
+            GC gc = e.gc;
+            Rectangle clArea = descriptionContainer.getClientArea();
+
+            gc.setForeground(fNotifierColors.getBorder());
+            gc.drawLine(4, 1, clArea.width, 1);
+          }
+        });
 
         Label descriptionText = new Label(descriptionContainer, SWT.WRAP);
         descriptionText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
