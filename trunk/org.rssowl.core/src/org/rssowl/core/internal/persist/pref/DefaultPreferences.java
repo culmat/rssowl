@@ -164,6 +164,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Enable Notifier for Element */
   public static final String ENABLE_NOTIFIER = "org.rssowl.pref.EnableNotifier";
 
+  /** Global: Show Description Excerpt in Notifier */
+  public static final String SHOW_EXCERPT_IN_NOTIFIER = "org.rssowl.pref.ShowExcerptInNotifier";
+
   /** Global: Confirm deleting a News */
   public static final String CONFIRM_DELETE_NEWS = "org.rssowl.pref.ConfirmDeleteNews";
 
