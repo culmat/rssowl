@@ -122,14 +122,17 @@ public class ModelUtils {
    */
   public static String getName(List<ISearchCondition> conditions, boolean matchAllConditions) {
     StringBuilder name = new StringBuilder();
+    List<ISearchCondition> locationConditions = new ArrayList<ISearchCondition>(conditions.size());
 
     /* First group Conditions by Field */
     Map<String, List<ISearchCondition>> mapFieldNameToConditions = new HashMap<String, List<ISearchCondition>>();
     for (ISearchCondition condition : conditions) {
 
-      /* TODO Support Location Field */
-      if (condition.getField().getId() == INews.LOCATION)
+      /* Handle Location at the End */
+      if (condition.getField().getId() == INews.LOCATION) {
+        locationConditions.add(condition);
         continue;
+      }
 
       String fieldName = condition.getField().getName();
       String condValue = condition.getValue().toString();
@@ -213,6 +216,20 @@ public class ModelUtils {
 
     if (name.length() > 0)
       name.delete(name.length() - (matchAllConditions ? " and ".length() : " or ".length()), name.length());
+
+    /* Append location if provided */
+    if (!locationConditions.isEmpty()) {
+      name.append(" in ");
+
+      for (ISearchCondition locationCondition : locationConditions) {
+        List<IFolderChild> locations = ModelUtils.toEntities((Long[][]) locationCondition.getValue());
+        for (IFolderChild location : locations) {
+          name.append(location.getName()).append(", ");
+        }
+      }
+
+      name.delete(name.length() - 2, name.length());
+    }
 
     return name.toString();
   }
