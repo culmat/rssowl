@@ -24,7 +24,6 @@
 
 package org.rssowl.ui.internal.dialogs.properties;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -41,8 +40,12 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.IModelFactory;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
@@ -55,6 +58,7 @@ import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -64,27 +68,38 @@ import java.util.Set;
 public class SearchMarkPropertyPage implements IEntityPropertyPage {
   private IPropertyDialogSite fSite;
   private Text fNameInput;
-  private ISearchMark fSearchMark;
   private Button fMatchAllRadio;
   private SearchConditionList fSearchConditionList;
   private Button fMatchAnyRadio;
   private FolderChooser fFolderChooser;
   private boolean fSearchChanged;
+  private List<IEntity> fEntities;
 
   /*
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#init(org.rssowl.ui.dialogs.properties.IPropertyDialogSite,
    * java.util.List)
    */
   public void init(IPropertyDialogSite site, List<IEntity> entities) {
-    Assert.isTrue(entities.size() == 1 && entities.get(0) instanceof ISearchMark);
     fSite = site;
-    fSearchMark = (ISearchMark) entities.get(0);
+    fEntities = entities;
   }
 
   /*
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#createContents(org.eclipse.swt.widgets.Composite)
    */
   public Control createContents(Composite parent) {
+
+    /* Create contents for single selection */
+    if (fEntities.size() == 1)
+      return createContentsSingleSearch(parent);
+
+    /* Create contents for multi selection */
+    return createContentsMultiSearch(parent);
+  }
+
+  private Control createContentsSingleSearch(Composite parent) {
+    ISearchMark mark = (ISearchMark) fEntities.get(0);
+
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(LayoutUtils.createGridLayout(2, 10, 10));
 
@@ -100,7 +115,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
 
     fNameInput = new Text(nameContainer, SWT.NONE);
     fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-    fNameInput.setText(fSearchMark.getName());
+    fNameInput.setText(mark.getName());
 
     ToolBar generateTitleBar = new ToolBar(nameContainer, SWT.FLAT);
     generateTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -120,7 +135,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     locationLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
     locationLabel.setText("Location: ");
 
-    fFolderChooser = new FolderChooser(container, fSearchMark.getParent(), SWT.BORDER);
+    fFolderChooser = new FolderChooser(container, mark.getParent(), SWT.BORDER);
     fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
     fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -132,11 +147,11 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
 
     fMatchAllRadio = new Button(radioContainer, SWT.RADIO);
     fMatchAllRadio.setText("Match all conditions");
-    fMatchAllRadio.setSelection(fSearchMark.matchAllConditions());
+    fMatchAllRadio.setSelection(mark.matchAllConditions());
 
     fMatchAnyRadio = new Button(radioContainer, SWT.RADIO);
     fMatchAnyRadio.setText("Match any condition");
-    fMatchAnyRadio.setSelection(!fSearchMark.matchAllConditions());
+    fMatchAnyRadio.setSelection(!mark.matchAllConditions());
 
     Composite conditionsContainer = new Composite(container, SWT.BORDER);
     conditionsContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
@@ -145,11 +160,89 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     conditionsContainer.setBackgroundMode(SWT.INHERIT_FORCE);
 
     /* Search Conditions List */
-    fSearchConditionList = new SearchConditionList(conditionsContainer, SWT.None, fSearchMark.getSearchConditions());
+    fSearchConditionList = new SearchConditionList(conditionsContainer, SWT.None, mark.getSearchConditions());
     fSearchConditionList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fSearchConditionList.setVisibleItemCount(3);
 
     return container;
+  }
+
+  private Control createContentsMultiSearch(Composite parent) {
+    boolean separateFromTop = false;
+
+    Composite container = new Composite(parent, SWT.NONE);
+    container.setLayout(LayoutUtils.createGridLayout(2, 10, 10));
+
+    /* Location */
+    IFolder sameParent = getSameParent(fEntities);
+    if (sameParent != null) {
+      separateFromTop = true;
+
+      Label locationLabel = new Label(container, SWT.None);
+      locationLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
+      locationLabel.setText("Location: ");
+
+      fFolderChooser = new FolderChooser(container, sameParent, null, SWT.BORDER);
+      fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
+      fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    }
+
+    /* Other Settings */
+    Composite otherSettingsContainer = new Composite(container, SWT.NONE);
+    otherSettingsContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
+    otherSettingsContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, true, 2, 1));
+
+    if (separateFromTop)
+      ((GridLayout) otherSettingsContainer.getLayout()).marginTop = 15;
+
+    /* Name */
+    Label nameLabel = new Label(otherSettingsContainer, SWT.None);
+    nameLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.BEGINNING, true, false, 2, 1));
+    nameLabel.setText("Add search conditions to all of the " + fEntities.size() + " selected saved searches: ");
+
+    Composite conditionsContainer = new Composite(otherSettingsContainer, SWT.BORDER);
+    conditionsContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+    conditionsContainer.setLayout(LayoutUtils.createGridLayout(1));
+    conditionsContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    conditionsContainer.setBackgroundMode(SWT.INHERIT_FORCE);
+
+    /* Search Conditions List */
+    fSearchConditionList = new SearchConditionList(conditionsContainer, SWT.None, getDefaultConditions());
+    fSearchConditionList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    fSearchConditionList.setVisibleItemCount(3);
+
+    return container;
+  }
+
+  private IFolder getSameParent(List<IEntity> entities) {
+    IFolder parent = null;
+
+    for (IEntity entity : entities) {
+      if (!(entity instanceof IFolderChild))
+        return null;
+
+      IFolderChild folderChild = (IFolderChild) entity;
+      IFolder folder = folderChild.getParent();
+      if (parent == null)
+        parent = folder;
+      else if (parent != folder)
+        return null;
+    }
+
+    return parent;
+  }
+
+  private List<ISearchCondition> getDefaultConditions() {
+    List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(1);
+    IModelFactory factory = Owl.getModelFactory();
+
+    ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
+    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS, "");
+
+    conditions.add(condition);
+
+    return conditions;
   }
 
   void onGenerateName() {
@@ -177,6 +270,17 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
    */
   public boolean performOk(Set<IEntity> entitiesToSave) {
 
+    /* Perform OK for single selection */
+    if (fEntities.size() == 1)
+      return performOkSingleSearch(entitiesToSave);
+
+    /* Perform OK for multi selection */
+    return performOkMultiSearch(entitiesToSave);
+  }
+
+  private boolean performOkSingleSearch(Set<IEntity> entitiesToSave) {
+    ISearchMark mark = (ISearchMark) fEntities.get(0);
+
     /* Require a Name */
     if (fNameInput.getText().length() == 0) {
       fSite.select(this);
@@ -196,36 +300,56 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     }
 
     /* Check for changed Name */
-    if (!fSearchMark.getName().equals(fNameInput.getText())) {
-      fSearchMark.setName(fNameInput.getText());
-      entitiesToSave.add(fSearchMark);
+    if (!mark.getName().equals(fNameInput.getText())) {
+      mark.setName(fNameInput.getText());
+      entitiesToSave.add(mark);
     }
 
     /* Update match-all-condition */
-    if (fSearchMark.matchAllConditions() != fMatchAllRadio.getSelection()) {
-      fSearchMark.setMatchAllConditions(fMatchAllRadio.getSelection());
-      entitiesToSave.add(fSearchMark);
+    if (mark.matchAllConditions() != fMatchAllRadio.getSelection()) {
+      mark.setMatchAllConditions(fMatchAllRadio.getSelection());
+      entitiesToSave.add(mark);
       fSearchChanged = true;
     }
 
     /* Update Conditions (TODO Could be optimized to not replace all conditions) */
     if (fSearchConditionList.isModified()) {
-      entitiesToSave.add(fSearchMark);
+      entitiesToSave.add(mark);
       fSearchChanged = true;
 
       /* Remove Old Conditions */
-      List<ISearchCondition> oldConditions = new ArrayList<ISearchCondition>(fSearchMark.getSearchConditions());
+      List<ISearchCondition> oldConditions = new ArrayList<ISearchCondition>(mark.getSearchConditions());
       for (ISearchCondition oldCondition : oldConditions) {
-        fSearchMark.removeSearchCondition(oldCondition);
+        mark.removeSearchCondition(oldCondition);
       }
 
       /* Add New Conditions */
-      fSearchConditionList.createConditions(fSearchMark);
+      fSearchConditionList.createConditions(mark);
     }
 
     /* Re-Run search if conditions changed */
     if (fSearchChanged)
-      Controller.getDefault().getSavedSearchService().updateSavedSearches(Collections.singleton(fSearchMark), true);
+      Controller.getDefault().getSavedSearchService().updateSavedSearches(Collections.singleton(mark), true);
+
+    return true;
+  }
+
+  private boolean performOkMultiSearch(Set<IEntity> entitiesToSave) {
+    Set<ISearchMark> searchesToUpdate = new HashSet<ISearchMark>(fEntities.size());
+
+    for (IEntity entity : fEntities) {
+      ISearchMark mark = (ISearchMark) entity;
+      List<ISearchCondition> conditions = fSearchConditionList.createConditions(mark);
+
+      if (!conditions.isEmpty()) {
+        entitiesToSave.add(entity);
+        searchesToUpdate.add(mark);
+      }
+    }
+
+    /* Force Update if changed */
+    if (!searchesToUpdate.isEmpty())
+      Controller.getDefault().getSavedSearchService().updateSavedSearches(searchesToUpdate, true);
 
     return true;
   }
@@ -236,9 +360,12 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
   public void finish() {
 
     /* Reparent if necessary */
-    if (fSearchMark.getParent() != fFolderChooser.getFolder()) {
-      ReparentInfo<IFolderChild, IFolder> reparent = new ReparentInfo<IFolderChild, IFolder>(fSearchMark, fFolderChooser.getFolder(), null, null);
-      Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(Collections.singletonList(reparent));
+    for (IEntity entity : fEntities) {
+      ISearchMark mark = (ISearchMark) entity;
+      if (mark.getParent() != fFolderChooser.getFolder()) {
+        ReparentInfo<IFolderChild, IFolder> reparent = new ReparentInfo<IFolderChild, IFolder>(mark, fFolderChooser.getFolder(), null, null);
+        Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(Collections.singletonList(reparent));
+      }
     }
   }
 }
