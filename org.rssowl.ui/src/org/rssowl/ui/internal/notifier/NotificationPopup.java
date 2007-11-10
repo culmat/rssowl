@@ -102,6 +102,7 @@ public class NotificationPopup extends PopupDialog {
   private CLabel fTitleCircleLabel;
   private Composite fInnerContentCircle;
   private Composite fOuterContentCircle;
+  private Font fNormalTextFont;
   private Font fBoldTextFont;
   private int fItemCounter;
   private UIJob fAutoCloser;
@@ -129,6 +130,7 @@ public class NotificationPopup extends PopupDialog {
     super(new Shell(PlatformUI.getWorkbench().getDisplay()), PopupDialog.INFOPOPUP_SHELLSTYLE | SWT.ON_TOP, false, false, false, false, null, null);
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fBoldTextFont = OwlUI.getThemeFont(OwlUI.NOTIFICATION_POPUP_FONT_ID, SWT.BOLD);
+    fNormalTextFont = OwlUI.getThemeFont(OwlUI.NOTIFICATION_POPUP_FONT_ID, SWT.NORMAL);
     fGlobalScope = Owl.getPreferenceService().getGlobalScope();
 
     fItemLimit = fGlobalScope.getInteger(DefaultPreferences.LIMIT_NOTIFICATION_SIZE);
@@ -367,6 +369,7 @@ public class NotificationPopup extends PopupDialog {
 
         Label descriptionText = new Label(descriptionContainer, SWT.WRAP);
         descriptionText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+        descriptionText.setFont(fNormalTextFont);
         descriptionText.setBackground(fInnerContentCircle.getBackground());
         descriptionText.setText(description);
       }
