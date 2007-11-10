@@ -86,7 +86,7 @@ public class NewsNotificationItem extends NotificationItem {
 
   private String extractDescriptionExcerpt(INews news) {
     if (news.getDescription() == null || news.getDescription().length() == 0)
-      return "No content.";
+      return null;
 
     String content = StringUtils.stripTags(news.getDescription());
     content = StringUtils.normalizeString(content);
@@ -95,7 +95,7 @@ public class NewsNotificationItem extends NotificationItem {
     if (content.contains("&"))
       content = StringUtils.replaceAll(content, "&", "&&");
 
-    return content.length() > 0 ? content : "No content.";
+    return content.length() > 0 ? content : null;
   }
 
   private static ImageDescriptor makeImage(INews news) {
