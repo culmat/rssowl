@@ -358,17 +358,18 @@ public class NotificationPopup extends PopupDialog {
 
     /* Show excerpt of content if set */
     if (fGlobalScope.getBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER)) {
-      Composite descriptionContainer = new Composite(fInnerContentCircle, SWT.NONE);
-      descriptionContainer.setLayout(LayoutUtils.createGridLayout(1));
-      descriptionContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-      descriptionContainer.setBackground(fInnerContentCircle.getBackground());
-
-      Label descriptionText = new Label(descriptionContainer, SWT.WRAP);
-      descriptionText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-      descriptionText.setBackground(fInnerContentCircle.getBackground());
-
       String description = item.getDescription();
-      descriptionText.setText(description != null ? description : "No content.");
+      if (description != null && description.length() > 0) {
+        Composite descriptionContainer = new Composite(fInnerContentCircle, SWT.NONE);
+        descriptionContainer.setLayout(LayoutUtils.createGridLayout(1));
+        descriptionContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+        descriptionContainer.setBackground(fInnerContentCircle.getBackground());
+
+        Label descriptionText = new Label(descriptionContainer, SWT.WRAP);
+        descriptionText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+        descriptionText.setBackground(fInnerContentCircle.getBackground());
+        descriptionText.setText(description);
+      }
     }
   }
 
