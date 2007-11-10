@@ -89,4 +89,11 @@ public abstract class NotificationItem implements Comparable<NotificationItem> {
   public ImageDescriptor getImage() {
     return fImage;
   }
+
+  /**
+   * @return The description of this item or <code>null</code> if none.
+   */
+  public String getDescription() {
+    return null;
+  }
 }
