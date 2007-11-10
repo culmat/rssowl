@@ -30,12 +30,15 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.util.EditorUtils;
+
+import java.util.EnumSet;
 
 /**
  * Instance of {@link NotificationItem} to display new search results from a
@@ -113,6 +116,15 @@ public class SearchNotificationItem extends NotificationItem {
   @Override
   public boolean supportsSticky() {
     return false;
+  }
+
+  /*
+   * @see org.rssowl.ui.internal.notifier.NotificationItem#getDescription()
+   */
+  @Override
+  public String getDescription() {
+    int totalCount = fSearchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.READ, INews.State.UPDATED));
+    return "New results are available for the search. The total number of results is " + totalCount + ".";
   }
 
   /*
