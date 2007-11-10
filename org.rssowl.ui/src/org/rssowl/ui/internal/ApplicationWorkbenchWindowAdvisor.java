@@ -40,7 +40,6 @@ import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Layout;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
@@ -91,7 +90,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
   private IPreferenceScope fPreferences;
   private boolean fBlockIconifyEvent;
   private boolean fMinimizeFromClose;
-  private Layout fCachedShellLayout;
 
   /* Listeners */
   private NewsAdapter fNewsListener;
@@ -450,14 +448,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     }
 
     fMinimizedToTray = true;
-
-    /*
-     * Bug in Eclipse (#180881): For some reason the workbench-layout is broken,
-     * when restoring from the Tray after it has been moved to tray with
-     * Shell-Close. Disable layout() to avoid this when hiding the shell.
-     */
-    fCachedShellLayout = shell.getLayout();
-    shell.setLayout(null);
   }
 
   /**
@@ -465,12 +455,16 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
    */
   public void restoreFromTray(Shell shell) {
 
-    /* Restore previous set Layout */
-    shell.setLayout(fCachedShellLayout);
-
     /* Restore Shell */
     shell.setVisible(true);
     shell.setActive();
+
+    /*
+     * Bug in Eclipse (#180881): For some reason the workbench-layout is broken,
+     * when restoring from the Tray after it has been moved to tray with
+     * Shell-Close. Fix this by explicitly forcing a layout after restore.
+     */
+    shell.layout(true);
 
     /* Un-Minimize if minimized */
     if (shell.getMinimized())
