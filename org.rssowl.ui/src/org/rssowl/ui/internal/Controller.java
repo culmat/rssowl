@@ -830,6 +830,7 @@ public class Controller {
     /* SearchCondition: New and Updated News */
     {
       ISearchMark mark = fFactory.createSearchMark(null, imported, "New and Updated News");
+      mark.setMatchAllConditions(true);
 
       ISearchField field1 = fFactory.createSearchField(INews.STATE, newsEntityName);
       fFactory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, INews.State.UPDATED));
@@ -838,6 +839,7 @@ public class Controller {
     /* SearchCondition: Recent News */
     {
       ISearchMark mark = fFactory.createSearchMark(null, imported, "Recent News");
+      mark.setMatchAllConditions(true);
 
       ISearchField field1 = fFactory.createSearchField(INews.AGE_IN_DAYS, newsEntityName);
       fFactory.createSearchCondition(null, mark, field1, SearchSpecifier.IS_LESS_THAN, 2);
@@ -846,6 +848,7 @@ public class Controller {
     /* SearchCondition: News with Attachments */
     {
       ISearchMark mark = fFactory.createSearchMark(null, imported, "News with Attachments");
+      mark.setMatchAllConditions(true);
 
       ISearchField field = fFactory.createSearchField(INews.HAS_ATTACHMENTS, newsEntityName);
       fFactory.createSearchCondition(null, mark, field, SearchSpecifier.IS, true);
@@ -854,6 +857,7 @@ public class Controller {
     /* SearchCondition: Sticky News */
     {
       ISearchMark mark = fFactory.createSearchMark(null, imported, "Sticky News");
+      mark.setMatchAllConditions(true);
 
       ISearchField field = fFactory.createSearchField(INews.IS_FLAGGED, newsEntityName);
       fFactory.createSearchCondition(null, mark, field, SearchSpecifier.IS, true);
