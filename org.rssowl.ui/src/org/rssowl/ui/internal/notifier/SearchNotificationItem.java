@@ -48,6 +48,7 @@ import java.util.EnumSet;
  */
 public class SearchNotificationItem extends NotificationItem {
   private final ISearchMark fSearchmark;
+  private final int fTotalResultCount;
 
   /**
    * @param searchmark the saved search containing new search results.
@@ -56,6 +57,7 @@ public class SearchNotificationItem extends NotificationItem {
   public SearchNotificationItem(ISearchMark searchmark, int newResultCount) {
     super(makeText(searchmark, newResultCount), OwlUI.SEARCHMARK);
     fSearchmark = searchmark;
+    fTotalResultCount = fSearchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.READ, INews.State.UPDATED));
   }
 
   private static String makeText(ISearchMark searchmark, int newResultCount) {
@@ -123,8 +125,7 @@ public class SearchNotificationItem extends NotificationItem {
    */
   @Override
   public String getDescription() {
-    int totalCount = fSearchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.READ, INews.State.UPDATED));
-    return "New results are available for the search. The total number of results is " + totalCount + ".";
+    return "New results are available for the search. The total number of results is " + fTotalResultCount + ".";
   }
 
   /*
