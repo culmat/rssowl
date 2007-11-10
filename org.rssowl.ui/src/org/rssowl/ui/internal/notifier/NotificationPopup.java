@@ -67,7 +67,6 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -97,10 +96,9 @@ public class NotificationPopup extends PopupDialog {
   private static final int DEFAULT_WIDTH = 400;
 
   private Shell fShell;
-  private List<NotificationItem> fRecentItems = new ArrayList<NotificationItem>();
+  private List<NotificationItem> fDisplayedItems = new ArrayList<NotificationItem>();
   private ResourceManager fResources;
   private Image fCloseImageNormal;
-  private Image fCloseImageActive;
   private Image fCloseImagePressed;
   private CLabel fTitleCircleLabel;
   private Composite fInnerContentCircle;
@@ -118,6 +116,15 @@ public class NotificationPopup extends PopupDialog {
   private Image fItemNonStickyIcon;
   private Image fItemNonStickyDisabledIcon;
   private Color fStickyBgColor;
+  private Image fPrevImageNormal;
+  private Image fPrevImagePressed;
+  private Image fPrevImageDisabled;
+  private Image fNextImageNormal;
+  private Image fNextImagePressed;
+  private Image fNextImageDisabled;
+  private CLabel fNextButton;
+  private CLabel fPrevButton;
+  private int fDisplayOffset;
 
   NotificationPopup(int visibleItemCount) {
     super(new Shell(PlatformUI.getWorkbench().getDisplay()), PopupDialog.INFOPOPUP_SHELLSTYLE | SWT.ON_TOP, false, false, false, false, null, null);
@@ -210,25 +217,42 @@ public class NotificationPopup extends PopupDialog {
     /* Remember count of Items */
     fItemCounter += getNewsCount(items);
 
-    /* Update Title Label */
-    if (fItemCounter > 0)
-      fTitleCircleLabel.setText("RSSOwl - " + fItemCounter + " incoming News");
-    else
-      fTitleCircleLabel.setText("RSSOwl - Incoming News");
-
-    /* Never show more than MAX_ITEMS items */
-    if (fRecentItems.size() >= fItemLimit)
-      return;
-
     /* Remove any old duplicate first */
     for (NotificationItem item : items)
-      fRecentItems.remove(item);
+      fDisplayedItems.remove(item);
 
-    /* Add to recent Items List */
-    fRecentItems.addAll(items);
+    /* Add to Items List */
+    fDisplayedItems.addAll(items);
 
-    /* Sort Items */
-    Collections.sort(fRecentItems);
+    /* Update Title Label */
+    updateTitleLabel();
+
+    /* Update Contents */
+    updateContents(fDisplayOffset);
+  }
+
+  private void updateTitleLabel() {
+
+    /* Items that add to Counter */
+    if (fItemCounter > 0) {
+      int totalPages = (fDisplayedItems.size() / fItemLimit) + ((fDisplayedItems.size() % fItemLimit != 0) ? 1 : 0);
+      int currentPage = (fDisplayOffset / fItemLimit) + 1;
+
+      /* No more than one page */
+      if (totalPages <= 1)
+        fTitleCircleLabel.setText(fItemCounter + " incoming News");
+
+      /* More than one page */
+      else
+        fTitleCircleLabel.setText(fItemCounter + " incoming News - Page " + currentPage + " of " + totalPages);
+    }
+
+    /* No Items that add to counter */
+    else
+      fTitleCircleLabel.setText("Incoming News");
+  }
+
+  private void updateContents(int offset) {
 
     /* Dispose old Items first */
     Control[] children = fInnerContentCircle.getChildren();
@@ -237,11 +261,8 @@ public class NotificationPopup extends PopupDialog {
     }
 
     /* Show Items */
-    fVisibleItemsCount = 0;
-    for (int i = 0; i < fItemLimit && i < fRecentItems.size(); i++) {
-      renderItem(fRecentItems.get(i));
-      fVisibleItemsCount++;
-    }
+    for (int i = offset; i < offset + fItemLimit && i < fDisplayedItems.size(); i++)
+      renderItem(fDisplayedItems.get(i));
 
     /* Layout */
     fOuterContentCircle.layout(true, true);
@@ -249,6 +270,7 @@ public class NotificationPopup extends PopupDialog {
     /* Update Shell Bounds */
     Point oldSize = fShell.getSize();
     int newHeight = fShell.computeSize(DEFAULT_WIDTH, SWT.DEFAULT).y;
+    newHeight = Math.max(oldSize.y, newHeight);
 
     Point newSize = new Point(oldSize.x, newHeight);
     Point newLocation = getInitialLocation(newSize);
@@ -256,6 +278,9 @@ public class NotificationPopup extends PopupDialog {
 
     /* Add Region to Shell */
     addRegion(fShell);
+
+    /* Update Nav Buttons */
+    updateNavButtons();
   }
 
   private int getNewsCount(Collection<NotificationItem> items) {
@@ -359,12 +384,17 @@ public class NotificationPopup extends PopupDialog {
     fStickyBgColor = OwlUI.getThemeColor(OwlUI.STICKY_BG_COLOR_ID, fResources, new RGB(255, 255, 128));
 
     /* Icons */
-    fCloseImageNormal = OwlUI.getImage(fResources, "icons/etool16/close_normal.gif");
-    fCloseImageActive = OwlUI.getImage(fResources, "icons/etool16/close_active.gif");
-    fCloseImagePressed = OwlUI.getImage(fResources, "icons/etool16/close_pressed.gif");
+    fCloseImageNormal = OwlUI.getImage(fResources, "icons/etool16/close_normal.png");
+    fCloseImagePressed = OwlUI.getImage(fResources, "icons/etool16/close_pressed.png");
     fItemStickyIcon = OwlUI.getImage(fResources, OwlUI.NEWS_PINNED);
     fItemNonStickyIcon = OwlUI.getImage(fResources, OwlUI.NEWS_PIN);
     fItemNonStickyDisabledIcon = OwlUI.getImage(fResources, "icons/obj16/news_pin_disabled.gif");
+    fPrevImageNormal = OwlUI.getImage(fResources, "icons/etool16/prev_normal.png");
+    fPrevImagePressed = OwlUI.getImage(fResources, "icons/etool16/prev_pressed.png");
+    fPrevImageDisabled = OwlUI.getImage(fResources, "icons/etool16/prev_disabled.png");
+    fNextImageNormal = OwlUI.getImage(fResources, "icons/etool16/next_normal.png");
+    fNextImagePressed = OwlUI.getImage(fResources, "icons/etool16/next_pressed.png");
+    fNextImageDisabled = OwlUI.getImage(fResources, "icons/etool16/next_disabled.png");
   }
 
   /*
@@ -395,7 +425,7 @@ public class NotificationPopup extends PopupDialog {
     final Composite titleCircle = new Composite(outerCircle, SWT.NO_FOCUS);
     titleCircle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     titleCircle.setBackgroundMode(SWT.INHERIT_FORCE);
-    titleCircle.setLayout(LayoutUtils.createGridLayout(2, 3, 0));
+    titleCircle.setLayout(LayoutUtils.createGridLayout(4, 3, 0, 5, 3, false));
     titleCircle.addMouseTrackListener(fMouseTrackListner);
     titleCircle.addControlListener(new ControlAdapter() {
       @Override
@@ -467,6 +497,40 @@ public class NotificationPopup extends PopupDialog {
       }
     });
 
+    /* Nav to previous News */
+    fPrevButton = new CLabel(titleCircle, SWT.NO_FOCUS);
+    fPrevButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+    fPrevButton.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+    fPrevButton.setImage(fPrevImageDisabled);
+    fPrevButton.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseUp(MouseEvent e) {
+        onNavPrevious();
+      }
+
+      @Override
+      public void mouseDown(MouseEvent e) {
+        fPrevButton.setImage(fPrevImagePressed);
+      }
+    });
+
+    /* Nav to next News */
+    fNextButton = new CLabel(titleCircle, SWT.NO_FOCUS);
+    fNextButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+    fNextButton.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+    fNextButton.setImage(fNextImageDisabled);
+    fNextButton.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseUp(MouseEvent e) {
+        onNavNext();
+      }
+
+      @Override
+      public void mouseDown(MouseEvent e) {
+        fNextButton.setImage(fNextImagePressed);
+      }
+    });
+
     /* CLabel to display a cross to close the popup */
     final CLabel closeButton = new CLabel(titleCircle, SWT.NO_FOCUS);
     closeButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
@@ -482,21 +546,6 @@ public class NotificationPopup extends PopupDialog {
       @Override
       public void mouseDown(MouseEvent e) {
         closeButton.setImage(fCloseImagePressed);
-      }
-    });
-
-    closeButton.addMouseTrackListener(new MouseTrackAdapter() {
-
-      /* Show hot image on mouse-enter */
-      @Override
-      public void mouseEnter(MouseEvent e) {
-        closeButton.setImage(fCloseImageActive);
-      }
-
-      /* Show normal image on mouse-exit */
-      @Override
-      public void mouseExit(MouseEvent e) {
-        closeButton.setImage(fCloseImageNormal);
       }
     });
 
@@ -523,6 +572,35 @@ public class NotificationPopup extends PopupDialog {
     fInnerContentCircle.setBackground(fShell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
     return outerCircle;
+  }
+
+  private void onNavPrevious() {
+    int newOffset = fDisplayOffset - fItemLimit;
+    if (newOffset >= 0) {
+      fDisplayOffset = newOffset;
+      updateTitleLabel();
+      updateContents(newOffset);
+    }
+  }
+
+  private void onNavNext() {
+    int newOffset = fDisplayOffset + fItemLimit;
+    if (newOffset < fDisplayedItems.size()) {
+      fDisplayOffset = newOffset;
+      updateTitleLabel();
+      updateContents(newOffset);
+    }
+  }
+
+  private void updateNavButtons() {
+    boolean isPrevEnabled = fDisplayOffset - fItemLimit >= 0;
+    boolean isNextEnabled = fDisplayOffset + fItemLimit < fDisplayedItems.size();
+
+    fPrevButton.setEnabled(isPrevEnabled);
+    fPrevButton.setImage(isPrevEnabled ? fPrevImageNormal : fPrevImageDisabled);
+
+    fNextButton.setEnabled(isNextEnabled);
+    fNextButton.setImage(isNextEnabled ? fNextImageNormal : fNextImageDisabled);
   }
 
   /*
