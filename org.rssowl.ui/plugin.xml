@@ -965,7 +965,7 @@
       </entityPropertyPage>
       <entityPropertyPage
             class="org.rssowl.ui.internal.dialogs.properties.SearchMarkPropertyPage"
-            handlesMultipleEntities="false"
+            handlesMultipleEntities="true"
             id="org.rssowl.ui.internal.dialogs.properties.SearchMarkPropertyPage"
             name="General"
             order="0">
