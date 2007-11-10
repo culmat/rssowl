@@ -35,6 +35,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.dnd.Clipboard;
@@ -952,5 +953,29 @@ public class OwlUI {
       applicationShell.setMinimized(false);
       applicationShell.forceActive();
     }
+  }
+
+  /**
+   * @return the current selected {@link IFolder} of the bookmark explorer or
+   * the parent of the current selected {@link IMark} or <code>null</code> if
+   * none.
+   */
+  public static IFolder getBookMarkExplorerSelection() {
+    IWorkbenchPage page = getPage();
+    if (page != null) {
+      IViewPart viewPart = page.findView(BookMarkExplorer.VIEW_ID);
+      if (viewPart != null) {
+        IStructuredSelection selection = (IStructuredSelection) viewPart.getSite().getSelectionProvider().getSelection();
+        if (!selection.isEmpty()) {
+          Object selectedEntity = selection.iterator().next();
+          if (selectedEntity instanceof IFolder)
+            return (IFolder) selectedEntity;
+          else if (selectedEntity instanceof IMark)
+            return ((IMark) selectedEntity).getParent();
+        }
+      }
+    }
+
+    return null;
   }
 }

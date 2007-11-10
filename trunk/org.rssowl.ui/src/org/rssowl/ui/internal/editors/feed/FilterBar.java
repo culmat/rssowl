@@ -611,7 +611,7 @@ public class FilterBar {
     }
 
     /* Create and Show SM Dialog */
-    SearchMarkDialog dialog = new SearchMarkDialog(fParent.getShell(), null, null, conditions, true);
+    SearchMarkDialog dialog = new SearchMarkDialog(fParent.getShell(), OwlUI.getBookMarkExplorerSelection(), null, conditions, true);
     dialog.open();
   }
 

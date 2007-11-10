@@ -1172,7 +1172,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     if (conditions.isEmpty())
       conditions.addAll(getDefaultConditions());
 
-    SearchMarkDialog dialog = new SearchMarkDialog((Shell) getShell().getParent(), null, null, conditions, fMatchAllRadio.getSelection());
+    SearchMarkDialog dialog = new SearchMarkDialog((Shell) getShell().getParent(), OwlUI.getBookMarkExplorerSelection(), null, conditions, fMatchAllRadio.getSelection());
     dialog.open();
   }
 
