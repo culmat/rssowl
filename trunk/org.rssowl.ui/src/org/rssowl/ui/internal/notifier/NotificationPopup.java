@@ -376,7 +376,8 @@ public class NotificationPopup extends PopupDialog {
             Rectangle clArea = descriptionContainer.getClientArea();
 
             gc.setForeground(fNotifierColors.getBorder());
-            gc.drawLine(4, 1, clArea.width, 1);
+            gc.setBackground(fNotifierColors.getGradientBegin());
+            gc.fillGradientRectangle(4, 1, clArea.width, 1, false);
           }
         });
 
