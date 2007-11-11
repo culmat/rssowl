@@ -249,9 +249,9 @@ public class NotificationService {
           if (fgNotificationPopup == null) {
             fgNotificationPopup = new NotificationPopup(items.size()) {
               @Override
-              public boolean close() {
+              public boolean doClose() {
                 fgNotificationPopup = null;
-                return super.close();
+                return super.doClose();
               }
             };
             fgNotificationPopup.open();
