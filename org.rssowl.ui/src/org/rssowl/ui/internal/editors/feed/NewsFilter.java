@@ -51,19 +51,22 @@ public class NewsFilter extends ViewerFilter {
   public enum Type {
 
     /** Show all News */
-    SHOW_ALL("Show All News"),
+    SHOW_ALL("All News"),
 
     /** Show New News */
-    SHOW_NEW("Show New News"),
+    SHOW_NEW("New News"),
 
     /** Show Unread News */
-    SHOW_UNREAD("Show Unread News"),
+    SHOW_UNREAD("Unread News"),
 
     /** Show Recent News */
-    SHOW_RECENT("Show Recent News"),
+    SHOW_RECENT("Recent News"),
 
     /** Show Sticky News */
-    SHOW_STICKY("Show Sticky News");
+    SHOW_STICKY("Sticky News"),
+
+    /** Show Recent News */
+    SHOW_LAST_5_DAYS("Last 5 Days");
 
     String fName;
 
@@ -238,6 +241,12 @@ public class NewsFilter extends ViewerFilter {
         case SHOW_RECENT:
           Date date = DateUtils.getRecentDate(news);
           isMatch = (date.getTime() > (DateUtils.getToday().getTimeInMillis() - DateUtils.DAY));
+          break;
+
+        /* Show Last 5 Days */
+        case SHOW_LAST_5_DAYS:
+          date = DateUtils.getRecentDate(news);
+          isMatch = (date.getTime() > (DateUtils.getToday().getTimeInMillis() - 5 * DateUtils.DAY));
           break;
       }
 

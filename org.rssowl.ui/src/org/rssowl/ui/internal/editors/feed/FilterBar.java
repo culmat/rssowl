@@ -523,6 +523,18 @@ public class FilterBar {
           }
         });
 
+        /* Filter: Sticky */
+        final MenuItem showSticky = new MenuItem(menu, SWT.RADIO);
+        showSticky.setText(NewsFilter.Type.SHOW_STICKY.getName());
+        showSticky.setSelection(NewsFilter.Type.SHOW_STICKY == filter.getType());
+        showSticky.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            if (showSticky.getSelection() && filter.getType() != NewsFilter.Type.SHOW_STICKY)
+              doFilter(NewsFilter.Type.SHOW_STICKY, true, true);
+          }
+        });
+
         /* Separator */
         new MenuItem(menu, SWT.SEPARATOR);
 
@@ -538,15 +550,15 @@ public class FilterBar {
           }
         });
 
-        /* Filter: Sticky */
-        final MenuItem showSticky = new MenuItem(menu, SWT.RADIO);
-        showSticky.setText(NewsFilter.Type.SHOW_STICKY.getName());
-        showSticky.setSelection(NewsFilter.Type.SHOW_STICKY == filter.getType());
-        showSticky.addSelectionListener(new SelectionAdapter() {
+        /* Filter: Last 5 Days */
+        final MenuItem showLastFiveDays = new MenuItem(menu, SWT.RADIO);
+        showLastFiveDays.setText(NewsFilter.Type.SHOW_LAST_5_DAYS.getName());
+        showLastFiveDays.setSelection(NewsFilter.Type.SHOW_LAST_5_DAYS == filter.getType());
+        showLastFiveDays.addSelectionListener(new SelectionAdapter() {
           @Override
           public void widgetSelected(SelectionEvent e) {
-            if (showSticky.getSelection() && filter.getType() != NewsFilter.Type.SHOW_STICKY)
-              doFilter(NewsFilter.Type.SHOW_STICKY, true, true);
+            if (showLastFiveDays.getSelection() && filter.getType() != NewsFilter.Type.SHOW_LAST_5_DAYS)
+              doFilter(NewsFilter.Type.SHOW_LAST_5_DAYS, true, true);
           }
         });
 
@@ -597,6 +609,11 @@ public class FilterBar {
       case SHOW_RECENT:
         field = factory.createSearchField(INews.AGE_IN_DAYS, INews.class.getName());
         conditions.add(factory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, 2));
+        break;
+
+      case SHOW_LAST_5_DAYS:
+        field = factory.createSearchField(INews.AGE_IN_DAYS, INews.class.getName());
+        conditions.add(factory.createSearchCondition(field, SearchSpecifier.IS_LESS_THAN, 6));
         break;
 
       case SHOW_STICKY:
