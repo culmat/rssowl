@@ -107,7 +107,6 @@ public class NotificationPopup extends PopupDialog {
   private Composite fOuterContentCircle;
   private Font fNormalTextFont;
   private Font fBoldTextFont;
-  private int fItemCounter;
   private UIJob fAutoCloser;
   private MouseTrackListener fMouseTrackListner;
   private IPreferenceScope fGlobalScope;
@@ -184,7 +183,7 @@ public class NotificationPopup extends PopupDialog {
       @Override
       public IStatus runInUIThread(IProgressMonitor monitor) {
         if (getShell() != null && !getShell().isDisposed())
-          close();
+          doClose();
 
         return Status.OK_STATUS;
       }
@@ -218,9 +217,6 @@ public class NotificationPopup extends PopupDialog {
       fAutoCloser.schedule(fGlobalScope.getInteger(DefaultPreferences.AUTOCLOSE_NOTIFICATION_VALUE) * 1000);
     }
 
-    /* Remember count of Items */
-    fItemCounter += getNewsCount(items);
-
     /* Remove any old duplicate first */
     for (NotificationItem item : items)
       fDisplayedItems.remove(item);
@@ -239,7 +235,7 @@ public class NotificationPopup extends PopupDialog {
     int totalPages = (fDisplayedItems.size() / fItemLimit) + ((fDisplayedItems.size() % fItemLimit != 0) ? 1 : 0);
     int currentPage = (fDisplayOffset / fItemLimit) + 1;
 
-    String firstPart = fItemCounter > 0 ? (fItemCounter + " incoming News") : "Incoming News";
+    String firstPart = "Incoming News";
     String secondPart = "";
 
     /* More than one page */
@@ -281,17 +277,6 @@ public class NotificationPopup extends PopupDialog {
     updateNavButtons();
   }
 
-  private int getNewsCount(Collection<NotificationItem> items) {
-    int count = 0;
-
-    for (NotificationItem item : items) {
-      if (item instanceof NewsNotificationItem)
-        count++;
-    }
-
-    return count;
-  }
-
   private void renderItem(final NotificationItem item) {
 
     /* Use a CCLabel per Item */
@@ -327,7 +312,7 @@ public class NotificationPopup extends PopupDialog {
         item.open(e);
 
         /* Close Popup */
-        close();
+        doClose();
       }
     });
 
@@ -376,7 +361,7 @@ public class NotificationPopup extends PopupDialog {
             Rectangle clArea = descriptionContainer.getClientArea();
 
             gc.setForeground(fNotifierColors.getBorder());
-            gc.setBackground(fNotifierColors.getGradientBegin());
+            gc.setBackground(fNotifierColors.getGradientEnd());
             gc.fillGradientRectangle(4, 1, clArea.width, 1, false);
           }
         });
@@ -518,7 +503,7 @@ public class NotificationPopup extends PopupDialog {
           restoreWindow(page);
 
           /* Close Notifier */
-          close();
+          doClose();
         }
       }
     });
@@ -566,7 +551,7 @@ public class NotificationPopup extends PopupDialog {
     closeButton.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseUp(MouseEvent e) {
-        close();
+        doClose();
       }
 
       @Override
@@ -664,6 +649,22 @@ public class NotificationPopup extends PopupDialog {
    */
   @Override
   public boolean close() {
+
+    /*
+     * This method is overriden because the parent PopupDialog class automatically
+     * closes the popup when the Shell is deactivated.
+     * We want to leave the popup open in this case though for stability reasons.
+     */
+    return false;
+  }
+
+  /**
+   * The actual implementation of close().
+   *
+   * @return <code>true</code> if the window is (or was already) closed, and
+   * <code>false</code> if it is still open
+   */
+  protected boolean doClose() {
     fResources.dispose();
     if (fLastUsedRegion != null)
       fLastUsedRegion.dispose();
