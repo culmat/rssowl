@@ -245,9 +245,6 @@ public class DateUtils {
         /* ISO 8601 w/o seconds */
         "yyyy-MM-dd'T'HH:mm'Z'", //$NON-NLS-1$
 
-        /* European Date Format */
-        "dd-MM-yyyy HH:mm:ss", //$NON-NLS-1$
-
         /* RFC 1123 without Day Name */
         "dd MMM yyyy HH:mm:ss z", //$NON-NLS-1$
 
