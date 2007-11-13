@@ -365,31 +365,32 @@ public class NotificationPopup extends PopupDialog {
     /* Show excerpt of content if set */
     if (fGlobalScope.getBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER)) {
       String description = item.getDescription();
-      if (StringUtils.isSet(description)) {
-        final Composite descriptionContainer = new Composite(fInnerContentCircle, SWT.NONE);
-        descriptionContainer.setLayout(LayoutUtils.createGridLayout(1));
-        ((GridLayout) descriptionContainer.getLayout()).marginBottom = 5;
-        descriptionContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 3, 1));
-        descriptionContainer.addMouseTrackListener(fMouseTrackListner);
-        descriptionContainer.setBackground(fInnerContentCircle.getBackground());
-        descriptionContainer.addPaintListener(new PaintListener() {
-          public void paintControl(PaintEvent e) {
-            GC gc = e.gc;
-            Rectangle clArea = descriptionContainer.getClientArea();
+      if (!StringUtils.isSet(description))
+        description = "This article does not provide any content.";
 
-            gc.setForeground(fNotifierColors.getBorder());
-            gc.setBackground(fNotifierColors.getGradientEnd());
-            gc.fillGradientRectangle(4, 1, clArea.width, 1, false);
-          }
-        });
+      final Composite descriptionContainer = new Composite(fInnerContentCircle, SWT.NONE);
+      descriptionContainer.setLayout(LayoutUtils.createGridLayout(1));
+      ((GridLayout) descriptionContainer.getLayout()).marginBottom = 5;
+      descriptionContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 3, 1));
+      descriptionContainer.addMouseTrackListener(fMouseTrackListner);
+      descriptionContainer.setBackground(fInnerContentCircle.getBackground());
+      descriptionContainer.addPaintListener(new PaintListener() {
+        public void paintControl(PaintEvent e) {
+          GC gc = e.gc;
+          Rectangle clArea = descriptionContainer.getClientArea();
 
-        Label descriptionText = new Label(descriptionContainer, SWT.WRAP);
-        descriptionText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-        descriptionText.setFont(fNormalTextFont);
-        descriptionText.setBackground(fInnerContentCircle.getBackground());
-        descriptionText.setText(description);
-        descriptionText.addMouseTrackListener(fMouseTrackListner);
-      }
+          gc.setForeground(fNotifierColors.getBorder());
+          gc.setBackground(fNotifierColors.getGradientEnd());
+          gc.fillGradientRectangle(4, 1, clArea.width, 1, false);
+        }
+      });
+
+      Label descriptionText = new Label(descriptionContainer, SWT.WRAP);
+      descriptionText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+      descriptionText.setFont(fNormalTextFont);
+      descriptionText.setBackground(fInnerContentCircle.getBackground());
+      descriptionText.setText(description);
+      descriptionText.addMouseTrackListener(fMouseTrackListner);
     }
   }
 
