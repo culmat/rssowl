@@ -127,6 +127,7 @@ public class NotificationPopup extends PopupDialog {
   private CLabel fNextButton;
   private CLabel fPrevButton;
   private int fDisplayOffset;
+  private boolean fMouseOverNotifier;
 
   NotificationPopup(int visibleItemCount) {
     super(new Shell(PlatformUI.getWorkbench().getDisplay()), PopupDialog.INFOPOPUP_SHELLSTYLE | SWT.ON_TOP, false, false, false, false, null, null);
@@ -182,7 +183,7 @@ public class NotificationPopup extends PopupDialog {
     fAutoCloser = new UIJob(PlatformUI.getWorkbench().getDisplay(), "") {
       @Override
       public IStatus runInUIThread(IProgressMonitor monitor) {
-        if (getShell() != null && !getShell().isDisposed())
+        if (!fMouseOverNotifier && getShell() != null && !getShell().isDisposed())
           doClose();
 
         return Status.OK_STATUS;
@@ -197,12 +198,14 @@ public class NotificationPopup extends PopupDialog {
     fMouseTrackListner = new MouseTrackAdapter() {
       @Override
       public void mouseEnter(MouseEvent e) {
+        fMouseOverNotifier = true;
         if (!fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP))
           fAutoCloser.cancel();
       }
 
       @Override
       public void mouseExit(MouseEvent e) {
+        fMouseOverNotifier = false;
         if (!fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP))
           fAutoCloser.schedule(fGlobalScope.getInteger(DefaultPreferences.AUTOCLOSE_NOTIFICATION_VALUE) * 1000);
       }
@@ -392,15 +395,21 @@ public class NotificationPopup extends PopupDialog {
 
   private void restoreWindow(IWorkbenchPage page) {
     Shell applicationShell = page.getWorkbenchWindow().getShell();
-
-    /* Restore from Tray or Minimization if required */
     ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
+
+    /* Restore From Tray */
     if (advisor != null && advisor.isMinimizedToTray())
       advisor.restoreFromTray(applicationShell);
+
+    /* Restore from being Minimized */
     else if (applicationShell.getMinimized()) {
       applicationShell.setMinimized(false);
       applicationShell.forceActive();
     }
+
+    /* Otherwise force Active */
+    else
+      applicationShell.forceActive();
   }
 
   private void initResources() {
