@@ -169,7 +169,7 @@ public class StringUtils {
       }
     }
 
-    return new String(result, 0, length);
+    return length > 0 ? new String(result, 0, length) : "";
   }
 
   /**
