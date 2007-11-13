@@ -321,6 +321,7 @@ public class NotificationPopup extends PopupDialog {
     markStickyLabel.setImage(item.supportsSticky() ? fItemNonStickyIcon : fItemNonStickyDisabledIcon);
     markStickyLabel.setBackground(fInnerContentCircle.getBackground());
     markStickyLabel.setEnabled(item.supportsSticky());
+    markStickyLabel.addMouseTrackListener(fMouseTrackListner);
     markStickyLabel.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
     markStickyLabel.addMouseListener(new MouseAdapter() {
       @Override
@@ -354,6 +355,7 @@ public class NotificationPopup extends PopupDialog {
         descriptionContainer.setLayout(LayoutUtils.createGridLayout(1));
         ((GridLayout) descriptionContainer.getLayout()).marginBottom = 5;
         descriptionContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+        descriptionContainer.addMouseTrackListener(fMouseTrackListner);
         descriptionContainer.setBackground(fInnerContentCircle.getBackground());
         descriptionContainer.addPaintListener(new PaintListener() {
           public void paintControl(PaintEvent e) {
@@ -371,6 +373,7 @@ public class NotificationPopup extends PopupDialog {
         descriptionText.setFont(fNormalTextFont);
         descriptionText.setBackground(fInnerContentCircle.getBackground());
         descriptionText.setText(description);
+        descriptionText.addMouseTrackListener(fMouseTrackListner);
       }
     }
   }
@@ -512,6 +515,7 @@ public class NotificationPopup extends PopupDialog {
     fPrevButton = new CLabel(titleCircle, SWT.NO_FOCUS);
     fPrevButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
     fPrevButton.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+    fPrevButton.addMouseTrackListener(fMouseTrackListner);
     fPrevButton.setImage(fPrevImageDisabled);
     fPrevButton.addMouseListener(new MouseAdapter() {
       @Override
@@ -528,6 +532,7 @@ public class NotificationPopup extends PopupDialog {
     /* Nav to next News */
     fNextButton = new CLabel(titleCircle, SWT.NO_FOCUS);
     fNextButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+    fNextButton.addMouseTrackListener(fMouseTrackListner);
     fNextButton.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
     fNextButton.setImage(fNextImageDisabled);
     fNextButton.addMouseListener(new MouseAdapter() {
