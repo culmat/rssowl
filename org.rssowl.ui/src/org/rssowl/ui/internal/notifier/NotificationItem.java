@@ -96,4 +96,11 @@ public abstract class NotificationItem implements Comparable<NotificationItem> {
   public String getDescription() {
     return null;
   }
+
+  /**
+   * @return The origin of this item or <code>null</code> if none.
+   */
+  public String getOrigin() {
+    return null;
+  }
 }

@@ -279,6 +279,15 @@ public class NotificationPopup extends PopupDialog {
 
   private void renderItem(final NotificationItem item) {
 
+    /* Image Label with Tooltip */
+    final CLabel imageLabel = new CLabel(fInnerContentCircle, SWT.NONE);
+    imageLabel.setBackground(fInnerContentCircle.getBackground());
+    imageLabel.setCursor(imageLabel.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+    imageLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
+    imageLabel.addMouseTrackListener(fMouseTrackListner);
+    imageLabel.setImage(OwlUI.getImage(fResources, item.getImage()));
+    imageLabel.setToolTipText(item.getOrigin());
+
     /* Use a CCLabel per Item */
     final CCLabel itemLabel = new CCLabel(fInnerContentCircle, SWT.NONE);
     itemLabel.setBackground(fInnerContentCircle.getBackground());
@@ -287,10 +296,9 @@ public class NotificationPopup extends PopupDialog {
     itemLabel.setText(item.getText());
     itemLabel.setFont(fBoldTextFont);
     itemLabel.addMouseTrackListener(fMouseTrackListner);
-    itemLabel.setImage(OwlUI.getImage(fResources, item.getImage()));
 
     /* Paint text blue on mouse-enter */
-    itemLabel.addMouseTrackListener(new MouseTrackAdapter() {
+    MouseTrackAdapter mouseTrackListener = new MouseTrackAdapter() {
 
       @Override
       public void mouseEnter(MouseEvent e) {
@@ -301,10 +309,13 @@ public class NotificationPopup extends PopupDialog {
       public void mouseExit(MouseEvent e) {
         itemLabel.setForeground(itemLabel.getDisplay().getSystemColor(SWT.COLOR_BLACK));
       }
-    });
+    };
+
+    itemLabel.addMouseTrackListener(mouseTrackListener);
+    imageLabel.addMouseTrackListener(mouseTrackListener);
 
     /* Restore RSSOwl label is clicked */
-    itemLabel.addMouseListener(new MouseAdapter() {
+    MouseAdapter mouseListener = new MouseAdapter() {
       @Override
       public void mouseUp(MouseEvent e) {
 
@@ -314,7 +325,10 @@ public class NotificationPopup extends PopupDialog {
         /* Close Popup */
         doClose();
       }
-    });
+    };
+
+    itemLabel.addMouseListener(mouseListener);
+    imageLabel.addMouseListener(mouseListener);
 
     /* Offer Label to mark item sticky */
     final CLabel markStickyLabel = new CLabel(fInnerContentCircle, SWT.NONE);
@@ -330,7 +344,6 @@ public class NotificationPopup extends PopupDialog {
 
         /* Update Background Color */
         itemLabel.setBackground(newStateSticky ? fStickyBgColor : fInnerContentCircle.getBackground());
-        markStickyLabel.setBackground(newStateSticky ? fStickyBgColor : fInnerContentCircle.getBackground());
 
         /* Update Image */
         markStickyLabel.setImage(newStateSticky ? fItemStickyIcon : fItemNonStickyIcon);
@@ -343,7 +356,6 @@ public class NotificationPopup extends PopupDialog {
     /* Show Sticky if required */
     if (item.supportsSticky() && item.isSticky()) {
       itemLabel.setBackground(fStickyBgColor);
-      markStickyLabel.setBackground(fStickyBgColor);
       markStickyLabel.setImage(fItemStickyIcon);
     }
 
@@ -354,7 +366,7 @@ public class NotificationPopup extends PopupDialog {
         final Composite descriptionContainer = new Composite(fInnerContentCircle, SWT.NONE);
         descriptionContainer.setLayout(LayoutUtils.createGridLayout(1));
         ((GridLayout) descriptionContainer.getLayout()).marginBottom = 5;
-        descriptionContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+        descriptionContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 3, 1));
         descriptionContainer.addMouseTrackListener(fMouseTrackListner);
         descriptionContainer.setBackground(fInnerContentCircle.getBackground());
         descriptionContainer.addPaintListener(new PaintListener() {
@@ -581,7 +593,7 @@ public class NotificationPopup extends PopupDialog {
     /* Inner composite containing the content controlls */
     fInnerContentCircle = new Composite(middleContentCircle, SWT.NO_FOCUS);
     fInnerContentCircle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    fInnerContentCircle.setLayout(LayoutUtils.createGridLayout(2, 0, 5, 0, 0, false));
+    fInnerContentCircle.setLayout(LayoutUtils.createGridLayout(3, 0, 5, 0, 0, false));
     ((GridLayout) fInnerContentCircle.getLayout()).marginLeft = 5;
     ((GridLayout) fInnerContentCircle.getLayout()).marginRight = 2;
     fInnerContentCircle.addMouseTrackListener(fMouseTrackListner);

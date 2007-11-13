@@ -52,16 +52,16 @@ public class SearchNotificationItem extends NotificationItem {
 
   /**
    * @param searchmark the saved search containing new search results.
-   * @param newResultCount the number of new results for the saved search.
+   * @param unreadResultCount the number of unread results for the saved search.
    */
-  public SearchNotificationItem(ISearchMark searchmark, int newResultCount) {
-    super(makeText(searchmark, newResultCount), OwlUI.SEARCHMARK);
+  public SearchNotificationItem(ISearchMark searchmark, int unreadResultCount) {
+    super(makeText(searchmark, unreadResultCount), OwlUI.SEARCHMARK);
     fSearchmark = searchmark;
     fTotalResultCount = fSearchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.READ, INews.State.UPDATED));
   }
 
-  private static String makeText(ISearchMark searchmark, int newResultCount) {
-    return searchmark.getName() + " (" + newResultCount + ")";
+  private static String makeText(ISearchMark searchmark, int unreadResultCount) {
+    return searchmark.getName() + " (" + unreadResultCount + ")";
   }
 
   /*
