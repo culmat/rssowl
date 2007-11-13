@@ -51,6 +51,14 @@ public class StringUtilsTest {
    * @throws Exception
    */
   @Test
+  public void testStripTagsTimeMagazine() throws Exception {
+    assertEquals("", StringUtils.stripTags("<img src=\"http://feeds.feedburner.com/~r/time/topstories/~4/183799328\" height=\"1\" width=\"1\"/>"));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testNormalize() throws Exception {
     assertEquals("Foo Bar", StringUtils.normalizeString("Foo Bar"));
     assertEquals("FooBar", StringUtils.normalizeString("FooBar"));
