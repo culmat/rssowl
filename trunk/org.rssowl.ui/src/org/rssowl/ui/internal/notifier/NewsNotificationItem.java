@@ -70,6 +70,7 @@ public class NewsNotificationItem extends NotificationItem {
   private final Date fRecentNewsDate;
   private boolean fIsNewsSticky;
   private String fCachedDescriptionExcerpt;
+  private String fCachedOrigin;
 
   /**
    * @param news The news that is to be displayed in the Notifier.
@@ -126,6 +127,20 @@ public class NewsNotificationItem extends NotificationItem {
       fCachedDescriptionExcerpt = extractDescriptionExcerpt(fNewsReference.resolve());
 
     return fCachedDescriptionExcerpt;
+  }
+
+  /*
+   * @see org.rssowl.ui.internal.notifier.NotificationItem#getOrigin()
+   */
+  @Override
+  public String getOrigin() {
+    if (fCachedOrigin == null) {
+      IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(fFeedReference);
+      if (bookMark != null)
+        fCachedOrigin = bookMark.getName();
+    }
+
+    return fCachedOrigin;
   }
 
   /*
