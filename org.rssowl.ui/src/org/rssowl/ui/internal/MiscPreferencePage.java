@@ -51,6 +51,10 @@ import org.rssowl.ui.internal.util.LayoutUtils;
  * @author bpasero
  */
 public class MiscPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+
+  /** ID of this Preferences Page */
+  public static final String ID = "org.rssowl.ui.MiscPreferences";
+
   private IPreferenceScope fGlobalScope;
   private IPreferenceScope fEclipseScope;
   private Button fMinimizeToTray;

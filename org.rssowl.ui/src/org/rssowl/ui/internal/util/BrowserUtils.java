@@ -24,12 +24,18 @@
 
 package org.rssowl.ui.internal.util;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.program.Program;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
+import org.rssowl.ui.internal.MiscPreferencePage;
+import org.rssowl.ui.internal.OwlUI;
 
 import java.io.IOException;
 
@@ -137,8 +143,13 @@ public class BrowserUtils {
     if (Program.launch(link))
       return;
 
+    /* Show Error Dialog on Windows */
+    if (Application.IS_WINDOWS) {
+      showErrorIfExternalBrowserFails();
+    }
+
     /* Launch default browser on Mac */
-    if (Application.IS_MAC) {
+    else if (Application.IS_MAC) {
       try {
         Process proc = Runtime.getRuntime().exec("/usr/bin/open " + link);
 
@@ -156,11 +167,12 @@ public class BrowserUtils {
       /* Show error message, default browser could not be launched */
       catch (IOException e) {
         Activator.getDefault().logError(e.getMessage(), e);
+        showErrorIfExternalBrowserFails();
       }
     }
 
     /* Launch default browser on Linux & Solaris */
-    else if (!Application.IS_WINDOWS) {
+    else {
 
       /* Run browser in a seperate thread */
       Thread launcher = new Thread("Browser Launcher") {
@@ -216,12 +228,30 @@ public class BrowserUtils {
           /* Show error, default browser could not be launched */
           catch (IOException e) {
             Activator.getDefault().logError(e.getMessage(), e);
+            showErrorIfExternalBrowserFails();
           }
         }
       };
       launcher.setDaemon(true);
       launcher.start();
     }
+  }
+
+  private static void showErrorIfExternalBrowserFails() {
+    final IWorkbenchWindow window = OwlUI.getWindow();
+    if (window == null)
+      return;
+
+    JobRunner.runInUIThread(window.getShell(), new Runnable() {
+      public void run() {
+        MessageBox box = new MessageBox(window.getShell(), SWT.ICON_WARNING | SWT.OK | SWT.CANCEL);
+        box.setText("Unable to Launch External Browser");
+        box.setMessage("RSSOwl is unable to launch the external browser. Please configure it and try again.");
+
+        if (box.open() == SWT.OK)
+          PreferencesUtil.createPreferenceDialogOn(window.getShell(), MiscPreferencePage.ID, null, null).open();
+      }
+    });
   }
 
   private static void useCustomBrowser(final String link) {
