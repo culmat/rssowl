@@ -96,6 +96,17 @@ public class NewsService {
 
       return new Point(x, y);
     }
+
+    /*
+     * @see org.eclipse.jface.dialogs.ProgressMonitorDialog#getInitialSize()
+     */
+    @Override
+    protected Point getInitialSize() {
+      int minWidth = 380;
+      int minHeight = getShell().computeSize(minWidth, SWT.DEFAULT).y;
+
+      return new Point(minWidth, minHeight);
+    }
   }
 
   NewsService() {
@@ -215,7 +226,7 @@ public class NewsService {
           /* Open the Dialog if exceeded SHOW_PROGRESS_THRESHOLD ms */
           if (System.currentTimeMillis() - start > SHOW_PROGRESS_THRESHOLD && !fDialogOpened) {
             dialog.open();
-            monitor.beginTask("RSSOwl was not shutdown properly. Restoring data, please wait...", feeds.size() - worked);
+            monitor.beginTask("RSSOwl was not shutdown properly. Restoring data...", feeds.size() - worked);
             fDialogOpened = true;
           }
 
