@@ -127,8 +127,7 @@ public interface ISearchCondition extends IEntity {
    * <li>EnumSet</li>
    * </ul>
    *
-   * @param value Sets the target String for matching News on the given search
-   * field.
+   * @param value Sets the value for matching News on the given search field.
    */
-  void setValue(String value);
+  void setValue(Object value);
 }
