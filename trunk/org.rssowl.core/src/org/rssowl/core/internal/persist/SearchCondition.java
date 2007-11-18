@@ -156,9 +156,9 @@ public class SearchCondition extends AbstractEntity implements ISearchCondition 
   }
 
   /*
-   * @see org.rssowl.core.model.search.ISearchCondition#setValue(java.lang.String)
+   * @see org.rssowl.core.persist.ISearchCondition#setValue(java.lang.Object)
    */
-  public synchronized void setValue(String value) {
+  public synchronized void setValue(Object value) {
     fValue = value;
   }
 
