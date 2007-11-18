@@ -3097,6 +3097,56 @@ public class ModelSearchTest {
     }
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testEmptyFolderLocationCondition() throws Exception {
+
+    /* First add some Types */
+    IFolder rootFolder = fFactory.createFolder(null, null, "Root");
+    DynamicDAO.save(rootFolder);
+
+    IFolder subFolder = fFactory.createFolder(null, rootFolder, "Sub Folder");
+    DynamicDAO.save(subFolder);
+
+    IFolder emptyFolder = fFactory.createFolder(null, rootFolder, "Empty Folder");
+    DynamicDAO.save(emptyFolder);
+
+    IFeed feed1 = fFactory.createFeed(null, new URI("http://www.testSearchNewsWithLocationFeed1.com"));
+    IFeed feed2 = fFactory.createFeed(null, new URI("http://www.testSearchNewsWithLocationFeed2.com"));
+    IFeed feed3 = fFactory.createFeed(null, new URI("http://www.testSearchNewsWithLocationFeed3.com"));
+
+    createNews(feed1, "First News of Feed One", "http://www.news.com/news1.html", State.UNREAD);
+    createNews(feed1, "Second News of Feed One", "http://www.news.com/news2.html", State.NEW);
+
+    DynamicDAO.save(feed1);
+    DynamicDAO.save(feed2);
+    DynamicDAO.save(feed3);
+
+    IBookMark rootMark1 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed1.getLink()), "rootMark1");
+    DynamicDAO.save(rootMark1);
+
+    IBookMark subRootMark1 = fFactory.createBookMark(null, subFolder, new FeedLinkReference(feed2.getLink()), "subRootMark1");
+    DynamicDAO.save(subRootMark1);
+
+    IBookMark subRootMark2 = fFactory.createBookMark(null, subFolder, new FeedLinkReference(feed3.getLink()), "subRootMark2");
+    DynamicDAO.save(subRootMark2);
+
+    /* Wait for Indexer */
+    waitForIndexer();
+
+    /* Location IS Empty Folder */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { emptyFolder })));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertEquals(0, result.size());
+    }
+  }
+
   private INews createNews(IFeed feed, String title, String link, INews.State state) throws URISyntaxException {
     INews news = fFactory.createNews(null, feed, new Date(System.currentTimeMillis()));
     news.setState(state);
