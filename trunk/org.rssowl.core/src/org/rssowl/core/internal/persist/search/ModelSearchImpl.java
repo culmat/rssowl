@@ -490,6 +490,10 @@ public class ModelSearchImpl implements IModelSearch {
       }
     }
 
+    /* The folder could be empty, make sure to add at least 1 Clause */
+    if (bQuery.clauses().isEmpty())
+      bQuery.add(new TermQuery(new Term(String.valueOf(INews.FEED), "")), Occur.SHOULD);
+
     return bQuery;
   }
 
