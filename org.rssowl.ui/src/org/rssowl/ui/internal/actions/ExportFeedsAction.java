@@ -36,6 +36,7 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
@@ -44,6 +45,7 @@ import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -120,7 +122,7 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
 
     for (IFolder folder : rootFolders) {
       String name = escape(folder.getName());
-      writer.write("<outline text=\"" + name + "\" rssowl:isSet=\"true\">\n");
+      writer.write("<outline text=\"" + name + "\" rssowl:isSet=\"true\" " + getIDAttribute(folder) + ">\n");
       exportToOPML(folder, writer);
       writer.write("</outline>\n");
     }
@@ -140,7 +142,7 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
       if (mark instanceof IBookMark) {
         String link = escape(((IBookMark) mark).getFeedLinkReference().getLink().toString());
 
-        writer.write("<outline text=\"" + name + "\" xmlUrl=\"" + link + "\" />\n");
+        writer.write("<outline text=\"" + name + "\" xmlUrl=\"" + link + "\" " + getIDAttribute(mark) + "/>\n");
       }
 
       /* Export SearchMark */
@@ -148,11 +150,7 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
         ISearchMark searchMark = (ISearchMark) mark;
         List<ISearchCondition> conditions = searchMark.getSearchConditions();
 
-        /* TODO Bug 604: Support import / export of location conditions in SMs */
-        if (containsLocationCondition(searchMark))
-          continue;
-
-        writer.write("<rssowl:savedsearch name=\"" + name + "\" matchAllConditions=\"" + searchMark.matchAllConditions() + "\">\n");
+        writer.write("<rssowl:savedsearch name=\"" + name + "\" matchAllConditions=\"" + searchMark.matchAllConditions() + "\" " + getIDAttribute(mark) + ">\n");
         for (ISearchCondition condition : conditions) {
           writer.write("\t<rssowl:searchcondition>\n");
           writer.write(toXML(condition));
@@ -162,23 +160,18 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
       }
     }
 
+    /* Export Folders */
     List<IFolder> childFolders = folder.getFolders();
     for (IFolder childFolder : childFolders) {
       String name = escape(childFolder.getName());
-      writer.write("<outline text=\"" + name + "\">\n");
+      writer.write("<outline text=\"" + name + "\" " + getIDAttribute(childFolder) + ">\n");
       exportToOPML(childFolder, writer);
       writer.write("</outline>\n");
     }
   }
 
-  private boolean containsLocationCondition(ISearchMark mark) {
-    List<ISearchCondition> searchConditions = mark.getSearchConditions();
-    for (ISearchCondition condition : searchConditions) {
-      if (condition.getField().getId() == INews.LOCATION)
-        return true;
-    }
-
-    return false;
+  private String getIDAttribute(IFolderChild entity) {
+    return "rssowl:id=\"" + entity.getId() + "\"";
   }
 
   private String escape(String str) {
@@ -196,8 +189,22 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
     /* Search Specifier */
     str.append("\t\t<rssowl:searchspecifier id=\"" + condition.getSpecifier().ordinal() + "\" />\n");
 
+    /* Search Condition: Location */
+    if (condition.getValue() instanceof Long[][]) {
+      List<IFolderChild> locations = ModelUtils.toEntities((Long[][]) condition.getValue());
+
+      str.append("\t\t<rssowl:searchvalue type=\"" + condition.getField().getSearchValueType().getId() + "\">\n");
+
+      for (IFolderChild child : locations) {
+        boolean isFolder = (child instanceof IFolder);
+        str.append("\t\t\t<rssowl:location isFolder=\"" + isFolder + "\" value=\"" + child.getId() + "\" />\n");
+      }
+
+      str.append("\t\t</rssowl:searchvalue>\n");
+    }
+
     /* Single Value */
-    if (!EnumSet.class.isAssignableFrom(condition.getValue().getClass()))
+    else if (!EnumSet.class.isAssignableFrom(condition.getValue().getClass()))
       str.append("\t\t<rssowl:searchvalue value=\"" + getValueString(condition) + "\" type=\"" + condition.getField().getSearchValueType().getId() + "\" />\n");
 
     /* Multiple Values */
