@@ -46,6 +46,7 @@ import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.connection.UnknownFeedException;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.interpreter.ParserException;
 import org.rssowl.core.persist.IBookMark;
@@ -53,6 +54,7 @@ import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IModelFactory;
@@ -67,6 +69,7 @@ import org.rssowl.core.persist.dao.IConditionalGetDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
+import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.event.BookMarkAdapter;
 import org.rssowl.core.persist.event.BookMarkEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -83,6 +86,7 @@ import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyPageWrapper;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import org.rssowl.ui.internal.notifier.NotificationService;
+import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
@@ -895,6 +899,12 @@ public class Controller {
     List<? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
     IFolder defaultContainer = (IFolder) types.get(0);
 
+    /* Map Old Id to IFolderChild */
+    Map<Long, IFolderChild> mapOldIdToFolderChild = ImportUtils.createOldIdToEntityMap(types);
+
+    /* Load SearchMarks containing location condition */
+    List<ISearchMark> locationConditionSearches = ImportUtils.getLocationConditionSearches(types);
+
     /* Load the current selected Set */
     String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
     Long selectedFolderID = fPrefsDAO.load(selectedBookMarkSetPref).getLong();
@@ -905,7 +915,13 @@ public class Controller {
 
     /* 1.) Handle Folders and Marks from default Container */
     {
-      reparentChildren(defaultContainer, selectedRootFolder);
+
+      /* Also update Map of Old ID */
+      if (defaultContainer.getProperty(ITypeImporter.ID_KEY) != null)
+        mapOldIdToFolderChild.put((Long) defaultContainer.getProperty(ITypeImporter.ID_KEY), selectedRootFolder);
+
+      /* Reparent and Save */
+      reparentAndSaveChildren(defaultContainer, selectedRootFolder);
       entitiesToReload.addAll(defaultContainer.getChildren());
     }
 
@@ -924,22 +940,39 @@ public class Controller {
 
       /* Reparent into Existing Set */
       if (existingSetFolder != null) {
-        reparentChildren(setFolder, existingSetFolder);
+
+        /* Also update Map of Old ID */
+        if (setFolder.getProperty(ITypeImporter.ID_KEY) != null)
+          mapOldIdToFolderChild.put((Long) setFolder.getProperty(ITypeImporter.ID_KEY), existingSetFolder);
+
+        /* Reparent and Save */
+        reparentAndSaveChildren(setFolder, existingSetFolder);
         entitiesToReload.addAll(existingSetFolder.getChildren());
       }
 
       /* Otherwise save as new Set */
       else {
+
+        /* Unset ID Property first */
+        ImportUtils.unsetIdProperty(setFolder);
+
+        /* Save */
         fFolderDAO.save(setFolder);
         entitiesToReload.add(setFolder);
       }
+    }
+
+    /* Fix locations in Search Marks if required and save */
+    if (!locationConditionSearches.isEmpty()) {
+      ImportUtils.updateLocationConditions(mapOldIdToFolderChild, locationConditionSearches);
+      DynamicDAO.getDAO(ISearchMarkDAO.class).saveAll(locationConditionSearches);
     }
 
     /* Reload imported Feeds */
     new ReloadTypesAction(new StructuredSelection(entitiesToReload), OwlUI.getPrimaryShell()).run();
   }
 
-  private void reparentChildren(IFolder from, IFolder to) {
+  private void reparentAndSaveChildren(IFolder from, IFolder to) {
     boolean changed = false;
 
     /* Reparent all imported folders into selected Set */
