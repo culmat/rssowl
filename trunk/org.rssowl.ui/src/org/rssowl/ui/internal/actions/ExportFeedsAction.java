@@ -114,7 +114,15 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
     }
   }
 
-  private void exportToOPML(File file, Set<IFolder> rootFolders) throws IOException, PersistenceException {
+  /**
+   * Public to use from Test
+   *
+   * @param file
+   * @param rootFolders
+   * @throws IOException
+   * @throws PersistenceException
+   */
+  public void exportToOPML(File file, Set<IFolder> rootFolders) throws IOException, PersistenceException {
     OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
     writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
     writer.write("<opml version=\"1.1\" xmlns:rssowl=\"http://www.rssowl.org\">\n");

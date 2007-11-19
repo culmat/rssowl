@@ -96,6 +96,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -906,12 +907,22 @@ public class Controller {
     List<ISearchMark> locationConditionSearches = ImportUtils.getLocationConditionSearches(types);
 
     /* Load the current selected Set */
-    String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
-    Long selectedFolderID = fPrefsDAO.load(selectedBookMarkSetPref).getLong();
-    IFolder selectedRootFolder = fFolderDAO.load(selectedFolderID);
+    IFolder selectedRootFolder;
+    if (!InternalOwl.TESTING) {
+      String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
+      Long selectedFolderID = fPrefsDAO.load(selectedBookMarkSetPref).getLong();
+      selectedRootFolder = fFolderDAO.load(selectedFolderID);
+    } else {
+      Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
+      selectedRootFolder = rootFolders.iterator().next();
+    }
 
     /* Load all Root Folders */
-    Set<IFolder> rootFolders = fCacheService.getRootFolders();
+    Set<IFolder> rootFolders;
+    if (!InternalOwl.TESTING)
+      rootFolders = fCacheService.getRootFolders();
+    else
+      rootFolders = new HashSet<IFolder>(DynamicDAO.getDAO(IFolderDAO.class).loadRoots());
 
     /* 1.) Handle Folders and Marks from default Container */
     {
@@ -969,7 +980,8 @@ public class Controller {
     }
 
     /* Reload imported Feeds */
-    new ReloadTypesAction(new StructuredSelection(entitiesToReload), OwlUI.getPrimaryShell()).run();
+    if (!InternalOwl.TESTING)
+      new ReloadTypesAction(new StructuredSelection(entitiesToReload), OwlUI.getPrimaryShell()).run();
   }
 
   private void reparentAndSaveChildren(IFolder from, IFolder to) {
