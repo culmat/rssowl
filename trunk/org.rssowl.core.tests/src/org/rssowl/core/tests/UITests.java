@@ -27,6 +27,7 @@ package org.rssowl.core.tests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.rssowl.core.tests.interpreter.ImportExportOPMLTest;
 import org.rssowl.core.tests.ui.CleanUpTests;
 import org.rssowl.core.tests.ui.EntityPropertyPageTests;
 import org.rssowl.core.tests.ui.ExpandingReaderTests;
@@ -54,6 +55,6 @@ import org.rssowl.core.tests.ui.TreeTraversalTest;
   TreeTraversalTest.class,
   MiscUITests.class,
   CleanUpTests.class,
-  ExpandingReaderTests.class
-})
+  ExpandingReaderTests.class,
+  ImportExportOPMLTest.class })
 public class UITests {}
