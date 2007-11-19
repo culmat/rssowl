@@ -31,10 +31,10 @@ import org.jdom.Namespace;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.interpreter.ITypeImporter;
-import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.ISearchField;
@@ -210,9 +210,34 @@ public class OPMLImporter implements ITypeImporter {
     Object value = null;
     int valueType = Integer.parseInt(valueElement.getAttributeValue("type"));
 
-    /* Treat set of News States separately */
+    List<?> locationElements = valueElement.getChildren("location", namespace);
     List<?> newsStateElements = valueElement.getChildren("newsstate", namespace);
-    if (newsStateElements.size() > 0) {
+
+    /* Treat set of Locations separately */
+    if (locationElements.size() > 0) {
+      List<Long> folderIds = new ArrayList<Long>(locationElements.size());
+      List<Long> bookmarkIds = new ArrayList<Long>(locationElements.size());
+
+      for (int i = 0; i < locationElements.size(); i++) {
+        Element locationElement = (Element) locationElements.get(i);
+        Long id = Long.parseLong(locationElement.getAttributeValue("value"));
+        boolean isFolder = Boolean.parseBoolean(locationElement.getAttributeValue("isFolder"));
+
+        if (isFolder)
+          folderIds.add(id);
+        else
+          bookmarkIds.add(id);
+      }
+
+      Long[][] result = new Long[2][];
+      result[0] = folderIds.toArray(new Long[folderIds.size()]);
+      result[1] = bookmarkIds.toArray(new Long[bookmarkIds.size()]);
+
+      return result;
+    }
+
+    /* Treat set of News States separately */
+    else if (newsStateElements.size() > 0) {
       List<INews.State> states = new ArrayList<INews.State>(newsStateElements.size());
       for (int i = 0; i < newsStateElements.size(); i++) {
         Element newsStateElement = (Element) newsStateElements.get(i);
@@ -270,7 +295,8 @@ public class OPMLImporter implements ITypeImporter {
   }
 
   private void processOutline(Element outline, IPersistable parent, List<IFolder> setFolders) {
-    IPersistable type = null;
+    IEntity type = null;
+    Long id = null;
     String title = null;
     String link = null;
     String homepage = null;
@@ -304,11 +330,19 @@ public class OPMLImporter implements ITypeImporter {
     }
 
     /* RSSOwl Namespace Attributes */
+    Attribute idAttribute = outline.getAttribute("id", fRSSOwlNamespace);
+    if (idAttribute != null)
+      id = Long.valueOf(idAttribute.getValue());
+
     boolean isSet = Boolean.parseBoolean(outline.getAttributeValue("isSet", fRSSOwlNamespace));
 
     /* Outline is a Folder */
     if (link == null && title != null) {
       type = Owl.getModelFactory().createFolder(null, isSet ? null : (IFolder) parent, title);
+
+      /* Assign old ID value */
+      if (id != null)
+        type.setProperty(ID_KEY, id);
 
       if (isSet)
         setFolders.add((IFolder) type);
@@ -334,11 +368,15 @@ public class OPMLImporter implements ITypeImporter {
         /* Create the BookMark */
         FeedLinkReference feedLinkRef = new FeedLinkReference(uri);
         type = Owl.getModelFactory().createBookMark(null, (IFolder) parent, feedLinkRef, title != null ? title : link);
+
+        /* Assign old ID value */
+        if (id != null)
+          type.setProperty(ID_KEY, id);
       }
     }
 
-    /* In case this Outline Element did not represent a Category */
-    if (type == null || type instanceof IBookMark)
+    /* In case this Outline Element did not represent a Folder */
+    if (type == null || type instanceof IMark)
       return;
 
     /* Recursivley Interpret Children */
