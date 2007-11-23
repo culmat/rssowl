@@ -553,8 +553,8 @@ public class ImportExportOPMLTest {
     assertEquals(INews.LOCATION, conditions.get(0).getField().getId());
     assertEquals(SearchSpecifier.IS, conditions.get(0).getSpecifier());
     assertEquals(2, locations.size());
-    assertEquals(true, locations.contains(fDefaultSet));
-//    assertEquals(true, locations.contains(fCustomSet));
+    assertContains("Default", locations);
+    assertContains("Custom", locations);
 
     /* 11) Location is Folder 1 */
     searchmark = searchmarks.get(10);
@@ -596,17 +596,20 @@ public class ImportExportOPMLTest {
     }
 
     assertEquals(3, locations.size());
-    assertEquals(true, locations.contains(fDefaultSet));
-    assertEquals(true, locations.contains(fCustomSet));
+    assertContains("Default", locations);
+    assertContains("Custom", locations);
+    assertContains("Bookmark 1", locations);
+  }
 
-    boolean containsBookMark = false;
-    for (IFolderChild location : locations) {
-      if (location instanceof IBookMark) {
-        assertEquals("Bookmark 1", location.getName());
-        containsBookMark = true;
+  private void assertContains(String name, List<IFolderChild> childs) {
+    boolean found = false;
+    for (IFolderChild child : childs) {
+      if (child.getName().equals(name)) {
+        found = true;
+        break;
       }
     }
 
-    assertEquals(true, containsBookMark);
+    assertEquals(true, found);
   }
 }
