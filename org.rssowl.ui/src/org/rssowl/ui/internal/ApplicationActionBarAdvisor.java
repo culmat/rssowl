@@ -85,6 +85,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
   /** End of the View Top Menu */
   public static final String M_VIEW_END = "viewEnd";
 
+  /* Some Action IDs */
+  private static final String TOGGLE_TOOLBAR_ID = "org.rssowl.ui.internal.ToggleToolBarAction";
+  private static final String TOGGLE_STATUS_ID = "org.rssowl.ui.internal.ToggleStatusAction";
+
   private IContributionItem fOpenWindowsItem;
   private IContributionItem fShowViewMenu;
   private IContributionItem fReopenEditors;
@@ -125,7 +129,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     /* Menu: Window */
     register(ActionFactory.OPEN_NEW_WINDOW.create(window));
     getAction(ActionFactory.OPEN_NEW_WINDOW.getId()).setText("&New Window");
-    register(ActionFactory.TOGGLE_COOLBAR.create(window));
+    //    register(ActionFactory.TOGGLE_COOLBAR.create(window));
     //    register(ActionFactory.RESET_PERSPECTIVE.create(window));
     //    register(ActionFactory.EDIT_ACTION_SETS.create(window));
     //    register(ActionFactory.ACTIVATE_EDITOR.create(window));
@@ -243,11 +247,64 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
   /* Menu: View */
   private void createViewMenu(IMenuManager menuBar) {
-    MenuManager viewMenu = new MenuManager("&View", M_VIEW);
+    final IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
+
+    final MenuManager viewMenu = new MenuManager("&View", M_VIEW);
     menuBar.add(viewMenu);
 
-    viewMenu.add(getAction(ActionFactory.TOGGLE_COOLBAR.getId()));
     viewMenu.add(new GroupMarker(M_VIEW_START));
+
+    /* Toggle State of Toolbar Visibility */
+    viewMenu.add(new Action("Toolbar", IAction.AS_CHECK_BOX) {
+      @Override
+      public void run() {
+        ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
+
+        boolean isToolBarVisible = preferences.getBoolean(DefaultPreferences.SHOW_TOOLBAR);
+        configurer.setToolBarVisible(!isToolBarVisible);
+        preferences.putBoolean(DefaultPreferences.SHOW_TOOLBAR, !isToolBarVisible);
+
+        viewMenu.find(getId()).update(IAction.CHECKED);
+      }
+
+      @Override
+      public boolean isChecked() {
+        return preferences.getBoolean(DefaultPreferences.SHOW_TOOLBAR);
+      }
+
+      @Override
+      public String getId() {
+        return TOGGLE_TOOLBAR_ID;
+      }
+    });
+
+    /* Toggle State of Status Bar Visibility */
+    viewMenu.add(new Action("Status", IAction.AS_CHECK_BOX) {
+      @Override
+      public void run() {
+        ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
+
+        boolean isStatusVisible = preferences.getBoolean(DefaultPreferences.SHOW_STATUS);
+        configurer.setStatusVisible(!isStatusVisible);
+        preferences.putBoolean(DefaultPreferences.SHOW_STATUS, !isStatusVisible);
+
+        viewMenu.find(getId()).update(IAction.CHECKED);
+      }
+
+      @Override
+      public boolean isChecked() {
+        return preferences.getBoolean(DefaultPreferences.SHOW_STATUS);
+      }
+
+      @Override
+      public String getId() {
+        return TOGGLE_STATUS_ID;
+      }
+    });
+
+    /* Toggle State of Bookmarks Visibility */
+    viewMenu.add(new Separator());
+
     viewMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
     viewMenu.add(new GroupMarker(M_VIEW_START));
   }
