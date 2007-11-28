@@ -209,6 +209,12 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Search Dialog: State of showing Preview */
   public static final String SEARCH_DIALOG_PREVIEW_VISIBLE = "org.rssowl.pref.SearchDialogPreviewVisible";
 
+  /** Global: Show Toolbar */
+  public static final String SHOW_TOOLBAR = "org.rssowl.pref.ShowToolbar";
+
+  /** Global: Show Statusbar */
+  public static final String SHOW_STATUS = "org.rssowl.pref.ShowStatus";
+
   /**
    * Eclipse Preferences Follow
    */
@@ -268,6 +274,8 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putBoolean(CONFIRM_DELETE_NEWS, true);
     defaultScope.putBoolean(SEARCH_DIALOG_PREVIEW_VISIBLE, true);
     defaultScope.putInteger(AUTOCLOSE_NOTIFICATION_VALUE, 8);
+    defaultScope.putBoolean(SHOW_TOOLBAR, true);
+    defaultScope.putBoolean(SHOW_STATUS, true);
   }
 
   private void initGlobalEclipseDefaults(IPreferenceScope defaultScope) {
