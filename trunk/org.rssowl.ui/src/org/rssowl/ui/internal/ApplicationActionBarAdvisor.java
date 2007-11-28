@@ -38,8 +38,11 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IActionDelegate;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.application.ActionBarAdvisor;
@@ -63,6 +66,7 @@ import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
+import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -84,10 +88,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
   /** End of the View Top Menu */
   public static final String M_VIEW_END = "viewEnd";
-
-  /* Some Action IDs */
-  private static final String TOGGLE_TOOLBAR_ID = "org.rssowl.ui.internal.ToggleToolBarAction";
-  private static final String TOGGLE_STATUS_ID = "org.rssowl.ui.internal.ToggleStatusAction";
 
   private IContributionItem fOpenWindowsItem;
   private IContributionItem fShowViewMenu;
@@ -249,64 +249,93 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
   private void createViewMenu(IMenuManager menuBar) {
     final IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
 
-    final MenuManager viewMenu = new MenuManager("&View", M_VIEW);
+    MenuManager viewMenu = new MenuManager("&View", M_VIEW);
+    viewMenu.setRemoveAllWhenShown(true);
     menuBar.add(viewMenu);
 
-    viewMenu.add(new GroupMarker(M_VIEW_START));
-
-    /* Toggle State of Toolbar Visibility */
-    viewMenu.add(new Action("Toolbar", IAction.AS_CHECK_BOX) {
+    /* Add dummy action to show the top level menu */
+    viewMenu.add(new Action("") {
       @Override
-      public void run() {
-        ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
-
-        boolean isToolBarVisible = preferences.getBoolean(DefaultPreferences.SHOW_TOOLBAR);
-        configurer.setToolBarVisible(!isToolBarVisible);
-        preferences.putBoolean(DefaultPreferences.SHOW_TOOLBAR, !isToolBarVisible);
-
-        viewMenu.find(getId()).update(IAction.CHECKED);
-      }
-
-      @Override
-      public boolean isChecked() {
-        return preferences.getBoolean(DefaultPreferences.SHOW_TOOLBAR);
-      }
-
-      @Override
-      public String getId() {
-        return TOGGLE_TOOLBAR_ID;
-      }
+      public void run() {}
     });
 
-    /* Toggle State of Status Bar Visibility */
-    viewMenu.add(new Action("Status", IAction.AS_CHECK_BOX) {
-      @Override
-      public void run() {
-        ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
+    /* Build Menu dynamically */
+    viewMenu.addMenuListener(new IMenuListener() {
+      public void menuAboutToShow(IMenuManager manager) {
+        manager.add(new GroupMarker(M_VIEW_START));
 
-        boolean isStatusVisible = preferences.getBoolean(DefaultPreferences.SHOW_STATUS);
-        configurer.setStatusVisible(!isStatusVisible);
-        preferences.putBoolean(DefaultPreferences.SHOW_STATUS, !isStatusVisible);
+        /* Toggle State of Toolbar Visibility */
+        manager.add(new Action("Toolbar", IAction.AS_CHECK_BOX) {
+          @Override
+          public void run() {
+            ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
 
-        viewMenu.find(getId()).update(IAction.CHECKED);
-      }
+            boolean isToolBarVisible = preferences.getBoolean(DefaultPreferences.SHOW_TOOLBAR);
+            configurer.setToolBarVisible(!isToolBarVisible);
+            preferences.putBoolean(DefaultPreferences.SHOW_TOOLBAR, !isToolBarVisible);
+          }
 
-      @Override
-      public boolean isChecked() {
-        return preferences.getBoolean(DefaultPreferences.SHOW_STATUS);
-      }
+          @Override
+          public boolean isChecked() {
+            return preferences.getBoolean(DefaultPreferences.SHOW_TOOLBAR);
+          }
+        });
 
-      @Override
-      public String getId() {
-        return TOGGLE_STATUS_ID;
+        /* Toggle State of Status Bar Visibility */
+        manager.add(new Action("Status", IAction.AS_CHECK_BOX) {
+          @Override
+          public void run() {
+            ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
+
+            boolean isStatusVisible = preferences.getBoolean(DefaultPreferences.SHOW_STATUS);
+            configurer.setStatusVisible(!isStatusVisible);
+            preferences.putBoolean(DefaultPreferences.SHOW_STATUS, !isStatusVisible);
+          }
+
+          @Override
+          public boolean isChecked() {
+            return preferences.getBoolean(DefaultPreferences.SHOW_STATUS);
+          }
+        });
+
+        /* Toggle State of Bookmarks Visibility */
+        manager.add(new Separator());
+        manager.add(new Action("Bookmarks", IAction.AS_CHECK_BOX) {
+          @Override
+          public void run() {
+            IWorkbenchPage page = OwlUI.getPage();
+            if (page != null) {
+              IViewPart explorerView = page.findView(BookMarkExplorer.VIEW_ID);
+
+              /* Hide Bookmarks */
+              if (explorerView != null)
+                page.hideView(explorerView);
+
+              /* Show Bookmarks */
+              else {
+                try {
+                  page.showView(BookMarkExplorer.VIEW_ID);
+                } catch (PartInitException e) {
+                  Activator.getDefault().logError(e.getMessage(), e);
+                }
+              }
+            }
+          }
+
+          @Override
+          public boolean isChecked() {
+            IWorkbenchPage page = OwlUI.getPage();
+            if (page != null)
+              return page.findView(BookMarkExplorer.VIEW_ID) != null;
+
+            return false;
+          }
+        });
+
+        manager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+        manager.add(new GroupMarker(M_VIEW_START));
       }
     });
-
-    /* Toggle State of Bookmarks Visibility */
-    viewMenu.add(new Separator());
-
-    viewMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
-    viewMenu.add(new GroupMarker(M_VIEW_START));
   }
 
   /* Menu: Go */
