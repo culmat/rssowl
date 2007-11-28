@@ -171,5 +171,4 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
     return res[0];
   }
-
 }
