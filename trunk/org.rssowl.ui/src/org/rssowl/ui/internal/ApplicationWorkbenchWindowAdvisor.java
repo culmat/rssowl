@@ -137,11 +137,43 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     fPreferences = Owl.getPreferenceService().getGlobalScope();
   }
 
+  void setToolBarVisible(boolean visible) {
+    getWindowConfigurer().setShowCoolBar(visible);
+
+    /* Hack: To avoid cheese, update Status Line Too */
+    boolean showsStatus = getWindowConfigurer().getShowStatusLine();
+    getWindowConfigurer().setShowStatusLine(!showsStatus);
+    getWindowConfigurer().setShowStatusLine(showsStatus);
+
+    getWindowConfigurer().getWindow().getShell().layout();
+  }
+
+  void setStatusVisible(boolean visible) {
+    getWindowConfigurer().setShowStatusLine(visible);
+    getWindowConfigurer().setShowProgressIndicator(visible);
+
+    /* Hack: To avoid cheese, update ToolBar Too */
+    boolean showsToolBar = getWindowConfigurer().getShowCoolBar();
+    getWindowConfigurer().setShowCoolBar(!showsToolBar);
+    getWindowConfigurer().setShowCoolBar(showsToolBar);
+
+    getWindowConfigurer().getWindow().getShell().layout();
+  }
+
   /*
    * @see org.eclipse.ui.application.WorkbenchWindowAdvisor#postWindowOpen()
    */
   @Override
   public void postWindowOpen() {
+
+    /* Toolbar & Status Visibility */
+    IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
+    if (!preferences.getBoolean(DefaultPreferences.SHOW_TOOLBAR))
+      setToolBarVisible(false);
+    if (!preferences.getBoolean(DefaultPreferences.SHOW_STATUS))
+      setStatusVisible(false);
+
+    /* System Tray */
     SafeRunner.run(new LoggingSafeRunnable() {
       public void run() throws Exception {
         boolean trayEnabled = false;
