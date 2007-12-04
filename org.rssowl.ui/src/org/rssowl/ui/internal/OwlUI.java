@@ -142,10 +142,10 @@ public class OwlUI {
   public static final ImageDescriptor NEWS_PINNED = Activator.getImageDescriptor("icons/obj16/news_pinned.gif"); //$NON-NLS-1$
 
   /** Tray Icon: Not Teasing */
-  public static final ImageDescriptor TRAY_OWL = Activator.getImageDescriptor("icons/elcl16/trayowl.gif"); //$NON-NLS-1$
+  public static final ImageDescriptor TRAY_OWL = Activator.getImageDescriptor("icons/elcl16/trayowl.png"); //$NON-NLS-1$
 
   /** Tray Icon: Teasing */
-  public static final ImageDescriptor TRAY_OWL_TEASING = Activator.getImageDescriptor("icons/elcl16/trayowl_tease.gif"); //$NON-NLS-1$
+  public static final ImageDescriptor TRAY_OWL_TEASING = Activator.getImageDescriptor("icons/elcl16/trayowl_tease.png"); //$NON-NLS-1$
 
   /** Info */
   public static final ImageDescriptor INFO = Activator.getImageDescriptor("icons/obj16/info.gif"); //$NON-NLS-1$

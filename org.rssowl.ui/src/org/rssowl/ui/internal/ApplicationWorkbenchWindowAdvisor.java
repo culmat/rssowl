@@ -37,6 +37,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -165,6 +166,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
    */
   @Override
   public void postWindowOpen() {
+    final Shell shell = getWindowConfigurer().getWindow().getShell();
 
     /* Toolbar & Status Visibility */
     IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
@@ -173,11 +175,19 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     if (!preferences.getBoolean(DefaultPreferences.SHOW_STATUS))
       setStatusVisible(false);
 
+    /* Use PNG on Windows and Linux */
+    if (Application.IS_WINDOWS || Application.IS_LINUX) {
+      Image[] shellImg = new Image[3];
+      shellImg[0] = OwlUI.getImage(shell, "icons/product/16x16.png");
+      shellImg[1] = OwlUI.getImage(shell, "icons/product/24x24.png");
+      shellImg[2] = OwlUI.getImage(shell, "icons/product/32x32.png");
+      shell.setImages(shellImg);
+    }
+
     /* System Tray */
     SafeRunner.run(new LoggingSafeRunnable() {
       public void run() throws Exception {
         boolean trayEnabled = false;
-        Shell shell = getWindowConfigurer().getWindow().getShell();
 
         /* Hook TrayItem if supported on OS and 1st Window */
         if (fPreferences.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE) || fPreferences.getBoolean(DefaultPreferences.TRAY_ON_CLOSE) || fPreferences.getBoolean(DefaultPreferences.TRAY_ON_START))
