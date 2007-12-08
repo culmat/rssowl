@@ -156,8 +156,16 @@ public class DBManager {
         migrationResult = migrate(workspaceVersion, getCurrentFormatVersion(), subMonitor.newChild(10));
       }
 
-      if (!defragmentIfNecessary(progressMonitor, subMonitor) && migrationResult.isDefragmentDatabase())
-        defragment(progressMonitor, subMonitor);
+      if (!defragmentIfNecessary(progressMonitor, subMonitor)) {
+        if (migrationResult.isDefragmentDatabase())
+          defragment(progressMonitor, subMonitor);
+        /*
+         * We only run the time-based back-up if a defragment has not taken
+         * place because we always back-up during defragment.
+         */
+        else
+          backUpIfNecessary();
+      }
 
       fObjectContainer = createObjectContainer(config);
 
@@ -185,6 +193,58 @@ public class DBManager {
     }
   }
 
+  private void backUpIfNecessary() {
+    File lastBackUpFile = getDBLastBackUpFile();
+    if (!lastBackUpFile.exists()) {
+      finishDBBackUp();
+      return;
+    }
+
+    try {
+      long lastBackUpDate = Long.parseLong(readFirstLineFromFile(lastBackUpFile));
+      long now = System.currentTimeMillis();
+      if (now - lastBackUpDate > (1000 * 60 * 60 * 24 * 7)) {
+        File dbFile = new File(getDBFilePath());
+        File backUpFile = prepareDBBackupFile();
+        copyFile(dbFile, backUpFile);
+        finishDBBackUp();
+      }
+    } catch (NumberFormatException e) {
+      throw new PersistenceException("lastbackup file does not contain a number for the date as expected", e);
+    }
+  }
+
+  private void finishDBBackUp() {
+    File lastBackUpFile = getDBLastBackUpFile();
+    if (!lastBackUpFile.exists()) {
+      try {
+        lastBackUpFile.createNewFile();
+      } catch (IOException e) {
+        throw new PersistenceException("Failed to create new file", e);
+      }
+    }
+    writeToFile(lastBackUpFile, String.valueOf(System.currentTimeMillis()));
+  }
+
+  private String readFirstLineFromFile(File file) {
+    BufferedReader reader = null;
+    try {
+      reader = new BufferedReader(new FileReader(file));
+      String text = reader.readLine();
+      return text;
+    } catch (IOException e) {
+      throw new PersistenceException(e);
+    } finally {
+      closeCloseable(reader);
+    }
+  }
+
+  private File getDBLastBackUpFile() {
+    File dir = new File(Activator.getDefault().getStateLocation().toOSString());
+    File lastBackUpFile = new File(dir, "lastbackup");
+    return lastBackUpFile;
+  }
+
   private MigrationResult migrate(int workspaceFormat, int currentFormat, IProgressMonitor progressMonitor) {
     ConfigurationFactory configFactory = new ConfigurationFactory() {
       public Configuration createConfiguration() {
@@ -198,7 +258,7 @@ public class DBManager {
 
     /* Create a copy of the db file to use for the migration */
     File dbFile = new File(getDBFilePath());
-    String migDbFileName = getDBFilePath() + ".mig";
+    String migDbFileName = getDBFilePath() + ".mig.temp";
     File migDbFile = new File(migDbFileName);
     copyFile(dbFile, migDbFile);
 
@@ -206,14 +266,14 @@ public class DBManager {
     MigrationResult migrationResult = migration.migrate(configFactory, migDbFileName, progressMonitor);
 
     /*
-     * Copy the db file to a permanent back where the file name includes the
+     * Copy the db file to a permanent back-up where the file name includes the
      * workspaceFormat number.
      */
-    File backupDbFile = new File(getDBFilePath() + ".bak." + workspaceFormat);
+    File backupDbFile = new File(getDBFilePath() + ".mig." + workspaceFormat);
     copyFile(dbFile, backupDbFile);
 
     File dbFormatFile = getDBFormatFile();
-    File migFormatFile = new File(dbFormatFile.getAbsolutePath() + ".mig");
+    File migFormatFile = new File(dbFormatFile.getAbsolutePath() + ".mig.temp");
     try {
       if (!migFormatFile.exists()) {
         migFormatFile.createNewFile();
@@ -278,20 +338,12 @@ public class DBManager {
       if (!formatFileExists)
         return 0;
 
-      BufferedReader reader = null;
+      String versionText = readFirstLineFromFile(formatFile);
       try {
-        reader = new BufferedReader(new FileReader(formatFile));
-        String versionText = reader.readLine();
-        try {
-          int version = Integer.parseInt(versionText);
-          return version;
-        } catch (NumberFormatException e) {
-          throw new PersistenceException("Format file does not contain a number as the version", e);
-        }
-      } catch (IOException e) {
-        throw new PersistenceException(e);
-      } finally {
-        closeCloseable(reader);
+        int version = Integer.parseInt(versionText);
+        return version;
+      } catch (NumberFormatException e) {
+        throw new PersistenceException("Format file does not contain a number as the version", e);
       }
     }
     /*
@@ -318,18 +370,21 @@ public class DBManager {
       }
   }
 
-  private void setFormatVersion(File formatFile) {
+  private void writeToFile(File file, String text) {
     BufferedWriter writer = null;
     try {
-      writer = new BufferedWriter(new FileWriter(formatFile));
-      String s = String.valueOf(getCurrentFormatVersion());
-      writer.write(s);
+      writer = new BufferedWriter(new FileWriter(file));
+      writer.write(text);
       writer.flush();
     } catch (IOException e) {
       throw new PersistenceException(e);
     } finally {
       closeCloseable(writer);
     }
+  }
+
+  private void setFormatVersion(File formatFile) {
+    writeToFile(formatFile, String.valueOf(getCurrentFormatVersion()));
   }
 
   private int getCurrentFormatVersion() {
@@ -366,18 +421,19 @@ public class DBManager {
     }
 
     File file = new File(getDBFilePath());
-    File backupFile = getDBBackupFile();
+    File backupFile = prepareDBBackupFile();
     if (!file.renameTo(backupFile)) {
       throw new PersistenceException("Failed to rename file: " + file + " to: "
           + backupFile);
     }
+    finishDBBackUp();
     copyDatabase(backupFile, file, monitor);
   }
 
   @SuppressWarnings("unused")
   private void db4oDefrag(Configuration config, File defragmentFile) {
     DefragmentConfig defragConfig = new DefragmentConfig(getDBFilePath(),
-        getDBBackupFile().getAbsolutePath());
+        prepareDBBackupFile().getAbsolutePath());
     defragConfig.db4oConfig(config);
     try {
       Defragment.defrag(defragConfig);
@@ -392,10 +448,10 @@ public class DBManager {
   }
 
   /**
-   * @return the File for the most recent back-up files and deletes and renames
+   * @return the File for the most recent back-up file and deletes and renames
    * the other back-up files as appropriate.
    */
-  private File getDBBackupFile() {
+  private File prepareDBBackupFile() {
     String dbFilePath = getDBFilePath();
     final String backupFilePath = dbFilePath + ".backup";
     final File backupFile = new File(backupFilePath);
