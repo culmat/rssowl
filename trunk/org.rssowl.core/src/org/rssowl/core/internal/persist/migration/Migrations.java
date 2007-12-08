@@ -25,18 +25,32 @@ package org.rssowl.core.internal.persist.migration;
 
 import org.rssowl.core.internal.persist.service.Migration;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This object is responsible for holding the currently supported migrations
+ * and making them available on request.
+ */
 public final class Migrations {
 
   private final List<Migration> fMigrations;
-  
+
+  /**
+   * Creates an instance of this object.
+   */
   public Migrations() {
-    fMigrations = new ArrayList<Migration>(0);
-    // No migrations included by default
+    fMigrations = Arrays.<Migration>asList(new Migration1To2());
   }
 
+  /**
+   * Returns a Migration that satisfies {@code originFormat} and
+   * {@code destinationFormat} or {@code null} if none can be found.
+   *
+   * @param originFormat The current format of the database.
+   * @param destinationFormat The desired format of the database.
+   * @return a Migration or {@code} null.
+   */
   public final Migration getMigration(int originFormat, int destinationFormat) {
     for (Migration migration : fMigrations) {
       if (migration.getOriginFormat() == originFormat && migration.getDestinationFormat() == destinationFormat) {
