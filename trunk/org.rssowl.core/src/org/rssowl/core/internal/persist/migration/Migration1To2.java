@@ -53,7 +53,7 @@ public class Migration1To2 implements Migration   {
     return 1;
   }
 
-  public boolean migrate(ConfigurationFactory configFactory, String dbFileName, IProgressMonitor progressMonitor) {
+  public MigrationResult migrate(ConfigurationFactory configFactory, String dbFileName, IProgressMonitor progressMonitor) {
     final int totalProgress = 100;
     int totalProgressIncremented = 0;
     progressMonitor.beginTask("Migrating data", totalProgress);
@@ -122,7 +122,7 @@ public class Migration1To2 implements Migration   {
 
     oc.close();
     progressMonitor.worked(totalProgress - totalProgressIncremented);
-    return false;
-  }
 
+    return new MigrationResult(false, true, true);
+  }
 }

@@ -37,6 +37,7 @@ import org.rssowl.core.internal.persist.Folder;
 import org.rssowl.core.internal.persist.Label;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.Preference;
+import org.rssowl.core.internal.persist.migration.MigrationResult;
 import org.rssowl.core.internal.persist.migration.Migrations;
 import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.service.IModelSearch;
@@ -145,17 +146,18 @@ public class DBManager {
   public void createDatabase(LongOperationMonitor progressMonitor) throws PersistenceException {
     Configuration config = createConfiguration();
     int workspaceVersion = getWorkspaceFormatVersion();
-    boolean reindexRequired = false;
+    MigrationResult migrationResult = new MigrationResult(false, false, false);
 
     SubMonitor subMonitor = null;
     try {
       if (workspaceVersion != getCurrentFormatVersion()) {
         progressMonitor.beginLongOperation();
         subMonitor = SubMonitor.convert(progressMonitor, "Please wait while RSSOwl migrates data to the new version", 100);
-        reindexRequired = migrate(workspaceVersion, getCurrentFormatVersion(), subMonitor.newChild(10));
+        migrationResult = migrate(workspaceVersion, getCurrentFormatVersion(), subMonitor.newChild(10));
       }
 
-      defragmentIfNecessary(progressMonitor, subMonitor);
+      if (!defragmentIfNecessary(progressMonitor, subMonitor) && migrationResult.isDefragmentDatabase())
+        defragment(progressMonitor, subMonitor);
 
       fObjectContainer = createObjectContainer(config);
 
@@ -165,11 +167,14 @@ public class DBManager {
        * If reindexRequired is true, subMonitor is guaranteed to be non-null,
        * but we have the check anyway to
        */
-      if (reindexRequired) {
-        IModelSearch modelSearch = InternalOwl.getDefault().getPersistenceService().getModelSearch();
+      IModelSearch modelSearch = InternalOwl.getDefault().getPersistenceService().getModelSearch();
+      if (migrationResult.isReindex()) {
         modelSearch.startup();
         modelSearch.reindexAll(subMonitor.newChild(80));
       }
+      if (migrationResult.isOptimizeIndex())
+        modelSearch.optimize();
+
     } finally {
       /*
        * If we perform the migration, the subMonitor is not null. Otherwise we
@@ -180,7 +185,7 @@ public class DBManager {
     }
   }
 
-  private boolean migrate(int workspaceFormat, int currentFormat, IProgressMonitor progressMonitor) {
+  private MigrationResult migrate(int workspaceFormat, int currentFormat, IProgressMonitor progressMonitor) {
     ConfigurationFactory configFactory = new ConfigurationFactory() {
       public Configuration createConfiguration() {
         return DBManager.createConfiguration();
@@ -198,7 +203,7 @@ public class DBManager {
     copyFile(dbFile, migDbFile);
 
     /* Migrate the copy */
-    boolean reindexRequired = migration.migrate(configFactory, migDbFileName, progressMonitor);
+    MigrationResult migrationResult = migration.migrate(configFactory, migDbFileName, progressMonitor);
 
     /*
      * Copy the db file to a permanent back where the file name includes the
@@ -238,7 +243,7 @@ public class DBManager {
       }
     }
 
-    return reindexRequired;
+    return migrationResult;
   }
 
   private void copyFile(File originFile, File destinationFile) {
@@ -331,11 +336,19 @@ public class DBManager {
     return 1;
   }
 
-  private void defragmentIfNecessary(LongOperationMonitor progressMonitor, SubMonitor subMonitor) {
+  private boolean defragmentIfNecessary(LongOperationMonitor progressMonitor, SubMonitor subMonitor) {
     File defragmentFile = getDefragmentFile();
     if (!defragmentFile.exists()) {
-      return;
+      return false;
     }
+    defragment(progressMonitor, subMonitor);
+    if (!defragmentFile.delete()) {
+      Activator.getDefault().logError("Failed to delete defragment file", null);
+    }
+    return true;
+  }
+
+  private void defragment(LongOperationMonitor progressMonitor, SubMonitor subMonitor) {
     IProgressMonitor monitor;
     if (subMonitor == null) {
       progressMonitor.beginLongOperation();
@@ -359,9 +372,6 @@ public class DBManager {
           + backupFile);
     }
     copyDatabase(backupFile, file, monitor);
-    if (!defragmentFile.delete()) {
-      Activator.getDefault().logError("Failed to delete defragment file", null);
-    }
   }
 
   @SuppressWarnings("unused")
