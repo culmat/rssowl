@@ -124,6 +124,7 @@ public class NotificationPopup extends PopupDialog {
   private Image fNextImageNormal;
   private Image fNextImagePressed;
   private Image fNextImageDisabled;
+  private Image fTitleBgImage;
   private CLabel fNextButton;
   private CLabel fPrevButton;
   private int fDisplayOffset;
@@ -467,8 +468,9 @@ public class NotificationPopup extends PopupDialog {
       @Override
       public void controlResized(ControlEvent e) {
         Rectangle clArea = titleCircle.getClientArea();
-        Image newBGImage = new Image(titleCircle.getDisplay(), clArea.width, clArea.height);
-        GC gc = new GC(newBGImage);
+        Image oldBgImage = fTitleBgImage;
+        fTitleBgImage = new Image(titleCircle.getDisplay(), clArea.width, clArea.height);
+        GC gc = new GC(fTitleBgImage);
 
         /* Gradient */
         drawGradient(gc, clArea);
@@ -478,11 +480,10 @@ public class NotificationPopup extends PopupDialog {
 
         gc.dispose();
 
-        Image oldBGImage = titleCircle.getBackgroundImage();
-        titleCircle.setBackgroundImage(newBGImage);
+        titleCircle.setBackgroundImage(fTitleBgImage);
 
-        if (oldBGImage != null)
-          oldBGImage.dispose();
+        if (oldBgImage != null)
+          oldBgImage.dispose();
       }
 
       private void drawGradient(GC gc, Rectangle clArea) {
@@ -695,6 +696,8 @@ public class NotificationPopup extends PopupDialog {
     fResources.dispose();
     if (fLastUsedRegion != null)
       fLastUsedRegion.dispose();
+    if (fTitleBgImage != null)
+      fTitleBgImage.dispose();
 
     return super.close();
   }
