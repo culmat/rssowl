@@ -21,36 +21,29 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.internal.persist.service;
+package org.rssowl.core.internal.persist.migration;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.rssowl.core.internal.persist.migration.MigrationResult;
+public final class MigrationResult {
+  private final boolean reindex;
+  private final boolean optimizeIndex;
+  private final boolean defragmentDatabase;
 
-/**
- * Implementations of this interface are able to migrate the database data from
- * one format version to another.
- */
-public interface Migration {
-  /**
-   * @return the format version that the implementation can migrate from.
-   */
-  int getOriginFormat();
+  public MigrationResult(boolean reindex, boolean optimizeIndex,
+      boolean defragmentDatabase) {
+    this.reindex = reindex;
+    this.optimizeIndex = optimizeIndex;
+    this.defragmentDatabase = defragmentDatabase;
+  }
 
-  /**
-   * @return the format version that the implementation can migrate to.
-   */
-  int getDestinationFormat();
+  public final boolean isReindex() {
+    return reindex;
+  }
 
-  /**
-   * Perform the migration. Implementations are responsible for making sure
-   * that all object containers are closed at the end of the script.
-   *
-   * @param configFactory
-   * @param dbFileName
-   * @param progressMonitor
-   *
-   * @return MigrationResult indicating actions that should be performed
-   * at some point after the migration.
-   */
-  MigrationResult migrate(ConfigurationFactory configFactory, String dbFileName, IProgressMonitor progressMonitor);
+  public final boolean isOptimizeIndex() {
+    return optimizeIndex;
+  }
+
+  public final boolean isDefragmentDatabase() {
+    return defragmentDatabase;
+  }
 }
