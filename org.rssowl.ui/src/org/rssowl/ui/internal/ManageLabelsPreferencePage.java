@@ -102,11 +102,13 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     private Image fColorImage;
     private RGB fSelectedColor;
     private String fName;
+    private Collection<ILabel> fAllLabels;
 
     LabelDialog(Shell parentShell, DialogMode mode, ILabel label) {
       super(parentShell);
       fMode = mode;
       fExistingLabel = label;
+      fAllLabels = DynamicDAO.loadAll(ILabel.class);
 
       if (fExistingLabel != null)
         fSelectedColor = OwlUI.getRGB(fExistingLabel);
@@ -157,6 +159,12 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
           fNameInput.selectAll();
           fNameInput.setFocus();
         }
+
+        fNameInput.addModifyListener(new ModifyListener() {
+          public void modifyText(ModifyEvent e) {
+            onModifyName();
+          }
+        });
       }
 
       /* Color */
@@ -187,6 +195,19 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
       return composite;
     }
 
+    private void onModifyName() {
+      boolean labelExists = false;
+
+      for (ILabel label : fAllLabels) {
+        if (label.getName().equals(fNameInput.getText()) && label != fExistingLabel) {
+          labelExists = true;
+          break;
+        }
+      }
+
+      getButton(IDialogConstants.OK_ID).setEnabled(!labelExists && fNameInput.getText().length() > 0);
+    }
+
     /*
      * @see org.eclipse.jface.dialogs.Dialog#createButtonBar(org.eclipse.swt.widgets.Composite)
      */
@@ -198,14 +219,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
       Control control = super.createButtonBar(parent);
 
-      /* Update OK Button based on Input */
-      fNameInput.addModifyListener(new ModifyListener() {
-        public void modifyText(ModifyEvent e) {
-          getButton(IDialogConstants.OK_ID).setEnabled(fNameInput.getText().length() > 0);
-        }
-      });
-
-      /* Udate now */
+      /* Udate enablement */
       getButton(IDialogConstants.OK_ID).setEnabled(fNameInput.getText().length() > 0);
 
       return control;
