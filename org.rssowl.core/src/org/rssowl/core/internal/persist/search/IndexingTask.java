@@ -63,8 +63,12 @@ public final class IndexingTask implements ITask {
 
   IndexingTask(Indexer indexer, Collection<INews> news, EventType taskType) {
     fIndexer = indexer;
-    fNews = new ArrayList<INews>(news.size());
-    fNews.addAll(news);
+
+    if (news instanceof List)
+      fNews = (List<INews>) news;
+    else
+      fNews = new ArrayList<INews>(news);
+
     fTaskType = taskType;
   }
 
