@@ -309,6 +309,6 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
     query.constrain(News.class);
     query.descend("fLabels").constrain(label);
 
-    return getList(query);
+    return new ArrayList<INews>(getList(query));
   }
 }
