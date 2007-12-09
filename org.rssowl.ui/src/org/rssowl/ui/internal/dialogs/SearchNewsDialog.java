@@ -461,7 +461,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
       FeedLinkReference feedRef = scoredNews.getNews().getFeedReference();
       IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(feedRef);
       if (bookMark != null)
-        return bookMark.getName();
+        return StringUtils.replaceAll(bookMark.getName(), "&", "&&");
 
       return null;
     }
