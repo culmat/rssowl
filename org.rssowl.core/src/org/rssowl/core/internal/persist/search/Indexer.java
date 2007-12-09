@@ -19,19 +19,24 @@ import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.INewsDAO;
+import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.event.LabelAdapter;
 import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.event.runnable.EventType;
+import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.JobQueue;
+import org.rssowl.core.util.SearchHit;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -282,15 +287,27 @@ public class Indexer {
       public void entitiesUpdated(Set<LabelEvent> events) {
 
         /* Re-Index all News when a containing Label updates */
+        ISearchField searchField = Owl.getModelFactory().createSearchField(INews.LABEL, INews.class.getName());
+
+        Set<Long> newsIndexed = new HashSet<Long>();
         for (LabelEvent labelEvent : events) {
           ILabel updatedLabel = labelEvent.getEntity();
-          Collection<INews> news = DynamicDAO.getDAO(INewsDAO.class).loadAll(updatedLabel);
+          ISearchCondition searchCondition = Owl.getModelFactory().createSearchCondition(searchField, SearchSpecifier.IS, updatedLabel.getName());
+          List<SearchHit<NewsReference>> hits = Owl.getPersistenceService().getModelSearch().searchNews(Collections.singletonList(searchCondition), true);
 
-          if (!news.isEmpty()) {
+          List<INews> newsList = new ArrayList<INews>(hits.size());
+          for (SearchHit<NewsReference> hit : hits) {
+            INews news = hit.getResult().resolve();
+            if (!newsIndexed.contains(news.getId())) {
+              newsList.add(news);
+              newsIndexed.add(news.getId());
+            }
+          }
+          if (!newsList.isEmpty()) {
             if (!InternalOwl.TESTING)
-              fJobQueue.schedule(new IndexingTask(Indexer.this, news, EventType.UPDATE));
+              fJobQueue.schedule(new IndexingTask(Indexer.this, newsList, EventType.UPDATE));
             else
-              new IndexingTask(Indexer.this, news, EventType.UPDATE).run(new NullProgressMonitor());
+              new IndexingTask(Indexer.this, newsList, EventType.UPDATE).run(new NullProgressMonitor());
           }
         }
       }
