@@ -298,7 +298,7 @@ public class Indexer {
           List<INews> newsList = new ArrayList<INews>(hits.size());
           for (SearchHit<NewsReference> hit : hits) {
             INews news = hit.getResult().resolve();
-            if (!newsIndexed.contains(news.getId())) {
+            if (news != null && !newsIndexed.contains(news.getId())) {
               newsList.add(news);
               newsIndexed.add(news.getId());
             }
