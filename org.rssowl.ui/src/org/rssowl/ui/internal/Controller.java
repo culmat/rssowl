@@ -1010,7 +1010,7 @@ public class Controller {
 
   private IStatus createWarningStatus(IStatus status, IBookMark bookmark, URI feedLink) {
     StringBuilder msg = new StringBuilder();
-    msg.append("Error loading '").append(bookmark.getName()).append("'");
+    msg.append("Error loading '").append(bookmark.getName()).append("' ");
 
     if (StringUtils.isSet(status.getMessage()))
       msg.append("\nProblem: ").append(status.getMessage());
