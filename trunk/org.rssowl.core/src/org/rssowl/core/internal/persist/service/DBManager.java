@@ -388,7 +388,7 @@ public class DBManager {
   }
 
   private int getCurrentFormatVersion() {
-    return 1;
+    return 2;
   }
 
   private boolean defragmentIfNecessary(LongOperationMonitor progressMonitor, SubMonitor subMonitor) {
