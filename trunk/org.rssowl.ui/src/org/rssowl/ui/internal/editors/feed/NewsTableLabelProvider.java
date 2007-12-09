@@ -181,7 +181,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     FeedLinkReference feedRef = news.getFeedReference();
     IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(feedRef);
     if (bookMark != null)
-      return bookMark.getName();
+      return StringUtils.replaceAll(bookMark.getName(), "&", "&&");
 
     return null;
   }
