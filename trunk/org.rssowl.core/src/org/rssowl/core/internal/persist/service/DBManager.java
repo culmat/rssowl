@@ -172,14 +172,15 @@ public class DBManager {
       fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
 
       /*
-       * If reindexRequired is true, subMonitor is guaranteed to be non-null,
-       * but we have the check anyway to
+       * If reindexRequired is true, subMonitor is guaranteed to be non-null
        */
       IModelSearch modelSearch = InternalOwl.getDefault().getPersistenceService().getModelSearch();
-      if (migrationResult.isReindex()) {
+      if (migrationResult.isReindex() || migrationResult.isOptimizeIndex())
         modelSearch.startup();
+
+      if (migrationResult.isReindex())
         modelSearch.reindexAll(subMonitor.newChild(80));
-      }
+
       if (migrationResult.isOptimizeIndex())
         modelSearch.optimize();
 
