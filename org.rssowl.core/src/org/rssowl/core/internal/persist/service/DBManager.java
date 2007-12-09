@@ -153,7 +153,9 @@ public class DBManager {
       if (workspaceVersion != getCurrentFormatVersion()) {
         progressMonitor.beginLongOperation();
         subMonitor = SubMonitor.convert(progressMonitor, "Please wait while RSSOwl migrates data to the new version", 100);
-        migrationResult = migrate(workspaceVersion, getCurrentFormatVersion(), subMonitor.newChild(10));
+        //TODO Have a better way to allocate the ticks to the child. We need
+        //to be able to do it dynamically based on whether a reindex is required or not.
+        migrationResult = migrate(workspaceVersion, getCurrentFormatVersion(), subMonitor.newChild(70));
       }
 
       if (!defragmentIfNecessary(progressMonitor, subMonitor)) {
@@ -179,7 +181,7 @@ public class DBManager {
         modelSearch.startup();
 
       if (migrationResult.isReindex())
-        modelSearch.reindexAll(subMonitor.newChild(80));
+        modelSearch.reindexAll(subMonitor.newChild(20));
 
       if (migrationResult.isOptimizeIndex())
         modelSearch.optimize();
@@ -405,7 +407,7 @@ public class DBManager {
   }
 
   private void defragment(LongOperationMonitor progressMonitor, SubMonitor subMonitor) {
-    IProgressMonitor monitor;
+    SubMonitor monitor;
     if (subMonitor == null) {
       progressMonitor.beginLongOperation();
       String monitorText = "Please wait while RSSOwl cleans up the database";
@@ -419,6 +421,7 @@ public class DBManager {
       monitor.beginTask(monitorText, 100);
     } else {
       monitor = subMonitor.newChild(10);
+      monitor.setWorkRemaining(100);
     }
 
     File file = new File(getDBFilePath());
