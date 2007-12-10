@@ -35,17 +35,17 @@ import org.rssowl.core.persist.event.runnable.NewsEventRunnable;
  * In order to retrieve the Model-Object that is affected on the Event, use the
  * <code>resolve()</code> Method of the <code>ModelReference</code> stored
  * in this Event.
- * 
+ *
  * @author bpasero
  */
 public final class NewsEvent extends ModelEvent {
 
   private final INews fOldNews;
-  
+
   /**
    * Stores an instance of <code>ModelReference</code> for the affected Type
    * in this Event.
-   * 
+   *
    * @param news An instance of <code>ModelReference</code> for the
    * affected Type.
    */
@@ -56,10 +56,10 @@ public final class NewsEvent extends ModelEvent {
 
   /**
    * Creates an instance of this event type.
-   * 
-   * @param oldNews The previous saved version of the affected type
+   *
+   * @param oldNews The previous saved version of the affected type or
+   * <code>null</code> if not known.
    * @param currentNews The affected type.
-   * this event took place or <code>null</code> if not known.
    * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
    * <code>FALSE</code> otherwise.
    */
@@ -80,7 +80,7 @@ public final class NewsEvent extends ModelEvent {
   public NewsEventRunnable createEventRunnable() {
     return new NewsEventRunnable();
   }
-  
+
   /**
    * @return The previous saved version of the affected type.
    */
