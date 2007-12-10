@@ -51,7 +51,7 @@ public final class LabelDAOImpl extends AbstractEntityDAO<ILabel, LabelListener,
 
   @Override
   protected final LabelEvent createDeleteEventTemplate(ILabel entity) {
-    return createSaveEventTemplate(entity);
+    return new LabelEvent(null, entity, true);
   }
 
   @Override
@@ -70,6 +70,7 @@ public final class LabelDAOImpl extends AbstractEntityDAO<ILabel, LabelListener,
 
   @Override
   protected final LabelEvent createSaveEventTemplate(ILabel entity) {
-    return new LabelEvent(entity, true);
+    ILabel oldLabel = fDb.ext().peekPersisted(entity, Integer.MAX_VALUE, true);
+    return new LabelEvent(oldLabel, entity, true);
   }
 }

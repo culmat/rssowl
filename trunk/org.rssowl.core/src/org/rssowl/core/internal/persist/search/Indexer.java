@@ -291,23 +291,26 @@ public class Indexer {
 
         Set<Long> newsIndexed = new HashSet<Long>();
         for (LabelEvent labelEvent : events) {
+          ILabel oldLabel = labelEvent.getOldLabel();
           ILabel updatedLabel = labelEvent.getEntity();
-          ISearchCondition searchCondition = Owl.getModelFactory().createSearchCondition(searchField, SearchSpecifier.IS, updatedLabel.getName());
-          List<SearchHit<NewsReference>> hits = Owl.getPersistenceService().getModelSearch().searchNews(Collections.singletonList(searchCondition), true);
+          if (!oldLabel.getName().equals(updatedLabel.getName())) {
+            ISearchCondition searchCondition = Owl.getModelFactory().createSearchCondition(searchField, SearchSpecifier.IS, oldLabel.getName());
+            List<SearchHit<NewsReference>> hits = Owl.getPersistenceService().getModelSearch().searchNews(Collections.singletonList(searchCondition), true);
 
-          List<INews> newsList = new ArrayList<INews>(hits.size());
-          for (SearchHit<NewsReference> hit : hits) {
-            INews news = hit.getResult().resolve();
-            if (news != null && !newsIndexed.contains(news.getId())) {
-              newsList.add(news);
-              newsIndexed.add(news.getId());
+            List<INews> newsList = new ArrayList<INews>(hits.size());
+            for (SearchHit<NewsReference> hit : hits) {
+              INews news = hit.getResult().resolve();
+              if (news != null && !newsIndexed.contains(news.getId())) {
+                newsList.add(news);
+                newsIndexed.add(news.getId());
+              }
             }
-          }
-          if (!newsList.isEmpty()) {
-            if (!InternalOwl.TESTING)
-              fJobQueue.schedule(new IndexingTask(Indexer.this, newsList, EventType.UPDATE));
-            else
-              new IndexingTask(Indexer.this, newsList, EventType.UPDATE).run(new NullProgressMonitor());
+            if (!newsList.isEmpty()) {
+              if (!InternalOwl.TESTING)
+                fJobQueue.schedule(new IndexingTask(Indexer.this, newsList, EventType.UPDATE));
+              else
+                new IndexingTask(Indexer.this, newsList, EventType.UPDATE).run(new NullProgressMonitor());
+            }
           }
         }
       }
