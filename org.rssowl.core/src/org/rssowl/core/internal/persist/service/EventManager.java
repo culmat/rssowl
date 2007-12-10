@@ -479,7 +479,9 @@ public class EventManager {
     }
     else if (entity instanceof ILabel) {
       ILabel label = (ILabel) entity;
-      modelEvent = new LabelEvent(label, root);
+      LabelEvent eventTemplate = (LabelEvent) template;
+      ILabel oldLabel = eventTemplate == null ? null : eventTemplate.getOldLabel();
+      modelEvent = new LabelEvent(oldLabel, label, root);
     }
     else if (entity instanceof ISearchCondition) {
       ISearchCondition searchCond = (ISearchCondition) entity;

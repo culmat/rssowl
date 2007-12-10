@@ -35,22 +35,33 @@ import org.rssowl.core.persist.event.runnable.LabelEventRunnable;
  * In order to retrieve the Model-Object that is affected on the Event, use the
  * <code>resolve()</code> Method of the <code>ModelReference</code> stored
  * in this Event.
- * 
+ *
  * @author bpasero
  */
 public final class LabelEvent extends ModelEvent {
 
+  private final ILabel fOldLabel;
   /**
    * Stores an instance of <code>ModelReference</code> for the affected Type
    * in this Event.
-   * 
-   * @param label An instance of <code>ModelReference</code> for the
+   *
+   * @param oldLabel The previous saved version of the affected type or
+   * {@code null} if not known.
+   * @param currentLabel An instance of <code>ModelReference</code> for the
    * affected Type.
    * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
    * <code>FALSE</code> otherwise.
    */
-  public LabelEvent(ILabel label, boolean isRoot) {
-    super(label, isRoot);
+  public LabelEvent(ILabel oldLabel, ILabel currentLabel, boolean isRoot) {
+    super(currentLabel, isRoot);
+    fOldLabel = oldLabel;
+  }
+
+  /**
+   * @return The previous saved version of the affected type.
+   */
+  public ILabel getOldLabel() {
+    return fOldLabel;
   }
 
   /*
