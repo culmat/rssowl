@@ -60,6 +60,7 @@ import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPreference;
+import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
@@ -72,6 +73,8 @@ import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.event.BookMarkAdapter;
 import org.rssowl.core.persist.event.BookMarkEvent;
+import org.rssowl.core.persist.event.LabelAdapter;
+import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.ITask;
@@ -185,6 +188,7 @@ public class Controller {
   private IModelFactory fFactory;
   private Lock fLoginDialogLock = new ReentrantLock();
   private BookMarkAdapter fBookMarkListener;
+  private LabelAdapter fLabelListener;
 
   /* Task to perform Reload-Operations */
   private class ReloadTask implements ITask {
@@ -252,6 +256,8 @@ public class Controller {
   }
 
   private void registerListeners() {
+
+    /* Delete Favicon when Bookmark gets deleted */
     fBookMarkListener = new BookMarkAdapter() {
       @Override
       public void entitiesDeleted(Set<BookMarkEvent> events) {
@@ -262,10 +268,44 @@ public class Controller {
     };
 
     DynamicDAO.addEntityListener(IBookMark.class, fBookMarkListener);
+
+    /* Update Label conditions when Label name changes */
+    fLabelListener = new LabelAdapter() {
+      @Override
+      public void entitiesUpdated(Set<LabelEvent> events) {
+        for (LabelEvent event : events) {
+          ILabel oldLabel = event.getOldLabel();
+          ILabel updatedLabel = event.getEntity();
+          if (!oldLabel.getName().equals(updatedLabel.getName())) {
+            updateLabelConditions(oldLabel.getName(), updatedLabel.getName());
+          }
+        }
+      }
+    };
+
+    DynamicDAO.addEntityListener(ILabel.class, fLabelListener);
+  }
+
+  private void updateLabelConditions(String oldLabelName, String newLabelName) {
+    Set<ISearchMark> searchMarksToUpdate = new HashSet<ISearchMark>(1);
+
+    Set<ISearchMark> searchMarks = fCacheService.getSearchMarks();
+    for (ISearchMark searchMark : searchMarks) {
+      List<ISearchCondition> conditions = searchMark.getSearchConditions();
+      for (ISearchCondition condition : conditions) {
+        if (condition.getField().getId() == INews.LABEL && condition.getValue().equals(oldLabelName)) {
+          condition.setValue(newLabelName);
+          searchMarksToUpdate.add(searchMark);
+        }
+      }
+    }
+
+    DynamicDAO.getDAO(ISearchMarkDAO.class).saveAll(searchMarksToUpdate);
   }
 
   private void unregisterListeners() {
     DynamicDAO.removeEntityListener(IBookMark.class, fBookMarkListener);
+    DynamicDAO.removeEntityListener(ILabel.class, fLabelListener);
   }
 
   private List<EntityPropertyPageWrapper> loadEntityPropertyPages() {
