@@ -781,47 +781,38 @@ public class Controller {
   private void onFirstStartup() throws PersistenceException, InterpreterException, ParserException {
 
     /* Add Default Labels */
-    List<ILabel> labels = addDefaultLabels();
+    addDefaultLabels();
 
     /* Import Default Marks */
-    importDefaults(labels);
+    importDefaults();
 
     /* Remember this */
     fgFirstStartup = true;
   }
 
-  private List<ILabel> addDefaultLabels() throws PersistenceException {
-    List<ILabel> labels = new ArrayList<ILabel>();
-
+  private void addDefaultLabels() throws PersistenceException {
     ILabel label = fFactory.createLabel(null, "Important");
     label.setColor("159,63,63");
-    labels.add(label);
     fLabelDao.save(label);
 
     label = fFactory.createLabel(null, "Work");
     label.setColor("255,153,0");
-    labels.add(label);
     fLabelDao.save(label);
 
     label = fFactory.createLabel(null, "Personal");
     label.setColor("0,153,0");
-    labels.add(label);
     fLabelDao.save(label);
 
     label = fFactory.createLabel(null, "To Do");
     label.setColor("51,51,255");
-    labels.add(label);
     fLabelDao.save(label);
 
     label = fFactory.createLabel(null, "Later");
     label.setColor("151,53,151");
-    labels.add(label);
     fLabelDao.save(label);
-
-    return labels;
   }
 
-  private void importDefaults(List<ILabel> labels) throws PersistenceException, InterpreterException, ParserException {
+  private void importDefaults() throws PersistenceException, InterpreterException, ParserException {
 
     /* Import Default Feeds */
     InputStream inS = getClass().getResourceAsStream("/default_feeds.xml"); //$NON-NLS-1$;
@@ -874,10 +865,8 @@ public class Controller {
       IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(mark);
       preferences.putInteger(DefaultPreferences.BM_NEWS_GROUPING, NewsGrouping.Type.GROUP_BY_LABEL.ordinal());
 
-      for (ILabel label : labels) {
-        ISearchField field = fFactory.createSearchField(INews.LABEL, newsEntityName);
-        fFactory.createSearchCondition(null, mark, field, SearchSpecifier.IS, label.getName());
-      }
+      ISearchField field = fFactory.createSearchField(INews.LABEL, newsEntityName);
+      fFactory.createSearchCondition(null, mark, field, SearchSpecifier.IS, "*");
     }
 
     fFolderDAO.save(imported);
