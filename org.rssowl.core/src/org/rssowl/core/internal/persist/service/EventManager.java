@@ -522,9 +522,8 @@ public class EventManager {
 
       /*
        * We must release the read lock before we can change the id of the
-       * news. This should be fine because even if someone else acquires
-       * the write lock, we won't issue any event until we get the read lock
-       * again.
+       * news. This should be fine because if the News has no id, it means
+       * that it's not known to anyone but the caller.
        */
       if (entity instanceof News) {
         News n = (News) entity;
