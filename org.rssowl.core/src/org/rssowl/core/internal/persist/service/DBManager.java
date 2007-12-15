@@ -128,7 +128,10 @@ public class DBManager {
     return new File(dir, "defragment");
   }
 
-  private String getDBFilePath() {
+  /**
+   * Internal method, exposed for tests only.
+   */
+  public static final String getDBFilePath() {
     String filePath = Activator.getDefault().getStateLocation().toOSString() + "/rssowl.db"; //$NON-NLS-1$
     return filePath;
   }
@@ -309,7 +312,12 @@ public class DBManager {
     return migrationResult;
   }
 
-  private void copyFile(File originFile, File destinationFile) {
+  /**
+   * Internal method. Exposed for testing.
+   * @param originFile
+   * @param destinationFile
+   */
+  public static final void copyFile(File originFile, File destinationFile) {
     FileInputStream inputStream = null;
     FileOutputStream outputStream = null;
     try {
@@ -364,7 +372,7 @@ public class DBManager {
     return getCurrentFormatVersion();
   }
 
-  private void closeCloseable(Closeable closeable) {
+  private static void closeCloseable(Closeable closeable) {
     if (closeable != null)
       try {
         closeable.close();
@@ -494,56 +502,64 @@ public class DBManager {
   }
 
   /**
+   * Internal method. Made public for testing.
+   *
    * Creates a copy of the database that has all essential data structures.
    * At the moment, this means not copying NewsCounter and
    * IConditionalGets since they will be re-populated eventually.
+   * @param source
+   * @param destination
    * @param monitor
    *
    */
-  private static void copyDatabase(File source, File destination, IProgressMonitor monitor) {
-      ObjectContainer sourceDb = Db4o.openFile(createConfiguration(),
-          source.getAbsolutePath());
-      ObjectContainer destinationDb = Db4o.openFile(createConfiguration(),
-          destination.getAbsolutePath());
+  public final static void copyDatabase(File source, File destination, IProgressMonitor monitor) {
+    ObjectContainer sourceDb = Db4o.openFile(createConfiguration(), source.getAbsolutePath());
+    ObjectContainer destinationDb = Db4o.openFile(createConfiguration(), destination.getAbsolutePath());
 
-      /*
-       * Keep labels in memory to avoid duplicate copies when cascading feed.
-       */
-      List<Label> labels = new ArrayList<Label>();
-      for (Label label : sourceDb.query(Label.class)) {
-        labels.add(label);
-        sourceDb.activate(label, Integer.MAX_VALUE);
-        destinationDb.ext().set(label, Integer.MAX_VALUE);
+    /*
+     * Keep labels in memory to avoid duplicate copies when cascading feed.
+     */
+    List<Label> labels = new ArrayList<Label>();
+    for (Label label : sourceDb.query(Label.class)) {
+      labels.add(label);
+      sourceDb.activate(label, Integer.MAX_VALUE);
+      destinationDb.ext().set(label, Integer.MAX_VALUE);
+    }
+    monitor.worked(5);
+    for (Folder type : sourceDb.query(Folder.class)) {
+      sourceDb.activate(type, Integer.MAX_VALUE);
+      if (type.getParent() == null) {
+        destinationDb.ext().set(type, Integer.MAX_VALUE);
       }
-      monitor.worked(5);
-      for (Folder type : sourceDb.query(Folder.class))  {
-        sourceDb.activate(type, Integer.MAX_VALUE);
-        if (type.getParent() == null) {
-          destinationDb.ext().set(type, Integer.MAX_VALUE);
-        }
-      }
-      monitor.worked(25);
-      for (Feed feed : sourceDb.query(Feed.class)) {
-        sourceDb.activate(feed, Integer.MAX_VALUE);
-        destinationDb.ext().set(feed, Integer.MAX_VALUE);
-      }
-      monitor.worked(55);
-      for (Preference pref : sourceDb.query(Preference.class)) {
-        sourceDb.activate(pref, Integer.MAX_VALUE);
-        destinationDb.ext().set(pref, Integer.MAX_VALUE);
-      }
-      monitor.worked(5);
-      List<Counter> counterSet = sourceDb.query(Counter.class);
-      Counter counter = counterSet.iterator().next();
-      sourceDb.activate(counter, Integer.MAX_VALUE);
-      destinationDb.ext().set(counter, Integer.MAX_VALUE);
+    }
+    monitor.worked(25);
+    for (Feed feed : sourceDb.query(Feed.class)) {
+      sourceDb.activate(feed, Integer.MAX_VALUE);
+      destinationDb.ext().set(feed, Integer.MAX_VALUE);
+    }
+    monitor.worked(55);
+    for (Preference pref : sourceDb.query(Preference.class)) {
+      sourceDb.activate(pref, Integer.MAX_VALUE);
+      destinationDb.ext().set(pref, Integer.MAX_VALUE);
+    }
+    monitor.worked(5);
+    List<Counter> counterSet = sourceDb.query(Counter.class);
+    Counter counter = counterSet.iterator().next();
+    sourceDb.activate(counter, Integer.MAX_VALUE);
+    destinationDb.ext().set(counter, Integer.MAX_VALUE);
 
-      destinationDb.commit();
-      destinationDb.close();
-      monitor.worked(10);
+    sourceDb.close();
+    destinationDb.commit();
+    destinationDb.close();
+    monitor.worked(10);
   }
 
-  private static Configuration createConfiguration() {
+  /**
+   * Internal method, exposed for tests only.
+   *
+   * @return
+   */
+  public static final Configuration createConfiguration() {
     Configuration config = Db4o.newConfiguration();
     //TODO We can use dbExists to configure our parameters for a more
     //efficient startup. For example, the following could be used. We'd have
