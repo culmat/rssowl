@@ -57,6 +57,13 @@ public class Source extends Persistable implements ISource {
       fLink = link.toString();
   }
 
+  public Source(ISource source) {
+    synchronized (source)  {
+      setLink(source.getLink());
+      setName(source.getName());
+    }
+  }
+
   /*
    * @see org.rssowl.core.model.types.ISource#setName(java.lang.String)
    */
