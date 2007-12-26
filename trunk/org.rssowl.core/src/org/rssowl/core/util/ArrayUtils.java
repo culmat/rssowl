@@ -29,6 +29,24 @@ public final class ArrayUtils {
     super();
   }
 
+  public static int binarySearch(long[] a, long key, int endIndex) {
+    int low = 0;
+    int high = endIndex - 1;
+
+    while (low <= high) {
+      int mid = (low + high) >> 1;
+      long midVal = a[mid];
+
+      if (midVal < key)
+        low = mid + 1;
+      else if (midVal > key)
+        high = mid - 1;
+      else
+        return mid;
+    }
+    return -(low + 1);
+  }
+
   public static void reverse(int[] newsToCleanUp, int newsToCleanUpSize) {
     for (int left = 0, right = newsToCleanUpSize -1 ; left < right; left++, right--) {
       int temp = newsToCleanUp[left];
