@@ -49,23 +49,23 @@ public class MergeUtilsTest {
    */
   @Test
   public void testSingleItemMergeWithNullDestination() {
-    IPerson person = new Person(null);
+    IPerson person = new Person((Long) null);
     ComplexMergeResult<IPerson> mergeResult = MergeUtils.merge(null, person);
     assertEquals(person, mergeResult.getMergedObject());
     assertEquals(true, mergeResult.isStructuralChange());
   }
-  
+
   /**
    * Tests {@link MergeUtils#merge(org.rssowl.core.persist.MergeCapable, org.rssowl.core.persist.MergeCapable)}.
    */
   @Test
   public void testSingleItemMergeWithNonNullDestinationAndNullOrigin() {
-    IPerson person = new Person(null);
+    IPerson person = new Person((Long) null);
     ComplexMergeResult<IPerson> mergeResult = MergeUtils.merge(person, null);
     assertNull(mergeResult.getMergedObject());
     assertEquals(true, mergeResult.isStructuralChange());
   }
-  
+
   /**
    * Tests {@link MergeUtils#merge(List, List, org.rssowl.core.persist.IPersistable)}.
    */
@@ -75,7 +75,7 @@ public class MergeUtilsTest {
     categories.add(new Category());
     MergeUtils.merge(null, categories, null);
   }
-  
+
   /**
    * Tests {@link MergeUtils#mergeProperties(org.rssowl.core.persist.IEntity, org.rssowl.core.persist.IEntity)}.
    */
@@ -91,7 +91,7 @@ public class MergeUtilsTest {
     String key2 = "key2";
     String value2 = "value2";
     label0.setProperty(key2, value2);
-    
+
     ILabel label1 = new Label(null, "label1");
     label1.setProperty(key1, value1);
     String newValue2 = "newValue2";
@@ -99,12 +99,12 @@ public class MergeUtilsTest {
     String key3 = "key3";
     String value3 = "value3";
     label1.setProperty(key3, value3);
-    
+
     ComplexMergeResult<?> mergeResult = MergeUtils.mergeProperties(label0, label1);
     assertEquals(true, mergeResult.getRemovedObjects().contains(value0));
     assertEquals(true, mergeResult.getRemovedObjects().contains(value2));
     assertEquals(true, mergeResult.isStructuralChange());
-    
+
     assertEquals(3, label0.getProperties().size());
     assertEquals(value1, label0.getProperties().get(key1));
     assertEquals(newValue2, label0.getProperties().get(key2));
