@@ -31,6 +31,7 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.IPreference;
@@ -45,6 +46,7 @@ import org.rssowl.core.persist.dao.IConditionalGetDAO;
 import org.rssowl.core.persist.dao.IFeedDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
+import org.rssowl.core.persist.dao.INewsBinDAO;
 import org.rssowl.core.persist.dao.INewsCounterDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.dao.IPersistableDAO;
@@ -71,11 +73,12 @@ public final class DAOServiceImpl extends DAOService  {
   private final ISearchConditionDAO fSearchConditionDAO = new SearchConditionDAOImpl();
   private final ISearchMarkDAO fSearchMarkDAO = new SearchMarkDAOImpl();
   private final ILabelDAO fLabelDAO = new LabelDAOImpl();
-  
+  private final INewsBinDAO fNewsBinDao = new NewsBinDaoImpl();
+
   private final Map<Class<?>, Object> fEntityInterfacesToDaosMap = new HashMap<Class<?>, Object>();
   private final Map<Class<?>, Object> fEntityDaoClassesToDaosMap = new HashMap<Class<?>, Object>();
   private final Map<Class<?>, Object> fEntityClassesToDaosMap = new HashMap<Class<?>, Object>();
-  
+
   public DAOServiceImpl() {
     super();
     fEntityDaoClassesToDaosMap.put(IAttachmentDAO.class, fAttachmentDAO);
@@ -91,12 +94,13 @@ public final class DAOServiceImpl extends DAOService  {
     fEntityDaoClassesToDaosMap.put(ISearchConditionDAO.class, fSearchConditionDAO);
     fEntityDaoClassesToDaosMap.put(ISearchMarkDAO.class, fSearchMarkDAO);
     fEntityDaoClassesToDaosMap.put(IPreferenceDAO.class, fPreferencesDAO);
+    fEntityDaoClassesToDaosMap.put(INewsBinDAO.class, fNewsBinDao);
 
     for (Object value : fEntityDaoClassesToDaosMap.values()) {
       IPersistableDAO<?> dao = (IPersistableDAO<?>) value;
       putInEntityClassesToDaosMap(dao);
     }
-    
+
     fEntityInterfacesToDaosMap.put(IAttachment.class, fAttachmentDAO);
     fEntityInterfacesToDaosMap.put(IBookMark.class, fBookMarkDAO);
     fEntityInterfacesToDaosMap.put(ICategory.class, fCategoryDAO);
@@ -110,6 +114,7 @@ public final class DAOServiceImpl extends DAOService  {
     fEntityInterfacesToDaosMap.put(ISearchCondition.class, fSearchConditionDAO);
     fEntityInterfacesToDaosMap.put(ISearchMark.class, fSearchMarkDAO);
     fEntityInterfacesToDaosMap.put(IPreference.class, fPreferencesDAO);
+    fEntityInterfacesToDaosMap.put(INewsBin.class, fNewsBinDao);
   }
 
   private void putInEntityClassesToDaosMap(IPersistableDAO<?> dao) {
@@ -135,7 +140,7 @@ public final class DAOServiceImpl extends DAOService  {
   public final ICategoryDAO getCategoryDAO() {
     return fCategoryDAO;
   }
-  
+
   @Override
   public IConditionalGetDAO getConditionalGetDAO() {
     return fConditionalGetDAO;
@@ -145,7 +150,7 @@ public final class DAOServiceImpl extends DAOService  {
   public final IFeedDAO getFeedDAO() {
     return fFeedDAO;
   }
-  
+
   @Override
   public final IFolderDAO getFolderDAO() {
     return fFolderDAO;
@@ -155,12 +160,12 @@ public final class DAOServiceImpl extends DAOService  {
   public final INewsCounterDAO getNewsCounterDAO() {
     return fNewsCounterDAO;
   }
-  
+
   @Override
   public final INewsDAO getNewsDAO() {
     return fNewsDAO;
   }
-  
+
   @Override
   public final IPersonDAO getPersonDAO() {
     return fPersonDAO;
@@ -180,13 +185,18 @@ public final class DAOServiceImpl extends DAOService  {
   public final ILabelDAO getLabelDAO() {
     return fLabelDAO;
   }
-  
+
+  @Override
+  public INewsBinDAO getNewsBinDao() {
+    return fNewsBinDao;
+  }
+
   @SuppressWarnings("unchecked")
   @Override
   public final <T extends IPersistableDAO<?>> T getDAO(Class<T> daoInterface) {
     return (T) fEntityDaoClassesToDaosMap.get(daoInterface);
   }
-  
+
   @SuppressWarnings("unchecked")
   @Override
   public final <T extends IPersistableDAO<? super P>, P extends IPersistable> T getDAOFromPersistable(Class<P> persistableClass) {
