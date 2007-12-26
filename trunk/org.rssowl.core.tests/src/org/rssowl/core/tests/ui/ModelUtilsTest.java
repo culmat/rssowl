@@ -531,10 +531,10 @@ public class ModelUtilsTest {
    */
   @Test
   public void testIsAuthorChange() throws Exception {
-    IPerson author1 = new Person(null);
+    IPerson author1 = new Person((Long) null);
     author1.setName("Foo");
 
-    IPerson author2 = new Person(null);
+    IPerson author2 = new Person((Long) null);
     author2.setName("Bar");
 
     IFeed feed = new Feed(new URI("http://www.link.com"));
