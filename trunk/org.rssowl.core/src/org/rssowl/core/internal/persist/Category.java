@@ -53,6 +53,13 @@ public class Category extends AbstractEntity implements ICategory {
     super(id);
   }
 
+  public Category(ICategory category) {
+    synchronized (category) {
+      setName(category.getName());
+      setDomain(category.getDomain());
+    }
+  }
+
   /*
    * @see org.rssowl.core.model.types.ICategory#setName(java.lang.String)
    */
