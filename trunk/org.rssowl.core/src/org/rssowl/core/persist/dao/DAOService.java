@@ -154,4 +154,11 @@ public abstract class DAOService {
    * @see DynamicDAO#getDAO(Class)
    */
   public abstract IConditionalGetDAO getConditionalGetDAO();
+
+  /**
+   * @return Returns the instance of <code>IEntityDAO</code> responsible for
+   * <code>INewsBin</code>.
+   * @see DynamicDAO#getDAO(Class)
+   */
+  public abstract INewsBinDAO getNewsBinDao();
 }
