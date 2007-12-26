@@ -38,6 +38,7 @@ import org.rssowl.core.persist.IImage;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.IPreference;
@@ -70,6 +71,10 @@ public class DefaultModelFactory implements IModelFactory {
     /* Automatically add to the Feed */
     feed.addNews(news);
     return news;
+  }
+
+  public INews createNews(INews news) {
+    return new News((News) news);
   }
 
   /*
@@ -235,6 +240,19 @@ public class DefaultModelFactory implements IModelFactory {
     folder.addMark(searchMark, position, after);
 
     return searchMark;
+  }
+
+  public INewsBin createNewsBin(Long id, IFolder folder, String name) {
+    return createNewsBin(id, folder, name, null, null);
+  }
+
+  public INewsBin createNewsBin(Long id, IFolder folder, String name, IFolderChild position, Boolean after) {
+    NewsBin newsBin = new NewsBin(id, folder, name);
+
+    /* Automatically add to the Folder */
+    folder.addMark(newsBin, position, after);
+
+    return newsBin;
   }
 
   /*
