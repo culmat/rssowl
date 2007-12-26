@@ -32,6 +32,7 @@ import org.rssowl.core.persist.IImage;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ITextInput;
+import org.rssowl.core.util.ArrayUtils;
 import org.rssowl.core.util.MergeUtils;
 
 import java.net.URI;
@@ -823,7 +824,7 @@ public class Feed extends AbstractEntity implements IFeed {
         mergeResult.addAll(existingNews.merge(newsListCopy.get(existingNewsIndex)));
         newsListCopy.remove(existingNewsIndex);
       } else if ((newsToCleanUp != null) && (existingNews.getState() == INews.State.DELETED)) {
-        newsToCleanUp = ensureCapacity(newsToCleanUp, newsToCleanUpSize + 1);
+        newsToCleanUp = ArrayUtils.ensureCapacity(newsToCleanUp, newsToCleanUpSize + 1);
         newsToCleanUp[newsToCleanUpSize++] = i;
       }
     }
@@ -838,7 +839,7 @@ public class Feed extends AbstractEntity implements IFeed {
        * better way to decide when to run this exists.
        */
       if (newsToCleanUpSize > 20 || (newsToCleanUpSize > 5 && (fNews.size() / newsToCleanUpSize < 5))) {
-        reverseArray(newsToCleanUp, newsToCleanUpSize);
+        ArrayUtils.reverse(newsToCleanUp, newsToCleanUpSize);
         for (int i = 0, c = fNews.size(), newIndex = 0; i < c; ++i) {
           if (Arrays.binarySearch(newsToCleanUp, i) < 0) {
             fNews.set(newIndex, fNews.get(i));
@@ -871,29 +872,6 @@ public class Feed extends AbstractEntity implements IFeed {
       mergeResult.addUpdatedObject(news);
     }
     return mergeResult;
-  }
-
-  private void reverseArray(int[] newsToCleanUp, int newsToCleanUpSize) {
-    for (int left = 0, right = newsToCleanUpSize -1 ; left < right; left++, right--) {
-      int temp = newsToCleanUp[left];
-      newsToCleanUp[left]  = newsToCleanUp[right];
-      newsToCleanUp[right] = temp;
-    }
-  }
-
-  private int[] ensureCapacity(int[] array, int minCapacity) {
-    int oldCapacity = array.length;
-    if (minCapacity > oldCapacity) {
-      int oldData[] = array;
-      int newCapacity = (oldCapacity * 3) / 2 + 1;
-      if (newCapacity < minCapacity)
-        newCapacity = minCapacity;
-      // minCapacity is usually close to size, so this is a win:
-      int[] copy = new int[newCapacity];
-      System.arraycopy(array, 0, copy, 0, Math.min(oldData.length, newCapacity));
-      return copy;
-    }
-    return array;
   }
 
   private List<INews> copyWithoutDuplicates(List<INews> newsList) {
