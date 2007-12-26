@@ -50,6 +50,14 @@ public interface IModelFactory {
   INews createNews(Long id, IFeed feed, Date receiveDate);
 
   /**
+   * Creates a deep copy of {@code news}.
+   *
+   * @param news INews to be copied.
+   * @return a deep copy of {@code news}.
+   */
+  INews createNews(INews news);
+
+  /**
    * Creates a new instance of IPerson with the provided parameters. The new
    * Person is automatically added to the given Type.
    *
@@ -178,7 +186,7 @@ public interface IModelFactory {
 
   /**
    * Creates a new instance of ISearchMark with the provided parameters. The new
-   * SearchMark is automatically added as laste item to the given parent folder.
+   * SearchMark is automatically added as last item to the given parent folder.
    *
    * @param id The unique id of the ISearchMark.
    * @param folder The parent Folder.
@@ -196,13 +204,41 @@ public interface IModelFactory {
    * @param folder The parent Folder.
    * @param name The Name of the ISearchMark.
    * @param position The new Position identified by a <code>IFolderChild</code>
-   * contained in this folder or <code>NULL</code> to add the mark as last
+   * contained in this folder or <code>NULL</code> to add the mark as the last
    * element.
-   * @param after If <code>true</code>, move the folders to a one index after
+   * @param after If <code>true</code>, add the mark to the index after
    * the given position. May be <code>NULL</code> if the position is unknown.
    * @return a new instance of ISearchMark with the provided parameters.
    */
   ISearchMark createSearchMark(Long id, IFolder folder, String name, IFolderChild position, Boolean after);
+
+  /**
+   * Creates a new instance of INewsBin with the provided parameters. The new
+   * NewsBin is automatically added as last item to the given parent folder.
+   *
+   * @param id The unique id of the INewsBin.
+   * @param folder The parent Folder.
+   * @param name The Name of the INewsBin.
+   * @return a new instance of INewsBin with the provided parameters.
+   */
+  INewsBin createNewsBin(Long id, IFolder folder, String name);
+
+  /**
+   * Creates a new instance of INewsBin with the provided parameters. The new
+   * NewsBin is automatically added to the given parent folder at the given
+   * position.
+   *
+   * @param id The unique id of the INewsBin.
+   * @param folder The parent Folder.
+   * @param name The Name of the INewsBin.
+   * @param position The new Position identified by a <code>IFolderChild</code>
+   * contained in this folder or <code>null</code> to add the INewsBin as the last
+   * element.
+   * @param after If <code>true</code>, add the INewsBin to the index after
+   * the given position. May be <code>NULL</code> if the position is unknown.
+   * @return a new instance of INewsBin with the provided parameters.
+   */
+  INewsBin createNewsBin(Long id, IFolder folder, String name, IFolderChild position, Boolean after);
 
   /**
    * Creates a new instance of IBookMark with the provided parameters. The new
