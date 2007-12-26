@@ -122,9 +122,6 @@ public class News extends AbstractEntity implements INews {
 
   private ISource fSource;
 
-  //TODO Remove after M7
-  private ILabel fLabel;
-
   private String fFeedLink;
   private transient FeedLinkReference fFeedLinkReference;
 
@@ -165,6 +162,55 @@ public class News extends AbstractEntity implements INews {
     fFeedLink = feed.getLink().toString();
     Assert.isNotNull(receiveDate, "The type News requires a ReceiveDate that is not NULL"); //$NON-NLS-1$
     fReceiveDate = receiveDate;
+    init();
+  }
+
+  public News(News news) {
+    super(null);
+    news.fLock.acquireReadLock();
+    try {
+      for (IAttachment attachment : news.getAttachments())
+        addAttachment(new Attachment(attachment, news));
+
+      if (news.getAuthor() != null)
+        fAuthor = new Person(news.getAuthor());
+
+      fBaseUri = news.fBaseUri;
+
+      for (ICategory category : news.getCategories())
+        addCategory(new Category(category));
+
+      fComments = news.fComments;
+      fDescription = news.fDescription;
+      fFeedLink = news.fFeedLink;
+      setGuid(news.getGuid());
+      fInReplyTo = news.fInReplyTo;
+      fIsFlagged = news.fIsFlagged;
+
+      /* Don't need to copy the labels because the relationship is ManyToMany */
+      fLabels = new HashSet<ILabel>(news.getLabels());
+
+      fLinkText = news.fLinkText;
+
+      if (news.fModifiedDate != null)
+        fModifiedDate = new Date(news.fModifiedDate.getTime());
+
+      if (news.fPublishDate != null)
+        fPublishDate = new Date(news.fPublishDate.getTime());
+
+      fRating = news.fRating;
+
+      if (news.fReceiveDate != null)
+        fReceiveDate = new Date(news.fReceiveDate.getTime());
+
+      if (news.getSource() != null)
+        fSource = new Source(news.getSource());
+
+      fStateOrdinal = news.fStateOrdinal;
+      fTitle = news.getTitle();
+    } finally {
+      news.fLock.releaseReadLock();
+    }
     init();
   }
 
@@ -948,7 +994,7 @@ public class News extends AbstractEntity implements INews {
           (getGuid() == null ? n.getGuid() == null : getGuid().equals(n.getGuid())) &&
           (fSource == null ? n.fSource == null : fSource.equals(n.fSource)) &&
           (fInReplyTo == null ? n.fInReplyTo == null : fInReplyTo.equals(n.fInReplyTo)) &&
-          (fLabel == null ? n.fLabel == null : fLabel.equals(n.fLabel)) &&
+          (getLabels().equals(n.getLabels())) &&
           (getAuthor() == null ? n.getAuthor() == null : getAuthor().equals(n.getAuthor())) &&
           getAttachments().equals(n.getAttachments()) &&
           getCategories().equals(n.getCategories()) &&
