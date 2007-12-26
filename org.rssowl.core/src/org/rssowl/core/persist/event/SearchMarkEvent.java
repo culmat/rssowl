@@ -46,7 +46,7 @@ public final class SearchMarkEvent extends ModelEvent {
   private final IFolder fOldParent;
 
   /* Only for resultsChanged(): TRUE if *new* news where added */
-  private boolean fAddedNewNews;
+  private final boolean fAddedNewNews;
 
   /**
    * Stores an instance of <code>ModelReference</code> and the Parent
