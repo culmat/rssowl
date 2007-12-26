@@ -37,6 +37,7 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearchCondition;
@@ -49,6 +50,7 @@ import org.rssowl.core.persist.event.FeedEvent;
 import org.rssowl.core.persist.event.FolderEvent;
 import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.event.ModelEvent;
+import org.rssowl.core.persist.event.NewsBinEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.PersonEvent;
 import org.rssowl.core.persist.event.PreferenceEvent;
@@ -470,6 +472,12 @@ public class EventManager {
       SearchMarkEvent eventTemplate = (SearchMarkEvent) template;
       IFolder oldParent = eventTemplate == null ? null : eventTemplate.getOldParent();
       modelEvent = new SearchMarkEvent(mark, oldParent, root);
+    }
+    else if (entity instanceof INewsBin) {
+      INewsBin newsBin = (INewsBin) entity;
+      NewsBinEvent eventTemplate = (NewsBinEvent) template;
+      IFolder oldParent = eventTemplate == null ? null : eventTemplate.getOldParent();
+      modelEvent = new NewsBinEvent(newsBin, oldParent, root);
     }
     else if (entity instanceof IFolder) {
       IFolder folder = (IFolder) entity;
