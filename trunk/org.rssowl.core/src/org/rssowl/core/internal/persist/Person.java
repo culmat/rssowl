@@ -56,6 +56,14 @@ public class Person extends AbstractEntity implements IPerson {
   // As per javadoc
   }
 
+  public Person(IPerson author) {
+    synchronized (author) {
+      setName(author.getName());
+      setUri(author.getUri());
+      setEmail(author.getEmail());
+    }
+  }
+
   /*
    * @see org.rssowl.core.model.types.IPerson#setName(java.lang.String)
    */
