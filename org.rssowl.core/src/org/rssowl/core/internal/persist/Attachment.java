@@ -78,6 +78,15 @@ public class Attachment extends AbstractEntity implements IAttachment {
     fNews = news;
   }
 
+  public Attachment(IAttachment attachment, INews news) {
+    synchronized (attachment) {
+      setLength(attachment.getLength());
+      setType(attachment.getType());
+      setLink(attachment.getLink());
+    }
+    setParent(news);
+  }
+
   /*
    * @see org.rssowl.core.model.types.IAttachment#getLength()
    */
