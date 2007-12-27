@@ -166,7 +166,7 @@ public class News extends AbstractEntity implements INews {
   }
 
   public News(News news) {
-    super(null);
+    super(null, news);
     news.fLock.acquireReadLock();
     try {
       for (IAttachment attachment : news.getAttachments())
@@ -207,7 +207,7 @@ public class News extends AbstractEntity implements INews {
         fSource = new Source(news.getSource());
 
       fStateOrdinal = news.fStateOrdinal;
-      fTitle = news.getTitle();
+      fTitle = news.fTitle;
     } finally {
       news.fLock.releaseReadLock();
     }
