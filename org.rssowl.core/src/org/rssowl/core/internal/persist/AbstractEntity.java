@@ -51,6 +51,17 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
     fId = id;
   }
 
+  /**
+   * Copy constructor.
+   * @param id id for the copy.
+   * @param entity to copy from.
+   */
+  protected AbstractEntity(Long id, AbstractEntity entity) {
+    fId = id;
+    if (entity.fProperties != null)
+      fProperties = new HashMap<String, Serializable>(entity.fProperties);
+  }
+
   /*
    * @see org.rssowl.core.model.types.IEntity#getId()
    */
