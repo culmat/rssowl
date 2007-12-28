@@ -51,10 +51,7 @@ public class NewsContainer {
   public NewsContainer(boolean sorted) {
     fSorted = sorted;
     int length = INews.State.values().length;
-    fNews = new long[length][];
-    for (int i = 0; i < length; ++i) {
-      fNews[i] = new long[0];
-    }
+    fNews = new long[length][0];
     fNewsSize = new int[length];
   }
 
