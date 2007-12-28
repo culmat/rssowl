@@ -47,6 +47,7 @@ public class NewsBin extends Mark implements INewsBin   {
    */
   public NewsBin(Long id, IFolder folder, String name) {
     super(id, folder, name);
+    newsContainer = new NewsContainer(true);
   }
 
   /**
