@@ -44,6 +44,7 @@ import com.db4o.ObjectContainer;
 import com.db4o.ext.Db4oException;
 import com.db4o.query.Query;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -206,10 +207,16 @@ public class ApplicationServiceImpl implements IApplicationService {
       fDb.delete(o);
     }
 
+    List<Object> otherObjects = new ArrayList<Object>();
     for (Object o : mergeResult.getUpdatedObjects()) {
       if (o instanceof INews)
         DBHelper.saveNews(fDb, (INews) o);
-      else if (o instanceof IFeed)
+      else
+        otherObjects.add(o);
+    }
+
+    for (Object o : otherObjects) {
+      if (o instanceof IFeed)
         fDb.ext().set(o, 2);
       else
         fDb.ext().set(o, 1);
