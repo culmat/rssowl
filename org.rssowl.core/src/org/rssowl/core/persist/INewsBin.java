@@ -23,18 +23,10 @@
  **  **********************************************************************  */
 package org.rssowl.core.persist;
 
-import org.rssowl.core.persist.reference.NewsReference;
 
-import java.util.List;
-import java.util.Set;
-
-public interface INewsBin extends IMark {
-
-  List<NewsReference> getNews();
+public interface INewsBin extends INewsMark {
 
   boolean containsNews(INews news);
-
-  int getNewsCount(Set<INews.State> states);
 
   void addNews(INews news);
 
