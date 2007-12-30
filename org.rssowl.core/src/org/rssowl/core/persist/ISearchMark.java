@@ -60,7 +60,7 @@ public interface ISearchMark extends IMark {
    * <code>NewsReference</code>s that represent the news that match the
    * search.
    * @return Returns a {@link Pair} where the first {@link Boolean} indicates
-   * wheather the new result differs from the existing one and the second
+   * whether the new result differs from the existing one and the second
    * {@link Boolean} indicates if there is any *new* news that where added with
    * the new result.
    */
