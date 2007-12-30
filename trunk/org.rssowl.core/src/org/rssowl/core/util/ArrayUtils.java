@@ -34,7 +34,7 @@ public final class ArrayUtils {
     int high = endIndex - 1;
 
     while (low <= high) {
-      int mid = (low + high) >> 1;
+      int mid = (low + high) >>> 1;
       long midVal = a[mid];
 
       if (midVal < key)
