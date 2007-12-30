@@ -44,7 +44,6 @@ import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.SearchHit;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
@@ -181,44 +180,22 @@ public class SavedSearchService {
       /* Execute the search */
       List<SearchHit<NewsReference>> results = modelSearch.searchNews(searchMark.getSearchConditions(), searchMark.matchAllConditions());
 
-      /* Fill Result into Buckets */
-      List<NewsReference> readNews = Collections.emptyList();
-      List<NewsReference> unreadNews = Collections.emptyList();
-      List<NewsReference> newNews = Collections.emptyList();
+      /* Fill Result into Map Buckets */
+      Map<INews.State, List<NewsReference>> resultsMap = new EnumMap<INews.State, List<NewsReference>>(INews.State.class);
 
+      Set<State> visibleStates = INews.State.getVisible();
       for (SearchHit<NewsReference> searchHit : results) {
         INews.State state = (State) searchHit.getData(INews.STATE);
 
-        /* Read News */
-        if (state == INews.State.READ) {
-          if (readNews.isEmpty())
-            readNews = new ArrayList<NewsReference>(results.size() / 3);
-
-          readNews.add(searchHit.getResult());
-        }
-
-        /* Unread or Updated News */
-        else if (state == INews.State.UNREAD || state == INews.State.UPDATED) {
-          if (unreadNews.isEmpty())
-            unreadNews = new ArrayList<NewsReference>(results.size() / 3);
-
-          unreadNews.add(searchHit.getResult());
-        }
-
-        /* New News */
-        else if (state == INews.State.NEW) {
-          if (newNews.isEmpty())
-            newNews = new ArrayList<NewsReference>(results.size() / 3);
-
-          newNews.add(searchHit.getResult());
+        if (visibleStates.contains(state)) {
+          List<NewsReference> newsRefs = resultsMap.get(state);
+          if (newsRefs == null) {
+            newsRefs = new ArrayList<NewsReference>(results.size() / 3);
+            resultsMap.put(state, newsRefs);
+          }
+          newsRefs.add(searchHit.getResult());
         }
       }
-
-      /* Set result to SearchMark */
-      Map<INews.State, List<NewsReference>> resultsMap = new EnumMap<INews.State, List<NewsReference>>(INews.State.class);
-      resultsMap.put(INews.State.NEW, newNews);
-      resultsMap.put(INews.State.UNREAD, unreadNews);
-      resultsMap.put(INews.State.READ, readNews);
 
       /* Set Result */
       Pair<Boolean, Boolean> result = searchMark.setResult(resultsMap);
