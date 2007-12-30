@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
@@ -41,6 +42,7 @@ import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.event.runnable.EventType;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.persist.service.PersistenceException;
@@ -124,28 +126,18 @@ public class NewsContentProvider implements ITreeContentProvider {
         }
       }
 
-      /* This is a Bookmark */
-      else if (object instanceof BookMarkReference) {
-        synchronized (NewsContentProvider.this) {
-          Collection<INews> news = fCachedNews;
-          if (news != null) {
-            if (fGrouping.getType() == NewsGrouping.Type.NO_GROUPING)
-              elements.addAll(news);
-            else
-              elements.addAll(fGrouping.group(news));
-          }
-        }
-      }
-
-      /* This is a SearchMark */
-      else if (object instanceof SearchMarkReference) {
-        synchronized (NewsContentProvider.this) {
-          Collection<INews> news = fCachedNews;
-          if (news != null) {
-            if (fGrouping.getType() == NewsGrouping.Type.NO_GROUPING)
-              elements.addAll(news);
-            else
-              elements.addAll(fGrouping.group(news));
+      /* This is a class that implements IMark */
+      else if (object instanceof ModelReference) {
+        Class<? extends IEntity> entityClass = ((ModelReference) object).getEntityClass();
+        if (IMark.class.isAssignableFrom(entityClass))  {
+          synchronized (NewsContentProvider.this) {
+            Collection<INews> news = fCachedNews;
+            if (news != null) {
+              if (fGrouping.getType() == NewsGrouping.Type.NO_GROUPING)
+                elements.addAll(news);
+              else
+                elements.addAll(fGrouping.group(news));
+            }
           }
         }
       }
