@@ -35,14 +35,14 @@ import java.util.List;
 public class DB4OIDGenerator implements IDGenerator {
 
   private final static int BATCH_SIZE = 100;
-  
+
   private long fCurrent = -1;
   private long fMax;
-  
+
   private ObjectContainer fDb;
-  
+
   private Counter fCounter;
-  
+
   /**
    * Creates an instance of this class.
    */
@@ -56,7 +56,7 @@ public class DB4OIDGenerator implements IDGenerator {
       }
     });
   }
-  
+
   private synchronized void setObjectContainer(ObjectContainer db) {
     fDb = db;
     if (fDb == null) {
@@ -70,7 +70,7 @@ public class DB4OIDGenerator implements IDGenerator {
       fMax = increaseMax(true);
     }
   }
-  
+
   public long getNext() {
     return getNext(true);
   }
@@ -81,7 +81,7 @@ public class DB4OIDGenerator implements IDGenerator {
    * should be set to <code>false</code> if this method is called from within
    * a db4o transaction. However, in the case the transaction is rolled back,
    * the ids provided during that transaction are invalid.
-   * 
+   *
    * @param commit
    * @return a long value that has not been returned from this method before.
    */
@@ -105,29 +105,29 @@ public class DB4OIDGenerator implements IDGenerator {
     fDb.set(fCounter);
     if (commit)
       fDb.commit();
-    
+
     return fCounter.getValue();
   }
-  
+
   public synchronized void shutdown() {
     fMax = fCurrent;
     fCounter.setValue(fCurrent + 1);
     fDb.set(fCounter);
     fDb.commit();
   }
-  
+
   private Counter loadCounter() {
     List<Counter> counters = fDb.ext().query(Counter.class);
     if (!counters.isEmpty())
       return counters.iterator().next();
-      
+
     return null;
   }
 
   private Counter loadOrCreateCounter() {
     Counter counter = loadCounter();
     if (counter == null)
-      counter = new Counter();
+      counter = new Counter(1L);
 
     return counter;
   }
