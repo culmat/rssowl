@@ -108,6 +108,16 @@ public class LongArrayList {
   }
 
   @Override
+  public final int hashCode() {
+    int hashCode = 1;
+    for (int i = 0, c = fElements.length; i < c; ++i) {
+      long element = fElements[i];
+      hashCode = 31 * hashCode + ((int) (element ^ (element >>> 32)));
+    }
+    return hashCode;
+  }
+
+  @Override
   public final boolean equals(Object o) {
     if (this == o)
       return true;
