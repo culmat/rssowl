@@ -198,7 +198,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   /*
    * @see org.eclipse.jface.viewers.IContentProvider#dispose()
    */
-  public void dispose() {
+  public synchronized void dispose() {
     fDisposed = true;
     unregisterListeners();
   }
