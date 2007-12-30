@@ -30,8 +30,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The super-type of all Feed Elements.
@@ -145,7 +145,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * modified by the caller safely.
    *
    * @return the visible news in the feed.
-   * @see #getNewsByStates(EnumSet)
+   * @see #getNewsByStates(Set)
    * @see INews.State#getVisible()
    */
   List<INews> getVisibleNews();
@@ -163,7 +163,7 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * @see INews#getState()
    * @see INews.State
    */
-  List<INews> getNewsByStates(EnumSet<INews.State> states);
+  List<INews> getNewsByStates(Set<INews.State> states);
 
   /**
    * Identify the Feed's Format, for example "RSS" or "Atom".
