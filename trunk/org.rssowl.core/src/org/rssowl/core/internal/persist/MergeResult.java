@@ -41,6 +41,7 @@ import java.util.Set;
  *
  * @see MergeCapable
  */
+//TODO Should separate added objects because they are treated differently
 public class MergeResult {
 
   private Set<Object> fRemovedObjects;
