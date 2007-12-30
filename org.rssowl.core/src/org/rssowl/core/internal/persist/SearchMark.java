@@ -45,6 +45,7 @@ import java.util.Set;
  * @author bpasero
  * @see ISearchMark
  */
+//TODO Methods not thread-safe
 public class SearchMark extends Mark implements ISearchMark {
   private List<ISearchCondition> fSearchConditions;
   private boolean fMatchAllConditions;
