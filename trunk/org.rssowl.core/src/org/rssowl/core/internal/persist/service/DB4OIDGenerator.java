@@ -127,7 +127,7 @@ public class DB4OIDGenerator implements IDGenerator {
   private Counter loadOrCreateCounter() {
     Counter counter = loadCounter();
     if (counter == null)
-      counter = new Counter(1L);
+      counter = new Counter(0L);
 
     return counter;
   }
