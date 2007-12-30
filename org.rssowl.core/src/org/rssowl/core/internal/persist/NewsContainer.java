@@ -26,61 +26,93 @@ package org.rssowl.core.internal.persist;
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.reference.NewsReference;
-import org.rssowl.core.util.ArrayUtils;
+import org.rssowl.core.util.Pair;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-public class NewsContainer {
+public final class NewsContainer {
 
-  /**
-   * A long[] for each state, so fNews[news.getState().ordinal()] returns
-   * the long[] of ids for the given state.
-   */
-  private long[][] fNews;
-
-  /**
-   * fNews[getState()] returns the current array size for the given state
-   * in fNews.
-   */
-  private int[] fNewsSize;
-
-  private boolean fSorted;
+  private LongArrayList[] fNewsIds;
 
   protected NewsContainer() {
     super();
   }
 
-  public NewsContainer(boolean sorted) {
-    fSorted = sorted;
+  public NewsContainer(Map<INews.State, Boolean> statesToSortedMap) {
     int length = INews.State.values().length;
-    fNews = new long[length][0];
-    fNewsSize = new int[length];
+    fNewsIds = new LongArrayList[length];
+    for (int i = 0; i < fNewsIds.length; i++) {
+      Boolean sort = statesToSortedMap.get(INews.State.getState(i));
+      if (sort != null && sort.equals(Boolean.TRUE))
+        fNewsIds[i] = new SortedLongArrayList(0);
+      else
+        fNewsIds[i] = new LongArrayList(0);
+    }
+  }
+
+  public Pair<Boolean, Boolean> setNews(Map<INews.State, List<NewsReference>> newsMap) {
+    Assert.isNotNull(newsMap, "newsMap");
+
+    boolean changed = false;
+    boolean isNewNewsAdded = false;
+
+    /* For each Result */
+    for (Map.Entry<INews.State, List<NewsReference>> mapEntry : newsMap.entrySet()) {
+      List<NewsReference> news = mapEntry.getValue();
+      INews.State state = mapEntry.getKey();
+
+      Assert.isNotNull(news, "news");
+      Assert.isNotNull(state, "state");
+
+      long[] newArray = new long[news.size()];
+
+      /* Fill Bucket */
+      for (int i = 0; i < news.size(); i++) {
+        newArray[i] = news.get(i).getId();
+      }
+
+      int index = state.ordinal();
+      LongArrayList currentArrayList = fNewsIds[index];
+
+      if (state.equals(INews.State.NEW)) {
+        /* Check for added *new* News */
+
+        if (newArray.length > currentArrayList.size())
+          isNewNewsAdded = true;
+        else {
+          for (long value : newArray) {
+            if (currentArrayList.indexOf(value) < 0) {
+              isNewNewsAdded = true;
+              break;
+            }
+          }
+        }
+        if (isNewNewsAdded || (newArray.length != currentArrayList.size())) {
+          changed = true;
+          currentArrayList.setAll(newArray);
+        }
+      } else {
+        if (!currentArrayList.elementsEqual(newArray)) {
+          currentArrayList.setAll(newArray);
+          changed = true;
+        }
+      }
+    }
+
+    return Pair.create(changed, isNewNewsAdded);
   }
 
   public void addNews(INews news) {
-    int index = news.getState().ordinal();
-    long[] fNewsState = fNews[index];
-    fNews[index] = addNews(fNewsState, news, fNewsSize[index]);
-    ++fNewsSize[index];
+    checkNewsIdNotNull(news);
+    fNewsIds[getIndex(news)].add(news.getId());
   }
 
-  private long[] addNews(long[] newsArray, INews news, int currentArraySize) {
-    long[] array = ArrayUtils.ensureCapacity(newsArray, currentArraySize + 1);
-    long newsId = news.getId();
-    if (fSorted) {
-      int index = ArrayUtils.binarySearch(array, newsId, currentArraySize);
-      Assert.isLegal(index < 0, "news already part of container: " + news);
-      int insertionPoint = (-index) - 1;
-      System.arraycopy(array, insertionPoint, array, insertionPoint + 1,
-          currentArraySize - insertionPoint);
-      array[index] = newsId;
-    }
-    else
-      array[currentArraySize] = newsId;
-    return array;
+  private int getIndex(INews news) {
+    return news.getState().ordinal();
   }
 
   public LongIterator getNewsIterator() {
@@ -88,28 +120,28 @@ public class NewsContainer {
       private int outerIndex = 0;
       private int innerIndex = 0;
       public boolean hasNext() {
-        if (outerIndex < fNews.length - 1) {
-          if (innerIndex < fNewsSize[outerIndex] - 1)
+        if (outerIndex < fNewsIds.length - 1) {
+          if (innerIndex < fNewsIds[outerIndex].size() - 1)
             return true;
 
-          for (int i = outerIndex + 1, c = fNewsSize.length; i < c; ++i) {
-            if (fNewsSize[i] > 0)
+          for (int i = outerIndex + 1, c = fNewsIds.length; i < c; ++i) {
+            if (fNewsIds[i].size() > 0)
               return true;
           }
           return false;
         }
 
-        if (outerIndex == fNews.length - 1) {
-          return innerIndex < fNewsSize[outerIndex] - 1;
+        if (outerIndex == fNewsIds.length - 1) {
+          return innerIndex < fNewsIds[outerIndex].size() - 1;
         }
         return false;
       }
 
       public long next() {
-        long value = fNews[outerIndex][innerIndex];
+        long value = fNewsIds[outerIndex].get(innerIndex);
         Assert.isLegal(value > 0);
 
-        if (innerIndex < fNewsSize[outerIndex] - 1)
+        if (innerIndex < fNewsIds[outerIndex].size() - 1)
           ++innerIndex;
         else {
           ++outerIndex;
@@ -122,36 +154,8 @@ public class NewsContainer {
   }
 
   public boolean removeNews(INews news) {
-    for (int i = 0, c = fNews.length; i < c; ++i) {
-      if (removeNews(i, news))
-        return true;
-    }
-    return false;
-  }
-
-  private boolean removeNews(int outerIndex, INews news) {
-    long[] newsArray = fNews[outerIndex];
-    if (fSorted) {
-      int index = ArrayUtils.binarySearch(newsArray, news.getId(), fNewsSize[outerIndex]);
-      if (index < 0)
-        return false;
-
-      removeNews(outerIndex, newsArray, index);
-      return true;
-    }
-
-    for (int i = 0, c = fNewsSize[outerIndex]; i < c; ++i) {
-      if (newsArray[i] == news.getId().longValue()) {
-        removeNews(outerIndex, newsArray, i);
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private void removeNews(int outerIndex, long[] newsArray, int innerIndex) {
-    System.arraycopy(newsArray, innerIndex + 1, newsArray, innerIndex, fNewsSize[outerIndex] - innerIndex - 1);
-    newsArray[--fNewsSize[outerIndex]] = 0L;
+    checkNewsIdNotNull(news);
+    return fNewsIds[getIndex(news)].removeByElement(news.getId());
   }
 
   public int getNewsCount(Set<INews.State> states) {
@@ -160,29 +164,23 @@ public class NewsContainer {
     int count = 0;
 
     for (INews.State state : states) {
-      count += fNewsSize[state.ordinal()];
+      count += fNewsIds[state.ordinal()].size();
     }
 
     return count;
   }
 
   public boolean containsNews(INews news) {
-    for (int i = 0, c = fNews.length; i < c; ++i) {
-      if (containsNews(fNews[i], news, fNewsSize[i]))
+    checkNewsIdNotNull(news);
+    for (int i = 0, c = fNewsIds.length; i < c; ++i) {
+      if (fNewsIds[i].contains(news.getId()))
         return true;
     }
     return false;
   }
 
-  private boolean containsNews(long[] newsArray, INews news, int endIndex) {
-    if (fSorted)
-      return ArrayUtils.binarySearch(newsArray, news.getId(), endIndex) >= 0;
-
-    for (int i = 0; i < endIndex; ++i) {
-      if (newsArray[i] == news.getId().longValue())
-        return true;
-    }
-    return false;
+  private void checkNewsIdNotNull(INews news) {
+    Assert.isNotNull(news.getId(), "news.getId()");
   }
 
   public List<NewsReference> getNews()  {
@@ -194,10 +192,11 @@ public class NewsContainer {
 
     for (INews.State state : states) {
       int index = state.ordinal();
-      long[] newsIds = fNews[index];
-      for (int i = 0, c = fNewsSize[index]; i < c; ++i) {
-        Assert.isLegal(newsIds[i] != 0);
-        newsRefs.add(new NewsReference(newsIds[i]));
+      LongArrayList newsIds = fNewsIds[index];
+      for (int i = 0, c = newsIds.size(); i < c; ++i) {
+        long newsId = newsIds.get(i);
+        Assert.isLegal(newsId != 0);
+        newsRefs.add(new NewsReference(newsId));
       }
     }
 
@@ -209,11 +208,8 @@ public class NewsContainer {
   }
 
   void compact() {
-    for (int i = 0, c = fNews.length; i < c; ++i) {
-      long[] fStateNews = fNews[i];
-      int size = fNewsSize[i];
-      long[] compacted = new long[size];
-      System.arraycopy(fStateNews, 0, compacted, 0, size);
+    for (int i = 0; i < fNewsIds.length; i++) {
+      fNewsIds[i].compact();
     }
   }
 
@@ -221,7 +217,7 @@ public class NewsContainer {
     List<NewsReference> newsRefs = getNews(states);
     for (INews.State state : states) {
       int index = state.ordinal();
-      fNews[index] = new long[0];
+      fNewsIds[index].clear();
     }
     return newsRefs;
   }
