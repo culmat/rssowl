@@ -23,12 +23,15 @@
  **  **********************************************************************  */
 package org.rssowl.core.internal.persist;
 
+import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.NewsReference;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -65,8 +68,8 @@ public class NewsBin extends Mark implements INewsBin   {
     return newsContainer.containsNews(news);
   }
 
-  public List<NewsReference> getNews() {
-    return newsContainer.getVisibleNews();
+  public List<NewsReference> getNewsRefs() {
+    return newsContainer.getNews();
   }
 
   public int getNewsCount(Set<State> states) {
@@ -75,5 +78,25 @@ public class NewsBin extends Mark implements INewsBin   {
 
   public void removeNews(INews news) {
     newsContainer.removeNews(news);
+  }
+
+  public List<INews> getNews() {
+    return getNews(EnumSet.allOf(INews.State.class));
+  }
+
+  public List<INews> getNews(Set<State> states) {
+    List<NewsReference> newsRefs = newsContainer.getNews(states);
+    List<INews> news = new ArrayList<INews>(newsRefs.size());
+
+    for (NewsReference newsRef : newsRefs) {
+      INews newsItem = newsRef.resolve();
+      Assert.isNotNull(newsItem, "newsItem");
+      news.add(newsItem);
+    }
+    return news;
+  }
+
+  public List<NewsReference> getNewsRefs(Set<State> states) {
+    return newsContainer.getNews(states);
   }
 }
