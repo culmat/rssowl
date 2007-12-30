@@ -343,7 +343,7 @@ public class ModelTest1 {
 
   /**
    * Tests {@link IFeed#getVisibleNews()} and
-   * {@link IFeed#getNewsByStates(EnumSet)}
+   * {@link IFeed#getNewsByStates(Set)}
    *
    * @throws Exception
    */
