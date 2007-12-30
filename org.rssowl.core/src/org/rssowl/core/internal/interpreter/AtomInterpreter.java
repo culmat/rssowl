@@ -171,7 +171,7 @@ public class AtomInterpreter extends BasicInterpreter {
     INews news = Owl.getModelFactory().createNews(null, feed, new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
     news.setBase(feed.getBase());
 
-    /* Check wether the Attributes are to be processed by a Contribution */
+    /* Check whether the Attributes are to be processed by a Contribution */
     processNamespaceAttributes(element, news);
 
     /* Interpret Children */
@@ -180,7 +180,7 @@ public class AtomInterpreter extends BasicInterpreter {
       Element child = (Element) iter.next();
       String name = child.getName().toLowerCase();
 
-      /* Check wether this Element is to be processed by a Contribution */
+      /* Check whether this Element is to be processed by a Contribution */
       if (processElementExtern(child, news))
         continue;
 
