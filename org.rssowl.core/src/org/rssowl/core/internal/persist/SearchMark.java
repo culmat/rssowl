@@ -45,7 +45,7 @@ import java.util.Set;
  * @author bpasero
  * @see ISearchMark
  */
-//TODO Methods not thread-safe
+//TODO Rely on NewsContainer instead of having long[]
 public class SearchMark extends Mark implements ISearchMark {
   private List<ISearchCondition> fSearchConditions;
   private boolean fMatchAllConditions;
@@ -78,7 +78,7 @@ public class SearchMark extends Mark implements ISearchMark {
   /*
    * @see org.rssowl.core.persist.ISearchMark#setResult(java.util.List)
    */
-  public Pair<Boolean, Boolean> setResult(Map<INews.State, List<NewsReference>> results) {
+  public synchronized Pair<Boolean, Boolean> setResult(Map<INews.State, List<NewsReference>> results) {
     Assert.isNotNull(results, "results");
 
     boolean changed = false;
@@ -154,14 +154,14 @@ public class SearchMark extends Mark implements ISearchMark {
   /*
    * @see org.rssowl.core.persist.ISearchMark#getMatchingNews()
    */
-  public List<NewsReference> getResult() {
+  public synchronized List<NewsReference> getResult() {
     return getResult(INews.State.getVisible());
   }
 
   /*
    * @see org.rssowl.core.persist.ISearchMark#getMatchingNews(java.util.EnumSet)
    */
-  public List<NewsReference> getResult(Set<INews.State> states) {
+  public synchronized List<NewsReference> getResult(Set<INews.State> states) {
     List<NewsReference> result = new ArrayList<NewsReference>(getResultCount(states));
 
     /* Add Read News */
@@ -188,7 +188,7 @@ public class SearchMark extends Mark implements ISearchMark {
   /*
    * @see org.rssowl.core.persist.ISearchMark#getMatchingNewsCount(java.util.Set)
    */
-  public int getResultCount(Set<INews.State> states) {
+  public synchronized int getResultCount(Set<INews.State> states) {
     Assert.isNotNull(states, "states");
     int count = 0;
 
@@ -210,7 +210,7 @@ public class SearchMark extends Mark implements ISearchMark {
   /*
    * @see org.rssowl.core.model.types.ISearchMark#addSearchCondition(org.rssowl.core.model.reference.SearchConditionReference)
    */
-  public void addSearchCondition(ISearchCondition searchCondition) {
+  public synchronized void addSearchCondition(ISearchCondition searchCondition) {
     Assert.isNotNull(searchCondition, "Exception adding NULL as Search Condition into SearchMark"); //$NON-NLS-1$
     fSearchConditions.add(searchCondition);
   }
@@ -218,28 +218,28 @@ public class SearchMark extends Mark implements ISearchMark {
   /*
    * @see org.rssowl.core.model.types.ISearchMark#removeSearchCondition(org.rssowl.core.model.search.ISearchCondition)
    */
-  public boolean removeSearchCondition(ISearchCondition searchCondition) {
+  public synchronized boolean removeSearchCondition(ISearchCondition searchCondition) {
     return fSearchConditions.remove(searchCondition);
   }
 
   /*
    * @see org.rssowl.core.model.types.ISearchMark#getSearchConditions()
    */
-  public List<ISearchCondition> getSearchConditions() {
+  public synchronized List<ISearchCondition> getSearchConditions() {
     return Collections.unmodifiableList(fSearchConditions);
   }
 
   /*
    * @see org.rssowl.core.model.types.ISearchMark#requiresAllConditions()
    */
-  public boolean matchAllConditions() {
+  public synchronized boolean matchAllConditions() {
     return fMatchAllConditions;
   }
 
   /*
    * @see org.rssowl.core.model.types.ISearchMark#setRequireAllConditions(boolean)
    */
-  public void setMatchAllConditions(boolean requiresAllConditions) {
+  public synchronized void setMatchAllConditions(boolean requiresAllConditions) {
     fMatchAllConditions = requiresAllConditions;
   }
 
@@ -250,7 +250,7 @@ public class SearchMark extends Mark implements ISearchMark {
    * @return whether this object and <code>searchMark</code> are identical. It
    * compares all the fields.
    */
-  public boolean isIdentical(ISearchMark searchMark) {
+  public synchronized boolean isIdentical(ISearchMark searchMark) {
     if (this == searchMark)
       return true;
 
@@ -269,7 +269,7 @@ public class SearchMark extends Mark implements ISearchMark {
    */
   @Override
   @SuppressWarnings("nls")
-  public String toLongString() {
+  public synchronized String toLongString() {
     return super.toString() + "Search Conditions = " + fSearchConditions.toString() + ")";
   }
 }
