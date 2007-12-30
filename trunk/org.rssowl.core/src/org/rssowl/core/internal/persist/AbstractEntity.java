@@ -58,8 +58,10 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
    */
   protected AbstractEntity(Long id, AbstractEntity entity) {
     fId = id;
-    if (entity.fProperties != null)
-      fProperties = new HashMap<String, Serializable>(entity.fProperties);
+    synchronized (entity) {
+      if (entity.fProperties != null)
+        fProperties = new HashMap<String, Serializable>(entity.fProperties);
+    }
   }
 
   /*
