@@ -29,6 +29,7 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.ArrayUtils;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -47,6 +48,10 @@ public class NewsContainer {
   private int[] fNewsSize;
 
   private boolean fSorted;
+
+  protected NewsContainer() {
+    super();
+  }
 
   public NewsContainer(boolean sorted) {
     fSorted = sorted;
@@ -78,8 +83,75 @@ public class NewsContainer {
     return array;
   }
 
-  public void removeNews(INews news) {
+  public LongIterator getNewsIterator() {
+    return new LongIterator() {
+      private int outerIndex = 0;
+      private int innerIndex = 0;
+      public boolean hasNext() {
+        if (outerIndex < fNews.length - 1) {
+          if (innerIndex < fNewsSize[outerIndex] - 1)
+            return true;
 
+          for (int i = outerIndex + 1, c = fNewsSize.length; i < c; ++i) {
+            if (fNewsSize[i] > 0)
+              return true;
+          }
+          return false;
+        }
+
+        if (outerIndex == fNews.length - 1) {
+          return innerIndex < fNewsSize[outerIndex] - 1;
+        }
+        return false;
+      }
+
+      public long next() {
+        long value = fNews[outerIndex][innerIndex];
+        Assert.isLegal(value > 0);
+
+        if (innerIndex < fNewsSize[outerIndex] - 1)
+          ++innerIndex;
+        else {
+          ++outerIndex;
+          innerIndex = 0;
+        }
+
+        return value;
+      }
+    };
+  }
+
+  public boolean removeNews(INews news) {
+    for (int i = 0, c = fNews.length; i < c; ++i) {
+      if (removeNews(i, news))
+        return true;
+    }
+    return false;
+  }
+
+  private boolean removeNews(int outerIndex, INews news) {
+    long[] newsArray = fNews[outerIndex];
+    if (fSorted) {
+      int index = ArrayUtils.binarySearch(newsArray, news.getId(), fNewsSize[outerIndex]);
+      if (index < 0)
+        return false;
+
+      removeNews(outerIndex, newsArray, index);
+      return true;
+    }
+
+    for (int i = 0, c = fNewsSize[outerIndex]; i < c; ++i) {
+      if (newsArray[i] == news.getId().longValue()) {
+        removeNews(outerIndex, newsArray, i);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private void removeNews(int outerIndex, long[] newsArray, int innerIndex) {
+    System.arraycopy(newsArray, innerIndex + 1, newsArray, innerIndex, fNewsSize[outerIndex] - innerIndex - 1);
+    newsArray[--fNewsSize[outerIndex]] = 0L;
   }
 
   public int getNewsCount(Set<INews.State> states) {
@@ -106,11 +178,15 @@ public class NewsContainer {
     if (fSorted)
       return ArrayUtils.binarySearch(newsArray, news.getId(), endIndex) >= 0;
 
-    for (int i = 0, c = newsArray.length; i < c; ++i) {
+    for (int i = 0; i < endIndex; ++i) {
       if (newsArray[i] == news.getId().longValue())
         return true;
     }
     return false;
+  }
+
+  public List<NewsReference> getNews()  {
+    return getNews(EnumSet.allOf(INews.State.class));
   }
 
   public List<NewsReference> getNews(Set<INews.State> states)   {
@@ -119,7 +195,8 @@ public class NewsContainer {
     for (INews.State state : states) {
       int index = state.ordinal();
       long[] newsIds = fNews[index];
-      for (int i = 0, c = newsIds.length; i < c; ++i) {
+      for (int i = 0, c = fNewsSize[index]; i < c; ++i) {
+        Assert.isLegal(newsIds[i] != 0);
         newsRefs.add(new NewsReference(newsIds[i]));
       }
     }
@@ -127,7 +204,7 @@ public class NewsContainer {
     return newsRefs;
   }
 
-  public List<NewsReference> getNews() {
+  public List<NewsReference> getVisibleNews() {
     return getNews(INews.State.getVisible());
   }
 
@@ -138,5 +215,14 @@ public class NewsContainer {
       long[] compacted = new long[size];
       System.arraycopy(fStateNews, 0, compacted, 0, size);
     }
+  }
+
+  public List<NewsReference> removeNews(Set<INews.State> states) {
+    List<NewsReference> newsRefs = getNews(states);
+    for (INews.State state : states) {
+      int index = state.ordinal();
+      fNews[index] = new long[0];
+    }
+    return newsRefs;
   }
 }
