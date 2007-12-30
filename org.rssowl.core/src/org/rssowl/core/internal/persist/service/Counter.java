@@ -25,16 +25,23 @@ package org.rssowl.core.internal.persist.service;
 
 public final class Counter {
   private long fValue;
-  
-  public Counter() {
-    // Default constructor
+
+  /**
+   * Provided for deserialization.
+   */
+  protected Counter() {
+    super();
   }
-  
+
+  public Counter(long value) {
+    fValue = value;
+  }
+
   public long increment(int amount) {
     fValue += amount;
     return fValue;
   }
-  
+
   public final long getValue() {
     return fValue;
   }
