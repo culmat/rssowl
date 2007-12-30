@@ -164,7 +164,7 @@ public class SavedSearchService {
   /**
    * @param searchMarks The Set of <code>ISearchMark</code> to update the
    * results in.
-   * @param fromUserEvent Indicates wheather to update the saved searches due to
+   * @param fromUserEvent Indicates whether to update the saved searches due to
    * a user initiated event or an automatic one.
    */
   public void updateSavedSearches(Set<ISearchMark> searchMarks, boolean fromUserEvent) {
