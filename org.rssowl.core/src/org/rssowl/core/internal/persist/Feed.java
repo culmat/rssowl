@@ -42,9 +42,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A Feed is the container of <code>News</code>. There can only be one Feed
@@ -328,9 +328,9 @@ public class Feed extends AbstractEntity implements IFeed {
   }
 
   /*
-   * @see org.rssowl.core.model.types.IFeed#getNewsByStates(java.util.EnumSet)
+   * @see org.rssowl.core.model.types.IFeed#getNewsByStates(java.util.Set)
    */
-  public synchronized List<INews> getNewsByStates(EnumSet<INews.State> states) {
+  public synchronized List<INews> getNewsByStates(Set<INews.State> states) {
     List<INews> newsList = new ArrayList<INews>();
     for (INews news : fNews) {
       for (INews.State state : states) {
