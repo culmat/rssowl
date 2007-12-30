@@ -1085,7 +1085,7 @@ public class News extends AbstractEntity implements INews {
     if (fGuid == null && guid == null)
       return false;
 
-    if ((fGuid == null && guid != null) || (!areGuidsIdentical(fGuid, guid))) {
+    if (fGuid == null || guid == null || (!areGuidsIdentical(fGuid, guid))) {
       setGuid(guid);
       return true;
     }
