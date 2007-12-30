@@ -31,6 +31,7 @@ import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.NewsReference;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +51,7 @@ public class NewsBin extends Mark implements INewsBin   {
    */
   public NewsBin(Long id, IFolder folder, String name) {
     super(id, folder, name);
-    newsContainer = new NewsContainer(true);
+    newsContainer = new NewsContainer(Collections.<INews.State, Boolean>emptyMap());
   }
 
   /**
