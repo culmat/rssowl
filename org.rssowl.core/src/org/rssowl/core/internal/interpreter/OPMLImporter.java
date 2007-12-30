@@ -41,7 +41,6 @@ import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.SearchSpecifier;
-import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFeedDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
@@ -362,7 +361,7 @@ public class OPMLImporter implements ITypeImporter {
           IFeed feed = Owl.getModelFactory().createFeed(null, uri);
           feed.setHomepage(homepage != null ? URIUtils.createURI(homepage) : null);
           feed.setDescription(description);
-          feed = DynamicDAO.save(feed);
+          feed = feedDao.save(feed);
         }
 
         /* Create the BookMark */
