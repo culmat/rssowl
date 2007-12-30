@@ -33,8 +33,8 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.Pair;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,9 +50,7 @@ public class SearchMark extends Mark implements ISearchMark {
   private List<ISearchCondition> fSearchConditions;
   private boolean fMatchAllConditions;
 
-  private transient long[] fMatchingReadNews = new long[0];
-  private transient long[] fMatchingUnreadUpdatedNews = new long[0];
-  private transient long[] fMatchingNewNews = new long[0];
+  private transient NewsContainer fNewsContainer;
 
   /**
    * Creates a new Element of the type SearchMark. A SearchMark is only visually
@@ -66,12 +64,20 @@ public class SearchMark extends Mark implements ISearchMark {
   public SearchMark(Long id, IFolder folder, String name) {
     super(id, folder, name);
     fSearchConditions = new ArrayList<ISearchCondition>(5);
+    fNewsContainer = createNewsContainer();
+  }
+
+  private NewsContainer createNewsContainer() {
+    Map<INews.State, Boolean> statesToSortedMap = new EnumMap<INews.State, Boolean>(INews.State.class);
+    statesToSortedMap.put(INews.State.NEW, Boolean.TRUE);
+    return new NewsContainer(statesToSortedMap);
   }
 
   /**
    * Default constructor for deserialization
    */
   protected SearchMark() {
+    fNewsContainer = createNewsContainer();
   // As per javadoc
   }
 
@@ -79,76 +85,7 @@ public class SearchMark extends Mark implements ISearchMark {
    * @see org.rssowl.core.persist.ISearchMark#setResult(java.util.List)
    */
   public synchronized Pair<Boolean, Boolean> setResult(Map<INews.State, List<NewsReference>> results) {
-    Assert.isNotNull(results, "results");
-
-    boolean changed = false;
-    boolean isNewNewsAdded = false;
-
-    /* For each Result */
-    for (Map.Entry<INews.State, List<NewsReference>> result : results.entrySet()) {
-      List<NewsReference> news = result.getValue();
-      INews.State state = result.getKey();
-
-      Assert.isNotNull(news, "news");
-      Assert.isNotNull(state, "state");
-
-      long[] bucket = new long[news.size()];
-
-      /* Fill Bucket */
-      for (int i = 0; i < news.size(); i++) {
-        bucket[i] = news.get(i).getId();
-      }
-
-      switch (state) {
-
-        /* Read News */
-        case READ:
-          if (!changed)
-            changed = !Arrays.equals(fMatchingReadNews, bucket);
-
-          fMatchingReadNews = bucket;
-          break;
-
-        /* Unread or Updated News */
-        case UNREAD:
-        case UPDATED:
-          if (!changed)
-            changed = !Arrays.equals(fMatchingUnreadUpdatedNews, bucket);
-
-          fMatchingUnreadUpdatedNews = bucket;
-          break;
-
-        /* New News */
-        case NEW:
-
-          /* Check for added *new* News */
-          for (long lVal : bucket) {
-            if (Arrays.binarySearch(fMatchingNewNews, lVal) < 0) {
-              isNewNewsAdded = true;
-              break;
-            }
-          }
-
-          /* Also use for changed-flag */
-          if (isNewNewsAdded)
-            changed = true;
-
-          /*
-           * We need to sort the array to be able to do the binary search
-           * in future iterations. However, since we assign the array to
-           * fMatchingNewNews, we also need to sort the array in case we do
-           * Arrays.equals.
-           */
-          Arrays.sort(bucket);
-          if (!changed)
-            changed = !Arrays.equals(fMatchingNewNews, bucket);
-
-          fMatchingNewNews = bucket;
-          break;
-      }
-    }
-
-    return Pair.create(changed, isNewNewsAdded);
+    return fNewsContainer.setNews(results);
   }
 
   /*
@@ -162,27 +99,7 @@ public class SearchMark extends Mark implements ISearchMark {
    * @see org.rssowl.core.persist.ISearchMark#getMatchingNews(java.util.EnumSet)
    */
   public synchronized List<NewsReference> getResult(Set<INews.State> states) {
-    List<NewsReference> result = new ArrayList<NewsReference>(getResultCount(states));
-
-    /* Add Read News */
-    if (states.contains(INews.State.READ)) {
-      for (long id : fMatchingReadNews)
-        result.add(new NewsReference(id));
-    }
-
-    /* Add Unread News */
-    if (states.contains(INews.State.UNREAD) || states.contains(INews.State.UPDATED)) {
-      for (long id : fMatchingUnreadUpdatedNews)
-        result.add(new NewsReference(id));
-    }
-
-    /* Add New News */
-    if (states.contains(INews.State.NEW)) {
-      for (long id : fMatchingNewNews)
-        result.add(new NewsReference(id));
-    }
-
-    return result;
+    return fNewsContainer.getNews(states);
   }
 
   /*
@@ -190,21 +107,7 @@ public class SearchMark extends Mark implements ISearchMark {
    */
   public synchronized int getResultCount(Set<INews.State> states) {
     Assert.isNotNull(states, "states");
-    int count = 0;
-
-    /* Read News */
-    if (states.contains(INews.State.READ))
-      count += fMatchingReadNews.length;
-
-    /* Unread or Updated News */
-    if (states.contains(INews.State.UNREAD) || states.contains(INews.State.UPDATED))
-      count += fMatchingUnreadUpdatedNews.length;
-
-    /* New News */
-    if (states.contains(INews.State.NEW))
-      count += fMatchingNewNews.length;
-
-    return count;
+    return fNewsContainer.getNewsCount(states);
   }
 
   /*
