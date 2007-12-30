@@ -33,18 +33,19 @@ import org.rssowl.core.persist.service.PersistenceException;
  * A <code>ModelReference</code> is a potential lightweight representation of
  * a Model-Type. The actual heavyweight Model-Type can be retrieved calling the
  * resolve()-Method.
- * 
+ *
  * @author bpasero
  */
 public abstract class ModelReference {
   private final long fId;
   private final IEntityDAO<?, ?, ?> fDAO;
-  
+  private final Class<? extends IEntity> fEntityClass;
+
   /**
    * Instantiates a new leightweight reference. Any resolve()-call will be
    * passed to the <code>IModelDAO</code> to load the heavyweight type from
    * the persistance layer.
-   * 
+   *
    * @param id The ID of the type to use for loading the type from the
    * persistance layer.
    * @param entityClass the class of the Entity that this reference points
@@ -53,12 +54,20 @@ public abstract class ModelReference {
    */
   protected ModelReference(long id, Class<? extends IEntity> entityClass) {
     fId = id;
+    fEntityClass = entityClass;
     fDAO = DynamicDAO.getDAOFromEntity(entityClass);
   }
 
   /**
+   * @return the class of the entity type represented by this reference.
+   */
+  public final Class<? extends IEntity> getEntityClass()    {
+    return fEntityClass;
+  }
+
+  /**
    * Get the ID of the Type this reference is related to.
-   * 
+   *
    * @return The ID of the Type this reference is related to.
    */
   public final long getId() {
@@ -67,7 +76,7 @@ public abstract class ModelReference {
 
   /**
    * Returns the heavyweight Model-Type that this reference is pointing to.
-   * 
+   *
    * @return The heavyweight <code>IEntity</code> that this reference is
    * pointing to.
    * @throws PersistenceException In case of an error while accessing the
@@ -76,12 +85,12 @@ public abstract class ModelReference {
   public IEntity resolve() throws PersistenceException  {
     return fDAO.load(fId);
   }
-  
+
   /**
-   * Returns <code>true</code> if calling {@link #resolve()} on this reference 
-   * will return an entity equal to <code>entity</code>. Note that subclasses 
+   * Returns <code>true</code> if calling {@link #resolve()} on this reference
+   * will return an entity equal to <code>entity</code>. Note that subclasses
    * are free to use something besides {@link IEntity#getId()} to assert this.
-   * 
+   *
    * @param entity The IEntity to compare to.
    * @return <code>true</code> if this object references <code>entity</code> or
    * <code>false</code> otherwise.
