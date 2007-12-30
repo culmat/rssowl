@@ -66,7 +66,7 @@ public class NewsBin extends Mark implements INewsBin   {
   }
 
   public List<NewsReference> getNews() {
-    return newsContainer.getNews();
+    return newsContainer.getVisibleNews();
   }
 
   public int getNewsCount(Set<State> states) {
