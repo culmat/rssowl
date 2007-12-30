@@ -119,7 +119,7 @@ public class JobQueue {
   }
 
   /**
-   * Cancels all Jobs that belong to this Queue. Optionally the callee may
+   * Cancels all Jobs that belong to this Queue. Optionally the caller may
    * decide to join the running Jobs that are not yet done. Note that this will
    * <em>block</em> the calling Thread until all running Tasks have finished
    * so this should only be considered for <em>short-running</em> Tasks.
@@ -127,18 +127,19 @@ public class JobQueue {
    * @param joinRunning If <code>TRUE</code>, join the running Jobs that are
    * not yet done.
    */
-  public synchronized void cancel(boolean joinRunning) {
+  public void cancel(boolean joinRunning) {
 
-    /* Clear open tasks */
-    fOpenTasksQueue.clear();
+    synchronized (this) {
+      /* Clear open tasks */
+      fOpenTasksQueue.clear();
 
-    /* Cancel scheduled Jobs */
-    Job.getJobManager().cancel(this);
+      /* Cancel scheduled Jobs */
+      Job.getJobManager().cancel(this);
 
-    /* Cancel Progress Job */
-    if (fProgressJob != null)
-      fProgressJob.cancel();
-
+      /* Cancel Progress Job */
+      if (fProgressJob != null)
+        fProgressJob.cancel();
+    }
     /* Join running Jobs if any */
     if (joinRunning) {
       while (Job.getJobManager().find(this).length != 0) {
