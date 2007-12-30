@@ -116,12 +116,16 @@ public class DBHelper {
   }
 
   public static final void saveNews(ObjectContainer db, INews news) {
+    saveNews(db, news, 2);
+  }
+
+  public static final void saveNews(ObjectContainer db, INews news, Integer updateDepth) {
     INews oldNews = peekPersistedNews(db, news);
     if (oldNews != null) {
       ModelEvent newsEventTemplate = new NewsEvent(oldNews, news, false);
       DBHelper.putEventTemplate(newsEventTemplate);
     }
-    db.ext().set(news, 2);
+    db.ext().set(news, updateDepth);
   }
 
   static final boolean feedExists(ObjectContainer db, URI link) {
