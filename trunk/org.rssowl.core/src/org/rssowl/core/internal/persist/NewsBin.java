@@ -60,31 +60,31 @@ public class NewsBin extends Mark implements INewsBin   {
     super();
   }
 
-  public void addNews(INews news) {
+  public synchronized void addNews(INews news) {
     newsContainer.addNews(news);
   }
 
-  public boolean containsNews(INews news) {
+  public synchronized boolean containsNews(INews news) {
     return newsContainer.containsNews(news);
   }
 
-  public List<NewsReference> getNewsRefs() {
+  public synchronized List<NewsReference> getNewsRefs() {
     return newsContainer.getNews();
   }
 
-  public int getNewsCount(Set<State> states) {
+  public synchronized int getNewsCount(Set<State> states) {
     return newsContainer.getNewsCount(states);
   }
 
-  public void removeNews(INews news) {
+  public synchronized void removeNews(INews news) {
     newsContainer.removeNews(news);
   }
 
-  public List<INews> getNews() {
+  public synchronized List<INews> getNews() {
     return getNews(EnumSet.allOf(INews.State.class));
   }
 
-  public List<INews> getNews(Set<State> states) {
+  public synchronized List<INews> getNews(Set<State> states) {
     List<NewsReference> newsRefs = newsContainer.getNews(states);
     List<INews> news = new ArrayList<INews>(newsRefs.size());
 
@@ -96,7 +96,7 @@ public class NewsBin extends Mark implements INewsBin   {
     return news;
   }
 
-  public List<NewsReference> getNewsRefs(Set<State> states) {
+  public synchronized List<NewsReference> getNewsRefs(Set<State> states) {
     return newsContainer.getNews(states);
   }
 }
