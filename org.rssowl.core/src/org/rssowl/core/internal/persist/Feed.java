@@ -319,12 +319,7 @@ public class Feed extends AbstractEntity implements IFeed {
    * @see org.rssowl.core.model.types.IFeed#getVisibleNews()
    */
   public synchronized List<INews> getVisibleNews() {
-    List<INews> newsList = new ArrayList<INews>();
-    for (INews news : fNews) {
-      if (news.isVisible())
-        newsList.add(news);
-    }
-    return newsList;
+    return getNewsByStates(INews.State.getVisible());
   }
 
   /*
@@ -333,12 +328,8 @@ public class Feed extends AbstractEntity implements IFeed {
   public synchronized List<INews> getNewsByStates(Set<INews.State> states) {
     List<INews> newsList = new ArrayList<INews>();
     for (INews news : fNews) {
-      for (INews.State state : states) {
-        if (news.getState() == state) {
+      if (states.contains(news.getState()))
           newsList.add(news);
-          break;
-        }
-      }
     }
     return newsList;
   }
