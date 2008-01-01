@@ -27,8 +27,7 @@ package org.rssowl.ui.internal.editors.feed;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
-import org.rssowl.core.persist.IBookMark;
-import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 
 /**
@@ -41,20 +40,24 @@ public class FeedViewFactory implements IElementFactory {
    */
   public IAdaptable createElement(IMemento memento) {
 
-    /* Check for BookMark */
-    String inputId = memento.getString(FeedViewInput.BOOKMARK_INPUT_ID);
+    /* Check for IMark */
+    String inputId = memento.getString(FeedViewInput.MARK_INPUT_ID);
     if (inputId != null) {
-      IBookMark mark = DynamicDAO.load(IBookMark.class, Long.valueOf(inputId));
-      if (mark != null)
-        return new FeedViewInput(mark);
-    }
-
-    /* Check for SearchMark */
-    inputId = memento.getString(FeedViewInput.SEARCHMARK_INPUT_ID);
-    if (inputId != null) {
-      ISearchMark mark = DynamicDAO.load(ISearchMark.class, Long.valueOf(inputId));
-      if (mark != null)
-        return new FeedViewInput(mark);
+      String inputClass = memento.getString(FeedViewInput.MARK_INPUT_CLASS);
+      Class<?> klass;
+      try {
+        klass = Class.forName(inputClass, true, Thread.currentThread().getContextClassLoader());
+        if (IMark.class.isAssignableFrom(klass)) {
+          Class<? extends IMark> markClass = klass.asSubclass(IMark.class);
+          IMark mark = DynamicDAO.load(markClass, Long.valueOf(inputId));
+          if (mark != null)
+            return new FeedViewInput(mark);
+        } else
+          throw new IllegalStateException(FeedViewInput.MARK_INPUT_CLASS + " does not implement IMark: " + inputClass);
+      } catch (ClassNotFoundException e) {
+        /* Should never happen */
+        throw new IllegalStateException(e);
+      }
     }
 
     return null;

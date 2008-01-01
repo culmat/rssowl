@@ -44,8 +44,8 @@ public class FeedViewInput implements IEditorInput {
   private static final String FACTORY_ID = "org.rssowl.ui.FeedViewFactory";
   private static final String RESTORE_QUALIFIER = "/instance/org.eclipse.ui.workbench/";
   private static final String RESTORE_KEY = "USE_IPERSISTABLE_EDITORS";
-  static final String BOOKMARK_INPUT_ID = "org.rssowl.ui.internal.editors.feed.BookMarkInputId";
-  static final String SEARCHMARK_INPUT_ID = "org.rssowl.ui.internal.editors.feed.SearchMarkInputId";
+  static final String MARK_INPUT_CLASS = "org.rssowl.ui.internal.editors.feed.MarkInputClass";
+  static final String MARK_INPUT_ID = "org.rssowl.ui.internal.editors.feed.MarkInputId";
 
   private IMark fMark;
   private boolean fIsDeleted;
@@ -127,10 +127,8 @@ public class FeedViewInput implements IEditorInput {
       }
 
       public void saveState(IMemento memento) {
-        if (fMark instanceof IBookMark)
-          memento.putString(BOOKMARK_INPUT_ID, String.valueOf(fMark.getId()));
-        else if (fMark instanceof ISearchMark)
-          memento.putString(SEARCHMARK_INPUT_ID, String.valueOf(fMark.getId()));
+        memento.putString(MARK_INPUT_CLASS, fMark.getClass().getName());
+        memento.putString(MARK_INPUT_ID, String.valueOf(fMark.getId()));
       }
     };
   }
