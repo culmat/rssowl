@@ -72,17 +72,37 @@ public class EventsMap {
     eventRunnable.addCheckedRemoveEvent(event);
   }
 
-  private EventRunnable< ? extends ModelEvent> getEventRunnable(ModelEvent event) {
+  public final boolean containsPersistEvent(Class<? extends ModelEvent> eventClass, IEntity entity) {
+    EventRunnable<? extends ModelEvent> eventRunnable = getEventRunnable(eventClass);
+    return eventRunnable.getPersistEvents().contains(entity);
+  }
+
+  public final boolean containsUpdateEvent(Class<? extends ModelEvent> eventClass, IEntity entity) {
+    EventRunnable<? extends ModelEvent> eventRunnable = getEventRunnable(eventClass);
+    return eventRunnable.getUpdateEvents().contains(entity);
+  }
+
+  public final boolean containsRemoveEvent(Class<? extends ModelEvent> eventClass, IEntity entity) {
+    EventRunnable<? extends ModelEvent> eventRunnable = getEventRunnable(eventClass);
+    return eventRunnable.getRemoveEvents().contains(entity);
+  }
+
+  private EventRunnable<? extends ModelEvent> getEventRunnable(Class<? extends ModelEvent> eventClass)   {
     InternalMap map = fEvents.get();
     if (map == null) {
       map = new InternalMap();
       fEvents.set(map);
     }
-    Class<? extends ModelEvent> eventClass = event.getClass();
     EventRunnable< ? extends ModelEvent> eventRunnable = map.get(eventClass);
+    return eventRunnable;
+  }
+
+  private EventRunnable< ? extends ModelEvent> getEventRunnable(ModelEvent event) {
+    Class<? extends ModelEvent> eventClass = event.getClass();
+    EventRunnable<? extends ModelEvent> eventRunnable = getEventRunnable(eventClass);
     if (eventRunnable == null) {
       eventRunnable = event.createEventRunnable();
-      map.put(eventClass, eventRunnable);
+      fEvents.get().put(eventClass, eventRunnable);
     }
     return eventRunnable;
   }
@@ -96,7 +116,8 @@ public class EventsMap {
     return runnable;
   }
 
-  public List<EventRunnable<?>> removeEventRunnables()    {
+
+  public List<EventRunnable<?>> getEventRunnables() {
     InternalMap map = fEvents.get();
     if (map == null)
       return new ArrayList<EventRunnable<?>>(0);
@@ -105,6 +126,15 @@ public class EventsMap {
     for (Map.Entry<Class<? extends ModelEvent>, EventRunnable<? extends ModelEvent>> entry : map.entrySet()) {
       eventRunnables.add(entry.getValue());
     }
+    return eventRunnables;
+  }
+
+  public List<EventRunnable<?>> removeEventRunnables()    {
+    InternalMap map = fEvents.get();
+    if (map == null)
+      return new ArrayList<EventRunnable<?>>(0);
+
+    List<EventRunnable<?>> eventRunnables = getEventRunnables();
     map.clear();
     return eventRunnables;
   }
