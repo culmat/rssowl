@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -102,10 +103,9 @@ public class ApplicationServiceImpl implements IApplicationService {
             emptyFeed.setProperty(entry.getKey(), entry.getValue());
         }
 
-        /* Merge with existing (remember number of added new news) */
-        List<INews> newNewsBeforeMerge = feed.getNewsByStates(EnumSet.of(INews.State.NEW));
+        /* Merge with existing */
         mergeResult = feed.mergeAndCleanUp(emptyFeed);
-        List<INews> newNewsAdded = getNewNewsAdded(feed, newNewsBeforeMerge);
+        List<INews> newNewsAdded = getNewNewsAdded(feed);
         updateStateOfUnsavedNewNews(newNewsAdded);
 
         /* Retention Policy */
@@ -154,10 +154,16 @@ public class ApplicationServiceImpl implements IApplicationService {
     }
   }
 
-  private List<INews> getNewNewsAdded(IFeed feed, List<INews> newNewsBeforeMerge) {
-    List<INews> newNewsAdded = feed.getNewsByStates(EnumSet.of(INews.State.NEW));
-    newNewsAdded.removeAll(newNewsBeforeMerge);
-    return newNewsAdded;
+  private List<INews> getNewNewsAdded(IFeed feed) {
+    List<INews> newsList = feed.getNewsByStates(EnumSet.of(INews.State.NEW));
+
+    for (ListIterator<INews> it = newsList.listIterator(newsList.size()); it.hasPrevious(); ) {
+      INews news = it.previous();
+      /* Relies on the fact that news added during merge have no id assigned yet. */
+      if (news.getId() != null)
+        it.remove();
+    }
+    return newsList;
   }
 
   private <T> List<T> activateAll(List<T> list) {
