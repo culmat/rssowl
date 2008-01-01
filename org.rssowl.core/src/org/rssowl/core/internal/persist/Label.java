@@ -26,6 +26,7 @@ package org.rssowl.core.internal.persist;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.reference.LabelReference;
 import org.rssowl.core.util.StringUtils;
 
 /**
@@ -116,5 +117,9 @@ public class Label extends AbstractEntity implements ILabel {
   @SuppressWarnings("nls")
   public synchronized String toString() {
     return super.toString() + "Name = " + fName + ", Color = " + fColor + ")";
+  }
+
+  public LabelReference toReference() {
+    return new LabelReference(getIdAsPrimitive());
   }
 }

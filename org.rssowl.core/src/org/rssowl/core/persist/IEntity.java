@@ -24,6 +24,7 @@
 
 package org.rssowl.core.persist;
 
+import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.service.IDGenerator;
 
 import java.util.Map;
@@ -40,7 +41,7 @@ import java.util.Map;
  * <li>Identified by a unique ID that allows to load the entity from the
  * persistence layer</li>
  * <li> A Map allowing to store Properties. The content of the Map is stored
- * into the DataBase and thereby kept persistant in case they are Serializable.
+ * into the DataBase and thereby kept persistent in case they are Serializable.
  * This is done using Java's Serialization Feature and it is strongly
  * recommended not to use the Properties to store complex Objects. It is very
  * good to use with Strings or primitive Arrays. For any complex type, please
@@ -118,4 +119,11 @@ public interface IEntity extends IPersistable {
    * @param id Unique id for the object.
    */
   void setId(Long id);
+
+  /**
+   * @return a ModelReference for this object if the id is not null. If the id
+   * is null, then an {@link IllegalStateException} is thrown.
+   * @throws IllegalStateException if the id is null.
+   */
+  ModelReference toReference();
 }

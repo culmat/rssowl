@@ -34,6 +34,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.MergeUtils;
 
 import java.net.URI;
@@ -1158,5 +1159,9 @@ public class News extends AbstractEntity implements INews {
     } finally {
       fLock.releaseWriteLock();
     }
+  }
+
+  public NewsReference toReference() {
+    return new NewsReference(getIdAsPrimitive());
   }
 }

@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.SearchSpecifier;
+import org.rssowl.core.persist.reference.SearchConditionReference;
 
 /**
  * <p>
@@ -189,5 +190,9 @@ public class SearchCondition extends AbstractEntity implements ISearchCondition 
   @SuppressWarnings("nls")
   public synchronized String toString() {
     return super.toString() + "Search-Field = " + fField + ", Search-Specifier = " + fSpecifier.name() + ", Search-Value = " + fValue + ")";
+  }
+
+  public SearchConditionReference toReference() {
+    return new SearchConditionReference(getIdAsPrimitive());
   }
 }

@@ -26,6 +26,7 @@ package org.rssowl.core.internal.persist;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IPreference;
+import org.rssowl.core.persist.reference.ModelReference;
 
 /**
  * Instances of <code>IPreference</code> are capable of storing a certain
@@ -269,5 +270,11 @@ public final class Preference extends AbstractEntity implements IPreference {
     fValues = null;
     fType = null;
     fCachedValues = null;
+  }
+
+  public ModelReference toReference() {
+    //FIXME We don't have PreferenceReference atm, should probably add them
+    //for consistency
+    throw new UnsupportedOperationException();
   }
 }

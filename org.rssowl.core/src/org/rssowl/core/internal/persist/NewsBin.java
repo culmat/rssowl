@@ -28,6 +28,7 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INews.State;
+import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 
 import java.util.ArrayList;
@@ -99,5 +100,9 @@ public class NewsBin extends Mark implements INewsBin   {
 
   public synchronized List<NewsReference> getNewsRefs(Set<State> states) {
     return newsContainer.getNews(states);
+  }
+
+  public NewsBinReference toReference() {
+    return new NewsBinReference(getIdAsPrimitive());
   }
 }

@@ -27,6 +27,7 @@ package org.rssowl.core.internal.persist;
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 
 /**
@@ -137,5 +138,9 @@ public class BookMark extends Mark implements IBookMark {
   @SuppressWarnings("nls")
   public synchronized String toString() {
     return super.toString() + "Belongs to Feed = " + fFeedLink + ")";
+  }
+
+  public BookMarkReference toReference() {
+    return new BookMarkReference(getIdAsPrimitive());
   }
 }
