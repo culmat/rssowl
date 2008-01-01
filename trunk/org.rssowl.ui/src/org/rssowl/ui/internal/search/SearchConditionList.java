@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.rssowl.core.Owl;
@@ -297,6 +298,7 @@ public class SearchConditionList extends ScrolledComposite {
   }
 
   SearchConditionItem addItem(ISearchCondition condition, int index) {
+    boolean wasScrollbarShowing = getVerticalBar().isVisible();
 
     /* Container for Item */
     final Composite itemContainer = new Composite(fContainer, SWT.NONE);
@@ -360,8 +362,31 @@ public class SearchConditionList extends ScrolledComposite {
 
     /* Update Size */
     updateSize();
+    adjustSizeForScrollbar(wasScrollbarShowing);
 
     return item;
+  }
+
+  private void adjustSizeForScrollbar(boolean wasScrollbarShowing) {
+    ScrollBar verticalBar = getVerticalBar();
+
+    /* Ignore for application window */
+    if (getShell().getParent() == null)
+      return;
+
+    int barWidth = verticalBar.getSize().x;
+
+    if (wasScrollbarShowing != verticalBar.isVisible()) {
+      Rectangle shellBounds = getShell().getBounds();
+
+      /* Increase if Scrollbar now Visible */
+      if (!wasScrollbarShowing)
+        getShell().setBounds(shellBounds.x, shellBounds.y, shellBounds.width + barWidth, shellBounds.height);
+
+      /* Reduce if Scrollbar now Invisible */
+      else
+        getShell().setBounds(shellBounds.x, shellBounds.y, shellBounds.width - barWidth, shellBounds.height);
+    }
   }
 
   private void createConditionMenu(Menu menu, SearchConditionItem item) {
@@ -497,6 +522,7 @@ public class SearchConditionList extends ScrolledComposite {
   void onDelete(final SearchConditionItem item, final Composite itemContainer) {
     getDisplay().asyncExec(new Runnable() {
       public void run() {
+        boolean wasScrollbarShowing = SearchConditionList.this.getVerticalBar().isVisible();
 
         /* Delete */
         itemContainer.dispose();
@@ -506,6 +532,8 @@ public class SearchConditionList extends ScrolledComposite {
         /* Restore Default if required */
         if (fItems.size() == 0)
           addItem(getDefaultCondition()).focusInput();
+
+        adjustSizeForScrollbar(wasScrollbarShowing);
       }
     });
   }
