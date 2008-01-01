@@ -63,9 +63,6 @@ import java.util.Map.Entry;
  */
 public class ModelUtils {
 
-  /* Shared Date Format */
-  private static final DateFormat fDateFormat = DateFormat.getDateInstance();
-
   /**
    * @param entities A list of folder childs.
    * @return Returns a multi-dimensional array where an array of {@link Long} is
@@ -191,13 +188,13 @@ public class ModelUtils {
 
               break;
             case ISearchValueType.DATE:
-              fieldExpression.append(fDateFormat.format(fieldCondition.getValue()));
+              fieldExpression.append(DateFormat.getDateInstance().format(fieldCondition.getValue()));
               break;
             case ISearchValueType.TIME:
-              fieldExpression.append(fDateFormat.format(fieldCondition.getValue()));
+              fieldExpression.append(DateFormat.getDateInstance().format(fieldCondition.getValue()));
               break;
             case ISearchValueType.DATETIME:
-              fieldExpression.append(fDateFormat.format(fieldCondition.getValue()));
+              fieldExpression.append(DateFormat.getDateInstance().format(fieldCondition.getValue()));
               break;
 
             default:
