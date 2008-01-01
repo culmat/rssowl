@@ -42,12 +42,12 @@ public abstract class ModelReference {
   private final Class<? extends IEntity> fEntityClass;
 
   /**
-   * Instantiates a new leightweight reference. Any resolve()-call will be
+   * Instantiates a new lightweight reference. Any resolve()-call will be
    * passed to the <code>IModelDAO</code> to load the heavyweight type from
-   * the persistance layer.
+   * the persistence layer.
    *
    * @param id The ID of the type to use for loading the type from the
-   * persistance layer.
+   * persistence layer.
    * @param entityClass the class of the Entity that this reference points
    * to. This may be the interface (e.g. INews.class) or the result of calling
    * IEntity#getClass().
