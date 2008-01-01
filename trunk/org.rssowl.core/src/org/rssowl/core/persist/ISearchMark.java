@@ -54,6 +54,10 @@ public interface ISearchMark extends IMark {
    * non-null Map (typically an EnumMap) of <code>INews.State</code> to a List
    * of <code>NewsReference</code>s that represent the news that match the
    * search.
+   * <p>
+   * Note: Any INews.State that is not included in the map will default to 0 as
+   * result value.
+   * </p>
    *
    * @param results The results are represented by a non-null Map (typically an
    * EnumMap) of <code>INews.State</code> to a List of
