@@ -717,7 +717,7 @@ public class ModelTest1 {
     feed = DynamicDAO.save(feed);
     INews news = fFactory.createNews(null, feed, new Date());
     fFactory.createAttachment(null, news);
-    INews savedNews = DynamicDAO.save(news);
+    INews savedNews = DynamicDAO.save(feed).getNews().get(0);
     DynamicDAO.delete(news.getAttachments().get(0));
     savedNews = DynamicDAO.load(INews.class, savedNews.getId());
     assertNotNull(savedNews);
@@ -850,9 +850,9 @@ public class ModelTest1 {
     SearchValueType valueTypeString2 = new SearchValueType(ISearchValueType.STRING);
     SearchValueType valueTypeDate = new SearchValueType(ISearchValueType.DATE);
 
-    SearchValueType valueTypeEnum1 = new SearchValueType(new ArrayList<String>(Arrays.asList(new String[] { "Foo", "Bar" })));
-    SearchValueType valueTypeEnum2 = new SearchValueType(new ArrayList<String>(Arrays.asList(new String[] { "Foo", "Bar" })));
-    SearchValueType valueTypeEnum3 = new SearchValueType(new ArrayList<String>(Arrays.asList(new String[] { "Foo" })));
+    SearchValueType valueTypeEnum1 = new SearchValueType(new ArrayList<String>(Arrays.asList("Foo", "Bar")));
+    SearchValueType valueTypeEnum2 = new SearchValueType(new ArrayList<String>(Arrays.asList("Foo", "Bar")));
+    SearchValueType valueTypeEnum3 = new SearchValueType(new ArrayList<String>(Arrays.asList("Foo")));
 
     assertTrue(valueTypeString1.hashCode() == valueTypeString2.hashCode());
     assertFalse(valueTypeString1.hashCode() == valueTypeDate.hashCode());
