@@ -535,7 +535,11 @@ public class ApplicationServer {
       if (Application.IS_MAC)
         writer.append("<!--").append(CRLF);
       writer.append("HTTP/1.x 200 OK").append(CRLF);
-      writer.append("Date: ").append(RFC_1123_DATE.format(new Date())).append(CRLF);
+
+      synchronized (RFC_1123_DATE) {
+        writer.append("Date: ").append(RFC_1123_DATE.format(new Date())).append(CRLF);
+      }
+
       writer.append("Server: RSSOwl Local Server").append(CRLF);
       writer.append("Content-Type: text/html; charset=UTF-8").append(CRLF);
       writer.append("Connection: close").append(CRLF);
