@@ -221,12 +221,20 @@ public class NotificationPopup extends PopupDialog {
       fAutoCloser.schedule(fGlobalScope.getInteger(DefaultPreferences.AUTOCLOSE_NOTIFICATION_VALUE) * 1000);
     }
 
-    /* Remove any old duplicate first */
-    for (NotificationItem item : items)
-      fDisplayedItems.remove(item);
+    /* Add / Update Notification Items to display */
+    for (NotificationItem item : items) {
+      int indexOfItem = fDisplayedItems.indexOf(item);
 
-    /* Add to Items List */
-    fDisplayedItems.addAll(items);
+      /* Replace existing Item */
+      if (indexOfItem >= 0) {
+        fDisplayedItems.remove(indexOfItem);
+        fDisplayedItems.add(indexOfItem, item);
+      }
+
+      /* Add new Item to the end */
+      else
+        fDisplayedItems.add(item);
+    }
 
     /* Update Title Label */
     updateTitleLabel();
