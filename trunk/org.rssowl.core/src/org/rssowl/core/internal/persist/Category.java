@@ -26,6 +26,7 @@ package org.rssowl.core.internal.persist;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.ICategory;
+import org.rssowl.core.persist.reference.CategoryReference;
 import org.rssowl.core.util.MergeUtils;
 
 /**
@@ -144,5 +145,9 @@ public class Category extends AbstractEntity implements ICategory {
 
       return result;
     }
+  }
+
+  public CategoryReference toReference() {
+    return new CategoryReference(getIdAsPrimitive());
   }
 }

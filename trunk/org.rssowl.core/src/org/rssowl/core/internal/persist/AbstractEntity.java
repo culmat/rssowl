@@ -71,6 +71,16 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
     return fId;
   }
 
+  /**
+   * @return the id as a long primitive if it's not null and throws an
+   * AssertionFailedException otherwise.
+   */
+  protected final long getIdAsPrimitive() {
+    Long id = getId();
+    Assert.isNotNull(id, "fId");
+    return id.longValue();
+  }
+
   /*
    * @see org.rssowl.core.model.types.IEntity#setId(java.lang.Long)
    */

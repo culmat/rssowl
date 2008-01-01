@@ -28,6 +28,8 @@ import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.reference.FolderReference;
+import org.rssowl.core.persist.reference.ModelReference;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -296,5 +298,9 @@ public class Folder extends AbstractEntity implements IFolder {
   @SuppressWarnings("nls")
   public synchronized String toLongString() {
     return super.toString() + "Name = " + fName + ", Blogroll Link = " + fBlogrollLink + ", Children = " + fChildren.toString() + ", Parent Folder = " + (fParent != null ? fParent.getId() : "none") + ")";
+  }
+
+  public FolderReference toReference() {
+    return new FolderReference(getIdAsPrimitive());
   }
 }

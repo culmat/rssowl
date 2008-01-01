@@ -27,6 +27,7 @@ package org.rssowl.core.internal.persist;
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.reference.AttachmentReference;
 import org.rssowl.core.util.MergeUtils;
 
 import java.net.URI;
@@ -208,5 +209,9 @@ public class Attachment extends AbstractEntity implements IAttachment {
   public synchronized void setParent(INews newParent) {
     Assert.isNotNull(newParent, "newParent");
     fNews = newParent;
+  }
+
+  public AttachmentReference toReference() {
+    return new AttachmentReference(getIdAsPrimitive());
   }
 }

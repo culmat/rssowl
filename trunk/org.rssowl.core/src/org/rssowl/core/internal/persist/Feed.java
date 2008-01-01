@@ -32,6 +32,7 @@ import org.rssowl.core.persist.IImage;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ITextInput;
+import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.util.ArrayUtils;
 import org.rssowl.core.util.MergeUtils;
 
@@ -883,5 +884,9 @@ public class Feed extends AbstractEntity implements IFeed {
 
   public synchronized boolean removeNews(INews news) {
     return fNews.remove(news);
+  }
+
+  public FeedReference toReference() {
+    return new FeedReference(getIdAsPrimitive());
   }
 }

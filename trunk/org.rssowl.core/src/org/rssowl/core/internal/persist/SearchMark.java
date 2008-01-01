@@ -30,6 +30,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.Pair;
 
 import java.util.ArrayList;
@@ -174,5 +175,9 @@ public class SearchMark extends Mark implements ISearchMark {
   @SuppressWarnings("nls")
   public synchronized String toLongString() {
     return super.toString() + "Search Conditions = " + fSearchConditions.toString() + ")";
+  }
+
+  public SearchMarkReference toReference() {
+    return new SearchMarkReference(getIdAsPrimitive());
   }
 }

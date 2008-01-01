@@ -26,6 +26,7 @@ package org.rssowl.core.internal.persist;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.reference.PersonReference;
 import org.rssowl.core.util.MergeUtils;
 
 import java.net.URI;
@@ -155,5 +156,9 @@ public class Person extends AbstractEntity implements IPerson {
 
       return mergeResult;
     }
+  }
+
+  public PersonReference toReference() {
+    return new PersonReference(getIdAsPrimitive());
   }
 }
