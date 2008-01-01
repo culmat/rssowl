@@ -9,9 +9,9 @@
          RSSOwl 2.0 Preview
 
 Version: 2.0.0
-Build id: Milestone 7 (2007-12-16)
+Build id: Milestone 8 (Nightly)
 
-(c) Copyright RSSOwl contributors and others 2005, 2007.  All rights reserved.
+(c) Copyright RSSOwl contributors and others 2005, 2008.  All rights reserved.
 Visit http://www.rssowl.org
       </text>
    </aboutInfo>
@@ -23,7 +23,6 @@ Visit http://www.rssowl.org
    </launcherArgs>
 
    <windowImages i16="/org.rssowl.ui/icons/product/16x16.gif" i32="/org.rssowl.ui/icons/product/32x32.gif" i48="/org.rssowl.ui/icons/product/48x48.gif" i64="/org.rssowl.ui/icons/product/64x64.gif" i128="/org.rssowl.ui/icons/product/128x128.gif"/>
-
 
    <launcher name="RSSOwl">
       <linux icon="/org.rssowl.ui/icons/product/rssowl.xpm"/>
