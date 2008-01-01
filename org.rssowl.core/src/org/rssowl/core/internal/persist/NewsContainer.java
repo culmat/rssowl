@@ -60,6 +60,19 @@ public final class NewsContainer {
     boolean changed = false;
     boolean isNewNewsAdded = false;
 
+    Set<INews.State> statesToReset = EnumSet.allOf(INews.State.class);
+    statesToReset.removeAll(newsMap.keySet());
+
+    /* Reset all ArrayLists whose state is not present in newsMap */
+    for (INews.State state : statesToReset) {
+      int index = state.ordinal();
+      LongArrayList currentArrayList = fNewsIds[index];
+      if (currentArrayList.size() > 0) {
+        currentArrayList.clear();
+        changed = true;
+      }
+    }
+
     /* For each Result */
     for (Map.Entry<INews.State, List<NewsReference>> mapEntry : newsMap.entrySet()) {
       List<NewsReference> news = mapEntry.getValue();
