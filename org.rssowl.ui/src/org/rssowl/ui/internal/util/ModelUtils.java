@@ -147,6 +147,7 @@ public class ModelUtils {
 
     /* For each Field Group */
     Set<Entry<String, List<ISearchCondition>>> entries = mapFieldNameToConditions.entrySet();
+    DateFormat dateFormat = DateFormat.getDateInstance();
     for (Entry<String, List<ISearchCondition>> entry : entries) {
       String prevSpecName = null;
       String fieldName = entry.getKey();
@@ -188,13 +189,13 @@ public class ModelUtils {
 
               break;
             case ISearchValueType.DATE:
-              fieldExpression.append(DateFormat.getDateInstance().format(fieldCondition.getValue()));
+              fieldExpression.append(dateFormat.format(fieldCondition.getValue()));
               break;
             case ISearchValueType.TIME:
-              fieldExpression.append(DateFormat.getDateInstance().format(fieldCondition.getValue()));
+              fieldExpression.append(dateFormat.format(fieldCondition.getValue()));
               break;
             case ISearchValueType.DATETIME:
-              fieldExpression.append(DateFormat.getDateInstance().format(fieldCondition.getValue()));
+              fieldExpression.append(dateFormat.format(fieldCondition.getValue()));
               break;
 
             default:
