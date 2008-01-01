@@ -74,6 +74,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.LabelAdapter;
@@ -81,6 +82,7 @@ import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.ModelReference;
+import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.TaskAdapter;
@@ -797,10 +799,8 @@ public class NewsTableControl implements IFeedViewPart {
       fCustomTree.setVisible(feedColumn, true, true);
 
     /* Set Input to Viewer */
-    if (input instanceof IBookMark)
-      fViewer.setInput(((IBookMark) input).getFeedLinkReference());
-    else if (input instanceof ISearchMark)
-      fViewer.setInput(new SearchMarkReference(((ISearchMark) input).getId()));
+    if (input instanceof IEntity)
+      fViewer.setInput(((IEntity) input).toReference());
     else
       fViewer.setInput(input);
   }
