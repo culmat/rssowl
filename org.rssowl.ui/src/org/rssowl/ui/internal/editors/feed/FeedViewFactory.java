@@ -44,9 +44,8 @@ public class FeedViewFactory implements IElementFactory {
     String inputId = memento.getString(FeedViewInput.MARK_INPUT_ID);
     if (inputId != null) {
       String inputClass = memento.getString(FeedViewInput.MARK_INPUT_CLASS);
-      Class<?> klass;
       try {
-        klass = Class.forName(inputClass, true, Thread.currentThread().getContextClassLoader());
+        Class<?> klass = Class.forName(inputClass, true, Thread.currentThread().getContextClassLoader());
         if (IMark.class.isAssignableFrom(klass)) {
           Class<? extends IMark> markClass = klass.asSubclass(IMark.class);
           IMark mark = DynamicDAO.load(markClass, Long.valueOf(inputId));
