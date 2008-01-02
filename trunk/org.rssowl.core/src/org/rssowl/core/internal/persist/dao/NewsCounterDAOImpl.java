@@ -46,6 +46,11 @@ public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter
   }
 
   @Override
+  protected void preCommit() {
+    //Do nothing
+  }
+
+  @Override
   public final void delete(NewsCounter newsCounter) {
     if (!newsCounter.equals(load()))
       throw new IllegalArgumentException("Only a single newsCounter should be used. " + "Trying to delete a non-existent one.");

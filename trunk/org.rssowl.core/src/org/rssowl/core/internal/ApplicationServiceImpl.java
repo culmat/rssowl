@@ -124,6 +124,7 @@ public class ApplicationServiceImpl implements IApplicationService {
           else
             fDb.ext().set(conditionalGet, 1);
         }
+        DBHelper.updateNewsCounter(fDb);
         fDb.commit();
       } catch (Db4oException e) {
         throw new PersistenceException(e);

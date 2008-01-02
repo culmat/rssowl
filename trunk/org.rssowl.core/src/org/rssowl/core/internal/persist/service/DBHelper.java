@@ -23,6 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.internal.persist.service;
 
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.persist.IEntity;
@@ -33,6 +34,8 @@ import org.rssowl.core.persist.event.FeedEvent;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.runnable.EventRunnable;
+import org.rssowl.core.persist.event.runnable.FeedEventRunnable;
+import org.rssowl.core.persist.event.runnable.NewsEventRunnable;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.persist.service.UniqueConstraintException;
 
@@ -168,5 +171,24 @@ public class DBHelper {
     saveEntities(db, news.getAttachments());
     saveEntity(db, news.getSource());
     db.ext().set(news, 2);
+  }
+
+  public static void updateNewsCounter(ObjectContainer db) {
+    List<EventRunnable<?>> eventRunnables = EventsMap.getInstance().getEventRunnables();
+    NewsCounterService newsCounterService = new NewsCounterService(Owl.getPersistenceService().getDAOService().getNewsCounterDAO(), db);
+    for (EventRunnable<?> eventRunnable : eventRunnables) {
+      if (eventRunnable instanceof NewsEventRunnable) {
+        NewsEventRunnable newsEventRunnable = (NewsEventRunnable) eventRunnable;
+        newsCounterService.onNewsAdded(newsEventRunnable.getPersistEvents());
+        newsCounterService.onNewsRemoved((newsEventRunnable.getRemoveEvents()));
+        newsCounterService.onNewsUpdated(newsEventRunnable.getUpdateEvents());
+      }
+    }
+    for (EventRunnable<?> eventRunnable : eventRunnables) {
+      if (eventRunnable instanceof FeedEventRunnable) {
+        FeedEventRunnable feedEventRunnable = (FeedEventRunnable) eventRunnable;
+        newsCounterService.onFeedRemoved(feedEventRunnable.getRemoveEvents());
+      }
+    }
   }
 }

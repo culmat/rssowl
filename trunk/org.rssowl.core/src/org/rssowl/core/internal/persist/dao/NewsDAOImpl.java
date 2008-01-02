@@ -141,6 +141,7 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
         }
         preSaveAll(changedNews);
         save(changedNews);
+        preCommit();
         fDb.commit();
       } catch (Db4oException e) {
         throw new PersistenceException(e);
