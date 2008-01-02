@@ -139,6 +139,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
         for (T object : objects) {
           doSave(object);
         }
+        preCommit();
         fDb.commit();
       } catch (Db4oException e) {
         throw new PersistenceException(e);
@@ -196,6 +197,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
       for (T object : objects) {
         doDelete(object);
       }
+      preCommit();
       fDb.commit();
     } catch (Db4oException e) {
       throw new PersistenceException(e);
@@ -203,6 +205,10 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
       fWriteLock.unlock();
     }
     DBHelper.cleanUpAndFireEvents();
+  }
+
+  protected void preCommit() {
+    DBHelper.updateNewsCounter(fDb);
   }
 
   protected void preDelete(T persistable) {
