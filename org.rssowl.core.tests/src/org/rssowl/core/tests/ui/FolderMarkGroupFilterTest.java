@@ -80,9 +80,9 @@ public class FolderMarkGroupFilterTest {
    */
   @Before
   public void setUp() throws Exception {
-    Controller.getDefault().getNewsService().testDirtyShutdown();
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
+    Controller.getDefault().getNewsService().testDirtyShutdown();
     fFactory = Owl.getModelFactory();
     fGrouping = new BookMarkGrouping();
     fFiltering = new BookMarkFilter();
@@ -269,13 +269,13 @@ public class FolderMarkGroupFilterTest {
   @Test
   public void testFolderMarkFiltering() throws Exception {
     IFeed feed1 = fFactory.createFeed(null, new URI("http://www.foo.com"));
-    feed1.setDescription("This is the bar.");
+    feed1.setDescription("This is the foo.");
     fFactory.createNews(null, feed1, new Date());
     fFactory.createNews(null, feed1, new Date()).setState(INews.State.UNREAD);
     DynamicDAO.save(feed1);
 
     IFeed feed2 = fFactory.createFeed(null, new URI("http://www.bar.com"));
-    feed2.setDescription("This is the foo.");
+    feed2.setDescription("This is the bar.");
     DynamicDAO.save(feed2);
 
     IFolder root = fFactory.createFolder(null, null, "Root");
