@@ -24,11 +24,11 @@
 
 package org.rssowl.core.tests.model;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertArrayEquals;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +39,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.event.PreferenceEvent;
 import org.rssowl.core.persist.event.PreferenceListener;
+import org.rssowl.ui.internal.Controller;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -59,6 +60,7 @@ public class PreferencesDAOTest {
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
+    Controller.getDefault().getNewsService().testDirtyShutdown();
     fDao = DynamicDAO.getDAO(IPreferenceDAO.class);
     fFactory = Owl.getModelFactory();
   }

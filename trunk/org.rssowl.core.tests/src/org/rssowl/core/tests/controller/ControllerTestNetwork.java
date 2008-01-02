@@ -56,9 +56,9 @@ public class ControllerTestNetwork {
    */
   @Before
   public void setUp() throws Exception {
-    Controller.getDefault().getNewsService().testDirtyShutdown();
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
+    Controller.getDefault().getNewsService().testDirtyShutdown();
   }
 
   /**

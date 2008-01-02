@@ -55,6 +55,7 @@ import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.tests.TestUtils;
 import org.rssowl.core.util.SearchHit;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.net.URI;
@@ -91,6 +92,7 @@ public class ModelSearchTest {
 
     fModelSearch.startup();
     Owl.getPersistenceService().recreateSchema();
+    Controller.getDefault().getNewsService().testDirtyShutdown();
   }
 
   /**

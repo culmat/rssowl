@@ -88,6 +88,7 @@ import org.rssowl.core.persist.reference.SearchConditionReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.tests.TestUtils;
+import org.rssowl.ui.internal.Controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -109,6 +110,7 @@ public class ModelTest2 {
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
+    Controller.getDefault().getNewsService().testDirtyShutdown();
     fFactory = Owl.getModelFactory();
   }
 

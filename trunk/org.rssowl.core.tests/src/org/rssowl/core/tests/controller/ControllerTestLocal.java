@@ -160,6 +160,7 @@ public class ControllerTestLocal {
 
     /* Simulate Dirty Shutdown */
     Owl.getPersistenceService().recreateSchema();
+    Controller.getDefault().getNewsService().testDirtyShutdown();
 
     feed = new Feed(new URI("http://www.rssowl.org/rssowl2dg/tests/manager/rss_2_0.xml")); //$NON-NLS-1$
     feed = DynamicDAO.save(feed);
