@@ -24,7 +24,6 @@
 
 package org.rssowl.ui.internal;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
@@ -39,18 +38,12 @@ import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.NewsCounterItem;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsCounterDAO;
-import org.rssowl.core.persist.event.FeedAdapter;
-import org.rssowl.core.persist.event.FeedEvent;
-import org.rssowl.core.persist.event.NewsEvent;
-import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.lang.reflect.InvocationTargetException;
-import java.net.URI;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * An internal Service helping Viewers to deal with the presentation of
@@ -76,7 +69,7 @@ public class NewsService {
   /* Delay before Progress is shown */
   private static final int SHOW_PROGRESS_THRESHOLD = 2000;
 
-  private INewsCounterDAO fNewsCounterDao;
+  private final INewsCounterDAO fNewsCounterDao;
 
   /* Subclass of a Progress Monitor Dialog to show progress after a Crash */
   private static class NewsServiceProgressMonitorDialog extends ProgressMonitorDialog {
@@ -111,8 +104,10 @@ public class NewsService {
 
   NewsService() {
     fNewsCounterDao = DynamicDAO.getDAO(INewsCounterDAO.class);
-    fCounter = loadCounter();
-    registerListeners();
+    NewsCounter counter = loadCounter();
+    synchronized (counter) {
+      fCounter = counter;
+    }
   }
 
   /**
@@ -123,7 +118,7 @@ public class NewsService {
    * @return the number of unread News for the Feed having the given Id.
    */
   public int getUnreadCount(FeedLinkReference feedLinkRef) {
-    synchronized (this) {
+    synchronized (fCounter) {
       NewsCounterItem counter = getFromCounter(feedLinkRef);
 
       /* Feed has no news */
@@ -142,7 +137,7 @@ public class NewsService {
    * @return the number of unread News for the Feed having the given link.
    */
   public int getNewCount(FeedLinkReference feedLinkRef) {
-    synchronized (this) {
+    synchronized (fCounter) {
       NewsCounterItem counter = getFromCounter(feedLinkRef);
 
       /* Feed has no news */
@@ -161,7 +156,7 @@ public class NewsService {
    * @return the number of sticky News for the Feed having the given Id.
    */
   public int getStickyCount(FeedLinkReference feedLinkRef) {
-    synchronized (this) {
+    synchronized (fCounter) {
       NewsCounterItem counter = getFromCounter(feedLinkRef);
 
       /* Feed has no news */
@@ -176,32 +171,29 @@ public class NewsService {
    * Stops the News-Service and saves all data.
    */
   public void stopService() {
-    synchronized (this) {
-      saveState();
-    }
+    // Do nothing
   }
 
   /**
    * Method only used by Tests!
    */
   public void testDirtyShutdown() {
-    synchronized (this) {
-      fCounter = loadCounter();
+    NewsCounter counter = loadCounter();
+    synchronized (counter) {
+     fCounter = counter;
     }
   }
 
-  private synchronized NewsCounter loadCounter() {
+  private NewsCounter loadCounter() {
 
     /* Load from DB */
     NewsCounter counter = fNewsCounterDao.load();
 
     /* Perform initial counting */
-    if (counter == null)
+    if (counter == null) {
       counter = countAll();
-
-    /* Delete it to force recount on dirty shutdown */
-    else
-      fNewsCounterDao.delete();
+      fNewsCounterDao.save(counter);
+    }
 
     return counter;
   }
@@ -255,10 +247,6 @@ public class NewsService {
     return newsCounter;
   }
 
-  private void putInCounter(FeedLinkReference feedRef, NewsCounterItem counterItem) {
-    fCounter.put(feedRef.getLink(), counterItem);
-  }
-
   private NewsCounterItem getFromCounter(FeedLinkReference feedRef) {
     return fCounter.get(feedRef.getLink());
   }
@@ -277,140 +265,5 @@ public class NewsService {
     }
 
     return counterItem;
-  }
-
-  private void saveState() {
-    fNewsCounterDao.save(fCounter);
-  }
-
-  private void registerListeners() {
-    DynamicDAO.addEntityListener(INews.class, new NewsListener() {
-      public void entitiesAdded(Set<NewsEvent> events) {
-        onNewsAdded(events);
-      }
-
-      public void entitiesUpdated(Set<NewsEvent> events) {
-        onNewsUpdated(events);
-      }
-
-      public void entitiesDeleted(Set<NewsEvent> events) {
-        onNewsDeleted(events);
-      }
-    });
-
-    DynamicDAO.addEntityListener(IFeed.class, new FeedAdapter() {
-      @Override
-      public void entitiesDeleted(Set<FeedEvent> events) {
-        onFeedDeleted(events);
-      }
-    });
-  }
-
-  private void onNewsAdded(Set<NewsEvent> events) {
-    for (NewsEvent event : events) {
-      INews news = event.getEntity();
-      FeedLinkReference feedRef = news.getFeedReference();
-
-      synchronized (this) {
-        NewsCounterItem counter = getFromCounter(feedRef);
-
-        /* Create Counter if not yet done */
-        if (counter == null) {
-          counter = new NewsCounterItem();
-          putInCounter(feedRef, counter);
-        }
-
-        /* Update Counter */
-        if (news.getState() == INews.State.NEW)
-          counter.incrementNewCounter();
-        if (ModelUtils.isUnread(news.getState()))
-          counter.incrementUnreadCounter();
-        if (news.isFlagged())
-          counter.incrementStickyCounter();
-      }
-    }
-  }
-
-  private void onNewsDeleted(Set<NewsEvent> events) {
-    for (NewsEvent event : events) {
-      INews news = event.getEntity();
-
-      synchronized (this) {
-        NewsCounterItem counter = getFromCounter(news.getFeedReference());
-        if (counter != null) {
-
-          /* Update Counter */
-          if (news.getState() == INews.State.NEW)
-            counter.decrementNewCounter();
-          if (ModelUtils.isUnread(news.getState()))
-            counter.decrementUnreadCounter();
-          if (news.isFlagged())
-            counter.decrementStickyCounter();
-        }
-      }
-    }
-  }
-
-  private void onNewsUpdated(Set<NewsEvent> events) {
-    for (NewsEvent event : events) {
-      INews currentNews = event.getEntity();
-      INews oldNews = event.getOldNews();
-      Assert.isNotNull(oldNews, "oldNews cannot be null on newsUpdated");
-      FeedLinkReference feedRef = currentNews.getFeedReference();
-
-      boolean oldStateUnread = ModelUtils.isUnread(oldNews.getState());
-      boolean currentStateUnread = ModelUtils.isUnread(currentNews.getState());
-
-      boolean oldStateNew = INews.State.NEW.equals(oldNews.getState());
-      boolean currentStateNew = INews.State.NEW.equals(currentNews.getState());
-
-      boolean oldStateSticky = oldNews.isFlagged();
-      boolean newStateSticky = currentNews.isFlagged() && currentNews.isVisible();
-
-      /* No Change - continue */
-      if (oldStateUnread == currentStateUnread && oldStateNew == currentStateNew && oldStateSticky == newStateSticky)
-        continue;
-
-      synchronized (this) {
-        NewsCounterItem counter = getFromCounter(feedRef);
-
-        /* News became read */
-        if (oldStateUnread && !currentStateUnread)
-          counter.decrementUnreadCounter();
-
-        /* News became unread */
-        else if (!oldStateUnread && currentStateUnread)
-          counter.incrementUnreadCounter();
-
-        /* News no longer New */
-        if (oldStateNew && !currentStateNew)
-          counter.decrementNewCounter();
-
-        /* News became New */
-        else if (!oldStateNew && currentStateNew)
-          counter.incrementNewCounter();
-
-        /* News became unsticky */
-        if (oldStateSticky && !newStateSticky)
-          counter.decrementStickyCounter();
-
-        /* News became sticky */
-        else if (!oldStateSticky && newStateSticky)
-          counter.incrementStickyCounter();
-      }
-    }
-  }
-
-  private void onFeedDeleted(Set<FeedEvent> events) {
-    for (FeedEvent event : events) {
-      URI feedLink = event.getEntity().getLink();
-      synchronized (this) {
-        removeFromCounter(feedLink);
-      }
-    }
-  }
-
-  private void removeFromCounter(URI feedLink) {
-    fCounter.remove(feedLink);
   }
 }
