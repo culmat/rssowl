@@ -69,6 +69,7 @@ import com.db4o.events.EventRegistryFactory;
 import com.db4o.events.ObjectEventArgs;
 import com.db4o.query.Query;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -410,10 +411,28 @@ public class EventManager {
     @SuppressWarnings("unchecked")
     List<IFeed> feeds = query.execute();
     for (IFeed feed : feeds) {
-      if(onlyBookMarkReference(feed)) {
-        fDb.delete(feed);
+      if (onlyBookMarkReference(feed)) {
+        if (feedHasNewsWithCopies(feed)) {
+          List<INews> newsList = new ArrayList<INews>(feed.getNews());
+          for (INews news : newsList) {
+            feed.removeNews(news);
+            addItemBeingDeleted(feed);
+            fDb.delete(news);
+          }
+          fDb.ext().set(feed, 2);
+        }
+        else
+          fDb.delete(feed);
       }
     }
+  }
+
+  private boolean feedHasNewsWithCopies(IFeed feed) {
+    Query query = fDb.query();
+    query.constrain(News.class);
+    query.descend("fLinkLink").constrain(feed.getLink().toString());
+    query.descend("fCopy").constrain(true);
+    return !query.execute().isEmpty();
   }
 
   private boolean onlyBookMarkReference(IFeed feed) {
