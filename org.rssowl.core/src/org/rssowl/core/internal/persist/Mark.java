@@ -27,10 +27,14 @@ package org.rssowl.core.internal.persist;
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.reference.FolderReference;
+import org.rssowl.core.persist.reference.NewsReference;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * The abstract super-type of <code>BookMark</code> and
@@ -135,6 +139,17 @@ public abstract class Mark extends AbstractEntity implements IMark {
   public synchronized void setParent(IFolder parent) {
     Assert.isNotNull(parent, "parent");
     fParent = parent;
+  }
+
+  protected static List<INews> getNews(List<NewsReference> newsRefs) {
+    List<INews> news = new ArrayList<INews>(newsRefs.size());
+
+    for (NewsReference newsRef : newsRefs) {
+      INews newsItem = newsRef.resolve();
+      Assert.isNotNull(newsItem, "newsItem");
+      news.add(newsItem);
+    }
+    return news;
   }
 
   /**
