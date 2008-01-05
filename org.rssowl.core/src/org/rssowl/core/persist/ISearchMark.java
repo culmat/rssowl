@@ -38,7 +38,7 @@ import java.util.Set;
  *
  * @author bpasero
  */
-public interface ISearchMark extends IMark {
+public interface ISearchMark extends INewsMark {
 
   /** One of the fields in this type described as constant */
   public static final int MATCHING_NEWS = 4;
