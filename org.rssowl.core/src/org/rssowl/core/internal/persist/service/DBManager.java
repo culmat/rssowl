@@ -54,6 +54,7 @@ import com.db4o.config.ObjectField;
 import com.db4o.config.QueryEvaluationMode;
 import com.db4o.defragment.Defragment;
 import com.db4o.defragment.DefragmentConfig;
+import com.db4o.query.Query;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -533,12 +534,21 @@ public class DBManager {
         destinationDb.ext().set(type, Integer.MAX_VALUE);
       }
     }
+    monitor.worked(15);
+
+    Query query = sourceDb.query();
+    query.constrain(News.class);
+    query.descend("fCopy").constrain(true);
+    for (Object news : query.execute())
+      destinationDb.ext().set(news, Integer.MAX_VALUE);
+
     monitor.worked(25);
+
     for (Feed feed : sourceDb.query(Feed.class)) {
       sourceDb.activate(feed, Integer.MAX_VALUE);
       destinationDb.ext().set(feed, Integer.MAX_VALUE);
     }
-    monitor.worked(55);
+    monitor.worked(40);
     for (Preference pref : sourceDb.query(Preference.class)) {
       sourceDb.activate(pref, Integer.MAX_VALUE);
       destinationDb.ext().set(pref, Integer.MAX_VALUE);
