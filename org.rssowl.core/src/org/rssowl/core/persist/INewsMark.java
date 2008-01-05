@@ -29,25 +29,15 @@ import java.util.List;
 import java.util.Set;
 
 public interface INewsMark extends IMark    {
-  //TODO Do we need to provide getNews and getNewsRefs? This could be useful
-  //for optimization. e.g. if a Mark needs to resolve the INews and the caller
-  //needs the resolved INews, it would be wasteful to do getNewsRefs followed
-  //by a resolve for each news.
+  boolean isGetNewsRefsEfficient();
+
   List<INews> getNews();
 
-  //TODO Need to decide how to deal with cases where the subclass doesn't
-  //hold news in a certain state. For example, a given SM search may include
-  //INews in HIDDEN or DELETED state, but we don't bother storing those since neither
-  //the UI or other users need those INews atm. On the other hand, INewsBin
-  //will store HIDDEN news. Seems like we need to document that subclasses
-  //will define the exact details of what states are returned.
   List<INews> getNews(Set<INews.State> states);
 
   List<NewsReference> getNewsRefs();
+
   List<NewsReference> getNewsRefs(Set<INews.State> states);
 
-  //TODO Unclear if all subclasses can do this efficiently. There are some
-  //problems with the idea of having IBookMark storing long[] or delegating
-  //to a IFeed that does this
   int getNewsCount(Set<INews.State> states);
 }
