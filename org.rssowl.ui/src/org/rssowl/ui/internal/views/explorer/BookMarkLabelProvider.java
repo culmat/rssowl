@@ -40,7 +40,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
@@ -167,15 +167,16 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       cell.setBackground(null);
     }
 
+    //TODO Maybe possible to share more code with INewsMark section
     /* Create Label for a BookMark */
     else if (element instanceof IBookMark) {
       IBookMark bookmark = (IBookMark) element;
       FeedLinkReference feedLinkRef = bookmark.getFeedLinkReference();
 
       if (fIndicateState) {
-        unreadNewsCount = getUnreadNewsCount(feedLinkRef);
+        unreadNewsCount = getUnreadNewsCount(bookmark);
         stickyNewsCount = getStickyNewsCount(feedLinkRef);
-        hasNew = getNewNewsCount(bookmark.getFeedLinkReference()) != 0;
+        hasNew = bookmark.getNewsCount(EnumSet.of(INews.State.NEW)) != 0;
       }
 
       /* Font */
@@ -235,15 +236,19 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       }
     }
 
-    /* Create Label for a SearchMark */
-    else if (element instanceof ISearchMark) {
-      ISearchMark searchmark = (ISearchMark) element;
+    /*
+     * Create Label for a INewsMark
+     * TODO Using the code for ISearchMark for all INewsMarks for now, but
+     * Ben should review this and change if necessary
+     */
+    else if (element instanceof INewsMark) {
+      INewsMark newsMark = (INewsMark) element;
       boolean hasMatchingNews = false;
 
       if (fIndicateState) {
-        unreadNewsCount = searchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
-        hasNew = searchmark.getResultCount(EnumSet.of(INews.State.NEW)) != 0;
-        hasMatchingNews = unreadNewsCount > 0 || searchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED, INews.State.READ)) != 0;
+        unreadNewsCount = newsMark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
+        hasNew = newsMark.getNewsCount(EnumSet.of(INews.State.NEW)) != 0;
+        hasMatchingNews = unreadNewsCount > 0 || newsMark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED, INews.State.READ)) != 0;
       }
 
       /* Image */
@@ -264,7 +269,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
         cell.setFont(fDefaultFont);
 
       /* Text */
-      StringBuilder str = new StringBuilder(searchmark.getName());
+      StringBuilder str = new StringBuilder(newsMark.getName());
       if (unreadNewsCount > 0)
         str.append(" (").append(unreadNewsCount).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
       cell.setText(str.toString());
@@ -321,24 +326,12 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     List<IFolderChild> children = folder.getChildren();
     for (IFolderChild child : children) {
 
-      /* BookMark */
-      if (child instanceof IBookMark) {
-        IBookMark bookmark = (IBookMark) child;
-
+      if (child instanceof INewsMark) {
+        INewsMark newsMark = (INewsMark) child;
         if (unread)
-          count += getUnreadNewsCount(bookmark.getFeedLinkReference());
+          count += getUnreadNewsCount(newsMark);
         else
-          count += getNewNewsCount(bookmark.getFeedLinkReference());
-      }
-
-      /* SearchMark */
-      else if (child instanceof ISearchMark) {
-        ISearchMark searchmark = (ISearchMark) child;
-
-        if (unread)
-          count += searchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
-        else
-          count += searchmark.getResultCount(EnumSet.of(INews.State.NEW));
+          count += newsMark.getNewsCount(EnumSet.of(INews.State.NEW));
       }
 
       /* Folder */
@@ -349,12 +342,8 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     return count;
   }
 
-  private int getUnreadNewsCount(FeedLinkReference feedLinkReference) {
-    return fNewsService.getUnreadCount(feedLinkReference);
-  }
-
-  private int getNewNewsCount(FeedLinkReference feedLinkReference) {
-    return fNewsService.getNewCount(feedLinkReference);
+  private int getUnreadNewsCount(INewsMark newsMark) {
+    return newsMark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
   }
 
   private int getStickyNewsCount(FeedLinkReference feedRef) {
