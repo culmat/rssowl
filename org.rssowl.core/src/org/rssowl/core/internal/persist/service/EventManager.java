@@ -257,13 +257,10 @@ public class EventManager {
       removeFromParentNews((IAttachment) entity);
     else if (entity instanceof ISearchCondition)
       cascadeSearchConditionDeletion((ISearchCondition) entity);
-    else if (entity instanceof INewsBin)
-      cascadeNewsBinDeletion((INewsBin) entity);
   }
 
   private void cascadeNewsBinDeletion(INewsBin entity) {
-    for (INews news : entity.getNews())
-      fDb.delete(news);
+    DBHelper.removeNewsAndFeedsAfterNewsBinUpdate(fDb, entity.getNewsRefs());
   }
 
   private void cascadeSearchConditionDeletion(ISearchCondition searchCondition) {
@@ -306,6 +303,8 @@ public class EventManager {
       deleteFeedIfNecessary((IBookMark) mark);
     else if (mark instanceof ISearchMark)
       cascadeSearchMarkDeletion((ISearchMark) mark);
+    else if (mark instanceof INewsBin)
+      cascadeNewsBinDeletion((INewsBin) mark);
   }
 
   private void cascadeSearchMarkDeletion(ISearchMark mark) {
@@ -411,15 +410,15 @@ public class EventManager {
   }
 
   private void deleteFeedIfNecessary(IBookMark mark) {
-    //TODO Share logic with IApplicationLayer method that does the same
     Query query = fDb.query();
     query.constrain(Feed.class);
     query.descend("fLinkText").constrain(mark.getFeedLinkReference().getLink().toString()); //$NON-NLS-1$
     @SuppressWarnings("unchecked")
     List<IFeed> feeds = query.execute();
     for (IFeed feed : feeds) {
-      if (onlyBookMarkReference(feed)) {
-        if (feedHasNewsWithCopies(feed)) {
+      FeedLinkReference feedRef = new FeedLinkReference(feed.getLink());
+      if (DBHelper.countBookMarkReference(fDb, feedRef) == 1) {
+        if (DBHelper.feedHasNewsWithCopies(fDb, feedRef)) {
           List<INews> newsList = new ArrayList<INews>(feed.getNews());
           for (INews news : newsList) {
             feed.removeNews(news);
@@ -432,29 +431,6 @@ public class EventManager {
           fDb.delete(feed);
       }
     }
-  }
-
-  private boolean feedHasNewsWithCopies(IFeed feed) {
-    Query query = fDb.query();
-    query.constrain(News.class);
-    query.descend("fLinkLink").constrain(feed.getLink().toString());
-    query.descend("fCopy").constrain(true);
-    return !query.execute().isEmpty();
-  }
-
-  private boolean onlyBookMarkReference(IFeed feed) {
-    //TODO Share logic with IApplicationLayer method that does the same
-    Query query = fDb.query();
-    query.constrain(BookMark.class);
-    query.descend("fFeedLink").constrain(feed.getLink().toString()); //$NON-NLS-1$
-
-    @SuppressWarnings("unchecked")
-    List<IBookMark> marks = query.execute();
-
-    if (marks.size() == 1) {
-      return true;
-    }
-    return false;
   }
 
   private void processDeletedEvent(EventArgs args) {
