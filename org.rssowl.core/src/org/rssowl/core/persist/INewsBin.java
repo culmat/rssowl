@@ -27,6 +27,7 @@ import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.NewsReference;
 
 import java.util.Collection;
+import java.util.Set;
 
 
 public interface INewsBin extends INewsMark {
@@ -59,4 +60,6 @@ public interface INewsBin extends INewsMark {
   boolean updateNewsStates(Collection<StatesUpdateInfo> statesUpdateInfos);
 
   void removeNews(INews news);
+
+  Collection<NewsReference> removeNews(Set<INews.State> states);
 }
