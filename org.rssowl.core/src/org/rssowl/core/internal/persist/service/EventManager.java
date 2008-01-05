@@ -257,6 +257,13 @@ public class EventManager {
       removeFromParentNews((IAttachment) entity);
     else if (entity instanceof ISearchCondition)
       cascadeSearchConditionDeletion((ISearchCondition) entity);
+    else if (entity instanceof INewsBin)
+      cascadeNewsBinDeletion((INewsBin) entity);
+  }
+
+  private void cascadeNewsBinDeletion(INewsBin entity) {
+    for (INews news : entity.getNews())
+      fDb.delete(news);
   }
 
   private void cascadeSearchConditionDeletion(ISearchCondition searchCondition) {
