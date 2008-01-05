@@ -23,7 +23,6 @@
  **  **********************************************************************  */
 package org.rssowl.core.internal.persist;
 
-import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
@@ -31,7 +30,6 @@ import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -39,7 +37,7 @@ import java.util.Set;
 
 public class NewsBin extends Mark implements INewsBin   {
 
-  private NewsContainer newsContainer;
+  private NewsContainer fNewsContainer;
 
   /**
    * Creates a new Element of the type SearchMark. A SearchMark is only visually
@@ -52,7 +50,7 @@ public class NewsBin extends Mark implements INewsBin   {
    */
   public NewsBin(Long id, IFolder folder, String name) {
     super(id, folder, name);
-    newsContainer = new NewsContainer(Collections.<INews.State, Boolean>emptyMap());
+    fNewsContainer = new NewsContainer(Collections.<INews.State, Boolean>emptyMap());
   }
 
   /**
@@ -63,43 +61,39 @@ public class NewsBin extends Mark implements INewsBin   {
   }
 
   public synchronized void addNews(INews news) {
-    newsContainer.addNews(news);
+    fNewsContainer.addNews(news);
   }
 
   public synchronized boolean containsNews(INews news) {
-    return newsContainer.containsNews(news);
+    return fNewsContainer.containsNews(news);
   }
 
   public synchronized List<NewsReference> getNewsRefs() {
-    return newsContainer.getNews();
+    return fNewsContainer.getNews();
   }
 
   public synchronized int getNewsCount(Set<State> states) {
-    return newsContainer.getNewsCount(states);
+    return fNewsContainer.getNewsCount(states);
   }
 
   public synchronized void removeNews(INews news) {
-    newsContainer.removeNews(news);
+    fNewsContainer.removeNews(news);
   }
 
   public synchronized List<INews> getNews() {
     return getNews(EnumSet.allOf(INews.State.class));
   }
 
-  public synchronized List<INews> getNews(Set<State> states) {
-    List<NewsReference> newsRefs = newsContainer.getNews(states);
-    List<INews> news = new ArrayList<INews>(newsRefs.size());
-
-    for (NewsReference newsRef : newsRefs) {
-      INews newsItem = newsRef.resolve();
-      Assert.isNotNull(newsItem, "newsItem");
-      news.add(newsItem);
+  public List<INews> getNews(Set<State> states) {
+    List<NewsReference> newsRefs;
+    synchronized (this) {
+      newsRefs = fNewsContainer.getNews(states);
     }
-    return news;
+    return getNews(newsRefs);
   }
 
   public synchronized List<NewsReference> getNewsRefs(Set<State> states) {
-    return newsContainer.getNews(states);
+    return fNewsContainer.getNews(states);
   }
 
   public NewsBinReference toReference() {
