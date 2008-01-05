@@ -98,6 +98,7 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -423,8 +424,8 @@ public class BookMarkExplorer extends ViewPart {
     /* Open Editors for the given Selection */
     for (int i = 0; i < list.size() && openedEditors < maxOpenEditors; i++) {
       Object object = list.get(i);
-      if (object instanceof IMark) {
-        IMark mark = ((IMark) object);
+      if (object instanceof INewsMark) {
+        INewsMark mark = ((INewsMark) object);
 
         /* Open in existing Feedview if set */
         if (reuseFeedView) {
@@ -1446,7 +1447,7 @@ public class BookMarkExplorer extends ViewPart {
   }
 
   private void performNavigation(ITreeNode targetNode, boolean newsScoped, boolean unread) {
-    IMark mark = (IMark) targetNode.getData();
+    INewsMark mark = (INewsMark) targetNode.getData();
 
     /* Set Selection to Mark */
     ISelection selection = new StructuredSelection(mark);

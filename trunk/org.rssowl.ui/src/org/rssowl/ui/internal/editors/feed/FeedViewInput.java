@@ -31,7 +31,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
 import org.rssowl.core.persist.IBookMark;
-import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.ui.internal.OwlUI;
 
@@ -47,7 +47,7 @@ public class FeedViewInput implements IEditorInput {
   static final String MARK_INPUT_CLASS = "org.rssowl.ui.internal.editors.feed.MarkInputClass";
   static final String MARK_INPUT_ID = "org.rssowl.ui.internal.editors.feed.MarkInputId";
 
-  private IMark fMark;
+  private INewsMark fMark;
   private boolean fIsDeleted;
   private boolean fIsBookMark;
   private PerformAfterInputSet fPerformOnInputSet;
@@ -55,7 +55,7 @@ public class FeedViewInput implements IEditorInput {
   /**
    * @param mark
    */
-  public FeedViewInput(IMark mark) {
+  public FeedViewInput(INewsMark mark) {
     this(mark, null);
   }
 
@@ -63,7 +63,7 @@ public class FeedViewInput implements IEditorInput {
    * @param mark
    * @param performOnInputSet
    */
-  public FeedViewInput(IMark mark, PerformAfterInputSet performOnInputSet) {
+  public FeedViewInput(INewsMark mark, PerformAfterInputSet performOnInputSet) {
     Assert.isNotNull(mark);
     fMark = mark;
     fIsBookMark = mark instanceof IBookMark;
@@ -151,7 +151,7 @@ public class FeedViewInput implements IEditorInput {
   /**
    * @return Returns the mark.
    */
-  public IMark getMark() {
+  public INewsMark getMark() {
     return fMark;
   }
 

@@ -29,9 +29,9 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
-import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.NewsAdapter;
@@ -67,7 +67,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   private NewsGrouping fGrouping;
   private NewsListener fNewsListener;
   private SearchMarkAdapter fSearchMarkListener;
-  private IMark[] fInput;
+  private INewsMark[] fInput;
   private FeedView fFeedView;
   private boolean fDisposed;
 
@@ -216,7 +216,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   }
 
   /* Returns the news that have been added since the last refresh */
-  synchronized List<INews> refreshCache(IMark[] input, boolean onlyAdd) throws PersistenceException {
+  synchronized List<INews> refreshCache(INewsMark[] input, boolean onlyAdd) throws PersistenceException {
     List<INews> addedNews = Collections.emptyList();
 
     /* Update Input */
@@ -238,19 +238,11 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* Obtain the News */
     addedNews = new ArrayList<INews>();
-    for (IMark mark : input) {
+    for (INewsMark mark : input) {
 
-      /* Obtain this BookMark's Feed */
-      if (mark instanceof IBookMark) {
-        IFeed feed = ((IBookMark) mark).getFeedLinkReference().resolve();
-        addedNews.addAll(feed.getVisibleNews());
-      }
-
-      /* Obtain this SearchMark's News */
-      else if (mark instanceof ISearchMark) {
-        ISearchMark searchMark = (ISearchMark) mark;
-        List<NewsReference> matchingNews = searchMark.getResult();
-        for (NewsReference newsRef : matchingNews) {
+      /* Special-case marks that can retrieve newsRefs cheaply */
+      if (mark.isGetNewsRefsEfficient()) {
+        for (NewsReference newsRef : mark.getNewsRefs()) {
 
           /* Avoid to resolve an already shown News */
           if (onlyAdd && hasCachedNews(newsRef))
@@ -262,6 +254,9 @@ public class NewsContentProvider implements ITreeContentProvider {
             addedNews.add(resolvedNews);
         }
       }
+
+      else
+        addedNews.addAll(mark.getNews(INews.State.getVisible()));
     }
 
     /* Add into Cache */
@@ -308,14 +303,14 @@ public class NewsContentProvider implements ITreeContentProvider {
         for (SearchMarkEvent event : events) {
           ISearchMark searchMark = event.getEntity();
 
-          for (final IMark inputMark : fInput) {
+          for (final INewsMark inputMark : fInput) {
             if (inputMark.equals(searchMark)) {
               JobRunner.runUIUpdater(new UIBackgroundJob(fFeedView.getEditorControl()) {
                 private List<INews> fAddedNews;
 
                 @Override
                 protected void runInBackground(IProgressMonitor monitor) {
-                  fAddedNews = refreshCache(new IMark[] { inputMark }, true);
+                  fAddedNews = refreshCache(new INewsMark[] { inputMark }, true);
                 }
 
                 @Override
