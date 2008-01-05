@@ -33,6 +33,7 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.INewsBin.StatesUpdateInfo;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsBinDAO;
 import org.rssowl.core.persist.event.FeedEvent;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
@@ -50,6 +51,7 @@ import com.db4o.query.Query;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 
 public class DBHelper {
@@ -204,10 +206,19 @@ public class DBHelper {
       }
     }
     if (!statesUpdateInfos.isEmpty()) {
+      INewsBinDAO newsBinDao = DynamicDAO.getDAO(INewsBinDAO.class);
+      List<NewsReference> removedNewsRefs = new ArrayList<NewsReference>();
       for (INewsBin newsBin : DynamicDAO.loadAll(INewsBin.class)) {
-        if (newsBin.updateNewsStates(statesUpdateInfos))
-          DynamicDAO.save(newsBin);
+        if (newsBin.updateNewsStates(statesUpdateInfos)) {
+          removedNewsRefs.addAll(newsBin.removeNews(EnumSet.of(INews.State.HIDDEN)));
+          newsBinDao.save(newsBin);
+        }
       }
+      List<INews> removedNews = new ArrayList<INews>(removedNewsRefs.size());
+      for (NewsReference newsRef : removedNewsRefs) {
+        removedNews.add(newsRef.resolve());
+      }
+      DynamicDAO.deleteAll(removedNews);
     }
   }
 
