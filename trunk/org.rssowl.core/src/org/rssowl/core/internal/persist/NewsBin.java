@@ -108,4 +108,8 @@ public class NewsBin extends Mark implements INewsBin   {
   public synchronized boolean updateNewsStates(Collection<StatesUpdateInfo> statesUpdateInfos) {
     return fNewsContainer.updateNewsStates(statesUpdateInfos);
   }
+
+  public synchronized Collection<NewsReference> removeNews(Set<State> states) {
+    return fNewsContainer.removeNews(states);
+  }
 }
