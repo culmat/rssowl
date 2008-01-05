@@ -29,6 +29,7 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.Pair;
@@ -36,6 +37,7 @@ import org.rssowl.core.util.Pair;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,7 +48,6 @@ import java.util.Set;
  * @author bpasero
  * @see ISearchMark
  */
-//TODO Rely on NewsContainer instead of having long[]
 public class SearchMark extends Mark implements ISearchMark {
   private List<ISearchCondition> fSearchConditions;
   private boolean fMatchAllConditions;
@@ -177,7 +178,38 @@ public class SearchMark extends Mark implements ISearchMark {
     return super.toString() + "Search Conditions = " + fSearchConditions.toString() + ")";
   }
 
+  /* getIdAsPrimitive is synchronized so this method doesn't need to be */
   public SearchMarkReference toReference() {
     return new SearchMarkReference(getIdAsPrimitive());
+  }
+
+  /* getNews(states) takes care of synchronization, so not done here */
+  public List<INews> getNews() {
+    return getNews(EnumSet.allOf(INews.State.class));
+  }
+
+  public List<INews> getNews(Set<State> states) {
+    List<NewsReference> newsRefs;
+    synchronized (this) {
+      newsRefs = fNewsContainer.getNews(states);
+    }
+    return getNews(newsRefs);
+  }
+
+  public synchronized int getNewsCount(Set<State> states) {
+    Assert.isNotNull(states, "states");
+    return fNewsContainer.getNewsCount(states);
+  }
+
+  public synchronized List<NewsReference> getNewsRefs() {
+    return fNewsContainer.getNews();
+  }
+
+  public synchronized List<NewsReference> getNewsRefs(Set<State> states) {
+    return fNewsContainer.getNews(states);
+  }
+
+  public boolean isGetNewsRefsEfficient() {
+    return true;
   }
 }
