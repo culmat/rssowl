@@ -34,6 +34,7 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.util.EditorUtils;
@@ -43,7 +44,7 @@ import java.util.List;
 /**
  * The <code>EditorDNDImpl</code> validates and handles drop-operations
  * resulting from a DND.
- * 
+ *
  * @author bpasero
  */
 public class EditorDNDImpl extends DropTargetAdapter {
@@ -97,9 +98,9 @@ public class EditorDNDImpl extends DropTargetAdapter {
     for (int i = 0; i < objects.size() && openedEditors < maxOpenEditors; i++) {
       Object obj = objects.get(i);
 
-      /* This is an IMark being dropped - display it */
-      if (obj instanceof IMark) {
-        IMark mark = ((IMark) obj);
+      /* This is an INewsMark being dropped - display it */
+      if (obj instanceof INewsMark) {
+        INewsMark mark = ((INewsMark) obj);
         try {
           IWorkbenchPage page = OwlUI.getPageAtCursor();
           if (page != null) {

@@ -27,7 +27,7 @@ package org.rssowl.ui.internal.editors.feed;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
-import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 
 /**
@@ -46,9 +46,9 @@ public class FeedViewFactory implements IElementFactory {
       String inputClass = memento.getString(FeedViewInput.MARK_INPUT_CLASS);
       try {
         Class<?> klass = Class.forName(inputClass, true, Thread.currentThread().getContextClassLoader());
-        if (IMark.class.isAssignableFrom(klass)) {
-          Class<? extends IMark> markClass = klass.asSubclass(IMark.class);
-          IMark mark = DynamicDAO.load(markClass, Long.valueOf(inputId));
+        if (INewsMark.class.isAssignableFrom(klass)) {
+          Class<? extends INewsMark> markClass = klass.asSubclass(INewsMark.class);
+          INewsMark mark = DynamicDAO.load(markClass, Long.valueOf(inputId));
           if (mark != null)
             return new FeedViewInput(mark);
         } else

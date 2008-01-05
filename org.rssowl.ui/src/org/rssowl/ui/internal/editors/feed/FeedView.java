@@ -64,6 +64,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -390,7 +391,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
             JobRunner.runUIUpdater(new UIBackgroundJob(fParent) {
               @Override
               protected void runInBackground(IProgressMonitor monitor) {
-                fContentProvider.refreshCache(new IMark[] { fInput.getMark() }, false);
+                fContentProvider.refreshCache(new INewsMark[] { fInput.getMark() }, false);
               }
 
               @Override
@@ -849,7 +850,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   }
 
   /* Set Input to Viewers */
-  private void setInput(final IMark mark, final boolean reused) {
+  private void setInput(final INewsMark mark, final boolean reused) {
 
     /* Update Cache in Background and then apply to UI */
     JobRunner.runUIUpdater(new UIBackgroundJob(fParent) {
@@ -864,7 +865,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       protected void runInBackground(IProgressMonitor monitor) {
         fBgMonitor = monitor;
         if (!monitor.isCanceled())
-          fContentProvider.refreshCache(new IMark[] { mark }, false);
+          fContentProvider.refreshCache(new INewsMark[] { mark }, false);
       }
 
       @Override
