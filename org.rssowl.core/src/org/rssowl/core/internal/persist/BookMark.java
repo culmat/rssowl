@@ -27,8 +27,16 @@ package org.rssowl.core.internal.persist;
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.persist.reference.NewsReference;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * A usual bookmark as seen in Firefox or other Browsers. The Bookmark is used
@@ -140,7 +148,40 @@ public class BookMark extends Mark implements IBookMark {
     return super.toString() + "Belongs to Feed = " + fFeedLink + ")";
   }
 
+  /* getIdAsPrimitive is synchronized so this method doesn't need to be */
   public BookMarkReference toReference() {
     return new BookMarkReference(getIdAsPrimitive());
+  }
+
+  public synchronized List<INews> getNews() {
+    return fFeedLinkReference.resolve().getNews();
+  }
+
+  public synchronized List<INews> getNews(Set<State> states) {
+    return fFeedLinkReference.resolve().getNewsByStates(states);
+  }
+
+  //FIXME Should rely on NewsCounter for the results here
+  public int getNewsCount(Set<State> states) {
+    return getNews(states).size();
+  }
+
+  /* getNews(states) is synchronized so this method does not need to be */
+  public List<NewsReference> getNewsRefs() {
+    return getNewsRefs(EnumSet.allOf(INews.State.class));
+  }
+
+  /* getNews(states) is synchronized so this method does not need to be */
+  public List<NewsReference> getNewsRefs(Set<State> states) {
+    List<INews> news = getNews(states);
+    List<NewsReference> newsRefs = new ArrayList<NewsReference>();
+    for (INews newsItem : news) {
+      newsRefs.add(new NewsReference(newsItem.getId()));
+    }
+    return newsRefs;
+  }
+
+  public boolean isGetNewsRefsEfficient() {
+    return false;
   }
 }
