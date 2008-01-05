@@ -614,6 +614,7 @@ public class DBManager {
     oc.objectField("fTitle").cascadeOnActivate(true); //$NON-NLS-1$
 
     /* Indexes */
+    oc.objectField("fCopy").indexed(true);
     oc.objectField("fLinkText").indexed(true); //$NON-NLS-1$
     oc.objectField("fGuidValue").indexed(true); //$NON-NLS-1$
     oc.objectField("fFeedLink").indexed(true); //$NON-NLS-1$
