@@ -553,4 +553,10 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
    * @param attachment
    */
   void removeAttachment(IAttachment attachment);
+
+  /**
+   * @return {@code true} if this INews is a copy. Copies are not contained
+   * in the original IFeed and are usually part of INewsBins.
+   */
+  boolean isCopy();
 }
