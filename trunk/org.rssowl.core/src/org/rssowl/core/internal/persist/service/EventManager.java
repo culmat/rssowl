@@ -43,6 +43,7 @@ import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.IConditionalGetDAO;
+import org.rssowl.core.persist.dao.INewsCounterDAO;
 import org.rssowl.core.persist.event.AttachmentEvent;
 import org.rssowl.core.persist.event.BookMarkEvent;
 import org.rssowl.core.persist.event.CategoryEvent;
@@ -121,6 +122,7 @@ public class EventManager {
   private ObjectContainer fDb;
   private IConditionalGetDAO fConditionalGetDAO;
   private IDGenerator fIDGenerator;
+  private INewsCounterDAO fNewsCounterDAO;
 
   private EventManager() {
     initEntityStoreListener();
@@ -138,6 +140,13 @@ public class EventManager {
       fConditionalGetDAO = Owl.getPersistenceService().getDAOService().getConditionalGetDAO();
 
     return fConditionalGetDAO;
+  }
+
+  private INewsCounterDAO getNewsCounterDAO() {
+    if (fNewsCounterDAO == null)
+      fNewsCounterDAO = Owl.getPersistenceService().getDAOService().getNewsCounterDAO();
+
+    return fNewsCounterDAO;
   }
 
   private void initEventRegistry() {
@@ -190,9 +199,14 @@ public class EventManager {
     if (entity == null)
       return;
 
-    if (entity instanceof News) {
+    if (entity instanceof News)
       ((News) entity).init();
-    }
+    else if (entity instanceof BookMark)
+      initBookMark((BookMark) entity);
+  }
+
+  private void initBookMark(BookMark entity) {
+    entity.setNewsCounter(getNewsCounterDAO().load());
   }
 
   private void processUpdatedEvent(EventArgs args) {
@@ -208,8 +222,11 @@ public class EventManager {
   private void processCreatingEvent(EventArgs args) {
     IEntity entity = getEntity(args);
 
-    if (entity != null)
+    if (entity != null) {
       setId(entity);
+      if (entity instanceof BookMark)
+        initBookMark((BookMark) entity);
+    }
   }
 
   private void processCreatedEvent(EventArgs args) {
