@@ -25,6 +25,7 @@
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.BookMark;
+import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.event.BookMarkEvent;
@@ -33,11 +34,9 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.service.PersistenceException;
 
 import com.db4o.ext.Db4oException;
-import com.db4o.query.Query;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * A data-access-object for <code>IBookMark</code>s.
@@ -63,10 +62,7 @@ public final class BookMarkDAOImpl extends AbstractEntityDAO<IBookMark, BookMark
 
   public final Collection<IBookMark> loadAll(FeedLinkReference feedRef) {
     try {
-      Query query = fDb.query();
-      query.constrain(fEntityClass);
-      query.descend("fFeedLink").constrain(feedRef.getLink().toString()); //$NON-NLS-1$
-      List<IBookMark> marks = getList(query);
+      Collection<IBookMark> marks = DBHelper.loadAllBookMarks(fDb, feedRef);
       activateAll(marks);
       return new ArrayList<IBookMark>(marks);
     } catch (Db4oException e) {

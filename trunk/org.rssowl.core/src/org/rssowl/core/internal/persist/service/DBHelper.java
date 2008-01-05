@@ -24,8 +24,10 @@
 package org.rssowl.core.internal.persist.service;
 
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.BookMark;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.News;
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
@@ -40,6 +42,7 @@ import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.runnable.EventRunnable;
 import org.rssowl.core.persist.event.runnable.FeedEventRunnable;
 import org.rssowl.core.persist.event.runnable.NewsEventRunnable;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.persist.service.UniqueConstraintException;
@@ -52,7 +55,9 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class DBHelper {
 
@@ -214,12 +219,46 @@ public class DBHelper {
           newsBinDao.save(newsBin);
         }
       }
-      List<INews> removedNews = new ArrayList<INews>(removedNewsRefs.size());
-      for (NewsReference newsRef : removedNewsRefs) {
-        removedNews.add(newsRef.resolve());
-      }
-      DynamicDAO.deleteAll(removedNews);
+      removeNewsAndFeedsAfterNewsBinUpdate(db, removedNewsRefs);
     }
+  }
+
+  static void removeNewsAndFeedsAfterNewsBinUpdate(ObjectContainer db,
+      List<NewsReference> removedNewsRefs) {
+
+    List<INews> removedNews = new ArrayList<INews>(removedNewsRefs.size());
+    Set<FeedLinkReference> feedRefs = new HashSet<FeedLinkReference>(removedNews.size());
+    for (NewsReference newsRef : removedNewsRefs) {
+      INews news = newsRef.resolve();
+      feedRefs.add(news.getFeedReference());
+      removedNews.add(news);
+    }
+    DynamicDAO.deleteAll(removedNews);
+    for (FeedLinkReference feedRef : feedRefs) {
+      if ((countBookMarkReference(db, feedRef) == 0) && !feedHasNewsWithCopies(db, feedRef))
+          db.delete(feedRef.resolve());
+    }
+  }
+
+  static int countBookMarkReference(ObjectContainer db, FeedLinkReference feedRef) {
+    Collection<IBookMark> marks = loadAllBookMarks(db, feedRef);
+    return marks.size();
+  }
+
+  @SuppressWarnings("unchecked")
+  public static Collection<IBookMark> loadAllBookMarks(ObjectContainer db, FeedLinkReference feedRef)  {
+    Query query = db.query();
+    query.constrain(BookMark.class);
+    query.descend("fFeedLink").constrain(feedRef.getLink().toString()); //$NON-NLS-1$
+    return query.execute();
+  }
+
+  static boolean feedHasNewsWithCopies(ObjectContainer db, FeedLinkReference feedRef) {
+    Query query = db.query();
+    query.constrain(News.class);
+    query.descend("fLinkLink").constrain(feedRef.getLink().toString());
+    query.descend("fCopy").constrain(true);
+    return !query.execute().isEmpty();
   }
 
   public static void updateNewsCounter(ObjectContainer db) {
