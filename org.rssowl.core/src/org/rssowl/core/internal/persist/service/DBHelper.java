@@ -29,13 +29,17 @@ import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPersistable;
+import org.rssowl.core.persist.INewsBin.StatesUpdateInfo;
+import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.FeedEvent;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.runnable.EventRunnable;
 import org.rssowl.core.persist.event.runnable.FeedEventRunnable;
 import org.rssowl.core.persist.event.runnable.NewsEventRunnable;
+import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.persist.service.UniqueConstraintException;
 
@@ -44,6 +48,7 @@ import com.db4o.ext.Db4oException;
 import com.db4o.query.Query;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -173,21 +178,53 @@ public class DBHelper {
     db.ext().set(news, 2);
   }
 
+  public static void preCommit(ObjectContainer db) {
+    updateNewsCounter(db);
+    updateNewsBins(db);
+  }
+
+  private static NewsEventRunnable getNewsEventRunnables(List<EventRunnable<?>> eventRunnables)  {
+    for (EventRunnable<?> eventRunnable : eventRunnables) {
+      if (eventRunnable instanceof NewsEventRunnable)
+        return (NewsEventRunnable) eventRunnable;
+    }
+    return null;
+  }
+
+  private static void updateNewsBins(ObjectContainer db) {
+    NewsEventRunnable newsEventRunnable = getNewsEventRunnables(EventsMap.getInstance().getEventRunnables());
+
+    if (newsEventRunnable == null)
+      return;
+
+    List<StatesUpdateInfo> statesUpdateInfos = new ArrayList<StatesUpdateInfo>();
+    for (NewsEvent newsEvent : newsEventRunnable.getUpdateEvents()) {
+      if (newsEvent.getEntity().isCopy() && (newsEvent.getOldNews().getState() != newsEvent.getEntity().getState())) {
+        statesUpdateInfos.add(new StatesUpdateInfo(newsEvent.getOldNews().getState(), newsEvent.getEntity().getState(), (NewsReference) newsEvent.getEntity().toReference()));
+      }
+    }
+    if (!statesUpdateInfos.isEmpty()) {
+      for (INewsBin newsBin : DynamicDAO.loadAll(INewsBin.class)) {
+        if (newsBin.updateNewsStates(statesUpdateInfos))
+          DynamicDAO.save(newsBin);
+      }
+    }
+  }
+
   public static void updateNewsCounter(ObjectContainer db) {
     List<EventRunnable<?>> eventRunnables = EventsMap.getInstance().getEventRunnables();
     NewsCounterService newsCounterService = new NewsCounterService(Owl.getPersistenceService().getDAOService().getNewsCounterDAO(), db);
-    for (EventRunnable<?> eventRunnable : eventRunnables) {
-      if (eventRunnable instanceof NewsEventRunnable) {
-        NewsEventRunnable newsEventRunnable = (NewsEventRunnable) eventRunnable;
-        newsCounterService.onNewsAdded(newsEventRunnable.getPersistEvents());
-        newsCounterService.onNewsRemoved((newsEventRunnable.getRemoveEvents()));
-        newsCounterService.onNewsUpdated(newsEventRunnable.getUpdateEvents());
-      }
+    NewsEventRunnable newsEventRunnable = getNewsEventRunnables(eventRunnables);
+    if (newsEventRunnable != null) {
+      newsCounterService.onNewsAdded(newsEventRunnable.getPersistEvents());
+      newsCounterService.onNewsRemoved((newsEventRunnable.getRemoveEvents()));
+      newsCounterService.onNewsUpdated(newsEventRunnable.getUpdateEvents());
     }
     for (EventRunnable<?> eventRunnable : eventRunnables) {
       if (eventRunnable instanceof FeedEventRunnable) {
         FeedEventRunnable feedEventRunnable = (FeedEventRunnable) eventRunnable;
         newsCounterService.onFeedRemoved(feedEventRunnable.getRemoveEvents());
+        break;
       }
     }
   }

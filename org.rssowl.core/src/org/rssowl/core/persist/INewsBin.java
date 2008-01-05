@@ -23,12 +23,40 @@
  **  **********************************************************************  */
 package org.rssowl.core.persist;
 
+import org.rssowl.core.persist.INews.State;
+import org.rssowl.core.persist.reference.NewsReference;
+
+import java.util.Collection;
+
 
 public interface INewsBin extends INewsMark {
+
+  public static final class StatesUpdateInfo  {
+    private final INews.State fOldState;
+    private final INews.State fNewState;
+    private final NewsReference fNewsReference;
+    public StatesUpdateInfo(State oldState, State newState, NewsReference newsReference) {
+      this.fOldState = oldState;
+      this.fNewState = newState;
+      this.fNewsReference = newsReference;
+    }
+    public INews.State getOldState() {
+      return fOldState;
+    }
+    public INews.State getNewState() {
+      return fNewState;
+    }
+    public NewsReference getNewsReference() {
+      return fNewsReference;
+    }
+
+  }
 
   boolean containsNews(INews news);
 
   void addNews(INews news);
+
+  boolean updateNewsStates(Collection<StatesUpdateInfo> statesUpdateInfos);
 
   void removeNews(INews news);
 }

@@ -208,7 +208,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
   }
 
   protected void preCommit() {
-    DBHelper.updateNewsCounter(fDb);
+    DBHelper.preCommit(fDb);
   }
 
   protected void preDelete(T persistable) {

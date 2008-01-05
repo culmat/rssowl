@@ -25,10 +25,12 @@ package org.rssowl.core.internal.persist;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin.StatesUpdateInfo;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.Pair;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -233,5 +235,17 @@ public final class NewsContainer {
       fNewsIds[index].clear();
     }
     return newsRefs;
+  }
+
+  public boolean updateNewsStates(Collection<StatesUpdateInfo> statesUpdateInfos) {
+    boolean changed = false;
+    for (StatesUpdateInfo info : statesUpdateInfos) {
+      long newsId = info.getNewsReference().getId();
+      if (fNewsIds[info.getOldState().ordinal()].removeByElement(newsId)) {
+        changed = true;
+        fNewsIds[info.getNewState().ordinal()].add(newsId);
+      }
+    }
+    return changed;
   }
 }

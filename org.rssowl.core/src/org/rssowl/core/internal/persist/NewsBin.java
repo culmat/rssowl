@@ -30,6 +30,7 @@ import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -102,5 +103,9 @@ public class NewsBin extends Mark implements INewsBin   {
 
   public boolean isGetNewsRefsEfficient() {
     return true;
+  }
+
+  public synchronized boolean updateNewsStates(Collection<StatesUpdateInfo> statesUpdateInfos) {
+    return fNewsContainer.updateNewsStates(statesUpdateInfos);
   }
 }
