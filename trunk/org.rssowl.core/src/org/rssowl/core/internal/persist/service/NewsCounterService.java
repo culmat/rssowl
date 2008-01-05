@@ -58,6 +58,10 @@ public final class NewsCounterService {
     synchronized (fNewsCounter) {
       for (NewsEvent newsEvent : newsEvents) {
         INews news = newsEvent.getEntity();
+
+        if (news.isCopy())
+          continue;
+
         FeedLinkReference feedRef = news.getFeedReference();
 
         NewsCounterItem newsCounterItem = fNewsCounter.get(feedRef.getLink());
@@ -94,6 +98,10 @@ public final class NewsCounterService {
     synchronized (fNewsCounter) {
       for (NewsEvent event : newsEvents) {
         INews currentNews = event.getEntity();
+
+        if (currentNews.isCopy())
+          continue;
+
         INews oldNews = event.getOldNews();
         Assert.isNotNull(oldNews, "oldNews cannot be null on newsUpdated");
 
@@ -149,6 +157,9 @@ public final class NewsCounterService {
     synchronized (fNewsCounter) {
       for (NewsEvent newsEvent : newsEvents) {
         INews news = newsEvent.getEntity();
+
+        if (news.isCopy())
+          continue;
 
         NewsCounterItem counterItem = fNewsCounter.get(news.getFeedReference().getLink());
 
