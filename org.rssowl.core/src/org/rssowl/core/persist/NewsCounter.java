@@ -88,4 +88,24 @@ public final class NewsCounter extends Persistable {
 
     return fCountersMap.remove(link.toString());
   }
+
+  public synchronized int getNewCount(URI feedLink) {
+    NewsCounterItem counter = get(feedLink);
+
+    /* Feed has no news */
+    if (counter == null)
+      return 0;
+
+    return counter.getNewCounter();
+  }
+
+  public synchronized int getUnreadCount(URI feedLink) {
+    NewsCounterItem counter = get(feedLink);
+
+    /* Feed has no news */
+    if (counter == null)
+      return 0;
+
+    return counter.getUnreadCounter();
+  }
 }
