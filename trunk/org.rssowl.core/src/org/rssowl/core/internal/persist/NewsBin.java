@@ -105,4 +105,8 @@ public class NewsBin extends Mark implements INewsBin   {
   public NewsBinReference toReference() {
     return new NewsBinReference(getIdAsPrimitive());
   }
+
+  public boolean isGetNewsRefsEfficient() {
+    return true;
+  }
 }
