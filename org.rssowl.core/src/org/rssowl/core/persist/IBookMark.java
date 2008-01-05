@@ -34,7 +34,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
  *
  * @author bpasero
  */
-public interface IBookMark extends IMark {
+public interface IBookMark extends INewsMark {
 
   /** One of the fields in this type described as constant */
   public static final int IS_ERROR_LOADING = 4;
