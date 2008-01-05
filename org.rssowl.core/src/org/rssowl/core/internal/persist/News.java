@@ -132,6 +132,8 @@ public class News extends AbstractEntity implements INews {
   private List<ICategory> fCategories;
   private Set<ILabel> fLabels;
 
+  private boolean fCopy;
+
   private transient final Lock fLock = new Lock();
 
   /**
@@ -168,6 +170,7 @@ public class News extends AbstractEntity implements INews {
 
   public News(News news) {
     super(null, news);
+    fCopy = true;
     news.fLock.acquireReadLock();
     try {
       for (IAttachment attachment : news.getAttachments())
@@ -1163,5 +1166,14 @@ public class News extends AbstractEntity implements INews {
 
   public NewsReference toReference() {
     return new NewsReference(getIdAsPrimitive());
+  }
+
+  public boolean isCopy() {
+    fLock.acquireReadLock();
+    try {
+      return fCopy;
+    } finally {
+      fLock.releaseReadLock();
+    }
   }
 }
