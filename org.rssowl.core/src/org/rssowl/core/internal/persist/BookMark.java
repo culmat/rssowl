@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
@@ -50,6 +51,7 @@ public class BookMark extends Mark implements IBookMark {
   private String fFeedLink;
   private transient FeedLinkReference fFeedLinkReference;
   private boolean fIsErrorLoading;
+  private transient NewsCounter fNewsCounter;
 
   /**
    * Creates a new Element of the type BookMark. A BookMark is only visually
@@ -73,6 +75,10 @@ public class BookMark extends Mark implements IBookMark {
    */
   protected BookMark() {
   // As per javadoc
+  }
+
+  public synchronized void setNewsCounter(NewsCounter newsCounter) {
+    fNewsCounter = newsCounter;
   }
 
   /*
@@ -161,8 +167,15 @@ public class BookMark extends Mark implements IBookMark {
     return fFeedLinkReference.resolve().getNewsByStates(states);
   }
 
-  //FIXME Should rely on NewsCounter for the results here
-  public int getNewsCount(Set<State> states) {
+  public synchronized int getNewsCount(Set<State> states) {
+    if (fNewsCounter != null) {
+      if (states.equals(EnumSet.of(INews.State.NEW)))
+        return fNewsCounter.getNewCount(fFeedLinkReference.getLink());
+
+      if (states.equals(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)))
+        return fNewsCounter.getUnreadCount(getFeedLinkReference().getLink());
+    }
+
     return getNews(states).size();
   }
 
