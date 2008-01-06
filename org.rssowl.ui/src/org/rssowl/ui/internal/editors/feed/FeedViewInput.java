@@ -31,6 +31,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
 import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.ui.internal.OwlUI;
@@ -102,6 +103,8 @@ public class FeedViewInput implements IEditorInput {
       return OwlUI.BOOKMARK;
     } else if (fMark instanceof ISearchMark)
       return OwlUI.SEARCHMARK;
+    else if (fMark instanceof INewsBin)
+      return OwlUI.NEWSBIN;
 
     return OwlUI.UNKNOWN;
   }
