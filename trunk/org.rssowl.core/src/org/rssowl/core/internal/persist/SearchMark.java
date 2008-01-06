@@ -212,4 +212,8 @@ public class SearchMark extends Mark implements ISearchMark {
   public boolean isGetNewsRefsEfficient() {
     return true;
   }
+
+  public boolean containsNews(INews news) {
+    return fNewsContainer.containsNews(news);
+  }
 }

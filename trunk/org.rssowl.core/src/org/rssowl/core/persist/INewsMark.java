@@ -31,6 +31,8 @@ import java.util.Set;
 public interface INewsMark extends IMark    {
   boolean isGetNewsRefsEfficient();
 
+  boolean containsNews(INews news);
+
   List<INews> getNews();
 
   List<INews> getNews(Set<INews.State> states);

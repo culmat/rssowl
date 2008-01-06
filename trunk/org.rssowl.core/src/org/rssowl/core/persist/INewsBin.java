@@ -53,8 +53,6 @@ public interface INewsBin extends INewsMark {
 
   }
 
-  boolean containsNews(INews news);
-
   void addNews(INews news);
 
   boolean updateNewsStates(Collection<StatesUpdateInfo> statesUpdateInfos);
