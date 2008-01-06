@@ -46,6 +46,15 @@
                style="push">
          </action>
          <action
+               class="org.rssowl.ui.internal.actions.NewNewsBinAction"
+               definitionId="org.rssowl.ui.actions.NewNewsBin"
+               icon="icons/obj16/newsbin.gif"
+               id="org.rssowl.ui.actions.NewNewsBin"
+               label="News Bin..."
+               menubarPath="file/new_sub/newsbin"
+               style="push">
+         </action>
+         <action
                class="org.rssowl.ui.internal.actions.NewSearchMarkAction"
                definitionId="org.rssowl.ui.actions.NewSearchMark"
                icon="icons/obj16/searchmark.gif"
@@ -87,6 +96,9 @@
                path="file/new.ext">
             <groupMarker
                   name="bookmark" />
+            <groupMarker
+                  name="newsbin">
+            </groupMarker>
             <groupMarker
                   name="searchmark">
             </groupMarker>
@@ -506,6 +518,12 @@
             description="Create a new Saved Search"
             id="org.rssowl.ui.actions.NewSearchMark"
             name="New Saved Search">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Create a new News Bin"
+            id="org.rssowl.ui.actions.NewNewsBin"
+            name="New News Bin">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"

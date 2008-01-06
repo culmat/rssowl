@@ -40,7 +40,9 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
+import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
@@ -71,6 +73,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
   private Image fSearchMarkEmptyIcon;
   private Image fGroupIcon;
   private Image fBookmarkSetIcon;
+  private Image fNewsBinIcon;
   private Color fStickyBgColor;
   private Color fGroupFgColor;
   private Font fBoldFont;
@@ -110,6 +113,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     fSearchMarkIcon = OwlUI.getImage(fResources, OwlUI.SEARCHMARK);
     fSearchMarkNewIcon = OwlUI.getImage(fResources, OwlUI.SEARCHMARK_NEW);
     fSearchMarkEmptyIcon = OwlUI.getImage(fResources, OwlUI.SEARCHMARK_EMPTY);
+    fNewsBinIcon = OwlUI.getImage(fResources, OwlUI.NEWSBIN);
 
     /* Fonts */
     fBoldFont = OwlUI.getThemeFont(OwlUI.BKMRK_EXPLORER_FONT_ID, SWT.BOLD);
@@ -167,16 +171,13 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       cell.setBackground(null);
     }
 
-    //TODO Maybe possible to share more code with INewsMark section
-    /* Create Label for a BookMark */
-    else if (element instanceof IBookMark) {
-      IBookMark bookmark = (IBookMark) element;
-      FeedLinkReference feedLinkRef = bookmark.getFeedLinkReference();
+    /* Create generic Label for instances of INewsMark */
+    else if (element instanceof INewsMark) {
+      INewsMark newsmark = (INewsMark) element;
 
       if (fIndicateState) {
-        unreadNewsCount = getUnreadNewsCount(bookmark);
-        stickyNewsCount = getStickyNewsCount(feedLinkRef);
-        hasNew = bookmark.getNewsCount(EnumSet.of(INews.State.NEW)) != 0;
+        unreadNewsCount = newsmark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
+        hasNew = newsmark.getNewsCount(EnumSet.of(INews.State.NEW)) != 0;
       }
 
       /* Font */
@@ -186,10 +187,16 @@ public class BookMarkLabelProvider extends CellLabelProvider {
         cell.setFont(fDefaultFont);
 
       /* Text */
-      StringBuilder str = new StringBuilder(bookmark.getName());
+      StringBuilder str = new StringBuilder(newsmark.getName());
       if (unreadNewsCount > 0)
-        str.append(" (").append(unreadNewsCount).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+        str.append(" (").append(unreadNewsCount).append(")");
       cell.setText(str.toString());
+
+      /* Background for IBookMark (TODO Support All) */
+      if (newsmark instanceof IBookMark && fIndicateState) {
+        FeedLinkReference feedLinkRef = ((IBookMark) newsmark).getFeedLinkReference();
+        stickyNewsCount = getStickyNewsCount(feedLinkRef);
+      }
 
       /* Background Color */
       if (stickyNewsCount > 0)
@@ -200,85 +207,13 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       /* Reset Foreground */
       cell.setForeground(null);
 
-      /* Load the FavIcon */
-      ImageDescriptor favicon = OwlUI.getFavicon(bookmark);
-
-      /* Indicate Error */
-      if (bookmark.isErrorLoading()) {
-
-        /* Overlay with Error Icon if required */
-        if (favicon != null) {
-          Image faviconImg = OwlUI.getImage(fResources, favicon);
-          DecorationOverlayIcon overlay = new DecorationOverlayIcon(faviconImg, OwlUI.getImageDescriptor("icons/ovr16/error.gif"), IDecoration.BOTTOM_RIGHT);
-          cell.setImage(OwlUI.getImage(fResources, overlay));
-        }
-
-        /* Default Error Icon */
-        else {
-          cell.setImage(fBookMarkErrorIcon);
-        }
-      }
-
-      /* Use normal Icon */
-      else {
-        Image icon = favicon != null ? OwlUI.getImage(fResources, favicon) : fBookMarkIcon;
-
-        /* Overlay if News are *new* */
-        if (hasNew) {
-          DecorationOverlayIcon overlay = new DecorationOverlayIcon(icon, OwlUI.getImageDescriptor("icons/ovr16/new.gif"), IDecoration.BOTTOM_RIGHT);
-          cell.setImage(OwlUI.getImage(fResources, overlay));
-        }
-
-        /* Don't overlay */
-        else {
-          cell.setImage(icon);
-        }
-      }
-    }
-
-    /*
-     * Create Label for a INewsMark
-     * TODO Using the code for ISearchMark for all INewsMarks for now, but
-     * Ben should review this and change if necessary
-     */
-    else if (element instanceof INewsMark) {
-      INewsMark newsMark = (INewsMark) element;
-      boolean hasMatchingNews = false;
-
-      if (fIndicateState) {
-        unreadNewsCount = newsMark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
-        hasNew = newsMark.getNewsCount(EnumSet.of(INews.State.NEW)) != 0;
-        hasMatchingNews = unreadNewsCount > 0 || newsMark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED, INews.State.READ)) != 0;
-      }
-
-      /* Image */
-      Image icon;
-      if (hasNew)
-        icon = fSearchMarkNewIcon;
-      else if (hasMatchingNews || !fIndicateState)
-        icon = fSearchMarkIcon;
-      else
-        icon = fSearchMarkEmptyIcon;
-
-      cell.setImage(icon);
-
-      /* Font */
-      if (unreadNewsCount > 0)
-        cell.setFont(fBoldFont);
-      else
-        cell.setFont(fDefaultFont);
-
-      /* Text */
-      StringBuilder str = new StringBuilder(newsMark.getName());
-      if (unreadNewsCount > 0)
-        str.append(" (").append(unreadNewsCount).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
-      cell.setText(str.toString());
-
-      /* Reset Foreground */
-      cell.setForeground(null);
-
-      /* Reset Background */
-      cell.setBackground(null);
+      /* Icon */
+      if (newsmark instanceof IBookMark)
+        cell.setImage(getIconForBookMark((IBookMark) newsmark, hasNew));
+      else if (newsmark instanceof ISearchMark)
+        cell.setImage(getIconForSearchMark((ISearchMark) newsmark, hasNew, unreadNewsCount));
+      else if (newsmark instanceof INewsBin)
+        cell.setImage(fNewsBinIcon);
     }
 
     /* Create Label for EntityGroup */
@@ -300,6 +235,49 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       /* Font */
       cell.setFont(fBoldFont);
     }
+  }
+
+  private Image getIconForBookMark(IBookMark bookmark, boolean hasNew) {
+
+    /* Load the FavIcon */
+    ImageDescriptor favicon = OwlUI.getFavicon(bookmark);
+
+    /* Indicate Error */
+    if (bookmark.isErrorLoading()) {
+
+      /* Overlay with Error Icon if required */
+      if (favicon != null) {
+        Image faviconImg = OwlUI.getImage(fResources, favicon);
+        DecorationOverlayIcon overlay = new DecorationOverlayIcon(faviconImg, OwlUI.getImageDescriptor("icons/ovr16/error.gif"), IDecoration.BOTTOM_RIGHT);
+        return OwlUI.getImage(fResources, overlay);
+      }
+
+      /* Default Error Icon */
+      return fBookMarkErrorIcon;
+    }
+
+    /* Use normal Icon */
+    Image icon = favicon != null ? OwlUI.getImage(fResources, favicon) : fBookMarkIcon;
+
+    /* Overlay if News are *new* */
+    if (hasNew) {
+      DecorationOverlayIcon overlay = new DecorationOverlayIcon(icon, OwlUI.getImageDescriptor("icons/ovr16/new.gif"), IDecoration.BOTTOM_RIGHT);
+      return OwlUI.getImage(fResources, overlay);
+    }
+
+    /* Don't overlay */
+    return icon;
+  }
+
+  private Image getIconForSearchMark(ISearchMark searchmark, boolean hasNew, int unreadNewsCount) {
+    boolean hasMatchingNews = unreadNewsCount > 0 || searchmark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED, INews.State.READ)) != 0;
+
+    if (hasNew)
+      return fSearchMarkNewIcon;
+    else if (hasMatchingNews || !fIndicateState)
+      return fSearchMarkIcon;
+    else
+      return fSearchMarkEmptyIcon;
   }
 
   /*

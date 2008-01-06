@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.editors.feed;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -36,6 +37,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ColumnViewer;
@@ -52,6 +54,11 @@ import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DragSourceListener;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Cursor;
@@ -83,6 +90,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.ITask;
+import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
@@ -246,7 +254,6 @@ public class NewsTableControl implements IFeedViewPart {
   private Columns fInitialSortColumn = Columns.DATE;
   private boolean fInitialAscending = false;
 
-
   /*
    * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#init(org.eclipse.ui.IEditorSite)
    */
@@ -291,7 +298,52 @@ public class NewsTableControl implements IFeedViewPart {
 
     fHandCursor = parent.getDisplay().getSystemCursor(SWT.CURSOR_HAND);
 
+    /* Drag and Drop */
+    initDragAndDrop();
+
     return fViewer;
+  }
+
+  private void initDragAndDrop() {
+    int ops = DND.DROP_COPY | DND.DROP_MOVE;
+    Transfer[] transfers = new Transfer[] { LocalSelectionTransfer.getTransfer(), TextTransfer.getInstance() };
+
+    /* Drag Support */
+    fViewer.addDragSupport(ops, transfers, new DragSourceListener() {
+      public void dragStart(final DragSourceEvent event) {
+        SafeRunner.run(new LoggingSafeRunnable() {
+          public void run() throws Exception {
+            LocalSelectionTransfer.getTransfer().setSelection(fViewer.getSelection());
+            LocalSelectionTransfer.getTransfer().setSelectionSetTime(event.time & 0xFFFFFFFFL);
+            event.doit = true;
+          }
+        });
+      }
+
+      public void dragSetData(final DragSourceEvent event) {
+        SafeRunner.run(new LoggingSafeRunnable() {
+          public void run() throws Exception {
+
+            /* Set Selection using LocalSelectionTransfer */
+            if (LocalSelectionTransfer.getTransfer().isSupportedType(event.dataType))
+              event.data = LocalSelectionTransfer.getTransfer().getSelection();
+
+            /* Set Text using TextTransfer */
+            else if (TextTransfer.getInstance().isSupportedType(event.dataType))
+              ; //TODO Support Text Transfer;
+          }
+        });
+      }
+
+      public void dragFinished(DragSourceEvent event) {
+        SafeRunner.run(new LoggingSafeRunnable() {
+          public void run() throws Exception {
+            LocalSelectionTransfer.getTransfer().setSelection(null);
+            LocalSelectionTransfer.getTransfer().setSelectionSetTime(0);
+          }
+        });
+      }
+    });
   }
 
   /*

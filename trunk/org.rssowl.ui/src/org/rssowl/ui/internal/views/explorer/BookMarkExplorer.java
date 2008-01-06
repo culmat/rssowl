@@ -121,6 +121,7 @@ import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.EntityPropertyDialogAction;
 import org.rssowl.ui.internal.actions.NewBookMarkAction;
 import org.rssowl.ui.internal.actions.NewFolderAction;
+import org.rssowl.ui.internal.actions.NewNewsBinAction;
 import org.rssowl.ui.internal.actions.NewSearchMarkAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.actions.RetargetActions;
@@ -1084,6 +1085,22 @@ public class BookMarkExplorer extends ViewPart {
       @Override
       public ImageDescriptor getImageDescriptor() {
         return OwlUI.BOOKMARK;
+      }
+    });
+
+    /* New NewsBin */
+    newMenu.add(new Action("News Bin...") {
+      @Override
+      public void run() {
+        IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
+        IFolder parent = getParent(selection);
+        IMark position = (IMark) ((selection.getFirstElement() instanceof IMark) ? selection.getFirstElement() : null);
+        new NewNewsBinAction(fViewSite.getShell(), parent, position).run(null);
+      }
+
+      @Override
+      public ImageDescriptor getImageDescriptor() {
+        return OwlUI.NEWSBIN;
       }
     });
 
