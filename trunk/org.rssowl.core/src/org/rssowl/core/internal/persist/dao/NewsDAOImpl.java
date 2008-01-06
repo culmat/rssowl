@@ -99,6 +99,7 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
     return new NewsEvent(oldNews, entity, true);
   }
 
+  //TODO Bug when the passed INews has isCopy == true
   public void setState(Collection<INews> news, State state, boolean affectEquivalentNews, boolean force) throws PersistenceException {
     if (news.isEmpty())
       return;
@@ -119,7 +120,9 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
 
             List<INews> equivalentNews;
 
-            if (newsItem.getGuid() != null && newsItem.getGuid().isPermaLink()) {
+            if (newsItem.isCopy())
+              equivalentNews = Collections.singletonList(newsItem);
+            else if (newsItem.getGuid() != null && newsItem.getGuid().isPermaLink()) {
               equivalentNews = getNewsFromGuid(newsItem);
               if (equivalentNews.isEmpty()) {
                 throw createIllegalException("No news were found with guid: " + //$NON-NLS-1$
