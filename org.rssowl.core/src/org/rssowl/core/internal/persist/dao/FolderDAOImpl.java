@@ -31,11 +31,13 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.event.BookMarkEvent;
 import org.rssowl.core.persist.event.FolderEvent;
 import org.rssowl.core.persist.event.FolderListener;
+import org.rssowl.core.persist.event.NewsBinEvent;
 import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.ReparentInfo;
@@ -87,13 +89,14 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
     Assert.isNotNull(reparentInfos, "reparentInfos"); //$NON-NLS-1$
     if (reparentInfos.isEmpty())
       return;
-    
+
     fWriteLock.lock();
     try {
       List<FolderEvent> folderEvents = new ArrayList<FolderEvent>(3);
       List<BookMarkEvent> bookMarkEvents = new ArrayList<BookMarkEvent>(3);
       List<SearchMarkEvent> searchMarkEvents = new ArrayList<SearchMarkEvent>(3);
-      fillFolderChildEvents(reparentInfos, folderEvents, bookMarkEvents, searchMarkEvents);
+      List<NewsBinEvent> newsBinEvents = new ArrayList<NewsBinEvent>(3);
+      fillFolderChildEvents(reparentInfos, folderEvents, bookMarkEvents, searchMarkEvents, newsBinEvents);
 
       for (FolderEvent event : folderEvents) {
         fDb.set(event.getOldParent());
@@ -144,7 +147,7 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
     parent.addMark(child, position, after);
   }
 
-  private void fillFolderChildEvents(List<ReparentInfo<IFolderChild, IFolder>> reparentInfos, List<FolderEvent> folderEvents, List<BookMarkEvent> bookMarkEvents, List<SearchMarkEvent> searchMarkEvents) {
+  private void fillFolderChildEvents(List<ReparentInfo<IFolderChild, IFolder>> reparentInfos, List<FolderEvent> folderEvents, List<BookMarkEvent> bookMarkEvents, List<SearchMarkEvent> searchMarkEvents, List<NewsBinEvent> newsBinEvents) {
     for (ReparentInfo<IFolderChild, IFolder> reparentInfo : reparentInfos) {
       IFolderChild child = reparentInfo.getObject();
       IFolder newParent = reparentInfo.getNewParent();
@@ -180,6 +183,10 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
         } else if (mark instanceof ISearchMark) {
           SearchMarkEvent event = new SearchMarkEvent((ISearchMark) mark, oldParent, true);
           searchMarkEvents.add(event);
+          DBHelper.putEventTemplate(event);
+        } else if (mark instanceof INewsBin) {
+          NewsBinEvent event = new NewsBinEvent((INewsBin) mark, oldParent, true);
+          newsBinEvents.add(event);
           DBHelper.putEventTemplate(event);
         } else
           throw new IllegalArgumentException("Unknown IMark subclass found: " + child.getClass());
