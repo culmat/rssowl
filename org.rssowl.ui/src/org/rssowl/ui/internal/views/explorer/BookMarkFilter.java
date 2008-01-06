@@ -204,14 +204,14 @@ public class BookMarkFilter extends ViewerFilter {
     return fMatcher.match(string);
   }
 
-  boolean needsRefresh(Class<? extends IEntity> entity, Set<? extends ModelEvent> events) {
+  boolean needsRefresh(Class<? extends IEntity> entityClass, Set<? extends ModelEvent> events) {
 
     /* In case the Filter is not active at all */
     if (fMatcher == null && fType == Type.SHOW_ALL)
       return false;
 
     /* Bookmark Event */
-    if (entity.equals(IBookMark.class)) {
+    if (IBookMark.class.isAssignableFrom(entityClass)) {
       if (fMatcher != null)
         return true;
 
@@ -220,7 +220,7 @@ public class BookMarkFilter extends ViewerFilter {
     }
 
     /* Searchmark / News Bin Event */
-    else if (entity.equals(ISearchMark.class) || entity.equals(INewsBin.class)) {
+    else if (ISearchMark.class.isAssignableFrom(entityClass) || INewsBin.class.isAssignableFrom(entityClass)) {
       if (fMatcher != null)
         return true;
 
@@ -229,7 +229,7 @@ public class BookMarkFilter extends ViewerFilter {
     }
 
     /* News Event */
-    else if (entity.equals(INews.class)) {
+    else if (entityClass.equals(INews.class)) {
       if (fType == Type.SHOW_NEW)
         return ModelUtils.isNewStateChange(events);
       else if (fType == Type.SHOW_UNREAD)
