@@ -54,10 +54,8 @@ public class LongArrayList {
 
   public int indexOf(long element) {
     for (int i = 0; i < fSize; ++i) {
-      if (fElements[i] == element) {
-        remove(i);
+      if (fElements[i] == element)
         return i;
-      }
     }
     return -1;
   }
