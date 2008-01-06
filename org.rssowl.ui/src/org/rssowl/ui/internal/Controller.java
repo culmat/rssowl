@@ -179,14 +179,15 @@ public class Controller {
   private ContextService fContextService;
 
   /* Misc. */
-  private IApplicationService fAppService;
-  private IBookMarkDAO fBookMarkDAO;
-  private IFolderDAO fFolderDAO;
-  private IConditionalGetDAO fConditionalGetDAO;
-  private IPreferenceDAO fPrefsDAO;
-  private ILabelDAO fLabelDao;
-  private IModelFactory fFactory;
-  private Lock fLoginDialogLock = new ReentrantLock();
+  private final IApplicationService fAppService;
+  private final IBookMarkDAO fBookMarkDAO;
+  private final ISearchMarkDAO fSearchMarkDAO;
+  private final IFolderDAO fFolderDAO;
+  private final IConditionalGetDAO fConditionalGetDAO;
+  private final IPreferenceDAO fPrefsDAO;
+  private final ILabelDAO fLabelDao;
+  private final IModelFactory fFactory;
+  private final Lock fLoginDialogLock = new ReentrantLock();
   private BookMarkAdapter fBookMarkListener;
   private LabelAdapter fLabelListener;
 
@@ -247,6 +248,7 @@ public class Controller {
     fSaveFeedQueue.setUnknownProgress(true);
     fEntityPropertyPages = loadEntityPropertyPages();
     fBookMarkDAO = DynamicDAO.getDAO(IBookMarkDAO.class);
+    fSearchMarkDAO = DynamicDAO.getDAO(ISearchMarkDAO.class);
     fConditionalGetDAO = DynamicDAO.getDAO(IConditionalGetDAO.class);
     fFolderDAO = DynamicDAO.getDAO(IFolderDAO.class);
     fLabelDao = DynamicDAO.getDAO(ILabelDAO.class);
@@ -289,8 +291,7 @@ public class Controller {
   private void updateLabelConditions(String oldLabelName, String newLabelName) {
     Set<ISearchMark> searchMarksToUpdate = new HashSet<ISearchMark>(1);
 
-    Set<ISearchMark> searchMarks = fCacheService.getSearchMarks();
-    for (ISearchMark searchMark : searchMarks) {
+    for (ISearchMark searchMark : fSearchMarkDAO.loadAll()) {
       List<ISearchCondition> conditions = searchMark.getSearchConditions();
       for (ISearchCondition condition : conditions) {
         if (condition.getField().getId() == INews.LABEL && condition.getValue().equals(oldLabelName)) {

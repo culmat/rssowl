@@ -44,6 +44,7 @@ import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.SearchHit;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
@@ -149,7 +150,7 @@ public class SavedSearchService {
     if (!force && fUpdatedOnce.get())
       return;
 
-    Set<ISearchMark> searchMarks = Controller.getDefault().getCacheService().getSearchMarks();
+    Collection<ISearchMark> searchMarks = DynamicDAO.loadAll(ISearchMark.class);
     updateSavedSearches(searchMarks);
   }
 
@@ -157,7 +158,7 @@ public class SavedSearchService {
    * @param searchMarks The Set of <code>ISearchMark</code> to update the
    * results in.
    */
-  public void updateSavedSearches(Set<ISearchMark> searchMarks) {
+  public void updateSavedSearches(Collection<ISearchMark> searchMarks) {
     updateSavedSearches(searchMarks, false);
   }
 
@@ -167,7 +168,7 @@ public class SavedSearchService {
    * @param fromUserEvent Indicates whether to update the saved searches due to
    * a user initiated event or an automatic one.
    */
-  public void updateSavedSearches(Set<ISearchMark> searchMarks, boolean fromUserEvent) {
+  public void updateSavedSearches(Collection<ISearchMark> searchMarks, boolean fromUserEvent) {
     boolean firstUpdate = !fUpdatedOnce.get();
 
     fUpdatedOnce.set(true);
