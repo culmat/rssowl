@@ -284,15 +284,15 @@ public class BookMarkGrouping {
       return true;
 
     /* Bookmark Event */
-    if (entityClass.equals(IBookMark.class))
+    if (IBookMark.class.isAssignableFrom(entityClass))
       return true;
 
     /* Searchmark Event */
-    if (entityClass.equals(ISearchMark.class))
+    if (ISearchMark.class.isAssignableFrom(entityClass))
       return true;
 
     /* News Bin Event */
-    if (entityClass.equals(INewsBin.class))
+    if (INewsBin.class.isAssignableFrom(entityClass))
       return true;
 
     return false;
