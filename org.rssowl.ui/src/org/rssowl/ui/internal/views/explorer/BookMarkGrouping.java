@@ -29,6 +29,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.ui.internal.EntityGroup;
@@ -124,7 +125,7 @@ public class BookMarkGrouping {
 
   /**
    * Set the Type of grouping as defined in the Type Enum
-   * 
+   *
    * @param type The new Grouping Type.
    */
   public void setType(Type type) {
@@ -133,7 +134,7 @@ public class BookMarkGrouping {
 
   /**
    * Group the Input based on the selected Type
-   * 
+   *
    * @param input The Input to Group.
    * @return The Input grouped in an array of EntityGroup, as specified by the
    * Type of Group.
@@ -288,6 +289,10 @@ public class BookMarkGrouping {
 
     /* Searchmark Event */
     if (entityClass.equals(ISearchMark.class))
+      return true;
+
+    /* News Bin Event */
+    if (entityClass.equals(INewsBin.class))
       return true;
 
     return false;
