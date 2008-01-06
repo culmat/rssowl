@@ -951,6 +951,9 @@
          <targetEntity
                class="org.rssowl.core.persist.IBookMark">
          </targetEntity>
+         <targetEntity
+               class="org.rssowl.core.persist.INewsBin">
+         </targetEntity>
       </entityPropertyPage>
       <entityPropertyPage
             class="org.rssowl.ui.internal.dialogs.properties.RetentionPropertyPage"
@@ -979,6 +982,9 @@
          </targetEntity>
          <targetEntity
                class="org.rssowl.core.persist.ISearchMark">
+         </targetEntity>
+         <targetEntity
+               class="org.rssowl.core.persist.INewsBin">
          </targetEntity>
       </entityPropertyPage>
       <entityPropertyPage
