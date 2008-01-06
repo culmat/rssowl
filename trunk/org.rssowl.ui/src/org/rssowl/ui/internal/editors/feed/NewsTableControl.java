@@ -83,6 +83,7 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.event.LabelAdapter;
 import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -112,12 +113,10 @@ import org.rssowl.ui.internal.util.JobTracker;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -248,6 +247,7 @@ public class NewsTableControl implements IFeedViewPart {
   private AtomicBoolean fBlockNewsStateTracker = new AtomicBoolean(false);
   private LabelAdapter fLabelListener;
   private IPreferenceScope fInputPreferences;
+  private INewsDAO fNewsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
 
   /* Settings */
   private IPreferenceScope fPreferences;
@@ -604,7 +604,7 @@ public class NewsTableControl implements IFeedViewPart {
     if (selectedNews.getState() != INews.State.READ && selectedNews.isVisible()) {
       fNewsStateTracker.run(new TaskAdapter() {
         public IStatus run(IProgressMonitor monitor) {
-          setNewsState(Arrays.asList(new INews[] { selectedNews }), INews.State.READ);
+          setNewsState(selectedNews, INews.State.READ);
           return Status.OK_STATUS;
         }
       });
@@ -638,7 +638,7 @@ public class NewsTableControl implements IFeedViewPart {
         INews news = (INews) data;
         disableTrackerTemporary = (news.getState() == INews.State.READ);
         INews.State newState = (news.getState() == INews.State.READ) ? INews.State.UNREAD : INews.State.READ;
-        setNewsState(new ArrayList<INews>(Arrays.asList(new INews[] { news })), newState);
+        setNewsState(news, newState);
       }
     }
 
@@ -881,7 +881,8 @@ public class NewsTableControl implements IFeedViewPart {
     PlatformUI.getWorkbench().getThemeManager().removePropertyChangeListener(fPropertyChangeListener);
   }
 
-  private void setNewsState(List<INews> news, INews.State state) {
-    Owl.getPersistenceService().getDAOService().getNewsDAO().setState(news, state, true, false);
+  private void setNewsState(INews news, INews.State state) {
+    boolean affectEquivalentNews = !news.isCopy();
+    fNewsDao.setState(Collections.singleton(news), state, affectEquivalentNews, false);
   }
 }
