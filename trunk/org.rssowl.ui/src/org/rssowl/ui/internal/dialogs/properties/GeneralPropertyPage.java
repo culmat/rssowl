@@ -53,6 +53,7 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DAOService;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -258,47 +259,58 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       ((GridLayout) otherSettingsContainer.getLayout()).marginTop = 15;
 
     /* Auto-Reload */
-    Composite autoReloadContainer = new Composite(otherSettingsContainer, SWT.NONE);
-    autoReloadContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0));
-    autoReloadContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, true));
+    if (!containsNewsBin(fEntities)) {
+      Composite autoReloadContainer = new Composite(otherSettingsContainer, SWT.NONE);
+      autoReloadContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0));
+      autoReloadContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, true));
 
-    fUpdateCheck = new Button(autoReloadContainer, SWT.CHECK);
-    fUpdateCheck.setText("Automatically update the " + (fIsSingleBookMark ? "feed" : "feeds") + " every ");
-    fUpdateCheck.setSelection(fPrefUpdateIntervalState);
-    fUpdateCheck.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        fReloadSpinner.setEnabled(fUpdateCheck.getSelection());
-        fReloadCombo.setEnabled(fUpdateCheck.getSelection());
-      }
-    });
+      fUpdateCheck = new Button(autoReloadContainer, SWT.CHECK);
+      fUpdateCheck.setText("Automatically update the " + (fIsSingleBookMark ? "feed" : "feeds") + " every ");
+      fUpdateCheck.setSelection(fPrefUpdateIntervalState);
+      fUpdateCheck.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          fReloadSpinner.setEnabled(fUpdateCheck.getSelection());
+          fReloadCombo.setEnabled(fUpdateCheck.getSelection());
+        }
+      });
 
-    fReloadSpinner = new Spinner(autoReloadContainer, SWT.BORDER);
-    fReloadSpinner.setMinimum(1);
-    fReloadSpinner.setMaximum(999);
-    fReloadSpinner.setEnabled(fPrefUpdateIntervalState);
+      fReloadSpinner = new Spinner(autoReloadContainer, SWT.BORDER);
+      fReloadSpinner.setMinimum(1);
+      fReloadSpinner.setMaximum(999);
+      fReloadSpinner.setEnabled(fPrefUpdateIntervalState);
 
-    if (fUpdateIntervalScope == MINUTES_SCOPE)
-      fReloadSpinner.setSelection((int) (fPrefUpdateInterval / MINUTE_IN_SECONDS));
-    else if (fUpdateIntervalScope == HOURS_SCOPE)
-      fReloadSpinner.setSelection((int) (fPrefUpdateInterval / HOUR_IN_SECONDS));
-    else if (fUpdateIntervalScope == DAYS_SCOPE)
-      fReloadSpinner.setSelection((int) (fPrefUpdateInterval / DAY_IN_SECONDS));
+      if (fUpdateIntervalScope == MINUTES_SCOPE)
+        fReloadSpinner.setSelection((int) (fPrefUpdateInterval / MINUTE_IN_SECONDS));
+      else if (fUpdateIntervalScope == HOURS_SCOPE)
+        fReloadSpinner.setSelection((int) (fPrefUpdateInterval / HOUR_IN_SECONDS));
+      else if (fUpdateIntervalScope == DAYS_SCOPE)
+        fReloadSpinner.setSelection((int) (fPrefUpdateInterval / DAY_IN_SECONDS));
 
-    fReloadCombo = new Combo(autoReloadContainer, SWT.READ_ONLY);
-    fReloadCombo.add("Minutes");
-    fReloadCombo.add("Hours");
-    fReloadCombo.add("Days");
-    fReloadCombo.select(fUpdateIntervalScope);
-    fReloadCombo.setEnabled(fPrefUpdateIntervalState);
+      fReloadCombo = new Combo(autoReloadContainer, SWT.READ_ONLY);
+      fReloadCombo.add("Minutes");
+      fReloadCombo.add("Hours");
+      fReloadCombo.add("Days");
+      fReloadCombo.select(fUpdateIntervalScope);
+      fReloadCombo.setEnabled(fPrefUpdateIntervalState);
 
-    /* Open on Startup */
-    fOpenOnStartupCheck = new Button(otherSettingsContainer, SWT.CHECK);
-    fOpenOnStartupCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fOpenOnStartupCheck.setText("Display the " + (fIsSingleBookMark ? "feed" : "feeds") + " on start-up");
-    fOpenOnStartupCheck.setSelection(fPrefOpenOnStartup);
+      /* Open on Startup */
+      fOpenOnStartupCheck = new Button(otherSettingsContainer, SWT.CHECK);
+      fOpenOnStartupCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      fOpenOnStartupCheck.setText("Display the " + (fIsSingleBookMark ? "feed" : "feeds") + " on start-up");
+      fOpenOnStartupCheck.setSelection(fPrefOpenOnStartup);
+    }
 
     return container;
+  }
+
+  private boolean containsNewsBin(List<IEntity> entities) {
+    for (IEntity entity : entities) {
+      if (entity instanceof INewsBin)
+        return true;
+    }
+
+    return false;
   }
 
   private void onGrabTitle() {
@@ -436,6 +448,8 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
         fSite.setMessage("Please enter a name for the folder.", IPropertyDialogSite.MessageType.ERROR);
       else if (entity instanceof IBookMark)
         fSite.setMessage("Please enter a name for the bookmark.", IPropertyDialogSite.MessageType.ERROR);
+      else if (entity instanceof INewsBin)
+        fSite.setMessage("Please enter a name for the news bin.", IPropertyDialogSite.MessageType.ERROR);
 
       return false;
     }
@@ -512,6 +526,17 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       }
     }
 
+    /* Update NewsBin */
+    else if (entity instanceof INewsBin) {
+      INewsBin newsbin = (INewsBin) entity;
+
+      /* Check for changed Name */
+      if (!newsbin.getName().equals(fNameInput.getText())) {
+        newsbin.setName(fNameInput.getText());
+        entitiesToSave.add(newsbin);
+      }
+    }
+
     return true;
   }
 
@@ -529,8 +554,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     if (sameParent != null && sameParent != fFolderChooser.getFolder()) {
       List<ReparentInfo<IFolderChild, IFolder>> reparenting = new ArrayList<ReparentInfo<IFolderChild, IFolder>>();
       for (IEntity entity : fEntities) {
-        /* Check BookMark and Folder */
-        if (entity instanceof IBookMark || entity instanceof IFolder) {
+        if (entity instanceof IFolderChild) {
           IFolderChild folderChild = (IFolderChild) entity;
           reparenting.add(ReparentInfo.create(folderChild, fFolderChooser.getFolder(), null, null));
         }
@@ -553,33 +577,39 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     boolean changed = false;
 
     /* Update Interval State */
-    boolean bVal = fUpdateCheck.getSelection();
-    if (fPrefUpdateIntervalState != bVal) {
-      scope.putBoolean(DefaultPreferences.BM_UPDATE_INTERVAL_STATE, bVal);
-      changed = true;
+    if (fUpdateCheck != null) {
+      boolean bVal = fUpdateCheck.getSelection();
+      if (fPrefUpdateIntervalState != bVal) {
+        scope.putBoolean(DefaultPreferences.BM_UPDATE_INTERVAL_STATE, bVal);
+        changed = true;
+      }
     }
 
     /* Update Interval */
-    long lVal;
-    fUpdateIntervalScope = fReloadCombo.getSelectionIndex();
+    if (fReloadCombo != null) {
+      long lVal;
+      fUpdateIntervalScope = fReloadCombo.getSelectionIndex();
 
-    if (fUpdateIntervalScope == MINUTES_SCOPE)
-      lVal = fReloadSpinner.getSelection() * MINUTE_IN_SECONDS;
-    else if (fUpdateIntervalScope == HOURS_SCOPE)
-      lVal = fReloadSpinner.getSelection() * HOUR_IN_SECONDS;
-    else
-      lVal = fReloadSpinner.getSelection() * DAY_IN_SECONDS;
+      if (fUpdateIntervalScope == MINUTES_SCOPE)
+        lVal = fReloadSpinner.getSelection() * MINUTE_IN_SECONDS;
+      else if (fUpdateIntervalScope == HOURS_SCOPE)
+        lVal = fReloadSpinner.getSelection() * HOUR_IN_SECONDS;
+      else
+        lVal = fReloadSpinner.getSelection() * DAY_IN_SECONDS;
 
-    if (fPrefUpdateInterval != lVal) {
-      scope.putLong(DefaultPreferences.BM_UPDATE_INTERVAL, lVal);
-      changed = true;
+      if (fPrefUpdateInterval != lVal) {
+        scope.putLong(DefaultPreferences.BM_UPDATE_INTERVAL, lVal);
+        changed = true;
+      }
     }
 
     /* Open on Startup */
-    bVal = fOpenOnStartupCheck.getSelection();
-    if (fPrefOpenOnStartup != bVal) {
-      scope.putBoolean(DefaultPreferences.BM_OPEN_ON_STARTUP, bVal);
-      changed = true;
+    if (fOpenOnStartupCheck != null) {
+      boolean bVal = fOpenOnStartupCheck.getSelection();
+      if (fPrefOpenOnStartup != bVal) {
+        scope.putBoolean(DefaultPreferences.BM_OPEN_ON_STARTUP, bVal);
+        changed = true;
+      }
     }
 
     return changed;
