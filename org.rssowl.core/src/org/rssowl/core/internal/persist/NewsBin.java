@@ -90,7 +90,7 @@ public class NewsBin extends Mark implements INewsBin   {
     synchronized (this) {
       newsRefs = fNewsContainer.getNews(states);
     }
-    return getNews(newsRefs);
+    return getNews(newsRefs, false);
   }
 
   public synchronized List<NewsReference> getNewsRefs(Set<State> states) {
