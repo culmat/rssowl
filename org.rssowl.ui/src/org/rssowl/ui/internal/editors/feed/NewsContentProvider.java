@@ -518,9 +518,9 @@ public class NewsContentProvider implements ITreeContentProvider {
           return true;
       }
 
-      /* TODO This is a workaround until there is an efficient way to find out if a searchmark contains a given News! */
+      /* Check if Saved Search contains the given News */
       else if (type != EventType.PERSIST && mark instanceof ISearchMark) {
-        return true;
+        return (((ISearchMark)mark).containsNews(news));
       }
 
       /* Check if News Bin contains the given News */
