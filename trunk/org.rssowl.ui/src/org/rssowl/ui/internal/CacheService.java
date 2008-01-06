@@ -27,15 +27,10 @@ package org.rssowl.ui.internal;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
-import org.rssowl.core.persist.IMark;
-import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.event.BookMarkEvent;
-import org.rssowl.core.persist.event.BookMarkListener;
+import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.event.FolderEvent;
 import org.rssowl.core.persist.event.FolderListener;
-import org.rssowl.core.persist.event.SearchMarkEvent;
-import org.rssowl.core.persist.event.SearchMarkListener;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 
 import java.util.Collection;
@@ -56,25 +51,23 @@ public class CacheService {
   private static final int CONCURRENT_WRITERS = 2;
   private static final float LOAD_FACTOR = 0.75f;
   private final Map<IFolder, Object> fRootFolders;
-  private final Map<IBookMark, Object> fBookMarks;
-  private final Map<ISearchMark, Object> fSearchMarks;
 
   /* Dummy value to associate with an Object in the maps */
   private static final Object PRESENT = new Object();
 
   /* Listeners */
   private FolderListener fFolderListener;
-  private BookMarkListener fBookMarkListener;
-  private SearchMarkListener fSearchMarkListener;
+
+  private final IBookMarkDAO fBookMarkDAO;
 
   /**
    * Registers Listeners to cache the entities that are of interest for this
    * Service.
    */
   public CacheService() {
+    fBookMarkDAO = DynamicDAO.getDAO(IBookMarkDAO.class);
+
     fRootFolders = new ConcurrentHashMap<IFolder, Object>(16, LOAD_FACTOR, CONCURRENT_WRITERS);
-    fBookMarks = new ConcurrentHashMap<IBookMark, Object>(32, LOAD_FACTOR, CONCURRENT_WRITERS);
-    fSearchMarks = new ConcurrentHashMap<ISearchMark, Object>(16, LOAD_FACTOR, CONCURRENT_WRITERS);
 
     registerListeners();
   }
@@ -108,61 +101,9 @@ public class CacheService {
       }
     };
 
-    /* Listen to BookMark Events */
-    fBookMarkListener = new BookMarkListener() {
-
-      /* BookMarks got Added */
-      public void entitiesAdded(Set<BookMarkEvent> events) {
-        for (BookMarkEvent bookMarkEvent : events) {
-          fBookMarks.put(bookMarkEvent.getEntity(), PRESENT);
-        }
-      }
-
-      /* Bookmarks got Deleted */
-      public void entitiesDeleted(Set<BookMarkEvent> events) {
-        for (BookMarkEvent bookMarkEvent : events) {
-          fBookMarks.remove(bookMarkEvent.getEntity());
-        }
-      }
-
-      /* Bookmarks got Updated */
-      public void entitiesUpdated(Set<BookMarkEvent> events) {
-      /* Not handled */
-      }
-    };
-
-    /* Listen to SearchMark Events */
-    fSearchMarkListener = new SearchMarkListener() {
-
-      /* SearchMark got Added */
-      public void entitiesAdded(Set<SearchMarkEvent> events) {
-        for (SearchMarkEvent searchMarkEvent : events) {
-          fSearchMarks.put(searchMarkEvent.getEntity(), PRESENT);
-        }
-      }
-
-      /* SearchMark got Deleted */
-      public void entitiesDeleted(Set<SearchMarkEvent> events) {
-        for (SearchMarkEvent searchMarkEvent : events) {
-          fSearchMarks.remove(searchMarkEvent.getEntity());
-        }
-      }
-
-      /* SearchMark got Updated */
-      public void entitiesUpdated(Set<SearchMarkEvent> events) {
-      /* Not handled */
-      }
-
-      /* Results Changed */
-      public void resultsChanged(Set<SearchMarkEvent> events) {
-      /* Not handled */
-      }
-    };
 
     /* Add Listeners */
     DynamicDAO.addEntityListener(IFolder.class, fFolderListener);
-    DynamicDAO.addEntityListener(IBookMark.class, fBookMarkListener);
-    DynamicDAO.addEntityListener(ISearchMark.class, fSearchMarkListener);
   }
 
   void stopService() {
@@ -171,8 +112,6 @@ public class CacheService {
 
   private void unregisterListeners() {
     DynamicDAO.removeEntityListener(IFolder.class, fFolderListener);
-    DynamicDAO.removeEntityListener(IBookMark.class, fBookMarkListener);
-    DynamicDAO.removeEntityListener(ISearchMark.class, fSearchMarkListener);
   }
 
   /**
@@ -186,59 +125,19 @@ public class CacheService {
   }
 
   /**
-   * Returns a Set of all <code>IBookMark</code>s stored in the persistence
-   * layer.
-   *
-   * @return a Set of all <code>IBookMark</code>s stored in the persistence
-   * layer.
-   */
-  public Set<IBookMark> getBookMarks() {
-    return fBookMarks.keySet();
-  }
-
-  /**
    * Returns a Set of all Links that are added as Bookmarks.
    *
    * @return Returns a Set of all Links that are added as Bookmarks.
    */
   public Set<String> getFeedLinks() {
-    Set<String> links = new HashSet<String>(fBookMarks.size());
+    Collection<IBookMark> bookMarks = fBookMarkDAO.loadAll();
+    Set<String> links = new HashSet<String>(bookMarks.size());
 
-    for (IBookMark bookmark : getBookMarks()) {
+    for (IBookMark bookmark : bookMarks) {
       links.add(bookmark.getFeedLinkReference().getLink().toString());
     }
 
     return links;
-  }
-
-  /**
-   * Returns a Set of all <code>ISearchMark</code>s stored in the persistence
-   * layer.
-   *
-   * @return a Set of all <code>ISearchMark</code>s stored in the persistence
-   * layer.
-   */
-  public Set<ISearchMark> getSearchMarks() {
-    return fSearchMarks.keySet();
-  }
-
-  /**
-   * Returns a Set of <code>IBookMark</code>s that reference the same feed as
-   * <code>feedRef</code>.
-   *
-   * @param feedRef The desired Feed.
-   * @return Returns a List of <code>IBookMark</code>s that reference the
-   * given Feed.
-   */
-  public Set<IBookMark> getBookMarks(FeedLinkReference feedRef) {
-    Set<IBookMark> bookmarks = new HashSet<IBookMark>();
-
-    for (IBookMark bookMark : getBookMarks()) {
-      if (bookMark.getFeedLinkReference().equals(feedRef))
-        bookmarks.add(bookMark);
-    }
-
-    return bookmarks;
   }
 
   /**
@@ -250,7 +149,7 @@ public class CacheService {
    * given Feed or <code>null</code> if none.
    */
   public IBookMark getBookMark(FeedLinkReference feedRef) {
-    Set<IBookMark> bookMarks = getBookMarks();
+    Collection<IBookMark> bookMarks = fBookMarkDAO.loadAll();
     for (IBookMark bookMark : bookMarks) {
       if (bookMark.getFeedLinkReference().equals(feedRef))
         return bookMark;
@@ -271,15 +170,6 @@ public class CacheService {
     /* Cache Root-Folders */
     if (folder.getParent() == null)
       fRootFolders.put(folder, PRESENT);
-
-    /* Cache Marks */
-    List<IMark> subMarks = folder.getMarks();
-    for (IMark subMark : subMarks) {
-      if (subMark instanceof IBookMark)
-        fBookMarks.put((IBookMark) subMark, PRESENT);
-      else if (subMark instanceof ISearchMark)
-        fSearchMarks.put((ISearchMark) subMark, PRESENT);
-    }
 
     /* Recursively refresh cache of sub-folders */
     List<IFolder> subFolders = folder.getFolders();

@@ -46,6 +46,7 @@ import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.JobRunner;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -164,7 +165,7 @@ public class FeedReloadService {
   private void init() {
 
     /* Query Update Intervals and reload/open state */
-    Set<IBookMark> bookmarks = Controller.getDefault().getCacheService().getBookMarks();
+    Collection<IBookMark> bookmarks = DynamicDAO.loadAll(IBookMark.class);
 
     final Set<IBookMark> bookmarksToReloadOnStartup = new HashSet<IBookMark>();
     final List<IBookMark> bookmarksToOpenOnStartup = new ArrayList<IBookMark>();

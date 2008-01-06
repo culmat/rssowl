@@ -39,6 +39,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.event.BookMarkEvent;
 import org.rssowl.core.persist.event.BookMarkListener;
 import org.rssowl.core.persist.event.FolderEvent;
@@ -53,7 +54,6 @@ import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.event.SearchMarkListener;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.service.PersistenceException;
-import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.ModelUtils;
@@ -673,14 +673,15 @@ public class BookMarkContentProvider implements ITreeContentProvider {
 
   private void updateParents(FeedLinkReference feedRef) throws PersistenceException {
 
+    IBookMarkDAO bookMarkDAO = DynamicDAO.getDAO(IBookMarkDAO.class);
     /* Collect all affected BookMarks */
-    Set<IBookMark> affectedBookMarks = Controller.getDefault().getCacheService().getBookMarks(feedRef);
+    Collection<IBookMark> affectedBookMarks = bookMarkDAO.loadAll(feedRef);
 
     /* Update them including Parents */
     updateMarksAndParents(affectedBookMarks);
   }
 
-  private void updateMarksAndParents(Set<IBookMark> bookmarks) {
+  private void updateMarksAndParents(Collection<IBookMark> bookmarks) {
     Set<IEntity> entitiesToUpdate = new HashSet<IEntity>();
     entitiesToUpdate.addAll(bookmarks);
 

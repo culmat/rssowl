@@ -42,7 +42,6 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.BatchedBuffer;
 import org.rssowl.ui.internal.ApplicationWorkbenchAdvisor;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
-import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
 
@@ -192,7 +191,7 @@ public class NotificationService {
       List<FeedLinkReference> enabledFeeds = new ArrayList<FeedLinkReference>();
 
       /* TODO This can be slow, try to optimize performance! */
-      Set<IBookMark> bookMarks = Controller.getDefault().getCacheService().getBookMarks();
+      Collection<IBookMark> bookMarks = DynamicDAO.loadAll(IBookMark.class);
       for (IBookMark bookMark : bookMarks) {
         IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(bookMark);
         if (prefs.getBoolean(DefaultPreferences.ENABLE_NOTIFIER))
