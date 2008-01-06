@@ -31,6 +31,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -129,7 +130,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       /* This is a class that implements IMark */
       else if (object instanceof ModelReference) {
         Class<? extends IEntity> entityClass = ((ModelReference) object).getEntityClass();
-        if (IMark.class.isAssignableFrom(entityClass))  {
+        if (IMark.class.isAssignableFrom(entityClass)) {
           synchronized (NewsContentProvider.this) {
             Collection<INews> news = fCachedNews;
             if (news != null) {
@@ -242,7 +243,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* Special-case marks that can retrieve newsRefs cheaply */
       if (mark.isGetNewsRefsEfficient()) {
-        for (NewsReference newsRef : mark.getNewsRefs()) {
+        for (NewsReference newsRef : mark.getNewsRefs(INews.State.getVisible())) {
 
           /* Avoid to resolve an already shown News */
           if (onlyAdd && hasCachedNews(newsRef))
@@ -510,16 +511,21 @@ public class NewsContentProvider implements ITreeContentProvider {
   private boolean isInputRelatedTo(INews news, EventType type) {
     for (IMark mark : fInput) {
 
-      /* Check if BookMark references the News' Feed */
+      /* Check if BookMark references the News' Feed and is not a copy */
       if (mark instanceof IBookMark) {
         IBookMark bookmark = (IBookMark) mark;
-        if (bookmark.getFeedLinkReference().equals(news.getFeedReference()))
+        if (!news.isCopy() && bookmark.getFeedLinkReference().equals(news.getFeedReference()))
           return true;
       }
 
-      /* TODO This is a workaround! */
+      /* TODO This is a workaround until there is an efficient way to find out if a searchmark contains a given News! */
       else if (type != EventType.PERSIST && mark instanceof ISearchMark) {
         return true;
+      }
+
+      /* Check if News Bin contains the given News */
+      else if (type != EventType.PERSIST && mark instanceof INewsBin) {
+        return news.isCopy() && (((INewsBin)mark).containsNews(news));
       }
     }
 
