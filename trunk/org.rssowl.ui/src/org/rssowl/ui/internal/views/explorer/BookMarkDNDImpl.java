@@ -381,6 +381,15 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     return true;
   }
 
+  private boolean containsFolderChilds(List<?> draggedObjects) {
+    for (Object object : draggedObjects) {
+      if (object instanceof IFolderChild)
+        return true;
+    }
+
+    return false;
+  }
+
   /*
    * @see org.eclipse.jface.viewers.ViewerDropAdapter#performDrop(java.lang.Object)
    */
@@ -394,7 +403,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
           IStructuredSelection selection = (IStructuredSelection) data;
           List<?> draggedObjects = selection.toList();
 
-          if (getCurrentTarget() instanceof INewsBin)
+          if (getCurrentTarget() instanceof INewsBin && !containsFolderChilds(draggedObjects))
             perfromNewsDrop(draggedObjects);
           else
             perfromFolderChildDrop(draggedObjects);
