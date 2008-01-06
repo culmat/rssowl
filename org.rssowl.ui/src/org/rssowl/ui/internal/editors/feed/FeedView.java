@@ -417,8 +417,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
       @Override
       public void entitiesUpdated(Set<FeedEvent> events) {
 
-        /* Not supported for Searchmarks */
-        if (fInput.getMark() instanceof ISearchMark || events.size() == 0)
+        /* Only supported for BookMarks */
+        if (!(fInput.getMark() instanceof IBookMark) || events.size() == 0)
           return;
 
         /* Check if Feed-Event affecting us */
