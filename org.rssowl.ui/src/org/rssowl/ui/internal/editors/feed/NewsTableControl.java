@@ -77,17 +77,17 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
-import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.event.LabelAdapter;
 import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.ITask;
@@ -836,17 +836,16 @@ public class NewsTableControl implements IFeedViewPart {
     Tree tree = fCustomTree.getControl();
     TreeColumn feedColumn = tree.getColumn(COL_FEED);
 
-    /* Old: Bookmark, New: Saved Search */
-    if (oldInput instanceof FeedLinkReference && input instanceof ISearchMark)
+    boolean oldInputShowsFeedColumn = !(oldInput instanceof BookMarkReference);
+    boolean newInputShowsFeedColumn = (input instanceof ISearchMark) || (input instanceof INewsBin);
+
+    /* Reveal Feed Column */
+    if ((!oldInputShowsFeedColumn && newInputShowsFeedColumn) || newInputShowsFeedColumn)
       fCustomTree.setVisible(feedColumn, true, true);
 
-    /* Old: Saved Search, New: Bookmark */
-    else if (oldInput instanceof SearchMarkReference && input instanceof IBookMark)
+    /* Hide Feed Column */
+    else if (oldInputShowsFeedColumn && !newInputShowsFeedColumn)
       fCustomTree.setVisible(feedColumn, false, true);
-
-    /* Saved Search */
-    else if (input instanceof ISearchMark)
-      fCustomTree.setVisible(feedColumn, true, true);
 
     /* Set Input to Viewer */
     if (input instanceof IEntity)
