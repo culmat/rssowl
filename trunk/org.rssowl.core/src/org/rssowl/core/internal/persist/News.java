@@ -279,19 +279,6 @@ public class News extends AbstractEntity implements INews {
   }
 
   /*
-   * @see org.rssowl.core.internal.persist.AbstractEntity#getId()
-   */
-  @Override
-  public Long getId() {
-    fLock.acquireReadLock();
-    try {
-      return super.getId();
-    } finally {
-      fLock.releaseReadLock();
-    }
-  }
-
-  /*
    * @see org.rssowl.core.internal.persist.AbstractEntity#equals(java.lang.Object)
    */
   @Override
