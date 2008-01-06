@@ -36,13 +36,17 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.BookMarkEvent;
 import org.rssowl.core.persist.event.BookMarkListener;
 import org.rssowl.core.persist.event.FolderEvent;
 import org.rssowl.core.persist.event.FolderListener;
+import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.NewsAdapter;
+import org.rssowl.core.persist.event.NewsBinEvent;
+import org.rssowl.core.persist.event.NewsBinListener;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.event.SearchMarkEvent;
@@ -76,6 +80,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
   /* Listener */
   private FolderListener fFolderListener;
   private BookMarkListener fBookMarkListener;
+  private NewsBinListener fNewsBinListener;
   private SearchMarkListener fSearchMarkListener;
   private NewsListener fNewsListener;
 
@@ -373,344 +378,290 @@ public class BookMarkContentProvider implements ITreeContentProvider {
 
       /* BookMarks got Updated */
       public void entitiesUpdated(final Set<BookMarkEvent> events) {
-        JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
-          public void run() {
-            Set<IBookMark> updatedBookMarks = null;
-            Map<IBookMark, IFolder> reparentedBookMarks = null;
-
-            /* Retrieve Updated BookMarks */
-            for (BookMarkEvent event : events) {
-              if (event.isRoot()) {
-
-                /* BookMark got reparented */
-                if (event.getOldParent() != null) {
-                  if (reparentedBookMarks == null)
-                    reparentedBookMarks = new HashMap<IBookMark, IFolder>();
-                  reparentedBookMarks.put(event.getEntity(), event.getOldParent());
-                }
-
-                /* Normal Update */
-                else {
-                  if (updatedBookMarks == null)
-                    updatedBookMarks = new HashSet<IBookMark>();
-                  updatedBookMarks.add(event.getEntity());
-                }
-              }
-            }
-
-            /* Event not interesting for us or we are disposed */
-            if (updatedBookMarks == null && reparentedBookMarks == null)
-              return;
-
-            /* Ask Filter */
-            if (fBookmarkFilter.needsRefresh(IBookMark.class, events))
-              fViewer.refresh(false);
-
-            /* Ask Group */
-            else if (fBookmarkGrouping.needsRefresh(IBookMark.class))
-              fViewer.refresh(false);
-
-            /* Handle reparented Folders */
-            else if (reparentedBookMarks != null) {
-              Set<Entry<IBookMark, IFolder>> entries = reparentedBookMarks.entrySet();
-              Set<IFolder> parentsToUpdate = new HashSet<IFolder>();
-              try {
-                fViewer.getControl().getParent().setRedraw(false);
-                for (Entry<IBookMark, IFolder> entry : entries) {
-                  IBookMark reparentedBookMark = entry.getKey();
-                  IFolder oldParent = entry.getValue();
-
-                  /* Reparent while keeping the Selection */
-                  ISelection selection = fViewer.getSelection();
-                  fViewer.remove(oldParent, new Object[] { reparentedBookMark });
-                  fViewer.refresh(reparentedBookMark.getParent(), false);
-                  fViewer.setSelection(selection);
-
-                  /* Remember to update parents */
-                  parentsToUpdate.add(oldParent);
-                  parentsToUpdate.add(reparentedBookMark.getParent());
-                }
-              } finally {
-                fViewer.getControl().getParent().setRedraw(true);
-              }
-
-              /* Update old Parents of Reparented Bookmarks */
-              for (IFolder folder : parentsToUpdate)
-                updateFolderAndParents(folder);
-            }
-
-            /* Handle Updated Folders */
-            if (updatedBookMarks != null)
-              fViewer.update(updatedBookMarks.toArray(), null);
-          }
-        });
+        onMarksUpdated(events);
       }
 
       /* BookMarks got Deleted */
       public void entitiesDeleted(final Set<BookMarkEvent> events) {
-        JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
-          public void run() {
-
-            /* Retrieve Removed BookMarks */
-            Set<IBookMark> removedBookMarks = null;
-            for (BookMarkEvent event : events) {
-              if (event.isRoot()) {
-                if (removedBookMarks == null)
-                  removedBookMarks = new HashSet<IBookMark>();
-                removedBookMarks.add(event.getEntity());
-              }
-            }
-
-            /* Event not interesting for us or we are disposed */
-            if (removedBookMarks == null || removedBookMarks.size() == 0)
-              return;
-
-            /* Ask Filter */
-            if (fBookmarkFilter.needsRefresh(IBookMark.class, events))
-              fViewer.refresh(false);
-
-            /* Ask Group */
-            else if (fBookmarkGrouping.needsRefresh(IBookMark.class))
-              fViewer.refresh(false);
-
-            /* React normally then */
-            else
-              fViewer.remove(removedBookMarks.toArray());
-
-            /* Update Read-State counters on Parents */
-            if (!fBookmarkGrouping.isActive()) {
-              for (BookMarkEvent event : events) {
-                IFolder eventParent = event.getEntity().getParent();
-                if (eventParent != null && eventParent.getParent() != null)
-                  updateFolderAndParents(eventParent);
-              }
-            }
-          }
-        });
+        onMarksRemoved(events);
       }
 
       /* BookMarks got Added */
       public void entitiesAdded(Set<BookMarkEvent> events) {
-
-        /* Reveal and Select if single Entity added */
-        if (events.size() == 1) {
-          final BookMarkEvent event = events.iterator().next();
-          JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
-            public void run() {
-              expand(event.getEntity().getParent());
-            }
-          });
-        }
+        onMarksAdded(events);
       }
     };
 
-    {
-      /* SearchMark Listener */
-      fSearchMarkListener = new SearchMarkListener() {
+    /* SearchMark Listener */
+    fSearchMarkListener = new SearchMarkListener() {
 
-        /* SearchMarks got Updated */
-        public void entitiesUpdated(final Set<SearchMarkEvent> events) {
-          JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
-            public void run() {
-              Set<ISearchMark> updatedSearchMarks = null;
-              Map<ISearchMark, IFolder> reparentedSearchMarks = null;
+      /* SearchMarks got Updated */
+      public void entitiesUpdated(final Set<SearchMarkEvent> events) {
+        onMarksUpdated(events);
+      }
 
-              /* Retrieve Updated SearchMarks */
-              for (SearchMarkEvent event : events) {
-                if (event.isRoot()) {
+      /* SearchMarks got Deleted */
+      public void entitiesDeleted(final Set<SearchMarkEvent> events) {
+        onMarksRemoved(events);
+      }
 
-                  /* SearchMark got reparented */
-                  if (event.getOldParent() != null) {
-                    if (reparentedSearchMarks == null)
-                      reparentedSearchMarks = new HashMap<ISearchMark, IFolder>();
-                    reparentedSearchMarks.put(event.getEntity(), event.getOldParent());
-                  }
+      /* SearchMarks got Added */
+      public void entitiesAdded(Set<SearchMarkEvent> events) {
+        onMarksAdded(events);
+      }
 
-                  /* Normal Update */
-                  else {
-                    if (updatedSearchMarks == null)
-                      updatedSearchMarks = new HashSet<ISearchMark>();
-                    updatedSearchMarks.add(event.getEntity());
-                  }
-                }
-              }
+      /* SearchMark result changed */
+      public void resultsChanged(final Set<SearchMarkEvent> events) {
+        JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
+          public void run() {
 
-              /* Event not interesting for us or we are disposed */
-              if (updatedSearchMarks == null && reparentedSearchMarks == null)
-                return;
+            /* Ask Filter for a refresh */
+            if (fBookmarkFilter.needsRefresh(ISearchMark.class, events))
+              fViewer.refresh(false);
 
-              /* Ask Filter */
-              if (fBookmarkFilter.needsRefresh(ISearchMark.class, events))
-                fViewer.refresh(false);
-
-              /* Ask Group */
-              else if (fBookmarkGrouping.needsRefresh(ISearchMark.class))
-                fViewer.refresh(false);
-
-              /* Handle reparented SearchMarks */
-              else if (reparentedSearchMarks != null) {
-                Set<Entry<ISearchMark, IFolder>> entries = reparentedSearchMarks.entrySet();
-                Set<IFolder> parentsToUpdate = new HashSet<IFolder>();
-                try {
-                  fViewer.getControl().getParent().setRedraw(false);
-                  for (Entry<ISearchMark, IFolder> entry : entries) {
-                    ISearchMark reparentedSearchMark = entry.getKey();
-                    IFolder oldParent = entry.getValue();
-
-                    /* Reparent while keeping the Selection */
-                    ISelection selection = fViewer.getSelection();
-                    fViewer.remove(oldParent, new Object[] { reparentedSearchMark });
-                    fViewer.refresh(reparentedSearchMark.getParent(), false);
-                    fViewer.setSelection(selection);
-
-                    /* Remember to update parents */
-                    parentsToUpdate.add(oldParent);
-                    parentsToUpdate.add(reparentedSearchMark.getParent());
-                  }
-                } finally {
-                  fViewer.getControl().getParent().setRedraw(true);
-                }
-
-                /* Update old Parents of Reparented Bookmarks */
-                for (IFolder folder : parentsToUpdate)
-                  updateFolderAndParents(folder);
-              }
-
-              /* Handle Updated Searchmarks */
-              if (updatedSearchMarks != null)
-                fViewer.update(updatedSearchMarks.toArray(), null);
+            /* Update SearchMarks */
+            Set<ISearchMark> updatedSearchMarks = new HashSet<ISearchMark>(events.size());
+            for (SearchMarkEvent event : events) {
+              updatedSearchMarks.add(event.getEntity());
             }
-          });
-        }
 
-        /* SearchMarks got Deleted */
-        public void entitiesDeleted(final Set<SearchMarkEvent> events) {
-          JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
-            public void run() {
-              Set<ISearchMark> removedSearchMarks = null;
+            fViewer.update(updatedSearchMarks.toArray(), null);
 
-              /* Retrieve Removed SearchMarks */
-              for (SearchMarkEvent event : events) {
-                if (event.isRoot()) {
-                  if (removedSearchMarks == null)
-                    removedSearchMarks = new HashSet<ISearchMark>();
-                  removedSearchMarks.add(event.getEntity());
-                }
-              }
-
-              /* Event not interesting for us or we are disposed */
-              if (removedSearchMarks == null || removedSearchMarks.size() == 0)
-                return;
-
-              /* Ask Filter */
-              if (fBookmarkFilter.needsRefresh(ISearchMark.class, events))
-                fViewer.refresh(false);
-
-              /* Ask Group */
-              else if (fBookmarkGrouping.needsRefresh(ISearchMark.class))
-                fViewer.refresh(false);
-
-              /* React normally then */
-              else
-                fViewer.remove(removedSearchMarks.toArray());
-            }
-          });
-        }
-
-        /* SearchMarks got Added */
-        public void entitiesAdded(Set<SearchMarkEvent> events) {
-
-          /* Reveal and Select if single Entity added */
-          if (events.size() == 1) {
-            final SearchMarkEvent event = events.iterator().next();
-            JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
-              public void run() {
-                expand(event.getEntity().getParent());
-              }
-            });
+            /* Update Parents */
+            for (ISearchMark searchMark : updatedSearchMarks)
+              updateFolderAndParents(searchMark.getParent());
           }
-        }
+        });
+      }
+    };
 
-        /* SearchMark result changed */
-        public void resultsChanged(final Set<SearchMarkEvent> events) {
-          JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
-            public void run() {
+    /* NewsBin Listener */
+    fNewsBinListener = new NewsBinListener() {
 
-              /* Ask Filter for a refresh */
-              if (fBookmarkFilter.needsRefresh(ISearchMark.class, events))
-                fViewer.refresh(false);
+      /* NewsBins got Updated */
+      public void entitiesUpdated(final Set<NewsBinEvent> events) {
+        onMarksUpdated(events);
+      }
 
-              /* Update SearchMarks */
-              Set<ISearchMark> updatedSearchMarks = new HashSet<ISearchMark>(events.size());
-              for (SearchMarkEvent event : events) {
-                updatedSearchMarks.add(event.getEntity());
-              }
+      /* NewsBins got Deleted */
+      public void entitiesDeleted(final Set<NewsBinEvent> events) {
+        onMarksRemoved(events);
+      }
 
-              fViewer.update(updatedSearchMarks.toArray(), null);
+      /* Newsbins got Added */
+      public void entitiesAdded(Set<NewsBinEvent> events) {
+        onMarksAdded(events);
+      }
+    };
 
-              /* Update Parents */
-              for (ISearchMark searchMark : updatedSearchMarks)
-                updateFolderAndParents(searchMark.getParent());
-            }
-          });
-        }
-      };
+    /* News Listener */
+    fNewsListener = new NewsAdapter() {
 
-      /* News Listener */
-      fNewsListener = new NewsAdapter() {
+      @Override
+      public void entitiesAdded(final Set<NewsEvent> events) {
+        JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
+          public void run() {
 
-        @Override
-        public void entitiesAdded(final Set<NewsEvent> events) {
-          JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
-            public void run() {
+            /* Ask Filter */
+            if (fBookmarkFilter.needsRefresh(INews.class, events))
+              fViewer.refresh(false);
 
-              /* Ask Filter */
-              if (fBookmarkFilter.needsRefresh(INews.class, events))
-                fViewer.refresh(false);
+            /* Ask Group */
+            else if (fBookmarkGrouping.needsRefresh(INews.class))
+              fViewer.refresh(false);
 
-              /* Ask Group */
-              else if (fBookmarkGrouping.needsRefresh(INews.class))
-                fViewer.refresh(false);
+            /* Updated affected Types on read-state if required */
+            if (requiresUpdate(events))
+              updateParents(events);
+          }
+        });
+      }
 
-              /* Updated affected Types on read-state if required */
-              if (requiresUpdate(events))
-                updateParents(events);
-            }
-          });
-        }
+      @Override
+      public void entitiesUpdated(final Set<NewsEvent> events) {
+        JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
+          public void run() {
 
-        @Override
-        public void entitiesUpdated(final Set<NewsEvent> events) {
-          JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
-            public void run() {
+            /* Ask Filter */
+            if (fBookmarkFilter.needsRefresh(INews.class, events))
+              fViewer.refresh(false);
 
-              /* Ask Filter */
-              if (fBookmarkFilter.needsRefresh(INews.class, events))
-                fViewer.refresh(false);
+            /* Ask Group */
+            else if (fBookmarkGrouping.needsRefresh(INews.class))
+              fViewer.refresh(false);
 
-              /* Ask Group */
-              else if (fBookmarkGrouping.needsRefresh(INews.class))
-                fViewer.refresh(false);
-
-              /* Updated affected Types on read-state if required */
-              if (requiresUpdate(events))
-                updateParents(events);
-            }
-          });
-        }
-      };
-    }
+            /* Updated affected Types on read-state if required */
+            if (requiresUpdate(events))
+              updateParents(events);
+          }
+        });
+      }
+    };
 
     /* Register Listeners */
     DynamicDAO.addEntityListener(IFolder.class, fFolderListener);
     DynamicDAO.addEntityListener(IBookMark.class, fBookMarkListener);
+    DynamicDAO.addEntityListener(INewsBin.class, fNewsBinListener);
     DynamicDAO.addEntityListener(ISearchMark.class, fSearchMarkListener);
     DynamicDAO.addEntityListener(INews.class, fNewsListener);
+  }
+
+  private void onMarksAdded(Set<? extends ModelEvent> events) {
+
+    /* Reveal and Select if single Entity added */
+    if (events.size() == 1) {
+      final ModelEvent event = events.iterator().next();
+      JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
+        public void run() {
+          IMark mark = (IMark) event.getEntity();
+          expand(mark.getParent());
+        }
+      });
+    }
+  }
+
+  private void onMarksRemoved(final Set<? extends ModelEvent> events) {
+    if (events.isEmpty())
+      return;
+
+    JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
+      public void run() {
+
+        /* Retrieve Removed Marks */
+        Class<? extends IEntity> clazz = null;
+        Set<IMark> removedMarks = null;
+        for (ModelEvent event : events) {
+          if (event.isRoot()) {
+            if (removedMarks == null)
+              removedMarks = new HashSet<IMark>();
+            removedMarks.add((IMark) event.getEntity());
+          }
+
+          if (clazz == null)
+            clazz = event.getEntity().getClass();
+        }
+
+        /* Event not interesting for us or we are disposed */
+        if (removedMarks == null || removedMarks.size() == 0)
+          return;
+
+        /* Ask Filter */
+        if (fBookmarkFilter.needsRefresh(clazz, events))
+          fViewer.refresh(false);
+
+        /* Ask Group */
+        else if (fBookmarkGrouping.needsRefresh(clazz))
+          fViewer.refresh(false);
+
+        /* React normally then */
+        else
+          fViewer.remove(removedMarks.toArray());
+
+        /* Update Read-State counters on Parents */
+        if (!fBookmarkGrouping.isActive()) {
+          for (ModelEvent event : events) {
+            IMark mark = (IMark) event.getEntity();
+            IFolder eventParent = mark.getParent();
+            if (eventParent != null && eventParent.getParent() != null)
+              updateFolderAndParents(eventParent);
+          }
+        }
+      }
+    });
+  }
+
+  private void onMarksUpdated(final Set<? extends ModelEvent> events) {
+    if (events.isEmpty())
+      return;
+
+    JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
+      public void run() {
+        Class<? extends IEntity> clazz = null;
+        Set<IMark> updatedMarks = null;
+        Map<IMark, IFolder> reparentedMarks = null;
+
+        /* Retrieve Updated Marks */
+        for (ModelEvent event : events) {
+          if (event.isRoot()) {
+            IFolder oldParent = null;
+            if (event instanceof BookMarkEvent)
+              oldParent = ((BookMarkEvent) event).getOldParent();
+            else if (event instanceof SearchMarkEvent)
+              oldParent = ((SearchMarkEvent) event).getOldParent();
+            else if (event instanceof NewsBinEvent)
+              oldParent = ((NewsBinEvent) event).getOldParent();
+
+            /* Mark got reparented */
+            if (oldParent != null) {
+              if (reparentedMarks == null)
+                reparentedMarks = new HashMap<IMark, IFolder>();
+              reparentedMarks.put((IMark) event.getEntity(), oldParent);
+            }
+
+            /* Normal Update */
+            else {
+              if (updatedMarks == null)
+                updatedMarks = new HashSet<IMark>();
+              updatedMarks.add((IMark) event.getEntity());
+            }
+          }
+
+          if (clazz == null)
+            clazz = event.getEntity().getClass();
+        }
+
+        /* Event not interesting for us or we are disposed */
+        if (updatedMarks == null && reparentedMarks == null)
+          return;
+
+        /* Ask Filter */
+        if (fBookmarkFilter.needsRefresh(clazz, events))
+          fViewer.refresh(false);
+
+        /* Ask Group */
+        else if (fBookmarkGrouping.needsRefresh(clazz))
+          fViewer.refresh(false);
+
+        /* Handle reparented Marks */
+        else if (reparentedMarks != null) {
+          Set<Entry<IMark, IFolder>> entries = reparentedMarks.entrySet();
+          Set<IFolder> parentsToUpdate = new HashSet<IFolder>();
+          try {
+            fViewer.getControl().getParent().setRedraw(false);
+            for (Entry<IMark, IFolder> entry : entries) {
+              IMark reparentedMark = entry.getKey();
+              IFolder oldParent = entry.getValue();
+
+              /* Reparent while keeping the Selection */
+              ISelection selection = fViewer.getSelection();
+              fViewer.remove(oldParent, new Object[] { reparentedMark });
+              fViewer.refresh(reparentedMark.getParent(), false);
+              fViewer.setSelection(selection);
+
+              /* Remember to update parents */
+              parentsToUpdate.add(oldParent);
+              parentsToUpdate.add(reparentedMark.getParent());
+            }
+          } finally {
+            fViewer.getControl().getParent().setRedraw(true);
+          }
+
+          /* Update old Parents of Reparented Marks */
+          for (IFolder folder : parentsToUpdate)
+            updateFolderAndParents(folder);
+        }
+
+        /* Handle Updated Marks */
+        if (updatedMarks != null)
+          fViewer.update(updatedMarks.toArray(), null);
+      }
+    });
   }
 
   private void unregisterListeners() {
     DynamicDAO.removeEntityListener(IFolder.class, fFolderListener);
     DynamicDAO.removeEntityListener(IBookMark.class, fBookMarkListener);
+    DynamicDAO.removeEntityListener(INewsBin.class, fNewsBinListener);
     DynamicDAO.removeEntityListener(ISearchMark.class, fSearchMarkListener);
     DynamicDAO.removeEntityListener(INews.class, fNewsListener);
   }
