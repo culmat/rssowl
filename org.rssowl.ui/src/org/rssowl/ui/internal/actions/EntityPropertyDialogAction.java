@@ -36,6 +36,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyDialog;
@@ -149,12 +150,15 @@ public class EntityPropertyDialogAction extends Action implements IObjectActionD
       int folderCount = 0;
       int bookMarkCount = 0;
       int searchMarkCount = 0;
+      int newsBinCount = 0;
 
       for (IEntity entity : entities) {
         if (entity instanceof IFolder)
           folderCount++;
         else if (entity instanceof IBookMark)
           bookMarkCount++;
+        else if (entity instanceof INewsBin)
+          newsBinCount++;
         else if (entity instanceof ISearchMark)
           searchMarkCount++;
       }
@@ -169,6 +173,9 @@ public class EntityPropertyDialogAction extends Action implements IObjectActionD
 
       if (searchMarkCount > 0)
         buf.append(searchMarkCount).append(searchMarkCount == 1 ? " Saved Search, " : " Saved Searches, ");
+
+      if (newsBinCount > 0)
+        buf.append(newsBinCount).append(newsBinCount == 1 ? " News Bin, " : " News Bins, ");
 
       buf.delete(buf.length() - 2, buf.length());
 

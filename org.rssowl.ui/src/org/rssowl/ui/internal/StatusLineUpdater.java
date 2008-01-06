@@ -32,12 +32,13 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 
 /**
  * Add the <code>StatusLineUpdater</code> to your ViewPart to have the
  * statusbar describing the selected elements.
- * 
+ *
  * @author bpasero
  */
 public class StatusLineUpdater implements ISelectionChangedListener {
@@ -90,6 +91,7 @@ public class StatusLineUpdater implements ISelectionChangedListener {
     int newsCount = 0;
     int folderCount = 0;
     int bookMarkCount = 0;
+    int newsBinCount = 0;
     int searchMarkCount = 0;
     int viewerGroupCount = 0;
 
@@ -98,6 +100,8 @@ public class StatusLineUpdater implements ISelectionChangedListener {
         folderCount++;
       else if (element instanceof IBookMark)
         bookMarkCount++;
+      else if (element instanceof INewsBin)
+        newsBinCount++;
       else if (element instanceof ISearchMark)
         searchMarkCount++;
       else if (element instanceof EntityGroup)
@@ -116,8 +120,11 @@ public class StatusLineUpdater implements ISelectionChangedListener {
     if (bookMarkCount > 0)
       buf.append(bookMarkCount).append(bookMarkCount == 1 ? " Bookmark, " : " Bookmarks, ");
 
+    if (newsBinCount > 0)
+      buf.append(newsBinCount).append(newsBinCount == 1 ? " News Bin, " : " News Bins, ");
+
     if (searchMarkCount > 0)
-      buf.append(searchMarkCount).append(searchMarkCount == 1 ? " Searchmark, " : " Searchmarks, ");
+      buf.append(searchMarkCount).append(searchMarkCount == 1 ? " Saved Search, " : " Saved Searches, ");
 
     if (viewerGroupCount > 0)
       buf.append(viewerGroupCount).append(viewerGroupCount == 1 ? " Group, " : " Groups, ");

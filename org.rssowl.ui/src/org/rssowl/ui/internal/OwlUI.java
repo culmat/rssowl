@@ -63,9 +63,11 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FolderReference;
+import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
@@ -299,6 +301,9 @@ public class OwlUI {
 
     if (obj instanceof IBookMark || obj instanceof BookMarkReference)
       return BOOKMARK;
+
+    if (obj instanceof INewsBin || obj instanceof NewsBinReference)
+      return NEWSBIN;
 
     if (obj instanceof ISearchMark || obj instanceof SearchMarkReference)
       return SEARCHMARK;

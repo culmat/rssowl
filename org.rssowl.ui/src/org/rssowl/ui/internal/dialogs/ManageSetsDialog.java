@@ -62,6 +62,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.FolderAdapter;
@@ -513,7 +514,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
       fStatusLabel.setText("");
     else {
       IFolder bookmarkSet = (IFolder) selection.getFirstElement();
-      int counter[] = new int[3];
+      int counter[] = new int[4];
 
       count(bookmarkSet, counter);
 
@@ -523,10 +524,12 @@ public class ManageSetsDialog extends TitleAreaDialog {
       if (counter[1] > 0)
         str.append(counter[1] == 1 ? "1 bookmark, " : (counter[1] + " bookmarks, "));
       if (counter[2] > 0)
-        str.append(counter[2] == 1 ? "1 saved searches, " : (counter[2] + " saved searches, "));
+        str.append(counter[2] == 1 ? "1 saved search, " : (counter[2] + " saved searches, "));
+      if (counter[3] > 0)
+        str.append(counter[3] == 1 ? "1 news bin, " : (counter[3] + " news bins, "));
 
       /* Set is Empty */
-      if (counter[0] == 0 && counter[1] == 0 && counter[2] == 0)
+      if (counter[0] == 0 && counter[1] == 0 && counter[2] == 0 && counter[3] == 0)
         str = new StringBuilder("Set is empty.");
       else
         str.delete(str.length() - 2, str.length()).append(".");
@@ -544,6 +547,8 @@ public class ManageSetsDialog extends TitleAreaDialog {
         counter[1]++;
       else if (mark instanceof ISearchMark)
         counter[2]++;
+      else if (mark instanceof INewsBin)
+        counter[3]++;
     }
 
     /* Count in Sub-Folders */

@@ -46,7 +46,6 @@ import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
-import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
@@ -153,23 +152,17 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     List<?> selectedObjects = selection.toList();
     for (Object selectedObject : selectedObjects) {
 
-      /* IFolder */
-      if (selectedObject instanceof IFolder) {
-        IFolder folder = (IFolder) selectedObject;
-        str.append(folder.getName()).append("\n");
-      }
-
       /* IBookMark */
-      else if (selectedObject instanceof IBookMark) {
+      if (selectedObject instanceof IBookMark) {
         IBookMark bookmark = (IBookMark) selectedObject;
         str.append(bookmark.getFeedLinkReference().getLink()).append("\n");
         str.append(bookmark.getName()).append("\n\n");
       }
 
-      /* ISearchMark */
-      else if (selectedObject instanceof ISearchMark) {
-        ISearchMark searchmark = (ISearchMark) selectedObject;
-        str.append(searchmark.getName()).append("\n");
+      /* Any other Folder Child */
+      else if (selectedObject instanceof IFolderChild) {
+        IFolderChild folderchild = (IFolderChild) selectedObject;
+        str.append(folderchild.getName()).append("\n");
       }
 
       /* Entity Group */
