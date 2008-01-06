@@ -151,7 +151,7 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
    * @see java.lang.Object#equals(java.lang.Object)
    */
   @Override
-  public synchronized boolean equals(Object obj) {
+  public boolean equals(Object obj) {
     if (this == obj)
       return true;
 
@@ -169,7 +169,7 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
    * @see java.lang.Object#hashCode()
    */
   @Override
-  public synchronized int hashCode() {
+  public int hashCode() {
     if (fId == null)
       return super.hashCode();
 
