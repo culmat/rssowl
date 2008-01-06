@@ -881,7 +881,6 @@ public class NewsTableControl implements IFeedViewPart {
   }
 
   private void setNewsState(INews news, INews.State state) {
-    boolean affectEquivalentNews = !news.isCopy();
-    fNewsDao.setState(Collections.singleton(news), state, affectEquivalentNews, false);
+    fNewsDao.setState(Collections.singleton(news), state, true, false);
   }
 }
