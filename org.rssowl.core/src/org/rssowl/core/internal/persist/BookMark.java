@@ -199,4 +199,9 @@ public class BookMark extends Mark implements IBookMark {
   public boolean isGetNewsRefsEfficient() {
     return false;
   }
+
+  /* getFeedLinkReference is synchronized, so no need to synchronize this */
+  public boolean containsNews(INews news) {
+    return !news.isCopy() && news.getFeedReference().equals(getFeedLinkReference());
+  }
 }
