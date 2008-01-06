@@ -49,7 +49,6 @@ import org.rssowl.ui.internal.NewsService;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.ModelUtils;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -130,7 +129,7 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     Map<IBookMark, Collection<INews>> retentionHelperMap = new HashMap<IBookMark, Collection<INews>>();
 
     /* Retrieve affected News */
-    List<INews> news = new ArrayList<INews>();
+    Set<INews> news = new HashSet<INews>();
     for (IEntity element : entities) {
       if (element instanceof IFolder)
         fillNews((IFolder) element, news, retentionHelperMap);
@@ -182,7 +181,7 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     return folders != null && folders.equals(rootFolders);
   }
 
-  private void fillNews(IFolder folder, List<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap) {
+  private void fillNews(IFolder folder, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap) {
     List<IFolderChild> children = folder.getChildren();
     for (IFolderChild child : children) {
       if (child instanceof IBookMark && containsUnread(((IBookMark) child)))
@@ -198,7 +197,7 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     return fNewsService.getUnreadCount(mark.getFeedLinkReference()) != 0;
   }
 
-  private void fillNews(IBookMark bookmark, List<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap) {
+  private void fillNews(IBookMark bookmark, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap) {
     IPreferenceScope bookMarkPrefs = Owl.getPreferenceService().getEntityScope(bookmark);
     boolean requiresRetention = bookMarkPrefs.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE);
 
@@ -220,7 +219,7 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     }
   }
 
-  private void fillNews(INewsMark newsmark, List<INews> news) {
+  private void fillNews(INewsMark newsmark, Collection<INews> news) {
     news.addAll(newsmark.getNews(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
   }
 
