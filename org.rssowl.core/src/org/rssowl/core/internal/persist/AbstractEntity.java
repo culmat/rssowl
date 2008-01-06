@@ -36,7 +36,7 @@ import java.util.Map;
  * @author bpasero
  */
 public abstract class AbstractEntity extends Persistable implements IEntity {
-  private Long fId;
+  private volatile Long fId;
   private HashMap<String, Serializable> fProperties;
 
   /**
@@ -67,7 +67,7 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
   /*
    * @see org.rssowl.core.model.types.IEntity#getId()
    */
-  public synchronized Long getId() {
+  public final Long getId() {
     return fId;
   }
 
