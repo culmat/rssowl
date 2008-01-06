@@ -276,7 +276,7 @@ public class EventManager {
     ISearchMark mark = Owl.getPersistenceService().getDAOService().getSearchMarkDAO().load(searchCondition);
 
     if (mark == null)
-      throw new IllegalStateException("searchCondition has less than or more than 1 parent ISearchMark");
+      throw new IllegalStateException("searchCondition has no parent ISearchMark");
 
     return mark;
   }
