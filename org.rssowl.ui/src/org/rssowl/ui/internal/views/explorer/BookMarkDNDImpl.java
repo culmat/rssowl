@@ -38,11 +38,14 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.TransferData;
+import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
@@ -51,11 +54,14 @@ import org.rssowl.core.util.RegExUtils;
 import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.actions.NewBookMarkAction;
+import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The <code>BookMarkDropImpl</code> is handling all drop-operations resulting
@@ -200,15 +206,21 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     }
 
     /* Un-Set some feedback if grouping */
-    if (fExplorer.isGroupingEnabled()) {
+    if (fExplorer.isGroupingEnabled() && !(getCurrentTarget() instanceof INewsBin)) {
       event.feedback &= ~DND.FEEDBACK_INSERT_AFTER;
       event.feedback &= ~DND.FEEDBACK_INSERT_BEFORE;
       event.feedback &= ~DND.FEEDBACK_SELECT;
     }
 
-    /* Never give Select as Feedback from a Mark */
-    if (getCurrentTarget() instanceof IMark)
+    /* Never give Select as Feedback from a Mark except INewsBin */
+    if (getCurrentTarget() instanceof IMark && !(getCurrentTarget() instanceof INewsBin))
       event.feedback &= ~DND.FEEDBACK_SELECT;
+
+    /* Don't show this feedback for News Bins */
+    if (getCurrentTarget() instanceof INewsBin) {
+      event.feedback &= ~DND.FEEDBACK_INSERT_AFTER;
+      event.feedback &= ~DND.FEEDBACK_INSERT_BEFORE;
+    }
 
     /* Unset some feedback when Text-Transfer is used */
     if (TextTransfer.getInstance().isSupportedType(event.currentDataType)) {
@@ -223,10 +235,6 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
    */
   @Override
   public boolean validateDrop(final Object target, int operation, TransferData transferType) {
-
-    /* Grouping does not allow Drag and Drop */
-    if (fExplorer.isGroupingEnabled())
-      return false;
 
     /* Require Entity as Target */
     if (!(target instanceof IEntity))
@@ -261,6 +269,10 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     /* Check validity for each dragged Object */
     for (Object draggedObject : draggedObjects) {
 
+      /* Shared rule: Do not allow drop when grouping is enabled */
+      if (draggedObject instanceof IFolderChild && fExplorer.isGroupingEnabled())
+        return false;
+
       /* Shared rule: Do not allow to drop on same Entity */
       if (draggedObject.equals(dropTarget))
         return false;
@@ -278,9 +290,44 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
         if (!isValidDrop(draggedMark, dropTarget))
           return false;
       }
+
+      /* Dragged News */
+      else if (draggedObject instanceof INews) {
+        INews draggedNews = (INews) draggedObject;
+        return isValidDrop(draggedNews, dropTarget);
+      }
+
+      /* Dragged Entity Group of News */
+      else if (draggedObject instanceof EntityGroup) {
+        EntityGroup group = (EntityGroup) draggedObject;
+        return isValidDrop(group, dropTarget);
+      }
     }
 
     return true;
+  }
+
+  private boolean isValidDrop(@SuppressWarnings("unused")
+  INews dragSource, IEntity dropTarget) {
+    int loc = getCurrentLocation();
+
+    /* Require to drop on actual Entity */
+    if (loc == LOCATION_BEFORE || loc == LOCATION_AFTER)
+      return false;
+
+    /* Require News Bin as target */
+    return dropTarget instanceof INewsBin;
+  }
+
+  private boolean isValidDrop(EntityGroup group, IEntity dropTarget) {
+    int loc = getCurrentLocation();
+
+    /* Require to drop on actual Entity */
+    if (loc == LOCATION_BEFORE || loc == LOCATION_AFTER)
+      return false;
+
+    /* Require News Bin as target */
+    return dropTarget instanceof INewsBin && NewsGrouping.GROUP_CATEGORY_ID.equals(group.getCategory());
   }
 
   private boolean isValidDrop(IFolder dragSource, IEntity dropTarget) {
@@ -351,7 +398,11 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
         public void run() throws Exception {
           IStructuredSelection selection = (IStructuredSelection) data;
           List<?> draggedObjects = selection.toList();
-          perfromDrop(draggedObjects);
+
+          if (getCurrentTarget() instanceof INewsBin)
+            perfromNewsDrop(draggedObjects);
+          else
+            perfromFolderChildDrop(draggedObjects);
         }
       });
 
@@ -394,7 +445,44 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     return false;
   }
 
-  private void perfromDrop(List<?> draggedObjects) {
+  private void perfromNewsDrop(List<?> draggedObjects) {
+    INewsBin dropTarget = (INewsBin) getCurrentTarget();
+    boolean requiresSave = false;
+
+    /* Normalize */
+    Set<INews> normalizedDraggedObjects = new HashSet<INews>(draggedObjects.size());
+    for (Object object : draggedObjects) {
+
+      /* News */
+      if (object instanceof INews) {
+        normalizedDraggedObjects.add((INews) object);
+      }
+
+      /* Group */
+      else if (object instanceof EntityGroup) {
+        EntityGroup group = (EntityGroup) object;
+        List<IEntity> entities = group.getEntities();
+        for (IEntity entity : entities) {
+          normalizedDraggedObjects.add((INews) entity);
+        }
+      }
+    }
+
+    /* For each dragged Object */
+    for (INews news : normalizedDraggedObjects) {
+      INews newsCopy = Owl.getModelFactory().createNews(news);
+      DynamicDAO.save(newsCopy);
+      dropTarget.addNews(newsCopy);
+
+      requiresSave = true;
+    }
+
+    /* Save */
+    if (requiresSave)
+      DynamicDAO.save(dropTarget);
+  }
+
+  private void perfromFolderChildDrop(List<?> draggedObjects) {
     Object dropTarget = getCurrentTarget();
     int location = getCurrentLocation();
 
@@ -476,7 +564,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
 
     /* Perform Re-Ordering on Children */
     if (childReordering != null) {
-      parentFolder.reorderChildren(childReordering, (IFolderChild)dropTarget, after);
+      parentFolder.reorderChildren(childReordering, (IFolderChild) dropTarget, after);
       requireSave = true;
     }
 

@@ -72,6 +72,20 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate {
       }
     });
 
+    MenuItem newNewsBin = new MenuItem(menu, SWT.PUSH);
+    newNewsBin.setText("News Bin");
+    newNewsBin.setImage(OwlUI.getImage(fResources, OwlUI.NEWSBIN));
+    newNewsBin.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        try {
+          addNewsBin();
+        } catch (Exception e1) {
+          Activator.getDefault().logError(e1.getMessage(), e1);
+        }
+      }
+    });
+
     MenuItem newSearchMark = new MenuItem(menu, SWT.PUSH);
     newSearchMark.setText("Saved Search");
     newSearchMark.setImage(OwlUI.getImage(fResources, OwlUI.SEARCHMARK));
@@ -157,6 +171,10 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate {
 
   private void addBookmark() {
     new NewBookMarkAction(fShell, fParent, fPosition).run(null);
+  }
+
+  private void addNewsBin() {
+    new NewNewsBinAction(fShell, fParent, fPosition).run(null);
   }
 
   private void addFolder() {

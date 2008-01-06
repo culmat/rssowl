@@ -111,6 +111,9 @@ public class OwlUI {
   /** BookMark (Error) */
   public static final ImageDescriptor BOOKMARK_ERROR = Activator.getImageDescriptor("icons/obj16/bkmrk_error.gif"); //$NON-NLS-1$
 
+  /** NewsBin */
+  public static final ImageDescriptor NEWSBIN = Activator.getImageDescriptor("icons/obj16/newsbin.gif"); //$NON-NLS-1$
+
   /** SearchMark */
   public static final ImageDescriptor SEARCHMARK = Activator.getImageDescriptor("icons/obj16/searchmark.gif"); //$NON-NLS-1$
 

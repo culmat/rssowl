@@ -99,6 +99,13 @@ public class EntityGroup implements IActionFilter {
   }
 
   /**
+   * @return Returns the ID of the Category of this group.
+   */
+  public String getCategory() {
+    return fCategoryId;
+  }
+
+  /**
    * @return Returns the List of <code>EntityGroupItem</code>s contained in
    * this Group.
    */

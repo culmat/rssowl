@@ -70,8 +70,8 @@ public class NewsGrouping {
   private static final int CATEGORY_ID_BEGIN = 3000;
   private static final int AUTHOR_ID_BEGIN = 4000;
 
-  /* ID of Group Category */
-  private static final String GROUP_CATEGORY_ID = "org.rssowl.ui.internal.editors.feed.NewsGrouping";
+  /** ID of News Group Category */
+  public static final String GROUP_CATEGORY_ID = "org.rssowl.ui.internal.editors.feed.NewsGrouping";
 
   /** Supported Grouping Types */
   public enum Type {
