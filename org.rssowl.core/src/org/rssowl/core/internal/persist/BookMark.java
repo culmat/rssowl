@@ -159,18 +159,20 @@ public class BookMark extends Mark implements IBookMark {
     return new BookMarkReference(getIdAsPrimitive());
   }
 
+  /* getFeedLinkReference is synchronized, so no need to synchronize this */
   public synchronized List<INews> getNews() {
-    return fFeedLinkReference.resolve().getNews();
+    return getFeedLinkReference().resolve().getNews();
   }
 
-  public synchronized List<INews> getNews(Set<State> states) {
-    return fFeedLinkReference.resolve().getNewsByStates(states);
+  /* getFeedLinkReference is synchronized, so no need to synchronize this */
+  public List<INews> getNews(Set<State> states) {
+    return getFeedLinkReference().resolve().getNewsByStates(states);
   }
 
   public synchronized int getNewsCount(Set<State> states) {
     if (fNewsCounter != null) {
       if (states.equals(EnumSet.of(INews.State.NEW)))
-        return fNewsCounter.getNewCount(fFeedLinkReference.getLink());
+        return fNewsCounter.getNewCount(getFeedLinkReference().getLink());
 
       if (states.equals(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)))
         return fNewsCounter.getUnreadCount(getFeedLinkReference().getLink());
