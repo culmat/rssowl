@@ -40,10 +40,7 @@ import org.rssowl.core.persist.event.runnable.SearchMarkEventRunnable;
  *
  * @author bpasero
  */
-public final class SearchMarkEvent extends ModelEvent {
-
-  /* In case of Reparenting, remember the old parent */
-  private final IFolder fOldParent;
+public final class SearchMarkEvent extends MarkEvent {
 
   /* Only for resultsChanged(): TRUE if *new* news where added */
   private final boolean fAddedNewNews;
@@ -76,8 +73,7 @@ public final class SearchMarkEvent extends ModelEvent {
    * @param addedNewNews TRUE if *new* news where added.
    */
   public SearchMarkEvent(ISearchMark mark, IFolder oldParent, boolean isRoot, boolean addedNewNews) {
-    super(mark, isRoot);
-    fOldParent = oldParent;
+    super(mark, oldParent, isRoot);
     fAddedNewNews = addedNewNews;
   }
 
@@ -94,21 +90,6 @@ public final class SearchMarkEvent extends ModelEvent {
    */
   public boolean isAddedNewNews() {
     return fAddedNewNews;
-  }
-
-  /**
-   * Get the previous Parent of this Type in case this Event informs about a
-   * Reparenting.
-   * <p>
-   * Note that this Method <em>will</em> return <code>NULL</code> in any
-   * case where the Event is not informing about reparenting!
-   * </p>
-   *
-   * @return Returns the previous Parent of this Type in case this Event informs
-   * about Reparenting. Otherwise this Method will return <code>NULL</code>.
-   */
-  public IFolder getOldParent() {
-    return fOldParent;
   }
 
   @Override
