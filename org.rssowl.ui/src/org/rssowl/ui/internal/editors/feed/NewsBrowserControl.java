@@ -44,13 +44,10 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
-import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.NewsReference;
-import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.ILinkHandler;
@@ -135,13 +132,9 @@ public class NewsBrowserControl implements IFeedViewPart {
 
   private Object getInput(Object obj) {
 
-    /* Bookmark: Return BookMarkReference */
-    if (obj instanceof IBookMark)
-      return new BookMarkReference(((IBookMark) obj).getId());
-
-    /* Searchmark: Return SearchMarkReference */
-    else if (obj instanceof ISearchMark)
-      return new SearchMarkReference(((ISearchMark) obj).getId());
+    /* Return Reference */
+    if (obj instanceof INewsMark)
+      return ((INewsMark) obj).toReference();
 
     /* News: Handle special dependant on settings */
     else if (obj instanceof INews)

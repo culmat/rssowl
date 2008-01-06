@@ -36,9 +36,11 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.ModelReference;
+import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.LoggingSafeRunnable;
@@ -107,6 +109,7 @@ public class ApplicationServer {
 
   /* Supported Operations */
   private static final String OP_DISPLAY_BOOKMARK = "displayBookMark="; //$NON-NLS-1$
+  private static final String OP_DISPLAY_NEWSBIN = "displayNewsBin="; //$NON-NLS-1$
   private static final String OP_DISPLAY_SEARCHMARK = "displaySearchMark="; //$NON-NLS-1$
   private static final String OP_DISPLAY_NEWS = "displayNews="; //$NON-NLS-1$
 
@@ -263,7 +266,7 @@ public class ApplicationServer {
     if (!StringUtils.isSet(url))
       return false;
 
-    return url.indexOf(OP_DISPLAY_BOOKMARK) > 0 || url.indexOf(OP_DISPLAY_NEWS) > 0 || url.indexOf(OP_DISPLAY_SEARCHMARK) > 0 || URIUtils.ABOUT_BLANK.equals(url);
+    return url.contains(OP_DISPLAY_BOOKMARK) || url.contains(OP_DISPLAY_NEWSBIN) || url.contains(OP_DISPLAY_NEWS) || url.contains(OP_DISPLAY_SEARCHMARK) || URIUtils.ABOUT_BLANK.equals(url);
   }
 
   /**
@@ -292,12 +295,15 @@ public class ApplicationServer {
     /* Input is an Array of Objects */
     List<Long> news = new ArrayList<Long>();
     List<Long> bookmarks = new ArrayList<Long>();
+    List<Long> newsbins = new ArrayList<Long>();
     List<Long> searchmarks = new ArrayList<Long>();
 
-    /* Split into BookMarks, SearchMarks and News */
+    /* Split into BookMarks, NewsBins, SearchMarks and News */
     for (Object obj : (Object[]) input) {
       if (obj instanceof IBookMark || obj instanceof BookMarkReference)
         bookmarks.add(getId(obj));
+      else if (obj instanceof INewsBin || obj instanceof NewsBinReference)
+        newsbins.add(getId(obj));
       else if (obj instanceof ISearchMark || obj instanceof SearchMarkReference)
         searchmarks.add(getId(obj));
       else if (obj instanceof INews || obj instanceof NewsReference)
@@ -317,6 +323,16 @@ public class ApplicationServer {
       url.append("&").append(OP_DISPLAY_BOOKMARK); //$NON-NLS-1$
       for (Long bookmarkIds : bookmarks)
         url.append(bookmarkIds).append(',');
+
+      /* Remove the last added ',' */
+      url.deleteCharAt(url.length() - 1);
+    }
+
+    /* Append Parameter for Newsbins */
+    if (newsbins.size() > 0) {
+      url.append("&").append(OP_DISPLAY_NEWSBIN); //$NON-NLS-1$
+      for (Long newsbinIds : newsbins)
+        url.append(newsbinIds).append(',');
 
       /* Remove the last added ',' */
       url.deleteCharAt(url.length() - 1);
@@ -472,6 +488,21 @@ public class ApplicationServer {
         StringTokenizer tokenizer = new StringTokenizer(parameters.substring(start, end), ",");//$NON-NLS-1$
         while (tokenizer.hasMoreElements()) {
           BookMarkReference ref = new BookMarkReference(Long.valueOf((String) tokenizer.nextElement()));
+          elements.addAll(Arrays.asList(newsContentProvider.getElements(ref)));
+        }
+      }
+
+      /* Look for NewsBins that are to displayed */
+      int displayNewsBinsIndex = parameters.indexOf(OP_DISPLAY_NEWSBIN);
+      if (displayNewsBinsIndex >= 0) {
+        start = displayNewsBinsIndex + OP_DISPLAY_NEWSBIN.length();
+        end = parameters.indexOf('&', start);
+        if (end < 0)
+          end = parameters.length();
+
+        StringTokenizer tokenizer = new StringTokenizer(parameters.substring(start, end), ",");//$NON-NLS-1$
+        while (tokenizer.hasMoreElements()) {
+          NewsBinReference ref = new NewsBinReference(Long.valueOf((String) tokenizer.nextElement()));
           elements.addAll(Arrays.asList(newsContentProvider.getElements(ref)));
         }
       }
