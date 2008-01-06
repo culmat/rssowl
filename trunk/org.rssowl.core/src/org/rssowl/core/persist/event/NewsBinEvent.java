@@ -44,4 +44,12 @@ public final class NewsBinEvent extends ModelEvent    {
   public IFolder getOldParent() {
     return fOldParent;
   }
+
+  /*
+   * @see org.rssowl.core.model.events.ModelEvent#getReference()
+   */
+  @Override
+  public INewsBin getEntity() {
+    return (INewsBin) super.getEntity();
+  }
 }
