@@ -34,6 +34,7 @@ import org.rssowl.core.persist.event.runnable.EventType;
 import org.rssowl.core.persist.service.PersistenceException;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -90,7 +91,7 @@ public abstract class CachingDAO<D extends AbstractEntityDAO<T, L, E>, T extends
   }
 
   public final Collection<T> loadAll() throws PersistenceException {
-    return fCache.values();
+    return Collections.unmodifiableCollection(fCache.values());
   }
 
   public final void fireEvents(Set<E> events, EventType eventType) {
