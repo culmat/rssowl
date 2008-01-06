@@ -49,9 +49,11 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.RegExUtils;
 import org.rssowl.core.util.ReparentInfo;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.actions.NewBookMarkAction;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
@@ -446,16 +448,18 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
   }
 
   private void perfromNewsDrop(List<?> draggedObjects) {
+    int operation = getCurrentOperation();
+
     INewsBin dropTarget = (INewsBin) getCurrentTarget();
     boolean requiresSave = false;
 
     /* Normalize */
-    Set<INews> normalizedDraggedObjects = new HashSet<INews>(draggedObjects.size());
+    Set<INews> normalizedDraggedNews = new HashSet<INews>(draggedObjects.size());
     for (Object object : draggedObjects) {
 
       /* News */
       if (object instanceof INews) {
-        normalizedDraggedObjects.add((INews) object);
+        normalizedDraggedNews.add((INews) object);
       }
 
       /* Group */
@@ -463,13 +467,13 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
         EntityGroup group = (EntityGroup) object;
         List<IEntity> entities = group.getEntities();
         for (IEntity entity : entities) {
-          normalizedDraggedObjects.add((INews) entity);
+          normalizedDraggedNews.add((INews) entity);
         }
       }
     }
 
     /* For each dragged Object */
-    for (INews news : normalizedDraggedObjects) {
+    for (INews news : normalizedDraggedNews) {
       INews newsCopy = Owl.getModelFactory().createNews(news);
       DynamicDAO.save(newsCopy);
       dropTarget.addNews(newsCopy);
@@ -480,6 +484,16 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     /* Save */
     if (requiresSave)
       DynamicDAO.save(dropTarget);
+
+    /* Delete dragged News if required */
+    if (operation == DND.DROP_MOVE) {
+
+      /* Mark Saved Search Service as in need for a quick Update */
+      Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+
+      /* Delete News in single Transaction */
+      DynamicDAO.getDAO(INewsDAO.class).setState(normalizedDraggedNews, INews.State.DELETED, false, false);
+    }
   }
 
   private void perfromFolderChildDrop(List<?> draggedObjects) {
