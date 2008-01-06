@@ -102,6 +102,7 @@ import org.rssowl.core.tests.TestUtils;
 import org.rssowl.ui.internal.Controller;
 
 import com.db4o.ObjectContainer;
+import com.db4o.query.Query;
 
 import java.lang.reflect.Field;
 import java.net.URI;
@@ -133,6 +134,49 @@ public class DBManagerTest {
     Controller.getDefault().getNewsService().testDirtyShutdown();
     fTypesFactory = Owl.getModelFactory();
     fDb = DBManager.getDefault().getObjectContainer();
+  }
+
+  /**
+   * Tests that querying on News#fCopy works.
+   */
+  @Test
+  public void testQueryNewsOnIsCopy() {
+    IFeed feed = createFeed();
+    INews news = fTypesFactory.createNews(null, feed, new Date());
+    fTypesFactory.createGuid(news, "http://www.link.com", true);
+    DynamicDAO.save(feed);
+    INews newsCopy = fTypesFactory.createNews(news);
+    DynamicDAO.save(newsCopy);
+
+    Query query = fDb.query();
+    query.constrain(News.class);
+    query.descend("fCopy").constrain(true);
+    List<?> newsCopies = query.execute();
+    assertEquals(1, newsCopies.size());
+    assertEquals(newsCopy, newsCopies.get(0));
+
+    query = fDb.query();
+    query.constrain(News.class);
+    query.descend("fCopy").constrain(false);
+    List<?> newsList = query.execute();
+    assertEquals(1, newsList.size());
+    assertEquals(news, newsList.get(0));
+
+    query = fDb.query();
+    query.constrain(News.class);
+    query.descend("fGuidValue").constrain(news.getGuid().getValue());
+    query.descend("fCopy").constrain(true);
+    newsCopies = query.execute();
+    assertEquals(1, newsCopies.size());
+    assertEquals(newsCopy, newsCopies.get(0));
+
+    query = fDb.query();
+    query.constrain(News.class);
+    query.descend("fGuidValue").constrain(news.getGuid().getValue());
+    query.descend("fCopy").constrain(false);
+    newsList = query.execute();
+    assertEquals(1, newsList.size());
+    assertEquals(news, newsList.get(0));
   }
 
   /**
