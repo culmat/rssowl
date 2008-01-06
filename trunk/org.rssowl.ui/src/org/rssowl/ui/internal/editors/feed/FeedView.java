@@ -84,7 +84,6 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.NewsService;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
@@ -204,7 +203,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private boolean fCreated;
   private Object fCacheJobIdentifier = new Object();
   private ImageDescriptor fTitleImageDescriptor;
-  private NewsService fNewsService;
   private Label fBrowserSep;
 
   /*
@@ -234,7 +232,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
     fEditorSite = site;
     setSite(site);
     fResourceManager = new LocalResourceManager(JFaceResources.getResources());
-    fNewsService = Controller.getDefault().getNewsService();
 
     /* Load Settings */
     fPreferences = Owl.getPreferenceService().getGlobalScope();
@@ -1334,14 +1331,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
   public boolean navigate(boolean respectSelection, boolean newsScoped, boolean next, boolean unread) {
 
     /* Check for unread counter */
-    if (unread && fInput.getMark() instanceof ISearchMark) {
-      ISearchMark searchmark = (ISearchMark) fInput.getMark();
-      if (searchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) == 0)
-        return false;
-    } else if (unread && fInput.getMark() instanceof IBookMark) {
-      IBookMark bookmark = (IBookMark) fInput.getMark();
-      if (fNewsService.getUnreadCount(bookmark.getFeedLinkReference()) == 0)
-        return false;
+    if (unread && fInput.getMark().getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) == 0) {
+      return false;
     }
 
     /* Don't update Selection in Tree, since this is not News-Scoped */
