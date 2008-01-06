@@ -24,6 +24,7 @@
 package org.rssowl.core.internal.persist.service;
 
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.BookMark;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.News;
@@ -79,7 +80,7 @@ import java.util.Set;
 /**
  *
  */
-public class EventManager {
+public class EventManager implements DatabaseListener   {
 
   /**
    * Iterator implementation that iterates from the end of the list. Useful
@@ -145,7 +146,7 @@ public class EventManager {
 
   private INewsCounterDAO getNewsCounterDAO() {
     if (fNewsCounterDAO == null)
-      fNewsCounterDAO = Owl.getPersistenceService().getDAOService().getNewsCounterDAO();
+      fNewsCounterDAO = InternalOwl.getDefault().getPersistenceService().getDAOService().getNewsCounterDAO();
 
     return fNewsCounterDAO;
   }
@@ -567,16 +568,16 @@ public class EventManager {
     }
   }
 
-  private void initEntityStoreListener() {
-    DBManager.getDefault().addEntityStoreListener(new DatabaseListener() {
-      public void databaseOpened(DatabaseEvent event) {
-        fDb = event.getObjectContainer();
-        initEventRegistry();
-      }
-      public void databaseClosed(DatabaseEvent event) {
-        fDb = null;
-      }
-    });
+  void initEntityStoreListener() {
+    DBManager.getDefault().addEntityStoreListener(this);
+  }
+
+  public void databaseOpened(DatabaseEvent event) {
+    fDb = event.getObjectContainer();
+    initEventRegistry();
+  }
+  public void databaseClosed(DatabaseEvent event) {
+    fDb = null;
   }
 
   //TODO Change this name to better reflect what it does. It just says that the
