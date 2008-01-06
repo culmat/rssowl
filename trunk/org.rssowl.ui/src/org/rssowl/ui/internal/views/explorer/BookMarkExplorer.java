@@ -100,7 +100,6 @@ import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.IPreference;
-import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.event.FolderAdapter;
@@ -114,7 +113,6 @@ import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
-import org.rssowl.ui.internal.NewsService;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.StatusLineUpdater;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
@@ -206,7 +204,6 @@ public class BookMarkExplorer extends ViewPart {
   private IViewSite fViewSite;
   private FolderListener fFolderListener;
   private IPartListener2 fPartListener;
-  private NewsService fNewsService;
   private IPreferenceDAO fPrefDAO;
   private IPropertyChangeListener fPropertyChangeListener;
 
@@ -1367,7 +1364,6 @@ public class BookMarkExplorer extends ViewPart {
   public void init(IViewSite site) throws PartInitException {
     super.init(site);
     fViewSite = site;
-    fNewsService = Controller.getDefault().getNewsService();
     fGlobalPreferences = Owl.getPreferenceService().getGlobalScope();
     fPrefDAO = DynamicDAO.getDAO(IPreferenceDAO.class);
     fExpandedNodes = new ArrayList<Long>();
@@ -1584,18 +1580,10 @@ public class BookMarkExplorer extends ViewPart {
   private boolean isValidNavigation(ITreeNode node, boolean unread) {
     Object data = node.getData();
 
-    /* Check if bookmark has unread if set as flag */
-    if (data instanceof IBookMark) {
-      IBookMark bookmark = (IBookMark) data;
-      FeedLinkReference feedRef = bookmark.getFeedLinkReference();
-      if (unread && fNewsService.getUnreadCount(feedRef) <= 0)
-        return false;
-    }
-
-    /* Check if searchmark has unread if set as flag */
-    else if (data instanceof ISearchMark) {
-      ISearchMark searchmark = (ISearchMark) data;
-      if (unread && searchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) == 0)
+    /* Check for Unread news if required */
+    if (data instanceof INewsMark) {
+      INewsMark newsmark = (INewsMark) data;
+      if (unread && newsmark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) == 0)
         return false;
     }
 
