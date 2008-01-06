@@ -38,12 +38,11 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.NewsService;
@@ -137,8 +136,8 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
         fillNews((IFolder) element, news, retentionHelperMap);
       else if (element instanceof IBookMark)
         fillNews((IBookMark) element, news, retentionHelperMap);
-      else if (element instanceof ISearchMark)
-        fillNews((ISearchMark) element, news);
+      else if (element instanceof INewsMark)
+        fillNews((INewsMark) element, news);
       else if (element instanceof INews)
         news.add((INews) element);
     }
@@ -183,12 +182,13 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     return folders != null && folders.equals(rootFolders);
   }
 
-  /* TODO This Method is currently ignoring SearchMarks */
   private void fillNews(IFolder folder, List<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap) {
     List<IFolderChild> children = folder.getChildren();
     for (IFolderChild child : children) {
       if (child instanceof IBookMark && containsUnread(((IBookMark) child)))
         fillNews((IBookMark) child, news, bookMarkNewsMap);
+      else if (child instanceof INewsMark)
+        fillNews((INewsMark) child, news);
       else if (child instanceof IFolder)
         fillNews((IFolder) child, news, bookMarkNewsMap);
     }
@@ -220,13 +220,8 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     }
   }
 
-  private void fillNews(ISearchMark searchmark, List<INews> news) {
-    List<NewsReference> matchingNews = searchmark.getResult(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
-    for (NewsReference newsRef : matchingNews) {
-      INews resolvedNews = newsRef.resolve();
-      if (resolvedNews != null) //TODO Remove once Bug 173 is fixed
-        news.add(resolvedNews);
-    }
+  private void fillNews(INewsMark newsmark, List<INews> news) {
+    news.addAll(newsmark.getNews(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
   }
 
   /*
