@@ -279,32 +279,6 @@ public class News extends AbstractEntity implements INews {
   }
 
   /*
-   * @see org.rssowl.core.internal.persist.AbstractEntity#equals(java.lang.Object)
-   */
-  @Override
-  public boolean equals(Object obj) {
-    fLock.acquireReadLock();
-    try {
-      return super.equals(obj);
-    } finally {
-      fLock.releaseReadLock();
-    }
-  }
-
-  /*
-   * @see org.rssowl.core.internal.persist.AbstractEntity#hashCode()
-   */
-  @Override
-  public int hashCode() {
-    fLock.acquireReadLock();
-    try {
-      return super.hashCode();
-    } finally {
-      fLock.releaseReadLock();
-    }
-  }
-
-  /*
    * @see org.rssowl.core.internal.persist.AbstractEntity#getProperties()
    */
   @Override
@@ -338,19 +312,6 @@ public class News extends AbstractEntity implements INews {
     fLock.acquireWriteLock();
     try {
       return super.removeProperty(key);
-    } finally {
-      fLock.releaseWriteLock();
-    }
-  }
-
-  /*
-   * @see org.rssowl.core.internal.persist.AbstractEntity#setId(java.lang.Long)
-   */
-  @Override
-  public void setId(Long id) {
-    fLock.acquireWriteLock();
-    try {
-      super.setId(id);
     } finally {
       fLock.releaseWriteLock();
     }
