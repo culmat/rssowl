@@ -62,7 +62,6 @@ public final class DAOServiceImpl extends DAOService  {
 
   private final IPreferenceDAO fPreferencesDAO = new PreferencesDAOImpl();
   private final IAttachmentDAO fAttachmentDAO = new AttachmentDAOImpl();
-  private final IBookMarkDAO fBookMarkDAO = new BookMarkDAOImpl();
   private final ICategoryDAO fCategoryDAO = new CategoryDAOImpl();
   private final IConditionalGetDAO fConditionalGetDAO = new ConditionalGetDAOImpl();
   private final IFeedDAO fFeedDAO = new FeedDAOImpl();
@@ -71,16 +70,22 @@ public final class DAOServiceImpl extends DAOService  {
   private final INewsDAO fNewsDAO = new NewsDAOImpl();
   private final IPersonDAO fPersonDAO = new PersonDAOImpl();
   private final ISearchConditionDAO fSearchConditionDAO = new SearchConditionDAOImpl();
-  private final ISearchMarkDAO fSearchMarkDAO = new SearchMarkDAOImpl();
   private final ILabelDAO fLabelDAO = new LabelDAOImpl();
-  private final INewsBinDAO fNewsBinDao = new NewsBinDaoImpl();
+
+  /* Cached daos */
+  private final IBookMarkDAO fBookMarkDAO;
+  private final ISearchMarkDAO fSearchMarkDAO;
+  private final INewsBinDAO fNewsBinDAO;
 
   private final Map<Class<?>, Object> fEntityInterfacesToDaosMap = new HashMap<Class<?>, Object>();
   private final Map<Class<?>, Object> fEntityDaoClassesToDaosMap = new HashMap<Class<?>, Object>();
   private final Map<Class<?>, Object> fEntityClassesToDaosMap = new HashMap<Class<?>, Object>();
 
   public DAOServiceImpl() {
-    super();
+    fBookMarkDAO = new CachingBookMarkDAO();
+    fNewsBinDAO = new CachingNewsBinDAO();
+    fSearchMarkDAO = new CachingSearchMarkDAO();
+
     fEntityDaoClassesToDaosMap.put(IAttachmentDAO.class, fAttachmentDAO);
     fEntityDaoClassesToDaosMap.put(IBookMarkDAO.class, fBookMarkDAO);
     fEntityDaoClassesToDaosMap.put(ICategoryDAO.class, fCategoryDAO);
@@ -94,7 +99,7 @@ public final class DAOServiceImpl extends DAOService  {
     fEntityDaoClassesToDaosMap.put(ISearchConditionDAO.class, fSearchConditionDAO);
     fEntityDaoClassesToDaosMap.put(ISearchMarkDAO.class, fSearchMarkDAO);
     fEntityDaoClassesToDaosMap.put(IPreferenceDAO.class, fPreferencesDAO);
-    fEntityDaoClassesToDaosMap.put(INewsBinDAO.class, fNewsBinDao);
+    fEntityDaoClassesToDaosMap.put(INewsBinDAO.class, fNewsBinDAO);
 
     for (Object value : fEntityDaoClassesToDaosMap.values()) {
       IPersistableDAO<?> dao = (IPersistableDAO<?>) value;
@@ -114,7 +119,7 @@ public final class DAOServiceImpl extends DAOService  {
     fEntityInterfacesToDaosMap.put(ISearchCondition.class, fSearchConditionDAO);
     fEntityInterfacesToDaosMap.put(ISearchMark.class, fSearchMarkDAO);
     fEntityInterfacesToDaosMap.put(IPreference.class, fPreferencesDAO);
-    fEntityInterfacesToDaosMap.put(INewsBin.class, fNewsBinDao);
+    fEntityInterfacesToDaosMap.put(INewsBin.class, fNewsBinDAO);
   }
 
   private void putInEntityClassesToDaosMap(IPersistableDAO<?> dao) {
@@ -188,7 +193,7 @@ public final class DAOServiceImpl extends DAOService  {
 
   @Override
   public INewsBinDAO getNewsBinDao() {
-    return fNewsBinDao;
+    return fNewsBinDAO;
   }
 
   @SuppressWarnings("unchecked")
