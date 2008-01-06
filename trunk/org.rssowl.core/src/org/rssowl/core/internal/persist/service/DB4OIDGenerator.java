@@ -32,7 +32,7 @@ import java.util.List;
 /**
  * db4o implementation of IDGenerator.
  */
-public class DB4OIDGenerator implements IDGenerator {
+public class DB4OIDGenerator implements IDGenerator, DatabaseListener {
 
   private final static int BATCH_SIZE = 100;
 
@@ -47,14 +47,15 @@ public class DB4OIDGenerator implements IDGenerator {
    * Creates an instance of this class.
    */
   public DB4OIDGenerator() {
-    DBManager.getDefault().addEntityStoreListener(new DatabaseListener() {
-      public void databaseClosed(DatabaseEvent event) {
-        setObjectContainer(null);
-      }
-      public void databaseOpened(DatabaseEvent event) {
-        setObjectContainer(event.getObjectContainer());
-      }
-    });
+    DBManager.getDefault().addEntityStoreListener(this);
+  }
+
+  public void databaseClosed(DatabaseEvent event) {
+    setObjectContainer(null);
+  }
+
+  public void databaseOpened(DatabaseEvent event) {
+    setObjectContainer(event.getObjectContainer());
   }
 
   private synchronized void setObjectContainer(ObjectContainer db) {

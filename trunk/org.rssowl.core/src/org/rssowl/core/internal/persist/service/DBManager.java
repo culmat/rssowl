@@ -24,7 +24,6 @@
 package org.rssowl.core.internal.persist.service;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.SubMonitor;
 import org.rssowl.core.internal.Activator;
@@ -68,6 +67,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -77,7 +77,7 @@ public class DBManager {
   private static DBManager fInstance;
   private ObjectContainer fObjectContainer;
   private final ReadWriteLock fLock = new ReentrantReadWriteLock();
-  private final ListenerList fEntityStoreListeners = new ListenerList();
+  private final List<DatabaseListener> fEntityStoreListeners = new CopyOnWriteArrayList<DatabaseListener>();
 
   /**
    * @return The Singleton Instance.
@@ -103,12 +103,19 @@ public class DBManager {
   }
 
   public void addEntityStoreListener(DatabaseListener listener) {
-    fEntityStoreListeners.add(listener);
+    if (listener instanceof EventManager)
+      fEntityStoreListeners.add(0, listener);
+    else if (listener instanceof DB4OIDGenerator) {
+      if (fEntityStoreListeners.get(0) instanceof EventManager)
+        fEntityStoreListeners.add(1, listener);
+      else
+        fEntityStoreListeners.add(0, listener);
+    } else
+      fEntityStoreListeners.add(listener);
   }
 
   private void fireDatabaseEvent(DatabaseEvent event, boolean storeOpened) {
-    for (Object l : fEntityStoreListeners.getListeners()) {
-      DatabaseListener listener = (DatabaseListener) l;
+    for (DatabaseListener listener : fEntityStoreListeners) {
       if (storeOpened) {
         listener.databaseOpened(event);
       } else {
