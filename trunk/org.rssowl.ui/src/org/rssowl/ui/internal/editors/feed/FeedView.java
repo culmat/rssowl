@@ -254,7 +254,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private void registerListeners() {
     fPartListener = new IPartListener2() {
 
-      /* Mark *new* News as *unread* ot *read* */
+      /* Mark *new* News as *unread* or *read* */
       public void partHidden(IWorkbenchPartReference partRef) {
         if (FeedView.this.equals(partRef.getPart(false)) && fInput.getMark() instanceof IBookMark)
           if (System.currentTimeMillis() - fOpenTime > HANDLE_NEWS_SEEN_DELAY)

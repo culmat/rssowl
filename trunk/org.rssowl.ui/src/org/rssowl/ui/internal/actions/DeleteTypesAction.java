@@ -42,6 +42,7 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
@@ -147,6 +148,8 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
         message.append("the folder '").append(((IFolder) element).getName()).append("'?");
       else if (element instanceof IBookMark)
         message.append("the bookmark '").append(((IMark) element).getName()).append("'?");
+      else if (element instanceof INewsBin)
+        message.append("the news bin '").append(((IMark) element).getName()).append("'?");
       else if (element instanceof ISearchMark)
         message.append("the saved search '").append(((IMark) element).getName()).append("'?");
       else if (element instanceof INews)

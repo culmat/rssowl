@@ -50,7 +50,6 @@ public class FeedViewInput implements IEditorInput {
 
   private INewsMark fMark;
   private boolean fIsDeleted;
-  private boolean fIsBookMark;
   private PerformAfterInputSet fPerformOnInputSet;
 
   /**
@@ -67,7 +66,6 @@ public class FeedViewInput implements IEditorInput {
   public FeedViewInput(INewsMark mark, PerformAfterInputSet performOnInputSet) {
     Assert.isNotNull(mark);
     fMark = mark;
-    fIsBookMark = mark instanceof IBookMark;
     fPerformOnInputSet = performOnInputSet;
   }
 
@@ -95,7 +93,7 @@ public class FeedViewInput implements IEditorInput {
    * @see org.eclipse.ui.IEditorInput#getImageDescriptor()
    */
   public ImageDescriptor getImageDescriptor() {
-    if (fIsBookMark) {
+    if (fMark instanceof IBookMark) {
       IBookMark bookmark = (IBookMark) fMark;
       ImageDescriptor favicon = OwlUI.getFavicon(bookmark);
       if (favicon != null)
