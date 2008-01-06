@@ -32,6 +32,8 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
@@ -217,8 +219,8 @@ public class BookMarkFilter extends ViewerFilter {
         return true;
     }
 
-    /* Searchmark Event */
-    else if (entity.equals(ISearchMark.class)) {
+    /* Searchmark / News Bin Event */
+    else if (entity.equals(ISearchMark.class) || entity.equals(INewsBin.class)) {
       if (fMatcher != null)
         return true;
 
@@ -300,84 +302,51 @@ public class BookMarkFilter extends ViewerFilter {
   protected boolean isLeafMatch(@SuppressWarnings("unused")
   Viewer viewer, Object element) {
 
-    /* Element is a BookMark */
-    if (element instanceof IBookMark) {
-      IBookMark bookmark = (IBookMark) element;
+    /* Element is a News Mark */
+    if (element instanceof INewsMark) {
+      INewsMark newsmark = (INewsMark) element;
       boolean isMatch = false;
 
+      /* Look at Type */
       switch (fType) {
 
-        /* Show: All */
         case SHOW_ALL:
           isMatch = true;
           break;
 
         /* Show: Feeds with New News */
         case SHOW_NEW:
-          isMatch = hasNewNews(bookmark.getFeedLinkReference());
+          isMatch = newsmark.getNewsCount(EnumSet.of(INews.State.NEW)) > 0;
           break;
 
-        /* Show: Unread Feeds */
+        /* Show: Unread Marks */
         case SHOW_UNREAD:
-          isMatch = hasUnreadNews(bookmark.getFeedLinkReference());
+          isMatch = newsmark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) > 0;
           break;
 
-        /* Show: Sticky Feeds */
+        /* Show: Sticky Marks */
         case SHOW_STICKY:
-          isMatch = hasStickyNews(bookmark.getFeedLinkReference());
+          if (newsmark instanceof IBookMark) {
+            IBookMark bookmark = (IBookMark) newsmark;
+            isMatch = hasStickyNews(bookmark.getFeedLinkReference());
+          }
           break;
 
         /* Show: Feeds that had an Error while loading */
         case SHOW_ERRONEOUS:
-          isMatch = bookmark.isErrorLoading();
+          if (newsmark instanceof IBookMark)
+            isMatch = ((IBookMark) newsmark).isErrorLoading();
           break;
 
         /* Show: Never visited Marks */
         case SHOW_NEVER_VISITED:
-          isMatch = bookmark.getPopularity() <= 0;
+          isMatch = newsmark.getPopularity() <= 0;
           break;
       }
 
       /* Finally check the Pattern */
       if (isMatch && fMatcher != null) {
-        if (!wordMatches(bookmark))
-          return false;
-      }
-
-      return isMatch;
-    }
-
-    /* Element is a SearchMark */
-    else if (element instanceof ISearchMark) {
-      ISearchMark mark = (ISearchMark) element;
-      boolean isMatch = false;
-
-      switch (fType) {
-
-        /* Show: All */
-        case SHOW_ALL:
-          isMatch = true;
-          break;
-
-        /* Show: New News */
-        case SHOW_NEW:
-          isMatch = mark.getResultCount(EnumSet.of(INews.State.NEW)) > 0;
-          break;
-
-        /* Show: Unread News */
-        case SHOW_UNREAD:
-          isMatch = mark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) > 0;
-          break;
-
-        /* Show: Never visited Marks */
-        case SHOW_NEVER_VISITED:
-          isMatch = mark.getPopularity() <= 0;
-          break;
-      }
-
-      /* Finally check the Pattern */
-      if (isMatch && fMatcher != null) {
-        if (!wordMatches(mark))
+        if (!wordMatches(newsmark))
           return false;
       }
 
@@ -387,16 +356,8 @@ public class BookMarkFilter extends ViewerFilter {
     return false;
   }
 
-  private boolean hasUnreadNews(FeedLinkReference feedRef) {
-    return fNewsService.getUnreadCount(feedRef) > 0;
-  }
-
   private boolean hasStickyNews(FeedLinkReference feedRef) {
     return fNewsService.getStickyCount(feedRef) > 0;
-  }
-
-  private boolean hasNewNews(FeedLinkReference feedRef) {
-    return fNewsService.getNewCount(feedRef) > 0;
   }
 
   /**
