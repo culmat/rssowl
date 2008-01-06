@@ -27,22 +27,15 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.event.runnable.NewsBinEventRunnable;
 
-public final class NewsBinEvent extends ModelEvent    {
-
-  private final IFolder fOldParent;
+public final class NewsBinEvent extends MarkEvent    {
 
   public NewsBinEvent(INewsBin newsBin, IFolder oldParent, boolean isRoot) {
-    super(newsBin, isRoot);
-    fOldParent = oldParent;
+    super(newsBin, oldParent, isRoot);
   }
 
   @Override
   public NewsBinEventRunnable createEventRunnable() {
     return new NewsBinEventRunnable();
-  }
-
-  public IFolder getOldParent() {
-    return fOldParent;
   }
 
   /*

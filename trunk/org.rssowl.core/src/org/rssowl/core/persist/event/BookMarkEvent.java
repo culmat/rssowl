@@ -31,24 +31,22 @@ import org.rssowl.core.persist.event.runnable.BookMarkEventRunnable;
 /**
  * <p>
  * An Event-Object being used to notify Listeners, whenever the type
- * <code>IBookMark</code> was added, updated or deleted in the persistance
+ * <code>IBookMark</code> is added, updated or deleted in the persistence
  * layer.
  * </p>
  * In order to retrieve the Model-Object that is affected on the Event, use the
  * <code>resolve()</code> Method of the <code>ModelReference</code> stored
  * in this Event.
- * 
+ *
  * @author bpasero
  */
-public final class BookMarkEvent extends ModelEvent {
+public final class BookMarkEvent extends MarkEvent {
 
-  /* In case of Reparenting, remember the old parent */
-  private final IFolder fOldParent;
 
   /**
    * Stores an instance of <code>ModelReference</code> and the Parent
    * Reference for the affected Type in this Event.
-   * 
+   *
    * @param mark An instance of <code>ModelReference</code> for the
    * affected Type.
    * @param oldParent If this Event informs about a Reparenting the old parent
@@ -57,8 +55,7 @@ public final class BookMarkEvent extends ModelEvent {
    * <code>FALSE</code> otherwise.
    */
   public BookMarkEvent(IBookMark mark, IFolder oldParent, boolean isRoot) {
-    super(mark, isRoot);
-    fOldParent = oldParent;
+    super(mark, oldParent, isRoot);
   }
 
   /*
@@ -67,21 +64,6 @@ public final class BookMarkEvent extends ModelEvent {
   @Override
   public IBookMark getEntity() {
     return (IBookMark) super.getEntity();
-  }
-
-  /**
-   * Get the previous Parent of this Type in case this Event informs about a
-   * Reparenting.
-   * <p>
-   * Note that this Method <em>will</em> return <code>NULL</code> in any
-   * case where the Event is not informing about reparenting!
-   * </p>
-   * 
-   * @return Returns the previous Parent of this Type in case this Event informs
-   * about Reparenting. Otherwise this Method will return <code>NULL</code>.
-   */
-  public IFolder getOldParent() {
-    return fOldParent;
   }
 
   @Override
