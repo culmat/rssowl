@@ -43,7 +43,7 @@ import org.rssowl.core.persist.event.BookMarkEvent;
 import org.rssowl.core.persist.event.BookMarkListener;
 import org.rssowl.core.persist.event.FolderEvent;
 import org.rssowl.core.persist.event.FolderListener;
-import org.rssowl.core.persist.event.ModelEvent;
+import org.rssowl.core.persist.event.MarkEvent;
 import org.rssowl.core.persist.event.NewsAdapter;
 import org.rssowl.core.persist.event.NewsBinEvent;
 import org.rssowl.core.persist.event.NewsBinListener;
@@ -506,21 +506,20 @@ public class BookMarkContentProvider implements ITreeContentProvider {
     DynamicDAO.addEntityListener(INews.class, fNewsListener);
   }
 
-  private void onMarksAdded(Set<? extends ModelEvent> events) {
+  private void onMarksAdded(Set<? extends MarkEvent> events) {
 
     /* Reveal and Select if single Entity added */
     if (events.size() == 1) {
-      final ModelEvent event = events.iterator().next();
+      final MarkEvent event = events.iterator().next();
       JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
         public void run() {
-          IMark mark = (IMark) event.getEntity();
-          expand(mark.getParent());
+          expand(event.getEntity().getParent());
         }
       });
     }
   }
 
-  private void onMarksRemoved(final Set<? extends ModelEvent> events) {
+  private void onMarksRemoved(final Set<? extends MarkEvent> events) {
     if (events.isEmpty())
       return;
 
@@ -528,13 +527,13 @@ public class BookMarkContentProvider implements ITreeContentProvider {
       public void run() {
 
         /* Retrieve Removed Marks */
-        Class<? extends IEntity> clazz = null;
+        Class<? extends IMark> clazz = null;
         Set<IMark> removedMarks = null;
-        for (ModelEvent event : events) {
+        for (MarkEvent event : events) {
           if (event.isRoot()) {
             if (removedMarks == null)
               removedMarks = new HashSet<IMark>();
-            removedMarks.add((IMark) event.getEntity());
+            removedMarks.add(event.getEntity());
           }
 
           if (clazz == null)
@@ -559,9 +558,8 @@ public class BookMarkContentProvider implements ITreeContentProvider {
 
         /* Update Read-State counters on Parents */
         if (!fBookmarkGrouping.isActive()) {
-          for (ModelEvent event : events) {
-            IMark mark = (IMark) event.getEntity();
-            IFolder eventParent = mark.getParent();
+          for (MarkEvent event : events) {
+            IFolder eventParent = event.getEntity().getParent();
             if (eventParent != null && eventParent.getParent() != null)
               updateFolderAndParents(eventParent);
           }
@@ -570,39 +568,33 @@ public class BookMarkContentProvider implements ITreeContentProvider {
     });
   }
 
-  private void onMarksUpdated(final Set<? extends ModelEvent> events) {
+  private void onMarksUpdated(final Set<? extends MarkEvent> events) {
     if (events.isEmpty())
       return;
 
     JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
       public void run() {
-        Class<? extends IEntity> clazz = null;
+        Class<? extends IMark> clazz = null;
         Set<IMark> updatedMarks = null;
         Map<IMark, IFolder> reparentedMarks = null;
 
         /* Retrieve Updated Marks */
-        for (ModelEvent event : events) {
+        for (MarkEvent event : events) {
           if (event.isRoot()) {
-            IFolder oldParent = null;
-            if (event instanceof BookMarkEvent)
-              oldParent = ((BookMarkEvent) event).getOldParent();
-            else if (event instanceof SearchMarkEvent)
-              oldParent = ((SearchMarkEvent) event).getOldParent();
-            else if (event instanceof NewsBinEvent)
-              oldParent = ((NewsBinEvent) event).getOldParent();
+            IFolder oldParent = event.getOldParent();
 
             /* Mark got reparented */
             if (oldParent != null) {
               if (reparentedMarks == null)
                 reparentedMarks = new HashMap<IMark, IFolder>();
-              reparentedMarks.put((IMark) event.getEntity(), oldParent);
+              reparentedMarks.put(event.getEntity(), oldParent);
             }
 
             /* Normal Update */
             else {
               if (updatedMarks == null)
                 updatedMarks = new HashSet<IMark>();
-              updatedMarks.add((IMark) event.getEntity());
+              updatedMarks.add(event.getEntity());
             }
           }
 
