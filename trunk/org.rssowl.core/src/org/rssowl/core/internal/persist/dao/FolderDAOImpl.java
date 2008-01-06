@@ -170,18 +170,16 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
             newParent.reorderChildren(markList, newPosition, reparentInfo.isAfter().booleanValue());
           }
         }
-        if (mark instanceof IBookMark) {
+        if (mark instanceof IBookMark)
           markEvent = new BookMarkEvent((IBookMark) mark, oldParent, true);
-          DBHelper.putEventTemplate(markEvent);
-        } else if (mark instanceof ISearchMark) {
+        else if (mark instanceof ISearchMark)
           markEvent = new SearchMarkEvent((ISearchMark) mark, oldParent, true);
-          DBHelper.putEventTemplate(markEvent);
-        } else if (mark instanceof INewsBin) {
+        else if (mark instanceof INewsBin)
           markEvent = new NewsBinEvent((INewsBin) mark, oldParent, true);
-          DBHelper.putEventTemplate(markEvent);
-        } else
+        else
           throw new IllegalArgumentException("Unknown IMark subclass found: " + child.getClass());
 
+        DBHelper.putEventTemplate(markEvent);
         markEvents.add(markEvent);
       } else {
         throw new IllegalArgumentException("Unknown IFolderChild subclass found: " + child.getClass());
