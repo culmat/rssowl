@@ -174,7 +174,7 @@ public class News extends AbstractEntity implements INews {
     news.fLock.acquireReadLock();
     try {
       for (IAttachment attachment : news.getAttachments())
-        addAttachment(new Attachment(attachment, news));
+        addAttachment(new Attachment(attachment, this));
 
       if (news.getAuthor() != null)
         fAuthor = new Person(news.getAuthor());
