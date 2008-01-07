@@ -101,6 +101,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.event.FolderAdapter;
 import org.rssowl.core.persist.event.FolderEvent;
@@ -1379,7 +1380,7 @@ public class BookMarkExplorer extends ViewPart {
     });
 
     /* Add Root-Folders */
-    fRootFolders.addAll(Controller.getDefault().getCacheService().getRootFolders());
+    fRootFolders.addAll(DynamicDAO.getDAO(IFolderDAO.class).loadRoots());
 
     /* Load Settings */
     loadState();
