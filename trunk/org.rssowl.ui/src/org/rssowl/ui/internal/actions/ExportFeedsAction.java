@@ -41,10 +41,11 @@ import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
-import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.io.File;
@@ -52,10 +53,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.text.DateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * TODO This is just for Developers Purposes!
@@ -106,7 +107,7 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
         }
 
         /* Proceed Exporting */
-        Set<IFolder> rootFolders = Controller.getDefault().getCacheService().getRootFolders();
+        Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();;
         exportToOPML(file, rootFolders);
       } catch (IOException e) {
         Activator.getDefault().logError(e.getMessage(), e);
@@ -122,7 +123,7 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
    * @throws IOException
    * @throws PersistenceException
    */
-  public void exportToOPML(File file, Set<IFolder> rootFolders) throws IOException, PersistenceException {
+  public void exportToOPML(File file, Collection<IFolder> rootFolders) throws IOException, PersistenceException {
     OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
     writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
     writer.write("<opml version=\"1.1\" xmlns:rssowl=\"http://www.rssowl.org\">\n");

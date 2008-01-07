@@ -51,6 +51,8 @@ import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.RetentionStrategy;
@@ -59,8 +61,8 @@ import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Preferences related to Feeds.
@@ -492,7 +494,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   }
 
   private void finish(boolean autoUpdateChange, boolean displayChange, boolean runCleanup) throws PersistenceException {
-    final Set<IFolder> rootFolders = Controller.getDefault().getCacheService().getRootFolders();
+    final Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
 
     /* Inform Reload Service about update-change */
     if (autoUpdateChange) {

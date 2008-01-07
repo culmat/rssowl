@@ -59,6 +59,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.event.FolderAdapter;
 import org.rssowl.core.persist.event.FolderEvent;
 import org.rssowl.ui.internal.actions.NewFolderAction;
@@ -66,6 +67,7 @@ import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkLabelProvider;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -296,7 +298,7 @@ public class FolderChooser extends Composite implements DisposeListener {
 
     fFolderViewer.setContentProvider(new ITreeContentProvider() {
       public Object[] getElements(Object inputElement) {
-        Set<IFolder> rootFolders = Controller.getDefault().getCacheService().getRootFolders();
+        Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
         return rootFolders.toArray();
       }
 

@@ -32,11 +32,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.persist.IFolder;
-import org.rssowl.ui.internal.Controller;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
 
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * Action to reload all BookMarks.
@@ -79,7 +80,7 @@ public class ReloadAllAction extends Action implements IWorkbenchWindowActionDel
   public void run() {
     JobRunner.runInBackgroundThread(new Runnable() {
       public void run() {
-        Set<IFolder> rootFolders = Controller.getDefault().getCacheService().getRootFolders();
+        Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
         new ReloadTypesAction(new StructuredSelection(rootFolders.toArray()), fShell).run();
       }
     });

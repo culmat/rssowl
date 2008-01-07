@@ -24,21 +24,14 @@
 
 package org.rssowl.ui.internal;
 
-import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IBookMark;
-import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
-import org.rssowl.core.persist.event.FolderEvent;
-import org.rssowl.core.persist.event.FolderListener;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A service that provides access to cached entities. The service ensures to
@@ -48,16 +41,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author bpasero
  */
 public class CacheService {
-  private static final int CONCURRENT_WRITERS = 2;
-  private static final float LOAD_FACTOR = 0.75f;
-  private final Map<IFolder, Object> fRootFolders;
-
-  /* Dummy value to associate with an Object in the maps */
-  private static final Object PRESENT = new Object();
-
-  /* Listeners */
-  private FolderListener fFolderListener;
-
   private final IBookMarkDAO fBookMarkDAO;
 
   /**
@@ -66,62 +49,6 @@ public class CacheService {
    */
   public CacheService() {
     fBookMarkDAO = DynamicDAO.getDAO(IBookMarkDAO.class);
-
-    fRootFolders = new ConcurrentHashMap<IFolder, Object>(16, LOAD_FACTOR, CONCURRENT_WRITERS);
-
-    registerListeners();
-  }
-
-  private void registerListeners() {
-
-    /* Listen to Folder Events */
-    fFolderListener = new FolderListener() {
-
-      /* Folders got added */
-      public void entitiesAdded(Set<FolderEvent> events) {
-        for (FolderEvent folderEvent : events) {
-          IFolder folder = folderEvent.getEntity();
-          if (folder.getParent() == null)
-            fRootFolders.put(folder, PRESENT);
-        }
-      }
-
-      /* Folders got Deleted */
-      public void entitiesDeleted(Set<FolderEvent> events) {
-        for (FolderEvent folderEvent : events) {
-          IFolder folder = folderEvent.getEntity();
-          if (folder.getParent() == null)
-            fRootFolders.remove(folder);
-        }
-      }
-
-      /* Folders got Updated */
-      public void entitiesUpdated(Set<FolderEvent> events) {
-      /* Not handled */
-      }
-    };
-
-
-    /* Add Listeners */
-    DynamicDAO.addEntityListener(IFolder.class, fFolderListener);
-  }
-
-  void stopService() {
-    unregisterListeners();
-  }
-
-  private void unregisterListeners() {
-    DynamicDAO.removeEntityListener(IFolder.class, fFolderListener);
-  }
-
-  /**
-   * Returns a Set of <code>IFolder</code>s, having no parent Folder set,
-   * thereby being Root-Folders.
-   *
-   * @return a Set of all Root-Folders.
-   */
-  public Set<IFolder> getRootFolders() {
-    return fRootFolders.keySet();
   }
 
   /**
@@ -156,24 +83,5 @@ public class CacheService {
     }
 
     return null;
-  }
-
-  void cacheRootFolders() {
-    Collection<IFolder> rootFolders = Owl.getPersistenceService().getDAOService().getFolderDAO().loadRoots();
-    for (IFolder rootFolder : rootFolders) {
-      cache(rootFolder);
-    }
-  }
-
-  private void cache(IFolder folder) {
-
-    /* Cache Root-Folders */
-    if (folder.getParent() == null)
-      fRootFolders.put(folder, PRESENT);
-
-    /* Recursively refresh cache of sub-folders */
-    List<IFolder> subFolders = folder.getFolders();
-    for (IFolder subFolder : subFolders)
-      cache(subFolder);
   }
 }
