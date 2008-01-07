@@ -65,27 +65,23 @@ public final class DAOServiceImpl extends DAOService  {
   private final ICategoryDAO fCategoryDAO = new CategoryDAOImpl();
   private final IConditionalGetDAO fConditionalGetDAO = new ConditionalGetDAOImpl();
   private final IFeedDAO fFeedDAO = new FeedDAOImpl();
-  private final IFolderDAO fFolderDAO = new FolderDAOImpl();
   private final INewsCounterDAO fNewsCounterDAO = new NewsCounterDAOImpl();
   private final INewsDAO fNewsDAO = new NewsDAOImpl();
   private final IPersonDAO fPersonDAO = new PersonDAOImpl();
   private final ISearchConditionDAO fSearchConditionDAO = new SearchConditionDAOImpl();
   private final ILabelDAO fLabelDAO = new LabelDAOImpl();
 
-  /* Cached daos */
-  private final IBookMarkDAO fBookMarkDAO;
-  private final ISearchMarkDAO fSearchMarkDAO;
-  private final INewsBinDAO fNewsBinDAO;
+  /* Caching DAOs */
+  private final IFolderDAO fFolderDAO = new CachingFolderDAO();
+  private final IBookMarkDAO fBookMarkDAO = new CachingBookMarkDAO();
+  private final ISearchMarkDAO fSearchMarkDAO = new CachingSearchMarkDAO();
+  private final INewsBinDAO fNewsBinDAO = new CachingNewsBinDAO();
 
   private final Map<Class<?>, Object> fEntityInterfacesToDaosMap = new HashMap<Class<?>, Object>();
   private final Map<Class<?>, Object> fEntityDaoClassesToDaosMap = new HashMap<Class<?>, Object>();
   private final Map<Class<?>, Object> fEntityClassesToDaosMap = new HashMap<Class<?>, Object>();
 
   public DAOServiceImpl() {
-    fBookMarkDAO = new CachingBookMarkDAO();
-    fNewsBinDAO = new CachingNewsBinDAO();
-    fSearchMarkDAO = new CachingSearchMarkDAO();
-
     fEntityDaoClassesToDaosMap.put(IAttachmentDAO.class, fAttachmentDAO);
     fEntityDaoClassesToDaosMap.put(IBookMarkDAO.class, fBookMarkDAO);
     fEntityDaoClassesToDaosMap.put(ICategoryDAO.class, fCategoryDAO);
