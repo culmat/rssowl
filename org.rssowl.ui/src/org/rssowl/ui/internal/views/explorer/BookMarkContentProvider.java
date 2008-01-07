@@ -90,6 +90,9 @@ public class BookMarkContentProvider implements ITreeContentProvider {
   private BookMarkFilter fBookmarkFilter;
   private BookMarkGrouping fBookmarkGrouping;
 
+  /* Misc. */
+  private IBookMarkDAO fBookMarkDAO = DynamicDAO.getDAO(IBookMarkDAO.class);
+
   /*
    * @see org.eclipse.jface.viewers.IStructuredContentProvider#getElements(java.lang.Object)
    */
@@ -673,9 +676,8 @@ public class BookMarkContentProvider implements ITreeContentProvider {
 
   private void updateParents(FeedLinkReference feedRef) throws PersistenceException {
 
-    IBookMarkDAO bookMarkDAO = DynamicDAO.getDAO(IBookMarkDAO.class);
     /* Collect all affected BookMarks */
-    Collection<IBookMark> affectedBookMarks = bookMarkDAO.loadAll(feedRef);
+    Collection<IBookMark> affectedBookMarks = fBookMarkDAO.loadAll(feedRef);
 
     /* Update them including Parents */
     updateMarksAndParents(affectedBookMarks);
