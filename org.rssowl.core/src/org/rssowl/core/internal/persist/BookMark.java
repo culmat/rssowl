@@ -204,4 +204,16 @@ public class BookMark extends Mark implements IBookMark {
   public boolean containsNews(INews news) {
     return !news.isCopy() && news.getFeedReference().equals(getFeedLinkReference());
   }
+
+  public synchronized int getStickyNewsCount() {
+    if (fNewsCounter != null)
+      return fNewsCounter.getStickyCount(getFeedLinkReference().getLink());
+
+    int stickyCount = 0;
+    for (INews news : getNews()) {
+      if (news.isFlagged())
+        ++stickyCount;
+    }
+    return stickyCount;
+  }
 }
