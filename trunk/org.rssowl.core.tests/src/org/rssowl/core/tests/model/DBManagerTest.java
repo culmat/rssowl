@@ -57,6 +57,7 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISearchCondition;
@@ -134,6 +135,31 @@ public class DBManagerTest {
     Controller.getDefault().getNewsService().testDirtyShutdown();
     fTypesFactory = Owl.getModelFactory();
     fDb = DBManager.getDefault().getObjectContainer();
+  }
+
+  /**
+   * Tests that copying a sticky news from the original feed to a INewsBin
+   * followed by deletion of the original IMark works correctly.
+   */
+  @Test
+  public void testCopyStickyNewsAndDeleteOriginalFeed() {
+    IFeed feed = createFeed();
+    INews news = fTypesFactory.createNews(null, feed, new Date());
+    news.setFlagged(true);
+    fTypesFactory.createGuid(news, "http://www.link.com", true);
+    DynamicDAO.save(feed);
+    INews newsCopy = fTypesFactory.createNews(news);
+    DynamicDAO.save(newsCopy);
+
+    IFolder folder = fTypesFactory.createFolder(null, null, "Folder");
+    IBookMark mark = fTypesFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark");
+    INewsBin newsBin = fTypesFactory.createNewsBin(null, folder, "NewsBin");
+    newsBin.addNews(newsCopy);
+    DynamicDAO.save(folder);
+
+    DynamicDAO.delete(mark);
+    assertEquals(1, newsBin.getNewsRefs().size());
+    assertEquals(newsCopy, newsBin.getNews().get(0));
   }
 
   /**
