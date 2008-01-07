@@ -137,6 +137,29 @@ public class DBManagerTest {
   }
 
   /**
+   * Tests that deleting a IBookMark where the feed has news copies does
+   * not delete the feed.
+   */
+  @Test
+  public void testDeleteBookMarkWithNewsCopies() {
+    IFeed feed = createFeed();
+    INews news = fTypesFactory.createNews(null, feed, new Date());
+    fTypesFactory.createGuid(news, "http://www.link.com", true);
+    DynamicDAO.save(feed);
+    INews newsCopy = fTypesFactory.createNews(news);
+    DynamicDAO.save(newsCopy);
+
+    IFolder folder = fTypesFactory.createFolder(null, null, "Folder");
+    fTypesFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "Mark");
+    DynamicDAO.save(folder);
+
+    DynamicDAO.delete(folder);
+    feed = DynamicDAO.load(IFeed.class, feed.getId());
+    assertNotNull(feed);
+    assertEquals(0, feed.getNews().size());
+  }
+
+  /**
    * Tests that querying on News#fCopy works.
    */
   @Test
