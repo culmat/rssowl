@@ -65,4 +65,9 @@ public interface IBookMark extends INewsMark {
   void setFeedLinkReference(FeedLinkReference feedLinkRef);
 
   BookMarkReference toReference();
+
+  /**
+   * @return the number of news in this IBookMark that are sticky.
+   */
+  int getStickyNewsCount();
 }
