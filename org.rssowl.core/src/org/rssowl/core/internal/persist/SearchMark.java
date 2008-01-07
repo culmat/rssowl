@@ -86,30 +86,8 @@ public class SearchMark extends Mark implements ISearchMark {
   /*
    * @see org.rssowl.core.persist.ISearchMark#setResult(java.util.List)
    */
-  public synchronized Pair<Boolean, Boolean> setResult(Map<INews.State, List<NewsReference>> results) {
+  public synchronized Pair<Boolean, Boolean> setNewsRefs(Map<INews.State, List<NewsReference>> results) {
     return fNewsContainer.setNews(results);
-  }
-
-  /*
-   * @see org.rssowl.core.persist.ISearchMark#getMatchingNews()
-   */
-  public synchronized List<NewsReference> getResult() {
-    return getResult(INews.State.getVisible());
-  }
-
-  /*
-   * @see org.rssowl.core.persist.ISearchMark#getMatchingNews(java.util.EnumSet)
-   */
-  public synchronized List<NewsReference> getResult(Set<INews.State> states) {
-    return fNewsContainer.getNews(states);
-  }
-
-  /*
-   * @see org.rssowl.core.persist.ISearchMark#getMatchingNewsCount(java.util.Set)
-   */
-  public synchronized int getResultCount(Set<INews.State> states) {
-    Assert.isNotNull(states, "states");
-    return fNewsContainer.getNewsCount(states);
   }
 
   /*
