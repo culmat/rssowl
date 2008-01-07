@@ -243,7 +243,8 @@ public class DBHelper {
           changed = true;
       }
     }
-    db.ext().set(newsCounter, Integer.MAX_VALUE);
+    if (changed)
+      db.ext().set(newsCounter, Integer.MAX_VALUE);
   }
 
   static int countBookMarkReference(ObjectContainer db, FeedLinkReference feedRef) {
