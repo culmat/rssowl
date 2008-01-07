@@ -36,6 +36,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import com.db4o.ObjectContainer;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -168,7 +169,7 @@ public final class NewsCounterService {
           counterItem.decrementNewCounter();
         if (isUnread(news.getState()))
           counterItem.decrementUnreadCounter();
-        if (news.isFlagged())
+        if (news.isFlagged() && (!EnumSet.of(INews.State.DELETED, INews.State.HIDDEN).contains(news.getState())))
           counterItem.decrementStickyCounter();
 
         updatedCounterItems.put(news.getFeedReference().getLink().toString(), counterItem);
