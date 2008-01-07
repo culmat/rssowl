@@ -284,7 +284,8 @@ public class EventManager implements DatabaseListener   {
 
   private void cascadeNewsDeletion(INews news) {
     addItemBeingDeleted(news);
-    removeFromParentFeed(news);
+    if (!news.isCopy())
+      removeFromParentFeed(news);
 
     fDb.delete(news.getGuid());
     fDb.delete(news.getSource());
