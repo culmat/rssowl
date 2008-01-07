@@ -112,6 +112,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -137,6 +138,35 @@ public class DBManagerTest {
     fTypesFactory = Owl.getModelFactory();
     fDb = DBManager.getDefault().getObjectContainer();
     fNewsDAO = DynamicDAO.getDAO(INewsDAO.class);
+  }
+
+
+  /**
+   * Tests that changing the state of a INews#isCopy() does not update the
+   * NewsCounter for its feed. Also tests that the parent INewsBin is updated.
+   */
+  @Test
+  public void testNewsCopyStateChangeDoesNotUpdateNewsCounter() {
+    IFeed feed = createFeed();
+    INews news = fTypesFactory.createNews(null, feed, new Date());
+    fTypesFactory.createGuid(news, "http://www.link.com", true);
+    DynamicDAO.save(feed);
+    INews newsCopy = fTypesFactory.createNews(news);
+    DynamicDAO.save(newsCopy);
+
+    IFolder folder = fTypesFactory.createFolder(null, null, "Folder");
+    IBookMark bookMark = fTypesFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark");
+    INewsBin newsBin = fTypesFactory.createNewsBin(null, folder, "NewsBin");
+    newsBin.addNews(newsCopy);
+    DynamicDAO.save(folder);
+
+    assertEquals(1, bookMark.getNewsCount(EnumSet.of(INews.State.NEW)));
+    assertEquals(1, newsBin.getNewsCount(EnumSet.of(INews.State.NEW)));
+
+    fNewsDAO.setState(Collections.singleton(newsCopy), INews.State.READ, false, false);
+
+    assertEquals(1, bookMark.getNewsCount(EnumSet.of(INews.State.NEW)));
+    assertEquals(0, newsBin.getNewsCount(EnumSet.of(INews.State.NEW)));
   }
 
   /**
