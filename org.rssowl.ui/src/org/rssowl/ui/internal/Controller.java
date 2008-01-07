@@ -722,7 +722,6 @@ public class Controller {
     /* Create the Cache-Service */
     if (!InternalOwl.TESTING) {
       fCacheService = new CacheService();
-      fCacheService.cacheRootFolders();
     }
 
     /* Create the News-Service */
@@ -761,10 +760,6 @@ public class Controller {
     /* Cancel the reload queue */
     if (!emergency)
       fReloadFeedQueue.cancel(false);
-
-    /* Stop the Cache-Service */
-    if (!InternalOwl.TESTING && !emergency)
-      fCacheService.stopService();
 
     /* Cancel the feed-save queue (join) */
     if (!emergency)
@@ -948,11 +943,7 @@ public class Controller {
     }
 
     /* Load all Root Folders */
-    Set<IFolder> rootFolders;
-    if (!InternalOwl.TESTING)
-      rootFolders = fCacheService.getRootFolders();
-    else
-      rootFolders = new HashSet<IFolder>(DynamicDAO.getDAO(IFolderDAO.class).loadRoots());
+    Set<IFolder> rootFolders = new HashSet<IFolder>(DynamicDAO.getDAO(IFolderDAO.class).loadRoots());
 
     /* 1.) Handle Folders and Marks from default Container */
     {

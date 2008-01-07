@@ -49,14 +49,16 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
-import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkLabelProvider;
 import org.rssowl.ui.internal.views.explorer.BookMarkSorter;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -135,7 +137,7 @@ public class FeedSelectionPage extends WizardPage {
     /* ContentProvider */
     fViewer.setContentProvider(new ITreeContentProvider() {
       public Object[] getElements(Object inputElement) {
-        Set<IFolder> rootFolders = Controller.getDefault().getCacheService().getRootFolders();
+        Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
         return rootFolders.toArray();
       }
 
@@ -207,7 +209,7 @@ public class FeedSelectionPage extends WizardPage {
     fViewer.setAllChecked(true);
 
     /* Set Checked Elements */
-    Set<IFolder> rootFolders = Controller.getDefault().getCacheService().getRootFolders();
+    Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
     for (IFolder folder : rootFolders) {
       setCheckedElements(folder, false);
     }

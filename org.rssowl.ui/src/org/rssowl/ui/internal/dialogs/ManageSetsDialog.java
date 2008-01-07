@@ -65,13 +65,12 @@ import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.event.FolderAdapter;
 import org.rssowl.core.persist.event.FolderEvent;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.ui.internal.Application;
-import org.rssowl.ui.internal.CacheService;
-import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.EntityPropertyDialogAction;
@@ -80,6 +79,7 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -101,7 +101,6 @@ public class ManageSetsDialog extends TitleAreaDialog {
   private Button fDeleteButton;
   private IFolder fSelectedSet;
   private FolderAdapter fFolderListener;
-  private CacheService fCacheService;
 
   /**
    * @param parentShell
@@ -111,7 +110,6 @@ public class ManageSetsDialog extends TitleAreaDialog {
     super(parentShell);
     fSelectedSet = selectedSet;
     fResources = new LocalResourceManager(JFaceResources.getResources());
-    fCacheService = Controller.getDefault().getCacheService();
   }
 
   /**
@@ -204,7 +202,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
     /* ContentProvider returns Root-Folders */
     fViewer.setContentProvider(new IStructuredContentProvider() {
       public Object[] getElements(Object inputElement) {
-        return fCacheService.getRootFolders().toArray();
+        return DynamicDAO.getDAO(IFolderDAO.class).loadRoots().toArray();
       }
 
       public void dispose() {}
@@ -298,7 +296,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
     });
 
     /* Pre-Select the current visible Set */
-    Set<IFolder> rootFolders = fCacheService.getRootFolders();
+    Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
     for (IFolder rootFolder : rootFolders) {
       if (rootFolder.equals(fSelectedSet)) {
         fViewer.setSelection(new StructuredSelection(rootFolder));
