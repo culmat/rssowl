@@ -57,7 +57,7 @@ public class SearchNotificationItem extends NotificationItem {
   public SearchNotificationItem(ISearchMark searchmark, int unreadResultCount) {
     super(makeText(searchmark, unreadResultCount), OwlUI.SEARCHMARK);
     fSearchmark = searchmark;
-    fTotalResultCount = fSearchmark.getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.READ, INews.State.UPDATED));
+    fTotalResultCount = fSearchmark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.READ, INews.State.UPDATED));
   }
 
   private static String makeText(ISearchMark searchmark, int unreadResultCount) {

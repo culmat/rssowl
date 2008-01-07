@@ -169,7 +169,7 @@ public class NotificationService {
     /* Create Items */
     List<NotificationItem> items = new ArrayList<NotificationItem>(filteredEvents.size());
     for (SearchMarkEvent event : filteredEvents)
-      items.add(new SearchNotificationItem(event.getEntity(), event.getEntity().getResultCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED))));
+      items.add(new SearchNotificationItem(event.getEntity(), event.getEntity().getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED))));
 
     /* Add into Buffer */
     if (!isPopupVisible())
