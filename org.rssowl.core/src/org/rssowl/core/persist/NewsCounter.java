@@ -89,6 +89,12 @@ public final class NewsCounter extends Persistable {
     return fCountersMap.remove(link.toString());
   }
 
+  /**
+   * Returns the number of new News for the feed with {@code feedLink}.
+   *
+   * @param feedLink The link of the Feed.
+   * @return the number of unread News for the Feed having the given link.
+   */
   public synchronized int getNewCount(URI feedLink) {
     NewsCounterItem counter = get(feedLink);
 
@@ -99,6 +105,12 @@ public final class NewsCounter extends Persistable {
     return counter.getNewCounter();
   }
 
+  /**
+   * Returns the number of new unread for the feed with {@code feedLink}.
+   *
+   * @param feedLink The link of the Feed.
+   * @return the number of unread News for the Feed having the given link.
+   */
   public synchronized int getUnreadCount(URI feedLink) {
     NewsCounterItem counter = get(feedLink);
 
@@ -107,5 +119,21 @@ public final class NewsCounter extends Persistable {
       return 0;
 
     return counter.getUnreadCounter();
+  }
+
+  /**
+   * Returns the number of sticky News for the feed with {@code feedLink}.
+   *
+   * @param feedLink The link of the Feed.
+   * @return the number of unread News for the Feed having the given link.
+   */
+  public synchronized int getStickyCount(URI feedLink) {
+    NewsCounterItem counter = get(feedLink);
+
+    /* Feed has no news */
+    if (counter == null)
+      return 0;
+
+    return counter.getStickyCounter();
   }
 }
