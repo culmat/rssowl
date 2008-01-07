@@ -72,7 +72,6 @@ import org.rssowl.core.tests.Activator;
 import org.rssowl.core.tests.TestUtils;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.TaskAdapter;
-import org.rssowl.ui.internal.CacheService;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.SavedSearchService;
 
@@ -289,9 +288,6 @@ public class PerformanceTest {
   List<ITask> getSavedSearchServiceTestTasks(final List<Exception> ex) {
     List<ITask> tasks = new ArrayList<ITask>();
 
-    /* Create Services */
-    final CacheService cacheService = new CacheService();
-
     /* Create Saved Searches */
     createSavedSearches();
 
@@ -303,7 +299,7 @@ public class PerformanceTest {
     tasks.add(new TaskAdapter() {
       public IStatus run(IProgressMonitor monitor) {
         try {
-          smService.updateSavedSearches(cacheService.getSearchMarks());
+          smService.updateSavedSearches(DynamicDAO.loadAll(ISearchMark.class));
           smService.stopService();
         } catch (Exception e) {
           ex.add(e);
