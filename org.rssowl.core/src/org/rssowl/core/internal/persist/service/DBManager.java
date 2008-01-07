@@ -39,7 +39,10 @@ import org.rssowl.core.internal.persist.NewsBin;
 import org.rssowl.core.internal.persist.Preference;
 import org.rssowl.core.internal.persist.migration.MigrationResult;
 import org.rssowl.core.internal.persist.migration.Migrations;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.NewsCounter;
+import org.rssowl.core.persist.NewsCounterItem;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.LoggingSafeRunnable;
@@ -66,7 +69,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -551,11 +557,15 @@ public class DBManager {
 
     monitor.worked(25);
 
+    NewsCounter newsCounter = new NewsCounter();
     for (Feed feed : sourceDb.query(Feed.class)) {
       sourceDb.activate(feed, Integer.MAX_VALUE);
+      addNewsCounterItem(newsCounter, feed);
       destinationDb.ext().set(feed, Integer.MAX_VALUE);
     }
+    destinationDb.ext().set(newsCounter, Integer.MAX_VALUE);
     monitor.worked(40);
+
     for (Preference pref : sourceDb.query(Preference.class)) {
       sourceDb.activate(pref, Integer.MAX_VALUE);
       destinationDb.ext().set(pref, Integer.MAX_VALUE);
@@ -570,6 +580,21 @@ public class DBManager {
     destinationDb.commit();
     destinationDb.close();
     monitor.worked(10);
+  }
+
+  private static void addNewsCounterItem(NewsCounter newsCounter, Feed feed) {
+    Map<State, Integer> stateToCountMap = feed.getNewsCount();
+    int unreadCount = getCount(stateToCountMap, EnumSet.of(State.NEW, State.UNREAD, State.READ));
+    Integer newCount = stateToCountMap.get(INews.State.NEW);
+    newsCounter.put(feed.getLink(), new NewsCounterItem(newCount, unreadCount, feed.getStickyCount()));
+  }
+
+  private static int getCount(Map<State, Integer> stateToCountMap, Set<State> states) {
+    int count = 0;
+    for (State state : states) {
+      count += stateToCountMap.get(state);
+    }
+    return count;
   }
 
   /**

@@ -32,6 +32,7 @@ import org.rssowl.core.persist.IImage;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ITextInput;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.util.ArrayUtils;
 import org.rssowl.core.util.MergeUtils;
@@ -43,8 +44,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -150,6 +153,29 @@ public class Feed extends AbstractEntity implements IFeed {
    */
   public synchronized List<INews> getNews() {
     return Collections.unmodifiableList(fNews);
+  }
+
+  public synchronized int getStickyCount() {
+    int count = 0;
+    for (INews news : fNews) {
+      if (news.isFlagged())
+        ++count;
+    }
+    return count;
+  }
+
+  public synchronized Map<State, Integer> getNewsCount() {
+    int[] counts = new int[State.values().length];
+    for (INews news : fNews) {
+      ++counts[news.getState().ordinal()];
+    }
+    Map<State, Integer> stateToCountMap = new EnumMap<State, Integer>(State.class);
+    int ordinal = 0;
+    for (int count : counts) {
+      stateToCountMap.put(State.getState(ordinal), count);
+      ++ordinal;
+    }
+    return stateToCountMap;
   }
 
   /*
