@@ -48,11 +48,13 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.dao.IFeedDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
+import org.rssowl.core.persist.dao.INewsCounterDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.event.BookMarkEvent;
 import org.rssowl.core.persist.event.BookMarkListener;
@@ -71,7 +73,6 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.tests.TestUtils;
 import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.NewsService;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -1216,7 +1217,7 @@ public class ApplicationLayerTest {
   public void testSetNewsStateOnPlanet() throws Exception {
     NewsListener newsListener = null;
     try {
-      NewsService service = Controller.getDefault().getNewsService();
+      NewsCounter newsCounter = DynamicDAO.getDAO(INewsCounterDAO.class).load();
 
       IFeed feed1 = fFactory.createFeed(null, new URI("http://www.feed.com"));
       IFeed feed2 = fFactory.createFeed(null, new URI("http://www.feed2.com"));
@@ -1233,10 +1234,10 @@ public class ApplicationLayerTest {
       feed1 = DynamicDAO.save(feed1);
       feed2 = DynamicDAO.save(feed2);
 
-      assertEquals(2, service.getUnreadCount(news1.getFeedReference()));
-      assertEquals(2, service.getNewCount(news1.getFeedReference()));
-      assertEquals(2, service.getUnreadCount(news2.getFeedReference()));
-      assertEquals(2, service.getNewCount(news2.getFeedReference()));
+      assertEquals(2, newsCounter.getUnreadCount(news1.getFeedReference().getLink()));
+      assertEquals(2, newsCounter.getNewCount(news1.getFeedReference().getLink()));
+      assertEquals(2, newsCounter.getUnreadCount(news2.getFeedReference().getLink()));
+      assertEquals(2, newsCounter.getNewCount(news2.getFeedReference().getLink()));
 
       final long feed1ID = feed1.getId();
       final long feed2ID = feed2.getId();
@@ -1271,10 +1272,10 @@ public class ApplicationLayerTest {
 
       Owl.getPersistenceService().getDAOService().getNewsDAO().setState(Arrays.asList(new INews[] { new NewsReference(news1ID).resolve() }), INews.State.READ, true, false);
 
-      assertEquals(1, service.getUnreadCount(news1.getFeedReference()));
-      assertEquals(1, service.getNewCount(news1.getFeedReference()));
-      assertEquals(1, service.getUnreadCount(news2.getFeedReference()));
-      assertEquals(1, service.getNewCount(news2.getFeedReference()));
+      assertEquals(1, newsCounter.getUnreadCount(news1.getFeedReference().getLink()));
+      assertEquals(1, newsCounter.getNewCount(news1.getFeedReference().getLink()));
+      assertEquals(1, newsCounter.getUnreadCount(news2.getFeedReference().getLink()));
+      assertEquals(1, newsCounter.getNewCount(news2.getFeedReference().getLink()));
     } finally {
       if (newsListener != null)
         DynamicDAO.removeEntityListener(INews.class, newsListener);

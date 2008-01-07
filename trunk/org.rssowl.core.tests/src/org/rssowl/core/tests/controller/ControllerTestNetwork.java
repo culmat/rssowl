@@ -34,13 +34,14 @@ import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsCounterDAO;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.NewsService;
 
 import java.net.URI;
 
@@ -115,19 +116,20 @@ public class ControllerTestNetwork {
     assertEquals(true, new BookMarkReference(bookmark.getId()).resolve().isErrorLoading());
   }
 
+  private NewsCounter loadNewsCounter() {
+    return DynamicDAO.getDAO(INewsCounterDAO.class).load();
+  }
+
   private int getNewCount(IFeed feed) {
-    NewsService service = Controller.getDefault().getNewsService();
-    return service.getNewCount(new FeedLinkReference(feed.getLink()));
+    return loadNewsCounter().getNewCount(feed.getLink());
   }
 
   private int getUnreadCount(IFeed feed) {
-    NewsService service = Controller.getDefault().getNewsService();
-    return service.getUnreadCount(new FeedLinkReference(feed.getLink()));
+    return loadNewsCounter().getUnreadCount(feed.getLink());
   }
 
   private int getStickyCount(IFeed feed) {
-    NewsService service = Controller.getDefault().getNewsService();
-    return service.getStickyCount(new FeedLinkReference(feed.getLink()));
+    return loadNewsCounter().getStickyCount(feed.getLink());
   }
 
   /**
