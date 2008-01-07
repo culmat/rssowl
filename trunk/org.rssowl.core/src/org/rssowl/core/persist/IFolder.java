@@ -24,6 +24,8 @@
 
 package org.rssowl.core.persist;
 
+import org.rssowl.core.persist.reference.FolderReference;
+
 import java.net.URI;
 import java.util.List;
 
@@ -183,4 +185,6 @@ public interface IFolder extends IFolderChild {
    * @param blogrollLink the Link to the Blogroll this Folder is pointing to.
    */
   void setBlogrollLink(URI blogrollLink);
+
+  FolderReference toReference();
 }

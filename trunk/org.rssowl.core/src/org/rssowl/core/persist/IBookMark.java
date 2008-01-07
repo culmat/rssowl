@@ -24,6 +24,7 @@
 
 package org.rssowl.core.persist;
 
+import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 
 /**
@@ -62,4 +63,6 @@ public interface IBookMark extends INewsMark {
    * @param feedLinkRef
    */
   void setFeedLinkReference(FeedLinkReference feedLinkRef);
+
+  BookMarkReference toReference();
 }

@@ -24,11 +24,13 @@
 
 package org.rssowl.core.persist;
 
+import org.rssowl.core.persist.reference.LabelReference;
+
 /**
  * A Label for a News. Some predefined Labels could be "Important", "Work",
  * "Personal", "Todo". Labels should be added by the user and be shown in a
  * custom Color. Labels could also be used to represent AmphetaRate ratings.
- * 
+ *
  * @author bpasero
  */
 public interface ILabel extends IEntity {
@@ -41,29 +43,31 @@ public interface ILabel extends IEntity {
 
   /**
    * The format to use here is "R,G,B" for example "255,255,127".
-   * 
+   *
    * @return The Color of the Label as RGB.
    */
   String getColor();
 
   /**
    * Get the Name of this Label.
-   * 
+   *
    * @return The name of this Label.
    */
   String getName();
 
   /**
    * The format to use here is "R,G,B" for example "255,255,127".
-   * 
+   *
    * @param color The Color of the Label as RGB.
    */
   void setColor(String color);
 
   /**
    * Set the Name of this Label.
-   * 
+   *
    * @param name The name of this Label.
    */
   void setName(String name);
+
+  LabelReference toReference();
 }

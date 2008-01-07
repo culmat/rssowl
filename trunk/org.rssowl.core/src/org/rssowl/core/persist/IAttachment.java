@@ -24,11 +24,13 @@
 
 package org.rssowl.core.persist;
 
+import org.rssowl.core.persist.reference.AttachmentReference;
+
 import java.net.URI;
 
 /**
  * The super-type of all Attachment Elements in Feeds.
- * 
+ *
  * @author bpasero
  */
 public interface IAttachment extends IEntity, MergeCapable<IAttachment>, Reparentable<INews> {
@@ -52,7 +54,7 @@ public interface IAttachment extends IEntity, MergeCapable<IAttachment>, Reparen
    * <li>Atom</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param link The URI pointing to where the enclosure is located to set.
    */
   void setLink(URI link);
@@ -67,7 +69,7 @@ public interface IAttachment extends IEntity, MergeCapable<IAttachment>, Reparen
    * <li>Atom</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param type The standard MIME Type of the Attachment to set.
    */
   void setType(String type);
@@ -82,36 +84,38 @@ public interface IAttachment extends IEntity, MergeCapable<IAttachment>, Reparen
    * <li>Atom</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param length The size of the Attachment in Bytes to set.
    */
   void setLength(int length);
 
   /**
    * The size of the Attachment in Bytes.
-   * 
+   *
    * @return Returns te size of the Attachment in Bytes.
    */
   int getLength();
 
   /**
    * The standard MIME Type of the Attachment.
-   * 
+   *
    * @return Returns the standard MIME Type of the Attachment.
    */
   String getType();
 
   /**
    * A URI pointing to where the Attachment is located.
-   * 
+   *
    * @return Returns a URI pointing to where the Attachment is located.
    */
   URI getLink();
 
   /**
    * The News this Attachment belongs to.
-   * 
+   *
    * @return Returns the News this Attachment belongs to.
    */
   INews getNews();
+
+  AttachmentReference toReference();
 }
