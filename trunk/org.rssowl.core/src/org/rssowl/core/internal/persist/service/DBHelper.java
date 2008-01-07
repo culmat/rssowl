@@ -33,8 +33,10 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPersistable;
+import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.INewsBin.StatesUpdateInfo;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsCounterDAO;
 import org.rssowl.core.persist.event.FeedEvent;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.NewsBinEvent;
@@ -232,10 +234,16 @@ public class DBHelper {
       feedRefs.add(news.getFeedReference());
       db.delete(news);
     }
+    NewsCounter newsCounter = DynamicDAO.getDAO(INewsCounterDAO.class).load();
+    boolean changed = false;
     for (FeedLinkReference feedRef : feedRefs) {
-      if ((countBookMarkReference(db, feedRef) == 0) && !feedHasNewsWithCopies(db, feedRef))
+      if ((countBookMarkReference(db, feedRef) == 0) && !feedHasNewsWithCopies(db, feedRef)) {
           db.delete(feedRef.resolve());
+          newsCounter.remove(feedRef.getLink());
+          changed = true;
+      }
     }
+    db.ext().set(newsCounter, Integer.MAX_VALUE);
   }
 
   static int countBookMarkReference(ObjectContainer db, FeedLinkReference feedRef) {
@@ -254,7 +262,7 @@ public class DBHelper {
   static boolean feedHasNewsWithCopies(ObjectContainer db, FeedLinkReference feedRef) {
     Query query = db.query();
     query.constrain(News.class);
-    query.descend("fLinkLink").constrain(feedRef.getLink().toString());
+    query.descend("fFeedLink").constrain(feedRef.getLink().toString());
     query.descend("fCopy").constrain(true);
     return !query.execute().isEmpty();
   }
