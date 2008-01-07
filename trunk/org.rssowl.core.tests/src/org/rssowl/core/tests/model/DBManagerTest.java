@@ -124,6 +124,7 @@ public class DBManagerTest {
   private static final String NOT_IDENTICAL_MESSAGE = "Item in the database is not identical to initial item.";
   private IModelFactory fTypesFactory;
   private ObjectContainer fDb;
+  private INewsDAO fNewsDAO;
 
   /**
    * @throws Exception
@@ -135,6 +136,37 @@ public class DBManagerTest {
     Controller.getDefault().getNewsService().testDirtyShutdown();
     fTypesFactory = Owl.getModelFactory();
     fDb = DBManager.getDefault().getObjectContainer();
+    fNewsDAO = DynamicDAO.getDAO(INewsDAO.class);
+  }
+
+  /**
+   * Tests that news copy is actually deleted and removed from INewsBin
+   * when it's saved after changing state to DELETED.
+   */
+  @Test
+  public void testNewsIsCopyActuallyDeletedOnDeleteStateChange() {
+    IFeed feed = createFeed();
+    INews news = fTypesFactory.createNews(null, feed, new Date());
+    fTypesFactory.createGuid(news, "http://www.link.com", true);
+    DynamicDAO.save(feed);
+    INews newsCopy = fTypesFactory.createNews(news);
+    DynamicDAO.save(newsCopy);
+
+    DynamicDAO.getDAO(INewsDAO.class).setState(Collections.singleton(news), INews.State.DELETED, true, true);
+
+    IFolder folder = fTypesFactory.createFolder(null, null, "Folder");
+    fTypesFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark");
+    INewsBin newsBin = fTypesFactory.createNewsBin(null, folder, "NewsBin");
+    newsBin.addNews(newsCopy);
+    DynamicDAO.save(folder);
+
+    fNewsDAO.setState(Collections.singleton(newsCopy), INews.State.HIDDEN, true, true);
+    assertEquals(1, newsBin.getNewsRefs().size());
+    assertEquals(newsCopy, newsBin.getNews().get(0));
+
+    fNewsDAO.setState(Collections.singleton(newsCopy), INews.State.DELETED, true, true);
+    assertEquals(0, newsBin.getNewsRefs().size());
+    assertNull(fNewsDAO.load(newsCopy.getId()));
   }
 
   /**
@@ -151,7 +183,7 @@ public class DBManagerTest {
     INews newsCopy = fTypesFactory.createNews(news);
     DynamicDAO.save(newsCopy);
 
-    DynamicDAO.getDAO(INewsDAO.class).setState(Collections.singleton(news), INews.State.DELETED, true, true);
+    fNewsDAO.setState(Collections.singleton(news), INews.State.DELETED, true, true);
 
     IFolder folder = fTypesFactory.createFolder(null, null, "Folder");
     IBookMark mark = fTypesFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark");
