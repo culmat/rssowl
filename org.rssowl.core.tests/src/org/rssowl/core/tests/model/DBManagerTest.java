@@ -151,6 +151,8 @@ public class DBManagerTest {
     INews newsCopy = fTypesFactory.createNews(news);
     DynamicDAO.save(newsCopy);
 
+    DynamicDAO.getDAO(INewsDAO.class).setState(Collections.singleton(news), INews.State.DELETED, true, true);
+
     IFolder folder = fTypesFactory.createFolder(null, null, "Folder");
     IBookMark mark = fTypesFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark");
     INewsBin newsBin = fTypesFactory.createNewsBin(null, folder, "NewsBin");
