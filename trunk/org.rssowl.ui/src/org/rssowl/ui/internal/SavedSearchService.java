@@ -199,7 +199,7 @@ public class SavedSearchService {
       }
 
       /* Set Result */
-      Pair<Boolean, Boolean> result = searchMark.setResult(resultsMap);
+      Pair<Boolean, Boolean> result = searchMark.setNewsRefs(resultsMap);
       boolean changed = result.getFirst();
       boolean newNewsAdded = result.getSecond();
 
