@@ -35,9 +35,9 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.INewsBin.StatesUpdateInfo;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.INewsBinDAO;
 import org.rssowl.core.persist.event.FeedEvent;
 import org.rssowl.core.persist.event.ModelEvent;
+import org.rssowl.core.persist.event.NewsBinEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.runnable.EventRunnable;
 import org.rssowl.core.persist.event.runnable.FeedEventRunnable;
@@ -211,12 +211,12 @@ public class DBHelper {
       }
     }
     if (!statesUpdateInfos.isEmpty()) {
-      INewsBinDAO newsBinDao = DynamicDAO.getDAO(INewsBinDAO.class);
       List<NewsReference> removedNewsRefs = new ArrayList<NewsReference>();
       for (INewsBin newsBin : DynamicDAO.loadAll(INewsBin.class)) {
         if (newsBin.updateNewsStates(statesUpdateInfos)) {
           removedNewsRefs.addAll(newsBin.removeNews(EnumSet.of(INews.State.HIDDEN)));
-          newsBinDao.save(newsBin);
+          putEventTemplate(new NewsBinEvent(newsBin, null, true));
+          db.ext().set(newsBin, Integer.MAX_VALUE);
         }
       }
       removeNewsAndFeedsAfterNewsBinUpdate(db, removedNewsRefs);
@@ -226,14 +226,12 @@ public class DBHelper {
   static void removeNewsAndFeedsAfterNewsBinUpdate(ObjectContainer db,
       List<NewsReference> removedNewsRefs) {
 
-    List<INews> removedNews = new ArrayList<INews>(removedNewsRefs.size());
-    Set<FeedLinkReference> feedRefs = new HashSet<FeedLinkReference>(removedNews.size());
+    Set<FeedLinkReference> feedRefs = new HashSet<FeedLinkReference>(removedNewsRefs.size());
     for (NewsReference newsRef : removedNewsRefs) {
       INews news = newsRef.resolve();
       feedRefs.add(news.getFeedReference());
-      removedNews.add(news);
+      db.delete(news);
     }
-    DynamicDAO.deleteAll(removedNews);
     for (FeedLinkReference feedRef : feedRefs) {
       if ((countBookMarkReference(db, feedRef) == 0) && !feedHasNewsWithCopies(db, feedRef))
           db.delete(feedRef.resolve());
