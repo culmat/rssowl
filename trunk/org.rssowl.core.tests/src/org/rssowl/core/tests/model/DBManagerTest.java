@@ -140,6 +140,51 @@ public class DBManagerTest {
     fNewsDAO = DynamicDAO.getDAO(INewsDAO.class);
   }
 
+  /**
+   * Tests that deleting a INews.isCopy() will cause either:
+   *
+   * <li>The original feed not to be deleted if it is referenced by a BM or
+   * another INews.isCopy()</li>
+   * <li>The original feed to be deleted otherwise.</li>
+   */
+  @Test
+  public void testDeleteNewsIsCopy() {
+    IFeed feed = createFeed();
+    INews news = fTypesFactory.createNews(null, feed, new Date());
+    fTypesFactory.createGuid(news, "http://www.link.com", true);
+    DynamicDAO.save(feed);
+    INews newsCopy = fTypesFactory.createNews(news);
+    DynamicDAO.save(newsCopy);
+
+    IFolder folder = fTypesFactory.createFolder(null, null, "Folder");
+    IBookMark bookMark = fTypesFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark");
+    INewsBin newsBin = fTypesFactory.createNewsBin(null, folder, "NewsBin");
+    newsBin.addNews(newsCopy);
+    DynamicDAO.save(folder);
+
+    /* Feed referenced by bookMark and newsCopy */
+    fNewsDAO.setState(Collections.singleton(newsCopy), INews.State.DELETED, false, false);
+    assertEquals(feed, DynamicDAO.load(IFeed.class, feed.getId()));
+
+    newsCopy = fTypesFactory.createNews(news);
+    fNewsDAO.save(newsCopy);
+    newsBin.addNews(newsCopy);
+    DynamicDAO.save(newsBin);
+
+    DynamicDAO.delete(bookMark);
+    INews newsCopy2 = fTypesFactory.createNews(newsCopy);
+    DynamicDAO.save(newsCopy2);
+    fTypesFactory.createNewsBin(null, folder, "NewsBin2");
+    DynamicDAO.save(folder);
+
+    /* Feed referenced by newsCopy and newsCopy2 */
+    fNewsDAO.setState(Collections.singleton(newsCopy), INews.State.DELETED, false, false);
+    assertEquals(feed, DynamicDAO.load(IFeed.class, feed.getId()));
+
+    /* Feed referenced by newsCopy2 which is being deleted */
+    fNewsDAO.setState(Collections.singleton(newsCopy2), INews.State.DELETED, false, false);
+    assertEquals(feed, DynamicDAO.load(IFeed.class, feed.getId()));
+  }
 
   /**
    * Tests that changing the state of a INews#isCopy() does not update the
@@ -171,7 +216,9 @@ public class DBManagerTest {
 
   /**
    * Tests that news copy is actually deleted and removed from INewsBin
-   * when it's saved after changing state to DELETED.
+   * when it's saved after changing state to DELETED. Also checks that
+   * INewsBin is updated if the state of the INews contained in it is changed
+   * to HIDDEN.
    */
   @Test
   public void testNewsIsCopyActuallyDeletedOnDeleteStateChange() {
@@ -182,8 +229,6 @@ public class DBManagerTest {
     INews newsCopy = fTypesFactory.createNews(news);
     DynamicDAO.save(newsCopy);
 
-    DynamicDAO.getDAO(INewsDAO.class).setState(Collections.singleton(news), INews.State.DELETED, true, true);
-
     IFolder folder = fTypesFactory.createFolder(null, null, "Folder");
     fTypesFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark");
     INewsBin newsBin = fTypesFactory.createNewsBin(null, folder, "NewsBin");
@@ -192,6 +237,8 @@ public class DBManagerTest {
 
     fNewsDAO.setState(Collections.singleton(newsCopy), INews.State.HIDDEN, true, true);
     assertEquals(1, newsBin.getNewsRefs().size());
+    assertEquals(1, newsBin.getNewsRefs(EnumSet.of(INews.State.HIDDEN)).size());
+    assertEquals(0, newsBin.getNewsRefs(EnumSet.of(INews.State.NEW)).size());
     assertEquals(newsCopy, newsBin.getNews().get(0));
 
     fNewsDAO.setState(Collections.singleton(newsCopy), INews.State.DELETED, true, true);
@@ -222,6 +269,7 @@ public class DBManagerTest {
     DynamicDAO.save(folder);
 
     DynamicDAO.delete(mark);
+    assertEquals(0, feed.getNews().size());
     assertEquals(1, newsBin.getNewsRefs().size());
     assertEquals(newsCopy, newsBin.getNews().get(0));
   }
