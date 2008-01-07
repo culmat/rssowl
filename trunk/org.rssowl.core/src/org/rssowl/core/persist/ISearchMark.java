@@ -30,7 +30,6 @@ import org.rssowl.core.util.Pair;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * A SearchMark acts like a virtual folder. The user defines some criteria, e.g.
@@ -56,8 +55,8 @@ public interface ISearchMark extends INewsMark {
    * of <code>NewsReference</code>s that represent the news that match the
    * search.
    * <p>
-   * Note: Any INews.State that is not included in the map will default to 0 as
-   * result value.
+   * Note: Any INews.State that is not included in the map will default to an
+   * an empty List as the result value.
    * </p>
    *
    * @param results The results are represented by a non-null Map (typically an
@@ -69,42 +68,7 @@ public interface ISearchMark extends INewsMark {
    * {@link Boolean} indicates if there is any *new* news that where added with
    * the new result.
    */
-  Pair<Boolean, Boolean> setResult(Map<INews.State, List<NewsReference>> results);
-
-  /**
-   * Returns a List of all visible news that match this search mark's
-   * conditions. To reduce the memory impact of this method, the news are
-   * returned as <code>NewsReference</code>.
-   *
-   * @return Returns a List of all news that match this search mark's
-   * conditions. To reduce the memory impact of this method, the news are
-   * returned as <code>NewsReference</code>.
-   */
-  List<NewsReference> getResult();
-
-  /**
-   * Returns a List of all news that match this search mark's conditions and the
-   * provided <code>INews.State</code>. To reduce the memory impact of this
-   * method, the news are returned as <code>NewsReference</code>.
-   *
-   * @param states A Set (typically an EnumSet) of <code>INews.State</code>
-   * that the resulting news must have.
-   * @return Returns a List of all news that match this search mark's conditions
-   * and the provided <code>INews.State</code>. To reduce the memory impact
-   * of this method, the news are returned as <code>NewsReference</code>.
-   */
-  List<NewsReference> getResult(Set<INews.State> states);
-
-  /**
-   * Returns the number of news that match this search mark's conditions and the
-   * provided <code>INews.State</code>.
-   *
-   * @param states A Set (typically an EnumSet) of <code>INews.State</code>
-   * that the resulting news must have.
-   * @return Returns the number of news that match this search mark's conditions
-   * and the provided <code>INews.State</code>.
-   */
-  int getResultCount(Set<INews.State> states);
+  Pair<Boolean, Boolean> setNewsRefs(Map<INews.State, List<NewsReference>> results);
 
   /**
    * Adds a <code>ISearchCondition</code> to the list of conditions this
