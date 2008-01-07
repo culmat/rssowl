@@ -37,9 +37,38 @@ public interface INewsMark extends IMark    {
 
   List<INews> getNews(Set<INews.State> states);
 
+  /**
+   * Returns a List of all news contained in this INewsMark. To reduce the
+   * memory impact of this method, the news are returned as
+   * <code>NewsReference</code>.
+   *
+   * @return Returns a List of all news contained in this INewsMark. To reduce
+   * the memory impact of this method, the news are returned as
+   * <code>NewsReference</code>.
+   */
   List<NewsReference> getNewsRefs();
 
+  /**
+   * Returns a List of all news contained in this INewsMark. To reduce the
+   * memory impact of this method, the news are returned as
+   * <code>NewsReference</code>.
+   *
+   * @param states A Set (typically an EnumSet) of <code>INews.State</code>
+   * that the resulting news must have.
+   * @return Returns a List of all news contained in this INewsMark. To reduce
+   * the memory impact of this method, the news are returned as
+   * <code>NewsReference</code>.
+   */
   List<NewsReference> getNewsRefs(Set<INews.State> states);
 
+  /**
+   * Returns the number of news that contained in this INewsMark in the
+   * provided <code>INews.State</code>s.
+   *
+   * @param states A Set (typically an EnumSet) of <code>INews.State</code>
+   * of the INews that should be included in the count.
+   * @return the number of news that contained in this INewsMark in the
+   * provided <code>INews.State</code>s.
+   */
   int getNewsCount(Set<INews.State> states);
 }
