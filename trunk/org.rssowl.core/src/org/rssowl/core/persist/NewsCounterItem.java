@@ -46,6 +46,15 @@ public final class NewsCounterItem extends Persistable {
   /** Default constructor for reflection */
   public NewsCounterItem() {}
 
+  public NewsCounterItem(int newCounter, int unreadCounter, int stickyCounter) {
+    Assert.isLegal(newCounter >= 0, "newCounter should be >= 0");
+    Assert.isLegal(unreadCounter >= 0, "unreadCounter should be >= 0");
+    Assert.isLegal(stickyCounter >= 0, "stickyCounter should be >= 0");
+    fNewCounter = newCounter;
+    fUnreadCounter = unreadCounter;
+    fStickyCounter = stickyCounter;
+  }
+
   /**
    * @return Returns the value of *new* News contained in the feed.
    */
