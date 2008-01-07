@@ -216,7 +216,7 @@ public class DBHelper {
       List<NewsReference> removedNewsRefs = new ArrayList<NewsReference>();
       for (INewsBin newsBin : DynamicDAO.loadAll(INewsBin.class)) {
         if (newsBin.updateNewsStates(statesUpdateInfos)) {
-          removedNewsRefs.addAll(newsBin.removeNews(EnumSet.of(INews.State.HIDDEN)));
+          removedNewsRefs.addAll(newsBin.removeNews(EnumSet.of(INews.State.DELETED)));
           putEventTemplate(new NewsBinEvent(newsBin, null, true));
           db.ext().set(newsBin, Integer.MAX_VALUE);
         }
