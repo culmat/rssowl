@@ -38,7 +38,9 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsCounterDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.event.AttachmentEvent;
 import org.rssowl.core.persist.event.AttachmentListener;
@@ -1430,12 +1432,16 @@ public class ReloadTestLocal {
     }
   }
 
+  private NewsCounter loadNewsCounter() {
+    return DynamicDAO.getDAO(INewsCounterDAO.class).load();
+  }
+
   private int getNewCount(IFeed feed) {
-    return fService.getNewCount(new FeedLinkReference(feed.getLink()));
+    return loadNewsCounter().getNewCount(feed.getLink());
   }
 
   private int getUnreadCount(IFeed feed) {
-    return fService.getUnreadCount(new FeedLinkReference(feed.getLink()));
+    return loadNewsCounter().getUnreadCount(feed.getLink());
   }
 
   @Test
