@@ -43,10 +43,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
-import org.rssowl.core.persist.reference.FeedLinkReference;
-import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
-import org.rssowl.ui.internal.NewsService;
 import org.rssowl.ui.internal.OwlUI;
 
 import java.util.EnumSet;
@@ -59,9 +56,6 @@ public class BookMarkLabelProvider extends CellLabelProvider {
 
   /* Resource Manager */
   private LocalResourceManager fResources;
-
-  /* News Service */
-  private NewsService fNewsService;
 
   /* Commonly used Resources */
   private Image fFolderIcon;
@@ -91,7 +85,6 @@ public class BookMarkLabelProvider extends CellLabelProvider {
   public BookMarkLabelProvider(boolean indicateState) {
     fIndicateState = indicateState;
     fResources = new LocalResourceManager(JFaceResources.getResources());
-    fNewsService = Controller.getDefault().getNewsService();
     createResources();
   }
 
@@ -193,10 +186,8 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       cell.setText(str.toString());
 
       /* Background for IBookMark (TODO Support All) */
-      if (newsmark instanceof IBookMark && fIndicateState) {
-        FeedLinkReference feedLinkRef = ((IBookMark) newsmark).getFeedLinkReference();
-        stickyNewsCount = getStickyNewsCount(feedLinkRef);
-      }
+      if (newsmark instanceof IBookMark && fIndicateState)
+        stickyNewsCount = getStickyNewsCount((IBookMark) newsmark);
 
       /* Background Color */
       if (stickyNewsCount > 0)
@@ -324,7 +315,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     return newsMark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
   }
 
-  private int getStickyNewsCount(FeedLinkReference feedRef) {
-    return fNewsService.getStickyCount(feedRef);
+  private int getStickyNewsCount(IBookMark bookMark) {
+    return bookMark.getStickyNewsCount();
   }
 }

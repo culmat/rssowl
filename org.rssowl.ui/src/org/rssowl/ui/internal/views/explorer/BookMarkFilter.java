@@ -36,9 +36,6 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.event.ModelEvent;
-import org.rssowl.core.persist.reference.FeedLinkReference;
-import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.NewsService;
 import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.util.StringMatcher;
 
@@ -100,9 +97,6 @@ public class BookMarkFilter extends ViewerFilter {
 
   /* Current Search Target */
   private SearchTarget fSearchTarget = SearchTarget.NAME;
-
-  /* News-Service */
-  private NewsService fNewsService = Controller.getDefault().getNewsService();
 
   /*
    * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer,
@@ -328,7 +322,7 @@ public class BookMarkFilter extends ViewerFilter {
         case SHOW_STICKY:
           if (newsmark instanceof IBookMark) {
             IBookMark bookmark = (IBookMark) newsmark;
-            isMatch = hasStickyNews(bookmark.getFeedLinkReference());
+            isMatch = hasStickyNews(bookmark);
           }
           break;
 
@@ -356,8 +350,8 @@ public class BookMarkFilter extends ViewerFilter {
     return false;
   }
 
-  private boolean hasStickyNews(FeedLinkReference feedRef) {
-    return fNewsService.getStickyCount(feedRef) > 0;
+  private boolean hasStickyNews(IBookMark bookmark) {
+    return bookmark.getStickyNewsCount() > 0;
   }
 
   /**
