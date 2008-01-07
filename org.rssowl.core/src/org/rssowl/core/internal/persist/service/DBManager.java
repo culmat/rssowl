@@ -584,7 +584,7 @@ public class DBManager {
 
   private static void addNewsCounterItem(NewsCounter newsCounter, Feed feed) {
     Map<State, Integer> stateToCountMap = feed.getNewsCount();
-    int unreadCount = getCount(stateToCountMap, EnumSet.of(State.NEW, State.UNREAD, State.READ));
+    int unreadCount = getCount(stateToCountMap, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED));
     Integer newCount = stateToCountMap.get(INews.State.NEW);
     newsCounter.put(feed.getLink(), new NewsCounterItem(newCount, unreadCount, feed.getStickyCount()));
   }
