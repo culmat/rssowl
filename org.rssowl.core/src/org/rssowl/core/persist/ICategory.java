@@ -24,6 +24,8 @@
 
 package org.rssowl.core.persist;
 
+import org.rssowl.core.persist.reference.CategoryReference;
+
 /**
  * The super-type of all Category Elements in Feeds.
  *
@@ -84,4 +86,6 @@ public interface ICategory extends IEntity, MergeCapable<ICategory> {
    * @return Returns the name of this category.
    */
   String getName();
+
+  CategoryReference toReference();
 }

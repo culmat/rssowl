@@ -25,6 +25,7 @@
 package org.rssowl.core.persist;
 
 import org.rssowl.core.internal.persist.MergeResult;
+import org.rssowl.core.persist.reference.FeedReference;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -771,4 +772,6 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * @see INews.State#DELETED
    */
   boolean removeNews(INews news);
+
+  FeedReference toReference();
 }

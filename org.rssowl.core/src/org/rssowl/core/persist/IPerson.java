@@ -24,11 +24,13 @@
 
 package org.rssowl.core.persist;
 
+import org.rssowl.core.persist.reference.PersonReference;
+
 import java.net.URI;
 
 /**
  * The super-type of all Person Elements in Feeds.
- * 
+ *
  * @author bpasero
  */
 public interface IPerson extends IEntity, MergeCapable<IPerson> {
@@ -53,7 +55,7 @@ public interface IPerson extends IEntity, MergeCapable<IPerson> {
    * <li>Atom</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param name The Human-readable name for the person to set.
    */
   void setName(String name);
@@ -66,7 +68,7 @@ public interface IPerson extends IEntity, MergeCapable<IPerson> {
    * <li>Atom</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param uri The Internationalized Resource Identifier associated with the
    * person to set.
    */
@@ -81,21 +83,21 @@ public interface IPerson extends IEntity, MergeCapable<IPerson> {
    * <li>OPML 1.0</li>
    * </ul>
    * </p>
-   * 
+   *
    * @param email an e-mail address associated with the person to set.
    */
   void setEmail(URI email);
 
   /**
    * Get the Human-readable name for the person
-   * 
+   *
    * @return The Human-readable name for the person
    */
   String getName();
 
   /**
    * Get the Internationalized Resource Identifier associated with the person
-   * 
+   *
    * @return The Internationalized Resource Identifier associated with the
    * person
    */
@@ -103,8 +105,10 @@ public interface IPerson extends IEntity, MergeCapable<IPerson> {
 
   /**
    * Get the e-mail address associated with the person
-   * 
+   *
    * @return an e-mail address associated with the person
    */
   URI getEmail();
+
+  PersonReference toReference();
 }

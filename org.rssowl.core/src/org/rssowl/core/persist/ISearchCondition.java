@@ -24,6 +24,8 @@
 
 package org.rssowl.core.persist;
 
+import org.rssowl.core.persist.reference.SearchConditionReference;
+
 /**
  * <p>
  * Instances of <code>ISearchCondition</code> are grouped under a single
@@ -130,4 +132,6 @@ public interface ISearchCondition extends IEntity {
    * @param value Sets the value for matching News on the given search field.
    */
   void setValue(Object value);
+
+  SearchConditionReference toReference();
 }

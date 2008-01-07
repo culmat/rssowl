@@ -25,6 +25,7 @@
 package org.rssowl.core.persist;
 
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.Pair;
 
 import java.util.List;
@@ -155,4 +156,6 @@ public interface ISearchMark extends INewsMark {
    * OR.
    */
   void setMatchAllConditions(boolean matchAllConditions);
+
+  SearchMarkReference toReference();
 }

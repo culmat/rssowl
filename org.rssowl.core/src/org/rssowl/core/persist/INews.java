@@ -25,6 +25,7 @@
 package org.rssowl.core.persist;
 
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.persist.reference.NewsReference;
 
 import java.net.URI;
 import java.util.Collections;
@@ -559,4 +560,6 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
    * in the original IFeed and are usually part of INewsBins.
    */
   boolean isCopy();
+
+  NewsReference toReference();
 }
