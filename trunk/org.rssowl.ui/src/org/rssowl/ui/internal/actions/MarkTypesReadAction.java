@@ -46,7 +46,6 @@ import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.NewsService;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.ModelUtils;
 
@@ -64,7 +63,6 @@ import java.util.Map.Entry;
  */
 public class MarkTypesReadAction extends Action implements IWorkbenchWindowActionDelegate {
   private IStructuredSelection fSelection;
-  private NewsService fNewsService;
   private INewsDAO fNewsDao;
 
   /**
@@ -79,7 +77,6 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
    */
   public MarkTypesReadAction(IStructuredSelection selection) {
     fSelection = selection;
-    fNewsService = Controller.getDefault().getNewsService();
     fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
   }
 
@@ -195,7 +192,7 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
   }
 
   private boolean containsUnread(IBookMark mark) {
-    return fNewsService.getUnreadCount(mark.getFeedLinkReference()) != 0;
+    return mark.getNewsCount(EnumSet.of(INews.State.NEW)) > 0;
   }
 
   private void fillNews(IBookMark bookmark, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap) {

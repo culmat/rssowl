@@ -38,7 +38,6 @@ import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.NewsCounterItem;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsCounterDAO;
-import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -62,9 +61,6 @@ import java.util.List;
  * @author bpasero
  */
 public class NewsService {
-
-  /* The Counter for various aspects of News, the key is the feed link */
-  private NewsCounter fCounter;
 
   /* Delay before Progress is shown */
   private static final int SHOW_PROGRESS_THRESHOLD = 2000;
@@ -104,67 +100,7 @@ public class NewsService {
 
   NewsService() {
     fNewsCounterDao = DynamicDAO.getDAO(INewsCounterDAO.class);
-    NewsCounter counter = loadCounter();
-    synchronized (counter) {
-      fCounter = counter;
-    }
-  }
-
-  /**
-   * Returns the number of unread News for the Feed referenced by
-   * <code>feedLinkRef</code>.
-   *
-   * @param feedLinkRef The reference to the link of the Feed.
-   * @return the number of unread News for the Feed having the given Id.
-   */
-  public int getUnreadCount(FeedLinkReference feedLinkRef) {
-    synchronized (fCounter) {
-      NewsCounterItem counter = getFromCounter(feedLinkRef);
-
-      /* Feed has no news */
-      if (counter == null)
-        return 0;
-
-      return counter.getUnreadCounter();
-    }
-  }
-
-  /**
-   * Returns the number of new News for the Feed referenced by
-   * <code>feedLinkRef</code>.
-   *
-   * @param feedLinkRef The reference to the link of the Feed.
-   * @return the number of unread News for the Feed having the given link.
-   */
-  public int getNewCount(FeedLinkReference feedLinkRef) {
-    synchronized (fCounter) {
-      NewsCounterItem counter = getFromCounter(feedLinkRef);
-
-      /* Feed has no news */
-      if (counter == null)
-        return 0;
-
-      return counter.getNewCounter();
-    }
-  }
-
-  /**
-   * Returns the number of sticky News for the Feed referenced by
-   * <code>feedLinkRef</code>.
-   *
-   * @param feedLinkRef The reference to the link of the Feed.
-   * @return the number of sticky News for the Feed having the given Id.
-   */
-  public int getStickyCount(FeedLinkReference feedLinkRef) {
-    synchronized (fCounter) {
-      NewsCounterItem counter = getFromCounter(feedLinkRef);
-
-      /* Feed has no news */
-      if (counter == null)
-        return 0;
-
-      return counter.getStickyCounter();
-    }
+    createAndSaveCounterIfNecessary();
   }
 
   /**
@@ -178,13 +114,10 @@ public class NewsService {
    * Method only used by Tests!
    */
   public void testDirtyShutdown() {
-    NewsCounter counter = loadCounter();
-    synchronized (counter) {
-     fCounter = counter;
-    }
+    createAndSaveCounterIfNecessary();
   }
 
-  private NewsCounter loadCounter() {
+  private NewsCounter createAndSaveCounterIfNecessary() {
 
     /* Load from DB */
     NewsCounter counter = fNewsCounterDao.load();
@@ -245,10 +178,6 @@ public class NewsService {
     }
 
     return newsCounter;
-  }
-
-  private NewsCounterItem getFromCounter(FeedLinkReference feedRef) {
-    return fCounter.get(feedRef.getLink());
   }
 
   private NewsCounterItem count(IFeed feed) {
