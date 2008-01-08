@@ -476,6 +476,11 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
 
     /* For each dragged Object */
     for (INews news : normalizedDraggedNews) {
+
+      /* Don't allow adding same news again */
+      if (dropTarget.containsNews(news))
+        continue;
+
       INews newsCopy = Owl.getModelFactory().createNews(news);
       DynamicDAO.save(newsCopy);
       dropTarget.addNews(newsCopy);
