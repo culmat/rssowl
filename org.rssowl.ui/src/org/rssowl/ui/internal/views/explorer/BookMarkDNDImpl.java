@@ -488,11 +488,14 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     }
 
     /* For each dragged Object */
+    List<INews> skippedNews = new ArrayList<INews>(0);
     for (INews news : normalizedDraggedNews) {
 
       /* Don't allow adding same news again */
-      if (dropTarget.containsNews(news))
+      if (dropTarget.containsNews(news)) {
+        skippedNews.add(news);
         continue;
+      }
 
       INews newsCopy = Owl.getModelFactory().createNews(news);
       DynamicDAO.save(newsCopy);
@@ -507,12 +510,16 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
 
     /* Delete dragged News if required */
     if (operation == DND.DROP_MOVE) {
+      normalizedDraggedNews.removeAll(skippedNews);
 
-      /* Mark Saved Search Service as in need for a quick Update */
-      Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+      if (!normalizedDraggedNews.isEmpty()) {
 
-      /* Delete News in single Transaction */
-      DynamicDAO.getDAO(INewsDAO.class).setState(normalizedDraggedNews, INews.State.DELETED, false, false);
+        /* Mark Saved Search Service as in need for a quick Update */
+        Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+
+        /* Delete News in single Transaction */
+        DynamicDAO.getDAO(INewsDAO.class).setState(normalizedDraggedNews, INews.State.DELETED, false, false);
+      }
     }
   }
 
