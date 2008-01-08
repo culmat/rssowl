@@ -498,6 +498,11 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       }
 
       INews newsCopy = Owl.getModelFactory().createNews(news);
+
+      /* Ensure the state is *unread* since it has been seen */
+      if (newsCopy.getState() == INews.State.NEW)
+        newsCopy.setState(INews.State.UNREAD);
+
       DynamicDAO.save(newsCopy);
       dropTarget.addNews(newsCopy);
 
