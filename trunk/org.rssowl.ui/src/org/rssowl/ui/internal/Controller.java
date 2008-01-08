@@ -172,9 +172,6 @@ public class Controller {
   /* Flag is set to TRUE when shutting down the application */
   private boolean fShuttingDown;
 
-  /* Service to access some cached Entities */
-  private CacheService fCacheService;
-
   /* Service to manage Contexts */
   private ContextService fContextService;
 
@@ -398,13 +395,6 @@ public class Controller {
       fContextService = new ContextService();
 
     return fContextService;
-  }
-
-  /**
-   * @return Returns the cacheService.
-   */
-  public CacheService getCacheService() {
-    return fCacheService;
   }
 
   /**
@@ -717,11 +707,6 @@ public class Controller {
           fPrefsDAO.save(fFactory.createPreference(FIRST_START_TOKEN));
         }
       });
-    }
-
-    /* Create the Cache-Service */
-    if (!InternalOwl.TESTING) {
-      fCacheService = new CacheService();
     }
 
     /* Create the News-Service */

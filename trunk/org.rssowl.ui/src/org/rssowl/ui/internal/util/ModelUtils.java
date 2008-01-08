@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.util;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
@@ -36,9 +37,11 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchValueType;
+import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.reference.BookMarkReference;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.DateUtils;
@@ -48,6 +51,7 @@ import org.rssowl.ui.internal.EntityGroupItem;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -766,5 +770,41 @@ public class ModelUtils {
     }
 
     return false;
+  }
+
+  /**
+   * Returns a Set of all Links that are added as Bookmarks.
+   *
+   * @return Returns a Set of all Links that are added as Bookmarks.
+   */
+  public static Set<String> getFeedLinks() {
+    IBookMarkDAO bookMarkDAO = Owl.getPersistenceService().getDAOService().getBookMarkDAO();
+    Collection<IBookMark> bookMarks = bookMarkDAO.loadAll();
+    Set<String> links = new HashSet<String>(bookMarks.size());
+
+    for (IBookMark bookmark : bookMarks) {
+      links.add(bookmark.getFeedLinkReference().getLink().toString());
+    }
+
+    return links;
+  }
+
+  /**
+   * Returns the first <code>IBookMark</code> that references the same feed as
+   * <code>feedRef</code> or <code>null</code> if none.
+   *
+   * @param feedRef The desired Feed.
+   * @return Returns the first <code>IBookMark</code> that references the
+   * given Feed or <code>null</code> if none.
+   */
+  public static IBookMark getBookMark(FeedLinkReference feedRef) {
+    IBookMarkDAO bookMarkDAO = Owl.getPersistenceService().getDAOService().getBookMarkDAO();
+    Collection<IBookMark> bookMarks = bookMarkDAO.loadAll();
+    for (IBookMark bookMark : bookMarks) {
+      if (bookMark.getFeedLinkReference().equals(feedRef))
+        return bookMark;
+    }
+
+    return null;
   }
 }

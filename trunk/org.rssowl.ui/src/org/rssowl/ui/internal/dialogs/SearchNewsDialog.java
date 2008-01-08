@@ -125,7 +125,6 @@ import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.CColumnLayoutData;
 import org.rssowl.ui.internal.CTable;
-import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.OwlUI;
@@ -459,7 +458,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     public String getToolTipText(Object element) {
       ScoredNews scoredNews = (ScoredNews) element;
       FeedLinkReference feedRef = scoredNews.getNews().getFeedReference();
-      IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(feedRef);
+      IBookMark bookMark = ModelUtils.getBookMark(feedRef);
       if (bookMark != null)
         return StringUtils.replaceAll(bookMark.getName(), "&", "&&");
 

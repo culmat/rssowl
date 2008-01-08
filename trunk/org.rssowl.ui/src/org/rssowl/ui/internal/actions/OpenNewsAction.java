@@ -38,13 +38,12 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.ui.internal.Activator;
-import org.rssowl.ui.internal.CacheService;
-import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.EditorUtils;
+import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +57,6 @@ import java.util.List;
  */
 public class OpenNewsAction extends Action {
   private IStructuredSelection fSelection;
-  private CacheService fCacheService;
   private Shell fShellToMinimize;
 
   /**
@@ -77,7 +75,6 @@ public class OpenNewsAction extends Action {
     Assert.isTrue(selection != null && !selection.isEmpty());
     fSelection = selection;
     fShellToMinimize = shellToMinimize;
-    fCacheService = Controller.getDefault().getCacheService();
 
     setText("Open");
   }
@@ -135,7 +132,7 @@ public class OpenNewsAction extends Action {
       INews news = newsToOpen.get(i);
 
       /* Receive the first Bookmark belonging to the News and open it */
-      IBookMark bookmark = fCacheService.getBookMark(news.getFeedReference());
+      IBookMark bookmark = ModelUtils.getBookMark(news.getFeedReference());
       if (bookmark != null) {
 
         /* Select this News in the FeedView */
