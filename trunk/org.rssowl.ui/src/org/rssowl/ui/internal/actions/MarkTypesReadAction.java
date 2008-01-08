@@ -192,7 +192,7 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
   }
 
   private boolean containsUnread(IBookMark mark) {
-    return mark.getNewsCount(EnumSet.of(INews.State.NEW)) > 0;
+    return mark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) > 0;
   }
 
   private void fillNews(IBookMark bookmark, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap) {
