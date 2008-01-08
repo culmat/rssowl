@@ -185,9 +185,9 @@ public class BookMarkLabelProvider extends CellLabelProvider {
         str.append(" (").append(unreadNewsCount).append(")");
       cell.setText(str.toString());
 
-      /* Background for IBookMark (TODO Support All) */
+      /* Background for IBookMark (TODO Support All News Marks) */
       if (newsmark instanceof IBookMark && fIndicateState)
-        stickyNewsCount = getStickyNewsCount((IBookMark) newsmark);
+        stickyNewsCount = ((IBookMark) newsmark).getStickyNewsCount();
 
       /* Background Color */
       if (stickyNewsCount > 0)
@@ -313,9 +313,5 @@ public class BookMarkLabelProvider extends CellLabelProvider {
 
   private int getUnreadNewsCount(INewsMark newsMark) {
     return newsMark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
-  }
-
-  private int getStickyNewsCount(IBookMark bookMark) {
-    return bookMark.getStickyNewsCount();
   }
 }
