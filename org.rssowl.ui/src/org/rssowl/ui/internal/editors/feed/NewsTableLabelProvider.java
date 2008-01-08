@@ -53,7 +53,6 @@ import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
-import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.ModelUtils;
@@ -179,7 +178,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
   public String getToolTipText(Object element) {
     INews news = (INews) element;
     FeedLinkReference feedRef = news.getFeedReference();
-    IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(feedRef);
+    IBookMark bookMark = ModelUtils.getBookMark(feedRef);
     if (bookMark != null)
       return StringUtils.replaceAll(bookMark.getName(), "&", "&&");
 
@@ -265,7 +264,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
       /* Feed Column */
       else if (columnIndex == NewsTableControl.COL_FEED && !(fViewer.getInput() instanceof FeedLinkReference)) {
         FeedLinkReference feedRef = news.getFeedReference();
-        IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(feedRef);
+        IBookMark bookMark = ModelUtils.getBookMark(feedRef);
         if (bookMark != null) {
           ImageDescriptor favicon = OwlUI.getFavicon(bookMark);
           return OwlUI.getImage(fResources, favicon != null ? favicon : OwlUI.BOOKMARK);

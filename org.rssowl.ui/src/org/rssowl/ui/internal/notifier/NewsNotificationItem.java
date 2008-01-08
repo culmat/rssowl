@@ -41,7 +41,6 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
-import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.editors.feed.FeedView;
@@ -100,7 +99,7 @@ public class NewsNotificationItem extends NotificationItem {
   }
 
   private static ImageDescriptor makeImage(INews news) {
-    IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(news.getFeedReference());
+    IBookMark bookMark = ModelUtils.getBookMark(news.getFeedReference());
     if (bookMark != null) {
       ImageDescriptor favicon = OwlUI.getFavicon(bookMark);
       if (favicon != null)
@@ -135,7 +134,7 @@ public class NewsNotificationItem extends NotificationItem {
   @Override
   public String getOrigin() {
     if (fCachedOrigin == null) {
-      IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(fFeedReference);
+      IBookMark bookMark = ModelUtils.getBookMark(fFeedReference);
       if (bookMark != null)
         fCachedOrigin = bookMark.getName();
     }
@@ -156,7 +155,7 @@ public class NewsNotificationItem extends NotificationItem {
     }
 
     /* Otherwise open Feedview and select the News */
-    IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(fFeedReference);
+    IBookMark bookMark = ModelUtils.getBookMark(fFeedReference);
     IWorkbenchPage page = OwlUI.getPage();
     if (page != null) {
 

@@ -39,7 +39,6 @@ import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
-import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.OwlUI;
@@ -404,7 +403,7 @@ public class NewsGrouping {
 
           if (!InternalOwl.TESTING) {
             ImageDescriptor feedIcon = null;
-            IBookMark bookMark = Controller.getDefault().getCacheService().getBookMark(new FeedLinkReference(feed.getLink()));
+            IBookMark bookMark = ModelUtils.getBookMark(new FeedLinkReference(feed.getLink()));
             if (bookMark != null)
               feedIcon = OwlUI.getFavicon(bookMark);
             group.setImage(feedIcon != null ? feedIcon : OwlUI.BOOKMARK);
