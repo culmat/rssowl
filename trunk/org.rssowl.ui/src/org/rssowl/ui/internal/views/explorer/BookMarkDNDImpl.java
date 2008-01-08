@@ -194,6 +194,9 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
   public void dragOver(DropTargetEvent event) {
     super.dragOver(event);
 
+    Object currentTarget = getCurrentTarget();
+    boolean isFolderChildsDragged = isFolderChildsDragged();
+
     /* Un-Set some feedback if sorting by name */
     if (fExplorer.isSortByNameEnabled()) {
       event.feedback &= ~DND.FEEDBACK_INSERT_AFTER;
@@ -201,18 +204,18 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     }
 
     /* Un-Set some feedback if grouping */
-    if (fExplorer.isGroupingEnabled() && !(getCurrentTarget() instanceof INewsBin)) {
+    if (fExplorer.isGroupingEnabled() && !(currentTarget instanceof INewsBin)) {
       event.feedback &= ~DND.FEEDBACK_INSERT_AFTER;
       event.feedback &= ~DND.FEEDBACK_INSERT_BEFORE;
       event.feedback &= ~DND.FEEDBACK_SELECT;
     }
 
     /* Never give Select as Feedback from a Mark except INewsBin */
-    if (getCurrentTarget() instanceof IMark && !(getCurrentTarget() instanceof INewsBin))
+    if (currentTarget instanceof IMark && (!(currentTarget instanceof INewsBin) || isFolderChildsDragged))
       event.feedback &= ~DND.FEEDBACK_SELECT;
 
-    /* Don't show this feedback for News Bins */
-    if (getCurrentTarget() instanceof INewsBin) {
+    /* Don't show this feedback for News Bins or non Folder-Childs */
+    if (currentTarget instanceof INewsBin || !isFolderChildsDragged) {
       event.feedback &= ~DND.FEEDBACK_INSERT_AFTER;
       event.feedback &= ~DND.FEEDBACK_INSERT_BEFORE;
     }
@@ -222,6 +225,16 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       event.feedback &= ~DND.FEEDBACK_INSERT_AFTER;
       event.feedback &= ~DND.FEEDBACK_INSERT_BEFORE;
     }
+  }
+
+  private boolean isFolderChildsDragged() {
+    IStructuredSelection currentSource = (IStructuredSelection) LocalSelectionTransfer.getTransfer().getSelection();
+    if (currentSource != null) {
+      List<?> draggedItems = currentSource.toList();
+      return containsFolderChilds(draggedItems);
+    }
+
+    return true;
   }
 
   /*
