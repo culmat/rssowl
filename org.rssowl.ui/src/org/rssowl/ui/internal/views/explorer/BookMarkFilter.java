@@ -322,7 +322,7 @@ public class BookMarkFilter extends ViewerFilter {
         case SHOW_STICKY:
           if (newsmark instanceof IBookMark) {
             IBookMark bookmark = (IBookMark) newsmark;
-            isMatch = hasStickyNews(bookmark);
+            isMatch = bookmark.getStickyNewsCount() > 0;
           }
           break;
 
@@ -348,10 +348,6 @@ public class BookMarkFilter extends ViewerFilter {
     }
 
     return false;
-  }
-
-  private boolean hasStickyNews(IBookMark bookmark) {
-    return bookmark.getStickyNewsCount() > 0;
   }
 
   /**
