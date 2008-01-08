@@ -462,10 +462,10 @@ public class NewsContentProvider implements ITreeContentProvider {
           public void run() {
             List<INews> deletedNews = null;
 
-            /* Filter News which are from a different Feed or invisible */
+            /* Filter News which are from a different Feed or invisible / non-copied */
             for (NewsEvent event : events) {
               INews news = event.getEntity();
-              if (news.isVisible() && isInputRelatedTo(news, EventType.REMOVE)) {
+              if ((news.isVisible() || news.isCopy()) && isInputRelatedTo(news, EventType.REMOVE)) {
                 if (deletedNews == null)
                   deletedNews = new ArrayList<INews>();
                 deletedNews.add(news);
@@ -523,9 +523,14 @@ public class NewsContentProvider implements ITreeContentProvider {
         return (((ISearchMark)mark).containsNews(news));
       }
 
-      /* Check if News Bin contains the given News */
-      else if (type != EventType.PERSIST && mark instanceof INewsBin) {
+      /* Update: Check if News Bin contains the given News */
+      else if (type == EventType.UPDATE && mark instanceof INewsBin) {
         return news.isCopy() && (((INewsBin)mark).containsNews(news));
+      }
+
+      /* Remove: Always update (workaround) */
+      else if (type == EventType.REMOVE && mark instanceof INewsBin) {
+        return true; //TODO Find a better solution - the bin can't know if it contained this news
       }
     }
 
