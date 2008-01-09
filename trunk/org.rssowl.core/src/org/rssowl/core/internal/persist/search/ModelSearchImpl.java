@@ -665,10 +665,8 @@ public class ModelSearchImpl implements IModelSearch {
         fSearcher = new IndexSearcher(fDirectory);
 
       /* Re-Create searcher if no longer current */
-      else if (flushed) {
-        fSearcher.close();
-        fSearcher = new IndexSearcher(fDirectory);
-      }
+      else if (flushed)
+        fSearcher.getIndexReader().reopen();
     } catch (IOException e) {
       throw new PersistenceException(e.getMessage(), e);
     }
