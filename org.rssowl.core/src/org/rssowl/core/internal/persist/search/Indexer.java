@@ -79,6 +79,11 @@ public class Indexer {
 
       return result;
     }
+
+    @Override
+    public TokenStream reusableTokenStream(String fieldName, Reader reader) {
+      return tokenStream(fieldName, reader);
+    }
   }
 
   /**
