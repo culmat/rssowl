@@ -24,6 +24,7 @@
 
 package org.rssowl.core.internal.persist.dao;
 
+import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.internal.persist.service.DatabaseEvent;
 import org.rssowl.core.persist.IFeed;
@@ -54,12 +55,24 @@ public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter
   @Override
   protected void onDatabaseOpened(DatabaseEvent event) {
     super.onDatabaseOpened(event);
-    NewsCounter newsCounter = load();
+    NewsCounter newsCounter = doLoad();
     if (newsCounter == null) {
       newsCounter = doCountAll();
       save(newsCounter);
     }
     fNewsCounter = newsCounter;
+  }
+
+  private NewsCounter doLoad() {
+    Collection<NewsCounter> counters = super.loadAll();
+    Assert.isLegal(counters.size() <= 1, "There shouldn't be more than 1 NewsCounter, size: " + counters.size());
+
+    for (NewsCounter newsCounter : counters) {
+      /* Return the first one since we assert that we don't have more than one */
+      return newsCounter;
+    }
+
+    return null;
   }
 
   @Override
