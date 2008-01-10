@@ -89,8 +89,8 @@ public class ModelSearchTest {
     fFactory = Owl.getModelFactory();
     fNewsEntityName = INews.class.getName();
 
-    fModelSearch.startup();
     Owl.getPersistenceService().recreateSchema();
+    fModelSearch.startup();
   }
 
   /**

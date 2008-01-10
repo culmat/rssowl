@@ -71,8 +71,8 @@ public class CleanUpTests {
     fModelSearch = Owl.getPersistenceService().getModelSearch();
     fFactory = Owl.getModelFactory();
 
-    fModelSearch.startup();
     Owl.getPersistenceService().recreateSchema();
+    fModelSearch.startup();
   }
 
   /**
