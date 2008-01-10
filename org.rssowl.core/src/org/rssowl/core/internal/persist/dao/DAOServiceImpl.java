@@ -71,6 +71,9 @@ public final class DAOServiceImpl extends DAOService  {
   private final ISearchConditionDAO fSearchConditionDAO = new SearchConditionDAOImpl();
   private final ILabelDAO fLabelDAO = new LabelDAOImpl();
 
+  /* Internal */
+  private final EntitiesToBeIndexedDAOImpl fEntitiesToBeIndexedDAO = new EntitiesToBeIndexedDAOImpl();
+
   /* Caching DAOs */
   private final IFolderDAO fFolderDAO = new CachingFolderDAO();
   private final IBookMarkDAO fBookMarkDAO = new CachingBookMarkDAO();
@@ -109,13 +112,13 @@ public final class DAOServiceImpl extends DAOService  {
     fEntityInterfacesToDaosMap.put(IFeed.class, fFeedDAO);
     fEntityInterfacesToDaosMap.put(IFolder.class, fFolderDAO);
     fEntityInterfacesToDaosMap.put(ILabel.class, fLabelDAO);
-    fEntityInterfacesToDaosMap.put(NewsCounter.class, fNewsCounterDAO);
     fEntityInterfacesToDaosMap.put(INews.class, fNewsDAO);
     fEntityInterfacesToDaosMap.put(IPerson.class, fPersonDAO);
     fEntityInterfacesToDaosMap.put(ISearchCondition.class, fSearchConditionDAO);
     fEntityInterfacesToDaosMap.put(ISearchMark.class, fSearchMarkDAO);
     fEntityInterfacesToDaosMap.put(IPreference.class, fPreferencesDAO);
     fEntityInterfacesToDaosMap.put(INewsBin.class, fNewsBinDAO);
+    fEntityInterfacesToDaosMap.put(NewsCounter.class, fNewsCounterDAO);
   }
 
   private void putInEntityClassesToDaosMap(IPersistableDAO<?> dao) {
@@ -190,6 +193,10 @@ public final class DAOServiceImpl extends DAOService  {
   @Override
   public INewsBinDAO getNewsBinDao() {
     return fNewsBinDAO;
+  }
+
+  public EntitiesToBeIndexedDAOImpl getEntitiesToBeIndexedDAO() {
+    return fEntitiesToBeIndexedDAO;
   }
 
   @SuppressWarnings("unchecked")

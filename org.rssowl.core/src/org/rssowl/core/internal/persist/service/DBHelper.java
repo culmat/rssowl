@@ -24,10 +24,13 @@
 package org.rssowl.core.internal.persist.service;
 
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.BookMark;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.LazySet;
 import org.rssowl.core.internal.persist.News;
+import org.rssowl.core.internal.persist.dao.DAOServiceImpl;
+import org.rssowl.core.internal.persist.dao.EntitiesToBeIndexedDAOImpl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
@@ -36,6 +39,7 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.INewsBin.StatesUpdateInfo;
+import org.rssowl.core.persist.dao.DAOService;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsCounterDAO;
 import org.rssowl.core.persist.event.FeedEvent;
@@ -191,7 +195,28 @@ public class DBHelper {
 
   public static void preCommit(ObjectContainer db) {
     updateNewsCounter(db);
+    updateNewsToBeIndexed(db);
     updateNewsBins(db);
+  }
+
+  public static EntitiesToBeIndexedDAOImpl getEntitiesToBeIndexedDAO() {
+    DAOService service = InternalOwl.getDefault().getPersistenceService().getDAOService();
+    if (service instanceof DAOServiceImpl) {
+      EntitiesToBeIndexedDAOImpl entitiesToBeIndexedDAO = ((DAOServiceImpl) service).getEntitiesToBeIndexedDAO();
+      return entitiesToBeIndexedDAO;
+    }
+    return null;
+  }
+
+  private static void updateNewsToBeIndexed(ObjectContainer db) {
+    NewsEventRunnable newsEventRunnables = getNewsEventRunnables(EventsMap.getInstance().getEventRunnables());
+    if (newsEventRunnables == null)
+      return;
+
+    EntitiesToBeIndexedDAOImpl dao = getEntitiesToBeIndexedDAO();
+    EntityIdsByEventType newsToBeIndexed = dao.load();
+    newsToBeIndexed.addAllEntities(newsEventRunnables.getPersistEvents(), newsEventRunnables.getUpdateEvents(), newsEventRunnables.getRemoveEvents());
+    db.ext().set(newsToBeIndexed, Integer.MAX_VALUE);
   }
 
   private static NewsEventRunnable getNewsEventRunnables(List<EventRunnable<?>> eventRunnables)  {

@@ -137,8 +137,8 @@ public class ModelSearchImpl implements IModelSearch {
 
       if (fIndexer == null)
         fIndexer = new Indexer(this, fDirectory);
-      else
-        fIndexer.initIfNecessary();
+
+      fIndexer.initIfNecessary();
 
       if (fSearcher == null)
         fSearcher = createIndexSearcher();
