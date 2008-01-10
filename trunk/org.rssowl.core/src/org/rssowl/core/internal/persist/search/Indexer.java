@@ -12,10 +12,14 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
+import org.rssowl.core.internal.persist.dao.EntitiesToBeIndexedDAOImpl;
+import org.rssowl.core.internal.persist.service.DBHelper;
+import org.rssowl.core.internal.persist.service.EntityIdsByEventType;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
@@ -35,6 +39,7 @@ import org.rssowl.core.util.SearchHit;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -64,6 +69,8 @@ public class Indexer {
   private LabelAdapter fLabelListener;
   private boolean fFlushRequired;
   private final ModelSearchImpl fSearch;
+
+  private final EntityIdsByEventType fUncommittedNews;
 
   /* The Default Analyzer */
   private static class DefaultAnalyzer extends KeywordAnalyzer {
@@ -95,8 +102,7 @@ public class Indexer {
     fSearch = search;
     fIndexDirectory = directory;
     fJobQueue = new JobQueue("Updating Saved Searches", MAX_INDEX_JOBS_COUNT, Integer.MAX_VALUE, true, INDEX_JOB_PROGRESS_DELAY);
-
-    init();
+    fUncommittedNews = new EntityIdsByEventType(false);
   }
 
   /**
@@ -120,12 +126,15 @@ public class Indexer {
           /* Update Event */
           if (isUpdate) {
             Term term = createTerm(news);
+            fUncommittedNews.addUpdatedEntity(news);
             fIndexWriter.updateDocument(term, newsDoc.getDocument());
           }
 
           /* Added Event */
-          else
+          else {
+            fUncommittedNews.addPersistedEntity(news);
             fIndexWriter.addDocument(newsDoc.getDocument());
+          }
 
           /* Mark as in need for a flush */
           fFlushRequired = true;
@@ -154,6 +163,7 @@ public class Indexer {
       INews news = it.previous();
       it.remove();
       Term term = createTerm(news);
+      fUncommittedNews.addRemovedEntity(news);
       fIndexWriter.deleteDocuments(term);
       docCount++;
     }
@@ -165,13 +175,18 @@ public class Indexer {
     fSearch.notifyIndexUpdated(docCount);
   }
 
+  //TODO Consider renaming to commitIfNecessary
+  //TODO Remove fFlushRequired and rely on fUncommittedNews
+  //TODO Perhaps commit after fUncommittedNews has a certain size instead
+  //of relying always in this method. In most situations this method will
+  //be called often though
   synchronized boolean flushIfNecessary() throws IOException {
     boolean flushed = fFlushRequired;
 
-    if (fFlushRequired)
-      fIndexWriter.flush();
-
-    fFlushRequired = false;
+    if (fFlushRequired) {
+      dispose();
+      createIndexWriter();
+    }
 
     return flushed;
   }
@@ -193,6 +208,12 @@ public class Indexer {
     dispose();
     if (IndexReader.indexExists(fIndexDirectory))
       fIndexWriter = createIndexWriter(fIndexDirectory, true);
+
+    /*
+     * We dispose again because otherwise calling this method breaks
+     * initialization
+     */
+    dispose();
   }
 
   /**
@@ -239,6 +260,25 @@ public class Indexer {
 
     /* Listen to Model Events */
     registerListeners();
+
+    /* Index outstanding news */
+    EntitiesToBeIndexedDAOImpl dao = DBHelper.getEntitiesToBeIndexedDAO();
+    if (dao != null) {
+      EntityIdsByEventType outstandingNewsIds = dao.load();
+      fJobQueue.schedule(new IndexingTask(Indexer.this, getNews(outstandingNewsIds.getPersistedEntityRefs()), EventType.PERSIST));
+      fJobQueue.schedule(new IndexingTask(Indexer.this, getNews((outstandingNewsIds.getUpdatedEntityRefs())), EventType.UPDATE));
+      fJobQueue.schedule(new IndexingTask(Indexer.this, getNews(outstandingNewsIds.getRemovedEntityRefs()), EventType.REMOVE));
+    }
+  }
+
+  private List<INews> getNews(Collection<NewsReference> newsRefs) {
+    List<INews> newsList = new ArrayList<INews>(newsRefs.size());
+    for (NewsReference newsRef : newsRefs) {
+      INews news = InternalOwl.getDefault().getPersistenceService().getDAOService().getNewsDAO().load(newsRef.getId());
+      Assert.isNotNull(news, "news");
+      newsList.add(news);
+    }
+    return newsList;
   }
 
   synchronized void initIfNecessary() {
@@ -337,7 +377,7 @@ public class Indexer {
   }
 
   private IndexWriter createIndexWriter(Directory directory, boolean create) throws IOException {
-    IndexWriter indexWriter = new IndexWriter(directory, createAnalyzer(), create);
+    IndexWriter indexWriter = new IndexWriter(directory, false, createAnalyzer(), create);
     fFlushRequired = false;
     return indexWriter;
   }
@@ -354,5 +394,19 @@ public class Indexer {
     fIndexWriter.close();
     fIndexWriter = null;
     fFlushRequired = false;
+
+    //TODO Do this as a job if from flushRequired
+    EntitiesToBeIndexedDAOImpl dao = DBHelper.getEntitiesToBeIndexedDAO();
+    if (dao != null) {
+      EntityIdsByEventType newsToBeIndexed = dao.load();
+      // TODO Must find better solution. This means that the db has already been
+      // closed and so we can't save to it anymore. However that means that we
+      // will reindex these news on startup again.
+      if (newsToBeIndexed != null) {
+        newsToBeIndexed.removeAll(fUncommittedNews.getPersistedEntityIds(), fUncommittedNews.getUpdatedEntityIds(), fUncommittedNews.getRemovedEntityIds());
+        fUncommittedNews.clear();
+        dao.save(newsToBeIndexed);
+      }
+    }
   }
 }
