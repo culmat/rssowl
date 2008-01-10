@@ -211,7 +211,7 @@ public class DBHelper {
     List<StatesUpdateInfo> statesUpdateInfos = new ArrayList<StatesUpdateInfo>();
     for (NewsEvent newsEvent : newsEventRunnable.getUpdateEvents()) {
       if (newsEvent.getEntity().isCopy() && (newsEvent.getOldNews().getState() != newsEvent.getEntity().getState())) {
-        statesUpdateInfos.add(new StatesUpdateInfo(newsEvent.getOldNews().getState(), newsEvent.getEntity().getState(), (NewsReference) newsEvent.getEntity().toReference()));
+        statesUpdateInfos.add(new StatesUpdateInfo(newsEvent.getOldNews().getState(), newsEvent.getEntity().getState(), newsEvent.getEntity().toReference()));
       }
     }
     if (!statesUpdateInfos.isEmpty()) {
