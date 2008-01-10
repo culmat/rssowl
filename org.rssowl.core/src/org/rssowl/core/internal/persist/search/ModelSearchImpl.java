@@ -34,6 +34,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.NumberTools;
 import org.apache.lucene.document.DateTools.Resolution;
 import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
@@ -140,7 +141,7 @@ public class ModelSearchImpl implements IModelSearch {
         fIndexer.initIfNecessary();
 
       if (fSearcher == null)
-        fSearcher = new IndexSearcher(fDirectory);
+        fSearcher = createIndexSearcher();
     } catch (IOException e) {
       Activator.getDefault().getLog().log(Activator.getDefault().createErrorStatus(e.getMessage(), e));
     }
@@ -656,17 +657,28 @@ public class ModelSearchImpl implements IModelSearch {
     throw new UnsupportedOperationException("Unsupported Specifier for Number Queries");
   }
 
+  private IndexSearcher createIndexSearcher() throws CorruptIndexException, IOException {
+    return new IndexSearcher(IndexReader.open(fDirectory));
+  }
+
   private synchronized void isSearcherCurrent() throws PersistenceException {
     try {
       boolean flushed = fIndexer.flushIfNecessary();
 
       /* Create searcher if not yet done */
       if (fSearcher == null)
-        fSearcher = new IndexSearcher(fDirectory);
+        fSearcher = createIndexSearcher();
 
       /* Re-Create searcher if no longer current */
-      else if (flushed)
-        fSearcher.getIndexReader().reopen();
+      else if (flushed) {
+        IndexReader reader = fSearcher.getIndexReader();
+        IndexReader newReader = reader.reopen();
+        if (newReader != reader) {
+          fSearcher.close();
+          reader.close();
+          fSearcher = new IndexSearcher(newReader);
+        }
+      }
     } catch (IOException e) {
       throw new PersistenceException(e.getMessage(), e);
     }
@@ -684,8 +696,10 @@ public class ModelSearchImpl implements IModelSearch {
   }
 
   private void disposeSearcher() throws IOException {
-    if (fSearcher != null)
+    if (fSearcher != null) {
       fSearcher.close();
+      fSearcher.getIndexReader().close();
+    }
 
     fSearcher = null;
   }
