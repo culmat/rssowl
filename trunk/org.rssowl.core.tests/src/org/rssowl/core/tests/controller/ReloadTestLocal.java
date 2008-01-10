@@ -52,7 +52,6 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.NewsService;
 
 import java.net.URI;
 import java.text.SimpleDateFormat;
@@ -83,7 +82,6 @@ import java.util.Set;
  * @author bpasero
  */
 public class ReloadTestLocal {
-  private NewsService fService;
   private Controller fController;
   private SimpleDateFormat fDateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssz"); //$NON-NLS-1$
   private Random fRand = new Random();
@@ -96,10 +94,9 @@ public class ReloadTestLocal {
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
-    Controller.getDefault().getNewsService().testDirtyShutdown();
+//    Controller.getDefault().getNewsService().testDirtyShutdown();
     InMemoryProtocolHandler.FEED = null;
 
-    fService = Controller.getDefault().getNewsService();
     fController = Controller.getDefault();
     fNewsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
   }

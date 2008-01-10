@@ -45,7 +45,6 @@ import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.RetentionStrategy;
-import org.rssowl.ui.internal.Controller;
 
 import java.net.URI;
 import java.util.Date;
@@ -73,7 +72,6 @@ public class RetentionStrategyTests {
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
-    Controller.getDefault().getNewsService().testDirtyShutdown();
     fFactory = Owl.getModelFactory();
   }
 

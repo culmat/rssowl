@@ -35,7 +35,6 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
-import org.rssowl.ui.internal.Controller;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -56,7 +55,6 @@ public class ImporterTest {
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
-    Controller.getDefault().getNewsService().testDirtyShutdown();
   }
 
   /**

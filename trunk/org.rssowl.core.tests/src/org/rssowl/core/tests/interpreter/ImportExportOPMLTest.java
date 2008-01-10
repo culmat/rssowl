@@ -90,7 +90,6 @@ public class ImportExportOPMLTest {
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
-    Controller.getDefault().getNewsService().testDirtyShutdown();
 
     fFactory = Owl.getModelFactory();
     fController = Controller.getDefault();

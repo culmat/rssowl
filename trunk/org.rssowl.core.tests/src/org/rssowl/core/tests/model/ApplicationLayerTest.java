@@ -72,7 +72,6 @@ import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.tests.TestUtils;
 import org.rssowl.core.util.ReparentInfo;
-import org.rssowl.ui.internal.Controller;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -101,7 +100,6 @@ public class ApplicationLayerTest {
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
-    Controller.getDefault().getNewsService().testDirtyShutdown();
     fFactory = Owl.getModelFactory();
     fAppService = Owl.getApplicationService();
   }

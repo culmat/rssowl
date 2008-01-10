@@ -37,7 +37,6 @@ import org.rssowl.core.internal.persist.service.DBManager;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.ui.internal.Controller;
 
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
@@ -66,7 +65,6 @@ public class DefragmentTest {
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
-    Controller.getDefault().getNewsService().testDirtyShutdown();
     fPluginLocation = FileLocator.toFileURL(Platform.getBundle("org.rssowl.core.tests").getEntry("/")).toURI();
     saveFeeds();
   }

@@ -38,7 +38,6 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.service.IModelSearch;
-import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.dialogs.cleanup.BookMarkTask;
 import org.rssowl.ui.internal.dialogs.cleanup.CleanUpGroup;
 import org.rssowl.ui.internal.dialogs.cleanup.CleanUpModel;
@@ -74,7 +73,6 @@ public class CleanUpTests {
 
     fModelSearch.startup();
     Owl.getPersistenceService().recreateSchema();
-    Controller.getDefault().getNewsService().testDirtyShutdown();
   }
 
   /**
