@@ -154,9 +154,6 @@ public class Controller {
   /* Queue for saving Feeds */
   private final JobQueue fSaveFeedQueue;
 
-  /* News-Service */
-  private NewsService fNewsService;
-
   /* Notification Service */
   private NotificationService fNotificationService;
 
@@ -369,13 +366,6 @@ public class Controller {
     }
 
     return pages;
-  }
-
-  /**
-   * @return Returns the newsService.
-   */
-  public NewsService getNewsService() {
-    return fNewsService;
   }
 
   /**
@@ -709,9 +699,6 @@ public class Controller {
       });
     }
 
-    /* Create the News-Service */
-    fNewsService = new NewsService();
-
     /* Create the Notification Service */
     if (!InternalOwl.TESTING)
       fNotificationService = new NotificationService();
@@ -749,9 +736,6 @@ public class Controller {
     /* Cancel the feed-save queue (join) */
     if (!emergency)
       fSaveFeedQueue.cancel(true);
-
-    /* Stop the News-Service */
-    fNewsService.stopService();
 
     /* Stop the Notification Service */
     if (!InternalOwl.TESTING && !emergency)
