@@ -179,10 +179,14 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     INews news = (INews) element;
     FeedLinkReference feedRef = news.getFeedReference();
     IBookMark bookMark = ModelUtils.getBookMark(feedRef);
-    if (bookMark != null)
-      return StringUtils.replaceAll(bookMark.getName(), "&", "&&");
 
-    return null;
+    String tooltip = null;
+    if (bookMark != null)
+      tooltip = StringUtils.replaceAll(bookMark.getName(), "&", "&&");
+    else
+      tooltip = StringUtils.replaceAll(feedRef.getLink().toString(), "&", "&&");
+
+    return tooltip;
   }
 
   /**
@@ -269,6 +273,8 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
           ImageDescriptor favicon = OwlUI.getFavicon(bookMark);
           return OwlUI.getImage(fResources, favicon != null ? favicon : OwlUI.BOOKMARK);
         }
+
+        return OwlUI.getImage(fResources, OwlUI.BOOKMARK);
       }
 
       /* Sticky State */
