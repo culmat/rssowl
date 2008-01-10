@@ -100,7 +100,6 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.persist.service.UniqueConstraintException;
 import org.rssowl.core.tests.TestUtils;
-import org.rssowl.ui.internal.Controller;
 
 import com.db4o.ObjectContainer;
 import com.db4o.query.Query;
@@ -134,7 +133,6 @@ public class DBManagerTest {
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
-    Controller.getDefault().getNewsService().testDirtyShutdown();
     fTypesFactory = Owl.getModelFactory();
     fDb = DBManager.getDefault().getObjectContainer();
     fNewsDAO = DynamicDAO.getDAO(INewsDAO.class);

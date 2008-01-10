@@ -40,7 +40,6 @@ import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.DateUtils;
-import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.views.explorer.BookMarkFilter;
 import org.rssowl.ui.internal.views.explorer.BookMarkGrouping;
@@ -82,7 +81,6 @@ public class FolderMarkGroupFilterTest {
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
-    Controller.getDefault().getNewsService().testDirtyShutdown();
     fFactory = Owl.getModelFactory();
     fGrouping = new BookMarkGrouping();
     fFiltering = new BookMarkFilter();

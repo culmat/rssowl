@@ -36,8 +36,6 @@ import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsCounterDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
-import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.NewsService;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -58,7 +56,6 @@ public class ControllerTestLocal {
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
-    Controller.getDefault().getNewsService().testDirtyShutdown();
   }
 
   private NewsCounter loadNewsCounter() {
@@ -85,7 +82,6 @@ public class ControllerTestLocal {
   @Test
   public void testNewsService() throws Exception {
     INewsDAO newsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
-    NewsService service = Controller.getDefault().getNewsService();
 
     IFeed feed = new Feed(new URI("http://www.rssowl.org/rssowl2dg/tests/manager/rss_2_0.xml")); //$NON-NLS-1$
     feed = DynamicDAO.save(feed);
@@ -132,9 +128,6 @@ public class ControllerTestLocal {
     assertEquals(0, getNewCount(feed));
     assertEquals(0, getStickyCount(feed));
 
-    /* Simulate Shutdown */
-    service.stopService();
-
     Owl.getModelFactory().createNews(null, feed, new Date()); //$NON-NLS-1$
     feed = DynamicDAO.save(feed);
 
@@ -162,7 +155,6 @@ public class ControllerTestLocal {
 
     /* Simulate Dirty Shutdown */
     Owl.getPersistenceService().recreateSchema();
-    Controller.getDefault().getNewsService().testDirtyShutdown();
 
     feed = new Feed(new URI("http://www.rssowl.org/rssowl2dg/tests/manager/rss_2_0.xml")); //$NON-NLS-1$
     feed = DynamicDAO.save(feed);
@@ -176,8 +168,6 @@ public class ControllerTestLocal {
     feed.getNews().get(0).setFlagged(true);
     feed.getNews().get(1).setFlagged(true);
     DynamicDAO.save(feed);
-
-    service.testDirtyShutdown();
 
     assertEquals(2, getUnreadCount(feed));
     assertEquals(2, getNewCount(feed));
