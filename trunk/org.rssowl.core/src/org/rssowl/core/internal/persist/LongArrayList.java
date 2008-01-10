@@ -158,4 +158,11 @@ public class LongArrayList {
     fSize = 0;
     fElements = new long[0];
   }
+
+  //TODO Optimise this
+  public void removeAll(LongArrayList list) {
+    for (long element : list.fElements)
+      removeByElement(element);
+
+  }
 }
