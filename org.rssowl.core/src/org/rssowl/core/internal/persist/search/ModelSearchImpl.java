@@ -315,7 +315,7 @@ public class ModelSearchImpl implements IModelSearch {
     TokenStream tokenStream = analyzer.tokenStream(titleField, new StringReader(value));
     Token token = null;
     while ((token = tokenStream.next()) != null) {
-      String termText = token.termText();
+      String termText = new String(token.termBuffer(), 0, token.termLength());
 
       WildcardQuery titleQuery = new WildcardQuery(new Term(titleField, termText));
       allFieldsQuery.add(new BooleanClause(titleQuery, Occur.SHOULD));
@@ -325,7 +325,7 @@ public class ModelSearchImpl implements IModelSearch {
     String descriptionField = String.valueOf(INews.DESCRIPTION);
     tokenStream = analyzer.tokenStream(descriptionField, new StringReader(value));
     while ((token = tokenStream.next()) != null) {
-      String termText = token.termText();
+      String termText = new String(token.termBuffer(), 0, token.termLength());
 
       WildcardQuery descriptionQuery = new WildcardQuery(new Term(descriptionField, termText));
       allFieldsQuery.add(new BooleanClause(descriptionQuery, Occur.SHOULD));
@@ -335,7 +335,7 @@ public class ModelSearchImpl implements IModelSearch {
     String attachmentField = String.valueOf(INews.ATTACHMENTS_CONTENT);
     tokenStream = analyzer.tokenStream(attachmentField, new StringReader(value));
     while ((token = tokenStream.next()) != null) {
-      String termText = token.termText();
+      String termText = new String(token.termBuffer(), 0, token.termLength());
 
       WildcardQuery attachmentQuery = new WildcardQuery(new Term(attachmentField, termText));
       allFieldsQuery.add(new BooleanClause(attachmentQuery, Occur.SHOULD));
@@ -345,7 +345,7 @@ public class ModelSearchImpl implements IModelSearch {
     String authorField = String.valueOf(INews.AUTHOR);
     tokenStream = analyzer.tokenStream(authorField, new StringReader(value));
     while ((token = tokenStream.next()) != null) {
-      String termText = token.termText();
+      String termText = new String(token.termBuffer(), 0, token.termLength());
 
       /* Explicitly ignore Stop Words here */
       if (STOP_WORDS.contains(termText))
@@ -359,7 +359,7 @@ public class ModelSearchImpl implements IModelSearch {
     String categoryField = String.valueOf(INews.CATEGORIES);
     tokenStream = analyzer.tokenStream(categoryField, new StringReader(value));
     while ((token = tokenStream.next()) != null) {
-      String termText = token.termText();
+      String termText = new String(token.termBuffer(), 0, token.termLength());
 
       /* Explicitly ignore Stop Words here */
       if (STOP_WORDS.contains(termText))

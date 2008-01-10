@@ -29,7 +29,6 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.reference.FolderReference;
-import org.rssowl.core.persist.reference.ModelReference;
 
 import java.net.URI;
 import java.util.ArrayList;
