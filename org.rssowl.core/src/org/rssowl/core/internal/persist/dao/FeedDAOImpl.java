@@ -25,7 +25,6 @@
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.Feed;
-import org.rssowl.core.internal.persist.LazySet;
 import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.dao.IFeedDAO;
@@ -34,7 +33,6 @@ import org.rssowl.core.persist.event.FeedListener;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.persist.service.PersistenceException;
 
-import com.db4o.ObjectSet;
 import com.db4o.ext.Db4oException;
 
 import java.net.URI;
@@ -70,12 +68,11 @@ public final class FeedDAOImpl extends AbstractEntityDAO<IFeed, FeedListener, Fe
   public final Feed load(URI link) {
     return DBHelper.loadFeed(fDb, link, Integer.MAX_VALUE);
   }
-  
+
   @Override
   public final Collection<IFeed> loadAll()  {
     try {
-      ObjectSet<? extends IFeed> entities = fDb.query(fEntityClass);
-      return new LazySet<IFeed>(entities, fDb);
+      return DBHelper.loadAllFeeds(fDb);
     } catch (Db4oException e) {
       throw new PersistenceException(e);
     }

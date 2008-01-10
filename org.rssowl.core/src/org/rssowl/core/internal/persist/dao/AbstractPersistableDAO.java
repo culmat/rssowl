@@ -61,15 +61,23 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
     fSaveFully = saveFully;
     DBManager.getDefault().addEntityStoreListener(new DatabaseListener() {
       public void databaseOpened(DatabaseEvent event) {
-        fDb = event.getObjectContainer();
-        fLock = event.getLock();
-        fWriteLock = fLock.writeLock();
-        fReadLock = fLock.readLock();
+        onDatabaseOpened(event);
       }
       public void databaseClosed(DatabaseEvent event) {
-        fDb = null;
+        onDatabaseClosed(event);
       }
     });
+  }
+
+  protected void onDatabaseClosed(DatabaseEvent event) {
+    fDb = null;
+  }
+
+  protected void onDatabaseOpened(DatabaseEvent event) {
+    fDb = event.getObjectContainer();
+    fLock = event.getLock();
+    fWriteLock = fLock.writeLock();
+    fReadLock = fLock.readLock();
   }
 
   public final Class<? extends T> getEntityClass()    {
