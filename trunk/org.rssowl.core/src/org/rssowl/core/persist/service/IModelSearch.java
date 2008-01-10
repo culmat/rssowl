@@ -66,7 +66,7 @@ public interface IModelSearch {
   /**
    * Makes the <code>IModelSearch</code> capable of indexing entities and
    * returning results. <br>
-   * Note that this method can be called multiple times with no side-effects.
+   * Note that this method can be called multiple times safely.
    *
    * @throws PersistenceException
    */
