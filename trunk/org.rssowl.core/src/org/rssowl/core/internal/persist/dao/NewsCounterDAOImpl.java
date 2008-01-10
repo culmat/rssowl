@@ -24,10 +24,18 @@
 
 package org.rssowl.core.internal.persist.dao;
 
+import org.rssowl.core.internal.persist.service.DBHelper;
+import org.rssowl.core.internal.persist.service.DatabaseEvent;
+import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.NewsCounter;
+import org.rssowl.core.persist.NewsCounterItem;
 import org.rssowl.core.persist.dao.INewsCounterDAO;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.EnumSet;
+import java.util.List;
 
 /**
  * A data-access-object for <code>NewsCounter</code>.
@@ -36,9 +44,28 @@ import java.util.Collection;
  */
 public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter> implements INewsCounterDAO {
 
+  private volatile NewsCounter fNewsCounter;
+
   /** Default constructor using the specific IPersistable for this DAO */
   public NewsCounterDAOImpl() {
     super(NewsCounter.class, true);
+  }
+
+  @Override
+  protected void onDatabaseOpened(DatabaseEvent event) {
+    super.onDatabaseOpened(event);
+    NewsCounter newsCounter = load();
+    if (newsCounter == null) {
+      newsCounter = doCountAll();
+      save(newsCounter);
+    }
+    fNewsCounter = newsCounter;
+  }
+
+  @Override
+  protected void onDatabaseClosed(DatabaseEvent event) {
+    super.onDatabaseClosed(event);
+    fNewsCounter = null;
   }
 
   public final void delete() {
@@ -50,6 +77,32 @@ public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter
     //Do nothing
   }
 
+  private NewsCounter doCountAll() {
+    NewsCounter newsCounter = new NewsCounter();
+    Collection<IFeed> feeds = DBHelper.loadAllFeeds(fDb);
+
+    for (IFeed feed : feeds)
+      newsCounter.put(feed.getLink(), doCount(feed));
+
+    return newsCounter;
+  }
+
+  private NewsCounterItem doCount(IFeed feed) {
+    NewsCounterItem counterItem = new NewsCounterItem();
+
+    List<INews> newsList = feed.getVisibleNews();
+    for (INews news : newsList) {
+      if (EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED).contains(news.getState()))
+        counterItem.incrementUnreadCounter();
+      if (INews.State.NEW.equals(news.getState()))
+        counterItem.incrementNewCounter();
+      if (news.isFlagged())
+        counterItem.incrementStickyCounter();
+    }
+
+    return counterItem;
+  }
+
   @Override
   public final void delete(NewsCounter newsCounter) {
     if (!newsCounter.equals(load()))
@@ -58,15 +111,15 @@ public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter
     super.delete(newsCounter);
   }
 
+  @Override
+  public Collection<NewsCounter> loadAll() {
+    List<NewsCounter> newsCounters = new ArrayList<NewsCounter>(1);
+    newsCounters.add(load());
+    return newsCounters;
+  }
+
   public final NewsCounter load() {
-    Collection<NewsCounter> newsCounters = loadAll();
-    if (newsCounters.isEmpty())
-      return null;
-
-    if (newsCounters.size() > 1)
-      throw new IllegalStateException("Only one NewsCounter should exist, but " + "there are: " + newsCounters.size());
-
-    return newsCounters.iterator().next();
+    return fNewsCounter;
   }
 
   @Override

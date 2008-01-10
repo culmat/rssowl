@@ -26,6 +26,7 @@ package org.rssowl.core.internal.persist.service;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.BookMark;
 import org.rssowl.core.internal.persist.Feed;
+import org.rssowl.core.internal.persist.LazySet;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
@@ -50,6 +51,7 @@ import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.persist.service.UniqueConstraintException;
 
 import com.db4o.ObjectContainer;
+import com.db4o.ObjectSet;
 import com.db4o.ext.Db4oException;
 import com.db4o.query.Query;
 
@@ -284,5 +286,9 @@ public class DBHelper {
         break;
       }
     }
+  }
+  public static Collection<IFeed> loadAllFeeds(ObjectContainer db) {
+    ObjectSet<? extends IFeed> entities = db.query(Feed.class);
+    return new LazySet<IFeed>(entities, db);
   }
 }
