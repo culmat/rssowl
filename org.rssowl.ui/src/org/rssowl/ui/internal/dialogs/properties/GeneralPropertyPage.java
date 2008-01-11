@@ -131,7 +131,6 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     /* Load initial Settings */
     loadInitialSettings();
 
-    /* Pre-Cache the Feed if Entity is a single BookMark */
     if (fEntities.size() == 1 && fEntities.get(0) instanceof IBookMark)
       fIsSingleBookMark = true;
   }
@@ -293,15 +292,44 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       fReloadCombo.add("Days");
       fReloadCombo.select(fUpdateIntervalScope);
       fReloadCombo.setEnabled(fPrefUpdateIntervalState);
-
-      /* Open on Startup */
-      fOpenOnStartupCheck = new Button(otherSettingsContainer, SWT.CHECK);
-      fOpenOnStartupCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-      fOpenOnStartupCheck.setText("Display the " + (fIsSingleBookMark ? "feed" : "feeds") + " on start-up");
-      fOpenOnStartupCheck.setSelection(fPrefOpenOnStartup);
     }
 
+    /* Open on Startup */
+    fOpenOnStartupCheck = new Button(otherSettingsContainer, SWT.CHECK);
+    fOpenOnStartupCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    fOpenOnStartupCheck.setText("Display the " + getDisplayName() + " on start-up");
+    fOpenOnStartupCheck.setSelection(fPrefOpenOnStartup);
+
     return container;
+  }
+
+  private String getDisplayName() {
+    if (fEntities.size() == 1) {
+      if (fEntities.get(0) instanceof INewsBin)
+        return "news bin";
+
+      if (fEntities.get(0) instanceof IBookMark)
+        return "feed";
+
+      return "feeds";
+    }
+
+    boolean containsBin = false;
+    boolean containsBookMarkOrFolder = false;
+
+    for (IEntity entity : fEntities) {
+      if (entity instanceof IFolder || entity instanceof IBookMark)
+        containsBookMarkOrFolder = true;
+      else if (entity instanceof INewsBin)
+        containsBin = true;
+    }
+
+    if (containsBin && containsBookMarkOrFolder)
+      return "elements";
+    else if (containsBin)
+      return "news bins";
+
+    return "feeds";
   }
 
   private boolean containsNewsBin(List<IEntity> entities) {
