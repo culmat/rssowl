@@ -48,6 +48,7 @@ import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
+import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -370,6 +371,36 @@ public class ModelUtils {
       entities.remove(subFolder);
       normalize(subFolder, entities);
     }
+  }
+
+  /**
+   * Will return all News of the List of Objects also considering EntityGroups.
+   *
+   * @param objects
+   * @return all News of the List of Objects also considering EntityGroups.
+   */
+  public static Set<INews> normalize(List<?> objects) {
+    Set<INews> normalizedNews = new HashSet<INews>(objects.size());
+    for (Object object : objects) {
+
+      /* News */
+      if (object instanceof INews) {
+        normalizedNews.add((INews) object);
+      }
+
+      /* Group */
+      else if (object instanceof EntityGroup) {
+        EntityGroup group = (EntityGroup) object;
+        if (NewsGrouping.GROUP_CATEGORY_ID.equals(group.getCategory())) {
+          List<IEntity> entities = group.getEntities();
+          for (IEntity entity : entities) {
+            normalizedNews.add((INews) entity);
+          }
+        }
+      }
+    }
+
+    return normalizedNews;
   }
 
   /**
