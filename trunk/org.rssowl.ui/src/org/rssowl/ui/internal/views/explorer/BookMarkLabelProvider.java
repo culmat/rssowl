@@ -68,6 +68,8 @@ public class BookMarkLabelProvider extends CellLabelProvider {
   private Image fGroupIcon;
   private Image fBookmarkSetIcon;
   private Image fNewsBinIcon;
+  private Image fNewsBinNewIcon;
+  private Image fNewsBinEmptyIcon;
   private Color fStickyBgColor;
   private Color fGroupFgColor;
   private Font fBoldFont;
@@ -107,6 +109,8 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     fSearchMarkNewIcon = OwlUI.getImage(fResources, OwlUI.SEARCHMARK_NEW);
     fSearchMarkEmptyIcon = OwlUI.getImage(fResources, OwlUI.SEARCHMARK_EMPTY);
     fNewsBinIcon = OwlUI.getImage(fResources, OwlUI.NEWSBIN);
+    fNewsBinNewIcon = OwlUI.getImage(fResources, OwlUI.NEWSBIN_NEW);
+    fNewsBinEmptyIcon = OwlUI.getImage(fResources, OwlUI.NEWSBIN_EMPTY);
 
     /* Fonts */
     fBoldFont = OwlUI.getThemeFont(OwlUI.BKMRK_EXPLORER_FONT_ID, SWT.BOLD);
@@ -204,7 +208,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       else if (newsmark instanceof ISearchMark)
         cell.setImage(getIconForSearchMark((ISearchMark) newsmark, hasNew, unreadNewsCount));
       else if (newsmark instanceof INewsBin)
-        cell.setImage(fNewsBinIcon);
+        cell.setImage(getIconForNewsBin((INewsBin) newsmark, hasNew, unreadNewsCount));
     }
 
     /* Create Label for EntityGroup */
@@ -269,6 +273,17 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       return fSearchMarkIcon;
     else
       return fSearchMarkEmptyIcon;
+  }
+
+  private Image getIconForNewsBin(INewsBin newsbin, boolean hasNew, int unreadNewsCount) {
+    boolean hasMatchingNews = unreadNewsCount > 0 || newsbin.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED, INews.State.READ)) != 0;
+
+    if (hasNew)
+      return fNewsBinNewIcon;
+    else if (hasMatchingNews || !fIndicateState)
+      return fNewsBinIcon;
+    else
+      return fNewsBinEmptyIcon;
   }
 
   /*

@@ -116,6 +116,12 @@ public class OwlUI {
   /** NewsBin */
   public static final ImageDescriptor NEWSBIN = Activator.getImageDescriptor("icons/obj16/newsbin.gif"); //$NON-NLS-1$
 
+  /** NewsBin (New) */
+  public static final ImageDescriptor NEWSBIN_NEW = Activator.getImageDescriptor("icons/obj16/newsbin_new.gif"); //$NON-NLS-1$
+
+  /** NewsBin (Empty) */
+  public static final ImageDescriptor NEWSBIN_EMPTY = Activator.getImageDescriptor("icons/obj16/newsbin_empty.gif"); //$NON-NLS-1$
+
   /** SearchMark */
   public static final ImageDescriptor SEARCHMARK = Activator.getImageDescriptor("icons/obj16/searchmark.gif"); //$NON-NLS-1$
 
