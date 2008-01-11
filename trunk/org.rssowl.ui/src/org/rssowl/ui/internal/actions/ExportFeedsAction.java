@@ -39,6 +39,7 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -166,6 +167,11 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
           writer.write("\t</rssowl:searchcondition>\n");
         }
         writer.write("</rssowl:savedsearch>\n\n");
+      }
+
+      /* Export Newsbin */
+      else if (mark instanceof INewsBin) {
+        writer.write("<rssowl:newsbin name=\"" + name + "\" />\n");
       }
     }
 
