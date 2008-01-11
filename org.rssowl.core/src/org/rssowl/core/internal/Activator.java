@@ -69,17 +69,10 @@ public class Activator extends Plugin {
         fProxyService = loadProxyService();
       }
     });
-
-    /* Activate Internal Owl (Done by UI in M6) */
-    //    SafeRunner.run(new LoggingSafeRunnable() {
-    //      public void run() throws Exception {
-    //        InternalOwl.getDefault().startup();
-    //      }
-    //    });
   }
 
   private IProxyService loadProxyService() {
-    Bundle bundle = Platform.getBundle(CORE_NET_BUNDLE); 
+    Bundle bundle = Platform.getBundle(CORE_NET_BUNDLE);
     if (bundle != null) {
       ServiceReference ref = bundle.getBundleContext().getServiceReference(IProxyService.class.getName());
       if (ref != null)
