@@ -56,6 +56,14 @@ public final class NewsContainer {
     }
   }
 
+  /**
+   * Should only be used for testing.
+   * @return the internal array used by this class.
+   */
+  public LongArrayList[] internalGetNewsIds() {
+    return fNewsIds;
+  }
+
   public Pair<Boolean, Boolean> setNews(Map<INews.State, List<NewsReference>> newsMap) {
     Assert.isNotNull(newsMap, "newsMap");
 
