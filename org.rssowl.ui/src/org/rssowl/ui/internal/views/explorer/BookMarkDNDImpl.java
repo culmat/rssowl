@@ -38,7 +38,6 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.TransferData;
-import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
@@ -48,21 +47,18 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
-import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.RegExUtils;
 import org.rssowl.core.util.ReparentInfo;
-import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
+import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
 import org.rssowl.ui.internal.actions.NewBookMarkAction;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * The <code>BookMarkDropImpl</code> is handling all drop-operations resulting
@@ -464,68 +460,9 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
 
   private void perfromNewsDrop(List<?> draggedObjects) {
     int operation = getCurrentOperation();
-
     INewsBin dropTarget = (INewsBin) getCurrentTarget();
-    boolean requiresSave = false;
 
-    /* Normalize */
-    Set<INews> normalizedDraggedNews = new HashSet<INews>(draggedObjects.size());
-    for (Object object : draggedObjects) {
-
-      /* News */
-      if (object instanceof INews) {
-        normalizedDraggedNews.add((INews) object);
-      }
-
-      /* Group */
-      else if (object instanceof EntityGroup) {
-        EntityGroup group = (EntityGroup) object;
-        List<IEntity> entities = group.getEntities();
-        for (IEntity entity : entities) {
-          normalizedDraggedNews.add((INews) entity);
-        }
-      }
-    }
-
-    /* For each dragged Object */
-    List<INews> skippedNews = new ArrayList<INews>(0);
-    for (INews news : normalizedDraggedNews) {
-
-      /* Don't allow adding same news again */
-      if (dropTarget.containsNews(news)) {
-        skippedNews.add(news);
-        continue;
-      }
-
-      INews newsCopy = Owl.getModelFactory().createNews(news);
-
-      /* Ensure the state is *unread* since it has been seen */
-      if (newsCopy.getState() == INews.State.NEW)
-        newsCopy.setState(INews.State.UNREAD);
-
-      DynamicDAO.save(newsCopy);
-      dropTarget.addNews(newsCopy);
-
-      requiresSave = true;
-    }
-
-    /* Save */
-    if (requiresSave)
-      DynamicDAO.save(dropTarget);
-
-    /* Delete dragged News if required */
-    if (operation == DND.DROP_MOVE) {
-      normalizedDraggedNews.removeAll(skippedNews);
-
-      if (!normalizedDraggedNews.isEmpty()) {
-
-        /* Mark Saved Search Service as in need for a quick Update */
-        Controller.getDefault().getSavedSearchService().forceQuickUpdate();
-
-        /* Delete News in single Transaction */
-        DynamicDAO.getDAO(INewsDAO.class).setState(normalizedDraggedNews, INews.State.DELETED, false, false);
-      }
-    }
+    new MoveCopyNewsToBinAction(new StructuredSelection(draggedObjects), dropTarget, operation == DND.DROP_MOVE).run();
   }
 
   private void perfromFolderChildDrop(List<?> draggedObjects) {
