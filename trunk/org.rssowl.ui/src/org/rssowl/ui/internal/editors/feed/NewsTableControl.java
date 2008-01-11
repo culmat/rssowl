@@ -334,7 +334,7 @@ public class NewsTableControl implements IFeedViewPart {
 
             /* Set Text using TextTransfer */
             else if (TextTransfer.getInstance().isSupportedType(event.dataType))
-              ; //TODO Support Text Transfer;
+              setTextData(event);
           }
         });
       }
@@ -348,6 +348,14 @@ public class NewsTableControl implements IFeedViewPart {
         });
       }
     });
+  }
+
+  private void setTextData(DragSourceEvent event) {
+    IStructuredSelection selection = (IStructuredSelection) LocalSelectionTransfer.getTransfer().getSelection();
+    Set<INews> news = ModelUtils.normalize(selection.toList());
+
+    if (!news.isEmpty())
+      event.data = news.iterator().next().getLink().toString();
   }
 
   /*
