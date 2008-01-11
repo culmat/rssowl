@@ -48,7 +48,6 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
-import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -176,14 +175,14 @@ public class FeedSelectionPage extends WizardPage {
     /* LabelProvider */
     fViewer.setLabelProvider(new BookMarkLabelProvider(false));
 
-    /* Filter out any Search Marks and empty folders */
+    /* Filter out any non Bookmarks and empty folders */
     fViewer.addFilter(new ViewerFilter() {
       @Override
       public boolean select(Viewer viewer, Object parentElement, Object element) {
         if (element instanceof IFolder)
           return hasBookMarks((IFolder) element);
 
-        return !(element instanceof ISearchMark);
+        return element instanceof IBookMark;
       }
     });
 
