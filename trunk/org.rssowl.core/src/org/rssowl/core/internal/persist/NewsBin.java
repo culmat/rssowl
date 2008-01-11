@@ -61,6 +61,14 @@ public class NewsBin extends Mark implements INewsBin   {
     super();
   }
 
+  /**
+   * Should be used for testing only.
+   * @return internal NewsContainer.
+   */
+  public synchronized NewsContainer internalGetNewsContainer() {
+    return fNewsContainer;
+  }
+
   public synchronized void addNews(INews news) {
     fNewsContainer.addNews(news);
   }
