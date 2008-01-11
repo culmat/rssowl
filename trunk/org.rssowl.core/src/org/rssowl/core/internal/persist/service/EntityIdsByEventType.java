@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.service;
 
 import org.rssowl.core.internal.persist.LongArrayList;
@@ -35,7 +36,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public final class EntityIdsByEventType extends Persistable implements IPersistable  {
+public final class EntityIdsByEventType extends Persistable implements IPersistable {
 
   private static final int DEFAULT_CAPACITY = 10;
 
@@ -69,7 +70,7 @@ public final class EntityIdsByEventType extends Persistable implements IPersista
   }
 
   private static void addAllEntities(LongArrayList entityIds, Collection<? extends ModelEvent> events) {
-    for (ModelEvent event: events)
+    for (ModelEvent event : events)
       entityIds.add(event.getEntity().getId());
   }
 
@@ -98,14 +99,15 @@ public final class EntityIdsByEventType extends Persistable implements IPersista
     return getEntityIds(fRemovedEntities);
   }
 
-  private static List<NewsReference> getEntityIds(LongArrayList list)   {
+  private static List<NewsReference> getEntityIds(LongArrayList list) {
     List<NewsReference> newsRef = new ArrayList<NewsReference>(list.size());
     for (int i = 0, c = list.size(); i < c; ++i) {
-      newsRef.add(new NewsReference(list.get(i)));
+      long id = list.get(i);
+      if (id > 0)
+        newsRef.add(new NewsReference(id));
     }
     return newsRef;
   }
-
 
   public synchronized void removeAll(LongArrayList addedEntityIds, LongArrayList updatedEntityIds, LongArrayList removedEntityIds) {
     fPersistedEntities.removeAll(addedEntityIds);
