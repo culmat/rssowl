@@ -24,7 +24,6 @@
 
 package org.rssowl.core.internal.persist.search;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -133,8 +132,8 @@ public final class IndexingTask implements ITask {
     List<INews> newsList = new ArrayList<INews>(newsRefs.size());
     for (NewsReference newsRef : newsRefs) {
       INews news = InternalOwl.getDefault().getPersistenceService().getDAOService().getNewsDAO().load(newsRef.getId());
-      Assert.isNotNull(news, "news");
-      newsList.add(news);
+      if (news != null)
+        newsList.add(news);
     }
     return newsList;
   }
