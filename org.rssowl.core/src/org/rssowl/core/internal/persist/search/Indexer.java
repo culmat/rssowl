@@ -210,12 +210,6 @@ public class Indexer {
     dispose();
     if (IndexReader.indexExists(fIndexDirectory))
       fIndexWriter = createIndexWriter(fIndexDirectory, true);
-
-    /*
-     * We dispose again because otherwise calling this method breaks
-     * initialization
-     */
-    dispose();
   }
 
   /**
@@ -264,15 +258,13 @@ public class Indexer {
     registerListeners();
 
     /* Index outstanding news */
-    final EntitiesToBeIndexedDAOImpl dao = DBHelper.getEntitiesToBeIndexedDAO();
-    if (dao != null) {
+    if (!InternalOwl.TESTING) {
       Job delayedIndexJob = new Job("Indexing from dirty shutdown") {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
-          EntityIdsByEventType outstandingNewsIds = dao.load();
-          fJobQueue.schedule(new IndexingTask(Indexer.this, EventType.PERSIST, outstandingNewsIds.getPersistedEntityRefs()));
-          fJobQueue.schedule(new IndexingTask(Indexer.this, EventType.UPDATE, outstandingNewsIds.getUpdatedEntityRefs()));
-          fJobQueue.schedule(new IndexingTask(Indexer.this, EventType.REMOVE, outstandingNewsIds.getRemovedEntityRefs()));
+          for (IndexingTask task : getIndexOutstandingEntitiesTasks())
+            fJobQueue.schedule(task);
+
           return Status.OK_STATUS;
         }
       };
@@ -280,7 +272,22 @@ public class Indexer {
       delayedIndexJob.setSystem(true);
       delayedIndexJob.setUser(false);
       delayedIndexJob.schedule(1000);
+    } else {
+      for (IndexingTask task : getIndexOutstandingEntitiesTasks())
+        task.run(new NullProgressMonitor());
     }
+  }
+
+  private List<IndexingTask> getIndexOutstandingEntitiesTasks(){
+    final EntitiesToBeIndexedDAOImpl dao = DBHelper.getEntitiesToBeIndexedDAO();
+    List<IndexingTask> indexingTasks = new ArrayList<IndexingTask>(3);
+    if (dao != null) {
+      EntityIdsByEventType outstandingNewsIds = dao.load();
+      indexingTasks.add(new IndexingTask(Indexer.this, EventType.PERSIST, outstandingNewsIds.getPersistedEntityRefs()));
+      indexingTasks.add(new IndexingTask(Indexer.this, EventType.UPDATE, outstandingNewsIds.getUpdatedEntityRefs()));
+      indexingTasks.add(new IndexingTask(Indexer.this, EventType.REMOVE, outstandingNewsIds.getRemovedEntityRefs()));
+    }
+    return indexingTasks;
   }
 
   synchronized void initIfNecessary() {
