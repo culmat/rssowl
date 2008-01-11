@@ -28,6 +28,7 @@ import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.BookMark;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.News;
+import org.rssowl.core.internal.persist.NewsBin;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
@@ -262,6 +263,9 @@ public class EventManager implements DatabaseListener   {
 
   private void cascadeNewsBinDeletion(INewsBin entity) {
     DBHelper.removeNewsAndFeedsAfterNewsBinUpdate(fDb, entity.getNewsRefs());
+    if (entity instanceof NewsBin)
+      fDb.delete(((NewsBin) entity).internalGetNewsContainer());
+
   }
 
   private void cascadeSearchConditionDeletion(ISearchCondition searchCondition) {
