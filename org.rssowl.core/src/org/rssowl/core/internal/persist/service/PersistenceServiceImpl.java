@@ -61,11 +61,11 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
     if (!emergency)
       getIDGenerator().shutdown();
 
-    /* db4o has priority over the search shutdown */
-    DBManager.getDefault().shutdown();
-
     /* Shutdown model search */
     getModelSearch().shutdown();
+
+    /* Shutdown db4o */
+    DBManager.getDefault().shutdown();
   }
 
   /*
@@ -76,13 +76,13 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
     DBManager.getDefault().createDatabase(new LongOperationMonitor(new NullProgressMonitor()) {
       @Override
       public void beginLongOperation() {
-        //Do nothing
+      //Do nothing
       }
     });
     getModelSearch().clearIndex();
   }
 
-  public void optimizeOnNextStartup() throws PersistenceException   {
+  public void optimizeOnNextStartup() throws PersistenceException {
     try {
       DBManager.getDefault().getDefragmentFile().createNewFile();
     } catch (IOException e) {
