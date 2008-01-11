@@ -35,7 +35,6 @@ import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.Folder;
 import org.rssowl.core.internal.persist.Label;
 import org.rssowl.core.internal.persist.News;
-import org.rssowl.core.internal.persist.NewsBin;
 import org.rssowl.core.internal.persist.Preference;
 import org.rssowl.core.internal.persist.migration.MigrationResult;
 import org.rssowl.core.internal.persist.migration.Migrations;
@@ -632,7 +631,6 @@ public class DBManager {
     configureFeed(config);
     configureNews(config);
     configureFolder(config);
-    config.objectClass(NewsBin.class).cascadeOnDelete(true);
     config.objectClass(NewsCounter.class).cascadeOnDelete(true);
     config.objectClass(Preference.class).cascadeOnDelete(true);
     config.objectClass(Preference.class).objectField("fKey").indexed(true); //$NON-NLS-1$
