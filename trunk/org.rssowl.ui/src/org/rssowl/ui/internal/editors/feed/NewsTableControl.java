@@ -105,6 +105,7 @@ import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
 import org.rssowl.ui.internal.actions.MarkNewsReadAction;
+import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
@@ -113,10 +114,13 @@ import org.rssowl.ui.internal.util.JobTracker;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -733,6 +737,44 @@ public class NewsTableControl implements IFeedViewPart {
           /* Show only when internal browser is used */
           if (!selection.isEmpty() && !fPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
             manager.add(new OpenInExternalBrowserAction(selection));
+        }
+
+        /* Move To / Copy To */
+        if (!selection.isEmpty()) {
+          manager.add(new Separator("movecopy"));
+
+          /* Load all news bins and sort by name */
+          List<INewsBin> newsbins = new ArrayList<INewsBin>(DynamicDAO.loadAll(INewsBin.class));
+
+          Comparator<INewsBin> comparator = new Comparator<INewsBin>() {
+            public int compare(INewsBin o1, INewsBin o2) {
+              return o1.getName().compareTo(o2.getName());
+            };
+          };
+
+          Collections.sort(newsbins, comparator);
+
+          /* Move To */
+          MenuManager moveMenu = new MenuManager("Move To", "moveto");
+          manager.add(moveMenu);
+
+          for (INewsBin bin : newsbins) {
+            moveMenu.add(new MoveCopyNewsToBinAction(selection, bin, true));
+          }
+
+          moveMenu.add(new Separator("movetonewbin"));
+          moveMenu.add(new MoveCopyNewsToBinAction(selection, null, true));
+
+          /* Copy To */
+          MenuManager copyMenu = new MenuManager("Copy To", "copyto");
+          manager.add(copyMenu);
+
+          for (INewsBin bin : newsbins) {
+            copyMenu.add(new MoveCopyNewsToBinAction(selection, bin, false));
+          }
+
+          copyMenu.add(new Separator("copytonewbin"));
+          copyMenu.add(new MoveCopyNewsToBinAction(selection, null, false));
         }
 
         /* Mark / Label */
