@@ -71,8 +71,9 @@ public class CleanUpTests {
     fModelSearch = Owl.getPersistenceService().getModelSearch();
     fFactory = Owl.getModelFactory();
 
-    Owl.getPersistenceService().recreateSchema();
+    /* We call startup first because of the shutdown called on tearDown */
     fModelSearch.startup();
+    Owl.getPersistenceService().recreateSchema();
   }
 
   /**

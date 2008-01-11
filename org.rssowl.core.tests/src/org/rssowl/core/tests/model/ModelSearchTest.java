@@ -89,8 +89,9 @@ public class ModelSearchTest {
     fFactory = Owl.getModelFactory();
     fNewsEntityName = INews.class.getName();
 
-    Owl.getPersistenceService().recreateSchema();
+    /* We call startup first because of the shutdown called on tearDown */
     fModelSearch.startup();
+    Owl.getPersistenceService().recreateSchema();
   }
 
   /**
