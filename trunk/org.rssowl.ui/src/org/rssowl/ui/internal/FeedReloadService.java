@@ -36,6 +36,8 @@ import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.BookMarkAdapter;
 import org.rssowl.core.persist.event.BookMarkEvent;
@@ -166,10 +168,12 @@ public class FeedReloadService {
 
     /* Query Update Intervals and reload/open state */
     Collection<IBookMark> bookmarks = DynamicDAO.loadAll(IBookMark.class);
+    Collection<INewsBin> newsbins = DynamicDAO.loadAll(INewsBin.class);
 
     final Set<IBookMark> bookmarksToReloadOnStartup = new HashSet<IBookMark>();
-    final List<IBookMark> bookmarksToOpenOnStartup = new ArrayList<IBookMark>();
+    final List<INewsMark> newsmarksToOpenOnStartup = new ArrayList<INewsMark>();
 
+    /* For each Bookmark */
     for (IBookMark bookMark : bookmarks) {
       IPreferenceScope entityPreferences = Owl.getPreferenceService().getEntityScope(bookMark);
 
@@ -185,7 +189,16 @@ public class FeedReloadService {
 
       /* BookMark is to open on startup */
       if (entityPreferences.getBoolean(DefaultPreferences.BM_OPEN_ON_STARTUP))
-        bookmarksToOpenOnStartup.add(bookMark);
+        newsmarksToOpenOnStartup.add(bookMark);
+    }
+
+    /* For each Newsbin */
+    for (INewsBin bin : newsbins) {
+      IPreferenceScope entityPreferences = Owl.getPreferenceService().getEntityScope(bin);
+
+      /* Newsbin is to open on startup */
+      if (entityPreferences.getBoolean(DefaultPreferences.BM_OPEN_ON_STARTUP))
+        newsmarksToOpenOnStartup.add(bin);
     }
 
     /* Reload the ones that reload on startup */
@@ -205,7 +218,7 @@ public class FeedReloadService {
     }
 
     /* Open BookMarks which are to open on startup */
-    if (!bookmarksToOpenOnStartup.isEmpty()) {
+    if (!newsmarksToOpenOnStartup.isEmpty()) {
       JobRunner.runInUIThread(null, new Runnable() {
         public void run() {
           boolean activateEditor = OpenStrategy.activateOnOpen();
@@ -214,10 +227,10 @@ public class FeedReloadService {
           IWorkbenchPage page = wWindow != null ? wWindow.getActivePage() : null;
 
           if (page != null) {
-            for (int i = 0; i < bookmarksToOpenOnStartup.size() && i < openEditorLimit; i++) {
+            for (int i = 0; i < newsmarksToOpenOnStartup.size() && i < openEditorLimit; i++) {
               try {
-                IBookMark bookMarkToOpen = bookmarksToOpenOnStartup.get(i);
-                page.openEditor(new FeedViewInput(bookMarkToOpen), FeedView.ID, activateEditor);
+                INewsMark newsMarkToOpen = newsmarksToOpenOnStartup.get(i);
+                page.openEditor(new FeedViewInput(newsMarkToOpen), FeedView.ID, activateEditor);
               } catch (PartInitException e) {
                 Activator.getDefault().getLog().log(e.getStatus());
               }
