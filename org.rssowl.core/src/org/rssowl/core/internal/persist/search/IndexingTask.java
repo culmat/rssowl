@@ -24,13 +24,16 @@
 
 package org.rssowl.core.internal.persist.search;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.runnable.EventType;
+import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.ITask;
 
 import java.io.IOException;
@@ -51,14 +54,18 @@ public final class IndexingTask implements ITask {
   private final Indexer fIndexer;
   private final EventType fTaskType;
   private final List<INews> fNews;
+  private final Collection<NewsReference> fNewsRefs;
 
   IndexingTask(Indexer indexer, Set<NewsEvent> events, EventType taskType) {
-    fIndexer = indexer;
-    fNews = new ArrayList<INews>(events.size());
-    for (NewsEvent event : events)
-      fNews.add(event.getEntity());
+    this(indexer, getNews(events), taskType);
+  }
 
-    fTaskType = taskType;
+  private static List<INews> getNews(Set<NewsEvent> events) {
+    List<INews> news = new ArrayList<INews>(events.size());
+    for (NewsEvent event : events)
+      news.add(event.getEntity());
+
+    return news;
   }
 
   IndexingTask(Indexer indexer, Collection<INews> news, EventType taskType) {
@@ -68,6 +75,17 @@ public final class IndexingTask implements ITask {
       fNews = (List<INews>) news;
     else
       fNews = new ArrayList<INews>(news);
+
+    fNewsRefs = null;
+
+    fTaskType = taskType;
+  }
+
+  IndexingTask(Indexer indexer, EventType taskType, Collection<NewsReference> newsRefs) {
+    fIndexer = indexer;
+
+    fNewsRefs = newsRefs;
+    fNews = null;
 
     fTaskType = taskType;
   }
@@ -111,17 +129,47 @@ public final class IndexingTask implements ITask {
     return Status.OK_STATUS;
   }
 
+  private List<INews> getNewsFromRefs(Collection<NewsReference> newsRefs) {
+    List<INews> newsList = new ArrayList<INews>(newsRefs.size());
+    for (NewsReference newsRef : newsRefs) {
+      INews news = InternalOwl.getDefault().getPersistenceService().getDAOService().getNewsDAO().load(newsRef.getId());
+      Assert.isNotNull(news, "news");
+      newsList.add(news);
+    }
+    return newsList;
+  }
+
+  private List<NewsReference> getRefsFromNews(List<INews> newsList) {
+    List<NewsReference> newsRefs = new ArrayList<NewsReference>(newsList.size());
+    for (INews news : newsList)
+      newsRefs.add(new NewsReference(news.getId()));
+
+    return newsRefs;
+  }
+
   private void addToIndex() {
+    if (fNews == null) {
+      fIndexer.index(getNewsFromRefs(fNewsRefs), false);
+      return;
+    }
     fIndexer.index(fNews, false);
   }
 
   private void updateIndex() {
+    if (fNews == null) {
+      fIndexer.index(getNewsFromRefs(fNewsRefs), true);
+      return;
+    }
     fIndexer.index(fNews, true);
   }
 
   private void deleteFromIndex() {
     try {
-      fIndexer.removeFromIndex(fNews);
+      if (fNews == null) {
+        fIndexer.removeFromIndex(fNewsRefs);
+        return;
+      }
+      fIndexer.removeFromIndex(getRefsFromNews(fNews));
     } catch (IOException e) {
       Activator.getDefault().getLog().log(Activator.getDefault().createErrorStatus(e.getMessage(), e));
     }

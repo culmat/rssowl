@@ -12,7 +12,6 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
@@ -31,6 +30,7 @@ import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.event.runnable.EventType;
+import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.JobQueue;
@@ -155,15 +155,13 @@ public class Indexer {
    * @param entities
    * @throws IOException
    */
-  synchronized void removeFromIndex(List<INews> entities) throws IOException {
+  synchronized void removeFromIndex(Collection<NewsReference> entities) throws IOException {
     int docCount = 0;
 
     /* For each entity */
-    for (ListIterator<INews> it = entities.listIterator(entities.size()); it.hasPrevious();) {
-      INews news = it.previous();
-      it.remove();
-      Term term = createTerm(news);
-      fUncommittedNews.addRemovedEntity(news);
+    for (NewsReference newsRef : entities) {
+      Term term = createTerm(newsRef);
+      fUncommittedNews.addRemovedEntityId(newsRef.getId());
       fIndexWriter.deleteDocuments(term);
       docCount++;
     }
@@ -265,20 +263,10 @@ public class Indexer {
     EntitiesToBeIndexedDAOImpl dao = DBHelper.getEntitiesToBeIndexedDAO();
     if (dao != null) {
       EntityIdsByEventType outstandingNewsIds = dao.load();
-      fJobQueue.schedule(new IndexingTask(Indexer.this, getNews(outstandingNewsIds.getPersistedEntityRefs()), EventType.PERSIST));
-      fJobQueue.schedule(new IndexingTask(Indexer.this, getNews((outstandingNewsIds.getUpdatedEntityRefs())), EventType.UPDATE));
-      fJobQueue.schedule(new IndexingTask(Indexer.this, getNews(outstandingNewsIds.getRemovedEntityRefs()), EventType.REMOVE));
+      fJobQueue.schedule(new IndexingTask(Indexer.this, EventType.PERSIST, outstandingNewsIds.getPersistedEntityRefs()));
+      fJobQueue.schedule(new IndexingTask(Indexer.this, EventType.UPDATE, outstandingNewsIds.getUpdatedEntityRefs()));
+      fJobQueue.schedule(new IndexingTask(Indexer.this, EventType.REMOVE, outstandingNewsIds.getRemovedEntityRefs()));
     }
-  }
-
-  private List<INews> getNews(Collection<NewsReference> newsRefs) {
-    List<INews> newsList = new ArrayList<INews>(newsRefs.size());
-    for (NewsReference newsRef : newsRefs) {
-      INews news = InternalOwl.getDefault().getPersistenceService().getDAOService().getNewsDAO().load(newsRef.getId());
-      Assert.isNotNull(news, "news");
-      newsList.add(news);
-    }
-    return newsList;
   }
 
   synchronized void initIfNecessary() {
@@ -380,6 +368,11 @@ public class Indexer {
     IndexWriter indexWriter = new IndexWriter(directory, false, createAnalyzer(), create);
     fFlushRequired = false;
     return indexWriter;
+  }
+
+  private Term createTerm(ModelReference reference) {
+    String value = String.valueOf(reference.getId());
+    return new Term(SearchDocument.ENTITY_ID_TEXT, value);
   }
 
   private Term createTerm(IEntity entity) {
