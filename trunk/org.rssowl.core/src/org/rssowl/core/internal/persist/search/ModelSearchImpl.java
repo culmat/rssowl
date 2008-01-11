@@ -577,7 +577,8 @@ public class ModelSearchImpl implements IModelSearch {
         TokenStream tokenStream = similarAnalyzer.tokenStream(String.valueOf(IEntity.ALL_FIELDS), new StringReader(value));
         Token token = null;
         while ((token = tokenStream.next()) != null) {
-          Term term = new Term(fieldname, token.termText());
+          String termText = new String(token.termBuffer(), 0, token.termLength());
+          Term term = new Term(fieldname, termText);
           similarityQuery.add(new BooleanClause(new FuzzyQuery(term), Occur.MUST));
         }
 
