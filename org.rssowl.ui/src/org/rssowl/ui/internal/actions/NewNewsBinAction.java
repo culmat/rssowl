@@ -73,6 +73,7 @@ public class NewNewsBinAction implements IWorkbenchWindowActionDelegate, IObject
   private Shell fShell;
   private IFolder fParent;
   private IMark fPosition;
+  private INewsBin fNewsbin;
 
   private static class NewNewsBinDialog extends TitleAreaDialog {
     private Text fNameInput;
@@ -224,16 +225,23 @@ public class NewNewsBinAction implements IWorkbenchWindowActionDelegate, IObject
       parent = dialog.getFolder();
 
       /* Create the NewsBin */
-      INewsBin newsbin = Owl.getModelFactory().createNewsBin(null, parent, title, fPosition, fPosition != null ? true : null);
+      fNewsbin = Owl.getModelFactory().createNewsBin(null, parent, title, fPosition, fPosition != null ? true : null);
 
       /* Copy all Properties from Parent into this Mark */
       Map<String, ?> properties = parent.getProperties();
 
       for (Map.Entry<String, ?> property : properties.entrySet())
-        newsbin.setProperty(property.getKey(), property.getValue());
+        fNewsbin.setProperty(property.getKey(), property.getValue());
 
       parent = DynamicDAO.save(parent);
     }
+  }
+
+  /**
+   * @return the newly created news bin.
+   */
+  public INewsBin getNewsbin() {
+    return fNewsbin;
   }
 
   /*
