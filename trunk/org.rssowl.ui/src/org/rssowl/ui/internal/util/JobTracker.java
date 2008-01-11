@@ -34,7 +34,7 @@ import org.rssowl.core.util.ITask;
 /**
  * The JobTracker guarantees that at anytime only the most recent
  * <code>ITask</code> is executed.
- * 
+ *
  * @author bpasero
  */
 public class JobTracker {
@@ -48,7 +48,7 @@ public class JobTracker {
   /**
    * Creates a new JobTracker with the given Delay. The JobTracker guarantees
    * that at anytime only the most recent <code>ITask</code> is executed.
-   * 
+   *
    * @param delay The delay in milliseconds after which new Tasks should be
    * scheduled.
    * @param showProgress if <code>TRUE</code>, progress is shown in the
@@ -63,7 +63,7 @@ public class JobTracker {
   /**
    * Creates a new JobTracker with the given Delay. The JobTracker guarantees
    * that at anytime only the most recent <code>ITask</code> is executed.
-   * 
+   *
    * @param delay The delay in milliseconds after which new Tasks should be
    * scheduled.
    * @param showProgress if <code>TRUE</code>, progress is shown in the
@@ -82,11 +82,11 @@ public class JobTracker {
 
   /**
    * Get the Delay after which Jobs should be scheduled for any new Tasks.
-   * 
+   *
    * @return Returns the Delay after which Jobs should be scheduled for any new
    * given Tasks.
    */
-  protected int getDelay() {
+  public int getDelay() {
     return fDelay;
   }
 
@@ -94,7 +94,7 @@ public class JobTracker {
    * Runs the given task after a certain delay that can be configured for this
    * Tracker. Any previous Task that the Tracker scheduled is canceld first, if
    * it was not yet running.
-   * 
+   *
    * @param task An instanceof <code>ITask</code> to be scheduled after the
    * Delay that has been set for this Tracker.
    */

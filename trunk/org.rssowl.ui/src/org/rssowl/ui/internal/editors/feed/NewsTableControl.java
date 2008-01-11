@@ -199,13 +199,22 @@ public class NewsTableControl implements IFeedViewPart {
 
   /* Tracker to Mark selected news as Read */
   private class MarkReadTracker extends JobTracker {
+    private boolean fUpdateDelayDynamically;
+
     MarkReadTracker(int delay, boolean showProgress) {
       super(delay, showProgress, ITask.Priority.INTERACTIVE);
     }
 
     @Override
-    protected int getDelay() {
-      return fInputPreferences.getInteger(DefaultPreferences.MARK_READ_IN_MILLIS);
+    public int getDelay() {
+      if (fUpdateDelayDynamically)
+        return fInputPreferences.getInteger(DefaultPreferences.MARK_READ_IN_MILLIS);
+
+      return super.getDelay();
+    }
+
+    public void setUpdateDelayDynamically(boolean updateDelayDynamically) {
+      fUpdateDelayDynamically = updateDelayDynamically;
     }
   }
 
@@ -239,7 +248,8 @@ public class NewsTableControl implements IFeedViewPart {
   }
 
   private IEditorSite fEditorSite;
-  private JobTracker fNewsStateTracker;
+  private MarkReadTracker fNewsStateTracker;
+  private MarkReadTracker fInstantMarkUnreadTracker;
   private NewsTableViewer fViewer;
   private ISelectionChangedListener fSelectionChangeListener;
   private IPropertyChangeListener fPropertyChangeListener;
@@ -265,6 +275,7 @@ public class NewsTableControl implements IFeedViewPart {
     fEditorSite = editorSite;
     fGlobalPreferences = Owl.getPreferenceService().getGlobalScope();
     fResources = new LocalResourceManager(JFaceResources.getResources());
+    fInstantMarkUnreadTracker = new MarkReadTracker(0, false);
   }
 
   /*
@@ -276,7 +287,10 @@ public class NewsTableControl implements IFeedViewPart {
     if (fNewsStateTracker != null)
       fNewsStateTracker.cancel();
 
+    fInstantMarkUnreadTracker.cancel();
+
     fNewsStateTracker = new MarkReadTracker(fInputPreferences.getInteger(DefaultPreferences.MARK_READ_IN_MILLIS), false);
+    fNewsStateTracker.setUpdateDelayDynamically(true);
   }
 
   IPreferenceScope getInputPreferences() {
@@ -602,33 +616,47 @@ public class NewsTableControl implements IFeedViewPart {
     if (fBlockNewsStateTracker.get() || !(event.getSelection() instanceof IStructuredSelection))
       return;
 
-    /* Check if settings disable the tracker */
-    if (!fInputPreferences.getBoolean(DefaultPreferences.MARK_READ_STATE))
-      return;
-
     /* Retrieve all NewsReferences of the Selection */
     IStructuredSelection selection = (IStructuredSelection) event.getSelection();
 
     /* Only responsible for single Selection of a News */
     if (selection.size() != 1 || !(selection.getFirstElement() instanceof INews)) {
       fNewsStateTracker.cancel();
+      fInstantMarkUnreadTracker.cancel();
       return;
     }
 
     /* Trigger the Tracker if news is not read already */
     final INews selectedNews = (INews) selection.getFirstElement();
     if (selectedNews.getState() != INews.State.READ && selectedNews.isVisible()) {
-      fNewsStateTracker.run(new TaskAdapter() {
-        public IStatus run(IProgressMonitor monitor) {
-          setNewsState(selectedNews, INews.State.READ);
-          return Status.OK_STATUS;
-        }
-      });
+      final boolean markRead = fInputPreferences.getBoolean(DefaultPreferences.MARK_READ_STATE);
+      final int delay = fNewsStateTracker.getDelay();
+
+      /* Instantly mark as *unread* if required */
+      if ((!markRead || delay > 0) && selectedNews.getState() != INews.State.UNREAD) {
+        fInstantMarkUnreadTracker.run(new TaskAdapter() {
+          public IStatus run(IProgressMonitor monitor) {
+            setNewsState(selectedNews, INews.State.UNREAD);
+            return Status.OK_STATUS;
+          }
+        });
+      }
+
+      /* Mark Read after Delay */
+      if (markRead) {
+        fNewsStateTracker.run(new TaskAdapter() {
+          public IStatus run(IProgressMonitor monitor) {
+            setNewsState(selectedNews, INews.State.READ);
+            return Status.OK_STATUS;
+          }
+        });
+      }
     }
 
     /* Cancel any possible running JobTracker */
     else if (selectedNews.getState() == INews.State.READ) {
       fNewsStateTracker.cancel();
+      fInstantMarkUnreadTracker.cancel();
     }
   }
 
@@ -920,6 +948,7 @@ public class NewsTableControl implements IFeedViewPart {
    */
   public void dispose() {
     fNewsStateTracker.cancel();
+    fInstantMarkUnreadTracker.cancel();
     fResources.dispose();
     unregisterListeners();
   }
