@@ -125,6 +125,10 @@ public final class EntityIdsByEventType extends Persistable implements IPersista
     fRemovedEntities.add(entity.getId());
   }
 
+  public synchronized void addRemovedEntityId(long id) {
+    fRemovedEntities.add(id);
+  }
+
   public LongArrayList getRemovedEntityIds() {
     return fRemovedEntities;
   }
