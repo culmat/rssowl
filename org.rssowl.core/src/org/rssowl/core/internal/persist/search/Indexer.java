@@ -278,14 +278,23 @@ public class Indexer {
     }
   }
 
-  private List<IndexingTask> getIndexOutstandingEntitiesTasks(){
+  private List<IndexingTask> getIndexOutstandingEntitiesTasks() {
     final EntitiesToBeIndexedDAOImpl dao = DBHelper.getEntitiesToBeIndexedDAO();
     List<IndexingTask> indexingTasks = new ArrayList<IndexingTask>(3);
     if (dao != null) {
       EntityIdsByEventType outstandingNewsIds = dao.load();
-      indexingTasks.add(new IndexingTask(Indexer.this, EventType.PERSIST, outstandingNewsIds.getPersistedEntityRefs()));
-      indexingTasks.add(new IndexingTask(Indexer.this, EventType.UPDATE, outstandingNewsIds.getUpdatedEntityRefs()));
-      indexingTasks.add(new IndexingTask(Indexer.this, EventType.REMOVE, outstandingNewsIds.getRemovedEntityRefs()));
+
+      List<NewsReference> persistedEntityRefs = outstandingNewsIds.getPersistedEntityRefs();
+      if (!persistedEntityRefs.isEmpty())
+        indexingTasks.add(new IndexingTask(Indexer.this, EventType.PERSIST, persistedEntityRefs));
+
+      List<NewsReference> updatedEntityRefs = outstandingNewsIds.getUpdatedEntityRefs();
+      if (!updatedEntityRefs.isEmpty())
+        indexingTasks.add(new IndexingTask(Indexer.this, EventType.UPDATE, updatedEntityRefs));
+
+      List<NewsReference> removedEntityRefs = outstandingNewsIds.getRemovedEntityRefs();
+      if (!removedEntityRefs.isEmpty())
+        indexingTasks.add(new IndexingTask(Indexer.this, EventType.REMOVE, removedEntityRefs));
     }
     return indexingTasks;
   }
