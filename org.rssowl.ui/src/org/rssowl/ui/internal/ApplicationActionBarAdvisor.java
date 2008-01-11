@@ -51,6 +51,7 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.actions.CopyLinkAction;
@@ -58,6 +59,7 @@ import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
 import org.rssowl.ui.internal.actions.MarkNewsReadAction;
+import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.ReloadAllAction;
@@ -68,8 +70,12 @@ import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -386,6 +392,44 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             manager.add(new OpenInExternalBrowserAction(selection));
         }
 
+        /* Move To / Copy To */
+        if (!selection.isEmpty()) {
+          manager.add(new Separator("movecopy"));
+
+          /* Load all news bins and sort by name */
+          List<INewsBin> newsbins = new ArrayList<INewsBin>(DynamicDAO.loadAll(INewsBin.class));
+
+          Comparator<INewsBin> comparator = new Comparator<INewsBin>() {
+            public int compare(INewsBin o1, INewsBin o2) {
+              return o1.getName().compareTo(o2.getName());
+            };
+          };
+
+          Collections.sort(newsbins, comparator);
+
+          /* Move To */
+          MenuManager moveMenu = new MenuManager("Move To", "moveto");
+          manager.add(moveMenu);
+
+          for (INewsBin bin : newsbins) {
+            moveMenu.add(new MoveCopyNewsToBinAction(selection, bin, true));
+          }
+
+          moveMenu.add(new Separator("movetonewbin"));
+          moveMenu.add(new MoveCopyNewsToBinAction(selection, null, true));
+
+          /* Copy To */
+          MenuManager copyMenu = new MenuManager("Copy To", "copyto");
+          manager.add(copyMenu);
+
+          for (INewsBin bin : newsbins) {
+            copyMenu.add(new MoveCopyNewsToBinAction(selection, bin, false));
+          }
+
+          copyMenu.add(new Separator("copytonewbin"));
+          copyMenu.add(new MoveCopyNewsToBinAction(selection, null, false));
+        }
+
         /* Mark / Label */
         {
           manager.add(new Separator("mark"));
@@ -428,6 +472,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
                 Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
                 new LabelAction(labels, selection, false).run();
               }
+
+              @Override
+              public boolean isEnabled() {
+                return !selection.isEmpty();
+              }
             };
 
             removeAllLabels.setEnabled(!labels.isEmpty());
@@ -441,6 +490,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
                   Set<ILabel> labels = new HashSet<ILabel>(1);
                   labels.add(label);
                   new LabelAction(labels, selection, isChecked()).run();
+                }
+
+                @Override
+                public boolean isEnabled() {
+                  return !selection.isEmpty();
                 }
               };
 
@@ -456,41 +510,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
               }
             });
           }
-        }
-
-        /* Edit */
-        {
-          manager.add(new Separator("edit"));
-
-          /* Copy Link */
-          manager.add(new Action("Copy Link") {
-            @Override
-            public void run() {
-              IActionDelegate action = new CopyLinkAction();
-              action.selectionChanged(null, selection);
-              action.run(null);
-            }
-
-            @Override
-            public boolean isEnabled() {
-              return !selection.isEmpty();
-            }
-          });
-
-          /* Send Link */
-          manager.add(new Action("Send Link") {
-            @Override
-            public void run() {
-              IActionDelegate action = new SendLinkAction();
-              action.selectionChanged(null, selection);
-              action.run(null);
-            }
-
-            @Override
-            public boolean isEnabled() {
-              return !selection.isEmpty();
-            }
-          });
         }
 
         /* Update */
@@ -527,6 +546,42 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         }
 
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        /* Edit */
+        {
+          manager.add(new Separator("edit"));
+
+          /* Copy Link */
+          manager.add(new Action("Copy Link") {
+            @Override
+            public void run() {
+              IActionDelegate action = new CopyLinkAction();
+              action.selectionChanged(null, selection);
+              action.run(null);
+            }
+
+            @Override
+            public boolean isEnabled() {
+              return !selection.isEmpty();
+            }
+          });
+
+          /* Send Link */
+          manager.add(new Action("Send Link") {
+            @Override
+            public void run() {
+              IActionDelegate action = new SendLinkAction();
+              action.selectionChanged(null, selection);
+              action.run(null);
+            }
+
+            @Override
+            public boolean isEnabled() {
+              return !selection.isEmpty();
+            }
+          });
+        }
+
       }
     });
   }
