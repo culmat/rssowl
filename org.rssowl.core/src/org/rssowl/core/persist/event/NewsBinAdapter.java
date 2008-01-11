@@ -21,8 +21,31 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.event;
 
-public class NewsBinAdapter {
+import java.util.Set;
 
+/**
+ * Provides an empty implementation of <code>NewsBinListener</code>. Useful
+ * if the client only needs to implement a subset of the interface.
+ *
+ * @author bpasero
+ */
+public class NewsBinAdapter implements NewsBinListener {
+
+  /*
+   * @see org.rssowl.core.persist.event.EntityListener#entitiesAdded(java.util.Set)
+   */
+  public void entitiesAdded(Set<NewsBinEvent> events) {}
+
+  /*
+   * @see org.rssowl.core.persist.event.EntityListener#entitiesDeleted(java.util.Set)
+   */
+  public void entitiesDeleted(Set<NewsBinEvent> events) {}
+
+  /*
+   * @see org.rssowl.core.persist.event.EntityListener#entitiesUpdated(java.util.Set)
+   */
+  public void entitiesUpdated(Set<NewsBinEvent> events) {}
 }
