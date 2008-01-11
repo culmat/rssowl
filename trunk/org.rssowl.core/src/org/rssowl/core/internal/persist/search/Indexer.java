@@ -12,7 +12,11 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.store.Directory;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
@@ -220,7 +224,7 @@ public class Indexer {
    * @throws CorruptIndexException
    * @throws IOException
    */
-  synchronized void optimize() throws CorruptIndexException, IOException  {
+  synchronized void optimize() throws CorruptIndexException, IOException {
     fIndexWriter.optimize();
   }
 
@@ -260,12 +264,22 @@ public class Indexer {
     registerListeners();
 
     /* Index outstanding news */
-    EntitiesToBeIndexedDAOImpl dao = DBHelper.getEntitiesToBeIndexedDAO();
+    final EntitiesToBeIndexedDAOImpl dao = DBHelper.getEntitiesToBeIndexedDAO();
     if (dao != null) {
-      EntityIdsByEventType outstandingNewsIds = dao.load();
-      fJobQueue.schedule(new IndexingTask(Indexer.this, EventType.PERSIST, outstandingNewsIds.getPersistedEntityRefs()));
-      fJobQueue.schedule(new IndexingTask(Indexer.this, EventType.UPDATE, outstandingNewsIds.getUpdatedEntityRefs()));
-      fJobQueue.schedule(new IndexingTask(Indexer.this, EventType.REMOVE, outstandingNewsIds.getRemovedEntityRefs()));
+      Job delayedIndexJob = new Job("Indexing from dirty shutdown") {
+        @Override
+        protected IStatus run(IProgressMonitor monitor) {
+          EntityIdsByEventType outstandingNewsIds = dao.load();
+          fJobQueue.schedule(new IndexingTask(Indexer.this, EventType.PERSIST, outstandingNewsIds.getPersistedEntityRefs()));
+          fJobQueue.schedule(new IndexingTask(Indexer.this, EventType.UPDATE, outstandingNewsIds.getUpdatedEntityRefs()));
+          fJobQueue.schedule(new IndexingTask(Indexer.this, EventType.REMOVE, outstandingNewsIds.getRemovedEntityRefs()));
+          return Status.OK_STATUS;
+        }
+      };
+
+      delayedIndexJob.setSystem(true);
+      delayedIndexJob.setUser(false);
+      delayedIndexJob.schedule(1000);
     }
   }
 
