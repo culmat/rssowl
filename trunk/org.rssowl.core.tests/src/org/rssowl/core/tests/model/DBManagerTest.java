@@ -24,6 +24,7 @@
 
 package org.rssowl.core.tests.model;
 
+import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -140,7 +141,6 @@ public class DBManagerTest {
 
   /**
    * Tests that deleting a INews.isCopy() will cause either:
-   *
    * <li>The original feed not to be deleted if it is referenced by a BM or
    * another INews.isCopy()</li>
    * <li>The original feed to be deleted otherwise.</li>
@@ -213,10 +213,9 @@ public class DBManagerTest {
   }
 
   /**
-   * Tests that news copy is actually deleted and removed from INewsBin
-   * when it's saved after changing state to DELETED. Also checks that
-   * INewsBin is updated if the state of the INews contained in it is changed
-   * to HIDDEN.
+   * Tests that news copy is actually deleted and removed from INewsBin when
+   * it's saved after changing state to DELETED. Also checks that INewsBin is
+   * updated if the state of the INews contained in it is changed to HIDDEN.
    */
   @Test
   public void testNewsIsCopyActuallyDeletedOnDeleteStateChange() {
@@ -273,8 +272,8 @@ public class DBManagerTest {
   }
 
   /**
-   * Tests that deleting a IBookMark where the feed has news copies does
-   * not delete the feed.
+   * Tests that deleting a IBookMark where the feed has news copies does not
+   * delete the feed.
    */
   @Test
   public void testDeleteBookMarkWithNewsCopies() {
@@ -378,6 +377,36 @@ public class DBManagerTest {
     assertNull(DynamicDAO.load(ISearchMark.class, searchMark.getId()));
     assertNull(DynamicDAO.load(ISearchCondition.class, searchCondition.getId()));
     assertNull(fDb.ext().getByID(searchFieldId));
+  }
+
+  /**
+   * Tests that deleting a news bin is not sending out folder-deleted events.
+   */
+  @Test
+  public void testDeleteBinIsNotSendindFolderDeleteEvents() {
+    IFolder folder = fTypesFactory.createFolder(null, null, "Folder");
+    INewsBin bin = fTypesFactory.createNewsBin(null, folder, "News Bin");
+    DynamicDAO.save(folder);
+
+    assertNotNull(DynamicDAO.load(INewsBin.class, bin.getId()));
+
+    final boolean[] bool = new boolean[] { false };
+
+    FolderAdapter folderListener = new FolderAdapter() {
+      @Override
+      public void entitiesDeleted(Set<FolderEvent> events) {
+        bool[0] = true;
+      }
+    };
+
+    DynamicDAO.addEntityListener(IFolder.class, folderListener);
+
+    DynamicDAO.delete(bin);
+    assertNull(DynamicDAO.load(INewsBin.class, bin.getId()));
+
+    DynamicDAO.removeEntityListener(IFolder.class, folderListener);
+
+    assertFalse("Unexpected Folder Event", bool[0]);
   }
 
   private ICategory createFeedCategory() throws PersistenceException {
