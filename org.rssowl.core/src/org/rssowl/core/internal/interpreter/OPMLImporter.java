@@ -391,6 +391,16 @@ public class OPMLImporter implements ITypeImporter {
       /* Process Saved Search */
       else if ("savedsearch".equals(name))
         processSavedSearch(child, (IFolder) type);
+
+      /* Process News Bin */
+      else if ("newsbin".equals(name))
+        processNewsBin(child, (IFolder) type);
     }
+  }
+
+  private void processNewsBin(Element newsBinElement, IFolder folder) {
+    String name = newsBinElement.getAttributeValue("name");
+
+    Owl.getModelFactory().createNewsBin(null, folder, name);
   }
 }
