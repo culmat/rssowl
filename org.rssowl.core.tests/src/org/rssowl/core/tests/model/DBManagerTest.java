@@ -43,6 +43,8 @@ import org.rssowl.core.internal.persist.Guid;
 import org.rssowl.core.internal.persist.Image;
 import org.rssowl.core.internal.persist.Label;
 import org.rssowl.core.internal.persist.News;
+import org.rssowl.core.internal.persist.NewsBin;
+import org.rssowl.core.internal.persist.NewsContainer;
 import org.rssowl.core.internal.persist.Person;
 import org.rssowl.core.internal.persist.SearchMark;
 import org.rssowl.core.internal.persist.Source;
@@ -377,6 +379,26 @@ public class DBManagerTest {
     assertNull(DynamicDAO.load(ISearchMark.class, searchMark.getId()));
     assertNull(DynamicDAO.load(ISearchCondition.class, searchCondition.getId()));
     assertNull(fDb.ext().getByID(searchFieldId));
+  }
+
+  @Test
+  public void testDeleteNewsBinDeletesNewsContainer() {
+    IFeed feed = createFeed();
+    INews news = fTypesFactory.createNews(null, feed, new Date());
+    DynamicDAO.save(feed);
+    INews newsCopy = fTypesFactory.createNews(news);
+    DynamicDAO.save(newsCopy);
+
+    IFolder folder = fTypesFactory.createFolder(null, null, "Folder");
+    NewsBin bin = (NewsBin) fTypesFactory.createNewsBin(null, folder, "News Bin");
+    DynamicDAO.save(folder);
+
+    /* Ensure that arrays are treated specially by db4o, don't need to delete them manually */
+    assertFalse(fDb.ext().isStored(bin.internalGetNewsContainer().internalGetNewsIds()));
+
+    NewsContainer newsContainer = bin.internalGetNewsContainer();
+    DynamicDAO.delete(bin);
+    assertFalse(fDb.ext().isStored(newsContainer));
   }
 
   /**
