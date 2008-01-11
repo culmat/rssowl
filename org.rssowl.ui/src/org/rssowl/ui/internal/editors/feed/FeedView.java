@@ -733,6 +733,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   public void notifyUIEvent(final UIEvent event) {
     final IMark inputMark = fInput.getMark();
     final Collection<INews> news = fContentProvider.getCachedNews();
+    IPreferenceScope inputPreferences = Owl.getPreferenceService().getEntityScope(inputMark);
 
     /*
      * News can be NULL at this moment, if the Job that is to refresh the cache
@@ -743,8 +744,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
     if (news == null || !fInput.exists())
       return;
 
-    final boolean markReadOnFeedChange = fPreferences.getBoolean(DefaultPreferences.MARK_FEED_READ_ON_CHANGE);
-    final boolean markReadOnMinimize = fPreferences.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE);
+    final boolean markReadOnFeedChange = inputPreferences.getBoolean(DefaultPreferences.MARK_FEED_READ_ON_CHANGE);
+    final boolean markReadOnMinimize = inputPreferences.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE);
 
     /* Mark *new* News as *unread* when closing the entire application */
     if (event == UIEvent.CLOSE) {

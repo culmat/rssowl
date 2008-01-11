@@ -205,7 +205,7 @@ public class NewsTableControl implements IFeedViewPart {
 
     @Override
     protected int getDelay() {
-      return fPreferences.getInteger(DefaultPreferences.MARK_READ_IN_MILLIS);
+      return fInputPreferences.getInteger(DefaultPreferences.MARK_READ_IN_MILLIS);
     }
   }
 
@@ -254,7 +254,7 @@ public class NewsTableControl implements IFeedViewPart {
   private INewsDAO fNewsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
 
   /* Settings */
-  private IPreferenceScope fPreferences;
+  private IPreferenceScope fGlobalPreferences;
   private Columns fInitialSortColumn = Columns.DATE;
   private boolean fInitialAscending = false;
 
@@ -263,8 +263,7 @@ public class NewsTableControl implements IFeedViewPart {
    */
   public void init(IEditorSite editorSite) {
     fEditorSite = editorSite;
-    fPreferences = Owl.getPreferenceService().getGlobalScope();
-    fNewsStateTracker = new MarkReadTracker(fPreferences.getInteger(DefaultPreferences.MARK_READ_IN_MILLIS), false);
+    fGlobalPreferences = Owl.getPreferenceService().getGlobalScope();
     fResources = new LocalResourceManager(JFaceResources.getResources());
   }
 
@@ -273,6 +272,11 @@ public class NewsTableControl implements IFeedViewPart {
    */
   public void onInputChanged(FeedViewInput input) {
     fInputPreferences = Owl.getPreferenceService().getEntityScope(input.getMark());
+
+    if (fNewsStateTracker != null)
+      fNewsStateTracker.cancel();
+
+    fNewsStateTracker = new MarkReadTracker(fInputPreferences.getInteger(DefaultPreferences.MARK_READ_IN_MILLIS), false);
   }
 
   IPreferenceScope getInputPreferences() {
@@ -599,7 +603,7 @@ public class NewsTableControl implements IFeedViewPart {
       return;
 
     /* Check if settings disable the tracker */
-    if (!fPreferences.getBoolean(DefaultPreferences.MARK_READ_STATE))
+    if (!fInputPreferences.getBoolean(DefaultPreferences.MARK_READ_STATE))
       return;
 
     /* Retrieve all NewsReferences of the Selection */
@@ -743,7 +747,7 @@ public class NewsTableControl implements IFeedViewPart {
           manager.add(new Separator("open"));
 
           /* Show only when internal browser is used */
-          if (!selection.isEmpty() && !fPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
+          if (!selection.isEmpty() && !fGlobalPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fGlobalPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
             manager.add(new OpenInExternalBrowserAction(selection));
         }
 
