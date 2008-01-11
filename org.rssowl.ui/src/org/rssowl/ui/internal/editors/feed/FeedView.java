@@ -64,6 +64,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
@@ -75,6 +76,10 @@ import org.rssowl.core.persist.event.BookMarkEvent;
 import org.rssowl.core.persist.event.BookMarkListener;
 import org.rssowl.core.persist.event.FeedAdapter;
 import org.rssowl.core.persist.event.FeedEvent;
+import org.rssowl.core.persist.event.MarkEvent;
+import org.rssowl.core.persist.event.NewsBinAdapter;
+import org.rssowl.core.persist.event.NewsBinEvent;
+import org.rssowl.core.persist.event.NewsBinListener;
 import org.rssowl.core.persist.event.SearchConditionEvent;
 import org.rssowl.core.persist.event.SearchConditionListener;
 import org.rssowl.core.persist.event.SearchMarkAdapter;
@@ -173,6 +178,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private SearchMarkAdapter fSearchMarkListener;
   private FeedAdapter fFeedListener;
   private SearchConditionListener fSearchConditionListener;
+  private NewsBinListener fNewsBinListener;
 
   /* Settings */
   NewsFilter.Type fInitialFilterType;
@@ -299,68 +305,30 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     fEditorSite.getPage().addPartListener(fPartListener);
 
-    /* Close Editor if Input was Deleted (BookMark) */
+    /* React on Bookmark Events */
     fBookMarkListener = new BookMarkAdapter() {
       @Override
       public void entitiesDeleted(Set<BookMarkEvent> events) {
-        for (BookMarkEvent event : events) {
-          IBookMark mark = event.getEntity();
-          if (mark.getId().equals(fInput.getMark().getId())) {
-            fInput.setDeleted();
-            fEditorSite.getPage().closeEditor(FeedView.this, false);
-            break;
-          }
-        }
+        onNewsMarksDeleted(events);
       }
 
       @Override
       public void entitiesUpdated(Set<BookMarkEvent> events) {
-        for (BookMarkEvent event : events) {
-          final IBookMark mark = event.getEntity();
-          if (mark.getId().equals(fInput.getMark().getId())) {
-            JobRunner.runInUIThread(fParent, new Runnable() {
-              public void run() {
-                setPartName(mark.getName());
-                OwlUI.updateWindowTitle(new IMark[] { fInput.getMark() });
-              }
-            });
-
-            break;
-          }
-        }
+        onNewsMarksUpdated(events);
       }
     };
     DynamicDAO.addEntityListener(IBookMark.class, fBookMarkListener);
 
-    /* Close Editor if Input was Deleted & Update on results Changed */
+    /* React on Searchmark Events */
     fSearchMarkListener = new SearchMarkAdapter() {
       @Override
       public void entitiesDeleted(Set<SearchMarkEvent> events) {
-        for (SearchMarkEvent event : events) {
-          ISearchMark mark = event.getEntity();
-          if (fInput.getMark().getId().equals(mark.getId())) {
-            fEditorSite.getPage().closeEditor(FeedView.this, false);
-            fInput.setDeleted();
-            break;
-          }
-        }
+        onNewsMarksDeleted(events);
       }
 
       @Override
       public void entitiesUpdated(Set<SearchMarkEvent> events) {
-        for (SearchMarkEvent event : events) {
-          final ISearchMark mark = event.getEntity();
-          if (mark.getId().equals(fInput.getMark().getId())) {
-            JobRunner.runInUIThread(fParent, new Runnable() {
-              public void run() {
-                setPartName(mark.getName());
-                OwlUI.updateWindowTitle(new IMark[] { fInput.getMark() });
-              }
-            });
-
-            break;
-          }
-        }
+        onNewsMarksUpdated(events);
       }
     };
     DynamicDAO.addEntityListener(ISearchMark.class, fSearchMarkListener);
@@ -409,6 +377,20 @@ public class FeedView extends EditorPart implements IReusableEditor {
     };
     DynamicDAO.addEntityListener(ISearchCondition.class, fSearchConditionListener);
 
+    /* React on Newsbin Events */
+    fNewsBinListener = new NewsBinAdapter() {
+      @Override
+      public void entitiesDeleted(Set<NewsBinEvent> events) {
+        onNewsMarksDeleted(events);
+      }
+
+      @Override
+      public void entitiesUpdated(Set<NewsBinEvent> events) {
+        onNewsMarksUpdated(events);
+      }
+    };
+    DynamicDAO.addEntityListener(INewsBin.class, fNewsBinListener);
+
     /* Listen if Title Image is changing */
     fFeedListener = new FeedAdapter() {
       @Override
@@ -441,6 +423,33 @@ public class FeedView extends EditorPart implements IReusableEditor {
       }
     };
     DynamicDAO.addEntityListener(IFeed.class, fFeedListener);
+  }
+
+  private void onNewsMarksUpdated(Set<? extends MarkEvent> events) {
+    for (MarkEvent event : events) {
+      final IMark mark = event.getEntity();
+      if (mark.getId().equals(fInput.getMark().getId())) {
+        JobRunner.runInUIThread(fParent, new Runnable() {
+          public void run() {
+            setPartName(mark.getName());
+            OwlUI.updateWindowTitle(new IMark[] { fInput.getMark() });
+          }
+        });
+
+        break;
+      }
+    }
+  }
+
+  private void onNewsMarksDeleted(Set<? extends MarkEvent> events) {
+    for (MarkEvent event : events) {
+      IMark mark = event.getEntity();
+      if (fInput.getMark().getId().equals(mark.getId())) {
+        fEditorSite.getPage().closeEditor(FeedView.this, false);
+        fInput.setDeleted();
+        break;
+      }
+    }
   }
 
   private void loadSettings(FeedViewInput input) {
@@ -946,6 +955,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     DynamicDAO.removeEntityListener(ISearchMark.class, fSearchMarkListener);
     DynamicDAO.removeEntityListener(IFeed.class, fFeedListener);
     DynamicDAO.removeEntityListener(ISearchCondition.class, fSearchConditionListener);
+    DynamicDAO.removeEntityListener(INewsBin.class, fNewsBinListener);
   }
 
   /**
