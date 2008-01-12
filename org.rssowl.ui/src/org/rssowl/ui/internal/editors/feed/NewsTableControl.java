@@ -671,10 +671,6 @@ public class NewsTableControl implements IFeedViewPart {
     if (item == null || item.isDisposed())
       return;
 
-    /* Don't run Tracker if other Mouse Button is used */
-    if (event.button != 1)
-      disableTrackerTemporary = true;
-
     /* Mouse-Up over Read-State-Column */
     if (event.button == 1 && item.getImageBounds(COL_TITLE).contains(p)) {
       Object data = item.getData();
