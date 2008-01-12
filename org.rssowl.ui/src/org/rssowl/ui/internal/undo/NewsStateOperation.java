@@ -31,11 +31,11 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,26 +65,10 @@ public class NewsStateOperation implements IUndoOperation {
   public NewsStateOperation(Collection<INews> news, INews.State newState, boolean affectEquivalentNews) {
     Assert.isTrue(SUPPORTED_STATES.contains(newState), "Unsupported Operation");
 
-    fOldStates = toStateMap(news);
+    fOldStates = ModelUtils.toStateMap(news);
     fNewState = newState;
     fAffectEquivalentNews = affectEquivalentNews;
     fNewsCount = news.size();
-  }
-
-  private Map<INews.State, List<NewsReference>> toStateMap(Collection<INews> news) {
-    Map<INews.State, List<NewsReference>> map = new HashMap<State, List<NewsReference>>();
-    for (INews newsitem : news) {
-      INews.State state = newsitem.getState();
-      List<NewsReference> newsrefs = map.get(state);
-      if (newsrefs == null) {
-        newsrefs = new ArrayList<NewsReference>();
-        map.put(state, newsrefs);
-      }
-
-      newsrefs.add(newsitem.toReference());
-    }
-
-    return map;
   }
 
   /*
@@ -118,7 +102,9 @@ public class NewsStateOperation implements IUndoOperation {
       List<INews> resolvedNews = new ArrayList<INews>(newsRefs.size());
       for (NewsReference newsRef : newsRefs) {
         INews news = newsRef.resolve();
-        if (news != null)
+
+        /* Only support Undo for News if state of news is still current */
+        if (news != null && news.getState() == fNewState)
           resolvedNews.add(news);
       }
 
@@ -134,22 +120,25 @@ public class NewsStateOperation implements IUndoOperation {
    * @see org.rssowl.ui.internal.undo.IUndoOperation#redo()
    */
   public void redo() {
+    Set<Entry<State, List<NewsReference>>> entries = fOldStates.entrySet();
+    for (Entry<State, List<NewsReference>> entry : entries) {
+      INews.State oldState = entry.getKey();
+      List<NewsReference> newsRefs = entry.getValue();
 
-    /* Resolve News */
-    List<INews> resolvedNews = new ArrayList<INews>(fNewsCount);
-    Collection<List<NewsReference>> newsRefLists = fOldStates.values();
-    for (List<NewsReference> newsRefList : newsRefLists) {
-      for (NewsReference newsRef : newsRefList) {
+      List<INews> resolvedNews = new ArrayList<INews>(newsRefs.size());
+      for (NewsReference newsRef : newsRefs) {
         INews news = newsRef.resolve();
-        if (news != null)
+
+        /* Only support Undo for News if state of news is still matching the old one */
+        if (news != null && news.getState() == oldState)
           resolvedNews.add(news);
       }
+
+      /* Force quick update of saved searches */
+      Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+
+      /* Set state back to all news */
+      fNewsDao.setState(resolvedNews, fNewState, fAffectEquivalentNews, false);
     }
-
-    /* Force quick update of saved searches */
-    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
-
-    /* Set state back to all news */
-    fNewsDao.setState(resolvedNews, fNewState, fAffectEquivalentNews, false);
   }
 }
