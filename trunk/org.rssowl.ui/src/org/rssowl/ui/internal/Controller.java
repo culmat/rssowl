@@ -127,6 +127,9 @@ public class Controller {
   /* Extension-Points */
   private static final String ENTITY_PROPERTY_PAGE_EXTENSION_POINT = "org.rssowl.ui.EntityPropertyPage"; //$NON-NLS-1$
 
+  /* Property to store info about a Realm in a Bookmark */
+  static final String BM_REALM_PROPERTY = "org.rssowl.ui.BMRealmProperty";
+
   /* The Singleton Instance */
   private static Controller fInstance;
 
@@ -587,8 +590,17 @@ public class Controller {
 
               /* Show Login Dialog */
               LoginDialog login = new LoginDialog(shell, feedLink, authEx.getRealm());
-              if (login.open() == Window.OK && !fShuttingDown)
+              if (login.open() == Window.OK && !fShuttingDown) {
+
+                /* Store info about Realm in Bookmark */
+                if (StringUtils.isSet(authEx.getRealm())) {
+                  bookmark.setProperty(BM_REALM_PROPERTY, authEx.getRealm());
+                  fBookMarkDAO.save(bookmark);
+                }
+
+                /* Re-Reload Bookmark */
                 reloadQueued(bookmark, shell);
+              }
 
               /* Update Error Flag if user hit Cancel */
               else if (!fShuttingDown && !monitor.isCanceled() && !bookmark.isErrorLoading()) {
