@@ -25,14 +25,15 @@
 package org.rssowl.ui.internal.editors.feed;
 
 import org.eclipse.jface.viewers.IContentProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.swt.widgets.Widget;
-import org.rssowl.core.internal.persist.pref.DefaultPreferences;
-import org.rssowl.ui.internal.util.TreeItemAdapter;
+import org.rssowl.core.persist.INews;
+import org.rssowl.ui.internal.util.ITreeNode;
+import org.rssowl.ui.internal.util.TreeTraversal;
+import org.rssowl.ui.internal.util.WidgetTreeNode;
 
 /**
  * The actual TreeViewer responsible for displaying the Headlines of a Feed.
@@ -42,15 +43,12 @@ import org.rssowl.ui.internal.util.TreeItemAdapter;
  */
 public class NewsTableViewer extends TreeViewer {
   private boolean fBlockRefresh;
-  private final NewsTableControl fNewsTableControl;
 
   /**
-   * @param newsTableControl
    * @param tree
    */
-  public NewsTableViewer(NewsTableControl newsTableControl, Tree tree) {
+  public NewsTableViewer(Tree tree) {
     super(tree);
-    fNewsTableControl = newsTableControl;
   }
 
   /*
@@ -87,50 +85,48 @@ public class NewsTableViewer extends TreeViewer {
     });
   }
 
-  private void updateSelectionAfterDelete(Runnable runnable) {
-    Tree tree = (Tree) getControl();
-    IStructuredSelection selection = (IStructuredSelection) getSelection();
+  void updateSelectionAfterDelete(Runnable runnable) {
+    TreeItem[] selection = getTree().getSelection();
 
     /* Nothing to do, since no selection */
-    if (selection.isEmpty()) {
+    if (selection.length == 0) {
       runnable.run();
       return;
     }
 
-    /* Look for the minimal Index of all selected Elements */
-    int minSelectedIndex = Integer.MAX_VALUE;
-    TreeItemAdapter parentOfMinSelected = new TreeItemAdapter(tree);
+    /* Navigate to next News if possible */
+    ITreeNode startingNode = new WidgetTreeNode(selection[selection.length - 1], this);
+    ISelection newSelection = navigate(startingNode, true);
 
-    /* For each selected Element */
-    Object[] selectedElements = selection.toArray();
-    for (Object selectedElement : selectedElements) {
-      Widget widget = findItem(selectedElement);
-      if (widget instanceof TreeItem) {
-        TreeItem item = (TreeItem) widget;
-        TreeItemAdapter parent = new TreeItemAdapter(item).getParent();
-
-        int index = parent.indexOf(item);
-        minSelectedIndex = Math.min(minSelectedIndex, index);
-        if (index == minSelectedIndex)
-          parentOfMinSelected.setItem(parent.getItem());
-      }
-    }
+    /* Try previous News if possible then */
+    if (newSelection == null)
+      newSelection = navigate(startingNode, false);
 
     /* Perform Deletion */
     runnable.run();
 
-    Object data = null;
+    /* Set new Selection */
+    if (newSelection != null)
+      setSelection(newSelection);
+  }
 
-    /* Restore selection to next Element */
-    if (parentOfMinSelected.getItemCount() > minSelectedIndex)
-      data = parentOfMinSelected.getItem(minSelectedIndex).getData();
+  private ISelection navigate(ITreeNode startingNode, boolean next) {
 
-    /* Restore selection to last Element */
-    else if (parentOfMinSelected.getItemCount() > 0)
-      data = parentOfMinSelected.getItem(parentOfMinSelected.getItemCount() - 1).getData();
+    /* Create Traverse-Helper */
+    TreeTraversal traverse = new TreeTraversal(startingNode) {
+      @Override
+      public boolean select(ITreeNode node) {
+        return node.getData() instanceof INews;
+      }
+    };
 
-    /* Set selection if clean-up is not enabled */
-    if (data != null && !fNewsTableControl.getInputPreferences().getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE))
-      setSelection(new StructuredSelection(data));
+    /* Retrieve and select new Target Node */
+    ITreeNode targetNode = (next ? traverse.nextNode() : traverse.previousNode());
+    if (targetNode != null) {
+      ISelection selection = new StructuredSelection(targetNode.getData());
+      return selection;
+    }
+
+    return null;
   }
 }

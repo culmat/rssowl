@@ -414,6 +414,7 @@ public class NewsContentProvider implements ITreeContentProvider {
             }
 
             boolean refresh = false;
+            boolean updateSelectionFromDelete = false;
 
             /* Handle Restored News */
             if (restoredNews != null && !restoredNews.isEmpty())
@@ -424,10 +425,22 @@ public class NewsContentProvider implements ITreeContentProvider {
               refresh = handleUpdatedNews(updatedNews);
 
             /* Handle Deleted News */
-            if (deletedNews != null && !deletedNews.isEmpty())
+            if (deletedNews != null && !deletedNews.isEmpty()) {
               refresh = handleDeletedNews(deletedNews);
+              updateSelectionFromDelete = refresh;
+            }
 
-            if (refresh)
+            /* Refresh and update selection due to deletion */
+            if (updateSelectionFromDelete) {
+              fTableViewer.updateSelectionAfterDelete(new Runnable() {
+                public void run() {
+                  fFeedView.refresh(false, false);
+                }
+              });
+            }
+
+            /* Normal refresh w/o deletion */
+            else if (refresh)
               fFeedView.refresh(false, false);
           }
         });
