@@ -62,9 +62,11 @@ import org.rssowl.ui.internal.actions.MarkNewsReadAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
+import org.rssowl.ui.internal.actions.RedoAction;
 import org.rssowl.ui.internal.actions.ReloadAllAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
+import org.rssowl.ui.internal.actions.UndoAction;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
@@ -232,23 +234,31 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     MenuManager editMenu = new MenuManager("&Edit", IWorkbenchActionConstants.M_EDIT);
     menuBar.add(editMenu);
 
-    editMenu.add(new GroupMarker(IWorkbenchActionConstants.EDIT_START));
-    editMenu.add(new Separator());
-    editMenu.add(new GroupMarker(IWorkbenchActionConstants.UNDO_EXT));
-    editMenu.add(new Separator());
+    editMenu.setRemoveAllWhenShown(true);
+    editMenu.addMenuListener(new IMenuListener() {
+      public void menuAboutToShow(IMenuManager editMenu) {
+        editMenu.add(new GroupMarker(IWorkbenchActionConstants.EDIT_START));
+        editMenu.add(new Separator());
 
-    editMenu.add(getAction(ActionFactory.CUT.getId()));
-    editMenu.add(getAction(ActionFactory.COPY.getId()));
-    editMenu.add(getAction(ActionFactory.PASTE.getId()));
-    editMenu.add(new Separator());
-    editMenu.add(getAction(ActionFactory.DELETE.getId()));
-    editMenu.add(getAction(ActionFactory.SELECT_ALL.getId()));
+        editMenu.add(new UndoAction());
+        editMenu.add(new RedoAction());
+        editMenu.add(new GroupMarker(IWorkbenchActionConstants.UNDO_EXT));
+        editMenu.add(new Separator());
 
-    editMenu.add(new Separator());
-    editMenu.add(new GroupMarker(IWorkbenchActionConstants.EDIT_END));
-    editMenu.add(new Separator());
+        editMenu.add(getAction(ActionFactory.CUT.getId()));
+        editMenu.add(getAction(ActionFactory.COPY.getId()));
+        editMenu.add(getAction(ActionFactory.PASTE.getId()));
+        editMenu.add(new Separator());
+        editMenu.add(getAction(ActionFactory.DELETE.getId()));
+        editMenu.add(getAction(ActionFactory.SELECT_ALL.getId()));
 
-    editMenu.add(getAction(ActionFactory.PROPERTIES.getId()));
+        editMenu.add(new Separator());
+        editMenu.add(new GroupMarker(IWorkbenchActionConstants.EDIT_END));
+        editMenu.add(new Separator());
+
+        editMenu.add(getAction(ActionFactory.PROPERTIES.getId()));
+      }
+    });
   }
 
   /* Menu: View */

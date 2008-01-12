@@ -210,6 +210,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private Object fCacheJobIdentifier = new Object();
   private ImageDescriptor fTitleImageDescriptor;
   private Label fBrowserSep;
+  private INewsDAO fNewsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
 
   /*
    * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
@@ -757,8 +758,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
           newsToUpdate.add(newsItem);
       }
 
-      INewsDAO newsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
-      newsDao.setState(newsToUpdate, INews.State.UNREAD, true, false);
+      /* Perform Operation */
+      fNewsDao.setState(newsToUpdate, INews.State.UNREAD, true, false);
     }
 
     /* Handle seen News: Feed Change (also closing the feed view) or Minimize Event */
@@ -790,8 +791,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
           if (event == UIEvent.FEED_CHANGE && !newsToUpdate.isEmpty())
             Controller.getDefault().getSavedSearchService().forceQuickUpdate();
 
-          INewsDAO newsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
-          newsDao.setState(newsToUpdate, markRead ? INews.State.READ : INews.State.UNREAD, true, false);
+          /* Perform Operation */
+          fNewsDao.setState(newsToUpdate, markRead ? INews.State.READ : INews.State.UNREAD, true, false);
 
           /* Retention Strategy */
           if (inputMark instanceof IBookMark)

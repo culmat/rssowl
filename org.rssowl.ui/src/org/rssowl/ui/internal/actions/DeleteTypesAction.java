@@ -50,6 +50,8 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.dialogs.ConfirmDeleteDialog;
+import org.rssowl.ui.internal.undo.NewsStateOperation;
+import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
@@ -228,8 +230,14 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
     DynamicDAO.deleteAll(entities);
 
     /* Delete News in single Transaction */
-    if (newsToDelete != null)
-      fNewsDAO.setState(newsToDelete, INews.State.DELETED, false, false);
+    if (newsToDelete != null && !newsToDelete.isEmpty()) {
+
+      /* Support Undo */
+      UndoStack.getInstance().addOperation(new NewsStateOperation(newsToDelete, INews.State.HIDDEN, false));
+
+      /* Perform Operation */
+      fNewsDAO.setState(newsToDelete, INews.State.HIDDEN, false, false);
+    }
   }
 
   /**

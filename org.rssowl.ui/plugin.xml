@@ -626,6 +626,16 @@
             id="org.rssowl.ui.SortByNameAction"
             name="Sort by Name">
       </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.UndoAction"
+            name="Undo">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.RedoAction"
+            name="Redo">
+      </command>
    </extension>
    <extension
          id="product"
@@ -721,6 +731,18 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.rssowl.ui.KeyScheme"
             sequence="M1+M2+F">
+      </key>
+      <key
+            commandId="org.rssowl.ui.UndoAction"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1+Z">
+      </key>
+      <key
+            commandId="org.rssowl.ui.RedoAction"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1+Y">
       </key>
    </extension>
    <extension

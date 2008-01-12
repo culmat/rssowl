@@ -348,21 +348,15 @@ public class NewsContentProvider implements ITreeContentProvider {
       public void entitiesAdded(final Set<NewsEvent> events) {
         JobRunner.runInUIThread(fFeedView.getEditorControl(), new Runnable() {
           public void run() {
-            List<INews> addedNews = null;
+            Set<NewsEvent> addedNews = null;
 
             /* Filter News which are from a different Feed than displayed */
             for (NewsEvent event : events) {
               if (isInputRelatedTo(event.getEntity(), EventType.PERSIST)) {
                 if (addedNews == null)
-                  addedNews = new ArrayList<INews>();
+                  addedNews = new HashSet<NewsEvent>();
 
-                INews news = event.getEntity();
-                addedNews.add(news);
-
-                /* Update Cache */
-                synchronized (NewsContentProvider.this) {
-                  fCachedNews.add(news);
-                }
+                addedNews.add(event);
               }
             }
 
@@ -370,19 +364,10 @@ public class NewsContentProvider implements ITreeContentProvider {
             if (addedNews == null || addedNews.size() == 0)
               return;
 
-            /* Ask Group */
-            if (fGrouping.needsRefresh(INews.class, events, false)) {
+            /* Handle */
+            boolean refresh = handleAddedNews(addedNews);
+            if (refresh)
               fFeedView.refresh(true, false);
-              return;
-            }
-
-            /* Add to Table-Viewer if Visible */
-            if (fFeedView.isTableViewerVisible())
-              fTableViewer.add(fTableViewer.getInput(), addedNews.toArray());
-
-            /* Add to Browser-Viewer if showing entire Feed */
-            if (fBrowserViewer.getInput() instanceof BookMarkReference)
-              fBrowserViewer.add(fBrowserViewer.getInput(), addedNews.toArray());
           }
         });
       }
@@ -392,65 +377,58 @@ public class NewsContentProvider implements ITreeContentProvider {
       public void entitiesUpdated(final Set<NewsEvent> events) {
         JobRunner.runInUIThread(fFeedView.getEditorControl(), new Runnable() {
           public void run() {
-            List<INews> deletedNews = null;
-            List<INews> updatedNews = null;
+            Set<NewsEvent> restoredNews = null;
+            Set<NewsEvent> updatedNews = null;
+            Set<NewsEvent> deletedNews = null;
 
             /* Filter News which are from a different Feed than displayed */
             for (NewsEvent event : events) {
               if (isInputRelatedTo(event.getEntity(), EventType.UPDATE)) {
                 INews news = event.getEntity();
+                INews.State oldState = event.getOldNews().getState();
 
                 /* News got Deleted */
                 if (!news.isVisible()) {
                   if (deletedNews == null)
-                    deletedNews = new ArrayList<INews>();
-                  deletedNews.add(news);
+                    deletedNews = new HashSet<NewsEvent>();
 
-                  synchronized (NewsContentProvider.this) {
-                    fCachedNews.remove(news);
-                  }
+                  deletedNews.add(event);
+                }
+
+                /* News got Restored */
+                else if (news.isVisible() && (oldState == INews.State.HIDDEN || oldState == INews.State.DELETED)) {
+                  if (restoredNews == null)
+                    restoredNews = new HashSet<NewsEvent>();
+
+                  restoredNews.add(event);
                 }
 
                 /* News got Updated */
                 else {
                   if (updatedNews == null)
-                    updatedNews = new ArrayList<INews>();
-                  updatedNews.add(news);
+                    updatedNews = new HashSet<NewsEvent>();
+
+                  updatedNews.add(event);
                 }
               }
             }
 
-            /* Event not interesting for us or we are disposed */
-            if (deletedNews == null && updatedNews == null)
-              return;
+            boolean refresh = false;
 
-            /* News got Deleted */
-            if (deletedNews != null && !isGroupingEnabled()) {
+            /* Handle Restored News */
+            if (restoredNews != null && !restoredNews.isEmpty())
+              refresh = handleAddedNews(restoredNews);
 
-              /* Remove from Table-Viewer */
-              if (fFeedView.isTableViewerVisible())
-                fTableViewer.remove(deletedNews.toArray());
+            /* Handle Updated News */
+            if (updatedNews != null && !updatedNews.isEmpty())
+              refresh = handleUpdatedNews(updatedNews);
 
-              /* Remove from Browser-Viewer */
-              if (contains(fBrowserViewer.getInput(), deletedNews))
-                fBrowserViewer.remove(deletedNews.toArray());
-            }
+            /* Handle Deleted News */
+            if (deletedNews != null && !deletedNews.isEmpty())
+              refresh = handleDeletedNews(deletedNews);
 
-            /* Ask Group */
-            if (fGrouping.needsRefresh(INews.class, events, true))
+            if (refresh)
               fFeedView.refresh(false, false);
-
-            /* News got Updated */
-            if (updatedNews != null) {
-
-              /* Update in Table-Viewer */
-              if (fFeedView.isTableViewerVisible())
-                fTableViewer.update(updatedNews.toArray(), null);
-
-              /* Update in Browser-Viewer */
-              if (contains(fBrowserViewer.getInput(), updatedNews))
-                fBrowserViewer.update(updatedNews.toArray(), null);
-            }
           }
         });
       }
@@ -460,40 +438,26 @@ public class NewsContentProvider implements ITreeContentProvider {
       public void entitiesDeleted(final Set<NewsEvent> events) {
         JobRunner.runInUIThread(fFeedView.getEditorControl(), new Runnable() {
           public void run() {
-            List<INews> deletedNews = null;
+            Set<NewsEvent> deletedNews = null;
 
-            /* Filter News which are from a different Feed or invisible / non-copied */
+            /* Filter News which are from a different Feed than displayed */
             for (NewsEvent event : events) {
               INews news = event.getEntity();
               if ((news.isVisible() || news.isCopy()) && isInputRelatedTo(news, EventType.REMOVE)) {
                 if (deletedNews == null)
-                  deletedNews = new ArrayList<INews>();
-                deletedNews.add(news);
+                  deletedNews = new HashSet<NewsEvent>();
 
-                synchronized (NewsContentProvider.this) {
-                  fCachedNews.remove(news);
-                }
+                deletedNews.add(event);
               }
             }
 
             /* Event not interesting for us or we are disposed */
-            if (deletedNews == null)
+            if (deletedNews == null || deletedNews.size() == 0)
               return;
 
-            /* News got Deleted */
-            if (!isGroupingEnabled()) {
-
-              /* Remove from Table-Viewer */
-              if (fFeedView.isTableViewerVisible())
-                fTableViewer.remove(deletedNews.toArray());
-
-              /* Remove from Browser-Viewer */
-              if (contains(fBrowserViewer.getInput(), deletedNews))
-                fBrowserViewer.remove(deletedNews.toArray());
-            }
-
-            /* Ask Group */
-            if (fGrouping.needsRefresh(INews.class, events, false))
+            /* Handle Deleted News */
+            boolean refresh = handleDeletedNews(deletedNews);
+            if (refresh)
               fFeedView.refresh(false, false);
           }
         });
@@ -501,6 +465,89 @@ public class NewsContentProvider implements ITreeContentProvider {
     };
 
     DynamicDAO.addEntityListener(INews.class, fNewsListener);
+  }
+
+  private boolean handleAddedNews(Set<NewsEvent> events) {
+
+    /* Receive added News */
+    List<INews> addedNews = new ArrayList<INews>(events.size());
+    for (NewsEvent event : events) {
+      addedNews.add(event.getEntity());
+    }
+
+    /* Add to Cache */
+    synchronized (NewsContentProvider.this) {
+      fCachedNews.addAll(addedNews);
+    }
+
+    /* Return early if a refresh is required anyways */
+    if (fGrouping.needsRefresh(INews.class, events, false))
+      return true;
+
+    /* Add to Table-Viewer if Visible */
+    if (fFeedView.isTableViewerVisible())
+      fTableViewer.add(fTableViewer.getInput(), addedNews.toArray());
+
+    /* Add to Browser-Viewer if showing entire Feed */
+    if (fBrowserViewer.getInput() instanceof BookMarkReference)
+      fBrowserViewer.add(fBrowserViewer.getInput(), addedNews.toArray());
+
+    return false;
+  }
+
+  private boolean handleUpdatedNews(Set<NewsEvent> events) {
+
+    /* Receive updated News */
+    List<INews> updatedNews = new ArrayList<INews>(events.size());
+    for (NewsEvent event : events) {
+      updatedNews.add(event.getEntity());
+    }
+
+    /* Return early if refresh is required anyways */
+    if (fGrouping.needsRefresh(INews.class, events, true))
+      return true;
+
+    /* Update in Table-Viewer */
+    if (fFeedView.isTableViewerVisible())
+      fTableViewer.update(updatedNews.toArray(), null);
+
+    /* Update in Browser-Viewer */
+    if (contains(fBrowserViewer.getInput(), updatedNews))
+      fBrowserViewer.update(updatedNews.toArray(), null);
+
+    return false;
+  }
+
+  private boolean handleDeletedNews(Set<NewsEvent> events) {
+
+    /* Receive deleted News */
+    List<INews> deletedNews = new ArrayList<INews>(events.size());
+    for (NewsEvent event : events) {
+      deletedNews.add(event.getEntity());
+    }
+
+    /* Remove from Cache */
+    synchronized (NewsContentProvider.this) {
+      fCachedNews.removeAll(deletedNews);
+    }
+
+    /* Return early if refresh is required anyways */
+    if (fGrouping.needsRefresh(INews.class, events, false))
+      return true;
+
+    /* Grouping Disabled */
+    if (!isGroupingEnabled()) {
+
+      /* Remove from Table-Viewer */
+      if (fFeedView.isTableViewerVisible())
+        fTableViewer.remove(deletedNews.toArray());
+
+      /* Remove from Browser-Viewer */
+      if (contains(fBrowserViewer.getInput(), deletedNews))
+        fBrowserViewer.remove(deletedNews.toArray());
+    }
+
+    return false;
   }
 
   private void unregisterListeners() {
@@ -520,12 +567,12 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* Check if Saved Search contains the given News */
       else if (type != EventType.PERSIST && mark instanceof ISearchMark) {
-        return (((ISearchMark)mark).containsNews(news));
+        return (((ISearchMark) mark).containsNews(news));
       }
 
       /* Update: Check if News Bin contains the given News */
       else if (type == EventType.UPDATE && mark instanceof INewsBin) {
-        return news.isCopy() && (((INewsBin)mark).containsNews(news));
+        return news.isCopy() && (((INewsBin) mark).containsNews(news));
       }
 
       /* Remove: Always update (workaround) */

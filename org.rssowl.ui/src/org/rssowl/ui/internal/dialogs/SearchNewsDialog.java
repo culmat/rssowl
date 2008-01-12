@@ -140,6 +140,8 @@ import org.rssowl.ui.internal.editors.feed.NewsTableControl;
 import org.rssowl.ui.internal.editors.feed.NewsTableLabelProvider;
 import org.rssowl.ui.internal.editors.feed.NewsTableControl.Columns;
 import org.rssowl.ui.internal.search.SearchConditionList;
+import org.rssowl.ui.internal.undo.NewsStateOperation;
+import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
@@ -1761,6 +1763,11 @@ public class SearchNewsDialog extends TitleAreaDialog {
   }
 
   private void setNewsState(List<INews> news, INews.State state) {
+
+    /* Add to UndoStack */
+    UndoStack.getInstance().addOperation(new NewsStateOperation(news, state, true));
+
+    /* Perform Operation */
     Owl.getPersistenceService().getDAOService().getNewsDAO().setState(news, state, true, false);
   }
 }
