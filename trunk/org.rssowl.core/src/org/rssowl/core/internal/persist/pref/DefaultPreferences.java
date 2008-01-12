@@ -167,9 +167,6 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Show Description Excerpt in Notifier */
   public static final String SHOW_EXCERPT_IN_NOTIFIER = "org.rssowl.pref.ShowExcerptInNotifier";
 
-  /** Global: Confirm deleting a News */
-  public static final String CONFIRM_DELETE_NEWS = "org.rssowl.pref.ConfirmDeleteNews";
-
   /** Global: Always reuse feed view */
   public static final String ALWAYS_REUSE_FEEDVIEW = "org.rssowl.pref.AlwaysReuseFeedView";
 
@@ -271,7 +268,6 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putBoolean(BM_OPEN_SITE_FOR_EMPTY_NEWS, false);
     defaultScope.putBoolean(BE_ENABLE_LINKING, true);
     defaultScope.putInteger(LIMIT_NOTIFICATION_SIZE, 5);
-    defaultScope.putBoolean(CONFIRM_DELETE_NEWS, true);
     defaultScope.putBoolean(SEARCH_DIALOG_PREVIEW_VISIBLE, true);
     defaultScope.putInteger(AUTOCLOSE_NOTIFICATION_VALUE, 8);
     defaultScope.putBoolean(SHOW_TOOLBAR, true);
