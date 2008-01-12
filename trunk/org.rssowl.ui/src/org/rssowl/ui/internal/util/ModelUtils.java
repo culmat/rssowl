@@ -37,12 +37,14 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchValueType;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FolderReference;
+import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
@@ -837,5 +839,26 @@ public class ModelUtils {
     }
 
     return null;
+  }
+
+  /**
+   * @param news
+   * @return Returns a Map mapping from a news-state to a list of
+   * news-references.
+   */
+  public static Map<INews.State, List<NewsReference>> toStateMap(Collection<INews> news) {
+    Map<INews.State, List<NewsReference>> map = new HashMap<State, List<NewsReference>>();
+    for (INews newsitem : news) {
+      INews.State state = newsitem.getState();
+      List<NewsReference> newsrefs = map.get(state);
+      if (newsrefs == null) {
+        newsrefs = new ArrayList<NewsReference>();
+        map.put(state, newsrefs);
+      }
+
+      newsrefs.add(newsitem.toReference());
+    }
+
+    return map;
   }
 }
