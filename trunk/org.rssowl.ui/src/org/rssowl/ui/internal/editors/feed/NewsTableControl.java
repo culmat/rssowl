@@ -109,6 +109,8 @@ import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
+import org.rssowl.ui.internal.undo.NewsStateOperation;
+import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.JobTracker;
 import org.rssowl.ui.internal.util.ModelUtils;
@@ -964,6 +966,12 @@ public class NewsTableControl implements IFeedViewPart {
   }
 
   private void setNewsState(INews news, INews.State state) {
-    fNewsDao.setState(Collections.singleton(news), state, true, false);
+    Set<INews> singleNewsSet = Collections.singleton(news);
+
+    /* Add to UndoStack */
+    UndoStack.getInstance().addOperation(new NewsStateOperation(singleNewsSet, state, true));
+
+    /* Perform Operation */
+    fNewsDao.setState(singleNewsSet, state, true, false);
   }
 }

@@ -46,6 +46,8 @@ import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.undo.NewsStateOperation;
+import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.ModelUtils;
 
@@ -139,6 +141,13 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
         news.add((INews) element);
     }
 
+    /* Only affect equivalent News if not all News are affected */
+    boolean affectEquivalentNews = !equalsRootFolders(folders);
+
+    /* Support Undo */
+    if (!news.isEmpty())
+      UndoStack.getInstance().addOperation(new NewsStateOperation(news, INews.State.READ, affectEquivalentNews));
+
     /* Apply the state to the NewsItems for Retention to handle them properly */
     for (INews newsItem : news) {
       newsItem.setState(INews.State.READ);
@@ -163,13 +172,10 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     /* Mark News Read */
     if (news.size() > 0) {
 
-      /* Only affect equivalent News if not all News are affected */
-      boolean affectEquivalentNews = !equalsRootFolders(folders);
-
       /* Mark Saved Search Service as in need for a quick Update */
       Controller.getDefault().getSavedSearchService().forceQuickUpdate();
 
-      /* Peform Op */
+      /* Perform Operation */
       Owl.getPersistenceService().getDAOService().getNewsDAO().setState(news, INews.State.READ, affectEquivalentNews, true);
     }
   }

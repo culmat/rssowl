@@ -37,6 +37,8 @@ import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.FeedView;
+import org.rssowl.ui.internal.undo.NewsStateOperation;
+import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.EnumSet;
@@ -129,6 +131,11 @@ public class MarkNewsReadAction extends Action implements IWorkbenchWindowAction
 
       /* Only consider INews */
       List<INews> newsList = ModelUtils.getEntities(fSelection, INews.class);
+
+      /* Support Undo */
+      UndoStack.getInstance().addOperation(new NewsStateOperation(newsList, INews.State.UNREAD, true));
+
+      /* Perform Operation */
       DynamicDAO.getDAO(INewsDAO.class).setState(newsList, INews.State.UNREAD, true, false);
     }
   }
