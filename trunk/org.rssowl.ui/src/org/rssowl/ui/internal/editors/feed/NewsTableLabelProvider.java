@@ -50,6 +50,7 @@ import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
@@ -265,8 +266,8 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
           return fNewsReadIcon;
       }
 
-      /* Feed Column */
-      else if (columnIndex == NewsTableControl.COL_FEED && !(fViewer.getInput() instanceof FeedLinkReference)) {
+      /* Feed Column (only when not showing Bookmarks) */
+      else if (columnIndex == NewsTableControl.COL_FEED && !(fViewer.getInput() instanceof BookMarkReference)) {
         FeedLinkReference feedRef = news.getFeedReference();
         IBookMark bookMark = ModelUtils.getBookMark(feedRef);
         if (bookMark != null) {
