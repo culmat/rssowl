@@ -308,7 +308,7 @@ public class NewsTableControl implements IFeedViewPart {
     fCustomTree = new CTree(parent, style);
     fCustomTree.getControl().setHeaderVisible(true);
 
-    fViewer = new NewsTableViewer(this, fCustomTree.getControl());
+    fViewer = new NewsTableViewer(fCustomTree.getControl());
     fViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fViewer.setUseHashlookup(true);
     fViewer.getControl().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
