@@ -206,6 +206,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
             onGrabTitle();
           } catch (URISyntaxException ex) {
             Activator.getDefault().logError(ex.getMessage(), ex);
+            setMessage("Unable to load a name from the feed.", IMessageProvider.WARNING);
           }
         }
       });
@@ -249,6 +250,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
                         onGrabTitle();
                       } catch (URISyntaxException e) {
                         Activator.getDefault().logError(e.getMessage(), e);
+                        setMessage("Unable to load a name from the feed.", IMessageProvider.WARNING);
                       }
                     }
                   }
@@ -262,7 +264,7 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
             if (StringUtils.isSet(fLabel))
               fNameInput.setText(fLabel);
             else
-              setMessage("Unable to load name from feed.", IMessageProvider.WARNING);
+              setMessage("Unable to load a name from the feed.", IMessageProvider.WARNING);
 
             getShell().setCursor(null);
           }
