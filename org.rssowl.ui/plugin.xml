@@ -421,6 +421,14 @@
                id="org.rssowl.ui.preferences.keywords.Notifier">
          </keywordReference>
       </page>
+      <page
+            class="org.rssowl.ui.internal.CredentialsPreferencesPage"
+            id="org.rssowl.ui.CredentialsPreferences"
+            name="Passwords">
+         <keywordReference
+               id="org.rssowl.ui.preferences.keywords.Credentials">
+         </keywordReference>
+      </page>
    </extension>
    <extension
          point="org.eclipse.ui.keywords">
@@ -454,6 +462,10 @@
       <keyword
             id="org.rssowl.ui.preferences.keywords.Notifier"
             label="notifier notification alert popup ">
+      </keyword>
+      <keyword
+            id="org.rssowl.ui.preferences.keywords.Credentials"
+            label="password passwords credential credentials protected secure security username login">
       </keyword>
    </extension>
    <extension
