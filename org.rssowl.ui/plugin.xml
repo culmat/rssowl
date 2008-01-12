@@ -640,11 +640,13 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.actions.UndoRedoHandler"
             id="org.rssowl.ui.UndoAction"
             name="Undo">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.actions.UndoRedoHandler"
             id="org.rssowl.ui.RedoAction"
             name="Redo">
       </command>

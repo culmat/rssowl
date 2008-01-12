@@ -24,62 +24,31 @@
 
 package org.rssowl.ui.internal.actions;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.rssowl.ui.internal.OwlUI;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.IHandler;
 import org.rssowl.ui.internal.undo.UndoStack;
 
 /**
- * Undo the last operation if possible.
+ * This {@link IHandler} is required to support key-bindings for programmatic
+ * added actions like the {@link UndoAction} or {@link RedoAction}.
  *
  * @author bpasero
  */
-public class UndoAction extends Action {
-  static final String ID = "org.rssowl.ui.UndoAction";
-
-  /** Set ID for Key Binding Support */
-  public UndoAction() {
-    setId(ID);
-    setActionDefinitionId(ID);
-  }
+public class UndoRedoHandler extends AbstractHandler {
 
   /*
-   * @see org.eclipse.jface.action.Action#run()
+   * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
    */
   @Override
-  public void run() {
-    UndoStack.getInstance().undo();
-  }
+  public Object execute(ExecutionEvent event) {
+    String commandId = event.getCommand().getId();
 
-  /*
-   * @see org.eclipse.jface.action.Action#isEnabled()
-   */
-  @Override
-  public boolean isEnabled() {
-    return UndoStack.getInstance().isUndoSupported();
-  }
+    if (UndoAction.ID.equals(commandId))
+      UndoStack.getInstance().undo();
+    else if (RedoAction.ID.equals(commandId))
+      UndoStack.getInstance().redo();
 
-  /*
-   * @see org.eclipse.jface.action.Action#getText()
-   */
-  @Override
-  public String getText() {
-    return UndoStack.getInstance().getUndoName();
-  }
-
-  /*
-   * @see org.eclipse.jface.action.Action#getImageDescriptor()
-   */
-  @Override
-  public ImageDescriptor getImageDescriptor() {
-    return OwlUI.getImageDescriptor("icons/elcl16/undo_edit.gif");
-  }
-
-  /*
-   * @see org.eclipse.jface.action.Action#getDisabledImageDescriptor()
-   */
-  @Override
-  public ImageDescriptor getDisabledImageDescriptor() {
-    return OwlUI.getImageDescriptor("icons/dlcl16/undo_edit.gif");
+    return null; //As per JavaDoc
   }
 }
