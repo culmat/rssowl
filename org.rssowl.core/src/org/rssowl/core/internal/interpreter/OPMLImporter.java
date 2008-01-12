@@ -129,7 +129,12 @@ public class OPMLImporter implements ITypeImporter {
         String entityName = fieldElement.getAttributeValue("entity");
         ISearchField searchField = Owl.getModelFactory().createSearchField(getFieldID(fieldName), entityName);
 
-        searchmark.addSearchCondition(Owl.getModelFactory().createSearchCondition(searchField, searchSpecifier, value));
+        /*
+         * Guard against null (Location Conditions may potentially lead to NULL
+         * if they are stale since they are not updated when locations change)
+         */
+        if (value != null)
+          searchmark.addSearchCondition(Owl.getModelFactory().createSearchCondition(searchField, searchSpecifier, value));
       } catch (NumberFormatException e) {
         Activator.getDefault().logError(e.getMessage(), e);
       } catch (ParseException e) {
