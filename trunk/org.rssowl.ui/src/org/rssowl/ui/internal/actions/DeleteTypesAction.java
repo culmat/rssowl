@@ -35,8 +35,6 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
-import org.rssowl.core.Owl;
-import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
@@ -46,10 +44,10 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
-import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.dialogs.ConfirmDeleteDialog;
+import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
 import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.ModelUtils;
@@ -68,7 +66,6 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
   private INewsDAO fNewsDAO;
   private Shell fShell;
   private boolean fConfirmed;
-  private IPreferenceScope fPreferences;
 
   /**
    * Keep default constructor for reflection.
@@ -91,7 +88,6 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
     fShell = shell;
     fSelection = selection;
     fNewsDAO = DynamicDAO.getDAO(INewsDAO.class);
-    fPreferences = Owl.getPreferenceService().getGlobalScope();
   }
 
   /*
@@ -122,22 +118,22 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
   }
 
   private boolean confirmed() {
-    String confirmPrefKey = null;
+
+    /* Ignore when deleting News since this operation can be undone */
     List<?> elements = fSelection.toList();
     for (Object element : elements) {
-      if (element instanceof INews || element instanceof EntityGroup) {
-        confirmPrefKey = DefaultPreferences.CONFIRM_DELETE_NEWS;
-        break;
+      if (element instanceof INews)
+        return true;
+      else if (element instanceof EntityGroup) {
+        EntityGroup group = (EntityGroup) element;
+        if (NewsGrouping.GROUP_CATEGORY_ID.equals(group.getId()))
+          return true;
       }
     }
 
     /* Create Dialog and open if confirmation required */
-    if (confirmPrefKey == null || fPreferences.getBoolean(confirmPrefKey)) {
-      ConfirmDeleteDialog dialog = new ConfirmDeleteDialog(fShell, "Confirm Delete", "This action can not be undone", getMessage(elements), confirmPrefKey);
-      return dialog.open() == IDialogConstants.OK_ID;
-    }
-
-    return true;
+    ConfirmDeleteDialog dialog = new ConfirmDeleteDialog(fShell, "Confirm Delete", "This action can not be undone", getMessage(elements), null);
+    return dialog.open() == IDialogConstants.OK_ID;
   }
 
   private String getMessage(List<?> elements) {

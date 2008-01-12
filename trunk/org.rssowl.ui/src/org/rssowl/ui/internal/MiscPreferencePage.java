@@ -65,7 +65,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   private Button fUseDefaultExternalBrowser;
   private Button fUseInternalBrowser;
   private Button fCustomBrowserSearchButton;
-  private Button fConfirmDeleteNews;
   private Spinner fAutoCloseTabsSpinner;
   private Button fAutoCloseTabsCheck;
   private Button fUseMultipleTabsCheck;
@@ -105,9 +104,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
 
     /* System Tray Options */
     createTrayOptions(container);
-
-    /* Confirmation Options */
-    createConfirmationOptions(container);
 
     return container;
   }
@@ -155,22 +151,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
 
     label = new Label(autoCloseTabsContainer, SWT.None);
     label.setText(fAutoCloseTabsSpinner.getSelection() == 1 ? " tab" : " tabs");
-  }
-
-  private void createConfirmationOptions(Composite container) {
-    Label label = new Label(container, SWT.NONE);
-    label.setText("Ask for confirmation");
-    label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
-
-    /* Confirmation Group */
-    Composite confirmationGroup = new Composite(container, SWT.None);
-    confirmationGroup.setLayout(LayoutUtils.createGridLayout(1, 10, 5));
-    confirmationGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
-    /* Confirm Delete News */
-    fConfirmDeleteNews = new Button(confirmationGroup, SWT.CHECK);
-    fConfirmDeleteNews.setText("when deleting News");
-    fConfirmDeleteNews.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CONFIRM_DELETE_NEWS));
   }
 
   private void createTrayOptions(Composite container) {
@@ -288,8 +268,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fGlobalScope.putBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER, fUseCustomExternalBrowser.getSelection());
     fGlobalScope.putString(DefaultPreferences.CUSTOM_BROWSER_PATH, fCustomBrowserInput.getText());
 
-    fGlobalScope.putBoolean(DefaultPreferences.CONFIRM_DELETE_NEWS, fConfirmDeleteNews.getSelection());
-
     return super.performOk();
   }
 
@@ -319,7 +297,5 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
 
     fCustomBrowserInput.setEnabled(fUseCustomExternalBrowser.getSelection());
     fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
-
-    fConfirmDeleteNews.setSelection(defaultScope.getBoolean(DefaultPreferences.CONFIRM_DELETE_NEWS));
   }
 }
