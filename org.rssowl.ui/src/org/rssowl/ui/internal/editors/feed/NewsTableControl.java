@@ -121,7 +121,6 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -852,8 +851,7 @@ public class NewsTableControl implements IFeedViewPart {
             IAction removeAllLabels = new Action("Remove All Labels") {
               @Override
               public void run() {
-                Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
-                new LabelAction(labels, selection, false).run();
+                new LabelAction(null, selection, false).run();
               }
             };
 
@@ -865,9 +863,7 @@ public class NewsTableControl implements IFeedViewPart {
               IAction labelAction = new Action(label.getName(), IAction.AS_CHECK_BOX) {
                 @Override
                 public void run() {
-                  Set<ILabel> labels = new HashSet<ILabel>(1);
-                  labels.add(label);
-                  new LabelAction(labels, selection, isChecked()).run();
+                  new LabelAction(label, selection, isChecked()).run();
                 }
               };
 

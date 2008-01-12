@@ -1522,8 +1522,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
             IAction removeAllLabels = new Action("Remove All Labels") {
               @Override
               public void run() {
-                Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
-                new LabelAction(labels, (IStructuredSelection) fResultViewer.getSelection(), false).run();
+                new LabelAction(null, (IStructuredSelection) fResultViewer.getSelection(), false).run();
               }
             };
 
@@ -1535,9 +1534,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
               IAction labelAction = new Action(label.getName(), IAction.AS_CHECK_BOX) {
                 @Override
                 public void run() {
-                  Set<ILabel> labels = new HashSet<ILabel>(1);
-                  labels.add(label);
-                  new LabelAction(labels, (IStructuredSelection) fResultViewer.getSelection(), isChecked()).run();
+                  new LabelAction(label, (IStructuredSelection) fResultViewer.getSelection(), isChecked()).run();
                 }
               };
 
