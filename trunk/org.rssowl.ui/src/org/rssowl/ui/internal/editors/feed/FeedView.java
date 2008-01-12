@@ -446,8 +446,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
     for (MarkEvent event : events) {
       IMark mark = event.getEntity();
       if (fInput.getMark().getId().equals(mark.getId())) {
-        fEditorSite.getPage().closeEditor(FeedView.this, false);
         fInput.setDeleted();
+        fEditorSite.getPage().closeEditor(FeedView.this, false);
         break;
       }
     }
@@ -743,6 +743,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
      * editor closed. Thereby do not react.
      */
     if (news == null || !fInput.exists())
+      return;
+
+    /* Input could have been deleted */
+    if (!fInput.exists())
       return;
 
     final boolean markReadOnFeedChange = inputPreferences.getBoolean(DefaultPreferences.MARK_FEED_READ_ON_CHANGE);
