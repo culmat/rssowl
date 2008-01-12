@@ -36,6 +36,8 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.undo.StickyOperation;
+import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.List;
@@ -123,6 +125,9 @@ public class MakeNewsStickyAction extends Action implements IWorkbenchWindowActi
     List<INews> newsList = ModelUtils.getEntities(fSelection, INews.class);
     if (newsList.isEmpty())
       return;
+
+    /* Support Undo */
+    UndoStack.getInstance().addOperation(new StickyOperation(newsList, fMarkSticky));
 
     /* Set Sticky State */
     for (INews newsItem : newsList) {
