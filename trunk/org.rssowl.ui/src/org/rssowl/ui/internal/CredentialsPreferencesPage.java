@@ -45,6 +45,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.rssowl.core.Owl;
@@ -70,6 +71,8 @@ import java.util.List;
 public class CredentialsPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage {
   private IConnectionService fConService = Owl.getConnectionService();
   private TableViewer fViewer;
+  private Button fRemoveAll;
+  private Button fRemoveSelected;
 
   /* Model used in the Viewer */
   private static class CredentialsModelData {
@@ -136,6 +139,11 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
   protected Control createContents(Composite parent) {
     Composite container = createComposite(parent);
 
+    /* Label */
+    Label infoLabel = new Label(container, SWT.NONE);
+    infoLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
+    infoLabel.setText("RSSOwl has saved login information for the following feeds:");
+
     /* Viewer to display Passwords */
     int style = SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER;
 
@@ -201,33 +209,34 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     fViewer.setInput(new Object());
 
     /* Offer Buttons to remove Credentials */
-    final Button removeSelected = new Button(container, SWT.PUSH);
-    removeSelected.setText("&Remove");
-    removeSelected.setEnabled(false);
-    removeSelected.addSelectionListener(new SelectionAdapter() {
+    fRemoveSelected = new Button(container, SWT.PUSH);
+    fRemoveSelected.setText("&Remove");
+    fRemoveSelected.setEnabled(false);
+    fRemoveSelected.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         onRemove();
       }
     });
 
-    Button removeAll = new Button(container, SWT.PUSH);
-    removeAll.setText("Remove &All");
-    removeAll.addSelectionListener(new SelectionAdapter() {
+    fRemoveAll = new Button(container, SWT.PUSH);
+    fRemoveAll.setText("Remove &All");
+    fRemoveAll.setEnabled(fViewer.getTable().getItemCount() > 0);
+    fRemoveAll.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         onRemoveAll();
       }
     });
 
-    setButtonLayoutData(removeSelected);
-    setButtonLayoutData(removeAll);
-    ((GridData) removeAll.getLayoutData()).grabExcessHorizontalSpace = false;
-    ((GridData) removeAll.getLayoutData()).horizontalAlignment = SWT.BEGINNING;
+    setButtonLayoutData(fRemoveSelected);
+    setButtonLayoutData(fRemoveAll);
+    ((GridData) fRemoveAll.getLayoutData()).grabExcessHorizontalSpace = false;
+    ((GridData) fRemoveAll.getLayoutData()).horizontalAlignment = SWT.BEGINNING;
 
     fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
-        removeSelected.setEnabled(!fViewer.getSelection().isEmpty());
+        fRemoveSelected.setEnabled(!fViewer.getSelection().isEmpty());
       }
     });
 
@@ -245,6 +254,8 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     /* Update in UI */
     fViewer.refresh();
+    fRemoveSelected.setEnabled(!fViewer.getSelection().isEmpty());
+    fRemoveAll.setEnabled(fViewer.getTable().getItemCount() > 0);
   }
 
   private void onRemoveAll() {
@@ -261,6 +272,8 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     /* Update in UI */
     fViewer.refresh();
+    fRemoveSelected.setEnabled(!fViewer.getSelection().isEmpty());
+    fRemoveAll.setEnabled(fViewer.getTable().getItemCount() > 0);
   }
 
   private void remove(CredentialsModelData data) {
