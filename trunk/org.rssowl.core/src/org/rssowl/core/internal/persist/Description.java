@@ -25,11 +25,11 @@ package org.rssowl.core.internal.persist;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.reference.NewsReference;
 
 public class Description extends Persistable    {
 
   private String fValue;
-  private INews fNews;
 
   /* Also used as its own identifier */
   private long fNewsId;
@@ -41,14 +41,13 @@ public class Description extends Persistable    {
   public Description(INews news, String value) {
     Assert.isNotNull(news, "news");
     Assert.isNotNull(news.getId(), "news.getId()");
-    fNews = news;
     fNewsId = news.getId();
 
     fValue = value;
   }
 
-  public synchronized INews getNews() {
-    return fNews;
+  public synchronized NewsReference getNews() {
+    return new NewsReference(fNewsId);
   }
 
   public synchronized String getValue() {
