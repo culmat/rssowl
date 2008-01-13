@@ -278,7 +278,7 @@ public class Indexer {
     }
   }
 
-  private List<IndexingTask> getIndexOutstandingEntitiesTasks(){
+  private List<IndexingTask> getIndexOutstandingEntitiesTasks() {
     final EntitiesToBeIndexedDAOImpl dao = DBHelper.getEntitiesToBeIndexedDAO();
     List<IndexingTask> indexingTasks = new ArrayList<IndexingTask>(3);
     if (dao != null) {
@@ -314,24 +314,56 @@ public class Indexer {
     /* Listen to News-Events */
     fNewsListener = new NewsListener() {
       public void entitiesAdded(Set<NewsEvent> events) {
-        if (!InternalOwl.TESTING)
-          fJobQueue.schedule(new IndexingTask(Indexer.this, events, EventType.PERSIST));
-        else
-          new IndexingTask(Indexer.this, events, EventType.PERSIST).run(new NullProgressMonitor());
+        handleEntitiesAdded(events);
       }
 
       public void entitiesUpdated(Set<NewsEvent> events) {
-        if (!InternalOwl.TESTING)
-          fJobQueue.schedule(new IndexingTask(Indexer.this, events, EventType.UPDATE));
-        else
-          new IndexingTask(Indexer.this, events, EventType.UPDATE).run(new NullProgressMonitor());
+
+        /* An Updated News may incolve Restore, Removal or actual Update */
+        Set<NewsEvent> newsToUpdate = null;
+        Set<NewsEvent> newsToRestore = null;
+        Set<NewsEvent> newsToDelete = null;
+        for (NewsEvent event : events) {
+          boolean wasVisible = event.getOldNews().isVisible();
+          boolean isVisible = event.getEntity().isVisible();
+
+          /* News got Deleted/Hidden */
+          if (wasVisible && !isVisible) {
+            if (newsToDelete == null)
+              newsToDelete = new HashSet<NewsEvent>(5);
+
+            newsToDelete.add(event);
+          }
+
+          /* News got Restored */
+          else if (!wasVisible && isVisible) {
+            if (newsToRestore == null)
+              newsToRestore = new HashSet<NewsEvent>(5);
+
+            newsToRestore.add(event);
+          }
+
+          /* Normal Update */
+          else if (wasVisible && isVisible) {
+            if (newsToUpdate == null)
+              newsToUpdate = new HashSet<NewsEvent>(5);
+
+            newsToUpdate.add(event);
+          }
+        }
+
+        if (newsToRestore != null)
+          handleEntitiesAdded(newsToRestore);
+
+        if (newsToUpdate != null)
+          handleEntitiesUpdated(newsToUpdate);
+
+        if (newsToDelete != null)
+          handleEntitiesDeleted(newsToDelete);
       }
 
       public void entitiesDeleted(Set<NewsEvent> events) {
-        if (!InternalOwl.TESTING)
-          fJobQueue.schedule(new IndexingTask(Indexer.this, events, EventType.REMOVE));
-        else
-          new IndexingTask(Indexer.this, events, EventType.REMOVE).run(new NullProgressMonitor());
+        handleEntitiesDeleted(events);
       }
     };
 
@@ -373,6 +405,27 @@ public class Indexer {
     /* We register listeners as part of initialisation, we must use InternalOwl */
     InternalOwl.getDefault().getPersistenceService().getDAOService().getNewsDAO().addEntityListener(fNewsListener);
     InternalOwl.getDefault().getPersistenceService().getDAOService().getLabelDAO().addEntityListener(fLabelListener);
+  }
+
+  private void handleEntitiesAdded(Set<NewsEvent> events) {
+    if (!InternalOwl.TESTING)
+      fJobQueue.schedule(new IndexingTask(Indexer.this, events, EventType.PERSIST));
+    else
+      new IndexingTask(Indexer.this, events, EventType.PERSIST).run(new NullProgressMonitor());
+  }
+
+  private void handleEntitiesUpdated(Set<NewsEvent> events) {
+    if (!InternalOwl.TESTING)
+      fJobQueue.schedule(new IndexingTask(Indexer.this, events, EventType.UPDATE));
+    else
+      new IndexingTask(Indexer.this, events, EventType.UPDATE).run(new NullProgressMonitor());
+  }
+
+  private void handleEntitiesDeleted(Set<NewsEvent> events) {
+    if (!InternalOwl.TESTING)
+      fJobQueue.schedule(new IndexingTask(Indexer.this, events, EventType.REMOVE));
+    else
+      new IndexingTask(Indexer.this, events, EventType.REMOVE).run(new NullProgressMonitor());
   }
 
   private void unregisterListeners() {
