@@ -348,7 +348,7 @@ public class ModelSearchImpl implements IModelSearch {
       String termText = new String(token.termBuffer(), 0, token.termLength());
 
       /* Explicitly ignore Stop Words here */
-      if (STOP_WORDS.contains(termText))
+      if (!fIndexer.fDisableStopWords && STOP_WORDS.contains(termText))
         continue;
 
       WildcardQuery authorQuery = new WildcardQuery(new Term(authorField, termText));
@@ -362,7 +362,7 @@ public class ModelSearchImpl implements IModelSearch {
       String termText = new String(token.termBuffer(), 0, token.termLength());
 
       /* Explicitly ignore Stop Words here */
-      if (STOP_WORDS.contains(termText))
+      if (!fIndexer.fDisableStopWords && STOP_WORDS.contains(termText))
         continue;
 
       WildcardQuery categoryQuery = new WildcardQuery(new Term(categoryField, termText));

@@ -62,6 +62,9 @@ public class Indexer {
   /* Lucene only allows 1 Indexer to run at the same time */
   private static final int MAX_INDEX_JOBS_COUNT = 1;
 
+  /* DWord to disable stop words when Indexing */
+  private static final String DISABLE_STOP_WORDS_PROPERTY = "disableStopWords";
+
   /* The directory to the lucene index */
   private final Directory fIndexDirectory;
 
@@ -73,7 +76,7 @@ public class Indexer {
   private LabelAdapter fLabelListener;
   private boolean fFlushRequired;
   private final ModelSearchImpl fSearch;
-
+  final boolean fDisableStopWords;
   private final EntityIdsByEventType fUncommittedNews;
 
   /* The Default Analyzer */
@@ -107,6 +110,7 @@ public class Indexer {
     fIndexDirectory = directory;
     fJobQueue = new JobQueue("Updating Saved Searches", MAX_INDEX_JOBS_COUNT, Integer.MAX_VALUE, true, INDEX_JOB_PROGRESS_DELAY);
     fUncommittedNews = new EntityIdsByEventType(false);
+    fDisableStopWords = System.getProperty(DISABLE_STOP_WORDS_PROPERTY) != null;
   }
 
   /**
@@ -233,7 +237,12 @@ public class Indexer {
     PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper(new DefaultAnalyzer());
 
     /* Standard (Lowercase, Letter, Stop,...) */
-    StandardAnalyzer stdAnalyzer = new StandardAnalyzer();
+    StandardAnalyzer stdAnalyzer;
+    if (fDisableStopWords)
+      stdAnalyzer = new StandardAnalyzer(Collections.EMPTY_SET);
+    else
+      stdAnalyzer = new StandardAnalyzer();
+
     analyzer.addAnalyzer(String.valueOf(INews.TITLE), stdAnalyzer);
     analyzer.addAnalyzer(String.valueOf(INews.DESCRIPTION), stdAnalyzer);
     analyzer.addAnalyzer(String.valueOf(INews.ATTACHMENTS_CONTENT), stdAnalyzer);
