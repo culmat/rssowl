@@ -861,4 +861,23 @@ public class ModelUtils {
 
     return map;
   }
+
+  /**
+   * @param map
+   * @return Returns a List of all News resolved.
+   */
+  public static List<INews> resolveAll(Map<State, List<NewsReference>> map) {
+    List<INews> news = new ArrayList<INews>();
+
+    Collection<List<NewsReference>> values = map.values();
+    for (List<NewsReference> value : values) {
+      for (NewsReference newsRef : value) {
+        INews newsitem = newsRef.resolve();
+        if (newsitem != null)
+          news.add(newsitem);
+      }
+    }
+
+    return news;
+  }
 }

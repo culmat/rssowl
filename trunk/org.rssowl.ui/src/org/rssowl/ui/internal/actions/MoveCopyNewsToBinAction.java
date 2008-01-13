@@ -34,6 +34,9 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.undo.CopyOperation;
+import org.rssowl.ui.internal.undo.MoveOperation;
+import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
@@ -100,17 +103,22 @@ public class MoveCopyNewsToBinAction extends Action {
     Set<INews> news = ModelUtils.normalize(objects);
     boolean requiresSave = false;
 
-    /* For each  News */
-    List<INews> skippedNews = new ArrayList<INews>(0);
+    /* Only consider those not already present in the Bin */
+    List<INews> newsToMoveCopy = new ArrayList<INews>(news.size());
     for (INews newsitem : news) {
+      if (!fBin.containsNews(newsitem))
+        newsToMoveCopy.add(newsitem);
+    }
 
-      /* Don't allow adding same news again */
-      if (fBin.containsNews(newsitem)) {
-        skippedNews.add(newsitem);
-        continue;
-      }
+    /* Return if nothing to do */
+    if (newsToMoveCopy.isEmpty())
+      return;
 
+    /* For each News: Copy */
+    List<INews> copiedNews = new ArrayList<INews>(newsToMoveCopy.size());
+    for (INews newsitem : newsToMoveCopy) {
       INews newsCopy = Owl.getModelFactory().createNews(newsitem);
+      copiedNews.add(newsCopy);
 
       /* Ensure the state is *unread* since it has been seen */
       if (newsCopy.getState() == INews.State.NEW)
@@ -126,18 +134,20 @@ public class MoveCopyNewsToBinAction extends Action {
     if (requiresSave)
       DynamicDAO.save(fBin);
 
+    /* Support Undo/Redo */
+    if (fIsMove)
+      UndoStack.getInstance().addOperation(new MoveOperation(newsToMoveCopy, copiedNews, fBin));
+    else
+      UndoStack.getInstance().addOperation(new CopyOperation(copiedNews, fBin));
+
     /* Delete News from Source if required */
     if (fIsMove) {
-      news.removeAll(skippedNews);
 
-      if (!news.isEmpty()) {
+      /* Mark Saved Search Service as in need for a quick Update */
+      Controller.getDefault().getSavedSearchService().forceQuickUpdate();
 
-        /* Mark Saved Search Service as in need for a quick Update */
-        Controller.getDefault().getSavedSearchService().forceQuickUpdate();
-
-        /* Delete News in single Transaction */
-        DynamicDAO.getDAO(INewsDAO.class).setState(news, INews.State.DELETED, false, false);
-      }
+      /* Delete News in single Transaction */
+      DynamicDAO.getDAO(INewsDAO.class).setState(newsToMoveCopy, INews.State.HIDDEN, false, false);
     }
   }
 }
