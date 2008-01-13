@@ -37,7 +37,7 @@ import java.util.List;
 
 public final class EntityIdsByEventType extends Persistable implements IPersistable  {
 
-  private static final int DEFAULT_CAPACITY = 10;
+  private static final int DEFAULT_CAPACITY = 5;
 
   private LongArrayList fPersistedEntities;
   private LongArrayList fUpdatedEntities;
@@ -145,5 +145,11 @@ public final class EntityIdsByEventType extends Persistable implements IPersista
     fPersistedEntities.clear();
     fUpdatedEntities.clear();
     fRemovedEntities.clear();
+  }
+
+  public synchronized void compact() {
+    fPersistedEntities.compact();
+    fUpdatedEntities.compact();
+    fRemovedEntities.compact();
   }
 }
