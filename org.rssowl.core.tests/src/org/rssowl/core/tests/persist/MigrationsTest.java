@@ -34,6 +34,9 @@ import org.rssowl.core.internal.persist.migration.Migrations.ChainedMigration;
 import org.rssowl.core.internal.persist.service.ConfigurationFactory;
 import org.rssowl.core.internal.persist.service.Migration;
 
+/**
+ * Tests for Migrations.
+ */
 public class MigrationsTest {
 
   private static class MigrationImpl implements Migration   {
@@ -63,6 +66,9 @@ public class MigrationsTest {
     }
   }
 
+  /**
+   * Tests simple migration scenarios.
+   */
   @Test
   public void testGetMigration() {
     Migrations migrations = new Migrations(new MigrationImpl(1, 2), new MigrationImpl(2, 3), new MigrationImpl(3, 4));
@@ -78,15 +84,25 @@ public class MigrationsTest {
     assertEquals(migrations.getMigrations().get(1), migration);
   }
 
+  /**
+   * Tests a more complex example of migration where there are multiple possible
+   * paths to the goal to make sure we choose the shortest one.
+   */
   @Test
   public void testGetMigrationComplex() {
     /* More complex example */
     Migrations migrations = new Migrations(new MigrationImpl(1, 2), new MigrationImpl(2, 3),
-        new MigrationImpl(3, 4), new MigrationImpl(4, 5), new MigrationImpl(3, 5),
-        new MigrationImpl(2, 4), new MigrationImpl(5, 6), new MigrationImpl(6, 8),
-        new MigrationImpl(7, 8), new MigrationImpl(7, 9), new MigrationImpl(8, 9));
+        new MigrationImpl(3, 4), new MigrationImpl(4, 6), new MigrationImpl(3, 5),
+        new MigrationImpl(2, 4), new MigrationImpl(5, 6), new MigrationImpl(7, 9),
+        new MigrationImpl(7, 8), new MigrationImpl(8, 9), new MigrationImpl(6, 8));
+
     Migration migration = migrations.getMigration(2, 8);
+
     assertEquals(ChainedMigration.class, migration.getClass());
     ChainedMigration chainedMigration = (ChainedMigration) migration;
+    assertEquals(3, chainedMigration.getMigrations().size());
+    assertEquals(migrations.getMigrations().get(5), chainedMigration.getMigrations().get(0));
+    assertEquals(migrations.getMigrations().get(3), chainedMigration.getMigrations().get(1));
+    assertEquals(migrations.getMigrations().get(10), chainedMigration.getMigrations().get(2));
   }
 }
