@@ -24,9 +24,7 @@
 
 package org.rssowl.ui.internal;
 
-import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.Command;
-import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -36,8 +34,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.viewers.ISelectionProvider;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
@@ -91,12 +87,11 @@ import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.core.util.URIUtils;
-import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyPageWrapper;
-import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
+import org.rssowl.ui.internal.handler.LabelNewsHandler;
 import org.rssowl.ui.internal.notifier.NotificationService;
 import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -1077,25 +1072,7 @@ public class Controller {
     for (final ILabel label : labels) {
       Command command = commandService.getCommand(LABEL_ACTION_PREFIX + i++);
       command.define("Label '" + label.getName() + "'", "Assign the label " + label.getName(), commandService.getCategory(RSSOWL_KEYBINDING_CATEGORY));
-
-      AbstractHandler handler = new AbstractHandler() {
-        @Override
-        public Object execute(ExecutionEvent arg0) {
-          FeedView feedview = OwlUI.getActiveFeedView();
-          if (feedview == null)
-            return null;
-
-          ISelectionProvider selectionProvider = feedview.getSite().getSelectionProvider();
-          if (selectionProvider == null)
-            return null;
-
-          /* Perform Action */
-          new LabelAction(label, (IStructuredSelection) selectionProvider.getSelection(), true).run();
-
-          return null; //As per JavaDoc
-        }
-      };
-      command.setHandler(handler);
+      command.setHandler(new LabelNewsHandler(label));
     }
   }
 

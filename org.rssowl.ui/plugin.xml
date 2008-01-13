@@ -512,9 +512,10 @@
             name="Mark All Read"/>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Toggle Flag of Selected Items"
-            id="org.rssowl.ui.actions.ToggleFlag"
-            name="Toggle Flag"/>
+            defaultHandler="org.rssowl.ui.internal.handler.MarkStickyHandler"
+            description="Mark selected items as Sticky"
+            id="org.rssowl.ui.actions.MarkSticky"
+            name="Mark Sticky"/>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.OpenInBrowser"
@@ -640,13 +641,13 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            defaultHandler="org.rssowl.ui.internal.actions.UndoRedoHandler"
+            defaultHandler="org.rssowl.ui.internal.handler.UndoRedoHandler"
             id="org.rssowl.ui.UndoAction"
             name="Undo">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            defaultHandler="org.rssowl.ui.internal.actions.UndoRedoHandler"
+            defaultHandler="org.rssowl.ui.internal.handler.UndoRedoHandler"
             id="org.rssowl.ui.RedoAction"
             name="Redo">
       </command>

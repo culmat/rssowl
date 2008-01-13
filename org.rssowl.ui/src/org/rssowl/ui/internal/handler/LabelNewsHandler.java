@@ -22,66 +22,50 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal.actions;
+package org.rssowl.ui.internal.handler;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.IHandler;
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.undo.UndoStack;
+import org.rssowl.ui.internal.actions.LabelAction;
+import org.rssowl.ui.internal.editors.feed.FeedView;
 
 /**
- * Redo the next operation if possible.
+ * This {@link IHandler} is required to support key-bindings for dynamic
+ * programmatic added actions like labelling news.
  *
  * @author bpasero
  */
-public class RedoAction extends Action {
+public class LabelNewsHandler extends AbstractHandler {
+  private final ILabel fLabel;
 
-  /** ID of this Action */
-  public static final String ID = "org.rssowl.ui.RedoAction";
-
-  /** Set ID for Key Binding Support */
-  public RedoAction() {
-    setId(ID);
-    setActionDefinitionId(ID);
+  /**
+   * @param label The {@link ILabel} to assign to the selected news.
+   */
+  public LabelNewsHandler(ILabel label) {
+    fLabel = label;
   }
 
   /*
-   * @see org.eclipse.jface.action.Action#run()
+   * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
    */
   @Override
-  public void run() {
-    UndoStack.getInstance().redo();
-  }
+  public Object execute(ExecutionEvent event) {
+    FeedView feedview = OwlUI.getActiveFeedView();
+    if (feedview == null)
+      return null;
 
-  /*
-   * @see org.eclipse.jface.action.Action#isEnabled()
-   */
-  @Override
-  public boolean isEnabled() {
-    return UndoStack.getInstance().isRedoSupported();
-  }
+    ISelectionProvider selectionProvider = feedview.getSite().getSelectionProvider();
+    if (selectionProvider == null)
+      return null;
 
-  /*
-   * @see org.eclipse.jface.action.Action#getText()
-   */
-  @Override
-  public String getText() {
-    return UndoStack.getInstance().getRedoName();
-  }
+    /* Perform Action */
+    new LabelAction(fLabel, (IStructuredSelection) selectionProvider.getSelection(), true).run();
 
-  /*
-   * @see org.eclipse.jface.action.Action#getImageDescriptor()
-   */
-  @Override
-  public ImageDescriptor getImageDescriptor() {
-    return OwlUI.getImageDescriptor("icons/elcl16/redo_edit.gif");
-  }
-
-  /*
-   * @see org.eclipse.jface.action.Action#getDisabledImageDescriptor()
-   */
-  @Override
-  public ImageDescriptor getDisabledImageDescriptor() {
-    return OwlUI.getImageDescriptor("icons/dlcl16/redo_edit.gif");
+    return null; //As per JavaDoc
   }
 }
