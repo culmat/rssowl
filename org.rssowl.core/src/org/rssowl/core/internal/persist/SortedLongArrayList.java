@@ -56,6 +56,7 @@ public final class SortedLongArrayList extends LongArrayList    {
     System.arraycopy(fElements, insertionPoint, fElements, insertionPoint + 1,
         fSize - insertionPoint);
     fElements[insertionPoint] = element;
+    ++fSize;
   }
 
   @Override
