@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.Platform;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.Description;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.Preference;
 import org.rssowl.core.internal.persist.service.Counter;
@@ -138,7 +139,19 @@ public class DefragmentTest {
       @SuppressWarnings("unchecked")
       List<INews> result = query.execute();
       assertEquals(1, result.size());
-      assertEquals(news.getDescription(), result.get(0).getDescription());
+      assertEquals(news.getTitle(), result.get(0).getTitle());
+    }
+
+    List<Description> descriptions = db.query(Description.class);
+    assertEquals(descriptions.size(), defragmentedDb.query(Description.class).size());
+    for (Description description : descriptions) {
+      Query query = defragmentedDb.query();
+      query.constrain(description.getClass());
+      query.descend("fNewsId").constrain(Long.valueOf(description.getNews().getId())); //$NON-NLS-1$
+      @SuppressWarnings("unchecked")
+      List<Description> result = query.execute();
+      assertEquals(1, result.size());
+      assertEquals(description.getValue(), result.get(0).getValue());
     }
 
     List<INewsBin> newsBins = db.query(INewsBin.class);
