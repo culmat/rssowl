@@ -68,6 +68,7 @@ import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.actions.UndoAction;
 import org.rssowl.ui.internal.editors.feed.FeedView;
+import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
@@ -374,9 +375,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         final IStructuredSelection selection;
 
         FeedView activeFeedView = OwlUI.getActiveFeedView();
-        if (activeFeedView != null)
+        FeedViewInput activeInput = null;
+        if (activeFeedView != null) {
           selection = (IStructuredSelection) activeFeedView.getSite().getSelectionProvider().getSelection();
-        else
+          activeInput = (FeedViewInput) activeFeedView.getEditorInput();
+        } else
           selection = StructuredSelection.EMPTY;
 
         /* Open */
@@ -421,6 +424,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           manager.add(moveMenu);
 
           for (INewsBin bin : newsbins) {
+            if (activeInput != null && activeInput.getMark().equals(bin))
+              continue;
+
             moveMenu.add(new MoveCopyNewsToBinAction(selection, bin, true));
           }
 
@@ -432,6 +438,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           manager.add(copyMenu);
 
           for (INewsBin bin : newsbins) {
+            if (activeInput != null && activeInput.getMark().equals(bin))
+              continue;
+
             copyMenu.add(new MoveCopyNewsToBinAction(selection, bin, false));
           }
 

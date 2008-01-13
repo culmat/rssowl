@@ -89,6 +89,7 @@ import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.ModelReference;
+import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.LoggingSafeRunnable;
@@ -796,6 +797,9 @@ public class NewsTableControl implements IFeedViewPart {
           manager.add(moveMenu);
 
           for (INewsBin bin : newsbins) {
+            if (fViewer.getInput() instanceof NewsBinReference && bin.getId().equals(((NewsBinReference) fViewer.getInput()).getId()))
+              continue;
+
             moveMenu.add(new MoveCopyNewsToBinAction(selection, bin, true));
           }
 
@@ -807,6 +811,9 @@ public class NewsTableControl implements IFeedViewPart {
           manager.add(copyMenu);
 
           for (INewsBin bin : newsbins) {
+            if (fViewer.getInput() instanceof NewsBinReference && bin.getId().equals(((NewsBinReference) fViewer.getInput()).getId()))
+              continue;
+
             copyMenu.add(new MoveCopyNewsToBinAction(selection, bin, false));
           }
 
