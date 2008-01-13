@@ -37,7 +37,7 @@ import org.rssowl.ui.internal.actions.ToggleReadStateAction;
  *
  * @author bpasero
  */
-public class MarkUnreadHandler extends AbstractHandler {
+public class ToggleReadStateHandler extends AbstractHandler {
 
   /*
    * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
@@ -47,7 +47,7 @@ public class MarkUnreadHandler extends AbstractHandler {
     IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
 
     if (selection != null)
-      new ToggleReadStateAction(selection, true).run();
+      new ToggleReadStateAction(selection).run();
 
     return null;
   }

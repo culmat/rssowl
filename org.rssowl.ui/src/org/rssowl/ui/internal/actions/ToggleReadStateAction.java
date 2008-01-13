@@ -26,11 +26,14 @@ package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.keys.IBindingService;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
@@ -48,6 +51,7 @@ import java.util.List;
  * @author bpasero
  */
 public class ToggleReadStateAction extends Action implements IWorkbenchWindowActionDelegate {
+  private static final String ID = "org.rssowl.ui.ToggleReadState";
   private static final EnumSet<INews.State> STATES = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
 
   private IStructuredSelection fSelection;
@@ -63,15 +67,6 @@ public class ToggleReadStateAction extends Action implements IWorkbenchWindowAct
     fSelection = selection;
 
     init();
-  }
-
-  /**
-   * @param selection
-   * @param markUnread
-   */
-  public ToggleReadStateAction(IStructuredSelection selection, boolean markUnread) {
-    fSelection = selection;
-    fMarkRead = false;
   }
 
   /*
@@ -99,7 +94,10 @@ public class ToggleReadStateAction extends Action implements IWorkbenchWindowAct
    */
   @Override
   public String getText() {
-    return "News as &Read";
+    IBindingService bs = (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
+    TriggerSequence binding = bs.getBestActiveBindingFor(ID);
+
+    return binding != null ? "News as &Read\t" + binding.format() : "News as &Read";
   }
 
   /*

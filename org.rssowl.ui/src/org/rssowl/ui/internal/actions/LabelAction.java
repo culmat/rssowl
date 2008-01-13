@@ -25,7 +25,10 @@
 package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.keys.IBindingService;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -42,17 +45,38 @@ import java.util.Set;
 public class LabelAction extends Action {
   private final ILabel fLabel;
   private IStructuredSelection fSelection;
-  private final boolean fAddLabel;
 
   /**
    * @param label
    * @param selection
-   * @param addLabel
    */
-  public LabelAction(ILabel label, IStructuredSelection selection, boolean addLabel) {
+  public LabelAction(ILabel label, IStructuredSelection selection) {
+    super("", label != null ? AS_CHECK_BOX : AS_UNSPECIFIED);
+
     fLabel = label;
     fSelection = selection;
-    fAddLabel = addLabel;
+  }
+
+  /*
+   * @see org.eclipse.jface.action.Action#getText()
+   */
+  @Override
+  public String getText() {
+    if (fLabel == null)
+      return "Remove All Labels";
+
+    IBindingService bs = (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
+    TriggerSequence binding = bs.getBestActiveBindingFor(Controller.LABEL_ACTION_PREFIX + fLabel.getId());
+
+    return binding != null ? fLabel.getName() + "\t" + binding.format() : fLabel.getName();
+  }
+
+  /*
+   * @see org.eclipse.jface.action.Action#isEnabled()
+   */
+  @Override
+  public boolean isEnabled() {
+    return !fSelection.isEmpty();
   }
 
   /*
@@ -69,7 +93,7 @@ public class LabelAction extends Action {
       Set<ILabel> newsLabels = newsItem.getLabels();
 
       /* Add Label */
-      if (fAddLabel) {
+      if (isChecked()) {
         newsItem.addLabel(fLabel);
       }
 
