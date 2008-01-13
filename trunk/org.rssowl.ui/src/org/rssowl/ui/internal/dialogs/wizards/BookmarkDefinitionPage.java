@@ -94,6 +94,7 @@ public class BookmarkDefinitionPage extends WizardPage {
       ((CreateBookmarkWizard) getWizard()).loadNameForFeed();
 
     super.setVisible(visible);
+    fNameInput.setFocus();
   }
 
   /*
