@@ -24,6 +24,9 @@
 
 package org.rssowl.ui.internal;
 
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.Command;
+import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -33,9 +36,13 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.commands.ICommandService;
 import org.rssowl.core.IApplicationService;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
@@ -84,9 +91,11 @@ import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyPageWrapper;
+import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import org.rssowl.ui.internal.notifier.NotificationService;
 import org.rssowl.ui.internal.util.ImportUtils;
@@ -129,6 +138,12 @@ public class Controller {
 
   /* Property to store info about a Realm in a Bookmark */
   static final String BM_REALM_PROPERTY = "org.rssowl.ui.BMRealmProperty";
+
+  /* Prefix for dynamic Label Actions */
+  private static final String LABEL_ACTION_PREFIX = "org.rssowl.ui.LabelAction";
+
+  /* ID of RSSOwl's Keybinding Category */
+  private static final String RSSOWL_KEYBINDING_CATEGORY = "org.rssowl.ui.commands.category.RSSOwl";
 
   /* The Singleton Instance */
   private static Controller fInstance;
@@ -270,8 +285,16 @@ public class Controller {
 
     /* Update Label conditions when Label name changes */
     fLabelListener = new LabelAdapter() {
+
+      @Override
+      public void entitiesAdded(Set<LabelEvent> events) {
+        defineLabelCommands(toLabels(events));
+      }
+
       @Override
       public void entitiesUpdated(Set<LabelEvent> events) {
+        defineLabelCommands(toLabels(events));
+
         for (LabelEvent event : events) {
           ILabel oldLabel = event.getOldLabel();
           ILabel updatedLabel = event.getEntity();
@@ -279,6 +302,11 @@ public class Controller {
             updateLabelConditions(oldLabel.getName(), updatedLabel.getName());
           }
         }
+      }
+
+      @Override
+      public void entitiesDeleted(Set<LabelEvent> events) {
+        undefineLabelCommands(toLabels(events));
       }
     };
 
@@ -763,13 +791,22 @@ public class Controller {
   }
 
   /**
-   * This method is called just after the windows have been opened.
+   * This method is called just after the UI has started (but no Window opened).
    */
   public void postUIStartup() {
 
     /* Create the Feed-Reload Service */
     if (!InternalOwl.TESTING)
       fFeedReloadService = new FeedReloadService();
+  }
+
+  /**
+   * This method is called just after the Window has opened.
+   */
+  public void postWindowOpen() {
+
+    /* Support Keybindings for assigning Labels */
+    defineLabelCommands(DynamicDAO.loadAll(ILabel.class));
   }
 
   /**
@@ -1020,5 +1057,68 @@ public class Controller {
     msg.append("\nLink: ").append(feedLink);
 
     return new Status(IStatus.WARNING, status.getPlugin(), status.getCode(), msg.toString(), null);
+  }
+
+  /*
+   * Registeres a command per Label to assign key-bindings. Should be called
+   * when {@link ILabel} get added, updated or removed and must be called once
+   * after startup.
+   */
+  private void defineLabelCommands(Collection<ILabel> labels) {
+    if (InternalOwl.TESTING)
+      return;
+
+    ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
+    if (commandService == null)
+      return;
+
+    /* Define Command For Each Label */
+    int i = 0;
+    for (final ILabel label : labels) {
+      Command command = commandService.getCommand(LABEL_ACTION_PREFIX + i++);
+      command.define("Label '" + label.getName() + "'", "Assign the label " + label.getName(), commandService.getCategory(RSSOWL_KEYBINDING_CATEGORY));
+
+      AbstractHandler handler = new AbstractHandler() {
+        @Override
+        public Object execute(ExecutionEvent arg0) {
+          FeedView feedview = OwlUI.getActiveFeedView();
+          if (feedview == null)
+            return null;
+
+          ISelectionProvider selectionProvider = feedview.getSite().getSelectionProvider();
+          if (selectionProvider == null)
+            return null;
+
+          /* Perform Action */
+          new LabelAction(label, (IStructuredSelection) selectionProvider.getSelection(), true).run();
+
+          return null; //As per JavaDoc
+        }
+      };
+      command.setHandler(handler);
+    }
+  }
+
+  /* TODO Also need to remove any keybinding associated with Label if existing */
+  private void undefineLabelCommands(Collection<ILabel> labels) {
+    if (InternalOwl.TESTING)
+      return;
+
+    ICommandService commandService = (ICommandService) PlatformUI.getWorkbench().getService(ICommandService.class);
+    if (commandService == null)
+      return;
+
+    for (ILabel label : labels) {
+      commandService.getCommand(LABEL_ACTION_PREFIX + label.getId()).undefine();
+    }
+  }
+
+  private List<ILabel> toLabels(Set<LabelEvent> events) {
+    List<ILabel> labels = new ArrayList<ILabel>(events.size());
+    for (LabelEvent event : events) {
+      labels.add(event.getEntity());
+    }
+
+    return labels;
   }
 }
