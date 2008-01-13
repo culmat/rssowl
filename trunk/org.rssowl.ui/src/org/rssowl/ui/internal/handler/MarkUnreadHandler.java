@@ -29,26 +29,26 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
+import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 
 /**
  * This {@link IHandler} is required to support key-bindings for programmatic
- * added actions like the {@link MakeNewsStickyAction}.
+ * added actions like the {@link ToggleReadStateAction}.
  *
  * @author bpasero
  */
-public class MarkStickyHandler extends AbstractHandler {
+public class MarkUnreadHandler extends AbstractHandler {
 
   /*
-   * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+   * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
    */
   @Override
-  public Object execute(ExecutionEvent event) {
+  public Object execute(ExecutionEvent arg0) {
     IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
 
     if (selection != null)
-      new MakeNewsStickyAction(selection).run();
+      new ToggleReadStateAction(selection, true).run();
 
-    return null; //As per JavaDoc
+    return null;
   }
 }

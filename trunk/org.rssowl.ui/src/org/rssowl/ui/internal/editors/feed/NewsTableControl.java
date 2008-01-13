@@ -105,7 +105,7 @@ import org.rssowl.ui.internal.StatusLineUpdater;
 import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
-import org.rssowl.ui.internal.actions.MarkNewsReadAction;
+import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
@@ -830,7 +830,7 @@ public class NewsTableControl implements IFeedViewPart {
           manager.add(markMenu);
 
           /* Mark as Read */
-          IAction action = new MarkNewsReadAction(selection);
+          IAction action = new ToggleReadStateAction(selection);
           action.setEnabled(!selection.isEmpty());
           markMenu.add(action);
 
