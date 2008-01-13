@@ -181,6 +181,7 @@ public class ModelTest1 {
   public void testNewsWithCategoriesMerge() throws Exception {
     IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com"));
     INews news = fFactory.createNews(null, feed, new Date());
+    news.setId(1L);
     news.setLink(new URI("http://news.com"));
     fFactory.createCategory(null, news);
     INews anotherNews = fFactory.createNews(null, feed, new Date());

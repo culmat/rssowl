@@ -554,6 +554,7 @@ public class DBManagerTest {
   public void testNewsMergeLink() throws Exception {
     IFeed feed = DynamicDAO.save(createFeed());
     INews news = fTypesFactory.createNews(null, feed, new Date());
+    news.setId(1L);
     news.setLink(createURI("http://www.uri.com"));
 
     INews anotherNews = fTypesFactory.createNews(null, feed, new Date());

@@ -141,6 +141,7 @@ public class INewsTest {
   public void testMergeGuidPermalink() throws Exception {
     IFeed parent = fFactory.createFeed(null, new URI("http://www.feed.com"));
     INews news = fFactory.createNews(null, parent, new Date());
+    news.setId(1L);
     fFactory.createGuid(news, "www.news.com", true);
 
     URI newsLink = new URI("http://www.news.com");
