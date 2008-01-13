@@ -26,6 +26,7 @@ package org.rssowl.core.internal.persist.service;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.BookMark;
+import org.rssowl.core.internal.persist.Description;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.NewsBin;
@@ -222,6 +223,18 @@ public class EventManager implements DatabaseListener   {
       EventsMap.getInstance().putUpdateEvent(event);
   }
 
+  /*
+   * Test items:
+   *
+   * News created, needs to save a description, but before assign news id
+   * to description
+   * News updated from NewsDAO or recursively from Feed dao (handleFeedReloaded does it on its own),
+   * must check if description changed. If it did, then
+   * update description too and make sure that news event is fired (e.g. nothing else changed)
+   * News deleted, needs to delete description
+   * on handle feed reloaded, if description.getValue is null, delete
+   */
+
   private void processCreatingEvent(EventArgs args) {
     IEntity entity = getEntity(args);
 
@@ -295,12 +308,14 @@ public class EventManager implements DatabaseListener   {
     fDb.delete(news.getSource());
     fDb.delete(news.getAuthor());
 
-    for (ICategory category : ReverseIterator.createInstance(news.getCategories())) {
+    for (ICategory category : ReverseIterator.createInstance(news.getCategories()))
       fDb.delete(category);
-    }
-    for (IAttachment attachment : ReverseIterator.createInstance(news.getAttachments())) {
+    for (IAttachment attachment : ReverseIterator.createInstance(news.getAttachments()))
       fDb.delete(attachment);
-    }
+
+    Description description = DBHelper.getDescriptionDAO().load(news.getId());
+    if (description != null)
+      fDb.delete(description);
   }
 
   private void cascadeMarkDeletion(IMark mark) {

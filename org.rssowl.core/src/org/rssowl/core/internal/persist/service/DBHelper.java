@@ -26,10 +26,12 @@ package org.rssowl.core.internal.persist.service;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.BookMark;
+import org.rssowl.core.internal.persist.Description;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.LazySet;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.dao.DAOServiceImpl;
+import org.rssowl.core.internal.persist.dao.DescriptionDAOImpl;
 import org.rssowl.core.internal.persist.dao.EntitiesToBeIndexedDAOImpl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
@@ -125,8 +127,11 @@ public class DBHelper {
       for (INews news : newsCollection)
         saveAndCascadeNews(db, news, root);
     } finally {
-      for (INews news : newsCollection)
-        ((News) news).releaseReadLockSpecial();
+      for (INews news : newsCollection) {
+        News n = (News) news;
+        n.releaseReadLockSpecial();
+        n.clearTransientDescription();
+      }
     }
   }
 
@@ -191,6 +196,41 @@ public class DBHelper {
     saveEntities(db, news.getAttachments());
     saveEntity(db, news.getSource());
     db.ext().set(news, 2);
+    saveDescription(db, news);
+  }
+
+  private static void saveDescription(ObjectContainer db, INews news) {
+    News n = (News) news;
+    Description dbDescription = null;
+    String dbDescriptionValue = null;
+
+    dbDescription = getDescriptionDAO().load(news.getId());
+    if (dbDescription != null)
+      dbDescriptionValue = dbDescription.getValue();
+
+    String newsDescriptionValue = n.getTransientDescription();
+
+    if (dbDescriptionValue == null && newsDescriptionValue == null)
+      return;
+
+    else if (dbDescriptionValue == null && newsDescriptionValue != null)
+      db.set(new Description(news, newsDescriptionValue));
+
+    else if (dbDescriptionValue != null && newsDescriptionValue == null)
+      db.delete(dbDescription);
+
+    else if (!dbDescriptionValue.equals(newsDescriptionValue)) {
+      dbDescription.setDescription(newsDescriptionValue);
+      db.set(dbDescription);
+    }
+  }
+
+  public static DescriptionDAOImpl getDescriptionDAO() {
+    DAOService daoService = InternalOwl.getDefault().getPersistenceService().getDAOService();
+    if (daoService instanceof DAOServiceImpl)
+      return ((DAOServiceImpl) daoService).getDescriptionDAO();
+
+    throw new IllegalStateException("This method should only be called if DAOService is of type " + DAOServiceImpl.class + ", but it is of type: " + daoService.getClass());
   }
 
   public static void preCommit(ObjectContainer db) {
@@ -216,10 +256,11 @@ public class DBHelper {
     EntitiesToBeIndexedDAOImpl dao = getEntitiesToBeIndexedDAO();
     EntityIdsByEventType newsToBeIndexed = dao.load();
     newsToBeIndexed.addAllEntities(newsEventRunnables.getPersistEvents(), newsEventRunnables.getUpdateEvents(), newsEventRunnables.getRemoveEvents());
+    newsToBeIndexed.compact();
     db.ext().set(newsToBeIndexed, Integer.MAX_VALUE);
   }
 
-  private static NewsEventRunnable getNewsEventRunnables(List<EventRunnable<?>> eventRunnables)  {
+  public static NewsEventRunnable getNewsEventRunnables(List<EventRunnable<?>> eventRunnables)  {
     for (EventRunnable<?> eventRunnable : eventRunnables) {
       if (eventRunnable instanceof NewsEventRunnable)
         return (NewsEventRunnable) eventRunnable;

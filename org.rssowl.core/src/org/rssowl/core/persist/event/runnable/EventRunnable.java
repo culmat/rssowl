@@ -220,11 +220,11 @@ public abstract class EventRunnable<T extends ModelEvent> implements Runnable   
    * @return a list of all events stored in this runnable.
    */
   public final List<T> getAllEvents() {
-    List<T> allEvents = new ArrayList<T>(fPersistEvents.size() +
-        fRemoveEvents.size() + fUpdateEvents.size());
-    allEvents.addAll(fPersistEvents);
-    allEvents.addAll(fRemoveEvents);
-    allEvents.addAll(fUpdateEvents);
+    List<T> allEvents = new ArrayList<T>(getPersistEvents().size() +
+        getRemoveEvents().size() + getUpdateEvents().size());
+    allEvents.addAll(getPersistEvents());
+    allEvents.addAll(getRemoveEvents());
+    allEvents.addAll(getUpdateEvents());
     return allEvents;
   }
 

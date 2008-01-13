@@ -165,4 +165,9 @@ public class LongArrayList {
       removeByElement(element);
 
   }
+
+  @Override
+  public final String toString() {
+    return Arrays.toString(fElements);
+  }
 }
