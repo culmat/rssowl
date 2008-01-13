@@ -243,7 +243,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
           excludes.add((IFolder) entity);
       }
 
-      fFolderChooser = new FolderChooser(container, sameParent, excludes, SWT.BORDER);
+      fFolderChooser = new FolderChooser(container, sameParent, excludes, SWT.BORDER, false);
       fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
       fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
       fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
