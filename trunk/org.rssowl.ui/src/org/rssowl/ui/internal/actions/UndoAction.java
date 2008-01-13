@@ -35,7 +35,9 @@ import org.rssowl.ui.internal.undo.UndoStack;
  * @author bpasero
  */
 public class UndoAction extends Action {
-  static final String ID = "org.rssowl.ui.UndoAction";
+
+  /** ID of this Action */
+  public static final String ID = "org.rssowl.ui.UndoAction";
 
   /** Set ID for Key Binding Support */
   public UndoAction() {

@@ -22,66 +22,35 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal.actions;
+package org.rssowl.ui.internal.handler;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.resource.ImageDescriptor;
-import org.rssowl.ui.internal.OwlUI;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.IHandler;
+import org.rssowl.ui.internal.actions.RedoAction;
+import org.rssowl.ui.internal.actions.UndoAction;
 import org.rssowl.ui.internal.undo.UndoStack;
 
 /**
- * Redo the next operation if possible.
+ * This {@link IHandler} is required to support key-bindings for programmatic
+ * added actions like the {@link UndoAction} or {@link RedoAction}.
  *
  * @author bpasero
  */
-public class RedoAction extends Action {
-
-  /** ID of this Action */
-  public static final String ID = "org.rssowl.ui.RedoAction";
-
-  /** Set ID for Key Binding Support */
-  public RedoAction() {
-    setId(ID);
-    setActionDefinitionId(ID);
-  }
+public class UndoRedoHandler extends AbstractHandler {
 
   /*
-   * @see org.eclipse.jface.action.Action#run()
+   * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
    */
   @Override
-  public void run() {
-    UndoStack.getInstance().redo();
-  }
+  public Object execute(ExecutionEvent event) {
+    String commandId = event.getCommand().getId();
 
-  /*
-   * @see org.eclipse.jface.action.Action#isEnabled()
-   */
-  @Override
-  public boolean isEnabled() {
-    return UndoStack.getInstance().isRedoSupported();
-  }
+    if (UndoAction.ID.equals(commandId))
+      UndoStack.getInstance().undo();
+    else if (RedoAction.ID.equals(commandId))
+      UndoStack.getInstance().redo();
 
-  /*
-   * @see org.eclipse.jface.action.Action#getText()
-   */
-  @Override
-  public String getText() {
-    return UndoStack.getInstance().getRedoName();
-  }
-
-  /*
-   * @see org.eclipse.jface.action.Action#getImageDescriptor()
-   */
-  @Override
-  public ImageDescriptor getImageDescriptor() {
-    return OwlUI.getImageDescriptor("icons/elcl16/redo_edit.gif");
-  }
-
-  /*
-   * @see org.eclipse.jface.action.Action#getDisabledImageDescriptor()
-   */
-  @Override
-  public ImageDescriptor getDisabledImageDescriptor() {
-    return OwlUI.getImageDescriptor("icons/dlcl16/redo_edit.gif");
+    return null; //As per JavaDoc
   }
 }

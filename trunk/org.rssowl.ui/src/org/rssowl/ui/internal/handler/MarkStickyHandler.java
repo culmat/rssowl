@@ -22,32 +22,39 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal.actions;
+package org.rssowl.ui.internal.handler;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.IHandler;
-import org.rssowl.ui.internal.undo.UndoStack;
+import org.eclipse.jface.viewers.ISelectionProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
+import org.rssowl.ui.internal.editors.feed.FeedView;
 
 /**
  * This {@link IHandler} is required to support key-bindings for programmatic
- * added actions like the {@link UndoAction} or {@link RedoAction}.
+ * added actions like the {@link MakeNewsStickyAction}.
  *
  * @author bpasero
  */
-public class UndoRedoHandler extends AbstractHandler {
+public class MarkStickyHandler extends AbstractHandler {
 
   /*
    * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
    */
   @Override
   public Object execute(ExecutionEvent event) {
-    String commandId = event.getCommand().getId();
+    FeedView feedview = OwlUI.getActiveFeedView();
+    if (feedview == null)
+      return null;
 
-    if (UndoAction.ID.equals(commandId))
-      UndoStack.getInstance().undo();
-    else if (RedoAction.ID.equals(commandId))
-      UndoStack.getInstance().redo();
+    ISelectionProvider selectionProvider = feedview.getSite().getSelectionProvider();
+    if (selectionProvider == null)
+      return null;
+
+    new MakeNewsStickyAction((IStructuredSelection) selectionProvider.getSelection()).run();
 
     return null; //As per JavaDoc
   }
