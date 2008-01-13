@@ -283,20 +283,21 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     return builder.toString();
   }
 
-  private StringBuilder getBuilder(INews news) {
+  private StringBuilder getBuilder(INews news, String description) {
     int capacity = 0;
 
     if (news.getTitle() != null)
       capacity += news.getTitle().length();
 
-    if (news.getDescription() != null)
-      capacity += news.getDescription().length();
+    if (description != null)
+      capacity += description.length();
 
     return new StringBuilder(capacity);
   }
 
   private String getLabel(INews news) {
-    StringBuilder builder = getBuilder(news);
+    String description = news.getDescription();
+    StringBuilder builder = getBuilder(news, description);
     StringBuilder search = new StringBuilder();
 
     String newsTitle = ModelUtils.getHeadline(news);
@@ -394,7 +395,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       /* DIV: NewsItem/Content */
       div(builder, "content");
 
-      builder.append(StringUtils.isSet(news.getDescription()) ? news.getDescription() : "This article does not provide any content.");
+      builder.append(StringUtils.isSet(description) ? description : "This article does not provide any content.");
 
       /* Close: NewsItem/Content */
       close(builder, "div");
