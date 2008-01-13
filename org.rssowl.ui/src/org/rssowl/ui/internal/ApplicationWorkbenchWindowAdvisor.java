@@ -205,6 +205,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
           moveToTray(shell);
       }
     });
+
+    /* Notify Controller */
+    Controller.getDefault().postWindowOpen();
   }
 
   /*
