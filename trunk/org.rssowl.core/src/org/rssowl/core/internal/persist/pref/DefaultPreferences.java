@@ -212,6 +212,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Show Statusbar */
   public static final String SHOW_STATUS = "org.rssowl.pref.ShowStatus";
 
+  /** Global: Load Title from Feed in Bookmark Wizard */
+  public static final String BM_LOAD_TITLE_FROM_FEED = "org.rssowl.pref.BMLoadTitleFromFeed";
+
   /**
    * Eclipse Preferences Follow
    */
@@ -272,6 +275,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putInteger(AUTOCLOSE_NOTIFICATION_VALUE, 8);
     defaultScope.putBoolean(SHOW_TOOLBAR, true);
     defaultScope.putBoolean(SHOW_STATUS, true);
+    defaultScope.putBoolean(BM_LOAD_TITLE_FROM_FEED, true);
   }
 
   private void initGlobalEclipseDefaults(IPreferenceScope defaultScope) {
