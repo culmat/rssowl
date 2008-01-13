@@ -56,6 +56,9 @@ import java.util.Map;
  * @author bpasero
  */
 public class CreateBookmarkWizard extends Wizard {
+  private static final String HTTP = "http://";
+  private static final String PROTOCOL_IDENTIFIER = "://";
+
   private FeedDefinitionPage fFeedDefinitionPage;
   private KeywordSubscriptionPage fKeywordPage;
   private BookmarkDefinitionPage fBookMarkDefinitionPage;
@@ -123,7 +126,11 @@ public class CreateBookmarkWizard extends Wizard {
 
     /* Link Subscription - Load from Feed if requested */
     else if (fFeedDefinitionPage.loadTitleFromFeed()) {
-      final String linkText = fFeedDefinitionPage.getLink();
+      String linkVal = fFeedDefinitionPage.getLink();
+      if (!linkVal.contains(PROTOCOL_IDENTIFIER))
+        linkVal = HTTP + linkVal;
+
+      final String linkText = linkVal;
       IRunnableWithProgress runnable = new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) {
           monitor.beginTask("Loading title from Feed...", IProgressMonitor.UNKNOWN);
@@ -188,8 +195,12 @@ public class CreateBookmarkWizard extends Wizard {
     URI uriObj;
     if (fFeedDefinitionPage.isKeywordSubscription())
       uriObj = new URI(fKeywordPage.getSelectedEngine().toUrl(fFeedDefinitionPage.getKeyword()));
-    else
-      uriObj = new URI(fFeedDefinitionPage.getLink());
+    else {
+      String linkVal = fFeedDefinitionPage.getLink();
+      if (!linkVal.contains(PROTOCOL_IDENTIFIER))
+        linkVal = HTTP + linkVal;
+      uriObj = new URI(linkVal);
+    }
 
     IFeedDAO feedDAO = DynamicDAO.getDAO(IFeedDAO.class);
 
