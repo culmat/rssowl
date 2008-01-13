@@ -41,7 +41,6 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFeedDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
-import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 
@@ -135,11 +134,10 @@ public class CreateBookmarkWizard extends Wizard {
         public void run(IProgressMonitor monitor) {
           monitor.beginTask("Please wait while loading the title from the feed...", IProgressMonitor.UNKNOWN);
 
+          String feedTitle = null;
           try {
             final URI link = new URI(linkText);
-            String feedTitle = Owl.getConnectionService().getLabel(link);
-            if (StringUtils.isSet(feedTitle))
-              fBookMarkDefinitionPage.presetBookmarkName(feedTitle);
+            feedTitle = Owl.getConnectionService().getLabel(link);
           } catch (final ConnectionException e) {
 
             /* Authentication Required */
@@ -149,6 +147,9 @@ public class CreateBookmarkWizard extends Wizard {
           } catch (URISyntaxException e) {
             Activator.getDefault().logError(e.getMessage(), e);
           }
+
+          /* Update last Page with Title */
+          fBookMarkDefinitionPage.presetBookmarkName(feedTitle);
         }
       };
 

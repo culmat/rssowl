@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.wizards;
 
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -34,6 +35,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -61,8 +63,13 @@ public class BookmarkDefinitionPage extends WizardPage {
   public void presetBookmarkName(final String name) {
     JobRunner.runInUIThread(fNameInput, new Runnable() {
       public void run() {
-        fNameInput.setText(name);
-        fNameInput.selectAll();
+        if (StringUtils.isSet(name)) {
+          setMessage("Create a new Bookmark to read News from a Feed.");
+          fNameInput.setText(name);
+          fNameInput.selectAll();
+        } else {
+          setMessage("Unable to load the title from the feed", IMessageProvider.WARNING);
+        }
       }
     });
   }
@@ -90,7 +97,7 @@ public class BookmarkDefinitionPage extends WizardPage {
    */
   @Override
   public void setVisible(boolean visible) {
-    if (visible && fNameInput.getText().length() == 0)
+    if (visible)
       ((CreateBookmarkWizard) getWizard()).loadNameForFeed();
 
     super.setVisible(visible);
