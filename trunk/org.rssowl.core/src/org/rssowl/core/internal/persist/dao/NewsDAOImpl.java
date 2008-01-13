@@ -84,7 +84,9 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
   @Override
   protected void postSaveAll(Collection<INews> objects) {
     for (INews news : objects) {
-      ((News) news).releaseReadLockSpecial();
+      News n = (News) news;
+      n.releaseReadLockSpecial();
+      n.clearTransientDescription();
     }
   }
 

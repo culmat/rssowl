@@ -73,6 +73,7 @@ public final class DAOServiceImpl extends DAOService  {
 
   /* Internal */
   private final EntitiesToBeIndexedDAOImpl fEntitiesToBeIndexedDAO = new EntitiesToBeIndexedDAOImpl();
+  private final DescriptionDAOImpl fDescriptionDAO = new DescriptionDAOImpl();
 
   /* Caching DAOs */
   private final IFolderDAO fFolderDAO = new CachingFolderDAO();
@@ -197,6 +198,10 @@ public final class DAOServiceImpl extends DAOService  {
 
   public EntitiesToBeIndexedDAOImpl getEntitiesToBeIndexedDAO() {
     return fEntitiesToBeIndexedDAO;
+  }
+
+  public DescriptionDAOImpl getDescriptionDAO() {
+    return fDescriptionDAO;
   }
 
   @SuppressWarnings("unchecked")

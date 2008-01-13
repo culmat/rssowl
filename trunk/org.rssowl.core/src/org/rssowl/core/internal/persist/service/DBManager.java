@@ -31,6 +31,7 @@ import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.AbstractEntity;
 import org.rssowl.core.internal.persist.BookMark;
 import org.rssowl.core.internal.persist.ConditionalGet;
+import org.rssowl.core.internal.persist.Description;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.Folder;
 import org.rssowl.core.internal.persist.Label;
@@ -631,6 +632,7 @@ public class DBManager {
     configureFeed(config);
     configureNews(config);
     configureFolder(config);
+    config.objectClass(Description.class).objectField("fNewsId").indexed(true);
     config.objectClass(NewsCounter.class).cascadeOnDelete(true);
     config.objectClass(Preference.class).cascadeOnDelete(true);
     config.objectClass(Preference.class).objectField("fKey").indexed(true); //$NON-NLS-1$

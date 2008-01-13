@@ -109,7 +109,7 @@ public class News extends AbstractEntity implements INews {
   private Date fReceiveDate;
   private Date fPublishDate;
   private Date fModifiedDate;
-  private String fDescription;
+
   private String fComments;
   private String fInReplyTo;
   private boolean fIsFlagged;
@@ -133,6 +133,13 @@ public class News extends AbstractEntity implements INews {
   private Set<ILabel> fLabels;
 
   private boolean fCopy;
+
+  //TODO Remove this after M8 release
+  private String fDescription;
+
+  /* We can't use fDescription to support migration from M7 to M8 */
+  private transient String fTransientDescription;
+  private transient boolean fTransientDescriptionSet;
 
   private transient final Lock fLock = new Lock();
 
@@ -184,8 +191,8 @@ public class News extends AbstractEntity implements INews {
       for (ICategory category : news.getCategories())
         addCategory(new Category(category));
 
+      setDescription(news.getDescription());
       fComments = news.fComments;
-      fDescription = news.fDescription;
       fFeedLink = news.fFeedLink;
       setGuid(news.getGuid());
       fInReplyTo = news.fInReplyTo;
@@ -471,19 +478,24 @@ public class News extends AbstractEntity implements INews {
   public String getDescription() {
     fLock.acquireReadLock();
     try {
-      return fDescription;
+      if (fTransientDescriptionSet)
+        return fTransientDescription;
     } finally {
       fLock.releaseReadLock();
     }
+
+    if (getId() == null)
+      return null;
+
+    Description description = loadDescription();
+    return description == null ? null : description.getValue();
   }
 
-  /*
-   * @see org.rssowl.core.model.types.INews#setDescription(java.lang.String)
-   */
   public void setDescription(String description) {
     fLock.acquireWriteLock();
     try {
-      fDescription = description;
+      fTransientDescription = description;
+      fTransientDescriptionSet = true;
     } finally {
       fLock.releaseWriteLock();
     }
@@ -962,7 +974,6 @@ public class News extends AbstractEntity implements INews {
   private boolean simpleFieldsEqual(INews news) {
     return MergeUtils.equals(getBase(), news.getBase()) &&
         MergeUtils.equals(fComments, news.getComments()) &&
-        MergeUtils.equals(getDescription(), news.getDescription()) &&
         MergeUtils.equals(getLink(), news.getLink()) &&
         MergeUtils.equals(fModifiedDate, news.getModifiedDate()) &&
         MergeUtils.equals(fPublishDate, news.getPublishDate()) &&
@@ -982,12 +993,12 @@ public class News extends AbstractEntity implements INews {
       updated |= processListMergeResult(result, mergeCategories(news.getCategories()));
       updated |= processListMergeResult(result, mergeAuthor(news.getAuthor()));
       updated |= mergeGuid(news.getGuid());
+      mergeDescription(result, (News) news);
       updated |= processListMergeResult(result, mergeSource(news.getSource()));
       updated |= !simpleFieldsEqual(news);
 
       setBase(news.getBase());
       fComments = news.getComments();
-      setDescription(news.getDescription());
       setLink(news.getLink());
       fModifiedDate = news.getModifiedDate();
       fPublishDate = news.getPublishDate();
@@ -1005,6 +1016,41 @@ public class News extends AbstractEntity implements INews {
     }
   }
 
+  private boolean areEqual(Object o1, Object o2) {
+    return o1 == null ? o2 == null : o1.equals(o2);
+  }
+
+  private void mergeDescription(MergeResult result, News news) {
+    String newsDescription = null;
+    if (news.getId() == null)
+      newsDescription = news.getTransientDescription();
+    else
+      newsDescription = news.getDescription();
+
+    Description description = loadDescription();
+    boolean descriptionUpdated = false;
+    if (description == null)
+      description = new Description(this, null);
+
+    if (fTransientDescriptionSet && (!areEqual(description.getValue(), fTransientDescription))) {
+      description.setDescription(fTransientDescription);
+      descriptionUpdated = true;
+    }
+
+    if (!areEqual(description.getValue(), newsDescription)) {
+      setDescription(newsDescription);
+      description.setDescription(newsDescription);
+      descriptionUpdated = true;
+    }
+
+    if (descriptionUpdated) {
+      if (description.getValue() == null)
+        result.addRemovedObject(description);
+      else
+        result.addUpdatedObject(description);
+    }
+  }
+
   private boolean mergeState(INews news) {
     State thisState = getState();
     State otherState = news.getState();
@@ -1019,8 +1065,6 @@ public class News extends AbstractEntity implements INews {
     return false;
   }
 
-  //FIXME Need to consolidate description comparison so that we only do it once
-  //per merge.
   private boolean isUpdated(INews news) {
     State thisState = getState();
     if (thisState != State.READ && thisState != State.UNREAD)
@@ -1122,6 +1166,29 @@ public class News extends AbstractEntity implements INews {
       return fCopy;
     } finally {
       fLock.releaseReadLock();
+    }
+  }
+
+  public Description loadDescription() {
+    return new DescriptionReference(this.getIdAsPrimitive()).resolve();
+  }
+
+  public String getTransientDescription() {
+    fLock.acquireReadLock();
+    try {
+      return fTransientDescription;
+    } finally {
+      fLock.releaseReadLock();
+    }
+  }
+
+  public void clearTransientDescription() {
+    fLock.acquireWriteLock();
+    try {
+      fTransientDescription = null;
+      fTransientDescriptionSet = false;
+    } finally {
+      fLock.releaseWriteLock();
     }
   }
 }
