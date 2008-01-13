@@ -95,16 +95,16 @@ public class FolderChooser extends Composite implements DisposeListener {
   private FolderAdapter fFolderListener;
   private ToolBar fAddFolderBar;
   private List<IFolder> fExcludes;
-  private final boolean fExpanded;
+  private final boolean fExpandable;
 
   /**
    * @param parent
    * @param initial
    * @param style
-   * @param expanded
+   * @param expandable
    */
-  public FolderChooser(Composite parent, IFolder initial, int style, boolean expanded) {
-    this(parent, initial, null, style, expanded);
+  public FolderChooser(Composite parent, IFolder initial, int style, boolean expandable) {
+    this(parent, initial, null, style, expandable);
   }
 
   /**
@@ -112,14 +112,14 @@ public class FolderChooser extends Composite implements DisposeListener {
    * @param initial
    * @param excludes
    * @param style
-   * @param expanded
+   * @param expandable
    */
-  public FolderChooser(Composite parent, IFolder initial, List<IFolder> excludes, int style, boolean expanded) {
+  public FolderChooser(Composite parent, IFolder initial, List<IFolder> excludes, int style, boolean expandable) {
     super(parent, style);
     fParent = parent;
     fSelectedFolder = initial;
     fExcludes = excludes;
-    fExpanded = expanded;
+    fExpandable = expandable;
     fResources = new LocalResourceManager(JFaceResources.getResources(), parent);
 
     initComponents();
@@ -193,35 +193,44 @@ public class FolderChooser extends Composite implements DisposeListener {
     ((GridLayout) headerContainer.getLayout()).marginLeft = 3;
     headerContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     headerContainer.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-    headerContainer.setCursor(fParent.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-    headerContainer.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseDown(MouseEvent e) {
-        onToggle();
-      }
-    });
+
+    if (fExpandable) {
+      headerContainer.setCursor(fParent.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+      headerContainer.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseDown(MouseEvent e) {
+          onToggle();
+        }
+      });
+    }
 
     fFolderIcon = new Label(headerContainer, SWT.None);
     fFolderIcon.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
     fFolderIcon.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-    fFolderIcon.setCursor(fParent.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-    fFolderIcon.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseDown(MouseEvent e) {
-        onToggle();
-      }
-    });
+
+    if (fExpandable) {
+      fFolderIcon.setCursor(fParent.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+      fFolderIcon.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseDown(MouseEvent e) {
+          onToggle();
+        }
+      });
+    }
 
     fFolderName = new Label(headerContainer, SWT.None);
     fFolderName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     fFolderName.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-    fFolderName.setCursor(fParent.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-    fFolderName.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseDown(MouseEvent e) {
-        onToggle();
-      }
-    });
+
+    if (fExpandable) {
+      fFolderName.setCursor(fParent.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+      fFolderName.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseDown(MouseEvent e) {
+          onToggle();
+        }
+      });
+    }
 
     Composite toolbarContainer = new Composite(headerContainer, SWT.NONE);
     toolbarContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 1, false));
@@ -232,7 +241,7 @@ public class FolderChooser extends Composite implements DisposeListener {
     fAddFolderBar.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
     fAddFolderBar.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
     fAddFolderBar.setCursor(headerContainer.getDisplay().getSystemCursor(SWT.CURSOR_ARROW));
-    fAddFolderBar.setVisible(fExpanded);
+    fAddFolderBar.setVisible(!fExpandable);
 
     ToolItem addFolderItem = new ToolItem(fAddFolderBar, SWT.PUSH);
     addFolderItem.setImage(OwlUI.getImage(fResources, "icons/etool16/add_crop.gif"));
@@ -246,12 +255,13 @@ public class FolderChooser extends Composite implements DisposeListener {
 
     ToolBar toggleBar = new ToolBar(toolbarContainer, SWT.FLAT);
     toggleBar.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
+    ((GridData) toggleBar.getLayoutData()).exclude = !fExpandable;
     toggleBar.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
     toggleBar.setCursor(headerContainer.getDisplay().getSystemCursor(SWT.CURSOR_ARROW));
 
     fToggleItem = new ToolItem(toggleBar, SWT.PUSH);
-    fToggleItem.setImage(OwlUI.getImage(fResources, fExpanded ? "icons/ovr16/arrow_up.gif" : "icons/ovr16/arrow_down.gif"));
-    fToggleItem.setToolTipText(fExpanded ? "Hide Folders" : "Show Folders");
+    fToggleItem.setImage(OwlUI.getImage(fResources, "icons/ovr16/arrow_down.gif"));
+    fToggleItem.setToolTipText("Show Folders");
     fToggleItem.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -274,7 +284,7 @@ public class FolderChooser extends Composite implements DisposeListener {
 
     fViewerHeight = fFolderViewer.getTree().getItemHeight() * 10 + 12;
     ((GridData) fFolderViewerContainer.getLayoutData()).heightHint = fViewerHeight;
-    ((GridData) fFolderViewerContainer.getLayoutData()).exclude = !fExpanded;
+    ((GridData) fFolderViewerContainer.getLayoutData()).exclude = fExpandable;
 
     /* Sort by Name if set so */
     if (Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.BE_SORT_BY_NAME)) {
@@ -361,7 +371,7 @@ public class FolderChooser extends Composite implements DisposeListener {
         }
 
         /* Select Folder and toggle */
-        else {
+        else if (fExpandable) {
           onToggle();
         }
       }
@@ -390,7 +400,7 @@ public class FolderChooser extends Composite implements DisposeListener {
   private void onNewFolder() {
 
     /* Make sure Folder-List is visible */
-    if (((GridData) fFolderViewerContainer.getLayoutData()).exclude)
+    if (((GridData) fFolderViewerContainer.getLayoutData()).exclude && fExpandable)
       onToggle();
 
     /* Create new Folder */
