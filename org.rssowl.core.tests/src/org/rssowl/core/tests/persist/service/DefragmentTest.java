@@ -33,10 +33,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.Feed;
+import org.rssowl.core.internal.persist.Preference;
+import org.rssowl.core.internal.persist.service.Counter;
 import org.rssowl.core.internal.persist.service.DBManager;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.IModelFactory;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
@@ -56,6 +64,7 @@ import java.util.List;
 public class DefragmentTest {
 
   private URI fPluginLocation;
+  private IModelFactory fFactory = Owl.getModelFactory();
 
   /**
    *
@@ -66,7 +75,30 @@ public class DefragmentTest {
     Owl.getPersistenceService().recreateSchema();
     Owl.getPersistenceService().getModelSearch().shutdown();
     fPluginLocation = FileLocator.toFileURL(Platform.getBundle("org.rssowl.core.tests").getEntry("/")).toURI();
-    saveFeeds();
+
+    ILabel label = fFactory.createLabel(null, "Label 0");
+    DynamicDAO.save(label);
+
+    List<IFeed> feeds = saveFeeds();
+    IFeed feed = feeds.get(1);
+    INews news = feed.getNews().get(2);
+    news.addLabel(label);
+    DynamicDAO.save(news);
+    INews anotherNews = feeds.get(feeds.size() - 1).getNews().get(0);
+    anotherNews.addLabel(label);
+    DynamicDAO.save(anotherNews);
+
+    IFolder folder = fFactory.createFolder(null, null, "Folder");
+    fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark");
+    fFactory.createSearchMark(null, folder, "SM");
+    INewsBin bin = fFactory.createNewsBin(null, folder, "NewsBin");
+    INews newsCopy = fFactory.createNews(news);
+    DynamicDAO.save(newsCopy);
+    bin.addNews(newsCopy);
+    DynamicDAO.save(folder);
+    Preference pref = new Preference("key");
+    pref.putLongs(2, 3, 4);
+    DynamicDAO.save(pref);
   }
 
   /**
@@ -96,11 +128,38 @@ public class DefragmentTest {
       assertEquals(1, result.size());
       assertEquals(entity, result.get(0));
     }
+
+    List<INews> newsList = db.query(INews.class);
+    assertEquals(newsList.size(), defragmentedDb.query(INews.class).size());
+    for (INews news : newsList) {
+      Query query = defragmentedDb.query();
+      query.constrain(news.getClass());
+      query.descend("fId").constrain(Long.valueOf(news.getId())); //$NON-NLS-1$
+      @SuppressWarnings("unchecked")
+      List<INews> result = query.execute();
+      assertEquals(1, result.size());
+      assertEquals(news.getDescription(), result.get(0).getDescription());
+    }
+
+    List<INewsBin> newsBins = db.query(INewsBin.class);
+    assertEquals(newsBins.size(), defragmentedDb.query(INewsBin.class).size());
+    for (INewsBin newsBin : newsBins) {
+      Query query = defragmentedDb.query();
+      query.constrain(newsBin.getClass());
+      query.descend("fId").constrain(Long.valueOf(newsBin.getId())); //$NON-NLS-1$
+      @SuppressWarnings("unchecked")
+      List<INewsBin> result = query.execute();
+      assertEquals(1, result.size());
+      assertEquals(newsBin.getNews(), result.get(0).getNews());
+    }
+
+    assertEquals(db.query(ILabel.class).size(), defragmentedDb.query(ILabel.class).size());
+    assertEquals(db.query(Counter.class).get(0).getValue(), defragmentedDb.query(Counter.class).get(0).getValue());
   }
 
-  private void saveFeeds() throws Exception {
+  private List<IFeed> saveFeeds() throws Exception {
     List<IFeed> feeds = new ArrayList<IFeed>();
-    for (int i = 1; i < 6; i++) {
+    for (int i = 1; i < 40; i++) {
       URI feedLink = fPluginLocation.resolve("data/performance/" + i + ".xml").toURL().toURI();
       IFeed feed = new Feed(feedLink);
 
@@ -110,5 +169,6 @@ public class DefragmentTest {
       feeds.add(feed);
     }
     DynamicDAO.saveAll(feeds);
+    return feeds;
   }
 }
