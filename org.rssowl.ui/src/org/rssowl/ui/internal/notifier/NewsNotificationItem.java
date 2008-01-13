@@ -85,10 +85,11 @@ public class NewsNotificationItem extends NotificationItem {
   }
 
   private String extractDescriptionExcerpt(INews news) {
-    if (news.getDescription() == null || news.getDescription().length() == 0)
+    String description = news.getDescription();
+    if (!StringUtils.isSet(description))
       return null;
 
-    String content = StringUtils.stripTags(news.getDescription());
+    String content = StringUtils.stripTags(description);
     content = StringUtils.normalizeString(content);
     content = StringUtils.smartTrim(content, MAX_DESCRIPTION_LENGTH);
 
