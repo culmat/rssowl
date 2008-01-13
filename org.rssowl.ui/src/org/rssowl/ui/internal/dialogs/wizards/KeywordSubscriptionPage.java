@@ -131,7 +131,7 @@ public class KeywordSubscriptionPage extends WizardPage {
     contentMargin.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     contentMargin.setLayout(new GridLayout(1, false));
     ((GridLayout) contentMargin.getLayout()).marginTop = 10;
-    ((GridLayout) contentMargin.getLayout()).verticalSpacing = 10;
+    ((GridLayout) contentMargin.getLayout()).verticalSpacing = 15;
 
     for (int i = 0; i < fgSearchEngines.length; i++) {
       final SearchEngine engine = fgSearchEngines[i];
