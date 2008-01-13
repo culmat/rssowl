@@ -32,6 +32,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
@@ -165,6 +166,9 @@ public class CreateBookmarkWizard extends Wizard {
     } catch (URISyntaxException e) {
       Activator.getDefault().logError(e.getMessage(), e);
     }
+
+    /* Remember Settings */
+    Owl.getPreferenceService().getGlobalScope().putBoolean(DefaultPreferences.BM_LOAD_TITLE_FROM_FEED, fFeedDefinitionPage.loadTitleFromFeed());
 
     return true;
   }

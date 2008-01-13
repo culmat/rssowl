@@ -35,6 +35,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
+import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.OwlUI;
@@ -51,6 +54,7 @@ public class FeedDefinitionPage extends WizardPage {
   private Button fFeedByLinkButton;
   private Button fFeedByKeywordButton;
   private String fInitialLink;
+  private IPreferenceScope fGlobalScope = Owl.getPreferenceService().getGlobalScope();
 
   /**
    * @param pageName
@@ -157,7 +161,7 @@ public class FeedDefinitionPage extends WizardPage {
 
     fLoadTitleFromFeedButton = new Button(textIndent, SWT.CHECK);
     fLoadTitleFromFeedButton.setText("Use the Title of the Feed as Name for the Bookmark");
-    fLoadTitleFromFeedButton.setSelection(true); //TODO Load from Settings
+    fLoadTitleFromFeedButton.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_LOAD_TITLE_FROM_FEED));
 
     /* 2) Feed by Keyword */
     fFeedByKeywordButton = new Button(container, SWT.RADIO);
