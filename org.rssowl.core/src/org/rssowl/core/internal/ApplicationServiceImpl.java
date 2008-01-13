@@ -57,9 +57,9 @@ import java.util.concurrent.locks.ReadWriteLock;
  * db4o implementation of IApplicationService
  */
 public class ApplicationServiceImpl implements IApplicationService {
-  private ObjectContainer fDb;
-  private ReadWriteLock fLock;
-  private Lock fWriteLock;
+  private volatile ObjectContainer fDb;
+  private volatile ReadWriteLock fLock;
+  private volatile Lock fWriteLock;
 
   /**
    * Creates an instance of this class.
