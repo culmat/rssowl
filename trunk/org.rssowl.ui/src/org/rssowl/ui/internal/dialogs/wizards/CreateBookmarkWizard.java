@@ -157,6 +157,17 @@ public class CreateBookmarkWizard extends Wizard {
   }
 
   /*
+   * @see org.eclipse.jface.wizard.Wizard#canFinish()
+   */
+  @Override
+  public boolean canFinish() {
+    if (getContainer().getCurrentPage() != fBookMarkDefinitionPage)
+      return false;
+
+    return super.canFinish();
+  }
+
+  /*
    * @see org.eclipse.jface.wizard.Wizard#performFinish()
    */
   @Override

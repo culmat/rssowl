@@ -28,6 +28,8 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -71,7 +73,7 @@ public class FeedDefinitionPage extends WizardPage {
   }
 
   private String loadInitialLinkFromClipboard() {
-    String initial = "http://";
+    String initial = HTTP;
 
     Clipboard cb = new Clipboard(getShell().getDisplay());
     TextTransfer transfer = TextTransfer.getInstance();
@@ -105,7 +107,13 @@ public class FeedDefinitionPage extends WizardPage {
    */
   @Override
   public boolean isPageComplete() {
-    return fFeedLinkInput.getText().length() > 0 || fKeywordInput.getText().length() > 0;
+
+    /* Checked for proper Link */
+    if (fFeedByLinkButton.getSelection())
+      return fFeedLinkInput.getText().length() > 0;
+
+    /* Check for Keyword */
+    return fKeywordInput.getText().length() > 0;
   }
 
   /*
@@ -115,15 +123,15 @@ public class FeedDefinitionPage extends WizardPage {
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(new GridLayout(1, false));
 
-//    Label infoLabel = new Label(container, SWT.WRAP);
-//    infoLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-//    infoLabel.setText("You may either create a new Bookmark by supplying the Link to a Newsfeed or by supplying some Keywords or a Phrase (e.g. for Flickr or YouTube).");
-//    ((GridData) infoLabel.getLayoutData()).widthHint = 200;
+    //    Label infoLabel = new Label(container, SWT.WRAP);
+    //    infoLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    //    infoLabel.setText("You may either create a new Bookmark by supplying the Link to a Newsfeed or by supplying some Keywords or a Phrase (e.g. for Flickr or YouTube).");
+    //    ((GridData) infoLabel.getLayoutData()).widthHint = 200;
 
-//    Composite contentMargin = new Composite(container, SWT.NONE);
-//    contentMargin.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-//    contentMargin.setLayout(new GridLayout(1, false));
-//    ((GridLayout) contentMargin.getLayout()).marginTop = 10;
+    //    Composite contentMargin = new Composite(container, SWT.NONE);
+    //    contentMargin.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    //    contentMargin.setLayout(new GridLayout(1, false));
+    //    ((GridLayout) contentMargin.getLayout()).marginTop = 10;
 
     /* 1) Feed by Link */
     if (!StringUtils.isSet(fInitialLink))
@@ -138,6 +146,8 @@ public class FeedDefinitionPage extends WizardPage {
       public void widgetSelected(SelectionEvent e) {
         fFeedLinkInput.setEnabled(fFeedByLinkButton.getSelection());
         fLoadTitleFromFeedButton.setEnabled(fFeedByLinkButton.getSelection());
+        fFeedLinkInput.setFocus();
+        getContainer().updateButtons();
       }
     });
 
@@ -159,6 +169,12 @@ public class FeedDefinitionPage extends WizardPage {
       fFeedLinkInput.setSelection(HTTP.length());
     }
 
+    fFeedLinkInput.addModifyListener(new ModifyListener() {
+      public void modifyText(ModifyEvent e) {
+        getContainer().updateButtons();
+      }
+    });
+
     fLoadTitleFromFeedButton = new Button(textIndent, SWT.CHECK);
     fLoadTitleFromFeedButton.setText("Use the Title of the Feed as Name for the Bookmark");
     fLoadTitleFromFeedButton.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_LOAD_TITLE_FROM_FEED));
@@ -171,6 +187,8 @@ public class FeedDefinitionPage extends WizardPage {
       @Override
       public void widgetSelected(SelectionEvent e) {
         fKeywordInput.setEnabled(fFeedByKeywordButton.getSelection());
+        fKeywordInput.setFocus();
+        getContainer().updateButtons();
       }
     });
 
@@ -182,6 +200,11 @@ public class FeedDefinitionPage extends WizardPage {
     fKeywordInput = new Text(textIndent, SWT.BORDER);
     fKeywordInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     fKeywordInput.setEnabled(false);
+    fKeywordInput.addModifyListener(new ModifyListener() {
+      public void modifyText(ModifyEvent e) {
+        getContainer().updateButtons();
+      }
+    });
 
     setControl(container);
   }
