@@ -283,7 +283,7 @@
                toolbarPath="news/mark">
          </action>
          <action
-               class="org.rssowl.ui.internal.actions.MarkNewsReadAction"
+               class="org.rssowl.ui.internal.actions.ToggleReadStateAction"
                definitionId="org.rssowl.ui.actions.MarkRead"
                disabledIcon="icons/dlcl16/mark_read.gif"
                enablesFor="+"
@@ -642,14 +642,23 @@
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.UndoRedoHandler"
+            description="Undo the last operation"
             id="org.rssowl.ui.UndoAction"
             name="Undo">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.UndoRedoHandler"
+            description="Redo the last operation"
             id="org.rssowl.ui.RedoAction"
             name="Redo">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.handler.MarkUnreadHandler"
+            description="Mark selected news as Unread"
+            id="org.rssowl.ui.MarkUnread"
+            name="Mark Unread">
       </command>
    </extension>
    <extension

@@ -47,22 +47,31 @@ import java.util.List;
 /**
  * @author bpasero
  */
-public class MarkNewsReadAction extends Action implements IWorkbenchWindowActionDelegate {
+public class ToggleReadStateAction extends Action implements IWorkbenchWindowActionDelegate {
   private static final EnumSet<INews.State> STATES = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
 
   private IStructuredSelection fSelection;
   private boolean fMarkRead;
 
   /** Leave for reflection */
-  public MarkNewsReadAction() {}
+  public ToggleReadStateAction() {}
 
   /**
    * @param selection
    */
-  public MarkNewsReadAction(IStructuredSelection selection) {
+  public ToggleReadStateAction(IStructuredSelection selection) {
     fSelection = selection;
 
     init();
+  }
+
+  /**
+   * @param selection
+   * @param markUnread
+   */
+  public ToggleReadStateAction(IStructuredSelection selection, boolean markUnread) {
+    fSelection = selection;
+    fMarkRead = false;
   }
 
   /*

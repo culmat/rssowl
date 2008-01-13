@@ -27,12 +27,10 @@ package org.rssowl.ui.internal.handler;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.IHandler;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.LabelAction;
-import org.rssowl.ui.internal.editors.feed.FeedView;
 
 /**
  * This {@link IHandler} is required to support key-bindings for dynamic
@@ -55,16 +53,11 @@ public class LabelNewsHandler extends AbstractHandler {
    */
   @Override
   public Object execute(ExecutionEvent event) {
-    FeedView feedview = OwlUI.getActiveFeedView();
-    if (feedview == null)
-      return null;
-
-    ISelectionProvider selectionProvider = feedview.getSite().getSelectionProvider();
-    if (selectionProvider == null)
-      return null;
+    IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
 
     /* Perform Action */
-    new LabelAction(fLabel, (IStructuredSelection) selectionProvider.getSelection(), true).run();
+    if (selection != null)
+      new LabelAction(fLabel, selection, true).run();
 
     return null; //As per JavaDoc
   }

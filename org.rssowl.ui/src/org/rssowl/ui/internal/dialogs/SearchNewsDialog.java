@@ -130,7 +130,7 @@ import org.rssowl.ui.internal.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
-import org.rssowl.ui.internal.actions.MarkNewsReadAction;
+import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider;
@@ -1498,7 +1498,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
           manager.add(markMenu);
 
           /* Mark as Read */
-          IAction action = new MarkNewsReadAction(selection);
+          IAction action = new ToggleReadStateAction(selection);
           action.setEnabled(!selection.isEmpty());
           markMenu.add(action);
 

@@ -35,6 +35,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;
@@ -868,6 +869,25 @@ public class OwlUI {
     }
 
     return null;
+  }
+
+  /**
+   * Attempts to find the selection from the first active <code>FeedView</code>
+   * from the PlatformUI facade. Otherwise, returns <code>NULL</code> if none.
+   *
+   * @return the selection from the first active <code>FeedView</code> from
+   * the PlatformUI facade or <code>NULL</code> if none.
+   */
+  public static IStructuredSelection getActiveFeedViewSelection() {
+    FeedView feedview = getActiveFeedView();
+    if (feedview == null)
+      return null;
+
+    ISelectionProvider selectionProvider = feedview.getSite().getSelectionProvider();
+    if (selectionProvider == null)
+      return null;
+
+    return (IStructuredSelection) selectionProvider.getSelection();
   }
 
   /**
