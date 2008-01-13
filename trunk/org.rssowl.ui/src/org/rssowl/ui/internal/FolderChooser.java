@@ -95,14 +95,16 @@ public class FolderChooser extends Composite implements DisposeListener {
   private FolderAdapter fFolderListener;
   private ToolBar fAddFolderBar;
   private List<IFolder> fExcludes;
+  private final boolean fExpanded;
 
   /**
    * @param parent
    * @param initial
    * @param style
+   * @param expanded
    */
-  public FolderChooser(Composite parent, IFolder initial, int style) {
-    this(parent, initial, null, style);
+  public FolderChooser(Composite parent, IFolder initial, int style, boolean expanded) {
+    this(parent, initial, null, style, expanded);
   }
 
   /**
@@ -110,12 +112,14 @@ public class FolderChooser extends Composite implements DisposeListener {
    * @param initial
    * @param excludes
    * @param style
+   * @param expanded
    */
-  public FolderChooser(Composite parent, IFolder initial, List<IFolder> excludes, int style) {
+  public FolderChooser(Composite parent, IFolder initial, List<IFolder> excludes, int style, boolean expanded) {
     super(parent, style);
     fParent = parent;
     fSelectedFolder = initial;
     fExcludes = excludes;
+    fExpanded = expanded;
     fResources = new LocalResourceManager(JFaceResources.getResources(), parent);
 
     initComponents();
@@ -228,7 +232,7 @@ public class FolderChooser extends Composite implements DisposeListener {
     fAddFolderBar.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
     fAddFolderBar.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
     fAddFolderBar.setCursor(headerContainer.getDisplay().getSystemCursor(SWT.CURSOR_ARROW));
-    fAddFolderBar.setVisible(false);
+    fAddFolderBar.setVisible(fExpanded);
 
     ToolItem addFolderItem = new ToolItem(fAddFolderBar, SWT.PUSH);
     addFolderItem.setImage(OwlUI.getImage(fResources, "icons/etool16/add_crop.gif"));
@@ -246,8 +250,8 @@ public class FolderChooser extends Composite implements DisposeListener {
     toggleBar.setCursor(headerContainer.getDisplay().getSystemCursor(SWT.CURSOR_ARROW));
 
     fToggleItem = new ToolItem(toggleBar, SWT.PUSH);
-    fToggleItem.setImage(OwlUI.getImage(fResources, "icons/ovr16/arrow_down.gif"));
-    fToggleItem.setToolTipText("Show Folders");
+    fToggleItem.setImage(OwlUI.getImage(fResources, fExpanded ? "icons/ovr16/arrow_up.gif" : "icons/ovr16/arrow_down.gif"));
+    fToggleItem.setToolTipText(fExpanded ? "Hide Folders" : "Show Folders");
     fToggleItem.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -270,7 +274,7 @@ public class FolderChooser extends Composite implements DisposeListener {
 
     fViewerHeight = fFolderViewer.getTree().getItemHeight() * 10 + 12;
     ((GridData) fFolderViewerContainer.getLayoutData()).heightHint = fViewerHeight;
-    ((GridData) fFolderViewerContainer.getLayoutData()).exclude = true;
+    ((GridData) fFolderViewerContainer.getLayoutData()).exclude = !fExpanded;
 
     /* Sort by Name if set so */
     if (Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.BE_SORT_BY_NAME)) {
