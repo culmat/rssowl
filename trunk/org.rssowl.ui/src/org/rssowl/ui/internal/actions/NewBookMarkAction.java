@@ -24,273 +24,33 @@
 
 package org.rssowl.ui.internal.actions;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.dialogs.TitleAreaDialog;
-import org.eclipse.jface.resource.JFaceResources;
-import org.eclipse.jface.resource.LocalResourceManager;
-import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.window.Window;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Label;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.rssowl.core.Owl;
-import org.rssowl.core.connection.AuthenticationRequiredException;
-import org.rssowl.core.connection.ConnectionException;
-import org.rssowl.core.persist.IBookMark;
-import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.IFeedDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
-import org.rssowl.core.persist.reference.FeedLinkReference;
-import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.service.PersistenceException;
-import org.rssowl.core.util.StringUtils;
-import org.rssowl.core.util.URIUtils;
-import org.rssowl.ui.internal.Activator;
-import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.dialogs.LoginDialog;
-import org.rssowl.ui.internal.util.JobRunner;
-import org.rssowl.ui.internal.util.LayoutUtils;
-import org.rssowl.ui.internal.util.UIBackgroundJob;
+import org.rssowl.ui.internal.dialogs.wizards.CreateBookmarkWizard;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Map;
-
 /**
- * TODO This is a rough-Action which is not polished or optimized and only for
- * developers purposes!
- *
  * @author bpasero
  */
 public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjectActionDelegate {
-  private static final String HTTP = "http://";
   private Shell fShell;
   private IFolder fParent;
   private IMark fPosition;
   private String fPreSetLink;
-
-  private static class NewBookMarkDialog extends TitleAreaDialog {
-    private String fInitialLinkValue;
-    private Text fLinkInput;
-    private Text fNameInput;
-    private ResourceManager fResources;
-    private String fLink;
-    private String fName;
-    private IFolder fFolder;
-    private FolderChooser fFolderChooser;
-
-    NewBookMarkDialog(Shell shell, IFolder folder, String initialLinkValue) {
-      super(shell);
-      fFolder = folder;
-      fInitialLinkValue = initialLinkValue;
-      fResources = new LocalResourceManager(JFaceResources.getResources());
-    }
-
-    @Override
-    public void create() {
-      super.create();
-      getButton(IDialogConstants.OK_ID).setEnabled(false);
-    }
-
-    @Override
-    protected void okPressed() {
-      fLink = fLinkInput.getText();
-      fName = fNameInput.getText();
-      super.okPressed();
-    }
-
-    @Override
-    public boolean close() {
-      boolean res = super.close();
-      fResources.dispose();
-      return res;
-    }
-
-    @Override
-    protected void configureShell(Shell newShell) {
-      newShell.setText("New Bookmark");
-      super.configureShell(newShell);
-    }
-
-    @Override
-    protected Control createDialogArea(Composite parent) {
-
-      /* Separator */
-      new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
-      /* Title Image */
-      setTitleImage(OwlUI.getImage(fResources, "icons/wizban/bkmrk_wiz.gif"));
-
-      /* Title Message */
-      setMessage("Please enter the name and link of the bookmark.", IMessageProvider.INFORMATION);
-
-      Composite container = new Composite(parent, SWT.NONE);
-      container.setLayout(LayoutUtils.createGridLayout(2, 5, 5));
-      container.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
-      Label l2 = new Label(container, SWT.NONE);
-      l2.setText("Link: ");
-
-      fLinkInput = new Text(container, SWT.SINGLE | SWT.BORDER);
-
-      if (StringUtils.isSet(fInitialLinkValue) && !fInitialLinkValue.equals(HTTP)) {
-        fLinkInput.setText(fInitialLinkValue);
-        fLinkInput.selectAll();
-      } else {
-        fLinkInput.setText(HTTP);
-        fLinkInput.setSelection(HTTP.length());
-      }
-
-      fLinkInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-      fLinkInput.addModifyListener(new ModifyListener() {
-        public void modifyText(ModifyEvent e) {
-          validateInput();
-        }
-      });
-
-      Label l1 = new Label(container, SWT.NONE);
-      l1.setText("Name: ");
-
-      Composite nameContainer = new Composite(container, SWT.BORDER);
-      nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-      nameContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
-      nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-
-      fNameInput = new Text(nameContainer, SWT.SINGLE);
-      fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-      fNameInput.addModifyListener(new ModifyListener() {
-        public void modifyText(ModifyEvent e) {
-          validateInput();
-        }
-      });
-
-      ToolBar grabTitleBar = new ToolBar(nameContainer, SWT.FLAT);
-      grabTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-
-      ToolItem grabTitleItem = new ToolItem(grabTitleBar, SWT.PUSH);
-      grabTitleItem.setImage(OwlUI.getImage(fResources, "icons/etool16/info.gif"));
-      grabTitleItem.setToolTipText("Load name from feed");
-      grabTitleItem.addSelectionListener(new SelectionAdapter() {
-        @Override
-        public void widgetSelected(SelectionEvent e) {
-          try {
-            onGrabTitle();
-          } catch (URISyntaxException ex) {
-            Activator.getDefault().logError(ex.getMessage(), ex);
-            setMessage("Unable to load a name from the feed.", IMessageProvider.WARNING);
-          }
-        }
-      });
-
-      Label l3 = new Label(container, SWT.NONE);
-      l3.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
-      l3.setText("Location: ");
-
-      /* Folder Chooser */
-      fFolderChooser = new FolderChooser(container, fFolder, SWT.BORDER);
-      fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-      fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
-      fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-
-      return container;
-    }
-
-    private void onGrabTitle() throws URISyntaxException {
-      if (StringUtils.isSet(fLinkInput.getText())) {
-        getShell().setCursor(getShell().getDisplay().getSystemCursor(SWT.CURSOR_APPSTARTING));
-        final String linkText = fLinkInput.getText();
-        final URI link = new URI(linkText);
-        JobRunner.runUIUpdater(new UIBackgroundJob(getShell()) {
-          private String fLabel;
-
-          @Override
-          protected void runInBackground(IProgressMonitor monitor) {
-            try {
-              fLabel = Owl.getConnectionService().getLabel(link);
-            } catch (final ConnectionException e) {
-
-              /* Authentication Required */
-              if (e instanceof AuthenticationRequiredException && getShell() != null && !getShell().isDisposed()) {
-                JobRunner.runInUIThread(getShell(), new Runnable() {
-                  public void run() {
-
-                    /* Show Login Dialog */
-                    LoginDialog login = new LoginDialog(getShell(), link, ((AuthenticationRequiredException) e).getRealm());
-                    if (login.open() == Window.OK) {
-                      try {
-                        onGrabTitle();
-                      } catch (URISyntaxException e) {
-                        Activator.getDefault().logError(e.getMessage(), e);
-                        setMessage("Unable to load a name from the feed.", IMessageProvider.WARNING);
-                      }
-                    }
-                  }
-                });
-              }
-            }
-          }
-
-          @Override
-          protected void runInUI(IProgressMonitor monitor) {
-            if (StringUtils.isSet(fLabel))
-              fNameInput.setText(fLabel);
-            else
-              setMessage("Unable to load a name from the feed.", IMessageProvider.WARNING);
-
-            getShell().setCursor(null);
-          }
-        });
-      }
-    }
-
-    @Override
-    protected void initializeBounds() {
-      super.initializeBounds();
-      Point bestSize = getShell().computeSize(convertHorizontalDLUsToPixels(IDialogConstants.MINIMUM_MESSAGE_AREA_WIDTH), SWT.DEFAULT);
-      getShell().setSize(bestSize.x, bestSize.y);
-      LayoutUtils.positionShell(getShell(), false);
-    }
-
-    private void validateInput() {
-      boolean valid = fLinkInput.getText().length() > 0 && fNameInput.getText().length() > 0;
-      Control button = getButton(IDialogConstants.OK_ID);
-      button.setEnabled(valid);
-      setMessage("Please enter the name and link of the bookmark.", IMessageProvider.INFORMATION);
-    }
-
-    IFolder getFolder() {
-      return fFolderChooser.getFolder();
-    }
-  }
 
   /** Keep for Reflection */
   public NewBookMarkAction() {
@@ -335,74 +95,15 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
    * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
    */
   public void run(IAction action) {
-    try {
-      internalRun();
-    } catch (URISyntaxException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
-    }
-  }
-
-  private void internalRun() throws URISyntaxException, PersistenceException {
-    String initial = null;
-    if (StringUtils.isSet(fPreSetLink))
-      initial = fPreSetLink;
-    else {
-      Clipboard cb = new Clipboard(fShell.getDisplay());
-      TextTransfer transfer = TextTransfer.getInstance();
-      String data = (String) cb.getContents(transfer);
-      data = (data != null) ? data.trim() : fPreSetLink;
-      cb.dispose();
-      initial = HTTP;
-
-      if (URIUtils.looksLikeLink(data)) {
-        if (!data.contains("://"))
-          data = initial + data;
-        initial = data;
-      }
-    }
 
     /* Get the parent Folder */
     IFolder parent = getParent();
 
     /* Show Dialog */
-    NewBookMarkDialog dialog = new NewBookMarkDialog(fShell, parent, initial);
-    if (dialog.open() == Window.OK) {
-      String title = dialog.fName;
-      parent = dialog.getFolder();
-
-      URI uriObj = new URI(dialog.fLink.trim());
-
-      IFeedDAO feedDAO = DynamicDAO.getDAO(IFeedDAO.class);
-
-      /* Check if a Feed with the URL already exists */
-      FeedReference feedRef = feedDAO.loadReference(uriObj);
-
-      /* Create a new Feed then */
-      if (feedRef == null) {
-        IFeed feed = Owl.getModelFactory().createFeed(null, uriObj);
-        feed = feedDAO.save(feed);
-      }
-
-      /* Create the BookMark */
-      FeedLinkReference feedLinkRef = new FeedLinkReference(uriObj);
-      IBookMark bookmark = Owl.getModelFactory().createBookMark(null, parent, feedLinkRef, title, fPosition, fPosition != null ? true : null);
-
-      /* Copy all Properties from Parent into this Mark */
-      Map<String, ?> properties = parent.getProperties();
-
-      for (Map.Entry<String, ?> property : properties.entrySet())
-        bookmark.setProperty(property.getKey(), property.getValue());
-
-      parent = DynamicDAO.save(parent);
-
-      /* Auto-Reload added BookMark */
-      for (IMark mark : parent.getMarks()) {
-        if (mark.equals(bookmark)) {
-          new ReloadTypesAction(new StructuredSelection(mark), fShell).run();
-          break;
-        }
-      }
-    }
+    CreateBookmarkWizard wizard = new CreateBookmarkWizard(parent, fPosition, fPreSetLink);
+    WizardDialog dialog = new WizardDialog(fShell, wizard);
+    dialog.create();
+    dialog.open();
   }
 
   /*
