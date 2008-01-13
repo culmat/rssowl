@@ -564,7 +564,13 @@ public class DBManager {
       destinationDb.ext().set(feed, Integer.MAX_VALUE);
     }
     destinationDb.ext().set(newsCounter, Integer.MAX_VALUE);
-    monitor.worked(40);
+    monitor.worked(30);
+
+    for (Description description : sourceDb.query(Description.class)) {
+      sourceDb.activate(description, Integer.MAX_VALUE);
+      destinationDb.ext().set(description, Integer.MAX_VALUE);
+    }
+    monitor.worked(10);
 
     for (Preference pref : sourceDb.query(Preference.class)) {
       sourceDb.activate(pref, Integer.MAX_VALUE);
