@@ -150,7 +150,7 @@ public class NewNewsBinAction implements IWorkbenchWindowActionDelegate, IObject
       l3.setText("Location: ");
 
       /* Folder Chooser */
-      fFolderChooser = new FolderChooser(container, fFolder, SWT.BORDER, false);
+      fFolderChooser = new FolderChooser(container, fFolder, SWT.BORDER, true);
       fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
       fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
       fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));

@@ -135,7 +135,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     locationLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
     locationLabel.setText("Location: ");
 
-    fFolderChooser = new FolderChooser(container, mark.getParent(), SWT.BORDER, false);
+    fFolderChooser = new FolderChooser(container, mark.getParent(), SWT.BORDER, true);
     fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
     fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -182,7 +182,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
       locationLabel.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, false));
       locationLabel.setText("Location: ");
 
-      fFolderChooser = new FolderChooser(container, sameParent, null, SWT.BORDER, false);
+      fFolderChooser = new FolderChooser(container, sameParent, null, SWT.BORDER, true);
       fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
       fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
       fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
