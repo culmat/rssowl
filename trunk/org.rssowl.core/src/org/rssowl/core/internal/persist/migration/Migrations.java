@@ -23,10 +23,16 @@
  **  **********************************************************************  */
 package org.rssowl.core.internal.persist.migration;
 
+import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.rssowl.core.internal.persist.service.ConfigurationFactory;
 import org.rssowl.core.internal.persist.service.Migration;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 /**
  * This object is responsible for holding the currently supported migrations
@@ -34,13 +40,62 @@ import java.util.List;
  */
 public final class Migrations {
 
+  public static class ChainedMigration implements Migration    {
+
+    private final List<Migration> fMigrations;
+    private final int fDestinationFormat;
+    private final int fOriginFormat;
+
+    public ChainedMigration(int originFormat, int destinationFormat, List<Migration> migrations) {
+      fOriginFormat = originFormat;
+      fDestinationFormat = destinationFormat;
+      fMigrations = migrations;
+    }
+
+    public int getDestinationFormat() {
+      return fDestinationFormat;
+    }
+
+    public int getOriginFormat() {
+      return fOriginFormat;
+    }
+
+    public List<Migration> getMigrations() {
+      return Collections.unmodifiableList(fMigrations);
+    }
+
+    public MigrationResult migrate(ConfigurationFactory configFactory, String dbFileName, IProgressMonitor progressMonitor) {
+      //FIXME Must create submonitors as appropriate
+
+      boolean reindex = false;
+      boolean optimize = false;
+      boolean defragment = false;
+      for (Migration migration : fMigrations) {
+        MigrationResult migrationResult = migration.migrate(configFactory, dbFileName, progressMonitor);
+        reindex |= migrationResult.isReindex();
+        optimize |= migrationResult.isOptimizeIndex();
+        defragment |= migrationResult.isDefragmentDatabase();
+      }
+      return new MigrationResult(reindex, optimize, defragment);
+    }
+
+  }
+
   private final List<Migration> fMigrations;
 
   /**
    * Creates an instance of this object.
    */
   public Migrations() {
-    fMigrations = Arrays.<Migration>asList(new Migration1To2());
+    fMigrations = Arrays.<Migration> asList(new Migration1To2(), new Migration2To3());
+  }
+
+  public Migrations(Migration... migrations) {
+    fMigrations = Arrays.asList(migrations);
+  }
+
+  public List<Migration> getMigrations() {
+    return Collections.unmodifiableList(fMigrations);
   }
 
   /**
@@ -52,11 +107,77 @@ public final class Migrations {
    * @return a Migration or {@code} null.
    */
   public final Migration getMigration(int originFormat, int destinationFormat) {
+    Assert.isLegal(originFormat < destinationFormat, "Only forward migrations supported currently, originFormat: " + originFormat + ", destinationFormat: " + destinationFormat);
+    Migration migration = doGetMigration(originFormat, destinationFormat);
+    if (migration != null)
+      return migration;
+
+    List<Migration> chainedMigrations = findChainedMigrations(originFormat, destinationFormat);
+    if (chainedMigrations.isEmpty())
+      return null;
+
+    return new ChainedMigration(originFormat, destinationFormat, chainedMigrations);
+  }
+
+  private Migration doGetMigration(int originFormat, int destinationFormat) {
     for (Migration migration : fMigrations) {
       if (migration.getOriginFormat() == originFormat && migration.getDestinationFormat() == destinationFormat) {
         return migration;
       }
     }
     return null;
+  }
+
+  private List<Migration> findChainedMigrations(int originFormat, int destinationFormat) {
+    LinkedList<LinkedList<Migration>> migrationsQueues = createMigrationsQueues(originFormat, destinationFormat);
+
+    LinkedList<Migration> smallestQueue = null;
+    for (LinkedList<Migration> migrationQueue : migrationsQueues)   {
+      if (smallestQueue == null || migrationQueue.size() < smallestQueue.size())
+        smallestQueue = migrationQueue;
+    }
+    return smallestQueue;
+  }
+
+  private LinkedList<LinkedList<Migration>> createMigrationsQueues(int originFormat, int destinationFormat) {
+    LinkedList<LinkedList<Migration>> migrationQueues = new LinkedList<LinkedList<Migration>>();
+    for (Migration migration : fMigrations) {
+      if (migration.getOriginFormat() == originFormat) {
+        LinkedList<Migration> migrationQueue = new LinkedList<Migration>();
+        migrationQueue.add(migration);
+        migrationQueues.add(migrationQueue);
+      }
+    }
+    return findMigrationQueues(migrationQueues, destinationFormat);
+  }
+
+  private LinkedList<LinkedList<Migration>> findMigrationQueues(LinkedList<LinkedList<Migration>> migrationQueues, int destinationFormat) {
+    boolean changed = false;
+    LinkedList<LinkedList<Migration>> migrationQueuesCopy = new LinkedList<LinkedList<Migration>>(migrationQueues);
+    for (ListIterator<LinkedList<Migration>> it = migrationQueuesCopy.listIterator(); it.hasNext(); ) {
+      LinkedList<Migration> migrationQueue = it.next();
+      Migration migration = migrationQueue.getLast();
+      if (migration.getDestinationFormat() == destinationFormat)
+        continue;
+
+      it.remove();
+
+      for (Migration innerMigration : fMigrations) {
+        if (migration.equals(innerMigration))
+          continue;
+
+        if (migration.getDestinationFormat() == innerMigration.getOriginFormat()) {
+          changed = true;
+          LinkedList<Migration> newMigrationQueue = new LinkedList<Migration>(migrationQueue);
+          newMigrationQueue.add(innerMigration);
+          it.add(newMigrationQueue);
+        }
+
+      }
+    }
+    if (changed)
+      return findMigrationQueues(migrationQueuesCopy, destinationFormat);
+
+    return migrationQueuesCopy;
   }
 }
