@@ -136,9 +136,9 @@ public class MoveCopyNewsToBinAction extends Action {
 
     /* Support Undo/Redo */
     if (fIsMove)
-      UndoStack.getInstance().addOperation(new MoveOperation(newsToMoveCopy, copiedNews, fBin));
+      UndoStack.getInstance().addOperation(new MoveOperation(newsToMoveCopy, copiedNews));
     else
-      UndoStack.getInstance().addOperation(new CopyOperation(copiedNews, fBin));
+      UndoStack.getInstance().addOperation(new CopyOperation(copiedNews));
 
     /* Delete News from Source if required */
     if (fIsMove) {

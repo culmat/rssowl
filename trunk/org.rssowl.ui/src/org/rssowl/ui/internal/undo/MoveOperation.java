@@ -26,7 +26,6 @@ package org.rssowl.ui.internal.undo;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
@@ -52,10 +51,9 @@ public class MoveOperation extends CopyOperation {
   /**
    * @param originalnews
    * @param copiednews
-   * @param bin
    */
-  public MoveOperation(List<INews> originalnews, List<INews> copiednews, INewsBin bin) {
-    super(copiednews, bin);
+  public MoveOperation(List<INews> originalnews, List<INews> copiednews) {
+    super(copiednews);
 
     Assert.isTrue(originalnews.size() == copiednews.size());
 
