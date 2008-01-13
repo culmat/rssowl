@@ -84,6 +84,6 @@ public class Migration2To3 implements Migration {
 
     progressMonitor.worked(totalProgress - totalProgressIncremented);
 
-    return new MigrationResult(false, false, false);
+    return new MigrationResult(true, false, false);
   }
 }
