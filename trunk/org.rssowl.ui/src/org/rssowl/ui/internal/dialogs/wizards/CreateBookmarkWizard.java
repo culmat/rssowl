@@ -133,7 +133,7 @@ public class CreateBookmarkWizard extends Wizard {
       final String linkText = linkVal;
       IRunnableWithProgress runnable = new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) {
-          monitor.beginTask("Loading title from Feed...", IProgressMonitor.UNKNOWN);
+          monitor.beginTask("Please wait while loading the title from the feed...", IProgressMonitor.UNKNOWN);
 
           try {
             final URI link = new URI(linkText);
