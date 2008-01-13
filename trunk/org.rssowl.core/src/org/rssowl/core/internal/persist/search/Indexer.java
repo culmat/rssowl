@@ -319,7 +319,7 @@ public class Indexer {
 
       public void entitiesUpdated(Set<NewsEvent> events) {
 
-        /* An Updated News may incolve Restore, Removal or actual Update */
+        /* An Updated News may involve Restore, Removal or actual Update */
         Set<NewsEvent> newsToUpdate = null;
         Set<NewsEvent> newsToRestore = null;
         Set<NewsEvent> newsToDelete = null;
@@ -407,25 +407,23 @@ public class Indexer {
     InternalOwl.getDefault().getPersistenceService().getDAOService().getLabelDAO().addEntityListener(fLabelListener);
   }
 
-  private void handleEntitiesAdded(Set<NewsEvent> events) {
+  private void handleEntityEvents(Set<NewsEvent> events, EventType eventType) {
     if (!InternalOwl.TESTING)
-      fJobQueue.schedule(new IndexingTask(Indexer.this, events, EventType.PERSIST));
+      fJobQueue.schedule(new IndexingTask(Indexer.this, events, eventType));
     else
-      new IndexingTask(Indexer.this, events, EventType.PERSIST).run(new NullProgressMonitor());
+      new IndexingTask(Indexer.this, events, eventType).run(new NullProgressMonitor());
+  }
+
+  private void handleEntitiesAdded(Set<NewsEvent> events) {
+    handleEntityEvents(events, EventType.PERSIST);
   }
 
   private void handleEntitiesUpdated(Set<NewsEvent> events) {
-    if (!InternalOwl.TESTING)
-      fJobQueue.schedule(new IndexingTask(Indexer.this, events, EventType.UPDATE));
-    else
-      new IndexingTask(Indexer.this, events, EventType.UPDATE).run(new NullProgressMonitor());
+    handleEntityEvents(events, EventType.UPDATE);
   }
 
   private void handleEntitiesDeleted(Set<NewsEvent> events) {
-    if (!InternalOwl.TESTING)
-      fJobQueue.schedule(new IndexingTask(Indexer.this, events, EventType.REMOVE));
-    else
-      new IndexingTask(Indexer.this, events, EventType.REMOVE).run(new NullProgressMonitor());
+    handleEntityEvents(events, EventType.REMOVE);
   }
 
   private void unregisterListeners() {
