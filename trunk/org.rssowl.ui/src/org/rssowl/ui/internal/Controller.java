@@ -134,8 +134,8 @@ public class Controller {
   /* Property to store info about a Realm in a Bookmark */
   static final String BM_REALM_PROPERTY = "org.rssowl.ui.BMRealmProperty";
 
-  /* Prefix for dynamic Label Actions */
-  private static final String LABEL_ACTION_PREFIX = "org.rssowl.ui.LabelAction";
+  /** Prefix for dynamic Label Actions */
+  public static final String LABEL_ACTION_PREFIX = "org.rssowl.ui.LabelAction";
 
   /* ID of RSSOwl's Keybinding Category */
   private static final String RSSOWL_KEYBINDING_CATEGORY = "org.rssowl.ui.commands.category.RSSOwl";

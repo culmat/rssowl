@@ -58,7 +58,6 @@ import org.rssowl.ui.internal.actions.CopyLinkAction;
 import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
-import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
@@ -66,6 +65,7 @@ import org.rssowl.ui.internal.actions.RedoAction;
 import org.rssowl.ui.internal.actions.ReloadAllAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
+import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.UndoAction;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
@@ -484,35 +484,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             /* Retrieve Labels that all selected News contain */
             Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(selection);
 
-            IAction removeAllLabels = new Action("Remove All Labels") {
-              @Override
-              public void run() {
-                new LabelAction(null, selection, false).run();
-              }
-
-              @Override
-              public boolean isEnabled() {
-                return !selection.isEmpty();
-              }
-            };
-
+            LabelAction removeAllLabels = new LabelAction(null, selection);
             removeAllLabels.setEnabled(!labels.isEmpty());
             labelMenu.add(removeAllLabels);
             labelMenu.add(new Separator());
 
             for (final ILabel label : labels) {
-              IAction labelAction = new Action(label.getName(), IAction.AS_CHECK_BOX) {
-                @Override
-                public void run() {
-                  new LabelAction(label, selection, isChecked()).run();
-                }
-
-                @Override
-                public boolean isEnabled() {
-                  return !selection.isEmpty();
-                }
-              };
-
+              LabelAction labelAction =new LabelAction(label, selection);
               labelAction.setChecked(selectedLabels.contains(label));
               labelMenu.add(labelAction);
             }

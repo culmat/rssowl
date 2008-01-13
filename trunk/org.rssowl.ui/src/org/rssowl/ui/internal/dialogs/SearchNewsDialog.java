@@ -130,9 +130,9 @@ import org.rssowl.ui.internal.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
-import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
+import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserViewer;
 import org.rssowl.ui.internal.editors.feed.NewsComparator;
@@ -1519,25 +1519,13 @@ public class SearchNewsDialog extends TitleAreaDialog {
             /* Retrieve Labels that all selected News contain */
             Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(selection);
 
-            IAction removeAllLabels = new Action("Remove All Labels") {
-              @Override
-              public void run() {
-                new LabelAction(null, (IStructuredSelection) fResultViewer.getSelection(), false).run();
-              }
-            };
-
+            LabelAction removeAllLabels = new LabelAction(null, selection);
             removeAllLabels.setEnabled(!labels.isEmpty());
             labelMenu.add(removeAllLabels);
             labelMenu.add(new Separator());
 
             for (final ILabel label : labels) {
-              IAction labelAction = new Action(label.getName(), IAction.AS_CHECK_BOX) {
-                @Override
-                public void run() {
-                  new LabelAction(label, (IStructuredSelection) fResultViewer.getSelection(), isChecked()).run();
-                }
-              };
-
+              LabelAction labelAction = new LabelAction(label, selection);
               labelAction.setChecked(selectedLabels.contains(label));
               labelMenu.add(labelAction);
             }

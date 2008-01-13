@@ -26,12 +26,15 @@ package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.keys.IBindingService;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.ui.internal.Controller;
@@ -48,6 +51,8 @@ import java.util.List;
  * @author bpasero
  */
 public class MakeNewsStickyAction extends Action implements IWorkbenchWindowActionDelegate {
+  private static final String ID = "org.rssowl.ui.actions.MarkSticky";
+
   private IStructuredSelection fSelection;
   private boolean fMarkSticky;
 
@@ -71,7 +76,10 @@ public class MakeNewsStickyAction extends Action implements IWorkbenchWindowActi
    */
   @Override
   public String getText() {
-    return "News as Sticky";
+    IBindingService bs = (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
+    TriggerSequence binding = bs.getBestActiveBindingFor(ID);
+
+    return binding != null ? "News as Sticky\t" + binding.format() : "News as Sticky";
   }
 
   /*

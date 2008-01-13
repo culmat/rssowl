@@ -655,10 +655,10 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            defaultHandler="org.rssowl.ui.internal.handler.MarkUnreadHandler"
-            description="Mark selected news as Unread"
-            id="org.rssowl.ui.MarkUnread"
-            name="Mark Unread">
+            defaultHandler="org.rssowl.ui.internal.handler.ToggleReadStateHandler"
+            description="Toggle Read State of selected News"
+            id="org.rssowl.ui.ToggleReadState"
+            name="Toggle Read State">
       </command>
    </extension>
    <extension
