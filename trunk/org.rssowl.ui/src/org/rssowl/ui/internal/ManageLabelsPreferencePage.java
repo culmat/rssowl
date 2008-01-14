@@ -65,12 +65,21 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.INewsDAO;
+import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.persist.service.IModelSearch;
+import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.dialogs.ConfirmDeleteDialog;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author bpasero
@@ -82,6 +91,8 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
   private LocalResourceManager fResources;
   private TreeViewer fViewer;
+  private IModelSearch fModelSearch = Owl.getPersistenceService().getModelSearch();
+  private ISearchField fLabelField = Owl.getModelFactory().createSearchField(INews.LABEL, INews.class.getName());
 
   /* Supported Modes of the Label Dialog */
   private enum DialogMode {
@@ -433,10 +444,11 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
       if (dialog.open() == IDialogConstants.OK_ID) {
 
         /* Remove Label from any News containing it */
-        Collection<INews> affectedNews = DynamicDAO.getDAO(INewsDAO.class).loadAll(label);
+        Collection<INews> affectedNews = findNewsWithLabel(label);
         for (INews news : affectedNews) {
           news.removeLabel(label);
         }
+        
         Controller.getDefault().getSavedSearchService().forceQuickUpdate();
         DynamicDAO.saveAll(affectedNews);
 
@@ -446,6 +458,24 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
       }
     }
     fViewer.getTree().setFocus();
+  }
+
+  private Collection<INews> findNewsWithLabel(ILabel label) {
+    List<INews> news = new ArrayList<INews>();
+
+    ISearchCondition condition = Owl.getModelFactory().createSearchCondition(fLabelField, SearchSpecifier.IS, label.getName());
+    List<SearchHit<NewsReference>> result = fModelSearch.searchNews(Collections.singleton(condition), false);
+
+    for (SearchHit<NewsReference> hit : result) {
+      INews newsitem = hit.getResult().resolve();
+      if (newsitem != null) {
+        Set<ILabel> newsLabels = newsitem.getLabels();
+        if (newsLabels != null && newsLabels.contains(label))
+          news.add(newsitem);
+      }
+    }
+
+    return news;
   }
 
   private void createViewer(Composite container) {
