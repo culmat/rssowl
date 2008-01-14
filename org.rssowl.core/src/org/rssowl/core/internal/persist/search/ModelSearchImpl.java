@@ -163,7 +163,7 @@ public class ModelSearchImpl implements IModelSearch {
    * @see org.rssowl.core.model.search.IModelSearch#searchNews(java.util.List,
    * boolean)
    */
-  public List<SearchHit<NewsReference>> searchNews(List<ISearchCondition> conditions, boolean matchAllConditions) throws PersistenceException {
+  public List<SearchHit<NewsReference>> searchNews(Collection<ISearchCondition> conditions, boolean matchAllConditions) throws PersistenceException {
 
     /* Make sure the searcher is in sync */
     isSearcherCurrent();
