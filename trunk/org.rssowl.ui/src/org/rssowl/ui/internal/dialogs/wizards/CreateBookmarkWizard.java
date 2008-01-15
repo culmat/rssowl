@@ -39,6 +39,7 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFeedDAO;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.ui.internal.Activator;
@@ -187,7 +188,10 @@ public class CreateBookmarkWizard extends Wizard {
     }
 
     /* Remember Settings */
-    Owl.getPreferenceService().getGlobalScope().putBoolean(DefaultPreferences.BM_LOAD_TITLE_FROM_FEED, fFeedDefinitionPage.loadTitleFromFeed());
+    IPreferenceScope globalPrefs = Owl.getPreferenceService().getGlobalScope();
+    globalPrefs.putBoolean(DefaultPreferences.BM_LOAD_TITLE_FROM_FEED, fFeedDefinitionPage.loadTitleFromFeed());
+    if (fFeedDefinitionPage.isKeywordSubscription())
+      globalPrefs.putString(DefaultPreferences.LAST_KEYWORD_FEED, fKeywordPage.getSelectedEngine().getId());
 
     return true;
   }
