@@ -120,6 +120,19 @@ public class FeedDefinitionPage extends WizardPage {
   }
 
   /*
+   * @see org.eclipse.jface.dialogs.DialogPage#setVisible(boolean)
+   */
+  @Override
+  public void setVisible(boolean visible) {
+    super.setVisible(visible);
+
+    if (visible && !isKeywordSubscription())
+      fFeedLinkInput.setFocus();
+    else if (visible)
+      fKeywordInput.setFocus();
+  }
+
+  /*
    * @see org.eclipse.jface.wizard.WizardPage#isPageComplete()
    */
   @Override
