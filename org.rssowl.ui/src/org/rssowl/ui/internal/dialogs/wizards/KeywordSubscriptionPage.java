@@ -24,6 +24,9 @@
 
 package org.rssowl.ui.internal.dialogs.wizards;
 
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -33,26 +36,38 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.OwlUI;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author bpasero
  */
 public class KeywordSubscriptionPage extends WizardPage {
-  private static final String URL_INPUT_TOKEN = " ";
+  private static final String URL_INPUT_TOKEN = "[:]";
+  private static final String KEYWORD_FEED_EXTENSION_POINT = "org.rssowl.ui.KeywordFeed";
 
   /* Base class for Search Engines */
   static class SearchEngine {
+    private final String fId;
     private final String fName;
     private final String fIconPath;
     private final String fUrl;
 
-    SearchEngine(String name, String iconPath, String url) {
+    SearchEngine(String id, String name, String iconPath, String url) {
+      fId = id;
       fName = name;
       fIconPath = iconPath;
       fUrl = url;
+    }
+
+    String getId() {
+      return fId;
     }
 
     String getName() {
@@ -73,37 +88,8 @@ public class KeywordSubscriptionPage extends WizardPage {
     }
   }
 
-  /* Supported Engines */
-  private static final SearchEngine[] fgSearchEngines = new SearchEngine[] {
-
-  /* Delicious */
-  new SearchEngine("Delicious", "icons/obj16/fav_delicious.gif", "http://del.icio.us/rss/tag/" + URL_INPUT_TOKEN),
-
-  /* Flickr Photo */
-  new SearchEngine("Flickr Photo", "icons/obj16/fav_flickr.gif", "http://www.flickr.com/services/feeds/photos_public.gne?tags=" + URL_INPUT_TOKEN + "&format=rss_200"),
-
-  /* Google Blog */
-  new SearchEngine("Google Blog", "icons/obj16/fav_google.gif", "http://blogsearch.google.com/blogsearch_feeds?q=" + URL_INPUT_TOKEN + "&num=10&output=rss"),
-
-  /* Google News */
-  new SearchEngine("Google News", "icons/obj16/fav_google.gif", "http://news.google.com/news?q=" + URL_INPUT_TOKEN + "&output=rss"),
-
-  /* Technorati */
-  new SearchEngine("Technorati", "icons/obj16/fav_technorati.gif", "http://feeds.technorati.com/search/" + URL_INPUT_TOKEN),
-
-  /* YouTube Video */
-  new SearchEngine("YouTube Video", "icons/obj16/fav_youtube.gif", "http://www.youtube.com/rss/tag/" + URL_INPUT_TOKEN + ".rss")
-
-  };
-
+  private static final List<SearchEngine> fgSearchEngines = loadSearchEngines();
   private SearchEngine fSelectedEngine;
-
-  /**
-   * @return Returns the currently selected SearchEngine.
-   */
-  public SearchEngine getSelectedEngine() {
-    return fSelectedEngine;
-  }
 
   /**
    * @param pageName
@@ -111,6 +97,32 @@ public class KeywordSubscriptionPage extends WizardPage {
   protected KeywordSubscriptionPage(String pageName) {
     super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/bkmrk_wiz.gif"));
     setMessage("Create a new Bookmark to read News from a Feed.");
+  }
+
+  private static List<SearchEngine> loadSearchEngines() {
+    List<SearchEngine> engines = new ArrayList<SearchEngine>(5);
+
+    IExtensionRegistry reg = Platform.getExtensionRegistry();
+    IConfigurationElement elements[] = reg.getConfigurationElementsFor(KEYWORD_FEED_EXTENSION_POINT);
+
+    /* For each contributed property keyword feed */
+    for (IConfigurationElement element : elements) {
+      String id = element.getAttribute("id");
+      String name = element.getAttribute("name");
+      String iconPath = element.getAttribute("icon"); //TODO Support loading icon from different plugin
+      String url = element.getAttribute("url");
+
+      engines.add(new SearchEngine(id, name, iconPath, url));
+    }
+
+    return engines;
+  }
+
+  /**
+   * @return Returns the currently selected SearchEngine.
+   */
+  public SearchEngine getSelectedEngine() {
+    return fSelectedEngine;
   }
 
   /*
@@ -129,13 +141,15 @@ public class KeywordSubscriptionPage extends WizardPage {
 
     Composite contentMargin = new Composite(container, SWT.NONE);
     contentMargin.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    contentMargin.setLayout(new GridLayout(1, false));
+    contentMargin.setLayout(new GridLayout(3, false));
     ((GridLayout) contentMargin.getLayout()).marginTop = 10;
-    ((GridLayout) contentMargin.getLayout()).verticalSpacing = 15;
+    ((GridLayout) contentMargin.getLayout()).verticalSpacing = 20;
 
-    for (int i = 0; i < fgSearchEngines.length; i++) {
-      final SearchEngine engine = fgSearchEngines[i];
+    String lastKeywordFeedId = Owl.getPreferenceService().getGlobalScope().getString(DefaultPreferences.LAST_KEYWORD_FEED);
+    if (!StringUtils.isSet(lastKeywordFeedId))
+      lastKeywordFeedId = fgSearchEngines.get(0).getId();
 
+    for (final SearchEngine engine : fgSearchEngines) {
       Button button = new Button(contentMargin, SWT.RADIO);
       button.setText(engine.getName());
       button.setImage(OwlUI.getImage(button, engine.getIconPath()));
@@ -146,7 +160,8 @@ public class KeywordSubscriptionPage extends WizardPage {
         }
       });
 
-      if (i == 0) {
+      /* Pre-select last used engine */
+      if (lastKeywordFeedId.equals(engine.getId())) {
         button.setSelection(true);
         button.setFocus();
         fSelectedEngine = engine;

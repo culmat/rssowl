@@ -2,6 +2,7 @@
 <?eclipse version="3.0"?>
 <plugin>
    <extension-point id="EntityPropertyPage" name="Entity Property Page" schema="schema/EntityPropertyPage.exsd"/>
+   <extension-point id="KeywordFeed" name="Keyword Feed" schema="schema/KeywordFeed.exsd"/>
 
    <extension
          id="rssowl"
@@ -1144,5 +1145,62 @@
             class="org.rssowl.ui.internal.editors.feed.FeedViewFactory"
             id="org.rssowl.ui.FeedViewFactory">
       </factory>
+   </extension>
+   <extension
+         point="org.rssowl.ui.KeywordFeed">
+      <keywordFeed
+            icon="icons/obj16/fav_google.gif"
+            id="org.rssowl.ui.GoogleNewsKeywordFeed"
+            name="Google News"
+            url="http://news.google.com/news?q=[:]&amp;output=rss">
+      </keywordFeed>
+      <keywordFeed
+            icon="icons/obj16/fav_technorati.gif"
+            id="org.rssowl.ui.TechnoratiKeywordFeed"
+            name="Technorati"
+            url="http://feeds.technorati.com/search/[:]">
+      </keywordFeed>
+      <keywordFeed
+            icon="icons/obj16/fav_delicious.gif"
+            id="org.rssowl.ui.DeliciousKeywordFeed"
+            name="Delicious"
+            url="http://del.icio.us/rss/tag/[:]">
+      </keywordFeed>
+      <keywordFeed
+            icon="icons/obj16/fav_live.gif"
+            id="org.rssowl.ui.LiveKeywordFeed"
+            name="Live Search"
+            url="http://search.live.com/results.aspx?q=[:]&amp;format=rss">
+      </keywordFeed>
+      <keywordFeed
+            icon="icons/obj16/fav_digg.gif"
+            id="org.rssowl.ui.DiggKeywordFeed"
+            name="Digg"
+            url="http://digg.com/rss_search?search=[:]&amp;area=all&amp;type=both&amp;section=all">
+      </keywordFeed>
+      <keywordFeed
+            icon="icons/obj16/fav_google.gif"
+            id="org.rssowl.ui.GoogleBlogKeywordFeed"
+            name="Google Blog"
+            url="http://blogsearch.google.com/blogsearch_feeds?q=[:]&amp;num=10&amp;output=rss">
+      </keywordFeed>
+      <keywordFeed
+            icon="icons/obj16/fav_youtube.gif"
+            id="org.rssowl.ui.YoutubeKeywordFeed"
+            name="YouTube Video"
+            url="http://www.youtube.com/rss/tag/[:].rss">
+      </keywordFeed>
+      <keywordFeed
+            icon="icons/obj16/fav_google.gif"
+            id="org.rssowl.ui.GoogleVideoKeywordFeed"
+            name="Google Video"
+            url="http://video.google.com/videofeed?type=search&amp;q=[:]&amp;output=rss">
+      </keywordFeed>
+      <keywordFeed
+            icon="icons/obj16/fav_flickr.gif"
+            id="org.rssowl.ui.FlickrKeywordFeed"
+            name="Flickr Photo"
+            url="http://www.flickr.com/services/feeds/photos_public.gne?tags=[:]&amp;format=rss_200">
+      </keywordFeed>
    </extension>
 </plugin>
