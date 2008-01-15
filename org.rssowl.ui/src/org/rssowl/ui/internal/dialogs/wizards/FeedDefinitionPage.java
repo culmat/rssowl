@@ -140,16 +140,6 @@ public class FeedDefinitionPage extends WizardPage {
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(new GridLayout(1, false));
 
-    //    Label infoLabel = new Label(container, SWT.WRAP);
-    //    infoLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-    //    infoLabel.setText("You may either create a new Bookmark by supplying the Link to a Newsfeed or by supplying some Keywords or a Phrase (e.g. for Flickr or YouTube).");
-    //    ((GridData) infoLabel.getLayoutData()).widthHint = 200;
-
-    //    Composite contentMargin = new Composite(container, SWT.NONE);
-    //    contentMargin.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    //    contentMargin.setLayout(new GridLayout(1, false));
-    //    ((GridLayout) contentMargin.getLayout()).marginTop = 10;
-
     /* 1) Feed by Link */
     if (!StringUtils.isSet(fInitialLink))
       fInitialLink = loadInitialLinkFromClipboard();
@@ -195,6 +185,12 @@ public class FeedDefinitionPage extends WizardPage {
     fLoadTitleFromFeedButton = new Button(textIndent, SWT.CHECK);
     fLoadTitleFromFeedButton.setText("Use the Title of the Feed as Name for the Bookmark");
     fLoadTitleFromFeedButton.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_LOAD_TITLE_FROM_FEED));
+    fLoadTitleFromFeedButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        getContainer().updateButtons();
+      }
+    });
 
     /* 2) Feed by Keyword */
     fFeedByKeywordButton = new Button(container, SWT.RADIO);
