@@ -215,6 +215,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Load Title from Feed in Bookmark Wizard */
   public static final String BM_LOAD_TITLE_FROM_FEED = "org.rssowl.pref.BMLoadTitleFromFeed";
 
+  /** Global: Last used Keyword Feed */
+  public static final String LAST_KEYWORD_FEED = "org.rssowl.pref.LastKeywordFeed";
+
   /**
    * Eclipse Preferences Follow
    */
