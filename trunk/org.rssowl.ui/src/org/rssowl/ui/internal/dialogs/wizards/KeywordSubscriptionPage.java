@@ -148,6 +148,7 @@ public class KeywordSubscriptionPage extends WizardPage {
 
       if (i == 0) {
         button.setSelection(true);
+        button.setFocus();
         fSelectedEngine = engine;
       }
     }

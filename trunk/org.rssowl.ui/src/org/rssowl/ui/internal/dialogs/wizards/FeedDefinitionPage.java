@@ -24,6 +24,12 @@
 
 package org.rssowl.ui.internal.dialogs.wizards;
 
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.fieldassist.ContentProposalAdapter;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
+import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
@@ -32,6 +38,7 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -39,10 +46,19 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.ICategoryDAO;
+import org.rssowl.core.persist.dao.ILabelDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.JobRunner;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author bpasero
@@ -57,6 +73,7 @@ public class FeedDefinitionPage extends WizardPage {
   private Button fFeedByKeywordButton;
   private String fInitialLink;
   private IPreferenceScope fGlobalScope = Owl.getPreferenceService().getGlobalScope();
+  private boolean fIsAutoCompleteKeywordHooked;
 
   /**
    * @param pageName
@@ -187,6 +204,10 @@ public class FeedDefinitionPage extends WizardPage {
       @Override
       public void widgetSelected(SelectionEvent e) {
         fKeywordInput.setEnabled(fFeedByKeywordButton.getSelection());
+
+        if (fKeywordInput.isEnabled())
+          hookKeywordAutocomplete();
+
         fKeywordInput.setFocus();
         getContainer().updateButtons();
       }
@@ -207,5 +228,90 @@ public class FeedDefinitionPage extends WizardPage {
     });
 
     setControl(container);
+  }
+
+  private void hookKeywordAutocomplete() {
+
+    /* Only perform once */
+    if (fIsAutoCompleteKeywordHooked)
+      return;
+    fIsAutoCompleteKeywordHooked = true;
+
+    /* Auto-Activate on Key-Down */
+    KeyStroke activationKey = KeyStroke.getInstance(SWT.ARROW_DOWN);
+
+    /* Create Content Proposal Adapter */
+    final SimpleContentProposalProvider proposalProvider = new SimpleContentProposalProvider(new String[0]);
+    proposalProvider.setFiltering(true);
+    final ContentProposalAdapter adapter = new ContentProposalAdapter(fKeywordInput, new TextContentAdapter(), proposalProvider, activationKey, null);
+    adapter.setPropagateKeys(true);
+    adapter.setAutoActivationDelay(500);
+    adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
+
+    /*
+     * TODO: This is a hack but there doesnt seem to be any API to set the size
+     * of the popup to match the actual size of the Text widget being used.
+     */
+    fKeywordInput.getDisplay().timerExec(100, new Runnable() {
+      public void run() {
+        if (!fKeywordInput.isDisposed()) {
+          adapter.setPopupSize(new Point(fKeywordInput.getSize().x, 100));
+        }
+      }
+    });
+
+    /* Load proposals in the Background */
+    JobRunner.runDelayedInBackgroundThread(new Runnable() {
+      public void run() {
+        if (!fKeywordInput.isDisposed()) {
+          Set<String> values = new HashSet<String>();
+
+          values.addAll(DynamicDAO.getDAO(ICategoryDAO.class).loadAllNames());
+
+          Collection<ILabel> labels = DynamicDAO.getDAO(ILabelDAO.class).loadAll();
+          for (ILabel label : labels) {
+            values.add(label.getName());
+          }
+
+          /* Apply Proposals */
+          if (!fKeywordInput.isDisposed())
+            applyProposals(values, proposalProvider, adapter);
+        }
+      }
+    });
+
+    /* Show UI Hint that Content Assist is available */
+    ControlDecoration controlDeco = new ControlDecoration(fKeywordInput, SWT.LEFT | SWT.TOP);
+    controlDeco.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
+    controlDeco.setDescriptionText("Content Assist Available (Press Arrow-Down Key)");
+    controlDeco.setShowOnlyOnFocus(true);
+  }
+
+  private void applyProposals(Collection<String> values, SimpleContentProposalProvider provider, ContentProposalAdapter adapter) {
+
+    /* Extract Proposals */
+    final String[] proposals = new String[values.size()];
+    Set<Character> charSet = new HashSet<Character>();
+    int i = 0;
+    for (String value : values) {
+      proposals[i] = value;
+
+      char c = value.charAt(0);
+      charSet.add(Character.toLowerCase(c));
+      charSet.add(Character.toUpperCase(c));
+      i++;
+    }
+
+    /* Auto-Activate on first Key typed */
+    char[] activationChars = new char[charSet.size()];
+    i = 0;
+    for (char c : charSet) {
+      activationChars[i] = c;
+      i++;
+    }
+
+    /* Apply proposals and auto-activation chars */
+    provider.setProposals(proposals);
+    adapter.setAutoActivationCharacters(activationChars);
   }
 }
