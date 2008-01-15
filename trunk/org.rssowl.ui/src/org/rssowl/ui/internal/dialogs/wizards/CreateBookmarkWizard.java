@@ -25,6 +25,8 @@
 package org.rssowl.ui.internal.dialogs.wizards;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.DialogPage;
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -42,6 +44,7 @@ import org.rssowl.core.persist.dao.IFeedDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 
@@ -170,7 +173,15 @@ public class CreateBookmarkWizard extends Wizard {
    */
   @Override
   public boolean canFinish() {
-    if (getContainer().getCurrentPage() != fBookMarkDefinitionPage)
+    IWizardPage currentPage = getContainer().getCurrentPage();
+
+    /* Allow to finish directly if link is supplied and title grabbed from feed */
+    String link = fFeedDefinitionPage.getLink();
+    if (currentPage == fFeedDefinitionPage && fFeedDefinitionPage.loadTitleFromFeed() && StringUtils.isSet(link) && !HTTP.equals(link))
+      return true;
+
+    /* Require last page then */
+    if (currentPage != fBookMarkDefinitionPage)
       return false;
 
     return super.canFinish();
@@ -181,8 +192,10 @@ public class CreateBookmarkWizard extends Wizard {
    */
   @Override
   public boolean performFinish() {
+    boolean res = false;
+
     try {
-      internalPerformFinish();
+      res = internalPerformFinish();
     } catch (URISyntaxException e) {
       Activator.getDefault().logError(e.getMessage(), e);
     }
@@ -193,11 +206,11 @@ public class CreateBookmarkWizard extends Wizard {
     if (fFeedDefinitionPage.isKeywordSubscription())
       globalPrefs.putString(DefaultPreferences.LAST_KEYWORD_FEED, fKeywordPage.getSelectedEngine().getId());
 
-    return true;
+    return res;
   }
 
-  private void internalPerformFinish() throws URISyntaxException {
-    URI uriObj;
+  private boolean internalPerformFinish() throws URISyntaxException {
+    final URI uriObj;
     if (fFeedDefinitionPage.isKeywordSubscription())
       uriObj = new URI(fKeywordPage.getSelectedEngine().toUrl(fFeedDefinitionPage.getKeyword()));
     else {
@@ -222,6 +235,37 @@ public class CreateBookmarkWizard extends Wizard {
     IFolder parent = fBookMarkDefinitionPage.getFolder();
     String title = fBookMarkDefinitionPage.getBookmarkName();
 
+    /* Load Title from Feed if not provided */
+    if (!StringUtils.isSet(title)) {
+      final String[] loadedTitle = new String[1];
+      IRunnableWithProgress runnable = new IRunnableWithProgress() {
+        public void run(IProgressMonitor monitor) {
+          try {
+            loadedTitle[0] = Owl.getConnectionService().getLabel(uriObj);
+          } catch (ConnectionException e) {
+            Activator.getDefault().logError(e.getMessage(), e);
+          }
+        }
+      };
+
+      /* Perform Runnable in same Thread and show progress */
+      try {
+        getContainer().run(false, false, runnable);
+      } catch (InvocationTargetException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      } catch (InterruptedException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
+
+      /* Cancel creation and show error if title failed loading */
+      if (!StringUtils.isSet(loadedTitle[0])) {
+        ((DialogPage) getContainer().getCurrentPage()).setMessage("Unable to load the title from the feed", IMessageProvider.ERROR);
+        return false;
+      }
+
+      title = loadedTitle[0];
+    }
+
     FeedLinkReference feedLinkRef = new FeedLinkReference(uriObj);
     IBookMark bookmark = Owl.getModelFactory().createBookMark(null, parent, feedLinkRef, title, fPosition, fPosition != null ? true : null);
 
@@ -240,6 +284,8 @@ public class CreateBookmarkWizard extends Wizard {
         break;
       }
     }
+
+    return true;
   }
 
   /*
