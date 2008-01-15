@@ -199,7 +199,7 @@ public class FeedDefinitionPage extends WizardPage {
     /* 2) Feed by Keyword */
     fFeedByKeywordButton = new Button(container, SWT.RADIO);
     fFeedByKeywordButton.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fFeedByKeywordButton.setText("Create a Feed by supplying a Keyword or Phrase:");
+    fFeedByKeywordButton.setText("Create a Feed by typing a Keyword or Phrase describing your Interest:");
     fFeedByKeywordButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
