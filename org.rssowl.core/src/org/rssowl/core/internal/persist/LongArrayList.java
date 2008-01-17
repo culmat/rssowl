@@ -43,6 +43,11 @@ public class LongArrayList {
     this.fElements = new long[initialCapacity];
   }
 
+  public LongArrayList(LongArrayList list) {
+    this.fElements = new long[list.size()];
+    System.arraycopy(list.fElements, 0, fElements, 0, list.size());
+  }
+
   public final int size() {
     return fSize;
   }
