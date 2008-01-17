@@ -456,7 +456,7 @@ public class NewsContentProvider implements ITreeContentProvider {
             /* Filter News which are from a different Feed than displayed */
             for (NewsEvent event : events) {
               INews news = event.getEntity();
-              if ((news.isVisible() || news.isCopy()) && isInputRelatedTo(news, EventType.REMOVE)) {
+              if ((news.isVisible() || news.getParentId() != 0) && isInputRelatedTo(news, EventType.REMOVE)) {
                 if (deletedNews == null)
                   deletedNews = new HashSet<NewsEvent>();
 
@@ -574,7 +574,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       /* Check if BookMark references the News' Feed and is not a copy */
       if (mark instanceof IBookMark) {
         IBookMark bookmark = (IBookMark) mark;
-        if (!news.isCopy() && bookmark.getFeedLinkReference().equals(news.getFeedReference()))
+        if (news.getParentId() == 0 && bookmark.getFeedLinkReference().equals(news.getFeedReference()))
           return true;
       }
 
@@ -585,7 +585,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* Update: Check if News Bin contains the given News */
       else if (type == EventType.UPDATE && mark instanceof INewsBin) {
-        return news.isCopy() && (((INewsBin) mark).containsNews(news));
+        return news.getParentId() != 0 && (((INewsBin) mark).containsNews(news));
       }
 
       /* Remove: Always update (workaround) */

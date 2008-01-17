@@ -117,7 +117,7 @@ public class MoveCopyNewsToBinAction extends Action {
     /* For each News: Copy */
     List<INews> copiedNews = new ArrayList<INews>(newsToMoveCopy.size());
     for (INews newsitem : newsToMoveCopy) {
-      INews newsCopy = Owl.getModelFactory().createNews(newsitem);
+      INews newsCopy = Owl.getModelFactory().createNews(newsitem, fBin);
       copiedNews.add(newsCopy);
 
       /* Ensure the state is *unread* since it has been seen */
@@ -125,8 +125,6 @@ public class MoveCopyNewsToBinAction extends Action {
         newsCopy.setState(INews.State.UNREAD);
 
       DynamicDAO.save(newsCopy);
-      fBin.addNews(newsCopy);
-
       requiresSave = true;
     }
 
