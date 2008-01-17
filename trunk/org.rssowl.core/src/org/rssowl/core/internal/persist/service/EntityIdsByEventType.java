@@ -50,6 +50,12 @@ public final class EntityIdsByEventType extends Persistable implements IPersista
     super();
   }
 
+  public EntityIdsByEventType(EntityIdsByEventType o) {
+    fPersistedEntities = new LongArrayList(o.fPersistedEntities);
+    fUpdatedEntities = new LongArrayList(o.fUpdatedEntities);
+    fRemovedEntities = new LongArrayList(o.fRemovedEntities);
+  }
+
   public EntityIdsByEventType(boolean sorted) {
     if (sorted) {
       fPersistedEntities = new SortedLongArrayList(DEFAULT_CAPACITY);
@@ -151,5 +157,10 @@ public final class EntityIdsByEventType extends Persistable implements IPersista
     fPersistedEntities.compact();
     fUpdatedEntities.compact();
     fRemovedEntities.compact();
+  }
+
+  public synchronized int size() {
+    int size = fPersistedEntities.size() + fUpdatedEntities.size() + fRemovedEntities.size();
+    return size;
   }
 }
