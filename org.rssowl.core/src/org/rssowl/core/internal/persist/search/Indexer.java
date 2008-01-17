@@ -74,9 +74,9 @@ public class Indexer {
   private final JobQueue fJobQueue;
   private NewsListener fNewsListener;
   private LabelAdapter fLabelListener;
-  private boolean fFlushRequired;
+  private volatile boolean fFlushRequired;
   private final ModelSearchImpl fSearch;
-  final boolean fDisableStopWords;
+  static final boolean DISABLE_STOP_WORDS = System.getProperty(DISABLE_STOP_WORDS_PROPERTY) != null;
   private final EntityIdsByEventType fUncommittedNews;
 
   /* The Default Analyzer */
@@ -110,7 +110,6 @@ public class Indexer {
     fIndexDirectory = directory;
     fJobQueue = new JobQueue("Updating Saved Searches", MAX_INDEX_JOBS_COUNT, Integer.MAX_VALUE, true, INDEX_JOB_PROGRESS_DELAY);
     fUncommittedNews = new EntityIdsByEventType(false);
-    fDisableStopWords = System.getProperty(DISABLE_STOP_WORDS_PROPERTY) != null;
   }
 
   /**
@@ -186,20 +185,28 @@ public class Indexer {
   //TODO Perhaps commit after fUncommittedNews has a certain size instead
   //of relying always in this method. In most situations this method will
   //be called often though
-  synchronized boolean flushIfNecessary() throws IOException {
-    boolean flushed = fFlushRequired;
+  boolean flushIfNecessary() throws IOException {
+    if (!fFlushRequired)
+      return false;
 
-    if (fFlushRequired) {
+    synchronized (this) {
+      /* Another thread got the lock before us and flushed */
+      if (!fFlushRequired)
+        return false;
+
       dispose();
       createIndexWriter();
+      saveCommittedNews(false, new EntityIdsByEventType(fUncommittedNews));
+      fUncommittedNews.clear();
     }
-
-    return flushed;
+    return true;
   }
 
   synchronized void shutdown() throws IOException {
     unregisterListeners();
     dispose();
+    saveCommittedNews(true, fUncommittedNews);
+    fUncommittedNews.clear();
   }
 
   /**
@@ -212,6 +219,7 @@ public class Indexer {
    */
   synchronized void clearIndex() throws IOException {
     dispose();
+    fUncommittedNews.clear();
     if (IndexReader.indexExists(fIndexDirectory))
       fIndexWriter = createIndexWriter(fIndexDirectory, true);
   }
@@ -233,12 +241,12 @@ public class Indexer {
    * @return Returns the <code>Analyzer</code> that is used for all
    * analyzation of Fields and Queries.
    */
-  Analyzer createAnalyzer() {
+  static Analyzer createAnalyzer() {
     PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper(new DefaultAnalyzer());
 
     /* Standard (Lowercase, Letter, Stop,...) */
     StandardAnalyzer stdAnalyzer;
-    if (fDisableStopWords)
+    if (DISABLE_STOP_WORDS)
       stdAnalyzer = new StandardAnalyzer(Collections.EMPTY_SET);
     else
       stdAnalyzer = new StandardAnalyzer();
@@ -468,17 +476,36 @@ public class Indexer {
     fIndexWriter.close();
     fIndexWriter = null;
     fFlushRequired = false;
+  }
 
-    //TODO Do this as a job if from flushRequired
+  private static void saveCommittedNews(boolean sync, final EntityIdsByEventType uncommittedNews) {
+    if (uncommittedNews.size() == 0)
+      return;
+
+    if (sync)
+      doSaveCommittedNews(uncommittedNews);
+    else {
+      new Job("") {
+        @Override
+        protected IStatus run(IProgressMonitor monitor) {
+          doSaveCommittedNews(uncommittedNews);
+          return Status.OK_STATUS;
+        }
+      }.schedule();
+    }
+  }
+
+  private static void doSaveCommittedNews(EntityIdsByEventType uncommittedNews) {
     EntitiesToBeIndexedDAOImpl dao = DBHelper.getEntitiesToBeIndexedDAO();
     if (dao != null) {
       EntityIdsByEventType newsToBeIndexed = dao.load();
-      // TODO Must find better solution. This means that the db has already been
-      // closed and so we can't save to it anymore. However that means that we
-      // will reindex these news on startup again.
+
+      /*
+       * null here means that there was a fast shutdown and the database is
+       * already closed. We'll just re-index on start-up.
+       */
       if (newsToBeIndexed != null) {
-        newsToBeIndexed.removeAll(fUncommittedNews.getPersistedEntityIds(), fUncommittedNews.getUpdatedEntityIds(), fUncommittedNews.getRemovedEntityIds());
-        fUncommittedNews.clear();
+        newsToBeIndexed.removeAll(uncommittedNews.getPersistedEntityIds(), uncommittedNews.getUpdatedEntityIds(), uncommittedNews.getRemovedEntityIds());
         dao.save(newsToBeIndexed);
       }
     }
