@@ -93,8 +93,6 @@ public class ReloadTestLocal {
   @Before
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
-    Owl.getPersistenceService().getModelSearch().shutdown();
-//    Controller.getDefault().getNewsService().testDirtyShutdown();
     InMemoryProtocolHandler.FEED = null;
 
     fController = Controller.getDefault();
@@ -1261,7 +1259,7 @@ public class ReloadTestLocal {
       news = feedRef.resolve().getNews();
       for (INews newsItem : news) {
         if ("http://www.link.de".equals(newsItem.getLink().toString()))
-          fNewsDao.setState(new ArrayList<INews>(Arrays.asList(newsItem)), INews.State.DELETED, true, false);
+          fNewsDao.setState(new ArrayList<INews>(Arrays.asList(newsItem)), INews.State.DELETED, false, false);
       }
 
       news = feedRef.resolve().getNews();

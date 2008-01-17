@@ -67,7 +67,6 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
   @Before
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
-    Owl.getPersistenceService().getModelSearch().shutdown();
     fFactory = Owl.getModelFactory();
   }
 

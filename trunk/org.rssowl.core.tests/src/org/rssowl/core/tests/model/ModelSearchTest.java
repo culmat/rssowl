@@ -28,7 +28,6 @@ import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
@@ -89,17 +88,7 @@ public class ModelSearchTest {
     fFactory = Owl.getModelFactory();
     fNewsEntityName = INews.class.getName();
 
-    /* We call startup first because of the shutdown called on tearDown */
-    fModelSearch.startup();
     Owl.getPersistenceService().recreateSchema();
-  }
-
-  /**
-   * @throws Exception
-   */
-  @After
-  public void tearDown() throws Exception {
-    fModelSearch.shutdown();
   }
 
   /**

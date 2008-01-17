@@ -55,7 +55,6 @@ public class ControllerTestLocal {
   @Before
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
-    Owl.getPersistenceService().getModelSearch().shutdown();
   }
 
   private NewsCounter loadNewsCounter() {

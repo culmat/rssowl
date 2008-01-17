@@ -99,7 +99,6 @@ public class ApplicationLayerTest {
   @Before
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
-    Owl.getPersistenceService().getModelSearch().shutdown();
     fFactory = Owl.getModelFactory();
     fAppService = Owl.getApplicationService();
   }

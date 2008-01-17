@@ -54,7 +54,6 @@ public class ImporterTest {
   @Before
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
-    Owl.getPersistenceService().getModelSearch().shutdown();
   }
 
   /**
