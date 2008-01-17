@@ -551,7 +551,7 @@ public class DBManager {
 
     Query query = sourceDb.query();
     query.constrain(News.class);
-    query.descend("fCopy").constrain(true);
+    query.descend("fParentId").constrain(0).not();
     for (Object news : query.execute())
       destinationDb.ext().set(news, Integer.MAX_VALUE);
 
@@ -661,12 +661,8 @@ public class DBManager {
   private static void configureNews(Configuration config) {
     ObjectClass oc = config.objectClass(News.class);
 
-    oc.objectField("fTitle").cascadeOnActivate(true); //$NON-NLS-1$
-
     /* Indexes */
-    oc.objectField("fCopy").indexed(true);
-    oc.objectField("fLinkText").indexed(true); //$NON-NLS-1$
-    oc.objectField("fGuidValue").indexed(true); //$NON-NLS-1$
+    oc.objectField("fParentId").indexed(true);
     oc.objectField("fFeedLink").indexed(true); //$NON-NLS-1$
     oc.objectField("fStateOrdinal").indexed(true); //$NON-NLS-1$
   }
