@@ -114,7 +114,7 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
 
       fDb.commit();
     } catch (Db4oException e) {
-      throw new PersistenceException(e);
+      throw DBHelper.rollbackAndPE(fDb, e);
     } finally {
       fWriteLock.unlock();
     }
