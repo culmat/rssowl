@@ -25,42 +25,26 @@
 package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
+import org.rssowl.ui.internal.editors.feed.FeedView;
+import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 /**
- * Action to open the <code>SearchNewsDialog</code> to search in all News.
+ * Supports "Find" in the current active bookmark explorer or feed view.
  *
  * @author bpasero
  */
-public class SearchNewsAction extends Action implements IWorkbenchWindowActionDelegate {
-  private IWorkbenchWindow fWindow;
+public class FindAction extends Action {
 
-  /** Leave for Reflection */
-  public SearchNewsAction() {}
-
-  /**
-   * Initialize with work bench window.
-   *
-   * @param window
-   */
-  public SearchNewsAction(IWorkbenchWindow window) {
-    fWindow = window;
-    setText("Search News...");
-    setImageDescriptor(OwlUI.SEARCHMARK);
-    setId("org.rssowl.ui.SearchNewsAction");
-    setActionDefinitionId("org.rssowl.ui.SearchNewsAction");
-  }
-
-  /*
-   * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
-   */
-  public void init(IWorkbenchWindow window) {
-    fWindow = window;
+  /** Find Action! */
+  public FindAction() {
+    setId("org.rssowl.ui.FindAction");
+    setActionDefinitionId("org.rssowl.ui.FindAction");
+    setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/find.gif"));
+    setText("&Find");
   }
 
   /*
@@ -68,25 +52,26 @@ public class SearchNewsAction extends Action implements IWorkbenchWindowActionDe
    */
   @Override
   public void run() {
-    run(null);
+    IWorkbenchWindow window = OwlUI.getWindow();
+    if (window != null) {
+      IWorkbenchPage activePage = window.getActivePage();
+      if (activePage != null) {
+        IWorkbenchPart activePart = activePage.getActivePart();
+        if (activePart != null) {
+
+          /* Find in Bookmark Explorer */
+          if (activePart instanceof BookMarkExplorer) {
+            ((BookMarkExplorer) activePart).find();
+          }
+
+          /* Find in Feed View */
+          else if (activePart instanceof FeedView) {
+            ((FeedView) activePart).find();
+          }
+        }
+      }
+    }
+
+    super.run();
   }
-
-  /*
-   * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-   */
-  public void run(IAction action) {
-    SearchNewsDialog dialog = new SearchNewsDialog(fWindow.getShell());
-    dialog.open();
-  }
-
-  /*
-   * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
-   */
-  public void dispose() {}
-
-  /*
-   * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
-   * org.eclipse.jface.viewers.ISelection)
-   */
-  public void selectionChanged(IAction action, ISelection selection) {}
 }

@@ -1340,15 +1340,6 @@ public class BookMarkExplorer extends ViewPart {
       }
     });
 
-    /* Find */
-    fViewSite.getActionBars().setGlobalActionHandler(RetargetActions.FIND, new Action() {
-      @Override
-      public void run() {
-        setSearchBarVisible(true);
-        fSearchBar.getControl().setFocus();
-      }
-    });
-
     /* Properties */
     fViewSite.getActionBars().setGlobalActionHandler(ActionFactory.PROPERTIES.getId(), new EntityPropertyDialogAction(fViewSite, fViewer));
 
@@ -1356,6 +1347,14 @@ public class BookMarkExplorer extends ViewPart {
     fViewSite.getActionBars().getGlobalActionHandler(ActionFactory.CUT.getId()).setEnabled(false);
     fViewSite.getActionBars().getGlobalActionHandler(ActionFactory.COPY.getId()).setEnabled(false);
     fViewSite.getActionBars().getGlobalActionHandler(ActionFactory.PASTE.getId()).setEnabled(false);
+  }
+
+  /**
+   * The user performed the "Find" action.
+   */
+  public void find() {
+    setSearchBarVisible(true);
+    fSearchBar.getControl().setFocus();
   }
 
   /*

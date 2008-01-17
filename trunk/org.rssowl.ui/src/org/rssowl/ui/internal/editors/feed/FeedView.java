@@ -196,7 +196,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private IAction fCutAction;
   private IAction fCopyAction;
   private IAction fPasteAction;
-  private IAction fFindAction;
   private IAction fPrintAction;
 
   /* Misc. */
@@ -563,15 +562,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
       }
     };
 
-    /* Find */
-    fFindAction = new Action() {
-      @Override
-      public void run() {
-        if (fFilterBar != null)
-          fFilterBar.focusQuickSearch();
-      }
-    };
-
     /* Print */
     fPrintAction = new Action() {
       @Override
@@ -582,11 +572,18 @@ public class FeedView extends EditorPart implements IReusableEditor {
     };
   }
 
+  /**
+   * The user performed the "Find" action.
+   */
+  public void find() {
+    if (fFilterBar != null)
+      fFilterBar.focusQuickSearch();
+  }
+
   private void setGlobalActions() {
 
     /* Define Retargetable Global Actions */
     fEditorSite.getActionBars().setGlobalActionHandler(RetargetActions.RELOAD, fReloadAction);
-    fEditorSite.getActionBars().setGlobalActionHandler(RetargetActions.FIND, fFindAction);
     fEditorSite.getActionBars().setGlobalActionHandler(ActionFactory.SELECT_ALL.getId(), fSelectAllAction);
     fEditorSite.getActionBars().setGlobalActionHandler(ActionFactory.DELETE.getId(), fDeleteAction);
     fEditorSite.getActionBars().setGlobalActionHandler(ActionFactory.CUT.getId(), fCutAction);

@@ -55,6 +55,7 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.actions.CopyLinkAction;
+import org.rssowl.ui.internal.actions.FindAction;
 import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
@@ -64,6 +65,7 @@ import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.RedoAction;
 import org.rssowl.ui.internal.actions.ReloadAllAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
+import org.rssowl.ui.internal.actions.SearchNewsAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.UndoAction;
@@ -100,6 +102,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
   private IContributionItem fOpenWindowsItem;
   private IContributionItem fShowViewMenu;
   private IContributionItem fReopenEditors;
+  private FindAction fFindAction;
 
   /**
    * @param configurer
@@ -130,6 +133,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     register(ActionFactory.DELETE.create(window));
     register(ActionFactory.SELECT_ALL.create(window));
     register(ActionFactory.PROPERTIES.create(window));
+
+    fFindAction = new FindAction();
+    register(fFindAction);
 
     /* Menu: Tools */
     register(ActionFactory.PREFERENCES.create(window));
@@ -232,6 +238,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
   /* Menu: Edit */
   private void createEditMenu(IMenuManager menuBar) {
     MenuManager editMenu = new MenuManager("&Edit", IWorkbenchActionConstants.M_EDIT);
+    editMenu.add(getAction(ActionFactory.COPY.getId())); //Dummy action
     menuBar.add(editMenu);
 
     editMenu.setRemoveAllWhenShown(true);
@@ -253,6 +260,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         editMenu.add(getAction(ActionFactory.SELECT_ALL.getId()));
 
         editMenu.add(new Separator());
+
+        editMenu.add(new SearchNewsAction(OwlUI.getWindow()));
+        editMenu.add(fFindAction);
+
         editMenu.add(new GroupMarker(IWorkbenchActionConstants.EDIT_END));
         editMenu.add(new Separator());
 
@@ -490,7 +501,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             labelMenu.add(new Separator());
 
             for (final ILabel label : labels) {
-              LabelAction labelAction =new LabelAction(label, selection);
+              LabelAction labelAction = new LabelAction(label, selection);
               labelAction.setChecked(selectedLabels.contains(label));
               labelMenu.add(labelAction);
             }
