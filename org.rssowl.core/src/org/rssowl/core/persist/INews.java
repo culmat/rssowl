@@ -101,6 +101,9 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
   /** One of the fields in this type described as constant */
   public static final int LOCATION = 19;
 
+  /** One of the fields in this type described as constant */
+  public static final int PARENT_ID = 20;
+
   /**
    * States of a INews being exclusive. Explanation follows:
    * <ul>
@@ -555,11 +558,13 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
    */
   void removeAttachment(IAttachment attachment);
 
-  /**
-   * @return {@code true} if this INews is a copy. Copies are not contained
-   * in the original IFeed and are usually part of INewsBins.
-   */
-  boolean isCopy();
+//  /**
+//   * @return {@code true} if this INews is a copy. Copies are not contained
+//   * in the original IFeed and are usually part of INewsBins.
+//   */
+//  boolean isCopy();
+
+  long getParentId();
 
   NewsReference toReference();
 }

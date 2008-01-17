@@ -55,7 +55,7 @@ public interface IModelFactory {
    * @param news INews to be copied.
    * @return a deep copy of {@code news}.
    */
-  INews createNews(INews news);
+  INews createNews(INews news, INewsBin newsBin);
 
   /**
    * Creates a new instance of IPerson with the provided parameters. The new
