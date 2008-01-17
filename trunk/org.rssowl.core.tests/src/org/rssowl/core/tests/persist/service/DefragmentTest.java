@@ -74,7 +74,6 @@ public class DefragmentTest {
   @Before
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
-    Owl.getPersistenceService().getModelSearch().shutdown();
     fPluginLocation = FileLocator.toFileURL(Platform.getBundle("org.rssowl.core.tests").getEntry("/")).toURI();
 
     ILabel label = fFactory.createLabel(null, "Label 0");
@@ -93,10 +92,10 @@ public class DefragmentTest {
     fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark");
     fFactory.createSearchMark(null, folder, "SM");
     INewsBin bin = fFactory.createNewsBin(null, folder, "NewsBin");
-    INews newsCopy = fFactory.createNews(news);
-    DynamicDAO.save(newsCopy);
-    bin.addNews(newsCopy);
     DynamicDAO.save(folder);
+    INews newsCopy = fFactory.createNews(news, bin);
+    DynamicDAO.save(newsCopy);
+    DynamicDAO.save(bin);
     Preference pref = new Preference("key");
     pref.putLongs(2, 3, 4);
     DynamicDAO.save(pref);
