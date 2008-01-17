@@ -1167,6 +1167,12 @@
             url="http://digg.com/rss_search?search=[:]&amp;area=all&amp;type=both&amp;section=all">
       </keywordFeed>
       <keywordFeed
+            icon="icons/obj16/fav_newsvine.gif"
+            id="org.rssowl.ui.NewsvineKeywordFeed"
+            name="Newsvine"
+            url="http://www.newsvine.com/_feeds/rss2/tag?id=[:]">
+      </keywordFeed>
+      <keywordFeed
             icon="icons/obj16/fav_google.gif"
             id="org.rssowl.ui.GoogleBlogKeywordFeed"
             name="Google Blog"
@@ -1177,12 +1183,6 @@
             id="org.rssowl.ui.YoutubeKeywordFeed"
             name="YouTube Video"
             url="http://www.youtube.com/rss/tag/[:].rss">
-      </keywordFeed>
-      <keywordFeed
-            icon="icons/obj16/fav_google.gif"
-            id="org.rssowl.ui.GoogleVideoKeywordFeed"
-            name="Google Video"
-            url="http://video.google.com/videofeed?type=search&amp;q=[:]&amp;output=rss">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_flickr.gif"
