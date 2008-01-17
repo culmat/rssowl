@@ -275,7 +275,9 @@ public class EventManager implements DatabaseListener   {
   }
 
   private void cascadeNewsBinDeletion(INewsBin entity) {
-    DBHelper.removeNewsAndFeedsAfterNewsBinUpdate(fDb, entity.getNewsRefs());
+    Set<FeedLinkReference> removedFeedRefs = new HashSet<FeedLinkReference>();
+    DBHelper.removeNews(fDb, removedFeedRefs, entity.getNewsRefs());
+    DBHelper.removeFeedsAfterNewsBinUpdate(fDb, removedFeedRefs);
     if (entity instanceof NewsBin)
       fDb.delete(((NewsBin) entity).internalGetNewsContainer());
 
@@ -301,7 +303,7 @@ public class EventManager implements DatabaseListener   {
 
   private void cascadeNewsDeletion(INews news) {
     addItemBeingDeleted(news);
-    if (!news.isCopy())
+    if (news.getParentId() == 0)
       removeFromParentFeed(news);
 
     fDb.delete(news.getGuid());
