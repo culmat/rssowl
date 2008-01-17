@@ -118,20 +118,8 @@
                icon="icons/obj16/searchmark.gif"
                id="org.rssowl.ui.SearchNewsAction"
                label="Search News..."
-               menubarPath="edit/editEnd"
                style="push"
                toolbarPath="search">
-         </action>
-         <action
-               allowLabelUpdate="true"
-               definitionId="org.rssowl.ui.FindAction"
-               icon="icons/etool16/find.gif"
-               id="org.rssowl.ui.FindAction"
-               label="&amp;Find"
-               menubarPath="edit/editEnd"
-               retarget="true"
-               style="push"
-               >
          </action>
       </actionSet>
       <actionSet

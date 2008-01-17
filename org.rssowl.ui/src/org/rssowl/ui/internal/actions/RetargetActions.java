@@ -26,7 +26,7 @@ package org.rssowl.ui.internal.actions;
 
 /**
  * List of IDs for the <code>RetargetAction</code> RSSOwl is defining.
- * 
+ *
  * @author bpasero
  */
 public class RetargetActions {
@@ -36,7 +36,4 @@ public class RetargetActions {
 
   /** Mark All Read */
   public static final String MARK_ALL_READ = "org.rssowl.ui.MarkAllRead";
-
-  /** Find */
-  public static final String FIND = "org.rssowl.ui.FindAction";
 }
