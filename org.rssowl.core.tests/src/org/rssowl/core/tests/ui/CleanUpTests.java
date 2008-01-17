@@ -26,7 +26,6 @@ package org.rssowl.core.tests.ui;
 
 import static junit.framework.Assert.assertEquals;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
@@ -71,17 +70,7 @@ public class CleanUpTests {
     fModelSearch = Owl.getPersistenceService().getModelSearch();
     fFactory = Owl.getModelFactory();
 
-    /* We call startup first because of the shutdown called on tearDown */
-    fModelSearch.startup();
     Owl.getPersistenceService().recreateSchema();
-  }
-
-  /**
-   * @throws Exception
-   */
-  @After
-  public void tearDown() throws Exception {
-    fModelSearch.shutdown();
   }
 
   /**

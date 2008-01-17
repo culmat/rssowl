@@ -122,7 +122,6 @@ public class PerformanceTest {
     InternalOwl.PERF_TESTING = true;
     Owl.getPersistenceService().recreateSchema();
     fModelSearch = Owl.getPersistenceService().getModelSearch();
-    fModelSearch.shutdown();
     fPluginLocation = FileLocator.toFileURL(Platform.getBundle("org.rssowl.core.tests").getEntry("/")).toURI();
     fController = Controller.getDefault();
   }
@@ -264,7 +263,6 @@ public class PerformanceTest {
   @Test
   public void savedSearchServiceTest() throws Exception {
     final List<Exception> ex = new ArrayList<Exception>();
-    fModelSearch.startup();
 
     /* Cold-Start: Run Saved Search Service on 216 Feeds */
     List<ITask> tasks = getSavedSearchServiceTestTasks(ex);
@@ -492,7 +490,6 @@ public class PerformanceTest {
   @Test
   public void saveAndIndexFeeds() throws Exception {
     final List<Exception> ex = new ArrayList<Exception>();
-    fModelSearch.startup();
 
     /* Cold-Start: Save and Index 216 Feeds */
     List<ITask> tasks = getSaveAndIndexFeedsTasks(ex);
@@ -510,7 +507,6 @@ public class PerformanceTest {
     System.out.println("Saving and Indexing " + FEEDS + " Feeds [Warm - " + 1 + " Jobs] took: " + (l1 + l2) / 2 + "ms");
 
     /* Warm-Start: Save 216 Feeds (to calculate plain index time) */
-    fModelSearch.shutdown();
     Owl.getPersistenceService().recreateSchema();
     tasks = getSaveAndIndexFeedsTasks(ex);
     long l3 = TestUtils.executeAndWait(tasks, 1);
@@ -582,8 +578,6 @@ public class PerformanceTest {
 
     /* Recreate */
     Owl.getPersistenceService().recreateSchema();
-    fModelSearch.shutdown();
-    fModelSearch.startup();
     saveFeedsHelper();
 
     /* Query 2: Entire News contains 'news' */
@@ -607,8 +601,6 @@ public class PerformanceTest {
 
     /* Recreate */
     Owl.getPersistenceService().recreateSchema();
-    fModelSearch.shutdown();
-    fModelSearch.startup();
     saveFeedsHelper();
 
     /*
@@ -641,8 +633,6 @@ public class PerformanceTest {
 
     /* Recreate */
     Owl.getPersistenceService().recreateSchema();
-    fModelSearch.shutdown();
-    fModelSearch.startup();
     saveFeedsHelper();
 
     /*
@@ -675,8 +665,6 @@ public class PerformanceTest {
 
     /* Recreate */
     Owl.getPersistenceService().recreateSchema();
-    fModelSearch.shutdown();
-    fModelSearch.startup();
     saveFeedsHelper();
 
     /* Query 5: Publish Date before Now AND After 2000 */
@@ -706,8 +694,6 @@ public class PerformanceTest {
 
     /* Recreate */
     Owl.getPersistenceService().recreateSchema();
-    fModelSearch.shutdown();
-    fModelSearch.startup();
     saveFeedsHelper();
 
     /* Query 6: News is *new*, *unread*, *updated* and Has Attachments IS TRUE */
