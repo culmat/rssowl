@@ -202,7 +202,7 @@ public class BookMark extends Mark implements IBookMark {
 
   /* getFeedLinkReference is synchronized, so no need to synchronize this */
   public boolean containsNews(INews news) {
-    return !news.isCopy() && news.getFeedReference().equals(getFeedLinkReference());
+    return news.getParentId() == 0 && news.getFeedReference().equals(getFeedLinkReference());
   }
 
   public synchronized int getStickyNewsCount() {

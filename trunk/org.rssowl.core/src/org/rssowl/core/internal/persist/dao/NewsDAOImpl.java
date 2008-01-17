@@ -25,7 +25,10 @@
 package org.rssowl.core.internal.persist.dao;
 
 import org.eclipse.core.runtime.Assert;
+import org.rssowl.core.Owl;
+import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.persist.News;
+import org.rssowl.core.internal.persist.search.ModelSearchImpl;
 import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INews.State;
@@ -34,6 +37,7 @@ import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.event.runnable.NewsEventRunnable;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 
 import com.db4o.ext.Db4oException;
@@ -100,61 +104,181 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
     return new NewsEvent(oldNews, entity, true);
   }
 
-  //TODO Bug when the passed INews has isCopy == true
   public void setState(Collection<INews> news, State state, boolean affectEquivalentNews, boolean force) throws PersistenceException {
     if (news.isEmpty())
       return;
     fWriteLock.lock();
     Set<INews> changedNews = null;
     try {
-      try {
-        if (affectEquivalentNews) {
-          /*
-           * Give extra 25% size to take into account news that have same guid
-           * or link.
-           */
-          int capacity = news.size() + (news.size() / 4);
-          changedNews = new HashSet<INews>(capacity);
-          for (INews newsItem : news) {
-            if (newsItem.getId() == null)
-              throw new IllegalArgumentException("newsItem was never saved to the database"); //$NON-NLS-1$
+      if (affectEquivalentNews) {
+        /*
+         * Give extra 25% size to take into account news that have same guid or
+         * link.
+         */
+        int capacity = news.size() + (news.size() / 4);
+        changedNews = new HashSet<INews>(capacity);
+        for (INews newsItem : news) {
+          if (newsItem.getId() == null)
+            throw new IllegalArgumentException("newsItem was never saved to the database"); //$NON-NLS-1$
+          /* Already handled this news because it's equivalent to one of the ones processed earlier */
+          if (changedNews.contains(newsItem))
+            continue;
+          if (!newsItem.isVisible() && affectEquivalentNews)
+            throw new IllegalArgumentException("affectEquivalentNews is not support for invisible news");
 
-            List<INews> equivalentNews;
+          List<INews> equivalentNews;
 
-            if (newsItem.isCopy())
-              equivalentNews = Collections.singletonList(newsItem);
-            else if (newsItem.getGuid() != null && newsItem.getGuid().isPermaLink()) {
-              equivalentNews = getNewsFromGuid(newsItem);
-              if (equivalentNews.isEmpty()) {
-                throw createIllegalException("No news were found with guid: " + //$NON-NLS-1$
-                    newsItem.getGuid().getValue(), newsItem);
-              }
-            } else if (newsItem.getLink() != null) {
-              equivalentNews = getNewsFromLink(newsItem);
-              if (equivalentNews.isEmpty()) {
-                throw createIllegalException("No news were found with link: " + //$NON-NLS-1$
-                    newsItem.getLink().toString(), newsItem);
-              }
-            } else
-              equivalentNews = Collections.singletonList(newsItem);
+          if (newsItem.getParentId() != 0)
+            equivalentNews = Collections.singletonList(newsItem);
+          else if (newsItem.getGuid() != null && newsItem.getGuid().isPermaLink()) {
+            equivalentNews = getNewsFromGuid(newsItem, true);
+            if (equivalentNews.isEmpty()) {
+              throw createIllegalException("No news were found with guid: " + //$NON-NLS-1$
+                  newsItem.getGuid().getValue(), newsItem);
+            }
+          } else if (newsItem.getLink() != null) {
+            equivalentNews = getNewsFromLink(newsItem, true);
+            if (equivalentNews.isEmpty()) {
+              throw createIllegalException("No news were found with link: " + //$NON-NLS-1$
+                  newsItem.getLink().toString(), newsItem);
+            }
+          } else
+            equivalentNews = Collections.singletonList(newsItem);
 
-            changedNews.addAll(setState(equivalentNews, state, force));
-          }
-        } else {
-          changedNews = setState(news, state, force);
+          changedNews.addAll(setState(equivalentNews, state, force));
         }
+      } else {
+        changedNews = setState(news, state, force);
+      }
+      try {
         preSaveAll(changedNews);
         save(changedNews);
         preCommit();
         fDb.commit();
-      } catch (Db4oException e) {
-        throw new PersistenceException(e);
       } finally {
-        fWriteLock.unlock();
+        postSaveAll(changedNews);
       }
-      DBHelper.cleanUpAndFireEvents();
+    } catch (Db4oException e) {
+      throw DBHelper.rollbackAndPE(fDb, e);
     } finally {
-      postSaveAll(changedNews);
+      fWriteLock.unlock();
+    }
+    DBHelper.cleanUpAndFireEvents();
+  }
+
+  private void save(Set<INews> newsList) {
+    for (INews news : newsList) {
+      fDb.ext().set(news, 1);
+    }
+  }
+
+  private RuntimeException createIllegalException(String message, INews newsItem) {
+    News dbNews = (News) DBHelper.peekPersistedNews(fDb, newsItem);
+    if (dbNews == null)
+      return new IllegalArgumentException("The news has been deleted from the persistence layer: " + newsItem);
+
+    return new IllegalStateException(message + ". This news in the db looks like: " //$NON-NLS-1$
+        + dbNews.toLongString());
+  }
+
+  public List<INews> getNewsFromLink(INews newsItem, boolean newsSaved) {
+    return searchNews(newsItem, false, newsSaved);
+  }
+
+  public List<INews> getNewsFromGuid(INews newsItem, boolean newsSaved) {
+    return searchNews(newsItem, true, newsSaved);
+  }
+
+  private void logWarning(String message) {
+    Activator activator = Activator.getDefault();
+    activator.getLog().log(activator.createWarningStatus(message, null));
+  }
+
+  private List<INews> searchNews(INews newsItem, boolean guid, boolean newsSaved) {
+    List<INews> news = doSearchNews(newsItem, guid);
+    if (!newsSaved)
+      return news;
+
+    if (news.contains(newsItem))
+      return news;
+
+    //TODO Get EntityIdsByEventType and check if the news is in there
+    logWarning("Stale Lucene index while setting news state, sleeping for 50 ms");
+    try {
+      Thread.sleep(50);
+    } catch (InterruptedException e) {
+      /*
+       * If we're interrupted we act just as if the sleep time had finished
+       * since it's a short operation.
+       */
+    }
+
+    news = doSearchNews(newsItem, guid);
+    if (!news.contains(newsItem)) {
+      logWarning("Stale Lucene index while setting news state, ignoring equivalent news");
+      news.add(newsItem);
+    }
+
+    return news;
+  }
+
+  private List<INews> doSearchNews(INews newsItem, boolean guid) {
+    ModelSearchImpl modelSearch = (ModelSearchImpl) Owl.getPersistenceService().getModelSearch();
+    List<NewsReference> hits;
+    if (guid)
+      hits = modelSearch.searchNewsByGuid(newsItem.getGuid(), false);
+    else
+      hits = modelSearch.searchNewsByLink(newsItem.getLink(), false);
+
+    List<INews> news = new ArrayList<INews>(hits.size());
+    for (NewsReference hit : hits) {
+      if (newsItem.getId() != null && (hit.getId() == newsItem.getId().longValue()))
+        news.add(newsItem);
+      else {
+        INews resolvedNewsItem = hit.resolve();
+        news.add(resolvedNewsItem);
+      }
+    }
+    return news;
+  }
+
+  private Set<INews> setState(Collection<INews> news, State state, boolean force) {
+    Set<INews> changedNews = new HashSet<INews>(news.size());
+    for (INews newsItem : news) {
+      if (newsItem.getState() != state || force) {
+        newsItem.setState(state);
+        changedNews.add(newsItem);
+      }
+    }
+    return changedNews;
+  }
+
+  public Collection<INews> loadAll(FeedLinkReference feedRef, Set<State> states) {
+    Assert.isNotNull(feedRef, "feedRef");
+    Assert.isNotNull(states, "states");
+    if (states.isEmpty())
+      return new ArrayList<INews>(0);
+
+    try {
+      Query query = fDb.query();
+      query.constrain(News.class);
+      query.descend("fFeedLink").constrain(feedRef.getLink().toString());
+      if (!states.containsAll(EnumSet.allOf(INews.State.class))) {
+        Constraint constraint = null;
+        for (INews.State state : states) {
+          if (constraint == null)
+            constraint = query.descend("fStateOrdinal").constrain(state.ordinal());
+          else
+            constraint = query.descend("fStateOrdinal").constrain(state.ordinal()).or(constraint);
+        }
+      }
+
+      Collection<INews> news = getList(query);
+      activateAll(news);
+
+      return new ArrayList<INews>(news);
+    } catch (Db4oException e) {
+      throw new PersistenceException(e);
     }
   }
 
@@ -187,13 +311,13 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
               List<INews> equivalentNews;
 
               if (newsItem.getGuid() != null) {
-                equivalentNews = getNewsFromGuid(newsItem);
+                equivalentNews = getNewsFromGuid(newsItem, true);
                 if (equivalentNews.isEmpty()) {
                   throw createIllegalException("No news were found with guid: " + //$NON-NLS-1$
                       newsItem.getGuid().getValue(), newsItem);
                 }
               } else if (newsItem.getLink() != null) {
-                equivalentNews = getNewsFromLink(newsItem);
+                equivalentNews = getNewsFromLink(newsItem, true);
                 if (equivalentNews.isEmpty()) {
                   throw createIllegalException("No news were found with link: " + //$NON-NLS-1$
                       newsItem.getLink().toString(), newsItem);
@@ -238,76 +362,5 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
       setStateLock.unlock();
     }
     eventRunnable.run();
-  }
-
-  private void save(Set<INews> newsList) {
-    for (INews news : newsList) {
-      fDb.ext().set(news, 1);
-    }
-  }
-
-  private RuntimeException createIllegalException(String message, INews newsItem) {
-    News dbNews = (News) DBHelper.peekPersistedNews(fDb, newsItem);
-    if (dbNews == null)
-      return new IllegalArgumentException("The news has been deleted from the persistence layer: " + newsItem);
-
-    return new IllegalStateException(message + ". This news in the db looks like: " //$NON-NLS-1$
-        + dbNews.toLongString());
-  }
-
-  private List<INews> getNewsFromGuid(INews newsItem) {
-    Query query = fDb.query();
-    query.constrain(fEntityClass);
-    query.descend("fGuidValue").constrain(newsItem.getGuid().getValue()); //$NON-NLS-1$
-    query.descend("fCopy").constrain(false);
-    return activateAll(getList(query));
-  }
-
-  private List<INews> getNewsFromLink(INews newsItem) {
-    Query query = fDb.query();
-    query.constrain(fEntityClass);
-    query.descend("fLinkText").constrain(newsItem.getLink().toString()); //$NON-NLS-1$
-    query.descend("fCopy").constrain(false);
-    return activateAll(getList(query));
-  }
-
-  private Set<INews> setState(Collection<INews> news, State state, boolean force) {
-    Set<INews> changedNews = new HashSet<INews>(news.size());
-    for (INews newsItem : news) {
-      if (newsItem.getState() != state || force) {
-        newsItem.setState(state);
-        changedNews.add(newsItem);
-      }
-    }
-    return changedNews;
-  }
-
-  public Collection<INews> loadAll(FeedLinkReference feedRef, Set<State> states) {
-    Assert.isNotNull(feedRef, "feedRef");
-    Assert.isNotNull(states, "states");
-    if (states.isEmpty())
-      return new ArrayList<INews>(0);
-
-    try {
-      Query query = fDb.query();
-      query.constrain(News.class);
-      query.descend("fFeedLink").constrain(feedRef.getLink().toString());
-      if (!states.containsAll(EnumSet.allOf(INews.State.class))) {
-        Constraint constraint = null;
-        for (INews.State state : states) {
-          if (constraint == null)
-            constraint = query.descend("fStateOrdinal").constrain(state.ordinal());
-          else
-            constraint = query.descend("fStateOrdinal").constrain(state.ordinal()).or(constraint);
-        }
-      }
-
-      Collection<INews> news = getList(query);
-      activateAll(news);
-
-      return new ArrayList<INews>(news);
-    } catch (Db4oException e) {
-      throw new PersistenceException(e);
-    }
   }
 }

@@ -30,6 +30,7 @@ import org.rssowl.core.internal.persist.Description;
 import org.rssowl.core.internal.persist.MergeResult;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.SortedLongArrayList;
+import org.rssowl.core.internal.persist.dao.NewsDAOImpl;
 import org.rssowl.core.internal.persist.service.DB4OIDGenerator;
 import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.internal.persist.service.DBManager;
@@ -47,11 +48,10 @@ import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.runnable.NewsEventRunnable;
 import org.rssowl.core.persist.service.IDGenerator;
-import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.RetentionStrategy;
 
 import com.db4o.ObjectContainer;
-import com.db4o.query.Query;
+import com.db4o.ext.Db4oException;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,48 +96,48 @@ public class ApplicationServiceImpl implements IApplicationService {
     fWriteLock.lock();
     MergeResult mergeResult = null;
     try {
+      /* Resolve reloaded Feed */
+      IFeed feed = bookMark.getFeedLinkReference().resolve();
+
+      /* Feed could have been deleted meanwhile! */
+      if (feed == null)
+        return;
+
+      /* Copy over Properties to reloaded Feed to keep them */
+      Map<String, ?> feedProperties = feed.getProperties();
+      if (feedProperties != null) {
+        feedProperties.entrySet();
+        for (Map.Entry<String, ?> entry : feedProperties.entrySet())
+          emptyFeed.setProperty(entry.getKey(), entry.getValue());
+      }
+
+      /* Merge with existing */
+      mergeResult = feed.mergeAndCleanUp(emptyFeed);
+      List<INews> newNewsAdded = getNewNewsAdded(feed);
+      updateStateOfUnsavedNewNews(newNewsAdded);
+
+      /* Retention Policy */
+      List<INews> deletedNews = RetentionStrategy.process(bookMark, feed, newNewsAdded.size());
+
+      for (INews news : deletedNews)
+        mergeResult.addUpdatedObject(news);
+
+      for (INews news : newNewsAdded) {
+        String description = ((News) news).getTransientDescription();
+        if (description != null) {
+          IDGenerator generator = Owl.getPersistenceService().getIDGenerator();
+          long id;
+          if (generator instanceof DB4OIDGenerator)
+            id = ((DB4OIDGenerator) generator).getNext(false);
+          else
+            id = generator.getNext();
+
+          news.setId(id);
+          mergeResult.addUpdatedObject(new Description(news, description));
+        }
+      }
+
       try {
-        /* Resolve reloaded Feed */
-        IFeed feed = bookMark.getFeedLinkReference().resolve();
-
-        /* Feed could have been deleted meanwhile! */
-        if (feed == null)
-          return;
-
-        /* Copy over Properties to reloaded Feed to keep them */
-        Map<String, ?> feedProperties = feed.getProperties();
-        if (feedProperties != null) {
-          feedProperties.entrySet();
-          for (Map.Entry<String, ?> entry : feedProperties.entrySet())
-            emptyFeed.setProperty(entry.getKey(), entry.getValue());
-        }
-
-        /* Merge with existing */
-        mergeResult = feed.mergeAndCleanUp(emptyFeed);
-        List<INews> newNewsAdded = getNewNewsAdded(feed);
-        updateStateOfUnsavedNewNews(newNewsAdded);
-
-        /* Retention Policy */
-        List<INews> deletedNews = RetentionStrategy.process(bookMark, feed, newNewsAdded.size());
-
-        for (INews news : deletedNews)
-          mergeResult.addUpdatedObject(news);
-
-        for (INews news : newNewsAdded) {
-          String description = ((News) news).getTransientDescription();
-          if (description != null) {
-            IDGenerator generator = Owl.getPersistenceService().getIDGenerator();
-            long id;
-            if (generator instanceof DB4OIDGenerator)
-              id = ((DB4OIDGenerator) generator).getNext(false);
-            else
-              id = generator.getNext();
-
-            news.setId(id);
-            mergeResult.addUpdatedObject(new Description(news, description));
-          }
-        }
-
         lockNewsObjects(mergeResult);
         saveFeed(mergeResult);
 
@@ -150,15 +150,15 @@ public class ApplicationServiceImpl implements IApplicationService {
         }
         DBHelper.preCommit(fDb);
         fDb.commit();
-      } catch (RuntimeException e) {
-        throw new PersistenceException(e);
       } finally {
-        fWriteLock.unlock();
+        unlockNewsObjects(mergeResult);
       }
-      DBHelper.cleanUpAndFireEvents();
+    } catch (Db4oException e) {
+      DBHelper.rollbackAndPE(fDb, e);
     } finally {
-      unlockNewsObjects(mergeResult);
+      fWriteLock.unlock();
     }
+    DBHelper.cleanUpAndFireEvents();
   }
 
   private void lockNewsObjects(MergeResult mergeResult) {
@@ -193,40 +193,18 @@ public class ApplicationServiceImpl implements IApplicationService {
     return newsList;
   }
 
-  private <T> List<T> activateAll(List<T> list) {
-    for (T o : list)
-      fDb.ext().activate(o, Integer.MAX_VALUE);
-
-    return list;
-  }
-
   private void updateStateOfUnsavedNewNews(List<INews> news) {
+    NewsDAOImpl newsDAO = (NewsDAOImpl) DynamicDAO.getDAO(INewsDAO.class);
     for (INews newsItem : news) {
       List<INews> equivalentNews = Collections.emptyList();
       if (newsItem.getGuid() != null)
-        equivalentNews = getNewsFromGuid(newsItem);
+        equivalentNews = newsDAO.getNewsFromGuid(newsItem, false);
       else if (newsItem.getLink() != null)
-        equivalentNews = getNewsFromLink(newsItem);
+        equivalentNews = newsDAO.getNewsFromLink(newsItem, false);
 
       if (!equivalentNews.isEmpty())
         newsItem.setState(equivalentNews.get(0).getState());
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  private List<INews> getNewsFromLink(INews newsItem) {
-    Query query = fDb.query();
-    query.constrain(News.class);
-    query.descend("fLinkText").constrain(newsItem.getLink().toString()); //$NON-NLS-1$
-    return activateAll(query.execute());
-  }
-
-  @SuppressWarnings("unchecked")
-  private List<INews> getNewsFromGuid(INews newsItem) {
-    Query query = fDb.query();
-    query.constrain(News.class);
-    query.descend("fGuidValue").constrain(newsItem.getGuid().getValue()); //$NON-NLS-1$
-    return activateAll(query.execute());
   }
 
   private void saveFeed(MergeResult mergeResult) {
