@@ -24,6 +24,7 @@
 
 package org.rssowl.core.internal.persist;
 
+import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
@@ -73,8 +74,11 @@ public class DefaultModelFactory implements IModelFactory {
     return news;
   }
 
-  public INews createNews(INews news) {
-    return new News((News) news);
+  public INews createNews(INews news, INewsBin newsBin) {
+    INews copy = new News((News) news, newsBin.getId());
+    copy.setId(Owl.getPersistenceService().getIDGenerator().getNext());
+    newsBin.addNews(copy);
+    return copy;
   }
 
   /*

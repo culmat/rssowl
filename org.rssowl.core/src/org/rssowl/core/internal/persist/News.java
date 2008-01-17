@@ -132,7 +132,11 @@ public class News extends AbstractEntity implements INews {
   private List<ICategory> fCategories;
   private Set<ILabel> fLabels;
 
+  /* FIXME Remove after nightly with migration is released */
   private boolean fCopy;
+
+  /* This field is only non-zero if the parent is not a feed */
+  private long fParentId;
 
   //TODO Remove this after M8 release
   private String fDescription;
@@ -175,9 +179,9 @@ public class News extends AbstractEntity implements INews {
     init();
   }
 
-  public News(News news) {
+  public News(News news, long parentId) {
     super(null, news);
-    fCopy = true;
+    fParentId = parentId;
     news.fLock.acquireReadLock();
     try {
       for (IAttachment attachment : news.getAttachments())
@@ -1160,10 +1164,10 @@ public class News extends AbstractEntity implements INews {
     return new NewsReference(getIdAsPrimitive());
   }
 
-  public boolean isCopy() {
+  public long getParentId() {
     fLock.acquireReadLock();
     try {
-      return fCopy;
+      return fParentId;
     } finally {
       fLock.releaseReadLock();
     }

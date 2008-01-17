@@ -43,6 +43,7 @@ import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.INewsBin.StatesUpdateInfo;
 import org.rssowl.core.persist.dao.DAOService;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsBinDAO;
 import org.rssowl.core.persist.dao.INewsCounterDAO;
 import org.rssowl.core.persist.event.FeedEvent;
 import org.rssowl.core.persist.event.ModelEvent;
@@ -65,8 +66,10 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class DBHelper {
@@ -88,6 +91,12 @@ public class DBHelper {
     for (EventRunnable<?> runnable : eventNotifiers) {
       runnable.run();
     }
+  }
+
+  public static final PersistenceException rollbackAndPE(ObjectContainer db, Exception e) {
+    DBHelper.cleanUpEvents();
+    db.rollback();
+    return new PersistenceException(e);
   }
 
   public static final void putEventTemplate(ModelEvent modelEvent) {
@@ -274,37 +283,47 @@ public class DBHelper {
     if (newsEventRunnable == null)
       return;
 
-    List<StatesUpdateInfo> statesUpdateInfos = new ArrayList<StatesUpdateInfo>();
+    Map<Long, List<StatesUpdateInfo>> statesUpdateInfos = new HashMap<Long, List<StatesUpdateInfo>>(5);
     for (NewsEvent newsEvent : newsEventRunnable.getUpdateEvents()) {
-      if (newsEvent.getEntity().isCopy() && (newsEvent.getOldNews().getState() != newsEvent.getEntity().getState())) {
-        statesUpdateInfos.add(new StatesUpdateInfo(newsEvent.getOldNews().getState(), newsEvent.getEntity().getState(), newsEvent.getEntity().toReference()));
+      INews news = newsEvent.getEntity();
+      if (news.getParentId() != 0 && (newsEvent.getOldNews().getState() != news.getState())) {
+        List<StatesUpdateInfo> list = statesUpdateInfos.get(news.getParentId());
+        if (list == null) {
+          list = new ArrayList<StatesUpdateInfo>();
+          statesUpdateInfos.put(news.getParentId(), list);
+        }
+        list.add(new StatesUpdateInfo(newsEvent.getOldNews().getState(), news.getState(), news.toReference()));
       }
     }
     if (!statesUpdateInfos.isEmpty()) {
-      List<NewsReference> removedNewsRefs = new ArrayList<NewsReference>();
-      for (INewsBin newsBin : DynamicDAO.loadAll(INewsBin.class)) {
-        if (newsBin.updateNewsStates(statesUpdateInfos)) {
-          removedNewsRefs.addAll(newsBin.removeNews(EnumSet.of(INews.State.DELETED)));
+      Set<FeedLinkReference> removedFeedRefs = new HashSet<FeedLinkReference>();
+      INewsBinDAO newsBinDAO = DynamicDAO.getDAO(INewsBinDAO.class);
+      for (Map.Entry<Long, List<StatesUpdateInfo>> mapEntry : statesUpdateInfos.entrySet()) {
+        INewsBin newsBin = newsBinDAO.load(mapEntry.getKey());
+        if (newsBin.updateNewsStates(mapEntry.getValue())) {
+          removeNews(db, removedFeedRefs, newsBin.removeNews(EnumSet.of(INews.State.DELETED)));
           putEventTemplate(new NewsBinEvent(newsBin, null, true));
           db.ext().set(newsBin, Integer.MAX_VALUE);
         }
       }
-      removeNewsAndFeedsAfterNewsBinUpdate(db, removedNewsRefs);
+      removeFeedsAfterNewsBinUpdate(db, removedFeedRefs);
     }
   }
 
-  static void removeNewsAndFeedsAfterNewsBinUpdate(ObjectContainer db,
-      List<NewsReference> removedNewsRefs) {
-
-    Set<FeedLinkReference> feedRefs = new HashSet<FeedLinkReference>(removedNewsRefs.size());
-    for (NewsReference newsRef : removedNewsRefs) {
+  static void removeNews(ObjectContainer db, Set<FeedLinkReference> feedRefs, Collection<NewsReference> newsRefs) {
+    for (NewsReference newsRef : newsRefs) {
       INews news = newsRef.resolve();
       feedRefs.add(news.getFeedReference());
       db.delete(news);
     }
+  }
+
+  static void removeFeedsAfterNewsBinUpdate(ObjectContainer db,
+      Set<FeedLinkReference> removedFeedRefs) {
+
     NewsCounter newsCounter = DynamicDAO.getDAO(INewsCounterDAO.class).load();
     boolean changed = false;
-    for (FeedLinkReference feedRef : feedRefs) {
+    for (FeedLinkReference feedRef : removedFeedRefs) {
       if ((countBookMarkReference(db, feedRef) == 0) && !feedHasNewsWithCopies(db, feedRef)) {
           db.delete(feedRef.resolve());
           newsCounter.remove(feedRef.getLink());
@@ -332,7 +351,7 @@ public class DBHelper {
     Query query = db.query();
     query.constrain(News.class);
     query.descend("fFeedLink").constrain(feedRef.getLink().toString());
-    query.descend("fCopy").constrain(true);
+    query.descend("fParentId").constrain(0).not();
     return !query.execute().isEmpty();
   }
 
