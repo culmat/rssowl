@@ -60,6 +60,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
@@ -76,6 +77,7 @@ import org.rssowl.core.util.SearchHit;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -86,7 +88,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * The central interface for searching types from the persistence layer. The
@@ -119,15 +123,16 @@ public class ModelSearchImpl implements IModelSearch {
   @SuppressWarnings( { "unchecked" })
   private static final Set STOP_WORDS = Collections.synchronizedSet(StopFilter.makeStopSet(StopAnalyzer.ENGLISH_STOP_WORDS));
 
-  private IndexSearcher fSearcher;
-  private Indexer fIndexer;
-  private Directory fDirectory;
+  private volatile IndexSearcher fSearcher;
+  private volatile Indexer fIndexer;
+  private volatile Directory fDirectory;
   private final List<IndexListener> fIndexListeners = new CopyOnWriteArrayList<IndexListener>();
+  private final Map<IndexSearcher, AtomicInteger> fSearchers = new ConcurrentHashMap<IndexSearcher, AtomicInteger>(3, 0.75f, 1);
 
   /*
    * @see org.rssowl.core.model.search.IModelSearch#startup()
    */
-  public synchronized void startup() throws PersistenceException {
+  public void startup() throws PersistenceException {
     try {
       if (fDirectory == null) {
         String path = Activator.getDefault().getStateLocation().toOSString();
@@ -140,8 +145,10 @@ public class ModelSearchImpl implements IModelSearch {
 
       fIndexer.initIfNecessary();
 
-      if (fSearcher == null)
-        fSearcher = createIndexSearcher();
+      synchronized (this) {
+        if (fSearcher == null)
+          fSearcher = createIndexSearcher();
+      }
     } catch (IOException e) {
       Activator.getDefault().getLog().log(Activator.getDefault().createErrorStatus(e.getMessage(), e));
     }
@@ -150,12 +157,85 @@ public class ModelSearchImpl implements IModelSearch {
   /*
    * @see org.rssowl.core.model.search.IModelSearch#shutdown()
    */
-  public synchronized void shutdown() throws PersistenceException {
+  public void shutdown() throws PersistenceException {
     try {
-      disposeSearcher();
+      synchronized (this) {
+        dispose(fSearcher);
+        fSearcher = null;
+      }
       fIndexer.shutdown();
     } catch (IOException e) {
       throw new PersistenceException(e.getMessage(), e);
+    }
+  }
+
+  private BooleanClause createIsCopyTermQuery(boolean copy) {
+    String field = String.valueOf(INews.PARENT_ID);
+    TermQuery termQuery = new TermQuery(new Term(field, NumberTools.longToString(0)));
+    Occur occur = copy ? Occur.MUST_NOT : Occur.MUST;
+    return new BooleanClause(termQuery, occur);
+  }
+
+  private static final class SimpleHitCollector extends HitCollector   {
+
+    private final IndexSearcher fSearcher;
+    private final List<NewsReference> fResultList;
+    SimpleHitCollector(IndexSearcher searcher, List<NewsReference> resultList) {
+      fSearcher = searcher;
+      fResultList = resultList;
+    }
+
+    @Override
+    public void collect(int doc, float score) {
+      try {
+        Document document = fSearcher.doc(doc);
+
+        /* Receive Stored Fields */
+        long newsId = Long.parseLong(document.get(SearchDocument.ENTITY_ID_TEXT));
+
+        /* Add to List */
+        fResultList.add(new NewsReference(newsId));
+      } catch (IOException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
+    }
+  }
+
+  public List<NewsReference> searchNewsByLink(URI link, boolean copy)   {
+    BooleanQuery query = new BooleanQuery(true);
+    query.add(new TermQuery(new Term(String.valueOf(INews.LINK), link.toString().toLowerCase())), Occur.MUST);
+    query.add(createIsCopyTermQuery(copy));
+    return simpleSearch(query);
+  }
+
+  public List<NewsReference> searchNewsByGuid(IGuid guid, boolean copy) {
+    BooleanQuery query = new BooleanQuery(true);
+    query.add(new TermQuery(new Term(String.valueOf(INews.GUID), guid.getValue().toLowerCase())), Occur.MUST);
+    query.add(createIsCopyTermQuery(copy));
+    return simpleSearch(query);
+  }
+
+  private List<NewsReference> simpleSearch(BooleanQuery query) {
+    try {
+      List<NewsReference> resultList = new ArrayList<NewsReference>(2);
+      /* Make sure the searcher is in sync */
+      IndexSearcher currentSearcher = getCurrentSearcher();
+      /* Use custom hit collector for performance reasons */
+      /* Perform the Search */
+      currentSearcher.search(query, new SimpleHitCollector(currentSearcher, resultList));
+      disposeIfNecessary(currentSearcher);
+
+      return resultList;
+    } catch (IOException e) {
+      throw new PersistenceException("Error searching news", e);
+    }
+  }
+
+  private void disposeIfNecessary(IndexSearcher currentSearcher) throws IOException {
+    AtomicInteger referenceCount = fSearchers.get(currentSearcher);
+    if (referenceCount.decrementAndGet() == 0 && fSearcher != currentSearcher) {
+      fSearchers.remove(currentSearcher);
+      dispose(currentSearcher);
     }
   }
 
@@ -164,9 +244,6 @@ public class ModelSearchImpl implements IModelSearch {
    * boolean)
    */
   public List<SearchHit<NewsReference>> searchNews(Collection<ISearchCondition> conditions, boolean matchAllConditions) throws PersistenceException {
-
-    /* Make sure the searcher is in sync */
-    isSearcherCurrent();
 
     /* Perform the search */
     try {
@@ -190,10 +267,7 @@ public class ModelSearchImpl implements IModelSearch {
 
       /* Create a Query for each condition */
       BooleanQuery fieldQuery = null;
-      Analyzer analyzer;
-      synchronized (this) {
-        analyzer = fIndexer.createAnalyzer();
-      }
+      Analyzer analyzer = Indexer.createAnalyzer();
       for (ISearchCondition condition : conditions) {
 
         /* State Queries already handled */
@@ -251,16 +325,19 @@ public class ModelSearchImpl implements IModelSearch {
           fieldQuery.add(new BooleanClause(new MatchAllDocsQuery(), Occur.MUST));
       }
 
-      /* Use custom hit collector for performance reasons */
+      /* Make sure the searcher is in sync */
+      final IndexSearcher currentSearcher = getCurrentSearcher();
       final List<SearchHit<NewsReference>> resultList = new ArrayList<SearchHit<NewsReference>>();
+
+      /* Use custom hit collector for performance reasons */
       HitCollector collector = new HitCollector() {
         @Override
         public void collect(int doc, float score) {
           try {
-            Document document = fSearcher.doc(doc);
+            Document document = currentSearcher.doc(doc);
 
             /* Receive Stored Fields */
-            long newsId = Long.valueOf(document.get(SearchDocument.ENTITY_ID_TEXT));
+            long newsId = Long.parseLong(document.get(SearchDocument.ENTITY_ID_TEXT));
             INews.State newsState = NEWS_STATES[Integer.parseInt(document.get(NewsDocument.STATE_ID_TEXT))];
 
             Map<Integer, INews.State> data = new HashMap<Integer, INews.State>(1);
@@ -275,9 +352,8 @@ public class ModelSearchImpl implements IModelSearch {
       };
 
       /* Perform the Search */
-      synchronized (this) {
-        fSearcher.search(bQuery, collector);
-      }
+      currentSearcher.search(bQuery, collector);
+      disposeIfNecessary(currentSearcher);
 
       return resultList;
     } catch (IOException e) {
@@ -348,7 +424,7 @@ public class ModelSearchImpl implements IModelSearch {
       String termText = new String(token.termBuffer(), 0, token.termLength());
 
       /* Explicitly ignore Stop Words here */
-      if (!fIndexer.fDisableStopWords && STOP_WORDS.contains(termText))
+      if (!Indexer.DISABLE_STOP_WORDS && STOP_WORDS.contains(termText))
         continue;
 
       WildcardQuery authorQuery = new WildcardQuery(new Term(authorField, termText));
@@ -362,7 +438,7 @@ public class ModelSearchImpl implements IModelSearch {
       String termText = new String(token.termBuffer(), 0, token.termLength());
 
       /* Explicitly ignore Stop Words here */
-      if (!fIndexer.fDisableStopWords && STOP_WORDS.contains(termText))
+      if (!Indexer.DISABLE_STOP_WORDS && STOP_WORDS.contains(termText))
         continue;
 
       WildcardQuery categoryQuery = new WildcardQuery(new Term(categoryField, termText));
@@ -659,26 +735,34 @@ public class ModelSearchImpl implements IModelSearch {
   }
 
   private IndexSearcher createIndexSearcher() throws CorruptIndexException, IOException {
-    return new IndexSearcher(IndexReader.open(fDirectory));
+    IndexSearcher searcher = new IndexSearcher(IndexReader.open(fDirectory));
+    fSearchers.put(searcher, new AtomicInteger(0));
+    return searcher;
   }
 
-  private synchronized void isSearcherCurrent() throws PersistenceException {
+  private IndexSearcher getCurrentSearcher() throws PersistenceException {
     try {
       boolean flushed = fIndexer.flushIfNecessary();
 
-      /* Create searcher if not yet done */
-      if (fSearcher == null)
-        fSearcher = createIndexSearcher();
+      synchronized (this) {
+        /* Re-Create searcher if no longer current */
+        if (flushed) {
+          IndexReader reader = fSearcher.getIndexReader();
+          IndexReader newReader = reader.reopen();
+          if (newReader != reader) {
+            AtomicInteger referenceCount = fSearchers.get(fSearcher);
+            if (referenceCount.get() == 0) {
+              fSearchers.remove(fSearcher);
+              dispose(fSearcher);
+            }
 
-      /* Re-Create searcher if no longer current */
-      else if (flushed) {
-        IndexReader reader = fSearcher.getIndexReader();
-        IndexReader newReader = reader.reopen();
-        if (newReader != reader) {
-          fSearcher.close();
-          reader.close();
-          fSearcher = new IndexSearcher(newReader);
+            fSearcher = new IndexSearcher(newReader);
+            fSearchers.put(fSearcher, new AtomicInteger(1));
+            return fSearcher;
+          }
         }
+        fSearchers.get(fSearcher).incrementAndGet();
+        return fSearcher;
       }
     } catch (IOException e) {
       throw new PersistenceException(e.getMessage(), e);
@@ -696,22 +780,23 @@ public class ModelSearchImpl implements IModelSearch {
     }
   }
 
-  private void disposeSearcher() throws IOException {
-    if (fSearcher != null) {
-      fSearcher.close();
-      fSearcher.getIndexReader().close();
-    }
-
-    fSearcher = null;
+  private synchronized void dispose(IndexSearcher searcher) throws IOException {
+    searcher.close();
+    searcher.getIndexReader().close();
   }
 
   /*
    * @see org.rssowl.core.model.search.IModelSearch#clearIndex()
    */
-  public synchronized void clearIndex() throws PersistenceException {
+  public void clearIndex() throws PersistenceException {
     try {
-      disposeSearcher();
-      fIndexer.clearIndex();
+      synchronized (this) {
+        dispose(fSearcher);
+
+        fIndexer.clearIndex();
+
+        fSearcher = createIndexSearcher();
+      }
     } catch (IOException e) {
       throw new PersistenceException(e.getMessage(), e);
     }
@@ -767,7 +852,7 @@ public class ModelSearchImpl implements IModelSearch {
   /*
    * @see org.rssowl.core.persist.service.IModelSearch#reindexAll(org.eclipse.core.runtime.IProgressMonitor)
    */
-  public synchronized void reindexAll(IProgressMonitor monitor) throws PersistenceException {
+  public void reindexAll(IProgressMonitor monitor) throws PersistenceException {
     /* May be used before Owl is completely set-up */
     Collection<IFeed> feeds = InternalOwl.getDefault().getPersistenceService().getDAOService().getFeedDAO().loadAll();
     monitor.beginTask("Re-Indexing all News", feeds.size());
