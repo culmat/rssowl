@@ -60,7 +60,7 @@ public final class NewsCounterService {
       for (NewsEvent newsEvent : newsEvents) {
         INews news = newsEvent.getEntity();
 
-        if (news.isCopy())
+        if (news.getParentId() != 0)
           continue;
 
         FeedLinkReference feedRef = news.getFeedReference();
@@ -100,7 +100,7 @@ public final class NewsCounterService {
       for (NewsEvent event : newsEvents) {
         INews currentNews = event.getEntity();
 
-        if (currentNews.isCopy())
+        if (currentNews.getParentId() != 0)
           continue;
 
         INews oldNews = event.getOldNews();
@@ -159,7 +159,7 @@ public final class NewsCounterService {
       for (NewsEvent newsEvent : newsEvents) {
         INews news = newsEvent.getEntity();
 
-        if (news.isCopy())
+        if (news.getParentId() != 0)
           continue;
 
         NewsCounterItem counterItem = fNewsCounter.get(news.getFeedReference().getLink());
