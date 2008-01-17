@@ -57,7 +57,6 @@ public class TreeTraversalTest {
   @Before
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
-    Owl.getPersistenceService().getModelSearch().shutdown();
   }
 
   /**
