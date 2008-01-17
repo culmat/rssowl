@@ -57,11 +57,19 @@ public class NewsDocument extends SearchDocument<INews> {
     addField(fields, createEnumField(INews.STATE, news.getState(), Store.YES));
     addField(fields, createBooleanField(INews.IS_FLAGGED, news.isFlagged(), Store.NO));
     addField(fields, createLongField(INews.RATING, news.getRating(), Store.NO));
+    addField(fields, createLongField(INews.PARENT_ID, news.getParentId(), Store.NO));
 
     /* Add Labels */
     Set<ILabel> labels = news.getLabels();
     for (ILabel label : labels) {
       addField(fields, createStringField(INews.LABEL, label.getName().toLowerCase(), Store.NO, Index.UN_TOKENIZED));
+    }
+
+    /* Add Guid, only if it's not null and is a permaLink */
+    if (news.getGuid() != null) {
+      String value = news.getGuid().getValue();
+      if (value != null)
+        addField(fields, createStringField(INews.GUID, value.toLowerCase(), Store.NO, Index.UN_TOKENIZED));
     }
 
     /* Add Source */
