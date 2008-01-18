@@ -61,6 +61,7 @@ public class Migration3To4 implements Migration {
     List<NewsBin> newsBins = oc.query(NewsBin.class);
 
     for (INewsBin newsBin : newsBins) {
+      oc.activate(newsBin, Integer.MAX_VALUE);
       for (NewsReference newsRef : newsBin.getNewsRefs()) {
         Query query = oc.query();
         query.constrain(News.class);
