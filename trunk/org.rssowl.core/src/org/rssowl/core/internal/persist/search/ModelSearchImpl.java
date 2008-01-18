@@ -56,6 +56,8 @@ import org.apache.lucene.store.NativeFSLockFactory;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
+import org.rssowl.core.internal.persist.service.DBHelper;
+import org.rssowl.core.internal.persist.service.EntityIdsByEventType;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
@@ -854,19 +856,35 @@ public class ModelSearchImpl implements IModelSearch {
   public void reindexAll(IProgressMonitor monitor) throws PersistenceException {
     /* May be used before Owl is completely set-up */
     Collection<INews> newsList = InternalOwl.getDefault().getPersistenceService().getDAOService().getNewsDAO().loadAll();
+
     monitor.beginTask("Re-Indexing all News", newsList.size());
 
+    EntityIdsByEventType entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
+
+    /* Ensure that we don't lose entities on dirty shutdown */
+    synchronized (entitiesToBeIndexed) {
+      for (INews news : newsList)
+        entitiesToBeIndexed.addUpdatedEntity(news);
+    }
+
+    DBHelper.getEntitiesToBeIndexedDAO().save(entitiesToBeIndexed);
     /* Lock the indexer for the duration of the reindexing */
     synchronized (fIndexer) {
       /* Delete the Index first */
       clearIndex();
 
-      /* Re-Index all Entities: News */
+      /*
+       * Re-Index all Entities: News
+       * newsList is a LazyList so news are only activated on retrieval
+       */
       for (INews news : newsList) {
         if (monitor.isCanceled())
           break;
 
-        fIndexer.index(Collections.singletonList(news), false);
+        /* We don't pass the whole list at once to be able to report progress. */
+        List<INews> indexList = new ArrayList<INews>(1);
+        indexList.add(news);
+        fIndexer.index(indexList, false);
         monitor.worked(1);
       }
       /* Commit in order to avoid first search slowdown */
