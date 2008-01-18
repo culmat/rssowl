@@ -58,7 +58,6 @@ import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
-import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.IMark;
@@ -854,19 +853,24 @@ public class ModelSearchImpl implements IModelSearch {
    */
   public void reindexAll(IProgressMonitor monitor) throws PersistenceException {
     /* May be used before Owl is completely set-up */
-    Collection<IFeed> feeds = InternalOwl.getDefault().getPersistenceService().getDAOService().getFeedDAO().loadAll();
-    monitor.beginTask("Re-Indexing all News", feeds.size());
+    Collection<INews> newsList = InternalOwl.getDefault().getPersistenceService().getDAOService().getNewsDAO().loadAll();
+    monitor.beginTask("Re-Indexing all News", newsList.size());
 
-    /* Delete the Index first */
-    clearIndex();
+    /* Lock the indexer for the duration of the reindexing */
+    synchronized (fIndexer) {
+      /* Delete the Index first */
+      clearIndex();
 
-    /* Re-Index all Entities: News */
-    for (IFeed feed : feeds) {
-      if (monitor.isCanceled())
-        break;
+      /* Re-Index all Entities: News */
+      for (INews news : newsList) {
+        if (monitor.isCanceled())
+          break;
 
-      fIndexer.index(new ArrayList<INews>(feed.getNews()), false);
-      monitor.worked(1);
+        fIndexer.index(Collections.singletonList(news), false);
+        monitor.worked(1);
+      }
+      /* Commit in order to avoid first search slowdown */
+      fIndexer.flushIfNecessary();
     }
 
     /* Finished */
