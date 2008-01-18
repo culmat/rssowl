@@ -27,6 +27,7 @@ package org.rssowl.core.internal.persist.dao;
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.internal.persist.LazySet;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.search.ModelSearchImpl;
 import org.rssowl.core.internal.persist.service.DBHelper;
@@ -82,6 +83,11 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
       DBHelper.putEventTemplate(createSaveEventTemplate(news));
       ((News) news).acquireReadLockSpecial();
     }
+  }
+
+  @Override
+  public Collection<INews> loadAll() {
+    return new LazySet<INews>(fDb.query(News.class), fDb);
   }
 
   @Override
