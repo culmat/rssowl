@@ -36,6 +36,7 @@ import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.Folder;
 import org.rssowl.core.internal.persist.Label;
 import org.rssowl.core.internal.persist.News;
+import org.rssowl.core.internal.persist.NewsBin;
 import org.rssowl.core.internal.persist.Preference;
 import org.rssowl.core.internal.persist.migration.MigrationResult;
 import org.rssowl.core.internal.persist.migration.Migrations;
@@ -43,6 +44,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.NewsCounterItem;
 import org.rssowl.core.persist.INews.State;
+import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.LoggingSafeRunnable;
@@ -549,11 +551,16 @@ public class DBManager {
     }
     monitor.worked(15);
 
-    Query query = sourceDb.query();
-    query.constrain(News.class);
-    query.descend("fParentId").constrain(0).not();
-    for (Object news : query.execute())
-      destinationDb.ext().set(news, Integer.MAX_VALUE);
+    for (NewsBin newsBin : sourceDb.query(NewsBin.class)) {
+      for (NewsReference newsRef : newsBin.getNewsRefs()) {
+        Query query = sourceDb.query();
+        query.constrain(News.class);
+        query.descend("fId").constrain(newsRef.getId());
+        Object news = query.execute().next();
+        sourceDb.activate(news, Integer.MAX_VALUE);
+        destinationDb.ext().set(news, Integer.MAX_VALUE);
+      }
+    }
 
     monitor.worked(25);
 
