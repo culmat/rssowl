@@ -32,22 +32,21 @@ import com.db4o.ObjectSet;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
-public final class LazySet<E extends IEntity> implements Set<E>   {
+public final class LazyList<E extends IEntity> implements List<E>   {
 
-  private final Set<Long> fIds;
+  private final LongArrayList fIds;
   private final ObjectContainer fObjectContainer;
 
-  public LazySet(ObjectSet<? extends E> entities, ObjectContainer objectContainer) {
+  public LazyList(ObjectSet<? extends E> entities, ObjectContainer objectContainer) {
     Assert.isNotNull(entities, "entities");
     Assert.isNotNull(objectContainer, "objectContainer");
     long[] ids = entities.ext().getIDs();
-    fIds = new LinkedHashSet<Long>(ids.length);
-    for (long id : ids) {
-      fIds.add(id);
-    }
+    fIds = new LongArrayList(ids.length);
+    fIds.setAll(ids);
     fObjectContainer = objectContainer;
   }
 
@@ -74,36 +73,102 @@ public final class LazySet<E extends IEntity> implements Set<E>   {
     return array;
   }
 
-  public Iterator<E> iterator() {
-    return new Iterator<E>() {
-      private final Iterator<Long> fDelegateIterator = fIds.iterator();
+  private E getEntity(long id) {
+    E object = fObjectContainer.ext().getByID(id);
+    fObjectContainer.activate(object, Integer.MAX_VALUE);
+    return object;
+  }
+
+  public E get(int index) {
+    return getEntity(fIds.get(index));
+  }
+
+  public int indexOf(Object o) {
+    if (o instanceof IEntity) {
+      IEntity entity = (IEntity) o;
+      if (entity.getId() != null)
+        return fIds.indexOf(entity.getId());
+    }
+    return -1;
+  }
+
+  public int lastIndexOf(Object o) {
+    if (o instanceof IEntity) {
+      IEntity entity = (IEntity) o;
+      if (entity.getId() != null)
+        return fIds.lastIndexOf(entity.getId());
+    }
+    return -1;
+  }
+
+  public ListIterator<E> listIterator() {
+    return listIterator(0);
+  }
+
+  public ListIterator<E> listIterator(int index) {
+    return new ListIterator<E>() {
+
+      private int cursor;
+      private int lastReturned = -1;
       public boolean hasNext() {
-        return fDelegateIterator.hasNext();
+        return cursor < fIds.size();
+      }
+
+      public boolean hasPrevious() {
+        return cursor > 0;
       }
 
       public E next() {
-        Long id = fDelegateIterator.next();
-        E object = fObjectContainer.ext().getByID(id);
-        fObjectContainer.activate(object, Integer.MAX_VALUE);
-        return object;
+        E entity = getEntity(fIds.get(cursor));
+        lastReturned = cursor++;
+        return entity;
+      }
+
+      public int nextIndex() {
+        return cursor;
+      }
+
+      public E previous() {
+        E entity = getEntity(fIds.get(--cursor));
+        lastReturned = cursor;
+        return entity;
+      }
+
+      public int previousIndex() {
+        return cursor - 1;
       }
 
       public void remove() {
+        if (lastReturned == -1)
+          throw new IllegalStateException();
+
+        fIds.removeByIndex(lastReturned);
+        if (lastReturned < cursor)
+          --cursor;
+
+        lastReturned = -1;
+      }
+
+      public void set(E o) {
+        throw new UnsupportedOperationException();
+      }
+
+      public void add(E o) {
         throw new UnsupportedOperationException();
       }
     };
   }
 
-  public boolean add(E e) {
-    throw new UnsupportedOperationException();
+  public E remove(int index) {
+    return getEntity(fIds.removeByIndex(index));
   }
 
-  public boolean addAll(Collection< ? extends E> c) {
-    throw new UnsupportedOperationException();
+  public Iterator<E> iterator() {
+    return listIterator();
   }
 
   public void clear() {
-    throw new UnsupportedOperationException();
+    fIds.clear();
   }
 
   public boolean contains(Object o) {
@@ -150,10 +215,28 @@ public final class LazySet<E extends IEntity> implements Set<E>   {
   }
 
   public boolean remove(Object o) {
-    throw new UnsupportedOperationException();
+    int index = indexOf(o);
+    if (index >= 0) {
+      fIds.removeByIndex(index);
+      return true;
+    }
+    return false;
   }
 
   public boolean removeAll(Collection< ? > c) {
+    boolean changed = false;
+    for (Object o : c)
+      changed |= remove(o);
+
+    return changed;
+  }
+
+  public int size() {
+    return fIds.size();
+  }
+
+  public List<E> subList(int fromIndex, int toIndex) {
+    //TODO Implement
     throw new UnsupportedOperationException();
   }
 
@@ -161,7 +244,23 @@ public final class LazySet<E extends IEntity> implements Set<E>   {
     throw new UnsupportedOperationException();
   }
 
-  public int size() {
-    return fIds.size();
+  public void add(int index, E element) {
+    throw new UnsupportedOperationException();
+  }
+
+  public boolean addAll(int index, Collection<? extends E> c) {
+    throw new UnsupportedOperationException();
+  }
+
+  public E set(int index, E element) {
+    throw new UnsupportedOperationException();
+  }
+
+  public boolean add(E e) {
+    throw new UnsupportedOperationException();
+  }
+
+  public boolean addAll(Collection< ? extends E> c) {
+    throw new UnsupportedOperationException();
   }
 }
