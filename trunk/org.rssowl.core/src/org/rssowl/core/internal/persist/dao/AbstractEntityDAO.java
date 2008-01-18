@@ -85,9 +85,12 @@ public abstract class AbstractEntityDAO<T extends IEntity,
       List<T> list = loadList(id);
       if (list.isEmpty())
         return null;
-      if (list.size() > 1)
-        throw new IllegalStateException("There should only be a single entity for a given id, but there are: " + list.size());
-
+      if (list.size() > 1) {
+        String message = "There should only be a single entity for a given id, but there are: " + list.size() + ", id: " + id + ", entities:\n";
+        for (T entity : list)
+          message += entity.toString() + "\n";
+        throw new IllegalStateException(message);
+      }
       T entity = list.get(0);
       // TODO Activate completely by default for now. Must decide how to deal
       // with this.
