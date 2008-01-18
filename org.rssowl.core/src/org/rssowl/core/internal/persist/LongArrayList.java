@@ -65,6 +65,14 @@ public class LongArrayList {
     return -1;
   }
 
+  public int lastIndexOf(long element) {
+    for (int i = fSize - 1; i >= 0; --i) {
+      if (fElements[i] == element)
+        return i;
+    }
+    return -1;
+  }
+
   public final boolean removeByElement(long element) {
     int index = indexOf(element);
     if (index >= 0) {
@@ -174,5 +182,9 @@ public class LongArrayList {
   @Override
   public final String toString() {
     return Arrays.toString(fElements);
+  }
+
+  public final boolean isEmpty() {
+    return fSize == 0;
   }
 }
