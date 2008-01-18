@@ -143,17 +143,25 @@ public class Indexer {
             fIndexWriter.addDocument(newsDoc.getDocument());
           }
 
-          /* Mark as in need for a flush */
-          fFlushRequired = true;
         }
       } catch (IOException e) {
         Activator.getDefault().getLog().log(Activator.getDefault().createErrorStatus(e.getMessage(), e));
       }
     }
 
-    /* Notify Listeners */
-    if (fFlushRequired)
+    /*
+     * Change the fFlushRequired field at the end. This increases concurrency
+     * slightly by allowing some minor staleness. More concretely if a reader
+     * performs a search while index is taking place for the first time since
+     * the last flush, it will just use the current searcher instead of blocking.
+     * This is similar to what is done in removeFromIndex.
+     */
+    if (docCount > 0) {
+      fFlushRequired = true;
+
+      /* Notify Listeners */
       fSearch.notifyIndexUpdated(docCount);
+    }
   }
 
   /**
@@ -173,11 +181,13 @@ public class Indexer {
       docCount++;
     }
 
-    /* Mark as in need for a flush */
-    fFlushRequired = true;
+    if (docCount > 0) {
+      /* Mark as in need for a flush */
+      fFlushRequired = true;
 
-    /* Notify Listeners */
-    fSearch.notifyIndexUpdated(docCount);
+      /* Notify Listeners */
+      fSearch.notifyIndexUpdated(docCount);
+    }
   }
 
   //TODO Consider renaming to commitIfNecessary
@@ -202,7 +212,7 @@ public class Indexer {
     return true;
   }
 
-  synchronized void shutdown() throws IOException {
+  synchronized void shutdown() {
     unregisterListeners();
     dispose();
     saveCommittedNews(true, fUncommittedNews);
