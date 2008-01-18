@@ -28,7 +28,7 @@ import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.BookMark;
 import org.rssowl.core.internal.persist.Description;
 import org.rssowl.core.internal.persist.Feed;
-import org.rssowl.core.internal.persist.LazySet;
+import org.rssowl.core.internal.persist.LazyList;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.dao.DAOServiceImpl;
 import org.rssowl.core.internal.persist.dao.DescriptionDAOImpl;
@@ -374,6 +374,6 @@ public class DBHelper {
   }
   public static Collection<IFeed> loadAllFeeds(ObjectContainer db) {
     ObjectSet<? extends IFeed> entities = db.query(Feed.class);
-    return new LazySet<IFeed>(entities, db);
+    return new LazyList<IFeed>(entities, db);
   }
 }
