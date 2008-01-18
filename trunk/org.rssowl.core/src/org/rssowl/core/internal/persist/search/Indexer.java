@@ -185,7 +185,7 @@ public class Indexer {
   //TODO Perhaps commit after fUncommittedNews has a certain size instead
   //of relying always in this method. In most situations this method will
   //be called often though
-  boolean flushIfNecessary() throws IOException {
+  boolean flushIfNecessary() throws PersistenceException {
     if (!fFlushRequired)
       return false;
 
@@ -469,11 +469,15 @@ public class Indexer {
     return new Term(SearchDocument.ENTITY_ID_TEXT, value);
   }
 
-  private void dispose() throws IOException {
+  private void dispose() throws PersistenceException {
     if (fIndexWriter == null)
       return;
 
-    fIndexWriter.close();
+    try {
+      fIndexWriter.close();
+    } catch (IOException e) {
+      throw new PersistenceException(e);
+    }
     fIndexWriter = null;
     fFlushRequired = false;
   }
