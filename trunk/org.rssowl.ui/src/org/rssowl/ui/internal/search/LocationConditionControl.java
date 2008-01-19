@@ -104,7 +104,7 @@ public class LocationConditionControl extends Composite {
       Object[] checkedObjects = fViewer.getCheckedElements();
       IStructuredSelection selection = new StructuredSelection(checkedObjects);
 
-      List<IFolderChild> entities = ModelUtils.getFoldersAndBookMarks(selection);
+      List<IFolderChild> entities = ModelUtils.getFoldersBookMarksBins(selection);
       List<IEntity> entitiesTmp = new ArrayList<IEntity>(entities);
 
       /* Normalize */

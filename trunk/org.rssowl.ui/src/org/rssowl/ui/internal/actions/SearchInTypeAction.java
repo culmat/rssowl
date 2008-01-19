@@ -74,7 +74,7 @@ public class SearchInTypeAction extends Action {
       selection = new StructuredSelection(new FolderReference(selectedRootFolderID).resolve());
     }
 
-    List<IFolderChild> entities = ModelUtils.getFoldersAndBookMarks(selection);
+    List<IFolderChild> entities = ModelUtils.getFoldersBookMarksBins(selection);
     List<IEntity> entitiesTmp = new ArrayList<IEntity>(entities);
 
     /* Normalize */

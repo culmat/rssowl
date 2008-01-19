@@ -34,6 +34,7 @@ import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchValueType;
@@ -44,6 +45,7 @@ import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FolderReference;
+import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.DateUtils;
@@ -70,17 +72,29 @@ import java.util.Map.Entry;
  */
 public class ModelUtils {
 
+  /** Folder Index Value for Long Arrays */
+  public static final int FOLDER = 0;
+
+  /** Bookmark Index Value for Long Arrays */
+  public static final int BOOKMARK = 1;
+
+  /** Newsbin Index Value for Long Arrays */
+  public static final int NEWSBIN = 2;
+
   /**
    * @param entities A list of folder childs.
    * @return Returns a multi-dimensional array where an array of {@link Long} is
    * stored in the first index representing IDs of all {@link IFolder} in the
    * list. The second index is an array of {@link Long} that represents the IDs
-   * of all {@link IBookMark} in the list. Returns <code>null</code> if the
-   * list of {@link IFolderChild} did not contain any folders or bookmarks.
+   * of all {@link IBookMark} in the list. The third index is an array of
+   * {@link Long} that represents the IDs of all {@link INewsBin} in the list.
+   * Returns <code>null</code> if the list of {@link IFolderChild} did not
+   * contain any folders or bookmarks.
    */
   public static Long[][] toPrimitive(List<IFolderChild> entities) {
     List<Long> folderIds = null;
     List<Long> bookmarkIds = null;
+    List<Long> newsbinIds = null;
 
     for (IEntity entity : entities) {
 
@@ -100,20 +114,31 @@ public class ModelUtils {
         bookmarkIds.add(entity.getId());
       }
 
+      /* NewsBin */
+      else if (entity instanceof INewsBin) {
+        if (newsbinIds == null)
+          newsbinIds = new ArrayList<Long>();
+
+        newsbinIds.add(entity.getId());
+      }
+
       /* Other type not supported */
       else
-        throw new IllegalArgumentException("Only Folders and Bookmars are allowed!");
+        throw new IllegalArgumentException("Only Folders, Bookmars and News Bins are allowed!");
     }
 
-    Long[][] result = new Long[2][];
+    Long[][] result = new Long[3][];
 
     if (folderIds != null)
-      result[0] = folderIds.toArray(new Long[folderIds.size()]);
+      result[FOLDER] = folderIds.toArray(new Long[folderIds.size()]);
 
     if (bookmarkIds != null)
-      result[1] = bookmarkIds.toArray(new Long[bookmarkIds.size()]);
+      result[BOOKMARK] = bookmarkIds.toArray(new Long[bookmarkIds.size()]);
 
-    if (folderIds == null && bookmarkIds == null)
+    if (newsbinIds != null)
+      result[NEWSBIN] = newsbinIds.toArray(new Long[newsbinIds.size()]);
+
+    if (folderIds == null && bookmarkIds == null && newsbinIds == null)
       return null;
 
     return result;
@@ -243,17 +268,19 @@ public class ModelUtils {
    * @param primitives A multi-dimensional array where an array of {@link Long}
    * is stored in the first index representing IDs of all {@link IFolder} in the
    * list. The second index is an array of {@link Long} that represents the IDs
-   * of all {@link IBookMark} in the list.
-   * @return A list of folder childs.
+   * of all {@link IBookMark} in the list. The third index is an array of
+   * {@link Long} that represents the IDs of all {@link INewsBin} in the list.
+   * @return A list of folder childs (limited to folders, bookmarks and news
+   * bins).
    */
   public static List<IFolderChild> toEntities(Long[][] primitives) {
     List<IFolderChild> childs = new ArrayList<IFolderChild>();
 
     /* Folders */
-    for (int i = 0; primitives[0] != null && i < primitives[0].length; i++) {
+    for (int i = 0; primitives[FOLDER] != null && i < primitives[FOLDER].length; i++) {
       try {
-        if (primitives[0][i] != null) {
-          IFolder folder = new FolderReference(primitives[0][i]).resolve();
+        if (primitives[FOLDER][i] != null) {
+          IFolder folder = new FolderReference(primitives[FOLDER][i]).resolve();
           if (folder != null)
             childs.add(folder);
         }
@@ -263,15 +290,30 @@ public class ModelUtils {
     }
 
     /* BookMarks */
-    for (int i = 0; primitives[1] != null && i < primitives[1].length; i++) {
+    for (int i = 0; primitives[BOOKMARK] != null && i < primitives[BOOKMARK].length; i++) {
       try {
-        if (primitives[1][i] != null) {
-          IBookMark bookmark = new BookMarkReference(primitives[1][i]).resolve();
+        if (primitives[BOOKMARK][i] != null) {
+          IBookMark bookmark = new BookMarkReference(primitives[BOOKMARK][i]).resolve();
           if (bookmark != null)
             childs.add(bookmark);
         }
       } catch (PersistenceException e) {
         /* Ignore - Could be deleted already */
+      }
+    }
+
+    /* News Bins */
+    if (primitives.length == 3) {
+      for (int i = 0; primitives[NEWSBIN] != null && i < primitives[NEWSBIN].length; i++) {
+        try {
+          if (primitives[NEWSBIN][i] != null) {
+            INewsBin newsbin = new NewsBinReference(primitives[NEWSBIN][i]).resolve();
+            if (newsbin != null)
+              childs.add(newsbin);
+          }
+        } catch (PersistenceException e) {
+          /* Ignore - Could be deleted already */
+        }
       }
     }
 
@@ -307,9 +349,9 @@ public class ModelUtils {
   /**
    * @param selection Any structured selection.
    * @return A List of {@link IFolderChild} from the given Selection containing
-   * {@link IFolder} and {@link IBookMark}.
+   * {@link IFolder}, {@link IBookMark} and {@link INewsBin}.
    */
-  public static List<IFolderChild> getFoldersAndBookMarks(IStructuredSelection selection) {
+  public static List<IFolderChild> getFoldersBookMarksBins(IStructuredSelection selection) {
     if (selection.isEmpty())
       return new ArrayList<IFolderChild>(0);
 
@@ -317,7 +359,7 @@ public class ModelUtils {
     List<IFolderChild> entities = new ArrayList<IFolderChild>(elements.size());
 
     for (Object object : elements) {
-      if (object instanceof IFolder || object instanceof IBookMark)
+      if (object instanceof IFolder || object instanceof IBookMark || object instanceof INewsBin)
         entities.add((IFolderChild) object);
     }
 
