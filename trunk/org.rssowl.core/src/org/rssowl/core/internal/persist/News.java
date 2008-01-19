@@ -873,8 +873,8 @@ public class News extends AbstractEntity implements INews {
       str.append("\nNews ID: ").append(getId());
       if (getTitle() != null)
         str.append("\nTitle: ").append(getTitle());
-      if (getLink() != null)
-        str.append("\nLink: ").append(getLink());
+      if (getLinkAsText() != null)
+        str.append("\nLink: ").append(getLinkAsText());
     } finally {
       fLock.releaseReadLock();
     }

@@ -16,7 +16,6 @@ import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.util.HTMLStripReader;
 
 import java.io.StringReader;
-import java.net.URI;
 import java.util.Date;
 import java.util.List;
 
@@ -169,11 +168,11 @@ public abstract class SearchDocument<T extends IEntity> {
    * @param index
    * @return Field
    */
-  protected Field createURIField(int fieldConstant, URI value, Store store, Index index) {
+  protected Field createURIField(int fieldConstant, String value, Store store, Index index) {
     if (value == null)
       return null;
 
-    return new Field(String.valueOf(fieldConstant), value.toString().toLowerCase(), store, index);
+    return new Field(String.valueOf(fieldConstant), value.toLowerCase(), store, index);
   }
 
   /**
@@ -240,7 +239,7 @@ public abstract class SearchDocument<T extends IEntity> {
 
     /* Add EMail if present */
     else if (person.getEmail() != null)
-      return createURIField(fieldConstant, person.getEmail(), store, Index.UN_TOKENIZED);
+      return createURIField(fieldConstant, person.getEmail().toString(), store, Index.UN_TOKENIZED);
 
     return null;
   }

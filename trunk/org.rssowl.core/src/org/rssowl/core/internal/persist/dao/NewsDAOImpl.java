@@ -142,11 +142,11 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
               throw createIllegalException("No news were found with guid: " + //$NON-NLS-1$
                   newsItem.getGuid().getValue(), newsItem);
             }
-          } else if (newsItem.getLink() != null) {
+          } else if (newsItem.getLinkAsText() != null) {
             equivalentNews = getNewsFromLink(newsItem, true);
             if (equivalentNews.isEmpty()) {
               throw createIllegalException("No news were found with link: " + //$NON-NLS-1$
-                  newsItem.getLink().toString(), newsItem);
+                  newsItem.getLinkAsText(), newsItem);
             }
           } else
             equivalentNews = Collections.singletonList(newsItem);
@@ -322,11 +322,11 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
                   throw createIllegalException("No news were found with guid: " + //$NON-NLS-1$
                       newsItem.getGuid().getValue(), newsItem);
                 }
-              } else if (newsItem.getLink() != null) {
+              } else if (newsItem.getLinkAsText() != null) {
                 equivalentNews = getNewsFromLink(newsItem, true);
                 if (equivalentNews.isEmpty()) {
                   throw createIllegalException("No news were found with link: " + //$NON-NLS-1$
-                      newsItem.getLink().toString(), newsItem);
+                      newsItem.getLinkAsText(), newsItem);
                 }
               } else
                 equivalentNews = Collections.singletonList(newsItem);

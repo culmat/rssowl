@@ -199,7 +199,7 @@ public class OPMLInterpreter extends BasicInterpreter {
       }
 
       /* HTML URL - If not yet set as Link */
-      else if ("htmlurl".equals(name) && news.getLink() == null) { //$NON-NLS-1$
+      else if ("htmlurl".equals(name) && news.getLinkAsText() == null) { //$NON-NLS-1$
         URI uri = URIUtils.createURI(attribute.getValue());
         if (uri != null)
           news.setLink(uri);
