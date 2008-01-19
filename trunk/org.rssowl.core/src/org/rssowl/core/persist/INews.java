@@ -558,12 +558,15 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
    */
   void removeAttachment(IAttachment attachment);
 
-//  /**
-//   * @return {@code true} if this INews is a copy. Copies are not contained
-//   * in the original IFeed and are usually part of INewsBins.
-//   */
-//  boolean isCopy();
-
+  /**
+   * Return the id of the parent of this INews or 0 if the parent is a feed.
+   * Hence this method can used to find out whether this news is still attached
+   * to the original feed or it's a copy attached to another parent (e.g. INewsBin).
+   * If the latter, calling {@code getFeedReference().resolve()} will return a feed
+   * that does _not_ contain this news.
+   *
+   * @return the id of the parent of this INews or 0 if the parent is a feed.
+   */
   long getParentId();
 
   NewsReference toReference();
