@@ -28,7 +28,6 @@ import static junit.framework.Assert.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -631,7 +630,6 @@ public class DBManagerTest {
     URI anotherUri = createURI("http://anotheruri.com");
     news.setLink(anotherUri);
 
-    assertSame("URI is not being cached", anotherUri, news.getLink());
     assertEquals(anotherUri, news.getLink());
   }
 
