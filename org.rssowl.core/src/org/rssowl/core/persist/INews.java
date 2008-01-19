@@ -570,4 +570,18 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
   long getParentId();
 
   NewsReference toReference();
+
+  /**
+   * Convenience method that returns the feed this news belongs to as text.
+   *
+   * @return the feed's link as text.
+   */
+  String getFeedLinkAsText();
+
+  /**
+   * Convenience method that returns the link of this news as text.
+   *
+   * @return the link of this news as text.
+   */
+  String getLinkAsText();
 }
