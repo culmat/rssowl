@@ -686,6 +686,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
       if (fNewsFilter.isPatternSet())
         fNewsFilter.setPattern("");
 
+      /* Update news mark in filter */
+      fNewsFilter.setNewsMark(fInput.getMark());
+
       /* Apply Input */
       setInput(fInput.getMark(), true);
     }
@@ -1225,6 +1228,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     fNewsFilter = new NewsFilter();
     fNewsFilter.setType(fInitialFilterType);
     fNewsFilter.setSearchTarget(fInitialSearchTarget);
+    fNewsFilter.setNewsMark(fInput.getMark());
 
     fNewsGrouping = new NewsGrouping();
     fNewsGrouping.setType(fInitialGroupType);
