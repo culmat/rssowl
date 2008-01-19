@@ -380,6 +380,7 @@ public class NewsFilter extends ViewerFilter {
 
     /* Match on Pattern */
     ISearchField field = null;
+    SearchSpecifier specifier = SearchSpecifier.CONTAINS;
     switch (fSearchTarget) {
       case ALL:
         field = fModelFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
@@ -395,6 +396,7 @@ public class NewsFilter extends ViewerFilter {
 
       case CATEGORY:
         field = fModelFactory.createSearchField(INews.CATEGORIES, INews.class.getName());
+        specifier = SearchSpecifier.IS;
         break;
 
       case HEADLINE:
@@ -403,10 +405,11 @@ public class NewsFilter extends ViewerFilter {
 
       case SOURCE:
         field = fModelFactory.createSearchField(INews.SOURCE, INews.class.getName());
+        specifier = SearchSpecifier.IS;
         break;
     }
 
-    conditions.add(fModelFactory.createSearchCondition(field, SearchSpecifier.IS, pattern));
+    conditions.add(fModelFactory.createSearchCondition(field, specifier, pattern));
 
     /* Perform Search */
     return Owl.getPersistenceService().getModelSearch().searchNews(conditions, true);
