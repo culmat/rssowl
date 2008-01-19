@@ -29,6 +29,7 @@ import org.eclipse.jface.dialogs.DialogPage;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.rssowl.core.Owl;
@@ -47,6 +48,8 @@ import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
+import org.rssowl.ui.internal.dialogs.LoginDialog;
+import org.rssowl.ui.internal.util.JobRunner;
 
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -55,6 +58,10 @@ import java.util.Map;
 
 /**
  * A {@link Wizard} to easily create a new {@link IBookMark}.
+ * <p>
+ * TODO Instead of showing a login dialog if the feed is protected rather have a
+ * wizard page asking for username and password.
+ * </p>
  *
  * @author bpasero
  */
@@ -139,14 +146,19 @@ public class CreateBookmarkWizard extends Wizard {
           monitor.beginTask("Please wait while loading the title from the feed...", IProgressMonitor.UNKNOWN);
 
           String feedTitle = null;
+          URI link = null;
           try {
-            final URI link = new URI(linkText);
+            link = new URI(linkText);
             feedTitle = Owl.getConnectionService().getLabel(link);
           } catch (final ConnectionException e) {
 
             /* Authentication Required */
-            if (e instanceof AuthenticationRequiredException) {
-              //TODO Rather show another Page for credentials then!
+            if (e instanceof AuthenticationRequiredException && handleProtectedFeed(link, ((AuthenticationRequiredException) e).getRealm())) {
+              try {
+                feedTitle = Owl.getConnectionService().getLabel(link);
+              } catch (ConnectionException e1) {
+                Activator.getDefault().logError(e.getMessage(), e);
+              }
             }
           } catch (URISyntaxException e) {
             Activator.getDefault().logError(e.getMessage(), e);
@@ -166,6 +178,22 @@ public class CreateBookmarkWizard extends Wizard {
         Activator.getDefault().logError(e.getMessage(), e);
       }
     }
+  }
+
+  private boolean handleProtectedFeed(final URI feedLink, final String realm) {
+    final boolean[] result = new boolean[1];
+
+    JobRunner.runSyncedInUIThread(getShell(), new Runnable() {
+      public void run() {
+
+        /* Show Login Dialog */
+        LoginDialog login = new LoginDialog(getShell(), feedLink, realm);
+        if (login.open() == Window.OK)
+          result[0] = true;
+      }
+    });
+
+    return result[0];
   }
 
   /*
@@ -242,8 +270,16 @@ public class CreateBookmarkWizard extends Wizard {
         public void run(IProgressMonitor monitor) {
           try {
             loadedTitle[0] = Owl.getConnectionService().getLabel(uriObj);
-          } catch (ConnectionException e) {
-            Activator.getDefault().logError(e.getMessage(), e);
+          } catch (final ConnectionException e) {
+
+            /* Authentication Required */
+            if (e instanceof AuthenticationRequiredException && handleProtectedFeed(uriObj, ((AuthenticationRequiredException) e).getRealm())) {
+              try {
+                loadedTitle[0] = Owl.getConnectionService().getLabel(uriObj);
+              } catch (ConnectionException e1) {
+                Activator.getDefault().logError(e.getMessage(), e);
+              }
+            }
           }
         }
       };
