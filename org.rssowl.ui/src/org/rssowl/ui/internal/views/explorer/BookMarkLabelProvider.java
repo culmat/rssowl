@@ -269,7 +269,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
 
     if (hasNew)
       return fSearchMarkNewIcon;
-    else if (hasMatchingNews || !fIndicateState)
+    else if (hasMatchingNews)
       return fSearchMarkIcon;
     else
       return fSearchMarkEmptyIcon;
@@ -280,7 +280,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
 
     if (hasNew)
       return fNewsBinNewIcon;
-    else if (hasMatchingNews || !fIndicateState)
+    else if (hasMatchingNews)
       return fNewsBinIcon;
     else
       return fNewsBinEmptyIcon;
