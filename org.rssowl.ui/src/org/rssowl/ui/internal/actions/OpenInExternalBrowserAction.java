@@ -55,8 +55,8 @@ public class OpenInExternalBrowserAction extends Action {
     for (Object object : selection) {
       if (object instanceof INews) {
         INews news = (INews) object;
-        if (news.getLink() != null)
-          BrowserUtils.openLink(news.getLink().toString());
+        if (news.getLinkAsText() != null)
+          BrowserUtils.openLink(news.getLinkAsText());
       }
     }
   }

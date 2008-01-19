@@ -375,7 +375,7 @@ public class NewsTableControl implements IFeedViewPart {
     Set<INews> news = ModelUtils.normalize(selection.toList());
 
     if (!news.isEmpty())
-      event.data = news.iterator().next().getLink().toString();
+      event.data = news.iterator().next().getLinkAsText();
   }
 
   /*
