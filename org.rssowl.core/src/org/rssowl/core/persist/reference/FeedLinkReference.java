@@ -30,13 +30,14 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.service.PersistenceException;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * A <code>FeedLinkReference</code> is a lightweight representation of IFeed.
  * The actual IFeed can be retrieved by calling the resolve() method.
  */
 public final class FeedLinkReference {
-  private final URI fLink;
+  private final String fLinkText;
 
   /**
    * Creates an instance of this object for a Feed with link <code>link</code>.
@@ -46,14 +47,29 @@ public final class FeedLinkReference {
    */
   public FeedLinkReference(URI link) {
     Assert.isNotNull(link, "link"); //$NON-NLS-1$
-    this.fLink = link;
+    fLinkText = link.toString();
   }
 
   /**
    * @return the link of the feed this object references.
    */
   public final URI getLink() {
-    return fLink;
+    try {
+      return new URI(fLinkText);
+    } catch (URISyntaxException e) {
+      /* Cannot happen */
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * Convenience method that returns the link of the feed this object references
+   * as text.
+   *
+   * @return text of the referenced feed's link.
+   */
+  public String getLinkAsText() {
+    return fLinkText;
   }
 
   /**
@@ -66,7 +82,7 @@ public final class FeedLinkReference {
    * persistence layer.
    */
   public final IFeed resolve() throws PersistenceException {
-    return Owl.getPersistenceService().getDAOService().getFeedDAO().load(fLink);
+    return Owl.getPersistenceService().getDAOService().getFeedDAO().load(getLink());
   }
 
   /**
@@ -80,8 +96,8 @@ public final class FeedLinkReference {
   public boolean references(IFeed feed) {
     Assert.isNotNull(feed);
 
-    URI entityLink = feed.getLink();
-    return entityLink == null ? false : fLink.equals(entityLink);
+    String entityLinkText = feed.getLink().toString();
+    return entityLinkText == null ? false : fLinkText.equals(entityLinkText);
   }
 
   @Override
@@ -93,12 +109,12 @@ public final class FeedLinkReference {
       return false;
 
     FeedLinkReference other = (FeedLinkReference) obj;
-    return fLink.toString().equals(other.fLink.toString());
+    return fLinkText.equals(other.fLinkText);
   }
 
   @Override
   public int hashCode() {
-    return fLink.toString().hashCode();
+    return fLinkText.hashCode();
   }
 
   @Override
@@ -109,6 +125,6 @@ public final class FeedLinkReference {
     if (index != -1)
       name = name.substring(index + 1, name.length());
 
-    return name + " (Link = " + fLink + ")";
+    return name + " (Link = " + fLinkText + ")";
   }
 }
