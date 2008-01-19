@@ -60,18 +60,28 @@ public class ImportUtils {
           List<IFolderChild> newLocations = new ArrayList<IFolderChild>();
 
           /* Folders */
-          for (int i = 0; value[0] != null && i < value[0].length; i++) {
-            if (value[0][i] != null) {
-              Long id = value[0][i];
+          for (int i = 0; value[ModelUtils.FOLDER] != null && i < value[ModelUtils.FOLDER].length; i++) {
+            if (value[ModelUtils.FOLDER][i] != null) {
+              Long id = value[ModelUtils.FOLDER][i];
               newLocations.add(oldIdToFolderChildMap.get(id));
             }
           }
 
           /* BookMarks */
-          for (int i = 0; value[1] != null && i < value[1].length; i++) {
-            if (value[1][i] != null) {
-              Long id = value[1][i];
+          for (int i = 0; value[ModelUtils.BOOKMARK] != null && i < value[ModelUtils.BOOKMARK].length; i++) {
+            if (value[ModelUtils.BOOKMARK][i] != null) {
+              Long id = value[ModelUtils.BOOKMARK][i];
               newLocations.add(oldIdToFolderChildMap.get(id));
+            }
+          }
+
+          /* NewsBins */
+          if (value.length == 3) {
+            for (int i = 0; value[ModelUtils.NEWSBIN] != null && i < value[ModelUtils.NEWSBIN].length; i++) {
+              if (value[ModelUtils.NEWSBIN][i] != null) {
+                Long id = value[ModelUtils.NEWSBIN][i];
+                newLocations.add(oldIdToFolderChildMap.get(id));
+              }
             }
           }
 

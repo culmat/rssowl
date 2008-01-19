@@ -171,7 +171,7 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
 
       /* Export Newsbin */
       else if (mark instanceof INewsBin) {
-        writer.write("<rssowl:newsbin name=\"" + name + "\" />\n");
+        writer.write("<rssowl:newsbin name=\"" + name + "\" " + getIDAttribute(mark) + "/>\n");
       }
     }
 
@@ -212,7 +212,8 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
 
       for (IFolderChild child : locations) {
         boolean isFolder = (child instanceof IFolder);
-        str.append("\t\t\t<rssowl:location isFolder=\"" + isFolder + "\" value=\"" + child.getId() + "\" />\n");
+        boolean isNewsbin = (child instanceof INewsBin);
+        str.append("\t\t\t<rssowl:location isBin=\"" + isNewsbin + "\" isFolder=\"" + isFolder + "\" value=\"" + child.getId() + "\" />\n");
       }
 
       str.append("\t\t</rssowl:searchvalue>\n");
