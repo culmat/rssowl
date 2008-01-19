@@ -53,6 +53,7 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.NativeFSLockFactory;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
@@ -205,41 +206,84 @@ public class ModelSearchImpl implements IModelSearch {
     }
   }
 
-  public List<NewsReference> searchNewsByLink(URI link, boolean copy) {
+  public Map<IGuid, List<NewsReference>> searchNewsByGuids(List<IGuid> guids, boolean copy)   {
+    Map<IGuid, List<NewsReference>> linkToRefs = new HashMap<IGuid, List<NewsReference>>(guids.size());
+    IndexSearcher currentSearcher = getCurrentSearcher();
+    for (IGuid guid : guids) {
+      BooleanQuery query = createGuidQuery(guid, copy);
+      linkToRefs.put(guid, simpleSearch(currentSearcher, query));
+    }
+    disposeIfNecessary(currentSearcher);
+    return linkToRefs;
+  }
+
+  public Map<URI, List<NewsReference>> searchNewsByLinks(List<URI> links, boolean copy)   {
+    Map<URI, List<NewsReference>> linkToRefs = new HashMap<URI, List<NewsReference>>(links.size());
+    IndexSearcher currentSearcher = getCurrentSearcher();
+    for (URI link : links) {
+      BooleanQuery query = createNewsByLinkBooleanQuery(link, copy);
+      linkToRefs.put(link, simpleSearch(currentSearcher, query));
+    }
+    disposeIfNecessary(currentSearcher);
+    return linkToRefs;
+  }
+
+  public List<NewsReference> searchNewsByLink(URI link, boolean copy)   {
+    Assert.isNotNull(link, "link");
+    BooleanQuery query = createNewsByLinkBooleanQuery(link, copy);
+    return simpleSearch(query);
+  }
+
+  private BooleanQuery createNewsByLinkBooleanQuery(URI link, boolean copy) {
     BooleanQuery query = new BooleanQuery(true);
     query.add(new TermQuery(new Term(String.valueOf(INews.LINK), link.toString().toLowerCase())), Occur.MUST);
     query.add(createIsCopyTermQuery(copy));
-    return simpleSearch(query);
+    return query;
   }
 
   public List<NewsReference> searchNewsByGuid(IGuid guid, boolean copy) {
-    BooleanQuery query = new BooleanQuery(true);
-    query.add(new TermQuery(new Term(String.valueOf(INews.GUID), guid.getValue().toLowerCase())), Occur.MUST);
-    query.add(createIsCopyTermQuery(copy));
+    Assert.isNotNull(guid, "guid");
+    BooleanQuery query = createGuidQuery(guid, copy);
     return simpleSearch(query);
   }
 
-  private List<NewsReference> simpleSearch(BooleanQuery query) {
-    try {
-      List<NewsReference> resultList = new ArrayList<NewsReference>(2);
-      /* Make sure the searcher is in sync */
-      IndexSearcher currentSearcher = getCurrentSearcher();
-      /* Use custom hit collector for performance reasons */
-      /* Perform the Search */
-      currentSearcher.search(query, new SimpleHitCollector(currentSearcher, resultList));
-      disposeIfNecessary(currentSearcher);
-
-      return resultList;
-    } catch (IOException e) {
-      throw new PersistenceException("Error searching news", e);
-    }
+  private BooleanQuery createGuidQuery(IGuid guid, boolean copy) {
+    BooleanQuery query = new BooleanQuery(true);
+    query.add(new TermQuery(new Term(String.valueOf(INews.GUID), guid.getValue().toLowerCase())), Occur.MUST);
+    query.add(createIsCopyTermQuery(copy));
+    return query;
   }
 
-  private void disposeIfNecessary(IndexSearcher currentSearcher) throws IOException {
+  private List<NewsReference> simpleSearch(BooleanQuery query) {
+    /* Make sure the searcher is in sync */
+    IndexSearcher currentSearcher = getCurrentSearcher();
+    List<NewsReference> newsRefs = simpleSearch(currentSearcher, query);
+    disposeIfNecessary(currentSearcher);
+    return newsRefs;
+  }
+
+  private List<NewsReference> simpleSearch(IndexSearcher currentSearcher, BooleanQuery query) {
+      List<NewsReference> resultList = new ArrayList<NewsReference>(2);
+
+      try {
+        /* Use custom hit collector for performance reasons */
+        /* Perform the Search */
+        currentSearcher.search(query, new SimpleHitCollector(currentSearcher, resultList));
+        return resultList;
+      } catch (IOException e) {
+        throw new PersistenceException(e);
+      }
+  }
+
+  private void disposeIfNecessary(IndexSearcher currentSearcher)    {
     AtomicInteger referenceCount = fSearchers.get(currentSearcher);
     if (referenceCount.decrementAndGet() == 0 && fSearcher != currentSearcher) {
       fSearchers.remove(currentSearcher);
-      dispose(currentSearcher);
+      try {
+        dispose(currentSearcher);
+      } catch (IOException e) {
+        throw new PersistenceException(e);
+      }
     }
   }
 
