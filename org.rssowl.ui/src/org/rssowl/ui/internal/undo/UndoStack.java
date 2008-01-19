@@ -37,7 +37,7 @@ import java.util.List;
  * @author bpasero
  */
 public class UndoStack {
-  private static final int MAX_SIZE = 10;
+  private static final int MAX_SIZE = 20;
   private static UndoStack singleton = new UndoStack();
 
   private List<IUndoOperation> fOperations = new ArrayList<IUndoOperation>();
