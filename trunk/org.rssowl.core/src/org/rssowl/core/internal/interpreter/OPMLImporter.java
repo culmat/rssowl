@@ -36,6 +36,7 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
@@ -221,21 +222,26 @@ public class OPMLImporter implements ITypeImporter {
     if (locationElements.size() > 0) {
       List<Long> folderIds = new ArrayList<Long>(locationElements.size());
       List<Long> bookmarkIds = new ArrayList<Long>(locationElements.size());
+      List<Long> newsbinIds = new ArrayList<Long>(locationElements.size());
 
       for (int i = 0; i < locationElements.size(); i++) {
         Element locationElement = (Element) locationElements.get(i);
         Long id = Long.parseLong(locationElement.getAttributeValue("value"));
         boolean isFolder = Boolean.parseBoolean(locationElement.getAttributeValue("isFolder"));
+        boolean isBin = Boolean.parseBoolean(locationElement.getAttributeValue("isBin"));
 
         if (isFolder)
           folderIds.add(id);
+        else if (isBin)
+          newsbinIds.add(id);
         else
           bookmarkIds.add(id);
       }
 
-      Long[][] result = new Long[2][];
+      Long[][] result = new Long[3][];
       result[0] = folderIds.toArray(new Long[folderIds.size()]);
       result[1] = bookmarkIds.toArray(new Long[bookmarkIds.size()]);
+      result[2] = newsbinIds.toArray(new Long[bookmarkIds.size()]);
 
       return result;
     }
@@ -406,6 +412,16 @@ public class OPMLImporter implements ITypeImporter {
   private void processNewsBin(Element newsBinElement, IFolder folder) {
     String name = newsBinElement.getAttributeValue("name");
 
-    Owl.getModelFactory().createNewsBin(null, folder, name);
+    /* RSSOwl Namespace Attributes */
+    Long id = null;
+    Attribute idAttribute = newsBinElement.getAttribute("id", fRSSOwlNamespace);
+    if (idAttribute != null)
+      id = Long.valueOf(idAttribute.getValue());
+
+    INewsBin newsbin = Owl.getModelFactory().createNewsBin(null, folder, name);
+
+    /* Assign old ID value */
+    if (id != null)
+      newsbin.setProperty(ID_KEY, id);
   }
 }

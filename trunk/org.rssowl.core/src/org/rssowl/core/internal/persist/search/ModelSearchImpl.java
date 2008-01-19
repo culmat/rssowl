@@ -64,12 +64,14 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FolderReference;
+import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IndexListener;
@@ -177,10 +179,11 @@ public class ModelSearchImpl implements IModelSearch {
     return new BooleanClause(termQuery, occur);
   }
 
-  private static final class SimpleHitCollector extends HitCollector   {
+  private static final class SimpleHitCollector extends HitCollector {
 
     private final IndexSearcher fSearcher;
     private final List<NewsReference> fResultList;
+
     SimpleHitCollector(IndexSearcher searcher, List<NewsReference> resultList) {
       fSearcher = searcher;
       fResultList = resultList;
@@ -202,7 +205,7 @@ public class ModelSearchImpl implements IModelSearch {
     }
   }
 
-  public List<NewsReference> searchNewsByLink(URI link, boolean copy)   {
+  public List<NewsReference> searchNewsByLink(URI link, boolean copy) {
     BooleanQuery query = new BooleanQuery(true);
     query.add(new TermQuery(new Term(String.valueOf(INews.LINK), link.toString().toLowerCase())), Occur.MUST);
     query.add(createIsCopyTermQuery(copy));
@@ -568,6 +571,20 @@ public class ModelSearchImpl implements IModelSearch {
       }
     }
 
+    /* Receive NewsBins */
+    if (value.length == 3) {
+      for (int i = 0; value[2] != null && i < value[2].length; i++) {
+        try {
+          if (value[2][i] != null) {
+            INewsBin newsbin = new NewsBinReference(value[2][i]).resolve();
+            addNewsBinLocationClause(bQuery, newsbin);
+          }
+        } catch (PersistenceException e) {
+          /* Ignore - Entity could have been deleted already */
+        }
+      }
+    }
+
     /* The folder could be empty, make sure to add at least 1 Clause */
     if (bQuery.clauses().isEmpty())
       bQuery.add(new TermQuery(new Term(String.valueOf(INews.FEED), "")), Occur.SHOULD);
@@ -584,10 +601,12 @@ public class ModelSearchImpl implements IModelSearch {
       for (IFolder childFolder : folders)
         addFolderLocationClause(bQuery, childFolder);
 
-      /* BookMarks */
+      /* BookMarks and Newsbins */
       for (IMark mark : marks)
         if (mark instanceof IBookMark)
           addBookMarkLocationClause(bQuery, (IBookMark) mark);
+        else if (mark instanceof INewsBin)
+          addNewsBinLocationClause(bQuery, (INewsBin) mark);
     }
   }
 
@@ -596,6 +615,11 @@ public class ModelSearchImpl implements IModelSearch {
       String feed = bookmark.getFeedLinkReference().getLink().toString().toLowerCase();
       bQuery.add(new TermQuery(new Term(String.valueOf(INews.FEED), feed)), Occur.SHOULD);
     }
+  }
+
+  private void addNewsBinLocationClause(BooleanQuery bQuery, INewsBin newsbin) {
+    if (newsbin != null)
+      bQuery.add(new TermQuery(new Term(String.valueOf(INews.PARENT_ID), NumberTools.longToString(newsbin.getId()))), Occur.SHOULD);
   }
 
   private Query createStringQuery(Analyzer analyzer, ISearchCondition condition) throws ParseException, IOException {
@@ -874,8 +898,8 @@ public class ModelSearchImpl implements IModelSearch {
       clearIndex();
 
       /*
-       * Re-Index all Entities: News
-       * newsList is a LazyList so news are only activated on retrieval
+       * Re-Index all Entities: News newsList is a LazyList so news are only
+       * activated on retrieval
        */
       for (INews news : newsList) {
         if (monitor.isCanceled())
