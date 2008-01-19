@@ -583,14 +583,9 @@ public class NewsContentProvider implements ITreeContentProvider {
         return (((ISearchMark) mark).containsNews(news));
       }
 
-      /* Update: Check if News Bin contains the given News */
-      else if (type == EventType.UPDATE && mark instanceof INewsBin) {
-        return news.getParentId() != 0 && (((INewsBin) mark).containsNews(news));
-      }
-
-      /* Remove: Always update (workaround) */
-      else if (type == EventType.REMOVE && mark instanceof INewsBin) {
-        return true; //TODO Find a better solution - the bin can't know if it contained this news
+      /* Update / Remove: Check if News points to this Bin */
+      else if (mark instanceof INewsBin) {
+        return news.getParentId() == mark.getId();
       }
     }
 
