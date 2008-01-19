@@ -34,6 +34,7 @@ import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -67,7 +68,7 @@ public class BookMark extends Mark implements IBookMark {
     super(id, folder, name);
     Assert.isNotNull(feedRef, "feedRef cannot be null"); //$NON-NLS-1$
     fFeedLinkReference = feedRef;
-    fFeedLink = feedRef.getLink().toString();
+    fFeedLink = feedRef.getLinkAsText();
   }
 
   /**
@@ -111,7 +112,7 @@ public class BookMark extends Mark implements IBookMark {
   public synchronized void setFeedLinkReference(FeedLinkReference feedLinkRef) {
     Assert.isNotNull(feedLinkRef, "link cannot be null"); //$NON-NLS-1$
     fFeedLinkReference = feedLinkRef;
-    fFeedLink = feedLinkRef.getLink().toString();
+    fFeedLink = feedLinkRef.getLinkAsText();
   }
 
   /**
