@@ -28,6 +28,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IAttachment;
@@ -88,6 +89,12 @@ public class NewsGroupFilterTest {
     today.set(Calendar.DAY_OF_WEEK, today.getFirstDayOfWeek());
     fEarlierThisWeek = new Date(today.getTimeInMillis() + 1000);
     fLastWeek = new Date(fEarlierThisWeek.getTime() - WEEK);
+
+    Owl.getPersistenceService().recreateSchema();
+  }
+
+  private void waitForIndexer() throws InterruptedException {
+    Thread.sleep(500);
   }
 
   /**
@@ -98,7 +105,6 @@ public class NewsGroupFilterTest {
     IFeed feed = fFactory.createFeed(null, new URI("http://www.link.com"));
     feed.setTitle("Feed Name");
     DynamicDAO.save(feed);
-
 
     INews news1 = fFactory.createNews(null, feed, new Date());
     news1.setTitle("News 1");
@@ -445,6 +451,7 @@ public class NewsGroupFilterTest {
    * @throws Exception
    */
   @Test
+  @Ignore
   public void testNewsFiltering() throws Exception {
     IFeed feed = fFactory.createFeed(null, new URI("http://www.link.com"));
     feed.setTitle("Feed Name");
@@ -469,13 +476,21 @@ public class NewsGroupFilterTest {
     news5.setTitle("News 5");
     news5.setPublishDate(new Date(0));
 
+    DynamicDAO.save(news1);
+    DynamicDAO.save(news2);
+    DynamicDAO.save(news3);
+    DynamicDAO.save(news4);
+    DynamicDAO.save(news5);
+
+    waitForIndexer();
+
     /* Fill into Array */
     Object elements[] = new Object[] { news1, news2, news3, news4, news5 };
 
     /* Filter: Show All */
     {
       fFiltering.setType(NewsFilter.Type.SHOW_ALL);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(elements.length, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { news1, news2, news3, news4, news5 })));
     }
@@ -488,7 +503,7 @@ public class NewsGroupFilterTest {
       news5.setState(INews.State.DELETED);
 
       fFiltering.setType(NewsFilter.Type.SHOW_NEW);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(1, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { news1 })));
 
@@ -499,7 +514,7 @@ public class NewsGroupFilterTest {
     /* Filter: Show Unread */
     {
       fFiltering.setType(NewsFilter.Type.SHOW_UNREAD);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(4, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { news2, news4 })));
     }
@@ -510,7 +525,7 @@ public class NewsGroupFilterTest {
       news2.setFlagged(true);
 
       fFiltering.setType(NewsFilter.Type.SHOW_STICKY);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(2, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { news1, news2 })));
     }
@@ -518,7 +533,7 @@ public class NewsGroupFilterTest {
     /* Filter: Show Recent */
     {
       fFiltering.setType(NewsFilter.Type.SHOW_RECENT);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(2, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { news1, news2 })));
     }
@@ -528,10 +543,14 @@ public class NewsGroupFilterTest {
       news1.setTitle("Foo Bar");
       news2.setTitle("Bar foo");
 
+      DynamicDAO.save(news1);
+      DynamicDAO.save(news2);
+      waitForIndexer();
+
       fFiltering.setType(NewsFilter.Type.SHOW_ALL);
       fFiltering.setPattern("*foo*");
       fFiltering.setSearchTarget(NewsFilter.SearchTarget.HEADLINE);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(2, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { news1, news2 })));
 
@@ -547,8 +566,16 @@ public class NewsGroupFilterTest {
       fFactory.createAttachment(null, news4).setLink(new URI("http://www.foo.com"));
       fFactory.createPerson(null, news5).setName("Foo bar");
 
+      DynamicDAO.save(news1);
+      DynamicDAO.save(news2);
+      DynamicDAO.save(news3);
+      DynamicDAO.save(news4);
+      DynamicDAO.save(news5);
+      waitForIndexer();
+
+      fFiltering.setPattern("foo");
       fFiltering.setSearchTarget(NewsFilter.SearchTarget.ALL);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(5, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { news1, news2, news3, news4, news5 })));
     }
@@ -556,7 +583,7 @@ public class NewsGroupFilterTest {
     /* Filter: Text Pattern (Author) */
     {
       fFiltering.setSearchTarget(NewsFilter.SearchTarget.AUTHOR);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(1, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { news5 })));
     }
@@ -566,8 +593,12 @@ public class NewsGroupFilterTest {
       fFactory.createCategory(null, news1).setName("Foo bar");
       fFactory.createCategory(null, news2).setName("Bar Foo");
 
+      DynamicDAO.save(news1);
+      DynamicDAO.save(news2);
+      waitForIndexer();
+
       fFiltering.setSearchTarget(NewsFilter.SearchTarget.CATEGORY);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(2, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { news1, news2 })));
     }
@@ -577,8 +608,12 @@ public class NewsGroupFilterTest {
       fFactory.createSource(news4).setLink(new URI("http://www.foo.com"));
       fFactory.createSource(news5).setLink(new URI("http://www.foo.com"));
 
+      DynamicDAO.save(news4);
+      DynamicDAO.save(news5);
+      waitForIndexer();
+
       fFiltering.setSearchTarget(NewsFilter.SearchTarget.SOURCE);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(2, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { news4, news5 })));
     }
@@ -591,8 +626,12 @@ public class NewsGroupFilterTest {
 
       fFactory.createAttachment(null, news2).setLink(new URI("http://www.foo.com"));
 
+      DynamicDAO.save(news1);
+      DynamicDAO.save(news2);
+      waitForIndexer();
+
       fFiltering.setSearchTarget(NewsFilter.SearchTarget.ATTACHMENTS);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(3, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { news1, news2, news4 })));
     }
