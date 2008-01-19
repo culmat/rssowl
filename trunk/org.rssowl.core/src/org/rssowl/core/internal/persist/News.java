@@ -101,7 +101,6 @@ public class News extends AbstractEntity implements INews {
 
   private String fTitle;
 
-  private transient URI fLink;
   private String fLinkText;
 
   private String fBaseUri;
@@ -118,13 +117,12 @@ public class News extends AbstractEntity implements INews {
   private int fStateOrdinal = INews.State.NEW.ordinal();
 
   private String fGuidValue;
-  private boolean fGuidIsPermaLink;
   private transient IGuid fGuid;
+  private boolean fGuidIsPermaLink;
 
   private ISource fSource;
 
   private String fFeedLink;
-  private transient FeedLinkReference fFeedLinkReference;
 
   private IPerson fAuthor;
 
@@ -242,12 +240,8 @@ public class News extends AbstractEntity implements INews {
   public final void init() {
     fLock.acquireWriteLock();
     try {
-      if (fLink == null) {
-        fLink = createURI(fLinkText);
-        fFeedLinkReference = new FeedLinkReference(createURI(fFeedLink));
-        if (fGuidValue != null)
-          fGuid = new Guid(fGuidValue, fGuidIsPermaLink);
-      }
+      if (fGuidValue != null)
+        fGuid = new Guid(fGuidValue, fGuidIsPermaLink);
     } finally {
       fLock.releaseWriteLock();
     }
@@ -511,7 +505,7 @@ public class News extends AbstractEntity implements INews {
   public URI getLink() {
     fLock.acquireReadLock();
     try {
-      return fLink;
+      return fLinkText == null ? null : createURI(fLinkText);
     } finally {
      fLock.releaseReadLock();
     }
@@ -524,7 +518,6 @@ public class News extends AbstractEntity implements INews {
     fLock.acquireWriteLock();
     try {
       fLinkText = link == null ? null : link.toString();
-      fLink = link;
     } finally {
       fLock.releaseWriteLock();
     }
@@ -584,7 +577,7 @@ public class News extends AbstractEntity implements INews {
   public FeedLinkReference getFeedReference() {
     fLock.acquireReadLock();
     try {
-      return fFeedLinkReference;
+      return fFeedLink == null ? null : new FeedLinkReference(createURI(fFeedLink));
     } finally {
       fLock.releaseReadLock();
     }
@@ -1144,7 +1137,6 @@ public class News extends AbstractEntity implements INews {
     fLock.acquireWriteLock();
     try {
       this.fFeedLink = feed.getLink().toString();
-      this.fFeedLinkReference = new FeedLinkReference(feed.getLink());
     } finally {
       fLock.releaseWriteLock();
     }
@@ -1194,5 +1186,13 @@ public class News extends AbstractEntity implements INews {
     } finally {
       fLock.releaseWriteLock();
     }
+  }
+
+  public String getFeedLinkAsText() {
+    return fFeedLink;
+  }
+
+  public String getLinkAsText() {
+    return fLinkText;
   }
 }
