@@ -108,7 +108,7 @@ public class FeedDefinitionPage extends WizardPage {
   }
 
   String getLink() {
-    return fFeedByLinkButton.getSelection() ? fFeedLinkInput.getText() : null;
+    return fFeedByLinkButton.getSelection() ? fFeedLinkInput.getText().trim() : null;
   }
 
   String getKeyword() {
