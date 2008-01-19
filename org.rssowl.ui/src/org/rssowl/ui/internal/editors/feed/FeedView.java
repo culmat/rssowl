@@ -93,6 +93,8 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.actions.RetargetActions;
+import org.rssowl.ui.internal.undo.NewsStateOperation;
+import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.ITreeNode;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -759,6 +761,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
           newsToUpdate.add(newsItem);
       }
 
+      /* Support Undo */
+      if (!newsToUpdate.isEmpty())
+        UndoStack.getInstance().addOperation(new NewsStateOperation(newsToUpdate, INews.State.UNREAD, true));
+
       /* Perform Operation */
       fNewsDao.setState(newsToUpdate, INews.State.UNREAD, true, false);
     }
@@ -791,6 +797,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
           /* Force quick update on Feed-Change */
           if (event == UIEvent.FEED_CHANGE && !newsToUpdate.isEmpty())
             Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+
+          /* Support Undo */
+          if (!newsToUpdate.isEmpty())
+            UndoStack.getInstance().addOperation(new NewsStateOperation(newsToUpdate, markRead ? INews.State.READ : INews.State.UNREAD, true));
 
           /* Perform Operation */
           fNewsDao.setState(newsToUpdate, markRead ? INews.State.READ : INews.State.UNREAD, true, false);
