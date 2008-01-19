@@ -389,7 +389,7 @@ public class OPMLImporter implements ITypeImporter {
     if (type == null || type instanceof IMark)
       return;
 
-    /* Recursivley Interpret Children */
+    /* Recursively Interpret Children */
     List<?> feedChildren = outline.getChildren();
     for (Iterator<?> iter = feedChildren.iterator(); iter.hasNext();) {
       Element child = (Element) iter.next();
