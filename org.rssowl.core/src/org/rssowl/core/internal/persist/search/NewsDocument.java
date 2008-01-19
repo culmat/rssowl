@@ -44,8 +44,8 @@ public class NewsDocument extends SearchDocument<INews> {
     addField(fields, createHTMLField(INews.DESCRIPTION, news.getDescription()));
 
     /* Add URIs */
-    addField(fields, createURIField(INews.LINK, news.getLink(), Store.NO, Index.UN_TOKENIZED));
-    addField(fields, createURIField(INews.FEED, news.getFeedReference().getLink(), Store.NO, Index.UN_TOKENIZED));
+    addField(fields, createURIField(INews.LINK, news.getLinkAsText(), Store.NO, Index.UN_TOKENIZED));
+    addField(fields, createURIField(INews.FEED, news.getFeedReference().getLinkAsText(), Store.NO, Index.UN_TOKENIZED));
 
     /* Add Dates */
     addField(fields, createDateField(INews.RECEIVE_DATE, news.getReceiveDate(), Store.NO));
@@ -75,7 +75,7 @@ public class NewsDocument extends SearchDocument<INews> {
     /* Add Source */
     if (news.getSource() != null) {
       if (news.getSource().getLink() != null)
-        addField(fields, createURIField(INews.SOURCE, news.getSource().getLink(), Store.NO, Index.UN_TOKENIZED));
+        addField(fields, createURIField(INews.SOURCE, news.getSource().getLink().toString(), Store.NO, Index.UN_TOKENIZED));
       else if (news.getSource().getName() != null)
         addField(fields, createStringField(INews.SOURCE, news.getSource().getName(), Store.NO, Index.TOKENIZED));
     }
