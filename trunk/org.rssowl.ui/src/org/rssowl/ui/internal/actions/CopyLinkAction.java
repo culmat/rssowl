@@ -40,7 +40,7 @@ import java.util.List;
 /**
  * Copy the Link of the given Elements into the Clipboard.. E.g. the Link of a
  * BookMark's Feed.
- * 
+ *
  * @author bpasero
  */
 public class CopyLinkAction implements IObjectActionDelegate {
@@ -68,8 +68,8 @@ public class CopyLinkAction implements IObjectActionDelegate {
           i++;
         } else if (element instanceof INews) {
           INews news = (INews) element;
-          if (news.getLink() != null) {
-            str.append(i > 0 ? "\n" : "").append(news.getLink());
+          if (news.getLinkAsText() != null) {
+            str.append(i > 0 ? "\n" : "").append(news.getLinkAsText());
             i++;
           }
         }

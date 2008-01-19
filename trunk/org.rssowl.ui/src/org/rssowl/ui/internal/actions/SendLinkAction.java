@@ -39,7 +39,7 @@ import java.util.List;
 /**
  * Send the Link of the given Elements via EMail. E.g. the Link of a BookMark's
  * Feed.
- * 
+ *
  * @author bpasero
  */
 public class SendLinkAction implements IObjectActionDelegate {
@@ -74,9 +74,9 @@ public class SendLinkAction implements IObjectActionDelegate {
         /* Send Title and Link of News if present */
         else if (element instanceof INews) {
           INews news = (INews) element;
-          if (news.getLink() != null) {
+          if (news.getLinkAsText() != null) {
             String title = ModelUtils.getHeadline(news) + "\n";
-            str.append(i > 0 ? "\n\n" : "").append(title).append(news.getLink());
+            str.append(i > 0 ? "\n\n" : "").append(title).append(news.getLinkAsText());
             i++;
           }
         }

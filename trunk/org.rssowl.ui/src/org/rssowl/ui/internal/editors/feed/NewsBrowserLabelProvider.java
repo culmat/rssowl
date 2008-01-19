@@ -301,7 +301,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     StringBuilder search = new StringBuilder();
 
     String newsTitle = ModelUtils.getHeadline(news);
-    boolean hasLink = news.getLink() != null;
+    boolean hasLink = news.getLinkAsText() != null;
     State state = news.getState();
     boolean isUnread = (state == State.NEW || state == State.UPDATED || state == State.UNREAD);
     String color = !news.getLabels().isEmpty() ? news.getLabels().iterator().next().getColor() : null;
@@ -324,7 +324,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
       /* Link */
       if (hasLink)
-        link(builder, news.getLink().toASCIIString(), newsTitle, cssClass, color);
+        link(builder, news.getLinkAsText(), newsTitle, cssClass, color);
 
       /* Normal */
       else
