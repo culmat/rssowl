@@ -28,17 +28,24 @@ import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.rssowl.core.persist.IAttachment;
-import org.rssowl.core.persist.ICategory;
+import org.rssowl.core.Owl;
+import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.IPerson;
-import org.rssowl.core.persist.ISource;
+import org.rssowl.core.persist.INewsMark;
+import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.SearchSpecifier;
+import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.DateUtils;
+import org.rssowl.core.util.SearchHit;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
-import org.rssowl.ui.internal.util.StringMatcher;
 
-import java.text.BreakIterator;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -121,14 +128,24 @@ public class NewsFilter extends ViewerFilter {
     }
   }
 
-  /* The string pattern matcher used for this pattern filter */
-  private StringMatcher fMatcher;
-
   /* Current Filter Value */
   private Type fType = Type.SHOW_ALL;
 
   /* Current Search Target */
   private SearchTarget fSearchTarget = SearchTarget.HEADLINE;
+
+  /* Misc. */
+  private INewsMark fNewsMark;
+  private List<SearchHit<NewsReference>> fCachedPatternMatchingNews;
+  private IModelFactory fModelFactory = Owl.getModelFactory();
+  private String fPatternString;
+
+  /**
+   * @param newsMark the {@link INewsMark} that is used as source for all news.
+   */
+  public void setNewsMark(INewsMark newsMark) {
+    fNewsMark = newsMark;
+  }
 
   /*
    * @see org.eclipse.jface.viewers.ViewerFilter#select(org.eclipse.jface.viewers.Viewer,
@@ -138,7 +155,7 @@ public class NewsFilter extends ViewerFilter {
   public final boolean select(Viewer viewer, Object parentElement, Object element) {
 
     /* Filter not Active */
-    if (fMatcher == null && fType == Type.SHOW_ALL)
+    if (fCachedPatternMatchingNews == null && fType == Type.SHOW_ALL)
       return true;
 
     return isElementVisible(viewer, element);
@@ -206,7 +223,7 @@ public class NewsFilter extends ViewerFilter {
   Viewer viewer, Object element) {
 
     /* Filter not Active */
-    if (fMatcher == null && fType == Type.SHOW_ALL)
+    if (fCachedPatternMatchingNews == null && fType == Type.SHOW_ALL)
       return true;
 
     /* Element is a News */
@@ -251,8 +268,8 @@ public class NewsFilter extends ViewerFilter {
       }
 
       /* Finally check the Pattern */
-      if (isMatch && fMatcher != null && !wordMatches(news))
-        isMatch = false;
+      if (isMatch && fCachedPatternMatchingNews != null)
+        isMatch = matchesPattern(news);
 
       return isMatch;
     }
@@ -260,6 +277,21 @@ public class NewsFilter extends ViewerFilter {
     return false;
   }
 
+  private boolean matchesPattern(INews news) {
+    if (fCachedPatternMatchingNews == null)
+      return true;
+
+    for (SearchHit<NewsReference> hit : fCachedPatternMatchingNews) {
+      if (hit.getResult().getId() == news.getId())
+        return true;
+    }
+
+    return false;
+  }
+
+  /*
+   * @see org.eclipse.jface.viewers.ViewerFilter#isFilterProperty(java.lang.Object, java.lang.String)
+   */
   @Override
   public boolean isFilterProperty(Object element, String property) {
     return false; // This is handled in needsRefresh() already
@@ -307,7 +339,12 @@ public class NewsFilter extends ViewerFilter {
    * <code>SearchTarget</code> enumeration.
    */
   public void setSearchTarget(SearchTarget searchTarget) {
+    SearchTarget oldTarget = fSearchTarget;
     fSearchTarget = searchTarget;
+
+    /* Cause re-search if required */
+    if (oldTarget != fSearchTarget)
+      setPattern(fPatternString);
   }
 
   /**
@@ -317,10 +354,62 @@ public class NewsFilter extends ViewerFilter {
    * @param patternString
    */
   public void setPattern(String patternString) {
-    if (patternString == null || patternString.equals("")) //$NON-NLS-1$
-      fMatcher = null;
+    fPatternString = patternString;
+
+    /* Pattern Reset */
+    if (!StringUtils.isSet(patternString))
+      fCachedPatternMatchingNews = null;
+
+    /* Pattern Set */
     else
-      fMatcher = new StringMatcher(patternString + "*", true, false); //$NON-NLS-1$
+      fCachedPatternMatchingNews = cacheMatchingNews(patternString);
+  }
+
+  private List<SearchHit<NewsReference>> cacheMatchingNews(String pattern) {
+    List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(2);
+
+    /* Convert to Wildcard Query */
+    if (!pattern.endsWith("*"))
+      pattern = pattern + "*";
+
+    /* Match on Location (not supported for search marks) */
+    if (fNewsMark != null && !(fNewsMark instanceof ISearchMark)) {
+      ISearchField field = fModelFactory.createSearchField(INews.LOCATION, INews.class.getName());
+      conditions.add(fModelFactory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList((IFolderChild) fNewsMark))));
+    }
+
+    /* Match on Pattern */
+    ISearchField field = null;
+    switch (fSearchTarget) {
+      case ALL:
+        field = fModelFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
+        break;
+
+      case ATTACHMENTS:
+        field = fModelFactory.createSearchField(INews.ATTACHMENTS_CONTENT, INews.class.getName());
+        break;
+
+      case AUTHOR:
+        field = fModelFactory.createSearchField(INews.AUTHOR, INews.class.getName());
+        break;
+
+      case CATEGORY:
+        field = fModelFactory.createSearchField(INews.CATEGORIES, INews.class.getName());
+        break;
+
+      case HEADLINE:
+        field = fModelFactory.createSearchField(INews.TITLE, INews.class.getName());
+        break;
+
+      case SOURCE:
+        field = fModelFactory.createSearchField(INews.SOURCE, INews.class.getName());
+        break;
+    }
+
+    conditions.add(fModelFactory.createSearchCondition(field, SearchSpecifier.IS, pattern));
+
+    /* Perform Search */
+    return Owl.getPersistenceService().getModelSearch().searchNews(conditions, true);
   }
 
   /**
@@ -328,152 +417,6 @@ public class NewsFilter extends ViewerFilter {
    * otherwise.
    */
   boolean isPatternSet() {
-    return fMatcher != null;
-  }
-
-  /**
-   * Answers whether the given String matches the pattern.
-   *
-   * @param string the String to test
-   * @return whether the string matches the pattern
-   */
-  private boolean match(String string) {
-    if (fMatcher == null)
-      return true;
-
-    return fMatcher.match(string);
-  }
-
-  /**
-   * Take the given filter text and break it down into words using a
-   * BreakIterator.
-   *
-   * @param text
-   * @return an array of words
-   */
-  private String[] getWords(String text) {
-    List<String> words = new ArrayList<String>();
-
-    /*
-     * Break the text up into words, separating based on whitespace and common
-     * punctuation. Previously used String.split(..., "\\W"), where "\W" is a
-     * regular expression (see the Javadoc for class Pattern). Need to avoid
-     * both String.split and regular expressions, in order to compile against
-     * JCL Foundation (bug 80053). Also need to do this in an NL-sensitive way.
-     * The use of BreakIterator was suggested in bug 90579.
-     */
-    BreakIterator iter = BreakIterator.getWordInstance();
-    iter.setText(text);
-    int i = iter.first();
-    while (i != java.text.BreakIterator.DONE && i < text.length()) {
-      int j = iter.following(i);
-      if (j == java.text.BreakIterator.DONE)
-        j = text.length();
-
-      /* match the word */
-      if (Character.isLetterOrDigit(text.charAt(i))) {
-        String word = text.substring(i, j);
-        words.add(word);
-      }
-      i = j;
-    }
-    return words.toArray(new String[words.size()]);
-  }
-
-  private boolean wordMatches(INews news) {
-
-    /* Custom List that converts Objects to Strings and checks for NULL */
-    List<Object> words = new ArrayList<Object>() {
-      @Override
-      public boolean add(Object o) {
-        if (o instanceof String)
-          return super.add(o);
-
-        else if (o != null)
-          return super.add(o.toString());
-
-        return false;
-      }
-    };
-
-    /* Search Headline */
-    if ((fSearchTarget == SearchTarget.HEADLINE || fSearchTarget == SearchTarget.ALL))
-      words.add(ModelUtils.getHeadline(news));
-
-    /* Search Author */
-    if (fSearchTarget == SearchTarget.AUTHOR || fSearchTarget == SearchTarget.ALL) {
-      IPerson author = news.getAuthor();
-      if (author != null) {
-        words.add(author.getName());
-        words.add(author.getEmail());
-        words.add(author.getUri());
-      }
-    }
-
-    /* Search Category */
-    if (fSearchTarget == SearchTarget.CATEGORY || fSearchTarget == SearchTarget.ALL) {
-      List<ICategory> categories = news.getCategories();
-      for (ICategory category : categories) {
-        words.add(category.getName());
-        words.add(category.getDomain());
-      }
-    }
-
-    /* Search Source */
-    if (fSearchTarget == SearchTarget.SOURCE || fSearchTarget == SearchTarget.ALL) {
-      ISource source = news.getSource();
-      if (source != null) {
-        words.add(source.getName());
-        words.add(source.getLink());
-      }
-    }
-
-    /* Search Attachments */
-    if (fSearchTarget == SearchTarget.ATTACHMENTS || fSearchTarget == SearchTarget.ALL) {
-      List<IAttachment> attachments = news.getAttachments();
-      for (IAttachment attachment : attachments) {
-        words.add(attachment.getType());
-        words.add(attachment.getLink());
-      }
-    }
-
-    /* Search All */
-    if (fSearchTarget == SearchTarget.ALL) {
-      words.add(news.getDescription());
-      words.add(news.getComments());
-      words.add(news.getLink());
-    }
-
-    StringBuilder str = new StringBuilder();
-    for (Object object : words)
-      str.append(object).append(' ');
-
-    return str.length() > 0 && wordMatches(str.toString());
-  }
-
-  /**
-   * Return whether or not if any of the words in text satisfy the match
-   * critera.
-   *
-   * @param text the text to match
-   * @return boolean <code>true</code> if one of the words in text satisifes
-   * the match criteria.
-   */
-  private boolean wordMatches(String text) {
-    if (text == null)
-      return false;
-
-    /* If the whole text matches we are all set */
-    if (match(text))
-      return true;
-
-    /* Otherwise check if any of the words of the text matches */
-    String[] words = getWords(text);
-    for (String word : words) {
-      if (match(word))
-        return true;
-    }
-
-    return false;
+    return fCachedPatternMatchingNews != null;
   }
 }
