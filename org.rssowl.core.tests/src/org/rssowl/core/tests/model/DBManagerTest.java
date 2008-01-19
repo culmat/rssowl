@@ -106,7 +106,6 @@ import org.rssowl.core.tests.TestUtils;
 import com.db4o.ObjectContainer;
 import com.db4o.query.Query;
 
-import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -605,10 +604,6 @@ public class DBManagerTest {
     news.merge(anotherNews);
 
     assertEquals(uri, news.getLink());
-    Field linkField = News.class.getDeclaredField("fLink");
-    linkField.setAccessible(true);
-    URI link = (URI) linkField.get(news);
-    assertEquals(uri, link);
   }
 
   /**
