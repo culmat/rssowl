@@ -29,7 +29,6 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
-import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 
@@ -119,7 +118,7 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
 
     /* Sort by Feed */
     else if (fSortBy == NewsTableControl.Columns.FEED)
-      result = compareByFeed(news1.getFeedReference(), news2.getFeedReference());
+      result = compareByFeed(news1.getFeedLinkAsText(), news2.getFeedLinkAsText());
 
     /* Fall Back to default sort if result is 0 */
     if (result == 0)
@@ -128,8 +127,8 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
     return result;
   }
 
-  private int compareByFeed(FeedLinkReference feed1, FeedLinkReference feed2) {
-    int result = feed1.getLink().compareTo(feed2.getLink());
+  private int compareByFeed(String feedLink1, String feedLink2) {
+    int result = feedLink1.compareTo(feedLink2);
 
     /* Respect ascending / descending Order */
     return fAscending ? result : result * -1;
