@@ -507,10 +507,6 @@
             name="Mark Sticky"/>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            id="org.rssowl.ui.OpenInBrowser"
-            name="Open in Browser"/>
-      <command
-            categoryId="org.rssowl.ui.commands.category.RSSOwl"
             description="Create a new BookMark"
             id="org.rssowl.ui.actions.NewBookMark"
             name="New BookMark">
@@ -595,11 +591,7 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            id="org.rssowl.ui.OpenInBrowser"
-            name="Open in Browser">
-      </command>
-      <command
-            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.handler.OpenExternalHandler"
             id="org.rssowl.ui.OpenInExternalBrowser"
             name="Open in External Browser">
       </command>

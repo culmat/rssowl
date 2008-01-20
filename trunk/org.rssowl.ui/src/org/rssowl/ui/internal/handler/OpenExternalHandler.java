@@ -22,45 +22,33 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal.actions;
+package org.rssowl.ui.internal.handler;
 
-import org.eclipse.jface.action.Action;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.IHandler;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.rssowl.core.persist.INews;
-import org.rssowl.ui.internal.util.BrowserUtils;
-
-import java.util.List;
+import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 
 /**
+ * This {@link IHandler} is required to support key-bindings for programmatic
+ * added actions like the {@link OpenInExternalBrowserAction}.
+ *
  * @author bpasero
  */
-public class OpenInExternalBrowserAction extends Action {
-  private static final String ID = "org.rssowl.ui.OpenInExternalBrowser";
-  private IStructuredSelection fSelection;
-
-  /**
-   * @param selection
-   */
-  public OpenInExternalBrowserAction(IStructuredSelection selection) {
-    fSelection = selection;
-
-    setText("Open in External Browser");
-    setId(ID);
-    setActionDefinitionId(ID);
-  }
+public class OpenExternalHandler extends AbstractHandler {
 
   /*
-   * @see org.eclipse.jface.action.Action#run()
+   * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
    */
   @Override
-  public void run() {
-    List<?> selection = fSelection.toList();
-    for (Object object : selection) {
-      if (object instanceof INews) {
-        INews news = (INews) object;
-        if (news.getLinkAsText() != null)
-          BrowserUtils.openLink(news.getLinkAsText());
-      }
-    }
+  public Object execute(ExecutionEvent arg0) {
+    IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
+
+    if (selection != null)
+      new OpenInExternalBrowserAction(selection).run();
+
+    return null; //As per JavaDoc
   }
 }
