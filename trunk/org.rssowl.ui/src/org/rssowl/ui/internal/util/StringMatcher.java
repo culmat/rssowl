@@ -17,10 +17,10 @@ import java.util.Vector;
  * A string pattern matcher, suppporting "*" and "?" wildcards.
  */
 public class StringMatcher {
-    private String fPattern;
-    private int fLength; // pattern length
-    private boolean fIgnoreWildCards;
-    private boolean fIgnoreCase;
+    private final String fPattern;
+    private final int fLength; // pattern length
+    private final boolean fIgnoreWildCards;
+    private final boolean fIgnoreCase;
     private boolean fHasLeadingStar;
     private boolean fHasTrailingStar;
     private String fSegments[]; //the given pattern is split into * separated segments

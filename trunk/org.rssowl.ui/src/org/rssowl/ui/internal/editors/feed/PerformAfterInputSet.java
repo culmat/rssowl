@@ -68,8 +68,8 @@ public class PerformAfterInputSet {
     return new PerformAfterInputSet(PerformAfterInputSet.Types.SELECT_SPECIFIC_NEWS, reference);
   }
 
-  private PerformAfterInputSet.Types fType;
-  private NewsReference fNewsToSelect;
+  private final PerformAfterInputSet.Types fType;
+  private final NewsReference fNewsToSelect;
   private boolean fShouldActivate = true;
 
   private PerformAfterInputSet(PerformAfterInputSet.Types type) {

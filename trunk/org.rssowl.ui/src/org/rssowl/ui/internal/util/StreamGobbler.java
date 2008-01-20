@@ -46,7 +46,7 @@ import java.io.InputStreamReader;
  * @author Taken from Java Pitfalls (www.javaworld.com)
  */
 public class StreamGobbler extends Job {
-  private InputStream fIs;
+  private final InputStream fIs;
 
   /**
    * Instantiate a new StreamGobbler

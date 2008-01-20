@@ -63,12 +63,12 @@ public class LoginDialog extends TitleAreaDialog {
   /* Divider between Protocol and Host */
   private static final String PROTOCOL_SEPARATOR = "://";
 
-  private LocalResourceManager fResources;
-  private URI fLink;
+  private final LocalResourceManager fResources;
+  private final URI fLink;
   private Text fUsername;
   private Text fPassword;
-  private ICredentialsProvider fCredProvider;
-  private String fRealm;
+  private final ICredentialsProvider fCredProvider;
+  private final String fRealm;
 
   /**
    * @param parentShell

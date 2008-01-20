@@ -260,15 +260,15 @@ public class NewsTableControl implements IFeedViewPart {
   private NewsComparator fNewsSorter;
   private Cursor fHandCursor;
   private boolean fShowsHandCursor;
-  private AtomicBoolean fBlockNewsStateTracker = new AtomicBoolean(false);
+  private final AtomicBoolean fBlockNewsStateTracker = new AtomicBoolean(false);
   private LabelAdapter fLabelListener;
   private IPreferenceScope fInputPreferences;
-  private INewsDAO fNewsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
+  private final INewsDAO fNewsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
 
   /* Settings */
   private IPreferenceScope fGlobalPreferences;
-  private Columns fInitialSortColumn = Columns.DATE;
-  private boolean fInitialAscending = false;
+  private final Columns fInitialSortColumn = Columns.DATE;
+  private final boolean fInitialAscending = false;
 
   /*
    * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#init(org.eclipse.ui.IEditorSite)

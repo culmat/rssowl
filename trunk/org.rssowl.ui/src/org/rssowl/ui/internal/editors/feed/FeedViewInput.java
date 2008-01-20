@@ -48,9 +48,9 @@ public class FeedViewInput implements IEditorInput {
   static final String MARK_INPUT_CLASS = "org.rssowl.ui.internal.editors.feed.MarkInputClass";
   static final String MARK_INPUT_ID = "org.rssowl.ui.internal.editors.feed.MarkInputId";
 
-  private INewsMark fMark;
+  private final INewsMark fMark;
   private boolean fIsDeleted;
-  private PerformAfterInputSet fPerformOnInputSet;
+  private final PerformAfterInputSet fPerformOnInputSet;
 
   /**
    * @param mark

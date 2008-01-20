@@ -78,7 +78,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
   protected LocalResourceManager fResources;
 
   /* Date Formatter for News */
-  private DateFormat fDateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+  private final DateFormat fDateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
 
   /* Pre-Cache some Colors being used */
   private Color fStickyBgColor;

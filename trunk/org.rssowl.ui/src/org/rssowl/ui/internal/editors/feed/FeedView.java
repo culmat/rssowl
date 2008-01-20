@@ -208,10 +208,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private IPreferenceScope fPreferences;
   private long fOpenTime;
   private boolean fCreated;
-  private Object fCacheJobIdentifier = new Object();
+  private final Object fCacheJobIdentifier = new Object();
   private ImageDescriptor fTitleImageDescriptor;
   private Label fBrowserSep;
-  private INewsDAO fNewsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
+  private final INewsDAO fNewsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
 
   /*
    * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
