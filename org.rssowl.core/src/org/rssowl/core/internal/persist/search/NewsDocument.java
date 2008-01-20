@@ -45,7 +45,7 @@ public class NewsDocument extends SearchDocument<INews> {
 
     /* Add URIs */
     addField(fields, createURIField(INews.LINK, news.getLinkAsText(), Store.NO, Index.UN_TOKENIZED));
-    addField(fields, createURIField(INews.FEED, news.getFeedReference().getLinkAsText(), Store.NO, Index.UN_TOKENIZED));
+    addField(fields, createURIField(INews.FEED, news.getFeedLinkAsText(), Store.NO, Index.UN_TOKENIZED));
 
     /* Add Dates */
     addField(fields, createDateField(INews.RECEIVE_DATE, news.getReceiveDate(), Store.NO));

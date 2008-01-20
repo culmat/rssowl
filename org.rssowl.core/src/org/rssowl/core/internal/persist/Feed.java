@@ -134,7 +134,7 @@ public class Feed extends AbstractEntity implements IFeed {
     Assert.isNotNull(news, "Exception adding NULL as News into Feed"); //$NON-NLS-1$
 
     /* Rule: Child needs to know about its new parent already! */
-    Assert.isTrue(fLinkText.equals(news.getFeedReference().getLink().toString()), "The News has a different Feed set!"); //$NON-NLS-1$
+    Assert.isTrue(fLinkText.equals(news.getFeedLinkAsText()), "The News has a different Feed set!"); //$NON-NLS-1$
 
     fNews.add(news);
   }
