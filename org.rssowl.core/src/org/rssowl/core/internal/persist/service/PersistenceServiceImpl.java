@@ -62,11 +62,11 @@ public class PersistenceServiceImpl extends AbstractPersistenceService {
       getIDGenerator().shutdown();
 
     if (!emergency) {
-      getModelSearch().shutdown();
+      getModelSearch().shutdown(emergency);
       DBManager.getDefault().shutdown();
     } else {
       DBManager.getDefault().shutdown();
-      getModelSearch().shutdown();
+      getModelSearch().shutdown(emergency);
     }
   }
 

@@ -60,9 +60,13 @@ public interface IModelSearch {
    * addition to stopping the indexer, this method also releases the resources
    * required to perform a search.
    *
+   * @param emergency If set to <code>TRUE</code>, this method is called from
+   * a shutdown hook that got triggered from a non-normal shutdown (e.g. System
+   * Shutdown).
+   *
    * @throws PersistenceException
    */
-  void shutdown() throws PersistenceException;
+  void shutdown(boolean emergency) throws PersistenceException;
 
   /**
    * Makes the <code>IModelSearch</code> capable of indexing entities and
