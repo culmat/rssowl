@@ -899,8 +899,8 @@ public class News extends AbstractEntity implements INews {
       str.append("\nState: ").append(getState());
       if (getTitle() != null)
         str.append("\nTitle: ").append(getTitle());
-      if (getLink() != null)
-        str.append("\nLink: ").append(getLink());
+      if (getLinkAsText() != null)
+        str.append("\nLink: ").append(getLinkAsText());
       if (getBase() != null)
         str.append("\nBase URI: ").append(getBase());
       if (getDescription() != null)
@@ -971,7 +971,7 @@ public class News extends AbstractEntity implements INews {
   private boolean simpleFieldsEqual(INews news) {
     return MergeUtils.equals(getBase(), news.getBase()) &&
         MergeUtils.equals(fComments, news.getComments()) &&
-        MergeUtils.equals(getLink(), news.getLink()) &&
+        MergeUtils.equals(fLinkText, news.getLinkAsText()) &&
         MergeUtils.equals(fModifiedDate, news.getModifiedDate()) &&
         MergeUtils.equals(fPublishDate, news.getPublishDate()) &&
         MergeUtils.equals(fInReplyTo, news.getInReplyTo()) &&
@@ -996,7 +996,7 @@ public class News extends AbstractEntity implements INews {
 
       setBase(news.getBase());
       fComments = news.getComments();
-      setLink(news.getLink());
+      fLinkText = news.getLinkAsText();
       fModifiedDate = news.getModifiedDate();
       fPublishDate = news.getPublishDate();
       fTitle = news.getTitle();
