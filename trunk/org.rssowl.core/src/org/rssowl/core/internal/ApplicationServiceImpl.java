@@ -30,7 +30,7 @@ import org.rssowl.core.internal.persist.Description;
 import org.rssowl.core.internal.persist.MergeResult;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.SortedLongArrayList;
-import org.rssowl.core.internal.persist.dao.NewsDAOImpl;
+import org.rssowl.core.internal.persist.search.ModelSearchImpl;
 import org.rssowl.core.internal.persist.service.DB4OIDGenerator;
 import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.internal.persist.service.DBManager;
@@ -42,19 +42,21 @@ import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.runnable.NewsEventRunnable;
+import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IDGenerator;
 import org.rssowl.core.util.RetentionStrategy;
 
 import com.db4o.ObjectContainer;
 import com.db4o.ext.Db4oException;
 
+import java.net.URI;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.ListIterator;
@@ -194,16 +196,30 @@ public class ApplicationServiceImpl implements IApplicationService {
   }
 
   private void updateStateOfUnsavedNewNews(List<INews> news) {
-    NewsDAOImpl newsDAO = (NewsDAOImpl) DynamicDAO.getDAO(INewsDAO.class);
-    for (INews newsItem : news) {
-      List<INews> equivalentNews = Collections.emptyList();
-      if (newsItem.getGuid() != null)
-        equivalentNews = newsDAO.getNewsFromGuid(newsItem, false);
-      else if (newsItem.getLink() != null)
-        equivalentNews = newsDAO.getNewsFromLink(newsItem, false);
+    if (news.isEmpty())
+      return;
 
-      if (!equivalentNews.isEmpty())
-        newsItem.setState(equivalentNews.get(0).getState());
+    List<URI> links = new ArrayList<URI>();
+    List<IGuid> guids = new ArrayList<IGuid>();
+    for (INews newsItem : news) {
+      if (newsItem.getGuid() != null)
+        guids.add(newsItem.getGuid());
+      else if (newsItem.getLink() != null)
+        links.add(newsItem.getLink());
+    }
+
+    ModelSearchImpl modelSearch = (ModelSearchImpl) Owl.getPersistenceService().getModelSearch();
+    Map<URI, List<NewsReference>> linkToNewsRefs = modelSearch.searchNewsByLinks(links, false);
+    Map<IGuid, List<NewsReference>> guidToNewsRefs = modelSearch.searchNewsByGuids(guids, false);
+    for (INews newsItem : news) {
+      List<NewsReference> equivalentNewsRefs = guidToNewsRefs.get(newsItem.getGuid());
+      if (equivalentNewsRefs != null)
+        newsItem.setState(equivalentNewsRefs.get(0).resolve().getState());
+      else {
+        equivalentNewsRefs = linkToNewsRefs.get(newsItem.getLink());
+        if (equivalentNewsRefs != null)
+          newsItem.setState(equivalentNewsRefs.get(0).resolve().getState());
+      }
     }
   }
 
