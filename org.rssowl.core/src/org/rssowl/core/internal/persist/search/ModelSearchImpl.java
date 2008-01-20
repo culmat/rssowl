@@ -164,7 +164,8 @@ public class ModelSearchImpl implements IModelSearch {
   public void shutdown(boolean emergency) throws PersistenceException {
     try {
       /*
-       * Close fIndexer first because it's more important (we may have uncommitted items).
+       * Close fIndexer first because it's more important (we may have
+       * uncommitted items).
        */
       fIndexer.shutdown();
 
@@ -234,7 +235,13 @@ public class ModelSearchImpl implements IModelSearch {
     }
   }
 
-  public Map<IGuid, List<NewsReference>> searchNewsByGuids(List<IGuid> guids, boolean copy)   {
+  /**
+   * @param guids the List of {@link IGuid} to search news for.
+   * @param copy If <code>true</code>, only consider copied News.
+   * @return a List of {@link NewsReference} matching the given search and
+   * grouped by {@link IGuid}.
+   */
+  public Map<IGuid, List<NewsReference>> searchNewsByGuids(List<IGuid> guids, boolean copy) {
     Map<IGuid, List<NewsReference>> linkToRefs = new HashMap<IGuid, List<NewsReference>>(guids.size());
     IndexSearcher currentSearcher = getCurrentSearcher();
     for (IGuid guid : guids) {
@@ -247,7 +254,13 @@ public class ModelSearchImpl implements IModelSearch {
     return linkToRefs;
   }
 
-  public Map<URI, List<NewsReference>> searchNewsByLinks(List<URI> links, boolean copy)   {
+  /**
+   * @param links The Links to search news for.
+   * @param copy If <code>true</code>, only consider copied News.
+   * @return a List of {@link NewsReference} matching the given search and
+   * grouped by the {@link URI}.
+   */
+  public Map<URI, List<NewsReference>> searchNewsByLinks(List<URI> links, boolean copy) {
     Map<URI, List<NewsReference>> linkToRefs = new HashMap<URI, List<NewsReference>>(links.size());
     IndexSearcher currentSearcher = getCurrentSearcher();
     for (URI link : links) {
@@ -260,7 +273,12 @@ public class ModelSearchImpl implements IModelSearch {
     return linkToRefs;
   }
 
-  public List<NewsReference> searchNewsByLink(URI link, boolean copy)   {
+  /**
+   * @param link The Link to search news for.
+   * @param copy If <code>true</code>, only consider copied News.
+   * @return a List of {@link NewsReference} matching the given search.
+   */
+  public List<NewsReference> searchNewsByLink(URI link, boolean copy) {
     Assert.isNotNull(link, "link");
     BooleanQuery query = createNewsByLinkBooleanQuery(link, copy);
     return simpleSearch(query);
@@ -273,6 +291,11 @@ public class ModelSearchImpl implements IModelSearch {
     return query;
   }
 
+  /**
+   * @param guid the {@link IGuid} to search news for.
+   * @param copy If <code>true</code>, only consider copied News.
+   * @return a List of {@link NewsReference} matching the given search.
+   */
   public List<NewsReference> searchNewsByGuid(IGuid guid, boolean copy) {
     Assert.isNotNull(guid, "guid");
     BooleanQuery query = createGuidQuery(guid, copy);
@@ -295,24 +318,26 @@ public class ModelSearchImpl implements IModelSearch {
   }
 
   private List<NewsReference> simpleSearch(IndexSearcher currentSearcher, BooleanQuery query) {
-      List<NewsReference> resultList = new ArrayList<NewsReference>(2);
+    List<NewsReference> resultList = new ArrayList<NewsReference>(2);
 
-      try {
-        /* Use custom hit collector for performance reasons */
-        /* Perform the Search */
-        currentSearcher.search(query, new SimpleHitCollector(currentSearcher, resultList));
-        return resultList;
-      } catch (IOException e) {
-        throw new PersistenceException(e);
-      }
+    try {
+      /* Use custom hit collector for performance reasons */
+      /* Perform the Search */
+      currentSearcher.search(query, new SimpleHitCollector(currentSearcher, resultList));
+      return resultList;
+    } catch (IOException e) {
+      throw new PersistenceException(e);
+    }
   }
 
-  private void disposeIfNecessary(IndexSearcher currentSearcher)    {
+  private void disposeIfNecessary(IndexSearcher currentSearcher) {
     AtomicInteger referenceCount = fSearchers.get(currentSearcher);
     if (referenceCount.decrementAndGet() == 0 && fSearcher != currentSearcher) {
       try {
-        /* May be called by getCurrentSearcher at the same time, but safe because
-         * dispose is safe to be called many times for the same searcher.
+        /*
+         * May be called by getCurrentSearcher at the same time, but safe
+         * because dispose is safe to be called many times for the same
+         * searcher.
          */
         dispose(currentSearcher);
       } catch (IOException e) {
@@ -627,38 +652,29 @@ public class ModelSearchImpl implements IModelSearch {
 
     /* Receive Folders */
     for (int i = 0; value[0] != null && i < value[0].length; i++) {
-      try {
-        if (value[0][i] != null) {
-          IFolder folder = new FolderReference(value[0][i]).resolve();
+      if (value[0][i] != null) {
+        IFolder folder = new FolderReference(value[0][i]).resolve();
+        if (folder != null)
           addFolderLocationClause(bQuery, folder);
-        }
-      } catch (PersistenceException e) {
-        /* Ignore - Entity could have been deleted already */
       }
     }
 
     /* Receive BookMarks */
     for (int i = 0; value[1] != null && i < value[1].length; i++) {
-      try {
-        if (value[1][i] != null) {
-          IBookMark bookmark = new BookMarkReference(value[1][i]).resolve();
+      if (value[1][i] != null) {
+        IBookMark bookmark = new BookMarkReference(value[1][i]).resolve();
+        if (bookmark != null)
           addBookMarkLocationClause(bQuery, bookmark);
-        }
-      } catch (PersistenceException e) {
-        /* Ignore - Entity could have been deleted already */
       }
     }
 
     /* Receive NewsBins */
     if (value.length == 3) {
       for (int i = 0; value[2] != null && i < value[2].length; i++) {
-        try {
-          if (value[2][i] != null) {
-            INewsBin newsbin = new NewsBinReference(value[2][i]).resolve();
+        if (value[2][i] != null) {
+          INewsBin newsbin = new NewsBinReference(value[2][i]).resolve();
+          if (newsbin != null)
             addNewsBinLocationClause(bQuery, newsbin);
-          }
-        } catch (PersistenceException e) {
-          /* Ignore - Entity could have been deleted already */
         }
       }
     }
@@ -853,10 +869,9 @@ public class ModelSearchImpl implements IModelSearch {
       synchronized (this) {
         /*
          * If there are changes and currentSearcher == fSearcher, it means we
-         * won the race for the lock, so we reopen the searcher. If flushed
-         * is true, but currentSearcher != fSearcher it means that another
-         * thread has reopened the reader while we were blocked waiting for
-         * the lock.
+         * won the race for the lock, so we reopen the searcher. If flushed is
+         * true, but currentSearcher != fSearcher it means that another thread
+         * has reopened the reader while we were blocked waiting for the lock.
          */
         if (flushed && currentSearcher == fSearcher) {
           IndexReader currentReader = fSearcher.getIndexReader();
@@ -867,18 +882,20 @@ public class ModelSearchImpl implements IModelSearch {
             fSearchers.put(newSearcher, new AtomicInteger(1));
 
             /*
-             * Assign to field before we check the referenceCount to ensure
-             * that disposeIfNecessary will dispose the searcher if it has
-             * the last reference, is yet to check if fSearcher has been
-             * changed (if this was done after referenceCount.get() == 0,
-             * we could leak a searcher).
+             * Assign to field before we check the referenceCount to ensure that
+             * disposeIfNecessary will dispose the searcher if it has the last
+             * reference, is yet to check if fSearcher has been changed (if this
+             * was done after referenceCount.get() == 0, we could leak a
+             * searcher).
              */
             fSearcher = newSearcher;
 
             AtomicInteger referenceCount = fSearchers.get(currentSearcher);
             if (referenceCount != null && referenceCount.get() == 0) {
-              /* May be called by disposeIfNecessary at the same time, but safe because
-               * dispose is safe to be called many times for the same searcher.
+              /*
+               * May be called by disposeIfNecessary at the same time, but safe
+               * because dispose is safe to be called many times for the same
+               * searcher.
                */
               dispose(currentSearcher);
             }
@@ -905,12 +922,11 @@ public class ModelSearchImpl implements IModelSearch {
     }
   }
 
-
   /**
-   * Can be called multiple times safely because:
-   * - close is safe to be called many times in IndexReader and IndexSearcher
-   * - No IndexSearcher is ever added again into the fSearchers map so calling
-   * remove two or more times is harmless.
+   * Can be called multiple times safely because: - close is safe to be called
+   * many times in IndexReader and IndexSearcher - No IndexSearcher is ever
+   * added again into the fSearchers map so calling remove two or more times is
+   * harmless.
    */
   private void dispose(IndexSearcher searcher) throws IOException {
     fSearchers.remove(searcher);
@@ -943,8 +959,7 @@ public class ModelSearchImpl implements IModelSearch {
              */
             dispose(currentSearcher);
             break;
-          }
-          else {
+          } else {
             try {
               Thread.sleep(100);
             } catch (InterruptedException e) {
