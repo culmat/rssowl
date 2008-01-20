@@ -282,6 +282,13 @@ public class ModelSearchImpl implements IModelSearch {
   private void disposeIfNecessary(IndexSearcher currentSearcher)    {
     AtomicInteger referenceCount = fSearchers.get(currentSearcher);
     if (referenceCount.decrementAndGet() == 0 && fSearcher != currentSearcher) {
+      /*
+       * There is the chance that getCurrentSearcher is now getting ready to do
+       * these exact operations at this same point in time. If that happens,
+       * both methods will perform both operations (order is undefined). This is
+       * harmless because close in IndexReader and IndexSearcher is a no-op
+       * after close has been called once. Map#remove is equally harmless.
+       */
       fSearchers.remove(currentSearcher);
       try {
         dispose(currentSearcher);
@@ -820,17 +827,43 @@ public class ModelSearchImpl implements IModelSearch {
       synchronized (this) {
         /* Re-Create searcher if no longer current */
         if (flushed) {
-          IndexReader reader = fSearcher.getIndexReader();
-          IndexReader newReader = reader.reopen();
-          if (newReader != reader) {
-            AtomicInteger referenceCount = fSearchers.get(fSearcher);
-            if (referenceCount.get() == 0) {
-              fSearchers.remove(fSearcher);
-              dispose(fSearcher);
+          IndexSearcher currentSearcher = fSearcher;
+          IndexReader currentReader = fSearcher.getIndexReader();
+          IndexReader newReader = currentReader.reopen();
+          if (newReader != currentReader) {
+
+            IndexSearcher newSearcher = new IndexSearcher(newReader);
+            fSearchers.put(newSearcher, new AtomicInteger(1));
+
+            /*
+             * Assign to field before we check the referenceCount to ensure
+             * that disposeIfNecessary will dispose the searcher if it has
+             * the last reference, is yet to check if fSearcher has been
+             * changed (if this was done after referenceCount.get() == 0,
+             * we could leak a searcher).
+             */
+            fSearcher = newSearcher;
+
+            /*
+             * This means that no-one has a reference to the searcher but it
+             * still is in the Map because it was still current when the last
+             * searcher with a reference finished using it or the last user
+             * of the searcher has decremented it
+             */
+            AtomicInteger referenceCount = fSearchers.get(currentSearcher);
+            if (referenceCount != null && referenceCount.get() == 0) {
+              /*
+               * There is the chance that disposeIfNecessary is now getting
+               * ready to do these exact operations at this same point in time.
+               * If that happens, both methods will perform both operations
+               * (order is undefined). This is harmless because close in
+               * IndexReader and IndexSearcher is a no-op after close has been
+               * called once. Map#remove is equally harmless.
+               */
+              fSearchers.remove(currentSearcher);
+              dispose(currentSearcher);
             }
 
-            fSearcher = new IndexSearcher(newReader);
-            fSearchers.put(fSearcher, new AtomicInteger(1));
             return fSearcher;
           }
         }
