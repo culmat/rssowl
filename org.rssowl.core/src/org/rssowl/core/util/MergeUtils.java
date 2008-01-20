@@ -38,32 +38,33 @@ import java.util.Map;
 
 /**
  * Some useful methods for dealing with MergeCapable objects.,
- * 
+ *
  * @author Ismael Juma (ismael@juma.me.uk)
  */
 public class MergeUtils {
 
   /**
    * Helper method that simply does:
-   * 
+   *
    * <code>o1 == null ? o2 == null : o1.equals(o2)</code>
-   * 
-   * This is useful because it handles nulls and it forces both objects to be
-   * of the same type.
-   * 
-   * @param <T> The type of the objects being compared.
+   *
+   * This is useful because it handles nulls and it forces {@code o2} to be
+   * assignable to {@code o1}.
+   *
+   * @param <T> The type of the first object being compared.
+   * @param <U> The type of the second object being compared.
    * @param o1 First object being compared.
    * @param o2 Second object being compared.
    * @return <code>true</code> if both objects are equal or if both objects are
    * <code>null</code>.
    */
-  public static <T> boolean equals(T o1, T o2) {
+  public static <T, U extends T> boolean equals(T o1, U o2) {
     return o1 == null ? o2 == null : o1.equals(o2);
   }
   /**
    * Merges origin into destination. This is mostly useful because it deals with
    * the case where one of the items is null.
-   * 
+   *
    * @param <T>
    * @param destination
    * @param origin
@@ -76,7 +77,7 @@ public class MergeUtils {
         mergeResult = ComplexMergeResult.create(null);
       else
         mergeResult = ComplexMergeResult.create(origin, true);
-      
+
       return mergeResult;
     }
     if (origin == null)
@@ -90,11 +91,11 @@ public class MergeUtils {
   /**
    * Convenience method that calls {@link #merge(List, List, Comparator, IPersistable)} with a
    * Comparator that uses equals().
-   * 
+   *
    * @param <T>
    * @param existingList
    * @param newList
-   * @param newParent 
+   * @param newParent
    * @return ListMergeResult indicating the results of the merge operation.
    */
   public static final <T extends MergeCapable<T>> ComplexMergeResult<List<T>> merge(List<T> existingList, List<T> newList,
@@ -109,17 +110,17 @@ public class MergeUtils {
       }
     }, newParent);
   }
-  
+
   /**
    * Merges the contents of <code>newList</code> into
    * <code>existingList</code> and returns a ListMergeResult indications the
    * operations performed.
-   * 
+   *
    * @param <T>
    * @param existingList
    * @param newList
    * @param comparator
-   * @param newParent 
+   * @param newParent
    * @return ListMergeResult indicating the results of the merge operation.
    */
   public static final <T extends MergeCapable<T>> ComplexMergeResult<List<T>> merge(List<T> existingList, List<T> newList, Comparator<T> comparator, IPersistable newParent) {
@@ -171,7 +172,7 @@ public class MergeUtils {
         existingIt.remove();
       }
     }
-    
+
     /*
      * Add all the items left in newList to the existing container and change
      * parent to new parent, if necessary
@@ -182,15 +183,15 @@ public class MergeUtils {
       mergeResult.addUpdatedObject(item);
       mergeResult.setStructuralChange(true);
     }
-    
+
     return mergeResult;
   }
-  
+
   @SuppressWarnings("unchecked")
   private static void reparent(Object object, IPersistable newParent) {
     if (newParent == null)
       return;
-    
+
     if (object instanceof Reparentable) {
       ((Reparentable<IPersistable>) object).setParent(newParent);
     }
@@ -202,7 +203,7 @@ public class MergeUtils {
 
   /**
    * Merges the properties of the newType into the existingType.
-   * 
+   *
    * @param existingType
    * @param newType
    * @return ListMergeResult indicating the operations performed as part of
@@ -221,7 +222,7 @@ public class MergeUtils {
       if (!value.equals(existingValue)) {
         if (existingValue != null)
           mergeResult.addRemovedObject(existingValue);
-        
+
         existingType.setProperty(key, value);
         mergeResult.setStructuralChange(true);
       }
