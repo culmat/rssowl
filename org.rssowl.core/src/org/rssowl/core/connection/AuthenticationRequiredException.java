@@ -33,7 +33,7 @@ import org.eclipse.core.runtime.IStatus;
  * @author bpasero
  */
 public class AuthenticationRequiredException extends ConnectionException {
-  private String fRealm;
+  private final String fRealm;
 
   /**
    * Creates a new exception with the given status object. The message of the
