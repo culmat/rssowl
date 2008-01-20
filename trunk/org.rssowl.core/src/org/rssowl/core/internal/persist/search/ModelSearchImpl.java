@@ -211,7 +211,9 @@ public class ModelSearchImpl implements IModelSearch {
     IndexSearcher currentSearcher = getCurrentSearcher();
     for (IGuid guid : guids) {
       BooleanQuery query = createGuidQuery(guid, copy);
-      linkToRefs.put(guid, simpleSearch(currentSearcher, query));
+      List<NewsReference> newsRefs = simpleSearch(currentSearcher, query);
+      if (!newsRefs.isEmpty())
+        linkToRefs.put(guid, newsRefs);
     }
     disposeIfNecessary(currentSearcher);
     return linkToRefs;
@@ -222,7 +224,9 @@ public class ModelSearchImpl implements IModelSearch {
     IndexSearcher currentSearcher = getCurrentSearcher();
     for (URI link : links) {
       BooleanQuery query = createNewsByLinkBooleanQuery(link, copy);
-      linkToRefs.put(link, simpleSearch(currentSearcher, query));
+      List<NewsReference> newsRefs = simpleSearch(currentSearcher, query);
+      if (!newsRefs.isEmpty())
+        linkToRefs.put(link, newsRefs);
     }
     disposeIfNecessary(currentSearcher);
     return linkToRefs;
