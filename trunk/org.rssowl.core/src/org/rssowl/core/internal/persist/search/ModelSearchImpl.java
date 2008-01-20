@@ -847,10 +847,18 @@ public class ModelSearchImpl implements IModelSearch {
     try {
       boolean flushed = fIndexer.flushIfNecessary();
 
+      /* Get the current searcher before acquiring lock in case we block */
+      IndexSearcher currentSearcher = fSearcher;
+
       synchronized (this) {
-        /* Re-Create searcher if no longer current */
-        if (flushed) {
-          IndexSearcher currentSearcher = fSearcher;
+        /*
+         * If there are changes and currentSearcher == fSearcher, it means we
+         * won the race for the lock, so we reopen the searcher. If flushed
+         * is true, but currentSearcher != fSearcher it means that another
+         * thread has reopened the reader while we were blocked waiting for
+         * the lock.
+         */
+        if (flushed && currentSearcher == fSearcher) {
           IndexReader currentReader = fSearcher.getIndexReader();
           IndexReader newReader = currentReader.reopen();
           if (newReader != currentReader) {
