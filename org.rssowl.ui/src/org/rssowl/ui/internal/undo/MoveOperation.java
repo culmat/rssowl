@@ -108,7 +108,7 @@ public class MoveOperation extends CopyOperation {
     /* Redo the Copy-Part */
     super.redo();
 
-    /* Remove original News */
+    /* Force quick update of saved searches */
     Controller.getDefault().getSavedSearchService().forceQuickUpdate();
 
     /* Delete News in single Transaction */
