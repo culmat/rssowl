@@ -39,10 +39,10 @@ import java.util.List;
 public class ExpandingReader extends Reader {
 
   /* Pushback Buffer */
-  private StringBuilder fPushed = new StringBuilder();
+  private final StringBuilder fPushed = new StringBuilder();
 
   /* Temp Buffer */
-  private StringBuilder fBuf = new StringBuilder();
+  private final StringBuilder fBuf = new StringBuilder();
 
   /* Constructor Values */
   private final Reader fIn;

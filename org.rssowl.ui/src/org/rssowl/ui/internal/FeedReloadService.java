@@ -78,7 +78,7 @@ public class FeedReloadService {
   private BookMarkAdapter fBookMarkListener;
 
   /* Map IBookMark to Update-Intervals */
-  private Map<IBookMark, Long> fMapBookMarkToInterval;
+  private final Map<IBookMark, Long> fMapBookMarkToInterval;
 
   /*
    * This subclass of a Job is making sure to delay the operation for <code>WAKEUP_DELAY</code>
@@ -92,7 +92,7 @@ public class FeedReloadService {
    * all BookMarks will show errors.
    */
   private class ReloadJob extends Job {
-    private IBookMark fBookMark;
+    private final IBookMark fBookMark;
     private long fLastRunInMillis;
 
     ReloadJob(IBookMark bookMark, String name) {

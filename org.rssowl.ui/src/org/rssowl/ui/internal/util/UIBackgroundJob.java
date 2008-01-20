@@ -42,7 +42,7 @@ import org.rssowl.core.util.LoggingSafeRunnable;
  */
 public abstract class UIBackgroundJob extends Job {
   private static final String NAME = "UI-Updater"; //$NON-NLS-1$
-  private Control fControl;
+  private final Control fControl;
 
   /**
    * Creates a new instance of this kind. Use it like any other instance of

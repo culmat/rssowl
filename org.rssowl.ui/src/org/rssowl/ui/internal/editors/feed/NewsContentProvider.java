@@ -63,13 +63,13 @@ import java.util.Set;
  * @author bpasero
  */
 public class NewsContentProvider implements ITreeContentProvider {
-  private NewsBrowserViewer fBrowserViewer;
-  private NewsTableViewer fTableViewer;
-  private NewsGrouping fGrouping;
+  private final NewsBrowserViewer fBrowserViewer;
+  private final NewsTableViewer fTableViewer;
+  private final NewsGrouping fGrouping;
   private NewsListener fNewsListener;
   private SearchMarkAdapter fSearchMarkListener;
   private INewsMark[] fInput;
-  private FeedView fFeedView;
+  private final FeedView fFeedView;
   private boolean fDisposed;
 
   /* Cache displayed News */

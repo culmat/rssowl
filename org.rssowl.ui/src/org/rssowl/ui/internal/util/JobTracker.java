@@ -38,9 +38,9 @@ import org.rssowl.core.util.ITask;
  * @author bpasero
  */
 public class JobTracker {
-  private int fDelay;
-  private boolean fShowProgress;
-  private boolean fRunInUIThread;
+  private final int fDelay;
+  private final boolean fShowProgress;
+  private final boolean fRunInUIThread;
   private Job fJob;
   private ITask fTask;
   private volatile boolean fRunning;

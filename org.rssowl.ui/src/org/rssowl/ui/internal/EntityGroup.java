@@ -41,9 +41,9 @@ import java.util.List;
  * @author bpasero
  */
 public class EntityGroup implements IActionFilter {
-  private long fId;
-  private String fCategoryId;
-  private String fName;
+  private final long fId;
+  private final String fCategoryId;
+  private final String fName;
   private ImageDescriptor fImage;
   List<EntityGroupItem> fItems;
 

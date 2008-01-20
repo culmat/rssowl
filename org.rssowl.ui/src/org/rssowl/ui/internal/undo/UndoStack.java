@@ -40,7 +40,7 @@ public class UndoStack {
   private static final int MAX_SIZE = 20;
   private static UndoStack singleton = new UndoStack();
 
-  private List<IUndoOperation> fOperations = new ArrayList<IUndoOperation>();
+  private final List<IUndoOperation> fOperations = new ArrayList<IUndoOperation>();
   private int fCurrentIndex = 0;
 
   private UndoStack() {}

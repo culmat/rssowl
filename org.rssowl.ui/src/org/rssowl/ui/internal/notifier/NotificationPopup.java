@@ -98,19 +98,19 @@ public class NotificationPopup extends PopupDialog {
   private static final int DEFAULT_WIDTH = 400;
 
   private Shell fShell;
-  private List<NotificationItem> fDisplayedItems = new ArrayList<NotificationItem>();
-  private ResourceManager fResources;
+  private final List<NotificationItem> fDisplayedItems = new ArrayList<NotificationItem>();
+  private final ResourceManager fResources;
   private Image fCloseImageNormal;
   private Image fCloseImagePressed;
   private CLabel fTitleCircleLabel;
   private Composite fInnerContentCircle;
   private Composite fOuterContentCircle;
-  private Font fNormalTextFont;
-  private Font fBoldTextFont;
+  private final Font fNormalTextFont;
+  private final Font fBoldTextFont;
   private UIJob fAutoCloser;
   private MouseTrackListener fMouseTrackListner;
-  private IPreferenceScope fGlobalScope;
-  private int fVisibleItemsCount;
+  private final IPreferenceScope fGlobalScope;
+  private final int fVisibleItemsCount;
   private int fItemLimit;
   private NotifierColors fNotifierColors;
   private Region fLastUsedRegion;
