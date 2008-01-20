@@ -67,7 +67,7 @@ public class SendLinkAction implements IObjectActionDelegate {
         if (element instanceof IBookMark) {
           IBookMark bookmark = (IBookMark) element;
           String title = bookmark.getName();
-          str.append(i > 0 ? "\n\n" : "").append(title).append("\n").append(bookmark.getFeedLinkReference().getLink().toString());
+          str.append(i > 0 ? "\n\n" : "").append(title).append("\n").append(bookmark.getFeedLinkReference().getLinkAsText());
           i++;
         }
 

@@ -150,7 +150,7 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
 
       /* Export BookMark */
       if (mark instanceof IBookMark) {
-        String link = escape(((IBookMark) mark).getFeedLinkReference().getLink().toString());
+        String link = escape(((IBookMark) mark).getFeedLinkReference().getLinkAsText());
 
         writer.write("<outline text=\"" + name + "\" xmlUrl=\"" + link + "\" " + getIDAttribute(mark) + "/>\n");
       }
