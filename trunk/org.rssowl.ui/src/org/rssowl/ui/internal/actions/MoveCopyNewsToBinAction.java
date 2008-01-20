@@ -124,13 +124,14 @@ public class MoveCopyNewsToBinAction extends Action {
       if (newsCopy.getState() == INews.State.NEW)
         newsCopy.setState(INews.State.UNREAD);
 
-      DynamicDAO.save(newsCopy);
       requiresSave = true;
     }
 
     /* Save */
-    if (requiresSave)
+    if (requiresSave) {
+      DynamicDAO.saveAll(copiedNews);
       DynamicDAO.save(fBin);
+    }
 
     /* Support Undo/Redo */
     if (fIsMove)
