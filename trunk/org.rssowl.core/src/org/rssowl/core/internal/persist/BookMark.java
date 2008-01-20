@@ -34,7 +34,6 @@ import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -203,7 +202,7 @@ public class BookMark extends Mark implements IBookMark {
 
   /* getFeedLinkReference is synchronized, so no need to synchronize this */
   public boolean containsNews(INews news) {
-    return news.getParentId() == 0 && news.getFeedReference().equals(getFeedLinkReference());
+    return news.getParentId() == 0 && news.getFeedLinkAsText().equals(fFeedLink);
   }
 
   public synchronized int getStickyNewsCount() {
