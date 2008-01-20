@@ -52,7 +52,7 @@ public class SearchMark extends Mark implements ISearchMark {
   private List<ISearchCondition> fSearchConditions;
   private boolean fMatchAllConditions;
 
-  private transient NewsContainer fNewsContainer;
+  private transient final NewsContainer fNewsContainer;
 
   /**
    * Creates a new Element of the type SearchMark. A SearchMark is only visually
