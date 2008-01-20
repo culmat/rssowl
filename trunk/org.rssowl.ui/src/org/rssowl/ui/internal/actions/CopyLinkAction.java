@@ -64,7 +64,7 @@ public class CopyLinkAction implements IObjectActionDelegate {
       int i = 0;
       for (Object element : list) {
         if (element instanceof IBookMark) {
-          str.append(i > 0 ? "\n" : "").append(((IBookMark) element).getFeedLinkReference().getLink());
+          str.append(i > 0 ? "\n" : "").append(((IBookMark) element).getFeedLinkReference().getLinkAsText());
           i++;
         } else if (element instanceof INews) {
           INews news = (INews) element;

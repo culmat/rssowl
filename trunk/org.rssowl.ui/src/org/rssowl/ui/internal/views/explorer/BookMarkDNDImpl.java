@@ -151,7 +151,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       /* IBookMark */
       if (selectedObject instanceof IBookMark) {
         IBookMark bookmark = (IBookMark) selectedObject;
-        str.append(bookmark.getFeedLinkReference().getLink()).append("\n");
+        str.append(bookmark.getFeedLinkReference().getLinkAsText()).append("\n");
         str.append(bookmark.getName()).append("\n\n");
       }
 

@@ -185,7 +185,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     if (bookMark != null)
       tooltip = StringUtils.replaceAll(bookMark.getName(), "&", "&&");
     else
-      tooltip = StringUtils.replaceAll(feedRef.getLink().toString(), "&", "&&");
+      tooltip = StringUtils.replaceAll(feedRef.getLinkAsText(), "&", "&&");
 
     return tooltip;
   }

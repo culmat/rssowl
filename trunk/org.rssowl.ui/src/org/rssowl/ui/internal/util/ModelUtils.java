@@ -858,7 +858,7 @@ public class ModelUtils {
     Set<String> links = new HashSet<String>(bookMarks.size());
 
     for (IBookMark bookmark : bookMarks) {
-      links.add(bookmark.getFeedLinkReference().getLink().toString());
+      links.add(bookmark.getFeedLinkReference().getLinkAsText());
     }
 
     return links;

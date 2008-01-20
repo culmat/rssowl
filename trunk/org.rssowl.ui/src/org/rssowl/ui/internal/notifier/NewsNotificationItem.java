@@ -49,7 +49,6 @@ import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 
-import java.net.URI;
 import java.util.Date;
 
 /**
@@ -63,7 +62,7 @@ public class NewsNotificationItem extends NotificationItem {
   /* Max. length of the Description Excerpt */
   private static final int MAX_DESCRIPTION_LENGTH = 500;
 
-  private final URI fNewsLink;
+  private final String fNewsLink;
   private final FeedLinkReference fFeedReference;
   private final NewsReference fNewsReference;
   private final Date fRecentNewsDate;
@@ -77,7 +76,7 @@ public class NewsNotificationItem extends NotificationItem {
   public NewsNotificationItem(INews news) {
     super(makeText(news), makeImage(news));
 
-    fNewsLink = news.getLink();
+    fNewsLink = news.getLinkAsText();
     fFeedReference = news.getFeedReference();
     fNewsReference = new NewsReference(news.getId());
     fRecentNewsDate = DateUtils.getRecentDate(news);

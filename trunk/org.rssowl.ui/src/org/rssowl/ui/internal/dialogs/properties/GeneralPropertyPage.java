@@ -182,7 +182,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
 
         fFeedInput = new Text(container, SWT.BORDER);
         fFeedInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-        fFeedInput.setText(((IBookMark) entity).getFeedLinkReference().getLink().toString());
+        fFeedInput.setText(((IBookMark) entity).getFeedLinkReference().getLinkAsText());
         ((GridData) fFeedInput.getLayoutData()).widthHint = fSite.getHorizontalPixels(IDialogConstants.ENTRY_FIELD_WIDTH);
 
         /* Name */
@@ -511,7 +511,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       }
 
       /* Check for changed Feed */
-      if (!bookmark.getFeedLinkReference().getLink().toString().equals(uriAsString)) {
+      if (!bookmark.getFeedLinkReference().getLinkAsText().equals(uriAsString)) {
         try {
           DAOService daoService = Owl.getPersistenceService().getDAOService();
 

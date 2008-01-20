@@ -394,7 +394,7 @@ public class BookMarkFilter extends ViewerFilter {
 
     /* Search Link */
     if (fSearchTarget == SearchTarget.LINK && mark instanceof IBookMark)
-      return wordMatches(((IBookMark) mark).getFeedLinkReference().getLink().toString());
+      return wordMatches(((IBookMark) mark).getFeedLinkReference().getLinkAsText());
 
     /* Require a Feed from here on */
     if (!(mark instanceof IBookMark))

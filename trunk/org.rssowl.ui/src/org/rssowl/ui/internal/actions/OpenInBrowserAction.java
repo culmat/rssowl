@@ -40,6 +40,7 @@ import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 
 import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 /**
@@ -83,6 +84,14 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
    */
   @Override
   public void run() {
+    try {
+      internalRun();
+    } catch (URISyntaxException e) {
+      Activator.getDefault().getLog().log(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+    }
+  }
+
+  private void internalRun() throws URISyntaxException {
     List<?> selection = fSelection.toList();
     for (Object object : selection) {
       URI link = null;
@@ -91,6 +100,8 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
         link = ((INews) object).getLink();
       else if (object instanceof URI)
         link = (URI) object;
+      else if (object instanceof String)
+        link = new URI((String) object);
 
       if (link != null) {
         IWorkbenchBrowserSupport browser = PlatformUI.getWorkbench().getBrowserSupport();
