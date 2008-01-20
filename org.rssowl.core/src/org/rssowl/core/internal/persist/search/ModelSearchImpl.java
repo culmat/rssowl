@@ -161,13 +161,41 @@ public class ModelSearchImpl implements IModelSearch {
   /*
    * @see org.rssowl.core.model.search.IModelSearch#shutdown()
    */
-  public void shutdown() throws PersistenceException {
+  public void shutdown(boolean emergency) throws PersistenceException {
     try {
+      /*
+       * Close fIndexer first because it's more important (we may have uncommitted items).
+       */
+      fIndexer.shutdown();
+
+      /*
+       * We don't bother to close searchers if it's an emergency. They will be
+       * released when the process exits.
+       */
+      if (emergency)
+        return;
+
       synchronized (this) {
-        dispose(fSearcher);
+        /* We first close all the searchers whose refCount is 0 */
+        for (Map.Entry<IndexSearcher, AtomicInteger> mapEntry : fSearchers.entrySet()) {
+          if (mapEntry.getValue().get() == 0)
+            dispose(mapEntry.getKey());
+        }
+        while (!fSearchers.isEmpty()) {
+          try {
+            Thread.sleep(50);
+          } catch (InterruptedException e) {
+            /* If interrupted, we just leave the rest of the searchers open */
+            return;
+          }
+          /* Try again for the ones that are left */
+          for (Map.Entry<IndexSearcher, AtomicInteger> mapEntry : fSearchers.entrySet()) {
+            if (mapEntry.getValue().get() == 0)
+              dispose(mapEntry.getKey());
+          }
+        }
         fSearcher = null;
       }
-      fIndexer.shutdown();
     } catch (IOException e) {
       throw new PersistenceException(e.getMessage(), e);
     }
@@ -282,15 +310,10 @@ public class ModelSearchImpl implements IModelSearch {
   private void disposeIfNecessary(IndexSearcher currentSearcher)    {
     AtomicInteger referenceCount = fSearchers.get(currentSearcher);
     if (referenceCount.decrementAndGet() == 0 && fSearcher != currentSearcher) {
-      /*
-       * There is the chance that getCurrentSearcher is now getting ready to do
-       * these exact operations at this same point in time. If that happens,
-       * both methods will perform both operations (order is undefined). This is
-       * harmless because close in IndexReader and IndexSearcher is a no-op
-       * after close has been called once. Map#remove is equally harmless.
-       */
-      fSearchers.remove(currentSearcher);
       try {
+        /* May be called by getCurrentSearcher at the same time, but safe because
+         * dispose is safe to be called many times for the same searcher.
+         */
         dispose(currentSearcher);
       } catch (IOException e) {
         throw new PersistenceException(e);
@@ -667,7 +690,7 @@ public class ModelSearchImpl implements IModelSearch {
 
   private void addBookMarkLocationClause(BooleanQuery bQuery, IBookMark bookmark) {
     if (bookmark != null) {
-      String feed = bookmark.getFeedLinkReference().getLink().toString().toLowerCase();
+      String feed = bookmark.getFeedLinkReference().getLinkAsText().toLowerCase();
       bQuery.add(new TermQuery(new Term(String.valueOf(INews.FEED), feed)), Occur.SHOULD);
     }
   }
@@ -844,23 +867,11 @@ public class ModelSearchImpl implements IModelSearch {
              */
             fSearcher = newSearcher;
 
-            /*
-             * This means that no-one has a reference to the searcher but it
-             * still is in the Map because it was still current when the last
-             * searcher with a reference finished using it or the last user
-             * of the searcher has decremented it
-             */
             AtomicInteger referenceCount = fSearchers.get(currentSearcher);
             if (referenceCount != null && referenceCount.get() == 0) {
-              /*
-               * There is the chance that disposeIfNecessary is now getting
-               * ready to do these exact operations at this same point in time.
-               * If that happens, both methods will perform both operations
-               * (order is undefined). This is harmless because close in
-               * IndexReader and IndexSearcher is a no-op after close has been
-               * called once. Map#remove is equally harmless.
+              /* May be called by disposeIfNecessary at the same time, but safe because
+               * dispose is safe to be called many times for the same searcher.
                */
-              fSearchers.remove(currentSearcher);
               dispose(currentSearcher);
             }
 
@@ -886,7 +897,15 @@ public class ModelSearchImpl implements IModelSearch {
     }
   }
 
+
+  /**
+   * Can be called multiple times safely because:
+   * - close is safe to be called many times in IndexReader and IndexSearcher
+   * - No IndexSearcher is ever added again into the fSearchers map so calling
+   * remove two or more times is harmless.
+   */
   private synchronized void dispose(IndexSearcher searcher) throws IOException {
+    fSearchers.remove(searcher);
     searcher.close();
     searcher.getIndexReader().close();
   }
@@ -897,11 +916,34 @@ public class ModelSearchImpl implements IModelSearch {
   public void clearIndex() throws PersistenceException {
     try {
       synchronized (this) {
-        dispose(fSearcher);
-
+        IndexSearcher currentSearcher = fSearcher;
         fIndexer.clearIndex();
-
         fSearcher = createIndexSearcher();
+
+        /*
+         * We block until the current reader has been closed or can be closed.
+         * Most times we should be able to succeed without having to sleep.
+         */
+        while (true) {
+          AtomicInteger refCount = fSearchers.get(currentSearcher);
+          if (refCount == null)
+            break;
+          else if (refCount.get() == 0) {
+            /*
+             * This may be called at the same time from disposeIfNecessary, but
+             * that's fine.
+             */
+            dispose(currentSearcher);
+            break;
+          }
+          else {
+            try {
+              Thread.sleep(100);
+            } catch (InterruptedException e) {
+              throw new PersistenceException("Failed to close IndexSearcher: " + fSearcher);
+            }
+          }
+        }
       }
     } catch (IOException e) {
       throw new PersistenceException(e.getMessage(), e);
@@ -979,7 +1021,7 @@ public class ModelSearchImpl implements IModelSearch {
       clearIndex();
 
       /*
-       * Re-Index all Entities: News newsList is a LazyList so news are only
+       * Re-Index all Entities: News. newsList is a LazyList so news are only
        * activated on retrieval
        */
       for (INews news : newsList) {
