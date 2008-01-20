@@ -200,9 +200,12 @@ public class Indexer {
       return false;
 
     synchronized (this) {
-      /* Another thread got the lock before us and flushed */
+      /*
+       * Another thread got the lock before us and flushed. We must still return
+       * {@code true} to let the caller know that the index has changed.
+       */
       if (!fFlushRequired)
-        return false;
+        return true;
 
       dispose();
       createIndexWriter();
