@@ -904,7 +904,7 @@ public class ModelSearchImpl implements IModelSearch {
    * - No IndexSearcher is ever added again into the fSearchers map so calling
    * remove two or more times is harmless.
    */
-  private synchronized void dispose(IndexSearcher searcher) throws IOException {
+  private void dispose(IndexSearcher searcher) throws IOException {
     fSearchers.remove(searcher);
     searcher.close();
     searcher.getIndexReader().close();
