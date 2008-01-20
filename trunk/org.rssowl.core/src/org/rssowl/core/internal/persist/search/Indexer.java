@@ -229,6 +229,7 @@ public class Indexer {
    */
   synchronized void clearIndex() throws IOException {
     dispose();
+    /* Database got cleared, so we don't need to worry about syncing these values */
     fUncommittedNews.clear();
     if (IndexReader.indexExists(fIndexDirectory))
       fIndexWriter = createIndexWriter(fIndexDirectory, true);
