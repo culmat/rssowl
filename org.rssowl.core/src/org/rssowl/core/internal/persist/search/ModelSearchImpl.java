@@ -984,8 +984,6 @@ public class ModelSearchImpl implements IModelSearch {
   public void optimize() {
     try {
       fIndexer.optimize();
-    } catch (CorruptIndexException e) {
-      throw new PersistenceException(e.getMessage(), e);
     } catch (IOException e) {
       throw new PersistenceException(e.getMessage(), e);
     }
