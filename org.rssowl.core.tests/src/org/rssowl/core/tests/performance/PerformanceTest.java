@@ -506,14 +506,20 @@ public class PerformanceTest {
 
     System.out.println("Saving and Indexing " + FEEDS + " Feeds [Warm - " + 1 + " Jobs] took: " + (l1 + l2) / 2 + "ms");
 
-    /* Warm-Start: Save 216 Feeds (to calculate plain index time) */
+    /* Warm-Start: Save 216 Feeds with search disabled (to calculate plain index time) */
     Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().getModelSearch().shutdown(false);
     tasks = getSaveAndIndexFeedsTasks(ex);
     long l3 = TestUtils.executeAndWait(tasks, 1);
 
+    Owl.getPersistenceService().getModelSearch().startup();
     Owl.getPersistenceService().recreateSchema();
+    Owl.getPersistenceService().getModelSearch().shutdown(false);
     tasks = getSaveAndIndexFeedsTasks(ex);
     long l4 = TestUtils.executeAndWait(tasks, 1);
+
+    /* Switch model search back on at the end */
+    Owl.getPersistenceService().getModelSearch().startup();
 
     long indexL = (l1 + l2) / 2 - (l3 + l4) / 2;
 
