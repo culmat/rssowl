@@ -269,17 +269,16 @@ public class DBManagerTest {
 
   /**
    * Tests that copying a sticky news from the original feed to a INewsBin
-   * followed by deletion of the original IMark works correctly.
+   * followed by deletion of the original IBookMark works correctly. In other words,
+   * we want to verify that the original feed is not deleted with the IBookMark.
    */
   @Test
-  public void testCopyStickyNewsAndDeleteOriginalFeed() {
+  public void testCopyStickyNewsAndDeleteOriginalBookMark() {
     IFeed feed = createFeed();
     INews news = fTypesFactory.createNews(null, feed, new Date());
     news.setFlagged(true);
     fTypesFactory.createGuid(news, "http://www.link.com", true);
     DynamicDAO.save(feed);
-
-    fNewsDAO.setState(Collections.singleton(news), INews.State.DELETED, true, true);
 
     IFolder folder = fTypesFactory.createFolder(null, null, "Folder");
     IBookMark mark = fTypesFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "BookMark");
