@@ -500,7 +500,7 @@ public class Indexer {
     if (uncommittedNews.size() == 0)
       return;
 
-    if (sync)
+    if (sync || InternalOwl.TESTING)
       doSaveCommittedNews(uncommittedNews);
     else {
       new Job("") {
