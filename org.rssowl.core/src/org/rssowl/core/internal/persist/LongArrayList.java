@@ -45,7 +45,8 @@ public class LongArrayList {
 
   public LongArrayList(LongArrayList list) {
     this.fElements = new long[list.size()];
-    System.arraycopy(list.fElements, 0, fElements, 0, list.size());
+    System.arraycopy(list.fElements, 0, fElements, 0, list.fSize);
+    fSize = list.fSize;
   }
 
   public final int size() {
