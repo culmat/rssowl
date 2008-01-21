@@ -1030,6 +1030,79 @@ public class ModelTest1 {
    * @throws Exception
    */
   @Test
+  public void testSaveSMWithLocationToTwoBookMarks() throws Exception {
+    IFolder root = fFactory.createFolder(null, null, "Root");
+
+    IFeed feed1 = fFactory.createFeed(null, new URI("http://www.foo1.com"));
+    DynamicDAO.save(feed1);
+
+    IFeed feed2 = fFactory.createFeed(null, new URI("http://www.foo2.com"));
+    DynamicDAO.save(feed2);
+
+    IFolderChild bookmark1 = fFactory.createBookMark(null, root, new FeedLinkReference(feed1.getLink()), "Bookmark1");
+    IFolderChild bookmark2 = fFactory.createBookMark(null, root, new FeedLinkReference(feed2.getLink()), "Bookmark2");
+
+    DynamicDAO.save(root);
+
+    ISearchField locationField = fFactory.createSearchField(INews.LOCATION, INews.class.getName());
+
+    List<IFolderChild> childs = new ArrayList<IFolderChild>(2);
+    childs.add(bookmark1);
+    childs.add(bookmark2);
+
+    ISearchCondition condition = fFactory.createSearchCondition(locationField, SearchSpecifier.IS, ModelUtils.toPrimitive(childs));
+
+    ISearchMark sm = fFactory.createSearchMark(null, root, "Search");
+    sm.addSearchCondition(condition);
+
+    DynamicDAO.save(root);
+
+    Long bmId1 = bookmark1.getId();
+    Long bmId2 = bookmark2.getId();
+
+    root = null;
+    locationField = null;
+    condition = null;
+    sm = null;
+    bookmark1 = null;
+    bookmark2 = null;
+
+    Runtime.getRuntime().gc();
+
+    Owl.getPersistenceService().shutdown(false);
+    Owl.getPersistenceService().startup(null);
+
+    Collection<ISearchMark> sms = DynamicDAO.loadAll(ISearchMark.class);
+    assertEquals(1, sms.size());
+
+    sm = sms.iterator().next();
+    assertEquals(1, sm.getSearchConditions().size());
+
+    boolean foundBm1 = false;
+    boolean foundBm2 = false;
+
+    condition = sm.getSearchConditions().get(0);
+    assertNotNull(condition.getValue());
+    assertEquals(true, condition.getValue() instanceof Long[][]);
+
+    Long[][] value = (Long[][]) condition.getValue();
+    assertEquals(2, value[1].length);
+
+    for (int i = 0; i < 2; i++) {
+      if (bmId1.equals(value[1][i]))
+        foundBm1 = true;
+      else if (bmId2.equals(value[1][i]))
+        foundBm2 = true;
+    }
+
+    assertTrue("Did not find Bookmark 1 in Location Conditions", foundBm1);
+    assertTrue("Did not find Bookmark 2 in Location Conditions", foundBm2);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testSaveSMWithLocationToFolderAndBin() throws Exception {
     IFolder root = fFactory.createFolder(null, null, "Root");
 
