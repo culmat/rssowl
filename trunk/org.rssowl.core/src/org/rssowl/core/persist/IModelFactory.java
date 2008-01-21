@@ -53,6 +53,8 @@ public interface IModelFactory {
    * Creates a deep copy of {@code news}.
    *
    * @param news INews to be copied.
+   * @param newsBin The instance of {@link INewsBin} the {@link INews} should be
+   * added to.
    * @return a deep copy of {@code news}.
    */
   INews createNews(INews news, INewsBin newsBin);
@@ -206,8 +208,8 @@ public interface IModelFactory {
    * @param position The new Position identified by a <code>IFolderChild</code>
    * contained in this folder or <code>NULL</code> to add the mark as the last
    * element.
-   * @param after If <code>true</code>, add the mark to the index after
-   * the given position. May be <code>NULL</code> if the position is unknown.
+   * @param after If <code>true</code>, add the mark to the index after the
+   * given position. May be <code>NULL</code> if the position is unknown.
    * @return a new instance of ISearchMark with the provided parameters.
    */
   ISearchMark createSearchMark(Long id, IFolder folder, String name, IFolderChild position, Boolean after);
@@ -232,8 +234,8 @@ public interface IModelFactory {
    * @param folder The parent Folder.
    * @param name The Name of the INewsBin.
    * @param position The new Position identified by a <code>IFolderChild</code>
-   * contained in this folder or <code>null</code> to add the INewsBin as the last
-   * element.
+   * contained in this folder or <code>null</code> to add the INewsBin as the
+   * last element.
    * @param after If <code>true</code>, add the INewsBin to the index after
    * the given position. May be <code>NULL</code> if the position is unknown.
    * @return a new instance of INewsBin with the provided parameters.
