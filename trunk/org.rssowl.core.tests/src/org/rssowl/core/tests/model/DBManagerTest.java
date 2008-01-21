@@ -291,6 +291,10 @@ public class DBManagerTest {
     DynamicDAO.save(newsBin);
 
     DynamicDAO.delete(mark);
+    /*
+     * Mark containing the feed was deleted, but feed is not deleted because
+     * it's still referenced by a copied news. The feed is hence empty.
+     */
     assertEquals(0, feed.getNews().size());
     assertEquals(1, newsBin.getNewsRefs().size());
     assertEquals(newsCopy, newsBin.getNews().get(0));
