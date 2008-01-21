@@ -25,6 +25,7 @@ package org.rssowl.core.internal.persist;
 
 import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.INewsBin.StatesUpdateInfo;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.Pair;
@@ -249,7 +250,26 @@ public final class NewsContainer {
     boolean changed = false;
     for (StatesUpdateInfo info : statesUpdateInfos) {
       long newsId = info.getNewsReference().getId();
-      if (fNewsIds[info.getOldState().ordinal()].removeByElement(newsId)) {
+      if (info.getOldState() == null) {
+        if (info.getNewState() == INews.State.NEW)
+          continue;
+
+        boolean itemRemoved = fNewsIds[INews.State.NEW.ordinal()].removeByElement(newsId);
+        if (!itemRemoved) {
+          EnumSet<State> remainingStates = EnumSet.allOf(INews.State.class);
+          remainingStates.remove(INews.State.NEW);
+          remainingStates.remove(info.getNewState());
+          for (INews.State state : remainingStates) {
+            if (fNewsIds[state.ordinal()].removeByElement(newsId))
+              itemRemoved = true;
+          }
+        }
+        if (itemRemoved) {
+          changed = true;
+          fNewsIds[info.getNewState().ordinal()].add(newsId);
+        }
+      }
+      else if (fNewsIds[info.getOldState().ordinal()].removeByElement(newsId)) {
         changed = true;
         fNewsIds[info.getNewState().ordinal()].add(newsId);
       }
