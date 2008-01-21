@@ -210,8 +210,8 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     if (currentTarget instanceof IMark && (!(currentTarget instanceof INewsBin) || isFolderChildsDragged))
       event.feedback &= ~DND.FEEDBACK_SELECT;
 
-    /* Don't show this feedback for News Bins or non Folder-Childs */
-    if (currentTarget instanceof INewsBin || !isFolderChildsDragged) {
+    /* Don't show this feedback for News Bins when non Folder-Childs are dragged */
+    if (currentTarget instanceof INewsBin && !isFolderChildsDragged) {
       event.feedback &= ~DND.FEEDBACK_INSERT_AFTER;
       event.feedback &= ~DND.FEEDBACK_INSERT_BEFORE;
     }
