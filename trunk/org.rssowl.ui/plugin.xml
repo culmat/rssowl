@@ -282,9 +282,16 @@
                style="push"
                toolbarPath="news/mark"
                tooltip="Mark News as Read">
-            <selection
-                  class="org.rssowl.core.persist.INews">
-            </selection>
+            <enablement>
+               <or>
+                  <objectClass
+                        name="org.rssowl.core.persist.INews">
+                  </objectClass>
+                  <objectClass
+                        name="org.rssowl.ui.internal.EntityGroup">
+                  </objectClass>
+               </or>
+            </enablement>
          </action>
          <action
                class="org.rssowl.ui.internal.actions.ReloadAllAction"
@@ -491,18 +498,19 @@
             name="Update All"/>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Mark selected Items as Read"
+            defaultHandler="org.rssowl.ui.internal.handler.MarkReadHandler"
+            description="Mark selected News as Read"
             id="org.rssowl.ui.actions.MarkRead"
             name="Mark Read"/>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Mark all News as Read"
+            description="Mark all News of the currently displayed Feed as Read"
             id="org.rssowl.ui.MarkAllRead"
             name="Mark All Read"/>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.MarkStickyHandler"
-            description="Mark selected items as Sticky"
+            description="Mark selected News as Sticky"
             id="org.rssowl.ui.actions.MarkSticky"
             name="Mark Sticky"/>
       <command
@@ -765,7 +773,7 @@
                label="&amp;Mark Read"
                menubarPath="mark"
                style="push"
-               tooltip="Mark selected Items as Read"/>
+               tooltip="Mark selected News as Read"/>
          <visibility>
             <or>
                <objectClass name="org.rssowl.core.persist.IMark"/>
