@@ -23,6 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.persist;
 
+import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
@@ -38,6 +39,7 @@ public interface INewsBin extends INewsMark {
     private final INews.State fNewState;
     private final NewsReference fNewsReference;
     public StatesUpdateInfo(State oldState, State newState, NewsReference newsReference) {
+      Assert.isNotNull(newState, "newState");
       this.fOldState = oldState;
       this.fNewState = newState;
       this.fNewsReference = newsReference;
