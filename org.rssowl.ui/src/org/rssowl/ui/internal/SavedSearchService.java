@@ -62,7 +62,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class SavedSearchService {
 
   /* Time in millies before updating the saved searches (long) */
-  private static final int BATCH_INTERVAL_LONG = 2000;
+  private static final int BATCH_INTERVAL_LONG = 1000;
 
   /* Time in millies before updating the saved searches (short) */
   private static final int BATCH_INTERVAL_SHORT = 100;
