@@ -40,6 +40,7 @@ import org.rssowl.core.tests.model.ModelTest3;
 import org.rssowl.core.tests.model.PreferencesDAOTest;
 import org.rssowl.core.tests.model.PreferencesScopeTest;
 import org.rssowl.core.tests.persist.INewsTest;
+import org.rssowl.core.tests.persist.LongArrayListTest;
 import org.rssowl.core.tests.persist.MigrationsTest;
 import org.rssowl.core.tests.persist.service.DefragmentTest;
 import org.rssowl.core.tests.util.MergeUtilsTest;
@@ -69,6 +70,7 @@ import org.rssowl.core.tests.util.StringUtilsTest;
   INewsTest.class,
   StringUtilsTest.class,
   DefragmentTest.class,
-  MigrationsTest.class
+  MigrationsTest.class,
+  LongArrayListTest.class
 })
 public class LocalTests {}
