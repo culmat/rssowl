@@ -24,6 +24,7 @@
 
 package org.rssowl.core.internal.persist;
 
+import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
@@ -75,6 +76,8 @@ public class DefaultModelFactory implements IModelFactory {
   }
 
   public INews createNews(INews news, INewsBin newsBin) {
+    Assert.isNotNull(newsBin.getId(), "ID of the Bin must not be null!");
+
     INews copy = new News((News) news, newsBin.getId());
     copy.setId(Owl.getPersistenceService().getIDGenerator().getNext());
     newsBin.addNews(copy);
