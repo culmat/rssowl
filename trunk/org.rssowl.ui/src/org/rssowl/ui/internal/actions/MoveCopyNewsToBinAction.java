@@ -69,6 +69,9 @@ public class MoveCopyNewsToBinAction extends Action {
    */
   @Override
   public ImageDescriptor getImageDescriptor() {
+    if (fBin != null)
+      return fBin.getNewsCount(INews.State.getVisible()) > 0 ? OwlUI.NEWSBIN : OwlUI.NEWSBIN_EMPTY;
+
     return OwlUI.NEWSBIN;
   }
 
