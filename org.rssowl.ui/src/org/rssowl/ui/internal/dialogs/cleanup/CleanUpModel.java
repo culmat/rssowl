@@ -100,7 +100,7 @@ public class CleanUpModel {
   }
 
   private ISearchCondition getLocationCondition(IBookMark mark) {
-    Long[][] value = new Long[2][1];
+    Long[][] value = new Long[3][1];
     value[1][0] = mark.getId();
     return fFactory.createSearchCondition(fLocationField, SearchSpecifier.IS, value);
   }

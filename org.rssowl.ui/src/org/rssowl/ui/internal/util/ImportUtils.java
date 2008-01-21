@@ -61,7 +61,7 @@ public class ImportUtils {
 
           /* Folders */
           for (int i = 0; value[ModelUtils.FOLDER] != null && i < value[ModelUtils.FOLDER].length; i++) {
-            if (value[ModelUtils.FOLDER][i] != null) {
+            if (value[ModelUtils.FOLDER][i] != null && value[ModelUtils.FOLDER][i] != 0) {
               Long id = value[ModelUtils.FOLDER][i];
               newLocations.add(oldIdToFolderChildMap.get(id));
             }
@@ -69,7 +69,7 @@ public class ImportUtils {
 
           /* BookMarks */
           for (int i = 0; value[ModelUtils.BOOKMARK] != null && i < value[ModelUtils.BOOKMARK].length; i++) {
-            if (value[ModelUtils.BOOKMARK][i] != null) {
+            if (value[ModelUtils.BOOKMARK][i] != null && value[ModelUtils.BOOKMARK][i] != 0) {
               Long id = value[ModelUtils.BOOKMARK][i];
               newLocations.add(oldIdToFolderChildMap.get(id));
             }
@@ -78,7 +78,7 @@ public class ImportUtils {
           /* NewsBins */
           if (value.length == 3) {
             for (int i = 0; value[ModelUtils.NEWSBIN] != null && i < value[ModelUtils.NEWSBIN].length; i++) {
-              if (value[ModelUtils.NEWSBIN][i] != null) {
+              if (value[ModelUtils.NEWSBIN][i] != null && value[ModelUtils.NEWSBIN][i] != 0) {
                 Long id = value[ModelUtils.NEWSBIN][i];
                 newLocations.add(oldIdToFolderChildMap.get(id));
               }
