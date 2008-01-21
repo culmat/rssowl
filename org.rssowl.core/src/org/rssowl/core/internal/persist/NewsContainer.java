@@ -251,9 +251,6 @@ public final class NewsContainer {
     for (StatesUpdateInfo info : statesUpdateInfos) {
       long newsId = info.getNewsReference().getId();
       if (info.getOldState() == null) {
-        if (info.getNewState() == INews.State.NEW)
-          continue;
-
         boolean itemRemoved = fNewsIds[INews.State.NEW.ordinal()].removeByElement(newsId);
         if (!itemRemoved) {
           EnumSet<State> remainingStates = EnumSet.allOf(INews.State.class);
