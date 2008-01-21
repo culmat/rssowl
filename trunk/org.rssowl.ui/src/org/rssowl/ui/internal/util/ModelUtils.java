@@ -81,6 +81,8 @@ public class ModelUtils {
   /** Newsbin Index Value for Long Arrays */
   public static final int NEWSBIN = 2;
 
+  private static final Long[] EMPTY_LOCATION = new Long[] { 0L };
+
   /**
    * @param entities A list of folder childs.
    * @return Returns a multi-dimensional array where an array of {@link Long} is
@@ -131,12 +133,18 @@ public class ModelUtils {
 
     if (folderIds != null)
       result[FOLDER] = folderIds.toArray(new Long[folderIds.size()]);
+    else
+      result[FOLDER] = EMPTY_LOCATION;
 
     if (bookmarkIds != null)
       result[BOOKMARK] = bookmarkIds.toArray(new Long[bookmarkIds.size()]);
+    else
+      result[BOOKMARK] = EMPTY_LOCATION;
 
     if (newsbinIds != null)
       result[NEWSBIN] = newsbinIds.toArray(new Long[newsbinIds.size()]);
+    else
+      result[NEWSBIN] = EMPTY_LOCATION;
 
     if (folderIds == null && bookmarkIds == null && newsbinIds == null)
       return null;
@@ -279,7 +287,7 @@ public class ModelUtils {
     /* Folders */
     for (int i = 0; primitives[FOLDER] != null && i < primitives[FOLDER].length; i++) {
       try {
-        if (primitives[FOLDER][i] != null) {
+        if (primitives[FOLDER][i] != null && primitives[FOLDER][i] != 0) {
           IFolder folder = new FolderReference(primitives[FOLDER][i]).resolve();
           if (folder != null)
             childs.add(folder);
@@ -292,7 +300,7 @@ public class ModelUtils {
     /* BookMarks */
     for (int i = 0; primitives[BOOKMARK] != null && i < primitives[BOOKMARK].length; i++) {
       try {
-        if (primitives[BOOKMARK][i] != null) {
+        if (primitives[BOOKMARK][i] != null && primitives[BOOKMARK][i] != 0) {
           IBookMark bookmark = new BookMarkReference(primitives[BOOKMARK][i]).resolve();
           if (bookmark != null)
             childs.add(bookmark);
@@ -306,7 +314,7 @@ public class ModelUtils {
     if (primitives.length == 3) {
       for (int i = 0; primitives[NEWSBIN] != null && i < primitives[NEWSBIN].length; i++) {
         try {
-          if (primitives[NEWSBIN][i] != null) {
+          if (primitives[NEWSBIN][i] != null && primitives[NEWSBIN][i] != 0) {
             INewsBin newsbin = new NewsBinReference(primitives[NEWSBIN][i]).resolve();
             if (newsbin != null)
               childs.add(newsbin);
