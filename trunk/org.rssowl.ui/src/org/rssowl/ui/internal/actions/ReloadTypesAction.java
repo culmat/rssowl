@@ -132,6 +132,9 @@ public class ReloadTypesAction extends Action implements IObjectActionDelegate {
       }
     }
 
+    /* Force quick update of the first News coming in */
+    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+
     /* Pass to controller for a queued reloading using ITasks */
     Controller.getDefault().reloadQueued(selectedBookMarks, fShell);
   }
