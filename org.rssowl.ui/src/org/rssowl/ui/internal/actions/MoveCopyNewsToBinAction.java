@@ -127,6 +127,9 @@ public class MoveCopyNewsToBinAction extends Action {
       requiresSave = true;
     }
 
+    /* Mark Saved Search Service as in need for a quick Update */
+    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+
     /* Save */
     if (requiresSave) {
       DynamicDAO.saveAll(copiedNews);
