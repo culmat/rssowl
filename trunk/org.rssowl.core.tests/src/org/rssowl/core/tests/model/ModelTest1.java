@@ -883,7 +883,7 @@ public class ModelTest1 {
     ISearchMark sm = fFactory.createSearchMark(null, root, "Search");
     sm.addSearchCondition(condition);
 
-    DynamicDAO.save(sm);
+    DynamicDAO.save(root);
 
     Long bmId = bookmark.getId();
 
@@ -892,6 +892,7 @@ public class ModelTest1 {
     locationField = null;
     condition = null;
     sm = null;
+    bookmark = null;
 
     Runtime.getRuntime().gc();
 
@@ -911,6 +912,182 @@ public class ModelTest1 {
     Long[][] value = (Long[][]) condition.getValue();
     assertEquals(1, value[1].length);
     assertEquals(bmId, value[1][0]);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSaveSMWithLocationToBin() throws Exception {
+    IFolder root = fFactory.createFolder(null, null, "Root");
+
+    IFolderChild bin = fFactory.createNewsBin(null, root, "Bin");
+
+    DynamicDAO.save(root);
+
+    ISearchField locationField = fFactory.createSearchField(INews.LOCATION, INews.class.getName());
+    ISearchCondition condition = fFactory.createSearchCondition(locationField, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList(bin)));
+    ISearchMark sm = fFactory.createSearchMark(null, root, "Search");
+    sm.addSearchCondition(condition);
+
+    DynamicDAO.save(root);
+
+    Long binId = bin.getId();
+
+    root = null;
+    locationField = null;
+    condition = null;
+    sm = null;
+    bin = null;
+
+    Runtime.getRuntime().gc();
+
+    Owl.getPersistenceService().shutdown(false);
+    Owl.getPersistenceService().startup(null);
+
+    Collection<ISearchMark> sms = DynamicDAO.loadAll(ISearchMark.class);
+    assertEquals(1, sms.size());
+
+    sm = sms.iterator().next();
+    assertEquals(1, sm.getSearchConditions().size());
+
+    condition = sm.getSearchConditions().get(0);
+    assertNotNull(condition.getValue());
+    assertEquals(true, condition.getValue() instanceof Long[][]);
+
+    Long[][] value = (Long[][]) condition.getValue();
+    assertEquals(1, value[2].length);
+    assertEquals(binId, value[2][0]);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSaveSMWithLocationToBookMarkAndBin() throws Exception {
+    IFolder root = fFactory.createFolder(null, null, "Root");
+
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.foo.com"));
+    DynamicDAO.save(feed);
+
+    IFolderChild bookmark = fFactory.createBookMark(null, root, new FeedLinkReference(feed.getLink()), "Bookmark");
+    IFolderChild bin = fFactory.createNewsBin(null, root, "Bin");
+
+    DynamicDAO.save(root);
+
+    ISearchField locationField = fFactory.createSearchField(INews.LOCATION, INews.class.getName());
+    ISearchCondition condition1 = fFactory.createSearchCondition(locationField, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList(bookmark)));
+    ISearchCondition condition2 = fFactory.createSearchCondition(locationField, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList(bin)));
+
+    ISearchMark sm = fFactory.createSearchMark(null, root, "Search");
+    sm.addSearchCondition(condition1);
+    sm.addSearchCondition(condition2);
+
+    DynamicDAO.save(root);
+
+    Long bmId = bookmark.getId();
+    Long binId = bin.getId();
+
+    root = null;
+    locationField = null;
+    condition1 = null;
+    condition2 = null;
+    sm = null;
+    bookmark = null;
+    bin = null;
+
+    Runtime.getRuntime().gc();
+
+    Owl.getPersistenceService().shutdown(false);
+    Owl.getPersistenceService().startup(null);
+
+    Collection<ISearchMark> sms = DynamicDAO.loadAll(ISearchMark.class);
+    assertEquals(1, sms.size());
+
+    sm = sms.iterator().next();
+    assertEquals(2, sm.getSearchConditions().size());
+
+    List<ISearchCondition> conditions = sm.getSearchConditions();
+    boolean foundBm = false;
+    boolean foundBin = false;
+
+    for (ISearchCondition condition : conditions) {
+      assertNotNull(condition.getValue());
+      assertEquals(true, condition.getValue() instanceof Long[][]);
+
+      Long[][] value = (Long[][]) condition.getValue();
+      if (value[1].length == 1 && bmId.equals(value[1][0]))
+        foundBm = true;
+      else if (value[2].length == 1 && binId.equals(value[2][0]))
+        foundBin = true;
+    }
+
+    assertTrue("Did not find Bin in Location Conditions", foundBin);
+    assertTrue("Did not find Bookmark in Location Conditions", foundBm);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSaveSMWithLocationToFolderAndBin() throws Exception {
+    IFolder root = fFactory.createFolder(null, null, "Root");
+
+    IFolderChild subRoot = fFactory.createFolder(null, root, "Sub Root");
+
+    IFolderChild bin = fFactory.createNewsBin(null, root, "Bin");
+
+    DynamicDAO.save(root);
+
+    ISearchField locationField = fFactory.createSearchField(INews.LOCATION, INews.class.getName());
+    ISearchCondition condition1 = fFactory.createSearchCondition(locationField, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList(subRoot)));
+    ISearchCondition condition2 = fFactory.createSearchCondition(locationField, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList(bin)));
+
+    ISearchMark sm = fFactory.createSearchMark(null, root, "Search");
+    sm.addSearchCondition(condition1);
+    sm.addSearchCondition(condition2);
+
+    DynamicDAO.save(root);
+
+    Long folderId = subRoot.getId();
+    Long binId = bin.getId();
+
+    root = null;
+    locationField = null;
+    condition1 = null;
+    condition2 = null;
+    sm = null;
+    subRoot = null;
+    bin = null;
+
+    Runtime.getRuntime().gc();
+
+    Owl.getPersistenceService().shutdown(false);
+    Owl.getPersistenceService().startup(null);
+
+    Collection<ISearchMark> sms = DynamicDAO.loadAll(ISearchMark.class);
+    assertEquals(1, sms.size());
+
+    sm = sms.iterator().next();
+    assertEquals(2, sm.getSearchConditions().size());
+
+    List<ISearchCondition> conditions = sm.getSearchConditions();
+    boolean foundFolder = false;
+    boolean foundBin = false;
+
+    for (ISearchCondition condition : conditions) {
+      assertNotNull(condition.getValue());
+      assertEquals(true, condition.getValue() instanceof Long[][]);
+
+      Long[][] value = (Long[][]) condition.getValue();
+      if (value[0].length == 1 && folderId.equals(value[0][0]))
+        foundFolder = true;
+      else if (value[2].length == 1 && binId.equals(value[2][0]))
+        foundBin = true;
+    }
+
+    assertTrue("Did not find Bin in Location Conditions", foundBin);
+    assertTrue("Did not find Folder in Location Conditions", foundFolder);
   }
 
   private IFeed createFeed(String url) throws URISyntaxException {
