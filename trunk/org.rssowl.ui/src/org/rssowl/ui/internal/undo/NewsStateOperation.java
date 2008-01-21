@@ -54,6 +54,7 @@ public class NewsStateOperation implements IUndoOperation {
   private final Map<State, List<NewsReference>> fOldStates;
   private final State fNewState;
   private final int fNewsCount;
+  private final boolean fOnlyNewNewsAffected;
   private final boolean fAffectEquivalentNews;
   private final INewsDAO fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
 
@@ -69,6 +70,7 @@ public class NewsStateOperation implements IUndoOperation {
     fNewState = newState;
     fAffectEquivalentNews = affectEquivalentNews;
     fNewsCount = news.size();
+    fOnlyNewNewsAffected = fOldStates.containsKey(INews.State.NEW) && fOldStates.get(INews.State.NEW).size() == fNewsCount;
   }
 
   /*
@@ -82,8 +84,12 @@ public class NewsStateOperation implements IUndoOperation {
       case READ:
         return "Mark " + fNewsCount + " News as Read";
 
-      case UNREAD:
+      case UNREAD: {
+        if (fOnlyNewNewsAffected)
+          return "Mark " + fNewsCount + " New News as Unread";
+
         return "Mark " + fNewsCount + " News as Unread";
+      }
 
       default:
         return "Unsupported Operation";
