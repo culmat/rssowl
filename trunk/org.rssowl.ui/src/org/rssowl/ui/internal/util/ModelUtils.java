@@ -81,8 +81,6 @@ public class ModelUtils {
   /** Newsbin Index Value for Long Arrays */
   public static final int NEWSBIN = 2;
 
-  private static final Long[] EMPTY_LOCATION = new Long[] { 0L };
-
   /**
    * @param entities A list of folder childs.
    * @return Returns a multi-dimensional array where an array of {@link Long} is
@@ -98,6 +96,10 @@ public class ModelUtils {
     List<Long> bookmarkIds = null;
     List<Long> newsbinIds = null;
 
+    int folderCounter = 0;
+    int bookmarkCounter = 0;
+    int newsbinCounter = 0;
+
     for (IEntity entity : entities) {
 
       /* Folder */
@@ -106,6 +108,7 @@ public class ModelUtils {
           folderIds = new ArrayList<Long>();
 
         folderIds.add(entity.getId());
+        folderCounter++;
       }
 
       /* BookMark */
@@ -114,6 +117,7 @@ public class ModelUtils {
           bookmarkIds = new ArrayList<Long>();
 
         bookmarkIds.add(entity.getId());
+        bookmarkCounter++;
       }
 
       /* NewsBin */
@@ -122,6 +126,7 @@ public class ModelUtils {
           newsbinIds = new ArrayList<Long>();
 
         newsbinIds.add(entity.getId());
+        newsbinCounter++;
       }
 
       /* Other type not supported */
@@ -129,27 +134,31 @@ public class ModelUtils {
         throw new IllegalArgumentException("Only Folders, Bookmars and News Bins are allowed!");
     }
 
-    Long[][] result = new Long[3][];
-
-    if (folderIds != null)
-      result[FOLDER] = folderIds.toArray(new Long[folderIds.size()]);
-    else
-      result[FOLDER] = EMPTY_LOCATION;
-
-    if (bookmarkIds != null)
-      result[BOOKMARK] = bookmarkIds.toArray(new Long[bookmarkIds.size()]);
-    else
-      result[BOOKMARK] = EMPTY_LOCATION;
-
-    if (newsbinIds != null)
-      result[NEWSBIN] = newsbinIds.toArray(new Long[newsbinIds.size()]);
-    else
-      result[NEWSBIN] = EMPTY_LOCATION;
-
     if (folderIds == null && bookmarkIds == null && newsbinIds == null)
       return null;
 
+    Long[][] result = new Long[3][];
+
+    int maxEntityCount = Math.max(folderCounter, Math.max(bookmarkCounter, newsbinCounter));
+
+    result[FOLDER] = toArray(folderIds, maxEntityCount);
+    result[BOOKMARK] = toArray(bookmarkIds, maxEntityCount);
+    result[NEWSBIN] = toArray(newsbinIds, maxEntityCount);;
+
     return result;
+  }
+
+  private static Long[] toArray(List<Long> values, int fillFactor) {
+    Long[] array = new Long[fillFactor];
+
+    for (int i = 0; i < fillFactor; i++) {
+      if (values != null && i < values.size())
+        array[i] = values.get(i);
+      else
+        array[i] = 0L;
+    }
+
+    return array;
   }
 
   /**
