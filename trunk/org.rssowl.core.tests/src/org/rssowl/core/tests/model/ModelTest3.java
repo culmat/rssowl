@@ -44,6 +44,7 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
@@ -51,6 +52,7 @@ import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.event.AttachmentAdapter;
 import org.rssowl.core.persist.event.AttachmentEvent;
@@ -92,6 +94,7 @@ import org.rssowl.core.tests.TestUtils;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -2264,5 +2267,31 @@ public class ModelTest3 {
     System.gc();
     DynamicDAO.delete(label);
     assertEquals(0, newsRef.resolve().getLabels().size());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testStateChangeFromNewToUnreadToHiddenInBin() throws Exception {
+    IFolder root = fFactory.createFolder(null, null, "Root");
+    INewsBin newsBin = fFactory.createNewsBin(null, root, "Bin");
+
+    DynamicDAO.save(root);
+
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.foo.com"));
+    INews news = fFactory.createNews(null, feed, new Date());
+
+    DynamicDAO.save(feed);
+
+    INews copiedNews = fFactory.createNews(news, newsBin);
+    copiedNews.setState(INews.State.UNREAD);
+
+    DynamicDAO.save(copiedNews);
+    DynamicDAO.save(newsBin);
+
+    DynamicDAO.getDAO(INewsDAO.class).setState(Collections.singleton(copiedNews), INews.State.HIDDEN, false, false);
+
+    assertEquals(0, newsBin.getNews(INews.State.getVisible()).size());
   }
 }
