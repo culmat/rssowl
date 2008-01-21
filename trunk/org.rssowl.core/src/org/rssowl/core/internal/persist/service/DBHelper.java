@@ -295,6 +295,17 @@ public class DBHelper {
         list.add(new StatesUpdateInfo(newsEvent.getOldNews().getState(), news.getState(), news.toReference()));
       }
     }
+    for (NewsEvent newsEvent : newsEventRunnable.getPersistEvents()) {
+      INews news = newsEvent.getEntity();
+      if (news.getParentId() != 0) {
+        List<StatesUpdateInfo> list = statesUpdateInfos.get(news.getParentId());
+        if (list == null) {
+          list = new ArrayList<StatesUpdateInfo>();
+          statesUpdateInfos.put(news.getParentId(), list);
+        }
+        list.add(new StatesUpdateInfo(null, news.getState(), news.toReference()));
+      }
+    }
     if (!statesUpdateInfos.isEmpty()) {
       Set<FeedLinkReference> removedFeedRefs = new HashSet<FeedLinkReference>();
       INewsBinDAO newsBinDAO = DynamicDAO.getDAO(INewsBinDAO.class);
