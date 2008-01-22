@@ -2294,4 +2294,26 @@ public class ModelTest3 {
 
     assertEquals(0, newsBin.getNews(INews.State.getVisible()).size());
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testAddLabelToNewsDoesNotDeleteDescription() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.foo.com"));
+    INews news = fFactory.createNews(null, feed, new Date());
+    news.setDescription("Hello World");
+
+    DynamicDAO.save(feed);
+
+    assertNotNull(news.getDescription());
+
+    ILabel label = fFactory.createLabel(null, "Label");
+    DynamicDAO.save(label);
+
+    news.addLabel(label);
+    DynamicDAO.save(news);
+
+    assertNotNull(news.getDescription());
+  }
 }
