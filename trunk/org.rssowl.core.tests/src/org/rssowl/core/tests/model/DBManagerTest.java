@@ -32,6 +32,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.BookMark;
@@ -137,6 +138,56 @@ public class DBManagerTest {
     fTypesFactory = Owl.getModelFactory();
     fDb = DBManager.getDefault().getObjectContainer();
     fNewsDAO = DynamicDAO.getDAO(INewsDAO.class);
+  }
+
+  /**
+   * Tests that saving a NewsBin with a INews that was never saved in DELETED
+   * state causes the INews to be removed from the INewsBin.
+   * @throws Exception
+   */
+  @Test
+  @Ignore("Not sure we need to support this case")
+  public void testSaveNewsBinWithNeverSavedNewsInDeletedState() throws Exception {
+    IFeed feed = fTypesFactory.createFeed(null, new URI("http://www.feed.com"));
+    INews news = fTypesFactory.createNews(null, feed, new Date());
+    news.setState(INews.State.DELETED);
+    DynamicDAO.save(feed);
+
+    IFolder folder = fTypesFactory.createFolder(null, null, "Folder");
+    INewsBin newsBin = fTypesFactory.createNewsBin(null, folder, "NewsBin");
+    DynamicDAO.save(folder);
+
+    INews newsCopy = fTypesFactory.createNews(news, newsBin);
+    DynamicDAO.save(newsCopy);
+    DynamicDAO.save(newsBin);
+
+    assertEquals(0, newsBin.getNews().size());
+    assertEquals(null, fNewsDAO.load(newsCopy.getId()));
+  }
+
+  /**
+   * Test case where original news is copied with a state != NEW, the copied news
+   * state is changed to NEW before saving and then it's saved. The news bin
+   * should have the news in the right bucket after save is finished.
+   * @throws Exception
+   */
+  @Test
+  public void testCopyReadNewsButSaveWithNewState() throws Exception {
+    IFeed feed = fTypesFactory.createFeed(null, new URI("http://www.feed.com"));
+    INews news = fTypesFactory.createNews(null, feed, new Date());
+    news.setState(INews.State.READ);
+    DynamicDAO.save(feed);
+
+    IFolder folder = fTypesFactory.createFolder(null, null, "Folder");
+    INewsBin newsBin = fTypesFactory.createNewsBin(null, folder, "NewsBin");
+    DynamicDAO.save(folder);
+
+    INews newsCopy = fTypesFactory.createNews(news, newsBin);
+    newsCopy.setState(INews.State.NEW);
+    DynamicDAO.save(newsCopy);
+    DynamicDAO.save(newsBin);
+
+    assertEquals(1, newsBin.getNews(EnumSet.of(INews.State.NEW)).size());
   }
 
   /**
