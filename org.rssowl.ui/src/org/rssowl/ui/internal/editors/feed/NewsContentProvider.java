@@ -286,6 +286,18 @@ public class NewsContentProvider implements ITreeContentProvider {
     return false;
   }
 
+  private synchronized boolean hasCachedNews(INews news) {
+    if (fCachedNews == null)
+      return false;
+
+    for (INews cachedNews : fCachedNews) {
+      if (cachedNews.equals(news))
+        return true;
+    }
+
+    return false;
+  }
+
   private synchronized INews obtainFromCache(NewsReference ref) {
     for (INews cachedNews : fCachedNews) {
       if (ref.references(cachedNews))
@@ -580,6 +592,20 @@ public class NewsContentProvider implements ITreeContentProvider {
 
       /* Check if Saved Search contains the given News */
       else if (type != EventType.PERSIST && mark instanceof ISearchMark) {
+
+        /*
+         * Workaround a race condition in a safe way: When a News gets deleted from a Searchmark,
+         * the Indexer is the first to process this event. Since the SavedSearchService updates
+         * all Searchmarks instantly as a result of that, the Searchmark at this point could no
+         * longer contain the affected News and isInputRelated() would return false. The fix is
+         * to check the cache for the News instead of the potential modified Searchmark. Since this
+         * is only the case for Hidden/Deleted News, we first ask if the News is visible or not.
+         */
+        if (!news.isVisible()) {
+          return hasCachedNews(news);
+        }
+
+        /* News visible: Check if its contained in the SM */
         return (((ISearchMark) mark).containsNews(news));
       }
 
