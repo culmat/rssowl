@@ -219,7 +219,12 @@ public class DBHelper {
 
     String newsDescriptionValue = n.getTransientDescription();
 
-    if (dbDescriptionValue == null && newsDescriptionValue == null)
+    /*
+     * If the description in news has not been set or if the description in the
+     * news has been set to null and it's already null in the database, there
+     * is nothing to do.
+     */
+    if ((!n.isTransientDescriptionSet()) || (dbDescriptionValue == null && newsDescriptionValue == null))
       return;
 
     else if (dbDescriptionValue == null && newsDescriptionValue != null)

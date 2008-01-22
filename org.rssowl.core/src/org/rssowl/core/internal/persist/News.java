@@ -1188,6 +1188,10 @@ public class News extends AbstractEntity implements INews {
     }
   }
 
+  public boolean isTransientDescriptionSet() {
+    return fTransientDescriptionSet;
+  }
+
   public String getFeedLinkAsText() {
     return fFeedLink;
   }
@@ -1195,4 +1199,5 @@ public class News extends AbstractEntity implements INews {
   public String getLinkAsText() {
     return fLinkText;
   }
+
 }
