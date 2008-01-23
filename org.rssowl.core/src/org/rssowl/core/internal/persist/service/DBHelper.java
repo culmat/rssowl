@@ -210,6 +210,14 @@ public class DBHelper {
 
   private static void saveDescription(ObjectContainer db, INews news) {
     News n = (News) news;
+
+    /*
+     * Avoid loading from the db if the description of the news being saved has
+     * not been changed.
+     */
+    if (!n.isTransientDescriptionSet())
+      return;
+
     Description dbDescription = null;
     String dbDescriptionValue = null;
 
@@ -220,11 +228,10 @@ public class DBHelper {
     String newsDescriptionValue = n.getTransientDescription();
 
     /*
-     * If the description in news has not been set or if the description in the
-     * news has been set to null and it's already null in the database, there
-     * is nothing to do.
+     * If the description in the news has been set to null and it's already null
+     * in the database, there is nothing to do.
      */
-    if ((!n.isTransientDescriptionSet()) || (dbDescriptionValue == null && newsDescriptionValue == null))
+    if (dbDescriptionValue == null && newsDescriptionValue == null)
       return;
 
     else if (dbDescriptionValue == null && newsDescriptionValue != null)
