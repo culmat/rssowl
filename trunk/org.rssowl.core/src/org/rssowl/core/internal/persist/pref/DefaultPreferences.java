@@ -131,6 +131,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** BookMark Explorer */
   public static final String BE_ENABLE_LINKING = "org.rssowl.ui.internal.views.explorer.EnableLinking"; //$NON-NLS-1$
 
+  /** BookMark Explorer */
+  public static final String BE_DISABLE_FAVICONS = "org.rssowl.ui.internal.views.explorer.DisableFavicons"; //$NON-NLS-1$
+
   /** BookMark News-Grouping */
   public static final String BM_NEWS_FILTERING = "org.rssowl.pref.BMNewsFiltering";
 
