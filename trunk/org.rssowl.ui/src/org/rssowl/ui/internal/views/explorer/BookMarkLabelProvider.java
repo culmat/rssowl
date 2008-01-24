@@ -74,7 +74,10 @@ public class BookMarkLabelProvider extends CellLabelProvider {
   private Color fGroupFgColor;
   private Font fBoldFont;
   private Font fDefaultFont;
+
+  /* Settings */
   private boolean fIndicateState;
+  private boolean fUseFavicons = true;
 
   /** */
   public BookMarkLabelProvider() {
@@ -94,6 +97,10 @@ public class BookMarkLabelProvider extends CellLabelProvider {
 
     /* Sticky Color */
     fStickyBgColor = OwlUI.getThemeColor(OwlUI.STICKY_BG_COLOR_ID, fResources, new RGB(255, 255, 128));
+  }
+
+  void setUseFavicons(boolean useFavicons) {
+    fUseFavicons = useFavicons;
   }
 
   private void createResources() {
@@ -234,8 +241,8 @@ public class BookMarkLabelProvider extends CellLabelProvider {
 
   private Image getIconForBookMark(IBookMark bookmark, boolean hasNew) {
 
-    /* Load the FavIcon */
-    ImageDescriptor favicon = OwlUI.getFavicon(bookmark);
+    /* Load the FavIcon (if enabled) */
+    ImageDescriptor favicon = fUseFavicons ? OwlUI.getFavicon(bookmark) : null;
 
     /* Indicate Error */
     if (bookmark.isErrorLoading()) {
