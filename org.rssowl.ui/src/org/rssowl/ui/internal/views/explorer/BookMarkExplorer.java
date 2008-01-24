@@ -40,7 +40,6 @@ import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IElementComparer;
@@ -183,11 +182,12 @@ public class BookMarkExplorer extends ViewPart {
   private BookMarkGrouping.Type fGroupingType;
   private IFolder fSelectedBookMarkSet;
   private boolean fLinkingEnabled;
+  private boolean fFaviconsEnabled;
 
   /* Viewer Classes */
   private TreeViewer fViewer;
   private IContentProvider fContentProvider;
-  private IBaseLabelProvider fLabelProvider;
+  private BookMarkLabelProvider fLabelProvider;
   private BookMarkSorter fBookMarkComparator;
   private BookMarkFilter fBookMarkFilter;
   private BookMarkGrouping fBookMarkGrouping;
@@ -292,6 +292,7 @@ public class BookMarkExplorer extends ViewPart {
 
     /* Create LabelProvider */
     fLabelProvider = new BookMarkLabelProvider();
+    fLabelProvider.setUseFavicons(fFaviconsEnabled);
     fViewer.setLabelProvider(fLabelProvider);
 
     /* Apply Sorter */
@@ -746,9 +747,28 @@ public class BookMarkExplorer extends ViewPart {
             fGlobalPreferences.putBoolean(DefaultPreferences.BE_SORT_BY_NAME, fSortByName);
           }
         };
-        sortByName.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/sort_alpha.gif")); //$NON-NLS-1$
         sortByName.setChecked(fSortByName);
         manager.add(sortByName);
+
+        IAction showFavicons = new Action("Show Feed Icons", IAction.AS_CHECK_BOX) {
+          @Override
+          public void run() {
+            fFaviconsEnabled = isChecked();
+
+            fLabelProvider.setUseFavicons(fFaviconsEnabled);
+            fViewer.getTree().setRedraw(false);
+            try {
+              fViewer.refresh(true);
+            } finally {
+              fViewer.getTree().setRedraw(true);
+            }
+          }
+        };
+        showFavicons.setChecked(fFaviconsEnabled);
+        manager.add(showFavicons);
+
+        /* Allow Contributions */
+        manager.add(new Separator());
 
         IAction linkFeedView = new Action("Link with Feed-View", IAction.AS_CHECK_BOX) {
           @Override
@@ -1248,7 +1268,7 @@ public class BookMarkExplorer extends ViewPart {
           return;
 
         if (OwlUI.STICKY_BG_COLOR_ID.equals(event.getProperty())) {
-          ((BookMarkLabelProvider) fLabelProvider).updateResources();
+          fLabelProvider.updateResources();
           fViewer.refresh(true);
         }
       }
@@ -1604,6 +1624,7 @@ public class BookMarkExplorer extends ViewPart {
     fGlobalPreferences.putBoolean(DefaultPreferences.BE_ALWAYS_SHOW_SEARCH, fAlwaysShowSearch);
     fGlobalPreferences.putBoolean(DefaultPreferences.BE_SORT_BY_NAME, fSortByName);
     fGlobalPreferences.putBoolean(DefaultPreferences.BE_ENABLE_LINKING, fLinkingEnabled);
+    fGlobalPreferences.putBoolean(DefaultPreferences.BE_DISABLE_FAVICONS, !fFaviconsEnabled);
     fGlobalPreferences.putInteger(DefaultPreferences.BE_FILTER_TYPE, fBookMarkFilter.getType().ordinal());
     fGlobalPreferences.putInteger(DefaultPreferences.BE_GROUP_TYPE, fBookMarkGrouping.getType().ordinal());
   }
@@ -1630,6 +1651,7 @@ public class BookMarkExplorer extends ViewPart {
     fAlwaysShowSearch = fGlobalPreferences.getBoolean(DefaultPreferences.BE_ALWAYS_SHOW_SEARCH);
     fSortByName = fGlobalPreferences.getBoolean(DefaultPreferences.BE_SORT_BY_NAME);
     fLinkingEnabled = fGlobalPreferences.getBoolean(DefaultPreferences.BE_ENABLE_LINKING);
+    fFaviconsEnabled = !fGlobalPreferences.getBoolean(DefaultPreferences.BE_DISABLE_FAVICONS);
     fFilterType = BookMarkFilter.Type.values()[fGlobalPreferences.getInteger(DefaultPreferences.BE_FILTER_TYPE)];
     fGroupingType = BookMarkGrouping.Type.values()[fGlobalPreferences.getInteger(DefaultPreferences.BE_GROUP_TYPE)];
 
