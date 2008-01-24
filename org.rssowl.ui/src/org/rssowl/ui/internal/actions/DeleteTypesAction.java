@@ -126,7 +126,7 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
         return true;
       else if (element instanceof EntityGroup) {
         EntityGroup group = (EntityGroup) element;
-        if (NewsGrouping.GROUP_CATEGORY_ID.equals(group.getId()))
+        if (NewsGrouping.GROUP_CATEGORY_ID.equals(group.getCategory()))
           return true;
       }
     }
