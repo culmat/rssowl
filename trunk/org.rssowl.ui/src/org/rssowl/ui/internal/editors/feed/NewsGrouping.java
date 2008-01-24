@@ -226,8 +226,8 @@ public class NewsGrouping {
     /* News Event */
     if (entity.equals(INews.class)) {
 
-      /* Update if a News got Deleted */
-      if (ModelUtils.gotDeleted(events))
+      /* Update if a News got Deleted or Restored */
+      if (ModelUtils.gotDeleted(events) || ModelUtils.gotRestored(events))
         return true;
 
       /* Check in dependence of Group Type */

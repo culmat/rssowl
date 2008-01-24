@@ -706,6 +706,27 @@ public class ModelUtils {
   }
 
   /**
+   * @param events
+   * @return <code>TRUE</code> in case any of the News got restored and
+   * <code>FALSE</code> otherwise.
+   */
+  public static boolean gotRestored(Set<? extends ModelEvent> events) {
+    for (ModelEvent event : events) {
+      if (event instanceof NewsEvent) {
+        NewsEvent newsEvent = (NewsEvent) event;
+
+        boolean isVisible = newsEvent.getEntity().isVisible();
+        boolean wasVisible = newsEvent.getOldNews() != null ? newsEvent.getOldNews().isVisible() : false;
+
+        if (isVisible && !wasVisible && newsEvent.getOldNews() != null)
+          return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
    * @param selection Any list of selected <code>INews</code> or
    * <code>EntityGroup</code>.
    * @return Returns a Set of <code>ILabel</code> that <em>all entities</em>
