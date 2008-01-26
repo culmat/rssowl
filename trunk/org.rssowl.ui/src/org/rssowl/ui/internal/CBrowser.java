@@ -30,7 +30,6 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.browser.Browser;
@@ -42,14 +41,11 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
-import org.rssowl.ui.internal.editors.browser.WebBrowserInput;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 import org.rssowl.ui.internal.util.BrowserUtils;
 
@@ -271,16 +267,9 @@ public class CBrowser {
           return;
 
         /* Open Browser in new Tab */
-        WebBrowserInput input = new WebBrowserInput(URIUtils.ABOUT_BLANK);
-        IWorkbenchPage page = OwlUI.getPage();
-        if (page != null) {
-          try {
-            WebBrowserView browserView = (WebBrowserView) page.openEditor(input, WebBrowserView.EDITOR_ID, OpenStrategy.activateOnOpen());
-            event.browser = browserView.getBrowser().getControl();
-          } catch (PartInitException e) {
-            Activator.getDefault().getLog().log(e.getStatus());
-          }
-        }
+        WebBrowserView browserView = BrowserUtils.openLinkInternal(URIUtils.ABOUT_BLANK);
+        if (browserView != null)
+          event.browser = browserView.getBrowser().getControl();
       }
     });
 
@@ -335,7 +324,7 @@ public class CBrowser {
 
         /* Finally, cancel event and open URL external */
         event.doit = false;
-        BrowserUtils.openLink(event.location);
+        BrowserUtils.openLinkExternal(event.location);
       }
     });
   }
