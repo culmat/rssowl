@@ -55,13 +55,15 @@ import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.dialogs.ConfirmDeleteDialog;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Preferences page to manage stored credentials for bookmarks.
@@ -76,32 +78,62 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
   /* Model used in the Viewer */
   private static class CredentialsModelData {
-    private URI fOriginalLink;
     private URI fNormalizedLink;
     private String fRealm;
-    private ICredentials fCredentials;
+    private String fUsername;
 
-    public CredentialsModelData(ICredentials credentials, URI originalLink, URI normalizedLink, String realm) {
-      fCredentials = credentials;
-      fOriginalLink = originalLink;
+    CredentialsModelData(String username, URI normalizedLink, String realm) {
+      fUsername = username;
       fNormalizedLink = normalizedLink;
       fRealm = realm;
     }
 
-    public URI getNormalizedLink() {
+    URI getNormalizedLink() {
       return fNormalizedLink;
     }
 
-    public URI getOriginalLink() {
-      return fOriginalLink;
-    }
-
-    public String getRealm() {
+    String getRealm() {
       return fRealm;
     }
 
-    public ICredentials getCredentials() {
-      return fCredentials;
+    String getUsername() {
+      return fUsername;
+    }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + ((fNormalizedLink == null) ? 0 : fNormalizedLink.hashCode());
+      result = prime * result + ((fRealm == null) ? 0 : fRealm.hashCode());
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj)
+        return true;
+
+      if (obj == null)
+        return false;
+
+      if (getClass() != obj.getClass())
+        return false;
+
+      CredentialsModelData other = (CredentialsModelData) obj;
+      if (fNormalizedLink == null) {
+        if (other.fNormalizedLink != null)
+          return false;
+      } else if (!fNormalizedLink.equals(other.fNormalizedLink))
+        return false;
+
+      if (fRealm == null) {
+        if (other.fRealm != null)
+          return false;
+      } else if (!fRealm.equals(other.fRealm))
+        return false;
+
+      return true;
     }
   }
 
@@ -142,7 +174,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     /* Label */
     Label infoLabel = new Label(container, SWT.NONE);
     infoLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-    infoLabel.setText("RSSOwl has saved login information for the following feeds:");
+    infoLabel.setText("RSSOwl has saved login information for the following sites and realms:");
 
     /* Viewer to display Passwords */
     int style = SWT.MULTI | SWT.FULL_SELECTION | SWT.BORDER;
@@ -156,16 +188,21 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     /* Create Columns */
     TableViewerColumn col = new TableViewerColumn(fViewer, SWT.LEFT);
-    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 60), "Feed", null, false, true);
+    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 45), "Site", null, false, true);
     col.getColumn().setMoveable(false);
 
     col = new TableViewerColumn(fViewer, SWT.LEFT);
-    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 40), "Username", null, false, true);
+    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 30), "Realm", null, false, true);
+    col.getColumn().setMoveable(false);
+
+    col = new TableViewerColumn(fViewer, SWT.LEFT);
+    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 25), "Username", null, false, true);
+    col.getColumn().setMoveable(false);
 
     /* Content Provider */
     fViewer.setContentProvider(new IStructuredContentProvider() {
       public Object[] getElements(Object inputElement) {
-        List<CredentialsModelData> credentials = loadCredentials();
+        Set<CredentialsModelData> credentials = loadCredentials();
         return credentials.toArray();
       }
 
@@ -187,7 +224,11 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
             break;
 
           case 1:
-            cell.setText(data.getCredentials().getUsername());
+            cell.setText(data.getRealm());
+            break;
+
+          case 2:
+            cell.setText(data.getUsername());
             break;
         }
       }
@@ -265,7 +306,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     if (dialog.open() != IDialogConstants.OK_ID)
       return;
 
-    List<CredentialsModelData> credentials = loadCredentials();
+    Set<CredentialsModelData> credentials = loadCredentials();
     for (CredentialsModelData data : credentials) {
       remove(data);
     }
@@ -277,34 +318,63 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
   }
 
   private void remove(CredentialsModelData data) {
+
+    /* Remove normalized link and realm */
     ICredentialsProvider provider = fConService.getCredentialsProvider(data.getNormalizedLink());
     if (provider != null) {
       try {
-
-        /* Delete normalized Link */
         provider.deleteAuthCredentials(data.getNormalizedLink(), data.getRealm());
-
-        /* Also delete original Link since its kept as well */
-        provider.deleteAuthCredentials(data.getOriginalLink(), null);
       } catch (CredentialsException e) {
         Activator.getDefault().logError(e.getMessage(), e);
       }
     }
+
+    /* Remove all other stored Credentials matching normalized link and realm */
+    Collection<IBookMark> bookmarks = DynamicDAO.loadAll(IBookMark.class);
+    for (IBookMark bookmark : bookmarks) {
+      String realm = (String) bookmark.getProperty(Controller.BM_REALM_PROPERTY);
+
+      URI feedLink = bookmark.getFeedLinkReference().getLink();
+      URI normalizedLink = URIUtils.normalizeUri(feedLink, true);
+
+      /*
+       * If realm is null, then this bookmark successfully loaded due to another bookmark
+       * that the user successfully authenticated to. If the realm is not null, then we
+       * have to compare the realm to ensure that no credentials from the same host but
+       * a different realm gets removed.
+       */
+      if ((realm == null || realm.equals(data.getRealm())) && normalizedLink.equals(data.getNormalizedLink())) {
+        provider = fConService.getCredentialsProvider(feedLink);
+        if (provider != null) {
+          try {
+            provider.deleteAuthCredentials(feedLink, null); //Null as per contract in DefaultProtocolHandler
+            bookmark.removeProperty(Controller.BM_REALM_PROPERTY);
+          } catch (CredentialsException e) {
+            Activator.getDefault().logError(e.getMessage(), e);
+          }
+        }
+      }
+    }
   }
 
-  private List<CredentialsModelData> loadCredentials() {
-    List<CredentialsModelData> credentials = new ArrayList<CredentialsModelData>();
+  private Set<CredentialsModelData> loadCredentials() {
+    Set<CredentialsModelData> credentials = new HashSet<CredentialsModelData>();
 
     Collection<IBookMark> bookmarks = DynamicDAO.loadAll(IBookMark.class);
     for (IBookMark bookmark : bookmarks) {
       String realm = (String) bookmark.getProperty(Controller.BM_REALM_PROPERTY);
+
+      /* Only support sites with realms */
+      if (!StringUtils.isSet(realm))
+        continue;
+
       URI feedLink = bookmark.getFeedLinkReference().getLink();
-      URI normalizedLink = realm != null ? URIUtils.normalizeUri(feedLink, true) : feedLink;
+      URI normalizedLink = URIUtils.normalizeUri(feedLink, true);
 
       try {
         ICredentials authCredentials = fConService.getAuthCredentials(normalizedLink, realm);
         if (authCredentials != null) {
-          CredentialsModelData data = new CredentialsModelData(authCredentials, feedLink, normalizedLink, realm);
+          CredentialsModelData data = new CredentialsModelData(authCredentials.getUsername(), normalizedLink, realm);
           credentials.add(data);
         }
       } catch (CredentialsException e) {
