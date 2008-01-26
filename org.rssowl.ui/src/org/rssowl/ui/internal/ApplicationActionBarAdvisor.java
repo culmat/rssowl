@@ -655,7 +655,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     helpMenu.add(new Action("&Boreal Owl Help") {
       @Override
       public void run() {
-        BrowserUtils.openLink("http://boreal.rssowl.org");
+        BrowserUtils.openLinkExternal("http://boreal.rssowl.org");
       }
 
       @Override
@@ -670,7 +670,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     helpMenu.add(new Action("&Report Bugs") {
       @Override
       public void run() {
-        BrowserUtils.openLink("http://dev.rssowl.org");
+        BrowserUtils.openLinkExternal("http://dev.rssowl.org");
       }
 
       @Override
@@ -683,7 +683,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     helpMenu.add(new Action("&Homepage") {
       @Override
       public void run() {
-        BrowserUtils.openLink("http://www.rssowl.org");
+        BrowserUtils.openLinkExternal("http://www.rssowl.org");
       }
     });
 
@@ -691,7 +691,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     helpMenu.add(new Action("&Mailinglist") {
       @Override
       public void run() {
-        BrowserUtils.openLink("https://lists.sourceforge.net/lists/listinfo/rssowl-boreal");
+        BrowserUtils.openLinkExternal("https://lists.sourceforge.net/lists/listinfo/rssowl-boreal");
       }
     });
 

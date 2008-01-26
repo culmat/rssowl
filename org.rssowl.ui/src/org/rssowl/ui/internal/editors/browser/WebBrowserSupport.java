@@ -27,7 +27,6 @@ package org.rssowl.ui.internal.editors.browser;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.browser.AbstractWorkbenchBrowserSupport;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.rssowl.core.Owl;
@@ -62,7 +61,7 @@ public class WebBrowserSupport extends AbstractWorkbenchBrowserSupport {
       /*
        * @see org.eclipse.ui.browser.IWebBrowser#openURL(java.net.URL)
        */
-      public void openURL(URL url) throws PartInitException {
+      public void openURL(URL url) {
         Assert.isNotNull(url);
 
         /* Open externally */
@@ -71,7 +70,7 @@ public class WebBrowserSupport extends AbstractWorkbenchBrowserSupport {
 
         /* Open internally */
         else
-          openInternal(url);
+          BrowserUtils.openLinkInternal(url.toExternalForm());
       }
 
       private boolean useExternalBrowser() {
@@ -79,15 +78,8 @@ public class WebBrowserSupport extends AbstractWorkbenchBrowserSupport {
         return globalScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER) || globalScope.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER);
       }
 
-      private void openInternal(URL url) throws PartInitException {
-        WebBrowserInput input = new WebBrowserInput(url.toExternalForm());
-        IWorkbenchPage page = OwlUI.getPage();
-        if (page != null)
-          fBrowserView = page.openEditor(input, WebBrowserView.EDITOR_ID);
-      }
-
       private void openExternal(URL url) {
-        BrowserUtils.openLink(url.toExternalForm());
+        BrowserUtils.openLinkExternal(url.toExternalForm());
       }
 
       /*

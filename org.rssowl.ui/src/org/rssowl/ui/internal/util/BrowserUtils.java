@@ -27,15 +27,21 @@ package org.rssowl.ui.internal.util;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.MiscPreferencePage;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.editors.browser.WebBrowserInput;
+import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 
 import java.io.IOException;
 
@@ -56,11 +62,54 @@ public class BrowserUtils {
   }
 
   /**
+   * @param href Any URL
+   * @return the {@link WebBrowserInput} created to show the link or
+   * <code>null</code> if it could not be created.
+   */
+  public static WebBrowserView openLinkInternal(String href) {
+    WebBrowserView view = null;
+
+    try {
+      IPreferenceScope eclipsePreferences = Owl.getPreferenceService().getEclipseScope();
+      IPreferenceScope owlPreferences = Owl.getPreferenceService().getGlobalScope();
+
+      WebBrowserInput input = new WebBrowserInput(href);
+      IWorkbenchPage page = OwlUI.getPage();
+      if (page != null) {
+        boolean multipleTabs = eclipsePreferences.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS);
+        boolean openInBackground = owlPreferences.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND);
+
+        /* Open Browser Tab in Background */
+        if (multipleTabs && openInBackground) {
+          IEditorPart previousActiveEditor = page.getActiveEditor();
+          page.getWorkbenchWindow().getShell().setRedraw(false);
+          try {
+            view = (WebBrowserView) page.openEditor(input, WebBrowserView.EDITOR_ID);
+
+            if (previousActiveEditor != null)
+              page.activate(previousActiveEditor);
+          } finally {
+            page.getWorkbenchWindow().getShell().setRedraw(true);
+          }
+        }
+
+        /* Open Browser Tab in Front */
+        else
+          view = (WebBrowserView) page.openEditor(input, WebBrowserView.EDITOR_ID);
+      }
+    } catch (PartInitException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    }
+
+    return view;
+  }
+
+  /**
    * Open a link in the external browser
    *
    * @param href Any URL
    */
-  public static void openLink(String href) {
+  public static void openLinkExternal(String href) {
 
     /* If href points to local file */
     if (href.startsWith("file:")) {
@@ -101,7 +150,7 @@ public class BrowserUtils {
     str.append("&subject=");
     str.append(subject != null ? URIUtils.mailToUrllEncode(subject) : "");
 
-    openLink(str.toString());
+    openLinkExternal(str.toString());
   }
 
   /**

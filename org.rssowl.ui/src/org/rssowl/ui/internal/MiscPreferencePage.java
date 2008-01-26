@@ -70,6 +70,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   private Button fUseMultipleTabsCheck;
   private Button fReopenFeedsOnStartupCheck;
   private Button fAlwaysReuseFeedView;
+  private Button fLoadBrowserTabInBackground;
 
   /** Leave for reflection */
   public MiscPreferencePage() {
@@ -126,9 +127,19 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fAlwaysReuseFeedView.setText("Always open feeds in the same tab");
     fAlwaysReuseFeedView.setSelection(fGlobalScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW));
 
+    fLoadBrowserTabInBackground = new Button(viewGroup, SWT.CHECK);
+    fLoadBrowserTabInBackground.setText("Open browser tabs in the background");
+    fLoadBrowserTabInBackground.setSelection(fGlobalScope.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND));
+
     fUseMultipleTabsCheck = new Button(viewGroup, SWT.CHECK);
     fUseMultipleTabsCheck.setText("Show multiple tabs side by side");
     fUseMultipleTabsCheck.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS));
+    fUseMultipleTabsCheck.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && fUseMultipleTabsCheck.getSelection());
+      }
+    });
 
     Composite autoCloseTabsContainer = new Composite(viewGroup, SWT.None);
     autoCloseTabsContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0, 0, 2, false));
@@ -151,6 +162,8 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
 
     label = new Label(autoCloseTabsContainer, SWT.None);
     label.setText(fAutoCloseTabsSpinner.getSelection() == 1 ? " tab" : " tabs");
+
+    fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && fUseMultipleTabsCheck.getSelection());
   }
 
   private void createTrayOptions(Composite container) {
@@ -193,6 +206,12 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fUseInternalBrowser = new Button(browserGroup, SWT.RADIO);
     fUseInternalBrowser.setText("Use internal Browser");
     fUseInternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
+    fUseInternalBrowser.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && fUseMultipleTabsCheck.getSelection());
+      }
+    });
 
     /* Use default external Browser */
     fUseDefaultExternalBrowser = new Button(browserGroup, SWT.RADIO);
@@ -256,6 +275,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   public boolean performOk() {
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS, fReopenFeedsOnStartupCheck.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW, fAlwaysReuseFeedView.getSelection());
+    fGlobalScope.putBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND, fLoadBrowserTabInBackground.getSelection());
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, fUseMultipleTabsCheck.getSelection());
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS, fAutoCloseTabsCheck.getSelection());
     fEclipseScope.putInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, fAutoCloseTabsSpinner.getSelection());
@@ -282,6 +302,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
 
     fReopenFeedsOnStartupCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS));
     fAlwaysReuseFeedView.setSelection(defaultScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW));
+    fLoadBrowserTabInBackground.setSelection(defaultScope.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND));
     fUseMultipleTabsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS));
     fAutoCloseTabsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS));
     fAutoCloseTabsSpinner.setSelection(defaultScope.getInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD));
@@ -297,5 +318,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
 
     fCustomBrowserInput.setEnabled(fUseCustomExternalBrowser.getSelection());
     fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
+
+    fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && fUseMultipleTabsCheck.getSelection());
   }
 }
