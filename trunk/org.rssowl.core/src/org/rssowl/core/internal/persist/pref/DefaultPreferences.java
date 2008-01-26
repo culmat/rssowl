@@ -221,6 +221,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Last used Keyword Feed */
   public static final String LAST_KEYWORD_FEED = "org.rssowl.pref.LastKeywordFeed";
 
+  /** Global: Open Browser Tabs in the Background */
+  public static final String OPEN_BROWSER_IN_BACKGROUND = "org.rssowl.pref.OpenBrowserInBackground";
+
   /**
    * Eclipse Preferences Follow
    */
