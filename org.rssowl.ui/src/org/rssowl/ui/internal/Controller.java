@@ -739,8 +739,7 @@ public class Controller {
       fNotificationService = new NotificationService();
 
     /* Create the Saved Search Service */
-    if (!InternalOwl.TESTING)
-      fSavedSearchService = new SavedSearchService();
+    fSavedSearchService = new SavedSearchService();
 
     /* Register Listeners */
     registerListeners();
@@ -777,7 +776,7 @@ public class Controller {
       fNotificationService.stopService();
 
     /* Stop the Saved Search Service */
-    if (!InternalOwl.TESTING && !emergency)
+    if (!emergency)
       fSavedSearchService.stopService();
 
     /* Shutdown ApplicationServer */
