@@ -36,7 +36,6 @@ import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
-import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.ui.internal.dialogs.cleanup.BookMarkTask;
 import org.rssowl.ui.internal.dialogs.cleanup.CleanUpGroup;
 import org.rssowl.ui.internal.dialogs.cleanup.CleanUpModel;
@@ -60,14 +59,12 @@ public class CleanUpTests {
   private static final long DAY = 24 * 60 * 60 * 1000;
 
   private IModelFactory fFactory;
-  private IModelSearch fModelSearch;
 
   /**
    * @throws Exception
    */
   @Before
   public void setUp() throws Exception {
-    fModelSearch = Owl.getPersistenceService().getModelSearch();
     fFactory = Owl.getModelFactory();
 
     Owl.getPersistenceService().recreateSchema();
