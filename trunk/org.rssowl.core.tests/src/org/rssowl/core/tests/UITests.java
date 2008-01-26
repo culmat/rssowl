@@ -37,6 +37,7 @@ import org.rssowl.core.tests.ui.ModelUtilsTest;
 import org.rssowl.core.tests.ui.NewsGroupFilterTest;
 import org.rssowl.core.tests.ui.RetentionStrategyTests;
 import org.rssowl.core.tests.ui.TreeTraversalTest;
+import org.rssowl.core.tests.ui.UndoTest;
 
 /**
  * Test-Suite for UI-Tests.
@@ -56,5 +57,6 @@ import org.rssowl.core.tests.ui.TreeTraversalTest;
   MiscUITests.class,
   CleanUpTests.class,
   ExpandingReaderTests.class,
-  ImportExportOPMLTest.class })
+  ImportExportOPMLTest.class,
+  UndoTest.class })
 public class UITests {}
