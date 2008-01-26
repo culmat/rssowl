@@ -39,6 +39,7 @@ import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
@@ -65,9 +66,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Tests a full export and import using OPML including Folders, Bookmarks and
- * Saved Searches. For saved searches most combinations of Field, Specifier and
- * Value are used to make sure everything works as expected.
+ * Tests a full export and import using OPML including Folders, Bookmarks, Saved
+ * Searches and News Bins. For saved searches most combinations of Field,
+ * Specifier and Value are used to make sure everything works as expected.
  *
  * @author bpasero
  */
@@ -82,6 +83,7 @@ public class ImportExportOPMLTest {
   private IBookMark fBookMark1;
   private IFolder fDefaultFolder2;
   private IFolder fCustomFolder2;
+  private INewsBin fNewsBin;
 
   /**
    * @throws Exception
@@ -153,6 +155,8 @@ public class ImportExportOPMLTest {
     IFeed feed3 = fFactory.createFeed(null, new URI("feed3"));
     fFactory.createBookMark(null, fDefaultFolder1, new FeedLinkReference(feed3.getLink()), "Bookmark 3");
 
+    /* Default > News Bin 1 */
+    fNewsBin = fFactory.createNewsBin(null, fDefaultSet, "Bin 1");
   }
 
   private void fillCustomSet() throws URISyntaxException {
@@ -320,6 +324,15 @@ public class ImportExportOPMLTest {
       condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { fBookMark1 })));
       searchmark.addSearchCondition(condition);
     }
+
+    /* 14) Location is Bin 1 */
+    {
+      ISearchField field = fFactory.createSearchField(INews.LOCATION, newsName);
+      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { fNewsBin })));
+
+      ISearchMark searchmark = fFactory.createSearchMark(null, parent, "Search");
+      searchmark.addSearchCondition(condition);
+    }
   }
 
   /**
@@ -382,7 +395,7 @@ public class ImportExportOPMLTest {
     assertNotNull(customFolder2);
 
     List<IMark> defaultMarks = defaultSet.getMarks();
-    assertEquals(14, defaultMarks.size());
+    assertEquals(16, defaultMarks.size());
 
     IBookMark bookmark1 = null;
     for (IMark mark : defaultMarks) {
@@ -393,8 +406,16 @@ public class ImportExportOPMLTest {
     assertNotNull(bookmark1);
     assertEquals("feed1", bookmark1.getFeedLinkReference().getLink().toString());
 
+    INewsBin bin = null;
+    for (IMark mark : defaultMarks) {
+      if (mark instanceof INewsBin && mark.getName().equals("Bin 1"))
+        bin = (INewsBin) mark;
+    }
+
+    assertNotNull(bin);
+
     List<IMark> customMarks = customSet.getMarks();
-    assertEquals(14, customMarks.size());
+    assertEquals(15, customMarks.size());
 
     IBookMark bookmark2 = null;
     for (IMark mark : customMarks) {
@@ -598,6 +619,17 @@ public class ImportExportOPMLTest {
     assertContains("Default", locations);
     assertContains("Custom", locations);
     assertContains("Bookmark 1", locations);
+
+    /* 14) Location is Bin 1 */
+    searchmark = searchmarks.get(13);
+    conditions = searchmark.getSearchConditions();
+    assertEquals(1, conditions.size());
+    assertEquals(INews.LOCATION, conditions.get(0).getField().getId());
+    assertEquals(SearchSpecifier.IS, conditions.get(0).getSpecifier());
+    locations = ModelUtils.toEntities((Long[][]) conditions.get(0).getValue());
+    assertEquals(1, locations.size());
+    assertEquals(true, locations.get(0) instanceof INewsBin);
+    assertEquals(fNewsBin.getName(), locations.get(0).getName());
   }
 
   private void assertContains(String name, List<IFolderChild> childs) {
