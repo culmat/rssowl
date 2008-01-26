@@ -2316,4 +2316,53 @@ public class ModelTest3 {
 
     assertNotNull(news.getDescription());
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSetStateDoesNotAffectHiddenDeletedNews() throws Exception {
+    IFeed feed1 = fFactory.createFeed(null, new URI("http://www.foo1.com"));
+    INews news1 = fFactory.createNews(null, feed1, new Date());
+    news1.setLink(new URI("http://www.news.com"));
+
+    IFeed feed2 = fFactory.createFeed(null, new URI("http://www.foo2.com"));
+    INews news2 = fFactory.createNews(null, feed2, new Date());
+    news2.setLink(new URI("http://www.news.com"));
+
+    DynamicDAO.save(feed1);
+    DynamicDAO.save(feed2);
+
+    INewsDAO newsDao = DynamicDAO.getDAO(INewsDAO.class);
+
+    newsDao.setState(Collections.singleton(news1), INews.State.READ, true, false);
+
+    assertEquals(INews.State.READ, news1.getState());
+    assertEquals(INews.State.READ, news2.getState());
+
+    newsDao.setState(Collections.singleton(news1), INews.State.UNREAD, true, false);
+
+    assertEquals(INews.State.UNREAD, news1.getState());
+    assertEquals(INews.State.UNREAD, news2.getState());
+
+    newsDao.setState(Collections.singleton(news1), INews.State.HIDDEN, false, false);
+
+    assertEquals(INews.State.HIDDEN, news1.getState());
+    assertEquals(INews.State.UNREAD, news2.getState());
+
+    newsDao.setState(Collections.singleton(news2), INews.State.READ, true, false);
+
+    assertEquals(INews.State.HIDDEN, news1.getState());
+    assertEquals(INews.State.READ, news2.getState());
+
+    newsDao.setState(Collections.singleton(news1), INews.State.DELETED, false, false);
+
+    assertEquals(INews.State.DELETED, news1.getState());
+    assertEquals(INews.State.READ, news2.getState());
+
+    newsDao.setState(Collections.singleton(news2), INews.State.UNREAD, true, false);
+
+    assertEquals(INews.State.DELETED, news1.getState());
+    assertEquals(INews.State.UNREAD, news2.getState());
+  }
 }
