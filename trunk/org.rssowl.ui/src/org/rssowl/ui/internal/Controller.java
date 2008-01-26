@@ -131,8 +131,8 @@ public class Controller {
   /* Extension-Points */
   private static final String ENTITY_PROPERTY_PAGE_EXTENSION_POINT = "org.rssowl.ui.EntityPropertyPage"; //$NON-NLS-1$
 
-  /* Property to store info about a Realm in a Bookmark */
-  static final String BM_REALM_PROPERTY = "org.rssowl.ui.BMRealmProperty";
+  /** Property to store info about a Realm in a Bookmark */
+  public static final String BM_REALM_PROPERTY = "org.rssowl.ui.BMRealmProperty";
 
   /** Prefix for dynamic Label Actions */
   public static final String LABEL_ACTION_PREFIX = "org.rssowl.ui.LabelAction";

@@ -47,6 +47,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -75,6 +76,7 @@ public class CreateBookmarkWizard extends Wizard {
   private final IFolder fSelection;
   private final String fInitialLink;
   private final IMark fPosition;
+  private String fLastRealm;
 
   /**
    * @param parent
@@ -150,6 +152,7 @@ public class CreateBookmarkWizard extends Wizard {
           try {
             link = new URI(linkText);
             feedTitle = Owl.getConnectionService().getLabel(link);
+            fLastRealm = null;
           } catch (final ConnectionException e) {
 
             /* Authentication Required */
@@ -181,6 +184,7 @@ public class CreateBookmarkWizard extends Wizard {
   }
 
   private boolean handleProtectedFeed(final URI feedLink, final String realm) {
+    fLastRealm = realm;
     final boolean[] result = new boolean[1];
 
     JobRunner.runSyncedInUIThread(getShell(), new Runnable() {
@@ -310,6 +314,10 @@ public class CreateBookmarkWizard extends Wizard {
 
     for (Map.Entry<String, ?> property : properties.entrySet())
       bookmark.setProperty(property.getKey(), property.getValue());
+
+    /* Remember Realm Property */
+    if (StringUtils.isSet(fLastRealm))
+      bookmark.setProperty(Controller.BM_REALM_PROPERTY, fLastRealm);
 
     parent = DynamicDAO.save(parent);
 
