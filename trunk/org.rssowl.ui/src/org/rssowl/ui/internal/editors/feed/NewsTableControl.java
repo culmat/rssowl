@@ -99,6 +99,7 @@ import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.CColumnLayoutData;
 import org.rssowl.ui.internal.CTree;
 import org.rssowl.ui.internal.EntityGroup;
+import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.StatusLineUpdater;
@@ -908,7 +909,7 @@ public class NewsTableControl implements IFeedViewPart {
     TreeColumn feedColumn = tree.getColumn(COL_FEED);
 
     boolean oldInputShowsFeedColumn = !(oldInput instanceof BookMarkReference);
-    boolean newInputShowsFeedColumn = (input instanceof ISearchMark) || (input instanceof INewsBin);
+    boolean newInputShowsFeedColumn = (input instanceof ISearchMark) || (input instanceof INewsBin) || (input instanceof FolderNewsMark);
 
     /* Reveal Feed Column */
     if ((!oldInputShowsFeedColumn && newInputShowsFeedColumn) || newInputShowsFeedColumn)

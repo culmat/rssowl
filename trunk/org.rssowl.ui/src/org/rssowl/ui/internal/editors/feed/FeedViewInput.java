@@ -34,6 +34,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
 
 /**
@@ -103,6 +104,8 @@ public class FeedViewInput implements IEditorInput {
       return OwlUI.SEARCHMARK;
     else if (fMark instanceof INewsBin)
       return OwlUI.NEWSBIN;
+    else if (fMark instanceof FolderNewsMark)
+      return OwlUI.FOLDER;
 
     return OwlUI.UNKNOWN;
   }
@@ -120,6 +123,9 @@ public class FeedViewInput implements IEditorInput {
   public IPersistableElement getPersistable() {
     boolean restore = Platform.getPreferencesService().getBoolean(RESTORE_QUALIFIER, RESTORE_KEY, true, null);
     if (!restore)
+      return null;
+
+    if (fMark instanceof FolderNewsMark)
       return null;
 
     return new IPersistableElement() {
