@@ -62,6 +62,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
@@ -76,6 +77,8 @@ import org.rssowl.core.persist.event.BookMarkEvent;
 import org.rssowl.core.persist.event.BookMarkListener;
 import org.rssowl.core.persist.event.FeedAdapter;
 import org.rssowl.core.persist.event.FeedEvent;
+import org.rssowl.core.persist.event.FolderAdapter;
+import org.rssowl.core.persist.event.FolderEvent;
 import org.rssowl.core.persist.event.MarkEvent;
 import org.rssowl.core.persist.event.NewsBinAdapter;
 import org.rssowl.core.persist.event.NewsBinEvent;
@@ -89,6 +92,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
@@ -181,6 +185,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private FeedAdapter fFeedListener;
   private SearchConditionListener fSearchConditionListener;
   private NewsBinListener fNewsBinListener;
+  private FolderAdapter fFolderListener;
 
   /* Settings */
   NewsFilter.Type fInitialFilterType;
@@ -321,6 +326,20 @@ public class FeedView extends EditorPart implements IReusableEditor {
     };
     DynamicDAO.addEntityListener(IBookMark.class, fBookMarkListener);
 
+    /* React on Folder Events */
+    fFolderListener = new FolderAdapter() {
+      @Override
+      public void entitiesDeleted(Set<FolderEvent> events) {
+        onFoldersDeleted(events);
+      }
+
+      @Override
+      public void entitiesUpdated(Set<FolderEvent> events) {
+        onNewsFoldersUpdated(events);
+      }
+    };
+    DynamicDAO.addEntityListener(IFolder.class, fFolderListener);
+
     /* React on Searchmark Events */
     fSearchMarkListener = new SearchMarkAdapter() {
       @Override
@@ -425,6 +444,41 @@ public class FeedView extends EditorPart implements IReusableEditor {
       }
     };
     DynamicDAO.addEntityListener(IFeed.class, fFeedListener);
+  }
+
+  private void onNewsFoldersUpdated(Set<FolderEvent> events) {
+    if (!(fInput.getMark() instanceof FolderNewsMark))
+      return;
+
+    FolderNewsMark folderNewsMark = (FolderNewsMark) (fInput.getMark());
+    for (FolderEvent event : events) {
+      final IFolder folder = event.getEntity();
+      if (folder.equals(folderNewsMark.getFolder())) {
+        JobRunner.runInUIThread(fParent, new Runnable() {
+          public void run() {
+            setPartName(folder.getName());
+            OwlUI.updateWindowTitle(new IMark[] { fInput.getMark() });
+          }
+        });
+
+        break;
+      }
+    }
+  }
+
+  private void onFoldersDeleted(Set<FolderEvent> events) {
+    if (!(fInput.getMark() instanceof FolderNewsMark))
+      return;
+
+    FolderNewsMark folderNewsMark = (FolderNewsMark) (fInput.getMark());
+    for (FolderEvent event : events) {
+      final IFolder folder = event.getEntity();
+      if (folder.equals(folderNewsMark.getFolder())) {
+        fInput.setDeleted();
+        fEditorSite.getPage().closeEditor(FeedView.this, false);
+        break;
+      }
+    }
   }
 
   private void onNewsMarksUpdated(Set<? extends MarkEvent> events) {
@@ -861,7 +915,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         }
 
         /* TODO Fixme once IBookMarkDAO.visited() is implemented */
-        else {
+        else if (!(mark instanceof FolderNewsMark)) {
           mark.setPopularity(mark.getPopularity() + 1);
           mark.setLastVisitDate(new Date(System.currentTimeMillis()));
           DynamicDAO.save(mark);
@@ -968,6 +1022,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private void unregisterListeners() {
     fEditorSite.getPage().removePartListener(fPartListener);
     DynamicDAO.removeEntityListener(IBookMark.class, fBookMarkListener);
+    DynamicDAO.removeEntityListener(IFolder.class, fFolderListener);
     DynamicDAO.removeEntityListener(ISearchMark.class, fSearchMarkListener);
     DynamicDAO.removeEntityListener(IFeed.class, fFeedListener);
     DynamicDAO.removeEntityListener(ISearchCondition.class, fSearchConditionListener);

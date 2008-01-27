@@ -35,6 +35,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
+import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -60,11 +61,14 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FolderReference;
@@ -72,6 +76,7 @@ import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
+import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.io.ByteArrayInputStream;
@@ -81,6 +86,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -1011,5 +1017,44 @@ public class OwlUI {
     }
 
     return null;
+  }
+
+  /**
+   * Opens a selection of {@link INewsMark} inside the feed view.
+   *
+   * @param page
+   * @param selection
+   */
+  public static void openInFeedView(IWorkbenchPage page, IStructuredSelection selection) {
+    List<?> list = selection.toList();
+    boolean activateEditor = OpenStrategy.activateOnOpen();
+    int openedEditors = 0;
+    int maxOpenEditors = EditorUtils.getOpenEditorLimit();
+    boolean reuseFeedView = Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW);
+
+    /* Open Editors for the given Selection */
+    for (int i = 0; i < list.size() && openedEditors < maxOpenEditors; i++) {
+      Object object = list.get(i);
+      if (object instanceof INewsMark) {
+        INewsMark mark = ((INewsMark) object);
+
+        /* Open in existing Feedview if set */
+        if (reuseFeedView) {
+          FeedView activeFeedView = OwlUI.getFirstActiveFeedView();
+          if (activeFeedView != null) {
+            activeFeedView.setInput(new FeedViewInput(mark));
+            break;
+          }
+        }
+
+        /* Otherwise simply open */
+        try {
+          page.openEditor(new FeedViewInput(mark), FeedView.ID, activateEditor);
+          openedEditors++;
+        } catch (PartInitException e) {
+          Activator.getDefault().getLog().log(e.getStatus());
+        }
+      }
+    }
   }
 }

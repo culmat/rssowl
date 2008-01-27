@@ -49,6 +49,7 @@ import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
+import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.UIBackgroundJob;
 
@@ -606,6 +607,22 @@ public class NewsContentProvider implements ITreeContentProvider {
       /* Update / Remove: Check if News points to this Bin */
       else if (mark instanceof INewsBin) {
         return news.getParentId() == mark.getId();
+      }
+
+      /* In Memory Folder News Mark (aggregated news) */
+      else if (mark instanceof FolderNewsMark) {
+
+        /* Ignore copied News */
+        if (news.getParentId() != 0 )
+          return false;
+
+        /* News Added/Updated: Check if its part of the Folder */
+        if (type == EventType.PERSIST || type == EventType.UPDATE) {
+          return ((FolderNewsMark) mark).isRelatedTo(news);
+        }
+
+        /* Remove: Check if news was cached */
+        return hasCachedNews(news);
       }
     }
 

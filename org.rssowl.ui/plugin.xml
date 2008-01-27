@@ -649,6 +649,12 @@
             id="org.rssowl.ui.ToggleReadState"
             name="Toggle Read State">
       </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Aggregate all feeds of the selected folder."
+            id="org.rssowl.ui.AggregateFolderAction"
+            name="Aggregate Feeds">
+      </command>
    </extension>
    <extension
          id="product"
@@ -952,6 +958,19 @@
                label="&amp;Properties"
                menubarPath="properties"
                tooltip="Show Properties">
+         </action>
+      </objectContribution>
+      <objectContribution
+            adaptable="false"
+            id="org.rssowl.ui.AggregateFolderContribution"
+            objectClass="org.rssowl.core.persist.IFolder">
+         <action
+               class="org.rssowl.ui.internal.actions.AggregateFolderAction"
+               definitionId="org.rssowl.ui.AggregateFolderAction"
+               enablesFor="1"
+               id="org.rssowl.ui.AggregateFolderAction"
+               label="Aggregate Feeds"
+               menubarPath="new.ext">
          </action>
       </objectContribution>
    </extension>

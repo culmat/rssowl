@@ -37,7 +37,6 @@ import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.LocalSelectionTransfer;
-import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -341,7 +340,7 @@ public class BookMarkExplorer extends ViewPart {
     /* Hook Open Support */
     fViewer.addOpenListener(new IOpenListener() {
       public void open(OpenEvent event) {
-        BookMarkExplorer.this.open((IStructuredSelection) fViewer.getSelection());
+        OwlUI.openInFeedView(fViewSite.getPage(), (IStructuredSelection) fViewer.getSelection());
       }
     });
 
@@ -411,39 +410,6 @@ public class BookMarkExplorer extends ViewPart {
         fExpandedNodes.remove(((IFolder) element).getId());
       else if (element instanceof EntityGroup)
         fExpandedNodes.remove(((EntityGroup) element).getId());
-    }
-  }
-
-  void open(IStructuredSelection selection) {
-    List<?> list = selection.toList();
-    boolean activateEditor = OpenStrategy.activateOnOpen();
-    int openedEditors = 0;
-    int maxOpenEditors = EditorUtils.getOpenEditorLimit();
-    boolean reuseFeedView = fGlobalPreferences.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW);
-
-    /* Open Editors for the given Selection */
-    for (int i = 0; i < list.size() && openedEditors < maxOpenEditors; i++) {
-      Object object = list.get(i);
-      if (object instanceof INewsMark) {
-        INewsMark mark = ((INewsMark) object);
-
-        /* Open in existing Feedview if set */
-        if (reuseFeedView) {
-          FeedView activeFeedView = OwlUI.getFirstActiveFeedView();
-          if (activeFeedView != null) {
-            activeFeedView.setInput(new FeedViewInput(mark));
-            break;
-          }
-        }
-
-        /* Otherwise simply open */
-        try {
-          fViewSite.getPage().openEditor(new FeedViewInput(mark), FeedView.ID, activateEditor);
-          openedEditors++;
-        } catch (PartInitException e) {
-          Activator.getDefault().getLog().log(e.getStatus());
-        }
-      }
     }
   }
 
