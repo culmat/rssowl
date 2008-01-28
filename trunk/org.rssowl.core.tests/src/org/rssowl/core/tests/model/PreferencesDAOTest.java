@@ -63,6 +63,39 @@ public class PreferencesDAOTest {
   }
 
   /**
+   * Tests that IPreference#getType returns the right value after the object
+   * has been saved and loaded by the db.
+   * @throws Exception
+   */
+  @Test
+  public void testGetTypeAfterSave() throws Exception   {
+    String booleanKey = "boolean";
+    String longKey = "long";
+    String stringKey = "string";
+
+    IPreference booleanPref = fDao.loadOrCreate(booleanKey);
+    booleanPref.putBooleans(true);
+    fDao.save(booleanPref);
+
+    IPreference longPref = fDao.loadOrCreate(longKey);
+    longPref.putLongs(5L);
+    fDao.save(longPref);
+
+    IPreference stringPref = fDao.loadOrCreate(stringKey);
+    stringPref.putStrings("some string");
+    fDao.save(stringPref);
+
+    booleanPref = null;
+    stringPref = null;
+    longPref = null;
+    System.gc();
+
+    assertEquals(IPreference.Type.BOOLEAN, fDao.load(booleanKey).getType());
+    assertEquals(IPreference.Type.LONG, fDao.load(longKey).getType());
+    assertEquals(IPreference.Type.STRING, fDao.load(stringKey).getType());
+  }
+
+  /**
    * Test adding and getting boolean Preferences.
    *
    * @throws Exception
