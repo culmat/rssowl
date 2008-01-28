@@ -60,76 +60,96 @@ public interface IPreference extends IEntity {
   Type getType();
 
   /**
-   * @return Returns the <code>Boolean</code> value from this Preference, or
-   * <code>NULL</code> if the value is from a different Type.
+   * @return Returns the <code>Boolean</code> value from this Preference.
+   *
+   * @throws IllegalArgumentException if {@link #getType()} is not
+   * {@linkplain Type#BOOLEAN}.
    */
   Boolean getBoolean();
 
   /**
-   * @return Returns the <code>boolean[]</code> value from this Preference, or
-   * <code>NULL</code> if the value is from a different Type.
+   * @return Returns the <code>boolean[]</code> value from this Preference.
+   *
+   * @throws IllegalArgumentException if {@link #getType()} is not
+   * {@linkplain Type#BOOLEAN}.
    */
   boolean[] getBooleans();
 
   /**
-   * @return Returns the <code>Integer</code> value from this Preference, or
-   * <code>NULL</code> if the value is from a different Type.
+   * @return Returns the <code>Integer</code> value from this Preference.
+   *
+   * @throws IllegalArgumentException if {@link #getType()} is not
+   * {@linkplain Type#INTEGER}.
    */
   Integer getInteger();
 
   /**
-   * @return Returns the <code>int[]</code> value from this Preference, or
-   * <code>NULL</code> if the value is from a different Type.
+   * @return Returns the <code>int[]</code> value from this Preference.
+   *
+   * @throws IllegalArgumentException if {@link #getType()} is not
+   * {@linkplain Type#INTEGER}.
    */
   int[] getIntegers();
 
   /**
-   * @return Returns the <code>Long</code> value from this Preference, or
-   * <code>NULL</code> if the value is from a different Type.
+   * @return Returns the <code>Long</code> value from this Preference.
+   *
+   * @throws IllegalArgumentException if {@link #getType()} is not
+   * {@linkplain Type#LONG}.
    */
   Long getLong();
 
   /**
-   * @return Returns the <code>long[]</code> value from this Preference, or
-   * <code>NULL</code> if the value is from a different Type.
+   * @return Returns the <code>long[]</code> value from this Preference.
+   *
+   * @throws IllegalArgumentException if {@link #getType()} is not
+   * {@linkplain Type#LONG}.
    */
   long[] getLongs();
 
   /**
-   * @return Returns the <code>String</code> value from this Preference, or
-   * <code>NULL</code> if the value is from a different Type.
+   * @return Returns the <code>String</code> value from this Preference.
+   *
+   * @throws IllegalArgumentException if {@link #getType()} is not
+   * {@linkplain Type#STRING}.
    */
   String getString();
 
   /**
-   * @return Returns the <code>String[]</code> value from this Preference, or
-   * <code>NULL</code> if the value is from a different Type.
+   * @return Returns the <code>String[]</code> value from this Preference.
+   *
+   * @throws IllegalArgumentException if {@link #getType()} is not
+   * {@linkplain Type#STRING}.
    */
   String[] getStrings();
 
   /**
-   * Stores the given values into this Preference.
+   * Stores the given values into this Preference, replacing any previously
+   * stores values.
    *
    * @param strings The <code>String</code>s to add as preference value.
    */
   void putStrings(String... strings);
 
   /**
-   * Stores the given values into this Preference.
+   * Stores the given values into this Preference, replacing any previously
+   * stores values.
    *
    * @param longs The <code>long</code>s to add as preference value.
    */
   void putLongs(long... longs);
 
   /**
-   * Stores the given values into this Preference.
+   * Stores the given values into this Preference, replacing any previously
+   * stores values.
    *
    * @param integers The <code>int</code>s to add as preference value.
    */
   void putIntegers(int... integers);
 
   /**
-   * Stores the given values into this Preference.
+   * Stores the given values into this Preference, replacing any previously
+   * stores values.
    *
    * @param booleans The <code>boolean</code>s to add as preference value.
    */
