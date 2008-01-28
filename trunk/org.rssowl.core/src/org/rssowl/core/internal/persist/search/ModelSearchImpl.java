@@ -244,14 +244,17 @@ public class ModelSearchImpl implements IModelSearch {
   public Map<IGuid, List<NewsReference>> searchNewsByGuids(List<IGuid> guids, boolean copy) {
     Map<IGuid, List<NewsReference>> linkToRefs = new HashMap<IGuid, List<NewsReference>>(guids.size());
     IndexSearcher currentSearcher = getCurrentSearcher();
-    for (IGuid guid : guids) {
-      BooleanQuery query = createGuidQuery(guid, copy);
-      List<NewsReference> newsRefs = simpleSearch(currentSearcher, query);
-      if (!newsRefs.isEmpty())
-        linkToRefs.put(guid, newsRefs);
+    try {
+      for (IGuid guid : guids) {
+        BooleanQuery query = createGuidQuery(guid, copy);
+        List<NewsReference> newsRefs = simpleSearch(currentSearcher, query);
+        if (!newsRefs.isEmpty())
+          linkToRefs.put(guid, newsRefs);
+      }
+      return linkToRefs;
+    } finally {
+      disposeIfNecessary(currentSearcher);
     }
-    disposeIfNecessary(currentSearcher);
-    return linkToRefs;
   }
 
   /**
@@ -263,14 +266,17 @@ public class ModelSearchImpl implements IModelSearch {
   public Map<URI, List<NewsReference>> searchNewsByLinks(List<URI> links, boolean copy) {
     Map<URI, List<NewsReference>> linkToRefs = new HashMap<URI, List<NewsReference>>(links.size());
     IndexSearcher currentSearcher = getCurrentSearcher();
-    for (URI link : links) {
-      BooleanQuery query = createNewsByLinkBooleanQuery(link, copy);
-      List<NewsReference> newsRefs = simpleSearch(currentSearcher, query);
-      if (!newsRefs.isEmpty())
-        linkToRefs.put(link, newsRefs);
+    try {
+      for (URI link : links) {
+        BooleanQuery query = createNewsByLinkBooleanQuery(link, copy);
+        List<NewsReference> newsRefs = simpleSearch(currentSearcher, query);
+        if (!newsRefs.isEmpty())
+          linkToRefs.put(link, newsRefs);
+      }
+      return linkToRefs;
+    } finally {
+      disposeIfNecessary(currentSearcher);
     }
-    disposeIfNecessary(currentSearcher);
-    return linkToRefs;
   }
 
   /**
@@ -312,9 +318,12 @@ public class ModelSearchImpl implements IModelSearch {
   private List<NewsReference> simpleSearch(BooleanQuery query) {
     /* Make sure the searcher is in sync */
     IndexSearcher currentSearcher = getCurrentSearcher();
-    List<NewsReference> newsRefs = simpleSearch(currentSearcher, query);
-    disposeIfNecessary(currentSearcher);
-    return newsRefs;
+    try {
+      List<NewsReference> newsRefs = simpleSearch(currentSearcher, query);
+      return newsRefs;
+    } finally {
+      disposeIfNecessary(currentSearcher);
+    }
   }
 
   private List<NewsReference> simpleSearch(IndexSearcher currentSearcher, BooleanQuery query) {
@@ -458,11 +467,13 @@ public class ModelSearchImpl implements IModelSearch {
         }
       };
 
-      /* Perform the Search */
-      currentSearcher.search(bQuery, collector);
-      disposeIfNecessary(currentSearcher);
-
-      return resultList;
+      try {
+        /* Perform the Search */
+        currentSearcher.search(bQuery, collector);
+        return resultList;
+      } finally {
+        disposeIfNecessary(currentSearcher);
+      }
     } catch (IOException e) {
       throw new PersistenceException("Error searching news", e);
     }
