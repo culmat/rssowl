@@ -69,6 +69,9 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -252,7 +255,11 @@ public class DBManager {
   private String readFirstLineFromFile(File file) {
     BufferedReader reader = null;
     try {
-      reader = new BufferedReader(new FileReader(file));
+      try {
+        reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+      } catch (UnsupportedEncodingException e) {
+        reader = new BufferedReader(new FileReader(file));
+      }
       String text = reader.readLine();
       return text;
     } catch (IOException e) {
@@ -401,7 +408,11 @@ public class DBManager {
   private void writeToFile(File file, String text) {
     BufferedWriter writer = null;
     try {
-      writer = new BufferedWriter(new FileWriter(file));
+      try {
+        writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+      } catch (UnsupportedEncodingException e) {
+        writer = new BufferedWriter(new FileWriter(file));
+      }
       writer.write(text);
       writer.flush();
     } catch (IOException e) {
