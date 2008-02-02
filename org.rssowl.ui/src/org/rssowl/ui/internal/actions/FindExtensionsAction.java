@@ -48,7 +48,7 @@ import java.net.URL;
 public class FindExtensionsAction extends Action implements IWorkbenchWindowActionDelegate {
 
   /* RSSOwl.org Update Site */
-  private static final String UPDATE_SITE = "http://rssowl.pluginbuilder.org/nightly/updateSite/"; //$NON-NLS-1$
+  private static final String UPDATE_SITE = "http://boreal.rssowl.org"; //$NON-NLS-1$
 
   /* RSSOwl Category */
   private static final String RSSOWL_CATEGORY = "RSSOwl Application"; //$NON-NLS-1$
