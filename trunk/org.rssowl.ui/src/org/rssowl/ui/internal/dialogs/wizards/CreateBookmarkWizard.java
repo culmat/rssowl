@@ -46,6 +46,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
@@ -129,7 +130,7 @@ public class CreateBookmarkWizard extends Wizard {
     return super.getNextPage(page);
   }
 
-  void loadNameForFeed() {
+  void loadNameFromFeed() {
 
     /* Keyword Subscription - Build from Search Engine */
     if (fFeedDefinitionPage.isKeywordSubscription()) {
@@ -147,18 +148,27 @@ public class CreateBookmarkWizard extends Wizard {
         public void run(IProgressMonitor monitor) {
           monitor.beginTask("Please wait while loading the title from the feed...", IProgressMonitor.UNKNOWN);
 
+          /* Load Title from Feed */
           String feedTitle = null;
-          URI link = null;
+          final URI[] link = new URI[1];
           try {
-            link = new URI(linkText);
-            feedTitle = Owl.getConnectionService().getLabel(link);
+            link[0] = new URI(linkText);
+
+            /* Load Feed from Link if necessary */
+            if (!URIUtils.looksLikeFeedLink(linkText)) {
+              final URI feedLink = Owl.getConnectionService().getFeed(link[0]);
+              if (feedLink != null)
+                link[0] = feedLink;
+            }
+
+            feedTitle = Owl.getConnectionService().getLabel(link[0]);
             fLastRealm = null;
           } catch (final ConnectionException e) {
 
             /* Authentication Required */
-            if (e instanceof AuthenticationRequiredException && handleProtectedFeed(link, ((AuthenticationRequiredException) e).getRealm())) {
+            if (e instanceof AuthenticationRequiredException && handleProtectedFeed(link[0], ((AuthenticationRequiredException) e).getRealm())) {
               try {
-                feedTitle = Owl.getConnectionService().getLabel(link);
+                feedTitle = Owl.getConnectionService().getLabel(link[0]);
               } catch (ConnectionException e1) {
                 Activator.getDefault().logError(e.getMessage(), e);
               }
@@ -169,6 +179,13 @@ public class CreateBookmarkWizard extends Wizard {
 
           /* Update last Page with Title */
           fBookMarkDefinitionPage.presetBookmarkName(feedTitle);
+
+          /* Update Link */
+          JobRunner.runInUIThread(100, getShell(), new Runnable() {
+            public void run() {
+              fFeedDefinitionPage.setLink(link[0].toString());
+            }
+          });
         }
       };
 
@@ -242,44 +259,37 @@ public class CreateBookmarkWizard extends Wizard {
   }
 
   private boolean internalPerformFinish() throws URISyntaxException {
-    final URI uriObj;
+    final String[] title = new String[] { fBookMarkDefinitionPage.getBookmarkName() };
+    final URI[] uriObj = new URI[1];
     if (fFeedDefinitionPage.isKeywordSubscription())
-      uriObj = new URI(fKeywordPage.getSelectedEngine().toUrl(fFeedDefinitionPage.getKeyword()));
+      uriObj[0] = new URI(fKeywordPage.getSelectedEngine().toUrl(fFeedDefinitionPage.getKeyword()));
     else {
       String linkVal = fFeedDefinitionPage.getLink();
       if (!linkVal.contains(PROTOCOL_IDENTIFIER))
         linkVal = HTTP + linkVal;
-      uriObj = new URI(linkVal);
+      uriObj[0] = new URI(linkVal);
     }
-
-    IFeedDAO feedDAO = DynamicDAO.getDAO(IFeedDAO.class);
-
-    /* Check if a Feed with the URL already exists */
-    FeedReference feedRef = feedDAO.loadReference(uriObj);
-
-    /* Create a new Feed then */
-    if (feedRef == null) {
-      IFeed feed = Owl.getModelFactory().createFeed(null, uriObj);
-      feed = feedDAO.save(feed);
-    }
-
-    /* Create the BookMark */
-    IFolder parent = fBookMarkDefinitionPage.getFolder();
-    String title = fBookMarkDefinitionPage.getBookmarkName();
 
     /* Load Title from Feed if not provided */
-    if (!StringUtils.isSet(title)) {
-      final String[] loadedTitle = new String[1];
+    if (!fFeedDefinitionPage.isKeywordSubscription() && !StringUtils.isSet(title[0])) {
       IRunnableWithProgress runnable = new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) {
           try {
-            loadedTitle[0] = Owl.getConnectionService().getLabel(uriObj);
+
+            /* Load Feed from Link if necessary */
+            if (!URIUtils.looksLikeFeedLink(uriObj[0].toString())) {
+              final URI feedLink = Owl.getConnectionService().getFeed(uriObj[0]);
+              if (feedLink != null)
+                uriObj[0] = feedLink;
+            }
+
+            title[0] = Owl.getConnectionService().getLabel(uriObj[0]);
           } catch (final ConnectionException e) {
 
             /* Authentication Required */
-            if (e instanceof AuthenticationRequiredException && handleProtectedFeed(uriObj, ((AuthenticationRequiredException) e).getRealm())) {
+            if (e instanceof AuthenticationRequiredException && handleProtectedFeed(uriObj[0], ((AuthenticationRequiredException) e).getRealm())) {
               try {
-                loadedTitle[0] = Owl.getConnectionService().getLabel(uriObj);
+                title[0] = Owl.getConnectionService().getLabel(uriObj[0]);
               } catch (ConnectionException e1) {
                 Activator.getDefault().logError(e.getMessage(), e);
               }
@@ -298,16 +308,28 @@ public class CreateBookmarkWizard extends Wizard {
       }
 
       /* Cancel creation and show error if title failed loading */
-      if (!StringUtils.isSet(loadedTitle[0])) {
+      if (!StringUtils.isSet(title[0])) {
         ((DialogPage) getContainer().getCurrentPage()).setMessage("Unable to load the title from the feed", IMessageProvider.ERROR);
         return false;
       }
-
-      title = loadedTitle[0];
     }
 
-    FeedLinkReference feedLinkRef = new FeedLinkReference(uriObj);
-    IBookMark bookmark = Owl.getModelFactory().createBookMark(null, parent, feedLinkRef, title, fPosition, fPosition != null ? true : null);
+    IFeedDAO feedDAO = DynamicDAO.getDAO(IFeedDAO.class);
+
+    /* Check if a Feed with the URL already exists */
+    FeedReference feedRef = feedDAO.loadReference(uriObj[0]);
+
+    /* Create a new Feed then */
+    if (feedRef == null) {
+      IFeed feed = Owl.getModelFactory().createFeed(null, uriObj[0]);
+      feed = feedDAO.save(feed);
+    }
+
+    /* Create the BookMark */
+    IFolder parent = fBookMarkDefinitionPage.getFolder();
+
+    FeedLinkReference feedLinkRef = new FeedLinkReference(uriObj[0]);
+    IBookMark bookmark = Owl.getModelFactory().createBookMark(null, parent, feedLinkRef, title[0], fPosition, fPosition != null ? true : null);
 
     /* Copy all Properties from Parent into this Mark */
     Map<String, ?> properties = parent.getProperties();
