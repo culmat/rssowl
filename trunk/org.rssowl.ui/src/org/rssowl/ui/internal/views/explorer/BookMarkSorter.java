@@ -114,7 +114,7 @@ public class BookMarkSorter extends ViewerComparator {
 
     /* Sort by Name */
     if (fType == Type.SORT_BY_NAME)
-      return folder1.getName().compareTo(folder2.getName());
+      return folder1.getName().toLowerCase().compareTo(folder2.getName().toLowerCase());
 
     return SKIP_SORT;
   }
@@ -123,7 +123,7 @@ public class BookMarkSorter extends ViewerComparator {
 
     /* Sort by Name */
     if (fType == Type.SORT_BY_NAME)
-      return mark1.getName().compareTo(mark2.getName());
+      return mark1.getName().toLowerCase().compareTo(mark2.getName().toLowerCase());
 
     /* Sort by Last Visit Date (descending) */
     else if (fType == Type.SORT_BY_LAST_VISIT_DATE) {
