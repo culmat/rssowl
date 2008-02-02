@@ -98,7 +98,7 @@ public class BookmarkDefinitionPage extends WizardPage {
   @Override
   public void setVisible(boolean visible) {
     if (visible)
-      ((CreateBookmarkWizard) getWizard()).loadNameForFeed();
+      ((CreateBookmarkWizard) getWizard()).loadNameFromFeed();
 
     super.setVisible(visible);
     fNameInput.setFocus();
