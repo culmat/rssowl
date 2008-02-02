@@ -47,6 +47,9 @@ public class URIUtils {
   /* Default Encoding */
   private static final String DEFAULT_ENCODING = "UTF-8"; //$NON-NLS-1$
 
+  /** Common Newsfeed Extensions with leading Dot */
+  private static final String[] FEED_EXTENSIONS_DOTTED = new String[] { ".rss", ".rdf", ".xml", ".atom", ".feed" };
+
   /* This utility class constructor is hidden */
   private URIUtils() {
   // Protect default constructor
@@ -83,6 +86,24 @@ public class URIUtils {
     }
 
     return link;
+  }
+
+  /**
+   * Return TRUE in case the given String looks like a Link to a Feed.
+   *
+   * @param str The String to check
+   * @return TRUE in case the String looks like a Link to a Feed.
+   */
+  public static boolean looksLikeFeedLink(String str) {
+    if (!looksLikeLink(str))
+      return false;
+
+    for (String extension : FEED_EXTENSIONS_DOTTED) {
+      if (str.contains(extension))
+        return true;
+    }
+
+    return false;
   }
 
   /**

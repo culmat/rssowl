@@ -88,6 +88,10 @@ import java.util.zip.GZIPInputStream;
  */
 public class DefaultProtocolHandler implements IProtocolHandler {
 
+  /* Mime Types for Feeds */
+  private static final String[] FEED_MIME_TYPES = new String[] { "application/rss+xml", "application/atom+xml", "application/rdf+xml" };
+  private static final String HREF = "href=";
+
   /* Http Status Codes */
   private static final int HTTP_ERRORS = 400;
   private static final int HTTP_STATUS_NOT_MODIFIED = 304;
@@ -653,5 +657,75 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     // TODO Decode possible XML special chars (entities)
 
     return title;
+  }
+
+  /*
+   * @see org.rssowl.core.connection.IProtocolHandler#getFeed(java.net.URI)
+   */
+  public URI getFeed(final URI website) throws ConnectionException {
+    URI feed = null;
+
+    BufferedInputStream bufIns = new BufferedInputStream(openStream(website, null));
+    BufferedReader reader = new BufferedReader(new InputStreamReader(bufIns));
+
+    try {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        for (String feedMimeType : FEED_MIME_TYPES) {
+          int index = line.indexOf(feedMimeType);
+
+          /* Mime Type Found */
+          if (index > -1) {
+
+            /* Set index to where the Link Element starts */
+            for (int i = index; i >= 0; i--) {
+              if (line.charAt(i) == '<') {
+                index = i;
+                break;
+              }
+            }
+
+            /* Find the HREF */
+            index = line.indexOf(HREF, index);
+            if (index > -1) {
+              StringBuilder str = new StringBuilder();
+              for (int i = index + HREF.length(); i < line.length(); i++) {
+                char c = line.charAt(i);
+
+                if (c == '\"' || c == '\'')
+                  continue;
+
+                if (Character.isWhitespace(c) || c == '>')
+                  break;
+
+                str.append(c);
+              }
+
+              /* Handle relative Links */
+              String linkVal = str.toString();
+              if (!linkVal.contains("://"))
+                linkVal = linkVal.startsWith("/") ? website.toString() + linkVal : website.toString() + "/" + linkVal;
+
+              return new URI(linkVal);
+            }
+          }
+        }
+      }
+    } catch (IOException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    } catch (URISyntaxException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    }
+
+    /* Finally close the Reader */
+    finally {
+      try {
+        reader.close();
+      } catch (IOException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
+    }
+
+    return feed;
   }
 }

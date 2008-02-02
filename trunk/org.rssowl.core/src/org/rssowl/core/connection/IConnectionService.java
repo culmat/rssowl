@@ -100,6 +100,18 @@ public interface IConnectionService {
   String getLabel(URI link) throws ConnectionException;
 
   /**
+   * Returns the {@link URI} of the Feed that is available from the given
+   * website or <code>null</code> if none.
+   *
+   * @param website the website to look for a valid feed.
+   * @return the {@link URI} of the Feed that is available from the given
+   * website or <code>null</code> if none.
+   * @throws ConnectionException Checked Exception to be used in case of any
+   * Exception.
+   */
+  URI getFeed(URI website) throws ConnectionException;
+
+  /**
    * Returns the Credentials-Provider capable of returning Credentials for
    * protected URLs and Proxy-Server.
    *
