@@ -132,4 +132,11 @@ public class InMemoryProtocolHandler implements IProtocolHandler {
   public String getLabel(URI link) throws ConnectionException {
     throw new UnsupportedOperationException();
   }
+
+  /*
+   * @see org.rssowl.core.connection.IProtocolHandler#getFeed(java.net.URI)
+   */
+  public URI getFeed(URI website) {
+    return website;
+  }
 }
