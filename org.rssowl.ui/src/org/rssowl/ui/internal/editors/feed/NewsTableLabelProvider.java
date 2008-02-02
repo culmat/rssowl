@@ -49,7 +49,9 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.DateUtils;
@@ -181,13 +183,20 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     FeedLinkReference feedRef = news.getFeedReference();
     IBookMark bookMark = ModelUtils.getBookMark(feedRef);
 
-    String tooltip = null;
+    String name = null;
     if (bookMark != null)
-      tooltip = StringUtils.replaceAll(bookMark.getName(), "&", "&&");
+      name = bookMark.getName();
     else
-      tooltip = StringUtils.replaceAll(feedRef.getLinkAsText(), "&", "&&");
+      name = feedRef.getLinkAsText();
 
-    return tooltip;
+    if (news.getParentId() != 0) {
+      INewsBin bin = DynamicDAO.load(INewsBin.class, news.getParentId());
+      if (bin != null) {
+        name = bin.getName() + ": " + name;
+      }
+    }
+
+    return StringUtils.replaceAll(name, "&", "&&");
   }
 
   /**
