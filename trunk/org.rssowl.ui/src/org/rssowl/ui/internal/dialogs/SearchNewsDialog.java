@@ -101,6 +101,7 @@ import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
@@ -459,12 +460,24 @@ public class SearchNewsDialog extends TitleAreaDialog {
     @Override
     public String getToolTipText(Object element) {
       ScoredNews scoredNews = (ScoredNews) element;
-      FeedLinkReference feedRef = scoredNews.getNews().getFeedReference();
+      INews news = scoredNews.getNews();
+      FeedLinkReference feedRef = news.getFeedReference();
       IBookMark bookMark = ModelUtils.getBookMark(feedRef);
-      if (bookMark != null)
-        return StringUtils.replaceAll(bookMark.getName(), "&", "&&");
 
-      return null;
+      String name = null;
+      if (bookMark != null)
+        name = bookMark.getName();
+      else
+        name = feedRef.getLinkAsText();
+
+      if (news.getParentId() != 0) {
+        INewsBin bin = DynamicDAO.load(INewsBin.class, news.getParentId());
+        if (bin != null) {
+          name = bin.getName() + ": " + name;
+        }
+      }
+
+      return StringUtils.replaceAll(name, "&", "&&");
     }
 
     /*
