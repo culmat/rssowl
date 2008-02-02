@@ -303,4 +303,16 @@ public class ConnectionTests {
 
     assertNull(conManager.getAuthCredentials(feedUrl, null));
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testLoadFeedFromWebsite() throws Exception {
+    IConnectionService conManager = Owl.getConnectionService();
+    URI feedUrl = new URI("http://www.planeteclipse.org");
+
+    assertEquals("http://www.planeteclipse.org/rss20.xml", conManager.getFeed(feedUrl).toString());
+  }
 }
