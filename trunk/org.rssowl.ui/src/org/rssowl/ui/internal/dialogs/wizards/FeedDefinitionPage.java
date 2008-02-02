@@ -46,6 +46,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.ICategoryDAO;
@@ -57,7 +58,9 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -74,6 +77,7 @@ public class FeedDefinitionPage extends WizardPage {
   private String fInitialLink;
   private IPreferenceScope fGlobalScope = Owl.getPreferenceService().getGlobalScope();
   private boolean fIsAutoCompleteKeywordHooked;
+  private Map<String, IBookMark> fExistingFeeds = new HashMap<String, IBookMark>();
 
   /**
    * @param pageName
@@ -83,6 +87,11 @@ public class FeedDefinitionPage extends WizardPage {
     super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/bkmrk_wiz.gif"));
     setMessage("Create a new Bookmark to read News from a Feed.");
     fInitialLink = initialLink;
+
+    Collection<IBookMark> bookmarks = DynamicDAO.loadAll(IBookMark.class);
+    for (IBookMark bookMark : bookmarks) {
+      fExistingFeeds.put(bookMark.getFeedLinkReference().getLinkAsText(), bookMark);
+    }
   }
 
   boolean loadTitleFromFeed() {
@@ -113,6 +122,7 @@ public class FeedDefinitionPage extends WizardPage {
 
   void setLink(String link) {
     fFeedLinkInput.setText(link);
+    onLinkChange();
   }
 
   String getKeyword() {
@@ -188,6 +198,7 @@ public class FeedDefinitionPage extends WizardPage {
     if (StringUtils.isSet(fInitialLink) && !fInitialLink.equals(HTTP)) {
       fFeedLinkInput.setText(fInitialLink);
       fFeedLinkInput.selectAll();
+      onLinkChange();
     } else {
       fFeedLinkInput.setText(HTTP);
       fFeedLinkInput.setSelection(HTTP.length());
@@ -196,6 +207,7 @@ public class FeedDefinitionPage extends WizardPage {
     fFeedLinkInput.addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
         getContainer().updateButtons();
+        onLinkChange();
       }
     });
 
@@ -241,6 +253,15 @@ public class FeedDefinitionPage extends WizardPage {
     });
 
     setControl(container);
+  }
+
+  private void onLinkChange() {
+    IBookMark existingBookMark = fExistingFeeds.get(fFeedLinkInput.getText());
+
+    if (existingBookMark != null)
+      setMessage("A bookmark named '" + existingBookMark.getName() + "' with the same link already exists.", WARNING);
+    else
+      setMessage("Create a new Bookmark to read News from a Feed.");
   }
 
   private void hookKeywordAutocomplete() {
