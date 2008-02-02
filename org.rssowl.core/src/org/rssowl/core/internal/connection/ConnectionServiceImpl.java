@@ -196,6 +196,21 @@ public class ConnectionServiceImpl implements IConnectionService {
   }
 
   /*
+   * @see org.rssowl.core.connection.IConnectionService#getFeedIcon(java.net.URI)
+   */
+  public URI getFeed(URI link) throws ConnectionException {
+    String protocol = link.getScheme();
+    IProtocolHandler handler = fProtocolHandler.get(protocol);
+
+    /* Handler present */
+    if (handler != null)
+      return handler.getFeed(link);
+
+    /* No Handler present */
+    throw new UnknownFeedException(Activator.getDefault().createErrorStatus("Could not find a matching ProtocolHandler for: " + protocol, null)); //$NON-NLS-1$
+  }
+
+  /*
    * @see org.rssowl.core.connection.IConnectionService#getCredentialsProvider(java.net.URI)
    */
   public ICredentialsProvider getCredentialsProvider(URI link) {
