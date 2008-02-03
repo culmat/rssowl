@@ -88,6 +88,7 @@ public class TestUtils {
    */
   public static void fail(PersistenceException e) {
     Assert.fail(e.getMessage());
+    Activator.getDefault().logError(e.getMessage(), e);
   }
 
   /**
