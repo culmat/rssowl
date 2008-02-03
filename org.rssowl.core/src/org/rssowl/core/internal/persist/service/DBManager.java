@@ -299,7 +299,7 @@ public class DBManager {
      * Copy the db file to a permanent back-up where the file name includes the
      * workspaceFormat number.
      */
-    File backupDbFile = new File(getDBFilePath() + ".mig." + workspaceFormat);
+    File backupDbFile = createMigrationBackUpFile(workspaceFormat);
     copyFile(dbFile, backupDbFile);
 
     File dbFormatFile = getDBFormatFile();
@@ -333,7 +333,18 @@ public class DBManager {
       }
     }
 
+    /* Delete old migration back-ups */
+    for (int i = workspaceFormat - 1; i >= 0; --i) {
+      File file = createMigrationBackUpFile(workspaceFormat);
+      if (file.exists())
+        file.delete();
+    }
+
     return migrationResult;
+  }
+
+  private File createMigrationBackUpFile(int workspaceFormat) {
+    return new File(getDBFilePath() + ".mig." + workspaceFormat);
   }
 
   /**
