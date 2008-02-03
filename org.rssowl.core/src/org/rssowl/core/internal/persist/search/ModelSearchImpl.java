@@ -164,10 +164,10 @@ public class ModelSearchImpl implements IModelSearch {
   public void shutdown(boolean emergency) throws PersistenceException {
     try {
       /*
-       * Close fIndexer first because it's more important (we may have
-       * uncommitted items).
+       * Close fIndexer first because it's more important (reduces the chance
+       * of a corrupt index).
        */
-      fIndexer.shutdown();
+      fIndexer.shutdown(emergency);
 
       /*
        * We don't bother to close searchers if it's an emergency. They will be
