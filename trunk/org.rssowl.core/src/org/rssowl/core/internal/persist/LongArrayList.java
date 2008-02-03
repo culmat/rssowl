@@ -180,6 +180,12 @@ public class LongArrayList {
 
   }
 
+  public long[] toArray() {
+    long[] copy = new long[fSize];
+    System.arraycopy(fElements, 0, copy, 0, fSize);
+    return copy;
+  }
+
   @Override
   public final String toString() {
     return Arrays.toString(fElements);
