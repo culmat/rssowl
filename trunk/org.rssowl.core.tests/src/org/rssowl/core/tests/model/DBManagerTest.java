@@ -1134,13 +1134,9 @@ public class DBManagerTest {
    */
   @Test
   public void testSaveFeedTwiceAfterMerging() {
-    try {
       IFeed savedFeed = DynamicDAO.save(createFeed());
       savedFeed.merge(createFeed());
       DynamicDAO.save(savedFeed);
-    } catch (PersistenceException e) {
-      TestUtils.fail(e);
-    }
   }
 
   /**
