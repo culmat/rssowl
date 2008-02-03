@@ -130,13 +130,11 @@ public class News extends AbstractEntity implements INews {
   private List<ICategory> fCategories;
   private Set<ILabel> fLabels;
 
-  /* FIXME Remove after nightly with migration is released */
-  private boolean fCopy;
-
   /* This field is only non-zero if the parent is not a feed */
   private long fParentId;
 
   //TODO Remove this after M8 release
+  @SuppressWarnings("unused")
   private String fDescription;
 
   /* We can't use fDescription to support migration from M7 to M8 */
