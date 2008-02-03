@@ -566,4 +566,11 @@ public class NewsGroupHandler implements IProtocolHandler {
 
     return link.toString();
   }
+
+  /*
+   * @see org.rssowl.core.connection.IProtocolHandler#getFeed(java.net.URI)
+   */
+  public URI getFeed(URI website) {
+    return website;
+  }
 }
