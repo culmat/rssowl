@@ -38,8 +38,8 @@ import com.db4o.query.Query;
 import java.util.List;
 
 /**
- * Migration from version 3 (nightly from 13-Jan-2008) to 4 (nightly from 17-Jan-2008)
- *
+ * Migration from version 3 (nightly from 13-Jan-2008) to 4 (nightly of
+ * 17-Jan-2008).
  */
 public class Migration3To4 implements Migration {
 
