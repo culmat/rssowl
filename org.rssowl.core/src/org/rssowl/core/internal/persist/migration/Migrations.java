@@ -87,8 +87,7 @@ public final class Migrations {
    * Creates an instance of this object.
    */
   public Migrations() {
-    fMigrations = Arrays.<Migration> asList(new Migration1To2(), new Migration2To3(),
-        new Migration3To4());
+    fMigrations = Arrays.<Migration> asList(new Migration2To3(), new Migration3To4());
   }
 
   public Migrations(Migration... migrations) {
