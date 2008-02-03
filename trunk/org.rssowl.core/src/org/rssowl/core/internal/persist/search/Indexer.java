@@ -215,11 +215,13 @@ public class Indexer {
     return true;
   }
 
-  synchronized void shutdown() {
+  synchronized void shutdown(boolean emergency) {
     unregisterListeners();
     dispose();
-    saveCommittedNews(true, fUncommittedNews);
-    fUncommittedNews.clear();
+    if (!emergency) {
+      saveCommittedNews(true, fUncommittedNews);
+      fUncommittedNews.clear();
+    }
   }
 
   /**
