@@ -130,7 +130,7 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
           if (changedNews.contains(newsItem))
             continue;
           if (!newsItem.isVisible() && affectEquivalentNews)
-            throw new IllegalArgumentException("affectEquivalentNews is not support for invisible news");
+            throw new IllegalArgumentException("affectEquivalentNews is not supported for invisible news");
 
           List<INews> equivalentNews;
 
