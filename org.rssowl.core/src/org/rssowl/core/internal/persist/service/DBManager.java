@@ -84,7 +84,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DBManager {
   private static final int MAX_BACKUPS_COUNT = 3;
-  private static final String FORMAT_FILE_NAME = "format";
+  private static final String FORMAT_FILE_NAME = "format2";
   private static DBManager fInstance;
   private ObjectContainer fObjectContainer;
   private final ReadWriteLock fLock = new ReentrantReadWriteLock();
@@ -269,7 +269,7 @@ public class DBManager {
     }
   }
 
-  private File getDBLastBackUpFile() {
+  public File getDBLastBackUpFile() {
     File dir = new File(Activator.getDefault().getStateLocation().toOSString());
     File lastBackUpFile = new File(dir, "lastbackup");
     return lastBackUpFile;
@@ -364,10 +364,33 @@ public class DBManager {
     }
   }
 
+  private File getOldDBFormatFile() {
+    File dir = new File(Activator.getDefault().getStateLocation().toOSString());
+    File formatFile = new File(dir, "format");
+    return formatFile;
+  }
+
   private int getWorkspaceFormatVersion() {
     boolean dbFileExists = new File(getDBFilePath()).exists();
     File formatFile = getDBFormatFile();
     boolean formatFileExists = formatFile.exists();
+
+    //TODO Remove this after M8 release
+    if (!formatFileExists && getOldDBFormatFile().exists()) {
+      BufferedReader reader = null;
+      try {
+        reader = new BufferedReader(new FileReader(getOldDBFormatFile()));
+        String text = reader.readLine();
+        writeToFile(formatFile, text);
+        formatFileExists = true;
+      } catch (IOException e) {
+        throw new PersistenceException(e);
+      } finally {
+        closeCloseable(reader);
+      }
+      getOldDBFormatFile().delete();
+    }
+
     if (dbFileExists) {
       /* Assume that it's M5a if no format file exists, but a db file exists */
       if (!formatFileExists)
@@ -427,7 +450,7 @@ public class DBManager {
   }
 
   private int getCurrentFormatVersion() {
-    return 4;
+    return 5;
   }
 
   private boolean defragmentIfNecessary(LongOperationMonitor progressMonitor, SubMonitor subMonitor) {

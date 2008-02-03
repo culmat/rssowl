@@ -24,24 +24,23 @@
 package org.rssowl.core.internal.persist.migration;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.rssowl.core.internal.persist.Description;
-import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.service.ConfigurationFactory;
+import org.rssowl.core.internal.persist.service.DBManager;
 import org.rssowl.core.internal.persist.service.Migration;
 
 import com.db4o.Db4o;
 import com.db4o.ObjectContainer;
 
-import java.util.List;
+import java.io.File;
 
 /**
- * Migration from version 2 (2.0M7) to version 3 (nightly from 13-Jan-2008).
- *
+ * Migration from version 2 (2.0M7) to version 5 (builds from nightly of
+ * 03-Feb-2008 to 2.0M8).
  */
-public class Migration2To3 implements Migration {
+public class Migration2To5 implements Migration {
 
   public int getDestinationFormat() {
-    return 3;
+    return 5;
   }
 
   public int getOriginFormat() {
@@ -55,40 +54,15 @@ public class Migration2To3 implements Migration {
 
     ObjectContainer oc = Db4o.openFile(configFactory.createConfiguration(), dbFileName);
 
-    totalProgressIncremented = migrate(progressMonitor, totalProgress, totalProgressIncremented, oc);
+    totalProgressIncremented = Migration2To3.migrate(progressMonitor, totalProgress, totalProgressIncremented, oc);
     oc.commit();
     oc.close();
 
+    File dbLastBackUpFile = DBManager.getDefault().getDBLastBackUpFile();
+    dbLastBackUpFile.delete();
+
     progressMonitor.worked(totalProgress - totalProgressIncremented);
 
-    return new MigrationResult(false, false, false);
-  }
-
-  static int migrate(IProgressMonitor progressMonitor, final int totalProgress, int totalProgressIncremented, ObjectContainer oc) {
-    List<News> newsList = oc.query(News.class);
-    int newsCountPerIncrement = newsList.size() / totalProgress;
-
-    int i = 0;
-    for (News news : newsList) {
-      oc.activate(news, Integer.MAX_VALUE);
-      String descriptionFieldName = "fDescription";
-      String descriptionValue = (String) MigrationHelper.getFieldValue(news, descriptionFieldName);
-      if (descriptionValue != null) {
-        MigrationHelper.setField(news, descriptionFieldName, null);
-        Description description = new Description(news, descriptionValue);
-        oc.ext().set(description, Integer.MAX_VALUE);
-        oc.ext().set(news, Integer.MAX_VALUE);
-      }
-      ++i;
-      if (newsCountPerIncrement == 0) {
-        int progressIncrement = totalProgress / newsList.size();
-        totalProgressIncremented += progressIncrement;
-        progressMonitor.worked(progressIncrement);
-      } else if (i % newsCountPerIncrement == 0) {
-        totalProgressIncremented++;
-        progressMonitor.worked(1);
-      }
-    }
-    return totalProgressIncremented;
+    return new MigrationResult(true, false, true);
   }
 }
