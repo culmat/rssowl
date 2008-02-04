@@ -56,6 +56,8 @@ import com.db4o.config.Configuration;
 import com.db4o.config.ObjectClass;
 import com.db4o.config.ObjectField;
 import com.db4o.config.QueryEvaluationMode;
+import com.db4o.ext.DatabaseFileLockedException;
+import com.db4o.ext.Db4oException;
 import com.db4o.query.Query;
 
 import java.io.BufferedReader;
@@ -72,7 +74,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DBManager {
-  private static final int MAX_BACKUPS_COUNT = 3;
+  private static final int MAX_BACKUPS_COUNT = 2;
   private static final String FORMAT_FILE_NAME = "format2";
   private static DBManager fInstance;
   private ObjectContainer fObjectContainer;
@@ -125,8 +127,39 @@ public class DBManager {
   }
 
   private ObjectContainer createObjectContainer(Configuration config) {
-    fObjectContainer = Db4o.openFile(config, getDBFilePath());
+    BackupService backupService = createOnlineBackupService();
+    backupService.backup(true);
+    try {
+      fObjectContainer = Db4o.openFile(config, getDBFilePath());
+    } catch (Exception e) {
+      if (e instanceof DatabaseFileLockedException)
+        throw (DatabaseFileLockedException) e;
+
+      /*
+       * Most recent back-up is the one we did before we opened the object
+       * container, we look at the second most recent to try a recovery.
+       */
+      File backupFile = backupService.getBackupFile(1);
+
+      /* There was no online back-up file. Should not happen. */
+      if (backupFile == null)
+        throw new PersistenceException("Database file corrupted and there is no online back-up", e);
+
+      backupService.rotateFileToBackupAsCorrupted();
+      DBHelper.rename(backupFile, backupService.getFileToBackup());
+      try {
+        fObjectContainer = Db4o.openFile(config, getDBFilePath());
+      } catch (Db4oException e1) {
+        Activator.getDefault().logError("Current and backup database files corrupted, logging exception for backup database and rethrowing exception for current database", e1);
+        throw new PersistenceException(e);
+      }
+    }
     return fObjectContainer;
+  }
+
+  private BackupService createOnlineBackupService() {
+    BackupService backupService = new BackupService(new File(getDBFilePath()), ".onlinebak", 2);
+    return backupService;
   }
 
   /**
@@ -506,6 +539,7 @@ public class DBManager {
 //    });
 //    config.messageLevel(3);
 
+    config.lockDatabaseFile(false);
     config.queries().evaluationMode(QueryEvaluationMode.IMMEDIATE);
     config.automaticShutDown(false);
 	config.callbacks(false);

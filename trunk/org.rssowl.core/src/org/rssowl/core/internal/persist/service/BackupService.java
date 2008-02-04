@@ -198,8 +198,24 @@ public final class BackupService {
     return backupFile;
   }
 
+  public File getBackupFile(int index) {
+    List<File> backupFiles = fLayoutStrategy.findBackupFiles();
+    if (index >= backupFiles.size())
+      return null;
+
+    return backupFiles.get(index);
+  }
+
   public File getTempBackupFile() {
     return new File(getBackupFile().getAbsolutePath() + ".temp");
+  }
+
+  public void rotateFileToBackupAsCorrupted() {
+    DBHelper.rename(getFileToBackup(), getCorruptedFile());
+  }
+
+  private File getCorruptedFile() {
+    return new File(getFileToBackup().getAbsolutePath() + ".corrupted");
   }
 
   private void deleteOldBackups(List<File> backupFiles) {
