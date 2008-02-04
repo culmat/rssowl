@@ -91,6 +91,7 @@ public final class BackupService {
   private final Long fBackupFrequency;
 
   private BackupLayoutStrategy fLayoutStrategy;
+  private File fFileToBackupAlias;
 
   public BackupService(File fileToBackup, String backupFileSuffix, int maxBackupsCount) {
     this(fileToBackup, backupFileSuffix, maxBackupsCount, null, null);
@@ -112,6 +113,16 @@ public final class BackupService {
     fBackupFrequency = backupFrequency;
 
     fLayoutStrategy = new DefaultBackupLayoutStrategy(getBackupFile());
+  }
+
+  /**
+   * This overrides where the back-up is made from. It's useful if fileToBackup
+   * is being used, there's a copy available and the back-up file name should
+   * be relative to fileToBackup.
+   * @param alias
+   */
+  public void setFileToBackupAlias(File alias) {
+    fFileToBackupAlias = alias;
   }
 
   public void setLayoutStrategy(BackupLayoutStrategy layoutStrategy) {
@@ -154,7 +165,12 @@ public final class BackupService {
       return false;
 
     prepareBackup();
-    DBHelper.copyFile(fFileToBackup, getBackupFile());
+
+    File sourceFile = fFileToBackup;
+    if (fFileToBackupAlias != null)
+      sourceFile = fFileToBackupAlias;
+
+    DBHelper.copyFile(sourceFile, getBackupFile());
     writeBackupTimestamp();
     return true;
   }
