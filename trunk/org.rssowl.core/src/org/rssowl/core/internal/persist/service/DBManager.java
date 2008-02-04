@@ -131,12 +131,14 @@ public class DBManager {
 
   private ObjectContainer createObjectContainer(Configuration config) {
     BackupService backupService = createOnlineBackupService();
-    backupService.backup(true);
+    if (backupService != null)
+      backupService.backup(true);
+
     try {
       fObjectContainer = Db4o.openFile(config, getDBFilePath());
     } catch (Exception e) {
-      if (e instanceof DatabaseFileLockedException)
-        throw (DatabaseFileLockedException) e;
+      if (backupService == null || e instanceof DatabaseFileLockedException)
+        throw new PersistenceException(e);
 
       /*
        * Most recent back-up is the one we did before we opened the object
@@ -144,7 +146,11 @@ public class DBManager {
        */
       File backupFile = backupService.getBackupFile(1);
 
-      /* There was no online back-up file. Should not happen. */
+      /*
+       * There was no online back-up file. This could only happen if the problem
+       * happened on the first start-up and no back-up was taken before before
+       * shutdown.
+       */
       if (backupFile == null)
         throw new PersistenceException("Database file corrupted and there is no online back-up", e);
 
@@ -161,7 +167,11 @@ public class DBManager {
   }
 
   private BackupService createOnlineBackupService() {
-    BackupService backupService = new BackupService(new File(getDBFilePath()), ".onlinebak", 2);
+    File file = new File(getDBFilePath());
+    if (!file.exists())
+      return null;
+
+    BackupService backupService = new BackupService(file, ".onlinebak", 2);
     return backupService;
   }
 
@@ -259,17 +269,33 @@ public class DBManager {
     if (!new File(getDBFilePath()).exists())
       return;
 
+    if (InternalOwl.TESTING)
+      doScheduledBackup();
+    else {
+      new Job("") {
+        @Override
+        protected IStatus run(IProgressMonitor monitor) {
+          doScheduledBackup();
+          return Status.OK_STATUS;
+        }
+      }.schedule(5000);
+    }
+  }
 
-    new Job("") {
-      @Override
-      protected IStatus run(IProgressMonitor monitor) {
-        long sevenDays = 1000 * 60 * 60 * 24 * 7;
-        BackupService backupService = createBackupService(sevenDays);
-        backupService.setFileToBackupAlias(createOnlineBackupService().getBackupFile());
-        backupService.backup(false);
-        return Status.OK_STATUS;
-      }
-    }.schedule(5000);
+  private void doScheduledBackup() {
+    long sevenDays = 1000 * 60 * 60 * 24 * 7;
+    File onlineBackupFile = createOnlineBackupService().getBackupFile();
+
+    /*
+     * If no online back-up exists yet, don't bother with a back-up because it's
+     * the first start-up
+     */
+    if (!onlineBackupFile.exists())
+      return;
+
+    BackupService backupService = createBackupService(sevenDays);
+    backupService.setFileToBackupAlias(onlineBackupFile);
+    backupService.backup(false);
   }
 
   public File getDBLastBackUpFile() {
