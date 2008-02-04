@@ -132,7 +132,13 @@ public final class DBHelper {
       outputStream = new FileOutputStream(destinationFile);
       FileChannel dstChannel = outputStream.getChannel();
 
-      dstChannel.transferFrom(srcChannel, 0, srcChannel.size());
+      long bytesToTransfer = srcChannel.size();
+      long position = 0;
+      while (bytesToTransfer > 0) {
+        long bytesTransferred = dstChannel.transferFrom(srcChannel, position, bytesToTransfer);
+        position += bytesTransferred;
+        bytesToTransfer -= bytesTransferred;
+      }
 
     } catch (IOException e) {
       throw new PersistenceException(e);
