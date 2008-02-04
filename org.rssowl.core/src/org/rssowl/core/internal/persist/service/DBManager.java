@@ -24,8 +24,11 @@
 package org.rssowl.core.internal.persist.service;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.AbstractEntity;
@@ -204,18 +207,24 @@ public class DBManager {
         migrationResult = migrate(workspaceVersion, getCurrentFormatVersion(), subMonitor.newChild(70));
       }
 
+      boolean scheduledBackupRequired = false;
       if (!defragmentIfNecessary(progressMonitor, subMonitor)) {
         if (migrationResult.isDefragmentDatabase())
           defragment(progressMonitor, subMonitor);
         /*
          * We only run the time-based back-up if a defragment has not taken
-         * place because we always back-up during defragment.
+         * place because we always back-up during defragment. We perform it
+         * after opening the object container because we can make the copy from
+         * the online back-up async.
          */
         else
-          scheduledBackup();
+          scheduledBackupRequired = true;
       }
 
       fObjectContainer = createObjectContainer(config);
+
+      if (scheduledBackupRequired)
+        scheduledBackup();
 
       fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
 
@@ -250,8 +259,17 @@ public class DBManager {
     if (!new File(getDBFilePath()).exists())
       return;
 
-    long sevenDays = 1000 * 60 * 60 * 24 * 7;
-    createBackupService(sevenDays).backup(false);
+
+    new Job("") {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        long sevenDays = 1000 * 60 * 60 * 24 * 7;
+        BackupService backupService = createBackupService(sevenDays);
+        backupService.setFileToBackupAlias(createOnlineBackupService().getBackupFile());
+        backupService.backup(false);
+        return Status.OK_STATUS;
+      }
+    }.schedule(5000);
   }
 
   public File getDBLastBackUpFile() {
