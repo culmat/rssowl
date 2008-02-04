@@ -122,6 +122,7 @@ public final class BackupService {
    * @param alias
    */
   public void setFileToBackupAlias(File alias) {
+    Assert.isLegal(alias.isFile(), "alias must be a file");
     fFileToBackupAlias = alias;
   }
 
