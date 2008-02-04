@@ -161,4 +161,6 @@ public abstract class DAOService {
    * @see DynamicDAO#getDAO(Class)
    */
   public abstract INewsBinDAO getNewsBinDao();
+
+  public abstract ISearchDAO getSearchDAO();
 }

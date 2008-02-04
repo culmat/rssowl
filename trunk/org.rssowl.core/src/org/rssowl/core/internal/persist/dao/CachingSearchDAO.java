@@ -21,22 +21,40 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.persist.event.runnable;
 
-import org.rssowl.core.persist.event.AttachmentEvent;
+package org.rssowl.core.internal.persist.dao;
 
-/**
- * Provides a way to fire a AttachmentEvent in the future.
- *
- * @see EventRunnable
- * @author Ismael Juma (ismael@juma.me.uk)
- */
-public final class AttachmentEventRunnable extends EventRunnable<AttachmentEvent> {
+import org.rssowl.core.persist.ISearch;
+import org.rssowl.core.persist.dao.ISearchDAO;
+import org.rssowl.core.persist.event.SearchEvent;
+import org.rssowl.core.persist.event.SearchListener;
 
-  /**
-   * Creates a new instance of this object.
-   */
-  public AttachmentEventRunnable() {
-    super(AttachmentEvent.class, getDAOService().getAttachmentDAO());
+import java.util.Set;
+
+public class CachingSearchDAO extends CachingDAO<SearchDAOImpl, ISearch, SearchListener, SearchEvent> implements ISearchDAO {
+
+  public CachingSearchDAO() {
+    super(new SearchDAOImpl());
+  }
+
+  @Override
+  protected SearchListener createEntityListener() {
+    return new SearchListener() {
+
+      public void entitiesAdded(Set<SearchEvent> events) {
+        for (SearchEvent event : events)
+          getCache().put(event.getEntity().getId(), event.getEntity());
+      }
+
+      public void entitiesDeleted(Set<SearchEvent> events) {
+        for (SearchEvent event : events)
+          getCache().remove(event.getEntity().getId(), event.getEntity());
+      }
+
+      public void entitiesUpdated(Set<SearchEvent> events) {
+      /* No action needed */
+      }
+
+    };
   }
 }

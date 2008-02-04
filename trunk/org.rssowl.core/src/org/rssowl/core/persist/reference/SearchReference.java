@@ -21,22 +21,19 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
-package org.rssowl.core.persist.event.runnable;
+package org.rssowl.core.persist.reference;
 
-import org.rssowl.core.persist.event.AttachmentEvent;
+import org.rssowl.core.persist.ISearch;
+import org.rssowl.core.persist.service.PersistenceException;
 
-/**
- * Provides a way to fire a AttachmentEvent in the future.
- *
- * @see EventRunnable
- * @author Ismael Juma (ismael@juma.me.uk)
- */
-public final class AttachmentEventRunnable extends EventRunnable<AttachmentEvent> {
+public final class SearchReference extends ModelReference {
 
-  /**
-   * Creates a new instance of this object.
-   */
-  public AttachmentEventRunnable() {
-    super(AttachmentEvent.class, getDAOService().getAttachmentDAO());
+  public SearchReference(long id) {
+    super(id, ISearch.class);
+  }
+
+  @Override
+  public ISearch resolve() throws PersistenceException {
+    return (ISearch) super.resolve();
   }
 }
