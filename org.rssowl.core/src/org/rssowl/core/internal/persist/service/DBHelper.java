@@ -24,6 +24,7 @@
 package org.rssowl.core.internal.persist.service;
 
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.BookMark;
 import org.rssowl.core.internal.persist.Description;
@@ -62,7 +63,20 @@ import com.db4o.ObjectSet;
 import com.db4o.ext.Db4oException;
 import com.db4o.query.Query;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
@@ -72,7 +86,87 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class DBHelper {
+public final class DBHelper {
+
+  private DBHelper() {
+    super();
+  }
+
+  public static void rename(File origin, File destination) throws PersistenceException  {
+    /* Try atomic rename first. If that fails, rely on delete + rename */
+    if (!origin.renameTo(destination)) {
+      destination.delete();
+      if (!origin.renameTo(destination)) {
+        throw new PersistenceException("Failed to rename: " + origin + " to: " + destination);
+      }
+    }
+  }
+
+  public static String readFirstLineFromFile(File file) {
+    BufferedReader reader = null;
+    try {
+      try {
+        reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+      } catch (UnsupportedEncodingException e) {
+        reader = new BufferedReader(new FileReader(file));
+      }
+      String text = reader.readLine();
+      return text;
+    } catch (IOException e) {
+      throw new PersistenceException(e);
+    } finally {
+      DBHelper.closeQuietly(reader);
+    }
+  }
+
+  public static final void copyFile(File originFile, File destinationFile) {
+    FileInputStream inputStream = null;
+    FileOutputStream outputStream = null;
+    try {
+      inputStream = new FileInputStream(originFile);
+      FileChannel srcChannel = inputStream.getChannel();
+
+      if (!destinationFile.exists())
+        destinationFile.createNewFile();
+
+      outputStream = new FileOutputStream(destinationFile);
+      FileChannel dstChannel = outputStream.getChannel();
+
+      dstChannel.transferFrom(srcChannel, 0, srcChannel.size());
+
+    } catch (IOException e) {
+      throw new PersistenceException(e);
+    } finally {
+      closeQuietly(inputStream);
+      closeQuietly(outputStream);
+    }
+  }
+
+  public static void writeToFile(File file, String text) {
+    BufferedWriter writer = null;
+    try {
+      try {
+        writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+      } catch (UnsupportedEncodingException e) {
+        writer = new BufferedWriter(new FileWriter(file));
+      }
+      writer.write(text);
+      writer.flush();
+    } catch (IOException e) {
+      throw new PersistenceException(e);
+    } finally {
+      closeQuietly(writer);
+    }
+  }
+
+  public static void closeQuietly(Closeable closeable) {
+    if (closeable != null)
+      try {
+        closeable.close();
+      } catch (IOException e) {
+        Activator.getDefault().logError("Failed to close stream.", e);
+      }
+  }
 
   public static final List<EventRunnable<?>> cleanUpEvents() {
     List<EventRunnable<?>> eventNotifiers = EventsMap.getInstance().removeEventRunnables();
