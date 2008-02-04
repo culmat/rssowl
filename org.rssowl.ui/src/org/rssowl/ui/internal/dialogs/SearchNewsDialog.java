@@ -205,7 +205,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private static int fgOpenDialogCount;
 
   /* A Set of Stop Words in English */
-  private static final Set<String> STOP_WORDS = Collections.synchronizedSet(new HashSet<String>(Arrays.asList(StringUtils.ENGLISH_STOP_WORDS)));
+  private static final Set<String> STOP_WORDS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(StringUtils.ENGLISH_STOP_WORDS)));
 
   /* Button IDs */
   private static final int BUTTON_SEARCH = 1000;
