@@ -80,7 +80,6 @@ public class SearchMark extends Mark implements ISearchMark {
    */
   protected SearchMark() {
     fNewsContainer = createNewsContainer();
-  // As per javadoc
   }
 
   /*

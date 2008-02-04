@@ -38,7 +38,7 @@ import java.util.Map;
  *
  * @author bpasero
  */
-public interface ISearchMark extends INewsMark {
+public interface ISearchMark extends INewsMark, ISearch {
 
   /** One of the fields in this type described as constant */
   public static final int MATCHING_NEWS = 4;
@@ -69,57 +69,6 @@ public interface ISearchMark extends INewsMark {
    * the new result.
    */
   Pair<Boolean, Boolean> setNewsRefs(Map<INews.State, List<NewsReference>> results);
-
-  /**
-   * Adds a <code>ISearchCondition</code> to the list of conditions this
-   * searchmark uses to search for <code>INews</code>.
-   *
-   * @param searchCondition The condition to add.
-   */
-  void addSearchCondition(ISearchCondition searchCondition);
-
-  /**
-   * Removes a <code>ISearchCondition</code> from the list of conditions this
-   * searchmark uses to search for <code>INews</code>.
-   *
-   * @param searchCondition The condition to remove.
-   * @return <code>true</code> if the item was removed.
-   */
-  boolean removeSearchCondition(ISearchCondition searchCondition);
-
-  /**
-   * @return A List of search conditions specifying the search that is to be
-   * performed to match News.
-   * <p>
-   * Note: The returned List should not be modified. The default Implementation
-   * returns an unmodifiable List using
-   * <code>Collections.unmodifiableList()</code>. Trying to modify the List
-   * will result in <code>UnsupportedOperationException</code>.
-   * </p>
-   */
-  List<ISearchCondition> getSearchConditions();
-
-  /**
-   * Describes how the search conditions are connected to other conditions from
-   * the same search:
-   * <ul>
-   * <li>If TRUE, News have to match <em>all</em> Conditions</li>
-   * <li>If FALSE, News have to match at least <em>one</em> of the Conditions</li>
-   * </ul>
-   *
-   * @return Returns <code>TRUE</code> if this condition is to be connected to
-   * other conditions of the same search with a logical AND, <code>FALSE</code>
-   * if this condition is to be connected with a logical OR.
-   */
-  boolean matchAllConditions();
-
-  /**
-   * @param matchAllConditions <code>TRUE</code> if this condition is to be
-   * connected to other conditions of the same search with a logical AND,
-   * <code>FALSE</code> if this condition is to be connected with a logical
-   * OR.
-   */
-  void setMatchAllConditions(boolean matchAllConditions);
 
   SearchMarkReference toReference();
 }

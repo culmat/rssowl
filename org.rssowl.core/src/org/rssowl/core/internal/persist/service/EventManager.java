@@ -43,6 +43,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.IPreference;
+import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.IConditionalGetDAO;
@@ -59,6 +60,7 @@ import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.PersonEvent;
 import org.rssowl.core.persist.event.PreferenceEvent;
 import org.rssowl.core.persist.event.SearchConditionEvent;
+import org.rssowl.core.persist.event.SearchEvent;
 import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.service.IDGenerator;
@@ -272,6 +274,8 @@ public class EventManager implements DatabaseListener   {
       removeFromParentNews((IAttachment) entity);
     else if (entity instanceof ISearchCondition)
       cascadeSearchConditionDeletion((ISearchCondition) entity);
+    else if (entity instanceof ISearch)
+      cascadeSearchDeletion((ISearch) entity);
   }
 
   private void cascadeNewsBinDeletion(INewsBin entity) {
@@ -332,9 +336,13 @@ public class EventManager implements DatabaseListener   {
 
   private void cascadeSearchMarkDeletion(ISearchMark mark) {
     addItemBeingDeleted(mark);
-    for (ISearchCondition condition : mark.getSearchConditions())   {
+    for (ISearchCondition condition : mark.getSearchConditions())
       fDb.delete(condition);
-    }
+  }
+
+  private void cascadeSearchDeletion(ISearch search) {
+    for (ISearchCondition condition : search.getSearchConditions())
+      fDb.delete(condition);
   }
 
   private void cascadeFeedDeletion(IFeed feed) {
@@ -540,6 +548,10 @@ public class EventManager implements DatabaseListener   {
     else if (entity instanceof IPreference) {
       IPreference pref = (IPreference) entity;
       modelEvent = new PreferenceEvent(pref);
+    }
+    else if (entity instanceof ISearch) {
+      ISearch search = (ISearch) entity;
+      modelEvent = new SearchEvent(search, root);
     }
     return modelEvent;
   }

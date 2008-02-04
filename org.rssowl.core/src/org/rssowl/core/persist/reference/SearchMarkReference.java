@@ -30,23 +30,23 @@ import org.rssowl.core.persist.service.PersistenceException;
 /**
  * Implementation of the <code>ModelReference</code> for the Type
  * <code>ISearchMark</code>.
- * 
+ *
  * @author bpasero
  */
 public final class SearchMarkReference extends MarkReference {
 
   /**
-   * Instantiates a new leightweight reference. Any resolve()-call will be
+   * Instantiates a new lightweight reference. Any resolve()-call will be
    * passed to the <code>IModelDAO</code> to load the heavyweight type from
-   * the persistance layer.
-   * 
+   * the persistence layer.
+   *
    * @param id The ID of the type to use for loading the type from the
-   * persistance layer.
+   * persistence layer.
    */
   public SearchMarkReference(long id) {
     super(id, ISearchMark.class);
   }
-  
+
   @Override
   public ISearchMark resolve() throws PersistenceException {
     return (ISearchMark) super.resolve();

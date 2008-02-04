@@ -35,6 +35,7 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.IPreference;
+import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.NewsCounter;
@@ -53,6 +54,7 @@ import org.rssowl.core.persist.dao.IPersistableDAO;
 import org.rssowl.core.persist.dao.IPersonDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.dao.ISearchConditionDAO;
+import org.rssowl.core.persist.dao.ISearchDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
 
 import java.util.HashMap;
@@ -80,6 +82,7 @@ public final class DAOServiceImpl extends DAOService  {
   private final IBookMarkDAO fBookMarkDAO = new CachingBookMarkDAO();
   private final ISearchMarkDAO fSearchMarkDAO = new CachingSearchMarkDAO();
   private final INewsBinDAO fNewsBinDAO = new CachingNewsBinDAO();
+  private final ISearchDAO fSearchDAO = new CachingSearchDAO();
 
   private final Map<Class<?>, Object> fEntityInterfacesToDaosMap = new HashMap<Class<?>, Object>();
   private final Map<Class<?>, Object> fEntityDaoClassesToDaosMap = new HashMap<Class<?>, Object>();
@@ -100,6 +103,7 @@ public final class DAOServiceImpl extends DAOService  {
     fEntityDaoClassesToDaosMap.put(ISearchMarkDAO.class, fSearchMarkDAO);
     fEntityDaoClassesToDaosMap.put(IPreferenceDAO.class, fPreferencesDAO);
     fEntityDaoClassesToDaosMap.put(INewsBinDAO.class, fNewsBinDAO);
+    fEntityDaoClassesToDaosMap.put(ISearchDAO.class, fSearchDAO);
 
     for (Object value : fEntityDaoClassesToDaosMap.values()) {
       IPersistableDAO<?> dao = (IPersistableDAO<?>) value;
@@ -119,6 +123,7 @@ public final class DAOServiceImpl extends DAOService  {
     fEntityInterfacesToDaosMap.put(ISearchMark.class, fSearchMarkDAO);
     fEntityInterfacesToDaosMap.put(IPreference.class, fPreferencesDAO);
     fEntityInterfacesToDaosMap.put(INewsBin.class, fNewsBinDAO);
+    fEntityInterfacesToDaosMap.put(ISearch.class, fSearchDAO);
     fEntityInterfacesToDaosMap.put(NewsCounter.class, fNewsCounterDAO);
   }
 
@@ -202,6 +207,11 @@ public final class DAOServiceImpl extends DAOService  {
 
   public DescriptionDAOImpl getDescriptionDAO() {
     return fDescriptionDAO;
+  }
+
+  @Override
+  public ISearchDAO getSearchDAO() {
+    return fSearchDAO;
   }
 
   @SuppressWarnings("unchecked")
