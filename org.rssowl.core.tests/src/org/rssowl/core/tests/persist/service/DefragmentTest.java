@@ -36,6 +36,7 @@ import org.rssowl.core.internal.persist.Description;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.Preference;
 import org.rssowl.core.internal.persist.service.Counter;
+import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.internal.persist.service.DBManager;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
@@ -108,7 +109,7 @@ public class DefragmentTest {
   public void testDefragment() {
     String dbPath = DBManager.getDBFilePath();
     File originDbFile = new File(dbPath + ".origin");
-    DBManager.copyFile(new File(dbPath), originDbFile);
+    DBHelper.copyFile(new File(dbPath), originDbFile);
     File defragmentedDbFile = new File(dbPath + ".dest");
     DBManager.copyDatabase(originDbFile, defragmentedDbFile,
         new NullProgressMonitor());
