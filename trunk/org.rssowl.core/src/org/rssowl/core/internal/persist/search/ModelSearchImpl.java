@@ -26,7 +26,6 @@ package org.rssowl.core.internal.persist.search;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.StopAnalyzer;
-import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.DateTools;
@@ -83,12 +82,14 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -124,8 +125,7 @@ public class ModelSearchImpl implements IModelSearch {
   private static final INews.State[] NEWS_STATES = INews.State.values();
 
   /* A Set of Stop Words in English */
-  @SuppressWarnings( { "unchecked" })
-  private static final Set STOP_WORDS = Collections.synchronizedSet(StopFilter.makeStopSet(StopAnalyzer.ENGLISH_STOP_WORDS));
+  private static final Set<String> STOP_WORDS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(StopAnalyzer.ENGLISH_STOP_WORDS)));
 
   private volatile IndexSearcher fSearcher;
   private volatile Indexer fIndexer;
