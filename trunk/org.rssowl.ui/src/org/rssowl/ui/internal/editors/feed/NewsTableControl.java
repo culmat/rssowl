@@ -953,13 +953,23 @@ public class NewsTableControl implements IFeedViewPart {
     PlatformUI.getWorkbench().getThemeManager().removePropertyChangeListener(fPropertyChangeListener);
   }
 
-  private void setNewsState(INews news, INews.State state) {
-    Set<INews> singleNewsSet = Collections.singleton(news);
+  /* We run this in the UI Thread to avoid race conditions */
+  private void setNewsState(final INews news, final INews.State state) {
+    JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
+      public void run() {
 
-    /* Add to UndoStack */
-    UndoStack.getInstance().addOperation(new NewsStateOperation(singleNewsSet, state, true));
+        /* The news might have been marked as hidden/deleted meanwhile, so return */
+        if (!news.isVisible())
+          return;
 
-    /* Perform Operation */
-    fNewsDao.setState(singleNewsSet, state, true, false);
+        Set<INews> singleNewsSet = Collections.singleton(news);
+
+        /* Add to UndoStack */
+        UndoStack.getInstance().addOperation(new NewsStateOperation(singleNewsSet, state, true));
+
+        /* Perform Operation */
+        fNewsDao.setState(singleNewsSet, state, true, false);
+      }
+    });
   }
 }
