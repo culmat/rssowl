@@ -274,6 +274,7 @@ public class CreateBookmarkWizard extends Wizard {
     if (!fFeedDefinitionPage.isKeywordSubscription() && !StringUtils.isSet(title[0])) {
       IRunnableWithProgress runnable = new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) {
+          monitor.beginTask("Please wait while loading the title from the feed...", IProgressMonitor.UNKNOWN);
           try {
 
             /* Load Feed from Link if necessary */
@@ -300,7 +301,7 @@ public class CreateBookmarkWizard extends Wizard {
 
       /* Perform Runnable in same Thread and show progress */
       try {
-        getContainer().run(false, false, runnable);
+        getContainer().run(true, false, runnable);
       } catch (InvocationTargetException e) {
         Activator.getDefault().logError(e.getMessage(), e);
       } catch (InterruptedException e) {
