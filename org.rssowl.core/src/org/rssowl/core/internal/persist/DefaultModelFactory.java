@@ -44,6 +44,7 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.IPreference;
+import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
@@ -324,7 +325,18 @@ public class DefaultModelFactory implements IModelFactory {
     return new ConditionalGet(ifModifiedSince, link, ifNoneMatch);
   }
 
+  /*
+   * @see org.rssowl.core.persist.IModelFactory#createPreference(java.lang.String)
+   */
   public IPreference createPreference(String key) {
     return new Preference(key);
+  }
+
+  /*
+   * @see org.rssowl.core.persist.IModelFactory#createSearch(java.lang.Long,
+   * java.util.List, java.lang.String)
+   */
+  public ISearch createSearch(Long id, String name) {
+    return new Search(id, name);
   }
 }
