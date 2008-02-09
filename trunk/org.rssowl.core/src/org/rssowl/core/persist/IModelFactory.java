@@ -340,4 +340,13 @@ public interface IModelFactory {
    * @return a new instance of IPreference.
    */
   IPreference createPreference(String key);
+
+  /**
+   * Creates a new instance of ISearch with the provided parameters.
+   *
+   * @param id The unique id of the ISearch.
+   * @param name The Name of the ISearch.
+   * @return a new instance of ISearch with the provided parameters.
+   */
+  ISearch createSearch(Long id, String name);
 }

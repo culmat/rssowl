@@ -28,6 +28,7 @@ import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.reference.SearchReference;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class Search extends AbstractEntity implements ISearch  {
     super(id);
     Assert.isNotNull(name, "name");
     fName = name;
+    fSearchConditions = new ArrayList<ISearchCondition>(5);
   }
 
   /**
