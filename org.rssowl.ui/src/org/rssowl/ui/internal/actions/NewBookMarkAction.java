@@ -40,7 +40,7 @@ import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.dialogs.wizards.CreateBookmarkWizard;
+import org.rssowl.ui.internal.dialogs.bookmark.CreateBookmarkWizard;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 /**
