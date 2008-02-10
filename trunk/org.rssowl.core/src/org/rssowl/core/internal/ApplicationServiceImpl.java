@@ -50,6 +50,7 @@ import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.runnable.NewsEventRunnable;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IDGenerator;
+import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.RetentionStrategy;
 
 import com.db4o.ObjectContainer;
@@ -118,9 +119,15 @@ public class ApplicationServiceImpl implements IApplicationService {
       /* Merge with existing */
       mergeResult = feed.mergeAndCleanUp(emptyFeed);
       List<INews> newNewsAdded = getNewNewsAdded(feed);
+
+      /* Update Date of last added news in Bookmark */
       if (!newNewsAdded.isEmpty()) {
-        bookMark.setLastAddedNewsDate(new Date());
-        fDb.set(bookMark);
+        Date mostRecentDate = DateUtils.getRecentDate(newNewsAdded);
+        Date previousMostRecentDate = bookMark.getMostRecentNewsDate();
+        if (previousMostRecentDate == null || mostRecentDate.after(previousMostRecentDate)) {
+          bookMark.setMostRecentNewsDate(mostRecentDate);
+          fDb.set(bookMark);
+        }
       }
 
       updateStateOfUnsavedNewNews(newNewsAdded);
