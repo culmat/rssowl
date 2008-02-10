@@ -208,7 +208,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
       preCommit();
       fDb.commit();
     } catch (Db4oException e) {
-      throw new PersistenceException(e);
+      DBHelper.rollbackAndPE(fDb, e);
     } finally {
       fWriteLock.unlock();
     }
