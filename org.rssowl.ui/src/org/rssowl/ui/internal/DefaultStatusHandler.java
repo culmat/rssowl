@@ -25,9 +25,12 @@
 package org.rssowl.ui.internal;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.WorkbenchErrorHandler;
 import org.rssowl.core.persist.service.PersistenceException;
+
+import java.io.IOException;
 
 /**
  * Default status handler in RSSOwl that performs certain special actions when
@@ -43,13 +46,27 @@ public class DefaultStatusHandler extends WorkbenchErrorHandler {
   @Override
   public void handle(StatusAdapter statusAdapter, int style) {
     IStatus status = statusAdapter.getStatus();
-    if (status != null) {
-      Throwable exception = status.getException();
-      if (exception instanceof PersistenceException)
-        ; //TODO Show in Dialog
 
-      /* Handle in WorkbenchErrorHandle in any case */
-      super.handle(statusAdapter, style);
+    /* Specially treat IOExceptions from PersistenceException */
+    if (status != null) {
+      Throwable ex = status.getException();
+      if (ex instanceof PersistenceException)
+        handlePersistenceException((PersistenceException) ex);
+      else if (ex != null) {
+        Throwable cause = ex.getCause();
+        if (cause instanceof PersistenceException)
+          handlePersistenceException((PersistenceException) cause);
+      }
+    }
+
+    /* Handle in WorkbenchErrorHandle in any case */
+    super.handle(statusAdapter, style);
+  }
+
+  private void handlePersistenceException(PersistenceException ex) {
+    Throwable cause = ex.getCause();
+    if (cause != null && cause instanceof IOException) {
+      ErrorDialog.openError(OwlUI.getPrimaryShell(), "Error", "RSSOwl was unable to write to your disk. This is typically caused by a disk that is full or if the permissions are not set correctly. We recommend that you solve the problem and restart the application.", Activator.getDefault().createErrorStatus(cause.getMessage(), (Exception) cause));
     }
   }
 }
