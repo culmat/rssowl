@@ -132,7 +132,7 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
     Composite controlsContainer = new Composite(composite, SWT.NONE);
     controlsContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     controlsContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0, 5, 0, false));
-    ((GridLayout) controlsContainer.getLayout()).marginTop = 15;
+    ((GridLayout) controlsContainer.getLayout()).marginTop = 25;
 
     final Button reminderCheck = new Button(controlsContainer, SWT.CHECK);
     reminderCheck.setText("Remind me every ");
@@ -212,6 +212,6 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
 
   private void showInfo() {
     setErrorMessage(null);
-    setMessage("This is a reminder to start the clean-up wizard\n to delete old news and bookmarks.", IMessageProvider.INFORMATION);
+    setMessage("As time goes on, unused bookmarks may accumulate in your feed reader.\n The Clean-up Wizard can help with this as well as optimize your system.", IMessageProvider.INFORMATION);
   }
 }
