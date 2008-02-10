@@ -471,6 +471,7 @@ public class Indexer {
 
   private IndexWriter createIndexWriter(Directory directory, boolean create) throws IOException {
     IndexWriter indexWriter = new IndexWriter(directory, false, createAnalyzer(), create);
+    indexWriter.setMergeFactor(6);
     fFlushRequired = false;
     return indexWriter;
   }
