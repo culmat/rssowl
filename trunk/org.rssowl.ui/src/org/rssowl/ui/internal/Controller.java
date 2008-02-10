@@ -34,6 +34,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
@@ -813,6 +814,11 @@ public class Controller {
 
     /* Support Keybindings for assigning Labels */
     defineLabelCommands(DynamicDAO.loadAll(ILabel.class));
+
+    /* Check for Status of Startup */
+    IStatus startupStatus = Owl.getPersistenceService().getStartupStatus();
+    if (startupStatus.getSeverity() == IStatus.ERROR)
+      ErrorDialog.openError(OwlUI.getPrimaryShell(), "Startup Error", "There was an error while starting RSSOwl.", startupStatus);
   }
 
   /**
