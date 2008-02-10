@@ -181,11 +181,13 @@ public class CreateBookmarkWizard extends Wizard {
           fBookMarkDefinitionPage.presetBookmarkName(feedTitle);
 
           /* Update Link */
-          JobRunner.runInUIThread(100, getShell(), new Runnable() {
-            public void run() {
-              fFeedDefinitionPage.setLink(link[0].toString());
-            }
-          });
+          if (link[0] != null) {
+            JobRunner.runInUIThread(100, getShell(), new Runnable() {
+              public void run() {
+                fFeedDefinitionPage.setLink(link[0].toString());
+              }
+            });
+          }
         }
       };
 
@@ -247,6 +249,7 @@ public class CreateBookmarkWizard extends Wizard {
       res = internalPerformFinish();
     } catch (URISyntaxException e) {
       Activator.getDefault().logError(e.getMessage(), e);
+      ((DialogPage) getContainer().getCurrentPage()).setMessage("Please enter a valid Link", IMessageProvider.ERROR);
     }
 
     /* Remember Settings */
