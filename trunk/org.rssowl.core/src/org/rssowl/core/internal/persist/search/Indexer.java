@@ -506,13 +506,15 @@ public class Indexer {
     if (sync || InternalOwl.TESTING)
       doSaveCommittedNews(uncommittedNews);
     else {
-      new Job("") {
+      Job job = new Job("") {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
           doSaveCommittedNews(uncommittedNews);
           return Status.OK_STATUS;
         }
-      }.schedule();
+      };
+      job.setSystem(true);
+      job.schedule();
     }
   }
 
