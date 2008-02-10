@@ -50,7 +50,6 @@ import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
-import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -198,7 +197,7 @@ public class FeedSelectionPage extends WizardPage {
           fViewer.setExpandedState(folder, expandedState);
 
           if (expandedState && fViewer.getChecked(folder))
-            setChildsChecked(folder, true, true);
+            setChildsChecked(folder, true);
         }
       }
     });
@@ -207,19 +206,13 @@ public class FeedSelectionPage extends WizardPage {
     fViewer.setInput(new Object());
     fViewer.setAllChecked(true);
 
-    /* Set Checked Elements */
-    Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
-    for (IFolder folder : rootFolders) {
-      setCheckedElements(folder, false);
-    }
-
     /* Update Checks on Selection */
     fViewer.getTree().addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         if (e.detail == SWT.CHECK) {
           TreeItem item = (TreeItem) e.item;
-          setChildsChecked((IFolderChild) item.getData(), item.getChecked(), true);
+          setChildsChecked((IFolderChild) item.getData(), item.getChecked());
 
           if (!item.getChecked())
             setParentsChecked((IFolderChild) item.getData(), false);
@@ -232,7 +225,7 @@ public class FeedSelectionPage extends WizardPage {
       public void treeExpanded(TreeExpansionEvent event) {
         boolean isChecked = fViewer.getChecked(event.getElement());
         if (isChecked)
-          setChildsChecked((IFolderChild) event.getElement(), isChecked, false);
+          setChildsChecked((IFolderChild) event.getElement(), isChecked);
       }
 
       public void treeCollapsed(TreeExpansionEvent event) {}
@@ -282,42 +275,12 @@ public class FeedSelectionPage extends WizardPage {
     return false;
   }
 
-  private void setCheckedElements(IFolderChild entity, boolean parentChecked) {
-
-    /* Check for Preference */
-    IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(entity);
-    if (prefs.getBoolean(DefaultPreferences.ENABLE_NOTIFIER)) {
-      if (!parentChecked) {
-        setParentsExpanded(entity);
-        parentChecked = true;
-      }
-      fViewer.setChecked(entity, true);
-      setChildsChecked(entity, true, true);
-    }
-
-    /* Check for Childs */
-    if (entity instanceof IFolder) {
-      List<IFolderChild> children = ((IFolder) entity).getChildren();
-      for (IFolderChild child : children) {
-        setCheckedElements(child, parentChecked);
-      }
-    }
-  }
-
-  private void setParentsExpanded(IFolderChild folderChild) {
-    IFolder parent = folderChild.getParent();
-    if (parent != null) {
-      fViewer.setExpandedState(parent, true);
-      setParentsExpanded(parent);
-    }
-  }
-
-  private void setChildsChecked(IFolderChild folderChild, boolean checked, boolean onlyExpanded) {
-    if (folderChild instanceof IFolder && (!onlyExpanded || fViewer.getExpandedState(folderChild))) {
+  private void setChildsChecked(IFolderChild folderChild, boolean checked) {
+    if (folderChild instanceof IFolder) {
       List<IFolderChild> children = ((IFolder) folderChild).getChildren();
       for (IFolderChild child : children) {
         fViewer.setChecked(child, checked);
-        setChildsChecked(child, checked, onlyExpanded);
+        setChildsChecked(child, checked);
       }
     }
   }
