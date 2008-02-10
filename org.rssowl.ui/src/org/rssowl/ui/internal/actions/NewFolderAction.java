@@ -60,6 +60,7 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -233,8 +234,8 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
 
         /* Copy all Properties from Parent into this Mark */
         if (parent != null) {
-          Map<String, ? > properties = parent.getProperties();
-          for (Map.Entry<String, ? > property : properties.entrySet())
+          Map<String, Serializable> properties = parent.getProperties();
+          for (Map.Entry<String, Serializable> property : properties.entrySet())
             folder.setProperty(property.getKey(), property.getValue());
         }
 
