@@ -746,9 +746,6 @@ public class Controller {
     /* Create the Saved Search Service */
     fSavedSearchService = new SavedSearchService();
 
-    /* Create the Clean-Up Reminder Service */
-    fCleanUpReminderService = new CleanUpReminderService();
-
     /* Register Listeners */
     registerListeners();
   }
@@ -810,6 +807,9 @@ public class Controller {
    * This method is called just after the Window has opened.
    */
   public void postWindowOpen() {
+
+    /* Create the Clean-Up Reminder Service */
+    fCleanUpReminderService = new CleanUpReminderService();
 
     /* Support Keybindings for assigning Labels */
     defineLabelCommands(DynamicDAO.loadAll(ILabel.class));
