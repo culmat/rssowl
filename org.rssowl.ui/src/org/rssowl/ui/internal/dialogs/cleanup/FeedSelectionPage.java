@@ -161,7 +161,7 @@ public class FeedSelectionPage extends WizardPage {
       public boolean hasChildren(Object element) {
         if (element instanceof IFolder) {
           IFolder folder = (IFolder) element;
-          return !folder.getChildren().isEmpty();
+          return !folder.isEmpty();
         }
 
         return false;
@@ -193,7 +193,7 @@ public class FeedSelectionPage extends WizardPage {
         IFolder folder = selection.getFirstElement() instanceof IFolder ? (IFolder) selection.getFirstElement() : null;
 
         /* Expand / Collapse Folder */
-        if (folder != null && !folder.getChildren().isEmpty()) {
+        if (folder != null && !folder.isEmpty()) {
           boolean expandedState = !fViewer.getExpandedState(folder);
           fViewer.setExpandedState(folder, expandedState);
 

@@ -416,11 +416,12 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     /* Handle selected News (Linux: Note Bug 444) */
     if ((event.detail & SWT.SELECTED) != 0) {
 
+      Set<ILabel> labels = news.getLabels();
       /* Some conditions under which we don't override the selection color */
-      if (news.getLabels().isEmpty() || !scrollable.isFocusControl())
+      if (labels.isEmpty() || !scrollable.isFocusControl())
         return;
 
-      ILabel label = news.getLabels().iterator().next();
+      ILabel label = labels.iterator().next();
       if (isInvalidLabelColor(label))
         return;
 

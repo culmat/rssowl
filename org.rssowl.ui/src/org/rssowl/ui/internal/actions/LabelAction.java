@@ -35,7 +35,6 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.util.ModelUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -103,12 +102,8 @@ public class LabelAction extends Action {
 
       /* Remove all Labels */
       else {
-        List<ILabel> newsLabelsCopy = new ArrayList<ILabel>(newsLabels.size());
-        newsLabelsCopy.addAll(newsLabels);
-
-        for (ILabel newsLabel : newsLabelsCopy) {
+        for (ILabel newsLabel : newsLabels)
           newsItem.removeLabel(newsLabel);
-        }
       }
     }
 

@@ -55,6 +55,7 @@ import java.io.Writer;
 import java.net.URI;
 import java.text.DateFormat;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -304,7 +305,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     boolean hasLink = news.getLinkAsText() != null;
     State state = news.getState();
     boolean isUnread = (state == State.NEW || state == State.UPDATED || state == State.UNREAD);
-    String color = !news.getLabels().isEmpty() ? news.getLabels().iterator().next().getColor() : null;
+    Set<ILabel> labels = news.getLabels();
+    String color = !labels.isEmpty() ? labels.iterator().next().getColor() : null;
 
     /* DIV: NewsItem */
     div(builder, "newsitem");
@@ -410,18 +412,19 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       div(footer, "footer");
 
       /* Attachments */
-      if (news.getAttachments().size() != 0) {
+      List<IAttachment> attachments = news.getAttachments();
+      if (attachments.size() != 0) {
         hasFooter = true;
 
         /* DIV: NewsItem/Footer/Attachments */
         div(footer, "attachments");
 
         /* Label */
-        span(footer, news.getAttachments().size() == 1 ? "Attachment:" : "Attachments:", "label");
+        span(footer, attachments.size() == 1 ? "Attachment:" : "Attachments:", "label");
 
         /* For each Attachment */
         boolean strip = false;
-        for (IAttachment attachment : news.getAttachments()) {
+        for (IAttachment attachment : attachments) {
           if (attachment.getLink() != null) {
             strip = true;
             URI link = attachment.getLink();
@@ -443,7 +446,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       }
 
       /* Label */
-      Set<ILabel> labels = news.getLabels();
       if (!labels.isEmpty()) {
         hasFooter = true;
 
@@ -471,35 +473,36 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       }
 
       /* Categories */
-      if (news.getCategories().size() > 0) {
-        StringBuilder categories = new StringBuilder();
+      List<ICategory> categories = news.getCategories();
+      if (categories.size() > 0) {
+        StringBuilder categoriesText = new StringBuilder();
         boolean hasCategories = false;
 
         /* DIV: NewsItem/Footer/Categories */
-        div(categories, "categories");
+        div(categoriesText, "categories");
 
         /* Label */
-        span(categories, news.getCategories().size() == 1 ? "Category:" : "Categories:", "label");
+        span(categoriesText, categories.size() == 1 ? "Category:" : "Categories:", "label");
 
         /* For each Category */
-        for (ICategory category : news.getCategories()) {
+        for (ICategory category : categories) {
           String name = category.getName();
           String domain = category.getDomain();
 
           /* As Link */
           if (URIUtils.looksLikeLink(domain) && StringUtils.isSet(name)) {
-            link(categories, domain, name, "category");
+            link(categoriesText, domain, name, "category");
             hasCategories = true;
           }
 
           /* As Text */
           else if (StringUtils.isSet(name)) {
-            categories.append(name);
+            categoriesText.append(name);
             hasCategories = true;
           }
 
           /* Separate with colon */
-          categories.append(", ");
+          categoriesText.append(", ");
 
           /* Add to Search */
           if (StringUtils.isSet(name)) {
@@ -510,15 +513,15 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         }
 
         if (hasCategories)
-          categories.delete(categories.length() - 2, categories.length());
+          categoriesText.delete(categoriesText.length() - 2, categoriesText.length());
 
         /* Close: NewsItem/Footer/Categories */
-        close(categories, "div");
+        close(categoriesText, "div");
 
         /* Append categories if provided */
         if (hasCategories) {
           hasFooter = true;
-          footer.append(categories);
+          footer.append(categoriesText);
         }
       }
 
