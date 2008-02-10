@@ -84,5 +84,5 @@ public interface IBookMark extends INewsMark {
    *
    * @param date Non-null Date object.
    */
-  void setLastNewNewsDate(Date date);
+  void setLastAddedNewsDate(Date date);
 }
