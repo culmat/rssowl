@@ -77,7 +77,7 @@ public interface IBookMark extends INewsMark {
    * @return the most recent Date when new INews where added to this IBookMark
    * or {@code null} if not yet set.
    */
-  Date getLastNewNewsDate();
+  Date getLastAddedNewsDate();
 
   /**
    * Set the most recent Date when new INews where added to this IBookMark.
