@@ -53,7 +53,7 @@ public class BookMark extends Mark implements IBookMark {
   private transient FeedLinkReference fFeedLinkReference;
   private boolean fIsErrorLoading;
   private transient NewsCounter fNewsCounter;
-  private long fLastNewNewsDate = -1;
+  private long fMostRecentNewsDate = -1;
 
   /**
    * Creates a new Element of the type BookMark. A BookMark is only visually
@@ -79,17 +79,17 @@ public class BookMark extends Mark implements IBookMark {
   // As per javadoc
   }
 
-  public synchronized Date getLastAddedNewsDate() {
-    if (fLastNewNewsDate < 0)
+  public synchronized Date getMostRecentNewsDate() {
+    if (fMostRecentNewsDate < 0)
       return null;
 
-    return new Date(fLastNewNewsDate);
+    return new Date(fMostRecentNewsDate);
   }
 
 
-  public synchronized void setLastAddedNewsDate(Date date) {
+  public synchronized void setMostRecentNewsDate(Date date) {
     Assert.isNotNull(date, "date");
-    fLastNewNewsDate = date.getTime();
+    fMostRecentNewsDate = date.getTime();
   }
 
   public synchronized void setNewsCounter(NewsCounter newsCounter) {
