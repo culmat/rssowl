@@ -46,10 +46,6 @@ import org.rssowl.ui.internal.util.JobRunner;
  * @author bpasero@rssowl.org
  */
 public class CleanUpReminderService {
-
-  /* Check every hour */
-  private static final long SCHEDULE_INTERVAL = 1000 * 60 * 60;
-
   private final Job fReminderJob;
   private final IPreferenceScope fPreferences = Owl.getPreferenceService().getGlobalScope();
 
@@ -57,9 +53,9 @@ public class CleanUpReminderService {
     fReminderJob = createJob();
     fReminderJob.setSystem(true);
     fReminderJob.setUser(false);
-    fReminderJob.schedule(SCHEDULE_INTERVAL);
 
     initIfNecessary();
+    reschedule();
   }
 
   /* Check if this is the first start */
@@ -68,6 +64,15 @@ public class CleanUpReminderService {
       long millies = fPreferences.getLong(DefaultPreferences.CLEAN_UP_REMINDER_DATE_MILLIES);
       if (millies == 0)
         storeNextReminderDate();
+    }
+  }
+
+  private void reschedule() {
+    if (fPreferences.getBoolean(DefaultPreferences.CLEAN_UP_REMINDER_STATE)) {
+      long nextReminderDate = fPreferences.getLong(DefaultPreferences.CLEAN_UP_REMINDER_DATE_MILLIES);
+      long diff = nextReminderDate - System.currentTimeMillis();
+
+      fReminderJob.schedule(diff > 0 ? diff : 0);
     }
   }
 
@@ -83,36 +88,30 @@ public class CleanUpReminderService {
           if (!fPreferences.getBoolean(DefaultPreferences.CLEAN_UP_REMINDER_STATE))
             return Status.OK_STATUS;
 
-          long nextReminderDate = fPreferences.getLong(DefaultPreferences.CLEAN_UP_REMINDER_DATE_MILLIES);
-          if (nextReminderDate != -1 && nextReminderDate < System.currentTimeMillis()) {
+          /* Show Reminder */
+          final Shell shell = OwlUI.getPrimaryShell();
+          if (shell != null && !monitor.isCanceled() && Platform.isRunning()) {
+            JobRunner.runSyncedInUIThread(shell, new Runnable() {
+              public void run() {
+                if (monitor.isCanceled() || !Platform.isRunning())
+                  return;
 
-            /* Show Reminder */
-            final Shell shell = OwlUI.getPrimaryShell();
-            if (shell != null && !monitor.isCanceled() && Platform.isRunning()) {
-              JobRunner.runInUIThread(shell, new Runnable() {
-                public void run() {
-                  if (monitor.isCanceled() || !Platform.isRunning())
-                    return;
+                if (CleanUpReminderDialog.getVisibleInstance() == null && new CleanUpReminderDialog(shell).open() == IDialogConstants.OK_ID) {
+                  CleanUpWizard cleanUpWizard = new CleanUpWizard();
+                  WizardDialog dialog = new WizardDialog(shell, cleanUpWizard);
+                  dialog.create();
+                  dialog.open();
+                };
+              }
+            });
 
-                  if (CleanUpReminderDialog.getVisibleInstance() == null && new CleanUpReminderDialog(shell).open() == IDialogConstants.OK_ID) {
-                    CleanUpWizard cleanUpWizard = new CleanUpWizard();
-                    WizardDialog dialog = new WizardDialog(shell, cleanUpWizard);
-                    dialog.create();
-                    dialog.open();
-                  };
-
-                  /* Store Next Date */
-                  if (fPreferences.getBoolean(DefaultPreferences.CLEAN_UP_REMINDER_STATE))
-                    storeNextReminderDate();
-                }
-              });
+            /* Store Next Date and reschedule */
+            if (fPreferences.getBoolean(DefaultPreferences.CLEAN_UP_REMINDER_STATE)) {
+              storeNextReminderDate();
+              reschedule();
             }
           }
         }
-
-        /* Re-Schedule */
-        if (!monitor.isCanceled() && Platform.isRunning())
-          schedule(SCHEDULE_INTERVAL);
 
         return Status.OK_STATUS;
       }
