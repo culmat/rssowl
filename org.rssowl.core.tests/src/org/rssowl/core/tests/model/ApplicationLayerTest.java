@@ -104,7 +104,7 @@ public class ApplicationLayerTest {
   }
 
   /**
-   * See bug #184 : State change and async loading of the same news in different
+   * See bug #184 : State change and async loading of the equivalent news in different
    * feeds can lead to incorrect behaviour.
    *
    * @throws Exception
@@ -119,9 +119,7 @@ public class ApplicationLayerTest {
     DynamicDAO.save(feed0);
 
     IFolder folder = fFactory.createFolder(null, null, "Folder");
-    IBookMark mark0 = fFactory.createBookMark(null, folder, new FeedLinkReference(feed0.getLink()), "Mark0");
     DynamicDAO.save(folder);
-    fAppService.handleFeedReload(mark0, feed0, null, false);
 
     IFeed feed1 = fFactory.createFeed(null, new URI("http://www.feed1.com"));
     DynamicDAO.save(feed1);
