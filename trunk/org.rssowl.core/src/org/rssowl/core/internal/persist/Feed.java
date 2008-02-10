@@ -152,7 +152,7 @@ public class Feed extends AbstractEntity implements IFeed {
    * @see org.rssowl.core.model.types.IFeed#getNews()
    */
   public synchronized List<INews> getNews() {
-    return Collections.unmodifiableList(fNews);
+    return new ArrayList<INews>(fNews);
   }
 
   public synchronized int getStickyCount() {
@@ -652,7 +652,7 @@ public class Feed extends AbstractEntity implements IFeed {
     if (fCategories == null)
       return Collections.emptyList();
 
-    return Collections.unmodifiableList(fCategories);
+    return new ArrayList<ICategory>(fCategories);
   }
 
   /**
@@ -735,6 +735,7 @@ public class Feed extends AbstractEntity implements IFeed {
 
   public synchronized MergeResult mergeAndCleanUp(IFeed objectToMerge) {
     Assert.isNotNull(objectToMerge);
+    Assert.isLegal(this != objectToMerge, "Trying to merge the same feed. This is most likely a mistake: " + objectToMerge);
     synchronized (objectToMerge) {
       return merge(objectToMerge, true);
     }

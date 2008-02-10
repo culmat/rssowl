@@ -50,6 +50,17 @@ public interface ISearch extends IEntity    {
   void setName(String name);
 
   /**
+   * Returns {@code true} if this ISearch contains {@code searchCondition} and
+   * {@false} otherwise.
+   *
+   * @param searchCondition element whose presence should be tested.
+   *
+   * @return {@code true} if this ISearch contains {@code searchCondition} and
+   * {@false} otherwise.
+   */
+  boolean containsSearchCondition(ISearchCondition searchCondition);
+
+  /**
    * Adds a <code>ISearchCondition</code> to the list of conditions used to
    * search for <code>INews</code>.
    *
@@ -69,12 +80,6 @@ public interface ISearch extends IEntity    {
   /**
    * @return A List of search conditions specifying the search that is to be
    * performed to match News.
-   * <p>
-   * Note: The returned List should not be modified. The default Implementation
-   * returns an unmodifiable List using
-   * <code>Collections.unmodifiableList()</code>. Trying to modify the List
-   * will result in <code>UnsupportedOperationException</code>.
-   * </p>
    */
   List<ISearchCondition> getSearchConditions();
 

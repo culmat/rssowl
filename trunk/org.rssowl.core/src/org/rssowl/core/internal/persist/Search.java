@@ -29,7 +29,6 @@ import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.reference.SearchReference;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class Search extends AbstractEntity implements ISearch  {
@@ -67,11 +66,15 @@ public class Search extends AbstractEntity implements ISearch  {
     return fSearchConditions.remove(searchCondition);
   }
 
+  public synchronized boolean containsSearchCondition(ISearchCondition searchCondition) {
+    return fSearchConditions.contains(searchCondition);
+  }
+
   /*
    * @see org.rssowl.core.model.types.ISearchMark#getSearchConditions()
    */
   public synchronized List<ISearchCondition> getSearchConditions() {
-    return Collections.unmodifiableList(fSearchConditions);
+    return new ArrayList<ISearchCondition>(fSearchConditions);
   }
 
   /*

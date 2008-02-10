@@ -198,8 +198,11 @@ public class News extends AbstractEntity implements INews {
       fInReplyTo = news.fInReplyTo;
       fIsFlagged = news.fIsFlagged;
 
-      /* Don't need to copy the labels because the relationship is ManyToMany */
-      fLabels = new HashSet<ILabel>(news.getLabels());
+      /*
+       * Don't need to copy the labels because the relationship is ManyToMany
+       * and getLabels returns a copy.
+       */
+      fLabels = news.getLabels();
 
       fLinkText = news.fLinkText;
 
@@ -398,7 +401,7 @@ public class News extends AbstractEntity implements INews {
     try {
       if (fLabels == null)
         return Collections.emptySet();
-      return Collections.unmodifiableSet(fLabels);
+      return new HashSet<ILabel>(fLabels);
     } finally {
       fLock.releaseReadLock();
     }
@@ -438,7 +441,7 @@ public class News extends AbstractEntity implements INews {
     try {
       if (fAttachments == null)
         return Collections.emptyList();
-      return Collections.unmodifiableList(fAttachments);
+      return new ArrayList<IAttachment>(fAttachments);
     } finally {
       fLock.releaseReadLock();
     }
@@ -773,7 +776,7 @@ public class News extends AbstractEntity implements INews {
     try {
       if (fCategories == null)
         return Collections.emptyList();
-      return Collections.unmodifiableList(fCategories);
+      return new ArrayList<ICategory>(fCategories);
     } finally {
       fLock.releaseReadLock();
     }
@@ -948,7 +951,7 @@ public class News extends AbstractEntity implements INews {
     try {
       return getId().equals(n.getId()) &&
           fFeedLink.equals(n.fFeedLink) &&
-          simpleFieldsEqual(news) &&
+          simpleFieldsEqual(n) &&
           (fReceiveDate == null ? n.fReceiveDate == null : fReceiveDate.equals(n.fReceiveDate)) &&
           (getGuid() == null ? n.getGuid() == null : getGuid().equals(n.getGuid())) &&
           (fSource == null ? n.fSource == null : fSource.equals(n.fSource)) &&
@@ -966,48 +969,61 @@ public class News extends AbstractEntity implements INews {
 
   }
 
-  private boolean simpleFieldsEqual(INews news) {
-    return MergeUtils.equals(getBase(), news.getBase()) &&
-        MergeUtils.equals(fComments, news.getComments()) &&
-        MergeUtils.equals(fLinkText, news.getLinkAsText()) &&
-        MergeUtils.equals(fModifiedDate, news.getModifiedDate()) &&
-        MergeUtils.equals(fPublishDate, news.getPublishDate()) &&
-        MergeUtils.equals(fInReplyTo, news.getInReplyTo()) &&
-        MergeUtils.equals(fTitle, news.getTitle());
+  private boolean simpleFieldsEqual(News news) {
+    return MergeUtils.equals(fBaseUri, news.fBaseUri) &&
+        MergeUtils.equals(fComments, news.fComments) &&
+        MergeUtils.equals(fLinkText, news.fLinkText) &&
+        MergeUtils.equals(fModifiedDate, news.fModifiedDate) &&
+        MergeUtils.equals(fPublishDate, news.fPublishDate) &&
+        MergeUtils.equals(fInReplyTo, news.fInReplyTo) &&
+        MergeUtils.equals(fTitle, news.fTitle);
   }
 
   public MergeResult merge(INews news) {
     Assert.isNotNull(news, "news cannot be null"); //$NON-NLS-1$
-    fLock.acquireWriteLock();
+    Assert.isLegal(this != news, "Trying to merge the same news, this is most likely a mistake, news: " + news);
+
+    //TODO It's _in theory_ possible for a deadlock to occur here. Even though
+    //we may want to remove that possibility at some point, it should not happen
+    //in practice because merge is always called on an existing news and passed
+    //a news reloaded from the site. The latter is not yet visible to the app
+    //so no locks should be held.
+    News n = (News) news;
+    n.fLock.acquireReadLock();
     try {
-      boolean updated = mergeState(news);
+      fLock.acquireWriteLock();
+      try {
+        boolean updated = mergeState(news);
 
-      MergeResult result = new MergeResult();
-      /* Merge all items except for feed and id */
-      updated |= processListMergeResult(result, mergeAttachments(news.getAttachments()));
-      updated |= processListMergeResult(result, mergeCategories(news.getCategories()));
-      updated |= processListMergeResult(result, mergeAuthor(news.getAuthor()));
-      updated |= mergeGuid(news.getGuid());
-      mergeDescription(result, (News) news);
-      updated |= processListMergeResult(result, mergeSource(news.getSource()));
-      updated |= !simpleFieldsEqual(news);
+        MergeResult result = new MergeResult();
+        /* Merge all items except for feed and id */
+        updated |= processListMergeResult(result, mergeAttachments(n.fAttachments));
+        updated |= processListMergeResult(result, mergeCategories(n.fCategories));
+        updated |= processListMergeResult(result, mergeAuthor(n.fAuthor));
+        updated |= mergeGuid(n.fGuid);
+        mergeDescription(result, n);
+        updated |= processListMergeResult(result, mergeSource(n.fSource));
+        updated |= !simpleFieldsEqual(n);
 
-      setBase(news.getBase());
-      fComments = news.getComments();
-      fLinkText = news.getLinkAsText();
-      fModifiedDate = news.getModifiedDate();
-      fPublishDate = news.getPublishDate();
-      fTitle = news.getTitle();
-      fInReplyTo = news.getInReplyTo();
+        fBaseUri = n.fBaseUri;
+        fComments = n.fComments;
+        fLinkText = n.fLinkText;
+        fModifiedDate = n.fModifiedDate;
+        fPublishDate = n.fPublishDate;
+        fTitle = n.fTitle;
+        fInReplyTo = n.fInReplyTo;
 
-      ComplexMergeResult<?> propertiesResult = MergeUtils.mergeProperties(this, news);
-      if (updated || propertiesResult.isStructuralChange()) {
-        result.addUpdatedObject(this);
-        result.addAll(propertiesResult);
+        ComplexMergeResult<?> propertiesResult = MergeUtils.mergeProperties(this, news);
+        if (updated || propertiesResult.isStructuralChange()) {
+          result.addUpdatedObject(this);
+          result.addAll(propertiesResult);
+        }
+        return result;
+      } finally {
+        fLock.releaseWriteLock();
       }
-      return result;
     } finally {
-      fLock.releaseWriteLock();
+      n.fLock.releaseReadLock();
     }
   }
 
@@ -1018,7 +1034,7 @@ public class News extends AbstractEntity implements INews {
   private void mergeDescription(MergeResult result, News news) {
     String newsDescription = null;
     if (news.getId() == null)
-      newsDescription = news.getTransientDescription();
+      newsDescription = news.fTransientDescription;
     else
       newsDescription = news.getDescription();
 
@@ -1089,18 +1105,21 @@ public class News extends AbstractEntity implements INews {
   }
 
   private ComplexMergeResult<ISource> mergeSource(ISource source) {
-    ComplexMergeResult<ISource> mergeResult = MergeUtils.merge(getSource(), source);
+    ComplexMergeResult<ISource> mergeResult = MergeUtils.merge(fSource, source);
     fSource = mergeResult.getMergedObject();
     return mergeResult;
   }
 
   private ComplexMergeResult<IPerson> mergeAuthor(IPerson author) {
-    ComplexMergeResult<IPerson> mergeResult = MergeUtils.merge(getAuthor(), author);
+    ComplexMergeResult<IPerson> mergeResult = MergeUtils.merge(fAuthor, author);
     fAuthor = mergeResult.getMergedObject();
     return mergeResult;
   }
 
   private ComplexMergeResult<List<ICategory>> mergeCategories(List<ICategory> categories) {
+    if (categories == null)
+      categories = Collections.emptyList();
+
     Comparator<ICategory> comparator = new Comparator<ICategory>() {
 
       public int compare(ICategory o1, ICategory o2) {
@@ -1117,6 +1136,9 @@ public class News extends AbstractEntity implements INews {
   }
 
   private ComplexMergeResult<List<IAttachment>> mergeAttachments(List<IAttachment> attachments) {
+    if (attachments == null)
+      attachments = Collections.emptyList();
+
     Comparator<IAttachment> comparator = new Comparator<IAttachment>() {
       public int compare(IAttachment o1, IAttachment o2) {
         if (o1.getLink().equals(o2.getLink())) {

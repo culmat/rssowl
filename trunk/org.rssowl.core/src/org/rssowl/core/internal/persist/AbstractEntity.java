@@ -144,7 +144,7 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
     if (fProperties == null)
       return Collections.emptyMap();
 
-    return Collections.unmodifiableMap(fProperties);
+    return new HashMap<String, Serializable>(fProperties);
   }
 
   /*

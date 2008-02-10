@@ -116,8 +116,7 @@ public class Folder extends AbstractEntity implements IFolder {
    * @see org.rssowl.core.model.types.IFolder#getMarks()
    */
   public synchronized List<IMark> getMarks() {
-    List<IMark> marks = extractTypes(IMark.class, fChildren);
-    return Collections.unmodifiableList(marks);
+    return extractTypes(IMark.class, fChildren);
   }
 
   /*
@@ -130,11 +129,19 @@ public class Folder extends AbstractEntity implements IFolder {
     addChild(folder, position, after);
   }
 
+  public synchronized boolean isEmpty() {
+    return fChildren.isEmpty();
+  }
+
+  public synchronized boolean containsChild(IFolderChild child) {
+    return fChildren.contains(child);
+  }
+
   /*
    * @see org.rssowl.core.persist.IFolder#getChildren()
    */
   public synchronized List<IFolderChild> getChildren() {
-    return Collections.unmodifiableList(fChildren);
+    return new ArrayList<IFolderChild>(fChildren);
   }
 
 
@@ -173,8 +180,7 @@ public class Folder extends AbstractEntity implements IFolder {
    * @see org.rssowl.core.model.types.IFolder#getFolders()
    */
   public synchronized List<IFolder> getFolders() {
-    List<IFolder> folders = extractTypes(IFolder.class, fChildren);
-    return Collections.unmodifiableList(folders);
+    return extractTypes(IFolder.class, fChildren);
   }
 
   private <T> List<T> extractTypes(Class<T> type, List<? super T> list) {

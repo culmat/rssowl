@@ -141,9 +141,6 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
    * Convenience method that returns all the news from the feed that are
    * visible. The news that are visible are the ones whose state matches any of
    * the states returned by {@link INews.State#getVisible()}.
-   * <p>
-   * Note: unlike the list returned from {@link #getNews()}, this one can be
-   * modified by the caller safely.
    *
    * @return the visible news in the feed.
    * @see #getNewsByStates(Set)
@@ -154,9 +151,6 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
   /**
    * Returns the list of news from the feed that are in the same state as one of
    * the elements of <code>states</code>.
-   * <p>
-   * Note: unlike the list returned from {@link #getNews()}, this one can be
-   * modified by the caller safely.
    *
    * @param states Set containing all the allowable news states in the returned
    * list.
@@ -718,23 +712,11 @@ public interface IFeed extends IEntity, MergeCapable<IFeed> {
 
   /**
    * @return All Categories of this Feed.
-   * <p>
-   * Note: The returned List should not be modified. The default Implementation
-   * returns an unmodifiable List using
-   * <code>Collections.unmodifiableList()</code>. Trying to modify the List
-   * will result in <code>UnsupportedOperationException</code>.
-   * </p>
    */
   List<ICategory> getCategories();
 
   /**
    * @return All News of this Feed.
-   * <p>
-   * Note: The returned List should not be modified. The default Implementation
-   * returns an unmodifiable List using
-   * <code>Collections.unmodifiableList()</code>. Trying to modify the List
-   * will result in <code>UnsupportedOperationException</code>.
-   * </p>
    */
   List<INews> getNews();
 
