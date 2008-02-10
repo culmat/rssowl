@@ -35,6 +35,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -52,6 +53,7 @@ public class BookMark extends Mark implements IBookMark {
   private transient FeedLinkReference fFeedLinkReference;
   private boolean fIsErrorLoading;
   private transient NewsCounter fNewsCounter;
+  private Date fLastNewNewsDate;
 
   /**
    * Creates a new Element of the type BookMark. A BookMark is only visually
@@ -75,6 +77,16 @@ public class BookMark extends Mark implements IBookMark {
    */
   protected BookMark() {
   // As per javadoc
+  }
+
+  public synchronized Date getLastNewNewsDate() {
+    return fLastNewNewsDate;
+  }
+
+
+  public synchronized void setLastNewNewsDate(Date date) {
+    Assert.isNotNull(date, "date");
+    fLastNewNewsDate = date;
   }
 
   public synchronized void setNewsCounter(NewsCounter newsCounter) {
