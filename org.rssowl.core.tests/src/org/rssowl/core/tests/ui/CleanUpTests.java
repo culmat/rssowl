@@ -36,6 +36,7 @@ import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.util.DateUtils;
 import org.rssowl.ui.internal.dialogs.cleanup.BookMarkTask;
 import org.rssowl.ui.internal.dialogs.cleanup.CleanUpGroup;
 import org.rssowl.ui.internal.dialogs.cleanup.CleanUpModel;
@@ -205,10 +206,10 @@ public class CleanUpTests {
     IFeed feed3 = fFactory.createFeed(null, new URI("http://www.feed3.com"));
 
     INews news1 = fFactory.createNews(null, feed1, new Date());
-    news1.setPublishDate(new Date(System.currentTimeMillis() - 4 * DAY));
+    news1.setPublishDate(new Date(System.currentTimeMillis() - 5 * DAY));
 
     INews news2 = fFactory.createNews(null, feed2, new Date());
-    news2.setPublishDate(new Date(System.currentTimeMillis() - 3 * DAY));
+    news2.setPublishDate(new Date(System.currentTimeMillis() - 4 * DAY));
 
     INews news3 = fFactory.createNews(null, feed3, new Date());
     news3.setPublishDate(new Date(System.currentTimeMillis() - 2 * DAY));
@@ -218,8 +219,13 @@ public class CleanUpTests {
     DynamicDAO.save(feed3);
 
     IBookMark bm1 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed1.getLink()), "BM1");
+    bm1.setMostRecentNewsDate(DateUtils.getRecentDate(news1));
+
     IBookMark bm2 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed2.getLink()), "BM2");
+    bm2.setMostRecentNewsDate(DateUtils.getRecentDate(news2));
+
     IBookMark bm3 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed3.getLink()), "BM3");
+    bm3.setMostRecentNewsDate(DateUtils.getRecentDate(news3));
 
     DynamicDAO.save(bm1);
     DynamicDAO.save(bm2);

@@ -135,7 +135,7 @@ public class ApplicationLayerTest {
   }
 
   /**
-   * Tests that {@link IBookMark#getLastAddedNewsDate()} is set correctly during
+   * Tests that {@link IBookMark#getMostRecentNewsDate()} is set correctly during
    * {@link IApplicationService#handleFeedReload(IBookMark, IFeed, org.rssowl.core.persist.IConditionalGet, boolean)}
    * @throws Exception
    */
@@ -147,19 +147,19 @@ public class ApplicationLayerTest {
     DynamicDAO.save(feed1);
     IBookMark mark1 = fFactory.createBookMark(null, folder, new FeedLinkReference(feed1.getLink()), "Mark1");
     DynamicDAO.save(folder);
-    assertNull(mark1.getLastAddedNewsDate());
+    assertNull(mark1.getMostRecentNewsDate());
 
     long time = System.currentTimeMillis();
     feed1 = fFactory.createFeed(null, new URI("http://www.feed1.com"));
     fFactory.createNews(null, feed1, new Date());
     fAppService.handleFeedReload(mark1, feed1, null, false);
-    assertNotNull(mark1.getLastAddedNewsDate());
-    long lastUpdatedDate = mark1.getLastAddedNewsDate().getTime();
+    assertNotNull(mark1.getMostRecentNewsDate());
+    long lastUpdatedDate = mark1.getMostRecentNewsDate().getTime();
     assertTrue(time <= lastUpdatedDate);
 
     feed1 = fFactory.createFeed(null, new URI("http://www.feed1.com"));
     fAppService.handleFeedReload(mark1, feed1, null, false);
-    assertEquals(lastUpdatedDate, mark1.getLastAddedNewsDate().getTime());
+    assertEquals(lastUpdatedDate, mark1.getMostRecentNewsDate().getTime());
   }
 
   /**
