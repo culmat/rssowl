@@ -379,23 +379,11 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
 
   /**
    * @return All Categories of this News.
-   * <p>
-   * Note: The returned List should not be modified. The default Implementation
-   * returns an unmodifiable List using
-   * <code>Collections.unmodifiableList()</code>. Trying to modify the List
-   * will result in <code>UnsupportedOperationException</code>.
-   * </p>
    */
   List<ICategory> getCategories();
 
   /**
    * @return All Attachments of this News.
-   * <p>
-   * Note: The returned List should not be modified. The default Implementation
-   * returns an unmodifiable List using
-   * <code>Collections.unmodifiableList()</code>. Trying to modify the List
-   * will result in <code>UnsupportedOperationException</code>.
-   * </p>
    */
   List<IAttachment> getAttachments();
 
@@ -494,7 +482,7 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
   void setFlagged(boolean isFlagged);
 
   /**
-   * @return An unmodifiable Set containing the Labels of this News.
+   * @return An Set containing the Labels of this News.
    */
   Set<ILabel> getLabels();
 

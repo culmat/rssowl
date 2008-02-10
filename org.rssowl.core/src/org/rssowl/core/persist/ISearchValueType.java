@@ -65,7 +65,7 @@ public interface ISearchValueType extends IPersistable {
   /** The Boolean Type can only have TRUE or FALSE */
   public static final int BOOLEAN = 6;
 
-  /** Enumeration of allowed Strings specififed by <code>getEnumValues()</code> */
+  /** Enumeration of allowed Strings specified by <code>getEnumValues()</code> */
   public static final int ENUM = 7;
 
   /** A Link (usually not tokenized) */
@@ -85,6 +85,9 @@ public interface ISearchValueType extends IPersistable {
    * <code>getSearchValueType()</code> returns
    * <code>ISearchValueType.ENUM</code>
    * </p>
+   *
+   * <p>Note that an unmodifiable list is returned by this method. Trying to
+   * modify it will cause a UnsupportedOperationException to be thrown.</p>
    *
    * @return Returns a List of allowed Strings for this ENUM type.
    */

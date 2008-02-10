@@ -4,6 +4,7 @@ package org.rssowl.core.internal.persist.search;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
+import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.util.DateUtils;
@@ -87,8 +88,9 @@ public class NewsDocument extends SearchDocument<INews> {
     addField(fields, createCategoriesField(INews.CATEGORIES, news.getCategories(), Store.NO, Index.TOKENIZED));
 
     /* Add Attachments */
-    addField(fields, createBooleanField(INews.HAS_ATTACHMENTS, !news.getAttachments().isEmpty(), Store.NO));
-    addField(fields, createAttachmentsField(INews.ATTACHMENTS_CONTENT, news.getAttachments(), Store.NO, Index.TOKENIZED));
+    List<IAttachment> attachments = news.getAttachments();
+    addField(fields, createBooleanField(INews.HAS_ATTACHMENTS, !attachments.isEmpty(), Store.NO));
+    addField(fields, createAttachmentsField(INews.ATTACHMENTS_CONTENT, attachments, Store.NO, Index.TOKENIZED));
 
     return addFieldsToDocument(fields);
   }

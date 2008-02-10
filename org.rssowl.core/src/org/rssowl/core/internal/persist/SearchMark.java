@@ -35,7 +35,6 @@ import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.Pair;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
@@ -104,11 +103,15 @@ public class SearchMark extends Mark implements ISearchMark {
     return fSearchConditions.remove(searchCondition);
   }
 
+  public synchronized boolean containsSearchCondition(ISearchCondition searchCondition) {
+    return fSearchConditions.contains(searchCondition);
+  }
+
   /*
    * @see org.rssowl.core.model.types.ISearchMark#getSearchConditions()
    */
   public synchronized List<ISearchCondition> getSearchConditions() {
-    return Collections.unmodifiableList(fSearchConditions);
+    return new ArrayList<ISearchCondition>(fSearchConditions);
   }
 
   /*

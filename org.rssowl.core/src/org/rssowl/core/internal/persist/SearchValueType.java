@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.Platform;
 import org.rssowl.core.persist.ISearchValueType;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -99,7 +100,7 @@ public class SearchValueType implements ISearchValueType {
    * @see org.rssowl.core.model.search.ISearchValueType#getEnumValues()
    */
   public synchronized List<String> getEnumValues() {
-    return fEnumValues;
+    return Collections.unmodifiableList(fEnumValues);
   }
 
   /**

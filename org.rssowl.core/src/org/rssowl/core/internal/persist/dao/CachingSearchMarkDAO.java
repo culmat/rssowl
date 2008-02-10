@@ -66,7 +66,7 @@ public class CachingSearchMarkDAO extends CachingDAO<SearchMarkDAOImpl, ISearchM
 
   public ISearchMark load(ISearchCondition searchCondition) {
     for (ISearchMark mark : getCache().values()) {
-      if (mark.getSearchConditions().contains(searchCondition))
+      if (mark.containsSearchCondition(searchCondition))
         return mark;
     }
     return null;

@@ -56,6 +56,23 @@ public interface IFolder extends IFolderChild {
   public static final int FOLDERS = 3;
 
   /**
+   * @return {@code true} if the folder has no children. Otherwise, it returns
+   * {@code false}.
+   */
+  public boolean isEmpty();
+
+  /**
+   * Returns {@code true} if this IFolder contains {@code child} and
+   * {@false} otherwise.
+   *
+   * @param child element whose presence should be tested.
+   *
+   * @return {@code true} if this IFolder contains {@code child} and
+   * {@false} otherwise.
+   */
+  public boolean containsChild(IFolderChild child);
+
+  /**
    * Get a list of the children contained in this folder. Typically, these
    * children will be of type IMark or IFolder.
    *
@@ -122,12 +139,6 @@ public interface IFolder extends IFolderChild {
    *
    * @return a list of marks contained in this folder. Typically, these marks
    * may be of type ISearchMark and/or IBookMark.
-   * <p>
-   * Note: The returned List should not be modified. The default Implementation
-   * returns an unmodifiable List using
-   * <code>Collections.unmodifiableList()</code>. Trying to modify the List
-   * will result in <code>UnsupportedOperationException</code>.
-   * </p>
    */
   List<IMark> getMarks();
 
@@ -149,12 +160,6 @@ public interface IFolder extends IFolderChild {
    * Get a list of the sub-folders contained in this folder.
    *
    * @return a list of sub-folders of this folder.
-   * <p>
-   * Note: The returned List should not be modified. The default Implementation
-   * returns an unmodifiable List using
-   * <code>Collections.unmodifiableList()</code>. Trying to modify the List
-   * will result in <code>UnsupportedOperationException</code>.
-   * </p>
    */
   List<IFolder> getFolders();
 
