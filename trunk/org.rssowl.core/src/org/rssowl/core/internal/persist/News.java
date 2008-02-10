@@ -37,6 +37,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.MergeUtils;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.text.DateFormat;
 import java.util.ArrayList;
@@ -288,7 +289,7 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.internal.persist.AbstractEntity#getProperties()
    */
   @Override
-  public Map<String, ?> getProperties() {
+  public Map<String, Serializable> getProperties() {
     fLock.acquireReadLock();
     try {
       return super.getProperties();
@@ -327,7 +328,7 @@ public class News extends AbstractEntity implements INews {
    * @see org.rssowl.core.internal.persist.AbstractEntity#setProperty(java.lang.String, java.lang.Object)
    */
   @Override
-  public void setProperty(String key, Object value) {
+  public void setProperty(String key, Serializable value) {
     fLock.acquireWriteLock();
     try {
       super.setProperty(key, value);

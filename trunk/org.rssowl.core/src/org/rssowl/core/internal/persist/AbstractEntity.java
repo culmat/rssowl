@@ -111,17 +111,14 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
    *
    * @param key The unique identifier of the Property.
    * @param value The value of the Property.
-   * @see org.rssowl.core.persist.IEntity#setProperty(java.lang.String,
-   * java.lang.Object)
+   * @see org.rssowl.core.persist.IEntity#setProperty(String, Serializable)
    */
-  public synchronized void setProperty(String key, Object value) {
+  public synchronized void setProperty(String key, Serializable value) {
     Assert.isNotNull(key, "Using NULL as Key is not permitted!"); //$NON-NLS-1$
     if (fProperties == null)
       fProperties = new HashMap<String, Serializable>();
 
-    /* Ignore any value not being a subtype of Serializable */
-    if (value instanceof Serializable)
-      fProperties.put(key, (Serializable) value);
+    fProperties.put(key, value);
   }
 
   public synchronized Object getProperty(String key) {
@@ -140,7 +137,7 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
     return fProperties.remove(key);
   }
 
-  public synchronized Map<String, ? > getProperties() {
+  public synchronized Map<String, Serializable> getProperties() {
     if (fProperties == null)
       return Collections.emptyMap();
 
