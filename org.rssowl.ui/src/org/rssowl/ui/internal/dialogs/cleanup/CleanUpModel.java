@@ -70,7 +70,6 @@ public class CleanUpModel {
   private IModelFactory fFactory;
   private IModelSearch fModelSearch;
   private ISearchField fLocationField;
-  private ISearchField fAgeInDaysField;
   private String fNewsName;
   private INewsDAO fNewsDao;
 
@@ -88,7 +87,6 @@ public class CleanUpModel {
 
     String newsName = INews.class.getName();
     fLocationField = fFactory.createSearchField(INews.LOCATION, newsName);
-    fAgeInDaysField = fFactory.createSearchField(INews.AGE_IN_DAYS, newsName);
     fNewsName = INews.class.getName();
   }
 
@@ -144,10 +142,8 @@ public class CleanUpModel {
     if (fOps.deleteFeedByLastUpdate()) {
       CleanUpGroup group = new CleanUpGroup("Bookmarks that have not been updated for " + fOps.getLastUpdateDays() + " days");
 
-      ISearchField stateField = fFactory.createSearchField(INews.STATE, fNewsName);
-      EnumSet<State> visibleStates = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED, INews.State.READ);
-      ISearchCondition stateCondition = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, visibleStates);
-      ISearchCondition ageCond = fFactory.createSearchCondition(fAgeInDaysField, SearchSpecifier.IS_LESS_THAN, fOps.getLastUpdateDays());
+      int days = fOps.getLastUpdateDays();
+      long maxLastUpdateDate = DateUtils.getToday().getTimeInMillis() - (days * DAY);
 
       /* For each selected Bookmark */
       for (IBookMark mark : fBookmarks) {
@@ -156,13 +152,8 @@ public class CleanUpModel {
         if (bookmarksToDelete.contains(mark))
           continue;
 
-        List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(3);
-        conditions.add(getLocationCondition(mark));
-        conditions.add(ageCond);
-        conditions.add(stateCondition);
-
-        List<SearchHit<NewsReference>> results = filterInvalidResults(fModelSearch.searchNews(conditions, true));
-        if (results.isEmpty()) {
+        Date date = mark.getMostRecentNewsDate();
+        if (date == null || date.getTime() <= maxLastUpdateDate) {
           bookmarksToDelete.add(mark);
           group.addTask(new BookMarkTask(group, mark));
         }
