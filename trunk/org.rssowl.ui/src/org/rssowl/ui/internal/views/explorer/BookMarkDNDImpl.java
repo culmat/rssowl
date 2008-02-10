@@ -345,7 +345,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     if (fExplorer.isSortByNameEnabled() && (loc == LOCATION_AFTER || loc == LOCATION_BEFORE)) {
       if (dropTarget instanceof IFolder) {
         IFolder target = (IFolder) dropTarget;
-        if (target.getParent().getChildren().contains(dragSource))
+        if (target.getParent().containsChild(dragSource))
           return false;
       }
     }
@@ -353,7 +353,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     /* Do not allow Re-Ordering over IMarks (when sorting or grouping) */
     if ((fExplorer.isSortByNameEnabled() || fExplorer.isGroupingEnabled()) && dropTarget instanceof IMark) {
       IMark target = (IMark) dropTarget;
-      if (target.getParent().getChildren().contains(dragSource))
+      if (target.getParent().containsChild(dragSource))
         return false;
     }
 
@@ -375,7 +375,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     if (fExplorer.isSortByNameEnabled()) {
       if (dropTarget instanceof IMark) {
         IMark target = (IMark) dropTarget;
-        if (target.getParent().getChildren().contains(dragSource))
+        if (target.getParent().containsChild(dragSource))
           return false;
       }
     }
@@ -383,7 +383,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     /* Do not allow Re-Ordering over IFolder (when sorting or grouping) */
     if ((fExplorer.isSortByNameEnabled() || fExplorer.isGroupingEnabled()) && dropTarget instanceof IFolder && (loc == LOCATION_AFTER || loc == LOCATION_BEFORE)) {
       IFolder target = (IFolder) dropTarget;
-      if (target.getParent().getChildren().contains(dragSource))
+      if (target.getParent().containsChild(dragSource))
         return false;
     }
 

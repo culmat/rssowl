@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * A concrete implementation of <code>ITreeNode</code> working on
  * <code>IFolder</code> and <code>IMark</code>.
- * 
+ *
  * @author bpasero
  */
 public class ModelTreeNode implements ITreeNode {
@@ -195,7 +195,7 @@ public class ModelTreeNode implements ITreeNode {
 
     /* Ask Folder */
     if (fFolder != null)
-      return fFolder.getChildren().size() > 0;
+      return !fFolder.isEmpty();
 
     /* Marks dont have Children */
     return false;

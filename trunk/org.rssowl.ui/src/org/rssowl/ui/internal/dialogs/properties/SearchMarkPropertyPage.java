@@ -318,7 +318,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
       fSearchChanged = true;
 
       /* Remove Old Conditions */
-      List<ISearchCondition> oldConditions = new ArrayList<ISearchCondition>(mark.getSearchConditions());
+      List<ISearchCondition> oldConditions = mark.getSearchConditions();
       for (ISearchCondition oldCondition : oldConditions) {
         mark.removeSearchCondition(oldCondition);
       }
