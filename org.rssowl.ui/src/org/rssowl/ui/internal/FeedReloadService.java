@@ -49,12 +49,12 @@ import org.rssowl.ui.internal.util.JobRunner;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A Service managing automatic reload of Feeds in RSSOwl based on the user
@@ -145,7 +145,7 @@ public class FeedReloadService {
   }
 
   FeedReloadService() {
-    fMapBookMarkToInterval = new HashMap<IBookMark, Long>();
+    fMapBookMarkToInterval = new ConcurrentHashMap<IBookMark, Long>();
 
     /* Register Listeners */
     registerListeners();
