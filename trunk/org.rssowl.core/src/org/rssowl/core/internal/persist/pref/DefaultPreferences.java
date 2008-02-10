@@ -322,7 +322,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putInteger(CLEAN_UP_NEWS_BY_AGE_VALUE, 30);
 
     defaultScope.putBoolean(CLEAN_UP_REMINDER_STATE, true);
-    defaultScope.putInteger(CLEAN_UP_REMINDER_DAYS_VALUE, 7);
+    defaultScope.putInteger(CLEAN_UP_REMINDER_DAYS_VALUE, 30);
   }
 
   private void initDisplayDefaults(IPreferenceScope defaultScope) {
