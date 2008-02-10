@@ -113,6 +113,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Feed View: Browser Maximized */
   public static final String FV_BROWSER_MAXIMIZED = "org.rssowl.ui.internal.editors.feed.BrowserMaximized";
 
+  /** Feed View: Highlight Search Results */
+  public static final String FV_HIGHLIGHT_SEARCH_RESULTS = "org.rssowl.ui.internal.editors.feed.HighlightSearchResults";
+
   /** BookMark Explorer */
   public static final String BE_BEGIN_SEARCH_ON_TYPING = "org.rssowl.ui.internal.views.explorer.BeginSearchOnTyping"; //$NON-NLS-1$
 
