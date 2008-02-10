@@ -79,7 +79,7 @@ public class BookMark extends Mark implements IBookMark {
   // As per javadoc
   }
 
-  public synchronized Date getLastNewNewsDate() {
+  public synchronized Date getLastAddedNewsDate() {
     if (fLastNewNewsDate < 0)
       return null;
 
