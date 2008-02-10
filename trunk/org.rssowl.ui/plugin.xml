@@ -1210,4 +1210,15 @@
             url="http://www.flickr.com/services/feeds/photos_public.gne?tags=[:]&amp;format=rss_200">
       </keywordFeed>
    </extension>
+   <extension
+         point="org.eclipse.ui.statusHandlers">
+      <statusHandler
+            class="org.rssowl.ui.internal.DefaultStatusHandler"
+            id="org.rssowl.ui.StatusHandler">
+      </statusHandler>
+      <statusHandlerProductBinding
+            handlerId="org.rssowl.ui.StatusHandler"
+            productId="org.rssowl.ui.product">
+      </statusHandlerProductBinding>
+   </extension>
 </plugin>
