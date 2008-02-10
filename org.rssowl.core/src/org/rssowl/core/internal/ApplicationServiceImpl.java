@@ -55,6 +55,7 @@ import org.rssowl.core.util.RetentionStrategy;
 import com.db4o.ObjectContainer;
 import com.db4o.ext.Db4oException;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
@@ -107,10 +108,10 @@ public class ApplicationServiceImpl implements IApplicationService {
         return;
 
       /* Copy over Properties to reloaded Feed to keep them */
-      Map<String, ?> feedProperties = feed.getProperties();
+      Map<String, Serializable> feedProperties = feed.getProperties();
       if (feedProperties != null) {
         feedProperties.entrySet();
-        for (Map.Entry<String, ?> entry : feedProperties.entrySet())
+        for (Map.Entry<String, Serializable> entry : feedProperties.entrySet())
           emptyFeed.setProperty(entry.getKey(), entry.getValue());
       }
 

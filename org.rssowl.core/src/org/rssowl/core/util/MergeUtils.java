@@ -30,6 +30,7 @@ import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.MergeCapable;
 import org.rssowl.core.persist.Reparentable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -211,14 +212,14 @@ public class MergeUtils {
    */
   public static final ComplexMergeResult<?> mergeProperties(IEntity existingType, IEntity newType) {
     ComplexMergeResult<Object> mergeResult = ComplexMergeResult.create(null);
-    Map<String, ? > existingProperties = existingType.getProperties();
-    Map<String, ? > newProperties = newType.getProperties();
+    Map<String, Serializable> existingProperties = existingType.getProperties();
+    Map<String, Serializable> newProperties = newType.getProperties();
 
     /* Add / Update Properties from New Type */
-    for (Map.Entry<String, ? > entry : newProperties.entrySet()) {
+    for (Map.Entry<String, Serializable> entry : newProperties.entrySet()) {
       String key = entry.getKey();
-      Object value = entry.getValue();
-      Object existingValue = existingProperties.get(key);
+      Serializable value = entry.getValue();
+      Serializable existingValue = existingProperties.get(key);
       if (!value.equals(existingValue)) {
         if (existingValue != null)
           mergeResult.addRemovedObject(existingValue);

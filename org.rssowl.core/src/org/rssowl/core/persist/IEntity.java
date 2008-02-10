@@ -27,6 +27,7 @@ package org.rssowl.core.persist;
 import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.service.IDGenerator;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -77,7 +78,7 @@ public interface IEntity extends IPersistable {
    * @param key The unique identifier of the Property.
    * @param value The value of the Property.
    */
-  void setProperty(String key, Object value);
+  void setProperty(String key, Serializable value);
 
   /**
    * Get a Property from this Map or NULL if not existing for the given Key.
@@ -102,7 +103,7 @@ public interface IEntity extends IPersistable {
    *
    * @return The Map containing all Properties of this Type.
    */
-  Map<String, ? > getProperties();
+  Map<String, Serializable> getProperties();
 
   /**
    * Get the unique id for this object. Implementors have to make sure, that no
