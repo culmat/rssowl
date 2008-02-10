@@ -72,6 +72,7 @@ import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.dao.IConditionalGetDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
+import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.event.BookMarkAdapter;
@@ -733,6 +734,9 @@ public class Controller {
         }
       });
     }
+
+    /* Delete hidden News from previous Session */
+    DynamicDAO.getDAO(INewsDAO.class).delete(EnumSet.of(INews.State.HIDDEN));
 
     /* Create the Notification Service */
     if (!InternalOwl.TESTING)
