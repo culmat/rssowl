@@ -135,6 +135,34 @@ public class ApplicationLayerTest {
   }
 
   /**
+   * Tests that {@link IBookMark#getLastNewNewsDate()} is set correctly during
+   * {@link IApplicationService#handleFeedReload(IBookMark, IFeed, org.rssowl.core.persist.IConditionalGet, boolean)}
+   * @throws Exception
+   */
+  @Test
+  public void testBookMarkLastNewNewsDateIsSetDuringReload() throws Exception {
+    IFolder folder = fFactory.createFolder(null, null, "Folder");
+
+    IFeed feed1 = fFactory.createFeed(null, new URI("http://www.feed1.com"));
+    DynamicDAO.save(feed1);
+    IBookMark mark1 = fFactory.createBookMark(null, folder, new FeedLinkReference(feed1.getLink()), "Mark1");
+    DynamicDAO.save(folder);
+    assertNull(mark1.getLastNewNewsDate());
+
+    long time = System.currentTimeMillis();
+    feed1 = fFactory.createFeed(null, new URI("http://www.feed1.com"));
+    fFactory.createNews(null, feed1, new Date());
+    fAppService.handleFeedReload(mark1, feed1, null, false);
+    assertNotNull(mark1.getLastNewNewsDate());
+    long lastUpdatedDate = mark1.getLastNewNewsDate().getTime();
+    assertTrue(time <= lastUpdatedDate);
+
+    feed1 = fFactory.createFeed(null, new URI("http://www.feed1.com"));
+    fAppService.handleFeedReload(mark1, feed1, null, false);
+    assertEquals(lastUpdatedDate, mark1.getLastNewNewsDate().getTime());
+  }
+
+  /**
    * See bug #317 : Retention strategy works incorrectly if news is deleted
    * before being saved.
    *
