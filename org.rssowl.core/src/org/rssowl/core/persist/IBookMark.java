@@ -27,6 +27,8 @@ package org.rssowl.core.persist;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 
+import java.util.Date;
+
 /**
  * A usual bookmark as seen in Firefox or other Browsers. The Bookmark is used
  * to define a position for a <code>Feed</code> inside the hierarchy of
@@ -70,4 +72,17 @@ public interface IBookMark extends INewsMark {
    * @return the number of news in this IBookMark that are sticky.
    */
   int getStickyNewsCount();
+
+  /**
+   * @return the most recent Date when new INews where added to this IBookMark
+   * or {@code null} if not yet set.
+   */
+  Date getLastNewNewsDate();
+
+  /**
+   * Set the most recent Date when new INews where added to this IBookMark.
+   *
+   * @param date Non-null Date object.
+   */
+  void setLastNewNewsDate(Date date);
 }

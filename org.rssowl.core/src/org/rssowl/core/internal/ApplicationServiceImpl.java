@@ -57,6 +57,7 @@ import com.db4o.ext.Db4oException;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.ListIterator;
@@ -116,6 +117,11 @@ public class ApplicationServiceImpl implements IApplicationService {
       /* Merge with existing */
       mergeResult = feed.mergeAndCleanUp(emptyFeed);
       List<INews> newNewsAdded = getNewNewsAdded(feed);
+      if (!newNewsAdded.isEmpty()) {
+        bookMark.setLastNewNewsDate(new Date());
+        fDb.set(bookMark);
+      }
+
       updateStateOfUnsavedNewNews(newNewsAdded);
 
       /* Retention Policy */
