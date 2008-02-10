@@ -61,6 +61,7 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -228,9 +229,9 @@ public class NewNewsBinAction implements IWorkbenchWindowActionDelegate, IObject
       fNewsbin = Owl.getModelFactory().createNewsBin(null, parent, title, fPosition, fPosition != null ? true : null);
 
       /* Copy all Properties from Parent into this Mark */
-      Map<String, ?> properties = parent.getProperties();
+      Map<String, Serializable> properties = parent.getProperties();
 
-      for (Map.Entry<String, ?> property : properties.entrySet())
+      for (Map.Entry<String, Serializable> property : properties.entrySet())
         fNewsbin.setProperty(property.getKey(), property.getValue());
 
       parent = DynamicDAO.save(parent);

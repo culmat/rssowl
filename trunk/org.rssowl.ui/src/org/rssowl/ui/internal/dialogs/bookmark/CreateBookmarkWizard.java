@@ -53,6 +53,7 @@ import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.util.JobRunner;
 
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -336,9 +337,9 @@ public class CreateBookmarkWizard extends Wizard {
     IBookMark bookmark = Owl.getModelFactory().createBookMark(null, parent, feedLinkRef, title[0], fPosition, fPosition != null ? true : null);
 
     /* Copy all Properties from Parent into this Mark */
-    Map<String, ?> properties = parent.getProperties();
+    Map<String, Serializable> properties = parent.getProperties();
 
-    for (Map.Entry<String, ?> property : properties.entrySet())
+    for (Map.Entry<String, Serializable> property : properties.entrySet())
       bookmark.setProperty(property.getKey(), property.getValue());
 
     /* Remember Realm Property */
