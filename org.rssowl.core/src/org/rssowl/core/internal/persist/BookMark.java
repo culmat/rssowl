@@ -87,7 +87,7 @@ public class BookMark extends Mark implements IBookMark {
   }
 
 
-  public synchronized void setLastNewNewsDate(Date date) {
+  public synchronized void setLastAddedNewsDate(Date date) {
     Assert.isNotNull(date, "date");
     fLastNewNewsDate = date.getTime();
   }

@@ -119,7 +119,7 @@ public class ApplicationServiceImpl implements IApplicationService {
       mergeResult = feed.mergeAndCleanUp(emptyFeed);
       List<INews> newNewsAdded = getNewNewsAdded(feed);
       if (!newNewsAdded.isEmpty()) {
-        bookMark.setLastNewNewsDate(new Date());
+        bookMark.setLastAddedNewsDate(new Date());
         fDb.set(bookMark);
       }
 
