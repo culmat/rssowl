@@ -377,7 +377,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
             JobRunner.runUIUpdater(new UIBackgroundJob(fParent) {
               @Override
               protected void runInBackground(IProgressMonitor monitor) {
-                fContentProvider.refreshCache(new INewsMark[] { fInput.getMark() }, false);
+                fContentProvider.refreshCache(fInput.getMark(), false);
               }
 
               @Override
@@ -940,7 +940,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       protected void runInBackground(IProgressMonitor monitor) {
         fBgMonitor = monitor;
         if (!monitor.isCanceled())
-          fContentProvider.refreshCache(new INewsMark[] { mark }, false);
+          fContentProvider.refreshCache(mark, false);
       }
 
       @Override

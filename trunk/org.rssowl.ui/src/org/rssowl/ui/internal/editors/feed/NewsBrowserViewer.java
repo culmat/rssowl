@@ -35,24 +35,32 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsMark;
+import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.SearchSpecifier;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.CBrowser;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
+import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
@@ -72,12 +80,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private String fId;
   private boolean fBlockRefresh;
   private IModelFactory fFactory;
+  private IPreferenceScope fPreferences = Owl.getPreferenceService().getGlobalScope();
 
   /* This viewer's sorter. <code>null</code> means there is no sorter. */
   private ViewerComparator fSorter;
 
   /* This viewer's filters (element type: <code>ViewerFilter</code>). */
-  private List<ViewerFilter> filters;
+  private List<ViewerFilter> fFilters;
+  private NewsFilter fNewsFilter;
 
   /**
    * @param parent
@@ -253,10 +263,13 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * @param filter a viewer filter
    */
   public void addFilter(ViewerFilter filter) {
-    if (filters == null)
-      filters = new ArrayList<ViewerFilter>();
+    if (fFilters == null)
+      fFilters = new ArrayList<ViewerFilter>();
 
-    filters.add(filter);
+    fFilters.add(filter);
+    if (filter instanceof NewsFilter)
+      fNewsFilter = (NewsFilter) filter;
+
     refresh();
   }
 
@@ -269,19 +282,22 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    */
   public void removeFilter(ViewerFilter filter) {
     Assert.isNotNull(filter);
-    if (filters != null) {
-      for (Iterator<ViewerFilter> i = filters.iterator(); i.hasNext();) {
+    if (fFilters != null) {
+      for (Iterator<ViewerFilter> i = fFilters.iterator(); i.hasNext();) {
         Object o = i.next();
         if (o == filter) {
           i.remove();
           refresh();
-          if (filters.size() == 0)
-            filters = null;
+          if (fFilters.size() == 0)
+            fFilters = null;
 
           return;
         }
       }
     }
+
+    if (filter == fNewsFilter)
+      fNewsFilter = null;
   }
 
   /**
@@ -353,8 +369,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       return result;
 
     /* Run Filters over result */
-    if (filters != null) {
-      for (Object filter : filters) {
+    if (fFilters != null) {
+      for (Object filter : fFilters) {
         ViewerFilter f = (ViewerFilter) filter;
         result = f.filter(this, parent, result);
       }
@@ -469,8 +485,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * @param elements
    * @param properties
    */
-  public void update(Object[] elements, @SuppressWarnings("unused")
-  String[] properties) {
+  public void update(Object[] elements, @SuppressWarnings("unused") String[] properties) {
     assertElementsNotNull(elements);
 
     /*
@@ -491,8 +506,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * @param element
    * @param properties
    */
-  public void update(Object element, @SuppressWarnings("unused")
-  String[] properties) {
+  public void update(Object element, @SuppressWarnings("unused") String[] properties) {
     Assert.isNotNull(element);
 
     refresh(); // TODO Optimize
@@ -530,7 +544,28 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * @return Returns a List of Strings that should get highlighted per News that
    * is displayed.
    */
-  protected List<String> getHighlightedWords() {
+  protected Collection<String> getHighlightedWords() {
+    if (getContentProvider() instanceof NewsContentProvider && fPreferences.getBoolean(DefaultPreferences.FV_HIGHLIGHT_SEARCH_RESULTS)) {
+      INewsMark mark = ((NewsContentProvider) getContentProvider()).getInput();
+      Set<String> extractedWords;
+
+      /* Extract from Conditions if any */
+      if (mark instanceof ISearch) {
+        List<ISearchCondition> conditions = ((ISearch) mark).getSearchConditions();
+        extractedWords = ModelUtils.extractWords(conditions, true, true);
+      } else
+        extractedWords = new HashSet<String>(1);
+
+      /* Fill Pattern if set */
+      if (fNewsFilter != null && StringUtils.isSet(fNewsFilter.getPatternString())) {
+        StringTokenizer tokenizer = new StringTokenizer(fNewsFilter.getPatternString());
+        while (tokenizer.hasMoreElements())
+          extractedWords.add(tokenizer.nextToken());
+      }
+
+      return extractedWords;
+    }
+
     return Collections.emptyList();
   }
 }

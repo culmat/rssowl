@@ -164,6 +164,9 @@ public class FilterBar {
     /* Toggle Layout */
     createLayoutBar();
 
+    /* Highlight Searches */
+    createHighlightBar();
+
     fSecondToolBarManager.createControl(container);
     fSecondToolBarManager.getControl().setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
@@ -174,6 +177,22 @@ public class FilterBar {
 
     /* Quick Search */
     createQuickSearch(container);
+  }
+
+  private void createHighlightBar() {
+    IAction highlightSearchAction = new Action("Highlight searched Words", IAction.AS_CHECK_BOX) {
+      @Override
+      public void run() {
+        fGlobalPreferences.putBoolean(DefaultPreferences.FV_HIGHLIGHT_SEARCH_RESULTS, isChecked());
+        fFeedView.getNewsBrowserControl().getViewer().refresh();
+      }
+    };
+
+    highlightSearchAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/highlight.gif"));
+    highlightSearchAction.setToolTipText("Highlight searched Words");
+    highlightSearchAction.setChecked(fGlobalPreferences.getBoolean(DefaultPreferences.FV_HIGHLIGHT_SEARCH_RESULTS));
+
+    fSecondToolBarManager.add(highlightSearchAction);
   }
 
   /* Quick Search */

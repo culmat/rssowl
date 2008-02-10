@@ -56,13 +56,16 @@ import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 
 import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.Map.Entry;
 
 /**
@@ -80,6 +83,9 @@ public class ModelUtils {
 
   /** Newsbin Index Value for Long Arrays */
   public static final int NEWSBIN = 2;
+
+  /* A Set of Stop Words in English */
+  private static final Set<String> STOP_WORDS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(StringUtils.ENGLISH_STOP_WORDS)));
 
   /**
    * @param entities A list of folder childs.
@@ -959,5 +965,37 @@ public class ModelUtils {
     }
 
     return news;
+  }
+
+  /**
+   * @param conditions
+   * @param ignoreWildcards
+   * @param ignoreStopWords
+   * @return Returns a set of words from the given conditions.
+   */
+  public static Set<String> extractWords(List<ISearchCondition> conditions, boolean ignoreWildcards, boolean ignoreStopWords) {
+    Set<String> words = new HashSet<String>(conditions.size());
+
+    /* Check Search Conditions for String-Values */
+    for (ISearchCondition cond : conditions) {
+      if (cond.getValue() instanceof String) {
+        String value = cond.getValue().toString();
+
+        if (ignoreWildcards && (value.contains("?") || value.contains("*")))
+          continue;
+
+        /* Split into Words */
+        StringTokenizer tokenizer = new StringTokenizer(value);
+        while (tokenizer.hasMoreElements()) {
+          String nextWord = tokenizer.nextElement().toString().toLowerCase();
+
+          /* Ignore Stop Words if required */
+          if (!ignoreStopWords || !STOP_WORDS.contains(nextWord))
+            words.add(nextWord);
+        }
+      }
+    }
+
+    return words;
   }
 }

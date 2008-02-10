@@ -69,7 +69,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   private final NewsGrouping fGrouping;
   private NewsListener fNewsListener;
   private SearchMarkAdapter fSearchMarkListener;
-  private INewsMark[] fInput;
+  private INewsMark fInput;
   private final FeedView fFeedView;
   private boolean fDisposed;
 
@@ -218,7 +218,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   }
 
   /* Returns the news that have been added since the last refresh */
-  synchronized List<INews> refreshCache(INewsMark[] input, boolean onlyAdd) throws PersistenceException {
+  synchronized List<INews> refreshCache(INewsMark input, boolean onlyAdd) throws PersistenceException {
     List<INews> addedNews = Collections.emptyList();
 
     /* Update Input */
@@ -240,31 +240,33 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* Obtain the News */
     addedNews = new ArrayList<INews>();
-    for (INewsMark mark : input) {
 
-      /* Special-case marks that can retrieve newsRefs cheaply */
-      if (mark.isGetNewsRefsEfficient()) {
-        for (NewsReference newsRef : mark.getNewsRefs(INews.State.getVisible())) {
+    /* Special-case marks that can retrieve newsRefs cheaply */
+    if (input.isGetNewsRefsEfficient()) {
+      for (NewsReference newsRef : input.getNewsRefs(INews.State.getVisible())) {
 
-          /* Avoid to resolve an already shown News */
-          if (onlyAdd && hasCachedNews(newsRef))
-            continue;
+        /* Avoid to resolve an already shown News */
+        if (onlyAdd && hasCachedNews(newsRef))
+          continue;
 
-          /* Resolve and Add News */
-          INews resolvedNews = newsRef.resolve();
-          if (resolvedNews != null) //TODO Remove once Bug 173 is fixed
-            addedNews.add(resolvedNews);
-        }
+        /* Resolve and Add News */
+        INews resolvedNews = newsRef.resolve();
+        if (resolvedNews != null) //TODO Remove once Bug 173 is fixed
+          addedNews.add(resolvedNews);
       }
-
-      else
-        addedNews.addAll(mark.getNews(INews.State.getVisible()));
     }
+
+    else
+      addedNews.addAll(input.getNews(INews.State.getVisible()));
 
     /* Add into Cache */
     fCachedNews.addAll(addedNews);
 
     return addedNews;
+  }
+
+  synchronized INewsMark getInput() {
+    return fInput;
   }
 
   synchronized Set<INews> getCachedNews() {
@@ -317,35 +319,33 @@ public class NewsContentProvider implements ITreeContentProvider {
         for (SearchMarkEvent event : events) {
           ISearchMark searchMark = event.getEntity();
 
-          for (final INewsMark inputMark : fInput) {
-            if (inputMark.equals(searchMark)) {
-              JobRunner.runUIUpdater(new UIBackgroundJob(fFeedView.getEditorControl()) {
-                private List<INews> fAddedNews;
+          if (fInput.equals(searchMark)) {
+            JobRunner.runUIUpdater(new UIBackgroundJob(fFeedView.getEditorControl()) {
+              private List<INews> fAddedNews;
 
-                @Override
-                protected void runInBackground(IProgressMonitor monitor) {
-                  fAddedNews = refreshCache(new INewsMark[] { inputMark }, true);
-                }
+              @Override
+              protected void runInBackground(IProgressMonitor monitor) {
+                fAddedNews = refreshCache(fInput, true);
+              }
 
-                @Override
-                protected void runInUI(IProgressMonitor monitor) {
+              @Override
+              protected void runInUI(IProgressMonitor monitor) {
 
-                  /* Event not interesting for us or we are disposed */
-                  if (fAddedNews == null || fAddedNews.size() == 0)
-                    return;
+                /* Event not interesting for us or we are disposed */
+                if (fAddedNews == null || fAddedNews.size() == 0)
+                  return;
 
-                  /* Refresh Viewer to reflect changes */
-                  fFeedView.refresh(true, true); //TODO Seems some JFace Caching Problem here
+                /* Refresh Viewer to reflect changes */
+                fFeedView.refresh(true, true); //TODO Seems some JFace Caching Problem here
 
-                  /* Add to Browser-Viewer if showing entire Feed */
-                  if (fBrowserViewer.getInput() instanceof BookMarkReference)
-                    fBrowserViewer.add(fBrowserViewer.getInput(), fAddedNews.toArray());
-                }
-              });
+                /* Add to Browser-Viewer if showing entire Feed */
+                if (fBrowserViewer.getInput() instanceof BookMarkReference)
+                  fBrowserViewer.add(fBrowserViewer.getInput(), fAddedNews.toArray());
+              }
+            });
 
-              /* Done */
-              return;
-            }
+            /* Done */
+            return;
           }
         }
       }
@@ -582,48 +582,46 @@ public class NewsContentProvider implements ITreeContentProvider {
   }
 
   private boolean isInputRelatedTo(INews news, EventType type) {
-    for (IMark mark : fInput) {
 
-      /* Check if BookMark references the News' Feed and is not a copy */
-      if (mark instanceof IBookMark) {
-        IBookMark bookmark = (IBookMark) mark;
-        if (news.getParentId() == 0 && bookmark.getFeedLinkReference().equals(news.getFeedReference()))
-          return true;
+    /* Check if BookMark references the News' Feed and is not a copy */
+    if (fInput instanceof IBookMark) {
+      IBookMark bookmark = (IBookMark) fInput;
+      if (news.getParentId() == 0 && bookmark.getFeedLinkReference().equals(news.getFeedReference()))
+        return true;
+    }
+
+    /* Check if Saved Search contains the given News */
+    else if (type != EventType.PERSIST && fInput instanceof ISearchMark) {
+
+      /*
+       * Workaround a race condition in a safe way: When a News gets updated or deleted from a
+       * Searchmark, the Indexer is the first to process this event. Since the SavedSearchService
+       * updates all Searchmarks instantly as a result of that, the Searchmark at this point could no
+       * longer contain the affected News and isInputRelated() would return false. The fix is
+       * to check the cache for the News instead of the potential modified Searchmark.
+       */
+      return hasCachedNews(news);
+    }
+
+    /* Update / Remove: Check if News points to this Bin */
+    else if (fInput instanceof INewsBin) {
+      return news.getParentId() == fInput.getId();
+    }
+
+    /* In Memory Folder News Mark (aggregated news) */
+    else if (fInput instanceof FolderNewsMark) {
+
+      /* Ignore copied News */
+      if (news.getParentId() != 0)
+        return false;
+
+      /* News Added/Updated: Check if its part of the Folder */
+      if (type == EventType.PERSIST || type == EventType.UPDATE) {
+        return ((FolderNewsMark) fInput).isRelatedTo(news);
       }
 
-      /* Check if Saved Search contains the given News */
-      else if (type != EventType.PERSIST && mark instanceof ISearchMark) {
-
-        /*
-         * Workaround a race condition in a safe way: When a News gets updated or deleted from a
-         * Searchmark, the Indexer is the first to process this event. Since the SavedSearchService
-         * updates all Searchmarks instantly as a result of that, the Searchmark at this point could no
-         * longer contain the affected News and isInputRelated() would return false. The fix is
-         * to check the cache for the News instead of the potential modified Searchmark.
-         */
-        return hasCachedNews(news);
-      }
-
-      /* Update / Remove: Check if News points to this Bin */
-      else if (mark instanceof INewsBin) {
-        return news.getParentId() == mark.getId();
-      }
-
-      /* In Memory Folder News Mark (aggregated news) */
-      else if (mark instanceof FolderNewsMark) {
-
-        /* Ignore copied News */
-        if (news.getParentId() != 0 )
-          return false;
-
-        /* News Added/Updated: Check if its part of the Folder */
-        if (type == EventType.PERSIST || type == EventType.UPDATE) {
-          return ((FolderNewsMark) mark).isRelatedTo(news);
-        }
-
-        /* Remove: Check if news was cached */
-        return hasCachedNews(news);
-      }
+      /* Remove: Check if news was cached */
+      return hasCachedNews(news);
     }
 
     return false;

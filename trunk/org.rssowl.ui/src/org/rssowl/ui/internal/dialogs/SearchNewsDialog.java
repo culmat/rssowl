@@ -156,10 +156,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
 
 /**
  * The <code>SearchNewsDialog</code> allows to define a number of
@@ -203,9 +201,6 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
   /* Count number of open Dialogs */
   private static int fgOpenDialogCount;
-
-  /* A Set of Stop Words in English */
-  private static final Set<String> STOP_WORDS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(StringUtils.ENGLISH_STOP_WORDS)));
 
   /* Button IDs */
   private static final int BUTTON_SEARCH = 1000;
@@ -738,31 +733,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private void createBrowserViewer(Composite bottomSashContent) {
     fBrowserViewer = new NewsBrowserViewer(bottomSashContent, SWT.NONE) {
       @Override
-      protected List<String> getHighlightedWords() {
-        List<String> words = new ArrayList<String>(fCurrentSearchConditions.size());
-
-        /* Check Search Conditions for String-Values */
-        for (ISearchCondition cond : fCurrentSearchConditions) {
-          if (cond.getValue() instanceof String) {
-            String value = cond.getValue().toString();
-
-            /* TODO Wildcards are not yet supported */
-            if (value.contains("?") || value.contains("*"))
-              continue;
-
-            /* Split into Words */
-            StringTokenizer tokenizer = new StringTokenizer(value);
-            while (tokenizer.hasMoreElements()) {
-              String nextWord = tokenizer.nextElement().toString().toLowerCase();
-
-              /* But ignore Stop Words */
-              if (!STOP_WORDS.contains(nextWord) && !words.contains(nextWord))
-                words.add(nextWord);
-            }
-          }
-        }
-
-        return words;
+      protected Collection<String> getHighlightedWords() {
+        return ModelUtils.extractWords(fCurrentSearchConditions, true, true);
       }
     };
     fBrowserViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
