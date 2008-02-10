@@ -506,7 +506,7 @@ public class Indexer {
     if (sync || InternalOwl.TESTING)
       doSaveCommittedNews(uncommittedNews);
     else {
-      Job job = new Job("") {
+      Job job = new Job("Save indexer news that have been committed") {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
           doSaveCommittedNews(uncommittedNews);
