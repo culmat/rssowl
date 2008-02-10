@@ -209,6 +209,15 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Clean Up: Never Delete Unread News (boolean) */
   public static final String CLEAN_UP_NEVER_DEL_UNREAD_NEWS_STATE = "org.rssowl.pref.CleanUpNeverDelUnreadNewsState";
 
+  /** Global: Clean Up: The Date of the next reminder for Clean-Up as Long */
+  public static final String CLEAN_UP_REMINDER_DATE_MILLIES = "org.rssowl.pref.CleanUpReminderDateMillies";
+
+  /** Global: Clean Up: Enabled state for the reminder for Clean-Up */
+  public static final String CLEAN_UP_REMINDER_STATE = "org.rssowl.pref.CleanUpReminderState";
+
+  /** Global: Clean Up: Number of days before showing the reminder for Clean-Up */
+  public static final String CLEAN_UP_REMINDER_DAYS_VALUE = "org.rssowl.pref.CleanUpReminderDaysValue";
+
   /** Global: Search Dialog: State of showing Preview */
   public static final String SEARCH_DIALOG_PREVIEW_VISIBLE = "org.rssowl.pref.SearchDialogPreviewVisible";
 
@@ -311,6 +320,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
 
     defaultScope.putInteger(CLEAN_UP_NEWS_BY_COUNT_VALUE, 200);
     defaultScope.putInteger(CLEAN_UP_NEWS_BY_AGE_VALUE, 30);
+
+    defaultScope.putBoolean(CLEAN_UP_REMINDER_STATE, true);
+    defaultScope.putInteger(CLEAN_UP_REMINDER_DAYS_VALUE, 7);
   }
 
   private void initDisplayDefaults(IPreferenceScope defaultScope) {
