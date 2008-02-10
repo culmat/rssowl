@@ -52,6 +52,7 @@ import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
+import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 
 import java.text.DateFormat;
@@ -114,6 +115,15 @@ public class ModelUtils {
           folderIds = new ArrayList<Long>();
 
         folderIds.add(entity.getId());
+        folderCounter++;
+      }
+
+      /* FolderMark (for aggregations) */
+      else if (entity instanceof FolderNewsMark) {
+        if (folderIds == null)
+          folderIds = new ArrayList<Long>();
+
+        folderIds.add(((FolderNewsMark)entity).getFolder().getId());
         folderCounter++;
       }
 
