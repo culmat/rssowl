@@ -70,4 +70,12 @@ public interface INewsDAO extends IEntityDAO<INews, NewsListener, NewsEvent> {
    * <code>states</code>.
    */
   Collection<INews> loadAll(FeedLinkReference feedRef, Set<INews.State> states);
+
+  /**
+   * Deletes all the news from the system whose state is equal to one of the
+   * elements in {@code states}.
+   *
+   * @param states The state of the news to be deleted.
+   */
+  void delete(Set<INews.State> states);
 }
