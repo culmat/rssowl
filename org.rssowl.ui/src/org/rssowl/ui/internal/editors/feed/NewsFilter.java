@@ -219,8 +219,7 @@ public class NewsFilter extends ViewerFilter {
    * @param element the tree element to check
    * @return true if the given element's label matches the filter text
    */
-  private boolean isLeafMatch(@SuppressWarnings("unused")
-  Viewer viewer, Object element) {
+  private boolean isLeafMatch(@SuppressWarnings("unused") Viewer viewer, Object element) {
 
     /* Filter not Active */
     if (fCachedPatternMatchingNews == null && fType == Type.SHOW_ALL)
@@ -329,6 +328,14 @@ public class NewsFilter extends ViewerFilter {
    */
   SearchTarget getSearchTarget() {
     return fSearchTarget;
+  }
+
+  /**
+   * @return Returns the current set pattern string or <code>null</code> if
+   * none.
+   */
+  String getPatternString() {
+    return fPatternString;
   }
 
   /**

@@ -28,7 +28,7 @@ import org.eclipse.core.runtime.Assert;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * An implementation of {@link Reader} that allows to surround certain words
@@ -46,7 +46,7 @@ public class ExpandingReader extends Reader {
 
   /* Constructor Values */
   private final Reader fIn;
-  private final List<String> fWordsToExpand;
+  private final Collection<String> fWordsToExpand;
   private final String fPreExpand;
   private final String fPostExpand;
   private final boolean fSkipTags;
@@ -62,7 +62,7 @@ public class ExpandingReader extends Reader {
    * @param postValue The value to put after the expanded word.
    * @param skipTags If <code>true</code>, do not expand when inside Tags.
    */
-  public ExpandingReader(Reader in, List<String> words, String preValue, String postValue, boolean skipTags) {
+  public ExpandingReader(Reader in, Collection<String> words, String preValue, String postValue, boolean skipTags) {
     Assert.isNotNull(in);
     Assert.isNotNull(words);
     Assert.isNotNull(preValue);

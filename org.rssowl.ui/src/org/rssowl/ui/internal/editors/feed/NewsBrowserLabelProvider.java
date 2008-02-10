@@ -54,7 +54,7 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.net.URI;
 import java.text.DateFormat;
-import java.util.List;
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -597,8 +597,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     String result = builder.toString();
 
-    /* TODO Experimental Highlight Support */
-    List<String> wordsToHighlight = fViewer.getHighlightedWords();
+    /* Highlight Support */
+    Collection<String> wordsToHighlight = fViewer.getHighlightedWords();
     if (!wordsToHighlight.isEmpty()) {
       StringBuilder highlightedResult = new StringBuilder(result.length());
       ExpandingReader resultHighlightReader = new ExpandingReader(new StringReader(result), wordsToHighlight, PRE_HIGHLIGHT, POST_HIGHLIGHT, true);
