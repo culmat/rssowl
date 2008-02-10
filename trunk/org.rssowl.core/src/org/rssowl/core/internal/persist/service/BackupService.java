@@ -33,6 +33,10 @@ import java.util.List;
 
 public final class BackupService {
 
+  interface BackupStrategy    {
+    void backup(File originFile, File destinationFile);
+  }
+
   interface BackupLayoutStrategy    {
     List<File> findBackupFiles();
 
@@ -92,6 +96,7 @@ public final class BackupService {
 
   private BackupLayoutStrategy fLayoutStrategy;
   private File fFileToBackupAlias;
+  private BackupStrategy fBackupStrategy;
 
   public BackupService(File fileToBackup, String backupFileSuffix, int maxBackupsCount) {
     this(fileToBackup, backupFileSuffix, maxBackupsCount, null, null);
@@ -113,6 +118,15 @@ public final class BackupService {
     fBackupFrequency = backupFrequency;
 
     fLayoutStrategy = new DefaultBackupLayoutStrategy(getBackupFile());
+    fBackupStrategy = new BackupStrategy() {
+      public void backup(File originFile, File destinationFile) {
+        DBHelper.copyFile(originFile, destinationFile);
+      }
+    };
+  }
+
+  public void setBackupStrategy(BackupStrategy backupStrategy) {
+    fBackupStrategy = backupStrategy;
   }
 
   /**
@@ -171,7 +185,7 @@ public final class BackupService {
     if (fFileToBackupAlias != null)
       sourceFile = fFileToBackupAlias;
 
-    DBHelper.copyFile(sourceFile, getBackupFile());
+    fBackupStrategy.backup(sourceFile, getBackupFile());
     writeBackupTimestamp();
     return true;
   }
