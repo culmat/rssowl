@@ -24,6 +24,7 @@
 
 package org.rssowl.core.util;
 
+import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.INews;
 
 import java.text.DateFormat;
@@ -32,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -91,6 +93,27 @@ public class DateUtils {
       return news.getPublishDate();
 
     return news.getReceiveDate();
+  }
+
+  /**
+   * Works like getRecentData(INews news) with the difference of returning the
+   * most recent date from a List of News.
+   *
+   * @param news A List of News to get the most recent Date from.
+   * @return Either Modified-Date, Publish-Date or Received-Date from the most
+   * recent News.
+   */
+  public static Date getRecentDate(List<INews> news) {
+    Assert.isTrue(!news.isEmpty());
+
+    Date mostRecentDate = null;
+    for (INews newsitem : news) {
+      Date date = getRecentDate(newsitem);
+      if (mostRecentDate == null || date.after(mostRecentDate))
+        mostRecentDate = date;
+    }
+
+    return mostRecentDate;
   }
 
   /**
