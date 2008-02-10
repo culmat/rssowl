@@ -223,7 +223,7 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
       public void widgetSelected(SelectionEvent e) {
         if (e.detail == SWT.CHECK) {
           TreeItem item = (TreeItem) e.item;
-          setChildsChecked((IFolderChild) item.getData(), item.getChecked(), true);
+          setChildsChecked((IFolderChild) item.getData(), item.getChecked(), false);
 
           if (!item.getChecked())
             setParentsChecked((IFolderChild) item.getData(), false);
