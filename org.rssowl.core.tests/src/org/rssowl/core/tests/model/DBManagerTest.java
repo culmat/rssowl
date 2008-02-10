@@ -115,6 +115,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -138,6 +139,75 @@ public class DBManagerTest {
     fTypesFactory = Owl.getModelFactory();
     fDb = DBManager.getDefault().getObjectContainer();
     fNewsDAO = DynamicDAO.getDAO(INewsDAO.class);
+  }
+
+  /**
+   * Tests that {@link INewsDAO#delete(Set)} works correctly.
+   * @throws Exception s
+   */
+  @Test
+  public void testNewsDAODeleteByStates() throws Exception  {
+    String feed0Link = "http://www.feed0.com";
+    IFeed feed = fTypesFactory.createFeed(null, new URI(feed0Link));
+    INews news = fTypesFactory.createNews(null, feed, new Date());
+    news.setState(INews.State.HIDDEN);
+    String news0Guid = "news0";
+    fTypesFactory.createGuid(news, news0Guid, true);
+    news = fTypesFactory.createNews(null, feed, new Date());
+    news.setState(INews.State.NEW);
+    String news1Guid = "news1";
+    fTypesFactory.createGuid(news, news1Guid, true);
+    DynamicDAO.save(feed);
+
+    String feed1Link = "http://www.feed1.com";
+    feed = fTypesFactory.createFeed(null, new URI(feed1Link));
+    news = fTypesFactory.createNews(null, feed, new Date());
+    news.setState(INews.State.HIDDEN);
+    String news2Guid = "news2";
+    fTypesFactory.createGuid(news, news2Guid, true);
+    news = fTypesFactory.createNews(null, feed, new Date());
+    news.setState(INews.State.READ);
+    String news3Guid = "news3";
+    fTypesFactory.createGuid(news, news3Guid, true);
+    DynamicDAO.save(feed);
+    news = null;
+    feed = null;
+    System.gc();
+
+    final Set<NewsEvent> newsEvents = new HashSet<NewsEvent>();
+    NewsListener newsListener = new NewsListener() {
+      public void entitiesAdded(Set<NewsEvent> events) {
+        fail("Only delete events expected");
+      }
+
+      public void entitiesDeleted(Set<NewsEvent> events) {
+        newsEvents.addAll(events);
+      }
+
+      public void entitiesUpdated(Set<NewsEvent> events) {
+        fail("Only delete events expected");
+      }
+    };
+    DynamicDAO.addEntityListener(INews.class, newsListener);
+    try {
+      fNewsDAO.delete(EnumSet.of(INews.State.HIDDEN));
+      assertEquals(2, newsEvents.size());
+      for (NewsEvent newsEvent : newsEvents) {
+        String guid = newsEvent.getEntity().getGuid().getValue();
+        assertEquals(true, guid.equals(news0Guid) || guid.equals(news2Guid));
+      }
+
+      IFeedDAO feedDao = DynamicDAO.getDAO(IFeedDAO.class);
+      feed = feedDao.load(new URI(feed0Link));
+      assertEquals(1, feed.getNews().size());
+      assertEquals(news1Guid, feed.getNews().get(0).getGuid().getValue());
+
+      feed = feedDao.load(new URI(feed1Link));
+      assertEquals(1, feed.getNews().size());
+      assertEquals(news3Guid, feed.getNews().get(0).getGuid().getValue());
+    } finally {
+      DynamicDAO.removeEntityListener(INews.class, newsListener);
+    }
   }
 
   /**
