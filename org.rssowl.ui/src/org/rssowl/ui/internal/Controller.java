@@ -188,6 +188,7 @@ public class Controller {
 
   /* Misc. */
   private final IApplicationService fAppService;
+  private CleanUpReminderService fCleanUpReminderService;
   private final IBookMarkDAO fBookMarkDAO;
   private final ISearchMarkDAO fSearchMarkDAO;
   private final IFolderDAO fFolderDAO;
@@ -745,6 +746,9 @@ public class Controller {
     /* Create the Saved Search Service */
     fSavedSearchService = new SavedSearchService();
 
+    /* Create the Clean-Up Reminder Service */
+    fCleanUpReminderService = new CleanUpReminderService();
+
     /* Register Listeners */
     registerListeners();
   }
@@ -762,6 +766,10 @@ public class Controller {
 
     /* Unregister Listeners */
     unregisterListeners();
+
+    /* Stop Clean-Up Reminder Service */
+    if (!emergency)
+      fCleanUpReminderService.stopService();
 
     /* Stop the Feed Reload Service */
     if (!InternalOwl.TESTING && !emergency)
