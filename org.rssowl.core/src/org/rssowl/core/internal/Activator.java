@@ -177,10 +177,10 @@ public class Activator extends Plugin {
    * Create a Error IStatus out of the given message and exception.
    *
    * @param msg The message describing the error.
-   * @param e The Exception that occured.
+   * @param e The Exception that occurred.
    * @return An IStatus out of the given message and exception.
    */
-  public IStatus createErrorStatus(String msg, Exception e) {
+  public IStatus createErrorStatus(String msg, Throwable e) {
     return new Status(IStatus.ERROR, getBundle().getSymbolicName(), IStatus.ERROR, msg, e);
   }
 }
