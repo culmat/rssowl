@@ -644,6 +644,7 @@ public class DBManager {
     sourceDb.close();
     destinationDb.commit();
     destinationDb.close();
+    System.gc();
     monitor.worked(10);
   }
 
