@@ -580,6 +580,7 @@ public class DBManager {
       sourceDb.activate(label, Integer.MAX_VALUE);
       destinationDb.ext().set(label, Integer.MAX_VALUE);
     }
+
     monitor.worked(5);
     for (Folder type : sourceDb.query(Folder.class)) {
       sourceDb.activate(type, Integer.MAX_VALUE);
@@ -602,19 +603,32 @@ public class DBManager {
 
     monitor.worked(25);
 
+    int feedCounter = 0;
     NewsCounter newsCounter = new NewsCounter();
     for (Feed feed : sourceDb.query(Feed.class)) {
       sourceDb.activate(feed, Integer.MAX_VALUE);
       addNewsCounterItem(newsCounter, feed);
       destinationDb.ext().set(feed, Integer.MAX_VALUE);
+
+      ++feedCounter;
+      if (feedCounter % 40 == 0)
+        System.gc();
     }
+    System.gc();
+
     destinationDb.ext().set(newsCounter, Integer.MAX_VALUE);
     monitor.worked(30);
 
+    int descriptionCounter = 0;
     for (Description description : sourceDb.query(Description.class)) {
       sourceDb.activate(description, Integer.MAX_VALUE);
       destinationDb.ext().set(description, Integer.MAX_VALUE);
+
+      ++descriptionCounter;
+      if (descriptionCounter % 600 == 0)
+        System.gc();
     }
+    System.gc();
     monitor.worked(10);
 
     for (Preference pref : sourceDb.query(Preference.class)) {
