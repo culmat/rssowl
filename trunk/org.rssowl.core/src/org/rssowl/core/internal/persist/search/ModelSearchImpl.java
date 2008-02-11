@@ -165,9 +165,10 @@ public class ModelSearchImpl implements IModelSearch {
     try {
       /*
        * Close fIndexer first because it's more important (reduces the chance
-       * of a corrupt index).
+       * of a corrupt index). Can be null if exception thrown during start-up
        */
-      fIndexer.shutdown(emergency);
+      if (fIndexer != null)
+        fIndexer.shutdown(emergency);
 
       /*
        * We don't bother to close searchers if it's an emergency. They will be
