@@ -241,12 +241,12 @@ public final class BackupService {
     return new File(getBackupFile().getAbsolutePath() + ".temp");
   }
 
-  public void rotateFileToBackupAsCorrupted() {
-    DBHelper.rename(getFileToBackup(), getCorruptedFile());
-  }
+  public File getCorruptedFile(Integer index) {
+    String fileName = getFileToBackup().getAbsolutePath() + ".corrupted";
+    if (index != null)
+      fileName += "." + index;
 
-  private File getCorruptedFile() {
-    return new File(getFileToBackup().getAbsolutePath() + ".corrupted");
+    return new File(fileName);
   }
 
   private void deleteOldBackups(List<File> backupFiles) {

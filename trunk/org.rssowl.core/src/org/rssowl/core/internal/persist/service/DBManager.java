@@ -23,6 +23,7 @@
  **  **********************************************************************  */
 package org.rssowl.core.internal.persist.service;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.SafeRunner;
@@ -48,7 +49,9 @@ import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.NewsCounterItem;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.persist.service.DiskFullException;
 import org.rssowl.core.persist.service.IModelSearch;
+import org.rssowl.core.persist.service.InsufficientFilePermissionException;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.LongOperationMonitor;
@@ -60,14 +63,15 @@ import com.db4o.config.ObjectClass;
 import com.db4o.config.ObjectField;
 import com.db4o.config.QueryEvaluationMode;
 import com.db4o.ext.DatabaseFileLockedException;
-import com.db4o.ext.Db4oException;
 import com.db4o.query.Query;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -83,6 +87,7 @@ public class DBManager {
   private ObjectContainer fObjectContainer;
   private final ReadWriteLock fLock = new ReentrantReadWriteLock();
   private final List<DatabaseListener> fEntityStoreListeners = new CopyOnWriteArrayList<DatabaseListener>();
+  private IStatus startupStatus;
 
   /**
    * @return The Singleton Instance.
@@ -129,49 +134,159 @@ public class DBManager {
     }
   }
 
-  private ObjectContainer createObjectContainer(Configuration config) {
-    BackupService backupService = createOnlineBackupService();
-    if (backupService != null)
-      backupService.backup(true);
+  /**
+   * There was an error creating the
+   */
+  private void createEmptyObjectContainer(Configuration config, IStatus status) {
+    /* Log in case there's also an exception creating an empty object container */
+    Activator.getDefault().getLog().log(status);
+    fObjectContainer = Db4o.openFile(config, getDBFilePath());
+  }
 
+  private IStatus createObjectContainer(Configuration config) {
+    IStatus status = null;
     try {
       fObjectContainer = Db4o.openFile(config, getDBFilePath());
-    } catch (Exception e) {
+      status = Status.OK_STATUS;
+    } catch (Throwable e) {
+      if (e instanceof Error)
+        throw (Error) e;
+
+      File file = new File(getDBFilePath());
+
+      if (!file.exists())
+        throw new DiskFullException("Failed to create an empty database. This seems to indicate that the disk is full. Please fix the issue and restart RSSOwl.", e);
+
+      if (!file.canRead() || (!file.canWrite()))
+        throw new InsufficientFilePermissionException("Current user has no permission to read and/or write file: " + file + ". Please fix the issue and restart RSSOwl.", null);
+
+
+      BackupService backupService = createOnlineBackupService();
       if (backupService == null || e instanceof DatabaseFileLockedException)
         throw new PersistenceException(e);
 
-      /*
-       * Most recent back-up is the one we did before we opened the object
-       * container, we look at the second most recent to try a recovery.
-       */
-      File backupFile = backupService.getBackupFile(1);
-
+      BackupService scheduledBackupService = createScheduledBackupService(null);
+      File currentDbCorruptedFile = backupService.getCorruptedFile(null);
+      DBHelper.rename(backupService.getFileToBackup(), currentDbCorruptedFile);
       /*
        * There was no online back-up file. This could only happen if the problem
-       * happened on the first start-up and no back-up was taken before before
-       * shutdown.
+       * happened on the first start-up or if the user never used the application
+       * for more than 10 minutes.
        */
-      if (backupFile == null)
-        throw new PersistenceException("Database file corrupted and there is no online back-up", e);
-
-      backupService.rotateFileToBackupAsCorrupted();
-      DBHelper.rename(backupFile, backupService.getFileToBackup());
-      try {
-        fObjectContainer = Db4o.openFile(config, getDBFilePath());
-      } catch (Db4oException e1) {
-        Activator.getDefault().logError("Current and backup database files corrupted, logging exception for backup database and rethrowing exception for current database", e1);
-        throw new PersistenceException(e);
+      if (backupService.getBackupFile(0) == null) {
+        status = Activator.getDefault().createErrorStatus("Database file is corrupted and no back-up could be found. The corrupted file has been saved to: " + currentDbCorruptedFile.getAbsolutePath(), e);
+        createEmptyObjectContainer(config, status);
+      } else {
+        status = restoreFromBackup(config, e, currentDbCorruptedFile, backupService, scheduledBackupService);
       }
     }
-    return fObjectContainer;
+
+    Assert.isNotNull(status, "status");
+    final BackupService backupService = createOnlineBackupService();
+    Job job = new Job("Back-up service") {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        backupService.backup(true);
+        schedule(getOnlineBackupDelay(false));
+        return Status.OK_STATUS;
+      }
+    };
+    job.setSystem(true);
+    job.schedule(getOnlineBackupDelay(true));
+    return status;
+  }
+
+  private void checkDirPermissions() {
+    File dir = new File(Activator.getDefault().getStateLocation().toOSString());
+    if (!dir.canRead() || (!dir.canWrite()))
+      throw new InsufficientFilePermissionException("Current user has no permission to read from and/or write to directory: " + dir + "Please fix the issue and restart RSSOwl.", null);
+  }
+
+  private IStatus restoreFromBackup(Configuration config, Throwable startupException, File currentDbCorruptedFile, BackupService... backupServices) {
+    Assert.isNotNull(backupServices, "backupServices");
+    Assert.isLegal(backupServices.length > 0, "backupServices should have at least one element");
+    Assert.isNotNull(backupServices[0].getBackupFile(0), "backupServices[0] should contain at least one back-up");
+    long lastModified = -1;
+    boolean foundSuitableBackup = false;
+    for (BackupService backupService : backupServices) {
+      for (int i = 0;; ++i) {
+        File backupFile = backupService.getBackupFile(i);
+        /* Always false in first iteration */
+        if (backupFile == null)
+          break;
+
+        lastModified = backupFile.lastModified();
+
+        DBHelper.rename(backupFile, backupService.getFileToBackup());
+        try {
+          fObjectContainer = Db4o.openFile(config, getDBFilePath());
+          foundSuitableBackup = true;
+          break;
+        } catch (Throwable e1) {
+          Activator.getDefault().logError("Back-up database corrupted: " + backupFile, e1);
+          DBHelper.rename(new File(getDBFilePath()), backupService.getCorruptedFile(i));
+        }
+      }
+      if (foundSuitableBackup)
+        break;
+    }
+
+    if (foundSuitableBackup) {
+      String message = createRecoveredFromCorruptedDatabaseMessage(currentDbCorruptedFile, lastModified);
+      return Activator.getDefault().createErrorStatus(message, startupException);
+    }
+
+    IStatus status = Activator.getDefault().createErrorStatus("Database file and its back-ups are all corrupted. The corrupted database file has been saved to: " + currentDbCorruptedFile.getAbsolutePath(), startupException);
+    createEmptyObjectContainer(config, status);
+    return status;
+  }
+
+  private String createRecoveredFromCorruptedDatabaseMessage(File corruptedFile, long lastModified) {
+    String date = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(new Date(lastModified));
+    return "There was a problem opening the database file. RSSOwl has reverted to the last working back-up (from " + date + "). The corrupted file has been saved to: " + corruptedFile.getAbsolutePath();
+  }
+
+  private long getOnlineBackupDelay(boolean initial) {
+    if (initial)
+      return 1000 * 60 * 10;
+
+    return getLongProperty("rssowl.onlinebackup.interval", 1000 * 60 * 60 * 4);
+  }
+
+  private long getLongProperty(String propertyName, long defaultValue) {
+    String backupIntervalText = System.getProperty(propertyName);
+
+    if (backupIntervalText != null) {
+      try {
+        long backupInterval = Long.parseLong(backupIntervalText);
+        if (backupInterval > 0) {
+          return backupInterval;
+        }
+      } catch (NumberFormatException e) {
+        /* Let it fall through and use default */
+      }
+    }
+    return defaultValue;
   }
 
   private BackupService createOnlineBackupService() {
     File file = new File(getDBFilePath());
+
+    /* No database file exists, so no back-up can exist */
     if (!file.exists())
       return null;
 
     BackupService backupService = new BackupService(file, ".onlinebak", 2);
+    backupService.setBackupStrategy(new BackupService.BackupStrategy() {
+      public void backup(File originFile, File destinationFile) {
+        try {
+          /* Relies on fObjectContainer being set before calling backup */
+          fObjectContainer.ext().backup(destinationFile.getAbsolutePath());
+        } catch (IOException e) {
+          throw new PersistenceException(e);
+        }
+      }
+    });
     return backupService;
   }
 
@@ -203,6 +318,7 @@ public class DBManager {
   }
 
   public void createDatabase(LongOperationMonitor progressMonitor) throws PersistenceException {
+    checkDirPermissions();
     Configuration config = createConfiguration();
     int workspaceVersion = getWorkspaceFormatVersion();
     MigrationResult migrationResult = new MigrationResult(false, false, false);
@@ -217,35 +333,31 @@ public class DBManager {
         migrationResult = migrate(workspaceVersion, getCurrentFormatVersion(), subMonitor.newChild(70));
       }
 
-      boolean scheduledBackupRequired = false;
       if (!defragmentIfNecessary(progressMonitor, subMonitor)) {
         if (migrationResult.isDefragmentDatabase())
           defragment(progressMonitor, subMonitor);
         /*
          * We only run the time-based back-up if a defragment has not taken
-         * place because we always back-up during defragment. We perform it
-         * after opening the object container because we can make the copy from
-         * the online back-up async.
+         * place because we always back-up during defragment.
          */
         else
-          scheduledBackupRequired = true;
+          scheduledBackup();
       }
 
-      fObjectContainer = createObjectContainer(config);
-
-      if (scheduledBackupRequired)
-        scheduledBackup();
+      startupStatus = createObjectContainer(config);
 
       fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
 
-      /*
-       * If reindexRequired is true, subMonitor is guaranteed to be non-null
-       */
+      if (subMonitor == null && (!startupStatus.isOK())) {
+        progressMonitor.beginLongOperation();
+        subMonitor = SubMonitor.convert(progressMonitor, "Please wait while RSSOwl reindexes your data", 20);
+      }
+
       IModelSearch modelSearch = InternalOwl.getDefault().getPersistenceService().getModelSearch();
-      if (migrationResult.isReindex() || migrationResult.isOptimizeIndex())
+      if (migrationResult.isReindex() || migrationResult.isOptimizeIndex() || (!startupStatus.isOK()))
         modelSearch.startup();
 
-      if (migrationResult.isReindex())
+      if (migrationResult.isReindex() || (!startupStatus.isOK()))
         modelSearch.reindexAll(subMonitor.newChild(20));
 
       if (migrationResult.isOptimizeIndex())
@@ -261,7 +373,7 @@ public class DBManager {
     }
   }
 
-  private BackupService createBackupService(Long backupFrequency) {
+  private BackupService createScheduledBackupService(Long backupFrequency) {
     return new BackupService(new File(getDBFilePath()), ".backup", MAX_BACKUPS_COUNT, getDBLastBackUpFile(), backupFrequency);
   }
 
@@ -269,33 +381,8 @@ public class DBManager {
     if (!new File(getDBFilePath()).exists())
       return;
 
-    if (InternalOwl.TESTING)
-      doScheduledBackup();
-    else {
-      new Job("") {
-        @Override
-        protected IStatus run(IProgressMonitor monitor) {
-          doScheduledBackup();
-          return Status.OK_STATUS;
-        }
-      }.schedule(5000);
-    }
-  }
-
-  private void doScheduledBackup() {
-    long sevenDays = 1000 * 60 * 60 * 24 * 7;
-    File onlineBackupFile = createOnlineBackupService().getBackupFile();
-
-    /*
-     * If no online back-up exists yet, don't bother with a back-up because it's
-     * the first start-up
-     */
-    if (!onlineBackupFile.exists())
-      return;
-
-    BackupService backupService = createBackupService(sevenDays);
-    backupService.setFileToBackupAlias(onlineBackupFile);
-    backupService.backup(false);
+    long sevenDays = getLongProperty("rssowl.offlinebackup.interval", 1000 * 60 * 60 * 24 * 7);
+    createScheduledBackupService(sevenDays).backup(false);
   }
 
   public File getDBLastBackUpFile() {
@@ -462,7 +549,7 @@ public class DBManager {
       monitor.setWorkRemaining(100);
     }
 
-    BackupService backupService = createBackupService(null);
+    BackupService backupService = createScheduledBackupService(null);
     File file = new File(getDBFilePath());
     File defragmentedFile = backupService.getTempBackupFile();
     copyDatabase(file, defragmentedFile, monitor);
@@ -669,5 +756,9 @@ public class DBManager {
 
   public final ObjectContainer getObjectContainer() {
     return fObjectContainer;
+  }
+
+  public IStatus getStartupStatus() {
+    return startupStatus;
   }
 }
