@@ -628,7 +628,6 @@ public class DBManager {
       if (descriptionCounter % 600 == 0)
         System.gc();
     }
-    System.gc();
     monitor.worked(10);
 
     for (Preference pref : sourceDb.query(Preference.class)) {
