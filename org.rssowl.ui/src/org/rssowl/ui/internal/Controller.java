@@ -766,7 +766,7 @@ public class Controller {
     unregisterListeners();
 
     /* Stop Clean-Up Reminder Service */
-    if (!emergency)
+    if (!InternalOwl.TESTING && !emergency)
       fCleanUpReminderService.stopService();
 
     /* Stop the Feed Reload Service */
