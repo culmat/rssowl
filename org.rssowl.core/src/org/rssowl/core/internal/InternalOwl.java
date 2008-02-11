@@ -118,8 +118,12 @@ public final class InternalOwl {
 
   /** Shutdown the Services managed by this Facade */
   public void shutdown() {
-    fConnectionService.shutdown();
-    fPersistenceService.shutdown(false);
+    /* Services could be null if an exception was thrown during start-up */
+    if (fConnectionService != null)
+      fConnectionService.shutdown();
+
+    if (fPersistenceService != null)
+      fPersistenceService.shutdown(false);
   }
 
   /**
