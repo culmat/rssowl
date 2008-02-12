@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Assert;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -46,7 +47,7 @@ public class ExpandingReader extends Reader {
 
   /* Constructor Values */
   private final Reader fIn;
-  private final Collection<String> fWordsToExpand;
+  private final Collection<StringMatcher> fStringMatcher;
   private final String fPreExpand;
   private final String fPostExpand;
   private final boolean fSkipTags;
@@ -69,10 +70,13 @@ public class ExpandingReader extends Reader {
     Assert.isNotNull(postValue);
 
     fIn = in;
-    fWordsToExpand = words;
     fPreExpand = preValue;
     fPostExpand = postValue;
     fSkipTags = skipTags;
+    fStringMatcher= new ArrayList<StringMatcher>(words.size());
+    for (String word : words) {
+      fStringMatcher.add(new StringMatcher(word, true, false));
+    }
   }
 
   /*
@@ -141,7 +145,12 @@ public class ExpandingReader extends Reader {
   }
 
   private boolean shouldExpand(String word) {
-    return fWordsToExpand.contains(word.toLowerCase());
+    for (StringMatcher matcher : fStringMatcher) {
+      if (matcher.match(word))
+        return true;
+    }
+
+    return false;
   }
 
   private String expand(String word) {

@@ -734,7 +734,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fBrowserViewer = new NewsBrowserViewer(bottomSashContent, SWT.NONE) {
       @Override
       protected Collection<String> getHighlightedWords() {
-        return ModelUtils.extractWords(fCurrentSearchConditions, true, true);
+        return ModelUtils.extractWords(fCurrentSearchConditions, false, true);
       }
     };
     fBrowserViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));

@@ -552,7 +552,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       /* Extract from Conditions if any */
       if (mark instanceof ISearch) {
         List<ISearchCondition> conditions = ((ISearch) mark).getSearchConditions();
-        extractedWords = ModelUtils.extractWords(conditions, true, true);
+        extractedWords = ModelUtils.extractWords(conditions, false, true);
       } else
         extractedWords = new HashSet<String>(1);
 
