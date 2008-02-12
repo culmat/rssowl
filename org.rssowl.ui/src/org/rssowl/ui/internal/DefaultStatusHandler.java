@@ -29,6 +29,7 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.WorkbenchErrorHandler;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.ui.internal.util.JobRunner;
 
 import java.io.IOException;
 
@@ -52,10 +53,14 @@ public class DefaultStatusHandler extends WorkbenchErrorHandler {
       Throwable ex = status.getException();
       if (ex instanceof PersistenceException)
         handlePersistenceException((PersistenceException) ex);
+      else if (ex instanceof OutOfMemoryError)
+        handleOutOfMemoryError((OutOfMemoryError) ex);
       else if (ex != null) {
         Throwable cause = ex.getCause();
         if (cause instanceof PersistenceException)
           handlePersistenceException((PersistenceException) cause);
+        else if (ex instanceof OutOfMemoryError)
+          handleOutOfMemoryError((OutOfMemoryError) cause);
       }
     }
 
@@ -63,10 +68,22 @@ public class DefaultStatusHandler extends WorkbenchErrorHandler {
     super.handle(statusAdapter, style);
   }
 
-  private void handlePersistenceException(PersistenceException ex) {
-    Throwable cause = ex.getCause();
-    if (cause != null && cause instanceof IOException) {
-      ErrorDialog.openError(OwlUI.getPrimaryShell(), "Error", "RSSOwl was unable to write to your disk. This is typically caused by a disk that is full or if the permissions are not set correctly. We recommend that you solve the problem and restart the application.", Activator.getDefault().createErrorStatus(cause.getMessage(), (Exception) cause));
-    }
+  private void handlePersistenceException(final PersistenceException ex) {
+    JobRunner.runInUIThread(null, new Runnable() {
+      public void run() {
+        Throwable cause = ex.getCause();
+        if (cause != null && cause instanceof IOException) {
+          ErrorDialog.openError(OwlUI.getPrimaryShell(), "Error", "RSSOwl was unable to write to your disk. This is typically caused by a disk that is full or if the permissions are not set correctly. We recommend that you solve the problem and restart the application.", Activator.getDefault().createErrorStatus(cause.getMessage(), (Exception) cause));
+        }
+      }
+    });
+  }
+
+  private void handleOutOfMemoryError(final OutOfMemoryError error) {
+    JobRunner.runInUIThread(null, new Runnable() {
+      public void run() {
+        ErrorDialog.openError(OwlUI.getPrimaryShell(), "Error", "RSSOwl has run out of memory. This should not happen under normal circumstances, but it can happen when a very high number of news got downloaded. You can solve this issue by setting the -Xmx value inside RSSOwl.ini to a higher value. Find this file in the installation directory of RSSOwl.", Activator.getDefault().createErrorStatus(error.getMessage()));
+      }
+    });
   }
 }
