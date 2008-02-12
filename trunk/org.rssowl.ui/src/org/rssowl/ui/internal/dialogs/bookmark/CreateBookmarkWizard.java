@@ -65,6 +65,10 @@ import java.util.Map;
  * TODO Instead of showing a login dialog if the feed is protected rather have a
  * wizard page asking for username and password.
  * </p>
+ * <p>
+ * TODO Make loading the feed from the website independent from the checkbox
+ * about loading the title from the feed.
+ * </p>
  *
  * @author bpasero
  */
