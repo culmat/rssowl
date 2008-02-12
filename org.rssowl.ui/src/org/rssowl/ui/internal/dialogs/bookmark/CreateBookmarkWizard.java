@@ -250,7 +250,7 @@ public class CreateBookmarkWizard extends Wizard {
       res = internalPerformFinish();
     } catch (URISyntaxException e) {
       Activator.getDefault().logError(e.getMessage(), e);
-      ((DialogPage) getContainer().getCurrentPage()).setMessage("Please enter a valid Link", IMessageProvider.ERROR);
+      ((DialogPage) getContainer().getCurrentPage()).setMessage("Please enter a valid link", IMessageProvider.ERROR);
     }
 
     /* Remember Settings */
