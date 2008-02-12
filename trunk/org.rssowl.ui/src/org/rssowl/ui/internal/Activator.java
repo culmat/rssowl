@@ -45,6 +45,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.InternalOwl;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.LongOperationMonitor;
 
@@ -78,6 +79,7 @@ public class Activator extends AbstractUIPlugin {
   private static Activator fgPlugin;
 
   private Thread fShutdownHook;
+  private IStatus fStartupStatus = Status.OK_STATUS;
 
   /**
    * The constructor.
@@ -202,7 +204,21 @@ public class Activator extends AbstractUIPlugin {
         };
 
         /* Start Core */
-        InternalOwl.getDefault().startup(callbackMonitor);
+        try {
+          InternalOwl.getDefault().startup(callbackMonitor);
+        }
+
+        /* Handle OOM Error */
+        catch (OutOfMemoryError e) {
+          Activator.this.fStartupStatus = createErrorStatus(e.getMessage());
+          Activator.getDefault().getLog().log(Activator.this.fStartupStatus);
+        }
+
+        /* Handle Persistence Exception */
+        catch (PersistenceException e) {
+          Activator.this.fStartupStatus = createErrorStatus(e.getMessage(), e);
+          Activator.getDefault().getLog().log(Activator.this.fStartupStatus);
+        }
       }
     };
 
@@ -214,6 +230,10 @@ public class Activator extends AbstractUIPlugin {
     } catch (InterruptedException e) {
       Activator.getDefault().logError(e.getMessage(), e);
     }
+  }
+
+  IStatus getStartupStatus() {
+    return fStartupStatus;
   }
 
   /* Start the Application Server */
@@ -354,8 +374,7 @@ public class Activator extends AbstractUIPlugin {
    *
    * @param msg The message to log as Info.
    */
-  public void logInfo(@SuppressWarnings("unused")
-  String msg) {
+  public void logInfo(@SuppressWarnings("unused") String msg) {
   // TODO Need a better logging facility here
   // getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(),
   // IStatus.OK, msg, null));
@@ -383,6 +402,16 @@ public class Activator extends AbstractUIPlugin {
    */
   public IStatus createErrorStatus(String msg, Exception e) {
     return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), IStatus.ERROR, msg, e);
+  }
+
+  /**
+   * Create a IStatus out of the given message.
+   *
+   * @param msg The message describing the error.
+   * @return An IStatus out of the given message and exception.
+   */
+  public IStatus createErrorStatus(String msg) {
+    return new Status(IStatus.ERROR, Activator.getDefault().getBundle().getSymbolicName(), msg);
   }
 
   /**
