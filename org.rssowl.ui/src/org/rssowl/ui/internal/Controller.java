@@ -818,7 +818,7 @@ public class Controller {
     /* Check for Status of Startup */
     IStatus startupStatus = Owl.getPersistenceService().getStartupStatus();
     if (startupStatus.getSeverity() == IStatus.ERROR)
-      ErrorDialog.openError(OwlUI.getPrimaryShell(), "Startup Error", "There was an error while starting RSSOwl.", startupStatus);
+      ErrorDialog.openError(OwlUI.getPrimaryShell(), "Startup error", "There was an error while starting RSSOwl.", startupStatus);
   }
 
   /**

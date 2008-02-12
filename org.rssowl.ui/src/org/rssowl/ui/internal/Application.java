@@ -24,9 +24,11 @@
 
 package org.rssowl.ui.internal;
 
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
@@ -95,6 +97,13 @@ public class Application implements IApplication {
             handleLinkSupplied(link);
         }
       };
+
+      /* Check Startup Status */
+      IStatus startupStatus = Activator.getDefault().getStartupStatus();
+      if (startupStatus.getSeverity() == IStatus.ERROR) {
+        ErrorDialog.openError(new Shell(), "Fatal startup error", "There was a fatal error while starting RSSOwl.", startupStatus);
+        return IApplication.EXIT_OK;
+      }
 
       /* Create the Workbench */
       fWorkbenchAdvisor = new ApplicationWorkbenchAdvisor(runAfterUIStartup);
