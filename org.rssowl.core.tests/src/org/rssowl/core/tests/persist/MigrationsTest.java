@@ -25,6 +25,7 @@ package org.rssowl.core.tests.persist;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.junit.Test;
@@ -64,6 +65,13 @@ public class MigrationsTest {
     public String toString() {
       return "(" + fOrigin + ", " + fDestination + ")";
     }
+  }
+
+  @Test
+  public void testNoMigrationPossible() {
+    Migrations migrations = new Migrations(new MigrationImpl(2, 3), new MigrationImpl(3, 4));
+    Migration migration = migrations.getMigration(1, 4);
+    assertNull(migration);
   }
 
   /**
