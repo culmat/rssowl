@@ -168,7 +168,8 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       }
     }
 
-    event.data = str.toString();
+    if (str.length() > 0)
+      event.data = str.toString();
   }
 
   /*
@@ -311,8 +312,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     return true;
   }
 
-  private boolean isValidDrop(@SuppressWarnings("unused")
-  INews dragSource, IEntity dropTarget) {
+  private boolean isValidDrop(@SuppressWarnings("unused") INews dragSource, IEntity dropTarget) {
     int loc = getCurrentLocation();
 
     /* Require to drop on actual Entity */

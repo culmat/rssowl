@@ -93,6 +93,7 @@ import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.LoggingSafeRunnable;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
@@ -375,8 +376,11 @@ public class NewsTableControl implements IFeedViewPart {
     IStructuredSelection selection = (IStructuredSelection) LocalSelectionTransfer.getTransfer().getSelection();
     Set<INews> news = ModelUtils.normalize(selection.toList());
 
-    if (!news.isEmpty())
-      event.data = news.iterator().next().getLinkAsText();
+    if (!news.isEmpty()) {
+      String linkAsText = news.iterator().next().getLinkAsText();
+      if (StringUtils.isSet(linkAsText))
+        event.data = linkAsText;
+    }
   }
 
   /*
