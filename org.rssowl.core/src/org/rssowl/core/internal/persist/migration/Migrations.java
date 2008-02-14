@@ -132,11 +132,13 @@ public final class Migrations {
   private List<Migration> findChainedMigrations(int originFormat, int destinationFormat) {
     LinkedList<LinkedList<Migration>> migrationsQueues = createMigrationsQueues(originFormat, destinationFormat);
 
-    LinkedList<Migration> smallestQueue = null;
+    List<Migration> smallestQueue = Collections.emptyList();
     for (LinkedList<Migration> migrationQueue : migrationsQueues)   {
-      if (smallestQueue == null || migrationQueue.size() < smallestQueue.size())
+      /* We want the smallest non-empty queue */
+      if (smallestQueue.isEmpty() || migrationQueue.size() < smallestQueue.size())
         smallestQueue = migrationQueue;
     }
+
     return smallestQueue;
   }
 
