@@ -185,6 +185,10 @@ public class ModelSearchImpl implements IModelSearch {
         }
         while (!fSearchers.isEmpty()) {
           try {
+            /*
+             * We sleep with a lock held because the Threads that we're
+             * waiting to make progress don't acquire a lock
+             */
             Thread.sleep(50);
           } catch (InterruptedException e) {
             /* If interrupted, we just leave the rest of the searchers open */
@@ -973,6 +977,10 @@ public class ModelSearchImpl implements IModelSearch {
             break;
           } else {
             try {
+              /*
+               * We sleep with a lock held because the Threads that we're
+               * waiting to make progress don't acquire a lock
+               */
               Thread.sleep(100);
             } catch (InterruptedException e) {
               throw new PersistenceException("Failed to close IndexSearcher: " + fSearcher);
