@@ -54,7 +54,7 @@ public final class BackupService {
   }
 
 
-  class DefaultBackupLayoutStrategy implements BackupLayoutStrategy {
+  static class DefaultBackupLayoutStrategy implements BackupLayoutStrategy {
     private final File fBackupFile;
 
     DefaultBackupLayoutStrategy(File backupFile)    {
