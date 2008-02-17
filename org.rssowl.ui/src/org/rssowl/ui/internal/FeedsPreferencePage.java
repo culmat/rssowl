@@ -103,6 +103,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   private Button fMarkReadOnMinimize;
   private Button fMarkReadOnChange;
   private LocalResourceManager fResources;
+  private Button fMarkReadOnTabClose;
 
   /** Leave for reflection */
   public FeedsPreferencePage() {
@@ -256,15 +257,20 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     Label label = new Label(markReadAfterContainer, SWT.None);
     label.setText(" seconds");
 
+    /* Mark Read on changing displayed Feed */
+    fMarkReadOnChange = new Button(group, SWT.CHECK);
+    fMarkReadOnChange.setText("Mark displayed news as read when feed changes");
+    fMarkReadOnChange.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_READ_ON_CHANGE));
+
+    /* Mark Read on closing the Feed Tab */
+    fMarkReadOnTabClose = new Button(group, SWT.CHECK);
+    fMarkReadOnTabClose.setText("Mark displayed news as read when closing the tab");
+    fMarkReadOnTabClose.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE));
+
     /* Mark Read on Minimize */
     fMarkReadOnMinimize = new Button(group, SWT.CHECK);
     fMarkReadOnMinimize.setText("Mark displayed news as read on minimize");
     fMarkReadOnMinimize.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE));
-
-    /* Mark Read on changing displayed Feed */
-    fMarkReadOnChange = new Button(group, SWT.CHECK);
-    fMarkReadOnChange.setText("Mark displayed news as read when feed changes");
-    fMarkReadOnChange.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_FEED_READ_ON_CHANGE));
   }
 
   private void createDisplayGroup(TabFolder parent) {
@@ -432,7 +438,8 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     /* Reading */
     fGlobalScope.putBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE, fMarkReadOnMinimize.getSelection());
-    fGlobalScope.putBoolean(DefaultPreferences.MARK_FEED_READ_ON_CHANGE, fMarkReadOnChange.getSelection());
+    fGlobalScope.putBoolean(DefaultPreferences.MARK_READ_ON_CHANGE, fMarkReadOnChange.getSelection());
+    fGlobalScope.putBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE, fMarkReadOnTabClose.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.MARK_READ_STATE, fMarkReadStateCheck.getSelection());
     fGlobalScope.putInteger(DefaultPreferences.MARK_READ_IN_MILLIS, fMarkReadAfterSpinner.getSelection() * 1000);
 
@@ -575,7 +582,8 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     /* Reading */
     fMarkReadOnMinimize.setSelection(defaultScope.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE));
-    fMarkReadOnChange.setSelection(defaultScope.getBoolean(DefaultPreferences.MARK_FEED_READ_ON_CHANGE));
+    fMarkReadOnChange.setSelection(defaultScope.getBoolean(DefaultPreferences.MARK_READ_ON_CHANGE));
+    fMarkReadOnTabClose.setSelection(defaultScope.getBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE));
     fMarkReadStateCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.MARK_READ_STATE));
     fMarkReadAfterSpinner.setSelection(defaultScope.getInteger(DefaultPreferences.MARK_READ_IN_MILLIS) / 1000);
     fMarkReadAfterSpinner.setEnabled(fMarkReadStateCheck.getSelection());

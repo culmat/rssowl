@@ -58,12 +58,14 @@ public class ReadingPropertyPage implements IEntityPropertyPage {
   private boolean fPrefMarkReadState;
   private int fPrefMarkReadVal;
   private boolean fPrefMarkReadOnMinimize;
+  private boolean fPrefMarkReadOnTabClose;
   private boolean fPrefMarkReadOnFeedChange;
   private Button fMarkReadStateCheck;
   private Spinner fMarkReadAfterSpinner;
   private Button fMarkReadOnMinimize;
   private Button fMarkReadOnChange;
   private boolean fSettingsChanged;
+  private Button fMarkReadOnTabClose;
 
   /*
    * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#init(org.rssowl.ui.dialogs.properties.IPropertyDialogSite, java.util.List)
@@ -89,7 +91,8 @@ public class ReadingPropertyPage implements IEntityPropertyPage {
     fPrefMarkReadState = firstScope.getBoolean(DefaultPreferences.MARK_READ_STATE);
     fPrefMarkReadVal = firstScope.getInteger(DefaultPreferences.MARK_READ_IN_MILLIS);
     fPrefMarkReadOnMinimize = firstScope.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE);
-    fPrefMarkReadOnFeedChange = firstScope.getBoolean(DefaultPreferences.MARK_FEED_READ_ON_CHANGE);
+    fPrefMarkReadOnTabClose = firstScope.getBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE);
+    fPrefMarkReadOnFeedChange = firstScope.getBoolean(DefaultPreferences.MARK_READ_ON_CHANGE);
 
     /* For any other scope not sharing the initial values, use the default */
     IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
@@ -105,8 +108,11 @@ public class ReadingPropertyPage implements IEntityPropertyPage {
       if (otherScope.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE) != fPrefMarkReadOnMinimize)
         fPrefMarkReadOnMinimize = defaultScope.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE);
 
-      if (otherScope.getBoolean(DefaultPreferences.MARK_FEED_READ_ON_CHANGE) != fPrefMarkReadOnFeedChange)
-        fPrefMarkReadOnFeedChange = defaultScope.getBoolean(DefaultPreferences.MARK_FEED_READ_ON_CHANGE);
+      if (otherScope.getBoolean(DefaultPreferences.MARK_READ_ON_CHANGE) != fPrefMarkReadOnFeedChange)
+        fPrefMarkReadOnFeedChange = defaultScope.getBoolean(DefaultPreferences.MARK_READ_ON_CHANGE);
+
+      if (otherScope.getBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE) != fPrefMarkReadOnTabClose)
+        fPrefMarkReadOnTabClose = defaultScope.getBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE);
     }
   }
 
@@ -141,15 +147,21 @@ public class ReadingPropertyPage implements IEntityPropertyPage {
     Label label = new Label(markReadAfterContainer, SWT.None);
     label.setText(" seconds");
 
+    /* Mark Read on changing displayed Feed */
+    fMarkReadOnChange = new Button(container, SWT.CHECK);
+    fMarkReadOnChange.setText("Mark displayed news as read when feed changes");
+    fMarkReadOnChange.setSelection(fPrefMarkReadOnFeedChange);
+
+    /* Mark Read on closing Feed Tab */
+    fMarkReadOnTabClose = new Button(container, SWT.CHECK);
+    fMarkReadOnTabClose.setText("Mark displayed news as read when closing the tab");
+    fMarkReadOnTabClose.setSelection(fPrefMarkReadOnTabClose);
+
     /* Mark Read on Minimize */
     fMarkReadOnMinimize = new Button(container, SWT.CHECK);
     fMarkReadOnMinimize.setText("Mark displayed news as read on minimize");
     fMarkReadOnMinimize.setSelection(fPrefMarkReadOnMinimize);
 
-    /* Mark Read on changing displayed Feed */
-    fMarkReadOnChange = new Button(container, SWT.CHECK);
-    fMarkReadOnChange.setText("Mark displayed news as read when feed changes");
-    fMarkReadOnChange.setSelection(fPrefMarkReadOnFeedChange);
 
     return container;
   }
@@ -229,7 +241,14 @@ public class ReadingPropertyPage implements IEntityPropertyPage {
     /* Mark Read on Feed Change */
     bVal = fMarkReadOnChange.getSelection();
     if (fPrefMarkReadOnFeedChange != bVal) {
-      scope.putBoolean(DefaultPreferences.MARK_FEED_READ_ON_CHANGE, bVal);
+      scope.putBoolean(DefaultPreferences.MARK_READ_ON_CHANGE, bVal);
+      changed = true;
+    }
+
+    /* Mark Read on Tab Close */
+    bVal = fMarkReadOnTabClose.getSelection();
+    if (fPrefMarkReadOnTabClose != bVal) {
+      scope.putBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE, bVal);
       changed = true;
     }
 
