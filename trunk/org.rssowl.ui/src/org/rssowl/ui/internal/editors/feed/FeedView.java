@@ -153,7 +153,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
     MINIMIZE,
 
     /** Application Closing */
-    CLOSE
+    CLOSE,
+
+    /** Tab Closed */
+    TAB_CLOSE
   }
 
   /* Editor Data */
@@ -266,7 +269,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
       /* Mark *new* News as *unread* or *read* */
       public void partHidden(IWorkbenchPartReference partRef) {
-        if (FeedView.this.equals(partRef.getPart(false)) && fInput.getMark() instanceof IBookMark)
+        if (FeedView.this.equals(partRef.getPart(false)))
           if (System.currentTimeMillis() - fOpenTime > HANDLE_NEWS_SEEN_DELAY)
             notifyUIEvent(UIEvent.FEED_CHANGE);
       }
@@ -281,8 +284,12 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
       public void partClosed(IWorkbenchPartReference partRef) {
         IEditorReference[] editors = partRef.getPage().getEditorReferences();
-        if (editors.length == 0 && FeedView.this.equals(partRef.getPart(false)))
+        boolean equalsThis = FeedView.this.equals(partRef.getPart(false));
+        if (editors.length == 0 && equalsThis)
           OwlUI.updateWindowTitle(null);
+
+        if (equalsThis)
+          notifyUIEvent(UIEvent.TAB_CLOSE);
       }
 
       public void partDeactivated(IWorkbenchPartReference partRef) {}
@@ -805,7 +812,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
     if (!fInput.exists())
       return;
 
-    final boolean markReadOnFeedChange = inputPreferences.getBoolean(DefaultPreferences.MARK_FEED_READ_ON_CHANGE);
+    final boolean markReadOnFeedChange = inputPreferences.getBoolean(DefaultPreferences.MARK_READ_ON_CHANGE);
+    final boolean markReadOnTabClose = inputPreferences.getBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE);
     final boolean markReadOnMinimize = inputPreferences.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE);
 
     /* Mark *new* News as *unread* when closing the entire application */
@@ -826,9 +834,24 @@ public class FeedView extends EditorPart implements IReusableEditor {
       fNewsDao.setState(newsToUpdate, INews.State.UNREAD, true, false);
     }
 
-    /* Handle seen News: Feed Change (also closing the feed view) or Minimize Event */
-    else if (event == UIEvent.FEED_CHANGE || event == UIEvent.MINIMIZE) {
-      JobRunner.runInBackgroundThread(HANDLE_NEWS_SEEN_DELAY, new Runnable() {
+    /* Handle seen News: Feed Change (also closing the feed view), Closing or Minimize Event */
+    else if (event == UIEvent.FEED_CHANGE || event == UIEvent.MINIMIZE || event == UIEvent.TAB_CLOSE) {
+
+      /* Return in this case because FEED_CHANGE is also called when closing a Tab */
+      if (event == UIEvent.TAB_CLOSE && !markReadOnTabClose)
+        return;
+
+      /*
+       * TODO This is a workaround to avoid potential race-conditions when closing a Tab. The problem
+       * is that both FEED_CHANGE (due to hiding the tab) and TAB_CLOSE (due to actually closing
+       * the tab) get sent when the user closes a tab. The workaround is to delay the processing of
+       * TAB_CLOSE a bit to minimize the chance of a race condition.
+       */
+      int delay = HANDLE_NEWS_SEEN_DELAY;
+      if (event == UIEvent.TAB_CLOSE)
+        delay += 50;
+
+      JobRunner.runInBackgroundThread(delay, new Runnable() {
         public void run() {
 
           /* Application might be in process of closing */
@@ -837,10 +860,19 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
           /* Check settings if mark as read should be performed */
           boolean markRead = false;
-          if (event == UIEvent.FEED_CHANGE)
-            markRead = markReadOnFeedChange;
-          else if (event == UIEvent.MINIMIZE)
-            markRead = markReadOnMinimize;
+          switch (event) {
+            case FEED_CHANGE:
+              markRead = markReadOnFeedChange;
+              break;
+
+            case TAB_CLOSE:
+              markRead = markReadOnTabClose;
+              break;
+
+            case MINIMIZE:
+              markRead = markReadOnMinimize;
+              break;
+          }
 
           /* Perform the State Change */
           List<INews> newsToUpdate = new ArrayList<INews>();
@@ -851,8 +883,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
               newsToUpdate.add(newsItem);
           }
 
-          /* Force quick update on Feed-Change */
-          if (event == UIEvent.FEED_CHANGE && !newsToUpdate.isEmpty())
+          /* Force quick update on Feed-Change or Tab Close */
+          if ((event == UIEvent.FEED_CHANGE || event == UIEvent.TAB_CLOSE) && !newsToUpdate.isEmpty())
             Controller.getDefault().getSavedSearchService().forceQuickUpdate();
 
           /* Support Undo */
