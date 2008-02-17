@@ -39,7 +39,10 @@ public class DefaultPreferences implements IPreferencesInitializer {
   public static final String MARK_READ_ON_MINIMIZE = "org.rssowl.pref.MarkNewsReadOnMinimize";
 
   /** Global: Mark feed as read when feed changes */
-  public static final String MARK_FEED_READ_ON_CHANGE = "org.rssowl.pref.MarkFeedReadOnChange";
+  public static final String MARK_READ_ON_CHANGE = "org.rssowl.pref.MarkFeedReadOnChange";
+
+  /** Global: Mark all news as read on tab close */
+  public static final String MARK_READ_ON_TAB_CLOSE = "org.rssowl.pref.MarkNewsReadOnTabClose";
 
   /** Global: Use default external browser */
   public static final String USE_DEFAULT_EXTERNAL_BROWSER = "org.rssowl.pref.UseExternalBrowser";
@@ -284,7 +287,8 @@ public class DefaultPreferences implements IPreferencesInitializer {
 
   private void initGlobalDefaults(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(MARK_READ_ON_MINIMIZE, false);
-    defaultScope.putBoolean(MARK_FEED_READ_ON_CHANGE, false);
+    defaultScope.putBoolean(MARK_READ_ON_CHANGE, false);
+    defaultScope.putBoolean(MARK_READ_ON_TAB_CLOSE, false);
     defaultScope.putBoolean(USE_DEFAULT_EXTERNAL_BROWSER, true);
     defaultScope.putBoolean(TRAY_ON_MINIMIZE, false);
     defaultScope.putBoolean(MARK_READ_STATE, true);
