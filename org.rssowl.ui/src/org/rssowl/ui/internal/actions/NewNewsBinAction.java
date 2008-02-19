@@ -234,7 +234,7 @@ public class NewNewsBinAction implements IWorkbenchWindowActionDelegate, IObject
       for (Map.Entry<String, Serializable> property : properties.entrySet())
         fNewsbin.setProperty(property.getKey(), property.getValue());
 
-      parent = DynamicDAO.save(parent);
+      DynamicDAO.save(parent);
     }
   }
 
