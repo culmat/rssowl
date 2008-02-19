@@ -807,19 +807,13 @@ public class Controller {
   }
 
   /**
-   * This method is called just after the UI has started (but no Window opened).
+   * This method is called just after the Window has opened.
    */
-  public void postUIStartup() {
+  public void postWindowOpen() {
 
     /* Create the Feed-Reload Service */
     if (!InternalOwl.TESTING)
       fFeedReloadService = new FeedReloadService();
-  }
-
-  /**
-   * This method is called just after the Window has opened.
-   */
-  public void postWindowOpen() {
 
     /* Create the Clean-Up Reminder Service */
     fCleanUpReminderService = new CleanUpReminderService();
