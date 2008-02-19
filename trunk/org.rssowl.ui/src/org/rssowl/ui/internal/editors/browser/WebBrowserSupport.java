@@ -25,14 +25,11 @@
 package org.rssowl.ui.internal.editors.browser;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.browser.AbstractWorkbenchBrowserSupport;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.BrowserUtils;
 
 import java.net.URL;
@@ -56,7 +53,6 @@ public class WebBrowserSupport extends AbstractWorkbenchBrowserSupport {
 
     /* Create WebBrowser and return */
     return new IWebBrowser() {
-      private IEditorPart fBrowserView;
 
       /*
        * @see org.eclipse.ui.browser.IWebBrowser#openURL(java.net.URL)
@@ -86,10 +82,6 @@ public class WebBrowserSupport extends AbstractWorkbenchBrowserSupport {
        * @see org.eclipse.ui.browser.IWebBrowser#close()
        */
       public boolean close() {
-        IWorkbenchPage page = OwlUI.getPage();
-        if (page != null && fBrowserView != null)
-          page.closeEditor(fBrowserView, false);
-
         return true;
       }
 

@@ -144,6 +144,9 @@ public class NewsTableControl implements IFeedViewPart {
   /* TODO Developer's flag to enable / disable COD */
   static final boolean USE_CUSTOM_OWNER_DRAWN = true;
 
+  /* Default Asecnding Sort Order value */
+  private static final boolean INITIAL_ASCENDING = false;
+
   /* Indices of Columns in the Tree-Viewer */
   static final int COL_TITLE = 0;
   static final int COL_FEED = 1;
@@ -270,7 +273,6 @@ public class NewsTableControl implements IFeedViewPart {
   /* Settings */
   private IPreferenceScope fGlobalPreferences;
   private final Columns fInitialSortColumn = Columns.DATE;
-  private final boolean fInitialAscending = false;
 
   /*
    * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#init(org.eclipse.ui.IEditorSite)
@@ -403,7 +405,7 @@ public class NewsTableControl implements IFeedViewPart {
     col.getColumn().setMoveable(false);
     if (fInitialSortColumn == Columns.TITLE) {
       fCustomTree.getControl().setSortColumn(col.getColumn());
-      fCustomTree.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
+      fCustomTree.getControl().setSortDirection(INITIAL_ASCENDING ? SWT.UP : SWT.DOWN);
     }
 
     /* Feed Column (visible only for saved searches) */
@@ -413,7 +415,7 @@ public class NewsTableControl implements IFeedViewPart {
     col.getColumn().setToolTipText("Feed");
     if (fInitialSortColumn == NewsTableControl.Columns.FEED) {
       fCustomTree.getControl().setSortColumn(col.getColumn());
-      fCustomTree.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
+      fCustomTree.getControl().setSortDirection(INITIAL_ASCENDING ? SWT.UP : SWT.DOWN);
     }
     fCustomTree.setVisible(col.getColumn(), false, false);
 
@@ -425,7 +427,7 @@ public class NewsTableControl implements IFeedViewPart {
     col.getColumn().setMoveable(false);
     if (fInitialSortColumn == Columns.DATE) {
       fCustomTree.getControl().setSortColumn(col.getColumn());
-      fCustomTree.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
+      fCustomTree.getControl().setSortDirection(INITIAL_ASCENDING ? SWT.UP : SWT.DOWN);
     }
 
     /* Author Column */
@@ -435,7 +437,7 @@ public class NewsTableControl implements IFeedViewPart {
     col.getColumn().setMoveable(false);
     if (fInitialSortColumn == Columns.AUTHOR) {
       fCustomTree.getControl().setSortColumn(col.getColumn());
-      fCustomTree.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
+      fCustomTree.getControl().setSortDirection(INITIAL_ASCENDING ? SWT.UP : SWT.DOWN);
     }
 
     /* Category Column */
@@ -445,7 +447,7 @@ public class NewsTableControl implements IFeedViewPart {
     col.getColumn().setMoveable(false);
     if (fInitialSortColumn == Columns.CATEGORY) {
       fCustomTree.getControl().setSortColumn(col.getColumn());
-      fCustomTree.getControl().setSortDirection(fInitialAscending ? SWT.UP : SWT.DOWN);
+      fCustomTree.getControl().setSortDirection(INITIAL_ASCENDING ? SWT.UP : SWT.DOWN);
     }
 
     /* Sticky Column */
@@ -474,7 +476,7 @@ public class NewsTableControl implements IFeedViewPart {
 
     /* Create Sorter */
     fNewsSorter = new NewsComparator();
-    fNewsSorter.setAscending(fInitialAscending);
+    fNewsSorter.setAscending(INITIAL_ASCENDING);
     fNewsSorter.setSortBy(fInitialSortColumn);
     fViewer.setComparator(fNewsSorter);
 

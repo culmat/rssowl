@@ -160,9 +160,6 @@ public class Controller {
   /* Connection Timeouts in MS */
   private static final int FEED_CON_TIMEOUT = 30000;
 
-  /* Flag indicating if RSSOwl is starting up for the first time */
-  static boolean fgFirstStartup;
-
   /* Queue for reloading Feeds */
   private final JobQueue fReloadFeedQueue;
 
@@ -857,9 +854,6 @@ public class Controller {
 
     /* Import Default Marks */
     importDefaults();
-
-    /* Remember this */
-    fgFirstStartup = true;
   }
 
   private void addDefaultLabels() throws PersistenceException {
