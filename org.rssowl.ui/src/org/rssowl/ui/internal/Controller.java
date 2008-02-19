@@ -607,7 +607,7 @@ public class Controller {
           fLoginDialogLock.lock();
           try {
             final AuthenticationRequiredException authEx = (AuthenticationRequiredException) e;
-            JobRunner.runSyncedInUIThread(shell, new Runnable() {
+            JobRunner.runSyncedInUIThread(shellAr[0], new Runnable() {
               public void run() {
 
                 /* Check for shutdown flag and return if required */
