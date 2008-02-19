@@ -147,17 +147,6 @@ public class Activator extends AbstractUIPlugin {
         Controller.getDefault().startup();
       }
     });
-
-    /* Propagate post-ui startup to Controller */
-    SafeRunner.run(new LoggingSafeRunnable() {
-      public void run() throws Exception {
-        Display.getDefault().asyncExec(new Runnable() {
-          public void run() {
-            Controller.getDefault().postUIStartup();
-          }
-        });
-      }
-    });
   }
 
   private void startCore() {
