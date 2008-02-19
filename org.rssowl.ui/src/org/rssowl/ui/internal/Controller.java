@@ -486,7 +486,7 @@ public class Controller {
    * a <code>NullProgressMonitor</code> if no progress is to be reported.
    * @return Returns the Status of the Operation.
    */
-  public IStatus reload(final IBookMark bookmark, final Shell shell, final IProgressMonitor monitor) {
+  public IStatus reload(final IBookMark bookmark, Shell shell, final IProgressMonitor monitor) {
     Assert.isNotNull(bookmark);
     CoreException ex = null;
 
@@ -590,55 +590,67 @@ public class Controller {
       ex = e;
 
       /* Authentication Required */
-      if (e instanceof AuthenticationRequiredException && shell != null && !shell.isDisposed() && !fShuttingDown) {
+      final Shell[] shellAr = new Shell[] { shell };
+      if (e instanceof AuthenticationRequiredException && !fShuttingDown) {
 
-        /* Only one Login Dialog at the same time */
-        fLoginDialogLock.lock();
-        try {
-          final AuthenticationRequiredException authEx = (AuthenticationRequiredException) e;
-          JobRunner.runSyncedInUIThread(shell, new Runnable() {
-            public void run() {
-
-              /* Check for shutdown flag and return if required */
-              if (fShuttingDown || monitor.isCanceled())
-                return;
-
-              /* Credentials might have been provided meanwhile in another dialog */
-              try {
-                URI normalizedUri = URIUtils.normalizeUri(feedLink, true);
-                if (!fShuttingDown && Owl.getConnectionService().getAuthCredentials(normalizedUri, authEx.getRealm()) != null) {
-                  reloadQueued(bookmark, shell);
-                  return;
-                }
-              } catch (CredentialsException exe) {
-                Activator.getDefault().getLog().log(exe.getStatus());
-              }
-
-              /* Show Login Dialog */
-              LoginDialog login = new LoginDialog(shell, feedLink, authEx.getRealm());
-              if (login.open() == Window.OK && !fShuttingDown) {
-
-                /* Store info about Realm in Bookmark */
-                if (StringUtils.isSet(authEx.getRealm())) {
-                  bookmark.setProperty(BM_REALM_PROPERTY, authEx.getRealm());
-                  fBookMarkDAO.save(bookmark);
-                }
-
-                /* Re-Reload Bookmark */
-                reloadQueued(bookmark, shell);
-              }
-
-              /* Update Error Flag if user hit Cancel */
-              else if (!fShuttingDown && !monitor.isCanceled() && !bookmark.isErrorLoading()) {
-                bookmark.setErrorLoading(true);
-                fBookMarkDAO.save(bookmark);
-              }
+        /* Resolve active Shell if necessary */
+        if (shellAr[0] == null || shellAr[0].isDisposed()) {
+          SafeRunner.run(new LoggingSafeRunnable() {
+            public void run() throws Exception {
+              shellAr[0] = OwlUI.getActiveShell();
             }
           });
+        }
 
-          return Status.OK_STATUS;
-        } finally {
-          fLoginDialogLock.unlock();
+        /* Only one Login Dialog at the same time */
+        if (shellAr[0] != null && !shellAr[0].isDisposed()) {
+          fLoginDialogLock.lock();
+          try {
+            final AuthenticationRequiredException authEx = (AuthenticationRequiredException) e;
+            JobRunner.runSyncedInUIThread(shell, new Runnable() {
+              public void run() {
+
+                /* Check for shutdown flag and return if required */
+                if (fShuttingDown || monitor.isCanceled())
+                  return;
+
+                /* Credentials might have been provided meanwhile in another dialog */
+                try {
+                  URI normalizedUri = URIUtils.normalizeUri(feedLink, true);
+                  if (!fShuttingDown && Owl.getConnectionService().getAuthCredentials(normalizedUri, authEx.getRealm()) != null) {
+                    reloadQueued(bookmark, shellAr[0]);
+                    return;
+                  }
+                } catch (CredentialsException exe) {
+                  Activator.getDefault().getLog().log(exe.getStatus());
+                }
+
+                /* Show Login Dialog */
+                LoginDialog login = new LoginDialog(shellAr[0], feedLink, authEx.getRealm());
+                if (login.open() == Window.OK && !fShuttingDown) {
+
+                  /* Store info about Realm in Bookmark */
+                  if (StringUtils.isSet(authEx.getRealm())) {
+                    bookmark.setProperty(BM_REALM_PROPERTY, authEx.getRealm());
+                    fBookMarkDAO.save(bookmark);
+                  }
+
+                  /* Re-Reload Bookmark */
+                  reloadQueued(bookmark, shellAr[0]);
+                }
+
+                /* Update Error Flag if user hit Cancel */
+                else if (!fShuttingDown && !monitor.isCanceled() && !bookmark.isErrorLoading()) {
+                  bookmark.setErrorLoading(true);
+                  fBookMarkDAO.save(bookmark);
+                }
+              }
+            });
+
+            return Status.OK_STATUS;
+          } finally {
+            fLoginDialogLock.unlock();
+          }
         }
       }
 

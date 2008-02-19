@@ -960,6 +960,21 @@ public class OwlUI {
   }
 
   /**
+   * Attempts to find the active <code>Shell</code> from the PlatformUI
+   * facade. Otherwise, returns <code>NULL</code> if none.
+   *
+   * @return the active <code>Shell</code> from the PlatformUI facade or
+   * <code>NULL</code> if none.
+   */
+  public static Shell getActiveShell() {
+    IWorkbenchWindow window = getWindow();
+    if (window != null)
+      return window.getShell();
+
+    return null;
+  }
+
+  /**
    * Update the current active window title based on the given array of
    * {@link IMark}.
    *

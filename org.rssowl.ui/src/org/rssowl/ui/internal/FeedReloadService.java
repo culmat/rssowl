@@ -121,7 +121,7 @@ public class FeedReloadService {
 
       /* Reload */
       if (!monitor.isCanceled())
-        Controller.getDefault().reloadQueued(fBookMark, OwlUI.getPrimaryShell());
+        Controller.getDefault().reloadQueued(fBookMark, null);
 
       /* Re-Schedule */
       if (!monitor.isCanceled() && updateIntervalInSeconds != null)
@@ -205,7 +205,7 @@ public class FeedReloadService {
     if (!bookmarksToReloadOnStartup.isEmpty()) {
       JobRunner.runInUIThread(null, new Runnable() {
         public void run() {
-          Controller.getDefault().reloadQueued(bookmarksToReloadOnStartup, OwlUI.getPrimaryShell());
+          Controller.getDefault().reloadQueued(bookmarksToReloadOnStartup, null);
         }
       });
     }
