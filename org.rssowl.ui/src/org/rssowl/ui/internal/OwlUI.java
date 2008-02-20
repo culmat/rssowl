@@ -538,7 +538,7 @@ public class OwlUI {
 
     /* 2.) Check if ImageDescriptor exists in File System */
     File favicon = getImageFile(bookmark.getId());
-    if (favicon.exists()) {
+    if (favicon != null && favicon.exists()) {
       try {
         descriptor = ImageDescriptor.createFromURL(favicon.toURI().toURL());
         FAVICO_CACHE.put(bookmark.getId(), descriptor);
@@ -555,14 +555,18 @@ public class OwlUI {
    * @param id
    */
   public static void deleteImage(long id) {
+    boolean res = false;
 
     /* Delete from Cache */
     FAVICO_CACHE.remove(id);
 
     /* Delete from Disk */
     File file = getImageFile(id);
-    if (file.exists())
-      file.delete();
+    if (file != null && file.exists())
+      res = file.delete();
+
+    if (!res)
+      Activator.getDefault().logInfo("Unable to delete image with ID " + id);
   }
 
   /**
@@ -610,6 +614,8 @@ public class OwlUI {
     /* Save Image into Cache-Area on File-System */
     if (imgData != null) {
       File imageFile = getImageFile(id);
+      if (imageFile == null)
+        return;
 
       /* Scale if required */
       if (imgData.width != 16 || imgData.height != 16)
@@ -697,13 +703,20 @@ public class OwlUI {
   }
 
   private static File getImageFile(long id) {
+    boolean res = false;
+
     IPath path = new Path(Activator.getDefault().getStateLocation().toOSString());
     path = path.append(ICONS_FOLDER);
     File root = new File(path.toOSString());
     if (!root.exists())
-      root.mkdir();
+      res = root.mkdir();
 
     path = path.append(id + ".ico");
+
+    if (!res) {
+      Activator.getDefault().logInfo("Unable to get image file with ID " + id);
+      return null;
+    }
 
     return new File(path.toOSString());
   }
