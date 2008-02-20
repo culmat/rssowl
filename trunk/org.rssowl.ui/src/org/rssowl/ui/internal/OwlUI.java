@@ -564,6 +564,8 @@ public class OwlUI {
     File file = getImageFile(id);
     if (file != null && file.exists())
       res = file.delete();
+    else
+      res = true;
 
     if (!res)
       Activator.getDefault().logInfo("Unable to delete image with ID " + id);
@@ -710,6 +712,8 @@ public class OwlUI {
     File root = new File(path.toOSString());
     if (!root.exists())
       res = root.mkdir();
+    else
+      res = true;
 
     path = path.append(id + ".ico");
 
