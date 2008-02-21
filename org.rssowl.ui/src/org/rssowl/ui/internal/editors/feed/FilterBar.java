@@ -109,6 +109,7 @@ public class FilterBar {
   private IPreferenceScope fGlobalPreferences;
   private boolean fMaximized;
   private ToolBarManager fFilterToolBar;
+  private boolean fBlockRefresh;
 
   /**
    * @param feedView
@@ -124,10 +125,20 @@ public class FilterBar {
     createControl();
   }
 
-  /** Clear the Quick-Search */
-  public void clearQuickSearch() {
-    if (fSearchInput.getText().length() != 0)
-      fSearchInput.setText(""); //$NON-NLS-1$
+  /**
+   * Clear the Quick-Search
+   *
+   * @param refresh
+   */
+  public void clearQuickSearch(boolean refresh) {
+    if (fSearchInput.getText().length() != 0) {
+      fBlockRefresh = !refresh;
+      try {
+        fSearchInput.setText(""); //$NON-NLS-1$
+      } finally {
+        fBlockRefresh = false;
+      }
+    }
   }
 
   /** Give Focus to the Quicksearch Input */
@@ -320,7 +331,7 @@ public class FilterBar {
       @Override
       public void keyPressed(KeyEvent e) {
         if (e.keyCode == SWT.ESC)
-          clearQuickSearch();
+          clearQuickSearch(true);
       }
     });
 
@@ -341,7 +352,8 @@ public class FilterBar {
         /* Clear Search immediately */
         if (fSearchInput.getText().length() == 0 && fFeedView.getFilter().isPatternSet()) {
           fFeedView.getFilter().setPattern(fSearchInput.getText());
-          fFeedView.refresh(true, false);
+          if (!fBlockRefresh)
+            fFeedView.refresh(true, false);
           setClearBarVisible(false);
         }
 
@@ -386,7 +398,7 @@ public class FilterBar {
     IAction clearTextAction = new Action("", IAction.AS_PUSH_BUTTON) {//$NON-NLS-1$
       @Override
       public void run() {
-        clearQuickSearch();
+        clearQuickSearch(true);
       }
     };
 

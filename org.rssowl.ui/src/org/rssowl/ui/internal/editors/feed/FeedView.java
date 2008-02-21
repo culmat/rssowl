@@ -726,6 +726,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
     if (!fCreated)
       updateTab(fInput);
 
+    /* Clear Filter Bar */
+    if (fFilterBar != null)
+      fFilterBar.clearQuickSearch(false);
+
     /* Editor is being reused */
     if (fCreated) {
       firePropertyChange(PROP_INPUT);
@@ -1363,7 +1367,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         @Override
         public void keyPressed(KeyEvent e) {
           if (e.keyCode == SWT.ESC)
-            fFilterBar.clearQuickSearch();
+            fFilterBar.clearQuickSearch(true);
         }
       });
 
@@ -1401,7 +1405,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         @Override
         public void keyPressed(KeyEvent e) {
           if (e.keyCode == SWT.ESC)
-            fFilterBar.clearQuickSearch();
+            fFilterBar.clearQuickSearch(true);
         }
       });
 
