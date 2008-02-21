@@ -48,6 +48,7 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 import org.rssowl.ui.internal.util.BrowserUtils;
+import org.rssowl.ui.internal.util.JobRunner;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -285,10 +286,17 @@ public class CBrowser {
         /* Handle Application Protocol */
         if (event.location != null && event.location.contains(ILinkHandler.HANDLER_PROTOCOL)) {
           try {
-            URI link = new URI(event.location);
-            String host = link.getHost();
+            final URI link = new URI(event.location);
+            final String host = link.getHost();
             if (StringUtils.isSet(host) && fLinkHandler.containsKey(host)) {
-              fLinkHandler.get(host).handle(host, link);
+
+              /* See Bug 747 - run asynced */
+              JobRunner.runInUIThread(getControl(), new Runnable() {
+                public void run() {
+                  fLinkHandler.get(host).handle(host, link);
+                }
+              });
+
               event.doit = false;
               return;
             }
