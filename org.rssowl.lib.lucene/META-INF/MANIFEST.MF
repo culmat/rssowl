@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Apache Lucene
 Bundle-SymbolicName: org.rssowl.lib.lucene
 Bundle-Version: 2.0.0.qualifier
-Bundle-ClassPath: lucene2_3_1_trunk.jar
+Bundle-ClassPath: lucene-core-2.3.1.jar
 Export-Package: org.apache.lucene,
  org.apache.lucene.analysis,
  org.apache.lucene.analysis.standard,
