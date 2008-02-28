@@ -48,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -394,6 +395,10 @@ public class NewsGrouping {
       if (object instanceof INews) {
         INews news = (INews) object;
         IFeed feed = news.getFeedReference().resolve();
+
+        /* TODO Workaround for Bug 751: NPE when deleting feed */
+        if (feed == null)
+          return Collections.emptyList();
 
         EntityGroup group = groupCache.get(feed.getId());
 
