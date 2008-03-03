@@ -72,19 +72,34 @@ public class JobRunner {
    * @param widget
    */
   public static void runInUIThread(int delay, final Widget widget, final Runnable runnable) {
-    Assert.isNotNull(runnable);
-    UIJob uiJob = new UIJob("UIJob Runner") { //$NON-NLS-1$
-      @Override
-      public IStatus runInUIThread(IProgressMonitor monitor) {
-        if (widget == null || !widget.isDisposed())
-          runnable.run();
-        return Status.OK_STATUS;
-      }
-    };
+    runInUIThread(delay, widget, false, runnable);
+  }
 
-    uiJob.setSystem(true);
-    uiJob.setUser(false);
-    uiJob.schedule(delay);
+  /**
+   * @param delay
+   * @param runnable
+   * @param widget
+   * @param avoidAsync
+   */
+  public static void runInUIThread(int delay, final Widget widget, boolean avoidAsync, final Runnable runnable) {
+    Assert.isNotNull(runnable);
+
+    if (avoidAsync && Display.getCurrent() != null)
+      runnable.run();
+    else {
+      UIJob uiJob = new UIJob("UIJob Runner") { //$NON-NLS-1$
+        @Override
+        public IStatus runInUIThread(IProgressMonitor monitor) {
+          if (widget == null || !widget.isDisposed())
+            runnable.run();
+          return Status.OK_STATUS;
+        }
+      };
+
+      uiJob.setSystem(true);
+      uiJob.setUser(false);
+      uiJob.schedule(delay);
+    }
   }
 
   /**
