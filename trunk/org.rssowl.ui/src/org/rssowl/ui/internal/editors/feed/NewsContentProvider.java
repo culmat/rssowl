@@ -388,7 +388,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       /* News got Updated */
       @Override
       public void entitiesUpdated(final Set<NewsEvent> events) {
-        JobRunner.runInUIThread(fFeedView.getEditorControl(), new Runnable() {
+        JobRunner.runInUIThread(0, fFeedView.getEditorControl(), true, new Runnable() {
           public void run() {
             Set<NewsEvent> restoredNews = null;
             Set<NewsEvent> updatedNews = null;
