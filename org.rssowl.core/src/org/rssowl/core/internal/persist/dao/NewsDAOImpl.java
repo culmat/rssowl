@@ -242,7 +242,10 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
         news.add(newsItem);
       else {
         INews resolvedNewsItem = hit.resolve();
-        news.add(resolvedNewsItem);
+        if (resolvedNewsItem == null)
+          logWarning("Stale Lucene index, it has returned a news that does not exist in the database anymore, id: " + hit.getId());
+        else
+          news.add(resolvedNewsItem);
       }
     }
     return news;
