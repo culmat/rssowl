@@ -246,6 +246,14 @@ public class DBManager {
     return "There was a problem opening the database file. RSSOwl has reverted to the last working back-up (from " + date + "). The corrupted file has been saved to: " + corruptedFile.getAbsolutePath();
   }
 
+  private boolean shouldReindex(MigrationResult migrationResult, IStatus startupStatus) {
+    boolean shouldReindex = migrationResult.isReindex() || (!startupStatus.isOK());
+    if (shouldReindex)
+      return true;
+
+    return Boolean.getBoolean("rssowl.reindex");
+  }
+
   private long getOnlineBackupDelay(boolean initial) {
     if (initial)
       return 1000 * 60 * 10;
@@ -348,20 +356,20 @@ public class DBManager {
 
       fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
 
-      if (subMonitor == null && (!startupStatus.isOK())) {
+      boolean shouldReindex = shouldReindex(migrationResult, startupStatus);
+      if (subMonitor == null && shouldReindex) {
         progressMonitor.beginLongOperation();
         subMonitor = SubMonitor.convert(progressMonitor, "Please wait while RSSOwl reindexes your data", 20);
       }
 
       IModelSearch modelSearch = InternalOwl.getDefault().getPersistenceService().getModelSearch();
-      if (migrationResult.isReindex() || migrationResult.isOptimizeIndex() || (!startupStatus.isOK()))
+      if (shouldReindex || migrationResult.isOptimizeIndex()) {
         modelSearch.startup();
-
-      if (migrationResult.isReindex() || (!startupStatus.isOK()))
-        modelSearch.reindexAll(subMonitor.newChild(20));
-
-      if (migrationResult.isOptimizeIndex())
-        modelSearch.optimize();
+        if (shouldReindex)
+          modelSearch.reindexAll(subMonitor.newChild(20));
+        if (migrationResult.isOptimizeIndex())
+          modelSearch.optimize();
+      }
 
     } finally {
       /*
