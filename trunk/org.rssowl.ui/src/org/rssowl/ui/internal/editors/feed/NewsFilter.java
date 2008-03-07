@@ -369,7 +369,7 @@ public class NewsFilter extends ViewerFilter {
 
     /* Pattern Set */
     else
-      fCachedPatternMatchingNews = cacheMatchingNews(patternString);
+      fCachedPatternMatchingNews = cacheMatchingNews(patternString.trim());
   }
 
   private List<SearchHit<NewsReference>> cacheMatchingNews(String pattern) {
