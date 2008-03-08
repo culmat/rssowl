@@ -294,7 +294,6 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putBoolean(MARK_READ_STATE, true);
     defaultScope.putInteger(MARK_READ_IN_MILLIS, 0);
     defaultScope.putBoolean(BM_OPEN_SITE_FOR_EMPTY_NEWS, false);
-    defaultScope.putBoolean(BE_ENABLE_LINKING, true);
     defaultScope.putInteger(LIMIT_NOTIFICATION_SIZE, 5);
     defaultScope.putBoolean(SEARCH_DIALOG_PREVIEW_VISIBLE, true);
     defaultScope.putInteger(AUTOCLOSE_NOTIFICATION_VALUE, 8);
