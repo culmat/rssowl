@@ -59,13 +59,16 @@ import org.rssowl.ui.internal.OwlUI;
  * @author bpasero
  */
 public class NewsBrowserControl implements IFeedViewPart {
+  private static final long BLOCK_OPEN_NEWS_IN_BROWSER = 300; //See bug 763
   private static final String LOCALHOST = "127.0.0.1";
+
   private IEditorSite fEditorSite;
   private NewsBrowserViewer fViewer;
   private ISelectionListener fSelectionListener;
   private Object fInitialInput;
   private IPreferenceScope fInputPreferences;
   private IPropertyChangeListener fPropertyChangeListener;
+  private long fLastInputChangedTime;
 
   /*
    * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#init(org.eclipse.ui.IEditorSite)
@@ -79,6 +82,7 @@ public class NewsBrowserControl implements IFeedViewPart {
    */
   public void onInputChanged(FeedViewInput input) {
     fInputPreferences = Owl.getPreferenceService().getEntityScope(input.getMark());
+    fLastInputChangedTime = System.currentTimeMillis();
   }
 
   /*
@@ -148,6 +152,10 @@ public class NewsBrowserControl implements IFeedViewPart {
   }
 
   private Object getInput(INews news) {
+    boolean blockOpen = (fLastInputChangedTime + BLOCK_OPEN_NEWS_IN_BROWSER) > System.currentTimeMillis();
+    if (blockOpen) // See bug 763
+      return news;
+
     if (fInputPreferences.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS))
       return news.getLinkAsText();
 
