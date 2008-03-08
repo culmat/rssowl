@@ -86,16 +86,16 @@ public class NewsTableViewer extends TreeViewer {
   }
 
   void updateSelectionAfterDelete(Runnable runnable) {
-    TreeItem[] selection = getTree().getSelection();
+    TreeItem[] oldSelection = getTree().getSelection();
 
     /* Nothing to do, since no selection */
-    if (selection.length == 0) {
+    if (oldSelection.length == 0) {
       runnable.run();
       return;
     }
 
     /* Navigate to next News if possible */
-    ITreeNode startingNode = new WidgetTreeNode(selection[selection.length - 1], this);
+    ITreeNode startingNode = new WidgetTreeNode(oldSelection[oldSelection.length - 1], this);
     ISelection newSelection = navigate(startingNode, true);
 
     /* Try previous News if possible then */
@@ -105,8 +105,17 @@ public class NewsTableViewer extends TreeViewer {
     /* Perform Deletion */
     runnable.run();
 
+    /* Ensure that an updated selection is required */
+    boolean updateSelection = false;
+    for (TreeItem oldSelectedItem : oldSelection) {
+      if (oldSelectedItem.isDisposed()) {
+        updateSelection = true;
+        break;
+      }
+    }
+
     /* Set new Selection */
-    if (newSelection != null)
+    if (updateSelection && newSelection != null)
       setSelection(newSelection);
   }
 
