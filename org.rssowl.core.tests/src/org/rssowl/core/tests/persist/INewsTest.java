@@ -30,13 +30,17 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.rssowl.core.internal.persist.DefaultModelFactory;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Unit tests for INews.
@@ -150,6 +154,9 @@ public class INewsTest {
     otherNews.setLink(newsLink);
     fFactory.createGuid(otherNews, "www.news.com", false);
 
+    //TODO Because description is now lazy-loaded from the db, this specific
+    //method fails when the test is executed as a unit test. Fix it if possible,
+    //or move it to the integration tests
     news.merge(otherNews);
     assertEquals(false, news.getGuid().isPermaLink());
 
@@ -165,5 +172,23 @@ public class INewsTest {
       }
     }
     throw new IllegalStateException();
+  }
+
+  /**
+   * Tests that adding a label to a news copy works correctly.
+   * @throws Exception
+   */
+  @Test
+  public void testAddLabelToNewsCopy() throws Exception {
+    IFeed parent = fFactory.createFeed(null, new URI("http://www.feed.com"));
+    INews news = fFactory.createNews(null, parent, new Date());
+    IFolder folder = fFactory.createFolder(null, null, "folder");
+    INewsBin newsBin = fFactory.createNewsBin(1L, folder, "newsbin");
+    INews newsCopy = fFactory.createNews(news, newsBin);
+    newsCopy.addLabel(fFactory.createLabel(null, "label"));
+    assertEquals(1, newsCopy.getLabels().size());
+    Set<ILabel> labels = news.getLabels();
+    labels.add(fFactory.createLabel(null, "Another label"));
+    assertEquals(1, labels.size());
   }
 }
