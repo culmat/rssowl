@@ -200,10 +200,9 @@ public class News extends AbstractEntity implements INews {
       fIsFlagged = news.fIsFlagged;
 
       /*
-       * Don't need to copy the labels because the relationship is ManyToMany
-       * and getLabels returns a copy.
+       * Don't need to copy the labels because the relationship is ManyToMany.
        */
-      fLabels = news.getLabels();
+      fLabels = news.fLabels == null ? null : new HashSet<ILabel>(news.fLabels);
 
       fLinkText = news.fLinkText;
 
@@ -401,7 +400,7 @@ public class News extends AbstractEntity implements INews {
     fLock.acquireReadLock();
     try {
       if (fLabels == null)
-        return Collections.emptySet();
+        return new HashSet<ILabel>(0);
       return new HashSet<ILabel>(fLabels);
     } finally {
       fLock.releaseReadLock();
@@ -441,7 +440,7 @@ public class News extends AbstractEntity implements INews {
     fLock.acquireReadLock();
     try {
       if (fAttachments == null)
-        return Collections.emptyList();
+        return new ArrayList<IAttachment>(0);
       return new ArrayList<IAttachment>(fAttachments);
     } finally {
       fLock.releaseReadLock();
@@ -776,7 +775,7 @@ public class News extends AbstractEntity implements INews {
     fLock.acquireReadLock();
     try {
       if (fCategories == null)
-        return Collections.emptyList();
+        return new ArrayList<ICategory>(0);
       return new ArrayList<ICategory>(fCategories);
     } finally {
       fLock.releaseReadLock();

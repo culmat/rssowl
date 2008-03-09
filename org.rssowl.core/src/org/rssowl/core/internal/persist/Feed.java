@@ -41,7 +41,6 @@ import java.net.URI;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.EnumMap;
@@ -650,7 +649,7 @@ public class Feed extends AbstractEntity implements IFeed {
    */
   public synchronized List<ICategory> getCategories() {
     if (fCategories == null)
-      return Collections.emptyList();
+      return new ArrayList<ICategory>(0);
 
     return new ArrayList<ICategory>(fCategories);
   }
