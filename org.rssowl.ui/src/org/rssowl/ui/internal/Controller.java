@@ -746,8 +746,8 @@ public class Controller {
       });
     }
 
-    /* Delete hidden News from previous Session */
-    DynamicDAO.getDAO(INewsDAO.class).delete(EnumSet.of(INews.State.HIDDEN));
+    /* Set hidden News from previous Session to deleted */
+    DynamicDAO.getDAO(INewsDAO.class).setState(EnumSet.of(INews.State.HIDDEN), INews.State.DELETED, false);
 
     /* Create the Notification Service */
     if (!InternalOwl.TESTING)
