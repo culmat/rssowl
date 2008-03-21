@@ -291,27 +291,28 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
     }
   }
 
-  public void delete(Set<INews.State> states) {
-    Assert.isNotNull(states, "states");
-    if (states.isEmpty())
+  public void setState(Set<State> originalStates, State state, boolean affectEquivalentNews) throws PersistenceException {
+    Assert.isNotNull(originalStates, "states");
+    Assert.isNotNull(state, "state");
+    if (originalStates.isEmpty())
       return;
 
     try {
       Query query = fDb.query();
       query.constrain(News.class);
-      if (!states.containsAll(EnumSet.allOf(INews.State.class))) {
+      if (!originalStates.containsAll(EnumSet.allOf(INews.State.class))) {
         Constraint constraint = null;
-        for (INews.State state : states) {
+        for (INews.State originalState : originalStates) {
           if (constraint == null)
-            constraint = query.descend("fStateOrdinal").constrain(state.ordinal());
+            constraint = query.descend("fStateOrdinal").constrain(originalState.ordinal());
           else
-            constraint = query.descend("fStateOrdinal").constrain(state.ordinal()).or(constraint);
+            constraint = query.descend("fStateOrdinal").constrain(originalState.ordinal()).or(constraint);
         }
       }
 
       Collection<INews> news = getList(query);
       activateAll(news);
-      deleteAll(news);
+      setState(news, state, affectEquivalentNews, false);
     } catch (Db4oException e) {
       throw DBHelper.rollbackAndPE(fDb, e);
     }

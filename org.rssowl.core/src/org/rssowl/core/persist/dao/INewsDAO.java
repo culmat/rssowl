@@ -72,10 +72,15 @@ public interface INewsDAO extends IEntityDAO<INews, NewsListener, NewsEvent> {
   Collection<INews> loadAll(FeedLinkReference feedRef, Set<INews.State> states);
 
   /**
-   * Deletes all the news from the system whose state is equal to one of the
-   * elements in {@code states}.
+   * Finds all the news from the system whose state is equal to one of the
+   * elements in {@code states}, changes their state to {@code state} and saves
+   * them.
    *
-   * @param states The state of the news to be deleted.
+   * @param originalStates The state of the news whose state should be changed.
+   * @param state The state to set the news items to.
+   * @param affectEquivalentNews If set to <code>TRUE</code> the state of
+   * equivalent news in other feeds will also be changed to <code>state</code>
+   * @throws PersistenceException
    */
-  void delete(Set<INews.State> states);
+  void setState(Set<INews.State> originalStates, INews.State state, boolean affectEquivalentNews) throws PersistenceException;
 }
