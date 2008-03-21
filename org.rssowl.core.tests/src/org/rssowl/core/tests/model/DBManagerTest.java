@@ -142,7 +142,7 @@ public class DBManagerTest {
   }
 
   /**
-   * Tests that {@link INewsDAO#delete(Set)} works correctly.
+   * Tests that {@link INewsDAO#setState(Set, State, boolean)} works correctly.
    * @throws Exception s
    */
   @Test
@@ -177,34 +177,33 @@ public class DBManagerTest {
     final Set<NewsEvent> newsEvents = new HashSet<NewsEvent>();
     NewsListener newsListener = new NewsListener() {
       public void entitiesAdded(Set<NewsEvent> events) {
-        fail("Only delete events expected");
+        fail("Only update events expected");
       }
 
       public void entitiesDeleted(Set<NewsEvent> events) {
-        newsEvents.addAll(events);
+        fail("Only update events expected");
       }
 
       public void entitiesUpdated(Set<NewsEvent> events) {
-        fail("Only delete events expected");
+        newsEvents.addAll(events);
       }
     };
     DynamicDAO.addEntityListener(INews.class, newsListener);
     try {
-      fNewsDAO.delete(EnumSet.of(INews.State.HIDDEN));
+      fNewsDAO.setState(EnumSet.of(INews.State.HIDDEN), INews.State.DELETED, false);
       assertEquals(2, newsEvents.size());
       for (NewsEvent newsEvent : newsEvents) {
         String guid = newsEvent.getEntity().getGuid().getValue();
+        assertEquals(INews.State.DELETED, newsEvent.getEntity().getState());
         assertEquals(true, guid.equals(news0Guid) || guid.equals(news2Guid));
       }
 
       IFeedDAO feedDao = DynamicDAO.getDAO(IFeedDAO.class);
       feed = feedDao.load(new URI(feed0Link));
-      assertEquals(1, feed.getNews().size());
-      assertEquals(news1Guid, feed.getNews().get(0).getGuid().getValue());
+      assertEquals(2, feed.getNews().size());
 
       feed = feedDao.load(new URI(feed1Link));
-      assertEquals(1, feed.getNews().size());
-      assertEquals(news3Guid, feed.getNews().get(0).getGuid().getValue());
+      assertEquals(2, feed.getNews().size());
     } finally {
       DynamicDAO.removeEntityListener(INews.class, newsListener);
     }
