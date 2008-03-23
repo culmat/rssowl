@@ -406,6 +406,7 @@ public class DBManager {
       }
     };
     Migration migration = new Migrations().getMigration(workspaceFormat, currentFormat);
+    //FIXME Add Better message for this case.
     if (migration == null) {
       throw new PersistenceException("No migration found for originFormat: " + workspaceFormat + ", and destinationFormat: " + currentFormat);
     }
@@ -461,6 +462,10 @@ public class DBManager {
     /* Finally, rename the actual db file */
     DBHelper.rename(migDbFile, dbFile);
 
+    //TODO Remove this after M9
+    if (getOldDBFormatFile().exists())
+      getOldDBFormatFile().delete();
+
     return migrationResult;
   }
 
@@ -475,7 +480,8 @@ public class DBManager {
     File formatFile = getDBFormatFile();
     boolean formatFileExists = formatFile.exists();
 
-    //TODO Remove this after M8 release
+    //TODO Remove this after M9 release and change the code to assume that if
+    //no format2 file exists, then the version is lower than M8
     if (!formatFileExists && getOldDBFormatFile().exists()) {
       BufferedReader reader = null;
       try {
@@ -488,7 +494,6 @@ public class DBManager {
       } finally {
         DBHelper.closeQuietly(reader);
       }
-      getOldDBFormatFile().delete();
     }
 
     if (dbFileExists) {
