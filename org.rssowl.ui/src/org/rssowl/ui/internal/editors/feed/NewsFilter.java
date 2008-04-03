@@ -375,6 +375,10 @@ public class NewsFilter extends ViewerFilter {
   private List<SearchHit<NewsReference>> cacheMatchingNews(String pattern) {
     List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(2);
 
+    /* Explicitly return on empty String */
+    if (!StringUtils.isSet(pattern))
+      return Collections.emptyList();
+
     /* Convert to Wildcard Query */
     if (!pattern.endsWith("*"))
       pattern = pattern + "*";
