@@ -480,6 +480,69 @@ public class ExpandingReaderTests {
     assertEquals("<a>Foo</a>", result);
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testStarWildcard() throws Exception {
+    String s = "Hello <a>World</a>";
+
+    List<String> words = Arrays.asList("*");
+
+    String preExpand = "(";
+    String postExpand = ")";
+
+    boolean skipTags = true;
+
+    //1
+    ExpandingReader reader = new ExpandingReader(new StringReader(s), words, preExpand, postExpand, skipTags);
+    String result = readFully(reader);
+
+    assertEquals("(Hello) <a>(World)</a>", result);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testQuestionmarkWildcard() throws Exception {
+    String s = "Hello i <a>World</a>";
+
+    List<String> words = Arrays.asList("?");
+
+    String preExpand = "(";
+    String postExpand = ")";
+
+    boolean skipTags = true;
+
+    //1
+    ExpandingReader reader = new ExpandingReader(new StringReader(s), words, preExpand, postExpand, skipTags);
+    String result = readFully(reader);
+
+    assertEquals("Hello (i) <a>World</a>", result);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testWildcards() throws Exception {
+    String s = "Hello <a>World</a>";
+
+    List<String> words = Arrays.asList("*", "?");
+
+    String preExpand = "(";
+    String postExpand = ")";
+
+    boolean skipTags = true;
+
+    //1
+    ExpandingReader reader = new ExpandingReader(new StringReader(s), words, preExpand, postExpand, skipTags);
+    String result = readFully(reader);
+
+    assertEquals("(Hello) <a>(World)</a>", result);
+  }
+
   private String readFully(Reader reader) throws IOException {
     StringBuilder str = new StringBuilder();
 
