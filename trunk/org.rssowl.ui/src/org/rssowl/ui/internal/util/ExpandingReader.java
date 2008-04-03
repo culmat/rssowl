@@ -108,7 +108,7 @@ public class ExpandingReader extends Reader {
         String result = fBuf.toString();
 
         /* Expand if required */
-        if (shouldExpand(result))
+        if (result.length() > 0 && shouldExpand(result))
           result = expand(result);
 
         /* Fill to Pushback Buffer */
