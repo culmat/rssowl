@@ -105,7 +105,7 @@ public final class BackupService {
   public BackupService(File fileToBackup, String backupFileSuffix, int maxBackupsCount,
       File backupTimestampFile, Long backupFrequency) {
     Assert.isNotNull(fileToBackup, "fileToBackup");
-    Assert.isLegal(fileToBackup.isFile(), "fileToBackup must be a file");
+    Assert.isLegal(fileToBackup.isFile(), "fileToBackup must be a file: " + fileToBackup.getAbsolutePath());
     Assert.isLegal(backupFileSuffix  != null && backupFileSuffix.length() > 0, "backupSuffix should contain a non-empty String");
     Assert.isLegal(maxBackupsCount > 0, "filesKeptCount should be higher than 0");
     if (backupFrequency != null)
