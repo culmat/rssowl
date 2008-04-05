@@ -311,7 +311,7 @@ public class DBManager {
    * @return the path to the db file.
    */
   public static final String getDBFilePath() {
-    String filePath = Activator.getDefault().getStateLocation().toOSString() + File.pathSeparator + "rssowl.db"; //$NON-NLS-1$
+    String filePath = Activator.getDefault().getStateLocation().toOSString() + File.separator + "rssowl.db"; //$NON-NLS-1$
     return filePath;
   }
 
