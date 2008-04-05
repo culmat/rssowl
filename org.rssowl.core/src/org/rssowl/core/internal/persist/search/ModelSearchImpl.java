@@ -48,6 +48,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery.TooManyClauses;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.LockFactory;
@@ -487,6 +488,8 @@ public class ModelSearchImpl implements IModelSearch {
       }
     } catch (IOException e) {
       throw new PersistenceException("Error searching news", e);
+    } catch (TooManyClauses e) {
+      throw new PersistenceException("Please avoid using the wildcards '*' and '?' as standalone terms.", e);
     }
   }
 
