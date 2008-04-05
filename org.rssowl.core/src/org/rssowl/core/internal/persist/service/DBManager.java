@@ -73,6 +73,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -603,11 +604,17 @@ public class DBManager {
     monitor.worked(15);
 
     for (NewsBin newsBin : sourceDb.query(NewsBin.class)) {
+      sourceDb.activate(newsBin, Integer.MAX_VALUE);
       for (NewsReference newsRef : newsBin.getNewsRefs()) {
         Query query = sourceDb.query();
         query.constrain(News.class);
         query.descend("fId").constrain(newsRef.getId());
-        Object news = query.execute().next();
+        Iterator<?> newsIt = query.execute().iterator();
+        if (!newsIt.hasNext()) {
+          Activator.getDefault().logError("NewsBin " + newsBin + " has reference to news with id: " + newsRef.getId() + ", but that news does not exist.", null);
+          continue;
+        }
+        Object news = newsIt.next();
         sourceDb.activate(news, Integer.MAX_VALUE);
         destinationDb.ext().set(news, Integer.MAX_VALUE);
       }
