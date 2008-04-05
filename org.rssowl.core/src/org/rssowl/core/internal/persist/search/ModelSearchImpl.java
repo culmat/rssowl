@@ -124,6 +124,12 @@ public class ModelSearchImpl implements IModelSearch {
   /* Cached News States */
   private static final INews.State[] NEWS_STATES = INews.State.values();
 
+  /* Wildcard matching any String */
+  private static final char STRING_WILDCARD = '*';
+
+  /* Wildcard matching any Char */
+  private static final char CHAR_WILDCARD = '?';
+
   /* A Set of Stop Words in English */
   private static final Set<String> STOP_WORDS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(StopAnalyzer.ENGLISH_STOP_WORDS)));
 
@@ -164,8 +170,8 @@ public class ModelSearchImpl implements IModelSearch {
   public void shutdown(boolean emergency) throws PersistenceException {
     try {
       /*
-       * Close fIndexer first because it's more important (reduces the chance
-       * of a corrupt index). Can be null if exception thrown during start-up
+       * Close fIndexer first because it's more important (reduces the chance of
+       * a corrupt index). Can be null if exception thrown during start-up
        */
       if (fIndexer != null)
         fIndexer.shutdown(emergency);
@@ -186,8 +192,8 @@ public class ModelSearchImpl implements IModelSearch {
         while (!fSearchers.isEmpty()) {
           try {
             /*
-             * We sleep with a lock held because the Threads that we're
-             * waiting to make progress don't acquire a lock
+             * We sleep with a lock held because the Threads that we're waiting
+             * to make progress don't acquire a lock
              */
             Thread.sleep(50);
           } catch (InterruptedException e) {
@@ -516,7 +522,7 @@ public class ModelSearchImpl implements IModelSearch {
     while ((token = tokenStream.next()) != null) {
       String termText = new String(token.termBuffer(), 0, token.termLength());
 
-      WildcardQuery titleQuery = new WildcardQuery(new Term(titleField, termText));
+      Query titleQuery = createWildcardQuery(titleField, termText);
       allFieldsQuery.add(new BooleanClause(titleQuery, Occur.SHOULD));
     }
 
@@ -526,7 +532,7 @@ public class ModelSearchImpl implements IModelSearch {
     while ((token = tokenStream.next()) != null) {
       String termText = new String(token.termBuffer(), 0, token.termLength());
 
-      WildcardQuery descriptionQuery = new WildcardQuery(new Term(descriptionField, termText));
+      Query descriptionQuery = createWildcardQuery(descriptionField, termText);
       allFieldsQuery.add(new BooleanClause(descriptionQuery, Occur.SHOULD));
     }
 
@@ -536,7 +542,7 @@ public class ModelSearchImpl implements IModelSearch {
     while ((token = tokenStream.next()) != null) {
       String termText = new String(token.termBuffer(), 0, token.termLength());
 
-      WildcardQuery attachmentQuery = new WildcardQuery(new Term(attachmentField, termText));
+      Query attachmentQuery = createWildcardQuery(attachmentField, termText);
       allFieldsQuery.add(new BooleanClause(attachmentQuery, Occur.SHOULD));
     }
 
@@ -550,7 +556,7 @@ public class ModelSearchImpl implements IModelSearch {
       if (!Indexer.DISABLE_STOP_WORDS && STOP_WORDS.contains(termText))
         continue;
 
-      WildcardQuery authorQuery = new WildcardQuery(new Term(authorField, termText));
+      Query authorQuery = createWildcardQuery(authorField, termText);
       allFieldsQuery.add(new BooleanClause(authorQuery, Occur.SHOULD));
     }
 
@@ -564,13 +570,34 @@ public class ModelSearchImpl implements IModelSearch {
       if (!Indexer.DISABLE_STOP_WORDS && STOP_WORDS.contains(termText))
         continue;
 
-      WildcardQuery categoryQuery = new WildcardQuery(new Term(categoryField, termText));
+      Query categoryQuery = createWildcardQuery(categoryField, termText);
       allFieldsQuery.add(new BooleanClause(categoryQuery, Occur.SHOULD));
     }
 
     /* Determine Occur (MUST, SHOULD, MUST NOT) */
     Occur occur = getOccur(condition.getSpecifier(), matchAllConditions);
     return new BooleanClause(allFieldsQuery, occur);
+  }
+
+  /*
+   * Will fallback to a TermQuery if the search-term is not valid for a
+   * WildcardQuery
+   */
+  private Query createWildcardQuery(String field, String term) {
+    if (String.valueOf(INews.LABEL).equals(field) || isValidWildcardTerm(term))
+      return new WildcardQuery(new Term(field, term));
+
+    return new TermQuery(new Term(field, term));
+  }
+
+  private boolean isValidWildcardTerm(String term) {
+    for (int i = 0; i < term.length(); i++) {
+      char charAtIndex = term.charAt(i);
+      if (charAtIndex != STRING_WILDCARD && charAtIndex != CHAR_WILDCARD)
+        return true;
+    }
+
+    return false;
   }
 
   private BooleanClause createBooleanClause(Analyzer analyzer, ISearchCondition condition, boolean matchAllConditions) throws IOException {
@@ -748,8 +775,7 @@ public class ModelSearchImpl implements IModelSearch {
       /* Create Wildcard-Query */
       case IS:
       case IS_NOT: {
-        Term term = new Term(fieldname, value.toLowerCase());
-        return new WildcardQuery(term);
+        return createWildcardQuery(fieldname, value.toLowerCase());
       }
 
         /* Let Query-Parser handle this */
@@ -768,16 +794,13 @@ public class ModelSearchImpl implements IModelSearch {
         /* Wildcard-Query with trailing '*' */
       case BEGINS_WITH: {
         value = value.toLowerCase() + "*";
-        Term term = new Term(fieldname, value);
-        WildcardQuery query = new WildcardQuery(term);
-        return query;
+        return createWildcardQuery(fieldname, value);
       }
 
         /* Wildcard-Query with leading '*' */
       case ENDS_WITH: {
         value = "*" + value.toLowerCase();
-        Term term = new Term(fieldname, value);
-        return new WildcardQuery(term);
+        return createWildcardQuery(fieldname, value);
       }
 
         /* Fuzzy Query */
