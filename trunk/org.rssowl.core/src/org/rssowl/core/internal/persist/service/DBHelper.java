@@ -436,8 +436,10 @@ public final class DBHelper {
   static void removeNews(ObjectContainer db, Set<FeedLinkReference> feedRefs, Collection<NewsReference> newsRefs) {
     for (NewsReference newsRef : newsRefs) {
       INews news = newsRef.resolve();
-      feedRefs.add(news.getFeedReference());
-      db.delete(news);
+      if (news != null) {
+        feedRefs.add(news.getFeedReference());
+        db.delete(news);
+      }
     }
   }
 
