@@ -537,10 +537,10 @@ public class DBManager {
     if (!defragmentFile.exists()) {
       return false;
     }
-    defragment(progressMonitor, subMonitor);
     if (!defragmentFile.delete()) {
       Activator.getDefault().logError("Failed to delete defragment file", null);
     }
+    defragment(progressMonitor, subMonitor);
     return true;
   }
 
