@@ -117,6 +117,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.core.util.StringUtils;
@@ -1021,56 +1022,67 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     JobRunner.runUIUpdater(new UIBackgroundJob(getShell()) {
       private List<ScoredNews> fResult = null;
+      private Exception fException = null;
 
       @Override
       protected void runInBackground(IProgressMonitor monitor) {
 
         /* Perform Search in the Background */
-        List<SearchHit<NewsReference>> searchHits = fModelSearch.searchNews(fCurrentSearchConditions, matchAllConditions);
-        fResult = new ArrayList<ScoredNews>(searchHits.size());
+        try {
+          List<SearchHit<NewsReference>> searchHits = fModelSearch.searchNews(fCurrentSearchConditions, matchAllConditions);
+          fResult = new ArrayList<ScoredNews>(searchHits.size());
 
-        /* Retrieve maximum raw relevance */
-        Float maxRelevanceScore = 0f;
-        for (SearchHit<NewsReference> searchHit : searchHits) {
-          Float relevanceRaw = searchHit.getRelevance();
-          maxRelevanceScore = Math.max(maxRelevanceScore, relevanceRaw);
+          /* Retrieve maximum raw relevance */
+          Float maxRelevanceScore = 0f;
+          for (SearchHit<NewsReference> searchHit : searchHits) {
+            Float relevanceRaw = searchHit.getRelevance();
+            maxRelevanceScore = Math.max(maxRelevanceScore, relevanceRaw);
+          }
+
+          /* Calculate Thresholds */
+          Float mediumRelThreshold = maxRelevanceScore / 3f * 1f;
+          Float highRelThreshold = maxRelevanceScore / 3f * 2f;
+
+          Set<State> visibleStates = State.getVisible();
+
+          /* Fill Results with Relevance */
+          for (SearchHit<NewsReference> searchHit : searchHits) {
+
+            /* Only add visible News for now */
+            INews.State state = (State) searchHit.getData(INews.STATE);
+            if (!visibleStates.contains(state))
+              continue;
+
+            /* TODO Have to test if Entity really exists (bug 337) */
+            if (!fNewsDao.exists(searchHit.getResult().getId()))
+              continue;
+
+            Float relevanceRaw = searchHit.getRelevance();
+            Relevance relevance = Relevance.LOW;
+            if (relevanceRaw > highRelThreshold)
+              relevance = Relevance.HIGH;
+            else if (relevanceRaw > mediumRelThreshold)
+              relevance = Relevance.MEDIUM;
+
+            /* Add to result */
+            fResult.add(new ScoredNews(searchHit.getResult(), state, relevanceRaw, relevance));
+          }
+
+          /* Preload some results that are known to be shown initially */
+          preload(fResult);
+        } catch (PersistenceException e) {
+          fException= e;
         }
-
-        /* Calculate Thresholds */
-        Float mediumRelThreshold = maxRelevanceScore / 3f * 1f;
-        Float highRelThreshold = maxRelevanceScore / 3f * 2f;
-
-        Set<State> visibleStates = State.getVisible();
-
-        /* Fill Results with Relevance */
-        for (SearchHit<NewsReference> searchHit : searchHits) {
-
-          /* Only add visible News for now */
-          INews.State state = (State) searchHit.getData(INews.STATE);
-          if (!visibleStates.contains(state))
-            continue;
-
-          /* TODO Have to test if Entity really exists (bug 337) */
-          if (!fNewsDao.exists(searchHit.getResult().getId()))
-            continue;
-
-          Float relevanceRaw = searchHit.getRelevance();
-          Relevance relevance = Relevance.LOW;
-          if (relevanceRaw > highRelThreshold)
-            relevance = Relevance.HIGH;
-          else if (relevanceRaw > mediumRelThreshold)
-            relevance = Relevance.MEDIUM;
-
-          /* Add to result */
-          fResult.add(new ScoredNews(searchHit.getResult(), state, relevanceRaw, relevance));
-        }
-
-        /* Preload some results that are known to be shown initially */
-        preload(fResult);
       }
 
       @Override
       protected void runInUI(IProgressMonitor monitor) {
+
+        /* Check for error first */
+        if (fException != null) {
+          setErrorMessage(fException.getMessage());
+          fResult= Collections.emptyList();
+        }
 
         /* Set Input (sorted) to Viewer */
         fResultViewer.setInput(fResult);
