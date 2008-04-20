@@ -273,4 +273,11 @@ public final class NewsContainer {
     }
     return changed;
   }
+
+  public void removeNewsRefs(List<NewsReference> newsRefs) {
+    for (LongArrayList list : fNewsIds) {
+      for (NewsReference newsRef : newsRefs)
+        list.removeByElement(newsRef.getId());
+    }
+  }
 }

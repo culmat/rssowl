@@ -603,8 +603,14 @@ public class DBManager {
     }
     monitor.worked(15);
 
-    for (NewsBin newsBin : sourceDb.query(NewsBin.class)) {
-      sourceDb.activate(newsBin, Integer.MAX_VALUE);
+    /*
+     * We use destinationDb for the query here because we have already copied
+     * the NewsBins at this stage and we may need to fix the NewsBin in case
+     * it contains stale news refs.
+     */
+    for (NewsBin newsBin : destinationDb.query(NewsBin.class)) {
+      destinationDb.activate(newsBin, Integer.MAX_VALUE);
+      List<NewsReference> staleNewsRefs = new ArrayList<NewsReference>(0);
       for (NewsReference newsRef : newsBin.getNewsRefs()) {
         Query query = sourceDb.query();
         query.constrain(News.class);
@@ -612,11 +618,16 @@ public class DBManager {
         Iterator<?> newsIt = query.execute().iterator();
         if (!newsIt.hasNext()) {
           Activator.getDefault().logError("NewsBin " + newsBin + " has reference to news with id: " + newsRef.getId() + ", but that news does not exist.", null);
+          staleNewsRefs.add(newsRef);
           continue;
         }
         Object news = newsIt.next();
         sourceDb.activate(news, Integer.MAX_VALUE);
         destinationDb.ext().set(news, Integer.MAX_VALUE);
+      }
+      if (!staleNewsRefs.isEmpty()) {
+        newsBin.removeNewsRefs(staleNewsRefs);
+        destinationDb.ext().set(newsBin, Integer.MAX_VALUE);
       }
     }
 
