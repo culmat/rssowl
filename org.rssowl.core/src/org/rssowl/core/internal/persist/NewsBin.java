@@ -89,6 +89,16 @@ public class NewsBin extends Mark implements INewsBin   {
     fNewsContainer.removeNews(news);
   }
 
+  /**
+   * Removes each NewsReference contained in this NewsBin that matches any of
+   * the ones in {@code newsRefs}. This method is not exposed in the INewsBin
+   * interface because it should only be used in rare cases.
+   * @param newsRefs
+   */
+  public synchronized void removeNewsRefs(List<NewsReference> newsRefs) {
+    fNewsContainer.removeNewsRefs(newsRefs);
+  }
+
   public synchronized List<INews> getNews() {
     return getNews(EnumSet.allOf(INews.State.class));
   }
