@@ -566,6 +566,7 @@ public class DBManager {
     File file = new File(getDBFilePath());
     File defragmentedFile = backupService.getTempBackupFile();
     copyDatabase(file, defragmentedFile, monitor);
+    backupService.backup(true);
     DBHelper.rename(defragmentedFile, file);
   }
 
