@@ -26,6 +26,8 @@ package org.rssowl.ui.internal;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.statushandlers.StatusAdapter;
 import org.eclipse.ui.statushandlers.WorkbenchErrorHandler;
 import org.rssowl.core.persist.service.PersistenceException;
@@ -79,10 +81,30 @@ public class DefaultStatusHandler extends WorkbenchErrorHandler {
     });
   }
 
+  private void emergencyClose() {
+    ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor.getWindowConfigurer().getWorkbenchConfigurer().emergencyClose();
+  }
+
   private void handleOutOfMemoryError(final OutOfMemoryError error) {
     JobRunner.runInUIThread(null, new Runnable() {
       public void run() {
-        ErrorDialog.openError(OwlUI.getPrimaryShell(), "Error", "RSSOwl has run out of memory. This should not happen under normal circumstances, but it can happen when a very high number of news got downloaded. You can solve this issue by setting the -Xmx value inside RSSOwl.ini to a higher value. Find this file in the installation directory of RSSOwl.", Activator.getDefault().createErrorStatus(error.getMessage()));
+        try {
+          ErrorDialog dialog = new ErrorDialog(OwlUI.getPrimaryShell(), "Error", "RSSOwl has run out of memory. This should not happen under normal circumstances, but it can happen when a very high number of news got downloaded. You can solve this issue by setting the -Xmx value inside RSSOwl.ini to a higher value. Find this file in the installation directory of RSSOwl.\n\nDo you want to exit the application?", Activator.getDefault().createErrorStatus(error.getMessage()), IStatus.OK | IStatus.INFO | IStatus.WARNING | IStatus.ERROR) {
+            @Override
+            protected void createButtonsForButtonBar(Composite parent) {
+              createButton(parent, IDialogConstants.OK_ID, IDialogConstants.YES_LABEL, true);
+              createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.NO_LABEL, false);
+            }
+          };
+
+          if (dialog.open() == IDialogConstants.OK_ID)
+            emergencyClose();
+        }
+
+        /* Serious problem - emergency close */
+        catch (Error err) {
+          emergencyClose();
+        }
       }
     });
   }
