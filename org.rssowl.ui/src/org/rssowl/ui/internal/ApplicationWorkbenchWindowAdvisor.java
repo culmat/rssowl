@@ -573,4 +573,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       }
     });
   }
+
+  /*
+   * @see org.eclipse.ui.application.WorkbenchWindowAdvisor#getWindowConfigurer()
+   */
+  @Override
+  public IWorkbenchWindowConfigurer getWindowConfigurer() {
+    return super.getWindowConfigurer();
+  }
 }
