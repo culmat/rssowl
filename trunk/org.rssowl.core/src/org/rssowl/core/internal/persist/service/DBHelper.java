@@ -141,6 +141,31 @@ public final class DBHelper {
       }
 
     } catch (IOException e) {
+      Activator.getDefault().logError("Failed to copy file using NIO. Falling " +
+      		"back to traditional IO", e);
+      copyFileWithoutNio(originFile, destinationFile);
+    } finally {
+      closeQuietly(inputStream);
+      closeQuietly(outputStream);
+    }
+  }
+
+  private static void copyFileWithoutNio(File originFile, File destinationFile) {
+    FileInputStream inputStream = null;
+    FileOutputStream outputStream = null;
+    try {
+      inputStream = new FileInputStream(originFile);
+
+      if (!destinationFile.exists())
+        destinationFile.createNewFile();
+      outputStream = new FileOutputStream(destinationFile);
+
+      byte[] buf = new byte[8192];
+      int i = 0;
+      while ((i = inputStream.read(buf)) != -1) {
+        outputStream.write(buf, 0, i);
+      }
+    } catch (IOException e) {
       throw new PersistenceException(e);
     } finally {
       closeQuietly(inputStream);
