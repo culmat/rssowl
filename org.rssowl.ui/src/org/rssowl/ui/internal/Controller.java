@@ -747,7 +747,11 @@ public class Controller {
     }
 
     /* Set hidden News from previous Session to deleted */
-    DynamicDAO.getDAO(INewsDAO.class).setState(EnumSet.of(INews.State.HIDDEN), INews.State.DELETED, false);
+    SafeRunner.run(new LoggingSafeRunnable() {
+      public void run() throws Exception {
+        DynamicDAO.getDAO(INewsDAO.class).setState(EnumSet.of(INews.State.HIDDEN), INews.State.DELETED, false);
+      }
+    });
 
     /* Create the Notification Service */
     if (!InternalOwl.TESTING)
