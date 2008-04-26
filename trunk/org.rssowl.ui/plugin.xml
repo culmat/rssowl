@@ -670,7 +670,7 @@
                value="icons/product/16x16.gif,icons/product/32x32.gif,icons/product/48x48.gif,icons/product/64x64.gif,icons/product/128x128.gif"/>
          <property
                name="aboutText"
-               value="RSSOwl 2.0&#x0D;&#x0A;&#x0D;&#x0A;Version: 2.0.0&#x0D;&#x0A;Build id: Milestone 9 Nightly&#x0D;&#x0A;&#x0D;&#x0A;(c) Copyright RSSOwl contributors and others 2005, 2008.  All rights reserved.&#x0D;&#x0A;Visit http://www.rssowl.org"/>
+               value="RSSOwl 2.0&#x0D;&#x0A;&#x0D;&#x0A;Version: 2.0.0&#x0D;&#x0A;Build id: Milestone 9 (Nightly)&#x0D;&#x0A;&#x0D;&#x0A;(c) Copyright RSSOwl contributors and others 2005, 2008.  All rights reserved.&#x0D;&#x0A;Visit http://www.rssowl.org"/>
          <property
                name="preferenceCustomization"
                value="preferences.ini"/>
