@@ -355,7 +355,8 @@ public class DBManager {
 
       startupStatus = createObjectContainer(config);
 
-      fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
+      if (startupStatus.isOK())
+        fireDatabaseEvent(new DatabaseEvent(fObjectContainer, fLock), true);
 
       boolean shouldReindex = shouldReindex(migrationResult, startupStatus);
       if (subMonitor == null && shouldReindex) {
