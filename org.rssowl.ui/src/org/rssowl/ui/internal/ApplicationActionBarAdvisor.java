@@ -37,6 +37,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
@@ -326,7 +327,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         });
 
         /* Toggle State of Bookmarks Visibility */
-        manager.add(new Separator());
         manager.add(new Action("Bookmarks", IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
@@ -356,6 +356,39 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
               return page.findView(BookMarkExplorer.VIEW_ID) != null;
 
             return false;
+          }
+        });
+
+        /* Fullscreen Mode */
+        manager.add(new Separator());
+        manager.add(new Action("Full Screen", IAction.AS_CHECK_BOX) {
+          @Override
+          public void run() {
+            Shell shell = OwlUI.getActiveShell();
+            if (shell != null) {
+              shell.setFullScreen(!shell.getFullScreen());
+              if (!shell.getFullScreen())
+                shell.layout(true, true); //Need to layout to avoid screen cheese
+            }
+          }
+
+          @Override
+          public String getActionDefinitionId() {
+            return "org.rssowl.ui.FullScreenCommand";
+          }
+
+          @Override
+          public String getId() {
+            return "org.rssowl.ui.FullScreenCommand";
+          }
+
+          @Override
+          public boolean isChecked() {
+            Shell shell = OwlUI.getActiveShell();
+            if (shell != null)
+              return shell.getFullScreen();
+
+            return super.isChecked();
           }
         });
 
