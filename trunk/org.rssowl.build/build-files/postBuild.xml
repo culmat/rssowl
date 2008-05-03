@@ -9,13 +9,13 @@
     	<property name="UpdateSiteFinalLocation" value="${buildResultsDirectory}/../updateSite"/>
     	<property name="siteXmlFile" value="${UpdateSiteStagingLocation}/site.xml"/>
     	
-        <antcall target="-generateUpdateSite"/>
+      <!--  <antcall target="-generateUpdateSite"/>
     	<antcall target="-createNightlyBuildSiteXml"/>
     	<copy todir="${UpdateSiteFinalLocation}">
     		<fileset dir="${UpdateSiteStagingLocation}" includes="**"/>
     	</copy>
     	<zip destfile="${buildResultsDirectory}/updateSite-${version.full}.zip" basedir="${UpdateSiteStagingLocation}"/>
-    	<delete dir="${UpdateSiteStagingLocation}/../.." includes="tmpUpdateSite/**" includeemptydirs="true"/>
+    	<delete dir="${UpdateSiteStagingLocation}/../.." includes="tmpUpdateSite/**" includeemptydirs="true"/>-->
     </target>
     
     <!--======================================================-->
