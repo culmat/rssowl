@@ -58,6 +58,7 @@ import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkLabelProvider;
@@ -263,7 +264,7 @@ public class LocationConditionControl extends Composite {
       selectAll.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
-          fViewer.setAllChecked(true);
+          OwlUI.setAllChecked(fViewer.getTree(), true);
         }
       });
 
@@ -273,7 +274,7 @@ public class LocationConditionControl extends Composite {
       deselectAll.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
-          fViewer.setAllChecked(false);
+          OwlUI.setAllChecked(fViewer.getTree(), false);
         }
       });
 
