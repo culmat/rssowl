@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?pde version="3.1"?>
+<?pde version="3.4"?>
 
 <product name="RSSOwl" id="org.rssowl.ui.product" application="org.rssowl.ui.rssowl" useFeatures="true">
 
    <aboutInfo>
       <image path="/org.rssowl.ui/icons/product/about.gif"/>
       <text>
-         RSSOwl 2.0 Preview
+         RSSOwl 2.0
 
 Version: 2.0.0
 Build id: Milestone 9 (Nightly)
@@ -16,7 +16,12 @@ Visit http://www.rssowl.org
       </text>
    </aboutInfo>
 
-   <configIni use="custom" path="/org.rssowl.ui/config.ini"/>
+   <configIni use="default">
+      <linux>/org.rssowl.ui/config.ini</linux>
+      <macosx>/org.rssowl.ui/config.ini</macosx>
+      <solaris>/org.rssowl.ui/config.ini</solaris>
+      <win32>/org.rssowl.ui/config.ini</win32>
+   </configIni>
 
    <launcherArgs>
       <vmArgs>-Xms15m -Xmx192m -Dosgi.requiredJavaVersion=1.5</vmArgs>
@@ -80,8 +85,8 @@ Visit http://www.rssowl.org
    </plugins>
 
    <features>
+      <feature id="org.eclipse.rcp" version="3.4.0.v20080324a-989JERhEjzvdtz-riwWN80OEB"/>
       <feature id="org.rssowl" version="2.0.0.qualifier"/>
-      <feature id="org.eclipse.rcp" version="3.3.3.r33x_r20080129-8y8eE9UEUWI6qujeED0xT7bc"/>
    </features>
 
 </product>
