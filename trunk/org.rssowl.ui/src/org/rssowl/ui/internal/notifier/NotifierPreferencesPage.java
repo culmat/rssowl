@@ -133,6 +133,7 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
     fViewer = new CheckboxTreeViewer(container, SWT.BORDER);
     fViewer.setAutoExpandLevel(2);
     fViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    ((GridData)fViewer.getTree().getLayoutData()).heightHint= 200;
     fViewer.getTree().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
 
     /* Sort by Name if set so */
