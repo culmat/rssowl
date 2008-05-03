@@ -29,7 +29,6 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
@@ -93,19 +92,11 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
     dialog.setText("Export all Feeds to OPML");
     dialog.setFilterExtensions(new String[] { "*.opml", "*.xml", "*.*" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     dialog.setFileName("feeds.opml");
+    dialog.setOverwrite(true);
     String string = dialog.open();
     if (string != null) {
       try {
         File file = new File(string);
-
-        /* Ask for Confirmation if file exists */
-        if (file.exists()) {
-          MessageBox box = new MessageBox(fShell, SWT.ICON_WARNING | SWT.YES | SWT.NO);
-          box.setMessage("The folder already contains a file named '" + file.getName() + "'.\n\nReplace the existing file?");
-          box.setText("Confirm Replace");
-          if (box.open() != SWT.YES)
-            return;
-        }
 
         /* Proceed Exporting */
         Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();;
