@@ -58,6 +58,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.URLTransfer;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
@@ -364,8 +365,8 @@ public class BookMarkExplorer extends ViewPart {
   }
 
   private void initDragAndDrop() {
-    int ops = DND.DROP_COPY | DND.DROP_MOVE;
-    Transfer[] transfers = new Transfer[] { LocalSelectionTransfer.getTransfer(), TextTransfer.getInstance() };
+    int ops = DND.DROP_COPY | DND.DROP_MOVE | DND.DROP_LINK;
+    Transfer[] transfers = new Transfer[] { LocalSelectionTransfer.getTransfer(), TextTransfer.getInstance(), URLTransfer.getInstance() };
     BookMarkDNDImpl bookmarkDND = new BookMarkDNDImpl(this, fViewer);
 
     /* Drag Support */
