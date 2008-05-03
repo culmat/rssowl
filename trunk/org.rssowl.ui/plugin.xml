@@ -655,6 +655,13 @@
             id="org.rssowl.ui.AggregateFolderAction"
             name="Aggregate Feeds">
       </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.handler.ToggleFullScreenHandler"
+            description="Toggle Full Screen"
+            id="org.rssowl.ui.FullScreenCommand"
+            name="Toggle Full Screen">
+      </command>
    </extension>
    <extension
          id="product"
@@ -762,6 +769,12 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.rssowl.ui.KeyScheme"
             sequence="M1+Y">
+      </key>
+      <key
+            commandId="org.rssowl.ui.FullScreenCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="F11">
       </key>
    </extension>
    <extension

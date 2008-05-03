@@ -27,26 +27,27 @@ package org.rssowl.ui.internal.handler;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.IHandler;
-import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.swt.widgets.Shell;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 
 /**
  * This {@link IHandler} is required to support key-bindings for programmatic
- * added actions like the {@link ToggleReadStateAction}.
+ * added actions.
  *
  * @author bpasero
  */
-public class ToggleReadStateHandler extends AbstractHandler {
+public class ToggleFullScreenHandler extends AbstractHandler implements IHandler {
 
   /*
-   * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
+   * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
    */
-  public Object execute(ExecutionEvent arg0) {
-    IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
-
-    if (selection != null)
-      new ToggleReadStateAction(selection).run();
+  public Object execute(ExecutionEvent event) {
+    Shell shell = OwlUI.getActiveShell();
+    if (shell != null) {
+      shell.setFullScreen(!shell.getFullScreen());
+      if (!shell.getFullScreen())
+        shell.layout(true, true); //Need to layout to avoid screen cheese
+    }
 
     return null; //As per JavaDoc
   }
