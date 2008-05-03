@@ -51,7 +51,6 @@ public class LabelNewsHandler extends AbstractHandler {
   /*
    * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
    */
-  @Override
   public Object execute(ExecutionEvent event) {
     IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
 
