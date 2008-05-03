@@ -67,6 +67,9 @@ public class MigrationsTest {
     }
   }
 
+  /**
+   * Test if no migration is possible
+   */
   @Test
   public void testNoMigrationPossible() {
     Migrations migrations = new Migrations(new MigrationImpl(2, 3), new MigrationImpl(3, 4));
