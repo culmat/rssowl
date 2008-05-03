@@ -121,7 +121,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     /* Menu: File */
     register(ActionFactory.CLOSE.create(window)); // TODO ActionSet?
     register(ActionFactory.CLOSE_ALL.create(window)); // TODO ActionSet?
-    register(ActionFactory.SAVE_AS.create(window)); // TODO ActionSet?
     register(ActionFactory.PRINT.create(window)); // TODO ActionSet?
     register(ActionFactory.QUIT.create(window));
 
@@ -218,9 +217,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     fileMenu.add(getAction(ActionFactory.CLOSE.getId()));
     fileMenu.add(getAction(ActionFactory.CLOSE_ALL.getId()));
     fileMenu.add(new GroupMarker(IWorkbenchActionConstants.CLOSE_EXT));
-    fileMenu.add(new Separator());
-    fileMenu.add(getAction(ActionFactory.SAVE_AS.getId()));
-    fileMenu.add(new GroupMarker(IWorkbenchActionConstants.SAVE_EXT));
     fileMenu.add(new Separator());
     fileMenu.add(getAction(ActionFactory.PRINT.getId()));
 
