@@ -38,6 +38,7 @@ import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.TransferData;
+import org.eclipse.swt.dnd.URLTransfer;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
@@ -138,6 +139,10 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
         /* Set Text using TextTransfer */
         else if (TextTransfer.getInstance().isSupportedType(event.dataType))
           setTextData(event);
+
+        /* Set Text using URLTranser */
+        else if (URLTransfer.getInstance().isSupportedType(event.dataType))
+          setURLData(event);
       }
     });
   }
@@ -165,6 +170,23 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       else if (selectedObject instanceof EntityGroup) {
         EntityGroup entitygroup = (EntityGroup) selectedObject;
         str.append(entitygroup.getName()).append("\n");
+      }
+    }
+
+    if (str.length() > 0)
+      event.data = str.toString();
+  }
+
+  private void setURLData(DragSourceEvent event) {
+    StringBuilder str = new StringBuilder("");
+    IStructuredSelection selection = (IStructuredSelection) getViewer().getSelection();
+    List<?> selectedObjects = selection.toList();
+    for (Object selectedObject : selectedObjects) {
+
+      /* IBookMark */
+      if (selectedObject instanceof IBookMark) {
+        IBookMark bookmark = (IBookMark) selectedObject;
+        str.append(bookmark.getFeedLinkReference().getLinkAsText()).append("\n");
       }
     }
 
@@ -217,8 +239,8 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       event.feedback &= ~DND.FEEDBACK_INSERT_BEFORE;
     }
 
-    /* Unset some feedback when Text-Transfer is used */
-    if (TextTransfer.getInstance().isSupportedType(event.currentDataType)) {
+    /* Unset some feedback when Text- or URLTransfer is used */
+    if (TextTransfer.getInstance().isSupportedType(event.currentDataType) || URLTransfer.getInstance().isSupportedType(event.currentDataType)) {
       event.feedback &= ~DND.FEEDBACK_INSERT_AFTER;
       event.feedback &= ~DND.FEEDBACK_INSERT_BEFORE;
     }

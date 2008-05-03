@@ -59,6 +59,7 @@ import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.URLTransfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Cursor;
@@ -334,7 +335,7 @@ public class NewsTableControl implements IFeedViewPart {
 
   private void initDragAndDrop() {
     int ops = DND.DROP_COPY | DND.DROP_MOVE;
-    Transfer[] transfers = new Transfer[] { LocalSelectionTransfer.getTransfer(), TextTransfer.getInstance() };
+    Transfer[] transfers = new Transfer[] { LocalSelectionTransfer.getTransfer(), TextTransfer.getInstance(), URLTransfer.getInstance() };
 
     /* Drag Support */
     fViewer.addDragSupport(ops, transfers, new DragSourceListener() {
@@ -356,8 +357,8 @@ public class NewsTableControl implements IFeedViewPart {
             if (LocalSelectionTransfer.getTransfer().isSupportedType(event.dataType))
               event.data = LocalSelectionTransfer.getTransfer().getSelection();
 
-            /* Set Text using TextTransfer */
-            else if (TextTransfer.getInstance().isSupportedType(event.dataType))
+            /* Set Text using Text- or URLTransfer */
+            else if (TextTransfer.getInstance().isSupportedType(event.dataType) || URLTransfer.getInstance().isSupportedType(event.dataType))
               setTextData(event);
           }
         });
