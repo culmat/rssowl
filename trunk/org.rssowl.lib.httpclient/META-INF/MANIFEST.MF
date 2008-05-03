@@ -24,7 +24,7 @@ Export-Package: org.apache.commons.codec,
  org.apache.commons.logging.impl,
  org.rssowl.lib.httpclient.internal
 Bundle-Vendor: RSSOwl.org
-Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.rssowl.lib.httpclient.internal.Activator
 Require-Bundle: org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
