@@ -204,7 +204,7 @@ public class FeedSelectionPage extends WizardPage {
 
     /* Dummy Input */
     fViewer.setInput(new Object());
-    fViewer.setAllChecked(true);
+    OwlUI.setAllChecked(fViewer.getTree(), true);
 
     /* Update Checks on Selection */
     fViewer.getTree().addSelectionListener(new SelectionAdapter() {
@@ -242,7 +242,7 @@ public class FeedSelectionPage extends WizardPage {
     fSelectAll.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        fViewer.setAllChecked(true);
+        OwlUI.setAllChecked(fViewer.getTree(), true);
       }
     });
 
@@ -252,7 +252,7 @@ public class FeedSelectionPage extends WizardPage {
     fDeselectAll.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        fViewer.setAllChecked(false);
+        OwlUI.setAllChecked(fViewer.getTree(), false);
       }
     });
 

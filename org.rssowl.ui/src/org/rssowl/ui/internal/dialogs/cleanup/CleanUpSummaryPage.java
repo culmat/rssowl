@@ -313,7 +313,7 @@ public class CleanUpSummaryPage extends WizardPage {
     fSelectAll.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        fViewer.setAllChecked(true);
+        OwlUI.setAllChecked(fViewer.getTree(), true);
       }
     });
 
@@ -323,7 +323,7 @@ public class CleanUpSummaryPage extends WizardPage {
     fDeselectAll.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        fViewer.setAllChecked(false);
+        OwlUI.setAllChecked(fViewer.getTree(), false);
       }
     });
 
@@ -385,7 +385,7 @@ public class CleanUpSummaryPage extends WizardPage {
       public void run() {
         fViewer.setInput(model.getTasks());
         fViewer.expandAll();
-        fViewer.setAllChecked(true);
+        OwlUI.setAllChecked(fViewer.getTree(), true);
       }
     });
   }

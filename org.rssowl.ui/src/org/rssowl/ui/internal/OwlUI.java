@@ -53,6 +53,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewPart;
@@ -746,8 +748,8 @@ public class OwlUI {
    * Attempts to find the first <code>IWorkbenchWindow</code> from the
    * PlatformUI facade. Otherwise, returns <code>NULL</code> if none.
    *
-   * @return the first <code>IWorkbenchWindow</code> from the PlatformUI
-   * facade or <code>NULL</code> if none.
+   * @return the first <code>IWorkbenchWindow</code> from the PlatformUI facade
+   * or <code>NULL</code> if none.
    */
   public static IWorkbenchWindow getWindow() {
 
@@ -769,9 +771,9 @@ public class OwlUI {
    * facade that is located at where the mouse is pointing at. Otherwise,
    * returns <code>NULL</code> if none.
    *
-   * @return the first <code>IWorkbenchWindow</code> from the PlatformUI
-   * facade that is located at where the mouse is pointing at or
-   * <code>NULL</code> if none.
+   * @return the first <code>IWorkbenchWindow</code> from the PlatformUI facade
+   * that is located at where the mouse is pointing at or <code>NULL</code> if
+   * none.
    */
   public static IWorkbenchWindow getWindowAtCursor() {
 
@@ -792,11 +794,11 @@ public class OwlUI {
   }
 
   /**
-   * Attempts to find the first <code>IWorkbenchPage</code> from the
-   * PlatformUI facade. Otherwise, returns <code>NULL</code> if none.
+   * Attempts to find the first <code>IWorkbenchPage</code> from the PlatformUI
+   * facade. Otherwise, returns <code>NULL</code> if none.
    *
-   * @return the first <code>IWorkbenchPage</code> from the PlatformUI facade
-   * or <code>NULL</code> if none.
+   * @return the first <code>IWorkbenchPage</code> from the PlatformUI facade or
+   * <code>NULL</code> if none.
    */
   public static IWorkbenchPage getPage() {
     IWorkbenchWindow window = getWindow();
@@ -821,8 +823,7 @@ public class OwlUI {
    *
    * @param window the {@link IWorkbenchWindow} to get the index in the stack of
    * windows that are open.
-   * @return the index of the given workbench window or <code>-1</code> if
-   * none.
+   * @return the index of the given workbench window or <code>-1</code> if none.
    */
   public static int getWindowIndex(IWorkbenchWindow window) {
     if (window != null) {
@@ -836,13 +837,13 @@ public class OwlUI {
   }
 
   /**
-   * Attempts to find the <code>IWorkbenchPage</code> from the
-   * Workbench-Window the mouse is currently over from the PlatformUI facade.
-   * Otherwise, returns <code>NULL</code> if none.
+   * Attempts to find the <code>IWorkbenchPage</code> from the Workbench-Window
+   * the mouse is currently over from the PlatformUI facade. Otherwise, returns
+   * <code>NULL</code> if none.
    *
-   * @return the first <code>IWorkbenchPage</code> from the Workbench-Window
-   * the mouse is currently over from the PlatformUI facade or <code>NULL</code>
-   * if none.
+   * @return the first <code>IWorkbenchPage</code> from the Workbench-Window the
+   * mouse is currently over from the PlatformUI facade or <code>NULL</code> if
+   * none.
    */
   public static IWorkbenchPage getPageAtCursor() {
     IWorkbenchWindow window = getWindowAtCursor();
@@ -877,8 +878,8 @@ public class OwlUI {
   }
 
   /**
-   * Attempts to find the first active <code>FeedView</code> from the
-   * PlatformUI facade. Otherwise, returns <code>NULL</code> if none.
+   * Attempts to find the first active <code>FeedView</code> from the PlatformUI
+   * facade. Otherwise, returns <code>NULL</code> if none.
    *
    * @return the first active <code>FeedView</code> from the PlatformUI facade
    * or <code>NULL</code> if none.
@@ -898,8 +899,8 @@ public class OwlUI {
    * Attempts to find the selection from the first active <code>FeedView</code>
    * from the PlatformUI facade. Otherwise, returns <code>NULL</code> if none.
    *
-   * @return the selection from the first active <code>FeedView</code> from
-   * the PlatformUI facade or <code>NULL</code> if none.
+   * @return the selection from the first active <code>FeedView</code> from the
+   * PlatformUI facade or <code>NULL</code> if none.
    */
   public static IStructuredSelection getActiveFeedViewSelection() {
     FeedView feedview = getActiveFeedView();
@@ -914,12 +915,12 @@ public class OwlUI {
   }
 
   /**
-   * Attempts to find the first <code>FeedView</code> from the active
-   * Workbench Window of the PlatformUI facade. Otherwise, returns
-   * <code>NULL</code> if none.
+   * Attempts to find the first <code>FeedView</code> from the active Workbench
+   * Window of the PlatformUI facade. Otherwise, returns <code>NULL</code> if
+   * none.
    *
-   * @return the first <code>FeedView</code> from the active Workbench Window
-   * of the PlatformUI facade or <code>NULL</code> if none.
+   * @return the first <code>FeedView</code> from the active Workbench Window of
+   * the PlatformUI facade or <code>NULL</code> if none.
    */
   public static FeedView getFirstActiveFeedView() {
     IWorkbenchPage page = getPage();
@@ -962,8 +963,8 @@ public class OwlUI {
   }
 
   /**
-   * Attempts to find the primary <code>Shell</code> from the PlatformUI
-   * facade. Otherwise, returns <code>NULL</code> if none.
+   * Attempts to find the primary <code>Shell</code> from the PlatformUI facade.
+   * Otherwise, returns <code>NULL</code> if none.
    *
    * @return the primary <code>Shell</code> from the PlatformUI facade or
    * <code>NULL</code> if none.
@@ -977,8 +978,8 @@ public class OwlUI {
   }
 
   /**
-   * Attempts to find the active <code>Shell</code> from the PlatformUI
-   * facade. Otherwise, returns <code>NULL</code> if none.
+   * Attempts to find the active <code>Shell</code> from the PlatformUI facade.
+   * Otherwise, returns <code>NULL</code> if none.
    *
    * @return the active <code>Shell</code> from the PlatformUI facade or
    * <code>NULL</code> if none.
@@ -992,8 +993,8 @@ public class OwlUI {
   }
 
   /**
-   * Update the current active window title based on the given array of
-   * {@link IMark}.
+   * Update the current active window title based on the given array of {@link
+   * IMark}.
    *
    * @param shownInput the input that is currently visible in RSSOwl.
    */
@@ -1087,6 +1088,24 @@ public class OwlUI {
           Activator.getDefault().getLog().log(e.getStatus());
         }
       }
+    }
+  }
+
+  /**
+   * Set's the checked state of all visible items to the suplied one.
+   *
+   * @param tree
+   * @param state
+   */
+  public static void setAllChecked(Tree tree, boolean state) {
+    setAllChecked(state, tree.getItems());
+  }
+
+  private static void setAllChecked(boolean state, TreeItem[] items) {
+    for (int i = 0; i < items.length; i++) {
+      items[i].setChecked(state);
+      TreeItem[] children = items[i].getItems();
+      setAllChecked(state, children);
     }
   }
 }
