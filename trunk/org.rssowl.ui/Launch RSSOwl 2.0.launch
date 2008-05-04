@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <launchConfiguration type="org.eclipse.pde.ui.RuntimeWorkbench">
 <stringAttribute key="application" value="org.rssowl.ui.rssowl"/>
 <booleanAttribute key="askclear" value="true"/>
@@ -20,9 +20,10 @@
 <stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xms40m -Xmx96m -DmultiInstance"/>
 <stringAttribute key="pde.version" value="3.3"/>
 <stringAttribute key="product" value="org.rssowl.ui.product"/>
-<stringAttribute key="selected_target_plugins" value="com.ibm.icu,org.eclipse.core.commands,org.eclipse.core.contenttype,org.eclipse.core.databinding,org.eclipse.core.expressions,org.eclipse.core.jobs,org.eclipse.core.net,org.eclipse.core.runtime,org.eclipse.core.runtime.compatibility.auth,org.eclipse.equinox.app,org.eclipse.equinox.common,org.eclipse.equinox.preferences,org.eclipse.equinox.registry,org.eclipse.help,org.eclipse.jface,org.eclipse.jface.databinding,org.eclipse.osgi,org.eclipse.pde.runtime,org.eclipse.swt,org.eclipse.swt.carbon.macosx,org.eclipse.swt.gtk.linux.x86,org.eclipse.swt.gtk.linux.x86_64,org.eclipse.swt.win32.win32.x86,org.eclipse.ui,org.eclipse.ui.forms,org.eclipse.ui.net,org.eclipse.ui.workbench,org.eclipse.update.configurator,org.eclipse.update.core,org.eclipse.update.scheduler,org.eclipse.update.ui"/>
-<stringAttribute key="selected_workspace_plugins" value="org.rssowl.ui,org.rssowl.lib.lucene,org.rssowl.lib.jdom,org.rssowl.core,org.rssowl.lib.db4o,org.rssowl.contrib.nntp,org.rssowl.lib.httpclient"/>
-<stringAttribute key="templateConfig" value="${target_home}\configuration\config.ini"/>
+<stringAttribute key="selected_target_plugins" value="org.eclipse.core.runtime,org.eclipse.core.commands,org.eclipse.core.net.win32.x86,org.eclipse.jface,org.eclipse.core.expressions,org.eclipse.ui.net,org.eclipse.core.contenttype,org.eclipse.update.configurator,org.eclipse.swt.win32.win32.x86,com.ibm.icu,org.eclipse.equinox.security.win32.x86,org.eclipse.swt,org.eclipse.swt.gtk.linux.x86_64,org.eclipse.core.net,org.eclipse.swt.gtk.linux.x86,org.eclipse.jface.databinding,org.eclipse.core.jobs,org.eclipse.core.net.linux.x86,org.eclipse.equinox.common,org.eclipse.update.ui,org.eclipse.osgi,org.eclipse.core.databinding,org.eclipse.equinox.security,org.eclipse.update.core,org.eclipse.equinox.app,org.eclipse.ui,org.eclipse.equinox.security.macosx,org.eclipse.equinox.preferences,org.eclipse.equinox.registry,org.eclipse.core.runtime.compatibility.auth,org.eclipse.ui.workbench,org.eclipse.help,org.eclipse.update.scheduler,org.eclipse.swt.carbon.macosx,org.eclipse.pde.runtime,org.eclipse.ui.forms"/>
+<stringAttribute key="selected_workspace_plugins" value="org.rssowl.core,org.rssowl.lib.jdom,org.rssowl.lib.httpclient,org.rssowl.contrib.nntp,org.rssowl.lib.db4o,org.rssowl.lib.lucene,org.rssowl.ui"/>
+<booleanAttribute key="show_selected_only" value="false"/>
+<stringAttribute key="templateConfig" value="${workspace_loc:org.rssowl.ui/config.ini}"/>
 <booleanAttribute key="tracing" value="false"/>
 <booleanAttribute key="useDefaultConfig" value="true"/>
 <booleanAttribute key="useDefaultConfigArea" value="true"/>
