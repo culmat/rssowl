@@ -84,7 +84,6 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
   private Spinner fAutoCloseNotifierSpinner;
   private Button fAutoCloseNotifierCheck;
   private Button fShowExcerptCheck;
-  private Button fFadeNotifierCheck;
   private Button fCloseNotifierOnOpen;
 
   /** Leave for reflection */
@@ -342,7 +341,6 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
       @Override
       public void widgetSelected(SelectionEvent e) {
         fNotificationOnlyFromTray.setEnabled(fShowNotificationPopup.getSelection());
-        fFadeNotifierCheck.setEnabled(fShowNotificationPopup.getSelection());
         fShowExcerptCheck.setEnabled(fShowNotificationPopup.getSelection());
         fCloseNotifierOnOpen.setEnabled(fShowNotificationPopup.getSelection());
         fAutoCloseNotifierCheck.setEnabled(fShowNotificationPopup.getSelection());
@@ -353,12 +351,6 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
         fLimitNotifierToSelectionCheck.setEnabled(fShowNotificationPopup.getSelection());
       }
     });
-
-    /* Fade Notifier in and out */
-    fFadeNotifierCheck = new Button(notificationGroup, SWT.CHECK);
-    fFadeNotifierCheck.setText("Fade the notification in and out");
-    fFadeNotifierCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER));
-    fFadeNotifierCheck.setEnabled(fShowNotificationPopup.getSelection());
 
     /* Limit number of Items showing in Notification */
     Composite limitItemsContainer = new Composite(notificationGroup, SWT.None);
@@ -452,7 +444,6 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
   public boolean performOk() {
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP, fShowNotificationPopup.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED, fNotificationOnlyFromTray.getSelection());
-    fGlobalScope.putBoolean(DefaultPreferences.FADE_NOTIFIER, fFadeNotifierCheck.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER, fShowExcerptCheck.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.CLOSE_NOTIFIER_ON_OPEN, fCloseNotifierOnOpen.getSelection());
 
@@ -532,9 +523,6 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
     fShowNotificationPopup.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP));
     fNotificationOnlyFromTray.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED));
     fNotificationOnlyFromTray.setEnabled(fShowNotificationPopup.getSelection());
-
-    fFadeNotifierCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.FADE_NOTIFIER));
-    fFadeNotifierCheck.setEnabled(fShowNotificationPopup.getSelection());
 
     fShowExcerptCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER));
     fShowExcerptCheck.setEnabled(fShowNotificationPopup.getSelection());
