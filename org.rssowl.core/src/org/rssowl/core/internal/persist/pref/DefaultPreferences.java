@@ -170,6 +170,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Limit Notifier to Selected Elements */
   public static final String LIMIT_NOTIFIER_TO_SELECTION = "org.rssowl.pref.LimitNotifierToSelection";
 
+  /** Global: Close Notifier after clicking on Item */
+  public static final String CLOSE_NOTIFIER_ON_OPEN = "org.rssowl.pref.CloseNotifierOnOpen";
+
   /** Global: Enable Notifier for Element */
   public static final String ENABLE_NOTIFIER = "org.rssowl.pref.EnableNotifier";
 
@@ -298,6 +301,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putInteger(MARK_READ_IN_MILLIS, 0);
     defaultScope.putBoolean(BM_OPEN_SITE_FOR_EMPTY_NEWS, false);
     defaultScope.putBoolean(FADE_NOTIFIER, true);
+    defaultScope.putBoolean(CLOSE_NOTIFIER_ON_OPEN, true);
     defaultScope.putInteger(LIMIT_NOTIFICATION_SIZE, 5);
     defaultScope.putBoolean(SEARCH_DIALOG_PREVIEW_VISIBLE, true);
     defaultScope.putInteger(AUTOCLOSE_NOTIFICATION_VALUE, 8);
