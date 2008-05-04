@@ -26,25 +26,30 @@ package org.rssowl.core.connection;
 
 import org.eclipse.core.net.proxy.IProxyData;
 import org.eclipse.core.net.proxy.IProxyService;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Platform;
+import org.eclipse.equinox.security.storage.EncodingUtils;
+import org.eclipse.equinox.security.storage.ISecurePreferences;
+import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
+import org.eclipse.equinox.security.storage.StorageException;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 
-import java.net.MalformedURLException;
+import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
  * The default implementation of the ICredentialsProvider retrieves
- * authentication Credentials from the Platform.
+ * authentication Credentials from the Equinox Security Storage.
  *
  * @author bpasero
  */
 public class PlatformCredentialsProvider implements ICredentialsProvider {
+
+  /** Node for feed related security preferences */
+  public static final String SECURE_FEED_NODE = "rssowl/feeds";
 
   /* Unique Key to store Usernames */
   private static final String USERNAME = "org.rssowl.core.connection.auth.Username"; //$NON-NLS-1$
@@ -58,37 +63,58 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   /* Default Realm being used to store credentials */
   private static final String REALM = ""; //$NON-NLS-1$
 
-  /* Default Scheme being used to store credentials */
-  private static final String SCHEME = ""; //$NON-NLS-1$
-
   /* A cache of non-protected Links */
   private final Set<String> fUnprotectedLinksCache = new HashSet<String>();
 
+  private ISecurePreferences fSecurity;
+
+  /** Default credentials provider using Equinox Security */
+  public PlatformCredentialsProvider() {
+    fSecurity = SecurePreferencesFactory.getDefault();
+  }
+
+  /* Simple POJO Implementation of ICredentials */
+  private static class Credentials implements ICredentials {
+    private String fUsername;
+    private String fPassword;
+    private String fDomain;
+
+    Credentials(String username, String password, String domain) {
+      fUsername = username;
+      fPassword = password;
+      fDomain = domain;
+    }
+
+    public String getUsername() {
+      return fUsername;
+    }
+
+    public String getPassword() {
+      return fPassword;
+    }
+
+    public String getDomain() {
+      return fDomain;
+    }
+  }
+
   /*
-   * @see org.rssowl.core.connection.ICredentialsProvider#getAuthCredentials(java.net.URI,
-   * java.lang.String)
+   * @see
+   * org.rssowl.core.connection.ICredentialsProvider#getAuthCredentials(java
+   * .net.URI, java.lang.String)
    */
-  public ICredentials getAuthCredentials(URI link, String realm) {
+  public ICredentials getAuthCredentials(URI link, String realm) throws CredentialsException {
+
+    /* Check Cache first */
+    if (fUnprotectedLinksCache.contains(link.toString()))
+      return null;
 
     /* Retrieve Credentials */
-    final Map<?, ?> authorizationInfo = getAuthorizationInfo(link, realm);
+    ICredentials authorizationInfo = getAuthorizationInfo(link, realm);
 
     /* Credentials Provided */
-    if (authorizationInfo != null) {
-      return new ICredentials() {
-        public String getUsername() {
-          return (String) authorizationInfo.get(USERNAME);
-        }
-
-        public String getPassword() {
-          return (String) authorizationInfo.get(PASSWORD);
-        }
-
-        public String getDomain() {
-          return (String) authorizationInfo.get(DOMAIN);
-        }
-      };
-    }
+    if (authorizationInfo != null)
+      return authorizationInfo;
 
     /* Cache as unprotected */
     if (!fUnprotectedLinksCache.contains(link.toString()))
@@ -98,23 +124,37 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     return null;
   }
 
-  private Map<?, ?> getAuthorizationInfo(URI link, String realm) {
+  private ICredentials getAuthorizationInfo(URI link, String realm) throws CredentialsException {
 
-    /* Check Cache first */
-    if (fUnprotectedLinksCache.contains(link.toString()))
-      return null;
+    /* Return from Equinox Security Storage */
+    if (fSecurity.nodeExists(SECURE_FEED_NODE)) { // Global Feed Node
+      ISecurePreferences allFeedsPreferences = fSecurity.node(SECURE_FEED_NODE);
+      if (allFeedsPreferences.nodeExists(EncodingUtils.encodeSlashes(link.toString()))) { // Feed Node
+        ISecurePreferences feedPreferences = allFeedsPreferences.node(EncodingUtils.encodeSlashes(link.toString()));
+        if (feedPreferences.nodeExists(EncodingUtils.encodeSlashes(realm != null ? realm : REALM))) { // Realm Node
+          ISecurePreferences realmPreferences = feedPreferences.node(EncodingUtils.encodeSlashes(realm != null ? realm : REALM));
 
-    /* Return from Platform */
-    try {
-      URL urlLink = link.toURL();
-      return Platform.getAuthorizationInfo(urlLink, realm != null ? realm : REALM, SCHEME);
-    } catch (MalformedURLException e) {
-      return null;
+          try {
+            String username = realmPreferences.get(USERNAME, null);
+            String password = realmPreferences.get(PASSWORD, null);
+            String domain = realmPreferences.get(DOMAIN, null);
+
+            if (username != null && password != null)
+              return new Credentials(username, password, domain);
+          } catch (StorageException e) {
+            throw new CredentialsException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+          }
+        }
+      }
     }
+
+    return null;
   }
 
   /*
-   * @see org.rssowl.core.connection.auth.ICredentialsProvider#getProxyCredentials(java.net.URI)
+   * @see
+   * org.rssowl.core.connection.auth.ICredentialsProvider#getProxyCredentials
+   * (java.net.URI)
    */
   public IProxyCredentials getProxyCredentials(URI link) {
     IProxyService proxyService = Activator.getDefault().getProxyService();
@@ -157,30 +197,33 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   }
 
   /*
-   * @see org.rssowl.core.connection.ICredentialsProvider#setAuthCredentials(org.rssowl.core.connection.ICredentials,
-   * java.net.URI, java.lang.String)
+   * @see
+   * org.rssowl.core.connection.ICredentialsProvider#setAuthCredentials(org.
+   * rssowl.core.connection.ICredentials, java.net.URI, java.lang.String)
    */
   public void setAuthCredentials(ICredentials credentials, URI link, String realm) throws CredentialsException {
 
-    /* Create Credentials Map */
-    Map<String, String> credMap = new HashMap<String, String>();
+    /* Store in Equinox Security Storage */
+    ISecurePreferences allFeedsPreferences = fSecurity.node(SECURE_FEED_NODE);
+    ISecurePreferences feedPreferences = allFeedsPreferences.node(EncodingUtils.encodeSlashes(link.toString()));
+    ISecurePreferences realmPreference = feedPreferences.node(EncodingUtils.encodeSlashes(realm != null ? realm : REALM));
 
-    if (credentials.getUsername() != null)
-      credMap.put(USERNAME, credentials.getUsername());
-
-    if (credentials.getPassword() != null)
-      credMap.put(PASSWORD, credentials.getPassword());
-
-    if (credentials.getDomain() != null)
-      credMap.put(DOMAIN, credentials.getDomain());
-
-    /* Store in Platform */
+    IPreferenceScope globalScope = Owl.getPreferenceService().getGlobalScope();
+    boolean useMasterPassword = globalScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD);
     try {
-      URL urlLink = link.toURL();
-      Platform.addAuthorizationInfo(urlLink, realm != null ? realm : REALM, SCHEME, credMap);
-    } catch (CoreException e) {
-      throw new CredentialsException(e.getStatus());
-    } catch (MalformedURLException e) {
+      if (credentials.getUsername() != null)
+        realmPreference.put(USERNAME, credentials.getUsername(), useMasterPassword);
+
+      if (credentials.getPassword() != null)
+        realmPreference.put(PASSWORD, credentials.getPassword(), useMasterPassword);
+
+      if (credentials.getDomain() != null)
+        realmPreference.put(DOMAIN, credentials.getDomain(), useMasterPassword);
+
+      realmPreference.flush(); // Flush to disk early
+    } catch (StorageException e) {
+      throw new CredentialsException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+    } catch (IOException e) {
       throw new CredentialsException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
     }
 
@@ -189,8 +232,9 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   }
 
   /*
-   * @see org.rssowl.core.connection.auth.ICredentialsProvider#setProxyCredentials(org.rssowl.core.connection.auth.IProxyCredentials,
-   * java.net.URI)
+   * @see
+   * org.rssowl.core.connection.auth.ICredentialsProvider#setProxyCredentials
+   * (org.rssowl.core.connection.auth.IProxyCredentials, java.net.URI)
    */
   public void setProxyCredentials(IProxyCredentials credentials, URI link) {
     IProxyService proxyService = Activator.getDefault().getProxyService();
@@ -208,19 +252,28 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   }
 
   /*
-   * @see org.rssowl.core.connection.ICredentialsProvider#deleteAuthCredentials(java.net.URI,
-   * java.lang.String)
+   * @see
+   * org.rssowl.core.connection.ICredentialsProvider#deleteAuthCredentials(java
+   * .net.URI, java.lang.String)
    */
   public void deleteAuthCredentials(URI link, String realm) throws CredentialsException {
 
-    /* Remove from Platform */
-    try {
-      URL urlLink = link.toURL();
-      Platform.flushAuthorizationInfo(urlLink, realm != null ? realm : REALM, SCHEME);
-    } catch (CoreException e) {
-      throw new CredentialsException(e.getStatus());
-    } catch (MalformedURLException e) {
-      throw new CredentialsException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+    /* Remove from Equinox Security Storage */
+    if (fSecurity.nodeExists(SECURE_FEED_NODE)) { // Global Feed Node
+      ISecurePreferences allFeedsPreferences = fSecurity.node(SECURE_FEED_NODE);
+      if (allFeedsPreferences.nodeExists(EncodingUtils.encodeSlashes(link.toString()))) { // Feed Node
+        ISecurePreferences feedPreferences = allFeedsPreferences.node(EncodingUtils.encodeSlashes(link.toString()));
+        if (feedPreferences.nodeExists(EncodingUtils.encodeSlashes(realm != null ? realm : REALM))) { // Realm Node
+          ISecurePreferences realmPreferences = feedPreferences.node(EncodingUtils.encodeSlashes(realm != null ? realm : REALM));
+          realmPreferences.clear();
+          realmPreferences.removeNode();
+          try {
+            feedPreferences.flush();
+          } catch (IOException e) {
+            throw new CredentialsException(Activator.getDefault().createErrorStatus(e.getMessage(), e));
+          }
+        }
+      }
     }
 
     /* Delete from Cache */
@@ -228,7 +281,9 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   }
 
   /*
-   * @see org.rssowl.core.connection.auth.ICredentialsProvider#deleteProxyCredentials(java.net.URI)
+   * @see
+   * org.rssowl.core.connection.auth.ICredentialsProvider#deleteProxyCredentials
+   * (java.net.URI)
    */
   public void deleteProxyCredentials(URI link) {
     IProxyService proxyService = Activator.getDefault().getProxyService();

@@ -35,6 +35,9 @@ import org.rssowl.core.persist.pref.IPreferencesInitializer;
  */
 public class DefaultPreferences implements IPreferencesInitializer {
 
+  /** Global: Use Master Password to encrypt passwords to feeds */
+  public static final String USE_MASTER_PASSWORD = "org.rssowl.pref.UseMasterPassword";
+
   /** Global: Mark all news as read on minimize */
   public static final String MARK_READ_ON_MINIMIZE = "org.rssowl.pref.MarkNewsReadOnMinimize";
 
