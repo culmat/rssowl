@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.notifier;
 
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -142,6 +143,7 @@ public class NotificationPopup extends PopupDialog {
   private int fDisplayOffset;
   private boolean fMouseOverNotifier;
   private FadeJob fFadeJob;
+  private Collection<NotificationItem> fInitialItems;
 
   private class FadeJob extends UIJob {
     private boolean fFadeIn;
@@ -224,16 +226,21 @@ public class NotificationPopup extends PopupDialog {
   public void create() {
     super.create();
 
+    /* Show initial set of items */
+    makeVisible(fInitialItems);
+
     /* Make shell invisible initially if fading in */
     if (fgFadeSupported && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER))
       getShell().setAlpha(0);
   }
 
-  /*
-   * @see org.eclipse.jface.dialogs.PopupDialog#open()
+  /**
+   * @param items the initial items to show inside the window.
+   * @return the status code from opening the window.
    */
-  @Override
-  public int open() {
+  public int open(Collection<NotificationItem> items) {
+    Assert.isLegal(items != null && !items.isEmpty());
+    fInitialItems = items;
     int res = super.open();
 
     /* Make shell fade in */
@@ -827,6 +834,8 @@ public class NotificationPopup extends PopupDialog {
       fLastUsedRegion.dispose();
     if (fTitleBgImage != null)
       fTitleBgImage.dispose();
+    if (fInitialItems != null)
+      fInitialItems.clear();
 
     return super.close();
   }

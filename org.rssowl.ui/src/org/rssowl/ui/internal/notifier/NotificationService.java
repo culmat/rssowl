@@ -253,11 +253,8 @@ public class NotificationService {
                 return super.doClose();
               }
             };
-            fgNotificationPopup.open();
+            fgNotificationPopup.open(items);
           }
-
-          /* Show Items */
-          fgNotificationPopup.makeVisible(items);
         }
       }
     });
