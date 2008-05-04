@@ -64,7 +64,7 @@ public class NewsGroupCredentialsProvider extends PlatformCredentialsProvider {
    * java.lang.String)
    */
   @Override
-  public ICredentials getAuthCredentials(URI link, String realm) {
+  public ICredentials getAuthCredentials(URI link, String realm) throws CredentialsException {
     return super.getAuthCredentials(URIUtils.normalizeUri(link), realm);
   }
 
