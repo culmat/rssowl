@@ -96,5 +96,13 @@
             class="org.rssowl.core.tests.model.PreferencesScopeTest">
       </preferencesInitializer>
    </extension>
+   <extension
+         id="TestsPasswordProvider"
+         point="org.eclipse.equinox.security.secureStorage">
+      <provider
+            class="org.rssowl.core.tests.TestsPasswordProvider"
+            priority="10">
+      </provider>
+   </extension>
 
 </plugin>
