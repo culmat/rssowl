@@ -173,6 +173,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Enable Notifier for Element */
   public static final String ENABLE_NOTIFIER = "org.rssowl.pref.EnableNotifier";
 
+  /** Global: Use transparency fade in / fade out */
+  public static final String FADE_NOTIFIER = "org.rssowl.pref.FadeNotifier";
+
   /** Global: Show Description Excerpt in Notifier */
   public static final String SHOW_EXCERPT_IN_NOTIFIER = "org.rssowl.pref.ShowExcerptInNotifier";
 
