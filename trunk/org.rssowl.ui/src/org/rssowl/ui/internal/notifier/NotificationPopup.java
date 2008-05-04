@@ -80,8 +80,8 @@ import java.util.List;
  * <li>Add preferences (respect use animation, number of news)</li>
  * <li>Enrich Popup toolbar with "Make Sticky" and a dropdown with "Options",
  * "Mark Read" etc...</li>
- * <li>SearchNotificationItems are not aggregated if the max. number of items
- * is already showing</li>
+ * <li>SearchNotificationItems are not aggregated if the max. number of items is
+ * already showing</li>
  * </ul>
  *
  * @author bpasero
@@ -96,6 +96,18 @@ public class NotificationPopup extends PopupDialog {
 
   /* Default Width of the Popup */
   private static final int DEFAULT_WIDTH = 400;
+
+  /* Milliseconds before incrementing the alpha for fade in / fade out */
+  private static final int FADE_DELAY = 50;
+
+  /* Alpha increment for fade in */
+  private static final int FADE_IN_INCREMENT = 20;
+
+  /* Alpha increment for fade out */
+  private static final int FADE_OUT_INCREMENT = -30;
+
+  /* A field that is set to true in case fading is not supported on the OS */
+  private static boolean fgFadeSupported = true;
 
   private Shell fShell;
   private final List<NotificationItem> fDisplayedItems = new ArrayList<NotificationItem>();
@@ -129,6 +141,55 @@ public class NotificationPopup extends PopupDialog {
   private CLabel fPrevButton;
   private int fDisplayOffset;
   private boolean fMouseOverNotifier;
+  private FadeJob fFadeJob;
+
+  private class FadeJob extends UIJob {
+    private boolean fFadeIn;
+
+    FadeJob(boolean fadeIn) {
+      super("Fade Job");
+      setSystem(true);
+      fFadeIn = fadeIn;
+    }
+
+    private boolean proceed(IProgressMonitor monitor) {
+      Shell shell = getShell();
+      if (monitor.isCanceled() || shell == null || shell.isDisposed() || shell.getDisplay().isDisposed())
+        return false;
+
+      return true;
+    }
+
+    @Override
+    public IStatus runInUIThread(final IProgressMonitor monitor) {
+      if (proceed(monitor)) {
+        final int alpha = getShell().getAlpha();
+
+        if (fgFadeSupported && (fFadeIn && alpha < 255 || !fFadeIn && alpha > 0)) {
+          if (proceed(monitor)) {
+            getShell().getDisplay().syncExec(new Runnable() {
+              public void run() {
+                if (proceed(monitor)) {
+                  int newAlpha = fFadeIn ? Math.min(alpha + FADE_IN_INCREMENT, 255) : Math.max(alpha + FADE_OUT_INCREMENT, 0);
+                  getShell().setAlpha(newAlpha);
+
+                  if (newAlpha != getShell().getAlpha())
+                    fgFadeSupported = false;
+                }
+              }
+            });
+            schedule(FADE_DELAY);
+          }
+        }
+
+        /* Fade Out finished - Close now */
+        if (!fFadeIn && (alpha <= 0 || !fgFadeSupported) && proceed(monitor))
+          doClose();
+      }
+
+      return Status.OK_STATUS;
+    }
+  };
 
   NotificationPopup(int visibleItemCount) {
     super(new Shell(PlatformUI.getWorkbench().getDisplay()), SWT.NO_TRIM | SWT.ON_TOP, false, false, false, false, false, null, null);
@@ -154,6 +215,48 @@ public class NotificationPopup extends PopupDialog {
   @Override
   protected int getShellStyle() {
     return SWT.NO_TRIM | SWT.ON_TOP;
+  }
+
+  /*
+   * @see org.eclipse.jface.window.Window#create()
+   */
+  @Override
+  public void create() {
+    super.create();
+
+    /* Make shell invisible initially if fading in */
+    if (fgFadeSupported && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER))
+      getShell().setAlpha(0);
+  }
+
+  /*
+   * @see org.eclipse.jface.dialogs.PopupDialog#open()
+   */
+  @Override
+  public int open() {
+    int res = super.open();
+
+    /* Make shell fade in */
+    if (fgFadeSupported && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER))
+      fadeIn();
+
+    return res;
+  }
+
+  private void fadeIn() {
+    if (fFadeJob != null)
+      fFadeJob.cancel();
+
+    fFadeJob = new FadeJob(true);
+    fFadeJob.schedule();
+  }
+
+  private void fadeOut() {
+    if (fFadeJob != null)
+      fFadeJob.cancel();
+
+    fFadeJob = new FadeJob(false);
+    fFadeJob.schedule();
   }
 
   private void addRegion(Shell shell) {
@@ -192,8 +295,12 @@ public class NotificationPopup extends PopupDialog {
     fAutoCloser = new UIJob(PlatformUI.getWorkbench().getDisplay(), "") {
       @Override
       public IStatus runInUIThread(IProgressMonitor monitor) {
-        if (!fMouseOverNotifier && getShell() != null && !getShell().isDisposed())
-          doClose();
+        if (!fMouseOverNotifier && getShell() != null && !getShell().isDisposed()) {
+          if (fgFadeSupported && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER))
+            fadeOut();
+          else
+            doClose();
+        }
 
         return Status.OK_STATUS;
       }
@@ -208,13 +315,21 @@ public class NotificationPopup extends PopupDialog {
       @Override
       public void mouseEnter(MouseEvent e) {
         fMouseOverNotifier = true;
+
         if (!fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP))
           fAutoCloser.cancel();
+
+        if (fgFadeSupported && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER) && getShell().getAlpha() < 255) {
+          if (fFadeJob != null)
+            fFadeJob.cancel();
+          getShell().setAlpha(255);
+        }
       }
 
       @Override
       public void mouseExit(MouseEvent e) {
         fMouseOverNotifier = false;
+
         if (!fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP))
           fAutoCloser.schedule(fGlobalScope.getInteger(DefaultPreferences.AUTOCLOSE_NOTIFICATION_VALUE) * 1000);
       }
