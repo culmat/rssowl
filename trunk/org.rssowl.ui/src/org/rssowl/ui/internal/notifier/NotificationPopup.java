@@ -454,7 +454,7 @@ public class NotificationPopup extends PopupDialog {
     itemLabel.addMouseTrackListener(mouseTrackListener);
     imageLabel.addMouseTrackListener(mouseTrackListener);
 
-    /* Restore RSSOwl label is clicked */
+    /* Clicked on item to open it */
     MouseAdapter mouseListener = new MouseAdapter() {
       @Override
       public void mouseUp(MouseEvent e) {
@@ -462,8 +462,13 @@ public class NotificationPopup extends PopupDialog {
         /* Open Item */
         item.open(e);
 
-        /* Close Popup */
-        doClose();
+        /* Close Popup if required */
+        if (fGlobalScope.getBoolean(DefaultPreferences.CLOSE_NOTIFIER_ON_OPEN))
+          doClose();
+
+        /* Indicate the item is marked as read now */
+        else
+          itemLabel.setFont(fNormalTextFont);
       }
     };
 
