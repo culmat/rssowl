@@ -24,9 +24,10 @@
 
 package org.rssowl.ui.internal;
 
+import org.eclipse.equinox.internal.security.storage.friends.InternalExchangeUtils;
+import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -53,12 +54,17 @@ import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.IConnectionService;
 import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.ICredentialsProvider;
+import org.rssowl.core.connection.PlatformCredentialsProvider;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.dialogs.ConfirmDeleteDialog;
+import org.rssowl.ui.internal.util.LayoutUtils;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
@@ -70,22 +76,40 @@ import java.util.Set;
  *
  * @author bpasero
  */
+@SuppressWarnings("restriction")
 public class CredentialsPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage {
+
+  /* Equinox Secure Storage Node */
+  private static final String EQUINOX_SECURE_STORAGE_NODE = "org.eclipse.equinox.secure.storage";
+
   private IConnectionService fConService = Owl.getConnectionService();
   private TableViewer fViewer;
   private Button fRemoveAll;
   private Button fRemoveSelected;
+  private Button fUseMasterPasswordCheck;
+  private IPreferenceScope fGlobalScope = Owl.getPreferenceService().getGlobalScope();
+  private Button fResetMasterPassword;
 
   /* Model used in the Viewer */
   private static class CredentialsModelData {
     private URI fNormalizedLink;
     private String fRealm;
     private String fUsername;
+    private String fPassword;
 
-    CredentialsModelData(String username, URI normalizedLink, String realm) {
+    CredentialsModelData(String username, String password, URI normalizedLink, String realm) {
       fUsername = username;
+      fPassword = password;
       fNormalizedLink = normalizedLink;
       fRealm = realm;
+    }
+
+    String getUsername() {
+      return fUsername;
+    }
+
+    String getPassword() {
+      return fPassword;
     }
 
     URI getNormalizedLink() {
@@ -96,8 +120,20 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
       return fRealm;
     }
 
-    String getUsername() {
-      return fUsername;
+    ICredentials toCredentials() {
+      return new ICredentials() {
+        public String getDomain() {
+          return "";
+        }
+
+        public String getPassword() {
+          return fPassword;
+        }
+
+        public String getUsername() {
+          return fUsername;
+        }
+      };
     }
 
     @Override
@@ -137,28 +173,6 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     }
   }
 
-  /** Leave for reflection */
-  public CredentialsPreferencesPage() {
-    noDefaultAndApplyButton();
-  }
-
-  /**
-   * @param title
-   */
-  public CredentialsPreferencesPage(String title) {
-    super(title);
-    noDefaultAndApplyButton();
-  }
-
-  /**
-   * @param title
-   * @param image
-   */
-  public CredentialsPreferencesPage(String title, ImageDescriptor image) {
-    super(title, image);
-    noDefaultAndApplyButton();
-  }
-
   /*
    * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
    */
@@ -170,6 +184,45 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
   @Override
   protected Control createContents(Composite parent) {
     Composite container = createComposite(parent);
+
+    /* Use a master password */
+    Composite masterContainer = new Composite(container, SWT.NONE);
+    masterContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
+    masterContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    ((GridLayout) masterContainer.getLayout()).marginBottom = 15;
+
+    fUseMasterPasswordCheck = new Button(masterContainer, SWT.CHECK);
+    fUseMasterPasswordCheck.setText("Use a master password to encrypt credentials");
+    fUseMasterPasswordCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    fUseMasterPasswordCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD));
+    fUseMasterPasswordCheck.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        fResetMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
+      }
+    });
+
+    fResetMasterPassword = new Button(masterContainer, SWT.PUSH);
+    fResetMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
+    fResetMasterPassword.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    fResetMasterPassword.setText("Reset Master Password...");
+    fResetMasterPassword.addSelectionListener(new SelectionAdapter() {
+      @SuppressWarnings("restriction")
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        ConfirmDeleteDialog dialog = new ConfirmDeleteDialog(getShell(), "Confirm Reset", "This action can not be undone", "Are you sure you want to reset the master password?", null) {
+          @Override
+          protected void createButtonsForButtonBar(Composite parent) {
+            createButton(parent, IDialogConstants.OK_ID, "Reset", true);
+            createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
+            getButton(IDialogConstants.OK_ID).setFocus();
+          }
+        };
+
+        if (dialog.open() == IDialogConstants.OK_ID)
+          resetMasterPassword();
+      }
+    });
 
     /* Label */
     Label infoLabel = new Label(container, SWT.NONE);
@@ -284,6 +337,14 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     return container;
   }
 
+  /*
+   * This is a hack until official API is available.
+   */
+  @SuppressWarnings("restriction")
+  private void resetMasterPassword() {
+    reSetAllCredentials();
+  }
+
   @SuppressWarnings("unchecked")
   private void onRemove() {
     IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
@@ -374,7 +435,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
       try {
         ICredentials authCredentials = fConService.getAuthCredentials(normalizedLink, realm);
         if (authCredentials != null) {
-          CredentialsModelData data = new CredentialsModelData(authCredentials.getUsername(), normalizedLink, realm);
+          CredentialsModelData data = new CredentialsModelData(authCredentials.getUsername(), authCredentials.getPassword(), normalizedLink, realm);
           credentials.add(data);
         }
       } catch (CredentialsException e) {
@@ -394,5 +455,70 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     composite.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_FILL | GridData.HORIZONTAL_ALIGN_FILL));
     composite.setFont(parent.getFont());
     return composite;
+  }
+
+  /*
+   * @see org.eclipse.jface.preference.PreferencePage#performOk()
+   */
+  @Override
+  public boolean performOk() {
+    boolean oldUseMasterPassword = fGlobalScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD);
+    boolean newUseMasterPassword = fUseMasterPasswordCheck.getSelection();
+
+    fGlobalScope.putBoolean(DefaultPreferences.USE_MASTER_PASSWORD, fUseMasterPasswordCheck.getSelection());
+
+    /*
+     * Hack: There does not seem to be any API to update the stored credentials in Equinox Secure Storage.
+     * In order to enable/disable the master password, the workaround is to save all known credentials again.
+     * The provider will automatically prompt for the new master password to use for the credentials.
+     */
+    if (oldUseMasterPassword != newUseMasterPassword)
+      reSetAllCredentials();
+
+    return super.performOk();
+  }
+
+  /*
+   * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
+   */
+  @Override
+  protected void performDefaults() {
+    super.performDefaults();
+
+    IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
+    fUseMasterPasswordCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD));
+    fResetMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
+  }
+
+  @SuppressWarnings("restriction")
+  private void reSetAllCredentials() {
+    Set<CredentialsModelData> credentials = loadCredentials();
+
+    /* Clear cached info */
+    InternalExchangeUtils.passwordProvidersReset();
+
+    /* Clear equinox security store and secure feed Node */
+    SecurePreferencesFactory.getDefault().node(EQUINOX_SECURE_STORAGE_NODE).clear();
+    SecurePreferencesFactory.getDefault().node(EQUINOX_SECURE_STORAGE_NODE).removeNode();
+    SecurePreferencesFactory.getDefault().node(PlatformCredentialsProvider.SECURE_FEED_NODE).clear();
+    SecurePreferencesFactory.getDefault().node(PlatformCredentialsProvider.SECURE_FEED_NODE).removeNode();
+    try {
+      SecurePreferencesFactory.getDefault().node(EQUINOX_SECURE_STORAGE_NODE).flush();
+      SecurePreferencesFactory.getDefault().node(PlatformCredentialsProvider.SECURE_FEED_NODE).flush();
+    } catch (IOException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    }
+
+    /* Write all Credentials into Node again */
+    for (CredentialsModelData credential : credentials) {
+      ICredentialsProvider credentialsProvider = Owl.getConnectionService().getCredentialsProvider(credential.fNormalizedLink);
+      if (credentialsProvider != null) {
+        try {
+          credentialsProvider.setAuthCredentials(credential.toCredentials(), credential.fNormalizedLink, credential.fRealm);
+        } catch (CredentialsException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+        }
+      }
+    }
   }
 }
