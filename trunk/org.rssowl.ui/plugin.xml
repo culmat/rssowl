@@ -457,7 +457,7 @@
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Notifier"
-            label="notifier notification alert popup ">
+            label="notifier notification alert popup fade animate info notify">
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Credentials"
