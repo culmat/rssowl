@@ -312,7 +312,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
 
             boolean isStatusVisible = preferences.getBoolean(DefaultPreferences.SHOW_STATUS);
-            configurer.setStatusVisible(!isStatusVisible);
+            configurer.setStatusVisible(!isStatusVisible, true);
             preferences.putBoolean(DefaultPreferences.SHOW_STATUS, !isStatusVisible);
           }
 
@@ -363,8 +363,20 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             Shell shell = OwlUI.getActiveShell();
             if (shell != null) {
               shell.setFullScreen(!shell.getFullScreen());
-              if (!shell.getFullScreen())
-                shell.layout(true, true); //Need to layout to avoid screen cheese
+
+              /* Shell got restored */
+              if (!shell.getFullScreen()) {
+                ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
+                configurer.setStatusVisible(preferences.getBoolean(DefaultPreferences.SHOW_STATUS), false);
+
+                shell.layout(); //Need to layout to avoid screen cheese
+              }
+
+              /* Shell got fullscreen */
+              else {
+                ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
+                configurer.setStatusVisible(false, true);
+              }
             }
           }
 

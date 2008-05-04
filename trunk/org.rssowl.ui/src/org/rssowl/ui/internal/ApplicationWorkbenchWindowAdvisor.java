@@ -149,7 +149,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     getWindowConfigurer().getWindow().getShell().layout();
   }
 
-  void setStatusVisible(boolean visible) {
+  /**
+   * @param visible
+   * @param layout
+   */
+  public void setStatusVisible(boolean visible, boolean layout) {
     getWindowConfigurer().setShowStatusLine(visible);
     getWindowConfigurer().setShowProgressIndicator(visible);
 
@@ -158,7 +162,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     getWindowConfigurer().setShowCoolBar(!showsToolBar);
     getWindowConfigurer().setShowCoolBar(showsToolBar);
 
-    getWindowConfigurer().getWindow().getShell().layout();
+    if (layout)
+      getWindowConfigurer().getWindow().getShell().layout();
   }
 
   /*
@@ -173,7 +178,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     if (!preferences.getBoolean(DefaultPreferences.SHOW_TOOLBAR))
       setToolBarVisible(false);
     if (!preferences.getBoolean(DefaultPreferences.SHOW_STATUS))
-      setStatusVisible(false);
+      setStatusVisible(false, true);
 
     /* Use PNG on Windows and Linux */
     if (Application.IS_WINDOWS || Application.IS_LINUX) {
