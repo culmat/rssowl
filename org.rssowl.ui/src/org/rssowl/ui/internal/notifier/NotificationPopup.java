@@ -116,6 +116,7 @@ public class NotificationPopup extends PopupDialog {
   private Image fCloseImageNormal;
   private Image fCloseImagePressed;
   private CLabel fTitleCircleLabel;
+  private CLabel fFooterCircleLabel;
   private Composite fInnerContentCircle;
   private Composite fOuterContentCircle;
   private final Font fNormalTextFont;
@@ -138,6 +139,7 @@ public class NotificationPopup extends PopupDialog {
   private Image fNextImagePressed;
   private Image fNextImageDisabled;
   private Image fTitleBgImage;
+  private Image fFooterBgImage;
   private CLabel fNextButton;
   private CLabel fPrevButton;
   private int fDisplayOffset;
@@ -287,6 +289,20 @@ public class NotificationPopup extends PopupDialog {
     region.subtract(s.x - 1, 3, 1, 1);
     region.subtract(s.x - 1, 4, 1, 1);
 
+    /* Subtract Bottom-Left Corner */
+    region.subtract(0, s.y, 5, 1);
+    region.subtract(0, s.y - 1, 3, 1);
+    region.subtract(0, s.y - 2, 2, 1);
+    region.subtract(0, s.y - 3, 1, 1);
+    region.subtract(0, s.y - 4, 1, 1);
+
+    /* Subtract Bottom-Right Corner */
+    region.subtract(s.x - 5, 0, 5, 1);
+    region.subtract(s.x - 3, 1, 3, 1);
+    region.subtract(s.x - 2, 2, 2, 1);
+    region.subtract(s.x - 1, 3, 1, 1);
+    region.subtract(s.x - 1, 4, 1, 1);
+
     /* Dispose old first */
     if (shell.getRegion() != null)
       shell.getRegion().dispose();
@@ -375,15 +391,16 @@ public class NotificationPopup extends PopupDialog {
     int totalPages = (fDisplayedItems.size() / fItemLimit) + ((fDisplayedItems.size() % fItemLimit != 0) ? 1 : 0);
     int currentPage = (fDisplayOffset / fItemLimit) + 1;
 
-    String firstPart = "Incoming News";
-    String secondPart = "";
+    String titlePart = fDisplayedItems.size() + " Incoming News";
+    String footerPart = "";
 
     /* More than one page */
     if (totalPages > 1)
-      secondPart = " - Page " + currentPage + " of " + totalPages;
+      footerPart = "Page " + currentPage + " of " + totalPages;
 
     /* Apply Text */
-    fTitleCircleLabel.setText(firstPart + secondPart);
+    fTitleCircleLabel.setText(titlePart);
+    fFooterCircleLabel.setText(footerPart);
   }
 
   private void updateContents(int offset) {
@@ -603,7 +620,7 @@ public class NotificationPopup extends PopupDialog {
     final Composite titleCircle = new Composite(outerCircle, SWT.NO_FOCUS);
     titleCircle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     titleCircle.setBackgroundMode(SWT.INHERIT_FORCE);
-    titleCircle.setLayout(LayoutUtils.createGridLayout(4, 3, 0, 5, 3, false));
+    titleCircle.setLayout(LayoutUtils.createGridLayout(2, 3, 0, 5, 3, false));
     titleCircle.addMouseTrackListener(fMouseTrackListner);
     titleCircle.addControlListener(new ControlAdapter() {
       @Override
@@ -675,42 +692,6 @@ public class NotificationPopup extends PopupDialog {
       }
     });
 
-    /* Nav to previous News */
-    fPrevButton = new CLabel(titleCircle, SWT.NO_FOCUS);
-    fPrevButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
-    fPrevButton.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-    fPrevButton.addMouseTrackListener(fMouseTrackListner);
-    fPrevButton.setImage(fPrevImageDisabled);
-    fPrevButton.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseUp(MouseEvent e) {
-        onNavPrevious();
-      }
-
-      @Override
-      public void mouseDown(MouseEvent e) {
-        fPrevButton.setImage(fPrevImagePressed);
-      }
-    });
-
-    /* Nav to next News */
-    fNextButton = new CLabel(titleCircle, SWT.NO_FOCUS);
-    fNextButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
-    fNextButton.addMouseTrackListener(fMouseTrackListner);
-    fNextButton.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
-    fNextButton.setImage(fNextImageDisabled);
-    fNextButton.addMouseListener(new MouseAdapter() {
-      @Override
-      public void mouseUp(MouseEvent e) {
-        onNavNext();
-      }
-
-      @Override
-      public void mouseDown(MouseEvent e) {
-        fNextButton.setImage(fNextImagePressed);
-      }
-    });
-
     /* CLabel to display a cross to close the popup */
     final CLabel closeButton = new CLabel(titleCircle, SWT.NO_FOCUS);
     closeButton.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
@@ -739,6 +720,7 @@ public class NotificationPopup extends PopupDialog {
     Composite middleContentCircle = new Composite(fOuterContentCircle, SWT.NO_FOCUS);
     middleContentCircle.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
     ((GridLayout) middleContentCircle.getLayout()).marginTop = 1;
+    ((GridLayout) middleContentCircle.getLayout()).marginBottom = 1;
     middleContentCircle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     middleContentCircle.setBackground(fNotifierColors.getBorder());
 
@@ -750,6 +732,101 @@ public class NotificationPopup extends PopupDialog {
     ((GridLayout) fInnerContentCircle.getLayout()).marginRight = 2;
     fInnerContentCircle.addMouseTrackListener(fMouseTrackListner);
     fInnerContentCircle.setBackground(fShell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+    /* Footer Area containing navigational controls */
+    final Composite footerCircle = new Composite(outerCircle, SWT.NO_FOCUS);
+    footerCircle.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+    footerCircle.setBackgroundMode(SWT.INHERIT_FORCE);
+    footerCircle.setLayout(LayoutUtils.createGridLayout(3, 3, 0, 5, 3, false));
+    footerCircle.addMouseTrackListener(fMouseTrackListner);
+    footerCircle.addControlListener(new ControlAdapter() {
+      @Override
+      public void controlResized(ControlEvent e) {
+        Rectangle clArea = footerCircle.getClientArea();
+        Image oldBgImage = fFooterBgImage;
+        fFooterBgImage = new Image(footerCircle.getDisplay(), clArea.width, clArea.height);
+        GC gc = new GC(fFooterBgImage);
+
+        /* Gradient */
+        drawGradient(gc, clArea);
+
+        /* Fix Region Shape */
+        fixRegion(gc, clArea);
+
+        gc.dispose();
+
+        footerCircle.setBackgroundImage(fFooterBgImage);
+
+        if (oldBgImage != null)
+          oldBgImage.dispose();
+      }
+
+      private void drawGradient(GC gc, Rectangle clArea) {
+        gc.setBackground(fNotifierColors.getGradientBegin());
+        gc.setForeground(fNotifierColors.getGradientEnd());
+        gc.fillGradientRectangle(clArea.x, clArea.y, clArea.width, clArea.height, true);
+      }
+
+      private void fixRegion(GC gc, Rectangle clArea) {
+        gc.setForeground(fNotifierColors.getBorder());
+
+        /* Fill Bottom Left */
+        gc.drawPoint(2, clArea.height - 0);
+        gc.drawPoint(3, clArea.height - 0);
+        gc.drawPoint(1, clArea.height - 1);
+        gc.drawPoint(0, clArea.height - 2);
+        gc.drawPoint(0, clArea.height - 3);
+
+        /* Fill Bottom Right */
+        gc.drawPoint(clArea.width - 4, clArea.height - 0);
+        gc.drawPoint(clArea.width - 3, clArea.height - 0);
+        gc.drawPoint(clArea.width - 2, clArea.height - 1);
+        gc.drawPoint(clArea.width - 1, clArea.height - 2);
+        gc.drawPoint(clArea.width - 1, clArea.height - 3);
+      }
+    });
+
+    /* Title Label displaying RSSOwl */
+    fFooterCircleLabel = new CLabel(footerCircle, SWT.NO_FOCUS);
+    fFooterCircleLabel.setFont(fBoldTextFont);
+    fFooterCircleLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+
+    /* Nav to previous News */
+    fPrevButton = new CLabel(footerCircle, SWT.NO_FOCUS);
+    fPrevButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, true, true));
+    fPrevButton.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+    fPrevButton.addMouseTrackListener(fMouseTrackListner);
+    fPrevButton.setImage(fPrevImageDisabled);
+    fPrevButton.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseUp(MouseEvent e) {
+        onNavPrevious();
+      }
+
+      @Override
+      public void mouseDown(MouseEvent e) {
+        fPrevButton.setImage(fPrevImagePressed);
+      }
+    });
+
+    /* Nav to next News */
+    fNextButton = new CLabel(footerCircle, SWT.NO_FOCUS);
+    fNextButton.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
+    fNextButton.addMouseTrackListener(fMouseTrackListner);
+    fNextButton.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+    fNextButton.setImage(fNextImageDisabled);
+    fNextButton.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseUp(MouseEvent e) {
+        onNavNext();
+      }
+
+      @Override
+      public void mouseDown(MouseEvent e) {
+        fNextButton.setImage(fNextImagePressed);
+      }
+    });
+
 
     return outerCircle;
   }
@@ -839,6 +916,8 @@ public class NotificationPopup extends PopupDialog {
       fLastUsedRegion.dispose();
     if (fTitleBgImage != null)
       fTitleBgImage.dispose();
+    if (fFooterBgImage != null)
+      fFooterBgImage.dispose();
     if (fInitialItems != null)
       fInitialItems.clear();
 
