@@ -84,7 +84,7 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
   /*
    * @see org.rssowl.core.model.types.IEntity#setId(java.lang.Long)
    */
-  public synchronized void setId(Long id) {
+  public void setId(Long id) {
     Assert.isNotNull(id, "id cannot be null"); //$NON-NLS-1$
     if (id.equals(fId))
       return;
