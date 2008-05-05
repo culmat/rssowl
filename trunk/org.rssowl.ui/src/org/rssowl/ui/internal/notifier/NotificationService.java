@@ -255,6 +255,10 @@ public class NotificationService {
             };
             fgNotificationPopup.open(items);
           }
+
+          /* Notifier already opened - Show Items */
+          else
+            fgNotificationPopup.makeVisible(items);
         }
       }
     });
