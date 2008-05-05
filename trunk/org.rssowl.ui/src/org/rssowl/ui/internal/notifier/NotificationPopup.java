@@ -99,13 +99,10 @@ public class NotificationPopup extends PopupDialog {
   private static final int DEFAULT_WIDTH = 400;
 
   /* Milliseconds before incrementing the alpha for fade in / fade out */
-  private static final int FADE_DELAY = 50;
+  private static final int FADE_DELAY = 40;
 
   /* Alpha increment for fade in */
   private static final int FADE_IN_INCREMENT = 20;
-
-  /* Alpha increment for fade out */
-  private static final int FADE_OUT_INCREMENT = -30;
 
   /* A field that is set to true in case fading is not supported on the OS */
   private static boolean fgFadeSupported = true;
@@ -148,12 +145,9 @@ public class NotificationPopup extends PopupDialog {
   private Collection<NotificationItem> fInitialItems;
 
   private class FadeJob extends UIJob {
-    private boolean fFadeIn;
-
-    FadeJob(boolean fadeIn) {
-      super("Fade Job");
+    FadeJob() {
+      super("Fade In Job");
       setSystem(true);
-      fFadeIn = fadeIn;
     }
 
     private boolean proceed(IProgressMonitor monitor) {
@@ -169,12 +163,12 @@ public class NotificationPopup extends PopupDialog {
       if (proceed(monitor)) {
         final int alpha = getShell().getAlpha();
 
-        if (fgFadeSupported && (fFadeIn && alpha < 255 || !fFadeIn && alpha > 0)) {
+        if (fgFadeSupported && alpha < 255) {
           if (proceed(monitor)) {
             getShell().getDisplay().syncExec(new Runnable() {
               public void run() {
                 if (proceed(monitor)) {
-                  int newAlpha = fFadeIn ? Math.min(alpha + FADE_IN_INCREMENT, 255) : Math.max(alpha + FADE_OUT_INCREMENT, 0);
+                  int newAlpha = Math.min(alpha + FADE_IN_INCREMENT, 255);
                   getShell().setAlpha(newAlpha);
 
                   if (newAlpha != getShell().getAlpha())
@@ -185,10 +179,6 @@ public class NotificationPopup extends PopupDialog {
             schedule(FADE_DELAY);
           }
         }
-
-        /* Fade Out finished - Close now */
-        if (!fFadeIn && (alpha <= 0 || !fgFadeSupported) && proceed(monitor))
-          doClose();
       }
 
       return Status.OK_STATUS;
@@ -256,15 +246,7 @@ public class NotificationPopup extends PopupDialog {
     if (fFadeJob != null)
       fFadeJob.cancel();
 
-    fFadeJob = new FadeJob(true);
-    fFadeJob.schedule();
-  }
-
-  private void fadeOut() {
-    if (fFadeJob != null)
-      fFadeJob.cancel();
-
-    fFadeJob = new FadeJob(false);
+    fFadeJob = new FadeJob();
     fFadeJob.schedule();
   }
 
@@ -318,12 +300,8 @@ public class NotificationPopup extends PopupDialog {
     fAutoCloser = new UIJob(PlatformUI.getWorkbench().getDisplay(), "") {
       @Override
       public IStatus runInUIThread(IProgressMonitor monitor) {
-        if (!fMouseOverNotifier && getShell() != null && !getShell().isDisposed()) {
-          if (fgFadeSupported && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER))
-            fadeOut();
-          else
-            doClose();
-        }
+        if (!fMouseOverNotifier && getShell() != null && !getShell().isDisposed())
+          doClose();
 
         return Status.OK_STATUS;
       }
@@ -826,7 +804,6 @@ public class NotificationPopup extends PopupDialog {
         fNextButton.setImage(fNextImagePressed);
       }
     });
-
 
     return outerCircle;
   }
