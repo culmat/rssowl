@@ -11,6 +11,10 @@
  **   distribution, and is available at:                                     **
  **   http://www.rssowl.org/legal/epl-v10.html                               **
  **                                                                          **
+ **   The algorithm to measure the strength of the master password was       **
+ **   taken from the Firefox sourcecode and is licensed under the Mozilla    **
+ **   Public License (MPL).                                                  **
+ **                                                                          **
  **   A copy is found in the file epl-v10.html and important notices to the  **
  **   license from the team is found in the textfile LICENSE.txt distributed **
  **   in this package.                                                       **
