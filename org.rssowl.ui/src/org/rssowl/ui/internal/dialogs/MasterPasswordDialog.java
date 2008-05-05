@@ -46,8 +46,8 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 /**
- * Dialog to ask for the master password used to encrypt credentials. Supports
- * a mode to create a new master password and to ask for an existing one.
+ * Dialog to ask for the master password used to encrypt credentials. Supports a
+ * mode to create a new master password and to ask for an existing one.
  *
  * @author bpasero
  */
@@ -206,11 +206,42 @@ public class MasterPasswordDialog extends TitleAreaDialog {
     return composite;
   }
 
-  //TODO Implement
   private void updateQualityBar() {
-    //    String pw = fPassword.getText();
+    String pw = fPassword.getText();
 
-    fQualityBar.setSelection(40);
+    int score = 0;
+
+    /* 1.) Length: password-length*10 - 20 (Max 20) */
+    score += Math.min(20, (pw.length() * 10) - 20);
+
+    /* 2.) Numbers: no-of-numerics * 10 (Max 30) */
+    int numericsCount = 0;
+    for (int i = 0; i < pw.length(); i++) {
+      if (Character.isDigit(pw.charAt(i)))
+        numericsCount++;
+    }
+
+    score += Math.min(30, numericsCount * 10);
+
+    /* 3.) Symbols: no-of-symbols * 15 (Max 45) */
+    int symbolCount = 0;
+    for (int i = 0; i < pw.length(); i++) {
+      if (!Character.isLetterOrDigit(pw.charAt(i)))
+        symbolCount++;
+    }
+
+    score += Math.min(45, symbolCount * 15);
+
+    /* 4.) Uppercase: no-of-Uppercase * 10 (Max 30) */
+    int upperCaseCount = 0;
+    for (int i = 0; i < pw.length(); i++) {
+      if (Character.isUpperCase(pw.charAt(i)))
+        upperCaseCount++;
+    }
+
+    score += Math.min(30, upperCaseCount * 10);
+
+    fQualityBar.setSelection(score);
   }
 
   /*
