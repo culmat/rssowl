@@ -203,6 +203,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Clean Up: Delete BMs with a connection error */
   public static final String CLEAN_UP_BM_BY_CON_ERROR = "org.rssowl.pref.CleanUpBMByConError";
 
+  /** Global: Clean Up: Delete duplicate BMs */
+  public static final String CLEAN_UP_BM_BY_DUPLICATES = "org.rssowl.pref.CleanUpBMByDuplicates";
+
   /** Global: Clean Up: Delete News > N (boolean) */
   public static final String CLEAN_UP_NEWS_BY_COUNT_STATE = "org.rssowl.pref.CleanUpNewsByCountState";
 
