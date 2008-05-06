@@ -162,6 +162,7 @@ public class CleanUpWizard extends Wizard {
         preferences.putInteger(DefaultPreferences.CLEAN_UP_BM_BY_LAST_UPDATE_VALUE, operations.getLastUpdateDays());
 
         preferences.putBoolean(DefaultPreferences.CLEAN_UP_BM_BY_CON_ERROR, operations.deleteFeedsByConError());
+        preferences.putBoolean(DefaultPreferences.CLEAN_UP_BM_BY_DUPLICATES, operations.deleteFeedsByDuplicates());
 
         preferences.putBoolean(DefaultPreferences.CLEAN_UP_NEWS_BY_AGE_STATE, operations.deleteNewsByAge());
         preferences.putInteger(DefaultPreferences.CLEAN_UP_NEWS_BY_AGE_VALUE, operations.getMaxNewsAge());
