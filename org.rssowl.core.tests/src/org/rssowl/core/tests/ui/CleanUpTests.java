@@ -46,6 +46,7 @@ import org.rssowl.ui.internal.dialogs.cleanup.NewsTask;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -103,7 +104,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Last Visit Date = 3 days */
-    CleanUpOperations ops = new CleanUpOperations(true, 3, false, 0, false, false, 0, false, 0, false, false);
+    CleanUpOperations ops = new CleanUpOperations(true, 3, false, 0, false, false, false, 0, false, 0, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -237,7 +238,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Last Update Date = 3 days */
-    CleanUpOperations ops = new CleanUpOperations(false, 0, true, 3, false, false, 0, false, 0, false, false);
+    CleanUpOperations ops = new CleanUpOperations(false, 0, true, 3, false, false, false, 0, false, 0, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -290,7 +291,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Last Update Date = 3 days */
-    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, true, false, 0, false, 0, false, false);
+    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, true, false, false, 0, false, 0, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -307,6 +308,75 @@ public class CleanUpTests {
       assertEquals(bm3, ((BookMarkTask) tasks.get(0)).getMark());
     }
   }
+
+  /**
+   * Test: Delete duplicate BookMarks
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testCleanUpBookmarksByDuplicates() throws Exception {
+    IFolder rootFolder = fFactory.createFolder(null, null, "Root");
+    DynamicDAO.save(rootFolder);
+
+    IFeed feed1 = fFactory.createFeed(null, new URI("http://www.feed1.com"));
+    IFeed feed2 = fFactory.createFeed(null, new URI("http://www.feed2.com"));
+    IFeed feed3 = fFactory.createFeed(null, new URI("http://www.feed3.com"));
+
+    DynamicDAO.save(feed1);
+    DynamicDAO.save(feed2);
+    DynamicDAO.save(feed3);
+
+    Calendar cal = Calendar.getInstance();
+
+    IBookMark bm1 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed1.getLink()), "BM1");
+    cal.set(2008, 10, 15, 12, 0);
+    bm1.setCreationDate(cal.getTime());
+
+    IBookMark bmMostRecentDuplicate = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed1.getLink()), "BM1 Most Recent Duplicate");
+    cal.set(2008, 10, 18, 12, 0);
+    bmMostRecentDuplicate.setCreationDate(cal.getTime());
+
+    IBookMark bmOldestDuplicate = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed1.getLink()), "BM1 Oldest Duplicate");
+    cal.set(2007, 9, 18, 12, 0);
+    bmOldestDuplicate.setCreationDate(cal.getTime());
+
+    IBookMark bm2 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed2.getLink()), "BM2");
+    IBookMark bm3 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed3.getLink()), "BM3");
+
+    DynamicDAO.save(bm1);
+    DynamicDAO.save(bmMostRecentDuplicate);
+    DynamicDAO.save(bmOldestDuplicate);
+    DynamicDAO.save(bm2);
+    DynamicDAO.save(bm3);
+
+    List<IBookMark> marks = new ArrayList<IBookMark>();
+    marks.add(bm1);
+    marks.add(bmMostRecentDuplicate);
+    marks.add(bmOldestDuplicate);
+    marks.add(bm2);
+    marks.add(bm3);
+
+    /* Delete Duplicates */
+    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, true, false, 0, false, 0, false, false);
+
+    {
+      CleanUpModel model = new CleanUpModel(ops, marks);
+      model.generate();
+      List<CleanUpGroup> groups = model.getTasks();
+
+      /* Assert Filled */
+      assertEquals(2, groups.size());
+
+      List<CleanUpTask> tasks = groups.get(1).getTasks();
+      assertEquals(2, tasks.size());
+      assertEquals(true, tasks.get(0) instanceof BookMarkTask);
+
+      assertEquals(bm1, ((BookMarkTask) tasks.get(0)).getMark());
+      assertEquals(bmMostRecentDuplicate, ((BookMarkTask) tasks.get(1)).getMark());
+    }
+  }
+
 
   /**
    * Test: Delete BookMarks that have Last Update > X Days ago and Last Visit >
@@ -350,7 +420,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Last Update Date = 3 days, Last Visit = 3 days */
-    CleanUpOperations ops = new CleanUpOperations(true, 3, true, 3, false, false, 0, false, 0, false, false);
+    CleanUpOperations ops = new CleanUpOperations(true, 3, true, 3, false, false, false, 0, false, 0, false, false);
 
     bm3.setLastVisitDate(new Date(System.currentTimeMillis() - 4 * DAY));
 
@@ -436,7 +506,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Max News Count: 1 */
-    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, true, 1, false, 0, false, false);
+    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, true, 1, false, 0, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -454,7 +524,7 @@ public class CleanUpTests {
     }
 
     /* Max News Count: 2 */
-    ops = new CleanUpOperations(false, 0, false, 0, false, true, 2, false, 0, false, false);
+    ops = new CleanUpOperations(false, 0, false, 0, false, false, true, 2, false, 0, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -507,7 +577,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Max News Age = 3 days */
-    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, 0, true, 3, false, false);
+    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, false, 0, true, 3, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -525,7 +595,7 @@ public class CleanUpTests {
     }
 
     /* Max News Age = 1 days */
-    ops = new CleanUpOperations(false, 0, false, 0, false, false, 0, true, 1, false, false);
+    ops = new CleanUpOperations(false, 0, false, 0, false, false, false, 0, true, 1, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -584,7 +654,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Max News Age = 3 days and keep unread */
-    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, 0, true, 3, false, true);
+    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, false, 0, true, 3, false, true);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -661,7 +731,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Max Last Visit Age = 3 days && Max News Age = 3 days */
-    CleanUpOperations ops = new CleanUpOperations(true, 3, false, 0, false, false, 0, true, 3, false, false);
+    CleanUpOperations ops = new CleanUpOperations(true, 3, false, 0, false, false, false, 0, true, 3, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -725,7 +795,7 @@ public class CleanUpTests {
     marks.add(bm3);
 
     /* Max News Age = 3 days and Max Count = 1 */
-    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, true, 1, true, 3, false, false);
+    CleanUpOperations ops = new CleanUpOperations(false, 0, false, 0, false, false, true, 1, true, 3, false, false);
 
     {
       CleanUpModel model = new CleanUpModel(ops, marks);
@@ -744,7 +814,7 @@ public class CleanUpTests {
       assertEquals(true, tasks2.get(0) instanceof NewsTask);
 
       assertEquals(news4, ((NewsTask) tasks1.get(0)).getNews().iterator().next().resolve());
-//      assertEquals(news1, ((NewsTask) tasks2.get(0)).getNews().iterator().next().resolve());
+      assertEquals(news1, ((NewsTask) tasks2.get(0)).getNews().iterator().next().resolve());
     }
   }
 }
