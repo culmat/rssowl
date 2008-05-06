@@ -171,6 +171,8 @@
 		<outline text="mozillaZine" xmlUrl="http://www.mozillazine.org/atom.xml" />
 		<outline text="Fileforum" xmlUrl="http://bootleg-rss.g-blog.net/betanews_com.php" />
 		<outline text="Download.com Mac New Releases" xmlUrl="http://www.download.com/3412-2003-0-25.xml" />
+		<outline text="Free Vista Files" xmlUrl="http://www.freevistafiles.com/rss/new_software.xml" />
+		<outline text="Do Download" xmlUrl="http://www.dodownload.com/rss/new_software.xml" />
 		</outline>
 		<outline text="Sports">
 		<outline text="NBC11.com - Sports" xmlUrl="http://www.nbc11.com/sports/topstory.rss" />
