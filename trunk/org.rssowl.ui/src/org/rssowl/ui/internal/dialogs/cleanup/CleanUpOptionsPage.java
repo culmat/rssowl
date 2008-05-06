@@ -49,6 +49,7 @@ public class CleanUpOptionsPage extends WizardPage {
   private Button fDeleteFeedByLastUpdateCheck;
   private Spinner fMaxLastUpdateSpinner;
   private Button fDeleteConErrorFeedCheck;
+  private Button fDeleteDuplicateBookmarksCheck;
   private Button fDeleteNewsByCountCheck;
   private Spinner fMaxCountSpinner;
   private Button fDeleteNewsByAgeCheck;
@@ -76,6 +77,7 @@ public class CleanUpOptionsPage extends WizardPage {
     boolean lastUpdateInDaysState = fDeleteFeedByLastUpdateCheck.getSelection();
     int lastUpdateInDays = fMaxLastUpdateSpinner.getSelection();
     boolean deleteFeedsByConError = fDeleteConErrorFeedCheck.getSelection();
+    boolean deleteFeedsByDuplicates = fDeleteDuplicateBookmarksCheck.getSelection();
 
     /* News Operations */
     boolean maxNewsCountPerFeedState = fDeleteNewsByCountCheck.getSelection();
@@ -87,7 +89,7 @@ public class CleanUpOptionsPage extends WizardPage {
     boolean deleteReadNews = fDeleteReadNewsCheck.getSelection();
     boolean keepUnreadNews = fNeverDeleteUnreadNewsCheck.getSelection();
 
-    return new CleanUpOperations(lastVisitInDaysState, lastVisitInDays, lastUpdateInDaysState, lastUpdateInDays, deleteFeedsByConError, maxNewsCountPerFeedState, maxNewsCountPerFeed, maxNewsAgeState, maxNewsAge, deleteReadNews, keepUnreadNews);
+    return new CleanUpOperations(lastVisitInDaysState, lastVisitInDays, lastUpdateInDaysState, lastUpdateInDays, deleteFeedsByConError, deleteFeedsByDuplicates, maxNewsCountPerFeedState, maxNewsCountPerFeed, maxNewsAgeState, maxNewsAge, deleteReadNews, keepUnreadNews);
   }
 
   /*
@@ -160,7 +162,15 @@ public class CleanUpOptionsPage extends WizardPage {
       label.setText("days");
     }
 
-    /* 3.) Delete Feeds that have Connection Error */
+    /* 3.) Delete Duplicate Feeds*/
+    {
+      fDeleteDuplicateBookmarksCheck = new Button(container, SWT.CHECK);
+      fDeleteDuplicateBookmarksCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
+      fDeleteDuplicateBookmarksCheck.setText("Delete recently created duplicate bookmarks");
+      fDeleteDuplicateBookmarksCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CLEAN_UP_BM_BY_DUPLICATES));
+    }
+
+    /* 4.) Delete Feeds that have Connection Error */
     {
       fDeleteConErrorFeedCheck = new Button(container, SWT.CHECK);
       fDeleteConErrorFeedCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));

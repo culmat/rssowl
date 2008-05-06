@@ -49,9 +49,11 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Creates the collection of <code>CleanUpTask</code> that the user may choose
@@ -195,6 +197,45 @@ public class CleanUpModel {
         if (!bookmarksToDelete.contains(mark) && mark.isErrorLoading()) {
           bookmarksToDelete.add(mark);
           group.addTask(new BookMarkTask(group, mark));
+        }
+      }
+
+      if (!group.isEmpty())
+        fTasks.add(group);
+    }
+
+    /* 4.) Delete Duplicate BookMarks */
+    if (fOps.deleteFeedsByDuplicates()) {
+      CleanUpGroup group = new CleanUpGroup("Most recently created duplicate bookmarks");
+
+      for (IBookMark currentBookMark : fBookmarks) {
+        if (!bookmarksToDelete.contains(currentBookMark)) {
+
+          /* Group of Bookmarks referencing the same Feed sorted by Creation Date */
+          Set<IBookMark> sortedBookmarkGroup = new TreeSet<IBookMark>(new Comparator<IBookMark>() {
+            public int compare(IBookMark o1, IBookMark o2) {
+              return o1.getCreationDate().compareTo(o2.getCreationDate());
+            }
+          });
+
+          /* Add Current Bookmark and Duplicates */
+          for (IBookMark bookMark : fBookmarks) {
+            if (!bookmarksToDelete.contains(bookMark) && bookMark.getFeedLinkReference().equals(currentBookMark.getFeedLinkReference())) {
+              sortedBookmarkGroup.add(bookMark);
+            }
+          }
+
+          /* Delete most recent duplicates if any */
+          if (sortedBookmarkGroup.size() > 1) {
+            Iterator<IBookMark> iterator = sortedBookmarkGroup.iterator();
+            iterator.next(); // Ignore first, oldest one
+
+            while (iterator.hasNext()) {
+              IBookMark bookmark = iterator.next();
+              bookmarksToDelete.add(bookmark);
+              group.addTask(new BookMarkTask(group, bookmark));
+            }
+          }
         }
       }
 

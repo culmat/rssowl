@@ -39,6 +39,7 @@ public class CleanUpOperations {
   private int fLastUpdateInDays;
 
   private boolean fDeleteFeedsByConError;
+  private final boolean fDeleteFeedsByDuplicates;
 
   /* News Operations */
   private boolean fMaxNewsCountPerFeedState;
@@ -56,6 +57,7 @@ public class CleanUpOperations {
    * @param lastUpdateState
    * @param lastUpdateInDays
    * @param deleteFeedsByConError
+   * @param deleteFeedsByDuplicates
    * @param maxNewsCountPerFeedState
    * @param maxNewsCountPerFeed
    * @param maxNewsAgeState
@@ -63,12 +65,13 @@ public class CleanUpOperations {
    * @param deleteReadNews
    * @param keepUnreadNews
    */
-  public CleanUpOperations(boolean lastVisitState, int lastVisitInDays, boolean lastUpdateState, int lastUpdateInDays, boolean deleteFeedsByConError, boolean maxNewsCountPerFeedState, int maxNewsCountPerFeed, boolean maxNewsAgeState, int maxNewsAge, boolean deleteReadNews, boolean keepUnreadNews) {
+  public CleanUpOperations(boolean lastVisitState, int lastVisitInDays, boolean lastUpdateState, int lastUpdateInDays, boolean deleteFeedsByConError, boolean deleteFeedsByDuplicates, boolean maxNewsCountPerFeedState, int maxNewsCountPerFeed, boolean maxNewsAgeState, int maxNewsAge, boolean deleteReadNews, boolean keepUnreadNews) {
     fLastVisitInDaysState = lastVisitState;
     fLastVisitInDays = lastVisitInDays;
     fLastUpdateInDaysState = lastUpdateState;
     fLastUpdateInDays = lastUpdateInDays;
     fDeleteFeedsByConError = deleteFeedsByConError;
+    fDeleteFeedsByDuplicates = deleteFeedsByDuplicates;
     fMaxNewsCountPerFeedState = maxNewsCountPerFeedState;
     fMaxNewsCountPerFeed = maxNewsCountPerFeed;
     fMaxNewsAgeState = maxNewsAgeState;
@@ -95,6 +98,10 @@ public class CleanUpOperations {
 
   boolean deleteFeedsByConError() {
     return fDeleteFeedsByConError;
+  }
+
+  boolean deleteFeedsByDuplicates() {
+    return fDeleteFeedsByDuplicates;
   }
 
   boolean deleteNewsByCount() {
