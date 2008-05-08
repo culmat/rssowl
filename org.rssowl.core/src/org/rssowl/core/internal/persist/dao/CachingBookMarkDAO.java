@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.persist.IBookMark;
@@ -33,41 +34,41 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-final class CachingBookMarkDAO extends CachingDAO<BookMarkDAOImpl, IBookMark, BookMarkListener, BookMarkEvent> implements IBookMarkDAO  {
+public final class CachingBookMarkDAO extends CachingDAO<BookMarkDAOImpl, IBookMark, BookMarkListener, BookMarkEvent> implements IBookMarkDAO {
 
-    public CachingBookMarkDAO() {
-      super(new BookMarkDAOImpl());
-    }
-
-    @Override
-    protected BookMarkListener createEntityListener() {
-      return new BookMarkListener() {
-        public void entitiesAdded(Set<BookMarkEvent> events) {
-          for (BookMarkEvent event : events)
-            getCache().put(event.getEntity().getId(), event.getEntity());
-
-        }
-
-        public void entitiesDeleted(Set<BookMarkEvent> events) {
-          for (BookMarkEvent event : events)
-            getCache().remove(event.getEntity().getId(), event.getEntity());
-
-        }
-
-        public void entitiesUpdated(Set<BookMarkEvent> events) {
-          /* No action needed */
-        }
-      };
-    }
-
-    public Collection<IBookMark> loadAll(FeedLinkReference feedRef) {
-      //TODO Check if this is faster than the db query
-      Set<IBookMark> marks = new HashSet<IBookMark>(1);
-      for (IBookMark mark : getCache().values()) {
-        if (mark.getFeedLinkReference().equals(feedRef))
-          marks.add(mark);
-      }
-      return marks;
-    }
-
+  public CachingBookMarkDAO() {
+    super(new BookMarkDAOImpl());
   }
+
+  @Override
+  protected BookMarkListener createEntityListener() {
+    return new BookMarkListener() {
+      public void entitiesAdded(Set<BookMarkEvent> events) {
+        for (BookMarkEvent event : events)
+          getCache().put(event.getEntity().getId(), event.getEntity());
+
+      }
+
+      public void entitiesDeleted(Set<BookMarkEvent> events) {
+        for (BookMarkEvent event : events)
+          getCache().remove(event.getEntity().getId(), event.getEntity());
+
+      }
+
+      public void entitiesUpdated(Set<BookMarkEvent> events) {
+      /* No action needed */
+      }
+    };
+  }
+
+  public Collection<IBookMark> loadAll(FeedLinkReference feedRef) {
+    //TODO Check if this is faster than the db query
+    Set<IBookMark> marks = new HashSet<IBookMark>(1);
+    for (IBookMark mark : getCache().values()) {
+      if (mark.getFeedLinkReference().equals(feedRef))
+        marks.add(mark);
+    }
+    return marks;
+  }
+
+}
