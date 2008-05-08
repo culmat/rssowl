@@ -30,7 +30,7 @@ import org.rssowl.core.persist.event.NewsBinListener;
 
 import java.util.Set;
 
-final class CachingNewsBinDAO extends CachingDAO<NewsBinDaoImpl, INewsBin, NewsBinListener, NewsBinEvent> implements INewsBinDAO {
+public final class CachingNewsBinDAO extends CachingDAO<NewsBinDaoImpl, INewsBin, NewsBinListener, NewsBinEvent> implements INewsBinDAO {
 
   public CachingNewsBinDAO() {
     super(new NewsBinDaoImpl());
