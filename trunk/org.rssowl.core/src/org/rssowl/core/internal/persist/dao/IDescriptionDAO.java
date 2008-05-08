@@ -24,31 +24,11 @@
 package org.rssowl.core.internal.persist.dao;
 
 import org.rssowl.core.internal.persist.Description;
+import org.rssowl.core.persist.dao.IPersistableDAO;
 
-import com.db4o.query.Query;
+public interface IDescriptionDAO extends IPersistableDAO<Description> {
 
-public class DescriptionDAOImpl extends AbstractPersistableDAO<Description> implements IDescriptionDAO {
+  public Description load(long newsId);
 
-  public DescriptionDAOImpl() {
-    super(Description.class, true);
-  }
-
-  public Description load(long newsId) {
-    Query query = fDb.query();
-    query.constrain(Description.class);
-    query.descend("fNewsId").constrain(newsId);
-    Description description = getSingleResult(query);
-    fDb.activate(description, Integer.MAX_VALUE);
-    return description;
-  }
-
-  public String loadValue(long newsId) {
-    Description description = load(newsId);
-    return description == null ? null : description.getValue();
-  }
-
-  @Override
-  protected void preCommit() {
-    // Do nothing
-  }
+  public String loadValue(long newsId);
 }
