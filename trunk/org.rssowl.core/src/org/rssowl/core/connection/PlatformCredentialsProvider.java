@@ -261,7 +261,13 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     ISecurePreferences realmPreference = feedPreferences.node(EncodingUtils.encodeSlashes(realm != null ? realm : REALM));
 
     IPreferenceScope globalScope = Owl.getPreferenceService().getGlobalScope();
-    boolean encryptPW = globalScope.getBoolean(DefaultPreferences.USE_OS_PASSWORD) || globalScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD);
+
+    /* OS Password is only supported on Windows and Mac */
+    boolean useOSPassword = globalScope.getBoolean(DefaultPreferences.USE_OS_PASSWORD);
+    if (!Platform.OS_WIN32.equals(Platform.getOS()) && !Platform.OS_MACOSX.equals(Platform.getOS()))
+      useOSPassword = false;
+
+    boolean encryptPW = useOSPassword || globalScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD);
     try {
       if (credentials.getUsername() != null)
         realmPreference.put(USERNAME, credentials.getUsername(), encryptPW);
