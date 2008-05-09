@@ -38,6 +38,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Use Master Password to encrypt passwords to feeds */
   public static final String USE_MASTER_PASSWORD = "org.rssowl.pref.UseMasterPassword";
 
+  /** Global: Use OS Password to encrypt passwords to feeds */
+  public static final String USE_OS_PASSWORD = "org.rssowl.pref.UseOSPassword";
+
   /** Global: Mark all news as read on minimize */
   public static final String MARK_READ_ON_MINIMIZE = "org.rssowl.pref.MarkNewsReadOnMinimize";
 
@@ -298,6 +301,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
   }
 
   private void initGlobalDefaults(IPreferenceScope defaultScope) {
+    defaultScope.putBoolean(USE_OS_PASSWORD, true);
     defaultScope.putBoolean(MARK_READ_ON_MINIMIZE, false);
     defaultScope.putBoolean(MARK_READ_ON_CHANGE, false);
     defaultScope.putBoolean(MARK_READ_ON_TAB_CLOSE, false);

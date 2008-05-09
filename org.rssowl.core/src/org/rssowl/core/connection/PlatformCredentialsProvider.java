@@ -27,10 +27,13 @@ package org.rssowl.core.connection;
 import org.eclipse.core.net.proxy.IProxyData;
 import org.eclipse.core.net.proxy.IProxyService;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.equinox.internal.security.storage.friends.InternalExchangeUtils;
 import org.eclipse.equinox.security.storage.EncodingUtils;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.equinox.security.storage.StorageException;
+import org.eclipse.equinox.security.storage.provider.IProviderHints;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
@@ -40,7 +43,9 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -49,13 +54,20 @@ import java.util.Set;
  *
  * @author bpasero
  */
+@SuppressWarnings("restriction")
 public class PlatformCredentialsProvider implements ICredentialsProvider {
 
-  /** Node for feed related security preferences */
-  public static final String SECURE_FEED_NODE = "rssowl/feeds";
+  /* Node for feed related security preferences */
+  private static final String SECURE_FEED_NODE = "rssowl/feeds";
 
   /* File with credentials stored */
   private static final String SECURE_STORAGE_FILE = ".credentials";
+
+  /* ID of the Win32 dependent password provider (win32) */
+  private static final String WIN_PW_PROVIDER_ID = "org.eclipse.equinox.security.WindowsPasswordProvider";
+
+  /* ID of the MacOS dependent password provider */
+  private static final String MACOS_PW_PROVIDER_ID = "org.eclipse.equinox.security.OSXKeystoreIntegration";
 
   /* Unique Key to store Usernames */
   private static final String USERNAME = "org.rssowl.core.connection.auth.Username"; //$NON-NLS-1$
@@ -71,30 +83,6 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
 
   /* A cache of non-protected Links */
   private final Set<String> fUnprotectedLinksCache = new HashSet<String>();
-
-  private ISecurePreferences fSecurity;
-
-  /** Default credentials provider using Equinox Security */
-  public PlatformCredentialsProvider() {
-
-    /* Try storing credentials in profile folder */
-    try {
-      IPath stateLocation = Activator.getDefault().getStateLocation();
-      stateLocation = stateLocation.append(SECURE_STORAGE_FILE);
-      URL location = stateLocation.toFile().toURL();
-      fSecurity = SecurePreferencesFactory.open(location, null);
-    } catch (MalformedURLException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
-    } catch (IllegalStateException e1) {
-      Activator.getDefault().logError(e1.getMessage(), e1);
-    } catch (IOException e2) {
-      Activator.getDefault().logError(e2.getMessage(), e2);
-    }
-
-    /* Fallback to default location */
-    if (fSecurity == null)
-      fSecurity = SecurePreferencesFactory.getDefault();
-  }
 
   /* Simple POJO Implementation of ICredentials */
   private static class Credentials implements ICredentials {
@@ -147,11 +135,51 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     return null;
   }
 
+  private ISecurePreferences getSecurePreferences() {
+    IPreferenceScope prefs = Owl.getPreferenceService().getGlobalScope();
+    boolean useOSPasswordProvider = prefs.getBoolean(DefaultPreferences.USE_OS_PASSWORD);
+
+    /* Disable OS Password if Master Password shall be used */
+    if (prefs.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD))
+      useOSPasswordProvider = false;
+
+    /* Try storing credentials in profile folder */
+    try {
+      IPath stateLocation = Activator.getDefault().getStateLocation();
+      stateLocation = stateLocation.append(SECURE_STORAGE_FILE);
+      URL location = stateLocation.toFile().toURL();
+      Map<String, String> options = null;
+
+      /* Use OS dependent password provider if available */
+      if (useOSPasswordProvider) {
+        if (Platform.OS_WIN32.equals(Platform.getOS())) {
+          options = new HashMap<String, String>();
+          options.put(IProviderHints.REQUIRED_MODULE_ID, WIN_PW_PROVIDER_ID);
+        } else if (Platform.OS_MACOSX.equals(Platform.getOS())) {
+          options = new HashMap<String, String>();
+          options.put(IProviderHints.REQUIRED_MODULE_ID, MACOS_PW_PROVIDER_ID);
+        }
+      }
+
+      return SecurePreferencesFactory.open(location, options);
+    } catch (MalformedURLException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    } catch (IllegalStateException e1) {
+      Activator.getDefault().logError(e1.getMessage(), e1);
+    } catch (IOException e2) {
+      Activator.getDefault().logError(e2.getMessage(), e2);
+    }
+
+    /* Fallback to default location */
+    return SecurePreferencesFactory.getDefault();
+  }
+
   private ICredentials getAuthorizationInfo(URI link, String realm) throws CredentialsException {
+    ISecurePreferences securePreferences = getSecurePreferences();
 
     /* Return from Equinox Security Storage */
-    if (fSecurity.nodeExists(SECURE_FEED_NODE)) { // Global Feed Node
-      ISecurePreferences allFeedsPreferences = fSecurity.node(SECURE_FEED_NODE);
+    if (securePreferences.nodeExists(SECURE_FEED_NODE)) { // Global Feed Node
+      ISecurePreferences allFeedsPreferences = securePreferences.node(SECURE_FEED_NODE);
       if (allFeedsPreferences.nodeExists(EncodingUtils.encodeSlashes(link.toString()))) { // Feed Node
         ISecurePreferences feedPreferences = allFeedsPreferences.node(EncodingUtils.encodeSlashes(link.toString()));
         if (feedPreferences.nodeExists(EncodingUtils.encodeSlashes(realm != null ? realm : REALM))) { // Realm Node
@@ -225,23 +253,24 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
    * rssowl.core.connection.ICredentials, java.net.URI, java.lang.String)
    */
   public void setAuthCredentials(ICredentials credentials, URI link, String realm) throws CredentialsException {
+    ISecurePreferences securePreferences = getSecurePreferences();
 
     /* Store in Equinox Security Storage */
-    ISecurePreferences allFeedsPreferences = fSecurity.node(SECURE_FEED_NODE);
+    ISecurePreferences allFeedsPreferences = securePreferences.node(SECURE_FEED_NODE);
     ISecurePreferences feedPreferences = allFeedsPreferences.node(EncodingUtils.encodeSlashes(link.toString()));
     ISecurePreferences realmPreference = feedPreferences.node(EncodingUtils.encodeSlashes(realm != null ? realm : REALM));
 
     IPreferenceScope globalScope = Owl.getPreferenceService().getGlobalScope();
-    boolean useMasterPassword = globalScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD);
+    boolean encryptPW = globalScope.getBoolean(DefaultPreferences.USE_OS_PASSWORD) || globalScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD);
     try {
       if (credentials.getUsername() != null)
-        realmPreference.put(USERNAME, credentials.getUsername(), useMasterPassword);
+        realmPreference.put(USERNAME, credentials.getUsername(), encryptPW);
 
       if (credentials.getPassword() != null)
-        realmPreference.put(PASSWORD, credentials.getPassword(), useMasterPassword);
+        realmPreference.put(PASSWORD, credentials.getPassword(), encryptPW);
 
       if (credentials.getDomain() != null)
-        realmPreference.put(DOMAIN, credentials.getDomain(), useMasterPassword);
+        realmPreference.put(DOMAIN, credentials.getDomain(), encryptPW);
 
       realmPreference.flush(); // Flush to disk early
     } catch (StorageException e) {
@@ -280,10 +309,11 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
    * .net.URI, java.lang.String)
    */
   public void deleteAuthCredentials(URI link, String realm) throws CredentialsException {
+    ISecurePreferences securePreferences = getSecurePreferences();
 
     /* Remove from Equinox Security Storage */
-    if (fSecurity.nodeExists(SECURE_FEED_NODE)) { // Global Feed Node
-      ISecurePreferences allFeedsPreferences = fSecurity.node(SECURE_FEED_NODE);
+    if (securePreferences.nodeExists(SECURE_FEED_NODE)) { // Global Feed Node
+      ISecurePreferences allFeedsPreferences = securePreferences.node(SECURE_FEED_NODE);
       if (allFeedsPreferences.nodeExists(EncodingUtils.encodeSlashes(link.toString()))) { // Feed Node
         ISecurePreferences feedPreferences = allFeedsPreferences.node(EncodingUtils.encodeSlashes(link.toString()));
         if (feedPreferences.nodeExists(EncodingUtils.encodeSlashes(realm != null ? realm : REALM))) { // Realm Node
@@ -312,5 +342,32 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     IProxyService proxyService = Activator.getDefault().getProxyService();
     proxyService.setProxiesEnabled(false);
     //TODO System Properties are still set?
+  }
+
+  /**
+   * An internal method only available for the {@link
+   * PlatformCredentialsProvider} to clear all secure preferences nodes. This
+   * method is called e.g. when the master password is to be changed or
+   * disabled.
+   */
+  @SuppressWarnings("restriction")
+  public void clear() {
+
+    /* Clear cached info */
+    InternalExchangeUtils.passwordProvidersReset();
+
+    /* Remove all Nodes */
+    ISecurePreferences secureRoot = getSecurePreferences();
+    String[] childrenNames = secureRoot.childrenNames();
+    for (String child : childrenNames) {
+      secureRoot.node(child).removeNode();
+    }
+
+    /* Flush to Disk */
+    try {
+      secureRoot.flush();
+    } catch (IOException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    }
   }
 }
