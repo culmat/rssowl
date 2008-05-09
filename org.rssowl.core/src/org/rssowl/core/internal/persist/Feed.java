@@ -915,4 +915,12 @@ public class Feed extends AbstractEntity implements IFeed {
   public FeedReference toReference() {
     return new FeedReference(getIdAsPrimitive());
   }
+
+  public MergeResult mergeNews(INews news) {
+    for (INews otherNews : fNews) {
+      if (otherNews.getId().equals(news.getId()))
+        return otherNews.merge(news);
+    }
+    return null;
+  }
 }
