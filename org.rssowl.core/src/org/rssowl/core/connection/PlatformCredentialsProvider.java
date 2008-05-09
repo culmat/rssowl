@@ -26,6 +26,7 @@ package org.rssowl.core.connection;
 
 import org.eclipse.core.net.proxy.IProxyData;
 import org.eclipse.core.net.proxy.IProxyService;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.equinox.security.storage.EncodingUtils;
 import org.eclipse.equinox.security.storage.ISecurePreferences;
 import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
@@ -36,7 +37,9 @@ import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -50,6 +53,9 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
 
   /** Node for feed related security preferences */
   public static final String SECURE_FEED_NODE = "rssowl/feeds";
+
+  /* File with credentials stored */
+  private static final String SECURE_STORAGE_FILE = ".credentials";
 
   /* Unique Key to store Usernames */
   private static final String USERNAME = "org.rssowl.core.connection.auth.Username"; //$NON-NLS-1$
@@ -70,7 +76,24 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
 
   /** Default credentials provider using Equinox Security */
   public PlatformCredentialsProvider() {
-    fSecurity = SecurePreferencesFactory.getDefault();
+
+    /* Try storing credentials in profile folder */
+    try {
+      IPath stateLocation = Activator.getDefault().getStateLocation();
+      stateLocation = stateLocation.append(SECURE_STORAGE_FILE);
+      URL location = stateLocation.toFile().toURL();
+      fSecurity = SecurePreferencesFactory.open(location, null);
+    } catch (MalformedURLException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    } catch (IllegalStateException e1) {
+      Activator.getDefault().logError(e1.getMessage(), e1);
+    } catch (IOException e2) {
+      Activator.getDefault().logError(e2.getMessage(), e2);
+    }
+
+    /* Fallback to default location */
+    if (fSecurity == null)
+      fSecurity = SecurePreferencesFactory.getDefault();
   }
 
   /* Simple POJO Implementation of ICredentials */
