@@ -192,11 +192,11 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     infoText.setBackground(masterContainer.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
     if (Application.IS_WINDOWS)
-      infoText.setText("Set a master password to encrypt your passwords for protected feeds. Note that on Windows, your passwords are automatically protected using your system password.");
+      infoText.setText("Set a master password to protect your passwords from unauthorized access. Note that on Windows, the passwords are automatically protected using your system password.");
     else if (Application.IS_MAC)
-      infoText.setText("Set a master password to encrypt your passwords for protected feeds. Note that on MacOS, your passwords are automatically protected using your system password.");
+      infoText.setText("Set a master password to protect your passwords from unauthorized access. Note that on MacOS, the passwords are automatically protected using your system password.");
     else
-      infoText.setText("It is recommended to set a master password to encrypt your passwords for protected feeds.");
+      infoText.setText("It is recommended to set a master password to protect your passwords from unauthorized access.");
 
     fUseMasterPasswordCheck = new Button(masterContainer, SWT.CHECK);
     fUseMasterPasswordCheck.setText("Use a master password");
