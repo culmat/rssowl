@@ -32,8 +32,9 @@ import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.internal.persist.LazyList;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.dao.DAOServiceImpl;
-import org.rssowl.core.internal.persist.dao.DescriptionDAOImpl;
 import org.rssowl.core.internal.persist.dao.EntitiesToBeIndexedDAOImpl;
+import org.rssowl.core.internal.persist.dao.IDescriptionDAO;
+import org.rssowl.core.internal.persist.dao.xstream.XStreamDAOService;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
@@ -371,10 +372,12 @@ public final class DBHelper {
     }
   }
 
-  public static DescriptionDAOImpl getDescriptionDAO() {
+  public static IDescriptionDAO getDescriptionDAO() {
     DAOService daoService = InternalOwl.getDefault().getPersistenceService().getDAOService();
     if (daoService instanceof DAOServiceImpl)
       return ((DAOServiceImpl) daoService).getDescriptionDAO();
+    else if (daoService instanceof XStreamDAOService)
+      return ((XStreamDAOService) daoService).getDescriptionDAO();
 
     throw new IllegalStateException("This method should only be called if DAOService is of type " + DAOServiceImpl.class + ", but it is of type: " + daoService.getClass());
   }
