@@ -142,7 +142,7 @@ public class News extends AbstractEntity implements INews {
   private transient String fTransientDescription;
   private transient boolean fTransientDescriptionSet;
 
-  private transient volatile Lock fLock = new Lock();
+  private transient final Lock fLock = new Lock();
 
   /**
    * Constructor used by <code>DefaultModelFactory</code>
@@ -246,12 +246,6 @@ public class News extends AbstractEntity implements INews {
     } finally {
       fLock.releaseWriteLock();
     }
-  }
-
-  private Object readResolve() {
-    fLock = new Lock();
-    init();
-    return this;
   }
 
   /**
