@@ -461,7 +461,7 @@
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Credentials"
-            label="password passwords credential credentials protected secure security username login">
+            label="password passwords credential credentials protected secure security username login master protect authorization authentication auth">
       </keyword>
    </extension>
    <extension
