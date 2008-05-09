@@ -24,8 +24,6 @@
 
 package org.rssowl.ui.internal;
 
-import org.eclipse.equinox.internal.security.storage.friends.InternalExchangeUtils;
-import org.eclipse.equinox.security.storage.SecurePreferencesFactory;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -39,6 +37,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -64,7 +63,6 @@ import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.dialogs.ConfirmDeleteDialog;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
@@ -78,10 +76,6 @@ import java.util.Set;
  */
 @SuppressWarnings("restriction")
 public class CredentialsPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage {
-
-  /* Equinox Secure Storage Node */
-  private static final String EQUINOX_SECURE_STORAGE_NODE = "org.eclipse.equinox.secure.storage";
-
   private IConnectionService fConService = Owl.getConnectionService();
   private TableViewer fViewer;
   private Button fRemoveAll;
@@ -190,9 +184,22 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     masterContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
     masterContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
     ((GridLayout) masterContainer.getLayout()).marginBottom = 15;
+    ((GridLayout) masterContainer.getLayout()).verticalSpacing = 10;
+
+    StyledText infoText = new StyledText(masterContainer, SWT.WRAP);
+    infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+    ((GridData) infoText.getLayoutData()).widthHint = 200;
+    infoText.setBackground(masterContainer.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+
+    if (Application.IS_WINDOWS)
+      infoText.setText("Set a master password to encrypt your passwords for protected feeds. Note that on Windows, your passwords are automatically protected using your system password.");
+    else if (Application.IS_MAC)
+      infoText.setText("Set a master password to encrypt your passwords for protected feeds. Note that on MacOS, your passwords are automatically protected using your system password.");
+    else
+      infoText.setText("It is recommended to set a master password to encrypt your passwords for protected feeds.");
 
     fUseMasterPasswordCheck = new Button(masterContainer, SWT.CHECK);
-    fUseMasterPasswordCheck.setText("Use a master password to encrypt credentials");
+    fUseMasterPasswordCheck.setText("Use a master password");
     fUseMasterPasswordCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     fUseMasterPasswordCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD));
     fUseMasterPasswordCheck.addSelectionListener(new SelectionAdapter() {
@@ -204,7 +211,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     fResetMasterPassword = new Button(masterContainer, SWT.PUSH);
     fResetMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
-    fResetMasterPassword.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    fResetMasterPassword.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
     fResetMasterPassword.setText("Reset Master Password...");
     fResetMasterPassword.addSelectionListener(new SelectionAdapter() {
       @SuppressWarnings("restriction")
@@ -220,7 +227,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
         };
 
         if (dialog.open() == IDialogConstants.OK_ID)
-          resetMasterPassword();
+          reSetAllCredentials();
       }
     });
 
@@ -335,14 +342,6 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     });
 
     return container;
-  }
-
-  /*
-   * This is a hack until official API is available.
-   */
-  @SuppressWarnings("restriction")
-  private void resetMasterPassword() {
-    reSetAllCredentials();
   }
 
   @SuppressWarnings("unchecked")
@@ -492,27 +491,20 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
   @SuppressWarnings("restriction")
   private void reSetAllCredentials() {
+    boolean clearedOnce = false; // Implementation Detail of PlatformCredentialsProvider
     Set<CredentialsModelData> credentials = loadCredentials();
 
-    /* Clear cached info */
-    InternalExchangeUtils.passwordProvidersReset();
-
-    /* Clear equinox security store and secure feed Node */
-    SecurePreferencesFactory.getDefault().node(EQUINOX_SECURE_STORAGE_NODE).clear();
-    SecurePreferencesFactory.getDefault().node(EQUINOX_SECURE_STORAGE_NODE).removeNode();
-    SecurePreferencesFactory.getDefault().node(PlatformCredentialsProvider.SECURE_FEED_NODE).clear();
-    SecurePreferencesFactory.getDefault().node(PlatformCredentialsProvider.SECURE_FEED_NODE).removeNode();
-    try {
-      SecurePreferencesFactory.getDefault().node(EQUINOX_SECURE_STORAGE_NODE).flush();
-      SecurePreferencesFactory.getDefault().node(PlatformCredentialsProvider.SECURE_FEED_NODE).flush();
-    } catch (IOException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
-    }
-
-    /* Write all Credentials into Node again */
+    /* Write all Credentials into credential provider again */
     for (CredentialsModelData credential : credentials) {
       ICredentialsProvider credentialsProvider = Owl.getConnectionService().getCredentialsProvider(credential.fNormalizedLink);
       if (credentialsProvider != null) {
+
+        /* Implementation Detail: Need to clear PlatformCredentialsProvider once if provided */
+        if (!clearedOnce && credentialsProvider instanceof PlatformCredentialsProvider) {
+          ((PlatformCredentialsProvider) credentialsProvider).clear();
+          clearedOnce = true;
+        }
+
         try {
           credentialsProvider.setAuthCredentials(credential.toCredentials(), credential.fNormalizedLink, credential.fRealm);
         } catch (CredentialsException e) {
