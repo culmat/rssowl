@@ -17,16 +17,16 @@
    <extension-point id="DAOService" name="DAO Service" schema="schema/DAOService.exsd"/>
    <extension
          point="org.rssowl.core.PersistenceService">
-      <persistenceservice class="org.rssowl.core.internal.persist.service.PersistenceServiceImpl"/>
+      <persistenceservice class="org.rssowl.core.internal.persist.dao.xstream.XStreamPersistenceService"/>
    </extension>
    <extension
          point="org.rssowl.core.ApplicationService">
-      <applicationservice class="org.rssowl.core.internal.ApplicationServiceImpl"/>
+      <applicationservice class="org.rssowl.core.internal.persist.dao.xstream.XStreamApplicationService"/>
    </extension>
    <extension
          point="org.rssowl.core.IDGenerator">
       <idgenerator
-            class="org.rssowl.core.internal.persist.service.DB4OIDGenerator">
+            class="org.rssowl.core.internal.persist.dao.xstream.XStreamIDGenerator">
       </idgenerator>
    </extension>
 	<extension
@@ -96,7 +96,7 @@
    <extension
          point="org.rssowl.core.DAOService">
       <daoservice
-            class="org.rssowl.core.internal.persist.dao.DAOServiceImpl">
+            class="org.rssowl.core.internal.persist.dao.xstream.XStreamDAOService">
       </daoservice>
    </extension>
    <extension
