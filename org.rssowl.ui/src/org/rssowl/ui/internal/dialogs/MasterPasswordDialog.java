@@ -146,7 +146,7 @@ public class MasterPasswordDialog extends TitleAreaDialog {
     /* Title Image */
     if ((fStyle & PasswordProvider.CREATE_NEW_PASSWORD) != 0) {
       setTitleImage(OwlUI.getImage(fResources, "icons/wizban/new_value_wiz.png"));
-      setMessage("Please make sure to remember the Master Password you have set.", IMessageProvider.WARNING);
+      setMessage("Please make sure to remember the master password you have set.", IMessageProvider.WARNING);
     } else {
       setTitleImage(OwlUI.getImage(fResources, "icons/wizban/login_wiz.png"));
       setMessage("The master password is used to encrypt and\n decrypt the passwords used for protected feeds.", IMessageProvider.INFORMATION);
