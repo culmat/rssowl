@@ -64,6 +64,7 @@ import org.rssowl.ui.internal.dialogs.ConfirmDeleteDialog;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -76,6 +77,10 @@ import java.util.Set;
  */
 @SuppressWarnings("restriction")
 public class CredentialsPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage {
+
+  /* Dummy for creating and changing the master password */
+  private static final String DUMMY_LINK = "http://www.rssowl.org";
+
   private IConnectionService fConService = Owl.getConnectionService();
   private TableViewer fViewer;
   private Button fRemoveAll;
@@ -212,22 +217,12 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     fResetMasterPassword = new Button(masterContainer, SWT.PUSH);
     fResetMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
     fResetMasterPassword.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
-    fResetMasterPassword.setText("Reset Master Password...");
+    fResetMasterPassword.setText("Change Master Password...");
     fResetMasterPassword.addSelectionListener(new SelectionAdapter() {
       @SuppressWarnings("restriction")
       @Override
       public void widgetSelected(SelectionEvent e) {
-        ConfirmDeleteDialog dialog = new ConfirmDeleteDialog(getShell(), "Confirm Reset", "This action can not be undone", "Are you sure you want to reset the master password?", null) {
-          @Override
-          protected void createButtonsForButtonBar(Composite parent) {
-            createButton(parent, IDialogConstants.OK_ID, "Reset", true);
-            createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
-            getButton(IDialogConstants.OK_ID).setFocus();
-          }
-        };
-
-        if (dialog.open() == IDialogConstants.OK_ID)
-          reSetAllCredentials();
+        reSetAllCredentials();
       }
     });
 
@@ -494,6 +489,17 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     boolean clearedOnce = false; // Implementation Detail of PlatformCredentialsProvider
     Set<CredentialsModelData> credentials = loadCredentials();
 
+    /* Add Dummy Credentials if no credentials present */
+    CredentialsModelData dummyCredentials = null;
+    if (credentials.isEmpty()) {
+      try {
+        dummyCredentials = new CredentialsModelData("", "", new URI(DUMMY_LINK), "");
+        credentials.add(dummyCredentials);
+      } catch (URISyntaxException e) {
+        /* Should not happen */
+      }
+    }
+
     /* Write all Credentials into credential provider again */
     for (CredentialsModelData credential : credentials) {
       ICredentialsProvider credentialsProvider = Owl.getConnectionService().getCredentialsProvider(credential.fNormalizedLink);
@@ -507,6 +513,18 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
         try {
           credentialsProvider.setAuthCredentials(credential.toCredentials(), credential.fNormalizedLink, credential.fRealm);
+        } catch (CredentialsException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+        }
+      }
+    }
+
+    /* Delete Dummy Credentials Again */
+    if (dummyCredentials != null) {
+      ICredentialsProvider credentialsProvider = Owl.getConnectionService().getCredentialsProvider(dummyCredentials.fNormalizedLink);
+      if (credentialsProvider != null) {
+        try {
+          credentialsProvider.deleteAuthCredentials(dummyCredentials.fNormalizedLink, dummyCredentials.fRealm);
         } catch (CredentialsException e) {
           Activator.getDefault().logError(e.getMessage(), e);
         }
