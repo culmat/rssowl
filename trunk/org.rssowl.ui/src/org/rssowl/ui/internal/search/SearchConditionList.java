@@ -342,7 +342,7 @@ public class SearchConditionList extends ScrolledComposite {
     deleteButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        JobRunner.runInUIThread(buttonBar, new Runnable() {
+        JobRunner.runInUIThread(0, true, buttonBar, new Runnable() {
           public void run() {
             onDelete(item, itemContainer);
           }

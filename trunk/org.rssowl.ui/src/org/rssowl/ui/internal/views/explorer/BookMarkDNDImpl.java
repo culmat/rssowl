@@ -465,7 +465,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
             final IMark position = (IMark) ((dropTarget instanceof IMark) ? dropTarget : null);
 
             /* Open Dialog to add new BookMark (asyncly!) */
-            JobRunner.runInUIThread(getViewer().getControl(), new Runnable() {
+            JobRunner.runInUIThread(0, true, getViewer().getControl(), new Runnable() {
               public void run() {
                 new NewBookMarkAction(getViewer().getControl().getShell(), parent, position, urls.get(0)).run(null);
               }

@@ -72,20 +72,23 @@ public class JobRunner {
    * @param widget
    */
   public static void runInUIThread(int delay, final Widget widget, final Runnable runnable) {
-    runInUIThread(delay, widget, false, runnable);
+    runInUIThread(delay, false, widget, runnable);
   }
 
   /**
    * @param delay
+   * @param forceAsync
    * @param runnable
    * @param widget
-   * @param avoidAsync
    */
-  public static void runInUIThread(int delay, final Widget widget, boolean avoidAsync, final Runnable runnable) {
+  public static void runInUIThread(int delay, boolean forceAsync, final Widget widget, final Runnable runnable) {
     Assert.isNotNull(runnable);
 
-    if (avoidAsync && Display.getCurrent() != null)
+    /* Run directly if already in UI Thread */
+    if (!forceAsync && delay == 0 && (widget == null || !widget.isDisposed()) && Display.getCurrent() != null)
       runnable.run();
+
+    /* Otherwise use UI Job */
     else {
       UIJob uiJob = new UIJob("UIJob Runner") { //$NON-NLS-1$
         @Override

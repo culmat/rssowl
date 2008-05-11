@@ -291,7 +291,7 @@ public class CBrowser {
             if (StringUtils.isSet(host) && fLinkHandler.containsKey(host)) {
 
               /* See Bug 747 - run asynced */
-              JobRunner.runInUIThread(getControl(), new Runnable() {
+              JobRunner.runInUIThread(0, true, getControl(), new Runnable() {
                 public void run() {
                   fLinkHandler.get(host).handle(host, link);
                 }
