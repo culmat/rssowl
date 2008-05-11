@@ -378,6 +378,7 @@ litigation.
 
    <plugin
          id="org.eclipse.equinox.security.macosx"
+         os="macosx"
          download-size="0"
          install-size="0"
          version="0.0.0"
@@ -386,6 +387,7 @@ litigation.
 
    <plugin
          id="org.eclipse.equinox.security.win32.x86"
+         os="win32"
          download-size="0"
          install-size="0"
          version="0.0.0"
