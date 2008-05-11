@@ -53,6 +53,7 @@ import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;
@@ -60,8 +61,8 @@ import java.util.List;
 
 /**
  * The <code>SearchConditionList</code> is a scrolled composite that allows to
- * define a set of <code>ISearchCondition</code>s. The UI allows to add,
- * remove and edit single Conditions.
+ * define a set of <code>ISearchCondition</code>s. The UI allows to add, remove
+ * and edit single Conditions.
  *
  * @author bpasero
  */
@@ -89,12 +90,12 @@ public class SearchConditionList extends ScrolledComposite {
   }
 
   /**
-   * Sets the number of <code>SearchConditionItem</code>s that should be
-   * visible in the List. If the number of items is higher, scrollbars will be
-   * shown automatically.
+   * Sets the number of <code>SearchConditionItem</code>s that should be visible
+   * in the List. If the number of items is higher, scrollbars will be shown
+   * automatically.
    *
-   * @param count the number of <code>SearchConditionItem</code>s that should
-   * be visible in the List.
+   * @param count the number of <code>SearchConditionItem</code>s that should be
+   * visible in the List.
    */
   public void setVisibleItemCount(int count) {
     Assert.isLegal(count >= 0);
@@ -186,8 +187,8 @@ public class SearchConditionList extends ScrolledComposite {
   }
 
   /**
-   * @param searchmark The parent of the <code>ISearchCondition</code>s that
-   * are being created.
+   * @param searchmark The parent of the <code>ISearchCondition</code>s that are
+   * being created.
    * @return Returns a List of <code>ISearchCondition</code> representing the
    * selected states.
    * @see SearchConditionList#createConditions()
@@ -208,8 +209,8 @@ public class SearchConditionList extends ScrolledComposite {
   /**
    * Shows the List of <code>ISearchCondition</code> in this List.
    *
-   * @param conditions the List of <code>ISearchCondition</code> to show in
-   * this List.
+   * @param conditions the List of <code>ISearchCondition</code> to show in this
+   * List.
    */
   public void showConditions(List<ISearchCondition> conditions) {
     fModified = true;
@@ -236,12 +237,12 @@ public class SearchConditionList extends ScrolledComposite {
   /**
    * Optimization: In order to check weather conditions in the list have been
    * modified, this method can be used. Note that this method will also return
-   * <code>TRUE</code> if a condition was modified and then reset to its
-   * initial value.
+   * <code>TRUE</code> if a condition was modified and then reset to its initial
+   * value.
    *
-   * @return Returns <code>TRUE</code> if the list of conditions was
-   * potentially modified (conditions added, removed or updated) and
-   * <code>FALSE</code> otherwise.
+   * @return Returns <code>TRUE</code> if the list of conditions was potentially
+   * modified (conditions added, removed or updated) and <code>FALSE</code>
+   * otherwise.
    */
   public boolean isModified() {
     if (fModified)
@@ -341,7 +342,11 @@ public class SearchConditionList extends ScrolledComposite {
     deleteButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        onDelete(item, itemContainer);
+        JobRunner.runInUIThread(buttonBar, new Runnable() {
+          public void run() {
+            onDelete(item, itemContainer);
+          }
+        });
       }
     });
 
@@ -520,22 +525,18 @@ public class SearchConditionList extends ScrolledComposite {
   }
 
   void onDelete(final SearchConditionItem item, final Composite itemContainer) {
-    getDisplay().asyncExec(new Runnable() {
-      public void run() {
-        boolean wasScrollbarShowing = SearchConditionList.this.getVerticalBar().isVisible();
+    boolean wasScrollbarShowing = SearchConditionList.this.getVerticalBar().isVisible();
 
-        /* Delete */
-        itemContainer.dispose();
-        removeItem(item);
-        fModified = true;
+    /* Delete */
+    itemContainer.dispose();
+    removeItem(item);
+    fModified = true;
 
-        /* Restore Default if required */
-        if (fItems.size() == 0)
-          addItem(getDefaultCondition()).focusInput();
+    /* Restore Default if required */
+    if (fItems.size() == 0)
+      addItem(getDefaultCondition()).focusInput();
 
-        adjustSizeForScrollbar(wasScrollbarShowing);
-      }
-    });
+    adjustSizeForScrollbar(wasScrollbarShowing);
   }
 
   private ISearchCondition createCondition(ISearchCondition current) {
