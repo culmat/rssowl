@@ -434,10 +434,20 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
         }
       } catch (CredentialsException e) {
         Activator.getDefault().logError(e.getMessage(), e);
+        showError();
+        break;
       }
     }
 
     return credentials;
+  }
+
+  private void showError() {
+    setErrorMessage("Wrong master password supplied.");
+
+    fUseMasterPasswordCheck.setEnabled(false);
+    fResetMasterPassword.setEnabled(false);
+    fViewer.getTable().setEnabled(false);
   }
 
   private Composite createComposite(Composite parent) {
