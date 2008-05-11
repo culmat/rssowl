@@ -282,7 +282,7 @@ class BookMarkSearchbar extends Composite {
     fFilterText.addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(FocusEvent e) {
-        JobRunner.runInUIThread(fFilterText, new Runnable() {
+        JobRunner.runInUIThread(0, true, fFilterText, new Runnable() {
           public void run() {
             if (fInitialText.equals(fFilterText.getText().trim()))
               fFilterText.selectAll();
