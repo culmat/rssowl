@@ -56,8 +56,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Instances of <code>CBrowser</code> wrap around the Browser-Widget and
- * enhance it by some means.
+ * Instances of <code>CBrowser</code> wrap around the Browser-Widget and enhance
+ * it by some means.
  *
  * @author bpasero
  */
@@ -109,7 +109,9 @@ public class CBrowser {
         browser = new Browser(parent, style | SWT.MOZILLA);
       } catch (SWTError e) {
         fgMozillaAvailable = false;
-        Activator.getDefault().getLog().log(Activator.getDefault().createInfoStatus(e.getMessage(), null));
+
+        if (!"No more handles [Could not detect registered XULRunner to use]".equals(e.getMessage())) //This happens too often to log it
+          Activator.getDefault().getLog().log(Activator.getDefault().createInfoStatus(e.getMessage(), null));
       }
     }
 
@@ -250,8 +252,7 @@ public class CBrowser {
   /**
    * Print the Browser using the JavaScript print() method
    *
-   * @return <code>TRUE</code> in case of success, <code>FALSE</code>
-   * otherwise
+   * @return <code>TRUE</code> in case of success, <code>FALSE</code> otherwise
    */
   public boolean print() {
     return fBrowser.execute(JAVA_SCRIPT_PRINT);
