@@ -114,7 +114,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
    * org.rssowl.core.connection.ICredentialsProvider#getAuthCredentials(java
    * .net.URI, java.lang.String)
    */
-  public ICredentials getAuthCredentials(URI link, String realm) throws CredentialsException {
+  public synchronized ICredentials getAuthCredentials(URI link, String realm) throws CredentialsException {
 
     /* Check Cache first */
     if (fUnprotectedLinksCache.contains(link.toString()))
@@ -314,7 +314,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
    * org.rssowl.core.connection.ICredentialsProvider#deleteAuthCredentials(java
    * .net.URI, java.lang.String)
    */
-  public void deleteAuthCredentials(URI link, String realm) throws CredentialsException {
+  public synchronized void deleteAuthCredentials(URI link, String realm) throws CredentialsException {
     ISecurePreferences securePreferences = getSecurePreferences();
 
     /* Remove from Equinox Security Storage */
