@@ -86,6 +86,10 @@
       <protocolHandler
             class="org.rssowl.core.internal.connection.DefaultProtocolHandler"
             protocol="file"/>
+      <protocolHandler
+            class="org.rssowl.core.internal.connection.DefaultProtocolHandler"
+            protocol="feed">
+      </protocolHandler>
    </extension>
    <extension
          point="org.rssowl.core.PreferencesInitializer">
@@ -112,6 +116,10 @@
       <credentialsProvider
             class="org.rssowl.core.connection.PlatformCredentialsProvider"
             protocol="file">
+      </credentialsProvider>
+      <credentialsProvider
+            class="org.rssowl.core.connection.PlatformCredentialsProvider"
+            protocol="feed">
       </credentialsProvider>
    </extension>
    <extension
