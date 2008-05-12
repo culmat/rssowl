@@ -146,6 +146,21 @@ public class ConnectionServiceImpl implements IConnectionService {
   }
 
   /*
+   * @see org.rssowl.core.connection.IConnectionService#getHandler(java.net.URI)
+   */
+  public IProtocolHandler getHandler(URI link) throws ConnectionException {
+    String protocol = link.getScheme();
+    IProtocolHandler handler = fProtocolHandler.get(protocol);
+
+    /* Handler present */
+    if (handler != null)
+      return handler;
+
+    /* No Handler present */
+    throw new UnknownFeedException(Activator.getDefault().createErrorStatus("Could not find a matching ProtocolHandler for: " + protocol, null)); //$NON-NLS-1$
+  }
+
+  /*
    * @see org.rssowl.core.connection.IConnectionService#getLabel(java.net.URI)
    */
   public String getLabel(URI link) throws ConnectionException {
@@ -181,7 +196,8 @@ public class ConnectionServiceImpl implements IConnectionService {
   }
 
   /*
-   * @see org.rssowl.core.connection.IConnectionService#getFeedIcon(java.net.URI)
+   * @see
+   * org.rssowl.core.connection.IConnectionService#getFeedIcon(java.net.URI)
    */
   public byte[] getFeedIcon(URI link) throws ConnectionException {
     String protocol = link.getScheme();
@@ -196,7 +212,8 @@ public class ConnectionServiceImpl implements IConnectionService {
   }
 
   /*
-   * @see org.rssowl.core.connection.IConnectionService#getFeedIcon(java.net.URI)
+   * @see
+   * org.rssowl.core.connection.IConnectionService#getFeedIcon(java.net.URI)
    */
   public URI getFeed(URI link) throws ConnectionException {
     String protocol = link.getScheme();
@@ -211,22 +228,27 @@ public class ConnectionServiceImpl implements IConnectionService {
   }
 
   /*
-   * @see org.rssowl.core.connection.IConnectionService#getCredentialsProvider(java.net.URI)
+   * @see
+   * org.rssowl.core.connection.IConnectionService#getCredentialsProvider(java
+   * .net.URI)
    */
   public ICredentialsProvider getCredentialsProvider(URI link) {
     return fCredentialsProvider.get(link.getScheme());
   }
 
   /*
-   * @see org.rssowl.core.connection.IConnectionService#getSecureProtocolSocketFactory()
+   * @see
+   * org.rssowl.core.connection.IConnectionService#getSecureProtocolSocketFactory
+   * ()
    */
   public SecureProtocolSocketFactory getSecureProtocolSocketFactory() {
     return fSecureProtocolSocketFactory;
   }
 
   /*
-   * @see org.rssowl.core.connection.IConnectionService#getAuthCredentials(java.net.URI,
-   * java.lang.String)
+   * @see
+   * org.rssowl.core.connection.IConnectionService#getAuthCredentials(java.net
+   * .URI, java.lang.String)
    */
   public ICredentials getAuthCredentials(URI link, String realm) throws CredentialsException {
     String protocol = link.getScheme();
@@ -246,7 +268,9 @@ public class ConnectionServiceImpl implements IConnectionService {
   }
 
   /*
-   * @see org.rssowl.core.connection.IConnectionService#getProxyCredentials(java.net.URI)
+   * @see
+   * org.rssowl.core.connection.IConnectionService#getProxyCredentials(java.
+   * net.URI)
    */
   public IProxyCredentials getProxyCredentials(URI link) throws CredentialsException {
     String protocol = link.getScheme();
