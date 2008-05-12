@@ -39,9 +39,11 @@ import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
@@ -368,8 +370,16 @@ public class NewsFilter extends ViewerFilter {
       fCachedPatternMatchingNews = null;
 
     /* Pattern Set */
-    else
-      fCachedPatternMatchingNews = cacheMatchingNews(patternString.trim());
+    else {
+      try {
+        fCachedPatternMatchingNews = cacheMatchingNews(patternString.trim());
+      }
+
+      /* This happens expectedly if max-clauses count reaches a certain limit */
+      catch (PersistenceException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
+    }
   }
 
   private List<SearchHit<NewsReference>> cacheMatchingNews(String pattern) {
