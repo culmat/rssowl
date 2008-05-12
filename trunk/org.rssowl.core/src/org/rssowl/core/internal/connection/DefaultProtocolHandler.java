@@ -33,6 +33,7 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.auth.AuthState;
 import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.protocol.DefaultProtocolSocketFactory;
 import org.apache.commons.httpclient.protocol.Protocol;
 import org.apache.commons.httpclient.protocol.ProtocolSocketFactory;
 import org.eclipse.core.runtime.Assert;
@@ -112,6 +113,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
   private static final String USER_AGENT = getOwlAgent();
   private static boolean fgSSLInitialized;
+  private static boolean fgFeedProtocolInitialized;
 
   /*
    * @see org.rssowl.core.connection.IProtocolHandler#reload(java.net.URI,
@@ -216,7 +218,6 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   /*
    * Do not override default URLStreamHandler of HTTP/HTTPS and therefor return
    * NULL.
-   *
    * @see org.rssowl.core.connection.IProtocolHandler#getURLStreamHandler()
    */
   public URLStreamHandlerService getURLStreamHandler() {
@@ -231,8 +232,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
    *
    * @param link The URL to load.
    * @param properties Connection related properties as defined in
-   * <code>IConnectionPropertyConstants</code> for example, or
-   * <code>NULL</code> if none.
+   * <code>IConnectionPropertyConstants</code> for example, or <code>NULL</code>
+   * if none.
    * @return The Content of the URL as InputStream.
    * @throws ConnectionException Checked Exception to be used in case of any
    * Exception.
@@ -287,6 +288,10 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     /* SSL Support */
     if ("https".equals(link.getScheme())) //$NON-NLS-1$
       initSSLProtocol();
+
+    /* Feed Support */
+    if ("feed".equals(link.getScheme()))
+      initFeedProtocol();
 
     /* Init Client */
     HttpClient client = initClient(properties);
@@ -396,7 +401,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     }
   }
 
-  private void initSSLProtocol() {
+  private synchronized void initSSLProtocol() {
     if (fgSSLInitialized)
       return;
 
@@ -405,6 +410,16 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     Protocol.registerProtocol("https", easyHttpsProtocol); //$NON-NLS-1$
 
     fgSSLInitialized = true;
+  }
+
+  private synchronized void initFeedProtocol() {
+    if (fgFeedProtocolInitialized)
+      return;
+
+    Protocol feed = new Protocol("feed", new DefaultProtocolSocketFactory(), 80);
+    Protocol.registerProtocol("feed", feed);
+
+    fgFeedProtocolInitialized = true;
   }
 
   private void setHeaders(Map<Object, Object> properties, GetMethod getMethod) {
