@@ -41,8 +41,8 @@ import java.util.Map;
  * authentication. Several extension points allow to customize the behavor of
  * this service, including the ability to register <code>IProtocolHandler</code>
  * to define the lookup process on per protocol basis or contributing
- * <code>ICredentialsProvider</code> to define how credentials should be
- * stored and retrieved.
+ * <code>ICredentialsProvider</code> to define how credentials should be stored
+ * and retrieved.
  *
  * @author bpasero
  * @see IProtocolHandler
@@ -56,8 +56,20 @@ public interface IConnectionService {
   void shutdown();
 
   /**
-   * Reloads a <code>IFeed</code> with its News from the given
-   * <code>URL</code> and returns it.
+   * Returns the responsible {@link IProtocolHandler} for the link or
+   * <code>null</code> if none.
+   *
+   * @param link the link to find a responsible {@link IProtocolHandler} for.
+   * @return the responsible {@link IProtocolHandler} for the link or
+   * <code>null</code> if none.
+   * @throws ConnectionException In case of an Exception while loading {@link
+   * IProtocolHandler}
+   */
+  IProtocolHandler getHandler(URI link) throws ConnectionException;
+
+  /**
+   * Reloads a <code>IFeed</code> with its News from the given <code>URL</code>
+   * and returns it.
    *
    * @param link The Link to the Feed as <code>URL</code>.
    * @param monitor The Progress-Monitor used from the callee.
@@ -131,8 +143,7 @@ public interface IConnectionService {
    * Return the Authentication Credentials for the given Feed or NULL if none.
    *
    * @param link The Link to check present Authentication Credentials.
-   * @param realm The Realm to get credentials for or <code>null</code> if
-   * none.
+   * @param realm The Realm to get credentials for or <code>null</code> if none.
    * @return the Authentication Credentials for the given Feed or NULL if none.
    * @throws CredentialsException In case of an error while retrieving
    * Credentials for the Feed.
