@@ -38,11 +38,11 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
+import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.StringUtils;
-import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.actions.NewBookMarkAction;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
@@ -79,7 +79,7 @@ public class Application implements IApplication {
         if (StringUtils.isSet(token)) {
           restoreApplication();
 
-          if (URIUtils.looksLikeLink(token))
+          if (hasProtocolHandler(token))
             handleLinkSupplied(token);
         }
       }
@@ -117,6 +117,21 @@ public class Application implements IApplication {
     }
   }
 
+  private boolean hasProtocolHandler(String link) {
+
+    /* Is empty or null? */
+    if (!StringUtils.isSet(link))
+      return false;
+
+    try {
+      return Owl.getConnectionService().getHandler(new URI(link)) != null;
+    } catch (ConnectionException e) {
+      return false;
+    } catch (URISyntaxException e) {
+      return false;
+    }
+  }
+
   /*
    * @see org.eclipse.equinox.app.IApplication#stop()
    */
@@ -137,7 +152,7 @@ public class Application implements IApplication {
   /* Return the first Link in this Array or NULL otherwise */
   private String parseLink(String[] commandLineArgs) {
     for (String arg : commandLineArgs) {
-      if (URIUtils.looksLikeLink(arg))
+      if (hasProtocolHandler(arg))
         return arg;
     }
 
