@@ -316,9 +316,9 @@ public class CreateBookmarkWizard extends Wizard {
         Activator.getDefault().logError(e.getMessage(), e);
       }
 
-      /* Cancel creation and show error if title failed loading */
+      /* Cancel creation and show warning if title failed loading */
       if (!StringUtils.isSet(title[0])) {
-        ((DialogPage) getContainer().getCurrentPage()).setMessage("Unable to load the title from the feed", IMessageProvider.ERROR);
+        getContainer().showPage(fBookMarkDefinitionPage);
         return false;
       }
     }
