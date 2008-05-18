@@ -85,8 +85,8 @@ Visit http://www.rssowl.org
    </plugins>
 
    <features>
-      <feature id="org.eclipse.rcp" version="3.4.0.v20080324a-989JERhEjzvdtz-riwWN80OEB"/>
       <feature id="org.rssowl" version="2.0.0.qualifier"/>
+      <feature id="org.eclipse.rcp" version="3.4.0.v20080324a-989JERhEjMvdudU1aZQPqz-8O"/>
    </features>
 
 </product>
