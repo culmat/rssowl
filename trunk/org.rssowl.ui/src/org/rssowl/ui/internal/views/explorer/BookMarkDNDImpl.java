@@ -244,6 +244,10 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       event.feedback &= ~DND.FEEDBACK_INSERT_AFTER;
       event.feedback &= ~DND.FEEDBACK_INSERT_BEFORE;
     }
+
+    /* Fix for eclipse bug 235136 in ViewerDropAdapter that does not support URLTransfer */
+    if (currentTarget != null && event.detail == DND.DROP_NONE && URLTransfer.getInstance().isSupportedType(event.currentDataType))
+      event.detail = DND.DROP_LINK;
   }
 
   private boolean isFolderChildsDragged() {
@@ -283,8 +287,8 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       return result[0];
     }
 
-    /* Text-Transfer (supported for all) */
-    else if (TextTransfer.getInstance().isSupportedType(transferType)) {
+    /* Text- and URLTransfer (supported for all) */
+    else if (TextTransfer.getInstance().isSupportedType(transferType) || URLTransfer.getInstance().isSupportedType(transferType)) {
       return true;
     }
 
