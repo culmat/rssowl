@@ -246,7 +246,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     }
 
     /* Fix for eclipse bug 235136 in ViewerDropAdapter that does not support URLTransfer */
-    if (currentTarget != null && event.detail == DND.DROP_NONE && URLTransfer.getInstance().isSupportedType(event.currentDataType))
+    if (event.detail == DND.DROP_NONE && URLTransfer.getInstance().isSupportedType(event.currentDataType))
       event.detail = DND.DROP_LINK;
   }
 
@@ -267,7 +267,11 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
   @Override
   public boolean validateDrop(final Object target, int operation, TransferData transferType) {
 
-    /* Require Entity as Target */
+    /* Text- and URLTransfer (supported for all) */
+    if (TextTransfer.getInstance().isSupportedType(transferType) || URLTransfer.getInstance().isSupportedType(transferType))
+      return true;
+
+    /* Require Entity as Target for other transfers */
     if (!(target instanceof IEntity))
       return false;
 
@@ -285,11 +289,6 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       });
 
       return result[0];
-    }
-
-    /* Text- and URLTransfer (supported for all) */
-    else if (TextTransfer.getInstance().isSupportedType(transferType) || URLTransfer.getInstance().isSupportedType(transferType)) {
-      return true;
     }
 
     return false;
