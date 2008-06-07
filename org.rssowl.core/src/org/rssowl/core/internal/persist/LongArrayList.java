@@ -122,7 +122,7 @@ public class LongArrayList {
   @Override
   public final int hashCode() {
     int hashCode = 1;
-    for (int i = 0, c = fElements.length; i < c; ++i) {
+    for (int i = 0; i < fSize; ++i) {
       long element = fElements[i];
       hashCode = 31 * hashCode + ((int) (element ^ (element >>> 32)));
     }
