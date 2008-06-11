@@ -372,6 +372,25 @@ public class ModelSearchImpl implements IModelSearch {
    * boolean)
    */
   public List<SearchHit<NewsReference>> searchNews(Collection<ISearchCondition> conditions, boolean matchAllConditions) throws PersistenceException {
+    try {
+      return doSearchNews(conditions, matchAllConditions);
+    }
+
+    /* Too Many Clauses - Increase Clauses Limit */
+    catch (TooManyClauses e) {
+
+      /* Disable Clauses Limit */
+      if (BooleanQuery.getMaxClauseCount() != Integer.MAX_VALUE) {
+        BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
+        return doSearchNews(conditions, matchAllConditions);
+      }
+
+      /* Maximum reached */
+      throw new PersistenceException("Please avoid using the wildcards '*' and '?' as standalone terms.", e);
+    }
+  }
+
+  private List<SearchHit<NewsReference>> doSearchNews(Collection<ISearchCondition> conditions, boolean matchAllConditions) throws PersistenceException {
 
     /* Perform the search */
     try {
@@ -488,8 +507,6 @@ public class ModelSearchImpl implements IModelSearch {
       }
     } catch (IOException e) {
       throw new PersistenceException("Error searching news", e);
-    } catch (TooManyClauses e) {
-      throw new PersistenceException("Please avoid using the wildcards '*' and '?' as standalone terms.", e);
     }
   }
 
@@ -1034,14 +1051,18 @@ public class ModelSearchImpl implements IModelSearch {
   }
 
   /*
-   * @see org.rssowl.core.persist.service.IModelSearch#addIndexListener(org.rssowl.core.persist.service.IndexListener)
+   * @see
+   * org.rssowl.core.persist.service.IModelSearch#addIndexListener(org.rssowl
+   * .core.persist.service.IndexListener)
    */
   public void addIndexListener(IndexListener listener) {
     fIndexListeners.add(listener);
   }
 
   /*
-   * @see org.rssowl.core.persist.service.IModelSearch#removeIndexListener(org.rssowl.core.persist.service.IndexListener)
+   * @see
+   * org.rssowl.core.persist.service.IModelSearch#removeIndexListener(org.rssowl
+   * .core.persist.service.IndexListener)
    */
   public void removeIndexListener(IndexListener listener) {
     fIndexListeners.remove(listener);
@@ -1065,7 +1086,9 @@ public class ModelSearchImpl implements IModelSearch {
   }
 
   /*
-   * @see org.rssowl.core.persist.service.IModelSearch#reindexAll(org.eclipse.core.runtime.IProgressMonitor)
+   * @see
+   * org.rssowl.core.persist.service.IModelSearch#reindexAll(org.eclipse.core
+   * .runtime.IProgressMonitor)
    */
   public void reindexAll(IProgressMonitor monitor) throws PersistenceException {
     /* May be used before Owl is completely set-up */
