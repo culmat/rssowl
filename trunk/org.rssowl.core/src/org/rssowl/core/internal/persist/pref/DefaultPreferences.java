@@ -270,6 +270,12 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global Eclipse: Autoclose Tabs Threshold */
   public static final String ECLIPSE_AUTOCLOSE_TABS_THRESHOLD = "instance/org.eclipse.ui.workbench/REUSE_OPEN_EDITORS";
 
+  /** Global Eclipse: Proxy Host */
+  public static final String ECLIPSE_PROXY_HOST = "/configuration/org.eclipse.core.net/proxyData/HTTP/host";
+
+  /** Global Eclipse: Proxy Port */
+  public static final String ECLIPSE_PROXY_PORT = "/configuration/org.eclipse.core.net/proxyData/HTTP/port";
+
   /*
    * @see org.rssowl.core.model.preferences.IPreferencesInitializer#initialize(org.rssowl.core.model.preferences.IPreferencesScope)
    */
