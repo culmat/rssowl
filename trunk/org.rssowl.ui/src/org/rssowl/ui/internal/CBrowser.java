@@ -66,12 +66,17 @@ public class CBrowser {
   /* JavaScript: print() Method */
   private static final String JAVA_SCRIPT_PRINT = "window.print();";
 
+  /* System Properties to configure proxy with XULRunner */
+  private static final String XULRUNNER_PROXY_HOST = "network.proxy_host";
+  private static final String XULRUNNER_PROXY_PORT = "network.proxy_port";
+
   /* Flag to check if Mozilla is available on Windows */
   private static boolean fgMozillaAvailable = true;
 
   private Browser fBrowser;
   private boolean fBlockNavigation;
   private IPreferenceScope fPreferences;
+  private IPreferenceScope fEclipsePreferences;
   private Map<String, ILinkHandler> fLinkHandler;
 
   /**
@@ -79,8 +84,9 @@ public class CBrowser {
    * @param style The Style to use for the Browser-
    */
   public CBrowser(Composite parent, int style) {
-    fBrowser = createBrowser(parent, style);
     fPreferences = Owl.getPreferenceService().getGlobalScope();
+    fEclipsePreferences = Owl.getPreferenceService().getEclipseScope();
+    fBrowser = createBrowser(parent, style);
     fLinkHandler = new HashMap<String, ILinkHandler>();
     hookListeners();
 
@@ -102,6 +108,16 @@ public class CBrowser {
 
   private Browser createBrowser(Composite parent, int style) {
     Browser browser = null;
+
+    /* Properly configure Proxy for Firefox/XULRunner if required */
+    if (Application.IS_LINUX || (Application.IS_WINDOWS && fgMozillaAvailable)) {
+      String proxyHost = fEclipsePreferences.getString(DefaultPreferences.ECLIPSE_PROXY_HOST);
+      String proxyPort = fEclipsePreferences.getString(DefaultPreferences.ECLIPSE_PROXY_PORT);
+      if (StringUtils.isSet(proxyHost) && StringUtils.isSet(proxyPort)) {
+        System.setProperty(XULRUNNER_PROXY_HOST, proxyHost);
+        System.setProperty(XULRUNNER_PROXY_PORT, proxyPort);
+      }
+    }
 
     /* Try Mozilla over IE on Windows */
     if (Application.IS_WINDOWS && fgMozillaAvailable) {
