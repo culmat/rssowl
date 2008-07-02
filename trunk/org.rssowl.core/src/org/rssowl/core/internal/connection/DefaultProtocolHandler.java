@@ -571,6 +571,10 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       /* Remove the title tags (also delete attributes in title tag) */
       title = title.replaceAll("<title[^>]*>", "");
       title = title.replaceAll("</title>", "");
+
+      /* Remove potential CDATA Tags */
+      title = title.replaceAll(Pattern.quote("<![CDATA["), "");
+      title = title.replaceAll(Pattern.quote("]]>"), "");
     } catch (IOException e) {
       Activator.getDefault().logError(e.getMessage(), e);
     }
@@ -586,7 +590,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       }
     }
 
-    return title;
+    return title.trim();
   }
 
   /* Tries to read the encoding information from the given InputReader */
