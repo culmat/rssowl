@@ -70,7 +70,7 @@ public class Activator extends AbstractUIPlugin {
   public static final String PLUGIN_ID = "org.rssowl.ui"; //$NON-NLS-1$
 
   /* The reg. expression for an URL */
-  private static final String URL_REGEX = "(www([\\wv\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?)|(http|ftp|https):\\/\\/[\\w]+(.[\\w]+)([\\wv\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?"; //$NON-NLS-1$
+  private static final String URL_REGEX = "(www([\\wv\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?)|(http|ftp|https|feed):\\/\\/[\\w]+(.[\\w]+)([\\wv\\-\\.,@?^=%&:/~\\+#]*[\\w\\-\\@?^=%&/~\\+#])?"; //$NON-NLS-1$
 
   /* The compiled pattern to match an URL */
   private static final Pattern URL_REGEX_PATTERN = Pattern.compile(URL_REGEX);
