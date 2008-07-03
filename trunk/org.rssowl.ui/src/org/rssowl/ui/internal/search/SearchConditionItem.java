@@ -373,7 +373,7 @@ public class SearchConditionItem extends Composite {
         case ISearchValueType.TIME:
         case ISearchValueType.DATETIME: {
           final Calendar cal = Calendar.getInstance();
-          final DateTime datetime = new DateTime(inputField, SWT.DATE);
+          final DateTime datetime = new DateTime(inputField, SWT.DATE | SWT.BORDER);
           datetime.addListener(SWT.Selection, new Listener() {
             public void handleEvent(Event event) {
               cal.set(Calendar.DATE, datetime.getDay());
