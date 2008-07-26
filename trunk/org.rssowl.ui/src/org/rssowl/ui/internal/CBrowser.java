@@ -41,6 +41,7 @@ import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MessageBox;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -86,7 +87,17 @@ public class CBrowser {
   public CBrowser(Composite parent, int style) {
     fPreferences = Owl.getPreferenceService().getGlobalScope();
     fEclipsePreferences = Owl.getPreferenceService().getEclipseScope();
-    fBrowser = createBrowser(parent, style);
+    try {
+      fBrowser = createBrowser(parent, style);
+    } catch (SWTError e) {
+      MessageBox box = new MessageBox(parent.getShell(), SWT.ICON_ERROR | SWT.OK | SWT.CANCEL);
+      box.setText("Error Creating Browser");
+      box.setMessage("RSSOwl was unable to create a browser for reading news. Please refer to the FAQ for further help.\n\nClick 'Ok' to open the FAQ now.");
+      if (box.open() == SWT.OK)
+        BrowserUtils.openLinkExternal("http://boreal.rssowl.org/#faq");
+
+      throw e;
+    }
     fLinkHandler = new HashMap<String, ILinkHandler>();
     hookListeners();
 
