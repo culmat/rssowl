@@ -160,9 +160,11 @@ public class BookMarkExplorer extends ViewPart {
   /** ID of this View */
   public static final String VIEW_ID = "org.rssowl.ui.BookMarkExplorer"; //$NON-NLS-1$
 
-  /* IDs of Actions */
-  private static final String NEXT_SET_ACTION = "org.rssowl.ui.internal.views.explorer.NextSetAction"; //$NON-NLS-1$
-  private static final String PREVIOUS_SET_ACTION = "org.rssowl.ui.internal.views.explorer.PreviousSetAction"; //$NON-NLS-1$
+  /** IDs of Action: Next Bookmark-Set */
+  public static final String NEXT_SET_ACTION = "org.rssowl.ui.internal.views.explorer.NextSetAction"; //$NON-NLS-1$
+
+  /** IDs of Action: Previous Bookmark-Set */
+  public static final String PREVIOUS_SET_ACTION = "org.rssowl.ui.internal.views.explorer.PreviousSetAction"; //$NON-NLS-1$
 
   /* Local Setting Constants */
   private static final String PREF_SELECTED_BOOKMARK_SET = "org.rssowl.ui.internal.views.explorer.SelectedBookMarkSet"; //$NON-NLS-1$
