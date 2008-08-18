@@ -262,7 +262,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
   public static final String ECLIPSE_RESTORE_TABS = "instance/org.eclipse.ui.workbench/USE_IPERSISTABLE_EDITORS";
 
   /** Global Eclipse: Use multiple Tabs */
-  public static final String ECLIPSE_MULTIPLE_TABS = "instance/org.eclipse.ui.workbench/SHOW_MULTIPLE_EDITOR_TABS";
+  public static final String ECLIPSE_MULTIPLE_TABS = "instance/org.eclipse.ui/SHOW_MULTIPLE_EDITOR_TABS";
 
   /** Global Eclipse: Autoclose Tabs */
   public static final String ECLIPSE_AUTOCLOSE_TABS = "instance/org.eclipse.ui.workbench/REUSE_OPEN_EDITORS_BOOLEAN";
