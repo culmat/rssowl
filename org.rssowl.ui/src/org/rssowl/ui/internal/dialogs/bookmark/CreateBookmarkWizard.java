@@ -275,6 +275,8 @@ public class CreateBookmarkWizard extends Wizard {
       String linkVal = fFeedDefinitionPage.getLink();
       if (!linkVal.contains(PROTOCOL_IDENTIFIER))
         linkVal = HTTP + linkVal;
+      if (linkVal.endsWith("/")) //Strip trailing slashes
+        linkVal = linkVal.substring(0, linkVal.length() - 1);
       uriObj[0] = new URI(linkVal);
     }
 
