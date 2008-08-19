@@ -25,11 +25,14 @@
 package org.rssowl.ui.internal.dialogs.bookmark;
 
 import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.Clipboard;
@@ -38,6 +41,8 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.FontMetrics;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -193,6 +198,14 @@ public class FeedDefinitionPage extends WizardPage {
 
     fFeedLinkInput = new Text(textIndent, SWT.BORDER);
     fFeedLinkInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+    GC gc = new GC(fFeedLinkInput);
+    gc.setFont(JFaceResources.getDialogFont());
+    FontMetrics fontMetrics = gc.getFontMetrics();
+    int entryFieldWidth = Dialog.convertHorizontalDLUsToPixels(fontMetrics, IDialogConstants.ENTRY_FIELD_WIDTH);
+    gc.dispose();
+
+    ((GridData) fFeedLinkInput.getLayoutData()).widthHint = entryFieldWidth; //Required to avoid large spanning dialog for long Links
     fFeedLinkInput.setFocus();
 
     if (StringUtils.isSet(fInitialLink) && !fInitialLink.equals(HTTP)) {
