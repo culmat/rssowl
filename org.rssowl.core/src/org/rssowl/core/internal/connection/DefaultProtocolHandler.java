@@ -463,7 +463,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     /* Create the Get Method. Wrap any RuntimeException into an IOException */
     GetMethod getMethod = null;
     try {
-      getMethod = new GetMethod(link.toString());
+      getMethod = new GetMethod();
+      getMethod.setURI(new org.apache.commons.httpclient.URI(link.toString(), false, getMethod.getParams().getUriCharset()));
     } catch (RuntimeException e) {
       throw new IOException(e.getMessage());
     }
