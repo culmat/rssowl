@@ -115,7 +115,7 @@ public class CTree {
 
     ScrollBar verticalBar = fTree.getVerticalBar();
     if (verticalBar != null)
-      totalWidth -= fTree.getVerticalBar().getSize().x;
+      totalWidth -= verticalBar.getSize().x;
 
     /* Bug on Mac: Width is too big */
     if (Application.IS_MAC)
