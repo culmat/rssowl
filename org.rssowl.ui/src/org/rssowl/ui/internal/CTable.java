@@ -102,7 +102,7 @@ public class CTable {
 
     ScrollBar verticalBar = fTable.getVerticalBar();
     if (verticalBar != null)
-      totalWidth -= fTable.getVerticalBar().getSize().x;
+      totalWidth -= verticalBar.getSize().x;
 
     /* Bug on Mac: Width is too big */
     if (Application.IS_MAC)
