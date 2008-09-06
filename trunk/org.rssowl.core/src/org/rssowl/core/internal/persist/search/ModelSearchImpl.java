@@ -532,7 +532,7 @@ public class ModelSearchImpl implements IModelSearch {
     BooleanQuery allFieldsQuery = new BooleanQuery();
 
     /* Require all words to be contained or not contained */
-    if (condition.getSpecifier() == SearchSpecifier.CONTAINS_ALL || condition.getSpecifier() == SearchSpecifier.CONTAINS_ALL_NOT) {
+    if (condition.getSpecifier() == SearchSpecifier.CONTAINS_ALL) {
       List<ISearchCondition> tokenConditions = new ArrayList<ISearchCondition>();
 
       StringTokenizer tokenizer = new StringTokenizer((String) condition.getValue());
@@ -814,8 +814,7 @@ public class ModelSearchImpl implements IModelSearch {
         /* Let Query-Parser handle this */
       case CONTAINS:
       case CONTAINS_ALL:
-      case CONTAINS_NOT:
-      case CONTAINS_ALL_NOT: {
+      case CONTAINS_NOT: {
         QueryParser parser = new QueryParser(fieldname, analyzer);
         Operator operator = (specifier == SearchSpecifier.CONTAINS || specifier == SearchSpecifier.CONTAINS_NOT) ? QueryParser.OR_OPERATOR : QueryParser.AND_OPERATOR;
         parser.setDefaultOperator(operator);
@@ -991,7 +990,6 @@ public class ModelSearchImpl implements IModelSearch {
     switch (specifier) {
       case IS_NOT:
       case CONTAINS_NOT:
-      case CONTAINS_ALL_NOT:
         return Occur.MUST_NOT;
 
       default:
