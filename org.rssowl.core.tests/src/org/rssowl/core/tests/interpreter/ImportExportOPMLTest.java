@@ -343,10 +343,10 @@ public class ImportExportOPMLTest {
       searchmark.addSearchCondition(condition);
     }
 
-    /* 16) Entire News CONTAINS_ALL_NOT foo?bar */
+    /* 16) Entire News CONTAINS_NOT foo?bar */
     {
       ISearchField field = fFactory.createSearchField(IEntity.ALL_FIELDS, newsName);
-      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL_NOT, "foo?bar");
+      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_NOT, "foo?bar");
 
       ISearchMark searchmark = fFactory.createSearchMark(null, parent, "Search");
       searchmark.addSearchCondition(condition);
@@ -657,12 +657,12 @@ public class ImportExportOPMLTest {
     assertEquals(SearchSpecifier.CONTAINS_ALL, conditions.get(0).getSpecifier());
     assertEquals("foo?bar", conditions.get(0).getValue());
 
-    /* 16) Entire News CONTAINS_ALL_NOT foo?bar */
+    /* 16) Entire News CONTAINS_NOT foo?bar */
     searchmark = searchmarks.get(15);
     conditions = searchmark.getSearchConditions();
     assertEquals(1, conditions.size());
     assertEquals(IEntity.ALL_FIELDS, conditions.get(0).getField().getId());
-    assertEquals(SearchSpecifier.CONTAINS_ALL_NOT, conditions.get(0).getSpecifier());
+    assertEquals(SearchSpecifier.CONTAINS_NOT, conditions.get(0).getSpecifier());
     assertEquals("foo?bar", conditions.get(0).getValue());
   }
 

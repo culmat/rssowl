@@ -3336,12 +3336,12 @@ public class ModelSearchTest {
     }
 
     /*
-     * Condition 1b: Title contains all not First OR Feed is not
+     * Condition 1b: Title contains not First OR Feed is not
      * "http://www.feed.com/feed1.xml"
      */
     {
       ISearchField field1 = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
-      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.CONTAINS_ALL_NOT, "First");
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.CONTAINS_NOT, "First");
 
       ISearchField field2 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
       ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS_NOT, "http://www.feed.com/feed1.xml");
@@ -3440,22 +3440,22 @@ public class ModelSearchTest {
     }
 
     /*
-     * Condition 6: Entire News contains not all News Feed
+     * Condition 6: Entire News contains not News Feed
      */
     {
       ISearchField field1 = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
-      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.CONTAINS_ALL_NOT, "News Feed");
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.CONTAINS_NOT, "News Feed");
 
       List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
       assertEquals(0, result.size());
     }
 
     /*
-     * Condition 7: Entire News contains not all Foo Bar
+     * Condition 7: Entire News contains not Foo Bar
      */
     {
       ISearchField field1 = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
-      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.CONTAINS_ALL_NOT, "Foo Bar");
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.CONTAINS_NOT, "Foo Bar");
 
       List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
       assertSame(result, news1, news2, news3, news4);
