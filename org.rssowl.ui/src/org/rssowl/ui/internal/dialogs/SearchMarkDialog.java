@@ -31,8 +31,6 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -60,6 +58,7 @@ import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.reference.FolderReference;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.Controller;
@@ -144,6 +143,10 @@ public class SearchMarkDialog extends TitleAreaDialog {
 
     /* Get selected Folder */
     fParent = fFolderChooser.getFolder();
+
+    /* Generate Name if necessary */
+    if (!StringUtils.isSet(fNameInput.getText()))
+      onGenerateName();
 
     /* Create new Searchmark */
     ISearchMark searchMark = Owl.getModelFactory().createSearchMark(null, fParent, fNameInput.getText(), fPosition, fPosition != null ? true : null);
@@ -240,12 +243,6 @@ public class SearchMarkDialog extends TitleAreaDialog {
       fNameInput.setText(ModelUtils.getName(fInitialSearchConditions, fInitialMatchAllConditions));
       fNameInput.selectAll();
     }
-
-    fNameInput.addModifyListener(new ModifyListener() {
-      public void modifyText(ModifyEvent e) {
-        validateInput();
-      }
-    });
 
     ToolBar generateTitleBar = new ToolBar(nameContainer, SWT.FLAT);
     generateTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -350,7 +347,6 @@ public class SearchMarkDialog extends TitleAreaDialog {
     Button okButton = createButton(buttonBar, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
     ((GridData) okButton.getLayoutData()).horizontalAlignment = SWT.END;
     ((GridData) okButton.getLayoutData()).grabExcessHorizontalSpace = true;
-    okButton.setEnabled(fNameInput.getText().length() > 0);
 
     /* Cancel */
     createButton(buttonBar, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
@@ -393,11 +389,5 @@ public class SearchMarkDialog extends TitleAreaDialog {
       getShell().setSize(requiredSize);
       LayoutUtils.positionShell(getShell(), false);
     }
-  }
-
-  private void validateInput() {
-    boolean valid = fNameInput.getText().length() > 0;
-    Control button = getButton(IDialogConstants.OK_ID);
-    button.setEnabled(valid);
   }
 }
