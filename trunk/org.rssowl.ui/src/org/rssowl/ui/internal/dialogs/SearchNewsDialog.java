@@ -560,7 +560,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     /* Add default condition as well */
     ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
-    conditions.add(factory.createSearchCondition(field, SearchSpecifier.CONTAINS, ""));
+    conditions.add(factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, ""));
 
     return conditions;
   }
@@ -1688,7 +1688,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     IModelFactory factory = Owl.getModelFactory();
 
     ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
-    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS, "");
+    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "");
 
     conditions.add(condition);
 

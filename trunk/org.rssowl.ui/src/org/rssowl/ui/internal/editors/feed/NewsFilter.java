@@ -401,7 +401,7 @@ public class NewsFilter extends ViewerFilter {
 
     /* Match on Pattern */
     ISearchField field = null;
-    SearchSpecifier specifier = SearchSpecifier.CONTAINS;
+    SearchSpecifier specifier = SearchSpecifier.CONTAINS_ALL;
     switch (fSearchTarget) {
       case ALL:
         field = fModelFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
