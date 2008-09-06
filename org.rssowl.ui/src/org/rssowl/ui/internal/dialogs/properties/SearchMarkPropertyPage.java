@@ -238,7 +238,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     IModelFactory factory = Owl.getModelFactory();
 
     ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
-    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS, "");
+    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "");
 
     conditions.add(condition);
 

@@ -221,7 +221,7 @@ public class SearchConditionItem extends Composite {
   private void createSpecifierCombo() {
     Combo specifierCombo = new Combo(this, SWT.BORDER | SWT.READ_ONLY);
     specifierCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
-    ((GridData) specifierCombo.getLayoutData()).widthHint = 80;
+    ((GridData) specifierCombo.getLayoutData()).widthHint = 90;
     specifierCombo.setVisibleItemCount(100);
 
     fSpecifierViewer = new ComboViewer(specifierCombo);
@@ -634,7 +634,9 @@ public class SearchConditionItem extends Composite {
 
       /* Contains / Contains Not */
       else {
+        specifiers.add(SearchSpecifier.CONTAINS_ALL);
         specifiers.add(SearchSpecifier.CONTAINS);
+        specifiers.add(SearchSpecifier.CONTAINS_ALL_NOT);
         specifiers.add(SearchSpecifier.CONTAINS_NOT);
       }
 

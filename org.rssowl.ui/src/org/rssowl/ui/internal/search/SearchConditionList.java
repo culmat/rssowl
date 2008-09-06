@@ -267,7 +267,8 @@ public class SearchConditionList extends ScrolledComposite {
     setLayout(new GridLayout(1, false));
     setExpandHorizontal(true);
     setExpandVertical(true);
-    getVerticalBar().setIncrement(10);
+    if (getVerticalBar() != null)
+      getVerticalBar().setIncrement(10);
 
     /* Create the Container */
     fContainer = new Composite(this, SWT.NONE);
@@ -289,7 +290,7 @@ public class SearchConditionList extends ScrolledComposite {
     IModelFactory factory = Owl.getModelFactory();
 
     ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
-    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS, "");
+    ISearchCondition condition = factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "");
 
     return condition;
   }
@@ -299,7 +300,7 @@ public class SearchConditionList extends ScrolledComposite {
   }
 
   SearchConditionItem addItem(ISearchCondition condition, int index) {
-    boolean wasScrollbarShowing = getVerticalBar().isVisible();
+    boolean wasScrollbarShowing = getVerticalBar() != null ? getVerticalBar().isVisible() : false;
 
     /* Container for Item */
     final Composite itemContainer = new Composite(fContainer, SWT.NONE);
@@ -374,6 +375,8 @@ public class SearchConditionList extends ScrolledComposite {
 
   private void adjustSizeForScrollbar(boolean wasScrollbarShowing) {
     ScrollBar verticalBar = getVerticalBar();
+    if (verticalBar == null)
+      return;
 
     /* Ignore for application window */
     if (getShell().getParent() == null)
@@ -525,7 +528,7 @@ public class SearchConditionList extends ScrolledComposite {
   }
 
   void onDelete(final SearchConditionItem item, final Composite itemContainer) {
-    boolean wasScrollbarShowing = SearchConditionList.this.getVerticalBar().isVisible();
+    boolean wasScrollbarShowing = getVerticalBar() != null ? getVerticalBar().isVisible() : false;
 
     /* Delete */
     itemContainer.dispose();

@@ -137,13 +137,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     /* Search on Author */
     if (AUTHOR_HANDLER_ID.equals(id)) {
-      StringTokenizer tokenizer = new StringTokenizer(query);
-      while (tokenizer.hasMoreTokens()) {
-        String token = tokenizer.nextToken();
-        ISearchField field = fFactory.createSearchField(INews.AUTHOR, entity);
-        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, token);
-        conditions.add(condition);
-      }
+      ISearchField field = fFactory.createSearchField(INews.AUTHOR, entity);
+      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, query);
+      conditions.add(condition);
     }
 
     /* Search on Category */
