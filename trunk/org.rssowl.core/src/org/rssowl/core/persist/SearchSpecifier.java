@@ -43,10 +43,10 @@ public enum SearchSpecifier implements IPersistable {
   /** Target must not match Value */
   IS_NOT,
 
-  /** Target is to contain Value */
+  /** Target is to contain Value (any) */
   CONTAINS,
 
-  /** Target must not contain Value */
+  /** Target must not contain Value (any) */
   CONTAINS_NOT,
 
   /** Target is to begin with Value */
@@ -68,7 +68,13 @@ public enum SearchSpecifier implements IPersistable {
   IS_LESS_THAN,
 
   /** Target is similiar to the Value (String) */
-  SIMILIAR_TO;
+  SIMILIAR_TO,
+
+  /** Target is to contain Value (all) */
+  CONTAINS_ALL,
+
+  /** Target must not contain Value (all) */
+  CONTAINS_ALL_NOT;
 
   /**
    * Get a human-readable representation of the specifier to be used in the UI
@@ -83,9 +89,13 @@ public enum SearchSpecifier implements IPersistable {
       case IS_NOT:
         return "isn't";
       case CONTAINS:
-        return "contains";
+        return "contains any";
+      case CONTAINS_ALL:
+        return "contains all";
       case CONTAINS_NOT:
-        return "doesn't contain";
+        return "doesn't contain any";
+      case CONTAINS_ALL_NOT:
+        return "doesn't contain all";
       case BEGINS_WITH:
         return "begins with";
       case ENDS_WITH:
@@ -113,7 +123,7 @@ public enum SearchSpecifier implements IPersistable {
    * <code>IS_NOT</code> or <code>CONTAINS_NOT</code>.
    */
   public boolean isNegation() {
-    return (this == IS_NOT) || (this == CONTAINS_NOT);
+    return (this == IS_NOT) || (this == CONTAINS_NOT) || (this == CONTAINS_ALL_NOT);
   }
 
   /**

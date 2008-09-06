@@ -25,7 +25,6 @@
 package org.rssowl.core.internal.persist.search;
 
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.StopAnalyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.document.DateTools;
@@ -37,6 +36,7 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
+import org.apache.lucene.queryParser.QueryParser.Operator;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.ConstantScoreRangeQuery;
@@ -55,6 +55,7 @@ import org.apache.lucene.store.LockFactory;
 import org.apache.lucene.store.NativeFSLockFactory;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.service.DBHelper;
@@ -64,9 +65,11 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
@@ -83,17 +86,14 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -130,9 +130,6 @@ public class ModelSearchImpl implements IModelSearch {
 
   /* Wildcard matching any Char */
   private static final char CHAR_WILDCARD = '?';
-
-  /* A Set of Stop Words in English */
-  private static final Set<String> STOP_WORDS = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(StopAnalyzer.ENGLISH_STOP_WORDS)));
 
   private volatile IndexSearcher fSearcher;
   private volatile Indexer fIndexer;
@@ -530,68 +527,84 @@ public class ModelSearchImpl implements IModelSearch {
     return condition.getField().getId() == INews.STATE;
   }
 
-  //TODO Think about a better performing solution here!
   private BooleanClause createAllNewsFieldsClause(Analyzer analyzer, ISearchCondition condition, boolean matchAllConditions) throws IOException {
+    IModelFactory factory = Owl.getModelFactory();
     BooleanQuery allFieldsQuery = new BooleanQuery();
-    String value = String.valueOf(condition.getValue());
 
-    /* Contained in Title */
-    String titleField = String.valueOf(INews.TITLE);
-    TokenStream tokenStream = analyzer.tokenStream(titleField, new StringReader(value));
-    Token token = null;
-    while ((token = tokenStream.next()) != null) {
-      String termText = new String(token.termBuffer(), 0, token.termLength());
+    /* Require all words to be contained or not contained */
+    if (condition.getSpecifier() == SearchSpecifier.CONTAINS_ALL || condition.getSpecifier() == SearchSpecifier.CONTAINS_ALL_NOT) {
+      List<ISearchCondition> tokenConditions = new ArrayList<ISearchCondition>();
 
-      Query titleQuery = createWildcardQuery(titleField, termText);
-      allFieldsQuery.add(new BooleanClause(titleQuery, Occur.SHOULD));
+      StringTokenizer tokenizer = new StringTokenizer((String) condition.getValue());
+      while (tokenizer.hasMoreTokens()) {
+        String token = tokenizer.nextToken().toLowerCase();
+        ISearchCondition tokenCondition = factory.createSearchCondition(condition.getField(), condition.getSpecifier(), token);
+
+        /* Rewrite Specifier */
+        if (condition.getSpecifier() == SearchSpecifier.CONTAINS_ALL)
+          tokenCondition.setSpecifier(SearchSpecifier.CONTAINS);
+        else
+          tokenCondition.setSpecifier(SearchSpecifier.CONTAINS_NOT);
+
+        tokenConditions.add(tokenCondition);
+      }
+
+      /* Build custom Query out of Conditions */
+      for (ISearchCondition tokenCondition : tokenConditions) {
+        BooleanClause tokenClause = createAllNewsFieldsClause(analyzer, tokenCondition, matchAllConditions);
+
+        /* Ignore empty clauses (e.g. due to Stop Words) */
+        if (tokenClause.getQuery() instanceof BooleanQuery && ((BooleanQuery) tokenClause.getQuery()).getClauses().length == 0)
+          continue;
+
+        tokenClause.setOccur(Occur.MUST);
+        allFieldsQuery.add(tokenClause);
+      }
     }
 
-    /* Contained in Description */
-    String descriptionField = String.valueOf(INews.DESCRIPTION);
-    tokenStream = analyzer.tokenStream(descriptionField, new StringReader(value));
-    while ((token = tokenStream.next()) != null) {
-      String termText = new String(token.termBuffer(), 0, token.termLength());
+    /* Require any word to be contained or not contained */
+    else {
+      List<ISearchCondition> allFieldsConditions = new ArrayList<ISearchCondition>(5);
 
-      Query descriptionQuery = createWildcardQuery(descriptionField, termText);
-      allFieldsQuery.add(new BooleanClause(descriptionQuery, Occur.SHOULD));
-    }
+      /* Title */
+      ISearchField field = factory.createSearchField(INews.TITLE, condition.getField().getEntityName());
+      allFieldsConditions.add(factory.createSearchCondition(field, condition.getSpecifier(), condition.getValue()));
 
-    /* Contained in Attachment */
-    String attachmentField = String.valueOf(INews.ATTACHMENTS_CONTENT);
-    tokenStream = analyzer.tokenStream(attachmentField, new StringReader(value));
-    while ((token = tokenStream.next()) != null) {
-      String termText = new String(token.termBuffer(), 0, token.termLength());
+      /* Description */
+      field = factory.createSearchField(INews.DESCRIPTION, condition.getField().getEntityName());
+      allFieldsConditions.add(factory.createSearchCondition(field, condition.getSpecifier(), condition.getValue()));
 
-      Query attachmentQuery = createWildcardQuery(attachmentField, termText);
-      allFieldsQuery.add(new BooleanClause(attachmentQuery, Occur.SHOULD));
-    }
+      /* Author */
+      field = factory.createSearchField(INews.AUTHOR, condition.getField().getEntityName());
+      allFieldsConditions.add(factory.createSearchCondition(field, condition.getSpecifier(), condition.getValue()));
 
-    /* Matches Author */
-    String authorField = String.valueOf(INews.AUTHOR);
-    tokenStream = analyzer.tokenStream(authorField, new StringReader(value));
-    while ((token = tokenStream.next()) != null) {
-      String termText = new String(token.termBuffer(), 0, token.termLength());
+      /* Category */
+      field = factory.createSearchField(INews.CATEGORIES, condition.getField().getEntityName());
+      allFieldsConditions.add(factory.createSearchCondition(field, condition.getSpecifier().isNegation() ? SearchSpecifier.IS_NOT : SearchSpecifier.IS, condition.getValue()));
 
-      /* Explicitly ignore Stop Words here */
-      if (!Indexer.DISABLE_STOP_WORDS && STOP_WORDS.contains(termText))
-        continue;
+      /* Attachment Content */
+      field = factory.createSearchField(INews.ATTACHMENTS_CONTENT, condition.getField().getEntityName());
+      allFieldsConditions.add(factory.createSearchCondition(field, condition.getSpecifier(), condition.getValue()));
 
-      Query authorQuery = createWildcardQuery(authorField, termText);
-      allFieldsQuery.add(new BooleanClause(authorQuery, Occur.SHOULD));
-    }
+      /* Create Clauses out of Conditions */
+      boolean anyClauseIsEmpty = false;
+      List<BooleanClause> clauses = new ArrayList<BooleanClause>();
+      for (ISearchCondition allFieldCondition : allFieldsConditions) {
+        BooleanClause clause = createBooleanClause(analyzer, allFieldCondition, matchAllConditions);
+        clause.setOccur(Occur.SHOULD);
+        clauses.add(clause);
 
-    /* Matches Category */
-    String categoryField = String.valueOf(INews.CATEGORIES);
-    tokenStream = analyzer.tokenStream(categoryField, new StringReader(value));
-    while ((token = tokenStream.next()) != null) {
-      String termText = new String(token.termBuffer(), 0, token.termLength());
+        /* Ignore empty clauses (e.g. due to Stop Words) */
+        if (clause.getQuery() instanceof BooleanQuery && ((BooleanQuery) clause.getQuery()).getClauses().length == 0)
+          anyClauseIsEmpty = true;
+      }
 
-      /* Explicitly ignore Stop Words here */
-      if (!Indexer.DISABLE_STOP_WORDS && STOP_WORDS.contains(termText))
-        continue;
-
-      Query categoryQuery = createWildcardQuery(categoryField, termText);
-      allFieldsQuery.add(new BooleanClause(categoryQuery, Occur.SHOULD));
+      /* Only add if none of the clauses is empty */
+      if (!anyClauseIsEmpty) {
+        for (BooleanClause clause : clauses) {
+          allFieldsQuery.add(clause);
+        }
+      }
     }
 
     /* Determine Occur (MUST, SHOULD, MUST NOT) */
@@ -800,8 +813,12 @@ public class ModelSearchImpl implements IModelSearch {
 
         /* Let Query-Parser handle this */
       case CONTAINS:
-      case CONTAINS_NOT: {
+      case CONTAINS_ALL:
+      case CONTAINS_NOT:
+      case CONTAINS_ALL_NOT: {
         QueryParser parser = new QueryParser(fieldname, analyzer);
+        Operator operator = (specifier == SearchSpecifier.CONTAINS || specifier == SearchSpecifier.CONTAINS_NOT) ? QueryParser.OR_OPERATOR : QueryParser.AND_OPERATOR;
+        parser.setDefaultOperator(operator);
         parser.setAllowLeadingWildcard(true);
 
         /* Prepare the value for parsing */
@@ -974,6 +991,7 @@ public class ModelSearchImpl implements IModelSearch {
     switch (specifier) {
       case IS_NOT:
       case CONTAINS_NOT:
+      case CONTAINS_ALL_NOT:
         return Occur.MUST_NOT;
 
       default:
