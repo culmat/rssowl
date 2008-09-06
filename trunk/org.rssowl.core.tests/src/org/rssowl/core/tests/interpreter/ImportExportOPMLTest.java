@@ -333,6 +333,24 @@ public class ImportExportOPMLTest {
       ISearchMark searchmark = fFactory.createSearchMark(null, parent, "Search");
       searchmark.addSearchCondition(condition);
     }
+
+    /* 15) Entire News CONTAINS_ALL foo?bar */
+    {
+      ISearchField field = fFactory.createSearchField(IEntity.ALL_FIELDS, newsName);
+      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "foo?bar");
+
+      ISearchMark searchmark = fFactory.createSearchMark(null, parent, "Search");
+      searchmark.addSearchCondition(condition);
+    }
+
+    /* 16) Entire News CONTAINS_ALL_NOT foo?bar */
+    {
+      ISearchField field = fFactory.createSearchField(IEntity.ALL_FIELDS, newsName);
+      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL_NOT, "foo?bar");
+
+      ISearchMark searchmark = fFactory.createSearchMark(null, parent, "Search");
+      searchmark.addSearchCondition(condition);
+    }
   }
 
   /**
@@ -395,7 +413,7 @@ public class ImportExportOPMLTest {
     assertNotNull(customFolder2);
 
     List<IMark> defaultMarks = defaultSet.getMarks();
-    assertEquals(16, defaultMarks.size());
+    assertEquals(18, defaultMarks.size());
 
     IBookMark bookmark1 = null;
     for (IMark mark : defaultMarks) {
@@ -415,7 +433,7 @@ public class ImportExportOPMLTest {
     assertNotNull(bin);
 
     List<IMark> customMarks = customSet.getMarks();
-    assertEquals(15, customMarks.size());
+    assertEquals(17, customMarks.size());
 
     IBookMark bookmark2 = null;
     for (IMark mark : customMarks) {
@@ -630,6 +648,22 @@ public class ImportExportOPMLTest {
     assertEquals(1, locations.size());
     assertEquals(true, locations.get(0) instanceof INewsBin);
     assertEquals(fNewsBin.getName(), locations.get(0).getName());
+
+    /* 15) Entire News CONTAINS_ALL foo?bar */
+    searchmark = searchmarks.get(14);
+    conditions = searchmark.getSearchConditions();
+    assertEquals(1, conditions.size());
+    assertEquals(IEntity.ALL_FIELDS, conditions.get(0).getField().getId());
+    assertEquals(SearchSpecifier.CONTAINS_ALL, conditions.get(0).getSpecifier());
+    assertEquals("foo?bar", conditions.get(0).getValue());
+
+    /* 16) Entire News CONTAINS_ALL_NOT foo?bar */
+    searchmark = searchmarks.get(15);
+    conditions = searchmark.getSearchConditions();
+    assertEquals(1, conditions.size());
+    assertEquals(IEntity.ALL_FIELDS, conditions.get(0).getField().getId());
+    assertEquals(SearchSpecifier.CONTAINS_ALL_NOT, conditions.get(0).getSpecifier());
+    assertEquals("foo?bar", conditions.get(0).getValue());
   }
 
   private void assertContains(String name, List<IFolderChild> childs) {

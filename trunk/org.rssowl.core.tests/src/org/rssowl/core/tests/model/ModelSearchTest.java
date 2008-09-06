@@ -97,10 +97,11 @@ public class ModelSearchTest {
   /**
    * Tests that uncommitted news are saved and loaded correctly in the presence
    * of an emergency or normal shutdown.
+   *
    * @throws Exception
    */
   @Test
-  public void testSaveLoadEntitiesToBeIndexed() throws Exception    {
+  public void testSaveLoadEntitiesToBeIndexed() throws Exception {
     EntityIdsByEventType entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
     assertEquals(0, entitiesToBeIndexed.size());
 
@@ -1076,6 +1077,520 @@ public class ModelSearchTest {
 
         field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
         condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "*barfoo");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertEquals(0, result.size());
+      }
+    } catch (PersistenceException e) {
+      TestUtils.fail(e);
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testSearchNewsWith_CONTAINS_ALL_Specifier_Behaves_Like_CONTAINS_For_Single_Terms() throws Exception {
+    try {
+
+      /* First add some Types */
+      IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
+
+      INews news1 = createNews(feed, "Foo", "http://www.news.com/news1.html", State.READ);
+      ICategory news1cat1 = fFactory.createCategory(null, news1);
+      news1cat1.setName("apple");
+      ILabel label1 = fFactory.createLabel(null, "work");
+      news1.addLabel(label1);
+      IAttachment att1news1 = fFactory.createAttachment(null, news1);
+      att1news1.setLink(new URI("http://www.attachment.com/att1news1.file"));
+      att1news1.setType("bin/mp3");
+
+      INews news2 = createNews(feed, " Bar", "http://www.news.com/news2.html", State.NEW);
+      news2.setDescription("This is a longer description with <html><h2>included!</h2></html>");
+      ICategory news2cat1 = fFactory.createCategory(null, news2);
+      news2cat1.setName("apple");
+      ICategory news2cat2 = fFactory.createCategory(null, news2);
+      news2cat2.setName("pasero");
+      ILabel label2 = fFactory.createLabel(null, "todo");
+      news2.addLabel(label2);
+      IAttachment att1news2 = fFactory.createAttachment(null, news2);
+      att1news2.setLink(new URI("http://www.attachment.com/att1news2.file"));
+      att1news2.setType("bin/doc");
+      IAttachment att2news2 = fFactory.createAttachment(null, news2);
+      att2news2.setLink(new URI("http://www.attachment.com/att2news2.file"));
+      att2news2.setType("bin/wav");
+
+      INews news3 = createNews(feed, "Foo Bar", "http://www.news.com/news3.html", State.NEW);
+      news3.setDescription("This is a longer description with \n newlines and <html><h2>included!</h2></html>");
+      IPerson author3 = fFactory.createPerson(null, news3);
+      author3.setName("Benjamin Pasero");
+      ICategory news3cat1 = fFactory.createCategory(null, news3);
+      news3cat1.setName("apple");
+      ICategory news3cat2 = fFactory.createCategory(null, news3);
+      news3cat2.setName("windows");
+      ICategory news3cat3 = fFactory.createCategory(null, news3);
+      news3cat3.setName("slashdot");
+
+      INews news4 = createNews(feed, "BAR FOO", "http://www.news.com/news4.html", State.UPDATED);
+      Date news4Date = new Date(1000000);
+      news4.setPublishDate(news4Date);
+      IPerson author4 = fFactory.createPerson(null, news4);
+      author4.setName("Pasero");
+      ISource source4 = fFactory.createSource(news4);
+      source4.setLink(new URI("http://www.source.com"));
+
+      INews news5 = createNews(feed, null, "http://www.news.com/news5.html", State.NEW);
+      news5.setFlagged(true);
+      IPerson author5 = fFactory.createPerson(null, news5);
+      author5.setEmail(new URI("test@rssowl.org"));
+      ISource source5 = fFactory.createSource(news5);
+      source5.setName("Source for News 5");
+
+      DynamicDAO.save(feed);
+
+      /* Wait for Indexer */
+      waitForIndexer();
+
+      /* Condition 1a: String (match) */
+      {
+
+        /* Title */
+        ISearchField field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "foo");
+
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news1, news3, news4);
+
+        field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "foo");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news1, news3, news4);
+
+        field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "b?r");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news2, news3, news4);
+
+        field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "b?r");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news2, news3, news4);
+
+        field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "b*");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news2, news3, news4);
+
+        field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "b*");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news2, news3, news4);
+
+        /* Description */
+        field = fFactory.createSearchField(INews.DESCRIPTION, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "included");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news2, news3);
+
+        field = fFactory.createSearchField(INews.DESCRIPTION, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "included");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news2, news3);
+
+        field = fFactory.createSearchField(INews.DESCRIPTION, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "inc?uded");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news2, news3);
+
+        field = fFactory.createSearchField(INews.DESCRIPTION, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "inc?uded");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news2, news3);
+
+        field = fFactory.createSearchField(INews.DESCRIPTION, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "inc*");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news2, news3);
+
+        field = fFactory.createSearchField(INews.DESCRIPTION, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "inc*");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news2, news3);
+
+        /* Attachments */
+        field = fFactory.createSearchField(INews.ATTACHMENTS_CONTENT, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "bin/mp3");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news1);
+
+        field = fFactory.createSearchField(INews.ATTACHMENTS_CONTENT, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "bin/mp3");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news1);
+
+        field = fFactory.createSearchField(INews.ATTACHMENTS_CONTENT, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "*mp3");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news1);
+
+        field = fFactory.createSearchField(INews.ATTACHMENTS_CONTENT, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "*mp3");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news1);
+
+        /* Author */
+        field = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "Pasero");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3, news4);
+
+        field = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "Pasero");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3, news4);
+
+        field = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "Pa?ero");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3, news4);
+
+        field = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "Pa?ero");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3, news4);
+
+        field = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "Pa*");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3, news4);
+
+        field = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "Pa*");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3, news4);
+
+        /* All Fields */
+        field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "foo");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news1, news3, news4);
+
+        field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "foo");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news1, news3, news4);
+
+        field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "f?o");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news1, news3, news4);
+
+        field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "f?o");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news1, news3, news4);
+
+        field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "fo*");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news1, news3, news4);
+
+        field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "fo*");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news1, news3, news4);
+      }
+    } catch (PersistenceException e) {
+      TestUtils.fail(e);
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testSearchNewsWith_CONTAINS_ALL_Specifier() throws Exception {
+    try {
+
+      /* First add some Types */
+      IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
+
+      INews news1 = createNews(feed, "Foo", "http://www.news.com/news1.html", State.READ);
+      ICategory news1cat1 = fFactory.createCategory(null, news1);
+      news1cat1.setName("apple");
+      ILabel label1 = fFactory.createLabel(null, "work");
+      news1.addLabel(label1);
+      IAttachment att1news1 = fFactory.createAttachment(null, news1);
+      att1news1.setLink(new URI("http://www.attachment.com/att1news1.file"));
+      att1news1.setType("bin/mp3");
+
+      INews news2 = createNews(feed, " Bar", "http://www.news.com/news2.html", State.NEW);
+      news2.setDescription("This is a longer description with <html><h2>included!</h2></html>");
+      ICategory news2cat1 = fFactory.createCategory(null, news2);
+      news2cat1.setName("apple");
+      ICategory news2cat2 = fFactory.createCategory(null, news2);
+      news2cat2.setName("pasero");
+      ILabel label2 = fFactory.createLabel(null, "todo");
+      news2.addLabel(label2);
+      IAttachment att1news2 = fFactory.createAttachment(null, news2);
+      att1news2.setLink(new URI("http://www.attachment.com/att1news2.file"));
+      att1news2.setType("bin/doc");
+      IAttachment att2news2 = fFactory.createAttachment(null, news2);
+      att2news2.setLink(new URI("http://www.attachment.com/att2news2.file"));
+      att2news2.setType("bin/wav");
+
+      INews news3 = createNews(feed, "Foo Bar", "http://www.news.com/news3.html", State.NEW);
+      news3.setDescription("This is a longer description with \n newlines and <html><h2>included!</h2></html>");
+      IPerson author3 = fFactory.createPerson(null, news3);
+      author3.setName("Benjamin Pasero");
+      ICategory news3cat1 = fFactory.createCategory(null, news3);
+      news3cat1.setName("apple");
+      ICategory news3cat2 = fFactory.createCategory(null, news3);
+      news3cat2.setName("windows");
+      ICategory news3cat3 = fFactory.createCategory(null, news3);
+      news3cat3.setName("slashdot");
+
+      INews news4 = createNews(feed, "BAR FOO", "http://www.news.com/news4.html", State.UPDATED);
+      Date news4Date = new Date(1000000);
+      news4.setPublishDate(news4Date);
+      IPerson author4 = fFactory.createPerson(null, news4);
+      author4.setName("Pasero");
+      ISource source4 = fFactory.createSource(news4);
+      source4.setLink(new URI("http://www.source.com"));
+
+      INews news5 = createNews(feed, null, "http://www.news.com/news5.html", State.NEW);
+      news5.setFlagged(true);
+      IPerson author5 = fFactory.createPerson(null, news5);
+      author5.setEmail(new URI("test@rssowl.org"));
+      ISource source5 = fFactory.createSource(news5);
+      source5.setName("Source for News 5");
+
+      DynamicDAO.save(feed);
+
+      /* Wait for Indexer */
+      waitForIndexer();
+
+      /* Condition 1a: String (match) */
+      {
+
+        /* Title */
+        ISearchField field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "foo bar");
+
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3, news4);
+
+        field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "bar foo");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3, news4);
+
+        field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "b* f*");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3, news4);
+
+        field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "fo? b*");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3, news4);
+
+        /* Description */
+        field = fFactory.createSearchField(INews.DESCRIPTION, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "newlines included");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3);
+
+        field = fFactory.createSearchField(INews.DESCRIPTION, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "new?ines description");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3);
+
+        /* Attachments */
+        field = fFactory.createSearchField(INews.ATTACHMENTS_CONTENT, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "bin/mp3");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news1);
+
+        field = fFactory.createSearchField(INews.ATTACHMENTS_CONTENT, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "*mp3");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news1);
+
+        field = fFactory.createSearchField(INews.ATTACHMENTS_CONTENT, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "www.attachment.com*");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news1, news2);
+
+        /* Author */
+        field = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "Benjamin Pasero");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3);
+
+        field = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "Pasero");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3, news4);
+
+        field = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "Ben?amin Pase*");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3);
+
+        field = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "Ben*");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3);
+
+        field = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "test@rssowl.org");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news5);
+
+        field = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "test@rssowl?*");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news5);
+
+        /* All Fields */
+        field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "foo");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news1, news3, news4);
+
+        field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "*pasero");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news2, news3, news4);
+
+        field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "description new?ines");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3);
+
+        field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "foo appl? bin/mp3");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news1);
+
+        field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "ba? Apple descript*");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news2, news3);
+
+        field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "BAR FOO PASERO");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertSame(result, news3, news4);
+      }
+
+      /* Condition 1b: String (no match) */
+      {
+
+        /* Title */
+        ISearchField field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "barfoo");
+
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+        assertEquals(0, result.size());
+
+        field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "f? b?");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertEquals(0, result.size());
+
+        /* Description */
+        field = fFactory.createSearchField(INews.DESCRIPTION, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "html");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertEquals(0, result.size());
+
+        field = fFactory.createSearchField(INews.DESCRIPTION, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "loner desription");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertEquals(0, result.size());
+
+        /* Attachment */
+        field = fFactory.createSearchField(INews.ATTACHMENTS_CONTENT, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "bin/ogg");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertEquals(0, result.size());
+
+        field = fFactory.createSearchField(INews.ATTACHMENTS_CONTENT, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "*ogg");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertEquals(0, result.size());
+
+        field = fFactory.createSearchField(INews.ATTACHMENTS_CONTENT, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "www.attachments.com*");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertEquals(0, result.size());
+
+        /* All Fields */
+        field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "foobar");
+
+        result = fModelSearch.searchNews(list(condition), false);
+        assertEquals(0, result.size());
+
+        field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+        condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "*barfoo");
 
         result = fModelSearch.searchNews(list(condition), false);
         assertEquals(0, result.size());
@@ -2414,6 +2929,24 @@ public class ModelSearchTest {
       }
 
       /*
+       * Condition 1b: Title CONTAINS_ALL Foo Bar OR Author IS test@rssowl.org
+       * OR Author IS Benjamin Pasero
+       */
+      {
+        ISearchField field1 = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+        ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.CONTAINS_ALL, "foo bar");
+
+        ISearchField field2 = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+        ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS, "test@rssowl.org");
+
+        ISearchField field3 = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+        ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS, "Benjamin Pasero");
+
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
+        assertSame(result, news3, news5);
+      }
+
+      /*
        * Condition 2: Title CONTAINS Foo AND Author IS test@rssowl.org
        */
       {
@@ -2428,8 +2961,22 @@ public class ModelSearchTest {
       }
 
       /*
-       * Condition 3: Title CONTAINS Foo AND Author IS Benjamin?Pasero AND
-       * Categories IS slash* AND Link BEGINS_WITH http://www.news.com/
+       * Condition 2b: Title CONTAINS_ALL Foo Bar AND Author IS test@rssowl.org
+       */
+      {
+        ISearchField field1 = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+        ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.CONTAINS_ALL, "foo bar");
+
+        ISearchField field2 = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+        ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS, "test@rssowl.org");
+
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), true);
+        assertEquals(0, result.size());
+      }
+
+      /*
+       * Condition 3: Title CONTAINS Foo AND Author CONTAINS benjami? AND
+       * Categories IS slash AND Link BEGINS_WITH http://www.news.com/
        */
       {
         ISearchField field1 = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
@@ -2449,8 +2996,30 @@ public class ModelSearchTest {
       }
 
       /*
-       * Condition 4: (State IS *new* OR State is *unread* OR State IS
-       * *updated*) AND Has Attachments
+       * Condition 3b: Title CONTAINS_ALL Foo Bar AND Author CONTAINS_ALL
+       * benjami?n pasero AND Categories IS slash AND Link BEGINS_WITH
+       * http://www.news.com/
+       */
+      {
+        ISearchField field1 = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+        ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.CONTAINS_ALL, "Foo Bar");
+
+        ISearchField field2 = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+        ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.CONTAINS, "benjami?n pasero");
+
+        ISearchField field3 = fFactory.createSearchField(INews.CATEGORIES, fNewsEntityName);
+        ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS, "slash*");
+
+        ISearchField field4 = fFactory.createSearchField(INews.LINK, fNewsEntityName);
+        ISearchCondition cond4 = fFactory.createSearchCondition(field4, SearchSpecifier.BEGINS_WITH, "http://www.news.com/");
+
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), true);
+        assertSame(result, news3);
+      }
+
+      /*
+       * Condition 4: (State IS new OR State is unread OR State IS updated) AND
+       * Has Attachments
        */
       {
         ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
@@ -2464,8 +3033,8 @@ public class ModelSearchTest {
       }
 
       /*
-       * Condition 5: (State IS *new* OR State is *unread* OR State IS
-       * *updated*) AND All_Fields CONTAINS foo
+       * Condition 5: (State IS new OR State is unread OR State IS updated) AND
+       * All_Fields CONTAINS pasero
        */
       {
         ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
@@ -2479,8 +3048,22 @@ public class ModelSearchTest {
       }
 
       /*
-       * Condition 6: (State IS *new* OR State is *unread* OR State IS
-       * *updated*)
+       * Condition 5: (State IS new OR State is unread OR State IS updated) AND
+       * All_Fields CONTAINS_ALL foo pasero
+       */
+      {
+        ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
+        ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED));
+
+        ISearchField field2 = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+        ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.CONTAINS_ALL, "foo pasero");
+
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), true);
+        assertSame(result, news3);
+      }
+
+      /*
+       * Condition 6: (State IS new OR State is unread OR State IS updated)
        */
       {
         ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
@@ -2553,8 +3136,8 @@ public class ModelSearchTest {
     waitForIndexer();
 
     /*
-     * Condition 1: (State IS *new* OR State is *unread* OR State IS *updated*)
-     * OR (Entire News contains "Foo") OR (Author is "Benjamin Pasero")
+     * Condition 1: (State IS new OR State is unread OR State IS updated) OR
+     * (Entire News contains "Foo") OR (Author is "Benjamin Pasero")
      */
     {
       ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
@@ -2571,8 +3154,26 @@ public class ModelSearchTest {
     }
 
     /*
-     * Condition 2: +(State IS *new* OR State is *unread* OR State IS *updated*)
-     * AND (Entire News contains "Foo") AND (Author is "Benjamin Pasero")
+     * Condition 1b: (State IS new OR State is unread OR State IS updated) OR
+     * (Entire News contains all "Foo Bar") OR (Author is "Benjamin Pasero")
+     */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED));
+
+      ISearchField field2 = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.CONTAINS_ALL, "Foo Bar");
+
+      ISearchField field3 = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+      ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS, "Benjamin Pasero");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
+      assertSame(result, news2, news3);
+    }
+
+    /*
+     * Condition 2: +(State IS new OR State is unread OR State IS updated) AND
+     * (Entire News contains "Foo") AND (Author is "Benjamin Pasero")
      */
     {
       ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
@@ -2589,7 +3190,26 @@ public class ModelSearchTest {
     }
 
     /*
-     * Condition 3: (Entire News contains "Foo") AND (Title contains "Bar") AND
+     * Condition 2b: +(State IS new OR State is unread OR State IS updated) AND
+     * (Entire News contains all "Foo Pasero Bar") AND (Author is
+     * "Benjamin Pasero")
+     */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED));
+
+      ISearchField field2 = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.CONTAINS_ALL, "Foo Pasero Bar");
+
+      ISearchField field3 = fFactory.createSearchField(INews.AUTHOR, fNewsEntityName);
+      ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.CONTAINS_ALL, "Benjamin Pasero");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), true);
+      assertSame(result, news3);
+    }
+
+    /*
+     * Condition 3: (Entire News contains "fafa") AND (Title contains "Bar") AND
      * (Author is not "Benjamin Pasero")
      */
     {
@@ -2607,8 +3227,8 @@ public class ModelSearchTest {
     }
 
     /*
-     * Condition 4: +(State IS *new* OR State is *unread* OR State IS *updated*)
-     * AND (Category IS Windows) AND (Category IS Apple)
+     * Condition 4: +(State IS new OR State is unread OR State IS updated) AND
+     * (Category IS Windows) AND (Category IS Apple)
      */
     {
       ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
@@ -2625,8 +3245,8 @@ public class ModelSearchTest {
     }
 
     /*
-     * Condition 5: +(State IS *new* OR State is *unread* OR State IS *updated*)
-     * AND (Category IS Windows) AND (Category IS Apple) AND (Category IS NOT
+     * Condition 5: +(State IS new OR State is unread OR State IS updated) AND
+     * (Category IS Windows) AND (Category IS Apple) AND (Category IS NOT
      * Slashdot)
      */
     {
@@ -2647,8 +3267,8 @@ public class ModelSearchTest {
     }
 
     /*
-     * Condition 6: +(State IS *new* OR State is *unread* OR State IS *updated*)
-     * AND (Category IS NOT Windows)
+     * Condition 6: +(State IS new OR State is unread OR State IS updated) AND
+     * (Category IS NOT Windows)
      */
     {
       ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
@@ -2662,8 +3282,8 @@ public class ModelSearchTest {
     }
 
     /*
-     * Condition 7: +(State IS *new* OR State is *unread* OR State IS *updated*)
-     * AND (Age is Less than 5 Days)
+     * Condition 7: +(State IS new OR State is unread OR State IS updated) AND
+     * (Age is Less than 5 Days)
      */
     {
       ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
@@ -2713,6 +3333,21 @@ public class ModelSearchTest {
 
       List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), false);
       assertSame(result, news1, news3, news4);
+    }
+
+    /*
+     * Condition 1b: Title contains all not First OR Feed is not
+     * "http://www.feed.com/feed1.xml"
+     */
+    {
+      ISearchField field1 = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.CONTAINS_ALL_NOT, "First");
+
+      ISearchField field2 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
+      ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS_NOT, "http://www.feed.com/feed1.xml");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), false);
+      assertSame(result, news2, news3, news4);
     }
 
     /*
@@ -2784,7 +3419,7 @@ public class ModelSearchTest {
     }
 
     /*
-     * Condition 5: State is not *new* AND State is not *unread*
+     * Condition 5: State is not new AND State is not unread
      */
     {
       ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
@@ -2802,6 +3437,28 @@ public class ModelSearchTest {
 
       result = fModelSearch.searchNews(list(cond1), true);
       assertSame(result, news4);
+    }
+
+    /*
+     * Condition 6: Entire News contains not all News Feed
+     */
+    {
+      ISearchField field1 = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.CONTAINS_ALL_NOT, "News Feed");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertEquals(0, result.size());
+    }
+
+    /*
+     * Condition 7: Entire News contains not all Foo Bar
+     */
+    {
+      ISearchField field1 = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.CONTAINS_ALL_NOT, "Foo Bar");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), true);
+      assertSame(result, news1, news2, news3, news4);
     }
   }
 
@@ -3061,7 +3718,7 @@ public class ModelSearchTest {
       assertSame(result, news3, news4);
     }
 
-    /* Location IS Sub Folder AND State is *new* */
+    /* Location IS Sub Folder AND State is new */
     {
       ISearchField field1 = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
       ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { subFolder })));
@@ -3181,7 +3838,7 @@ public class ModelSearchTest {
       assertSame(result, news1Copy, news2Copy, news3CopyRoot, news3CopySubRoot, news4Copy, news5Copy, news6Copy);
     }
 
-    /* Location IS Sub Folder AND State is *new* */
+    /* Location IS Sub Folder AND State is new */
     {
       ISearchField field1 = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
       ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { subFolder })));
@@ -3233,6 +3890,152 @@ public class ModelSearchTest {
       condition1 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "(DVD)");
       condition2 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "no");
       ISearchCondition condition3 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "RadIO");
+
+      result = fModelSearch.searchNews(list(condition1, condition2, condition3), true);
+      assertSame(result, news1, news2);
+    } catch (PersistenceException e) {
+      TestUtils.fail(e);
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testSearchEntireNewsWithWildcards() throws Exception {
+    try {
+
+      /* First add some Types */
+      IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
+
+      /* Title */
+      INews news1 = createNews(feed, "Benjamin Pasero", "http://www.news.com/news1.html", State.NEW);
+
+      /* Description */
+      INews news2 = createNews(feed, "Michael Jordan", "http://www.news.com/news2.html", State.NEW);
+      news2.setDescription("This is a longer name like Benjamin Pasero.");
+
+      /* Author */
+      INews news3 = createNews(feed, "Jordan Kinsey", "http://www.news.com/news3.html", State.NEW);
+      IPerson author = fFactory.createPerson(null, news3);
+      author.setName("Benjamin Pasero");
+
+      /* Category */
+      INews news4 = createNews(feed, "McDonalds", "http://www.news.com/news4.html", State.NEW);
+      ICategory category = fFactory.createCategory(null, news4);
+      category.setName("Benjamin Pasero");
+
+      /* Attachment Content */
+      INews news5 = createNews(feed, "McFlurry", "http://www.news.com/news5.html", State.NEW);
+      IAttachment attachment = fFactory.createAttachment(null, news5);
+      attachment.setLink(new URI("http://www.attachment.com/att1news2.file"));
+      attachment.setType("Benjamin Pasero");
+
+      DynamicDAO.save(feed);
+
+      /* Wait for Indexer */
+      waitForIndexer();
+
+      /* All Fields */
+      ISearchField field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "Benjamin Pasero");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+      assertSame(result, news1, news2, news3, news4, news5);
+
+      field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      ISearchCondition condition1 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "Benjamin P*");
+
+      result = fModelSearch.searchNews(list(condition1), false);
+      assertSame(result, news1, news2, news3, news4, news5);
+
+      field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      condition1 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "Benjamin Pa?e*o");
+
+      result = fModelSearch.searchNews(list(condition1), false);
+      assertSame(result, news1, news2, news3, news4, news5);
+
+      field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      condition1 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "Ben* Paser?");
+
+      result = fModelSearch.searchNews(list(condition1), false);
+      assertSame(result, news1, news2, news3, news4, news5);
+
+      field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      condition1 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "?enjamin ?asero");
+
+      result = fModelSearch.searchNews(list(condition1), false);
+      assertSame(result, news1, news2, news3, news4, news5);
+
+      field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      condition1 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "B* P*");
+
+      result = fModelSearch.searchNews(list(condition1), false);
+      assertSame(result, news1, news2, news3, news4, news5);
+
+      field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      condition1 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "*e?j?mi? *a?e?*");
+
+      result = fModelSearch.searchNews(list(condition1), false);
+      assertSame(result, news1, news2, news3, news4, news5);
+
+    } catch (PersistenceException e) {
+      TestUtils.fail(e);
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testSearchEntireNewsWith_CONTAINS_ALL_Specifier() throws Exception {
+    try {
+
+      /* First add some Types */
+      IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
+
+      INews news1 = createNews(feed, "This is Radio no (DVD)", "http://www.news.com/news1.html", State.READ);
+
+      INews news2 = createNews(feed, " Bar", "http://www.news.com/news2.html", State.NEW);
+      news2.setDescription("This is a longer Radio no (DVD) description with <html><h2>included!</h2></html>");
+
+      DynamicDAO.save(feed);
+
+      /* Wait for Indexer */
+      waitForIndexer();
+
+      /* All Fields */
+      ISearchField field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "(DVD)");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+      assertSame(result, news1, news2);
+
+      field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "(DVD) description included");
+
+      result = fModelSearch.searchNews(list(condition), false);
+      assertSame(result, news2);
+
+      field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      ISearchCondition condition1 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "(DVD)");
+      ISearchCondition condition2 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "no");
+
+      result = fModelSearch.searchNews(list(condition1, condition2), true);
+      assertSame(result, news1, news2);
+
+      field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      condition1 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "(DVD) no");
+
+      result = fModelSearch.searchNews(list(condition1), true);
+      assertSame(result, news1, news2);
+
+      field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+      condition1 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "(DVD)");
+      condition2 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "no");
+      ISearchCondition condition3 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "RadIO");
 
       result = fModelSearch.searchNews(list(condition1, condition2, condition3), true);
       assertSame(result, news1, news2);
