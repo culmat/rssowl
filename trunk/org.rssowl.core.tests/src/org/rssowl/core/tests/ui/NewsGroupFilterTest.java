@@ -28,7 +28,6 @@ import static org.junit.Assert.assertEquals;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IAttachment;
@@ -451,7 +450,6 @@ public class NewsGroupFilterTest {
    * @throws Exception
    */
   @Test
-  @Ignore
   public void testNewsFiltering() throws Exception {
     IFeed feed = fFactory.createFeed(null, new URI("http://www.link.com"));
     feed.setTitle("Feed Name");
@@ -576,8 +574,8 @@ public class NewsGroupFilterTest {
       fFiltering.setPattern("foo");
       fFiltering.setSearchTarget(NewsFilter.SearchTarget.ALL);
       List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
-      assertEquals(5, result.size());
-      assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { news1, news2, news3, news4, news5 })));
+      assertEquals(3, result.size());
+      assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { news1, news2, news5 })));
     }
 
     /* Filter: Text Pattern (Author) */
@@ -597,6 +595,7 @@ public class NewsGroupFilterTest {
       DynamicDAO.save(news2);
       waitForIndexer();
 
+      fFiltering.setPattern("*foo*");
       fFiltering.setSearchTarget(NewsFilter.SearchTarget.CATEGORY);
       List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(2, result.size());
@@ -612,6 +611,7 @@ public class NewsGroupFilterTest {
       DynamicDAO.save(news5);
       waitForIndexer();
 
+      fFiltering.setPattern("*foo*");
       fFiltering.setSearchTarget(NewsFilter.SearchTarget.SOURCE);
       List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(2, result.size());
@@ -630,6 +630,7 @@ public class NewsGroupFilterTest {
       DynamicDAO.save(news2);
       waitForIndexer();
 
+      fFiltering.setPattern("*foo*");
       fFiltering.setSearchTarget(NewsFilter.SearchTarget.ATTACHMENTS);
       List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(3, result.size());
