@@ -42,7 +42,7 @@ import java.io.InputStreamReader;
  * It was first printed by JavaWorld (www.javaworld.com) in "When Runtime.exec()
  * won't", December 2000
  * (http://www.javaworld.com/javaworld/jw-12-2000/jw-1229-traps.html)
- * 
+ *
  * @author Taken from Java Pitfalls (www.javaworld.com)
  */
 public class StreamGobbler extends Job {
@@ -50,11 +50,12 @@ public class StreamGobbler extends Job {
 
   /**
    * Instantiate a new StreamGobbler
-   * 
+   *
    * @param is The inputstream of the process
    */
   public StreamGobbler(InputStream is) {
     super("Stream Gobbler");
+    setSystem(true);
     fIs = is;
   }
 
