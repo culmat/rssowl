@@ -33,7 +33,9 @@ import org.rssowl.core.tests.interpreter.ImporterTest;
 import org.rssowl.core.tests.interpreter.InterpreterTest;
 import org.rssowl.core.tests.model.ApplicationLayerTest;
 import org.rssowl.core.tests.model.DBManagerTest;
-import org.rssowl.core.tests.model.ModelSearchTest;
+import org.rssowl.core.tests.model.ModelSearchTest1;
+import org.rssowl.core.tests.model.ModelSearchTest2;
+import org.rssowl.core.tests.model.ModelSearchTest3;
 import org.rssowl.core.tests.model.ModelTest1;
 import org.rssowl.core.tests.model.ModelTest2;
 import org.rssowl.core.tests.model.ModelTest3;
@@ -63,7 +65,9 @@ import org.rssowl.core.tests.util.StringUtilsTest;
   ModelTest3.class,
   PreferencesDAOTest.class,
   ApplicationLayerTest.class,
-  ModelSearchTest.class,
+  ModelSearchTest1.class,
+  ModelSearchTest2.class,
+  ModelSearchTest3.class,
   DBManagerTest.class,
   PreferencesScopeTest.class,
   MergeUtilsTest.class,
