@@ -580,6 +580,11 @@ public class ModelSearchImpl implements IModelSearch {
 
       /* Category */
       field = factory.createSearchField(INews.CATEGORIES, condition.getField().getEntityName());
+      StringTokenizer tokenizer = new StringTokenizer(condition.getValue().toString());
+      while (tokenizer.hasMoreTokens()) {
+        String token = tokenizer.nextToken();
+        allFieldsConditions.add(factory.createSearchCondition(field, condition.getSpecifier().isNegation() ? SearchSpecifier.IS_NOT : SearchSpecifier.IS, token));
+      }
       allFieldsConditions.add(factory.createSearchCondition(field, condition.getSpecifier().isNegation() ? SearchSpecifier.IS_NOT : SearchSpecifier.IS, condition.getValue()));
 
       /* Attachment Content */
