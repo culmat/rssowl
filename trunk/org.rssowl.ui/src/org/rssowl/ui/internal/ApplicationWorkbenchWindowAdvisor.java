@@ -509,13 +509,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     shell.setVisible(true);
     shell.setActive();
 
-    /*
-     * Bug in Eclipse (#180881): For some reason the workbench-layout is broken,
-     * when restoring from the Tray after it has been moved to tray with
-     * Shell-Close. Fix this by explicitly forcing a layout after restore.
-     */
-    shell.layout(true);
-
     /* Un-Minimize if minimized */
     if (shell.getMinimized())
       shell.setMinimized(false);
