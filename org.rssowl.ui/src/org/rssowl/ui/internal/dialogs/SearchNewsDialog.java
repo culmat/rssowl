@@ -667,7 +667,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     setTitleImage(OwlUI.getImage(fResources, "icons/wizban/search.gif"));
 
     /* Title Message */
-    setMessage("You can use \'?\' for any character and \'*\' for any number of characters in your search.", IMessageProvider.INFORMATION);
+    setMessage("Use \'?\' for any character and \'*\' for any word in your search. Surround words with \" to search for phrases.", IMessageProvider.INFORMATION);
 
     /* Sashform dividing search definition from results */
     fSashForm = new SashForm(parent, SWT.VERTICAL | SWT.SMOOTH);

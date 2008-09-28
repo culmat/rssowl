@@ -123,7 +123,7 @@ public class ModelUtils {
         if (folderIds == null)
           folderIds = new ArrayList<Long>();
 
-        folderIds.add(((FolderNewsMark)entity).getFolder().getId());
+        folderIds.add(((FolderNewsMark) entity).getFolder().getId());
         folderCounter++;
       }
 
@@ -586,9 +586,8 @@ public class ModelUtils {
 
   /**
    * @param events
-   * @return <code>TRUE</code> in case the <code>INews.State.NEW</code>
-   * changed its value for any of the given Events, <code>FALSE</code>
-   * otherwise.
+   * @return <code>TRUE</code> in case the <code>INews.State.NEW</code> changed
+   * its value for any of the given Events, <code>FALSE</code> otherwise.
    */
   public static boolean isNewStateChange(Set<? extends ModelEvent> events) {
     for (ModelEvent event : events) {
@@ -648,9 +647,9 @@ public class ModelUtils {
 
   /**
    * @param events
-   * @return <code>TRUE</code> in case the <code>INews.State.NEW</code> or
-   * any unread-state (NEW, UPDATED, UNREAD) changed its value for any of the
-   * given Events, <code>FALSE</code> otherwise.
+   * @return <code>TRUE</code> in case the <code>INews.State.NEW</code> or any
+   * unread-state (NEW, UPDATED, UNREAD) changed its value for any of the given
+   * Events, <code>FALSE</code> otherwise.
    */
   public static boolean isNewOrReadStateChange(Set<? extends ModelEvent> events) {
     for (ModelEvent event : events) {
@@ -684,8 +683,8 @@ public class ModelUtils {
 
   /**
    * @param events
-   * @return <code>TRUE</code> in case any State changed for ther given
-   * Events, <code>FALSE</code> otherwise.
+   * @return <code>TRUE</code> in case any State changed for ther given Events,
+   * <code>FALSE</code> otherwise.
    */
   public static boolean isStateChange(Set<? extends ModelEvent> events) {
     for (ModelEvent event : events) {
@@ -745,8 +744,8 @@ public class ModelUtils {
   /**
    * @param selection Any list of selected <code>INews</code> or
    * <code>EntityGroup</code>.
-   * @return Returns a Set of <code>ILabel</code> that <em>all entities</em>
-   * of the given Selection had applied to.
+   * @return Returns a Set of <code>ILabel</code> that <em>all entities</em> of
+   * the given Selection had applied to.
    */
   public static Set<ILabel> getLabelsForAll(IStructuredSelection selection) {
     Set<ILabel> labelsForAll = new HashSet<ILabel>(5);
@@ -775,8 +774,8 @@ public class ModelUtils {
 
   /**
    * @param events
-   * @return <code>TRUE</code> in case any of the events tell about a change
-   * in the Publish-Date of the News, <code>FALSE</code> otherwise.
+   * @return <code>TRUE</code> in case any of the events tell about a change in
+   * the Publish-Date of the News, <code>FALSE</code> otherwise.
    */
   public static boolean isDateChange(Set<? extends ModelEvent> events) {
     for (ModelEvent modelEvent : events) {
@@ -795,8 +794,8 @@ public class ModelUtils {
 
   /**
    * @param events
-   * @return <code>TRUE</code> in case any of the events tell about a change
-   * in the Author of the News, <code>FALSE</code> otherwise.
+   * @return <code>TRUE</code> in case any of the events tell about a change in
+   * the Author of the News, <code>FALSE</code> otherwise.
    */
   public static boolean isAuthorChange(Set<? extends ModelEvent> events) {
     for (ModelEvent modelEvent : events) {
@@ -817,8 +816,8 @@ public class ModelUtils {
 
   /**
    * @param events
-   * @return <code>TRUE</code> in case any of the events tell about a change
-   * in the Category of the News, <code>FALSE</code> otherwise.
+   * @return <code>TRUE</code> in case any of the events tell about a change in
+   * the Category of the News, <code>FALSE</code> otherwise.
    */
   public static boolean isCategoryChange(Set<? extends ModelEvent> events) {
     for (ModelEvent modelEvent : events) {
@@ -837,8 +836,8 @@ public class ModelUtils {
 
   /**
    * @param events
-   * @return <code>TRUE</code> in case any of the events tell about a change
-   * in the Label of the News, <code>FALSE</code> otherwise.
+   * @return <code>TRUE</code> in case any of the events tell about a change in
+   * the Label of the News, <code>FALSE</code> otherwise.
    */
   public static boolean isLabelChange(Set<? extends ModelEvent> events) {
     for (ModelEvent modelEvent : events) {
@@ -857,8 +856,8 @@ public class ModelUtils {
 
   /**
    * @param events
-   * @return <code>TRUE</code> in case any of the events tell about a change
-   * in the Title of the News, <code>FALSE</code> otherwise.
+   * @return <code>TRUE</code> in case any of the events tell about a change in
+   * the Title of the News, <code>FALSE</code> otherwise.
    */
   public static boolean isTitleChange(Set<? extends ModelEvent> events) {
     for (ModelEvent modelEvent : events) {
@@ -878,8 +877,8 @@ public class ModelUtils {
   /**
    * @param parent
    * @param entityToCheck
-   * @return <code>TRUE</code> in case the given Entity is a child of the
-   * given Folder, <code>FALSE</code> otherwise.
+   * @return <code>TRUE</code> in case the given Entity is a child of the given
+   * Folder, <code>FALSE</code> otherwise.
    */
   public static boolean hasChildRelation(IFolder parent, IEntity entityToCheck) {
     if (entityToCheck instanceof IFolder) {
@@ -923,8 +922,8 @@ public class ModelUtils {
    * <code>feedRef</code> or <code>null</code> if none.
    *
    * @param feedRef The desired Feed.
-   * @return Returns the first <code>IBookMark</code> that references the
-   * given Feed or <code>null</code> if none.
+   * @return Returns the first <code>IBookMark</code> that references the given
+   * Feed or <code>null</code> if none.
    */
   public static IBookMark getBookMark(FeedLinkReference feedRef) {
     IBookMarkDAO bookMarkDAO = Owl.getPersistenceService().getDAOService().getBookMarkDAO();
@@ -995,6 +994,7 @@ public class ModelUtils {
           continue;
 
         /* Split into Words */
+        value= StringUtils.replaceAll(value, "\"", "");
         StringTokenizer tokenizer = new StringTokenizer(value);
         while (tokenizer.hasMoreElements()) {
           String nextWord = tokenizer.nextElement().toString().toLowerCase();
