@@ -25,9 +25,12 @@
 package org.rssowl.core.tests.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.rssowl.core.util.StringUtils;
+
+import java.util.Arrays;
 
 /**
  * Tests methods in StringUtils.
@@ -70,5 +73,46 @@ public class StringUtilsTest {
     assertEquals("Foo Bar", StringUtils.normalizeString("  Foo\nBar  "));
     assertEquals("Foo Bar", StringUtils.normalizeString("  Foo\n\t Bar  "));
     assertEquals("Foo Bar", StringUtils.normalizeString("  Foo Bar\n  "));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testTokenizePhraseAware() throws Exception {
+    assertTrue(StringUtils.tokenizePhraseAware(null).isEmpty());
+    assertTrue(StringUtils.tokenizePhraseAware("").isEmpty());
+    assertTrue(StringUtils.tokenizePhraseAware(" ").isEmpty());
+    assertTrue(StringUtils.tokenizePhraseAware("  ").isEmpty());
+    assertTrue(StringUtils.tokenizePhraseAware("     ").isEmpty());
+
+    assertEquals(Arrays.asList(new String[] { "\"" }), StringUtils.tokenizePhraseAware("\""));
+    assertEquals(Arrays.asList(new String[] { "\"\"" }), StringUtils.tokenizePhraseAware("\"\""));
+    assertEquals(Arrays.asList(new String[] { "\"\"", "a" }), StringUtils.tokenizePhraseAware("\"\" a"));
+
+    assertEquals(Arrays.asList(new String[] { "foo" }), StringUtils.tokenizePhraseAware("foo"));
+    assertEquals(Arrays.asList(new String[] { "foo", "bar" }), StringUtils.tokenizePhraseAware("foo bar"));
+    assertEquals(Arrays.asList(new String[] { "foo", "bar" }), StringUtils.tokenizePhraseAware(" foo bar "));
+    assertEquals(Arrays.asList(new String[] { "foo", "bar" }), StringUtils.tokenizePhraseAware(" foo    bar "));
+    assertEquals(Arrays.asList(new String[] { "foo", "bar", "foobar" }), StringUtils.tokenizePhraseAware("foo bar foobar"));
+    assertEquals(Arrays.asList(new String[] { "foo", "bar", "foobar" }), StringUtils.tokenizePhraseAware(" foo bar foobar "));
+    assertEquals(Arrays.asList(new String[] { "foo", "bar", "foobar" }), StringUtils.tokenizePhraseAware(" foo    bar foobar "));
+
+    assertEquals(Arrays.asList(new String[] { "\"foo" }), StringUtils.tokenizePhraseAware("\"foo"));
+    assertEquals(Arrays.asList(new String[] { "foo\"" }), StringUtils.tokenizePhraseAware("foo\""));
+    assertEquals(Arrays.asList(new String[] { "\"foo\"" }), StringUtils.tokenizePhraseAware("\"foo\""));
+    assertEquals(Arrays.asList(new String[] { "\"foo bar\"" }), StringUtils.tokenizePhraseAware("\"foo bar\""));
+    assertEquals(Arrays.asList(new String[] { "\"foo bar" }), StringUtils.tokenizePhraseAware("\"foo bar"));
+    assertEquals(Arrays.asList(new String[] { "foo", "bar\"" }), StringUtils.tokenizePhraseAware("foo bar\""));
+    assertEquals(Arrays.asList(new String[] { "\"foo\"", "bar" }), StringUtils.tokenizePhraseAware("\"foo\" bar"));
+    assertEquals(Arrays.asList(new String[] { "\"foo\"", "\"bar" }), StringUtils.tokenizePhraseAware("\"foo\" \"bar"));
+    assertEquals(Arrays.asList(new String[] { "\"foo\"", "bar\"" }), StringUtils.tokenizePhraseAware("\"foo\" bar\""));
+    assertEquals(Arrays.asList(new String[] { "\"foo\"", "\"bar\"" }), StringUtils.tokenizePhraseAware("\"foo\" \"bar\""));
+
+    assertEquals(Arrays.asList(new String[] { "\"foo bar\"", "foobar" }), StringUtils.tokenizePhraseAware("\"foo bar\" foobar"));
+    assertEquals(Arrays.asList(new String[] { "foo", "\"bar foobar\"" }), StringUtils.tokenizePhraseAware("foo \"bar foobar\""));
+    assertEquals(Arrays.asList(new String[] { "foo", "\"bar foobar\"" }), StringUtils.tokenizePhraseAware("foo  \"bar    foobar\""));
+    assertEquals(Arrays.asList(new String[] { "\"foo bar foobar\"" }), StringUtils.tokenizePhraseAware("\"foo bar foobar\""));
+    assertEquals(Arrays.asList(new String[] { "\"foo\"bar\"foobar\"" }), StringUtils.tokenizePhraseAware("\"foo\"bar\"foobar\""));
   }
 }
