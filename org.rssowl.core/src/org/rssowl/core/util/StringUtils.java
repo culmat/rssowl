@@ -28,6 +28,9 @@ import org.apache.lucene.analysis.StopAnalyzer;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Utility Class for working with <code>Strings</code>.
@@ -227,8 +230,8 @@ public class StringUtils {
   }
 
   /**
-   * Convert a String to int and return <code>-1</code> in case the input
-   * String is not a number.
+   * Convert a String to int and return <code>-1</code> in case the input String
+   * is not a number.
    *
    * @param str The String to convert.
    * @return int The converted integer or <code>-1</code> in case the input
@@ -240,5 +243,59 @@ public class StringUtils {
     } catch (NumberFormatException e) {
       return -1;
     }
+  }
+
+  /**
+   * Tokenizes the given String at a whitespace character, but keeps phrases
+   * surrounded by quotes together.
+   *
+   * @param str the String to tokenize.
+   * @return A list of tokens, including phrases surrounded by quotes if any.
+   */
+  public static List<String> tokenizePhraseAware(String str) {
+    if (!StringUtils.isSet(str))
+      return Collections.emptyList();
+
+    str = normalizeString(str);
+
+    boolean inQuotes = false;
+    List<String> tokens = new ArrayList<String>(1);
+    StringBuilder builder = new StringBuilder();
+    for (int i = 0; i < str.length(); i++) {
+      char c = str.charAt(i);
+
+      /* Opening Quote */
+      if (c == '"' && !inQuotes) {
+        inQuotes = true;
+        builder.append(c);
+      }
+
+      /* Closing Quote */
+      else if (c == '"' && inQuotes) {
+        inQuotes = false;
+        builder.append(c);
+      }
+
+      /* Whitespace outside Quotes */
+      else if (c == ' ' && !inQuotes) {
+        tokens.add(builder.toString());
+        builder.setLength(0);
+      }
+
+      /* Whitespace inside Quotes */
+      else if (c == ' ' && inQuotes) {
+        builder.append(c);
+      }
+
+      /* Any other Character */
+      else {
+        builder.append(c);
+      }
+    }
+
+    if (builder.length() > 0)
+      tokens.add(builder.toString());
+
+    return tokens;
   }
 }
