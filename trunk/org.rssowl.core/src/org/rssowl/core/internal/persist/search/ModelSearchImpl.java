@@ -81,6 +81,7 @@ import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.IndexListener;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.SearchHit;
+import org.rssowl.core.util.StringUtils;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -495,8 +496,8 @@ public class ModelSearchImpl implements IModelSearch {
         }
       };
 
+      /* Perform the Search */
       try {
-        /* Perform the Search */
         currentSearcher.search(bQuery, collector);
         return resultList;
       } finally {
@@ -535,9 +536,8 @@ public class ModelSearchImpl implements IModelSearch {
     if (condition.getSpecifier() == SearchSpecifier.CONTAINS_ALL) {
       List<ISearchCondition> tokenConditions = new ArrayList<ISearchCondition>();
 
-      StringTokenizer tokenizer = new StringTokenizer((String) condition.getValue());
-      while (tokenizer.hasMoreTokens()) {
-        String token = tokenizer.nextToken().toLowerCase();
+      List<String> tokens = StringUtils.tokenizePhraseAware((String) condition.getValue());
+      for (String token : tokens) {
         ISearchCondition tokenCondition = factory.createSearchCondition(condition.getField(), condition.getSpecifier(), token);
 
         /* Rewrite Specifier */
@@ -1063,7 +1063,7 @@ public class ModelSearchImpl implements IModelSearch {
       char c = s.charAt(i);
 
       /* Escape Special Characters being used in Lucene */
-      if (c == '\\' || c == '+' || c == '-' || c == '!' || c == '(' || c == ')' || c == ':' || c == '^' || c == '[' || c == ']' || c == '\"' || c == '{' || c == '}' || c == '~')
+      if (c == '\\' || c == '+' || c == '-' || c == '!' || c == '(' || c == ')' || c == ':' || c == '^' || c == '[' || c == ']' || c == '{' || c == '}' || c == '~')
         sb.append('\\');
 
       sb.append(c);
