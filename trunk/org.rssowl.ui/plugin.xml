@@ -860,7 +860,7 @@
          <action
                class="org.rssowl.ui.internal.actions.SortByNameAction"
                definitionId="org.rssowl.ui.SortByNameAction"
-               enablesFor="1"
+               enablesFor="+"
                id="org.rssowl.ui.SortByNameAction"
                label="&amp;Sort by Name"
                menubarPath="edit">

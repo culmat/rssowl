@@ -49,10 +49,12 @@ public class SortByNameAction implements IActionDelegate {
    */
   public void run(IAction action) {
     List<?> list = fSelection.toList();
-    if (!list.isEmpty() && list.get(0) instanceof IFolder) {
-      IFolder folder = (IFolder) list.get(0);
-      folder.sort();
-      DynamicDAO.save(folder);
+    for (Object obj : list) {
+      if (obj instanceof IFolder) {
+        IFolder folder = (IFolder) obj;
+        folder.sort();
+        DynamicDAO.save(folder);
+      }
     }
   }
 
