@@ -29,6 +29,7 @@ import org.eclipse.equinox.security.storage.provider.IPreferencesContainer;
 import org.eclipse.equinox.security.storage.provider.PasswordProvider;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 import org.rssowl.ui.internal.dialogs.MasterPasswordDialog;
 import org.rssowl.ui.internal.util.JobRunner;
 
@@ -53,6 +54,9 @@ public class DefaultPasswordProvider extends PasswordProvider {
   @SuppressWarnings("restriction")
   @Override
   public PBEKeySpec getPassword(IPreferencesContainer container, final int passwordType) {
+    if (!PlatformUI.isWorkbenchRunning())
+      return null;
+
     final PBEKeySpec[] spec = new PBEKeySpec[1];
     final Shell activeShell = OwlUI.getActiveShell();
 
