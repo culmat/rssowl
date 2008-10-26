@@ -15,6 +15,7 @@
    <extension-point id="CredentialsProvider" name="Credentials Provider" schema="schema/CredentialsProvider.exsd"/>
    <extension-point id="SSLHandler" name="SSL Handler" schema="schema/SSLHandler.exsd"/>
    <extension-point id="DAOService" name="DAO Service" schema="schema/DAOService.exsd"/>
+   <extension-point id="NewsAction" name="News Action" schema="schema/NewsAction.exsd"/>
    <extension
          point="org.rssowl.core.PersistenceService">
       <persistenceservice class="org.rssowl.core.internal.persist.service.PersistenceServiceImpl"/>
@@ -139,5 +140,44 @@
       <xmlparser
             class="org.rssowl.core.internal.interpreter.DefaultSaxParserImpl">
       </xmlparser>
+   </extension>
+   <extension
+         point="org.rssowl.core.NewsAction">
+      <newsAction
+            class="org.rssowl.core.internal.newsaction.MoveNewsAction"
+            id="org.rssowl.core.MoveNewsAction"
+            name="Move News"
+            sortKey="95">
+      </newsAction>
+      <newsAction
+            class="org.rssowl.core.internal.newsaction.CopyNewsAction"
+            id="org.rssowl.core.CopyNewsAction"
+            name="Copy News"
+            sortKey="90">
+      </newsAction>
+      <newsAction
+            class="org.rssowl.core.internal.newsaction.MarkReadNewsAction"
+            id="org.rssowl.core.MarkReadNewsAction"
+            name="Mark News as Read"
+            sortKey="85">
+      </newsAction>
+      <newsAction
+            class="org.rssowl.core.internal.newsaction.MarkStickyNewsAction"
+            id="org.rssowl.core.MarkStickyNewsAction"
+            name="Mark News as Sticky"
+            sortKey="83">
+      </newsAction>
+      <newsAction
+            class="org.rssowl.core.internal.newsaction.LabelNewsAction"
+            id="org.rssowl.core.LabelNewsAction"
+            name="Label News"
+            sortKey="80">
+      </newsAction>
+      <newsAction
+            class="org.rssowl.core.internal.newsaction.DeleteNewsAction"
+            id="org.rssowl.core.DeleteNewsAction"
+            name="Delete News"
+            sortKey="30">
+      </newsAction>
    </extension>
 </plugin>

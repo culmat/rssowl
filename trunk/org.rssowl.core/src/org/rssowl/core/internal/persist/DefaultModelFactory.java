@@ -33,6 +33,7 @@ import org.rssowl.core.persist.ICloud;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IGuid;
@@ -47,6 +48,7 @@ import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.ITextInput;
@@ -338,5 +340,19 @@ public class DefaultModelFactory implements IModelFactory {
    */
   public ISearch createSearch(Long id, String name) {
     return new Search(id, name);
+  }
+
+  /*
+   * @see org.rssowl.core.persist.IModelFactory#createFilterAction(java.lang.String)
+   */
+  public IFilterAction createFilterAction(String actionId) {
+    return new FilterAction(actionId);
+  }
+
+  /*
+   * @see org.rssowl.core.persist.IModelFactory#createSearchFilter(java.lang.Long, org.rssowl.core.persist.ISearch, java.lang.String)
+   */
+  public ISearchFilter createSearchFilter(Long id, ISearch search, String name) {
+    return new SearchFilter(id, search, name);
   }
 }

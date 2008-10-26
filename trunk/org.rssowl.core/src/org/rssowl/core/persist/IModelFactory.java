@@ -42,7 +42,8 @@ public interface IModelFactory {
    * Creates a new instance of INews with the provided parameters. The News is
    * automatically added to the given Feed.
    *
-   * @param id The unique ID of the News.
+   * @param id The unique ID of the News or <code>null</code> if this is a new
+   * entity.
    * @param feed The Feed this News belongs to.
    * @param receiveDate The Date this News was received.
    * @return A new instance of INews with the provided parameters.
@@ -63,7 +64,8 @@ public interface IModelFactory {
    * Creates a new instance of IPerson with the provided parameters. The new
    * Person is automatically added to the given Type.
    *
-   * @param id The unique ID of the Person.
+   * @param id The unique ID of the Person or <code>null</code> if this is a new
+   * entity.
    * @param parentRef The Type this Person belongs to.
    * @return A new instance of IPerson with the provided parameters.
    */
@@ -82,7 +84,8 @@ public interface IModelFactory {
    * Creates a new instance of IAttachment with the provided parameters. The new
    * Attachment is automatically added to the given News.
    *
-   * @param id The unique ID of the Attachment.
+   * @param id The unique ID of the Attachment or <code>null</code> if this is a
+   * new entity.
    * @param news The News this Attachment belongs to.
    * @return A new instance of IAttachment with the provided parameters.
    */
@@ -91,7 +94,8 @@ public interface IModelFactory {
   /**
    * Creates a new instance of ICategory with the provided parameters.
    *
-   * @param id The unique ID of the Category.
+   * @param id The unique ID of the Category or <code>null</code> if this is a
+   * new entity.
    * @param parent The Type this Category belongs to.
    * @return A new instance ICategory with the provided parameters.
    */
@@ -140,7 +144,8 @@ public interface IModelFactory {
   /**
    * Creates a new instance of IFeed with the provided parameters.
    *
-   * @param id The unique ID of the Feed.
+   * @param id The unique ID of the Feed or <code>null</code> if this is a new
+   * entity.
    * @param link The URI of this Feed, where to retrieve the News from.
    * @return A new instance of IFeed with the provided parameters.
    */
@@ -151,9 +156,9 @@ public interface IModelFactory {
    * Folder is automatically added as last item to the given parent folder,
    * unless its <code>NULL</code> or not cached.
    *
-   * @param id The unique id of the Folder.
-   * @param parent A parent Folder, or <code>NULL</code> if this is root
-   * Folder.
+   * @param id The unique id of the Folder or <code>null</code> if this is a new
+   * entity.
+   * @param parent A parent Folder, or <code>NULL</code> if this is root Folder.
    * @param name The Name of the Folder.
    * @return a new instance of IFolder with the provided parameters.
    */
@@ -164,9 +169,9 @@ public interface IModelFactory {
    * Folder is automatically added to the given parent folder using the given
    * position, unless its <code>NULL</code> or not cached.
    *
-   * @param id The unique id of the Folder.
-   * @param parent A parent Folder, or <code>NULL</code> if this is root
-   * Folder.
+   * @param id The unique id of the Folder or <code>null</code> if this is a new
+   * entity.
+   * @param parent A parent Folder, or <code>NULL</code> if this is root Folder.
    * @param name The Name of the Folder.
    * @param position The new Position identified by a <code>IFolderChild</code>
    * contained in this folder or <code>NULL</code> to add the folder as last
@@ -180,7 +185,8 @@ public interface IModelFactory {
   /**
    * Creates a new instance of ILabel with the provided parameters.
    *
-   * @param id The unique ID of this Label.
+   * @param id The unique ID of this Label or <code>null</code> if this is a new
+   * entity.
    * @param name The Name of this Label.
    * @return a new instance of ILabel with the provided parameters.
    */
@@ -190,7 +196,8 @@ public interface IModelFactory {
    * Creates a new instance of ISearchMark with the provided parameters. The new
    * SearchMark is automatically added as last item to the given parent folder.
    *
-   * @param id The unique id of the ISearchMark.
+   * @param id The unique id of the ISearchMark or <code>null</code> if this is
+   * a new entity.
    * @param folder The parent Folder.
    * @param name The Name of the ISearchMark.
    * @return a new instance of ISearchMark with the provided parameters.
@@ -202,7 +209,8 @@ public interface IModelFactory {
    * SearchMark is automatically added to the given parent folder at the given
    * position.
    *
-   * @param id The unique id of the ISearchMark.
+   * @param id The unique id of the ISearchMark or <code>null</code> if this is
+   * a new entity.
    * @param folder The parent Folder.
    * @param name The Name of the ISearchMark.
    * @param position The new Position identified by a <code>IFolderChild</code>
@@ -218,7 +226,8 @@ public interface IModelFactory {
    * Creates a new instance of INewsBin with the provided parameters. The new
    * NewsBin is automatically added as last item to the given parent folder.
    *
-   * @param id The unique id of the INewsBin.
+   * @param id The unique id of the INewsBin or <code>null</code> if this is a
+   * new entity.
    * @param folder The parent Folder.
    * @param name The Name of the INewsBin.
    * @return a new instance of INewsBin with the provided parameters.
@@ -230,14 +239,15 @@ public interface IModelFactory {
    * NewsBin is automatically added to the given parent folder at the given
    * position.
    *
-   * @param id The unique id of the INewsBin.
+   * @param id The unique id of the INewsBin or <code>null</code> if this is a
+   * new entity.
    * @param folder The parent Folder.
    * @param name The Name of the INewsBin.
    * @param position The new Position identified by a <code>IFolderChild</code>
    * contained in this folder or <code>null</code> to add the INewsBin as the
    * last element.
-   * @param after If <code>true</code>, add the INewsBin to the index after
-   * the given position. May be <code>NULL</code> if the position is unknown.
+   * @param after If <code>true</code>, add the INewsBin to the index after the
+   * given position. May be <code>NULL</code> if the position is unknown.
    * @return a new instance of INewsBin with the provided parameters.
    */
   INewsBin createNewsBin(Long id, IFolder folder, String name, IFolderChild position, Boolean after);
@@ -246,7 +256,8 @@ public interface IModelFactory {
    * Creates a new instance of IBookMark with the provided parameters. The new
    * BookMark is automatically added to the given parent folder as last element.
    *
-   * @param id The unique id of the BookMark.
+   * @param id The unique id of the BookMark or <code>null</code> if this is a
+   * new entity.
    * @param folder The parent Folder
    * @param feedRef The reference to the feed this BookMark is related to.
    * @param name The Name of the Folder.
@@ -259,7 +270,8 @@ public interface IModelFactory {
    * BookMark is automatically added to the given parent folder at the given
    * position.
    *
-   * @param id The unique id of the BookMark.
+   * @param id The unique id of the BookMark or <code>null</code> if this is a
+   * new entity.
    * @param folder The parent Folder
    * @param feedRef The reference to the feed this BookMark is related to.
    * @param name The Name of the Folder.
@@ -277,15 +289,15 @@ public interface IModelFactory {
    * The new SearchCondition is automatically added to the given parent
    * SearchMark.
    *
-   * @param id The unique id of the SearchCondition.
+   * @param id The unique id of the SearchCondition or <code>null</code> if this
+   * is a new entity.
    * @param searchMark The SearckMark this type belongs to.
    * @param field The SearchField this SearchCondition is targeting.
    * @param specifier The specifier tells about how the value should match the
    * target field.
    * @param value The value of the Search (will be converted to a String).
    * Unless the value is a <code>String</code>, primitive Type, or
-   * <code>Enum</code>, make sure to provide a decent toString()
-   * implementation.
+   * <code>Enum</code>, make sure to provide a decent toString() implementation.
    * @param isAndSearch If <code>TRUE</code>, this SearchCondition and all
    * others having TRUE as value for this parameter, must be matched by the
    * target.
@@ -301,8 +313,7 @@ public interface IModelFactory {
    * target field.
    * @param value The value of the Search (will be converted to a String).
    * Unless the value is a <code>String</code>, primitive Type, or
-   * <code>Enum</code>, make sure to provide a decent toString()
-   * implementation.
+   * <code>Enum</code>, make sure to provide a decent toString() implementation.
    * @return a new instance of ISearchCondition with the provided parameters.
    */
   ISearchCondition createSearchCondition(ISearchField field, SearchSpecifier specifier, Object value);
@@ -312,8 +323,8 @@ public interface IModelFactory {
    *
    * @param id The unique id of the searchfield as defined in the given
    * <code>class</code> through constants.
-   * @param entityName The fully qualified Name of the <code>IEntity</code>
-   * this <code>ISearchField</code> is referring to.
+   * @param entityName The fully qualified Name of the <code>IEntity</code> this
+   * <code>ISearchField</code> is referring to.
    * @return a new instance of ISearchField with the provided parameters.
    */
   ISearchField createSearchField(int id, String entityName);
@@ -328,8 +339,7 @@ public interface IModelFactory {
    * Header.
    * @return a new instance of IConditionalGet.
    * @throws IllegalArgumentException if <code>ifModifiedSince</code> and
-   * <code>ifNoneMatch</code> are both null, or if <code>link</code> is
-   * null.
+   * <code>ifNoneMatch</code> are both null, or if <code>link</code> is null.
    */
   IConditionalGet createConditionalGet(String ifModifiedSince, URI link, String ifNoneMatch);
 
@@ -349,4 +359,24 @@ public interface IModelFactory {
    * @return a new instance of ISearch with the provided parameters.
    */
   ISearch createSearch(Long id, String name);
+
+  /**
+   * Creates a new instance of ISearchFilter with the provided parameters.
+   *
+   * @param id the unique ID of the ISearchFilter or <code>null</code> if this
+   * is a new entity.
+   * @param search the search conditions to define the resulting entities.
+   * @param name a human readable name for the filter
+   * @return a new instance of ISearchFilter with the provided parameters.
+   */
+  ISearchFilter createSearchFilter(Long id, ISearch search, String name);
+
+  /**
+   * Creates a new instance of IFilterAction with the provided parameters.
+   *
+   * @param actionId the ID of an action to perform on the resulting entities of
+   * a {@link ISearchFilter}.
+   * @return a new instance of IFilterAction with the provided parameters.
+   */
+  IFilterAction createFilterAction(String actionId);
 }

@@ -37,6 +37,7 @@ import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.dao.DAOService;
@@ -55,6 +56,7 @@ import org.rssowl.core.persist.dao.IPersonDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.dao.ISearchConditionDAO;
 import org.rssowl.core.persist.dao.ISearchDAO;
+import org.rssowl.core.persist.dao.ISearchFilterDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
 
 import java.util.HashMap;
@@ -72,6 +74,7 @@ public final class DAOServiceImpl extends DAOService  {
   private final IPersonDAO fPersonDAO = new PersonDAOImpl();
   private final ISearchConditionDAO fSearchConditionDAO = new SearchConditionDAOImpl();
   private final ILabelDAO fLabelDAO = new LabelDAOImpl();
+  private final ISearchFilterDAO fSearchFilterDAO= new SearchFilterDAOImpl();
 
   /* Internal */
   private final EntitiesToBeIndexedDAOImpl fEntitiesToBeIndexedDAO = new EntitiesToBeIndexedDAOImpl();
@@ -104,6 +107,7 @@ public final class DAOServiceImpl extends DAOService  {
     fEntityDaoClassesToDaosMap.put(IPreferenceDAO.class, fPreferencesDAO);
     fEntityDaoClassesToDaosMap.put(INewsBinDAO.class, fNewsBinDAO);
     fEntityDaoClassesToDaosMap.put(ISearchDAO.class, fSearchDAO);
+    fEntityDaoClassesToDaosMap.put(ISearchFilterDAO.class, fSearchFilterDAO);
 
     for (Object value : fEntityDaoClassesToDaosMap.values()) {
       IPersistableDAO<?> dao = (IPersistableDAO<?>) value;
@@ -125,6 +129,7 @@ public final class DAOServiceImpl extends DAOService  {
     fEntityInterfacesToDaosMap.put(INewsBin.class, fNewsBinDAO);
     fEntityInterfacesToDaosMap.put(ISearch.class, fSearchDAO);
     fEntityInterfacesToDaosMap.put(NewsCounter.class, fNewsCounterDAO);
+    fEntityInterfacesToDaosMap.put(ISearchFilter.class, fSearchFilterDAO);
   }
 
   private void putInEntityClassesToDaosMap(IPersistableDAO<?> dao) {
@@ -207,6 +212,11 @@ public final class DAOServiceImpl extends DAOService  {
 
   public IDescriptionDAO getDescriptionDAO() {
     return fDescriptionDAO;
+  }
+
+  @Override
+  public ISearchFilterDAO getSearchFilterDAO() {
+   return fSearchFilterDAO;
   }
 
   @Override
