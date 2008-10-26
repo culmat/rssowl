@@ -27,10 +27,10 @@ package org.rssowl.core.persist.dao;
 import org.rssowl.core.persist.IPersistable;
 
 /**
- * The <code>DAOService</code> is an abstract class that provides getter to
- * the data access objects of all <code>IPersistable</code> model types in
- * RSSOwl. This service can be contributed by using the DAOService extension
- * point provided in this bundle.
+ * The <code>DAOService</code> is an abstract class that provides getter to the
+ * data access objects of all <code>IPersistable</code> model types in RSSOwl.
+ * This service can be contributed by using the DAOService extension point
+ * provided in this bundle.
  *
  * @author Ismael Juma (ismael@juma.me.uk)
  */
@@ -53,10 +53,8 @@ public abstract class DAOService {
    * given <code>IPersistable</code>.
    *
    * @param <T> A concrete subclass of <code>IPersistableDAO</code>
-   * @param
-   * <P>
-   * A concrete subclass of <code>IPersistable</code> to load the responsible
-   * DAO for.
+   * @param <P> A concrete subclass of <code>IPersistable</code> to load the
+   * responsible DAO for.
    * @param persistableClass The <code>Class</code> of the
    * <code>IPersistable</code> to load the responsible DAO for.
    * @return Returns the instance of <code>IPersistableDAO</code> responsible
@@ -162,5 +160,17 @@ public abstract class DAOService {
    */
   public abstract INewsBinDAO getNewsBinDao();
 
+  /**
+   * @return Returns the instance of <code>IEntityDAO</code> responsible for
+   * <code>ISearch</code>.
+   * @see DynamicDAO#getDAO(Class)
+   */
   public abstract ISearchDAO getSearchDAO();
+
+  /**
+   * @return Returns the instance of <code>IEntityDAO</code> responsible for
+   * <code>ISearchFilter</code>.
+   * @see DynamicDAO#getDAO(Class)
+   */
+  public abstract ISearchFilterDAO getSearchFilterDAO();
 }
