@@ -3,6 +3,7 @@
 <plugin>
    <extension-point id="EntityPropertyPage" name="Entity Property Page" schema="schema/EntityPropertyPage.exsd"/>
    <extension-point id="KeywordFeed" name="Keyword Feed" schema="schema/KeywordFeed.exsd"/>
+   <extension-point id="NewsActionPresentation" name="News Action Presentation" schema="schema/NewsActionPresentation.exsd"/>
 
    <extension
          id="rssowl"
@@ -328,6 +329,19 @@
                id="org.rssowl.ui.CleanUpAction"
                label="Clean Up..."
                menubarPath="tools/begin">
+         </action>
+      </actionSet>
+      <actionSet
+            id="org.rssowl.ui.NewsFiltersSet"
+            label="News Filters"
+            visible="true">
+         <action
+               class="org.rssowl.ui.internal.actions.OpenNewsFiltersAction"
+               definitionId="org.rssowl.ui.OpenNewsFiltersAction"
+               id="org.rssowl.ui.OpenNewsFiltersAction"
+               label="News Filters..."
+               menubarPath="tools/begin"
+               style="push">
          </action>
       </actionSet>
    </extension>
@@ -675,6 +689,11 @@
             description="Navigate to the previous Bookmark-Set"
             id="org.rssowl.ui.PreviousBookmarkSetCommand"
             name="Previous Bookmark-Set">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.OpenNewsFiltersAction"
+            name="News Filters">
       </command>
    </extension>
    <extension
@@ -1255,5 +1274,29 @@
             class="org.rssowl.ui.internal.DefaultPasswordProvider"
             priority="8">
       </provider>
+   </extension>
+   <extension
+         point="org.rssowl.core.NewsAction">
+      <newsAction
+            class="org.rssowl.ui.internal.filter.ShowNotifierNewsAction"
+            id="org.rssowl.ui.ShowNotifierNewsAction"
+            name="Show News in Notifier"
+            sortKey="50">
+      </newsAction>
+   </extension>
+   <extension
+         point="org.rssowl.ui.NewsActionPresentation">
+      <newsActionPresentation
+            class="org.rssowl.ui.internal.filter.LabelNewsActionPresentation"
+            actionId="org.rssowl.core.LabelNewsAction">
+      </newsActionPresentation>
+      <newsActionPresentation
+            class="org.rssowl.ui.internal.filter.MoveCopyNewsActionPresentation"
+            actionId="org.rssowl.core.MoveNewsAction">
+      </newsActionPresentation>
+      <newsActionPresentation
+            class="org.rssowl.ui.internal.filter.MoveCopyNewsActionPresentation"
+            actionId="org.rssowl.core.CopyNewsAction">
+      </newsActionPresentation>
    </extension>
 </plugin>

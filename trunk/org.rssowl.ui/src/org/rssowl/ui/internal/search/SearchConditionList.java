@@ -68,6 +68,7 @@ import java.util.List;
  */
 public class SearchConditionList extends ScrolledComposite {
   private List<SearchConditionItem> fItems;
+  private final List<Integer> fFieldsToExclude;
   private Composite fContainer;
   private LocalResourceManager fResources;
   private Image fAddIcon;
@@ -81,8 +82,19 @@ public class SearchConditionList extends ScrolledComposite {
    * @param conditions The initial conditions this List is showing.
    */
   public SearchConditionList(Composite parent, int style, List<ISearchCondition> conditions) {
+    this(parent, style, conditions, null);
+  }
+
+  /**
+   * @param parent The parent Composite.
+   * @param style The Style as defined by SWT constants.
+   * @param conditions The initial conditions this List is showing.
+   * @param fieldsToExclude A list of search fields to exclude from the UI.
+   */
+  public SearchConditionList(Composite parent, int style, List<ISearchCondition> conditions, List<Integer> fieldsToExclude) {
     super(parent, style | SWT.V_SCROLL);
     fItems = new ArrayList<SearchConditionItem>();
+    fFieldsToExclude = fieldsToExclude;
     fResources = new LocalResourceManager(JFaceResources.getResources(), this);
 
     initResources();
@@ -308,7 +320,7 @@ public class SearchConditionList extends ScrolledComposite {
     itemContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Create Item */
-    final SearchConditionItem item = new SearchConditionItem(itemContainer, SWT.NONE, condition);
+    final SearchConditionItem item = new SearchConditionItem(itemContainer, SWT.NONE, condition, fFieldsToExclude);
     item.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Create Button Box */
@@ -401,61 +413,83 @@ public class SearchConditionList extends ScrolledComposite {
     IModelFactory factory = Owl.getModelFactory();
     String news = INews.class.getName();
 
-    MenuItem mItem = new MenuItem(menu, SWT.PUSH);
-    mItem.setText("Entire News");
-    hookSelectionListener(mItem, item, factory.createSearchField(IEntity.ALL_FIELDS, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(IEntity.ALL_FIELDS)) {
+      MenuItem mItem = new MenuItem(menu, SWT.PUSH);
+      mItem.setText("Entire News");
+      hookSelectionListener(mItem, item, factory.createSearchField(IEntity.ALL_FIELDS, news));
 
-    mItem = new MenuItem(menu, SWT.SEPARATOR);
+      new MenuItem(menu, SWT.SEPARATOR);
+    }
 
-    mItem = new MenuItem(menu, SWT.PUSH);
-    mItem.setText("State");
-    hookSelectionListener(mItem, item, factory.createSearchField(INews.STATE, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.STATE)) {
+      MenuItem mItem = new MenuItem(menu, SWT.PUSH);
+      mItem.setText("State");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.STATE, news));
+    }
 
-    mItem = new MenuItem(menu, SWT.PUSH);
-    mItem.setText("Location");
-    hookSelectionListener(mItem, item, factory.createSearchField(INews.LOCATION, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.LOCATION)) {
+      MenuItem mItem = new MenuItem(menu, SWT.PUSH);
+      mItem.setText("Location");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.LOCATION, news));
 
-    new MenuItem(menu, SWT.SEPARATOR);
+      new MenuItem(menu, SWT.SEPARATOR);
+    }
 
-    mItem = new MenuItem(menu, SWT.PUSH);
-    mItem.setText("Title");
-    hookSelectionListener(mItem, item, factory.createSearchField(INews.TITLE, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.TITLE)) {
+      MenuItem mItem = new MenuItem(menu, SWT.PUSH);
+      mItem.setText("Title");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.TITLE, news));
+    }
 
-    mItem = new MenuItem(menu, SWT.PUSH);
-    mItem.setText("Description");
-    hookSelectionListener(mItem, item, factory.createSearchField(INews.DESCRIPTION, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.DESCRIPTION)) {
+      MenuItem mItem = new MenuItem(menu, SWT.PUSH);
+      mItem.setText("Description");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.DESCRIPTION, news));
+    }
 
-    mItem = new MenuItem(menu, SWT.PUSH);
-    mItem.setText("Author");
-    hookSelectionListener(mItem, item, factory.createSearchField(INews.AUTHOR, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.AUTHOR)) {
+      MenuItem mItem = new MenuItem(menu, SWT.PUSH);
+      mItem.setText("Author");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.AUTHOR, news));
+    }
 
-    mItem = new MenuItem(menu, SWT.PUSH);
-    mItem.setText("Category");
-    hookSelectionListener(mItem, item, factory.createSearchField(INews.CATEGORIES, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.CATEGORIES)) {
+      MenuItem mItem = new MenuItem(menu, SWT.PUSH);
+      mItem.setText("Category");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.CATEGORIES, news));
+    }
 
-    mItem = new MenuItem(menu, SWT.CASCADE);
+    MenuItem mItem = new MenuItem(menu, SWT.CASCADE);
     mItem.setText("Date");
 
     Menu dateMenu = new Menu(mItem);
     mItem.setMenu(dateMenu);
 
-    mItem = new MenuItem(dateMenu, SWT.PUSH);
-    mItem.setText("Date Modified");
-    hookSelectionListener(mItem, item, factory.createSearchField(INews.MODIFIED_DATE, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.MODIFIED_DATE)) {
+      mItem = new MenuItem(dateMenu, SWT.PUSH);
+      mItem.setText("Date Modified");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.MODIFIED_DATE, news));
+    }
 
-    mItem = new MenuItem(dateMenu, SWT.PUSH);
-    mItem.setText("Date Published");
-    hookSelectionListener(mItem, item, factory.createSearchField(INews.PUBLISH_DATE, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.PUBLISH_DATE)) {
+      mItem = new MenuItem(dateMenu, SWT.PUSH);
+      mItem.setText("Date Published");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.PUBLISH_DATE, news));
+    }
 
-    mItem = new MenuItem(dateMenu, SWT.PUSH);
-    mItem.setText("Date Received");
-    hookSelectionListener(mItem, item, factory.createSearchField(INews.RECEIVE_DATE, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.RECEIVE_DATE)) {
+      mItem = new MenuItem(dateMenu, SWT.PUSH);
+      mItem.setText("Date Received");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.RECEIVE_DATE, news));
+    }
 
     new MenuItem(dateMenu, SWT.SEPARATOR);
 
-    mItem = new MenuItem(dateMenu, SWT.PUSH);
-    mItem.setText("Age in Days");
-    hookSelectionListener(mItem, item, factory.createSearchField(INews.AGE_IN_DAYS, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.AGE_IN_DAYS)) {
+      mItem = new MenuItem(dateMenu, SWT.PUSH);
+      mItem.setText("Age in Days");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.AGE_IN_DAYS, news));
+    }
 
     mItem = new MenuItem(menu, SWT.SEPARATOR);
 
@@ -465,35 +499,49 @@ public class SearchConditionList extends ScrolledComposite {
     Menu otherMenu = new Menu(mItem);
     mItem.setMenu(otherMenu);
 
-    mItem = new MenuItem(otherMenu, SWT.PUSH);
-    mItem.setText("Has Attachments");
-    hookSelectionListener(mItem, item, factory.createSearchField(INews.HAS_ATTACHMENTS, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.HAS_ATTACHMENTS)) {
+      mItem = new MenuItem(otherMenu, SWT.PUSH);
+      mItem.setText("Has Attachments");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.HAS_ATTACHMENTS, news));
+    }
 
-    mItem = new MenuItem(otherMenu, SWT.PUSH);
-    mItem.setText("Attachment");
-    hookSelectionListener(mItem, item, factory.createSearchField(INews.ATTACHMENTS_CONTENT, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.ATTACHMENTS_CONTENT)) {
+      mItem = new MenuItem(otherMenu, SWT.PUSH);
+      mItem.setText("Attachment");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.ATTACHMENTS_CONTENT, news));
+    }
 
     new MenuItem(otherMenu, SWT.SEPARATOR);
 
-    mItem = new MenuItem(otherMenu, SWT.PUSH);
-    mItem.setText("Source");
-    hookSelectionListener(mItem, item, factory.createSearchField(INews.SOURCE, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.SOURCE)) {
+      mItem = new MenuItem(otherMenu, SWT.PUSH);
+      mItem.setText("Source");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.SOURCE, news));
+    }
 
-    mItem = new MenuItem(otherMenu, SWT.PUSH);
-    mItem.setText("Link");
-    hookSelectionListener(mItem, item, factory.createSearchField(INews.LINK, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.LINK)) {
+      mItem = new MenuItem(otherMenu, SWT.PUSH);
+      mItem.setText("Link");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.LINK, news));
+    }
 
-    mItem = new MenuItem(otherMenu, SWT.PUSH);
-    mItem.setText("Is Sticky");
-    hookSelectionListener(mItem, item, factory.createSearchField(INews.IS_FLAGGED, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.IS_FLAGGED)) {
+      mItem = new MenuItem(otherMenu, SWT.PUSH);
+      mItem.setText("Is Sticky");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.IS_FLAGGED, news));
+    }
 
-    mItem = new MenuItem(otherMenu, SWT.PUSH);
-    mItem.setText("Feed");
-    hookSelectionListener(mItem, item, factory.createSearchField(INews.FEED, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.FEED)) {
+      mItem = new MenuItem(otherMenu, SWT.PUSH);
+      mItem.setText("Feed");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.FEED, news));
+    }
 
-    mItem = new MenuItem(otherMenu, SWT.PUSH);
-    mItem.setText("Label");
-    hookSelectionListener(mItem, item, factory.createSearchField(INews.LABEL, news));
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.LABEL)) {
+      mItem = new MenuItem(otherMenu, SWT.PUSH);
+      mItem.setText("Label");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.LABEL, news));
+    }
   }
 
   private void hookSelectionListener(MenuItem item, final SearchConditionItem condition, final ISearchField field) {

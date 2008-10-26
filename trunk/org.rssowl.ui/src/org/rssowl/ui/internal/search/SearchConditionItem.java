@@ -97,6 +97,7 @@ public class SearchConditionItem extends Composite {
 
   /* Model */
   private final ISearchCondition fCondition;
+  private final List<Integer> fFieldsToExclude;
   private Object fInputValue;
   private IModelFactory fFactory;
   private DAOService fDaoService;
@@ -144,10 +145,12 @@ public class SearchConditionItem extends Composite {
    * @param parent The parent Composite.
    * @param style The Style as defined by SWT constants.
    * @param condition The condition this Item is showing.
+   * @param fieldsToExclude A list of search fields to exclude from the UI.
    */
-  public SearchConditionItem(Composite parent, int style, ISearchCondition condition) {
+  public SearchConditionItem(Composite parent, int style, ISearchCondition condition, List<Integer> fieldsToExclude) {
     super(parent, style);
     fCondition = condition;
+    fFieldsToExclude = fieldsToExclude;
     fFactory = Owl.getModelFactory();
     fDaoService = Owl.getPersistenceService().getDAOService();
 
@@ -318,7 +321,7 @@ public class SearchConditionItem extends Composite {
 
     /* Specially treat News-Location */
     else if (field.getId() == INews.LOCATION) {
-      final LocationConditionControl locationConditionControl = new LocationConditionControl(inputField, SWT.NONE);
+      final LocationControl locationConditionControl = new LocationControl(inputField, SWT.NONE);
       locationConditionControl.addListener(SWT.Modify, new Listener() {
         public void handleEvent(Event event) {
           fInputValue = locationConditionControl.getSelection();
@@ -590,25 +593,33 @@ public class SearchConditionItem extends Composite {
 
     /* Return all Fields of News */
     if (INews.class.getName().equals(entityName)) {
-      fields.add(fFactory.createSearchField(IEntity.ALL_FIELDS, entityName));
-      fields.add(fFactory.createSearchField(INews.STATE, entityName));
-      fields.add(fFactory.createSearchField(INews.LOCATION, entityName));
-      fields.add(fFactory.createSearchField(INews.TITLE, entityName));
-      fields.add(fFactory.createSearchField(INews.DESCRIPTION, entityName));
-      fields.add(fFactory.createSearchField(INews.AUTHOR, entityName));
-      fields.add(fFactory.createSearchField(INews.CATEGORIES, entityName));
-      fields.add(fFactory.createSearchField(INews.PUBLISH_DATE, entityName));
-      fields.add(fFactory.createSearchField(INews.MODIFIED_DATE, entityName));
-      fields.add(fFactory.createSearchField(INews.RECEIVE_DATE, entityName));
-      fields.add(fFactory.createSearchField(INews.AGE_IN_DAYS, entityName));
-      fields.add(fFactory.createSearchField(INews.HAS_ATTACHMENTS, entityName));
-      fields.add(fFactory.createSearchField(INews.ATTACHMENTS_CONTENT, entityName));
-      fields.add(fFactory.createSearchField(INews.SOURCE, entityName));
-      fields.add(fFactory.createSearchField(INews.LINK, entityName));
-      fields.add(fFactory.createSearchField(INews.IS_FLAGGED, entityName));
-      fields.add(fFactory.createSearchField(INews.LABEL, entityName));
-      //      fields.add(fFactory.createSearchField(INews.RATING, entityName));
-      fields.add(fFactory.createSearchField(INews.FEED, entityName));
+      List<Integer> newsFields = new ArrayList<Integer>();
+      newsFields.add(IEntity.ALL_FIELDS);
+      newsFields.add(INews.STATE);
+      newsFields.add(INews.LOCATION);
+      newsFields.add(INews.TITLE);
+      newsFields.add(INews.DESCRIPTION);
+      newsFields.add(INews.AUTHOR);
+      newsFields.add(INews.CATEGORIES);
+      newsFields.add(INews.PUBLISH_DATE);
+      newsFields.add(INews.MODIFIED_DATE);
+      newsFields.add(INews.RECEIVE_DATE);
+      newsFields.add(INews.AGE_IN_DAYS);
+      newsFields.add(INews.HAS_ATTACHMENTS);
+      newsFields.add(INews.ATTACHMENTS_CONTENT);
+      newsFields.add(INews.SOURCE);
+      newsFields.add(INews.LINK);
+      newsFields.add(INews.IS_FLAGGED);
+      newsFields.add(INews.LABEL);
+      //newsFields.add(INews.RATING);
+      newsFields.add(INews.FEED);
+
+      if (fFieldsToExclude != null)
+        newsFields.removeAll(fFieldsToExclude);
+
+      for (Integer newsField : newsFields) {
+        fields.add(fFactory.createSearchField(newsField, entityName));
+      }
     }
 
     return fields;
