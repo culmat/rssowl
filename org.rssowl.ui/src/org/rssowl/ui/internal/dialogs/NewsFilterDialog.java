@@ -273,7 +273,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
     nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     Label nameLabel = new Label(nameContainer, SWT.NONE);
-    nameLabel.setText("Filter Name: ");
+    nameLabel.setText("Name: ");
 
     fNameInput = new Text(nameContainer, SWT.SINGLE | SWT.BORDER);
     fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
