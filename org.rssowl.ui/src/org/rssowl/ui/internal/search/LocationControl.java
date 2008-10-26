@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.search;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.viewers.AbstractTreeViewer;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -35,6 +36,7 @@ import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -51,9 +53,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TreeItem;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
@@ -77,12 +81,23 @@ import java.util.List;
  *
  * @author bpasero
  */
-public class LocationConditionControl extends Composite {
+public class LocationControl extends Composite {
+  private Mode fMode = Mode.SEARCH_LOCATION;
   private Link fConditionLabel;
   private List<IFolderChild> fSelection;
 
+  /** Supported Modes for the Control */
+  public enum Mode {
+
+    /** Select a Folder Child to Search in */
+    SEARCH_LOCATION,
+
+    /** Select a News Bin */
+    SELECT_BIN
+  }
+
   /* A Dialog to select Folders and Childs */
-  private static class FolderChildChooserDialog extends Dialog {
+  private class FolderChildChooserDialog extends Dialog {
     private CheckboxTreeViewer fViewer;
     private List<IFolderChild> fCheckedElements;
     private IFolderChild fSelectedElement;
@@ -130,10 +145,19 @@ public class LocationConditionControl extends Composite {
 
       Label label = new Label(composite, SWT.None);
       label.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-      label.setText("Please choose the locations to search in:");
+
+      switch (fMode) {
+        case SEARCH_LOCATION:
+          label.setText("Please choose the locations to search in:");
+          break;
+
+        case SELECT_BIN:
+          label.setText("Please choose the news bins to copy or move news into:");
+          break;
+      }
 
       fViewer = new CheckboxTreeViewer(composite, SWT.BORDER);
-      fViewer.setAutoExpandLevel(2);
+      fViewer.setAutoExpandLevel(fMode == Mode.SELECT_BIN ? AbstractTreeViewer.ALL_LEVELS : 2);
       fViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
       fViewer.getTree().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
 
@@ -185,13 +209,45 @@ public class LocationConditionControl extends Composite {
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
       });
 
-      fViewer.setLabelProvider(new BookMarkLabelProvider(false));
+      fViewer.setLabelProvider(new BookMarkLabelProvider(false) {
+        @Override
+        public void update(ViewerCell cell) {
+          super.update(cell);
+
+          if (fMode == Mode.SELECT_BIN) {
+            Object element = cell.getElement();
+            if (element instanceof IFolder)
+              cell.setForeground(fViewer.getControl().getDisplay().getSystemColor(SWT.COLOR_GRAY));
+          }
+        }
+      });
 
       /* Filter out any Search Marks */
       fViewer.addFilter(new ViewerFilter() {
         @Override
         public boolean select(Viewer viewer, Object parentElement, Object element) {
-          return !(element instanceof ISearchMark);
+          switch (fMode) {
+            case SEARCH_LOCATION:
+              return !(element instanceof ISearchMark);
+
+            case SELECT_BIN:
+              if (element instanceof IFolder)
+                return containsBin(((IFolder) element).getChildren());
+              return !(element instanceof ISearchMark || element instanceof IBookMark);
+          }
+
+          return true;
+        }
+
+        private boolean containsBin(List<IFolderChild> children) {
+          for (IFolderChild child : children) {
+            if (child instanceof INewsBin)
+              return true;
+            else if (child instanceof IFolder && containsBin((((IFolder) child).getChildren())))
+              return true;
+          }
+
+          return false;
         }
       });
 
@@ -228,10 +284,21 @@ public class LocationConditionControl extends Composite {
         public void widgetSelected(SelectionEvent e) {
           if (e.detail == SWT.CHECK) {
             TreeItem item = (TreeItem) e.item;
-            setChildsChecked((IFolderChild) item.getData(), item.getChecked(), false);
 
-            if (!item.getChecked())
-              setParentsChecked((IFolderChild) item.getData(), false);
+            /* Disable selection for Folders if SELECT_BIN */
+            if (fMode == Mode.SELECT_BIN && item.getData() instanceof IFolder) {
+              e.detail = SWT.NONE;
+              e.doit = false;
+              item.setChecked(false);
+            }
+
+            /* Normal selection behavior otherwise */
+            else {
+              setChildsChecked((IFolderChild) item.getData(), item.getChecked(), false);
+
+              if (!item.getChecked())
+                setParentsChecked((IFolderChild) item.getData(), false);
+            }
           }
         }
       });
@@ -258,15 +325,17 @@ public class LocationConditionControl extends Composite {
       buttonContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
       buttonContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
-      Button selectAll = new Button(buttonContainer, SWT.PUSH);
-      selectAll.setText("&Select All");
-      setButtonLayoutData(selectAll);
-      selectAll.addSelectionListener(new SelectionAdapter() {
-        @Override
-        public void widgetSelected(SelectionEvent e) {
-          OwlUI.setAllChecked(fViewer.getTree(), true);
-        }
-      });
+      if (fMode == Mode.SEARCH_LOCATION) {
+        Button selectAll = new Button(buttonContainer, SWT.PUSH);
+        selectAll.setText("&Select All");
+        setButtonLayoutData(selectAll);
+        selectAll.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            OwlUI.setAllChecked(fViewer.getTree(), true);
+          }
+        });
+      }
 
       Button deselectAll = new Button(buttonContainer, SWT.PUSH);
       deselectAll.setText("&Deselect All");
@@ -326,7 +395,14 @@ public class LocationConditionControl extends Composite {
     @Override
     protected void configureShell(Shell newShell) {
       super.configureShell(newShell);
-      newShell.setText("Search Location");
+      switch (fMode) {
+        case SEARCH_LOCATION:
+          newShell.setText("Choose Location");
+          break;
+        case SELECT_BIN:
+          newShell.setText("Choose News Bins");
+          break;
+      }
     }
 
     /*
@@ -345,17 +421,33 @@ public class LocationConditionControl extends Composite {
    * @param parent
    * @param style
    */
-  public LocationConditionControl(Composite parent, int style) {
+  public LocationControl(Composite parent, int style) {
+    this(parent, style, Mode.SEARCH_LOCATION);
+  }
+
+  /**
+   * @param parent
+   * @param style
+   * @param mode
+   */
+  public LocationControl(Composite parent, int style, Mode mode) {
     super(parent, style);
 
+    fMode = mode;
     initComponents();
   }
 
-  Long[][] getSelection() {
+  /**
+   * @return the selected locations
+   */
+  public Long[][] getSelection() {
     return fSelection != null ? ModelUtils.toPrimitive(fSelection) : null;
   }
 
-  void select(Long[][] selection) {
+  /**
+   * @param selection
+   */
+  public void select(Long[][] selection) {
     fSelection = ModelUtils.toEntities(selection);
     fConditionLabel.setText(getLabel(fSelection));
   }
@@ -394,12 +486,18 @@ public class LocationConditionControl extends Composite {
     }
   }
 
+  @SuppressWarnings("null")
   private String getLabel(List<IFolderChild> entities) {
-    if (entities == null || entities.size() == 0)
-      return "<a href=\"\">Choose Location...</a>";
+    if (entities == null || entities.size() == 0) {
+      switch (fMode) {
+        case SEARCH_LOCATION:
+          return "<a href=\"\">Choose Location...</a>";
+        case SELECT_BIN:
+          return "<a href=\"\">Choose News Bins...</a>";
+      }
+    }
 
     StringBuilder strB = new StringBuilder();
-
     for (int i = 0; i < entities.size(); i++) {
       strB.append("<a href=\"" + i + "\">").append(entities.get(i).getName()).append("</a>").append(", ");
     }
