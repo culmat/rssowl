@@ -41,6 +41,9 @@ import java.util.List;
  */
 public class MoveNewsAction implements INewsAction {
 
+  /** ID of this Action */
+  public static final String ID = "org.rssowl.core.MoveNewsAction";
+
   /*
    * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
    */
