@@ -476,8 +476,14 @@ public class SearchConditionItem extends Composite {
             }
           });
 
+          /* Show UI Hint for extra information is available */
+          ControlDecoration controlDeco = new ControlDecoration(text, SWT.LEFT | SWT.TOP);
+          controlDeco.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
+          controlDeco.setShowOnlyOnFocus(true);
+
           /* Provide auto-complete for Categories, Authors and Feeds */
           if (field.getId() == INews.CATEGORIES || field.getId() == INews.AUTHOR || field.getId() == INews.FEED) {
+            controlDeco.setDescriptionText("Content Assist Available (Press Arrow-Down Key)");
             final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = hookAutoComplete(text, null);
 
             /* Load proposals in the Background */
@@ -498,12 +504,11 @@ public class SearchConditionItem extends Composite {
                 }
               }
             });
+          }
 
-            /* Show UI Hint that Content Assist is available */
-            ControlDecoration controlDeco = new ControlDecoration(text, SWT.LEFT | SWT.TOP);
-            controlDeco.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
-            controlDeco.setDescriptionText("Content Assist Available (Press Arrow-Down Key)");
-            controlDeco.setShowOnlyOnFocus(true);
+          /* Show UI Hint that Wildcards can be used */
+          else {
+            controlDeco.setDescriptionText("Use \'?\' for any character and \'*\' for any word in your search. Surround words with \" to search for phrases.");
           }
 
           /* Pre-Select input if given */
