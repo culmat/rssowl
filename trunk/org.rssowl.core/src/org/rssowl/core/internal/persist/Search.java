@@ -33,14 +33,11 @@ import java.util.List;
 
 public class Search extends AbstractEntity implements ISearch  {
 
-  private String fName;
   private List<ISearchCondition> fSearchConditions;
   private boolean fMatchAllConditions;
 
-  public Search(Long id, String name) {
+  public Search(Long id) {
     super(id);
-    Assert.isNotNull(name, "name");
-    fName = name;
     fSearchConditions = new ArrayList<ISearchCondition>(5);
   }
 
@@ -91,16 +88,7 @@ public class Search extends AbstractEntity implements ISearch  {
     fMatchAllConditions = requiresAllConditions;
   }
 
-  public synchronized String getName() {
-    return fName;
-  }
-
   public SearchReference toReference() {
     return new SearchReference(getIdAsPrimitive());
-  }
-
-  public synchronized void setName(String name) {
-    Assert.isNotNull(name, "name");
-    fName = name;
   }
 }
