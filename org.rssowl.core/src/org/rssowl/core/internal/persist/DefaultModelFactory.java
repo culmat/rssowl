@@ -335,11 +335,10 @@ public class DefaultModelFactory implements IModelFactory {
   }
 
   /*
-   * @see org.rssowl.core.persist.IModelFactory#createSearch(java.lang.Long,
-   * java.util.List, java.lang.String)
+   * @see org.rssowl.core.persist.IModelFactory#createSearch(java.lang.Long)
    */
-  public ISearch createSearch(Long id, String name) {
-    return new Search(id, name);
+  public ISearch createSearch(Long id) {
+    return new Search(id);
   }
 
   /*

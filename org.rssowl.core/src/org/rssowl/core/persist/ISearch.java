@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist;
 
 import org.rssowl.core.persist.service.IModelSearch;
@@ -33,28 +34,13 @@ import java.util.List;
  *
  * @see IModelSearch
  */
-public interface ISearch extends IEntity    {
-
-  /**
-   * Gets the name of this search.
-   *
-   * @return the name of this search.
-   */
-  String getName();
-
-  /**
-   * Sets the name of this search,
-   *
-   * @param name The name of this search.
-   */
-  void setName(String name);
+public interface ISearch extends IEntity {
 
   /**
    * Returns {@code true} if this ISearch contains {@code searchCondition} and
    * {@false} otherwise.
    *
    * @param searchCondition element whose presence should be tested.
-   *
    * @return {@code true} if this ISearch contains {@code searchCondition} and
    * {@false} otherwise.
    */
@@ -69,8 +55,8 @@ public interface ISearch extends IEntity    {
   void addSearchCondition(ISearchCondition searchCondition);
 
   /**
-   * Removes a <code>ISearchCondition</code> from the list of conditions used
-   * to search for <code>INews</code>.
+   * Removes a <code>ISearchCondition</code> from the list of conditions used to
+   * search for <code>INews</code>.
    *
    * @param searchCondition The condition to remove.
    * @return <code>true</code> if the item was removed.
@@ -100,8 +86,7 @@ public interface ISearch extends IEntity    {
   /**
    * @param matchAllConditions <code>TRUE</code> if this condition is to be
    * connected to other conditions of the same search with a logical AND,
-   * <code>FALSE</code> if this condition is to be connected with a logical
-   * OR.
+   * <code>FALSE</code> if this condition is to be connected with a logical OR.
    */
   void setMatchAllConditions(boolean matchAllConditions);
 

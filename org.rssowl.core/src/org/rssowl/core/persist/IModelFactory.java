@@ -355,10 +355,9 @@ public interface IModelFactory {
    * Creates a new instance of ISearch with the provided parameters.
    *
    * @param id The unique id of the ISearch.
-   * @param name The Name of the ISearch.
    * @return a new instance of ISearch with the provided parameters.
    */
-  ISearch createSearch(Long id, String name);
+  ISearch createSearch(Long id);
 
   /**
    * Creates a new instance of ISearchFilter with the provided parameters.
