@@ -159,7 +159,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
 
       /* Create Conditions */
       List<ISearchCondition> conditions = fSearchConditionList.createConditions();
-      ISearch search = factory.createSearch(null, fNameInput.getText());
+      ISearch search = factory.createSearch(null);
       search.setMatchAllConditions(fMatchAllRadio.getSelection());
       for (ISearchCondition condition : conditions) {
         search.addSearchCondition(condition);
