@@ -506,7 +506,7 @@ public class ApplicationLayerTest {
       public void entitiesUpdated(Set<NewsEvent> events) {
         assertEquals(1, events.size());
         NewsEvent event = events.iterator().next();
-        assertEquals(savedNews.getId().longValue(), event.getEntity().getId());
+        assertEquals(savedNews.getId().longValue(), event.getEntity().getId().longValue());
         assertEquals(State.UNREAD, event.getOldNews().getState());
         assertEquals(State.UPDATED, event.getEntity().getState());
       }
@@ -576,7 +576,7 @@ public class ApplicationLayerTest {
     feed1 = Owl.getPersistenceService().getDAOService().getFeedDAO().load(feed1Url);
     assertNotNull(feed1);
     assertEquals(1, feed1.getNews().size());
-    assertEquals(newsId, feed1.getNews().get(0).getId());
+    assertEquals(newsId, feed1.getNews().get(0).getId().longValue());
   }
 
   /**
@@ -1283,9 +1283,9 @@ public class ApplicationLayerTest {
             IFeed parent = news.getFeedReference().resolve();
 
             if (news.getId() == news1ID)
-              assertEquals(feed1ID, parent.getId());
+              assertEquals(feed1ID, parent.getId().longValue());
             else if (news.getId() == news2ID)
-              assertEquals(feed2ID, parent.getId());
+              assertEquals(feed2ID, parent.getId().longValue());
             else
               fail("Unexpected Reference in Event!");
           }
