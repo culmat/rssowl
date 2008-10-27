@@ -734,7 +734,17 @@ public class DBManager {
     config.objectClass(NewsCounter.class).cascadeOnDelete(true);
     config.objectClass(Preference.class).cascadeOnDelete(true);
     config.objectClass(Preference.class).objectField("fKey").indexed(true); //$NON-NLS-1$
+
+    if (isIBM_VM_1_6()) //See defect 733
+      config.objectClass("java.util.MiniEnumSet").translate(new com.db4o.config.TSerializable());
+
     return config;
+  }
+
+  private static boolean isIBM_VM_1_6() {
+    String javaVendor = System.getProperty("java.vendor");
+    String javaVersion = System.getProperty("java.version");
+    return javaVendor != null && javaVendor.contains("IBM") && javaVersion != null && javaVersion.contains("1.6");
   }
 
   private static void configureAbstractEntity(Configuration config) {
