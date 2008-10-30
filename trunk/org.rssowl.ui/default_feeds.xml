@@ -172,6 +172,7 @@
 		<outline text="Fileforum" xmlUrl="http://bootleg-rss.g-blog.net/betanews_com.php" />
 		<outline text="Download.com Mac New Releases" xmlUrl="http://www.download.com/3412-2003-0-25.xml" />
 		<outline text="Free Vista Files" xmlUrl="http://www.freevistafiles.com/rss/new_software.xml" />
+		<outline text="FilePlaza" xmlUrl="http://www.fileplaza.com/lastaddedsoftware.rss" />
 		<outline text="Do Download" xmlUrl="http://www.dodownload.com/rss/new_software.xml" />
 		</outline>
 		<outline text="Sports">
