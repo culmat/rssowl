@@ -40,6 +40,7 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
+import org.rssowl.core.persist.dao.INewsBinDAO;
 import org.rssowl.core.persist.event.BookMarkEvent;
 import org.rssowl.core.persist.event.BookMarkListener;
 import org.rssowl.core.persist.event.FolderEvent;
@@ -663,15 +664,25 @@ public class BookMarkContentProvider implements ITreeContentProvider {
 
   /* Update Entities that are affected by the given NewsEvents */
   private void updateParents(final Set<NewsEvent> events) {
+    INewsBinDAO newsBinDao = DynamicDAO.getDAO(INewsBinDAO.class);
 
-    /* Group by Feed */
+    /* Group by Feed and Bins */
     Set<FeedLinkReference> affectedFeeds = new HashSet<FeedLinkReference>();
-    for (NewsEvent event : events)
-      affectedFeeds.add(event.getEntity().getFeedReference());
+    Set<IFolder> affectedBinFolders = new HashSet<IFolder>();
+    for (NewsEvent event : events) {
+      INews news = event.getEntity();
+      if (news.getParentId() != 0)
+        affectedBinFolders.add(newsBinDao.load(news.getParentId()).getParent());
+      else
+        affectedFeeds.add(news.getFeedReference());
+    }
 
     /* Update related Entities */
     for (FeedLinkReference feedRef : affectedFeeds)
       updateParents(feedRef);
+
+    for (IFolder folder : affectedBinFolders)
+      updateFolderAndParents(folder);
   }
 
   private void updateParents(FeedLinkReference feedRef) throws PersistenceException {
