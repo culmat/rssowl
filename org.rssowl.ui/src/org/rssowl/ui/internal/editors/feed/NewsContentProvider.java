@@ -29,6 +29,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
@@ -131,7 +132,7 @@ public class NewsContentProvider implements ITreeContentProvider {
       /* This is a class that implements IMark */
       else if (object instanceof ModelReference) {
         Class<? extends IEntity> entityClass = ((ModelReference) object).getEntityClass();
-        if (IMark.class.isAssignableFrom(entityClass)) {
+        if (IMark.class.isAssignableFrom(entityClass) || IFolder.class.isAssignableFrom(entityClass)) { //Suppoer FolderNewsMark too
           synchronized (NewsContentProvider.this) {
             Collection<INews> news = fCachedNews;
             if (news != null) {
@@ -610,10 +611,6 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* In Memory Folder News Mark (aggregated news) */
     else if (fInput instanceof FolderNewsMark) {
-
-      /* Ignore copied News */
-      if (news.getParentId() != 0)
-        return false;
 
       /* News Added/Updated: Check if its part of the Folder */
       if (type == EventType.PERSIST || type == EventType.UPDATE) {
