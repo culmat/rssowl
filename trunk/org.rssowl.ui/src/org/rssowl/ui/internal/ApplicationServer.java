@@ -39,6 +39,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.reference.BookMarkReference;
+import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
@@ -71,8 +72,8 @@ import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * The <code>NewsServer</code> is a Singleton that serves HTML for a request
- * of News. A Browser can navigate to a local URL with Port 8795 and use some
+ * The <code>NewsServer</code> is a Singleton that serves HTML for a request of
+ * News. A Browser can navigate to a local URL with Port 8795 and use some
  * special parameters to request either a List of News or complete Feeds.
  * <p>
  * TODO As more and more stuff is handled by this server, it should be
@@ -108,6 +109,7 @@ public class ApplicationServer {
   private static Map<String, ContentViewer> fRegistry = new ConcurrentHashMap<String, ContentViewer>();
 
   /* Supported Operations */
+  private static final String OP_DISPLAY_FOLDER = "displayFolder="; //$NON-NLS-1$
   private static final String OP_DISPLAY_BOOKMARK = "displayBookMark="; //$NON-NLS-1$
   private static final String OP_DISPLAY_NEWSBIN = "displayNewsBin="; //$NON-NLS-1$
   private static final String OP_DISPLAY_SEARCHMARK = "displaySearchMark="; //$NON-NLS-1$
@@ -259,14 +261,13 @@ public class ApplicationServer {
    * Server.
    *
    * @param url The URL to Test for a Display Operation.
-   * @return Returns <code>TRUE</code> if the given URL is a
-   * display-operation.
+   * @return Returns <code>TRUE</code> if the given URL is a display-operation.
    */
   public boolean isDisplayOperation(String url) {
     if (!StringUtils.isSet(url))
       return false;
 
-    return url.contains(OP_DISPLAY_BOOKMARK) || url.contains(OP_DISPLAY_NEWSBIN) || url.contains(OP_DISPLAY_NEWS) || url.contains(OP_DISPLAY_SEARCHMARK) || URIUtils.ABOUT_BLANK.equals(url);
+    return url.contains(OP_DISPLAY_FOLDER) || url.contains(OP_DISPLAY_BOOKMARK) || url.contains(OP_DISPLAY_NEWSBIN) || url.contains(OP_DISPLAY_NEWS) || url.contains(OP_DISPLAY_SEARCHMARK) || URIUtils.ABOUT_BLANK.equals(url);
   }
 
   /**
@@ -297,10 +298,13 @@ public class ApplicationServer {
     List<Long> bookmarks = new ArrayList<Long>();
     List<Long> newsbins = new ArrayList<Long>();
     List<Long> searchmarks = new ArrayList<Long>();
+    List<Long> folders = new ArrayList<Long>();
 
     /* Split into BookMarks, NewsBins, SearchMarks and News */
     for (Object obj : (Object[]) input) {
-      if (obj instanceof IBookMark || obj instanceof BookMarkReference)
+      if (obj instanceof FolderNewsMarkReference)
+        folders.add(getId(obj));
+      else if (obj instanceof IBookMark || obj instanceof BookMarkReference)
         bookmarks.add(getId(obj));
       else if (obj instanceof INewsBin || obj instanceof NewsBinReference)
         newsbins.add(getId(obj));
@@ -318,47 +322,33 @@ public class ApplicationServer {
       }
     }
 
-    /* Append Parameter for Bookmarks */
-    if (bookmarks.size() > 0) {
-      url.append("&").append(OP_DISPLAY_BOOKMARK); //$NON-NLS-1$
-      for (Long bookmarkIds : bookmarks)
-        url.append(bookmarkIds).append(',');
+    /* Append Parameter for Folders */
+    appendParameters(url, folders, OP_DISPLAY_FOLDER);
 
-      /* Remove the last added ',' */
-      url.deleteCharAt(url.length() - 1);
-    }
+    /* Append Parameter for Bookmarks */
+    appendParameters(url, bookmarks, OP_DISPLAY_BOOKMARK);
 
     /* Append Parameter for Newsbins */
-    if (newsbins.size() > 0) {
-      url.append("&").append(OP_DISPLAY_NEWSBIN); //$NON-NLS-1$
-      for (Long newsbinIds : newsbins)
-        url.append(newsbinIds).append(',');
-
-      /* Remove the last added ',' */
-      url.deleteCharAt(url.length() - 1);
-    }
+    appendParameters(url, newsbins, OP_DISPLAY_NEWSBIN);
 
     /* Append Parameter for SearchMarks */
-    if (searchmarks.size() > 0) {
-      url.append("&").append(OP_DISPLAY_SEARCHMARK); //$NON-NLS-1$
-      for (Long searchmarkIds : searchmarks)
-        url.append(searchmarkIds).append(',');
-
-      /* Remove the last added ',' */
-      url.deleteCharAt(url.length() - 1);
-    }
+    appendParameters(url, searchmarks, OP_DISPLAY_SEARCHMARK);
 
     /* Append Parameter for News */
-    if (news.size() > 0) {
-      url.append("&").append(OP_DISPLAY_NEWS); //$NON-NLS-1$
-      for (Long newsitemIds : news)
-        url.append(newsitemIds).append(',');
+    appendParameters(url, news, OP_DISPLAY_NEWS);
+
+    return url.toString();
+  }
+
+  private void appendParameters(StringBuilder url, List<Long> ids, String op) {
+    if (!ids.isEmpty()) {
+      url.append("&").append(op); //$NON-NLS-1$
+      for (Long id : ids)
+        url.append(id).append(',');
 
       /* Remove the last added ',' */
       url.deleteCharAt(url.length() - 1);
     }
-
-    return url.toString();
   }
 
   private Long getId(Object obj) {
@@ -476,6 +466,21 @@ public class ApplicationServer {
     ContentViewer viewer = fRegistry.get(viewerId);
     if (viewer instanceof NewsBrowserViewer && viewer.getContentProvider() != null) {
       IStructuredContentProvider newsContentProvider = (IStructuredContentProvider) viewer.getContentProvider();
+
+      /* Look for Folders that are to displayed */
+      int displayFolderIndex = parameters.indexOf(OP_DISPLAY_FOLDER);
+      if (displayFolderIndex >= 0) {
+        start = displayFolderIndex + OP_DISPLAY_FOLDER.length();
+        end = parameters.indexOf('&', start);
+        if (end < 0)
+          end = parameters.length();
+
+        StringTokenizer tokenizer = new StringTokenizer(parameters.substring(start, end), ",");//$NON-NLS-1$
+        while (tokenizer.hasMoreElements()) {
+          FolderReference ref = new FolderReference(Long.valueOf((String) tokenizer.nextElement()));
+          elements.addAll(Arrays.asList(newsContentProvider.getElements(ref)));
+        }
+      }
 
       /* Look for BookMarks that are to displayed */
       int displayBookMarkIndex = parameters.indexOf(OP_DISPLAY_BOOKMARK);

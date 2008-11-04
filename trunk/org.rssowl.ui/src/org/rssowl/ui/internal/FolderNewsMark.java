@@ -30,19 +30,26 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.persist.service.PersistenceException;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
- * TODO Remove this workaround until a real virtual solution is implemented.
+ * An internal subclass of {@link Mark} that implements {@link INewsMark} to
+ * provide the news of all bookmarks, bins and saved searches inside a folder.
+ * The {@link FolderNewsMark} is created dynamically whenever a folder is opened
+ * in the feedview and is never persisted to the DB.
  *
  * @author bpasero
  */
@@ -57,27 +64,19 @@ public class FolderNewsMark extends Mark implements INewsMark {
   public FolderNewsMark(IFolder folder) {
     super(folder.getId(), folder.getParent(), folder.getName());
     fFolder = folder;
-
     fNewsContainer = new NewsContainer(Collections.<INews.State, Boolean> emptyMap());
     fillNews(folder);
-  }
-
-  /**
-   * @return the {@link IFolder} that serves as input to this {@link INewsMark}.
-   */
-  public IFolder getFolder() {
-    return fFolder;
   }
 
   private void fillNews(IFolder folder) {
     List<IFolderChild> children = folder.getChildren();
     for (IFolderChild child : children) {
-
-      if (child instanceof IBookMark) {
-        IBookMark bookmark = (IBookMark) child;
-        List<INews> news = bookmark.getNews(INews.State.getVisible());
+      if (child instanceof INewsMark) {
+        INewsMark newsmark = (INewsMark) child;
+        List<INews> news = newsmark.getNews(INews.State.getVisible());
         for (INews newsitem : news) {
-          fNewsContainer.addNews(newsitem);
+          if (newsitem != null) //TODO Remove once Bug 173 is fixed
+            fNewsContainer.addNews(newsitem);
         }
       }
 
@@ -88,24 +87,88 @@ public class FolderNewsMark extends Mark implements INewsMark {
   }
 
   /**
-   * @param news
-   * @return <code>true</code> if the given News belongs to any
-   * {@link IBookMark} of the given {@link IFolder}.
+   * @return the {@link IFolder} that serves as input to this {@link INewsMark}.
    */
-  public boolean isRelatedTo(INews news) {
-    FeedLinkReference feedRef = news.getFeedReference();
-    return isRelatedTo(fFolder, feedRef);
+  public IFolder getFolder() {
+    return fFolder;
   }
 
-  private boolean isRelatedTo(IFolder folder, FeedLinkReference ref) {
+  /*
+   * @see org.rssowl.core.internal.persist.AbstractEntity#setProperty(java.lang.String, java.io.Serializable)
+   */
+  @Override
+  public synchronized void setProperty(String key, Serializable value) {
+    fFolder.setProperty(key, value);
+  }
+
+  /*
+   * @see org.rssowl.core.internal.persist.Mark#getName()
+   */
+  @Override
+  public synchronized String getName() {
+    return fFolder.getName();
+  }
+
+  /*
+   * @see org.rssowl.core.internal.persist.AbstractEntity#getProperties()
+   */
+  @Override
+  public synchronized Map<String, Serializable> getProperties() {
+    return fFolder.getProperties();
+  }
+
+  /*
+   * @see org.rssowl.core.internal.persist.AbstractEntity#getProperty(java.lang.String)
+   */
+  @Override
+  public synchronized Object getProperty(String key) {
+    return fFolder.getProperty(key);
+  }
+
+  /*
+   * @see org.rssowl.core.internal.persist.Mark#getParent()
+   */
+  /*
+   * @see org.rssowl.core.internal.persist.Mark#getParent()
+   */
+  @Override
+  public synchronized IFolder getParent() {
+    return fFolder.getParent();
+  }
+
+  /**
+   * @param news
+   * @return <code>true</code> if the given News belongs to any
+   * {@link IBookMark} or {@link INewsBin} of the given {@link IFolder}.
+   */
+  public boolean isRelatedTo(INews news) {
+
+    /* Might be contained */
+    if (containsNews(news))
+      return true;
+
+    FeedLinkReference feedRef = news.getFeedReference();
+    return isRelatedTo(fFolder, news, feedRef);
+  }
+
+  private boolean isRelatedTo(IFolder folder, INews news, FeedLinkReference ref) {
     List<IFolderChild> children = folder.getChildren();
 
     for (IFolderChild child : children) {
       if (child instanceof IFolder)
-        return isRelatedTo((IFolder) child, ref);
-      else if (child instanceof IBookMark) {
+        return isRelatedTo((IFolder) child, news, ref);
+
+      /* News could be part of the Feed (but is no copy) */
+      else if (news.getParentId() == 0 && child instanceof IBookMark) {
         IBookMark bookmark = (IBookMark) child;
         if (bookmark.getFeedLinkReference().equals(ref))
+          return true;
+      }
+
+      /* News could be part of Bin (and is a copy) */
+      else if (news.getParentId() != 0 && child instanceof INewsBin) {
+        INewsBin bin = (INewsBin) child;
+        if (bin.getId() == news.getParentId())
           return true;
       }
     }
@@ -163,13 +226,34 @@ public class FolderNewsMark extends Mark implements INewsMark {
    * @see org.rssowl.core.persist.INewsMark#isGetNewsRefsEfficient()
    */
   public boolean isGetNewsRefsEfficient() {
-    return true;
+    return false;
   }
 
   /*
    * @see org.rssowl.core.persist.IEntity#toReference()
    */
   public ModelReference toReference() {
-    return new ModelReference(0, FolderNewsMark.class) {};
+    return new FolderNewsMarkReference(getId());
+  }
+}
+
+/**
+ * Internal implementation of the <code>ModelReference</code> for the internal
+ * Type <code>FolderNewsMark</code>.
+ *
+ * @author bpasero
+ */
+final class FolderNewsMarkReference extends ModelReference {
+
+  /**
+   * @param id
+   */
+  public FolderNewsMarkReference(long id) {
+    super(id, FolderNewsMark.class);
+  }
+
+  @Override
+  public IFolder resolve() throws PersistenceException {
+    throw new UnsupportedOperationException();
   }
 }

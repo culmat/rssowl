@@ -44,6 +44,7 @@ import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
@@ -393,8 +394,8 @@ public class NewsFilter extends ViewerFilter {
     if (!pattern.endsWith("*"))
       pattern = pattern + "*";
 
-    /* Match on Location (not supported for search marks) */
-    if (fNewsMark != null && !(fNewsMark instanceof ISearchMark)) {
+    /* Match on Location (not supported for search marks and folder marks) */
+    if (fNewsMark != null && !(fNewsMark instanceof ISearchMark) && !(fNewsMark instanceof FolderNewsMark)) {
       ISearchField field = fModelFactory.createSearchField(INews.LOCATION, INews.class.getName());
       conditions.add(fModelFactory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList((IFolderChild) fNewsMark))));
     }

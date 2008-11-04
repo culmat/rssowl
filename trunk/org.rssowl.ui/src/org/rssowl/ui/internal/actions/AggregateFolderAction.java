@@ -28,8 +28,10 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
@@ -59,14 +61,19 @@ public class AggregateFolderAction implements IObjectActionDelegate {
    */
   public void run(IAction action) {
     if (!fSelection.isEmpty() && fSelection instanceof IStructuredSelection) {
-      Object firstElem = ((IStructuredSelection) fSelection).getFirstElement();
+      final Object firstElem = ((IStructuredSelection) fSelection).getFirstElement();
       if (firstElem instanceof IFolder) {
 
         /* Create in-memory Newsmark */
-        StructuredSelection newSelection = new StructuredSelection(new FolderNewsMark((IFolder) firstElem));
+        BusyIndicator.showWhile(PlatformUI.getWorkbench().getDisplay(), new Runnable() {
+          public void run() {
+            FolderNewsMark folderNewsMark = new FolderNewsMark((IFolder) firstElem);
+            StructuredSelection newSelection = new StructuredSelection(folderNewsMark);
 
-        /* Open in Feedview */
-        OwlUI.openInFeedView(fTargetPart.getSite().getPage(), newSelection);
+            /* Open in Feedview */
+            OwlUI.openInFeedView(fTargetPart.getSite().getPage(), newSelection);
+          }
+        });
       }
     }
   }

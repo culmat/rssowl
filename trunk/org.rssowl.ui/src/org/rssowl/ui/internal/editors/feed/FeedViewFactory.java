@@ -27,9 +27,7 @@ package org.rssowl.ui.internal.editors.feed;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
-import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INewsMark;
-import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 
 /**
@@ -59,30 +57,6 @@ public class FeedViewFactory implements IElementFactory {
         /* Should never happen */
         throw new IllegalStateException(e);
       }
-    }
-
-    return oldCreateElement(memento);
-  }
-
-  //TODO Remove everything below this after the release of 2.0M8
-  static final String BOOKMARK_INPUT_ID = "org.rssowl.ui.internal.editors.feed.BookMarkInputId";
-  static final String SEARCHMARK_INPUT_ID = "org.rssowl.ui.internal.editors.feed.SearchMarkInputId";
-
-  private IAdaptable oldCreateElement(IMemento memento) {
-    /* Check for BookMark */
-    String inputId = memento.getString(BOOKMARK_INPUT_ID);
-    if (inputId != null) {
-      IBookMark mark = DynamicDAO.load(IBookMark.class, Long.valueOf(inputId));
-      if (mark != null)
-        return new FeedViewInput(mark);
-    }
-
-    /* Check for SearchMark */
-    inputId = memento.getString(SEARCHMARK_INPUT_ID);
-    if (inputId != null) {
-      ISearchMark mark = DynamicDAO.load(ISearchMark.class, Long.valueOf(inputId));
-      if (mark != null)
-        return new FeedViewInput(mark);
     }
 
     return null;
