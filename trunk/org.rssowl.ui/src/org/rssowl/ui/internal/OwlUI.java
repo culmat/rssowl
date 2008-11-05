@@ -39,9 +39,11 @@ import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.SWTError;
 import org.eclipse.swt.SWTException;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -241,6 +243,60 @@ public class OwlUI {
 
     /** Any other Theme */
     OTHER
+  }
+
+  /* Helper to ensure favicons cause no errors if corrupt */
+  private static class FavIconImageDescriptor extends ImageDescriptor {
+    private final ImageDescriptor fDescriptor;
+
+    private FavIconImageDescriptor(ImageDescriptor descriptor) {
+      Assert.isNotNull(descriptor);
+      fDescriptor = descriptor;
+    }
+
+    /*
+     * @see org.eclipse.jface.resource.ImageDescriptor#getImageData()
+     */
+    @Override
+    public ImageData getImageData() {
+      return fDescriptor.getImageData();
+    }
+
+    /*
+     * @see org.eclipse.jface.resource.ImageDescriptor#createImage(boolean, org.eclipse.swt.graphics.Device)
+     */
+    @Override
+    public Image createImage(boolean returnMissingImageOnError, Device device) {
+      try {
+        return fDescriptor.createImage(returnMissingImageOnError, device);
+      } catch (SWTError error) {
+        return BOOKMARK.createImage(returnMissingImageOnError, device);
+      }
+    }
+
+    /*
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+      return fDescriptor.equals(obj);
+    }
+
+    /*
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+      return fDescriptor.hashCode();
+    }
+
+    /*
+     * @see org.eclipse.jface.resource.ImageDescriptor#destroyResource(java.lang.Object)
+     */
+    @Override
+    public void destroyResource(Object previouslyCreatedObject) {
+      fDescriptor.destroyResource(previouslyCreatedObject);
+    }
   }
 
   /**
@@ -542,7 +598,7 @@ public class OwlUI {
     File favicon = getImageFile(bookmark.getId());
     if (favicon != null && favicon.exists()) {
       try {
-        descriptor = ImageDescriptor.createFromURL(favicon.toURI().toURL());
+        descriptor = new FavIconImageDescriptor(ImageDescriptor.createFromURL(favicon.toURI().toURL()));
         FAVICO_CACHE.put(bookmark.getId(), descriptor);
         return descriptor;
       } catch (MalformedURLException e) {
@@ -993,8 +1049,8 @@ public class OwlUI {
   }
 
   /**
-   * Update the current active window title based on the given array of {@link
-   * IMark}.
+   * Update the current active window title based on the given array of
+   * {@link IMark}.
    *
    * @param shownInput the input that is currently visible in RSSOwl.
    */
