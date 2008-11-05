@@ -754,8 +754,21 @@
       <key
             commandId="org.eclipse.ui.edit.delete"
             contextId="org.eclipse.ui.contexts.dialogAndWindow"
+            platform="win32"
             schemeId="org.rssowl.ui.KeyScheme"
             sequence="DEL"/>
+      <key
+            commandId="org.eclipse.ui.edit.delete"
+            contextId="org.eclipse.ui.contexts.dialogAndWindow"
+            platform="gtk"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="DEL"/>
+      <key
+            commandId="org.eclipse.ui.edit.delete"
+            contextId="org.eclipse.ui.contexts.dialogAndWindow"
+            platform="carbon"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="BS"/>
       <key
             commandId="org.rssowl.ui.MarkAllRead"
             contextId="org.eclipse.ui.contexts.window"
