@@ -276,7 +276,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
       switch (fMode) {
         case ADD:
-          newShell.setText("Add Label");
+          newShell.setText("New Label");
           break;
         case EDIT:
           newShell.setText("Edit Label");
@@ -347,7 +347,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     buttonBox.setLayoutData(new GridData(SWT.FILL, SWT.FILL, false, true));
 
     Button addButton = new Button(buttonBox, SWT.PUSH);
-    addButton.setText("&Add...");
+    addButton.setText("&New...");
     setButtonLayoutData(addButton);
     addButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -448,7 +448,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
         for (INews news : affectedNews) {
           news.removeLabel(label);
         }
-        
+
         Controller.getDefault().getSavedSearchService().forceQuickUpdate();
         DynamicDAO.saveAll(affectedNews);
 
