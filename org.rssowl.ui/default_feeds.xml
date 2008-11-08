@@ -64,6 +64,7 @@
 		<outline text="Joystiq" xmlUrl="http://www.joystiq.com/rss.xml" />
 		</outline>
 		<outline text="Humor">
+		<outline text="Dilbert Blog" xmlUrl="http://dilbertblog.typepad.com/the_dilbert_blog/atom.xml" />
 		<outline text="JabTV" xmlUrl="http://www.jabtv.com/rss/rss.xml" />
 		<outline text="Darkgate Comic Slurper" xmlUrl="http://darkgate.net/comic/feed.php?foxtrot&amp;dilbert&amp;doonesbury&amp;sherman&amp;userf&amp;stonesoup" />
 		<outline text="Get Fuzzy" xmlUrl="http://www.tapestrycomics.com/getfuzzy.xml" />
@@ -144,10 +145,6 @@
 		<outline text="Instapundit.com" xmlUrl="http://www.instapundit.com/index.rdf" />
 		<outline text="Talking Points Memo" xmlUrl="http://www.talkingpointsmemo.com/index.xml" />
 		</outline>
-		<outline text="RSSOwl">
-		<outline text="RSSOwl News" xmlUrl="http://www.rssowl.org/newsfeed" />
-		<outline text="Project Statistics" xmlUrl="http://sourceforge.net/export/rss2_projsummary.php?group_id=86683" />
-		</outline>
 		<outline text="Science">
 		<outline text="Physics Post" xmlUrl="http://physicspost.com/rss.php" />
 		<outline text="ScienceDaily Headlines" xmlUrl="http://www.sciencedaily.com/newsfeed.xml" />
@@ -209,7 +206,6 @@
 		</outline>
 		<outline text="Digital Photography Review" xmlUrl="http://www.dpreview.com/news/dpr.rdf" />
 		<outline text="eWEEK Technology News" xmlUrl="http://rssnewsapps.ziffdavis.com/tech.xml" />
-		<outline text="Engadget" xmlUrl="http://www.engadget.com/rss.xml" />
 		<outline text="Javalobby Front Page" xmlUrl="http://www.javalobby.org/forumrss/61.xml" />
 		<outline text="Joel on Software" xmlUrl="http://www.joelonsoftware.com/rss.xml" />
 		<outline text="BBC News | Technology | World Edition" xmlUrl="http://news.bbc.co.uk/rss/newsonline_world_edition/technology/rss091.xml" />
@@ -239,6 +235,11 @@
 		<outline text="Fedora People" xmlUrl="http://planet.fedoraproject.org/rss20.xml" />
 		<outline text="Planet Debian" xmlUrl="http://planet.debian.org/rss20.xml" />
 		<outline text="Mozillazine" xmlUrl="http://planet.mozillazine.org/rss20.xml" />
+		<outline text="Eclipse News" xmlUrl="http://www.eclipse.org/home/eclipsenews.rss" />
+		<outline text="Planet Eclipse" xmlUrl="http://www.planeteclipse.org/planet/atom.xml" />
+		<outline text="EclipseZone: News" xmlUrl="http://www.eclipsezone.com/forumRSS/18112.xml" />
+		<outline text="EclipseZone: Tips" xmlUrl="http://www.eclipsezone.com/forumRSS/18111.xml" />
+		<outline text="Eclipse Podcasts" xmlUrl="http://feeds.feedburner.com/ezpodcast" />
 		</outline>
 		<outline text="Weblogs">
 		<outline text="Google Sightseeing" xmlUrl="http://googlesightseeing.com/feed" />
@@ -257,12 +258,11 @@
 		<outline text="Spamusement" xmlUrl="http://spamusement.com/rss" />
 		<outline text="Pandagon" xmlUrl="http://pandagon.net/feed" />
 		</outline>
-		<outline text="EclipseCon 2007" xmlUrl="http://www.eclipsecon.org/2007/feeds/atom.xml" />
-		<outline text="Dilbert Blog" xmlUrl="http://dilbertblog.typepad.com/the_dilbert_blog/atom.xml" />
-		<outline text="Eclipse News" xmlUrl="http://www.eclipse.org/home/eclipsenews.rss" />
-		<outline text="Planet Eclipse" xmlUrl="http://www.planeteclipse.org/planet/atom.xml" />
-		<outline text="EclipseZone: News" xmlUrl="http://www.eclipsezone.com/forumRSS/18112.xml" />
-		<outline text="EclipseZone: Tips" xmlUrl="http://www.eclipsezone.com/forumRSS/18111.xml" />
-		<outline text="Eclipse Podcasts" xmlUrl="http://feeds.feedburner.com/ezpodcast" />
+		<outline text="RSSOwl News" xmlUrl="http://www.rssowl.org/newsfeed" />
+		<outline text="Engadget" xmlUrl="http://www.engadget.com/rss.xml" />
+		<outline text="MarketWatch" xmlUrl="http://feeds.marketwatch.com/marketwatch/topstories" />
+		<outline text="New York Times" xmlUrl="http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml" />
+		<outline text="Techcrunch" xmlUrl="http://feedproxy.google.com/Techcrunch" />
+		<outline text="Wired Top Stories" xmlUrl="http://feeds.wired.com/wired/index" />
 	</body>
 </opml>
