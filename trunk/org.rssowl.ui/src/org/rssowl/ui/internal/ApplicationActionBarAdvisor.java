@@ -696,7 +696,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     helpMenu.add(new Action("&Boreal Owl Help") {
       @Override
       public void run() {
-        BrowserUtils.openLinkExternal("http://boreal.rssowl.org");
+        BrowserUtils.openLinkExternal("http://boreal.rssowl.org/#faq");
       }
 
       @Override
