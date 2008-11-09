@@ -383,6 +383,19 @@ public class Activator extends AbstractUIPlugin {
   }
 
   /**
+   * Log a Warning Message.
+   *
+   * @param msg The message to log as Warning.
+   * @param e The occuring Exception to log.
+   */
+  public void logWarning(String msg, Exception e) {
+    if (msg == null)
+      msg = ""; //$NON-NLS-1$
+
+    getLog().log(new Status(IStatus.WARNING, getBundle().getSymbolicName(), IStatus.WARNING, msg, e));
+  }
+
+  /**
    * Create a IStatus out of the given message and exception.
    *
    * @param msg The message describing the error.

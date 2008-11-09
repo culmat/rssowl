@@ -51,6 +51,7 @@ import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.JobRunner;
 
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -73,6 +74,9 @@ public class CBrowser {
 
   /* Flag to check if Mozilla is available on Windows */
   private static boolean fgMozillaAvailable = true;
+
+  /* Log failing disablement of JavaScript only once per session */
+  private static boolean fgScriptDisableLogged = false;
 
   private Browser fBrowser;
   private boolean fBlockNavigation;
@@ -282,13 +286,65 @@ public class CBrowser {
    * @return <code>TRUE</code> in case of success, <code>FALSE</code> otherwise
    */
   public boolean print() {
+    setScriptDisabled(false);
     return fBrowser.execute(JAVA_SCRIPT_PRINT);
   }
 
-  private void hookListeners() {
+  /* Special handling of opened websites on Windows */
+  private OpenWindowListener getOpenWindowListenerForWindows() {
+    return new OpenWindowListener() {
+      public void open(WindowEvent event) {
 
-    /* Listen to Open-Window-Changes */
-    fBrowser.addOpenWindowListener(new OpenWindowListener() {
+        /* Special handle external Browser */
+        if (useExternalBrowser()) {
+
+          /* Avoid IE being loaded from SWT on Windows */
+          final Browser tempBrowser = new Browser(fBrowser.getShell(), SWT.NONE);
+          tempBrowser.setVisible(false);
+          event.browser = tempBrowser;
+          tempBrowser.getDisplay().asyncExec(new Runnable() {
+            public void run() {
+              if (!tempBrowser.isDisposed()) {
+                String url = tempBrowser.getUrl();
+                tempBrowser.dispose();
+                if (StringUtils.isSet(url))
+                  BrowserUtils.openLinkExternal(url);
+              }
+            }
+          });
+          return;
+        }
+
+        /* Open internal Browser in a new Tab */
+        if (fEclipsePreferences.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS)) {
+          WebBrowserView browserView = BrowserUtils.openLinkInternal(URIUtils.ABOUT_BLANK);
+          if (browserView != null)
+            event.browser = browserView.getBrowser().getControl();
+        }
+
+        /* Open internal Browser in same Browser */
+        else {
+          final Browser tempBrowser = new Browser(fBrowser.getShell(), SWT.NONE);
+          tempBrowser.setVisible(false);
+          event.browser = tempBrowser;
+          tempBrowser.getDisplay().asyncExec(new Runnable() {
+            public void run() {
+              if (!tempBrowser.isDisposed()) {
+                String url = tempBrowser.getUrl();
+                tempBrowser.dispose();
+                if (StringUtils.isSet(url))
+                  fBrowser.setUrl(url);
+              }
+            }
+          });
+        }
+      }
+    };
+  }
+
+  /* Default handling of opened websites on OS other than Windows */
+  private OpenWindowListener getOpenWindowListener() {
+    return new OpenWindowListener() {
       public void open(WindowEvent event) {
 
         /* Do not handle when external Browser is being used */
@@ -300,7 +356,37 @@ public class CBrowser {
         if (browserView != null)
           event.browser = browserView.getBrowser().getControl();
       }
-    });
+    };
+  }
+
+  private void setScriptDisabled(Boolean disabled) {
+
+    /* Only supported on Windows IE */
+    if (!Application.IS_WINDOWS || (fBrowser.getStyle() & SWT.MOZILLA) != 0)
+      return;
+
+    /* Toggle via Reflection due to patched SWT */
+    try {
+      Method method = fBrowser.getClass().getMethod("setScriptDisabled", Boolean.class);
+      if (method != null)
+        method.invoke(fBrowser, disabled);
+    } catch (Exception e) {
+      if (!fgScriptDisableLogged) {
+        Activator.getDefault().logWarning("Unable to disable JavaScript", e);
+        fgScriptDisableLogged = true;
+      }
+    }
+  }
+
+  /* Disallow JavaScript for localhost locations or globally if set */
+  private boolean shouldDisableScript(String location) {
+    return fPreferences.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT) || location.startsWith(ApplicationServer.PROTOCOL + "://" + ApplicationServer.LOCALHOST);
+  }
+
+  private void hookListeners() {
+
+    /* Listen to Open-Window-Changes */
+    fBrowser.addOpenWindowListener(Application.IS_WINDOWS ? getOpenWindowListenerForWindows() : getOpenWindowListener());
 
     /* Listen to Location-Changes */
     fBrowser.addLocationListener(new LocationListener() {
@@ -310,6 +396,9 @@ public class CBrowser {
       }
 
       public void changing(LocationEvent event) {
+
+        /* Update JavaScript enabled state */
+        setScriptDisabled(shouldDisableScript(event.location));
 
         /* Handle Application Protocol */
         if (event.location != null && event.location.contains(ILinkHandler.HANDLER_PROTOCOL)) {

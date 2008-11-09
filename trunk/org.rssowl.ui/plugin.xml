@@ -459,7 +459,7 @@
             label="open view switch"/>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Miscellaneous"
-            label="internal embedded systemtray confirm confirmation delete reopen open single multi tabs minimize tray external browser feed view ">
+            label="internal embedded systemtray confirm confirmation delete reopen open single multi tabs minimize tray external browser feed view script js javascript java">
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Feeds"
