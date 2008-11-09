@@ -50,6 +50,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Mark all news as read on tab close */
   public static final String MARK_READ_ON_TAB_CLOSE = "org.rssowl.pref.MarkNewsReadOnTabClose";
 
+  /** Global: Disable JavaScript (Windows only) */
+  public static final String DISABLE_JAVASCRIPT = "org.rssowl.pref.DisableJavaScript";
+
   /** Global: Use default external browser */
   public static final String USE_DEFAULT_EXTERNAL_BROWSER = "org.rssowl.pref.UseExternalBrowser";
 
@@ -311,6 +314,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putBoolean(MARK_READ_ON_MINIMIZE, false);
     defaultScope.putBoolean(MARK_READ_ON_CHANGE, false);
     defaultScope.putBoolean(MARK_READ_ON_TAB_CLOSE, false);
+    defaultScope.putBoolean(DISABLE_JAVASCRIPT, true);
     defaultScope.putBoolean(USE_DEFAULT_EXTERNAL_BROWSER, true);
     defaultScope.putBoolean(TRAY_ON_MINIMIZE, false);
     defaultScope.putBoolean(MARK_READ_STATE, true);
