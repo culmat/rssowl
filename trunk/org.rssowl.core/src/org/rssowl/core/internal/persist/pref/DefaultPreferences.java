@@ -332,8 +332,8 @@ public class DefaultPreferences implements IPreferencesInitializer {
 
   private void initGlobalEclipseDefaults(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(ECLIPSE_RESTORE_TABS, true);
-    defaultScope.putBoolean(ECLIPSE_AUTOCLOSE_TABS, true);
-    defaultScope.putInteger(ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 1);
+    defaultScope.putBoolean(ECLIPSE_MULTIPLE_TABS, true);
+    defaultScope.putInteger(ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 5);
   }
 
   private void initRetentionDefaults(IPreferenceScope defaultScope) {
