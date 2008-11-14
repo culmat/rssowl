@@ -690,6 +690,24 @@
             id="org.rssowl.ui.PreviousBookmarkSetCommand"
             name="Previous Bookmark-Set">
       </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Navigate to the next Tab"
+            id="org.eclipse.ui.window.nextEditor"
+            name="Next Tab">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Navigate to the previous Tab"
+            id="org.eclipse.ui.window.previousEditor"
+            name="Previous Tab">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Switch to any opened Tab"
+            id="org.eclipse.ui.window.openEditorDropDown"
+            name="Switch to Tab">
+      </command>
       <!--<command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.OpenNewsFiltersAction"
@@ -821,6 +839,12 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.rssowl.ui.KeyScheme"
             sequence="F11">
+      </key>
+      <key
+            commandId="org.eclipse.ui.window.nextEditor"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1+TAB">
       </key>
    </extension>
    <extension
