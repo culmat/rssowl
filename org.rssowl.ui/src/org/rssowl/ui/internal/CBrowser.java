@@ -79,9 +79,6 @@ public class CBrowser {
   /* Flag to check if Mozilla is available on Windows */
   private static boolean fgMozillaAvailable = true;
 
-  /* Log failing disablement of JavaScript only once per session */
-  private static boolean fgScriptDisableLogged = false;
-
   private Browser fBrowser;
   private boolean fBlockNavigation;
   private IPreferenceScope fPreferences;
@@ -376,10 +373,7 @@ public class CBrowser {
       if (method != null)
         method.invoke(fBrowser, disabled);
     } catch (Exception e) {
-      if (!fgScriptDisableLogged) {
-        Activator.getDefault().logWarning("Unable to disable JavaScript", e);
-        fgScriptDisableLogged = true;
-      }
+      /* Ignore Silently */
     }
   }
 
