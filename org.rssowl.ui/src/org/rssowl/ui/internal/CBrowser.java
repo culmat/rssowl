@@ -42,6 +42,7 @@ import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -64,6 +65,9 @@ import java.util.Map;
  * @author bpasero
  */
 public class CBrowser {
+
+  /* Delay before a URL is set in a IE/Mozilla Browser (guess) */
+  private static final int BROWSER_URL_DELAY = 500;
 
   /* JavaScript: print() Method */
   private static final String JAVA_SCRIPT_PRINT = "window.print();";
@@ -290,7 +294,7 @@ public class CBrowser {
     return fBrowser.execute(JAVA_SCRIPT_PRINT);
   }
 
-  /* Special handling of opened websites on Windows */
+  /* Special handling of opened websites on Windows (IE and Mozilla) */
   private OpenWindowListener getOpenWindowListenerForWindows() {
     return new OpenWindowListener() {
       public void open(WindowEvent event) {
@@ -299,12 +303,12 @@ public class CBrowser {
         if (useExternalBrowser()) {
 
           /* Avoid IE being loaded from SWT on Windows */
-          final Browser tempBrowser = new Browser(fBrowser.getShell(), SWT.NONE);
+          final Browser tempBrowser = new Browser(fBrowser.getShell(), fgMozillaAvailable ? SWT.MOZILLA : SWT.NONE);
           tempBrowser.setVisible(false);
           event.browser = tempBrowser;
-          tempBrowser.getDisplay().asyncExec(new Runnable() {
+          tempBrowser.getDisplay().timerExec(BROWSER_URL_DELAY, new Runnable() {
             public void run() {
-              if (!tempBrowser.isDisposed()) {
+              if (!tempBrowser.isDisposed() && PlatformUI.isWorkbenchRunning()) {
                 String url = tempBrowser.getUrl();
                 tempBrowser.dispose();
                 if (StringUtils.isSet(url))
@@ -312,6 +316,7 @@ public class CBrowser {
               }
             }
           });
+
           return;
         }
 
@@ -324,12 +329,12 @@ public class CBrowser {
 
         /* Open internal Browser in same Browser */
         else {
-          final Browser tempBrowser = new Browser(fBrowser.getShell(), SWT.NONE);
+          final Browser tempBrowser = new Browser(fBrowser.getShell(), fgMozillaAvailable ? SWT.MOZILLA : SWT.NONE);
           tempBrowser.setVisible(false);
           event.browser = tempBrowser;
-          tempBrowser.getDisplay().asyncExec(new Runnable() {
+          tempBrowser.getDisplay().timerExec(BROWSER_URL_DELAY, new Runnable() {
             public void run() {
-              if (!tempBrowser.isDisposed()) {
+              if (!tempBrowser.isDisposed() && PlatformUI.isWorkbenchRunning()) {
                 String url = tempBrowser.getUrl();
                 tempBrowser.dispose();
                 if (StringUtils.isSet(url))
@@ -342,13 +347,13 @@ public class CBrowser {
     };
   }
 
-  /* Default handling of opened websites on OS other than Windows */
+  /* Default handling of opened websites on OS other than Windows or Non-IE */
   private OpenWindowListener getOpenWindowListener() {
     return new OpenWindowListener() {
       public void open(WindowEvent event) {
 
-        /* Do not handle when external Browser is being used */
-        if (useExternalBrowser())
+        /* Do not handle when external Browser is being used and it can be properly handled by the OS */
+        if (useExternalBrowser() && !event.required)
           return;
 
         /* Open Browser in new Tab */
