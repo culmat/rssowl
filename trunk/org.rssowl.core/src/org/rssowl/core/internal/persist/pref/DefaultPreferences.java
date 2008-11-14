@@ -28,8 +28,8 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.pref.IPreferencesInitializer;
 
 /**
- * An instance of <code>IPreferencesInitializer</code> responsible for
- * defining the default preferences of RSSOwl.
+ * An instance of <code>IPreferencesInitializer</code> responsible for defining
+ * the default preferences of RSSOwl.
  *
  * @author bpasero
  */
@@ -273,6 +273,12 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global Eclipse: Autoclose Tabs Threshold */
   public static final String ECLIPSE_AUTOCLOSE_TABS_THRESHOLD = "instance/org.eclipse.ui.workbench/REUSE_OPEN_EDITORS";
 
+  /** Global Eclipse: Use Proxy */
+  public static final String ECLIPSE_USE_PROXY = "/configuration/org.eclipse.core.net/proxiesEnabled";
+
+  /** Global Eclipse: Use System Proxy */
+  public static final String ECLIPSE_USE_SYSTEM_PROXY = "/configuration/org.eclipse.core.net/systemProxiesEnabled";
+
   /** Global Eclipse: Proxy Host */
   public static final String ECLIPSE_PROXY_HOST = "/configuration/org.eclipse.core.net/proxyData/HTTP/host";
 
@@ -280,7 +286,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   public static final String ECLIPSE_PROXY_PORT = "/configuration/org.eclipse.core.net/proxyData/HTTP/port";
 
   /*
-   * @see org.rssowl.core.model.preferences.IPreferencesInitializer#initialize(org.rssowl.core.model.preferences.IPreferencesScope)
+   * @see
+   * org.rssowl.core.model.preferences.IPreferencesInitializer#initialize(org
+   * .rssowl.core.model.preferences.IPreferencesScope)
    */
   public void initialize(IPreferenceScope defaultScope) {
 
