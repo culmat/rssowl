@@ -1164,4 +1164,24 @@ public class OwlUI {
       setAllChecked(state, children);
     }
   }
+
+  /** Identical with ActionFactory.CLOSE_OTHERS */
+  public static void closeOtherEditors() {
+    IWorkbenchPage page = getPage();
+    if (page != null) {
+      IEditorReference[] refArray = page.getEditorReferences();
+      if (refArray != null && refArray.length > 1) {
+        IEditorReference[] otherEditors = new IEditorReference[refArray.length - 1];
+        IEditorReference activeEditor = (IEditorReference) page.getReference(page.getActiveEditor());
+        for (int i = 0; i < refArray.length; i++) {
+          if (refArray[i] != activeEditor)
+            continue;
+          System.arraycopy(refArray, 0, otherEditors, 0, i);
+          System.arraycopy(refArray, i + 1, otherEditors, i, refArray.length - 1 - i);
+          break;
+        }
+        page.closeEditors(otherEditors, true);
+      }
+    }
+  }
 }

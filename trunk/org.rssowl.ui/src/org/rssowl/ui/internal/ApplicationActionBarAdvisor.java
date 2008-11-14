@@ -37,8 +37,11 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionDelegate;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
@@ -272,6 +275,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
   /* Menu: View */
   private void createViewMenu(IMenuManager menuBar) {
     final IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
+    final IPreferenceScope eclipsePrefs = Owl.getPreferenceService().getEclipseScope();
 
     MenuManager viewMenu = new MenuManager("&View", M_VIEW);
     viewMenu.setRemoveAllWhenShown(true);
@@ -352,6 +356,51 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
               return page.findView(BookMarkExplorer.VIEW_ID) != null;
 
             return false;
+          }
+        });
+
+        /* Tabbed Browsing */
+        manager.add(new Separator());
+        manager.add(new Action("Tabbed Browsing", IAction.AS_CHECK_BOX) {
+          @Override
+          public void run() {
+            boolean tabbedBrowsingEnabled = isChecked();
+
+            /* Disable Tabbed Browsing */
+            if (tabbedBrowsingEnabled) {
+
+              /* Close other Tabs if necessary */
+              IWorkbenchPage page = OwlUI.getPage();
+              if (page != null) {
+                IEditorReference[] editorReferences = page.getEditorReferences();
+                if (editorReferences.length > 1) {
+                  MessageBox confirmDialog = new MessageBox(page.getWorkbenchWindow().getShell(), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+                  confirmDialog.setText("Disable Tabbed Browsing");
+                  confirmDialog.setMessage("You currently have " + editorReferences.length + " tabs opened.\nDo you want to close all tabs except for the active one?");
+                  if (confirmDialog.open() == SWT.YES)
+                    OwlUI.closeOtherEditors();
+                }
+              }
+
+              /* Update Preferences */
+              eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, false);
+              eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS, true);
+              eclipsePrefs.putInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 1);
+            }
+
+            /* Enable Tabbed Browsing */
+            else {
+              eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, true);
+              eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS, false);
+              eclipsePrefs.putInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 5);
+            }
+          }
+
+          @Override
+          public boolean isChecked() {
+            boolean autoCloseTabs = eclipsePrefs.getBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS);
+            int autoCloseTabsThreshold = eclipsePrefs.getInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD);
+            return !autoCloseTabs || autoCloseTabsThreshold > 1;
           }
         });
 
