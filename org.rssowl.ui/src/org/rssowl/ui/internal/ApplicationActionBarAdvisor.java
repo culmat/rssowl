@@ -43,15 +43,18 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.keys.IBindingService;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.ILabel;
@@ -751,6 +754,16 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       @Override
       public ImageDescriptor getImageDescriptor() {
         return OwlUI.getImageDescriptor("icons/elcl16/help.gif");
+      }
+    });
+
+    /* Show Key Bindings */
+    helpMenu.add(new Action("Show Key Bindings") {
+      @Override
+      public void run() {
+        IWorkbench workbench = PlatformUI.getWorkbench();
+        IBindingService bindingService = (IBindingService) workbench.getService(IBindingService.class);
+        bindingService.openKeyAssistDialog();
       }
     });
 
