@@ -38,9 +38,6 @@ public class Perspective implements IPerspectiveFactory {
    */
   public void createInitialLayout(IPageLayout layout) {
 
-    /* BookMark Explorer */
-    layout.addView(BookMarkExplorer.VIEW_ID, IPageLayout.LEFT, 0.25f, layout.getEditorArea());
-
     /* Show View */
     layout.addShowViewShortcut(BookMarkExplorer.VIEW_ID);
   }

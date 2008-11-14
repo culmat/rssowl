@@ -1312,4 +1312,22 @@
             actionId="org.rssowl.core.CopyNewsAction">
       </newsActionPresentation>
    </extension>
+   <extension
+         point="org.eclipse.ui.perspectiveExtensions">
+      <perspectiveExtension
+            targetID="org.rssowl.ui.perspective">
+         <view
+               closeable="false"
+               id="org.rssowl.ui.BookMarkExplorer"
+               minimized="false"
+               moveable="true"
+               ratio="0.25"
+               relationship="left"
+               relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               standalone="false"
+               visible="true">
+         </view>
+      </perspectiveExtension>
+   </extension>
 </plugin>
