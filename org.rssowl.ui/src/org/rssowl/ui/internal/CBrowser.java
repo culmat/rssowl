@@ -129,9 +129,12 @@ public class CBrowser {
     if (Application.IS_LINUX || (Application.IS_WINDOWS && fgMozillaAvailable)) {
       String proxyHost = fEclipsePreferences.getString(DefaultPreferences.ECLIPSE_PROXY_HOST);
       String proxyPort = fEclipsePreferences.getString(DefaultPreferences.ECLIPSE_PROXY_PORT);
-      if (StringUtils.isSet(proxyHost) && StringUtils.isSet(proxyPort)) {
+      if (useProxy() && StringUtils.isSet(proxyHost) && StringUtils.isSet(proxyPort)) {
         System.setProperty(XULRUNNER_PROXY_HOST, proxyHost);
         System.setProperty(XULRUNNER_PROXY_PORT, proxyPort);
+      } else {
+        System.setProperty(XULRUNNER_PROXY_HOST, "");
+        System.setProperty(XULRUNNER_PROXY_PORT, "");
       }
     }
 
@@ -163,6 +166,12 @@ public class CBrowser {
     });
 
     return browser;
+  }
+
+  private boolean useProxy() {
+    boolean useProxy = fEclipsePreferences.getBoolean(DefaultPreferences.ECLIPSE_USE_PROXY);
+    boolean useSystemProxy = fEclipsePreferences.getBoolean(DefaultPreferences.ECLIPSE_USE_SYSTEM_PROXY);
+    return useProxy && !useSystemProxy;
   }
 
   private void hookMenu() {
