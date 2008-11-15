@@ -790,11 +790,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       }
     });
 
-    /* Mailing List */
-    helpMenu.add(new Action("&Mailinglist") {
+    /* License */
+    helpMenu.add(new Action("&License") {
       @Override
       public void run() {
-        BrowserUtils.openLinkExternal("https://lists.sourceforge.net/lists/listinfo/rssowl-boreal");
+        BrowserUtils.openLinkExternal("http://www.rssowl.org/legal/epl-v10.html");
       }
     });
 
