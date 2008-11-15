@@ -143,12 +143,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fUseMultipleTabsCheck = new Button(viewGroup, SWT.CHECK);
     fUseMultipleTabsCheck.setText("Show multiple tabs side by side");
     fUseMultipleTabsCheck.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS));
-    fUseMultipleTabsCheck.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && fUseMultipleTabsCheck.getSelection());
-      }
-    });
 
     Composite autoCloseTabsContainer = new Composite(viewGroup, SWT.None);
     autoCloseTabsContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0, 0, 2, false));
@@ -160,6 +154,8 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
       @Override
       public void widgetSelected(SelectionEvent e) {
         fAutoCloseTabsSpinner.setEnabled(fAutoCloseTabsCheck.getSelection());
+        fAlwaysReuseFeedView.setEnabled(!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1);
+        fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
       }
     });
 
@@ -168,11 +164,19 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fAutoCloseTabsSpinner.setMaximum(100);
     fAutoCloseTabsSpinner.setSelection(fEclipseScope.getInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD));
     fAutoCloseTabsSpinner.setEnabled(fAutoCloseTabsCheck.getSelection());
+    fAutoCloseTabsSpinner.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        fAlwaysReuseFeedView.setEnabled(!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1);
+        fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
+      }
+    });
 
     label = new Label(autoCloseTabsContainer, SWT.None);
-    label.setText(fAutoCloseTabsSpinner.getSelection() == 1 ? " tab" : " tabs");
+    label.setText(" tabs");
 
-    fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && fUseMultipleTabsCheck.getSelection());
+    fAlwaysReuseFeedView.setEnabled(!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1);
+    fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
   }
 
   private void createTrayOptions(Composite container) {
@@ -218,7 +222,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fUseInternalBrowser.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && fUseMultipleTabsCheck.getSelection());
+        fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
         if (Application.IS_WINDOWS)
           fEnableJavaScriptCheck.setEnabled(fUseInternalBrowser.getSelection());
       }
@@ -339,6 +343,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     if (Application.IS_WINDOWS)
       fEnableJavaScriptCheck.setEnabled(fUseInternalBrowser.getSelection());
 
-    fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && fUseMultipleTabsCheck.getSelection());
+    fAlwaysReuseFeedView.setEnabled(!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1);
+    fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
   }
 }
