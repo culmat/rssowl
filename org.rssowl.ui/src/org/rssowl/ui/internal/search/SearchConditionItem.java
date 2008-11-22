@@ -63,6 +63,7 @@ import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DAOService;
 import org.rssowl.core.util.Pair;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
@@ -224,7 +225,7 @@ public class SearchConditionItem extends Composite {
   private void createSpecifierCombo() {
     Combo specifierCombo = new Combo(this, SWT.BORDER | SWT.READ_ONLY);
     specifierCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
-    ((GridData) specifierCombo.getLayoutData()).widthHint = 80;
+    ((GridData) specifierCombo.getLayoutData()).widthHint = Application.IS_MAC ? 150 : 80;
     specifierCombo.setVisibleItemCount(100);
 
     fSpecifierViewer = new ComboViewer(specifierCombo);
