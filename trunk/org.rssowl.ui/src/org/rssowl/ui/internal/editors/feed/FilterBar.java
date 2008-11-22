@@ -65,6 +65,7 @@ import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.TaskAdapter;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.SearchMarkDialog;
@@ -209,7 +210,7 @@ public class FilterBar {
   /* Quick Search */
   private void createQuickSearch(Composite parent) {
     Composite searchContainer = new Composite(parent, SWT.NONE);
-    searchContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0, 0, 0, false));
+    searchContainer.setLayout(LayoutUtils.createGridLayout(Application.IS_MAC ? 2 : 3, 0, 0, 0, 0, false));
     ((GridLayout) searchContainer.getLayout()).marginTop = 1;
     searchContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
     ((GridData) searchContainer.getLayoutData()).widthHint = 180;
@@ -319,7 +320,7 @@ public class FilterBar {
     manager.createControl(searchContainer);
 
     /* Input for the Search */
-    fSearchInput = new Text(searchContainer, SWT.BORDER | SWT.SINGLE | SWT.SEARCH);
+    fSearchInput = new Text(searchContainer, SWT.BORDER | SWT.SINGLE | SWT.SEARCH | SWT.CANCEL);
     fSearchInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     fSearchInput.setMessage(fFeedView.getFilter().getSearchTarget().getName());
 
@@ -386,29 +387,31 @@ public class FilterBar {
     });
 
     /* Clear Button */
-    ToolBar toolBar = new ToolBar(searchContainer, SWT.FLAT | SWT.HORIZONTAL);
-    fFilterToolBar = new ToolBarManager(toolBar);
-    fFilterToolBar.getControl().setBackground(parent.getBackground());
-    fFilterToolBar.getControl().setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
+    if (!Application.IS_MAC) {
+      ToolBar toolBar = new ToolBar(searchContainer, SWT.FLAT | SWT.HORIZONTAL);
+      fFilterToolBar = new ToolBarManager(toolBar);
+      fFilterToolBar.getControl().setBackground(parent.getBackground());
+      fFilterToolBar.getControl().setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
 
-    /* Initially Hide */
-    ((GridData) toolBar.getLayoutData()).exclude = true;
-    toolBar.setVisible(false);
+      /* Initially Hide */
+      ((GridData) toolBar.getLayoutData()).exclude = true;
+      toolBar.setVisible(false);
 
-    IAction clearTextAction = new Action("", IAction.AS_PUSH_BUTTON) {//$NON-NLS-1$
-      @Override
-      public void run() {
-        clearQuickSearch(true);
-      }
-    };
+      IAction clearTextAction = new Action("", IAction.AS_PUSH_BUTTON) {//$NON-NLS-1$
+        @Override
+        public void run() {
+          clearQuickSearch(true);
+        }
+      };
 
-    clearTextAction.setToolTipText("Clear");
-    clearTextAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/clear.gif")); //$NON-NLS-1$
+      clearTextAction.setToolTipText("Clear");
+      clearTextAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/clear.gif")); //$NON-NLS-1$
 
-    fFilterToolBar.add(clearTextAction);
+      fFilterToolBar.add(clearTextAction);
 
-    fFilterToolBar.update(false);
-    fFilterToolBar.getControl().setVisible(false);
+      fFilterToolBar.update(false);
+      fFilterToolBar.getControl().setVisible(false);
+    }
   }
 
   void setClearBarVisible(boolean visible) {
