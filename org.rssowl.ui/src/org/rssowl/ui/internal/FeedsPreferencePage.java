@@ -259,7 +259,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     /* Mark Read on changing displayed Feed */
     fMarkReadOnChange = new Button(group, SWT.CHECK);
-    fMarkReadOnChange.setText("Mark displayed news as read when feed changes");
+    fMarkReadOnChange.setText("Mark displayed news as read when switching feeds");
     fMarkReadOnChange.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_READ_ON_CHANGE));
 
     /* Mark Read on closing the Feed Tab */

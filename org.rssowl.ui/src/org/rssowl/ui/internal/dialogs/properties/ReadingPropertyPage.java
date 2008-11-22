@@ -149,7 +149,7 @@ public class ReadingPropertyPage implements IEntityPropertyPage {
 
     /* Mark Read on changing displayed Feed */
     fMarkReadOnChange = new Button(container, SWT.CHECK);
-    fMarkReadOnChange.setText("Mark displayed news as read when feed changes");
+    fMarkReadOnChange.setText("Mark displayed news as read when switching feeds");
     fMarkReadOnChange.setSelection(fPrefMarkReadOnFeedChange);
 
     /* Mark Read on closing Feed Tab */
