@@ -66,6 +66,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.progress.WorkbenchJob;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -73,8 +74,7 @@ import org.rssowl.ui.internal.views.explorer.BookMarkFilter.SearchTarget;
 
 /**
  * A simple control that provides a text widget. The contents of the text widget
- * are used to drive a <code>PatternFilter</code> that is part of a
- * TreeViewer.
+ * are used to drive a <code>PatternFilter</code> that is part of a TreeViewer.
  *
  * @author bpasero
  */
@@ -149,7 +149,7 @@ class BookMarkSearchbar extends Composite {
 
     /* Container for Filter Controls */
     fFilterComposite = new Composite(this, SWT.NONE);
-    GridLayout filterLayout = new GridLayout(3, false);
+    GridLayout filterLayout = new GridLayout(Application.IS_MAC ? 2 : 3, false);
     filterLayout.marginHeight = 0;
     filterLayout.marginWidth = 0;
     filterLayout.horizontalSpacing = 3;
@@ -163,20 +163,25 @@ class BookMarkSearchbar extends Composite {
     fFilterComposite.setBackground(parent.getBackground());
 
     /* Set height as required */
-    int prefContainerHeight = fFilterComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
-    int prefToolbarHeight = fFilterToolBar.getControl().computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
-    if (prefToolbarHeight >= prefContainerHeight)
-      ((GridData) fFilterComposite.getLayoutData()).heightHint = prefToolbarHeight;
+    if (fFilterToolBar != null) {
+      int prefContainerHeight = fFilterComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+      int prefToolbarHeight = fFilterToolBar.getControl().computeSize(SWT.DEFAULT, SWT.DEFAULT).y;
+      if (prefToolbarHeight >= prefContainerHeight)
+        ((GridData) fFilterComposite.getLayoutData()).heightHint = prefToolbarHeight;
+    }
   }
 
   /* Create Label, Input Field and ToolBar */
   private Composite createFilterControls(Composite parent) {
     createFilterTarget(parent);
     createFilterText(parent);
-    createClearText(parent);
+    if (!Application.IS_MAC)
+      createClearText(parent);
 
-    fFilterToolBar.update(false);
-    fFilterToolBar.getControl().setVisible(false);
+    if (fFilterToolBar != null) {
+      fFilterToolBar.update(false);
+      fFilterToolBar.getControl().setVisible(false);
+    }
     return parent;
   }
 
@@ -254,7 +259,7 @@ class BookMarkSearchbar extends Composite {
 
   /* Input Field for typing into the Filter */
   private void createFilterText(Composite parent) {
-    fFilterText = new Text(parent, SWT.SINGLE | SWT.BORDER | SWT.SEARCH);
+    fFilterText = new Text(parent, SWT.SINGLE | SWT.BORDER | SWT.SEARCH | SWT.CANCEL);
     fFilterText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
     /* Set Message */
