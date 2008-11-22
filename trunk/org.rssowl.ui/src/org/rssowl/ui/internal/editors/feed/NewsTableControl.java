@@ -542,6 +542,13 @@ public class NewsTableControl implements IFeedViewPart {
       }
     });
 
+    /* Perform Action on Mouse-Up */
+    fCustomTree.getControl().addListener(SWT.MouseUp, new Listener() {
+      public void handleEvent(Event event) {
+        onMouseUp(event);
+      }
+    });
+
     /* Update Cursor on Mouse-Move */
     fCustomTree.getControl().addListener(SWT.MouseMove, new Listener() {
       public void handleEvent(Event event) {
@@ -667,6 +674,24 @@ public class NewsTableControl implements IFeedViewPart {
     else if (selectedNews.getState() == INews.State.READ) {
       fNewsStateTracker.cancel();
       fInstantMarkUnreadTracker.cancel();
+    }
+  }
+
+  private void onMouseUp(Event event) {
+
+    /* Middle Mouse Button pressed */
+    if (event.button == 2) {
+      Point p = new Point(event.x, event.y);
+      TreeItem item = fCustomTree.getControl().getItem(p);
+
+      /* Problem - return */
+      if (item == null || item.isDisposed())
+        return;
+
+      /* Open News */
+      Object element = item.getData();
+      if (element instanceof INews)
+        new OpenInBrowserAction(new StructuredSelection(element)).run();
     }
   }
 
