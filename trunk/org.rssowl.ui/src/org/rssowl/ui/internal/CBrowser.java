@@ -107,8 +107,12 @@ public class CBrowser {
     hookListeners();
 
     /* Add custom Context Menu on OS where this is not supported */
-    if (Application.IS_LINUX || fgMozillaAvailable)
+    if (Application.IS_LINUX || (useMozilla()))
       hookMenu();
+  }
+
+  private boolean useMozilla() {
+    return Application.IS_WINDOWS && fgMozillaAvailable;
   }
 
   /**
@@ -126,7 +130,7 @@ public class CBrowser {
     Browser browser = null;
 
     /* Properly configure Proxy for Firefox/XULRunner if required */
-    if (Application.IS_LINUX || (Application.IS_WINDOWS && fgMozillaAvailable)) {
+    if (Application.IS_LINUX || (useMozilla())) {
       String proxyHost = fEclipsePreferences.getString(DefaultPreferences.ECLIPSE_PROXY_HOST);
       String proxyPort = fEclipsePreferences.getString(DefaultPreferences.ECLIPSE_PROXY_PORT);
       if (useProxy() && StringUtils.isSet(proxyHost) && StringUtils.isSet(proxyPort)) {
@@ -139,7 +143,7 @@ public class CBrowser {
     }
 
     /* Try Mozilla over IE on Windows */
-    if (Application.IS_WINDOWS && fgMozillaAvailable) {
+    if (useMozilla()) {
       try {
         browser = new Browser(parent, style | SWT.MOZILLA);
       } catch (SWTError e) {
@@ -301,7 +305,7 @@ public class CBrowser {
   }
 
   /* Special handling of opened websites on Windows (IE and Mozilla) */
-  private OpenWindowListener getOpenWindowListenerForWindows() {
+  private OpenWindowListener getOpenWindowListener() {
     return new OpenWindowListener() {
       public void open(WindowEvent event) {
 
@@ -309,7 +313,7 @@ public class CBrowser {
         if (useExternalBrowser()) {
 
           /* Avoid IE being loaded from SWT on Windows */
-          final Browser tempBrowser = new Browser(fBrowser.getShell(), fgMozillaAvailable ? SWT.MOZILLA : SWT.NONE);
+          final Browser tempBrowser = new Browser(fBrowser.getShell(), useMozilla() ? SWT.MOZILLA : SWT.NONE);
           tempBrowser.setVisible(false);
           event.browser = tempBrowser;
           tempBrowser.getDisplay().timerExec(BROWSER_URL_DELAY, new Runnable() {
@@ -335,7 +339,7 @@ public class CBrowser {
 
         /* Open internal Browser in same Browser */
         else {
-          final Browser tempBrowser = new Browser(fBrowser.getShell(), fgMozillaAvailable ? SWT.MOZILLA : SWT.NONE);
+          final Browser tempBrowser = new Browser(fBrowser.getShell(), useMozilla() ? SWT.MOZILLA : SWT.NONE);
           tempBrowser.setVisible(false);
           event.browser = tempBrowser;
           tempBrowser.getDisplay().timerExec(BROWSER_URL_DELAY, new Runnable() {
@@ -349,23 +353,6 @@ public class CBrowser {
             }
           });
         }
-      }
-    };
-  }
-
-  /* Default handling of opened websites on OS other than Windows or Non-IE */
-  private OpenWindowListener getOpenWindowListener() {
-    return new OpenWindowListener() {
-      public void open(WindowEvent event) {
-
-        /* Do not handle when external Browser is being used and it can be properly handled by the OS */
-        if (useExternalBrowser() && !event.required)
-          return;
-
-        /* Open Browser in new Tab */
-        WebBrowserView browserView = BrowserUtils.openLinkInternal(URIUtils.ABOUT_BLANK);
-        if (browserView != null)
-          event.browser = browserView.getBrowser().getControl();
       }
     };
   }
@@ -394,7 +381,7 @@ public class CBrowser {
   private void hookListeners() {
 
     /* Listen to Open-Window-Changes */
-    fBrowser.addOpenWindowListener(Application.IS_WINDOWS ? getOpenWindowListenerForWindows() : getOpenWindowListener());
+    fBrowser.addOpenWindowListener(getOpenWindowListener());
 
     /* Listen to Location-Changes */
     fBrowser.addLocationListener(new LocationListener() {
@@ -432,15 +419,6 @@ public class CBrowser {
 
         /* Feature not enabled */
         if (!useExternalBrowser())
-          return;
-
-        /*
-         * Bug on Mac: Safari puts out links from images as event.location
-         * resulting in RSSOwl to open a browser although its not necessary
-         * Workaround is to disable this feature on Mac until its fixed. (see
-         * Bug #1068304).
-         */
-        if (Application.IS_MAC)
           return;
 
         /* Only proceed if navigation should not be blocked */
