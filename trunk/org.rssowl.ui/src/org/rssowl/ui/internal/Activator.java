@@ -152,7 +152,9 @@ public class Activator extends AbstractUIPlugin {
   private void startCore() {
 
     /* Dialog to show progress */
-    final ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell(Display.getDefault())) {
+    Display display = Display.getDefault();
+    Display.setAppName("RSSOwl");
+    final ProgressMonitorDialog dialog = new ProgressMonitorDialog(new Shell(display)) {
       @Override
       protected Point getInitialLocation(Point initialSize) {
         Rectangle displayBounds = getParentShell().getDisplay().getPrimaryMonitor().getBounds();
