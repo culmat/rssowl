@@ -239,7 +239,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     /* Mark Read after Millis */
     fMarkReadStateCheck = new Button(markReadAfterContainer, SWT.CHECK);
-    fMarkReadStateCheck.setText("Mark news as read after ");
+    fMarkReadStateCheck.setText("Mark selected news as read after ");
     fMarkReadStateCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_READ_STATE));
     fMarkReadStateCheck.addSelectionListener(new SelectionAdapter() {
       @Override

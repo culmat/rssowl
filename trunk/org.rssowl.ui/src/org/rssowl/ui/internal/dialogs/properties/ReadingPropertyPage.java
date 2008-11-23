@@ -129,7 +129,7 @@ public class ReadingPropertyPage implements IEntityPropertyPage {
 
     /* Mark Read after Millis */
     fMarkReadStateCheck = new Button(markReadAfterContainer, SWT.CHECK);
-    fMarkReadStateCheck.setText("Mark news as read after ");
+    fMarkReadStateCheck.setText("Mark selected news as read after ");
     fMarkReadStateCheck.setSelection(fPrefMarkReadState);
     fMarkReadStateCheck.addSelectionListener(new SelectionAdapter() {
       @Override
