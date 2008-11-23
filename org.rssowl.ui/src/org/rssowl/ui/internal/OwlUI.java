@@ -1124,10 +1124,10 @@ public class OwlUI {
    *
    * @param page
    * @param selection
-   * @param activate
+   * @param forceActivate
    */
-  public static void openInFeedView(IWorkbenchPage page, IStructuredSelection selection, boolean activate) {
-    openInFeedView(page, selection, activate, null);
+  public static void openInFeedView(IWorkbenchPage page, IStructuredSelection selection, boolean forceActivate) {
+    openInFeedView(page, selection, forceActivate, null);
   }
 
   /**
@@ -1136,11 +1136,11 @@ public class OwlUI {
    * @param page
    * @param selection
    * @param perform
-   * @param activate
+   * @param forceActivate
    */
-  public static void openInFeedView(IWorkbenchPage page, IStructuredSelection selection, boolean activate, PerformAfterInputSet perform) {
+  public static void openInFeedView(IWorkbenchPage page, IStructuredSelection selection, boolean forceActivate, PerformAfterInputSet perform) {
     List<?> list = selection.toList();
-    boolean activateEditor = activate || OpenStrategy.activateOnOpen();
+    boolean activateEditor = forceActivate || OpenStrategy.activateOnOpen();
     int openedEditors = 0;
     int maxOpenEditors = EditorUtils.getOpenEditorLimit();
     boolean reuseFeedView = Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW);
