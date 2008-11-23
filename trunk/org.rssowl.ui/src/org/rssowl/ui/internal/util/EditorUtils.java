@@ -24,12 +24,12 @@
 
 package org.rssowl.ui.internal.util;
 
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
-import org.osgi.service.prefs.Preferences;
+import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.OwlUI;
@@ -67,19 +67,12 @@ public class EditorUtils {
    * @return the number of editors able to be visible at the same time.
    */
   public static int getOpenEditorLimit() {
-    Preferences instanceNode = Platform.getPreferencesService().getRootNode().node("instance");
-    if (instanceNode != null) {
-      Preferences workbenchNode = instanceNode.node("org.eclipse.ui.workbench");
-      if (workbenchNode != null) {
-        boolean isLimited = workbenchNode.getBoolean("REUSE_OPEN_EDITORS_BOOLEAN", true);
-        if (!isLimited)
-          return Integer.MAX_VALUE;
+    IPreferenceScope preferences = Owl.getPreferenceService().getEclipseScope();
+    boolean isLimited= preferences.getBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS);
+    if (!isLimited)
+      return Integer.MAX_VALUE;
 
-        return workbenchNode.getInt("REUSE_OPEN_EDITORS", 1);
-      }
-    }
-
-    return 1;
+    return preferences.getInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD);
   }
 
   /**
