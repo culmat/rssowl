@@ -141,6 +141,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
   /* Delay in ms to Mark *new* News to *unread* on Part-Deactivation */
   private static final int HANDLE_NEWS_SEEN_DELAY = 100;
 
+  /* Millies before news seen are handled */
+  private static final int HANDLE_NEWS_SEEN_BLOCK_DELAY = 800;
+
   /* Millies before the next clean up is allowed to run again */
   private static final int CLEAN_UP_BLOCK_DELAY = 1000;
 
@@ -228,7 +231,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private Label fBrowserSep;
   private final INewsDAO fNewsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
   private boolean fIsDisposed;
-  private AtomicLong fLastCleanUpRun= new AtomicLong();
+  private AtomicLong fLastCleanUpRun = new AtomicLong();
 
   /*
    * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
@@ -274,7 +277,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   }
 
   private boolean justOpened() {
-    return System.currentTimeMillis() - fOpenTime < HANDLE_NEWS_SEEN_DELAY;
+    return System.currentTimeMillis() - fOpenTime < HANDLE_NEWS_SEEN_BLOCK_DELAY;
   }
 
   private void registerListeners() {
