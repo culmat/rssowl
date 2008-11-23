@@ -118,9 +118,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The FeedView is an instance of <code>EditorPart</code> capable of
- * displaying News in a Table-Viewer and Browser-Viewer. It offers controls to
- * Filter and Group them.
+ * The FeedView is an instance of <code>EditorPart</code> capable of displaying
+ * News in a Table-Viewer and Browser-Viewer. It offers controls to Filter and
+ * Group them.
  * <p>
  * TODO Think about storing settings in a central place in memory and flush them
  * to the DB on shutdown. Alternative: Update settings while action is invoked
@@ -139,6 +139,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
   /* Delay in ms to Mark *new* News to *unread* on Part-Deactivation */
   private static final int HANDLE_NEWS_SEEN_DELAY = 100;
+
+  /* The last visible Feedview */
+  private static FeedView fgLastVisibleFeedView = null;
 
   /** ID of this EditorPart */
   public static final String ID = "org.rssowl.ui.FeedView"; //$NON-NLS-1$
@@ -220,6 +223,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private ImageDescriptor fTitleImageDescriptor;
   private Label fBrowserSep;
   private final INewsDAO fNewsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
+  private boolean fIsDisposed;
 
   /*
    * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
@@ -264,14 +268,23 @@ public class FeedView extends EditorPart implements IReusableEditor {
     registerListeners();
   }
 
+  private boolean justOpened() {
+    return System.currentTimeMillis() - fOpenTime < HANDLE_NEWS_SEEN_DELAY;
+  }
+
   private void registerListeners() {
     fPartListener = new IPartListener2() {
 
       /* Mark *new* News as *unread* or *read* */
       public void partHidden(IWorkbenchPartReference partRef) {
+
+        /* Return early if event is too close after opening the feed */
+        if (justOpened())
+          return;
+
+        /* Remember this feedview as being the last visible one */
         if (FeedView.this.equals(partRef.getPart(false)))
-          if (System.currentTimeMillis() - fOpenTime > HANDLE_NEWS_SEEN_DELAY)
-            notifyUIEvent(UIEvent.FEED_CHANGE);
+          fgLastVisibleFeedView = FeedView.this;
       }
 
       /* Hook into Global Actions for this Editor */
@@ -279,7 +292,17 @@ public class FeedView extends EditorPart implements IReusableEditor {
         if (FeedView.this.equals(partRef.getPart(false))) {
           setGlobalActions();
           OwlUI.updateWindowTitle(fInput != null ? new IMark[] { fInput.getMark() } : null);
+
+          /* Notify last visible feedview about change */
+          if (fgLastVisibleFeedView != null && fgLastVisibleFeedView != FeedView.this && !fgLastVisibleFeedView.fIsDisposed) {
+            fgLastVisibleFeedView.notifyUIEvent(UIEvent.FEED_CHANGE);
+            fgLastVisibleFeedView = null;
+          }
         }
+
+        /* Any other editor was brought to top, reset last visible feedview */
+        else if (!ID.equals(partRef.getId()))
+          fgLastVisibleFeedView = null;
       }
 
       public void partClosed(IWorkbenchPartReference partRef) {
@@ -288,8 +311,11 @@ public class FeedView extends EditorPart implements IReusableEditor {
         if (editors.length == 0 && equalsThis)
           OwlUI.updateWindowTitle(null);
 
-        if (equalsThis)
+        if (equalsThis) {
+          if (fgLastVisibleFeedView == FeedView.this) //Avoids duplicate UI Event handling
+            fgLastVisibleFeedView = null;
           notifyUIEvent(UIEvent.TAB_CLOSE);
+        }
       }
 
       public void partDeactivated(IWorkbenchPartReference partRef) {}
@@ -661,9 +687,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
   }
 
   /**
-   * Sets the given <code>IStructuredSelection</code> to the News-Table
-   * showing in the FeedView. Will ignore the selection, if the Table is
-   * minimized.
+   * Sets the given <code>IStructuredSelection</code> to the News-Table showing
+   * in the FeedView. Will ignore the selection, if the Table is minimized.
    *
    * @param selection The Selection to show in the News-Table.
    */
@@ -812,10 +837,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
     if (news == null || !fInput.exists())
       return;
 
-    /* Input could have been deleted */
-    if (!fInput.exists())
-      return;
-
     final boolean markReadOnFeedChange = inputPreferences.getBoolean(DefaultPreferences.MARK_READ_ON_CHANGE);
     final boolean markReadOnTabClose = inputPreferences.getBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE);
     final boolean markReadOnMinimize = inputPreferences.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE);
@@ -841,10 +862,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
     /* Handle seen News: Feed Change (also closing the feed view), Closing or Minimize Event */
     else if (event == UIEvent.FEED_CHANGE || event == UIEvent.MINIMIZE || event == UIEvent.TAB_CLOSE) {
 
-      /* Return in this case because FEED_CHANGE is also called when closing a Tab */
-      if (event == UIEvent.TAB_CLOSE && !markReadOnTabClose)
-        return;
-
       /*
        * TODO This is a workaround to avoid potential race-conditions when closing a Tab. The problem
        * is that both FEED_CHANGE (due to hiding the tab) and TAB_CLOSE (due to actually closing
@@ -853,7 +870,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
        */
       int delay = HANDLE_NEWS_SEEN_DELAY;
       if (event == UIEvent.TAB_CLOSE)
-        delay += 50;
+        delay += 100;
 
       JobRunner.runInBackgroundThread(delay, new Runnable() {
         public void run() {
@@ -1053,6 +1070,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     fNewsTableControl.dispose();
     fNewsBrowserControl.dispose();
     fResourceManager.dispose();
+    fIsDisposed = true;
   }
 
   private void unregisterListeners() {
@@ -1433,17 +1451,17 @@ public class FeedView extends EditorPart implements IReusableEditor {
    * Navigate to the next/previous read or unread News respecting the News-Items
    * that are displayed in the NewsTableControl.
    *
-   * @param respectSelection If <code>TRUE</code>, respect the current
-   * selected Item from the Tree as starting-node for the navigation, or
+   * @param respectSelection If <code>TRUE</code>, respect the current selected
+   * Item from the Tree as starting-node for the navigation, or
    * <code>FALSE</code> otherwise.
-   * @param newsScoped If <code>TRUE</code>, the navigation looks for News
-   * and for Feeds if <code>FALSE</code>.
+   * @param newsScoped If <code>TRUE</code>, the navigation looks for News and
+   * for Feeds if <code>FALSE</code>.
    * @param next If <code>TRUE</code>, move to the next item, or previous if
    * <code>FALSE</code>.
-   * @param unread If <code>TRUE</code>, only move to unread items, or ignore
-   * if <code>FALSE</code>.
-   * @return Returns <code>TRUE</code> in case navigation found a valid item,
-   * or <code>FALSE</code> otherwise.
+   * @param unread If <code>TRUE</code>, only move to unread items, or ignore if
+   * <code>FALSE</code>.
+   * @return Returns <code>TRUE</code> in case navigation found a valid item, or
+   * <code>FALSE</code> otherwise.
    */
   public boolean navigate(boolean respectSelection, boolean newsScoped, boolean next, boolean unread) {
 
