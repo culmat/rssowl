@@ -25,14 +25,12 @@
 package org.rssowl.ui.internal.notifier;
 
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -40,11 +38,9 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
-import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.editors.feed.FeedView;
-import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
@@ -173,15 +169,8 @@ public class NewsNotificationItem extends NotificationItem {
       }
 
       /* Otherwise Open */
-      else {
-        boolean activateEditor = OpenStrategy.activateOnOpen();
-        FeedViewInput input = new FeedViewInput(bookMark, PerformAfterInputSet.selectNews(fNewsReference));
-        try {
-          OwlUI.getPage().openEditor(input, FeedView.ID, activateEditor);
-        } catch (PartInitException ex) {
-          Activator.getDefault().getLog().log(ex.getStatus());
-        }
-      }
+      else
+        OwlUI.openInFeedView(page, new StructuredSelection(bookMark), false, PerformAfterInputSet.selectNews(fNewsReference));
     }
   }
 

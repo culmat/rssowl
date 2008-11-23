@@ -28,10 +28,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jface.util.OpenStrategy;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
@@ -42,9 +41,6 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.BookMarkAdapter;
 import org.rssowl.core.persist.event.BookMarkEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.ui.internal.editors.feed.FeedView;
-import org.rssowl.ui.internal.editors.feed.FeedViewInput;
-import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.JobRunner;
 
 import java.util.ArrayList;
@@ -221,21 +217,11 @@ public class FeedReloadService {
     if (!newsmarksToOpenOnStartup.isEmpty()) {
       JobRunner.runInUIThread(null, new Runnable() {
         public void run() {
-          boolean activateEditor = OpenStrategy.activateOnOpen();
-          int openEditorLimit = EditorUtils.getOpenEditorLimit();
           IWorkbenchWindow wWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
           IWorkbenchPage page = wWindow != null ? wWindow.getActivePage() : null;
 
-          if (page != null) {
-            for (int i = 0; i < newsmarksToOpenOnStartup.size() && i < openEditorLimit; i++) {
-              try {
-                INewsMark newsMarkToOpen = newsmarksToOpenOnStartup.get(i);
-                page.openEditor(new FeedViewInput(newsMarkToOpen), FeedView.ID, activateEditor);
-              } catch (PartInitException e) {
-                Activator.getDefault().getLog().log(e.getStatus());
-              }
-            }
-          }
+          if (page != null)
+            OwlUI.openInFeedView(page, new StructuredSelection(newsmarksToOpenOnStartup));
         }
       });
     }

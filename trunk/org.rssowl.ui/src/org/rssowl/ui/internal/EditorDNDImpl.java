@@ -25,19 +25,12 @@
 package org.rssowl.ui.internal;
 
 import org.eclipse.jface.util.LocalSelectionTransfer;
-import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DropTargetAdapter;
 import org.eclipse.swt.dnd.DropTargetEvent;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 import org.rssowl.core.persist.IMark;
-import org.rssowl.core.persist.INewsMark;
-import org.rssowl.ui.internal.editors.feed.FeedView;
-import org.rssowl.ui.internal.editors.feed.FeedViewInput;
-import org.rssowl.ui.internal.util.EditorUtils;
 
 import java.util.List;
 
@@ -61,7 +54,7 @@ public class EditorDNDImpl extends DropTargetAdapter {
 
       /* Check that Selection only contains IMarks */
       if (selection instanceof IStructuredSelection) {
-        List< ? > selectedObjects = ((IStructuredSelection) selection).toList();
+        List<?> selectedObjects = ((IStructuredSelection) selection).toList();
         for (Object selectedObject : selectedObjects) {
           if (!(selectedObject instanceof IMark))
             return;
@@ -82,35 +75,8 @@ public class EditorDNDImpl extends DropTargetAdapter {
     /* Local Selection Transfer */
     if (LocalSelectionTransfer.getTransfer().isSupportedType(event.currentDataType)) {
       ISelection selection = LocalSelectionTransfer.getTransfer().getSelection();
-      if (selection instanceof IStructuredSelection) {
-        List< ? > selectedObjects = ((IStructuredSelection) selection).toList();
-        drop(selectedObjects);
-      }
-    }
-  }
-
-  private void drop(List< ? > objects) {
-    int openedEditors = 0;
-    int maxOpenEditors = EditorUtils.getOpenEditorLimit();
-    boolean activateEditor = OpenStrategy.activateOnOpen();
-
-    /* For each dropped Object */
-    for (int i = 0; i < objects.size() && openedEditors < maxOpenEditors; i++) {
-      Object obj = objects.get(i);
-
-      /* This is an INewsMark being dropped - display it */
-      if (obj instanceof INewsMark) {
-        INewsMark mark = ((INewsMark) obj);
-        try {
-          IWorkbenchPage page = OwlUI.getPageAtCursor();
-          if (page != null) {
-            page.openEditor(new FeedViewInput(mark), FeedView.ID, activateEditor);
-            openedEditors++;
-          }
-        } catch (PartInitException e) {
-          Activator.getDefault().getLog().log(e.getStatus());
-        }
-      }
+      if (selection instanceof IStructuredSelection)
+        OwlUI.openInFeedView(OwlUI.getPageAtCursor(), (IStructuredSelection) selection);
     }
   }
 }

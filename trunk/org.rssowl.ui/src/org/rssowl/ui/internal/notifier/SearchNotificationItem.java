@@ -24,18 +24,15 @@
 
 package org.rssowl.ui.internal.notifier;
 
-import org.eclipse.jface.util.OpenStrategy;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchMark;
-import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.FeedView;
-import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.util.EditorUtils;
 
 import java.util.EnumSet;
@@ -86,15 +83,8 @@ public class SearchNotificationItem extends NotificationItem {
       }
 
       /* Otherwise Open */
-      else {
-        boolean activateEditor = OpenStrategy.activateOnOpen();
-        FeedViewInput input = new FeedViewInput(fSearchmark);
-        try {
-          OwlUI.getPage().openEditor(input, FeedView.ID, activateEditor);
-        } catch (PartInitException ex) {
-          Activator.getDefault().getLog().log(ex.getStatus());
-        }
-      }
+      else
+        OwlUI.openInFeedView(page, new StructuredSelection(fSearchmark));
     }
   }
 

@@ -32,12 +32,10 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
-import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
@@ -50,8 +48,8 @@ import java.util.List;
 
 /**
  * The <code>OpenNewsAction</code> will open a given Selection of
- * <code>INews</code> in the <code>FeedView</code> opening the related
- * BookMark and adjusting the selection.
+ * <code>INews</code> in the <code>FeedView</code> opening the related BookMark
+ * and adjusting the selection.
  *
  * @author bpasero
  */
@@ -104,10 +102,9 @@ public class OpenNewsAction extends Action {
 
     int openedEditors = 0;
     int maxOpenEditors = EditorUtils.getOpenEditorLimit();
-    IEditorPart lastOpenedEditor = null;
 
     /* Convert selection to List of News (1 per Feed) */
-    List< ? > list = fSelection.toList();
+    List<?> list = fSelection.toList();
     List<FeedLinkReference> handledFeeds = new ArrayList<FeedLinkReference>(list.size());
     List<INews> newsToOpen = new ArrayList<INews>(list.size());
     for (Object selection : list) {
@@ -141,32 +138,23 @@ public class OpenNewsAction extends Action {
 
         /* Open this Bookmark */
         FeedViewInput fvInput = new FeedViewInput(bookmark, perform);
-        try {
-          FeedView feedview = null;
+        FeedView feedview = null;
 
-          /* First check if input already shown */
-          IEditorPart existingEditor = page.findEditor(fvInput);
-          if (existingEditor != null && existingEditor instanceof FeedView) {
-            feedview = (FeedView) existingEditor;
+        /* First check if input already shown */
+        IEditorPart existingEditor = page.findEditor(fvInput);
+        if (existingEditor != null && existingEditor instanceof FeedView) {
+          feedview = (FeedView) existingEditor;
 
-            /* Set Selection */
-            feedview.setSelection(new StructuredSelection(news));
-          }
-
-          /* Otherwise open the Input in a new Editor */
-          else
-            feedview = (FeedView) page.openEditor(fvInput, FeedView.ID, true);
-
-          openedEditors++;
-          lastOpenedEditor = feedview;
-        } catch (PartInitException e) {
-          Activator.getDefault().getLog().log(e.getStatus());
+          /* Set Selection */
+          feedview.setSelection(new StructuredSelection(news));
         }
+
+        /* Otherwise open the Input in a new Editor */
+        else
+          OwlUI.openInFeedView(page, new StructuredSelection(bookmark), true, perform);
+
+        openedEditors++;
       }
     }
-
-    /* Activate the last opened editor */
-    if (lastOpenedEditor != null)
-      page.activate(lastOpenedEditor);
   }
 }
