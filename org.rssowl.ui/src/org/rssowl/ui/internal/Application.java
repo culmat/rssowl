@@ -29,13 +29,12 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplication;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.util.OpenStrategy;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.ConnectionException;
@@ -44,8 +43,6 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.actions.NewBookMarkAction;
-import org.rssowl.ui.internal.editors.feed.FeedView;
-import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.util.JobRunner;
 
 import java.net.URI;
@@ -203,13 +200,8 @@ public class Application implements IApplication {
         /* Display selected Feed since its existing already */
         else {
           IWorkbenchPage page = OwlUI.getPage();
-          if (page != null) {
-            try {
-              page.openEditor(new FeedViewInput(existingBookMark), FeedView.ID, OpenStrategy.activateOnOpen());
-            } catch (PartInitException e) {
-              Activator.getDefault().getLog().log(e.getStatus());
-            }
-          }
+          if (page != null)
+            OwlUI.openInFeedView(page, new StructuredSelection(existingBookMark));
         }
       }
     });
