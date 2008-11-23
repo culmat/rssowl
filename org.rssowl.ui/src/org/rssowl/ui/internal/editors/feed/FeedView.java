@@ -116,6 +116,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * The FeedView is an instance of <code>EditorPart</code> capable of displaying
@@ -139,6 +140,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
   /* Delay in ms to Mark *new* News to *unread* on Part-Deactivation */
   private static final int HANDLE_NEWS_SEEN_DELAY = 100;
+
+  /* Millies before the next clean up is allowed to run again */
+  private static final int CLEAN_UP_BLOCK_DELAY = 1000;
 
   /* The last visible Feedview */
   private static FeedView fgLastVisibleFeedView = null;
@@ -224,6 +228,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private Label fBrowserSep;
   private final INewsDAO fNewsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
   private boolean fIsDisposed;
+  private AtomicLong fLastCleanUpRun= new AtomicLong();
 
   /*
    * @see org.eclipse.ui.part.EditorPart#doSave(org.eclipse.core.runtime.IProgressMonitor)
@@ -904,22 +909,31 @@ public class FeedView extends EditorPart implements IReusableEditor {
               newsToUpdate.add(newsItem);
           }
 
-          /* Force quick update on Feed-Change or Tab Close */
-          if ((event == UIEvent.FEED_CHANGE || event == UIEvent.TAB_CLOSE) && !newsToUpdate.isEmpty())
-            Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+          if (!newsToUpdate.isEmpty()) {
 
-          /* Support Undo */
-          if (!newsToUpdate.isEmpty())
+            /* Force quick update on Feed-Change or Tab Close */
+            if ((event == UIEvent.FEED_CHANGE || event == UIEvent.TAB_CLOSE))
+              Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+
+            /* Support Undo */
             UndoStack.getInstance().addOperation(new NewsStateOperation(newsToUpdate, markRead ? INews.State.READ : INews.State.UNREAD, true));
 
-          /* Perform Operation */
-          fNewsDao.setState(newsToUpdate, markRead ? INews.State.READ : INews.State.UNREAD, true, false);
+            /* Perform Operation */
+            fNewsDao.setState(newsToUpdate, markRead ? INews.State.READ : INews.State.UNREAD, true, false);
+          }
 
           /* Retention Strategy */
           if (inputMark instanceof IBookMark)
-            RetentionStrategy.process((IBookMark) inputMark, news);
+            performCleanUp((IBookMark) inputMark, news);
         }
       });
+    }
+  }
+
+  private void performCleanUp(IBookMark bookmark, Collection<INews> news) {
+    if (System.currentTimeMillis() - fLastCleanUpRun.get() > CLEAN_UP_BLOCK_DELAY) {
+      RetentionStrategy.process(bookmark, news);
+      fLastCleanUpRun.set(System.currentTimeMillis());
     }
   }
 
