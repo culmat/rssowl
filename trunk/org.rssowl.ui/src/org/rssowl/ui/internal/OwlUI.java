@@ -1132,6 +1132,10 @@ public class OwlUI {
           FeedView activeFeedView = OwlUI.getFirstActiveFeedView();
           if (activeFeedView != null) {
             activeFeedView.setInput(new FeedViewInput(mark));
+            if (activateEditor)
+              page.activate(activeFeedView);
+            else
+              page.bringToTop(activeFeedView);
             break;
           }
         }
