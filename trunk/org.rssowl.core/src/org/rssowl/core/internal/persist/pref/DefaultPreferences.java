@@ -331,6 +331,8 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putBoolean(FADE_NOTIFIER, true);
     defaultScope.putBoolean(CLOSE_NOTIFIER_ON_OPEN, true);
     defaultScope.putInteger(LIMIT_NOTIFICATION_SIZE, 5);
+    defaultScope.putBoolean(SHOW_NOTIFICATION_POPUP, true);
+    defaultScope.putBoolean(SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED, true);
     defaultScope.putBoolean(SEARCH_DIALOG_PREVIEW_VISIBLE, true);
     defaultScope.putInteger(AUTOCLOSE_NOTIFICATION_VALUE, 8);
     defaultScope.putBoolean(SHOW_TOOLBAR, true);
