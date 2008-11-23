@@ -80,6 +80,7 @@ import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
+import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
@@ -1115,8 +1116,31 @@ public class OwlUI {
    * @param selection
    */
   public static void openInFeedView(IWorkbenchPage page, IStructuredSelection selection) {
+    openInFeedView(page, selection, false);
+  }
+
+  /**
+   * Opens a selection of {@link INewsMark} inside the feed view.
+   *
+   * @param page
+   * @param selection
+   * @param activate
+   */
+  public static void openInFeedView(IWorkbenchPage page, IStructuredSelection selection, boolean activate) {
+    openInFeedView(page, selection, activate, null);
+  }
+
+  /**
+   * Opens a selection of {@link INewsMark} inside the feed view.
+   *
+   * @param page
+   * @param selection
+   * @param perform
+   * @param activate
+   */
+  public static void openInFeedView(IWorkbenchPage page, IStructuredSelection selection, boolean activate, PerformAfterInputSet perform) {
     List<?> list = selection.toList();
-    boolean activateEditor = OpenStrategy.activateOnOpen();
+    boolean activateEditor = activate || OpenStrategy.activateOnOpen();
     int openedEditors = 0;
     int maxOpenEditors = EditorUtils.getOpenEditorLimit();
     boolean reuseFeedView = Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW);
@@ -1126,12 +1150,13 @@ public class OwlUI {
       Object object = list.get(i);
       if (object instanceof INewsMark) {
         INewsMark mark = ((INewsMark) object);
+        FeedViewInput input = new FeedViewInput(mark, perform);
 
         /* Open in existing Feedview if set */
         if (reuseFeedView) {
           FeedView activeFeedView = OwlUI.getFirstActiveFeedView();
           if (activeFeedView != null) {
-            activeFeedView.setInput(new FeedViewInput(mark));
+            activeFeedView.setInput(input);
             if (activateEditor)
               page.activate(activeFeedView);
             else
@@ -1142,7 +1167,7 @@ public class OwlUI {
 
         /* Otherwise simply open */
         try {
-          page.openEditor(new FeedViewInput(mark), FeedView.ID, activateEditor);
+          page.openEditor(input, FeedView.ID, activateEditor);
           openedEditors++;
         } catch (PartInitException e) {
           Activator.getDefault().getLog().log(e.getStatus());

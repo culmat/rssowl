@@ -109,7 +109,6 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.reference.ModelReference;
-import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
@@ -125,7 +124,6 @@ import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.actions.RetargetActions;
 import org.rssowl.ui.internal.actions.SearchInTypeAction;
 import org.rssowl.ui.internal.dialogs.ManageSetsDialog;
-import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.EditorUtils;
@@ -1408,14 +1406,14 @@ public class BookMarkExplorer extends ViewPart {
    * Navigate to the next/previous read or unread Feed respecting the Marks that
    * are displayed in the Tree-Viewer.
    *
-   * @param newsScoped If <code>TRUE</code>, the navigation looks for News
-   * and for Feeds if <code>FALSE</code>.
+   * @param newsScoped If <code>TRUE</code>, the navigation looks for News and
+   * for Feeds if <code>FALSE</code>.
    * @param next If <code>TRUE</code>, move to the next item, or previous if
    * <code>FALSE</code>.
-   * @param unread If <code>TRUE</code>, only move to unread items, or ignore
-   * if <code>FALSE</code>.
-   * @return Returns <code>TRUE</code> in case navigation found a valid item,
-   * or <code>FALSE</code> otherwise.
+   * @param unread If <code>TRUE</code>, only move to unread items, or ignore if
+   * <code>FALSE</code>.
+   * @return Returns <code>TRUE</code> in case navigation found a valid item, or
+   * <code>FALSE</code> otherwise.
    */
   public boolean navigate(boolean newsScoped, boolean next, boolean unread) {
     Tree explorerTree = fViewer.getTree();
@@ -1452,22 +1450,17 @@ public class BookMarkExplorer extends ViewPart {
     INewsMark mark = (INewsMark) targetNode.getData();
 
     /* Set Selection to Mark */
-    ISelection selection = new StructuredSelection(mark);
+    IStructuredSelection selection = new StructuredSelection(mark);
     fViewer.setSelection(selection);
 
     /* Open in FeedView */
-    try {
-      PerformAfterInputSet perform = null;
-      if (newsScoped && unread)
-        perform = PerformAfterInputSet.SELECT_UNREAD_NEWS;
-      else if (newsScoped)
-        perform = PerformAfterInputSet.SELECT_FIRST_NEWS;
+    PerformAfterInputSet perform = null;
+    if (newsScoped && unread)
+      perform = PerformAfterInputSet.SELECT_UNREAD_NEWS;
+    else if (newsScoped)
+      perform = PerformAfterInputSet.SELECT_FIRST_NEWS;
 
-      IEditorPart feedview = fViewSite.getPage().openEditor(new FeedViewInput(mark, perform), FeedView.ID, true);
-      feedview.getSite().getPage().activate(feedview.getSite().getPart());
-    } catch (PartInitException e) {
-      Activator.getDefault().getLog().log(e.getStatus());
-    }
+    OwlUI.openInFeedView(fViewSite.getPage(), selection, true, perform);
   }
 
   private ITreeNode navigateInTree(Tree tree, boolean next, boolean unread) {
