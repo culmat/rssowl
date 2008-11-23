@@ -735,7 +735,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     }
 
     /* Apply selection to Table */
-    fNewsTableControl.getViewer().setSelection(selection);
+    fNewsTableControl.getViewer().setSelection(selection, true);
   }
 
   /*
@@ -1539,7 +1539,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     ITreeNode targetNode = (next ? traverse.nextNode() : traverse.previousNode());
     if (targetNode != null) {
       ISelection selection = new StructuredSelection(targetNode.getData());
-      fNewsTableControl.getViewer().setSelection(selection);
+      fNewsTableControl.getViewer().setSelection(selection, true);
       return true;
     }
 
