@@ -373,6 +373,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             if (tabbedBrowsingEnabled) {
 
               /* Close other Tabs if necessary */
+              boolean doit = true;
               IWorkbenchPage page = OwlUI.getPage();
               if (page != null) {
                 IEditorReference[] editorReferences = page.getEditorReferences();
@@ -382,13 +383,17 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
                   confirmDialog.setMessage("You currently have " + editorReferences.length + " tabs opened.\nDo you want to close all tabs except for the active one?");
                   if (confirmDialog.open() == SWT.YES)
                     OwlUI.closeOtherEditors();
+                  else
+                    doit = false;
                 }
               }
 
               /* Update Preferences */
-              eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, false);
-              eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS, true);
-              eclipsePrefs.putInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 1);
+              if (doit) {
+                eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, false);
+                eclipsePrefs.putBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS, true);
+                eclipsePrefs.putInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 1);
+              }
             }
 
             /* Enable Tabbed Browsing */
