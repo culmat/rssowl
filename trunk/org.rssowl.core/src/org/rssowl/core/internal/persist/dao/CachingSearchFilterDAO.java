@@ -32,8 +32,8 @@ import java.util.Set;
 
 public class CachingSearchFilterDAO extends CachingDAO<SearchFilterDAOImpl, ISearchFilter, SearchFilterListener, SearchFilterEvent> implements ISearchFilterDAO {
 
-  public CachingSearchFilterDAO(SearchFilterDAOImpl dao) {
-    super(dao);
+  public CachingSearchFilterDAO() {
+    super(new SearchFilterDAOImpl());
   }
 
   @Override
