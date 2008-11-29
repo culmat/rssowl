@@ -1017,8 +1017,16 @@ public class FeedView extends EditorPart implements IReusableEditor {
       protected void runInUI(IProgressMonitor monitor) {
         IStructuredSelection oldSelection = null;
         Object value = fgSelectionCache.get(fInput.hashCode());
-        if (value != null)
-          oldSelection = new StructuredSelection(value);
+        if (value != null) {
+          IPreferenceScope entityPreferences = Owl.getPreferenceService().getEntityScope(mark);
+          boolean openEmptyNews = entityPreferences.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS);
+          boolean openAllNews = entityPreferences.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS);
+          boolean useExternalBrowser = fPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER) || fPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER);
+
+          /* Only re-select if this has not the potential of opening in external Browser */
+          if (!useExternalBrowser || (!openAllNews && !openEmptyNews))
+            oldSelection = new StructuredSelection(value);
+        }
 
         /* Set input to News-Table if Visible */
         if (!fBgMonitor.isCanceled() && isTableViewerVisible())

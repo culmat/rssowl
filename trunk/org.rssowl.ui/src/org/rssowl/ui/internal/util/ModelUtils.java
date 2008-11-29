@@ -1008,4 +1008,19 @@ public class ModelUtils {
 
     return words;
   }
+
+  /**
+   * @param news the {@link INews} to check.
+   * @return <code>true</code> if the content is either empty or identical with
+   * the title, <code>false</code> otherwise.
+   */
+  public static boolean isEmpty(INews news) {
+    if (!StringUtils.isSet(news.getDescription()))
+      return true;
+
+    if (StringUtils.isSet(news.getTitle()) && news.getTitle().equals(news.getDescription()))
+      return true;
+
+    return false;
+  }
 }
