@@ -329,7 +329,7 @@
                menubarPath="tools/begin">
          </action>
       </actionSet>
-      <!--<actionSet
+      <actionSet
             id="org.rssowl.ui.NewsFiltersSet"
             label="News Filters"
             visible="true">
@@ -341,7 +341,7 @@
                menubarPath="tools/begin"
                style="push">
          </action>
-      </actionSet>-->
+      </actionSet>
    </extension>
    <extension
          point="org.eclipse.ui.views">
@@ -706,11 +706,11 @@
             id="org.eclipse.ui.window.openEditorDropDown"
             name="Switch to Tab">
       </command>
-      <!--<command
+      <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             id="org.rssowl.ui.OpenNewsFiltersAction"
             name="News Filters">
-      </command>-->
+      </command>
    </extension>
    <extension
          id="product"
