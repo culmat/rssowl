@@ -74,13 +74,13 @@ public final class DAOServiceImpl extends DAOService  {
   private final IPersonDAO fPersonDAO = new PersonDAOImpl();
   private final ISearchConditionDAO fSearchConditionDAO = new SearchConditionDAOImpl();
   private final ILabelDAO fLabelDAO = new LabelDAOImpl();
-  private final ISearchFilterDAO fSearchFilterDAO= new SearchFilterDAOImpl();
 
   /* Internal */
   private final EntitiesToBeIndexedDAOImpl fEntitiesToBeIndexedDAO = new EntitiesToBeIndexedDAOImpl();
   private final IDescriptionDAO fDescriptionDAO = new DescriptionDAOImpl();
 
   /* Caching DAOs */
+  private final ISearchFilterDAO fSearchFilterDAO= new CachingSearchFilterDAO();
   private final IFolderDAO fFolderDAO = new CachingFolderDAO();
   private final IBookMarkDAO fBookMarkDAO = new CachingBookMarkDAO();
   private final ISearchMarkDAO fSearchMarkDAO = new CachingSearchMarkDAO();
