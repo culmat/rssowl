@@ -42,6 +42,7 @@ import org.rssowl.core.internal.persist.Label;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.NewsBin;
 import org.rssowl.core.internal.persist.Preference;
+import org.rssowl.core.internal.persist.SearchFilter;
 import org.rssowl.core.internal.persist.migration.MigrationResult;
 import org.rssowl.core.internal.persist.migration.Migrations;
 import org.rssowl.core.persist.INews;
@@ -734,6 +735,7 @@ public class DBManager {
     config.objectClass(NewsCounter.class).cascadeOnDelete(true);
     config.objectClass(Preference.class).cascadeOnDelete(true);
     config.objectClass(Preference.class).objectField("fKey").indexed(true); //$NON-NLS-1$
+    config.objectClass(SearchFilter.class).objectField("fActions").cascadeOnDelete(true);
 
     if (isIBM_VM_1_6()) //See defect 733
       config.objectClass("java.util.MiniEnumSet").translate(new com.db4o.config.TSerializable());
