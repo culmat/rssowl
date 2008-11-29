@@ -26,7 +26,7 @@
    <extension
          point="org.eclipse.ui.actionSets">
       <actionSet
-            id="org.rssowl.ui.fileSet"
+            id="orgrssowluiseta"
             label="File"
             visible="true">
          <action
@@ -110,7 +110,7 @@
          </menu>
       </actionSet>
       <actionSet
-            id="org.rssowl.ui.editSet"
+            id="orgrssowluisetb"
             label="Edit"
             visible="true">
          <action
@@ -124,7 +124,7 @@
          </action>
       </actionSet>
       <actionSet
-            id="org.rssowl.ui.goSet"
+            id="org.rssowl.ui.GoSet"
             label="Go"
             visible="true">
          <menu
@@ -226,7 +226,6 @@
                label="&amp;Check for Updates"
                menubarPath="help/helpEnd"
                style="push"
-               toolbarPath="update"
                tooltip="Find Updates for installed Extensions">
          </action>
          <action
@@ -237,7 +236,6 @@
                label="&amp;Get More Extensions"
                menubarPath="tools/extensions/findExtensions"
                style="push"
-               toolbarPath="update"
                tooltip="Get More Extensions"/>
          <action
                class="org.rssowl.ui.internal.actions.ManageConfigurationAction"
@@ -259,7 +257,7 @@
          </menu>
       </actionSet>
       <actionSet
-            id="org.rssowl.ui.NewsSet"
+            id="orgrssowluisetc"
             label="News"
             visible="true">
          <action
