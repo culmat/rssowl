@@ -229,7 +229,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
           continue;
 
         NewsActionDescriptor otherNewsAction = fNewsActionPresentationManager.getNewsActionDescriptor(otherAction.getActionId());
-        if (otherNewsAction.getNewsAction().isConflicting(newsAction.getNewsAction())) {
+        if (otherNewsAction.getNewsAction().conflictsWith(newsAction.getNewsAction())) {
           StringBuilder str = new StringBuilder();
           str.append("Please remove the action '").append(otherNewsAction.getName()).append("'. It can not be used together with the action '").append(newsAction.getName()).append("'.");
 

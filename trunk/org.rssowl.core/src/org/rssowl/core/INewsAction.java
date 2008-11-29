@@ -58,5 +58,5 @@ public interface INewsAction {
    * @return <code>true</code> in case the two operations can not be used
    * together and <code>false</code> otherwise.
    */
-  boolean isConflicting(INewsAction otherAction);
+  boolean conflictsWith(INewsAction otherAction);
 }

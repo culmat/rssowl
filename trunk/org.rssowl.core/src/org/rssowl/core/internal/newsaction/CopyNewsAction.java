@@ -74,7 +74,7 @@ public class CopyNewsAction implements INewsAction {
   /*
    * @see org.rssowl.core.INewsAction#isConflicting(org.rssowl.core.INewsAction)
    */
-  public boolean isConflicting(INewsAction otherAction) {
+  public boolean conflictsWith(INewsAction otherAction) {
     return otherAction instanceof DeleteNewsAction;
   }
 }
