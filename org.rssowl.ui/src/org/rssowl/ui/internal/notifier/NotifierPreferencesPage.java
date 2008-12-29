@@ -545,7 +545,7 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
 
     fLimitNotifierToSelectionCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.LIMIT_NOTIFIER_TO_SELECTION));
 
-    setLimitNotificationEnabled(fShowNotificationPopup.getSelection() && fLimitNotificationCheck.getSelection());
+    setLimitNotificationEnabled(fShowNotificationPopup.getSelection() && fLimitNotifierToSelectionCheck.getSelection());
   }
 
   /*
