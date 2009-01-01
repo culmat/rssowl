@@ -25,10 +25,10 @@
 package org.rssowl.core.tests.model;
 
 import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Before;
@@ -54,6 +54,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IImage;
 import org.rssowl.core.persist.ILabel;
@@ -63,8 +64,10 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.SearchSpecifier;
@@ -927,6 +930,29 @@ public class DBManagerTest {
       }
     }
 
+  }
+
+  @Test
+  public void testUpdateAndGetSearchFilter() throws Exception {
+    ISearch search = fTypesFactory.createSearch(null);
+    ISearchCondition condition = fTypesFactory.createSearchCondition(fTypesFactory.createSearchField(INews.TITLE, INews.class.getName()), SearchSpecifier.IS, "Test");
+    search.addSearchCondition(condition);
+    ISearchFilter filter = fTypesFactory.createSearchFilter(null, search, "Filter");
+    IFilterAction action = fTypesFactory.createFilterAction("org.rssowl.ActionId");
+    filter.addAction(action);
+    filter.setEnabled(true);
+    filter.setOrder(5);
+
+    filter= DynamicDAO.save(filter);
+    System.gc();
+
+    Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
+    assertEquals(1, filters.size());
+  }
+
+  @Test
+  public void testDeleteSearchFilter() throws Exception {
+  //TODO
   }
 
   /**
