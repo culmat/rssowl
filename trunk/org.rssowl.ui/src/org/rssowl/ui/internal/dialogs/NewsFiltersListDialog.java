@@ -57,6 +57,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.ISearchFilterDAO;
 import org.rssowl.ui.internal.CColumnLayoutData;
 import org.rssowl.ui.internal.CTable;
 import org.rssowl.ui.internal.OwlUI;
@@ -83,6 +84,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
   private Button fMoveDownButton;
   private Button fMoveUpButton;
   private Image fFilterIcon;
+  private ISearchFilterDAO fSearchFilterDao;
 
   /**
    * @param parentShell
@@ -91,6 +93,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     super(parentShell);
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fFilterIcon = OwlUI.getImage(fResources, "icons/obj16/news_filter.gif");
+    fSearchFilterDao = DynamicDAO.getDAO(ISearchFilterDAO.class);
   }
 
   /*
@@ -142,7 +145,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     /* ContentProvider returns all filters */
     fViewer.setContentProvider(new IStructuredContentProvider() {
       public Object[] getElements(Object inputElement) {
-        return DynamicDAO.loadAll(ISearchFilter.class).toArray();
+        return fSearchFilterDao.loadAll().toArray();
       }
 
       public void dispose() {}
@@ -199,7 +202,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
       public void checkStateChanged(CheckStateChangedEvent event) {
         ISearchFilter filter = (ISearchFilter) event.getElement();
         filter.setEnabled(event.getChecked());
-        DynamicDAO.save(filter);
+        fSearchFilterDao.save(filter);
       }
     });
 
@@ -327,7 +330,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
       otherFilter.setOrder(selectedFilterOrder);
     }
 
-    DynamicDAO.saveAll(Arrays.asList(new ISearchFilter[] { selectedFilter, otherFilter }));
+    fSearchFilterDao.saveAll(Arrays.asList(new ISearchFilter[] { selectedFilter, otherFilter }));
     fViewer.refresh();
     updateCheckedState();
     updateMoveEnablement();
@@ -376,7 +379,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
         filtersToDelete.add(filter);
       }
 
-      DynamicDAO.deleteAll(filtersToDelete);
+      fSearchFilterDao.deleteAll(filtersToDelete);
       fViewer.remove(selection.toArray());
     }
   }
