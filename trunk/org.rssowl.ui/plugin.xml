@@ -784,7 +784,7 @@
             contextId="org.eclipse.ui.contexts.dialogAndWindow"
             platform="carbon"
             schemeId="org.rssowl.ui.KeyScheme"
-            sequence="BS"/>
+            sequence="M1+BS"/>
       <key
             commandId="org.rssowl.ui.MarkAllRead"
             contextId="org.eclipse.ui.contexts.window"
