@@ -100,7 +100,6 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.event.FolderAdapter;
 import org.rssowl.core.persist.event.FolderEvent;
@@ -130,15 +129,14 @@ import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.ITreeNode;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.ModelTreeNode;
+import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.util.TreeTraversal;
 import org.rssowl.ui.internal.util.WidgetTreeNode;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * <p>
@@ -1356,17 +1354,7 @@ public class BookMarkExplorer extends ViewPart {
     fExpandedNodes = new ArrayList<Long>();
 
     /* Sort Root-Folders by ID */
-    fRootFolders = new TreeSet<IFolder>(new Comparator<IFolder>() {
-      public int compare(IFolder f1, IFolder f2) {
-        if (f1.equals(f2))
-          return 0;
-
-        return f1.getId() < f2.getId() ? -1 : 1;
-      }
-    });
-
-    /* Add Root-Folders */
-    fRootFolders.addAll(DynamicDAO.getDAO(IFolderDAO.class).loadRoots());
+    fRootFolders = ModelUtils.loadRootFolders();
 
     /* Load Settings */
     loadState();

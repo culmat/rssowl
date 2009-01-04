@@ -97,6 +97,7 @@ import org.rssowl.ui.internal.handler.LabelNewsHandler;
 import org.rssowl.ui.internal.notifier.NotificationService;
 import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.JobRunner;
+import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.io.File;
@@ -972,12 +973,12 @@ public class Controller {
       Long selectedFolderID = fPrefsDAO.load(selectedBookMarkSetPref).getLong();
       selectedRootFolder = fFolderDAO.load(selectedFolderID);
     } else {
-      Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
+      Collection<IFolder> rootFolders = ModelUtils.loadRootFolders();
       selectedRootFolder = rootFolders.iterator().next();
     }
 
     /* Load all Root Folders */
-    Set<IFolder> rootFolders = new HashSet<IFolder>(DynamicDAO.getDAO(IFolderDAO.class).loadRoots());
+    Set<IFolder> rootFolders = ModelUtils.loadRootFolders();
 
     /* 1.) Handle Folders and Marks from default Container */
     {

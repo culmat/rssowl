@@ -39,7 +39,9 @@ import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.INews.State;
+import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
+import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.reference.BookMarkReference;
@@ -60,6 +62,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,6 +70,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.TreeSet;
 import java.util.Map.Entry;
 
 /**
@@ -994,7 +998,7 @@ public class ModelUtils {
           continue;
 
         /* Split into Words */
-        value= StringUtils.replaceAll(value, "\"", "");
+        value = StringUtils.replaceAll(value, "\"", "");
         StringTokenizer tokenizer = new StringTokenizer(value);
         while (tokenizer.hasMoreElements()) {
           String nextWord = tokenizer.nextElement().toString().toLowerCase();
@@ -1022,5 +1026,26 @@ public class ModelUtils {
       return true;
 
     return false;
+  }
+
+  /**
+   * @return all root folders sorted by their ID.
+   */
+  public static Set<IFolder> loadRootFolders() {
+
+    /* Sort by ID to respect order */
+    Set<IFolder> rootFolders = new TreeSet<IFolder>(new Comparator<IFolder>() {
+      public int compare(IFolder f1, IFolder f2) {
+        if (f1.equals(f2))
+          return 0;
+
+        return f1.getId() < f2.getId() ? -1 : 1;
+      }
+    });
+
+    /* Add Root-Folders */
+    rootFolders.addAll(DynamicDAO.getDAO(IFolderDAO.class).loadRoots());
+
+    return rootFolders;
   }
 }
