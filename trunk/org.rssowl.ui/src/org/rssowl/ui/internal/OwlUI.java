@@ -249,9 +249,12 @@ public class OwlUI {
   /* Helper to ensure favicons cause no errors if corrupt */
   private static class FavIconImageDescriptor extends ImageDescriptor {
     private final ImageDescriptor fDescriptor;
+    private final File fFaviconFile;
 
-    private FavIconImageDescriptor(ImageDescriptor descriptor) {
+    private FavIconImageDescriptor(File faviconFile, ImageDescriptor descriptor) {
+      Assert.isNotNull(faviconFile);
       Assert.isNotNull(descriptor);
+      fFaviconFile = faviconFile;
       fDescriptor = descriptor;
     }
 
@@ -269,10 +272,29 @@ public class OwlUI {
     @Override
     public Image createImage(boolean returnMissingImageOnError, Device device) {
       try {
-        return fDescriptor.createImage(returnMissingImageOnError, device);
+        return internalCreateImage(returnMissingImageOnError, device);
+      } catch (SWTException e) {
+        //Fallback to default Image
       } catch (SWTError error) {
-        return BOOKMARK.createImage(returnMissingImageOnError, device);
+        //Fallback to default Image
       }
+
+      return BOOKMARK.createImage(returnMissingImageOnError, device);
+    }
+
+    private Image internalCreateImage(boolean returnMissingImageOnError, Device device) {
+      try {
+        ImageLoader loader = new ImageLoader();
+        ImageData[] datas = loader.load(fFaviconFile.toString());
+        if (datas != null && datas.length > 0)
+          return new Image(device, datas[0]);
+      } catch (SWTException e) {
+        //Fallback to alternative method to load Image
+      } catch (SWTError error) {
+        //Fallback to alternative method to load Image
+      }
+
+      return fDescriptor.createImage(returnMissingImageOnError, device);
     }
 
     /*
@@ -599,7 +621,7 @@ public class OwlUI {
     File favicon = getImageFile(bookmark.getId());
     if (favicon != null && favicon.exists()) {
       try {
-        descriptor = new FavIconImageDescriptor(ImageDescriptor.createFromURL(favicon.toURI().toURL()));
+        descriptor = new FavIconImageDescriptor(favicon, ImageDescriptor.createFromURL(favicon.toURI().toURL()));
         FAVICO_CACHE.put(bookmark.getId(), descriptor);
         return descriptor;
       } catch (MalformedURLException e) {
