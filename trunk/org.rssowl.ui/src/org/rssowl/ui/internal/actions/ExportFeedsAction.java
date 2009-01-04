@@ -41,8 +41,6 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
-import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
@@ -99,7 +97,7 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
         File file = new File(string);
 
         /* Proceed Exporting */
-        Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();;
+        Collection<IFolder> rootFolders = ModelUtils.loadRootFolders();
         exportToOPML(file, rootFolders);
       } catch (IOException e) {
         Activator.getDefault().logError(e.getMessage(), e);

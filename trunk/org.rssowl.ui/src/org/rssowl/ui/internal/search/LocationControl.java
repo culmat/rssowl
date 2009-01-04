@@ -59,8 +59,6 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
-import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -173,7 +171,7 @@ public class LocationControl extends Composite {
 
       fViewer.setContentProvider(new ITreeContentProvider() {
         public Object[] getElements(Object inputElement) {
-          Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
+          Collection<IFolder> rootFolders = ModelUtils.loadRootFolders();
           return rootFolders.toArray();
         }
 

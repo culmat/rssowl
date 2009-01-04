@@ -32,10 +32,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.persist.IFolder;
-import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
+import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.Collection;
 
@@ -80,7 +79,7 @@ public class ReloadAllAction extends Action implements IWorkbenchWindowActionDel
   public void run() {
     JobRunner.runInBackgroundThread(new Runnable() {
       public void run() {
-        Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
+        Collection<IFolder> rootFolders = ModelUtils.loadRootFolders();
         new ReloadTypesAction(new StructuredSelection(rootFolders.toArray()), fShell).run();
       }
     });
