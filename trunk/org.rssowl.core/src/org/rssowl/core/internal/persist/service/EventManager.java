@@ -45,6 +45,7 @@ import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.IConditionalGetDAO;
 import org.rssowl.core.persist.dao.INewsCounterDAO;
@@ -61,6 +62,7 @@ import org.rssowl.core.persist.event.PersonEvent;
 import org.rssowl.core.persist.event.PreferenceEvent;
 import org.rssowl.core.persist.event.SearchConditionEvent;
 import org.rssowl.core.persist.event.SearchEvent;
+import org.rssowl.core.persist.event.SearchFilterEvent;
 import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.service.IDGenerator;
@@ -552,6 +554,10 @@ public class EventManager implements DatabaseListener   {
     else if (entity instanceof ISearch) {
       ISearch search = (ISearch) entity;
       modelEvent = new SearchEvent(search, root);
+    }
+    else if (entity instanceof ISearchFilter) {
+      ISearchFilter filter = (ISearchFilter) entity;
+      modelEvent = new SearchFilterEvent(filter, root);
     }
     return modelEvent;
   }
