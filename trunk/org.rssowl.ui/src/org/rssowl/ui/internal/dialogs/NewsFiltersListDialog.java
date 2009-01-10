@@ -374,7 +374,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     ConfirmDeleteDialog dialog = new ConfirmDeleteDialog(getShell(), "Confirm Delete", "This action can not be undone", getMessage(selectedFilters), null);
     if (dialog.open() == IDialogConstants.OK_ID) {
       List<ISearchFilter> filtersToDelete = new ArrayList<ISearchFilter>(selectedFilters.size());
-      for (Iterator<?> iterator = filtersToDelete.iterator(); iterator.hasNext();) {
+      for (Iterator<?> iterator = selectedFilters.iterator(); iterator.hasNext();) {
         ISearchFilter filter = (ISearchFilter) iterator.next();
         filtersToDelete.add(filter);
       }
