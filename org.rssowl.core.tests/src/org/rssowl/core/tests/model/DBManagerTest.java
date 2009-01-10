@@ -46,6 +46,7 @@ import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.NewsBin;
 import org.rssowl.core.internal.persist.NewsContainer;
 import org.rssowl.core.internal.persist.Person;
+import org.rssowl.core.internal.persist.SearchCondition;
 import org.rssowl.core.internal.persist.SearchMark;
 import org.rssowl.core.internal.persist.Source;
 import org.rssowl.core.internal.persist.service.DBManager;
@@ -929,30 +930,133 @@ public class DBManagerTest {
         DynamicDAO.removeEntityListener(ILabel.class, labelListener);
       }
     }
-
   }
 
-  @Test
-  public void testUpdateAndGetSearchFilter() throws Exception {
-    ISearch search = fTypesFactory.createSearch(null);
-    ISearchCondition condition = fTypesFactory.createSearchCondition(fTypesFactory.createSearchField(INews.TITLE, INews.class.getName()), SearchSpecifier.IS, "Test");
-    search.addSearchCondition(condition);
-    ISearchFilter filter = fTypesFactory.createSearchFilter(null, search, "Filter");
-    IFilterAction action = fTypesFactory.createFilterAction("org.rssowl.ActionId");
-    filter.addAction(action);
-    filter.setEnabled(true);
-    filter.setOrder(5);
+  private void doTestAddUpdateGetAndDeleteSearchFilter(boolean gc) {
+    /* Add */
+    {
+      ISearch search = fTypesFactory.createSearch(null);
+      search.setMatchAllConditions(true);
 
-    filter= DynamicDAO.save(filter);
-    System.gc();
+      ISearchCondition condition1 = fTypesFactory.createSearchCondition(fTypesFactory.createSearchField(INews.TITLE, INews.class.getName()), SearchSpecifier.IS, "Foo");
+      search.addSearchCondition(condition1);
+      ISearchCondition condition2 = fTypesFactory.createSearchCondition(fTypesFactory.createSearchField(INews.ATTACHMENTS_CONTENT, INews.class.getName()), SearchSpecifier.CONTAINS, "Bar");
+      search.addSearchCondition(condition2);
 
-    Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
-    assertEquals(1, filters.size());
+      ISearchFilter filter = fTypesFactory.createSearchFilter(null, search, "Filter");
+      filter.setEnabled(true);
+      filter.setOrder(5);
+
+      IFilterAction action = fTypesFactory.createFilterAction("org.rssowl.ActionId1");
+      action.setData(100);
+      filter.addAction(action);
+
+      action = fTypesFactory.createFilterAction("org.rssowl.ActionId2");
+      action.setData(new Long[] { 1l, 2l, 3l });
+      filter.addAction(action);
+
+      filter = DynamicDAO.save(filter);
+      if (gc)
+        System.gc();
+
+      Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
+      assertEquals(1, filters.size());
+      ISearchFilter savedFilter = filters.iterator().next();
+      assertEquals(filter.getName(), savedFilter.getName());
+      assertEquals(filter.getOrder(), savedFilter.getOrder());
+      assertEquals(filter.isEnabled(), savedFilter.isEnabled());
+
+      List<IFilterAction> actions = savedFilter.getActions();
+      assertEquals(2, actions.size());
+      assertEquals("org.rssowl.ActionId1", actions.get(0).getActionId());
+      assertEquals(100, actions.get(0).getData());
+      assertEquals("org.rssowl.ActionId2", actions.get(1).getActionId());
+      assertEquals(true, Arrays.equals((Object[]) actions.get(1).getData(), new Long[] { 1l, 2l, 3l }));
+
+      ISearch savedSearch = savedFilter.getSearch();
+      assertEquals(search.matchAllConditions(), savedSearch.matchAllConditions());
+      List<ISearchCondition> savedConditions = savedSearch.getSearchConditions();
+      assertEquals(2, savedConditions.size());
+
+      assertEquals(true, ((SearchCondition) savedConditions.get(0)).isIdentical(condition1));
+      assertEquals(true, ((SearchCondition) savedConditions.get(1)).isIdentical(condition2));
+    }
+
+    /* Update */
+    {
+      Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
+      ISearchFilter savedFilter = filters.iterator().next();
+
+      savedFilter.setName("Disabled Filter");
+      savedFilter.setEnabled(false);
+      savedFilter.setOrder(1);
+
+      List<IFilterAction> actions = savedFilter.getActions();
+      savedFilter.removeAction(actions.get(0));
+      actions.get(1).setData(new Long[] { 3l, 2l, 1l });
+      IFilterAction action = fTypesFactory.createFilterAction("org.rssowl.ActionId3");
+      action.setData(200);
+      savedFilter.addAction(action);
+
+      ISearch savedSearch = savedFilter.getSearch();
+      savedSearch.setMatchAllConditions(false);
+      List<ISearchCondition> savedConditions = savedSearch.getSearchConditions();
+
+      ISearchCondition condition1 = savedConditions.get(0);
+      condition1.setSpecifier(SearchSpecifier.CONTAINS_NOT);
+      savedSearch.removeSearchCondition(savedConditions.get(1));
+
+      ISearchCondition condition2 = fTypesFactory.createSearchCondition(fTypesFactory.createSearchField(INews.LOCATION, INews.class.getName()), SearchSpecifier.IS, new Long[][] { { 2l } });
+      savedSearch.addSearchCondition(condition2);
+
+      DynamicDAO.save(savedFilter);
+      if (gc)
+        System.gc();
+
+      filters = DynamicDAO.loadAll(ISearchFilter.class);
+      assertEquals(1, filters.size());
+      ISearchFilter loadedFilter = filters.iterator().next();
+      assertEquals(savedFilter.getName(), loadedFilter.getName());
+      assertEquals(savedFilter.getOrder(), loadedFilter.getOrder());
+      assertEquals(savedFilter.isEnabled(), loadedFilter.isEnabled());
+
+      List<IFilterAction> loadedActions = loadedFilter.getActions();
+      assertEquals(2, loadedActions.size());
+      assertEquals("org.rssowl.ActionId2", loadedActions.get(0).getActionId());
+      assertEquals(true, Arrays.equals((Object[]) actions.get(1).getData(), new Long[] { 3l, 2l, 1l }));
+      assertEquals("org.rssowl.ActionId3", loadedActions.get(1).getActionId());
+      assertEquals(200, loadedActions.get(1).getData());
+
+      ISearch loadedSearch = loadedFilter.getSearch();
+      assertEquals(savedSearch.matchAllConditions(), loadedSearch.matchAllConditions());
+      List<ISearchCondition> loadedConditions = loadedSearch.getSearchConditions();
+      assertEquals(2, loadedConditions.size());
+
+      assertEquals(true, ((SearchCondition) loadedConditions.get(0)).isIdentical(condition1));
+      assertEquals(true, ((SearchCondition) loadedConditions.get(1)).isIdentical(condition2));
+    }
+
+    /* Delete */
+    {
+      Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
+      assertEquals(1, filters.size());
+
+      DynamicDAO.delete(filters.iterator().next());
+      if (gc)
+        System.gc();
+
+      filters = DynamicDAO.loadAll(ISearchFilter.class);
+      assertTrue(filters.isEmpty());
+    }
   }
 
+  /**
+   * Test add, update, get and delete of ISearchFilter
+   */
   @Test
-  public void testDeleteSearchFilter() throws Exception {
-  //TODO
+  public void testAddUpdateGetAndDeleteSearchFilter() {
+    doTestAddUpdateGetAndDeleteSearchFilter(true);
+    doTestAddUpdateGetAndDeleteSearchFilter(false);
   }
 
   /**
