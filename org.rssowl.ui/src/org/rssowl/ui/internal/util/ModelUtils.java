@@ -615,14 +615,35 @@ public class ModelUtils {
    * otherwise.
    */
   public static boolean isStickyStateChange(Set<? extends ModelEvent> events) {
+    return isStickyStateChange(events, false);
+  }
+
+  /**
+   * @param events
+   * @param onlyHasBecomeSticky if <code>true</code>, only return <code>true</code> if
+   * a news has become sticky.
+   * @return <code>TRUE</code> in case the Sticky-State of the given News
+   * changed its value for any of the given Events, <code>FALSE</code>
+   * otherwise. Respects the onlyHasBecomeSticky parameter.
+   */
+  public static boolean isStickyStateChange(Set<? extends ModelEvent> events, boolean onlyHasBecomeSticky) {
     for (ModelEvent event : events) {
       if (event instanceof NewsEvent) {
         NewsEvent newsEvent = (NewsEvent) event;
         boolean oldSticky = (newsEvent.getOldNews() != null) ? newsEvent.getOldNews().isFlagged() : false;
         boolean currentSticky = newsEvent.getEntity().isFlagged();
 
-        if (oldSticky != currentSticky)
-          return true;
+        /* Only return true if sticky state is now TRUE */
+        if (onlyHasBecomeSticky) {
+          if (!oldSticky && currentSticky)
+            return true;
+        }
+
+        /* Return TRUE on sticky state change */
+        else {
+          if (oldSticky != currentSticky)
+            return true;
+        }
       }
     }
 
@@ -635,14 +656,35 @@ public class ModelUtils {
    * UNREAD to a different one, <code>FALSE</code> otherwise.
    */
   public static boolean isReadStateChange(Set<? extends ModelEvent> events) {
+    return isReadStateChange(events, false);
+  }
+
+  /**
+   * @param events
+   * @param onlyHasBecomeUnread if <code>true</code>, only return <code>true</code> if
+   * a news has become unread.
+   * @return <code>TRUE</code> in case any state changed from NEW, UPDATED or
+   * UNREAD to a different one, <code>FALSE</code> otherwise. Respects the onlyHasBecomeUnread
+   * parameter.
+   */
+  public static boolean isReadStateChange(Set<? extends ModelEvent> events, boolean onlyHasBecomeUnread) {
     for (ModelEvent event : events) {
       if (event instanceof NewsEvent) {
         NewsEvent newsEvent = (NewsEvent) event;
         boolean oldStateUnread = isUnread(newsEvent.getOldNews() != null ? newsEvent.getOldNews().getState() : null);
         boolean newStateUnread = isUnread(newsEvent.getEntity().getState());
 
-        if (oldStateUnread != newStateUnread)
-          return true;
+        /* Only return true if unread state is now TRUE */
+        if (onlyHasBecomeUnread) {
+          if (!oldStateUnread && newStateUnread)
+            return true;
+        }
+
+        /* Return TRUE on sticky state change */
+        else {
+          if (oldStateUnread != newStateUnread)
+            return true;
+        }
       }
     }
 
