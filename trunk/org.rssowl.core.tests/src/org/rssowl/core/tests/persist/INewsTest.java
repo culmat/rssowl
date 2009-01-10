@@ -50,17 +50,14 @@ public class INewsTest {
   private IModelFactory fFactory = new DefaultModelFactory();
 
   /**
-   * See bug #558 : Consider not using GUID if isPermaLink is false.
-   * Update from bug 958: Consider GUID if equal regardless of isPermaLink.
+   * See:
+   * <li>bug #558 : Consider not using GUID if isPermaLink is false.</li>
+   * <li>bug 958: Consider GUID if equal regardless of isPermaLink.</li>
    *
    * <p>
-   * Tests that we consider a Guid#isPermaLink == false in the same way we
-   * consider a null Guid when calling {@link INews#isEquivalent(INews)}.
-   * Update from bug 958: Consider GUID if equal regardless of isPermaLink.
-   *
-   * <p>
-   * Note that this should happen no matter what happens in the comparison of
-   * Guid#getValue for both News.
+   * Tests that isPermalink is ignored in positive matches, but is considered
+   * for negative matches. In the latter case, if the guid does not match and
+   * isPermalink == false then the guid is ignored (as if it was null).
    * </p>
    * @throws URISyntaxException
    */
