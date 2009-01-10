@@ -51,10 +51,12 @@ public class INewsTest {
 
   /**
    * See bug #558 : Consider not using GUID if isPermaLink is false.
+   * Update from bug 958: Consider GUID if equal regardless of isPermaLink.
    *
    * <p>
    * Tests that we consider a Guid#isPermaLink == false in the same way we
    * consider a null Guid when calling {@link INews#isEquivalent(INews)}.
+   * Update from bug 958: Consider GUID if equal regardless of isPermaLink.
    *
    * <p>
    * Note that this should happen no matter what happens in the comparison of
@@ -83,14 +85,19 @@ public class INewsTest {
     fFactory.createGuid(news4, link, false);
     news4.setLink(new URI("www.anotherlink2.com"));
 
+    INews news5 = fFactory.createNews(null, feed, new Date());
+    fFactory.createGuid(news5, "http://www.anotherlink.com", false);
+    news5.setLink(new URI("www.anotherlink2.com"));
+
     assertTrue(news1.isEquivalent(news2));
     assertTrue(news1.isEquivalent(news3));
-    assertFalse(news1.isEquivalent(news4));
+    assertTrue(news1.isEquivalent(news4));
 
     assertTrue(news2.isEquivalent(news3));
-    assertFalse(news2.isEquivalent(news4));
+    assertTrue(news2.isEquivalent(news4));
 
     assertFalse(news3.isEquivalent(news4));
+    assertTrue(news4.isEquivalent(news5));
   }
 
   /**
