@@ -38,6 +38,7 @@ import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
+import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.DateUtils;
@@ -51,6 +52,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author bpasero
@@ -443,5 +445,25 @@ public class NewsFilter extends ViewerFilter {
    */
   boolean isPatternSet() {
     return fCachedPatternMatchingNews != null;
+  }
+
+  /**
+   * @param events the {@link Set} of NewsEvents that occured.
+   * @return <code>true</code> if the filter requires a refresh and
+   * <code>false</code> otherwise
+   */
+  public boolean needsRefresh(Set<NewsEvent> events) {
+
+    /* Check if any News has become Unread */
+    if (fType == Type.SHOW_UNREAD) {
+      return ModelUtils.isReadStateChange(events, true);
+    }
+
+    /* Check if any News has become Sticky */
+    else if (fType == Type.SHOW_STICKY) {
+      return ModelUtils.isStickyStateChange(events, true);
+    }
+
+    return false;
   }
 }

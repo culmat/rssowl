@@ -68,6 +68,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   private final NewsBrowserViewer fBrowserViewer;
   private final NewsTableViewer fTableViewer;
   private final NewsGrouping fGrouping;
+  private final NewsFilter fFilter;
   private NewsListener fNewsListener;
   private SearchMarkAdapter fSearchMarkListener;
   private INewsMark fInput;
@@ -87,6 +88,7 @@ public class NewsContentProvider implements ITreeContentProvider {
     fBrowserViewer = browserViewer;
     fFeedView = feedView;
     fGrouping = feedView.getGrouper();
+    fFilter = feedView.getFilter();
   }
 
   /*
@@ -530,8 +532,12 @@ public class NewsContentProvider implements ITreeContentProvider {
       updatedNews.add(event.getEntity());
     }
 
-    /* Return early if refresh is required anyways */
+    /* Return early if refresh is required anyways for Grouper */
     if (fGrouping.needsRefresh(INews.class, events, true))
+      return true;
+
+    /* Return early if refresh is required anyways for Filter */
+    if (fFilter.needsRefresh(events))
       return true;
 
     /* Update in Table-Viewer */
