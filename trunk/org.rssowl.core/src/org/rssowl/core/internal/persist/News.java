@@ -354,7 +354,7 @@ public class News extends AbstractEntity implements INews {
       //same guidValue should not happen in practice.
       if (guidMatch != null && guidMatch.equals(Boolean.FALSE) && (fGuidValue == null || fGuidIsPermaLink) && (other.fGuidValue == null || other.fGuidIsPermaLink))
         return false;
-      else if (guidMatch != null && guidMatch.equals(Boolean.TRUE) && fGuidIsPermaLink && other.fGuidIsPermaLink)
+      else if (guidMatch != null && guidMatch.equals(Boolean.TRUE))
         return true;
 
       Boolean linkMatch = isEquivalentCompare(fLinkText, other.fLinkText);
