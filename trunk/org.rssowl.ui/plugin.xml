@@ -1318,6 +1318,12 @@
             name="Show News in Notifier"
             sortKey="50">
       </newsAction>
+      <newsAction
+            class="org.rssowl.ui.internal.filter.PlaySoundAction"
+            id="org.rssowl.ui.PlaySoundAction"
+            name="Play a Sound"
+            sortKey="40">
+      </newsAction>
    </extension>
    <extension
          point="org.rssowl.ui.NewsActionPresentation">
@@ -1332,6 +1338,10 @@
       <newsActionPresentation
             class="org.rssowl.ui.internal.filter.MoveCopyNewsActionPresentation"
             actionId="org.rssowl.core.CopyNewsAction">
+      </newsActionPresentation>
+      <newsActionPresentation
+            actionId="org.rssowl.ui.PlaySoundAction"
+            class="org.rssowl.ui.internal.filter.PlaySoundActionPresentation">
       </newsActionPresentation>
    </extension>
    <extension
