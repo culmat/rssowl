@@ -26,7 +26,6 @@ package org.rssowl.core.internal.newsaction;
 
 import org.rssowl.core.INewsAction;
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.dao.DynamicDAO;
 
 import java.util.List;
 
@@ -43,8 +42,6 @@ public class MarkStickyNewsAction implements INewsAction {
   public void run(List<INews> news, Object data) {
     for (INews item : news)
       item.setFlagged(true);
-
-    DynamicDAO.saveAll(news);
   }
 
   /*

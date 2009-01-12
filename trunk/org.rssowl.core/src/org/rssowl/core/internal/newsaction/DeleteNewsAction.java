@@ -26,8 +26,6 @@ package org.rssowl.core.internal.newsaction;
 
 import org.rssowl.core.INewsAction;
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.INewsDAO;
 
 import java.util.List;
 
@@ -42,7 +40,8 @@ public class DeleteNewsAction implements INewsAction {
    * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
    */
   public void run(List<INews> news, Object data) {
-    DynamicDAO.getDAO(INewsDAO.class).setState(news, INews.State.HIDDEN, false, false);
+    for (INews newsitem : news)
+      newsitem.setState(INews.State.HIDDEN);
   }
 
   /*
