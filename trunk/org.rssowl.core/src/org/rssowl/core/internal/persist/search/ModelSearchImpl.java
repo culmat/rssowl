@@ -68,6 +68,7 @@ import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchValueType;
@@ -363,6 +364,15 @@ public class ModelSearchImpl implements IModelSearch {
         throw new PersistenceException(e);
       }
     }
+  }
+
+  /*
+   * @see
+   * org.rssowl.core.persist.service.IModelSearch#searchNews(org.rssowl.core
+   * .persist.ISearch)
+   */
+  public List<SearchHit<NewsReference>> searchNews(ISearch search) throws PersistenceException {
+    return searchNews(search.getSearchConditions(), search.matchAllConditions());
   }
 
   /*
