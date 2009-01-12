@@ -46,11 +46,8 @@ public class LabelNewsAction implements INewsAction {
     ILabel label = DynamicDAO.load(ILabel.class, labelId);
 
     if (label != null) {
-      for (INews item : news) {
+      for (INews item : news)
         item.addLabel(label);
-      }
-
-      DynamicDAO.saveAll(news);
     }
   }
 
