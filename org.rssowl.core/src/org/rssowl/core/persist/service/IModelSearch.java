@@ -25,6 +25,7 @@
 package org.rssowl.core.persist.service;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.SearchHit;
@@ -43,13 +44,24 @@ public interface IModelSearch {
   /**
    * Search for the type <code>INews</code> in the persistance layer.
    *
+   * @param search the instanceof {@link ISearch} describing the search to
+   * perform.
+   * @return Returns the result of the search as <code>List</code>. In case no
+   * type is matching the search, an empty <code>List</code> is returned.
+   * @throws PersistenceException In case of an error while searching.
+   */
+  public List<SearchHit<NewsReference>> searchNews(ISearch search) throws PersistenceException;
+
+  /**
+   * Search for the type <code>INews</code> in the persistance layer.
+   *
    * @param conditions A <code>List</code> of Search-Conditions specifying the
    * search to perform.
-   * @param matchAllConditions If <code>TRUE</code>, require all conditions
-   * to match, and if <code>FALSE</code>, News are considered a result when
-   * they match at least 1 condition.
-   * @return Returns the result of the search as <code>List</code>. In case
-   * no type is matching the search, an empty <code>List</code> is returned.
+   * @param matchAllConditions If <code>TRUE</code>, require all conditions to
+   * match, and if <code>FALSE</code>, News are considered a result when they
+   * match at least 1 condition.
+   * @return Returns the result of the search as <code>List</code>. In case no
+   * type is matching the search, an empty <code>List</code> is returned.
    * @throws PersistenceException In case of an error while searching.
    */
   List<SearchHit<NewsReference>> searchNews(Collection<ISearchCondition> conditions, boolean matchAllConditions) throws PersistenceException;
@@ -60,10 +72,9 @@ public interface IModelSearch {
    * addition to stopping the indexer, this method also releases the resources
    * required to perform a search.
    *
-   * @param emergency If set to <code>TRUE</code>, this method is called from
-   * a shutdown hook that got triggered from a non-normal shutdown (e.g. System
+   * @param emergency If set to <code>TRUE</code>, this method is called from a
+   * shutdown hook that got triggered from a non-normal shutdown (e.g. System
    * Shutdown).
-   *
    * @throws PersistenceException
    */
   void shutdown(boolean emergency) throws PersistenceException;
