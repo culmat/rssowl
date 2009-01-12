@@ -91,6 +91,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
   private NewsActionPresentationManager fNewsActionPresentationManager = NewsActionPresentationManager.getInstance();
   private Button fMatchAllRadio;
   private Button fMatchAnyRadio;
+  private Button fMatchAllNewsRadio;
   private NewsActionList fFilterActionList;
   private Text fNameInput;
   private int fFilterPosition;
@@ -134,8 +135,8 @@ public class NewsFilterDialog extends TitleAreaDialog {
       return;
     }
 
-    /* Ensure that a Search Condition is specified */
-    if (fSearchConditionList.isEmpty()) {
+    /* Ensure that a Search Condition is specified if required */
+    if (fSearchConditionList.isEmpty() && !fMatchAllNewsRadio.getSelection()) {
       setErrorMessage("Please enter at least one search condition for the news filter.");
       fSearchConditionList.focusInput();
       return;
@@ -153,11 +154,72 @@ public class NewsFilterDialog extends TitleAreaDialog {
     if (isConflicting(actions))
       return;
 
-    /* Create new Filter */
+    /* Create new Filter and save */
     if (fEditedFilter == null) {
-      IModelFactory factory = Owl.getModelFactory();
+      ISearchFilter filter = createFilter(actions);
+      DynamicDAO.save(filter);
+    }
 
-      /* Create Conditions */
+    /* Update existing Filter */
+    else {
+      updateFilter(actions);
+      DynamicDAO.save(fEditedFilter);
+    }
+
+    super.okPressed();
+  }
+
+  private ISearchFilter createFilter(List<IFilterAction> actions) {
+    IModelFactory factory = Owl.getModelFactory();
+    ISearch search = null;
+
+    /* Create Conditions unless filter should match all News */
+    if (!fMatchAllNewsRadio.getSelection()) {
+      List<ISearchCondition> conditions = fSearchConditionList.createConditions();
+      search = factory.createSearch(null);
+      search.setMatchAllConditions(fMatchAllRadio.getSelection());
+      for (ISearchCondition condition : conditions) {
+        search.addSearchCondition(condition);
+      }
+    }
+
+    /* Create Actions */
+    ISearchFilter filter = factory.createSearchFilter(null, search, fNameInput.getText());
+    filter.setEnabled(true);
+    filter.setMatchAllNews(fMatchAllNewsRadio.getSelection());
+    filter.setOrder(fFilterPosition);
+    for (IFilterAction action : actions) {
+      filter.addAction(action);
+    }
+
+    return filter;
+  }
+
+  private void updateFilter(List<IFilterAction> actions) {
+
+    /* Name */
+    fEditedFilter.setName(fNameInput.getText());
+
+    /* Actions */
+    if (fFilterActionList.isModified()) {
+
+      /* Remove Old Actions */
+      List<IFilterAction> oldActions = fEditedFilter.getActions();
+      for (IFilterAction oldAction : oldActions) {
+        fEditedFilter.removeAction(oldAction);
+      }
+
+      /* Add New Actions */
+      for (IFilterAction action : actions) {
+        fEditedFilter.addAction(action);
+      }
+    }
+
+    /* Search got Added */
+    if (fEditedFilter.matchAllNews() && !fMatchAllNewsRadio.getSelection()) {
+      fEditedFilter.setMatchAllNews(false);
+
+      IModelFactory factory = Owl.getModelFactory();
       List<ISearchCondition> conditions = fSearchConditionList.createConditions();
       ISearch search = factory.createSearch(null);
       search.setMatchAllConditions(fMatchAllRadio.getSelection());
@@ -165,21 +227,17 @@ public class NewsFilterDialog extends TitleAreaDialog {
         search.addSearchCondition(condition);
       }
 
-      /* Create Actions */
-      ISearchFilter filter = factory.createSearchFilter(null, search, fNameInput.getText());
-      filter.setEnabled(true);
-      filter.setOrder(fFilterPosition);
-      for (IFilterAction action : actions) {
-        filter.addAction(action);
-      }
-
-      /* Save search Filter */
-      DynamicDAO.save(filter);
+      fEditedFilter.setSearch(search);
     }
 
-    /* Update existing Filter */
-    else {
-      fEditedFilter.setName(fNameInput.getText());
+    /* Search got Deleted */
+    if (!fEditedFilter.matchAllNews() && fMatchAllNewsRadio.getSelection()) {
+      fEditedFilter.setMatchAllNews(true);
+      fEditedFilter.setSearch(null);
+    }
+
+    /* Search got Updated */
+    if (!fEditedFilter.matchAllNews() && !fMatchAllNewsRadio.getSelection()) {
       ISearch editedSearch = fEditedFilter.getSearch();
       editedSearch.setMatchAllConditions(fMatchAllRadio.getSelection());
 
@@ -198,27 +256,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
           editedSearch.addSearchCondition(condition);
         }
       }
-
-      /* Update Search Actions */
-      if (fFilterActionList.isModified()) {
-
-        /* Remove Old Actions */
-        List<IFilterAction> oldActions = fEditedFilter.getActions();
-        for (IFilterAction oldAction : oldActions) {
-          fEditedFilter.removeAction(oldAction);
-        }
-
-        /* Add New Actions */
-        for (IFilterAction action : actions) {
-          fEditedFilter.addAction(action);
-        }
-      }
-
-      /* Update search Filter */
-      DynamicDAO.save(fEditedFilter);
     }
-
-    super.okPressed();
   }
 
   private boolean isConflicting(List<IFilterAction> actions) {
@@ -316,18 +354,29 @@ public class NewsFilterDialog extends TitleAreaDialog {
   private void createConditionControls(Composite container) {
     Composite topControlsContainer = new Composite(container, SWT.None);
     topControlsContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-    topControlsContainer.setLayout(LayoutUtils.createGridLayout(3, 10, 0));
+    topControlsContainer.setLayout(LayoutUtils.createGridLayout(4, 10, 0));
 
-    boolean matchAllConditions = (fEditedFilter != null) ? fEditedFilter.getSearch().matchAllConditions() : true;
+    boolean matchAllNews = (fEditedFilter != null) ? fEditedFilter.matchAllNews() : false;
+    boolean matchAllConditions = !matchAllNews && (fEditedFilter != null) ? fEditedFilter.getSearch().matchAllConditions() : true;
 
     /* Radio to select Condition Matching */
     fMatchAllRadio = new Button(topControlsContainer, SWT.RADIO);
     fMatchAllRadio.setText("&Match all conditions");
-    fMatchAllRadio.setSelection(matchAllConditions);
+    fMatchAllRadio.setSelection(matchAllConditions && !matchAllNews);
 
     fMatchAnyRadio = new Button(topControlsContainer, SWT.RADIO);
     fMatchAnyRadio.setText("Match any c&ondition");
-    fMatchAnyRadio.setSelection(!matchAllConditions);
+    fMatchAnyRadio.setSelection(!matchAllConditions && !matchAllNews);
+
+    fMatchAllNewsRadio = new Button(topControlsContainer, SWT.RADIO);
+    fMatchAllNewsRadio.setText("Match all &News");
+    fMatchAllNewsRadio.setSelection(matchAllNews);
+    fMatchAllNewsRadio.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        setControlEnabled(fSearchConditionList, !fMatchAllNewsRadio.getSelection());
+      }
+    });
 
     /* ToolBar to add and select existing saved searches */
     final ToolBarManager dialogToolBar = new ToolBarManager(SWT.RIGHT | SWT.FLAT);
@@ -369,6 +418,8 @@ public class NewsFilterDialog extends TitleAreaDialog {
                 /* Match Conditions */
                 fMatchAllRadio.setSelection(searchMark.matchAllConditions());
                 fMatchAnyRadio.setSelection(!searchMark.matchAllConditions());
+                fMatchAllNewsRadio.setSelection(false);
+                setControlEnabled(fSearchConditionList, !fMatchAllNewsRadio.getSelection());
 
                 /* Show Conditions */
                 fSearchConditionList.showConditions(searchMark.getSearchConditions());
@@ -412,8 +463,22 @@ public class NewsFilterDialog extends TitleAreaDialog {
     fSearchConditionList.setVisibleItemCount(3);
 
     /* Show Initial Conditions if present */
-    if (fEditedFilter != null)
+    if (fEditedFilter != null && fEditedFilter.getSearch() != null)
       fSearchConditionList.showConditions(fEditedFilter.getSearch().getSearchConditions());
+
+    /* Update Enable-State of Search Condition List */
+    setControlEnabled(fSearchConditionList, !fMatchAllNewsRadio.getSelection());
+  }
+
+  private void setControlEnabled(Control control, boolean enabled) {
+    control.setEnabled(enabled);
+    if (control instanceof Composite) {
+      Composite composite = (Composite) control;
+      Control[] children = composite.getChildren();
+      for (Control child : children) {
+        setControlEnabled(child, enabled);
+      }
+    }
   }
 
   private boolean isSupported(ISearchMark searchmark) {
