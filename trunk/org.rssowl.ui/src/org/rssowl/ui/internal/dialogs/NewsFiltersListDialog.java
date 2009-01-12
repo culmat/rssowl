@@ -118,9 +118,6 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     /* Title Image */
     setTitleImage(OwlUI.getImage(fResources, "icons/wizban/filter_wiz.gif"));
 
-    /* Title Message */
-    setMessage("Enabled filters will run automatically in the order shown below.\n If a news matches more than one filter, only the first will be applied.", IMessageProvider.INFORMATION);
-
     /* Composite to hold all components */
     Composite composite = new Composite(parent, SWT.NONE);
     composite.setLayout(LayoutUtils.createGridLayout(2, 5, 10));
@@ -276,7 +273,32 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
+    /* Update Title Message */
+    updateTitle();
+
     return composite;
+  }
+
+  private void updateTitle() {
+    ISearchFilter problematicFilter= null;
+
+    Table table = fViewer.getTable();
+    TableItem[] items = table.getItems();
+    for (TableItem item : items) {
+      ISearchFilter filter = (ISearchFilter) item.getData();
+      if (filter.matchAllNews()) {
+        int index = table.indexOf(item);
+        if (index < table.getItemCount() - 1) {
+          problematicFilter = filter;
+          break;
+        }
+      }
+    }
+
+    if (problematicFilter != null)
+      setMessage("The filter '" + problematicFilter.getName() + "' matches on all News. Move it to the bottom or\n disable it to support the other filters below.", IMessageProvider.WARNING);
+    else
+      setMessage("Enabled filters will run automatically in the order shown below.\n If a news matches more than one filter, only the first will be applied.", IMessageProvider.INFORMATION);
   }
 
   /*
@@ -334,6 +356,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     fViewer.refresh();
     updateCheckedState();
     updateMoveEnablement();
+    updateTitle();
   }
 
   private void updateCheckedState() {
@@ -353,6 +376,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
       updateCheckedState();
       fViewer.setSelection(new StructuredSelection(table.getItem(table.getItemCount() - 1).getData()));
       fViewer.getTable().setFocus();
+      updateTitle();
     }
   }
 
@@ -364,6 +388,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     if (dialog.open() == IDialogConstants.OK_ID) {
       fViewer.refresh(true);
       fViewer.getTable().setFocus();
+      updateTitle();
     }
   }
 
@@ -381,6 +406,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
       fSearchFilterDao.deleteAll(filtersToDelete);
       fViewer.remove(selection.toArray());
+      updateTitle();
     }
   }
 
