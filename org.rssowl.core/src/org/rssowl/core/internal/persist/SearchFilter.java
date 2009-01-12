@@ -46,6 +46,7 @@ public class SearchFilter extends AbstractEntity implements ISearchFilter {
   private boolean fEnabled;
   private List<IFilterAction> fActions;
   private ISearch fSearch;
+  private boolean fMatchAllNews;
 
   /**
    * @param id
@@ -54,7 +55,6 @@ public class SearchFilter extends AbstractEntity implements ISearchFilter {
    */
   public SearchFilter(Long id, ISearch search, String name) {
     super(id);
-    Assert.isNotNull(search);
     Assert.isNotNull(name);
     fSearch = search;
     fActions = new ArrayList<IFilterAction>(1);
@@ -149,6 +149,20 @@ public class SearchFilter extends AbstractEntity implements ISearchFilter {
    */
   public synchronized void setOrder(int order) {
     fOrder = order;
+  }
+
+  /*
+   * @see org.rssowl.core.persist.ISearchFilter#setMatchAllNews(boolean)
+   */
+  public synchronized void setMatchAllNews(boolean matchAllNews) {
+    fMatchAllNews= matchAllNews;
+  }
+
+  /*
+   * @see org.rssowl.core.persist.ISearchFilter#matchAllNews()
+   */
+  public synchronized boolean matchAllNews() {
+   return fMatchAllNews;
   }
 
   /*

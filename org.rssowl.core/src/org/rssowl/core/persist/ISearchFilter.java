@@ -73,7 +73,8 @@ public interface ISearchFilter extends IEntity {
   void setOrder(int order);
 
   /**
-   * @return the {@link ISearch} containing the search conditions of the filter.
+   * @return the {@link ISearch} containing the search conditions of the filter
+   * or <code>null</code> if <code>matchAllNews()</code> returns <code>true</code>.
    */
   ISearch getSearch();
 
@@ -97,4 +98,16 @@ public interface ISearchFilter extends IEntity {
    * @param action an {@link IFilterAction} to remove from the list of actions.
    */
   void removeAction(IFilterAction action);
+
+  /**
+   * @param matchAllNews <code>true</code> if this filter should apply on all news and
+   * <code>false</code> otherwise.
+   */
+  void setMatchAllNews(boolean matchAllNews);
+
+  /**
+   * @return <code>true</code> if this filter should apply on all news and
+   * <code>false</code> otherwise.
+   */
+  boolean matchAllNews();
 }
