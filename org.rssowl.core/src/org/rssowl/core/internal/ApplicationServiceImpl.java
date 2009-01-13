@@ -311,7 +311,7 @@ public class ApplicationServiceImpl implements IApplicationService {
         List<INews> remainingNews = new ArrayList<INews>(news);
         remainingNews.removeAll(filteredNews);
         if (!remainingNews.isEmpty())
-          applyFilter(filter, news);
+          applyFilter(filter, remainingNews);
 
         /* Done - we only support 1 filter per News */
         break;
