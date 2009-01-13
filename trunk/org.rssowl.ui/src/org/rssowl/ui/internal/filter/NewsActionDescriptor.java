@@ -36,17 +36,21 @@ public class NewsActionDescriptor implements Comparable<NewsActionDescriptor> {
   private final String fName;
   private final String fSortKey;
   private final INewsAction fNewsAction;
+  private final String fDescription;
 
   /**
    * @param actionId the unique ID of the contributed {@link INewsAction}
    * @param newsAction the contributed implementation of {@link INewsAction}
    * @param name the human readable name of the action
+   * @param description a description of what the action does nor
+   * <code>null</code> if none.
    * @param sortKey the sort key of the action
    */
-  public NewsActionDescriptor(String actionId, INewsAction newsAction, String name, String sortKey) {
+  public NewsActionDescriptor(String actionId, INewsAction newsAction, String name, String description, String sortKey) {
     fActionId = actionId;
     fNewsAction = newsAction;
     fName = name;
+    fDescription = description;
     fSortKey = sortKey;
   }
 
@@ -69,6 +73,13 @@ public class NewsActionDescriptor implements Comparable<NewsActionDescriptor> {
    */
   public String getName() {
     return fName;
+  }
+
+  /**
+   * @return a description of what the action does or <code>null</code> if none.
+   */
+  public String getDescription() {
+    return fDescription;
   }
 
   /**
