@@ -175,6 +175,7 @@
       </newsAction>
       <newsAction
             class="org.rssowl.core.internal.newsaction.StopFilterNewsAction"
+            description="Stops applying any more filters to matching News"
             id="org.rssowl.core.StopFilterAction"
             name="Stop Filtering"
             sortKey="12">
