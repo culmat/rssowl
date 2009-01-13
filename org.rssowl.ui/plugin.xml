@@ -1316,13 +1316,13 @@
             class="org.rssowl.ui.internal.filter.ShowNotifierNewsAction"
             id="org.rssowl.ui.ShowNotifierNewsAction"
             name="Show News in Notifier"
-            sortKey="50">
+            sortKey="51">
       </newsAction>
       <newsAction
             class="org.rssowl.ui.internal.filter.PlaySoundAction"
             id="org.rssowl.ui.PlaySoundAction"
             name="Play a Sound"
-            sortKey="40">
+            sortKey="50">
       </newsAction>
    </extension>
    <extension
