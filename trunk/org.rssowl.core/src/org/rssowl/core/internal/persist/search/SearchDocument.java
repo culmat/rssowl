@@ -35,7 +35,7 @@ public abstract class SearchDocument<T extends IEntity> {
   protected static final int ENTITY_ID = -2;
 
   /** The value of an Entitie's ID as String */
-  protected static final String ENTITY_ID_TEXT = String.valueOf(ENTITY_ID);
+  public static final String ENTITY_ID_TEXT = String.valueOf(ENTITY_ID);
 
   private final Document fDocument;
   private final T fType;
