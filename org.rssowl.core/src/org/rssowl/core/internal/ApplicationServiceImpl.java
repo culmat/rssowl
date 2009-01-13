@@ -24,13 +24,31 @@
 
 package org.rssowl.core.internal;
 
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.search.HitCollector;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.store.NoLockFactory;
+import org.apache.lucene.store.RAMDirectory;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IConfigurationElement;
+import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.InvalidRegistryObjectException;
+import org.eclipse.core.runtime.Platform;
 import org.rssowl.core.IApplicationService;
+import org.rssowl.core.INewsAction;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.Description;
 import org.rssowl.core.internal.persist.MergeResult;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.SortedLongArrayList;
+import org.rssowl.core.internal.persist.search.Indexer;
 import org.rssowl.core.internal.persist.search.ModelSearchImpl;
+import org.rssowl.core.internal.persist.search.ModelSearchQueries;
+import org.rssowl.core.internal.persist.search.NewsDocument;
+import org.rssowl.core.internal.persist.search.SearchDocument;
 import org.rssowl.core.internal.persist.service.DB4OIDGenerator;
 import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.internal.persist.service.DBManager;
@@ -42,10 +60,13 @@ import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
+import org.rssowl.core.persist.dao.ISearchFilterDAO;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.runnable.NewsEventRunnable;
 import org.rssowl.core.persist.reference.NewsReference;
@@ -56,21 +77,33 @@ import org.rssowl.core.util.RetentionStrategy;
 import com.db4o.ObjectContainer;
 import com.db4o.ext.Db4oException;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 
 /**
- * db4o implementation of IApplicationService
+ * db4o and Lucene implementation of IApplicationService.
  */
 public class ApplicationServiceImpl implements IApplicationService {
+
+  /* ID of the contributed News Actions */
+  private static final String NEWS_ACTION_EXTENSION_POINT = "org.rssowl.core.NewsAction"; //$NON-NLS-1$
+
+  private final Map<String, INewsAction> fNewsActions;
   private volatile ObjectContainer fDb;
   private volatile ReadWriteLock fLock;
   private volatile Lock fWriteLock;
@@ -79,6 +112,9 @@ public class ApplicationServiceImpl implements IApplicationService {
    * Creates an instance of this class.
    */
   public ApplicationServiceImpl() {
+    fNewsActions = new HashMap<String, INewsAction>();
+    loadNewsActions();
+
     DBManager.getDefault().addEntityStoreListener(new DatabaseListener() {
       public void databaseOpened(DatabaseEvent event) {
         fDb = event.getObjectContainer();
@@ -92,9 +128,25 @@ public class ApplicationServiceImpl implements IApplicationService {
     });
   }
 
+  private void loadNewsActions() {
+    IExtensionRegistry reg = Platform.getExtensionRegistry();
+    IConfigurationElement elements[] = reg.getConfigurationElementsFor(NEWS_ACTION_EXTENSION_POINT);
+    for (IConfigurationElement element : elements) {
+      try {
+        String id = element.getAttribute("id");
+        fNewsActions.put(id, (INewsAction) element.createExecutableExtension("class"));//$NON-NLS-1$
+      } catch (InvalidRegistryObjectException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      } catch (CoreException e) {
+        Activator.getDefault().getLog().log(e.getStatus());
+      }
+    }
+  }
+
   /*
-   * @see org.rssowl.core.model.dao.IApplicationLayer#handleFeedReload(org.rssowl.core.model.persist.IBookMark,
-   * org.rssowl.core.model.persist.IFeed,
+   * @see
+   * org.rssowl.core.model.dao.IApplicationLayer#handleFeedReload(org.rssowl
+   * .core.model.persist.IBookMark, org.rssowl.core.model.persist.IFeed,
    * org.rssowl.core.model.persist.IConditionalGet, boolean)
    */
   public final void handleFeedReload(IBookMark bookMark, IFeed emptyFeed, IConditionalGet conditionalGet, boolean deleteConditionalGet) {
@@ -119,6 +171,9 @@ public class ApplicationServiceImpl implements IApplicationService {
       /* Merge with existing */
       mergeResult = feed.mergeAndCleanUp(emptyFeed);
       List<INews> newNewsAdded = getNewNewsAdded(feed);
+
+      //TODO Work in Progress
+      runNewsFilters(newNewsAdded);
 
       /* Update Date of last added news in Bookmark */
       if (!newNewsAdded.isEmpty()) {
@@ -177,6 +232,140 @@ public class ApplicationServiceImpl implements IApplicationService {
     DBHelper.cleanUpAndFireEvents();
   }
 
+  private Set<ISearchFilter> loadFilters() {
+
+    /* Load Filters */
+    Collection<ISearchFilter> filters = DynamicDAO.getDAO(ISearchFilterDAO.class).loadAll();
+    if (filters.isEmpty())
+      return Collections.emptySet();
+
+    /* Sort filters by ID */
+    Set<ISearchFilter> sortedFilters = new TreeSet<ISearchFilter>(new Comparator<ISearchFilter>() {
+      public int compare(ISearchFilter f1, ISearchFilter f2) {
+        return (f1.getOrder() < f2.getOrder() ? -1 : (f1.getOrder() == f2.getOrder() ? 0 : 1));
+      }
+    });
+
+    sortedFilters.addAll(filters);
+    return sortedFilters;
+  }
+
+  private boolean needToFilter(Collection<ISearchFilter> filters) {
+    for (ISearchFilter filter : filters) {
+      if (filter.isEnabled())
+        return true;
+    }
+
+    return false;
+  }
+
+  private boolean needToIndex(Set<ISearchFilter> filters) {
+    ISearchFilter firstFilter = filters.iterator().next();
+    return !firstFilter.matchAllNews();
+  }
+
+  //TODO Use lots of SafeRunner!
+  private void runNewsFilters(final List<INews> news) {
+
+    /* Load Filters */
+    Set<ISearchFilter> filters = loadFilters();
+
+    /* Nothing to do */
+    if (!needToFilter(filters))
+      return;
+
+    /* Need to index News and perform Searches */
+    RAMDirectory directory = null;
+    final IndexSearcher[] searcher = new IndexSearcher[1];
+    if (needToIndex(filters)) {
+      directory = new RAMDirectory();
+      directory.setLockFactory(NoLockFactory.getNoLockFactory());
+
+      /* Index News */
+      try {
+        IndexWriter indexWriter = new IndexWriter(directory, Indexer.createAnalyzer()); //TODO Consider Singleton!
+        for (int i = 0; i < news.size(); i++) {
+          NewsDocument document = new NewsDocument(news.get(i));
+          document.addFields();
+          document.getDocument().getField(SearchDocument.ENTITY_ID_TEXT).setValue(String.valueOf(i));
+          indexWriter.addDocument(document.getDocument());
+        }
+        indexWriter.close();
+
+        searcher[0] = new IndexSearcher(directory);
+      } catch (Exception e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+        directory.close();
+        return;
+      }
+    }
+
+    /* Remember the news already filtered */
+    List<INews> filteredNews = new ArrayList<INews>(news.size());
+
+    /* Iterate over Filters */
+    for (ISearchFilter filter : filters) {
+
+      /* No Search Required */
+      if (filter.matchAllNews()) {
+        List<INews> remainingNews = new ArrayList<INews>(news);
+        remainingNews.removeAll(filteredNews);
+        if (!remainingNews.isEmpty())
+          applyFilter(filter, news);
+
+        /* Done - we only support 1 filter per News */
+        break;
+      }
+
+      /* Search Required */
+      else if (directory != null && searcher[0] != null) {
+        try {
+          final List<INews> matchingNews = new ArrayList<INews>(3);
+
+          /* Perform Query */
+          Query query = ModelSearchQueries.createQuery(filter.getSearch()); //TODO Listen to filter changes and cache query?
+          searcher[0].search(query, new HitCollector() {
+            @Override
+            public void collect(int doc, float score) {
+              try {
+                Document document = searcher[0].doc(doc);
+                int index = Integer.valueOf(document.get(SearchDocument.ENTITY_ID_TEXT));
+                matchingNews.add(news.get(index));
+              } catch (CorruptIndexException e) {
+                Activator.getDefault().logError(e.getMessage(), e);
+              } catch (IOException e) {
+                Activator.getDefault().logError(e.getMessage(), e);
+              }
+            }
+          });
+
+          /* Apply Filter */
+          matchingNews.removeAll(filteredNews);
+          applyFilter(filter, matchingNews);
+          filteredNews.addAll(matchingNews);
+        } catch (IOException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+          directory.close();
+          return;
+        }
+      }
+    }
+
+    /* Free RAMDirectory if it was built */
+    if (directory != null)
+      directory.close();
+  }
+
+  //TODO Run in SafeRunner!
+  private void applyFilter(ISearchFilter filter, List<INews> news) {
+    List<IFilterAction> actions = filter.getActions();
+    for (IFilterAction action : actions) {
+      INewsAction newsAction = fNewsActions.get(action.getActionId());
+      if (newsAction != null)
+        newsAction.run(news, action.getData());
+    }
+  }
+
   private void lockNewsObjects(MergeResult mergeResult) {
     for (Object object : mergeResult.getUpdatedObjects()) {
       if (object instanceof News) {
@@ -200,9 +389,12 @@ public class ApplicationServiceImpl implements IApplicationService {
   private List<INews> getNewNewsAdded(IFeed feed) {
     List<INews> newsList = feed.getNewsByStates(EnumSet.of(INews.State.NEW));
 
-    for (ListIterator<INews> it = newsList.listIterator(newsList.size()); it.hasPrevious(); ) {
+    for (ListIterator<INews> it = newsList.listIterator(newsList.size()); it.hasPrevious();) {
       INews news = it.previous();
-      /* Relies on the fact that news added during merge have no id assigned yet. */
+      /*
+       * Relies on the fact that news added during merge have no id assigned
+       * yet.
+       */
       if (news.getId() != null)
         it.remove();
     }
@@ -266,8 +458,7 @@ public class ApplicationServiceImpl implements IApplicationService {
     for (Object o : otherObjects) {
       if (o instanceof IFeed) {
         fDb.ext().set(o, 2);
-      }
-      else
+      } else
         fDb.ext().set(o, 1);
     }
 
