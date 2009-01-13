@@ -174,10 +174,16 @@
             sortKey="80">
       </newsAction>
       <newsAction
+            class="org.rssowl.core.internal.newsaction.StopFilterNewsAction"
+            id="org.rssowl.core.StopFilterAction"
+            name="Stop Filtering"
+            sortKey="12">
+      </newsAction>
+      <newsAction
             class="org.rssowl.core.internal.newsaction.DeleteNewsAction"
             id="org.rssowl.core.DeleteNewsAction"
             name="Delete News"
-            sortKey="30">
+            sortKey="11">
       </newsAction>
    </extension>
 </plugin>
