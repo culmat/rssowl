@@ -1036,6 +1036,11 @@ public class ModelUtils {
       if (cond.getValue() instanceof String) {
         String value = cond.getValue().toString();
 
+        /* Ignore Wildcard Only Values (e.g. search for Labels) */
+        if (value == "?" || value == "*")
+          continue;
+
+        /* Ignore Wildcards if set */
         if (ignoreWildcards && (value.contains("?") || value.contains("*")))
           continue;
 
