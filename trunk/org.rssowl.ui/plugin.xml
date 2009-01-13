@@ -1314,6 +1314,7 @@
          point="org.rssowl.core.NewsAction">
       <newsAction
             class="org.rssowl.ui.internal.filter.ShowNotifierNewsAction"
+            description="Shows matching News in the Notifier Pop-Up"
             id="org.rssowl.ui.ShowNotifierNewsAction"
             name="Show News in Notifier"
             sortKey="51">
