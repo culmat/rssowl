@@ -25,6 +25,8 @@
 package org.rssowl.ui.internal.filter;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -40,6 +42,7 @@ import org.rssowl.core.INewsAction;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IModelFactory;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.filter.INewsActionPresentation;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -57,6 +60,7 @@ public class NewsActionItem extends Composite {
   private final NewsActionPresentationManager fNewsActionPresentationManager = NewsActionPresentationManager.getInstance();
   private ComboViewer fViewer;
   private INewsActionPresentation fShowingPresentation;
+  private ControlDecoration fInformationHover;
 
   /**
    * @param parent
@@ -106,6 +110,10 @@ public class NewsActionItem extends Composite {
     combo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
     combo.setVisibleItemCount(10);
 
+    fInformationHover = new ControlDecoration(combo, SWT.LEFT | SWT.TOP);
+    fInformationHover.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
+    fInformationHover.hide();
+
     fViewer = new ComboViewer(combo);
     fViewer.setContentProvider(new ArrayContentProvider());
     fViewer.setLabelProvider(new LabelProvider() {
@@ -124,6 +132,7 @@ public class NewsActionItem extends Composite {
       if (action.getActionId().equals(fInitialFilterAction.getActionId())) {
         fViewer.setSelection(new StructuredSelection(action));
         selectedFilterAction = action;
+        updateInfoControl(action);
         break;
       }
     }
@@ -132,12 +141,22 @@ public class NewsActionItem extends Composite {
     fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
         IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-        showFilterAction((NewsActionDescriptor) selection.getFirstElement(), null);
+        NewsActionDescriptor descriptor = (NewsActionDescriptor) selection.getFirstElement();
+        showFilterAction(descriptor, null);
+        updateInfoControl(descriptor);
       }
     });
 
     if (selectedFilterAction != null)
       showFilterAction(selectedFilterAction, fInitialFilterAction.getData());
+  }
+
+  private void updateInfoControl(NewsActionDescriptor descriptor) {
+    if (StringUtils.isSet(descriptor.getDescription())) {
+      fInformationHover.setDescriptionText(descriptor.getDescription());
+      fInformationHover.show();
+    } else
+      fInformationHover.hide();
   }
 
   private void showFilterAction(NewsActionDescriptor action, Object data) {

@@ -116,9 +116,10 @@ public class NewsActionPresentationManager {
         String id = element.getAttribute("id");
         INewsAction newsAction = (INewsAction) element.createExecutableExtension("class");
         String name = element.getAttribute("name");
+        String description = element.getAttribute("description");
         String sortKey = element.getAttribute("sortKey");
 
-        NewsActionDescriptor filterAction = new NewsActionDescriptor(id, newsAction, name, sortKey);
+        NewsActionDescriptor filterAction = new NewsActionDescriptor(id, newsAction, name, description, sortKey);
         fNewsActions.put(id, filterAction);
         fSortedNewsActions.add(filterAction);
       } catch (InvalidRegistryObjectException e) {
