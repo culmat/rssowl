@@ -52,6 +52,7 @@ import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchValueType;
@@ -99,6 +100,17 @@ public class ModelSearchQueries {
 
   /* Wildcard matching any Char */
   private static final char CHAR_WILDCARD = '?';
+
+  /**
+   * Creates a Lucene {@link Query} from the given parameters.
+   *
+   * @param search the search for the query.
+   * @return a {@link Query} from the given parameters.
+   * @throws IOException in case of an error.
+   */
+  public static Query createQuery(ISearch search) throws IOException {
+    return createQuery(search.getSearchConditions(), search.matchAllConditions());
+  }
 
   /**
    * Creates a Lucene {@link Query} from the given parameters.
