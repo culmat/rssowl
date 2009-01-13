@@ -257,7 +257,7 @@ public class Indexer {
    * @return Returns the <code>Analyzer</code> that is used for all
    * analyzation of Fields and Queries.
    */
-  static Analyzer createAnalyzer() {
+  public static Analyzer createAnalyzer() {
     PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper(new DefaultAnalyzer());
 
     /* Standard (Lowercase, Letter, Stop,...) */
