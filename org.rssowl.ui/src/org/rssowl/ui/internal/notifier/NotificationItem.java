@@ -27,6 +27,7 @@ package org.rssowl.ui.internal.notifier;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.RGB;
 
 /**
  * Instances of {@link NotificationItem} can be displayed in the
@@ -88,6 +89,14 @@ public abstract class NotificationItem implements Comparable<NotificationItem> {
    */
   public ImageDescriptor getImage() {
     return fImage;
+  }
+
+  /**
+   * @return The foreground color for the News in the notifier or
+   * <code>null</code> if none.
+   */
+  public RGB getColor() {
+    return null;
   }
 
   /**
