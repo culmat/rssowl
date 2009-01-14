@@ -25,8 +25,10 @@
 package org.rssowl.ui.internal.filter;
 
 import org.rssowl.core.INewsAction;
-import org.rssowl.core.internal.newsaction.DeleteNewsAction;
 import org.rssowl.core.persist.INews;
+import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.notifier.NotificationService;
 
 import java.util.List;
 
@@ -41,14 +43,18 @@ public class ShowNotifierNewsAction implements INewsAction {
   /*
    * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
    */
-  public void run(List<INews> news, Object data) {
-  // TODO Implement showing News in Notifier
+  public void run(final List<INews> news, final Object data) {
+    NotificationService notificationService = Controller.getDefault().getNotificationService();
+    if (data != null && data instanceof String)
+      notificationService.show(news, OwlUI.getRGB((String) data));
+    else
+      notificationService.show(news, null);
   }
 
   /*
    * @see org.rssowl.core.INewsAction#isConflicting(org.rssowl.core.INewsAction)
    */
   public boolean conflictsWith(INewsAction otherAction) {
-    return otherAction instanceof DeleteNewsAction;
+    return false;
   }
 }
