@@ -172,9 +172,6 @@ public class ApplicationServiceImpl implements IApplicationService {
       mergeResult = feed.mergeAndCleanUp(emptyFeed);
       List<INews> newNewsAdded = getNewNewsAdded(feed);
 
-      //TODO Work in Progress
-      runNewsFilters(newNewsAdded);
-
       /* Update Date of last added news in Bookmark */
       if (!newNewsAdded.isEmpty()) {
         Date mostRecentDate = DateUtils.getRecentDate(newNewsAdded);
@@ -207,6 +204,9 @@ public class ApplicationServiceImpl implements IApplicationService {
           mergeResult.addUpdatedObject(new Description(news, description));
         }
       }
+
+      //TODO Check side-effects of running the filter here!
+      runNewsFilters(newNewsAdded);
 
       try {
         lockNewsObjects(mergeResult);
@@ -341,7 +341,8 @@ public class ApplicationServiceImpl implements IApplicationService {
 
           /* Apply Filter */
           matchingNews.removeAll(filteredNews);
-          applyFilter(filter, matchingNews);
+          if (!matchingNews.isEmpty())
+            applyFilter(filter, matchingNews);
           filteredNews.addAll(matchingNews);
         } catch (IOException e) {
           Activator.getDefault().logError(e.getMessage(), e);
