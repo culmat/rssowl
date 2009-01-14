@@ -412,6 +412,13 @@ public class NotificationPopup extends PopupDialog {
     updateNavButtons();
   }
 
+  private void updateItemColor(NotificationItem item, CCLabel itemLabel) {
+    if (item.getColor() == null)
+      itemLabel.setForeground(itemLabel.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+    else
+      itemLabel.setForeground(OwlUI.getColor(fResources, item.getColor()));
+  }
+
   private void renderItem(final NotificationItem item) {
 
     /* Image Label with Tooltip */
@@ -430,6 +437,7 @@ public class NotificationPopup extends PopupDialog {
     itemLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     itemLabel.setText(item.getText());
     itemLabel.setFont(fBoldTextFont);
+    updateItemColor(item, itemLabel);
     itemLabel.addMouseTrackListener(fMouseTrackListner);
 
     /* Paint text blue on mouse-enter */
@@ -442,7 +450,7 @@ public class NotificationPopup extends PopupDialog {
 
       @Override
       public void mouseExit(MouseEvent e) {
-        itemLabel.setForeground(itemLabel.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+        updateItemColor(item, itemLabel);
       }
     };
 
