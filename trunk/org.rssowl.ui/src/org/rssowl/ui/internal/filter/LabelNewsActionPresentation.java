@@ -31,11 +31,13 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.ui.filter.INewsActionPresentation;
+import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.Collection;
 
@@ -47,12 +49,18 @@ import java.util.Collection;
 public class LabelNewsActionPresentation implements INewsActionPresentation {
   private Combo fLabelCombo;
   private ComboViewer fViewer;
+  private Composite fContainer;
 
   /*
    * @see org.rssowl.ui.IFilterActionPresentation#create(org.eclipse.swt.widgets.Composite, java.lang.Object)
    */
   public void create(Composite parent, Object data) {
-    fLabelCombo = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
+    fContainer = new Composite(parent, SWT.NONE);
+    fContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
+    ((GridLayout) fContainer.getLayout()).marginLeft = 5;
+    fContainer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+
+    fLabelCombo = new Combo(fContainer, SWT.READ_ONLY | SWT.BORDER);
     fLabelCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fViewer = new ComboViewer(fLabelCombo);
@@ -87,7 +95,7 @@ public class LabelNewsActionPresentation implements INewsActionPresentation {
    * @see org.rssowl.ui.IFilterActionPresentation#dispose()
    */
   public void dispose() {
-    fLabelCombo.dispose();
+    fContainer.dispose();
   }
 
   /*
