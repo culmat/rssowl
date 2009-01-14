@@ -1344,6 +1344,10 @@
             actionId="org.rssowl.ui.PlaySoundAction"
             class="org.rssowl.ui.internal.filter.PlaySoundActionPresentation">
       </newsActionPresentation>
+      <newsActionPresentation
+            actionId="org.rssowl.ui.ShowNotifierNewsAction"
+            class="org.rssowl.ui.internal.filter.ShowNotifierNewsActionPresentation">
+      </newsActionPresentation>
    </extension>
    <extension
          point="org.eclipse.ui.perspectiveExtensions">
