@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.notifier;
 
+import org.eclipse.swt.graphics.RGB;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
@@ -54,8 +55,8 @@ import java.util.Set;
 
 /**
  * The <code>NotificationService</code> listens on News being downloaded and
- * opens the <code>NotificationPopup</code> to show them in case the
- * preferences are set to show notifications.
+ * opens the <code>NotificationPopup</code> to show them in case the preferences
+ * are set to show notifications.
  *
  * @author bpasero
  */
@@ -92,6 +93,24 @@ public class NotificationService {
   public void stopService() {
     DynamicDAO.removeEntityListener(INews.class, fNewsListener);
     DynamicDAO.removeEntityListener(ISearchMark.class, fSearchMarkListener);
+  }
+
+  /**
+   * @param news the list of {@link INews} to show in the notifier.
+   * @param color the color to use for the news or <code>null</code> if none.
+   */
+  public void show(List<INews> news, RGB color) {
+    List<NotificationItem> items = new ArrayList<NotificationItem>(news.size());
+    for (INews newsitem : news)
+      items.add(new NewsNotificationItem(newsitem, color));
+
+    /* Add into Buffer */
+    if (!isPopupVisible())
+      fBatchedBuffer.addAll(items);
+
+    /* Show Directly */
+    else
+      showItems(items);
   }
 
   private boolean isPopupVisible() {
