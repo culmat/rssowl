@@ -25,8 +25,6 @@
 package org.rssowl.ui.internal.filter;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -60,7 +58,6 @@ public class NewsActionItem extends Composite {
   private final NewsActionPresentationManager fNewsActionPresentationManager = NewsActionPresentationManager.getInstance();
   private ComboViewer fViewer;
   private INewsActionPresentation fShowingPresentation;
-  private ControlDecoration fInformationHover;
 
   /**
    * @param parent
@@ -110,10 +107,6 @@ public class NewsActionItem extends Composite {
     combo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
     combo.setVisibleItemCount(10);
 
-    fInformationHover = new ControlDecoration(combo, SWT.LEFT | SWT.TOP);
-    fInformationHover.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
-    fInformationHover.hide();
-
     fViewer = new ComboViewer(combo);
     fViewer.setContentProvider(new ArrayContentProvider());
     fViewer.setLabelProvider(new LabelProvider() {
@@ -152,11 +145,10 @@ public class NewsActionItem extends Composite {
   }
 
   private void updateInfoControl(NewsActionDescriptor descriptor) {
-    if (StringUtils.isSet(descriptor.getDescription())) {
-      fInformationHover.setDescriptionText(descriptor.getDescription());
-      fInformationHover.show();
-    } else
-      fInformationHover.hide();
+    if (StringUtils.isSet(descriptor.getDescription()))
+      fViewer.getControl().setToolTipText(descriptor.getDescription());
+    else
+      fViewer.getControl().setToolTipText(null);
   }
 
   private void showFilterAction(NewsActionDescriptor action, Object data) {
