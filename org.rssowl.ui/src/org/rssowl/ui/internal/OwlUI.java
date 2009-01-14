@@ -516,8 +516,24 @@ public class OwlUI {
    * @return RGB
    */
   public static RGB getRGB(ILabel label) {
-    String color[] = label.getColor().split(",");
+    return getRGB(label.getColor());
+  }
+
+  /**
+   * @param rgb
+   * @return RGB
+   */
+  public static RGB getRGB(String rgb) {
+    String color[] = rgb.split(",");
     return new RGB(Integer.parseInt(color[0]), Integer.parseInt(color[1]), Integer.parseInt(color[2]));
+  }
+
+  /**
+   * @param rgb
+   * @return String
+   */
+  public static String toString(RGB rgb) {
+    return rgb.red + "," + rgb.green + "," + rgb.blue;
   }
 
   /**
