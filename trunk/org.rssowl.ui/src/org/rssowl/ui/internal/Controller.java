@@ -403,6 +403,13 @@ public class Controller {
   }
 
   /**
+   * @return Returns the notificationService.
+   */
+  public NotificationService getNotificationService() {
+    return fNotificationService;
+  }
+
+  /**
    * @return Returns the contextService.
    */
   public ContextService getContextService() {
