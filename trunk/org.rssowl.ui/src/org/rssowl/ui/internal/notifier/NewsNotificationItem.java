@@ -28,10 +28,12 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
@@ -46,6 +48,7 @@ import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Instance of {@link NotificationItem} to display new {@link INews} in the
@@ -65,11 +68,21 @@ public class NewsNotificationItem extends NotificationItem {
   private boolean fIsNewsSticky;
   private String fCachedDescriptionExcerpt;
   private String fCachedOrigin;
+  private RGB fColor;
 
   /**
    * @param news The news that is to be displayed in the Notifier.
    */
   public NewsNotificationItem(INews news) {
+    this(news, null);
+  }
+
+  /**
+   * @param news The news that is to be displayed in the Notifier.
+   * @param color The color for the news in the Notifier or <code>null</code> if
+   * none.
+   */
+  public NewsNotificationItem(INews news, RGB color) {
     super(makeText(news), makeImage(news));
 
     fNewsLink = news.getLinkAsText();
@@ -77,6 +90,14 @@ public class NewsNotificationItem extends NotificationItem {
     fNewsReference = new NewsReference(news.getId());
     fRecentNewsDate = DateUtils.getRecentDate(news);
     fIsNewsSticky = news.isFlagged();
+
+    if (color != null)
+      fColor = color;
+    else {
+      Set<ILabel> labels = news.getLabels();
+      if (!labels.isEmpty())
+        fColor = OwlUI.getRGB(labels.iterator().next());
+    }
   }
 
   private String extractDescriptionExcerpt(INews news) {
@@ -122,6 +143,14 @@ public class NewsNotificationItem extends NotificationItem {
       fCachedDescriptionExcerpt = extractDescriptionExcerpt(fNewsReference.resolve());
 
     return fCachedDescriptionExcerpt;
+  }
+
+  /*
+   * @see org.rssowl.ui.internal.notifier.NotificationItem#getColor()
+   */
+  @Override
+  public RGB getColor() {
+    return fColor;
   }
 
   /*
