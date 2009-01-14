@@ -98,7 +98,10 @@ public class BatchedBuffer<T> {
 
       /* Existing Batch */
       else {
-        fBuffer.addAll(objects);
+        for (T object : objects) {
+          if (!fBuffer.contains(object))
+            fBuffer.add(object);
+        }
       }
     }
   }
