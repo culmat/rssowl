@@ -368,7 +368,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
             /* Filter News which are from a different Feed than displayed */
             for (NewsEvent event : events) {
-              if (isInputRelatedTo(event.getEntity(), EventType.PERSIST)) {
+              if (event.getEntity().isVisible() && isInputRelatedTo(event.getEntity(), EventType.PERSIST)) {
                 if (addedNews == null)
                   addedNews = new HashSet<NewsEvent>();
 
