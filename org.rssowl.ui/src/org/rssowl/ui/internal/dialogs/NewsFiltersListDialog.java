@@ -460,14 +460,14 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
             public void run() throws Exception {
               newsAction.run(news, action.getData());
+
+              /* Make sure that news are saved after action has run */
+              DynamicDAO.saveAll(news);
             }
           });
         }
       }
     }
-
-    /* Make sure that news are saved after action has run */
-    DynamicDAO.saveAll(news);
   }
 
   private List<List<SearchHit<NewsReference>>> toChunks(int size, List<SearchHit<NewsReference>> list) {
