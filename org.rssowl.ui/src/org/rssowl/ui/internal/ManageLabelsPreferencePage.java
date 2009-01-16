@@ -26,6 +26,10 @@ package org.rssowl.ui.internal;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.fieldassist.ContentProposalAdapter;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -69,10 +73,13 @@ import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.ICategoryDAO;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
+import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.dialogs.ConfirmDeleteDialog;
+import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;
@@ -174,6 +181,28 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
         fNameInput.addModifyListener(new ModifyListener() {
           public void modifyText(ModifyEvent e) {
             onModifyName();
+          }
+        });
+
+        /* Show UI Hint for extra information is available */
+        ControlDecoration controlDeco = new ControlDecoration(fNameInput, SWT.LEFT | SWT.TOP);
+        controlDeco.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
+        controlDeco.setDescriptionText("Content Assist Available (Press Arrow-Down Key)");
+        controlDeco.setShowOnlyOnFocus(true);
+
+        /* Add auto-complete for Labels taken from existing Categories */
+        final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = OwlUI.hookAutoComplete(fNameInput, null);
+
+        /* Load proposals in the Background */
+        JobRunner.runDelayedInBackgroundThread(new Runnable() {
+          public void run() {
+            if (!fNameInput.isDisposed()) {
+              Set<String> values = DynamicDAO.getDAO(ICategoryDAO.class).loadAllNames();
+
+              /* Apply Proposals */
+              if (!fNameInput.isDisposed())
+                OwlUI.applyAutoCompleteProposals(values, pair.getFirst(), pair.getSecond());
+            }
           }
         });
       }
