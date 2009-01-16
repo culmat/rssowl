@@ -24,11 +24,14 @@
 
 package org.rssowl.ui.internal.dialogs;
 
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -55,19 +58,36 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.rssowl.core.INewsAction;
+import org.rssowl.core.Owl;
+import org.rssowl.core.persist.IFilterAction;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchFilter;
+import org.rssowl.core.persist.SearchSpecifier;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.ISearchFilterDAO;
+import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.persist.service.IModelSearch;
+import org.rssowl.core.util.SearchHit;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.CColumnLayoutData;
 import org.rssowl.ui.internal.CTable;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.CColumnLayoutData.Size;
+import org.rssowl.ui.internal.filter.NewsActionDescriptor;
+import org.rssowl.ui.internal.filter.NewsActionPresentationManager;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A dialog to manage news filters in RSSOwl. The dialog allows to add, edit and
@@ -77,6 +97,11 @@ import java.util.List;
  * @author bpasero
  */
 public class NewsFiltersListDialog extends TitleAreaDialog {
+
+  /* Number of News to process in a forced Filter run at once */
+  private static final int FILTER_CHUNK_SIZE = 50;
+
+  private NewsActionPresentationManager fNewsActionPresentationManager = NewsActionPresentationManager.getInstance();
   private LocalResourceManager fResources;
   private CheckboxTableViewer fViewer;
   private Button fEditButton;
@@ -85,6 +110,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
   private Button fMoveUpButton;
   private Image fFilterIcon;
   private ISearchFilterDAO fSearchFilterDao;
+  private Button fApplySelectedFilter;
 
   /**
    * @param parentShell
@@ -176,8 +202,10 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     /* Selection */
     fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
-        fEditButton.setEnabled(!event.getSelection().isEmpty());
-        fDeleteButton.setEnabled(!event.getSelection().isEmpty());
+        IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+        fEditButton.setEnabled(!selection.isEmpty());
+        fDeleteButton.setEnabled(!selection.isEmpty());
+        fApplySelectedFilter.setEnabled(!selection.isEmpty() && selection.size() == 1);
 
         updateMoveEnablement();
       }
@@ -203,7 +231,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
       }
     });
 
-    /* Container for the Buttons to Manage Sets */
+    /* Container for the Buttons to Manage Filters */
     Composite buttonContainer = new Composite(composite, SWT.None);
     buttonContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
     buttonContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false));
@@ -270,6 +298,20 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
       }
     });
 
+    /* Button to apply filter on all News */
+    fApplySelectedFilter = new Button(composite, SWT.PUSH);
+    fApplySelectedFilter.setText("&Run Selected Filter...");
+    fApplySelectedFilter.setEnabled(false);
+    setButtonLayoutData(fApplySelectedFilter);
+    ((GridData) fApplySelectedFilter.getLayoutData()).grabExcessHorizontalSpace = false;
+    ((GridData) fApplySelectedFilter.getLayoutData()).horizontalAlignment = SWT.BEGINNING;
+    fApplySelectedFilter.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        onApplySelectedFilter();
+      }
+    });
+
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
@@ -279,8 +321,144 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     return composite;
   }
 
+  private void onApplySelectedFilter() {
+    IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
+    if (!selection.isEmpty()) {
+      ISearchFilter filter = (ISearchFilter) selection.getFirstElement();
+
+      /* Retrieve those actions that are forcable to run */
+      List<IFilterAction> actions = filter.getActions();
+      List<IFilterAction> forcableActions = new ArrayList<IFilterAction>(actions.size());
+      for (IFilterAction action : actions) {
+        NewsActionDescriptor newsActionDescriptor = fNewsActionPresentationManager.getNewsActionDescriptor(action.getActionId());
+        if (newsActionDescriptor != null && newsActionDescriptor.isForcable())
+          forcableActions.add(action);
+      }
+
+      /* Return early if selected Action is not forcable */
+      if (forcableActions.isEmpty()) {
+        MessageDialog.openWarning(getShell(), "Run Selected Filter '" + filter.getName() + "'", "The selected filter '" + filter.getName() + "' does not contain any action that can be forced to run on your news. Please select a different filter.");
+        return;
+      }
+
+      IModelSearch search = Owl.getPersistenceService().getModelSearch();
+      List<SearchHit<NewsReference>> targetNews = null;
+
+      /* Search for all Visible News */
+      Set<State> visibleStates = INews.State.getVisible();
+      if (filter.matchAllNews()) {
+        ISearchField stateField = Owl.getModelFactory().createSearchField(INews.STATE, INews.class.getName());
+        ISearchCondition stateCondition = Owl.getModelFactory().createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED, State.READ));
+        targetNews = search.searchNews(Collections.singleton(stateCondition), true);
+      }
+
+      /* Use Search from Filter */
+      else {
+        List<SearchHit<NewsReference>> result = search.searchNews(filter.getSearch());
+        targetNews = new ArrayList<SearchHit<NewsReference>>(result.size());
+
+        /* Filter out those that are not visible */
+        for (SearchHit<NewsReference> resultItem : result) {
+          INews.State state = (State) resultItem.getData(INews.STATE);
+          if (visibleStates.contains(state))
+            targetNews.add(resultItem);
+        }
+      }
+
+      /* Return early if there is no matching News */
+      if (targetNews.isEmpty()) {
+        MessageDialog.openWarning(getShell(), "Run Selected Filter '" + filter.getName() + "'", "The selected filter '" + filter.getName() + "' does not match any of the existing News.");
+        return;
+      }
+
+      /* Ask for Confirmation */
+      boolean multipleActions = forcableActions.size() > 1;
+      String title = "Run Selected Filter '" + filter.getName() + "'";
+      StringBuilder message = new StringBuilder("The following " + (multipleActions ? "actions" : "action") + " will be performed on " + targetNews.size() + " matching news:\n");
+      for (IFilterAction action : forcableActions) {
+        NewsActionDescriptor newsActionDescriptor = fNewsActionPresentationManager.getNewsActionDescriptor(action.getActionId());
+        message.append("\n - ").append(newsActionDescriptor.getName());
+      }
+
+      message.append("\n\nPress OK to to confirm.");
+
+      ConfirmDeleteDialog dialog = new ConfirmDeleteDialog(getShell(), title, "This action can not be undone", message.toString(), IDialogConstants.OK_LABEL, null) {
+        @Override
+        protected String getTitleImage() {
+          return "icons/wizban/filter_wiz.gif";
+        }
+      };
+
+      /* Apply Actions in chunks of N Items to avoid Memory issues */
+      if (dialog.open() == IDialogConstants.OK_ID) {
+        applyFilter(targetNews, filter);
+      }
+    }
+  }
+
+  //TODO Show Progress
+  private void applyFilter(List<SearchHit<NewsReference>> news, ISearchFilter filter) {
+    List<List<SearchHit<NewsReference>>> chunks = toChunks(FILTER_CHUNK_SIZE, news);
+    for (List<SearchHit<NewsReference>> chunk : chunks) {
+      List<INews> newsItemsToFilter = new ArrayList<INews>(FILTER_CHUNK_SIZE);
+      for (SearchHit<NewsReference> chunkItem : chunk) {
+        INews newsItemToFilter = chunkItem.getResult().resolve();
+        if (newsItemToFilter != null)
+          newsItemsToFilter.add(newsItemToFilter);
+      }
+
+      applyFilterOnChunks(newsItemsToFilter, filter);
+    }
+  }
+
+  private void applyFilterOnChunks(final List<INews> news, ISearchFilter filter) {
+    List<IFilterAction> actions = filter.getActions();
+    for (final IFilterAction action : actions) {
+      NewsActionDescriptor newsActionDescriptor = fNewsActionPresentationManager.getNewsActionDescriptor(action.getActionId());
+      if (newsActionDescriptor != null) {
+        final INewsAction newsAction = newsActionDescriptor.getNewsAction();
+        if (newsAction != null) {
+          SafeRunnable.run(new ISafeRunnable() {
+            public void handleException(Throwable e) {
+              if (e instanceof Exception)
+                Activator.getDefault().logError(e.getMessage(), (Exception) e);
+            }
+
+            public void run() throws Exception {
+              newsAction.run(news, action.getData());
+            }
+          });
+        }
+      }
+    }
+
+    /* Make sure that news are saved after action has run */
+    DynamicDAO.saveAll(news);
+  }
+
+  private List<List<SearchHit<NewsReference>>> toChunks(int size, List<SearchHit<NewsReference>> list) {
+    List<List<SearchHit<NewsReference>>> chunkList = new ArrayList<List<SearchHit<NewsReference>>>();
+    List<SearchHit<NewsReference>> currentChunk = new ArrayList<SearchHit<NewsReference>>(size);
+    chunkList.add(currentChunk);
+
+    int counter = 0;
+    for (SearchHit<NewsReference> entry : list) {
+      currentChunk.add(entry);
+      counter++;
+      if (counter % size == 0) {
+        currentChunk = new ArrayList<SearchHit<NewsReference>>(size);
+        chunkList.add(currentChunk);
+      }
+    }
+
+    if (currentChunk.isEmpty())
+      chunkList.remove(currentChunk);
+
+    return chunkList;
+  }
+
   private void updateTitle() {
-    ISearchFilter problematicFilter= null;
+    ISearchFilter problematicFilter = null;
 
     Table table = fViewer.getTable();
     TableItem[] items = table.getItems();

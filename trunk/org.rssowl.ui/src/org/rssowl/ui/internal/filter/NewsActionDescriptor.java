@@ -37,6 +37,7 @@ public class NewsActionDescriptor implements Comparable<NewsActionDescriptor> {
   private final String fSortKey;
   private final INewsAction fNewsAction;
   private final String fDescription;
+  private final boolean fIsForcable;
 
   /**
    * @param actionId the unique ID of the contributed {@link INewsAction}
@@ -45,13 +46,15 @@ public class NewsActionDescriptor implements Comparable<NewsActionDescriptor> {
    * @param description a description of what the action does nor
    * <code>null</code> if none.
    * @param sortKey the sort key of the action
+   * @param isForcable if <code>true</code> allows to be run forced.
    */
-  public NewsActionDescriptor(String actionId, INewsAction newsAction, String name, String description, String sortKey) {
+  public NewsActionDescriptor(String actionId, INewsAction newsAction, String name, String description, String sortKey, boolean isForcable) {
     fActionId = actionId;
     fNewsAction = newsAction;
     fName = name;
     fDescription = description;
     fSortKey = sortKey;
+    fIsForcable = isForcable;
   }
 
   /**
@@ -87,6 +90,14 @@ public class NewsActionDescriptor implements Comparable<NewsActionDescriptor> {
    */
   public String getSortKey() {
     return fSortKey;
+  }
+
+  /**
+   * @return <code>true</code> if this action can be forced to run and
+   * <code>false</code> otherwise.
+   */
+  public boolean isForcable() {
+    return fIsForcable;
   }
 
   /*
