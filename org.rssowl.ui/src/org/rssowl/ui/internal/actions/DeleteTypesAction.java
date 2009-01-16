@@ -46,7 +46,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
-import org.rssowl.ui.internal.dialogs.ConfirmDeleteDialog;
+import org.rssowl.ui.internal.dialogs.ConfirmDialog;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
 import org.rssowl.ui.internal.undo.UndoStack;
@@ -132,7 +132,7 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
     }
 
     /* Create Dialog and open if confirmation required */
-    ConfirmDeleteDialog dialog = new ConfirmDeleteDialog(fShell, "Confirm Delete", "This action can not be undone", getMessage(elements), null);
+    ConfirmDialog dialog = new ConfirmDialog(fShell, "Confirm Delete", "This action can not be undone", getMessage(elements), null);
     return dialog.open() == IDialogConstants.OK_ID;
   }
 

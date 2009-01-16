@@ -382,7 +382,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
       message.append("\n\nPress OK to to confirm.");
 
-      ConfirmDeleteDialog dialog = new ConfirmDeleteDialog(getShell(), title, "This action can not be undone", message.toString(), IDialogConstants.OK_LABEL, null) {
+      ConfirmDialog dialog = new ConfirmDialog(getShell(), title, "This action can not be undone", message.toString(), IDialogConstants.OK_LABEL, null) {
         @Override
         protected String getTitleImage() {
           return "icons/wizban/filter_wiz.gif";
@@ -574,7 +574,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
 
     List<?> selectedFilters = selection.toList();
-    ConfirmDeleteDialog dialog = new ConfirmDeleteDialog(getShell(), "Confirm Delete", "This action can not be undone", getMessage(selectedFilters), null);
+    ConfirmDialog dialog = new ConfirmDialog(getShell(), "Confirm Delete", "This action can not be undone", getMessage(selectedFilters), null);
     if (dialog.open() == IDialogConstants.OK_ID) {
       List<ISearchFilter> filtersToDelete = new ArrayList<ISearchFilter>(selectedFilters.size());
       for (Iterator<?> iterator = selectedFilters.iterator(); iterator.hasNext();) {
