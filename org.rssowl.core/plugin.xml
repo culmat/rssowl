@@ -147,30 +147,35 @@
             class="org.rssowl.core.internal.newsaction.MoveNewsAction"
             id="org.rssowl.core.MoveNewsAction"
             name="Move News"
+            forcable="true"
             sortKey="95">
       </newsAction>
       <newsAction
             class="org.rssowl.core.internal.newsaction.CopyNewsAction"
             id="org.rssowl.core.CopyNewsAction"
             name="Copy News"
+            forcable="true"
             sortKey="90">
       </newsAction>
       <newsAction
             class="org.rssowl.core.internal.newsaction.MarkReadNewsAction"
             id="org.rssowl.core.MarkReadNewsAction"
             name="Mark News as Read"
+            forcable="true"
             sortKey="85">
       </newsAction>
       <newsAction
             class="org.rssowl.core.internal.newsaction.MarkStickyNewsAction"
             id="org.rssowl.core.MarkStickyNewsAction"
             name="Mark News as Sticky"
+            forcable="true"
             sortKey="83">
       </newsAction>
       <newsAction
             class="org.rssowl.core.internal.newsaction.LabelNewsAction"
             id="org.rssowl.core.LabelNewsAction"
             name="Label News"
+            forcable="true"
             sortKey="80">
       </newsAction>
       <newsAction
@@ -178,12 +183,14 @@
             description="Stops applying any more filters to matching News"
             id="org.rssowl.core.StopFilterAction"
             name="Stop Filtering"
+            forcable="true"
             sortKey="12">
       </newsAction>
       <newsAction
             class="org.rssowl.core.internal.newsaction.DeleteNewsAction"
             id="org.rssowl.core.DeleteNewsAction"
             name="Delete News"
+            forcable="true"
             sortKey="11">
       </newsAction>
    </extension>
