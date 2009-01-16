@@ -1317,12 +1317,14 @@
             description="Shows matching News in the Notifier Pop-Up"
             id="org.rssowl.ui.ShowNotifierNewsAction"
             name="Show News in Notifier"
+            forcable="false"
             sortKey="51">
       </newsAction>
       <newsAction
             class="org.rssowl.ui.internal.filter.PlaySoundAction"
             id="org.rssowl.ui.PlaySoundAction"
             name="Play a Sound"
+            forcable="false"
             sortKey="50">
       </newsAction>
    </extension>

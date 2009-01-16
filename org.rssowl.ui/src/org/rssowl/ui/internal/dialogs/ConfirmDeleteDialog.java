@@ -43,7 +43,7 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 /**
- * Generic Dialog for asking for confirmation when deleting something.
+ * Generic Dialog for asking for confirmation when performing something.
  *
  * @author bpasero
  */
@@ -59,6 +59,7 @@ public class ConfirmDeleteDialog extends TitleAreaDialog {
   private LocalResourceManager fResources;
   private String fConfirmPrefKey;
   private IPreferenceScope fPreferences;
+  private String fButtonName;
 
   /**
    * Instantiate a new ConfirmDeleteDialog
@@ -71,10 +72,26 @@ public class ConfirmDeleteDialog extends TitleAreaDialog {
    * setting for "Never ask again"
    */
   public ConfirmDeleteDialog(Shell parentShell, String title, String dialogHeaderMessage, String dialogMessage, String confirmPrefKey) {
+    this(parentShell, title, dialogHeaderMessage, dialogMessage, "Delete", confirmPrefKey);
+  }
+
+  /**
+   * Instantiate a new ConfirmDeleteDialog
+   *
+   * @param parentShell The parent shell
+   * @param title The title of the dialog
+   * @param dialogHeaderMessage The info message
+   * @param dialogMessage The dialog message
+   * @param okButtonName
+   * @param confirmPrefKey The key to the boolean preference to receive the
+   * setting for "Never ask again"
+   */
+  public ConfirmDeleteDialog(Shell parentShell, String title, String dialogHeaderMessage, String dialogMessage, String okButtonName, String confirmPrefKey) {
     super(parentShell);
     fTitle = title;
     fDialogMessage = dialogMessage;
     fDialogHeaderMessage = dialogHeaderMessage;
+    fButtonName = okButtonName;
     fConfirmPrefKey = confirmPrefKey;
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fPreferences = Owl.getPreferenceService().getGlobalScope();
@@ -111,6 +128,13 @@ public class ConfirmDeleteDialog extends TitleAreaDialog {
     newShell.setText(fTitle);
   }
 
+  /**
+   * @return the path to the title image to use.
+   */
+  protected String getTitleImage() {
+    return "/icons/wizban/trash.gif";
+  }
+
   /*
    * @see org.eclipse.jface.dialogs.TitleAreaDialog#createDialogArea(org.eclipse.swt.widgets.Composite)
    */
@@ -123,7 +147,7 @@ public class ConfirmDeleteDialog extends TitleAreaDialog {
     composite.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Title Image */
-    setTitleImage(OwlUI.getImage(fResources, "/icons/wizban/trash.gif"));
+    setTitleImage(OwlUI.getImage(fResources, getTitleImage()));
 
     /* Title Message */
     setMessage(fDialogHeaderMessage, IMessageProvider.WARNING);
@@ -159,7 +183,7 @@ public class ConfirmDeleteDialog extends TitleAreaDialog {
    */
   @Override
   protected void createButtonsForButtonBar(Composite parent) {
-    createButton(parent, IDialogConstants.OK_ID, "Delete", true);
+    createButton(parent, IDialogConstants.OK_ID, fButtonName, true);
     createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
     getButton(IDialogConstants.OK_ID).setFocus();
   }

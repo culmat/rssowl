@@ -118,8 +118,9 @@ public class NewsActionPresentationManager {
         String name = element.getAttribute("name");
         String description = element.getAttribute("description");
         String sortKey = element.getAttribute("sortKey");
+        String forcable = element.getAttribute("forcable");
 
-        NewsActionDescriptor filterAction = new NewsActionDescriptor(id, newsAction, name, description, sortKey);
+        NewsActionDescriptor filterAction = new NewsActionDescriptor(id, newsAction, name, description, sortKey, Boolean.parseBoolean(forcable));
         fNewsActions.put(id, filterAction);
         fSortedNewsActions.add(filterAction);
       } catch (InvalidRegistryObjectException e) {

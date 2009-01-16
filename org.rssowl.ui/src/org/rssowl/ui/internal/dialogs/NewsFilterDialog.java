@@ -75,6 +75,7 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -491,14 +492,9 @@ public class NewsFilterDialog extends TitleAreaDialog {
     return true;
   }
 
+  /* We allow all conditions because a filter could also be run on existing news! */
   private List<Integer> getExcludedConditions() {
-    List<Integer> conditionsToExclude = new ArrayList<Integer>(3);
-
-    conditionsToExclude.add(INews.STATE);
-    conditionsToExclude.add(INews.IS_FLAGGED);
-    conditionsToExclude.add(INews.LABEL);
-
-    return conditionsToExclude;
+    return Collections.emptyList();
   }
 
   private List<ISearchCondition> getDefaultConditions() {
