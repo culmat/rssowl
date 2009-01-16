@@ -27,6 +27,10 @@ package org.rssowl.ui.internal;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.fieldassist.ContentProposalAdapter;
+import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
+import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.jface.resource.ColorDescriptor;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.DeviceResourceException;
@@ -55,6 +59,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorPart;
@@ -78,6 +83,7 @@ import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
+import org.rssowl.core.util.Pair;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
@@ -90,9 +96,12 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Central Facade for UI-related tasks.
@@ -1250,5 +1259,75 @@ public class OwlUI {
         page.closeEditors(otherEditors, true);
       }
     }
+  }
+
+  /**
+   * @param text
+   * @param values
+   * @return Pair
+   */
+  public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Text text, Collection<String> values) {
+
+    /* Auto-Activate on Key-Down */
+    KeyStroke activationKey = KeyStroke.getInstance(SWT.ARROW_DOWN);
+
+    /* Create Content Proposal Adapter */
+    SimpleContentProposalProvider proposalProvider = new SimpleContentProposalProvider(new String[0]);
+    proposalProvider.setFiltering(true);
+    final ContentProposalAdapter adapter = new ContentProposalAdapter(text, new TextContentAdapter(), proposalProvider, activationKey, null);
+    adapter.setPropagateKeys(true);
+    adapter.setAutoActivationDelay(500);
+    adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
+
+    /* Apply Proposals */
+    if (values != null)
+      applyAutoCompleteProposals(values, proposalProvider, adapter);
+
+    /*
+     * TODO: This is a hack but there doesnt seem to be any API to set the size
+     * of the popup to match the actual size of the Text widget being used.
+     */
+    text.getDisplay().timerExec(100, new Runnable() {
+      public void run() {
+        if (!text.isDisposed()) {
+          adapter.setPopupSize(new Point(text.getSize().x, 100));
+        }
+      }
+    });
+
+    return Pair.create(proposalProvider, adapter);
+  }
+
+  /**
+   * @param values
+   * @param provider
+   * @param adapter
+   */
+  public static void applyAutoCompleteProposals(Collection<String> values, SimpleContentProposalProvider provider, ContentProposalAdapter adapter) {
+
+    /* Extract Proposals */
+    final String[] proposals = new String[values.size()];
+    Set<Character> charSet = new HashSet<Character>();
+    int i = 0;
+    for (String value : values) {
+      proposals[i] = value;
+
+      char c = value.charAt(0);
+      charSet.add(Character.toLowerCase(c));
+      charSet.add(Character.toUpperCase(c));
+      i++;
+    }
+
+    /* Auto-Activate on first Key typed */
+    char[] activationChars = new char[charSet.size()];
+    i = 0;
+    for (char c : charSet) {
+      activationChars[i] = c;
+      i++;
+    }
+
+    /* Apply proposals and auto-activation chars */
+    provider.setProposals(proposals);
+    adapter.setAutoActivationCharacters(activationChars);
   }
 }

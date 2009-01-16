@@ -24,12 +24,10 @@
 
 package org.rssowl.ui.internal.search;
 
-import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
-import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -40,7 +38,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
@@ -64,16 +61,15 @@ import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DAOService;
 import org.rssowl.core.util.Pair;
 import org.rssowl.ui.internal.Application;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -419,7 +415,7 @@ public class SearchConditionItem extends Composite {
           });
 
           /* Provide Auto-Complete Field */
-          hookAutoComplete(text, field.getSearchValueType().getEnumValues());
+          OwlUI.hookAutoComplete(text, field.getSearchValueType().getEnumValues());
 
           /* Show UI Hint that Content Assist is available */
           ControlDecoration controlDeco = new ControlDecoration(text, SWT.LEFT | SWT.TOP);
@@ -485,7 +481,7 @@ public class SearchConditionItem extends Composite {
           /* Provide auto-complete for Categories, Authors and Feeds */
           if (field.getId() == INews.CATEGORIES || field.getId() == INews.AUTHOR || field.getId() == INews.FEED) {
             controlDeco.setDescriptionText("Content Assist Available (Press Arrow-Down Key)");
-            final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = hookAutoComplete(text, null);
+            final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = OwlUI.hookAutoComplete(text, null);
 
             /* Load proposals in the Background */
             JobRunner.runDelayedInBackgroundThread(new Runnable() {
@@ -501,7 +497,7 @@ public class SearchConditionItem extends Composite {
 
                   /* Apply Proposals */
                   if (!text.isDisposed())
-                    applyProposals(values, pair.getFirst(), pair.getSecond());
+                    OwlUI.applyAutoCompleteProposals(values, pair.getFirst(), pair.getSecond());
                 }
               }
             });
@@ -530,66 +526,6 @@ public class SearchConditionItem extends Composite {
     inputField.getParent().update();
     inputField.layout();
     inputField.update();
-  }
-
-  private Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Text text, Collection<String> values) {
-
-    /* Auto-Activate on Key-Down */
-    KeyStroke activationKey = KeyStroke.getInstance(SWT.ARROW_DOWN);
-
-    /* Create Content Proposal Adapter */
-    SimpleContentProposalProvider proposalProvider = new SimpleContentProposalProvider(new String[0]);
-    proposalProvider.setFiltering(true);
-    final ContentProposalAdapter adapter = new ContentProposalAdapter(text, new TextContentAdapter(), proposalProvider, activationKey, null);
-    adapter.setPropagateKeys(true);
-    adapter.setAutoActivationDelay(500);
-    adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
-
-    /* Apply Proposals */
-    if (values != null)
-      applyProposals(values, proposalProvider, adapter);
-
-    /*
-     * TODO: This is a hack but there doesnt seem to be any API to set the size
-     * of the popup to match the actual size of the Text widget being used.
-     */
-    text.getDisplay().timerExec(100, new Runnable() {
-      public void run() {
-        if (!text.isDisposed()) {
-          adapter.setPopupSize(new Point(text.getSize().x, 100));
-        }
-      }
-    });
-
-    return Pair.create(proposalProvider, adapter);
-  }
-
-  private void applyProposals(Collection<String> values, SimpleContentProposalProvider provider, ContentProposalAdapter adapter) {
-
-    /* Extract Proposals */
-    final String[] proposals = new String[values.size()];
-    Set<Character> charSet = new HashSet<Character>();
-    int i = 0;
-    for (String value : values) {
-      proposals[i] = value;
-
-      char c = value.charAt(0);
-      charSet.add(Character.toLowerCase(c));
-      charSet.add(Character.toUpperCase(c));
-      i++;
-    }
-
-    /* Auto-Activate on first Key typed */
-    char[] activationChars = new char[charSet.size()];
-    i = 0;
-    for (char c : charSet) {
-      activationChars[i] = c;
-      i++;
-    }
-
-    /* Apply proposals and auto-activation chars */
-    provider.setProposals(proposals);
-    adapter.setAutoActivationCharacters(activationChars);
   }
 
   /* TODO This is currently only supporting INews as Entity */
