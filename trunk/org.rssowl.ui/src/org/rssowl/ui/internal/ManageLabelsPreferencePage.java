@@ -76,7 +76,7 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.SearchHit;
-import org.rssowl.ui.internal.dialogs.ConfirmDeleteDialog;
+import org.rssowl.ui.internal.dialogs.ConfirmDialog;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -461,7 +461,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
       ILabel label = (ILabel) selection.getFirstElement();
 
       String msg = "Are you sure you want to delete the Label '" + label.getName() + "'?";
-      ConfirmDeleteDialog dialog = new ConfirmDeleteDialog(getShell(), "Confirm Delete", "This action can not be undone", msg, null);
+      ConfirmDialog dialog = new ConfirmDialog(getShell(), "Confirm Delete", "This action can not be undone", msg, null);
       if (dialog.open() == IDialogConstants.OK_ID) {
 
         /* Remove Label from any News containing it */

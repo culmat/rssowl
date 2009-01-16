@@ -38,7 +38,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.dialogs.ConfirmDeleteDialog;
+import org.rssowl.ui.internal.dialogs.ConfirmDialog;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -106,7 +106,7 @@ public class CleanUpWizard extends Wizard {
       else
         msg += newsCounter + " news?";
 
-      ConfirmDeleteDialog dialog = new ConfirmDeleteDialog(getShell(), "Confirm Delete", "This action can not be undone", msg, null);
+      ConfirmDialog dialog = new ConfirmDialog(getShell(), "Confirm Delete", "This action can not be undone", msg, null);
       if (dialog.open() != Window.OK)
         return false;
     }

@@ -47,7 +47,7 @@ import org.rssowl.ui.internal.util.LayoutUtils;
  *
  * @author bpasero
  */
-public class ConfirmDeleteDialog extends TitleAreaDialog {
+public class ConfirmDialog extends TitleAreaDialog {
 
   /* Min. width of the dialog in DLUs */
   private static final int dialogMinWidth = 320;
@@ -71,7 +71,7 @@ public class ConfirmDeleteDialog extends TitleAreaDialog {
    * @param confirmPrefKey The key to the boolean preference to receive the
    * setting for "Never ask again"
    */
-  public ConfirmDeleteDialog(Shell parentShell, String title, String dialogHeaderMessage, String dialogMessage, String confirmPrefKey) {
+  public ConfirmDialog(Shell parentShell, String title, String dialogHeaderMessage, String dialogMessage, String confirmPrefKey) {
     this(parentShell, title, dialogHeaderMessage, dialogMessage, "Delete", confirmPrefKey);
   }
 
@@ -86,7 +86,7 @@ public class ConfirmDeleteDialog extends TitleAreaDialog {
    * @param confirmPrefKey The key to the boolean preference to receive the
    * setting for "Never ask again"
    */
-  public ConfirmDeleteDialog(Shell parentShell, String title, String dialogHeaderMessage, String dialogMessage, String okButtonName, String confirmPrefKey) {
+  public ConfirmDialog(Shell parentShell, String title, String dialogHeaderMessage, String dialogMessage, String okButtonName, String confirmPrefKey) {
     super(parentShell);
     fTitle = title;
     fDialogMessage = dialogMessage;

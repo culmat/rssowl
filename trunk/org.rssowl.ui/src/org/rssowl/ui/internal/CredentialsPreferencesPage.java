@@ -60,7 +60,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
-import org.rssowl.ui.internal.dialogs.ConfirmDeleteDialog;
+import org.rssowl.ui.internal.dialogs.ConfirmDialog;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.net.URI;
@@ -357,7 +357,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
   private void onRemoveAll() {
 
     /* Ask for Confirmation first */
-    ConfirmDeleteDialog dialog = new ConfirmDeleteDialog(getShell(), "Confirm Remove", "This action can not be undone", "Are you sure you want to remove all stored passwords?", null);
+    ConfirmDialog dialog = new ConfirmDialog(getShell(), "Confirm Remove", "This action can not be undone", "Are you sure you want to remove all stored passwords?", null);
     if (dialog.open() != IDialogConstants.OK_ID)
       return;
 
