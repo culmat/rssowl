@@ -24,11 +24,14 @@
 
 package org.rssowl.ui.internal.dialogs;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.SafeRunnable;
@@ -81,6 +84,7 @@ import org.rssowl.ui.internal.filter.NewsActionDescriptor;
 import org.rssowl.ui.internal.filter.NewsActionPresentationManager;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -396,18 +400,48 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     }
   }
 
-  //TODO Show Progress
-  private void applyFilter(List<SearchHit<NewsReference>> news, ISearchFilter filter) {
-    List<List<SearchHit<NewsReference>>> chunks = toChunks(FILTER_CHUNK_SIZE, news);
-    for (List<SearchHit<NewsReference>> chunk : chunks) {
-      List<INews> newsItemsToFilter = new ArrayList<INews>(FILTER_CHUNK_SIZE);
-      for (SearchHit<NewsReference> chunkItem : chunk) {
-        INews newsItemToFilter = chunkItem.getResult().resolve();
-        if (newsItemToFilter != null)
-          newsItemsToFilter.add(newsItemToFilter);
-      }
+  private void applyFilter(final List<SearchHit<NewsReference>> news, final ISearchFilter filter) {
+    IRunnableWithProgress runnable = new IRunnableWithProgress() {
+      public void run(IProgressMonitor monitor) {
+        List<List<SearchHit<NewsReference>>> chunks = toChunks(FILTER_CHUNK_SIZE, news);
+        monitor.beginTask("Please wait while the filter is applied...", chunks.size());
 
-      applyFilterOnChunks(newsItemsToFilter, filter);
+        if (monitor.isCanceled())
+          return;
+
+        int counter = 0;
+        for (List<SearchHit<NewsReference>> chunk : chunks) {
+          if (monitor.isCanceled())
+            return;
+
+          monitor.subTask("Filtered " + counter * FILTER_CHUNK_SIZE + " of " + news.size() + " News");
+          List<INews> newsItemsToFilter = new ArrayList<INews>(FILTER_CHUNK_SIZE);
+          for (SearchHit<NewsReference> chunkItem : chunk) {
+            INews newsItemToFilter = chunkItem.getResult().resolve();
+            if (newsItemToFilter != null)
+              newsItemsToFilter.add(newsItemToFilter);
+          }
+
+          applyFilterOnChunks(newsItemsToFilter, filter);
+          monitor.worked(1);
+          counter++;
+        }
+
+        monitor.done();
+      }
+    };
+
+    /* Show progress and allow for cancellation */
+    ProgressMonitorDialog dialog = new ProgressMonitorDialog(getShell());
+    dialog.setBlockOnOpen(false);
+    dialog.setCancelable(true);
+    dialog.setOpenOnRun(true);
+    try {
+      dialog.run(true, true, runnable);
+    } catch (InvocationTargetException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    } catch (InterruptedException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
     }
   }
 
