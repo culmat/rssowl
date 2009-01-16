@@ -87,6 +87,13 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="forcable" type="boolean">
+            <annotation>
+               <documentation>
+                  If set to true, lets the action participate if a filter was forced to run on all news by the user.
+               </documentation>
+            </annotation>
+         </attribute>
       </complexType>
    </element>
 
