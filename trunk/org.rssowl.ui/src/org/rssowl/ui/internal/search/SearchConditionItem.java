@@ -415,13 +415,7 @@ public class SearchConditionItem extends Composite {
           });
 
           /* Provide Auto-Complete Field */
-          OwlUI.hookAutoComplete(text, field.getSearchValueType().getEnumValues());
-
-          /* Show UI Hint that Content Assist is available */
-          ControlDecoration controlDeco = new ControlDecoration(text, SWT.LEFT | SWT.TOP);
-          controlDeco.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
-          controlDeco.setDescriptionText("Content Assist Available (Press Arrow-Down Key)");
-          controlDeco.setShowOnlyOnFocus(true);
+          OwlUI.hookAutoComplete(text, field.getSearchValueType().getEnumValues(), true);
 
           /* Pre-Select input if given */
           String inputValue = (input != null ? input.toString() : null);
@@ -481,7 +475,7 @@ public class SearchConditionItem extends Composite {
           /* Provide auto-complete for Categories, Authors and Feeds */
           if (field.getId() == INews.CATEGORIES || field.getId() == INews.AUTHOR || field.getId() == INews.FEED) {
             controlDeco.setDescriptionText("Content Assist Available (Press Arrow-Down Key)");
-            final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = OwlUI.hookAutoComplete(text, null);
+            final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = OwlUI.hookAutoComplete(text, null, false);
 
             /* Load proposals in the Background */
             JobRunner.runDelayedInBackgroundThread(new Runnable() {

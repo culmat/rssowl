@@ -29,6 +29,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
+import org.eclipse.jface.fieldassist.ControlDecoration;
+import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.jface.resource.ColorDescriptor;
@@ -1264,9 +1266,18 @@ public class OwlUI {
   /**
    * @param text
    * @param values
+   * @param decorate
    * @return Pair
    */
-  public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Text text, Collection<String> values) {
+  public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Text text, Collection<String> values, boolean decorate) {
+
+    /* Show UI Hint that Content Assist is available */
+    if (decorate) {
+      ControlDecoration controlDeco = new ControlDecoration(text, SWT.LEFT | SWT.TOP);
+      controlDeco.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
+      controlDeco.setDescriptionText("Content Assist Available (Press Arrow-Down Key)");
+      controlDeco.setShowOnlyOnFocus(true);
+    }
 
     /* Auto-Activate on Key-Down */
     KeyStroke activationKey = KeyStroke.getInstance(SWT.ARROW_DOWN);

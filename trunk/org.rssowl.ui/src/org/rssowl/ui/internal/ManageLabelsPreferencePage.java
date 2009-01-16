@@ -27,8 +27,6 @@ package org.rssowl.ui.internal;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
-import org.eclipse.jface.fieldassist.ControlDecoration;
-import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
@@ -184,14 +182,8 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
           }
         });
 
-        /* Show UI Hint for extra information is available */
-        ControlDecoration controlDeco = new ControlDecoration(fNameInput, SWT.LEFT | SWT.TOP);
-        controlDeco.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
-        controlDeco.setDescriptionText("Content Assist Available (Press Arrow-Down Key)");
-        controlDeco.setShowOnlyOnFocus(true);
-
         /* Add auto-complete for Labels taken from existing Categories */
-        final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = OwlUI.hookAutoComplete(fNameInput, null);
+        final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = OwlUI.hookAutoComplete(fNameInput, null, true);
 
         /* Load proposals in the Background */
         JobRunner.runDelayedInBackgroundThread(new Runnable() {
