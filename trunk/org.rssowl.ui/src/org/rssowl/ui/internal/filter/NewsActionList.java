@@ -258,6 +258,10 @@ public class NewsActionList extends ScrolledComposite {
   }
 
   NewsActionItem addItem(IFilterAction action, int index) {
+    return addItem(action, index, false);
+  }
+
+  NewsActionItem addItem(IFilterAction action, int index, boolean scroll) {
     boolean wasScrollbarShowing = getVerticalBar() != null ? getVerticalBar().isVisible() : false;
 
     /* Container for Item */
@@ -310,8 +314,11 @@ public class NewsActionList extends ScrolledComposite {
     });
 
     /* Add to the End */
-    if (index == fItems.size())
+    boolean addedToEnd = false;
+    if (index == fItems.size()) {
+      addedToEnd = true;
       fItems.add(item);
+    }
 
     /* Add to specific Index */
     else {
@@ -327,6 +334,10 @@ public class NewsActionList extends ScrolledComposite {
     /* Update Size */
     updateSize();
     adjustSizeForScrollbar(wasScrollbarShowing);
+
+    /* Scroll to Bottom if added as last element */
+    if (scroll && addedToEnd)
+      setOrigin(0, getContent().getSize().y);
 
     return item;
   }
@@ -383,12 +394,12 @@ public class NewsActionList extends ScrolledComposite {
 
   void onAdd(NewsActionItem selectedItem) {
     IFilterAction filterAction = createAction(selectedItem.createFilterAction(false));
-    addItem(filterAction, indexOf(selectedItem) + 1);
+    addItem(filterAction, indexOf(selectedItem) + 1, true);
   }
 
   void onAdd(NewsActionItem selectedItem, String actionId) {
     IFilterAction filterAction = Owl.getModelFactory().createFilterAction(actionId);
-    addItem(filterAction, indexOf(selectedItem) + 1);
+    addItem(filterAction, indexOf(selectedItem) + 1, true);
   }
 
   int indexOf(NewsActionItem item) {

@@ -312,6 +312,10 @@ public class SearchConditionList extends ScrolledComposite {
   }
 
   SearchConditionItem addItem(ISearchCondition condition, int index) {
+    return addItem(condition, index, false);
+  }
+
+  SearchConditionItem addItem(ISearchCondition condition, int index, boolean scroll) {
     boolean wasScrollbarShowing = getVerticalBar() != null ? getVerticalBar().isVisible() : false;
 
     /* Container for Item */
@@ -364,8 +368,11 @@ public class SearchConditionList extends ScrolledComposite {
     });
 
     /* Add to the End */
-    if (index == fItems.size())
+    boolean addedToEnd = false;
+    if (index == fItems.size()) {
+      addedToEnd = true;
       fItems.add(item);
+    }
 
     /* Add to specific Index */
     else {
@@ -381,6 +388,10 @@ public class SearchConditionList extends ScrolledComposite {
     /* Update Size */
     updateSize();
     adjustSizeForScrollbar(wasScrollbarShowing);
+
+    /* Scroll to Bottom if added as last element */
+    if (scroll && addedToEnd)
+      setOrigin(0, getContent().getSize().y);
 
     return item;
   }
@@ -561,7 +572,7 @@ public class SearchConditionList extends ScrolledComposite {
     ISearchCondition condition = createCondition(selectedItem.createCondition(null, false));
     condition.setField(field);
 
-    SearchConditionItem addedItem = addItem(condition, indexOf(selectedItem) + 1);
+    SearchConditionItem addedItem = addItem(condition, indexOf(selectedItem) + 1, true);
     addedItem.focusInput();
 
     fModified = true;
@@ -569,7 +580,7 @@ public class SearchConditionList extends ScrolledComposite {
 
   void onAdd(SearchConditionItem selectedItem) {
     ISearchCondition condition = createCondition(selectedItem.createCondition(null, false));
-    SearchConditionItem addedItem = addItem(condition, indexOf(selectedItem) + 1);
+    SearchConditionItem addedItem = addItem(condition, indexOf(selectedItem) + 1, true);
     addedItem.focusInput();
 
     fModified = true;

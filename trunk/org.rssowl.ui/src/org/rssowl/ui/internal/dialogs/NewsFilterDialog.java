@@ -533,7 +533,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
     /* Action List */
     fFilterActionList = new NewsActionList(actionsContainer, SWT.NONE, getDefaultActions());
     fFilterActionList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-    fFilterActionList.setVisibleItemCount(2);
+    fFilterActionList.setVisibleItemCount(3);
 
     /* Show initial Actions if present */
     if (fEditedFilter != null)
