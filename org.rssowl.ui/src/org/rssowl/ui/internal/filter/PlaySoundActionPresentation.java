@@ -32,7 +32,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Link;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.filter.INewsActionPresentation;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.io.File;
@@ -44,6 +46,7 @@ import java.io.File;
  * @author bpasero
  */
 public class PlaySoundActionPresentation implements INewsActionPresentation {
+  private static boolean fgMediaDirectorySet = false;
   private Link fSoundPathLink;
   private Composite fContainer;
 
@@ -73,10 +76,22 @@ public class PlaySoundActionPresentation implements INewsActionPresentation {
     dialog.setText("Select a Sound to Play");
     dialog.setFilterExtensions(new String[] { "*.wav" });
 
+    /* Preset with existing sound if present */
     if (fSoundPathLink.getData() != null) {
       File file = new File(fSoundPathLink.getData().toString());
       if (file.exists())
         dialog.setFileName(file.toString());
+    }
+
+    /* Lookup Windows Media directory if on Windows */
+    if (!StringUtils.isSet(dialog.getFileName()) && Application.IS_WINDOWS && !fgMediaDirectorySet) {
+      fgMediaDirectorySet = true; //Only set once
+      String winDir = System.getenv("WinDir");
+      if (StringUtils.isSet(winDir)) {
+        File mediaDir = new File(winDir + "\\Media");
+        if (mediaDir.exists())
+          dialog.setFilterPath(mediaDir.toString());
+      }
     }
 
     String fileName = dialog.open();
