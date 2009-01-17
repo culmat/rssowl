@@ -711,6 +711,16 @@
             id="org.rssowl.ui.OpenNewsFiltersAction"
             name="News Filters">
       </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.CreateFilterAction"
+            name="Create Filter">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.FilterNewsAction"
+            name="Filter News">
+      </command>
    </extension>
    <extension
          id="product"
@@ -1053,6 +1063,52 @@
                label="Aggregate News"
                menubarPath="new.ext">
          </action>
+      </objectContribution>
+      <objectContribution
+            adaptable="false"
+            id="org.rssowl.ui.FilterNewsContribution"
+            objectClass="java.lang.Object">
+         <action
+               class="org.rssowl.ui.internal.actions.CreateFilterAction"
+               definitionId="org.rssowl.ui.CreateFilterAction"
+               icon="icons/etool16/filter.gif"
+               id="org.rssowl.ui.FilterNewsAction"
+               label="Filter News..."
+               menubarPath="find.ext"
+               style="push">
+         </action>
+         <visibility>
+            <or>
+               <objectClass
+                     name="org.rssowl.core.persist.IFolder">
+               </objectClass>
+               <objectClass
+                     name="org.rssowl.core.persist.IBookMark">
+               </objectClass>
+               <objectClass
+                     name="org.rssowl.core.persist.INewsBin">
+               </objectClass>
+            </or>
+         </visibility>
+      </objectContribution>
+      <objectContribution
+            adaptable="false"
+            id="org.rssowl.ui.CreateFilterContribution"
+            objectClass="java.lang.Object">
+         <action
+               class="org.rssowl.ui.internal.actions.CreateFilterAction"
+               definitionId="org.rssowl.ui.CreateFilterAction"
+               icon="icons/etool16/filter.gif"
+               id="org.rssowl.ui.CreateFilterAction"
+               label="Create Filter..."
+               menubarPath="filter"
+               style="push">
+         </action>
+         <visibility>
+            <objectClass
+                  name="org.rssowl.core.persist.INews">
+            </objectClass>
+         </visibility>
       </objectContribution>
    </extension>
    <extension

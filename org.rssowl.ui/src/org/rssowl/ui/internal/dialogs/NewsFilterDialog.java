@@ -96,12 +96,14 @@ public class NewsFilterDialog extends TitleAreaDialog {
   private NewsActionList fFilterActionList;
   private Text fNameInput;
   private int fFilterPosition;
+  private ISearch fPresetSearch;
+  private ISearchFilter fAddedFilter;
 
   /**
    * @param parentShell the Shell to create this Dialog on.
    */
   public NewsFilterDialog(Shell parentShell) {
-    this(parentShell, null);
+    this(parentShell, (ISearchFilter) null);
   }
 
   /**
@@ -113,6 +115,18 @@ public class NewsFilterDialog extends TitleAreaDialog {
     super(parentShell);
 
     fEditedFilter = filter;
+    fResources = new LocalResourceManager(JFaceResources.getResources());
+  }
+
+  /**
+   * @param parentShell the Shell to create this Dialog on.
+   * @param presetSearch a search that is preset in the condition area.
+   */
+  public NewsFilterDialog(Shell parentShell, ISearch presetSearch) {
+    super(parentShell);
+
+    fPresetSearch = presetSearch;
+    fEditedFilter = null;
     fResources = new LocalResourceManager(JFaceResources.getResources());
   }
 
@@ -157,8 +171,8 @@ public class NewsFilterDialog extends TitleAreaDialog {
 
     /* Create new Filter and save */
     if (fEditedFilter == null) {
-      ISearchFilter filter = createFilter(actions);
-      DynamicDAO.save(filter);
+      fAddedFilter = createFilter(actions);
+      DynamicDAO.save(fAddedFilter);
     }
 
     /* Update existing Filter */
@@ -168,6 +182,13 @@ public class NewsFilterDialog extends TitleAreaDialog {
     }
 
     super.okPressed();
+  }
+
+  /**
+   * @return the {@link ISearchFilter} that was added or updated.
+   */
+  public ISearchFilter getFilter() {
+    return fEditedFilter != null ? fEditedFilter : fAddedFilter;
   }
 
   private ISearchFilter createFilter(List<IFilterAction> actions) {
@@ -360,6 +381,9 @@ public class NewsFilterDialog extends TitleAreaDialog {
     boolean matchAllNews = (fEditedFilter != null) ? fEditedFilter.matchAllNews() : false;
     boolean matchAllConditions = !matchAllNews && (fEditedFilter != null) ? fEditedFilter.getSearch().matchAllConditions() : true;
 
+    if (fPresetSearch != null)
+      matchAllConditions = fPresetSearch.matchAllConditions();
+
     /* Radio to select Condition Matching */
     fMatchAllRadio = new Button(topControlsContainer, SWT.RADIO);
     fMatchAllRadio.setText("&Match all conditions");
@@ -466,6 +490,8 @@ public class NewsFilterDialog extends TitleAreaDialog {
     /* Show Initial Conditions if present */
     if (fEditedFilter != null && fEditedFilter.getSearch() != null)
       fSearchConditionList.showConditions(fEditedFilter.getSearch().getSearchConditions());
+    else if (fPresetSearch != null)
+      fSearchConditionList.showConditions(fPresetSearch.getSearchConditions());
 
     /* Update Enable-State of Search Condition List */
     setControlEnabled(fSearchConditionList, !fMatchAllNewsRadio.getSelection());
