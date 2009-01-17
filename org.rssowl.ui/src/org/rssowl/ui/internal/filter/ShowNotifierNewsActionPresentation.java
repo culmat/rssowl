@@ -31,6 +31,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.rssowl.ui.filter.INewsActionPresentation;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.ColorPicker;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -58,7 +59,7 @@ public class ShowNotifierNewsActionPresentation implements INewsActionPresentati
     fContainer = new Composite(parent, SWT.NONE);
     fContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
     ((GridLayout) fContainer.getLayout()).marginLeft = 5;
-    fContainer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    fContainer.setLayoutData(new GridData(SWT.FILL, Application.IS_WINDOWS ? SWT.FILL : SWT.CENTER, true, true));
 
     Label nameLabel = new Label(fContainer, SWT.NONE);
     nameLabel.setText("Select a Color: ");
