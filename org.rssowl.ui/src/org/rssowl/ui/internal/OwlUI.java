@@ -1341,4 +1341,29 @@ public class OwlUI {
     provider.setProposals(proposals);
     adapter.setAutoActivationCharacters(activationChars);
   }
+
+  /**
+   * @param display
+   * @param rgb the color value to use in the image
+   * @return an {@link Image} for the color that must be disposed when no longer
+   * used.
+   */
+  public static Image createColorImage(Display display, RGB rgb) {
+    Color color = new Color(display, rgb);
+
+    Image image = new Image(display, 12, 12);
+
+    GC gc = new GC(image);
+
+    gc.setBackground(color);
+    gc.fillRectangle(0, 0, 12, 12);
+
+    gc.setForeground(display.getSystemColor(SWT.COLOR_BLACK));
+    gc.drawRectangle(0, 0, 11, 11);
+
+    gc.dispose();
+    color.dispose();
+
+    return image;
+  }
 }

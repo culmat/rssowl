@@ -47,21 +47,15 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
-import org.eclipse.swt.graphics.GC;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.rssowl.core.Owl;
@@ -77,6 +71,7 @@ import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.dialogs.ConfirmDialog;
+import org.rssowl.ui.internal.util.ColorPicker;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -114,22 +109,15 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     private final DialogMode fMode;
     private final ILabel fExistingLabel;
     private Text fNameInput;
-    private ToolItem fColorItem;
-    private Image fColorImage;
-    private RGB fSelectedColor;
     private String fName;
     private Collection<ILabel> fAllLabels;
+    private ColorPicker fColorPicker;
 
     LabelDialog(Shell parentShell, DialogMode mode, ILabel label) {
       super(parentShell);
       fMode = mode;
       fExistingLabel = label;
       fAllLabels = DynamicDAO.loadAll(ILabel.class);
-
-      if (fExistingLabel != null)
-        fSelectedColor = OwlUI.getRGB(fExistingLabel);
-      else
-        fSelectedColor = new RGB(0, 0, 0);
     }
 
     String getName() {
@@ -137,7 +125,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     }
 
     RGB getColor() {
-      return fSelectedColor;
+      return fColorPicker.getColor();
     }
 
     /*
@@ -204,24 +192,9 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
         Label nameLabel = new Label(composite, SWT.NONE);
         nameLabel.setText("Color: ");
 
-        Composite colorContainer = new Composite(composite, SWT.BORDER);
-        colorContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-        colorContainer.setBackground(getShell().getDisplay().getSystemColor(SWT.COLOR_WHITE));
-        colorContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
-
-        ToolBar colorBar = new ToolBar(colorContainer, SWT.FLAT);
-        colorBar.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-        colorBar.setBackground(getShell().getDisplay().getSystemColor(SWT.COLOR_WHITE));
-
-        fColorItem = new ToolItem(colorBar, SWT.PUSH);
-        fColorItem.addSelectionListener(new SelectionAdapter() {
-          @Override
-          public void widgetSelected(SelectionEvent e) {
-            onSelectColor();
-          }
-        });
-
-        updateColorItem();
+        fColorPicker = new ColorPicker(composite, SWT.FLAT);
+        if (fExistingLabel != null)
+          fColorPicker.setColor(OwlUI.getRGB(fExistingLabel));
       }
 
       return composite;
@@ -257,37 +230,6 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
       return control;
     }
 
-    private void updateColorItem() {
-      Color color = OwlUI.getColor(fResources, fSelectedColor);
-
-      /* Dispose old first */
-      if (fColorImage != null)
-        fColorImage.dispose();
-
-      fColorImage = new Image(getShell().getDisplay(), 32, 10);
-      GC gc = new GC(fColorImage);
-
-      gc.setBackground(color);
-      gc.fillRectangle(0, 0, 32, 10);
-
-      gc.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_BLACK));
-      gc.drawRectangle(0, 0, 31, 9);
-
-      gc.dispose();
-
-      fColorItem.setImage(fColorImage);
-    }
-
-    private void onSelectColor() {
-      ColorDialog dialog = new ColorDialog(getShell());
-      dialog.setRGB(fSelectedColor);
-      RGB color = dialog.open();
-      if (color != null) {
-        fSelectedColor = color;
-        updateColorItem();
-      }
-    }
-
     /*
      * @see org.eclipse.jface.window.Window#configureShell(org.eclipse.swt.widgets.Shell)
      */
@@ -314,18 +256,6 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
         fName = fNameInput.getText();
 
       super.okPressed();
-    }
-
-    /*
-     * @see org.eclipse.jface.dialogs.Dialog#close()
-     */
-    @Override
-    public boolean close() {
-      boolean res = super.close();
-      if (res && fColorImage != null)
-        fColorImage.dispose();
-
-      return res;
     }
   }
 
@@ -502,6 +432,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
   private void createViewer(Composite container) {
     fViewer = new TreeViewer(container, SWT.FULL_SELECTION | SWT.BORDER | SWT.SINGLE);
     fViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    fViewer.getTree().setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
 
     /* Content Provider */
     fViewer.setContentProvider(new ITreeContentProvider() {
