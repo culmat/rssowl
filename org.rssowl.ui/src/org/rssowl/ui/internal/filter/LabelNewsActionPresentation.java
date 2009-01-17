@@ -35,9 +35,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.rssowl.core.persist.ILabel;
-import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.ui.filter.INewsActionPresentation;
 import org.rssowl.ui.internal.util.LayoutUtils;
+import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.Collection;
 
@@ -62,6 +62,7 @@ public class LabelNewsActionPresentation implements INewsActionPresentation {
 
     fLabelCombo = new Combo(fContainer, SWT.READ_ONLY | SWT.BORDER);
     fLabelCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    fLabelCombo.setVisibleItemCount(15);
 
     fViewer = new ComboViewer(fLabelCombo);
     fViewer.setContentProvider(new ArrayContentProvider());
@@ -72,7 +73,7 @@ public class LabelNewsActionPresentation implements INewsActionPresentation {
       }
     });
 
-    Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
+    Collection<ILabel> labels = ModelUtils.loadSortedLabels();
     fViewer.setInput(labels);
 
     /* Set Selection */

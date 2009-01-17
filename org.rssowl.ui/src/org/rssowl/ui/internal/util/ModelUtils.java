@@ -620,8 +620,8 @@ public class ModelUtils {
 
   /**
    * @param events
-   * @param onlyHasBecomeSticky if <code>true</code>, only return <code>true</code> if
-   * a news has become sticky.
+   * @param onlyHasBecomeSticky if <code>true</code>, only return
+   * <code>true</code> if a news has become sticky.
    * @return <code>TRUE</code> in case the Sticky-State of the given News
    * changed its value for any of the given Events, <code>FALSE</code>
    * otherwise. Respects the onlyHasBecomeSticky parameter.
@@ -661,11 +661,11 @@ public class ModelUtils {
 
   /**
    * @param events
-   * @param onlyHasBecomeUnread if <code>true</code>, only return <code>true</code> if
-   * a news has become unread.
+   * @param onlyHasBecomeUnread if <code>true</code>, only return
+   * <code>true</code> if a news has become unread.
    * @return <code>TRUE</code> in case any state changed from NEW, UPDATED or
-   * UNREAD to a different one, <code>FALSE</code> otherwise. Respects the onlyHasBecomeUnread
-   * parameter.
+   * UNREAD to a different one, <code>FALSE</code> otherwise. Respects the
+   * onlyHasBecomeUnread parameter.
    */
   public static boolean isReadStateChange(Set<? extends ModelEvent> events, boolean onlyHasBecomeUnread) {
     for (ModelEvent event : events) {
@@ -1094,5 +1094,26 @@ public class ModelUtils {
     rootFolders.addAll(DynamicDAO.getDAO(IFolderDAO.class).loadRoots());
 
     return rootFolders;
+  }
+
+  /**
+   * @return all labels sorted by their sort value.
+   */
+  public static Set<ILabel> loadSortedLabels() {
+
+    /* Sort by Sort Key to respect order */
+    Set<ILabel> labels = new TreeSet<ILabel>(new Comparator<ILabel>() {
+      public int compare(ILabel l1, ILabel l2) {
+        if (l1.equals(l2))
+          return 0;
+
+        return l1.getOrder() < l2.getOrder() ? -1 : 1;
+      }
+    });
+
+    /* Add Labels */
+    labels.addAll(DynamicDAO.loadAll(ILabel.class));
+
+    return labels;
   }
 }

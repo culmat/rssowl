@@ -56,6 +56,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.rssowl.core.Owl;
@@ -66,6 +67,7 @@ import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.ICategoryDAO;
+import org.rssowl.core.persist.dao.ILabelDAO;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.Pair;
@@ -74,8 +76,10 @@ import org.rssowl.ui.internal.dialogs.ConfirmDialog;
 import org.rssowl.ui.internal.util.ColorPicker;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
+import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -91,6 +95,8 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
   private LocalResourceManager fResources;
   private TreeViewer fViewer;
+  private Button fMoveDownButton;
+  private Button fMoveUpButton;
   private IModelSearch fModelSearch = Owl.getPersistenceService().getModelSearch();
   private ISearchField fLabelField = Owl.getModelFactory().createSearchField(INews.LABEL, INews.class.getName());
 
@@ -117,7 +123,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
       super(parentShell);
       fMode = mode;
       fExistingLabel = label;
-      fAllLabels = DynamicDAO.loadAll(ILabel.class);
+      fAllLabels = ModelUtils.loadSortedLabels();
     }
 
     String getName() {
@@ -329,12 +335,93 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
       }
     });
 
+    Label sep = new Label(buttonBox, SWT.SEPARATOR | SWT.HORIZONTAL);
+    sep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+    /* Move Label Up */
+    fMoveUpButton = new Button(buttonBox, SWT.PUSH);
+    fMoveUpButton.setText("Move &Up");
+    fMoveUpButton.setEnabled(false);
+    setButtonLayoutData(fMoveUpButton);
+    fMoveUpButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        onMove(true);
+      }
+    });
+
+    /* Move Label Down */
+    fMoveDownButton = new Button(buttonBox, SWT.PUSH);
+    fMoveDownButton.setText("Move &Down");
+    fMoveDownButton.setEnabled(false);
+    setButtonLayoutData(fMoveDownButton);
+    fMoveDownButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        onMove(false);
+      }
+    });
+
     fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
         editButton.setEnabled(!event.getSelection().isEmpty());
         deleteButton.setEnabled(!event.getSelection().isEmpty());
+        updateMoveEnablement();
       }
     });
+  }
+
+  private void onMove(boolean up) {
+    TreeItem[] items = fViewer.getTree().getItems();
+    List<ILabel> sortedLabels = new ArrayList<ILabel>(items.length);
+    for (TreeItem item : items) {
+      sortedLabels.add((ILabel) item.getData());
+    }
+
+    IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
+    ILabel selectedLabel = (ILabel) selection.getFirstElement();
+    int selectedLabelOrder = selectedLabel.getOrder();
+    ILabel otherLabel = null;
+    int index = sortedLabels.indexOf(selectedLabel);
+
+    /* Move Up */
+    if (up && index > 0) {
+      otherLabel = sortedLabels.get(index - 1);
+      selectedLabel.setOrder(otherLabel.getOrder());
+      otherLabel.setOrder(selectedLabelOrder);
+    }
+
+    /* Move Down */
+    else if (!up && index < sortedLabels.size() - 1) {
+      otherLabel = sortedLabels.get(index + 1);
+      selectedLabel.setOrder(otherLabel.getOrder());
+      otherLabel.setOrder(selectedLabelOrder);
+    }
+
+    DynamicDAO.getDAO(ILabelDAO.class).saveAll(Arrays.asList(new ILabel[] { selectedLabel, otherLabel }));
+    fViewer.refresh();
+    updateMoveEnablement();
+  }
+
+  private void updateMoveEnablement() {
+    boolean enableMoveUp = true;
+    boolean enableMoveDown = true;
+
+    TreeItem[] selection = fViewer.getTree().getSelection();
+    int[] selectionIndices = new int[selection.length];
+    for (int i = 0; i < selection.length; i++)
+      selectionIndices[i] = fViewer.getTree().indexOf(selection[i]);
+
+    if (selectionIndices.length == 1) {
+      enableMoveUp = selectionIndices[0] != 0;
+      enableMoveDown = selectionIndices[0] != fViewer.getTree().getItemCount() - 1;
+    } else {
+      enableMoveUp = false;
+      enableMoveDown = false;
+    }
+
+    fMoveUpButton.setEnabled(enableMoveUp);
+    fMoveDownButton.setEnabled(enableMoveDown);
   }
 
   private void onAdd() {
@@ -345,6 +432,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
       ILabel newLabel = Owl.getModelFactory().createLabel(null, name);
       newLabel.setColor(color.red + "," + color.green + "," + color.blue);
+      newLabel.setOrder(fViewer.getTree().getItemCount());
       DynamicDAO.save(newLabel);
 
       fViewer.refresh();
@@ -437,7 +525,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     /* Content Provider */
     fViewer.setContentProvider(new ITreeContentProvider() {
       public Object[] getElements(Object inputElement) {
-        return DynamicDAO.loadAll(ILabel.class).toArray();
+        return ModelUtils.loadSortedLabels().toArray();
       }
 
       public Object[] getChildren(Object parentElement) {

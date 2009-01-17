@@ -586,7 +586,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
           /* Label */
           {
-            Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
+            Collection<ILabel> labels = ModelUtils.loadSortedLabels();
 
             MenuManager labelMenu = new MenuManager("Label");
             manager.add(labelMenu);
