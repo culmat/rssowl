@@ -25,6 +25,8 @@
 package org.rssowl.ui.internal.notifier;
 
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -44,6 +46,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IWorkbench;
@@ -58,6 +61,7 @@ import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.dialogs.NewsFiltersListDialog;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkLabelProvider;
@@ -73,7 +77,7 @@ import java.util.Set;
  * @author bpasero
  */
 public class NotifierPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage {
-  private IPreferenceScope fGlobalScope;
+  private IPreferenceScope fGlobalScope = Owl.getPreferenceService().getGlobalScope();
   private Button fNotificationOnlyFromTray;
   private Button fShowNotificationPopup;
   private Button fLimitNotificationCheck;
@@ -86,17 +90,25 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
   private Button fAutoCloseNotifierCheck;
   private Button fShowExcerptCheck;
   private Button fCloseNotifierOnOpen;
+  private LocalResourceManager fResources = new LocalResourceManager(JFaceResources.getResources());;
 
   /** Leave for reflection */
-  public NotifierPreferencesPage() {
-    fGlobalScope = Owl.getPreferenceService().getGlobalScope();
-  }
+  public NotifierPreferencesPage() {}
 
   /**
    * @param title
    */
   public NotifierPreferencesPage(String title) {
     super(title);
+  }
+
+  /*
+   * @see org.eclipse.jface.dialogs.DialogPage#dispose()
+   */
+  @Override
+  public void dispose() {
+    super.dispose();
+    fResources.dispose();
   }
 
   /*
@@ -114,6 +126,25 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
 
     /* Viewer to select Folders/Marks for the Notifier */
     createNotifierViewer(container);
+
+    /* Info Container */
+    Composite infoContainer = new Composite(container, SWT.None);
+    infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+
+    Label infoImg = new Label(infoContainer, SWT.NONE);
+    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
+    infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    Link infoText = new Link(infoContainer, SWT.WRAP);
+    infoText.setText("You can add specific notifications for news by adding <a>News Filters</a>.");
+    infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+    infoText.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        new NewsFiltersListDialog(getShell()).open();
+      }
+    });
 
     return container;
   }
