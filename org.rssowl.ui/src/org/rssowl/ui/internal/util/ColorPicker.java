@@ -55,23 +55,42 @@ import java.util.List;
  */
 public class ColorPicker {
 
-  private static final String[] COLOR_LABELS = new String[] { "Brick", "Bright Red", "Hot Pink", "Dark Orange", "Tangerine", "Anjou Pear", "Olive", "Light Green", "Denim", "Navy", "Dark Teal", "Plum", "Dark Pink", "Dark Gray", "Light Gray" };
+  private static final String[] COLOR_LABELS = new String[] { //
+      "Barn Red", //
+      "Salem Red", //
+      "Salmon", //
+      "Pumpkin", //
+      "Marigold Yellow", //
+      "Mustard", //
+      "Bayberry Green", //
+      "Tavern Green", //
+      "Lexington Green", //
+      "Sea Green", //
+      "Federal Blue", //
+      "Soldier Blue", //
+      "Slate", //
+      "Pitch Black", //
+      "Driftwood", //
+      "Chocolate Brown" //
+  };
 
-  private static final RGB[] COLOR_VALUES = new RGB[] { new RGB(129, 24, 38), //Brick
-      new RGB(177, 39, 52), //Bright Red
-      new RGB(207, 63, 90), //Hot Pink
-      new RGB(216, 107, 78), //Dark Orange
-      new RGB(234, 152, 79), //Tangerine
-      new RGB(235, 192, 123), //Anjou Pear
-      new RGB(105, 130, 73), //Olive
-      new RGB(151, 192, 136), //Light Green
-      new RGB(67, 96, 138), //Denim
-      new RGB(96, 106, 142), //Navy
-      new RGB(113, 160, 168), //Dark Teal
-      new RGB(113, 21, 88), //Plum
-      new RGB(228, 158, 156), //Dark Pink
-      new RGB(100, 100, 100), //Dark Gray
-      new RGB(160, 160, 160) //Light Gray
+  private static final RGB[] COLOR_VALUES = new RGB[] { //
+  new RGB(124, 10, 2), // "Barn Red",
+      new RGB(163, 21, 2), // "Salem Red",
+      new RGB(214, 148, 99), // "Salmon",
+      new RGB(200, 118, 10), // "Pumpkin",
+      new RGB(240, 177, 12), // "Marigold Yellow",
+      new RGB(209, 161, 17), // "Mustard",
+      new RGB(136, 128, 54), // "Bayberry Green",
+      new RGB(129, 150, 93), // "Tavern Green",
+      new RGB(82, 92, 58), // "Lexington Green",
+      new RGB(126, 135, 130), // "Sea Green",
+      new RGB(111, 121, 174), // "Federal Blue",
+      new RGB(92, 101, 126), // "Soldier Blue",
+      new RGB(144, 152, 163), // "Slate",
+      new RGB(25, 16, 17), // "Pitch Black",
+      new RGB(82, 66, 41), // "Driftwood",
+      new RGB(82, 16, 0), // "Chocolate Brown"
   };
 
   private Menu fColorMenu;
