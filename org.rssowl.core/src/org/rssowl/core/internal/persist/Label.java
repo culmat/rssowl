@@ -40,6 +40,7 @@ public class Label extends AbstractEntity implements ILabel {
 
   private String fName;
   private String fColor;
+  private int fOrder;
 
   /**
    * Creates a new Element of type Label.
@@ -90,6 +91,20 @@ public class Label extends AbstractEntity implements ILabel {
     fName = name;
   }
 
+  /*
+   * @see org.rssowl.core.persist.ILabel#getOrder()
+   */
+  public synchronized int getOrder() {
+    return fOrder;
+  }
+
+  /*
+   * @see org.rssowl.core.persist.ILabel#setOrder(int)
+   */
+  public synchronized void setOrder(int order) {
+    fOrder = order;
+  }
+
   /**
    * Compare the given type with this type for identity.
    *
@@ -109,6 +124,7 @@ public class Label extends AbstractEntity implements ILabel {
 
       return getId() == l.getId() && fName.equals(l.fName) &&
           (fColor == null ? l.fColor == null : fColor.equals(l.fColor)) &&
+          getOrder() == l.getOrder() &&
           (getProperties() == null ? l.getProperties() == null : getProperties().equals(l.getProperties()));
     }
   }
