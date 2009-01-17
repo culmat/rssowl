@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.Link;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.filter.INewsActionPresentation;
 import org.rssowl.ui.internal.Application;
+import org.rssowl.ui.internal.util.AudioUtils;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.io.File;
@@ -66,7 +67,10 @@ public class PlaySoundActionPresentation implements INewsActionPresentation {
     fSoundPathLink.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        onSelect();
+        if ("here".equals(e.text) && AudioUtils.isSupported())
+          AudioUtils.play(fSoundPathLink.getData().toString());
+        else
+          onSelect();
       }
     });
   }
@@ -105,7 +109,7 @@ public class PlaySoundActionPresentation implements INewsActionPresentation {
     } else {
       File file = new File(data.toString());
       if (file.exists()) {
-        fSoundPathLink.setText("Sound to Play: <a>" + file.getName() + "</a>");
+        fSoundPathLink.setText("Sound to play: <a>" + file.getName() + "</a>. Click <a>here</a> to play the sound now.");
         fSoundPathLink.setToolTipText(data.toString());
         fSoundPathLink.setData(data);
       } else
