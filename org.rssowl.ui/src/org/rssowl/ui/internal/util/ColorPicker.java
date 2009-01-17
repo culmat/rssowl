@@ -35,6 +35,7 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.ColorDialog;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -99,6 +100,13 @@ public class ColorPicker {
       fColorItem.getImage().dispose();
 
     fColorItem.setImage(createColorImage(color));
+  }
+
+  /**
+   * @return the control of the picker.
+   */
+  public Control getControl() {
+    return fBar;
   }
 
   /**

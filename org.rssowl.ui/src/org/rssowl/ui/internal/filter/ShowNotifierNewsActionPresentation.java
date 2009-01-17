@@ -66,6 +66,7 @@ public class ShowNotifierNewsActionPresentation implements INewsActionPresentati
 
     fColorPicker = new ColorPicker(fContainer, SWT.FLAT);
     fColorPicker.setColor(fSelectedColor);
+    fColorPicker.getControl().setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
   }
 
   /*
