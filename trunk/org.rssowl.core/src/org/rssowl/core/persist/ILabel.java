@@ -69,5 +69,15 @@ public interface ILabel extends IEntity {
    */
   void setName(String name);
 
+  /**
+   * @return the order value of this label compared to other labels.
+   */
+  int getOrder();
+
+  /**
+   * @param order the order value of this label compared to other labels.
+   */
+  void setOrder(int order);
+
   LabelReference toReference();
 }
