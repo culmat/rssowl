@@ -62,6 +62,7 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.actions.CopyLinkAction;
+import org.rssowl.ui.internal.actions.CreateFilterAction;
 import org.rssowl.ui.internal.actions.FindAction;
 import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
@@ -612,6 +613,26 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
               }
             });
           }
+        }
+
+        /* Filter */
+        if (!selection.isEmpty()) {
+          manager.add(new Separator("filter"));
+
+          /* Create Filter */
+          manager.add(new Action("Create Filter...") {
+            @Override
+            public void run() {
+              CreateFilterAction action = new CreateFilterAction();
+              action.selectionChanged(null, selection);
+              action.run(null);
+            }
+
+            @Override
+            public ImageDescriptor getImageDescriptor() {
+              return OwlUI.getImageDescriptor("icons/etool16/filter.gif");
+            }
+          });
         }
 
         /* Update */

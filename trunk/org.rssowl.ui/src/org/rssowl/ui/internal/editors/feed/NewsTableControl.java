@@ -909,6 +909,7 @@ public class NewsTableControl implements IFeedViewPart {
           }
         }
 
+        manager.add(new Separator("filter"));
         manager.add(new Separator("edit"));
         manager.add(new Separator("copy"));
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));

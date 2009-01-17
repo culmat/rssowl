@@ -1128,6 +1128,7 @@ public class BookMarkExplorer extends ViewPart {
     /* Search News */
     manager.add(new Separator());
     manager.add(new SearchInTypeAction(fViewSite.getWorkbenchWindow(), fViewer));
+    manager.add(new GroupMarker(IWorkbenchActionConstants.FIND_EXT));
 
     /* Allow Contributions */
     manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));

@@ -115,6 +115,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
   private Image fFilterIcon;
   private ISearchFilterDAO fSearchFilterDao;
   private Button fApplySelectedFilter;
+  private ISearchFilter fSelectedFilter;
 
   /**
    * @param parentShell
@@ -321,6 +322,10 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
     /* Update Title Message */
     updateTitle();
+
+    /* Set Selection if provided */
+    if (fSelectedFilter != null)
+      fViewer.setSelection(new StructuredSelection(fSelectedFilter), true);
 
     return composite;
   }
@@ -646,5 +651,12 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
     shell.setText("News Filters");
+  }
+
+  /**
+   * @param filter the {@link ISearchFilter} to select.
+   */
+  public void setSelection(ISearchFilter filter) {
+    fSelectedFilter = filter;
   }
 }
