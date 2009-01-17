@@ -708,16 +708,19 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Opens a dialog to manage all news filters."
             id="org.rssowl.ui.OpenNewsFiltersAction"
             name="News Filters">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Create a new filter from a selected news."
             id="org.rssowl.ui.CreateFilterAction"
             name="Create Filter">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Create a new filter from a selected bookmark or folder."
             id="org.rssowl.ui.FilterNewsAction"
             name="Filter News">
       </command>
