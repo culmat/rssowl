@@ -879,7 +879,7 @@ public class NewsTableControl implements IFeedViewPart {
 
           /* Label */
           if (!selection.isEmpty()) {
-            Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
+            Collection<ILabel> labels = ModelUtils.loadSortedLabels();
 
             /* Label */
             MenuManager labelMenu = new MenuManager("Label");

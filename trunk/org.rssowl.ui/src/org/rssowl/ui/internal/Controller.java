@@ -776,8 +776,8 @@ public class Controller {
    * Tells the Controller to stop. This method is called automatically from osgi
    * as soon as the org.rssowl.ui bundle gets stopped.
    *
-   * @param emergency If set to <code>TRUE</code>, this method is called from
-   * a shutdown hook that got triggered from a non-normal shutdown (e.g. System
+   * @param emergency If set to <code>TRUE</code>, this method is called from a
+   * shutdown hook that got triggered from a non-normal shutdown (e.g. System
    * Shutdown).
    */
   public void shutdown(boolean emergency) {
@@ -850,8 +850,8 @@ public class Controller {
    * This method is called immediately prior to workbench shutdown before any
    * windows have been closed.
    *
-   * @return <code>true</code> to allow the workbench to proceed with
-   * shutdown, <code>false</code> to veto a non-forced shutdown
+   * @return <code>true</code> to allow the workbench to proceed with shutdown,
+   * <code>false</code> to veto a non-forced shutdown
    */
   public boolean preUIShutdown() {
     fShuttingDown = true;
@@ -869,25 +869,31 @@ public class Controller {
   }
 
   private void addDefaultLabels() throws PersistenceException {
-    ILabel label = fFactory.createLabel(null, "Important");
-    label.setColor("159,63,63");
-    fLabelDao.save(label);
-
-    label = fFactory.createLabel(null, "Work");
-    label.setColor("255,153,0");
+    ILabel label = fFactory.createLabel(null, "Later");
+    label.setColor("151,53,151");
+    label.setOrder(0);
     fLabelDao.save(label);
 
     label = fFactory.createLabel(null, "Personal");
     label.setColor("0,153,0");
+    label.setOrder(1);
+    fLabelDao.save(label);
+
+    label = fFactory.createLabel(null, "Important");
+    label.setColor("159,63,63");
+    label.setOrder(2);
+    fLabelDao.save(label);
+
+    label = fFactory.createLabel(null, "Work");
+    label.setColor("255,153,0");
+    label.setOrder(3);
     fLabelDao.save(label);
 
     label = fFactory.createLabel(null, "To Do");
     label.setColor("51,51,255");
+    label.setOrder(4);
     fLabelDao.save(label);
 
-    label = fFactory.createLabel(null, "Later");
-    label.setColor("151,53,151");
-    fLabelDao.save(label);
   }
 
   private void importDefaults() throws PersistenceException, InterpreterException, ParserException {

@@ -1507,7 +1507,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
           /* Label */
           if (!selection.isEmpty()) {
-            Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
+            Collection<ILabel> labels = ModelUtils.loadSortedLabels();
 
             /* Label */
             MenuManager labelMenu = new MenuManager("Label");
