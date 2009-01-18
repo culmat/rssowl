@@ -233,6 +233,11 @@ public abstract class SearchDocument<T extends IEntity> {
     if (person == null)
       return null;
 
+    /* Add Name and EMail */
+    if (person.getName() != null && person.getEmail() != null) {
+      return createStringField(fieldConstant, person.getName() + " " + person.getEmail().toString(), store, index);
+    }
+
     /* Add Name if present */
     if (person.getName() != null)
       return createStringField(fieldConstant, person.getName(), store, index);
