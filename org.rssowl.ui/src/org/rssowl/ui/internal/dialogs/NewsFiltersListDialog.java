@@ -35,6 +35,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.SafeRunnable;
+import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -43,10 +44,10 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -56,6 +57,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -181,15 +183,15 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
       public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
     });
 
-    fViewer.setLabelProvider(new LabelProvider() {
+    /* Label Provider */
+    fViewer.setLabelProvider(new CellLabelProvider() {
       @Override
-      public String getText(Object element) {
-        return ((ISearchFilter) element).getName();
-      }
-
-      @Override
-      public Image getImage(Object element) {
-        return fFilterIcon;
+      public void update(ViewerCell cell) {
+        ISearchFilter filter = (ISearchFilter) cell.getElement();
+        Display display = fViewer.getControl().getDisplay();
+        cell.setText(filter.getName());
+        cell.setImage(fFilterIcon);
+        cell.setForeground(filter.isEnabled() ? display.getSystemColor(SWT.COLOR_BLACK) : display.getSystemColor(SWT.COLOR_GRAY));
       }
     });
 
@@ -233,6 +235,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
         ISearchFilter filter = (ISearchFilter) event.getElement();
         filter.setEnabled(event.getChecked());
         fSearchFilterDao.save(filter);
+        fViewer.update(filter, null);
       }
     });
 
