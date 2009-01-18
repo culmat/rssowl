@@ -35,10 +35,13 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeViewerListener;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -50,7 +53,11 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.dialogs.FilteredTree;
+import org.eclipse.ui.dialogs.PatternFilter;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
@@ -68,7 +75,9 @@ import org.rssowl.ui.internal.views.explorer.BookMarkSorter;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * The <code>LocationConditionControl</code> is a <code>Composite</code>
@@ -99,6 +108,7 @@ public class LocationControl extends Composite {
     private CheckboxTreeViewer fViewer;
     private List<IFolderChild> fCheckedElements;
     private IFolderChild fSelectedElement;
+    private Set<IFolderChild> fCheckedElementsCache = new HashSet<IFolderChild>();
 
     FolderChildChooserDialog(Shell parentShell, IFolderChild selectedElement, List<IFolderChild> checkedElements) {
       super(parentShell);
@@ -115,7 +125,7 @@ public class LocationControl extends Composite {
      */
     @Override
     protected void okPressed() {
-      Object[] checkedObjects = fViewer.getCheckedElements();
+      Object[] checkedObjects = fCheckedElementsCache.toArray();
       IStructuredSelection selection = new StructuredSelection(checkedObjects);
 
       List<IFolderChild> entities = ModelUtils.getFoldersBookMarksBins(selection);
@@ -154,10 +164,69 @@ public class LocationControl extends Composite {
           break;
       }
 
-      fViewer = new CheckboxTreeViewer(composite, SWT.BORDER);
-      fViewer.setAutoExpandLevel(fMode == Mode.SELECT_BIN ? AbstractTreeViewer.ALL_LEVELS : 2);
-      fViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-      fViewer.getTree().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
+      /* Filter for Filtered Tree */
+      final PatternFilter filter = new PatternFilter() {
+        @Override
+        protected boolean isLeafMatch(Viewer viewer, Object element) {
+          String labelText = ((IFolderChild) element).getName();
+          if (labelText == null)
+            return false;
+
+          return wordMatches(labelText);
+        }
+      };
+
+      /* Filtered Tree to make it easier to chose an element */
+      final FilteredTree filteredTree = new FilteredTree(composite, SWT.BORDER, filter) {
+        @Override
+        protected TreeViewer doCreateTreeViewer(Composite parent, int style) {
+          fViewer = new CheckboxTreeViewer(parent, SWT.BORDER) {
+            @Override
+            public void refresh(boolean updateLabels) {
+              super.refresh(updateLabels);
+
+              /* Avoid collapsed Tree */
+              expandToLevel(fMode == Mode.SELECT_BIN ? AbstractTreeViewer.ALL_LEVELS : 2);
+
+              /* Restore Checked Elements */
+              for (IFolderChild child : fCheckedElementsCache) {
+                setParentsExpanded(child);
+                fViewer.setChecked(child, true);
+                setChildsChecked(child, true, true, false);
+              }
+            }
+          };
+          fViewer.setAutoExpandLevel(fMode == Mode.SELECT_BIN ? AbstractTreeViewer.ALL_LEVELS : 2);
+          fViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+          fViewer.getTree().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
+          return fViewer;
+        }
+      };
+
+      filteredTree.setInitialText("");
+      if (fMode == Mode.SEARCH_LOCATION)
+        filteredTree.getFilterControl().setMessage("Type here to filter locations by name");
+      else
+        filteredTree.getFilterControl().setMessage("Type here to filter news bins by name");
+      filteredTree.getViewer().getControl().setFocus();
+
+      /* Filter when Typing into Tree */
+      filteredTree.getViewer().getControl().addKeyListener(new KeyAdapter() {
+        @Override
+        public void keyPressed(KeyEvent e) {
+          if (e.character > 0x20) {
+            String character = String.valueOf(e.character);
+            Text text = filteredTree.getFilterControl();
+            text.setFocus();
+            text.setText(character);
+            text.setSelection(1);
+            filter.setPattern(character);
+
+            /* Consume the Event */
+            e.doit = false;
+          }
+        }
+      });
 
       int viewerHeight = fViewer.getTree().getItemHeight() * 20 + 12;
       ((GridData) composite.getLayoutData()).heightHint = viewerHeight;
@@ -260,7 +329,7 @@ public class LocationControl extends Composite {
             fViewer.setExpandedState(folder, expandedState);
 
             if (expandedState && fViewer.getChecked(folder))
-              setChildsChecked(folder, true, true);
+              setChildsChecked(folder, true, true, false);
           }
         }
       });
@@ -271,8 +340,9 @@ public class LocationControl extends Composite {
       if (fCheckedElements != null) {
         for (IFolderChild child : fCheckedElements) {
           setParentsExpanded(child);
+          cache(child, true);
           fViewer.setChecked(child, true);
-          setChildsChecked(child, true, true);
+          setChildsChecked(child, true, true, true);
         }
       }
 
@@ -292,10 +362,12 @@ public class LocationControl extends Composite {
 
             /* Normal selection behavior otherwise */
             else {
-              setChildsChecked((IFolderChild) item.getData(), item.getChecked(), false);
+              IFolderChild folderChild = (IFolderChild) item.getData();
+              setChildsChecked(folderChild, item.getChecked(), false, true);
+              cache(folderChild, item.getChecked());
 
               if (!item.getChecked())
-                setParentsChecked((IFolderChild) item.getData(), false);
+                setParentsChecked(folderChild, false, true);
             }
           }
         }
@@ -306,7 +378,7 @@ public class LocationControl extends Composite {
         public void treeExpanded(TreeExpansionEvent event) {
           boolean isChecked = fViewer.getChecked(event.getElement());
           if (isChecked)
-            setChildsChecked((IFolderChild) event.getElement(), isChecked, false);
+            setChildsChecked((IFolderChild) event.getElement(), isChecked, false, false);
         }
 
         public void treeCollapsed(TreeExpansionEvent event) {}
@@ -331,6 +403,7 @@ public class LocationControl extends Composite {
           @Override
           public void widgetSelected(SelectionEvent e) {
             OwlUI.setAllChecked(fViewer.getTree(), true);
+            cacheAll(true);
           }
         });
       }
@@ -342,6 +415,7 @@ public class LocationControl extends Composite {
         @Override
         public void widgetSelected(SelectionEvent e) {
           OwlUI.setAllChecked(fViewer.getTree(), false);
+          cacheAll(false);
         }
       });
 
@@ -361,21 +435,46 @@ public class LocationControl extends Composite {
       return super.createButtonBar(parent);
     }
 
-    private void setChildsChecked(IFolderChild folderChild, boolean checked, boolean onlyExpanded) {
-      if (folderChild instanceof IFolder && (!onlyExpanded || fViewer.getExpandedState(folderChild))) {
-        List<IFolderChild> children = ((IFolder) folderChild).getChildren();
-        for (IFolderChild child : children) {
-          fViewer.setChecked(child, checked);
-          setChildsChecked(child, checked, onlyExpanded);
+    private void cache(IFolderChild child, boolean checked) {
+      if (checked)
+        fCheckedElementsCache.add(child);
+      else
+        fCheckedElementsCache.remove(child);
+    }
+
+    private void cacheAll(boolean checked) {
+      Tree tree = fViewer.getTree();
+      cacheAll(tree.getItems(), checked);
+    }
+
+    private void cacheAll(TreeItem[] items, boolean checked) {
+      for (TreeItem item : items) {
+        if (item.getData() != null) { //Could not yet be resolved!
+          cache((IFolderChild) item.getData(), checked);
+          cacheAll(item.getItems(), checked);
         }
       }
     }
 
-    private void setParentsChecked(IFolderChild folderChild, boolean checked) {
+    private void setChildsChecked(IFolderChild folderChild, boolean checked, boolean onlyExpanded, boolean cache) {
+      if (folderChild instanceof IFolder && (!onlyExpanded || fViewer.getExpandedState(folderChild))) {
+        List<IFolderChild> children = ((IFolder) folderChild).getChildren();
+        for (IFolderChild child : children) {
+          if (cache)
+            cache(child, checked);
+          fViewer.setChecked(child, checked);
+          setChildsChecked(child, checked, onlyExpanded, cache);
+        }
+      }
+    }
+
+    private void setParentsChecked(IFolderChild folderChild, boolean checked, boolean cache) {
       IFolder parent = folderChild.getParent();
       if (parent != null) {
+        if (cache)
+          cache(parent, checked);
         fViewer.setChecked(parent, checked);
-        setParentsChecked(parent, checked);
+        setParentsChecked(parent, checked, cache);
       }
     }
 
