@@ -459,8 +459,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
         if (newsAction != null) {
           SafeRunnable.run(new ISafeRunnable() {
             public void handleException(Throwable e) {
-              if (e instanceof Exception)
-                Activator.getDefault().logError(e.getMessage(), (Exception) e);
+              Activator.getDefault().logError(e.getMessage(), e);
             }
 
             public void run() throws Exception {
