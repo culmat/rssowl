@@ -125,7 +125,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
   public NewsFiltersListDialog(Shell parentShell) {
     super(parentShell);
     fResources = new LocalResourceManager(JFaceResources.getResources());
-    fFilterIcon = OwlUI.getImage(fResources, "icons/obj16/news_filter.gif");
+    fFilterIcon = OwlUI.getImage(fResources, "icons/etool16/filter.gif");
     fSearchFilterDao = DynamicDAO.getDAO(ISearchFilterDAO.class);
   }
 
