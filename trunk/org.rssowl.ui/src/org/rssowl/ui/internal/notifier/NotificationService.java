@@ -222,8 +222,15 @@ public class NotificationService {
 
     /* Create Items */
     List<NotificationItem> items = new ArrayList<NotificationItem>(events.size());
-    for (NewsEvent event : events)
-      items.add(new NewsNotificationItem(event.getEntity()));
+    for (NewsEvent event : events) {
+      INews news = event.getEntity();
+      if (news.getParentId() == 0) //Don't show notifier for copied/moved news
+        items.add(new NewsNotificationItem(news));
+    }
+
+    /* Return if nothing to show */
+    if (items.isEmpty())
+      return;
 
     /* Add into Buffer */
     if (!isPopupVisible())
