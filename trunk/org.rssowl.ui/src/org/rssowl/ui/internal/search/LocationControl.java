@@ -168,6 +168,9 @@ public class LocationControl extends Composite {
       final PatternFilter filter = new PatternFilter() {
         @Override
         protected boolean isLeafMatch(Viewer viewer, Object element) {
+          if (fMode == Mode.SELECT_BIN && !(element instanceof INewsBin))
+            return false;
+
           String labelText = ((IFolderChild) element).getName();
           if (labelText == null)
             return false;
@@ -209,10 +212,10 @@ public class LocationControl extends Composite {
 
         @Override
         protected Composite createFilterControls(Composite parent) {
-           Composite filterControls = super.createFilterControls(parent);
-           filterToolBar.getControl().setVisible(true);
-           filterToolBar.getControl().setEnabled(false);
-           return filterControls;
+          Composite filterControls = super.createFilterControls(parent);
+          filterToolBar.getControl().setVisible(true);
+          filterToolBar.getControl().setEnabled(false);
+          return filterControls;
         }
       };
 
