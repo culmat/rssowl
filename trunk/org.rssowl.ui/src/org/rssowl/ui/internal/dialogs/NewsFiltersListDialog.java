@@ -236,6 +236,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
         filter.setEnabled(event.getChecked());
         fSearchFilterDao.save(filter);
         fViewer.update(filter, null);
+        updateTitle();
       }
     });
 
@@ -505,7 +506,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     TableItem[] items = table.getItems();
     for (TableItem item : items) {
       ISearchFilter filter = (ISearchFilter) item.getData();
-      if (filter.matchAllNews()) {
+      if (filter.matchAllNews() && filter.isEnabled()) {
         int index = table.indexOf(item);
         if (index < table.getItemCount() - 1) {
           problematicFilter = filter;
