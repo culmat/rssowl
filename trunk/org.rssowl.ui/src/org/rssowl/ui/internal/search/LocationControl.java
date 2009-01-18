@@ -201,6 +201,19 @@ public class LocationControl extends Composite {
           fViewer.getTree().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
           return fViewer;
         }
+
+        @Override
+        protected void updateToolbar(boolean visible) {
+          filterToolBar.getControl().setEnabled(visible);
+        }
+
+        @Override
+        protected Composite createFilterControls(Composite parent) {
+           Composite filterControls = super.createFilterControls(parent);
+           filterToolBar.getControl().setVisible(true);
+           filterToolBar.getControl().setEnabled(false);
+           return filterControls;
+        }
       };
 
       filteredTree.setInitialText("");
