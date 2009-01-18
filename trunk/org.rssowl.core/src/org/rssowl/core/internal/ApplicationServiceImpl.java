@@ -35,8 +35,10 @@ import org.apache.lucene.store.RAMDirectory;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SafeRunner;
 import org.rssowl.core.IApplicationService;
 import org.rssowl.core.INewsAction;
 import org.rssowl.core.Owl;
@@ -357,13 +359,21 @@ public class ApplicationServiceImpl implements IApplicationService {
       directory.close();
   }
 
-  //TODO Run in SafeRunner!
-  private void applyFilter(ISearchFilter filter, List<INews> news) {
+  private void applyFilter(ISearchFilter filter, final List<INews> news) {
     List<IFilterAction> actions = filter.getActions();
-    for (IFilterAction action : actions) {
-      INewsAction newsAction = fNewsActions.get(action.getActionId());
-      if (newsAction != null)
-        newsAction.run(news, action.getData());
+    for (final IFilterAction action : actions) {
+      final INewsAction newsAction = fNewsActions.get(action.getActionId());
+      if (newsAction != null) {
+        SafeRunner.run(new ISafeRunnable() {
+          public void handleException(Throwable e) {
+            Activator.getDefault().logError(e.getMessage(), e);
+          }
+
+          public void run() throws Exception {
+            newsAction.run(news, action.getData());
+          }
+        });
+      }
     }
   }
 
