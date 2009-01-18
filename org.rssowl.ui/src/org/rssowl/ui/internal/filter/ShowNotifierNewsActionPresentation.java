@@ -54,7 +54,7 @@ public class ShowNotifierNewsActionPresentation implements INewsActionPresentati
     if (data != null && data instanceof String)
       fSelectedColor = OwlUI.getRGB((String) data);
     else
-      fSelectedColor = new RGB(0, 0, 0);
+      fSelectedColor = new RGB(200, 118, 10);
 
     fContainer = new Composite(parent, SWT.NONE);
     fContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
