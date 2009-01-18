@@ -377,7 +377,7 @@ public class Activator extends AbstractUIPlugin {
    * @param msg The message to log as Error.
    * @param e The occuring Exception to log.
    */
-  public void logError(String msg, Exception e) {
+  public void logError(String msg, Throwable e) {
     if (msg == null)
       msg = ""; //$NON-NLS-1$
 
