@@ -45,6 +45,8 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.persist.ISearch;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 
@@ -100,6 +102,10 @@ public class DefragmentTest {
     Preference pref = new Preference("key");
     pref.putLongs(2, 3, 4);
     DynamicDAO.save(pref);
+
+    ISearch search = fFactory.createSearch(null);
+    ISearchFilter filter = fFactory.createSearchFilter(null, search, "filter");
+    DynamicDAO.save(filter);
   }
 
   /**
@@ -168,6 +174,7 @@ public class DefragmentTest {
 
     assertEquals(db.query(ILabel.class).size(), defragmentedDb.query(ILabel.class).size());
     assertEquals(db.query(Counter.class).get(0).getValue(), defragmentedDb.query(Counter.class).get(0).getValue());
+    assertEquals(db.query(ISearchFilter.class).get(0).getName(), defragmentedDb.query(ISearchFilter.class).get(0).getName());
   }
 
   private List<IFeed> saveFeeds() throws Exception {

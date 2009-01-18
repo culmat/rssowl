@@ -46,6 +46,7 @@ import org.rssowl.core.internal.persist.SearchFilter;
 import org.rssowl.core.internal.persist.migration.MigrationResult;
 import org.rssowl.core.internal.persist.migration.Migrations;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.NewsCounterItem;
 import org.rssowl.core.persist.INews.State;
@@ -667,6 +668,12 @@ public class DBManager {
       sourceDb.activate(pref, Integer.MAX_VALUE);
       destinationDb.ext().set(pref, Integer.MAX_VALUE);
     }
+
+    for (ISearchFilter filter : sourceDb.query(SearchFilter.class)) {
+      sourceDb.activate(filter, Integer.MAX_VALUE);
+      destinationDb.ext().set(filter, Integer.MAX_VALUE);
+    }
+
     monitor.worked(5);
     List<Counter> counterSet = sourceDb.query(Counter.class);
     Counter counter = counterSet.iterator().next();
