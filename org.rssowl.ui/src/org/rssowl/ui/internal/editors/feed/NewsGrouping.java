@@ -92,7 +92,7 @@ public class NewsGrouping {
     GROUP_BY_CATEGORY("Group by Category"),
 
     /** Group by Title */
-    GROUP_BY_TOPIC("Group by Topic"),
+    GROUP_BY_TOPIC("Group by Title"),
 
     /** Group by Feed */
     GROUP_BY_FEED("Group by Feed"),
