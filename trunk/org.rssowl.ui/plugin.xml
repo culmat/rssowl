@@ -724,6 +724,31 @@
             id="org.rssowl.ui.FilterNewsAction"
             name="Filter News">
       </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.LabelAction0"
+            name="Label News 1">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.LabelAction1"
+            name="Label News 2">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.LabelAction2"
+            name="Label News 3">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.LabelAction3"
+            name="Label News 4">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.LabelAction4"
+            name="Label News 5">
+      </command>
    </extension>
    <extension
          id="product"
@@ -856,6 +881,36 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.rssowl.ui.KeyScheme"
             sequence="M1+TAB">
+      </key>
+      <key
+            commandId="org.rssowl.ui.LabelAction0"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1+1">
+      </key>
+      <key
+            commandId="org.rssowl.ui.LabelAction1"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1+2">
+      </key>
+      <key
+            commandId="org.rssowl.ui.LabelAction2"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1+3">
+      </key>
+      <key
+            commandId="org.rssowl.ui.LabelAction3"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1+4">
+      </key>
+      <key
+            commandId="org.rssowl.ui.LabelAction4"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1+5">
       </key>
    </extension>
    <extension
