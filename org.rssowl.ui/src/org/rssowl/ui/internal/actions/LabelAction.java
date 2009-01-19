@@ -57,6 +57,17 @@ public class LabelAction extends Action {
   }
 
   /*
+   * @see org.eclipse.jface.action.Action#getActionDefinitionId()
+   */
+  @Override
+  public String getActionDefinitionId() {
+    if (fLabel != null)
+      return Controller.LABEL_ACTION_PREFIX + fLabel.getOrder();
+
+    return null;
+  }
+
+  /*
    * @see org.eclipse.jface.action.Action#getText()
    */
   @Override

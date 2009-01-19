@@ -284,12 +284,12 @@ public class Controller {
 
       @Override
       public void entitiesAdded(Set<LabelEvent> events) {
-        defineLabelCommands(toLabels(events));
+        updateLabelCommands();
       }
 
       @Override
       public void entitiesUpdated(Set<LabelEvent> events) {
-        defineLabelCommands(toLabels(events));
+        updateLabelCommands();
 
         for (LabelEvent event : events) {
           ILabel oldLabel = event.getOldLabel();
@@ -302,7 +302,7 @@ public class Controller {
 
       @Override
       public void entitiesDeleted(Set<LabelEvent> events) {
-        undefineLabelCommands(toLabels(events));
+        updateLabelCommands();
       }
     };
 
@@ -828,7 +828,7 @@ public class Controller {
     fCleanUpReminderService = new CleanUpReminderService();
 
     /* Support Keybindings for assigning Labels */
-    defineLabelCommands(DynamicDAO.loadAll(ILabel.class));
+    defineLabelCommands(ModelUtils.loadSortedLabels());
 
     /* Check for Status of Startup */
     IStatus startupStatus = Owl.getPersistenceService().getStartupStatus();
@@ -1103,12 +1103,17 @@ public class Controller {
       return;
 
     /* Define Command For Each Label */
-    int i = 0;
     for (final ILabel label : labels) {
-      Command command = commandService.getCommand(LABEL_ACTION_PREFIX + i++);
-      command.define("Label '" + label.getName() + "'", "Assign the label " + label.getName(), commandService.getCategory(RSSOWL_KEYBINDING_CATEGORY));
+      Command command = commandService.getCommand(LABEL_ACTION_PREFIX + label.getOrder());
+      command.define("Label '" + label.getName() + "'", "Assign the label " + label.getName() + " to selected News.", commandService.getCategory(RSSOWL_KEYBINDING_CATEGORY));
       command.setHandler(new LabelNewsHandler(label));
     }
+  }
+
+  private void updateLabelCommands() {
+    Set<ILabel> labels = ModelUtils.loadSortedLabels();
+    undefineLabelCommands(labels);
+    defineLabelCommands(labels);
   }
 
   /* TODO Also need to remove any keybinding associated with Label if existing */
@@ -1121,16 +1126,7 @@ public class Controller {
       return;
 
     for (ILabel label : labels) {
-      commandService.getCommand(LABEL_ACTION_PREFIX + label.getId()).undefine();
+      commandService.getCommand(LABEL_ACTION_PREFIX + label.getOrder()).undefine();
     }
-  }
-
-  private List<ILabel> toLabels(Set<LabelEvent> events) {
-    List<ILabel> labels = new ArrayList<ILabel>(events.size());
-    for (LabelEvent event : events) {
-      labels.add(event.getEntity());
-    }
-
-    return labels;
   }
 }
