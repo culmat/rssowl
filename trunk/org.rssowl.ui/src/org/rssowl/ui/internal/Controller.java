@@ -870,27 +870,27 @@ public class Controller {
 
   private void addDefaultLabels() throws PersistenceException {
     ILabel label = fFactory.createLabel(null, "Later");
-    label.setColor("151,53,151");
+    label.setColor("113,21,88");
     label.setOrder(0);
     fLabelDao.save(label);
 
     label = fFactory.createLabel(null, "Personal");
-    label.setColor("0,153,0");
+    label.setColor("105,130,73");
     label.setOrder(1);
     fLabelDao.save(label);
 
     label = fFactory.createLabel(null, "Important");
-    label.setColor("159,63,63");
+    label.setColor("177,39,52");
     label.setOrder(2);
     fLabelDao.save(label);
 
     label = fFactory.createLabel(null, "Work");
-    label.setColor("255,153,0");
+    label.setColor("234,152,79");
     label.setOrder(3);
     fLabelDao.save(label);
 
     label = fFactory.createLabel(null, "To Do");
-    label.setColor("51,51,255");
+    label.setColor("113,160,168");
     label.setOrder(4);
     fLabelDao.save(label);
 
