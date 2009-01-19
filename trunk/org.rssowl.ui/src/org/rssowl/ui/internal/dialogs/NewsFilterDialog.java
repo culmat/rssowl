@@ -618,4 +618,12 @@ public class NewsFilterDialog extends TitleAreaDialog {
     else
       shell.setText("Edit News Filter '" + fEditedFilter.getName() + "'");
   }
+
+  /*
+   * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+   */
+  @Override
+  protected boolean isResizable() {
+    return true;
+  }
 }

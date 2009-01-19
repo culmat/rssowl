@@ -662,4 +662,12 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
   public void setSelection(ISearchFilter filter) {
     fSelectedFilter = filter;
   }
+
+  /*
+   * @see org.eclipse.jface.dialogs.Dialog#isResizable()
+   */
+  @Override
+  protected boolean isResizable() {
+    return true;
+  }
 }
