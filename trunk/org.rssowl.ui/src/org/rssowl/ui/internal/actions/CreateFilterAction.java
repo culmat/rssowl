@@ -78,6 +78,7 @@ public class CreateFilterAction implements IObjectActionDelegate {
     if (shell != null && !fSelection.isEmpty()) {
       ISearch presetSearch = Owl.getModelFactory().createSearch(null);
       fillSearchConditions(presetSearch);
+      presetSearch.setMatchAllConditions(true);
 
       NewsFilterDialog dialog = new NewsFilterDialog(shell, presetSearch);
       if (dialog.open() == IDialogConstants.OK_ID) {
@@ -131,7 +132,6 @@ public class CreateFilterAction implements IObjectActionDelegate {
 
         ISearchCondition condition = factory.createSearchCondition(categoryField, SearchSpecifier.IS, category.getName());
         presetSearch.addSearchCondition(condition);
-        presetSearch.setMatchAllConditions(true);
       }
     }
 
@@ -147,7 +147,6 @@ public class CreateFilterAction implements IObjectActionDelegate {
 
         ISearchCondition condition = factory.createSearchCondition(authorField, SearchSpecifier.CONTAINS_ALL, value);
         presetSearch.addSearchCondition(condition);
-        presetSearch.setMatchAllConditions(true);
       }
     }
   }
