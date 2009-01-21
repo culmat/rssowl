@@ -77,6 +77,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.ISearchFilterDAO;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.CColumnLayoutData;
@@ -90,6 +91,7 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -457,7 +459,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
   }
 
   private void applyFilterOnChunks(final List<INews> news, ISearchFilter filter) {
-    List<IFilterAction> actions = filter.getActions();
+    Collection<IFilterAction> actions = CoreUtils.getActions(filter); //Need to sort structural actions to end
     final Set<IEntity> entitiesToSave = new HashSet<IEntity>(news.size());
 
     for (final IFilterAction action : actions) {
