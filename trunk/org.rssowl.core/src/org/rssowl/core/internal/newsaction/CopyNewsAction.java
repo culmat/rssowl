@@ -49,8 +49,6 @@ public class CopyNewsAction implements INewsAction {
    * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
    */
   public List<IEntity> run(List<INews> news, Object data) {
-    List<IEntity> entitiesToSave = new ArrayList<IEntity>(news.size());
-
     Long[] binIds = (Long[]) data;
     List<INewsBin> bins = new ArrayList<INewsBin>(binIds.length);
     for (Long id : binIds) {
@@ -77,7 +75,7 @@ public class CopyNewsAction implements INewsAction {
       DynamicDAO.save(bin);
     }
 
-    return entitiesToSave; //TODO Fix
+    return Collections.emptyList(); //The original news where not touched at all
   }
 
   /*

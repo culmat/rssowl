@@ -30,7 +30,6 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.INewsDAO;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,10 +77,13 @@ public class MoveNewsAction implements INewsAction {
       DynamicDAO.save(bin);
     }
 
-    /* Delete News from Source */
-    DynamicDAO.getDAO(INewsDAO.class).setState(news, INews.State.HIDDEN, false, false);
+    /* Set news as deleted */
+    for (INews newsitem : news) {
+      newsitem.setState(INews.State.HIDDEN);
+      entitiesToSave.add(newsitem);
+    }
 
-    return entitiesToSave;  //TODO Fix
+    return entitiesToSave;
   }
 
   /*
