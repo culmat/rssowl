@@ -48,6 +48,7 @@ import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.actions.ExportFeedsAction;
@@ -581,13 +582,13 @@ public class ImportExportOPMLTest {
     assertEquals(1, conditions.size());
     assertEquals(INews.LOCATION, conditions.get(0).getField().getId());
     assertEquals(SearchSpecifier.IS, conditions.get(0).getSpecifier());
-    assertEquals(Arrays.asList(new IFolderChild[] { fDefaultSet }), ModelUtils.toEntities((Long[][]) conditions.get(0).getValue()));
+    assertEquals(Arrays.asList(new IFolderChild[] { fDefaultSet }), CoreUtils.toEntities((Long[][]) conditions.get(0).getValue()));
 
     /* 10) Location is Default Set OR Location is Custom Set */
     searchmark = searchmarks.get(9);
     conditions = searchmark.getSearchConditions();
     assertEquals(1, conditions.size());
-    List<IFolderChild> locations = ModelUtils.toEntities((Long[][]) conditions.get(0).getValue());
+    List<IFolderChild> locations = CoreUtils.toEntities((Long[][]) conditions.get(0).getValue());
     assertEquals(INews.LOCATION, conditions.get(0).getField().getId());
     assertEquals(SearchSpecifier.IS, conditions.get(0).getSpecifier());
     assertEquals(2, locations.size());
@@ -600,7 +601,7 @@ public class ImportExportOPMLTest {
     assertEquals(1, conditions.size());
     assertEquals(INews.LOCATION, conditions.get(0).getField().getId());
     assertEquals(SearchSpecifier.IS, conditions.get(0).getSpecifier());
-    locations = ModelUtils.toEntities((Long[][]) conditions.get(0).getValue());
+    locations = CoreUtils.toEntities((Long[][]) conditions.get(0).getValue());
     assertEquals(1, locations.size());
     assertEquals(true, locations.get(0) instanceof IFolder);
     assertEquals("Default Folder 1", locations.get(0).getName());
@@ -611,7 +612,7 @@ public class ImportExportOPMLTest {
     assertEquals(1, conditions.size());
     assertEquals(INews.LOCATION, conditions.get(0).getField().getId());
     assertEquals(SearchSpecifier.IS, conditions.get(0).getSpecifier());
-    locations = ModelUtils.toEntities((Long[][]) conditions.get(0).getValue());
+    locations = CoreUtils.toEntities((Long[][]) conditions.get(0).getValue());
     assertEquals(1, locations.size());
     assertEquals(true, locations.get(0) instanceof IBookMark);
     assertEquals("Bookmark 1", locations.get(0).getName());
@@ -630,7 +631,7 @@ public class ImportExportOPMLTest {
       assertEquals(INews.LOCATION, condition.getField().getId());
       assertEquals(SearchSpecifier.IS, condition.getSpecifier());
 
-      locations.addAll(ModelUtils.toEntities((Long[][]) condition.getValue()));
+      locations.addAll(CoreUtils.toEntities((Long[][]) condition.getValue()));
     }
 
     assertEquals(3, locations.size());
@@ -644,7 +645,7 @@ public class ImportExportOPMLTest {
     assertEquals(1, conditions.size());
     assertEquals(INews.LOCATION, conditions.get(0).getField().getId());
     assertEquals(SearchSpecifier.IS, conditions.get(0).getSpecifier());
-    locations = ModelUtils.toEntities((Long[][]) conditions.get(0).getValue());
+    locations = CoreUtils.toEntities((Long[][]) conditions.get(0).getValue());
     assertEquals(1, locations.size());
     assertEquals(true, locations.get(0) instanceof INewsBin);
     assertEquals(fNewsBin.getName(), locations.get(0).getName());

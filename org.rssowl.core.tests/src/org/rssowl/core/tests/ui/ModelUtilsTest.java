@@ -52,6 +52,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.util.ModelUtils;
@@ -65,7 +66,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Tests for the ModelUtils class of the UI Plugin.
+ * Tests for the ModelUtils and CoreUtils class of the UI Plugin.
  *
  * @author bpasero
  */
@@ -194,7 +195,7 @@ public class ModelUtilsTest {
     entities.add(mark3);
     entities.add(mark4);
 
-    ModelUtils.normalize(root1, entities);
+    CoreUtils.normalize(root1, entities);
     assertEquals(4, entities.size());
     assertEquals(true, entities.containsAll(Arrays.asList(new IEntity[] { root1, root2, mark5, mark6 })));
 
@@ -210,7 +211,7 @@ public class ModelUtilsTest {
     entities.add(mark3);
     entities.add(mark4);
 
-    ModelUtils.normalize(subRoot, entities);
+    CoreUtils.normalize(subRoot, entities);
     assertEquals(7, entities.size());
     assertEquals(true, entities.containsAll(Arrays.asList(new IEntity[] { root1, root2, subRoot, mark1, mark2, mark5, mark6 })));
 
@@ -226,7 +227,7 @@ public class ModelUtilsTest {
     entities.add(mark3);
     entities.add(mark4);
 
-    ModelUtils.normalize(root2, entities);
+    CoreUtils.normalize(root2, entities);
     assertEquals(7, entities.size());
     assertEquals(true, entities.containsAll(Arrays.asList(new IEntity[] { root1, root2, subRoot, mark1, mark2, mark3, mark4 })));
   }
@@ -274,25 +275,25 @@ public class ModelUtilsTest {
     NewsEvent event8 = new NewsEvent(newNews, deletedNews, true);
 
     events.add(event1);
-    assertEquals(false, ModelUtils.isNewStateChange(events));
+    assertEquals(false, CoreUtils.isNewStateChange(events));
     events.add(event4);
-    assertEquals(false, ModelUtils.isNewStateChange(events));
+    assertEquals(false, CoreUtils.isNewStateChange(events));
     events.add(event5);
-    assertEquals(false, ModelUtils.isNewStateChange(events));
+    assertEquals(false, CoreUtils.isNewStateChange(events));
     events.add(event6);
-    assertEquals(false, ModelUtils.isNewStateChange(events));
+    assertEquals(false, CoreUtils.isNewStateChange(events));
     events.add(event2);
-    assertEquals(true, ModelUtils.isNewStateChange(events));
+    assertEquals(true, CoreUtils.isNewStateChange(events));
     events.add(event3);
-    assertEquals(true, ModelUtils.isNewStateChange(events));
+    assertEquals(true, CoreUtils.isNewStateChange(events));
 
     events.clear();
     events.add(event7);
-    assertEquals(true, ModelUtils.isNewStateChange(events));
+    assertEquals(true, CoreUtils.isNewStateChange(events));
 
     events.clear();
     events.add(event8);
-    assertEquals(true, ModelUtils.isNewStateChange(events));
+    assertEquals(true, CoreUtils.isNewStateChange(events));
   }
 
   /**
@@ -338,31 +339,31 @@ public class ModelUtilsTest {
     NewsEvent event8 = new NewsEvent(newNews, deletedNews, true);
 
     events.add(event1);
-    assertEquals(false, ModelUtils.isReadStateChange(events));
+    assertEquals(false, CoreUtils.isReadStateChange(events));
     events.add(event4);
-    assertEquals(true, ModelUtils.isReadStateChange(events));
+    assertEquals(true, CoreUtils.isReadStateChange(events));
     events.add(event5);
-    assertEquals(true, ModelUtils.isReadStateChange(events));
+    assertEquals(true, CoreUtils.isReadStateChange(events));
 
     events.clear();
     events.add(event7);
-    assertEquals(true, ModelUtils.isReadStateChange(events));
+    assertEquals(true, CoreUtils.isReadStateChange(events));
 
     events.clear();
     events.add(event8);
-    assertEquals(true, ModelUtils.isReadStateChange(events));
+    assertEquals(true, CoreUtils.isReadStateChange(events));
 
     events.clear();
     events.add(event2);
-    assertEquals(true, ModelUtils.isReadStateChange(events));
+    assertEquals(true, CoreUtils.isReadStateChange(events));
 
     events.clear();
     events.add(event3);
-    assertEquals(true, ModelUtils.isReadStateChange(events));
+    assertEquals(true, CoreUtils.isReadStateChange(events));
 
     events.clear();
     events.add(event6);
-    assertEquals(false, ModelUtils.isReadStateChange(events));
+    assertEquals(false, CoreUtils.isReadStateChange(events));
   }
 
   /**
@@ -409,25 +410,25 @@ public class ModelUtilsTest {
       NewsEvent event8 = new NewsEvent(newNews, deletedNews, true);
 
       events.add(event1);
-      assertEquals(false, ModelUtils.isNewOrReadStateChange(events));
+      assertEquals(false, CoreUtils.isNewOrReadStateChange(events));
       events.add(event4);
-      assertEquals(true, ModelUtils.isNewOrReadStateChange(events));
+      assertEquals(true, CoreUtils.isNewOrReadStateChange(events));
       events.add(event5);
-      assertEquals(true, ModelUtils.isNewOrReadStateChange(events));
+      assertEquals(true, CoreUtils.isNewOrReadStateChange(events));
       events.add(event6);
-      assertEquals(true, ModelUtils.isNewOrReadStateChange(events));
+      assertEquals(true, CoreUtils.isNewOrReadStateChange(events));
       events.add(event2);
-      assertEquals(true, ModelUtils.isNewOrReadStateChange(events));
+      assertEquals(true, CoreUtils.isNewOrReadStateChange(events));
       events.add(event3);
-      assertEquals(true, ModelUtils.isNewOrReadStateChange(events));
+      assertEquals(true, CoreUtils.isNewOrReadStateChange(events));
 
       events.clear();
       events.add(event7);
-      assertEquals(true, ModelUtils.isNewOrReadStateChange(events));
+      assertEquals(true, CoreUtils.isNewOrReadStateChange(events));
 
       events.clear();
       events.add(event8);
-      assertEquals(true, ModelUtils.isNewOrReadStateChange(events));
+      assertEquals(true, CoreUtils.isNewOrReadStateChange(events));
     }
 
     {
@@ -469,31 +470,31 @@ public class ModelUtilsTest {
       NewsEvent event8 = new NewsEvent(newNews, deletedNews, true);
 
       events.add(event1);
-      assertEquals(false, ModelUtils.isNewOrReadStateChange(events));
+      assertEquals(false, CoreUtils.isNewOrReadStateChange(events));
       events.add(event4);
-      assertEquals(true, ModelUtils.isNewOrReadStateChange(events));
+      assertEquals(true, CoreUtils.isNewOrReadStateChange(events));
       events.add(event5);
-      assertEquals(true, ModelUtils.isNewOrReadStateChange(events));
+      assertEquals(true, CoreUtils.isNewOrReadStateChange(events));
 
       events.clear();
       events.add(event7);
-      assertEquals(true, ModelUtils.isNewOrReadStateChange(events));
+      assertEquals(true, CoreUtils.isNewOrReadStateChange(events));
 
       events.clear();
       events.add(event8);
-      assertEquals(true, ModelUtils.isNewOrReadStateChange(events));
+      assertEquals(true, CoreUtils.isNewOrReadStateChange(events));
 
       events.clear();
       events.add(event2);
-      assertEquals(true, ModelUtils.isNewOrReadStateChange(events));
+      assertEquals(true, CoreUtils.isNewOrReadStateChange(events));
 
       events.clear();
       events.add(event3);
-      assertEquals(true, ModelUtils.isNewOrReadStateChange(events));
+      assertEquals(true, CoreUtils.isNewOrReadStateChange(events));
 
       events.clear();
       events.add(event6);
-      assertEquals(false, ModelUtils.isNewOrReadStateChange(events));
+      assertEquals(false, CoreUtils.isNewOrReadStateChange(events));
     }
   }
 
@@ -519,10 +520,10 @@ public class ModelUtilsTest {
     feed.addNews(news3);
 
     NewsEvent event1 = new NewsEvent(news1, news2, true);
-    assertEquals(false, ModelUtils.isDateChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    assertEquals(false, CoreUtils.isDateChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
 
     event1 = new NewsEvent(news1, news3, true);
-    assertEquals(true, ModelUtils.isDateChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    assertEquals(true, CoreUtils.isDateChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
   }
 
   /**
@@ -555,16 +556,16 @@ public class ModelUtilsTest {
     feed.addNews(news4);
 
     NewsEvent event1 = new NewsEvent(news1, news2, true);
-    assertEquals(false, ModelUtils.isAuthorChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    assertEquals(false, CoreUtils.isAuthorChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
 
     event1 = new NewsEvent(news1, news3, true);
-    assertEquals(true, ModelUtils.isAuthorChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    assertEquals(true, CoreUtils.isAuthorChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
 
     event1 = new NewsEvent(news1, news4, true);
-    assertEquals(true, ModelUtils.isAuthorChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    assertEquals(true, CoreUtils.isAuthorChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
 
     event1 = new NewsEvent(news4, news1, true);
-    assertEquals(true, ModelUtils.isAuthorChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    assertEquals(true, CoreUtils.isAuthorChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
   }
 
   /**
@@ -616,28 +617,28 @@ public class ModelUtilsTest {
     feed.addNews(news7);
 
     NewsEvent event1 = new NewsEvent(news1, news2, true);
-    assertEquals(false, ModelUtils.isCategoryChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    assertEquals(false, CoreUtils.isCategoryChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
 
     event1 = new NewsEvent(news1, news3, true);
-    assertEquals(true, ModelUtils.isCategoryChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    assertEquals(true, CoreUtils.isCategoryChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
 
     event1 = new NewsEvent(news1, news4, true);
-    assertEquals(true, ModelUtils.isCategoryChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    assertEquals(true, CoreUtils.isCategoryChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
 
     event1 = new NewsEvent(news4, news1, true);
-    assertEquals(true, ModelUtils.isCategoryChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    assertEquals(true, CoreUtils.isCategoryChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
 
     event1 = new NewsEvent(news5, news6, true);
-    assertEquals(true, ModelUtils.isCategoryChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    assertEquals(true, CoreUtils.isCategoryChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
 
     event1 = new NewsEvent(news6, news5, true);
-    assertEquals(true, ModelUtils.isCategoryChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    assertEquals(true, CoreUtils.isCategoryChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
 
     event1 = new NewsEvent(news7, news4, true);
-    assertEquals(true, ModelUtils.isCategoryChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    assertEquals(true, CoreUtils.isCategoryChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
 
     event1 = new NewsEvent(news4, news7, true);
-    assertEquals(true, ModelUtils.isCategoryChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
+    assertEquals(true, CoreUtils.isCategoryChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event1 }))));
   }
 
   /**
@@ -667,16 +668,16 @@ public class ModelUtilsTest {
     feed.addNews(news4);
 
     NewsEvent event = new NewsEvent(news1, news2, true);
-    assertEquals(false, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
+    assertEquals(false, CoreUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
 
     event = new NewsEvent(news1, news3, true);
-    assertEquals(true, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
+    assertEquals(true, CoreUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
 
     event = new NewsEvent(news1, news4, true);
-    assertEquals(true, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
+    assertEquals(true, CoreUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
 
     event = new NewsEvent(news4, news1, true);
-    assertEquals(true, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
+    assertEquals(true, CoreUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
   }
 
   /**
@@ -709,16 +710,16 @@ public class ModelUtilsTest {
     feed.addNews(news4);
 
     NewsEvent event = new NewsEvent(news1, news2, true);
-    assertEquals(true, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
+    assertEquals(true, CoreUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
 
     event = new NewsEvent(news1, news3, true);
-    assertEquals(true, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
+    assertEquals(true, CoreUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
 
     event = new NewsEvent(news1, news4, true);
-    assertEquals(true, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
+    assertEquals(true, CoreUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
 
     event = new NewsEvent(news4, news1, true);
-    assertEquals(true, ModelUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
+    assertEquals(true, CoreUtils.isLabelChange(new HashSet<ModelEvent>(Arrays.asList(new ModelEvent[] { event }))));
   }
 
   /**
@@ -749,22 +750,22 @@ public class ModelUtilsTest {
     subRootFolder1.addMark(subRoot1Mark2, null, false);
 
     /* Begin Testing */
-    assertEquals(true, ModelUtils.hasChildRelation(root, subRootFolder1));
-    assertEquals(true, ModelUtils.hasChildRelation(root, subRoot1Folder1));
-    assertEquals(true, ModelUtils.hasChildRelation(root, subRoot11Folder1));
-    assertEquals(true, ModelUtils.hasChildRelation(root, subRoot11Mark1));
-    assertEquals(true, ModelUtils.hasChildRelation(root, subRoot1Mark1));
-    assertEquals(true, ModelUtils.hasChildRelation(root, subRoot1Mark2));
+    assertEquals(true, CoreUtils.hasChildRelation(root, subRootFolder1));
+    assertEquals(true, CoreUtils.hasChildRelation(root, subRoot1Folder1));
+    assertEquals(true, CoreUtils.hasChildRelation(root, subRoot11Folder1));
+    assertEquals(true, CoreUtils.hasChildRelation(root, subRoot11Mark1));
+    assertEquals(true, CoreUtils.hasChildRelation(root, subRoot1Mark1));
+    assertEquals(true, CoreUtils.hasChildRelation(root, subRoot1Mark2));
 
-    assertEquals(true, ModelUtils.hasChildRelation(subRootFolder1, subRoot11Folder1));
-    assertEquals(true, ModelUtils.hasChildRelation(subRootFolder1, subRoot11Mark1));
-    assertEquals(true, ModelUtils.hasChildRelation(subRootFolder1, subRoot1Mark1));
-    assertEquals(true, ModelUtils.hasChildRelation(subRootFolder1, subRoot1Mark2));
+    assertEquals(true, CoreUtils.hasChildRelation(subRootFolder1, subRoot11Folder1));
+    assertEquals(true, CoreUtils.hasChildRelation(subRootFolder1, subRoot11Mark1));
+    assertEquals(true, CoreUtils.hasChildRelation(subRootFolder1, subRoot1Mark1));
+    assertEquals(true, CoreUtils.hasChildRelation(subRootFolder1, subRoot1Mark2));
 
-    assertEquals(false, ModelUtils.hasChildRelation(subRootFolder1, root));
-    assertEquals(false, ModelUtils.hasChildRelation(subRoot11Folder1, root));
-    assertEquals(false, ModelUtils.hasChildRelation(subRoot11Folder1, root));
-    assertEquals(false, ModelUtils.hasChildRelation(subRoot11Folder1, subRoot1Mark2));
+    assertEquals(false, CoreUtils.hasChildRelation(subRootFolder1, root));
+    assertEquals(false, CoreUtils.hasChildRelation(subRoot11Folder1, root));
+    assertEquals(false, CoreUtils.hasChildRelation(subRoot11Folder1, root));
+    assertEquals(false, CoreUtils.hasChildRelation(subRoot11Folder1, subRoot1Mark2));
   }
 
   /**
@@ -773,63 +774,63 @@ public class ModelUtilsTest {
   @Test
   public void testNormalizeTitle() throws Exception {
     String title = "Hello World";
-    assertEquals(title, ModelUtils.normalizeTitle(title));
+    assertEquals(title, CoreUtils.normalizeTitle(title));
 
     title = "";
-    assertEquals("", ModelUtils.normalizeTitle(title));
+    assertEquals("", CoreUtils.normalizeTitle(title));
 
     title = null;
-    assertEquals(null, ModelUtils.normalizeTitle(title));
+    assertEquals(null, CoreUtils.normalizeTitle(title));
 
     title = "Re: ";
-    assertEquals("", ModelUtils.normalizeTitle(title));
+    assertEquals("", CoreUtils.normalizeTitle(title));
 
     title = "Re[33]:";
-    assertEquals("", ModelUtils.normalizeTitle(title));
+    assertEquals("", CoreUtils.normalizeTitle(title));
 
     title = "Re Hello World";
-    assertEquals("Re Hello World", ModelUtils.normalizeTitle(title));
+    assertEquals("Re Hello World", CoreUtils.normalizeTitle(title));
 
     title = "Re:Hello World";
-    assertEquals("Hello World", ModelUtils.normalizeTitle(title));
+    assertEquals("Hello World", CoreUtils.normalizeTitle(title));
 
     title = "Re: Hello World";
-    assertEquals("Hello World", ModelUtils.normalizeTitle(title));
+    assertEquals("Hello World", CoreUtils.normalizeTitle(title));
 
     title = "Re: Re: Hello World";
-    assertEquals("Hello World", ModelUtils.normalizeTitle(title));
+    assertEquals("Hello World", CoreUtils.normalizeTitle(title));
 
     title = "Re:Re: Hello World";
-    assertEquals("Hello World", ModelUtils.normalizeTitle(title));
+    assertEquals("Hello World", CoreUtils.normalizeTitle(title));
 
     title = "Re:Re: Hello World Re:";
-    assertEquals("Hello World Re:", ModelUtils.normalizeTitle(title));
+    assertEquals("Hello World Re:", CoreUtils.normalizeTitle(title));
 
     title = "Re: Hello World (re from)";
-    assertEquals("Hello World (re from)", ModelUtils.normalizeTitle(title));
+    assertEquals("Hello World (re from)", CoreUtils.normalizeTitle(title));
 
     title = "Re(33): Hello World";
-    assertEquals("Hello World", ModelUtils.normalizeTitle(title));
+    assertEquals("Hello World", CoreUtils.normalizeTitle(title));
 
     title = "Re[33]: Hello World";
-    assertEquals("Hello World", ModelUtils.normalizeTitle(title));
+    assertEquals("Hello World", CoreUtils.normalizeTitle(title));
 
     title = "Re(33: Hello World";
-    assertEquals("Re(33: Hello World", ModelUtils.normalizeTitle(title));
+    assertEquals("Re(33: Hello World", CoreUtils.normalizeTitle(title));
 
     title = "Re[33: Hello World";
-    assertEquals("Re[33: Hello World", ModelUtils.normalizeTitle(title));
+    assertEquals("Re[33: Hello World", CoreUtils.normalizeTitle(title));
 
     title = "Re(33): Hello World[]";
-    assertEquals("Hello World[]", ModelUtils.normalizeTitle(title));
+    assertEquals("Hello World[]", CoreUtils.normalizeTitle(title));
 
     title = "Re[33]: Hello World()";
-    assertEquals("Hello World()", ModelUtils.normalizeTitle(title));
+    assertEquals("Hello World()", CoreUtils.normalizeTitle(title));
 
     title = "Re(33): Hello World(3)";
-    assertEquals("Hello World(3)", ModelUtils.normalizeTitle(title));
+    assertEquals("Hello World(3)", CoreUtils.normalizeTitle(title));
 
     title = "Re[33]: Hello World[3]";
-    assertEquals("Hello World[3]", ModelUtils.normalizeTitle(title));
+    assertEquals("Hello World[3]", CoreUtils.normalizeTitle(title));
   }
 }
