@@ -547,14 +547,15 @@ public class NewsFilterTest {
   /**
    * @throws Exception
    */
+  @Test
   public void testComplexFilter() throws Exception {
     IBookMark bm = createBookMark("local1");
     IFeed feed = fFactory.createFeed(null, bm.getFeedLinkReference().getLink());
 
-    INews news1 = createNews(feed, "Title");
+    INews news1 = createNews(feed, "Title", "Link1");
     news1.setState(INews.State.NEW);
 
-    INews news2 = createNews(feed, "Title");
+    INews news2 = createNews(feed, "Title", "Link2");
     news2.setState(INews.State.NEW);
 
     INews news3 = createNews(feed, "Other");
@@ -598,7 +599,7 @@ public class NewsFilterTest {
     {
       ISearch search = createTitleSearch("Other");
 
-      ISearchFilter filter = fFactory.createSearchFilter(null, search, "Title is Title");
+      ISearchFilter filter = fFactory.createSearchFilter(null, search, "Title is Other");
       filter.setEnabled(true);
       filter.setOrder(1);
 
@@ -614,11 +615,14 @@ public class NewsFilterTest {
 
       ISearchFilter filter = fFactory.createSearchFilter(null, null, "All News");
       filter.setEnabled(true);
+      filter.setMatchAllNews(true);
       filter.setOrder(2);
 
       IFilterAction labelAction = fFactory.createFilterAction(LABEL_NEWS_ID);
       labelAction.setData(label.getId());
       filter.addAction(labelAction);
+
+      DynamicDAO.save(filter);
     }
 
     fAppService.handleFeedReload(bm, feed, null, false);
@@ -643,6 +647,10 @@ public class NewsFilterTest {
       }
     }
 
+    assertEquals(3, bin1.getNews().size());
+    assertEquals(1, bin1.getNewsCount(EnumSet.of(INews.State.NEW)));
+    assertEquals(2, bin1.getNewsCount(EnumSet.of(INews.State.READ)));
+
     List<INews> binNews = bin1.getNews();
     for (INews newsitem : binNews) {
       if (newsitem.equals(news1)) {
@@ -662,8 +670,9 @@ public class NewsFilterTest {
       }
     }
 
-    assertEquals(1, bin1.getNewsCount(EnumSet.of(INews.State.NEW)));
-    assertEquals(2, bin1.getNewsCount(EnumSet.of(INews.State.READ)));
+    assertEquals(3, bin2.getNews().size());
+    assertEquals(1, bin2.getNewsCount(EnumSet.of(INews.State.NEW)));
+    assertEquals(2, bin2.getNewsCount(EnumSet.of(INews.State.READ)));
 
     binNews = bin2.getNews();
     for (INews newsitem : binNews) {
@@ -679,9 +688,6 @@ public class NewsFilterTest {
         assertTrue(!newsitem.isFlagged());
       }
     }
-
-    assertEquals(1, bin2.getNewsCount(EnumSet.of(INews.State.NEW)));
-    assertEquals(2, bin2.getNewsCount(EnumSet.of(INews.State.READ)));
   }
 
   private ISearch createStickySearch(boolean sticky) {
@@ -706,6 +712,13 @@ public class NewsFilterTest {
 
   private INews createNews(IFeed feed, String title) {
     INews news = fFactory.createNews(null, feed, new Date());
+    news.setTitle(title);
+    return news;
+  }
+
+  private INews createNews(IFeed feed, String title, String link) throws URISyntaxException {
+    INews news = fFactory.createNews(null, feed, new Date());
+    news.setLink(new URI(link));
     news.setTitle(title);
     return news;
   }
