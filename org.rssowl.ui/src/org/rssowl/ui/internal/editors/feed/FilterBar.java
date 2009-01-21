@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.ToolBarManager;
@@ -105,7 +106,6 @@ public class FilterBar {
   private FeedView fFeedView;
   private JobTracker fQuickSearchTracker;
   private Text fSearchInput;
-  private Label fFilterLabel;
   private boolean fLayoutVertical;
   private IPreferenceScope fGlobalPreferences;
   private boolean fMaximized;
@@ -149,19 +149,14 @@ public class FilterBar {
 
   private void createControl() {
     Composite container = new Composite(fParent, SWT.NONE);
-    container.setLayout(LayoutUtils.createGridLayout(6, 3, 0));
+    container.setLayout(LayoutUtils.createGridLayout(5, 3, 0));
     container.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Filter */
-    fFirstToolBarManager = new ToolBarManager(SWT.FLAT);
+    fFirstToolBarManager = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
     createFilterBar();
     fFirstToolBarManager.createControl(container);
-    fFirstToolBarManager.getControl().setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
-
-    /* Link to show and change Filter */
-    fFilterLabel = new Label(container, SWT.NONE);
-    fFilterLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-    fFilterLabel.setText(fFeedView.getFilter().getType().getName());
+    fFirstToolBarManager.getControl().setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
     /* Separator */
     Label sep = new Label(container, SWT.SEPARATOR | SWT.VERTICAL);
@@ -505,9 +500,18 @@ public class FilterBar {
 
         return OwlUI.getImageDescriptor("icons/etool16/filter_active.gif"); //$NON-NLS-1$
       }
+
+      @Override
+      public String getText() {
+        return filter.getType().getName();
+      }
     };
     newsFilterAction.setId(FILTER_ACTION);
-    fFirstToolBarManager.add(newsFilterAction);
+
+    ActionContributionItem item = new ActionContributionItem(newsFilterAction);
+    item.setMode(ActionContributionItem.MODE_FORCE_TEXT);
+
+    fFirstToolBarManager.add(item);
 
     newsFilterAction.setMenuCreator(new IMenuCreator() {
       public void dispose() {}
@@ -668,9 +672,7 @@ public class FilterBar {
 
   void doFilter(final NewsFilter.Type type, boolean refresh, boolean saveSettings) {
     fFeedView.getFilter().setType(type);
-    fFilterLabel.setText(type.getName());
-    fFilterLabel.getParent().layout();
-    fFirstToolBarManager.find(FILTER_ACTION).update(IAction.IMAGE);
+    fFirstToolBarManager.find(FILTER_ACTION).update();
 
     /* Refresh if set */
     if (refresh)
