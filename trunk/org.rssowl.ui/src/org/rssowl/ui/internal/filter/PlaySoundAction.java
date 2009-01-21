@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.filter;
 
 import org.rssowl.core.INewsAction;
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
 import org.rssowl.ui.internal.util.AudioUtils;
 
@@ -48,16 +49,9 @@ public class PlaySoundAction implements INewsAction {
   private static final long BLOCK_SOUND_REPEAT_VALUE = 5000;
 
   /*
-   * @see org.rssowl.core.INewsAction#conflictsWith(org.rssowl.core.INewsAction)
-   */
-  public boolean conflictsWith(INewsAction otherAction) {
-    return false;
-  }
-
-  /*
    * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
    */
-  public void run(List<INews> news, Object data) {
+  public List<IEntity> run(List<INews> news, Object data) {
     if (AudioUtils.isSupported() && data != null && data instanceof String) {
       Long lastPlayed = fgLastPlayedSoundsMap.get(data);
       if (lastPlayed == null || System.currentTimeMillis() - lastPlayed > BLOCK_SOUND_REPEAT_VALUE) {
@@ -65,5 +59,14 @@ public class PlaySoundAction implements INewsAction {
         fgLastPlayedSoundsMap.put((String) data, System.currentTimeMillis());
       }
     }
+
+    return Collections.emptyList();
+  }
+
+  /*
+   * @see org.rssowl.core.INewsAction#conflictsWith(org.rssowl.core.INewsAction)
+   */
+  public boolean conflictsWith(INewsAction otherAction) {
+    return false;
   }
 }
