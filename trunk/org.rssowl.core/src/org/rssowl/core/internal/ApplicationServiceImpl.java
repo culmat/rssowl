@@ -151,7 +151,7 @@ public class ApplicationServiceImpl implements IApplicationService {
    * .core.model.persist.IBookMark, org.rssowl.core.model.persist.IFeed,
    * org.rssowl.core.model.persist.IConditionalGet, boolean)
    */
-  public final void handleFeedReload(IBookMark bookMark, IFeed emptyFeed, IConditionalGet conditionalGet, boolean deleteConditionalGet) {
+  public final void handleFeedReload(IBookMark bookMark, IFeed interpretedFeed, IConditionalGet conditionalGet, boolean deleteConditionalGet) {
     fWriteLock.lock();
     MergeResult mergeResult = null;
     try {
@@ -167,11 +167,11 @@ public class ApplicationServiceImpl implements IApplicationService {
       if (feedProperties != null) {
         feedProperties.entrySet();
         for (Map.Entry<String, Serializable> entry : feedProperties.entrySet())
-          emptyFeed.setProperty(entry.getKey(), entry.getValue());
+          interpretedFeed.setProperty(entry.getKey(), entry.getValue());
       }
 
       /* Merge with existing */
-      mergeResult = feed.mergeAndCleanUp(emptyFeed);
+      mergeResult = feed.mergeAndCleanUp(interpretedFeed);
       List<INews> newNewsAdded = getNewNewsAdded(feed);
 
       /* Update Date of last added news in Bookmark */
