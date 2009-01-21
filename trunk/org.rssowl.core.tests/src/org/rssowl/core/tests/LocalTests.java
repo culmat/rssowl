@@ -40,6 +40,7 @@ import org.rssowl.core.tests.model.ModelSearchTest4;
 import org.rssowl.core.tests.model.ModelTest1;
 import org.rssowl.core.tests.model.ModelTest2;
 import org.rssowl.core.tests.model.ModelTest3;
+import org.rssowl.core.tests.model.NewsFilterTest;
 import org.rssowl.core.tests.model.PreferencesDAOTest;
 import org.rssowl.core.tests.model.PreferencesScopeTest;
 import org.rssowl.core.tests.persist.INewsTest;
@@ -66,6 +67,7 @@ import org.rssowl.core.tests.util.StringUtilsTest;
   ModelTest3.class,
   PreferencesDAOTest.class,
   ApplicationLayerTest.class,
+  NewsFilterTest.class,
   ModelSearchTest1.class,
   ModelSearchTest2.class,
   ModelSearchTest3.class,
