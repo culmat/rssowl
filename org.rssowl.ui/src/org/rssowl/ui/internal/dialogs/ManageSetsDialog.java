@@ -68,6 +68,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.event.FolderAdapter;
 import org.rssowl.core.persist.event.FolderEvent;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.ui.internal.Application;
@@ -76,7 +77,6 @@ import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.EntityPropertyDialogAction;
 import org.rssowl.ui.internal.actions.NewFolderAction;
 import org.rssowl.ui.internal.util.LayoutUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -370,14 +370,14 @@ public class ManageSetsDialog extends TitleAreaDialog {
       /* Dragged Folder */
       if (draggedObject instanceof IFolder) {
         IFolder draggedFolder = (IFolder) draggedObject;
-        if (ModelUtils.hasChildRelation(dropFolder, draggedFolder))
+        if (CoreUtils.hasChildRelation(dropFolder, draggedFolder))
           return false;
       }
 
       /* Dragged Mark */
       else if (draggedObject instanceof IMark) {
         IMark draggedMark = (IMark) draggedObject;
-        if (ModelUtils.hasChildRelation(dropFolder, draggedMark))
+        if (CoreUtils.hasChildRelation(dropFolder, draggedMark))
           return false;
       }
     }

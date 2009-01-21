@@ -92,6 +92,7 @@ import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.StringUtils;
@@ -879,7 +880,7 @@ public class NewsTableControl implements IFeedViewPart {
 
           /* Label */
           if (!selection.isEmpty()) {
-            Collection<ILabel> labels = ModelUtils.loadSortedLabels();
+            Collection<ILabel> labels = CoreUtils.loadSortedLabels();
 
             /* Label */
             MenuManager labelMenu = new MenuManager("Label");

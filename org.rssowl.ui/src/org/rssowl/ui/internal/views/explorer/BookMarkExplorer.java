@@ -108,6 +108,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.reference.ModelReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
@@ -129,7 +130,6 @@ import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.ITreeNode;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.ModelTreeNode;
-import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.util.TreeTraversal;
 import org.rssowl.ui.internal.util.WidgetTreeNode;
 
@@ -1355,7 +1355,7 @@ public class BookMarkExplorer extends ViewPart {
     fExpandedNodes = new ArrayList<Long>();
 
     /* Sort Root-Folders by ID */
-    fRootFolders = ModelUtils.loadRootFolders();
+    fRootFolders = CoreUtils.loadRootFolders();
 
     /* Load Settings */
     loadState();

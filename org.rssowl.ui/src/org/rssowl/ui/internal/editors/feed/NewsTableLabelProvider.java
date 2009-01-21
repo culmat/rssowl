@@ -54,11 +54,11 @@ import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -181,7 +181,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
   public String getToolTipText(Object element) {
     INews news = (INews) element;
     FeedLinkReference feedRef = news.getFeedReference();
-    IBookMark bookMark = ModelUtils.getBookMark(feedRef);
+    IBookMark bookMark = CoreUtils.getBookMark(feedRef);
 
     String name = null;
     if (bookMark != null)
@@ -213,7 +213,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
       switch (columnIndex) {
         case NewsTableControl.COL_TITLE:
-          text = ModelUtils.getHeadline(news);
+          text = CoreUtils.getHeadline(news);
           break;
 
         case NewsTableControl.COL_PUBDATE:
@@ -278,7 +278,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
       /* Feed Column (only when not showing Bookmarks) */
       else if (columnIndex == NewsTableControl.COL_FEED && !(fViewer.getInput() instanceof BookMarkReference)) {
         FeedLinkReference feedRef = news.getFeedReference();
-        IBookMark bookMark = ModelUtils.getBookMark(feedRef);
+        IBookMark bookMark = CoreUtils.getBookMark(feedRef);
         if (bookMark != null) {
           ImageDescriptor favicon = OwlUI.getFavicon(bookMark);
           return OwlUI.getImage(fResources, favicon != null ? favicon : OwlUI.BOOKMARK);

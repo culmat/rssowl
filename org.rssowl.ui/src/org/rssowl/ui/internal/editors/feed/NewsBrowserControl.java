@@ -48,11 +48,11 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 /**
  * Part of the FeedView to display News in a BrowserViewer.
@@ -153,7 +153,7 @@ public class NewsBrowserControl implements IFeedViewPart {
       return news.getLinkAsText();
 
     boolean openEmptyNews = Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS);
-    if (openEmptyNews && ModelUtils.isEmpty(news))
+    if (openEmptyNews && CoreUtils.isEmpty(news))
       return news.getLinkAsText();
 
     return news;

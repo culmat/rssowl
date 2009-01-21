@@ -44,6 +44,7 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.dialogs.ConfirmDialog;
@@ -200,7 +201,7 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
     /* Normalize */
     if (folders != null)
       for (IFolder folder : folders)
-        ModelUtils.normalize(folder, entities);
+        CoreUtils.normalize(folder, entities);
 
     /* Separate News */
     List<INews> newsToDelete = null;

@@ -58,6 +58,7 @@ import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.reference.FolderReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
@@ -67,7 +68,6 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.search.SearchConditionList;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.util.ArrayList;
@@ -240,7 +240,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
 
     /* Prefill Name out of Conditions if provided */
     if (fInitialSearchConditions != null && !fInitialSearchConditions.isEmpty()) {
-      fNameInput.setText(ModelUtils.getName(fInitialSearchConditions, fInitialMatchAllConditions));
+      fNameInput.setText(CoreUtils.getName(fInitialSearchConditions, fInitialMatchAllConditions));
       fNameInput.selectAll();
     }
 
@@ -298,7 +298,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
 
   void onGenerateName() {
     List<ISearchCondition> conditions = fSearchConditionList.createConditions();
-    String name = ModelUtils.getName(conditions, fMatchAllRadio.getSelection());
+    String name = CoreUtils.getName(conditions, fMatchAllRadio.getSelection());
 
     if (name.length() > 0) {
       fNameInput.setText(name);

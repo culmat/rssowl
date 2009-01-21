@@ -37,12 +37,12 @@ import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -228,26 +228,26 @@ public class NewsGrouping {
     if (entity.equals(INews.class)) {
 
       /* Update if a News got Deleted or Restored */
-      if (ModelUtils.gotDeleted(events) || ModelUtils.gotRestored(events))
+      if (CoreUtils.gotDeleted(events) || CoreUtils.gotRestored(events))
         return true;
 
       /* Check in dependence of Group Type */
       if (fType == Type.GROUP_BY_STATE)
-        return ModelUtils.isStateChange(events);
+        return CoreUtils.isStateChange(events);
       else if (fType == Type.GROUP_BY_DATE)
-        return ModelUtils.isDateChange(events);
+        return CoreUtils.isDateChange(events);
       else if (fType == Type.GROUP_BY_AUTHOR)
-        return ModelUtils.isAuthorChange(events);
+        return CoreUtils.isAuthorChange(events);
       else if (fType == Type.GROUP_BY_CATEGORY)
-        return ModelUtils.isCategoryChange(events);
+        return CoreUtils.isCategoryChange(events);
       else if (fType == Type.GROUP_BY_LABEL)
-        return ModelUtils.isLabelChange(events);
+        return CoreUtils.isLabelChange(events);
       else if (fType == Type.GROUP_BY_FEED && isUpdate) //TODO To be reconsidered when News can be reparented
         return false;
       else if (fType == Type.GROUP_BY_TOPIC)
-        return ModelUtils.isTitleChange(events);
+        return CoreUtils.isTitleChange(events);
       else if (fType == Type.GROUP_BY_STICKY)
-        return ModelUtils.isStickyStateChange(events);
+        return CoreUtils.isStickyStateChange(events);
       else if (fType == Type.GROUP_BY_RATING)
         return false;
 
@@ -331,8 +331,8 @@ public class NewsGrouping {
         EntityGroup group = gDefault;
 
         /* Normalize Title */
-        String normalizedTitle = ModelUtils.getHeadline(news);
-        normalizedTitle = ModelUtils.normalizeTitle(normalizedTitle);
+        String normalizedTitle = CoreUtils.getHeadline(news);
+        normalizedTitle = CoreUtils.normalizeTitle(normalizedTitle);
 
         /* Determine Group ID */
         String groupId;
@@ -408,7 +408,7 @@ public class NewsGrouping {
 
           if (!InternalOwl.TESTING) {
             ImageDescriptor feedIcon = null;
-            IBookMark bookMark = ModelUtils.getBookMark(new FeedLinkReference(feed.getLink()));
+            IBookMark bookMark = CoreUtils.getBookMark(new FeedLinkReference(feed.getLink()));
             if (bookMark != null)
               feedIcon = OwlUI.getFavicon(bookMark);
             group.setImage(feedIcon != null ? feedIcon : OwlUI.BOOKMARK);

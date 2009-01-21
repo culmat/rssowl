@@ -61,6 +61,7 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.actions.CopyLinkAction;
 import org.rssowl.ui.internal.actions.CreateFilterAction;
 import org.rssowl.ui.internal.actions.FindAction;
@@ -586,7 +587,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
           /* Label */
           {
-            Collection<ILabel> labels = ModelUtils.loadSortedLabels();
+            Collection<ILabel> labels = CoreUtils.loadSortedLabels();
 
             MenuManager labelMenu = new MenuManager("Label");
             manager.add(labelMenu);

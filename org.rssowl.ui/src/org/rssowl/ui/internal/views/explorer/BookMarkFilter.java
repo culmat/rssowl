@@ -36,7 +36,7 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.event.ModelEvent;
-import org.rssowl.ui.internal.util.ModelUtils;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.util.StringMatcher;
 
 import java.text.BreakIterator;
@@ -225,11 +225,11 @@ public class BookMarkFilter extends ViewerFilter {
     /* News Event */
     else if (entityClass.equals(INews.class)) {
       if (fType == Type.SHOW_NEW)
-        return ModelUtils.isNewStateChange(events);
+        return CoreUtils.isNewStateChange(events);
       else if (fType == Type.SHOW_UNREAD)
-        return ModelUtils.isReadStateChange(events);
+        return CoreUtils.isReadStateChange(events);
       else if (fType == Type.SHOW_STICKY)
-        return ModelUtils.isStickyStateChange(events);
+        return CoreUtils.isStickyStateChange(events);
     }
 
     return false;

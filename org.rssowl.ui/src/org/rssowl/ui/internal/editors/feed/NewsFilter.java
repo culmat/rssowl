@@ -41,6 +41,7 @@ import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.core.util.StringUtils;
@@ -456,12 +457,12 @@ public class NewsFilter extends ViewerFilter {
 
     /* Check if any News has become Unread */
     if (fType == Type.SHOW_UNREAD) {
-      return ModelUtils.isReadStateChange(events, true);
+      return CoreUtils.isReadStateChange(events, true);
     }
 
     /* Check if any News has become Sticky */
     else if (fType == Type.SHOW_STICKY) {
-      return ModelUtils.isStickyStateChange(events, true);
+      return CoreUtils.isStickyStateChange(events, true);
     }
 
     return false;

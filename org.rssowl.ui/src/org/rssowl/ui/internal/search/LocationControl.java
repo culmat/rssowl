@@ -66,6 +66,7 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -134,7 +135,7 @@ public class LocationControl extends Composite {
       /* Normalize */
       for (IEntity entity : entitiesTmp) {
         if (entity instanceof IFolder)
-          ModelUtils.normalize((IFolder) entity, entities);
+          CoreUtils.normalize((IFolder) entity, entities);
       }
 
       fCheckedElements = entities;
@@ -256,7 +257,7 @@ public class LocationControl extends Composite {
 
       fViewer.setContentProvider(new ITreeContentProvider() {
         public Object[] getElements(Object inputElement) {
-          Collection<IFolder> rootFolders = ModelUtils.loadRootFolders();
+          Collection<IFolder> rootFolders = CoreUtils.loadRootFolders();
           return rootFolders.toArray();
         }
 
@@ -561,7 +562,7 @@ public class LocationControl extends Composite {
    * @param selection
    */
   public void select(Long[][] selection) {
-    fSelection = ModelUtils.toEntities(selection);
+    fSelection = CoreUtils.toEntities(selection);
     fConditionLabel.setText(getLabel(fSelection));
   }
 

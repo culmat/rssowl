@@ -35,6 +35,7 @@ import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.reference.FolderReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
 import org.rssowl.ui.internal.util.ModelUtils;
@@ -80,7 +81,7 @@ public class SearchInTypeAction extends Action {
     /* Normalize */
     for (IEntity entity : entitiesTmp) {
       if (entity instanceof IFolder)
-        ModelUtils.normalize((IFolder) entity, entities);
+        CoreUtils.normalize((IFolder) entity, entities);
     }
 
     SearchNewsDialog dialog = new SearchNewsDialog(fWindow.getShell(), entities);

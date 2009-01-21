@@ -42,9 +42,9 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -97,7 +97,7 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
         File file = new File(string);
 
         /* Proceed Exporting */
-        Collection<IFolder> rootFolders = ModelUtils.loadRootFolders();
+        Collection<IFolder> rootFolders = CoreUtils.loadRootFolders();
         exportToOPML(file, rootFolders);
       } catch (IOException e) {
         Activator.getDefault().logError(e.getMessage(), e);
@@ -195,7 +195,7 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
 
     /* Search Condition: Location */
     if (condition.getValue() instanceof Long[][]) {
-      List<IFolderChild> locations = ModelUtils.toEntities((Long[][]) condition.getValue());
+      List<IFolderChild> locations = CoreUtils.toEntities((Long[][]) condition.getValue());
 
       str.append("\t\t<rssowl:searchvalue type=\"" + condition.getField().getSearchValueType().getId() + "\">\n");
 

@@ -44,13 +44,13 @@ import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.CBrowser;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -548,7 +548,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       /* Extract from Conditions if any */
       if (mark instanceof ISearch) {
         List<ISearchCondition> conditions = ((ISearch) mark).getSearchConditions();
-        extractedWords = ModelUtils.extractWords(conditions, false, true);
+        extractedWords = CoreUtils.extractWords(conditions, false, true);
       } else
         extractedWords = new HashSet<String>(1);
 

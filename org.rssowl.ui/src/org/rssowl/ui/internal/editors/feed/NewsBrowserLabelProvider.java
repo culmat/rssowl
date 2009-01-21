@@ -39,6 +39,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.INews.State;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
@@ -47,7 +48,6 @@ import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.ExpandingReader;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -301,7 +301,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     StringBuilder builder = getBuilder(news, description);
     StringBuilder search = new StringBuilder();
 
-    String newsTitle = ModelUtils.getHeadline(news);
+    String newsTitle = CoreUtils.getHeadline(news);
     boolean hasLink = news.getLinkAsText() != null;
     State state = news.getState();
     boolean isUnread = (state == State.NEW || state == State.UPDATED || state == State.UNREAD);

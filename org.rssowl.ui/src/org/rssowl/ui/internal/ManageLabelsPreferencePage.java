@@ -70,13 +70,13 @@ import org.rssowl.core.persist.dao.ICategoryDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.dialogs.ConfirmDialog;
 import org.rssowl.ui.internal.util.ColorPicker;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -123,7 +123,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
       super(parentShell);
       fMode = mode;
       fExistingLabel = label;
-      fAllLabels = ModelUtils.loadSortedLabels();
+      fAllLabels = CoreUtils.loadSortedLabels();
     }
 
     String getName() {
@@ -525,7 +525,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     /* Content Provider */
     fViewer.setContentProvider(new ITreeContentProvider() {
       public Object[] getElements(Object inputElement) {
-        return ModelUtils.loadSortedLabels().toArray();
+        return CoreUtils.loadSortedLabels().toArray();
       }
 
       public Object[] getChildren(Object parentElement) {

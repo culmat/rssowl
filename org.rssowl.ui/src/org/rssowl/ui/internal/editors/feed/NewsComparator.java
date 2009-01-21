@@ -29,8 +29,8 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.Comparator;
 import java.util.Date;
@@ -102,7 +102,7 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
 
     /* Sort by Title */
     else if (fSortBy == NewsTableControl.Columns.TITLE)
-      result = compareByTitle(ModelUtils.getHeadline(news1), ModelUtils.getHeadline(news2));
+      result = compareByTitle(CoreUtils.getHeadline(news1), CoreUtils.getHeadline(news2));
 
     /* Sort by Author */
     else if (fSortBy == NewsTableControl.Columns.AUTHOR)

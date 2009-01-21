@@ -90,6 +90,7 @@ import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderNewsMark;
@@ -102,7 +103,6 @@ import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.ITreeNode;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.util.TreeTraversal;
 import org.rssowl.ui.internal.util.UIBackgroundJob;
 import org.rssowl.ui.internal.util.WidgetTreeNode;
@@ -1563,7 +1563,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     /* Check if News is unread if set as flag */
     INews news = (INews) data;
-    if (unread && !ModelUtils.isUnread(news.getState()))
+    if (unread && !CoreUtils.isUnread(news.getState()))
       return false;
 
     return true;

@@ -55,9 +55,9 @@ import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.event.SearchMarkListener;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.util.JobRunner;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -768,8 +768,8 @@ public class BookMarkContentProvider implements ITreeContentProvider {
         return true;
 
       /* Check Change in Read-State */
-      boolean oldStateUnread = ModelUtils.isUnread(newsEvent.getOldNews() != null ? newsEvent.getOldNews().getState() : null);
-      boolean newStateUnread = ModelUtils.isUnread(newsEvent.getEntity().getState());
+      boolean oldStateUnread = CoreUtils.isUnread(newsEvent.getOldNews() != null ? newsEvent.getOldNews().getState() : null);
+      boolean newStateUnread = CoreUtils.isUnread(newsEvent.getEntity().getState());
       if (oldStateUnread != newStateUnread)
         return true;
 

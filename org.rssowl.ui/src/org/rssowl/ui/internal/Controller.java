@@ -82,6 +82,7 @@ import org.rssowl.core.persist.event.LabelAdapter;
 import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.JobQueue;
 import org.rssowl.core.util.LoggingSafeRunnable;
@@ -97,7 +98,6 @@ import org.rssowl.ui.internal.handler.LabelNewsHandler;
 import org.rssowl.ui.internal.notifier.NotificationService;
 import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.JobRunner;
-import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.io.File;
@@ -828,7 +828,7 @@ public class Controller {
     fCleanUpReminderService = new CleanUpReminderService();
 
     /* Support Keybindings for assigning Labels */
-    defineLabelCommands(ModelUtils.loadSortedLabels());
+    defineLabelCommands(CoreUtils.loadSortedLabels());
 
     /* Check for Status of Startup */
     IStatus startupStatus = Owl.getPersistenceService().getStartupStatus();
@@ -986,12 +986,12 @@ public class Controller {
       Long selectedFolderID = fPrefsDAO.load(selectedBookMarkSetPref).getLong();
       selectedRootFolder = fFolderDAO.load(selectedFolderID);
     } else {
-      Collection<IFolder> rootFolders = ModelUtils.loadRootFolders();
+      Collection<IFolder> rootFolders = CoreUtils.loadRootFolders();
       selectedRootFolder = rootFolders.iterator().next();
     }
 
     /* Load all Root Folders */
-    Set<IFolder> rootFolders = ModelUtils.loadRootFolders();
+    Set<IFolder> rootFolders = CoreUtils.loadRootFolders();
 
     /* 1.) Handle Folders and Marks from default Container */
     {
@@ -1111,7 +1111,7 @@ public class Controller {
   }
 
   private void updateLabelCommands() {
-    Set<ILabel> labels = ModelUtils.loadSortedLabels();
+    Set<ILabel> labels = CoreUtils.loadSortedLabels();
     undefineLabelCommands(labels);
     defineLabelCommands(labels);
   }

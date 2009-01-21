@@ -38,6 +38,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.OwlUI;
@@ -45,7 +46,6 @@ import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.EditorUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.Date;
 import java.util.Set;
@@ -116,7 +116,7 @@ public class NewsNotificationItem extends NotificationItem {
   }
 
   private static ImageDescriptor makeImage(INews news) {
-    IBookMark bookMark = ModelUtils.getBookMark(news.getFeedReference());
+    IBookMark bookMark = CoreUtils.getBookMark(news.getFeedReference());
     if (bookMark != null) {
       ImageDescriptor favicon = OwlUI.getFavicon(bookMark);
       if (favicon != null)
@@ -127,7 +127,7 @@ public class NewsNotificationItem extends NotificationItem {
   }
 
   private static String makeText(INews news) {
-    String headline = ModelUtils.getHeadline(news);
+    String headline = CoreUtils.getHeadline(news);
     if (headline.contains("&"))
       headline = StringUtils.replaceAll(headline, "&", "&&");
 
@@ -159,7 +159,7 @@ public class NewsNotificationItem extends NotificationItem {
   @Override
   public String getOrigin() {
     if (fCachedOrigin == null) {
-      IBookMark bookMark = ModelUtils.getBookMark(fFeedReference);
+      IBookMark bookMark = CoreUtils.getBookMark(fFeedReference);
       if (bookMark != null)
         fCachedOrigin = bookMark.getName();
     }
@@ -180,7 +180,7 @@ public class NewsNotificationItem extends NotificationItem {
     }
 
     /* Otherwise open Feedview and select the News */
-    IBookMark bookMark = ModelUtils.getBookMark(fFeedReference);
+    IBookMark bookMark = CoreUtils.getBookMark(fFeedReference);
     IWorkbenchPage page = OwlUI.getPage();
     if (page != null) {
 

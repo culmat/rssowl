@@ -46,6 +46,7 @@ import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
@@ -54,7 +55,6 @@ import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.search.SearchConditionList;
 import org.rssowl.ui.internal.util.LayoutUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -247,7 +247,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
 
   void onGenerateName() {
     List<ISearchCondition> conditions = fSearchConditionList.createConditions();
-    String name = ModelUtils.getName(conditions, fMatchAllRadio.getSelection());
+    String name = CoreUtils.getName(conditions, fMatchAllRadio.getSelection());
 
     if (name.length() > 0) {
       fNameInput.setText(name);
