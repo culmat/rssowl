@@ -26,11 +26,13 @@ package org.rssowl.core.internal.newsaction;
 
 import org.rssowl.core.INewsAction;
 import org.rssowl.core.Owl;
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -43,7 +45,9 @@ public class CopyNewsAction implements INewsAction {
   /*
    * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
    */
-  public void run(List<INews> news, Object data) {
+  public List<IEntity> run(List<INews> news, Object data) {
+    List<IEntity> entitiesToSave = new ArrayList<IEntity>(news.size());
+
     Long[] binIds = (Long[]) data;
     List<INewsBin> bins = new ArrayList<INewsBin>(binIds.length);
     for (Long id : binIds) {
@@ -53,7 +57,7 @@ public class CopyNewsAction implements INewsAction {
     }
 
     if (bins.isEmpty())
-      return;
+      return Collections.emptyList();
 
     /* For each target Bin */
     for (INewsBin bin : bins) {
@@ -69,6 +73,8 @@ public class CopyNewsAction implements INewsAction {
       DynamicDAO.saveAll(copiedNews);
       DynamicDAO.save(bin);
     }
+
+    return entitiesToSave; //TODO Fix
   }
 
   /*

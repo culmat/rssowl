@@ -25,8 +25,10 @@
 package org.rssowl.core.internal.newsaction;
 
 import org.rssowl.core.INewsAction;
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,9 +41,17 @@ public class MarkStickyNewsAction implements INewsAction {
   /*
    * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
    */
-  public void run(List<INews> news, Object data) {
-    for (INews item : news)
-      item.setFlagged(true);
+  public List<IEntity> run(List<INews> news, Object data) {
+    List<IEntity> entitiesToSave = new ArrayList<IEntity>(news.size());
+
+    for (INews newsitem : news) {
+      if (!newsitem.isFlagged()) {
+        newsitem.setFlagged(true);
+        entitiesToSave.add(newsitem);
+      }
+    }
+
+    return entitiesToSave;
   }
 
   /*

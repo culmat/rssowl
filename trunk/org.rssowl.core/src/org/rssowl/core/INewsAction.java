@@ -24,6 +24,7 @@
 
 package org.rssowl.core;
 
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
 
 import java.util.List;
@@ -46,8 +47,11 @@ public interface INewsAction {
    *
    * @param news the list of news to perform the operation on.
    * @param data arbitrary data associated with the action.
+   * @return a {@link List} of {@link IEntity} that has been changed as a result
+   * of the action. The caller must ensure to save these entities. Never
+   * <code>null</code>.
    */
-  void run(List<INews> news, Object data);
+  List<IEntity> run(List<INews> news, Object data);
 
   /**
    * Checks whether the two operations can be used together or not. E.g. an
