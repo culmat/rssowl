@@ -31,7 +31,7 @@ import org.rssowl.core.internal.InternalOwl;
 
 /**
  * Abstract implementation of <code>ISafeRunnable</code> that is logging any
- * exception using the Plugin's Log Mechanism.
+ * {@link CoreException} using the Plugin's Log Mechanism.
  * <p>
  * TODO Create ExceptionListener that allows to listen for these Runtime
  * Exceptions. That would allow the UI to show an Error Dialog with Details of
