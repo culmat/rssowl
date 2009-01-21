@@ -25,10 +25,12 @@
 package org.rssowl.core.internal.newsaction;
 
 import org.rssowl.core.INewsAction;
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.dao.DynamicDAO;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -41,14 +43,21 @@ public class LabelNewsAction implements INewsAction {
   /*
    * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
    */
-  public void run(List<INews> news, Object data) {
+  public List<IEntity> run(List<INews> news, Object data) {
+    List<IEntity> entitiesToSave = new ArrayList<IEntity>(news.size());
     Long labelId = (Long) data;
     ILabel label = DynamicDAO.load(ILabel.class, labelId);
 
     if (label != null) {
-      for (INews item : news)
-        item.addLabel(label);
+      for (INews newsitem : news) {
+        if (!newsitem.getLabels().contains(label)) {
+          newsitem.addLabel(label);
+          entitiesToSave.add(newsitem);
+        }
+      }
     }
+
+    return entitiesToSave;
   }
 
   /*

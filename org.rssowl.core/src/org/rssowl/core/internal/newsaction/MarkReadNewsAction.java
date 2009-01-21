@@ -25,8 +25,11 @@
 package org.rssowl.core.internal.newsaction;
 
 import org.rssowl.core.INewsAction;
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INews.State;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -39,9 +42,18 @@ public class MarkReadNewsAction implements INewsAction {
   /*
    * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
    */
-  public void run(List<INews> news, Object data) {
-    for (INews newsitem : news)
-      newsitem.setState(INews.State.READ);
+  public List<IEntity> run(List<INews> news, Object data) {
+    List<IEntity> entitiesToSave = new ArrayList<IEntity>(news.size());
+
+    for (INews newsitem : news) {
+      State state = newsitem.getState();
+      if (state == INews.State.NEW || state == INews.State.UNREAD || state == INews.State.UPDATED) {
+        newsitem.setState(INews.State.READ);
+        entitiesToSave.add(newsitem);
+      }
+    }
+
+    return entitiesToSave;
   }
 
   /*
