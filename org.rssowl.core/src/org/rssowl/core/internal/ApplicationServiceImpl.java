@@ -309,6 +309,10 @@ public class ApplicationServiceImpl implements IApplicationService {
     /* Iterate over Filters */
     for (ISearchFilter filter : filters) {
 
+      /* Continue if filter is disabled */
+      if (!filter.isEnabled())
+        continue;
+
       /* No Search Required */
       if (filter.matchAllNews()) {
         List<INews> remainingNews = new ArrayList<INews>(news);
