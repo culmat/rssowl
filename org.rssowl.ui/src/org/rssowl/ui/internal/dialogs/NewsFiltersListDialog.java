@@ -65,6 +65,7 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.rssowl.core.INewsAction;
 import org.rssowl.core.Owl;
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
@@ -91,6 +92,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -456,6 +458,8 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
   private void applyFilterOnChunks(final List<INews> news, ISearchFilter filter) {
     List<IFilterAction> actions = filter.getActions();
+    final Set<IEntity> entitiesToSave = new HashSet<IEntity>(news.size());
+
     for (final IFilterAction action : actions) {
       NewsActionDescriptor newsActionDescriptor = fNewsActionPresentationManager.getNewsActionDescriptor(action.getActionId());
       if (newsActionDescriptor != null) {
@@ -467,15 +471,17 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
             }
 
             public void run() throws Exception {
-              newsAction.run(news, action.getData());
-
-              /* Make sure that news are saved after action has run */
-              DynamicDAO.saveAll(news);
+              List<IEntity> changedEntities = newsAction.run(news, action.getData());
+              entitiesToSave.addAll(changedEntities);
             }
           });
         }
       }
     }
+
+    /* Make sure that changed entities are saved for all actions */
+    if (!entitiesToSave.isEmpty())
+      DynamicDAO.saveAll(entitiesToSave);
   }
 
   private List<List<SearchHit<NewsReference>>> toChunks(int size, List<SearchHit<NewsReference>> list) {
