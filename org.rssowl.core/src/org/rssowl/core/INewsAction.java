@@ -37,6 +37,11 @@ import java.util.List;
  * </p>
  * The news filter facility in RSSOwl makes use of {@link INewsAction} to
  * perform certain operations based on search conditions.
+ * <p>
+ * Implementors are asked to not save any news that is passed to the action but
+ * rather return the list of entities that have been changed from the
+ * {@link #run(List, Object)} method.
+ * </p>
  *
  * @author bpasero
  */
@@ -44,6 +49,11 @@ public interface INewsAction {
 
   /**
    * Runs the operation on the list of news.
+   * <p>
+   * Implementors are asked to not save any news that is passed to the action
+   * but rather return the list of entities that have been changed from the
+   * {@link #run(List, Object)} method.
+   * </p>
    *
    * @param news the list of news to perform the operation on.
    * @param data arbitrary data associated with the action.
