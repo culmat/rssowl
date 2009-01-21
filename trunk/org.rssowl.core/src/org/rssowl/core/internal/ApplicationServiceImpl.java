@@ -35,7 +35,6 @@ import org.apache.lucene.store.RAMDirectory;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
-import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
@@ -75,6 +74,7 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IDGenerator;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
+import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.RetentionStrategy;
 
 import com.db4o.ObjectContainer;
@@ -173,7 +173,7 @@ public class ApplicationServiceImpl implements IApplicationService {
 
       /* Merge with existing */
       mergeResult = feed.mergeAndCleanUp(interpretedFeed);
-      List<INews> newNewsAdded = getNewNewsAdded(feed);
+      final List<INews> newNewsAdded = getNewNewsAdded(feed);
 
       /* Update Date of last added news in Bookmark */
       if (!newNewsAdded.isEmpty()) {
@@ -209,7 +209,11 @@ public class ApplicationServiceImpl implements IApplicationService {
       }
 
       //TODO Check side-effects of running the filter here!
-      runNewsFilters(newNewsAdded);
+      SafeRunner.run(new LoggingSafeRunnable() {
+        public void run() throws Exception {
+          runNewsFilters(newNewsAdded);
+        }
+      });
 
       try {
         lockNewsObjects(mergeResult);
@@ -267,8 +271,7 @@ public class ApplicationServiceImpl implements IApplicationService {
     return !firstFilter.matchAllNews();
   }
 
-  //TODO Use lots of SafeRunner!
-  private void runNewsFilters(final List<INews> news) {
+  private void runNewsFilters(final List<INews> news) throws Exception {
 
     /* Load Filters */
     Set<ISearchFilter> filters = loadFilters();
@@ -297,9 +300,8 @@ public class ApplicationServiceImpl implements IApplicationService {
 
         searcher[0] = new IndexSearcher(directory);
       } catch (Exception e) {
-        Activator.getDefault().logError(e.getMessage(), e);
         directory.close();
-        return;
+        throw e;
       }
     }
 
@@ -352,9 +354,8 @@ public class ApplicationServiceImpl implements IApplicationService {
             applyFilter(filter, matchingNews);
           filteredNews.addAll(matchingNews);
         } catch (IOException e) {
-          Activator.getDefault().logError(e.getMessage(), e);
           directory.close();
-          return;
+          throw e;
         }
       }
     }
@@ -369,11 +370,7 @@ public class ApplicationServiceImpl implements IApplicationService {
     for (final IFilterAction action : actions) {
       final INewsAction newsAction = fNewsActions.get(action.getActionId());
       if (newsAction != null) {
-        SafeRunner.run(new ISafeRunnable() {
-          public void handleException(Throwable e) {
-            Activator.getDefault().logError(e.getMessage(), e);
-          }
-
+        SafeRunner.run(new LoggingSafeRunnable() {
           public void run() throws Exception {
             newsAction.run(news, action.getData());
           }
