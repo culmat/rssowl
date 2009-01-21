@@ -107,6 +107,10 @@ public class NotificationPopup extends PopupDialog {
   /* A field that is set to true in case fading is not supported on the OS */
   private static boolean fgFadeSupported = true;
 
+  /* System Property to disable Transparency for the Notifier */
+  private static final String DISABLE_TRANSPARENCY = "disableNotifierTransparency";
+  private static final boolean FADE_ENABLED = System.getProperty(DISABLE_TRANSPARENCY) == null;
+
   private Shell fShell;
   private final List<NotificationItem> fDisplayedItems = new ArrayList<NotificationItem>();
   private final ResourceManager fResources;
@@ -163,7 +167,7 @@ public class NotificationPopup extends PopupDialog {
       if (proceed(monitor)) {
         final int alpha = getShell().getAlpha();
 
-        if (fgFadeSupported && alpha < 255) {
+        if (FADE_ENABLED && fgFadeSupported && alpha < 255) {
           if (proceed(monitor)) {
             getShell().getDisplay().syncExec(new Runnable() {
               public void run() {
@@ -222,7 +226,7 @@ public class NotificationPopup extends PopupDialog {
     makeVisible(fInitialItems);
 
     /* Make shell invisible initially if fading in */
-    if (fgFadeSupported && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER))
+    if (FADE_ENABLED && fgFadeSupported && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER))
       getShell().setAlpha(0);
   }
 
@@ -236,7 +240,7 @@ public class NotificationPopup extends PopupDialog {
     int res = super.open();
 
     /* Make shell fade in */
-    if (fgFadeSupported && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER))
+    if (FADE_ENABLED && fgFadeSupported && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER))
       fadeIn();
 
     return res;
@@ -320,7 +324,7 @@ public class NotificationPopup extends PopupDialog {
         if (!fGlobalScope.getBoolean(DefaultPreferences.STICKY_NOTIFICATION_POPUP))
           fAutoCloser.cancel();
 
-        if (fgFadeSupported && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER) && getShell().getAlpha() < 255) {
+        if (FADE_ENABLED && fgFadeSupported && fGlobalScope.getBoolean(DefaultPreferences.FADE_NOTIFIER) && getShell().getAlpha() < 255) {
           if (fFadeJob != null)
             fFadeJob.cancel();
           getShell().setAlpha(255);
