@@ -22,68 +22,55 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.internal.newsaction;
+package org.rssowl.core.util;
 
-import org.rssowl.core.INewsAction;
-import org.rssowl.core.Owl;
-import org.rssowl.core.persist.IEntity;
-import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.INewsBin;
-import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.internal.newsaction.CopyNewsAction;
+import org.rssowl.core.internal.newsaction.MoveNewsAction;
+import org.rssowl.core.persist.IFilterAction;
+import org.rssowl.core.persist.ISearchFilter;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
- * An instance of {@link INewsAction} to copy a list of news to a bin.
+ * Helper class for various Model operations.
  *
  * @author bpasero
  */
-public class CopyNewsAction implements INewsAction {
+public class CoreUtils {
 
-  /** ID of this Action */
-  public static final String ID = "org.rssowl.core.CopyNewsAction";
+  /* Special case structural actions that need to run as last action */
+  private static List<String> STRUCTURAL_ACTIONS = Arrays.asList(new String[] { MoveNewsAction.ID, CopyNewsAction.ID });
 
-  /*
-   * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
-   */
-  public List<IEntity> run(List<INews> news, Object data) {
-    List<IEntity> entitiesToSave = new ArrayList<IEntity>(news.size());
-
-    Long[] binIds = (Long[]) data;
-    List<INewsBin> bins = new ArrayList<INewsBin>(binIds.length);
-    for (Long id : binIds) {
-      INewsBin bin = DynamicDAO.load(INewsBin.class, id);
-      if (bin != null)
-        bins.add(bin);
-    }
-
-    if (bins.isEmpty())
-      return Collections.emptyList();
-
-    /* For each target Bin */
-    for (INewsBin bin : bins) {
-
-      /* For each News: Copy */
-      List<INews> copiedNews = new ArrayList<INews>(news.size());
-      for (INews newsitem : news) {
-        INews newsCopy = Owl.getModelFactory().createNews(newsitem, bin);
-        copiedNews.add(newsCopy);
-      }
-
-      /* Save */
-      DynamicDAO.saveAll(copiedNews);
-      DynamicDAO.save(bin);
-    }
-
-    return entitiesToSave; //TODO Fix
+  /* This utility class constructor is hidden */
+  private CoreUtils() {
+  // Protect default constructor
   }
 
-  /*
-   * @see org.rssowl.core.INewsAction#isConflicting(org.rssowl.core.INewsAction)
+  /**
+   * @param filter an instance of {@link ISearchFilter} to obtain a collection
+   * of {@link IFilterAction}.
+   * @return a collection of {@link IFilterAction}. the collection is sorted
+   * such as structural actions are moved to the end of the list.
    */
-  public boolean conflictsWith(INewsAction otherAction) {
-    return otherAction instanceof DeleteNewsAction || otherAction instanceof MoveNewsAction || otherAction instanceof CopyNewsAction;
+  public static Collection<IFilterAction> getActions(ISearchFilter filter) {
+    Set<IFilterAction> actions = new TreeSet<IFilterAction>(new Comparator<IFilterAction>() {
+      public int compare(IFilterAction o1, IFilterAction o2) {
+        if (STRUCTURAL_ACTIONS.contains(o1.getActionId()))
+          return 1;
+
+        if (STRUCTURAL_ACTIONS.contains(o2.getActionId()))
+          return -1;
+
+        return 1;
+      }
+    });
+
+    actions.addAll(filter.getActions());
+    return actions;
   }
 }
