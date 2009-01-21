@@ -73,6 +73,7 @@ import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.runnable.NewsEventRunnable;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IDGenerator;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.RetentionStrategy;
 
@@ -360,7 +361,7 @@ public class ApplicationServiceImpl implements IApplicationService {
   }
 
   private void applyFilter(ISearchFilter filter, final List<INews> news) {
-    List<IFilterAction> actions = filter.getActions();
+    Collection<IFilterAction> actions = CoreUtils.getActions(filter); //Need to sort structural actions to end
     for (final IFilterAction action : actions) {
       final INewsAction newsAction = fNewsActions.get(action.getActionId());
       if (newsAction != null) {
