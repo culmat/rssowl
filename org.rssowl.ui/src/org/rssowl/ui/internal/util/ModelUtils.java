@@ -286,7 +286,10 @@ public class ModelUtils {
 
     /* Append location if provided */
     if (!locationConditions.isEmpty()) {
-      name.append(" in ");
+      if (name.length() == 0)
+        name.append("All News in ");
+      else
+        name.append(" in ");
 
       for (ISearchCondition locationCondition : locationConditions) {
         List<IFolderChild> locations = ModelUtils.toEntities((Long[][]) locationCondition.getValue());
