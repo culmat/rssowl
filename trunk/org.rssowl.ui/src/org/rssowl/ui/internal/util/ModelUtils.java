@@ -50,6 +50,7 @@ import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.EntityGroup;
@@ -75,6 +76,8 @@ import java.util.Map.Entry;
 
 /**
  * Helper class for various Model-Transformations required by the UI.
+ *
+ * TODO Move more methods from here to {@link CoreUtils}.
  *
  * @author bpasero
  */
