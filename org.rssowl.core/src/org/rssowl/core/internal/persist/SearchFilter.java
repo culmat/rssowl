@@ -57,6 +57,7 @@ public class SearchFilter extends AbstractEntity implements ISearchFilter {
     super(id);
     Assert.isNotNull(name);
     fSearch = search;
+    fMatchAllNews = (fSearch == null);
     fActions = new ArrayList<IFilterAction>(1);
     fName = name;
   }
@@ -103,6 +104,7 @@ public class SearchFilter extends AbstractEntity implements ISearchFilter {
    */
   public synchronized void setSearch(ISearch search) {
     fSearch = search;
+    setMatchAllNews(search == null);
   }
 
   /*
