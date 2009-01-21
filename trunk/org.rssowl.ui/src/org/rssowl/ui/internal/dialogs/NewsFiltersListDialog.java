@@ -462,7 +462,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
     for (final IFilterAction action : actions) {
       NewsActionDescriptor newsActionDescriptor = fNewsActionPresentationManager.getNewsActionDescriptor(action.getActionId());
-      if (newsActionDescriptor != null) {
+      if (newsActionDescriptor != null && newsActionDescriptor.isForcable()) {
         final INewsAction newsAction = newsActionDescriptor.getNewsAction();
         if (newsAction != null) {
           SafeRunnable.run(new ISafeRunnable() {
