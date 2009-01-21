@@ -59,11 +59,11 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.NewsFiltersListDialog;
 import org.rssowl.ui.internal.util.LayoutUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkLabelProvider;
 import org.rssowl.ui.internal.views.explorer.BookMarkSorter;
 
@@ -179,7 +179,7 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
     /* ContentProvider */
     fViewer.setContentProvider(new ITreeContentProvider() {
       public Object[] getElements(Object inputElement) {
-        Collection<IFolder> rootFolders = ModelUtils.loadRootFolders();
+        Collection<IFolder> rootFolders = CoreUtils.loadRootFolders();
         return rootFolders.toArray();
       }
 

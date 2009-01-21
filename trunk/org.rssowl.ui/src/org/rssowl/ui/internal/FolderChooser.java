@@ -61,10 +61,10 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.event.FolderAdapter;
 import org.rssowl.core.persist.event.FolderEvent;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.actions.NewFolderAction;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkLabelProvider;
 
 import java.util.Collection;
@@ -312,7 +312,7 @@ public class FolderChooser extends Composite implements DisposeListener {
 
     fFolderViewer.setContentProvider(new ITreeContentProvider() {
       public Object[] getElements(Object inputElement) {
-        Collection<IFolder> rootFolders = ModelUtils.loadRootFolders();
+        Collection<IFolder> rootFolders = CoreUtils.loadRootFolders();
         return rootFolders.toArray();
       }
 

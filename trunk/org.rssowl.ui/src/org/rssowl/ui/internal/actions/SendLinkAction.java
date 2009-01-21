@@ -31,8 +31,8 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.util.BrowserUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.List;
 
@@ -75,7 +75,7 @@ public class SendLinkAction implements IObjectActionDelegate {
         else if (element instanceof INews) {
           INews news = (INews) element;
           if (news.getLinkAsText() != null) {
-            String title = ModelUtils.getHeadline(news) + "\n";
+            String title = CoreUtils.getHeadline(news) + "\n";
             str.append(i > 0 ? "\n\n" : "").append(title).append(news.getLinkAsText());
             i++;
           }

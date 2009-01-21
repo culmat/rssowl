@@ -48,6 +48,7 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.RegExUtils;
 import org.rssowl.core.util.ReparentInfo;
@@ -56,7 +57,6 @@ import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
 import org.rssowl.ui.internal.actions.NewBookMarkAction;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import org.rssowl.ui.internal.util.JobRunner;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -120,7 +120,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
 
     /* Normalize the dragged entities */
     for (IFolder folder : draggedFolders)
-      ModelUtils.normalize(folder, draggedEntities);
+      CoreUtils.normalize(folder, draggedEntities);
 
     return new StructuredSelection(draggedEntities);
   }
@@ -383,7 +383,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
     }
 
     /* Do not allow dropping in Child of Drag-Folder */
-    if (ModelUtils.hasChildRelation(dragSource, dropTarget))
+    if (CoreUtils.hasChildRelation(dragSource, dropTarget))
       return false;
 
     return true;

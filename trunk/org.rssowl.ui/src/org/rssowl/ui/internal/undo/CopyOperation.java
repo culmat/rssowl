@@ -29,8 +29,8 @@ import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +53,7 @@ public class CopyOperation implements IUndoOperation {
    * @param copiednews
    */
   public CopyOperation(List<INews> copiednews) {
-    fCopiedNews = ModelUtils.toStateMap(copiednews);
+    fCopiedNews = CoreUtils.toStateMap(copiednews);
     fNewsCount = copiednews.size();
   }
 
@@ -73,7 +73,7 @@ public class CopyOperation implements IUndoOperation {
     Controller.getDefault().getSavedSearchService().forceQuickUpdate();
 
     /* Set Copied News to Hidden */
-    fNewsDao.setState(ModelUtils.resolveAll(fCopiedNews), INews.State.HIDDEN, false, false);
+    fNewsDao.setState(CoreUtils.resolveAll(fCopiedNews), INews.State.HIDDEN, false, false);
   }
 
   /*

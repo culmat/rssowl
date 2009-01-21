@@ -36,12 +36,12 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.EditorUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -129,7 +129,7 @@ public class OpenNewsAction extends Action {
       INews news = newsToOpen.get(i);
 
       /* Receive the first Bookmark belonging to the News and open it */
-      IBookMark bookmark = ModelUtils.getBookMark(news.getFeedReference());
+      IBookMark bookmark = CoreUtils.getBookMark(news.getFeedReference());
       if (bookmark != null) {
 
         /* Select this News in the FeedView */

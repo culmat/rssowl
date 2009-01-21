@@ -30,8 +30,8 @@ import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,7 +66,7 @@ public class NewsStateOperation implements IUndoOperation {
   public NewsStateOperation(Collection<INews> news, INews.State newState, boolean affectEquivalentNews) {
     Assert.isTrue(SUPPORTED_STATES.contains(newState), "Unsupported Operation");
 
-    fOldStates = ModelUtils.toStateMap(news);
+    fOldStates = CoreUtils.toStateMap(news);
     fNewState = newState;
     fAffectEquivalentNews = affectEquivalentNews;
     fNewsCount = news.size();

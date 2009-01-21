@@ -48,10 +48,10 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkLabelProvider;
 import org.rssowl.ui.internal.views.explorer.BookMarkSorter;
 
@@ -135,7 +135,7 @@ public class FeedSelectionPage extends WizardPage {
     /* ContentProvider */
     fViewer.setContentProvider(new ITreeContentProvider() {
       public Object[] getElements(Object inputElement) {
-        Collection<IFolder> rootFolders = ModelUtils.loadRootFolders();
+        Collection<IFolder> rootFolders = CoreUtils.loadRootFolders();
         return rootFolders.toArray();
       }
 

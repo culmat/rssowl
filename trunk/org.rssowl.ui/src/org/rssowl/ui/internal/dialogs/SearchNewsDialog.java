@@ -118,6 +118,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.core.util.StringUtils;
@@ -458,7 +459,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
       ScoredNews scoredNews = (ScoredNews) element;
       INews news = scoredNews.getNews();
       FeedLinkReference feedRef = news.getFeedReference();
-      IBookMark bookMark = ModelUtils.getBookMark(feedRef);
+      IBookMark bookMark = CoreUtils.getBookMark(feedRef);
 
       String name = null;
       if (bookMark != null)
@@ -735,7 +736,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fBrowserViewer = new NewsBrowserViewer(bottomSashContent, SWT.NONE) {
       @Override
       protected Collection<String> getHighlightedWords() {
-        return ModelUtils.extractWords(fCurrentSearchConditions, false, true);
+        return CoreUtils.extractWords(fCurrentSearchConditions, false, true);
       }
     };
     fBrowserViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -1507,7 +1508,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
           /* Label */
           if (!selection.isEmpty()) {
-            Collection<ILabel> labels = ModelUtils.loadSortedLabels();
+            Collection<ILabel> labels = CoreUtils.loadSortedLabels();
 
             /* Label */
             MenuManager labelMenu = new MenuManager("Label");

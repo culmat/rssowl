@@ -59,12 +59,12 @@ import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DAOService;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -487,7 +487,7 @@ public class SearchConditionItem extends Composite {
                   else if (field.getId() == INews.AUTHOR)
                     values = fDaoService.getPersonDAO().loadAllNames();
                   else if (field.getId() == INews.FEED)
-                    values = ModelUtils.getFeedLinks();
+                    values = CoreUtils.getFeedLinks();
 
                   /* Apply Proposals */
                   if (!text.isDisposed())

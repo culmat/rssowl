@@ -67,6 +67,7 @@ import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.filter.NewsActionDescriptor;
@@ -74,7 +75,6 @@ import org.rssowl.ui.internal.filter.NewsActionList;
 import org.rssowl.ui.internal.filter.NewsActionPresentationManager;
 import org.rssowl.ui.internal.search.SearchConditionList;
 import org.rssowl.ui.internal.util.LayoutUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -400,7 +400,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
       name = "All News";
     else {
       List<ISearchCondition> conditions = fSearchConditionList.createConditions();
-      name = ModelUtils.getName(conditions, fMatchAllRadio.getSelection());
+      name = CoreUtils.getName(conditions, fMatchAllRadio.getSelection());
     }
 
     if (name.length() > 0) {

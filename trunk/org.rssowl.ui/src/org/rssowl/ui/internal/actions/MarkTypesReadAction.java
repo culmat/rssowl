@@ -44,6 +44,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
@@ -123,7 +124,7 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
     /* Normalize */
     if (folders != null)
       for (IFolder folder : folders)
-        ModelUtils.normalize(folder, entities);
+        CoreUtils.normalize(folder, entities);
 
     /* Use Map for follow-up Retention */
     Map<IBookMark, Collection<INews>> retentionHelperMap = new HashMap<IBookMark, Collection<INews>>();

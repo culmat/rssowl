@@ -35,9 +35,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.filter.INewsActionPresentation;
 import org.rssowl.ui.internal.util.LayoutUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.Collection;
 
@@ -73,7 +73,7 @@ public class LabelNewsActionPresentation implements INewsActionPresentation {
       }
     });
 
-    Collection<ILabel> labels = ModelUtils.loadSortedLabels();
+    Collection<ILabel> labels = CoreUtils.loadSortedLabels();
     fViewer.setInput(labels);
 
     /* Set Selection */
