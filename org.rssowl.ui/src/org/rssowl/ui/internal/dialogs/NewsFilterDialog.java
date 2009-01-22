@@ -146,12 +146,9 @@ public class NewsFilterDialog extends TitleAreaDialog {
   @Override
   protected void okPressed() {
 
-    /* Ensure that Filter Name is set */
-    if (!StringUtils.isSet(fNameInput.getText())) {
-      setErrorMessage("Please enter a name for the news filter.");
-      fNameInput.setFocus();
-      return;
-    }
+    /* Generate Name if necessary */
+    if (!StringUtils.isSet(fNameInput.getText()))
+      onGenerateName();
 
     /* Ensure that a Search Condition is specified if required */
     if (fSearchConditionList.isEmpty() && !fMatchAllNewsRadio.getSelection()) {
@@ -531,6 +528,10 @@ public class NewsFilterDialog extends TitleAreaDialog {
 
     /* Update Enable-State of Search Condition List */
     setControlEnabled(fSearchConditionList, !fMatchAllNewsRadio.getSelection());
+
+    /* Generate Name if preset */
+    if (fPresetSearch != null)
+      onGenerateName();
   }
 
   private void setControlEnabled(Control control, boolean enabled) {
