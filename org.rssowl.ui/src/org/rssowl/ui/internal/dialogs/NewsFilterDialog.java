@@ -29,6 +29,8 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -41,6 +43,7 @@ import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
@@ -340,6 +343,8 @@ public class NewsFilterDialog extends TitleAreaDialog {
     nameContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
     nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
+
+
     fNameInput = new Text(nameContainer, SWT.SINGLE);
     fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     if (fEditedFilter != null) {
@@ -352,6 +357,14 @@ public class NewsFilterDialog extends TitleAreaDialog {
         setErrorMessage(null);
       }
     });
+
+    GC gc = new GC(fNameInput);
+    gc.setFont(JFaceResources.getDialogFont());
+    FontMetrics fontMetrics = gc.getFontMetrics();
+    int entryFieldWidth = Dialog.convertHorizontalDLUsToPixels(fontMetrics, IDialogConstants.ENTRY_FIELD_WIDTH);
+    gc.dispose();
+
+    ((GridData) fNameInput.getLayoutData()).widthHint = entryFieldWidth; //Required to avoid large spanning dialog for long Links
 
     ToolBar generateTitleBar = new ToolBar(nameContainer, SWT.FLAT);
     generateTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
