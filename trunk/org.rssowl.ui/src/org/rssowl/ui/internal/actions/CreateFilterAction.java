@@ -81,6 +81,10 @@ public class CreateFilterAction implements IObjectActionDelegate {
       presetSearch.setMatchAllConditions(true);
 
       NewsFilterDialog dialog = new NewsFilterDialog(shell, presetSearch);
+      Collection<ISearchFilter> existingFilters = DynamicDAO.loadAll(ISearchFilter.class);
+      if (existingFilters != null && !existingFilters.isEmpty())
+        dialog.setFilterPosition(existingFilters.size());
+
       if (dialog.open() == IDialogConstants.OK_ID) {
         NewsFiltersListDialog filterListDialog = new NewsFiltersListDialog(shell);
         filterListDialog.setSelection(dialog.getFilter());

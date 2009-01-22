@@ -136,7 +136,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
   /**
    * @param filterPosition the sort order for the resulting news filter.
    */
-  void setFilterPosition(int filterPosition) {
+  public void setFilterPosition(int filterPosition) {
     fFilterPosition = filterPosition;
   }
 
