@@ -66,13 +66,17 @@ public class CopyNewsAction implements INewsAction {
       /* For each News: Copy */
       List<INews> copiedNews = new ArrayList<INews>(news.size());
       for (INews newsitem : news) {
-        INews newsCopy = Owl.getModelFactory().createNews(newsitem, bin);
-        copiedNews.add(newsCopy);
+        if (newsitem.getParentId() != bin.getId()) { // News could be already inside the bin
+          INews newsCopy = Owl.getModelFactory().createNews(newsitem, bin);
+          copiedNews.add(newsCopy);
+        }
       }
 
       /* Save */
-      DynamicDAO.saveAll(copiedNews);
-      DynamicDAO.save(bin);
+      if (!copiedNews.isEmpty()) {
+        DynamicDAO.saveAll(copiedNews);
+        DynamicDAO.save(bin);
+      }
     }
 
     return Collections.emptyList(); //The original news where not touched at all
