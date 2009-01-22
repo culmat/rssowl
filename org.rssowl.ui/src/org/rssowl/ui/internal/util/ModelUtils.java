@@ -166,12 +166,13 @@ public class ModelUtils {
     List<IEntity> entities = new ArrayList<IEntity>(elements.size());
 
     for (Object object : elements) {
-      if (object instanceof IEntity)
+      if (object instanceof IEntity && !entities.contains(object))
         entities.add((IEntity) object);
       else if (object instanceof EntityGroup) {
         List<EntityGroupItem> items = ((EntityGroup) object).getItems();
         for (EntityGroupItem item : items)
-          entities.add(item.getEntity());
+          if (!entities.contains(item.getEntity()))
+            entities.add(item.getEntity());
       }
     }
 
@@ -214,12 +215,12 @@ public class ModelUtils {
     List<T> entities = new ArrayList<T>(elements.size());
 
     for (Object object : elements) {
-      if (entityClass.isInstance(object))
+      if (entityClass.isInstance(object) && !entities.contains(entityClass.cast(object)))
         entities.add(entityClass.cast(object));
       else if (object instanceof EntityGroup) {
         List<EntityGroupItem> items = ((EntityGroup) object).getItems();
         for (EntityGroupItem item : items) {
-          if (entityClass.isInstance(item.getEntity()))
+          if (entityClass.isInstance(item.getEntity()) && !entities.contains(entityClass.cast(item.getEntity())))
             entities.add(entityClass.cast(item.getEntity()));
         }
       }
