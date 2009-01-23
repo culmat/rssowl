@@ -64,11 +64,13 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.actions.NewNewsBinAction;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkLabelProvider;
@@ -110,6 +112,7 @@ public class LocationControl extends Composite {
     private List<IFolderChild> fCheckedElements;
     private IFolderChild fSelectedElement;
     private Set<IFolderChild> fCheckedElementsCache = new HashSet<IFolderChild>();
+    private FilteredTree fFilteredTree;
 
     FolderChildChooserDialog(Shell parentShell, IFolderChild selectedElement, List<IFolderChild> checkedElements) {
       super(parentShell);
@@ -181,7 +184,7 @@ public class LocationControl extends Composite {
       };
 
       /* Filtered Tree to make it easier to chose an element */
-      final FilteredTree filteredTree = new FilteredTree(composite, SWT.BORDER, filter) {
+      fFilteredTree = new FilteredTree(composite, SWT.BORDER, filter) {
         @Override
         protected TreeViewer doCreateTreeViewer(Composite parent, int style) {
           fViewer = new CheckboxTreeViewer(parent, SWT.BORDER) {
@@ -220,20 +223,20 @@ public class LocationControl extends Composite {
         }
       };
 
-      filteredTree.setInitialText("");
+      fFilteredTree.setInitialText("");
       if (fMode == Mode.SEARCH_LOCATION)
-        filteredTree.getFilterControl().setMessage("Type here to filter locations by name");
+        fFilteredTree.getFilterControl().setMessage("Type here to filter locations by name");
       else
-        filteredTree.getFilterControl().setMessage("Type here to filter news bins by name");
-      filteredTree.getViewer().getControl().setFocus();
+        fFilteredTree.getFilterControl().setMessage("Type here to filter news bins by name");
+      fFilteredTree.getViewer().getControl().setFocus();
 
       /* Filter when Typing into Tree */
-      filteredTree.getViewer().getControl().addKeyListener(new KeyAdapter() {
+      fFilteredTree.getViewer().getControl().addKeyListener(new KeyAdapter() {
         @Override
         public void keyPressed(KeyEvent e) {
           if (e.character > 0x20) {
             String character = String.valueOf(e.character);
-            Text text = filteredTree.getFilterControl();
+            Text text = fFilteredTree.getFilterControl();
             text.setFocus();
             text.setText(character);
             text.setSelection(1);
@@ -407,11 +410,12 @@ public class LocationControl extends Composite {
         fViewer.getTree().showSelection();
       }
 
-      /* Select All / Deselect All */
+      /* Buttons */
       Composite buttonContainer = new Composite(composite, SWT.NONE);
       buttonContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
       buttonContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
+      /* Select All / Deselect All for Location Lookup */
       if (fMode == Mode.SEARCH_LOCATION) {
         Button selectAll = new Button(buttonContainer, SWT.PUSH);
         selectAll.setText("&Select All");
@@ -423,20 +427,61 @@ public class LocationControl extends Composite {
             cacheAll(true);
           }
         });
+
+        Button deselectAll = new Button(buttonContainer, SWT.PUSH);
+        deselectAll.setText("&Deselect All");
+        setButtonLayoutData(deselectAll);
+        deselectAll.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            OwlUI.setAllChecked(fViewer.getTree(), false);
+            cacheAll(false);
+          }
+        });
       }
 
-      Button deselectAll = new Button(buttonContainer, SWT.PUSH);
-      deselectAll.setText("&Deselect All");
-      setButtonLayoutData(deselectAll);
-      deselectAll.addSelectionListener(new SelectionAdapter() {
-        @Override
-        public void widgetSelected(SelectionEvent e) {
-          OwlUI.setAllChecked(fViewer.getTree(), false);
-          cacheAll(false);
-        }
-      });
+      /* Create Bin for Bin Selection */
+      else {
+        Button createBin = new Button(buttonContainer, SWT.PUSH);
+        createBin.setText("&New News Bin...");
+        setButtonLayoutData(createBin);
+        createBin.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            onCreateNewsBin();
+          }
+        });
+      }
 
       return composite;
+    }
+
+    private void onCreateNewsBin() {
+      IFolderChild selectedFolderChild = null;
+      IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
+      if (!selection.isEmpty()) {
+        Object element = selection.getFirstElement();
+        if (element instanceof IFolderChild)
+          selectedFolderChild = (IFolderChild) element;
+      }
+
+      IFolder folder = (IFolder) ((selectedFolderChild instanceof IFolder) ? selectedFolderChild : null);
+      IMark position = null;
+      if (folder == null && selectedFolderChild != null && selectedFolderChild instanceof IMark) {
+        folder = selectedFolderChild.getParent();
+        position = (IMark) selectedFolderChild;
+      }
+
+      NewNewsBinAction action = new NewNewsBinAction(getShell(), folder, position);
+      action.run(null);
+      INewsBin newsbin = action.getNewsbin();
+      if (newsbin != null) {
+        fFilteredTree.getPatternFilter().setPattern("");
+        fFilteredTree.getFilterControl().setText("");
+        fViewer.refresh();
+        fViewer.expandAll();
+        fViewer.setSelection(new StructuredSelection(newsbin), true);
+      }
     }
 
     /*
