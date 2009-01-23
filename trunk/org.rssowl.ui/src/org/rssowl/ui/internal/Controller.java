@@ -29,8 +29,10 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
@@ -83,6 +85,7 @@ import org.rssowl.core.persist.event.LabelEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.JobQueue;
 import org.rssowl.core.util.LoggingSafeRunnable;
@@ -90,6 +93,7 @@ import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.actions.ExportFeedsAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyPageWrapper;
@@ -103,6 +107,7 @@ import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -788,6 +793,13 @@ public class Controller {
 
     /* Register Listeners */
     registerListeners();
+
+    /* Backup Subscriptions as OPML */
+    SafeRunner.run(new LoggingSafeRunnable() {
+      public void run() throws Exception {
+        backupSubscriptions();
+      }
+    });
   }
 
   /**
@@ -852,6 +864,33 @@ public class Controller {
     IStatus startupStatus = Owl.getPersistenceService().getStartupStatus();
     if (startupStatus.getSeverity() == IStatus.ERROR)
       ErrorDialog.openError(OwlUI.getPrimaryShell(), "Startup error", "There was an error while starting RSSOwl.", startupStatus);
+  }
+
+  private void backupSubscriptions() {
+    IPath path = new Path(Activator.getDefault().getStateLocation().toOSString());
+    File root = path.toFile();
+    if (!root.exists())
+      root.mkdir();
+
+    path = path.append("subscriptions.opml");
+    File backupFile = path.toFile();
+
+    /* Only create 1 Backup per Day */
+    if (backupFile.exists()) {
+      long lastModified = backupFile.lastModified();
+      if (lastModified + DateUtils.DAY > System.currentTimeMillis())
+        return;
+    }
+
+    try {
+      Set<IFolder> rootFolders = CoreUtils.loadRootFolders();
+      if (!rootFolders.isEmpty())
+        new ExportFeedsAction().exportToOPML(path.toFile(), rootFolders);
+    } catch (PersistenceException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    } catch (IOException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    }
   }
 
   /**
