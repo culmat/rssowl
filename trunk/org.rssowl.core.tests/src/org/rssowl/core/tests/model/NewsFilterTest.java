@@ -690,6 +690,21 @@ public class NewsFilterTest {
     }
   }
 
+  //TODO Test how filtering works when retention is applied on news in the feed
+  public void testFilterAndRetention() throws Exception {
+
+  }
+
+  //TODO Test that filters work well for news with descriptions
+  public void testFilterOnNewsWithDescription() throws Exception {
+
+  }
+
+  //TODO Test how filter works on a news that is existing already in another feed
+  public void testFilterOnDuplicateNews() throws Exception {
+
+  }
+
   private ISearch createStickySearch(boolean sticky) {
     ISearch search = fFactory.createSearch(null);
     ISearchField field = fFactory.createSearchField(INews.IS_FLAGGED, INews.class.getName());
