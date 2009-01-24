@@ -293,7 +293,7 @@ public class ApplicationServiceImpl implements IApplicationService {
         for (int i = 0; i < news.size(); i++) {
           NewsDocument document = new NewsDocument(news.get(i));
           document.addFields();
-          document.getDocument().getField(SearchDocument.ENTITY_ID_TEXT).setValue(String.valueOf(i));
+          document.getDocument().getField(SearchDocument.ENTITY_ID_TEXT).setValue(String.valueOf(i)); //TODO Consider optimizing to not index desc if not required
           indexWriter.addDocument(document.getDocument());
         }
         indexWriter.close();
