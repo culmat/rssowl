@@ -50,6 +50,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -193,6 +194,14 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
 
   public List<INews> getNewsFromGuid(INews newsItem, boolean newsSaved) {
     return searchNews(newsItem, true, newsSaved);
+  }
+
+  @Override
+  public void saveAll(Collection<INews> news) {
+    IdentityHashMap<INews, Object> map = new IdentityHashMap<INews, Object>();
+    for (INews newsItem : news)
+      map.put(newsItem, newsItem);
+    super.saveAll(map.keySet());
   }
 
   private void logWarning(String message) {

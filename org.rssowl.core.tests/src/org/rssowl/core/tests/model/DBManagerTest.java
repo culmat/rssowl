@@ -145,6 +145,16 @@ public class DBManagerTest {
     fNewsDAO = DynamicDAO.getDAO(INewsDAO.class);
   }
 
+  @Test
+  public void testAddDuplicateNewsDeadlocks() {
+    List<INews> newsList = new ArrayList<INews>();
+    IFeed feed = createFeed();
+    INews news = createNews(feed);
+    newsList.add(news);
+    newsList.add(news);
+    DynamicDAO.saveAll(newsList);
+  }
+
   /**
    * Tests that {@link INewsDAO#setState(Set, State, boolean)} works correctly.
    * @throws Exception s
