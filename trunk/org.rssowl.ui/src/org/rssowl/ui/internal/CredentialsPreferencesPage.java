@@ -210,7 +210,8 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     fUseMasterPasswordCheck.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        fResetMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
+        if (!fUseMasterPasswordCheck.getSelection())
+          fResetMasterPassword.setEnabled(false);
       }
     });
 
@@ -219,7 +220,6 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     fResetMasterPassword.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
     fResetMasterPassword.setText("Change Master Password...");
     fResetMasterPassword.addSelectionListener(new SelectionAdapter() {
-      @SuppressWarnings("restriction")
       @Override
       public void widgetSelected(SelectionEvent e) {
         reSetAllCredentials();
@@ -480,6 +480,15 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
       reSetAllCredentials();
 
     return super.performOk();
+  }
+
+  /*
+   * @see org.eclipse.jface.preference.PreferencePage#performApply()
+   */
+  @Override
+  protected void performApply() {
+    super.performApply();
+    fResetMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
   }
 
   /*
