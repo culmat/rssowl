@@ -32,7 +32,6 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
@@ -135,6 +134,10 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author bpasero
  */
 public class Controller {
+
+  /* Backup Files */
+  private static final String DAILY_BACKUP = "subscriptions.opml";
+  private static final String WEEKLY_BACKUP = "subscriptions_weekly.opml";
 
   /* Extension-Points */
   private static final String ENTITY_PROPERTY_PAGE_EXTENSION_POINT = "org.rssowl.ui.EntityPropertyPage"; //$NON-NLS-1$
@@ -867,25 +870,36 @@ public class Controller {
   }
 
   private void backupSubscriptions() {
-    IPath path = new Path(Activator.getDefault().getStateLocation().toOSString());
-    File root = path.toFile();
+    IPath rootPath = Platform.getLocation();
+    File root = rootPath.toFile();
     if (!root.exists())
       root.mkdir();
 
-    path = path.append("subscriptions.opml");
-    File backupFile = path.toFile();
+    IPath dailyBackupPath = rootPath.append(DAILY_BACKUP);
+    IPath weeklyBackupPath = rootPath.append(WEEKLY_BACKUP);
 
-    /* Only create 1 Backup per Day */
-    if (backupFile.exists()) {
-      long lastModified = backupFile.lastModified();
+    File dailyBackupFile = dailyBackupPath.toFile();
+    File weeklyBackupFile = weeklyBackupPath.toFile();
+
+    if (dailyBackupFile.exists()) {
+
+      /* Update Weekly Backup if required */
+      if (!weeklyBackupFile.exists() || (weeklyBackupFile.lastModified() + DateUtils.WEEK < System.currentTimeMillis())) {
+        weeklyBackupFile.delete();
+        dailyBackupFile.renameTo(weeklyBackupFile);
+      }
+
+      /* Check 1 Day Condition */
+      long lastModified = dailyBackupFile.lastModified();
       if (lastModified + DateUtils.DAY > System.currentTimeMillis())
         return;
     }
 
+    /* Create Daily Backup */
     try {
       Set<IFolder> rootFolders = CoreUtils.loadRootFolders();
       if (!rootFolders.isEmpty())
-        new ExportFeedsAction().exportToOPML(path.toFile(), rootFolders);
+        new ExportFeedsAction().exportToOPML(dailyBackupFile, rootFolders);
     } catch (PersistenceException e) {
       Activator.getDefault().logError(e.getMessage(), e);
     } catch (IOException e) {
