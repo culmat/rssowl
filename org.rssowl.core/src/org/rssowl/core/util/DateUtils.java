@@ -47,6 +47,9 @@ public class DateUtils {
   /** 1 Day in Millis */
   public static final long DAY = 24L * 60L * 60L * 1000L;
 
+  /** 1 Week in Millis */
+  public static final long WEEK = 7 * DAY;
+
   /* An array of custom date formats */
   private static final DateFormat[] CUSTOM_DATE_FORMATS;
 
