@@ -31,6 +31,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.IApplicationService;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFilterAction;
@@ -45,6 +46,7 @@ import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 
 import java.net.URI;
@@ -110,6 +112,8 @@ public class NewsFilterTest {
     fAppService.handleFeedReload(bm, feed, null, false);
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.READ)));
+    assertEquals(3, news.size());
     for (INews newsitem : news) {
       assertEquals(INews.State.READ, newsitem.getState());
     }
@@ -144,6 +148,8 @@ public class NewsFilterTest {
     fAppService.handleFeedReload(bm, feed, null, false);
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.NEW)));
+    assertEquals(3, news.size());
     for (INews newsitem : news) {
       assertEquals(true, newsitem.isFlagged());
     }
@@ -182,6 +188,8 @@ public class NewsFilterTest {
     fAppService.handleFeedReload(bm, feed, null, false);
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+    assertEquals(3, news.size());
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.NEW)));
     for (INews newsitem : news) {
       assertEquals(1, newsitem.getLabels().size());
       assertEquals(label, newsitem.getLabels().iterator().next());
@@ -218,6 +226,8 @@ public class NewsFilterTest {
     fAppService.handleFeedReload(bm, feed, null, false);
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+    assertEquals(3, news.size());
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.HIDDEN)));
     for (INews newsitem : news) {
       assertEquals(INews.State.HIDDEN, newsitem.getState());
     }
@@ -256,18 +266,20 @@ public class NewsFilterTest {
     fAppService.handleFeedReload(bm, feed, null, false);
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+    assertEquals(3, news.size());
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.NEW)));
     for (INews newsitem : news) {
       assertEquals(INews.State.NEW, newsitem.getState());
       assertEquals(0, newsitem.getParentId());
     }
 
     List<INews> binNews = bin.getNews();
+    assertEquals(3, bin.getNewsCount(EnumSet.of(INews.State.NEW)));
     for (INews newsitem : binNews) {
       assertEquals(INews.State.NEW, newsitem.getState());
       assertEquals(bin.getId(), newsitem.getParentId());
     }
 
-    assertEquals(3, bin.getNewsCount(EnumSet.of(INews.State.NEW)));
   }
 
   /**
@@ -303,17 +315,19 @@ public class NewsFilterTest {
     fAppService.handleFeedReload(bm, feed, null, false);
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+    assertEquals(3, news.size());
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.HIDDEN)));
     for (INews newsitem : news) {
       assertEquals(INews.State.HIDDEN, newsitem.getState());
     }
 
     List<INews> binNews = bin.getNews();
+    assertEquals(3, bin.getNewsCount(EnumSet.of(INews.State.NEW)));
     for (INews newsitem : binNews) {
       assertEquals(INews.State.NEW, newsitem.getState());
       assertEquals(bin.getId(), newsitem.getParentId());
     }
 
-    assertEquals(3, bin.getNewsCount(EnumSet.of(INews.State.NEW)));
   }
 
   /**
@@ -352,18 +366,20 @@ public class NewsFilterTest {
     fAppService.handleFeedReload(bm, feed, null, false);
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+    assertEquals(3, news.size());
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.HIDDEN)));
     for (INews newsitem : news) {
       assertEquals(INews.State.HIDDEN, newsitem.getState());
     }
 
     List<INews> binNews = bin.getNews();
+    assertEquals(3, bin.getNewsCount(EnumSet.of(INews.State.NEW)));
     for (INews newsitem : binNews) {
       assertEquals(INews.State.NEW, newsitem.getState());
       assertEquals(bin.getId(), newsitem.getParentId());
       assertEquals(true, newsitem.isFlagged());
     }
 
-    assertEquals(3, bin.getNewsCount(EnumSet.of(INews.State.NEW)));
   }
 
   /**
@@ -415,6 +431,9 @@ public class NewsFilterTest {
     fAppService.handleFeedReload(bm, feed, null, false);
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+    assertEquals(3, news.size());
+    assertEquals(1, bm.getNewsCount(EnumSet.of(INews.State.NEW)));
+    assertEquals(2, bm.getNewsCount(EnumSet.of(INews.State.READ)));
     for (INews newsitem : news) {
       if (newsitem.equals(news1)) {
         assertEquals(INews.State.NEW, news1.getState());
@@ -475,6 +494,8 @@ public class NewsFilterTest {
     fAppService.handleFeedReload(bm, feed, null, false);
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+    assertEquals(3, news.size());
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.READ)));
     for (INews newsitem : news) {
       if (newsitem.equals(news1))
         assertEquals(INews.State.READ, news1.getState());
@@ -534,6 +555,8 @@ public class NewsFilterTest {
     fAppService.handleFeedReload(bm, feed, null, false);
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+    assertEquals(3, news.size());
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.READ)));
     for (INews newsitem : news) {
       if (newsitem.equals(news1))
         assertEquals(INews.State.READ, news1.getState());
@@ -628,6 +651,10 @@ public class NewsFilterTest {
     fAppService.handleFeedReload(bm, feed, null, false);
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+    assertEquals(4, news.size());
+    assertEquals(2, bm.getNewsCount(EnumSet.of(INews.State.READ)));
+    assertEquals(1, bm.getNewsCount(EnumSet.of(INews.State.HIDDEN)));
+    assertEquals(1, bm.getNewsCount(EnumSet.of(INews.State.NEW)));
     for (INews newsitem : news) {
       if (newsitem.equals(news1)) {
         assertEquals(INews.State.READ, news1.getState());
@@ -690,19 +717,144 @@ public class NewsFilterTest {
     }
   }
 
-  //TODO Test how filtering works when retention is applied on news in the feed
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testFilterAndRetention() throws Exception {
+    IBookMark bm = createBookMark("local1");
+    IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(bm);
+    preferences.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
+    preferences.putInteger(DefaultPreferences.DEL_NEWS_BY_COUNT_VALUE, 2);
 
+    DynamicDAO.save(bm);
+
+    IFeed feed = fFactory.createFeed(null, bm.getFeedLinkReference().getLink());
+
+    INews news1 = createNews(feed, "News1");
+    news1.setState(INews.State.NEW);
+
+    INews news2 = createNews(feed, "News2");
+    news2.setState(INews.State.NEW);
+
+    INews news3 = createNews(feed, "News3");
+    news3.setState(INews.State.NEW);
+
+    ILabel label = fFactory.createLabel(null, "New Label");
+    DynamicDAO.save(label);
+
+    ISearchFilter filter = fFactory.createSearchFilter(null, null, "All News");
+    filter.setMatchAllNews(true);
+    filter.setEnabled(true);
+
+    IFilterAction action = fFactory.createFilterAction(LABEL_NEWS_ID);
+    action.setData(label.getId());
+    filter.addAction(action);
+
+    DynamicDAO.save(filter);
+
+    fAppService.handleFeedReload(bm, feed, null, false);
+
+    List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+    assertEquals(3, news.size());
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.NEW)));
+    for (INews newsitem : news) {
+      assertEquals(1, newsitem.getLabels().size());
+      assertEquals(label, newsitem.getLabels().iterator().next());
+      assertEquals("New Label", newsitem.getLabels().iterator().next().getName());
+    }
   }
 
-  //TODO Test that filters work well for news with descriptions
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testFilterOnNewsWithDescription() throws Exception {
+    IBookMark bm = createBookMark("local1");
+    IFeed feed = fFactory.createFeed(null, bm.getFeedLinkReference().getLink());
 
+    INews news1 = createNews(feed, "News1");
+    news1.setState(INews.State.NEW);
+    news1.setDescription("Description 1");
+
+    INews news2 = createNews(feed, "News2");
+    news2.setState(INews.State.NEW);
+    news2.setDescription("Description 1");
+
+    INews news3 = createNews(feed, "News3");
+    news3.setState(INews.State.NEW);
+    news3.setDescription("Description 1");
+
+    ILabel label = fFactory.createLabel(null, "New Label");
+    DynamicDAO.save(label);
+
+    ISearchFilter filter = fFactory.createSearchFilter(null, null, "All News");
+    filter.setMatchAllNews(true);
+    filter.setEnabled(true);
+
+    IFilterAction action = fFactory.createFilterAction(LABEL_NEWS_ID);
+    action.setData(label.getId());
+    filter.addAction(action);
+
+    DynamicDAO.save(filter);
+
+    fAppService.handleFeedReload(bm, feed, null, false);
+
+    List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+    assertEquals(3, news.size());
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.NEW)));
+    for (INews newsitem : news) {
+      assertEquals(1, newsitem.getLabels().size());
+      assertEquals(label, newsitem.getLabels().iterator().next());
+      assertEquals("New Label", newsitem.getLabels().iterator().next().getName());
+    }
   }
 
-  //TODO Test how filter works on a news that is existing already in another feed
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testFilterOnDuplicateNews() throws Exception {
+    IBookMark bm1 = createBookMark("local1");
+    IFeed feed1 = bm1.getFeedLinkReference().resolve();
 
+    INews news1_feed1 = createNews(feed1, "News1");
+    news1_feed1.setState(INews.State.READ);
+    news1_feed1.setLink(new URI("news_link"));
+
+    DynamicDAO.save(feed1);
+
+    IBookMark bm2 = createBookMark("local2");
+    IFeed feed2 = fFactory.createFeed(null, bm2.getFeedLinkReference().getLink());
+
+    INews news1_feed2 = createNews(feed2, "News2");
+    news1_feed2.setLink(new URI("news_link"));
+    news1_feed2.setState(INews.State.NEW);
+
+    ILabel label = fFactory.createLabel(null, "New Label");
+    DynamicDAO.save(label);
+
+    ISearchFilter filter = fFactory.createSearchFilter(null, null, "All News");
+    filter.setMatchAllNews(true);
+    filter.setEnabled(true);
+
+    IFilterAction action = fFactory.createFilterAction(LABEL_NEWS_ID);
+    action.setData(label.getId());
+    filter.addAction(action);
+
+    DynamicDAO.save(filter);
+
+    fAppService.handleFeedReload(bm2, feed2, null, false);
+
+    List<INews> news = bm2.getFeedLinkReference().resolve().getNews();
+    assertEquals(1, news.size());
+    assertEquals(1, bm2.getNewsCount(EnumSet.of(INews.State.READ)));
+    for (INews newsitem : news) {
+      assertEquals(1, newsitem.getLabels().size());
+      assertEquals(INews.State.READ, newsitem.getState()); //Because the news is duplicate in another feed and read
+      assertEquals(label, newsitem.getLabels().iterator().next());
+      assertEquals("New Label", newsitem.getLabels().iterator().next().getName());
+    }
   }
 
   private ISearch createStickySearch(boolean sticky) {
