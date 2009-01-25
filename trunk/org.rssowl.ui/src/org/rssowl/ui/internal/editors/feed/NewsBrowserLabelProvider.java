@@ -397,7 +397,17 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       /* DIV: NewsItem/Content */
       div(builder, "content");
 
-      builder.append(StringUtils.isSet(description) ? description : "This article does not provide any content.");
+      if (StringUtils.isSet(description) && !description.equals(news.getTitle()))
+        builder.append(description);
+      else {
+        builder.append("This article does not provide any content.");
+
+        if (hasLink) {
+          builder.append(" Click ");
+          link(builder, news.getLinkAsText(), "here", null);
+          builder.append(" to open the article in the browser.");
+        }
+      }
 
       /* Close: NewsItem/Content */
       close(builder, "div");
@@ -634,7 +644,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   }
 
   private void link(StringBuilder builder, String link, String content, String cssClass, String color) {
-    builder.append("<a href=\"").append(link).append("\" class=\"").append(cssClass).append("\"");
+    builder.append("<a href=\"").append(link).append("\"");
+
+    if (cssClass != null)
+      builder.append(" class=\"").append(cssClass).append("\"");
 
     if (color != null)
       builder.append(" style=\"color: rgb(").append(color).append(");\"");
