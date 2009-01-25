@@ -193,17 +193,19 @@ public class ApplicationServiceImpl implements IApplicationService {
       for (INews news : deletedNews)
         mergeResult.addUpdatedObject(news);
 
+      /* Set ID to News and handle Description entity */
+      IDGenerator generator = Owl.getPersistenceService().getIDGenerator();
       for (INews news : newNewsAdded) {
+        long id;
+        if (generator instanceof DB4OIDGenerator)
+          id = ((DB4OIDGenerator) generator).getNext(false);
+        else
+          id = generator.getNext();
+
+        news.setId(id);
+
         String description = ((News) news).getTransientDescription();
         if (description != null) {
-          IDGenerator generator = Owl.getPersistenceService().getIDGenerator();
-          long id;
-          if (generator instanceof DB4OIDGenerator)
-            id = ((DB4OIDGenerator) generator).getNext(false);
-          else
-            id = generator.getNext();
-
-          news.setId(id);
           mergeResult.addUpdatedObject(new Description(news, description));
         }
       }
