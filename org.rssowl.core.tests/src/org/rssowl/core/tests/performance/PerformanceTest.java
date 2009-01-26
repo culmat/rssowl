@@ -54,8 +54,10 @@ import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPersistable;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.ITextInput;
@@ -124,6 +126,73 @@ public class PerformanceTest {
     fModelSearch = Owl.getPersistenceService().getModelSearch();
     fPluginLocation = FileLocator.toFileURL(Platform.getBundle("org.rssowl.core.tests").getEntry("/")).toURI();
     fController = Controller.getDefault();
+  }
+
+  /**
+   * @throws Exception
+   */
+  @SuppressWarnings("nls")
+  @Test
+  public void realWorldReloadTestWithFilters() throws Exception {
+    /*
+     * We use 2 to simulate better how things happen. The queue for saving has a
+     * single job and there are multiple jobs for loading the online feed and
+     * interpreting. However, since the test infrastructure uses a single
+     */
+    int jobsCount = 2;
+    File corpus1Folder = new File(fPluginLocation.resolve("data/performance/corpus_10-03-07"));
+    File corpus2Folder = new File(fPluginLocation.resolve("data/performance/corpus_10-06-07"));
+    File corpus3Folder = new File(fPluginLocation.resolve("data/performance/corpus_10-09-07"));
+    File tmpFolder = new File(System.getProperty("java.io.tmpdir"));
+    File feedFolder = new File(tmpFolder.getAbsolutePath(), "rssowlfeeds");
+    feedFolder.mkdir();
+    feedFolder.deleteOnExit();
+
+    /* Copy Feeds of corpus_10-03-07 to temp location */
+    copyFeedFilesToTempLocation(corpus1Folder, feedFolder);
+
+    /* Create Filter */
+    {
+      IModelFactory factory = Owl.getModelFactory();
+      ISearch search = factory.createSearch(null);
+      search.setMatchAllConditions(false);
+      ISearchField field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
+      search.addSearchCondition(factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "foo bar president"));
+
+      field = factory.createSearchField(INews.AUTHOR, INews.class.getName());
+      search.addSearchCondition(factory.createSearchCondition(field, SearchSpecifier.IS, "foobar"));
+
+      field = factory.createSearchField(INews.TITLE, INews.class.getName());
+      search.addSearchCondition(factory.createSearchCondition(field, SearchSpecifier.IS, "anything"));
+
+      ISearchFilter filter = factory.createSearchFilter(null, search, "Filter 1");
+      filter.setEnabled(true);
+      filter.setOrder(0);
+
+      filter.addAction(factory.createFilterAction("org.rssowl.core.StopFilterAction"));
+
+      DynamicDAO.save(filter);
+    }
+
+    List<ITask> tasks = getRealWorldReloadTasks(feedFolder.getAbsolutePath());
+
+    System.gc();
+    /* Initial Reload */
+    System.out.println("Reloading Real Word Feeds With Filters: " + FEEDS + " Feeds [Initial - " + jobsCount + " Jobs] took: " + TestUtils.executeAndWait(tasks, jobsCount) + "ms");
+
+    /* Copy Feeds of corpus_10-06-07 to temp location */
+    copyFeedFilesToTempLocation(corpus2Folder, feedFolder);
+    System.gc();
+
+    /* Second Reload */
+    System.out.println("Reloading Real Word Feeds With Filters: " + FEEDS + " Feeds [Second - " + jobsCount + " Jobs] took: " + TestUtils.executeAndWait(tasks, jobsCount) + "ms");
+
+    /* Copy Feeds of corpus_10-06-09 to temp location */
+    copyFeedFilesToTempLocation(corpus3Folder, feedFolder);
+    System.gc();
+
+    /* Third Reload */
+    System.out.println("Reloading Real Word Feeds With Filters: " + FEEDS + " Feeds [Third - " + jobsCount + " Jobs] took: " + TestUtils.executeAndWait(tasks, jobsCount) + "ms");
   }
 
   /**
