@@ -34,6 +34,14 @@ public class NewsDocument extends SearchDocument<INews> {
    */
   @Override
   public boolean addFields() {
+    return addFields(true);
+  }
+
+  /**
+   * @param indexDescription
+   * @return boolean
+   */
+  public boolean addFields(boolean indexDescription) {
     INews news = getType();
     List<Field> fields = new ArrayList<Field>();
 
@@ -42,7 +50,8 @@ public class NewsDocument extends SearchDocument<INews> {
 
     /* Add textual content */
     addField(fields, createHTMLField(INews.TITLE, news.getTitle()));
-    addField(fields, createHTMLField(INews.DESCRIPTION, news.getDescription()));
+    if (indexDescription)
+      addField(fields, createHTMLField(INews.DESCRIPTION, news.getDescription()));
 
     /* Add URIs */
     addField(fields, createURIField(INews.LINK, news.getLinkAsText(), Store.NO, Index.UN_TOKENIZED));
