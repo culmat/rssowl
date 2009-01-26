@@ -188,10 +188,11 @@ public class ApplicationServiceImpl implements IApplicationService {
         }
       }
 
+      /* Update state of added news if equivalent news already exists */
       updateStateOfUnsavedNewNews(newNewsAdded);
 
       /* Retention Policy */
-      List<INews> deletedNews = RetentionStrategy.process(bookMark, feed, newNewsAdded.size());
+      final List<INews> deletedNews = RetentionStrategy.process(bookMark, feed, newNewsAdded.size());
 
       for (INews news : deletedNews)
         mergeResult.addUpdatedObject(news);
@@ -213,9 +214,10 @@ public class ApplicationServiceImpl implements IApplicationService {
         }
       }
 
-      //TODO Check side-effects of running the filter here!
+      /* Run News Filters */
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
+          newNewsAdded.removeAll(deletedNews);
           runNewsFilters(newNewsAdded);
         }
       });
@@ -295,7 +297,7 @@ public class ApplicationServiceImpl implements IApplicationService {
 
       /* Index News */
       try {
-        IndexWriter indexWriter = new IndexWriter(directory, Indexer.createAnalyzer()); //TODO Consider Singleton!
+        IndexWriter indexWriter = new IndexWriter(directory, Indexer.createAnalyzer());
         for (int i = 0; i < news.size(); i++) {
           NewsDocument document = new NewsDocument(news.get(i));
           document.addFields(indexDescription);
@@ -338,7 +340,7 @@ public class ApplicationServiceImpl implements IApplicationService {
           final List<INews> matchingNews = new ArrayList<INews>(3);
 
           /* Perform Query */
-          Query query = ModelSearchQueries.createQuery(filter.getSearch()); //TODO Listen to filter changes and cache query?
+          Query query = ModelSearchQueries.createQuery(filter.getSearch());
           searcher[0].search(query, new HitCollector() {
             @Override
             public void collect(int doc, float score) {
