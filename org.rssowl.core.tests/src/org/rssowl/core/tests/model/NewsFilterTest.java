@@ -48,9 +48,11 @@ import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.util.DateUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
@@ -721,7 +723,7 @@ public class NewsFilterTest {
    * @throws Exception
    */
   @Test
-  public void testFilterAndRetention() throws Exception {
+  public void testFilterAndRetention_Count() throws Exception {
     IBookMark bm = createBookMark("local1");
     IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(bm);
     preferences.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, true);
@@ -762,6 +764,66 @@ public class NewsFilterTest {
       assertEquals(1, newsitem.getLabels().size());
       assertEquals(label, newsitem.getLabels().iterator().next());
       assertEquals("New Label", newsitem.getLabels().iterator().next().getName());
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testFilterAndRetention_Age() throws Exception {
+    IBookMark bm = createBookMark("local1");
+    IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(bm);
+    preferences.putBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE, true);
+    preferences.putInteger(DefaultPreferences.DEL_NEWS_BY_AGE_VALUE, 2);
+
+    DynamicDAO.save(bm);
+
+    IFeed feed = fFactory.createFeed(null, bm.getFeedLinkReference().getLink());
+
+    Calendar cal= Calendar.getInstance();
+    cal.setTimeInMillis(cal.getTimeInMillis() - DateUtils.WEEK);
+    Date oldDate= cal.getTime();
+
+    INews news1 = createNews(feed, "News1");
+    news1.setState(INews.State.NEW);
+    news1.setReceiveDate(oldDate);
+    news1.setPublishDate(oldDate);
+    news1.setModifiedDate(oldDate);
+
+    INews news2 = createNews(feed, "News2");
+    news2.setState(INews.State.NEW);
+    news2.setReceiveDate(oldDate);
+    news2.setPublishDate(oldDate);
+    news2.setModifiedDate(oldDate);
+
+    INews news3 = createNews(feed, "News3");
+    news3.setState(INews.State.NEW);
+    news3.setReceiveDate(oldDate);
+    news3.setPublishDate(oldDate);
+    news3.setModifiedDate(oldDate);
+
+    ILabel label = fFactory.createLabel(null, "New Label");
+    DynamicDAO.save(label);
+
+    ISearchFilter filter = fFactory.createSearchFilter(null, null, "All News");
+    filter.setMatchAllNews(true);
+    filter.setEnabled(true);
+
+    IFilterAction action = fFactory.createFilterAction(LABEL_NEWS_ID);
+    action.setData(label.getId());
+    filter.addAction(action);
+
+    DynamicDAO.save(filter);
+
+    fAppService.handleFeedReload(bm, feed, null, false);
+
+    List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+    assertEquals(3, news.size());
+    assertEquals(0, bm.getNewsCount(EnumSet.of(INews.State.NEW)));
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.DELETED)));
+    for (INews newsitem : news) {
+      assertEquals(0, newsitem.getLabels().size());
     }
   }
 
