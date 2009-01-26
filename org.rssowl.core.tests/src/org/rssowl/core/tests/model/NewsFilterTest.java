@@ -769,7 +769,7 @@ public class NewsFilterTest {
    * @throws Exception
    */
   @Test
-  public void testFilterOnNewsWithDescription() throws Exception {
+  public void testSimpleFilterOnNewsWithDescription() throws Exception {
     IBookMark bm = createBookMark("local1");
     IFeed feed = fFactory.createFeed(null, bm.getFeedLinkReference().getLink());
 
@@ -808,6 +808,54 @@ public class NewsFilterTest {
       assertEquals(label, newsitem.getLabels().iterator().next());
       assertEquals("New Label", newsitem.getLabels().iterator().next().getName());
     }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testComplexFilterOnNewsWithDescription() throws Exception {
+    IBookMark bm = createBookMark("local1");
+    IFeed feed = fFactory.createFeed(null, bm.getFeedLinkReference().getLink());
+
+    INews news1 = createNews(feed, "News1");
+    news1.setState(INews.State.NEW);
+    news1.setDescription("Description");
+
+    INews news2 = createNews(feed, "News2");
+    news2.setState(INews.State.NEW);
+    news2.setDescription("Foo");
+
+    INews news3 = createNews(feed, "News3");
+    news3.setState(INews.State.NEW);
+    news3.setDescription("Bar");
+
+    ILabel label = fFactory.createLabel(null, "New Label");
+    DynamicDAO.save(label);
+
+    ISearchFilter filter = fFactory.createSearchFilter(null, createDescriptionSearch("description"), "Some News");
+    filter.setEnabled(true);
+
+    IFilterAction action = fFactory.createFilterAction(LABEL_NEWS_ID);
+    action.setData(label.getId());
+    filter.addAction(action);
+
+    DynamicDAO.save(filter);
+
+    fAppService.handleFeedReload(bm, feed, null, false);
+
+    List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+    assertEquals(3, news.size());
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.NEW)));
+    boolean labelFound= false;
+    for (INews newsitem : news) {
+      if (news1.equals(newsitem)) {
+        assertEquals("New Label", newsitem.getLabels().iterator().next().getName());
+        labelFound= true;
+      }
+    }
+
+    assertTrue(labelFound);
   }
 
   /**
@@ -872,6 +920,16 @@ public class NewsFilterTest {
     ISearchField field = fFactory.createSearchField(INews.TITLE, INews.class.getName());
 
     ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, title);
+    search.addSearchCondition(condition);
+
+    return search;
+  }
+
+  private ISearch createDescriptionSearch(String description) {
+    ISearch search = fFactory.createSearch(null);
+    ISearchField field = fFactory.createSearchField(INews.DESCRIPTION, INews.class.getName());
+
+    ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, description);
     search.addSearchCondition(condition);
 
     return search;
