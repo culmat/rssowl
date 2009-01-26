@@ -60,10 +60,13 @@ import org.rssowl.core.internal.persist.service.EventsMap;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IConditionalGet;
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.ISearch;
+import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
@@ -286,6 +289,7 @@ public class ApplicationServiceImpl implements IApplicationService {
     RAMDirectory directory = null;
     final IndexSearcher[] searcher = new IndexSearcher[1];
     if (needToIndex(filters)) {
+      boolean indexDescription = needToIndexDescription(filters);
       directory = new RAMDirectory();
       directory.setLockFactory(NoLockFactory.getNoLockFactory());
 
@@ -294,8 +298,8 @@ public class ApplicationServiceImpl implements IApplicationService {
         IndexWriter indexWriter = new IndexWriter(directory, Indexer.createAnalyzer()); //TODO Consider Singleton!
         for (int i = 0; i < news.size(); i++) {
           NewsDocument document = new NewsDocument(news.get(i));
-          document.addFields();
-          document.getDocument().getField(SearchDocument.ENTITY_ID_TEXT).setValue(String.valueOf(i)); //TODO Consider optimizing to not index desc if not required
+          document.addFields(indexDescription);
+          document.getDocument().getField(SearchDocument.ENTITY_ID_TEXT).setValue(String.valueOf(i));
           indexWriter.addDocument(document.getDocument());
         }
         indexWriter.close();
@@ -365,6 +369,21 @@ public class ApplicationServiceImpl implements IApplicationService {
     /* Free RAMDirectory if it was built */
     if (directory != null)
       directory.close();
+  }
+
+  private boolean needToIndexDescription(Set<ISearchFilter> filters) {
+    for (ISearchFilter filter : filters) {
+      ISearch search = filter.getSearch();
+      if (search != null) {
+        List<ISearchCondition> conditions = search.getSearchConditions();
+        for (ISearchCondition condition : conditions) {
+          int fieldId = condition.getField().getId();
+          if (fieldId == IEntity.ALL_FIELDS || fieldId == INews.DESCRIPTION)
+            return true;
+        }
+      }
+    }
+    return false;
   }
 
   private void applyFilter(ISearchFilter filter, final List<INews> news) {
