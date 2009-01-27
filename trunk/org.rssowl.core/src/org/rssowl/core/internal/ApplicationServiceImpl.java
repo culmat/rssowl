@@ -246,7 +246,7 @@ public class ApplicationServiceImpl implements IApplicationService {
     DBHelper.cleanUpAndFireEvents();
   }
 
-  private Set<ISearchFilter> loadFilters() {
+  private Set<ISearchFilter> loadEnabledFilters() {
 
     /* Load Filters */
     Collection<ISearchFilter> filters = DynamicDAO.getDAO(ISearchFilterDAO.class).loadAll();
@@ -260,17 +260,12 @@ public class ApplicationServiceImpl implements IApplicationService {
       }
     });
 
-    sortedFilters.addAll(filters);
-    return sortedFilters;
-  }
-
-  private boolean needToFilter(Collection<ISearchFilter> filters) {
     for (ISearchFilter filter : filters) {
       if (filter.isEnabled())
-        return true;
+        sortedFilters.add(filter);
     }
 
-    return false;
+    return sortedFilters;
   }
 
   private boolean needToIndex(Set<ISearchFilter> filters) {
@@ -281,17 +276,17 @@ public class ApplicationServiceImpl implements IApplicationService {
   private void runNewsFilters(final List<INews> news) throws Exception {
 
     /* Load Filters */
-    Set<ISearchFilter> filters = loadFilters();
+    Set<ISearchFilter> enabledFilters = loadEnabledFilters();
 
     /* Nothing to do */
-    if (!needToFilter(filters))
+    if (enabledFilters.isEmpty())
       return;
 
     /* Need to index News and perform Searches */
     RAMDirectory directory = null;
     final IndexSearcher[] searcher = new IndexSearcher[1];
-    if (needToIndex(filters)) {
-      boolean indexDescription = needToIndexDescription(filters);
+    if (needToIndex(enabledFilters)) {
+      boolean indexDescription = needToIndexDescription(enabledFilters);
       directory = new RAMDirectory();
       directory.setLockFactory(NoLockFactory.getNoLockFactory());
 
@@ -317,11 +312,7 @@ public class ApplicationServiceImpl implements IApplicationService {
     List<INews> filteredNews = new ArrayList<INews>(news.size());
 
     /* Iterate over Filters */
-    for (ISearchFilter filter : filters) {
-
-      /* Continue if filter is disabled */
-      if (!filter.isEnabled())
-        continue;
+    for (ISearchFilter filter : enabledFilters) {
 
       /* No Search Required */
       if (filter.matchAllNews()) {
@@ -358,9 +349,10 @@ public class ApplicationServiceImpl implements IApplicationService {
 
           /* Apply Filter */
           matchingNews.removeAll(filteredNews);
-          if (!matchingNews.isEmpty())
+          if (!matchingNews.isEmpty()) {
             applyFilter(filter, matchingNews);
-          filteredNews.addAll(matchingNews);
+            filteredNews.addAll(matchingNews);
+          }
         } catch (IOException e) {
           directory.close();
           throw e;
