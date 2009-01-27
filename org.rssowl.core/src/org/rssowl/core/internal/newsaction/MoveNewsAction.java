@@ -86,7 +86,7 @@ public class MoveNewsAction implements INewsAction {
 
     /* Set news as deleted */
     for (IEntity entity : entitiesToSave) {
-      ((INews) entity).setState(INews.State.HIDDEN);
+      ((INews) entity).setState(INews.State.DELETED);
     }
 
     return entitiesToSave;
