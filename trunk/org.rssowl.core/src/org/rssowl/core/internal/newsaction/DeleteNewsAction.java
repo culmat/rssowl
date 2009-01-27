@@ -46,7 +46,7 @@ public class DeleteNewsAction implements INewsAction {
 
     for (INews newsitem : news) {
       if (newsitem.isVisible()) {
-        newsitem.setState(INews.State.HIDDEN);
+        newsitem.setState(INews.State.DELETED);
         entitiesToSave.add(newsitem);
       }
     }
