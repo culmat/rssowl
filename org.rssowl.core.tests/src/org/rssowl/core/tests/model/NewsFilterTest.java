@@ -229,9 +229,9 @@ public class NewsFilterTest {
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, news.size());
-    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.HIDDEN)));
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.DELETED)));
     for (INews newsitem : news) {
-      assertEquals(INews.State.HIDDEN, newsitem.getState());
+      assertEquals(INews.State.DELETED, newsitem.getState());
     }
   }
 
@@ -318,9 +318,9 @@ public class NewsFilterTest {
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, news.size());
-    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.HIDDEN)));
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.DELETED)));
     for (INews newsitem : news) {
-      assertEquals(INews.State.HIDDEN, newsitem.getState());
+      assertEquals(INews.State.DELETED, newsitem.getState());
     }
 
     List<INews> binNews = bin.getNews();
@@ -369,9 +369,9 @@ public class NewsFilterTest {
 
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, news.size());
-    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.HIDDEN)));
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.DELETED)));
     for (INews newsitem : news) {
-      assertEquals(INews.State.HIDDEN, newsitem.getState());
+      assertEquals(INews.State.DELETED, newsitem.getState());
     }
 
     List<INews> binNews = bin.getNews();
@@ -655,7 +655,7 @@ public class NewsFilterTest {
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(4, news.size());
     assertEquals(2, bm.getNewsCount(EnumSet.of(INews.State.READ)));
-    assertEquals(1, bm.getNewsCount(EnumSet.of(INews.State.HIDDEN)));
+    assertEquals(1, bm.getNewsCount(EnumSet.of(INews.State.DELETED)));
     assertEquals(1, bm.getNewsCount(EnumSet.of(INews.State.NEW)));
     for (INews newsitem : news) {
       if (newsitem.equals(news1)) {
@@ -669,7 +669,7 @@ public class NewsFilterTest {
         assertTrue(!news2.getLabels().isEmpty());
         assertEquals(label, news2.getLabels().iterator().next());
       } else if (newsitem.equals(news3)) {
-        assertEquals(INews.State.HIDDEN, news3.getState());
+        assertEquals(INews.State.DELETED, news3.getState());
       } else if (newsitem.equals(news4)) {
         assertTrue(!news4.getLabels().isEmpty());
         assertEquals(label, news4.getLabels().iterator().next());
