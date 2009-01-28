@@ -157,7 +157,7 @@ public class CreateBookmarkWizard extends Wizard {
           String feedTitle = null;
           final URI[] link = new URI[1];
           try {
-            link[0] = new URI(linkText);
+            link[0] = new URI(URIUtils.fastEncode(linkText));
 
             /* Load Feed from Link if necessary */
             if (!URIUtils.looksLikeFeedLink(linkText)) {
@@ -277,7 +277,7 @@ public class CreateBookmarkWizard extends Wizard {
         linkVal = HTTP + linkVal;
       if (linkVal.endsWith("/")) //Strip trailing slashes
         linkVal = linkVal.substring(0, linkVal.length() - 1);
-      uriObj[0] = new URI(linkVal);
+      uriObj[0] = new URI(URIUtils.fastEncode(linkVal));
     }
 
     /* Load Title from Feed if not provided */

@@ -42,6 +42,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.actions.NewBookMarkAction;
 import org.rssowl.ui.internal.util.JobRunner;
 
@@ -121,7 +122,7 @@ public class Application implements IApplication {
       return false;
 
     try {
-      return Owl.getConnectionService().getHandler(new URI(link)) != null;
+      return Owl.getConnectionService().getHandler(new URI(URIUtils.fastEncode(link))) != null;
     } catch (ConnectionException e) {
       return false;
     } catch (URISyntaxException e) {
@@ -212,7 +213,7 @@ public class Application implements IApplication {
     /* Need a URI */
     URI linkAsURI;
     try {
-      linkAsURI = new URI(link);
+      linkAsURI = new URI(URIUtils.fastEncode(link));
     } catch (URISyntaxException e) {
       return null;
     }
