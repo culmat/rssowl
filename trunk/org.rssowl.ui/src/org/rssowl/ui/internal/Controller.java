@@ -137,6 +137,7 @@ public class Controller {
 
   /* Backup Files */
   private static final String DAILY_BACKUP = "subscriptions.opml";
+  private static final String BACKUP_TMP = "subscriptions.tmp";
   private static final String WEEKLY_BACKUP = "subscriptions_weekly.opml";
 
   /* Extension-Points */
@@ -876,9 +877,12 @@ public class Controller {
       root.mkdir();
 
     IPath dailyBackupPath = rootPath.append(DAILY_BACKUP);
+    IPath backupTmpPath = rootPath.append(BACKUP_TMP);
     IPath weeklyBackupPath = rootPath.append(WEEKLY_BACKUP);
 
     File dailyBackupFile = dailyBackupPath.toFile();
+    File backupTmpFile = backupTmpPath.toFile();
+    backupTmpFile.deleteOnExit();
     File weeklyBackupFile = weeklyBackupPath.toFile();
 
     if (dailyBackupFile.exists()) {
@@ -898,8 +902,15 @@ public class Controller {
     /* Create Daily Backup */
     try {
       Set<IFolder> rootFolders = CoreUtils.loadRootFolders();
-      if (!rootFolders.isEmpty())
-        new ExportFeedsAction().exportToOPML(dailyBackupFile, rootFolders);
+      if (!rootFolders.isEmpty()) {
+        new ExportFeedsAction().exportToOPML(backupTmpFile, rootFolders);
+
+        /* Rename to actual backup in a short op to avoid corrupt data */
+        if (!backupTmpFile.renameTo(dailyBackupFile)) {
+          dailyBackupFile.delete();
+          backupTmpFile.renameTo(dailyBackupFile);
+        }
+      }
     } catch (PersistenceException e) {
       Activator.getDefault().logError(e.getMessage(), e);
     } catch (IOException e) {
