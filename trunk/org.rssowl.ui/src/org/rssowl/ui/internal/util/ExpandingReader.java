@@ -207,37 +207,4 @@ public class ExpandingReader extends Reader {
 
     return i;
   }
-
-  //  public static void main(String[] args) throws IOException {
-  //    String html = "<div class=\"newsitem\">\r\n" +
-  //    		"<div class=\"header\">\r\n" +
-  //    		"<div class=\"title\">\r\n" +
-  //    		"<a href=\"http://www.rssowl.org/node/199\" class=\"read\">Feed Security and RSSOwl</a></div>\r\n" +
-  //    		"<div class=\"date\">\r\n" +
-  //    		"Montag, 7. August 2006 21:37</div>\r\n" +
-  //    		"<div class=\"author\">\r\n" +
-  //    		"bpasero</div>\r\n" +
-  //    		"</div>\r\n" +
-  //    		"<div class=\"content\">\r\n" +
-  //    		"As Nick already mentioned in his <a href=\"http://nick.typepad.com/blog/2006/08/feed_security_a.html\">Blog</a>,  the <a href=\"http://www.blackhat.com/html/bh-usa-06/bh-usa-06-index.html\">Black Hat USA 2006</a> brought up the topic about security issues in newsreaders. RSSOwl was <a href=\"http://news.com.com/2100-1002_3-6102171.html\">mentioned</a> to be vulnerable on malicious JavaScript coming from a newsfeed. I am going to work in that area for upcoming RSSOwl 1.2.2, but if you are really concerned about the Internet Explorer being used, you can always disable it in preferences and use an external Browser instead.\r\n" +
-  //    		"\r\n" +
-  //    		"For the future I am seriously looking into integrating Mozilla rather than the Internet Explorer.\r\n" +
-  //    		"\r\n" +
-  //    		"Ben</div>\r\n" +
-  //    		"<div class=\"footer\">\r\n" +
-  //    		"<div class=\"searchrelated\">\r\n" +
-  //    		"<span class=\"label\">Search related News:</span>\r\n" +
-  //    		"<a href=\"rssowl://org.rssowl.ui.search.Author?bpasero\" class=\"searchrelated\">bpasero</a></div>\r\n" +
-  //    		"</div>\r\n" +
-  //    		"</div>\r\n" +
-  //    		"";
-  //    StringBuilder b = new StringBuilder();
-  //    ExpandingReader reader = new ExpandingReader(new StringReader(html), Arrays.asList("explorer"), "<span style=\"background-color:rgb(255,255,0)\">", "</span>", true);
-  //
-  //    int i = 0;
-  //    while ((i = reader.read()) != -1)
-  //      b.append((char) i);
-  //
-  //    System.out.println(b);
-  //  }
 }
