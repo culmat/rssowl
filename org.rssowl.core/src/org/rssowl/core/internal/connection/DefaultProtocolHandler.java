@@ -725,7 +725,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
               if (!linkVal.contains("://"))
                 linkVal = linkVal.startsWith("/") ? website.toString() + linkVal : website.toString() + "/" + linkVal;
 
-              return new URI(linkVal);
+              return new URI(URIUtils.fastEncode(linkVal));
             }
           }
         }
