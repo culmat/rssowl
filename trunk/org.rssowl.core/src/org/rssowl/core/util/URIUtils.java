@@ -265,7 +265,7 @@ public class URIUtils {
     buf.append(host);
     buf.append("/favicon.ico"); //$NON-NLS-1$
 
-    return new URI(buf.toString());
+    return new URI(fastEncode(buf.toString()));
   }
 
   /**
