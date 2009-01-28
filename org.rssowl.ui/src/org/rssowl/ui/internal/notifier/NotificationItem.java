@@ -66,6 +66,12 @@ public abstract class NotificationItem implements Comparable<NotificationItem> {
   public abstract boolean supportsSticky();
 
   /**
+   * @return <code>true</code> if this item supports being marked as read and
+   * <code>false</code> otherwise.
+   */
+  public abstract boolean supportsMarkRead();
+
+  /**
    * @return <code>true</code> if the item is sticky and <code>false</code>
    * otherwise.
    */
@@ -76,6 +82,18 @@ public abstract class NotificationItem implements Comparable<NotificationItem> {
    * <code>false</code> otherwise.
    */
   public abstract void setSticky(boolean sticky);
+
+  /**
+   * @return <code>true</code> if the item is read, and <code>false</code>
+   * otherwise.
+   */
+  public abstract boolean isRead();
+
+  /**
+   * @param read <code>true</code> if the item is made read and
+   * <code>false</code> otherwise.
+   */
+  public abstract void setRead(boolean read);
 
   /**
    * @return The text of the item to show in the popup.

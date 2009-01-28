@@ -66,6 +66,7 @@ public class NewsNotificationItem extends NotificationItem {
   private final NewsReference fNewsReference;
   private final Date fRecentNewsDate;
   private boolean fIsNewsSticky;
+  private boolean fIsNewsRead;
   private String fCachedDescriptionExcerpt;
   private String fCachedOrigin;
   private RGB fColor;
@@ -90,6 +91,7 @@ public class NewsNotificationItem extends NotificationItem {
     fNewsReference = new NewsReference(news.getId());
     fRecentNewsDate = DateUtils.getRecentDate(news);
     fIsNewsSticky = news.isFlagged();
+    fIsNewsRead= (INews.State.READ == news.getState());
 
     if (color != null)
       fColor = color;
@@ -229,6 +231,34 @@ public class NewsNotificationItem extends NotificationItem {
     INews news = fNewsReference.resolve();
     news.setFlagged(sticky);
     DynamicDAO.save(news);
+  }
+
+  /*
+   * @see org.rssowl.ui.internal.notifier.NotificationItem#supportsMarkRead()
+   */
+  @Override
+  public boolean supportsMarkRead() {
+    return true;
+  }
+
+  /*
+   * @see org.rssowl.ui.internal.notifier.NotificationItem#setRead(boolean)
+   */
+  @Override
+  public void setRead(boolean read) {
+    fIsNewsRead = read;
+
+    INews news = fNewsReference.resolve();
+    news.setState(read ? INews.State.READ : INews.State.NEW);
+    DynamicDAO.save(news);
+  }
+
+  /*
+   * @see org.rssowl.ui.internal.notifier.NotificationItem#isRead()
+   */
+  @Override
+  public boolean isRead() {
+    return fIsNewsRead;
   }
 
   /*
