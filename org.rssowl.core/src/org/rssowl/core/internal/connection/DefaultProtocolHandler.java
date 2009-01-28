@@ -463,7 +463,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     /* Create the Get Method. Wrap any RuntimeException into an IOException */
     GetMethod getMethod = null;
     try {
-      getMethod = new GetMethod(escape(link.toString()));
+      getMethod = new GetMethod(link.toString());
     } catch (RuntimeException e) {
       throw new IOException(e.getMessage());
     }
@@ -487,16 +487,6 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
     /* Finally retrieve the InputStream from the respond body */
     return getMethod.getResponseBodyAsStream();
-  }
-
-  /* Workaround for bug 889 */
-  private String escape(String url) {
-    if (url.contains("[") || url.contains("]")) {
-      url = StringUtils.replaceAll(url, "[", "%5B");
-      url = StringUtils.replaceAll(url, "]", "%5D");
-    }
-
-    return url;
   }
 
   private InputStream pipeStream(InputStream inputStream, GetMethod getMethod) throws IOException {
