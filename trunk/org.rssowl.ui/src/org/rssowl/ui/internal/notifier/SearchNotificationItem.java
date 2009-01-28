@@ -111,6 +111,28 @@ public class SearchNotificationItem extends NotificationItem {
   }
 
   /*
+   * @see org.rssowl.ui.internal.notifier.NotificationItem#setRead(boolean)
+   */
+  @Override
+  public void setRead(boolean read) {}
+
+  /*
+   * @see org.rssowl.ui.internal.notifier.NotificationItem#isRead()
+   */
+  @Override
+  public boolean isRead() {
+    return false;
+  }
+
+  /*
+   * @see org.rssowl.ui.internal.notifier.NotificationItem#supportsMarkRead()
+   */
+  @Override
+  public boolean supportsMarkRead() {
+    return false;
+  }
+
+  /*
    * @see org.rssowl.ui.internal.notifier.NotificationItem#getDescription()
    */
   @Override

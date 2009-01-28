@@ -129,6 +129,8 @@ public class NotificationPopup extends PopupDialog {
   private int fItemLimit;
   private NotifierColors fNotifierColors;
   private Region fLastUsedRegion;
+  private Image fMarkReadIcon;
+  private Image fMarkReadDisabledIcon;
   private Image fItemStickyIcon;
   private Image fItemNonStickyIcon;
   private Image fItemNonStickyDisabledIcon;
@@ -440,7 +442,7 @@ public class NotificationPopup extends PopupDialog {
     itemLabel.setCursor(itemLabel.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
     itemLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     itemLabel.setText(item.getText());
-    itemLabel.setFont(fBoldTextFont);
+    itemLabel.setFont(item.isRead() ? fNormalTextFont : fBoldTextFont);
     updateItemColor(item, itemLabel);
     itemLabel.addMouseTrackListener(fMouseTrackListner);
 
@@ -482,6 +484,28 @@ public class NotificationPopup extends PopupDialog {
     itemLabel.addMouseListener(mouseListener);
     imageLabel.addMouseListener(mouseListener);
 
+    /* Offer Label to mark item read if content is shown */
+    if (fGlobalScope.getBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER)) {
+      CLabel markReadLabel = new CLabel(fInnerContentCircle, SWT.NONE);
+      markReadLabel.setImage(item.supportsMarkRead() ? fMarkReadIcon : fMarkReadDisabledIcon);
+      markReadLabel.setBackground(fInnerContentCircle.getBackground());
+      markReadLabel.addMouseTrackListener(fMouseTrackListner);
+      markReadLabel.setEnabled(item.supportsMarkRead());
+      markReadLabel.setCursor(fShell.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
+      markReadLabel.addMouseListener(new MouseAdapter() {
+        @Override
+        public void mouseDown(MouseEvent e) {
+          boolean newStateRead = !item.isRead();
+
+          /* Update Font */
+          itemLabel.setFont(newStateRead ? fNormalTextFont : fBoldTextFont);
+
+          /* Apply state */
+          item.setRead(newStateRead);
+        }
+      });
+    }
+
     /* Offer Label to mark item sticky */
     final CLabel markStickyLabel = new CLabel(fInnerContentCircle, SWT.NONE);
     markStickyLabel.setImage(item.supportsSticky() ? fItemNonStickyIcon : fItemNonStickyDisabledIcon);
@@ -520,7 +544,7 @@ public class NotificationPopup extends PopupDialog {
       final Composite descriptionContainer = new Composite(fInnerContentCircle, SWT.NONE);
       descriptionContainer.setLayout(LayoutUtils.createGridLayout(1));
       ((GridLayout) descriptionContainer.getLayout()).marginBottom = 5;
-      descriptionContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 3, 1));
+      descriptionContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 4, 1));
       descriptionContainer.addMouseTrackListener(fMouseTrackListner);
       descriptionContainer.setBackground(fInnerContentCircle.getBackground());
       descriptionContainer.addPaintListener(new PaintListener() {
@@ -571,6 +595,8 @@ public class NotificationPopup extends PopupDialog {
     /* Icons */
     fCloseImageNormal = OwlUI.getImage(fResources, "icons/etool16/close_normal.png");
     fCloseImagePressed = OwlUI.getImage(fResources, "icons/etool16/close_pressed.png");
+    fMarkReadIcon = OwlUI.getImage(fResources, "icons/elcl16/mark_read.gif");
+    fMarkReadDisabledIcon = OwlUI.getImage(fResources, "icons/dlcl16/mark_read.gif");
     fItemStickyIcon = OwlUI.getImage(fResources, OwlUI.NEWS_PINNED);
     fItemNonStickyIcon = OwlUI.getImage(fResources, OwlUI.NEWS_PIN);
     fItemNonStickyDisabledIcon = OwlUI.getImage(fResources, "icons/obj16/news_pin_disabled.gif");
@@ -717,7 +743,7 @@ public class NotificationPopup extends PopupDialog {
     /* Inner composite containing the content controlls */
     fInnerContentCircle = new Composite(middleContentCircle, SWT.NO_FOCUS);
     fInnerContentCircle.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    fInnerContentCircle.setLayout(LayoutUtils.createGridLayout(3, 0, 5, 0, 0, false));
+    fInnerContentCircle.setLayout(LayoutUtils.createGridLayout(fGlobalScope.getBoolean(DefaultPreferences.SHOW_EXCERPT_IN_NOTIFIER) ? 4 : 3, 0, 5, 0, 0, false));
     ((GridLayout) fInnerContentCircle.getLayout()).marginLeft = 5;
     ((GridLayout) fInnerContentCircle.getLayout()).marginRight = 2;
     fInnerContentCircle.addMouseTrackListener(fMouseTrackListner);
