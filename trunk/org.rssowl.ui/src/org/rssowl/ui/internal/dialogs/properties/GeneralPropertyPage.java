@@ -351,7 +351,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
         @Override
         protected void runInBackground(IProgressMonitor monitor) {
           try {
-            URI link = new URI(linkText);
+            URI link = new URI(URIUtils.fastEncode(linkText));
             fLabel = Owl.getConnectionService().getLabel(link);
           } catch (ConnectionException e) {
             /* Ignore */
@@ -504,7 +504,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       }
 
       /* Append "http" to Link if missing */
-      String uriAsString = fFeedInput.getText();
+      String uriAsString = URIUtils.fastEncode(fFeedInput.getText());
       if (URIUtils.looksLikeLink(uriAsString)) {
         if (!uriAsString.contains("://"))
           uriAsString = "http://" + uriAsString;
