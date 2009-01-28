@@ -842,7 +842,7 @@ public class CoreUtils {
         String value = cond.getValue().toString();
 
         /* Ignore Wildcard Only Values (e.g. search for Labels) */
-        if (value == "?" || value == "*")
+        if ("?".equals(value) || "*".equals(value))
           continue;
 
         /* Ignore Wildcards if set */
