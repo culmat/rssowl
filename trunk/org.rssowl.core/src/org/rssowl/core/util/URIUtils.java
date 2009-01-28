@@ -50,6 +50,10 @@ public class URIUtils {
   /** Common Newsfeed Extensions with leading Dot */
   private static final String[] FEED_EXTENSIONS_DOTTED = new String[] { ".rss", ".rdf", ".xml", ".atom", ".feed" };
 
+  /* Used when encoding a URL in a fast way */
+  private static final String[] CHARS_TO_ENCODE = new String[] { " ", "[", "]", "{", "}", "|", "^", "\\", "<", ">" };
+  private static final String[] ENCODED_CHARS = new String[] { "%20", "%5B", "%5D", "%7B", "%7D", "%7C", "%5E", "%5C", "%3C", "%3E" };
+
   /* This utility class constructor is hidden */
   private URIUtils() {
   // Protect default constructor
@@ -226,8 +230,8 @@ public class URIUtils {
   }
 
   /**
-   * Returns a new <code>URI</code> from the given one, that potentially
-   * points to the favicon.ico.
+   * Returns a new <code>URI</code> from the given one, that potentially points
+   * to the favicon.ico.
    *
    * @param link The Link to look for a favicon.
    * @param rewriteHost If <code>TRUE</code>, change the host for a better
@@ -278,5 +282,18 @@ public class URIUtils {
         return urlDecode(parts[parts.length - 1]);
     }
     return uri.toASCIIString();
+  }
+
+  /**
+   * @param url the link to encode.
+   * @return the encoded link.
+   */
+  public static String fastEncode(String url) {
+    for (int i = 0; i < CHARS_TO_ENCODE.length; i++) {
+      if (url.contains(CHARS_TO_ENCODE[i]))
+        url = StringUtils.replaceAll(url, CHARS_TO_ENCODE[i], ENCODED_CHARS[i]);
+    }
+
+    return url;
   }
 }
