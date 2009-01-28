@@ -1588,7 +1588,7 @@ public class BookMarkExplorer extends ViewPart {
       i++;
     }
     /* Add the ID of the current selected Set to make it Unique */
-    String key = PREF_EXPANDED_NODES + fSelectedBookMarkSet;
+    String key = PREF_EXPANDED_NODES + fSelectedBookMarkSet.getId();
 
     IPreference pref = fPrefDAO.loadOrCreate(key);
     pref.putLongs(elements);
@@ -1626,7 +1626,7 @@ public class BookMarkExplorer extends ViewPart {
 
   /* Expanded Elements - Use ID of selected Set to make it Unique */
   private void loadExpandedElements() {
-    IPreference pref = fPrefDAO.load(PREF_EXPANDED_NODES + fSelectedBookMarkSet);
+    IPreference pref = fPrefDAO.load(PREF_EXPANDED_NODES + fSelectedBookMarkSet.getId());
     if (pref != null) {
       for (long element : pref.getLongs())
         fExpandedNodes.add(element);
