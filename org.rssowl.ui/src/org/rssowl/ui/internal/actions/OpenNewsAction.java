@@ -166,7 +166,8 @@ public class OpenNewsAction extends Action {
     if (existingEditor != null && existingEditor instanceof FeedView) {
       feedview = (FeedView) existingEditor;
 
-      /* Set Selection */
+      /* Set Selection and bring to front */
+      existingEditor.getSite().getPage().activate(existingEditor);
       feedview.setSelection(new StructuredSelection(news));
     }
 
