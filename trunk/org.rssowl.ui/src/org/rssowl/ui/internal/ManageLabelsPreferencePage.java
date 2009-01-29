@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.TreeItem;
@@ -74,6 +75,7 @@ import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.dialogs.ConfirmDialog;
+import org.rssowl.ui.internal.dialogs.NewsFiltersListDialog;
 import org.rssowl.ui.internal.util.ColorPicker;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -294,6 +296,25 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
     /* Button Box */
     createButtons(container);
+
+    /* Info Container */
+    Composite infoContainer = new Composite(container, SWT.None);
+    infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+
+    Label infoImg = new Label(infoContainer, SWT.NONE);
+    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
+    infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    Link infoText = new Link(infoContainer, SWT.WRAP);
+    infoText.setText("You can automatically assign labels to news by adding <a>News Filters</a>.");
+    infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+    infoText.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        new NewsFiltersListDialog(getShell()).open();
+      }
+    });
 
     return container;
   }
