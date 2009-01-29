@@ -476,8 +476,10 @@ public class NotificationPopup extends PopupDialog {
           doClose();
 
         /* Indicate the item is marked as read now */
-        else
+        else {
+          item.setRead(true);
           itemLabel.setFont(fNormalTextFont);
+        }
       }
     };
 
