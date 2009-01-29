@@ -133,6 +133,7 @@ import org.rssowl.ui.internal.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
+import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
@@ -163,8 +164,8 @@ import java.util.Set;
 
 /**
  * The <code>SearchNewsDialog</code> allows to define a number of
- * <code>ISearchCondition</code>s to search in all News. The result is given
- * out in a Table-Control below.
+ * <code>ISearchCondition</code>s to search in all News. The result is given out
+ * in a Table-Control below.
  * <p>
  * TODO Unfortunately this Dialog copies a lot of existing code from
  * NewsTableControl
@@ -569,8 +570,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
   /**
    * @param parentShell
    * @param initialConditions A List of Conditions that should show initially.
-   * @param matchAllConditions If <code>TRUE</code>, require all conditions
-   * to match, <code>FALSE</code> otherwise.
+   * @param matchAllConditions If <code>TRUE</code>, require all conditions to
+   * match, <code>FALSE</code> otherwise.
    * @param runSearch If <code>TRUE</code>, run the search after the dialog
    * opened.
    */
@@ -1072,7 +1073,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
           /* Preload some results that are known to be shown initially */
           preload(fResult);
         } catch (PersistenceException e) {
-          fException= e;
+          fException = e;
         }
       }
 
@@ -1082,7 +1083,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
         /* Check for error first */
         if (fException != null) {
           setErrorMessage(fException.getMessage());
-          fResult= Collections.emptyList();
+          fResult = Collections.emptyList();
         }
 
         /* Set Input (sorted) to Viewer */
@@ -1485,6 +1486,44 @@ public class SearchNewsDialog extends TitleAreaDialog {
           /* Show only when internal browser is used */
           if (!selection.isEmpty() && !fPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
             manager.add(new OpenInExternalBrowserAction(selection));
+        }
+
+        /* Move To / Copy To */
+        if (!selection.isEmpty()) {
+          manager.add(new Separator("movecopy"));
+
+          /* Load all news bins and sort by name */
+          List<INewsBin> newsbins = new ArrayList<INewsBin>(DynamicDAO.loadAll(INewsBin.class));
+
+          Comparator<INewsBin> comparator = new Comparator<INewsBin>() {
+            public int compare(INewsBin o1, INewsBin o2) {
+              return o1.getName().compareTo(o2.getName());
+            };
+          };
+
+          Collections.sort(newsbins, comparator);
+
+          /* Move To */
+          MenuManager moveMenu = new MenuManager("Move To", "moveto");
+          manager.add(moveMenu);
+
+          for (INewsBin bin : newsbins) {
+            moveMenu.add(new MoveCopyNewsToBinAction(selection, bin, true));
+          }
+
+          moveMenu.add(new Separator("movetonewbin"));
+          moveMenu.add(new MoveCopyNewsToBinAction(selection, null, true));
+
+          /* Copy To */
+          MenuManager copyMenu = new MenuManager("Copy To", "copyto");
+          manager.add(copyMenu);
+
+          for (INewsBin bin : newsbins) {
+            copyMenu.add(new MoveCopyNewsToBinAction(selection, bin, false));
+          }
+
+          copyMenu.add(new Separator("copytonewbin"));
+          copyMenu.add(new MoveCopyNewsToBinAction(selection, null, false));
         }
 
         /* Mark / Label */
