@@ -172,7 +172,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     });
 
     final Button deleteButton = new Button(buttonBox, SWT.PUSH);
-    deleteButton.setText("&Delete");
+    deleteButton.setText("&Delete...");
     deleteButton.setEnabled(!fViewer.getSelection().isEmpty());
     setButtonLayoutData(deleteButton);
     deleteButton.addSelectionListener(new SelectionAdapter() {
