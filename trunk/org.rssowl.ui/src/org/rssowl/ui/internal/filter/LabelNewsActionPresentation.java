@@ -24,22 +24,33 @@
 
 package org.rssowl.ui.internal.filter;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.rssowl.core.Owl;
 import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.filter.INewsActionPresentation;
+import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.dialogs.LabelDialog;
+import org.rssowl.ui.internal.dialogs.LabelDialog.DialogMode;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * An implementation of {@link INewsActionPresentation} to select a Label.
@@ -50,6 +61,7 @@ public class LabelNewsActionPresentation implements INewsActionPresentation {
   private Combo fLabelCombo;
   private ComboViewer fViewer;
   private Composite fContainer;
+  private static final Object NEW_LABEL_MARKER = new Object();
 
   /*
    * @see org.rssowl.ui.IFilterActionPresentation#create(org.eclipse.swt.widgets.Composite, java.lang.Object)
@@ -69,12 +81,23 @@ public class LabelNewsActionPresentation implements INewsActionPresentation {
     fViewer.setLabelProvider(new LabelProvider() {
       @Override
       public String getText(Object element) {
+        if (element == NEW_LABEL_MARKER)
+          return "New Label...";
         return ((ILabel) element).getName();
       }
     });
 
+    fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      public void selectionChanged(SelectionChangedEvent event) {
+        IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+        if (NEW_LABEL_MARKER == selection.getFirstElement())
+          onCreateLabel();
+      }
+    });
+
+    /* Set Input */
     Collection<ILabel> labels = CoreUtils.loadSortedLabels();
-    fViewer.setInput(labels);
+    updateInput(labels);
 
     /* Set Selection */
     if (fLabelCombo.getItemCount() > 0) {
@@ -90,6 +113,30 @@ public class LabelNewsActionPresentation implements INewsActionPresentation {
       if (fLabelCombo.getSelectionIndex() == -1)
         fLabelCombo.select(0);
     }
+  }
+
+  private void updateInput(Collection<ILabel> labels) {
+    List<Object> input = new ArrayList<Object>();
+    input.addAll(labels);
+    input.add(NEW_LABEL_MARKER);
+    fViewer.setInput(input);
+  }
+
+  private void onCreateLabel() {
+    LabelDialog dialog = new LabelDialog(fContainer.getShell(), DialogMode.ADD, null);
+    if (dialog.open() == IDialogConstants.OK_ID) {
+      String name = dialog.getName();
+      RGB color = dialog.getColor();
+
+      ILabel newLabel = Owl.getModelFactory().createLabel(null, name);
+      newLabel.setColor(OwlUI.toString(color));
+      newLabel.setOrder(fViewer.getCombo().getItemCount() - 1); // Do not count Marker
+      DynamicDAO.save(newLabel);
+
+      updateInput(CoreUtils.loadSortedLabels());
+      fViewer.setSelection(new StructuredSelection(newLabel));
+    } else
+      fLabelCombo.select(0);
   }
 
   /*
