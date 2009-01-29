@@ -151,6 +151,10 @@ public class LabelNewsActionPresentation implements INewsActionPresentation {
    */
   public Long getData() {
     IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
-    return ((ILabel) selection.getFirstElement()).getId();
+    Object object = selection.getFirstElement();
+    if (object instanceof ILabel)
+      return ((ILabel) selection.getFirstElement()).getId();
+
+    return null;
   }
 }
