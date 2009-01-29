@@ -32,9 +32,10 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbenchPage;
-import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.OwlUI;
@@ -103,19 +104,30 @@ public class OpenNewsAction extends Action {
     int openedEditors = 0;
     int maxOpenEditors = EditorUtils.getOpenEditorLimit();
 
-    /* Convert selection to List of News (1 per Feed) */
+    /* Convert selection to List of News (1 per Feed and Bin) */
     List<?> list = fSelection.toList();
-    List<FeedLinkReference> handledFeeds = new ArrayList<FeedLinkReference>(list.size());
+    List<FeedLinkReference> handledFeeds = new ArrayList<FeedLinkReference>(list.size() / 2);
+    List<Long> handledBins = new ArrayList<Long>(list.size() / 2);
     List<INews> newsToOpen = new ArrayList<INews>(list.size());
     for (Object selection : list) {
       if (selection instanceof INews) {
         INews news = (INews) selection;
-        FeedLinkReference feedRef = news.getFeedReference();
 
-        /* Check if already Handled */
-        if (!handledFeeds.contains(feedRef)) {
-          newsToOpen.add(news);
-          handledFeeds.add(feedRef);
+        /* News in a Bin */
+        if (news.getParentId() != 0) {
+          if (!handledBins.contains(news.getParentId())) {
+            newsToOpen.add(news);
+            handledBins.add(news.getParentId());
+          }
+        }
+
+        /* News in a Feed */
+        else {
+          FeedLinkReference feedRef = news.getFeedReference();
+          if (!handledFeeds.contains(feedRef)) {
+            newsToOpen.add(news);
+            handledFeeds.add(feedRef);
+          }
         }
       }
     }
@@ -127,34 +139,39 @@ public class OpenNewsAction extends Action {
     /* Open Bookmarks belonging to the News */
     for (int i = 0; i < newsToOpen.size() && openedEditors < maxOpenEditors; i++) {
       INews news = newsToOpen.get(i);
+      INewsMark newsmark;
+      if (news.getParentId() != 0)
+        newsmark = new NewsBinReference(news.getParentId()).resolve();
+      else
+        newsmark = CoreUtils.getBookMark(news.getFeedReference());
 
-      /* Receive the first Bookmark belonging to the News and open it */
-      IBookMark bookmark = CoreUtils.getBookMark(news.getFeedReference());
-      if (bookmark != null) {
-
-        /* Select this News in the FeedView */
-        PerformAfterInputSet perform = PerformAfterInputSet.selectNews(new NewsReference(news.getId()));
-        perform.setActivate(false);
-
-        /* Open this Bookmark */
-        FeedViewInput fvInput = new FeedViewInput(bookmark, perform);
-        FeedView feedview = null;
-
-        /* First check if input already shown */
-        IEditorPart existingEditor = page.findEditor(fvInput);
-        if (existingEditor != null && existingEditor instanceof FeedView) {
-          feedview = (FeedView) existingEditor;
-
-          /* Set Selection */
-          feedview.setSelection(new StructuredSelection(news));
-        }
-
-        /* Otherwise open the Input in a new Editor */
-        else
-          OwlUI.openInFeedView(page, new StructuredSelection(bookmark), true, perform);
-
+      /* Open and Select */
+      if (newsmark != null) {
+        openAndSelect(page, news, newsmark);
         openedEditors++;
       }
     }
+  }
+
+  private void openAndSelect(IWorkbenchPage page, INews news, INewsMark newsmark) {
+    PerformAfterInputSet perform = PerformAfterInputSet.selectNews(new NewsReference(news.getId()));
+    perform.setActivate(false);
+
+    /* Open this Bookmark */
+    FeedViewInput fvInput = new FeedViewInput(newsmark, perform);
+    FeedView feedview = null;
+
+    /* First check if input already shown */
+    IEditorPart existingEditor = page.findEditor(fvInput);
+    if (existingEditor != null && existingEditor instanceof FeedView) {
+      feedview = (FeedView) existingEditor;
+
+      /* Set Selection */
+      feedview.setSelection(new StructuredSelection(news));
+    }
+
+    /* Otherwise open the Input in a new Editor */
+    else
+      OwlUI.openInFeedView(page, new StructuredSelection(newsmark), true, perform);
   }
 }
