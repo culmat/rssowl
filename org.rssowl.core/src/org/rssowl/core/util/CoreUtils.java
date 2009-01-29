@@ -233,7 +233,7 @@ public class CoreUtils {
       for (ISearchCondition locationCondition : locationConditions) {
         List<IFolderChild> locations = toEntities((Long[][]) locationCondition.getValue());
         for (IFolderChild location : locations) {
-          name.append(location.getName()).append(", ");
+          name.append("'").append(location.getName()).append("', ");
         }
       }
 
