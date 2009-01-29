@@ -468,17 +468,17 @@ public class NotificationPopup extends PopupDialog {
       @Override
       public void mouseUp(MouseEvent e) {
 
-        /* Open Item */
-        item.open(e);
-
-        /* Close Popup if required */
-        if (fGlobalScope.getBoolean(DefaultPreferences.CLOSE_NOTIFIER_ON_OPEN))
+        /* Close Popup if required after opening */
+        if (fGlobalScope.getBoolean(DefaultPreferences.CLOSE_NOTIFIER_ON_OPEN)) {
+          item.open(e);
           doClose();
+        }
 
-        /* Indicate the item is marked as read now */
+        /* Indicate the item is marked as read now and open */
         else {
           item.setRead(true);
           itemLabel.setFont(fNormalTextFont);
+          item.open(e);
         }
       }
     };
