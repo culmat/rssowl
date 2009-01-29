@@ -481,6 +481,8 @@ public class LocationControl extends Composite {
         fViewer.refresh();
         fViewer.expandAll();
         fViewer.setSelection(new StructuredSelection(newsbin), true);
+        fViewer.setChecked(newsbin, true);
+        fCheckedElementsCache.add(newsbin);
       }
     }
 
