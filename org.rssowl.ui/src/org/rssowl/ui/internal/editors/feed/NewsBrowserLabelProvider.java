@@ -463,12 +463,16 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         div(footer, "label");
 
         /* Label */
-        span(footer, "Label:", "label");
+        span(footer, labels.size() > 1 ? "Labels:" : "Label:", "label");
 
         /* Append Labels to Footer */
+        int c = 0;
         for (ILabel label : labels) {
-          String labelColor = label.getColor();
-          span(footer, label.getName(), "label", labelColor);
+          c++;
+          if (c < labels.size())
+            span(footer, label.getName() + ", ", "label", label.getColor());
+          else
+            span(footer, label.getName(), "label", label.getColor());
         }
 
         /* Close: NewsItem/Footer/Label */
