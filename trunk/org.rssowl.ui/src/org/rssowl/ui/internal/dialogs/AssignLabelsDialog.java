@@ -187,6 +187,7 @@ public class AssignLabelsDialog extends Dialog {
       public void run() {
         if (!fLabelsInput.isDisposed()) {
           Set<String> values = DynamicDAO.getDAO(ICategoryDAO.class).loadAllNames();
+          values.addAll(fExistingLabelNames);
 
           /* Apply Proposals */
           if (!fLabelsInput.isDisposed())
