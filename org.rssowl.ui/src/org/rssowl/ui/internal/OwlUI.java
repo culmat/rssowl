@@ -1270,6 +1270,17 @@ public class OwlUI {
    * @return Pair
    */
   public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Text text, Collection<String> values, boolean decorate) {
+    return hookAutoComplete(text, new TextContentAdapter(), values, decorate);
+  }
+
+  /**
+   * @param text
+   * @param textContentAdapter
+   * @param values
+   * @param decorate
+   * @return Pair
+   */
+  public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Text text, TextContentAdapter textContentAdapter, Collection<String> values, boolean decorate) {
 
     /* Show UI Hint that Content Assist is available */
     if (decorate) {
@@ -1285,7 +1296,7 @@ public class OwlUI {
     /* Create Content Proposal Adapter */
     SimpleContentProposalProvider proposalProvider = new SimpleContentProposalProvider(new String[0]);
     proposalProvider.setFiltering(true);
-    final ContentProposalAdapter adapter = new ContentProposalAdapter(text, new TextContentAdapter(), proposalProvider, activationKey, null);
+    final ContentProposalAdapter adapter = new ContentProposalAdapter(text, textContentAdapter, proposalProvider, activationKey, null);
     adapter.setPropagateKeys(true);
     adapter.setAutoActivationDelay(500);
     adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
