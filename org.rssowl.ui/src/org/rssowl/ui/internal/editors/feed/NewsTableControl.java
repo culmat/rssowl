@@ -887,28 +887,29 @@ public class NewsTableControl implements IFeedViewPart {
             MenuManager labelMenu = new MenuManager("Label");
             manager.appendToGroup("mark", labelMenu);
 
-            /* Retrieve Labels that all selected News contain */
-            Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(selection);
-
-            LabelAction removeAllLabels = new LabelAction(null, selection);
-            removeAllLabels.setEnabled(!labels.isEmpty());
-            labelMenu.add(removeAllLabels);
-            labelMenu.add(new Separator());
-
-            for (final ILabel label : labels) {
-              LabelAction labelAction = new LabelAction(label, selection);
-              labelAction.setChecked(selectedLabels.contains(label));
-              labelMenu.add(labelAction);
-            }
-
-            labelMenu.add(new Separator());
-            labelMenu.add(new AssignLabelsAction(fEditorSite.getShell(), selection));
+            /* Assign / Organize Labels */
+            labelMenu.add(new AssignLabelsAction(fViewer.getTree().getShell(), selection));
             labelMenu.add(new Action("Organize Labels...") {
               @Override
               public void run() {
                 PreferencesUtil.createPreferenceDialogOn(fViewer.getTree().getShell(), ManageLabelsPreferencePage.ID, null, null).open();
               }
             });
+            labelMenu.add(new Separator());
+
+            /* Retrieve Labels that all selected News contain */
+            Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(selection);
+            for (final ILabel label : labels) {
+              LabelAction labelAction = new LabelAction(label, selection);
+              labelAction.setChecked(selectedLabels.contains(label));
+              labelMenu.add(labelAction);
+            }
+
+            /* Remove All Labels */
+            labelMenu.add(new Separator());
+            LabelAction removeAllLabels = new LabelAction(null, selection);
+            removeAllLabels.setEnabled(!labels.isEmpty());
+            labelMenu.add(removeAllLabels);
           }
         }
 
