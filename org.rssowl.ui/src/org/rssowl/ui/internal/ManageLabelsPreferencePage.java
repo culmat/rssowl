@@ -70,6 +70,7 @@ import org.rssowl.ui.internal.dialogs.LabelDialog;
 import org.rssowl.ui.internal.dialogs.NewsFiltersListDialog;
 import org.rssowl.ui.internal.dialogs.LabelDialog.DialogMode;
 import org.rssowl.ui.internal.util.LayoutUtils;
+import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -323,23 +324,30 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
   private void onDelete() {
     IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
     if (!selection.isEmpty()) {
-      ILabel label = (ILabel) selection.getFirstElement();
+      List<ILabel> selectedLabels = ModelUtils.getEntities(selection, ILabel.class);
 
-      String msg = "Are you sure you want to delete the Label '" + label.getName() + "'?";
+      String msg;
+      if (selectedLabels.size() == 1)
+        msg = "Are you sure you want to delete the Label '" + selectedLabels.get(0).getName() + "'?";
+      else
+        msg = "Are you sure you want to delete " + selectedLabels.size() + " Labels?";
+
       ConfirmDialog dialog = new ConfirmDialog(getShell(), "Confirm Delete", "This action can not be undone", msg, null);
       if (dialog.open() == IDialogConstants.OK_ID) {
+        for (ILabel label : selectedLabels) {
 
-        /* Remove Label from any News containing it */
-        Collection<INews> affectedNews = findNewsWithLabel(label);
-        for (INews news : affectedNews) {
-          news.removeLabel(label);
+          /* Remove Label from any News containing it */
+          Collection<INews> affectedNews = findNewsWithLabel(label);
+          for (INews news : affectedNews) {
+            news.removeLabel(label);
+          }
+
+          Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+          DynamicDAO.saveAll(affectedNews);
         }
 
-        Controller.getDefault().getSavedSearchService().forceQuickUpdate();
-        DynamicDAO.saveAll(affectedNews);
-
         /* Delete Label from DB */
-        DynamicDAO.delete(label);
+        DynamicDAO.deleteAll(selectedLabels);
         fViewer.refresh();
       }
     }
@@ -365,7 +373,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
   }
 
   private void createViewer(Composite container) {
-    fViewer = new TreeViewer(container, SWT.FULL_SELECTION | SWT.BORDER | SWT.SINGLE);
+    fViewer = new TreeViewer(container, SWT.FULL_SELECTION | SWT.BORDER | SWT.MULTI);
     fViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fViewer.getTree().setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
 
