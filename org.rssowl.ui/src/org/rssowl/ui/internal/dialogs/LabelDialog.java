@@ -5,11 +5,15 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
@@ -40,6 +44,9 @@ public class LabelDialog extends Dialog {
   private String fName;
   private Collection<ILabel> fAllLabels;
   private ColorPicker fColorPicker;
+  private Label fInfoImg;
+  private Label fInfoText;
+  private ResourceManager fResources = new LocalResourceManager(JFaceResources.getResources());
 
   /** Supported Modes of the Label Dialog */
   public enum DialogMode {
@@ -67,7 +74,7 @@ public class LabelDialog extends Dialog {
    * @return the name of the label.
    */
   public String getName() {
-    return fName;
+    return fName != null ? fName.trim() : null;
   }
 
   /**
@@ -78,6 +85,15 @@ public class LabelDialog extends Dialog {
   }
 
   /*
+   * @see org.eclipse.jface.dialogs.Dialog#close()
+   */
+  @Override
+  public boolean close() {
+    fResources.dispose();
+    return super.close();
+  }
+
+  /*
    * @see org.eclipse.jface.dialogs.Dialog#createDialogArea(org.eclipse.swt.widgets.Composite)
    */
   @Override
@@ -85,19 +101,6 @@ public class LabelDialog extends Dialog {
     Composite composite = new Composite(parent, SWT.NONE);
     composite.setLayout(LayoutUtils.createGridLayout(2, 10, 10));
     composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-    /* Label */
-    Label label = new Label(composite, SWT.None);
-    label.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-
-    switch (fMode) {
-      case ADD:
-        label.setText("Please enter the name and color for the new Label:");
-        break;
-      case EDIT:
-        label.setText("Please update the name and color for this Label:");
-        break;
-    }
 
     /* Name */
     if (fMode == DialogMode.ADD || fMode == DialogMode.EDIT) {
@@ -146,20 +149,68 @@ public class LabelDialog extends Dialog {
         fColorPicker.setColor(OwlUI.getRGB(fExistingLabel));
     }
 
+    /* Info Container */
+    Composite infoContainer = new Composite(composite, SWT.None);
+    infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+    infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    ((GridLayout) infoContainer.getLayout()).marginTop = 15;
+
+    fInfoImg = new Label(infoContainer, SWT.NONE);
+    fInfoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    fInfoText = new Label(infoContainer, SWT.WRAP);
+    fInfoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+    showInfo();
+
     return composite;
+  }
+
+  private void showInfo() {
+    switch (fMode) {
+      case ADD:
+        fInfoText.setText("Please enter the name and color for the new Label.");
+        break;
+      case EDIT:
+        fInfoText.setText("Please update the name and color for this Label.");
+        break;
+    }
+
+    fInfoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
+    fInfoImg.getParent().layout();
+  }
+
+  private void showError(String msg) {
+    fInfoText.setText(msg);
+    fInfoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/error.gif"));
+    fInfoImg.getParent().layout();
   }
 
   private void onModifyName() {
     boolean labelExists = false;
+    String inputValue = fNameInput.getText().trim().toLowerCase();
 
+    /* Disallow comma in the Name for a Label */
+    if (inputValue.contains(",")) {
+      getButton(IDialogConstants.OK_ID).setEnabled(false);
+      showError("A comma is not allowed in the name for a Label.");
+      return;
+    }
+
+    /* Check if Label exists already */
     for (ILabel label : fAllLabels) {
-      if (label.getName().equals(fNameInput.getText()) && label != fExistingLabel) {
+      if (label.getName().toLowerCase().equals(inputValue) && label != fExistingLabel) {
         labelExists = true;
         break;
       }
     }
 
+    /* Disable OK Button if Label exists */
     getButton(IDialogConstants.OK_ID).setEnabled(!labelExists && fNameInput.getText().length() > 0);
+    if (labelExists)
+      showError("A Label with this name already exists.");
+    else
+      showInfo();
   }
 
   /*
