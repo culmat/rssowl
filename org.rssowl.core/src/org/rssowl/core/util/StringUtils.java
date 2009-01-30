@@ -30,7 +30,9 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Utility Class for working with <code>Strings</code>.
@@ -199,6 +201,25 @@ public class StringUtils {
     }
 
     return true;
+  }
+
+  /**
+   * This method does exactly the same as String.replaceAll() with the
+   * difference that no regular expressions are used to perform the replacement.
+   *
+   * @param strings The source Strings to search and replace
+   * @param search The search term that should get replaced
+   * @param replace The value that replaces the search term
+   * @return Set The new Strings with all replaced search terms
+   */
+  public static Set<String> replaceAll(Set<String> strings, String search, String replace) {
+    Set<String> replacedStrings = new HashSet<String>(strings.size());
+
+    for (String string : strings) {
+      replacedStrings.add(replaceAll(string, search, replace));
+    }
+
+    return replacedStrings;
   }
 
   /**
