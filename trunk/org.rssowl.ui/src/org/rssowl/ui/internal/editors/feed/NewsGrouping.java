@@ -470,7 +470,7 @@ public class NewsGrouping {
     for (Object object : input) {
       if (object instanceof INews) {
         INews news = (INews) object;
-        Set<ILabel> labels = news.getLabels();
+        Set<ILabel> labels = CoreUtils.getSortedLabels(news);
         EntityGroup group = gDefault;
 
         if (!labels.isEmpty()) {

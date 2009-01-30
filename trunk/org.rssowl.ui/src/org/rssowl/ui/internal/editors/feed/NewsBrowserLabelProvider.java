@@ -305,7 +305,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     boolean hasLink = news.getLinkAsText() != null;
     State state = news.getState();
     boolean isUnread = (state == State.NEW || state == State.UPDATED || state == State.UNREAD);
-    Set<ILabel> labels = news.getLabels();
+    Set<ILabel> labels = CoreUtils.getSortedLabels(news);
     String color = !labels.isEmpty() ? labels.iterator().next().getColor() : null;
 
     /* DIV: NewsItem */
