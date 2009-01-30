@@ -131,6 +131,7 @@ import org.rssowl.ui.internal.CTable;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.actions.AssignLabelsAction;
 import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
@@ -1568,7 +1569,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
             }
 
             labelMenu.add(new Separator());
-            labelMenu.add(new Action("Organize...") {
+            labelMenu.add(new AssignLabelsAction(getShell(), selection));
+            labelMenu.add(new Action("Organize Labels...") {
               @Override
               public void run() {
                 PreferencesUtil.createPreferenceDialogOn(fResultViewer.getTable().getShell(), ManageLabelsPreferencePage.ID, null, null).open();

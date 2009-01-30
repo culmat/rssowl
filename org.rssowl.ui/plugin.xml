@@ -749,6 +749,13 @@
             id="org.rssowl.ui.LabelAction4"
             name="Label News 5">
       </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.handler.AssignLabelsHandler"
+            description="Assign Labels for a selection of News"
+            id="org.rssowl.ui.AssignLabels"
+            name="Assign Labels">
+      </command>
    </extension>
    <extension
          id="product"
@@ -911,6 +918,12 @@
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.rssowl.ui.KeyScheme"
             sequence="M1+5">
+      </key>
+      <key
+            commandId="org.rssowl.ui.AssignLabels"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1+L">
       </key>
    </extension>
    <extension

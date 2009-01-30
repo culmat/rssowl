@@ -106,6 +106,7 @@ import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.StatusLineUpdater;
+import org.rssowl.ui.internal.actions.AssignLabelsAction;
 import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
@@ -901,7 +902,8 @@ public class NewsTableControl implements IFeedViewPart {
             }
 
             labelMenu.add(new Separator());
-            labelMenu.add(new Action("Organize...") {
+            labelMenu.add(new AssignLabelsAction(fEditorSite.getShell(), selection));
+            labelMenu.add(new Action("Organize Labels...") {
               @Override
               public void run() {
                 PreferencesUtil.createPreferenceDialogOn(fViewer.getTree().getShell(), ManageLabelsPreferencePage.ID, null, null).open();
