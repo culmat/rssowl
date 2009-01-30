@@ -368,7 +368,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
     /* Handle INews */
     else if (element instanceof INews) {
-      Set<ILabel> labels = ((INews) element).getLabels();
+      Set<ILabel> labels = CoreUtils.getSortedLabels((INews)element);
       if (!labels.isEmpty())
         return OwlUI.getColor(fResources, labels.iterator().next());
     }
@@ -416,7 +416,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     /* Handle selected News (Linux: Note Bug 444) */
     if (!news.isFlagged() && (event.detail & SWT.SELECTED) != 0) {
 
-      Set<ILabel> labels = news.getLabels();
+      Set<ILabel> labels = CoreUtils.getSortedLabels(news);
       /* Some conditions under which we don't override the selection color */
       if (labels.isEmpty() || !scrollable.isFocusControl())
         return;

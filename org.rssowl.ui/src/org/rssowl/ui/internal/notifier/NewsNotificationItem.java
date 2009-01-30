@@ -96,7 +96,7 @@ public class NewsNotificationItem extends NotificationItem {
     if (color != null)
       fColor = color;
     else {
-      Set<ILabel> labels = news.getLabels();
+      Set<ILabel> labels = CoreUtils.getSortedLabels(news);
       if (!labels.isEmpty())
         fColor = OwlUI.getRGB(labels.iterator().next());
     }
