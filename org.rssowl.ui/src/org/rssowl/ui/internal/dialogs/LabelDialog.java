@@ -24,6 +24,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.ICategoryDAO;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.ColorPicker;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -130,6 +131,7 @@ public class LabelDialog extends Dialog {
         public void run() {
           if (!fNameInput.isDisposed()) {
             Set<String> values = DynamicDAO.getDAO(ICategoryDAO.class).loadAllNames();
+            values= StringUtils.replaceAll(values, ",", " "); // Comma not allowed for Labels
 
             /* Apply Proposals */
             if (!fNameInput.isDisposed())

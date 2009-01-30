@@ -26,6 +26,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.ICategoryDAO;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -187,7 +188,7 @@ public class AssignLabelsDialog extends Dialog {
       public void run() {
         if (!fLabelsInput.isDisposed()) {
           Set<String> values = DynamicDAO.getDAO(ICategoryDAO.class).loadAllNames();
-          values.addAll(fExistingLabelNames);
+          values= StringUtils.replaceAll(values, ",", " "); // Comma not allowed for Labels
 
           /* Apply Proposals */
           if (!fLabelsInput.isDisposed())
