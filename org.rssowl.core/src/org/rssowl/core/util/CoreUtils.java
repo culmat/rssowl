@@ -921,4 +921,30 @@ public class CoreUtils {
 
     return labels;
   }
+
+  /**
+   * @param news the news to obtain the labels from.
+   * @return all labels sorted by their sort value from the given news or an
+   * empty {@link Set} if none.
+   */
+  public static Set<ILabel> getSortedLabels(INews news) {
+    Set<ILabel> newsLabels = news.getLabels();
+    if (newsLabels.isEmpty())
+      return newsLabels;
+
+    /* Sort by Sort Key to respect order */
+    Set<ILabel> labels = new TreeSet<ILabel>(new Comparator<ILabel>() {
+      public int compare(ILabel l1, ILabel l2) {
+        if (l1.equals(l2))
+          return 0;
+
+        return l1.getOrder() < l2.getOrder() ? -1 : 1;
+      }
+    });
+
+    /* Add Labels */
+    labels.addAll(newsLabels);
+
+    return labels;
+  }
 }
