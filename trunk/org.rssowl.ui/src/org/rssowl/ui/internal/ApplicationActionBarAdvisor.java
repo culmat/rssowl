@@ -62,6 +62,7 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.ui.internal.actions.AssignLabelsAction;
 import org.rssowl.ui.internal.actions.CopyLinkAction;
 import org.rssowl.ui.internal.actions.CreateFilterAction;
 import org.rssowl.ui.internal.actions.FindAction;
@@ -607,7 +608,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             }
 
             labelMenu.add(new Separator());
-            labelMenu.add(new Action("Organize...") {
+            labelMenu.add(new AssignLabelsAction(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), selection));
+            labelMenu.add(new Action("Organize Labels...") {
               @Override
               public void run() {
                 PreferencesUtil.createPreferenceDialogOn(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), ManageLabelsPreferencePage.ID, null, null).open();
