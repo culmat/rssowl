@@ -59,10 +59,11 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author bpasero
@@ -286,7 +287,11 @@ public class FeedDefinitionPage extends WizardPage {
     JobRunner.runDelayedInBackgroundThread(new Runnable() {
       public void run() {
         if (!fKeywordInput.isDisposed()) {
-          Set<String> values = new HashSet<String>();
+          Set<String> values = new TreeSet<String>(new Comparator<String>() {
+            public int compare(String o1, String o2) {
+              return o1.compareToIgnoreCase(o2);
+            }
+          });
 
           values.addAll(DynamicDAO.getDAO(ICategoryDAO.class).loadAllNames());
 

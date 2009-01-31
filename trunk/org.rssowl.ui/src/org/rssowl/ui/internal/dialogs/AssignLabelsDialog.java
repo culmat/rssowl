@@ -187,8 +187,16 @@ public class AssignLabelsDialog extends Dialog {
     JobRunner.runDelayedInBackgroundThread(new Runnable() {
       public void run() {
         if (!fLabelsInput.isDisposed()) {
-          Set<String> values = DynamicDAO.getDAO(ICategoryDAO.class).loadAllNames();
-          values= StringUtils.replaceAll(values, ",", " "); // Comma not allowed for Labels
+          Set<String> values = new TreeSet<String>(new Comparator<String>() {
+            public int compare(String o1, String o2) {
+              return o1.compareToIgnoreCase(o2);
+            }
+          });
+
+          Set<String> categoryNames = DynamicDAO.getDAO(ICategoryDAO.class).loadAllNames();
+          categoryNames = StringUtils.replaceAll(categoryNames, ",", " "); // Comma not allowed for Labels
+
+          values.addAll(categoryNames);
 
           /* Apply Proposals */
           if (!fLabelsInput.isDisposed())
