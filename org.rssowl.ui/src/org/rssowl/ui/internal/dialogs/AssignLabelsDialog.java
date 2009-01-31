@@ -194,7 +194,6 @@ public class AssignLabelsDialog extends Dialog {
       }
 
       @Override
-      //TODO Replace all between the commas!
       public void insertControlContents(Control control, String textToInsert, int cursorPosition) {
         String text = fLabelsInput.getText();
 
@@ -204,25 +203,30 @@ public class AssignLabelsDialog extends Dialog {
 
         /* Replace All: No Comma Found */
         if (previousCommaIndex == -1 && nextCommaIndex == -1) {
-          fLabelsInput.setText(textToInsert + ", ");
-          fLabelsInput.setSelection(fLabelsInput.getText().length());
-          return;
+          text = textToInsert + ", ";
         }
 
-        /* TODO Previous Comma Found */
+        /* Replace All beginning with Previous Comma  */
         else if (previousCommaIndex != -1 && nextCommaIndex == -1) {
-
+          text = text.substring(0, previousCommaIndex);
+          text = text + ", " + textToInsert + ", ";
         }
 
-        /* TODO Next Comma Found */
+        /* Replace all from beginning till Next Comma */
         else if (previousCommaIndex == -1 && nextCommaIndex != -1) {
-
+          text = textToInsert + text.substring(nextCommaIndex);
         }
 
-        /* TODO Previous and Next Comma Found */
-        else  {
+        /* Replace all from previous Comma till next Comma */
+        else {
+          String leftHand = text.substring(0, previousCommaIndex);
+          String rightHand = text.substring(nextCommaIndex);
 
+          text = leftHand + ", " + textToInsert + rightHand;
         }
+
+        fLabelsInput.setText(text);
+        fLabelsInput.setSelection(fLabelsInput.getText().length());
       }
     };
 
