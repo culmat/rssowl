@@ -92,7 +92,7 @@ import java.util.Set;
 public class ManageSetsDialog extends TitleAreaDialog {
 
   /* Keep the visible instance saved */
-  private static ManageSetsDialog fVisibleInstance;
+  private static ManageSetsDialog fgVisibleInstance;
 
   private LocalResourceManager fResources;
   private TableViewer fViewer;
@@ -117,7 +117,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
    * <code>NULL</code> in case no instance is currently open.
    */
   public static ManageSetsDialog getVisibleInstance() {
-    return fVisibleInstance;
+    return fgVisibleInstance;
   }
 
   /*
@@ -125,7 +125,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
    */
   @Override
   public int open() {
-    fVisibleInstance = this;
+    fgVisibleInstance = this;
     registerListeners();
     return super.open();
   }
@@ -153,7 +153,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
   @Override
   public boolean close() {
     unregisterListeners();
-    fVisibleInstance = null;
+    fgVisibleInstance = null;
     fResources.dispose();
     return super.close();
   }

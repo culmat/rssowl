@@ -80,6 +80,7 @@ import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.CColumnLayoutData;
 import org.rssowl.ui.internal.CTable;
 import org.rssowl.ui.internal.OwlUI;
@@ -111,6 +112,9 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
   /* Number of News to process in a forced Filter run at once */
   private static final int FILTER_CHUNK_SIZE = 50;
 
+  /* Keep the visible instance saved */
+  private static NewsFiltersListDialog fgVisibleInstance;
+
   private NewsActionPresentationManager fNewsActionPresentationManager = NewsActionPresentationManager.getInstance();
   private LocalResourceManager fResources;
   private CheckboxTableViewer fViewer;
@@ -133,12 +137,30 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     fSearchFilterDao = DynamicDAO.getDAO(ISearchFilterDAO.class);
   }
 
+  /**
+   * @return Returns an instance of <code>NewsFiltersListDialog</code> or
+   * <code>NULL</code> in case no instance is currently open.
+   */
+  public static NewsFiltersListDialog getVisibleInstance() {
+    return fgVisibleInstance;
+  }
+
+  /*
+   * @see org.eclipse.jface.window.Window#open()
+   */
+  @Override
+  public int open() {
+    fgVisibleInstance = this;
+    return super.open();
+  }
+
   /*
    * @see org.eclipse.jface.dialogs.TrayDialog#close()
    */
   @Override
   public boolean close() {
     boolean res = super.close();
+    fgVisibleInstance = null;
     fResources.dispose();
     return res;
   }
@@ -324,9 +346,6 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
         onApplySelectedFilter();
       }
     });
-
-    /* Separator */
-    new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Update Title Message */
     updateTitle();
@@ -530,11 +549,11 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
   }
 
   /*
-   * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+   * @see org.eclipse.jface.dialogs.TrayDialog#createButtonBar(org.eclipse.swt.widgets.Composite)
    */
   @Override
-  protected void createButtonsForButtonBar(Composite parent) {
-    createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
+  protected Control createButtonBar(Composite parent) {
+    return null;
   }
 
   private void updateMoveEnablement() {
@@ -669,6 +688,18 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
    */
   public void setSelection(ISearchFilter filter) {
     fSelectedFilter = filter;
+    if (fViewer != null)
+      fViewer.setSelection(new StructuredSelection(fSelectedFilter), true);
+  }
+
+  /**
+   * Refresh the list of displayed Filters.
+   */
+  public void refresh() {
+    if (fViewer != null) {
+      fViewer.refresh();
+      updateCheckedState();
+    }
   }
 
   /*
@@ -677,5 +708,19 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
   @Override
   protected boolean isResizable() {
     return true;
+  }
+
+  /*
+   * @see org.eclipse.jface.window.Window#getShellStyle()
+   */
+  @Override
+  protected int getShellStyle() {
+    int style = SWT.TITLE | SWT.BORDER | getDefaultOrientation();
+
+    /* Follow Apple's Human Interface Guidelines for Application Modal Dialogs */
+    if (!Application.IS_MAC)
+      style |= SWT.CLOSE;
+
+    return style;
   }
 }

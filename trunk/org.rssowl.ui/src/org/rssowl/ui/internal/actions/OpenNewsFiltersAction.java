@@ -54,7 +54,13 @@ public class OpenNewsFiltersAction implements IWorkbenchWindowActionDelegate {
    * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
    */
   public void run(IAction action) {
-    new NewsFiltersListDialog(fWindow.getShell()).open();
+    NewsFiltersListDialog dialog = NewsFiltersListDialog.getVisibleInstance();
+    if (dialog == null) {
+      dialog = new NewsFiltersListDialog(fWindow.getShell());
+      dialog.open();
+    } else {
+      dialog.getShell().forceActive();
+    }
   }
 
   /*
