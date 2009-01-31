@@ -162,6 +162,17 @@ public class AssignLabelsDialog extends Dialog {
         if (selectionOffset == 0)
           return "";
 
+        int previousCommaIndex = getPreviousCommaIndex(text, selectionOffset);
+
+        /* No Previous Comma Found - Return from Beginning */
+        if (previousCommaIndex == -1)
+          return text.substring(0, selectionOffset).trim();
+
+        /* Previous Comma Found - Return from Comma *///TODO What if , is last char in text field?
+        return text.substring(previousCommaIndex + 1, selectionOffset).trim();
+      }
+
+      private int getPreviousCommaIndex(String text, int selectionOffset) {
         int previousCommaIndex = -1;
         for (int i = 0; i < text.length(); i++) {
           if (i == selectionOffset)
@@ -170,13 +181,48 @@ public class AssignLabelsDialog extends Dialog {
           if (text.charAt(i) == ',')
             previousCommaIndex = i;
         }
+        return previousCommaIndex;
+      }
 
-        return text.substring(previousCommaIndex + 1, selectionOffset).trim();
+      private int getNextCommaIndex(String text, int selectionOffset) {
+        int nextCommaIndex = -1;
+        for (int i = selectionOffset + 1; i < text.length(); i++) {
+          if (text.charAt(i) == ',')
+            return i;
+        }
+        return nextCommaIndex;
       }
 
       @Override
-      public void insertControlContents(Control control, String text, int cursorPosition) {
-      //TODO Implement accordingly!
+      //TODO Replace all between the commas!
+      public void insertControlContents(Control control, String textToInsert, int cursorPosition) {
+        String text = fLabelsInput.getText();
+
+        int selectionOffset = fLabelsInput.getSelection().x;
+        int previousCommaIndex = getPreviousCommaIndex(text, selectionOffset);
+        int nextCommaIndex = getNextCommaIndex(text, selectionOffset);
+
+        /* Replace All: No Comma Found */
+        if (previousCommaIndex == -1 && nextCommaIndex == -1) {
+          fLabelsInput.setText(textToInsert + ", ");
+          fLabelsInput.setSelection(fLabelsInput.getText().length());
+          return;
+        }
+
+        /* TODO Previous Comma Found */
+        else if (previousCommaIndex != -1 && nextCommaIndex == -1) {
+
+        }
+
+        /* TODO Next Comma Found */
+        else if (previousCommaIndex == -1 && nextCommaIndex != -1) {
+
+        }
+
+        /* TODO Previous and Next Comma Found */
+        else  {
+
+        }
       }
     };
 
