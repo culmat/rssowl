@@ -68,10 +68,12 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * The <code>SearchConditionItem</code> is an item of the
@@ -481,13 +483,18 @@ public class SearchConditionItem extends Composite {
             JobRunner.runDelayedInBackgroundThread(new Runnable() {
               public void run() {
                 if (!text.isDisposed()) {
-                  Set<String> values = null;
+                  Set<String> values = new TreeSet<String>(new Comparator<String>() {
+                    public int compare(String o1, String o2) {
+                      return o1.compareToIgnoreCase(o2);
+                    }
+                  });
+
                   if (field.getId() == INews.CATEGORIES)
-                    values = fDaoService.getCategoryDAO().loadAllNames();
+                    values.addAll(fDaoService.getCategoryDAO().loadAllNames());
                   else if (field.getId() == INews.AUTHOR)
-                    values = fDaoService.getPersonDAO().loadAllNames();
+                    values.addAll(fDaoService.getPersonDAO().loadAllNames());
                   else if (field.getId() == INews.FEED)
-                    values = CoreUtils.getFeedLinks();
+                    values.addAll(CoreUtils.getFeedLinks());
 
                   /* Apply Proposals */
                   if (!text.isDisposed())
