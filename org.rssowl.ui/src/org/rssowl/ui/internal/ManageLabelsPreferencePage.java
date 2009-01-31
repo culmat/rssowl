@@ -139,7 +139,13 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     infoText.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        new NewsFiltersListDialog(getShell()).open();
+        NewsFiltersListDialog dialog = NewsFiltersListDialog.getVisibleInstance();
+        if (dialog == null) {
+          dialog = new NewsFiltersListDialog(getShell());
+          dialog.open();
+        } else {
+          dialog.getShell().forceActive();
+        }
       }
     });
 

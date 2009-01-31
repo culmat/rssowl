@@ -86,9 +86,16 @@ public class CreateFilterAction implements IObjectActionDelegate {
         dialog.setFilterPosition(existingFilters.size());
 
       if (dialog.open() == IDialogConstants.OK_ID) {
-        NewsFiltersListDialog filterListDialog = new NewsFiltersListDialog(shell);
-        filterListDialog.setSelection(dialog.getFilter());
-        filterListDialog.open();
+        NewsFiltersListDialog filterListDialog = NewsFiltersListDialog.getVisibleInstance();
+        if (filterListDialog == null) {
+          filterListDialog = new NewsFiltersListDialog(shell);
+          filterListDialog.setSelection(dialog.getFilter());
+          filterListDialog.open();
+        } else {
+          filterListDialog.refresh();
+          filterListDialog.setSelection(dialog.getFilter());
+          filterListDialog.getShell().forceActive();
+        }
       }
     }
   }
