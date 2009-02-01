@@ -41,6 +41,7 @@ import org.rssowl.core.persist.event.SearchMarkListener;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.BatchedBuffer;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.ApplicationWorkbenchAdvisor;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
@@ -203,6 +204,10 @@ public class NotificationService {
 
     /* Return if Notification is disabled */
     if (!fGlobalPreferences.getBoolean(DefaultPreferences.SHOW_NOTIFICATION_POPUP))
+      return;
+
+    /* Return if events are not containing any NEW News */
+    if (!CoreUtils.containsState(events, INews.State.NEW))
       return;
 
     /* Filter Events if user decided to show Notifier only for selected Elements */
