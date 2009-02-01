@@ -224,7 +224,7 @@ public class NotificationService {
     List<NotificationItem> items = new ArrayList<NotificationItem>(events.size());
     for (NewsEvent event : events) {
       INews news = event.getEntity();
-      if (news.getParentId() == 0) //Don't show notifier for copied/moved news
+      if (news.isVisible() && news.getParentId() == 0) //Don't show notifier for deleted or copied/moved news
         items.add(new NewsNotificationItem(news));
     }
 
@@ -245,7 +245,7 @@ public class NotificationService {
     Set<NewsEvent> filteredEvents = new HashSet<NewsEvent>();
 
     for (NewsEvent event : events) {
-      if (enabledFeeds.contains(event.getEntity().getFeedReference()))
+      if (event.getEntity().isVisible() && enabledFeeds.contains(event.getEntity().getFeedReference()))
         filteredEvents.add(event);
     }
 
