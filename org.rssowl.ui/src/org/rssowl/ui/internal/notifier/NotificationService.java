@@ -224,7 +224,7 @@ public class NotificationService {
     List<NotificationItem> items = new ArrayList<NotificationItem>(events.size());
     for (NewsEvent event : events) {
       INews news = event.getEntity();
-      if (news.isVisible() && news.getParentId() == 0) //Don't show notifier for deleted or copied/moved news
+      if (news.getState().equals(INews.State.NEW)) //Only show NEW news in Notifier
         items.add(new NewsNotificationItem(news));
     }
 
