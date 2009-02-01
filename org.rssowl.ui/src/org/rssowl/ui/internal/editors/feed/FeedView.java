@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IPartListener2;
@@ -491,6 +492,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     if (!(fInput.getMark() instanceof FolderNewsMark))
       return;
 
+    final IEditorPart activeFeedView = fEditorSite.getPage().getActiveEditor();
     FolderNewsMark folderNewsMark = (FolderNewsMark) (fInput.getMark());
     for (FolderEvent event : events) {
       final IFolder folder = event.getEntity();
@@ -498,7 +500,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
         JobRunner.runInUIThread(fParent, new Runnable() {
           public void run() {
             setPartName(folder.getName());
-            OwlUI.updateWindowTitle(new IMark[] { fInput.getMark() });
+            if (activeFeedView == FeedView.this)
+              OwlUI.updateWindowTitle(new IMark[] { fInput.getMark() });
           }
         });
 
@@ -523,13 +526,15 @@ public class FeedView extends EditorPart implements IReusableEditor {
   }
 
   private void onNewsMarksUpdated(Set<? extends MarkEvent> events) {
+    final IEditorPart activeFeedView = fEditorSite.getPage().getActiveEditor();
     for (MarkEvent event : events) {
       final IMark mark = event.getEntity();
       if (mark.getId().equals(fInput.getMark().getId())) {
         JobRunner.runInUIThread(fParent, new Runnable() {
           public void run() {
             setPartName(mark.getName());
-            OwlUI.updateWindowTitle(new IMark[] { fInput.getMark() });
+            if (activeFeedView == FeedView.this)
+              OwlUI.updateWindowTitle(new IMark[] { fInput.getMark() });
           }
         });
 
