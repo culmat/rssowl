@@ -947,4 +947,20 @@ public class CoreUtils {
 
     return labels;
   }
+
+  /**
+   * @param events a {@link Set} of news events.
+   * @param state the {@link State} to search for.
+   * @return <code>true</code> if any of the events has the given state and
+   * <code>false</code> otherwise.
+   */
+  public static boolean containsState(Set<NewsEvent> events, INews.State state) {
+    for (NewsEvent event : events) {
+      INews entity = event.getEntity();
+      if (entity != null && entity.getState() == state)
+        return true;
+    }
+
+    return false;
+  }
 }
