@@ -29,6 +29,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.util.DateUtils;
@@ -277,6 +278,10 @@ public class BookMarkGrouping {
 
     /* In case the Grouping is not active at all */
     if (fType == Type.NO_GROUPING)
+      return false;
+
+    /* Early return for News */
+    if (entityClass.equals(INews.class))
       return false;
 
     /* Folder Event (e.g. Mark deleted) */

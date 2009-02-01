@@ -204,8 +204,18 @@ public class BookMarkFilter extends ViewerFilter {
     if (fMatcher == null && fType == Type.SHOW_ALL)
       return false;
 
+    /* News Event */
+    if (entityClass.equals(INews.class)) {
+      if (fType == Type.SHOW_NEW)
+        return CoreUtils.isNewStateChange(events);
+      else if (fType == Type.SHOW_UNREAD)
+        return CoreUtils.isReadStateChange(events);
+      else if (fType == Type.SHOW_STICKY)
+        return CoreUtils.isStickyStateChange(events);
+    }
+
     /* Bookmark Event */
-    if (IBookMark.class.isAssignableFrom(entityClass)) {
+    else if (IBookMark.class.isAssignableFrom(entityClass)) {
       if (fMatcher != null)
         return true;
 
@@ -220,16 +230,6 @@ public class BookMarkFilter extends ViewerFilter {
 
       if (fType == Type.SHOW_NEW || fType == Type.SHOW_UNREAD)
         return true;
-    }
-
-    /* News Event */
-    else if (entityClass.equals(INews.class)) {
-      if (fType == Type.SHOW_NEW)
-        return CoreUtils.isNewStateChange(events);
-      else if (fType == Type.SHOW_UNREAD)
-        return CoreUtils.isReadStateChange(events);
-      else if (fType == Type.SHOW_STICKY)
-        return CoreUtils.isStickyStateChange(events);
     }
 
     return false;
@@ -293,8 +293,7 @@ public class BookMarkFilter extends ViewerFilter {
    * @param element the tree element to check
    * @return true if the given element's label matches the filter text
    */
-  protected boolean isLeafMatch(@SuppressWarnings("unused")
-  Viewer viewer, Object element) {
+  protected boolean isLeafMatch(@SuppressWarnings("unused") Viewer viewer, Object element) {
 
     /* Element is a News Mark */
     if (element instanceof INewsMark) {
@@ -408,8 +407,8 @@ public class BookMarkFilter extends ViewerFilter {
    * critera.
    *
    * @param text the text to match
-   * @return boolean <code>true</code> if one of the words in text satisifes
-   * the match criteria.
+   * @return boolean <code>true</code> if one of the words in text satisifes the
+   * match criteria.
    */
   protected boolean wordMatches(String text) {
     if (text == null)
