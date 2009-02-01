@@ -57,6 +57,7 @@ import java.util.List;
 public class OpenNewsAction extends Action {
   private IStructuredSelection fSelection;
   private Shell fShellToMinimize;
+  private boolean fRestoreWindow;
 
   /**
    * @param selection
@@ -76,6 +77,14 @@ public class OpenNewsAction extends Action {
     fShellToMinimize = shellToMinimize;
 
     setText("Open");
+  }
+
+  /**
+   * @param restoreWindow <code>true</code> if the window should be restored and
+   * <code>false</code> otherwise.
+   */
+  public void setRestoreWindow(boolean restoreWindow) {
+    fRestoreWindow = restoreWindow;
   }
 
   /*
@@ -100,6 +109,10 @@ public class OpenNewsAction extends Action {
     IWorkbenchPage page = OwlUI.getPage();
     if (page == null)
       return;
+
+    /* Restore Window */
+    if (fRestoreWindow)
+      OwlUI.restoreWindow(page);
 
     int openedEditors = 0;
     int maxOpenEditors = EditorUtils.getOpenEditorLimit();
