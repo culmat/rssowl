@@ -83,7 +83,8 @@ public class Indexer {
   private static class DefaultAnalyzer extends KeywordAnalyzer {
 
     /*
-     * @see org.apache.lucene.analysis.KeywordAnalyzer#tokenStream(java.lang.String,
+     * @see
+     * org.apache.lucene.analysis.KeywordAnalyzer#tokenStream(java.lang.String,
      * java.io.Reader)
      */
     @Override
@@ -114,7 +115,7 @@ public class Indexer {
 
   /**
    * TODO Provide generic method that can deal with any entity!
-   *
+   * 
    * @param entities
    * @param isUpdate
    */
@@ -153,8 +154,8 @@ public class Indexer {
      * Change the fFlushRequired field at the end. This increases concurrency
      * slightly by allowing some minor staleness. More concretely if a reader
      * performs a search while index is taking place for the first time since
-     * the last flush, it will just use the current searcher instead of blocking.
-     * This is similar to what is done in removeFromIndex.
+     * the last flush, it will just use the current searcher instead of
+     * blocking. This is similar to what is done in removeFromIndex.
      */
     if (docCount > 0) {
       fFlushRequired = true;
@@ -166,7 +167,7 @@ public class Indexer {
 
   /**
    * TODO Provide generic method that can deal with any Event!
-   *
+   * 
    * @param entities
    * @throws IOException
    */
@@ -229,12 +230,15 @@ public class Indexer {
    * be called if the information stored in the persistence layer has been
    * cleared with a method that does not issue events for the elements that are
    * removed.
-   *
+   * 
    * @throws IOException
    */
   synchronized void clearIndex() throws IOException {
     dispose();
-    /* Database got cleared, so we don't need to worry about syncing these values */
+    /*
+     * Database got cleared, so we don't need to worry about syncing these
+     * values
+     */
     fUncommittedNews.clear();
     if (IndexReader.indexExists(fIndexDirectory))
       fIndexWriter = createIndexWriter(fIndexDirectory, true);
@@ -242,7 +246,7 @@ public class Indexer {
 
   /**
    * Optimizes the Lucene Index.
-   *
+   * 
    * @throws CorruptIndexException
    * @throws IOException
    */
@@ -253,9 +257,9 @@ public class Indexer {
   /**
    * Creates the <code>Analyzer</code> that is used for all analyzation of
    * Fields and Queries.
-   *
-   * @return Returns the <code>Analyzer</code> that is used for all
-   * analyzation of Fields and Queries.
+   * 
+   * @return Returns the <code>Analyzer</code> that is used for all analyzation
+   * of Fields and Queries.
    */
   public static Analyzer createAnalyzer() {
     PerFieldAnalyzerWrapper analyzer = new PerFieldAnalyzerWrapper(new DefaultAnalyzer());
@@ -316,9 +320,17 @@ public class Indexer {
     List<IndexingTask> indexingTasks = new ArrayList<IndexingTask>(3);
     if (dao != null) {
       EntityIdsByEventType outstandingNewsIds = dao.load();
-      indexingTasks.add(new IndexingTask(Indexer.this, EventType.PERSIST, outstandingNewsIds.getPersistedEntityRefs()));
-      indexingTasks.add(new IndexingTask(Indexer.this, EventType.UPDATE, outstandingNewsIds.getUpdatedEntityRefs()));
-      indexingTasks.add(new IndexingTask(Indexer.this, EventType.REMOVE, outstandingNewsIds.getRemovedEntityRefs()));
+      List<NewsReference> persistedEntityRefs = outstandingNewsIds.getPersistedEntityRefs();
+      if (!persistedEntityRefs.isEmpty())
+        indexingTasks.add(new IndexingTask(Indexer.this, EventType.PERSIST, persistedEntityRefs));
+
+      List<NewsReference> updatedEntityRefs = outstandingNewsIds.getUpdatedEntityRefs();
+      if (!updatedEntityRefs.isEmpty())
+        indexingTasks.add(new IndexingTask(Indexer.this, EventType.UPDATE, updatedEntityRefs));
+
+      List<NewsReference> removedEntityRefs = outstandingNewsIds.getRemovedEntityRefs();
+      if (!removedEntityRefs.isEmpty())
+        indexingTasks.add(new IndexingTask(Indexer.this, EventType.REMOVE, removedEntityRefs));
     }
     return indexingTasks;
   }
