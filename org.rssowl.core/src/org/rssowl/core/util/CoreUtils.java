@@ -467,7 +467,7 @@ public class CoreUtils {
       if (event instanceof NewsEvent) {
         NewsEvent newsEvent = (NewsEvent) event;
         boolean oldSticky = (newsEvent.getOldNews() != null) ? newsEvent.getOldNews().isFlagged() : false;
-        boolean currentSticky = newsEvent.getEntity().isFlagged();
+        boolean currentSticky = newsEvent.getEntity().isVisible() && newsEvent.getEntity().isFlagged();
 
         /* Only return true if sticky state is now TRUE */
         if (onlyHasBecomeSticky) {
