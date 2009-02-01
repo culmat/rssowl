@@ -29,9 +29,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.ui.IEditorPart;
-import org.eclipse.ui.IEditorReference;
-import org.eclipse.ui.IWorkbenchPage;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
@@ -43,9 +40,7 @@ import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
-import org.rssowl.ui.internal.editors.feed.FeedView;
-import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
-import org.rssowl.ui.internal.util.EditorUtils;
+import org.rssowl.ui.internal.actions.OpenNewsAction;
 
 import java.util.Date;
 import java.util.Set;
@@ -91,7 +86,7 @@ public class NewsNotificationItem extends NotificationItem {
     fNewsReference = new NewsReference(news.getId());
     fRecentNewsDate = DateUtils.getRecentDate(news);
     fIsNewsSticky = news.isFlagged();
-    fIsNewsRead= (INews.State.READ == news.getState());
+    fIsNewsRead = (INews.State.READ == news.getState());
 
     if (color != null)
       fColor = color;
@@ -178,30 +173,16 @@ public class NewsNotificationItem extends NotificationItem {
     /* Open Link in Browser if Modifier Key is pressed */
     if ((e.stateMask & SWT.MOD1) != 0) {
       new OpenInBrowserAction(new StructuredSelection(fNewsLink)).run();
-      return;
     }
 
-    /* Otherwise open Feedview and select the News */
-    IBookMark bookMark = CoreUtils.getBookMark(fFeedReference);
-    IWorkbenchPage page = OwlUI.getPage();
-    if (page != null) {
-
-      /* Restore Window */
-      OwlUI.restoreWindow(page);
-
-      /* First try if the Bookmark is already visible */
-      IEditorReference editorRef = EditorUtils.findEditor(page.getEditorReferences(), bookMark);
-      if (editorRef != null) {
-        IEditorPart editor = editorRef.getEditor(false);
-        if (editor instanceof FeedView) {
-          ((FeedView) editor).setSelection(new StructuredSelection(fNewsReference));
-          page.activate(editor);
-        }
+    /* Open Link in Feed View */
+    else {
+      INews news = fNewsReference.resolve();
+      if (news != null) {
+        OpenNewsAction action = new OpenNewsAction(new StructuredSelection(news));
+        action.setRestoreWindow(true);
+        action.run();
       }
-
-      /* Otherwise Open */
-      else
-        OwlUI.openInFeedView(page, new StructuredSelection(bookMark), false, PerformAfterInputSet.selectNews(fNewsReference));
     }
   }
 
