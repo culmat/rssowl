@@ -669,11 +669,16 @@ public class BookMarkContentProvider implements ITreeContentProvider {
     /* Group by Feed and Bins */
     Set<FeedLinkReference> affectedFeeds = new HashSet<FeedLinkReference>();
     Set<IFolder> affectedBinFolders = new HashSet<IFolder>();
+    Set<Long> handledBins = new HashSet<Long>();
     for (NewsEvent event : events) {
       INews news = event.getEntity();
-      if (news.getParentId() != 0)
-        affectedBinFolders.add(newsBinDao.load(news.getParentId()).getParent());
-      else
+      long parentId = news.getParentId();
+      if (parentId != 0) {
+        if (!handledBins.contains(parentId)) {
+          affectedBinFolders.add(newsBinDao.load(parentId).getParent());
+          handledBins.add(parentId);
+        }
+      } else
         affectedFeeds.add(news.getFeedReference());
     }
 
@@ -760,22 +765,24 @@ public class BookMarkContentProvider implements ITreeContentProvider {
 
   private boolean requiresUpdate(Set<NewsEvent> events) {
     for (NewsEvent newsEvent : events) {
+      INews oldNews = newsEvent.getOldNews();
+      INews currentNews = newsEvent.getEntity();
 
       /* Check Change in New-State */
-      boolean oldStateNew = INews.State.NEW.equals(newsEvent.getOldNews() != null ? newsEvent.getOldNews().getState() : null);
-      boolean currentStateNew = INews.State.NEW.equals(newsEvent.getEntity().getState());
+      boolean oldStateNew = INews.State.NEW.equals(oldNews != null ? oldNews.getState() : null);
+      boolean currentStateNew = INews.State.NEW.equals(currentNews.getState());
       if (oldStateNew != currentStateNew)
         return true;
 
       /* Check Change in Read-State */
-      boolean oldStateUnread = CoreUtils.isUnread(newsEvent.getOldNews() != null ? newsEvent.getOldNews().getState() : null);
-      boolean newStateUnread = CoreUtils.isUnread(newsEvent.getEntity().getState());
+      boolean oldStateUnread = CoreUtils.isUnread(oldNews != null ? oldNews.getState() : null);
+      boolean newStateUnread = CoreUtils.isUnread(currentNews.getState());
       if (oldStateUnread != newStateUnread)
         return true;
 
       /* Check Change in Sticky-State */
-      boolean oldStateSticky = newsEvent.getOldNews() != null ? newsEvent.getOldNews().isFlagged() : false;
-      boolean newStateSticky = newsEvent.getEntity().isFlagged();
+      boolean oldStateSticky = oldNews != null ? oldNews.isFlagged() : false;
+      boolean newStateSticky = currentNews.isVisible() && currentNews.isFlagged();
       if (oldStateSticky != newStateSticky)
         return true;
     }
