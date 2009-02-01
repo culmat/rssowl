@@ -675,7 +675,9 @@ public class BookMarkContentProvider implements ITreeContentProvider {
       long parentId = news.getParentId();
       if (parentId != 0) {
         if (!handledBins.contains(parentId)) {
-          affectedBinFolders.add(newsBinDao.load(parentId).getParent());
+          INewsBin bin = newsBinDao.load(parentId);
+          if (bin != null) //Could have been deleted meanwhile
+            affectedBinFolders.add(bin.getParent());
           handledBins.add(parentId);
         }
       } else
