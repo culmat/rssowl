@@ -56,13 +56,17 @@ public final class IndexingTask implements ITask {
   private final Collection<NewsReference> fNewsRefs;
 
   IndexingTask(Indexer indexer, Set<NewsEvent> events, EventType taskType) {
-    this(indexer, getNews(events), taskType);
+    this(indexer, getNews(events, taskType), taskType);
   }
 
-  private static List<INews> getNews(Set<NewsEvent> events) {
+  private static List<INews> getNews(Set<NewsEvent> events, EventType taskType) {
     List<INews> news = new ArrayList<INews>(events.size());
-    for (NewsEvent event : events)
+    for (NewsEvent event : events) {
+      if (taskType == EventType.PERSIST && event.getEntity().getState().equals(INews.State.DELETED))
+        continue; //News could be deleted from a Filter
+
       news.add(event.getEntity());
+    }
 
     return news;
   }
