@@ -65,6 +65,7 @@ import org.rssowl.core.persist.event.PreferenceEvent;
 import org.rssowl.core.persist.event.PreferenceListener;
 import org.rssowl.core.persist.event.runnable.EventType;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -462,6 +463,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       @Override
       public void entitiesAdded(Set<NewsEvent> events) {
+       if (!CoreUtils.containsState(events, INews.State.NEW))
+         return;
+
         JobRunner.runInUIThread(fTrayItem, new Runnable() {
           public void run() {
 
