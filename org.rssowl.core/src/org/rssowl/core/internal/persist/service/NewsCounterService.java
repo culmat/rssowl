@@ -122,6 +122,10 @@ public final class NewsCounterService {
         if (oldStateUnread == currentStateUnread && oldStateNew == currentStateNew && oldStateSticky == newStateSticky)
           continue;
 
+        /* News already handled */
+        if (oldNews.getState() == INews.State.HIDDEN && currentNews.getState() == INews.State.DELETED)
+          continue;
+
         NewsCounterItem counterItem = fNewsCounter.get(currentNews.getFeedReference().getLink());
 
         /* News became read */
