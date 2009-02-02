@@ -50,6 +50,7 @@ import org.rssowl.core.internal.persist.SearchCondition;
 import org.rssowl.core.internal.persist.SearchMark;
 import org.rssowl.core.internal.persist.Source;
 import org.rssowl.core.internal.persist.service.DBManager;
+import org.rssowl.core.internal.persist.service.NewsCounterService;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
@@ -1686,7 +1687,7 @@ public class DBManagerTest {
     news.setAuthor(createPersonMary(news));
     news.setBase(createURI("http://www.someuri.com"));
     news.setComments("One comment");
-    news.setState(State.DELETED);
+    news.setState(State.HIDDEN);
     news.setDescription("News description");
     fTypesFactory.createGuid(news, "someGUIDvalue", null);
     news.setLink(createURI("http://www.somelocation.com/feed.rss"));
@@ -2507,5 +2508,57 @@ public class DBManagerTest {
 
     DynamicDAO.delete(newsRef.resolve());
     DynamicDAO.delete(feed);
+  }
+
+  /**
+   * Tests {@link NewsCounterService} for added news that are DELETED
+   */
+  @Test
+  public void testNewsCounterOnDeletedAddedNews() {
+    final IFeed feed = DynamicDAO.save(createFeed());
+    INews news = createNews(feed);
+    news.setFlagged(true);
+    news.setState(INews.State.DELETED);
+
+    DynamicDAO.save(news);
+
+    IFolder folder = Owl.getModelFactory().createFolder(null, null, "Root");
+    IBookMark bookmark = Owl.getModelFactory().createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "Bookmark");
+
+    DynamicDAO.save(bookmark);
+
+    assertEquals(0, bookmark.getStickyNewsCount());
+    assertEquals(0, bookmark.getNewsCount(INews.State.getVisible()));
+  }
+
+  /**
+   * Tests {@link NewsCounterService} for added news that are DELETED and Sticky
+   */
+  @Test
+  public void testNewsCounterOnStickyDeletedNews() {
+    final IFeed feed = DynamicDAO.save(createFeed());
+    INews news = createNews(feed);
+    news.setState(INews.State.NEW);
+    news.setFlagged(true);
+
+    DynamicDAO.save(news);
+
+    IFolder folder = Owl.getModelFactory().createFolder(null, null, "Root");
+    IBookMark bookmark = Owl.getModelFactory().createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "Bookmark");
+
+    DynamicDAO.save(bookmark);
+
+    assertEquals(1, bookmark.getStickyNewsCount());
+    assertEquals(1, bookmark.getNewsCount(INews.State.getVisible()));
+
+    DynamicDAO.getDAO(INewsDAO.class).setState(Collections.singleton(news), INews.State.HIDDEN, false, false);
+
+    assertEquals(0, bookmark.getStickyNewsCount());
+    assertEquals(0, bookmark.getNewsCount(INews.State.getVisible()));
+
+    DynamicDAO.getDAO(INewsDAO.class).setState(Collections.singleton(news), INews.State.DELETED, false, false);
+
+    assertEquals(0, bookmark.getStickyNewsCount());
+    assertEquals(0, bookmark.getNewsCount(INews.State.getVisible()));
   }
 }
