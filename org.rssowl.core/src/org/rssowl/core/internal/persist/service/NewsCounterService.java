@@ -63,6 +63,9 @@ public final class NewsCounterService {
         if (news.getParentId() != 0)
           continue;
 
+        if (news.getState() == INews.State.DELETED) //Could be DELETED from filters
+          continue;
+
         FeedLinkReference feedRef = news.getFeedReference();
 
         NewsCounterItem newsCounterItem = fNewsCounter.get(feedRef.getLink());

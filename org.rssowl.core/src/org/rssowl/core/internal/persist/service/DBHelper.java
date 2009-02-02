@@ -401,9 +401,21 @@ public final class DBHelper {
 
     EntitiesToBeIndexedDAOImpl dao = getEntitiesToBeIndexedDAO();
     EntityIdsByEventType newsToBeIndexed = dao.load();
-    newsToBeIndexed.addAllEntities(newsEventRunnables.getPersistEvents(), newsEventRunnables.getUpdateEvents(), newsEventRunnables.getRemoveEvents());
+    newsToBeIndexed.addAllEntities(maskDeletedNews(newsEventRunnables.getPersistEvents()), newsEventRunnables.getUpdateEvents(), newsEventRunnables.getRemoveEvents());
     newsToBeIndexed.compact();
     db.ext().set(newsToBeIndexed, Integer.MAX_VALUE);
+  }
+
+  /* News could be DELETED from Filters */
+  private static Collection<NewsEvent> maskDeletedNews(Set<NewsEvent> persistEvents) {
+    Set<NewsEvent> set= new HashSet<NewsEvent>(persistEvents.size());
+    for (NewsEvent event : set) {
+      if (event.getEntity() != null && event.getEntity().getState() == INews.State.DELETED)
+        continue;
+
+      set.add(event);
+    }
+    return set;
   }
 
   public static NewsEventRunnable getNewsEventRunnables(List<EventRunnable<?>> eventRunnables)  {
