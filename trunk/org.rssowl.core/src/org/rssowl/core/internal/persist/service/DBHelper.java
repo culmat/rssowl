@@ -409,7 +409,7 @@ public final class DBHelper {
   /* News could be DELETED from Filters */
   private static Collection<NewsEvent> maskDeletedNews(Set<NewsEvent> persistEvents) {
     Set<NewsEvent> set= new HashSet<NewsEvent>(persistEvents.size());
-    for (NewsEvent event : set) {
+    for (NewsEvent event : persistEvents) {
       if (event.getEntity() != null && event.getEntity().getState() == INews.State.DELETED)
         continue;
 
