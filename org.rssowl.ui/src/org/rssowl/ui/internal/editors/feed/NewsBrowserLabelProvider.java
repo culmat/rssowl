@@ -66,7 +66,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   /* Date Formatter for News */
   private DateFormat fDateFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT);
 
-  /* TODO Experimenteal Search Result Highlight */
+  /* Search Result Highlight */
   private static final String PRE_HIGHLIGHT = "<span style=\"background-color:rgb(255,255,0)\">";
   private static final String POST_HIGHLIGHT = "</span>";
 

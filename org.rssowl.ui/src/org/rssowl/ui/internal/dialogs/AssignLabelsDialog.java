@@ -168,7 +168,7 @@ public class AssignLabelsDialog extends Dialog {
         if (previousCommaIndex == -1)
           return text.substring(0, selectionOffset).trim();
 
-        /* Previous Comma Found - Return from Comma *///TODO What if , is last char in text field?
+        /* Previous Comma Found - Return from Comma */
         return text.substring(previousCommaIndex + 1, selectionOffset).trim();
       }
 

@@ -43,9 +43,6 @@ import java.util.EnumSet;
  * <p>
  * TODO This class is currently only working on INews.
  * </p>
- * <p>
- * TODO Enable support for *deleted* state again.
- * </p>
  *
  * @author bpasero
  */
