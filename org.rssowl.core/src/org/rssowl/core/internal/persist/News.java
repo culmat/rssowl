@@ -134,10 +134,6 @@ public class News extends AbstractEntity implements INews {
   /* This field is only non-zero if the parent is not a feed */
   private long fParentId;
 
-  //TODO Remove this after M8 release
-  @SuppressWarnings("unused")
-  private String fDescription;
-
   /* We can't use fDescription to support migration from M7 to M8 */
   private transient String fTransientDescription;
   private transient boolean fTransientDescriptionSet;
