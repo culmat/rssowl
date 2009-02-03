@@ -72,7 +72,8 @@ public class NewsDocument extends SearchDocument<INews> {
     /* Add Labels */
     Set<ILabel> labels = news.getLabels();
     for (ILabel label : labels) {
-      addField(fields, createStringField(INews.LABEL, label.getName().toLowerCase(), Store.NO, Index.UN_TOKENIZED));
+      if (label != null) //Can happen on next start if Label was deleted and RSSOwl instantly shutdown
+        addField(fields, createStringField(INews.LABEL, label.getName().toLowerCase(), Store.NO, Index.UN_TOKENIZED));
     }
 
     /* Add Guid, only if it's not null and is a permaLink */
