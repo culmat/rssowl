@@ -236,6 +236,43 @@ public class UndoTest {
    * @throws Exception
    */
   @Test
+  public void testUndoDeleteAndSticky() throws Exception {
+    IFolder root= fFactory.createFolder(null, null, "Root");
+
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.foo1.com"));
+    INews news = fFactory.createNews(null, feed, new Date());
+    news.setLink(new URI("http://www.news.com"));
+    news.setFlagged(true);
+
+    DynamicDAO.save(feed);
+
+    IBookMark bookmark = fFactory.createBookMark(null, root, new FeedLinkReference(feed.getLink()), "Bookmark");
+    DynamicDAO.save(root);
+
+    assertEquals(1, bookmark.getStickyNewsCount());
+    assertEquals(1, bookmark.getNewsCount(INews.State.getVisible()));
+
+    UndoStack.getInstance().addOperation(new NewsStateOperation(Collections.singleton(news), INews.State.HIDDEN, false));
+    DynamicDAO.getDAO(INewsDAO.class).setState(Collections.singleton(news), INews.State.HIDDEN, false, false);
+
+    assertEquals(0, bookmark.getStickyNewsCount());
+    assertEquals(0, bookmark.getNewsCount(INews.State.getVisible()));
+
+    UndoStack.getInstance().undo();
+
+    assertEquals(1, bookmark.getStickyNewsCount());
+    assertEquals(1, bookmark.getNewsCount(INews.State.getVisible()));
+
+    UndoStack.getInstance().redo();
+
+    assertEquals(0, bookmark.getStickyNewsCount());
+    assertEquals(0, bookmark.getNewsCount(INews.State.getVisible()));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testNewActionFromUndoActionDeletesAllFollowingRedoActions() throws Exception {
     IFeed feed = fFactory.createFeed(null, new URI("http://www.foo1.com"));
     INews news = fFactory.createNews(null, feed, new Date());
