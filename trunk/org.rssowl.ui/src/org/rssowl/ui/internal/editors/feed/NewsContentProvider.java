@@ -254,7 +254,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
         /* Resolve and Add News */
         INews resolvedNews = newsRef.resolve();
-        if (resolvedNews != null) //TODO Remove once Bug 173 is fixed
+        if (resolvedNews != null)
           addedNews.add(resolvedNews);
       }
     }

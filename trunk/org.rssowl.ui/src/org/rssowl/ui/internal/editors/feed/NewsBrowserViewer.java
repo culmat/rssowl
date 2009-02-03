@@ -534,9 +534,6 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   /**
-   * TODO This is temporary API until Bug 627 is fixed using Lucene Token
-   * Positions.
-   *
    * @return Returns a List of Strings that should get highlighted per News that
    * is displayed.
    */

@@ -75,7 +75,7 @@ public class FolderNewsMark extends Mark implements INewsMark {
         INewsMark newsmark = (INewsMark) child;
         List<INews> news = newsmark.getNews(INews.State.getVisible());
         for (INews newsitem : news) {
-          if (newsitem != null) //TODO Remove once Bug 173 is fixed
+          if (newsitem != null)
             fNewsContainer.addNews(newsitem);
         }
       }
