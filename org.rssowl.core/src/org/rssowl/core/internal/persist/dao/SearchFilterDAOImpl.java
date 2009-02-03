@@ -32,8 +32,6 @@ import org.rssowl.core.persist.event.SearchFilterListener;
 
 /**
  * @author bpasero
- *
- * TODO Make this a caching DAO!
  */
 public class SearchFilterDAOImpl extends AbstractEntityDAO<ISearchFilter, SearchFilterListener, SearchFilterEvent> implements ISearchFilterDAO {
 
