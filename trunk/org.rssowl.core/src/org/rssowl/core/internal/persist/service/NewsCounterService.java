@@ -115,15 +115,11 @@ public final class NewsCounterService {
         boolean oldStateNew = INews.State.NEW.equals(oldNews.getState());
         boolean currentStateNew = INews.State.NEW.equals(currentNews.getState());
 
-        boolean oldStateSticky = oldNews.isFlagged();
+        boolean oldStateSticky = oldNews.isFlagged() && oldNews.isVisible();
         boolean newStateSticky = currentNews.isFlagged() && currentNews.isVisible();
 
         /* No Change - continue */
         if (oldStateUnread == currentStateUnread && oldStateNew == currentStateNew && oldStateSticky == newStateSticky)
-          continue;
-
-        /* News already handled */
-        if (oldNews.getState() == INews.State.HIDDEN && currentNews.getState() == INews.State.DELETED)
           continue;
 
         NewsCounterItem counterItem = fNewsCounter.get(currentNews.getFeedReference().getLink());
