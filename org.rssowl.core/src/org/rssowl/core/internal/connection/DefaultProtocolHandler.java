@@ -54,6 +54,7 @@ import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.connection.ProxyAuthenticationRequiredException;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.interpreter.EncodingException;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IModelFactory;
@@ -73,6 +74,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -106,6 +108,9 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   private static final String HEADER_RESPOND_IF_NONE_MATCH = "If-None-Match"; //$NON-NLS-1$
   private static final String HEADER_RESPOND_IF_MODIFIED_SINCE = "If-Modified-Since"; //$NON-NLS-1$
 
+  /** Property to tell the XML parser to use platform encoding */
+  public static final String USE_PLATFORM_ENCODING = "org.rssowl.core.internal.connection.DefaultProtocolHandler.UsePlatformEncoding";
+
   /* The Default Connection Timeout */
   private static final int DEFAULT_CON_TIMEOUT = 30000;
 
@@ -138,19 +143,41 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
     /* Return on Cancelation or Shutdown */
     if (monitor.isCanceled()) {
-      try {
-        if (inS != null)
-          inS.close();
-      } catch (IOException e) {
-        /* Ignore */
-      }
+      closeStream(inS);
       return null;
     }
 
     /* Pass the Stream to the Interpreter */
-    Owl.getInterpreter().interpret(inS, feed);
+    try {
+      Owl.getInterpreter().interpret(inS, feed, null);
+    } catch (EncodingException e) {
+
+      /* Re-retrieve InputStream from the Feed's Link */
+      inS = openStream(link, properties);
+
+      /* Re-retrieve Conditional Get if present */
+      conditionalGet = getConditionalGet(link, inS);
+
+      /* Return on Cancelation or Shutdown */
+      if (monitor.isCanceled()) {
+        closeStream(inS);
+        return null;
+      }
+
+      /* Second try: Use platform encoding */
+      Owl.getInterpreter().interpret(inS, feed, Collections.singletonMap((Object) USE_PLATFORM_ENCODING, (Object) Boolean.TRUE));
+    }
 
     return Pair.create(feed, conditionalGet);
+  }
+
+  private void closeStream(InputStream inS) {
+    try {
+      if (inS != null)
+        inS.close();
+    } catch (IOException ex) {
+      /* Ignore */
+    }
   }
 
   /*

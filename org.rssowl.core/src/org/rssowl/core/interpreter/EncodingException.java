@@ -24,40 +24,23 @@
 
 package org.rssowl.core.interpreter;
 
-import org.jdom.Document;
-
-import java.io.InputStream;
-import java.util.Map;
+import org.eclipse.core.runtime.IStatus;
 
 /**
- * This interface allows to contribute the XML-Parser that is to be used. It is
- * also responsible to parse a given InputStream into an instance of
- * <code>org.jdom.Document</code>.
+ * Checked Exception thrown from Parser operations indicating that something is
+ * wrong with the encoding of the feed.
  *
  * @author bpasero
  */
-public interface IXMLParser {
+public class EncodingException extends ParserException {
 
   /**
-   * Called prior usage of the XML-Parser. For example, load the Class of the
-   * used Parser here and setup some properties.
+   * Creates a new exception with the given status object. The message of the
+   * given status is used as the exception message.
    *
-   * @throws ParserException Checked Exception to be used in case of any
-   * Exception.
+   * @param status the status object to be associated with this exception
    */
-  void init() throws ParserException;
-
-  /**
-   * Parse the given InputStream and return the an instance of
-   * <code>org.jdom.Document</code>.
-   *
-   * @param inS The InputStream to parse.
-   * @param properties a map of properties to configure parsing or
-   * <code>null</code> if none.
-   * @return An instance of <code>org.jdom.Document</code> as parsed
-   * InputStream.
-   * @throws ParserException Checked Exception to be used in case of any
-   * Exception.
-   */
-  Document parse(InputStream inS, Map<Object, Object> properties) throws ParserException;
+  public EncodingException(IStatus status) {
+    super(status);
+  }
 }
