@@ -407,8 +407,13 @@ public class CleanUpTests {
     DynamicDAO.save(feed3);
 
     IBookMark bm1 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed1.getLink()), "BM1");
+    bm1.setMostRecentNewsDate(news1.getPublishDate());
+
     IBookMark bm2 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed2.getLink()), "BM2");
+    bm2.setMostRecentNewsDate(news2.getPublishDate());
+
     IBookMark bm3 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed3.getLink()), "BM3");
+    bm3.setMostRecentNewsDate(news3.getPublishDate());
 
     DynamicDAO.save(bm1);
     DynamicDAO.save(bm2);
@@ -437,12 +442,10 @@ public class CleanUpTests {
       assertEquals(true, tasks1.get(0) instanceof BookMarkTask);
 
       List<CleanUpTask> tasks2 = groups.get(2).getTasks();
-      assertEquals(2, tasks2.size());
+      assertEquals(1, tasks2.size());
       assertEquals(true, tasks2.get(0) instanceof BookMarkTask);
-      assertEquals(true, tasks2.get(1) instanceof BookMarkTask);
 
       assertEquals(bm1, ((BookMarkTask) tasks2.get(0)).getMark());
-      assertEquals(bm2, ((BookMarkTask) tasks2.get(1)).getMark());
       assertEquals(bm3, ((BookMarkTask) tasks1.get(0)).getMark());
     }
 
