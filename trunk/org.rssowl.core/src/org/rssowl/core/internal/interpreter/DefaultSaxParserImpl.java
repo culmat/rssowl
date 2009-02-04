@@ -38,6 +38,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Default Implementation of the ISAXParser Interface using the JDKs default XML
@@ -99,7 +100,7 @@ public class DefaultSaxParserImpl implements IXMLParser {
     }
 
     /* Second Run - Try with Platform Default Encoding */
-    if (ex instanceof JDOMParseException) {
+    if (ex instanceof JDOMParseException || ex instanceof UnsupportedEncodingException) {
 
       /* Try to reset the Stream to 0 */
       boolean reset = false;
