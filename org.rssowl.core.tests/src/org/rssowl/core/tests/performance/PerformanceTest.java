@@ -1084,7 +1084,7 @@ public class PerformanceTest {
             IFeed feed = new Feed(feedLink);
 
             InputStream inS = loadFileProtocol(feed.getLink());
-            Owl.getInterpreter().interpret(inS, feed);
+            Owl.getInterpreter().interpret(inS, feed, null);
           } catch (Exception e) {
             ex.add(e);
           }
@@ -1581,7 +1581,7 @@ public class PerformanceTest {
         IFeed feed = new Feed(feedLink);
 
         InputStream inS = loadFileProtocol(feed.getLink());
-        Owl.getInterpreter().interpret(inS, feed);
+        Owl.getInterpreter().interpret(inS, feed, null);
 
         feeds.add(feed);
       } catch (Exception e) {

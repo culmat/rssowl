@@ -84,7 +84,7 @@ public class InMemoryProtocolHandler implements IProtocolHandler {
     }
 
     /* Pass the Stream to the Interpreter */
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     return Pair.create(feed, conditionalGet);
   }

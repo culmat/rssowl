@@ -184,7 +184,7 @@ public class DefragmentTest {
       IFeed feed = new Feed(feedLink);
 
       InputStream inS = new BufferedInputStream(new FileInputStream(new File(feed.getLink())));
-      Owl.getInterpreter().interpret(inS, feed);
+      Owl.getInterpreter().interpret(inS, feed, null);
 
       feeds.add(feed);
     }

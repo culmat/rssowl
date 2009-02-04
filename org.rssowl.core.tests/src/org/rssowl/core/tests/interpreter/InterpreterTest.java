@@ -63,7 +63,7 @@ public class InterpreterTest {
   public void testAtom() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_atom.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_atom.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("Atom 1.0", feed.getFormat());
     assertEquals("atom_title", feed.getTitle());
@@ -152,7 +152,7 @@ public class InterpreterTest {
   public void testRSS() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_rss.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_rss.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("RSS 2.0", feed.getFormat());
     assertEquals("rss_title", feed.getTitle());
@@ -218,7 +218,7 @@ public class InterpreterTest {
   public void testURINormalized() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_uri_mix.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_rss.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals(new URI("http://www.link.com/feed/link"), feed.getHomepage());
     assertEquals(new URI("http://www.link.com/feed/docs"), feed.getDocs());
@@ -245,7 +245,7 @@ public class InterpreterTest {
   public void testRDF() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_rdf.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_rdf.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("RDF", feed.getFormat());
     assertEquals("rdf_title", feed.getTitle());
@@ -293,7 +293,7 @@ public class InterpreterTest {
   public void testCDF() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_cdf.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_cdf.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("CDF", feed.getFormat());
     assertEquals(new URI("cdf_base"), feed.getHomepage());
@@ -320,7 +320,7 @@ public class InterpreterTest {
   public void testOPML() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_opml.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_opml.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("OPML", feed.getFormat());
     assertEquals("opml_title", feed.getTitle());
@@ -354,7 +354,7 @@ public class InterpreterTest {
   public void testFormat() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_format.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_format.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("MyFeed", feed.getFormat());
     assertEquals("format_custom", feed.getTitle());
@@ -378,7 +378,7 @@ public class InterpreterTest {
   public void testISO() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_ISO-8859-1.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_atom.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("iso_title#\u00F6\u00E4\u00FC\u00DF", feed.getTitle());
     assertEquals("iso_description#\u00F6\u00E4\u00FC\u00DF", feed.getDescription());
@@ -400,7 +400,7 @@ public class InterpreterTest {
   public void testEntities() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_entities.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_atom.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("entities_title#\u00F6\u00E4\u00FC&<>", feed.getTitle());
     assertEquals("entities_description#\u00F6\u00E4\u00FC&<>", feed.getDescription());
@@ -424,7 +424,7 @@ public class InterpreterTest {
   public void testUndeclaredEntities() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_undeclared_entities.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_atom.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("entities_title#\u00F6\u00E4\u00FC&<>", feed.getTitle());
     assertEquals("entities_description#\u00F6\u00E4\u00FC&<>", feed.getDescription());
@@ -490,7 +490,7 @@ public class InterpreterTest {
     UnknownFormatException e = null;
 
     try {
-      Owl.getInterpreter().interpret(inS, feed);
+      Owl.getInterpreter().interpret(inS, feed, null);
     } catch (UnknownFormatException e1) {
       e = e1;
     }
@@ -552,7 +552,7 @@ public class InterpreterTest {
   public void testRSSElements() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_rss_elements.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_rss_elements.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("sub_rss_leveld", feed.getProperty("sub_rss_leveld"));
     assertEquals("sub_channel_leveld", feed.getProperty("sub_channel_leveld"));
@@ -574,7 +574,7 @@ public class InterpreterTest {
   public void testRSSNamespaces() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_rss_namespaces.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_rss_namespaces.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("custom_formatAttribute", feed.getProperty("custom_formatAttribute"));
     assertEquals("custom_channelAttribute", feed.getProperty("custom_channelAttribute"));
@@ -611,7 +611,7 @@ public class InterpreterTest {
   public void testAtomElements() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_atom_elements.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_atom_elements.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("entry_leveld", feed.getProperty("entry_leveld"));
 
@@ -638,7 +638,7 @@ public class InterpreterTest {
   public void testAtomNamespaces() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_atom_namespaces.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_atom_namespaces.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("custom_formatAttribute", feed.getProperty("custom_formatAttribute"));
     assertEquals("custom_titleAttribute", feed.getProperty("custom_titleAttribute"));
@@ -685,7 +685,7 @@ public class InterpreterTest {
   public void testOPMLElements() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_opml_elements.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_opml_elements.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("head_leveld", feed.getProperty("head_leveld"));
     assertEquals("sub_head_leveld", feed.getProperty("sub_head_leveld"));
@@ -702,7 +702,7 @@ public class InterpreterTest {
   public void testOPMLNamespaces() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_opml_namespaces.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_opml_namespaces.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("custom_formatAttribute", feed.getProperty("custom_formatAttribute"));
     assertEquals("custom_headAttribute", feed.getProperty("custom_headAttribute"));
@@ -728,7 +728,7 @@ public class InterpreterTest {
   public void testCDFElements() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_cdf_elements.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_cdf_elements.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("item_leveld", feed.getProperty("item_leveld"));
 
@@ -747,7 +747,7 @@ public class InterpreterTest {
   public void testCDFNamespaces() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_cdf_namespaces.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_cdf_namespaces.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("custom_formatAttribute", feed.getProperty("custom_formatAttribute"));
     assertEquals("custom_titleAttribute", feed.getProperty("custom_titleAttribute"));
@@ -771,7 +771,7 @@ public class InterpreterTest {
   public void testRDFElements() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_rdf_elements.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_rdf_elements.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("channel_leveld", feed.getProperty("channel_leveld"));
     assertEquals("sub_channel_leveld", feed.getProperty("sub_channel_leveld"));
@@ -793,7 +793,7 @@ public class InterpreterTest {
   public void testRDFNamespaces() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_rdf_namespaces.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_rdf_namespaces.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("custom_formatAttribute", feed.getProperty("custom_formatAttribute"));
     assertEquals("custom_channelAttribute", feed.getProperty("custom_channelAttribute"));
@@ -821,7 +821,7 @@ public class InterpreterTest {
   public void testBugzilla() throws Exception {
     InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_bugzilla.xml");
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_bugzilla.xml"));
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("Bugzilla 2.20", feed.getFormat());
     assertEquals(new URI("http://dev.rssowl.org"), feed.getBase());
