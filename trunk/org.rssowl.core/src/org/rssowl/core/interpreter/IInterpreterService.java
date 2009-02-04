@@ -30,6 +30,7 @@ import org.rssowl.core.persist.IFeed;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Provides access to the interpreter service of RSSOwl. This service provides
@@ -38,8 +39,8 @@ import java.util.List;
  * out of the content. Various extension points allow to customize the behavor
  * of the interpreter:
  * <ul>
- * <li>Contribute a new format interpreter using the FormatInterpreter
- * extension point. This allows to display any XML in RSSOwl as Feed.</li>
+ * <li>Contribute a new format interpreter using the FormatInterpreter extension
+ * point. This allows to display any XML in RSSOwl as Feed.</li>
  * <li>Contribute a new namespace handler using the NamespaceHandler extension
  * point. This allows to properly handle any new namespace in RSSOwl.</li>
  * <li>Contribute a new element handler using the ElementHandler extension
@@ -61,20 +62,20 @@ public interface IInterpreterService {
    * delegate the Interpretation to the contributed FormatInterpreters.
    *
    * @param inS The InputStream to Interpret as <code>IFeed</code>.
-   * @param feed An instance of <code>IFeed</code> that stores the
-   * interpretion.
+   * @param feed An instance of <code>IFeed</code> that stores the interpretion.
+   * @param properties a map of properties to configure interpretion or
+   * <code>null</code> if none.
    * @throws ParserException In case of an Error while Parsing.
    * @throws InterpreterException In case of an Error while Interpreting.
    */
-  void interpret(InputStream inS, IFeed feed) throws ParserException, InterpreterException;
+  void interpret(InputStream inS, IFeed feed, Map<Object, Object> properties) throws ParserException, InterpreterException;
 
   /**
-   * Interpret the given <code>org.w3c.dom.Document</code> as Feed by
-   * delegating the Interpretation to the contributed FormatInterpreters.
+   * Interpret the given <code>org.w3c.dom.Document</code> as Feed by delegating
+   * the Interpretation to the contributed FormatInterpreters.
    *
    * @param w3cDocument The Document to interpret as <code>IFeed</code>.
-   * @param feed An instance of <code>IFeed</code> that stores the
-   * interpretion.
+   * @param feed An instance of <code>IFeed</code> that stores the interpretion.
    * @throws InterpreterException In case of an Error while Interpreting.
    */
   void interpretW3CDocument(org.w3c.dom.Document w3cDocument, IFeed feed) throws InterpreterException;
@@ -84,8 +85,7 @@ public interface IInterpreterService {
    * the Interpretation to the contributed FormatInterpreters.
    *
    * @param document The Document to interpret as <code>IFeed</code>.
-   * @param feed An instance of <code>IFeed</code> that stores the
-   * interpretion.
+   * @param feed An instance of <code>IFeed</code> that stores the interpretion.
    * @throws InterpreterException In case of an Error while Interpreting.
    */
   void interpretJDomDocument(Document document, IFeed feed) throws InterpreterException;
@@ -98,7 +98,7 @@ public interface IInterpreterService {
    * @throws InterpreterException In case of an Error while Interpreting.
    * @throws ParserException In case of an Error while Parsing.
    */
-  List< ? extends IEntity> importFrom(InputStream inS) throws InterpreterException, ParserException;
+  List<? extends IEntity> importFrom(InputStream inS) throws InterpreterException, ParserException;
 
   /**
    * Get the Namespace Handler for the given Namespace or NULL if not

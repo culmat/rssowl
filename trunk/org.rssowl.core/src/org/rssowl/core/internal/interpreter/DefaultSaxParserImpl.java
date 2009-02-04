@@ -29,6 +29,8 @@ import org.jdom.JDOMException;
 import org.jdom.input.JDOMParseException;
 import org.jdom.input.SAXBuilder;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.internal.connection.DefaultProtocolHandler;
+import org.rssowl.core.interpreter.EncodingException;
 import org.rssowl.core.interpreter.IXMLParser;
 import org.rssowl.core.interpreter.ParserException;
 import org.xml.sax.InputSource;
@@ -39,6 +41,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.Map;
 
 /**
  * Default Implementation of the ISAXParser Interface using the JDKs default XML
@@ -79,28 +82,35 @@ public class DefaultSaxParserImpl implements IXMLParser {
   }
 
   /*
-   * @see org.rssowl.core.interpreter.ISAXParser#parse(java.io.InputStream)
+   * @see org.rssowl.core.interpreter.IXMLParser#parse(java.io.InputStream,
+   * java.util.Map)
    */
-  public Document parse(InputStream inS) throws ParserException {
+  public Document parse(InputStream inS, Map<Object, Object> properties) throws ParserException {
     Document document = null;
     Exception ex = null;
     SAXBuilder builder = getBuilder();
+    boolean encodingIssue = false;
+    boolean usePlatformEncoding = (properties != null && properties.containsKey(DefaultProtocolHandler.USE_PLATFORM_ENCODING));
 
     /* Set a Mark to support a 2d Run */
     KeepAliveInputStream keepAliveIns = new KeepAliveInputStream(inS);
     keepAliveIns.mark(0);
 
-    /* First Run - Try with Documents own Encoding */
+    /* First Run */
     try {
-      document = builder.build(keepAliveIns);
+      if (!usePlatformEncoding)
+        document = builder.build(keepAliveIns);
+      else
+        document = builder.build(new InputStreamReader(keepAliveIns));
     } catch (JDOMException e) {
       ex = e;
     } catch (IOException e) {
       ex = e;
     }
 
-    /* Second Run - Try with Platform Default Encoding */
-    if (ex instanceof JDOMParseException || ex instanceof UnsupportedEncodingException) {
+    /* Second Run - Try with Platform Default Encoding from existing Stream */
+    if (!usePlatformEncoding && ex instanceof JDOMParseException || ex instanceof UnsupportedEncodingException) {
+      encodingIssue = true;
 
       /* Try to reset the Stream to 0 */
       boolean reset = false;
@@ -131,8 +141,11 @@ public class DefaultSaxParserImpl implements IXMLParser {
     }
 
     /* In case of an exception */
-    if (ex != null && document == null && Activator.getDefault() != null)
+    if (ex != null && document == null && Activator.getDefault() != null) {
+      if (!usePlatformEncoding && encodingIssue)
+        throw new EncodingException(Activator.getDefault().createErrorStatus(ex.getMessage(), ex));
       throw new ParserException(Activator.getDefault().createErrorStatus(ex.getMessage(), ex));
+    }
 
     /* Return Document */
     return document;
@@ -148,7 +161,8 @@ public class DefaultSaxParserImpl implements IXMLParser {
     builder.setEntityResolver(new EntityResolver2() {
 
       /*
-       * @see org.xml.sax.ext.EntityResolver2#getExternalSubset(java.lang.String,
+       * @see
+       * org.xml.sax.ext.EntityResolver2#getExternalSubset(java.lang.String,
        * java.lang.String)
        */
       public InputSource getExternalSubset(String name, String baseURI) {

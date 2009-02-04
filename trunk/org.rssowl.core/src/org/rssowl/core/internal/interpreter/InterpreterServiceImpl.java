@@ -99,11 +99,10 @@ public class InterpreterServiceImpl implements IInterpreterService {
   }
 
   /*
-   * @see org.rssowl.core.interpreter.IInterpreterService#interpret(java.io.InputStream,
-   * org.rssowl.core.model.persist.IFeed)
+   * @see org.rssowl.core.interpreter.IInterpreterService#interpret(java.io.InputStream, org.rssowl.core.persist.IFeed, java.util.Map)
    */
-  public void interpret(InputStream inS, IFeed feed) throws ParserException, InterpreterException {
-    Document document = fXMLParserImpl.parse(inS);
+  public void interpret(InputStream inS, IFeed feed, Map<Object, Object> properties) throws ParserException, InterpreterException {
+    Document document = fXMLParserImpl.parse(inS, properties);
 
     interpretJDomDocument(document, feed);
   }
@@ -144,7 +143,7 @@ public class InterpreterServiceImpl implements IInterpreterService {
    * @see org.rssowl.core.interpreter.IInterpreterService#importFrom(java.io.InputStream)
    */
   public List< ? extends IEntity> importFrom(InputStream inS) throws InterpreterException, ParserException {
-    Document document = fXMLParserImpl.parse(inS);
+    Document document = fXMLParserImpl.parse(inS, null);
 
     /* A Root Element is required */
     if (!document.hasRootElement())
