@@ -223,6 +223,9 @@ public class OwlUI {
   /** Sticky Background Color */
   public static final String STICKY_BG_COLOR_ID = "org.rssowl.ui.StickyBGColor";
 
+  /** Search Highlight Background Color */
+  public static final String SEARCH_HIGHLIGHT_BG_COLOR_ID = "org.rssowl.ui.SearchHighlightBGColor";
+
   /* Used to cache Image-Descriptors for Favicons */
   private static final Map<Long, ImageDescriptor> FAVICO_CACHE = new HashMap<Long, ImageDescriptor>();
 

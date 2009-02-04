@@ -66,10 +66,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   /* Date Formatter for News */
   private DateFormat fDateFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT);
 
-  /* Search Result Highlight */
-  private static final String PRE_HIGHLIGHT = "<span style=\"background-color:rgb(255,255,0)\">";
-  private static final String POST_HIGHLIGHT = "</span>";
-
   private String fNewsFontFamily;
   private String fNormalFontCSS;
   private String fSmallFontCSS;
@@ -618,7 +614,12 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     Collection<String> wordsToHighlight = fViewer.getHighlightedWords();
     if (!wordsToHighlight.isEmpty()) {
       StringBuilder highlightedResult = new StringBuilder(result.length());
-      ExpandingReader resultHighlightReader = new ExpandingReader(new StringReader(result), wordsToHighlight, PRE_HIGHLIGHT, POST_HIGHLIGHT, true);
+
+      RGB searchRGB = OwlUI.getThemeRGB(OwlUI.SEARCH_HIGHLIGHT_BG_COLOR_ID, new RGB(255, 255, 0));
+      String preHighlight = "<span style=\"background-color:rgb(" + OwlUI.toString(searchRGB) + ");\">";
+      String postHighlight = "</span>";
+
+      ExpandingReader resultHighlightReader = new ExpandingReader(new StringReader(result), wordsToHighlight, preHighlight, postHighlight, true);
 
       int len = 0;
       char[] buf = new char[1000];
