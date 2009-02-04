@@ -75,6 +75,34 @@ public class ControllerTestNetwork {
   }
 
   /**
+   * Reload a large Feed with invalid encoding.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testReloadLargeFeedWithInvalidEncoding() throws Exception {
+    IFeed feed = new Feed(new URI("http://www.rssowl.org/rssowl2dg/tests/manager/invalid_utf8_large.xml")); //$NON-NLS-1$
+    feed = DynamicDAO.save(feed);
+    Controller.getDefault().reload(createBookMark(feed), null, new NullProgressMonitor());
+
+    assertEquals(new FeedReference(feed.getId()).resolve().getFormat(), "RDF"); //$NON-NLS-1$
+  }
+
+  /**
+   * Reload a small Feed with invalid encoding.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testReloadSmallFeedWithInvalidEncoding() throws Exception {
+    IFeed feed = new Feed(new URI("http://www.rssowl.org/rssowl2dg/tests/manager/invalid_utf8_small.xml")); //$NON-NLS-1$
+    feed = DynamicDAO.save(feed);
+    Controller.getDefault().reload(createBookMark(feed), null, new NullProgressMonitor());
+
+    assertEquals(new FeedReference(feed.getId()).resolve().getFormat(), "RDF"); //$NON-NLS-1$
+  }
+
+  /**
    * Reload a BookMark.
    *
    * @throws Exception

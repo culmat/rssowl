@@ -128,7 +128,7 @@ public class ConnectionTests {
     InputStream inS = new DefaultProtocolHandler().openStream(feed1.getLink(), null);
     assertNotNull(inS);
 
-    Owl.getInterpreter().interpret(inS, feed1);
+    Owl.getInterpreter().interpret(inS, feed1, null);
     assertEquals("RSS 2.0", feed1.getFormat());
 
     /* Test authentication by other realm is not working */
@@ -148,7 +148,7 @@ public class ConnectionTests {
     inS = new DefaultProtocolHandler().openStream(feed2.getLink(), null);
     assertNotNull(inS);
 
-    Owl.getInterpreter().interpret(inS, feed2);
+    Owl.getInterpreter().interpret(inS, feed2, null);
     assertEquals("RSS 2.0", feed2.getFormat());
   }
 
@@ -166,7 +166,7 @@ public class ConnectionTests {
     InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
     assertNotNull(inS);
 
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
     assertEquals("RSS 2.0", feed.getFormat());
   }
 
@@ -184,7 +184,7 @@ public class ConnectionTests {
     InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
     assertNotNull(inS);
 
-    Owl.getInterpreter().interpret(inS, feed);
+    Owl.getInterpreter().interpret(inS, feed, null);
     assertEquals("RSS 2.0", feed.getFormat());
   }
 
