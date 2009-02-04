@@ -1346,6 +1346,15 @@
             The notification popup font is used in the notification when news are coming in.
          </description>
       </fontDefinition>
+      <colorDefinition
+            categoryId="org.rssowl.ui.ThemeCategory"
+            id="org.rssowl.ui.SearchHighlightBGColor"
+            label="Search Result Background"
+            value="255,255,0">
+         <description>
+            The search result background color is used when the words of a search are highlighted inside the news content.
+         </description>
+      </colorDefinition>
    </extension>
    <extension
          point="org.eclipse.ui.browserSupport">
