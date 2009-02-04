@@ -72,7 +72,6 @@ public class CleanUpModel {
   private IModelFactory fFactory;
   private IModelSearch fModelSearch;
   private ISearchField fLocationField;
-  private ISearchField fAgeInDaysField;
   private String fNewsName;
   private INewsDAO fNewsDao;
 
@@ -90,7 +89,6 @@ public class CleanUpModel {
 
     String newsName = INews.class.getName();
     fLocationField = fFactory.createSearchField(INews.LOCATION, newsName);
-    fAgeInDaysField = fFactory.createSearchField(INews.AGE_IN_DAYS, newsName);
     fNewsName = INews.class.getName();
   }
 
@@ -146,12 +144,6 @@ public class CleanUpModel {
     if (fOps.deleteFeedByLastUpdate()) {
       CleanUpGroup group = new CleanUpGroup("Bookmarks that have not been updated for " + fOps.getLastUpdateDays() + " days");
 
-      // TODO Remove this block in M9
-      ISearchField stateField = fFactory.createSearchField(INews.STATE, fNewsName);
-      EnumSet<State> visibleStates = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED, INews.State.READ);
-      ISearchCondition stateCondition = fFactory.createSearchCondition(stateField, SearchSpecifier.IS, visibleStates);
-      ISearchCondition ageCond = fFactory.createSearchCondition(fAgeInDaysField, SearchSpecifier.IS_LESS_THAN, fOps.getLastUpdateDays());
-
       int days = fOps.getLastUpdateDays();
       long maxLastUpdateDate = DateUtils.getToday().getTimeInMillis() - (days * DAY);
 
@@ -162,24 +154,19 @@ public class CleanUpModel {
         if (bookmarksToDelete.contains(mark))
           continue;
 
-        Date date = mark.getMostRecentNewsDate();
+        Date mostRecentNewsDate = mark.getMostRecentNewsDate();
+        Date creationDate = mark.getCreationDate();
+        boolean deleteBookMark = false;
 
-        /* Use old strategy (M7 and before) to check for last update */
-        if (date == null) {
-          List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(3);
-          conditions.add(getLocationCondition(mark));
-          conditions.add(ageCond);
-          conditions.add(stateCondition);
+        /* Ask for most recent news date if present */
+        if (mostRecentNewsDate != null && mostRecentNewsDate.getTime() <= maxLastUpdateDate)
+          deleteBookMark = true;
 
-          List<SearchHit<NewsReference>> results = filterInvalidResults(fModelSearch.searchNews(conditions, true));
-          if (results.isEmpty()) {
-            bookmarksToDelete.add(mark);
-            group.addTask(new BookMarkTask(group, mark));
-          }
-        }
+        /* Alternatively check for creation date */
+        else if (mostRecentNewsDate == null && creationDate.getTime() <= maxLastUpdateDate)
+          deleteBookMark = true;
 
-        /* Use new strategy (M8) to check for the last update */
-        else if (date.getTime() <= maxLastUpdateDate) {
+        if (deleteBookMark) {
           bookmarksToDelete.add(mark);
           group.addTask(new BookMarkTask(group, mark));
         }
