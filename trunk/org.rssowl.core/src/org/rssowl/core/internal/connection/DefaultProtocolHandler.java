@@ -72,6 +72,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -561,7 +562,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       bufIns.reset();
 
       /* Grab Title using supplied Encoding */
-      if (StringUtils.isSet(encoding))
+      if (StringUtils.isSet(encoding) && Charset.isSupported(encoding))
         title = getTitleFromFeed(new BufferedReader(new InputStreamReader(bufIns, encoding)));
 
       /* Grab Title using Default Encoding */
