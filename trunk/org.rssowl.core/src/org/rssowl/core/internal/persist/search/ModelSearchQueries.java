@@ -482,8 +482,16 @@ public class ModelSearchQueries {
 
   private static void addBookMarkLocationClause(BooleanQuery bQuery, IBookMark bookmark) {
     if (bookmark != null) {
+      BooleanQuery bookMarkLocationQuery= new BooleanQuery();
+
+      /* Match on Feed */
       String feed = bookmark.getFeedLinkReference().getLinkAsText().toLowerCase();
-      bQuery.add(new TermQuery(new Term(String.valueOf(INews.FEED), feed)), Occur.SHOULD);
+      bookMarkLocationQuery.add(new TermQuery(new Term(String.valueOf(INews.FEED), feed)), Occur.MUST);
+
+      /* But ignore News from Bins */
+      bookMarkLocationQuery.add(new TermQuery(new Term(String.valueOf(INews.PARENT_ID), NumberTools.longToString(0))), Occur.MUST);
+
+      bQuery.add(bookMarkLocationQuery, Occur.SHOULD);
     }
   }
 
