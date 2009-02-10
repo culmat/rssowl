@@ -25,12 +25,16 @@
 package org.rssowl.core.tests.model;
 
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISearchCondition;
@@ -38,12 +42,15 @@ import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.tests.TestUtils;
 import org.rssowl.core.util.SearchHit;
+import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -422,6 +429,70 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
       }
     } catch (PersistenceException e) {
       TestUtils.fail(e);
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testLocationSearch_BINs() throws Exception {
+    IFolderChild root= fFactory.createFolder(null, null, "Root");
+    DynamicDAO.save(root);
+
+    IFolderChild child= fFactory.createFolder(null, (IFolder) root, "Child");
+    DynamicDAO.save(child);
+
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
+    INews news1 = createNews(feed, "Title", "http://www.news.com/news1.html", State.NEW);
+    DynamicDAO.save(feed);
+
+    IFolderChild mark= fFactory.createBookMark(null, (IFolder) child, new FeedLinkReference(feed.getLink()), "Mark");
+    DynamicDAO.save(mark);
+
+    IFolderChild bin = fFactory.createNewsBin(null, (IFolder) root, "Bin");
+    DynamicDAO.save(bin);
+    News copiedNews= new News((News) news1, bin.getId().longValue());
+    DynamicDAO.save(copiedNews);
+    DynamicDAO.save(bin);
+
+    /* Wait for Indexer */
+    waitForIndexer();
+
+    {
+      ISearchField field = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList(mark)));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+      assertEquals(1, result.size());
+      assertSame(result, news1);
+    }
+
+    {
+      ISearchField field = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList(bin)));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+      assertEquals(1, result.size());
+      assertSame(result, copiedNews);
+    }
+
+    {
+      ISearchField field = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList(child)));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+      assertEquals(1, result.size());
+      assertSame(result, news1);
+    }
+
+    {
+      ISearchField field = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList(root)));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+      assertEquals(2, result.size());
+      assertSame(result, news1, copiedNews);
     }
   }
 }
