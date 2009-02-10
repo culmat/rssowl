@@ -85,7 +85,7 @@ public class ControllerTestNetwork {
     feed = DynamicDAO.save(feed);
     Controller.getDefault().reload(createBookMark(feed), null, new NullProgressMonitor());
 
-    assertEquals(new FeedReference(feed.getId()).resolve().getFormat(), "RDF"); //$NON-NLS-1$
+    assertEquals("RDF", new FeedReference(feed.getId()).resolve().getFormat()); //$NON-NLS-1$
   }
 
   /**
@@ -99,7 +99,7 @@ public class ControllerTestNetwork {
     feed = DynamicDAO.save(feed);
     Controller.getDefault().reload(createBookMark(feed), null, new NullProgressMonitor());
 
-    assertEquals(new FeedReference(feed.getId()).resolve().getFormat(), "RDF"); //$NON-NLS-1$
+    assertEquals("RDF", new FeedReference(feed.getId()).resolve().getFormat()); //$NON-NLS-1$
   }
 
   /**
