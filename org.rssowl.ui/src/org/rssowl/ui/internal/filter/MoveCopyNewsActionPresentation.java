@@ -29,11 +29,11 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.filter.INewsActionPresentation;
 import org.rssowl.ui.internal.search.LocationControl;
 import org.rssowl.ui.internal.search.LocationControl.Mode;
 import org.rssowl.ui.internal.util.LayoutUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 /**
  * An implementation of {@link INewsActionPresentation} for moving or copying
@@ -63,7 +63,7 @@ public class MoveCopyNewsActionPresentation implements INewsActionPresentation {
     fLocationControl.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
     if (data != null && data instanceof Long[]) {
       Long[][] locationData = new Long[3][];
-      locationData[ModelUtils.NEWSBIN] = (Long[]) data;
+      locationData[CoreUtils.NEWSBIN] = (Long[]) data;
       fLocationControl.select(locationData);
     }
   }
@@ -81,7 +81,7 @@ public class MoveCopyNewsActionPresentation implements INewsActionPresentation {
   public Long[] getData() {
     Long[][] selection = fLocationControl.getSelection();
     if (selection != null) {
-      return selection[ModelUtils.NEWSBIN];
+      return selection[CoreUtils.NEWSBIN];
     }
 
     return null;

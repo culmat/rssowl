@@ -31,6 +31,7 @@ import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.util.CoreUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,26 +61,26 @@ public class ImportUtils {
           List<IFolderChild> newLocations = new ArrayList<IFolderChild>();
 
           /* Folders */
-          for (int i = 0; value[ModelUtils.FOLDER] != null && i < value[ModelUtils.FOLDER].length; i++) {
-            if (value[ModelUtils.FOLDER][i] != null && value[ModelUtils.FOLDER][i] != 0) {
-              Long id = value[ModelUtils.FOLDER][i];
+          for (int i = 0; value[CoreUtils.FOLDER] != null && i < value[CoreUtils.FOLDER].length; i++) {
+            if (value[CoreUtils.FOLDER][i] != null && value[CoreUtils.FOLDER][i] != 0) {
+              Long id = value[CoreUtils.FOLDER][i];
               newLocations.add(oldIdToFolderChildMap.get(id));
             }
           }
 
           /* BookMarks */
-          for (int i = 0; value[ModelUtils.BOOKMARK] != null && i < value[ModelUtils.BOOKMARK].length; i++) {
-            if (value[ModelUtils.BOOKMARK][i] != null && value[ModelUtils.BOOKMARK][i] != 0) {
-              Long id = value[ModelUtils.BOOKMARK][i];
+          for (int i = 0; value[CoreUtils.BOOKMARK] != null && i < value[CoreUtils.BOOKMARK].length; i++) {
+            if (value[CoreUtils.BOOKMARK][i] != null && value[CoreUtils.BOOKMARK][i] != 0) {
+              Long id = value[CoreUtils.BOOKMARK][i];
               newLocations.add(oldIdToFolderChildMap.get(id));
             }
           }
 
           /* NewsBins */
           if (value.length == 3) {
-            for (int i = 0; value[ModelUtils.NEWSBIN] != null && i < value[ModelUtils.NEWSBIN].length; i++) {
-              if (value[ModelUtils.NEWSBIN][i] != null && value[ModelUtils.NEWSBIN][i] != 0) {
-                Long id = value[ModelUtils.NEWSBIN][i];
+            for (int i = 0; value[CoreUtils.NEWSBIN] != null && i < value[CoreUtils.NEWSBIN].length; i++) {
+              if (value[CoreUtils.NEWSBIN][i] != null && value[CoreUtils.NEWSBIN][i] != 0) {
+                Long id = value[CoreUtils.NEWSBIN][i];
                 newLocations.add(oldIdToFolderChildMap.get(id));
               }
             }
