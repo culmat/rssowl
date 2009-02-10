@@ -33,6 +33,7 @@ import org.rssowl.core.internal.connection.DefaultProtocolHandler;
 import org.rssowl.core.interpreter.EncodingException;
 import org.rssowl.core.interpreter.IXMLParser;
 import org.rssowl.core.interpreter.ParserException;
+import org.rssowl.core.util.StringUtils;
 import org.xml.sax.InputSource;
 import org.xml.sax.ext.EntityResolver2;
 
@@ -109,7 +110,7 @@ public class DefaultSaxParserImpl implements IXMLParser {
     }
 
     /* Second Run - Try with Platform Default Encoding from existing Stream */
-    if (!usePlatformEncoding && ex instanceof JDOMParseException || ex instanceof UnsupportedEncodingException) {
+    if (!usePlatformEncoding && isEncodingIssue(ex)) {
       encodingIssue = true;
 
       /* Try to reset the Stream to 0 */
@@ -149,6 +150,17 @@ public class DefaultSaxParserImpl implements IXMLParser {
 
     /* Return Document */
     return document;
+  }
+
+  private boolean isEncodingIssue(Exception ex) {
+    if (ex == null)
+      return false;
+
+    if (ex instanceof JDOMParseException || ex instanceof UnsupportedEncodingException)
+      return true;
+
+    String name = ex.getClass().getName();
+    return (StringUtils.isSet(name) && name.contains("MalformedByteSequenceException"));
   }
 
   private SAXBuilder getBuilder() {
