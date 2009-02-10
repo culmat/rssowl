@@ -32,6 +32,7 @@ import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.FolderNewsMark;
@@ -48,15 +49,6 @@ import java.util.Set;
  * @author bpasero
  */
 public class ModelUtils {
-
-  /** Folder Index Value for Long Arrays */
-  public static final int FOLDER = 0;
-
-  /** Bookmark Index Value for Long Arrays */
-  public static final int BOOKMARK = 1;
-
-  /** Newsbin Index Value for Long Arrays */
-  public static final int NEWSBIN = 2;
 
   /* This utility class constructor is hidden */
   private ModelUtils() {
@@ -132,9 +124,9 @@ public class ModelUtils {
 
     int maxEntityCount = Math.max(folderCounter, Math.max(bookmarkCounter, newsbinCounter));
 
-    result[FOLDER] = toArray(folderIds, maxEntityCount);
-    result[BOOKMARK] = toArray(bookmarkIds, maxEntityCount);
-    result[NEWSBIN] = toArray(newsbinIds, maxEntityCount);;
+    result[CoreUtils.FOLDER] = toArray(folderIds, maxEntityCount);
+    result[CoreUtils.BOOKMARK] = toArray(bookmarkIds, maxEntityCount);
+    result[CoreUtils.NEWSBIN] = toArray(newsbinIds, maxEntityCount);;
 
     return result;
   }
