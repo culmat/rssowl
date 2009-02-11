@@ -188,11 +188,11 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
         + dbNews.toLongString());
   }
 
-  public List<INews> getNewsFromLink(INews newsItem, boolean newsSaved) {
+  private List<INews> getNewsFromLink(INews newsItem, boolean newsSaved) {
     return searchNews(newsItem, false, newsSaved);
   }
 
-  public List<INews> getNewsFromGuid(INews newsItem, boolean newsSaved) {
+  private List<INews> getNewsFromGuid(INews newsItem, boolean newsSaved) {
     return searchNews(newsItem, true, newsSaved);
   }
 
