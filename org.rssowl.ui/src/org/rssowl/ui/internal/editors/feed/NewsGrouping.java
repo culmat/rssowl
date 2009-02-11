@@ -49,11 +49,13 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * @author bpasero
@@ -268,7 +270,7 @@ public class NewsGrouping {
    * @return The Input grouped in an array of EntityGroup, as specified by the
    * Type of Group.
    */
-  public List<EntityGroup> group(Collection<INews> input) {
+  public Collection<EntityGroup> group(Collection<INews> input) {
     Assert.isTrue(fType != Type.NO_GROUPING, "Grouping is not enabled!"); //$NON-NLS-1$
 
     /* In case the List is empty */
@@ -386,7 +388,7 @@ public class NewsGrouping {
     return maskEmpty(new ArrayList<EntityGroup>(Arrays.asList(new EntityGroup[] { gSticky, gNotSticky })));
   }
 
-  private List<EntityGroup> createFeedGroups(Collection<INews> input) {
+  private Collection<EntityGroup> createFeedGroups(Collection<INews> input) {
     Map<Long, EntityGroup> groupCache = new HashMap<Long, EntityGroup>();
 
     /* Group Input */
@@ -423,7 +425,7 @@ public class NewsGrouping {
     }
 
     /* Select all that are non empty */
-    return maskEmpty(new ArrayList<EntityGroup>(Arrays.asList(groupCache.values().toArray(new EntityGroup[groupCache.values().size()]))));
+    return sort(maskEmpty(new ArrayList<EntityGroup>(Arrays.asList(groupCache.values().toArray(new EntityGroup[groupCache.values().size()])))));
   }
 
   private List<EntityGroup> createRatingGroups(Collection<INews> input) {
@@ -457,10 +459,10 @@ public class NewsGrouping {
     return maskEmpty(new ArrayList<EntityGroup>(Arrays.asList(new EntityGroup[] { gFantastic, gGood, gModerate, gBad, gVeryBad })));
   }
 
-  private List<EntityGroup> createLabelGroups(Collection<INews> input) {
+  private Collection<EntityGroup> createLabelGroups(Collection<INews> input) {
 
     /* Default Group */
-    EntityGroup gDefault = new EntityGroup(Group.NONE.ordinal(), GROUP_CATEGORY_ID, Group.NONE.getName());
+    EntityGroup gDefault = new EntityGroup(Group.NONE.ordinal(), GROUP_CATEGORY_ID, Group.NONE.getName(), Integer.MAX_VALUE);
 
     Map<String, EntityGroup> groupCache = new HashMap<String, EntityGroup>();
     groupCache.put(Group.NONE.getName(), gDefault);
@@ -474,10 +476,11 @@ public class NewsGrouping {
         EntityGroup group = gDefault;
 
         if (!labels.isEmpty()) {
-          String name = labels.iterator().next().getName();
+          ILabel label = labels.iterator().next();
+          String name = label.getName();
           group = groupCache.get(name);
           if (group == null) {
-            group = new EntityGroup(nextId++, GROUP_CATEGORY_ID, name);
+            group = new EntityGroup(nextId++, GROUP_CATEGORY_ID, name, label.getOrder());
             groupCache.put(name, group);
           }
         }
@@ -487,10 +490,10 @@ public class NewsGrouping {
     }
 
     /* Select all that are non empty */
-    return maskEmpty(new ArrayList<EntityGroup>(Arrays.asList(groupCache.values().toArray(new EntityGroup[groupCache.values().size()]))));
+    return sort(maskEmpty(new ArrayList<EntityGroup>(Arrays.asList(groupCache.values().toArray(new EntityGroup[groupCache.values().size()])))));
   }
 
-  private List<EntityGroup> createCategoryGroups(Collection<INews> input) {
+  private Collection<EntityGroup> createCategoryGroups(Collection<INews> input) {
 
     /* Default Group */
     EntityGroup gDefault = new EntityGroup(Group.UNKNOWN_CATEGORY.ordinal(), GROUP_CATEGORY_ID, Group.UNKNOWN_CATEGORY.getName());
@@ -523,10 +526,10 @@ public class NewsGrouping {
     }
 
     /* Select all that are non empty */
-    return maskEmpty(new ArrayList<EntityGroup>(Arrays.asList(groupCache.values().toArray(new EntityGroup[groupCache.values().size()]))));
+    return sort(maskEmpty(new ArrayList<EntityGroup>(Arrays.asList(groupCache.values().toArray(new EntityGroup[groupCache.values().size()])))));
   }
 
-  private List<EntityGroup> createAuthorGroups(Collection<INews> input) {
+  private Collection<EntityGroup> createAuthorGroups(Collection<INews> input) {
 
     /* Default Group */
     EntityGroup gDefault = new EntityGroup(Group.UNKNOWN_AUTHOR.ordinal(), GROUP_CATEGORY_ID, Group.UNKNOWN_AUTHOR.getName());
@@ -559,7 +562,7 @@ public class NewsGrouping {
     }
 
     /* Select all that are non empty */
-    return maskEmpty(new ArrayList<EntityGroup>(Arrays.asList(groupCache.values().toArray(new EntityGroup[groupCache.values().size()]))));
+    return sort(maskEmpty(new ArrayList<EntityGroup>(Arrays.asList(groupCache.values().toArray(new EntityGroup[groupCache.values().size()])))));
   }
 
   private List<EntityGroup> createStateGroups(Collection<INews> input) {
@@ -660,6 +663,27 @@ public class NewsGrouping {
     }
 
     return maskedItems;
+  }
+
+  private Collection<EntityGroup> sort(List<EntityGroup> items) {
+    Set<EntityGroup> sortedItems = new TreeSet<EntityGroup>(new Comparator<EntityGroup>() {
+      public int compare(EntityGroup o1, EntityGroup o2) {
+        if (o1.getSortKey() != null && o2.getSortKey() != null) {
+          if (o1.getSortKey() == o2.getSortKey())
+            return -1;
+
+          return o1.getSortKey().compareTo(o2.getSortKey());
+        }
+
+        if (o1.getName().equalsIgnoreCase(o2.getName())) //Duplicate names are allowed!
+          return -1;
+
+        return o1.getName().compareToIgnoreCase(o2.getName());
+      }
+    });
+
+    sortedItems.addAll(items);
+    return sortedItems;
   }
 
   boolean isActive() {
