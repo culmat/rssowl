@@ -984,6 +984,15 @@ public class FeedView extends EditorPart implements IReusableEditor {
             new ReloadTypesAction(new StructuredSelection(mark), getEditorSite().getShell()).run();
         }
 
+        /* Trigger reload of not loaded included Bookmarks */
+        else if (mark instanceof FolderNewsMark) {
+          IFolder folder = ((FolderNewsMark) mark).getFolder();
+          List<IBookMark> bookMarksToReload = new ArrayList<IBookMark>();
+          fillBookMarksToReload(bookMarksToReload, folder);
+          if (!bookMarksToReload.isEmpty())
+            new ReloadTypesAction(new StructuredSelection(bookMarksToReload.toArray()), getEditorSite().getShell()).run();
+        }
+
         /* Update some fields due to displaying the mark */
         if (mark instanceof ISearchMark) {
           DynamicDAO.getDAO(ISearchMarkDAO.class).visited((ISearchMark) mark);
@@ -997,6 +1006,21 @@ public class FeedView extends EditorPart implements IReusableEditor {
         }
       }
     });
+  }
+
+  private void fillBookMarksToReload(List<IBookMark> bookMarksToReload, IFolder folder) {
+    List<IMark> marks = folder.getMarks();
+    for (IMark mark : marks) {
+      if (mark instanceof IBookMark) {
+        if ((((IBookMark) mark).getMostRecentNewsDate() == null))
+          bookMarksToReload.add((IBookMark) mark);
+      }
+    }
+
+    List<IFolder> childs = folder.getFolders();
+    for (IFolder child : childs) {
+      fillBookMarksToReload(bookMarksToReload, child);
+    }
   }
 
   /* Set Input to Viewers */
