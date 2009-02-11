@@ -185,9 +185,9 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* Handle Grouping specially */
     if (fGrouping.isActive() && element instanceof INews) {
-      List<EntityGroup> groups = fGrouping.group(Collections.singletonList((INews) element));
+      Collection<EntityGroup> groups = fGrouping.group(Collections.singletonList((INews) element));
       if (groups.size() == 1)
-        return groups.get(0);
+        return groups.iterator().next();
     }
 
     return null;

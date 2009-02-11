@@ -46,6 +46,7 @@ public class EntityGroup implements IActionFilter {
   private final String fName;
   private ImageDescriptor fImage;
   List<EntityGroupItem> fItems;
+  private final Integer fSortKey;
 
   /**
    * Creates a new EntityGroup with the given ID. Note that inside one Viewer
@@ -70,11 +71,27 @@ public class EntityGroup implements IActionFilter {
    * @param name The Name of this EntityGroup.
    */
   public EntityGroup(long id, String groupId, String name) {
+    this (id, groupId, name, null);
+  }
+
+  /**
+   * Creates a new EntityGroup with the given ID and Name. Note that inside one
+   * Viewer there should <em>not</em> be two different ViewerGroups with the
+   * same ID.
+   *
+   * @param id The unique ID of the EntityGroup.
+   * @param groupId A unique Identifier describing the Category of this Group.
+   * The Category is used to decide wether contributed Actions should enable.
+   * @param sortKey a key for sorting or <code>null</code> if none.
+   * @param name The Name of this EntityGroup.
+   */
+  public EntityGroup(long id, String groupId, String name, Integer sortKey) {
     Assert.isNotNull(groupId);
     fId = id;
     fCategoryId = groupId;
     fName = name;
     fItems = new ArrayList<EntityGroupItem>();
+    fSortKey = sortKey;
   }
 
   /**
@@ -145,6 +162,13 @@ public class EntityGroup implements IActionFilter {
    */
   public int size() {
     return fItems.size();
+  }
+
+  /**
+   * @return the sort key or <code>null</code> if none.
+   */
+  public Integer getSortKey() {
+    return fSortKey;
   }
 
   @Override
