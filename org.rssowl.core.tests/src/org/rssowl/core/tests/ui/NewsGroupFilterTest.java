@@ -47,6 +47,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -145,7 +146,7 @@ public class NewsGroupFilterTest {
     /* Group by Date */
     {
       fGrouping.setType(NewsGrouping.Type.GROUP_BY_DATE);
-      List<EntityGroup> group = fGrouping.group(input);
+      Collection<EntityGroup> group = fGrouping.group(input);
 
       assertEquals(fTodayIsFirstDayOfWeek || fYesterdayIsFirstDayOfWeek ? 4 : 5, group.size());
       assertEquals(input.size(), countEntities(group));
@@ -200,7 +201,7 @@ public class NewsGroupFilterTest {
       news5.setState(INews.State.UPDATED);
 
       fGrouping.setType(NewsGrouping.Type.GROUP_BY_STATE);
-      List<EntityGroup> group = fGrouping.group(input);
+      Collection<EntityGroup> group = fGrouping.group(input);
 
       assertEquals(4, group.size());
       assertEquals(5, countEntities(group));
@@ -244,7 +245,7 @@ public class NewsGroupFilterTest {
       author2.setName("Author 2");
 
       fGrouping.setType(NewsGrouping.Type.GROUP_BY_AUTHOR);
-      List<EntityGroup> group = fGrouping.group(input);
+      Collection<EntityGroup> group = fGrouping.group(input);
 
       assertEquals(3, group.size());
       assertEquals(input.size(), countEntities(group));
@@ -276,7 +277,7 @@ public class NewsGroupFilterTest {
       fFactory.createCategory(null, news2).setName("Category 2");
 
       fGrouping.setType(NewsGrouping.Type.GROUP_BY_CATEGORY);
-      List<EntityGroup> group = fGrouping.group(input);
+      Collection<EntityGroup> group = fGrouping.group(input);
 
       assertEquals(3, group.size());
       assertEquals(input.size(), countEntities(group));
@@ -310,7 +311,7 @@ public class NewsGroupFilterTest {
       news7.addLabel(label2);
 
       fGrouping.setType(NewsGrouping.Type.GROUP_BY_LABEL);
-      List<EntityGroup> group = fGrouping.group(input);
+      Collection<EntityGroup> group = fGrouping.group(input);
 
       assertEquals(3, group.size());
       assertEquals(input.size(), countEntities(group));
@@ -345,7 +346,7 @@ public class NewsGroupFilterTest {
       news5.setRating(80);
 
       fGrouping.setType(NewsGrouping.Type.GROUP_BY_RATING);
-      List<EntityGroup> group = fGrouping.group(input);
+      Collection<EntityGroup> group = fGrouping.group(input);
 
       assertEquals(5, group.size());
       assertEquals(input.size(), countEntities(group));
@@ -386,7 +387,7 @@ public class NewsGroupFilterTest {
     /* Group by Feed */
     {
       fGrouping.setType(NewsGrouping.Type.GROUP_BY_FEED);
-      List<EntityGroup> group = fGrouping.group(input);
+      Collection<EntityGroup> group = fGrouping.group(input);
 
       assertEquals(1, group.size());
       assertEquals(input.size(), countEntities(group));
@@ -406,7 +407,7 @@ public class NewsGroupFilterTest {
       news2.setFlagged(true);
 
       fGrouping.setType(NewsGrouping.Type.GROUP_BY_STICKY);
-      List<EntityGroup> group = fGrouping.group(input);
+      Collection<EntityGroup> group = fGrouping.group(input);
 
       assertEquals(2, group.size());
       assertEquals(input.size(), countEntities(group));
@@ -431,7 +432,7 @@ public class NewsGroupFilterTest {
       news2.setTitle(news1.getTitle());
 
       fGrouping.setType(NewsGrouping.Type.GROUP_BY_TOPIC);
-      List<EntityGroup> group = fGrouping.group(input);
+      Collection<EntityGroup> group = fGrouping.group(input);
 
       assertEquals(6, group.size());
       assertEquals(input.size(), countEntities(group));
@@ -638,7 +639,7 @@ public class NewsGroupFilterTest {
     }
   }
 
-  private int countEntities(List<EntityGroup> group) {
+  private int countEntities(Collection<EntityGroup> group) {
     int count = 0;
 
     for (EntityGroup entityGroup : group) {
