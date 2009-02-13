@@ -44,9 +44,10 @@ import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * Global Action for Reloading a Selection of Folders and contained BookMarks.
@@ -102,7 +103,11 @@ public class ReloadTypesAction extends Action implements IObjectActionDelegate {
 
   @Override
   public void run() {
-    Set<IBookMark> selectedBookMarks = new HashSet<IBookMark>();
+    Set<IBookMark> selectedBookMarks = new TreeSet<IBookMark>(new Comparator<IBookMark>() {
+      public int compare(IBookMark o1, IBookMark o2) {
+        return 1;
+      }
+    });
 
     List<?> list = fSelection.toList();
     for (Object selection : list) {
@@ -145,17 +150,17 @@ public class ReloadTypesAction extends Action implements IObjectActionDelegate {
 
   private void getBookMarks(IFolder folder, Set<IBookMark> bookmarks) {
 
-    /* Go through Subfolders */
-    List<IFolder> folders = folder.getFolders();
-    for (IFolder childFolder : folders)
-      getBookMarks(childFolder, bookmarks);
-
     /* Go through BookMarks */
     List<IMark> marks = folder.getMarks();
     for (IMark mark : marks) {
       if (mark instanceof IBookMark)
         bookmarks.add((IBookMark) mark);
     }
+
+    /* Go through Subfolders */
+    List<IFolder> folders = folder.getFolders();
+    for (IFolder childFolder : folders)
+      getBookMarks(childFolder, bookmarks);
   }
 
   /*
