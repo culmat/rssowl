@@ -655,7 +655,7 @@ public class NewsTableControl implements IFeedViewPart {
       if ((!markRead || delay > 0) && selectedNews.getState() != INews.State.UNREAD) {
         fInstantMarkUnreadTracker.run(new TaskAdapter() {
           public IStatus run(IProgressMonitor monitor) {
-            setNewsState(selectedNews, INews.State.UNREAD);
+            setNewsState(selectedNews, INews.State.UNREAD, true);
             return Status.OK_STATUS;
           }
         });
@@ -665,7 +665,7 @@ public class NewsTableControl implements IFeedViewPart {
       if (markRead) {
         fNewsStateTracker.run(new TaskAdapter() {
           public IStatus run(IProgressMonitor monitor) {
-            setNewsState(selectedNews, INews.State.READ);
+            setNewsState(selectedNews, INews.State.READ, true);
             return Status.OK_STATUS;
           }
         });
@@ -715,7 +715,7 @@ public class NewsTableControl implements IFeedViewPart {
         INews news = (INews) data;
         disableTrackerTemporary = (news.getState() == INews.State.READ);
         INews.State newState = (news.getState() == INews.State.READ) ? INews.State.UNREAD : INews.State.READ;
-        setNewsState(news, newState);
+        setNewsState(news, newState, false);
       }
     }
 
@@ -990,9 +990,8 @@ public class NewsTableControl implements IFeedViewPart {
     PlatformUI.getWorkbench().getThemeManager().removePropertyChangeListener(fPropertyChangeListener);
   }
 
-  /* We run this in the UI Thread to avoid race conditions */
-  private void setNewsState(final INews news, final INews.State state) {
-    JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
+  private void setNewsState(final INews news, final INews.State state, boolean async) {
+    Runnable runnable = new Runnable() {
       public void run() {
 
         /* The news might have been marked as hidden/deleted meanwhile, so return */
@@ -1007,6 +1006,11 @@ public class NewsTableControl implements IFeedViewPart {
         /* Perform Operation */
         fNewsDao.setState(singleNewsSet, state, true, false);
       }
-    });
+    };
+
+    if (async)
+      JobRunner.runInUIThread(fViewer.getControl(), runnable);
+    else
+      runnable.run();
   }
 }
