@@ -299,7 +299,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         manager.add(new GroupMarker(M_VIEW_START));
 
         /* Toggle State of Toolbar Visibility */
-        manager.add(new Action("Toolbar", IAction.AS_CHECK_BOX) {
+        manager.add(new Action("&Toolbar", IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
@@ -316,7 +316,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         });
 
         /* Toggle State of Status Bar Visibility */
-        manager.add(new Action("Status", IAction.AS_CHECK_BOX) {
+        manager.add(new Action("&Status", IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
@@ -333,7 +333,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         });
 
         /* Toggle State of Bookmarks Visibility */
-        manager.add(new Action("Bookmarks", IAction.AS_CHECK_BOX) {
+        manager.add(new Action("&Bookmarks", IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             IWorkbenchPage page = OwlUI.getPage();
@@ -367,7 +367,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         /* Tabbed Browsing */
         manager.add(new Separator());
-        manager.add(new Action("Tabbed Browsing", IAction.AS_CHECK_BOX) {
+        manager.add(new Action("T&abbed Browsing", IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             boolean tabbedBrowsingEnabled = isChecked();
@@ -417,7 +417,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         /* Fullscreen Mode */
         manager.add(new Separator());
-        manager.add(new Action("Full Screen", IAction.AS_CHECK_BOX) {
+        manager.add(new Action("&Full Screen", IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             Shell shell = OwlUI.getActiveShell();
@@ -527,7 +527,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           Collections.sort(newsbins, comparator);
 
           /* Move To */
-          MenuManager moveMenu = new MenuManager("Move To", "moveto");
+          MenuManager moveMenu = new MenuManager("&Move To", "moveto");
           manager.add(moveMenu);
 
           for (INewsBin bin : newsbins) {
@@ -541,7 +541,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           moveMenu.add(new MoveCopyNewsToBinAction(selection, null, true));
 
           /* Copy To */
-          MenuManager copyMenu = new MenuManager("Copy To", "copyto");
+          MenuManager copyMenu = new MenuManager("&Copy To", "copyto");
           manager.add(copyMenu);
 
           for (INewsBin bin : newsbins) {
@@ -561,7 +561,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
           /* Mark */
           {
-            MenuManager markMenu = new MenuManager("Mark", "mark");
+            MenuManager markMenu = new MenuManager("M&ark", "mark");
             manager.add(markMenu);
 
             /* Mark as Read */
@@ -585,12 +585,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           {
             Collection<ILabel> labels = CoreUtils.loadSortedLabels();
 
-            MenuManager labelMenu = new MenuManager("Label");
+            MenuManager labelMenu = new MenuManager("&Label");
             manager.add(labelMenu);
 
             /* Assign / Organize Labels */
             labelMenu.add(new AssignLabelsAction(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), selection));
-            labelMenu.add(new Action("Organize Labels...") {
+            labelMenu.add(new Action("&Organize Labels...") {
               @Override
               public void run() {
                 PreferencesUtil.createPreferenceDialogOn(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), ManageLabelsPreferencePage.ID, null, null).open();
@@ -619,7 +619,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           manager.add(new Separator("filter"));
 
           /* Create Filter */
-          manager.add(new Action("Create Filter...") {
+          manager.add(new Action("Create &Filter...") {
             @Override
             public void run() {
               CreateFilterAction action = new CreateFilterAction();
@@ -639,7 +639,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           manager.add(new Separator("reload"));
 
           /* Update */
-          manager.add(new Action("Update") {
+          manager.add(new Action("&Update") {
             @Override
             public void run() {
               IActionDelegate action = new ReloadTypesAction();
@@ -684,7 +684,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           manager.add(new Separator("edit"));
 
           /* Copy Link */
-          manager.add(new Action("Copy Link") {
+          manager.add(new Action("Copy &Link") {
             @Override
             public void run() {
               IActionDelegate action = new CopyLinkAction();
@@ -709,7 +709,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           });
 
           /* Send Link */
-          manager.add(new Action("Send Link") {
+          manager.add(new Action("&Send Link") {
             @Override
             public void run() {
               IActionDelegate action = new SendLinkAction();
@@ -812,7 +812,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     });
 
     /* Show Key Bindings */
-    helpMenu.add(new Action("Show Key Bindings") {
+    helpMenu.add(new Action("&Show Key Bindings") {
       @Override
       public void run() {
         IWorkbench workbench = PlatformUI.getWorkbench();

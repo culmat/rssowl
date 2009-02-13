@@ -62,7 +62,7 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
    */
   public OpenInBrowserAction(IStructuredSelection selection) {
     fSelection = selection;
-    setText("Open in Browser");
+    setText("&Open in Browser");
     setId(ID);
     setActionDefinitionId(ID);
   }

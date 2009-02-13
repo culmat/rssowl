@@ -88,9 +88,9 @@ public class UndoStack {
    */
   public String getUndoName() {
     if (!isUndoSupported())
-      return "Undo";
+      return "&Undo";
 
-    return "Undo '" + fOperations.get(fCurrentIndex).getName() + "'";
+    return "&Undo '" + fOperations.get(fCurrentIndex).getName() + "'";
   }
 
   /**
@@ -99,9 +99,9 @@ public class UndoStack {
    */
   public String getRedoName() {
     if (!isRedoSupported())
-      return "Redo";
+      return "&Redo";
 
-    return "Redo '" + fOperations.get(fCurrentIndex + 1).getName() + "'";
+    return "&Redo '" + fOperations.get(fCurrentIndex + 1).getName() + "'";
   }
 
   /**
