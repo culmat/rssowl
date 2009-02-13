@@ -44,6 +44,10 @@ import java.util.List;
  * @author bpasero
  */
 public class CopyLinkAction implements IObjectActionDelegate {
+
+  /** ID of this Action */
+  public static final String ID = "org.rssowl.ui.CopyLinkAction";
+
   private IStructuredSelection fSelection;
 
   /*

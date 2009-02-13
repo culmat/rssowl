@@ -499,12 +499,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           manager.add(new Separator("open"));
 
           /* Open News in Browser */
-          manager.add(new Action("Open in Browser") {
-            @Override
-            public void run() {
-              new OpenInBrowserAction(selection).run();
-            }
-
+          manager.add(new OpenInBrowserAction(selection) {
             @Override
             public boolean isEnabled() {
               return !selection.isEmpty();
@@ -666,6 +661,16 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             public boolean isEnabled() {
               return !selection.isEmpty();
             }
+
+            @Override
+            public String getActionDefinitionId() {
+              return ReloadTypesAction.ID;
+            }
+
+            @Override
+            public String getId() {
+              return ReloadTypesAction.ID;
+            }
           });
 
           /* Update All */
@@ -691,6 +696,16 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             public boolean isEnabled() {
               return !selection.isEmpty();
             }
+
+            @Override
+            public String getActionDefinitionId() {
+              return CopyLinkAction.ID;
+            }
+
+            @Override
+            public String getId() {
+              return CopyLinkAction.ID;
+            }
           });
 
           /* Send Link */
@@ -706,9 +721,18 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             public boolean isEnabled() {
               return !selection.isEmpty();
             }
+
+            @Override
+            public String getActionDefinitionId() {
+              return SendLinkAction.ID;
+            }
+
+            @Override
+            public String getId() {
+              return SendLinkAction.ID;
+            }
           });
         }
-
       }
     });
   }

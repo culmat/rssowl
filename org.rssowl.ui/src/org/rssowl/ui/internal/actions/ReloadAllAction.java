@@ -44,6 +44,8 @@ import java.util.Collection;
  * @author bpasero
  */
 public class ReloadAllAction extends Action implements IWorkbenchWindowActionDelegate {
+  private static final String ID = "org.rssowl.ui.actions.ReloadAll";
+
   private Shell fShell;
 
   /**
@@ -51,6 +53,8 @@ public class ReloadAllAction extends Action implements IWorkbenchWindowActionDel
    */
   public ReloadAllAction() {
     super("Update All", OwlUI.getImageDescriptor("icons/elcl16/reload_all.gif"));
+    setId(ID);
+    setActionDefinitionId(ID);
   }
 
   /*

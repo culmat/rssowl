@@ -43,6 +43,10 @@ import java.util.List;
  * @author bpasero
  */
 public class SendLinkAction implements IObjectActionDelegate {
+
+  /** ID of this Action */
+  public static final String ID = "org.rssowl.ui.SendLinkAction";
+
   private IStructuredSelection fSelection;
 
   /*
