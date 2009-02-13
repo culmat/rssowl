@@ -11,6 +11,7 @@ import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -41,6 +42,10 @@ import java.util.TreeSet;
  * @author bpasero
  */
 public class LabelDialog extends Dialog {
+
+  /* Minimum Dialog Width */
+  private static final int MIN_DIALOG_WIDTH = 300;
+
   private final DialogMode fMode;
   private final ILabel fExistingLabel;
   private Text fNameInput;
@@ -184,7 +189,7 @@ public class LabelDialog extends Dialog {
         fInfoText.setText("Please enter the name and color for the new Label.");
         break;
       case EDIT:
-        fInfoText.setText("Please update the name and color for this Label.");
+        fInfoText.setText("Please enter the name and color for this Label.");
         break;
     }
 
@@ -268,5 +273,14 @@ public class LabelDialog extends Dialog {
       fName = fNameInput.getText();
 
     super.okPressed();
+  }
+
+  /*
+   * @see org.eclipse.jface.dialogs.Dialog#getInitialSize()
+   */
+  @Override
+  protected Point getInitialSize() {
+    Point shellSize = super.getInitialSize();
+    return new Point(Math.max(convertHorizontalDLUsToPixels(MIN_DIALOG_WIDTH), shellSize.x), shellSize.y);
   }
 }
