@@ -52,7 +52,7 @@ public class ReloadAllAction extends Action implements IWorkbenchWindowActionDel
    * Action to reload all BookMarks.
    */
   public ReloadAllAction() {
-    super("Update All", OwlUI.getImageDescriptor("icons/elcl16/reload_all.gif"));
+    super("Update &All", OwlUI.getImageDescriptor("icons/elcl16/reload_all.gif"));
     setId(ID);
     setActionDefinitionId(ID);
   }

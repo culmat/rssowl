@@ -64,7 +64,7 @@ public class AssignLabelsAction extends Action {
    */
   @Override
   public String getText() {
-    return "Assign Labels...";
+    return "&Assign Labels...";
   }
 
   /*

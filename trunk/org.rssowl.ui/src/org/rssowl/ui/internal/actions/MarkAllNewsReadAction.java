@@ -42,7 +42,7 @@ public class MarkAllNewsReadAction extends Action implements IWorkbenchWindowAct
 
   /** Leave for reflection */
   public MarkAllNewsReadAction() {
-    setText("All News as Read");
+    setText("&All News as Read");
     setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/mark_all_read.gif"));
     setId(ID);
     setActionDefinitionId(ID);

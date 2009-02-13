@@ -43,7 +43,7 @@
                definitionId="org.rssowl.ui.actions.NewBookMark"
                icon="icons/obj16/bookmark.gif"
                id="org.rssowl.ui.actions.NewBookMark"
-               label="Bookmark..."
+               label="&amp;Bookmark..."
                menubarPath="file/new_sub/bookmark"
                style="push">
          </action>
@@ -52,7 +52,7 @@
                definitionId="org.rssowl.ui.actions.NewNewsBin"
                icon="icons/obj16/newsbin.gif"
                id="org.rssowl.ui.actions.NewNewsBin"
-               label="News Bin..."
+               label="&amp;News Bin..."
                menubarPath="file/new_sub/newsbin"
                style="push">
          </action>
@@ -61,7 +61,7 @@
                definitionId="org.rssowl.ui.actions.NewSearchMark"
                icon="icons/obj16/searchmark.gif"
                id="org.rssowl.ui.actions.NewSearchMark"
-               label="Saved Search..."
+               label="&amp;Saved Search..."
                menubarPath="file/new_sub/searchmark"
                style="push">
          </action>
@@ -70,7 +70,7 @@
                definitionId="org.rssowl.ui.actions.NewFolder"
                icon="icons/obj16/folder.gif"
                id="org.rssowl.ui.actions.NewFolder"
-               label="Folder..."
+               label="&amp;Folder..."
                menubarPath="file/new_sub/folder"
                style="push">
          </action>
@@ -153,7 +153,7 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextUnreadNews"
                definitionId="org.rssowl.ui.NextUnreadNews"
                id="org.rssowl.ui.NextUnreadNews"
-               label="Next Unread News"
+               label="Next &amp;Unread News"
                menubarPath="navigate/next/next.news"
                style="push">
          </action>
@@ -161,7 +161,7 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextNews"
                definitionId="org.rssowl.ui.NextNews"
                id="org.rssowl.ui.NextNews"
-               label="Next News"
+               label="&amp;Next News"
                menubarPath="navigate/next/next.news"
                style="push">
          </action>
@@ -169,7 +169,7 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextUnreadFeed"
                definitionId="org.rssowl.ui.NextUnreadFeed"
                id="org.rssowl.ui.NextUnreadFeed"
-               label="Next Feed with Unread News"
+               label="Next Feed &amp;with Unread News"
                menubarPath="navigate/next/next.feed"
                style="push">
          </action>
@@ -177,7 +177,7 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextFeed"
                definitionId="org.rssowl.ui.NextFeed"
                id="org.rssowl.ui.NextFeed"
-               label="Next Feed"
+               label="Next &amp;Feed"
                menubarPath="navigate/next/next.feed"
                style="push">
          </action>
@@ -185,7 +185,7 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousUnreadNews"
                definitionId="org.rssowl.ui.PreviousUnreadNews"
                id="org.rssowl.ui.PreviousUnreadNews"
-               label="Previous Unread News"
+               label="Previous &amp;Unread News"
                menubarPath="navigate/previous/previous.news"
                style="push">
          </action>
@@ -193,7 +193,7 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousNews"
                definitionId="org.rssowl.ui.PreviousNews"
                id="org.rssowl.ui.PreviousNews"
-               label="Previous News"
+               label="&amp;Previous News"
                menubarPath="navigate/previous/previous.news"
                style="push">
          </action>
@@ -201,7 +201,7 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousUnreadFeed"
                definitionId="org.rssowl.ui.PreviousUnreadFeed"
                id="org.rssowl.ui.PreviousUnreadFeed"
-               label="Previous Feed with Unread News"
+               label="Previous Feed &amp;with Unread News"
                menubarPath="navigate/previous/previous.feed"
                style="push">
          </action>
@@ -209,7 +209,7 @@
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousFeed"
                definitionId="org.rssowl.ui.PreviousFeed"
                id="org.rssowl.ui.PreviousFeed"
-               label="Previous Feed"
+               label="Previous &amp;Feed"
                menubarPath="navigate/previous/previous.feed"
                style="push">
          </action>
@@ -325,7 +325,7 @@
                class="org.rssowl.ui.internal.actions.CleanUpAction"
                definitionId="org.rssowl.ui.CleanUpAction"
                id="org.rssowl.ui.CleanUpAction"
-               label="Clean Up..."
+               label="&amp;Clean Up..."
                menubarPath="tools/begin">
          </action>
       </actionSet>
@@ -337,7 +337,7 @@
                class="org.rssowl.ui.internal.actions.OpenNewsFiltersAction"
                definitionId="org.rssowl.ui.OpenNewsFiltersAction"
                id="org.rssowl.ui.OpenNewsFiltersAction"
-               label="News Filters..."
+               label="&amp;News Filters..."
                menubarPath="tools/begin"
                style="push">
          </action>

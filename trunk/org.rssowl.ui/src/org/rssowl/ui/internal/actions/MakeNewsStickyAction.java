@@ -79,7 +79,7 @@ public class MakeNewsStickyAction extends Action implements IWorkbenchWindowActi
     IBindingService bs = (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
     TriggerSequence binding = bs.getBestActiveBindingFor(ID);
 
-    return binding != null ? "News as Sticky\t" + binding.format() : "News as Sticky";
+    return binding != null ? "News as &Sticky\t" + binding.format() : "News as &Sticky";
   }
 
   /*

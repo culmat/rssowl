@@ -50,7 +50,7 @@ public class SearchNewsAction extends Action implements IWorkbenchWindowActionDe
    */
   public SearchNewsAction(IWorkbenchWindow window) {
     fWindow = window;
-    setText("Search News...");
+    setText("&Search News...");
     setImageDescriptor(OwlUI.SEARCHMARK);
     setId("org.rssowl.ui.SearchNewsAction");
     setActionDefinitionId("org.rssowl.ui.SearchNewsAction");
