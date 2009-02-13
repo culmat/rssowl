@@ -48,9 +48,11 @@ import java.util.List;
  * @author bpasero
  */
 public class OpenInBrowserAction extends Action implements IWorkbenchWindowActionDelegate {
+  private static final String ID = "org.rssowl.ui.OpenInBrowserAction";
+
   private IStructuredSelection fSelection;
 
-  /** */
+  /** Default Constructor for Reflection */
   public OpenInBrowserAction() {
     this(StructuredSelection.EMPTY);
   }
@@ -61,6 +63,8 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
   public OpenInBrowserAction(IStructuredSelection selection) {
     fSelection = selection;
     setText("Open in Browser");
+    setId(ID);
+    setActionDefinitionId(ID);
   }
 
   /*

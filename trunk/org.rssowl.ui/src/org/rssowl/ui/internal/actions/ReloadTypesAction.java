@@ -54,6 +54,10 @@ import java.util.Set;
  * @author bpasero
  */
 public class ReloadTypesAction extends Action implements IObjectActionDelegate {
+
+  /** ID of this Action */
+  public static final String ID = "org.rssowl.ui.actions.Reload";
+
   private IStructuredSelection fSelection;
   private Shell fShell;
 
@@ -100,7 +104,7 @@ public class ReloadTypesAction extends Action implements IObjectActionDelegate {
   public void run() {
     Set<IBookMark> selectedBookMarks = new HashSet<IBookMark>();
 
-    List< ? > list = fSelection.toList();
+    List<?> list = fSelection.toList();
     for (Object selection : list) {
       if (selection instanceof IFolder) {
         IFolder folder = (IFolder) selection;
