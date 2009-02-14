@@ -109,7 +109,6 @@
 		</outline>
 		<outline text="News">
 		<outline text="Guardian Unlimited" xmlUrl="http://www.guardian.co.uk/rss/1,,,00.xml" />
-		<outline text="FAZ.NET" xmlUrl="http://www.faz.net/s/rub/tpl~epartner~srss_.xml" />
 		<outline text="World Press Review" xmlUrl="http://www.worldpress.org/feeds/topstories.xml" />
 		<outline text="Yahoo! News" xmlUrl="http://rss.news.yahoo.com/rss/topstories" />
 		<outline text="CNN" xmlUrl="http://xml.newsisfree.com/feeds/15/2315.xml" />
@@ -179,6 +178,7 @@
 		<outline text="PHPBuilder.com" xmlUrl="http://phpbuilder.com/rss_feed.php?type=articles&amp;limit=20" />
 		<outline text="PHP News" xmlUrl="http://www.php.net/news.rss" />
 		<outline text="Java" xmlUrl="http://developers.sun.com/rss/sdn.xml" />
+		<outline text="Planet JDK" xmlUrl="http://planetjdk.org/feed.atom-1.0" />
 		<outline text="Servlets.com" xmlUrl="http://www.servlets.com/blog/index.rss" />
 		<outline text="JavaScript Tips" xmlUrl="http://www.webreference.com/js/tips/channels/last1515.rdf" />
 		</outline>
@@ -241,7 +241,6 @@
 		<outline text="Wizbang" xmlUrl="http://wizbangblog.com/index.rdf" />
 		<outline text="little. yellow. different." xmlUrl="http://littleyellowdifferent.com/index.xml" />
 		<outline text="Blogcritics" xmlUrl="http://www.blogcritics.org/index.rdf" />
-		<outline text="Der Männerblog" xmlUrl="http://maennerseiten.de/blog/index.php/feed" />
 		<outline text="Jonathan Schwartz's Weblog" xmlUrl="http://blogs.sun.com/roller/rss/jonathan" />
 		<outline text="Boing Boing" xmlUrl="http://www.boingboing.net/index.rdf" />
 		<outline text="Anil Dash" xmlUrl="http://www.dashes.com/anil/index.rdf" />
