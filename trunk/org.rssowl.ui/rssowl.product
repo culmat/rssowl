@@ -9,7 +9,7 @@
          RSSOwl 2.0
 
 Version: 2.0.0
-Build id: Milestone 9 RC1
+Build id: Milestone 9 RC2
 
 RSSOwl is licensed under the terms of the Eclipse Public License version 1.0.
 http://www.rssowl.org/legal/epl-v10.html
@@ -40,6 +40,7 @@ http://www.rssowl.org/legal/epl-v10.html
          <bmp/>
       </win>
    </launcher>
+
 
    <vm>
    </vm>
