@@ -196,10 +196,8 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     ((GridData) infoText.getLayoutData()).widthHint = 200;
     infoText.setBackground(masterContainer.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
-    if (Application.IS_WINDOWS)
-      infoText.setText("Set a master password to protect your passwords from unauthorized access. Note that on Windows, the passwords are automatically protected using your system password.");
-    else if (Application.IS_MAC)
-      infoText.setText("Set a master password to protect your passwords from unauthorized access. Note that on MacOS, the passwords are automatically protected using your system password.");
+    if (Application.IS_WINDOWS || Application.IS_MAC)
+      infoText.setText("Set a master password to protect your passwords from unauthorized access. Note that passwords are automatically protected using your operating system password.");
     else
       infoText.setText("It is recommended to set a master password to protect your passwords from unauthorized access.");
 
