@@ -42,13 +42,13 @@ public class LongHashSet {
 
   private long[] elements;
 
-  protected byte[] states;
+  private byte[] states;
 
-  protected static final byte FREE = 0;
+  private static final byte FREE = 0;
 
-  protected static final byte FULL = 1;
+  private static final byte FULL = 1;
 
-  protected static final byte REMOVED = 2;
+  private static final byte REMOVED = 2;
 
   public LongHashSet() {
     this(DEFAULT_EXPECTED_SIZE);
