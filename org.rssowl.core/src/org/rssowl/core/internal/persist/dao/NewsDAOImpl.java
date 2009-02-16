@@ -281,6 +281,7 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
       Query query = fDb.query();
       query.constrain(News.class);
       query.descend("fFeedLink").constrain(feedRef.getLink().toString());
+      query.descend("fParentId").constrain(0);
       if (!states.containsAll(EnumSet.allOf(INews.State.class))) {
         Constraint constraint = null;
         for (INews.State state : states) {
