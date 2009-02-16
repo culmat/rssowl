@@ -24,7 +24,7 @@
 
 package org.rssowl.core.internal.persist;
 
-public class LongSet {
+public class LongHashSet {
 
   private static final long serialVersionUID = 1L;
 
@@ -50,18 +50,18 @@ public class LongSet {
 
   protected static final byte REMOVED = 2;
 
-  public LongSet() {
+  public LongHashSet() {
     this(DEFAULT_EXPECTED_SIZE);
   }
 
-  public LongSet(int expectedSize) {
+  public LongHashSet(int expectedSize) {
     int capacity = computeCapacity(expectedSize);
     elements = new long[capacity];
     states = new byte[capacity];
     mask = capacity - 1;
   }
 
-  public LongSet(LongSet source) {
+  public LongHashSet(LongHashSet source) {
     int length = source.elements.length;
     elements = new long[length];
     System.arraycopy(source.elements, 0, elements, 0, length);
