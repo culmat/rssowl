@@ -29,21 +29,16 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.rssowl.core.internal.persist.DefaultModelFactory;
-import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
-import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.INewsDAO;
-import org.rssowl.core.persist.reference.FeedLinkReference;
 
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
@@ -199,27 +194,5 @@ public class INewsTest {
     Set<ILabel> labels = news.getLabels();
     labels.add(fFactory.createLabel(null, "Another label"));
     assertEquals(1, labels.size());
-  }
-
-  /**
-   * @throws Exception
-   */
-  @Test
-  public void testNewsDaoLoadAllFromFeed() throws Exception {
-    IFolder root = fFactory.createFolder(null, null, "Root");
-    INewsBin bin = fFactory.createNewsBin(null, root, "Bin");
-    DynamicDAO.save(root);
-
-    IFeed parent = fFactory.createFeed(null, new URI("http://www.feed.com"));
-    INews news = fFactory.createNews(null, parent, new Date());
-    DynamicDAO.save(parent);
-
-    INews newsCopy = new News((News) news, bin.getId());
-    DynamicDAO.save(newsCopy);
-    DynamicDAO.save(bin);
-
-    Collection<INews> newsFromFeed = DynamicDAO.getDAO(INewsDAO.class).loadAll(new FeedLinkReference(parent.getLink()), INews.State.getVisible());
-    assertEquals(1, newsFromFeed.size());
-    assertEquals(news, newsFromFeed.iterator().next());
   }
 }

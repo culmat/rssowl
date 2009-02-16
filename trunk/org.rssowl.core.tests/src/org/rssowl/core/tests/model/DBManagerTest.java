@@ -146,6 +146,28 @@ public class DBManagerTest {
     fNewsDAO = DynamicDAO.getDAO(INewsDAO.class);
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testNewsDaoLoadAllFromFeed() throws Exception {
+    IFolder root = fTypesFactory.createFolder(null, null, "Root");
+    INewsBin bin = fTypesFactory.createNewsBin(null, root, "Bin");
+    DynamicDAO.save(root);
+
+    IFeed parent = fTypesFactory.createFeed(null, new URI("http://www.feed.com"));
+    INews news = fTypesFactory.createNews(null, parent, new Date());
+    DynamicDAO.save(parent);
+
+    INews newsCopy = fTypesFactory.createNews(news, bin);
+    DynamicDAO.save(newsCopy);
+    DynamicDAO.save(bin);
+
+    Collection<INews> newsFromFeed = DynamicDAO.getDAO(INewsDAO.class).loadAll(new FeedLinkReference(parent.getLink()), INews.State.getVisible());
+    assertEquals(1, newsFromFeed.size());
+    assertEquals(news, newsFromFeed.iterator().next());
+  }
+
   @Test
   public void testAddDuplicateNewsDeadlocks() {
     List<INews> newsList = new ArrayList<INews>();
