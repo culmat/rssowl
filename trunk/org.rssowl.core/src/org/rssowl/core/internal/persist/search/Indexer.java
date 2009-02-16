@@ -115,7 +115,7 @@ public class Indexer {
 
   /**
    * TODO Provide generic method that can deal with any entity!
-   * 
+   *
    * @param entities
    * @param isUpdate
    */
@@ -167,7 +167,7 @@ public class Indexer {
 
   /**
    * TODO Provide generic method that can deal with any Event!
-   * 
+   *
    * @param entities
    * @throws IOException
    */
@@ -230,7 +230,7 @@ public class Indexer {
    * be called if the information stored in the persistence layer has been
    * cleared with a method that does not issue events for the elements that are
    * removed.
-   * 
+   *
    * @throws IOException
    */
   synchronized void clearIndex() throws IOException {
@@ -246,7 +246,7 @@ public class Indexer {
 
   /**
    * Optimizes the Lucene Index.
-   * 
+   *
    * @throws CorruptIndexException
    * @throws IOException
    */
@@ -257,7 +257,7 @@ public class Indexer {
   /**
    * Creates the <code>Analyzer</code> that is used for all analyzation of
    * Fields and Queries.
-   * 
+   *
    * @return Returns the <code>Analyzer</code> that is used for all analyzation
    * of Fields and Queries.
    */
@@ -359,51 +359,25 @@ public class Indexer {
     /* Listen to News-Events */
     fNewsListener = new NewsListener() {
       public void entitiesAdded(Set<NewsEvent> events) {
-        handleEntitiesAdded(events);
+        handleEntitiesAdded(DBHelper.filterPersistedNewsForIndexing(events));
       }
 
       public void entitiesUpdated(Set<NewsEvent> events) {
 
         /* An Updated News may involve Restore, Removal or actual Update */
-        Set<NewsEvent> newsToUpdate = null;
-        Set<NewsEvent> newsToRestore = null;
-        Set<NewsEvent> newsToDelete = null;
-        for (NewsEvent event : events) {
-          boolean wasVisible = event.getOldNews().isVisible();
-          boolean isVisible = event.getEntity().isVisible();
+        Set<NewsEvent> newsToUpdate = new HashSet<NewsEvent>(3);
+        Set<NewsEvent> newsToRestore = new HashSet<NewsEvent>(3);
+        Set<NewsEvent> newsToDelete = new HashSet<NewsEvent>(3);
+        for (NewsEvent event : events)
+          DBHelper.indexTypeForNewsUpdate(event, newsToRestore, newsToUpdate, newsToDelete);
 
-          /* News got Deleted/Hidden */
-          if (wasVisible && !isVisible) {
-            if (newsToDelete == null)
-              newsToDelete = new HashSet<NewsEvent>(5);
-
-            newsToDelete.add(event);
-          }
-
-          /* News got Restored */
-          else if (!wasVisible && isVisible) {
-            if (newsToRestore == null)
-              newsToRestore = new HashSet<NewsEvent>(5);
-
-            newsToRestore.add(event);
-          }
-
-          /* Normal Update */
-          else if (wasVisible && isVisible) {
-            if (newsToUpdate == null)
-              newsToUpdate = new HashSet<NewsEvent>(5);
-
-            newsToUpdate.add(event);
-          }
-        }
-
-        if (newsToRestore != null)
+        if (!newsToRestore.isEmpty())
           handleEntitiesAdded(newsToRestore);
 
-        if (newsToUpdate != null)
+        if (!newsToUpdate.isEmpty())
           handleEntitiesUpdated(newsToUpdate);
 
-        if (newsToDelete != null)
+        if (!newsToDelete.isEmpty())
           handleEntitiesDeleted(newsToDelete);
       }
 
