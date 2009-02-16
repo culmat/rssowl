@@ -25,7 +25,6 @@
 		<outline text="macosxhints" xmlUrl="http://www.macosxhints.com/backend/geeklog.rdf" />
 		<outline text="Mac Help Forums" xmlUrl="http://www.mac-help.com/forums/external.php?type=rss2" />
 		<outline text="Mac OS X Knowledge Base Docs" xmlUrl="http://docs.info.apple.com/rss/macosx.rss" />
-		<outline text="HardMac.com" xmlUrl="http://www.hardmac.com/hardmac.rss" />
 		<outline text="MACnn News" xmlUrl="http://macnn.com/macnn.rss" />
 		<outline text="Macworld" xmlUrl="http://www.macworld.com/rss.xml" />
 		<outline text="Mac Gems Weblog" xmlUrl="http://www.macworld.com/weblogs/macgems/rss.xml" />
@@ -46,7 +45,6 @@
 		<outline text="Variety.com" xmlUrl="http://www.variety.com/rss.asp?categoryid=1010" />
 		<outline text="NYT Book Review" xmlUrl="http://radio.weblogs.com/0124132/staplerfeeds/nytbook.xml" />
 		<outline text="The Literary Saloon" xmlUrl="http://www.complete-review.com/saloon/rss.xml" />
-		<outline text="bookfetish" xmlUrl="http://bookfetish.blogspot.com/atom.xml" />
 		<outline text="The Shifted Librarian" xmlUrl="http://www.theshiftedlibrarian.com/rss.xml" />
 		</outline>
 		<outline text="Cars">
@@ -61,19 +59,16 @@
 		<outline text="Joystiq" xmlUrl="http://www.joystiq.com/rss.xml" />
 		</outline>
 		<outline text="Humor">
-		<outline text="Dilbert Blog" xmlUrl="http://dilbertblog.typepad.com/the_dilbert_blog/atom.xml" />
-		<outline text="JabTV" xmlUrl="http://www.jabtv.com/rss/rss.xml" />
+		<outline text="Dilbert.com Blog" xmlUrl="http://dilbert.com/blog/" />
 		<outline text="Darkgate Comic Slurper" xmlUrl="http://darkgate.net/comic/feed.php?foxtrot&amp;dilbert&amp;doonesbury&amp;sherman&amp;userf&amp;stonesoup" />
 		<outline text="Get Fuzzy" xmlUrl="http://www.tapestrycomics.com/getfuzzy.xml" />
 		<outline text="Lost Brain" xmlUrl="http://www.lostbrain.com/rss/rssv0_91.xml" />
 		</outline>
 		<outline text="SciFi">
-		<outline text="Battlestar Galactica Blog" xmlUrl="http://blog.scifi.com/battlestar/atom.xml" />
 		<outline text="Stargate Blog" xmlUrl="http://blog.scifi.com/stargate/index.rdf" />
 		<outline text="Sci-Fi Storm" xmlUrl="http://scifistorm.org/scifistorm.rdf" />
 		</outline>
 		<outline text="Gawker" xmlUrl="http://www.gawker.com/index.xml" />
-		<outline text="Ask Yahoo!" xmlUrl="http://ask.yahoo.com/ask/index.xml" />
 		<outline text="The Movie Blog" xmlUrl="http://feeds.feedburner.com/themovieblog/VkTh" />
 		<outline text="CC Insider" xmlUrl="http://ccinsider.comedycentral.com/cc_insider/atom.xml" />
 		</outline>
@@ -90,7 +85,6 @@
 		<outline text="NBC Bay Area - Health Top Stories" xmlUrl="http://feeds.nbcbayarea.com/nbcbayarea/health/?rss=y" />
 		<outline text="Family Medicine Notes" xmlUrl="http://www.docnotes.net/index.rdf" />
 		<outline text="Pharyngula" xmlUrl="http://pharyngula.org/index.xml" />
-		<outline text="medpundit" xmlUrl="http://medpundit.blogspot.com/rss/medpundit.xml" />
 		</outline>
 		<outline text="Internet">
 		<outline text="WebDeveloper.com" xmlUrl="http://www.webdeveloper.com/webdeveloper.rdf" />
@@ -124,19 +118,15 @@
 		<outline text="The Chris Pirillo Show" xmlUrl="http://feeds.pirillo.com/ChrisPirilloShow" />
 		<outline text="Open Source" xmlUrl="http://www.radioopensource.org/wp-rss2.php?cat=18" />
 		<outline text="President's Weekly Radio Address" xmlUrl="http://www.whitehouse.gov/rss/radioaddress.xml" />
-		<outline text="Morning Coffee Notes" xmlUrl="http://www.morningcoffeenotes.com/rss.xml" />
-		<outline text="Gillmor Gang" xmlUrl="http://gillmorgang.podshow.com/wp-rss2.php" />
 		<outline text="Geek News Central" xmlUrl="http://www.geeknewscentral.com/index.xml" />
 		<outline text="this WEEK in TECH" xmlUrl="http://leo.am/podcasts/twit" />
 		<outline text="Adam Curry: Daily Source Code" xmlUrl="http://radio.weblogs.com/0001014/categories/dailysourcecode/rss.xml" />
 		<outline text="Geek News Central Podcast" xmlUrl="http://www.geeknewscentral.com/podcast.xml" />
-		<outline text="the Eric Rice Show" xmlUrl="http://show.ericrice.com/blog/index.xml" />
 		</outline>
 		<outline text="Politics">
 		<outline text="GrokLaw" xmlUrl="http://www.groklaw.net/backend/groklaw.rdf" />
 		<outline text="The Agitator" xmlUrl="http://theagitator.com/index.xml" />
 		<outline text="Davenetics Politics (electablog)" xmlUrl="http://www.electablog.com/rss.xml" />
-		<outline text="Instapundit.com" xmlUrl="http://www.instapundit.com/index.rdf" />
 		<outline text="Talking Points Memo" xmlUrl="http://www.talkingpointsmemo.com/index.xml" />
 		</outline>
 		<outline text="Science">
@@ -190,7 +180,6 @@
 		<outline text="Wireless">
 		<outline text="Computer World Mobile" xmlUrl="http://www.computerworld.com/news/xml/0,5000,68,00.xml" />
 		<outline text="The RFID Weblog" xmlUrl="http://www.rfid-weblog.com/index.rdf" />
-		<outline text="Wireless Business Applications" xmlUrl="http://wirelessbusiness.blogs.com/weblog/index.rdf" />
 		<outline text="WiFi Planet" xmlUrl="http://www.wi-fiplanet.com/icom_includes/feeds/80211/xml_front-news-10.xml" />
 		<outline text="InfoWorld: Wireless" xmlUrl="http://www.infoworld.com/rss/wireless.rdf" />
 		</outline>
@@ -234,17 +223,16 @@
 		<outline text="Weblogs">
 		<outline text="Google Sightseeing" xmlUrl="http://googlesightseeing.com/feed" />
 		<outline text="LivingRoom. A space for Life" xmlUrl="http://www.livingroom.org.au/blog/index.rdf" />
-		<outline text="Scobleizer: Microsoft Geek Blogger" xmlUrl="http://radio.weblogs.com/0001011/rss.xml" />
+		<outline text="Scobleizer -- Tech geek blogger" xmlUrl="http://scobleizer.wordpress.com/feed/" />
 		<outline text="Mini-Microsoft" xmlUrl="http://minimsft.blogspot.com/atom.xml" />
 		<outline text="Google Blogoscoped" xmlUrl="http://blog.outer-court.com/rss.xml" />
-		<outline text="HorsePigCow: life uncommon" xmlUrl="http://www.horsepigcow.com/roguereport/atom.xml" />
+		<outline text="HorsePigCow: life uncommon" xmlUrl="http://feeds.feedburner.com/horsepigcowLifeUncommon" />
 		<outline text="Wizbang" xmlUrl="http://wizbangblog.com/index.rdf" />
 		<outline text="little. yellow. different." xmlUrl="http://littleyellowdifferent.com/index.xml" />
 		<outline text="Blogcritics" xmlUrl="http://www.blogcritics.org/index.rdf" />
 		<outline text="Jonathan Schwartz's Weblog" xmlUrl="http://blogs.sun.com/roller/rss/jonathan" />
 		<outline text="Boing Boing" xmlUrl="http://www.boingboing.net/index.rdf" />
 		<outline text="Anil Dash" xmlUrl="http://www.dashes.com/anil/index.rdf" />
-		<outline text="Spamusement" xmlUrl="http://spamusement.com/rss" />
 		<outline text="Pandagon" xmlUrl="http://pandagon.net/index.php/site/rss_2.0/" />
 		</outline>
 		<outline text="RSSOwl News" xmlUrl="http://www.rssowl.org/newsfeed" />
