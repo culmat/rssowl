@@ -29,13 +29,13 @@ import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.rssowl.core.internal.persist.LongSet;
+import org.rssowl.core.internal.persist.LongHashSet;
 
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-public class LongSetTest {
+public class LongHashSetTest {
     private Set<Long> javaSet = new HashSet<Long>();
 
     @Before
@@ -63,8 +63,8 @@ public class LongSetTest {
         return set;
     }
 
-    private LongSet createFromJavaSet() {
-        LongSet set = new LongSet();
+    private LongHashSet createFromJavaSet() {
+        LongHashSet set = new LongHashSet();
         for (Long element : javaSet)
             set.add(element);
         return set;
@@ -72,27 +72,27 @@ public class LongSetTest {
 
     @Test
     public void testAddAndContainsWith0ExpectedSize() {
-        LongSet set = new LongSet(0);
+        LongHashSet set = new LongHashSet(0);
         assertAddAndContains(set);
     }
 
     @Test
     public void testAddAndContainsWithExpectedSize() {
-        LongSet set = new LongSet(500);
+        LongHashSet set = new LongHashSet(500);
         assertAddAndContains(set);
     }
 
     @Test
     public void testAddAndContains() {
-        LongSet set = new LongSet();
+        LongHashSet set = new LongHashSet();
         assertAddAndContains(set);
     }
 
-    private void assertAddAndContains(LongSet set) {
+    private void assertAddAndContains(LongHashSet set) {
         assertAddAndContains(set, 0, new HashSet<Long>());
     }
 
-    private void assertAddAndContains(LongSet set, int setSize,
+    private void assertAddAndContains(LongHashSet set, int setSize,
             Set<Long> keysInSet) {
         assertEquals(setSize, set.size());
         for (Long element : javaSet) {
@@ -106,7 +106,7 @@ public class LongSetTest {
 
     @Test
     public void testAddAbsentOnExisting() {
-        LongSet set = createFromJavaSet();
+        LongHashSet set = createFromJavaSet();
         int size = javaSet.size();
         for (long element : generateAbsent()) {
             set.add(element);
@@ -117,7 +117,7 @@ public class LongSetTest {
 
     @Test
     public void testAddOnExisting() {
-        LongSet set = createFromJavaSet();
+        LongHashSet set = createFromJavaSet();
         for (long element : javaSet) {
             set.add(element);
             assertEquals(javaSet.size(), set.size());
@@ -128,7 +128,7 @@ public class LongSetTest {
     @Test
     public void testContainsAbsent() {
         Set<Long> generated = generateAbsent();
-        LongSet set = createFromJavaSet();
+        LongHashSet set = createFromJavaSet();
 
         for (long element : generated)
           assertFalse(set.contains(element));
@@ -136,7 +136,7 @@ public class LongSetTest {
 
     @Test
     public void testContainsFromEmpty() {
-        LongSet set = new LongSet();
+        LongHashSet set = new LongHashSet();
         assertFalse(set.contains(5));
         assertFalse(set.contains(0));
         assertFalse(set.contains(50));
@@ -144,7 +144,7 @@ public class LongSetTest {
 
     @Test
     public void testRemove() {
-        LongSet set = createFromJavaSet();
+        LongHashSet set = createFromJavaSet();
         int setSize = javaSet.size();
         assertEquals(setSize, set.size());
         for (long element : javaSet) {
@@ -160,7 +160,7 @@ public class LongSetTest {
     /* This time only remove some entries */
     @Test
     public void testRemove2() {
-        LongSet set = createFromJavaSet();
+        LongHashSet set = createFromJavaSet();
         int setSize = javaSet.size();
         int count = 0;
         Set<Long> keysInSet = new HashSet<Long>(javaSet);
@@ -179,7 +179,7 @@ public class LongSetTest {
 
     @Test
     public void testRemoveFromEmpty() {
-        LongSet set = new LongSet();
+        LongHashSet set = new LongHashSet();
         assertFalse(set.remove(50));
     }
 
@@ -187,7 +187,7 @@ public class LongSetTest {
     public void testRemoveAbsent() {
         Set<Long> generated = generateAbsent();
 
-        LongSet set = createFromJavaSet();
+        LongHashSet set = createFromJavaSet();
         int setSize = set.size();
 
         for (long element : generated) {
@@ -212,7 +212,7 @@ public class LongSetTest {
 
     @Test
     public void testCopy() {
-        LongSet copy = new LongSet(createFromJavaSet());
+        LongHashSet copy = new LongHashSet(createFromJavaSet());
         assertEquals(javaSet.size(), copy.size());
 
         for (Long element : javaSet)
