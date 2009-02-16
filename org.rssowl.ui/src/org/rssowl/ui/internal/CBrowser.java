@@ -373,9 +373,9 @@ public class CBrowser {
     }
   }
 
-  /* Disallow JavaScript for localhost locations or globally if set */
-  private boolean shouldDisableScript(String location) {
-    return fPreferences.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT) || location.startsWith(ApplicationServer.PROTOCOL + "://" + ApplicationServer.LOCALHOST);
+  /* Disallow JavaScript if configured */
+  private boolean shouldDisableScript() {
+    return fPreferences.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT);
   }
 
   private void hookListeners() {
@@ -393,7 +393,7 @@ public class CBrowser {
       public void changing(LocationEvent event) {
 
         /* Update JavaScript enabled state */
-        setScriptDisabled(shouldDisableScript(event.location));
+        setScriptDisabled(shouldDisableScript());
 
         /* Handle Application Protocol */
         if (event.location != null && event.location.contains(ILinkHandler.HANDLER_PROTOCOL)) {
