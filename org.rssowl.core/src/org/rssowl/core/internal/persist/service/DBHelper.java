@@ -401,21 +401,48 @@ public final class DBHelper {
 
     EntitiesToBeIndexedDAOImpl dao = getEntitiesToBeIndexedDAO();
     EntityIdsByEventType newsToBeIndexed = dao.load();
-    newsToBeIndexed.addAllEntities(maskDeletedNews(newsEventRunnables.getPersistEvents()), newsEventRunnables.getUpdateEvents(), newsEventRunnables.getRemoveEvents());
+    Set<NewsEvent> updateEvents = new HashSet<NewsEvent>(newsEventRunnables.getUpdateEvents());
+    Set<NewsEvent> deleteEvents = new HashSet<NewsEvent>(newsEventRunnables.getRemoveEvents());
+    Set<NewsEvent> persistEvents = filterPersistedNewsForIndexing(newsEventRunnables.getPersistEvents());
+    for (NewsEvent event : newsEventRunnables.getUpdateEvents())
+      indexTypeForNewsUpdate(event, persistEvents, updateEvents, deleteEvents);
+
+    NewsEventRunnable copy = new NewsEventRunnable();
+    for (NewsEvent persistEvent : persistEvents)
+      copy.addCheckedPersistEvent(persistEvent);
+    for (NewsEvent updateEvent : updateEvents)
+      copy.addCheckedUpdateEvent(updateEvent);
+    for (NewsEvent deleteEvent : deleteEvents)
+      copy.addCheckedRemoveEvent(deleteEvent);
+
+    newsToBeIndexed.addAllEntities(copy.getPersistEvents(), copy.getUpdateEvents(), copy.getRemoveEvents());
     newsToBeIndexed.compact();
     db.ext().set(newsToBeIndexed, Integer.MAX_VALUE);
   }
 
-  /* News could be DELETED from Filters */
-  private static Collection<NewsEvent> maskDeletedNews(Set<NewsEvent> persistEvents) {
-    Set<NewsEvent> set= new HashSet<NewsEvent>(persistEvents.size());
-    for (NewsEvent event : persistEvents) {
-      if (event.getEntity() != null && event.getEntity().getState() == INews.State.DELETED)
-        continue;
+  public static Set<NewsEvent> filterPersistedNewsForIndexing(Collection<NewsEvent> events) {
+    Set<NewsEvent> result = new HashSet<NewsEvent>();
+    for (NewsEvent event : events)
+      if (event.getEntity().isVisible())
+        result.add(event);
+    return result;
+  }
 
-      set.add(event);
-    }
-    return set;
+  public static void indexTypeForNewsUpdate(NewsEvent event, Collection<NewsEvent> newsToRestore, Collection<NewsEvent> newsToUpdate, Collection<NewsEvent> newsToDelete) {
+    boolean wasVisible = event.getOldNews().isVisible();
+    boolean isVisible = event.getEntity().isVisible();
+
+    /* News got Deleted/Hidden */
+    if (wasVisible && !isVisible)
+      newsToDelete.add(event);
+
+    /* News got Restored */
+    else if (!wasVisible && isVisible)
+      newsToRestore.add(event);
+
+    /* Normal Update */
+    else if (wasVisible && isVisible)
+      newsToUpdate.add(event);
   }
 
   public static NewsEventRunnable getNewsEventRunnables(List<EventRunnable<?>> eventRunnables)  {
