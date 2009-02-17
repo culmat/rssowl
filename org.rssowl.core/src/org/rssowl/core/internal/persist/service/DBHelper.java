@@ -421,7 +421,7 @@ public final class DBHelper {
   }
 
   public static Set<NewsEvent> filterPersistedNewsForIndexing(Collection<NewsEvent> events) {
-    Set<NewsEvent> result = new HashSet<NewsEvent>();
+    Set<NewsEvent> result = new HashSet<NewsEvent>(events.size());
     for (NewsEvent event : events)
       if (event.getEntity().isVisible())
         result.add(event);
