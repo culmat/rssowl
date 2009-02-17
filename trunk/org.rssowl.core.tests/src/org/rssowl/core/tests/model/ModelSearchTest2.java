@@ -1535,7 +1535,7 @@ public class ModelSearchTest2 extends AbstractModelSearchTest {
     INews news2 = createNews(feed1, "Second News of Feed One", "http://www.news.com/news2.html", State.NEW);
 
     INews news3 = createNews(feed2, "First News of Feed Two", "http://www.news.com/news3.html", State.NEW);
-    INews news4 = createNews(feed2, "Second News of Feed Two", "http://www.news.com/news4.html", State.HIDDEN);
+    INews news4 = createNews(feed2, "Second News of Feed Two", "http://www.news.com/news4.html", State.READ);
 
     DynamicDAO.save(feed1);
     DynamicDAO.save(feed2);
@@ -1699,7 +1699,7 @@ public class ModelSearchTest2 extends AbstractModelSearchTest {
     INews news2 = createNews(feed1, "Second News of Feed One", "http://www.news.com/news2.html", State.NEW);
 
     INews news3 = createNews(feed2, "First News of Feed Two", "http://www.news.com/news3.html", State.NEW);
-    INews news4 = createNews(feed2, "Second News of Feed Two", "http://www.news.com/news4.html", State.HIDDEN);
+    INews news4 = createNews(feed2, "Second News of Feed Two", "http://www.news.com/news4.html", State.READ);
 
     DynamicDAO.save(feed1);
     DynamicDAO.save(feed2);
