@@ -1617,7 +1617,7 @@ public class ModelSearchTest2 extends AbstractModelSearchTest {
      */
     {
       ISearchField field1 = fFactory.createSearchField(INews.STATE, fNewsEntityName);
-      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(State.HIDDEN));
+      ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, EnumSet.of(State.READ));
 
       ISearchField field2 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
       ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS_NOT, "http://www.feed.com/feed1.xml");
