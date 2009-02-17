@@ -437,22 +437,22 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
    */
   @Test
   public void testLocationSearch_BINs() throws Exception {
-    IFolderChild root= fFactory.createFolder(null, null, "Root");
+    IFolderChild root = fFactory.createFolder(null, null, "Root");
     DynamicDAO.save(root);
 
-    IFolderChild child= fFactory.createFolder(null, (IFolder) root, "Child");
+    IFolderChild child = fFactory.createFolder(null, (IFolder) root, "Child");
     DynamicDAO.save(child);
 
     IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
     INews news1 = createNews(feed, "Title", "http://www.news.com/news1.html", State.NEW);
     DynamicDAO.save(feed);
 
-    IFolderChild mark= fFactory.createBookMark(null, (IFolder) child, new FeedLinkReference(feed.getLink()), "Mark");
+    IFolderChild mark = fFactory.createBookMark(null, (IFolder) child, new FeedLinkReference(feed.getLink()), "Mark");
     DynamicDAO.save(mark);
 
     IFolderChild bin = fFactory.createNewsBin(null, (IFolder) root, "Bin");
     DynamicDAO.save(bin);
-    News copiedNews= new News((News) news1, bin.getId().longValue());
+    News copiedNews = new News((News) news1, bin.getId().longValue());
     DynamicDAO.save(copiedNews);
     DynamicDAO.save(bin);
 
@@ -494,5 +494,93 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
       assertEquals(2, result.size());
       assertSame(result, news1, copiedNews);
     }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testHiddenDeletedNewsNotIndexed_1() throws Exception {
+
+    /* First add some Types */
+    IFeed feed1 = fFactory.createFeed(null, new URI("http://www.feed.com/feed1.xml"));
+
+    createNews(feed1, "First News of Feed One", "http://www.news.com/news1.html", State.HIDDEN);
+    createNews(feed1, "Second News of Feed One", "http://www.news.com/news2.html", State.DELETED);
+
+    DynamicDAO.save(feed1);
+
+    /* Wait for Indexer */
+    waitForIndexer();
+
+    ISearchField field1 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
+    ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, "http://www.feed.com/feed1.xml");
+
+    List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), false);
+    assertEquals(0, result.size());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testHiddenDeletedNewsNotIndexed_2() throws Exception {
+
+    /* First add some Types */
+    IFeed feed1 = fFactory.createFeed(null, new URI("http://www.feed.com/feed1.xml"));
+
+    INews news1 = createNews(feed1, "First News of Feed One", "http://www.news.com/news1.html", State.NEW);
+    INews news2 = createNews(feed1, "Second News of Feed One", "http://www.news.com/news2.html", State.READ);
+
+    DynamicDAO.save(feed1);
+
+    /* Wait for Indexer */
+    waitForIndexer();
+
+    news1.setState(INews.State.HIDDEN);
+    news2.setState(INews.State.DELETED);
+
+    DynamicDAO.save(feed1);
+
+    /* Wait for Indexer */
+    waitForIndexer();
+
+    ISearchField field1 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
+    ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, "http://www.feed.com/feed1.xml");
+
+    List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), false);
+    assertEquals(0, result.size());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testRestoredNewsSearchable() throws Exception {
+
+    /* First add some Types */
+    IFeed feed1 = fFactory.createFeed(null, new URI("http://www.feed.com/feed1.xml"));
+
+    INews news1 = createNews(feed1, "First News of Feed One", "http://www.news.com/news1.html", State.HIDDEN);
+    INews news2 = createNews(feed1, "Second News of Feed One", "http://www.news.com/news2.html", State.HIDDEN);
+
+    DynamicDAO.save(feed1);
+
+    /* Wait for Indexer */
+    waitForIndexer();
+
+    news1.setState(INews.State.NEW);
+    news2.setState(INews.State.READ);
+
+    DynamicDAO.save(feed1);
+
+    /* Wait for Indexer */
+    waitForIndexer();
+
+    ISearchField field1 = fFactory.createSearchField(INews.FEED, fNewsEntityName);
+    ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, "http://www.feed.com/feed1.xml");
+
+    List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), false);
+    assertSame(result, news1, news2);
   }
 }
