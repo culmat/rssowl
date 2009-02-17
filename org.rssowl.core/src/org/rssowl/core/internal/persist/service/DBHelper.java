@@ -401,7 +401,7 @@ public final class DBHelper {
 
     EntitiesToBeIndexedDAOImpl dao = getEntitiesToBeIndexedDAO();
     EntityIdsByEventType newsToBeIndexed = dao.load();
-    Set<NewsEvent> updateEvents = new HashSet<NewsEvent>(newsEventRunnables.getUpdateEvents());
+    Set<NewsEvent> updateEvents = new HashSet<NewsEvent>(newsEventRunnables.getUpdateEvents().size());
     Set<NewsEvent> deleteEvents = new HashSet<NewsEvent>(newsEventRunnables.getRemoveEvents());
     Set<NewsEvent> persistEvents = filterPersistedNewsForIndexing(newsEventRunnables.getPersistEvents());
     for (NewsEvent event : newsEventRunnables.getUpdateEvents())
