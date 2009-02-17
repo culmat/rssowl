@@ -34,7 +34,11 @@ import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.persist.MergeResult;
+import org.rssowl.core.internal.persist.dao.EntitiesToBeIndexedDAOImpl;
+import org.rssowl.core.internal.persist.service.DBHelper;
+import org.rssowl.core.internal.persist.service.EntityIdsByEventType;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
@@ -122,8 +126,8 @@ public class ModelTest3 {
   }
 
   /**
-   * Tests {@link INews#merge(INews)}. Particularly: - If the state of both
-   * news is different, it's changed to the new state with one exception: if the
+   * Tests {@link INews#merge(INews)}. Particularly: - If the state of both news
+   * is different, it's changed to the new state with one exception: if the
    * second News is in the NEW state, the state of the first news won't be
    * changed.
    *
@@ -237,9 +241,9 @@ public class ModelTest3 {
   }
 
   /**
-   * Tests {@link INews#merge(INews)}. Particularly: - The state does not
-   * change to UPDATED if both news have the same state and it is NEW, DELETED
-   * or HIDDEN.
+   * Tests {@link INews#merge(INews)}. Particularly: - The state does not change
+   * to UPDATED if both news have the same state and it is NEW, DELETED or
+   * HIDDEN.
    *
    * @throws Exception
    */
@@ -2364,5 +2368,173 @@ public class ModelTest3 {
 
     assertEquals(INews.State.DELETED, news1.getState());
     assertEquals(INews.State.UNREAD, news2.getState());
+  }
+
+  /**
+   * Tests that the EntitiesToBeIndexedDAO contains no outstanding news to be
+   * indexed after a simulated restart.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testEntitiesToBeIndexedOnRestart_NEW() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.foo.com"));
+    INews news = fFactory.createNews(null, feed, new Date());
+    news.setLink(new URI("http://www.news.com"));
+
+    DynamicDAO.save(feed);
+
+    InternalOwl.getDefault().shutdown();
+    InternalOwl.getDefault().startup(null);
+
+    EntitiesToBeIndexedDAOImpl dao = DBHelper.getEntitiesToBeIndexedDAO();
+    EntityIdsByEventType outstandingNewsIds = dao.load();
+    assertEquals(0, outstandingNewsIds.getPersistedEntityRefs().size());
+    assertEquals(0, outstandingNewsIds.getUpdatedEntityRefs().size());
+    assertEquals(0, outstandingNewsIds.getRemovedEntityRefs().size());
+  }
+
+  /**
+   * Tests that the EntitiesToBeIndexedDAO contains no outstanding news to be
+   * indexed after a simulated restart.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testEntitiesToBeIndexedOnRestart_NEW_to_HIDDEN() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.foo.com"));
+    INews news = fFactory.createNews(null, feed, new Date());
+    news.setLink(new URI("http://www.news.com"));
+
+    DynamicDAO.save(feed);
+
+    news.setState(INews.State.HIDDEN);
+    DynamicDAO.save(news);
+
+    InternalOwl.getDefault().shutdown();
+    InternalOwl.getDefault().startup(null);
+
+    final EntitiesToBeIndexedDAOImpl dao = DBHelper.getEntitiesToBeIndexedDAO();
+    EntityIdsByEventType outstandingNewsIds = dao.load();
+    assertEquals(0, outstandingNewsIds.getPersistedEntityRefs().size());
+    assertEquals(0, outstandingNewsIds.getUpdatedEntityRefs().size());
+    assertEquals(0, outstandingNewsIds.getRemovedEntityRefs().size());
+  }
+
+  /**
+   * Tests that the EntitiesToBeIndexedDAO contains no outstanding news to be
+   * indexed after a simulated restart.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testEntitiesToBeIndexedOnRestart_NEW_to_DELETED() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.foo.com"));
+    INews news = fFactory.createNews(null, feed, new Date());
+    news.setLink(new URI("http://www.news.com"));
+
+    DynamicDAO.save(feed);
+
+    news.setState(INews.State.DELETED);
+    DynamicDAO.save(news);
+
+    InternalOwl.getDefault().shutdown();
+    InternalOwl.getDefault().startup(null);
+
+    final EntitiesToBeIndexedDAOImpl dao = DBHelper.getEntitiesToBeIndexedDAO();
+    EntityIdsByEventType outstandingNewsIds = dao.load();
+    assertEquals(0, outstandingNewsIds.getPersistedEntityRefs().size());
+    assertEquals(0, outstandingNewsIds.getUpdatedEntityRefs().size());
+    assertEquals(0, outstandingNewsIds.getRemovedEntityRefs().size());
+  }
+
+  /**
+   * Tests that the EntitiesToBeIndexedDAO contains no outstanding news to be
+   * indexed after a simulated restart.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testEntitiesToBeIndexedOnRestart_HIDDEN_to_DELETED() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.foo.com"));
+    INews news = fFactory.createNews(null, feed, new Date());
+    news.setLink(new URI("http://www.news.com"));
+
+    DynamicDAO.save(feed);
+
+    news.setState(INews.State.HIDDEN);
+    DynamicDAO.save(news);
+
+    InternalOwl.getDefault().shutdown();
+    InternalOwl.getDefault().startup(null);
+
+    news.setState(INews.State.DELETED);
+    DynamicDAO.save(news);
+
+    final EntitiesToBeIndexedDAOImpl dao = DBHelper.getEntitiesToBeIndexedDAO();
+    EntityIdsByEventType outstandingNewsIds = dao.load();
+    assertEquals(0, outstandingNewsIds.getPersistedEntityRefs().size());
+    assertEquals(0, outstandingNewsIds.getUpdatedEntityRefs().size());
+    assertEquals(0, outstandingNewsIds.getRemovedEntityRefs().size());
+  }
+
+  /**
+   * Tests that the EntitiesToBeIndexedDAO contains no outstanding news to be
+   * indexed after a simulated restart.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testEntitiesToBeIndexedOnRestart_HIDDEN_to_NEW_1() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.foo.com"));
+    INews news = fFactory.createNews(null, feed, new Date());
+    news.setLink(new URI("http://www.news.com"));
+
+    DynamicDAO.save(feed);
+
+    news.setState(INews.State.HIDDEN);
+    DynamicDAO.save(news);
+
+    InternalOwl.getDefault().shutdown();
+    InternalOwl.getDefault().startup(null);
+
+    news.setState(INews.State.NEW);
+    DynamicDAO.save(news);
+
+    final EntitiesToBeIndexedDAOImpl dao = DBHelper.getEntitiesToBeIndexedDAO();
+    EntityIdsByEventType outstandingNewsIds = dao.load();
+    assertEquals(0, outstandingNewsIds.getPersistedEntityRefs().size());
+    assertEquals(0, outstandingNewsIds.getUpdatedEntityRefs().size());
+    assertEquals(0, outstandingNewsIds.getRemovedEntityRefs().size());
+  }
+
+  /**
+   * Tests that the EntitiesToBeIndexedDAO contains no outstanding news to be
+   * indexed after a simulated restart.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testEntitiesToBeIndexedOnRestart_HIDDEN_to_NEW_2() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.foo.com"));
+    INews news = fFactory.createNews(null, feed, new Date());
+    news.setLink(new URI("http://www.news.com"));
+
+    DynamicDAO.save(feed);
+
+    news.setState(INews.State.HIDDEN);
+    DynamicDAO.save(news);
+
+    news.setState(INews.State.NEW);
+    DynamicDAO.save(news);
+
+    InternalOwl.getDefault().shutdown();
+    InternalOwl.getDefault().startup(null);
+
+    final EntitiesToBeIndexedDAOImpl dao = DBHelper.getEntitiesToBeIndexedDAO();
+    EntityIdsByEventType outstandingNewsIds = dao.load();
+    assertEquals(0, outstandingNewsIds.getPersistedEntityRefs().size());
+    assertEquals(0, outstandingNewsIds.getUpdatedEntityRefs().size());
+    assertEquals(0, outstandingNewsIds.getRemovedEntityRefs().size());
   }
 }
