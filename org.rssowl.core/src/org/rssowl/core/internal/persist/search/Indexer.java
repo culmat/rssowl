@@ -219,6 +219,13 @@ public class Indexer {
   synchronized void shutdown(boolean emergency) {
     unregisterListeners();
     dispose();
+    if (InternalOwl.TESTING) { //Required for tests that shutdown and startup again
+      try {
+        fIndexDirectory.close();
+      } catch (IOException e) {
+        /* Ignore */
+      }
+    }
     if (!emergency) {
       saveCommittedNews(true, fUncommittedNews);
       fUncommittedNews.clear();
