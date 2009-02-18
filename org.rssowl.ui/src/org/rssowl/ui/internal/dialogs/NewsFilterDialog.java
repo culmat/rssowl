@@ -31,6 +31,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -72,6 +73,7 @@ import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.filter.NewsActionDescriptor;
 import org.rssowl.ui.internal.filter.NewsActionList;
@@ -91,6 +93,10 @@ import java.util.List;
  */
 @SuppressWarnings("restriction")
 public class NewsFilterDialog extends TitleAreaDialog {
+
+  /* Section for Dialogs Settings */
+  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.NewsFilterDialog";
+
   private LocalResourceManager fResources;
   private final ISearchFilter fEditedFilter;
   private final List<Integer> fExcludedConditions = getExcludedConditions();
@@ -342,8 +348,6 @@ public class NewsFilterDialog extends TitleAreaDialog {
     nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     nameContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
     nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
-
-
 
     fNameInput = new Text(nameContainer, SWT.SINGLE);
     fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
@@ -639,5 +643,26 @@ public class NewsFilterDialog extends TitleAreaDialog {
   @Override
   protected boolean isResizable() {
     return true;
+  }
+
+  /*
+   * @see org.eclipse.jface.dialogs.Dialog#getDialogBoundsStrategy()
+   */
+  @Override
+  protected int getDialogBoundsStrategy() {
+    return DIALOG_PERSISTSIZE;
+}
+
+  /*
+   * @see org.eclipse.jface.dialogs.Dialog#getDialogBoundsSettings()
+   */
+  @Override
+  protected IDialogSettings getDialogBoundsSettings() {
+    IDialogSettings settings = Activator.getDefault().getDialogSettings();
+    IDialogSettings section = settings.getSection(SETTINGS_SECTION);
+    if (section != null)
+      return section;
+
+    return settings.addNewSection(SETTINGS_SECTION);
   }
 }
