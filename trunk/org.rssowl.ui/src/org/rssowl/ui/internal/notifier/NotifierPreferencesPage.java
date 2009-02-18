@@ -148,6 +148,8 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
           dialog.open();
         } else {
           dialog.getShell().forceActive();
+          if (dialog.getShell().getMinimized())
+            dialog.getShell().setMinimized(false);
         }
       }
     });

@@ -27,6 +27,7 @@ package org.rssowl.ui.internal.dialogs;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -80,7 +81,6 @@ import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.Activator;
-import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.CColumnLayoutData;
 import org.rssowl.ui.internal.CTable;
 import org.rssowl.ui.internal.OwlUI;
@@ -114,6 +114,9 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
   /* Keep the visible instance saved */
   private static NewsFiltersListDialog fgVisibleInstance;
+
+  /* Section for Dialogs Settings */
+  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.NewsFiltersListDialog";
 
   private NewsActionPresentationManager fNewsActionPresentationManager = NewsActionPresentationManager.getInstance();
   private LocalResourceManager fResources;
@@ -180,16 +183,16 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     /* Composite to hold all components */
     Composite composite = new Composite(parent, SWT.NONE);
     composite.setLayout(LayoutUtils.createGridLayout(2, 5, 10));
-    composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
     Composite tableContainer = new Composite(composite, SWT.NONE);
     tableContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
-    tableContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    tableContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
     CTable cTable = new CTable(tableContainer, SWT.CHECK | SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
 
     fViewer = new CheckboxTableViewer(cTable.getControl());
-    fViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    fViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fViewer.getTable().setHeaderVisible(true);
     ((GridData) fViewer.getTable().getLayoutData()).heightHint = fViewer.getTable().getItemHeight() * 15;
 
@@ -715,12 +718,21 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
    */
   @Override
   protected int getShellStyle() {
-    int style = SWT.TITLE | SWT.BORDER | getDefaultOrientation();
-
-    /* Follow Apple's Human Interface Guidelines for Application Modal Dialogs */
-    if (!Application.IS_MAC)
-      style |= SWT.CLOSE;
+    int style = SWT.TITLE | SWT.BORDER | SWT.MIN | SWT.MAX | SWT.RESIZE | SWT.CLOSE | getDefaultOrientation();
 
     return style;
+  }
+
+  /*
+   * @see org.eclipse.jface.dialogs.Dialog#getDialogBoundsSettings()
+   */
+  @Override
+  protected IDialogSettings getDialogBoundsSettings() {
+    IDialogSettings settings = Activator.getDefault().getDialogSettings();
+    IDialogSettings section = settings.getSection(SETTINGS_SECTION);
+    if (section != null)
+      return section;
+
+    return settings.addNewSection(SETTINGS_SECTION);
   }
 }
