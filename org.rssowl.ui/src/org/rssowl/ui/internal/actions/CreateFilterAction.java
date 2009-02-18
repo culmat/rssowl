@@ -95,6 +95,8 @@ public class CreateFilterAction implements IObjectActionDelegate {
           filterListDialog.refresh();
           filterListDialog.setSelection(dialog.getFilter());
           filterListDialog.getShell().forceActive();
+          if (filterListDialog.getShell().getMinimized())
+            filterListDialog.getShell().setMinimized(false);
         }
       }
     }

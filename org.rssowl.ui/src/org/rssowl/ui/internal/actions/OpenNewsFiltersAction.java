@@ -60,6 +60,8 @@ public class OpenNewsFiltersAction implements IWorkbenchWindowActionDelegate {
       dialog.open();
     } else {
       dialog.getShell().forceActive();
+      if (dialog.getShell().getMinimized())
+        dialog.getShell().setMinimized(false);
     }
   }
 
