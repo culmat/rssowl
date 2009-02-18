@@ -30,14 +30,13 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.DateUtils;
+import org.rssowl.ui.internal.actions.CleanUpAction;
 import org.rssowl.ui.internal.dialogs.CleanUpReminderDialog;
-import org.rssowl.ui.internal.dialogs.cleanup.CleanUpWizard;
 import org.rssowl.ui.internal.util.JobRunner;
 
 /**
@@ -96,12 +95,8 @@ public class CleanUpReminderService {
                 if (monitor.isCanceled() || !Platform.isRunning())
                   return;
 
-                if (CleanUpReminderDialog.getVisibleInstance() == null && new CleanUpReminderDialog(shell).open() == IDialogConstants.OK_ID) {
-                  CleanUpWizard cleanUpWizard = new CleanUpWizard();
-                  WizardDialog dialog = new WizardDialog(shell, cleanUpWizard);
-                  dialog.create();
-                  dialog.open();
-                };
+                if (CleanUpReminderDialog.getVisibleInstance() == null && new CleanUpReminderDialog(shell).open() == IDialogConstants.OK_ID)
+                  new CleanUpAction().openWizard(shell);
               }
             });
 
