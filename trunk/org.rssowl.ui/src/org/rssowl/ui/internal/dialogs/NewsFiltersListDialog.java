@@ -724,6 +724,14 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
   }
 
   /*
+   * @see org.eclipse.jface.dialogs.Dialog#getDialogBoundsStrategy()
+   */
+  @Override
+  protected int getDialogBoundsStrategy() {
+    return DIALOG_PERSISTSIZE;
+  }
+
+  /*
    * @see org.eclipse.jface.dialogs.Dialog#getDialogBoundsSettings()
    */
   @Override
