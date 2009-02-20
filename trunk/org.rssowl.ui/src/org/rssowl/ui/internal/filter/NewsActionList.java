@@ -65,6 +65,7 @@ import java.util.List;
  */
 @SuppressWarnings("restriction")
 public class NewsActionList extends ScrolledComposite {
+  private final NewsActionPresentationManager fNewsActionPresentationManager = NewsActionPresentationManager.getInstance();
   private List<NewsActionItem> fItems;
   private int fVisibleItemCount;
   private LocalResourceManager fResources;
@@ -215,8 +216,16 @@ public class NewsActionList extends ScrolledComposite {
 
       /* Add Actions */
       if (actions != null) {
-        for (IFilterAction action : actions)
-          addItem(action);
+        boolean addDefaultAction = true;
+        for (IFilterAction action : actions) {
+          if (fNewsActionPresentationManager.hasNewsAction(action.getActionId())) {
+            addItem(action);
+            addDefaultAction = false;
+          }
+        }
+
+        if (addDefaultAction)
+          addItem(getDefaultAction());
       }
     } finally {
       setRedraw(true);
