@@ -29,7 +29,9 @@ import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.swt.SWT;
 import org.rssowl.core.INewsAction;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.filter.INewsActionPresentation;
 import org.rssowl.ui.internal.Activator;
 
@@ -108,11 +110,26 @@ public class NewsActionPresentationManager {
     return fNewsActions.get(actionId);
   }
 
+  /**
+   * @param actionId the unique ID of the contributed {@link INewsAction}.
+   * @return <code>true</code> if the action is contributed and supported for
+   * the current platform and <code>false</code> otherwise.
+   */
+  public boolean hasNewsAction(String actionId) {
+    return fNewsActions.containsKey(actionId);
+  }
+
   private void loadNewsActions() {
     IExtensionRegistry reg = Platform.getExtensionRegistry();
     IConfigurationElement elements[] = reg.getConfigurationElementsFor(NEWS_ACTION_EXTENSION_POINT);
     for (IConfigurationElement element : elements) {
       try {
+
+        /* Check if this Action is only available to a certain platform */
+        String platform = element.getAttribute("platform");
+        if (StringUtils.isSet(platform) && !SWT.getPlatform().equals(platform))
+          continue;
+
         String id = element.getAttribute("id");
         INewsAction newsAction = (INewsAction) element.createExecutableExtension("class");
         String name = element.getAttribute("name");
