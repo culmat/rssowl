@@ -94,6 +94,23 @@
                </documentation>
             </annotation>
          </attribute>
+         <attribute name="platform">
+            <annotation>
+               <documentation>
+                  The platform this action is supported on. Leave empty to show the action on all platforms.
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="win32">
+                  </enumeration>
+                  <enumeration value="carbon">
+                  </enumeration>
+                  <enumeration value="gtk">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
       </complexType>
    </element>
 
