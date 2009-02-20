@@ -857,7 +857,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
       public void dispose() {}
 
       public Menu getMenu(Control parent) {
-        Collection<ISearchMark> searchMarks = DynamicDAO.loadAll(ISearchMark.class);
+        Collection<ISearchMark> searchMarks = CoreUtils.loadSortedSearchMarks();
         Menu menu = new Menu(parent);
 
         /* Create new Saved Search */
