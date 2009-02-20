@@ -40,6 +40,7 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchFilter;
+import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -920,6 +921,27 @@ public class CoreUtils {
     labels.addAll(DynamicDAO.loadAll(ILabel.class));
 
     return labels;
+  }
+
+  /**
+   * @return all saved searches sorted by name.
+   */
+  public static Set<ISearchMark> loadSortedSearchMarks() {
+
+    /* Sort by Sort Key to respect order */
+    Set<ISearchMark> searchmarks = new TreeSet<ISearchMark>(new Comparator<ISearchMark>() {
+      public int compare(ISearchMark s1, ISearchMark s2) {
+        if (s1.getName().equalsIgnoreCase(s2.getName())) //Duplicate names are allowed!
+          return -1;
+
+        return s1.getName().compareToIgnoreCase(s2.getName());
+      }
+    });
+
+    /* Add Searchmarks */
+    searchmarks.addAll(DynamicDAO.loadAll(ISearchMark.class));
+
+    return searchmarks;
   }
 
   /**
