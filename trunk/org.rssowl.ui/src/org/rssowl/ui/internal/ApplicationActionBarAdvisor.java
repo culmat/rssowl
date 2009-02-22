@@ -799,7 +799,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     helpMenu.add(new GroupMarker(IWorkbenchActionConstants.HELP_START));
 
     /* Link to boreal.rssowl.org */
-    helpMenu.add(new Action("&Boreal Owl Help") {
+    helpMenu.add(new Action("&Frequently Asked Questions") {
       @Override
       public void run() {
         BrowserUtils.openLinkExternal("http://boreal.rssowl.org/#faq");
