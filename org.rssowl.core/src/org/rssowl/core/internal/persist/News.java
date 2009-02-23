@@ -1137,7 +1137,7 @@ public class News extends AbstractEntity implements INews {
 
     Comparator<IAttachment> comparator = new Comparator<IAttachment>() {
       public int compare(IAttachment o1, IAttachment o2) {
-        if (o1.getLink().equals(o2.getLink())) {
+        if (o1.getLink() == null ? o2.getLink() == null : o1.getLink().equals(o2.getLink())) {
           return 0;
         }
         return -1;
