@@ -2577,4 +2577,23 @@ public class ModelTest3 {
     ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.IS, "http://www.feed.com/feed1.xml");
     Owl.getPersistenceService().getModelSearch().searchNews(Collections.singleton(cond1), false);
   }
+
+  /**
+   * See Bug 1041: NPE from News.mergeAttachments
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testMergeNewsAttachmentsWithNullLink() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.foo.com"));
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setLink(new URI("http://www.news.com"));
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setLink(new URI("http://www.news.com"));
+    fFactory.createAttachment(null, news1);
+    DynamicDAO.save(feed);
+    fFactory.createAttachment(null, news2);
+
+    news2.merge(news1);
+  }
 }
