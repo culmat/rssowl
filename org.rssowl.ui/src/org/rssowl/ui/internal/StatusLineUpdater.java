@@ -58,9 +58,6 @@ public class StatusLineUpdater implements ISelectionChangedListener {
     IStructuredSelection selection = (IStructuredSelection) event.getSelection();
     String text = formatElements(selection.toArray());
 
-    /* Replace & with && */
-    text = text.replaceAll("&", "&&"); //$NON-NLS-1$//$NON-NLS-2$
-
     /* Show Message */
     fStatusLineManager.setMessage(text);
   }
