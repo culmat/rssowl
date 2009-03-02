@@ -679,6 +679,9 @@ public class DBManager {
     Counter counter = counterSet.iterator().next();
     sourceDb.activate(counter, Integer.MAX_VALUE);
     destinationDb.ext().set(counter, Integer.MAX_VALUE);
+    EntityIdsByEventType entityIdsByEventType = sourceDb.query(EntityIdsByEventType.class).iterator().next();
+    sourceDb.activate(entityIdsByEventType, Integer.MAX_VALUE);
+    destinationDb.ext().set(entityIdsByEventType, Integer.MAX_VALUE);
 
     sourceDb.close();
     destinationDb.commit();

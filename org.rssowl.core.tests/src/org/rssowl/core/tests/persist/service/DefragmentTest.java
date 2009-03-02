@@ -38,6 +38,7 @@ import org.rssowl.core.internal.persist.Preference;
 import org.rssowl.core.internal.persist.service.Counter;
 import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.internal.persist.service.DBManager;
+import org.rssowl.core.internal.persist.service.EntityIdsByEventType;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
@@ -175,6 +176,7 @@ public class DefragmentTest {
     assertEquals(db.query(ILabel.class).size(), defragmentedDb.query(ILabel.class).size());
     assertEquals(db.query(Counter.class).get(0).getValue(), defragmentedDb.query(Counter.class).get(0).getValue());
     assertEquals(db.query(ISearchFilter.class).get(0).getName(), defragmentedDb.query(ISearchFilter.class).get(0).getName());
+    assertEquals(db.query(EntityIdsByEventType.class).get(0), defragmentedDb.query(EntityIdsByEventType.class).get(0));
   }
 
   private List<IFeed> saveFeeds() throws Exception {
