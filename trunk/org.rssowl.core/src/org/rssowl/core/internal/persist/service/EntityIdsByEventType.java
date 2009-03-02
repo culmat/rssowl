@@ -46,7 +46,7 @@ public final class EntityIdsByEventType extends Persistable implements IPersista
   /**
    * Provided for deserialization.
    */
-  protected EntityIdsByEventType() {
+  public EntityIdsByEventType() {
     super();
   }
 
@@ -151,6 +151,28 @@ public final class EntityIdsByEventType extends Persistable implements IPersista
     fPersistedEntities.clear();
     fUpdatedEntities.clear();
     fRemovedEntities.clear();
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + fPersistedEntities.hashCode();
+    result = prime * result + fRemovedEntities.hashCode();
+    result = prime * result + fUpdatedEntities.hashCode();
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    EntityIdsByEventType other = (EntityIdsByEventType) obj;
+    return fPersistedEntities.equals(other.fPersistedEntities) && fRemovedEntities.equals(other.fRemovedEntities) && fUpdatedEntities.equals(other.fUpdatedEntities);
   }
 
   public synchronized void compact() {
