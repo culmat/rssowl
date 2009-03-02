@@ -20,7 +20,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
+import org.rssowl.core.internal.persist.LongArrayList;
 import org.rssowl.core.internal.persist.dao.EntitiesToBeIndexedDAOImpl;
+import org.rssowl.core.internal.persist.search.IndexingTask.RemovedNewsRefsListener;
 import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.internal.persist.service.EntityIdsByEventType;
 import org.rssowl.core.persist.IEntity;
@@ -319,18 +321,28 @@ public class Indexer {
     final EntitiesToBeIndexedDAOImpl dao = DBHelper.getEntitiesToBeIndexedDAO();
     List<IndexingTask> indexingTasks = new ArrayList<IndexingTask>(3);
     if (dao != null) {
+      RemovedNewsRefsListener removedNewsRefsListener = new IndexingTask.RemovedNewsRefsListener() {
+        public void event(Collection<NewsReference> newsRefs) {
+          LongArrayList list = new LongArrayList(newsRefs.size());
+          for (NewsReference newsRef : newsRefs)
+            list.add(newsRef.getId());
+          EntityIdsByEventType entityIdsByEventType = dao.load();
+          entityIdsByEventType.removeAll(list, list, list);
+          dao.save(entityIdsByEventType);
+        }
+      };
       EntityIdsByEventType outstandingNewsIds = dao.load();
       List<NewsReference> persistedEntityRefs = outstandingNewsIds.getPersistedEntityRefs();
       if (!persistedEntityRefs.isEmpty())
-        indexingTasks.add(new IndexingTask(Indexer.this, EventType.PERSIST, persistedEntityRefs));
+        indexingTasks.add(new IndexingTask(Indexer.this, EventType.PERSIST, persistedEntityRefs, removedNewsRefsListener));
 
       List<NewsReference> updatedEntityRefs = outstandingNewsIds.getUpdatedEntityRefs();
       if (!updatedEntityRefs.isEmpty())
-        indexingTasks.add(new IndexingTask(Indexer.this, EventType.UPDATE, updatedEntityRefs));
+        indexingTasks.add(new IndexingTask(Indexer.this, EventType.UPDATE, updatedEntityRefs, removedNewsRefsListener));
 
       List<NewsReference> removedEntityRefs = outstandingNewsIds.getRemovedEntityRefs();
       if (!removedEntityRefs.isEmpty())
-        indexingTasks.add(new IndexingTask(Indexer.this, EventType.REMOVE, removedEntityRefs));
+        indexingTasks.add(new IndexingTask(Indexer.this, EventType.REMOVE, removedEntityRefs, removedNewsRefsListener));
     }
     return indexingTasks;
   }

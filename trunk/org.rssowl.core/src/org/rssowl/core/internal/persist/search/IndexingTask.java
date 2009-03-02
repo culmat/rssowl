@@ -50,10 +50,21 @@ import java.util.Set;
  * @author bpasero
  */
 public final class IndexingTask implements ITask {
+
+  /**
+   * This listener will be called by the indexer to indicate the news refs
+   * for which an index operation was requested, but not completed because
+   * they are not in the database anymore.
+   */
+  static interface RemovedNewsRefsListener {
+    void event(Collection<NewsReference> newsRefs);
+  }
+
   private final Indexer fIndexer;
   private final EventType fTaskType;
   private final List<INews> fNews;
   private final Collection<NewsReference> fNewsRefs;
+  private final RemovedNewsRefsListener fRemovedNewsRefsListener;
 
   IndexingTask(Indexer indexer, Set<NewsEvent> events, EventType taskType) {
     this(indexer, getNews(events, taskType), taskType);
@@ -82,15 +93,18 @@ public final class IndexingTask implements ITask {
     fNewsRefs = null;
 
     fTaskType = taskType;
+    fRemovedNewsRefsListener = null;
   }
 
-  IndexingTask(Indexer indexer, EventType taskType, Collection<NewsReference> newsRefs) {
+  IndexingTask(Indexer indexer, EventType taskType, Collection<NewsReference> newsRefs,
+      RemovedNewsRefsListener removedNewsRefsListener) {
     fIndexer = indexer;
 
     fNewsRefs = newsRefs;
     fNews = null;
 
     fTaskType = taskType;
+    fRemovedNewsRefsListener = removedNewsRefsListener;
   }
 
   /*
@@ -134,11 +148,16 @@ public final class IndexingTask implements ITask {
 
   private List<INews> getNewsFromRefs(Collection<NewsReference> newsRefs) {
     List<INews> newsList = new ArrayList<INews>(newsRefs.size());
+    List<NewsReference> removedNewsRefs = new ArrayList<NewsReference>(1);
     for (NewsReference newsRef : newsRefs) {
       INews news = InternalOwl.getDefault().getPersistenceService().getDAOService().getNewsDAO().load(newsRef.getId());
-      if (news != null)
+      if (news == null)
+        removedNewsRefs.add(newsRef);
+      else
         newsList.add(news);
     }
+    if (fRemovedNewsRefsListener != null)
+      fRemovedNewsRefsListener.event(removedNewsRefs);
     return newsList;
   }
 
