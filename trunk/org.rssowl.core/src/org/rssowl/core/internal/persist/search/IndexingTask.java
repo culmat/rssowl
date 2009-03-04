@@ -30,6 +30,7 @@ import org.eclipse.core.runtime.Status;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.event.runnable.EventType;
 import org.rssowl.core.persist.reference.NewsReference;
@@ -149,8 +150,9 @@ public final class IndexingTask implements ITask {
   private List<INews> getNewsFromRefs(Collection<NewsReference> newsRefs) {
     List<INews> newsList = new ArrayList<INews>(newsRefs.size());
     List<NewsReference> removedNewsRefs = new ArrayList<NewsReference>(1);
+    INewsDAO newsDAO = InternalOwl.getDefault().getPersistenceService().getDAOService().getNewsDAO();
     for (NewsReference newsRef : newsRefs) {
-      INews news = InternalOwl.getDefault().getPersistenceService().getDAOService().getNewsDAO().load(newsRef.getId());
+      INews news = newsDAO.load(newsRef.getId());
       if (news == null)
         removedNewsRefs.add(newsRef);
       else
