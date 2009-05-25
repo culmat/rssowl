@@ -96,6 +96,7 @@ import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.Controller.BookMarkLoadListener;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.actions.RetargetActions;
@@ -200,6 +201,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private SearchConditionListener fSearchConditionListener;
   private NewsBinListener fNewsBinListener;
   private FolderAdapter fFolderListener;
+  private BookMarkLoadListener fBookMarkLoadListener;
 
   /* Settings */
   NewsFilter.Type fInitialFilterType;
@@ -486,6 +488,30 @@ public class FeedView extends EditorPart implements IReusableEditor {
       }
     };
     DynamicDAO.addEntityListener(IFeed.class, fFeedListener);
+
+    /* Show Busy when Input is loaded */
+    fBookMarkLoadListener = new Controller.BookMarkLoadListener() {
+      public void bookMarkAboutToLoad(IBookMark bookmark) {
+        if (!fIsDisposed && bookmark.equals(fInput.getMark()))
+          showBusyLoading(true);
+      }
+
+      public void bookMarkDoneLoading(IBookMark bookmark) {
+        if (!fIsDisposed && bookmark.equals(fInput.getMark()))
+          showBusyLoading(false);
+      }
+    };
+    Controller.getDefault().addBookMarkLoadListener(fBookMarkLoadListener);
+  }
+
+  private void showBusyLoading(final boolean busy) {
+    JobRunner.runInUIThread(fParent, new Runnable() {
+      @SuppressWarnings("restriction")
+      public void run() {
+        if (!fIsDisposed && getSite() instanceof org.eclipse.ui.internal.PartSite)
+          ((org.eclipse.ui.internal.PartSite) getSite()).getPane().setBusy(busy);
+      }
+    });
   }
 
   private void onNewsFoldersUpdated(Set<FolderEvent> events) {
@@ -1135,6 +1161,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     DynamicDAO.removeEntityListener(IFeed.class, fFeedListener);
     DynamicDAO.removeEntityListener(ISearchCondition.class, fSearchConditionListener);
     DynamicDAO.removeEntityListener(INewsBin.class, fNewsBinListener);
+    Controller.getDefault().removeBookMarkLoadListener(fBookMarkLoadListener);
   }
 
   /**
