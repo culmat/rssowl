@@ -356,6 +356,16 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           }
 
           @Override
+          public String getActionDefinitionId() {
+            return "org.rssowl.ui.ToggleBookmarksCommand";
+          }
+
+          @Override
+          public String getId() {
+            return "org.rssowl.ui.ToggleBookmarksCommand";
+          }
+
+          @Override
           public boolean isChecked() {
             IWorkbenchPage page = OwlUI.getPage();
             if (page != null)
