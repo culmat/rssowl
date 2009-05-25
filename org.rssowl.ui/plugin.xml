@@ -676,6 +676,13 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.handler.ToggleBookMarksHandler"
+            description="Toggle Bookmarks"
+            id="org.rssowl.ui.ToggleBookmarksCommand"
+            name="Toggle Bookmarks">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.NextBookmarkSetHandler"
             description="Navigate to the next Bookmark-Set"
             id="org.rssowl.ui.NextBookmarkSetCommand"
