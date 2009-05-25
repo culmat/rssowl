@@ -207,6 +207,24 @@ public class Controller {
   private final Lock fLoginDialogLock = new ReentrantLock();
   private BookMarkAdapter fBookMarkListener;
   private LabelAdapter fLabelListener;
+  private List<BookMarkLoadListener> fBookMarkLoadListeners = new ArrayList<BookMarkLoadListener>(1);
+
+  /**
+   * A listener that informs when a {@link IBookMark} is getting reloaded from
+   * the {@link Controller}.
+   */
+  public static interface BookMarkLoadListener {
+
+    /**
+     * @param bookmark the {@link IBookMark} that is about to load.
+     */
+    void bookMarkAboutToLoad(IBookMark bookmark);
+
+    /**
+     * @param bookmark the {@link IBookMark} that is done loading.
+     */
+    void bookMarkDoneLoading(IBookMark bookmark);
+  }
 
   /* Task to perform Reload-Operations */
   private class ReloadTask implements ITask {
@@ -513,6 +531,9 @@ public class Controller {
       if (monitor.isCanceled() || fShuttingDown)
         return Status.CANCEL_STATUS;
 
+      /* Notify about Bookmark getting loaded */
+      fireBookMarkAboutToLoad(bookmark);
+
       /* Load Conditional Get for the URL */
       IConditionalGet conditionalGet = fConditionalGetDAO.load(feedLink);
 
@@ -689,6 +710,9 @@ public class Controller {
     /* Save Error State to the Bookmark if present */
     finally {
       updateErrorIndicator(bookmark, monitor, ex);
+
+      /* Notify about Bookmark done loading */
+      fireBookMarkDoneLoading(bookmark);
     }
 
     return Status.OK_STATUS;
@@ -1209,6 +1233,43 @@ public class Controller {
 
     for (ILabel label : labels) {
       commandService.getCommand(LABEL_ACTION_PREFIX + label.getOrder()).undefine();
+    }
+  }
+
+  /**
+   * @param listener the listener thats gets informed when a bookmark is loaded
+   * from the controller.
+   */
+  public void addBookMarkLoadListener(BookMarkLoadListener listener) {
+    if (!fBookMarkLoadListeners.contains(listener))
+      fBookMarkLoadListeners.add(listener);
+  }
+
+  /**
+   * @param listener the listener thats gets informed when a bookmark is done
+   * loading from the controller.
+   */
+  public void removeBookMarkLoadListener(BookMarkLoadListener listener) {
+    fBookMarkLoadListeners.remove(listener);
+  }
+
+  private void fireBookMarkAboutToLoad(final IBookMark bookmark) {
+    for (final BookMarkLoadListener listener : fBookMarkLoadListeners) {
+      SafeRunner.run(new LoggingSafeRunnable() {
+        public void run() throws Exception {
+          listener.bookMarkAboutToLoad(bookmark);
+        }
+      });
+    }
+  }
+
+  private void fireBookMarkDoneLoading(final IBookMark bookmark) {
+    for (final BookMarkLoadListener listener : fBookMarkLoadListeners) {
+      SafeRunner.run(new LoggingSafeRunnable() {
+        public void run() throws Exception {
+          listener.bookMarkDoneLoading(bookmark);
+        }
+      });
     }
   }
 }
