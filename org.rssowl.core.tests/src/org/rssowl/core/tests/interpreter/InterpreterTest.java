@@ -437,6 +437,24 @@ public class InterpreterTest {
   }
 
   /**
+   * See Bug 1078.
+   *
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testMediaTitle() throws Exception {
+    InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_media_title.xml");
+    IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_rss.xml"));
+    Owl.getInterpreter().interpret(inS, feed, null);
+
+    assertEquals(1, feed.getNews().size());
+
+    INews news1 = feed.getNews().get(0);
+    assertEquals("News Title", news1.getTitle());
+  }
+
+  /**
    * Test a Feed that has been loaded via W3C Document.
    *
    * @throws Exception
