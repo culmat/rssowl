@@ -69,7 +69,7 @@
 		<item>
 			<title>rss_item1.title</title>
 	        <link>
-	          http://www.Link.com/feed/item1/link/</link>
+	          http://www.Link .com/[feed]/{item1}/link/</link>
 	        <author>rss_item1.author</author>
 	        <description>rss_item1.description</description>
 	        <pubDate>2005-26-12T20:00:00Z</pubDate>

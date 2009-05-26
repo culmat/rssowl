@@ -212,16 +212,8 @@ public class URIUtils {
       /* Remove surrounding whitespaces */
       str = str.trim();
 
-      /* Take first token not containing any whitespace */
-      if (str.contains(" ")) {
-        String[] split = str.split(" ");
-        if (split.length > 0)
-          str = split[0];
-      }
-
-      /* Remove trailing slash if any */
-      if (str.length() > 0 && str.charAt(str.length() - 1) == '/')
-        str = str.substring(0, str.length() - 1);
+      /* Encode invalid URI Characters */
+      str= fastEncode(str);
 
       return new URI(str);
     } catch (URISyntaxException e) {
@@ -292,6 +284,19 @@ public class URIUtils {
     for (int i = 0; i < CHARS_TO_ENCODE.length; i++) {
       if (url.contains(CHARS_TO_ENCODE[i]))
         url = StringUtils.replaceAll(url, CHARS_TO_ENCODE[i], ENCODED_CHARS[i]);
+    }
+
+    return url;
+  }
+
+  /**
+   * @param url the link to decode.
+   * @return the decoded link.
+   */
+  public static String fastDecode(String url) {
+    for (int i = 0; i < ENCODED_CHARS.length; i++) {
+      if (url.contains(ENCODED_CHARS[i]))
+        url = StringUtils.replaceAll(url, ENCODED_CHARS[i], CHARS_TO_ENCODE[i]);
     }
 
     return url;
