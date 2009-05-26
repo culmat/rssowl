@@ -98,7 +98,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -984,6 +986,19 @@ public class OwlUI {
       return page.getActiveEditor();
 
     return null;
+  }
+
+  /**
+   * @return a list of all editors currently open in the UI as references.
+   */
+  public static List<IEditorReference> getEditorReferences() {
+    IWorkbenchPage page = getPage();
+    if (page != null) {
+      IEditorReference[] references = page.getEditorReferences();
+      return Arrays.asList(references);
+    }
+
+    return Collections.emptyList();
   }
 
   /**
