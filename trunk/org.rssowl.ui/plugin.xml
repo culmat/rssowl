@@ -137,6 +137,9 @@
             <separator
                   name="previous.feed">
             </separator>
+            <separator
+                  name="previous.tab">
+            </separator>
          </menu>
          <menu
                id="next"
@@ -147,6 +150,9 @@
             </separator>
             <separator
                   name="next.feed">
+            </separator>
+            <separator
+                  name="next.tab">
             </separator>
          </menu>
          <action
@@ -182,6 +188,14 @@
                style="push">
          </action>
          <action
+               class="org.rssowl.ui.internal.actions.NavigationActionFactory:nextTab"
+               definitionId="org.rssowl.ui.NextTab"
+               id="org.rssowl.ui.NextTab"
+               label="Next &amp;Tab"
+               menubarPath="navigate/next/next.tab"
+               style="push">
+         </action>
+         <action
                class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousUnreadNews"
                definitionId="org.rssowl.ui.PreviousUnreadNews"
                id="org.rssowl.ui.PreviousUnreadNews"
@@ -211,6 +225,14 @@
                id="org.rssowl.ui.PreviousFeed"
                label="Previous &amp;Feed"
                menubarPath="navigate/previous/previous.feed"
+               style="push">
+         </action>
+         <action
+               class="org.rssowl.ui.internal.actions.NavigationActionFactory:previousTab"
+               definitionId="org.rssowl.ui.PreviousTab"
+               id="org.rssowl.ui.PreviousTab"
+               label="Previous &amp;Tab"
+               menubarPath="navigate/previous/previous.tab"
                style="push">
          </action>
       </actionSet>
@@ -762,6 +784,16 @@
             description="Assign Labels for a selection of News"
             id="org.rssowl.ui.AssignLabels"
             name="Assign Labels">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.NextTab"
+            name="Next Tab">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            id="org.rssowl.ui.PreviousTab"
+            name="Previous Tab">
       </command>
    </extension>
    <extension
