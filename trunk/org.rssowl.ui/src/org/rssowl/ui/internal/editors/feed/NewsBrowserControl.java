@@ -196,6 +196,7 @@ public class NewsBrowserControl implements IFeedViewPart {
         /* Don't show Status for the Handler Protocol */
         if (event.text != null && !event.text.contains(ILinkHandler.HANDLER_PROTOCOL) && !event.text.contains(LOCALHOST)) {
           String statusText = event.text;
+          statusText = URIUtils.fastDecode(statusText);
           statusText = statusText.replaceAll("&", "&&"); //$NON-NLS-1$//$NON-NLS-2$
           fEditorSite.getActionBars().getStatusLineManager().setMessage(statusText);
         }

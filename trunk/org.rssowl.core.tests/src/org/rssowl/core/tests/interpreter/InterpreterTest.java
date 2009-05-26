@@ -220,19 +220,19 @@ public class InterpreterTest {
     IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_rss.xml"));
     Owl.getInterpreter().interpret(inS, feed, null);
 
-    assertEquals(new URI("http://www.link.com/feed/link"), feed.getHomepage());
+    assertEquals(new URI("http://www.link.com/feed/link/"), feed.getHomepage());
     assertEquals(new URI("http://www.link.com/feed/docs"), feed.getDocs());
 
     assertNotNull(feed.getImage());
-    assertEquals(new URI("http://www.link.com/image/url/"), feed.getImage().getLink());
+    assertEquals(new URI("http://www.link.com/image/url//"), feed.getImage().getLink());
 
     assertEquals(3, feed.getNews().size());
     INews news1 = feed.getNews().get(0);
 
-    assertEquals(new URI("http://www.link.com/feed/item1/link"), news1.getLink());
+    assertEquals(new URI("http://www.Link%20.com/%5Bfeed%5D/%7Bitem1%7D/link/"), news1.getLink());
 
     assertEquals(1, news1.getAttachments().size());
-    assertEquals(new URI("http://www.Link.com/feed/item1/attachment1/link"), news1.getAttachments().get(0).getLink());
+    assertEquals(new URI("http://www.Link.com/feed/item1/attachment1/link/"), news1.getAttachments().get(0).getLink());
   }
 
   /**
@@ -824,7 +824,7 @@ public class InterpreterTest {
     Owl.getInterpreter().interpret(inS, feed, null);
 
     assertEquals("Bugzilla 2.20", feed.getFormat());
-    assertEquals(new URI("http://dev.rssowl.org"), feed.getBase());
+    assertEquals(new URI("http://dev.rssowl.org/"), feed.getBase());
     assertEquals("bugzilla_short_description", feed.getTitle());
     assertEquals(new URI("http://dev.rssowl.org/show_bug.cgi?id=10"), feed.getHomepage());
     assertEquals(new URI("bugzilla_reporter@mail.xx"), feed.getAuthor().getEmail());
