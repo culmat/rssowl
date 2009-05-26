@@ -41,7 +41,7 @@ import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 /**
  * The <code>NavigationActionFactory</code> is providing a list of common
  * Actions to navigate to News-Items or Feeds.
- * 
+ *
  * @author bpasero
  */
 public class NavigationActionFactory implements IExecutableExtensionFactory, IExecutableExtension {
@@ -81,7 +81,13 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
 
       /* Run on active FeedView if any */
       if (fType.isNewsScoped() && activeFeedView != null) {
-        if (activeFeedView.navigate(true, fType.isNewsScoped(), fType.isNext(), fType.isUnread())) {
+        boolean success = activeFeedView.navigate(true, fType.isNewsScoped(), fType.isNext(), fType.isUnread());
+
+        /* For unread news, consider all news of the active feed (see Bug 1064) */
+        if (!success && fType.isNewsScoped() && fType.isUnread())
+          success = activeFeedView.navigate(false, fType.isNewsScoped(), fType.isNext(), fType.isUnread());
+
+        if (success) {
           IWorkbenchPage page = activeFeedView.getSite().getPage();
           page.activate(activeFeedView.getSite().getPart());
           page.activate(activeFeedView);
