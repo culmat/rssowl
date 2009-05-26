@@ -69,6 +69,14 @@
             class="org.rssowl.core.internal.interpreter.PodcastNamespaceHandler"
             namespaceURI="http://www.itunes.com/dtds/podcast-1.0.dtd">
       </namespaceHandler>
+      <namespaceHandler
+            class="org.rssowl.core.internal.interpreter.MediaNamespaceHandler"
+            namespaceURI="http://search.yahoo.com/mrss/">
+      </namespaceHandler>
+      <namespaceHandler
+            class="org.rssowl.core.internal.interpreter.MediaNamespaceHandler"
+            namespaceURI="http://search.yahoo.com/mrss">
+      </namespaceHandler>
    </extension>
    <extension
          point="org.rssowl.core.TypeImporter">
