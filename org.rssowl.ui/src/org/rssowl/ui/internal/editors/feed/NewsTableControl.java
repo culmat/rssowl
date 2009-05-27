@@ -661,8 +661,12 @@ public class NewsTableControl implements IFeedViewPart {
         });
       }
 
+      /* Instantly Mark Read (see Bug 1023) */
+      if (markRead && delay == 0)
+        setNewsState(selectedNews, INews.State.READ, false);
+
       /* Mark Read after Delay */
-      if (markRead) {
+      else if (markRead) {
         fNewsStateTracker.run(new TaskAdapter() {
           public IStatus run(IProgressMonitor monitor) {
             setNewsState(selectedNews, INews.State.READ, true);
