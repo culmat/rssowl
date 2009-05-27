@@ -549,8 +549,13 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     }
 
     /* Create the GZipInputStream then */
-    if (isGzipStream)
-      return new GZIPInputStream(inputStream);
+    if (isGzipStream) {
+      try {
+        return new GZIPInputStream(inputStream);
+      } catch (IOException e) {
+        return inputStream;
+      }
+    }
     return inputStream;
   }
 
