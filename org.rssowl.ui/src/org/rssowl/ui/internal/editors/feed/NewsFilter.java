@@ -455,13 +455,8 @@ public class NewsFilter extends ViewerFilter {
    */
   public boolean needsRefresh(Set<NewsEvent> events) {
 
-    /* Check if any News has become Unread */
-    if (fType == Type.SHOW_UNREAD) {
-      return CoreUtils.isReadStateChange(events, true);
-    }
-
     /* Check if any News has become Sticky */
-    else if (fType == Type.SHOW_STICKY) {
+    if (fType == Type.SHOW_STICKY) {
       return CoreUtils.isStickyStateChange(events, true);
     }
 
