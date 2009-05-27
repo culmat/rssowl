@@ -30,11 +30,12 @@ import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
-import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.CoreUtils;
@@ -48,7 +49,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -390,34 +390,38 @@ public class NewsGrouping {
 
   private Collection<EntityGroup> createFeedGroups(Collection<INews> input) {
     Map<Long, EntityGroup> groupCache = new HashMap<Long, EntityGroup>();
+    IBookMarkDAO bookmarkDao = DynamicDAO.getDAO(IBookMarkDAO.class);
+    Map<FeedLinkReference, IBookMark> feedToBookMarkCache = new HashMap<FeedLinkReference, IBookMark>();
 
     /* Group Input */
     int nextId = 0;
     for (Object object : input) {
       if (object instanceof INews) {
         INews news = (INews) object;
-        IFeed feed = news.getFeedReference().resolve();
+        FeedLinkReference feedRef = news.getFeedReference();
 
-        /* TODO Workaround for Bug 751: NPE when deleting feed */
-        if (feed == null)
-          return Collections.emptyList();
+        IBookMark bookmark = feedToBookMarkCache.get(feedRef);
+        if (bookmark == null) {
+          Collection<IBookMark> bookmarks = bookmarkDao.loadAll(feedRef);
+          if (bookmarks.isEmpty())
+            continue;
 
-        EntityGroup group = groupCache.get(feed.getId());
+          bookmark = bookmarks.iterator().next();
+          feedToBookMarkCache.put(feedRef, bookmark);
+        }
 
+        EntityGroup group = groupCache.get(bookmark.getId());
         if (group == null) {
-          String name = StringUtils.isSet(feed.getTitle()) ? feed.getTitle() : feed.getLink().toString();
+          String name = bookmark.getName();
           group = new EntityGroup(nextId++, GROUP_CATEGORY_ID, name);
 
           if (!InternalOwl.TESTING) {
-            ImageDescriptor feedIcon = null;
-            IBookMark bookMark = CoreUtils.getBookMark(new FeedLinkReference(feed.getLink()));
-            if (bookMark != null)
-              feedIcon = OwlUI.getFavicon(bookMark);
+            ImageDescriptor feedIcon = OwlUI.getFavicon(bookmark);
             group.setImage(feedIcon != null ? feedIcon : OwlUI.BOOKMARK);
           }
 
           /* Cache */
-          groupCache.put(feed.getId(), group);
+          groupCache.put(bookmark.getId(), group);
         }
 
         new EntityGroupItem(group, news);
