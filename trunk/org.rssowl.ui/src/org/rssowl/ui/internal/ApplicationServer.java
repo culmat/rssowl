@@ -555,8 +555,14 @@ public class ApplicationServer {
     if (viewerId == null)
       return;
 
-    /* Ask for sorted Elements */
+    /* Retrieve Viewer */
     ContentViewer viewer = fRegistry.get(viewerId);
+
+    /* Might be bad timing */
+    if (viewer == null)
+      return;
+
+    /* Ask for sorted Elements */
     ILabelProvider labelProvider = (ILabelProvider) viewer.getLabelProvider();
     Object[] children = new Object[0];
     if (viewer instanceof NewsBrowserViewer)
