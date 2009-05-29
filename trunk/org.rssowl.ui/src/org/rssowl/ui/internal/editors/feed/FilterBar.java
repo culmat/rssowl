@@ -893,8 +893,18 @@ public class FilterBar {
     fSecondToolBarManager.find(GROUP_ACTION).update(IAction.IMAGE);
 
     /* Refresh if set */
-    if (refresh)
-      fFeedView.refresh(true, false);
+    if (refresh) {
+      NewsTableControl newsTable = fFeedView.getNewsTableControl();
+      boolean isNewsTableVisible = fFeedView.isTableViewerVisible();
+      try {
+        if (newsTable != null && isNewsTableVisible)
+          newsTable.setBlockNewsStateTracker(true);
+        fFeedView.refresh(true, false);
+      } finally {
+        if (newsTable != null && isNewsTableVisible)
+          newsTable.setBlockNewsStateTracker(false);
+      }
+    }
 
     /* Update Settings */
     if (saveSettings) {
