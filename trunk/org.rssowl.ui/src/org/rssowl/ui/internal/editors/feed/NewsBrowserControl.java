@@ -187,7 +187,7 @@ public class NewsBrowserControl implements IFeedViewPart {
           setPartInput(selection.getFirstElement());
       }
     };
-    fEditorSite.getPage().addPostSelectionListener(fSelectionListener);
+    fEditorSite.getPage().addSelectionListener(fSelectionListener);
 
     /* Send Browser-Status to Workbench-Status */
     ((Browser) fViewer.getControl()).addStatusTextListener(new StatusTextListener() {
@@ -232,7 +232,7 @@ public class NewsBrowserControl implements IFeedViewPart {
   }
 
   private void unregisterListeners() {
-    fEditorSite.getPage().removePostSelectionListener(fSelectionListener);
+    fEditorSite.getPage().removeSelectionListener(fSelectionListener);
     PlatformUI.getWorkbench().getThemeManager().removePropertyChangeListener(fPropertyChangeListener);
   }
 

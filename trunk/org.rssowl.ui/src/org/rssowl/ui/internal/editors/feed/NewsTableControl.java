@@ -535,7 +535,7 @@ public class NewsTableControl implements IFeedViewPart {
         onSelectionChanged(event);
       }
     };
-    fViewer.addPostSelectionChangedListener(fSelectionChangeListener);
+    fViewer.addSelectionChangedListener(fSelectionChangeListener);
 
     /* Perform Action on Mouse-Down */
     fCustomTree.getControl().addListener(SWT.MouseDown, new Listener() {
@@ -989,7 +989,7 @@ public class NewsTableControl implements IFeedViewPart {
   }
 
   private void unregisterListeners() {
-    fViewer.removePostSelectionChangedListener(fSelectionChangeListener);
+    fViewer.removeSelectionChangedListener(fSelectionChangeListener);
     DynamicDAO.removeEntityListener(ILabel.class, fLabelListener);
     PlatformUI.getWorkbench().getThemeManager().removePropertyChangeListener(fPropertyChangeListener);
   }
