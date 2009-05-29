@@ -31,13 +31,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IAttachment;
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.editors.feed.NewsFilter;
@@ -102,9 +105,15 @@ public class NewsGroupFilterTest {
    */
   @Test
   public void testNewsGrouping() throws Exception {
+    IFolder folder= fFactory.createFolder(null, null, "Root");
+    DynamicDAO.save(folder);
+
     IFeed feed = fFactory.createFeed(null, new URI("http://www.link.com"));
     feed.setTitle("Feed Name");
     DynamicDAO.save(feed);
+
+    IBookMark bookmark= fFactory.createBookMark(null, folder, new FeedLinkReference(feed.getLink()), "Feed Name");
+    DynamicDAO.save(bookmark);
 
     INews news1 = fFactory.createNews(null, feed, new Date());
     news1.setTitle("News 1");
