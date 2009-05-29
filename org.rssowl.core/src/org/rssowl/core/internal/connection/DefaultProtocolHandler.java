@@ -757,6 +757,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
               String linkVal = str.toString();
               if (!linkVal.contains("://")) {
                 try {
+                  if (!linkVal.startsWith("/"))
+                    linkVal = "/" + linkVal;
                   linkVal = website.resolve(linkVal).toString();
                 } catch (IllegalArgumentException e) {
                   linkVal = linkVal.startsWith("/") ? website.toString() + linkVal : website.toString() + "/" + linkVal;
