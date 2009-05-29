@@ -24,6 +24,7 @@
 
 package org.rssowl.core.internal.interpreter;
 
+import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.rssowl.core.Owl;
@@ -223,12 +224,24 @@ public class RDFInterpreter extends BasicInterpreter {
   private void processItem(Element element, IFeed feed) {
     INews news = Owl.getModelFactory().createNews(null, feed, new Date(System.currentTimeMillis() - (fNewsCounter++ * 1)));
 
-    /* Check wether the Attributes are to be processed by a Contribution */
-    processNamespaceAttributes(element, news);
+    /* Interpret Attributes */
+    List<?> itemAttributes = element.getAttributes();
+    for (Iterator<?> iter = itemAttributes.iterator(); iter.hasNext();) {
+      Attribute attribute = (Attribute) iter.next();
+      String name = attribute.getName().toLowerCase();
+
+      /* Check wether this Attribute is to be processed by a Contribution */
+      if (processAttributeExtern(attribute, news))
+        continue;
+
+      /* About */
+      else if ("about".equals(name)) //$NON-NLS-1$
+        Owl.getModelFactory().createGuid(news, attribute.getValue(), true);
+    }
 
     /* Interpret Children */
-    List< ? > newsChilds = element.getChildren();
-    for (Iterator< ? > iter = newsChilds.iterator(); iter.hasNext();) {
+    List<?> newsChilds = element.getChildren();
+    for (Iterator<?> iter = newsChilds.iterator(); iter.hasNext();) {
       Element child = (Element) iter.next();
       String name = child.getName().toLowerCase();
 
