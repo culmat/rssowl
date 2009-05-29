@@ -24,6 +24,8 @@
 
 package org.rssowl.core.tests.interpreter;
 
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -281,6 +283,62 @@ public class InterpreterTest {
 
     assertNotNull(news1.getSource());
     assertEquals(new URI("rdf_item1.source"), news1.getSource().getLink());
+  }
+
+  /**
+   * Test an RDF Feed with rdf:about.
+   *
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testRDFAbout() throws Exception {
+    InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_rdf_about.xml");
+    IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_rdf_about.xml"));
+    Owl.getInterpreter().interpret(inS, feed, null);
+
+    assertEquals("RDF", feed.getFormat());
+    assertEquals("rdf_title", feed.getTitle());
+    assertEquals(new URI("rdf_link"), feed.getHomepage());
+    assertEquals("rdf_description", feed.getDescription());
+    assertEquals("rdf_rights", feed.getCopyright());
+    assertEquals("en-us", feed.getLanguage());
+
+    assertNotNull(feed.getAuthor());
+    assertEquals("rdf_publisher", feed.getAuthor().getName());
+
+    assertNotNull(feed.getPublishDate());
+
+    assertNotNull(feed.getImage());
+    assertEquals(new URI("rdf_image.url"), feed.getImage().getLink());
+    assertEquals("rdf_image.title", feed.getImage().getTitle());
+    assertEquals(new URI("rdf_image.link"), feed.getImage().getHomepage());
+
+    assertEquals(3, feed.getNews().size());
+
+    INews news1 = feed.getNews().get(0);
+    assertEquals("rdf_item1.title", news1.getTitle());
+    assertEquals(new URI("rdf_item1.link"), news1.getLink());
+    assertEquals("rdf_item1.description", news1.getDescription());
+
+    assertNotNull(news1.getGuid());
+    assertEquals("rdf_item1.identifier", news1.getGuid().getValue());
+
+    assertNotNull(news1.getPublishDate());
+
+    assertNotNull(news1.getAuthor());
+    assertEquals("rdf_item1.publisher", news1.getAuthor().getName());
+
+    assertNotNull(news1.getSource());
+    assertEquals(new URI("rdf_item1.source"), news1.getSource().getLink());
+
+    INews news2 = feed.getNews().get(1);
+    assertNotNull(news2.getGuid());
+    assertEquals("rdf_item2.link", news2.getGuid().getValue());
+    assertTrue(news2.getGuid().isPermaLink());
+
+    INews news3 = feed.getNews().get(2);
+    assertNull(news3.getGuid());
   }
 
   /**
