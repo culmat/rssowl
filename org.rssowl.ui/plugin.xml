@@ -1439,7 +1439,7 @@
             icon="icons/obj16/fav_digg.gif"
             id="org.rssowl.ui.DiggKeywordFeed"
             name="Digg"
-            url="http://digg.com/rss_search?search=[:]&amp;area=all&amp;type=both&amp;section=all">
+            url="http://digg.com/rss_search?s=[:]">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_newsvine.gif"
