@@ -1406,6 +1406,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
     return fNewsBrowserControl;
   }
 
+  NewsTableControl getNewsTableControl() {
+    return fNewsTableControl;
+  }
+
   /*
    * @see org.eclipse.ui.part.WorkbenchPart#createPartControl(org.eclipse.swt.widgets.Composite)
    */
