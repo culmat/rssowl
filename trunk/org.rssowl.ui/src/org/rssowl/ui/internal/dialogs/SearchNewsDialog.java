@@ -968,7 +968,6 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Status Label */
     fStatusLabel = new Link(buttonBar, SWT.NONE);
     fStatusLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-    ((GridData) fStatusLabel.getLayoutData()).heightHint = 20;
     fStatusLabel.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
