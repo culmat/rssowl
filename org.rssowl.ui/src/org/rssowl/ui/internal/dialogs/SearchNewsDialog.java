@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.dialogs;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
@@ -41,6 +42,7 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ColumnViewerToolTipSupport;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -60,6 +62,12 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DragSourceListener;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.URLTransfer;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.PaintEvent;
@@ -120,6 +128,7 @@ import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
+import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
@@ -1235,8 +1244,64 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Hook Contextual Menu */
     hookContextualMenu();
 
+    /* Drag and Drop */
+    initDragAndDrop();
+
     /* Register Listeners */
     registerListeners();
+  }
+
+  private void initDragAndDrop() {
+    int ops = DND.DROP_COPY | DND.DROP_MOVE;
+    Transfer[] transfers = new Transfer[] { LocalSelectionTransfer.getTransfer(), TextTransfer.getInstance(), URLTransfer.getInstance() };
+
+    /* Drag Support */
+    fResultViewer.addDragSupport(ops, transfers, new DragSourceListener() {
+      public void dragStart(final DragSourceEvent event) {
+        SafeRunner.run(new LoggingSafeRunnable() {
+          public void run() throws Exception {
+            LocalSelectionTransfer.getTransfer().setSelection(fResultViewer.getSelection());
+            LocalSelectionTransfer.getTransfer().setSelectionSetTime(event.time & 0xFFFFFFFFL);
+            event.doit = true;
+          }
+        });
+      }
+
+      public void dragSetData(final DragSourceEvent event) {
+        SafeRunner.run(new LoggingSafeRunnable() {
+          public void run() throws Exception {
+
+            /* Set Selection using LocalSelectionTransfer */
+            if (LocalSelectionTransfer.getTransfer().isSupportedType(event.dataType))
+              event.data = LocalSelectionTransfer.getTransfer().getSelection();
+
+            /* Set Text using Text- or URLTransfer */
+            else if (TextTransfer.getInstance().isSupportedType(event.dataType) || URLTransfer.getInstance().isSupportedType(event.dataType))
+              setTextData(event);
+          }
+        });
+      }
+
+      public void dragFinished(DragSourceEvent event) {
+        SafeRunner.run(new LoggingSafeRunnable() {
+          public void run() throws Exception {
+            LocalSelectionTransfer.getTransfer().setSelection(null);
+            LocalSelectionTransfer.getTransfer().setSelectionSetTime(0);
+          }
+        });
+      }
+    });
+  }
+
+  private void setTextData(DragSourceEvent event) {
+    IStructuredSelection selection = (IStructuredSelection) LocalSelectionTransfer.getTransfer().getSelection();
+    Set<INews> news = ModelUtils.normalize(selection.toList());
+
+    if (!news.isEmpty()) {
+      String linkAsText = news.iterator().next().getLinkAsText();
+      if (StringUtils.isSet(linkAsText))
+        event.data = linkAsText;
+    }
   }
 
   /* Convert Selection to INews */
