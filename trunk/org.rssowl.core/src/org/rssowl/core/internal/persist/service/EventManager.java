@@ -291,19 +291,17 @@ public class EventManager implements DatabaseListener   {
 
   private void cascadeSearchConditionDeletion(ISearchCondition searchCondition) {
     ISearchMark searchMark = loadSearchMark(searchCondition);
-    if (!itemsBeingDeletedContains(searchMark)) {
-      if (searchMark.removeSearchCondition(searchCondition))
-        fDb.ext().set(searchMark, 2);
+    if (searchMark != null) {
+      if (!itemsBeingDeletedContains(searchMark)) {
+        if (searchMark.removeSearchCondition(searchCondition))
+          fDb.ext().set(searchMark, 2);
+      }
     }
     fDb.delete(searchCondition.getField());
   }
 
   private ISearchMark loadSearchMark(ISearchCondition searchCondition) {
     ISearchMark mark = Owl.getPersistenceService().getDAOService().getSearchMarkDAO().load(searchCondition);
-
-    if (mark == null)
-      throw new IllegalStateException("searchCondition has no parent ISearchMark");
-
     return mark;
   }
 
