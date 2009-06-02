@@ -1011,4 +1011,25 @@ public class CoreUtils {
 
     return Pair.create(scope, otherConditions);
   }
+
+  /**
+   * @param conditions the list of search conditions.
+   * @return <code>true</code> if there are conflicting location conditions and
+   * <code>false</code> otherwise.
+   */
+  public static boolean isLocationConflict(List<ISearchCondition> conditions) {
+    if (conditions == null || conditions.isEmpty())
+      return false;
+
+    Pair<ISearchCondition, List<ISearchCondition>> splitConditions = splitScope(conditions);
+    if (splitConditions.getFirst() == null)
+      return false;
+
+    for (ISearchCondition condition : splitConditions.getSecond()) {
+      if (condition.getField().getId() == INews.LOCATION)
+        return true;
+    }
+
+    return false;
+  }
 }

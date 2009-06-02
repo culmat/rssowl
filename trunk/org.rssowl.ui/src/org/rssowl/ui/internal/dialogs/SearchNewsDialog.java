@@ -689,7 +689,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     setTitleImage(OwlUI.getImage(fResources, "icons/wizban/search.gif"));
 
     /* Title Message */
-    setMessage("Use \'?\' for any character and \'*\' for any word in your search. Surround words with quotes to search for phrases.", IMessageProvider.INFORMATION);
+    restoreInfoMessage(false);
 
     /* Sashform dividing search definition from results */
     fSashForm = new SashForm(parent, SWT.VERTICAL | SWT.SMOOTH);
@@ -995,11 +995,17 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Show Conditions */
     fSearchConditionList.showConditions(conditions.getSecond());
 
-    /* Unset Error Message */
-    setErrorMessage(null);
+    /* Unset Warning/Error Message */
+    restoreInfoMessage(true);
 
     /* Layout */
     fLocationControl.getParent().getParent().getParent().layout(true, true);
+  }
+
+  private void restoreInfoMessage(boolean clearError) {
+    if (clearError)
+      setErrorMessage(null);
+    setMessage("Use \'?\' for any character and \'*\' for any word in your search. Surround words with quotes to search for phrases.", IMessageProvider.INFORMATION);
   }
 
   /*
@@ -1063,14 +1069,20 @@ public class SearchNewsDialog extends TitleAreaDialog {
       return;
     }
 
-    /* Unset Error Message */
-    setErrorMessage(null);
-
     /* Create Conditions */
     fCurrentSearchConditions = fSearchConditionList.createConditions();
     ISearchCondition locationCondition = fLocationControl.toScopeCondition();
     if (locationCondition != null)
       fCurrentSearchConditions.add(locationCondition);
+
+    /* Make sure there is no Location Conflict */
+    if (CoreUtils.isLocationConflict(fCurrentSearchConditions))
+      setMessage("You are using a location condition together with a value for \"Search in\".", IMessageProvider.WARNING);
+
+    /* Unset Warning/Error Message */
+    else
+      restoreInfoMessage(true);
+
     final boolean matchAllConditions = fMatchAllRadio.getSelection();
 
     /* Disable Buttons and update Cursor */
@@ -1213,8 +1225,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fResultViewer.setInput(Collections.emptyList());
     hideBrowser(true);
 
-    /* Unset Error Message */
-    setErrorMessage(null);
+    /* Unset Warning/Error Message */
+    restoreInfoMessage(true);
 
     /* Unset Status Message */
     fStatusLabel.setText("");

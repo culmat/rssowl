@@ -193,6 +193,9 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     fSearchConditionList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fSearchConditionList.setVisibleItemCount(3);
 
+    if (CoreUtils.isLocationConflict(mark.getSearchConditions()))
+      fSite.setMessage("You are using a location condition together with a value for \"Search in\".", IPropertyDialogSite.MessageType.WARNING);
+
     return container;
   }
 
