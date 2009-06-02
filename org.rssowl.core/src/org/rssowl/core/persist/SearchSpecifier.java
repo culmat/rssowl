@@ -71,7 +71,10 @@ public enum SearchSpecifier implements IPersistable {
   SIMILIAR_TO,
 
   /** Target is to contain Value (all) */
-  CONTAINS_ALL;
+  CONTAINS_ALL,
+
+  /** Location Scope */
+  SCOPE;
 
   /**
    * Get a human-readable representation of the specifier to be used in the UI
@@ -105,6 +108,8 @@ public enum SearchSpecifier implements IPersistable {
         return "is less than";
       case SIMILIAR_TO:
         return "is similar to";
+      case SCOPE:
+        return "is";
       default:
         return super.toString();
     }

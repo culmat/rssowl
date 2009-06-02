@@ -42,6 +42,7 @@ import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.ISearchValueType;
+import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
@@ -254,6 +255,9 @@ public class CoreUtils {
    * bins).
    */
   public static List<IFolderChild> toEntities(Long[][] primitives) {
+    if (primitives == null)
+      return Collections.emptyList();
+
     List<IFolderChild> childs = new ArrayList<IFolderChild>();
 
     /* Folders */
@@ -984,5 +988,27 @@ public class CoreUtils {
     }
 
     return false;
+  }
+
+  /**
+   * @param conditions the conditions to split into scope and other conditions.
+   * @return a {@link Pair} containing a condition for the scope or
+   * <code>null</code> and the other conditions that are from different type.
+   */
+  public static Pair<ISearchCondition, List<ISearchCondition>> splitScope(List<ISearchCondition> conditions) {
+    if (conditions == null)
+      return null;
+
+    ISearchCondition scope = null;
+    List<ISearchCondition> otherConditions = new ArrayList<ISearchCondition>(conditions.size());
+
+    for (ISearchCondition condition : conditions) {
+      if (condition.getSpecifier() == SearchSpecifier.SCOPE)
+        scope = condition;
+      else
+        otherConditions.add(condition);
+    }
+
+    return Pair.create(scope, otherConditions);
   }
 }

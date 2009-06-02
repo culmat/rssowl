@@ -59,12 +59,14 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.search.LocationControl;
 import org.rssowl.ui.internal.search.SearchConditionList;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -75,8 +77,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * TODO This is a rough-Action which is not polished or optimized and only for
- * developers purposes!
+ * Dialog to add saved searches.
  *
  * @author bpasero
  */
@@ -94,9 +95,11 @@ public class SearchMarkDialog extends TitleAreaDialog {
   private boolean fFirstTimeOpen;
   private IFolder fParent;
   private IMark fPosition;
+  private ISearchCondition fInitialLocation;
   private List<ISearchCondition> fInitialSearchConditions;
   private boolean fInitialMatchAllConditions;
   private FolderChooser fFolderChooser;
+  private LocationControl fLocationControl;
 
   /**
    * @param shell
@@ -111,15 +114,14 @@ public class SearchMarkDialog extends TitleAreaDialog {
    * @param shell
    * @param parent
    * @param position
-   * @param conditions
+   * @param initialConditions
    * @param matchAllConditions
    */
-  public SearchMarkDialog(Shell shell, IFolder parent, IMark position, List<ISearchCondition> conditions, boolean matchAllConditions) {
+  public SearchMarkDialog(Shell shell, IFolder parent, IMark position, List<ISearchCondition> initialConditions, boolean matchAllConditions) {
     super(shell);
     fParent = parent;
     fPosition = position;
     fInitialMatchAllConditions = matchAllConditions;
-    fInitialSearchConditions = conditions;
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fDialogSettings = Activator.getDefault().getDialogSettings();
     fFirstTimeOpen = (fDialogSettings.getSection(SETTINGS_SECTION) == null);
@@ -127,6 +129,13 @@ public class SearchMarkDialog extends TitleAreaDialog {
     /* Use default Parent if required */
     if (fParent == null)
       fParent = getDefaultParent();
+
+    /* Look for initial conditions and scope */
+    if (initialConditions != null) {
+      Pair<ISearchCondition, List<ISearchCondition>> conditions = CoreUtils.splitScope(initialConditions);
+      fInitialLocation = conditions.getFirst();
+      fInitialSearchConditions = conditions.getSecond();
+    }
   }
 
   /*
@@ -154,6 +163,10 @@ public class SearchMarkDialog extends TitleAreaDialog {
 
     /* Create Conditions and save in DB */
     fSearchConditionList.createConditions(searchMark);
+    ISearchCondition locationCondition = fLocationControl.toScopeCondition();
+    if (locationCondition != null)
+      searchMark.addSearchCondition(locationCondition);
+
     DynamicDAO.save(fParent);
 
     /* Update the Search */
@@ -238,12 +251,6 @@ public class SearchMarkDialog extends TitleAreaDialog {
     fNameInput = new Text(nameContainer, SWT.SINGLE);
     fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
-    /* Prefill Name out of Conditions if provided */
-    if (fInitialSearchConditions != null && !fInitialSearchConditions.isEmpty()) {
-      fNameInput.setText(CoreUtils.getName(fInitialSearchConditions, fInitialMatchAllConditions));
-      fNameInput.selectAll();
-    }
-
     ToolBar generateTitleBar = new ToolBar(nameContainer, SWT.FLAT);
     generateTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
@@ -267,18 +274,43 @@ public class SearchMarkDialog extends TitleAreaDialog {
     fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
     fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
-    Composite radioContainer = new Composite(container, SWT.None);
-    radioContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-    radioContainer.setLayout(LayoutUtils.createGridLayout(2, 5, 0));
-    ((GridLayout) radioContainer.getLayout()).marginTop = 10;
+    Composite topControlsContainer = new Composite(container, SWT.None);
+    topControlsContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
+    topControlsContainer.setLayout(LayoutUtils.createGridLayout(4, 5, 0));
+    ((GridLayout) topControlsContainer.getLayout()).marginTop = 10;
 
-    fMatchAllRadio = new Button(radioContainer, SWT.RADIO);
+    fMatchAllRadio = new Button(topControlsContainer, SWT.RADIO);
     fMatchAllRadio.setText("Match all conditions");
     fMatchAllRadio.setSelection(fInitialMatchAllConditions);
 
-    fMatchAnyRadio = new Button(radioContainer, SWT.RADIO);
+    fMatchAnyRadio = new Button(topControlsContainer, SWT.RADIO);
     fMatchAnyRadio.setText("Match any condition");
     fMatchAnyRadio.setSelection(!fInitialMatchAllConditions);
+
+    /* Separator */
+    Label sep = new Label(topControlsContainer, SWT.SEPARATOR | SWT.VERTICAL);
+    sep.setLayoutData(new GridData(SWT.DEFAULT, 20));
+
+    /* Scope */
+    Composite scopeContainer = new Composite(topControlsContainer, SWT.None);
+    scopeContainer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    scopeContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
+
+    Label locationLabel = new Label(scopeContainer, SWT.NONE);
+    locationLabel.setText("Search in: ");
+
+    fLocationControl = new LocationControl(scopeContainer, SWT.WRAP) {
+      @Override
+      protected String getDefaultLabel() {
+        return "All News";
+      }
+    };
+    fLocationControl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    ((GridData) fLocationControl.getLayoutData()).widthHint = 100;
+    fLocationControl.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
+
+    if (fInitialLocation != null && fInitialLocation.getValue() instanceof Long[][])
+      fLocationControl.select((Long[][]) fInitialLocation.getValue());
 
     Composite conditionsContainer = new Composite(container, SWT.BORDER);
     conditionsContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
@@ -293,13 +325,20 @@ public class SearchMarkDialog extends TitleAreaDialog {
     fSearchConditionList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
     fSearchConditionList.setVisibleItemCount(3);
 
+    /* Prefill Name out of Conditions if provided */
+    if (fInitialSearchConditions != null && !fInitialSearchConditions.isEmpty())
+      onGenerateName();
+
     return container;
   }
 
   void onGenerateName() {
     List<ISearchCondition> conditions = fSearchConditionList.createConditions();
-    String name = CoreUtils.getName(conditions, fMatchAllRadio.getSelection());
+    ISearchCondition locationCondition = fLocationControl.toScopeCondition();
+    if (locationCondition != null)
+      conditions.add(locationCondition);
 
+    String name = CoreUtils.getName(conditions, fMatchAllRadio.getSelection());
     if (name.length() > 0) {
       fNameInput.setText(name);
       fNameInput.selectAll();
@@ -357,6 +396,10 @@ public class SearchMarkDialog extends TitleAreaDialog {
   private void onPreview() {
     final List<ISearchCondition> conditions = fSearchConditionList.createConditions();
     if (!conditions.isEmpty()) {
+      ISearchCondition locationCondition = fLocationControl.toScopeCondition();
+      if (locationCondition != null)
+        conditions.add(locationCondition);
+
       JobRunner.runInUIThread(getShell(), new Runnable() {
         public void run() {
           SearchNewsDialog dialog = new SearchNewsDialog(getShell(), conditions, fMatchAllRadio.getSelection(), true);

@@ -124,6 +124,35 @@ public class ModelSearchQueries {
   public static Query createQuery(Collection<ISearchCondition> conditions, boolean matchAllConditions) throws IOException {
     BooleanQuery bQuery = new BooleanQuery();
 
+    /* Handle Scope Query separately */
+    boolean isScoped = false;
+    for (ISearchCondition condition : conditions) {
+      if (isScopeCondition(condition)) {
+        BooleanQuery scopeClause = createLocationClause(condition);
+        if (!scopeClause.clauses().isEmpty()) {
+          bQuery.add(scopeClause, Occur.MUST);
+          isScoped = true;
+        }
+      }
+    }
+
+    /* If scoped, the fieldQuery is a MUST-Clause to the outer Query */
+    BooleanQuery fieldQuery = bQuery;
+    if (isScoped)
+      fieldQuery = new BooleanQuery();
+
+    /* Add Conditions into the Boolean Query */
+    addFieldClauses(conditions, matchAllConditions, fieldQuery);
+
+    /* Only add if not empty if scoped */
+    if (isScoped && !fieldQuery.clauses().isEmpty())
+      bQuery.add(fieldQuery, Occur.MUST);
+
+    return bQuery;
+  }
+
+  private static void addFieldClauses(Collection<ISearchCondition> conditions, boolean matchAllConditions, BooleanQuery bQuery) throws IOException {
+
     /* Handle State-Field separately (group) */
     BooleanQuery statesQuery = null;
     for (ISearchCondition condition : conditions) {
@@ -145,8 +174,8 @@ public class ModelSearchQueries {
     Analyzer analyzer = Indexer.createAnalyzer();
     for (ISearchCondition condition : conditions) {
 
-      /* State Queries already handled */
-      if (requiresStateGrouping(condition))
+      /* State and Scope Queries already handled */
+      if (requiresStateGrouping(condition) || isScopeCondition(condition))
         continue;
 
       /* Create and add new BooleanQuery for other Fields */
@@ -199,8 +228,6 @@ public class ModelSearchQueries {
       if (requireAllDocsQuery)
         fieldQuery.add(new BooleanClause(new MatchAllDocsQuery(), Occur.MUST));
     }
-
-    return bQuery;
   }
 
   @SuppressWarnings("unchecked")
@@ -221,6 +248,10 @@ public class ModelSearchQueries {
 
   private static boolean requiresStateGrouping(ISearchCondition condition) {
     return condition.getField().getId() == INews.STATE;
+  }
+
+  private static boolean isScopeCondition(ISearchCondition condition) {
+    return condition.getSpecifier() == SearchSpecifier.SCOPE;
   }
 
   private static BooleanClause createAllNewsFieldsClause(Analyzer analyzer, ISearchCondition condition, boolean matchAllConditions) throws IOException {
@@ -422,7 +453,7 @@ public class ModelSearchQueries {
   }
 
   /* This Clause needs to be generated dynamically */
-  private static Query createLocationClause(ISearchCondition condition) {
+  private static BooleanQuery createLocationClause(ISearchCondition condition) {
     BooleanQuery bQuery = new BooleanQuery();
     Long[][] value = (Long[][]) condition.getValue();
 
@@ -482,7 +513,7 @@ public class ModelSearchQueries {
 
   private static void addBookMarkLocationClause(BooleanQuery bQuery, IBookMark bookmark) {
     if (bookmark != null) {
-      BooleanQuery bookMarkLocationQuery= new BooleanQuery();
+      BooleanQuery bookMarkLocationQuery = new BooleanQuery();
 
       /* Match on Feed */
       String feed = bookmark.getFeedLinkReference().getLinkAsText().toLowerCase();

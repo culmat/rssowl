@@ -47,12 +47,14 @@ import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.search.LocationControl;
 import org.rssowl.ui.internal.search.SearchConditionList;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -69,6 +71,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
   private IPropertyDialogSite fSite;
   private Text fNameInput;
   private Button fMatchAllRadio;
+  private LocationControl fLocationControl;
   private SearchConditionList fSearchConditionList;
   private Button fMatchAnyRadio;
   private FolderChooser fFolderChooser;
@@ -99,6 +102,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
 
   private Control createContentsSingleSearch(Composite parent) {
     ISearchMark mark = (ISearchMark) fEntities.get(0);
+    Pair<ISearchCondition, List<ISearchCondition>> conditions = CoreUtils.splitScope(mark.getSearchConditions());
 
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(LayoutUtils.createGridLayout(2, 10, 10));
@@ -140,18 +144,43 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
     fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
-    Composite radioContainer = new Composite(container, SWT.None);
-    radioContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
-    radioContainer.setLayout(LayoutUtils.createGridLayout(2, 5, 0));
-    ((GridLayout) radioContainer.getLayout()).marginTop = 10;
+    Composite topControlsContainer = new Composite(container, SWT.None);
+    topControlsContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
+    topControlsContainer.setLayout(LayoutUtils.createGridLayout(4, 5, 0));
+    ((GridLayout) topControlsContainer.getLayout()).marginTop = 10;
 
-    fMatchAllRadio = new Button(radioContainer, SWT.RADIO);
+    fMatchAllRadio = new Button(topControlsContainer, SWT.RADIO);
     fMatchAllRadio.setText("Match all conditions");
     fMatchAllRadio.setSelection(mark.matchAllConditions());
 
-    fMatchAnyRadio = new Button(radioContainer, SWT.RADIO);
+    fMatchAnyRadio = new Button(topControlsContainer, SWT.RADIO);
     fMatchAnyRadio.setText("Match any condition");
     fMatchAnyRadio.setSelection(!mark.matchAllConditions());
+
+    /* Separator */
+    Label sep = new Label(topControlsContainer, SWT.SEPARATOR | SWT.VERTICAL);
+    sep.setLayoutData(new GridData(SWT.DEFAULT, 20));
+
+    /* Scope */
+    Composite scopeContainer = new Composite(topControlsContainer, SWT.None);
+    scopeContainer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    scopeContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
+
+    Label scopeLabel = new Label(scopeContainer, SWT.NONE);
+    scopeLabel.setText("Search in: ");
+
+    fLocationControl = new LocationControl(scopeContainer, SWT.WRAP) {
+      @Override
+      protected String getDefaultLabel() {
+        return "All News";
+      }
+    };
+    fLocationControl.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    ((GridData) fLocationControl.getLayoutData()).widthHint = 100;
+    fLocationControl.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
+
+    if (conditions.getFirst() != null && conditions.getFirst().getValue() instanceof Long[][])
+      fLocationControl.select((Long[][]) conditions.getFirst().getValue());
 
     Composite conditionsContainer = new Composite(container, SWT.BORDER);
     conditionsContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
@@ -160,7 +189,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     conditionsContainer.setBackgroundMode(SWT.INHERIT_FORCE);
 
     /* Search Conditions List */
-    fSearchConditionList = new SearchConditionList(conditionsContainer, SWT.None, mark.getSearchConditions());
+    fSearchConditionList = new SearchConditionList(conditionsContainer, SWT.None, conditions.getSecond());
     fSearchConditionList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fSearchConditionList.setVisibleItemCount(3);
 
@@ -247,8 +276,11 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
 
   void onGenerateName() {
     List<ISearchCondition> conditions = fSearchConditionList.createConditions();
-    String name = CoreUtils.getName(conditions, fMatchAllRadio.getSelection());
+    ISearchCondition locationCondition = fLocationControl.toScopeCondition();
+    if (locationCondition != null)
+      conditions.add(locationCondition);
 
+    String name = CoreUtils.getName(conditions, fMatchAllRadio.getSelection());
     if (name.length() > 0) {
       fNameInput.setText(name);
       fNameInput.selectAll();
@@ -313,7 +345,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     }
 
     /* Update Conditions (TODO Could be optimized to not replace all conditions) */
-    if (fSearchConditionList.isModified()) {
+    if (fSearchConditionList.isModified() || fLocationControl.isModified()) {
       entitiesToSave.add(mark);
       fSearchChanged = true;
 
@@ -325,6 +357,9 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
 
       /* Add New Conditions */
       fSearchConditionList.createConditions(mark);
+      ISearchCondition locationCondition = fLocationControl.toScopeCondition();
+      if (locationCondition != null)
+        mark.addSearchCondition(locationCondition);
     }
 
     /* Re-Run search if conditions changed */

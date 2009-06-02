@@ -270,7 +270,7 @@ public class ApplicationServiceImpl implements IApplicationService {
 
   private boolean needToIndex(Set<ISearchFilter> filters) {
     ISearchFilter firstFilter = filters.iterator().next();
-    return !firstFilter.matchAllNews();
+    return firstFilter.getSearch() != null;
   }
 
   private void runNewsFilters(final List<INews> news) throws Exception {
@@ -315,7 +315,7 @@ public class ApplicationServiceImpl implements IApplicationService {
     for (ISearchFilter filter : enabledFilters) {
 
       /* No Search Required */
-      if (filter.matchAllNews()) {
+      if (filter.getSearch() == null) {
         List<INews> remainingNews = new ArrayList<INews>(news);
         remainingNews.removeAll(filteredNews);
         if (!remainingNews.isEmpty())
