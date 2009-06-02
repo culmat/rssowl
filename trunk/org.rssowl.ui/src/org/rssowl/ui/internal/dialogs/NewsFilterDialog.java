@@ -164,7 +164,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
 
     /* Ensure that a Search Condition is specified if required */
     if (fSearchConditionList.isEmpty() && !fMatchAllNewsRadio.getSelection()) {
-      setErrorMessage("Please enter at least one search condition for the news filter.");
+      setErrorMessage("Please enter at least one search condition for the news filter or select \"Match All\" to match all news.");
       fSearchConditionList.focusInput();
       return;
     }
