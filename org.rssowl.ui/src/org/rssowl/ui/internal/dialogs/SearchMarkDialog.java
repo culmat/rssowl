@@ -100,6 +100,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
   private boolean fInitialMatchAllConditions;
   private FolderChooser fFolderChooser;
   private LocationControl fLocationControl;
+  private boolean fShowLocationConflict;
 
   /**
    * @param shell
@@ -135,6 +136,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
       Pair<ISearchCondition, List<ISearchCondition>> conditions = CoreUtils.splitScope(initialConditions);
       fInitialLocation = conditions.getFirst();
       fInitialSearchConditions = conditions.getSecond();
+      fShowLocationConflict= CoreUtils.isLocationConflict(initialConditions);
     }
   }
 
@@ -328,6 +330,10 @@ public class SearchMarkDialog extends TitleAreaDialog {
     /* Prefill Name out of Conditions if provided */
     if (fInitialSearchConditions != null && !fInitialSearchConditions.isEmpty())
       onGenerateName();
+
+    /* Show Warning in case of location conflict */
+    if (fShowLocationConflict)
+      setMessage("You are using a location condition together with a value for \"Search in\".", IMessageProvider.WARNING);
 
     return container;
   }

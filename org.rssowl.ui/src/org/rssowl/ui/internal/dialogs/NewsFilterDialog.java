@@ -572,6 +572,9 @@ public class NewsFilterDialog extends TitleAreaDialog {
 
       if (!conditions.getSecond().isEmpty())
         fSearchConditionList.showConditions(conditions.getSecond());
+
+      if (CoreUtils.isLocationConflict(initialConditions))
+        setMessage("You are using a location condition together with a value for \"In\".", IMessageProvider.WARNING);
     }
 
     /* Update Enable-State of Search Condition List */

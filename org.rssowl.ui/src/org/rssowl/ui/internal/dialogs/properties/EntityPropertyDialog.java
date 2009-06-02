@@ -74,6 +74,8 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
   private Label fMessageImage;
   private LocalResourceManager fResources;
   private TabFolder fTabFolder;
+  private String fInitialMessage;
+  private MessageType fInitialMessageType;
 
   /**
    * @param parentShell
@@ -197,6 +199,10 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
     fMessageText = new Label(composite, SWT.None);
     fMessageText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
+    /* Show Initial if provided */
+    if (fInitialMessage != null && fInitialMessageType != null)
+      setMessage(fInitialMessage, fInitialMessageType);
+
     return composite;
   }
 
@@ -278,6 +284,13 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
     /* Mask NULL */
     if (message == null)
       message = "";
+
+    /* Return early if not created yet */
+    if (fMessageImage == null || fMessageText == null) {
+      fInitialMessage = message;
+      fInitialMessageType = type;
+      return;
+    }
 
     /* Update Image */
     if (message.length() == 0)
