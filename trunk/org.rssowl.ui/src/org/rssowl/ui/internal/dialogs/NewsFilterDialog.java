@@ -269,7 +269,10 @@ public class NewsFilterDialog extends TitleAreaDialog {
     fEditedFilter.setMatchAllNews(fMatchAllNewsRadio.getSelection());
 
     /* Update Search */
+    ISearch oldSearch = fEditedFilter.getSearch();
     fEditedFilter.setSearch(createSearch());
+    if (oldSearch != null)
+      DynamicDAO.delete(oldSearch);
   }
 
   private boolean isConflicting(List<IFilterAction> actions) {
@@ -409,8 +412,6 @@ public class NewsFilterDialog extends TitleAreaDialog {
   }
 
   private void createConditionControls(Composite container) {
-    System.out.println("SIZE: " + DynamicDAO.loadAll(ISearch.class).size());
-
     Composite topControlsContainer = new Composite(container, SWT.None);
     topControlsContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
     topControlsContainer.setLayout(LayoutUtils.createGridLayout(6, 10, 3));
