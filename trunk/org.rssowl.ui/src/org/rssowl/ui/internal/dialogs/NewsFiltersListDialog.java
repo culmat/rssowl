@@ -385,7 +385,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
       /* Search for all Visible News */
       Set<State> visibleStates = INews.State.getVisible();
-      if (filter.matchAllNews()) {
+      if (filter.getSearch() == null) {
         ISearchField stateField = Owl.getModelFactory().createSearchField(INews.STATE, INews.class.getName());
         ISearchCondition stateCondition = Owl.getModelFactory().createSearchCondition(stateField, SearchSpecifier.IS, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED, State.READ));
         targetNews = search.searchNews(Collections.singleton(stateCondition), true);
@@ -536,7 +536,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     TableItem[] items = table.getItems();
     for (TableItem item : items) {
       ISearchFilter filter = (ISearchFilter) item.getData();
-      if (filter.matchAllNews() && filter.isEnabled()) {
+      if (filter.getSearch() == null && filter.isEnabled()) {
         int index = table.indexOf(item);
         if (index < table.getItemCount() - 1) {
           problematicFilter = filter;

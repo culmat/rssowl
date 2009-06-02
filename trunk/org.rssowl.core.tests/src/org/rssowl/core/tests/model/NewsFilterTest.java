@@ -36,6 +36,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
@@ -49,9 +50,11 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.DateUtils;
+import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.EnumSet;
@@ -781,9 +784,9 @@ public class NewsFilterTest {
 
     IFeed feed = fFactory.createFeed(null, bm.getFeedLinkReference().getLink());
 
-    Calendar cal= Calendar.getInstance();
+    Calendar cal = Calendar.getInstance();
     cal.setTimeInMillis(cal.getTimeInMillis() - DateUtils.WEEK);
-    Date oldDate= cal.getTime();
+    Date oldDate = cal.getTime();
 
     INews news1 = createNews(feed, "News1");
     news1.setState(INews.State.NEW);
@@ -909,11 +912,11 @@ public class NewsFilterTest {
     List<INews> news = bm.getFeedLinkReference().resolve().getNews();
     assertEquals(3, news.size());
     assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.NEW)));
-    boolean labelFound= false;
+    boolean labelFound = false;
     for (INews newsitem : news) {
       if (news1.equals(newsitem)) {
         assertEquals("New Label", newsitem.getLabels().iterator().next().getName());
-        labelFound= true;
+        labelFound = true;
       }
     }
 
@@ -967,11 +970,104 @@ public class NewsFilterTest {
     }
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testScopeFilter_Matching() throws Exception {
+    IBookMark bm1 = createBookMark("local1");
+    IFeed feed = fFactory.createFeed(null, bm1.getFeedLinkReference().getLink());
+
+    IBookMark bm2 = fFactory.createBookMark(null, bm1.getParent(), new FeedLinkReference(new URI("local2")), "local2");
+    DynamicDAO.save(bm2);
+
+    INews news1 = createNews(feed, "News1");
+    news1.setState(INews.State.NEW);
+
+    INews news2 = createNews(feed, "News2");
+    news2.setState(INews.State.NEW);
+
+    INews news3 = createNews(feed, "News3");
+    news3.setState(INews.State.NEW);
+
+    ISearch search = createScopeSearch(bm1);
+
+    ISearchFilter filter = fFactory.createSearchFilter(null, search, "All News in BM1");
+    filter.setMatchAllNews(true);
+    filter.setEnabled(true);
+
+    IFilterAction action = fFactory.createFilterAction(MARK_READ_ID);
+    filter.addAction(action);
+
+    DynamicDAO.save(filter);
+
+    fAppService.handleFeedReload(bm1, feed, null, false);
+
+    List<INews> news = bm1.getFeedLinkReference().resolve().getNews();
+    assertEquals(3, bm1.getNewsCount(EnumSet.of(INews.State.READ)));
+    assertEquals(3, news.size());
+    for (INews newsitem : news) {
+      assertEquals(INews.State.READ, newsitem.getState());
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testScopeFilter_NotMatching() throws Exception {
+    IBookMark bm1 = createBookMark("local1");
+    IFeed feed = fFactory.createFeed(null, bm1.getFeedLinkReference().getLink());
+
+    IBookMark bm2 = fFactory.createBookMark(null, bm1.getParent(), new FeedLinkReference(new URI("local2")), "local2");
+    DynamicDAO.save(bm2);
+
+    INews news1 = createNews(feed, "News1");
+    news1.setState(INews.State.NEW);
+
+    INews news2 = createNews(feed, "News2");
+    news2.setState(INews.State.NEW);
+
+    INews news3 = createNews(feed, "News3");
+    news3.setState(INews.State.NEW);
+
+    ISearch search = createScopeSearch(bm2);
+
+    ISearchFilter filter = fFactory.createSearchFilter(null, search, "All News in BM2");
+    filter.setMatchAllNews(true);
+    filter.setEnabled(true);
+
+    IFilterAction action = fFactory.createFilterAction(MARK_READ_ID);
+    filter.addAction(action);
+
+    DynamicDAO.save(filter);
+
+    fAppService.handleFeedReload(bm1, feed, null, false);
+
+    List<INews> news = bm1.getFeedLinkReference().resolve().getNews();
+    assertEquals(0, bm1.getNewsCount(EnumSet.of(INews.State.READ)));
+    assertEquals(3, news.size());
+    for (INews newsitem : news) {
+      assertEquals(INews.State.NEW, newsitem.getState());
+    }
+  }
+
+
   private ISearch createStickySearch(boolean sticky) {
     ISearch search = fFactory.createSearch(null);
     ISearchField field = fFactory.createSearchField(INews.IS_FLAGGED, INews.class.getName());
 
     ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, sticky);
+    search.addSearchCondition(condition);
+
+    return search;
+  }
+
+  private ISearch createScopeSearch(IFolderChild scope) {
+    ISearch search = fFactory.createSearch(null);
+    ISearchField field = fFactory.createSearchField(INews.LOCATION, INews.class.getName());
+
+    ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { scope })));
     search.addSearchCondition(condition);
 
     return search;

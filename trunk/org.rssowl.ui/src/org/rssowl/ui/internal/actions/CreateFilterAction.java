@@ -115,7 +115,7 @@ public class CreateFilterAction implements IObjectActionDelegate {
     ISearchField locationField = Owl.getModelFactory().createSearchField(INews.LOCATION, INews.class.getName());
     Long[][] value = ModelUtils.toPrimitive((List<IFolderChild>) selection);
 
-    ISearchCondition condition = Owl.getModelFactory().createSearchCondition(locationField, SearchSpecifier.IS, value);
+    ISearchCondition condition = Owl.getModelFactory().createSearchCondition(locationField, SearchSpecifier.SCOPE, value);
     presetSearch.addSearchCondition(condition);
   }
 
@@ -132,7 +132,7 @@ public class CreateFilterAction implements IObjectActionDelegate {
 
       Long[][] value = ModelUtils.toPrimitive(new ArrayList<IFolderChild>(bookmarks));
 
-      ISearchCondition condition = factory.createSearchCondition(locationField, SearchSpecifier.IS, value);
+      ISearchCondition condition = factory.createSearchCondition(locationField, SearchSpecifier.SCOPE, value);
       presetSearch.addSearchCondition(condition);
     }
 

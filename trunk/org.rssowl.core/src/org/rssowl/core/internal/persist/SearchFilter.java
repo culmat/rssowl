@@ -104,7 +104,6 @@ public class SearchFilter extends AbstractEntity implements ISearchFilter {
    */
   public synchronized void setSearch(ISearch search) {
     fSearch = search;
-    setMatchAllNews(search == null);
   }
 
   /*

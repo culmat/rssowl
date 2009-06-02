@@ -30,6 +30,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.persist.IAttachment;
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
@@ -50,7 +51,9 @@ import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -582,5 +585,345 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
 
     List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), false);
     assertSame(result, news1, news2);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testScopeSearch() throws Exception {
+
+    /* First add some Types */
+    IFolder rootFolder = fFactory.createFolder(null, null, "Root");
+    DynamicDAO.save(rootFolder);
+
+    IFolder subFolder1 = fFactory.createFolder(null, rootFolder, "Sub Folder 1");
+    DynamicDAO.save(subFolder1);
+
+    IFolder subFolder2 = fFactory.createFolder(null, rootFolder, "Sub Folder 2");
+    DynamicDAO.save(subFolder2);
+
+    IFeed feed1 = fFactory.createFeed(null, new URI("http://www.feed.com/feed1.xml"));
+    IFeed feed2 = fFactory.createFeed(null, new URI("http://www.feed.com/feed2.xml"));
+    IFeed feed3 = fFactory.createFeed(null, new URI("http://www.feed.com/feed3.xml"));
+
+    INews news1 = createNews(feed1, "First News of Feed One", "http://www.news.com/news1.html", State.NEW);
+    INews news2 = createNews(feed2, "First News of Feed Two", "http://www.news.com/news2.html", State.UNREAD);
+    INews news3 = createNews(feed3, "First News of Feed Three", "http://www.news.com/news3.html", State.READ);
+    news3.setFlagged(true);
+
+    DynamicDAO.save(feed1);
+    DynamicDAO.save(feed2);
+    DynamicDAO.save(feed3);
+
+    IBookMark bm1 = fFactory.createBookMark(null, rootFolder, new FeedLinkReference(feed1.getLink()), "BM1");
+    IBookMark bm2 = fFactory.createBookMark(null, subFolder1, new FeedLinkReference(feed2.getLink()), "BM2");
+    IBookMark bm3 = fFactory.createBookMark(null, subFolder2, new FeedLinkReference(feed3.getLink()), "BM3");
+
+    DynamicDAO.save(bm1);
+    DynamicDAO.save(bm2);
+    DynamicDAO.save(bm3);
+
+    /* Wait for Indexer */
+    waitForIndexer();
+
+    ISearchField fieldLoc = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+    ISearchField fieldState = fFactory.createSearchField(INews.STATE, fNewsEntityName);
+    ISearchField fieldIsFlagged = fFactory.createSearchField(INews.IS_FLAGGED, fNewsEntityName);
+    ISearchField fieldAllFields = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+
+    /* Search Test: Simple */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { rootFolder })));
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), false);
+      assertSame(result, news1, news2, news3);
+    }
+
+    /* Search Test: Simple */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { subFolder1 })));
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), false);
+      assertSame(result, news2);
+    }
+
+    /* Search Test: Simple */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { subFolder2 })));
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), false);
+      assertSame(result, news3);
+    }
+
+    /* Search Test: Simple */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { subFolder1, subFolder2 })));
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), false);
+      assertSame(result, news2, news3);
+    }
+
+    /* Search Test: Simple */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm1, bm2, bm3 })));
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), false);
+      assertSame(result, news1, news2, news3);
+    }
+
+    /* Search Test: Simple */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm1 })));
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), false);
+      assertSame(result, news1);
+    }
+
+    /* Search Test: Simple */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm1, subFolder2 })));
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), false);
+      assertSame(result, news1, news3);
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { rootFolder })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), false);
+      assertSame(result, news1);
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { rootFolder })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), true);
+      assertSame(result, news1);
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { rootFolder, subFolder2 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), false);
+      assertSame(result, news1);
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm3 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), false);
+      assertTrue(result.isEmpty());
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm2, bm3 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), false);
+      assertTrue(result.isEmpty());
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, new Long[][] { { null }, { null }, { null } });
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1), false);
+      assertTrue(result.isEmpty());
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, new Long[][] { { null }, { null }, { null } });
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, INews.State.UNREAD));
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2), false);
+      assertTrue(result.isEmpty());
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { rootFolder })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS, "Three");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
+      assertSame(result, news1, news3);
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { rootFolder })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS, "Three");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), true);
+      assertTrue(result.isEmpty());
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { rootFolder })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS, "One");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), true);
+      assertSame(result, news1);
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm1 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS, "Three");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
+      assertSame(result, news1);
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm1 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS, "Three");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), true);
+      assertTrue(result.isEmpty());
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm1 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS, "One");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), true);
+      assertSame(result, news1);
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm1, bm2, bm3 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS, "Three");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
+      assertSame(result, news1, news3);
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm1, bm2, bm3 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS, "Three");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), true);
+      assertTrue(result.isEmpty());
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm1, bm2, bm3 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS, "One");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), true);
+      assertSame(result, news1);
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm1, bm2, bm3 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS_ALL, "Three");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
+      assertSame(result, news1, news3);
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm1, bm2, bm3 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS_ALL, "Three");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), true);
+      assertTrue(result.isEmpty());
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm1, bm2, bm3 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS_ALL, "One");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), true);
+      assertSame(result, news1);
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm1, bm2, bm3 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS_NOT, "Three");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), false);
+      assertSame(result, news1, news2);
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm1, bm2, bm3 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS_NOT, "Three");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), true);
+      assertSame(result, news1);
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm1, bm2, bm3 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS_NOT, "One");
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3), true);
+      assertTrue(result.isEmpty());
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { bm1 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS, "Three");
+      ISearchCondition cond4 = fFactory.createSearchCondition(fieldIsFlagged, SearchSpecifier.IS, true);
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), false);
+      assertSame(result, news1);
+    }
+
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { subFolder1, subFolder2, bm1 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.NEW));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS, "Three");
+      ISearchCondition cond4 = fFactory.createSearchCondition(fieldIsFlagged, SearchSpecifier.IS, true);
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), false);
+      assertSame(result, news1, news3);
+    }
+    
+    /* Search Test: Complex */
+    {
+      ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { subFolder1, subFolder2, bm1 })));
+      ISearchCondition cond2 = fFactory.createSearchCondition(fieldState, SearchSpecifier.IS, EnumSet.of(INews.State.READ));
+      ISearchCondition cond3 = fFactory.createSearchCondition(fieldAllFields, SearchSpecifier.CONTAINS, "Three");
+      ISearchCondition cond4 = fFactory.createSearchCondition(fieldIsFlagged, SearchSpecifier.IS, true);
+
+      List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), true);
+      assertSame(result, news3);
+    }
   }
 }

@@ -65,8 +65,13 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.IModelFactory;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
@@ -95,6 +100,7 @@ public class LocationControl extends Composite {
   private Mode fMode = Mode.SEARCH_LOCATION;
   private Link fConditionLabel;
   private List<IFolderChild> fSelection;
+  private boolean fModified;
 
   /** Supported Modes for the Control */
   public enum Mode {
@@ -142,6 +148,7 @@ public class LocationControl extends Composite {
       }
 
       fCheckedElements = entities;
+      fModified = true;
 
       super.okPressed();
     }
@@ -613,6 +620,14 @@ public class LocationControl extends Composite {
     fConditionLabel.setText(getLabel(fSelection));
   }
 
+  /**
+   * @return <code>true</code> if the location was modified by the user and
+   * <code>false</code> otherwise.
+   */
+  public boolean isModified() {
+    return fModified;
+  }
+
   private void initComponents() {
 
     /* Apply Gridlayout */
@@ -647,15 +662,20 @@ public class LocationControl extends Composite {
     }
   }
 
+  /**
+   * @return the label to show when no location is selected.
+   */
+  protected String getDefaultLabel() {
+    if (fMode == Mode.SELECT_BIN)
+      return "Choose News Bins...";
+
+    return "Choose Location...";
+  }
+
   @SuppressWarnings("null")
   private String getLabel(List<IFolderChild> entities) {
     if (entities == null || entities.size() == 0) {
-      switch (fMode) {
-        case SEARCH_LOCATION:
-          return "<a href=\"\">Choose Location...</a>";
-        case SELECT_BIN:
-          return "<a href=\"\">Choose News Bins...</a>";
-      }
+      return "<a href=\"\">" + getDefaultLabel() + "</a>";
     }
 
     StringBuilder strB = new StringBuilder();
@@ -667,5 +687,21 @@ public class LocationControl extends Composite {
       strB.delete(strB.length() - 2, strB.length());
 
     return strB.toString();
+  }
+
+  /**
+   * @return a {@link ISearchCondition} from the selection of the control or
+   * <code>null</code> if none.
+   */
+  public ISearchCondition toScopeCondition() {
+    ISearchCondition condition = null;
+    Long[][] selection = getSelection();
+    if (selection != null) {
+      IModelFactory factory = Owl.getModelFactory();
+      ISearchField field = factory.createSearchField(INews.LOCATION, INews.class.getName());
+      condition = factory.createSearchCondition(field, SearchSpecifier.SCOPE, selection);
+    }
+
+    return condition;
   }
 }
