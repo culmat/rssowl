@@ -371,7 +371,7 @@ public class BookMarkContentProvider implements ITreeContentProvider {
             }
 
             if (!addedFolders.isEmpty())
-              fViewer.setSelection(new StructuredSelection(addedFolders), events.size() == 1);
+              fViewer.setSelection(new StructuredSelection(addedFolders), addedFolders.size() == 1);
           }
         });
       }
