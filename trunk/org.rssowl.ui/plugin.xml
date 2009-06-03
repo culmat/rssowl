@@ -1321,9 +1321,9 @@
    <extension
          point="org.eclipse.ui.contexts">
       <context
-            description="This context is reserved for navigation between Feeds and News in RSSOwl."
+            description="This context is reserved for bindings in RSSOwl."
             id="org.rssowl.ui.NavigationContext"
-            name="RSSOwl Navigation"
+            name="In RSSOwl"
             parentId="org.eclipse.ui.contexts.window">
       </context>
    </extension>
