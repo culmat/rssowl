@@ -49,8 +49,10 @@ import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
@@ -2595,5 +2597,25 @@ public class ModelTest3 {
     fFactory.createAttachment(null, news2);
 
     news2.merge(news1);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testDeleteSearchFilter() throws Exception {
+    ISearchField field = fFactory.createSearchField(INews.IS_FLAGGED, INews.class.getName());
+    ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, true);
+    ISearch search= fFactory.createSearch(null);
+    search.addSearchCondition(condition);
+
+    ISearchFilter filter = fFactory.createSearchFilter(null, search, "Filter");
+    DynamicDAO.save(filter);
+
+    DynamicDAO.delete(filter);
+
+    assertNull(filter.toReference().resolve());
+    assertNull(search.toReference().resolve());
+    assertNull(condition.toReference().resolve());
   }
 }
