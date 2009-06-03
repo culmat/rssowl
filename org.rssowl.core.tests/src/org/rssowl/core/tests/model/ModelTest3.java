@@ -2606,11 +2606,15 @@ public class ModelTest3 {
   public void testDeleteSearchFilter() throws Exception {
     ISearchField field = fFactory.createSearchField(INews.IS_FLAGGED, INews.class.getName());
     ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, true);
-    ISearch search= fFactory.createSearch(null);
+    ISearch search = fFactory.createSearch(null);
     search.addSearchCondition(condition);
 
     ISearchFilter filter = fFactory.createSearchFilter(null, search, "Filter");
     DynamicDAO.save(filter);
+
+    assertNotNull(filter.toReference().resolve());
+    assertNotNull(search.toReference().resolve());
+    assertNotNull(condition.toReference().resolve());
 
     DynamicDAO.delete(filter);
 
