@@ -865,10 +865,10 @@
             sequence="DEL"/>
       <key
             commandId="org.eclipse.ui.edit.delete"
-            contextId="org.eclipse.ui.contexts.dialogAndWindow"
+            contextId="org.rssowl.ui.NavigationContext"
             platform="carbon"
             schemeId="org.rssowl.ui.KeyScheme"
-            sequence="M1+BS"/>
+            sequence="BS"/>
       <key
             commandId="org.rssowl.ui.MarkAllRead"
             contextId="org.eclipse.ui.contexts.window"
