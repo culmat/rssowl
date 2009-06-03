@@ -967,8 +967,19 @@ public class BookMarkExplorer extends ViewPart {
 
     fToolBarManager.add(bookmarkGroup);
 
-    /* BookmarkSet Navigation - TODO Consider showing dynamically */
+    /* Collapse All */
     fToolBarManager.add(new Separator());
+    IAction collapseAll = new Action("Collapse All") {
+      @Override
+      public void run() {
+        fViewer.collapseAll();
+        fExpandedNodes.clear();
+      }
+    };
+    collapseAll.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/collapseall.gif")); //$NON-NLS-1$
+    fToolBarManager.add(collapseAll);
+
+    /* BookmarkSet Navigation - TODO Consider showing dynamically */
     IAction previousSet = new Action("Previous Bookmark-Set") {
       @Override
       public void run() {
