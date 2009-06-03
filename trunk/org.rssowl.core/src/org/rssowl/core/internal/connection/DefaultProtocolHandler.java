@@ -451,7 +451,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   }
 
   private void setHeaders(Map<Object, Object> properties, GetMethod getMethod) {
-    getMethod.setRequestHeader(HEADER_RESPOND_ACCEPT_ENCODING, "gzip, *"); //$NON-NLS-1$
+    getMethod.setRequestHeader(HEADER_RESPOND_ACCEPT_ENCODING, "gzip"); //$NON-NLS-1$
     getMethod.setRequestHeader(HEADER_RESPOND_USER_AGENT, USER_AGENT);
 
     /* Add Conditional GET Headers if present */
