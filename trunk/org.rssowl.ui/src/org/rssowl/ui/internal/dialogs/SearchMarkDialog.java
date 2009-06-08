@@ -31,6 +31,8 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -136,7 +138,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
       Pair<ISearchCondition, List<ISearchCondition>> conditions = CoreUtils.splitScope(initialConditions);
       fInitialLocation = conditions.getFirst();
       fInitialSearchConditions = conditions.getSecond();
-      fShowLocationConflict= CoreUtils.isLocationConflict(initialConditions);
+      fShowLocationConflict = CoreUtils.isLocationConflict(initialConditions);
     }
   }
 
@@ -255,6 +257,11 @@ public class SearchMarkDialog extends TitleAreaDialog {
 
     fNameInput = new Text(nameContainer, SWT.SINGLE);
     fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    fNameInput.addModifyListener(new ModifyListener() {
+      public void modifyText(ModifyEvent e) {
+        setErrorMessage(null);
+      }
+    });
 
     ToolBar generateTitleBar = new ToolBar(nameContainer, SWT.FLAT);
     generateTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
