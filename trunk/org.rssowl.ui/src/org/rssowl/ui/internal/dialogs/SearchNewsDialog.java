@@ -1080,8 +1080,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
       fCurrentSearchConditions.add(locationCondition);
 
     /* Make sure there is no Location Conflict */
-    if (CoreUtils.isLocationConflict(fCurrentSearchConditions))
+    if (CoreUtils.isLocationConflict(fCurrentSearchConditions)) {
+      setErrorMessage(null);
       setMessage("You are using a location condition together with a value for \"Search in\".", IMessageProvider.WARNING);
+    }
 
     /* Unset Warning/Error Message */
     else

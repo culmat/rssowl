@@ -26,7 +26,6 @@ package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -174,7 +173,7 @@ public class NewNewsBinAction implements IWorkbenchWindowActionDelegate, IObject
       boolean valid = fNameInput.getText().length() > 0;
       Control button = getButton(IDialogConstants.OK_ID);
       button.setEnabled(valid);
-      setMessage("Please enter the name of the news bin.", IMessageProvider.INFORMATION);
+      setMessage("Create a new News Bin.");
     }
 
     IFolder getFolder() {
