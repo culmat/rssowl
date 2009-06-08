@@ -117,7 +117,7 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
     setTitleImage(OwlUI.getImage(fResources, "icons/wizban/cleanup_wiz.gif"));
 
     /* Title Message */
-    showInfo();
+    setMessage("As time goes on, unused bookmarks may accumulate in your feed reader.\nThe Clean Up Wizard can help with this as well as optimize your system.");
 
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -210,10 +210,5 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
 
     shell.setSize(Math.max(minWidth, requiredSize.x), Math.max(minHeight, requiredSize.y));
     LayoutUtils.positionShell(shell, false);
-  }
-
-  private void showInfo() {
-    setErrorMessage(null);
-    setMessage("As time goes on, unused bookmarks may accumulate in your feed reader.\nThe Clean Up Wizard can help with this as well as optimize your system.");
   }
 }
