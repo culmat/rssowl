@@ -76,7 +76,7 @@ public class CleanUpReminderService {
   }
 
   private Job createJob() {
-    return new Job("Clean-Up Reminder Service ") {
+    return new Job("Clean Up Reminder Service ") {
       @Override
       protected IStatus run(final IProgressMonitor monitor) {
 

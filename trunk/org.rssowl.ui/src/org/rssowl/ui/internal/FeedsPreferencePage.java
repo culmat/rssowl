@@ -331,7 +331,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     group.setLayout(LayoutUtils.createGridLayout(2, 5, 5, 10, 5, false));
 
     TabItem item = new TabItem(parent, SWT.None);
-    item.setText("Clean-Up");
+    item.setText("Clean Up");
     item.setControl(group);
 
     /* Explanation Label */
@@ -516,12 +516,12 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     /* Peform clean-up on all BookMarks */
     if (runCleanup) {
-      Job retentionJob = new Job("Performing clean-up...") {
+      Job retentionJob = new Job("Performing clean up...") {
 
         @Override
         protected IStatus run(IProgressMonitor monitor) {
           try {
-            monitor.beginTask("Performing clean-up...", rootFolders.size());
+            monitor.beginTask("Performing clean up...", rootFolders.size());
 
             for (IFolder rootFolder : rootFolders) {
               RetentionStrategy.process(rootFolder);

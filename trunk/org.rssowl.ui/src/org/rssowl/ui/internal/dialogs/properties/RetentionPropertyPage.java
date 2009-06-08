@@ -299,12 +299,12 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
 
     /* Run Retention since settings changed */
     if (fSettingsChanged) {
-      Job retentionJob = new Job("Performing clean-up...") {
+      Job retentionJob = new Job("Performing clean up...") {
 
         @Override
         protected IStatus run(IProgressMonitor monitor) {
           try {
-            monitor.beginTask("Performing clean-up...", fEntities.size());
+            monitor.beginTask("Performing clean up...", fEntities.size());
 
             for (IEntity entity : fEntities) {
               if (entity instanceof IBookMark)

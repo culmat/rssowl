@@ -146,6 +146,9 @@ public class ConfirmDialog extends TitleAreaDialog {
     composite.setLayout(LayoutUtils.createGridLayout(1, 5, 10));
     composite.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
+    /* Title */
+    setTitle("Delete");
+
     /* Title Image */
     setTitleImage(OwlUI.getImage(fResources, getTitleImage()));
 

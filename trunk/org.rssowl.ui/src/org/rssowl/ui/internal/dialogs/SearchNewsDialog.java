@@ -685,6 +685,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
+    /* Title */
+    setTitle("Search News");
+
     /* Title Image */
     setTitleImage(OwlUI.getImage(fResources, "icons/wizban/search.gif"));
 
