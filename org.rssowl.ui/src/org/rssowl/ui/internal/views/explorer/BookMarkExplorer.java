@@ -635,7 +635,7 @@ public class BookMarkExplorer extends ViewPart {
       public void menuAboutToShow(IMenuManager manager) {
 
         /* Manage Bookmark Sets */
-        IAction manageSets = new Action("Manage Bookmark-Sets...") {
+        IAction manageSets = new Action("Manage Bookmark Sets...") {
           @Override
           public void run() {
             ManageSetsDialog instance = ManageSetsDialog.getVisibleInstance();
@@ -980,7 +980,7 @@ public class BookMarkExplorer extends ViewPart {
     fToolBarManager.add(collapseAll);
 
     /* BookmarkSet Navigation - TODO Consider showing dynamically */
-    IAction previousSet = new Action("Previous Bookmark-Set") {
+    IAction previousSet = new Action("Previous Bookmark Set") {
       @Override
       public void run() {
         int index = getIndexOfRootFolder(fSelectedBookMarkSet);
@@ -998,7 +998,7 @@ public class BookMarkExplorer extends ViewPart {
     previousSet.setDisabledImageDescriptor(OwlUI.getImageDescriptor("icons/dtool16/backward.gif")); //$NON-NLS-1$
     fToolBarManager.add(previousSet);
 
-    IAction nextSet = new Action("Next Bookmark-Set") {
+    IAction nextSet = new Action("Next Bookmark Set") {
       @Override
       public void run() {
         int index = getIndexOfRootFolder(fSelectedBookMarkSet);

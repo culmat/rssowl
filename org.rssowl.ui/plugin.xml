@@ -706,16 +706,16 @@
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.NextBookmarkSetHandler"
-            description="Navigate to the next Bookmark-Set"
+            description="Navigate to the next Bookmark Set"
             id="org.rssowl.ui.NextBookmarkSetCommand"
-            name="Next Bookmark-Set">
+            name="Next Bookmark Set">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.PreviousBookmarkSetHandler"
-            description="Navigate to the previous Bookmark-Set"
+            description="Navigate to the previous Bookmark Set"
             id="org.rssowl.ui.PreviousBookmarkSetCommand"
-            name="Previous Bookmark-Set">
+            name="Previous Bookmark Set">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"

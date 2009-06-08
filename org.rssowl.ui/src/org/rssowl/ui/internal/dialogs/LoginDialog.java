@@ -25,7 +25,6 @@
 package org.rssowl.ui.internal.dialogs;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -158,14 +157,17 @@ public class LoginDialog extends TitleAreaDialog {
     composite.setLayout(LayoutUtils.createGridLayout(2, 5, 10));
     composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
+    /* Title */
+    setTitle("Login");
+
     /* Title Image */
     setTitleImage(OwlUI.getImage(fResources, "icons/wizban/auth.gif"));
 
     /* Title Message */
     if (fRealm != null)
-      setMessage("Enter Username and Password for '" + fRealm + "'", IMessageProvider.INFORMATION);
+      setMessage("Enter Username and Password for '" + fRealm + "'");
     else
-      setMessage("Enter Username and Password", IMessageProvider.INFORMATION);
+      setMessage("Enter Username and Password");
 
     /* Spacer */
     new Label(composite, SWT.NONE);

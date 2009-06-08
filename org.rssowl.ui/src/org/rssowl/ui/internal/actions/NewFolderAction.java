@@ -26,7 +26,6 @@ package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -109,7 +108,7 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
 
     @Override
     protected void configureShell(Shell newShell) {
-      newShell.setText(fRootMode ? "New Bookmark-Set" : "New Folder");
+      newShell.setText(fRootMode ? "New Bookmark Set" : "New Folder");
       super.configureShell(newShell);
     }
 
@@ -119,11 +118,14 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
       /* Separator */
       new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
+      /* Title */
+      setTitle("Folder");
+
       /* Title Image */
       setTitleImage(OwlUI.getImage(fResources, fRootMode ? "icons/wizban/bkmrk_set_title.gif" : "icons/wizban/folder_wiz.gif"));
 
       /* Title Message */
-      setMessage("Please enter the name of the " + (fRootMode ? "Bookmark-Set" : "Folder"), IMessageProvider.INFORMATION);
+      setMessage("Create a new " + (fRootMode ? "Bookmark Set" : "Folder") + ".");
 
       Composite container = new Composite(parent, SWT.NONE);
       container.setLayout(LayoutUtils.createGridLayout(2, 5, 5));

@@ -315,11 +315,14 @@ public class NewsFilterDialog extends TitleAreaDialog {
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
+    /* Title */
+    setTitle("News Filter");
+
     /* Title Image */
     setTitleImage(OwlUI.getImage(fResources, "icons/wizban/filter_wiz.gif"));
 
     /* Title Message */
-    setMessage("Please define the search conditions and actions to perform on matching news.", IMessageProvider.INFORMATION);
+    setMessage("Please define the search conditions and actions to perform on matching news.");
 
     /* Name Input Filed */
     Composite container = new Composite(parent, SWT.None);

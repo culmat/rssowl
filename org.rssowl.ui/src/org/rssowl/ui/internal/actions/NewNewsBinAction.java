@@ -120,11 +120,14 @@ public class NewNewsBinAction implements IWorkbenchWindowActionDelegate, IObject
       /* Separator */
       new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
+      /* Title */
+      setTitle("News Bin");
+
       /* Title Image */
       setTitleImage(OwlUI.getImage(fResources, "icons/wizban/newsbin_wiz.gif"));
 
       /* Title Message */
-      setMessage("Please enter the name of the news bin.", IMessageProvider.INFORMATION);
+      setMessage("Create a new News Bin.");
 
       Composite container = new Composite(parent, SWT.NONE);
       container.setLayout(LayoutUtils.createGridLayout(2, 5, 5));

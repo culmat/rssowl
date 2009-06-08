@@ -25,7 +25,6 @@
 package org.rssowl.ui.internal.dialogs;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -102,7 +101,7 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
   @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
-    shell.setText("Reminder to perform Clean-Up");
+    shell.setText("Reminder to perform Clean Up");
   }
 
   /*
@@ -110,6 +109,9 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
    */
   @Override
   protected Control createDialogArea(Composite parent) {
+
+    /* Title */
+    setTitle("Clean Up Reminder");
 
     /* Title Image */
     setTitleImage(OwlUI.getImage(fResources, "icons/wizban/cleanup_wiz.gif"));
@@ -127,7 +129,7 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
 
     Label infoLabel = new Label(composite, SWT.WRAP);
     infoLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    infoLabel.setText("Would you like to open the clean-up wizard now?");
+    infoLabel.setText("Would you like to open the Clean Up wizard now?");
 
     Composite controlsContainer = new Composite(composite, SWT.NONE);
     controlsContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -212,6 +214,6 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
 
   private void showInfo() {
     setErrorMessage(null);
-    setMessage("As time goes on, unused bookmarks may accumulate in your feed reader.\n The Clean-up Wizard can help with this as well as optimize your system.", IMessageProvider.INFORMATION);
+    setMessage("As time goes on, unused bookmarks may accumulate in your feed reader.\nThe Clean Up Wizard can help with this as well as optimize your system.");
   }
 }

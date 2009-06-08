@@ -26,7 +26,6 @@ package org.rssowl.ui.internal.dialogs;
 
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jface.dialogs.IDialogConstants;
-import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -168,7 +167,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
   @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
-    shell.setText("Manage Bookmark-Sets");
+    shell.setText("Manage Bookmark Sets");
   }
 
   /*
@@ -176,6 +175,9 @@ public class ManageSetsDialog extends TitleAreaDialog {
    */
   @Override
   protected Control createDialogArea(Composite parent) {
+
+    /* Title */
+    setTitle("Bookmark Sets");
 
     /* Title Image */
     setTitleImage(OwlUI.getImage(fResources, "icons/wizban/bkmrk_set_title.gif"));
@@ -191,7 +193,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
     composite.setLayout(LayoutUtils.createGridLayout(2, 5, 10));
     composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
-    /* TableViewer to display Bookmark-Sets */
+    /* TableViewer to display Bookmark Sets */
     fViewer = new TableViewer(composite, SWT.BORDER);
     fViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     ((GridData) fViewer.getTable().getLayoutData()).heightHint = fViewer.getTable().getItemHeight() * 7;
@@ -437,7 +439,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
 
     /* Require at least 1 Set to remain undeleted */
     if (fViewer.getTable().getItemCount() == 1) {
-      setErrorMessage("It is not possible to delete the last Bookmark-Set. Please create a new Set first.");
+      setErrorMessage("It is not possible to delete the last Bookmark Set.\n Please create a new Set first.");
       return;
     }
 
@@ -503,7 +505,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
 
   private void showInfo() {
     setErrorMessage(null);
-    setMessage("Please select a Bookmark-Set to manage.", IMessageProvider.INFORMATION);
+    setMessage("Please select a Bookmark Set to manage.");
   }
 
   private void updateStatusLabel() {

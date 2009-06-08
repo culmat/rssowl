@@ -232,11 +232,14 @@ public class SearchMarkDialog extends TitleAreaDialog {
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
+    /* Title */
+    setTitle("Saved Search");
+
     /* Title Image */
     setTitleImage(OwlUI.getImage(fResources, "icons/wizban/search.gif"));
 
     /* Title Message */
-    setMessage("Use \'?\' for any character and \'*\' for any word in your search.\n Surround words with quotes to search for phrases.", IMessageProvider.INFORMATION);
+    setMessage("Use \'?\' for any character and \'*\' for any word in your search. Surround words with quotes to search for phrases.", IMessageProvider.INFORMATION);
 
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(LayoutUtils.createGridLayout(2, 5, 5, 5, 5, false));

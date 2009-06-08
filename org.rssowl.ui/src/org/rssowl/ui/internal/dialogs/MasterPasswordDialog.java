@@ -143,6 +143,9 @@ public class MasterPasswordDialog extends TitleAreaDialog {
     composite.setLayout(LayoutUtils.createGridLayout(2, 5, 10));
     composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
 
+    /* Title */
+    setTitle("Master Password");
+
     /* Title Image */
     if ((fStyle & PasswordProvider.CREATE_NEW_PASSWORD) != 0) {
       setTitleImage(OwlUI.getImage(fResources, "icons/wizban/new_value_wiz.png"));
