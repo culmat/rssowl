@@ -830,9 +830,6 @@ public class SearchNewsDialog extends TitleAreaDialog {
     ((GridData) fLocationControl.getLayoutData()).widthHint = 100;
     fLocationControl.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
 
-    if (fInitialScope != null && fInitialScope.getValue() instanceof Long[][])
-      fLocationControl.select((Long[][]) fInitialScope.getValue());
-
     /* ToolBar to add and select existing saved searches */
     final ToolBarManager dialogToolBar = new ToolBarManager(SWT.RIGHT | SWT.FLAT);
 
@@ -964,6 +961,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fSearchConditionList = new SearchConditionList(conditionsContainer, SWT.None, getDefaultConditions());
     fSearchConditionList.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
     fSearchConditionList.setVisibleItemCount(3);
+
+    /* Show Initial Scope if present */
+    if (fInitialScope != null && fInitialScope.getValue() instanceof Long[][])
+      fLocationControl.select((Long[][]) fInitialScope.getValue());
 
     /* Show Initial Conditions if present */
     if (fInitialConditions != null)
