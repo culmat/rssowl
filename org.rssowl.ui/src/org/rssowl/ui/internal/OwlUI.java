@@ -197,6 +197,9 @@ public class OwlUI {
   /** Attachment */
   public static final ImageDescriptor ATTACHMENT = Activator.getImageDescriptor("icons/obj16/attachment.gif"); //$NON-NLS-1$
 
+  /** Columns */
+  public static final ImageDescriptor COLUMNS = Activator.getImageDescriptor("icons/etool16/columns.gif"); //$NON-NLS-1$
+
   /** Group Foreground Color */
   public static final RGB GROUP_FG_COLOR = new RGB(0, 0, 128);
 

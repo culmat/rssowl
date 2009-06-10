@@ -213,6 +213,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private SearchConditionList fSearchConditionList;
   private CTable fCustomTable;
   private TableViewer fResultViewer;
+  private NewsColumnViewModel fColumnModel;
   private ScoredNewsComparator fNewsSorter;
   private Link fStatusLabel;
   private NewsBrowserViewer fBrowserViewer;
@@ -615,6 +616,14 @@ public class SearchNewsDialog extends TitleAreaDialog {
   public boolean close() {
     fgOpenDialogCount--;
 
+    /* Store Column Model */
+    if (!fResultViewer.getTable().isDisposed()) {
+      NewsColumnViewModel model = NewsColumnViewModel.initializeFrom(fResultViewer.getTable());
+      model.setSortColumn(fNewsSorter.getSortBy());
+      model.setAscending(fNewsSorter.isAscending());
+      model.saveTo(fPreferences, true);
+    }
+
     /* Store Preferences */
     fPreferences.putBoolean(DefaultPreferences.SEARCH_DIALOG_PREVIEW_VISIBLE, fIsPreviewVisible);
     if (fCachedWeights != null)
@@ -819,6 +828,72 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     /* ToolBar to add and select existing saved searches */
     final ToolBarManager dialogToolBar = new ToolBarManager(SWT.RIGHT | SWT.FLAT);
+
+    /* Columns */
+    IAction columnDropdown = new Action("Visible Columns", IAction.AS_DROP_DOWN_MENU) {
+      @Override
+      public void run() {
+        getMenuCreator().getMenu(dialogToolBar.getControl()).setVisible(true);
+      }
+
+      @Override
+      public ImageDescriptor getImageDescriptor() {
+        return OwlUI.COLUMNS;
+      }
+    };
+
+    columnDropdown.setMenuCreator(new IMenuCreator() {
+      public Menu getMenu(Control parent) {
+        Menu menu = new Menu(parent);
+
+        MenuItem restoreDefaults = new MenuItem(menu, SWT.None);
+        restoreDefaults.setText("&Restore Defaults");
+        restoreDefaults.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            fColumnModel = NewsColumnViewModel.createDefault(true);
+            showColumns(fColumnModel, true);
+          }
+        });
+
+        new MenuItem(menu, SWT.SEPARATOR);
+
+        NewsColumn[] columns = NewsColumn.values();
+        for (final NewsColumn column : columns) {
+          if (column.isSelectable()) {
+            MenuItem item = new MenuItem(menu, SWT.CHECK);
+            item.setText(column.getName());
+            if (fColumnModel.contains(column))
+              item.setSelection(true);
+
+            item.addSelectionListener(new SelectionAdapter() {
+              @Override
+              public void widgetSelected(SelectionEvent e) {
+                if (fColumnModel.contains(column))
+                  fColumnModel.removeColumn(column);
+                else
+                  fColumnModel.addColumn(column);
+
+                showColumns(fColumnModel, true);
+              }
+            });
+          }
+        }
+
+        return menu;
+      }
+
+      public Menu getMenu(Menu parent) {
+        return null;
+      }
+
+      public void dispose() {}
+    });
+
+    dialogToolBar.add(columnDropdown);
+
+    /* Separator */
+    dialogToolBar.add(new Separator());
 
     /* Toggle Preview */
     final String previewActionId = "org.rssowl.ui.internal.dialogs.search.PreviewAction";
@@ -1270,7 +1345,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Apply ContentProvider */
     fResultViewer.setContentProvider(getContentProvider());
 
-    /* Create LabelProvider (Custom Owner Drawn enabled!) */
+    /* Create LabelProvider */
     NewsColumnViewModel model = NewsColumnViewModel.loadFrom(fPreferences, true);
     fNewsTableLabelProvider = new ScoredNewsLabelProvider(model);
     if (USE_CUSTOM_OWNER_DRAWN) {
@@ -1287,7 +1362,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fResultViewer.setComparator(fNewsSorter);
 
     /* Create the Columns */
-    createColumns(model);
+    showColumns(model, false);
 
     /* Hook Contextual Menu */
     hookContextualMenu();
@@ -1299,60 +1374,77 @@ public class SearchNewsDialog extends TitleAreaDialog {
     registerListeners();
   }
 
-  private void createColumns(NewsColumnViewModel model) {
+  private void showColumns(NewsColumnViewModel model, boolean update) {
+    fResultViewer.getTable().setRedraw(false);
+    try {
 
-    /* Dispose Old */
-    fCustomTable.clear();
+      /* Dispose Old */
+      fCustomTable.clear();
 
-    /* Create New */
-    List<NewsColumn> cols = model.getColumns();
-    for (NewsColumn col : cols) {
-      TableViewerColumn viewerColumn = new TableViewerColumn(fResultViewer, SWT.LEFT);
-      fCustomTable.manageColumn(viewerColumn.getColumn(), model.getLayoutData(col), col.showName() ? col.getName() : null, col.showTooltip() ? col.getName() : null, null, col.isMoveable(), col.isResizable());
-      viewerColumn.getColumn().setData(NewsColumnViewModel.COL_ID, col);
+      /* Keep as current */
+      fColumnModel = model;
 
-      if (model.getSortColumn() == col && col.showSortIndicator()) {
-        fCustomTable.getControl().setSortColumn(viewerColumn.getColumn());
-        fCustomTable.getControl().setSortDirection(model.isAscending() ? SWT.UP : SWT.DOWN);
-      }
-    }
+      /* Create New */
+      List<NewsColumn> cols = model.getColumns();
+      for (NewsColumn col : cols) {
+        TableViewerColumn viewerColumn = new TableViewerColumn(fResultViewer, SWT.LEFT);
+        fCustomTable.manageColumn(viewerColumn.getColumn(), model.getLayoutData(col), col.showName() ? col.getName() : null, col.showTooltip() ? col.getName() : null, null, col.isMoveable(), col.isResizable());
+        viewerColumn.getColumn().setData(NewsColumnViewModel.COL_ID, col);
 
-    /* Enable Sorting adding listeners to Columns */
-    TableColumn[] columns = fResultViewer.getTable().getColumns();
-    for (final TableColumn column : columns) {
-      column.addSelectionListener(new SelectionAdapter() {
-        @SuppressWarnings("unchecked")
-        @Override
-        public void widgetSelected(SelectionEvent e) {
-          NewsColumn oldSortBy = fNewsSorter.getSortBy();
-          NewsColumn newSortBy = (NewsColumn) column.getData(NewsColumnViewModel.COL_ID);
-          boolean defaultAscending = newSortBy.prefersAscending();
-          boolean ascending = (oldSortBy != newSortBy) ? defaultAscending : !fNewsSorter.isAscending();
-
-          fNewsSorter.setSortBy(newSortBy);
-          fNewsSorter.setAscending(ascending);
-
-          /* Indicate Sort-Column in UI for Columns that have a certain width */
-          if (newSortBy.showSortIndicator()) {
-            fResultViewer.getTable().setSortColumn(column);
-            fResultViewer.getTable().setSortDirection(ascending ? SWT.UP : SWT.DOWN);
-          } else {
-            fResultViewer.getTable().setSortColumn(null);
-          }
-
-          /* Since Virtual Style is set, we have to sort the model manually */
-          Collections.sort(((List<ScoredNews>) fResultViewer.getInput()), fNewsSorter);
-          fResultViewer.refresh(false);
+        if (model.getSortColumn() == col && col.showSortIndicator()) {
+          fCustomTable.getControl().setSortColumn(viewerColumn.getColumn());
+          fCustomTable.getControl().setSortDirection(model.isAscending() ? SWT.UP : SWT.DOWN);
         }
-      });
+      }
+
+      /* Enable Sorting adding listeners to Columns */
+      TableColumn[] columns = fResultViewer.getTable().getColumns();
+      for (final TableColumn column : columns) {
+        column.addSelectionListener(new SelectionAdapter() {
+          @SuppressWarnings("unchecked")
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            NewsColumn oldSortBy = fNewsSorter.getSortBy();
+            NewsColumn newSortBy = (NewsColumn) column.getData(NewsColumnViewModel.COL_ID);
+            boolean defaultAscending = newSortBy.prefersAscending();
+            boolean ascending = (oldSortBy != newSortBy) ? defaultAscending : !fNewsSorter.isAscending();
+
+            fNewsSorter.setSortBy(newSortBy);
+            fNewsSorter.setAscending(ascending);
+
+            /* Indicate Sort-Column in UI for Columns that have a certain width */
+            if (newSortBy.showSortIndicator()) {
+              fResultViewer.getTable().setSortColumn(column);
+              fResultViewer.getTable().setSortDirection(ascending ? SWT.UP : SWT.DOWN);
+            } else {
+              fResultViewer.getTable().setSortColumn(null);
+            }
+
+            /* Since Virtual Style is set, we have to sort the model manually */
+            Collections.sort(((List<ScoredNews>) fResultViewer.getInput()), fNewsSorter);
+            fResultViewer.refresh(false);
+          }
+        });
+      }
+
+      /* Update Table */
+      if (update)
+        fCustomTable.update();
+
+      /* Update Sorter */
+      fNewsSorter.setAscending(model.isAscending());
+      fNewsSorter.setSortBy(model.getSortColumn());
+
+      /* Set Label Provider */
+      fNewsTableLabelProvider.init(model);
+      fResultViewer.setLabelProvider(fNewsTableLabelProvider);
+
+      /* Refresh if necessary */
+      if (update)
+        fResultViewer.refresh(true);
+    } finally {
+      fResultViewer.getTable().setRedraw(true);
     }
-
-    /* Update Sorter */
-    fNewsSorter.setAscending(model.isAscending());
-    fNewsSorter.setSortBy(model.getSortColumn());
-
-    /* Set Label Provider */
-    fResultViewer.setLabelProvider(fNewsTableLabelProvider);
   }
 
   private void initDragAndDrop() {

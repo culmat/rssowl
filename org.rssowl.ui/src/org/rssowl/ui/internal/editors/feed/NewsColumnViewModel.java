@@ -24,6 +24,10 @@
 
 package org.rssowl.ui.internal.editors.feed;
 
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeColumn;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -58,6 +62,16 @@ public class NewsColumnViewModel {
    */
   public static NewsColumnViewModel createDefault() {
     return loadFrom(Owl.getPreferenceService().getDefaultScope());
+  }
+
+  /**
+   * @param isSearch set to <code>true</code> if column model is for search
+   * results, <code>false</code> otherwise.
+   * @return a default {@link NewsColumnViewModel} initialized from the default
+   * scope of preferences.
+   */
+  public static NewsColumnViewModel createDefault(boolean isSearch) {
+    return loadFrom(Owl.getPreferenceService().getDefaultScope(), isSearch);
   }
 
   /**
@@ -102,6 +116,42 @@ public class NewsColumnViewModel {
 
     /* Sort Order */
     model.setAscending(ascending);
+
+    return model;
+  }
+
+  /**
+   * @param tree the tree to initialize the model from.
+   * @return the {@link NewsColumnViewModel} from the provided tree.
+   */
+  public static NewsColumnViewModel initializeFrom(Tree tree) {
+    NewsColumnViewModel model = new NewsColumnViewModel();
+
+    TreeColumn[] columns = tree.getColumns();
+    int[] columnOrder = tree.getColumnOrder();
+    for (int order : columnOrder) {
+      Object data = columns[order].getData(COL_ID);
+      if (data != null)
+        model.addColumn((NewsColumn) data);
+    }
+
+    return model;
+  }
+
+  /**
+   * @param table the table to initialize the model from.
+   * @return the {@link NewsColumnViewModel} from the provided table.
+   */
+  public static NewsColumnViewModel initializeFrom(Table table) {
+    NewsColumnViewModel model = new NewsColumnViewModel();
+
+    TableColumn[] columns = table.getColumns();
+    int[] columnOrder = table.getColumnOrder();
+    for (int order : columnOrder) {
+      Object data = columns[order].getData(COL_ID);
+      if (data != null)
+        model.addColumn((NewsColumn) data);
+    }
 
     return model;
   }
@@ -210,7 +260,7 @@ public class NewsColumnViewModel {
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 18);
 
       case STATUS:
-        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 100);
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 70);
 
       default: //Never Reached
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 100);
@@ -219,10 +269,12 @@ public class NewsColumnViewModel {
 
   /**
    * @param preferences the preferences to save the news column model into.
+   * @param isSearch set to <code>true</code> if column model is for search
+   * results, <code>false</code> otherwise.
    * @return <code>true</code> in case the settings have changed and
    * <code>false</code> otherwise.
    */
-  public boolean saveTo(IPreferenceScope preferences) {
+  public boolean saveTo(IPreferenceScope preferences, boolean isSearch) {
     boolean changed = true;
 
     /* News Columns */
@@ -231,16 +283,16 @@ public class NewsColumnViewModel {
       columns[i] = fColumns.get(i).ordinal();
 
     /* Check for Changes */
-    int[] prefColumns = preferences.getIntegers(DefaultPreferences.BM_NEWS_COLUMNS);
-    int prefSortColumn = preferences.getInteger(DefaultPreferences.BM_NEWS_SORT_COLUMN);
-    boolean prefAscending = preferences.getBoolean(DefaultPreferences.BM_NEWS_SORT_ASCENDING);
+    int[] prefColumns = preferences.getIntegers(isSearch ? DefaultPreferences.SEARCH_DIALOG_NEWS_COLUMNS : DefaultPreferences.BM_NEWS_COLUMNS);
+    int prefSortColumn = preferences.getInteger(isSearch ? DefaultPreferences.SEARCH_DIALOG_NEWS_SORT_COLUMN : DefaultPreferences.BM_NEWS_SORT_COLUMN);
+    boolean prefAscending = preferences.getBoolean(isSearch ? DefaultPreferences.SEARCH_DIALOG_NEWS_SORT_ASCENDING : DefaultPreferences.BM_NEWS_SORT_ASCENDING);
 
     changed = !Arrays.equals(prefColumns, columns) || prefSortColumn != fSortColumn.ordinal() || prefAscending != fAscending;
 
     /* Save */
-    preferences.putIntegers(DefaultPreferences.BM_NEWS_COLUMNS, columns);
-    preferences.putInteger(DefaultPreferences.BM_NEWS_SORT_COLUMN, fSortColumn.ordinal());
-    preferences.putBoolean(DefaultPreferences.BM_NEWS_SORT_ASCENDING, fAscending);
+    preferences.putIntegers(isSearch ? DefaultPreferences.SEARCH_DIALOG_NEWS_COLUMNS : DefaultPreferences.BM_NEWS_COLUMNS, columns);
+    preferences.putInteger(isSearch ? DefaultPreferences.SEARCH_DIALOG_NEWS_SORT_COLUMN : DefaultPreferences.BM_NEWS_SORT_COLUMN, fSortColumn.ordinal());
+    preferences.putBoolean(isSearch ? DefaultPreferences.SEARCH_DIALOG_NEWS_SORT_ASCENDING : DefaultPreferences.BM_NEWS_SORT_ASCENDING, fAscending);
 
     return changed;
   }
