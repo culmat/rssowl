@@ -964,6 +964,18 @@
             schemeId="org.rssowl.ui.KeyScheme"
             sequence="M1+L">
       </key>
+      <key
+            commandId="org.rssowl.ui.actions.MarkSticky"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1+S">
+      </key>
+      <key
+            commandId="org.rssowl.ui.actions.NewBookMark"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1+D">
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.popupMenus">
