@@ -242,7 +242,7 @@ public class NewsColumnViewModel {
         return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20);
 
       case LABELS:
-        return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20);
+        return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 10);
 
       case DATE:
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, OwlUI.getDateWidth());
@@ -261,6 +261,9 @@ public class NewsColumnViewModel {
 
       case STATUS:
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 70);
+
+      case LOCATION:
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 150);
 
       default: //Never Reached
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 100);

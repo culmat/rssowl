@@ -60,7 +60,10 @@ public enum NewsColumn {
   FEED("Feed", false, true, false, true, false, true, false),
 
   /** Relevance of a News (not selectable) */
-  RELEVANCE("Relevance", false, true, false, false, false, true, false);
+  RELEVANCE("Relevance", false, true, false, false, false, true, false),
+
+  /** Location of a News */
+  LOCATION("Location", true, false, true, true, true, true, true);
 
   private final String fName;
   private final boolean fShowName;
