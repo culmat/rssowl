@@ -185,9 +185,6 @@ public class NewsColumnViewModel {
       case TITLE:
         return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 60);
 
-      case DATE:
-        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, OwlUI.getDateWidth());
-
       case AUTHOR:
         return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20);
 
@@ -196,6 +193,9 @@ public class NewsColumnViewModel {
 
       case LABELS:
         return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20);
+
+      case DATE:
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, OwlUI.getDateWidth());
 
       case ATTACHMENTS:
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 18);
@@ -212,8 +212,8 @@ public class NewsColumnViewModel {
       case STATUS:
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 100);
 
-      default:
-        return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20);
+      default: //Never Reached
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 100);
     }
   }
 
