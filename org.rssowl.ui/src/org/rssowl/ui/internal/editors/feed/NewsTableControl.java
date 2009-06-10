@@ -424,9 +424,12 @@ public class NewsTableControl implements IFeedViewPart {
 
     /* Create Columns */
     List<NewsColumn> cols = newModel.getColumns();
-    for (NewsColumn col : cols) {
+    for (int i = 0; i < cols.size(); i++) {
+      NewsColumn col = cols.get(i);
       TreeViewerColumn viewerColumn = new TreeViewerColumn(fViewer, SWT.LEFT);
       fCustomTree.manageColumn(viewerColumn.getColumn(), newModel.getLayoutData(col), col.showName() ? col.getName() : null, col.showTooltip() ? col.getName() : null, null, col.isMoveable(), col.isResizable());
+      if (i == 0)
+        viewerColumn.getColumn().setResizable(true); //Need to override this due to bug on windows
       viewerColumn.getColumn().setData(NewsColumnViewModel.COL_ID, col);
 
       if (newModel.getSortColumn() == col && col.showSortIndicator()) {
