@@ -847,12 +847,13 @@ public class SearchNewsDialog extends TitleAreaDialog {
         Menu menu = new Menu(parent);
 
         MenuItem restoreDefaults = new MenuItem(menu, SWT.None);
-        restoreDefaults.setText("&Restore Defaults");
+        restoreDefaults.setText("&Restore Default Columns");
         restoreDefaults.addSelectionListener(new SelectionAdapter() {
           @Override
           public void widgetSelected(SelectionEvent e) {
-            fColumnModel = NewsColumnViewModel.createDefault(true);
-            showColumns(fColumnModel, true);
+            NewsColumnViewModel defaultModel = NewsColumnViewModel.createDefault(true);
+            if (!defaultModel.equals(fColumnModel))
+              showColumns(defaultModel, true);
           }
         });
 
