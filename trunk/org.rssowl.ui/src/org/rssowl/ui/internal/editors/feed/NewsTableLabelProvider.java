@@ -56,6 +56,7 @@ import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
@@ -64,7 +65,9 @@ import org.rssowl.ui.internal.OwlUI;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -105,6 +108,10 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
   /* Pre-Cache some Fonts being used */
   private Font fBoldFont;
+
+  /* A cache for the Location Column */
+  private Map<Long, String> fMapBinIdToLocation = new HashMap<Long, String>();
+  private Map<String, String> fMapFeedLinkToLocation = new HashMap<String, String>();
 
   /**
    * Creates a new instance of this LabelProvider
@@ -288,6 +295,33 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
             text = "Read";
 
           break;
+
+        case LOCATION:
+
+          /* Location: Bin */
+          if (news.getParentId() > 0) {
+            String location = fMapBinIdToLocation.get(news.getParentId());
+            if (location == null) {
+              NewsBinReference ref = new NewsBinReference(news.getParentId());
+              INewsBin bin = ref.resolve();
+              location = bin.getName();
+              fMapBinIdToLocation.put(news.getParentId(), location);
+            }
+
+            return location;
+          }
+
+          /* Location: Bookmark */
+          String location = fMapFeedLinkToLocation.get(news.getFeedLinkAsText());
+          if (location == null) {
+            IBookMark bookmark = CoreUtils.getBookMark(news.getFeedReference());
+            if (bookmark != null) {
+              location = bookmark.getName();
+              fMapFeedLinkToLocation.put(news.getFeedLinkAsText(), location);
+            }
+          }
+
+          return location;
       }
     }
 

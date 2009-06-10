@@ -26,17 +26,22 @@ package org.rssowl.ui.internal.editors.feed;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.INews.State;
+import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -49,6 +54,10 @@ import java.util.Set;
 public class NewsComparator extends ViewerComparator implements Comparator<INews> {
   private NewsColumn fSortBy;
   private boolean fAscending;
+
+  /* A cache for the Location Column */
+  private Map<Long, String> fMapBinIdToLocation = new HashMap<Long, String>();
+  private Map<String, String> fMapFeedLinkToLocation = new HashMap<String, String>();
 
   /**
    * @return Returns the ascending.
@@ -144,6 +153,11 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
       case STATUS:
         result = compareByStatus(news1.getState(), news2.getState());
         break;
+
+      /* Sort by Location */
+      case LOCATION:
+        result = compareByLocation(news1, news2);
+        break;
     }
 
     /* Fall Back to default sort if result is 0 */
@@ -201,6 +215,41 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
 
     /* Respect ascending / descending Order */
     return fAscending ? result : result * -1;
+  }
+
+  private int compareByLocation(INews n1, INews n2) {
+    int result = compareByString(getLocation(n1), getLocation(n2));
+
+    /* Respect ascending / descending Order */
+    return fAscending ? result : result * -1;
+  }
+
+  private String getLocation(INews news) {
+
+    /* Location: Bin */
+    if (news.getParentId() > 0) {
+      String location = fMapBinIdToLocation.get(news.getParentId());
+      if (location == null) {
+        NewsBinReference ref = new NewsBinReference(news.getParentId());
+        INewsBin bin = ref.resolve();
+        location = bin.getName();
+        fMapBinIdToLocation.put(news.getParentId(), location);
+      }
+
+      return location;
+    }
+
+    /* Location: Bookmark */
+    String location = fMapFeedLinkToLocation.get(news.getFeedLinkAsText());
+    if (location == null) {
+      IBookMark bookmark = CoreUtils.getBookMark(news.getFeedReference());
+      if (bookmark != null) {
+        location = bookmark.getName();
+        fMapFeedLinkToLocation.put(news.getFeedLinkAsText(), location);
+      }
+    }
+
+    return location;
   }
 
   private int compareByHasAttachments(boolean hasAttachments1, boolean hasAttachments2) {
