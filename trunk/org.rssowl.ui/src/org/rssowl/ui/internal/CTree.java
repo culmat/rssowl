@@ -152,7 +152,8 @@ public class CTree {
 
     /* Foreach TreeColumn */
     int totalFillSum = 0;
-    for (TreeColumn column : fCols) {
+    for (int i = 0; i < fCols.size(); i++) {
+      TreeColumn column = fCols.get(i);
       CColumnLayoutData data = (CColumnLayoutData) column.getData(LAYOUT_DATA);
 
       /* Hide Column */
@@ -170,12 +171,19 @@ public class CTree {
 
       /* Fixed with actual Width Hint */
       else if (data.getSize() == CColumnLayoutData.Size.FIXED) {
-        freeWidth -= data.getWidthHint();
-        occupiedWidth += data.getWidthHint();
+        int widthHint = data.getWidthHint();
+
+        /* Bug on Windows: First column in tree always needs extra space for expand/collapse */
+        if (Application.IS_WINDOWS && i == 0 && widthHint < 45) {
+          widthHint = 45;
+        }
+
+        freeWidth -= widthHint;
+        occupiedWidth += widthHint;
 
         /* Only apply if changed */
-        if (column.getWidth() != data.getWidthHint())
-          column.setWidth(data.getWidthHint());
+        if (column.getWidth() != widthHint)
+          column.setWidth(widthHint);
       }
 
       /* Sum up the fill ratios for later use */
