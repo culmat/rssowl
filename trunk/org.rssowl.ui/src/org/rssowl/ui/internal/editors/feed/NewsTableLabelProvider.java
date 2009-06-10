@@ -27,8 +27,10 @@ package org.rssowl.ui.internal.editors.feed;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -113,6 +115,14 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     fColumnModel = model;
     fResources = new LocalResourceManager(JFaceResources.getResources());
     createResources();
+  }
+
+  /*
+   * @see org.eclipse.jface.viewers.OwnerDrawLabelProvider#initialize(org.eclipse.jface.viewers.ColumnViewer, org.eclipse.jface.viewers.ViewerColumn)
+   */
+  @Override
+  protected void initialize(ColumnViewer viewer, ViewerColumn column) {
+    super.initialize(viewer, column, false); //Disable Custom Ownerdrawn
   }
 
   /**

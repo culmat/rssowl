@@ -482,7 +482,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fGlobalScope.putBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS, fOpenSiteForEmptyNewsCheck.getSelection());
 
     /* Columns */
-    columnChange = fColumnSelectionControl.getModel().saveTo(fGlobalScope);
+    columnChange = fColumnSelectionControl.getModel().saveTo(fGlobalScope, false);
 
     /* Clean-Up */
     if (fGlobalScope.getBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE) != fDeleteNewsByCountCheck.getSelection()) {
