@@ -151,6 +151,7 @@ public class CTree {
     int occupiedWidth = 0;
 
     /* Foreach TreeColumn */
+    int totalFillSum = 0;
     for (TreeColumn column : fCols) {
       CColumnLayoutData data = (CColumnLayoutData) column.getData(LAYOUT_DATA);
 
@@ -176,6 +177,11 @@ public class CTree {
         if (column.getWidth() != data.getWidthHint())
           column.setWidth(data.getWidthHint());
       }
+
+      /* Sum up the fill ratios for later use */
+      else if (data.getSize() == CColumnLayoutData.Size.FILL) {
+        totalFillSum += data.getWidthHint();
+      }
     }
 
     /* Foreach TreeColumn */
@@ -184,7 +190,7 @@ public class CTree {
 
       /* Fill available space with ratio */
       if (data.getSize() == CColumnLayoutData.Size.FILL) {
-        int colWidth = (freeWidth * data.getWidthHint()) / 100;
+        int colWidth = (freeWidth * data.getWidthHint()) / totalFillSum;
 
         /* Trim if necessary */
         if (occupiedWidth + colWidth >= totalWidth)

@@ -138,6 +138,7 @@ public class CTable {
     int occupiedWidth = 0;
 
     /* Foreach TableColumn */
+    int totalFillSum = 0;
     for (TableColumn column : fCols) {
       CColumnLayoutData data = (CColumnLayoutData) column.getData(LAYOUT_DATA);
 
@@ -158,6 +159,11 @@ public class CTable {
         if (column.getWidth() != data.getWidthHint())
           column.setWidth(data.getWidthHint());
       }
+
+      /* Sum up the fill ratios for later use */
+      else if (data.getSize() == CColumnLayoutData.Size.FILL) {
+        totalFillSum += data.getWidthHint();
+      }
     }
 
     /* Foreach TableColumn */
@@ -166,7 +172,7 @@ public class CTable {
 
       /* Fill available space with ratio */
       if (data.getSize() == CColumnLayoutData.Size.FILL) {
-        int colWidth = (freeWidth * data.getWidthHint()) / 100;
+        int colWidth = (freeWidth * data.getWidthHint()) / totalFillSum;
 
         /* Trim if necessary */
         if (occupiedWidth + colWidth >= totalWidth)
