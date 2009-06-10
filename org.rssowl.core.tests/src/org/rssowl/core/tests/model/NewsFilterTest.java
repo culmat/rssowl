@@ -282,7 +282,7 @@ public class NewsFilterTest {
     assertEquals(3, bin.getNewsCount(EnumSet.of(INews.State.NEW)));
     for (INews newsitem : binNews) {
       assertEquals(INews.State.NEW, newsitem.getState());
-      assertEquals(bin.getId(), newsitem.getParentId());
+      assertEquals(bin.getId(), (Long)newsitem.getParentId());
     }
 
   }
@@ -330,7 +330,7 @@ public class NewsFilterTest {
     assertEquals(3, bin.getNewsCount(EnumSet.of(INews.State.NEW)));
     for (INews newsitem : binNews) {
       assertEquals(INews.State.NEW, newsitem.getState());
-      assertEquals(bin.getId(), newsitem.getParentId());
+      assertEquals(bin.getId(), (Long)newsitem.getParentId());
     }
 
   }
@@ -381,7 +381,7 @@ public class NewsFilterTest {
     assertEquals(3, bin.getNewsCount(EnumSet.of(INews.State.NEW)));
     for (INews newsitem : binNews) {
       assertEquals(INews.State.NEW, newsitem.getState());
-      assertEquals(bin.getId(), newsitem.getParentId());
+      assertEquals(bin.getId(), (Long)newsitem.getParentId());
       assertEquals(true, newsitem.isFlagged());
     }
 
