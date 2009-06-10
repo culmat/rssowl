@@ -159,10 +159,10 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     NewsColumn column = fColumnModel.getColumn(cell.getColumnIndex());
 
     /* Text */
-    cell.setText(getColumnText(cell.getElement(), column));
+    cell.setText(getColumnText(cell.getElement(), column, cell.getColumnIndex()));
 
     /* Image */
-    cell.setImage(getColumnImage(cell.getElement(), column));
+    cell.setImage(getColumnImage(cell.getElement(), column, cell.getColumnIndex()));
 
     /* Font */
     cell.setFont(getFont(cell.getElement(), cell.getColumnIndex()));
@@ -212,9 +212,10 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
   /**
    * @param element
    * @param column
+   * @param colIndex
    * @return String
    */
-  protected String getColumnText(Object element, NewsColumn column) {
+  protected String getColumnText(Object element, NewsColumn column, int colIndex) {
     String text = null;
 
     /* Handle News */
@@ -281,7 +282,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     }
 
     /* Handle EntityGroup */
-    else if (element instanceof EntityGroup && column == NewsColumn.TITLE)
+    else if (element instanceof EntityGroup && colIndex == 0)
       text = ((EntityGroup) element).getName();
 
     /* Make sure to normalize the Text for the Table */
@@ -291,9 +292,10 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
   /**
    * @param element
    * @param newsColumn
+   * @param colIndex
    * @return Image
    */
-  protected Image getColumnImage(Object element, NewsColumn newsColumn) {
+  protected Image getColumnImage(Object element, NewsColumn newsColumn, int colIndex) {
 
     /* News */
     if (element instanceof INews) {
@@ -340,7 +342,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     }
 
     /* EntityGroup Image */
-    else if (element instanceof EntityGroup && newsColumn == NewsColumn.TITLE) {
+    else if (element instanceof EntityGroup && colIndex == 0) {
       EntityGroup group = (EntityGroup) element;
       if (group.getImage() != null)
         return OwlUI.getImage(fResources, group.getImage());

@@ -378,16 +378,16 @@ public class SearchNewsDialog extends TitleAreaDialog {
       if (column == NewsColumn.CATEGORY)
         cell.setText(getCategories(scoredNews.getNews()));
       else
-        cell.setText(getColumnText(scoredNews.getNews(), column));
+        cell.setText(getColumnText(scoredNews.getNews(), column, cell.getColumnIndex()));
 
       /* Image */
-      cell.setImage(getColumnImage(scoredNews, column));
+      cell.setImage(getColumnImage(scoredNews, column, cell.getColumnIndex()));
 
       /* Font */
-      cell.setFont(getFont(scoredNews.getNews(), 0));
+      cell.setFont(getFont(scoredNews.getNews(), cell.getColumnIndex()));
 
       /* Foreground */
-      Color foreground = getForeground(scoredNews.getNews(), 0);
+      Color foreground = getForeground(scoredNews.getNews(), cell.getColumnIndex());
 
       /* TODO This is required to invalidate + redraw the entire TableItem! */
       if (USE_CUSTOM_OWNER_DRAWN) {
@@ -398,7 +398,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
         cell.setForeground(foreground);
 
       /* Background */
-      cell.setBackground(getBackground(scoredNews.getNews(), 0));
+      cell.setBackground(getBackground(scoredNews.getNews(), cell.getColumnIndex()));
     }
 
     private String getCategories(INews news) {
@@ -418,10 +418,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
     }
 
     /*
-     * @see org.rssowl.ui.internal.editors.feed.NewsTableLabelProvider#getColumnImage(java.lang.Object, org.rssowl.ui.internal.editors.feed.NewsColumn)
+     * @see org.rssowl.ui.internal.editors.feed.NewsTableLabelProvider#getColumnImage(java.lang.Object, org.rssowl.ui.internal.editors.feed.NewsColumn, int)
      */
     @Override
-    protected Image getColumnImage(Object element, NewsColumn column) {
+    protected Image getColumnImage(Object element, NewsColumn column, int colIndex) {
 
       /* Score Column */
       if (column == NewsColumn.RELEVANCE) {
@@ -437,7 +437,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
       }
 
       /* Any other Column */
-      return super.getColumnImage(((ScoredNews) element).getNews(), column);
+      return super.getColumnImage(((ScoredNews) element).getNews(), column, colIndex);
     }
 
     /*
