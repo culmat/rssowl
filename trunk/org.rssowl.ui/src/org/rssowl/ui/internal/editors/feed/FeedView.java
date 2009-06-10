@@ -856,6 +856,14 @@ public class FeedView extends EditorPart implements IReusableEditor {
   }
 
   /**
+   * Refresh the visible columns of the opened news table control.
+   */
+  public void updateColumns() {
+    if (isTableViewerVisible() && fInput != null)
+      fNewsTableControl.updateColumns(fInput.getMark());
+  }
+
+  /**
    * Notifies this editor about a UI-Event just occured. In dependance of the
    * event, the Editor might want to update the state on the displayed News.
    *

@@ -50,6 +50,7 @@ import org.eclipse.swt.SWTException;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.Drawable;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -57,7 +58,6 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -98,7 +98,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -192,6 +194,9 @@ public class OwlUI {
   /** Error */
   public static final ImageDescriptor ERROR = Activator.getImageDescriptor("icons/obj16/error.gif"); //$NON-NLS-1$
 
+  /** Attachment */
+  public static final ImageDescriptor ATTACHMENT = Activator.getImageDescriptor("icons/obj16/attachment.gif"); //$NON-NLS-1$
+
   /** Group Foreground Color */
   public static final RGB GROUP_FG_COLOR = new RGB(0, 0, 128);
 
@@ -242,6 +247,9 @@ public class OwlUI {
 
   /* Cache the OSTheme once retrieved */
   private static OSTheme fgCachedOSTheme;
+
+  /* Workaround for unknown Date Width */
+  private static int DATE_WIDTH = -1;
 
   /** An enumeration of Operating System Themes */
   enum OSTheme {
@@ -628,7 +636,7 @@ public class OwlUI {
    * @param font
    * @return The size of the Text as Point.
    */
-  public static Point getTextSize(Composite drawable, Font font, String text) {
+  public static Point getTextSize(Drawable drawable, Font font, String text) {
     GC gc = new GC(drawable);
     gc.setFont(font);
     Point p = gc.textExtent(text);
@@ -1394,5 +1402,26 @@ public class OwlUI {
     color.dispose();
 
     return image;
+  }
+
+  /**
+   * @return the width for displaying a date.
+   */
+  public static int getDateWidth() {
+
+    /* Check if Cached already */
+    if (DATE_WIDTH > 0)
+      return DATE_WIDTH;
+
+    /* Calculate and Cache */
+    DateFormat dF = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT);
+    Calendar cal = Calendar.getInstance();
+    cal.set(2006, Calendar.DECEMBER, 12, 12, 12, 12);
+    String sampleDate = dF.format(cal.getTime());
+
+    DATE_WIDTH = OwlUI.getTextSize(Display.getDefault(), OwlUI.getBold(JFaceResources.DEFAULT_FONT), sampleDate).x;
+    DATE_WIDTH += 30; // Bounds of TableColumn requires more space
+
+    return DATE_WIDTH;
   }
 }

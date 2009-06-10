@@ -96,4 +96,26 @@ public class EditorUtils {
       }
     }
   }
+
+  /**
+   * TODO Find a better solution once its possible to add listeners to
+   * {@link IPreferenceScope} and then listen to changes of column-properties.
+   */
+  public static void updateColumns() {
+    IWorkbenchPage page = OwlUI.getPage();
+    if (page != null) {
+      IEditorReference[] editorReferences = page.getEditorReferences();
+      for (IEditorReference reference : editorReferences) {
+        try {
+          IEditorInput editorInput = reference.getEditorInput();
+          if (editorInput instanceof FeedViewInput) {
+            FeedView feedView = (FeedView) reference.getEditor(true);
+            feedView.updateColumns();
+          }
+        } catch (PartInitException e) {
+          Activator.getDefault().getLog().log(e.getStatus());
+        }
+      }
+    }
+  }
 }

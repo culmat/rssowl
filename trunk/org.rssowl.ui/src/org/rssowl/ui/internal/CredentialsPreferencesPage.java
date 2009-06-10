@@ -107,10 +107,6 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
       return fUsername;
     }
 
-    String getPassword() {
-      return fPassword;
-    }
-
     URI getNormalizedLink() {
       return fNormalizedLink;
     }
@@ -241,15 +237,15 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     /* Create Columns */
     TableViewerColumn col = new TableViewerColumn(fViewer, SWT.LEFT);
-    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 45), "Site", null, false, true);
+    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 45), "Site", null, null, false, true);
     col.getColumn().setMoveable(false);
 
     col = new TableViewerColumn(fViewer, SWT.LEFT);
-    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 30), "Realm", null, false, true);
+    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 30), "Realm", null, null, false, true);
     col.getColumn().setMoveable(false);
 
     col = new TableViewerColumn(fViewer, SWT.LEFT);
-    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 25), "Username", null, false, true);
+    customTable.manageColumn(col.getColumn(), new CColumnLayoutData(CColumnLayoutData.Size.FILL, 25), "Username", null, null, false, true);
     col.getColumn().setMoveable(false);
 
     /* Content Provider */

@@ -75,18 +75,22 @@ public class CTree {
    * @param col
    * @param layoutData
    * @param text
+   * @param tooltip
    * @param image
    * @param moveable
    * @param resizable
    * @return TreeColumn
    */
-  public TreeColumn manageColumn(TreeColumn col, CColumnLayoutData layoutData, String text, Image image, boolean moveable, boolean resizable) {
+  public TreeColumn manageColumn(TreeColumn col, CColumnLayoutData layoutData, String text, String tooltip, Image image, boolean moveable, boolean resizable) {
     col.setData(LAYOUT_DATA, layoutData);
     col.setMoveable(moveable);
     col.setResizable(resizable);
 
     if (text != null)
       col.setText(text);
+
+    if (tooltip != null)
+      col.setToolTipText(tooltip);
 
     if (image != null)
       col.setImage(image);
@@ -107,6 +111,24 @@ public class CTree {
 
     if (update)
       onTreeResize();
+  }
+
+  /**
+   * Force layout of all columns.
+   */
+  public void update() {
+    onTreeResize();
+  }
+
+  /**
+   * Dispose and clear all columns.
+   */
+  public void clear() {
+    for (TreeColumn cols : fCols) {
+      cols.dispose();
+    }
+
+    fCols.clear();
   }
 
   private void onTreeResize() {

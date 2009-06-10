@@ -56,6 +56,7 @@ import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.RetentionStrategy;
+import org.rssowl.ui.internal.editors.feed.NewsColumnViewModel;
 import org.rssowl.ui.internal.editors.feed.NewsFilter;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import org.rssowl.ui.internal.util.EditorUtils;
@@ -104,6 +105,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   private Button fMarkReadOnChange;
   private LocalResourceManager fResources;
   private Button fMarkReadOnTabClose;
+  private NewsColumnSelectionControl fColumnSelectionControl;
 
   /** Leave for reflection */
   public FeedsPreferencePage() {
@@ -145,6 +147,9 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     /* Display */
     createDisplayGroup(tabFolder);
 
+    /* Columns */
+    createColumnsGroup(tabFolder);
+
     /* Clean-Up */
     createCleanUpGroup(tabFolder);
 
@@ -167,7 +172,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   private void createGeneralGroup(TabFolder parent) {
     Composite group = new Composite(parent, SWT.NONE);
     group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    group.setLayout(LayoutUtils.createGridLayout(1));
+    group.setLayout(LayoutUtils.createGridLayout(1, 10, 10));
 
     TabItem item = new TabItem(parent, SWT.None);
     item.setText("General");
@@ -227,7 +232,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   private void createReadingGroup(TabFolder parent) {
     Composite group = new Composite(parent, SWT.NONE);
     group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    group.setLayout(LayoutUtils.createGridLayout(1));
+    group.setLayout(LayoutUtils.createGridLayout(1, 10, 10));
 
     TabItem item = new TabItem(parent, SWT.None);
     item.setText("Reading");
@@ -276,7 +281,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   private void createDisplayGroup(TabFolder parent) {
     Composite group = new Composite(parent, SWT.NONE);
     group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    group.setLayout(LayoutUtils.createGridLayout(2));
+    group.setLayout(LayoutUtils.createGridLayout(2, 10, 10));
 
     TabItem item = new TabItem(parent, SWT.None);
     item.setText("Display");
@@ -325,10 +330,24 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fOpenSiteForEmptyNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS));
   }
 
+  private void createColumnsGroup(TabFolder parent) {
+    Composite group = new Composite(parent, SWT.NONE);
+    group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    group.setLayout(LayoutUtils.createGridLayout(1, 10, 10));
+
+    TabItem item = new TabItem(parent, SWT.None);
+    item.setText("Columns");
+    item.setControl(group);
+
+    fColumnSelectionControl = new NewsColumnSelectionControl(group, SWT.NONE);
+    fColumnSelectionControl.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    fColumnSelectionControl.setInput(NewsColumnViewModel.loadFrom(fGlobalScope));
+  }
+
   private void createCleanUpGroup(TabFolder parent) {
     Composite group = new Composite(parent, SWT.NONE);
     group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    group.setLayout(LayoutUtils.createGridLayout(2, 5, 5, 10, 5, false));
+    group.setLayout(LayoutUtils.createGridLayout(2, 10, 10, 10, 5, false));
 
     TabItem item = new TabItem(parent, SWT.None);
     item.setText("Clean Up");
@@ -410,6 +429,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     /* Track Changes */
     boolean autoUpdateChange = false;
     boolean displayChange = false;
+    boolean columnChange = false;
     boolean runCleanUp = false;
 
     /* General */
@@ -461,6 +481,9 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     fGlobalScope.putBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS, fOpenSiteForEmptyNewsCheck.getSelection());
 
+    /* Columns */
+    columnChange = fColumnSelectionControl.getModel().saveTo(fGlobalScope);
+
     /* Clean-Up */
     if (fGlobalScope.getBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE) != fDeleteNewsByCountCheck.getSelection()) {
       fGlobalScope.putBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE, fDeleteNewsByCountCheck.getSelection());
@@ -495,12 +518,12 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fGlobalScope.putBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE, fNeverDeleteUnReadNewsCheck.getSelection());
 
     /* Run certain tasks now */
-    finish(autoUpdateChange, displayChange, runCleanUp);
+    finish(autoUpdateChange, displayChange, columnChange, runCleanUp);
 
     return super.performOk();
   }
 
-  private void finish(boolean autoUpdateChange, boolean displayChange, boolean runCleanup) throws PersistenceException {
+  private void finish(boolean autoUpdateChange, boolean displayChange, boolean columnChange, boolean runCleanup) throws PersistenceException {
     final Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
 
     /* Inform Reload Service about update-change */
@@ -513,6 +536,10 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     /* Inform open editors about display-change */
     if (displayChange)
       EditorUtils.updateFilterAndGrouping();
+
+    /* Inform open editors about columns-change */
+    if (columnChange)
+      EditorUtils.updateColumns();
 
     /* Peform clean-up on all BookMarks */
     if (runCleanup) {
@@ -593,6 +620,9 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fGroupCombo.select(defaultScope.getInteger(DefaultPreferences.BM_NEWS_GROUPING) + 1);
     fOpenSiteForNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS));
     fOpenSiteForEmptyNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS));
+
+    /* Columns */
+    fColumnSelectionControl.setInput(NewsColumnViewModel.loadFrom(defaultScope));
 
     /* Clean-Up */
     fDeleteNewsByCountCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE));
