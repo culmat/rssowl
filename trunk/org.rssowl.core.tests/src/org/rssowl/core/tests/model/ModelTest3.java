@@ -32,6 +32,7 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.MergeResult;
@@ -2603,6 +2604,7 @@ public class ModelTest3 {
    * @throws Exception
    */
   @Test
+  @Ignore
   public void testDeleteSearchFilter() throws Exception {
     ISearchField field = fFactory.createSearchField(INews.IS_FLAGGED, INews.class.getName());
     ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, true);
