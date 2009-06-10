@@ -72,21 +72,43 @@ public class CTable {
   }
 
   /**
+   * Force layout of all columns.
+   */
+  public void update() {
+    onTableResize();
+  }
+
+  /**
+   * Dispose and clear all columns.
+   */
+  public void clear() {
+    for (TableColumn cols : fCols) {
+      cols.dispose();
+    }
+
+    fCols.clear();
+  }
+
+  /**
    * @param col
    * @param layoutData
    * @param text
+   * @param tooltip
    * @param image
    * @param moveable
    * @param resizable
    * @return TableColumn
    */
-  public TableColumn manageColumn(TableColumn col, CColumnLayoutData layoutData, String text, Image image, boolean moveable, boolean resizable) {
+  public TableColumn manageColumn(TableColumn col, CColumnLayoutData layoutData, String text, String tooltip, Image image, boolean moveable, boolean resizable) {
     col.setData(LAYOUT_DATA, layoutData);
     col.setMoveable(moveable);
     col.setResizable(resizable);
 
     if (text != null)
       col.setText(text);
+
+    if (tooltip != null)
+      col.setToolTipText(tooltip);
 
     if (image != null)
       col.setImage(image);

@@ -1,0 +1,293 @@
+/*   **********************************************************************  **
+ **   Copyright notice                                                       **
+ **                                                                          **
+ **   (c) 2005-2008 RSSOwl Development Team                                  **
+ **   http://www.rssowl.org/                                                 **
+ **                                                                          **
+ **   All rights reserved                                                    **
+ **                                                                          **
+ **   This program and the accompanying materials are made available under   **
+ **   the terms of the Eclipse Public License v1.0 which accompanies this    **
+ **   distribution, and is available at:                                     **
+ **   http://www.rssowl.org/legal/epl-v10.html                               **
+ **                                                                          **
+ **   A copy is found in the file epl-v10.html and important notices to the  **
+ **   license from the team is found in the textfile LICENSE.txt distributed **
+ **   in this package.                                                       **
+ **                                                                          **
+ **   This copyright notice MUST APPEAR in all copies of the file!           **
+ **                                                                          **
+ **   Contributors:                                                          **
+ **     RSSOwl Development Team - initial API and implementation             **
+ **                                                                          **
+ **  **********************************************************************  */
+
+package org.rssowl.ui.internal.editors.feed;
+
+import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.ui.internal.Application;
+import org.rssowl.ui.internal.CColumnLayoutData;
+import org.rssowl.ui.internal.OwlUI;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+/**
+ * The view model behind the columns of the feed view used in
+ * {@link NewsTableControl}.
+ *
+ * @author bpasero
+ */
+public class NewsColumnViewModel {
+
+  /** ID to associate a Column with its ID */
+  public static final String COL_ID = "org.rssowl.ui.internal.editors.feed.ColumnIdentifier";
+
+  private final List<NewsColumn> fColumns = new ArrayList<NewsColumn>();
+  private NewsColumn fSortColumn;
+  private boolean fAscending;
+
+  private NewsColumnViewModel() {}
+
+  /**
+   * @return a default {@link NewsColumnViewModel} initialized from the default
+   * scope of preferences.
+   */
+  public static NewsColumnViewModel createDefault() {
+    return loadFrom(Owl.getPreferenceService().getDefaultScope());
+  }
+
+  /**
+   * @param preferences the preferences to load the news column model from.
+   * @return the {@link NewsColumnViewModel} from the provided preferences.
+   */
+  public static NewsColumnViewModel loadFrom(IPreferenceScope preferences) {
+    return loadFrom(preferences, false);
+  }
+
+  /**
+   * @param preferences the preferences to load the news column model from.
+   * @param isSearch set to <code>true</code> if column model is for search
+   * results, <code>false</code> otherwise.
+   * @return the {@link NewsColumnViewModel} from the provided preferences.
+   */
+  public static NewsColumnViewModel loadFrom(IPreferenceScope preferences, boolean isSearch) {
+    int[] columns = preferences.getIntegers(isSearch ? DefaultPreferences.SEARCH_DIALOG_NEWS_COLUMNS : DefaultPreferences.BM_NEWS_COLUMNS);
+    int sortColumn = preferences.getInteger(isSearch ? DefaultPreferences.SEARCH_DIALOG_NEWS_SORT_COLUMN : DefaultPreferences.BM_NEWS_SORT_COLUMN);
+    boolean ascending = preferences.getBoolean(isSearch ? DefaultPreferences.SEARCH_DIALOG_NEWS_SORT_ASCENDING : DefaultPreferences.BM_NEWS_SORT_ASCENDING);
+
+    return createFrom(columns, sortColumn, ascending);
+  }
+
+  /**
+   * @param columns the selected columns.
+   * @param sortColumn the sorted column.
+   * @param ascending the sort order.
+   * @return the {@link NewsColumnViewModel} from the provided settings.
+   */
+  public static NewsColumnViewModel createFrom(int[] columns, int sortColumn, boolean ascending) {
+    NewsColumn[] newsColumns = NewsColumn.values();
+    NewsColumnViewModel model = new NewsColumnViewModel();
+
+    /* News Columns */
+    for (int column : columns) {
+      model.addColumn(newsColumns[column]);
+    }
+
+    /* Sort Column */
+    model.setSortColumn(newsColumns[sortColumn]);
+
+    /* Sort Order */
+    model.setAscending(ascending);
+
+    return model;
+  }
+
+  /**
+   * @return the visible columns.
+   */
+  public List<NewsColumn> getColumns() {
+    return fColumns;
+  }
+
+  /**
+   * @param column the column to add to the model.
+   */
+  public void addColumn(NewsColumn column) {
+    if (!fColumns.contains(column))
+      fColumns.add(column);
+  }
+
+  /**
+   * @param column the column to remove from the model.
+   */
+  public void removeColumn(NewsColumn column) {
+    fColumns.remove(column);
+  }
+
+  /**
+   * @param index the index of the column to return.
+   * @return the {@link NewsColumn} at the given index.
+   */
+  public NewsColumn getColumn(int index) {
+    return fColumns.get(index);
+  }
+
+  /**
+   * @param column the column to check if included in this model.
+   * @return <code>true</code> if the column is part of this model and
+   * <code>false</code> otherwise.
+   */
+  public boolean contains(NewsColumn column) {
+    return fColumns.contains(column);
+  }
+
+  /**
+   * @return the sorted column.
+   */
+  public NewsColumn getSortColumn() {
+    return fSortColumn;
+  }
+
+  /**
+   * @param column the sorted column.
+   */
+  public void setSortColumn(NewsColumn column) {
+    fSortColumn = column;
+  }
+
+  /**
+   * @return <code>true</code> if sorting is ascending or <code>false</code>
+   * otherwise.
+   */
+  public boolean isAscending() {
+    return fAscending;
+  }
+
+  /**
+   * @param ascending <code>true</code> if sorting is ascending or
+   * <code>false</code> otherwise.
+   */
+  public void setAscending(boolean ascending) {
+    fAscending = ascending;
+  }
+
+  /**
+   * @param column the column to get the layout information for.
+   * @return an instance of {@link CColumnLayoutData} describing the layout of
+   * the column.
+   */
+  public CColumnLayoutData getLayoutData(NewsColumn column) {
+    switch (column) {
+      case TITLE:
+        return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 60);
+
+      case DATE:
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, OwlUI.getDateWidth());
+
+      case AUTHOR:
+        return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20);
+
+      case CATEGORY:
+        return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20);
+
+      case LABELS:
+        return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20);
+
+      case ATTACHMENTS:
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 18);
+
+      case FEED:
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, Application.IS_LINUX ? 20 : 18);
+
+      case RELEVANCE:
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 24);
+
+      case STICKY:
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 18);
+
+      case STATUS:
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 100);
+
+      default:
+        return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20);
+    }
+  }
+
+  /**
+   * @param preferences the preferences to save the news column model into.
+   * @return <code>true</code> in case the settings have changed and
+   * <code>false</code> otherwise.
+   */
+  public boolean saveTo(IPreferenceScope preferences) {
+    boolean changed = true;
+
+    /* News Columns */
+    int[] columns = new int[fColumns.size()];
+    for (int i = 0; i < fColumns.size(); i++)
+      columns[i] = fColumns.get(i).ordinal();
+
+    /* Check for Changes */
+    int[] prefColumns = preferences.getIntegers(DefaultPreferences.BM_NEWS_COLUMNS);
+    int prefSortColumn = preferences.getInteger(DefaultPreferences.BM_NEWS_SORT_COLUMN);
+    boolean prefAscending = preferences.getBoolean(DefaultPreferences.BM_NEWS_SORT_ASCENDING);
+
+    changed = !Arrays.equals(prefColumns, columns) || prefSortColumn != fSortColumn.ordinal() || prefAscending != fAscending;
+
+    /* Save */
+    preferences.putIntegers(DefaultPreferences.BM_NEWS_COLUMNS, columns);
+    preferences.putInteger(DefaultPreferences.BM_NEWS_SORT_COLUMN, fSortColumn.ordinal());
+    preferences.putBoolean(DefaultPreferences.BM_NEWS_SORT_ASCENDING, fAscending);
+
+    return changed;
+  }
+
+  /*
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (fAscending ? 1231 : 1237);
+    result = prime * result + ((fColumns == null) ? 0 : fColumns.hashCode());
+    result = prime * result + ((fSortColumn == null) ? 0 : fSortColumn.hashCode());
+    return result;
+  }
+
+  /*
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+
+    if (obj == null)
+      return false;
+
+    if (getClass() != obj.getClass())
+      return false;
+
+    NewsColumnViewModel other = (NewsColumnViewModel) obj;
+    if (fAscending != other.fAscending)
+      return false;
+
+    if (fSortColumn == null) {
+      if (other.fSortColumn != null)
+        return false;
+    } else if (!fSortColumn.equals(other.fSortColumn))
+      return false;
+
+    if (fColumns == null) {
+      if (other.fColumns != null)
+        return false;
+    } else if (!fColumns.equals(other.fColumns))
+      return false;
+
+    return true;
+  }
+}

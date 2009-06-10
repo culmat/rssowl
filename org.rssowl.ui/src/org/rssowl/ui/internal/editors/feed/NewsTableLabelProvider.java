@@ -28,7 +28,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.OwnerDrawLabelProvider;
-import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
@@ -45,14 +44,15 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
@@ -70,7 +70,9 @@ import java.util.Set;
  * @author bpasero
  */
 public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
-  private final StructuredViewer fViewer;
+
+  /** News Column Model to use */
+  protected NewsColumnViewModel fColumnModel;
 
   /* Some Colors of a Label */
   private static final String LABEL_COLOR_BLACK = "0,0,0";
@@ -105,12 +107,19 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
   /**
    * Creates a new instance of this LabelProvider
    *
-   * @param viewer
+   * @param model the column model.
    */
-  public NewsTableLabelProvider(StructuredViewer viewer) {
-    fViewer = viewer;
+  public NewsTableLabelProvider(NewsColumnViewModel model) {
+    fColumnModel = model;
     fResources = new LocalResourceManager(JFaceResources.getResources());
     createResources();
+  }
+
+  /**
+   * @param model
+   */
+  public void init(NewsColumnViewModel model) {
+    fColumnModel = model;
   }
 
   void updateResources() {
@@ -147,12 +156,13 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
    */
   @Override
   public void update(ViewerCell cell) {
+    NewsColumn column = fColumnModel.getColumn(cell.getColumnIndex());
 
     /* Text */
-    cell.setText(getColumnText(cell.getElement(), cell.getColumnIndex()));
+    cell.setText(getColumnText(cell.getElement(), column));
 
     /* Image */
-    cell.setImage(getColumnImage(cell.getElement(), cell.getColumnIndex()));
+    cell.setImage(getColumnImage(cell.getElement(), column));
 
     /* Font */
     cell.setFont(getFont(cell.getElement(), cell.getColumnIndex()));
@@ -201,27 +211,27 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
   /**
    * @param element
-   * @param columnIndex
+   * @param column
    * @return String
    */
-  protected String getColumnText(Object element, int columnIndex) {
+  protected String getColumnText(Object element, NewsColumn column) {
     String text = null;
 
     /* Handle News */
     if (element instanceof INews) {
       INews news = (INews) element;
 
-      switch (columnIndex) {
-        case NewsTableControl.COL_TITLE:
+      switch (column) {
+        case TITLE:
           text = CoreUtils.getHeadline(news);
           break;
 
-        case NewsTableControl.COL_PUBDATE:
+        case DATE:
           Date date = DateUtils.getRecentDate(news);
           text = fDateFormat.format(date);
           break;
 
-        case NewsTableControl.COL_AUTHOR:
+        case AUTHOR:
           IPerson author = news.getAuthor();
           if (author != null) {
             if (author.getName() != null)
@@ -231,7 +241,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
           }
           break;
 
-        case NewsTableControl.COL_CATEGORY:
+        case CATEGORY:
           List<ICategory> categories = news.getCategories();
           if (categories.size() > 0) {
             ICategory category = categories.get(0);
@@ -241,11 +251,37 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
               text = category.getDomain();
           }
           break;
+
+        case LABELS:
+          Set<ILabel> labels = CoreUtils.getSortedLabels(news);
+          if (!labels.isEmpty()) {
+            StringBuilder str = new StringBuilder();
+            for (ILabel label : labels) {
+              str.append(label.getName()).append(", ");
+            }
+
+            str = str.delete(str.length() - 2, str.length());
+            text = str.toString();
+          }
+          break;
+
+        case STATUS:
+          State state = news.getState();
+          if (state == State.NEW)
+            text = "New";
+          else if (state == State.UNREAD)
+            text = "Unread";
+          else if (state == State.UPDATED)
+            text = "Updated";
+          else if (state == State.READ)
+            text = "Read";
+
+          break;
       }
     }
 
     /* Handle EntityGroup */
-    else if (element instanceof EntityGroup && columnIndex == NewsTableControl.COL_TITLE)
+    else if (element instanceof EntityGroup && column == NewsColumn.TITLE)
       text = ((EntityGroup) element).getName();
 
     /* Make sure to normalize the Text for the Table */
@@ -254,17 +290,17 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
   /**
    * @param element
-   * @param columnIndex
+   * @param newsColumn
    * @return Image
    */
-  protected Image getColumnImage(Object element, int columnIndex) {
+  protected Image getColumnImage(Object element, NewsColumn newsColumn) {
 
     /* News */
     if (element instanceof INews) {
       INews news = (INews) element;
 
       /* News Icon */
-      if (columnIndex == NewsTableControl.COL_TITLE) {
+      if (newsColumn == NewsColumn.TITLE) {
         if (news.getState() == INews.State.UNREAD)
           return fNewsUnreadIcon;
         else if (news.getState() == INews.State.NEW)
@@ -275,8 +311,8 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
           return fNewsReadIcon;
       }
 
-      /* Feed Column (only when not showing Bookmarks) */
-      else if (columnIndex == NewsTableControl.COL_FEED && !(fViewer.getInput() instanceof BookMarkReference)) {
+      /* Feed Column */
+      else if (newsColumn == NewsColumn.FEED) {
         FeedLinkReference feedRef = news.getFeedReference();
         IBookMark bookMark = CoreUtils.getBookMark(feedRef);
         if (bookMark != null) {
@@ -288,16 +324,23 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
       }
 
       /* Sticky State */
-      else if (columnIndex == NewsTableControl.COL_STICKY) {
+      else if (newsColumn == NewsColumn.STICKY) {
         if (news.isFlagged())
           return fNewsStickyIcon;
 
         return fNewsNonStickyIcon;
       }
+
+      /* Attachment */
+      else if (newsColumn == NewsColumn.ATTACHMENTS) {
+        List<IAttachment> attachments = news.getAttachments();
+        if (!attachments.isEmpty())
+          return OwlUI.getImage(fResources, OwlUI.ATTACHMENT);
+      }
     }
 
     /* EntityGroup Image */
-    else if (element instanceof EntityGroup && columnIndex == NewsTableControl.COL_TITLE) {
+    else if (element instanceof EntityGroup && newsColumn == NewsColumn.TITLE) {
       EntityGroup group = (EntityGroup) element;
       if (group.getImage() != null)
         return OwlUI.getImage(fResources, group.getImage());
@@ -313,8 +356,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
    * @param columnIndex
    * @return Font
    */
-  protected Font getFont(Object element, @SuppressWarnings("unused")
-  int columnIndex) {
+  protected Font getFont(Object element, @SuppressWarnings("unused") int columnIndex) {
 
     /* Use a Bold Font for Unread News */
     if (element instanceof INews) {
@@ -340,8 +382,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
    * @param columnIndex
    * @return Color
    */
-  protected Color getBackground(Object element, @SuppressWarnings("unused")
-  int columnIndex) {
+  protected Color getBackground(Object element, @SuppressWarnings("unused") int columnIndex) {
 
     /* Handle INews */
     if (element instanceof INews && ((INews) element).isFlagged())
@@ -359,8 +400,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
    * @param columnIndex
    * @return Color
    */
-  protected Color getForeground(Object element, @SuppressWarnings("unused")
-  int columnIndex) {
+  protected Color getForeground(Object element, @SuppressWarnings("unused") int columnIndex) {
 
     /* Handle EntityGroup */
     if (element instanceof EntityGroup)
@@ -368,7 +408,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
     /* Handle INews */
     else if (element instanceof INews) {
-      Set<ILabel> labels = CoreUtils.getSortedLabels((INews)element);
+      Set<ILabel> labels = CoreUtils.getSortedLabels((INews) element);
       if (!labels.isEmpty())
         return OwlUI.getColor(fResources, labels.iterator().next());
     }
@@ -465,8 +505,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     return label.getColor().equals(LABEL_COLOR_BLACK) || label.getColor().equals(LABEL_COLOR_WHITE);
   }
 
-  private void eraseGroup(Event event, @SuppressWarnings("unused")
-  EntityGroup group) {
+  private void eraseGroup(Event event, @SuppressWarnings("unused") EntityGroup group) {
     Scrollable scrollable = (Scrollable) event.widget;
     GC gc = event.gc;
 

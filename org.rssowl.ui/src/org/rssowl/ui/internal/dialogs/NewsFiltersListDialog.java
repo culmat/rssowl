@@ -202,7 +202,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     TableColumn nameCol = new TableColumn(fViewer.getTable(), SWT.NONE);
 
     CColumnLayoutData data = new CColumnLayoutData(Size.FILL, 100);
-    cTable.manageColumn(nameCol, data, "Name", null, false, false);
+    cTable.manageColumn(nameCol, data, "Name", null, null, false, false);
 
     /* ContentProvider returns all filters */
     fViewer.setContentProvider(new IStructuredContentProvider() {

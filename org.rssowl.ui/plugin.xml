@@ -483,7 +483,7 @@
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Feeds"
-            label="update reload display startup start-up auto automatic clean clean-up retention delete age maximum">
+            label="update reload display startup start-up auto automatic clean clean-up retention delete age maximum columns sort order">
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.ManageLabels"
@@ -1305,11 +1305,30 @@
          </targetEntity>
       </entityPropertyPage>
       <entityPropertyPage
+            class="org.rssowl.ui.internal.dialogs.properties.ColumnsPropertyPage"
+            handlesMultipleEntities="true"
+            id="org.rssowl.ui.internal.dialogs.properties.ColumnsPropertyPage"
+            name="Columns"
+            order="3">
+         <targetEntity
+               class="org.rssowl.core.persist.IFolder">
+         </targetEntity>
+         <targetEntity
+               class="org.rssowl.core.persist.IBookMark">
+         </targetEntity>
+         <targetEntity
+               class="org.rssowl.core.persist.ISearchMark">
+         </targetEntity>
+         <targetEntity
+               class="org.rssowl.core.persist.INewsBin">
+         </targetEntity>
+      </entityPropertyPage>
+      <entityPropertyPage
             class="org.rssowl.ui.internal.dialogs.properties.RetentionPropertyPage"
             handlesMultipleEntities="true"
             id="org.rssowl.ui.internal.dialogs.properties.RetentionPropertyPage"
             name="Clean Up"
-            order="3">
+            order="4">
          <targetEntity
                class="org.rssowl.core.persist.IFolder">
          </targetEntity>

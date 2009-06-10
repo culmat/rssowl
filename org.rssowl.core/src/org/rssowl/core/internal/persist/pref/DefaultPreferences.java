@@ -95,6 +95,15 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Retention Policy: Never Delete Unread News (boolean) */
   public static final String NEVER_DEL_UNREAD_NEWS_STATE = "org.rssowl.pref.NeverDelUnreadNewsState";
 
+  /** BookMarks: Visible Columns */
+  public static final String BM_NEWS_COLUMNS = "org.rssowl.pref.BMNewsColumns";
+
+  /** BookMarks: Sorted Column */
+  public static final String BM_NEWS_SORT_COLUMN = "org.rssowl.pref.BMNewsSortColumn";
+
+  /** BookMarks: Ascended / Descended Sorting */
+  public static final String BM_NEWS_SORT_ASCENDING = "org.rssowl.pref.BMNewsSortAscending";
+
   /** BookMarks: Auto-Update Interval (integer) */
   public static final String BM_UPDATE_INTERVAL = "org.rssowl.pref.BMUpdateInterval";
 
@@ -242,6 +251,15 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Search Dialog: State of showing Preview */
   public static final String SEARCH_DIALOG_PREVIEW_VISIBLE = "org.rssowl.pref.SearchDialogPreviewVisible";
 
+  /** Global: Visible Columns in Search Dialog */
+  public static final String SEARCH_DIALOG_NEWS_COLUMNS = "org.rssowl.pref.SearchDialogNewsColumns";
+
+  /** Global: Sorted Column in Search Dialog */
+  public static final String SEARCH_DIALOG_NEWS_SORT_COLUMN = "org.rssowl.pref.SearchDialogNewsSortColumn";
+
+  /** Global: Ascended / Descended Sorting in Search Dialog */
+  public static final String SEARCH_DIALOG_NEWS_SORT_ASCENDING = "org.rssowl.pref.SearchDialogNewsSortAscending";
+
   /** Global: Show Toolbar */
   public static final String SHOW_TOOLBAR = "org.rssowl.pref.ShowToolbar";
 
@@ -298,6 +316,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
     /* Default Eclipse Globals */
     initGlobalEclipseDefaults(defaultScope);
 
+    /* Default News Column Settings */
+    initNewsColumnsDefaults(defaultScope);
+
     /* Default Retention Policy */
     initRetentionDefaults(defaultScope);
 
@@ -338,6 +359,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putBoolean(SHOW_TOOLBAR, true);
     defaultScope.putBoolean(SHOW_STATUS, true);
     defaultScope.putBoolean(BM_LOAD_TITLE_FROM_FEED, true);
+    defaultScope.putIntegers(SEARCH_DIALOG_NEWS_COLUMNS, new int[] { 9, 0, 8, 1, 2, 3, 6 }); //TODO Must be in sync with NewsColumn enum
+    defaultScope.putInteger(SEARCH_DIALOG_NEWS_SORT_COLUMN, 9); //TODO Must be in sync with NewsColumn enum
+    defaultScope.putBoolean(SEARCH_DIALOG_NEWS_SORT_ASCENDING, false);
   }
 
   private void initGlobalEclipseDefaults(IPreferenceScope defaultScope) {
@@ -376,6 +400,12 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putLong(BM_UPDATE_INTERVAL, 60 * 30); // 30 Minutes
     defaultScope.putBoolean(BM_OPEN_ON_STARTUP, false);
     defaultScope.putBoolean(BM_RELOAD_ON_STARTUP, false);
+  }
+
+  private void initNewsColumnsDefaults(IPreferenceScope defaultScope) {
+    defaultScope.putIntegers(BM_NEWS_COLUMNS, new int[] { 0, 1, 2, 3, 6 }); //TODO Must be in sync with NewsColumn enum
+    defaultScope.putInteger(BM_NEWS_SORT_COLUMN, 1); //TODO Must be in sync with NewsColumn enum
+    defaultScope.putBoolean(BM_NEWS_SORT_ASCENDING, false);
   }
 
   private void initBookMarkExplorerDefaults(IPreferenceScope defaultScope) {

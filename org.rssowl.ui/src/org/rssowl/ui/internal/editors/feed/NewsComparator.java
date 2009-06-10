@@ -27,14 +27,17 @@ package org.rssowl.ui.internal.editors.feed;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.rssowl.core.persist.ICategory;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
 
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Sorts the elements of the feed view based on the choices provided by the
@@ -44,7 +47,7 @@ import java.util.List;
  * @author bpasero
  */
 public class NewsComparator extends ViewerComparator implements Comparator<INews> {
-  private NewsTableControl.Columns fSortBy;
+  private NewsColumn fSortBy;
   private boolean fAscending;
 
   /**
@@ -64,14 +67,14 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
   /**
    * @return Returns the sortBy.
    */
-  public NewsTableControl.Columns getSortBy() {
+  public NewsColumn getSortBy() {
     return fSortBy;
   }
 
   /**
    * @param sortBy The sortBy to set.
    */
-  public void setSortBy(NewsTableControl.Columns sortBy) {
+  public void setSortBy(NewsColumn sortBy) {
     fSortBy = sortBy;
   }
 
@@ -96,29 +99,52 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
   public int compare(INews news1, INews news2) {
     int result = 0;
 
-    /* Sort by Date */
-    if (fSortBy == NewsTableControl.Columns.DATE)
-      return compareByDate(news1, news2, false);
+    switch (fSortBy) {
 
-    /* Sort by Title */
-    else if (fSortBy == NewsTableControl.Columns.TITLE)
-      result = compareByTitle(CoreUtils.getHeadline(news1), CoreUtils.getHeadline(news2));
+      /* Sort by Date */
+      case DATE:
+        return compareByDate(news1, news2, false);
 
-    /* Sort by Author */
-    else if (fSortBy == NewsTableControl.Columns.AUTHOR)
-      result = compareByAuthor(news1.getAuthor(), news2.getAuthor());
+        /* Sort by Title */
+      case TITLE:
+        result = compareByTitle(CoreUtils.getHeadline(news1), CoreUtils.getHeadline(news2));
+        break;
 
-    /* Sort by Category */
-    else if (fSortBy == NewsTableControl.Columns.CATEGORY)
-      result = compareByCategory(news1.getCategories(), news2.getCategories());
+      /* Sort by Author */
+      case AUTHOR:
+        result = compareByAuthor(news1.getAuthor(), news2.getAuthor());
+        break;
 
-    /* Sort by Stickyness */
-    else if (fSortBy == NewsTableControl.Columns.STICKY)
-      result = compareByStickyness(news1.isFlagged(), news2.isFlagged());
+      /* Sort by Category */
+      case CATEGORY:
+        result = compareByCategory(news1.getCategories(), news2.getCategories());
+        break;
 
-    /* Sort by Feed */
-    else if (fSortBy == NewsTableControl.Columns.FEED)
-      result = compareByFeed(news1.getFeedLinkAsText(), news2.getFeedLinkAsText());
+      /* Sort by Stickyness */
+      case STICKY:
+        result = compareByStickyness(news1.isFlagged(), news2.isFlagged());
+        break;
+
+      /* Sort by Feed */
+      case FEED:
+        result = compareByFeed(news1.getFeedLinkAsText(), news2.getFeedLinkAsText());
+        break;
+
+      /* Sort by "Has Attachments" */
+      case ATTACHMENTS:
+        result = compareByHasAttachments(!news1.getAttachments().isEmpty(), !news2.getAttachments().isEmpty());
+        break;
+
+      /* Sort by Labels */
+      case LABELS:
+        result = compareByLabels(CoreUtils.getSortedLabels(news1), CoreUtils.getSortedLabels(news2));
+        break;
+
+      /* Sort by Status */
+      case STATUS:
+        result = compareByStatus(news1.getState(), news2.getState());
+        break;
+    }
 
     /* Fall Back to default sort if result is 0 */
     if (result == 0)
@@ -151,6 +177,57 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
 
     /* Respect ascending / descending Order */
     return fAscending ? result : result * -1;
+  }
+
+  private int compareByStatus(INews.State s1, INews.State s2) {
+    int result = 0;
+
+    if (s1 != s2) {
+      if (s1 == State.NEW)
+        result = -1;
+      else if (s2 == State.NEW)
+        result = 1;
+      else if (s1 == State.UPDATED)
+        result = -1;
+      else if (s2 == State.UPDATED)
+        result = 1;
+      else if (s1 == State.UNREAD)
+        result = -1;
+      else if (s2 == State.UNREAD)
+        result = 1;
+      else
+        result = s1.compareTo(s2);
+    }
+
+    /* Respect ascending / descending Order */
+    return fAscending ? result : result * -1;
+  }
+
+  private int compareByHasAttachments(boolean hasAttachments1, boolean hasAttachments2) {
+    int result = 0;
+
+    if (hasAttachments1 && !hasAttachments2)
+      result = 1;
+
+    else if (!hasAttachments1 && hasAttachments2)
+      result = -1;
+
+    /* Respect ascending / descending Order */
+    return fAscending ? result : result * -1;
+  }
+
+  private int compareByLabels(Set<ILabel> labels1, Set<ILabel> labels2) {
+    int result = compareByString(toString(labels1), toString(labels2));
+
+    /* Respect ascending / descending Order */
+    return fAscending ? result : result * -1;
+  }
+
+  private String toString(Set<ILabel> labels) {
+    if (!labels.isEmpty())
+      return labels.iterator().next().getName();
+
+    return "";
   }
 
   private int compareByAuthor(IPerson author1, IPerson author2) {
