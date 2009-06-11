@@ -457,10 +457,8 @@ public class FilterBar {
         restoreDefaults.addSelectionListener(new SelectionAdapter() {
           @Override
           public void widgetSelected(SelectionEvent e) {
-            NewsColumnViewModel model = getColumnModel();
             NewsColumnViewModel defaultModel = NewsColumnViewModel.createDefault(false);
-            if (!defaultModel.equals(model))
-              onColumnsChange(defaultModel);
+            onColumnsChange(defaultModel);
           }
         });
 
