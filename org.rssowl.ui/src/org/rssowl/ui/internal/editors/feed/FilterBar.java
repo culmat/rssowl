@@ -63,11 +63,13 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.SearchSpecifier;
+import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.SearchMarkDialog;
 import org.rssowl.ui.internal.editors.feed.NewsFilter.Type;
@@ -581,8 +583,13 @@ public class FilterBar {
 
     /* Save only into Entity if the Entity was configured with Column Settings before */
     IPreferenceScope entityPrefs = Owl.getPreferenceService().getEntityScope(input.getMark());
-    if (entityPrefs.hasKey(DefaultPreferences.BM_NEWS_COLUMNS) || entityPrefs.hasKey(DefaultPreferences.BM_NEWS_SORT_COLUMN) || entityPrefs.hasKey(DefaultPreferences.BM_NEWS_SORT_ASCENDING))
+    if (entityPrefs.hasKey(DefaultPreferences.BM_NEWS_COLUMNS) || entityPrefs.hasKey(DefaultPreferences.BM_NEWS_SORT_COLUMN) || entityPrefs.hasKey(DefaultPreferences.BM_NEWS_SORT_ASCENDING)) {
       newModel.saveTo(entityPrefs);
+      if (input.getMark() instanceof FolderNewsMark)
+        DynamicDAO.save(((FolderNewsMark) input.getMark()).getFolder());
+      else
+        DynamicDAO.save(input.getMark());
+    }
 
     /* Save Globally */
     else
