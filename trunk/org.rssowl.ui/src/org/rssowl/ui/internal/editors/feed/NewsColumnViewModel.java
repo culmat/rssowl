@@ -272,6 +272,15 @@ public class NewsColumnViewModel {
 
   /**
    * @param preferences the preferences to save the news column model into.
+   * @return <code>true</code> in case the settings have changed and
+   * <code>false</code> otherwise.
+   */
+  public boolean saveTo(IPreferenceScope preferences) {
+    return saveTo(preferences, false);
+  }
+
+  /**
+   * @param preferences the preferences to save the news column model into.
    * @param isSearch set to <code>true</code> if column model is for search
    * results, <code>false</code> otherwise.
    * @return <code>true</code> in case the settings have changed and
