@@ -155,6 +155,7 @@ public class FilterBar {
     /* Filter */
     fFirstToolBarManager = new ToolBarManager(SWT.FLAT | SWT.RIGHT);
     createFilterBar();
+    createGrouperBar();
     fFirstToolBarManager.createControl(container);
     fFirstToolBarManager.getControl().setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
 
@@ -164,9 +165,6 @@ public class FilterBar {
     ((GridData) sep.getLayoutData()).heightHint = 18;
 
     fSecondToolBarManager = new ToolBarManager(SWT.FLAT);
-
-    /* Group By */
-    createGrouperBar();
 
     /* Toggle Layout */
     createLayoutBar();
@@ -728,6 +726,11 @@ public class FilterBar {
 
         return OwlUI.getImageDescriptor("icons/etool16/group_active.gif"); //$NON-NLS-1$
       }
+
+      @Override
+      public String getText() {
+        return grouping.getType().getName();
+      }
     };
 
     newsGroup.setId(GROUP_ACTION);
@@ -885,12 +888,15 @@ public class FilterBar {
       }
     });
 
-    fSecondToolBarManager.add(newsGroup);
+    ActionContributionItem item = new ActionContributionItem(newsGroup);
+    item.setMode(ActionContributionItem.MODE_FORCE_TEXT);
+
+    fFirstToolBarManager.add(item);
   }
 
   void doGrouping(final NewsGrouping.Type type, boolean refresh, boolean saveSettings) {
     fFeedView.getGrouper().setType(type);
-    fSecondToolBarManager.find(GROUP_ACTION).update(IAction.IMAGE);
+    fFirstToolBarManager.find(GROUP_ACTION).update();
 
     /* Refresh if set */
     if (refresh) {
