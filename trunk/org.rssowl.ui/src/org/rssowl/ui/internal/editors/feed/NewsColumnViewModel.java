@@ -57,6 +57,17 @@ public class NewsColumnViewModel {
   private NewsColumnViewModel() {}
 
   /**
+   * Copy constructor for the model.
+   *
+   * @param copyFrom the model to copy from.
+   */
+  public NewsColumnViewModel(NewsColumnViewModel copyFrom) {
+    fColumns.addAll(copyFrom.getColumns());
+    fSortColumn= copyFrom.getSortColumn();
+    fAscending = copyFrom.isAscending();
+  }
+
+  /**
    * @return a default {@link NewsColumnViewModel} initialized from the default
    * scope of preferences.
    */
