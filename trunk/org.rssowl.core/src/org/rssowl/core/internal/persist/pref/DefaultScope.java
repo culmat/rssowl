@@ -33,7 +33,7 @@ import java.util.Properties;
  * Property-List of Preferences. These are entirely held in Memory and never
  * stored persistently. The <code>DefaultScope</code> can be used to store
  * initial preferences.
- * 
+ *
  * @author bpasero
  */
 public class DefaultScope implements IPreferenceScope {
@@ -64,6 +64,13 @@ public class DefaultScope implements IPreferenceScope {
    */
   public void delete(String key) {
     fDefaults.remove(key);
+  }
+
+  /*
+   * @see org.rssowl.core.persist.pref.IPreferenceScope#hasKey(java.lang.String)
+   */
+  public boolean hasKey(String key) {
+    return fDefaults.containsKey(key);
   }
 
   /*

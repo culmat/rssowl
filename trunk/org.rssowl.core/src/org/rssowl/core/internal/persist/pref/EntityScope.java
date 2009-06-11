@@ -73,6 +73,13 @@ public class EntityScope implements IPreferenceScope {
   }
 
   /*
+   * @see org.rssowl.core.persist.pref.IPreferenceScope#hasKey(java.lang.String)
+   */
+  public boolean hasKey(String key) {
+    return fEntity.getProperty(key) != null;
+  }
+
+  /*
    * @see org.rssowl.core.model.preferences.IPreferencesNode#getBoolean(java.lang.String)
    */
   public boolean getBoolean(String key) {
