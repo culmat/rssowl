@@ -259,7 +259,7 @@ public class NewsColumnViewModel {
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, OwlUI.getDateWidth());
 
       case ATTACHMENTS:
-        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 18);
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, Application.IS_LINUX ? 20 : 18);
 
       case FEED:
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, Application.IS_LINUX ? 20 : 18);
@@ -268,10 +268,10 @@ public class NewsColumnViewModel {
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 24);
 
       case STICKY:
-        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 18);
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, Application.IS_LINUX ? 20 : 18);
 
       case STATUS:
-        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 70);
+        return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, OwlUI.getStateWidth());
 
       case LOCATION:
         return new CColumnLayoutData(CColumnLayoutData.Size.FIXED, 150);
