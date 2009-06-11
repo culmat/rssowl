@@ -194,7 +194,7 @@ public class ColumnsPropertyPage implements IEntityPropertyPage {
 
     /* Save if changed */
     if (changed)
-      model.saveTo(scope, false);
+      model.saveTo(scope);
 
     return changed;
   }

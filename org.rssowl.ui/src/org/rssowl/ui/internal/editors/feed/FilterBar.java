@@ -97,6 +97,9 @@ public class FilterBar {
   /* Toggle vertical/horizontal Layout */
   private static final String TOGGLE_LAYOUT_ACTION = "org.rssowl.ui.internal.editors.feed.ToggleLayoutAction";
 
+  /* Columns */
+  private static final String COLUMNS_ACTION = "org.rssowl.ui.internal.editors.feed.ColumnsAction";
+
   /* Maximize Browser */
   private static final String TOGGLE_MAXIMIZED_ACTION = "org.rssowl.ui.internal.editors.feed.ToggleMaximizedAction";
 
@@ -417,10 +420,91 @@ public class FilterBar {
 
   /* Layout */
   private void createLayoutBar() {
+    final ImageDescriptor columnsImgDisabled = OwlUI.getImageDescriptor("icons/dtool16/columns.gif");
+
+    /* Set Columns */
+    IAction columnDropdown = new Action("Visible Columns", IAction.AS_DROP_DOWN_MENU) {
+      @Override
+      public void run() {
+        getMenuCreator().getMenu(fSecondToolBarManager.getControl()).setVisible(true);
+      }
+
+      @Override
+      public ImageDescriptor getImageDescriptor() {
+        return OwlUI.COLUMNS;
+      }
+
+      @Override
+      public ImageDescriptor getDisabledImageDescriptor() {
+        return columnsImgDisabled;
+      }
+
+      @Override
+      public boolean isEnabled() {
+        return !fMaximized;
+      }
+    };
+    columnDropdown.setId(COLUMNS_ACTION);
+
+    columnDropdown.setMenuCreator(new IMenuCreator() {
+      public Menu getMenu(Control parent) {
+        Menu menu = new Menu(parent);
+
+        MenuItem restoreDefaults = new MenuItem(menu, SWT.None);
+        restoreDefaults.setText("&Restore Default Columns");
+        restoreDefaults.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            NewsColumnViewModel model = getColumnModel();
+            NewsColumnViewModel defaultModel = NewsColumnViewModel.createDefault(false);
+            if (!defaultModel.equals(model))
+              onColumnsChange(defaultModel);
+          }
+        });
+
+        new MenuItem(menu, SWT.SEPARATOR);
+
+        NewsColumn[] columns = NewsColumn.values();
+        for (final NewsColumn column : columns) {
+          if (column.isSelectable()) {
+            final NewsColumnViewModel model = getColumnModel();
+
+            MenuItem item = new MenuItem(menu, SWT.CHECK);
+            item.setText(column.getName());
+            if (model.contains(column))
+              item.setSelection(true);
+
+            item.addSelectionListener(new SelectionAdapter() {
+              @Override
+              public void widgetSelected(SelectionEvent e) {
+                if (model.contains(column))
+                  model.removeColumn(column);
+                else
+                  model.addColumn(column);
+
+                onColumnsChange(model);
+              }
+            });
+          }
+        }
+
+        return menu;
+      }
+
+      public Menu getMenu(Menu parent) {
+        return null;
+      }
+
+      public void dispose() {}
+    });
+
+    fSecondToolBarManager.add(columnDropdown);
 
     /* Toggle Layout */
     final ImageDescriptor horizontalImg = OwlUI.getImageDescriptor("icons/etool16/horizontal.gif");
+    final ImageDescriptor horizontalImgDisabled = OwlUI.getImageDescriptor("icons/dtool16/horizontal.gif");
     final ImageDescriptor verticalImg = OwlUI.getImageDescriptor("icons/etool16/vertical.gif");
+    final ImageDescriptor verticalImgDisabled = OwlUI.getImageDescriptor("icons/dtool16/vertical.gif");
 
     /* Toggle Layout */
     IAction toggleLayout = new Action("Toggle Layout", IAction.AS_PUSH_BUTTON) {
@@ -438,8 +522,19 @@ public class FilterBar {
           return horizontalImg;
         return verticalImg;
       }
+
+      @Override
+      public ImageDescriptor getDisabledImageDescriptor() {
+        if (fLayoutVertical)
+          return horizontalImgDisabled;
+        return verticalImgDisabled;
+      }
+
+      @Override
+      public boolean isEnabled() {
+        return !fMaximized;
+      }
     };
-    toggleLayout.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/vertical.gif"));
     toggleLayout.setId(TOGGLE_LAYOUT_ACTION);
     fSecondToolBarManager.add(toggleLayout);
 
@@ -453,6 +548,8 @@ public class FilterBar {
         fFeedView.toggleNewsViewMaximized();
         fMaximized = !fMaximized;
         fSecondToolBarManager.find(TOGGLE_MAXIMIZED_ACTION).update(IAction.TOOL_TIP_TEXT);
+        fSecondToolBarManager.find(TOGGLE_LAYOUT_ACTION).update();
+        fSecondToolBarManager.find(COLUMNS_ACTION).update();
       }
 
       @Override
@@ -472,6 +569,27 @@ public class FilterBar {
     toggleMaximized.setChecked(fMaximized);
 
     fSecondToolBarManager.add(toggleMaximized);
+  }
+
+  private NewsColumnViewModel getColumnModel() {
+    FeedViewInput input = ((FeedViewInput) fFeedView.getEditorInput());
+    return NewsColumnViewModel.loadFrom(Owl.getPreferenceService().getEntityScope(input.getMark()));
+  }
+
+  private void onColumnsChange(NewsColumnViewModel newModel) {
+    FeedViewInput input = ((FeedViewInput) fFeedView.getEditorInput());
+
+    /* Save only into Entity if the Entity was configured with Column Settings before */
+    IPreferenceScope entityPrefs = Owl.getPreferenceService().getEntityScope(input.getMark());
+    if (entityPrefs.hasKey(DefaultPreferences.BM_NEWS_COLUMNS) || entityPrefs.hasKey(DefaultPreferences.BM_NEWS_SORT_COLUMN) || entityPrefs.hasKey(DefaultPreferences.BM_NEWS_SORT_ASCENDING))
+      newModel.saveTo(entityPrefs);
+
+    /* Save Globally */
+    else
+      newModel.saveTo(fGlobalPreferences);
+
+    /* Update Columns of visible Feedview */
+    fFeedView.updateColumns();
   }
 
   /* News Filter */
