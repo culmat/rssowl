@@ -77,6 +77,13 @@ public class EclipseScope implements IPreferenceScope {
   }
 
   /*
+   * @see org.rssowl.core.persist.pref.IPreferenceScope#hasKey(java.lang.String)
+   */
+  public boolean hasKey(String key) {
+    throw new UnsupportedOperationException();
+  }
+
+  /*
    * @see org.rssowl.core.persist.pref.IPreferenceScope#delete(java.lang.String)
    */
   public void delete(String key) {

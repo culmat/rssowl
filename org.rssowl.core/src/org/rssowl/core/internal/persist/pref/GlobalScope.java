@@ -106,6 +106,13 @@ public class GlobalScope implements IPreferenceScope {
   }
 
   /*
+   * @see org.rssowl.core.persist.pref.IPreferenceScope#hasKey(java.lang.String)
+   */
+  public boolean hasKey(String key) {
+    throw new UnsupportedOperationException();
+  }
+
+  /*
    * @see org.rssowl.core.model.preferences.IPreferencesNode#getBoolean(java.lang.String)
    */
   public boolean getBoolean(String key) {
