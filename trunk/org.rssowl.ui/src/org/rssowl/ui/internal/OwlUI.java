@@ -254,6 +254,9 @@ public class OwlUI {
   /* Workaround for unknown Date Width */
   private static int DATE_WIDTH = -1;
 
+  /* Workaround for unknown State Width */
+  private static int STATE_WIDTH = -1;
+
   /** An enumeration of Operating System Themes */
   enum OSTheme {
 
@@ -1422,9 +1425,27 @@ public class OwlUI {
     cal.set(2006, Calendar.DECEMBER, 12, 12, 12, 12);
     String sampleDate = dF.format(cal.getTime());
 
-    DATE_WIDTH = OwlUI.getTextSize(Display.getDefault(), OwlUI.getBold(JFaceResources.DEFAULT_FONT), sampleDate).x;
-    DATE_WIDTH += 30; // Bounds of TableColumn requires more space
+    DATE_WIDTH = OwlUI.getTextSize(Display.getDefault(), OwlUI.getBold(HEADLINES_FONT_ID), sampleDate).x;
+    DATE_WIDTH += 30; // Bounds of Column requires more space
 
     return DATE_WIDTH;
+  }
+
+  /**
+   * @return the width for displaying a state.
+   */
+  public static int getStateWidth() {
+
+    /* Check if Cached already */
+    if (STATE_WIDTH > 0)
+      return STATE_WIDTH;
+
+    /* Calculate and Cache */
+    String sampleState = "Updated";
+
+    STATE_WIDTH = OwlUI.getTextSize(Display.getDefault(), OwlUI.getBold(HEADLINES_FONT_ID), sampleState).x;
+    STATE_WIDTH += 30; // Bounds of Column requires more space
+
+    return STATE_WIDTH;
   }
 }
