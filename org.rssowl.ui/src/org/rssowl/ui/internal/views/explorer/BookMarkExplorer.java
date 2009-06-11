@@ -1067,7 +1067,7 @@ public class BookMarkExplorer extends ViewPart {
     manager.add(newMenu);
 
     /* New BookMark */
-    newMenu.add(new Action("Bookmark...") {
+    Action newBookmarkAction = new Action("Bookmark...") {
       @Override
       public void run() {
         IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
@@ -1080,10 +1080,13 @@ public class BookMarkExplorer extends ViewPart {
       public ImageDescriptor getImageDescriptor() {
         return OwlUI.BOOKMARK;
       }
-    });
+    };
+    newBookmarkAction.setId("org.rssowl.ui.actions.NewBookMark");
+    newBookmarkAction.setActionDefinitionId("org.rssowl.ui.actions.NewBookMark");
+    newMenu.add(newBookmarkAction);
 
     /* New NewsBin */
-    newMenu.add(new Action("News Bin...") {
+    Action newNewsBinAction = new Action("News Bin...") {
       @Override
       public void run() {
         IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
@@ -1096,10 +1099,13 @@ public class BookMarkExplorer extends ViewPart {
       public ImageDescriptor getImageDescriptor() {
         return OwlUI.NEWSBIN;
       }
-    });
+    };
+    newNewsBinAction.setId("org.rssowl.ui.actions.NewNewsBin");
+    newNewsBinAction.setActionDefinitionId("org.rssowl.ui.actions.NewNewsBin");
+    newMenu.add(newNewsBinAction);
 
     /* New Saved Search */
-    newMenu.add(new Action("Saved Search...") {
+    Action newSavedSearchAction = new Action("Saved Search...") {
       @Override
       public void run() {
         IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
@@ -1112,11 +1118,14 @@ public class BookMarkExplorer extends ViewPart {
       public ImageDescriptor getImageDescriptor() {
         return OwlUI.SEARCHMARK;
       }
-    });
+    };
+    newSavedSearchAction.setId("org.rssowl.ui.actions.NewSearchMark");
+    newSavedSearchAction.setActionDefinitionId("org.rssowl.ui.actions.NewSearchMark");
+    newMenu.add(newSavedSearchAction);
 
     /* New Folder */
     newMenu.add(new Separator());
-    newMenu.add(new Action("Folder...") {
+    Action newFolderAction = new Action("Folder...") {
       @Override
       public void run() {
         IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
@@ -1129,7 +1138,10 @@ public class BookMarkExplorer extends ViewPart {
       public ImageDescriptor getImageDescriptor() {
         return OwlUI.FOLDER;
       }
-    });
+    };
+    newFolderAction.setId("org.rssowl.ui.actions.NewFolder");
+    newFolderAction.setActionDefinitionId("org.rssowl.ui.actions.NewFolder");
+    newMenu.add(newFolderAction);
 
     manager.add(new GroupMarker(IWorkbenchActionConstants.NEW_EXT));
 
