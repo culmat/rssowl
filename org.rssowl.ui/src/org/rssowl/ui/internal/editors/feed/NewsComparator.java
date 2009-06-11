@@ -268,17 +268,18 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
   }
 
   private int compareByLabels(Set<ILabel> labels1, Set<ILabel> labels2) {
-    int result = compareByString(toString(labels1), toString(labels2));
+    if (labels1.isEmpty())
+      return fAscending ? 1 : -1;
+    else if (labels2.isEmpty())
+      return fAscending ? -1 : 1;
+
+    ILabel label1 = labels1.iterator().next();
+    ILabel label2 = labels2.iterator().next();
+
+    int result = label1.getOrder() < label2.getOrder() ? -1 : 1;
 
     /* Respect ascending / descending Order */
     return fAscending ? result : result * -1;
-  }
-
-  private String toString(Set<ILabel> labels) {
-    if (!labels.isEmpty())
-      return labels.iterator().next().getName();
-
-    return "";
   }
 
   private int compareByAuthor(IPerson author1, IPerson author2) {
