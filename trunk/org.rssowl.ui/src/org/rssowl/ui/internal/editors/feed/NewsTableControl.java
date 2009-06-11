@@ -83,6 +83,7 @@ import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
@@ -120,6 +121,7 @@ import org.rssowl.ui.internal.util.JobTracker;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -209,6 +211,7 @@ public class NewsTableControl implements IFeedViewPart {
   private ISelectionChangedListener fSelectionChangeListener;
   private IPropertyChangeListener fPropertyChangeListener;
   private CTree fCustomTree;
+  private int[] fOldColumnOrder;
   private LocalResourceManager fResources;
   private NewsComparator fNewsSorter;
   private Cursor fHandCursor;
@@ -219,6 +222,7 @@ public class NewsTableControl implements IFeedViewPart {
   private final INewsDAO fNewsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
   private NewsColumnViewModel fColumnModel;
   private FeedViewInput fEditorInput;
+  private boolean fBlockColumMoveEvent;
 
   /* Settings */
   private IPreferenceScope fGlobalPreferences;
@@ -417,7 +421,12 @@ public class NewsTableControl implements IFeedViewPart {
       return;
 
     /* Dispose Old */
-    fCustomTree.clear();
+    fBlockColumMoveEvent = true;
+    try {
+      fCustomTree.clear();
+    } finally {
+      fBlockColumMoveEvent = false;
+    }
 
     /* Keep as current */
     fColumnModel = newModel;
@@ -438,32 +447,8 @@ public class NewsTableControl implements IFeedViewPart {
       }
     }
 
-    /* Enable Sorting adding listeners to Columns */
-    TreeColumn[] columns = fCustomTree.getControl().getColumns();
-    for (final TreeColumn column : columns) {
-      column.addSelectionListener(new SelectionAdapter() {
-        @Override
-        public void widgetSelected(SelectionEvent e) {
-          NewsColumn oldSortBy = fNewsSorter.getSortBy();
-          NewsColumn newSortBy = (NewsColumn) column.getData(NewsColumnViewModel.COL_ID);
-          boolean defaultAscending = newSortBy.prefersAscending();
-          boolean ascending = (oldSortBy != newSortBy) ? defaultAscending : !fNewsSorter.isAscending();
-
-          fNewsSorter.setSortBy(newSortBy);
-          fNewsSorter.setAscending(ascending);
-
-          /* Indicate Sort-Column in UI for Columns that have a certain width */
-          if (newSortBy.showSortIndicator()) {
-            fCustomTree.getControl().setSortColumn(column);
-            fCustomTree.getControl().setSortDirection(ascending ? SWT.UP : SWT.DOWN);
-          } else {
-            fCustomTree.getControl().setSortColumn(null);
-          }
-
-          fViewer.refresh(false);
-        }
-      });
-    }
+    /* Remember Column Order */
+    fOldColumnOrder = fCustomTree.getControl().getColumnOrder();
 
     /* Update Tree */
     if (update)
@@ -480,6 +465,68 @@ public class NewsTableControl implements IFeedViewPart {
     /* Refresh if necessary */
     if (refresh)
       fViewer.refresh(true);
+
+    /* Enable Sorting adding listeners to Columns */
+    TreeColumn[] columns = fCustomTree.getControl().getColumns();
+    for (final TreeColumn column : columns) {
+      column.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          NewsColumn oldSortBy = fNewsSorter.getSortBy();
+          NewsColumn newSortBy = (NewsColumn) column.getData(NewsColumnViewModel.COL_ID);
+          boolean defaultAscending = newSortBy.prefersAscending();
+          boolean ascending = (oldSortBy != newSortBy) ? defaultAscending : !fNewsSorter.isAscending();
+
+          /* Update Model */
+          fColumnModel.setSortColumn(newSortBy);
+          fColumnModel.setAscending(ascending);
+
+          /* Update Sorter */
+          fNewsSorter.setSortBy(newSortBy);
+          fNewsSorter.setAscending(ascending);
+
+          /* Indicate Sort-Column in UI for Columns that have a certain width */
+          if (newSortBy.showSortIndicator()) {
+            fCustomTree.getControl().setSortColumn(column);
+            fCustomTree.getControl().setSortDirection(ascending ? SWT.UP : SWT.DOWN);
+          } else {
+            fCustomTree.getControl().setSortColumn(null);
+          }
+
+          /* Refresh UI */
+          fViewer.refresh(false);
+
+          /* Save Column Model in Background */
+          saveColumnModelInBackground();
+        }
+      });
+
+      /* Listen to moved columns */
+      column.addListener(SWT.Move, new Listener() {
+        public void handleEvent(Event event) {
+          if (fCustomTree.getControl().isDisposed() || fBlockColumMoveEvent)
+            return;
+
+          int[] columnOrder = fCustomTree.getControl().getColumnOrder();
+          if (!Arrays.equals(fOldColumnOrder, columnOrder)) {
+
+            /* Remember Old */
+            fOldColumnOrder = columnOrder;
+
+            /* Create Column Model from Control */
+            NewsColumnViewModel currentModel = NewsColumnViewModel.initializeFrom(fCustomTree.getControl());
+            currentModel.setSortColumn(fNewsSorter.getSortBy());
+            currentModel.setAscending(fNewsSorter.isAscending());
+
+            /* Save in case the model changed */
+            if (!currentModel.equals(fColumnModel)) {
+              fColumnModel = currentModel;
+              saveColumnModelInBackground();
+            }
+          }
+        }
+      });
+    }
   }
 
   private void registerListeners() {
@@ -966,5 +1013,31 @@ public class NewsTableControl implements IFeedViewPart {
       return false;
 
     return item.getImageBounds(index).contains(p);
+  }
+
+  private void saveColumnModelInBackground() {
+    final IPreferenceScope[] scope = new IPreferenceScope[1];
+    final boolean[] saveMark = new boolean[] { false };
+    final INewsMark mark = fEditorInput.getMark();
+
+    IPreferenceScope entityPrefs = Owl.getPreferenceService().getEntityScope(mark);
+    if (entityPrefs.hasKey(DefaultPreferences.BM_NEWS_COLUMNS) || entityPrefs.hasKey(DefaultPreferences.BM_NEWS_SORT_COLUMN) || entityPrefs.hasKey(DefaultPreferences.BM_NEWS_SORT_ASCENDING)) {
+      scope[0] = entityPrefs; //Save to Entity
+      saveMark[0] = true;
+    } else
+      scope[0] = fGlobalPreferences; //Save Globally
+
+    final NewsColumnViewModel modelCopy = new NewsColumnViewModel(fColumnModel);
+    JobRunner.runInBackgroundThread(new Runnable() {
+      public void run() {
+        modelCopy.saveTo(scope[0]);
+        if (saveMark[0]) {
+          if (mark instanceof FolderNewsMark)
+            DynamicDAO.save(((FolderNewsMark) mark).getFolder());
+          else
+            DynamicDAO.save(mark);
+        }
+      }
+    });
   }
 }
