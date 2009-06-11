@@ -108,56 +108,58 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
   public int compare(INews news1, INews news2) {
     int result = 0;
 
-    switch (fSortBy) {
+    if (fSortBy != null) {
+      switch (fSortBy) {
 
-      /* Sort by Date */
-      case DATE:
-        return compareByDate(news1, news2, false);
+        /* Sort by Date */
+        case DATE:
+          return compareByDate(news1, news2, false);
 
-        /* Sort by Title */
-      case TITLE:
-        result = compareByTitle(CoreUtils.getHeadline(news1), CoreUtils.getHeadline(news2));
-        break;
+          /* Sort by Title */
+        case TITLE:
+          result = compareByTitle(CoreUtils.getHeadline(news1), CoreUtils.getHeadline(news2));
+          break;
 
-      /* Sort by Author */
-      case AUTHOR:
-        result = compareByAuthor(news1.getAuthor(), news2.getAuthor());
-        break;
+        /* Sort by Author */
+        case AUTHOR:
+          result = compareByAuthor(news1.getAuthor(), news2.getAuthor());
+          break;
 
-      /* Sort by Category */
-      case CATEGORY:
-        result = compareByCategory(news1.getCategories(), news2.getCategories());
-        break;
+        /* Sort by Category */
+        case CATEGORY:
+          result = compareByCategory(news1.getCategories(), news2.getCategories());
+          break;
 
-      /* Sort by Stickyness */
-      case STICKY:
-        result = compareByStickyness(news1.isFlagged(), news2.isFlagged());
-        break;
+        /* Sort by Stickyness */
+        case STICKY:
+          result = compareByStickyness(news1.isFlagged(), news2.isFlagged());
+          break;
 
-      /* Sort by Feed */
-      case FEED:
-        result = compareByFeed(news1.getFeedLinkAsText(), news2.getFeedLinkAsText());
-        break;
+        /* Sort by Feed */
+        case FEED:
+          result = compareByFeed(news1.getFeedLinkAsText(), news2.getFeedLinkAsText());
+          break;
 
-      /* Sort by "Has Attachments" */
-      case ATTACHMENTS:
-        result = compareByHasAttachments(!news1.getAttachments().isEmpty(), !news2.getAttachments().isEmpty());
-        break;
+        /* Sort by "Has Attachments" */
+        case ATTACHMENTS:
+          result = compareByHasAttachments(!news1.getAttachments().isEmpty(), !news2.getAttachments().isEmpty());
+          break;
 
-      /* Sort by Labels */
-      case LABELS:
-        result = compareByLabels(CoreUtils.getSortedLabels(news1), CoreUtils.getSortedLabels(news2));
-        break;
+        /* Sort by Labels */
+        case LABELS:
+          result = compareByLabels(CoreUtils.getSortedLabels(news1), CoreUtils.getSortedLabels(news2));
+          break;
 
-      /* Sort by Status */
-      case STATUS:
-        result = compareByStatus(news1.getState(), news2.getState());
-        break;
+        /* Sort by Status */
+        case STATUS:
+          result = compareByStatus(news1.getState(), news2.getState());
+          break;
 
-      /* Sort by Location */
-      case LOCATION:
-        result = compareByLocation(news1, news2);
-        break;
+        /* Sort by Location */
+        case LOCATION:
+          result = compareByLocation(news1, news2);
+          break;
+      }
     }
 
     /* Fall Back to default sort if result is 0 */
