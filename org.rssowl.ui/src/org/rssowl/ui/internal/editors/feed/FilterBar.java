@@ -57,6 +57,7 @@ import org.eclipse.ui.actions.ActionFactory;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
@@ -755,11 +756,16 @@ public class FilterBar {
     List<IFolderChild> searchScope = new ArrayList<IFolderChild>(1);
     searchScope.add(((FeedViewInput) fFeedView.getEditorInput()).getMark());
     ISearchField field = factory.createSearchField(INews.LOCATION, INews.class.getName());
-    conditions.add(factory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(searchScope)));
+    conditions.add(factory.createSearchCondition(field, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(searchScope)));
 
     /* Create Condition from Filter */
     Type filterType = fFeedView.getFilter().getType();
     switch (filterType) {
+      case SHOW_ALL:
+        field = factory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
+        conditions.add(factory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, ""));
+        break;
+
       case SHOW_NEW:
         field = factory.createSearchField(INews.STATE, INews.class.getName());
         conditions.add(factory.createSearchCondition(field, SearchSpecifier.IS, EnumSet.of(INews.State.NEW)));
