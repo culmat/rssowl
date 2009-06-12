@@ -79,7 +79,7 @@ public class NewsGrouping {
   public enum Type {
 
     /** Grouping is Disabled */
-    NO_GROUPING("No Grouping"),
+    NO_GROUPING("Ungrouped"),
 
     /** Group by Date */
     GROUP_BY_DATE("Group by Date"),
