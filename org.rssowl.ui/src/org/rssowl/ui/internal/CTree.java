@@ -81,6 +81,14 @@ public class CTree {
   }
 
   /**
+   * @return <code>true</code> if only one level of tree items is used and
+   * <code>false</code> if the tree has parent and childs.
+   */
+  public boolean isFlat() {
+    return fIsFlat;
+  }
+
+  /**
    * @param col
    * @param layoutData
    * @param text
