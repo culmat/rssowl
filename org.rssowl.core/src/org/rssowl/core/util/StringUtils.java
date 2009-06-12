@@ -158,12 +158,10 @@ public class StringUtils {
     char[] result = new char[str.length()];
     HTMLStripReader stripReader = new HTMLStripReader(new StringReader(str));
     try {
-
       length += stripReader.read(result);
 
       if (stripReader.read() != -1)
         throw new IllegalStateException("stripReader blocks before filling the result array");
-
     } catch (IOException e) {
       throw new RuntimeException(e);
     } finally {
