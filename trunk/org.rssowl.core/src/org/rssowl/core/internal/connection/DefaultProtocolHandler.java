@@ -623,7 +623,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       }
     }
 
-    return title.trim();
+    return StringUtils.stripTags(title.trim());
   }
 
   /* Tries to read the encoding information from the given InputReader */
