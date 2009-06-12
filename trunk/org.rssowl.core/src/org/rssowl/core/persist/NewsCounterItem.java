@@ -28,8 +28,8 @@ import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.internal.persist.Persistable;
 
 /**
- * Instances of <code>NewsCounterItem</code> store number values and are kept
- * by a <code>NewsCounter</code>. They provide leightweight access to certain
+ * Instances of <code>NewsCounterItem</code> store number values and are kept by
+ * a <code>NewsCounter</code>. They provide leightweight access to certain
  * information of a <code>IFeed</code> entity.
  * <p>
  * TODO Consider contributing the NewsCounter from org.rssowl.ui if its only
@@ -46,6 +46,11 @@ public final class NewsCounterItem extends Persistable {
   /** Default constructor for reflection */
   public NewsCounterItem() {}
 
+  /**
+   * @param newCounter number of new news
+   * @param unreadCounter number of unread news
+   * @param stickyCounter number of sticky news
+   */
   public NewsCounterItem(int newCounter, int unreadCounter, int stickyCounter) {
     Assert.isLegal(newCounter >= 0, "newCounter should be >= 0");
     Assert.isLegal(unreadCounter >= 0, "unreadCounter should be >= 0");

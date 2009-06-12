@@ -31,24 +31,18 @@ import org.rssowl.core.persist.event.runnable.BookMarkEventRunnable;
 /**
  * <p>
  * An Event-Object being used to notify Listeners, whenever the type
- * <code>IBookMark</code> is added, updated or deleted in the persistence
- * layer.
+ * <code>IBookMark</code> is added, updated or deleted in the persistence layer.
  * </p>
- * In order to retrieve the Model-Object that is affected on the Event, use the
- * <code>resolve()</code> Method of the <code>ModelReference</code> stored
- * in this Event.
  *
  * @author bpasero
  */
 public final class BookMarkEvent extends MarkEvent {
 
-
   /**
-   * Stores an instance of <code>ModelReference</code> and the Parent
-   * Reference for the affected Type in this Event.
+   * Stores an instance of <code>IBookMark</code> and the Parent Reference for
+   * the affected Type in this Event.
    *
-   * @param mark An instance of <code>ModelReference</code> for the
-   * affected Type.
+   * @param mark An instance of <code>IBookMark</code> for the affected Type.
    * @param oldParent If this Event informs about a Reparenting the old parent
    * is used to do updates in the UI, <code>NULL</code> otherwise.
    * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
@@ -66,6 +60,9 @@ public final class BookMarkEvent extends MarkEvent {
     return (IBookMark) super.getEntity();
   }
 
+  /*
+   * @see org.rssowl.core.persist.event.ModelEvent#createEventRunnable()
+   */
   @Override
   public BookMarkEventRunnable createEventRunnable() {
     return new BookMarkEventRunnable();

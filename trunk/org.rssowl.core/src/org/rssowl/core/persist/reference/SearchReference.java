@@ -21,17 +21,35 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.reference;
 
 import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.service.PersistenceException;
 
+/**
+ * Implementation of the <code>ModelReference</code> for the Type
+ * <code>ISearch</code>.
+ *
+ * @author bpasero
+ */
 public final class SearchReference extends ModelReference {
 
+  /**
+   * Instantiates a new lightweight reference. Any resolve()-call will be passed
+   * to the <code>IEntityDAO</code> to load the heavyweight type from the
+   * persistence layer.
+   *
+   * @param id The ID of the type to use for loading the type from the
+   * persistence layer.
+   */
   public SearchReference(long id) {
     super(id, ISearch.class);
   }
 
+  /*
+   * @see org.rssowl.core.persist.reference.ModelReference#resolve()
+   */
   @Override
   public ISearch resolve() throws PersistenceException {
     return (ISearch) super.resolve();

@@ -21,13 +21,18 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.event.NewsBinEvent;
 import org.rssowl.core.persist.event.NewsBinListener;
 
+/**
+ * A data-access-object for <code>INewsBin</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
 public interface INewsBinDAO extends IEntityDAO<INewsBin, NewsBinListener, NewsBinEvent> {
-
   // No new methods
 }

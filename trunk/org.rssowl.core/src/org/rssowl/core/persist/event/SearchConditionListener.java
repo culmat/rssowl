@@ -26,13 +26,12 @@ package org.rssowl.core.persist.event;
 
 import org.rssowl.core.persist.ISearchCondition;
 
-
 /**
- * A Listener being notified whenever the type <code>ISearchCondition</code>
- * was added, updated or deleted in the persistance layer.
- * 
+ * A Listener being notified whenever the type <code>ISearchCondition</code> was
+ * added, updated or deleted in the persistance layer.
+ *
  * @author bpasero
  */
-public interface SearchConditionListener extends EntityListener<SearchConditionEvent, ISearchCondition>   {
+public interface SearchConditionListener extends EntityListener<SearchConditionEvent, ISearchCondition> {
   // No new methods
 }

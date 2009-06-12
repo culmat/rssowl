@@ -30,22 +30,19 @@ import org.rssowl.core.persist.event.runnable.SearchFilterEventRunnable;
 /**
  * <p>
  * An Event-Object being used to notify Listeners, whenever the type
- * <code>ISearchFilter</code> was added, updated or deleted in the
- * persistance layer.
+ * <code>ISearchFilter</code> was added, updated or deleted in the persistance
+ * layer.
  * </p>
- * In order to retrieve the Model-Object that is affected on the Event, use the
- * <code>resolve()</code> Method of the <code>ModelReference</code> stored in
- * this Event.
  *
  * @author bpasero
  */
 public final class SearchFilterEvent extends ModelEvent {
 
   /**
-   * Stores an instance of <code>ModelReference</code> for the affected Type in
+   * Stores an instance of <code>ISearchFilter</code> for the affected Type in
    * this Event.
    *
-   * @param searchFilter An instance of <code>ModelReference</code> for the
+   * @param searchFilter An instance of <code>ISearchFilter</code> for the
    * affected Type.
    * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
    * <code>FALSE</code> otherwise.
@@ -62,6 +59,9 @@ public final class SearchFilterEvent extends ModelEvent {
     return (ISearchFilter) super.getEntity();
   }
 
+  /*
+   * @see org.rssowl.core.persist.event.ModelEvent#createEventRunnable()
+   */
   @Override
   public SearchFilterEventRunnable createEventRunnable() {
     return new SearchFilterEventRunnable();

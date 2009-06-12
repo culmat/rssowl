@@ -32,22 +32,17 @@ import org.rssowl.core.persist.event.runnable.NewsEventRunnable;
  * An Event-Object being used to notify Listeners, whenever the type
  * <code>INews</code> was added, updated or deleted in the persistance layer.
  * </p>
- * In order to retrieve the Model-Object that is affected on the Event, use the
- * <code>resolve()</code> Method of the <code>ModelReference</code> stored
- * in this Event.
  *
  * @author bpasero
  */
 public final class NewsEvent extends ModelEvent {
-
   private final INews fOldNews;
 
   /**
-   * Stores an instance of <code>ModelReference</code> for the affected Type
-   * in this Event.
+   * Stores an instance of <code>INews</code> for the affected Type in this
+   * Event.
    *
-   * @param news An instance of <code>ModelReference</code> for the
-   * affected Type.
+   * @param news An instance of <code>INews</code> for the affected Type.
    */
   public NewsEvent(INews news) {
     super(news);
@@ -76,6 +71,9 @@ public final class NewsEvent extends ModelEvent {
     return (INews) super.getEntity();
   }
 
+  /*
+   * @see org.rssowl.core.persist.event.ModelEvent#createEventRunnable()
+   */
   @Override
   public NewsEventRunnable createEventRunnable() {
     return new NewsEventRunnable();

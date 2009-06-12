@@ -30,34 +30,28 @@ import org.rssowl.core.persist.event.runnable.PersonEventRunnable;
 /**
  * <p>
  * An Event-Object being used to notify Listeners, whenever the type
- * <code>IPerson</code> was added, updated or deleted in the persistance
- * layer.
+ * <code>IPerson</code> was added, updated or deleted in the persistance layer.
  * </p>
- * In order to retrieve the Model-Object that is affected on the Event, use the
- * <code>resolve()</code> Method of the <code>ModelReference</code> stored
- * in this Event.
- * 
+ *
  * @author bpasero
  */
 public final class PersonEvent extends ModelEvent {
 
   /**
-   * Stores an instance of <code>ModelReference</code> for the affected Type
-   * in this Event.
-   * 
-   * @param person An instance of <code>ModelReference</code> for the
-   * affected Type.
+   * Stores an instance of <code>IPerson</code> for the affected Type in this
+   * Event.
+   *
+   * @param person An instance of <code>IPerson</code> for the affected Type.
    */
   public PersonEvent(IPerson person) {
     super(person);
   }
 
   /**
-   * Stores an instance of <code>ModelReference</code> for the affected Type
-   * in this Event.
-   * 
-   * @param person An instance of <code>ModelReference</code> for the
-   * affected Type.
+   * Stores an instance of <code>IPerson</code> for the affected Type in this
+   * Event.
+   *
+   * @param person An instance of <code>IPerson</code> for the affected Type.
    * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
    * <code>FALSE</code> otherwise.
    */
@@ -73,6 +67,9 @@ public final class PersonEvent extends ModelEvent {
     return (IPerson) super.getEntity();
   }
 
+  /*
+   * @see org.rssowl.core.persist.event.ModelEvent#createEventRunnable()
+   */
   @Override
   public PersonEventRunnable createEventRunnable() {
     return new PersonEventRunnable();

@@ -21,10 +21,17 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.event;
 
 import org.rssowl.core.persist.ISearch;
 
-public interface SearchListener extends EntityListener<SearchEvent, ISearch>  {
+/**
+ * A Listener being notified whenever the type <code>ISearch</code> was added,
+ * updated or deleted in the persistance layer.
+ *
+ * @author bpasero
+ */
+public interface SearchListener extends EntityListener<SearchEvent, ISearch> {
   // No new methods
 }

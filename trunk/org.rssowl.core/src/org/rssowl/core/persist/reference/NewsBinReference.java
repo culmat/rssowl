@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.reference;
 
 import org.rssowl.core.persist.INewsBin;
@@ -29,13 +30,15 @@ import org.rssowl.core.persist.service.PersistenceException;
 /**
  * Implementation of the <code>ModelReference</code> for the Type
  * <code>INewsBin</code>.
+ *
+ * @author bpasero
  */
 public class NewsBinReference extends MarkReference {
 
   /**
    * Instantiates a new leightweight reference. Any resolve()-call will be
-   * passed to the <code>IModelDAO</code> to load the heavyweight type from
-   * the persistance layer.
+   * passed to the <code>IEntityDAO</code> to load the heavyweight type from the
+   * persistance layer.
    *
    * @param id The ID of the type to use for loading the type from the
    * persistance layer.
@@ -44,9 +47,11 @@ public class NewsBinReference extends MarkReference {
     super(id, INewsBin.class);
   }
 
+  /*
+   * @see org.rssowl.core.persist.reference.ModelReference#resolve()
+   */
   @Override
   public INewsBin resolve() throws PersistenceException {
     return (INewsBin) super.resolve();
   }
-
 }

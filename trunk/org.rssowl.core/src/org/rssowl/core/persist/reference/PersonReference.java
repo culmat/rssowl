@@ -30,23 +30,26 @@ import org.rssowl.core.persist.service.PersistenceException;
 /**
  * Implementation of the <code>ModelReference</code> for the Type
  * <code>IPerson</code>.
- * 
+ *
  * @author bpasero
  */
 public final class PersonReference extends ModelReference {
 
   /**
    * Instantiates a new leightweight reference. Any resolve()-call will be
-   * passed to the <code>IModelDAO</code> to load the heavyweight type from
+   * passed to the <code>IEntityDAO</code> to load the heavyweight type from
    * the persistance layer.
-   * 
+   *
    * @param id The ID of the type to use for loading the type from the
    * persistance layer.
    */
   public PersonReference(long id) {
     super(id, IPerson.class);
   }
-  
+
+  /*
+   * @see org.rssowl.core.persist.reference.ModelReference#resolve()
+   */
   @Override
   public IPerson resolve() throws PersistenceException {
     return (IPerson) super.resolve();

@@ -26,11 +26,10 @@ package org.rssowl.core.persist.event;
 
 import org.rssowl.core.persist.IPerson;
 
-
 /**
  * A Listener being notified whenever the type <code>IPerson</code> was added,
  * updated or deleted in the persistance layer.
- * 
+ *
  * @author bpasero
  */
 public interface PersonListener extends EntityListener<PersonEvent, IPerson> {

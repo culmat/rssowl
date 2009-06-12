@@ -33,31 +33,28 @@ import org.rssowl.core.persist.event.runnable.CategoryEventRunnable;
  * <code>ICategory</code> was added, updated or deleted in the persistance
  * layer.
  * </p>
- * In order to retrieve the Model-Object that is affected on the Event, use the
- * <code>resolve()</code> Method of the <code>ModelReference</code> stored
- * in this Event.
- * 
+ *
  * @author bpasero
  */
 public final class CategoryEvent extends ModelEvent {
 
   /**
-   * Stores an instance of <code>ModelReference</code> for the affected Type
-   * in this Event.
-   * 
-   * @param category An instance of <code>ModelReference</code> for the
-   * affected Type.
+   * Stores an instance of <code>ICategory</code> for the affected Type in this
+   * Event.
+   *
+   * @param category An instance of <code>ICategory</code> for the affected
+   * Type.
    */
   public CategoryEvent(ICategory category) {
     super(category);
   }
 
   /**
-   * Stores an instance of <code>ModelReference</code> for the affected Type
-   * in this Event.
-   * 
-   * @param category An instance of <code>ModelReference</code> for the
-   * affected Type.
+   * Stores an instance of <code>ICategory</code> for the affected Type in this
+   * Event.
+   *
+   * @param category An instance of <code>ICategory</code> for the affected
+   * Type.
    * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
    * <code>FALSE</code> otherwise.
    */
@@ -73,6 +70,9 @@ public final class CategoryEvent extends ModelEvent {
     return (ICategory) super.getEntity();
   }
 
+  /*
+   * @see org.rssowl.core.persist.event.ModelEvent#createEventRunnable()
+   */
   @Override
   public CategoryEventRunnable createEventRunnable() {
     return new CategoryEventRunnable();

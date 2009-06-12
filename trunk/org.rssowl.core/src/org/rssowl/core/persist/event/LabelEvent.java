@@ -32,23 +32,21 @@ import org.rssowl.core.persist.event.runnable.LabelEventRunnable;
  * An Event-Object being used to notify Listeners, whenever the type
  * <code>ILabel</code> was added, updated or deleted in the persistance layer.
  * </p>
- * In order to retrieve the Model-Object that is affected on the Event, use the
- * <code>resolve()</code> Method of the <code>ModelReference</code> stored
- * in this Event.
  *
  * @author bpasero
  */
 public final class LabelEvent extends ModelEvent {
 
   private final ILabel fOldLabel;
+
   /**
-   * Stores an instance of <code>ModelReference</code> for the affected Type
-   * in this Event.
+   * Stores an instance of <code>ILabel</code> for the affected Type in this
+   * Event.
    *
-   * @param oldLabel The previous saved version of the affected type or
-   * {@code null} if not known.
-   * @param currentLabel An instance of <code>ModelReference</code> for the
-   * affected Type.
+   * @param oldLabel The previous saved version of the affected type or {@code
+   * null} if not known.
+   * @param currentLabel An instance of <code>ILabel</code> for the affected
+   * Type.
    * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
    * <code>FALSE</code> otherwise.
    */
@@ -72,6 +70,9 @@ public final class LabelEvent extends ModelEvent {
     return (ILabel) super.getEntity();
   }
 
+  /*
+   * @see org.rssowl.core.persist.event.ModelEvent#createEventRunnable()
+   */
   @Override
   public LabelEventRunnable createEventRunnable() {
     return new LabelEventRunnable();

@@ -31,10 +31,10 @@ import org.rssowl.core.persist.event.runnable.PreferenceEventRunnable;
 /**
  * An Event-Object being used to notify Listeners, whenever a Preference was
  * added, updated or deleted in the persistance layer.
- * 
+ *
  * @author bpasero
  */
-public class PreferenceEvent extends ModelEvent    {
+public class PreferenceEvent extends ModelEvent {
 
   /**
    * @param preference The preference affected by this event.
@@ -43,12 +43,18 @@ public class PreferenceEvent extends ModelEvent    {
     super(preference);
     Assert.isNotNull(preference, "The preference must not be null"); //$NON-NLS-1$
   }
-  
+
+  /*
+   * @see org.rssowl.core.persist.event.ModelEvent#getEntity()
+   */
   @Override
   public final IPreference getEntity() {
     return (IPreference) super.getEntity();
   }
 
+  /*
+   * @see org.rssowl.core.persist.event.ModelEvent#createEventRunnable()
+   */
   @Override
   public PreferenceEventRunnable createEventRunnable() {
     return new PreferenceEventRunnable();

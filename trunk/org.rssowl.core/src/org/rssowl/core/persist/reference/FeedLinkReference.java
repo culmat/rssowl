@@ -90,8 +90,8 @@ public final class FeedLinkReference {
    * will return an entity equal to <code>feed</code>.
    *
    * @param feed The IFeed to compare to.
-   * @return <code>true</code> if this object references <code>feed</code>
-   * or <code>false</code> otherwise.
+   * @return <code>true</code> if this object references <code>feed</code> or
+   * <code>false</code> otherwise.
    */
   public boolean references(IFeed feed) {
     Assert.isNotNull(feed);
@@ -100,6 +100,9 @@ public final class FeedLinkReference {
     return entityLinkText == null ? false : fLinkText.equals(entityLinkText);
   }
 
+  /*
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -112,11 +115,17 @@ public final class FeedLinkReference {
     return fLinkText.equals(other.fLinkText);
   }
 
+  /*
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     return fLinkText.hashCode();
   }
 
+  /*
+   * @see java.lang.Object#toString()
+   */
   @Override
   @SuppressWarnings("nls")
   public String toString() {

@@ -33,11 +33,15 @@ import org.rssowl.core.persist.NewsCounter;
  */
 public interface INewsCounterDAO extends IPersistableDAO<NewsCounter> {
 
+  /**
+   * Saves the singleton instance of <code>NewsCounter</code> to the persistence
+   * layer.
+   */
   void save();
 
   /**
-   * @return Returns the singleton instance of <code>NewsCounter</code> from
-   * the persistence layer.
+   * @return Returns the singleton instance of <code>NewsCounter</code> from the
+   * persistence layer.
    */
   NewsCounter load();
 

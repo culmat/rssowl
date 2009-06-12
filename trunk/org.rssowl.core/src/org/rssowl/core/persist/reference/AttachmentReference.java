@@ -30,23 +30,26 @@ import org.rssowl.core.persist.service.PersistenceException;
 /**
  * Implementation of the <code>ModelReference</code> for the Type
  * <code>IAttachment</code>.
- * 
+ *
  * @author bpasero
  */
 public final class AttachmentReference extends ModelReference {
 
   /**
    * Instantiates a new leightweight reference. Any resolve()-call will be
-   * passed to the <code>IModelDAO</code> to load the heavyweight type from
-   * the persistance layer.
-   * 
+   * passed to the <code>IEntityDAO</code> to load the heavyweight type from the
+   * persistance layer.
+   *
    * @param id The ID of the type to use for loading the type from the
    * persistance layer.
    */
   public AttachmentReference(long id) {
     super(id, IAttachment.class);
   }
-  
+
+  /*
+   * @see org.rssowl.core.persist.reference.ModelReference#resolve()
+   */
   @Override
   public IAttachment resolve() throws PersistenceException {
     return (IAttachment) super.resolve();

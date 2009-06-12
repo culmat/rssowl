@@ -36,9 +36,9 @@ import org.rssowl.core.persist.service.PersistenceException;
 public final class SearchMarkReference extends MarkReference {
 
   /**
-   * Instantiates a new lightweight reference. Any resolve()-call will be
-   * passed to the <code>IModelDAO</code> to load the heavyweight type from
-   * the persistence layer.
+   * Instantiates a new lightweight reference. Any resolve()-call will be passed
+   * to the <code>IEntityDAO</code> to load the heavyweight type from the
+   * persistence layer.
    *
    * @param id The ID of the type to use for loading the type from the
    * persistence layer.
@@ -47,6 +47,9 @@ public final class SearchMarkReference extends MarkReference {
     super(id, ISearchMark.class);
   }
 
+  /*
+   * @see org.rssowl.core.persist.reference.ModelReference#resolve()
+   */
   @Override
   public ISearchMark resolve() throws PersistenceException {
     return (ISearchMark) super.resolve();

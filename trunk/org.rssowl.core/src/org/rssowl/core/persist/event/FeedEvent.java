@@ -32,20 +32,16 @@ import org.rssowl.core.persist.event.runnable.FeedEventRunnable;
  * An Event-Object being used to notify Listeners, whenever the type
  * <code>IFeed</code> was added, updated or deleted in the persistance layer.
  * </p>
- * In order to retrieve the Model-Object that is affected on the Event, use the
- * <code>resolve()</code> Method of the <code>ModelReference</code> stored
- * in this Event.
- * 
+ *
  * @author bpasero
  */
 public final class FeedEvent extends ModelEvent {
 
   /**
-   * Stores an instance of <code>ModelReference</code> for the affected Type
-   * in this Event.
-   * 
-   * @param feed An instance of <code>ModelReference</code> for the
-   * affected Type.
+   * Stores an instance of <code>IFeed</code> for the affected Type in this
+   * Event.
+   *
+   * @param feed An instance of <code>IFeed</code> for the affected Type.
    * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
    * <code>FALSE</code> otherwise.
    */
@@ -61,6 +57,9 @@ public final class FeedEvent extends ModelEvent {
     return (IFeed) super.getEntity();
   }
 
+  /*
+   * @see org.rssowl.core.persist.event.ModelEvent#createEventRunnable()
+   */
   @Override
   public FeedEventRunnable createEventRunnable() {
     return new FeedEventRunnable();
