@@ -207,6 +207,9 @@ public class URIUtils {
    * Syntax.
    */
   public static URI createURI(String str) {
+    if (str == null)
+      return null;
+
     try {
 
       /* Remove surrounding whitespaces */
