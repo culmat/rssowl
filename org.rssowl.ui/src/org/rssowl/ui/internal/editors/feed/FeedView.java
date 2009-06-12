@@ -1100,7 +1100,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
           fNewsTableControl.setPartInput(null);
 
         /* Set input to News-Browser if visible */
-        if (!fBgMonitor.isCanceled() && (!isTableViewerVisible() || (BROWSER_SHOWS_ALL && oldSelection == null)))
+        if (!fBgMonitor.isCanceled() && (!isTableViewerVisible() || (BROWSER_SHOWS_ALL /* && oldSelection == null */)))
           fNewsBrowserControl.setPartInput(mark);
 
         /* Reset old Input to Browser if availabel */
