@@ -1473,10 +1473,10 @@
             url="http://digg.com/rss_search?s=[:]">
       </keywordFeed>
       <keywordFeed
-            icon="icons/obj16/fav_newsvine.gif"
-            id="org.rssowl.ui.NewsvineKeywordFeed"
-            name="Newsvine"
-            url="http://www.newsvine.com/_feeds/rss2/tag?id=[:]">
+            icon="icons/obj16/fav_twitter.gif"
+            id="org.rssowl.ui.TwitterKeywordFeed"
+            name="Twitter"
+            url="http://search.twitter.com/search.atom?q=[:]">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_google.gif"
