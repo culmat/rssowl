@@ -111,8 +111,9 @@ import org.rssowl.ui.internal.util.TreeTraversal;
 import org.rssowl.ui.internal.util.UIBackgroundJob;
 import org.rssowl.ui.internal.util.WidgetTreeNode;
 
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -326,9 +327,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
       return;
 
     /* Write into File */
-    FileWriter writer = null;
+    OutputStreamWriter writer = null;
     try {
-      writer = new FileWriter(fileName);
+      writer = new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8");
       writer.write(content.toString());
       writer.close();
     } catch (IOException e) {
