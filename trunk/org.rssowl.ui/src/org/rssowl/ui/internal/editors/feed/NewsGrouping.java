@@ -79,48 +79,57 @@ public class NewsGrouping {
   public enum Type {
 
     /** Grouping is Disabled */
-    NO_GROUPING("No Grouping"),
+    NO_GROUPING("No Grouping", "Ungrouped"),
 
     /** Group by Date */
-    GROUP_BY_DATE("Group by Date"),
+    GROUP_BY_DATE("Group by Date", "Grouped by Date"),
 
     /** Group by State */
-    GROUP_BY_STATE("Group by State"),
+    GROUP_BY_STATE("Group by State", "Grouped by State"),
 
     /** Group by Author */
-    GROUP_BY_AUTHOR("Group by Author"),
+    GROUP_BY_AUTHOR("Group by Author", "Grouped by Author"),
 
     /** Group by Category */
-    GROUP_BY_CATEGORY("Group by Category"),
+    GROUP_BY_CATEGORY("Group by Category", "Grouped by Category"),
 
     /** Group by Title */
-    GROUP_BY_TOPIC("Group by Title"),
+    GROUP_BY_TOPIC("Group by Title", "Grouped by Title"),
 
     /** Group by Feed */
-    GROUP_BY_FEED("Group by Feed"),
+    GROUP_BY_FEED("Group by Feed", "Grouped by Feed"),
 
     /** Group by Label */
-    GROUP_BY_LABEL("Group by Label"),
+    GROUP_BY_LABEL("Group by Label", "Grouped by Label"),
 
     /** Group by Rating */
-    GROUP_BY_RATING("Group by Rating"),
+    GROUP_BY_RATING("Group by Rating", "Grouped by Rating"),
 
     /** Group by Stickyness */
-    GROUP_BY_STICKY("Group by Stickyness");
+    GROUP_BY_STICKY("Group by Stickyness", "Grouped by Stickyness");
 
     String fName;
+    String fDisplayName;
 
-    Type(String name) {
-      fName = name;
+    Type(String actionName, String displayName) {
+      fName = actionName;
+      fDisplayName = displayName;
     }
 
     /**
-     * Returns a human-readable Name of this enum-value.
+     * Returns a human-readable Action Name of this enum-value.
      *
-     * @return A human-readable Name of this enum-value.
+     * @return A human-readable Action Name of this enum-value.
      */
     public String getName() {
       return fName;
+    }
+
+    /**
+     * @return the display name when this grouping is active.
+     */
+    public String getDisplayName() {
+      return fDisplayName;
     }
   }
 
