@@ -858,6 +858,8 @@ public class FilterBar {
 
       @Override
       public String getText() {
+        if (grouping.getType() == org.rssowl.ui.internal.editors.feed.NewsGrouping.Type.NO_GROUPING)
+          return "Ungrouped";
         return grouping.getType().getName();
       }
     };

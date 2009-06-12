@@ -919,7 +919,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Group: None */
         final MenuItem noGrouping = new MenuItem(menu, SWT.RADIO);
-        noGrouping.setText("Ungrouped");
+        noGrouping.setText("No Grouping");
         noGrouping.setSelection(BookMarkGrouping.Type.NO_GROUPING == fBookMarkGrouping.getType());
         menu.setDefaultItem(noGrouping);
         noGrouping.addSelectionListener(new SelectionAdapter() {
