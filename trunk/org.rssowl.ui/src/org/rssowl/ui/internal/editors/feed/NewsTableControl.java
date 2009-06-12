@@ -939,6 +939,16 @@ public class NewsTableControl implements IFeedViewPart {
       fViewer.setInput(((IEntity) input).toReference());
     else
       fViewer.setInput(input);
+
+    /* Adjust Scroll Position depending on sort order */
+    Tree tree = fViewer.getTree();
+    int itemCount = tree.getItemCount();
+    if (itemCount > 0) {
+      if (fNewsSorter.getSortBy() == NewsColumn.DATE && fNewsSorter.isAscending())
+        tree.showItem(tree.getItem(itemCount - 1));
+      else
+        tree.setTopItem(tree.getItem(0));
+    }
   }
 
   /*
