@@ -1358,10 +1358,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
           fNewsTableControl.setBlockNewsStateTracker(false);
         }
       }
-
-      /* Set Top Item */
-      if (tree.getItemCount() > 0)
-        tree.setTopItem(tree.getItem(0));
     } finally {
       tree.getParent().setRedraw(true);
     }
