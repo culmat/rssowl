@@ -26,6 +26,8 @@ package org.rssowl.ui.internal.editors.feed;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
@@ -61,6 +63,9 @@ import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.EditorPart;
 import org.rssowl.core.Owl;
+import org.rssowl.core.connection.ConnectionException;
+import org.rssowl.core.connection.IProtocolHandler;
+import org.rssowl.core.internal.connection.DefaultProtocolHandler;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
@@ -111,10 +116,13 @@ import org.rssowl.ui.internal.util.TreeTraversal;
 import org.rssowl.ui.internal.util.UIBackgroundJob;
 import org.rssowl.ui.internal.util.WidgetTreeNode;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -261,14 +269,86 @@ public class FeedView extends EditorPart implements IReusableEditor {
     /* Ask user for File */
     FileDialog dialog = new FileDialog(getSite().getShell(), SWT.SAVE);
     dialog.setOverwrite(true);
-    dialog.setFilterExtensions(new String[] { ".html" });
-    dialog.setFileName(fInput.getName() + ".html");
+    if (fInput.getMark() instanceof IBookMark)
+      dialog.setFilterExtensions(new String[] { ".html", ".xml" });
+    else
+      dialog.setFilterExtensions(new String[] { ".html" });
+    dialog.setFileName(fInput.getName());
 
     String fileName = dialog.open();
     if (fileName == null)
       return;
 
-    /* Build Content as String from Feed */
+    if (fileName.endsWith(".xml"))
+      saveAsXml(fileName);
+    else
+      saveAsHtml(fileName);
+  }
+
+  @SuppressWarnings("restriction")
+  private void saveAsXml(final String fileName) {
+    IBookMark bm = (IBookMark) fInput.getMark();
+    final URI feedLink = bm.getFeedLinkReference().getLink();
+    try {
+      final IProtocolHandler handler = Owl.getConnectionService().getHandler(feedLink);
+      if (handler instanceof DefaultProtocolHandler) {
+        Job downloadJob = new Job("Downloading Feed...") {
+          @Override
+          protected IStatus run(IProgressMonitor monitor) {
+            monitor.beginTask("Downloading Feed...", IProgressMonitor.UNKNOWN);
+
+            InputStream in = null;
+            FileOutputStream out = null;
+            try {
+              byte[] buffer = new byte[1000];
+
+              in = ((DefaultProtocolHandler) handler).openStream(feedLink, null);
+              out = new FileOutputStream(fileName);
+              while (true) {
+                int read = in.read(buffer);
+                if (read == -1)
+                  break;
+
+                out.write(buffer, 0, read);
+              }
+            } catch (FileNotFoundException e) {
+              Activator.getDefault().logError(e.getMessage(), e);
+            } catch (IOException e) {
+              Activator.getDefault().logError(e.getMessage(), e);
+            } catch (ConnectionException e) {
+              Activator.getDefault().logError(e.getMessage(), e);
+            } finally {
+              monitor.done();
+
+              if (in != null) {
+                try {
+                  in.close();
+                } catch (IOException e) {
+                  Activator.getDefault().logError(e.getMessage(), e);
+                }
+              }
+
+              if (out != null) {
+                try {
+                  out.close();
+                } catch (IOException e) {
+                  Activator.getDefault().logError(e.getMessage(), e);
+                }
+              }
+            }
+
+            return Status.OK_STATUS;
+          }
+        };
+        downloadJob.schedule();
+      }
+    } catch (ConnectionException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    }
+  }
+
+  /* Build Content as String from Feed */
+  private void saveAsHtml(String fileName) {
     StringBuilder content = new StringBuilder();
     NewsBrowserLabelProvider labelProvider = (NewsBrowserLabelProvider) fNewsBrowserControl.getViewer().getLabelProvider();
 
