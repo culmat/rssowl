@@ -528,16 +528,14 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
             feed = DynamicDAO.save(feed);
           }
 
-          /* Remember the old Reference */
+          /* Check if the old reference can be deleted now */
           FeedLinkReference oldFeedRef = bookmark.getFeedLinkReference();
+          if (daoService.getBookMarkDAO().loadAll(oldFeedRef).size() == 1)
+            DynamicDAO.delete(oldFeedRef.resolve());
 
           /* Apply the new Reference */
           bookmark.setFeedLinkReference(new FeedLinkReference(newFeedLink));
           entitiesToSave.add(bookmark);
-
-          /* Check if the old reference can be deleted now */
-          if (daoService.getBookMarkDAO().loadAll(oldFeedRef).size() == 1)
-            DynamicDAO.delete(oldFeedRef.resolve());
 
           /* Delete the Favicon since the feed has changed */
           OwlUI.deleteImage(bookmark.getId());
