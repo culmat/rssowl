@@ -151,6 +151,17 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   @Override
   @SuppressWarnings("nls")
   public String getText(Object element) {
+    return getText(element, true);
+  }
+
+  /**
+   * @param element the element to get a HTML representation from.
+   * @param withInternalLinks <code>true</code> to include links of the internal
+   * protocol rssowl:// and <code>false</code> otherwise.
+   * @return the HTML representation for the given element.
+   */
+  @SuppressWarnings("nls")
+  public String getText(Object element, boolean withInternalLinks) {
 
     /* Return HTML for a Group */
     if (element instanceof EntityGroup)
@@ -158,7 +169,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     /* Return HTML for a News */
     else if (element instanceof INews)
-      return getLabel((INews) element);
+      return getLabel((INews) element, withInternalLinks);
 
     return ""; //$NON-NLS-1$
   }
@@ -292,7 +303,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     return new StringBuilder(capacity);
   }
 
-  private String getLabel(INews news) {
+  private String getLabel(INews news, boolean withInternalLinks) {
     String description = news.getDescription();
     StringBuilder builder = getBuilder(news, description);
     StringBuilder search = new StringBuilder();
@@ -588,10 +599,12 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         div(footer, "searchrelated");
 
         /* Label */
-        span(footer, "Search related News:", "label");
+        if (withInternalLinks)
+          span(footer, "Search related News:", "label");
 
         /* Append to Footer */
-        footer.append(search);
+        if (withInternalLinks)
+          footer.append(search);
 
         /* Close: NewsItem/Footer/SearchRelated */
         close(footer, "div");

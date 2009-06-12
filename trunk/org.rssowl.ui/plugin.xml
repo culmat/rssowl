@@ -968,13 +968,19 @@
             commandId="org.rssowl.ui.actions.MarkSticky"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.rssowl.ui.KeyScheme"
-            sequence="M1+S">
+            sequence="M1+M2+S">
       </key>
       <key
             commandId="org.rssowl.ui.actions.NewBookMark"
             contextId="org.eclipse.ui.contexts.window"
             schemeId="org.rssowl.ui.KeyScheme"
             sequence="M1+D">
+      </key>
+      <key
+            commandId="org.eclipse.ui.file.saveAs"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1+S">
       </key>
    </extension>
    <extension

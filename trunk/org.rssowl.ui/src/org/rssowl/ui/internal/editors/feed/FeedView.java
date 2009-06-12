@@ -46,6 +46,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
@@ -93,6 +94,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.RetentionStrategy;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
@@ -109,6 +111,9 @@ import org.rssowl.ui.internal.util.TreeTraversal;
 import org.rssowl.ui.internal.util.UIBackgroundJob;
 import org.rssowl.ui.internal.util.WidgetTreeNode;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -249,7 +254,93 @@ public class FeedView extends EditorPart implements IReusableEditor {
    */
   @Override
   public void doSaveAs() {
-  /* Not Supported */
+    if (fIsDisposed || Controller.getDefault().isShuttingDown())
+      return;
+
+    /* Ask user for File */
+    FileDialog dialog = new FileDialog(getSite().getShell(), SWT.SAVE);
+    dialog.setOverwrite(true);
+    dialog.setFilterExtensions(new String[] { ".html" });
+    dialog.setFileName(fInput.getName() + ".html");
+
+    String fileName = dialog.open();
+    if (fileName == null)
+      return;
+
+    /* Build Content as String from Feed */
+    StringBuilder content = new StringBuilder();
+    NewsBrowserLabelProvider labelProvider = (NewsBrowserLabelProvider) fNewsBrowserControl.getViewer().getLabelProvider();
+
+    /* Save from Table */
+    if (isTableViewerVisible()) {
+      Tree tree = fNewsTableControl.getViewer().getTree();
+      TreeItem[] items = tree.getItems();
+      if (items.length > 0) {
+        List<INews> newsToSave = new ArrayList<INews>();
+
+        /* Ungrouped */
+        if (items[0].getItemCount() == 0) {
+          for (TreeItem item : items) {
+            if (item.getData() instanceof INews)
+              newsToSave.add((INews) item.getData());
+          }
+        }
+
+        /* Grouped */
+        else {
+          for (TreeItem parentItem : items) {
+            TreeItem[] childItems = parentItem.getItems();
+            for (TreeItem item : childItems) {
+              if (item.getData() instanceof INews)
+                newsToSave.add((INews) item.getData());
+            }
+          }
+        }
+
+        /* Create Content for each Item */
+        content.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
+        content.append("<html>\n  <head>\n");
+        StringWriter css = new StringWriter();
+        try {
+          labelProvider.writeCSS(css);
+        } catch (IOException e) {
+          /* Ignore */
+        }
+        content.append(css.toString());
+        content.append("  </head>\n  <body>\n");
+        for (INews newsItemToSave : newsToSave) {
+          String text = labelProvider.getText(newsItemToSave, false);
+          content.append(text);
+        }
+        content.append("\n  </body>\n</html>");
+      }
+    }
+
+    /* Save from Browser */
+    else {
+      //content.append(fNewsBrowserControl.getViewer().getBrowser().getControl().getText()); TODO Enable in 3.5
+    }
+
+    if (content.length() == 0)
+      return;
+
+    /* Write into File */
+    FileWriter writer = null;
+    try {
+      writer = new FileWriter(fileName);
+      writer.write(content.toString());
+      writer.close();
+    } catch (IOException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    } finally {
+      if (writer != null) {
+        try {
+          writer.close();
+        } catch (IOException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+        }
+      }
+    }
   }
 
   /*
@@ -1134,7 +1225,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
    */
   @Override
   public boolean isSaveAsAllowed() {
-    return false;
+    return true;
   }
 
   /*
