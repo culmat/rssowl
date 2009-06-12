@@ -21,14 +21,27 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.util;
 
+/**
+ * Utility methods for Arrays.
+ *
+ * @author bpasero
+ */
 public final class ArrayUtils {
 
+  /* This utility class constructor is hidden */
   private ArrayUtils() {
-    super();
+  // Protect default constructor
   }
 
+  /**
+   * @param a the array to search in
+   * @param key the key to search for
+   * @param endIndex the limit for the search
+   * @return the index of the key to search for
+   */
   public static int binarySearch(long[] a, long key, int endIndex) {
     int low = 0;
     int high = endIndex - 1;
@@ -47,14 +60,23 @@ public final class ArrayUtils {
     return -(low + 1);
   }
 
-  public static void reverse(int[] newsToCleanUp, int newsToCleanUpSize) {
-    for (int left = 0, right = newsToCleanUpSize -1 ; left < right; left++, right--) {
-      int temp = newsToCleanUp[left];
-      newsToCleanUp[left]  = newsToCleanUp[right];
-      newsToCleanUp[right] = temp;
+  /**
+   * @param array the array to reverse
+   * @param size the size of the array
+   */
+  public static void reverse(int[] array, int size) {
+    for (int left = 0, right = size - 1; left < right; left++, right--) {
+      int temp = array[left];
+      array[left] = array[right];
+      array[right] = temp;
     }
   }
 
+  /**
+   * @param array the array to ensure a capacity for
+   * @param minCapacity the minimum capacity for the array
+   * @return a new array with minCapacity length
+   */
   public static int[] ensureCapacity(int[] array, int minCapacity) {
     int oldCapacity = array.length;
     if (minCapacity > oldCapacity) {
@@ -70,6 +92,11 @@ public final class ArrayUtils {
     return array;
   }
 
+  /**
+   * @param array the array to ensure a capacity for
+   * @param minCapacity the minimum capacity for the array
+   * @return a new array with minCapacity length
+   */
   public static long[] ensureCapacity(long[] array, int minCapacity) {
     int oldCapacity = array.length;
     if (minCapacity > oldCapacity) {

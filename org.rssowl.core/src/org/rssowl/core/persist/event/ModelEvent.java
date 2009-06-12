@@ -27,35 +27,32 @@ package org.rssowl.core.persist.event;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.event.runnable.EventRunnable;
 
-
 /**
  * The abstract super-type of all ModelEvents in the Application. This type
- * guarantees that each Event-Object issued for a Model-Type contains the ID of
- * the affected type using a <code>ModelReference</code> instance.
- * 
+ * guarantees that each Event-Object issued for a Model-Type contains the
+ * <code>IEntity</code> of the affected type.
+ *
  * @author bpasero
  */
-public abstract class ModelEvent    {
+public abstract class ModelEvent {
   private final IEntity fEntity;
   private final boolean fIsRoot;
 
   /**
-   * Stores an instance of <code>ModelReference</code> for the affected Type
-   * in this Event.
-   * 
-   * @param entity An instance of <code>ModelReference</code> for the
-   * affected Type.
+   * Stores an instance of <code>IEntity</code> for the affected Type in this
+   * Event.
+   *
+   * @param entity An instance of <code>IEntity</code> for the affected Type.
    */
   protected ModelEvent(IEntity entity) {
     this(entity, true);
   }
 
   /**
-   * Stores an instance of <code>ModelReference</code> for the affected Type
-   * in this Event.
-   * 
-   * @param entity An instance of <code>ModelReference</code> for the
-   * affected Type.
+   * Stores an instance of <code>IEntity</code> for the affected Type in this
+   * Event.
+   *
+   * @param entity An instance of <code>IEntity</code> for the affected Type.
    * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
    * <code>FALSE</code> otherwise.
    */
@@ -63,19 +60,14 @@ public abstract class ModelEvent    {
     fEntity = entity;
     fIsRoot = isRoot;
   }
-  
-  
 
   /**
-   * The reference instance can be used to resolve the Model-Type that is
-   * affected by this Event.
-   * 
-   * @return An instance of <code>ModelReference</code> for the affected Type.
+   * @return An instance of <code>IEntity</code> for the affected Type.
    */
   public IEntity getEntity() {
     return fEntity;
   }
-  
+
   /**
    * <p>
    * Some Events, like the import of a Folder filled with BookMarks, result in
@@ -85,30 +77,32 @@ public abstract class ModelEvent    {
    * Root-Event and decide wether an update is required.
    * </p>
    * Note: Any Event created is a Root-Event by default.
-   * 
+   *
    * @return Returns <code>TRUE</code> if this Event is the Root-Event,
    * <code>FALSE</code> otherwise.
    */
   public boolean isRoot() {
     return fIsRoot;
   }
-  
+
   /**
    * Creates a subclass of <code>EventRunnable</code> that can be used to hold
-   * events of the same type as this one. This is useful if the event should
-   * be fired in the future.<p>
-   * 
-   * As an example, if the method was called on a <code>NewsEvent</code>,
-   * a <code>NewsEventRunnable</code> would be created and returned. The
-   * same NewsEvent could then be added to the NewsEventRunnable and when
-   * appropriate, the event could be fired by calling the 
+   * events of the same type as this one. This is useful if the event should be
+   * fired in the future.
+   * <p>
+   * As an example, if the method was called on a <code>NewsEvent</code>, a
+   * <code>NewsEventRunnable</code> would be created and returned. The same
+   * NewsEvent could then be added to the NewsEventRunnable and when
+   * appropriate, the event could be fired by calling the
    * {@link EventRunnable#run()} method.
-   * 
+   *
    * @return EventRunnable subclass holding no events.
    */
   public abstract EventRunnable<? extends ModelEvent> createEventRunnable();
-  
 
+  /*
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     final int PRIME = 31;
@@ -118,6 +112,9 @@ public abstract class ModelEvent    {
     return result;
   }
 
+  /*
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -137,6 +134,9 @@ public abstract class ModelEvent    {
     return true;
   }
 
+  /*
+   * @see java.lang.Object#toString()
+   */
   @SuppressWarnings("nls")
   @Override
   public String toString() {

@@ -21,10 +21,17 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.event;
 
 import org.rssowl.core.persist.INewsBin;
 
+/**
+ * A Listener being notified whenever the type <code>INewsBin</code> was added,
+ * updated or deleted in the persistance layer.
+ *
+ * @author bpasero
+ */
 public interface NewsBinListener extends EntityListener<NewsBinEvent, INewsBin> {
   // No new methods
 }

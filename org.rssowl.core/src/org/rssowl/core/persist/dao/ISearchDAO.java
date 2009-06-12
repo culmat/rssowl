@@ -21,13 +21,18 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.dao;
 
 import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.event.SearchEvent;
 import org.rssowl.core.persist.event.SearchListener;
 
-public interface ISearchDAO extends IEntityDAO<ISearch, SearchListener, SearchEvent>  {
-
+/**
+ * A data-access-object for <code>ISearch</code>es.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
+public interface ISearchDAO extends IEntityDAO<ISearch, SearchListener, SearchEvent> {
   // No new methods
 }

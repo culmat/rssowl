@@ -33,25 +33,21 @@ import org.rssowl.core.persist.event.runnable.SearchConditionEventRunnable;
  * <code>ISearchCondition</code> was added, updated or deleted in the
  * persistance layer.
  * </p>
- * In order to retrieve the Model-Object that is affected on the Event, use the
- * <code>resolve()</code> Method of the <code>ModelReference</code> stored
- * in this Event.
- * 
+ *
  * @author bpasero
  */
 public final class SearchConditionEvent extends ModelEvent {
 
   /**
-   * Stores an instance of <code>ModelReference</code> for the affected Type
+   * Stores an instance of <code>ISearchCondition</code> for the affected Type
    * in this Event.
-   * 
-   * @param searchCondition An instance of <code>ModelReference</code> for the
+   *
+   * @param searchCondition An instance of <code>ISearchCondition</code> for the
    * affected Type.
    * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
    * <code>FALSE</code> otherwise.
    */
-  public SearchConditionEvent(ISearchCondition searchCondition, 
-      boolean isRoot) {
+  public SearchConditionEvent(ISearchCondition searchCondition, boolean isRoot) {
     super(searchCondition, isRoot);
   }
 
@@ -63,6 +59,9 @@ public final class SearchConditionEvent extends ModelEvent {
     return (ISearchCondition) super.getEntity();
   }
 
+  /*
+   * @see org.rssowl.core.persist.event.ModelEvent#createEventRunnable()
+   */
   @Override
   public SearchConditionEventRunnable createEventRunnable() {
     return new SearchConditionEventRunnable();

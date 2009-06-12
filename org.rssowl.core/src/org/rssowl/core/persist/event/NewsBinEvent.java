@@ -21,18 +21,40 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.event;
 
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.event.runnable.NewsBinEventRunnable;
 
-public final class NewsBinEvent extends MarkEvent    {
+/**
+ * <p>
+ * An Event-Object being used to notify Listeners, whenever the type
+ * <code>INewsBin</code> was added, updated or deleted in the persistance layer.
+ * </p>
+ *
+ * @author bpasero
+ */
+public final class NewsBinEvent extends MarkEvent {
 
+  /**
+   * Stores an instance of <code>INewsBin</code> for the affected Type in this
+   * Event.
+   *
+   * @param newsBin An instance of <code>INewsBin</code> for the affected Type.
+   * @param oldParent The previous saved version of the affected type or
+   * <code>null</code> if not known.
+   * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
+   * <code>FALSE</code> otherwise.
+   */
   public NewsBinEvent(INewsBin newsBin, IFolder oldParent, boolean isRoot) {
     super(newsBin, oldParent, isRoot);
   }
 
+  /*
+   * @see org.rssowl.core.persist.event.ModelEvent#createEventRunnable()
+   */
   @Override
   public NewsBinEventRunnable createEventRunnable() {
     return new NewsBinEventRunnable();

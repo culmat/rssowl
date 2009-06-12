@@ -30,13 +30,9 @@ import org.rssowl.core.persist.event.runnable.FolderEventRunnable;
 /**
  * <p>
  * An Event-Object being used to notify Listeners, whenever the type
- * <code>IFolder</code> was added, updated or deleted in the persistance
- * layer.
+ * <code>IFolder</code> was added, updated or deleted in the persistance layer.
  * </p>
- * In order to retrieve the Model-Object that is affected on the Event, use the
- * <code>resolve()</code> Method of the <code>ModelReference</code> stored
- * in this Event.
- * 
+ *
  * @author bpasero
  */
 public final class FolderEvent extends ModelEvent {
@@ -45,11 +41,10 @@ public final class FolderEvent extends ModelEvent {
   private final IFolder fOldParent;
 
   /**
-   * Stores an instance of <code>ModelReference</code> and the Parent
-   * Reference for the affected Type in this Event.
-   * 
-   * @param folder An instance of <code>ModelReference</code> for the
-   * affected Type.
+   * Stores an instance of <code>IFolder</code> and the Parent Reference for the
+   * affected Type in this Event.
+   *
+   * @param folder An instance of <code>IFolder</code> for the affected Type.
    * @param oldParent If this Event informs about a Reparenting the old parent
    * is used to do updates in the UI, <code>NULL</code> otherwise.
    * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
@@ -72,10 +67,10 @@ public final class FolderEvent extends ModelEvent {
    * Get the previous Parent of this Type in case this Event informs about a
    * Reparenting.
    * <p>
-   * Note that this Method <em>will</em> return <code>NULL</code> in any
-   * case where the Event is not informing about reparenting!
+   * Note that this Method <em>will</em> return <code>NULL</code> in any case
+   * where the Event is not informing about reparenting!
    * </p>
-   * 
+   *
    * @return Returns the previous Parent of this Type in case this Event informs
    * about Reparenting. Otherwise this Method will return <code>NULL</code>.
    */
@@ -83,6 +78,9 @@ public final class FolderEvent extends ModelEvent {
     return fOldParent;
   }
 
+  /*
+   * @see org.rssowl.core.persist.event.ModelEvent#createEventRunnable()
+   */
   @Override
   public FolderEventRunnable createEventRunnable() {
     return new FolderEventRunnable();

@@ -29,8 +29,8 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.service.PersistenceException;
 
 /**
- * A <code>ModelReference</code> is a potential lightweight representation of
- * a Model-Type. The actual heavyweight Model-Type can be retrieved calling the
+ * A <code>ModelReference</code> is a potential lightweight representation of a
+ * Model-Type. The actual heavyweight Model-Type can be retrieved calling the
  * resolve()-Method.
  *
  * @author bpasero
@@ -40,14 +40,14 @@ public abstract class ModelReference {
   private final Class<? extends IEntity> fEntityClass;
 
   /**
-   * Instantiates a new lightweight reference. Any resolve()-call will be
-   * passed to the <code>IModelDAO</code> to load the heavyweight type from
-   * the persistence layer.
+   * Instantiates a new lightweight reference. Any resolve()-call will be passed
+   * to the <code>IEntityDAO</code> to load the heavyweight type from the
+   * persistence layer.
    *
    * @param id The ID of the type to use for loading the type from the
    * persistence layer.
-   * @param entityClass the class of the Entity that this reference points
-   * to. This may be the interface (e.g. INews.class) or the result of calling
+   * @param entityClass the class of the Entity that this reference points to.
+   * This may be the interface (e.g. INews.class) or the result of calling
    * IEntity#getClass().
    */
   protected ModelReference(long id, Class<? extends IEntity> entityClass) {
@@ -58,7 +58,7 @@ public abstract class ModelReference {
   /**
    * @return the class of the entity type represented by this reference.
    */
-  public final Class<? extends IEntity> getEntityClass()    {
+  public final Class<? extends IEntity> getEntityClass() {
     return fEntityClass;
   }
 
@@ -79,7 +79,7 @@ public abstract class ModelReference {
    * @throws PersistenceException In case of an error while accessing the
    * persistance layer implementation.
    */
-  public IEntity resolve() throws PersistenceException  {
+  public IEntity resolve() throws PersistenceException {
     return DynamicDAO.getDAOFromEntity(fEntityClass).load(fId);
   }
 
@@ -97,6 +97,9 @@ public abstract class ModelReference {
     return entityId == null ? false : fId == entityId.longValue();
   }
 
+  /*
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -109,11 +112,17 @@ public abstract class ModelReference {
     return fId == other.fId;
   }
 
+  /*
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     return (int) (fId ^ (fId >>> 32));
   }
 
+  /*
+   * @see java.lang.Object#toString()
+   */
   @Override
   @SuppressWarnings("nls")
   public String toString() {

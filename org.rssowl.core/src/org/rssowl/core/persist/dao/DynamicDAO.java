@@ -38,10 +38,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Convinient access to commonly used methods from the persistence layer.
  */
 public final class DynamicDAO {
 
+  /* Singleton Instance */
   private static DAOService DAO_SERVICE;
 
   private synchronized static final DAOService getDAOService() {
@@ -66,7 +67,7 @@ public final class DynamicDAO {
    * @throws IllegalArgumentException if there is no DAO for
    * <code>entityClass</code>.
    */
-  public static boolean exists(Class<? extends IEntity> entityClass, long id) throws PersistenceException   {
+  public static boolean exists(Class<? extends IEntity> entityClass, long id) throws PersistenceException {
     IEntityDAO<?, ?, ?> dao = getDAOFromEntity(entityClass);
     checkEntityDAO(entityClass, dao);
     return dao.exists(id);
@@ -80,34 +81,33 @@ public final class DynamicDAO {
    * @param <T> The type of the entity to be loaded.
    * @param entityClass The Class of the entity to be loaded.
    * @param id The id of the persistable to load from the persistence system.
-   * @return the persistable with <code>id</code> or <code>null</code> in
-   * case none exists.
+   * @return the persistable with <code>id</code> or <code>null</code> in case
+   * none exists.
    * @throws PersistenceException In case of an error while loading the
    * persistable.
    * @throws IllegalArgumentException if there is no DAO for
    * <code>entityClass</code>.
    */
-  public static <T extends IEntity> T load(Class<T> entityClass, long id) throws PersistenceException   {
+  public static <T extends IEntity> T load(Class<T> entityClass, long id) throws PersistenceException {
     IEntityDAO<T, ?, ?> dao = getDAOFromEntity(entityClass);
     checkEntityDAO(entityClass, dao);
     return dao.load(id);
   }
 
   /**
-   * Loads a <code>Collection</code> of all <code>IPersistable</code>s of
-   * type <code>persistableClass</code>.
+   * Loads a <code>Collection</code> of all <code>IPersistable</code>s of type
+   * <code>persistableClass</code>.
    *
    * @param <T> The type of IPersistable to be loaded.
    * @param persistableClass The Class of IPersistable to be loaded.
-   * @return Returns a <code>Collection</code> of all
-   * <code>IPersistable</code>s this DAO of type
-   * <code>persistableClass</code>.
+   * @return Returns a <code>Collection</code> of all <code>IPersistable</code>s
+   * this DAO of type <code>persistableClass</code>.
    * @throws PersistenceException In case of an error while trying to perform
    * the operation.
    * @throws IllegalArgumentException if there is no DAO for
    * <code>persistableClass</code>.
    */
-  public static <T extends IPersistable> Collection<T> loadAll(Class<T> persistableClass) throws PersistenceException   {
+  public static <T extends IPersistable> Collection<T> loadAll(Class<T> persistableClass) throws PersistenceException {
     IPersistableDAO<T> dao = getDAOFromPersistable(persistableClass);
     checkPersistableDAO(persistableClass, dao);
     return dao.loadAll();
@@ -127,7 +127,7 @@ public final class DynamicDAO {
    * <code>persistable</code>.
    */
   @SuppressWarnings("unchecked")
-  public static <T extends IPersistable> T save(T persistable) throws PersistenceException   {
+  public static <T extends IPersistable> T save(T persistable) throws PersistenceException {
     Class<? extends IPersistable> persistableClass = persistable.getClass();
     IPersistableDAO<T> dao = (IPersistableDAO<T>) getDAOFromPersistable(persistableClass);
     checkPersistableDAO(persistableClass, dao);
@@ -135,25 +135,25 @@ public final class DynamicDAO {
   }
 
   /**
-   * Saves the given Collection of <code>persistable</code>s to the
-   * persistence system in a single operation. This method handles new and
-   * existing persistables. In other words, it will add or update the
-   * persistable as appropriate.
+   * Saves the given Collection of <code>persistable</code>s to the persistence
+   * system in a single operation. This method handles new and existing
+   * persistables. In other words, it will add or update the persistable as
+   * appropriate.
    *
    * @param <T> The supertype of persistables to be saved.
    * @param persistables The persistables to save.
    * @throws PersistenceException In case of an error while trying to perform
    * the operation.
-   * @throws IllegalArgumentException if there is no DAO for any of the persistables
-   * in the provided collection.
+   * @throws IllegalArgumentException if there is no DAO for any of the
+   * persistables in the provided collection.
    */
   @SuppressWarnings("unchecked")
-  public static <T extends IPersistable> void saveAll(Collection<T> persistables) throws PersistenceException   {
+  public static <T extends IPersistable> void saveAll(Collection<T> persistables) throws PersistenceException {
     if (persistables.size() == 0)
       return;
 
-    Map<Class< ? extends IPersistable>, List<T>> persistablesMap = getPersistablesMap(persistables);
-    for (Map.Entry<Class< ? extends IPersistable>, List<T>> entry : persistablesMap.entrySet()) {
+    Map<Class<? extends IPersistable>, List<T>> persistablesMap = getPersistablesMap(persistables);
+    for (Map.Entry<Class<? extends IPersistable>, List<T>> entry : persistablesMap.entrySet()) {
       Class<? extends IPersistable> key = entry.getKey();
       IPersistableDAO<T> dao = (IPersistableDAO<T>) getDAOFromPersistable(key);
       checkPersistableDAO(key, dao);
@@ -161,10 +161,10 @@ public final class DynamicDAO {
     }
   }
 
-  private static <T extends IPersistable> Map<Class< ? extends IPersistable>, List<T>> getPersistablesMap(Collection<T> persistables) {
-    Map<Class< ? extends IPersistable>, List<T>> persistablesMap = new LinkedHashMap<Class< ? extends IPersistable>, List<T>>(3);
+  private static <T extends IPersistable> Map<Class<? extends IPersistable>, List<T>> getPersistablesMap(Collection<T> persistables) {
+    Map<Class<? extends IPersistable>, List<T>> persistablesMap = new LinkedHashMap<Class<? extends IPersistable>, List<T>>(3);
     for (T persistable : persistables) {
-      Class< ? extends IPersistable> persistableClass = persistable.getClass();
+      Class<? extends IPersistable> persistableClass = persistable.getClass();
       List<T> persistableList = persistablesMap.get(persistableClass);
       if (persistableList == null) {
         persistableList = new ArrayList<T>(persistables.size());
@@ -186,7 +186,7 @@ public final class DynamicDAO {
    * <code>entityClass</code>.
    */
   @SuppressWarnings("unchecked")
-  public static <T extends IPersistable> void delete(T persistable) throws PersistenceException   {
+  public static <T extends IPersistable> void delete(T persistable) throws PersistenceException {
     Class<? extends IPersistable> persistableClass = persistable.getClass();
     IPersistableDAO<T> dao = (IPersistableDAO<T>) getDAOFromPersistable(persistableClass);
     checkPersistableDAO(persistableClass, dao);
@@ -201,15 +201,15 @@ public final class DynamicDAO {
    * @param persistables The persistables to delete.
    * @throws PersistenceException In case of an error while trying to perform
    * the operation.
-   * @throws IllegalArgumentException if there is no DAO for any of the persistables
-   * in the provided collection.
+   * @throws IllegalArgumentException if there is no DAO for any of the
+   * persistables in the provided collection.
    */
   @SuppressWarnings("unchecked")
-  public static <T extends IPersistable> void deleteAll(Collection<T> persistables) throws PersistenceException   {
+  public static <T extends IPersistable> void deleteAll(Collection<T> persistables) throws PersistenceException {
     if (persistables.size() == 0)
       return;
 
-    Map<Class< ? extends IPersistable>, List<T>> persistablesMap = getPersistablesMap(persistables);
+    Map<Class<? extends IPersistable>, List<T>> persistablesMap = getPersistablesMap(persistables);
     for (Map.Entry<Class<? extends IPersistable>, List<T>> entry : persistablesMap.entrySet()) {
       Class<? extends IPersistable> key = entry.getKey();
       IPersistableDAO<T> dao = (IPersistableDAO<T>) getDAOFromPersistable(key);
@@ -231,7 +231,7 @@ public final class DynamicDAO {
    * @throws IllegalArgumentException if there is no DAO for
    * <code>persistableClass</code>.
    */
-  public static <T extends IPersistable> long countAll(Class<T> persistableClass) throws PersistenceException   {
+  public static <T extends IPersistable> long countAll(Class<T> persistableClass) throws PersistenceException {
     IPersistableDAO<T> dao = getDAOFromPersistable(persistableClass);
     checkPersistableDAO(persistableClass, dao);
     return dao.countAll();
@@ -249,8 +249,8 @@ public final class DynamicDAO {
 
   /**
    * Adds a listener to the collection of listeners who will be notified
-   * whenever entities of type <code>T extends IEntity</code> get added,
-   * updated or removed.
+   * whenever entities of type <code>T extends IEntity</code> get added, updated
+   * or removed.
    *
    * @param <T> The type of the entity.
    * @param <L> The type of the listener.
@@ -269,8 +269,8 @@ public final class DynamicDAO {
 
   /**
    * Removes a listener from the collection of listeners who will be notified
-   * whenever entities of type <code>T extends IEntity</code> get added,
-   * updated or removed.
+   * whenever entities of type <code>T extends IEntity</code> get added, updated
+   * or removed.
    *
    * @param <T> The type of the entity.
    * @param <L> The type of the listener.
@@ -325,7 +325,7 @@ public final class DynamicDAO {
    * @return The DAO responsible for <code>entityClass</code> or
    * <code>null</code> if no such DAO exists.
    */
-  public static <T extends IEntity> IEntityDAO<T, ?, ?> getDAOFromEntity(Class<? extends T> entityClass)  {
+  public static <T extends IEntity> IEntityDAO<T, ?, ?> getDAOFromEntity(Class<? extends T> entityClass) {
     return getDAOService().getDAOFromPersistable(entityClass);
   }
 }

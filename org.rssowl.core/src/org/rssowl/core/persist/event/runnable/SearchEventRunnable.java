@@ -21,13 +21,22 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.event.runnable;
 
 import org.rssowl.core.persist.event.SearchEvent;
 
-
+/**
+ * Provides a way to fire a SearchEventRunnable in the future.
+ *
+ * @see EventRunnable
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
 public final class SearchEventRunnable extends EventRunnable<SearchEvent> {
 
+  /**
+   * Creates a new instance of this object.
+   */
   public SearchEventRunnable() {
     super(SearchEvent.class, getDAOService().getSearchDAO());
   }

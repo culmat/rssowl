@@ -21,6 +21,7 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.event;
 
 import org.rssowl.core.persist.IFolder;
@@ -29,26 +30,21 @@ import org.rssowl.core.persist.IMark;
 /**
  * <p>
  * An Event-Object being used to notify Listeners, whenever a subclass of
- * <code>IMark</code> is added, updated or deleted in the persistence
- * layer.
+ * <code>IMark</code> is added, updated or deleted in the persistence layer.
  * </p>
- * In order to retrieve the Model-Object that is affected on the Event, use the
- * <code>resolve()</code> Method of the <code>ModelReference</code> stored
- * in this Event.
  *
  * @author bpasero
  */
-public abstract class MarkEvent extends ModelEvent   {
+public abstract class MarkEvent extends ModelEvent {
 
   /* In case of Reparenting, remember the old parent */
   private final IFolder fOldParent;
 
   /**
-   * Stores an instance of <code>ModelReference</code> and the Parent
-   * Reference for the affected Type in this Event.
+   * Stores an instance of <code>IMark</code> and the Parent Reference for the
+   * affected Type in this Event.
    *
-   * @param mark An instance of <code>ModelReference</code> for the
-   * affected Type.
+   * @param mark An instance of <code>IMark</code> for the affected Type.
    * @param oldParent If this Event informs about a Reparenting the old parent
    * is used to do updates in the UI, <code>NULL</code> otherwise.
    * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
@@ -59,6 +55,9 @@ public abstract class MarkEvent extends ModelEvent   {
     fOldParent = oldParent;
   }
 
+  /*
+   * @see org.rssowl.core.persist.event.ModelEvent#getEntity()
+   */
   @Override
   public IMark getEntity() {
     return (IMark) super.getEntity();
@@ -68,8 +67,8 @@ public abstract class MarkEvent extends ModelEvent   {
    * Get the previous Parent of this Type in case this Event informs about a
    * Reparenting.
    * <p>
-   * Note that this Method <em>will</em> return <code>NULL</code> in any
-   * case where the Event is not informing about reparenting!
+   * Note that this Method <em>will</em> return <code>NULL</code> in any case
+   * where the Event is not informing about reparenting!
    * </p>
    *
    * @return Returns the previous Parent of this Type in case this Event informs

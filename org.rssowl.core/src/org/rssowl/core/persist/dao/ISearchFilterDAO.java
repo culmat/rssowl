@@ -28,7 +28,11 @@ import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.event.SearchFilterEvent;
 import org.rssowl.core.persist.event.SearchFilterListener;
 
+/**
+ * A data-access-object for <code>ISearchFilter</code>s.
+ *
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
 public interface ISearchFilterDAO extends IEntityDAO<ISearchFilter, SearchFilterListener, SearchFilterEvent> {
-
   // No new methods
 }

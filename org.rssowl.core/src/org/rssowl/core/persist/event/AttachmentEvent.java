@@ -33,29 +33,26 @@ import org.rssowl.core.persist.event.runnable.AttachmentEventRunnable;
  * <code>IAttachment</code> was added, updated or deleted in the persistance
  * layer.
  * </p>
- * In order to retrieve the Model-Object that is affected on the Event, use the
- * <code>resolve()</code> Method of the <code>ModelReference</code> stored
- * in this Event.
- * 
+ *
  * @author bpasero
  */
-public final class AttachmentEvent extends ModelEvent   {
+public final class AttachmentEvent extends ModelEvent {
 
   /**
-   * Stores an instance of <code>ModelReference</code> for the affected Type
-   * in this Event.
-   * 
-   * @param attachment An instance of <code>ModelReference</code> for the
-   * affected Type.
+   * Stores an instance of <code>IAttachment</code> for the affected Type in
+   * this Event.
+   *
+   * @param attachment An instance of <code>IAttachment</code> for the affected
+   * Type.
    */
   public AttachmentEvent(IAttachment attachment) {
     super(attachment);
   }
 
   /**
-   * Stores an instance of <code>ModelReference</code> for the affected Type
-   * in this Event.
-   * 
+   * Stores an instance of <code>IAttachment</code> for the affected Type in
+   * this Event.
+   *
    * @param attachment An instance of the affected Type.
    * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
    * <code>FALSE</code> otherwise.
@@ -63,7 +60,7 @@ public final class AttachmentEvent extends ModelEvent   {
   public AttachmentEvent(IAttachment attachment, boolean isRoot) {
     super(attachment, isRoot);
   }
-  
+
   /*
    * @see org.rssowl.core.model.events.ModelEvent#getReference()
    */
@@ -72,6 +69,9 @@ public final class AttachmentEvent extends ModelEvent   {
     return (IAttachment) super.getEntity();
   }
 
+  /*
+   * @see org.rssowl.core.persist.event.ModelEvent#createEventRunnable()
+   */
   @Override
   public AttachmentEventRunnable createEventRunnable() {
     return new AttachmentEventRunnable();

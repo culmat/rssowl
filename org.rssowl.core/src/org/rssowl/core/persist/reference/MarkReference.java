@@ -29,16 +29,16 @@ import org.rssowl.core.persist.IMark;
 /**
  * Implementation of the <code>ModelReference</code> for the Type
  * <code>IMark</code>.
- * 
+ *
  * @author bpasero
  */
 public abstract class MarkReference extends ModelReference {
 
   /**
    * Instantiates a new leightweight reference. Any resolve()-call will be
-   * passed to the <code>IModelDAO</code> to load the heavyweight type from
-   * the persistance layer.
-   * 
+   * passed to the <code>IEntityDAO</code> to load the heavyweight type from the
+   * persistance layer.
+   *
    * @param id The ID of the type to use for loading the type from the
    * persistance layer.
    * @param markClass the class of the IMark (e.g. IBookMark.class).

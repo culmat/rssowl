@@ -21,25 +21,47 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.event;
 
 import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.event.runnable.SearchEventRunnable;
 
+/**
+ * <p>
+ * An Event-Object being used to notify Listeners, whenever the type
+ * <code>ISearch</code> was added, updated or deleted in the persistance layer.
+ * </p>
+ *
+ * @author bpasero
+ */
 public final class SearchEvent extends ModelEvent {
 
-  public SearchEvent(ISearch entity, boolean isRoot) {
-    super(entity, isRoot);
+  /**
+   * Stores an instance of <code>ISearch</code> for the affected Type in this
+   * Event.
+   *
+   * @param search An instance of <code>ISearch</code> for the affected Type.
+   * @param isRoot <code>TRUE</code> if this Event is a Root-Event,
+   * <code>FALSE</code> otherwise.
+   */
+  public SearchEvent(ISearch search, boolean isRoot) {
+    super(search, isRoot);
   }
 
+  /*
+   * @see org.rssowl.core.persist.event.ModelEvent#createEventRunnable()
+   */
   @Override
   public SearchEventRunnable createEventRunnable() {
     return new SearchEventRunnable();
   }
 
+  /*
+   * @see org.rssowl.core.persist.event.ModelEvent#getEntity()
+   */
   @Override
   public ISearch getEntity() {
     return (ISearch) super.getEntity();
   }
-
 }

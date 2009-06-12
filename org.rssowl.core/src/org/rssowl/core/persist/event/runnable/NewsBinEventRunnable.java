@@ -21,14 +21,23 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.persist.event.runnable;
 
 import org.rssowl.core.persist.event.NewsBinEvent;
 
+/**
+ * Provides a way to fire a NewsBinEventRunnable in the future.
+ *
+ * @see EventRunnable
+ * @author Ismael Juma (ismael@juma.me.uk)
+ */
 public class NewsBinEventRunnable extends EventRunnable<NewsBinEvent> {
 
+  /**
+   * Creates a new instance of this object.
+   */
   public NewsBinEventRunnable() {
     super(NewsBinEvent.class, getDAOService().getNewsBinDao());
   }
-
 }

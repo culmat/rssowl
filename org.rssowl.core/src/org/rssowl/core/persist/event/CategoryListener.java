@@ -26,11 +26,10 @@ package org.rssowl.core.persist.event;
 
 import org.rssowl.core.persist.ICategory;
 
-
 /**
- * A Listener being notified whenever the type <code>ICategory</code> was
- * added, updated or deleted in the persistance layer.
- * 
+ * A Listener being notified whenever the type <code>ICategory</code> was added,
+ * updated or deleted in the persistance layer.
+ *
  * @author bpasero
  */
 public interface CategoryListener extends EntityListener<CategoryEvent, ICategory> {
