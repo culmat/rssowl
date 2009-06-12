@@ -326,7 +326,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     }
 
     /* Handle EntityGroup */
-    else if (element instanceof EntityGroup && colIndex == 0)
+    else if (element instanceof EntityGroup && column == NewsColumn.TITLE)
       text = ((EntityGroup) element).getName();
 
     /* Make sure to normalize the Text for the Table */
@@ -386,7 +386,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     }
 
     /* EntityGroup Image */
-    else if (element instanceof EntityGroup && colIndex == 0) {
+    else if (element instanceof EntityGroup && newsColumn == NewsColumn.TITLE) {
       EntityGroup group = (EntityGroup) element;
       if (group.getImage() != null)
         return OwlUI.getImage(fResources, group.getImage());

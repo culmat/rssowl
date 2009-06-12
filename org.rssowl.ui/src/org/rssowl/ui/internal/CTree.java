@@ -184,10 +184,10 @@ public class CTree {
 
         /* Bug on Windows: First column in tree always needs extra space for expand/collapse */
         if (Application.IS_WINDOWS && i == 0) {
-          if (fIsFlat && widthHint < 45)
-            widthHint = 45;
-          else if (!fIsFlat && widthHint < 65)
-            widthHint = 65;
+          if (fIsFlat)
+            widthHint += 25;
+          else if (!fIsFlat)
+            widthHint += 45;
         }
 
         freeWidth -= widthHint;
