@@ -1040,4 +1040,8 @@ public class NewsTableControl implements IFeedViewPart {
       }
     });
   }
+
+  void notifyGroupingEnabled(boolean enabled) {
+    fCustomTree.setFlat(!enabled);
+  }
 }

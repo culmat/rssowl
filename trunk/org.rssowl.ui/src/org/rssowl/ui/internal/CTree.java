@@ -50,6 +50,7 @@ public class CTree {
 
   private Tree fTree;
   private List<TreeColumn> fCols = new ArrayList<TreeColumn>();
+  private boolean fIsFlat = true;
 
   /**
    * @param parent
@@ -69,6 +70,14 @@ public class CTree {
    */
   public Tree getControl() {
     return fTree;
+  }
+
+  /**
+   * @param flat if <code>true</code> only one level of tree items is used and
+   * <code>false</code> if the tree has parent and childs.
+   */
+  public void setFlat(boolean flat) {
+    fIsFlat = flat;
   }
 
   /**
@@ -174,8 +183,11 @@ public class CTree {
         int widthHint = data.getWidthHint();
 
         /* Bug on Windows: First column in tree always needs extra space for expand/collapse */
-        if (Application.IS_WINDOWS && i == 0 && widthHint < 45) {
-          widthHint = 45;
+        if (Application.IS_WINDOWS && i == 0) {
+          if (fIsFlat && widthHint < 45)
+            widthHint = 45;
+          else if (!fIsFlat && widthHint < 65)
+            widthHint = 65;
         }
 
         freeWidth -= widthHint;
