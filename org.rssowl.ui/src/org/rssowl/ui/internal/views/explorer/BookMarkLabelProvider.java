@@ -142,8 +142,10 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     /* Create Label for a Folder */
     if (element instanceof IFolder) {
       IFolder folder = (IFolder) element;
+      boolean hasSticky = false;
 
       if (fIndicateState) {
+        hasSticky = hasSticky(folder);
         unreadNewsCount = getNewsCount(folder, true);
         newNewsCount = getNewsCount(folder, false);
       }
@@ -171,8 +173,11 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       /* Reset Foreground */
       cell.setForeground(null);
 
-      /* Reset Background */
-      cell.setBackground(null);
+      /* Background Color */
+      if (hasSticky)
+        cell.setBackground(fStickyBgColor);
+      else
+        cell.setBackground(null);
     }
 
     /* Create generic Label for instances of INewsMark */
@@ -307,6 +312,25 @@ public class BookMarkLabelProvider extends CellLabelProvider {
    */
   @Override
   public boolean isLabelProperty(Object element, String property) {
+    return false;
+  }
+
+  private boolean hasSticky(IFolder folder) {
+
+    /* Go through all Folders and Bookmarks */
+    List<IFolderChild> children = folder.getChildren();
+    for (IFolderChild child : children) {
+      if (child instanceof IBookMark) {
+        IBookMark bookmark = (IBookMark) child;
+        if (bookmark.getStickyNewsCount() > 0)
+          return true;
+      }
+
+      /* Folder */
+      else if (child instanceof IFolder)
+        return hasSticky((IFolder) child);
+    }
+
     return false;
   }
 
