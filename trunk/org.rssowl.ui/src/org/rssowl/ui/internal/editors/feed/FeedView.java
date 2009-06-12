@@ -300,6 +300,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         /* Create Content for each Item */
         content.append("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
         content.append("<html>\n  <head>\n");
+        content.append("\n  <meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n");
         StringWriter css = new StringWriter();
         try {
           labelProvider.writeCSS(css);
