@@ -164,6 +164,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** BookMark News-Filtering */
   public static final String BM_NEWS_GROUPING = "org.rssowl.pref.BMNewsGrouping";
 
+  /** BookMark Load Images */
+  public static final String BM_LOAD_IMAGES = "org.rssowl.pref.BMLoadImages";
+
   /** Mark: Open Website instead of showing News */
   public static final String BM_OPEN_SITE_FOR_NEWS = "org.rssowl.pref.BMOpenSiteForNews";
 
@@ -393,6 +396,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
   private void initDisplayDefaults(IPreferenceScope defaultScope) {
     defaultScope.putInteger(BM_NEWS_FILTERING, -1);
     defaultScope.putInteger(BM_NEWS_GROUPING, -1);
+    defaultScope.putBoolean(BM_LOAD_IMAGES, true);
   }
 
   private void initReloadOpenDefaults(IPreferenceScope defaultScope) {
