@@ -67,6 +67,7 @@ public class NewsBrowserControl implements IFeedViewPart {
   private Object fInitialInput;
   private IPreferenceScope fInputPreferences;
   private IPropertyChangeListener fPropertyChangeListener;
+  private boolean fStripMediaFromNews;
 
   /*
    * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#init(org.eclipse.ui.IEditorSite)
@@ -80,6 +81,9 @@ public class NewsBrowserControl implements IFeedViewPart {
    */
   public void onInputChanged(FeedViewInput input) {
     fInputPreferences = Owl.getPreferenceService().getEntityScope(input.getMark());
+    fStripMediaFromNews = !fInputPreferences.getBoolean(DefaultPreferences.BM_LOAD_IMAGES);
+    if (fViewer != null && fViewer.getLabelProvider() != null)
+      ((NewsBrowserLabelProvider) fViewer.getLabelProvider()).setStripMediaFromNews(fStripMediaFromNews);
   }
 
   /*
@@ -109,7 +113,9 @@ public class NewsBrowserControl implements IFeedViewPart {
     fViewer.setContentProvider(contentProvider);
 
     /* Create LabelProvider */
-    fViewer.setLabelProvider(new NewsBrowserLabelProvider(fViewer));
+    NewsBrowserLabelProvider labelProvider = new NewsBrowserLabelProvider(fViewer);
+    labelProvider.setStripMediaFromNews(fStripMediaFromNews);
+    fViewer.setLabelProvider(labelProvider);
 
     /* Create Comparator */
     fViewer.setComparator(new NewsComparator());

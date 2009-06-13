@@ -54,7 +54,9 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.net.URI;
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -66,6 +68,9 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   /* Date Formatter for News */
   private DateFormat fDateFormat = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT);
 
+  /* Potential Media Tags */
+  private final Set<String> fMediaTags = new HashSet<String>(Arrays.asList(new String[] { "img", "applet", "embed", "area", "frame", "frameset", "iframe", "map", "object" }));
+
   private String fNewsFontFamily;
   private String fNormalFontCSS;
   private String fSmallFontCSS;
@@ -74,6 +79,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private String fStickyBGColorCSS;
   private IPropertyChangeListener fPropertyChangeListener;
   private NewsBrowserViewer fViewer;
+  private boolean fStripMediaFromNews;
 
   /**
    * Creates a new Browser LabelProvider for News
@@ -85,6 +91,14 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     createFonts();
     createColors();
     registerListeners();
+  }
+
+  /**
+   * @param stripMediaFromNews <code>true</code> to strip images and other media
+   * from the news and <code>false</code> otherwise.
+   */
+  void setStripMediaFromNews(boolean stripMediaFromNews) {
+    fStripMediaFromNews = stripMediaFromNews;
   }
 
   /*
@@ -305,6 +319,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   private String getLabel(INews news, boolean withInternalLinks) {
     String description = news.getDescription();
+    if (fStripMediaFromNews)
+      description = StringUtils.filterTags(description, fMediaTags);
     StringBuilder builder = getBuilder(news, description);
     StringBuilder search = new StringBuilder();
 
