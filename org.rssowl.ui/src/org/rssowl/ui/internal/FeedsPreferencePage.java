@@ -354,7 +354,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   private void createCleanUpGroup(TabFolder parent) {
     Composite group = new Composite(parent, SWT.NONE);
     group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    group.setLayout(LayoutUtils.createGridLayout(2, 10, 10, 10, 5, false));
+    group.setLayout(LayoutUtils.createGridLayout(2, 10, 10, 5, 5, false));
 
     TabItem item = new TabItem(parent, SWT.None);
     item.setText("Clean Up");
