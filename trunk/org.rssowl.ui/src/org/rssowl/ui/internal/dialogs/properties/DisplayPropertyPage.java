@@ -59,12 +59,14 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
   private Combo fFilterCombo;
   private Combo fGroupCombo;
   private Button fOpenSiteForNewsCheck;
+  private Button fLoadImagesForNewsCheck;
 
   /* Settings */
   private List<IPreferenceScope> fEntityPreferences;
   private int fPrefSelectedFilter;
   private int fPrefSelectedGroup;
   private boolean fPrefOpenSiteForNews;
+  private boolean fPrefLoadImagesForNews;
   private boolean fSettingsChanged;
 
   /*
@@ -91,6 +93,7 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
     fPrefSelectedFilter = firstScope.getInteger(DefaultPreferences.BM_NEWS_FILTERING);
     fPrefSelectedGroup = firstScope.getInteger(DefaultPreferences.BM_NEWS_GROUPING);
     fPrefOpenSiteForNews = firstScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS);
+    fPrefLoadImagesForNews = firstScope.getBoolean(DefaultPreferences.BM_LOAD_IMAGES);
 
     /* For any other scope not sharing the initial values, use the default */
     IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
@@ -105,6 +108,9 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
 
       if (otherScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS) != fPrefOpenSiteForNews)
         fPrefOpenSiteForNews = defaultScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS);
+
+      if (otherScope.getBoolean(DefaultPreferences.BM_LOAD_IMAGES) != fPrefLoadImagesForNews)
+        fPrefLoadImagesForNews = defaultScope.getBoolean(DefaultPreferences.BM_LOAD_IMAGES);
     }
   }
 
@@ -150,6 +156,12 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
     fOpenSiteForNewsCheck.setText("When a news is selected, open its link directly");
     fOpenSiteForNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fOpenSiteForNewsCheck.setSelection(fPrefOpenSiteForNews);
+
+    /* Load Images for News Settings */
+    fLoadImagesForNewsCheck = new Button(container, SWT.CHECK);
+    fLoadImagesForNewsCheck.setText("Display images and flash content from news");
+    fLoadImagesForNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
+    fLoadImagesForNewsCheck.setSelection(fPrefLoadImagesForNews);
 
     return container;
   }
@@ -224,6 +236,13 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
     boolean bVal = fOpenSiteForNewsCheck.getSelection();
     if (fPrefOpenSiteForNews != bVal) {
       scope.putBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS, bVal);
+      changed = true;
+    }
+
+    /* Load Images for News */
+    bVal = fLoadImagesForNewsCheck.getSelection();
+    if (fPrefLoadImagesForNews != bVal) {
+      scope.putBoolean(DefaultPreferences.BM_LOAD_IMAGES, bVal);
       changed = true;
     }
 

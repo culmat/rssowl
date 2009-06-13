@@ -99,6 +99,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   private Combo fGroupCombo;
   private Button fOpenSiteForNewsCheck;
   private Button fOpenSiteForEmptyNewsCheck;
+  private Button fLoadImagesForNewsCheck;
   private Button fMarkReadStateCheck;
   private Spinner fMarkReadAfterSpinner;
   private Button fMarkReadOnMinimize;
@@ -328,6 +329,12 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fOpenSiteForEmptyNewsCheck.setText("When a news' summary is empty, open its link directly");
     fOpenSiteForEmptyNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fOpenSiteForEmptyNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS));
+
+    /* Load Images for News Settings */
+    fLoadImagesForNewsCheck = new Button(group, SWT.CHECK);
+    fLoadImagesForNewsCheck.setText("Display images and flash content from news");
+    fLoadImagesForNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
+    fLoadImagesForNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_LOAD_IMAGES));
   }
 
   private void createColumnsGroup(TabFolder parent) {
@@ -474,10 +481,11 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
       displayChange = true;
     }
 
-    if (fGlobalScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS) != (fOpenSiteForNewsCheck.getSelection())) {
+    if (fGlobalScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS) != (fOpenSiteForNewsCheck.getSelection()))
       fGlobalScope.putBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS, fOpenSiteForNewsCheck.getSelection());
-      displayChange = true;
-    }
+
+    if (fGlobalScope.getBoolean(DefaultPreferences.BM_LOAD_IMAGES) != (fLoadImagesForNewsCheck.getSelection()))
+      fGlobalScope.putBoolean(DefaultPreferences.BM_LOAD_IMAGES, fLoadImagesForNewsCheck.getSelection());
 
     fGlobalScope.putBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS, fOpenSiteForEmptyNewsCheck.getSelection());
 
@@ -620,6 +628,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fGroupCombo.select(defaultScope.getInteger(DefaultPreferences.BM_NEWS_GROUPING) + 1);
     fOpenSiteForNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS));
     fOpenSiteForEmptyNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS));
+    fLoadImagesForNewsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.BM_LOAD_IMAGES));
 
     /* Columns */
     fColumnSelectionControl.setInput(NewsColumnViewModel.loadFrom(defaultScope));
