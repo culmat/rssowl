@@ -136,7 +136,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
    */
   public Control createContents(Composite parent) {
     Composite container = new Composite(parent, SWT.NONE);
-    container.setLayout(LayoutUtils.createGridLayout(2, 10, 10, 10, 5, false));
+    container.setLayout(LayoutUtils.createGridLayout(2, 10, 10, 5, 5, false));
 
     /* Explanation Label */
     Label explanationLabel = new Label(container, SWT.WRAP);
