@@ -255,7 +255,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     otherSettingsContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, true, 2, 1));
 
     if (separateFromTop)
-      ((GridLayout) otherSettingsContainer.getLayout()).marginTop = 15;
+      ((GridLayout) otherSettingsContainer.getLayout()).marginTop = 10;
 
     /* Auto-Reload */
     if (!containsNewsBin(fEntities)) {
