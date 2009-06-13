@@ -29,9 +29,6 @@ import java.util.Map;
  * <p>
  * This class is part of Apache Solr and is versioned: 472574 (2006-11-08)
  * </p>
- *
- * @author yonik Initial Implementation
- * @author bpasero Minor Modifications
  */
 public class HTMLStripReader extends Reader {
 
@@ -41,7 +38,7 @@ public class HTMLStripReader extends Reader {
   private static final int READAHEAD = 4096;
 
   /* Common Entities */
-  private static final Map<String, Character> fEntityTable;
+  private static final Map<String, Character> fgEntityTable;
 
   /* Wrapped Reader */
   private final Reader fIn;
@@ -54,7 +51,7 @@ public class HTMLStripReader extends Reader {
 
   /* Static Initializer: Cache Entities */
   static {
-    fEntityTable = new HashMap<String, Character>();
+    fgEntityTable = new HashMap<String, Character>();
 
     /* Entity Names */
     final String[] entityName = { "zwnj", "aring", "gt", "yen", "ograve",
@@ -117,10 +114,10 @@ public class HTMLStripReader extends Reader {
 
     /* Fill Entities */
     for (int i = 0; i < entityName.length; i++)
-      fEntityTable.put(entityName[i], Character.valueOf(entityVal[i]));
+      fgEntityTable.put(entityName[i], Character.valueOf(entityVal[i]));
 
     /* Special-case nbsp to a simple space instead of 0xa0 */
-    fEntityTable.put("nbsp", Character.valueOf(' '));
+    fgEntityTable.put("nbsp", Character.valueOf(' '));
   }
 
   /**
@@ -290,7 +287,7 @@ public class HTMLStripReader extends Reader {
 
     if (ch == ';') {
       String entity = fStrBuf.toString();
-      Character entityChar = fEntityTable.get(entity);
+      Character entityChar = fgEntityTable.get(entity);
       if (entityChar != null) {
         return entityChar.charValue();
       }
