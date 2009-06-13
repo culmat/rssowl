@@ -25,8 +25,10 @@
 package org.rssowl.core.util;
 
 import org.apache.lucene.analysis.StopAnalyzer;
+import org.rssowl.core.internal.Activator;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -149,6 +151,20 @@ public class StringUtils {
    * @return Returns a String that is no longer containing any HTML or Entities.
    */
   public static String stripTags(String str) {
+    return filterTags(str, null);
+  }
+
+  /**
+   * Remove HTML tags from the given String and replace Entities with their
+   * corresponding values. If the set of Strings is provided (not null), only
+   * these tags will be stripped.
+   *
+   * @param str The String to remove the Tags from
+   * @param tags the set of HTML tags to strip out of the given String or
+   * <code>null</code> to strip all HTML tags.
+   * @return the String with HTML Tags and Entities replaced.
+   */
+  public static String filterTags(String str, Set<String> tags) {
 
     /* Check String first */
     if (!StringUtils.isSet(str))
@@ -156,19 +172,22 @@ public class StringUtils {
 
     int length = 0;
     char[] result = new char[str.length()];
-    HTMLStripReader stripReader = new HTMLStripReader(new StringReader(str));
+    Reader stripReader;
+    if (tags == null || tags.isEmpty())
+      stripReader = new HTMLStripReader(new StringReader(str));
+    else
+      stripReader = new HTMLFilterReader(new StringReader(str), tags);
+
     try {
       length += stripReader.read(result);
-
-      if (stripReader.read() != -1)
-        throw new IllegalStateException("stripReader blocks before filling the result array");
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      Activator.getDefault().logError(e.getMessage(), e);
+      return str;
     } finally {
       try {
         stripReader.close();
       } catch (IOException e) {
-        throw new RuntimeException(e);
+        Activator.getDefault().logError(e.getMessage(), e);
       }
     }
 
