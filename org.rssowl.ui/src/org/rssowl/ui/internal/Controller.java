@@ -161,8 +161,11 @@ public class Controller {
   /* Token to ask the DB if this is the first start of RSSOwl */
   private static final String FIRST_START_TOKEN = "org.rssowl.ui.FirstStartToken"; //$NON-NLS-1$
 
-  /* Max. number of concurrent running reload Jobs */
-  private static final int MAX_CONCURRENT_RELOAD_JOBS = 10;
+  /* Default Max. number of concurrent running reload Jobs */
+  private static final int DEFAULT_MAX_CONCURRENT_RELOAD_JOBS = 10;
+
+  /* System Property to override default Max. number of concurrent running reload Jobs */
+  private static final String MAX_CONCURRENT_RELOAD_JOBS_PROPERTY = "maxReloadJobs";
 
   /* Max. number of concurrent Jobs for saving a Feed */
   private static final int MAX_CONCURRENT_SAVE_JOBS = 1;
@@ -281,7 +284,21 @@ public class Controller {
   }
 
   private Controller() {
-    fReloadFeedQueue = new JobQueue("Updating Feeds", MAX_CONCURRENT_RELOAD_JOBS, Integer.MAX_VALUE, true, 0);
+    int maxConcurrentReloadJobs = DEFAULT_MAX_CONCURRENT_RELOAD_JOBS;
+    String value = System.getProperty(MAX_CONCURRENT_RELOAD_JOBS_PROPERTY);
+    if (value != null) {
+      int iVal = 0;
+      try {
+        iVal = Integer.parseInt(value);
+      } catch (NumberFormatException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
+
+      if (iVal > 0)
+        maxConcurrentReloadJobs = iVal;
+    }
+
+    fReloadFeedQueue = new JobQueue("Updating Feeds", maxConcurrentReloadJobs, Integer.MAX_VALUE, true, 0);
     fSaveFeedQueue = new JobQueue("Updating Feeds", MAX_CONCURRENT_SAVE_JOBS, MAX_SAVE_QUEUE_SIZE, true, 0);
     fSaveFeedQueue.setUnknownProgress(true);
     fEntityPropertyPages = loadEntityPropertyPages();
