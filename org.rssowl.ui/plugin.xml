@@ -1354,6 +1354,16 @@
                class="org.rssowl.core.persist.IBookMark">
          </targetEntity>
       </entityPropertyPage>
+      <entityPropertyPage
+            class="org.rssowl.ui.internal.dialogs.properties.InformationPropertyPage"
+            handlesMultipleEntities="false"
+            id="org.rssowl.ui.InfoPropertyPage"
+            name="Status"
+            order="5">
+         <targetEntity
+               class="org.rssowl.core.persist.IBookMark">
+         </targetEntity>
+      </entityPropertyPage>
    </extension>
    <extension
          point="org.eclipse.ui.contexts">
