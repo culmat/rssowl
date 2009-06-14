@@ -349,7 +349,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     /* In case authentication required / failed */
     if (getMethod.getStatusCode() == HTTP_ERROR_AUTH_REQUIRED) {
       AuthState hostAuthState = getMethod.getHostAuthState();
-      throw new AuthenticationRequiredException(hostAuthState != null ? hostAuthState.getRealm() : null, Activator.getDefault().createErrorStatus("Authentication required!", null)); //$NON-NLS-1$
+      throw new AuthenticationRequiredException(hostAuthState != null ? hostAuthState.getRealm() : null, Activator.getDefault().createErrorStatus("Authentication required.", null)); //$NON-NLS-1$
     }
 
     /* In case proxy-authentication required / failed */
