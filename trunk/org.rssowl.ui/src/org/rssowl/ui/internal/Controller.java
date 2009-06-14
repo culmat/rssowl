@@ -149,6 +149,9 @@ public class Controller {
   /** Prefix for dynamic Label Actions */
   public static final String LABEL_ACTION_PREFIX = "org.rssowl.ui.LabelAction";
 
+  /** Key to store error messages into entities during reload */
+  public static final String LOAD_ERROR_KEY = "org.rssowl.ui.internal.LoadErrorKey";
+
   /* ID of RSSOwl's Keybinding Category */
   private static final String RSSOWL_KEYBINDING_CATEGORY = "org.rssowl.ui.commands.category.RSSOwl";
 
@@ -677,6 +680,8 @@ public class Controller {
                 /* Update Error Flag if user hit Cancel */
                 else if (!fShuttingDown && !monitor.isCanceled() && !bookmark.isErrorLoading()) {
                   bookmark.setErrorLoading(true);
+                  if (StringUtils.isSet(authEx.getMessage()))
+                    bookmark.setProperty(LOAD_ERROR_KEY, authEx.getMessage());
                   fBookMarkDAO.save(bookmark);
                 }
               }
@@ -727,12 +732,15 @@ public class Controller {
     /* Reset Error-Loading flag if necessary */
     if (bookmark.isErrorLoading() && (ex == null || ex instanceof NotModifiedException)) {
       bookmark.setErrorLoading(false);
+      bookmark.removeProperty(LOAD_ERROR_KEY);
       fBookMarkDAO.save(bookmark);
     }
 
     /* Set Error-Loading flag if necessary */
     else if (!bookmark.isErrorLoading() && ex != null && !(ex instanceof NotModifiedException) && !(ex instanceof AuthenticationRequiredException)) {
       bookmark.setErrorLoading(true);
+      if (StringUtils.isSet(ex.getMessage()))
+        bookmark.setProperty(LOAD_ERROR_KEY, ex.getMessage());
       fBookMarkDAO.save(bookmark);
     }
   }
