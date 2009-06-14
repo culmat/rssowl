@@ -174,7 +174,10 @@ public class Controller {
   private static final int MAX_SAVE_QUEUE_SIZE = 1;
 
   /* Connection Timeouts in MS */
-  private static final int FEED_CON_TIMEOUT = 30000;
+  private static final int DEFAULT_FEED_CON_TIMEOUT = 30000;
+
+  /* System Property to override default connection timeout */
+  private static final String FEED_CON_TIMEOUT_PROPERTY = "conTimeout";
 
   /* Queue for reloading Feeds */
   private final JobQueue fReloadFeedQueue;
@@ -214,6 +217,7 @@ public class Controller {
   private BookMarkAdapter fBookMarkListener;
   private LabelAdapter fLabelListener;
   private List<BookMarkLoadListener> fBookMarkLoadListeners = new ArrayList<BookMarkLoadListener>(1);
+  private final int fConnectionTimeout;
 
   /**
    * A listener that informs when a {@link IBookMark} is getting reloaded from
@@ -284,20 +288,7 @@ public class Controller {
   }
 
   private Controller() {
-    int maxConcurrentReloadJobs = DEFAULT_MAX_CONCURRENT_RELOAD_JOBS;
-    String value = System.getProperty(MAX_CONCURRENT_RELOAD_JOBS_PROPERTY);
-    if (value != null) {
-      int iVal = 0;
-      try {
-        iVal = Integer.parseInt(value);
-      } catch (NumberFormatException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
-      }
-
-      if (iVal > 0)
-        maxConcurrentReloadJobs = iVal;
-    }
-
+    int maxConcurrentReloadJobs = getSystemProperty(MAX_CONCURRENT_RELOAD_JOBS_PROPERTY, 0, DEFAULT_MAX_CONCURRENT_RELOAD_JOBS);
     fReloadFeedQueue = new JobQueue("Updating Feeds", maxConcurrentReloadJobs, Integer.MAX_VALUE, true, 0);
     fSaveFeedQueue = new JobQueue("Updating Feeds", MAX_CONCURRENT_SAVE_JOBS, MAX_SAVE_QUEUE_SIZE, true, 0);
     fSaveFeedQueue.setUnknownProgress(true);
@@ -310,6 +301,25 @@ public class Controller {
     fPrefsDAO = Owl.getPersistenceService().getDAOService().getPreferencesDAO();
     fAppService = Owl.getApplicationService();
     fFactory = Owl.getModelFactory();
+    fConnectionTimeout = getSystemProperty(FEED_CON_TIMEOUT_PROPERTY, DEFAULT_FEED_CON_TIMEOUT, DEFAULT_FEED_CON_TIMEOUT);
+  }
+
+  private int getSystemProperty(String key, int minValue, int defaultValue) {
+    String strVal = System.getProperty(key);
+    if (strVal != null) {
+      int intVal = 0;
+      try {
+        intVal = Integer.parseInt(strVal);
+      } catch (NumberFormatException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+        return defaultValue;
+      }
+
+      if (intVal > minValue)
+        return intVal;
+    }
+
+    return defaultValue;
   }
 
   private void registerListeners() {
@@ -559,7 +569,7 @@ public class Controller {
 
       /* Define Properties for Connection */
       Map<Object, Object> properties = new HashMap<Object, Object>();
-      properties.put(IConnectionPropertyConstants.CON_TIMEOUT, FEED_CON_TIMEOUT);
+      properties.put(IConnectionPropertyConstants.CON_TIMEOUT, fConnectionTimeout);
 
       /* Add Conditional GET Headers if present */
       if (conditionalGet != null) {
