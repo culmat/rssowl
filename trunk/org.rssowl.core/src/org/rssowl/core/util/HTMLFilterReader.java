@@ -451,7 +451,7 @@ public class HTMLFilterReader extends Reader {
         break;
       }
     }
-    if (fEscapedTags != null && !fEscapedTags.contains(fSb.toString())) {
+    if (fEscapedTags != null && !fEscapedTags.contains(fSb.toString().toLowerCase())) {
       //if this is a reservedTag, then keep it
       return MISMATCH;
     }
@@ -472,7 +472,7 @@ public class HTMLFilterReader extends Reader {
           int ret = readAttr2();
           if (ret == MISMATCH)
             return ret;
-        } else if (ch == '/') {
+        } else if (ch == '/' || ch == '"') {
           // read end tag '/>' or '/ >', etc
           return nextSkipWS() == '>' ? MATCH : MISMATCH;
         } else if (ch == '>') {
@@ -607,7 +607,7 @@ public class HTMLFilterReader extends Reader {
 
     }
     //strip off the trailing >
-    if (builder != null && !fEscapedTags.contains(builder.substring(0, builder.length() - 1))) {
+    if (builder != null && !fEscapedTags.contains(builder.substring(0, builder.length() - 1).toLowerCase())) {
       return MISMATCH;
     }
     return MATCH;
@@ -616,8 +616,8 @@ public class HTMLFilterReader extends Reader {
   /***
    * [10] AttValue ::= '"' ([^<&"] | Reference)* '"' | "'" ([^<&'] | Reference)*
    * "'" need to also handle unquoted attributes, and attributes w/o values: <td
-   * * * * * * * * * * * * * * * * id=msviGlobalToolbar height="22" nowrap * *
-   * align=left>
+   * * * * * * * * * * * * * * * * * * id=msviGlobalToolbar height="22" nowrap *
+   * * * * align=left>
    ***/
 
   // This reads attributes and attempts to handle any
