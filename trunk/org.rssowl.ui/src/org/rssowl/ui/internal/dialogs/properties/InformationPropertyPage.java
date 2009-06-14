@@ -119,7 +119,7 @@ public class InformationPropertyPage implements IEntityPropertyPage {
     createLabel(container, "Homepage: ", true);
 
     final Link homepageLink = new Link(container, SWT.NONE);
-    homepageLink.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
+    homepageLink.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Load from Background */
     JobRunner.runUIUpdater(new UIBackgroundJob(container) {
