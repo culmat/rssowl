@@ -1168,41 +1168,49 @@ public class BookMarkExplorer extends ViewPart {
     fFolderListener = new FolderAdapter() {
 
       @Override
-      public void entitiesAdded(Set<FolderEvent> events) {
-        for (FolderEvent event : events) {
-          if (event.getEntity().getParent() == null) {
-            fRootFolders.add(event.getEntity());
+      public void entitiesAdded(final Set<FolderEvent> events) {
+        JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
+          public void run() {
+            for (FolderEvent event : events) {
+              if (event.getEntity().getParent() == null) {
+                fRootFolders.add(event.getEntity());
 
-            /* Show this Folder in the Explorer */
-            changeSet(event.getEntity());
+                /* Show this Folder in the Explorer */
+                changeSet(event.getEntity());
+              }
+            }
           }
-        }
+        });
       }
 
       @Override
-      public void entitiesDeleted(Set<FolderEvent> events) {
-        for (FolderEvent event : events) {
-          IFolder deletedFolder = event.getEntity();
-          IFolder parentFolder = event.getEntity().getParent();
-          if (parentFolder == null) {
-            int index = getIndexOfRootFolder(deletedFolder);
-            fRootFolders.remove(event.getEntity());
+      public void entitiesDeleted(final Set<FolderEvent> events) {
+        JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
+          public void run() {
+            for (FolderEvent event : events) {
+              IFolder deletedFolder = event.getEntity();
+              IFolder parentFolder = event.getEntity().getParent();
+              if (parentFolder == null) {
+                int index = getIndexOfRootFolder(deletedFolder);
+                fRootFolders.remove(event.getEntity());
 
-            /* In case this Bookmark set is currently showing in the Explorer */
-            if (fSelectedBookMarkSet.equals(deletedFolder)) {
-              if (fRootFolders.size() > index)
-                changeSet(getRootFolderAt(index));
-              else
-                changeSet(getRootFolderAt(index - 1));
-            }
+                /* In case this Bookmark set is currently showing in the Explorer */
+                if (fSelectedBookMarkSet.equals(deletedFolder)) {
+                  if (fRootFolders.size() > index)
+                    changeSet(getRootFolderAt(index));
+                  else
+                    changeSet(getRootFolderAt(index - 1));
+                }
 
-            /* Otherwise make sure to update Nav-Buttons */
-            else {
-              fViewSite.getActionBars().getToolBarManager().find(PREVIOUS_SET_ACTION).update(IAction.ENABLED);
-              fViewSite.getActionBars().getToolBarManager().find(NEXT_SET_ACTION).update(IAction.ENABLED);
+                /* Otherwise make sure to update Nav-Buttons */
+                else {
+                  fViewSite.getActionBars().getToolBarManager().find(PREVIOUS_SET_ACTION).update(IAction.ENABLED);
+                  fViewSite.getActionBars().getToolBarManager().find(NEXT_SET_ACTION).update(IAction.ENABLED);
+                }
+              }
             }
           }
-        }
+        });
       }
     };
     DynamicDAO.addEntityListener(IFolder.class, fFolderListener);
