@@ -513,7 +513,7 @@ public class NewsGroupHandler implements IProtocolHandler {
 
   private void checkAuthenticationRequired(NNTPClient client) throws AuthenticationRequiredException {
     if (client.getReplyCode() == STATUS_AUTH_REQUIRED || client.getReplyCode() == STATUS_AUTH_REQUIRED_ALTERNATIVE)
-      throw new AuthenticationRequiredException(null, Activator.createErrorStatus("Authentication required!", null)); //$NON-NLS-1$
+      throw new AuthenticationRequiredException(null, Activator.createErrorStatus("Authentication required.", null)); //$NON-NLS-1$
   }
 
   private void throwConnectionException(String msg, NNTPClient client) throws ConnectionException {
