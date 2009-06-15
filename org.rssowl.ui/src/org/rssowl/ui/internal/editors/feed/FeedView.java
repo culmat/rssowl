@@ -687,26 +687,26 @@ public class FeedView extends EditorPart implements IReusableEditor {
     });
   }
 
-  private void onNewsFoldersUpdated(Set<FolderEvent> events) {
-    if (!(fInput.getMark() instanceof FolderNewsMark))
-      return;
+  private void onNewsFoldersUpdated(final Set<FolderEvent> events) {
+    JobRunner.runInUIThread(fParent, new Runnable() {
+      public void run() {
+        if (!(fInput.getMark() instanceof FolderNewsMark))
+          return;
 
-    final IEditorPart activeFeedView = fEditorSite.getPage().getActiveEditor();
-    FolderNewsMark folderNewsMark = (FolderNewsMark) (fInput.getMark());
-    for (FolderEvent event : events) {
-      final IFolder folder = event.getEntity();
-      if (folder.equals(folderNewsMark.getFolder())) {
-        JobRunner.runInUIThread(fParent, new Runnable() {
-          public void run() {
+        final IEditorPart activeFeedView = fEditorSite.getPage().getActiveEditor();
+        FolderNewsMark folderNewsMark = (FolderNewsMark) (fInput.getMark());
+        for (FolderEvent event : events) {
+          final IFolder folder = event.getEntity();
+          if (folder.equals(folderNewsMark.getFolder())) {
             setPartName(folder.getName());
             if (activeFeedView == FeedView.this)
               OwlUI.updateWindowTitle(new IMark[] { fInput.getMark() });
-          }
-        });
 
-        break;
+            break;
+          }
+        }
       }
-    }
+    });
   }
 
   private void onFoldersDeleted(Set<FolderEvent> events) {
@@ -718,28 +718,32 @@ public class FeedView extends EditorPart implements IReusableEditor {
       final IFolder folder = event.getEntity();
       if (folder.equals(folderNewsMark.getFolder())) {
         fInput.setDeleted();
-        fEditorSite.getPage().closeEditor(FeedView.this, false);
+        JobRunner.runInUIThread(fParent, new Runnable() {
+          public void run() {
+            fEditorSite.getPage().closeEditor(FeedView.this, false);
+          }
+        });
         break;
       }
     }
   }
 
-  private void onNewsMarksUpdated(Set<? extends MarkEvent> events) {
-    final IEditorPart activeFeedView = fEditorSite.getPage().getActiveEditor();
-    for (MarkEvent event : events) {
-      final IMark mark = event.getEntity();
-      if (mark.getId().equals(fInput.getMark().getId())) {
-        JobRunner.runInUIThread(fParent, new Runnable() {
-          public void run() {
+  private void onNewsMarksUpdated(final Set<? extends MarkEvent> events) {
+    JobRunner.runInUIThread(fParent, new Runnable() {
+      public void run() {
+        final IEditorPart activeFeedView = fEditorSite.getPage().getActiveEditor();
+        for (MarkEvent event : events) {
+          final IMark mark = event.getEntity();
+          if (mark.getId().equals(fInput.getMark().getId())) {
             setPartName(mark.getName());
             if (activeFeedView == FeedView.this)
               OwlUI.updateWindowTitle(new IMark[] { fInput.getMark() });
-          }
-        });
 
-        break;
+            break;
+          }
+        }
       }
-    }
+    });
   }
 
   private void onNewsMarksDeleted(Set<? extends MarkEvent> events) {
@@ -747,7 +751,11 @@ public class FeedView extends EditorPart implements IReusableEditor {
       IMark mark = event.getEntity();
       if (fInput.getMark().getId().equals(mark.getId())) {
         fInput.setDeleted();
-        fEditorSite.getPage().closeEditor(FeedView.this, false);
+        JobRunner.runInUIThread(fParent, new Runnable() {
+          public void run() {
+            fEditorSite.getPage().closeEditor(FeedView.this, false);
+          }
+        });
         break;
       }
     }

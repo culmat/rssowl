@@ -75,6 +75,7 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.EntityPropertyDialogAction;
 import org.rssowl.ui.internal.actions.NewFolderAction;
+import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;
@@ -132,14 +133,18 @@ public class ManageSetsDialog extends TitleAreaDialog {
   private void registerListeners() {
     fFolderListener = new FolderAdapter() {
       @Override
-      public void entitiesAdded(Set<FolderEvent> events) {
-        for (FolderEvent folderEvent : events) {
-          IFolder folder = folderEvent.getEntity();
-          if (folder.getParent() == null) {
-            fViewer.add(folder);
-            fViewer.setSelection(new StructuredSelection(folder));
+      public void entitiesAdded(final Set<FolderEvent> events) {
+        JobRunner.runInUIThread(fViewer.getControl(), new Runnable() {
+          public void run() {
+            for (FolderEvent folderEvent : events) {
+              IFolder folder = folderEvent.getEntity();
+              if (folder.getParent() == null) {
+                fViewer.add(folder);
+                fViewer.setSelection(new StructuredSelection(folder));
+              }
+            }
           }
-        }
+        });
       }
     };
 
