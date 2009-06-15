@@ -25,43 +25,83 @@
 package org.rssowl.ui.internal.editors.browser;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.ui.browser.AbstractWorkbenchBrowserSupport;
 import org.eclipse.ui.browser.IWebBrowser;
+import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.INewsMark;
+import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.ui.internal.util.BrowserUtils;
+
+import java.net.URL;
 
 /**
- * RSSOwl's own support for an embedded Browser. Will respect the "Use external
- * Browser" setting to open a Link externally if set.
+ * The embedded web browser used from {@link WebBrowserSupport} in RSSOwl.
  *
  * @author bpasero
  */
-public class WebBrowserSupport extends AbstractWorkbenchBrowserSupport {
+public class EmbeddedWebBrowser implements IWebBrowser {
+  private final String fBrowserId;
+  private INewsMark fContext;
 
-  /** Leave Default Constructor for Reflection */
-  public WebBrowserSupport() {}
-
-  /*
-   * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(java.lang.String)
+  /**
+   * @param browserId
    */
-  public IWebBrowser createBrowser(final String browserId) {
-    Assert.isNotNull(browserId);
+  public EmbeddedWebBrowser(String browserId) {
+    this(browserId, null);
+  }
 
-    /* Create WebBrowser and return */
-    return new EmbeddedWebBrowser(browserId);
+  /**
+   * @param browserId
+   * @param context
+   */
+  public EmbeddedWebBrowser(String browserId, INewsMark context) {
+    fBrowserId = browserId;
+    fContext = context;
+  }
+
+  /**
+   * @param context the context from which this browser was created or
+   * <code>null</code> if none.
+   */
+  public void setContext(INewsMark context) {
+    fContext = context;
   }
 
   /*
-   * @see org.eclipse.ui.browser.IWorkbenchBrowserSupport#createBrowser(int,
-   * java.lang.String, java.lang.String, java.lang.String)
+   * @see org.eclipse.ui.browser.IWebBrowser#openURL(java.net.URL)
    */
-  public IWebBrowser createBrowser(int style, String browserId, String name, String tooltip) {
-    return createBrowser(browserId);
+  public void openURL(URL url) {
+    Assert.isNotNull(url);
+
+    /* Open externally */
+    if (useExternalBrowser())
+      openExternal(url);
+
+    /* Open internally */
+    else
+      BrowserUtils.openLinkInternal(url.toExternalForm(), fContext);
+  }
+
+  private boolean useExternalBrowser() {
+    IPreferenceScope globalScope = Owl.getPreferenceService().getGlobalScope();
+    return globalScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER) || globalScope.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER);
+  }
+
+  private void openExternal(URL url) {
+    BrowserUtils.openLinkExternal(url.toExternalForm());
   }
 
   /*
-   * @see org.eclipse.ui.browser.AbstractWorkbenchBrowserSupport#isInternalWebBrowserAvailable()
+   * @see org.eclipse.ui.browser.IWebBrowser#close()
    */
-  @Override
-  public boolean isInternalWebBrowserAvailable() {
+  public boolean close() {
     return true;
+  }
+
+  /*
+   * @see org.eclipse.ui.browser.IWebBrowser#getId()
+   */
+  public String getId() {
+    return fBrowserId;
   }
 }

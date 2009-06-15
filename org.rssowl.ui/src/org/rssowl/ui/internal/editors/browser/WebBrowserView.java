@@ -29,6 +29,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.browser.LocationAdapter;
@@ -53,11 +54,18 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.EditorPart;
+import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.persist.INewsMark;
+import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.CBrowser;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -233,12 +241,15 @@ public class WebBrowserView extends EditorPart {
     IAction navBackward = new Action("Back") {
       @Override
       public void run() {
-        fBrowser.back();
+        if (fBrowser != null && fBrowser.getControl().isBackEnabled())
+          fBrowser.back();
+        else if (fInput.getContext() != null)
+          openContext(fInput.getContext());
       }
 
       @Override
       public boolean isEnabled() {
-        return fBrowser != null && fBrowser.getControl().isBackEnabled();
+        return (fInput.getContext() != null) || (fBrowser != null && fBrowser.getControl().isBackEnabled());
       }
     };
     navBackward.setId(BACK_ACTION);
@@ -294,6 +305,26 @@ public class WebBrowserView extends EditorPart {
     fNavigationToolBarManager.add(navHome);
 
     fNavigationToolBarManager.createControl(parent);
+  }
+
+  private void openContext(INewsMark context) {
+    if (!exists(context))
+      return;
+
+    OwlUI.openInFeedView(fEditorSite.getPage(), new StructuredSelection(context), true);
+  }
+
+  private boolean exists(INewsMark context) {
+    if (context instanceof FolderNewsMark)
+      return DynamicDAO.exists(IFolder.class, context.getId());
+    else if (context instanceof IBookMark)
+      return DynamicDAO.exists(IBookMark.class, context.getId());
+    else if (context instanceof ISearchMark)
+      return DynamicDAO.exists(ISearchMark.class, context.getId());
+    else if (context instanceof INewsBin)
+      return DynamicDAO.exists(INewsBin.class, context.getId());
+
+    return false;
   }
 
   private void createLocationInput(Composite parent) {
