@@ -625,7 +625,7 @@ public class FilterBar {
 
       @Override
       public String getText() {
-        return filter.getType().getName();
+        return filter.getType().getDisplayName();
       }
     };
     newsFilterAction.setId(FILTER_ACTION);

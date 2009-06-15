@@ -64,27 +64,29 @@ public class NewsFilter extends ViewerFilter {
   public enum Type {
 
     /** Show all News */
-    SHOW_ALL("All News"),
+    SHOW_ALL("Show All News", "All News"),
 
     /** Show New News */
-    SHOW_NEW("New News"),
+    SHOW_NEW("Show New News", "New News"),
 
     /** Show Unread News */
-    SHOW_UNREAD("Unread News"),
+    SHOW_UNREAD("Show Unread News", "Unread News"),
 
     /** Show Recent News */
-    SHOW_RECENT("Recent News"),
+    SHOW_RECENT("Show Recent News", "Recent News"),
 
     /** Show Sticky News */
-    SHOW_STICKY("Sticky News"),
+    SHOW_STICKY("Show Sticky News", "Sticky News"),
 
     /** Show Recent News */
-    SHOW_LAST_5_DAYS("Last 5 Days");
+    SHOW_LAST_5_DAYS("Show News of Last 5 Days", "Last 5 Days");
 
     String fName;
+    String fDisplayName;
 
-    Type(String name) {
-      fName = name;
+    Type(String actionName, String displayName) {
+      fName = actionName;
+      fDisplayName = displayName;
     }
 
     /**
@@ -94,6 +96,13 @@ public class NewsFilter extends ViewerFilter {
      */
     public String getName() {
       return fName;
+    }
+
+    /**
+     * @return the display name when this grouping is active.
+     */
+    public String getDisplayName() {
+      return fDisplayName;
     }
   }
 

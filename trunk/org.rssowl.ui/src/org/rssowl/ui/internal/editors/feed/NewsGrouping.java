@@ -108,11 +108,11 @@ public class NewsGrouping {
     /** Group by Stickyness */
     GROUP_BY_STICKY("Group by Stickyness", "Grouped by Stickyness");
 
-    String fName;
+    String fActionName;
     String fDisplayName;
 
     Type(String actionName, String displayName) {
-      fName = actionName;
+      fActionName = actionName;
       fDisplayName = displayName;
     }
 
@@ -122,7 +122,7 @@ public class NewsGrouping {
      * @return A human-readable Action Name of this enum-value.
      */
     public String getName() {
-      return fName;
+      return fActionName;
     }
 
     /**
