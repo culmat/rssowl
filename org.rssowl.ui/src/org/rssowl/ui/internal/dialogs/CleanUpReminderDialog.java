@@ -202,13 +202,13 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
     Shell shell = getShell();
 
     /* Minimum Size */
-    int minWidth = convertHorizontalDLUsToPixels(OwlUI.MIN_DIALOG_WIDTH_DLU);
-    int minHeight = shell.computeSize(minWidth, SWT.DEFAULT).y;
+    int maxWidth = convertHorizontalDLUsToPixels(OwlUI.MIN_DIALOG_WIDTH_DLU);
+    int maxHeight = 500;
 
     /* Required Size */
     Point requiredSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 
-    shell.setSize(Math.max(minWidth, requiredSize.x), Math.max(minHeight, requiredSize.y));
+    shell.setSize(Math.min(maxWidth, requiredSize.x), Math.min(maxHeight, requiredSize.y));
     LayoutUtils.positionShell(shell, false);
   }
 }
