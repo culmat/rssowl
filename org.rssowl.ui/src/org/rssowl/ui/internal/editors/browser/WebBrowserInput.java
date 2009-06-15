@@ -27,7 +27,6 @@ package org.rssowl.ui.internal.editors.browser;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IPersistableElement;
-import org.rssowl.core.persist.INewsMark;
 import org.rssowl.ui.internal.OwlUI;
 
 /**
@@ -38,7 +37,7 @@ import org.rssowl.ui.internal.OwlUI;
  */
 public class WebBrowserInput implements IEditorInput {
   private final String fUrl;
-  private final INewsMark fContext;
+  private final WebBrowserContext fContext;
 
   /**
    * @param url
@@ -51,7 +50,7 @@ public class WebBrowserInput implements IEditorInput {
    * @param url
    * @param context
    */
-  public WebBrowserInput(String url, INewsMark context) {
+  public WebBrowserInput(String url, WebBrowserContext context) {
     fUrl = url;
     fContext = context;
   }
@@ -67,7 +66,7 @@ public class WebBrowserInput implements IEditorInput {
    * @return the context from which this web browser input was created from or
    * <code>null</code> if none.
    */
-  public INewsMark getContext() {
+  public WebBrowserContext getContext() {
     return fContext;
   }
 

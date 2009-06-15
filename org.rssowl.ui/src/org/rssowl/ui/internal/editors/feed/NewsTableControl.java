@@ -114,6 +114,7 @@ import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
+import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
 import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -607,7 +608,7 @@ public class NewsTableControl implements IFeedViewPart {
 
     /* Open News */
     if (firstElem instanceof INews)
-      new OpenInBrowserAction(selection, fEditorInput.getMark()).run();
+      new OpenInBrowserAction(selection, WebBrowserContext.createFrom((INews) firstElem, fEditorInput.getMark())).run();
 
     /* Toggle expanded State of Group */
     else if (firstElem instanceof EntityGroup)
@@ -682,7 +683,7 @@ public class NewsTableControl implements IFeedViewPart {
       /* Open News */
       Object element = item.getData();
       if (element instanceof INews)
-        new OpenInBrowserAction(new StructuredSelection(element), fEditorInput.getMark()).run();
+        new OpenInBrowserAction(new StructuredSelection(element), WebBrowserContext.createFrom((INews) element, fEditorInput.getMark())).run();
     }
   }
 

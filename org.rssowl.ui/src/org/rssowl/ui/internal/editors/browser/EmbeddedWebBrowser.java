@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
-import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.util.BrowserUtils;
 
@@ -41,7 +40,7 @@ import java.net.URL;
  */
 public class EmbeddedWebBrowser implements IWebBrowser {
   private final String fBrowserId;
-  private INewsMark fContext;
+  private WebBrowserContext fContext;
 
   /**
    * @param browserId
@@ -54,7 +53,7 @@ public class EmbeddedWebBrowser implements IWebBrowser {
    * @param browserId
    * @param context
    */
-  public EmbeddedWebBrowser(String browserId, INewsMark context) {
+  public EmbeddedWebBrowser(String browserId, WebBrowserContext context) {
     fBrowserId = browserId;
     fContext = context;
   }
@@ -63,7 +62,7 @@ public class EmbeddedWebBrowser implements IWebBrowser {
    * @param context the context from which this browser was created or
    * <code>null</code> if none.
    */
-  public void setContext(INewsMark context) {
+  public void setContext(WebBrowserContext context) {
     fContext = context;
   }
 
