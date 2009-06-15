@@ -97,7 +97,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -108,6 +111,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Central Facade for UI-related tasks.
@@ -241,6 +245,9 @@ public class OwlUI {
 
   /* Used to cache Image-Descriptors obtained from a file-path */
   private static final Map<String, ImageDescriptor> DESCRIPTOR_CACHE = new HashMap<String, ImageDescriptor>();
+
+  /* Used to cache the path of Images used in the embedded Browser */
+  private static final Map<String, URI> fgImageUriMap = new ConcurrentHashMap<String, URI>();
 
   /* Name of Folder for storing Icons */
   private static final String ICONS_FOLDER = "icons";
@@ -502,6 +509,67 @@ public class OwlUI {
   public static Image getImage(Control owner, String path) {
     LocalResourceManager manager = new LocalResourceManager(JFaceResources.getResources(), owner);
     return getImage(manager, path);
+  }
+
+  /**
+   * @param path the path to the image as absolute path from the plugin root.
+   * @param name the name of the image.
+   * @return an {@link URI} to a file where the image has been saved to.
+   */
+  public static URI getImageUri(String path, String name) {
+
+    /* Check Cache */
+    URI imgUri = fgImageUriMap.get(path);
+    if (imgUri != null)
+      return imgUri;
+
+    /* Check Filesystem */
+    File imgFile = getImageFile(name);
+    if (imgFile.exists()) {
+      imgUri = imgFile.toURI();
+      fgImageUriMap.put(path, imgUri);
+      return imgUri;
+    }
+
+    /* Copy to Filesystem */
+    try {
+      copy(OwlUI.class.getResourceAsStream(path), new FileOutputStream(imgFile));
+      imgUri = imgFile.toURI();
+      fgImageUriMap.put(path, imgUri);
+      return imgUri;
+    } catch (IOException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    }
+
+    return null;
+  }
+
+  private static void copy(InputStream fis, OutputStream fos) {
+    try {
+      byte buffer[] = new byte[0xffff];
+      int nbytes;
+
+      while ((nbytes = fis.read(buffer)) != -1)
+        fos.write(buffer, 0, nbytes);
+    } catch (IOException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    } finally {
+      if (fis != null) {
+        try {
+          fis.close();
+        } catch (IOException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+        }
+      }
+
+      if (fos != null) {
+        try {
+          fos.close();
+        } catch (IOException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+        }
+      }
+    }
   }
 
   /**
@@ -831,7 +899,7 @@ public class OwlUI {
     return true;
   }
 
-  private static File getImageFile(long id) {
+  private static File getImageFile(String fileName) {
     boolean res = false;
 
     IPath path = new Path(Activator.getDefault().getStateLocation().toOSString());
@@ -842,14 +910,18 @@ public class OwlUI {
     else
       res = true;
 
-    path = path.append(id + ".ico");
+    path = path.append(fileName);
 
     if (!res) {
-      Activator.getDefault().logInfo("Unable to get image file with ID " + id);
+      Activator.getDefault().logInfo("Unable to get image file with name " + fileName);
       return null;
     }
 
     return new File(path.toOSString());
+  }
+
+  private static File getImageFile(long id) {
+    return getImageFile(id + ".ico");
   }
 
   /**
