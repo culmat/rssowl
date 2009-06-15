@@ -29,6 +29,7 @@ import org.eclipse.jface.viewers.ContentViewer;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.events.DisposeEvent;
@@ -43,6 +44,7 @@ import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.SearchSpecifier;
+import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
@@ -50,6 +52,10 @@ import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.CBrowser;
 import org.rssowl.ui.internal.ILinkHandler;
+import org.rssowl.ui.internal.actions.AssignLabelsAction;
+import org.rssowl.ui.internal.actions.DeleteTypesAction;
+import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
+import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
 
 import java.net.URI;
@@ -73,6 +79,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   static final String AUTHOR_HANDLER_ID = "org.rssowl.ui.search.Author";
   static final String CATEGORY_HANDLER_ID = "org.rssowl.ui.search.Category";
   static final String LABEL_HANDLER_ID = "org.rssowl.ui.search.Label";
+  static final String TOGGLE_READ_HANDLER_ID = "org.rssowl.ui.ToggleRead";
+  static final String TOGGLE_STICKY_HANDLER_ID = "org.rssowl.ui.ToggleSticky";
+  static final String DELETE_HANDLER_ID = "org.rssowl.ui.Delete";
+  static final String ASSIGN_LABELS_HANDLER_ID = "org.rssowl.ui.AssignLabels";
 
   private Object fInput;
   private CBrowser fBrowser;
@@ -81,6 +91,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private boolean fBlockRefresh;
   private IModelFactory fFactory;
   private IPreferenceScope fPreferences = Owl.getPreferenceService().getGlobalScope();
+  private INewsDAO fNewsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
 
   /* This viewer's sorter. <code>null</code> means there is no sorter. */
   private ViewerComparator fSorter;
@@ -112,6 +123,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fBrowser.addLinkHandler(AUTHOR_HANDLER_ID, this);
     fBrowser.addLinkHandler(CATEGORY_HANDLER_ID, this);
     fBrowser.addLinkHandler(LABEL_HANDLER_ID, this);
+    fBrowser.addLinkHandler(TOGGLE_READ_HANDLER_ID, this);
+    fBrowser.addLinkHandler(TOGGLE_STICKY_HANDLER_ID, this);
+    fBrowser.addLinkHandler(DELETE_HANDLER_ID, this);
+    fBrowser.addLinkHandler(ASSIGN_LABELS_HANDLER_ID, this);
   }
 
   void setBlockRefresh(boolean block) {
@@ -132,35 +147,83 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     /* Decode Value */
     query = URIUtils.urlDecode(query).trim();
 
-    List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(1);
-    String entity = INews.class.getName();
+    /* Handler to perform a Search */
+    if (AUTHOR_HANDLER_ID.equals(id) || CATEGORY_HANDLER_ID.equals(id) || LABEL_HANDLER_ID.equals(id)) {
+      List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(1);
+      String entity = INews.class.getName();
 
-    /* Search on Author */
-    if (AUTHOR_HANDLER_ID.equals(id)) {
-      ISearchField field = fFactory.createSearchField(INews.AUTHOR, entity);
-      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, query);
-      conditions.add(condition);
+      /* Search on Author */
+      if (AUTHOR_HANDLER_ID.equals(id)) {
+        ISearchField field = fFactory.createSearchField(INews.AUTHOR, entity);
+        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, query);
+        conditions.add(condition);
+      }
+
+      /* Search on Category */
+      else if (CATEGORY_HANDLER_ID.equals(id)) {
+        ISearchField field = fFactory.createSearchField(INews.CATEGORIES, entity);
+        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, query);
+        conditions.add(condition);
+      }
+
+      /* Search on Label */
+      else if (LABEL_HANDLER_ID.equals(id)) {
+        ISearchField field = fFactory.createSearchField(INews.LABEL, entity);
+        ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, query);
+        conditions.add(condition);
+      }
+
+      /* Open Dialog and Search */
+      if (conditions.size() >= 1 && !fBrowser.getControl().isDisposed()) {
+        boolean matchAllConditions = AUTHOR_HANDLER_ID.equals(id);
+        SearchNewsDialog dialog = new SearchNewsDialog(fBrowser.getControl().getShell(), conditions, matchAllConditions, true);
+        dialog.open();
+      }
     }
 
-    /* Search on Category */
-    else if (CATEGORY_HANDLER_ID.equals(id)) {
-      ISearchField field = fFactory.createSearchField(INews.CATEGORIES, entity);
-      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, query);
-      conditions.add(condition);
+    /*  Toggle Read */
+    else if (TOGGLE_READ_HANDLER_ID.equals(id)) {
+      INews news = getNews(query);
+      if (news != null) {
+        ToggleReadStateAction action = new ToggleReadStateAction(new StructuredSelection(news));
+        action.run();
+      }
     }
 
-    /* Search on Label */
-    else if (LABEL_HANDLER_ID.equals(id)) {
-      ISearchField field = fFactory.createSearchField(INews.LABEL, entity);
-      ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, query);
-      conditions.add(condition);
+    /*  Toggle Sticky */
+    else if (TOGGLE_STICKY_HANDLER_ID.equals(id)) {
+      INews news = getNews(query);
+      if (news != null) {
+        MakeNewsStickyAction action = new MakeNewsStickyAction(new StructuredSelection(news));
+        action.run();
+      }
     }
 
-    /* Open Dialog and Search */
-    if (conditions.size() >= 1 && !fBrowser.getControl().isDisposed()) {
-      boolean matchAllConditions = AUTHOR_HANDLER_ID.equals(id);
-      SearchNewsDialog dialog = new SearchNewsDialog(fBrowser.getControl().getShell(), conditions, matchAllConditions, true);
-      dialog.open();
+    /*  Delete */
+    else if (DELETE_HANDLER_ID.equals(id)) {
+      INews news = getNews(query);
+      if (news != null) {
+        DeleteTypesAction action = new DeleteTypesAction(fBrowser.getControl().getShell(), new StructuredSelection(news));
+        action.run();
+      }
+    }
+
+    /*  Assign Labels */
+    else if (ASSIGN_LABELS_HANDLER_ID.equals(id)) {
+      INews news = getNews(query);
+      if (news != null) {
+        AssignLabelsAction action = new AssignLabelsAction(fBrowser.getControl().getShell(), new StructuredSelection(news));
+        action.run();
+      }
+    }
+  }
+
+  private INews getNews(String query) {
+    try {
+      long id = Long.parseLong(query);
+      return fNewsDao.load(id);
+    } catch (NullPointerException e) {
+      return null;
     }
   }
 
@@ -493,10 +556,22 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     String browserUrl = fBrowser.getControl().getUrl();
     boolean resetInput = browserUrl.length() == 0 || URIUtils.ABOUT_BLANK.equals(browserUrl);
     if (inputUrl.equals(browserUrl))
+      //      internalUpdate(elements);
       refresh(); // TODO Optimize
     else if (fServer.isDisplayOperation(inputUrl) && resetInput)
       fBrowser.setUrl(inputUrl);
   }
+
+//  private void internalUpdate(Object[] elements) {
+//    for (Object element : elements) {
+//      if (element instanceof INews) {
+//        INews news = (INews) element;
+//        if (news.getState() == INews.State.UNREAD)
+//          fBrowser.getControl().execute("window.document.getElementById('title" + news.getId() + "').className='unread';");
+//        //TODO Always fall back to refresh() if execute returns FALSE
+//      }
+//    }
+//  }
 
   /**
    * @param element

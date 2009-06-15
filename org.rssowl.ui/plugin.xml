@@ -1419,7 +1419,7 @@
             categoryId="org.rssowl.ui.ThemeCategory"
             id="org.rssowl.ui.StickyBGColor"
             label="Sticky News Background"
-            value="255,255,128">
+            value="255,255,180">
          <description>
             The sticky news background color is used as background color for all sticky news including the bookmark that the news is belonging to.
          </description>
