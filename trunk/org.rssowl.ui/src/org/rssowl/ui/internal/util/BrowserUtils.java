@@ -34,6 +34,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
@@ -63,17 +64,19 @@ public class BrowserUtils {
 
   /**
    * @param href Any URL
+   * @param context the context from which this link is coming from or
+   * <code>null</code> if none.
    * @return the {@link WebBrowserInput} created to show the link or
    * <code>null</code> if it could not be created.
    */
-  public static WebBrowserView openLinkInternal(String href) {
+  public static WebBrowserView openLinkInternal(String href, INewsMark context) {
     WebBrowserView view = null;
 
     try {
       IPreferenceScope eclipsePreferences = Owl.getPreferenceService().getEclipseScope();
       IPreferenceScope owlPreferences = Owl.getPreferenceService().getGlobalScope();
 
-      WebBrowserInput input = new WebBrowserInput(href);
+      WebBrowserInput input = new WebBrowserInput(href, context);
       IWorkbenchPage page = OwlUI.getPage();
       if (page != null) {
         boolean multipleTabs = eclipsePreferences.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS);

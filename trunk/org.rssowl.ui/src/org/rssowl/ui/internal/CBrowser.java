@@ -332,7 +332,7 @@ public class CBrowser {
 
         /* Open internal Browser in a new Tab */
         if (fEclipsePreferences.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS)) {
-          WebBrowserView browserView = BrowserUtils.openLinkInternal(URIUtils.ABOUT_BLANK);
+          WebBrowserView browserView = BrowserUtils.openLinkInternal(URIUtils.ABOUT_BLANK, null);
           if (browserView != null)
             event.browser = browserView.getBrowser().getControl();
         }

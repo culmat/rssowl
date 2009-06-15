@@ -607,7 +607,7 @@ public class NewsTableControl implements IFeedViewPart {
 
     /* Open News */
     if (firstElem instanceof INews)
-      new OpenInBrowserAction(selection).run();
+      new OpenInBrowserAction(selection, fEditorInput.getMark()).run();
 
     /* Toggle expanded State of Group */
     else if (firstElem instanceof EntityGroup)
@@ -682,7 +682,7 @@ public class NewsTableControl implements IFeedViewPart {
       /* Open News */
       Object element = item.getData();
       if (element instanceof INews)
-        new OpenInBrowserAction(new StructuredSelection(element)).run();
+        new OpenInBrowserAction(new StructuredSelection(element), fEditorInput.getMark()).run();
     }
   }
 

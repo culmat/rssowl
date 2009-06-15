@@ -33,10 +33,13 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.editors.browser.EmbeddedWebBrowser;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 
 import java.net.MalformedURLException;
@@ -51,6 +54,7 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
   private static final String ID = "org.rssowl.ui.OpenInBrowserAction";
 
   private IStructuredSelection fSelection;
+  private INewsMark fContext;
 
   /** Default Constructor for Reflection */
   public OpenInBrowserAction() {
@@ -61,7 +65,16 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
    * @param selection
    */
   public OpenInBrowserAction(IStructuredSelection selection) {
+    this(selection, null);
+  }
+
+  /**
+   * @param selection
+   * @param context
+   */
+  public OpenInBrowserAction(IStructuredSelection selection, INewsMark context) {
     fSelection = selection;
+    fContext = context;
     setText("&Open in Browser");
     setId(ID);
     setActionDefinitionId(ID);
@@ -109,9 +122,12 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
         link = new URI(URIUtils.fastEncode((String) object));
 
       if (link != null) {
-        IWorkbenchBrowserSupport browser = PlatformUI.getWorkbench().getBrowserSupport();
+        IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
         try {
-          browser.createBrowser(WebBrowserView.EDITOR_ID).openURL(link.toURL());
+          IWebBrowser browser = browserSupport.createBrowser(WebBrowserView.EDITOR_ID);
+          if (browser instanceof EmbeddedWebBrowser)
+            ((EmbeddedWebBrowser) browser).setContext(fContext);
+          browser.openURL(link.toURL());
         } catch (PartInitException e) {
           Activator.getDefault().getLog().log(e.getStatus());
         } catch (MalformedURLException e) {
