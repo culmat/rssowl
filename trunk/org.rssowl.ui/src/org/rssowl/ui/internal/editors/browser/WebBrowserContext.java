@@ -24,6 +24,8 @@
 
 package org.rssowl.ui.internal.editors.browser;
 
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.INews;
@@ -37,6 +39,8 @@ import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.ui.internal.FolderNewsMark;
+import org.rssowl.ui.internal.editors.feed.FeedView;
+import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 
 /**
  * The context from which the webbrowser was created.
@@ -64,6 +68,34 @@ public class WebBrowserContext {
       context.fNewsMarkReference = mark.toReference();
 
     return context;
+  }
+
+  /**
+   * @param selection the selected news of the given feedview.
+   * @param feedview the feedview from which the browser is opened.
+   * @return a new instance of {@link WebBrowserContext} from the given input.
+   */
+  public static WebBrowserContext createFrom(ISelection selection, FeedView feedview) {
+    WebBrowserContext context = new WebBrowserContext();
+    context.fNewsReference = getNewsReference(selection);
+
+    INewsMark mark = ((FeedViewInput) feedview.getEditorInput()).getMark();
+    if (mark instanceof FolderNewsMark)
+      context.fNewsMarkReference = new FolderReference(mark.getId());
+    else
+      context.fNewsMarkReference = mark.toReference();
+
+    return context;
+  }
+
+  private static NewsReference getNewsReference(ISelection selection) {
+    if (selection instanceof StructuredSelection) {
+      Object element = ((StructuredSelection) selection).getFirstElement();
+      if (element instanceof INews)
+        return ((INews) element).toReference();
+    }
+
+    return null;
   }
 
   /**

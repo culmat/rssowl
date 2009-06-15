@@ -79,6 +79,7 @@ import org.rssowl.ui.internal.actions.SearchNewsAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.UndoAction;
+import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.util.BrowserUtils;
@@ -512,7 +513,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           manager.add(new Separator("open"));
 
           /* Open News in Browser */
-          manager.add(new OpenInBrowserAction(selection) {
+          manager.add(new OpenInBrowserAction(selection, WebBrowserContext.createFrom(selection, activeFeedView)) {
             @Override
             public boolean isEnabled() {
               return !selection.isEmpty();
