@@ -24,13 +24,17 @@
 
 package org.rssowl.ui.internal.actions;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.custom.BusyIndicator;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
@@ -38,6 +42,7 @@ import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
@@ -45,17 +50,21 @@ import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.ConfirmDialog;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
 import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.ModelUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Global Action for Deleting a Selection of <code>ModelReferences</code>.
@@ -63,6 +72,10 @@ import java.util.List;
  * @author bpasero
  */
 public class DeleteTypesAction extends Action implements IObjectActionDelegate {
+
+  /* Number of News to Delete before running operation in Background */
+  private static final int RUN_IN_BACKGROUND_CAP = 500;
+
   private IStructuredSelection fSelection;
   private INewsDAO fNewsDAO;
   private Shell fShell;
@@ -186,7 +199,7 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
     fConfirmed = true;
 
     /* Only consider Entities */
-    List<IEntity> entities = ModelUtils.getEntities(fSelection);
+    final List<IEntity> entities = ModelUtils.getEntities(fSelection);
 
     /* Retrieve any Folder that is to be deleted */
     List<IFolder> folders = null;
@@ -204,7 +217,7 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
         CoreUtils.normalize(folder, entities);
 
     /* Separate News */
-    List<INews> newsToDelete = null;
+    final List<INews> newsToDelete = new ArrayList<INews>();
 
     /* Extract News */
     for (Iterator<IEntity> it = entities.iterator(); it.hasNext();) {
@@ -212,28 +225,110 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
 
       /* Separate News */
       if (element instanceof INews) {
-        if (newsToDelete == null)
-          newsToDelete = new ArrayList<INews>();
-
         it.remove();
         newsToDelete.add((INews) element);
       }
     }
 
-    /* Mark Saved Search Service as in need for a quick Update */
-    Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+    /* Wrap into Runnable */
+    Runnable deleteRunnable = new Runnable() {
+      public void run() {
 
-    /* Delete Folders and Marks in single Transaction */
-    DynamicDAO.deleteAll(entities);
+        /* Mark Saved Search Service as in need for a quick Update */
+        Controller.getDefault().getSavedSearchService().forceQuickUpdate();
 
-    /* Delete News in single Transaction */
-    if (newsToDelete != null && !newsToDelete.isEmpty()) {
+        /* Delete Folders and Marks in single Transaction */
+        DynamicDAO.deleteAll(entities);
 
-      /* Support Undo */
-      UndoStack.getInstance().addOperation(new NewsStateOperation(newsToDelete, INews.State.HIDDEN, false));
+        /* Delete News in single Transaction */
+        if (!newsToDelete.isEmpty()) {
 
-      /* Perform Operation */
-      fNewsDAO.setState(newsToDelete, INews.State.HIDDEN, false, false);
+          /* Support Undo */
+          UndoStack.getInstance().addOperation(new NewsStateOperation(newsToDelete, INews.State.HIDDEN, false));
+
+          /* Perform Operation */
+          fNewsDAO.setState(newsToDelete, INews.State.HIDDEN, false, false);
+        }
+      }
+    };
+
+    /* Run in background given the potential time the op takes */
+    if (shouldRunInBackground(entities, newsToDelete))
+      deleteInBackground(deleteRunnable);
+
+    /* Run this potential short op right away */
+    else
+      deleteRunnable.run();
+  }
+
+  private boolean shouldRunInBackground(List<IEntity> entities, List<INews> newsToDelete) {
+    int newsCount = newsToDelete.size();
+
+    AtomicInteger count = new AtomicInteger();
+    for (IEntity entity : entities)
+      countNews(entity, count);
+
+    newsCount += count.get();
+    return newsCount > RUN_IN_BACKGROUND_CAP;
+  }
+
+  private void countNews(IEntity entity, AtomicInteger count) {
+    if (entity instanceof IBookMark)
+      count.addAndGet(((IBookMark) entity).getNewsCount(INews.State.getVisible()));
+    else if (entity instanceof INewsBin)
+      count.addAndGet(((INewsBin) entity).getNewsCount(INews.State.getVisible()));
+    else if (entity instanceof IFolder) {
+      IFolder folder = (IFolder) entity;
+      List<IFolderChild> children = folder.getChildren();
+      for (IFolderChild child : children) {
+        countNews(child, count);
+      }
+    }
+  }
+
+  private void deleteInBackground(final Runnable deleteRunnable) {
+
+    /* Runnable with Progress */
+    IRunnableWithProgress runnableWithProgress = new IRunnableWithProgress() {
+      public void run(IProgressMonitor monitor) {
+        monitor.beginTask("Please wait while deleting...", -1);
+        try {
+          deleteRunnable.run();
+        } finally {
+          monitor.done();
+        }
+      }
+    };
+
+    /* Progress Dialog */
+    Shell shell = fShell;
+    if (shell == null)
+      shell = OwlUI.getActiveShell();
+
+    ProgressMonitorDialog dialog = new ProgressMonitorDialog(shell) {
+      @Override
+      protected void initializeBounds() {
+        super.initializeBounds();
+
+        /* Size */
+        Shell shell = getShell();
+        int width = convertHorizontalDLUsToPixels(OwlUI.MIN_DIALOG_WIDTH_DLU);
+        shell.setSize(width, shell.getSize().y);
+
+        /* New Location */
+        Rectangle containerBounds = shell.getParent().getBounds();
+        int x = Math.max(0, containerBounds.x + (containerBounds.width - width) / 2);
+        shell.setLocation(x, shell.getLocation().y);
+      }
+    };
+
+    /* Open and Run */
+    try {
+      dialog.run(true, false, runnableWithProgress);
+    } catch (InvocationTargetException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    } catch (InterruptedException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
     }
   }
 
