@@ -54,20 +54,16 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.EditorPart;
-import org.rssowl.core.persist.IBookMark;
-import org.rssowl.core.persist.IFolder;
-import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
-import org.rssowl.core.persist.ISearchMark;
-import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.CBrowser;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 /**
@@ -307,24 +303,16 @@ public class WebBrowserView extends EditorPart {
     fNavigationToolBarManager.createControl(parent);
   }
 
-  private void openContext(INewsMark context) {
-    if (!exists(context))
-      return;
+  private void openContext(WebBrowserContext context) {
+    NewsReference newsReference = context.getNewsReference();
+    INewsMark newsMark = context.getNewsMark();
 
-    OwlUI.openInFeedView(fEditorSite.getPage(), new StructuredSelection(context), true);
-  }
+    PerformAfterInputSet perform = null;
+    if (newsReference != null)
+      perform = PerformAfterInputSet.selectNews(newsReference);
 
-  private boolean exists(INewsMark context) {
-    if (context instanceof FolderNewsMark)
-      return DynamicDAO.exists(IFolder.class, context.getId());
-    else if (context instanceof IBookMark)
-      return DynamicDAO.exists(IBookMark.class, context.getId());
-    else if (context instanceof ISearchMark)
-      return DynamicDAO.exists(ISearchMark.class, context.getId());
-    else if (context instanceof INewsBin)
-      return DynamicDAO.exists(INewsBin.class, context.getId());
-
-    return false;
+    if (newsMark != null)
+      OwlUI.openInFeedView(fEditorSite.getPage(), new StructuredSelection(newsMark), true, perform);
   }
 
   private void createLocationInput(Composite parent) {
