@@ -294,7 +294,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     fFilterCombo = new Combo(group, SWT.BORDER | SWT.READ_ONLY);
     fFilterCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
-    fFilterCombo.add("Use Default");
+    fFilterCombo.add("");
 
     NewsFilter.Type[] filters = NewsFilter.Type.values();
     for (NewsFilter.Type filter : filters)
@@ -309,7 +309,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     fGroupCombo = new Combo(group, SWT.BORDER | SWT.READ_ONLY);
     fGroupCombo.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
-    fGroupCombo.add("Use Default");
+    fGroupCombo.add("");
 
     NewsGrouping.Type[] groups = NewsGrouping.Type.values();
     for (NewsGrouping.Type groupT : groups)
