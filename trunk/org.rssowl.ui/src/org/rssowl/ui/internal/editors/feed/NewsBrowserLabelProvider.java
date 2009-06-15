@@ -24,6 +24,12 @@
 
 package org.rssowl.ui.internal.editors.feed;
 
+import static org.rssowl.ui.internal.ILinkHandler.HANDLER_PROTOCOL;
+import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.ASSIGN_LABELS_HANDLER_ID;
+import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.DELETE_HANDLER_ID;
+import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_READ_HANDLER_ID;
+import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_STICKY_HANDLER_ID;
+
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -213,7 +219,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("div.newsitem { margin: 10px 10px 30px 10px; border: dotted 1px silver; }\n");
 
     /* Main DIV Item Areas */
-    writer.write("div.header { padding: 10px; background-color: #eee; }\n");
+    writer.write("div.header { padding: 10px 10px 5px 10px; background-color: #eee; }\n");
+    writer.append("div.headerSticky { padding: 10px 10px 5px 10px; ").append(fStickyBGColorCSS).append(" }\n");
     writer.write("div.content { \n");
     writer.write("   padding: 15px 10px 15px 10px; border-top: dotted 1px silver; \n");
     writer.append("  background-color: #fff; clear: both; ").append(fNormalFontCSS).append("\n");
@@ -224,18 +231,22 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("div.content p { margin-top: 0; padding-top: 0; margin-left: 0; padding-left: 0; }\n");
 
     /* Title */
-    writer.append("div.title { padding-bottom: 6px; ").append(fBiggerFontCSS).append(" }\n");
+    writer.append("div.title { float: left; padding-bottom: 6px; ").append(fBiggerFontCSS).append(" }\n");
 
     writer.write("div.title a { color: #009; text-decoration: none; }\n");
     writer.write("div.title a.unread { font-weight: bold; }\n");
-    writer.append("div.title a.readsticky { ").append(fStickyBGColorCSS).append(" }\n");
-    writer.append("div.title a.unreadsticky { font-weight: bold; ").append(fStickyBGColorCSS).append(" }\n");
     writer.write("div.title a:hover { color: #009; text-decoration: underline; }\n");
     writer.write("div.title a:visited { color: #009; text-decoration: underline; }\n");
 
     writer.write("div.title span.unread { font-weight: bold; }\n");
-    writer.append("div.title span.readsticky { ").append(fStickyBGColorCSS).append(" }\n");
-    writer.append("div.title span.unreadsticky { font-weight: bold; ").append(fStickyBGColorCSS).append(" }\n");
+
+    /* Delete */
+    writer.append("div.delete { text-align: right; ").append(fSmallFontCSS).append(" }\n");
+
+    /* Subline */
+    writer.append("div.subline { clear: left; ").append(fSmallFontCSS).append(" }\n");
+    writer.append("table.subline { margin: 0; padding: 0; }\n");
+    writer.append("td.subline { color: rgb(80, 80, 80); padding-right: 5px; ").append(fSmallFontCSS).append(" }\n");
 
     /* Date */
     writer.append("div.date { float: left; ").append(fSmallFontCSS).append(" }\n");
@@ -335,7 +346,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     div(builder, "newsitem");
 
     /* DIV: NewsItem/Header */
-    div(builder, "header");
+    div(builder, news.isFlagged() ? "headerSticky" : "header");
 
     /* News Title */
     {
@@ -344,8 +355,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       div(builder, "title");
 
       String cssClass = isUnread ? "unread" : "read";
-      if (news.isFlagged())
-        cssClass = cssClass + "sticky";
 
       /* Link */
       if (hasLink)
@@ -359,57 +368,89 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       close(builder, "div");
     }
 
-    /* News Date */
-    {
+    /* Delete */
+    if (withInternalLinks) {
 
-      /* DIV: NewsItem/Header/Date */
-      div(builder, "date");
+      /* DIV: NewsItem/Header/Delete */
+      div(builder, "delete");
+      String link = HANDLER_PROTOCOL + DELETE_HANDLER_ID + "?" + news.getId();
+      imageLink(builder, link, "Delete", "/icons/elcl16/remove_light.gif", "remove_light.gif");
 
+      /* DIV: NewsItem/Header/Delete */
+      close(builder, "div");
+    }
+
+    /* DIV: NewsItem/Header/Subline */
+    div(builder, "subline");
+    builder.append("<table class=\"subline\">");
+    builder.append("<tr>");
+
+    /* Actions */
+    if (withInternalLinks) {
+
+      /* Toggle Read */
+      builder.append("<td class=\"subline\">");
+      String link = HANDLER_PROTOCOL + TOGGLE_READ_HANDLER_ID + "?" + news.getId();
+      imageLink(builder, link, news.getState() == INews.State.READ ? "Mark Unread" : "Mark Read", "/icons/elcl16/mark_read_light.gif", "mark_read_light.gif");
+      builder.append("</td>");
+
+      /* Toggle Sticky */
+      builder.append("<td class=\"subline\">");
+      link = HANDLER_PROTOCOL + TOGGLE_STICKY_HANDLER_ID + "?" + news.getId();
+      imageLink(builder, link, news.isFlagged() ? "Remove Sticky" : "Mark Sticky", news.isFlagged() ? "/icons/obj16/news_pinned_light.gif" : "/icons/obj16/news_pin_light.gif", news.isFlagged() ? "news_pinned.gif" : "news_pin.gif");
+      builder.append("</td>");
+
+      /* Assign Labels */
+      builder.append("<td class=\"subline\">");
+      link = HANDLER_PROTOCOL + ASSIGN_LABELS_HANDLER_ID + "?" + news.getId();
+      imageLink(builder, link, "Assign Labels", "/icons/elcl16/assign_labels.gif", "assign_labels.gif");
+      builder.append("</td>");
+
+      builder.append("<td class=\"subline\">");
       builder.append(fDateFormat.format(DateUtils.getRecentDate(news)));
+      builder.append("</td>");
 
-      /* Close: NewsItem/Header/Date */
-      close(builder, "div");
+      builder.append("<td class=\"subline\">");
+      builder.append("|");
+      builder.append("</td>");
     }
 
-    /* News Author */
-    {
-      IPerson author = news.getAuthor();
+    /* Author */
+    IPerson author = news.getAuthor();
+    if (author != null) {
+      builder.append("<td class=\"subline\">By ");
+      String name = author.getName();
+      String email = (author.getEmail() != null) ? author.getEmail().toASCIIString() : null;
+      if (email != null && !email.contains("mail:"))
+        email = "mailto:" + email;
 
-      /* DIV: NewsItem/Header/Author */
-      div(builder, "author");
+      /* Use name as email if valid */
+      if (email == null && name.contains("@") && !name.contains(" "))
+        email = name;
 
-      if (author != null) {
-        String name = author.getName();
-        String email = (author.getEmail() != null) ? author.getEmail().toASCIIString() : null;
-        if (email != null && !email.contains("mail:"))
-          email = "mailto:" + email;
+      if (StringUtils.isSet(name) && email != null)
+        link(builder, email, name, "author");
+      else if (StringUtils.isSet(name))
+        builder.append(name);
+      else if (email != null)
+        link(builder, email, email, "author");
+      else
+        builder.append("Unknown");
 
-        /* Use name as email if valid */
-        if (email == null && name.contains("@") && !name.contains(" "))
-          email = name;
-
-        if (StringUtils.isSet(name) && email != null)
-          link(builder, email, name, "author");
-        else if (StringUtils.isSet(name))
-          builder.append(name);
-        else if (email != null)
-          link(builder, email, email, "author");
-        else
-          builder.append("&nbsp;");
-
-        /* Add to Search */
-        String value = StringUtils.isSet(name) ? name : email;
-        if (StringUtils.isSet(value)) {
-          String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.AUTHOR_HANDLER_ID + "?" + URIUtils.urlEncode(value);
-          link(search, link, value, "searchrelated");
-          search.append(", ");
-        }
-      } else
-        builder.append("&nbsp;");
-
-      /* Close: NewsItem/Header/Author */
-      close(builder, "div");
+      /* Add to Search */
+      String value = StringUtils.isSet(name) ? name : email;
+      if (StringUtils.isSet(value)) {
+        String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.AUTHOR_HANDLER_ID + "?" + URIUtils.urlEncode(value);
+        link(search, link, value, "searchrelated");
+        search.append(", ");
+      }
+      builder.append("</td>");
     }
+
+    /* Close: NewsItem/Header/Actions */
+    builder.append("</tr>");
+    builder.append("</table>");
+    close(builder, "div");
 
     /* Close: NewsItem/Header */
     close(builder, "div");
@@ -687,6 +728,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       builder.append(" style=\"color: rgb(").append(color).append(");\"");
 
     builder.append(">").append(content).append("</a>");
+  }
+
+  private void imageLink(StringBuilder builder, String link, String tooltip, String imgPath, String imgName) {
+    builder.append("<a title=\"").append(tooltip).append("\" href=\"").append(link).append("\"");
+    builder.append(">").append("<img border=\"0\" src=\"").append(OwlUI.getImageUri(imgPath, imgName)).append("\" />").append("</a>");
   }
 
   private void span(StringBuilder builder, String content, String cssClass) {
