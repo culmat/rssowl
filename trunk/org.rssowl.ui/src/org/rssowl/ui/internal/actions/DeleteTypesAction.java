@@ -74,7 +74,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DeleteTypesAction extends Action implements IObjectActionDelegate {
 
   /* Number of News to Delete before running operation in Background */
-  private static final int RUN_IN_BACKGROUND_CAP = 500;
+  private static final int RUN_IN_BACKGROUND_CAP = 200;
 
   private IStructuredSelection fSelection;
   private INewsDAO fNewsDAO;
