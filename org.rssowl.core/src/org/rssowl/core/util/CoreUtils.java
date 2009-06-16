@@ -330,12 +330,14 @@ public class CoreUtils {
    * the News, but if not provided, parts of the Content will be taken instead.
    *
    * @param news The News to get the Headline from.
+   * @param replaceEntities <code>true</code> to replace entities and
+   * <code>false</code> otherwise.
    * @return the Headline of the given News or "No Headline" if none.
    */
-  public static String getHeadline(INews news) {
+  public static String getHeadline(INews news, boolean replaceEntities) {
 
     /* Title provided */
-    String title = StringUtils.stripTags(news.getTitle());
+    String title = StringUtils.stripTags(news.getTitle(), replaceEntities);
     title = StringUtils.normalizeString(title);
     if (StringUtils.isSet(title))
       return title;
@@ -343,7 +345,7 @@ public class CoreUtils {
     /* Try Content instead */
     String content = news.getDescription();
     if (StringUtils.isSet(content)) {
-      content = StringUtils.stripTags(content);
+      content = StringUtils.stripTags(content, replaceEntities);
       content = StringUtils.normalizeString(content);
       content = StringUtils.smartTrim(content, 50);
 
@@ -720,8 +722,8 @@ public class CoreUtils {
       if (modelEvent instanceof NewsEvent) {
         NewsEvent event = (NewsEvent) modelEvent;
 
-        String oldTopic = event.getOldNews() != null ? getHeadline(event.getOldNews()) : null;
-        String newTopic = getHeadline(event.getEntity());
+        String oldTopic = event.getOldNews() != null ? getHeadline(event.getOldNews(), true) : null;
+        String newTopic = getHeadline(event.getEntity(), true);
 
         if (!newTopic.equals(oldTopic))
           return true;

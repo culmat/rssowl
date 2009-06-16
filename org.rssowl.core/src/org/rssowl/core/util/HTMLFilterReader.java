@@ -44,6 +44,7 @@ public class HTMLFilterReader extends Reader {
 
   /* Common Entities */
   private static final HashMap<String, Character> fgEntityTable;
+  private final boolean fReplaceEntities;
 
   private final Reader fIn;
   private int fReadAheadLimit = DEFAULT_READ_AHEAD;
@@ -116,31 +117,14 @@ public class HTMLFilterReader extends Reader {
 
   /**
    * @param source
+   * @param escapedTags
+   * @param replaceEntities
    */
-  public HTMLFilterReader(Reader source) {
+  public HTMLFilterReader(Reader source, Set<String> escapedTags, boolean replaceEntities) {
     super();
-    this.fIn = source.markSupported() ? source : new BufferedReader(source);
-  }
-
-  /**
-   * @param source
-   * @param escapedTags
-   */
-  public HTMLFilterReader(Reader source, Set<String> escapedTags) {
-    this(source);
-    this.fEscapedTags = escapedTags;
-  }
-
-  /**
-   * @param source
-   * @param escapedTags
-   * @param readAheadLimit
-   */
-  public HTMLFilterReader(Reader source, Set<String> escapedTags, int readAheadLimit) {
-    this(source);
-    this.fEscapedTags = escapedTags;
-    this.fReadAheadLimit = readAheadLimit;
-    fSafeReadAheadLimit = readAheadLimit - 3;
+    fIn = source.markSupported() ? source : new BufferedReader(source);
+    fEscapedTags = escapedTags;
+    fReplaceEntities = replaceEntities;
   }
 
   private int next() throws IOException {
@@ -316,7 +300,7 @@ public class HTMLFilterReader extends Reader {
       }
     }
 
-    if (ch == ';') {
+    if (ch == ';' && fReplaceEntities) {
       String entity = fSb.toString();
       Character entityChar = fgEntityTable.get(entity);
       if (entityChar != null) {

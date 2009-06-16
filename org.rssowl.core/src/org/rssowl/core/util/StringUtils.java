@@ -148,10 +148,12 @@ public class StringUtils {
    * corresponding values.
    *
    * @param str The String to remove the Tags from
+   * @param replaceEntities <code>true</code> to replace entities and
+   * <code>false</code> otherwise.
    * @return Returns a String that is no longer containing any HTML or Entities.
    */
-  public static String stripTags(String str) {
-    return filterTags(str, null);
+  public static String stripTags(String str, boolean replaceEntities) {
+    return filterTags(str, null, replaceEntities);
   }
 
   /**
@@ -162,9 +164,11 @@ public class StringUtils {
    * @param str The String to remove the Tags from
    * @param tags the set of HTML tags to strip out of the given String or
    * <code>null</code> to strip all HTML tags.
+   * @param replaceEntities <code>true</code> to replace entities and
+   * <code>false</code> otherwise.
    * @return the String with HTML Tags and Entities replaced.
    */
-  public static String filterTags(String str, Set<String> tags) {
+  public static String filterTags(String str, Set<String> tags, boolean replaceEntities) {
 
     /* Check String first */
     if (!StringUtils.isSet(str))
@@ -174,9 +178,9 @@ public class StringUtils {
     char[] result = new char[str.length()];
     Reader stripReader;
     if (tags == null || tags.isEmpty())
-      stripReader = new HTMLStripReader(new StringReader(str));
+      stripReader = new HTMLStripReader(new StringReader(str), replaceEntities);
     else
-      stripReader = new HTMLFilterReader(new StringReader(str), tags);
+      stripReader = new HTMLFilterReader(new StringReader(str), tags, replaceEntities);
 
     try {
       length += stripReader.read(result);
