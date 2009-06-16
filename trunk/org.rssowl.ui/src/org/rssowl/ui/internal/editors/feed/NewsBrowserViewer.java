@@ -25,20 +25,37 @@
 package org.rssowl.ui.internal.editors.feed;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.ContentViewer;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
@@ -47,6 +64,7 @@ import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
@@ -54,17 +72,28 @@ import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.CBrowser;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.ILinkHandler;
+import org.rssowl.ui.internal.ManageLabelsPreferencePage;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.AssignLabelsAction;
+import org.rssowl.ui.internal.actions.LabelAction;
+import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
+import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
+import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
+import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
+import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
+import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider.Dynamic;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
 import org.rssowl.ui.internal.undo.StickyOperation;
 import org.rssowl.ui.internal.undo.UndoStack;
+import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -73,7 +102,6 @@ import java.util.StringTokenizer;
 
 /**
  * @author bpasero
- * @author Kay Patzwald <kay_patzwald@users.sourceforge.net>
  */
 public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
@@ -85,9 +113,13 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   static final String TOGGLE_STICKY_HANDLER_ID = "org.rssowl.ui.ToggleSticky";
   static final String DELETE_HANDLER_ID = "org.rssowl.ui.Delete";
   static final String ASSIGN_LABELS_HANDLER_ID = "org.rssowl.ui.AssignLabels";
+  static final String NEWS_MENU_HANDLER_ID = "org.rssowl.ui.NewsMenu";
 
   private Object fInput;
   private CBrowser fBrowser;
+  private IWorkbenchPartSite fSite;
+  private Menu fNewsContextMenu;
+  private IStructuredSelection fCurrentSelection = StructuredSelection.EMPTY;
   private ApplicationServer fServer;
   private String fId;
   private boolean fBlockRefresh;
@@ -107,15 +139,19 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * @param style
    */
   public NewsBrowserViewer(Composite parent, int style) {
-    this(new CBrowser(parent, style));
+    this(parent, style, null);
   }
 
   /**
-   * @param browser
+   * @param parent
+   * @param style
+   * @param site
    */
-  public NewsBrowserViewer(CBrowser browser) {
-    hookControl(browser.getControl());
-    fBrowser = browser;
+  public NewsBrowserViewer(Composite parent, int style, IWorkbenchPartSite site) {
+    fBrowser = new CBrowser(parent, style);
+    fSite = site;
+    hookControl(fBrowser.getControl());
+    hookNewsContextMenu();
     fId = String.valueOf(hashCode());
     fServer = ApplicationServer.getDefault();
     fServer.register(fId, this);
@@ -129,6 +165,148 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fBrowser.addLinkHandler(TOGGLE_STICKY_HANDLER_ID, this);
     fBrowser.addLinkHandler(DELETE_HANDLER_ID, this);
     fBrowser.addLinkHandler(ASSIGN_LABELS_HANDLER_ID, this);
+    fBrowser.addLinkHandler(NEWS_MENU_HANDLER_ID, this);
+  }
+
+  private void hookNewsContextMenu() {
+    MenuManager manager = new MenuManager();
+    manager.setRemoveAllWhenShown(true);
+    manager.addMenuListener(new IMenuListener() {
+      public void menuAboutToShow(IMenuManager manager) {
+
+        /* Open */
+        {
+          manager.add(new Separator("open"));
+
+          /* Show only when internal browser is used */
+          if (!fCurrentSelection.isEmpty() && !fPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
+            manager.add(new OpenInExternalBrowserAction(fCurrentSelection));
+        }
+
+        /* Move To / Copy To */
+        if (!fCurrentSelection.isEmpty()) {
+          manager.add(new Separator("movecopy"));
+
+          /* Load all news bins and sort by name */
+          List<INewsBin> newsbins = new ArrayList<INewsBin>(DynamicDAO.loadAll(INewsBin.class));
+
+          Comparator<INewsBin> comparator = new Comparator<INewsBin>() {
+            public int compare(INewsBin o1, INewsBin o2) {
+              return o1.getName().compareTo(o2.getName());
+            };
+          };
+
+          Collections.sort(newsbins, comparator);
+
+          /* Move To */
+          MenuManager moveMenu = new MenuManager("Move To", "moveto");
+          manager.add(moveMenu);
+
+          for (INewsBin bin : newsbins) {
+            if (getInput() instanceof NewsBinReference && bin.getId().equals(((NewsBinReference) getInput()).getId()))
+              continue;
+
+            moveMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, bin, true));
+          }
+
+          moveMenu.add(new Separator("movetonewbin"));
+          moveMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, null, true));
+
+          /* Copy To */
+          MenuManager copyMenu = new MenuManager("Copy To", "copyto");
+          manager.add(copyMenu);
+
+          for (INewsBin bin : newsbins) {
+            if (getInput() instanceof NewsBinReference && bin.getId().equals(((NewsBinReference) getInput()).getId()))
+              continue;
+
+            copyMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, bin, false));
+          }
+
+          copyMenu.add(new Separator("copytonewbin"));
+          copyMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, null, false));
+        }
+
+        /* Mark / Label */
+        {
+          manager.add(new Separator("mark"));
+
+          /* Mark */
+          MenuManager markMenu = new MenuManager("Mark", "mark");
+          manager.add(markMenu);
+
+          /* Mark as Read */
+          IAction action = new ToggleReadStateAction(fCurrentSelection);
+          action.setEnabled(!fCurrentSelection.isEmpty());
+          markMenu.add(action);
+
+          /* Mark All Read */
+          action = new MarkAllNewsReadAction();
+          markMenu.add(action);
+
+          /* Sticky */
+          markMenu.add(new Separator());
+          action = new MakeNewsStickyAction(fCurrentSelection);
+          action.setEnabled(!fCurrentSelection.isEmpty());
+          markMenu.add(action);
+
+          /* Label */
+          if (!fCurrentSelection.isEmpty()) {
+            Collection<ILabel> labels = CoreUtils.loadSortedLabels();
+
+            /* Label */
+            MenuManager labelMenu = new MenuManager("Label");
+            manager.appendToGroup("mark", labelMenu);
+
+            /* Assign / Organize Labels */
+            labelMenu.add(new AssignLabelsAction(fBrowser.getControl().getShell(), fCurrentSelection));
+            labelMenu.add(new Action("Organize Labels...") {
+              @Override
+              public void run() {
+                PreferencesUtil.createPreferenceDialogOn(fBrowser.getControl().getShell(), ManageLabelsPreferencePage.ID, null, null).open();
+              }
+            });
+            labelMenu.add(new Separator());
+
+            /* Retrieve Labels that all selected News contain */
+            Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(fCurrentSelection);
+            for (final ILabel label : labels) {
+              LabelAction labelAction = new LabelAction(label, fCurrentSelection);
+              labelAction.setChecked(selectedLabels.contains(label));
+              labelMenu.add(labelAction);
+            }
+
+            /* Remove All Labels */
+            labelMenu.add(new Separator());
+            LabelAction removeAllLabels = new LabelAction(null, fCurrentSelection);
+            removeAllLabels.setEnabled(!labels.isEmpty());
+            labelMenu.add(removeAllLabels);
+          }
+        }
+
+        manager.add(new Separator("filter"));
+        manager.add(new Separator("edit"));
+        manager.add(new Separator("copy"));
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+      }
+    });
+
+    /* Create and Register with Workbench */
+    fNewsContextMenu = manager.createContextMenu(fBrowser.getControl().getShell());
+
+    /* Register with Part Site if possible */
+    IWorkbenchPartSite site = fSite;
+    if (site == null) {
+      IWorkbenchWindow window = OwlUI.getWindow();
+      if (window != null) {
+        IWorkbenchPart activePart = window.getPartService().getActivePart();
+        if (activePart != null && activePart.getSite() != null)
+          site = activePart.getSite();
+      }
+    }
+
+    if (site != null)
+      site.registerContextMenu(manager, this);
   }
 
   void setBlockRefresh(boolean block) {
@@ -224,6 +402,18 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         action.run();
       }
     }
+
+    /* News Context Menu */
+    else if (NEWS_MENU_HANDLER_ID.equals(id)) {
+      INews news = getNews(query);
+      if (news != null) {
+        setSelection(new StructuredSelection(news));
+        Point cursorLocation = fBrowser.getControl().getDisplay().getCursorLocation();
+        cursorLocation.y = cursorLocation.y + 16;
+        fNewsContextMenu.setLocation(cursorLocation);
+        fNewsContextMenu.setVisible(true);
+      }
+    }
   }
 
   private INews getNews(String query) {
@@ -263,6 +453,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   @Override
   protected void handleDispose(DisposeEvent event) {
     fServer.unregister(fId);
+    fCurrentSelection = null;
+    fNewsContextMenu.dispose();
     super.handleDispose(event);
   }
 
@@ -397,8 +589,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    */
   @Override
   public ISelection getSelection() {
-    /* Not Supported */
-    return null;
+    return fCurrentSelection;
   }
 
   /*
@@ -407,7 +598,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    */
   @Override
   public void setSelection(ISelection selection, boolean reveal) {
-  /* Not Supported */
+    fCurrentSelection = (IStructuredSelection) selection;
+    fireSelectionChanged(new SelectionChangedEvent(this, selection));
   }
 
   /**
@@ -563,23 +755,12 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     String inputUrl = fServer.toUrl(fId, fInput);
     String browserUrl = fBrowser.getControl().getUrl();
     boolean resetInput = browserUrl.length() == 0 || URIUtils.ABOUT_BLANK.equals(browserUrl);
-    if (inputUrl.equals(browserUrl))
-      //      internalUpdate(elements);
-      refresh(); // TODO Optimize
-    else if (fServer.isDisplayOperation(inputUrl) && resetInput)
+    if (inputUrl.equals(browserUrl)) {
+      if (!internalUpdate(elements))
+        refresh(); // Refresh if dynamic update failed
+    } else if (fServer.isDisplayOperation(inputUrl) && resetInput)
       fBrowser.setUrl(inputUrl);
   }
-
-  //  private void internalUpdate(Object[] elements) {
-  //    for (Object element : elements) {
-  //      if (element instanceof INews) {
-  //        INews news = (INews) element;
-  //        if (news.getState() == INews.State.UNREAD)
-  //          fBrowser.getControl().execute("window.document.getElementById('title" + news.getId() + "').className='unread';");
-  //        //TODO Always fall back to refresh() if execute returns FALSE
-  //      }
-  //    }
-  //  }
 
   /**
    * @param element
@@ -588,7 +769,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   public void update(Object element, @SuppressWarnings("unused") String[] properties) {
     Assert.isNotNull(element);
 
-    refresh(); // TODO Optimize
+    /* Refresh if dynamic update failed */
+    if (!internalUpdate(new Object[] { element }))
+      refresh();
   }
 
   /**
@@ -597,7 +780,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   public void remove(Object[] objects) {
     assertElementsNotNull(objects);
 
-    refresh(); // TODO Optimize
+    /* Refresh if dynamic removal failed */
+    if (!internalRemove(objects))
+      refresh();
   }
 
   /**
@@ -606,7 +791,75 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   public void remove(Object element) {
     Assert.isNotNull(element);
 
-    refresh(); // TODO Optimize
+    /* Refresh if dynamic removal failed */
+    if (!internalRemove(new Object[] { element }))
+      refresh();
+  }
+
+  private boolean internalUpdate(Object[] elements) {
+    boolean toggleJS = fBrowser.shouldDisableScript();
+    try {
+      if (toggleJS)
+        fBrowser.setScriptDisabled(false);
+
+      for (Object element : elements) {
+        if (element instanceof INews) {
+          INews news = (INews) element;
+
+          StringBuilder js = new StringBuilder();
+
+          /* State (Bold/Plain Title, Mark Read Tooltip) */
+          boolean isRead = (INews.State.READ == news.getState());
+          js.append(getElementById(Dynamic.TITLE.getId(news)).append(isRead ? ".className='read'; " : ".className='unread'; "));
+          js.append(getElementById(Dynamic.TOGGLE_READ.getId(news)).append(isRead ? ".title='Mark Unread'; " : ".title='Mark Read'; "));
+
+          /* Sticky (Title Background, Footer Background, Mark Sticky Image) */
+          boolean isSticky = news.isFlagged();
+          js.append(getElementById(Dynamic.HEADER.getId(news)).append(isSticky ? ".className='headerSticky'; " : ".className='header'; "));
+          js.append(getElementById(Dynamic.FOOTER.getId(news)).append(isSticky ? ".className='footerSticky'; " : ".className='footer'; "));
+          String stickyImg = isSticky ? OwlUI.getImageUri("/icons/obj16/news_pinned_light.gif", "news_pinned_light.gif") : OwlUI.getImageUri("/icons/obj16/news_pin_light.gif", "news_pin_light.gif");
+          js.append(getElementById(Dynamic.TOGGLE_STICKY.getId(news)).append(".src='").append(stickyImg).append("'; "));
+
+          /* Label (Title Foreground, Label List) */
+          //TODO Implement
+
+          boolean res = fBrowser.getControl().execute(js.toString());
+          if (!res)
+            return false;
+        }
+      }
+    } finally {
+      if (toggleJS)
+        fBrowser.setScriptDisabled(true);
+    }
+
+    return true;
+  }
+
+  private StringBuilder getElementById(String id) {
+    return new StringBuilder("document.getElementById('" + id + "')");
+  }
+
+  private boolean internalRemove(Object[] elements) {
+    boolean toggleJS = fBrowser.shouldDisableScript();
+    try {
+      if (toggleJS)
+        fBrowser.setScriptDisabled(false);
+
+      for (Object element : elements) {
+        if (element instanceof INews) {
+          INews news = (INews) element;
+          boolean res = fBrowser.getControl().execute(getElementById(Dynamic.NEWS.getId(news)) + ".className='hidden';");
+          if (!res)
+            return false;
+        }
+      }
+    } finally {
+      if (toggleJS)
+        fBrowser.setScriptDisabled(true);
+    }
+
+    return true;
   }
 
   private void assertElementsNotNull(Object[] elements) {

@@ -90,7 +90,7 @@ public class NewsBrowserControl implements IFeedViewPart {
    * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#createViewer(org.eclipse.swt.widgets.Composite)
    */
   public NewsBrowserViewer createViewer(Composite parent) {
-    fViewer = new NewsBrowserViewer(parent, SWT.NONE);
+    fViewer = new NewsBrowserViewer(parent, SWT.NONE, fEditorSite);
     fViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
     return fViewer;

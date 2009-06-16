@@ -27,6 +27,7 @@ package org.rssowl.ui.internal.editors.feed;
 import static org.rssowl.ui.internal.ILinkHandler.HANDLER_PROTOCOL;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.ASSIGN_LABELS_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.DELETE_HANDLER_ID;
+import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.NEWS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_READ_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_STICKY_HANDLER_ID;
 
@@ -76,6 +77,21 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /* Potential Media Tags */
   private final Set<String> fMediaTags = new HashSet<String>(Arrays.asList(new String[] { "img", "applet", "embed", "area", "frame", "frameset", "iframe", "map", "object" }));
+
+  /* Dynamic HTML in Content */
+  enum Dynamic {
+    NEWS("newsitem"), TITLE("title"), TOGGLE_READ("toggleRead"), HEADER("header"), FOOTER("footer"), TOGGLE_STICKY("toggleSticky");
+
+    private String fId;
+
+    Dynamic(String id) {
+      fId = id;
+    }
+
+    String getId(INews news) {
+      return fId + news.getId();
+    }
+  }
 
   private String fNewsFontFamily;
   private String fNormalFontCSS;
@@ -211,6 +227,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("a:hover { color: #009; text-decoration: underline; }\n");
     writer.write("a:visited { color: #009; text-decoration: none; }\n");
     writer.write("img { border: none; }\n");
+    writer.write("div.hidden { display: none; }\n");
 
     /* Group */
     writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; padding: 0 15px 5px 15px; }\n");
@@ -352,10 +369,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     }
 
     /* DIV: NewsItem */
-    div(builder, "newsitem");
+    div(builder, "newsitem", Dynamic.NEWS.getId(news));
 
     /* DIV: NewsItem/Header */
-    div(builder, news.isFlagged() ? "headerSticky" : "header");
+    div(builder, news.isFlagged() ? "headerSticky" : "header", Dynamic.HEADER.getId(news));
 
     /* News Title */
     {
@@ -367,11 +384,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
       /* Link */
       if (hasLink)
-        link(builder, news.getLinkAsText(), newsTitle, cssClass, color);
+        link(builder, news.getLinkAsText(), newsTitle, cssClass, Dynamic.TITLE.getId(news), color);
 
       /* Normal */
       else
-        span(builder, newsTitle, cssClass, color);
+        span(builder, newsTitle, cssClass, Dynamic.TITLE.getId(news), color);
 
       /* Close: NewsItem/Header/Title */
       close(builder, "div");
@@ -384,7 +401,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       div(builder, "delete");
 
       String link = HANDLER_PROTOCOL + DELETE_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, "Delete", "/icons/elcl16/remove_light.gif", "remove_light.gif");
+      imageLink(builder, link, "Delete", "/icons/elcl16/remove_light.gif", "remove_light.gif", null, null);
 
       /* DIV: NewsItem/Header/Delete */
       close(builder, "div");
@@ -401,19 +418,19 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       /* Toggle Read */
       builder.append("<td class=\"subline\">");
       String link = HANDLER_PROTOCOL + TOGGLE_READ_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, news.getState() == INews.State.READ ? "Mark Unread" : "Mark Read", "/icons/elcl16/mark_read_light.gif", "mark_read_light.gif");
+      imageLink(builder, link, news.getState() == INews.State.READ ? "Mark Unread" : "Mark Read", "/icons/elcl16/mark_read_light.gif", "mark_read_light.gif", Dynamic.TOGGLE_READ.getId(news), null);
       builder.append("</td>");
 
       /* Toggle Sticky */
       builder.append("<td class=\"subline\">");
       link = HANDLER_PROTOCOL + TOGGLE_STICKY_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, news.isFlagged() ? "Remove Sticky" : "Mark Sticky", news.isFlagged() ? "/icons/obj16/news_pinned_light.gif" : "/icons/obj16/news_pin_light.gif", news.isFlagged() ? "news_pinned_light.gif" : "news_pin_light.gif");
+      imageLink(builder, link, "Sticky", news.isFlagged() ? "/icons/obj16/news_pinned_light.gif" : "/icons/obj16/news_pin_light.gif", news.isFlagged() ? "news_pinned_light.gif" : "news_pin_light.gif", null, Dynamic.TOGGLE_STICKY.getId(news));
       builder.append("</td>");
 
       /* Assign Labels */
       builder.append("<td class=\"subline\">");
       link = HANDLER_PROTOCOL + ASSIGN_LABELS_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, "Assign Labels", "/icons/elcl16/assign_labels.gif", "assign_labels.gif");
+      imageLink(builder, link, "Assign Labels", "/icons/elcl16/assign_labels.gif", "assign_labels.gif", null, null);
       builder.append("</td>");
 
       /* Go to Attachments */
@@ -422,22 +439,29 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         IAttachment attachment = news.getAttachments().get(0);
         link = attachment.getLink().toASCIIString();
         String name = URIUtils.getFile(attachment.getLink());
-        imageLink(builder, link, StringUtils.isSet(name) ? name : "Attachment", "/icons/obj16/attachment.gif", "attachment.gif");
+        imageLink(builder, link, StringUtils.isSet(name) ? name : "Attachment", "/icons/obj16/attachment.gif", "attachment.gif", null, null);
         builder.append("</td>");
       }
 
+      /* News Context Menu */
       builder.append("<td class=\"subline\">");
-      builder.append(fDateFormat.format(DateUtils.getRecentDate(news)));
-      builder.append("</td>");
-
-      builder.append("<td class=\"subline\">");
-      builder.append("|");
+      link = HANDLER_PROTOCOL + NEWS_MENU_HANDLER_ID + "?" + news.getId();
+      imageLink(builder, link, "Menu", "/icons/obj16/menu_light.gif", "menu_light.gif", null, null);
       builder.append("</td>");
     }
+
+    /* Date */
+    builder.append("<td class=\"subline\">");
+    builder.append(fDateFormat.format(DateUtils.getRecentDate(news)));
+    builder.append("</td>");
 
     /* Author */
     IPerson author = news.getAuthor();
     if (author != null) {
+      builder.append("<td class=\"subline\">");
+      builder.append("|");
+      builder.append("</td>");
+
       builder.append("<td class=\"subline\">By ");
       String name = author.getName();
       String email = (author.getEmail() != null) ? author.getEmail().toASCIIString() : null;
@@ -545,7 +569,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       boolean hasFooter = false;
 
       /* DIV: NewsItem/Footer */
-      div(footer, news.isFlagged() ? "footerSticky" : "footer");
+      div(footer, news.isFlagged() ? "footerSticky" : "footer", Dynamic.FOOTER.getId(news));
 
       /* Attachments */
       List<IAttachment> attachments = news.getAttachments();
@@ -721,6 +745,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     builder.append("<div class=\"").append(cssClass).append("\">\n");
   }
 
+  private void div(StringBuilder builder, String cssClass, String id) {
+    builder.append("<div id=\"").append(id).append("\" class=\"").append(cssClass).append("\">\n");
+  }
+
   private void close(StringBuilder builder, String tag) {
     builder.append("</").append(tag).append(">\n");
   }
@@ -730,6 +758,10 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   }
 
   private void link(StringBuilder builder, String link, String content, String cssClass, String color) {
+    link(builder, link, content, cssClass, null, color);
+  }
+
+  private void link(StringBuilder builder, String link, String content, String cssClass, String id, String color) {
     builder.append("<a href=\"").append(link).append("\"");
 
     if (cssClass != null)
@@ -738,12 +770,26 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     if (color != null)
       builder.append(" style=\"color: rgb(").append(color).append(");\"");
 
+    if (id != null)
+      builder.append(" id=\"").append(id).append("\"");
+
     builder.append(">").append(content).append("</a>");
   }
 
-  private void imageLink(StringBuilder builder, String link, String tooltip, String imgPath, String imgName) {
-    builder.append("<a title=\"").append(tooltip).append("\" href=\"").append(link).append("\"");
-    builder.append(">").append("<img border=\"0\" src=\"").append(OwlUI.getImageUri(imgPath, imgName)).append("\" />").append("</a>");
+  private void imageLink(StringBuilder builder, String link, String tooltip, String imgPath, String imgName, String linkId, String imageId) {
+    builder.append("<a");
+
+    if (linkId != null)
+      builder.append(" id=\"").append(linkId).append("\"");
+
+    builder.append(" title=\"").append(tooltip).append("\" href=\"").append(link).append("\">");
+    builder.append("<img");
+
+    if (imageId != null)
+      builder.append(" id=\"").append(imageId).append("\"");
+
+    builder.append(" border=\"0\" src=\"").append(OwlUI.getImageUri(imgPath, imgName)).append("\" />");
+    builder.append("</a>");
   }
 
   private void span(StringBuilder builder, String content, String cssClass) {
@@ -751,10 +797,17 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   }
 
   private void span(StringBuilder builder, String content, String cssClass, String color) {
+    span(builder, content, cssClass, null, color);
+  }
+
+  private void span(StringBuilder builder, String content, String cssClass, String id, String color) {
     builder.append("<span class=\"").append(cssClass).append("\"");
 
     if (color != null)
       builder.append(" style=\"color: rgb(").append(color).append(");\"");
+
+    if (id != null)
+      builder.append(" id=\"").append(id).append("\"");
 
     builder.append(">").append(content).append("</span>\n");
   }
