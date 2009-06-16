@@ -357,7 +357,11 @@ public class CBrowser {
     };
   }
 
-  private void setScriptDisabled(Boolean disabled) {
+  /**
+   * @param disabled <code>true</code> to disable JavaScript and
+   * <code>false</code> otherwise.
+   */
+  public void setScriptDisabled(Boolean disabled) {
 
     /* Only supported on Windows IE */
     if (!Application.IS_WINDOWS || (fBrowser.getStyle() & SWT.MOZILLA) != 0)
@@ -373,8 +377,11 @@ public class CBrowser {
     }
   }
 
-  /* Disallow JavaScript if configured */
-  private boolean shouldDisableScript() {
+  /**
+   * @return <code>true</code> if the configuration is to disable JavaScript and
+   * <code>false</code> otherwise.
+   */
+  public boolean shouldDisableScript() {
     return fPreferences.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT);
   }
 
