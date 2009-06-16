@@ -42,12 +42,14 @@ public class StringUtilsTest {
    */
   @Test
   public void testStripTags() throws Exception {
-    assertEquals("Foo Bar", StringUtils.stripTags("Foo Bar"));
-    assertEquals("Foo  Bar", StringUtils.stripTags("Foo <br> Bar"));
-    assertEquals("Foo Bar", StringUtils.stripTags("Foo Bar<br>"));
-    assertEquals("Foo Bar Foo Bar", StringUtils.stripTags("Foo Bar<br> Foo Bar<br>"));
-    assertEquals("Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar", StringUtils.stripTags("Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br>"));
-    assertEquals("T-Systems übernimmt DVB-H-Sendebetrieb", StringUtils.stripTags("<h3 class=\"anriss\"><a href=\"/newsticker/meldung/97406\">T-Systems übernimmt DVB-H-Sendebetrieb</a></h3>"));
+    assertEquals("Foo Bar", StringUtils.stripTags("Foo Bar", true));
+    assertEquals("Foo & Bar", StringUtils.stripTags("Foo &lt; Bar", true));
+    assertEquals("Foo &lt; Bar", StringUtils.stripTags("Foo &lt; Bar", false));
+    assertEquals("Foo  Bar", StringUtils.stripTags("Foo <br> Bar", true));
+    assertEquals("Foo Bar", StringUtils.stripTags("Foo Bar<br>", true));
+    assertEquals("Foo Bar Foo Bar", StringUtils.stripTags("Foo Bar<br> Foo Bar<br>", true));
+    assertEquals("Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar Foo Bar", StringUtils.stripTags("Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br> Foo Bar<br>", true));
+    assertEquals("T-Systems übernimmt DVB-H-Sendebetrieb", StringUtils.stripTags("<h3 class=\"anriss\"><a href=\"/newsticker/meldung/97406\">T-Systems übernimmt DVB-H-Sendebetrieb</a></h3>", true));
   }
 
   /**
@@ -55,7 +57,7 @@ public class StringUtilsTest {
    */
   @Test
   public void testStripTagsTimeMagazine() throws Exception {
-    assertEquals("", StringUtils.stripTags("<img src=\"http://feeds.feedburner.com/~r/time/topstories/~4/183799328\" height=\"1\" width=\"1\"/>"));
+    assertEquals("", StringUtils.stripTags("<img src=\"http://feeds.feedburner.com/~r/time/topstories/~4/183799328\" height=\"1\" width=\"1\"/>", true));
   }
 
   /**
