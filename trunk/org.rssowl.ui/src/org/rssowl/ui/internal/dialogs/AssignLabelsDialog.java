@@ -31,8 +31,10 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -230,7 +232,14 @@ public class AssignLabelsDialog extends Dialog {
       }
     };
 
-    final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = OwlUI.hookAutoComplete(fLabelsInput, adapter, null, true);
+    /* Labels */
+    Set<ILabel> labels = CoreUtils.loadSortedLabels();
+    final List<String> labelNames = new ArrayList<String>(labels.size());
+    for (ILabel label : labels) {
+      labelNames.add(label.getName());
+    }
+
+    final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = OwlUI.hookAutoComplete(fLabelsInput, adapter, labelNames, true);
     pair.getSecond().setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_INSERT);
 
     /* Load proposals in the Background */
@@ -243,10 +252,13 @@ public class AssignLabelsDialog extends Dialog {
             }
           });
 
+          /* Categories */
           Set<String> categoryNames = DynamicDAO.getDAO(ICategoryDAO.class).loadAllNames();
           categoryNames = StringUtils.replaceAll(categoryNames, ",", " "); // Comma not allowed for Labels
-
           values.addAll(categoryNames);
+
+          /* Labels */
+          values.addAll(labelNames);
 
           /* Apply Proposals */
           if (!fLabelsInput.isDisposed())
