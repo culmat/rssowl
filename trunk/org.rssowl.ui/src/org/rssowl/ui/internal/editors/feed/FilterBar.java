@@ -501,6 +501,38 @@ public class FilterBar {
 
     fSecondToolBarManager.add(columnDropdown);
 
+    /* Maximize / Minimize Browser */
+    final ImageDescriptor img = OwlUI.getImageDescriptor("icons/etool16/browsermaximized.gif");
+
+    IAction toggleMaximized = new Action("", IAction.AS_CHECK_BOX) {
+
+      @Override
+      public void run() {
+        fFeedView.toggleNewsViewMaximized();
+        fMaximized = !fMaximized;
+        fSecondToolBarManager.find(TOGGLE_MAXIMIZED_ACTION).update(IAction.TOOL_TIP_TEXT);
+        fSecondToolBarManager.find(TOGGLE_LAYOUT_ACTION).update();
+        fSecondToolBarManager.find(COLUMNS_ACTION).update();
+      }
+
+      @Override
+      public ImageDescriptor getImageDescriptor() {
+        return img;
+      }
+
+      @Override
+      public String getToolTipText() {
+        if (fMaximized)
+          return "Show Headlines";
+
+        return "Hide Headlines";
+      }
+    };
+    toggleMaximized.setId(TOGGLE_MAXIMIZED_ACTION);
+    toggleMaximized.setChecked(fMaximized);
+
+    fSecondToolBarManager.add(toggleMaximized);
+
     /* Toggle Layout */
     final ImageDescriptor horizontalImg = OwlUI.getImageDescriptor("icons/etool16/horizontal.gif");
     final ImageDescriptor horizontalImgDisabled = OwlUI.getImageDescriptor("icons/dtool16/horizontal.gif");
@@ -538,38 +570,6 @@ public class FilterBar {
     };
     toggleLayout.setId(TOGGLE_LAYOUT_ACTION);
     fSecondToolBarManager.add(toggleLayout);
-
-    /* Maximize / Minimize Browser */
-    final ImageDescriptor img = OwlUI.getImageDescriptor("icons/etool16/browsermaximized.gif");
-
-    IAction toggleMaximized = new Action("", IAction.AS_CHECK_BOX) {
-
-      @Override
-      public void run() {
-        fFeedView.toggleNewsViewMaximized();
-        fMaximized = !fMaximized;
-        fSecondToolBarManager.find(TOGGLE_MAXIMIZED_ACTION).update(IAction.TOOL_TIP_TEXT);
-        fSecondToolBarManager.find(TOGGLE_LAYOUT_ACTION).update();
-        fSecondToolBarManager.find(COLUMNS_ACTION).update();
-      }
-
-      @Override
-      public ImageDescriptor getImageDescriptor() {
-        return img;
-      }
-
-      @Override
-      public String getToolTipText() {
-        if (fMaximized)
-          return "Show Headlines";
-
-        return "Hide Headlines";
-      }
-    };
-    toggleMaximized.setId(TOGGLE_MAXIMIZED_ACTION);
-    toggleMaximized.setChecked(fMaximized);
-
-    fSecondToolBarManager.add(toggleMaximized);
   }
 
   private NewsColumnViewModel getColumnModel() {
