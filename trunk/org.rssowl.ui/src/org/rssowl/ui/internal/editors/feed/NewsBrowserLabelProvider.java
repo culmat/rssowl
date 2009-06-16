@@ -235,9 +235,9 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("div.title { float: left; padding-bottom: 6px; ").append(fBiggerFontCSS).append(" }\n");
 
     writer.write("div.title a { color: #009; text-decoration: none; }\n");
-    writer.write("div.title a.unread { font-weight: bold; }\n");
-    writer.write("div.title a:hover { color: #009; text-decoration: underline; }\n");
-    writer.write("div.title a:visited { color: #009; text-decoration: underline; }\n");
+    writer.write("div.title a.unread { font-weight: bold; text-decoration: none; }\n");
+    writer.write("div.title a:hover { color: #009; text-decoration: none; }\n");
+    writer.write("div.title a:visited { color: #009; text-decoration: none; }\n");
 
     writer.write("div.title span.unread { font-weight: bold; }\n");
 

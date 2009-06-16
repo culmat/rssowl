@@ -247,7 +247,7 @@ public class OwlUI {
   private static final Map<String, ImageDescriptor> DESCRIPTOR_CACHE = new HashMap<String, ImageDescriptor>();
 
   /* Used to cache the path of Images used in the embedded Browser */
-  private static final Map<String, URI> fgImageUriMap = new ConcurrentHashMap<String, URI>();
+  private static final Map<String, String> fgImageUriMap = new ConcurrentHashMap<String, String>();
 
   /* Name of Folder for storing Icons */
   private static final String ICONS_FOLDER = "icons";
@@ -516,17 +516,17 @@ public class OwlUI {
    * @param name the name of the image.
    * @return an {@link URI} to a file where the image has been saved to.
    */
-  public static URI getImageUri(String path, String name) {
+  public static String getImageUri(String path, String name) {
 
     /* Check Cache */
-    URI imgUri = fgImageUriMap.get(path);
+    String imgUri = fgImageUriMap.get(path);
     if (imgUri != null)
       return imgUri;
 
     /* Check Filesystem */
     File imgFile = getImageFile(name);
     if (imgFile.exists()) {
-      imgUri = imgFile.toURI();
+      imgUri = getImageUri(imgFile);
       fgImageUriMap.put(path, imgUri);
       return imgUri;
     }
@@ -534,7 +534,7 @@ public class OwlUI {
     /* Copy to Filesystem */
     try {
       copy(OwlUI.class.getResourceAsStream(path), new FileOutputStream(imgFile));
-      imgUri = imgFile.toURI();
+      imgUri = getImageUri(imgFile);
       fgImageUriMap.put(path, imgUri);
       return imgUri;
     } catch (IOException e) {
@@ -542,6 +542,12 @@ public class OwlUI {
     }
 
     return null;
+  }
+
+  private static String getImageUri(File file) {
+    URI uri = file.toURI();
+    String s = uri.toASCIIString();
+    return s.replaceFirst("/", "///");
   }
 
   private static void copy(InputStream fis, OutputStream fos) {
