@@ -117,7 +117,7 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
 
           /* Sort by Title */
         case TITLE:
-          result = compareByTitle(CoreUtils.getHeadline(news1), CoreUtils.getHeadline(news2));
+          result = compareByTitle(CoreUtils.getHeadline(news1, true), CoreUtils.getHeadline(news2, true));
           break;
 
         /* Sort by Author */

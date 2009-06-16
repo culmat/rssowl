@@ -130,7 +130,7 @@ public class InformationPropertyPage implements IEntityPropertyPage {
       protected void runInBackground(IProgressMonitor monitor) {
         IFeed feed = bm.getFeedLinkReference().resolve();
         if (feed != null) {
-          description = StringUtils.stripTags(feed.getDescription());
+          description = StringUtils.stripTags(feed.getDescription(), true);
           homepage = feed.getHomepage();
         }
       }

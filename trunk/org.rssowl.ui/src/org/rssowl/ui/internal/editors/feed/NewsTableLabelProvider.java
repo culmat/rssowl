@@ -241,7 +241,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
       switch (column) {
         case TITLE:
-          text = CoreUtils.getHeadline(news);
+          text = CoreUtils.getHeadline(news, true);
           break;
 
         case DATE:

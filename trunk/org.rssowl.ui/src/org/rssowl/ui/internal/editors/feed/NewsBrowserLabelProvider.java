@@ -332,11 +332,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private String getLabel(INews news, boolean withInternalLinks) {
     String description = news.getDescription();
     if (fStripMediaFromNews)
-      description = StringUtils.filterTags(description, fMediaTags);
+      description = StringUtils.filterTags(description, fMediaTags, false);
     StringBuilder builder = getBuilder(news, description);
     StringBuilder search = new StringBuilder();
 
-    String newsTitle = CoreUtils.getHeadline(news);
+    String newsTitle = CoreUtils.getHeadline(news, false);
     boolean hasLink = news.getLinkAsText() != null;
     State state = news.getState();
     boolean isUnread = (state == State.NEW || state == State.UPDATED || state == State.UNREAD);

@@ -342,7 +342,7 @@ public class NewsGrouping {
         EntityGroup group = gDefault;
 
         /* Normalize Title */
-        String normalizedTitle = CoreUtils.getHeadline(news);
+        String normalizedTitle = CoreUtils.getHeadline(news, true);
         normalizedTitle = CoreUtils.normalizeTitle(normalizedTitle);
 
         /* Determine Group ID */

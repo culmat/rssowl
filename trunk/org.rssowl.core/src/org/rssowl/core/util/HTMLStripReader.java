@@ -39,6 +39,7 @@ public class HTMLStripReader extends Reader {
 
   /* Common Entities */
   private static final Map<String, Character> fgEntityTable;
+  private final boolean fReplaceEntities;
 
   /* Wrapped Reader */
   private final Reader fIn;
@@ -127,8 +128,21 @@ public class HTMLStripReader extends Reader {
    * @param source The <code>Reader</code> to wrap around.
    */
   public HTMLStripReader(Reader source) {
+    this(source, true);
+  }
+
+  /**
+   * Creates a new <code>HTMLStripReader</code> that wraps another reader and
+   * attempts to strip out HTML constructs.
+   *
+   * @param source The <code>Reader</code> to wrap around.
+   * @param replaceEntities <code>true</code> to replace entities and
+   * <code>false</code> otherwise.
+   */
+  public HTMLStripReader(Reader source, boolean replaceEntities) {
     super();
     fIn = source.markSupported() ? source : new BufferedReader(source);
+    fReplaceEntities = replaceEntities;
   }
 
   private int next() throws IOException {
@@ -285,7 +299,7 @@ public class HTMLStripReader extends Reader {
       }
     }
 
-    if (ch == ';') {
+    if (ch == ';' && fReplaceEntities) {
       String entity = fStrBuf.toString();
       Character entityChar = fgEntityTable.get(entity);
       if (entityChar != null) {

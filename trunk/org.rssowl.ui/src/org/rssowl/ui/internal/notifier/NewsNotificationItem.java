@@ -102,7 +102,7 @@ public class NewsNotificationItem extends NotificationItem {
     if (!StringUtils.isSet(description))
       return null;
 
-    String content = StringUtils.stripTags(description);
+    String content = StringUtils.stripTags(description, true);
     content = StringUtils.normalizeString(content);
     content = StringUtils.smartTrim(content, MAX_DESCRIPTION_LENGTH);
 
@@ -124,7 +124,7 @@ public class NewsNotificationItem extends NotificationItem {
   }
 
   private static String makeText(INews news) {
-    String headline = CoreUtils.getHeadline(news);
+    String headline = CoreUtils.getHeadline(news, true);
     if (headline.contains("&"))
       headline = StringUtils.replaceAll(headline, "&", "&&");
 
