@@ -239,6 +239,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("div.title a:hover { color: #009; text-decoration: none; }\n");
     writer.write("div.title a:visited { color: #009; text-decoration: none; }\n");
 
+    writer.write("a.comments { color: rgb(80,80,80); text-decoration: none; }\n");
+    writer.write("a.comments:hover { color: rgb(80,80,80); text-decoration: none; }\n");
+    writer.write("a.comments:active { color: rgb(80,80,80); text-decoration: none; }\n");
+    writer.write("a.comments:visited { color: rgb(80,80,80); text-decoration: none; }\n");
+
     writer.write("div.title span.unread { font-weight: bold; }\n");
 
     /* Delete */
@@ -261,10 +266,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("div.attachments a { color: #009; text-decoration: none; }\n");
     writer.write("div.attachments a:visited { color: #009; text-decoration: none; }\n");
     writer.write("div.attachments a:hover { text-decoration: underline; }\n");
-
-    /* Label */
-    writer.append("div.label { clear: both; ").append(fSmallFontCSS).append(" }\n");
-    writer.write("div.label span.label {float: left; padding-right: 5px; }\n");
 
     /* Categories */
     writer.append("div.categories { clear: both; ").append(fSmallFontCSS).append(" }\n");
@@ -449,6 +450,48 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       builder.append("</td>");
     }
 
+    /* Comments */
+    if (StringUtils.isSet(news.getComments()) && news.getComments().trim().length() > 0 && URIUtils.looksLikeLink(news.getComments())) {
+      builder.append("<td class=\"subline\">");
+      builder.append("|");
+      builder.append("</td>");
+
+      builder.append("<td class=\"subline\">");
+
+      String comments = news.getComments();
+      link(builder, comments, "Comments", "comments");
+
+      builder.append("</td>");
+    }
+
+    /* Labels */
+    if (!labels.isEmpty()) {
+      builder.append("<td class=\"subline\">");
+      builder.append("|");
+      builder.append("</td>");
+
+      builder.append("<td class=\"subline\">Labels: ");
+
+      /* Append Labels to Footer */
+      int c = 0;
+      for (ILabel label : labels) {
+        c++;
+        if (c < labels.size())
+          span(builder, label.getName() + ", ", null, label.getColor());
+        else
+          span(builder, label.getName(), null, label.getColor());
+      }
+
+      builder.append("</td>");
+
+      /* Add to Search */
+      for (ILabel label : labels) {
+        String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.LABEL_HANDLER_ID + "?" + URIUtils.urlEncode(label.getName());
+        link(search, link, label.getName(), "searchrelated");
+        search.append(", ");
+      }
+    }
+
     /* Close: NewsItem/Header/Actions */
     builder.append("</tr>");
     builder.append("</table>");
@@ -519,37 +562,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
         /* Close: NewsItem/Footer/Attachments */
         close(footer, "div");
-      }
-
-      /* Label */
-      if (!labels.isEmpty()) {
-        hasFooter = true;
-
-        /* DIV: NewsItem/Footer/Label */
-        div(footer, "label");
-
-        /* Label */
-        span(footer, labels.size() > 1 ? "Labels:" : "Label:", "label");
-
-        /* Append Labels to Footer */
-        int c = 0;
-        for (ILabel label : labels) {
-          c++;
-          if (c < labels.size())
-            span(footer, label.getName() + ", ", "label", label.getColor());
-          else
-            span(footer, label.getName(), "label", label.getColor());
-        }
-
-        /* Close: NewsItem/Footer/Label */
-        close(footer, "div");
-
-        /* Add to Search */
-        for (ILabel label : labels) {
-          String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.LABEL_HANDLER_ID + "?" + URIUtils.urlEncode(label.getName());
-          link(search, link, label.getName(), "searchrelated");
-          search.append(", ");
-        }
       }
 
       /* Categories */
@@ -626,26 +638,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
           footer.append(name);
 
         /* Close: NewsItem/Footer/Source */
-        close(footer, "div");
-      }
-
-      /* Comments */
-      if (StringUtils.isSet(news.getComments()) && news.getComments().trim().length() > 0) {
-        hasFooter = true;
-        String comments = news.getComments();
-
-        /* DIV: NewsItem/Footer/Comments */
-        div(footer, "comments");
-
-        /* Label */
-        span(footer, "Comments:", "label");
-
-        if (URIUtils.looksLikeLink(comments))
-          link(footer, comments, "Read", "comments");
-        else
-          footer.append(comments);
-
-        /* Close: NewsItem/Footer/Comments */
         close(footer, "div");
       }
 
