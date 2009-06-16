@@ -344,6 +344,13 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     Set<ILabel> labels = CoreUtils.getSortedLabels(news);
     String color = !labels.isEmpty() ? labels.iterator().next().getColor() : null;
 
+    boolean hasAttachments = false;
+    if (!news.getAttachments().isEmpty()) {
+      URI attachmentLink = news.getAttachments().get(0).getLink();
+      if (attachmentLink != null)
+        hasAttachments = URIUtils.looksLikeLink(attachmentLink.toString());
+    }
+
     /* DIV: NewsItem */
     div(builder, "newsitem");
 
@@ -408,6 +415,16 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       link = HANDLER_PROTOCOL + ASSIGN_LABELS_HANDLER_ID + "?" + news.getId();
       imageLink(builder, link, "Assign Labels", "/icons/elcl16/assign_labels.gif", "assign_labels.gif");
       builder.append("</td>");
+
+      /* Go to Attachments */
+      if (hasAttachments) {
+        builder.append("<td class=\"subline\">");
+        IAttachment attachment = news.getAttachments().get(0);
+        link = attachment.getLink().toASCIIString();
+        String name = URIUtils.getFile(attachment.getLink());
+        imageLink(builder, link, StringUtils.isSet(name) ? name : "Attachment", "/icons/obj16/attachment.gif", "attachment.gif");
+        builder.append("</td>");
+      }
 
       builder.append("<td class=\"subline\">");
       builder.append(fDateFormat.format(DateUtils.getRecentDate(news)));
