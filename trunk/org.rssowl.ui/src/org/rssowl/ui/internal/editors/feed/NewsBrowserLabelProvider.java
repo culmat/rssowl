@@ -226,6 +226,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("  background-color: #fff; clear: both; ").append(fNormalFontCSS).append("\n");
     writer.write("}\n");
     writer.write("div.footer { background-color: rgb(248,248,248); padding: 5px 10px 5px 10px; line-height: 20px; border-top: dotted 1px silver; }\n");
+    writer.append("div.footerSticky { ").append(fStickyBGColorCSS).append(" padding: 5px 10px 5px 10px; line-height: 20px; border-top: dotted 1px silver; }\n");
 
     /* Restrict the style of embedded Paragraphs */
     writer.write("div.content p { margin-top: 0; padding-top: 0; margin-left: 0; padding-left: 0; }\n");
@@ -373,6 +374,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
       /* DIV: NewsItem/Header/Delete */
       div(builder, "delete");
+
       String link = HANDLER_PROTOCOL + DELETE_HANDLER_ID + "?" + news.getId();
       imageLink(builder, link, "Delete", "/icons/elcl16/remove_light.gif", "remove_light.gif");
 
@@ -397,7 +399,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       /* Toggle Sticky */
       builder.append("<td class=\"subline\">");
       link = HANDLER_PROTOCOL + TOGGLE_STICKY_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, news.isFlagged() ? "Remove Sticky" : "Mark Sticky", news.isFlagged() ? "/icons/obj16/news_pinned_light.gif" : "/icons/obj16/news_pin_light.gif", news.isFlagged() ? "news_pinned.gif" : "news_pin.gif");
+      imageLink(builder, link, news.isFlagged() ? "Remove Sticky" : "Mark Sticky", news.isFlagged() ? "/icons/obj16/news_pinned_light.gif" : "/icons/obj16/news_pin_light.gif", news.isFlagged() ? "news_pinned_light.gif" : "news_pin_light.gif");
       builder.append("</td>");
 
       /* Assign Labels */
@@ -483,7 +485,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       boolean hasFooter = false;
 
       /* DIV: NewsItem/Footer */
-      div(footer, "footer");
+      div(footer, news.isFlagged() ? "footerSticky" : "footer");
 
       /* Attachments */
       List<IAttachment> attachments = news.getAttachments();

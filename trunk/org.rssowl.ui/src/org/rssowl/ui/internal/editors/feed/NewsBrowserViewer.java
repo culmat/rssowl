@@ -44,6 +44,7 @@ import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.SearchSpecifier;
+import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.CoreUtils;
@@ -51,12 +52,13 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.CBrowser;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.actions.AssignLabelsAction;
-import org.rssowl.ui.internal.actions.DeleteTypesAction;
-import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
-import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
+import org.rssowl.ui.internal.undo.NewsStateOperation;
+import org.rssowl.ui.internal.undo.StickyOperation;
+import org.rssowl.ui.internal.undo.UndoStack;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -91,7 +93,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private boolean fBlockRefresh;
   private IModelFactory fFactory;
   private IPreferenceScope fPreferences = Owl.getPreferenceService().getGlobalScope();
-  private INewsDAO fNewsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
+  private INewsDAO fNewsDao = DynamicDAO.getDAO(INewsDAO.class);
 
   /* This viewer's sorter. <code>null</code> means there is no sorter. */
   private ViewerComparator fSorter;
@@ -185,8 +187,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     else if (TOGGLE_READ_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
-        ToggleReadStateAction action = new ToggleReadStateAction(new StructuredSelection(news));
-        action.run();
+        INews.State newState = (news.getState() == INews.State.READ) ? INews.State.UNREAD : INews.State.READ;
+        Set<INews> singleNewsSet = Collections.singleton(news);
+        UndoStack.getInstance().addOperation(new NewsStateOperation(singleNewsSet, newState, true));
+        fNewsDao.setState(singleNewsSet, newState, true, false);
       }
     }
 
@@ -194,8 +198,11 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     else if (TOGGLE_STICKY_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
-        MakeNewsStickyAction action = new MakeNewsStickyAction(new StructuredSelection(news));
-        action.run();
+        Set<INews> singleNewsSet = Collections.singleton(news);
+        UndoStack.getInstance().addOperation(new StickyOperation(singleNewsSet, !news.isFlagged()));
+        news.setFlagged(!news.isFlagged());
+        Controller.getDefault().getSavedSearchService().forceQuickUpdate();
+        DynamicDAO.saveAll(singleNewsSet);
       }
     }
 
@@ -203,8 +210,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     else if (DELETE_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
-        DeleteTypesAction action = new DeleteTypesAction(fBrowser.getControl().getShell(), new StructuredSelection(news));
-        action.run();
+        Set<INews> singleNewsSet = Collections.singleton(news);
+        UndoStack.getInstance().addOperation(new NewsStateOperation(singleNewsSet, INews.State.HIDDEN, false));
+        fNewsDao.setState(singleNewsSet, INews.State.HIDDEN, false, false);
       }
     }
 
@@ -562,16 +570,16 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       fBrowser.setUrl(inputUrl);
   }
 
-//  private void internalUpdate(Object[] elements) {
-//    for (Object element : elements) {
-//      if (element instanceof INews) {
-//        INews news = (INews) element;
-//        if (news.getState() == INews.State.UNREAD)
-//          fBrowser.getControl().execute("window.document.getElementById('title" + news.getId() + "').className='unread';");
-//        //TODO Always fall back to refresh() if execute returns FALSE
-//      }
-//    }
-//  }
+  //  private void internalUpdate(Object[] elements) {
+  //    for (Object element : elements) {
+  //      if (element instanceof INews) {
+  //        INews news = (INews) element;
+  //        if (news.getState() == INews.State.UNREAD)
+  //          fBrowser.getControl().execute("window.document.getElementById('title" + news.getId() + "').className='unread';");
+  //        //TODO Always fall back to refresh() if execute returns FALSE
+  //      }
+  //    }
+  //  }
 
   /**
    * @param element
