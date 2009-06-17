@@ -592,7 +592,7 @@ public class NotificationPopup extends PopupDialog {
 
     /* Colors */
     fNotifierColors = new NotifierColors(getParentShell().getDisplay(), fResources);
-    fStickyBgColor = OwlUI.getThemeColor(OwlUI.STICKY_BG_COLOR_ID, fResources, new RGB(255, 255, 128));
+    fStickyBgColor = OwlUI.getThemeColor(OwlUI.STICKY_BG_COLOR_ID, fResources, new RGB(255, 255, 180));
 
     /* Icons */
     fCloseImageNormal = OwlUI.getImage(fResources, "icons/etool16/close_normal.png");

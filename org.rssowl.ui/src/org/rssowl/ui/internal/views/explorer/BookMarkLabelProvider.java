@@ -96,7 +96,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
   void updateResources() {
 
     /* Sticky Color */
-    fStickyBgColor = OwlUI.getThemeColor(OwlUI.STICKY_BG_COLOR_ID, fResources, new RGB(255, 255, 128));
+    fStickyBgColor = OwlUI.getThemeColor(OwlUI.STICKY_BG_COLOR_ID, fResources, new RGB(255, 255, 180));
   }
 
   void setUseFavicons(boolean useFavicons) {
@@ -124,7 +124,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     fDefaultFont = OwlUI.getThemeFont(OwlUI.BKMRK_EXPLORER_FONT_ID, SWT.NORMAL);
 
     /* Colors */
-    fStickyBgColor = OwlUI.getThemeColor(OwlUI.STICKY_BG_COLOR_ID, fResources, new RGB(255, 255, 128));
+    fStickyBgColor = OwlUI.getThemeColor(OwlUI.STICKY_BG_COLOR_ID, fResources, new RGB(255, 255, 180));
     fGroupFgColor = OwlUI.getColor(fResources, OwlUI.GROUP_FG_COLOR);
   }
 

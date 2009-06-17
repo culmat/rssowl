@@ -177,7 +177,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /* Init the Theme Color (from UI Thread) */
   private void createColors() {
-    RGB stickyRgb = OwlUI.getThemeRGB(OwlUI.STICKY_BG_COLOR_ID, new RGB(255, 255, 128));
+    RGB stickyRgb = OwlUI.getThemeRGB(OwlUI.STICKY_BG_COLOR_ID, new RGB(255, 255, 180));
     fStickyBGColorCSS = "background-color: rgb(" + stickyRgb.red + "," + stickyRgb.green + "," + stickyRgb.blue + ");";
   }
 
