@@ -546,7 +546,7 @@ public class NewsContentProvider implements ITreeContentProvider {
 
     /* Update in Browser-Viewer */
     if (contains(fBrowserViewer.getInput(), updatedNews))
-      fBrowserViewer.update(updatedNews.toArray(), null);
+      fBrowserViewer.update(events);
 
     return false;
   }

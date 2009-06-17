@@ -462,6 +462,19 @@ public class CoreUtils {
   }
 
   /**
+   * @param newsEvent
+   * @return <code>TRUE</code> in case the Sticky-State of the given News
+   * changed its value for any of the given Events, <code>FALSE</code>
+   * otherwise.
+   */
+  public static boolean isStickyStateChange(NewsEvent newsEvent) {
+    boolean oldSticky = (newsEvent.getOldNews() != null) ? newsEvent.getOldNews().isFlagged() : false;
+    boolean currentSticky = newsEvent.getEntity().isVisible() && newsEvent.getEntity().isFlagged();
+
+    return oldSticky != currentSticky;
+  }
+
+  /**
    * @param events
    * @param onlyHasBecomeSticky if <code>true</code>, only return
    * <code>true</code> if a news has become sticky.
@@ -589,6 +602,19 @@ public class CoreUtils {
   }
 
   /**
+   * @param newsEvent
+   * @return <code>TRUE</code> in case any State changed for ther given Events,
+   * <code>FALSE</code> otherwise.
+   */
+  public static boolean isStateChange(NewsEvent newsEvent) {
+    INews.State oldState = newsEvent.getOldNews() != null ? newsEvent.getOldNews().getState() : null;
+    if (oldState != newsEvent.getEntity().getState())
+      return true;
+
+    return false;
+  }
+
+  /**
    * @param events
    * @return <code>TRUE</code> in case any of the News got deleted and
    * <code>FALSE</code> otherwise.
@@ -710,6 +736,18 @@ public class CoreUtils {
       }
     }
     return false;
+  }
+
+  /**
+   * @param event
+   * @return <code>TRUE</code> in case any of the events tell about a change in
+   * the Label of the News, <code>FALSE</code> otherwise.
+   */
+  public static boolean isLabelChange(NewsEvent event) {
+    Set<ILabel> oldLabels = event.getOldNews() != null ? event.getOldNews().getLabels() : null;
+    Set<ILabel> newLabels = event.getEntity().getLabels();
+
+    return !newLabels.equals(oldLabels);
   }
 
   /**
