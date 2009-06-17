@@ -63,6 +63,7 @@ import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
+import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.util.CoreUtils;
@@ -741,11 +742,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   /**
-   * @param elements
-   * @param properties
+   * @param news
    */
-  public void update(Object[] elements, @SuppressWarnings("unused") String[] properties) {
-    assertElementsNotNull(elements);
+  public void update(Set<NewsEvent> news) {
 
     /*
      * The update-event could have been sent out a lot faster than the Browser
@@ -756,22 +755,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     String browserUrl = fBrowser.getControl().getUrl();
     boolean resetInput = browserUrl.length() == 0 || URIUtils.ABOUT_BLANK.equals(browserUrl);
     if (inputUrl.equals(browserUrl)) {
-      if (!internalUpdate(elements))
+      if (!internalUpdate(news))
         refresh(); // Refresh if dynamic update failed
     } else if (fServer.isDisplayOperation(inputUrl) && resetInput)
       fBrowser.setUrl(inputUrl);
-  }
-
-  /**
-   * @param element
-   * @param properties
-   */
-  public void update(Object element, @SuppressWarnings("unused") String[] properties) {
-    Assert.isNotNull(element);
-
-    /* Refresh if dynamic update failed */
-    if (!internalUpdate(new Object[] { element }))
-      refresh();
   }
 
   /**
@@ -796,31 +783,36 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       refresh();
   }
 
-  private boolean internalUpdate(Object[] elements) {
+  private boolean internalUpdate(Set<NewsEvent> newsEvents) {
     boolean toggleJS = fBrowser.shouldDisableScript();
     try {
       if (toggleJS)
         fBrowser.setScriptDisabled(false);
 
-      for (Object element : elements) {
-        if (element instanceof INews) {
-          INews news = (INews) element;
+      /* Update for each Event */
+      for (NewsEvent newsEvent : newsEvents) {
+        INews news = newsEvent.getEntity();
 
-          StringBuilder js = new StringBuilder();
+        StringBuilder js = new StringBuilder();
 
-          /* State (Bold/Plain Title, Mark Read Tooltip) */
+        /* State (Bold/Plain Title, Mark Read Tooltip) */
+        if (CoreUtils.isStateChange(newsEvent)) {
           boolean isRead = (INews.State.READ == news.getState());
           js.append(getElementById(Dynamic.TITLE.getId(news)).append(isRead ? ".className='read'; " : ".className='unread'; "));
           js.append(getElementById(Dynamic.TOGGLE_READ.getId(news)).append(isRead ? ".title='Mark Unread'; " : ".title='Mark Read'; "));
+        }
 
-          /* Sticky (Title Background, Footer Background, Mark Sticky Image) */
+        /* Sticky (Title Background, Footer Background, Mark Sticky Image) */
+        if (CoreUtils.isStickyStateChange(newsEvent)) {
           boolean isSticky = news.isFlagged();
           js.append(getElementById(Dynamic.HEADER.getId(news)).append(isSticky ? ".className='headerSticky'; " : ".className='header'; "));
           js.append(getElementById(Dynamic.FOOTER.getId(news)).append(isSticky ? ".className='footerSticky'; " : ".className='footer'; "));
           String stickyImg = isSticky ? OwlUI.getImageUri("/icons/obj16/news_pinned_light.gif", "news_pinned_light.gif") : OwlUI.getImageUri("/icons/obj16/news_pin_light.gif", "news_pin_light.gif");
           js.append(getElementById(Dynamic.TOGGLE_STICKY.getId(news)).append(".src='").append(stickyImg).append("'; "));
+        }
 
-          /* Label (Title Foreground, Label List) */
+        /* Label (Title Foreground, Label List) */
+        if (CoreUtils.isLabelChange(newsEvent)) {
           Set<ILabel> labels = CoreUtils.getSortedLabels(news);
           String defaultColor = news.getLinkAsText() != null ? "#009" : "rgb(0,0,0)";
           String color = (labels.isEmpty()) ? defaultColor : "rgb(" + OwlUI.toString(OwlUI.getRGB(labels.iterator().next())) + ")";
@@ -846,7 +838,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
             js.append(getElementById(Dynamic.LABELS.getId(news)).append(".innerHTML='").append(labelsHtml.toString()).append("'; "));
           }
+        }
 
+        if (js.length() > 0) {
           boolean res = fBrowser.getControl().execute(js.toString());
           if (!res)
             return false;
