@@ -230,7 +230,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("div.hidden { display: none; }\n");
 
     /* Group */
-    writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; padding: 0 15px 5px 15px; }\n");
+    writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; padding: 5px 5px 0px 15px; }\n");
 
     /* Main DIV per Item */
     writer.write("div.newsitem { margin: 10px 10px 30px 10px; border: dotted 1px silver; }\n");
