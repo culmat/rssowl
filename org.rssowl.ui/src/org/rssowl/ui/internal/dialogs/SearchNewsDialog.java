@@ -1069,7 +1069,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private void restoreInfoMessage(boolean clearError) {
     if (clearError)
       setErrorMessage(null);
-    setMessage("Use \'?\' for any character and \'*\' for any word in your search. Surround words with quotes to search for phrases.", IMessageProvider.INFORMATION);
+    setMessage("Use \'?\' for any character and \'*\' for any character sequence in your search. Surround words with quotes to search for phrases.", IMessageProvider.INFORMATION);
   }
 
   /*

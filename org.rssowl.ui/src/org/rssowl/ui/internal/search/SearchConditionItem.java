@@ -506,7 +506,7 @@ public class SearchConditionItem extends Composite {
 
           /* Show UI Hint that Wildcards can be used */
           else {
-            controlDeco.setDescriptionText("Use \'?\' for any character and \'*\' for any word in your search. Surround words with quotes to search for phrases.");
+            controlDeco.setDescriptionText("Use \'?\' for any character and \'*\' for any character sequence in your search. Surround words with quotes to search for phrases.");
           }
 
           /* Pre-Select input if given */
