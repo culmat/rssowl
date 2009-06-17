@@ -47,6 +47,7 @@ import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.FolderNewsMark.FolderNewsMarkReference;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserViewer;
 
