@@ -45,12 +45,14 @@ import org.rssowl.core.persist.event.runnable.EventType;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.ModelReference;
+import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.FolderNewsMark;
+import org.rssowl.ui.internal.FolderNewsMark.FolderNewsMarkReference;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.UIBackgroundJob;
 
@@ -633,11 +635,7 @@ public class NewsContentProvider implements ITreeContentProvider {
   private boolean contains(Object input, List<INews> list) {
 
     /* Can only belong to this Feed since filtered before already */
-    if (input instanceof BookMarkReference)
-      return true;
-
-    /* TODO Handle searchmarks properly */
-    else if (input instanceof SearchMarkReference)
+    if (input instanceof BookMarkReference || input instanceof NewsBinReference || input instanceof SearchMarkReference || input instanceof FolderNewsMarkReference)
       return true;
 
     else if (input instanceof INews)

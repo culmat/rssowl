@@ -59,6 +59,27 @@ public class FolderNewsMark extends Mark implements INewsMark {
   private final IFolder fFolder;
 
   /**
+   * Internal implementation of the <code>ModelReference</code> for the internal
+   * Type <code>FolderNewsMark</code>.
+   *
+   * @author bpasero
+   */
+  public final class FolderNewsMarkReference extends ModelReference {
+
+    /**
+     * @param id
+     */
+    public FolderNewsMarkReference(long id) {
+      super(id, FolderNewsMark.class);
+    }
+
+    @Override
+    public IFolder resolve() throws PersistenceException {
+      throw new UnsupportedOperationException();
+    }
+  }
+
+  /**
    * @param folder
    */
   public FolderNewsMark(IFolder folder) {
@@ -234,26 +255,5 @@ public class FolderNewsMark extends Mark implements INewsMark {
    */
   public ModelReference toReference() {
     return new FolderNewsMarkReference(getId());
-  }
-}
-
-/**
- * Internal implementation of the <code>ModelReference</code> for the internal
- * Type <code>FolderNewsMark</code>.
- *
- * @author bpasero
- */
-final class FolderNewsMarkReference extends ModelReference {
-
-  /**
-   * @param id
-   */
-  public FolderNewsMarkReference(long id) {
-    super(id, FolderNewsMark.class);
-  }
-
-  @Override
-  public IFolder resolve() throws PersistenceException {
-    throw new UnsupportedOperationException();
   }
 }
