@@ -65,7 +65,6 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
@@ -204,7 +203,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           manager.add(moveMenu);
 
           for (INewsBin bin : newsbins) {
-            if (getInput() instanceof NewsBinReference && bin.getId().equals(((NewsBinReference) getInput()).getId()))
+            if (contained(bin, fCurrentSelection))
               continue;
 
             moveMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, bin, true));
@@ -218,7 +217,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           manager.add(copyMenu);
 
           for (INewsBin bin : newsbins) {
-            if (getInput() instanceof NewsBinReference && bin.getId().equals(((NewsBinReference) getInput()).getId()))
+            if (contained(bin, fCurrentSelection))
               continue;
 
             copyMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, bin, false));
@@ -308,6 +307,19 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
     if (site != null)
       site.registerContextMenu(manager, this);
+  }
+
+  private boolean contained(INewsBin bin, IStructuredSelection selection) {
+    if (selection == null || selection.isEmpty())
+      return false;
+
+    Object element = selection.getFirstElement();
+    if (element instanceof INews) {
+      INews news = (INews) element;
+      return news.getParentId() == bin.getId();
+    }
+
+    return false;
   }
 
   void setBlockRefresh(boolean block) {
