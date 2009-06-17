@@ -68,11 +68,11 @@ public class NewsColumnViewModel {
   }
 
   /**
-   * @return a default {@link NewsColumnViewModel} initialized from the default
+   * @return a default {@link NewsColumnViewModel} initialized from the global
    * scope of preferences.
    */
-  public static NewsColumnViewModel createDefault() {
-    return loadFrom(Owl.getPreferenceService().getDefaultScope());
+  public static NewsColumnViewModel createGlobal() {
+    return loadFrom(Owl.getPreferenceService().getGlobalScope());
   }
 
   /**

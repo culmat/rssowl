@@ -44,6 +44,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -51,6 +52,7 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
 
@@ -132,11 +134,15 @@ public class NewsBrowserControl implements IFeedViewPart {
     registerListener();
   }
 
-  void updateSorting(INewsMark mark, boolean refreshIfChanged) {
+  void updateSorting(Object input, boolean refreshIfChanged) {
     if (fViewer.getControl().isDisposed())
       return;
 
-    IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(mark);
+    IPreferenceScope preferences;
+    if (input instanceof IEntity)
+      preferences = Owl.getPreferenceService().getEntityScope((IEntity) input);
+    else
+      preferences = Owl.getPreferenceService().getGlobalScope();
 
     NewsColumn sortColumn = NewsColumn.values()[preferences.getInteger(DefaultPreferences.BM_NEWS_SORT_COLUMN)];
     boolean ascending = preferences.getBoolean(DefaultPreferences.BM_NEWS_SORT_ASCENDING);
@@ -155,6 +161,12 @@ public class NewsBrowserControl implements IFeedViewPart {
    * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#setInput(java.lang.Object)
    */
   public void setPartInput(Object input) {
+
+    /* Update Columns for Input */
+    if (input instanceof EntityGroup || input instanceof INewsMark)
+      updateSorting(input, false);
+
+    /* Set input to Viewer */
     fViewer.setInput(getInput(input));
 
     /* Remember as initial Input */
