@@ -821,7 +821,31 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           js.append(getElementById(Dynamic.TOGGLE_STICKY.getId(news)).append(".src='").append(stickyImg).append("'; "));
 
           /* Label (Title Foreground, Label List) */
-          //TODO Implement
+          Set<ILabel> labels = CoreUtils.getSortedLabels(news);
+          String defaultColor = news.getLinkAsText() != null ? "#009" : "rgb(0,0,0)";
+          String color = (labels.isEmpty()) ? defaultColor : "rgb(" + OwlUI.toString(OwlUI.getRGB(labels.iterator().next())) + ")";
+          if ("rgb(0,0,0)".equals(color)) //Don't let black override link color
+            color = defaultColor;
+          js.append(getElementById(Dynamic.TITLE.getId(news)).append(".style.color='").append(color).append("'; "));
+
+          if (labels.isEmpty()) {
+            js.append(getElementById(Dynamic.LABELS_SEPARATOR.getId(news)).append(".style.display='none'; "));
+            js.append(getElementById(Dynamic.LABELS.getId(news)).append(".innerHTML=''; "));
+          } else {
+            js.append(getElementById(Dynamic.LABELS_SEPARATOR.getId(news)).append(".style.display='inline'; "));
+
+            StringBuilder labelsHtml = new StringBuilder("Labels: ");
+            int c = 0;
+            for (ILabel label : labels) {
+              c++;
+              if (c < labels.size())
+                span(labelsHtml, label.getName() + ", ", label.getColor());
+              else
+                span(labelsHtml, label.getName(), label.getColor());
+            }
+
+            js.append(getElementById(Dynamic.LABELS.getId(news)).append(".innerHTML='").append(labelsHtml.toString()).append("'; "));
+          }
 
           boolean res = fBrowser.getControl().execute(js.toString());
           if (!res)
@@ -834,6 +858,11 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     return true;
+  }
+
+  private void span(StringBuilder builder, String content, String color) {
+    builder.append("<span style=\"color: rgb(").append(color).append(");\"");
+    builder.append(">").append(content).append("</span>");
   }
 
   private StringBuilder getElementById(String id) {
