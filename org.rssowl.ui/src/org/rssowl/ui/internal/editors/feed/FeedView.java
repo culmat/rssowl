@@ -1390,13 +1390,33 @@ public class FeedView extends EditorPart implements IReusableEditor {
   }
 
   /**
+   * Update the State of showing Headlines in the Feed View.
+   */
+  public void updateBrowserViewMaximized() {
+    boolean browserMaximized = fPreferences.getBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED);
+    setBrowserMaximized(browserMaximized);
+    fFilterBar.updateBrowserViewMaximized(browserMaximized);
+  }
+
+  /**
    * Toggle between maximized and normal Browser-Control.
    */
-  void toggleNewsViewMaximized() {
+  void toggleBrowserViewMaximized() {
     final boolean isMaximized = !isTableViewerVisible();
+    setBrowserMaximized(!isMaximized);
+
+    /* Update Settings */
+    JobRunner.runInBackgroundThread(new Runnable() {
+      public void run() {
+        fPreferences.putBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED, !isMaximized);
+      }
+    });
+  }
+
+  private void setBrowserMaximized(boolean maximized) {
 
     /* Maximize Browser */
-    if (!isMaximized) {
+    if (maximized) {
       fSashForm.setMaximizedControl(fBrowserViewerControlContainer);
       fNewsTableControl.getViewer().setSelection(StructuredSelection.EMPTY);
       fNewsBrowserControl.setPartInput(fInput.getMark());
@@ -1413,13 +1433,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
       fNewsBrowserControl.setPartInput(null);
       fNewsTableControl.setFocus();
     }
-
-    /* Update Settings */
-    JobRunner.runInBackgroundThread(new Runnable() {
-      public void run() {
-        fPreferences.putBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED, !isMaximized);
-      }
-    });
   }
 
   /**

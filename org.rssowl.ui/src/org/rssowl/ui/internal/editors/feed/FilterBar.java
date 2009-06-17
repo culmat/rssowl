@@ -508,7 +508,7 @@ public class FilterBar {
 
       @Override
       public void run() {
-        fFeedView.toggleNewsViewMaximized();
+        fFeedView.toggleBrowserViewMaximized();
         fMaximized = !fMaximized;
         fSecondToolBarManager.find(TOGGLE_MAXIMIZED_ACTION).update(IAction.TOOL_TIP_TEXT);
         fSecondToolBarManager.find(TOGGLE_LAYOUT_ACTION).update();
@@ -521,6 +521,11 @@ public class FilterBar {
       }
 
       @Override
+      public boolean isChecked() {
+        return fMaximized;
+      }
+
+      @Override
       public String getToolTipText() {
         if (fMaximized)
           return "Show Headlines";
@@ -529,7 +534,6 @@ public class FilterBar {
       }
     };
     toggleMaximized.setId(TOGGLE_MAXIMIZED_ACTION);
-    toggleMaximized.setChecked(fMaximized);
 
     fSecondToolBarManager.add(toggleMaximized);
 
@@ -1049,5 +1053,12 @@ public class FilterBar {
         }
       });
     }
+  }
+
+  void updateBrowserViewMaximized(boolean maximized) {
+    fMaximized = maximized;
+    fSecondToolBarManager.find(TOGGLE_MAXIMIZED_ACTION).update();
+    fSecondToolBarManager.find(TOGGLE_LAYOUT_ACTION).update();
+    fSecondToolBarManager.find(COLUMNS_ACTION).update();
   }
 }
