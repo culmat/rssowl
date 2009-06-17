@@ -80,7 +80,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /* Dynamic HTML in Content */
   enum Dynamic {
-    NEWS("newsitem"), TITLE("title"), TOGGLE_READ("toggleRead"), HEADER("header"), FOOTER("footer"), TOGGLE_STICKY("toggleSticky");
+    NEWS("newsitem"), TITLE("title"), TOGGLE_READ("toggleRead"), HEADER("header"), FOOTER("footer"), TOGGLE_STICKY("toggleSticky"), LABELS("labels"), LABELS_SEPARATOR("labelsSeparator");
 
     private String fId;
 
@@ -360,6 +360,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     boolean isUnread = (state == State.NEW || state == State.UPDATED || state == State.UNREAD);
     Set<ILabel> labels = CoreUtils.getSortedLabels(news);
     String color = !labels.isEmpty() ? labels.iterator().next().getColor() : null;
+    if ("0,0,0".equals(color)) //Don't let black override link color
+      color = null;
 
     boolean hasAttachments = false;
     if (!news.getAttachments().isEmpty()) {
@@ -505,32 +507,37 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       builder.append("</td>");
     }
 
+    /* Labels Separator  */
+    if (labels.isEmpty())
+      builder.append("<td id=\"").append(Dynamic.LABELS_SEPARATOR.getId(news)).append("\" class=\"subline\" style=\"display: none;\">");
+    else
+      builder.append("<td id=\"").append(Dynamic.LABELS_SEPARATOR.getId(news)).append("\" class=\"subline\">");
+    builder.append("|");
+    builder.append("</td>");
+
     /* Labels */
-    if (!labels.isEmpty()) {
-      builder.append("<td class=\"subline\">");
-      builder.append("|");
-      builder.append("</td>");
+    builder.append("<td id=\"").append(Dynamic.LABELS.getId(news)).append("\" class=\"subline\">");
 
-      builder.append("<td class=\"subline\">Labels: ");
+    if (!labels.isEmpty())
+      builder.append("Labels: ");
 
-      /* Append Labels to Footer */
-      int c = 0;
-      for (ILabel label : labels) {
-        c++;
-        if (c < labels.size())
-          span(builder, label.getName() + ", ", null, label.getColor());
-        else
-          span(builder, label.getName(), null, label.getColor());
-      }
+    /* Append Labels to Footer */
+    int c = 0;
+    for (ILabel label : labels) {
+      c++;
+      if (c < labels.size())
+        span(builder, label.getName() + ", ", null, label.getColor());
+      else
+        span(builder, label.getName(), null, label.getColor());
+    }
 
-      builder.append("</td>");
+    builder.append("</td>");
 
-      /* Add to Search */
-      for (ILabel label : labels) {
-        String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.LABEL_HANDLER_ID + "?" + URIUtils.urlEncode(label.getName());
-        link(search, link, label.getName(), "searchrelated");
-        search.append(", ");
-      }
+    /* Add to Search */
+    for (ILabel label : labels) {
+      String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.LABEL_HANDLER_ID + "?" + URIUtils.urlEncode(label.getName());
+      link(search, link, label.getName(), "searchrelated");
+      search.append(", ");
     }
 
     /* Close: NewsItem/Header/Actions */
