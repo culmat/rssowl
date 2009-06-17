@@ -233,9 +233,8 @@ public class AssignLabelsDialog extends Dialog {
     };
 
     /* Labels */
-    Set<ILabel> labels = CoreUtils.loadSortedLabels();
-    final List<String> labelNames = new ArrayList<String>(labels.size());
-    for (ILabel label : labels) {
+    final List<String> labelNames = new ArrayList<String>(fExistingLabels.size());
+    for (ILabel label : fExistingLabels) {
       labelNames.add(label.getName());
     }
 
@@ -306,8 +305,6 @@ public class AssignLabelsDialog extends Dialog {
       str.append(label.getName()).append(", ");
     }
 
-    if (str.length() > 0)
-      str = str.delete(str.length() - 2, str.length());
     return str.toString();
   }
 
