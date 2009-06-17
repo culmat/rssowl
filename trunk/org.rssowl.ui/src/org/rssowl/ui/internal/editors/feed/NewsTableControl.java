@@ -401,7 +401,7 @@ public class NewsTableControl implements IFeedViewPart {
     if (input instanceof IFolderChild)
       model = NewsColumnViewModel.loadFrom(Owl.getPreferenceService().getEntityScope((IEntity) input));
     else
-      model = NewsColumnViewModel.createDefault();
+      model = NewsColumnViewModel.createGlobal();
 
     /* Synthetically add the "Feed" column if not present */
     if ((input instanceof ISearchMark) || (input instanceof INewsBin) || (input instanceof FolderNewsMark)) {
