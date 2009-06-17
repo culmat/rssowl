@@ -60,6 +60,9 @@ public class WebBrowserContext {
    */
   public static WebBrowserContext createFrom(INews news, INewsMark mark) {
     WebBrowserContext context = new WebBrowserContext();
+    if (news == null || mark == null)
+      return context;
+
     context.fNewsReference = news.toReference();
 
     if (mark instanceof FolderNewsMark)
@@ -77,6 +80,9 @@ public class WebBrowserContext {
    */
   public static WebBrowserContext createFrom(ISelection selection, FeedView feedview) {
     WebBrowserContext context = new WebBrowserContext();
+    if (selection == null || feedview == null)
+      return context;
+
     context.fNewsReference = getNewsReference(selection);
 
     INewsMark mark = ((FeedViewInput) feedview.getEditorInput()).getMark();
