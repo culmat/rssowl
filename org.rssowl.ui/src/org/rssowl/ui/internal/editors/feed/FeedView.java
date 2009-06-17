@@ -1042,6 +1042,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   public void updateColumns() {
     if (isTableViewerVisible() && fInput != null)
       fNewsTableControl.updateColumns(fInput.getMark());
+    fNewsBrowserControl.updateSorting(fInput.getMark(), true);
   }
 
   /**

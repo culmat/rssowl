@@ -68,6 +68,8 @@ public class NewsBrowserControl implements IFeedViewPart {
   private IPreferenceScope fInputPreferences;
   private IPropertyChangeListener fPropertyChangeListener;
   private boolean fStripMediaFromNews;
+  private NewsComparator fNewsSorter;
+  private FeedViewInput fEditorInput;
 
   /*
    * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#init(org.eclipse.ui.IEditorSite)
@@ -80,6 +82,7 @@ public class NewsBrowserControl implements IFeedViewPart {
    * @see org.rssowl.ui.internal.editors.feed.IFeedViewPart#onInputChanged(org.rssowl.ui.internal.editors.feed.FeedViewInput)
    */
   public void onInputChanged(FeedViewInput input) {
+    fEditorInput = input;
     fInputPreferences = Owl.getPreferenceService().getEntityScope(input.getMark());
     fStripMediaFromNews = !fInputPreferences.getBoolean(DefaultPreferences.BM_LOAD_IMAGES);
     if (fViewer != null && fViewer.getLabelProvider() != null)
@@ -117,14 +120,35 @@ public class NewsBrowserControl implements IFeedViewPart {
     labelProvider.setStripMediaFromNews(fStripMediaFromNews);
     fViewer.setLabelProvider(labelProvider);
 
-    /* Create Comparator */
-    fViewer.setComparator(new NewsComparator());
+    /* Create Sorter */
+    fNewsSorter = new NewsComparator();
+    fViewer.setComparator(fNewsSorter);
+    updateSorting(fEditorInput.getMark(), false);
 
     /* Add ViewerFilter */
     fViewer.addFilter(filter);
 
     /* Register Listeners */
     registerListener();
+  }
+
+  void updateSorting(INewsMark mark, boolean refreshIfChanged) {
+    if (fViewer.getControl().isDisposed())
+      return;
+
+    IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(mark);
+
+    NewsColumn sortColumn = NewsColumn.values()[preferences.getInteger(DefaultPreferences.BM_NEWS_SORT_COLUMN)];
+    boolean ascending = preferences.getBoolean(DefaultPreferences.BM_NEWS_SORT_ASCENDING);
+
+    NewsColumn oldSortColumn = fNewsSorter.getSortBy();
+    boolean oldAscending = fNewsSorter.isAscending();
+
+    fNewsSorter.setSortBy(sortColumn);
+    fNewsSorter.setAscending(ascending);
+
+    if (refreshIfChanged && ((oldSortColumn != sortColumn) || (oldAscending != ascending)))
+      fViewer.refresh();
   }
 
   /*
@@ -170,6 +194,7 @@ public class NewsBrowserControl implements IFeedViewPart {
    */
   public void dispose() {
     unregisterListeners();
+    fEditorInput = null;
   }
 
   private void registerListener() {
