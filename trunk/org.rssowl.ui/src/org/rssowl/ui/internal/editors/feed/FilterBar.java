@@ -510,7 +510,7 @@ public class FilterBar {
       public void run() {
         fFeedView.toggleBrowserViewMaximized();
         fMaximized = !fMaximized;
-        fSecondToolBarManager.find(TOGGLE_MAXIMIZED_ACTION).update(IAction.TOOL_TIP_TEXT);
+        fSecondToolBarManager.find(TOGGLE_MAXIMIZED_ACTION).update();
         fSecondToolBarManager.find(TOGGLE_LAYOUT_ACTION).update();
         fSecondToolBarManager.find(COLUMNS_ACTION).update();
       }
