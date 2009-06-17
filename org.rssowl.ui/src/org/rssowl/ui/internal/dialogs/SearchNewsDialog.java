@@ -166,6 +166,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -1576,6 +1577,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     JobRunner.runUIUpdater(new UIBackgroundJob(getShell()) {
       private List<ScoredNews> fDeletedScoredNews;
       private List<ScoredNews> fUpdatedScoredNews;
+      private Set<NewsEvent> fUpdatedNewsEvents;
 
       @Override
       protected void runInBackground(IProgressMonitor monitor) {
@@ -1601,6 +1603,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
                 if (fUpdatedScoredNews == null)
                   fUpdatedScoredNews = new ArrayList<ScoredNews>();
                 fUpdatedScoredNews.add(scoredNews);
+
+                if (fUpdatedNewsEvents == null)
+                  fUpdatedNewsEvents = new HashSet<NewsEvent>();
+                fUpdatedNewsEvents.add(event);
               }
             }
           }
@@ -1617,6 +1623,29 @@ public class SearchNewsDialog extends TitleAreaDialog {
         /* News got Updated */
         if (fUpdatedScoredNews != null)
           fResultViewer.update(fUpdatedScoredNews.toArray(), null);
+
+        /* Update Browser Viewer if visible */
+        if (fBrowserViewer.getControl().isVisible()) {
+          Object input = fBrowserViewer.getInput();
+
+          if (fUpdatedNewsEvents != null) {
+            for (NewsEvent event : fUpdatedNewsEvents) {
+              if (event.getEntity().equals(input)) {
+                fBrowserViewer.update(Collections.singleton(event));
+                break; // Viewer only shows 1 News at maximum
+              }
+            }
+          }
+
+          if (fDeletedScoredNews != null) {
+            for (ScoredNews news : fDeletedScoredNews) {
+              if (news.getNews().equals(input)) {
+                fBrowserViewer.remove(news.getNews());
+                break; // Viewer only shows 1 News at maximum
+              }
+            }
+          }
+        }
       }
     });
   }
