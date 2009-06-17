@@ -795,6 +795,13 @@
             id="org.rssowl.ui.PreviousTab"
             name="Previous Tab">
       </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.handler.ToggleHeadlinesHandler"
+            description="Show or hide headlines from the feed view."
+            id="org.rssowl.ui.ToggleHeadlinesCommand"
+            name="Toggle Headlines">
+      </command>
    </extension>
    <extension
          id="product"

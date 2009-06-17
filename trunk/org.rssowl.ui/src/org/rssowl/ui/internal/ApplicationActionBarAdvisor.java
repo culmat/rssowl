@@ -429,6 +429,36 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           }
         });
 
+        /* Hide Headlines */
+        final boolean headlinesHidden = preferences.getBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED);
+        manager.add(new Action("&Hide Headlines", IAction.AS_CHECK_BOX) {
+          @Override
+          public void run() {
+            preferences.putBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED, !headlinesHidden);
+
+            /* Update Visible Feedviews */
+            List<FeedView> feedViews = OwlUI.getFeedViews();
+            for (FeedView feedView : feedViews) {
+              feedView.updateBrowserViewMaximized();
+            }
+          }
+
+          @Override
+          public String getActionDefinitionId() {
+            return "org.rssowl.ui.ToggleHeadlinesCommand";
+          }
+
+          @Override
+          public String getId() {
+            return "org.rssowl.ui.ToggleHeadlinesCommand";
+          }
+
+          @Override
+          public boolean isChecked() {
+            return headlinesHidden;
+          }
+        });
+
         /* Fullscreen Mode */
         manager.add(new Separator());
         manager.add(new Action("&Full Screen", IAction.AS_CHECK_BOX) {

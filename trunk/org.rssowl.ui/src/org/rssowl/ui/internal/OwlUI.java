@@ -102,6 +102,7 @@ import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -1109,6 +1110,26 @@ public class OwlUI {
     }
 
     return null;
+  }
+
+  /**
+   * Attempts to find all open <code>FeedView</code>s from the PlatformUI
+   * facade. Otherwise, returns an empty list if none.
+   *
+   * @return all open <code>FeedView</code>s from the PlatformUI facadeor an
+   * empty list if none.
+   */
+  public static List<FeedView> getFeedViews() {
+    List<FeedView> feedViews = new ArrayList<FeedView>();
+
+    List<IEditorReference> references = getEditorReferences();
+    for (IEditorReference reference : references) {
+      IEditorPart editor = reference.getEditor(true);
+      if (editor instanceof FeedView)
+        feedViews.add((FeedView) editor);
+    }
+
+    return feedViews;
   }
 
   /**
