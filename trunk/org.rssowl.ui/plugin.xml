@@ -1608,5 +1608,34 @@
             order="0"
             url="http://www.facebook.com/sharer.php?u=[L]&amp;t=[T]">
       </shareNewsProvider>
+      <shareNewsProvider
+            icon="icons/obj16/share_digg.gif"
+            id="org.rssowl.ui.DiggShareNewsProvider"
+            maxTitleLength="75"
+            name="Digg"
+            order="3"
+            url="http://digg.com/submit?url=[L]&amp;title=[T]">
+      </shareNewsProvider>
+      <shareNewsProvider
+            icon="icons/obj16/share_delicious.gif"
+            id="org.rssowl.ui.DeliciousShareNewsProvider"
+            name="Delicious"
+            order="6"
+            url="http://delicious.com/save?url=[L]&amp;title=[T]">
+      </shareNewsProvider>
+      <shareNewsProvider
+            icon="icons/obj16/share_technorati.gif"
+            id="org.rssowl.ui.TechnoratiShareNewsProvider"
+            name="Technorati"
+            order="9"
+            url="http://www.technorati.com/faves/?add=[L]">
+      </shareNewsProvider>
+      <shareNewsProvider
+            icon="icons/obj16/share_stumbleupon.gif"
+            id="org.rssowl.ui.StumbleuponShareNewsProvider"
+            name="StumbleUpon"
+            order="12"
+            url="http://www.stumbleupon.com/submit?url=[L]&amp;title=[T]">
+      </shareNewsProvider>
    </extension>
 </plugin>
