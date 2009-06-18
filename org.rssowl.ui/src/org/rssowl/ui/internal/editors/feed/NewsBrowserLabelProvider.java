@@ -25,7 +25,7 @@
 package org.rssowl.ui.internal.editors.feed;
 
 import static org.rssowl.ui.internal.ILinkHandler.HANDLER_PROTOCOL;
-import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.ASSIGN_LABELS_HANDLER_ID;
+import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.LABELS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.DELETE_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.NEWS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_READ_HANDLER_ID;
@@ -431,8 +431,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
       /* Assign Labels */
       builder.append("<td class=\"subline\">");
-      link = HANDLER_PROTOCOL + ASSIGN_LABELS_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, "Assign Labels", "/icons/elcl16/assign_labels.gif", "assign_labels.gif", null, null);
+      link = HANDLER_PROTOCOL + LABELS_MENU_HANDLER_ID + "?" + news.getId();
+      imageLink(builder, link, "Assign Labels", "/icons/elcl16/label.gif", "label.gif", null, null);
       builder.append("</td>");
 
       /* Go to Attachments */
