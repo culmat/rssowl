@@ -31,6 +31,7 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ContentViewer;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -74,11 +75,13 @@ import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.ShareNewsProvider;
 import org.rssowl.ui.internal.actions.AssignLabelsAction;
 import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
+import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
@@ -114,12 +117,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   static final String DELETE_HANDLER_ID = "org.rssowl.ui.Delete";
   static final String LABELS_MENU_HANDLER_ID = "org.rssowl.ui.LabelsMenu";
   static final String NEWS_MENU_HANDLER_ID = "org.rssowl.ui.NewsMenu";
+  static final String SHARE_NEWS_MENU_HANDLER_ID = "org.rssowl.ui.ShareNewsMenu";
 
   private Object fInput;
   private CBrowser fBrowser;
   private IWorkbenchPartSite fSite;
   private Menu fNewsContextMenu;
   private Menu fLabelsContextMenu;
+  private Menu fShareNewsContextMenu;
   private IStructuredSelection fCurrentSelection = StructuredSelection.EMPTY;
   private ApplicationServer fServer;
   private String fId;
@@ -154,6 +159,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     hookControl(fBrowser.getControl());
     hookNewsContextMenu();
     hookLabelContextMenu();
+    hookShareNewsContextMenu();
     fId = String.valueOf(hashCode());
     fServer = ApplicationServer.getDefault();
     fServer.register(fId, this);
@@ -168,6 +174,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fBrowser.addLinkHandler(DELETE_HANDLER_ID, this);
     fBrowser.addLinkHandler(LABELS_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(NEWS_MENU_HANDLER_ID, this);
+    fBrowser.addLinkHandler(SHARE_NEWS_MENU_HANDLER_ID, this);
   }
 
   private void hookNewsContextMenu() {
@@ -183,6 +190,32 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           /* Show only when internal browser is used */
           if (!fCurrentSelection.isEmpty() && !fPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
             manager.add(new OpenInExternalBrowserAction(fCurrentSelection));
+        }
+
+        /* Share */
+        {
+          manager.add(new Separator("share"));
+          MenuManager shareMenu = new MenuManager("Share News", "sharenews");
+          manager.add(shareMenu);
+
+          List<ShareNewsProvider> providers = Controller.getDefault().getShareNewsProviders();
+          for (final ShareNewsProvider provider : providers) {
+            shareMenu.add(new Action(provider.getName()) {
+              @Override
+              public void run() {
+                Object obj = fCurrentSelection.getFirstElement();
+                if (obj != null && obj instanceof INews) {
+                  String shareLink = provider.toShareUrl((INews) obj);
+                  new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
+                }
+              };
+
+              @Override
+              public ImageDescriptor getImageDescriptor() {
+                return OwlUI.getImageDescriptor(provider.getIconPath());
+              };
+            });
+          }
         }
 
         /* Move To / Copy To */
@@ -348,6 +381,36 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fLabelsContextMenu = manager.createContextMenu(fBrowser.getControl().getShell());
   }
 
+  private void hookShareNewsContextMenu() {
+    MenuManager manager = new MenuManager();
+    manager.setRemoveAllWhenShown(true);
+    manager.addMenuListener(new IMenuListener() {
+      public void menuAboutToShow(IMenuManager manager) {
+        List<ShareNewsProvider> providers = Controller.getDefault().getShareNewsProviders();
+        for (final ShareNewsProvider provider : providers) {
+          manager.add(new Action(provider.getName()) {
+            @Override
+            public void run() {
+              Object obj = fCurrentSelection.getFirstElement();
+              if (obj != null && obj instanceof INews) {
+                String shareLink = provider.toShareUrl((INews) obj);
+                new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
+              }
+            };
+
+            @Override
+            public ImageDescriptor getImageDescriptor() {
+              return OwlUI.getImageDescriptor(provider.getIconPath());
+            };
+          });
+        }
+      }
+    });
+
+    /* Create  */
+    fShareNewsContextMenu = manager.createContextMenu(fBrowser.getControl().getShell());
+  }
+
   private boolean contained(INewsBin bin, IStructuredSelection selection) {
     if (selection == null || selection.isEmpty())
       return false;
@@ -469,6 +532,18 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         fNewsContextMenu.setVisible(true);
       }
     }
+
+    /* Share News Context Menu */
+    else if (SHARE_NEWS_MENU_HANDLER_ID.equals(id)) {
+      INews news = getNews(query);
+      if (news != null) {
+        setSelection(new StructuredSelection(news));
+        Point cursorLocation = fBrowser.getControl().getDisplay().getCursorLocation();
+        cursorLocation.y = cursorLocation.y + 16;
+        fShareNewsContextMenu.setLocation(cursorLocation);
+        fShareNewsContextMenu.setVisible(true);
+      }
+    }
   }
 
   private INews getNews(String query) {
@@ -511,6 +586,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fCurrentSelection = null;
     fNewsContextMenu.dispose();
     fLabelsContextMenu.dispose();
+    fShareNewsContextMenu.dispose();
     super.handleDispose(event);
   }
 
