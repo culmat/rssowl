@@ -112,13 +112,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   static final String TOGGLE_READ_HANDLER_ID = "org.rssowl.ui.ToggleRead";
   static final String TOGGLE_STICKY_HANDLER_ID = "org.rssowl.ui.ToggleSticky";
   static final String DELETE_HANDLER_ID = "org.rssowl.ui.Delete";
-  static final String ASSIGN_LABELS_HANDLER_ID = "org.rssowl.ui.AssignLabels";
+  static final String LABELS_MENU_HANDLER_ID = "org.rssowl.ui.LabelsMenu";
   static final String NEWS_MENU_HANDLER_ID = "org.rssowl.ui.NewsMenu";
 
   private Object fInput;
   private CBrowser fBrowser;
   private IWorkbenchPartSite fSite;
   private Menu fNewsContextMenu;
+  private Menu fLabelsContextMenu;
   private IStructuredSelection fCurrentSelection = StructuredSelection.EMPTY;
   private ApplicationServer fServer;
   private String fId;
@@ -152,6 +153,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fSite = site;
     hookControl(fBrowser.getControl());
     hookNewsContextMenu();
+    hookLabelContextMenu();
     fId = String.valueOf(hashCode());
     fServer = ApplicationServer.getDefault();
     fServer.register(fId, this);
@@ -164,7 +166,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fBrowser.addLinkHandler(TOGGLE_READ_HANDLER_ID, this);
     fBrowser.addLinkHandler(TOGGLE_STICKY_HANDLER_ID, this);
     fBrowser.addLinkHandler(DELETE_HANDLER_ID, this);
-    fBrowser.addLinkHandler(ASSIGN_LABELS_HANDLER_ID, this);
+    fBrowser.addLinkHandler(LABELS_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(NEWS_MENU_HANDLER_ID, this);
   }
 
@@ -309,6 +311,43 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       site.registerContextMenu(manager, this);
   }
 
+  private void hookLabelContextMenu() {
+    MenuManager manager = new MenuManager();
+    manager.setRemoveAllWhenShown(true);
+    manager.addMenuListener(new IMenuListener() {
+      public void menuAboutToShow(IMenuManager manager) {
+        Collection<ILabel> labels = CoreUtils.loadSortedLabels();
+
+        /* Assign / Organize Labels */
+        manager.add(new AssignLabelsAction(fBrowser.getControl().getShell(), fCurrentSelection));
+        manager.add(new Action("Organize Labels...") {
+          @Override
+          public void run() {
+            PreferencesUtil.createPreferenceDialogOn(fBrowser.getControl().getShell(), ManageLabelsPreferencePage.ID, null, null).open();
+          }
+        });
+        manager.add(new Separator());
+
+        /* Retrieve Labels that all selected News contain */
+        Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(fCurrentSelection);
+        for (final ILabel label : labels) {
+          LabelAction labelAction = new LabelAction(label, fCurrentSelection);
+          labelAction.setChecked(selectedLabels.contains(label));
+          manager.add(labelAction);
+        }
+
+        /* Remove All Labels */
+        manager.add(new Separator());
+        LabelAction removeAllLabels = new LabelAction(null, fCurrentSelection);
+        removeAllLabels.setEnabled(!labels.isEmpty());
+        manager.add(removeAllLabels);
+      }
+    });
+
+    /* Create  */
+    fLabelsContextMenu = manager.createContextMenu(fBrowser.getControl().getShell());
+  }
+
   private boolean contained(INewsBin bin, IStructuredSelection selection) {
     if (selection == null || selection.isEmpty())
       return false;
@@ -407,12 +446,15 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       }
     }
 
-    /*  Assign Labels */
-    else if (ASSIGN_LABELS_HANDLER_ID.equals(id)) {
+    /*  Labels Menu */
+    else if (LABELS_MENU_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
-        AssignLabelsAction action = new AssignLabelsAction(fBrowser.getControl().getShell(), new StructuredSelection(news));
-        action.run();
+        setSelection(new StructuredSelection(news));
+        Point cursorLocation = fBrowser.getControl().getDisplay().getCursorLocation();
+        cursorLocation.y = cursorLocation.y + 16;
+        fLabelsContextMenu.setLocation(cursorLocation);
+        fLabelsContextMenu.setVisible(true);
       }
     }
 
@@ -468,6 +510,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fServer.unregister(fId);
     fCurrentSelection = null;
     fNewsContextMenu.dispose();
+    fLabelsContextMenu.dispose();
     super.handleDispose(event);
   }
 
