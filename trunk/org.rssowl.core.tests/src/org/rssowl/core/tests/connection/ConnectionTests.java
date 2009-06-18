@@ -315,4 +315,148 @@ public class ConnectionTests {
 
     assertEquals("http://www.planeteclipse.org/rss20.xml", conManager.getFeed(feedUrl).toString());
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testKeywordFeedGoogleNews() throws Exception {
+    URI feedUrl = new URI("http://news.google.com/news?q=blog&output=rss");
+    IFeed feed = new Feed(feedUrl);
+
+    InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
+    assertNotNull(inS);
+
+    assertNull(feed.getFormat());
+    Owl.getInterpreter().interpret(inS, feed, null);
+    assertNotNull(feed.getFormat());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testKeywordFeedTechnorati() throws Exception {
+    URI feedUrl = new URI("http://feeds.technorati.com/search/blog");
+    IFeed feed = new Feed(feedUrl);
+
+    InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
+    assertNotNull(inS);
+
+    assertNull(feed.getFormat());
+    Owl.getInterpreter().interpret(inS, feed, null);
+    assertNotNull(feed.getFormat());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testKeywordFeedDelicious() throws Exception {
+    URI feedUrl = new URI("http://del.icio.us/rss/tag/blog");
+    IFeed feed = new Feed(feedUrl);
+
+    InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
+    assertNotNull(inS);
+
+    assertNull(feed.getFormat());
+    Owl.getInterpreter().interpret(inS, feed, null);
+    assertNotNull(feed.getFormat());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testKeywordFeedLiveSearch() throws Exception {
+    URI feedUrl = new URI("http://search.live.com/results.aspx?q=blog&format=rss");
+    IFeed feed = new Feed(feedUrl);
+
+    InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
+    assertNotNull(inS);
+
+    assertNull(feed.getFormat());
+    Owl.getInterpreter().interpret(inS, feed, null);
+    assertNotNull(feed.getFormat());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testKeywordFeedDigg() throws Exception {
+    URI feedUrl = new URI("http://digg.com/rss_search?s=blog");
+    IFeed feed = new Feed(feedUrl);
+
+    InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
+    assertNotNull(inS);
+
+    assertNull(feed.getFormat());
+    Owl.getInterpreter().interpret(inS, feed, null);
+    assertNotNull(feed.getFormat());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testKeywordFeedTwitter() throws Exception {
+    URI feedUrl = new URI("http://search.twitter.com/search.atom?q=blog");
+    IFeed feed = new Feed(feedUrl);
+
+    InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
+    assertNotNull(inS);
+
+    assertNull(feed.getFormat());
+    Owl.getInterpreter().interpret(inS, feed, null);
+    assertNotNull(feed.getFormat());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testKeywordFeedGoogleBlog() throws Exception {
+    URI feedUrl = new URI("http://blogsearch.google.com/blogsearch_feeds?q=blog&num=10&output=rss");
+    IFeed feed = new Feed(feedUrl);
+
+    InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
+    assertNotNull(inS);
+
+    assertNull(feed.getFormat());
+    Owl.getInterpreter().interpret(inS, feed, null);
+    assertNotNull(feed.getFormat());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testKeywordFeedYouTube() throws Exception {
+    URI feedUrl = new URI("http://www.youtube.com/rss/tag/blog.rss");
+    IFeed feed = new Feed(feedUrl);
+
+    InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
+    assertNotNull(inS);
+
+    assertNull(feed.getFormat());
+    Owl.getInterpreter().interpret(inS, feed, null);
+    assertNotNull(feed.getFormat());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testKeywordFeedFlickr() throws Exception {
+    URI feedUrl = new URI("http://www.flickr.com/services/feeds/photos_public.gne?tags=blog&format=rss_200");
+    IFeed feed = new Feed(feedUrl);
+
+    InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
+    assertNotNull(inS);
+
+    assertNull(feed.getFormat());
+    Owl.getInterpreter().interpret(inS, feed, null);
+    assertNotNull(feed.getFormat());
+  }
 }
