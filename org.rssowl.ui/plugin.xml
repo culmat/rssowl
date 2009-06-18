@@ -1626,7 +1626,7 @@
             id="org.rssowl.ui.TwitterShareNewsProvider"
             name="Twitter"
             order="12"
-            url="http://twitter.com/home?status=[T]%20[L]">
+            url="http://twitter.com/home?status=[L]">
       </shareNewsProvider>
       <shareNewsProvider
             icon="icons/obj16/share_stumbleupon.gif"
