@@ -86,6 +86,8 @@ import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.Pair;
+import org.rssowl.ui.internal.editors.browser.WebBrowserInput;
+import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
@@ -1167,6 +1169,31 @@ public class OwlUI {
         try {
           if (editorReference.getEditorInput() instanceof FeedViewInput)
             return (FeedView) editorReference.getEditor(true);
+        } catch (PartInitException e) {
+          /* Ignore Silently */
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Attempts to find the first <code>WebBrowserView</code> from the active Workbench
+   * Window of the PlatformUI facade. Otherwise, returns <code>NULL</code> if
+   * none.
+   *
+   * @return the first <code>WebBrowserView</code> from the active Workbench Window of
+   * the PlatformUI facade or <code>NULL</code> if none.
+   */
+  public static WebBrowserView getFirstActiveBrowser() {
+    IWorkbenchPage page = getPage();
+    if (page != null) {
+      IEditorReference[] editorReferences = page.getEditorReferences();
+      for (IEditorReference editorReference : editorReferences) {
+        try {
+          if (editorReference.getEditorInput() instanceof WebBrowserInput)
+            return (WebBrowserView) editorReference.getEditor(true);
         } catch (PartInitException e) {
           /* Ignore Silently */
         }
