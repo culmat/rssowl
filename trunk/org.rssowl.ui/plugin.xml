@@ -645,6 +645,7 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Send the link of the selected element as E-Mail."
             id="org.rssowl.ui.SendLinkAction"
             name="Send Link">
       </command>
