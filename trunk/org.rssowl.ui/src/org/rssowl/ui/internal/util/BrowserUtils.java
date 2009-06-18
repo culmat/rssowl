@@ -81,13 +81,15 @@ public class BrowserUtils {
       if (page != null) {
         boolean multipleTabs = eclipsePreferences.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS);
         boolean openInBackground = owlPreferences.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND);
+        boolean reuseTab = owlPreferences.getBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER);
+        int matchEditors = reuseTab ? IWorkbenchPage.MATCH_ID : IWorkbenchPage.MATCH_INPUT;
 
         /* Open Browser Tab in Background */
         if (multipleTabs && openInBackground) {
           IEditorPart previousActiveEditor = page.getActiveEditor();
           page.getWorkbenchWindow().getShell().setRedraw(false);
           try {
-            view = (WebBrowserView) page.openEditor(input, WebBrowserView.EDITOR_ID);
+            view = (WebBrowserView) page.openEditor(input, WebBrowserView.EDITOR_ID, true, matchEditors);
 
             if (previousActiveEditor != null)
               page.activate(previousActiveEditor);
@@ -98,7 +100,7 @@ public class BrowserUtils {
 
         /* Open Browser Tab in Front */
         else
-          view = (WebBrowserView) page.openEditor(input, WebBrowserView.EDITOR_ID);
+          view = (WebBrowserView) page.openEditor(input, WebBrowserView.EDITOR_ID, true, matchEditors);
       }
     } catch (PartInitException e) {
       Activator.getDefault().logError(e.getMessage(), e);

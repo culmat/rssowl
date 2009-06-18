@@ -206,6 +206,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Always reuse feed view */
   public static final String ALWAYS_REUSE_FEEDVIEW = "org.rssowl.pref.AlwaysReuseFeedView";
 
+  /** Global: Always reuse Browser */
+  public static final String ALWAYS_REUSE_BROWSER = "org.rssowl.pref.AlwaysReuseBrowser";
+
   /** Global: Clean Up: Delete BMs by last visit (state) */
   public static final String CLEAN_UP_BM_BY_LAST_VISIT_STATE = "org.rssowl.pref.CleanUpBMByLastVisitState";
 
