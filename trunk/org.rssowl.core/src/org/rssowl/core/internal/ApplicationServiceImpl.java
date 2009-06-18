@@ -447,14 +447,30 @@ public class ApplicationServiceImpl implements IApplicationService {
     Map<IGuid, List<NewsReference>> guidToNewsRefs = modelSearch.searchNewsByGuids(guids, false);
     for (INews newsItem : news) {
       List<NewsReference> equivalentNewsRefs = guidToNewsRefs.get(newsItem.getGuid());
-      if (equivalentNewsRefs != null)
-        newsItem.setState(equivalentNewsRefs.get(0).resolve().getState());
-      else {
+      if (equivalentNewsRefs != null && !equivalentNewsRefs.isEmpty()) {
+        NewsReference newsRef = equivalentNewsRefs.get(0);
+        INews resolvedNews = newsRef.resolve();
+        if (resolvedNews != null)
+          newsItem.setState(resolvedNews.getState());
+        else
+          logWarning("Stale Lucene index, it has returned a news that does not exist in the database anymore, id: " + newsRef.getId());
+      } else {
         equivalentNewsRefs = linkToNewsRefs.get(newsItem.getLink());
-        if (equivalentNewsRefs != null)
-          newsItem.setState(equivalentNewsRefs.get(0).resolve().getState());
+        if (equivalentNewsRefs != null && !equivalentNewsRefs.isEmpty()) {
+          NewsReference newsRef = equivalentNewsRefs.get(0);
+          INews resolvedNews = newsRef.resolve();
+          if (resolvedNews != null)
+            newsItem.setState(resolvedNews.getState());
+          else
+            logWarning("Stale Lucene index, it has returned a news that does not exist in the database anymore, id: " + newsRef.getId());
+        }
       }
     }
+  }
+
+  private void logWarning(String message) {
+    Activator activator = Activator.getDefault();
+    activator.getLog().log(activator.createWarningStatus(message, null));
   }
 
   private void saveFeed(MergeResult mergeResult) {
