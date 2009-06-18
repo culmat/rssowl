@@ -73,6 +73,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.PlatformUI;
@@ -116,6 +117,7 @@ import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
+import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
@@ -829,6 +831,33 @@ public class NewsTableControl implements IFeedViewPart {
               };
             });
           }
+
+          shareMenu.add(new Separator());
+
+          /* Send Link */
+          shareMenu.add(new Action("&E-Mail") {
+            @Override
+            public void run() {
+              IActionDelegate action = new SendLinkAction();
+              action.selectionChanged(null, selection);
+              action.run(null);
+            }
+
+            @Override
+            public boolean isEnabled() {
+              return !selection.isEmpty();
+            }
+
+            @Override
+            public String getActionDefinitionId() {
+              return SendLinkAction.ID;
+            }
+
+            @Override
+            public String getId() {
+              return SendLinkAction.ID;
+            }
+          });
         }
 
         /* Move To / Copy To */

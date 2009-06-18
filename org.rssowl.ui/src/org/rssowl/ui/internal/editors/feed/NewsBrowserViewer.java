@@ -46,6 +46,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
@@ -83,6 +84,7 @@ import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
+import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider.Dynamic;
@@ -216,6 +218,32 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
               };
             });
           }
+
+          /* Send Link */
+          shareMenu.add(new Separator());
+          shareMenu.add(new Action("&E-Mail") {
+            @Override
+            public void run() {
+              IActionDelegate action = new SendLinkAction();
+              action.selectionChanged(null, fCurrentSelection);
+              action.run(null);
+            }
+
+            @Override
+            public boolean isEnabled() {
+              return !fCurrentSelection.isEmpty();
+            }
+
+            @Override
+            public String getActionDefinitionId() {
+              return SendLinkAction.ID;
+            }
+
+            @Override
+            public String getId() {
+              return SendLinkAction.ID;
+            }
+          });
         }
 
         /* Move To / Copy To */
@@ -404,6 +432,17 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
             };
           });
         }
+
+        /* Send Link */
+        manager.add(new Separator());
+        manager.add(new Action("&E-Mail") {
+          @Override
+          public void run() {
+            IActionDelegate action = new SendLinkAction();
+            action.selectionChanged(null, fCurrentSelection);
+            action.run(null);
+          }
+        });
       }
     });
 
