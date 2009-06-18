@@ -135,13 +135,16 @@ import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.CTable;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.ShareNewsProvider;
 import org.rssowl.ui.internal.actions.AssignLabelsAction;
 import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
+import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
@@ -1732,7 +1735,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     manager.setRemoveAllWhenShown(true);
     manager.addMenuListener(new IMenuListener() {
       public void menuAboutToShow(IMenuManager manager) {
-        IStructuredSelection selection = (IStructuredSelection) fResultViewer.getSelection();
+        final IStructuredSelection selection = (IStructuredSelection) fResultViewer.getSelection();
 
         /* Open */
         {
@@ -1747,6 +1750,32 @@ public class SearchNewsDialog extends TitleAreaDialog {
           /* Show only when internal browser is used */
           if (!selection.isEmpty() && !fPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
             manager.add(new OpenInExternalBrowserAction(selection));
+        }
+
+        /* Share */
+        {
+          manager.add(new Separator("share"));
+          MenuManager shareMenu = new MenuManager("Share News", "sharenews");
+          manager.add(shareMenu);
+
+          List<ShareNewsProvider> providers = Controller.getDefault().getShareNewsProviders();
+          for (final ShareNewsProvider provider : providers) {
+            shareMenu.add(new Action(provider.getName()) {
+              @Override
+              public void run() {
+                Object obj = selection.getFirstElement();
+                if (obj != null && obj instanceof INews) {
+                  String shareLink = provider.toShareUrl((INews) obj);
+                  new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
+                }
+              };
+
+              @Override
+              public ImageDescriptor getImageDescriptor() {
+                return OwlUI.getImageDescriptor(provider.getIconPath());
+              };
+            });
+          }
         }
 
         /* Move To / Copy To */

@@ -111,6 +111,8 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -203,6 +205,9 @@ public class Controller {
   /* Service to manage Contexts */
   private ContextService fContextService;
 
+  /* Share News Provider Extension Point */
+  private static final String SHARE_NEWS_PROVIDER_EXTENSION_POINT = "org.rssowl.ui.ShareNewsProvider";
+
   /* Misc. */
   private final IApplicationService fAppService;
   private CleanUpReminderService fCleanUpReminderService;
@@ -218,6 +223,7 @@ public class Controller {
   private LabelAdapter fLabelListener;
   private List<BookMarkLoadListener> fBookMarkLoadListeners = new ArrayList<BookMarkLoadListener>(1);
   private final int fConnectionTimeout;
+  private List<ShareNewsProvider> fShareNewsProviders = new ArrayList<ShareNewsProvider>();
 
   /**
    * A listener that informs when a {@link IBookMark} is getting reloaded from
@@ -863,6 +869,40 @@ public class Controller {
         backupSubscriptions();
       }
     });
+
+    /* Load Contributed News Share Providers */
+    loadShareNewsProviders();
+  }
+
+  private void loadShareNewsProviders() {   
+    IExtensionRegistry reg = Platform.getExtensionRegistry();
+    IConfigurationElement elements[] = reg.getConfigurationElementsFor(SHARE_NEWS_PROVIDER_EXTENSION_POINT);
+
+    /* For each contributed property keyword feed */
+    for (IConfigurationElement element : elements) {
+      String id = element.getAttribute("id");
+      String name = element.getAttribute("name");
+      String iconPath = element.getAttribute("icon"); //TODO Support loading icon from different plugin
+      String url = element.getAttribute("url");
+      String order = element.getAttribute("order");
+      String maxTitleLength = element.getAttribute("maxTitleLength");
+
+      fShareNewsProviders.add(new ShareNewsProvider(id, name, iconPath, url, order, maxTitleLength));
+    }
+
+    Collections.sort(fShareNewsProviders, new Comparator<ShareNewsProvider>() {
+      public int compare(ShareNewsProvider p1, ShareNewsProvider p2) {
+        return p1.getOrder() < p2.getOrder() ? -1 : 1;
+      }
+    });
+  }
+
+  /**
+   * @return a sorted {@link List} of all contributed providers for sharing
+   * news.
+   */
+  public List<ShareNewsProvider> getShareNewsProviders() {
+    return fShareNewsProviders;
   }
 
   /**

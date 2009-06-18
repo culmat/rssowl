@@ -58,6 +58,7 @@ import org.eclipse.ui.keys.IBindingService;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -553,6 +554,32 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           /* Open Externally - Show only when internal browser is used */
           if (!selection.isEmpty() && !preferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !preferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
             manager.add(new OpenInExternalBrowserAction(selection));
+        }
+
+        /* Share */
+        if (!selection.isEmpty()) {
+          manager.add(new Separator("share"));
+          MenuManager shareMenu = new MenuManager("Share News", "sharenews");
+          manager.add(shareMenu);
+
+          List<ShareNewsProvider> providers = Controller.getDefault().getShareNewsProviders();
+          for (final ShareNewsProvider provider : providers) {
+            shareMenu.add(new Action(provider.getName()) {
+              @Override
+              public void run() {
+                Object obj = selection.getFirstElement();
+                if (obj != null && obj instanceof INews) {
+                  String shareLink = provider.toShareUrl((INews) obj);
+                  new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
+                }
+              };
+
+              @Override
+              public ImageDescriptor getImageDescriptor() {
+                return OwlUI.getImageDescriptor(provider.getIconPath());
+              };
+            });
+          }
         }
 
         /* Move To / Copy To */
