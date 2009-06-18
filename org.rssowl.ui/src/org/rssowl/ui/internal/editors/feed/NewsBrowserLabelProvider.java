@@ -497,7 +497,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       builder.append("<td class=\"subline\">");
 
       String comments = news.getComments();
-      imageLink(builder, comments, "Read Comments", "/icons/obj16/comments.gif", "comments.gif", null, null);
+      imageLink(builder, comments, "Read Comments", "/icons/obj16/comments_light.gif", "comments_light.gif", null, null);
 
       builder.append("</td>");
     }
@@ -512,7 +512,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       IAttachment attachment = news.getAttachments().get(0);
       String link = attachment.getLink().toASCIIString();
       String name = URIUtils.getFile(attachment.getLink());
-      imageLink(builder, link, StringUtils.isSet(name) ? name : "Attachment", "/icons/obj16/attachment.gif", "attachment.gif", null, null);
+      imageLink(builder, link, StringUtils.isSet(name) ? name : "Attachment", "/icons/obj16/attachment_light.gif", "attachment_light.gif", null, null);
       builder.append("</td>");
     }
 
