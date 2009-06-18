@@ -93,6 +93,7 @@ public class WebBrowserView extends EditorPart {
   private Action fCopyAction;
   private Action fPasteAction;
   private Action fPrintAction;
+  private boolean fCreated;
 
   /** Leave default for reflection */
   public WebBrowserView() {}
@@ -121,6 +122,34 @@ public class WebBrowserView extends EditorPart {
    */
   public CBrowser getBrowser() {
     return fBrowser;
+  }
+
+  /*
+   * @see org.eclipse.ui.part.EditorPart#setInput(org.eclipse.ui.IEditorInput)
+   */
+  @Override
+  public void setInput(IEditorInput input) {
+    super.setInput(input);
+
+    fInput = (WebBrowserInput) input;
+
+    /* Update Browser with Input if already created */
+    if (fCreated) {
+      WebBrowserInput browserInput = (WebBrowserInput) input;
+      fBrowser.setUrl(browserInput.getUrl());
+      fNavigationToolBarManager.find(BACK_ACTION).update(IAction.ENABLED);
+      fNavigationToolBarManager.find(FORWARD_ACTION).update(IAction.ENABLED);
+      fLocationInput.setText(fInput.getUrl());
+    }
+  }
+
+  /*
+   * @see org.eclipse.ui.part.WorkbenchPart#dispose()
+   */
+  @Override
+  public void dispose() {
+    super.dispose();
+    fCreated = false;
   }
 
   private void createGlobalActions() {
@@ -202,6 +231,7 @@ public class WebBrowserView extends EditorPart {
    */
   @Override
   public void createPartControl(Composite parent) {
+    fCreated = true;
     parent.setLayout(LayoutUtils.createGridLayout(1, 0, 5, 0, 0, false));
 
     /* Browser Bar */

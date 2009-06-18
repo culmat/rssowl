@@ -82,14 +82,25 @@ public class BrowserUtils {
         boolean multipleTabs = eclipsePreferences.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS);
         boolean openInBackground = owlPreferences.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND);
         boolean reuseTab = owlPreferences.getBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER);
-        int matchEditors = reuseTab ? IWorkbenchPage.MATCH_ID : IWorkbenchPage.MATCH_INPUT;
+
+        /* Try to Reuse existing Browser first if set */
+        if (reuseTab) {
+          WebBrowserView browser = OwlUI.getFirstActiveBrowser();
+          if (browser != null) {
+            browser.setInput(input);
+            if (!openInBackground)
+              page.activate(browser);
+
+            return browser;
+          }
+        }
 
         /* Open Browser Tab in Background */
         if (multipleTabs && openInBackground) {
           IEditorPart previousActiveEditor = page.getActiveEditor();
           page.getWorkbenchWindow().getShell().setRedraw(false);
           try {
-            view = (WebBrowserView) page.openEditor(input, WebBrowserView.EDITOR_ID, true, matchEditors);
+            view = (WebBrowserView) page.openEditor(input, WebBrowserView.EDITOR_ID, true);
 
             if (previousActiveEditor != null)
               page.activate(previousActiveEditor);
@@ -100,7 +111,7 @@ public class BrowserUtils {
 
         /* Open Browser Tab in Front */
         else
-          view = (WebBrowserView) page.openEditor(input, WebBrowserView.EDITOR_ID, true, matchEditors);
+          view = (WebBrowserView) page.openEditor(input, WebBrowserView.EDITOR_ID, true);
       }
     } catch (PartInitException e) {
       Activator.getDefault().logError(e.getMessage(), e);
