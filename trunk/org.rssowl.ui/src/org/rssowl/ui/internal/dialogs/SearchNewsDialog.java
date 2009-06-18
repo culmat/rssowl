@@ -95,6 +95,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -147,6 +148,7 @@ import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
+import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserViewer;
@@ -1776,6 +1778,32 @@ public class SearchNewsDialog extends TitleAreaDialog {
               };
             });
           }
+
+          /* Send Link */
+          shareMenu.add(new Separator());
+          shareMenu.add(new Action("&E-Mail") {
+            @Override
+            public void run() {
+              IActionDelegate action = new SendLinkAction();
+              action.selectionChanged(null, selection);
+              action.run(null);
+            }
+
+            @Override
+            public boolean isEnabled() {
+              return !selection.isEmpty();
+            }
+
+            @Override
+            public String getActionDefinitionId() {
+              return SendLinkAction.ID;
+            }
+
+            @Override
+            public String getId() {
+              return SendLinkAction.ID;
+            }
+          });
         }
 
         /* Move To / Copy To */

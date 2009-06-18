@@ -580,6 +580,32 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
               };
             });
           }
+
+          /* Send Link */
+          shareMenu.add(new Separator());
+          shareMenu.add(new Action("&E-Mail") {
+            @Override
+            public void run() {
+              IActionDelegate action = new SendLinkAction();
+              action.selectionChanged(null, selection);
+              action.run(null);
+            }
+
+            @Override
+            public boolean isEnabled() {
+              return !selection.isEmpty();
+            }
+
+            @Override
+            public String getActionDefinitionId() {
+              return SendLinkAction.ID;
+            }
+
+            @Override
+            public String getId() {
+              return SendLinkAction.ID;
+            }
+          });
         }
 
         /* Move To / Copy To */
@@ -776,31 +802,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             @Override
             public String getId() {
               return CopyLinkAction.ID;
-            }
-          });
-
-          /* Send Link */
-          manager.add(new Action("&Send Link") {
-            @Override
-            public void run() {
-              IActionDelegate action = new SendLinkAction();
-              action.selectionChanged(null, selection);
-              action.run(null);
-            }
-
-            @Override
-            public boolean isEnabled() {
-              return !selection.isEmpty();
-            }
-
-            @Override
-            public String getActionDefinitionId() {
-              return SendLinkAction.ID;
-            }
-
-            @Override
-            public String getId() {
-              return SendLinkAction.ID;
             }
           });
         }
