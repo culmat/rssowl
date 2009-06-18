@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.rssowl.ui">
+<schema targetNamespace="org.rssowl.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
          <meta.schema plugin="org.rssowl.ui" id="OnlineFeedEngine" name="Online Feed Engine"/>
@@ -11,6 +11,11 @@
    </annotation>
 
    <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
       <complexType>
          <sequence minOccurs="1" maxOccurs="unbounded">
             <element ref="keywordFeed"/>
@@ -71,7 +76,7 @@
          <attribute name="url" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The URL to create the keyword feed from. Add a &quot;[:]&quot; into the URL where the search term should be added to.
                </documentation>
             </annotation>
          </attribute>
