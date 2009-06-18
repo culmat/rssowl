@@ -28,6 +28,7 @@ import static org.rssowl.ui.internal.ILinkHandler.HANDLER_PROTOCOL;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.DELETE_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.LABELS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.NEWS_MENU_HANDLER_ID;
+import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.SHARE_NEWS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_READ_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.TOGGLE_STICKY_HANDLER_ID;
 
@@ -434,6 +435,12 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       builder.append("<td class=\"subline\">");
       link = HANDLER_PROTOCOL + LABELS_MENU_HANDLER_ID + "?" + news.getId();
       imageLink(builder, link, "Assign Labels", "/icons/elcl16/labels_light.gif", "labels_light.gif", null, null);
+      builder.append("</td>");
+
+      /* Share News Context Menu */
+      builder.append("<td class=\"subline\">");
+      link = HANDLER_PROTOCOL + SHARE_NEWS_MENU_HANDLER_ID + "?" + news.getId();
+      imageLink(builder, link, "Share News", "/icons/elcl16/share_light.gif", "share_light.gif", null, null);
       builder.append("</td>");
 
       /* News Context Menu */
