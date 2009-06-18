@@ -1042,7 +1042,13 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       for (Object element : elements) {
         if (element instanceof INews) {
           INews news = (INews) element;
-          boolean res = fBrowser.getControl().execute(getElementById(Dynamic.NEWS.getId(news)) + ".className='hidden';");
+          StringBuilder js = new StringBuilder();
+          js.append("var node = ").append(getElementById(Dynamic.NEWS.getId(news))).append("; ");
+          js.append("if (node != null) { ");
+          js.append("node.className='hidden';");
+          js.append(" } ");
+
+          boolean res = fBrowser.getControl().execute(js.toString());
           if (!res)
             return false;
         }
