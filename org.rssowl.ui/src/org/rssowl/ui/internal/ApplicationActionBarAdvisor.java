@@ -559,7 +559,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         /* Share */
         if (!selection.isEmpty()) {
           manager.add(new Separator("share"));
-          MenuManager shareMenu = new MenuManager("Share News", "sharenews");
+          MenuManager shareMenu = new MenuManager("S&hare News", "sharenews");
           manager.add(shareMenu);
 
           List<ShareNewsProvider> providers = Controller.getDefault().getShareNewsProviders();
