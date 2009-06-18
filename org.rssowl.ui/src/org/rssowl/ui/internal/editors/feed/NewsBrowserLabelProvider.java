@@ -436,20 +436,14 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       imageLink(builder, link, "Assign Labels", "/icons/elcl16/labels_light.gif", "labels_light.gif", null, null);
       builder.append("</td>");
 
-      /* Go to Attachments */
-      if (hasAttachments) {
-        builder.append("<td class=\"subline\">");
-        IAttachment attachment = news.getAttachments().get(0);
-        link = attachment.getLink().toASCIIString();
-        String name = URIUtils.getFile(attachment.getLink());
-        imageLink(builder, link, StringUtils.isSet(name) ? name : "Attachment", "/icons/obj16/attachment.gif", "attachment.gif", null, null);
-        builder.append("</td>");
-      }
-
       /* News Context Menu */
       builder.append("<td class=\"subline\">");
       link = HANDLER_PROTOCOL + NEWS_MENU_HANDLER_ID + "?" + news.getId();
       imageLink(builder, link, "Menu", "/icons/obj16/menu_light.gif", "menu_light.gif", null, null);
+      builder.append("</td>");
+
+      builder.append("<td class=\"subline\">");
+      builder.append("|");
       builder.append("</td>");
     }
 
@@ -503,8 +497,22 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       builder.append("<td class=\"subline\">");
 
       String comments = news.getComments();
-      link(builder, comments, "Comments", "comments");
+      imageLink(builder, comments, "Read Comments", "/icons/obj16/comments.gif", "comments.gif", null, null);
 
+      builder.append("</td>");
+    }
+
+    /* Go to Attachments */
+    if (hasAttachments) {
+      builder.append("<td class=\"subline\">");
+      builder.append("|");
+      builder.append("</td>");
+
+      builder.append("<td class=\"subline\">");
+      IAttachment attachment = news.getAttachments().get(0);
+      String link = attachment.getLink().toASCIIString();
+      String name = URIUtils.getFile(attachment.getLink());
+      imageLink(builder, link, StringUtils.isSet(name) ? name : "Attachment", "/icons/obj16/attachment.gif", "attachment.gif", null, null);
       builder.append("</td>");
     }
 
