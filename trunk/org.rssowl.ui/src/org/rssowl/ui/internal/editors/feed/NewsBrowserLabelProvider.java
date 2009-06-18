@@ -271,7 +271,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("div.subline { margin: 0; padding: 0; clear: left; ").append(fSmallFontCSS).append(" }\n");
     writer.append("table.subline { margin: 0; padding: 0; }\n");
     writer.append("tr.subline { margin: 0; padding: 0; }\n");
-    writer.append("td.subline { margin: 0; padding: 0; color: rgb(80, 80, 80); padding-right: 5px; ").append(fSmallFontCSS).append(" }\n");
+    writer.append("td.subline { margin: 0; padding: 0; color: rgb(80, 80, 80); padding-right: 8px; ").append(fSmallFontCSS).append(" }\n");
 
     /* Date */
     writer.append("div.date { float: left; ").append(fSmallFontCSS).append(" }\n");
