@@ -71,6 +71,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   private Button fReopenFeedsOnStartupCheck;
   private Button fAlwaysReuseFeedView;
   private Button fLoadBrowserTabInBackground;
+  private Button fAlwaysReuseBrowser;
   private Button fEnableJavaScriptCheck;
 
   /** Leave for reflection */
@@ -128,17 +129,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fAlwaysReuseFeedView.setText("Always open feeds in the same tab");
     fAlwaysReuseFeedView.setSelection(fGlobalScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW));
 
-    fLoadBrowserTabInBackground = new Button(viewGroup, SWT.CHECK);
-    fLoadBrowserTabInBackground.setText("Open browser tabs in the background");
-    fLoadBrowserTabInBackground.setSelection(fGlobalScope.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND));
-
-    /* Enable JavaScript in Browser */
-    if (Application.IS_WINDOWS) {
-      fEnableJavaScriptCheck = new Button(viewGroup, SWT.CHECK);
-      fEnableJavaScriptCheck.setText("Enable JavaScript in Browser");
-      fEnableJavaScriptCheck.setSelection(!fGlobalScope.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT));
-    }
-
     fUseMultipleTabsCheck = new Button(viewGroup, SWT.CHECK);
     fUseMultipleTabsCheck.setText("Show multiple tabs side by side");
     fUseMultipleTabsCheck.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS));
@@ -154,6 +144,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
       public void widgetSelected(SelectionEvent e) {
         fAutoCloseTabsSpinner.setEnabled(fAutoCloseTabsCheck.getSelection());
         fAlwaysReuseFeedView.setEnabled(!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1);
+        fAlwaysReuseBrowser.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
         fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
       }
     });
@@ -167,6 +158,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
       @Override
       public void widgetSelected(SelectionEvent e) {
         fAlwaysReuseFeedView.setEnabled(!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1);
+        fAlwaysReuseBrowser.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
         fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
       }
     });
@@ -175,6 +167,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     label.setText(" tabs");
 
     fAlwaysReuseFeedView.setEnabled(!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1);
+    fAlwaysReuseBrowser.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
     fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
   }
 
@@ -221,6 +214,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fUseInternalBrowser.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
+        fAlwaysReuseBrowser.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
         fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
       }
     });
@@ -267,6 +261,24 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
           fCustomBrowserInput.setText(path);
       }
     });
+
+    fLoadBrowserTabInBackground = new Button(browserGroup, SWT.CHECK);
+    fLoadBrowserTabInBackground.setText("Open browser tabs in the background");
+    fLoadBrowserTabInBackground.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
+    fLoadBrowserTabInBackground.setSelection(fGlobalScope.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND));
+
+    fAlwaysReuseBrowser = new Button(browserGroup, SWT.CHECK);
+    fAlwaysReuseBrowser.setText("Always open web sites in the same tab");
+    fAlwaysReuseBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
+    fAlwaysReuseBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER));
+
+    /* Enable JavaScript in Browser */
+    if (Application.IS_WINDOWS) {
+      fEnableJavaScriptCheck = new Button(browserGroup, SWT.CHECK);
+      fEnableJavaScriptCheck.setText("Enable JavaScript in Browser");
+      fEnableJavaScriptCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
+      fEnableJavaScriptCheck.setSelection(!fGlobalScope.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT));
+    }
   }
 
   private Composite createComposite(Composite parent) {
@@ -287,7 +299,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   public boolean performOk() {
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS, fReopenFeedsOnStartupCheck.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW, fAlwaysReuseFeedView.getSelection());
-    fGlobalScope.putBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND, fLoadBrowserTabInBackground.getSelection());
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, fUseMultipleTabsCheck.getSelection());
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS, fAutoCloseTabsCheck.getSelection());
     fEclipseScope.putInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, fAutoCloseTabsSpinner.getSelection());
@@ -296,6 +307,8 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_START, fMoveToTrayOnStart.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_CLOSE, fMoveToTrayOnExit.getSelection());
 
+    fGlobalScope.putBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER, fAlwaysReuseBrowser.getSelection());
+    fGlobalScope.putBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND, fLoadBrowserTabInBackground.getSelection());
     if (Application.IS_WINDOWS)
       fGlobalScope.putBoolean(DefaultPreferences.DISABLE_JAVASCRIPT, !fEnableJavaScriptCheck.getSelection());
 
@@ -317,7 +330,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
 
     fReopenFeedsOnStartupCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS));
     fAlwaysReuseFeedView.setSelection(defaultScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW));
-    fLoadBrowserTabInBackground.setSelection(defaultScope.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND));
     fUseMultipleTabsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS));
     fAutoCloseTabsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS));
     fAutoCloseTabsSpinner.setSelection(defaultScope.getInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD));
@@ -327,6 +339,8 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fMoveToTrayOnStart.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_START));
     fMoveToTrayOnExit.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
 
+    fAlwaysReuseBrowser.setSelection(defaultScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER));
+    fLoadBrowserTabInBackground.setSelection(defaultScope.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND));
     if (Application.IS_WINDOWS)
       fEnableJavaScriptCheck.setSelection(!defaultScope.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT));
 
@@ -338,6 +352,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
 
     fAlwaysReuseFeedView.setEnabled(!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1);
+    fAlwaysReuseBrowser.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
     fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
   }
 }
