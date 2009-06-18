@@ -4,6 +4,7 @@
    <extension-point id="EntityPropertyPage" name="Entity Property Page" schema="schema/EntityPropertyPage.exsd"/>
    <extension-point id="KeywordFeed" name="Keyword Feed" schema="schema/KeywordFeed.exsd"/>
    <extension-point id="NewsActionPresentation" name="News Action Presentation" schema="schema/NewsActionPresentation.exsd"/>
+   <extension-point id="ShareNewsProvider" name="Share News Provider" schema="schema/ShareNewsProvider.exsd"/>
 
    <extension
          id="rssowl"
@@ -1597,5 +1598,15 @@
                visible="true">
          </view>
       </perspectiveExtension>
+   </extension>
+   <extension
+         point="org.rssowl.ui.ShareNewsProvider">
+      <shareNewsProvider
+            icon="icons/obj16/share_fb.gif"
+            id="org.rssowl.ui.FacebookShareNewsProvider"
+            name="Facebook"
+            order="0"
+            url="http://www.facebook.com/sharer.php?u=[L]&amp;t=[T]">
+      </shareNewsProvider>
    </extension>
 </plugin>

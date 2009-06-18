@@ -34,6 +34,7 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -100,10 +101,12 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.CTree;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.ShareNewsProvider;
 import org.rssowl.ui.internal.StatusLineUpdater;
 import org.rssowl.ui.internal.actions.AssignLabelsAction;
 import org.rssowl.ui.internal.actions.LabelAction;
@@ -800,6 +803,32 @@ public class NewsTableControl implements IFeedViewPart {
           /* Show only when internal browser is used */
           if (!selection.isEmpty() && !fGlobalPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fGlobalPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
             manager.add(new OpenInExternalBrowserAction(selection));
+        }
+
+        /* Share */
+        {
+          manager.add(new Separator("share"));
+          MenuManager shareMenu = new MenuManager("Share News", "sharenews");
+          manager.add(shareMenu);
+
+          List<ShareNewsProvider> providers = Controller.getDefault().getShareNewsProviders();
+          for (final ShareNewsProvider provider : providers) {
+            shareMenu.add(new Action(provider.getName()) {
+              @Override
+              public void run() {
+                Object obj = selection.getFirstElement();
+                if (obj != null && obj instanceof INews) {
+                  String shareLink = provider.toShareUrl((INews) obj);
+                  new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
+                }
+              };
+
+              @Override
+              public ImageDescriptor getImageDescriptor() {
+                return OwlUI.getImageDescriptor(provider.getIconPath());
+              };
+            });
+          }
         }
 
         /* Move To / Copy To */
