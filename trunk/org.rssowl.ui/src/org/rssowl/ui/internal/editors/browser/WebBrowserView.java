@@ -133,6 +133,10 @@ public class WebBrowserView extends EditorPart {
 
     fInput = (WebBrowserInput) input;
 
+    /* Update Part Name */
+    if (fInput.getContext() != null && StringUtils.isSet(fInput.getContext().getTitle()))
+      setPartName(fInput.getContext().getTitle());
+
     /* Update Browser with Input if already created */
     if (fCreated) {
       WebBrowserInput browserInput = (WebBrowserInput) input;
