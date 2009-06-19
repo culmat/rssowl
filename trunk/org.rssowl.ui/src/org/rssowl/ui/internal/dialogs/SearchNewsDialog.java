@@ -1774,7 +1774,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
               @Override
               public ImageDescriptor getImageDescriptor() {
-                return OwlUI.getImageDescriptor(provider.getIconPath());
+                if (StringUtils.isSet(provider.getIconPath()))
+                  return OwlUI.getImageDescriptor(provider.getIconPath());
+
+                return super.getImageDescriptor();
               };
             });
           }

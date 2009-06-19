@@ -152,7 +152,8 @@ public class KeywordSubscriptionPage extends WizardPage {
     for (final SearchEngine engine : fgSearchEngines) {
       Button button = new Button(contentMargin, SWT.RADIO);
       button.setText(engine.getName());
-      button.setImage(OwlUI.getImage(button, engine.getIconPath()));
+      if (StringUtils.isSet(engine.getIconPath()))
+        button.setImage(OwlUI.getImage(button, engine.getIconPath()));
       button.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {

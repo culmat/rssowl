@@ -827,7 +827,10 @@ public class NewsTableControl implements IFeedViewPart {
 
               @Override
               public ImageDescriptor getImageDescriptor() {
-                return OwlUI.getImageDescriptor(provider.getIconPath());
+                if (StringUtils.isSet(provider.getIconPath()))
+                  return OwlUI.getImageDescriptor(provider.getIconPath());
+
+                return super.getImageDescriptor();
               };
             });
           }
