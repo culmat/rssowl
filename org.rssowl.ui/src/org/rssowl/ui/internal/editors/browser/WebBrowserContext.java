@@ -38,6 +38,7 @@ import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
@@ -50,6 +51,7 @@ import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 public class WebBrowserContext {
   private NewsReference fNewsReference;
   private ModelReference fNewsMarkReference;
+  private String fTitle;
 
   private WebBrowserContext() {}
 
@@ -64,6 +66,7 @@ public class WebBrowserContext {
       return context;
 
     context.fNewsReference = news.toReference();
+    context.fTitle = CoreUtils.getHeadline(news, true);
 
     if (mark instanceof FolderNewsMark)
       context.fNewsMarkReference = new FolderReference(mark.getId());
@@ -79,26 +82,19 @@ public class WebBrowserContext {
    * @return a new instance of {@link WebBrowserContext} from the given input.
    */
   public static WebBrowserContext createFrom(ISelection selection, FeedView feedview) {
-    WebBrowserContext context = new WebBrowserContext();
     if (selection == null || feedview == null)
-      return context;
+      return new WebBrowserContext();
 
-    context.fNewsReference = getNewsReference(selection);
-
+    INews news = getNews(selection);
     INewsMark mark = ((FeedViewInput) feedview.getEditorInput()).getMark();
-    if (mark instanceof FolderNewsMark)
-      context.fNewsMarkReference = new FolderReference(mark.getId());
-    else
-      context.fNewsMarkReference = mark.toReference();
-
-    return context;
+    return createFrom(news, mark);
   }
 
-  private static NewsReference getNewsReference(ISelection selection) {
+  private static INews getNews(ISelection selection) {
     if (selection instanceof StructuredSelection) {
       Object element = ((StructuredSelection) selection).getFirstElement();
       if (element instanceof INews)
-        return ((INews) element).toReference();
+        return (INews) element;
     }
 
     return null;
@@ -110,6 +106,14 @@ public class WebBrowserContext {
    */
   public NewsReference getNewsReference() {
     return fNewsReference;
+  }
+
+  /**
+   * @return a human readable name for this context or <code>null</code> if
+   * none.
+   */
+  public String getTitle() {
+    return fTitle;
   }
 
   /**
