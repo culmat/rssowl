@@ -214,7 +214,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
               @Override
               public ImageDescriptor getImageDescriptor() {
-                return OwlUI.getImageDescriptor(provider.getIconPath());
+                if (StringUtils.isSet(provider.getIconPath()))
+                  return OwlUI.getImageDescriptor(provider.getIconPath());
+
+                return super.getImageDescriptor();
               };
             });
           }
@@ -428,7 +431,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
             @Override
             public ImageDescriptor getImageDescriptor() {
-              return OwlUI.getImageDescriptor(provider.getIconPath());
+              if (StringUtils.isSet(provider.getIconPath()))
+                return OwlUI.getImageDescriptor(provider.getIconPath());
+
+              return super.getImageDescriptor();
             };
           });
         }
