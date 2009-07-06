@@ -51,6 +51,6 @@ class DefragDatabaseTask extends CleanUpTask {
    */
   @Override
   String getLabel() {
-    return "Clean up the database (takes place on next start)";
+    return "Improve application performance (takes place on next start)";
   }
 }
