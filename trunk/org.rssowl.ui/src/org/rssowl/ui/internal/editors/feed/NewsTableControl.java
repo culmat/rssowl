@@ -408,9 +408,9 @@ public class NewsTableControl implements IFeedViewPart {
     else
       model = NewsColumnViewModel.createGlobal();
 
-    /* Synthetically add the "Feed" column if not present */
+    /* Synthetically add the "Feed" column if both "Feed" and "Location" not present */
     if ((input instanceof ISearchMark) || (input instanceof INewsBin) || (input instanceof FolderNewsMark)) {
-      if (!model.getColumns().contains(NewsColumn.FEED)) {
+      if (!model.getColumns().contains(NewsColumn.FEED) && !model.getColumns().contains(NewsColumn.LOCATION)) {
         model.getColumns().add(1, NewsColumn.FEED);
       }
     }
