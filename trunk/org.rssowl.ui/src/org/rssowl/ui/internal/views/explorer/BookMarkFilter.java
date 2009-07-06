@@ -30,7 +30,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
-import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
@@ -339,7 +339,7 @@ public class BookMarkFilter extends ViewerFilter {
 
       /* Finally check the Pattern */
       if (isMatch && fMatcher != null) {
-        if (!wordMatches(newsmark))
+        if (!wordMatches(newsmark) && !wordMatches(newsmark.getParent()))
           return false;
       }
 
@@ -385,19 +385,15 @@ public class BookMarkFilter extends ViewerFilter {
     return words.toArray(new String[words.size()]);
   }
 
-  private boolean wordMatches(IMark mark) {
+  private boolean wordMatches(IFolderChild node) {
 
     /* Search Name */
     if (fSearchTarget == SearchTarget.NAME)
-      return wordMatches(mark.getName());
+      return wordMatches(node.getName());
 
     /* Search Link */
-    if (fSearchTarget == SearchTarget.LINK && mark instanceof IBookMark)
-      return wordMatches(((IBookMark) mark).getFeedLinkReference().getLinkAsText());
-
-    /* Require a Feed from here on */
-    if (!(mark instanceof IBookMark))
-      return false;
+    if (fSearchTarget == SearchTarget.LINK && node instanceof IBookMark)
+      return wordMatches(((IBookMark) node).getFeedLinkReference().getLinkAsText());
 
     return false;
   }
