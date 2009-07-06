@@ -24,10 +24,12 @@
 
 package org.rssowl.core.persist.pref;
 
-
 /**
  * An instance of <code>IPreferencesInitializer</code> responsible for defining
  * the default preferences of RSSOwl.
+ * <p>
+ * Subclasses may override to provide custom settings.
+ * </p>
  *
  * @author bpasero
  */
@@ -342,7 +344,10 @@ public class DefaultPreferences implements IPreferencesInitializer {
     initReloadOpenDefaults(defaultScope);
   }
 
-  private void initGlobalDefaults(IPreferenceScope defaultScope) {
+  /**
+   * @param defaultScope the container for preferences to fill.
+   */
+  protected void initGlobalDefaults(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(USE_OS_PASSWORD, true);
     defaultScope.putBoolean(MARK_READ_ON_MINIMIZE, false);
     defaultScope.putBoolean(MARK_READ_ON_CHANGE, false);
@@ -368,19 +373,28 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putBoolean(SEARCH_DIALOG_NEWS_SORT_ASCENDING, false);
   }
 
-  private void initGlobalEclipseDefaults(IPreferenceScope defaultScope) {
+  /**
+   * @param defaultScope the container for preferences to fill.
+   */
+  protected void initGlobalEclipseDefaults(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(ECLIPSE_RESTORE_TABS, true);
     defaultScope.putBoolean(ECLIPSE_MULTIPLE_TABS, true);
     defaultScope.putInteger(ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 5);
   }
 
-  private void initRetentionDefaults(IPreferenceScope defaultScope) {
+  /**
+   * @param defaultScope the container for preferences to fill.
+   */
+  protected void initRetentionDefaults(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(DEL_NEWS_BY_COUNT_STATE, true);
     defaultScope.putInteger(DEL_NEWS_BY_COUNT_VALUE, 200);
     defaultScope.putInteger(DEL_NEWS_BY_AGE_VALUE, 30);
   }
 
-  private void initCleanUpDefaults(IPreferenceScope defaultScope) {
+  /**
+   * @param defaultScope the container for preferences to fill.
+   */
+  protected void initCleanUpDefaults(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(CLEAN_UP_BM_BY_LAST_UPDATE_STATE, true);
     defaultScope.putInteger(CLEAN_UP_BM_BY_LAST_UPDATE_VALUE, 30);
 
@@ -394,31 +408,46 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putInteger(CLEAN_UP_REMINDER_DAYS_VALUE, 30);
   }
 
-  private void initDisplayDefaults(IPreferenceScope defaultScope) {
+  /**
+   * @param defaultScope the container for preferences to fill.
+   */
+  protected void initDisplayDefaults(IPreferenceScope defaultScope) {
     defaultScope.putInteger(BM_NEWS_FILTERING, -1);
     defaultScope.putInteger(BM_NEWS_GROUPING, -1);
     defaultScope.putBoolean(BM_LOAD_IMAGES, true);
   }
 
-  private void initReloadOpenDefaults(IPreferenceScope defaultScope) {
+  /**
+   * @param defaultScope the container for preferences to fill.
+   */
+  protected void initReloadOpenDefaults(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(BM_UPDATE_INTERVAL_STATE, true);
     defaultScope.putLong(BM_UPDATE_INTERVAL, 60 * 30); // 30 Minutes
     defaultScope.putBoolean(BM_OPEN_ON_STARTUP, false);
     defaultScope.putBoolean(BM_RELOAD_ON_STARTUP, false);
   }
 
-  private void initNewsColumnsDefaults(IPreferenceScope defaultScope) {
+  /**
+   * @param defaultScope the container for preferences to fill.
+   */
+  protected void initNewsColumnsDefaults(IPreferenceScope defaultScope) {
     defaultScope.putIntegers(BM_NEWS_COLUMNS, new int[] { 0, 1, 2, 3, 6 }); //TODO Must be in sync with NewsColumn enum
     defaultScope.putInteger(BM_NEWS_SORT_COLUMN, 1); //TODO Must be in sync with NewsColumn enum
     defaultScope.putBoolean(BM_NEWS_SORT_ASCENDING, false);
   }
 
-  private void initBookMarkExplorerDefaults(IPreferenceScope defaultScope) {
+  /**
+   * @param defaultScope the container for preferences to fill.
+   */
+  protected void initBookMarkExplorerDefaults(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(BE_BEGIN_SEARCH_ON_TYPING, true);
     defaultScope.putBoolean(BE_SORT_BY_NAME, false);
   }
 
-  private void initFeedViewDefaults(IPreferenceScope defaultScope) {
+  /**
+   * @param defaultScope the container for preferences to fill.
+   */
+  protected void initFeedViewDefaults(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(FV_LAYOUT_VERTICAL, true);
     defaultScope.putIntegers(FV_SASHFORM_WEIGHTS, new int[] { 50, 50 });
     defaultScope.putBoolean(BM_OPEN_SITE_FOR_NEWS, false);
