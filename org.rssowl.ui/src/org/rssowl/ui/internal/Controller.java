@@ -874,7 +874,7 @@ public class Controller {
     loadShareNewsProviders();
   }
 
-  private void loadShareNewsProviders() {   
+  private void loadShareNewsProviders() {
     IExtensionRegistry reg = Platform.getExtensionRegistry();
     IConfigurationElement elements[] = reg.getConfigurationElementsFor(SHARE_NEWS_PROVIDER_EXTENSION_POINT);
 
@@ -1083,7 +1083,7 @@ public class Controller {
     InputStream inS = getClass().getResourceAsStream("/default_feeds.xml"); //$NON-NLS-1$;
     List<? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
     IFolder imported = (IFolder) types.get(0);
-    imported.setName("Default"); //$NON-NLS-1$
+    imported.setName("My Bookmarks"); //$NON-NLS-1$
 
     /* Create Default SearchMarks */
     String newsEntityName = INews.class.getName();
