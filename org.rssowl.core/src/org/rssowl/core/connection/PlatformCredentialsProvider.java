@@ -36,7 +36,7 @@ import org.eclipse.equinox.security.storage.StorageException;
 import org.eclipse.equinox.security.storage.provider.IProviderHints;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
-import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 
 import java.io.IOException;

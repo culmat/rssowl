@@ -25,13 +25,13 @@
 package org.rssowl.core.util;
 
 import org.rssowl.core.Owl;
-import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INews.State;
+import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.service.PersistenceException;
 
