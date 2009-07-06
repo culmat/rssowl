@@ -86,7 +86,7 @@ public class OPMLImporter implements ITypeImporter {
   }
 
   private List<IFolder> processBody(Element body) {
-    IFolder defaultRootFolder = Owl.getModelFactory().createFolder(null, null, "Default");
+    IFolder defaultRootFolder = Owl.getModelFactory().createFolder(null, null, "My Bookmarks");
     List<IFolder> rootFolders = new ArrayList<IFolder>();
     rootFolders.add(defaultRootFolder);
 
