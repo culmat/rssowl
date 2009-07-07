@@ -33,6 +33,7 @@ import org.eclipse.ui.IObjectActionDelegate;
 import org.eclipse.ui.IWorkbenchPart;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.OwlUI;
 
 import java.util.List;
@@ -72,8 +73,9 @@ public class CopyLinkAction implements IObjectActionDelegate {
           i++;
         } else if (element instanceof INews) {
           INews news = (INews) element;
-          if (news.getLinkAsText() != null) {
-            str.append(i > 0 ? "\n" : "").append(news.getLinkAsText());
+          String link = CoreUtils.getLink(news);
+          if (link != null) {
+            str.append(i > 0 ? "\n" : "").append(link);
             i++;
           }
         }

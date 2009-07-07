@@ -27,6 +27,7 @@ package org.rssowl.ui.internal.actions;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.util.BrowserUtils;
 
 import java.util.List;
@@ -58,8 +59,9 @@ public class OpenInExternalBrowserAction extends Action {
     for (Object object : selection) {
       if (object instanceof INews) {
         INews news = (INews) object;
-        if (news.getLinkAsText() != null)
-          BrowserUtils.openLinkExternal(news.getLinkAsText());
+        String link = CoreUtils.getLink(news);
+        if (link != null)
+          BrowserUtils.openLinkExternal(link);
       }
     }
   }
