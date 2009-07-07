@@ -933,6 +933,33 @@ public class BookMarkExplorer extends ViewPart {
         /* Separator */
         new MenuItem(menu, SWT.SEPARATOR);
 
+        /* Group: By Type */
+        final MenuItem groupByType = new MenuItem(menu, SWT.RADIO);
+        groupByType.setText("Group by Type");
+        groupByType.setSelection(BookMarkGrouping.Type.GROUP_BY_TYPE == fBookMarkGrouping.getType());
+        groupByType.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            if (groupByType.getSelection() && fBookMarkGrouping.getType() != BookMarkGrouping.Type.GROUP_BY_TYPE)
+              doGrouping(BookMarkGrouping.Type.GROUP_BY_TYPE);
+          }
+        });
+
+        /* Group: By State */
+        final MenuItem groupByState = new MenuItem(menu, SWT.RADIO);
+        groupByState.setText("Group by State");
+        groupByState.setSelection(BookMarkGrouping.Type.GROUP_BY_STATE == fBookMarkGrouping.getType());
+        groupByState.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            if (groupByState.getSelection() && fBookMarkGrouping.getType() != BookMarkGrouping.Type.GROUP_BY_STATE)
+              doGrouping(BookMarkGrouping.Type.GROUP_BY_STATE);
+          }
+        });
+
+        /* Separator */
+        new MenuItem(menu, SWT.SEPARATOR);
+
         /* Group: By Last Visit */
         final MenuItem groupByLastVisit = new MenuItem(menu, SWT.RADIO);
         groupByLastVisit.setText("Group by Last Visit");
