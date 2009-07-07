@@ -43,7 +43,7 @@ public class StringUtilsTest {
   @Test
   public void testStripTags() throws Exception {
     assertEquals("Foo Bar", StringUtils.stripTags("Foo Bar", true));
-    assertEquals("Foo & Bar", StringUtils.stripTags("Foo &lt; Bar", true));
+    assertEquals("Foo < Bar", StringUtils.stripTags("Foo &lt; Bar", true));
     assertEquals("Foo &lt; Bar", StringUtils.stripTags("Foo &lt; Bar", false));
     assertEquals("Foo  Bar", StringUtils.stripTags("Foo <br> Bar", true));
     assertEquals("Foo Bar", StringUtils.stripTags("Foo Bar<br>", true));
