@@ -36,6 +36,7 @@ import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.widgets.Event;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
@@ -71,6 +72,9 @@ public class BookMarkLabelProvider extends CellLabelProvider {
   private Image fNewsBinNewIcon;
   private Image fNewsBinEmptyIcon;
   private Color fStickyBgColor;
+  private Color fGradientFgColor;
+  private Color fGradientBgColor;
+  private Color fGradientEndColor;
   private Color fGroupFgColor;
   private Font fBoldFont;
   private Font fDefaultFont;
@@ -126,6 +130,9 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     /* Colors */
     fStickyBgColor = OwlUI.getThemeColor(OwlUI.STICKY_BG_COLOR_ID, fResources, new RGB(255, 255, 180));
     fGroupFgColor = OwlUI.getColor(fResources, OwlUI.GROUP_FG_COLOR);
+    fGradientFgColor = OwlUI.getColor(fResources, OwlUI.GROUP_GRADIENT_FG_COLOR);
+    fGradientBgColor = OwlUI.getColor(fResources, OwlUI.GROUP_GRADIENT_BG_COLOR);
+    fGradientEndColor = OwlUI.getColor(fResources, OwlUI.GROUP_GRADIENT_END_COLOR);
   }
 
   /*
@@ -359,5 +366,10 @@ public class BookMarkLabelProvider extends CellLabelProvider {
 
   private int getUnreadNewsCount(INewsMark newsMark) {
     return newsMark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
+  }
+
+  void erase(Event event, Object element) {
+    if (element instanceof EntityGroup)
+      OwlUI.codDrawGradient(event, fGradientFgColor, fGradientBgColor, fGradientEndColor);
   }
 }

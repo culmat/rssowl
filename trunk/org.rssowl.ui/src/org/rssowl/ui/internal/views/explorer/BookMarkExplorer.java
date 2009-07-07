@@ -69,7 +69,9 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
@@ -340,6 +342,14 @@ public class BookMarkExplorer extends ViewPart {
     fViewer.addOpenListener(new IOpenListener() {
       public void open(OpenEvent event) {
         OwlUI.openInFeedView(fViewSite.getPage(), (IStructuredSelection) fViewer.getSelection());
+      }
+    });
+
+    /* Custom Owner Drawn for Groups */
+    fViewer.getControl().addListener(SWT.EraseItem, new Listener() {
+      public void handleEvent(Event event) {
+        Object element = event.item.getData();
+        fLabelProvider.erase(event, element);
       }
     });
 
