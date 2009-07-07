@@ -36,6 +36,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.eclipse.ui.browser.IWorkbenchBrowserSupport;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.editors.browser.EmbeddedWebBrowser;
@@ -114,10 +115,22 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
     for (Object object : selection) {
       URI link = null;
 
-      if (object instanceof INews)
-        link = ((INews) object).getLink();
+      /* News */
+      if (object instanceof INews) {
+        INews news = (INews) object;
+        link = news.getLink();
+        if (link == null) {
+          String fallbackLink = CoreUtils.getLink(news);
+          if (fallbackLink != null)
+            link = new URI(fallbackLink);
+        }
+      }
+
+      /* URI */
       else if (object instanceof URI)
         link = (URI) object;
+
+      /* String */
       else if (object instanceof String)
         link = new URI(URIUtils.fastEncode((String) object));
 

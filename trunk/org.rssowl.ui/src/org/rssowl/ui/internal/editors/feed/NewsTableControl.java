@@ -339,7 +339,7 @@ public class NewsTableControl implements IFeedViewPart {
     Set<INews> news = ModelUtils.normalize(selection.toList());
 
     if (!news.isEmpty()) {
-      String linkAsText = news.iterator().next().getLinkAsText();
+      String linkAsText = CoreUtils.getLink(news.iterator().next());
       if (StringUtils.isSet(linkAsText))
         event.data = linkAsText;
     }

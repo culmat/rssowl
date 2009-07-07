@@ -357,7 +357,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     StringBuilder search = new StringBuilder();
 
     String newsTitle = CoreUtils.getHeadline(news, false);
-    boolean hasLink = news.getLinkAsText() != null;
+    String newsLink = CoreUtils.getLink(news);
+    boolean hasLink = newsLink != null;
     State state = news.getState();
     boolean isUnread = (state == State.NEW || state == State.UPDATED || state == State.UNREAD);
     Set<ILabel> labels = CoreUtils.getSortedLabels(news);
@@ -388,7 +389,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
       /* Link */
       if (hasLink)
-        link(builder, news.getLinkAsText(), newsTitle, cssClass, Dynamic.TITLE.getId(news), color);
+        link(builder, newsLink, newsTitle, cssClass, Dynamic.TITLE.getId(news), color);
 
       /* Normal */
       else
@@ -577,7 +578,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
         if (hasLink) {
           builder.append(" Click ");
-          link(builder, news.getLinkAsText(), "here", null);
+          link(builder, newsLink, "here", null);
           builder.append(" to open the article in the browser.");
         }
       }

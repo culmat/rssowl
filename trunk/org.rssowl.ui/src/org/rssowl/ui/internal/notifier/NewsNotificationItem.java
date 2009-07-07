@@ -81,7 +81,7 @@ public class NewsNotificationItem extends NotificationItem {
   public NewsNotificationItem(INews news, RGB color) {
     super(makeText(news), makeImage(news));
 
-    fNewsLink = news.getLinkAsText();
+    fNewsLink = CoreUtils.getLink(news);
     fFeedReference = news.getFeedReference();
     fNewsReference = new NewsReference(news.getId());
     fRecentNewsDate = DateUtils.getRecentDate(news);

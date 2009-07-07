@@ -192,11 +192,11 @@ public class NewsBrowserControl implements IFeedViewPart {
 
   private Object getInput(INews news) {
     if (fInputPreferences.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS))
-      return news.getLinkAsText();
+      return CoreUtils.getLink(news);
 
     boolean openEmptyNews = Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS);
     if (openEmptyNews && CoreUtils.isEmpty(news))
-      return news.getLinkAsText();
+      return CoreUtils.getLink(news);
 
     return news;
   }

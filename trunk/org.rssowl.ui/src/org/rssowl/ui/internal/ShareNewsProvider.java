@@ -105,7 +105,7 @@ public class ShareNewsProvider {
    * @return a link that can be used to share the link with this provider.
    */
   public String toShareUrl(INews news) {
-    String link = news.getLinkAsText();
+    String link = CoreUtils.getLink(news);
     if (!StringUtils.isSet(link))
       link = "";
 

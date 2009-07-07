@@ -33,6 +33,7 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
@@ -354,6 +355,30 @@ public class CoreUtils {
     }
 
     return "No Headline";
+  }
+
+  /**
+   * @param news the news to obtain the link from. Will fall back to the
+   * {@link IGuid} if necessary.
+   * @return the link that can be used to open the news in a browser or
+   * <code>null</code> if none.
+   */
+  public static String getLink(INews news) {
+
+    /* Check Link Provided */
+    String link = news.getLinkAsText();
+    if (StringUtils.isSet(link))
+      return link;
+
+    /* Fallback to Guid if available */
+    IGuid guid = news.getGuid();
+    if (guid != null) {
+      String value = guid.getValue();
+      if (URIUtils.looksLikeLink(value))
+        return value;
+    }
+
+    return null;
   }
 
   /**

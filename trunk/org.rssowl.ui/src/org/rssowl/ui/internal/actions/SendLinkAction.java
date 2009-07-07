@@ -78,9 +78,10 @@ public class SendLinkAction implements IObjectActionDelegate {
         /* Send Title and Link of News if present */
         else if (element instanceof INews) {
           INews news = (INews) element;
-          if (news.getLinkAsText() != null) {
+          String link = CoreUtils.getLink(news);
+          if (link != null) {
             String title = CoreUtils.getHeadline(news, true) + "\n";
-            str.append(i > 0 ? "\n\n" : "").append(title).append(news.getLinkAsText());
+            str.append(i > 0 ? "\n\n" : "").append(title).append(link);
             i++;
           }
         }
