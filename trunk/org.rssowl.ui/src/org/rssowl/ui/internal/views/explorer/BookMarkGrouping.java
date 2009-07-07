@@ -31,6 +31,7 @@ import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.util.DateUtils;
 import org.rssowl.ui.internal.EntityGroup;
@@ -40,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 
 /**
@@ -68,8 +70,14 @@ public class BookMarkGrouping {
     /** Group by Last Visit Date */
     GROUP_BY_LAST_VISIT,
 
-    /** Group by Visit Count */
-    GROUP_BY_POPULARITY
+    /** Group by Popularity */
+    GROUP_BY_POPULARITY,
+
+    /** Group by Type */
+    GROUP_BY_TYPE,
+
+    /** Group by State */
+    GROUP_BY_STATE
   }
 
   /** Valid Groups */
@@ -103,7 +111,28 @@ public class BookMarkGrouping {
     FAIRLY_POPULAR("Fairly Popular"),
 
     /** Group: Unpopular */
-    UNPOPULAR("Unpopular");
+    UNPOPULAR("Unpopular"),
+
+    /** Group: Bins */
+    BIN("News Bins"),
+
+    /** Group: Searches */
+    SEARCH("Saved Searches"),
+
+    /** Group: Bookmarks */
+    BOOKMARK("Bookmarks"),
+
+    /** Group: Sticky */
+    STICKY("Sticky"),
+
+    /** Group: New */
+    NEW("New"),
+
+    /** Group: Unread */
+    UNREAD("Unread"),
+
+    /** Group: Other */
+    OTHER("Other");
 
     String fName;
 
@@ -150,6 +179,14 @@ public class BookMarkGrouping {
     /* Group by Popularity */
     else if (Type.GROUP_BY_POPULARITY == fType)
       return createPopularityGroups(input);
+
+    /* Group by State */
+    else if (Type.GROUP_BY_STATE == fType)
+      return createStateGroups(input);
+
+    /* Group by Type */
+    else if (Type.GROUP_BY_TYPE == fType)
+      return createTypeGroups(input);
 
     /* Should not happen */
     return new EntityGroup[0];
@@ -264,6 +301,74 @@ public class BookMarkGrouping {
     return maskEmpty(new ArrayList<EntityGroup>(Arrays.asList(new EntityGroup[] { gVeryPopular, gPopular, gFairlyPopular, gUnpopular })));
   }
 
+  /* Create the Group for the Type GROUP_BY_TYPE */
+  private EntityGroup[] createTypeGroups(List<? extends IEntity> input) {
+
+    /* Build Groups */
+    EntityGroup gBins = new EntityGroup(Group.BIN.ordinal(), GROUP_CATEGORY_ID, Group.BIN.getName());
+    EntityGroup gSearches = new EntityGroup(Group.SEARCH.ordinal(), GROUP_CATEGORY_ID, Group.SEARCH.getName());
+    EntityGroup gBookmarks = new EntityGroup(Group.BOOKMARK.ordinal(), GROUP_CATEGORY_ID, Group.BOOKMARK.getName());
+
+    /* Group Input */
+    for (Object object : input) {
+
+      /* Bookmark */
+      if (object instanceof IBookMark)
+        new EntityGroupItem(gBookmarks, (IEntity) object);
+
+      /* Bin */
+      else if (object instanceof INewsBin)
+        new EntityGroupItem(gBins, (IEntity) object);
+
+      /* Saved Search */
+      else if (object instanceof ISearchMark)
+        new EntityGroupItem(gSearches, (IEntity) object);
+    }
+
+    /* Select all that are non empty */
+    return maskEmpty(new ArrayList<EntityGroup>(Arrays.asList(new EntityGroup[] { gBins, gSearches, gBookmarks })));
+  }
+
+  /* Create the Group for the Type GROUP_BY_STATE */
+  private EntityGroup[] createStateGroups(List<? extends IEntity> input) {
+
+    /* Build Groups */
+    EntityGroup gSticky = new EntityGroup(Group.STICKY.ordinal(), GROUP_CATEGORY_ID, Group.STICKY.getName());
+    EntityGroup gNew = new EntityGroup(Group.NEW.ordinal(), GROUP_CATEGORY_ID, Group.NEW.getName());
+    EntityGroup gUnread = new EntityGroup(Group.UNREAD.ordinal(), GROUP_CATEGORY_ID, Group.UNREAD.getName());
+    EntityGroup gOther = new EntityGroup(Group.OTHER.ordinal(), GROUP_CATEGORY_ID, Group.OTHER.getName());
+
+    /* Group Input */
+    for (Object object : input) {
+      if (object instanceof INewsMark) {
+        INewsMark mark = (INewsMark) object;
+
+        /* Early exclude saved searches (buggy) */
+        if (mark instanceof ISearchMark)
+          new EntityGroupItem(gOther, mark);
+
+        /* Contains Sticky */
+        else if (mark instanceof IBookMark && ((IBookMark) mark).getStickyNewsCount() > 0)
+          new EntityGroupItem(gSticky, mark);
+
+        /* Contains New */
+        else if (mark.getNewsCount(EnumSet.of(INews.State.NEW)) > 0)
+          new EntityGroupItem(gNew, mark);
+
+        /* Contains Unread */
+        else if (mark.getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) > 0)
+          new EntityGroupItem(gUnread, mark);
+
+        /* Other */
+        else
+          new EntityGroupItem(gOther, mark);
+      }
+    }
+
+    /* Select all that are non empty */
+    return maskEmpty(new ArrayList<EntityGroup>(Arrays.asList(new EntityGroup[] { gSticky, gNew, gUnread, gOther })));
+  }
+
   private EntityGroup[] maskEmpty(List<EntityGroup> items) {
     List<EntityGroup> maskedItems = new ArrayList<EntityGroup>();
     for (EntityGroup item : items) {
@@ -274,15 +379,15 @@ public class BookMarkGrouping {
     return maskedItems.toArray(new EntityGroup[maskedItems.size()]);
   }
 
-  boolean needsRefresh(Class< ? extends IEntity> entityClass) {
+  boolean needsRefresh(Class<? extends IEntity> entityClass) {
 
     /* In case the Grouping is not active at all */
     if (fType == Type.NO_GROUPING)
       return false;
 
-    /* Early return for News */
+    /* Early handle News */
     if (entityClass.equals(INews.class))
-      return false;
+      return fType == Type.GROUP_BY_STATE;
 
     /* Folder Event (e.g. Mark deleted) */
     if (entityClass.equals(IFolder.class))
