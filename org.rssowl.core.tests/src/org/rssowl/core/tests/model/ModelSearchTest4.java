@@ -914,7 +914,7 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
       List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), false);
       assertSame(result, news1, news3);
     }
-    
+
     /* Search Test: Complex */
     {
       ISearchCondition cond1 = fFactory.createSearchCondition(fieldLoc, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { subFolder1, subFolder2, bm1 })));
@@ -924,6 +924,74 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
 
       List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(cond1, cond2, cond3, cond4), true);
       assertSame(result, news3);
+    }
+  }
+
+  /**
+   * See http://dev.rssowl.org/show_bug.cgi?id=1122
+   *
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testSearchNewsWithPhraseInCategory() throws Exception {
+    try {
+
+      /* First add some Types */
+      IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
+
+      INews news = createNews(feed, "Friend", "http://www.news.com/news3.html", State.READ);
+      ICategory category = fFactory.createCategory(null, news);
+      category.setName("Global");
+      news.addCategory(category);
+
+      DynamicDAO.save(feed);
+
+      /* Wait for Indexer */
+      waitForIndexer();
+
+      /* Condition 1 */
+      {
+        ISearchField field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+
+        ISearchCondition condition1 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "\"Giant Global Graph\"");
+
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition1), false);
+        assertEquals(0, result.size());
+      }
+
+      /* Condition 2 */
+      {
+        ISearchField field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+
+        ISearchCondition condition1 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "\"Giant Global Graph\"");
+
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition1), false);
+        assertEquals(0, result.size());
+      }
+
+      /* Condition 1 */
+      {
+        ISearchField field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+
+        ISearchCondition condition1 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS_ALL, "Giant Global Graph");
+
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition1), false);
+        assertEquals(0, result.size());
+      }
+
+      /* Condition 1 */
+      {
+        ISearchField field = fFactory.createSearchField(IEntity.ALL_FIELDS, fNewsEntityName);
+
+        ISearchCondition condition1 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "Giant Global Graph");
+
+        List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition1), false);
+        assertEquals(1, result.size());
+        assertSame(result, news);
+      }
+    } catch (PersistenceException e) {
+      TestUtils.fail(e);
     }
   }
 }
