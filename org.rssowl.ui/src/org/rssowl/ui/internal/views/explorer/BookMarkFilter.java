@@ -387,6 +387,10 @@ public class BookMarkFilter extends ViewerFilter {
 
   private boolean wordMatches(IFolderChild node) {
 
+    /* Return early if node is a Bookmark-Set */
+    if (node.getParent() == null)
+      return false;
+
     /* Search Name */
     if (fSearchTarget == SearchTarget.NAME)
       return wordMatches(node.getName());
