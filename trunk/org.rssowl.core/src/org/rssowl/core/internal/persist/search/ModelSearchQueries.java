@@ -71,7 +71,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.StringTokenizer;
 
 /**
  * Helper to build the queries to search for {@link INews}.
@@ -306,12 +305,12 @@ public class ModelSearchQueries {
 
       /* Category */
       field = factory.createSearchField(INews.CATEGORIES, condition.getField().getEntityName());
-      StringTokenizer tokenizer = new StringTokenizer(condition.getValue().toString());
-      while (tokenizer.hasMoreTokens()) {
-        String token = tokenizer.nextToken();
+      List<String> tokens = StringUtils.tokenizePhraseAware(condition.getValue().toString());
+      if (!tokens.contains(condition.getValue().toString()))
+        tokens.add(condition.getValue().toString());
+      for (String token : tokens) {
         allFieldsConditions.add(factory.createSearchCondition(field, condition.getSpecifier().isNegation() ? SearchSpecifier.IS_NOT : SearchSpecifier.IS, token));
       }
-      allFieldsConditions.add(factory.createSearchCondition(field, condition.getSpecifier().isNegation() ? SearchSpecifier.IS_NOT : SearchSpecifier.IS, condition.getValue()));
 
       /* Attachment Content */
       field = factory.createSearchField(INews.ATTACHMENTS_CONTENT, condition.getField().getEntityName());
