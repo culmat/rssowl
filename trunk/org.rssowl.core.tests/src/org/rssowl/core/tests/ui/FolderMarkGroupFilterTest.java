@@ -30,13 +30,17 @@ import org.eclipse.jface.viewers.Viewer;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.BookMark;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.NewsCounter;
+import org.rssowl.core.persist.NewsCounterItem;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.DateUtils;
@@ -99,44 +103,48 @@ public class FolderMarkGroupFilterTest {
    */
   @Test
   public void testFolderMarkGrouping() throws Exception {
-    IFeed feed = fFactory.createFeed(null, new URI("http://www.link.com"));
-    DynamicDAO.save(feed);
+    IFeed feed1 = fFactory.createFeed(null, new URI("http://www.link1.com"));
+    IFeed feed2 = fFactory.createFeed(null, new URI("http://www.link2.com"));
+    IFeed feed3 = fFactory.createFeed(null, new URI("http://www.link3.com"));
+    DynamicDAO.save(feed1);
+    DynamicDAO.save(feed2);
+    DynamicDAO.save(feed3);
 
     IFolder root = fFactory.createFolder(null, null, "Root");
 
     /* Today */
-    IBookMark bookmark1 = fFactory.createBookMark(null, root, new FeedLinkReference(feed.getLink()), "BookMark 1");
+    IBookMark bookmark1 = fFactory.createBookMark(null, root, new FeedLinkReference(feed1.getLink()), "BookMark 1");
     bookmark1.setLastVisitDate(fToday);
     ISearchMark searchmark1 = fFactory.createSearchMark(null, root, "SearchMark 1");
     searchmark1.setLastVisitDate(fToday);
 
     /* Yesterday */
-    IBookMark bookmark2 = fFactory.createBookMark(null, root, new FeedLinkReference(feed.getLink()), "BookMark 2");
+    IBookMark bookmark2 = fFactory.createBookMark(null, root, new FeedLinkReference(feed2.getLink()), "BookMark 2");
     bookmark2.setLastVisitDate(fYesterday);
     ISearchMark searchmark2 = fFactory.createSearchMark(null, root, "SearchMark 2");
     searchmark2.setLastVisitDate(fYesterday);
 
     /* Earlier this Week */
-    IBookMark bookmark3 = fFactory.createBookMark(null, root, new FeedLinkReference(feed.getLink()), "BookMark 3");
+    IBookMark bookmark3 = fFactory.createBookMark(null, root, new FeedLinkReference(feed3.getLink()), "BookMark 3");
     bookmark3.setLastVisitDate(fEarlierThisWeek);
     ISearchMark searchmark3 = fFactory.createSearchMark(null, root, "SearchMark 3");
     searchmark3.setLastVisitDate(fEarlierThisWeek);
 
     /* Last Week */
-    IBookMark bookmark4 = fFactory.createBookMark(null, root, new FeedLinkReference(feed.getLink()), "BookMark 4");
+    IBookMark bookmark4 = fFactory.createBookMark(null, root, new FeedLinkReference(feed1.getLink()), "BookMark 4");
     bookmark4.setLastVisitDate(fLastWeek);
     ISearchMark searchmark4 = fFactory.createSearchMark(null, root, "SearchMark 4");
     searchmark4.setLastVisitDate(fLastWeek);
 
     /* More than one Week ago */
-    IBookMark bookmark5 = fFactory.createBookMark(null, root, new FeedLinkReference(feed.getLink()), "BookMark 5");
+    IBookMark bookmark5 = fFactory.createBookMark(null, root, new FeedLinkReference(feed1.getLink()), "BookMark 5");
     bookmark5.setLastVisitDate(new Date(0));
 
     /* Visited Never */
     ISearchMark searchmark5 = fFactory.createSearchMark(null, root, "SearchMark 5");
 
     /* Future */
-    IBookMark bookmark6 = fFactory.createBookMark(null, root, new FeedLinkReference(feed.getLink()), "BookMark 6");
+    IBookMark bookmark6 = fFactory.createBookMark(null, root, new FeedLinkReference(feed1.getLink()), "BookMark 6");
     bookmark6.setLastVisitDate(new Date(fToday.getTime() + 10000000));
 
     List<IEntity> input = new ArrayList<IEntity>();
@@ -258,6 +266,106 @@ public class FolderMarkGroupFilterTest {
         }
       }
     }
+
+    input = new ArrayList<IEntity>();
+    input.add(bookmark1);
+    input.add(bookmark2);
+    input.add(bookmark3);
+    input.add(bookmark4);
+    input.add(bookmark5);
+    input.add(bookmark6);
+    input.add(searchmark1);
+    input.add(searchmark2);
+    input.add(searchmark3);
+    input.add(searchmark4);
+    input.add(searchmark5);
+
+    INewsBin bin = fFactory.createNewsBin(null, root, "Bin");
+    input.add(bin);
+
+    NewsCounter count = new NewsCounter();
+    NewsCounterItem item = new NewsCounterItem(1, 0, 0);
+    count.put(feed1.getLink(), item);
+    ((BookMark) bookmark1).setNewsCounter(count);
+
+    count = new NewsCounter();
+    item = new NewsCounterItem(0, 1, 0);
+    count.put(feed2.getLink(), item);
+    ((BookMark) bookmark2).setNewsCounter(count);
+
+    count = new NewsCounter();
+    item = new NewsCounterItem(0, 0, 1);
+    count.put(feed3.getLink(), item);
+    ((BookMark) bookmark3).setNewsCounter(count);
+
+    INews news = fFactory.createNews(null, fFactory.createFeed(null, new URI("feed4")), new Date());
+    news.setState(INews.State.NEW);
+    news.setId(System.currentTimeMillis());
+    bin.addNews(news);
+
+    /* Group by State */
+    {
+      fGrouping.setType(BookMarkGrouping.Type.GROUP_BY_STATE);
+      EntityGroup[] group = fGrouping.group(input);
+
+      assertEquals(4, group.length);
+      assertEquals(input.size(), countEntities(group));
+
+      for (EntityGroup entityGroup : group) {
+        if (entityGroup.getId() == BookMarkGrouping.Group.STICKY.ordinal()) {
+          List<IEntity> entities = entityGroup.getEntities();
+          assertEquals(1, entities.size());
+          assertEquals(true, entities.containsAll(Arrays.asList(new IEntity[] { bookmark3 })));
+        }
+
+        else if (entityGroup.getId() == BookMarkGrouping.Group.NEW.ordinal()) {
+          List<IEntity> entities = entityGroup.getEntities();
+          assertEquals(2, entities.size());
+          assertEquals(true, entities.containsAll(Arrays.asList(new IEntity[] { bookmark1, bin })));
+        }
+
+        else if (entityGroup.getId() == BookMarkGrouping.Group.UNREAD.ordinal()) {
+          List<IEntity> entities = entityGroup.getEntities();
+          assertEquals(1, entities.size());
+          assertEquals(true, entities.containsAll(Arrays.asList(new IEntity[] { bookmark2 })));
+        }
+
+        else if (entityGroup.getId() == BookMarkGrouping.Group.OTHER.ordinal()) {
+          List<IEntity> entities = entityGroup.getEntities();
+          assertEquals(8, entities.size());
+          assertEquals(true, entities.containsAll(Arrays.asList(new IEntity[] { bookmark4, bookmark5, bookmark6, searchmark1, searchmark2, searchmark3, searchmark4, searchmark5 })));
+        }
+      }
+    }
+
+    /* Group by Type */
+    {
+      fGrouping.setType(BookMarkGrouping.Type.GROUP_BY_TYPE);
+      EntityGroup[] group = fGrouping.group(input);
+
+      assertEquals(3, group.length);
+      assertEquals(input.size(), countEntities(group));
+
+      for (EntityGroup entityGroup : group) {
+        if (entityGroup.getId() == BookMarkGrouping.Group.BOOKMARK.ordinal()) {
+          List<IEntity> entities = entityGroup.getEntities();
+          assertEquals(6, entities.size());
+          assertEquals(true, entities.containsAll(Arrays.asList(new IEntity[] { bookmark1, bookmark2, bookmark3, bookmark4, bookmark5, bookmark6 })));
+        }
+
+        else if (entityGroup.getId() == BookMarkGrouping.Group.SEARCH.ordinal()) {
+          List<IEntity> entities = entityGroup.getEntities();
+          assertEquals(5, entities.size());
+          assertEquals(true, entities.containsAll(Arrays.asList(new IEntity[] { searchmark1, searchmark2, searchmark3, searchmark4, searchmark5 })));
+        }
+
+        else if (entityGroup.getId() == BookMarkGrouping.Group.BIN.ordinal()) {
+          List<IEntity> entities = entityGroup.getEntities();
+          assertEquals(1, entities.size());
+          assertEquals(true, entities.containsAll(Arrays.asList(new IEntity[] { bin })));
+        }
+      }
+    }
   }
 
   /**
@@ -315,7 +423,7 @@ public class FolderMarkGroupFilterTest {
     /* Filter: Show All */
     {
       fFiltering.setType(BookMarkFilter.Type.SHOW_ALL);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(elements.length, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { bm1, bm2, bm3, bm4, bm5, bm6, sm1, sm2, sm3, sm4, sm5 })));
     }
@@ -323,7 +431,7 @@ public class FolderMarkGroupFilterTest {
     /* Filter: Show Erroneous */
     {
       fFiltering.setType(BookMarkFilter.Type.SHOW_ERRONEOUS);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(1, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { bm1 })));
     }
@@ -331,7 +439,7 @@ public class FolderMarkGroupFilterTest {
     /* Filter: Show Never Visited */
     {
       fFiltering.setType(BookMarkFilter.Type.SHOW_NEVER_VISITED);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(2, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { sm5, bm6 })));
     }
@@ -339,7 +447,7 @@ public class FolderMarkGroupFilterTest {
     /* Filter: Show New */
     {
       fFiltering.setType(BookMarkFilter.Type.SHOW_NEW);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(3, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { bm1, bm3, bm5 })));
     }
@@ -347,7 +455,7 @@ public class FolderMarkGroupFilterTest {
     /* Filter: Show Unread */
     {
       fFiltering.setType(BookMarkFilter.Type.SHOW_UNREAD);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(3, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { bm1, bm3, bm5 })));
     }
@@ -357,7 +465,7 @@ public class FolderMarkGroupFilterTest {
       fFiltering.setType(BookMarkFilter.Type.SHOW_ALL);
       fFiltering.setPattern("*foo*");
       fFiltering.setSearchTarget(BookMarkFilter.SearchTarget.NAME);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(1, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { bm1 })));
     }
@@ -365,7 +473,7 @@ public class FolderMarkGroupFilterTest {
     /* Filter: Text Pattern (Link) */
     {
       fFiltering.setSearchTarget(BookMarkFilter.SearchTarget.LINK);
-      List< ? > result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
+      List<?> result = Arrays.asList(fFiltering.filter(fNullViewer, (Object) null, elements));
       assertEquals(3, result.size());
       assertEquals(true, result.containsAll(Arrays.asList(new IEntity[] { bm1, bm3, bm5 })));
     }
