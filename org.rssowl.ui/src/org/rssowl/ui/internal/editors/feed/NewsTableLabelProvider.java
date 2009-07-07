@@ -38,13 +38,10 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Scrollable;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
@@ -492,7 +489,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
     /* Erase Group */
     else if (element instanceof EntityGroup)
-      eraseGroup(event, (EntityGroup) element);
+      OwlUI.codDrawGradient(event, fGradientFgColor, fGradientBgColor, fGradientEndColor);
   }
 
   private void eraseNews(Event event, INews news) {
@@ -515,7 +512,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
       Rectangle itemRect = event.getBounds();
 
       /* Paint the selection beyond the end of last column */
-      expandRegion(event, scrollable, gc, clArea);
+      OwlUI.codExpandRegion(event, scrollable, gc, clArea);
 
       /* Draw Rectangle */
       Color oldBackground = gc.getBackground();
@@ -534,7 +531,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
       Rectangle itemRect = event.getBounds();
 
       /* Paint the selection beyond the end of last column */
-      expandRegion(event, scrollable, gc, clArea);
+      OwlUI.codExpandRegion(event, scrollable, gc, clArea);
 
       /* Draw Rectangle */
       Color oldBackground = gc.getBackground();
@@ -549,55 +546,6 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
 
   private boolean isInvalidLabelColor(ILabel label) {
     return label.getColor().equals(LABEL_COLOR_BLACK) || label.getColor().equals(LABEL_COLOR_WHITE);
-  }
-
-  private void eraseGroup(Event event, @SuppressWarnings("unused") EntityGroup group) {
-    Scrollable scrollable = (Scrollable) event.widget;
-    GC gc = event.gc;
-
-    Rectangle area = scrollable.getClientArea();
-    Rectangle rect = event.getBounds();
-
-    /* Paint the selection beyond the end of last column */
-    expandRegion(event, scrollable, gc, area);
-
-    /* Draw Gradient Rectangle */
-    Color oldForeground = gc.getForeground();
-    Color oldBackground = gc.getBackground();
-
-    /* Gradient */
-    gc.setForeground(fGradientFgColor);
-    gc.setBackground(fGradientBgColor);
-    gc.fillGradientRectangle(0, rect.y, area.width, rect.height, true);
-
-    /* Bottom Line */
-    gc.setForeground(fGradientEndColor);
-    gc.drawLine(0, rect.y + rect.height - 1, area.width, rect.y + rect.height - 1);
-
-    gc.setForeground(oldForeground);
-    gc.setBackground(oldBackground);
-
-    /* Mark as Background being handled */
-    event.detail &= ~SWT.BACKGROUND;
-  }
-
-  private void expandRegion(Event event, Scrollable scrollable, GC gc, Rectangle area) {
-    int columnCount;
-    if (scrollable instanceof Table)
-      columnCount = ((Table) scrollable).getColumnCount();
-    else
-      columnCount = ((Tree) scrollable).getColumnCount();
-
-    if (event.index == columnCount - 1 || columnCount == 0) {
-      int width = area.x + area.width - event.x;
-      if (width > 0) {
-        Region region = new Region();
-        gc.getClipping(region);
-        region.add(event.x, event.y, width, event.height);
-        gc.setClipping(region);
-        region.dispose();
-      }
-    }
   }
 
   /*

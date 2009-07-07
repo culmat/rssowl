@@ -58,9 +58,14 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Scrollable;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
@@ -1179,12 +1184,12 @@ public class OwlUI {
   }
 
   /**
-   * Attempts to find the first <code>WebBrowserView</code> from the active Workbench
-   * Window of the PlatformUI facade. Otherwise, returns <code>NULL</code> if
-   * none.
+   * Attempts to find the first <code>WebBrowserView</code> from the active
+   * Workbench Window of the PlatformUI facade. Otherwise, returns
+   * <code>NULL</code> if none.
    *
-   * @return the first <code>WebBrowserView</code> from the active Workbench Window of
-   * the PlatformUI facade or <code>NULL</code> if none.
+   * @return the first <code>WebBrowserView</code> from the active Workbench
+   * Window of the PlatformUI facade or <code>NULL</code> if none.
    */
   public static WebBrowserView getFirstActiveBrowser() {
     IWorkbenchPage page = getPage();
@@ -1573,5 +1578,70 @@ public class OwlUI {
     STATE_WIDTH += 30; // Bounds of Column requires more space
 
     return STATE_WIDTH;
+  }
+
+  /**
+   * Custom Owner Drawn helper to draw a gradient across a Scrollable item.
+   *
+   * @param event the erase event.
+   * @param fg gradient foreground.
+   * @param bg gradient background.
+   * @param end gradient end.
+   */
+  public static void codDrawGradient(Event event, Color fg, Color bg, Color end) {
+    Scrollable scrollable = (Scrollable) event.widget;
+    GC gc = event.gc;
+
+    Rectangle area = scrollable.getClientArea();
+    Rectangle rect = event.getBounds();
+
+    /* Paint the selection beyond the end of last column */
+    codExpandRegion(event, scrollable, gc, area);
+
+    /* Draw Gradient Rectangle */
+    Color oldForeground = gc.getForeground();
+    Color oldBackground = gc.getBackground();
+
+    /* Gradient */
+    gc.setForeground(fg);
+    gc.setBackground(bg);
+    gc.fillGradientRectangle(0, rect.y, area.width, rect.height, true);
+
+    /* Bottom Line */
+    gc.setForeground(end);
+    gc.drawLine(0, rect.y + rect.height - 1, area.width, rect.y + rect.height - 1);
+
+    gc.setForeground(oldForeground);
+    gc.setBackground(oldBackground);
+
+    /* Mark as Background being handled */
+    event.detail &= ~SWT.BACKGROUND;
+  }
+
+  /**
+   * Custom Owner Draw helper to expand a drawn region over a scrollable item.
+   *
+   * @param event the erase event.
+   * @param scrollable the scrollable to paint on.
+   * @param gc the gc to paint on.
+   * @param area the drawable area.
+   */
+  public static void codExpandRegion(Event event, Scrollable scrollable, GC gc, Rectangle area) {
+    int columnCount;
+    if (scrollable instanceof Table)
+      columnCount = ((Table) scrollable).getColumnCount();
+    else
+      columnCount = ((Tree) scrollable).getColumnCount();
+
+    if (event.index == columnCount - 1 || columnCount == 0) {
+      int width = area.x + area.width - event.x;
+      if (width > 0) {
+        Region region = new Region();
+        gc.getClipping(region);
+        region.add(event.x, event.y, width, event.height);
+        gc.setClipping(region);
+        region.dispose();
+      }
+    }
   }
 }
