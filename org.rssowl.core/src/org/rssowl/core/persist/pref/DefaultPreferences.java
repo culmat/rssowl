@@ -281,6 +281,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Open Browser Tabs in the Background */
   public static final String OPEN_BROWSER_IN_BACKGROUND = "org.rssowl.pref.OpenBrowserInBackground";
 
+  /** Global: Share Provider Order and Enablement */
+  public static final String SHARE_PROVIDER_STATE = "org.rssowl.pref.ShareProviderState";
+
   /**
    * Eclipse Preferences Follow
    */
@@ -371,6 +374,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putIntegers(SEARCH_DIALOG_NEWS_COLUMNS, new int[] { 9, 0, 8, 1, 2, 3, 6 }); //TODO Must be in sync with NewsColumn enum
     defaultScope.putInteger(SEARCH_DIALOG_NEWS_SORT_COLUMN, 9); //TODO Must be in sync with NewsColumn enum
     defaultScope.putBoolean(SEARCH_DIALOG_NEWS_SORT_ASCENDING, false);
+    defaultScope.putIntegers(SHARE_PROVIDER_STATE, new int[] { 1, 2, 3, 4, 5, 6, 7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18  }); //TODO Must be in sync with Share Provider contributions
   }
 
   /**
