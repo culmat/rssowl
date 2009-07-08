@@ -44,6 +44,7 @@ import org.rssowl.core.util.BatchedBuffer;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.ApplicationWorkbenchAdvisor;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
 
@@ -267,6 +268,10 @@ public class NotificationService {
     /* Make sure to run in UI Thread */
     JobRunner.runInUIThread(OwlUI.getPrimaryShell(), new Runnable() {
       public void run() {
+
+        /* Return early if shutting down */
+        if (Controller.getDefault().isShuttingDown())
+          return;
 
         /* Return if Notification should only show when minimized */
         ApplicationWorkbenchWindowAdvisor advisor = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
