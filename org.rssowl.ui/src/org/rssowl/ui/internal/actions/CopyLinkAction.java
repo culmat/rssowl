@@ -24,13 +24,11 @@
 
 package org.rssowl.ui.internal.actions;
 
-import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IWorkbenchPart;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.util.CoreUtils;
@@ -44,55 +42,71 @@ import java.util.List;
  *
  * @author bpasero
  */
-public class CopyLinkAction implements IObjectActionDelegate {
+public class CopyLinkAction extends Action {
 
   /** ID of this Action */
   public static final String ID = "org.rssowl.ui.CopyLinkAction";
 
-  private IStructuredSelection fSelection;
-
-  /*
-   * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction,
-   * org.eclipse.ui.IWorkbenchPart)
+  /**
+   * Set ID and Action Definition ID.
    */
-  public void setActivePart(IAction action, IWorkbenchPart targetPart) {}
-
-  /*
-   * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-   */
-  public void run(IAction action) {
-    StringBuilder str = new StringBuilder();
-
-    /* Build Contents */
-    if (!fSelection.isEmpty()) {
-      List< ? > list = fSelection.toList();
-      int i = 0;
-      for (Object element : list) {
-        if (element instanceof IBookMark) {
-          str.append(i > 0 ? "\n" : "").append(((IBookMark) element).getFeedLinkReference().getLinkAsText());
-          i++;
-        } else if (element instanceof INews) {
-          INews news = (INews) element;
-          String link = CoreUtils.getLink(news);
-          if (link != null) {
-            str.append(i > 0 ? "\n" : "").append(link);
-            i++;
-          }
-        }
-      }
-    }
-
-    /* Set Contents to Clipboard */
-    if (str.length() > 0)
-      OwlUI.getClipboard().setContents(new Object[] { str.toString() }, new Transfer[] { TextTransfer.getInstance() });
+  public CopyLinkAction() {
+    setId(ID);
+    setActionDefinitionId(ID);
+    setText("Copy Link");
+    setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/copy_link.gif"));
+    setDisabledImageDescriptor(OwlUI.getImageDescriptor("icons/dlcl16/copy_link.gif"));
   }
 
   /*
-   * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
-   * org.eclipse.jface.viewers.ISelection)
+   * @see org.eclipse.jface.action.Action#isEnabled()
    */
-  public void selectionChanged(IAction action, ISelection selection) {
-    if (selection instanceof IStructuredSelection)
-      fSelection = (IStructuredSelection) selection;
+  @Override
+  public boolean isEnabled() {
+    ISelection selection = OwlUI.getActiveSelection();
+    if (selection != null && !selection.isEmpty() && selection instanceof IStructuredSelection) {
+      List<?> list = ((IStructuredSelection) selection).toList();
+      for (Object entry : list) {
+        if (entry instanceof IBookMark || entry instanceof INews)
+          return true;
+      }
+    }
+
+    return false;
+  }
+
+  /*
+   * @see org.eclipse.jface.action.Action#run()
+   */
+  @Override
+  public void run() {
+    ISelection selection = OwlUI.getActiveSelection();
+    if (selection != null && !selection.isEmpty() && selection instanceof IStructuredSelection) {
+      IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+      StringBuilder str = new StringBuilder();
+
+      /* Build Contents */
+      if (!structuredSelection.isEmpty()) {
+        List<?> list = structuredSelection.toList();
+        int i = 0;
+        for (Object element : list) {
+          if (element instanceof IBookMark) {
+            str.append(i > 0 ? "\n" : "").append(((IBookMark) element).getFeedLinkReference().getLinkAsText());
+            i++;
+          } else if (element instanceof INews) {
+            INews news = (INews) element;
+            String link = CoreUtils.getLink(news);
+            if (link != null) {
+              str.append(i > 0 ? "\n" : "").append(link);
+              i++;
+            }
+          }
+        }
+      }
+
+      /* Set Contents to Clipboard */
+      if (str.length() > 0)
+        OwlUI.getClipboard().setContents(new Object[] { str.toString() }, new Transfer[] { TextTransfer.getInstance() });
+    }
   }
 }
