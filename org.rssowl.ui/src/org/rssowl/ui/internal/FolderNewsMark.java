@@ -176,8 +176,10 @@ public class FolderNewsMark extends Mark implements INewsMark {
     List<IFolderChild> children = folder.getChildren();
 
     for (IFolderChild child : children) {
-      if (child instanceof IFolder)
-        return isRelatedTo((IFolder) child, news, ref);
+
+      /* Check contained in Folder */
+      if (child instanceof IFolder && isRelatedTo((IFolder) child, news, ref))
+        return true;
 
       /* News could be part of the Feed (but is no copy) */
       else if (news.getParentId() == 0 && child instanceof IBookMark) {
