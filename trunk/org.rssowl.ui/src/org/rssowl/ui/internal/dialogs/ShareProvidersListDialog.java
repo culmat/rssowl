@@ -111,12 +111,12 @@ public class ShareProvidersListDialog extends TitleAreaDialog {
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Title */
-    setTitle("Configure Share Providers");
+    setTitle("Configure Communities");
 
     /* Title Image */
     setTitleImage(OwlUI.getImage(fResources, "icons/wizban/share_wiz.gif"));
 
-    setMessage("Configure the order and enablement of share providers.");
+    setMessage("Configure the sort order and enablement of communities for sharing.");
 
     /* Composite to hold all components */
     Composite composite = new Composite(parent, SWT.NONE);
@@ -345,7 +345,7 @@ public class ShareProvidersListDialog extends TitleAreaDialog {
   @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
-    shell.setText("Configure Share Providers");
+    shell.setText("Configure Communities");
   }
 
   /*
