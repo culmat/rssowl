@@ -1675,7 +1675,7 @@
             icon="icons/obj16/share_yahoobuzz.gif"
             id="org.rssowl.ui.BuzzShareProvider"
             name="Buzz"
-            url="http://buzz.yahoo.com/submit/?submitUrl=[L]&amp;submitHeadline=[T]">
+            url="http://buzz.yahoo.com/buzz?targetUrl=[L]&amp;headline=[T]">
       </shareProvider>
       <shareProvider
             enabled="false"
