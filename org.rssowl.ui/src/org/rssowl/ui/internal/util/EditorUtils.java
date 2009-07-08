@@ -32,6 +32,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
@@ -52,7 +53,11 @@ public class EditorUtils {
         IEditorInput editorInput = reference.getEditorInput();
         if (editorInput instanceof FeedViewInput) {
           FeedViewInput feedViewInput = (FeedViewInput) editorInput;
-          if (feedViewInput.getMark().equals(input))
+          Object inputObj = feedViewInput.getMark();
+          if (inputObj instanceof FolderNewsMark)
+            inputObj = ((FolderNewsMark) inputObj).getFolder();
+
+          if (inputObj.equals(input))
             return reference;
         }
       } catch (PartInitException e) {
@@ -68,7 +73,7 @@ public class EditorUtils {
    */
   public static int getOpenEditorLimit() {
     IPreferenceScope preferences = Owl.getPreferenceService().getEclipseScope();
-    boolean isLimited= preferences.getBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS);
+    boolean isLimited = preferences.getBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS);
     if (!isLimited)
       return Integer.MAX_VALUE;
 
