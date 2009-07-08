@@ -27,8 +27,10 @@ package org.rssowl.ui.internal.editors.feed;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.ui.IElementFactory;
 import org.eclipse.ui.IMemento;
+import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.ui.internal.FolderNewsMark;
 
 /**
  * @author bpasero
@@ -44,18 +46,29 @@ public class FeedViewFactory implements IElementFactory {
     String inputId = memento.getString(FeedViewInput.MARK_INPUT_ID);
     if (inputId != null) {
       String inputClass = memento.getString(FeedViewInput.MARK_INPUT_CLASS);
-      try {
-        Class<?> klass = Class.forName(inputClass, true, Thread.currentThread().getContextClassLoader());
-        if (INewsMark.class.isAssignableFrom(klass)) {
-          Class<? extends INewsMark> markClass = klass.asSubclass(INewsMark.class);
-          INewsMark mark = DynamicDAO.load(markClass, Long.valueOf(inputId));
-          if (mark != null)
-            return new FeedViewInput(mark);
-        } else
-          throw new IllegalStateException(FeedViewInput.MARK_INPUT_CLASS + " does not implement IMark: " + inputClass);
-      } catch (ClassNotFoundException e) {
-        /* Should never happen */
-        throw new IllegalStateException(e);
+
+      /* Special Case Folders */
+      if (FolderNewsMark.class.getName().equals(inputClass)) {
+        IFolder folder = DynamicDAO.load(IFolder.class, Long.valueOf(inputId));
+        if (folder != null)
+          return new FeedViewInput(new FolderNewsMark(folder));
+      }
+
+      /* Normal NewsMark */
+      else {
+        try {
+          Class<?> klass = Class.forName(inputClass, true, Thread.currentThread().getContextClassLoader());
+          if (INewsMark.class.isAssignableFrom(klass)) {
+            Class<? extends INewsMark> markClass = klass.asSubclass(INewsMark.class);
+            INewsMark mark = DynamicDAO.load(markClass, Long.valueOf(inputId));
+            if (mark != null)
+              return new FeedViewInput(mark);
+          } else
+            throw new IllegalStateException(FeedViewInput.MARK_INPUT_CLASS + " does not implement IMark: " + inputClass);
+        } catch (ClassNotFoundException e) {
+          /* Should never happen */
+          throw new IllegalStateException(e);
+        }
       }
     }
 
