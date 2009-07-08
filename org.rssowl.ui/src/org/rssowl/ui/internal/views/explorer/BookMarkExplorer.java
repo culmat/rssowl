@@ -1201,7 +1201,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Share */
         final IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
-        if (selection.size() == 1 && selection.getFirstElement() instanceof IBookMark) {
+        if (getBookMark(selection) != null) {
           manager.add(new Separator("share"));
           MenuManager shareMenu = new MenuManager("Share Bookmark", OwlUI.SHARE, "sharebookmark");
           manager.add(shareMenu);
@@ -1217,9 +1217,9 @@ public class BookMarkExplorer extends ViewPart {
                     action.selectionChanged(null, selection);
                     action.run(null);
                   } else {
-                    Object obj = selection.getFirstElement();
-                    if (obj != null && obj instanceof IBookMark) {
-                      String shareLink = provider.toShareUrl((IBookMark) obj);
+                    IBookMark bookmark = getBookMark(selection);
+                    if (bookmark != null) {
+                      String shareLink = provider.toShareUrl(bookmark);
                       new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
                     }
                   }
@@ -1270,6 +1270,16 @@ public class BookMarkExplorer extends ViewPart {
     Menu menu = manager.createContextMenu(fViewer.getControl());
     fViewer.getControl().setMenu(menu);
     fViewSite.registerContextMenu(manager, fViewer);
+  }
+
+  private IBookMark getBookMark(IStructuredSelection selection) {
+    List<?> list = selection.toList();
+    for (Object object : list) {
+      if (object instanceof IBookMark)
+        return (IBookMark) object;
+    }
+
+    return null;
   }
 
   private void registerListeners() {
