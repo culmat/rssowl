@@ -42,6 +42,7 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
 import org.eclipse.jface.util.OpenStrategy;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -74,6 +75,7 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -211,6 +213,9 @@ public class OwlUI {
 
   /** Columns */
   public static final ImageDescriptor COLUMNS = Activator.getImageDescriptor("icons/etool16/columns.gif"); //$NON-NLS-1$
+
+  /** Share */
+  public static final ImageDescriptor SHARE = Activator.getImageDescriptor("icons/elcl16/share.gif"); //$NON-NLS-1$
 
   /** Group Foreground Color */
   public static final RGB GROUP_FG_COLOR = new RGB(0, 0, 128);
@@ -1156,6 +1161,30 @@ public class OwlUI {
       return null;
 
     return (IStructuredSelection) selectionProvider.getSelection();
+  }
+
+  /**
+   * Attempts to find the selection from the first active <code>Part</code> from
+   * the PlatformUI facade. Otherwise, returns <code>NULL</code> if none.
+   *
+   * @return the selection from the first active <code>Part</code> from the
+   * PlatformUI facade or <code>NULL</code> if none.
+   */
+  public static IStructuredSelection getActiveSelection() {
+    IWorkbenchPage page = getPage();
+    if (page != null) {
+      IWorkbenchPart part = page.getActivePart();
+      if (part != null && part.getSite() != null) {
+        ISelectionProvider selectionProvider = part.getSite().getSelectionProvider();
+        if (selectionProvider != null) {
+          ISelection selection = selectionProvider.getSelection();
+          if (!selection.isEmpty() && selection instanceof IStructuredSelection)
+            return (IStructuredSelection) selection;
+        }
+      }
+    }
+
+    return null;
   }
 
   /**
