@@ -507,7 +507,7 @@ public class BookMarkExplorer extends ViewPart {
       IEditorReference[] editorReferences = activePage.getEditorReferences();
       IEditorReference reference = EditorUtils.findEditor(editorReferences, element);
       if (reference != null)
-        activePage.bringToTop(reference.getPart(false));
+        activePage.bringToTop(reference.getPart(true));
     }
   }
 
