@@ -76,6 +76,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
+import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
@@ -111,10 +112,12 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.ShareProvider;
 import org.rssowl.ui.internal.StatusLineUpdater;
 import org.rssowl.ui.internal.actions.DeleteTypesAction;
 import org.rssowl.ui.internal.actions.EntityPropertyDialogAction;
@@ -122,10 +125,13 @@ import org.rssowl.ui.internal.actions.NewBookMarkAction;
 import org.rssowl.ui.internal.actions.NewFolderAction;
 import org.rssowl.ui.internal.actions.NewNewsBinAction;
 import org.rssowl.ui.internal.actions.NewSearchMarkAction;
+import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.actions.RetargetActions;
 import org.rssowl.ui.internal.actions.SearchInTypeAction;
+import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.dialogs.ManageSetsDialog;
+import org.rssowl.ui.internal.dialogs.ShareProvidersListDialog;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.EditorUtils;
@@ -1098,100 +1104,167 @@ public class BookMarkExplorer extends ViewPart {
 
   private void hookContextualMenu() {
     MenuManager manager = new MenuManager();
+    manager.setRemoveAllWhenShown(true);
+    manager.addMenuListener(new IMenuListener() {
+      public void menuAboutToShow(IMenuManager manager) {
 
-    /* New Menu */
-    MenuManager newMenu = new MenuManager("New");
-    manager.add(newMenu);
+        /* New Menu */
+        MenuManager newMenu = new MenuManager("New");
+        manager.add(newMenu);
 
-    /* New BookMark */
-    Action newBookmarkAction = new Action("Bookmark...") {
-      @Override
-      public void run() {
-        IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
-        IFolder parent = getParent(selection);
-        IMark position = (IMark) ((selection.getFirstElement() instanceof IMark) ? selection.getFirstElement() : null);
-        new NewBookMarkAction(fViewSite.getShell(), parent, position).run(null);
+        /* New BookMark */
+        Action newBookmarkAction = new Action("Bookmark...") {
+          @Override
+          public void run() {
+            IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
+            IFolder parent = getParent(selection);
+            IMark position = (IMark) ((selection.getFirstElement() instanceof IMark) ? selection.getFirstElement() : null);
+            new NewBookMarkAction(fViewSite.getShell(), parent, position).run(null);
+          }
+
+          @Override
+          public ImageDescriptor getImageDescriptor() {
+            return OwlUI.BOOKMARK;
+          }
+        };
+        newBookmarkAction.setId("org.rssowl.ui.actions.NewBookMark");
+        newBookmarkAction.setActionDefinitionId("org.rssowl.ui.actions.NewBookMark");
+        newMenu.add(newBookmarkAction);
+
+        /* New NewsBin */
+        Action newNewsBinAction = new Action("News Bin...") {
+          @Override
+          public void run() {
+            IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
+            IFolder parent = getParent(selection);
+            IMark position = (IMark) ((selection.getFirstElement() instanceof IMark) ? selection.getFirstElement() : null);
+            new NewNewsBinAction(fViewSite.getShell(), parent, position).run(null);
+          }
+
+          @Override
+          public ImageDescriptor getImageDescriptor() {
+            return OwlUI.NEWSBIN;
+          }
+        };
+        newNewsBinAction.setId("org.rssowl.ui.actions.NewNewsBin");
+        newNewsBinAction.setActionDefinitionId("org.rssowl.ui.actions.NewNewsBin");
+        newMenu.add(newNewsBinAction);
+
+        /* New Saved Search */
+        Action newSavedSearchAction = new Action("Saved Search...") {
+          @Override
+          public void run() {
+            IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
+            IFolder parent = getParent(selection);
+            IMark position = (IMark) ((selection.getFirstElement() instanceof IMark) ? selection.getFirstElement() : null);
+            new NewSearchMarkAction(fViewSite.getShell(), parent, position).run(null);
+          }
+
+          @Override
+          public ImageDescriptor getImageDescriptor() {
+            return OwlUI.SEARCHMARK;
+          }
+        };
+        newSavedSearchAction.setId("org.rssowl.ui.actions.NewSearchMark");
+        newSavedSearchAction.setActionDefinitionId("org.rssowl.ui.actions.NewSearchMark");
+        newMenu.add(newSavedSearchAction);
+
+        /* New Folder */
+        newMenu.add(new Separator());
+        Action newFolderAction = new Action("Folder...") {
+          @Override
+          public void run() {
+            IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
+            IFolder parent = getParent(selection);
+            IMark position = (IMark) ((selection.getFirstElement() instanceof IMark) ? selection.getFirstElement() : null);
+            new NewFolderAction(fViewSite.getShell(), parent, position).run(null);
+          }
+
+          @Override
+          public ImageDescriptor getImageDescriptor() {
+            return OwlUI.FOLDER;
+          }
+        };
+        newFolderAction.setId("org.rssowl.ui.actions.NewFolder");
+        newFolderAction.setActionDefinitionId("org.rssowl.ui.actions.NewFolder");
+        newMenu.add(newFolderAction);
+
+        manager.add(new GroupMarker(IWorkbenchActionConstants.NEW_EXT));
+
+        /* Mark Read */
+        manager.add(new Separator(OwlUI.M_MARK));
+
+        /* Search News */
+        manager.add(new Separator());
+        manager.add(new SearchInTypeAction(fViewSite.getWorkbenchWindow(), fViewer));
+        manager.add(new GroupMarker(IWorkbenchActionConstants.FIND_EXT));
+
+        /* Share */
+        final IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
+        if (selection.size() == 1 && selection.getFirstElement() instanceof IBookMark) {
+          manager.add(new Separator("share"));
+          MenuManager shareMenu = new MenuManager("Share Bookmark", OwlUI.SHARE, "sharebookmark");
+          manager.add(shareMenu);
+
+          List<ShareProvider> providers = Controller.getDefault().getShareProviders();
+          for (final ShareProvider provider : providers) {
+            if (provider.isEnabled()) {
+              shareMenu.add(new Action(provider.getName()) {
+                @Override
+                public void run() {
+                  if (SendLinkAction.ID.equals(provider.getId())) {
+                    IActionDelegate action = new SendLinkAction();
+                    action.selectionChanged(null, selection);
+                    action.run(null);
+                  } else {
+                    Object obj = selection.getFirstElement();
+                    if (obj != null && obj instanceof IBookMark) {
+                      String shareLink = provider.toShareUrl((IBookMark) obj);
+                      new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
+                    }
+                  }
+                };
+
+                @Override
+                public ImageDescriptor getImageDescriptor() {
+                  if (StringUtils.isSet(provider.getIconPath()))
+                    return OwlUI.getImageDescriptor(provider.getIconPath());
+
+                  return super.getImageDescriptor();
+                };
+
+                @Override
+                public boolean isEnabled() {
+                  return !selection.isEmpty();
+                };
+
+                @Override
+                public String getActionDefinitionId() {
+                  return SendLinkAction.ID.equals(provider.getId()) ? SendLinkAction.ID : super.getActionDefinitionId();
+                }
+
+                @Override
+                public String getId() {
+                  return SendLinkAction.ID.equals(provider.getId()) ? SendLinkAction.ID : super.getId();
+                }
+              });
+            }
+          }
+
+          /* Configure Providers */
+          shareMenu.add(new Separator());
+          shareMenu.add(new Action("&Configure...") {
+            @Override
+            public void run() {
+              new ShareProvidersListDialog(fViewer.getTree().getShell()).open();
+            };
+          });
+        }
+
+        /* Allow Contributions */
+        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
       }
-
-      @Override
-      public ImageDescriptor getImageDescriptor() {
-        return OwlUI.BOOKMARK;
-      }
-    };
-    newBookmarkAction.setId("org.rssowl.ui.actions.NewBookMark");
-    newBookmarkAction.setActionDefinitionId("org.rssowl.ui.actions.NewBookMark");
-    newMenu.add(newBookmarkAction);
-
-    /* New NewsBin */
-    Action newNewsBinAction = new Action("News Bin...") {
-      @Override
-      public void run() {
-        IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
-        IFolder parent = getParent(selection);
-        IMark position = (IMark) ((selection.getFirstElement() instanceof IMark) ? selection.getFirstElement() : null);
-        new NewNewsBinAction(fViewSite.getShell(), parent, position).run(null);
-      }
-
-      @Override
-      public ImageDescriptor getImageDescriptor() {
-        return OwlUI.NEWSBIN;
-      }
-    };
-    newNewsBinAction.setId("org.rssowl.ui.actions.NewNewsBin");
-    newNewsBinAction.setActionDefinitionId("org.rssowl.ui.actions.NewNewsBin");
-    newMenu.add(newNewsBinAction);
-
-    /* New Saved Search */
-    Action newSavedSearchAction = new Action("Saved Search...") {
-      @Override
-      public void run() {
-        IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
-        IFolder parent = getParent(selection);
-        IMark position = (IMark) ((selection.getFirstElement() instanceof IMark) ? selection.getFirstElement() : null);
-        new NewSearchMarkAction(fViewSite.getShell(), parent, position).run(null);
-      }
-
-      @Override
-      public ImageDescriptor getImageDescriptor() {
-        return OwlUI.SEARCHMARK;
-      }
-    };
-    newSavedSearchAction.setId("org.rssowl.ui.actions.NewSearchMark");
-    newSavedSearchAction.setActionDefinitionId("org.rssowl.ui.actions.NewSearchMark");
-    newMenu.add(newSavedSearchAction);
-
-    /* New Folder */
-    newMenu.add(new Separator());
-    Action newFolderAction = new Action("Folder...") {
-      @Override
-      public void run() {
-        IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
-        IFolder parent = getParent(selection);
-        IMark position = (IMark) ((selection.getFirstElement() instanceof IMark) ? selection.getFirstElement() : null);
-        new NewFolderAction(fViewSite.getShell(), parent, position).run(null);
-      }
-
-      @Override
-      public ImageDescriptor getImageDescriptor() {
-        return OwlUI.FOLDER;
-      }
-    };
-    newFolderAction.setId("org.rssowl.ui.actions.NewFolder");
-    newFolderAction.setActionDefinitionId("org.rssowl.ui.actions.NewFolder");
-    newMenu.add(newFolderAction);
-
-    manager.add(new GroupMarker(IWorkbenchActionConstants.NEW_EXT));
-
-    /* Mark Read */
-    manager.add(new Separator(OwlUI.M_MARK));
-
-    /* Search News */
-    manager.add(new Separator());
-    manager.add(new SearchInTypeAction(fViewSite.getWorkbenchWindow(), fViewer));
-    manager.add(new GroupMarker(IWorkbenchActionConstants.FIND_EXT));
-
-    /* Allow Contributions */
-    manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+    });
 
     /* Create and Register with Workbench */
     Menu menu = manager.createContextMenu(fViewer.getControl());

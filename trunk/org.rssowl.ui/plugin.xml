@@ -4,7 +4,7 @@
    <extension-point id="EntityPropertyPage" name="Entity Property Page" schema="schema/EntityPropertyPage.exsd"/>
    <extension-point id="KeywordFeed" name="Keyword Feed" schema="schema/KeywordFeed.exsd"/>
    <extension-point id="NewsActionPresentation" name="News Action Presentation" schema="schema/NewsActionPresentation.exsd"/>
-   <extension-point id="ShareNewsProvider" name="Share News Provider" schema="schema/ShareNewsProvider.exsd"/>
+   <extension-point id="ShareProvider" name="Share Provider" schema="schema/ShareProvider.exsd"/>
 
    <extension
          id="rssowl"
@@ -651,6 +651,7 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            defaultHandler="org.rssowl.ui.internal.handler.CopyLinkHandler"
             id="org.rssowl.ui.CopyLinkAction"
             name="Copy Link">
       </command>
@@ -1106,42 +1107,6 @@
       </objectContribution>
       <objectContribution
             adaptable="false"
-            id="org.rssowl.ui.SendLinkContribution"
-            objectClass="org.rssowl.core.persist.IBookMark">
-         <action
-               class="org.rssowl.ui.internal.actions.SendLinkAction"
-               definitionId="org.rssowl.ui.SendLinkAction"
-               id="org.rssowl.ui.SendLinkAction"
-               label="Send Link"
-               menubarPath="copy"
-               style="push">
-         </action>
-      </objectContribution>
-      <objectContribution
-            adaptable="false"
-            id="org.rssowl.ui.CopyLinkContribution"
-            objectClass="java.lang.Object">
-         <action
-               class="org.rssowl.ui.internal.actions.CopyLinkAction"
-               definitionId="org.rssowl.ui.CopyLinkAction"
-               id="org.rssowl.ui.CopyLinkAction"
-               label="Copy Link"
-               menubarPath="copy"
-               style="push">
-         </action>
-         <visibility>
-            <or>
-               <objectClass
-                     name="org.rssowl.core.persist.IBookMark">
-               </objectClass>
-               <objectClass
-                     name="org.rssowl.core.persist.INews">
-               </objectClass>
-            </or>
-         </visibility>
-      </objectContribution>
-      <objectContribution
-            adaptable="false"
             id="org.rssowl.ui.OpenInBrowserContribution"
             objectClass="org.rssowl.core.persist.INews">
          <action
@@ -1591,56 +1556,133 @@
       </perspectiveExtension>
    </extension>
    <extension
-         point="org.rssowl.ui.ShareNewsProvider">
-      <shareNewsProvider
+         point="org.rssowl.ui.ShareProvider">
+      <shareProvider
+            enabled="true"
+            icon="icons/obj16/share_delicious.gif"
+            id="org.rssowl.ui.DeliciousShareProvider"
+            name="Delicious"
+            url="http://delicious.com/save?url=[L]&amp;title=[T]">
+      </shareProvider>
+      <shareProvider
+            enabled="true"
+            icon="icons/obj16/share_technorati.gif"
+            id="org.rssowl.ui.TechnoratiShareProvider"
+            name="Technorati"
+            url="http://www.technorati.com/faves/?add=[L]">
+      </shareProvider>
+      <shareProvider
+            enabled="true"
             icon="icons/obj16/share_fb.gif"
-            id="org.rssowl.ui.FacebookShareNewsProvider"
+            id="org.rssowl.ui.FacebookShareProvider"
             name="Facebook"
-            order="0"
             url="http://www.facebook.com/sharer.php?u=[L]&amp;t=[T]">
-      </shareNewsProvider>
-      <shareNewsProvider
+      </shareProvider>
+      <shareProvider
+            enabled="true"
             icon="icons/obj16/share_digg.gif"
-            id="org.rssowl.ui.DiggShareNewsProvider"
+            id="org.rssowl.ui.DiggShareProvider"
             maxTitleLength="75"
             name="Digg"
-            order="3"
             url="http://digg.com/submit?url=[L]&amp;title=[T]">
-      </shareNewsProvider>
-      <shareNewsProvider
-            icon="icons/obj16/share_delicious.gif"
-            id="org.rssowl.ui.DeliciousShareNewsProvider"
-            name="Delicious"
-            order="6"
-            url="http://delicious.com/save?url=[L]&amp;title=[T]">
-      </shareNewsProvider>
-      <shareNewsProvider
-            icon="icons/obj16/share_technorati.gif"
-            id="org.rssowl.ui.TechnoratiShareNewsProvider"
-            name="Technorati"
-            order="9"
-            url="http://www.technorati.com/faves/?add=[L]">
-      </shareNewsProvider>
-      <shareNewsProvider
+      </shareProvider>
+      <shareProvider
+            enabled="true"
             icon="icons/obj16/share_twitter.gif"
-            id="org.rssowl.ui.TwitterShareNewsProvider"
+            id="org.rssowl.ui.TwitterShareProvider"
             name="Twitter"
-            order="12"
             url="http://twitter.com/home?status=[L]">
-      </shareNewsProvider>
-      <shareNewsProvider
+      </shareProvider>
+      <shareProvider
+            enabled="true"
+            icon="icons/obj16/share_mail.gif"
+            id="org.rssowl.ui.SendLinkAction"
+            name="E-Mail"
+            url="mailto">
+      </shareProvider>
+      <shareProvider
+            enabled="true"
+            icon="icons/obj16/share_printfriendly.gif"
+            id="org.rssowl.ui.PrintFriendlyShareProvider"
+            name="PrintFriendly"
+            url="http://www.printfriendly.com/print?url=[L]">
+      </shareProvider>
+      <shareProvider
+            enabled="false"
             icon="icons/obj16/share_stumbleupon.gif"
-            id="org.rssowl.ui.StumbleuponShareNewsProvider"
+            id="org.rssowl.ui.StumbleuponShareProvider"
             name="StumbleUpon"
-            order="15"
             url="http://www.stumbleupon.com/submit?url=[L]&amp;title=[T]">
-      </shareNewsProvider>
-      <shareNewsProvider
+      </shareProvider>
+      <shareProvider
+            enabled="false"
             icon="icons/obj16/share_google.gif"
-            id="org.rssowl.ui.GoogleShareNewsProvider"
+            id="org.rssowl.ui.GoogleShareProvider"
             name="Google"
-            order="18"
             url="http://www.google.com/bookmarks/mark?op=edit&amp;bkmk=[L]&amp;title=[T]">
-      </shareNewsProvider>
+      </shareProvider>
+      <shareProvider
+            enabled="false"
+            icon="icons/obj16/share_reddit.gif"
+            id="org.rssowl.ui.RedditShareProvider"
+            name="Reddit"
+            url="http://www.reddit.com/submit?url=[L]&amp;title=[T]">
+      </shareProvider>
+      <shareProvider
+            enabled="false"
+            icon="icons/obj16/share_mixx.gif"
+            id="org.rssowl.ui.MixxShareProvider"
+            name="Mixx"
+            url="http://www.mixx.com/submit?page_url=[L]&amp;title=[T]">
+      </shareProvider>
+      <shareProvider
+            enabled="false"
+            icon="icons/obj16/share_friendfeed.gif"
+            id="org.rssowl.ui.FriendFeedShareProvider"
+            name="FriendFeed"
+            url="http://friendfeed.com/share?url=[L]&amp;title=[T]">
+      </shareProvider>
+      <shareProvider
+            enabled="false"
+            icon="icons/obj16/share_mrwong.gif"
+            id="org.rssowl.ui.MisterWongShareProvider"
+            name="Mister Wong"
+            url="http://www.mister-wong.com/index.php?action=addurl&amp;bm_url=[L]&amp;bm_description=[T]">
+      </shareProvider>
+      <shareProvider
+            enabled="false"
+            icon="icons/obj16/share_newsvine.gif"
+            id="org.rssowl.ui.NewsvineShareProvider"
+            name="Newsvine"
+            url="http://www.newsvine.com/_tools/seed&amp;save?u=[L]&amp;h=[T]">
+      </shareProvider>
+      <shareProvider
+            enabled="false"
+            icon="icons/obj16/share_myspace.gif"
+            id="org.rssowl.ui.MyspaceShareProvider"
+            name="MySpace"
+            url="http://www.myspace.com/Modules/PostTo/Pages/?l=3&amp;u=[L]&amp;t=[T]">
+      </shareProvider>
+      <shareProvider
+            enabled="false"
+            icon="icons/obj16/share_slashdot.gif"
+            id="org.rssowl.ui.SlashdotShareProvider"
+            name="Slashdot"
+            url="http://slashdot.org/bookmark.pl?title=[T]&amp;url=[L]">
+      </shareProvider>
+      <shareProvider
+            enabled="false"
+            icon="icons/obj16/share_yahoobuzz.gif"
+            id="org.rssowl.ui.BuzzShareProvider"
+            name="Buzz"
+            url="http://buzz.yahoo.com/submit/?submitUrl=[L]&amp;submitHeadline=[T]">
+      </shareProvider>
+      <shareProvider
+            enabled="false"
+            icon="icons/obj16/share_diigo.gif"
+            id="org.rssowl.ui.DiigoShareProvider"
+            name="Diigo"
+            url="http://secure.diigo.com/post?url=[L]&amp;title=[T]">
+      </shareProvider>
    </extension>
 </plugin>

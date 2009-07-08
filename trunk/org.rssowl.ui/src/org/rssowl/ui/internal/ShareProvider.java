@@ -24,47 +24,48 @@
 
 package org.rssowl.ui.internal;
 
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 
 /**
- * Instances of {@link ShareNewsProvider} are used to allow for sharing of news
+ * Instances of {@link ShareProvider} are used to allow for sharing of news
  * items with services. They can be contributed using the
- * <cod>ShareNewsProvider</code> extension point.
+ * <cod>ShareProvider</code> extension point.
  *
  * @author bpasero
  */
-public class ShareNewsProvider {
+public class ShareProvider {
   private static final String URL_INPUT_TOKEN = "[L]";
   private static final String TITLE_INPUT_TOKEN = "[T]";
 
   private final String fId;
+  private final int fIndex;
   private final String fName;
   private final String fIconPath;
   private final String fUrl;
-  private final int fOrder;
   private final int fMaxTitleLength;
+  private boolean fEnabled;
 
   /**
    * @param id the unique id of the contributed provider.
+   * @param index the index of the provider for sorting.
    * @param name the name of the provider.
    * @param iconPath the path to an icon of the provider.
    * @param url the templated URL to share with.
-   * @param order the order of the provider.
    * @param maxTitleLength a limit for the title.
+   * @param enabled <code>true</code> if this provider is enabled and
+   * <code>false</code> otherwise.
    */
-  public ShareNewsProvider(String id, String name, String iconPath, String url, String order, String maxTitleLength) {
+  public ShareProvider(String id, int index, String name, String iconPath, String url, String maxTitleLength, boolean enabled) {
     fId = id;
+    fIndex = index;
     fName = name;
     fIconPath = iconPath;
     fUrl = url;
-
-    if (order != null)
-      fOrder = Integer.parseInt(order);
-    else
-      fOrder = Integer.MAX_VALUE;
+    fEnabled = enabled;
 
     if (maxTitleLength != null)
       fMaxTitleLength = Integer.parseInt(maxTitleLength);
@@ -77,6 +78,13 @@ public class ShareNewsProvider {
    */
   public String getId() {
     return fId;
+  }
+
+  /**
+   * @return the index of the provider used for sorting.
+   */
+  public int getIndex() {
+    return fIndex;
   }
 
   /**
@@ -94,22 +102,52 @@ public class ShareNewsProvider {
   }
 
   /**
-   * @return the order of the provider.
+   * @param enabled <code>true</code> if this provider is enabled and
+   * <code>false</code> otherwise.
    */
-  public int getOrder() {
-    return fOrder;
+  public void setEnabled(boolean enabled) {
+    fEnabled = enabled;
+  }
+
+  /**
+   * @return <code>true</code> if this provider is enabled and
+   * <code>false</code> otherwise.
+   */
+  public boolean isEnabled() {
+    return fEnabled;
   }
 
   /**
    * @param news the news to share.
-   * @return a link that can be used to share the link with this provider.
+   * @return a link that can be used to share the news with this provider.
    */
   public String toShareUrl(INews news) {
     String link = CoreUtils.getLink(news);
+    String title = CoreUtils.getHeadline(news, true);
+
+    return toShareUrl(link, title);
+  }
+
+  /**
+   * @param mark the bookmark to share.
+   * @return a link that can be used to share the bookmark with this provider.
+   */
+  public String toShareUrl(IBookMark mark) {
+    String link = mark.getFeedLinkReference().getLinkAsText();
+    String title = mark.getName();
+
+    return toShareUrl(link, title);
+  }
+
+  /**
+   * @param link the link to share.
+   * @param title a title for the link to share.
+   * @return a link that can be used to share the link with this provider.
+   */
+  public String toShareUrl(String link, String title) {
     if (!StringUtils.isSet(link))
       link = "";
 
-    String title = CoreUtils.getHeadline(news, true);
     if (!StringUtils.isSet(title))
       title = "";
 
@@ -158,7 +196,7 @@ public class ShareNewsProvider {
     if (getClass() != obj.getClass())
       return false;
 
-    ShareNewsProvider other = (ShareNewsProvider) obj;
+    ShareProvider other = (ShareProvider) obj;
     if (fId == null) {
       if (other.fId != null)
         return false;

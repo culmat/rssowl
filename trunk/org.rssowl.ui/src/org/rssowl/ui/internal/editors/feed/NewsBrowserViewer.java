@@ -76,7 +76,7 @@ import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.ShareNewsProvider;
+import org.rssowl.ui.internal.ShareProvider;
 import org.rssowl.ui.internal.actions.AssignLabelsAction;
 import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
@@ -87,6 +87,7 @@ import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
+import org.rssowl.ui.internal.dialogs.ShareProvidersListDialog;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider.Dynamic;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
 import org.rssowl.ui.internal.undo.StickyOperation;
@@ -197,55 +198,56 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         /* Share */
         {
           manager.add(new Separator("share"));
-          MenuManager shareMenu = new MenuManager("Share News", "sharenews");
+          MenuManager shareMenu = new MenuManager("Share News", OwlUI.SHARE, "sharenews");
           manager.add(shareMenu);
 
-          List<ShareNewsProvider> providers = Controller.getDefault().getShareNewsProviders();
-          for (final ShareNewsProvider provider : providers) {
-            shareMenu.add(new Action(provider.getName()) {
-              @Override
-              public void run() {
-                Object obj = fCurrentSelection.getFirstElement();
-                if (obj != null && obj instanceof INews) {
-                  String shareLink = provider.toShareUrl((INews) obj);
-                  new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
+          List<ShareProvider> providers = Controller.getDefault().getShareProviders();
+          for (final ShareProvider provider : providers) {
+            if (provider.isEnabled()) {
+              shareMenu.add(new Action(provider.getName()) {
+                @Override
+                public void run() {
+                  if (SendLinkAction.ID.equals(provider.getId())) {
+                    IActionDelegate action = new SendLinkAction();
+                    action.selectionChanged(null, fCurrentSelection);
+                    action.run(null);
+                  } else {
+                    Object obj = fCurrentSelection.getFirstElement();
+                    if (obj != null && obj instanceof INews) {
+                      String shareLink = provider.toShareUrl((INews) obj);
+                      new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
+                    }
+                  }
+                };
+
+                @Override
+                public ImageDescriptor getImageDescriptor() {
+                  if (StringUtils.isSet(provider.getIconPath()))
+                    return OwlUI.getImageDescriptor(provider.getIconPath());
+
+                  return super.getImageDescriptor();
+                };
+
+                @Override
+                public String getActionDefinitionId() {
+                  return SendLinkAction.ID.equals(provider.getId()) ? SendLinkAction.ID : super.getActionDefinitionId();
                 }
-              };
 
-              @Override
-              public ImageDescriptor getImageDescriptor() {
-                if (StringUtils.isSet(provider.getIconPath()))
-                  return OwlUI.getImageDescriptor(provider.getIconPath());
-
-                return super.getImageDescriptor();
-              };
-            });
+                @Override
+                public String getId() {
+                  return SendLinkAction.ID.equals(provider.getId()) ? SendLinkAction.ID : super.getId();
+                }
+              });
+            }
           }
 
-          /* Send Link */
+          /* Configure Providers */
           shareMenu.add(new Separator());
-          shareMenu.add(new Action("&E-Mail") {
+          shareMenu.add(new Action("&Configure...") {
             @Override
             public void run() {
-              IActionDelegate action = new SendLinkAction();
-              action.selectionChanged(null, fCurrentSelection);
-              action.run(null);
-            }
-
-            @Override
-            public boolean isEnabled() {
-              return !fCurrentSelection.isEmpty();
-            }
-
-            @Override
-            public String getActionDefinitionId() {
-              return SendLinkAction.ID;
-            }
-
-            @Override
-            public String getId() {
-              return SendLinkAction.ID;
-            }
+              new ShareProvidersListDialog(fBrowser.getControl().getShell()).open();
+            };
           });
         }
 
@@ -417,37 +419,43 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     manager.setRemoveAllWhenShown(true);
     manager.addMenuListener(new IMenuListener() {
       public void menuAboutToShow(IMenuManager manager) {
-        List<ShareNewsProvider> providers = Controller.getDefault().getShareNewsProviders();
-        for (final ShareNewsProvider provider : providers) {
-          manager.add(new Action(provider.getName()) {
-            @Override
-            public void run() {
-              Object obj = fCurrentSelection.getFirstElement();
-              if (obj != null && obj instanceof INews) {
-                String shareLink = provider.toShareUrl((INews) obj);
-                new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
-              }
-            };
+        List<ShareProvider> providers = Controller.getDefault().getShareProviders();
+        for (final ShareProvider provider : providers) {
+          if (provider.isEnabled()) {
+            manager.add(new Action(provider.getName()) {
+              @Override
+              public void run() {
+                if (SendLinkAction.ID.equals(provider.getId())) {
+                  IActionDelegate action = new SendLinkAction();
+                  action.selectionChanged(null, fCurrentSelection);
+                  action.run(null);
+                } else {
+                  Object obj = fCurrentSelection.getFirstElement();
+                  if (obj != null && obj instanceof INews) {
+                    String shareLink = provider.toShareUrl((INews) obj);
+                    new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
+                  }
+                }
+              };
 
-            @Override
-            public ImageDescriptor getImageDescriptor() {
-              if (StringUtils.isSet(provider.getIconPath()))
-                return OwlUI.getImageDescriptor(provider.getIconPath());
+              @Override
+              public ImageDescriptor getImageDescriptor() {
+                if (StringUtils.isSet(provider.getIconPath()))
+                  return OwlUI.getImageDescriptor(provider.getIconPath());
 
-              return super.getImageDescriptor();
-            };
-          });
+                return super.getImageDescriptor();
+              };
+            });
+          }
         }
 
-        /* Send Link */
+        /* Configure Providers */
         manager.add(new Separator());
-        manager.add(new Action("&E-Mail") {
+        manager.add(new Action("&Configure...") {
           @Override
           public void run() {
-            IActionDelegate action = new SendLinkAction();
-            action.selectionChanged(null, fCurrentSelection);
-            action.run(null);
-          }
+            new ShareProvidersListDialog(fBrowser.getControl().getShell()).open();
+          };
         });
       }
     });

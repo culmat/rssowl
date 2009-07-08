@@ -111,8 +111,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -206,7 +204,7 @@ public class Controller {
   private ContextService fContextService;
 
   /* Share News Provider Extension Point */
-  private static final String SHARE_NEWS_PROVIDER_EXTENSION_POINT = "org.rssowl.ui.ShareNewsProvider";
+  private static final String SHARE_PROVIDER_EXTENSION_POINT = "org.rssowl.ui.ShareProvider";
 
   /* Misc. */
   private final IApplicationService fAppService;
@@ -223,7 +221,7 @@ public class Controller {
   private LabelAdapter fLabelListener;
   private List<BookMarkLoadListener> fBookMarkLoadListeners = new ArrayList<BookMarkLoadListener>(1);
   private final int fConnectionTimeout;
-  private List<ShareNewsProvider> fShareNewsProviders = new ArrayList<ShareNewsProvider>();
+  private List<ShareProvider> fShareProviders = new ArrayList<ShareProvider>();
 
   /**
    * A listener that informs when a {@link IBookMark} is getting reloaded from
@@ -871,38 +869,65 @@ public class Controller {
     });
 
     /* Load Contributed News Share Providers */
-    loadShareNewsProviders();
+    loadShareProviders();
   }
 
-  private void loadShareNewsProviders() {
+  private void loadShareProviders() {
     IExtensionRegistry reg = Platform.getExtensionRegistry();
-    IConfigurationElement elements[] = reg.getConfigurationElementsFor(SHARE_NEWS_PROVIDER_EXTENSION_POINT);
+    IConfigurationElement elements[] = reg.getConfigurationElementsFor(SHARE_PROVIDER_EXTENSION_POINT);
 
     /* For each contributed property keyword feed */
-    for (IConfigurationElement element : elements) {
+    for (int i = 0; i < elements.length; i++) {
+      IConfigurationElement element = elements[i];
+
       String id = element.getAttribute("id");
       String name = element.getAttribute("name");
       String iconPath = element.getAttribute("icon"); //TODO Support loading icon from different plugin
       String url = element.getAttribute("url");
-      String order = element.getAttribute("order");
       String maxTitleLength = element.getAttribute("maxTitleLength");
+      String enabled = element.getAttribute("enabled");
 
-      fShareNewsProviders.add(new ShareNewsProvider(id, name, iconPath, url, order, maxTitleLength));
+      boolean isEnabled = (enabled != null && Boolean.parseBoolean(enabled));
+      fShareProviders.add(new ShareProvider(id, i, name, iconPath, url, maxTitleLength, isEnabled));
     }
-
-    Collections.sort(fShareNewsProviders, new Comparator<ShareNewsProvider>() {
-      public int compare(ShareNewsProvider p1, ShareNewsProvider p2) {
-        return p1.getOrder() < p2.getOrder() ? -1 : 1;
-      }
-    });
   }
 
   /**
    * @return a sorted {@link List} of all contributed providers for sharing
-   * news.
+   * links.
    */
-  public List<ShareNewsProvider> getShareNewsProviders() {
-    return fShareNewsProviders;
+  public List<ShareProvider> getShareProviders() {
+    IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
+    int[] providerState = preferences.getIntegers(DefaultPreferences.SHARE_PROVIDER_STATE);
+
+    /* Ignore State if Number of Providers got smaller */
+    if (providerState.length > fShareProviders.size())
+      return fShareProviders;
+
+    List<ShareProvider> sortedProviders = new ArrayList<ShareProvider>();
+    for (int i = 0; i < providerState.length; i++) {
+      int providerIndex = providerState[i];
+      boolean enabled = providerIndex > 0;
+      if (providerIndex < 0)
+        providerIndex = providerIndex * -1;
+      providerIndex--; //Adjust to zero-indexing
+
+      if (providerIndex < fShareProviders.size()) {
+        ShareProvider provider = fShareProviders.get(providerIndex);
+        provider.setEnabled(enabled);
+        sortedProviders.add(provider);
+      }
+    }
+
+    /* Add missing ones as disabled if any (can happen for new contributions) */
+    for (ShareProvider shareProvider : fShareProviders) {
+      if (!sortedProviders.contains(shareProvider)) {
+        shareProvider.setEnabled(false);
+        sortedProviders.add(shareProvider);
+      }
+    }
+
+    return sortedProviders;
   }
 
   /**
