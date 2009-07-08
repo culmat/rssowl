@@ -125,9 +125,6 @@ public class FeedViewInput implements IEditorInput {
     if (!restore)
       return null;
 
-    if (fMark instanceof FolderNewsMark)
-      return null;
-
     return new IPersistableElement() {
       public String getFactoryId() {
         return FACTORY_ID;
