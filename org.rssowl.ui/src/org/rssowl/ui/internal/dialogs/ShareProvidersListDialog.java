@@ -213,7 +213,44 @@ public class ShareProvidersListDialog extends TitleAreaDialog {
       }
     });
 
+    /* Select All */
+    Button selectAllButton = new Button(buttonContainer, SWT.PUSH);
+    selectAllButton.setText("Select &All");
+    setButtonLayoutData(selectAllButton);
+    ((GridData) selectAllButton.getLayoutData()).verticalAlignment = SWT.END;
+    ((GridData) selectAllButton.getLayoutData()).grabExcessVerticalSpace = true;
+    selectAllButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        onSelectAll(false);
+      }
+    });
+
+    /* De-Select All */
+    Button deSelectAllButton = new Button(buttonContainer, SWT.PUSH);
+    deSelectAllButton.setText("&Deselect All");
+    setButtonLayoutData(deSelectAllButton);
+    deSelectAllButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        onSelectAll(true);
+      }
+    });
+
     return composite;
+  }
+
+  private void onSelectAll(boolean deselect) {
+    TableItem[] items = fViewer.getTable().getItems();
+    for (int i = 0; i < items.length; i++) {
+      TableItem tableItem = items[i];
+      ShareProvider provider = (ShareProvider) tableItem.getData();
+      provider.setEnabled(!deselect);
+      fViewer.setChecked(provider, !deselect);
+    }
+
+    save();
+    fViewer.refresh();
   }
 
   private void save() {
