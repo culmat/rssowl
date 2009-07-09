@@ -24,11 +24,14 @@
 
 package org.rssowl.ui.internal.dialogs.cleanup;
 
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
@@ -57,6 +60,7 @@ public class CleanUpOptionsPage extends WizardPage {
   private Button fDeleteReadNewsCheck;
   private Button fNeverDeleteUnreadNewsCheck;
   private IPreferenceScope fGlobalScope;
+  private LocalResourceManager fResources;
 
   /**
    * @param pageName
@@ -65,6 +69,7 @@ public class CleanUpOptionsPage extends WizardPage {
     super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/cleanup_wiz.gif"));
     setMessage("Please choose the desired operations that are used to clean up.");
     fGlobalScope = Owl.getPreferenceService().getGlobalScope();
+    fResources = new LocalResourceManager(JFaceResources.getResources());
   }
 
   /* Returns the selected clean up operations */
@@ -242,5 +247,28 @@ public class CleanUpOptionsPage extends WizardPage {
       fNeverDeleteUnreadNewsCheck.setText("Do not delete unread news");
       fNeverDeleteUnreadNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CLEAN_UP_NEVER_DEL_UNREAD_NEWS_STATE));
     }
+
+    /* Info Container */
+    Composite infoContainer = new Composite(container, SWT.None);
+    infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    ((GridLayout)infoContainer.getLayout()).marginTop = 5;
+
+    Label infoImg = new Label(infoContainer, SWT.NONE);
+    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
+    infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    Label infoText = new Label(infoContainer, SWT.WRAP);
+    infoText.setText("Note: Sticky and labeled News will not be deleted.");
+    infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+  }
+
+  /*
+   * @see org.eclipse.jface.dialogs.DialogPage#dispose()
+   */
+  @Override
+  public void dispose() {
+    super.dispose();
+    fResources.dispose();
   }
 }
