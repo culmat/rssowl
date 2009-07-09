@@ -30,15 +30,24 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.internal.newsaction.CopyNewsAction;
+import org.rssowl.core.internal.newsaction.LabelNewsAction;
+import org.rssowl.core.internal.newsaction.MoveNewsAction;
 import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPersistable;
+import org.rssowl.core.persist.ISearch;
+import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.SearchSpecifier;
@@ -66,7 +75,8 @@ public class OPMLImporter implements ITypeImporter {
   private final Namespace fRSSOwlNamespace = Namespace.getNamespace("rssowl", "http://www.rssowl.org");
 
   /*
-   * @see org.rssowl.core.interpreter.ITypeImporter#importFrom(org.jdom.Document)
+   * @see
+   * org.rssowl.core.interpreter.ITypeImporter#importFrom(org.jdom.Document)
    */
   public List<? extends IEntity> importFrom(Document document) {
     Element root = document.getRootElement();
@@ -85,10 +95,10 @@ public class OPMLImporter implements ITypeImporter {
     return null;
   }
 
-  private List<IFolder> processBody(Element body) {
+  private List<IEntity> processBody(Element body) {
     IFolder defaultRootFolder = Owl.getModelFactory().createFolder(null, null, "My Bookmarks");
-    List<IFolder> rootFolders = new ArrayList<IFolder>();
-    rootFolders.add(defaultRootFolder);
+    List<IEntity> importedEntities = new ArrayList<IEntity>();
+    importedEntities.add(defaultRootFolder);
 
     /* Interpret Children */
     List<?> feedChildren = body.getChildren();
@@ -98,10 +108,95 @@ public class OPMLImporter implements ITypeImporter {
 
       /* Process Outline */
       if ("outline".equals(name)) //$NON-NLS-1$
-        processOutline(child, defaultRootFolder, rootFolders);
+        processOutline(child, defaultRootFolder, importedEntities);
+
+      /* Process Label */
+      else if ("label".equals(name))
+        processLabel(child, importedEntities);
+
+      /* Process News Filter */
+      else if ("searchfilter".equals(name))
+        processFilter(child, importedEntities);
     }
 
-    return rootFolders;
+    return importedEntities;
+  }
+
+  private void processFilter(Element filterElement, List<IEntity> importedEntities) {
+    IModelFactory factory = Owl.getModelFactory();
+
+    String name = filterElement.getAttributeValue("name");
+    int order = Integer.parseInt(filterElement.getAttributeValue("order"));
+    boolean isEnabled = Boolean.parseBoolean(filterElement.getAttributeValue("enabled"));
+    boolean matchAllNews = Boolean.parseBoolean(filterElement.getAttributeValue("matchAllNews"));
+
+    /* Search if provided */
+    ISearch search = null;
+    Element searchElement = filterElement.getChild("search", fRSSOwlNamespace);
+    if (searchElement != null) {
+      search = factory.createSearch(null);
+      search.setMatchAllConditions(Boolean.parseBoolean(searchElement.getAttributeValue("matchAllConditions")));
+
+      /* Search Conditions */
+      List<?> conditions = searchElement.getChildren("searchcondition", fRSSOwlNamespace);
+      for (int i = 0; i < conditions.size(); i++) {
+        try {
+          Element condition = (Element) conditions.get(i);
+
+          ISearchCondition searchCondition = processSearchCondition(condition);
+          if (searchCondition != null)
+            search.addSearchCondition(searchCondition);
+        } catch (NumberFormatException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+        } catch (ParseException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+        }
+      }
+    }
+
+    /* Filter */
+    ISearchFilter filter = factory.createSearchFilter(null, search, name);
+    filter.setEnabled(isEnabled);
+    filter.setMatchAllNews(matchAllNews);
+    filter.setOrder(order);
+
+    /* Filter Actions */
+    List<?> actions = filterElement.getChildren("filteraction", fRSSOwlNamespace);
+    for (int i = 0; i < actions.size(); i++) {
+      Element action = (Element) actions.get(i);
+      String id = action.getAttributeValue("id");
+      String data = action.getAttributeValue("data");
+
+      IFilterAction filterAction = factory.createFilterAction(id);
+      if (data != null) {
+
+        /* Special case Label Action */
+        if (LabelNewsAction.ID.equals(id)) {
+          Long labelId = Long.parseLong(data);
+          filterAction.setData(labelId);
+        }
+
+        /* Special case Move/Copy Action */
+        else if (MoveNewsAction.ID.equals(id) || CopyNewsAction.ID.equals(id)) {
+          String[] binIds = data.split(",");
+          Long[] binIdsLong = new Long[binIds.length];
+          for (int j = 0; j < binIds.length; j++) {
+            binIdsLong[j] = Long.parseLong(binIds[j]);
+          }
+
+          filterAction.setData(binIdsLong);
+        }
+
+        /* Any other Action */
+        else {
+          filterAction.setData(data);
+        }
+      }
+
+      filter.addAction(filterAction);
+    }
+
+    importedEntities.add(filter);
   }
 
   private void processSavedSearch(Element savedSearchElement, IFolder folder) {
@@ -116,32 +211,41 @@ public class OPMLImporter implements ITypeImporter {
       try {
         Element condition = (Element) conditions.get(i);
 
-        /* Search Specifier */
-        Element specifierElement = condition.getChild("searchspecifier", fRSSOwlNamespace);
-        SearchSpecifier searchSpecifier = SearchSpecifier.values()[Integer.parseInt(specifierElement.getAttributeValue("id"))];
-
-        /* Search Value */
-        Element valueElement = condition.getChild("searchvalue", fRSSOwlNamespace);
-        Object value = getValue(valueElement, fRSSOwlNamespace);
-
-        /* Search Field */
-        Element fieldElement = condition.getChild("searchfield", fRSSOwlNamespace);
-        String fieldName = fieldElement.getAttributeValue("name");
-        String entityName = fieldElement.getAttributeValue("entity");
-        ISearchField searchField = Owl.getModelFactory().createSearchField(getFieldID(fieldName), entityName);
-
-        /*
-         * Guard against null (Location Conditions may potentially lead to NULL
-         * if they are stale since they are not updated when locations change)
-         */
-        if (value != null)
-          searchmark.addSearchCondition(Owl.getModelFactory().createSearchCondition(searchField, searchSpecifier, value));
+        ISearchCondition searchCondition = processSearchCondition(condition);
+        if (searchCondition != null)
+          searchmark.addSearchCondition(searchCondition);
       } catch (NumberFormatException e) {
         Activator.getDefault().logError(e.getMessage(), e);
       } catch (ParseException e) {
         Activator.getDefault().logError(e.getMessage(), e);
       }
     }
+  }
+
+  private ISearchCondition processSearchCondition(Element conditionElement) throws ParseException {
+
+    /* Search Specifier */
+    Element specifierElement = conditionElement.getChild("searchspecifier", fRSSOwlNamespace);
+    SearchSpecifier searchSpecifier = SearchSpecifier.values()[Integer.parseInt(specifierElement.getAttributeValue("id"))];
+
+    /* Search Value */
+    Element valueElement = conditionElement.getChild("searchvalue", fRSSOwlNamespace);
+    Object value = getValue(valueElement, fRSSOwlNamespace);
+
+    /* Search Field */
+    Element fieldElement = conditionElement.getChild("searchfield", fRSSOwlNamespace);
+    String fieldName = fieldElement.getAttributeValue("name");
+    String entityName = fieldElement.getAttributeValue("entity");
+    ISearchField searchField = Owl.getModelFactory().createSearchField(getFieldID(fieldName), entityName);
+
+    /*
+     * Guard against null (Location Conditions may potentially lead to NULL if
+     * they are stale since they are not updated when locations change)
+     */
+    if (value != null)
+      return Owl.getModelFactory().createSearchCondition(searchField, searchSpecifier, value);
+
+    return null;
   }
 
   private int getFieldID(String fieldName) {
@@ -304,7 +408,7 @@ public class OPMLImporter implements ITypeImporter {
     return value;
   }
 
-  private void processOutline(Element outline, IPersistable parent, List<IFolder> setFolders) {
+  private void processOutline(Element outline, IPersistable parent, List<IEntity> importedEntities) {
     IEntity type = null;
     Long id = null;
     String title = null;
@@ -355,7 +459,7 @@ public class OPMLImporter implements ITypeImporter {
         type.setProperty(ID_KEY, id);
 
       if (isSet)
-        setFolders.add((IFolder) type);
+        importedEntities.add(type);
     }
 
     /* Outline is a BookMark */
@@ -397,7 +501,7 @@ public class OPMLImporter implements ITypeImporter {
 
       /* Process Outline */
       if ("outline".equals(name)) //$NON-NLS-1$
-        processOutline(child, type, setFolders);
+        processOutline(child, type, importedEntities);
 
       /* Process Saved Search */
       else if ("savedsearch".equals(name))
@@ -407,6 +511,20 @@ public class OPMLImporter implements ITypeImporter {
       else if ("newsbin".equals(name))
         processNewsBin(child, (IFolder) type);
     }
+  }
+
+  private void processLabel(Element labelElement, List<IEntity> importedEntities) {
+    String id = labelElement.getAttributeValue("id");
+    String name = labelElement.getAttributeValue("name");
+    String order = labelElement.getAttributeValue("order");
+    String color = labelElement.getAttributeValue("color");
+
+    ILabel label = Owl.getModelFactory().createLabel(null, name);
+    label.setColor(color);
+    label.setOrder(Integer.parseInt(order));
+    label.setProperty(ID_KEY, Long.valueOf(id));
+
+    importedEntities.add(label);
   }
 
   private void processNewsBin(Element newsBinElement, IFolder folder) {

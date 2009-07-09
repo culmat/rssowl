@@ -28,8 +28,11 @@ import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.util.CoreUtils;
 
@@ -50,9 +53,9 @@ public class ImportUtils {
    * @param oldIdToFolderChildMap
    * @param searches
    */
-  public static void updateLocationConditions(Map<Long, IFolderChild> oldIdToFolderChildMap, List<ISearchMark> searches) {
-    for (ISearchMark searchMark : searches) {
-      List<ISearchCondition> conditions = searchMark.getSearchConditions();
+  public static void updateLocationConditions(Map<Long, IFolderChild> oldIdToFolderChildMap, List<? extends ISearch> searches) {
+    for (ISearch search : searches) {
+      List<ISearchCondition> conditions = search.getSearchConditions();
       for (ISearchCondition condition : conditions) {
 
         /* Location Condition */
@@ -110,15 +113,61 @@ public class ImportUtils {
 
   /**
    * @param types
-   * @return List
+   * @return List of Saved Searches with Location Conditions.
    */
-  public static List<ISearchMark> getLocationConditionSearches(List<? extends IEntity> types) {
-    List<ISearchMark> locationConditionSearches = new ArrayList<ISearchMark>();
+  public static List<ISearchMark> getLocationConditionSavedSearches(List<? extends IEntity> types) {
+    List<ISearchMark> locationConditionSavedSearches = new ArrayList<ISearchMark>();
 
     for (IEntity entity : types)
-      fillLocationConditionSearches(locationConditionSearches, entity);
+      fillLocationConditionSavedSearches(locationConditionSavedSearches, entity);
+
+    return locationConditionSavedSearches;
+  }
+
+  /**
+   * @param filters
+   * @return List of Searches with Location Conditions.
+   */
+  public static List<ISearch> getLocationConditionSearchesFromFilters(List<ISearchFilter> filters) {
+    List<ISearch> locationConditionSearches = new ArrayList<ISearch>();
+
+    for (ISearchFilter filter : filters) {
+      ISearch search = filter.getSearch();
+      if (search != null && containsLocationCondition(search))
+        locationConditionSearches.add(search);
+    }
 
     return locationConditionSearches;
+  }
+
+  /**
+   * @param types
+   * @return List of Labels.
+   */
+  public static List<ILabel> getLabels(List<? extends IEntity> types) {
+    List<ILabel> labels = new ArrayList<ILabel>();
+
+    for (IEntity entity : types) {
+      if (entity instanceof ILabel)
+        labels.add((ILabel) entity);
+    }
+
+    return labels;
+  }
+
+  /**
+   * @param types
+   * @return List of Filters.
+   */
+  public static List<ISearchFilter> getFilters(List<? extends IEntity> types) {
+    List<ISearchFilter> filters = new ArrayList<ISearchFilter>();
+
+    for (IEntity entity : types) {
+      if (entity instanceof ISearchFilter)
+        filters.add((ISearchFilter) entity);
+    }
+
+    return filters;
   }
 
   /**
@@ -136,20 +185,20 @@ public class ImportUtils {
     return oldIdToEntityMap;
   }
 
-  private static void fillLocationConditionSearches(List<ISearchMark> searchmarks, IEntity entity) {
+  private static void fillLocationConditionSavedSearches(List<ISearchMark> searchmarks, IEntity entity) {
     if (entity instanceof ISearchMark && containsLocationCondition((ISearchMark) entity)) {
       searchmarks.add((ISearchMark) entity);
     } else if (entity instanceof IFolder) {
       IFolder folder = (IFolder) entity;
       List<IFolderChild> children = folder.getChildren();
       for (IFolderChild child : children) {
-        fillLocationConditionSearches(searchmarks, child);
+        fillLocationConditionSavedSearches(searchmarks, child);
       }
     }
   }
 
-  private static boolean containsLocationCondition(ISearchMark mark) {
-    List<ISearchCondition> searchConditions = mark.getSearchConditions();
+  private static boolean containsLocationCondition(ISearch search) {
+    List<ISearchCondition> searchConditions = search.getSearchConditions();
     for (ISearchCondition condition : searchConditions) {
       if (condition.getField().getId() == INews.LOCATION)
         return true;

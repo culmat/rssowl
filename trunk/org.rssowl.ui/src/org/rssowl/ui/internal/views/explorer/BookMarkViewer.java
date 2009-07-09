@@ -42,6 +42,8 @@ import org.eclipse.swt.widgets.Widget;
 import org.rssowl.ui.internal.util.TreeItemAdapter;
 import org.rssowl.ui.internal.util.ViewerOpenStrategy;
 
+import java.util.List;
+
 /**
  * A Subclass of <code>TreeViewer</code> to display Folders and all kinds of
  * Marks in the "BookMark Explorer".
@@ -129,7 +131,8 @@ public class BookMarkViewer extends TreeViewer {
   @Override
   public void setSelection(ISelection selection) {
     super.setSelection(selection);
-    fViewerOpenStrategy.clearExpandFlag(); // See Bug 164372
+    if (fViewerOpenStrategy != null)
+      fViewerOpenStrategy.clearExpandFlag(); // See Bug 164372
   }
 
   /*
@@ -139,7 +142,40 @@ public class BookMarkViewer extends TreeViewer {
   @Override
   public void setSelection(ISelection selection, boolean reveal) {
     super.setSelection(selection, reveal);
-    fViewerOpenStrategy.clearExpandFlag(); // See Bug 164372
+    if (fViewerOpenStrategy != null)
+      fViewerOpenStrategy.clearExpandFlag(); // See Bug 164372
+  }
+
+  /*
+   * @see org.eclipse.jface.viewers.TreeViewer#setSelection(java.util.List)
+   */
+  @SuppressWarnings("unchecked")
+  @Override
+  protected void setSelection(List items) {
+    super.setSelection(items);
+    if (fViewerOpenStrategy != null)
+      fViewerOpenStrategy.clearExpandFlag(); // See Bug 164372
+  }
+
+  /*
+   * @see org.eclipse.jface.viewers.AbstractTreeViewer#setSelectionToWidget(org.eclipse.jface.viewers.ISelection, boolean)
+   */
+  @Override
+  protected void setSelectionToWidget(ISelection selection, boolean reveal) {
+    super.setSelectionToWidget(selection, reveal);
+    if (fViewerOpenStrategy != null)
+      fViewerOpenStrategy.clearExpandFlag(); // See Bug 164372
+  }
+
+  /*
+   * @see org.eclipse.jface.viewers.AbstractTreeViewer#setSelectionToWidget(java.util.List, boolean)
+   */
+  @SuppressWarnings("unchecked")
+  @Override
+  protected void setSelectionToWidget(List v, boolean reveal) {
+    super.setSelectionToWidget(v, reveal);
+    if (fViewerOpenStrategy != null)
+      fViewerOpenStrategy.clearExpandFlag(); // See Bug 164372
   }
 
   /*
