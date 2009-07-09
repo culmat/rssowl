@@ -24,6 +24,8 @@
 
 package org.rssowl.core.tests.interpreter;
 
+import static junit.framework.Assert.assertNull;
+import static junit.framework.Assert.assertTrue;
 import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -31,22 +33,30 @@ import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.newsaction.LabelNewsAction;
+import org.rssowl.core.internal.newsaction.MoveNewsAction;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
+import org.rssowl.core.persist.dao.ILabelDAO;
+import org.rssowl.core.persist.dao.INewsBinDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
@@ -69,13 +79,15 @@ import java.util.Set;
 /**
  * Tests a full export and import using OPML including Folders, Bookmarks, Saved
  * Searches and News Bins. For saved searches most combinations of Field,
- * Specifier and Value are used to make sure everything works as expected.
+ * Specifier and Value are used to make sure everything works as expected. Also
+ * tested is import export of a OPML file from a backup containing Labels and
+ * Filters.
  *
  * @author bpasero
  */
 public class ImportExportOPMLTest {
-  private ExportFeedsAction fExportAction;
   private File fTmpFile;
+  private File fTmpBackupFile;
   private Controller fController;
   private IModelFactory fFactory;
   private IFolder fDefaultSet;
@@ -85,6 +97,7 @@ public class ImportExportOPMLTest {
   private IFolder fDefaultFolder2;
   private IFolder fCustomFolder2;
   private INewsBin fNewsBin;
+  private ILabel fImportantLabel;
 
   /**
    * @throws Exception
@@ -95,9 +108,11 @@ public class ImportExportOPMLTest {
 
     fFactory = Owl.getModelFactory();
     fController = Controller.getDefault();
-    fExportAction = new ExportFeedsAction();
     fTmpFile = File.createTempFile("rssowl", "opml");
     fTmpFile.deleteOnExit();
+
+    fTmpBackupFile = File.createTempFile("rssowl_backup", "opml");
+    fTmpBackupFile.deleteOnExit();
 
     /* Fill Defaults */
     fillDefaults();
@@ -108,13 +123,15 @@ public class ImportExportOPMLTest {
     Set<IFolder> rootFolders = new HashSet<IFolder>();
     rootFolders.add(fDefaultSet);
     rootFolders.add(fCustomSet);
-    fExportAction.exportToOPML(fTmpFile, rootFolders);
+
+    new ExportFeedsAction().exportToOPML(fTmpFile, rootFolders);
+    new ExportFeedsAction(true).exportToOPML(fTmpBackupFile, rootFolders);
 
     /* Clear */
     Owl.getPersistenceService().recreateSchema();
 
     /* Add Default Set */
-    DynamicDAO.getDAO(IFolderDAO.class).save(fFactory.createFolder(null, null, "Default"));
+    DynamicDAO.getDAO(IFolderDAO.class).save(fFactory.createFolder(null, null, "My Bookmarks"));
   }
 
   private void fillDefaults() throws URISyntaxException {
@@ -139,10 +156,121 @@ public class ImportExportOPMLTest {
 
     /* Custom > Folder 2 > List of SearchMarks */
     fillSearchMarks(fCustomFolder2);
+
+    /* Labels */
+    fillLabels();
+
+    /* Filters */
+    fillFilters();
+  }
+
+  private void fillFilters() {
+
+    /* 1) Match All News - Enabled - Mark Read */
+    ISearchFilter filter = fFactory.createSearchFilter(null, null, "Filter 1");
+    filter.setMatchAllNews(true);
+    filter.setEnabled(true);
+    filter.setOrder(5);
+    filter.addAction(fFactory.createFilterAction("org.rssowl.core.MarkReadNewsAction"));
+    DynamicDAO.save(filter);
+
+    /* 2) Match All News - Disabled - Mark Read + Mark Sticky */
+    filter = fFactory.createSearchFilter(null, null, "Filter 2");
+    filter.setMatchAllNews(true);
+    filter.setEnabled(false);
+    filter.setOrder(0);
+    filter.addAction(fFactory.createFilterAction("org.rssowl.core.MarkReadNewsAction"));
+    filter.addAction(fFactory.createFilterAction("org.rssowl.core.MarkStickyNewsAction"));
+    DynamicDAO.save(filter);
+
+    /* 3) Entire News contains "Foo" - Enabled - Mark Read */
+    ISearch search = fFactory.createSearch(null);
+    ISearchField entireNewsField = fFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
+    search.addSearchCondition(fFactory.createSearchCondition(entireNewsField, SearchSpecifier.CONTAINS, "Foo"));
+    filter = fFactory.createSearchFilter(null, search, "Filter 3");
+    filter.setMatchAllNews(false);
+    filter.setOrder(3);
+    filter.addAction(fFactory.createFilterAction("org.rssowl.core.MarkReadNewsAction"));
+    DynamicDAO.save(filter);
+
+    /* 4) Entire News contains "Foo" or "Bar" - Enabled - Mark Read */
+    search = fFactory.createSearch(null);
+    search.setMatchAllConditions(true);
+    search.addSearchCondition(fFactory.createSearchCondition(entireNewsField, SearchSpecifier.CONTAINS, "Foo"));
+    search.addSearchCondition(fFactory.createSearchCondition(entireNewsField, SearchSpecifier.CONTAINS, "Bar"));
+    filter = fFactory.createSearchFilter(null, search, "Filter 4");
+    filter.setMatchAllNews(false);
+    filter.setOrder(4);
+    filter.addAction(fFactory.createFilterAction("org.rssowl.core.MarkReadNewsAction"));
+    DynamicDAO.save(filter);
+
+    /* 5) Location is "XY" - Enabled - Mark Read */
+    search = fFactory.createSearch(null);
+    ISearchField locationField = fFactory.createSearchField(INews.LOCATION, INews.class.getName());
+    search.addSearchCondition(fFactory.createSearchCondition(locationField, SearchSpecifier.SCOPE, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { fBookMark1, fNewsBin }))));
+    filter = fFactory.createSearchFilter(null, search, "Filter 5");
+    filter.setMatchAllNews(false);
+    filter.setOrder(8);
+    filter.addAction(fFactory.createFilterAction("org.rssowl.core.MarkReadNewsAction"));
+    DynamicDAO.save(filter);
+
+    /* 6) Match All News - Enabled - Label News */
+    filter = fFactory.createSearchFilter(null, null, "Filter 6");
+    filter.setMatchAllNews(true);
+    filter.setOrder(5);
+    IFilterAction action = fFactory.createFilterAction(LabelNewsAction.ID);
+    action.setData(fImportantLabel.getId());
+    filter.addAction(action);
+    DynamicDAO.save(filter);
+
+    /* 7) Match All News - Enabled - Label News + Move News + Play Sound */
+    filter = fFactory.createSearchFilter(null, null, "Filter 7");
+    filter.setMatchAllNews(true);
+    filter.setOrder(5);
+    action = fFactory.createFilterAction(LabelNewsAction.ID);
+    action.setData(fImportantLabel.getId());
+    filter.addAction(action);
+
+    action = fFactory.createFilterAction(MoveNewsAction.ID);
+    action.setData(new Long[] { fNewsBin.getId() });
+    filter.addAction(action);
+
+    action = fFactory.createFilterAction("org.rssowl.ui.PlaySoundAction");
+    action.setData("C:\\ProgramData\\Microsoft\\Windows & Help\\Start Menu");
+    filter.addAction(action);
+
+    DynamicDAO.save(filter);
+  }
+
+  private void fillLabels() {
+    ILabel label = fFactory.createLabel(null, "Later");
+    label.setColor("113,21,88");
+    label.setOrder(4);
+    DynamicDAO.save(label);
+
+    label = fFactory.createLabel(null, "Personal");
+    label.setColor("105,130,73");
+    label.setOrder(3);
+    DynamicDAO.save(label);
+
+    fImportantLabel = fFactory.createLabel(null, "Important");
+    fImportantLabel.setColor("177,39,52");
+    fImportantLabel.setOrder(2);
+    DynamicDAO.save(fImportantLabel);
+
+    label = fFactory.createLabel(null, "Work");
+    label.setColor("234,152,79");
+    label.setOrder(1);
+    DynamicDAO.save(label);
+
+    label = fFactory.createLabel(null, "To Do");
+    label.setColor("113,160,168");
+    label.setOrder(0);
+    DynamicDAO.save(label);
   }
 
   private void fillDefaultSet() throws URISyntaxException {
-    fDefaultSet = fFactory.createFolder(null, null, "Default");
+    fDefaultSet = fFactory.createFolder(null, null, "My Bookmarks");
 
     fDefaultFolder1 = fFactory.createFolder(null, fDefaultSet, "Default Folder 1");
 
@@ -360,9 +488,35 @@ public class ImportExportOPMLTest {
   @Test
   @SuppressWarnings( { "nls", "null" })
   public void testExportImportCompleteOPML() throws Exception {
+    exportImportCompleteOPML(false);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null" })
+  public void testExportImportCompleteBackupOPML() throws Exception {
+
+    /* Pre-Create some Labels for Testing merge behavior */
+    ILabel label = fFactory.createLabel(null, "Later");
+    label.setColor("113,21,88");
+    label.setOrder(0);
+    DynamicDAO.save(label);
+
+    label = fFactory.createLabel(null, "Personal");
+    label.setColor("0,0,0");
+    label.setOrder(1);
+    DynamicDAO.save(label);
+
+    exportImportCompleteOPML(true);
+  }
+
+  @SuppressWarnings( { "nls", "null" })
+  private void exportImportCompleteOPML(boolean useBackup) throws Exception {
 
     /* Import */
-    fController.importFeeds(fTmpFile.getAbsolutePath());
+    fController.importFeeds(useBackup ? fTmpBackupFile.getAbsolutePath() : fTmpFile.getAbsolutePath());
 
     /* Validate */
     Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
@@ -372,7 +526,7 @@ public class ImportExportOPMLTest {
     IFolder defaultSet = null;
     IFolder customSet = null;
     for (IFolder rootFolder : rootFolders) {
-      if (rootFolder.getName().equals("Default"))
+      if (rootFolder.getName().equals("My Bookmarks"))
         defaultSet = rootFolder;
       else if (rootFolder.getName().equals("Custom"))
         customSet = rootFolder;
@@ -473,6 +627,160 @@ public class ImportExportOPMLTest {
     assertSearchMarks(customSet);
     assertSearchMarks(defaultFolder2);
     assertSearchMarks(customFolder2);
+
+    if (useBackup) {
+      assertLabels();
+      assertFilters();
+    }
+  }
+
+  private void assertFilters() {
+    Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
+    assertEquals(7, filters.size());
+
+    for (ISearchFilter filter : filters) {
+      if ("Filter 1".equals(filter.getName())) {
+        assertEquals(true, filter.isEnabled());
+        assertNull(filter.getSearch());
+        assertTrue(filter.matchAllNews());
+        assertEquals(5, filter.getOrder());
+        assertEquals(1, filter.getActions().size());
+        assertEquals("org.rssowl.core.MarkReadNewsAction", filter.getActions().get(0).getActionId());
+        assertNull(filter.getActions().get(0).getData());
+      }
+
+      else if ("Filter 2".equals(filter.getName())) {
+        assertEquals(false, filter.isEnabled());
+        assertNull(filter.getSearch());
+        assertTrue(filter.matchAllNews());
+        assertEquals(0, filter.getOrder());
+        assertEquals(2, filter.getActions().size());
+        assertEquals("org.rssowl.core.MarkReadNewsAction", filter.getActions().get(0).getActionId());
+        assertNull(filter.getActions().get(0).getData());
+        assertEquals("org.rssowl.core.MarkStickyNewsAction", filter.getActions().get(1).getActionId());
+        assertNull(filter.getActions().get(1).getData());
+      }
+
+      else if ("Filter 3".equals(filter.getName())) {
+        assertNotNull(filter.getSearch());
+        assertEquals(false, filter.getSearch().matchAllConditions());
+        assertEquals(1, filter.getSearch().getSearchConditions().size());
+        ISearchCondition cond = filter.getSearch().getSearchConditions().get(0);
+        assertEquals(IEntity.ALL_FIELDS, cond.getField().getId());
+        assertEquals(INews.class.getName(), cond.getField().getEntityName());
+        assertEquals(SearchSpecifier.CONTAINS, cond.getSpecifier());
+        assertEquals("Foo", cond.getValue());
+
+        assertEquals(false, filter.matchAllNews());
+        assertEquals(3, filter.getOrder());
+        assertEquals(1, filter.getActions().size());
+        assertEquals("org.rssowl.core.MarkReadNewsAction", filter.getActions().get(0).getActionId());
+        assertNull(filter.getActions().get(0).getData());
+      }
+
+      else if ("Filter 4".equals(filter.getName())) {
+        assertNotNull(filter.getSearch());
+        assertEquals(true, filter.getSearch().matchAllConditions());
+        assertEquals(2, filter.getSearch().getSearchConditions().size());
+        ISearchCondition cond1 = filter.getSearch().getSearchConditions().get(0);
+        assertEquals(IEntity.ALL_FIELDS, cond1.getField().getId());
+        assertEquals(INews.class.getName(), cond1.getField().getEntityName());
+        assertEquals(SearchSpecifier.CONTAINS, cond1.getSpecifier());
+        assertEquals("Foo", cond1.getValue());
+
+        ISearchCondition cond2 = filter.getSearch().getSearchConditions().get(1);
+        assertEquals(IEntity.ALL_FIELDS, cond2.getField().getId());
+        assertEquals(INews.class.getName(), cond2.getField().getEntityName());
+        assertEquals(SearchSpecifier.CONTAINS, cond2.getSpecifier());
+        assertEquals("Bar", cond2.getValue());
+
+        assertEquals(false, filter.matchAllNews());
+        assertEquals(4, filter.getOrder());
+        assertEquals(1, filter.getActions().size());
+        assertEquals("org.rssowl.core.MarkReadNewsAction", filter.getActions().get(0).getActionId());
+        assertNull(filter.getActions().get(0).getData());
+      }
+
+      else if ("Filter 5".equals(filter.getName())) {
+        assertNotNull(filter.getSearch());
+        assertEquals(1, filter.getSearch().getSearchConditions().size());
+        ISearchCondition cond = filter.getSearch().getSearchConditions().get(0);
+        assertEquals(INews.LOCATION, cond.getField().getId());
+        assertEquals(INews.class.getName(), cond.getField().getEntityName());
+        assertEquals(SearchSpecifier.SCOPE, cond.getSpecifier());
+
+        List<IFolderChild> locations = CoreUtils.toEntities((Long[][]) cond.getValue());
+        assertEquals(2, locations.size());
+        for (IFolderChild location : locations) {
+          if (!fBookMark1.getName().equals(location.getName()) && !fNewsBin.getName().equals(location.getName()))
+            fail("Unexpected location: " + location.getName());
+        }
+      }
+
+      else if ("Filter 6".equals(filter.getName())) {
+        assertEquals(1, filter.getActions().size());
+        assertEquals(LabelNewsAction.ID, filter.getActions().get(0).getActionId());
+        Object data = filter.getActions().get(0).getData();
+        assertNotNull(data);
+        assertEquals(true, data instanceof Long);
+        ILabel label = DynamicDAO.getDAO(ILabelDAO.class).load(((Long) data).longValue());
+        assertNotNull(label);
+        assertEquals(fImportantLabel.getName(), label.getName());
+      }
+
+      else if ("Filter 7".equals(filter.getName())) {
+        assertEquals(3, filter.getActions().size());
+        assertEquals(LabelNewsAction.ID, filter.getActions().get(0).getActionId());
+        Object data = filter.getActions().get(0).getData();
+        assertNotNull(data);
+        assertEquals(true, data instanceof Long);
+        ILabel label = DynamicDAO.getDAO(ILabelDAO.class).load(((Long) data).longValue());
+        assertNotNull(label);
+        assertEquals(fImportantLabel.getName(), label.getName());
+
+        assertEquals(MoveNewsAction.ID, filter.getActions().get(1).getActionId());
+        data = filter.getActions().get(1).getData();
+        assertNotNull(data);
+        assertEquals(true, data instanceof Long[]);
+        assertEquals(1, ((Long[]) data).length);
+        INewsBin bin = DynamicDAO.getDAO(INewsBinDAO.class).load(((Long[]) data)[0].longValue());
+        assertNotNull(bin);
+        assertEquals(fNewsBin.getName(), bin.getName());
+
+        assertEquals("org.rssowl.ui.PlaySoundAction", filter.getActions().get(2).getActionId());
+        data = filter.getActions().get(2).getData();
+        assertNotNull(data);
+        assertEquals("C:\\ProgramData\\Microsoft\\Windows & Help\\Start Menu", data);
+      }
+
+      else
+        fail("Unexpected Filter found with name: " + filter.getName());
+    }
+  }
+
+  private void assertLabels() {
+    Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
+    assertEquals(5, labels.size());
+    for (ILabel label : labels) {
+      if ("Later".equals(label.getName())) {
+        assertEquals("113,21,88", label.getColor());
+        assertEquals(4, label.getOrder());
+      } else if ("Personal".equals(label.getName())) {
+        assertEquals("105,130,73", label.getColor());
+        assertEquals(3, label.getOrder());
+      } else if ("Important".equals(label.getName())) {
+        assertEquals("177,39,52", label.getColor());
+        assertEquals(2, label.getOrder());
+        label.setColor("177,39,52");
+      } else if ("Work".equals(label.getName())) {
+        assertEquals("234,152,79", label.getColor());
+        assertEquals(1, label.getOrder());
+      } else if ("To Do".equals(label.getName())) {
+        assertEquals("113,160,168", label.getColor());
+        assertEquals(0, label.getOrder());
+      } else
+        fail("Unexpected Label found with name: " + label.getName());
+    }
   }
 
   private void assertSearchMarks(IFolder folder) {
@@ -592,7 +900,7 @@ public class ImportExportOPMLTest {
     assertEquals(INews.LOCATION, conditions.get(0).getField().getId());
     assertEquals(SearchSpecifier.IS, conditions.get(0).getSpecifier());
     assertEquals(2, locations.size());
-    assertContains("Default", locations);
+    assertContains("My Bookmarks", locations);
     assertContains("Custom", locations);
 
     /* 11) Location is Folder 1 */
@@ -635,7 +943,7 @@ public class ImportExportOPMLTest {
     }
 
     assertEquals(3, locations.size());
-    assertContains("Default", locations);
+    assertContains("My Bookmarks", locations);
     assertContains("Custom", locations);
     assertContains("Bookmark 1", locations);
 

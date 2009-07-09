@@ -50,6 +50,9 @@ import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.connection.UnknownFeedException;
 import org.rssowl.core.internal.InternalOwl;
+import org.rssowl.core.internal.newsaction.CopyNewsAction;
+import org.rssowl.core.internal.newsaction.LabelNewsAction;
+import org.rssowl.core.internal.newsaction.MoveNewsAction;
 import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.interpreter.ParserException;
@@ -57,6 +60,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
@@ -64,8 +68,10 @@ import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPreference;
+import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -1027,7 +1033,7 @@ public class Controller {
     try {
       Set<IFolder> rootFolders = CoreUtils.loadRootFolders();
       if (!rootFolders.isEmpty()) {
-        new ExportFeedsAction().exportToOPML(backupTmpFile, rootFolders);
+        new ExportFeedsAction(true).exportToOPML(backupTmpFile, rootFolders);
 
         /* Rename to actual backup in a short op to avoid corrupt data */
         if (!backupTmpFile.renameTo(dailyBackupFile)) {
@@ -1183,7 +1189,7 @@ public class Controller {
     Map<Long, IFolderChild> mapOldIdToFolderChild = ImportUtils.createOldIdToEntityMap(types);
 
     /* Load SearchMarks containing location condition */
-    List<ISearchMark> locationConditionSearches = ImportUtils.getLocationConditionSearches(types);
+    List<ISearchMark> locationConditionSavedSearches = ImportUtils.getLocationConditionSavedSearches(types);
 
     /* Load the current selected Set */
     IFolder selectedRootFolder;
@@ -1213,6 +1219,9 @@ public class Controller {
 
     /* 2.) Handle other Sets */
     for (int i = 1; i < types.size(); i++) {
+      if (!(types.get(i) instanceof IFolder))
+        continue;
+
       IFolder setFolder = (IFolder) types.get(i);
       IFolder existingSetFolder = null;
 
@@ -1249,9 +1258,99 @@ public class Controller {
     }
 
     /* Fix locations in Search Marks if required and save */
-    if (!locationConditionSearches.isEmpty()) {
-      ImportUtils.updateLocationConditions(mapOldIdToFolderChild, locationConditionSearches);
-      DynamicDAO.getDAO(ISearchMarkDAO.class).saveAll(locationConditionSearches);
+    if (!locationConditionSavedSearches.isEmpty()) {
+      ImportUtils.updateLocationConditions(mapOldIdToFolderChild, locationConditionSavedSearches);
+      DynamicDAO.getDAO(ISearchMarkDAO.class).saveAll(locationConditionSavedSearches);
+    }
+
+    /* Look for Labels (from backup OPML) */
+    Map<String, ILabel> mapExistingLabelToName = new HashMap<String, ILabel>();
+    Map<Long, ILabel> mapOldIdToImportedLabel = new HashMap<Long, ILabel>();
+    List<ILabel> importedLabels = ImportUtils.getLabels(types);
+    if (!importedLabels.isEmpty()) {
+      Collection<ILabel> existingLabels = DynamicDAO.loadAll(ILabel.class);
+      for (ILabel existingLabel : existingLabels) {
+        mapExistingLabelToName.put(existingLabel.getName(), existingLabel);
+      }
+
+      for (ILabel importedLabel : importedLabels) {
+        Object oldIdValue = importedLabel.getProperty(ITypeImporter.ID_KEY);
+        if (oldIdValue != null && oldIdValue instanceof Long)
+          mapOldIdToImportedLabel.put((Long) oldIdValue, importedLabel);
+      }
+
+      for (ILabel importedLabel : importedLabels) {
+        ILabel existingLabel = mapExistingLabelToName.get(importedLabel.getName());
+
+        /* Update Existing */
+        if (existingLabel != null) {
+          existingLabel.setColor(importedLabel.getColor());
+          existingLabel.setOrder(importedLabel.getOrder());
+          DynamicDAO.save(existingLabel);
+        }
+
+        /* Save as New */
+        else {
+          importedLabel.removeProperty(ITypeImporter.ID_KEY);
+          DynamicDAO.save(importedLabel);
+        }
+      }
+    }
+
+    /* Look for Filters (from backup OPML) */
+    List<ISearchFilter> filters = ImportUtils.getFilters(types);
+    if (!filters.isEmpty()) {
+
+      /* Fix locations in Searches if required */
+      List<ISearch> locationConditionSearches = ImportUtils.getLocationConditionSearchesFromFilters(filters);
+      if (!locationConditionSearches.isEmpty())
+        ImportUtils.updateLocationConditions(mapOldIdToFolderChild, locationConditionSearches);
+
+      /* Fix locations in Actions if required */
+      for (ISearchFilter filter : filters) {
+        List<IFilterAction> actions = filter.getActions();
+        for (IFilterAction action : actions) {
+          if (MoveNewsAction.ID.equals(action.getActionId()) || CopyNewsAction.ID.equals(action.getActionId())) {
+            Object data = action.getData();
+            if (data != null && data instanceof Long[]) {
+              Long[] oldBinLocations = (Long[]) data;
+              Long[] newBinLocations = new Long[oldBinLocations.length];
+
+              for (int i = 0; i < oldBinLocations.length; i++) {
+                Long oldLocation = oldBinLocations[i];
+                IFolderChild location = mapOldIdToFolderChild.get(oldLocation);
+                newBinLocations[i] = location.getId();
+              }
+
+              action.setData(newBinLocations);
+            }
+          }
+        }
+      }
+
+      /* Fix labels in Actions if required */
+      for (ISearchFilter filter : filters) {
+        List<IFilterAction> actions = filter.getActions();
+        for (IFilterAction action : actions) {
+          if (LabelNewsAction.ID.equals(action.getActionId())) {
+            Object data = action.getData();
+            if (data != null && data instanceof Long) {
+              ILabel label = mapOldIdToImportedLabel.get(data);
+              if (label != null) {
+                String name = label.getName();
+                ILabel existingLabel = mapExistingLabelToName.get(name);
+                if (existingLabel != null)
+                  action.setData(existingLabel.getId());
+                else
+                  action.setData(label.getId());
+              }
+            }
+          }
+        }
+      }
+
+      /* Save */
+      DynamicDAO.saveAll(filters);
     }
 
     /* Reload imported Feeds */

@@ -34,13 +34,18 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
@@ -57,13 +62,28 @@ import java.util.EnumSet;
 import java.util.List;
 
 /**
- * TODO This is just for Developers Purposes!
+ * Export Feeds and also support backup of Labels and Filters.
  *
  * @author bpasero
  */
 public class ExportFeedsAction extends Action implements IWorkbenchWindowActionDelegate {
   private Shell fShell;
   private DateFormat fDateFormat = DateFormat.getDateInstance();
+  private boolean fIsBackup;
+
+  /**
+   * Default Export Action (no backup).
+   */
+  public ExportFeedsAction() {
+    this(false);
+  }
+
+  /**
+   * @param isBackup if <code>true</code> will also export Labels and Filters.
+   */
+  public ExportFeedsAction(boolean isBackup) {
+    fIsBackup = isBackup;
+  }
 
   /*
    * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
@@ -119,6 +139,7 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
     writer.write("<opml version=\"1.1\" xmlns:rssowl=\"http://www.rssowl.org\">\n");
     writer.write("<body>\n");
 
+    /* Export Folders */
     for (IFolder folder : rootFolders) {
       String name = escape(folder.getName());
       writer.write("<outline text=\"" + name + "\" rssowl:isSet=\"true\" " + getIDAttribute(folder) + ">\n");
@@ -126,10 +147,92 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
       writer.write("</outline>\n");
     }
 
+    /* Export Labels */
+    if (fIsBackup) {
+      Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
+      for (ILabel label : labels) {
+        Long id = label.getId();
+        String name = escape(label.getName());
+        String color = label.getColor();
+        int order = label.getOrder();
+
+        writer.write("<rssowl:label id=\"" + id + "\" name=\"" + name + "\" order=\"" + order + "\" color=\"" + color + "\" />\n");
+      }
+    }
+
+    /* Export Filters */
+    if (fIsBackup) {
+      Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
+      for (ISearchFilter filter : filters) {
+        String name = escape(filter.getName());
+        int order = filter.getOrder();
+        boolean isEnabled = filter.isEnabled();
+        boolean matchAllNews = filter.matchAllNews();
+
+        writer.write("<rssowl:searchfilter name=\"" + name + "\" order=\"" + order + "\" enabled=\"" + isEnabled + "\" matchAllNews=\"" + matchAllNews + "\">\n");
+        exportToOPML(filter, writer);
+        writer.write("</rssowl:searchfilter>\n");
+      }
+    }
+
     writer.write("</body>\n");
     writer.write("</opml>\n");
 
     writer.close();
+  }
+
+  private void exportToOPML(ISearchFilter filter, OutputStreamWriter writer) throws IOException {
+
+    /* Export Search if provided */
+    ISearch search = filter.getSearch();
+    if (search != null) {
+      List<ISearchCondition> conditions = search.getSearchConditions();
+      writer.write("<rssowl:search matchAllConditions=\"" + search.matchAllConditions() + "\">\n");
+      for (ISearchCondition condition : conditions) {
+        writer.write("\t<rssowl:searchcondition>\n");
+        writer.write(toXML(condition));
+        writer.write("\t</rssowl:searchcondition>\n");
+      }
+      writer.write("</rssowl:search>\n");
+    }
+
+    /* Export Actions */
+    List<IFilterAction> actions = filter.getActions();
+    for (IFilterAction action : actions) {
+      String actionId = action.getActionId();
+      String data = toString(action.getData());
+
+      if (data != null)
+        writer.write("<rssowl:filteraction id=\"" + actionId + "\" data=\"" + escape(data) + "\" />\n");
+      else
+        writer.write("<rssowl:filteraction id=\"" + actionId + "\" />\n");
+    }
+  }
+
+  private String toString(Object data) {
+    if (data == null)
+      return null;
+
+    if (data instanceof String)
+      return (String) data;
+
+    if (data instanceof Long)
+      return String.valueOf(data);
+
+    if (data instanceof Long[]) {
+      Long[] value = (Long[]) data;
+      StringBuilder builder = new StringBuilder();
+      for (Long val : value) {
+        builder.append(val).append(",");
+      }
+
+      if (value.length > 0)
+        builder.delete(builder.length() - 1, builder.length());
+
+      return builder.toString();
+    }
+
+    return null;
   }
 
   private void exportToOPML(IFolder folder, OutputStreamWriter writer) throws IOException, PersistenceException {
