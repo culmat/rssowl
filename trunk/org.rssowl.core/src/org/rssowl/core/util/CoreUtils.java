@@ -25,6 +25,7 @@
 package org.rssowl.core.util;
 
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.newsaction.CopyNewsAction;
 import org.rssowl.core.internal.newsaction.MoveNewsAction;
 import org.rssowl.core.persist.IBookMark;
@@ -57,6 +58,9 @@ import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1096,5 +1100,39 @@ public class CoreUtils {
     }
 
     return false;
+  }
+
+  /**
+   * Copies the contents of one stream to another.
+   *
+   * @param fis the input stream to read from.
+   * @param fos the output stream to write to.
+   */
+  public static void copy(InputStream fis, OutputStream fos) {
+    try {
+      byte buffer[] = new byte[0xffff];
+      int nbytes;
+
+      while ((nbytes = fis.read(buffer)) != -1)
+        fos.write(buffer, 0, nbytes);
+    } catch (IOException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    } finally {
+      if (fis != null) {
+        try {
+          fis.close();
+        } catch (IOException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+        }
+      }
+
+      if (fos != null) {
+        try {
+          fos.close();
+        } catch (IOException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+        }
+      }
+    }
   }
 }
