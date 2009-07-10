@@ -2655,4 +2655,58 @@ public class ModelTest3 {
     /* Delete Folder */
     DynamicDAO.deleteAll(Collections.singleton(folder));
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @Ignore
+  public void testSaveBinCausesNoUnwantedEvents() throws Exception {
+    SearchConditionListener listener = null;
+    try {
+      IFolder root = fFactory.createFolder(null, null, "Root");
+
+      IFolder childFolder = fFactory.createFolder(null, root, "Child");
+
+      IFeed feed = fFactory.createFeed(null, new URI("feed"));
+      DynamicDAO.save(feed);
+
+      IBookMark bookmark = fFactory.createBookMark(null, root, new FeedLinkReference(feed.getLink()), "Bookmark");
+
+      INewsBin bin = fFactory.createNewsBin(null, root, "Bin");
+
+      ISearchMark searchMark = fFactory.createSearchMark(null, root, "Search");
+      ISearchField field = fFactory.createSearchField(INews.TITLE, INews.class.getName());
+      searchMark.addSearchCondition(fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "Foo"));
+
+      DynamicDAO.save(root);
+
+      listener = new SearchConditionListener() {
+
+        public void entitiesUpdated(Set<SearchConditionEvent> events) {
+          fail("Unexpected Event");
+        }
+
+        public void entitiesDeleted(Set<SearchConditionEvent> events) {
+          fail("Unexpected Event");
+        }
+
+        public void entitiesAdded(Set<SearchConditionEvent> events) {
+          fail("Unexpected Event");
+        }
+      };
+      DynamicDAO.addEntityListener(ISearchCondition.class, listener);
+
+      childFolder.setName("Other");
+      DynamicDAO.save(childFolder);
+
+      bookmark.setName("Other");
+      DynamicDAO.save(bookmark);
+
+      bin.setName("Other");
+      DynamicDAO.save(bin);
+    } finally {
+      DynamicDAO.removeEntityListener(ISearchCondition.class, listener);
+    }
+  }
 }
