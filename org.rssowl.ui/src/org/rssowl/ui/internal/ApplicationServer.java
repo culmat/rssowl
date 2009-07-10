@@ -44,6 +44,7 @@ import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
@@ -51,6 +52,7 @@ import org.rssowl.ui.internal.FolderNewsMark.FolderNewsMarkReference;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserViewer;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -115,6 +117,7 @@ public class ApplicationServer {
   private static final String OP_DISPLAY_NEWSBIN = "displayNewsBin="; //$NON-NLS-1$
   private static final String OP_DISPLAY_SEARCHMARK = "displaySearchMark="; //$NON-NLS-1$
   private static final String OP_DISPLAY_NEWS = "displayNews="; //$NON-NLS-1$
+  private static final String OP_RESOURCE = "resource="; //$NON-NLS-1$
 
   /* Windows only: Mark of the Web */
   private static final String IE_MOTW = "<!-- saved from url=(0014)about:internet -->"; //$NON-NLS-1$
@@ -269,6 +272,32 @@ public class ApplicationServer {
       return false;
 
     return url.contains(OP_DISPLAY_FOLDER) || url.contains(OP_DISPLAY_BOOKMARK) || url.contains(OP_DISPLAY_NEWSBIN) || url.contains(OP_DISPLAY_NEWS) || url.contains(OP_DISPLAY_SEARCHMARK) || URIUtils.ABOUT_BLANK.equals(url);
+  }
+
+  /**
+   * Check wether the given URL contains one of the resource-operations of this
+   * Server.
+   *
+   * @param url The URL to Test for a Resource Operation.
+   * @return Returns <code>TRUE</code> if the given URL is a resource-operation.
+   */
+  public boolean isResourceOperation(String url) {
+    if (!StringUtils.isSet(url))
+      return false;
+
+    return url.contains(OP_RESOURCE);
+  }
+
+  /**
+   * @param path the path to the resource in the plugin.
+   * @return a url that can be used to access the resource.
+   */
+  public String toResourceUrl(String path) {
+    StringBuilder url = new StringBuilder();
+    url.append(PROTOCOL).append("://").append(LOCALHOST).append(':').append(fPort).append("/"); //$NON-NLS-1$ //$NON-NLS-2$
+    url.append("?").append(OP_RESOURCE).append(path);
+
+    return url.toString();
   }
 
   /**
@@ -429,6 +458,10 @@ public class ApplicationServer {
         if (isDisplayOperation(message))
           processDisplayOperation(socket, message);
 
+        /* This is a Resource-Operation */
+        else if (isResourceOperation(message))
+          processResourceOperation(socket, message);
+
         /* This is a startup handshake */
         else
           processHandshake(message);
@@ -440,6 +473,36 @@ public class ApplicationServer {
   private void processHandshake(String message) {
     if (fHandshakeHandler != null)
       fHandshakeHandler.handle(message);
+  }
+
+  private void processResourceOperation(Socket socket, String message) {
+
+    /* Substring to get the Parameters String */
+    int start = message.indexOf(OP_RESOURCE) + OP_RESOURCE.length();
+    int end = message.indexOf(' ', start);
+    String parameter = message.substring(start, end);
+
+    /* Write HTML to the Receiver */
+    BufferedOutputStream outS = null;
+    try {
+      outS = new BufferedOutputStream(socket.getOutputStream());
+      CoreUtils.copy(OwlUI.class.getResourceAsStream(parameter), outS);
+    } catch (IOException e) {
+      if (Activator.getDefault() != null)
+        Activator.getDefault().logInfo(e.getMessage());
+    }
+
+    /* Cleanup */
+    finally {
+      if (outS != null) {
+        try {
+          outS.close();
+        } catch (IOException e) {
+          if (Activator.getDefault() != null)
+            Activator.getDefault().logInfo(e.getMessage());
+        }
+      }
+    }
   }
 
   /* Process Message by looking for operations */

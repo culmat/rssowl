@@ -33,6 +33,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ContentViewer;
+import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -609,6 +610,19 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   /*
+   * @see org.eclipse.jface.viewers.ContentViewer#setLabelProvider(org.eclipse.jface.viewers.IBaseLabelProvider)
+   */
+  @Override
+  public void setLabelProvider(IBaseLabelProvider labelProvider) {
+    fBlockRefresh = true;
+    try {
+      super.setLabelProvider(labelProvider);
+    } finally {
+      fBlockRefresh = false;
+    }
+  }
+
+  /*
    * @see org.eclipse.jface.viewers.ContentViewer#setContentProvider(org.eclipse.jface.viewers.IContentProvider)
    */
   @Override
@@ -701,8 +715,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   }
 
   /**
-   * Adds the given filter to this viewer, and triggers refiltering and
-   * resorting of the elements.
+   * Adds the given filter to this viewer.
    *
    * @param filter a viewer filter
    */
@@ -713,8 +726,6 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fFilters.add(filter);
     if (filter instanceof NewsFilter)
       fNewsFilter = (NewsFilter) filter;
-
-    refresh();
   }
 
   /**
@@ -748,10 +759,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    * @param comparator
    */
   public void setComparator(ViewerComparator comparator) {
-    if (fSorter != comparator) {
+    if (fSorter != comparator)
       fSorter = comparator;
-      refresh();
-    }
   }
 
   /*
@@ -991,8 +1000,14 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           boolean isSticky = news.isFlagged();
           js.append(getElementById(Dynamic.HEADER.getId(news)).append(isSticky ? ".className='headerSticky'; " : ".className='header'; "));
           js.append(getElementById(Dynamic.FOOTER.getId(news)).append(isSticky ? ".className='footerSticky'; " : ".className='footer'; "));
-          String stickyImg = isSticky ? OwlUI.getImageUri("/icons/obj16/news_pinned_light.gif", "news_pinned_light.gif") : OwlUI.getImageUri("/icons/obj16/news_pin_light.gif", "news_pin_light.gif");
-          js.append(getElementById(Dynamic.TOGGLE_STICKY.getId(news)).append(".src='").append(stickyImg).append("'; "));
+
+          String stickyImgUri;
+          if (fBrowser.isIE())
+            stickyImgUri = isSticky ? OwlUI.getImageUri("/icons/obj16/news_pinned_light.gif", "news_pinned_light.gif") : OwlUI.getImageUri("/icons/obj16/news_pin_light.gif", "news_pin_light.gif");
+          else
+            stickyImgUri = isSticky ? ApplicationServer.getDefault().toResourceUrl("/icons/obj16/news_pinned_light.gif") : ApplicationServer.getDefault().toResourceUrl("/icons/obj16/news_pin_light.gif");
+
+          js.append(getElementById(Dynamic.TOGGLE_STICKY.getId(news)).append(".src='").append(stickyImgUri).append("'; "));
         }
 
         /* Label (Title Foreground, Label List) */
