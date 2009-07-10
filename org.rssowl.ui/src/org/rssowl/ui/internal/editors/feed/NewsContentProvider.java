@@ -520,10 +520,16 @@ public class NewsContentProvider implements ITreeContentProvider {
       fTableViewer.add(fTableViewer.getInput(), addedNews.toArray());
 
     /* Add to Browser-Viewer if showing entire Feed */
-    if (fBrowserViewer.getInput() instanceof BookMarkReference)
+    if (browserShowsCollection())
       fBrowserViewer.add(fBrowserViewer.getInput(), addedNews.toArray());
 
     return false;
+  }
+
+  /* Browser shows collection if maximized */
+  private boolean browserShowsCollection() {
+    Object input = fBrowserViewer.getInput();
+    return (input instanceof BookMarkReference || input instanceof NewsBinReference || input instanceof SearchMarkReference || input instanceof FolderNewsMarkReference);
   }
 
   private boolean handleUpdatedNews(Set<NewsEvent> events) {
