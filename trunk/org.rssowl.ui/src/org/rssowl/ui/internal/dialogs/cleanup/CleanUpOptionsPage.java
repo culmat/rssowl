@@ -250,7 +250,7 @@ public class CleanUpOptionsPage extends WizardPage {
 
     /* Info Container */
     Composite infoContainer = new Composite(container, SWT.None);
-    infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
     infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
     ((GridLayout)infoContainer.getLayout()).marginTop = 5;
 

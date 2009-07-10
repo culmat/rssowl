@@ -33,6 +33,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -48,6 +49,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;
@@ -60,6 +62,7 @@ import java.util.Set;
  * @author bpasero
  */
 public class RetentionPropertyPage implements IEntityPropertyPage {
+  private IPropertyDialogSite fSite;
   private List<IEntity> fEntities;
   private Spinner fMaxCountSpinner;
   private Spinner fMaxAgeSpinner;
@@ -84,6 +87,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
    */
   public void init(IPropertyDialogSite site, List<IEntity> entities) {
     Assert.isTrue(!entities.isEmpty());
+    fSite = site;
     fEntities = entities;
 
     /* Load Entity Preferences */
@@ -192,6 +196,20 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     fNeverDeleteUnreadNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
     fNeverDeleteUnreadNewsCheck.setText("Never delete unread news");
     fNeverDeleteUnreadNewsCheck.setSelection(fPrefNeverDeleteUnReadNews);
+
+    /* Info Container */
+    Composite infoContainer = new Composite(container, SWT.None);
+    infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+    infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    ((GridLayout)infoContainer.getLayout()).marginTop = 5;
+
+    Label infoImg = new Label(infoContainer, SWT.NONE);
+    infoImg.setImage(OwlUI.getImage(fSite.getResourceManager(), "icons/obj16/info.gif"));
+    infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    Label infoText = new Label(infoContainer, SWT.WRAP);
+    infoText.setText("Note: Sticky and labeled News will not be deleted.");
+    infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     return container;
   }
