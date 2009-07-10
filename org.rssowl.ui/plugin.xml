@@ -480,11 +480,11 @@
             label="open view switch"/>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Miscellaneous"
-            label="internal embedded systemtray confirm confirmation delete reopen open single multi tabs minimize tray external browser feed view script js javascript java">
+            label="internal embedded systemtray confirm confirmation delete reopen open single multi tab minimize tray external browser feed view script js web link javascript java background">
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Feeds"
-            label="update reload display startup start-up auto automatic clean clean-up retention delete age maximum columns sort order">
+            label="update reload display startup start-up auto automatic clean clean-up retention delete age maximum columns sort order images flash">
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.ManageLabels"
