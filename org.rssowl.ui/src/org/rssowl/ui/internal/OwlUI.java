@@ -92,6 +92,7 @@ import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.ui.internal.editors.browser.WebBrowserInput;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
@@ -106,8 +107,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.DateFormat;
@@ -546,7 +545,7 @@ public class OwlUI {
 
     /* Copy to Filesystem */
     try {
-      copy(OwlUI.class.getResourceAsStream(path), new FileOutputStream(imgFile));
+      CoreUtils.copy(OwlUI.class.getResourceAsStream(path), new FileOutputStream(imgFile));
       imgUri = getImageUri(imgFile);
       fgImageUriMap.put(path, imgUri);
       return imgUri;
@@ -561,34 +560,6 @@ public class OwlUI {
     URI uri = file.toURI();
     String s = uri.toASCIIString();
     return s.replaceFirst("/", "///");
-  }
-
-  private static void copy(InputStream fis, OutputStream fos) {
-    try {
-      byte buffer[] = new byte[0xffff];
-      int nbytes;
-
-      while ((nbytes = fis.read(buffer)) != -1)
-        fos.write(buffer, 0, nbytes);
-    } catch (IOException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
-    } finally {
-      if (fis != null) {
-        try {
-          fis.close();
-        } catch (IOException e) {
-          Activator.getDefault().logError(e.getMessage(), e);
-        }
-      }
-
-      if (fos != null) {
-        try {
-          fos.close();
-        } catch (IOException e) {
-          Activator.getDefault().logError(e.getMessage(), e);
-        }
-      }
-    }
   }
 
   /**
