@@ -38,6 +38,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.PaintEvent;
@@ -48,6 +49,7 @@ import org.eclipse.swt.graphics.FontMetrics;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -371,27 +373,35 @@ public class NewsFilterDialog extends TitleAreaDialog {
       }
     });
 
-    /* Create Condition Controls */
-    Composite conditionContainer = new Composite(parent, SWT.NONE);
-    conditionContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
-    conditionContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    createConditionControls(conditionContainer);
+    /* Sashform dividing search definition from actions */
+    SashForm sashForm = new SashForm(parent, SWT.VERTICAL | SWT.SMOOTH);
+    sashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+    /* Top Sash */
+    Composite topSash = new Composite(sashForm, SWT.NONE);
+    topSash.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
+    createConditionControls(topSash);
+
+    /* Bottom Sash */
+    Composite bottomSash = new Composite(sashForm, SWT.NONE);
+    bottomSash.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
 
     /* Label in between */
-    Composite labelContainer = new Composite(parent, SWT.NONE);
-    labelContainer.setLayout(LayoutUtils.createGridLayout(1, 10, 5, 0, 0, false));
+    Composite labelContainer = new Composite(bottomSash, SWT.NONE);
+    labelContainer.setLayout(LayoutUtils.createGridLayout(1, 10, 3, 0, 0, false));
+    ((GridLayout) labelContainer.getLayout()).marginBottom = 2;
     labelContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     Label explanationLabel = new Label(labelContainer, SWT.NONE);
-    explanationLabel.setText("For news matching the above conditions perform these actions:");
+    explanationLabel.setText("For news matching the above conditions perform the following actions:");
 
-    /* Create Action Controls */
-    Composite actionContainer = new Composite(parent, SWT.NONE);
-    actionContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
-    actionContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    createActionControls(actionContainer);
+    /* Action Controls */
+    createActionControls(bottomSash);
 
     /* Separator */
-    new Label(actionContainer, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.END, true, false));
+    new Label(bottomSash, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.END, true, false));
+
+    /* Set weights to even */
+    sashForm.setWeights(new int[] { 50, 50 });
 
     return parent;
   }
