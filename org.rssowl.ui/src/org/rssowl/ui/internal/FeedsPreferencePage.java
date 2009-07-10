@@ -414,6 +414,20 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fNeverDeleteUnReadNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
     fNeverDeleteUnReadNewsCheck.setText("Never delete unread news");
     fNeverDeleteUnReadNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE));
+
+    /* Info Container */
+    Composite infoContainer = new Composite(group, SWT.None);
+    infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+    infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    ((GridLayout)infoContainer.getLayout()).marginTop = 5;
+
+    Label infoImg = new Label(infoContainer, SWT.NONE);
+    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
+    infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    Label infoText = new Label(infoContainer, SWT.WRAP);
+    infoText.setText("Note: Sticky and labeled News will not be deleted.");
+    infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
   }
 
   private Composite createComposite(Composite parent) {
