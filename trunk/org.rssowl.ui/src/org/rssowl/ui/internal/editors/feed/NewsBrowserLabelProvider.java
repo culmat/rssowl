@@ -52,6 +52,7 @@ import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
@@ -101,7 +102,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   private String fBiggestFontCSS;
   private String fStickyBGColorCSS;
   private IPropertyChangeListener fPropertyChangeListener;
-  private NewsBrowserViewer fViewer;
+  private final boolean fIsIE;
+  private final NewsBrowserViewer fViewer;
   private boolean fStripMediaFromNews;
 
   /**
@@ -111,6 +113,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
    */
   public NewsBrowserLabelProvider(NewsBrowserViewer viewer) {
     fViewer = viewer;
+    fIsIE = fViewer.getBrowser().isIE();
     createFonts();
     createColors();
     registerListeners();
@@ -406,7 +409,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       div(builder, "delete");
 
       String link = HANDLER_PROTOCOL + DELETE_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, "Delete", "/icons/elcl16/remove_light.gif", "remove_light.gif", null, null);
+      imageLink(builder, link, "Delete", "Delete", "/icons/elcl16/remove_light.gif", "remove_light.gif", null, null);
 
       /* DIV: NewsItem/Header/Delete */
       close(builder, "div");
@@ -423,31 +426,31 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       /* Toggle Read */
       builder.append("<td class=\"subline\">");
       String link = HANDLER_PROTOCOL + TOGGLE_READ_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, news.getState() == INews.State.READ ? "Mark Unread" : "Mark Read", "/icons/elcl16/mark_read_light.gif", "mark_read_light.gif", Dynamic.TOGGLE_READ.getId(news), null);
+      imageLink(builder, link, news.getState() == INews.State.READ ? "Mark Unread" : "Mark Read", "Toggle Read", "/icons/elcl16/mark_read_light.gif", "mark_read_light.gif", Dynamic.TOGGLE_READ.getId(news), null);
       builder.append("</td>");
 
       /* Toggle Sticky */
       builder.append("<td class=\"subline\">");
       link = HANDLER_PROTOCOL + TOGGLE_STICKY_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, "Sticky", news.isFlagged() ? "/icons/obj16/news_pinned_light.gif" : "/icons/obj16/news_pin_light.gif", news.isFlagged() ? "news_pinned_light.gif" : "news_pin_light.gif", null, Dynamic.TOGGLE_STICKY.getId(news));
+      imageLink(builder, link, "Sticky", "Sticky", news.isFlagged() ? "/icons/obj16/news_pinned_light.gif" : "/icons/obj16/news_pin_light.gif", news.isFlagged() ? "news_pinned_light.gif" : "news_pin_light.gif", null, Dynamic.TOGGLE_STICKY.getId(news));
       builder.append("</td>");
 
       /* Assign Labels */
       builder.append("<td class=\"subline\">");
       link = HANDLER_PROTOCOL + LABELS_MENU_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, "Assign Labels", "/icons/elcl16/labels_light.gif", "labels_light.gif", null, null);
+      imageLink(builder, link, "Assign Labels", "Label", "/icons/elcl16/labels_light.gif", "labels_light.gif", null, null);
       builder.append("</td>");
 
       /* Share News Context Menu */
       builder.append("<td class=\"subline\">");
       link = HANDLER_PROTOCOL + SHARE_NEWS_MENU_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, "Share News", "/icons/elcl16/share_light.gif", "share_light.gif", null, null);
+      imageLink(builder, link, "Share News", "Share", "/icons/elcl16/share_light.gif", "share_light.gif", null, null);
       builder.append("</td>");
 
       /* News Context Menu */
       builder.append("<td class=\"subline\">");
       link = HANDLER_PROTOCOL + NEWS_MENU_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, "Menu", "/icons/obj16/menu_light.gif", "menu_light.gif", null, null);
+      imageLink(builder, link, "Menu", "Menu", "/icons/obj16/menu_light.gif", "menu_light.gif", null, null);
       builder.append("</td>");
 
       builder.append("<td class=\"subline\">");
@@ -505,7 +508,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       builder.append("<td class=\"subline\">");
 
       String comments = news.getComments();
-      imageLink(builder, comments, "Read Comments", "/icons/obj16/comments_light.gif", "comments_light.gif", null, null);
+      imageLink(builder, comments, "Read Comments", "Comments", "/icons/obj16/comments_light.gif", "comments_light.gif", null, null);
 
       builder.append("</td>");
     }
@@ -520,7 +523,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       IAttachment attachment = news.getAttachments().get(0);
       String link = attachment.getLink().toASCIIString();
       String name = URIUtils.getFile(attachment.getLink());
-      imageLink(builder, link, StringUtils.isSet(name) ? name : "Attachment", "/icons/obj16/attachment_light.gif", "attachment_light.gif", null, null);
+      imageLink(builder, link, StringUtils.isSet(name) ? name : "Attachment", "Attachment", "/icons/obj16/attachment_light.gif", "attachment_light.gif", null, null);
       builder.append("</td>");
     }
 
@@ -590,7 +593,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     /* News Footer */
     {
       StringBuilder footer = new StringBuilder();
-      boolean hasFooter = false;
 
       /* DIV: NewsItem/Footer */
       div(footer, news.isFlagged() ? "footerSticky" : "footer", Dynamic.FOOTER.getId(news));
@@ -598,7 +600,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       /* Attachments */
       List<IAttachment> attachments = news.getAttachments();
       if (attachments.size() != 0) {
-        hasFooter = true;
 
         /* DIV: NewsItem/Footer/Attachments */
         div(footer, "attachments");
@@ -676,16 +677,13 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         close(categoriesText, "div");
 
         /* Append categories if provided */
-        if (hasCategories) {
-          hasFooter = true;
+        if (hasCategories)
           footer.append(categoriesText);
-        }
       }
 
       /* Source */
       ISource source = news.getSource();
       if (source != null) {
-        hasFooter = true;
         String link = (source.getLink() != null) ? source.getLink().toASCIIString() : null;
         String name = source.getName();
 
@@ -708,7 +706,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
       /* Find related News */
       if (search.length() > 0) {
-        hasFooter = true;
         search.delete(search.length() - 2, search.length());
 
         /* DIV: NewsItem/Footer/SearchRelated */
@@ -729,9 +726,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       /* Close: NewsItem/Footer */
       close(footer, "div");
 
-      /* Append if provided */
-      if (hasFooter)
-        builder.append(footer);
+      /* Append */
+      builder.append(footer);
     }
 
     /* Close: NewsItem */
@@ -800,7 +796,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     builder.append(">").append(content).append("</a>");
   }
 
-  private void imageLink(StringBuilder builder, String link, String tooltip, String imgPath, String imgName, String linkId, String imageId) {
+  private void imageLink(StringBuilder builder, String link, String tooltip, String alt, String imgPath, String imgName, String linkId, String imageId) {
     builder.append("<a");
 
     if (linkId != null)
@@ -812,7 +808,13 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     if (imageId != null)
       builder.append(" id=\"").append(imageId).append("\"");
 
-    builder.append(" border=\"0\" src=\"").append(OwlUI.getImageUri(imgPath, imgName)).append("\" />");
+    String imageUri;
+    if (fIsIE)
+      imageUri = OwlUI.getImageUri(imgPath, imgName);
+    else
+      imageUri = ApplicationServer.getDefault().toResourceUrl(imgPath);
+
+    builder.append(" alt=\"").append(alt).append("\" border=\"0\" src=\"").append(imageUri).append("\" />");
     builder.append("</a>");
   }
 
