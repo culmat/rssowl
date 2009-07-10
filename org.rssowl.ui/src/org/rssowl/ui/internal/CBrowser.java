@@ -358,6 +358,14 @@ public class CBrowser {
   }
 
   /**
+   * @return <code>true</code> if this browser is IE and <code>false</code>
+   * otherwise.
+   */
+  public boolean isIE() {
+    return Application.IS_WINDOWS && !fBrowser.isDisposed() && (fBrowser.getStyle() & SWT.MOZILLA) == 0;
+  }
+
+  /**
    * @param disabled <code>true</code> to disable JavaScript and
    * <code>false</code> otherwise.
    */
