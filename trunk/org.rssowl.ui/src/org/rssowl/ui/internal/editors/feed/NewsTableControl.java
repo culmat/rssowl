@@ -636,7 +636,7 @@ public class NewsTableControl implements IFeedViewPart {
       return;
 
     /* Remember */
-    fLastSelection= (IStructuredSelection) event.getSelection();
+    fLastSelection = (IStructuredSelection) event.getSelection();
 
     /* Check Flag */
     if (fBlockNewsStateTracker.get())
@@ -1022,8 +1022,12 @@ public class NewsTableControl implements IFeedViewPart {
       fViewer.setInput(((IEntity) input).toReference());
     else
       fViewer.setInput(input);
+  }
 
-    /* Adjust Scroll Position depending on sort order */
+  /**
+   * Adjusts the scroll position to reflect the sorting.
+   */
+  public void adjustScrollPosition() {
     Tree tree = fViewer.getTree();
     int itemCount = tree.getItemCount();
     if (itemCount > 0) {

@@ -27,6 +27,8 @@ package org.rssowl.ui.internal.editors.feed;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
@@ -515,9 +517,23 @@ public class NewsContentProvider implements ITreeContentProvider {
     if (fGrouping.needsRefresh(INews.class, events, false))
       return true;
 
-    /* Add to Table-Viewer if Visible */
-    if (fFeedView.isTableViewerVisible())
-      fTableViewer.add(fTableViewer.getInput(), addedNews.toArray());
+    /* Add to Table-Viewer if Visible (keep top item stable) */
+    if (fFeedView.isTableViewerVisible()) {
+      Tree tree = fTableViewer.getTree();
+      TreeItem topItem = tree.getTopItem();
+      int indexOfTopItem = 0;
+      if (topItem != null)
+        indexOfTopItem = tree.indexOf(topItem);
+
+      tree.setRedraw(false);
+      try {
+        fTableViewer.add(fTableViewer.getInput(), addedNews.toArray());
+        if (topItem != null && indexOfTopItem != 0)
+          tree.setTopItem(topItem);
+      } finally {
+        tree.setRedraw(true);
+      }
+    }
 
     /* Add to Browser-Viewer if showing entire Feed */
     if (browserShowsCollection())

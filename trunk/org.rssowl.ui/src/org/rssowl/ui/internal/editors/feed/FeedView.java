@@ -1439,6 +1439,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       ((GridData) fBrowserSep.getLayoutData()).exclude = false;
       fSashForm.setMaximizedControl(null);
       fNewsTableControl.setPartInput(fInput.getMark());
+      fNewsTableControl.adjustScrollPosition();
       expandNewsTableViewerGroups(true, StructuredSelection.EMPTY);
       fNewsBrowserControl.setPartInput(null);
       fNewsTableControl.setFocus();
@@ -1563,6 +1564,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
           fNewsTableControl.setBlockNewsStateTracker(false);
         }
       }
+
+      /* Adjust Scroll Position */
+      fNewsTableControl.adjustScrollPosition();
     } finally {
       tree.getParent().setRedraw(true);
     }
