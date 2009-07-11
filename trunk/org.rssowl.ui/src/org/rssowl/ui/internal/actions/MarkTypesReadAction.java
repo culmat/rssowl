@@ -47,6 +47,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
 import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -136,6 +137,8 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
         fillNews((IFolder) element, news, retentionHelperMap);
       else if (element instanceof IBookMark)
         fillNews((IBookMark) element, news, retentionHelperMap);
+      else if (element instanceof FolderNewsMark)
+        fillNews(((FolderNewsMark) element).getFolder(), news, retentionHelperMap);
       else if (element instanceof INewsMark)
         fillNews((INewsMark) element, news);
       else if (element instanceof INews)
