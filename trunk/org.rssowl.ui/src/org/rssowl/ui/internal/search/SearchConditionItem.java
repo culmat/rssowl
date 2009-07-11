@@ -223,7 +223,7 @@ public class SearchConditionItem extends Composite {
   private void createSpecifierCombo() {
     final Combo specifierCombo = new Combo(this, SWT.BORDER | SWT.READ_ONLY);
     specifierCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
-    ((GridData) specifierCombo.getLayoutData()).widthHint = Application.IS_MAC ? 150 : 80;
+    ((GridData) specifierCombo.getLayoutData()).widthHint = Application.IS_MAC ? 160 : 90;
     specifierCombo.setVisibleItemCount(100);
 
     fSpecifierViewer = new ComboViewer(specifierCombo);
