@@ -792,11 +792,13 @@ public class BookMarkContentProvider implements ITreeContentProvider {
     return false;
   }
 
+  /* Recursively expand a folder and all parents */
   private void expand(IFolder folder) {
     IFolder parent = folder.getParent();
     if (parent != null)
       expand(parent);
 
-    fViewer.setExpandedState(folder, true);
+    if (folder.getParent() != null) //Never expand Set, its visible anyways
+      fViewer.setExpandedState(folder, true);
   }
 }
