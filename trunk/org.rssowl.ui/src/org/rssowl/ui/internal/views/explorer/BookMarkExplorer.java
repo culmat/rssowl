@@ -1371,8 +1371,15 @@ public class BookMarkExplorer extends ViewPart {
       public void partHidden(IWorkbenchPartReference ref) {}
 
       public void partInputChanged(IWorkbenchPartReference ref) {
-        if (ref.getPart(true) instanceof IEditorPart)
-          editorActivated(fViewSite.getPage().getActiveEditor());
+        if (ref.getPart(true) instanceof IEditorPart) {
+
+          /* Workaround for Bug 1126 */
+          JobRunner.runInUIThread(50, fViewer.getTree(), new Runnable() {
+            public void run() {
+              editorActivated(fViewSite.getPage().getActiveEditor());
+            }
+          });
+        }
       }
     };
 
