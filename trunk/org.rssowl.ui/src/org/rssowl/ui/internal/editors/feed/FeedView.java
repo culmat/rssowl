@@ -34,6 +34,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -67,6 +68,7 @@ import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.internal.connection.DefaultProtocolHandler;
 import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
@@ -98,6 +100,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
@@ -128,9 +131,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -147,9 +148,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * @author bpasero
  */
 public class FeedView extends EditorPart implements IReusableEditor {
-
-  /* Cache to remember selected News-Items */
-  private static Map<Integer, NewsReference> fgSelectionCache = new HashMap<Integer, NewsReference>();
 
   /* TODO Move this to Settings */
   private static final boolean BROWSER_SHOWS_ALL = false;
@@ -961,7 +959,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     /* Handle Old being hidden now */
     if (fInput != null) {
       notifyUIEvent(UIEvent.FEED_CHANGE);
-      rememberSelection();
+      rememberSelection(fInput.getMark(), fNewsTableControl.getLastSelection());
     }
 
     /* Remember New */
@@ -1056,6 +1054,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     final IMark inputMark = fInput.getMark();
     final Collection<INews> news = fContentProvider.getCachedNews();
     IPreferenceScope inputPreferences = Owl.getPreferenceService().getEntityScope(inputMark);
+    final IStructuredSelection lastSelection = fNewsTableControl.getLastSelection();
 
     /*
      * News can be NULL at this moment, if the Job that is to refresh the cache
@@ -1070,7 +1069,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     final boolean markReadOnTabClose = inputPreferences.getBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE);
     final boolean markReadOnMinimize = inputPreferences.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE);
 
-    /* Mark *new* News as *unread* when closing the entire application */
+    /* Mark *new* News as *unread* when closing the entire application and remember selected news */
     if (event == UIEvent.CLOSE) {
 
       /* Perform the State Change */
@@ -1086,6 +1085,9 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
       /* Perform Operation */
       fNewsDao.setState(newsToUpdate, INews.State.UNREAD, true, false);
+
+      /* Remember Selection */
+      rememberSelection(inputMark, lastSelection);
     }
 
     /* Handle seen News: Feed Change (also closing the feed view), Closing or Minimize Event */
@@ -1149,6 +1151,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
           /* Retention Strategy */
           if (inputMark instanceof IBookMark)
             performCleanUp((IBookMark) inputMark, news);
+
+          /* Also remember the last selected News */
+          if (event == UIEvent.TAB_CLOSE)
+            rememberSelection(inputMark, lastSelection);
         }
       });
     }
@@ -1261,16 +1267,17 @@ public class FeedView extends EditorPart implements IReusableEditor {
       @Override
       protected void runInUI(IProgressMonitor monitor) {
         IStructuredSelection oldSelection = null;
-        Object value = fgSelectionCache.get(fInput.hashCode());
-        if (value != null) {
-          IPreferenceScope entityPreferences = Owl.getPreferenceService().getEntityScope(mark);
+        IPreferenceScope entityPreferences = Owl.getPreferenceService().getEntityScope(mark);
+
+        long value = entityPreferences.getLong(DefaultPreferences.NM_SELECTED_NEWS);
+        if (value > 0) {
           boolean openEmptyNews = entityPreferences.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS);
           boolean openAllNews = entityPreferences.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS);
           boolean useExternalBrowser = fPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER) || fPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER);
 
           /* Only re-select if this has not the potential of opening in external Browser */
           if (!useExternalBrowser || (!openAllNews && !openEmptyNews))
-            oldSelection = new StructuredSelection(value);
+            oldSelection = new StructuredSelection(new NewsReference(value));
         }
 
         /* Set input to News-Table if Visible */
@@ -1285,9 +1292,12 @@ public class FeedView extends EditorPart implements IReusableEditor {
         if (!fBgMonitor.isCanceled() && (!isTableViewerVisible() || (BROWSER_SHOWS_ALL /* && oldSelection == null */)))
           fNewsBrowserControl.setPartInput(mark);
 
-        /* Reset old Input to Browser if availabel */
-        else if (!fBgMonitor.isCanceled() && oldSelection != null)
-          fNewsBrowserControl.setPartInput(oldSelection.getFirstElement());
+        /* Reset old Input to Browser if available */
+        else if (!fBgMonitor.isCanceled() && oldSelection != null) {
+          ISelection selection = fNewsTableControl.getViewer().getSelection();
+          if (!selection.isEmpty()) //Could be filtered
+            fNewsBrowserControl.setPartInput(oldSelection.getFirstElement());
+        }
 
         /* Clear old Input from Browser */
         else if (!fBgMonitor.isCanceled() && reused)
@@ -1558,15 +1568,48 @@ public class FeedView extends EditorPart implements IReusableEditor {
     }
   }
 
-  private void rememberSelection() {
-    IStructuredSelection sel = (IStructuredSelection) fNewsTableControl.getViewer().getSelection();
-    if (!sel.isEmpty()) {
-      Object obj = sel.getFirstElement();
-      if (obj instanceof INews)
-        fgSelectionCache.put(fInput.hashCode(), new NewsReference(((INews) obj).getId()));
-      else
-        fgSelectionCache.remove(fInput.hashCode());
-    }
+  private void rememberSelection(final IMark inputMark, final IStructuredSelection selection) {
+    SafeRunnable.run(new LoggingSafeRunnable() {
+      public void run() throws Exception {
+        IPreferenceScope inputPrefs = Owl.getPreferenceService().getEntityScope(inputMark);
+        long oldSelectionValue = inputPrefs.getLong(DefaultPreferences.NM_SELECTED_NEWS);
+
+        /* Find Selected News ID */
+        long newSelectionValue = 0;
+        if (!selection.isEmpty()) {
+          Object obj = selection.getFirstElement();
+          if (obj instanceof INews)
+            newSelectionValue = ((INews) obj).getId();
+        }
+
+        boolean needToSave = false;
+
+        /* Selection Provided */
+        if (newSelectionValue > 0) {
+          if (oldSelectionValue != newSelectionValue) {
+            needToSave = true;
+            inputPrefs.putLong(DefaultPreferences.NM_SELECTED_NEWS, newSelectionValue);
+          }
+        }
+
+        /* No Selection Provided */
+        else {
+          if (oldSelectionValue > 0) {
+            needToSave = true;
+            inputPrefs.delete(DefaultPreferences.NM_SELECTED_NEWS);
+          }
+        }
+
+        IEntity entityToSave;
+        if (fInput.getMark() instanceof FolderNewsMark)
+          entityToSave = ((FolderNewsMark) fInput.getMark()).getFolder();
+        else
+          entityToSave = fInput.getMark();
+
+        if (needToSave)
+          DynamicDAO.save(entityToSave);
+      }
+    });
   }
 
   /* Refresh Browser-Viewer */
