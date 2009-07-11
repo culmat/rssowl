@@ -221,7 +221,7 @@ public class SearchConditionItem extends Composite {
   }
 
   private void createSpecifierCombo() {
-    Combo specifierCombo = new Combo(this, SWT.BORDER | SWT.READ_ONLY);
+    final Combo specifierCombo = new Combo(this, SWT.BORDER | SWT.READ_ONLY);
     specifierCombo.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
     ((GridData) specifierCombo.getLayoutData()).widthHint = Application.IS_MAC ? 150 : 80;
     specifierCombo.setVisibleItemCount(100);
@@ -238,6 +238,8 @@ public class SearchConditionItem extends Composite {
     /* Make sure to at least select the first item */
     if (fSpecifierViewer.getSelection().isEmpty())
       fSpecifierViewer.getCombo().select(0);
+
+    specifierCombo.setToolTipText(getSpecifierTooltip((IStructuredSelection) fSpecifierViewer.getSelection()));
 
     /* Listen to Selection Changes in the Field-Viewer */
     fFieldViewer.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -264,8 +266,20 @@ public class SearchConditionItem extends Composite {
     fSpecifierViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
         fModified = true;
+        specifierCombo.setToolTipText(getSpecifierTooltip((IStructuredSelection) event.getSelection()));
       }
     });
+  }
+
+  private String getSpecifierTooltip(IStructuredSelection selection) {
+    Object element = selection.getFirstElement();
+    if (element instanceof SearchSpecifier) {
+      SearchSpecifier specifier = (SearchSpecifier) element;
+      if (specifier == SearchSpecifier.CONTAINS)
+        return "contains any of the words";
+    }
+
+    return null;
   }
 
   private void createInputField() {

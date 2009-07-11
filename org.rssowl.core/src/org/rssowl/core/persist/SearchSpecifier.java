@@ -91,7 +91,7 @@ public enum SearchSpecifier implements IPersistable {
       case CONTAINS:
         return "contains any";
       case CONTAINS_ALL:
-        return "contains all";
+        return "contains";
       case CONTAINS_NOT:
         return "doesn't contain";
       case BEGINS_WITH:
