@@ -230,6 +230,7 @@ public class NewsTableControl implements IFeedViewPart {
   private NewsColumnViewModel fColumnModel;
   private FeedViewInput fEditorInput;
   private boolean fBlockColumMoveEvent;
+  private IStructuredSelection fLastSelection = StructuredSelection.EMPTY;
 
   /* Settings */
   private IPreferenceScope fGlobalPreferences;
@@ -291,6 +292,13 @@ public class NewsTableControl implements IFeedViewPart {
     initDragAndDrop();
 
     return fViewer;
+  }
+
+  /**
+   * return the last selection in the table viewer.
+   */
+  IStructuredSelection getLastSelection() {
+    return fLastSelection;
   }
 
   private void initDragAndDrop() {
@@ -623,8 +631,15 @@ public class NewsTableControl implements IFeedViewPart {
 
   private void onSelectionChanged(SelectionChangedEvent event) {
 
-    /* Check Flag and only consider Structured Selections */
-    if (fBlockNewsStateTracker.get() || !(event.getSelection() instanceof IStructuredSelection))
+    /* Only consider Structured Selections */
+    if (!(event.getSelection() instanceof IStructuredSelection))
+      return;
+
+    /* Remember */
+    fLastSelection= (IStructuredSelection) event.getSelection();
+
+    /* Check Flag */
+    if (fBlockNewsStateTracker.get())
       return;
 
     /* Retrieve all NewsReferences of the Selection */
