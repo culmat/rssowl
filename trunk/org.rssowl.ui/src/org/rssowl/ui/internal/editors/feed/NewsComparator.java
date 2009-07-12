@@ -36,6 +36,8 @@ import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
+import org.rssowl.ui.internal.EntityGroup;
+import org.rssowl.ui.internal.editors.feed.NewsGrouping.Group;
 
 import java.util.Comparator;
 import java.util.Date;
@@ -94,12 +96,27 @@ public class NewsComparator extends ViewerComparator implements Comparator<INews
   @Override
   public int compare(Viewer viewer, Object e1, Object e2) {
 
-    /* Can only be an EntityGroup then */
-    if (!(e1 instanceof INews) || !(e2 instanceof INews))
-      return 0;
+    /* Compare Entity Groups */
+    if (e1 instanceof EntityGroup && e2 instanceof EntityGroup)
+      return compare((EntityGroup) e1, (EntityGroup) e2);
 
-    /* Proceed comparing News */
-    return compare((INews) e1, (INews) e2);
+    /* Compare News */
+    if (e1 instanceof INews && e2 instanceof INews)
+      return compare((INews) e1, (INews) e2);
+
+    return 0;
+  }
+
+  private int compare(EntityGroup e1, @SuppressWarnings("unused") EntityGroup e2) {
+
+    /* Support sorting Entity Groups of type DATE */
+    if (fSortBy != null && fSortBy == NewsColumn.DATE && fAscending) {
+      long id = e1.getId();
+      if (id == Group.TODAY.ordinal() || id == Group.YESTERDAY.ordinal() || id == Group.EARLIER_THIS_WEEK.ordinal() || id == Group.LAST_WEEK.ordinal() || id == Group.OLDER.ordinal())
+        return fAscending ? 1 : -1;
+    }
+
+    return 0;
   }
 
   /*

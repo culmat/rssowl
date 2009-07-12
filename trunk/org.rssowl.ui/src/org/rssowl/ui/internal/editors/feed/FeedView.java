@@ -1493,7 +1493,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private void refreshTableViewer(boolean delayRedraw, boolean updateLabels) {
     if (isTableViewerVisible()) {
       boolean groupingEnabled = fNewsGrouping.getType() != NewsGrouping.Type.NO_GROUPING;
-      fNewsTableControl.notifyGroupingEnabled(groupingEnabled);
 
       /* Remember Selection if grouping enabled */
       ISelection selection = StructuredSelection.EMPTY;
@@ -1711,9 +1710,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
       /* Create Viewer */
       tableViewer = fNewsTableControl.createViewer(container);
-
-      /* Inform about Grouping State */
-      fNewsTableControl.notifyGroupingEnabled(fNewsGrouping.isActive());
 
       /* Clear any quicksearch when ESC is hit from the Tree */
       tableViewer.getControl().addKeyListener(new KeyAdapter() {

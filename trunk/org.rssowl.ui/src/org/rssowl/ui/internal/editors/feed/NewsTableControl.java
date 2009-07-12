@@ -1031,9 +1031,13 @@ public class NewsTableControl implements IFeedViewPart {
     Tree tree = fViewer.getTree();
     int itemCount = tree.getItemCount();
     if (itemCount > 0) {
-      if (fCustomTree.isFlat() && fNewsSorter.getSortBy() == NewsColumn.DATE && fNewsSorter.isAscending())
-        tree.showItem(tree.getItem(itemCount - 1));
-      else
+      if (fNewsSorter.getSortBy() == NewsColumn.DATE && fNewsSorter.isAscending()) {
+        TreeItem item = tree.getItem(itemCount - 1);
+        int childCount = item.getItemCount();
+        if (childCount != 0)
+          item = item.getItem(childCount - 1);
+        tree.showItem(item);
+      } else
         tree.setTopItem(tree.getItem(0));
     }
   }
@@ -1136,9 +1140,5 @@ public class NewsTableControl implements IFeedViewPart {
         }
       }
     });
-  }
-
-  void notifyGroupingEnabled(boolean enabled) {
-    fCustomTree.setFlat(!enabled);
   }
 }
