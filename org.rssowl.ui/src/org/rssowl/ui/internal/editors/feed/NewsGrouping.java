@@ -176,7 +176,7 @@ public class NewsGrouping {
     BAD("Bad"),
 
     /** Group: Very Bad */
-    VERY_BAD("Very Bad"),
+    VERY_BAD("Unrated"),
 
     /** Group: New */
     NEW("New"),
