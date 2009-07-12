@@ -405,7 +405,10 @@ public class WebBrowserView extends EditorPart {
     /* Title Listener */
     fBrowser.getControl().addTitleListener(new TitleListener() {
       public void changed(TitleEvent event) {
-        setPartName(event.title);
+        if (URIUtils.ABOUT_BLANK.equals(event.title))
+          setPartName("Blank Page");
+        else
+          setPartName(event.title);
       }
     });
 
@@ -488,7 +491,12 @@ public class WebBrowserView extends EditorPart {
    */
   @Override
   public void setFocus() {
-    if (fBrowser != null && !fBrowser.getControl().isDisposed())
-      fBrowser.getControl().setFocus();
+    if (fBrowser != null && !fBrowser.getControl().isDisposed()) {
+      String url = fInput.getUrl();
+      if (URIUtils.ABOUT_BLANK.equals(url) || !StringUtils.isSet(url))
+        fLocationInput.setFocus();
+      else
+        fBrowser.getControl().setFocus();
+    }
   }
 }
