@@ -398,6 +398,8 @@ public class WebBrowserView extends EditorPart {
   private void createBrowser(Composite parent) {
     fBrowser = new CBrowser(parent, SWT.NONE);
     fBrowser.setUrl(fInput.getUrl());
+    if (StringUtils.isSet(fInput.getUrl()) && !URIUtils.ABOUT_BLANK.equals(fInput.getUrl()))
+      setBusy(true);
     fBrowser.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
   }
 
@@ -429,6 +431,12 @@ public class WebBrowserView extends EditorPart {
       public void changed(LocationEvent event) {
         fNavigationToolBarManager.find(BACK_ACTION).update(IAction.ENABLED);
         fNavigationToolBarManager.find(FORWARD_ACTION).update(IAction.ENABLED);
+        setBusy(false);
+      }
+
+      @Override
+      public void changing(LocationEvent event) {
+        setBusy(true);
       }
     });
 
@@ -453,6 +461,12 @@ public class WebBrowserView extends EditorPart {
         }
       }
     });
+  }
+
+  @SuppressWarnings("restriction")
+  private void setBusy(boolean busy) {
+    if (fCreated && getSite() instanceof org.eclipse.ui.internal.PartSite)
+      ((org.eclipse.ui.internal.PartSite) getSite()).getPane().setBusy(busy);
   }
 
   /*
