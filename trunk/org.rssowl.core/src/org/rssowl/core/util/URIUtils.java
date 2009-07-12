@@ -216,7 +216,7 @@ public class URIUtils {
       str = str.trim();
 
       /* Encode invalid URI Characters */
-      str= fastEncode(str);
+      str = fastEncode(str);
 
       return new URI(str);
     } catch (URISyntaxException e) {
@@ -303,5 +303,22 @@ public class URIUtils {
     }
 
     return url;
+  }
+
+  /**
+   * @param value the input value (either a link or phrase).
+   * @return the value as is if it is a link or a search url for the phrase.
+   */
+  public static String getLink(String value) {
+    if (!StringUtils.isSet(value))
+      return value;
+
+    if (value.contains(":") || value.contains("/"))
+      return value;
+
+    if (value.contains(" ") || !value.contains("."))
+      return "http://www.google.com/search?q=" + urlEncode(value);
+
+    return value;
   }
 }

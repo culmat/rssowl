@@ -236,12 +236,13 @@ public class BrowserBar {
 
   private void createLocationInput(Composite parent) {
     fLocationInput = new Text(parent, SWT.BORDER | SWT.SINGLE);
+    fLocationInput.setMessage("Enter a website or search phrase");
     fLocationInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     fLocationInput.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetDefaultSelected(SelectionEvent e) {
         if (StringUtils.isSet(fLocationInput.getText())) {
-          fBrowser.setUrl(fLocationInput.getText());
+          fBrowser.setUrl(URIUtils.getLink(fLocationInput.getText()));
           fBrowser.getControl().setFocus();
         }
       }
