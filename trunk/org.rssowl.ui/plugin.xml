@@ -1618,7 +1618,7 @@
             enabled="false"
             icon="icons/obj16/share_google.gif"
             id="org.rssowl.ui.GoogleShareProvider"
-            name="Google"
+            name="Google Bookmarks"
             url="http://www.google.com/bookmarks/mark?op=edit&amp;bkmk=[L]&amp;title=[T]">
       </shareProvider>
       <shareProvider
