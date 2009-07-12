@@ -61,7 +61,7 @@ import java.util.Map;
 /**
  * Instances of <code>CBrowser</code> wrap around the Browser-Widget and enhance
  * it by some means.
- *
+ * 
  * @author bpasero
  */
 public class CBrowser {
@@ -117,7 +117,7 @@ public class CBrowser {
 
   /**
    * Adds the given Handler to this instance responsible for the given Command.
-   *
+   * 
    * @param commandId The ID of the Command the provided Handler is responsible
    * for.
    * @param handler The Handler responsible for the fiven ID.
@@ -255,7 +255,7 @@ public class CBrowser {
 
   /**
    * Returns the Browser-Widget this class is wrapping.
-   *
+   * 
    * @return The Browser-Widget this class is wrapping.
    */
   public Browser getControl() {
@@ -264,7 +264,7 @@ public class CBrowser {
 
   /**
    * Browse to the given URL.
-   *
+   * 
    * @param url The URL to browse to.
    */
   public void setUrl(String url) {
@@ -274,7 +274,7 @@ public class CBrowser {
 
   /**
    * Navigate to the previous session history item.
-   *
+   * 
    * @return <code>true</code> if the operation was successful and
    * <code>false</code> otherwise
    */
@@ -285,7 +285,7 @@ public class CBrowser {
 
   /**
    * Navigate to the next session history item.
-   *
+   * 
    * @return <code>true</code> if the operation was successful and
    * <code>false</code> otherwise
    */
@@ -296,7 +296,7 @@ public class CBrowser {
 
   /**
    * Print the Browser using the JavaScript print() method
-   *
+   * 
    * @return <code>TRUE</code> in case of success, <code>FALSE</code> otherwise
    */
   public boolean print() {
@@ -393,6 +393,24 @@ public class CBrowser {
     return fPreferences.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT);
   }
 
+  private boolean shouldDisableScript(String location) {
+    if (!shouldDisableScript())
+      return false;
+
+    if (!StringUtils.isSet(location))
+      return true;
+
+    String[] websites = fPreferences.getStrings(DefaultPreferences.DISABLE_JAVASCRIPT_EXCEPTIONS);
+    if (websites != null) {
+      for (String website : websites) {
+        if (location.contains(website))
+          return false;
+      }
+    }
+
+    return true;
+  }
+
   private void hookListeners() {
 
     /* Listen to Open-Window-Changes */
@@ -408,7 +426,7 @@ public class CBrowser {
       public void changing(LocationEvent event) {
 
         /* Update JavaScript enabled state */
-        setScriptDisabled(shouldDisableScript());
+        setScriptDisabled(shouldDisableScript(event.location));
 
         /* Handle Application Protocol */
         if (event.location != null && event.location.contains(ILinkHandler.HANDLER_PROTOCOL)) {

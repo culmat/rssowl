@@ -43,6 +43,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.ui.internal.dialogs.WebsiteListDialog;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 /**
@@ -72,7 +73,8 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   private Button fAlwaysReuseFeedView;
   private Button fLoadBrowserTabInBackground;
   private Button fAlwaysReuseBrowser;
-  private Button fEnableJavaScriptCheck;
+  private Button fDisableJavaScriptCheck;
+  private Button fDisableJavaScriptExceptionsButton;
 
   /** Leave for reflection */
   public MiscPreferencePage() {
@@ -272,12 +274,33 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fAlwaysReuseBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fAlwaysReuseBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER));
 
-    /* Enable JavaScript in Browser */
+    /* Disable JavaScript in Browser */
     if (Application.IS_WINDOWS) {
-      fEnableJavaScriptCheck = new Button(browserGroup, SWT.CHECK);
-      fEnableJavaScriptCheck.setText("Enable JavaScript in Browser");
-      fEnableJavaScriptCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
-      fEnableJavaScriptCheck.setSelection(!fGlobalScope.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT));
+      Composite jsContainer = new Composite(browserGroup, SWT.NONE);
+      jsContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
+      jsContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+
+      fDisableJavaScriptCheck = new Button(jsContainer, SWT.CHECK);
+      fDisableJavaScriptCheck.setText("Disable JavaScript in Browser");
+      fDisableJavaScriptCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, true));
+      fDisableJavaScriptCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT));
+      fDisableJavaScriptCheck.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          fDisableJavaScriptExceptionsButton.setEnabled(fDisableJavaScriptCheck.getSelection());
+        }
+      });
+
+      fDisableJavaScriptExceptionsButton = new Button(jsContainer, SWT.PUSH);
+      fDisableJavaScriptExceptionsButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
+      fDisableJavaScriptExceptionsButton.setText("Exceptions...");
+      fDisableJavaScriptExceptionsButton.setEnabled(fDisableJavaScriptCheck.getSelection());
+      fDisableJavaScriptExceptionsButton.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          new WebsiteListDialog(getShell()).open();
+        }
+      });
     }
   }
 
@@ -309,8 +332,10 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
 
     fGlobalScope.putBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER, fAlwaysReuseBrowser.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND, fLoadBrowserTabInBackground.getSelection());
-    if (Application.IS_WINDOWS)
-      fGlobalScope.putBoolean(DefaultPreferences.DISABLE_JAVASCRIPT, !fEnableJavaScriptCheck.getSelection());
+    if (Application.IS_WINDOWS) {
+      fGlobalScope.putBoolean(DefaultPreferences.DISABLE_JAVASCRIPT, fDisableJavaScriptCheck.getSelection());
+      fDisableJavaScriptExceptionsButton.setEnabled(fDisableJavaScriptCheck.getSelection());
+    }
 
     fGlobalScope.putBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER, fUseDefaultExternalBrowser.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER, fUseCustomExternalBrowser.getSelection());
@@ -341,8 +366,10 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
 
     fAlwaysReuseBrowser.setSelection(defaultScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER));
     fLoadBrowserTabInBackground.setSelection(defaultScope.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND));
-    if (Application.IS_WINDOWS)
-      fEnableJavaScriptCheck.setSelection(!defaultScope.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT));
+    if (Application.IS_WINDOWS) {
+      fDisableJavaScriptCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT));
+      fDisableJavaScriptExceptionsButton.setEnabled(fDisableJavaScriptCheck.getSelection());
+    }
 
     fUseDefaultExternalBrowser.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER));
     fUseCustomExternalBrowser.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER));
