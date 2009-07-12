@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.editors.feed;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -52,12 +53,13 @@ import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.CBrowser;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 /**
- * The <code>BrowserBar</code> is providing controls to navigate a Browser.
- * This includes common actions like 'Forward' and 'Back'. A Text-Field is
- * provided to enter URLs.
+ * The <code>BrowserBar</code> is providing controls to navigate a Browser. This
+ * includes common actions like 'Forward' and 'Back'. A Text-Field is provided
+ * to enter URLs.
  *
  * @author bpasero
  */
@@ -154,7 +156,18 @@ public class BrowserBar {
   private void createNavigationToolBar(Composite parent) {
     fNavigationToolBarManager = new ToolBarManager(SWT.FLAT);
 
+    /* New Browser Tab */
+    IAction newBrowserTab = new Action("New Browser Tab") {
+      @Override
+      public void run() {
+        BrowserUtils.openLinkInternal(URIUtils.ABOUT_BLANK, null);
+      }
+    };
+    newBrowserTab.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/new_browser_tab.gif")); //$NON-NLS-1$
+    fNavigationToolBarManager.add(newBrowserTab);
+
     /* Navigate Backward */
+    fNavigationToolBarManager.add(new Separator());
     IAction navBackward = new Action("Back") {
       @Override
       public void run() {
