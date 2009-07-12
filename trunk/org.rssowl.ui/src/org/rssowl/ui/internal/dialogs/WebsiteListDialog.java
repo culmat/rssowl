@@ -90,7 +90,7 @@ public class WebsiteListDialog extends Dialog {
     /* Info Label */
     Label infoLabel = new Label(composite, SWT.None);
     infoLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
-    infoLabel.setText("Type the domain of the website: ");
+    infoLabel.setText("Enter websites for which JavaScript should be enabled: ");
 
     /* URL Input */
     fWebsiteInput = new Text(composite, SWT.BORDER | SWT.SINGLE);
