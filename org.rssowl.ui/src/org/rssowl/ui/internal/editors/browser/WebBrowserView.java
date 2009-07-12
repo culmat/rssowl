@@ -322,6 +322,7 @@ public class WebBrowserView extends EditorPart {
       @Override
       public void run() {
         fBrowser.getControl().stop();
+        setBusy(false);
       }
     };
     stopNav.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/cancel.gif")); //$NON-NLS-1$
@@ -332,6 +333,7 @@ public class WebBrowserView extends EditorPart {
       @Override
       public void run() {
         fBrowser.getControl().refresh();
+        setBusy(true);
       }
     };
     reload.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/reload.gif")); //$NON-NLS-1$
