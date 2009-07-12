@@ -1109,7 +1109,16 @@ public class SearchNewsDialog extends TitleAreaDialog {
     ((GridData) searchButton.getLayoutData()).grabExcessHorizontalSpace = false;
 
     /* Clear */
-    createButton(buttonBar, BUTTON_CLEAR, "&Clear", false);
+    createButton(buttonBar, BUTTON_CLEAR, "C&lear", false);
+
+    /* Close */
+    Button closeButton = createButton(buttonBar, IDialogConstants.CLOSE_ID, IDialogConstants.CLOSE_LABEL, false);
+    closeButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        close();
+      }
+    });
 
     return buttonBar;
   }
@@ -1292,8 +1301,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     /* Reset Conditions */
     fSearchConditionList.reset();
-    fMatchAllRadio.setSelection(false);
-    fMatchAnyRadio.setSelection(true);
+    fMatchAllRadio.setSelection(true);
+    fMatchAnyRadio.setSelection(false);
     fResultViewer.setInput(Collections.emptyList());
     hideBrowser(true);
 

@@ -213,12 +213,14 @@ public class ShareProvidersListDialog extends TitleAreaDialog {
       }
     });
 
+    /* Separator */
+    Label sep = new Label(buttonContainer, SWT.SEPARATOR | SWT.HORIZONTAL);
+    sep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
     /* Select All */
     Button selectAllButton = new Button(buttonContainer, SWT.PUSH);
     selectAllButton.setText("Select &All");
     setButtonLayoutData(selectAllButton);
-    ((GridData) selectAllButton.getLayoutData()).verticalAlignment = SWT.END;
-    ((GridData) selectAllButton.getLayoutData()).grabExcessVerticalSpace = true;
     selectAllButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -234,6 +236,20 @@ public class ShareProvidersListDialog extends TitleAreaDialog {
       @Override
       public void widgetSelected(SelectionEvent e) {
         onSelectAll(true);
+      }
+    });
+
+    /* Close */
+    Button closeButton = new Button(buttonContainer, SWT.PUSH);
+    closeButton.getShell().setDefaultButton(closeButton);
+    closeButton.setText("&Close");
+    setButtonLayoutData(closeButton);
+    ((GridData) closeButton.getLayoutData()).verticalAlignment = SWT.END;
+    ((GridData) closeButton.getLayoutData()).grabExcessVerticalSpace = true;
+    closeButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        close();
       }
     });
 
