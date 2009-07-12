@@ -199,7 +199,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     fUseMasterPasswordCheck = new Button(masterContainer, SWT.CHECK);
     fUseMasterPasswordCheck.setText("Use a master password");
-    fUseMasterPasswordCheck.setLayoutData(new GridData(SWT.FILL, SWT.END, true, true));
+    fUseMasterPasswordCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     fUseMasterPasswordCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD));
     fUseMasterPasswordCheck.addSelectionListener(new SelectionAdapter() {
       @Override
