@@ -313,13 +313,15 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
       }
     });
 
+    /* Separator */
+    Label sep = new Label(buttonContainer, SWT.SEPARATOR | SWT.HORIZONTAL);
+    sep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
     /* Move Filter Up */
     fMoveUpButton = new Button(buttonContainer, SWT.PUSH);
     fMoveUpButton.setText("Move &Up");
     fMoveUpButton.setEnabled(false);
     setButtonLayoutData(fMoveUpButton);
-    ((GridData) fMoveUpButton.getLayoutData()).verticalAlignment = SWT.END;
-    ((GridData) fMoveUpButton.getLayoutData()).grabExcessVerticalSpace = true;
     fMoveUpButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -339,8 +341,12 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
       }
     });
 
+    Composite buttonBar = new Composite(composite, SWT.NONE);
+    buttonBar.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    buttonBar.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
+
     /* Button to apply filter on all News */
-    fApplySelectedFilter = new Button(composite, SWT.PUSH);
+    fApplySelectedFilter = new Button(buttonBar, SWT.PUSH);
     fApplySelectedFilter.setText("&Run Selected Filter...");
     fApplySelectedFilter.setEnabled(false);
     setButtonLayoutData(fApplySelectedFilter);
@@ -350,6 +356,19 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
       @Override
       public void widgetSelected(SelectionEvent e) {
         onApplySelectedFilter();
+      }
+    });
+
+    /* Close */
+    Button closeButton = new Button(buttonBar, SWT.PUSH);
+    closeButton.setText("&Close");
+    setButtonLayoutData(closeButton);
+    ((GridData) closeButton.getLayoutData()).grabExcessHorizontalSpace = true;
+    ((GridData) closeButton.getLayoutData()).horizontalAlignment = SWT.END;
+    closeButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        close();
       }
     });
 

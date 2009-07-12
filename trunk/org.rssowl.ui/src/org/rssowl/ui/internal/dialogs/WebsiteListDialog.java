@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.dialogs;
 
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -204,6 +205,12 @@ public class WebsiteListDialog extends Dialog {
         onRemoveAll();
       }
     });
+
+    /* Close */
+    Button closeButton = createButton(parent, IDialogConstants.OK_ID, IDialogConstants.CLOSE_LABEL, false);
+    int widthHint = ((GridData) closeButton.getLayoutData()).widthHint;
+    closeButton.setLayoutData(new GridData(SWT.END, SWT.BEGINNING, true, false));
+    ((GridData) closeButton.getLayoutData()).widthHint = widthHint;
   }
 
   private void onAdd() {
