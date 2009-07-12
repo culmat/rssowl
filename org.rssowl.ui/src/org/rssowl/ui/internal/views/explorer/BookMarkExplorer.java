@@ -1015,15 +1015,8 @@ public class BookMarkExplorer extends ViewPart {
     IAction collapseAll = new Action("Collapse All") {
       @Override
       public void run() {
-        ISelection selection = fViewer.getSelection();
-        fViewer.getTree().setRedraw(false);
-        try {
-          fViewer.collapseAll();
-          fExpandedNodes.clear();
-          fViewer.setSelection(selection, true);
-        } finally {
-          fViewer.getTree().setRedraw(true);
-        }
+        fViewer.collapseAll();
+        fExpandedNodes.clear();
       }
     };
     collapseAll.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/collapseall.gif")); //$NON-NLS-1$
