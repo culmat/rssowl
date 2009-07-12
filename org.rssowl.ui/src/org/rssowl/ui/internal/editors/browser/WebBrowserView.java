@@ -98,6 +98,7 @@ public class WebBrowserView extends EditorPart {
   private Action fPasteAction;
   private Action fPrintAction;
   private boolean fCreated;
+  private boolean fLocationSelectAllOnce = true;
 
   /** Leave default for reflection */
   public WebBrowserView() {}
@@ -385,8 +386,10 @@ public class WebBrowserView extends EditorPart {
     fLocationInput.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseUp(MouseEvent e) {
-        if (fLocationInput.getSelectionCount() == 0)
+        if (fLocationSelectAllOnce && fLocationInput.getSelectionCount() == 0)
           fLocationInput.selectAll();
+
+        fLocationSelectAllOnce = false;
       }
     });
 
@@ -404,6 +407,7 @@ public class WebBrowserView extends EditorPart {
         fEditorSite.getActionBars().getGlobalActionHandler(ActionFactory.CUT.getId()).setEnabled(false);
         fEditorSite.getActionBars().getGlobalActionHandler(ActionFactory.COPY.getId()).setEnabled(false);
         fEditorSite.getActionBars().getGlobalActionHandler(ActionFactory.PASTE.getId()).setEnabled(false);
+        fLocationSelectAllOnce = true;
       }
     });
   }
