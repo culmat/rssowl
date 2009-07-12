@@ -79,6 +79,7 @@ public class BrowserBar {
   private Text fLocationInput;
   private FeedView fFeedView;
   private boolean fUseExternalBrowser;
+  private boolean fLocationSelectAllOnce = true;
 
   /**
    * @param feedView
@@ -254,8 +255,10 @@ public class BrowserBar {
     fLocationInput.addMouseListener(new MouseAdapter() {
       @Override
       public void mouseUp(MouseEvent e) {
-        if (fLocationInput.getSelectionCount() == 0)
+        if (fLocationSelectAllOnce && fLocationInput.getSelectionCount() == 0)
           fLocationInput.selectAll();
+
+        fLocationSelectAllOnce = false;
       }
     });
 
@@ -273,6 +276,7 @@ public class BrowserBar {
         fFeedView.getEditorSite().getActionBars().getGlobalActionHandler(ActionFactory.CUT.getId()).setEnabled(false);
         fFeedView.getEditorSite().getActionBars().getGlobalActionHandler(ActionFactory.COPY.getId()).setEnabled(false);
         fFeedView.getEditorSite().getActionBars().getGlobalActionHandler(ActionFactory.PASTE.getId()).setEnabled(false);
+        fLocationSelectAllOnce = true;
       }
     });
   }
