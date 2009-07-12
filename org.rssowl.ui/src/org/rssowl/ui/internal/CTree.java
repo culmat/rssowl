@@ -73,22 +73,6 @@ public class CTree {
   }
 
   /**
-   * @param flat if <code>true</code> only one level of tree items is used and
-   * <code>false</code> if the tree has parent and childs.
-   */
-  public void setFlat(boolean flat) {
-    fIsFlat = flat;
-  }
-
-  /**
-   * @return <code>true</code> if only one level of tree items is used and
-   * <code>false</code> if the tree has parent and childs.
-   */
-  public boolean isFlat() {
-    return fIsFlat;
-  }
-
-  /**
    * @param col
    * @param layoutData
    * @param text
