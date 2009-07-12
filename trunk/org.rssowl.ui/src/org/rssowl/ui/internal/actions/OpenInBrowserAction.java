@@ -111,6 +111,7 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
   }
 
   private void internalRun() throws URISyntaxException {
+    String title = "Loading...";
     List<?> selection = fSelection.toList();
     for (Object object : selection) {
       URI link = null;
@@ -118,6 +119,7 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
       /* News */
       if (object instanceof INews) {
         INews news = (INews) object;
+        title = CoreUtils.getHeadline(news, true);
         link = news.getLink();
         if (link == null) {
           String fallbackLink = CoreUtils.getLink(news);
@@ -138,8 +140,12 @@ public class OpenInBrowserAction extends Action implements IWorkbenchWindowActio
         IWorkbenchBrowserSupport browserSupport = PlatformUI.getWorkbench().getBrowserSupport();
         try {
           IWebBrowser browser = browserSupport.createBrowser(WebBrowserView.EDITOR_ID);
-          if (browser instanceof EmbeddedWebBrowser)
-            ((EmbeddedWebBrowser) browser).setContext(fContext);
+          if (browser instanceof EmbeddedWebBrowser) {
+            if (fContext != null)
+              ((EmbeddedWebBrowser) browser).setContext(fContext);
+            else
+              ((EmbeddedWebBrowser) browser).setContext(WebBrowserContext.createFrom(title));
+          }
           browser.openURL(link.toURL());
         } catch (PartInitException e) {
           Activator.getDefault().getLog().log(e.getStatus());

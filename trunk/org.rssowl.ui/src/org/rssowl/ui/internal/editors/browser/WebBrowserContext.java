@@ -39,6 +39,7 @@ import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
@@ -54,6 +55,19 @@ public class WebBrowserContext {
   private String fTitle;
 
   private WebBrowserContext() {}
+
+  /**
+   * @param text the text to show while loading the website.
+   * @return a new instance of {@link WebBrowserContext} from the given input.
+   */
+  public static WebBrowserContext createFrom(String text) {
+    WebBrowserContext context = new WebBrowserContext();
+    if (!StringUtils.isSet(text))
+      return context;
+
+    context.fTitle = text;
+    return context;
+  }
 
   /**
    * @param news the news that is opened in the browser.
