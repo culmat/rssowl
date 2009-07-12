@@ -213,11 +213,13 @@ public class WebsiteListDialog extends Dialog {
       if (websites == null)
         websites = new String[0];
       List<String> newWebsites = new ArrayList<String>(Arrays.asList(websites));
-      newWebsites.add(website);
+      if (!newWebsites.contains(website))
+        newWebsites.add(website);
       String[] newWebsitesArray = newWebsites.toArray(new String[newWebsites.size()]);
       fPreferences.putStrings(DefaultPreferences.DISABLE_JAVASCRIPT_EXCEPTIONS, newWebsitesArray);
       fViewer.setInput(newWebsitesArray);
       fWebsiteInput.setText("");
+      fWebsiteInput.setFocus();
     }
   }
 
