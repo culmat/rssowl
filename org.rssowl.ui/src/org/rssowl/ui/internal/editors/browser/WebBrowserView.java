@@ -43,6 +43,8 @@ import org.eclipse.swt.browser.TitleEvent;
 import org.eclipse.swt.browser.TitleListener;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -376,6 +378,15 @@ public class WebBrowserView extends EditorPart {
           fBrowser.setUrl(URIUtils.getLink(fLocationInput.getText()));
           fBrowser.getControl().setFocus();
         }
+      }
+    });
+
+    /* Select All on Mouse Up */
+    fLocationInput.addMouseListener(new MouseAdapter() {
+      @Override
+      public void mouseUp(MouseEvent e) {
+        if (fLocationInput.getSelectionCount() == 0)
+          fLocationInput.selectAll();
       }
     });
 
