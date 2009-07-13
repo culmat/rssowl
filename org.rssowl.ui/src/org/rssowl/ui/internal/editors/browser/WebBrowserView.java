@@ -67,6 +67,7 @@ import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.CBrowser;
 import org.rssowl.ui.internal.Controller;
@@ -466,7 +467,10 @@ public class WebBrowserView extends EditorPart {
   }
 
   private void createLocationInput(Composite parent) {
-    fLocationInput = new Text(parent, SWT.BORDER | SWT.SINGLE);
+    if (Application.IS_WINDOWS || Application.IS_LINUX)
+      fLocationInput = new Text(parent, SWT.BORDER | SWT.SINGLE | SWT.SEARCH);
+    else
+      fLocationInput = new Text(parent, SWT.BORDER | SWT.SINGLE);
     fLocationInput.setMessage("Enter a website or search phrase");
     fLocationInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     if (fInput.getUrl() != null)
