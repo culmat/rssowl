@@ -85,6 +85,11 @@ public class SendLinkAction implements IObjectActionDelegate {
             i++;
           }
         }
+
+        /* Directly append String if present */
+        else if (element instanceof String) {
+          str.append(element);
+        }
       }
     }
 
