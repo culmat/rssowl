@@ -28,8 +28,12 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.browser.Browser;
@@ -52,7 +56,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.actions.ActionFactory;
@@ -66,9 +72,15 @@ import org.rssowl.ui.internal.CBrowser;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.ShareProvider;
+import org.rssowl.ui.internal.actions.OpenInBrowserAction;
+import org.rssowl.ui.internal.actions.SendLinkAction;
+import org.rssowl.ui.internal.dialogs.ShareProvidersListDialog;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.LayoutUtils;
+
+import java.util.List;
 
 /**
  * The <code>WebBrowserView</code> is able to display a website in an embedded
@@ -356,6 +368,86 @@ public class WebBrowserView extends EditorPart {
     };
     navHome.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/home.gif")); //$NON-NLS-1$
     fNavigationToolBarManager.add(navHome);
+
+    /* Share */
+    fNavigationToolBarManager.add(new Separator());
+    IAction shareLink = new Action("Share Link", IAction.AS_DROP_DOWN_MENU) {
+      @Override
+      public void run() {
+        getMenuCreator().getMenu(fNavigationToolBarManager.getControl()).setVisible(true);
+      }
+    };
+    fNavigationToolBarManager.add(shareLink);
+    shareLink.setImageDescriptor(OwlUI.SHARE);
+    shareLink.setMenuCreator(new IMenuCreator() {
+      public Menu getMenu(Menu parent) {
+        return null;
+      }
+
+      public Menu getMenu(Control parent) {
+        MenuManager shareMenu = new MenuManager();
+
+        final IStructuredSelection selection = new StructuredSelection(fBrowser.getControl().getUrl());
+
+        List<ShareProvider> providers = Controller.getDefault().getShareProviders();
+        for (final ShareProvider provider : providers) {
+          if (provider.isEnabled()) {
+            shareMenu.add(new Action(provider.getName()) {
+              @Override
+              public void run() {
+                if (SendLinkAction.ID.equals(provider.getId())) {
+                  IActionDelegate action = new SendLinkAction();
+                  action.selectionChanged(null, selection);
+                  action.run(null);
+                } else {
+                  Object obj = selection.getFirstElement();
+                  if (StringUtils.isSet((String) obj) && !URIUtils.ABOUT_BLANK.equals(obj)) {
+                    String shareLink = provider.toShareUrl((String) obj, null);
+                    new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
+                  }
+                }
+              };
+
+              @Override
+              public ImageDescriptor getImageDescriptor() {
+                if (StringUtils.isSet(provider.getIconPath()))
+                  return OwlUI.getImageDescriptor(provider.getIconPath());
+
+                return super.getImageDescriptor();
+              };
+
+              @Override
+              public boolean isEnabled() {
+                return !selection.isEmpty();
+              }
+
+              @Override
+              public String getActionDefinitionId() {
+                return SendLinkAction.ID.equals(provider.getId()) ? SendLinkAction.ID : super.getActionDefinitionId();
+              }
+
+              @Override
+              public String getId() {
+                return SendLinkAction.ID.equals(provider.getId()) ? SendLinkAction.ID : super.getId();
+              }
+            });
+          }
+        }
+
+        /* Configure Providers */
+        shareMenu.add(new Separator());
+        shareMenu.add(new Action("&Configure...") {
+          @Override
+          public void run() {
+            new ShareProvidersListDialog(fBrowser.getControl().getShell()).open();
+          };
+        });
+
+        return shareMenu.createContextMenu(parent);
+      }
+
+      public void dispose() {}
+    });
 
     fNavigationToolBarManager.createControl(parent);
   }
