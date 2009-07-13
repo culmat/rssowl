@@ -460,6 +460,14 @@
                id="org.rssowl.ui.preferences.keywords.Credentials">
          </keywordReference>
       </page>
+      <page
+            class="org.rssowl.ui.internal.BrowserPreferencePage"
+            id="org.rssowl.ui.BrowserPreferencesPage"
+            name="Browser">
+         <keywordReference
+               id="org.rssowl.ui.preferences.keywords.Browser">
+         </keywordReference>
+      </page>
    </extension>
    <extension
          point="org.eclipse.ui.keywords">
@@ -480,7 +488,7 @@
             label="open view switch"/>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Miscellaneous"
-            label="internal embedded systemtray confirm confirmation delete reopen open single multi tab minimize tray external browser feed view script js web link javascript java background">
+            label="systemtray reopen open single multi tab minimize tray feed view">
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Feeds"
@@ -497,6 +505,10 @@
       <keyword
             id="org.rssowl.ui.preferences.keywords.Credentials"
             label="password passwords credential credentials protected secure security username login master protect authorization authentication auth">
+      </keyword>
+      <keyword
+            id="org.rssowl.ui.preferences.keywords.Browser"
+            label="internal embedded external browser script js web link javascript java background">
       </keyword>
    </extension>
    <extension

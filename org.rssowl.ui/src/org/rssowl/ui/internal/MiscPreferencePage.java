@@ -34,16 +34,13 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.ui.internal.dialogs.WebsiteListDialog;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 /**
@@ -61,20 +58,11 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   private Button fMinimizeToTray;
   private Button fMoveToTrayOnStart;
   private Button fMoveToTrayOnExit;
-  private Text fCustomBrowserInput;
-  private Button fUseCustomExternalBrowser;
-  private Button fUseDefaultExternalBrowser;
-  private Button fUseInternalBrowser;
-  private Button fCustomBrowserSearchButton;
   private Spinner fAutoCloseTabsSpinner;
   private Button fAutoCloseTabsCheck;
   private Button fUseMultipleTabsCheck;
   private Button fReopenFeedsOnStartupCheck;
   private Button fAlwaysReuseFeedView;
-  private Button fLoadBrowserTabInBackground;
-  private Button fAlwaysReuseBrowser;
-  private Button fDisableJavaScriptCheck;
-  private Button fDisableJavaScriptExceptionsButton;
 
   /** Leave for reflection */
   public MiscPreferencePage() {
@@ -100,9 +88,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   @Override
   protected Control createContents(Composite parent) {
     Composite container = createComposite(parent);
-
-    /* Browser Options */
-    createBrowserOptions(container);
 
     /* View Options */
     createViewOptions(container);
@@ -146,8 +131,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
       public void widgetSelected(SelectionEvent e) {
         fAutoCloseTabsSpinner.setEnabled(fAutoCloseTabsCheck.getSelection());
         fAlwaysReuseFeedView.setEnabled(!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1);
-        fAlwaysReuseBrowser.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
-        fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
       }
     });
 
@@ -160,8 +143,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
       @Override
       public void widgetSelected(SelectionEvent e) {
         fAlwaysReuseFeedView.setEnabled(!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1);
-        fAlwaysReuseBrowser.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
-        fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
       }
     });
 
@@ -169,8 +150,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     label.setText(" tabs");
 
     fAlwaysReuseFeedView.setEnabled(!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1);
-    fAlwaysReuseBrowser.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
-    fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
   }
 
   private void createTrayOptions(Composite container) {
@@ -199,111 +178,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fMoveToTrayOnExit.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
   }
 
-  private void createBrowserOptions(Composite container) {
-    Label label = new Label(container, SWT.NONE);
-    label.setText("Browser");
-    label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
-
-    /* Browser Group */
-    Composite browserGroup = new Composite(container, SWT.None);
-    browserGroup.setLayout(LayoutUtils.createGridLayout(2, 10, 5));
-    browserGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
-    /* Use internal Browser */
-    fUseInternalBrowser = new Button(browserGroup, SWT.RADIO);
-    fUseInternalBrowser.setText("Use internal Browser");
-    fUseInternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
-    fUseInternalBrowser.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        fAlwaysReuseBrowser.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
-        fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
-      }
-    });
-
-    /* Use default external Browser */
-    fUseDefaultExternalBrowser = new Button(browserGroup, SWT.RADIO);
-    fUseDefaultExternalBrowser.setText("Use default external Browser");
-    fUseDefaultExternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
-    fUseDefaultExternalBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER));
-
-    /* Use custom external Browser */
-    fUseCustomExternalBrowser = new Button(browserGroup, SWT.RADIO);
-    fUseCustomExternalBrowser.setText("Use the following external Browser:");
-    fUseCustomExternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
-    fUseCustomExternalBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER));
-    fUseCustomExternalBrowser.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        fCustomBrowserInput.setEnabled(fUseCustomExternalBrowser.getSelection());
-        fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
-      }
-    });
-
-    fUseInternalBrowser.setSelection(!fUseDefaultExternalBrowser.getSelection() && !fUseCustomExternalBrowser.getSelection());
-
-    fCustomBrowserInput = new Text(browserGroup, SWT.BORDER);
-    fCustomBrowserInput.setEnabled(fUseCustomExternalBrowser.getSelection());
-    fCustomBrowserInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-
-    String customBrowserValue = fGlobalScope.getString(DefaultPreferences.CUSTOM_BROWSER_PATH);
-    if (customBrowserValue != null)
-      fCustomBrowserInput.setText(customBrowserValue);
-
-    fCustomBrowserSearchButton = new Button(browserGroup, SWT.PUSH);
-    fCustomBrowserSearchButton.setText("Search...");
-    fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
-    fCustomBrowserSearchButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        FileDialog dialog = new FileDialog(getShell(), SWT.OPEN);
-        dialog.setFileName(fCustomBrowserInput.getText());
-        String path = dialog.open();
-        if (path != null)
-          fCustomBrowserInput.setText(path);
-      }
-    });
-
-    fLoadBrowserTabInBackground = new Button(browserGroup, SWT.CHECK);
-    fLoadBrowserTabInBackground.setText("Open browser tabs in the background");
-    fLoadBrowserTabInBackground.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
-    fLoadBrowserTabInBackground.setSelection(fGlobalScope.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND));
-
-    fAlwaysReuseBrowser = new Button(browserGroup, SWT.CHECK);
-    fAlwaysReuseBrowser.setText("Always open web sites in the same tab");
-    fAlwaysReuseBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
-    fAlwaysReuseBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER));
-
-    /* Disable JavaScript in Browser */
-    if (Application.IS_WINDOWS) {
-      Composite jsContainer = new Composite(browserGroup, SWT.NONE);
-      jsContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
-      jsContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
-
-      fDisableJavaScriptCheck = new Button(jsContainer, SWT.CHECK);
-      fDisableJavaScriptCheck.setText("Disable JavaScript in Browser");
-      fDisableJavaScriptCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, true));
-      fDisableJavaScriptCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT));
-      fDisableJavaScriptCheck.addSelectionListener(new SelectionAdapter() {
-        @Override
-        public void widgetSelected(SelectionEvent e) {
-          fDisableJavaScriptExceptionsButton.setEnabled(fDisableJavaScriptCheck.getSelection());
-        }
-      });
-
-      fDisableJavaScriptExceptionsButton = new Button(jsContainer, SWT.PUSH);
-      fDisableJavaScriptExceptionsButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
-      fDisableJavaScriptExceptionsButton.setText("Exceptions...");
-      fDisableJavaScriptExceptionsButton.setEnabled(fDisableJavaScriptCheck.getSelection());
-      fDisableJavaScriptExceptionsButton.addSelectionListener(new SelectionAdapter() {
-        @Override
-        public void widgetSelected(SelectionEvent e) {
-          new WebsiteListDialog(getShell()).open();
-        }
-      });
-    }
-  }
-
   private Composite createComposite(Composite parent) {
     Composite composite = new Composite(parent, SWT.NULL);
     GridLayout layout = new GridLayout();
@@ -330,17 +204,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_START, fMoveToTrayOnStart.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_CLOSE, fMoveToTrayOnExit.getSelection());
 
-    fGlobalScope.putBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER, fAlwaysReuseBrowser.getSelection());
-    fGlobalScope.putBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND, fLoadBrowserTabInBackground.getSelection());
-    if (Application.IS_WINDOWS) {
-      fGlobalScope.putBoolean(DefaultPreferences.DISABLE_JAVASCRIPT, fDisableJavaScriptCheck.getSelection());
-      fDisableJavaScriptExceptionsButton.setEnabled(fDisableJavaScriptCheck.getSelection());
-    }
-
-    fGlobalScope.putBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER, fUseDefaultExternalBrowser.getSelection());
-    fGlobalScope.putBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER, fUseCustomExternalBrowser.getSelection());
-    fGlobalScope.putString(DefaultPreferences.CUSTOM_BROWSER_PATH, fCustomBrowserInput.getText());
-
     return super.performOk();
   }
 
@@ -364,22 +227,6 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fMoveToTrayOnStart.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_START));
     fMoveToTrayOnExit.setSelection(defaultScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
 
-    fAlwaysReuseBrowser.setSelection(defaultScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER));
-    fLoadBrowserTabInBackground.setSelection(defaultScope.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND));
-    if (Application.IS_WINDOWS) {
-      fDisableJavaScriptCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT));
-      fDisableJavaScriptExceptionsButton.setEnabled(fDisableJavaScriptCheck.getSelection());
-    }
-
-    fUseDefaultExternalBrowser.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER));
-    fUseCustomExternalBrowser.setSelection(defaultScope.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER));
-    fUseInternalBrowser.setSelection(!fUseDefaultExternalBrowser.getSelection() && !fUseDefaultExternalBrowser.getSelection());
-
-    fCustomBrowserInput.setEnabled(fUseCustomExternalBrowser.getSelection());
-    fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
-
     fAlwaysReuseFeedView.setEnabled(!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1);
-    fAlwaysReuseBrowser.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
-    fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && (!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1));
   }
 }
