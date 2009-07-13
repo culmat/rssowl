@@ -119,9 +119,10 @@ public class BrowserBar {
       public void changed(ProgressEvent event) {
         if (!fLocationInput.isDisposed()) {
           String url = ((Browser) event.widget).getUrl();
-          if (ApplicationServer.getDefault().isNewsServerUrl(url))
-            fLocationInput.setText(""); //$NON-NLS-1$
-          else if (!StringUtils.isSet(fLocationInput.getText()))
+          if (ApplicationServer.getDefault().isNewsServerUrl(url)) {
+            if (ApplicationServer.getDefault().isNewsServerUrl(fLocationInput.getText()))
+              fLocationInput.setText(""); //$NON-NLS-1$
+          } else if (!StringUtils.isSet(fLocationInput.getText()))
             fLocationInput.setText(URIUtils.ABOUT_BLANK.equals(url) ? "" : url); //$NON-NLS-1$
         }
       }
