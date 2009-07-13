@@ -24,6 +24,7 @@
 
 package org.rssowl.core.tests.connection;
 
+import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -35,6 +36,7 @@ import org.eclipse.core.runtime.Platform;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
+import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.IConditionalGetCompatible;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IConnectionService;
@@ -340,12 +342,16 @@ public class ConnectionTests {
       URI feedUrl = new URI(feedUrlStr);
       IFeed feed = new Feed(feedUrl);
 
-      InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
-      assertNotNull(id, inS);
+      try {
+        InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
+        assertNotNull(id, inS);
 
-      assertNull(id, feed.getFormat());
-      Owl.getInterpreter().interpret(inS, feed, null);
-      assertNotNull(id, feed.getFormat());
+        assertNull(id, feed.getFormat());
+        Owl.getInterpreter().interpret(inS, feed, null);
+        assertNotNull(id, feed.getFormat());
+      } catch (ConnectionException e) {
+        fail(feedUrlStr);
+      }
     }
   }
 }
