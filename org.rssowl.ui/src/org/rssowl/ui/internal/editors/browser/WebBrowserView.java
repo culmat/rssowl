@@ -60,7 +60,10 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.EditorPart;
 import org.rssowl.core.persist.INewsMark;
@@ -112,6 +115,7 @@ public class WebBrowserView extends EditorPart {
   private Action fPrintAction;
   private boolean fCreated;
   private boolean fLocationSelectAllOnce = true;
+  private IPartListener2 fPartListener;
 
   /** Leave default for reflection */
   public WebBrowserView() {}
@@ -132,6 +136,55 @@ public class WebBrowserView extends EditorPart {
     /* Hook into Global Actions */
     createGlobalActions();
     setGlobalActions();
+
+    /* Register Listeners */
+    registerListeners();
+  }
+
+  private void registerListeners() {
+    fPartListener = new IPartListener2() {
+
+      public void partHidden(IWorkbenchPartReference partRef) {}
+
+      /* Hook into Global Actions for this Editor */
+      public void partBroughtToTop(IWorkbenchPartReference partRef) {
+        if (WebBrowserView.this.equals(partRef.getPart(false))) {
+          setGlobalActions();
+          OwlUI.updateWindowTitle(getPartName());
+        }
+      }
+
+      public void partClosed(IWorkbenchPartReference partRef) {
+        IEditorReference[] editors = partRef.getPage().getEditorReferences();
+        boolean equalsThis = WebBrowserView.this.equals(partRef.getPart(false));
+        if (editors.length == 0 && equalsThis)
+          OwlUI.updateWindowTitle(getPartName());
+      }
+
+      public void partDeactivated(IWorkbenchPartReference partRef) {}
+
+      public void partActivated(IWorkbenchPartReference partRef) {
+        if (WebBrowserView.this.equals(partRef.getPart(false)))
+          OwlUI.updateWindowTitle(getPartName());
+      }
+
+      public void partInputChanged(IWorkbenchPartReference partRef) {
+        if (WebBrowserView.this.equals(partRef.getPart(false)))
+          OwlUI.updateWindowTitle(getPartName());
+      }
+
+      public void partOpened(IWorkbenchPartReference partRef) {
+        if (WebBrowserView.this.equals(partRef.getPart(false)))
+          OwlUI.updateWindowTitle(getPartName());
+      }
+
+      public void partVisible(IWorkbenchPartReference partRef) {
+        if (WebBrowserView.this.equals(partRef.getPart(false)))
+          OwlUI.updateWindowTitle(getPartName());
+      }
+    };
+
+    fEditorSite.getPage().addPartListener(fPartListener);
   }
 
   /**
@@ -174,8 +227,13 @@ public class WebBrowserView extends EditorPart {
    */
   @Override
   public void dispose() {
+    unregisterListeners();
     super.dispose();
     fCreated = false;
+  }
+
+  private void unregisterListeners() {
+    fEditorSite.getPage().removePartListener(fPartListener);
   }
 
   private void createGlobalActions() {
@@ -533,6 +591,8 @@ public class WebBrowserView extends EditorPart {
           setPartName("Blank Page");
         else
           setPartName(event.title);
+
+        OwlUI.updateWindowTitle(getPartName());
       }
     });
 

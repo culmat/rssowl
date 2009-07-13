@@ -94,6 +94,7 @@ import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.editors.browser.WebBrowserInput;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 import org.rssowl.ui.internal.editors.feed.FeedView;
@@ -1268,11 +1269,23 @@ public class OwlUI {
    * @param shownInput the input that is currently visible in RSSOwl.
    */
   public static void updateWindowTitle(IMark[] shownInput) {
+    if (shownInput != null && shownInput.length > 0)
+      updateWindowTitle(shownInput[0].getName());
+  }
+
+  /**
+   * Update the current active window title based on the given title.
+   *
+   * @param title the name of the input that is currently visible in RSSOwl.
+   */
+  public static void updateWindowTitle(String title) {
     IWorkbenchWindow window = getWindow();
     if (window != null) {
-      String title = "RSSOwl";
-      if (shownInput != null && shownInput.length > 0)
-        title = shownInput[0].getName() + " - " + title;
+      String appTitle = "RSSOwl";
+      if (StringUtils.isSet(title))
+        title = title + " - " + appTitle;
+      else
+        title = appTitle;
 
       window.getShell().setText(title);
     }
