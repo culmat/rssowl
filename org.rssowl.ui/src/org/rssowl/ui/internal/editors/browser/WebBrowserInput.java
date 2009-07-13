@@ -56,7 +56,8 @@ public class WebBrowserInput implements IEditorInput {
   }
 
   /**
-   * @return The URL that is to to open as <code>String</code>.
+   * @return The URL that is to to open as <code>String</code> or
+   * <code>null</code> if none.
    */
   public String getUrl() {
     return fUrl;
@@ -88,7 +89,7 @@ public class WebBrowserInput implements IEditorInput {
    * @see org.eclipse.ui.IEditorInput#getName()
    */
   public String getName() {
-    return fUrl;
+    return fUrl != null ? fUrl : "Loading...";
   }
 
   /*
