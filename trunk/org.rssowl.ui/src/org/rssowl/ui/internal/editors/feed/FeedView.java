@@ -398,7 +398,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     /* Save from Browser */
     else {
-      //content.append(fNewsBrowserControl.getViewer().getBrowser().getControl().getText()); TODO Enable in 3.5
+      content.append(fNewsBrowserControl.getViewer().getBrowser().getControl().getText());
     }
 
     if (content.length() == 0)
