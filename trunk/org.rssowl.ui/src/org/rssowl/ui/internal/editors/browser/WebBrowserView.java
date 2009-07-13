@@ -145,10 +145,14 @@ public class WebBrowserView extends EditorPart {
     /* Update Browser with Input if already created */
     if (fCreated) {
       WebBrowserInput browserInput = (WebBrowserInput) input;
-      fBrowser.setUrl(browserInput.getUrl());
+      if (browserInput.getUrl() != null)
+        fBrowser.setUrl(browserInput.getUrl());
       fNavigationToolBarManager.find(BACK_ACTION).update(IAction.ENABLED);
       fNavigationToolBarManager.find(FORWARD_ACTION).update(IAction.ENABLED);
-      fLocationInput.setText(fInput.getUrl());
+      if (fInput.getUrl() != null)
+        fLocationInput.setText(fInput.getUrl());
+      else
+        fLocationInput.setText("");
     }
   }
 
@@ -346,7 +350,8 @@ public class WebBrowserView extends EditorPart {
     IAction navHome = new Action("Home") {
       @Override
       public void run() {
-        fBrowser.setUrl(fInput.getUrl());
+        if (fInput.getUrl() != null)
+          fBrowser.setUrl(fInput.getUrl());
       }
     };
     navHome.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/home.gif")); //$NON-NLS-1$
@@ -371,7 +376,8 @@ public class WebBrowserView extends EditorPart {
     fLocationInput = new Text(parent, SWT.BORDER | SWT.SINGLE);
     fLocationInput.setMessage("Enter a website or search phrase");
     fLocationInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-    fLocationInput.setText(fInput.getUrl());
+    if (fInput.getUrl() != null)
+      fLocationInput.setText(fInput.getUrl());
     fLocationInput.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetDefaultSelected(SelectionEvent e) {
@@ -414,7 +420,8 @@ public class WebBrowserView extends EditorPart {
 
   private void createBrowser(Composite parent) {
     fBrowser = new CBrowser(parent, SWT.NONE);
-    fBrowser.setUrl(fInput.getUrl());
+    if (fInput.getUrl() != null)
+      fBrowser.setUrl(fInput.getUrl());
     if (StringUtils.isSet(fInput.getUrl()) && !URIUtils.ABOUT_BLANK.equals(fInput.getUrl()))
       setBusy(true);
     fBrowser.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
@@ -525,7 +532,7 @@ public class WebBrowserView extends EditorPart {
   public void setFocus() {
     if (fBrowser != null && !fBrowser.getControl().isDisposed()) {
       String url = fInput.getUrl();
-      if (URIUtils.ABOUT_BLANK.equals(url) || !StringUtils.isSet(url))
+      if (URIUtils.ABOUT_BLANK.equals(url))
         fLocationInput.setFocus();
       else
         fBrowser.getControl().setFocus();

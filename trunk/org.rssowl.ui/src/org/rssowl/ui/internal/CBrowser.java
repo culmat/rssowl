@@ -48,6 +48,7 @@ import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -61,7 +62,7 @@ import java.util.Map;
 /**
  * Instances of <code>CBrowser</code> wrap around the Browser-Widget and enhance
  * it by some means.
- * 
+ *
  * @author bpasero
  */
 public class CBrowser {
@@ -117,7 +118,7 @@ public class CBrowser {
 
   /**
    * Adds the given Handler to this instance responsible for the given Command.
-   * 
+   *
    * @param commandId The ID of the Command the provided Handler is responsible
    * for.
    * @param handler The Handler responsible for the fiven ID.
@@ -255,7 +256,7 @@ public class CBrowser {
 
   /**
    * Returns the Browser-Widget this class is wrapping.
-   * 
+   *
    * @return The Browser-Widget this class is wrapping.
    */
   public Browser getControl() {
@@ -264,7 +265,7 @@ public class CBrowser {
 
   /**
    * Browse to the given URL.
-   * 
+   *
    * @param url The URL to browse to.
    */
   public void setUrl(String url) {
@@ -274,7 +275,7 @@ public class CBrowser {
 
   /**
    * Navigate to the previous session history item.
-   * 
+   *
    * @return <code>true</code> if the operation was successful and
    * <code>false</code> otherwise
    */
@@ -285,7 +286,7 @@ public class CBrowser {
 
   /**
    * Navigate to the next session history item.
-   * 
+   *
    * @return <code>true</code> if the operation was successful and
    * <code>false</code> otherwise
    */
@@ -296,7 +297,7 @@ public class CBrowser {
 
   /**
    * Print the Browser using the JavaScript print() method
-   * 
+   *
    * @return <code>TRUE</code> in case of success, <code>FALSE</code> otherwise
    */
   public boolean print() {
@@ -332,7 +333,7 @@ public class CBrowser {
 
         /* Open internal Browser in a new Tab */
         if (fEclipsePreferences.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS)) {
-          WebBrowserView browserView = BrowserUtils.openLinkInternal(URIUtils.ABOUT_BLANK, null);
+          WebBrowserView browserView = BrowserUtils.openLinkInternal(null, WebBrowserContext.createFrom("Loading..."));
           if (browserView != null)
             event.browser = browserView.getBrowser().getControl();
         }
