@@ -491,7 +491,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         IEditorReference[] editors = partRef.getPage().getEditorReferences();
         boolean equalsThis = FeedView.this.equals(partRef.getPart(false));
         if (editors.length == 0 && equalsThis)
-          OwlUI.updateWindowTitle(null);
+          OwlUI.updateWindowTitle((String) null);
 
         if (equalsThis) {
           if (fgLastVisibleFeedView == FeedView.this) //Avoids duplicate UI Event handling
