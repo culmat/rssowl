@@ -113,9 +113,8 @@ public class NewsColumnSelectionControl extends Composite {
     setLayout(LayoutUtils.createGridLayout(2, 0, 0));
 
     /* Left: List of Columns */
-    fNewsColumnViewer = new ListViewer(this, SWT.BORDER | SWT.MULTI);
+    fNewsColumnViewer = new ListViewer(this, SWT.BORDER | SWT.MULTI | SWT.V_SCROLL);
     fNewsColumnViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-    ((GridData) fNewsColumnViewer.getControl().getLayoutData()).heightHint = fNewsColumnViewer.getList().getItemHeight() * (NewsColumn.values().length - 1); //Not all selectable
     fNewsColumnViewer.setContentProvider(new ArrayContentProvider());
     fNewsColumnViewer.setLabelProvider(new LabelProvider() {
       @Override
