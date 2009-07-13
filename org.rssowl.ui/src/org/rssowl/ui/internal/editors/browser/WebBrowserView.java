@@ -387,7 +387,8 @@ public class WebBrowserView extends EditorPart {
       public Menu getMenu(Control parent) {
         MenuManager shareMenu = new MenuManager();
 
-        final IStructuredSelection selection = new StructuredSelection(fBrowser.getControl().getUrl());
+        String url = fBrowser.getControl().getUrl();
+        final IStructuredSelection selection = URIUtils.ABOUT_BLANK.equals(url) ? StructuredSelection.EMPTY : new StructuredSelection(url);
 
         List<ShareProvider> providers = Controller.getDefault().getShareProviders();
         for (final ShareProvider provider : providers) {
