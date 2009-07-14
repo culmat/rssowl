@@ -55,6 +55,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
@@ -70,6 +71,7 @@ import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.CBrowser;
@@ -84,6 +86,9 @@ import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.List;
 
 /**
@@ -663,7 +668,7 @@ public class WebBrowserView extends EditorPart {
    */
   @Override
   public boolean isSaveAsAllowed() {
-    return false;
+    return true;
   }
 
   /*
@@ -679,7 +684,44 @@ public class WebBrowserView extends EditorPart {
    */
   @Override
   public void doSaveAs() {
-  /* Not Supported */
+    if (!fCreated || Controller.getDefault().isShuttingDown())
+      return;
+
+    if (URIUtils.ABOUT_BLANK.equals(fBrowser.getControl().getUrl()))
+      return;
+
+    /* Ask user for File */
+    FileDialog dialog = new FileDialog(getSite().getShell(), SWT.SAVE);
+    dialog.setOverwrite(true);
+    dialog.setFilterExtensions(new String[] { ".html" });
+    dialog.setFileName("site.html");
+
+    String fileName = dialog.open();
+    if (fileName == null)
+      return;
+
+    StringBuilder content = new StringBuilder();
+    content.append(fBrowser.getControl().getText());
+    if (content.length() == 0)
+      return;
+
+    /* Write into File */
+    OutputStreamWriter writer = null;
+    try {
+      writer = new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8");
+      writer.write(content.toString());
+      writer.close();
+    } catch (IOException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    } finally {
+      if (writer != null) {
+        try {
+          writer.close();
+        } catch (IOException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+        }
+      }
+    }
   }
 
   /*
