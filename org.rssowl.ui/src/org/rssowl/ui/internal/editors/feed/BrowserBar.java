@@ -31,6 +31,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -46,6 +47,7 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -95,6 +97,7 @@ public class BrowserBar {
   private FeedView fFeedView;
   private boolean fUseExternalBrowser;
   private boolean fLocationSelectAllOnce = true;
+  private final Font fItalicFont;
 
   /**
    * @param feedView
@@ -103,6 +106,7 @@ public class BrowserBar {
   public BrowserBar(FeedView feedView, Composite parent) {
     fFeedView = feedView;
     fParent = parent;
+    fItalicFont = OwlUI.getItalic(JFaceResources.DEFAULT_FONT);
 
     IPreferenceScope globalScope = Owl.getPreferenceService().getGlobalScope();
     fUseExternalBrowser = globalScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER) || globalScope.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER);
@@ -127,6 +131,12 @@ public class BrowserBar {
       public void changed(LocationEvent event) {
         fNavigationToolBarManager.find(BACK_ACTION).update(IAction.ENABLED);
         fNavigationToolBarManager.find(FORWARD_ACTION).update(IAction.ENABLED);
+        setBusy(false);
+      }
+
+      @Override
+      public void changing(LocationEvent event) {
+        setBusy(true);
       }
     };
 
@@ -225,6 +235,7 @@ public class BrowserBar {
       @Override
       public void run() {
         fBrowser.getControl().stop();
+        setBusy(false);
       }
     };
     stopNav.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/cancel.gif")); //$NON-NLS-1$
@@ -235,6 +246,7 @@ public class BrowserBar {
       @Override
       public void run() {
         fBrowser.getControl().refresh();
+        setBusy(true);
       }
     };
     reload.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/reload.gif")); //$NON-NLS-1$
@@ -386,5 +398,16 @@ public class BrowserBar {
         fLocationSelectAllOnce = true;
       }
     });
+  }
+
+  private void setBusy(boolean busy) {
+    if (fLocationInput.isDisposed())
+      return;
+
+    String url = fLocationInput.getText();
+    if (busy && StringUtils.isSet(url) && !ApplicationServer.getDefault().isNewsServerUrl(url) && !URIUtils.ABOUT_BLANK.equals(url))
+      fLocationInput.setFont(fItalicFont);
+    else
+      fLocationInput.setFont(null);
   }
 }

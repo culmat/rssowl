@@ -1427,6 +1427,8 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     /* Maximize Browser */
     if (maximized) {
+      ((GridData) fBrowserSep.getLayoutData()).exclude = !fBrowserBar.isVisible();
+      fBrowserSep.setVisible(fBrowserBar.isVisible());
       fSashForm.setMaximizedControl(fBrowserViewerControlContainer);
       fNewsTableControl.getViewer().setSelection(StructuredSelection.EMPTY);
       fNewsBrowserControl.setPartInput(fInput.getMark());
@@ -1437,6 +1439,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     /* Restore Table */
     else {
       ((GridData) fBrowserSep.getLayoutData()).exclude = false;
+      fBrowserSep.setVisible(true);
       fSashForm.setMaximizedControl(null);
       fNewsTableControl.setPartInput(fInput.getMark());
       fNewsTableControl.adjustScrollPosition();
