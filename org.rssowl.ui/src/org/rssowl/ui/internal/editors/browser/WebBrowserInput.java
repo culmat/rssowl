@@ -24,9 +24,14 @@
 
 package org.rssowl.ui.internal.editors.browser;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IPersistableElement;
+import org.rssowl.core.Owl;
+import org.rssowl.core.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.OwlUI;
 
 /**
@@ -36,8 +41,12 @@ import org.rssowl.ui.internal.OwlUI;
  * @author bpasero
  */
 public class WebBrowserInput implements IEditorInput {
+  private static final String FACTORY_ID = "org.rssowl.ui.WebBrowserViewFactory";
+  static final String URL = "org.rssowl.ui.internal.editors.browser.Url";
+
   private final String fUrl;
   private final WebBrowserContext fContext;
+  private String fCurrentUrl;
 
   /**
    * @param url
@@ -64,6 +73,14 @@ public class WebBrowserInput implements IEditorInput {
   }
 
   /**
+   * @param url The current URL as <code>String</code> or <code>null</code> if
+   * none.
+   */
+  public void setCurrentUrl(String url) {
+    fCurrentUrl = url;
+  }
+
+  /**
    * @return the context from which this web browser input was created from or
    * <code>null</code> if none.
    */
@@ -75,7 +92,7 @@ public class WebBrowserInput implements IEditorInput {
    * @see org.eclipse.ui.IEditorInput#exists()
    */
   public boolean exists() {
-    return false;
+    return true;
   }
 
   /*
@@ -96,7 +113,25 @@ public class WebBrowserInput implements IEditorInput {
    * @see org.eclipse.ui.IEditorInput#getPersistable()
    */
   public IPersistableElement getPersistable() {
-    return null;
+    IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
+
+    boolean useExternalBrowser = preferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) || preferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER);
+    if (useExternalBrowser)
+      return null;
+
+    boolean restore = preferences.getBoolean(DefaultPreferences.REOPEN_BROWSER_TABS);
+    if (!restore)
+      return null;
+
+    return new IPersistableElement() {
+      public String getFactoryId() {
+        return FACTORY_ID;
+      }
+
+      public void saveState(IMemento memento) {
+        memento.putString(URL, fCurrentUrl != null ? fCurrentUrl : fUrl);
+      }
+    };
   }
 
   /*
@@ -111,6 +146,6 @@ public class WebBrowserInput implements IEditorInput {
    */
   @SuppressWarnings("unchecked")
   public Object getAdapter(Class adapter) {
-    return null;
+    return Platform.getAdapterManager().getAdapter(this, adapter);
   }
 }

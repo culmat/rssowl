@@ -65,6 +65,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
   /** Global: Path to the custom Browser */
   public static final String CUSTOM_BROWSER_PATH = "org.rssowl.pref.CustomBrowserPath";
 
+  /** Global: Re-Open last opened Browser on Startup */
+  public static final String REOPEN_BROWSER_TABS = "org.rssowl.pref.ReopenBrowserTabs";
+
   /** Global: Minimize to the system tray */
   public static final String TRAY_ON_MINIMIZE = "org.rssowl.pref.UseSystemTray";
 

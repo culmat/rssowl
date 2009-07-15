@@ -431,7 +431,7 @@
       <page
             class="org.rssowl.ui.internal.MiscPreferencePage"
             id="org.rssowl.ui.MiscPreferences"
-            name="Miscellaneous">
+            name="View">
          <keywordReference
                id="org.rssowl.ui.preferences.keywords.Miscellaneous">
          </keywordReference>
@@ -1430,6 +1430,10 @@
       <factory
             class="org.rssowl.ui.internal.editors.feed.FeedViewFactory"
             id="org.rssowl.ui.FeedViewFactory">
+      </factory>
+      <factory
+            class="org.rssowl.ui.internal.editors.browser.WebBrowserViewFactory"
+            id="org.rssowl.ui.WebBrowserViewFactory">
       </factory>
    </extension>
    <extension

@@ -64,6 +64,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IPartListener2;
+import org.eclipse.ui.IReusableEditor;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.EditorPart;
@@ -97,7 +98,7 @@ import java.util.List;
  *
  * @author bpasero
  */
-public class WebBrowserView extends EditorPart {
+public class WebBrowserView extends EditorPart implements IReusableEditor {
 
   /** ID of this Editor */
   public static final String EDITOR_ID = "org.rssowl.ui.WebBrowser";
@@ -542,7 +543,10 @@ public class WebBrowserView extends EditorPart {
       @Override
       public void widgetDefaultSelected(SelectionEvent e) {
         if (StringUtils.isSet(fLocationInput.getText())) {
-          fBrowser.setUrl(URIUtils.getLink(fLocationInput.getText()));
+          String link = URIUtils.getLink(fLocationInput.getText());
+          fBrowser.setUrl(link);
+          if (fInput != null)
+            fInput.setCurrentUrl(link);
           fBrowser.getControl().setFocus();
         }
       }
@@ -642,8 +646,11 @@ public class WebBrowserView extends EditorPart {
           String url = ((Browser) event.widget).getUrl();
           if (ApplicationServer.getDefault().isNewsServerUrl(url))
             fLocationInput.setText(""); //$NON-NLS-1$
-          else if (StringUtils.isSet(url))
+          else if (StringUtils.isSet(url)) {
             fLocationInput.setText(URIUtils.ABOUT_BLANK.equals(url) ? "" : url); //$NON-NLS-1$
+            if (fInput != null)
+              fInput.setCurrentUrl(url);
+          }
         }
       }
     });
