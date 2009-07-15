@@ -25,7 +25,6 @@
 package org.rssowl.ui.internal;
 
 import org.eclipse.jface.preference.PreferencePage;
-import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -99,13 +98,10 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   }
 
   private void createViewOptions(Composite container) {
-    Label label = new Label(container, SWT.NONE);
-    label.setText("View");
-    label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
 
     /* View Group */
     Composite viewGroup = new Composite(container, SWT.None);
-    viewGroup.setLayout(LayoutUtils.createGridLayout(1, 10, 5));
+    viewGroup.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
     viewGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fReopenFeedsOnStartupCheck = new Button(viewGroup, SWT.CHECK);
@@ -146,21 +142,22 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
       }
     });
 
-    label = new Label(autoCloseTabsContainer, SWT.None);
+    Label label = new Label(autoCloseTabsContainer, SWT.None);
     label.setText(" tabs");
 
     fAlwaysReuseFeedView.setEnabled(!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1);
   }
 
   private void createTrayOptions(Composite container) {
-    Label label = new Label(container, SWT.NONE);
-    label.setText("Move to the System Tray");
-    label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
 
     /* System Tray Group */
     Composite trayGroup = new Composite(container, SWT.None);
-    trayGroup.setLayout(LayoutUtils.createGridLayout(1, 10, 5));
+    trayGroup.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
+    ((GridLayout) trayGroup.getLayout()).marginTop = 5;
     trayGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+    Label label = new Label(trayGroup, SWT.NONE);
+    label.setText("Move to the System Tray: ");
 
     /* Enable / Disable Tray */
     fMinimizeToTray = new Button(trayGroup, SWT.CHECK);
