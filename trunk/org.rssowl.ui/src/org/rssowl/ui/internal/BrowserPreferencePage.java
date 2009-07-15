@@ -30,6 +30,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -40,6 +41,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.dialogs.WebsiteListDialog;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -53,6 +55,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
   private Button fUseDefaultExternalBrowser;
   private Button fUseInternalBrowser;
   private Button fCustomBrowserSearchButton;
+  private Button fReOpenBrowserTabs;
   private Button fLoadBrowserTabInBackground;
   private Button fAlwaysReuseBrowser;
   private Button fDisableJavaScriptCheck;
@@ -101,7 +104,12 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
 
     /* Use default external Browser */
     fUseDefaultExternalBrowser = new Button(browserGroup, SWT.RADIO);
-    fUseDefaultExternalBrowser.setText("Use default external Browser");
+    String name = getDefaultBrowserName();
+    if (StringUtils.isSet(name))
+      fUseDefaultExternalBrowser.setText("Use default external Browser (" + name + ")");
+    else
+      fUseDefaultExternalBrowser.setText("Use default external Browser");
+
     fUseDefaultExternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fUseDefaultExternalBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER));
 
@@ -142,10 +150,15 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
       }
     });
 
-    Composite bottomContainer= new Composite(browserGroup, SWT.NONE);
+    Composite bottomContainer = new Composite(browserGroup, SWT.NONE);
     bottomContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
     bottomContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
-    ((GridLayout)bottomContainer.getLayout()).marginTop = 10;
+    ((GridLayout) bottomContainer.getLayout()).marginTop = 10;
+
+    fReOpenBrowserTabs = new Button(bottomContainer, SWT.CHECK);
+    fReOpenBrowserTabs.setText("Re-Open last opened browser tabs on startup");
+    fReOpenBrowserTabs.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
+    fReOpenBrowserTabs.setSelection(fGlobalScope.getBoolean(DefaultPreferences.REOPEN_BROWSER_TABS));
 
     fLoadBrowserTabInBackground = new Button(bottomContainer, SWT.CHECK);
     fLoadBrowserTabInBackground.setText("Open browser tabs in the background");
@@ -189,6 +202,47 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
     }
   }
 
+  private String getDefaultBrowserName() {
+    Program program = Program.findProgram("html");
+    if (program != null) {
+      String name = program.getName();
+      if (StringUtils.isSet(name)) {
+        name = name.toLowerCase();
+        if (name.contains("firefox"))
+          return "Mozilla Firefox";
+
+        if (name.contains("mozilla"))
+          return "Mozilla";
+
+        if (name.contains("opera"))
+          return "Opera";
+
+        if (name.contains("safari"))
+          return "Safari";
+
+        if (name.contains("chrome"))
+          return "Google Chrome";
+
+        if (name.equals("html document") && Application.IS_WINDOWS)
+          return "Internet Explorer";
+
+        if (name.contains("internet explorer") && Application.IS_WINDOWS)
+          return "Internet Explorer";
+
+        if (name.contains("netscape"))
+          return "Netscape";
+
+        if (name.contains("konqueror"))
+          return "Konqueror";
+
+        if (name.contains("camino"))
+          return "Camino";
+      }
+    }
+
+    return null;
+  }
+
   private Composite createComposite(Composite parent) {
     Composite composite = new Composite(parent, SWT.NULL);
     GridLayout layout = new GridLayout();
@@ -205,6 +259,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
    */
   @Override
   public boolean performOk() {
+    fGlobalScope.putBoolean(DefaultPreferences.REOPEN_BROWSER_TABS, fReOpenBrowserTabs.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER, fAlwaysReuseBrowser.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND, fLoadBrowserTabInBackground.getSelection());
     if (Application.IS_WINDOWS) {
@@ -228,6 +283,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
 
     IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
 
+    fReOpenBrowserTabs.setSelection(defaultScope.getBoolean(DefaultPreferences.REOPEN_BROWSER_TABS));
     fAlwaysReuseBrowser.setSelection(defaultScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER));
     fLoadBrowserTabInBackground.setSelection(defaultScope.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND));
     if (Application.IS_WINDOWS) {
@@ -249,7 +305,9 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
     boolean autoCloseTab = fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS);
     int autoCloseTabCount = fEclipseScope.getInteger(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD);
 
-    fAlwaysReuseBrowser.setEnabled(fUseInternalBrowser.getSelection() && (!autoCloseTab || autoCloseTabCount > 1));
-    fLoadBrowserTabInBackground.setEnabled(fUseInternalBrowser.getSelection() && (!autoCloseTab || autoCloseTabCount > 1));
+    boolean enable = fUseInternalBrowser.getSelection() && (!autoCloseTab || autoCloseTabCount > 1);
+    fAlwaysReuseBrowser.setEnabled(enable);
+    fLoadBrowserTabInBackground.setEnabled(enable);
+    fReOpenBrowserTabs.setEnabled(enable);
   }
 }
