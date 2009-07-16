@@ -27,6 +27,7 @@ package org.rssowl.ui.internal.dialogs.properties;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -52,6 +53,7 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DAOService;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -94,6 +96,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
   private static final int HOURS_SCOPE = 1;
   private static final int DAYS_SCOPE = 2;
 
+  private Composite fParent;
   private IPropertyDialogSite fSite;
   private List<IEntity> fEntities;
   private Text fNameInput;
@@ -165,6 +168,8 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
    * @see org.rssowl.ui.internal.dialogs.properties.IEntityPropertyPage#createContents(org.eclipse.swt.widgets.Composite)
    */
   public Control createContents(Composite parent) {
+    fParent = parent;
+
     boolean separateFromTop = false;
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(LayoutUtils.createGridLayout(2, 10, 10));
@@ -512,6 +517,16 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
 
       /* Check for changed Feed */
       if (!bookmark.getFeedLinkReference().getLinkAsText().equals(uriAsString)) {
+
+        /* Check if this operation has the potential of deleting existing news */
+        boolean containsNews = bookmark.getNewsCount(INews.State.getVisible()) > 0;
+        if (containsNews) {
+          String msg = "Changing the link of a bookmark will delete all news inside. Are you sure you want to continue?";
+          MessageDialog dialog = new MessageDialog(fParent.getShell(), "Warning", null, msg, MessageDialog.WARNING, new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL }, 1);
+          if (dialog.open() == IDialogConstants.CANCEL_ID)
+            return false;
+        }
+
         try {
           DAOService daoService = Owl.getPersistenceService().getDAOService();
 
