@@ -233,6 +233,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     fViewer = new TableViewer(customTable.getControl());
     fViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
+    ((GridData) fViewer.getTable().getLayoutData()).heightHint = 190;
     fViewer.getControl().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
 
     /* Create Columns */
