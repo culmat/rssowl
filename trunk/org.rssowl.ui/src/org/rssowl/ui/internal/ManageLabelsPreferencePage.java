@@ -256,6 +256,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
     DynamicDAO.getDAO(ILabelDAO.class).saveAll(Arrays.asList(new ILabel[] { selectedLabel, otherLabel }));
     fViewer.refresh();
+    fViewer.getTree().showSelection();
     updateMoveEnablement();
   }
 
@@ -383,6 +384,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
   private void createViewer(Composite container) {
     fViewer = new TreeViewer(container, SWT.FULL_SELECTION | SWT.BORDER | SWT.MULTI);
     fViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    ((GridData) fViewer.getTree().getLayoutData()).heightHint = 190;
     fViewer.getTree().setFont(OwlUI.getBold(JFaceResources.DIALOG_FONT));
 
     /* Content Provider */

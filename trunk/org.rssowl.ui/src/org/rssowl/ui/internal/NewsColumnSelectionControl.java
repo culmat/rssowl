@@ -287,6 +287,7 @@ public class NewsColumnSelectionControl extends Composite {
     }
 
     fNewsColumnViewer.refresh();
+    fNewsColumnViewer.getList().showSelection();
     updateMoveEnablement();
   }
 

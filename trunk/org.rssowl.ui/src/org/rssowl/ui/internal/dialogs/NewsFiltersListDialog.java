@@ -626,6 +626,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
 
     fSearchFilterDao.saveAll(Arrays.asList(new ISearchFilter[] { selectedFilter, otherFilter }));
     fViewer.refresh();
+    fViewer.getTable().showSelection();
     updateCheckedState();
     updateMoveEnablement();
     updateTitle();
