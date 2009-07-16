@@ -158,7 +158,7 @@ public class ShareProvidersListDialog extends TitleAreaDialog {
         Display display = fViewer.getControl().getDisplay();
         cell.setText(provider.getName());
         if (StringUtils.isSet(provider.getIconPath()))
-          cell.setImage(fResources.createImage(OwlUI.getImageDescriptor(provider.getIconPath())));
+          cell.setImage(fResources.createImage(OwlUI.getImageDescriptor(provider.getPluginId(), provider.getIconPath())));
         cell.setForeground(provider.isEnabled() ? display.getSystemColor(SWT.COLOR_BLACK) : display.getSystemColor(SWT.COLOR_DARK_GRAY));
       }
     });
@@ -335,6 +335,7 @@ public class ShareProvidersListDialog extends TitleAreaDialog {
 
     fPreferences.putIntegers(DefaultPreferences.SHARE_PROVIDER_STATE, order);
     fViewer.refresh();
+    fViewer.getTable().showSelection();
     updateCheckedState();
     updateMoveEnablement();
   }

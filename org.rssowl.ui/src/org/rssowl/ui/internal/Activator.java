@@ -357,7 +357,19 @@ public class Activator extends AbstractUIPlugin {
    * @return the image descriptor
    */
   public static ImageDescriptor getImageDescriptor(String path) {
-    return AbstractUIPlugin.imageDescriptorFromPlugin("org.rssowl.ui", path); //$NON-NLS-1$
+    return getImageDescriptor(PLUGIN_ID, path);
+  }
+
+  /**
+   * Returns an image descriptor for the image file at the given plug-in
+   * relative path.
+   *
+   * @param pluginId the ID of the plugin to load the image from.
+   * @param path the path
+   * @return the image descriptor
+   */
+  public static ImageDescriptor getImageDescriptor(String pluginId, String path) {
+    return AbstractUIPlugin.imageDescriptorFromPlugin(pluginId, path); //$NON-NLS-1$
   }
 
   /**

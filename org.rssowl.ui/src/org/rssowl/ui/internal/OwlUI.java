@@ -463,10 +463,19 @@ public class OwlUI {
    * @return ImageDescriptor
    */
   public static ImageDescriptor getImageDescriptor(String path) {
-    ImageDescriptor desc = DESCRIPTOR_CACHE.get(path);
+    return getImageDescriptor(Activator.PLUGIN_ID, path);
+  }
+
+  /**
+   * @param pluginId
+   * @param path
+   * @return ImageDescriptor
+   */
+  public static ImageDescriptor getImageDescriptor(String pluginId, String path) {
+    ImageDescriptor desc = DESCRIPTOR_CACHE.get(pluginId + path);
     if (desc == null) {
-      desc = Activator.getImageDescriptor(path);
-      DESCRIPTOR_CACHE.put(path, desc);
+      desc = Activator.getImageDescriptor(pluginId, path);
+      DESCRIPTOR_CACHE.put(pluginId + path, desc);
     }
 
     return desc;
