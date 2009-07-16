@@ -894,7 +894,7 @@ public class Controller {
       String enabled = element.getAttribute("enabled");
 
       boolean isEnabled = (enabled != null && Boolean.parseBoolean(enabled));
-      fShareProviders.add(new ShareProvider(id, i, name, iconPath, url, maxTitleLength, isEnabled));
+      fShareProviders.add(new ShareProvider(id, element.getNamespaceIdentifier(), i, name, iconPath, url, maxTitleLength, isEnabled));
     }
   }
 

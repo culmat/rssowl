@@ -27,6 +27,8 @@ package org.rssowl.ui.internal.dialogs.bookmark;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -55,12 +57,14 @@ public class KeywordSubscriptionPage extends WizardPage {
   /* Base class for Search Engines */
   static class SearchEngine {
     private final String fId;
+    private final String fPluginId;
     private final String fName;
     private final String fIconPath;
     private final String fUrl;
 
-    SearchEngine(String id, String name, String iconPath, String url) {
+    SearchEngine(String id, String pluginId, String name, String iconPath, String url) {
       fId = id;
+      fPluginId = pluginId;
       fName = name;
       fIconPath = iconPath;
       fUrl = url;
@@ -68,6 +72,10 @@ public class KeywordSubscriptionPage extends WizardPage {
 
     String getId() {
       return fId;
+    }
+
+    String getPluginId() {
+      return fPluginId;
     }
 
     String getName() {
@@ -109,10 +117,10 @@ public class KeywordSubscriptionPage extends WizardPage {
     for (IConfigurationElement element : elements) {
       String id = element.getAttribute("id");
       String name = element.getAttribute("name");
-      String iconPath = element.getAttribute("icon"); //TODO Support loading icon from different plugin
+      String iconPath = element.getAttribute("icon");
       String url = element.getAttribute("url");
 
-      engines.add(new SearchEngine(id, name, iconPath, url));
+      engines.add(new SearchEngine(id, element.getNamespaceIdentifier(), name, iconPath, url));
     }
 
     return engines;
@@ -152,8 +160,10 @@ public class KeywordSubscriptionPage extends WizardPage {
     for (final SearchEngine engine : fgSearchEngines) {
       Button button = new Button(contentMargin, SWT.RADIO);
       button.setText(engine.getName());
-      if (StringUtils.isSet(engine.getIconPath()))
-        button.setImage(OwlUI.getImage(button, engine.getIconPath()));
+      if (StringUtils.isSet(engine.getIconPath())) {
+        LocalResourceManager resources = new LocalResourceManager(JFaceResources.getResources(), button);
+        button.setImage(OwlUI.getImage(resources, OwlUI.getImageDescriptor(engine.getPluginId(), engine.getIconPath())));
+      }
       button.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {

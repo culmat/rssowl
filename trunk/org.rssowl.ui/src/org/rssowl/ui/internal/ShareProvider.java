@@ -42,6 +42,7 @@ public class ShareProvider {
   private static final String TITLE_INPUT_TOKEN = "[T]";
 
   private final String fId;
+  private final String fPluginId;
   private final int fIndex;
   private final String fName;
   private final String fIconPath;
@@ -51,6 +52,7 @@ public class ShareProvider {
 
   /**
    * @param id the unique id of the contributed provider.
+   * @param pluginId the id of the plugin that contributes this provider.
    * @param index the index of the provider for sorting.
    * @param name the name of the provider.
    * @param iconPath the path to an icon of the provider.
@@ -59,8 +61,9 @@ public class ShareProvider {
    * @param enabled <code>true</code> if this provider is enabled and
    * <code>false</code> otherwise.
    */
-  public ShareProvider(String id, int index, String name, String iconPath, String url, String maxTitleLength, boolean enabled) {
+  public ShareProvider(String id, String pluginId, int index, String name, String iconPath, String url, String maxTitleLength, boolean enabled) {
     fId = id;
+    fPluginId = pluginId;
     fIndex = index;
     fName = name;
     fIconPath = iconPath;
@@ -78,6 +81,13 @@ public class ShareProvider {
    */
   public String getId() {
     return fId;
+  }
+
+  /**
+   * @return the id of the plugin that contributes this provider.
+   */
+  public String getPluginId() {
+    return fPluginId;
   }
 
   /**
