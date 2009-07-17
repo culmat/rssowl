@@ -247,10 +247,10 @@ public class NewsColumnViewModel {
         return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 60);
 
       case AUTHOR:
-        return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20);
+        return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 15);
 
       case CATEGORY:
-        return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 20);
+        return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 15);
 
       case LABELS:
         return new CColumnLayoutData(CColumnLayoutData.Size.FILL, 10);
