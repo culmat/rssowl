@@ -1579,7 +1579,7 @@ public class OwlUI {
     String sampleDate = dF.format(cal.getTime());
 
     DATE_WIDTH = OwlUI.getTextSize(Display.getDefault(), OwlUI.getBold(HEADLINES_FONT_ID), sampleDate).x;
-    DATE_WIDTH += 30; // Bounds of Column requires more space
+    DATE_WIDTH += Application.IS_WINDOWS ? 15 : 30; // Bounds of Column requires more space
 
     return DATE_WIDTH;
   }
@@ -1597,7 +1597,7 @@ public class OwlUI {
     String sampleState = "Updated";
 
     STATE_WIDTH = OwlUI.getTextSize(Display.getDefault(), OwlUI.getBold(HEADLINES_FONT_ID), sampleState).x;
-    STATE_WIDTH += 30; // Bounds of Column requires more space
+    STATE_WIDTH += Application.IS_WINDOWS ? 15 : 30; // Bounds of Column requires more space
 
     return STATE_WIDTH;
   }
