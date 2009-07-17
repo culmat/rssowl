@@ -62,6 +62,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   private Button fUseMultipleTabsCheck;
   private Button fReopenFeedsOnStartupCheck;
   private Button fAlwaysReuseFeedView;
+  private Button fOpenOnSingleClick;
 
   /** Leave for reflection */
   public MiscPreferencePage() {
@@ -146,6 +147,10 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     label.setText(" tabs");
 
     fAlwaysReuseFeedView.setEnabled(!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1);
+
+    fOpenOnSingleClick = new Button(viewGroup, SWT.CHECK);
+    fOpenOnSingleClick.setText("Open feeds with single mouse-click");
+    fOpenOnSingleClick.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN));
   }
 
   private void createTrayOptions(Composite container) {
@@ -191,6 +196,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
    */
   @Override
   public boolean performOk() {
+    fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN, fOpenOnSingleClick.getSelection());
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS, fReopenFeedsOnStartupCheck.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW, fAlwaysReuseFeedView.getSelection());
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS, fUseMultipleTabsCheck.getSelection());
@@ -213,6 +219,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
 
     IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
 
+    fOpenOnSingleClick.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN));
     fReopenFeedsOnStartupCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS));
     fAlwaysReuseFeedView.setSelection(defaultScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW));
     fUseMultipleTabsCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS));

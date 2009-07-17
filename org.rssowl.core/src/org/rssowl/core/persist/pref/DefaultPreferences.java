@@ -297,6 +297,9 @@ public class DefaultPreferences implements IPreferencesInitializer {
    * Eclipse Preferences Follow
    */
 
+  /** Global Eclipse: Open on Single Click */
+  public static final String ECLIPSE_SINGLE_CLICK_OPEN = "instance/org.eclipse.ui.workbench/OPEN_ON_SINGLE_CLICK";
+
   /** Global Eclipse: Restore Tabs on startup */
   public static final String ECLIPSE_RESTORE_TABS = "instance/org.eclipse.ui.workbench/USE_IPERSISTABLE_EDITORS";
 
@@ -390,6 +393,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
    * @param defaultScope the container for preferences to fill.
    */
   protected void initGlobalEclipseDefaults(IPreferenceScope defaultScope) {
+    defaultScope.putBoolean(ECLIPSE_SINGLE_CLICK_OPEN, true);
     defaultScope.putBoolean(ECLIPSE_RESTORE_TABS, true);
     defaultScope.putBoolean(ECLIPSE_MULTIPLE_TABS, true);
     defaultScope.putInteger(ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 5);
