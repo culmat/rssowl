@@ -90,22 +90,8 @@ public class OverviewPreferencesPage extends PreferencePage implements IWorkbenc
     container.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_FILL | GridData.HORIZONTAL_ALIGN_FILL));
     container.setFont(parent.getFont());
 
-    /* Search Info Container */
-    Composite infoContainer = new Composite(container, SWT.None);
-    infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-    infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
-    ((GridLayout) infoContainer.getLayout()).marginBottom = 10;
-
-    Label infoImg = new Label(infoContainer, SWT.NONE);
-    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
-    infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-
-    Label infoText = new Label(infoContainer, SWT.WRAP);
-    infoText.setText("Tip: Use the text field on top to search over all preferences.");
-    infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-
     Label titleLabel = new Label(container, SWT.None);
-    titleLabel.setText("The following links quickly open the desired preferences page:");
+    titleLabel.setText("The following links allow to open the related preferences page:");
     titleLabel.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
 
     List<String> ids = new ArrayList<String>();
@@ -167,11 +153,12 @@ public class OverviewPreferencesPage extends PreferencePage implements IWorkbenc
       final String id = ids.get(i);
 
       Label imgLabel = new Label(linkContainer, SWT.None);
+      imgLabel.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
       imgLabel.setImage(images.get(i));
 
       Link link = new Link(linkContainer, SWT.None);
       link.setText("<a>" + labels.get(i) + "</a>");
-      link.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      link.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
       link.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
@@ -179,6 +166,20 @@ public class OverviewPreferencesPage extends PreferencePage implements IWorkbenc
         }
       });
     }
+
+    /* Search Info Container */
+    Composite infoContainer = new Composite(container, SWT.None);
+    infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.END, true, true, 2, 1));
+    infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    ((GridLayout) infoContainer.getLayout()).marginBottom = 10;
+
+    Label infoImg = new Label(infoContainer, SWT.NONE);
+    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
+    infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    Label infoText = new Label(infoContainer, SWT.WRAP);
+    infoText.setText("Tip: Use the text field on top to search over all preferences.");
+    infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     return container;
   }
