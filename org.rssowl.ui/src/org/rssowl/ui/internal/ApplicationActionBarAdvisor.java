@@ -114,7 +114,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
   public static final String M_VIEW_END = "viewEnd";
 
   private IContributionItem fOpenWindowsItem;
-  private IContributionItem fShowViewMenu;
   private IContributionItem fReopenEditors;
   private FindAction fFindAction;
 
@@ -157,6 +156,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     /* Menu: Window */
     register(ActionFactory.OPEN_NEW_WINDOW.create(window));
     getAction(ActionFactory.OPEN_NEW_WINDOW.getId()).setText("&New Window");
+    fOpenWindowsItem = ContributionItemFactory.OPEN_WINDOWS.create(window);
+
     //    register(ActionFactory.TOGGLE_COOLBAR.create(window));
     //    register(ActionFactory.RESET_PERSPECTIVE.create(window));
     //    register(ActionFactory.EDIT_ACTION_SETS.create(window));
@@ -168,13 +169,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     //    register(ActionFactory.PREVIOUS_PART.create(window));
     //    register(ActionFactory.NEXT_PART.create(window));
     //    register(ActionFactory.SHOW_EDITOR.create(window));
-    //    register(ActionFactory.SHOW_OPEN_EDITORS.create(window));
-    //    register(ActionFactory.SHOW_WORKBOOK_EDITORS.create(window));
-    //    register(ActionFactory.SHOW_PART_PANE_MENU.create(window));
-    //    register(ActionFactory.SHOW_VIEW_MENU.create(window));
-
-    fOpenWindowsItem = ContributionItemFactory.OPEN_WINDOWS.create(window);
-    fShowViewMenu = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
 
     /* Menu: Help */
     // register(ActionFactory.INTRO.create(window)); TODO Enable
@@ -238,8 +232,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     fileMenu.add(new Separator());
     fileMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
-
-    fileMenu.add(fReopenEditors); // TODO Consider moving into a "Go" Menu!
 
     fileMenu.add(new Separator());
     fileMenu.add(new GroupMarker(IWorkbenchActionConstants.FILE_END));
@@ -516,10 +508,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
   /* Menu: Go */
   private void createGoMenu(IMenuManager menuBar) {
-    MenuManager viewMenu = new MenuManager("&Go", IWorkbenchActionConstants.M_NAVIGATE);
-    menuBar.add(viewMenu);
+    MenuManager goMenu = new MenuManager("&Go", IWorkbenchActionConstants.M_NAVIGATE);
+    menuBar.add(goMenu);
 
-    viewMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+    goMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+    goMenu.add(fReopenEditors);
   }
 
   /* Menu News */
@@ -801,7 +794,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     toolsMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
     toolsMenu.add(new Separator());
 
-    toolsMenu.add(getAction(ActionFactory.PREFERENCES.getId()));
+    IAction preferences = getAction(ActionFactory.PREFERENCES.getId());
+    preferences.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/preferences.gif"));
+    toolsMenu.add(preferences);
   }
 
   /* Menu: Window */
@@ -809,12 +804,16 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     MenuManager windowMenu = new MenuManager("&Window", IWorkbenchActionConstants.M_WINDOW);
     menuBar.add(windowMenu);
 
-    windowMenu.add(getAction(ActionFactory.OPEN_NEW_WINDOW.getId()));
-    windowMenu.add(new Separator());
+    IAction openNewWindowAction = getAction(ActionFactory.OPEN_NEW_WINDOW.getId());
+    openNewWindowAction.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/newwindow.gif"));
+    windowMenu.add(openNewWindowAction);
 
-    MenuManager showViewMenu = new MenuManager("&Show View");
-    windowMenu.add(showViewMenu);
-    showViewMenu.add(fShowViewMenu);
+    windowMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+    windowMenu.add(fOpenWindowsItem);
+
+    //    MenuManager showViewMenu = new MenuManager("&Show View");
+    //    windowMenu.add(showViewMenu);
+    //    showViewMenu.add(fShowViewMenu);
     //    windowMenu.add(new Separator());
 
     //    windowMenu.add(getAction(ActionFactory.EDIT_ACTION_SETS.getId()));
@@ -839,10 +838,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     //    navigationMenu.add(new Separator());
     //    navigationMenu.add(getAction(ActionFactory.NEXT_PART.getId()));
     //    navigationMenu.add(getAction(ActionFactory.PREVIOUS_PART.getId()));
-
-    windowMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
-
-    windowMenu.add(fOpenWindowsItem);
   }
 
   /* Menu: Help */
