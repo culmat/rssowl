@@ -72,6 +72,9 @@ import java.util.List;
  */
 public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
 
+  /** ID of the Page */
+  public static String ID = "org.rssowl.ui.FeedsPreferences";
+
   /* Interval-Scopes in Seconds */
   private static final long DAY_IN_SECONDS = 24 * 60 * 60;
   private static final long HOUR_IN_SECONDS = 60 * 60;

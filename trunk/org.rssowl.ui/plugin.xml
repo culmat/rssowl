@@ -359,6 +359,7 @@
          <action
                class="org.rssowl.ui.internal.actions.OpenNewsFiltersAction"
                definitionId="org.rssowl.ui.OpenNewsFiltersAction"
+               icon="icons/etool16/filter.gif"
                id="org.rssowl.ui.OpenNewsFiltersAction"
                label="&amp;News Filters..."
                menubarPath="tools/begin"
@@ -394,10 +395,10 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="org.eclipse.ui.ExtensionFactory:workbenchPreferencePage"
+            class="org.rssowl.ui.internal.OverviewPreferencesPage"
             id="org.eclipse.ui.preferencePages.Workbench"
-            name="General">
-         <keywordReference id="org.rssowl.ui.preferences.keywords.General"/>
+            name="Overview">
+         <keywordReference id="org.rssowl.ui.preferences.keywords.Overview"/>
       </page>
       <page
             category="org.eclipse.ui.preferencePages.Workbench"
@@ -405,13 +406,6 @@
             id="org.rssowl.ui.preferences.Keys"
             name="Keys">
          <keywordReference id="org.rssowl.ui.preferences.keywords.Keys"/>
-      </page>
-      <page
-            category="org.eclipse.ui.preferencePages.Workbench"
-            class="org.eclipse.ui.ExtensionFactory:appearancePreferencePage"
-            id="org.rssowl.ui.preferences.Appearance"
-            name="Appearance">
-         <keywordReference id="org.rssowl.ui.preferences.keywords.Appearance"/>
       </page>
       <page
             category="org.eclipse.ui.preferencePages.Workbench"
@@ -472,14 +466,11 @@
    <extension
          point="org.eclipse.ui.keywords">
       <keyword
-            id="org.rssowl.ui.preferences.keywords.General"
-            label="click background heap double single"/>
+            id="org.rssowl.ui.preferences.keywords.Overview"
+            label="help guide guidance search"/>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Keys"
             label="binding command scheme hotkey accelerator"/>
-      <keyword
-            id="org.rssowl.ui.preferences.keywords.Appearance"
-            label="presentation theme position animation style"/>
       <keyword
             id="org.rssowl.ui.preferences.keywords.ColorsAndFonts"
             label="presentation theme style"/>
@@ -488,7 +479,7 @@
             label="open view switch"/>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Miscellaneous"
-            label="systemtray reopen open single multi tab minimize tray feed view">
+            label="systemtray reopen open single multi tab minimize tray feed view single double click mouse">
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Feeds"

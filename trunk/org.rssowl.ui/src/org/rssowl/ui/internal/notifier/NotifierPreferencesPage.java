@@ -77,6 +77,10 @@ import java.util.Set;
  * @author bpasero
  */
 public class NotifierPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage {
+
+  /** ID of the Page */
+  public static String ID = "org.rssowl.ui.NotifierPreferences";
+
   private IPreferenceScope fGlobalScope = Owl.getPreferenceService().getGlobalScope();
   private Button fNotificationOnlyFromTray;
   private Button fShowNotificationPopup;

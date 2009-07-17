@@ -49,6 +49,10 @@ import org.rssowl.ui.internal.util.LayoutUtils;
  * @author bpasero
  */
 public class BrowserPreferencePage extends PreferencePage implements IWorkbenchPreferencePage {
+
+  /** ID of the Page */
+  public static String ID = "org.rssowl.ui.BrowserPreferencesPage";
+
   private IPreferenceScope fGlobalScope;
   private Text fCustomBrowserInput;
   private Button fUseCustomExternalBrowser;

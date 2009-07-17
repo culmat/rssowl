@@ -78,6 +78,9 @@ import java.util.Set;
 @SuppressWarnings("restriction")
 public class CredentialsPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage {
 
+  /** ID of the Page */
+  public static String ID = "org.rssowl.ui.CredentialsPreferences";
+
   /* Dummy for creating and changing the master password */
   private static final String DUMMY_LINK = "http://www.rssowl.org";
 
@@ -187,7 +190,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     ((GridLayout) masterContainer.getLayout()).marginBottom = 15;
     ((GridLayout) masterContainer.getLayout()).verticalSpacing = 10;
 
-    StyledText infoText = new StyledText(masterContainer, SWT.WRAP);
+    StyledText infoText = new StyledText(masterContainer, SWT.WRAP | SWT.READ_ONLY);
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
     ((GridData) infoText.getLayoutData()).widthHint = 200;
     infoText.setBackground(masterContainer.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
