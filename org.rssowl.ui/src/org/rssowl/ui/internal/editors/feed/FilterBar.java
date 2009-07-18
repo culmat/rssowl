@@ -307,6 +307,18 @@ public class FilterBar {
           }
         });
 
+        /* Search on: Labels */
+        final MenuItem searchLabels = new MenuItem(menu, SWT.RADIO);
+        searchLabels.setText(NewsFilter.SearchTarget.LABELS.getName());
+        searchLabels.setSelection(NewsFilter.SearchTarget.LABELS == filter.getSearchTarget());
+        searchLabels.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            if (searchLabels.getSelection() && filter.getSearchTarget() != NewsFilter.SearchTarget.LABELS)
+              doSearch(NewsFilter.SearchTarget.LABELS);
+          }
+        });
+
         return menu;
       }
 
