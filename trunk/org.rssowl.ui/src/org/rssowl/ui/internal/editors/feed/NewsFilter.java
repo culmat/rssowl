@@ -125,7 +125,10 @@ public class NewsFilter extends ViewerFilter {
     SOURCE("Source"),
 
     /** Search Attachments */
-    ATTACHMENTS("Attachments");
+    ATTACHMENTS("Attachments"),
+
+    /** Search Labels */
+    LABELS("Labels");
 
     String fName;
 
@@ -439,6 +442,11 @@ public class NewsFilter extends ViewerFilter {
 
       case SOURCE:
         field = fModelFactory.createSearchField(INews.SOURCE, INews.class.getName());
+        specifier = SearchSpecifier.IS;
+        break;
+
+      case LABELS:
+        field = fModelFactory.createSearchField(INews.LABEL, INews.class.getName());
         specifier = SearchSpecifier.IS;
         break;
     }
