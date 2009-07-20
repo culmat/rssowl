@@ -43,6 +43,7 @@ import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.EditorUtils;
+import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -150,6 +151,7 @@ public class OpenNewsAction extends Action {
       fShellToMinimize.setMinimized(true);
 
     /* Open Bookmarks belonging to the News */
+    INewsMark lastOpenedNewsMark = null;
     for (int i = 0; i < newsToOpen.size() && openedEditors < maxOpenEditors; i++) {
       INews news = newsToOpen.get(i);
       INewsMark newsmark;
@@ -162,7 +164,14 @@ public class OpenNewsAction extends Action {
       if (newsmark != null) {
         openAndSelect(page, news, newsmark);
         openedEditors++;
+        lastOpenedNewsMark = newsmark;
       }
+    }
+
+    /* Reveal Newsmark of last opened News */
+    BookMarkExplorer explorer = OwlUI.getOpenBookMarkExplorer();
+    if (explorer != null && lastOpenedNewsMark != null && !explorer.isLinkingEnabled()) {
+      explorer.reveal(lastOpenedNewsMark);
     }
   }
 
