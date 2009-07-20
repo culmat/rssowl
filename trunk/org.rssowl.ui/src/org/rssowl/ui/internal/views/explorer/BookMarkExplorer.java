@@ -512,26 +512,42 @@ public class BookMarkExplorer extends ViewPart {
   }
 
   private void editorActivated(IEditorPart part) {
-    if (!fLinkingEnabled || !fViewSite.getPage().isPartVisible(this) || part == null)
+    if (!fLinkingEnabled || part == null)
       return;
 
     /* Try to select and reveal editor input in the Explorer */
     IEditorInput editorInput = part.getEditorInput();
-    if (editorInput instanceof FeedViewInput) {
-      FeedViewInput feedViewInput = (FeedViewInput) editorInput;
-      IMark mark = feedViewInput.getMark();
+    if (editorInput instanceof FeedViewInput)
+      reveal(((FeedViewInput) editorInput).getMark());
+  }
 
-      /* Change Set if required */
-      IFolderChild child = mark;
-      while (child.getParent() != null)
-        child = child.getParent();
+  /**
+   * @return <code>true</code> if the explorer is linked to the feed view and
+   * <code>false</code> otherwise.
+   */
+  public boolean isLinkingEnabled() {
+    return fLinkingEnabled;
+  }
 
-      if (!fSelectedBookMarkSet.equals(child))
-        changeSet((IFolder) child);
+  /**
+   * @param mark the news mark to make visible and select.
+   */
+  public void reveal(INewsMark mark) {
 
-      /* Set Selection */
-      fViewer.setSelection(new StructuredSelection(mark), true);
-    }
+    /* Return early if hidden */
+    if (!fViewSite.getPage().isPartVisible(this))
+      return;
+
+    /* Change Set if required */
+    IFolderChild child = mark;
+    while (child.getParent() != null)
+      child = child.getParent();
+
+    if (!fSelectedBookMarkSet.equals(child))
+      changeSet((IFolder) child);
+
+    /* Set Selection */
+    fViewer.setSelection(new StructuredSelection(mark), true);
   }
 
   void changeSet(IFolder folder) {
