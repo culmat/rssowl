@@ -97,7 +97,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
 
     /* Use internal Browser */
     fUseInternalBrowser = new Button(browserGroup, SWT.RADIO);
-    fUseInternalBrowser.setText("Use internal Browser");
+    fUseInternalBrowser.setText("Use the embedded Browser");
     fUseInternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fUseInternalBrowser.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -110,9 +110,9 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
     fUseDefaultExternalBrowser = new Button(browserGroup, SWT.RADIO);
     String name = getDefaultBrowserName();
     if (StringUtils.isSet(name))
-      fUseDefaultExternalBrowser.setText("Use default external Browser (" + name + ")");
+      fUseDefaultExternalBrowser.setText("Use the standard external Browser (" + name + ")");
     else
-      fUseDefaultExternalBrowser.setText("Use default external Browser");
+      fUseDefaultExternalBrowser.setText("Use the standard external Browser");
 
     fUseDefaultExternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fUseDefaultExternalBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER));
@@ -160,17 +160,17 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
     ((GridLayout) bottomContainer.getLayout()).marginTop = 10;
 
     fReOpenBrowserTabs = new Button(bottomContainer, SWT.CHECK);
-    fReOpenBrowserTabs.setText("Re-Open last opened browser tabs on startup");
+    fReOpenBrowserTabs.setText("Reopen last opened websites on startup");
     fReOpenBrowserTabs.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fReOpenBrowserTabs.setSelection(fGlobalScope.getBoolean(DefaultPreferences.REOPEN_BROWSER_TABS));
 
     fLoadBrowserTabInBackground = new Button(bottomContainer, SWT.CHECK);
-    fLoadBrowserTabInBackground.setText("Open browser tabs in the background");
+    fLoadBrowserTabInBackground.setText("Open websites in the background");
     fLoadBrowserTabInBackground.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fLoadBrowserTabInBackground.setSelection(fGlobalScope.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND));
 
     fAlwaysReuseBrowser = new Button(bottomContainer, SWT.CHECK);
-    fAlwaysReuseBrowser.setText("Always open web sites in the same tab");
+    fAlwaysReuseBrowser.setText("Always open websites in the same tab");
     fAlwaysReuseBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fAlwaysReuseBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER));
 
