@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.editors.feed;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -49,10 +50,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IWorkbenchActionConstants;
-import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
-import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.dialogs.PreferencesUtil;
+import org.eclipse.ui.internal.ObjectActionContributorManager;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
@@ -85,6 +85,7 @@ import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
+import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
@@ -126,6 +127,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private Object fInput;
   private CBrowser fBrowser;
   private IWorkbenchPartSite fSite;
+  private boolean fIsEmbedded;
   private Menu fNewsContextMenu;
   private Menu fLabelsContextMenu;
   private Menu fShareNewsContextMenu;
@@ -160,6 +162,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   public NewsBrowserViewer(Composite parent, int style, IWorkbenchPartSite site) {
     fBrowser = new CBrowser(parent, style);
     fSite = site;
+    fIsEmbedded = (fSite != null);
     hookControl(fBrowser.getControl());
     hookNewsContextMenu();
     hookLabelContextMenu();
@@ -185,11 +188,23 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     MenuManager manager = new MenuManager();
     manager.setRemoveAllWhenShown(true);
     manager.addMenuListener(new IMenuListener() {
+      @SuppressWarnings("restriction")
       public void menuAboutToShow(IMenuManager manager) {
 
         /* Open */
         {
-          manager.add(new Separator("open"));
+          boolean useSeparator = true;
+
+          /* Open in FeedView */
+          if (!fIsEmbedded) {
+            manager.add(new Separator("internalopen"));
+            if (!fCurrentSelection.isEmpty()) {
+              manager.appendToGroup("internalopen", new OpenNewsAction(fCurrentSelection, fBrowser.getControl().getShell()));
+              useSeparator = false;
+            }
+          }
+
+          manager.add(useSeparator ? new Separator("open") : new GroupMarker("open"));
 
           /* Show only when internal browser is used */
           if (!fCurrentSelection.isEmpty() && !fPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
@@ -357,6 +372,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         manager.add(new Separator("edit"));
         manager.add(new Separator("copy"));
         manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+
+        /* Fill Contributions if Context Menu not registered */
+        if (fSite == null)
+          ObjectActionContributorManager.getManager().contributeObjectActions(null, manager, NewsBrowserViewer.this);
       }
     });
 
@@ -364,18 +383,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fNewsContextMenu = manager.createContextMenu(fBrowser.getControl().getShell());
 
     /* Register with Part Site if possible */
-    IWorkbenchPartSite site = fSite;
-    if (site == null) {
-      IWorkbenchWindow window = OwlUI.getWindow();
-      if (window != null) {
-        IWorkbenchPart activePart = window.getPartService().getActivePart();
-        if (activePart != null && activePart.getSite() != null)
-          site = activePart.getSite();
-      }
-    }
-
-    if (site != null)
-      site.registerContextMenu(manager, this);
+    if (fSite != null)
+      fSite.registerContextMenu(manager, this);
   }
 
   private void hookLabelContextMenu() {
