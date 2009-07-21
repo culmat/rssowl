@@ -219,7 +219,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
   NewsFilter.Type fInitialFilterType;
   NewsGrouping.Type fInitialGroupType;
   NewsFilter.SearchTarget fInitialSearchTarget;
-  boolean fInitialLayoutVertical;
+  boolean fInitialLayoutClassic;
   private boolean fInitialBrowserMaximized;
   private int fInitialWeights[];
   private int fCacheWeights[];
@@ -778,7 +778,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     /* Other Settings */
     fInitialBrowserMaximized = fPreferences.getBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED);
-    fInitialLayoutVertical = fPreferences.getBoolean(DefaultPreferences.FV_LAYOUT_VERTICAL);
+    fInitialLayoutClassic = fPreferences.getBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC);
     fInitialWeights = fPreferences.getIntegers(DefaultPreferences.FV_SASHFORM_WEIGHTS);
     fInitialSearchTarget = NewsFilter.SearchTarget.values()[fPreferences.getInteger(DefaultPreferences.FV_SEARCH_TARGET)];
   }
@@ -1365,47 +1365,43 @@ public class FeedView extends EditorPart implements IReusableEditor {
   }
 
   /**
-   * Toggle between vertical and horizontal Layout.
-   * <p>
-   * TODO This needs to be optimized!
-   * </p>
-   */
-  void toggleLayout() {
-    int orientation = fSashForm.getOrientation();
-
-    /* Horizontal Alignment */
-    if ((orientation & SWT.VERTICAL) != 0) {
-      fBrowserSep.setVisible(fBrowserBar.isVisible());
-      fSashForm.setOrientation(SWT.HORIZONTAL);
-      fSashForm.setBackground(fSashForm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
-      ((GridData) fTableBrowserSep.getLayoutData()).exclude = true;
-      fTableBrowserSep.getParent().layout();
-    }
-
-    /* Vertical Alignment (default) */
-    else {
-      fBrowserSep.setVisible(true);
-      fSashForm.setOrientation(SWT.VERTICAL);
-      fSashForm.setBackground(null);
-      ((GridData) fTableBrowserSep.getLayoutData()).exclude = false;
-      fTableBrowserSep.getParent().layout();
-    }
-
-    /* Update Settings */
-    JobRunner.runInBackgroundThread(new Runnable() {
-      public void run() {
-        fPreferences.putBoolean(DefaultPreferences.FV_LAYOUT_VERTICAL, (fSashForm.getOrientation() & SWT.VERTICAL) != 0);
-      }
-    });
-  }
-
-  /**
    * Update the State of showing Headlines in the Feed View.
    */
   public void updateBrowserViewMaximized() {
     boolean browserMaximized = fPreferences.getBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED);
     setBrowserMaximized(browserMaximized);
     fFilterBar.updateBrowserViewMaximized(browserMaximized);
+  }
+
+  /**
+   * Update the Layout in the Feed View.
+   */
+  public void updateLayout() {
+
+    /* Update Browser Maximized State */
+    updateBrowserViewMaximized();
+
+    /* Update Classic/Vertical Alignment if necessary */
+    if (!fPreferences.getBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED)) {
+
+      /* Vertical Alignment */
+      if (!fPreferences.getBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC)) {
+        fBrowserSep.setVisible(fBrowserBar.isVisible());
+        fSashForm.setOrientation(SWT.HORIZONTAL);
+        fSashForm.setBackground(fSashForm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+        ((GridData) fTableBrowserSep.getLayoutData()).exclude = true;
+        fTableBrowserSep.getParent().layout();
+      }
+
+      /* Classic Alignment (default) */
+      else {
+        fBrowserSep.setVisible(true);
+        fSashForm.setOrientation(SWT.VERTICAL);
+        fSashForm.setBackground(null);
+        ((GridData) fTableBrowserSep.getLayoutData()).exclude = false;
+        fTableBrowserSep.getParent().layout();
+      }
+    }
   }
 
   /**
@@ -1689,10 +1685,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
     sep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* SashForm dividing Feed and News View */
-    fSashForm = new SashForm(rootComposite, (fInitialLayoutVertical ? SWT.VERTICAL : SWT.HORIZONTAL) | SWT.SMOOTH);
+    fSashForm = new SashForm(rootComposite, (fInitialLayoutClassic ? SWT.VERTICAL : SWT.HORIZONTAL) | SWT.SMOOTH);
     fSashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-    if (!fInitialLayoutVertical)
+    if (!fInitialLayoutClassic)
       fSashForm.setBackground(fSashForm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
 
     /* Table-Viewer to display headlines */
@@ -1726,7 +1722,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       /* Separate from Browser-Viewer */
       fTableBrowserSep = new Label(container, SWT.SEPARATOR | SWT.HORIZONTAL);
       fTableBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-      ((GridData) fTableBrowserSep.getLayoutData()).exclude = !fInitialLayoutVertical;
+      ((GridData) fTableBrowserSep.getLayoutData()).exclude = !fInitialLayoutClassic;
     }
 
     /* Browser-Viewer to display news */

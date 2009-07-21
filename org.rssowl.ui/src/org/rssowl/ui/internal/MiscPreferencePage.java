@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal;
 
 import org.eclipse.jface.preference.PreferencePage;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -40,7 +41,10 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.util.LayoutUtils;
+
+import java.util.List;
 
 /**
  * Container for all Preferences that have not yet been categorized.
@@ -54,6 +58,9 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
 
   private IPreferenceScope fGlobalScope;
   private IPreferenceScope fEclipseScope;
+  private Button fBrowserMaximizedLayoutRadio;
+  private Button fVerticalLayoutRadio;
+  private Button fClassicLayoutRadio;
   private Button fMinimizeToTray;
   private Button fMoveToTrayOnStart;
   private Button fMoveToTrayOnExit;
@@ -89,35 +96,67 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   protected Control createContents(Composite parent) {
     Composite container = createComposite(parent);
 
-    /* View Options */
-    createViewOptions(container);
+    /* Layout Options */
+    createLayoutOptions(container);
+
+    /* Tab Options */
+    createTabOptions(container);
 
     /* System Tray Options */
     createTrayOptions(container);
 
+    /* Misc Options */
+    createMiscOptions(container);
+
     return container;
   }
 
-  private void createViewOptions(Composite container) {
+  private void createLayoutOptions(Composite container) {
+    boolean browserMaximized = fGlobalScope.getBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED);
 
-    /* View Group */
-    Composite viewGroup = new Composite(container, SWT.None);
-    viewGroup.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
-    viewGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    Label label = new Label(container, SWT.NONE);
+    label.setText("Layout");
+    label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
 
-    fReopenFeedsOnStartupCheck = new Button(viewGroup, SWT.CHECK);
-    fReopenFeedsOnStartupCheck.setText("Re-Open last opened feeds on startup");
-    fReopenFeedsOnStartupCheck.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS));
+    /* Group */
+    Composite group = new Composite(container, SWT.None);
+    group.setLayout(LayoutUtils.createGridLayout(3, 7, 3));
+    ((GridLayout) group.getLayout()).marginBottom = 5;
+    group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
-    fAlwaysReuseFeedView = new Button(viewGroup, SWT.CHECK);
+    fClassicLayoutRadio = new Button(group, SWT.RADIO);
+    fClassicLayoutRadio.setText("Classic View");
+    fClassicLayoutRadio.setSelection(!browserMaximized && fGlobalScope.getBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC));
+
+    fVerticalLayoutRadio = new Button(group, SWT.RADIO);
+    fVerticalLayoutRadio.setText("Vertical View");
+    fVerticalLayoutRadio.setSelection(!browserMaximized && !fGlobalScope.getBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC));
+
+    fBrowserMaximizedLayoutRadio = new Button(group, SWT.RADIO);
+    fBrowserMaximizedLayoutRadio.setText("Newspaper View");
+    fBrowserMaximizedLayoutRadio.setSelection(browserMaximized);
+  }
+
+  private void createTabOptions(Composite container) {
+    Label label = new Label(container, SWT.NONE);
+    label.setText("Tabbed Browsing");
+    label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
+
+    /* Group */
+    Composite group = new Composite(container, SWT.None);
+    group.setLayout(LayoutUtils.createGridLayout(1, 7, 3));
+    ((GridLayout) group.getLayout()).marginBottom = 5;
+    group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+    fAlwaysReuseFeedView = new Button(group, SWT.CHECK);
     fAlwaysReuseFeedView.setText("Always open feeds in the same tab");
     fAlwaysReuseFeedView.setSelection(fGlobalScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW));
 
-    fUseMultipleTabsCheck = new Button(viewGroup, SWT.CHECK);
+    fUseMultipleTabsCheck = new Button(group, SWT.CHECK);
     fUseMultipleTabsCheck.setText("Show multiple tabs side by side");
     fUseMultipleTabsCheck.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS));
 
-    Composite autoCloseTabsContainer = new Composite(viewGroup, SWT.None);
+    Composite autoCloseTabsContainer = new Composite(group, SWT.None);
     autoCloseTabsContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0, 0, 2, false));
 
     fAutoCloseTabsCheck = new Button(autoCloseTabsContainer, SWT.CHECK);
@@ -143,39 +182,57 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
       }
     });
 
-    Label label = new Label(autoCloseTabsContainer, SWT.None);
+    label = new Label(autoCloseTabsContainer, SWT.None);
     label.setText(" tabs");
 
     fAlwaysReuseFeedView.setEnabled(!fAutoCloseTabsCheck.getSelection() || fAutoCloseTabsSpinner.getSelection() > 1);
+  }
 
-    fOpenOnSingleClick = new Button(viewGroup, SWT.CHECK);
-    fOpenOnSingleClick.setText("Open feeds with single mouse-click");
+  private void createMiscOptions(Composite container) {
+    Label label = new Label(container, SWT.NONE);
+    label.setText("Misc.");
+    label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
+
+    /* Group */
+    Composite miscGroup = new Composite(container, SWT.None);
+    miscGroup.setLayout(LayoutUtils.createGridLayout(1, 7, 3));
+    miscGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+    fReopenFeedsOnStartupCheck = new Button(miscGroup, SWT.CHECK);
+    fReopenFeedsOnStartupCheck.setText("Reopen last opened feeds on startup");
+    fReopenFeedsOnStartupCheck.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS));
+
+    fOpenOnSingleClick = new Button(miscGroup, SWT.CHECK);
+    fOpenOnSingleClick.setText("Open feeds with a single mouse-click");
     fOpenOnSingleClick.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN));
   }
 
   private void createTrayOptions(Composite container) {
+    Label label = new Label(container, SWT.NONE);
+    label.setText("System Tray");
+    label.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.DIALOG_FONT));
 
-    /* System Tray Group */
-    Composite trayGroup = new Composite(container, SWT.None);
-    trayGroup.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
-    ((GridLayout) trayGroup.getLayout()).marginTop = 5;
-    trayGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    /* Group */
+    Composite group = new Composite(container, SWT.None);
+    group.setLayout(LayoutUtils.createGridLayout(1, 7, 3));
+    ((GridLayout) group.getLayout()).marginBottom = 5;
+    group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
-    Label label = new Label(trayGroup, SWT.NONE);
+    label = new Label(group, SWT.NONE);
     label.setText("Move to the System Tray: ");
 
     /* Enable / Disable Tray */
-    fMinimizeToTray = new Button(trayGroup, SWT.CHECK);
+    fMinimizeToTray = new Button(group, SWT.CHECK);
     fMinimizeToTray.setText("when minimizing RSSOwl");
     fMinimizeToTray.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE));
 
     /* Move to Tray on Start */
-    fMoveToTrayOnStart = new Button(trayGroup, SWT.CHECK);
+    fMoveToTrayOnStart = new Button(group, SWT.CHECK);
     fMoveToTrayOnStart.setText("when starting RSSOwl");
     fMoveToTrayOnStart.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_START));
 
     /* Move to Tray on Close */
-    fMoveToTrayOnExit = new Button(trayGroup, SWT.CHECK);
+    fMoveToTrayOnExit = new Button(group, SWT.CHECK);
     fMoveToTrayOnExit.setText("when closing RSSOwl");
     fMoveToTrayOnExit.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
   }
@@ -196,6 +253,18 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
    */
   @Override
   public boolean performOk() {
+    boolean layoutChanged = false;
+
+    if (fGlobalScope.getBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC) != fClassicLayoutRadio.getSelection()) {
+      fGlobalScope.putBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC, fClassicLayoutRadio.getSelection());
+      layoutChanged = true;
+    }
+
+    if (fGlobalScope.getBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED) != fBrowserMaximizedLayoutRadio.getSelection()) {
+      fGlobalScope.putBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED, fBrowserMaximizedLayoutRadio.getSelection());
+      layoutChanged = true;
+    }
+
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN, fOpenOnSingleClick.getSelection());
     fEclipseScope.putBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS, fReopenFeedsOnStartupCheck.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW, fAlwaysReuseFeedView.getSelection());
@@ -206,6 +275,14 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_MINIMIZE, fMinimizeToTray.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_START, fMoveToTrayOnStart.getSelection());
     fGlobalScope.putBoolean(DefaultPreferences.TRAY_ON_CLOSE, fMoveToTrayOnExit.getSelection());
+
+    /* Update Visible Feedviews */
+    if (layoutChanged) {
+      List<FeedView> feedViews = OwlUI.getFeedViews();
+      for (FeedView feedView : feedViews) {
+        feedView.updateLayout();
+      }
+    }
 
     return super.performOk();
   }
@@ -218,6 +295,11 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     super.performDefaults();
 
     IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
+
+    boolean browserMaximized = defaultScope.getBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED);
+    fClassicLayoutRadio.setSelection(!browserMaximized && defaultScope.getBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC));
+    fVerticalLayoutRadio.setSelection(!browserMaximized && !defaultScope.getBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC));
+    fBrowserMaximizedLayoutRadio.setSelection(browserMaximized);
 
     fOpenOnSingleClick.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN));
     fReopenFeedsOnStartupCheck.setSelection(defaultScope.getBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS));
