@@ -427,7 +427,7 @@
             id="org.rssowl.ui.MiscPreferences"
             name="View">
          <keywordReference
-               id="org.rssowl.ui.preferences.keywords.Miscellaneous">
+               id="org.rssowl.ui.preferences.keywords.View">
          </keywordReference>
       </page>
       <page
@@ -467,7 +467,7 @@
          point="org.eclipse.ui.keywords">
       <keyword
             id="org.rssowl.ui.preferences.keywords.Overview"
-            label="help guide guidance search"/>
+            label="help guide guidance search intro"/>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Keys"
             label="binding command scheme hotkey accelerator"/>
@@ -475,11 +475,8 @@
             id="org.rssowl.ui.preferences.keywords.ColorsAndFonts"
             label="presentation theme style"/>
       <keyword
-            id="org.rssowl.ui.preferences.keywords.Perspectives"
-            label="open view switch"/>
-      <keyword
-            id="org.rssowl.ui.preferences.keywords.Miscellaneous"
-            label="systemtray reopen open single multi tab minimize tray feed view single double click mouse">
+            id="org.rssowl.ui.preferences.keywords.View"
+            label="systemtray reopen open single multi tab minimize tray feed view single double click mouse layout newspaper vertical alignment">
       </keyword>
       <keyword
             id="org.rssowl.ui.preferences.keywords.Feeds"
