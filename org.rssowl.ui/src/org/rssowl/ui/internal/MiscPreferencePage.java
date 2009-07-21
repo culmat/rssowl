@@ -255,7 +255,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   public boolean performOk() {
     boolean layoutChanged = false;
 
-    if (fGlobalScope.getBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC) != fClassicLayoutRadio.getSelection()) {
+    if (!fBrowserMaximizedLayoutRadio.getSelection() && fGlobalScope.getBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC) != fClassicLayoutRadio.getSelection()) {
       fGlobalScope.putBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC, fClassicLayoutRadio.getSelection());
       layoutChanged = true;
     }
