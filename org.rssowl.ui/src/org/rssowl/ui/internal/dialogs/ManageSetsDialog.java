@@ -56,7 +56,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
-import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
@@ -411,7 +410,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
     }
 
     /* Perform reparenting */
-    Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(reparenting);
+    OwlUI.reparentWithProperties(reparenting);
     fViewer.setSelection(fViewer.getSelection());
   }
 

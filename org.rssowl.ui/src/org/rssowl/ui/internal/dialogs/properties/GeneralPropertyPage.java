@@ -602,7 +602,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       }
 
       /* Perform Reparenting */
-      Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(reparenting);
+      OwlUI.reparentWithProperties(reparenting);
     }
   }
 
