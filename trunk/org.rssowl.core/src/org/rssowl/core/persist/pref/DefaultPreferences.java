@@ -135,7 +135,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
   public static final String FV_SASHFORM_WEIGHTS = "org.rssowl.ui.internal.editors.feed.SashFormWeights";
 
   /** Feed View: Layout */
-  public static final String FV_LAYOUT_VERTICAL = "org.rssowl.ui.internal.editors.feed.LayoutVertical";
+  public static final String FV_LAYOUT_CLASSIC = "org.rssowl.ui.internal.editors.feed.LayoutVertical";
 
   /** Feed View: Browser Maximized */
   public static final String FV_BROWSER_MAXIMIZED = "org.rssowl.ui.internal.editors.feed.BrowserMaximized";
@@ -465,7 +465,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
    * @param defaultScope the container for preferences to fill.
    */
   protected void initFeedViewDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putBoolean(FV_LAYOUT_VERTICAL, true);
+    defaultScope.putBoolean(FV_LAYOUT_CLASSIC, true);
     defaultScope.putIntegers(FV_SASHFORM_WEIGHTS, new int[] { 50, 50 });
     defaultScope.putBoolean(BM_OPEN_SITE_FOR_NEWS, false);
   }

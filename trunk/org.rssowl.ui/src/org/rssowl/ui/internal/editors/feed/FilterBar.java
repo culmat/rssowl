@@ -97,9 +97,6 @@ public class FilterBar {
   /* Action to Group News */
   private static final String GROUP_ACTION = "org.rssowl.ui.internal.editors.feed.GroupAction";
 
-  /* Toggle vertical/horizontal Layout */
-  private static final String TOGGLE_LAYOUT_ACTION = "org.rssowl.ui.internal.editors.feed.ToggleLayoutAction";
-
   /* Columns */
   private static final String COLUMNS_ACTION = "org.rssowl.ui.internal.editors.feed.ColumnsAction";
 
@@ -112,7 +109,6 @@ public class FilterBar {
   private FeedView fFeedView;
   private JobTracker fQuickSearchTracker;
   private Text fSearchInput;
-  private boolean fLayoutVertical;
   private IPreferenceScope fGlobalPreferences;
   private boolean fMaximized;
   private ToolBarManager fFilterToolBar;
@@ -125,7 +121,6 @@ public class FilterBar {
   public FilterBar(FeedView feedView, Composite parent) {
     fFeedView = feedView;
     fParent = parent;
-    fLayoutVertical = feedView.fInitialLayoutVertical;
     fQuickSearchTracker = new JobTracker(500, false, true, ITask.Priority.SHORT);
     fGlobalPreferences = Owl.getPreferenceService().getGlobalScope();
     fMaximized = fGlobalPreferences.getBoolean(DefaultPreferences.FV_BROWSER_MAXIMIZED);
@@ -523,7 +518,6 @@ public class FilterBar {
         fFeedView.toggleBrowserViewMaximized();
         fMaximized = !fMaximized;
         fSecondToolBarManager.find(TOGGLE_MAXIMIZED_ACTION).update();
-        fSecondToolBarManager.find(TOGGLE_LAYOUT_ACTION).update();
         fSecondToolBarManager.find(COLUMNS_ACTION).update();
       }
 
@@ -548,44 +542,6 @@ public class FilterBar {
     toggleMaximized.setId(TOGGLE_MAXIMIZED_ACTION);
 
     fSecondToolBarManager.add(toggleMaximized);
-
-    /* Toggle Layout */
-    final ImageDescriptor horizontalImg = OwlUI.getImageDescriptor("icons/etool16/horizontal.gif");
-    final ImageDescriptor horizontalImgDisabled = OwlUI.getImageDescriptor("icons/dtool16/horizontal.gif");
-    final ImageDescriptor verticalImg = OwlUI.getImageDescriptor("icons/etool16/vertical.gif");
-    final ImageDescriptor verticalImgDisabled = OwlUI.getImageDescriptor("icons/dtool16/vertical.gif");
-
-    /* Toggle Layout */
-    IAction toggleLayout = new Action("Toggle Layout", IAction.AS_PUSH_BUTTON) {
-
-      @Override
-      public void run() {
-        fFeedView.toggleLayout();
-        fLayoutVertical = !fLayoutVertical;
-        fSecondToolBarManager.find(TOGGLE_LAYOUT_ACTION).update(IAction.IMAGE);
-      }
-
-      @Override
-      public ImageDescriptor getImageDescriptor() {
-        if (fLayoutVertical)
-          return horizontalImg;
-        return verticalImg;
-      }
-
-      @Override
-      public ImageDescriptor getDisabledImageDescriptor() {
-        if (fLayoutVertical)
-          return horizontalImgDisabled;
-        return verticalImgDisabled;
-      }
-
-      @Override
-      public boolean isEnabled() {
-        return !fMaximized;
-      }
-    };
-    toggleLayout.setId(TOGGLE_LAYOUT_ACTION);
-    fSecondToolBarManager.add(toggleLayout);
   }
 
   private NewsColumnViewModel getColumnModel() {
@@ -1070,7 +1026,6 @@ public class FilterBar {
   void updateBrowserViewMaximized(boolean maximized) {
     fMaximized = maximized;
     fSecondToolBarManager.find(TOGGLE_MAXIMIZED_ACTION).update();
-    fSecondToolBarManager.find(TOGGLE_LAYOUT_ACTION).update();
     fSecondToolBarManager.find(COLUMNS_ACTION).update();
   }
 }
