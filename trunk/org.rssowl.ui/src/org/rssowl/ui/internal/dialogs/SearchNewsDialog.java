@@ -1437,8 +1437,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
             }
 
             /* Since Virtual Style is set, we have to sort the model manually */
-            Collections.sort(((List<ScoredNews>) fResultViewer.getInput()), fNewsSorter);
-            fResultViewer.refresh(false);
+            if (fResultViewer.getInput() != null) {
+              Collections.sort(((List<ScoredNews>) fResultViewer.getInput()), fNewsSorter);
+              fResultViewer.refresh(false);
+            }
           }
         });
       }
