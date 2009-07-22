@@ -1176,11 +1176,11 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
       /* Select first News */
       if (perform.getType() == PerformAfterInputSet.Types.SELECT_FIRST_NEWS)
-        navigate(false, true, true, false);
+        navigate(false, true, false);
 
       /* Select first unread News */
       else if (perform.getType() == PerformAfterInputSet.Types.SELECT_UNREAD_NEWS)
-        navigate(false, true, true, true);
+        navigate(false, true, true);
 
       /* Select specific News */
       else if (perform.getType() == PerformAfterInputSet.Types.SELECT_SPECIFIC_NEWS)
@@ -1784,8 +1784,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
    * @param respectSelection If <code>TRUE</code>, respect the current selected
    * Item from the Tree as starting-node for the navigation, or
    * <code>FALSE</code> otherwise.
-   * @param newsScoped If <code>TRUE</code>, the navigation looks for News and
-   * for Feeds if <code>FALSE</code>.
    * @param next If <code>TRUE</code>, move to the next item, or previous if
    * <code>FALSE</code>.
    * @param unread If <code>TRUE</code>, only move to unread items, or ignore if
@@ -1793,20 +1791,17 @@ public class FeedView extends EditorPart implements IReusableEditor {
    * @return Returns <code>TRUE</code> in case navigation found a valid item, or
    * <code>FALSE</code> otherwise.
    */
-  public boolean navigate(boolean respectSelection, boolean newsScoped, boolean next, boolean unread) {
+  public boolean navigate(boolean respectSelection, boolean next, boolean unread) {
 
     /* Check for unread counter */
-    if (unread && fInput.getMark().getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) == 0) {
+    if (unread && fInput.getMark().getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)) == 0)
       return false;
+
+    /* Navigate in maximized Browser */
+    if (!isTableViewerVisible()) {
+      fNewsBrowserControl.navigate(next, unread);
+      return true;
     }
-
-    /* Don't update Selection in Tree, since this is not News-Scoped */
-    if (!newsScoped)
-      return true;
-
-    /* TODO Better support for maximized Browser */
-    if (!isTableViewerVisible())
-      return true;
 
     Tree newsTree = fNewsTableControl.getViewer().getTree();
 

@@ -52,6 +52,7 @@ import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.CBrowser;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
@@ -284,5 +285,64 @@ public class NewsBrowserControl implements IFeedViewPart {
    */
   public void setFocus() {
     fViewer.getControl().setFocus();
+  }
+
+  /*
+   * Executes JavaScript in the Browser to navigate between News.
+   */
+  void navigate(boolean next, boolean unread) {
+    CBrowser browser = fViewer.getBrowser();
+    if (browser.shouldDisableScript())
+      browser.setScriptDisabled(false);
+
+    /* Create JavaScript to Execute */
+    StringBuffer js = new StringBuffer();
+    if (browser.isIE())
+      js.append("var scrollPosY = document.body.scrollTop; ");
+    else
+      js.append("var scrollPosY = window.pageYOffset; ");
+    js.append("var body = document.getElementById(\"owlbody\"); ");
+    js.append("var divs = body.childNodes; ");
+
+    /* Next News */
+    if (next) {
+      js.append("  for (var i = 1; i < divs.length; i++) { ");
+      js.append("    if (divs[i].nodeType != 1) { ");
+      js.append("      continue; ");
+      js.append("    } ");
+      js.append("    var divPosY = divs[i].offsetTop; ");
+      if (unread) {
+        js.append("  if (divPosY > scrollPosY && divs[i].className == \"newsitemUnread\") { ");
+      } else
+        js.append("  if (divPosY > scrollPosY) { ");
+      js.append("      divs[i].scrollIntoView(); ");
+      js.append("      break; ");
+      js.append("    } ");
+      js.append("  } ");
+    }
+
+    /* Previous News */
+    else {
+      js.append("  for (var i = divs.length - 1; i >= 0; i--) { ");
+      js.append("    if (divs[i].nodeType != 1) { ");
+      js.append("      continue; ");
+      js.append("    } ");
+      js.append("    var divPosY = divs[i].offsetTop; ");
+      if (unread) {
+        js.append("  if (divPosY < scrollPosY - 10 && divs[i].className == \"newsitemUnread\") { ");
+      } else
+        js.append("  if (divPosY < scrollPosY - 10) { ");
+      js.append("      divs[i].scrollIntoView(); ");
+      js.append("      break; ");
+      js.append("    } ");
+      js.append("  } ");
+    }
+
+    try {
+      browser.getControl().execute(js.toString());
+    } finally {
+      if (browser.shouldDisableScript())
+        browser.setScriptDisabled(true);
+    }
   }
 }
