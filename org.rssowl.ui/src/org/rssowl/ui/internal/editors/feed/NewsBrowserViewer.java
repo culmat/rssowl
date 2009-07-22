@@ -1000,6 +1000,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         /* State (Bold/Plain Title, Mark Read Tooltip) */
         if (CoreUtils.isStateChange(newsEvent)) {
           boolean isRead = (INews.State.READ == news.getState());
+          js.append(getElementById(Dynamic.NEWS.getId(news)).append(isRead ? ".className='newsitemRead'; " : ".className='newsitemUnread'; "));
           js.append(getElementById(Dynamic.TITLE.getId(news)).append(isRead ? ".className='read'; " : ".className='unread'; "));
           js.append(getElementById(Dynamic.TOGGLE_READ.getId(news)).append(isRead ? ".title='Mark Unread'; " : ".title='Mark Read'; "));
         }

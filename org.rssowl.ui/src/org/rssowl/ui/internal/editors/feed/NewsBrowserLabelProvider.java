@@ -237,7 +237,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; padding: 5px 5px 0px 15px; }\n");
 
     /* Main DIV per Item */
-    writer.write("div.newsitem { margin: 10px 10px 30px 10px; border: dotted 1px silver; }\n");
+    writer.write("div.newsitemUnread { margin: 10px 10px 30px 10px; border: dotted 1px silver; }\n");
+    writer.write("div.newsitemRead { margin: 10px 10px 30px 10px; border: dotted 1px silver; }\n");
 
     /* Main DIV Item Areas */
     writer.write("div.header { padding: 10px 10px 5px 10px; background-color: #eee; }\n");
@@ -377,7 +378,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     }
 
     /* DIV: NewsItem */
-    div(builder, "newsitem", Dynamic.NEWS.getId(news));
+    div(builder, isUnread ? "newsitemUnread" : "newsitemRead", Dynamic.NEWS.getId(news));
 
     /* DIV: NewsItem/Header */
     div(builder, news.isFlagged() ? "headerSticky" : "header", Dynamic.HEADER.getId(news));

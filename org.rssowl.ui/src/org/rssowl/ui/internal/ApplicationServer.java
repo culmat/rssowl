@@ -681,7 +681,7 @@ public class ApplicationServer {
         ((NewsBrowserLabelProvider) labelProvider).writeCSS(writer);
 
       /* Open Body */
-      writer.write("  </head>\n  <body>\n");
+      writer.write("  </head>\n  <body id=\"owlbody\">\n");
 
       /* Output each Element as HTML */
       for (Object el : children) {
