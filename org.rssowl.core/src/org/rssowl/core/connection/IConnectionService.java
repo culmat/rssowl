@@ -99,9 +99,6 @@ public interface IConnectionService {
    * Returns a Label that can be used to present the resource identified by the
    * given <code>URI</code>. For instance, if the resource is a feed, this
    * method should return the Title of the feed.
-   * <p>
-   * TODO Make the default implementation use authentication by realm too!
-   * </p>
    *
    * @param link The <code>URI</code> identifying the resource.
    * @return Returns a Label that can be used to present the resource identified

@@ -428,7 +428,6 @@ public class SearchField implements ISearchField {
     return new ArrayList<String>(Arrays.asList(new String[] { "New", "Read", "Unread", "Updated", "Deleted" }));
   }
 
-  /* TODO */
   private List<String> loadLanguageValues() {
     return new ArrayList<String>();
   }

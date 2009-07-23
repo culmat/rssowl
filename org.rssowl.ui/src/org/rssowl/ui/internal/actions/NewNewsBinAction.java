@@ -64,9 +64,6 @@ import java.io.Serializable;
 import java.util.Map;
 
 /**
- * TODO This is a rough-Action which is not polished or optimized and only for
- * developers purposes!
- *
  * @author bpasero
  */
 public class NewNewsBinAction implements IWorkbenchWindowActionDelegate, IObjectActionDelegate {

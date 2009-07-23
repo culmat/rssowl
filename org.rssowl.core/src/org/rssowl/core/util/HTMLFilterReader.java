@@ -285,7 +285,7 @@ public class HTMLFilterReader extends Reader {
     // otherwise we may try and convert part of some company
     // names to an entity.  "Alpha&Beta Corp" for instance.
     //
-    // TODO: perhaps I should special case some of the
+    // Perhaps I should special case some of the
     // more common ones like &amp to make the ';' optional...
 
     fSb.setLength(0);
@@ -504,7 +504,7 @@ public class HTMLFilterReader extends Reader {
   // find an end tag, but beware of comments...
   // <script><!-- </script> -->foo</script>
   // beware markup in script strings: </script>...document.write("</script>")foo</script>
-  // TODO: do I need to worry about CDATA sections "<![CDATA["  ?
+  // Do I need to worry about CDATA sections "<![CDATA["  ?
   int findEndTag() throws IOException {
 
     while ((fNumRead - fLastMark) < fSafeReadAheadLimit) {
@@ -717,7 +717,7 @@ public class HTMLFilterReader extends Reader {
    */
   @Override
   public int read() throws IOException {
-    // TODO: Do we ever want to preserve CDATA sections?
+    // Do we ever want to preserve CDATA sections?
     // where do we have to worry about them?
     // <![ CDATA [ unescaped markup ]]>
     if (fNumWhitespace > 0) {

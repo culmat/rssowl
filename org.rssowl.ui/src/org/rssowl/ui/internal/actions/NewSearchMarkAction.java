@@ -43,9 +43,6 @@ import org.rssowl.ui.internal.dialogs.SearchMarkDialog;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 /**
- * TODO This is a rough-Action which is not polished or optimized and only for
- * developers purposes!
- *
  * @author bpasero
  */
 public class NewSearchMarkAction implements IWorkbenchWindowActionDelegate, IObjectActionDelegate {

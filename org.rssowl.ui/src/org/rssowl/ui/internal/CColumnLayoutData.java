@@ -26,7 +26,7 @@ package org.rssowl.ui.internal;
 
 /**
  * Layout-Information to be used with a <code>CTree</code> or
- * <code>CTable</code>. TODO Delete if this is no longer used!
+ * <code>CTable</code>.
  *
  * @author bpasero
  */
