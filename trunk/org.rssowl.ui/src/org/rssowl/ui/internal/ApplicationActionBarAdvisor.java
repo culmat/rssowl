@@ -171,7 +171,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     //    register(ActionFactory.SHOW_EDITOR.create(window));
 
     /* Menu: Help */
-    // register(ActionFactory.INTRO.create(window)); TODO Enable
+    // register(ActionFactory.INTRO.create(window));
     register(ActionFactory.ABOUT.create(window));
     getAction(ActionFactory.ABOUT.getId()).setText("&About RSSOwl");
 
@@ -552,6 +552,109 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             manager.add(new OpenInExternalBrowserAction(selection));
         }
 
+        /* Mark / Label */
+        {
+          manager.add(new Separator("mark"));
+
+          /* Mark */
+          {
+            MenuManager markMenu = new MenuManager("M&ark", "mark");
+            manager.add(markMenu);
+
+            /* Mark as Read */
+            IAction action = new ToggleReadStateAction(selection);
+            action.setEnabled(!selection.isEmpty());
+            markMenu.add(action);
+
+            /* Mark All Read */
+            action = new MarkAllNewsReadAction();
+            action.setEnabled(activeFeedView != null);
+            markMenu.add(action);
+
+            /* Sticky */
+            markMenu.add(new Separator());
+            action = new MakeNewsStickyAction(selection);
+            action.setEnabled(!selection.isEmpty());
+            markMenu.add(action);
+          }
+
+          /* Label */
+          {
+            Collection<ILabel> labels = CoreUtils.loadSortedLabels();
+
+            MenuManager labelMenu = new MenuManager("&Label");
+            manager.add(labelMenu);
+
+            /* Assign / Organize Labels */
+            labelMenu.add(new AssignLabelsAction(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), selection));
+            labelMenu.add(new Action("&Organize Labels...") {
+              @Override
+              public void run() {
+                PreferencesUtil.createPreferenceDialogOn(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), ManageLabelsPreferencePage.ID, null, null).open();
+              }
+            });
+            labelMenu.add(new Separator());
+
+            /* Retrieve Labels that all selected News contain */
+            Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(selection);
+            for (final ILabel label : labels) {
+              LabelAction labelAction = new LabelAction(label, selection);
+              labelAction.setChecked(selectedLabels.contains(label));
+              labelMenu.add(labelAction);
+            }
+
+            /* Remove All Labels */
+            labelMenu.add(new Separator());
+            LabelAction removeAllLabels = new LabelAction(null, selection);
+            removeAllLabels.setEnabled(!labels.isEmpty());
+            labelMenu.add(removeAllLabels);
+          }
+        }
+
+        /* Move To / Copy To */
+        if (!selection.isEmpty()) {
+          manager.add(new Separator("movecopy"));
+
+          /* Load all news bins and sort by name */
+          List<INewsBin> newsbins = new ArrayList<INewsBin>(DynamicDAO.loadAll(INewsBin.class));
+
+          Comparator<INewsBin> comparator = new Comparator<INewsBin>() {
+            public int compare(INewsBin o1, INewsBin o2) {
+              return o1.getName().compareTo(o2.getName());
+            };
+          };
+
+          Collections.sort(newsbins, comparator);
+
+          /* Move To */
+          MenuManager moveMenu = new MenuManager("&Move To", "moveto");
+          manager.add(moveMenu);
+
+          for (INewsBin bin : newsbins) {
+            if (activeInput != null && activeInput.getMark().equals(bin))
+              continue;
+
+            moveMenu.add(new MoveCopyNewsToBinAction(selection, bin, true));
+          }
+
+          moveMenu.add(new Separator("movetonewbin"));
+          moveMenu.add(new MoveCopyNewsToBinAction(selection, null, true));
+
+          /* Copy To */
+          MenuManager copyMenu = new MenuManager("&Copy To", "copyto");
+          manager.add(copyMenu);
+
+          for (INewsBin bin : newsbins) {
+            if (activeInput != null && activeInput.getMark().equals(bin))
+              continue;
+
+            copyMenu.add(new MoveCopyNewsToBinAction(selection, bin, false));
+          }
+
+          copyMenu.add(new Separator("copytonewbin"));
+          copyMenu.add(new MoveCopyNewsToBinAction(selection, null, false));
+        }
+
         /* Share */
         if (!selection.isEmpty()) {
           manager.add(new Separator("share"));
@@ -611,109 +714,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
               new ShareProvidersListDialog(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell()).open();
             };
           });
-        }
-
-        /* Move To / Copy To */
-        if (!selection.isEmpty()) {
-          manager.add(new Separator("movecopy"));
-
-          /* Load all news bins and sort by name */
-          List<INewsBin> newsbins = new ArrayList<INewsBin>(DynamicDAO.loadAll(INewsBin.class));
-
-          Comparator<INewsBin> comparator = new Comparator<INewsBin>() {
-            public int compare(INewsBin o1, INewsBin o2) {
-              return o1.getName().compareTo(o2.getName());
-            };
-          };
-
-          Collections.sort(newsbins, comparator);
-
-          /* Move To */
-          MenuManager moveMenu = new MenuManager("&Move To", "moveto");
-          manager.add(moveMenu);
-
-          for (INewsBin bin : newsbins) {
-            if (activeInput != null && activeInput.getMark().equals(bin))
-              continue;
-
-            moveMenu.add(new MoveCopyNewsToBinAction(selection, bin, true));
-          }
-
-          moveMenu.add(new Separator("movetonewbin"));
-          moveMenu.add(new MoveCopyNewsToBinAction(selection, null, true));
-
-          /* Copy To */
-          MenuManager copyMenu = new MenuManager("&Copy To", "copyto");
-          manager.add(copyMenu);
-
-          for (INewsBin bin : newsbins) {
-            if (activeInput != null && activeInput.getMark().equals(bin))
-              continue;
-
-            copyMenu.add(new MoveCopyNewsToBinAction(selection, bin, false));
-          }
-
-          copyMenu.add(new Separator("copytonewbin"));
-          copyMenu.add(new MoveCopyNewsToBinAction(selection, null, false));
-        }
-
-        /* Mark / Label */
-        {
-          manager.add(new Separator("mark"));
-
-          /* Mark */
-          {
-            MenuManager markMenu = new MenuManager("M&ark", "mark");
-            manager.add(markMenu);
-
-            /* Mark as Read */
-            IAction action = new ToggleReadStateAction(selection);
-            action.setEnabled(!selection.isEmpty());
-            markMenu.add(action);
-
-            /* Mark All Read */
-            action = new MarkAllNewsReadAction();
-            action.setEnabled(activeFeedView != null);
-            markMenu.add(action);
-
-            /* Sticky */
-            markMenu.add(new Separator());
-            action = new MakeNewsStickyAction(selection);
-            action.setEnabled(!selection.isEmpty());
-            markMenu.add(action);
-          }
-
-          /* Label */
-          {
-            Collection<ILabel> labels = CoreUtils.loadSortedLabels();
-
-            MenuManager labelMenu = new MenuManager("&Label");
-            manager.add(labelMenu);
-
-            /* Assign / Organize Labels */
-            labelMenu.add(new AssignLabelsAction(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), selection));
-            labelMenu.add(new Action("&Organize Labels...") {
-              @Override
-              public void run() {
-                PreferencesUtil.createPreferenceDialogOn(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), ManageLabelsPreferencePage.ID, null, null).open();
-              }
-            });
-            labelMenu.add(new Separator());
-
-            /* Retrieve Labels that all selected News contain */
-            Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(selection);
-            for (final ILabel label : labels) {
-              LabelAction labelAction = new LabelAction(label, selection);
-              labelAction.setChecked(selectedLabels.contains(label));
-              labelMenu.add(labelAction);
-            }
-
-            /* Remove All Labels */
-            labelMenu.add(new Separator());
-            LabelAction removeAllLabels = new LabelAction(null, selection);
-            removeAllLabels.setEnabled(!labels.isEmpty());
-            labelMenu.add(removeAllLabels);
-          }
         }
 
         /* Filter */
@@ -901,7 +901,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       }
     });
 
-    // helpMenu.add(getAction(ActionFactory.INTRO.getId())); TODO Enable
+    // helpMenu.add(getAction(ActionFactory.INTRO.getId()));
     helpMenu.add(new Separator());
 
     helpMenu.add(new Separator());
