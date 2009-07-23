@@ -139,11 +139,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * The FeedView is an instance of <code>EditorPart</code> capable of displaying
  * News in a Table-Viewer and Browser-Viewer. It offers controls to Filter and
  * Group them.
- * <p>
- * TODO Think about storing settings in a central place in memory and flush them
- * to the DB on shutdown. Alternative: Update settings while action is invoked
- * with a short delay (in non-UI-Thread).
- * </p>
  *
  * @author bpasero
  */
@@ -1172,24 +1167,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     /* Check if an action is to be performed */
     PerformAfterInputSet perform = fInput.getPerformOnInputSet();
-    if (perform != null) {
-
-      /* Select first News */
-      if (perform.getType() == PerformAfterInputSet.Types.SELECT_FIRST_NEWS)
-        navigate(false, true, false);
-
-      /* Select first unread News */
-      else if (perform.getType() == PerformAfterInputSet.Types.SELECT_UNREAD_NEWS)
-        navigate(false, true, true);
-
-      /* Select specific News */
-      else if (perform.getType() == PerformAfterInputSet.Types.SELECT_SPECIFIC_NEWS)
-        setSelection(new StructuredSelection(perform.getNewsToSelect()));
-
-      /* Make sure to activate this FeedView in case of an action */
-      if (perform.shouldActivate())
-        fEditorSite.getPage().activate(fEditorSite.getPart());
-    }
+    perform(perform);
 
     /* DB Roundtrips done in the background */
     JobRunner.runInBackgroundThread(new Runnable() {
@@ -1228,6 +1206,30 @@ public class FeedView extends EditorPart implements IReusableEditor {
         }
       }
     });
+  }
+
+  /**
+   * @param perform the action to perform on this editor.
+   */
+  public void perform(PerformAfterInputSet perform) {
+    if (perform != null) {
+
+      /* Select first News */
+      if (perform.getType() == PerformAfterInputSet.Types.SELECT_FIRST_NEWS)
+        navigate(false, true, false);
+
+      /* Select first unread News */
+      else if (perform.getType() == PerformAfterInputSet.Types.SELECT_UNREAD_NEWS)
+        navigate(false, true, true);
+
+      /* Select specific News */
+      else if (perform.getType() == PerformAfterInputSet.Types.SELECT_SPECIFIC_NEWS)
+        setSelection(new StructuredSelection(perform.getNewsToSelect()));
+
+      /* Make sure to activate this FeedView in case of an action */
+      if (perform.shouldActivate())
+        fEditorSite.getPage().activate(fEditorSite.getPart());
+    }
   }
 
   private void fillBookMarksToReload(List<IBookMark> bookMarksToReload, IFolder folder) {
