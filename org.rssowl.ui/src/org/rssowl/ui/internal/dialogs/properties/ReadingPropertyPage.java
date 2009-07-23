@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.dialogs.properties;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -164,6 +165,13 @@ public class ReadingPropertyPage implements IEntityPropertyPage {
 
 
     return container;
+  }
+
+  /*
+   * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#getImage()
+   */
+  public ImageDescriptor getImage() {
+    return null;
   }
 
   /*
