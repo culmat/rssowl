@@ -62,7 +62,6 @@ public class StatusLineUpdater implements ISelectionChangedListener {
     fStatusLineManager.setMessage(text);
   }
 
-  /* TODO Use MessageFormat to support I18N here */
   private String formatElements(Object elements[]) {
 
     /* No Element selected */

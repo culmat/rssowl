@@ -888,7 +888,7 @@ public class Controller {
 
       String id = element.getAttribute("id");
       String name = element.getAttribute("name");
-      String iconPath = element.getAttribute("icon"); //TODO Support loading icon from different plugin
+      String iconPath = element.getAttribute("icon");
       String url = element.getAttribute("url");
       String maxTitleLength = element.getAttribute("maxTitleLength");
       String enabled = element.getAttribute("enabled");
@@ -1169,8 +1169,6 @@ public class Controller {
   }
 
   /**
-   * TODO Temporary
-   *
    * @param fileName
    * @throws FileNotFoundException In case of an error.
    * @throws ParserException In case of an error.

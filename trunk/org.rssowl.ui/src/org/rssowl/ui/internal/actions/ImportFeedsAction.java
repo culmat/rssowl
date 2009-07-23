@@ -37,8 +37,6 @@ import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.util.JobRunner;
 
 /**
- * TODO This is just for Developers Purposes!
- *
  * @author bpasero
  */
 public class ImportFeedsAction extends Action implements IWorkbenchWindowActionDelegate {

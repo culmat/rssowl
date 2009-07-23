@@ -184,7 +184,7 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     /* Foreground */
     Color foreground = getForeground(cell.getElement(), cell.getColumnIndex());
 
-    /* TODO This is required to invalidate + redraw the entire TableItem! */
+    /* This is required to invalidate + redraw the entire TableItem! */
     if (NewsTableControl.USE_CUSTOM_OWNER_DRAWN) {
       Item item = (Item) cell.getItem();
       if (item instanceof TreeItem)

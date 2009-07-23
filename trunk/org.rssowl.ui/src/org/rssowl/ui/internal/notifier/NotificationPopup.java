@@ -77,10 +77,8 @@ import java.util.List;
 /**
  * TODO
  * <ul>
- * <li>Implement animation (and transparency)</li>
+ * <li>Implement animation</li>
  * <li>Add preferences (respect use animation, number of news)</li>
- * <li>Enrich Popup toolbar with "Make Sticky" and a dropdown with "Options",
- * "Mark Read" etc...</li>
  * <li>SearchNotificationItems are not aggregated if the max. number of items is
  * already showing</li>
  * </ul>

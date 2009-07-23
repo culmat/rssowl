@@ -706,8 +706,6 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     if (match.find())
       title = match.group();
 
-    // TODO Decode possible XML special chars (entities)
-
     return title;
   }
 
