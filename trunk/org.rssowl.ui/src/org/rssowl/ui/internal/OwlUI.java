@@ -1405,8 +1405,18 @@ public class OwlUI {
 
         /* Otherwise simply open */
         try {
+          boolean explicitPerform = false;
+          IEditorPart existingEditor = null;
+          if (perform != null) {
+            existingEditor = page.findEditor(input);
+            explicitPerform = (existingEditor != null);
+          }
+
           page.openEditor(input, FeedView.ID, activateEditor);
           openedEditors++;
+
+          if (explicitPerform && existingEditor instanceof FeedView)
+            ((FeedView) existingEditor).perform(perform);
         } catch (PartInitException e) {
           Activator.getDefault().getLog().log(e.getStatus());
         }
