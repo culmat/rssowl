@@ -27,6 +27,7 @@ package org.rssowl.core.tests.ui;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.junit.Test;
@@ -154,6 +155,10 @@ public class EntityPropertyPageTests implements IEntityPropertyPage {
 
   public boolean performOk(Set<IEntity> entitiesToSave) {
     return false;
+  }
+
+  public ImageDescriptor getImage() {
+    return null;
   }
 
   public void setFocus() {}

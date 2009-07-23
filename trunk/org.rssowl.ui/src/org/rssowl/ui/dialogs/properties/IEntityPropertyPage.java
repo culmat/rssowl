@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.dialogs.properties;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.rssowl.core.persist.IEntity;
@@ -58,6 +59,12 @@ public interface IEntityPropertyPage {
   Control createContents(Composite parent);
 
   /**
+   * @return the image to show for the property page or <code>null</code> if
+   * none.
+   */
+  ImageDescriptor getImage();
+
+  /**
    * Asks to focus the given <code>IEntityPropertyPage</code>.
    */
   void setFocus();
@@ -65,9 +72,9 @@ public interface IEntityPropertyPage {
   /**
    * Notifies that the OK button of this page's container has been pressed.
    *
-   * @param entitiesToSave A Set of <code>IEntity</code>s which are to be
-   * saved. This way of collecting entities for saving avoids the situation
-   * where two different pages wants to save the same entity.
+   * @param entitiesToSave A Set of <code>IEntity</code>s which are to be saved.
+   * This way of collecting entities for saving avoids the situation where two
+   * different pages wants to save the same entity.
    * @return <code>false</code> to abort the container's OK processing and
    * <code>true</code> to allow the OK to happen
    */

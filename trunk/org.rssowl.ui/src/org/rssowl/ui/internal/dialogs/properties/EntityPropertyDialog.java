@@ -182,9 +182,12 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
     /* For each Page - create TabItem */
     for (EntityPropertyPageWrapper pageWrapper : fPages) {
       TabItem item = new TabItem(fTabFolder, SWT.None);
-      item.setData(pageWrapper.getPage());
+      IEntityPropertyPage page = pageWrapper.getPage();
+      item.setData(page);
       item.setText(pageWrapper.getName());
-      item.setControl(pageWrapper.getPage().createContents(fTabFolder));
+      if (page.getImage() != null)
+        item.setImage(OwlUI.getImage(fResources, page.getImage()));
+      item.setControl(page.createContents(fTabFolder));
     }
 
     /* Focus first Page */

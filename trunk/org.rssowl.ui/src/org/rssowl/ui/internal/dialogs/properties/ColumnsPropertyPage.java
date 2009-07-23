@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.dialogs.properties;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -115,6 +116,13 @@ public class ColumnsPropertyPage implements IEntityPropertyPage {
     fColumnSelectionControl.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     fColumnSelectionControl.setInput(NewsColumnViewModel.createFrom(fPrefSelectedColumns, fPrefSortColumn, fPrefAscending));
     return container;
+  }
+
+  /*
+   * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#getImage()
+   */
+  public ImageDescriptor getImage() {
+    return null;
   }
 
   /*

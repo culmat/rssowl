@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -306,6 +307,13 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     fOpenOnStartupCheck.setSelection(fPrefOpenOnStartup);
 
     return container;
+  }
+
+  /*
+   * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#getImage()
+   */
+  public ImageDescriptor getImage() {
+    return null;
   }
 
   private String getDisplayName() {

@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.dialogs.properties;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -176,6 +177,16 @@ public class InformationPropertyPage implements IEntityPropertyPage {
       createLabel(container, totalCount + " (" + newCount + " new, " + unreadCount + " unread)", false);
 
     return container;
+  }
+
+  /*
+   * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#getImage()
+   */
+  public ImageDescriptor getImage() {
+    if (!fEntities.isEmpty() && ((IBookMark) fEntities.get(0)).isErrorLoading())
+      return OwlUI.getImageDescriptor("icons/ovr16/error.gif");
+
+    return null;
   }
 
   private void createLabel(Composite parent, String text, boolean bold) {

@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.properties;
 
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -99,6 +100,13 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
 
     /* Create contents for multi selection */
     return createContentsMultiSearch(parent);
+  }
+
+  /*
+   * @see org.rssowl.ui.dialogs.properties.IEntityPropertyPage#getImage()
+   */
+  public ImageDescriptor getImage() {
+    return null;
   }
 
   private Control createContentsSingleSearch(Composite parent) {
