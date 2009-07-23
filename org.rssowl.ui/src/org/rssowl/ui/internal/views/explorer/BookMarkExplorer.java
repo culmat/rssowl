@@ -44,7 +44,6 @@ import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.IInputProvider;
 import org.eclipse.jface.viewers.IOpenListener;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -108,6 +107,7 @@ import org.rssowl.core.persist.event.FolderEvent;
 import org.rssowl.core.persist.event.FolderListener;
 import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.reference.ModelReference;
@@ -171,6 +171,7 @@ public class BookMarkExplorer extends ViewPart {
   public static final String PREVIOUS_SET_ACTION = "org.rssowl.ui.internal.views.explorer.PreviousSetAction"; //$NON-NLS-1$
 
   /* Local Setting Constants */
+  private static final String PREF_SELECTED_FOLDER_CHILD = "org.rssowl.ui.internal.views.explorer.SelectedFolderChild"; //$NON-NLS-1$
   private static final String PREF_SELECTED_BOOKMARK_SET = "org.rssowl.ui.internal.views.explorer.SelectedBookMarkSet"; //$NON-NLS-1$
   private static final String PREF_EXPANDED_NODES = "org.rssowl.ui.internal.views.explorer.ExpandedNodes"; //$NON-NLS-1$
 
@@ -189,6 +190,7 @@ public class BookMarkExplorer extends ViewPart {
   private IFolder fSelectedBookMarkSet;
   private boolean fLinkingEnabled;
   private boolean fFaviconsEnabled;
+  private long fLastSelectedFolderChild;
 
   /* Viewer Classes */
   private TreeViewer fViewer;
@@ -209,6 +211,7 @@ public class BookMarkExplorer extends ViewPart {
 
   /* Misc. */
   private IViewSite fViewSite;
+  private IStructuredSelection fLastSelection;
   private FolderListener fFolderListener;
   private IPartListener2 fPartListener;
   private IPreferenceDAO fPrefDAO;
@@ -247,6 +250,10 @@ public class BookMarkExplorer extends ViewPart {
 
     /* Restore Expanded Elements */
     restoreExpandedElements();
+
+    /* Restore Selection if linking is disabled */
+    if (fLastSelectedFolderChild > 0 && !fLinkingEnabled)
+      fViewer.setSelection(new StructuredSelection(new BookMarkReference(fLastSelectedFolderChild)), true);
 
     /* Hook into Statusline */
     fViewer.addSelectionChangedListener(new StatusLineUpdater(getViewSite().getActionBars().getStatusLineManager()));
@@ -391,10 +398,9 @@ public class BookMarkExplorer extends ViewPart {
   }
 
   private void onSelectionChanged(SelectionChangedEvent event) {
-    if (fLinkingEnabled) {
-      ISelection selection = event.getSelection();
-      linkToFeedView((IStructuredSelection) selection);
-    }
+    fLastSelection = (IStructuredSelection) event.getSelection();
+    if (fLinkingEnabled)
+      linkToFeedView(fLastSelection);
   }
 
   private void onDoubleClick(DoubleClickEvent event) {
@@ -1744,6 +1750,16 @@ public class BookMarkExplorer extends ViewPart {
     /* Expanded Elements */
     saveExpandedElements();
 
+    /* Selection */
+    if (fLastSelection != null && !fLastSelection.isEmpty()) {
+      Object element = fLastSelection.getFirstElement();
+      if (element instanceof IFolderChild)
+        fGlobalPreferences.putLong(PREF_SELECTED_FOLDER_CHILD, ((IFolderChild) element).getId());
+      else
+        fGlobalPreferences.delete(PREF_SELECTED_FOLDER_CHILD);
+    } else
+      fGlobalPreferences.delete(PREF_SELECTED_FOLDER_CHILD);
+
     /* Misc. Settings */
     fGlobalPreferences.putBoolean(DefaultPreferences.BE_BEGIN_SEARCH_ON_TYPING, fBeginSearchOnTyping);
     fGlobalPreferences.putBoolean(DefaultPreferences.BE_ALWAYS_SHOW_SEARCH, fAlwaysShowSearch);
@@ -1796,6 +1812,9 @@ public class BookMarkExplorer extends ViewPart {
 
     /* Expanded Elements */
     loadExpandedElements();
+
+    /* Selected Folder Child */
+    fLastSelectedFolderChild= fGlobalPreferences.getLong(PREF_SELECTED_FOLDER_CHILD);
   }
 
   /* Expanded Elements - Use ID of selected Set to make it Unique */
