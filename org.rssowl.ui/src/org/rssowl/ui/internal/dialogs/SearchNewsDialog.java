@@ -396,7 +396,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
       /* Foreground */
       Color foreground = getForeground(scoredNews.getNews(), cell.getColumnIndex());
 
-      /* TODO This is required to invalidate + redraw the entire TableItem! */
+      /* This is required to invalidate + redraw the entire TableItem! */
       if (USE_CUSTOM_OWNER_DRAWN) {
         Item item = (Item) cell.getItem();
         if (item instanceof TableItem)
@@ -1765,6 +1765,97 @@ public class SearchNewsDialog extends TitleAreaDialog {
             manager.add(new OpenInExternalBrowserAction(selection));
         }
 
+        /* Mark / Label */
+        if (!selection.isEmpty()) {
+          manager.add(new Separator("mark"));
+
+          /* Mark */
+          MenuManager markMenu = new MenuManager("Mark", "mark");
+          manager.add(markMenu);
+
+          /* Mark as Read */
+          IAction action = new ToggleReadStateAction(selection);
+          action.setEnabled(!selection.isEmpty());
+          markMenu.add(action);
+
+          /* Sticky */
+          markMenu.add(new Separator());
+          action = new MakeNewsStickyAction(selection);
+          action.setEnabled(!selection.isEmpty());
+          markMenu.add(action);
+
+          /* Label */
+          if (!selection.isEmpty()) {
+            Collection<ILabel> labels = CoreUtils.loadSortedLabels();
+
+            /* Label */
+            MenuManager labelMenu = new MenuManager("Label");
+            manager.appendToGroup("mark", labelMenu);
+
+            /* Assign / Organize Labels */
+            labelMenu.add(new AssignLabelsAction(getShell(), selection));
+            labelMenu.add(new Action("Organize Labels...") {
+              @Override
+              public void run() {
+                PreferencesUtil.createPreferenceDialogOn(getShell(), ManageLabelsPreferencePage.ID, null, null).open();
+              }
+            });
+            labelMenu.add(new Separator());
+
+            /* Retrieve Labels that all selected News contain */
+            Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(selection);
+            for (final ILabel label : labels) {
+              LabelAction labelAction = new LabelAction(label, selection);
+              labelAction.setChecked(selectedLabels.contains(label));
+              labelMenu.add(labelAction);
+            }
+
+            /* Remove All Labels */
+            labelMenu.add(new Separator());
+            LabelAction removeAllLabels = new LabelAction(null, selection);
+            removeAllLabels.setEnabled(!labels.isEmpty());
+            labelMenu.add(removeAllLabels);
+          }
+        }
+
+        /* Move To / Copy To */
+        if (!selection.isEmpty()) {
+          manager.add(new Separator("movecopy"));
+
+          /* Load all news bins and sort by name */
+          List<INewsBin> newsbins = new ArrayList<INewsBin>(DynamicDAO.loadAll(INewsBin.class));
+
+          Comparator<INewsBin> comparator = new Comparator<INewsBin>() {
+            public int compare(INewsBin o1, INewsBin o2) {
+              return o1.getName().compareTo(o2.getName());
+            };
+          };
+
+          Collections.sort(newsbins, comparator);
+
+          /* Move To */
+          MenuManager moveMenu = new MenuManager("Move To", "moveto");
+          manager.add(moveMenu);
+
+          for (INewsBin bin : newsbins) {
+            moveMenu.add(new MoveCopyNewsToBinAction(selection, bin, true));
+          }
+
+          moveMenu.add(new Separator("movetonewbin"));
+          moveMenu.add(new MoveCopyNewsToBinAction(selection, null, true));
+
+          /* Copy To */
+          MenuManager copyMenu = new MenuManager("Copy To", "copyto");
+          manager.add(copyMenu);
+
+          for (INewsBin bin : newsbins) {
+            copyMenu.add(new MoveCopyNewsToBinAction(selection, bin, false));
+          }
+
+          copyMenu.add(new Separator("copytonewbin"));
+          copyMenu.add(new MoveCopyNewsToBinAction(selection, null, false));
+        }
+
         /* Share */
         {
           manager.add(new Separator("share"));
@@ -1824,97 +1915,6 @@ public class SearchNewsDialog extends TitleAreaDialog {
               new ShareProvidersListDialog(fResultViewer.getTable().getShell()).open();
             };
           });
-        }
-
-        /* Move To / Copy To */
-        if (!selection.isEmpty()) {
-          manager.add(new Separator("movecopy"));
-
-          /* Load all news bins and sort by name */
-          List<INewsBin> newsbins = new ArrayList<INewsBin>(DynamicDAO.loadAll(INewsBin.class));
-
-          Comparator<INewsBin> comparator = new Comparator<INewsBin>() {
-            public int compare(INewsBin o1, INewsBin o2) {
-              return o1.getName().compareTo(o2.getName());
-            };
-          };
-
-          Collections.sort(newsbins, comparator);
-
-          /* Move To */
-          MenuManager moveMenu = new MenuManager("Move To", "moveto");
-          manager.add(moveMenu);
-
-          for (INewsBin bin : newsbins) {
-            moveMenu.add(new MoveCopyNewsToBinAction(selection, bin, true));
-          }
-
-          moveMenu.add(new Separator("movetonewbin"));
-          moveMenu.add(new MoveCopyNewsToBinAction(selection, null, true));
-
-          /* Copy To */
-          MenuManager copyMenu = new MenuManager("Copy To", "copyto");
-          manager.add(copyMenu);
-
-          for (INewsBin bin : newsbins) {
-            copyMenu.add(new MoveCopyNewsToBinAction(selection, bin, false));
-          }
-
-          copyMenu.add(new Separator("copytonewbin"));
-          copyMenu.add(new MoveCopyNewsToBinAction(selection, null, false));
-        }
-
-        /* Mark / Label */
-        if (!selection.isEmpty()) {
-          manager.add(new Separator("mark"));
-
-          /* Mark */
-          MenuManager markMenu = new MenuManager("Mark", "mark");
-          manager.add(markMenu);
-
-          /* Mark as Read */
-          IAction action = new ToggleReadStateAction(selection);
-          action.setEnabled(!selection.isEmpty());
-          markMenu.add(action);
-
-          /* Sticky */
-          markMenu.add(new Separator());
-          action = new MakeNewsStickyAction(selection);
-          action.setEnabled(!selection.isEmpty());
-          markMenu.add(action);
-
-          /* Label */
-          if (!selection.isEmpty()) {
-            Collection<ILabel> labels = CoreUtils.loadSortedLabels();
-
-            /* Label */
-            MenuManager labelMenu = new MenuManager("Label");
-            manager.appendToGroup("mark", labelMenu);
-
-            /* Assign / Organize Labels */
-            labelMenu.add(new AssignLabelsAction(getShell(), selection));
-            labelMenu.add(new Action("Organize Labels...") {
-              @Override
-              public void run() {
-                PreferencesUtil.createPreferenceDialogOn(getShell(), ManageLabelsPreferencePage.ID, null, null).open();
-              }
-            });
-            labelMenu.add(new Separator());
-
-            /* Retrieve Labels that all selected News contain */
-            Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(selection);
-            for (final ILabel label : labels) {
-              LabelAction labelAction = new LabelAction(label, selection);
-              labelAction.setChecked(selectedLabels.contains(label));
-              labelMenu.add(labelAction);
-            }
-
-            /* Remove All Labels */
-            labelMenu.add(new Separator());
-            LabelAction removeAllLabels = new LabelAction(null, selection);
-            removeAllLabels.setEnabled(!labels.isEmpty());
-            labelMenu.add(removeAllLabels);
-          }
         }
 
         manager.add(new Separator("filter"));
