@@ -821,26 +821,8 @@ public class Controller {
 
           /* First check wether this action is required */
           IPreference firstStartToken = fPrefsDAO.load(FIRST_START_TOKEN);
-          if (firstStartToken != null) {
-
-            /* TODO Remove this code in M10 - Migrates Label Order from < M9 */
-            Collection<ILabel> labels = CoreUtils.loadSortedLabels();
-
-            int i = 0;
-            List<ILabel> labelsToSave = new ArrayList<ILabel>(labels.size());
-            for (ILabel label : labels) {
-              if (label.getOrder() != i) {
-                label.setOrder(i);
-                labelsToSave.add(label);
-              }
-              i++;
-            }
-
-            if (!labelsToSave.isEmpty())
-              DynamicDAO.saveAll(labelsToSave);
-
+          if (firstStartToken != null)
             return;
-          }
 
           onFirstStartup();
 
