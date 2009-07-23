@@ -211,106 +211,6 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
             manager.add(new OpenInExternalBrowserAction(fCurrentSelection));
         }
 
-        /* Share */
-        {
-          manager.add(new Separator("share"));
-          MenuManager shareMenu = new MenuManager("Share News", OwlUI.SHARE, "sharenews");
-          manager.add(shareMenu);
-
-          List<ShareProvider> providers = Controller.getDefault().getShareProviders();
-          for (final ShareProvider provider : providers) {
-            if (provider.isEnabled()) {
-              shareMenu.add(new Action(provider.getName()) {
-                @Override
-                public void run() {
-                  if (SendLinkAction.ID.equals(provider.getId())) {
-                    IActionDelegate action = new SendLinkAction();
-                    action.selectionChanged(null, fCurrentSelection);
-                    action.run(null);
-                  } else {
-                    Object obj = fCurrentSelection.getFirstElement();
-                    if (obj != null && obj instanceof INews) {
-                      String shareLink = provider.toShareUrl((INews) obj);
-                      new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
-                    }
-                  }
-                };
-
-                @Override
-                public ImageDescriptor getImageDescriptor() {
-                  if (StringUtils.isSet(provider.getIconPath()))
-                    return OwlUI.getImageDescriptor(provider.getPluginId(), provider.getIconPath());
-
-                  return super.getImageDescriptor();
-                };
-
-                @Override
-                public String getActionDefinitionId() {
-                  return SendLinkAction.ID.equals(provider.getId()) ? SendLinkAction.ID : super.getActionDefinitionId();
-                }
-
-                @Override
-                public String getId() {
-                  return SendLinkAction.ID.equals(provider.getId()) ? SendLinkAction.ID : super.getId();
-                }
-              });
-            }
-          }
-
-          /* Configure Providers */
-          shareMenu.add(new Separator());
-          shareMenu.add(new Action("&Configure...") {
-            @Override
-            public void run() {
-              new ShareProvidersListDialog(fBrowser.getControl().getShell()).open();
-            };
-          });
-        }
-
-        /* Move To / Copy To */
-        if (!fCurrentSelection.isEmpty()) {
-          manager.add(new Separator("movecopy"));
-
-          /* Load all news bins and sort by name */
-          List<INewsBin> newsbins = new ArrayList<INewsBin>(DynamicDAO.loadAll(INewsBin.class));
-
-          Comparator<INewsBin> comparator = new Comparator<INewsBin>() {
-            public int compare(INewsBin o1, INewsBin o2) {
-              return o1.getName().compareTo(o2.getName());
-            };
-          };
-
-          Collections.sort(newsbins, comparator);
-
-          /* Move To */
-          MenuManager moveMenu = new MenuManager("Move To", "moveto");
-          manager.add(moveMenu);
-
-          for (INewsBin bin : newsbins) {
-            if (contained(bin, fCurrentSelection))
-              continue;
-
-            moveMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, bin, true));
-          }
-
-          moveMenu.add(new Separator("movetonewbin"));
-          moveMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, null, true));
-
-          /* Copy To */
-          MenuManager copyMenu = new MenuManager("Copy To", "copyto");
-          manager.add(copyMenu);
-
-          for (INewsBin bin : newsbins) {
-            if (contained(bin, fCurrentSelection))
-              continue;
-
-            copyMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, bin, false));
-          }
-
-          copyMenu.add(new Separator("copytonewbin"));
-          copyMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, null, false));
-        }
-
         /* Mark / Label */
         {
           manager.add(new Separator("mark"));
@@ -366,6 +266,106 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
             removeAllLabels.setEnabled(!labels.isEmpty());
             labelMenu.add(removeAllLabels);
           }
+        }
+
+        /* Move To / Copy To */
+        if (!fCurrentSelection.isEmpty()) {
+          manager.add(new Separator("movecopy"));
+
+          /* Load all news bins and sort by name */
+          List<INewsBin> newsbins = new ArrayList<INewsBin>(DynamicDAO.loadAll(INewsBin.class));
+
+          Comparator<INewsBin> comparator = new Comparator<INewsBin>() {
+            public int compare(INewsBin o1, INewsBin o2) {
+              return o1.getName().compareTo(o2.getName());
+            };
+          };
+
+          Collections.sort(newsbins, comparator);
+
+          /* Move To */
+          MenuManager moveMenu = new MenuManager("Move To", "moveto");
+          manager.add(moveMenu);
+
+          for (INewsBin bin : newsbins) {
+            if (contained(bin, fCurrentSelection))
+              continue;
+
+            moveMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, bin, true));
+          }
+
+          moveMenu.add(new Separator("movetonewbin"));
+          moveMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, null, true));
+
+          /* Copy To */
+          MenuManager copyMenu = new MenuManager("Copy To", "copyto");
+          manager.add(copyMenu);
+
+          for (INewsBin bin : newsbins) {
+            if (contained(bin, fCurrentSelection))
+              continue;
+
+            copyMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, bin, false));
+          }
+
+          copyMenu.add(new Separator("copytonewbin"));
+          copyMenu.add(new MoveCopyNewsToBinAction(fCurrentSelection, null, false));
+        }
+
+        /* Share */
+        {
+          manager.add(new Separator("share"));
+          MenuManager shareMenu = new MenuManager("Share News", OwlUI.SHARE, "sharenews");
+          manager.add(shareMenu);
+
+          List<ShareProvider> providers = Controller.getDefault().getShareProviders();
+          for (final ShareProvider provider : providers) {
+            if (provider.isEnabled()) {
+              shareMenu.add(new Action(provider.getName()) {
+                @Override
+                public void run() {
+                  if (SendLinkAction.ID.equals(provider.getId())) {
+                    IActionDelegate action = new SendLinkAction();
+                    action.selectionChanged(null, fCurrentSelection);
+                    action.run(null);
+                  } else {
+                    Object obj = fCurrentSelection.getFirstElement();
+                    if (obj != null && obj instanceof INews) {
+                      String shareLink = provider.toShareUrl((INews) obj);
+                      new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
+                    }
+                  }
+                };
+
+                @Override
+                public ImageDescriptor getImageDescriptor() {
+                  if (StringUtils.isSet(provider.getIconPath()))
+                    return OwlUI.getImageDescriptor(provider.getPluginId(), provider.getIconPath());
+
+                  return super.getImageDescriptor();
+                };
+
+                @Override
+                public String getActionDefinitionId() {
+                  return SendLinkAction.ID.equals(provider.getId()) ? SendLinkAction.ID : super.getActionDefinitionId();
+                }
+
+                @Override
+                public String getId() {
+                  return SendLinkAction.ID.equals(provider.getId()) ? SendLinkAction.ID : super.getId();
+                }
+              });
+            }
+          }
+
+          /* Configure Providers */
+          shareMenu.add(new Separator());
+          shareMenu.add(new Action("&Configure...") {
+            @Override
+            public void run() {
+              new ShareProvidersListDialog(fBrowser.getControl().getShell()).open();
+            };
+          });
         }
 
         manager.add(new Separator("filter"));
@@ -1125,7 +1125,13 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
       /* Fill Pattern if set */
       if (fNewsFilter != null && StringUtils.isSet(fNewsFilter.getPatternString())) {
-        StringTokenizer tokenizer = new StringTokenizer(fNewsFilter.getPatternString());
+        String pattern = fNewsFilter.getPatternString();
+
+        /* News Filter always converts to wildcard query */
+        if (!pattern.endsWith("*"))
+          pattern = pattern + "*";
+
+        StringTokenizer tokenizer = new StringTokenizer(pattern);
         while (tokenizer.hasMoreElements())
           extractedWords.add(tokenizer.nextToken());
       }
