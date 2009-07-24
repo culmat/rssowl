@@ -111,7 +111,7 @@ public class DownloadService {
 
   /** Default Constructor to create a Download Queue */
   public DownloadService() {
-    fDownloadQueue = new JobQueue("Downloading Files", MAX_CONCURRENT_DOWNLOAD_JOBS, Integer.MAX_VALUE, true, 0);
+    fDownloadQueue = new JobQueue("Downloading Attachments...", MAX_CONCURRENT_DOWNLOAD_JOBS, Integer.MAX_VALUE, true, 0);
     fDownloadQueue.setUnknownProgress(true);
   }
 
