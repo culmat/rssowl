@@ -139,4 +139,12 @@ public class InMemoryProtocolHandler implements IProtocolHandler {
   public URI getFeed(URI website) {
     return website;
   }
+
+  /*
+   * @see org.rssowl.core.connection.IProtocolHandler#openStream(java.net.URI,
+   * org.eclipse.core.runtime.IProgressMonitor, java.util.Map)
+   */
+  public InputStream openStream(URI link, IProgressMonitor monitor, Map<Object, Object> properties) {
+    throw new UnsupportedOperationException();
+  }
 }

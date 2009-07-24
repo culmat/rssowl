@@ -44,7 +44,6 @@ import org.rssowl.core.connection.ICredentials;
 import org.rssowl.core.connection.ICredentialsProvider;
 import org.rssowl.core.connection.IProxyCredentials;
 import org.rssowl.core.connection.NotModifiedException;
-import org.rssowl.core.internal.connection.DefaultProtocolHandler;
 import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
@@ -106,7 +105,7 @@ public class ConnectionTests {
     AuthenticationRequiredException e = null;
 
     try {
-      new DefaultProtocolHandler().openStream(feed1.getLink(), null);
+      Owl.getConnectionService().getHandler(feed1.getLink()).openStream(feed1.getLink(), null, null);
     } catch (AuthenticationRequiredException e1) {
       e = e1;
     }
@@ -130,7 +129,7 @@ public class ConnectionTests {
 
     credProvider.setAuthCredentials(credentials, feedUrl1, null);
 
-    InputStream inS = new DefaultProtocolHandler().openStream(feed1.getLink(), null);
+    InputStream inS = Owl.getConnectionService().getHandler(feed1.getLink()).openStream(feed1.getLink(), null, null);
     assertNotNull(inS);
 
     Owl.getInterpreter().interpret(inS, feed1, null);
@@ -140,7 +139,7 @@ public class ConnectionTests {
     credProvider.setAuthCredentials(credentials, URIUtils.normalizeUri(feedUrl2, true), "Other Directory");
 
     try {
-      new DefaultProtocolHandler().openStream(feed2.getLink(), null);
+      Owl.getConnectionService().getHandler(feed2.getLink()).openStream(feed2.getLink(), null, null);
     } catch (AuthenticationRequiredException e1) {
       e = e1;
     }
@@ -150,7 +149,7 @@ public class ConnectionTests {
     /* Test authentication by realm is working */
     credProvider.setAuthCredentials(credentials, URIUtils.normalizeUri(feedUrl2, true), "Restricted Directory");
 
-    inS = new DefaultProtocolHandler().openStream(feed2.getLink(), null);
+    inS = Owl.getConnectionService().getHandler(feed2.getLink()).openStream(feed2.getLink(), null, null);
     assertNotNull(inS);
 
     Owl.getInterpreter().interpret(inS, feed2, null);
@@ -168,7 +167,7 @@ public class ConnectionTests {
     URI feedUrl = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/rss_2_0.xml");
     IFeed feed = new Feed(feedUrl);
 
-    InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
+    InputStream inS = Owl.getConnectionService().getHandler(feed.getLink()).openStream(feed.getLink(), null, null);
     assertNotNull(inS);
 
     Owl.getInterpreter().interpret(inS, feed, null);
@@ -186,7 +185,7 @@ public class ConnectionTests {
     URI feedUrl = new URI("https://sourceforge.net/export/rss2_projnews.php?group_id=141424&rss_fulltext=1");
     IFeed feed = new Feed(feedUrl);
 
-    InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
+    InputStream inS = Owl.getConnectionService().getHandler(feed.getLink()).openStream(feed.getLink(), null, null);
     assertNotNull(inS);
 
     Owl.getInterpreter().interpret(inS, feed, null);
@@ -223,7 +222,7 @@ public class ConnectionTests {
     IFeed feed = new Feed(feedUrl);
     NotModifiedException e = null;
 
-    InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
+    InputStream inS = Owl.getConnectionService().getHandler(feed.getLink()).openStream(feed.getLink(), null, null);
     assertNotNull(inS);
 
     String ifModifiedSince = null;
@@ -244,7 +243,7 @@ public class ConnectionTests {
       conProperties.put(IConnectionPropertyConstants.IF_NONE_MATCH, ifNoneMatch);
 
     try {
-      new DefaultProtocolHandler().openStream(feed.getLink(), conProperties);
+      Owl.getConnectionService().getHandler(feed.getLink()).openStream(feed.getLink(), null, conProperties);
     } catch (NotModifiedException e1) {
       e = e1;
     }
@@ -267,7 +266,7 @@ public class ConnectionTests {
 
     try {
       conManager.getCredentialsProvider(feedUrl).deleteProxyCredentials(feedUrl); //Disable Proxy
-      new DefaultProtocolHandler().openStream(feed.getLink(), null);
+      Owl.getConnectionService().getHandler(feed.getLink()).openStream(feed.getLink(), null, null);
     } catch (AuthenticationRequiredException e1) {
       e = e1;
     }
@@ -343,7 +342,7 @@ public class ConnectionTests {
       IFeed feed = new Feed(feedUrl);
 
       try {
-        InputStream inS = new DefaultProtocolHandler().openStream(feed.getLink(), null);
+        InputStream inS = Owl.getConnectionService().getHandler(feed.getLink()).openStream(feed.getLink(), null, null);
         assertNotNull(id, inS);
 
         assertNull(id, feed.getFormat());

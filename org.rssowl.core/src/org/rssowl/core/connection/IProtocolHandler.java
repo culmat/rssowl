@@ -31,6 +31,7 @@ import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.util.Pair;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
 
@@ -43,8 +44,8 @@ import java.util.Map;
 public interface IProtocolHandler {
 
   /**
-   * Reloads a <code>IFeed</code> with its News from the given
-   * <code>URL</code> and returns it.
+   * Reloads a <code>IFeed</code> with its News from the given <code>URL</code>
+   * and returns it.
    *
    * @param link The Link to the Feed as <code>URI</code>.
    * @param monitor The Progress-Monitor used from the callee.
@@ -56,6 +57,21 @@ public interface IProtocolHandler {
    * @see {@link IConnectionPropertyConstants}
    */
   Pair<IFeed, IConditionalGet> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException;
+
+  /**
+   * Opens a connection to the given {@link URI} and returns a
+   * {@link InputStream} to read from.
+   *
+   * @param link the link to open a connection to.
+   * @param monitor The Progress-Monitor used from the callee.
+   * @param properties A Map of properties that can be used to transport custom
+   * information
+   * @return an {@link InputStream} for the given {@link URI}.
+   * @throws ConnectionException Checked Exception to be used in case of any
+   * Exception.
+   * @see {@link IConnectionPropertyConstants}
+   */
+  InputStream openStream(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws ConnectionException;
 
   /**
    * Get the Feed Icon for the given Link. For instance, this could be the

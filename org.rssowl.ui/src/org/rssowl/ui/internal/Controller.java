@@ -197,6 +197,9 @@ public class Controller {
   /* Saved Search Service */
   private SavedSearchService fSavedSearchService;
 
+  /* Download Service */
+  private DownloadService fDownloadService;
+
   /* Feed-Reload Service */
   private FeedReloadService fFeedReloadService;
 
@@ -467,6 +470,13 @@ public class Controller {
    */
   public SavedSearchService getSavedSearchService() {
     return fSavedSearchService;
+  }
+
+  /**
+   * @return Returns the download service.
+   */
+  public DownloadService getDownloadService() {
+    return fDownloadService;
   }
 
   /**
@@ -846,6 +856,9 @@ public class Controller {
     /* Create the Saved Search Service */
     fSavedSearchService = new SavedSearchService();
 
+    /* Create the Download Service */
+    fDownloadService = new DownloadService();
+
     /* Register Listeners */
     registerListeners();
 
@@ -931,6 +944,10 @@ public class Controller {
 
     /* Unregister Listeners */
     unregisterListeners();
+
+    /* Stop the Download Service */
+    if (!emergency)
+      fDownloadService.stopService();
 
     /* Stop Clean-Up Reminder Service */
     if (!InternalOwl.TESTING && !emergency)
