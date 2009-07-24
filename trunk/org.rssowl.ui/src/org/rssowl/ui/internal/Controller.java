@@ -36,7 +36,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
@@ -50,28 +49,19 @@ import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.NotModifiedException;
 import org.rssowl.core.connection.UnknownFeedException;
 import org.rssowl.core.internal.InternalOwl;
-import org.rssowl.core.internal.newsaction.CopyNewsAction;
-import org.rssowl.core.internal.newsaction.LabelNewsAction;
-import org.rssowl.core.internal.newsaction.MoveNewsAction;
-import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.interpreter.ParserException;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
-import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
-import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
-import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPreference;
-import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
-import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -99,7 +89,6 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.actions.ExportFeedsAction;
-import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyPageWrapper;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
@@ -110,13 +99,9 @@ import org.rssowl.ui.internal.services.ContextService;
 import org.rssowl.ui.internal.services.DownloadService;
 import org.rssowl.ui.internal.services.FeedReloadService;
 import org.rssowl.ui.internal.services.SavedSearchService;
-import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.JobRunner;
-import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -1170,218 +1155,6 @@ public class Controller {
     }
 
     fFolderDAO.save(imported);
-  }
-
-  /**
-   * @param fileName
-   * @throws FileNotFoundException In case of an error.
-   * @throws ParserException In case of an error.
-   * @throws InterpreterException In case of an error.
-   */
-  public void importFeeds(String fileName) throws FileNotFoundException, InterpreterException, ParserException {
-    List<IEntity> entitiesToReload = new ArrayList<IEntity>();
-
-    /* Import from File */
-    File file = new File(fileName);
-    InputStream inS = new FileInputStream(file);
-    List<? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
-    IFolder defaultContainer = (IFolder) types.get(0);
-
-    /* Map Old Id to IFolderChild */
-    Map<Long, IFolderChild> mapOldIdToFolderChild = ImportUtils.createOldIdToEntityMap(types);
-
-    /* Load SearchMarks containing location condition */
-    List<ISearchMark> locationConditionSavedSearches = ImportUtils.getLocationConditionSavedSearches(types);
-
-    /* Load the current selected Set */
-    IFolder selectedRootFolder;
-    if (!InternalOwl.TESTING) {
-      String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
-      Long selectedFolderID = fPrefsDAO.load(selectedBookMarkSetPref).getLong();
-      selectedRootFolder = fFolderDAO.load(selectedFolderID);
-    } else {
-      Collection<IFolder> rootFolders = CoreUtils.loadRootFolders();
-      selectedRootFolder = rootFolders.iterator().next();
-    }
-
-    /* Load all Root Folders */
-    Set<IFolder> rootFolders = CoreUtils.loadRootFolders();
-
-    /* 1.) Handle Folders and Marks from default Container */
-    {
-
-      /* Also update Map of Old ID */
-      if (defaultContainer.getProperty(ITypeImporter.ID_KEY) != null)
-        mapOldIdToFolderChild.put((Long) defaultContainer.getProperty(ITypeImporter.ID_KEY), selectedRootFolder);
-
-      /* Reparent and Save */
-      reparentAndSaveChildren(defaultContainer, selectedRootFolder);
-      entitiesToReload.addAll(defaultContainer.getChildren());
-    }
-
-    /* 2.) Handle other Sets */
-    for (int i = 1; i < types.size(); i++) {
-      if (!(types.get(i) instanceof IFolder))
-        continue;
-
-      IFolder setFolder = (IFolder) types.get(i);
-      IFolder existingSetFolder = null;
-
-      /* Check if set already exists */
-      for (IFolder rootFolder : rootFolders) {
-        if (rootFolder.getName().equals(setFolder.getName())) {
-          existingSetFolder = rootFolder;
-          break;
-        }
-      }
-
-      /* Reparent into Existing Set */
-      if (existingSetFolder != null) {
-
-        /* Also update Map of Old ID */
-        if (setFolder.getProperty(ITypeImporter.ID_KEY) != null)
-          mapOldIdToFolderChild.put((Long) setFolder.getProperty(ITypeImporter.ID_KEY), existingSetFolder);
-
-        /* Reparent and Save */
-        reparentAndSaveChildren(setFolder, existingSetFolder);
-        entitiesToReload.addAll(existingSetFolder.getChildren());
-      }
-
-      /* Otherwise save as new Set */
-      else {
-
-        /* Unset ID Property first */
-        ImportUtils.unsetIdProperty(setFolder);
-
-        /* Save */
-        fFolderDAO.save(setFolder);
-        entitiesToReload.add(setFolder);
-      }
-    }
-
-    /* Fix locations in Search Marks if required and save */
-    if (!locationConditionSavedSearches.isEmpty()) {
-      ImportUtils.updateLocationConditions(mapOldIdToFolderChild, locationConditionSavedSearches);
-      DynamicDAO.getDAO(ISearchMarkDAO.class).saveAll(locationConditionSavedSearches);
-    }
-
-    /* Look for Labels (from backup OPML) */
-    Map<String, ILabel> mapExistingLabelToName = new HashMap<String, ILabel>();
-    Map<Long, ILabel> mapOldIdToImportedLabel = new HashMap<Long, ILabel>();
-    List<ILabel> importedLabels = ImportUtils.getLabels(types);
-    if (!importedLabels.isEmpty()) {
-      Collection<ILabel> existingLabels = DynamicDAO.loadAll(ILabel.class);
-      for (ILabel existingLabel : existingLabels) {
-        mapExistingLabelToName.put(existingLabel.getName(), existingLabel);
-      }
-
-      for (ILabel importedLabel : importedLabels) {
-        Object oldIdValue = importedLabel.getProperty(ITypeImporter.ID_KEY);
-        if (oldIdValue != null && oldIdValue instanceof Long)
-          mapOldIdToImportedLabel.put((Long) oldIdValue, importedLabel);
-      }
-
-      for (ILabel importedLabel : importedLabels) {
-        ILabel existingLabel = mapExistingLabelToName.get(importedLabel.getName());
-
-        /* Update Existing */
-        if (existingLabel != null) {
-          existingLabel.setColor(importedLabel.getColor());
-          existingLabel.setOrder(importedLabel.getOrder());
-          DynamicDAO.save(existingLabel);
-        }
-
-        /* Save as New */
-        else {
-          importedLabel.removeProperty(ITypeImporter.ID_KEY);
-          DynamicDAO.save(importedLabel);
-        }
-      }
-    }
-
-    /* Look for Filters (from backup OPML) */
-    List<ISearchFilter> filters = ImportUtils.getFilters(types);
-    if (!filters.isEmpty()) {
-
-      /* Fix locations in Searches if required */
-      List<ISearch> locationConditionSearches = ImportUtils.getLocationConditionSearchesFromFilters(filters);
-      if (!locationConditionSearches.isEmpty())
-        ImportUtils.updateLocationConditions(mapOldIdToFolderChild, locationConditionSearches);
-
-      /* Fix locations in Actions if required */
-      for (ISearchFilter filter : filters) {
-        List<IFilterAction> actions = filter.getActions();
-        for (IFilterAction action : actions) {
-          if (MoveNewsAction.ID.equals(action.getActionId()) || CopyNewsAction.ID.equals(action.getActionId())) {
-            Object data = action.getData();
-            if (data != null && data instanceof Long[]) {
-              Long[] oldBinLocations = (Long[]) data;
-              Long[] newBinLocations = new Long[oldBinLocations.length];
-
-              for (int i = 0; i < oldBinLocations.length; i++) {
-                Long oldLocation = oldBinLocations[i];
-                IFolderChild location = mapOldIdToFolderChild.get(oldLocation);
-                newBinLocations[i] = location.getId();
-              }
-
-              action.setData(newBinLocations);
-            }
-          }
-        }
-      }
-
-      /* Fix labels in Actions if required */
-      for (ISearchFilter filter : filters) {
-        List<IFilterAction> actions = filter.getActions();
-        for (IFilterAction action : actions) {
-          if (LabelNewsAction.ID.equals(action.getActionId())) {
-            Object data = action.getData();
-            if (data != null && data instanceof Long) {
-              ILabel label = mapOldIdToImportedLabel.get(data);
-              if (label != null) {
-                String name = label.getName();
-                ILabel existingLabel = mapExistingLabelToName.get(name);
-                if (existingLabel != null)
-                  action.setData(existingLabel.getId());
-                else
-                  action.setData(label.getId());
-              }
-            }
-          }
-        }
-      }
-
-      /* Save */
-      DynamicDAO.saveAll(filters);
-    }
-
-    /* Reload imported Feeds */
-    if (!InternalOwl.TESTING)
-      new ReloadTypesAction(new StructuredSelection(entitiesToReload), OwlUI.getPrimaryShell()).run();
-  }
-
-  private void reparentAndSaveChildren(IFolder from, IFolder to) {
-    boolean changed = false;
-
-    /* Reparent all imported folders into selected Set */
-    List<IFolder> folders = from.getFolders();
-    for (IFolder folder : folders) {
-      folder.setParent(to);
-      to.addFolder(folder, null, null);
-      changed = true;
-    }
-
-    /* Reparent all imported marks into selected Set */
-    List<IMark> marks = from.getMarks();
-    for (IMark mark : marks) {
-      mark.setParent(to);
-      to.addMark(mark, null, null);
-      changed = true;
-    }
-
-    /* Save Set */
-    if (changed)
-      fFolderDAO.save(to);
   }
 
   private IStatus createWarningStatus(IStatus status, IBookMark bookmark, URI feedLink) {

@@ -60,8 +60,8 @@ import org.rssowl.core.persist.dao.INewsBinDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
-import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.actions.ExportFeedsAction;
+import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.io.File;
@@ -88,7 +88,6 @@ import java.util.Set;
 public class ImportExportOPMLTest {
   private File fTmpFile;
   private File fTmpBackupFile;
-  private Controller fController;
   private IModelFactory fFactory;
   private IFolder fDefaultSet;
   private IFolder fCustomSet;
@@ -107,7 +106,6 @@ public class ImportExportOPMLTest {
     Owl.getPersistenceService().recreateSchema();
 
     fFactory = Owl.getModelFactory();
-    fController = Controller.getDefault();
     fTmpFile = File.createTempFile("rssowl", "opml");
     fTmpFile.deleteOnExit();
 
@@ -516,7 +514,7 @@ public class ImportExportOPMLTest {
   private void exportImportCompleteOPML(boolean useBackup) throws Exception {
 
     /* Import */
-    fController.importFeeds(useBackup ? fTmpBackupFile.getAbsolutePath() : fTmpFile.getAbsolutePath());
+    ImportUtils.importFeeds(useBackup ? fTmpBackupFile.getAbsolutePath() : fTmpFile.getAbsolutePath());
 
     /* Validate */
     Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
