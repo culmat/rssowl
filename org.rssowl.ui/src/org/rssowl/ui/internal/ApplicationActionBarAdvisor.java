@@ -82,6 +82,7 @@ import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.UndoAction;
 import org.rssowl.ui.internal.dialogs.ShareProvidersListDialog;
+import org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;

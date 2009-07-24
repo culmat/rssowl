@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal;
+package org.rssowl.ui.internal.dialogs.preferences;
 
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.preferences.IWorkbenchPreferenceContainer;
-import org.rssowl.ui.internal.notifier.NotifierPreferencesPage;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;

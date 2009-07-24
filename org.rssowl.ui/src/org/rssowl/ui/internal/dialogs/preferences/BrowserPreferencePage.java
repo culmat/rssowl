@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal;
+package org.rssowl.ui.internal.dialogs.preferences;
 
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
@@ -42,6 +42,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.dialogs.WebsiteListDialog;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
