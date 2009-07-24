@@ -38,11 +38,11 @@ import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
-import org.rssowl.ui.internal.NewsColumnSelectionControl;
 import org.rssowl.ui.internal.editors.feed.NewsColumn;
 import org.rssowl.ui.internal.editors.feed.NewsColumnViewModel;
 import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.LayoutUtils;
+import org.rssowl.ui.internal.util.NewsColumnSelectionControl;
 
 import java.util.ArrayList;
 import java.util.Arrays;

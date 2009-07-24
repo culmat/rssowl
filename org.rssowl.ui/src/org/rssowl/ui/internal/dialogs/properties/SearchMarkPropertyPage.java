@@ -54,10 +54,10 @@ import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.ui.dialogs.properties.IEntityPropertyPage;
 import org.rssowl.ui.dialogs.properties.IPropertyDialogSite;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.search.LocationControl;
 import org.rssowl.ui.internal.search.SearchConditionList;
+import org.rssowl.ui.internal.util.FolderChooser;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;

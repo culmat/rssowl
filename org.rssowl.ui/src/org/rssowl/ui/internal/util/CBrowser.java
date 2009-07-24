@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal;
+package org.rssowl.ui.internal.util;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -48,10 +48,14 @@ import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.Application;
+import org.rssowl.ui.internal.ApplicationServer;
+import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
+import org.rssowl.ui.internal.ILinkHandler;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
-import org.rssowl.ui.internal.util.BrowserUtils;
-import org.rssowl.ui.internal.util.JobRunner;
 
 import java.lang.reflect.Method;
 import java.net.URI;

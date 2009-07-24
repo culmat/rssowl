@@ -75,7 +75,6 @@ import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationServer;
-import org.rssowl.ui.internal.CBrowser;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
@@ -85,6 +84,7 @@ import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.dialogs.ShareProvidersListDialog;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.BrowserUtils;
+import org.rssowl.ui.internal.util.CBrowser;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.io.FileOutputStream;

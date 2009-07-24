@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal;
+package org.rssowl.ui.internal.util;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.MenuManager;
@@ -62,9 +62,9 @@ import org.rssowl.core.persist.event.FolderAdapter;
 import org.rssowl.core.persist.event.FolderEvent;
 import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.NewFolderAction;
-import org.rssowl.ui.internal.util.JobRunner;
-import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkLabelProvider;
 
 import java.util.Collection;

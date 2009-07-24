@@ -66,8 +66,8 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.ApplicationWorkbenchAdvisor;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
-import org.rssowl.ui.internal.CCLabel;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.CCLabel;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.ArrayList;

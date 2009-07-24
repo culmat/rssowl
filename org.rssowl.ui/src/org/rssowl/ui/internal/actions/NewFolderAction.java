@@ -54,8 +54,8 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.service.PersistenceException;
-import org.rssowl.ui.internal.FolderChooser;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.FolderChooser;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
