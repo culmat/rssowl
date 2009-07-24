@@ -395,7 +395,7 @@
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
-            class="org.rssowl.ui.internal.OverviewPreferencesPage"
+            class="org.rssowl.ui.internal.dialogs.preferences.OverviewPreferencesPage"
             id="org.eclipse.ui.preferencePages.Workbench"
             name="Overview">
          <keywordReference id="org.rssowl.ui.preferences.keywords.Overview"/>
@@ -415,7 +415,7 @@
          <keywordReference id="org.rssowl.ui.preferences.keywords.ColorsAndFonts"/>
       </page>
       <page
-            class="org.rssowl.ui.internal.FeedsPreferencePage"
+            class="org.rssowl.ui.internal.dialogs.preferences.FeedsPreferencePage"
             id="org.rssowl.ui.FeedsPreferences"
             name="Feeds">
          <keywordReference
@@ -423,7 +423,7 @@
          </keywordReference>
       </page>
       <page
-            class="org.rssowl.ui.internal.MiscPreferencePage"
+            class="org.rssowl.ui.internal.dialogs.preferences.MiscPreferencePage"
             id="org.rssowl.ui.MiscPreferences"
             name="View">
          <keywordReference
@@ -431,7 +431,7 @@
          </keywordReference>
       </page>
       <page
-            class="org.rssowl.ui.internal.ManageLabelsPreferencePage"
+            class="org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage"
             id="org.rssowl.ui.ManageLabels"
             name="Organize Labels">
          <keywordReference
@@ -439,7 +439,7 @@
          </keywordReference>
       </page>
       <page
-            class="org.rssowl.ui.internal.notifier.NotifierPreferencesPage"
+            class="org.rssowl.ui.internal.dialogs.preferences.NotifierPreferencesPage"
             id="org.rssowl.ui.NotifierPreferences"
             name="Notifier">
          <keywordReference
@@ -447,7 +447,7 @@
          </keywordReference>
       </page>
       <page
-            class="org.rssowl.ui.internal.CredentialsPreferencesPage"
+            class="org.rssowl.ui.internal.dialogs.preferences.CredentialsPreferencesPage"
             id="org.rssowl.ui.CredentialsPreferences"
             name="Passwords">
          <keywordReference
@@ -455,7 +455,7 @@
          </keywordReference>
       </page>
       <page
-            class="org.rssowl.ui.internal.BrowserPreferencePage"
+            class="org.rssowl.ui.internal.dialogs.preferences.BrowserPreferencePage"
             id="org.rssowl.ui.BrowserPreferencesPage"
             name="Browser">
          <keywordReference

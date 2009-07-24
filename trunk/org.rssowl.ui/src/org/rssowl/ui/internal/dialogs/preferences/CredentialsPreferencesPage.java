@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal;
+package org.rssowl.ui.internal.dialogs.preferences;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.preference.PreferencePage;
@@ -60,6 +60,13 @@ import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.Application;
+import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
+import org.rssowl.ui.internal.CColumnLayoutData;
+import org.rssowl.ui.internal.CTable;
+import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.CColumnLayoutData.Size;
 import org.rssowl.ui.internal.dialogs.ConfirmDialog;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
