@@ -132,8 +132,9 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     IFeed feed = typesFactory.createFeed(null, link);
 
     /* Add Monitor to support early cancelation */
-    if (properties != null)
-      properties.put(IConnectionPropertyConstants.PROGRESS_MONITOR, monitor);
+    if (properties == null)
+      properties = new HashMap<Object, Object>();
+    properties.put(IConnectionPropertyConstants.PROGRESS_MONITOR, monitor);
 
     /* Retrieve the InputStream out of the Feed's Link */
     InputStream inS = openStream(link, properties);
@@ -252,6 +253,22 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     return null;
   }
 
+  /*
+   * @see org.rssowl.core.connection.IProtocolHandler#openStream(java.net.URI,
+   * org.eclipse.core.runtime.IProgressMonitor, java.util.Map)
+   */
+  public InputStream openStream(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws ConnectionException {
+
+    /* Add Monitor to support early cancelation */
+    if (monitor != null) {
+      if (properties == null)
+        properties = new HashMap<Object, Object>();
+      properties.put(IConnectionPropertyConstants.PROGRESS_MONITOR, monitor);
+    }
+
+    return openStream(link, properties);
+  }
+
   /**
    * Load the Contents of the given URL by connecting to it. The additional
    * properties may be used in conjunction with the
@@ -268,7 +285,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
    * @see AuthenticationRequiredException
    * @see NotModifiedException
    */
-  public InputStream openStream(URI link, Map<Object, Object> properties) throws ConnectionException {
+  private InputStream openStream(URI link, Map<Object, Object> properties) throws ConnectionException {
 
     /* Retrieve the InputStream out of the Link */
     try {

@@ -70,8 +70,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The <code>NewsGroupHandler</code> is capable of creating a
- * <code>IFeed</code> with News from a Newsgroup-Server.
+ * The <code>NewsGroupHandler</code> is capable of creating a <code>IFeed</code>
+ * with News from a Newsgroup-Server.
  * <p>
  * TODO The performance of reading an article could be improved by a custom
  * <code>Reader</code> that would perform the String-Replacement while reading
@@ -572,5 +572,13 @@ public class NewsGroupHandler implements IProtocolHandler {
    */
   public URI getFeed(URI website) {
     return website;
+  }
+
+  /*
+   * @see org.rssowl.core.connection.IProtocolHandler#openStream(java.net.URI,
+   * org.eclipse.core.runtime.IProgressMonitor, java.util.Map)
+   */
+  public InputStream openStream(URI link, IProgressMonitor monitor, Map<Object, Object> properties) {
+    throw new UnsupportedOperationException();
   }
 }

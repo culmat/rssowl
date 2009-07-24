@@ -1517,6 +1517,14 @@
             forcable="false"
             sortKey="50">
       </newsAction>
+      <newsAction
+            class="org.rssowl.ui.internal.filter.DownloadAttachmentsNewsAction"
+            description="Downloads Attachments (e.g. Podcasts) from matching news if present"
+            forcable="true"
+            id="org.rssowl.ui.DownloadAttachmentsNewsAction"
+            name="Download Attachments"
+            sortKey="49">
+      </newsAction>
    </extension>
    <extension
          point="org.rssowl.ui.NewsActionPresentation">
@@ -1539,6 +1547,10 @@
       <newsActionPresentation
             actionId="org.rssowl.ui.ShowNotifierNewsAction"
             class="org.rssowl.ui.internal.filter.ShowNotifierNewsActionPresentation">
+      </newsActionPresentation>
+      <newsActionPresentation
+            actionId="org.rssowl.ui.DownloadAttachmentsNewsAction"
+            class="org.rssowl.ui.internal.filter.DownloadAttachmentsNewsActionPresentation">
       </newsActionPresentation>
    </extension>
    <extension

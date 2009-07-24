@@ -293,11 +293,17 @@ public class FeedView extends EditorPart implements IReusableEditor {
             InputStream in = null;
             FileOutputStream out = null;
             try {
-              byte[] buffer = new byte[1000];
+              byte[] buffer = new byte[8192];
 
-              in = ((DefaultProtocolHandler) handler).openStream(feedLink, null);
+              in = handler.openStream(feedLink, monitor, null);
               out = new FileOutputStream(fileName);
               while (true) {
+
+                /* Check for Cancellation and Shutdown */
+                if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
+                  return Status.CANCEL_STATUS;
+
+                /* Read from Stream */
                 int read = in.read(buffer);
                 if (read == -1)
                   break;
