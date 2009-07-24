@@ -75,7 +75,7 @@ import org.rssowl.core.tests.TestUtils;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.SavedSearchService;
+import org.rssowl.ui.internal.services.SavedSearchService;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
