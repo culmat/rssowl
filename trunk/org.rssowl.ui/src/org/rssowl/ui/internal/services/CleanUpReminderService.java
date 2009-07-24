@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal;
+package org.rssowl.ui.internal.services;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -35,6 +35,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.DateUtils;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.CleanUpAction;
 import org.rssowl.ui.internal.dialogs.CleanUpReminderDialog;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -48,7 +49,10 @@ public class CleanUpReminderService {
   private final Job fReminderJob;
   private final IPreferenceScope fPreferences = Owl.getPreferenceService().getGlobalScope();
 
-  CleanUpReminderService() {
+  /**
+   * Instantiates a new Clean-Up Reminder Service.
+   */
+  public CleanUpReminderService() {
     fReminderJob = createJob();
     fReminderJob.setSystem(true);
     fReminderJob.setUser(false);
@@ -118,7 +122,10 @@ public class CleanUpReminderService {
     fPreferences.putLong(DefaultPreferences.CLEAN_UP_REMINDER_DATE_MILLIES, System.currentTimeMillis() + (days * DateUtils.DAY));
   }
 
-  void stopService() {
+  /**
+   * Stops this Service.
+   */
+  public void stopService() {
     fReminderJob.cancel();
   }
 }
