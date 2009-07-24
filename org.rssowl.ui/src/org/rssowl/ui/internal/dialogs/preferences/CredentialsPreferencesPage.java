@@ -66,7 +66,6 @@ import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.CColumnLayoutData;
 import org.rssowl.ui.internal.CTable;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.CColumnLayoutData.Size;
 import org.rssowl.ui.internal.dialogs.ConfirmDialog;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
