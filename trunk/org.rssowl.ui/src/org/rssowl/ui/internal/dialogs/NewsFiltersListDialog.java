@@ -81,13 +81,13 @@ import org.rssowl.core.persist.service.IModelSearch;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.Activator;
-import org.rssowl.ui.internal.CColumnLayoutData;
-import org.rssowl.ui.internal.CTable;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.CColumnLayoutData.Size;
 import org.rssowl.ui.internal.filter.NewsActionDescriptor;
 import org.rssowl.ui.internal.filter.NewsActionPresentationManager;
+import org.rssowl.ui.internal.util.CColumnLayoutData;
+import org.rssowl.ui.internal.util.CTable;
 import org.rssowl.ui.internal.util.LayoutUtils;
+import org.rssowl.ui.internal.util.CColumnLayoutData.Size;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;

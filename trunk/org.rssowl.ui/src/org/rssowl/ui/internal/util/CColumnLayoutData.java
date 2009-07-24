@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal;
+package org.rssowl.ui.internal.util;
 
 /**
  * Layout-Information to be used with a <code>CTree</code> or

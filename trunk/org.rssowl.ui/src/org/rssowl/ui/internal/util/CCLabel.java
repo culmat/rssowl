@@ -23,7 +23,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal;
+package org.rssowl.ui.internal.util;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTException;

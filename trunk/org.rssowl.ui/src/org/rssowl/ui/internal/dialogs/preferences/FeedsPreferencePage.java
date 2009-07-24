@@ -57,7 +57,6 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Controller;
-import org.rssowl.ui.internal.NewsColumnSelectionControl;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.editors.feed.NewsColumnViewModel;
 import org.rssowl.ui.internal.editors.feed.NewsFilter;
@@ -65,6 +64,7 @@ import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import org.rssowl.ui.internal.services.FeedReloadService;
 import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.util.LayoutUtils;
+import org.rssowl.ui.internal.util.NewsColumnSelectionControl;
 
 import java.util.Collection;
 import java.util.List;

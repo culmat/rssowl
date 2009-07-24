@@ -55,13 +55,13 @@ import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
-import org.rssowl.ui.internal.CColumnLayoutData;
-import org.rssowl.ui.internal.CTable;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.ShareProvider;
-import org.rssowl.ui.internal.CColumnLayoutData.Size;
+import org.rssowl.ui.internal.util.CColumnLayoutData;
+import org.rssowl.ui.internal.util.CTable;
 import org.rssowl.ui.internal.util.LayoutUtils;
+import org.rssowl.ui.internal.util.CColumnLayoutData.Size;
 
 import java.util.ArrayList;
 import java.util.List;

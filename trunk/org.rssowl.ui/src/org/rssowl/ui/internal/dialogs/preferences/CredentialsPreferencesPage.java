@@ -63,10 +63,10 @@ import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
-import org.rssowl.ui.internal.CColumnLayoutData;
-import org.rssowl.ui.internal.CTable;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.dialogs.ConfirmDialog;
+import org.rssowl.ui.internal.util.CColumnLayoutData;
+import org.rssowl.ui.internal.util.CTable;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.net.URI;

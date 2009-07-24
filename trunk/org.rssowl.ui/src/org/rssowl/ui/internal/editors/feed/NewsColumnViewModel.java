@@ -32,8 +32,8 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.Application;
-import org.rssowl.ui.internal.CColumnLayoutData;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.CColumnLayoutData;
 
 import java.util.ArrayList;
 import java.util.Arrays;

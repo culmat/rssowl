@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal;
+package org.rssowl.ui.internal.util;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -30,46 +30,64 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.ScrollBar;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.rssowl.ui.internal.Application;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A wrapper around <code>Tree</code> that allows to apply
- * <code>CTreeLayoutData</code> to Columns of the underlying Tree. The Wrapper
- * is making sure to avoid horizontal scrollbars if possible.
+ * A wrapper around <code>Table</code> that allows to apply
+ * <code>CTreeLayoutData</code> to Columns of the underlying Table. The
+ * Wrapper is making sure to avoid horizontal scrollbars if possible.
  *
  * @author bpasero
  */
-public class CTree {
+public class CTable {
 
-  /* ID to store Layout-Data with TreeColumns */
+  /* ID to store Layout-Data with TableColumns */
   private static final String LAYOUT_DATA = "org.rssowl.ui.internal.CTreeLayoutData";
 
-  private Tree fTree;
-  private List<TreeColumn> fCols = new ArrayList<TreeColumn>();
-  private boolean fIsFlat = true;
+  private Table fTable;
+  private List<TableColumn> fCols = new ArrayList<TableColumn>();
 
   /**
    * @param parent
    * @param style
    */
-  public CTree(Composite parent, int style) {
-    fTree = new Tree(parent, style);
+  public CTable(Composite parent, int style) {
+    fTable = new Table(parent, style);
     parent.addListener(SWT.Resize, new Listener() {
       public void handleEvent(Event event) {
-        onTreeResize();
+        onTableResize();
       }
     });
   }
 
   /**
-   * @return Tree
+   * @return Table
    */
-  public Tree getControl() {
-    return fTree;
+  public Table getControl() {
+    return fTable;
+  }
+
+  /**
+   * Force layout of all columns.
+   */
+  public void update() {
+    onTableResize();
+  }
+
+  /**
+   * Dispose and clear all columns.
+   */
+  public void clear() {
+    for (TableColumn cols : fCols) {
+      cols.dispose();
+    }
+
+    fCols.clear();
   }
 
   /**
@@ -80,9 +98,9 @@ public class CTree {
    * @param image
    * @param moveable
    * @param resizable
-   * @return TreeColumn
+   * @return TableColumn
    */
-  public TreeColumn manageColumn(TreeColumn col, CColumnLayoutData layoutData, String text, String tooltip, Image image, boolean moveable, boolean resizable) {
+  public TableColumn manageColumn(TableColumn col, CColumnLayoutData layoutData, String text, String tooltip, Image image, boolean moveable, boolean resizable) {
     col.setData(LAYOUT_DATA, layoutData);
     col.setMoveable(moveable);
     col.setResizable(resizable);
@@ -101,42 +119,11 @@ public class CTree {
     return col;
   }
 
-  /**
-   * @param col
-   * @param visible
-   * @param update
-   */
-  public void setVisible(TreeColumn col, boolean visible, boolean update) {
-    CColumnLayoutData data = (CColumnLayoutData) col.getData(LAYOUT_DATA);
-    data.setHidden(!visible);
+  private void onTableResize() {
+    int totalWidth = fTable.getParent().getClientArea().width;
+    totalWidth -= fTable.getBorderWidth() * 2;
 
-    if (update)
-      onTreeResize();
-  }
-
-  /**
-   * Force layout of all columns.
-   */
-  public void update() {
-    onTreeResize();
-  }
-
-  /**
-   * Dispose and clear all columns.
-   */
-  public void clear() {
-    for (TreeColumn cols : fCols) {
-      cols.dispose();
-    }
-
-    fCols.clear();
-  }
-
-  private void onTreeResize() {
-    int totalWidth = fTree.getParent().getClientArea().width;
-    totalWidth -= fTree.getBorderWidth() * 2;
-
-    ScrollBar verticalBar = fTree.getVerticalBar();
+    ScrollBar verticalBar = fTable.getVerticalBar();
     if (verticalBar != null)
       totalWidth -= verticalBar.getSize().x;
 
@@ -151,19 +138,13 @@ public class CTree {
     int freeWidth = totalWidth;
     int occupiedWidth = 0;
 
-    /* Foreach TreeColumn */
+    /* Foreach TableColumn */
     int totalFillSum = 0;
-    for (int i = 0; i < fCols.size(); i++) {
-      TreeColumn column = fCols.get(i);
+    for (TableColumn column : fCols) {
       CColumnLayoutData data = (CColumnLayoutData) column.getData(LAYOUT_DATA);
 
-      /* Hide Column */
-      if (data.isHidden()) {
-        column.setWidth(0);
-      }
-
       /* Fixed with Default Width Hint */
-      else if (data.getSize() == CColumnLayoutData.Size.FIXED && data.getWidthHint() == CColumnLayoutData.DEFAULT) {
+      if (data.getSize() == CColumnLayoutData.Size.FIXED && data.getWidthHint() == CColumnLayoutData.DEFAULT) {
         column.pack();
         int width = column.getWidth();
         freeWidth -= width;
@@ -172,22 +153,12 @@ public class CTree {
 
       /* Fixed with actual Width Hint */
       else if (data.getSize() == CColumnLayoutData.Size.FIXED) {
-        int widthHint = data.getWidthHint();
-
-        /* Bug on Windows: First column in tree always needs extra space for expand/collapse */
-        if (Application.IS_WINDOWS && i == 0) {
-          if (fIsFlat)
-            widthHint += 25;
-          else if (!fIsFlat)
-            widthHint += 45;
-        }
-
-        freeWidth -= widthHint;
-        occupiedWidth += widthHint;
+        freeWidth -= data.getWidthHint();
+        occupiedWidth += data.getWidthHint();
 
         /* Only apply if changed */
-        if (column.getWidth() != widthHint)
-          column.setWidth(widthHint);
+        if (column.getWidth() != data.getWidthHint())
+          column.setWidth(data.getWidthHint());
       }
 
       /* Sum up the fill ratios for later use */
@@ -196,8 +167,8 @@ public class CTree {
       }
     }
 
-    /* Foreach TreeColumn */
-    for (TreeColumn column : fCols) {
+    /* Foreach TableColumn */
+    for (TableColumn column : fCols) {
       CColumnLayoutData data = (CColumnLayoutData) column.getData(LAYOUT_DATA);
 
       /* Fill available space with ratio */
