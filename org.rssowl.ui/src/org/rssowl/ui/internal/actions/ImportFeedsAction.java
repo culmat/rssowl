@@ -34,6 +34,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.JobRunner;
 
 /**
@@ -69,7 +70,7 @@ public class ImportFeedsAction extends Action implements IWorkbenchWindowActionD
     String string = dialog.open();
     if (string != null) {
       try {
-        Controller.getDefault().importFeeds(string);
+        ImportUtils.importFeeds(string);
       } catch (Exception e) {
         Activator.getDefault().logError(e.getMessage(), e);
         ErrorDialog.openError(fShell, "Error importing Feeds", "RSSOwl was unable to import '" + string + "'", Activator.getDefault().createErrorStatus(e.getMessage(), e));
