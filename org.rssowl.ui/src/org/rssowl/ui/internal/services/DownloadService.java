@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal;
+package org.rssowl.ui.internal.services;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -34,6 +34,8 @@ import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.JobQueue;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.Controller;
 
 import java.io.File;
 import java.io.FileNotFoundException;

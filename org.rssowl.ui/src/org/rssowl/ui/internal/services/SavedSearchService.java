@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal;
+package org.rssowl.ui.internal.services;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -42,6 +42,7 @@ import org.rssowl.core.persist.service.IndexListener;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.SearchHit;
+import org.rssowl.ui.internal.Controller;
 
 import java.util.ArrayList;
 import java.util.Collection;

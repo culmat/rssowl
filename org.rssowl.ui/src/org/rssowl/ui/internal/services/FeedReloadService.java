@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal;
+package org.rssowl.ui.internal.services;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -41,6 +41,8 @@ import org.rssowl.core.persist.event.BookMarkAdapter;
 import org.rssowl.core.persist.event.BookMarkEvent;
 import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.JobRunner;
 
 import java.util.ArrayList;
@@ -140,7 +142,10 @@ public class FeedReloadService {
     }
   }
 
-  FeedReloadService() {
+  /**
+   * Instantiates the Feed Reload Service.
+   */
+  public FeedReloadService() {
     fMapBookMarkToInterval = new ConcurrentHashMap<IBookMark, Long>();
 
     /* Register Listeners */

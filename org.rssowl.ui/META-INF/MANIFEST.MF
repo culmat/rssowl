@@ -28,6 +28,7 @@ Export-Package: org.rssowl.ui.dialogs.properties,
  org.rssowl.ui.internal.handler;x-internal:=true,
  org.rssowl.ui.internal.notifier;x-internal:=true,
  org.rssowl.ui.internal.search;x-internal:=true,
+ org.rssowl.ui.internal.services;x-internal:=true,
  org.rssowl.ui.internal.undo;x-internal:=true,
  org.rssowl.ui.internal.util;x-internal:=true,
  org.rssowl.ui.internal.views.explorer;x-internal:=true
