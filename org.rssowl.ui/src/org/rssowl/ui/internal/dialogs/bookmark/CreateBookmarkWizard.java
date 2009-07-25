@@ -236,6 +236,10 @@ public class CreateBookmarkWizard extends Wizard {
     if (currentPage == fFeedDefinitionPage && fFeedDefinitionPage.loadTitleFromFeed() && StringUtils.isSet(link) && !HTTP.equals(link))
       return true;
 
+    /* Allow to finish from Keyword Page */
+    if (currentPage == fKeywordPage)
+      return true;
+
     /* Require last page then */
     if (currentPage != fBookMarkDefinitionPage)
       return false;
@@ -280,49 +284,57 @@ public class CreateBookmarkWizard extends Wizard {
       uriObj[0] = new URI(URIUtils.fastEncode(linkVal));
     }
 
-    /* Load Title from Feed if not provided */
-    if (!fFeedDefinitionPage.isKeywordSubscription() && !StringUtils.isSet(title[0])) {
-      IRunnableWithProgress runnable = new IRunnableWithProgress() {
-        public void run(IProgressMonitor monitor) {
-          monitor.beginTask("Please wait while loading the title from the feed...", IProgressMonitor.UNKNOWN);
-          try {
+    /* Need to generate a Title for the new Bookmark */
+    if (!StringUtils.isSet(title[0])) {
 
-            /* Load Feed from Link if necessary */
-            if (!URIUtils.looksLikeFeedLink(uriObj[0].toString())) {
-              final URI feedLink = Owl.getConnectionService().getFeed(uriObj[0]);
-              if (feedLink != null)
-                uriObj[0] = feedLink;
-            }
+      /* Load Title from Feed if not provided */
+      if (!fFeedDefinitionPage.isKeywordSubscription()) {
+        IRunnableWithProgress runnable = new IRunnableWithProgress() {
+          public void run(IProgressMonitor monitor) {
+            monitor.beginTask("Please wait while loading the title from the feed...", IProgressMonitor.UNKNOWN);
+            try {
 
-            title[0] = Owl.getConnectionService().getLabel(uriObj[0]);
-          } catch (final ConnectionException e) {
+              /* Load Feed from Link if necessary */
+              if (!URIUtils.looksLikeFeedLink(uriObj[0].toString())) {
+                final URI feedLink = Owl.getConnectionService().getFeed(uriObj[0]);
+                if (feedLink != null)
+                  uriObj[0] = feedLink;
+              }
 
-            /* Authentication Required */
-            if (e instanceof AuthenticationRequiredException && handleProtectedFeed(uriObj[0], ((AuthenticationRequiredException) e).getRealm())) {
-              try {
-                title[0] = Owl.getConnectionService().getLabel(uriObj[0]);
-              } catch (ConnectionException e1) {
-                Activator.getDefault().logError(e.getMessage(), e);
+              title[0] = Owl.getConnectionService().getLabel(uriObj[0]);
+            } catch (final ConnectionException e) {
+
+              /* Authentication Required */
+              if (e instanceof AuthenticationRequiredException && handleProtectedFeed(uriObj[0], ((AuthenticationRequiredException) e).getRealm())) {
+                try {
+                  title[0] = Owl.getConnectionService().getLabel(uriObj[0]);
+                } catch (ConnectionException e1) {
+                  Activator.getDefault().logError(e.getMessage(), e);
+                }
               }
             }
           }
+        };
+
+        /* Perform Runnable in same Thread and show progress */
+        try {
+          getContainer().run(true, false, runnable);
+        } catch (InvocationTargetException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+        } catch (InterruptedException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
         }
-      };
 
-      /* Perform Runnable in same Thread and show progress */
-      try {
-        getContainer().run(true, false, runnable);
-      } catch (InvocationTargetException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
-      } catch (InterruptedException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
+        /* Cancel creation and show warning if title failed loading */
+        if (!StringUtils.isSet(title[0])) {
+          getContainer().showPage(fBookMarkDefinitionPage);
+          return false;
+        }
       }
 
-      /* Cancel creation and show warning if title failed loading */
-      if (!StringUtils.isSet(title[0])) {
-        getContainer().showPage(fBookMarkDefinitionPage);
-        return false;
-      }
+      /* Generate Name from Keyword Feed if not defined */
+      else
+        title[0] = fKeywordPage.getSelectedEngine().getLabel(fFeedDefinitionPage.getKeyword());
     }
 
     IFeedDAO feedDAO = DynamicDAO.getDAO(IFeedDAO.class);
