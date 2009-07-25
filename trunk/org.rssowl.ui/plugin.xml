@@ -574,6 +574,7 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Search in the displayed News"
             id="org.rssowl.ui.FindAction"
             name="Find">
       </command>
@@ -619,6 +620,7 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Search across all News"
             id="org.rssowl.ui.SearchNewsAction"
             name="Search News">
       </command>
@@ -640,6 +642,7 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Perform Clean Up Tasks"
             id="org.rssowl.ui.CleanUpAction"
             name="Clean Up">
       </command>
@@ -702,7 +705,7 @@
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             defaultHandler="org.rssowl.ui.internal.handler.ToggleBookMarksHandler"
-            description="Toggle Bookmarks"
+            description="Show or Hide the Bookmarks View"
             id="org.rssowl.ui.ToggleBookmarksCommand"
             name="Toggle Bookmarks">
       </command>
@@ -722,21 +725,15 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Navigate to the next Tab"
+            description="Select a Tab from all Opened Tabs"
             id="org.eclipse.ui.window.nextEditor"
-            name="Next Tab">
+            name="Select Tab">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Navigate to the previous Tab"
-            id="org.eclipse.ui.window.previousEditor"
-            name="Previous Tab">
-      </command>
-      <command
-            categoryId="org.rssowl.ui.commands.category.RSSOwl"
-            description="Switch to any opened Tab"
+            description="Find a Tab to Open"
             id="org.eclipse.ui.window.openEditorDropDown"
-            name="Switch to Tab">
+            name="Find Tab">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
@@ -790,11 +787,13 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Select the Next Tab"
             id="org.rssowl.ui.NextTab"
             name="Next Tab">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Select the Previous Tab"
             id="org.rssowl.ui.PreviousTab"
             name="Previous Tab">
       </command>
