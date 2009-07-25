@@ -39,7 +39,7 @@ import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.dialogs.preferences.MiscPreferencePage;
+import org.rssowl.ui.internal.dialogs.preferences.BrowserPreferencePage;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.editors.browser.WebBrowserInput;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
@@ -314,7 +314,7 @@ public class BrowserUtils {
         box.setMessage("RSSOwl is unable to launch the external browser. Please configure it and try again.");
 
         if (box.open() == SWT.OK)
-          PreferencesUtil.createPreferenceDialogOn(window.getShell(), MiscPreferencePage.ID, null, null).open();
+          PreferencesUtil.createPreferenceDialogOn(window.getShell(), BrowserPreferencePage.ID, null, null).open();
       }
     });
   }
