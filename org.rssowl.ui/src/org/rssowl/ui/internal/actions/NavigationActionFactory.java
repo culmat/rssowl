@@ -54,7 +54,7 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
 
   /* Actual Action for the Navigation */
   private static class NavigationAction implements IWorkbenchWindowActionDelegate {
-    private Actions fType;
+    private final Actions fType;
 
     NavigationAction(Actions type) {
       fType = type;
@@ -74,7 +74,7 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
       /* News/Feed Navigation */
       else {
 
-        /* 1.) Navigate in opened FeedViews */
+        /* 1.) Navigate in opened FeedView */
         if (navigateOnActiveFeedView())
           return;
 
@@ -178,7 +178,7 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
   }
 
   /** Enumeration with all possible types of NavigationAction */
-  enum Actions {
+  public enum Actions {
 
     /** Action: Go to the next News */
     NEXT_NEWS("nextNews", true, true, false),
@@ -222,7 +222,10 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
       fIsUnread = isUnread;
     }
 
-    String getId() {
+    /**
+     * @return the id of this navigation action.
+     */
+    public String getId() {
       return fId;
     }
 

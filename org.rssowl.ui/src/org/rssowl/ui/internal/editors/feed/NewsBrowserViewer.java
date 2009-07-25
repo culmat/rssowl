@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.editors.feed;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
@@ -51,6 +52,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.internal.ObjectActionContributorManager;
 import org.rssowl.core.Owl;
@@ -81,6 +83,7 @@ import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
+import org.rssowl.ui.internal.actions.NavigationActionFactory;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
@@ -123,6 +126,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   static final String LABELS_MENU_HANDLER_ID = "org.rssowl.ui.LabelsMenu";
   static final String NEWS_MENU_HANDLER_ID = "org.rssowl.ui.NewsMenu";
   static final String SHARE_NEWS_MENU_HANDLER_ID = "org.rssowl.ui.ShareNewsMenu";
+  static final String NEXT_NEWS_HANDLER_ID = "org.rssowl.ui.NextNews";
+  static final String NEXT_UNREAD_NEWS_HANDLER_ID = "org.rssowl.ui.NextUnreadNews";
+  static final String PREVIOUS_NEWS_HANDLER_ID = "org.rssowl.ui.PreviousNews";
+  static final String PREVIOUS_UNREAD_NEWS_HANDLER_ID = "org.rssowl.ui.PreviousUnreadNews";
 
   private Object fInput;
   private CBrowser fBrowser;
@@ -182,6 +189,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fBrowser.addLinkHandler(LABELS_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(NEWS_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(SHARE_NEWS_MENU_HANDLER_ID, this);
+    fBrowser.addLinkHandler(NEXT_NEWS_HANDLER_ID, this);
+    fBrowser.addLinkHandler(NEXT_UNREAD_NEWS_HANDLER_ID, this);
+    fBrowser.addLinkHandler(PREVIOUS_NEWS_HANDLER_ID, this);
+    fBrowser.addLinkHandler(PREVIOUS_UNREAD_NEWS_HANDLER_ID, this);
   }
 
   private void hookNewsContextMenu() {
@@ -497,16 +508,13 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
    */
   public void handle(String id, URI link) {
 
-    /* Extract Query Part */
+    /* Extract Query Part and Decode */
     String query = link.getQuery();
-    if (!StringUtils.isSet(query))
-      return;
-
-    /* Decode Value */
-    query = URIUtils.urlDecode(query).trim();
+    if (StringUtils.isSet(query))
+      query = URIUtils.urlDecode(query).trim();
 
     /* Handler to perform a Search */
-    if (AUTHOR_HANDLER_ID.equals(id) || CATEGORY_HANDLER_ID.equals(id) || LABEL_HANDLER_ID.equals(id)) {
+    if (StringUtils.isSet(query) && (AUTHOR_HANDLER_ID.equals(id) || CATEGORY_HANDLER_ID.equals(id) || LABEL_HANDLER_ID.equals(id))) {
       List<ISearchCondition> conditions = new ArrayList<ISearchCondition>(1);
       String entity = INews.class.getName();
 
@@ -540,7 +548,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /*  Toggle Read */
-    else if (TOGGLE_READ_HANDLER_ID.equals(id)) {
+    else if (StringUtils.isSet(query) && TOGGLE_READ_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
         INews.State newState = (news.getState() == INews.State.READ) ? INews.State.UNREAD : INews.State.READ;
@@ -551,7 +559,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /*  Toggle Sticky */
-    else if (TOGGLE_STICKY_HANDLER_ID.equals(id)) {
+    else if (StringUtils.isSet(query) && TOGGLE_STICKY_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
         Set<INews> singleNewsSet = Collections.singleton(news);
@@ -563,7 +571,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /*  Delete */
-    else if (DELETE_HANDLER_ID.equals(id)) {
+    else if (StringUtils.isSet(query) && DELETE_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
         Set<INews> singleNewsSet = Collections.singleton(news);
@@ -573,7 +581,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /*  Labels Menu */
-    else if (LABELS_MENU_HANDLER_ID.equals(id)) {
+    else if (StringUtils.isSet(query) && LABELS_MENU_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
         setSelection(new StructuredSelection(news));
@@ -585,7 +593,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /* News Context Menu */
-    else if (NEWS_MENU_HANDLER_ID.equals(id)) {
+    else if (StringUtils.isSet(query) && NEWS_MENU_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
         setSelection(new StructuredSelection(news));
@@ -597,7 +605,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     }
 
     /* Share News Context Menu */
-    else if (SHARE_NEWS_MENU_HANDLER_ID.equals(id)) {
+    else if (StringUtils.isSet(query) && SHARE_NEWS_MENU_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
       if (news != null) {
         setSelection(new StructuredSelection(news));
@@ -605,6 +613,54 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
         cursorLocation.y = cursorLocation.y + 16;
         fShareNewsContextMenu.setLocation(cursorLocation);
         fShareNewsContextMenu.setVisible(true);
+      }
+    }
+
+    /* Go to Next News */
+    else if (NEXT_NEWS_HANDLER_ID.equals(id)) {
+      NavigationActionFactory factory = new NavigationActionFactory();
+      try {
+        factory.setInitializationData(null, null, NavigationActionFactory.Actions.NEXT_FEED.getId());
+        IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
+        action.run(null);
+      } catch (CoreException e) {
+        /* Ignore */
+      }
+    }
+
+    /* Go to Next Unread News */
+    else if (NEXT_UNREAD_NEWS_HANDLER_ID.equals(id)) {
+      NavigationActionFactory factory = new NavigationActionFactory();
+      try {
+        factory.setInitializationData(null, null, NavigationActionFactory.Actions.NEXT_UNREAD_FEED.getId());
+        IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
+        action.run(null);
+      } catch (CoreException e) {
+        /* Ignore */
+      }
+    }
+
+    /* Go to Previous News */
+    else if (PREVIOUS_NEWS_HANDLER_ID.equals(id)) {
+      NavigationActionFactory factory = new NavigationActionFactory();
+      try {
+        factory.setInitializationData(null, null, NavigationActionFactory.Actions.PREVIOUS_FEED.getId());
+        IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
+        action.run(null);
+      } catch (CoreException e) {
+        /* Ignore */
+      }
+    }
+
+    /* Go to Previous Unread News */
+    else if (PREVIOUS_UNREAD_NEWS_HANDLER_ID.equals(id)) {
+      NavigationActionFactory factory = new NavigationActionFactory();
+      try {
+        factory.setInitializationData(null, null, NavigationActionFactory.Actions.PREVIOUS_UNREAD_FEED.getId());
+        IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
+        action.run(null);
+      } catch (CoreException e) {
+        /* Ignore */
       }
     }
   }
