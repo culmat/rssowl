@@ -338,6 +338,29 @@ public class NewsBrowserControl implements IFeedViewPart {
       js.append("  } ");
     }
 
+    /* See if the Scroll Position Changed at all and handle */
+    String actionId;
+    if (next) {
+      if (unread)
+        actionId = NewsBrowserViewer.NEXT_UNREAD_NEWS_HANDLER_ID;
+      else
+        actionId = NewsBrowserViewer.NEXT_NEWS_HANDLER_ID;
+    } else {
+      if (unread)
+        actionId = NewsBrowserViewer.PREVIOUS_UNREAD_NEWS_HANDLER_ID;
+      else
+        actionId = NewsBrowserViewer.PREVIOUS_NEWS_HANDLER_ID;
+    }
+
+    if (browser.isIE())
+      js.append("var newScrollPosY = document.body.scrollTop; ");
+    else
+      js.append("var newScrollPosY = window.pageYOffset; ");
+
+    js.append("if (scrollPosY == newScrollPosY) { ");
+    js.append("  window.location.href = \"").append(ILinkHandler.HANDLER_PROTOCOL + actionId).append("\"; ");
+    js.append("} ");
+
     try {
       browser.getControl().execute(js.toString());
     } finally {
