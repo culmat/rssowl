@@ -74,6 +74,7 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -88,6 +89,7 @@ import java.util.Set;
  */
 public class ImportExportOPMLTest {
   private File fTmpFile;
+  private File fTmpFileOnlyMarks;
   private File fTmpBackupFile;
   private IModelFactory fFactory;
   private IFolder fDefaultSet;
@@ -111,6 +113,9 @@ public class ImportExportOPMLTest {
     fTmpFile = File.createTempFile("rssowl", "opml");
     fTmpFile.deleteOnExit();
 
+    fTmpFileOnlyMarks = File.createTempFile("rssowl2", "opml");
+    fTmpFileOnlyMarks.deleteOnExit();
+
     fTmpBackupFile = File.createTempFile("rssowl_backup", "opml");
     fTmpBackupFile.deleteOnExit();
 
@@ -124,7 +129,16 @@ public class ImportExportOPMLTest {
     rootFolders.add(fDefaultSet);
     rootFolders.add(fCustomSet);
 
+    List<IMark> marks = new ArrayList<IMark>(fDefaultSet.getMarks());
+    marks.addAll(fCustomSet.getMarks());
+    Iterator<IMark> iterator = marks.iterator();
+    while (iterator.hasNext()) {
+      if (iterator.next() instanceof ISearchMark) //Remove Saved Searches since they might depend on a not existing location
+        iterator.remove();
+    }
+
     Owl.getInterpreter().exportTo(fTmpFile, rootFolders, null);
+    Owl.getInterpreter().exportTo(fTmpFileOnlyMarks, marks, null);
     Owl.getInterpreter().exportTo(fTmpBackupFile, rootFolders, EnumSet.of(Options.EXPORT_FILTERS, Options.EXPORT_LABELS, Options.EXPORT_PREFERENCES));
 
     /* Clear */
@@ -513,6 +527,37 @@ public class ImportExportOPMLTest {
    */
   @Test
   @SuppressWarnings( { "nls", "null" })
+  public void testExportImportOnlyMarkOPML() throws Exception {
+
+    /* Import */
+    ImportUtils.importFeeds(fTmpFileOnlyMarks.getAbsolutePath());
+
+    /* Validate */
+    Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
+
+    assertEquals(1, rootFolders.size());
+    List<IFolderChild> children = rootFolders.iterator().next().getChildren();
+
+    int countBookmarks = 0;
+    int countBins = 0;
+    for (IFolderChild child : children) {
+      if (child instanceof IBookMark)
+        countBookmarks++;
+      else if (child instanceof INewsBin)
+        countBins++;
+      else
+        fail();
+    }
+
+    assertEquals(2, countBookmarks);
+    assertEquals(1, countBins);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null" })
   public void testExportImportCompleteOPML() throws Exception {
     exportImportCompleteOPML(false);
   }
@@ -604,8 +649,6 @@ public class ImportExportOPMLTest {
       if (mark instanceof IBookMark && mark.getName().equals("Bookmark 1"))
         bookmark1 = (IBookMark) mark;
     }
-
-
 
     assertNotNull(bookmark1);
     assertEquals("feed1", bookmark1.getFeedLinkReference().getLink().toString());
