@@ -994,4 +994,35 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
       TestUtils.fail(e);
     }
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSearchNewsWithInvalidLocation() throws Exception {
+
+    /* First add some Types */
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
+
+    INews news = createNews(feed, "Friend", "http://www.news.com/news3.html", State.READ);
+    ICategory category = fFactory.createCategory(null, news);
+    category.setName("Global");
+    news.addCategory(category);
+
+    DynamicDAO.save(feed);
+
+    IFolder root = fFactory.createFolder(null, null, "Root");
+    fFactory.createBookMark(null, root, new FeedLinkReference(feed.getLink()), "Bookmark");
+    DynamicDAO.save(root);
+
+    /* Wait for Indexer */
+    waitForIndexer();
+
+    ISearchField field = fFactory.createSearchField(INews.LOCATION, fNewsEntityName);
+
+    ISearchCondition condition1 = fFactory.createSearchCondition(field, SearchSpecifier.IS, new Long[][] { { 10l }, { 20l }, { 30l } });
+
+    List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition1), false);
+    assertEquals(0, result.size());
+  }
 }
