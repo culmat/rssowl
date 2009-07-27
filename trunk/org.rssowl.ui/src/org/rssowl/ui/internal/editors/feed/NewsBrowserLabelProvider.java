@@ -547,9 +547,9 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     for (ILabel label : labels) {
       c++;
       if (c < labels.size())
-        span(builder, label.getName() + ", ", null, label.getColor());
+        span(builder, StringUtils.xmlEscape(label.getName()) + ", ", null, label.getColor());
       else
-        span(builder, label.getName(), null, label.getColor());
+        span(builder, StringUtils.xmlEscape(label.getName()), null, label.getColor());
     }
 
     builder.append("</td>");
@@ -557,7 +557,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     /* Add to Search */
     for (ILabel label : labels) {
       String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.LABEL_HANDLER_ID + "?" + URIUtils.urlEncode(label.getName());
-      link(search, link, label.getName(), "searchrelated");
+      link(search, link, StringUtils.xmlEscape(label.getName()), "searchrelated");
       search.append(", ");
     }
 

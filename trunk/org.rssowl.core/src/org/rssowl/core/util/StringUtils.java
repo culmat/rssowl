@@ -340,4 +340,20 @@ public class StringUtils {
 
     return tokens;
   }
+
+  /**
+   * @param str the string to escape for use in XML.
+   * @return the escaped string that can safely be used in XML.
+   */
+  public static String xmlEscape(String str) {
+    if (!StringUtils.isSet(str))
+      return str;
+
+    str = StringUtils.replaceAll(str, "&", "&amp;");
+    str = StringUtils.replaceAll(str, "<", "&lt;");
+    str = StringUtils.replaceAll(str, ">", "&gt;");
+    str = StringUtils.replaceAll(str, "\"", "&#0034;");
+
+    return str;
+  }
 }
