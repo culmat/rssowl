@@ -72,6 +72,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -90,6 +91,7 @@ import java.util.Set;
 public class ImportExportOPMLTest {
   private File fTmpFile;
   private File fTmpFileOnlyMarks;
+  private File fTmpFileInvalidLocations;
   private File fTmpBackupFile;
   private IModelFactory fFactory;
   private IFolder fDefaultSet;
@@ -101,6 +103,7 @@ public class ImportExportOPMLTest {
   private INewsBin fNewsBin;
   private ILabel fImportantLabel;
   private ISearchMark fSearchmark;
+  private ISearchMark fSearchmarkWithLocation;
 
   /**
    * @throws Exception
@@ -113,8 +116,11 @@ public class ImportExportOPMLTest {
     fTmpFile = File.createTempFile("rssowl", "opml");
     fTmpFile.deleteOnExit();
 
-    fTmpFileOnlyMarks = File.createTempFile("rssowl2", "opml");
+    fTmpFileOnlyMarks = File.createTempFile("rssowl_onlymarks", "opml");
     fTmpFileOnlyMarks.deleteOnExit();
+
+    fTmpFileInvalidLocations = File.createTempFile("rssowl_invalidlocations", "opml");
+    fTmpFileInvalidLocations.deleteOnExit();
 
     fTmpBackupFile = File.createTempFile("rssowl_backup", "opml");
     fTmpBackupFile.deleteOnExit();
@@ -139,6 +145,7 @@ public class ImportExportOPMLTest {
 
     Owl.getInterpreter().exportTo(fTmpFile, rootFolders, null);
     Owl.getInterpreter().exportTo(fTmpFileOnlyMarks, marks, null);
+    Owl.getInterpreter().exportTo(fTmpFileInvalidLocations, Collections.singleton(fSearchmarkWithLocation), EnumSet.of(Options.EXPORT_FILTERS, Options.EXPORT_LABELS, Options.EXPORT_PREFERENCES));
     Owl.getInterpreter().exportTo(fTmpBackupFile, rootFolders, EnumSet.of(Options.EXPORT_FILTERS, Options.EXPORT_LABELS, Options.EXPORT_PREFERENCES));
 
     /* Clear */
@@ -471,8 +478,8 @@ public class ImportExportOPMLTest {
       ISearchField field = fFactory.createSearchField(INews.LOCATION, newsName);
       ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(Arrays.asList(new IFolderChild[] { fBookMark1 })));
 
-      ISearchMark searchmark = fFactory.createSearchMark(null, parent, "Search");
-      searchmark.addSearchCondition(condition);
+      fSearchmarkWithLocation = fFactory.createSearchMark(null, parent, "Search");
+      fSearchmarkWithLocation.addSearchCondition(condition);
     }
 
     /*
@@ -551,6 +558,26 @@ public class ImportExportOPMLTest {
 
     assertEquals(2, countBookmarks);
     assertEquals(1, countBins);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null" })
+  public void testExportImportInvalidLocationsOPML() throws Exception {
+
+    /* Import */
+    ImportUtils.importFeeds(fTmpFileInvalidLocations.getAbsolutePath());
+
+    /* Validate */
+    Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
+
+    assertEquals(1, rootFolders.size());
+    List<IFolderChild> children = rootFolders.iterator().next().getChildren();
+
+    assertEquals(1, children.size());
+    assertTrue(children.get(0) instanceof ISearchMark);
   }
 
   /**
