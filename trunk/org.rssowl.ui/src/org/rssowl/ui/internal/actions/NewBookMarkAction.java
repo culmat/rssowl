@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -39,6 +40,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.bookmark.CreateBookmarkWizard;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
@@ -47,6 +49,10 @@ import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
  * @author bpasero
  */
 public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjectActionDelegate {
+
+  /* Section for Dialogs Settings */
+  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.bookmark.CreateBookmarkWizard";
+
   private Shell fShell;
   private IFolder fParent;
   private IMark fPosition;
@@ -101,7 +107,27 @@ public class NewBookMarkAction implements IWorkbenchWindowActionDelegate, IObjec
 
     /* Show Dialog */
     CreateBookmarkWizard wizard = new CreateBookmarkWizard(parent, fPosition, fPreSetLink);
-    WizardDialog dialog = new WizardDialog(fShell, wizard);
+    WizardDialog dialog = new WizardDialog(fShell, wizard) {
+      @Override
+      protected boolean isResizable() {
+        return true;
+      }
+
+      @Override
+      protected IDialogSettings getDialogBoundsSettings() {
+        IDialogSettings settings = Activator.getDefault().getDialogSettings();
+        IDialogSettings section = settings.getSection(SETTINGS_SECTION);
+        if (section != null)
+          return section;
+
+        return settings.addNewSection(SETTINGS_SECTION);
+      }
+
+      @Override
+      protected int getDialogBoundsStrategy() {
+        return DIALOG_PERSISTSIZE;
+      }
+    };
     dialog.create();
     dialog.open();
   }
