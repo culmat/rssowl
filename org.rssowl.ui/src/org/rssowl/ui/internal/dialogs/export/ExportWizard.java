@@ -42,6 +42,7 @@ import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.Activator;
@@ -136,36 +137,41 @@ public class ExportWizard extends Wizard {
     List<IFolderChild> selectedElements = fFolderChildsPage.getElementsToExport();
     EnumSet<Options> options = fExportSettingsPage.getExportOptions();
 
-    /* Find Folders and Saved Searches */
-    Set<ISearchMark> savedSearches = new HashSet<ISearchMark>();
-    Set<IFolder> folders = new HashSet<IFolder>();
-    for (IFolderChild child : selectedElements) {
-      if (child instanceof IFolder)
-        folders.add((IFolder) child);
-      else if (child instanceof ISearchMark)
-        savedSearches.add((ISearchMark) child);
-    }
+    /* Check if dependent locations need to be added manually */
+    Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
+    if (!selectedElements.containsAll(rootFolders)) {
 
-    /* Find Saved Searches from Folders */
-    for (IFolder folder : folders) {
-      findSavedSearches(savedSearches, folder);
-    }
+      /* Find Folders and Saved Searches */
+      Set<ISearchMark> savedSearches = new HashSet<ISearchMark>();
+      Set<IFolder> folders = new HashSet<IFolder>();
+      for (IFolderChild child : selectedElements) {
+        if (child instanceof IFolder)
+          folders.add((IFolder) child);
+        else if (child instanceof ISearchMark)
+          savedSearches.add((ISearchMark) child);
+      }
 
-    /* Add those Locations required by Saved Searches */
-    for (ISearchMark savedSearch : savedSearches) {
-      extractLocations(selectedElements, savedSearch);
-    }
+      /* Find Saved Searches from Folders */
+      for (IFolder folder : folders) {
+        findSavedSearches(savedSearches, folder);
+      }
 
-    /* Add those Locations required by Filters */
-    if (options != null && options.contains(Options.EXPORT_FILTERS)) {
-      Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
-      for (ISearchFilter filter : filters) {
-        extractLocations(selectedElements, filter);
+      /* Add those Locations required by Saved Searches */
+      for (ISearchMark savedSearch : savedSearches) {
+        extractLocations(selectedElements, savedSearch);
+      }
+
+      /* Add those Locations required by Filters */
+      if (options != null && options.contains(Options.EXPORT_FILTERS)) {
+        Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
+        for (ISearchFilter filter : filters) {
+          extractLocations(selectedElements, filter);
+        }
       }
     }
 
-    /* Search for Folders again (new ones could have been added from searches and filters) */
-    folders = new HashSet<IFolder>();
+    /* Search for Folders */
+    Set<IFolder> folders = new HashSet<IFolder>();
     for (IFolderChild child : selectedElements) {
       if (child instanceof IFolder)
         folders.add((IFolder) child);
