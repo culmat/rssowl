@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.actions;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
@@ -33,18 +34,17 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.ui.internal.Activator;
-import org.rssowl.ui.internal.dialogs.exporter.ExportWizard;
+import org.rssowl.ui.internal.dialogs.importer.ImportWizard;
 
 /**
- * Opens a Wizard to export {@link IFolderChild} with the option to also
+ * Opens a Wizard to import {@link IFolderChild} with the option to also
  * consider Filters, Labels and Preferences.
  *
  * @author bpasero
  */
-public class ExportAction implements IWorkbenchWindowActionDelegate {
-
+public class ImportAction extends Action implements IWorkbenchWindowActionDelegate {
   /* Section for Dialogs Settings */
-  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.exporter.ExportWizard";
+  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.importer.ImportWizard";
 
   private IWorkbenchWindow fWindow;
 
@@ -71,7 +71,7 @@ public class ExportAction implements IWorkbenchWindowActionDelegate {
    * @param shell the {@link Shell} acting as parent of the wizard.
    */
   public void openWizard(Shell shell) {
-    ExportWizard exportWizard = new ExportWizard();
+    ImportWizard exportWizard = new ImportWizard();
 
     WizardDialog dialog = new WizardDialog(shell, exportWizard) {
       @Override
