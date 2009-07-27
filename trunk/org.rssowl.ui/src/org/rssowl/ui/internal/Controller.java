@@ -851,13 +851,6 @@ public class Controller {
     /* Register Listeners */
     registerListeners();
 
-    /* Backup Subscriptions as OPML */
-    SafeRunner.run(new LoggingSafeRunnable() {
-      public void run() throws Exception {
-        backupSubscriptions();
-      }
-    });
-
     /* Load Contributed News Share Providers */
     loadShareProviders();
   }
@@ -986,6 +979,20 @@ public class Controller {
     IStatus startupStatus = Owl.getPersistenceService().getStartupStatus();
     if (startupStatus.getSeverity() == IStatus.ERROR)
       ErrorDialog.openError(OwlUI.getPrimaryShell(), "Startup error", "There was an error while starting RSSOwl.", startupStatus);
+
+    /* Backup Subscriptions as OPML if no error */
+    else {
+      SafeRunner.run(new LoggingSafeRunnable() {
+        public void run() throws Exception {
+          JobRunner.runDelayedInBackgroundThread(new Runnable() {
+            public void run() {
+              if (!fShuttingDown)
+                backupSubscriptions();
+            }
+          });
+        }
+      });
+    }
   }
 
   private void backupSubscriptions() {
@@ -1020,7 +1027,7 @@ public class Controller {
     /* Create Daily Backup */
     try {
       Set<IFolder> rootFolders = CoreUtils.loadRootFolders();
-      if (!rootFolders.isEmpty()) {
+      if (!rootFolders.isEmpty() && !fShuttingDown) {
         Owl.getInterpreter().exportTo(backupTmpFile, rootFolders, EnumSet.of(Options.EXPORT_FILTERS, Options.EXPORT_LABELS, Options.EXPORT_PREFERENCES));
 
         /* Rename to actual backup in a short op to avoid corrupt data */
@@ -1030,7 +1037,8 @@ public class Controller {
         }
       }
     } catch (InterpreterException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
+      if (!fShuttingDown)
+        Activator.getDefault().logError(e.getMessage(), e);
     }
   }
 
