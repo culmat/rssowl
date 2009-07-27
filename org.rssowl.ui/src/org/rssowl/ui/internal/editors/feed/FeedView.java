@@ -66,7 +66,6 @@ import org.eclipse.ui.part.EditorPart;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.IProtocolHandler;
-import org.rssowl.core.internal.connection.DefaultProtocolHandler;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
@@ -284,7 +283,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     final URI feedLink = bm.getFeedLinkReference().getLink();
     try {
       final IProtocolHandler handler = Owl.getConnectionService().getHandler(feedLink);
-      if (handler instanceof DefaultProtocolHandler) {
+      if (handler instanceof org.rssowl.core.internal.connection.DefaultProtocolHandler) {
         Job downloadJob = new Job("Downloading Feed...") {
           @Override
           protected IStatus run(IProgressMonitor monitor) {

@@ -54,7 +54,6 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.dialogs.PreferencesUtil;
-import org.eclipse.ui.internal.ObjectActionContributorManager;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
@@ -386,7 +385,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
         /* Fill Contributions if Context Menu not registered */
         if (fSite == null)
-          ObjectActionContributorManager.getManager().contributeObjectActions(null, manager, NewsBrowserViewer.this);
+          org.eclipse.ui.internal.ObjectActionContributorManager.getManager().contributeObjectActions(null, manager, NewsBrowserViewer.this);
       }
     });
 
