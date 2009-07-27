@@ -333,7 +333,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     /* DIV: Group */
     div(builder, "group");
 
-    builder.append(group.getName());
+    builder.append(StringUtils.htmlEscape(group.getName()));
 
     /* Close: Group */
     close(builder, "div");
@@ -482,11 +482,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         email = name;
 
       if (StringUtils.isSet(name) && email != null)
-        link(builder, email, name, "author");
+        link(builder, email, StringUtils.htmlEscape(name), "author");
       else if (StringUtils.isSet(name))
-        builder.append(name);
+        builder.append(StringUtils.htmlEscape(name));
       else if (email != null)
-        link(builder, email, email, "author");
+        link(builder, email, StringUtils.htmlEscape(email), "author");
       else
         builder.append("Unknown");
 
@@ -494,7 +494,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       String value = StringUtils.isSet(name) ? name : email;
       if (StringUtils.isSet(value)) {
         String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.AUTHOR_HANDLER_ID + "?" + URIUtils.urlEncode(value);
-        link(search, link, value, "searchrelated");
+        link(search, link, StringUtils.htmlEscape(value), "searchrelated");
         search.append(", ");
       }
       builder.append("</td>");
@@ -524,7 +524,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       IAttachment attachment = news.getAttachments().get(0);
       String link = attachment.getLink().toASCIIString();
       String name = URIUtils.getFile(attachment.getLink());
-      imageLink(builder, link, StringUtils.isSet(name) ? name : "Attachment", "Attachment", "/icons/obj16/attachment_light.gif", "attachment_light.gif", null, null);
+      imageLink(builder, link, StringUtils.isSet(name) ? StringUtils.htmlEscape(name) : "Attachment", "Attachment", "/icons/obj16/attachment_light.gif", "attachment_light.gif", null, null);
       builder.append("</td>");
     }
 
@@ -547,9 +547,9 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     for (ILabel label : labels) {
       c++;
       if (c < labels.size())
-        span(builder, StringUtils.xmlEscape(label.getName()) + ", ", null, label.getColor());
+        span(builder, StringUtils.htmlEscape(label.getName()) + ", ", null, label.getColor());
       else
-        span(builder, StringUtils.xmlEscape(label.getName()), null, label.getColor());
+        span(builder, StringUtils.htmlEscape(label.getName()), null, label.getColor());
     }
 
     builder.append("</td>");
@@ -557,7 +557,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     /* Add to Search */
     for (ILabel label : labels) {
       String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.LABEL_HANDLER_ID + "?" + URIUtils.urlEncode(label.getName());
-      link(search, link, StringUtils.xmlEscape(label.getName()), "searchrelated");
+      link(search, link, StringUtils.htmlEscape(label.getName()), "searchrelated");
       search.append(", ");
     }
 
@@ -619,7 +619,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
               name = link.toASCIIString();
 
             //TODO Consider Attachment length and type
-            link(footer, link.toASCIIString(), name, "attachment");
+            link(footer, link.toASCIIString(), StringUtils.htmlEscape(name), "attachment");
             footer.append(", ");
           }
         }
@@ -650,13 +650,13 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
           /* As Link */
           if (URIUtils.looksLikeLink(domain) && StringUtils.isSet(name)) {
-            link(categoriesText, domain, name, "category");
+            link(categoriesText, domain, StringUtils.htmlEscape(name), "category");
             hasCategories = true;
           }
 
           /* As Text */
           else if (StringUtils.isSet(name)) {
-            categoriesText.append(name);
+            categoriesText.append(StringUtils.htmlEscape(name));
             hasCategories = true;
           }
 
@@ -666,7 +666,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
           /* Add to Search */
           if (StringUtils.isSet(name)) {
             String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.CATEGORY_HANDLER_ID + "?" + URIUtils.urlEncode(name);
-            link(search, link, name, "searchrelated");
+            link(search, link, StringUtils.htmlEscape(name), "searchrelated");
             search.append(", ");
           }
         }
@@ -695,11 +695,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         span(footer, "Source:", "label");
 
         if (StringUtils.isSet(name) && link != null)
-          link(footer, link, name, "source");
+          link(footer, link, StringUtils.htmlEscape(name), "source");
         else if (link != null)
-          link(footer, link, link, "source");
+          link(footer, link, StringUtils.htmlEscape(link), "source");
         else if (StringUtils.isSet(name))
-          footer.append(name);
+          footer.append(StringUtils.htmlEscape(name));
 
         /* Close: NewsItem/Footer/Source */
         close(footer, "div");
