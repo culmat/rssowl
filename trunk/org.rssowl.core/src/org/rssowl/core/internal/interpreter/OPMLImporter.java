@@ -110,6 +110,14 @@ public class OPMLImporter implements ITypeImporter {
       if ("outline".equals(name)) //$NON-NLS-1$
         processOutline(child, defaultRootFolder, importedEntities);
 
+      /* Process Saved Search */
+      else if ("savedsearch".equals(name))
+        processSavedSearch(child, defaultRootFolder);
+
+      /* Process News Bin */
+      else if ("newsbin".equals(name))
+        processNewsBin(child, defaultRootFolder);
+
       /* Process Label */
       else if ("label".equals(name))
         processLabel(child, importedEntities);
