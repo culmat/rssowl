@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal.dialogs.export;
+package org.rssowl.ui.internal.dialogs.exporter;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.SWT;
