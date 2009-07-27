@@ -97,7 +97,9 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
   private LocalResourceManager fResources = new LocalResourceManager(JFaceResources.getResources());;
 
   /** Leave for reflection */
-  public NotifierPreferencesPage() {}
+  public NotifierPreferencesPage() {
+    setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/notification.gif"));
+  }
 
   /**
    * @param title

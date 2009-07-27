@@ -76,6 +76,7 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
   public MiscPreferencePage() {
     fGlobalScope = Owl.getPreferenceService().getGlobalScope();
     fEclipseScope = Owl.getPreferenceService().getEclipseScope();
+    setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/view.gif"));
   }
 
   /**

@@ -120,6 +120,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fGlobalScope = Owl.getPreferenceService().getGlobalScope();
     fReloadService = Controller.getDefault().getReloadService();
     fResources = new LocalResourceManager(JFaceResources.getResources());
+    setImageDescriptor(OwlUI.BOOKMARK);
   }
 
   /*
