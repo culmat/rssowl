@@ -1096,9 +1096,9 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
             for (ILabel label : labels) {
               c++;
               if (c < labels.size())
-                span(labelsHtml, StringUtils.xmlEscape(label.getName()) + ", ", label.getColor());
+                span(labelsHtml, StringUtils.htmlEscape(label.getName()) + ", ", label.getColor());
               else
-                span(labelsHtml, StringUtils.xmlEscape(label.getName()), label.getColor());
+                span(labelsHtml, StringUtils.htmlEscape(label.getName()), label.getColor());
             }
 
             js.append(getElementById(Dynamic.LABELS.getId(news)).append(".innerHTML='").append(labelsHtml.toString()).append("'; "));
