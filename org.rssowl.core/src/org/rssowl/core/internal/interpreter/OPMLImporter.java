@@ -24,12 +24,16 @@
 
 package org.rssowl.core.internal.interpreter;
 
+import static org.rssowl.core.internal.interpreter.OPMLConstants.RSSOWL_NS;
+
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.internal.interpreter.OPMLConstants.Attributes;
+import org.rssowl.core.internal.interpreter.OPMLConstants.Tags;
 import org.rssowl.core.internal.newsaction.CopyNewsAction;
 import org.rssowl.core.internal.newsaction.LabelNewsAction;
 import org.rssowl.core.internal.newsaction.MoveNewsAction;
@@ -72,7 +76,6 @@ import java.util.List;
  */
 public class OPMLImporter implements ITypeImporter {
   private final DateFormat fDateFormat = DateFormat.getDateInstance();
-  private final Namespace fRSSOwlNamespace = Namespace.getNamespace("rssowl", "http://www.rssowl.org");
 
   /*
    * @see
@@ -88,7 +91,7 @@ public class OPMLImporter implements ITypeImporter {
       String name = child.getName().toLowerCase();
 
       /* Process Body */
-      if ("body".equals(name)) //$NON-NLS-1$
+      if (Tags.BODY.get().equals(name)) //$NON-NLS-1$
         return processBody(child);
     }
 
@@ -107,23 +110,23 @@ public class OPMLImporter implements ITypeImporter {
       String name = child.getName().toLowerCase();
 
       /* Process Outline */
-      if ("outline".equals(name)) //$NON-NLS-1$
+      if (Tags.OUTLINE.get().equals(name)) //$NON-NLS-1$
         processOutline(child, defaultRootFolder, importedEntities);
 
       /* Process Saved Search */
-      else if ("savedsearch".equals(name))
+      else if (Tags.SAVED_SEARCH.get().equals(name))
         processSavedSearch(child, defaultRootFolder);
 
       /* Process News Bin */
-      else if ("newsbin".equals(name))
+      else if (Tags.BIN.get().equals(name))
         processNewsBin(child, defaultRootFolder);
 
       /* Process Label */
-      else if ("label".equals(name))
+      else if (Tags.LABEL.get().equals(name))
         processLabel(child, importedEntities);
 
       /* Process News Filter */
-      else if ("searchfilter".equals(name))
+      else if (Tags.FILTER.get().equals(name))
         processFilter(child, importedEntities);
     }
 
@@ -133,20 +136,20 @@ public class OPMLImporter implements ITypeImporter {
   private void processFilter(Element filterElement, List<IEntity> importedEntities) {
     IModelFactory factory = Owl.getModelFactory();
 
-    String name = filterElement.getAttributeValue("name");
-    int order = Integer.parseInt(filterElement.getAttributeValue("order"));
-    boolean isEnabled = Boolean.parseBoolean(filterElement.getAttributeValue("enabled"));
-    boolean matchAllNews = Boolean.parseBoolean(filterElement.getAttributeValue("matchAllNews"));
+    String name = filterElement.getAttributeValue(Attributes.NAME.get());
+    int order = Integer.parseInt(filterElement.getAttributeValue(Attributes.ORDER.get()));
+    boolean isEnabled = Boolean.parseBoolean(filterElement.getAttributeValue(Attributes.ENABLED.get()));
+    boolean matchAllNews = Boolean.parseBoolean(filterElement.getAttributeValue(Attributes.MATCH_ALL_NEWS.get()));
 
     /* Search if provided */
     ISearch search = null;
-    Element searchElement = filterElement.getChild("search", fRSSOwlNamespace);
+    Element searchElement = filterElement.getChild(Tags.SEARCH.get(), RSSOWL_NS);
     if (searchElement != null) {
       search = factory.createSearch(null);
-      search.setMatchAllConditions(Boolean.parseBoolean(searchElement.getAttributeValue("matchAllConditions")));
+      search.setMatchAllConditions(Boolean.parseBoolean(searchElement.getAttributeValue(Attributes.MATCH_ALL_CONDITIONS.get())));
 
       /* Search Conditions */
-      List<?> conditions = searchElement.getChildren("searchcondition", fRSSOwlNamespace);
+      List<?> conditions = searchElement.getChildren(Tags.SEARCH_CONDITION.get(), RSSOWL_NS);
       for (int i = 0; i < conditions.size(); i++) {
         try {
           Element condition = (Element) conditions.get(i);
@@ -169,11 +172,11 @@ public class OPMLImporter implements ITypeImporter {
     filter.setOrder(order);
 
     /* Filter Actions */
-    List<?> actions = filterElement.getChildren("filteraction", fRSSOwlNamespace);
+    List<?> actions = filterElement.getChildren(Tags.ACTION.get(), RSSOWL_NS);
     for (int i = 0; i < actions.size(); i++) {
       Element action = (Element) actions.get(i);
-      String id = action.getAttributeValue("id");
-      String data = action.getAttributeValue("data");
+      String id = action.getAttributeValue(Attributes.ID.get());
+      String data = action.getAttributeValue(Attributes.DATA.get());
 
       IFilterAction filterAction = factory.createFilterAction(id);
       if (data != null) {
@@ -208,13 +211,13 @@ public class OPMLImporter implements ITypeImporter {
   }
 
   private void processSavedSearch(Element savedSearchElement, IFolder folder) {
-    String name = savedSearchElement.getAttributeValue("name");
-    boolean matchAllConditions = Boolean.parseBoolean(savedSearchElement.getAttributeValue("matchAllConditions"));
+    String name = savedSearchElement.getAttributeValue(Attributes.NAME.get());
+    boolean matchAllConditions = Boolean.parseBoolean(savedSearchElement.getAttributeValue(Attributes.MATCH_ALL_CONDITIONS.get()));
 
     ISearchMark searchmark = Owl.getModelFactory().createSearchMark(null, folder, name);
     searchmark.setMatchAllConditions(matchAllConditions);
 
-    List<?> conditions = savedSearchElement.getChildren("searchcondition", fRSSOwlNamespace);
+    List<?> conditions = savedSearchElement.getChildren(Tags.SEARCH_CONDITION.get(), RSSOWL_NS);
     for (int i = 0; i < conditions.size(); i++) {
       try {
         Element condition = (Element) conditions.get(i);
@@ -233,17 +236,17 @@ public class OPMLImporter implements ITypeImporter {
   private ISearchCondition processSearchCondition(Element conditionElement) throws ParseException {
 
     /* Search Specifier */
-    Element specifierElement = conditionElement.getChild("searchspecifier", fRSSOwlNamespace);
-    SearchSpecifier searchSpecifier = SearchSpecifier.values()[Integer.parseInt(specifierElement.getAttributeValue("id"))];
+    Element specifierElement = conditionElement.getChild(Tags.SPECIFIER.get(), RSSOWL_NS);
+    SearchSpecifier searchSpecifier = SearchSpecifier.values()[Integer.parseInt(specifierElement.getAttributeValue(Attributes.ID.get()))];
 
     /* Search Value */
-    Element valueElement = conditionElement.getChild("searchvalue", fRSSOwlNamespace);
-    Object value = getValue(valueElement, fRSSOwlNamespace);
+    Element valueElement = conditionElement.getChild(Tags.SEARCH_VALUE.get(), RSSOWL_NS);
+    Object value = getValue(valueElement, RSSOWL_NS);
 
     /* Search Field */
-    Element fieldElement = conditionElement.getChild("searchfield", fRSSOwlNamespace);
-    String fieldName = fieldElement.getAttributeValue("name");
-    String entityName = fieldElement.getAttributeValue("entity");
+    Element fieldElement = conditionElement.getChild(Tags.SEARCH_FIELD.get(), RSSOWL_NS);
+    String fieldName = fieldElement.getAttributeValue(Attributes.NAME.get());
+    String entityName = fieldElement.getAttributeValue(Attributes.ENTITY.get());
     ISearchField searchField = Owl.getModelFactory().createSearchField(getFieldID(fieldName), entityName);
 
     /*
@@ -325,10 +328,10 @@ public class OPMLImporter implements ITypeImporter {
 
   private Object getValue(Element valueElement, Namespace namespace) throws ParseException {
     Object value = null;
-    int valueType = Integer.parseInt(valueElement.getAttributeValue("type"));
+    int valueType = Integer.parseInt(valueElement.getAttributeValue(Attributes.TYPE.get()));
 
-    List<?> locationElements = valueElement.getChildren("location", namespace);
-    List<?> newsStateElements = valueElement.getChildren("newsstate", namespace);
+    List<?> locationElements = valueElement.getChildren(Tags.LOCATION.get(), namespace);
+    List<?> newsStateElements = valueElement.getChildren(Tags.STATE.get(), namespace);
 
     /* Treat set of Locations separately */
     if (locationElements.size() > 0) {
@@ -338,9 +341,9 @@ public class OPMLImporter implements ITypeImporter {
 
       for (int i = 0; i < locationElements.size(); i++) {
         Element locationElement = (Element) locationElements.get(i);
-        Long id = Long.parseLong(locationElement.getAttributeValue("value"));
-        boolean isFolder = Boolean.parseBoolean(locationElement.getAttributeValue("isFolder"));
-        boolean isBin = Boolean.parseBoolean(locationElement.getAttributeValue("isBin"));
+        Long id = Long.parseLong(locationElement.getAttributeValue(Attributes.VALUE.get()));
+        boolean isFolder = Boolean.parseBoolean(locationElement.getAttributeValue(Attributes.IS_FOLDER.get()));
+        boolean isBin = Boolean.parseBoolean(locationElement.getAttributeValue(Attributes.IS_BIN.get()));
 
         if (isFolder)
           folderIds.add(id);
@@ -363,7 +366,7 @@ public class OPMLImporter implements ITypeImporter {
       List<INews.State> states = new ArrayList<INews.State>(newsStateElements.size());
       for (int i = 0; i < newsStateElements.size(); i++) {
         Element newsStateElement = (Element) newsStateElements.get(i);
-        int ordinal = Integer.parseInt(newsStateElement.getAttributeValue("value"));
+        int ordinal = Integer.parseInt(newsStateElement.getAttributeValue(Attributes.VALUE.get()));
         states.add(INews.State.values()[ordinal]);
       }
 
@@ -372,7 +375,7 @@ public class OPMLImporter implements ITypeImporter {
 
     /* Any other Value */
     else {
-      String valueAsString = valueElement.getAttributeValue("value");
+      String valueAsString = valueElement.getAttributeValue(Attributes.VALUE.get());
 
       switch (valueType) {
         case ISearchValueType.BOOLEAN:
@@ -431,32 +434,32 @@ public class OPMLImporter implements ITypeImporter {
       String name = attribute.getName();
 
       /* Link */
-      if (name.toLowerCase().equals("xmlurl")) //$NON-NLS-1$
+      if (name.toLowerCase().equals(Attributes.XML_URL.get().toLowerCase())) //$NON-NLS-1$
         link = attribute.getValue();
 
       /* Title */
-      else if (name.toLowerCase().equals("title")) //$NON-NLS-1$
+      else if (name.toLowerCase().equals(Attributes.TITLE.get())) //$NON-NLS-1$
         title = attribute.getValue();
 
       /* Text */
-      else if (title == null && name.toLowerCase().equals("text")) //$NON-NLS-1$
+      else if (title == null && name.toLowerCase().equals(Attributes.TEXT.get())) //$NON-NLS-1$
         title = attribute.getValue();
 
       /* Homepage */
-      else if (name.toLowerCase().equals("htmlurl")) //$NON-NLS-1$
+      else if (name.toLowerCase().equals(Attributes.HTML_URL.get().toLowerCase())) //$NON-NLS-1$
         homepage = attribute.getValue();
 
       /* Description */
-      else if (name.toLowerCase().equals("description")) //$NON-NLS-1$
+      else if (name.toLowerCase().equals(Attributes.DESCRIPTION.get())) //$NON-NLS-1$
         description = attribute.getValue();
     }
 
     /* RSSOwl Namespace Attributes */
-    Attribute idAttribute = outline.getAttribute("id", fRSSOwlNamespace);
+    Attribute idAttribute = outline.getAttribute(Attributes.ID.get(), RSSOWL_NS);
     if (idAttribute != null)
       id = Long.valueOf(idAttribute.getValue());
 
-    boolean isSet = Boolean.parseBoolean(outline.getAttributeValue("isSet", fRSSOwlNamespace));
+    boolean isSet = Boolean.parseBoolean(outline.getAttributeValue(Attributes.IS_SET.get(), RSSOWL_NS));
 
     /* Outline is a Folder */
     if (link == null && title != null) {
@@ -508,24 +511,24 @@ public class OPMLImporter implements ITypeImporter {
       String name = child.getName().toLowerCase();
 
       /* Process Outline */
-      if ("outline".equals(name)) //$NON-NLS-1$
+      if (Tags.OUTLINE.get().equals(name)) //$NON-NLS-1$
         processOutline(child, type, importedEntities);
 
       /* Process Saved Search */
-      else if ("savedsearch".equals(name))
+      else if (Tags.SAVED_SEARCH.get().equals(name))
         processSavedSearch(child, (IFolder) type);
 
       /* Process News Bin */
-      else if ("newsbin".equals(name))
+      else if (Tags.BIN.get().equals(name))
         processNewsBin(child, (IFolder) type);
     }
   }
 
   private void processLabel(Element labelElement, List<IEntity> importedEntities) {
-    String id = labelElement.getAttributeValue("id");
-    String name = labelElement.getAttributeValue("name");
-    String order = labelElement.getAttributeValue("order");
-    String color = labelElement.getAttributeValue("color");
+    String id = labelElement.getAttributeValue(Attributes.ID.get());
+    String name = labelElement.getAttributeValue(Attributes.NAME.get());
+    String order = labelElement.getAttributeValue(Attributes.ORDER.get());
+    String color = labelElement.getAttributeValue(Attributes.COLOR.get());
 
     ILabel label = Owl.getModelFactory().createLabel(null, name);
     label.setColor(color);
@@ -536,11 +539,11 @@ public class OPMLImporter implements ITypeImporter {
   }
 
   private void processNewsBin(Element newsBinElement, IFolder folder) {
-    String name = newsBinElement.getAttributeValue("name");
+    String name = newsBinElement.getAttributeValue(Attributes.NAME.get());
 
     /* RSSOwl Namespace Attributes */
     Long id = null;
-    Attribute idAttribute = newsBinElement.getAttribute("id", fRSSOwlNamespace);
+    Attribute idAttribute = newsBinElement.getAttribute(Attributes.ID.get(), RSSOWL_NS);
     if (idAttribute != null)
       id = Long.valueOf(idAttribute.getValue());
 

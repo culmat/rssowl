@@ -24,12 +24,15 @@
 
 package org.rssowl.core.internal.interpreter;
 
+import static org.rssowl.core.internal.interpreter.OPMLConstants.RSSOWL_NS;
+
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.rssowl.core.internal.Activator;
+import org.rssowl.core.internal.interpreter.OPMLConstants.Attributes;
+import org.rssowl.core.internal.interpreter.OPMLConstants.Tags;
 import org.rssowl.core.interpreter.ITypeExporter;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.persist.IBookMark;
@@ -70,54 +73,8 @@ import java.util.Map.Entry;
  */
 public class OPMLExporter implements ITypeExporter {
 
-  /* The namespace RSSOwl is using */
-  private static final Namespace RSSOWL_NS = Namespace.getNamespace("rssowl", "http://www.rssowl.org");
-
   /* Default Encoding */
   private static final String UTF_8 = "UTF-8"; //$NON-NLS-1$
-
-  /* List of Elements to use for the XML */
-  private enum Tags {
-
-    /** Standard OPML */
-    OPML("opml"), OUTLINE("outline"), BODY("body"),
-
-    /** Custom RSSOwl */
-    PREFERENCE("pref"), BIN("newsbin"), SAVED_SEARCH("savedsearch"), LABEL("label"), STATE("newsstate"),
-    SPECIFIER("searchspecifier"), LOCATION("location"), SEARCH_VALUE("searchvalue"), SEARCH_FIELD("searchfield"),
-    FILTER("searchfilter"), SEARCH("search"), SEARCH_CONDITION("searchcondition"), ACTION("filteraction");
-
-    private String fName;
-
-    Tags(String name) {
-      fName = name;
-    }
-
-    String get() {
-      return fName;
-    }
-  }
-
-  /* List of Attributes to use for the XML */
-  private enum Attributes {
-
-    /** Standard OPML */
-    VERSION("version"), ID("id"), XML_URL("xmlUrl"), TEXT("text"),
-
-    /** Custom RSSOwl */
-    IS_SET("isSet"), TYPE("type"), VALUE("value"), DATA("data"), NAME("name"), IS_BIN("isBin"), IS_FOLDER("isFolder"),
-    ENTITY("entity"), ORDER("order"), COLOR("color"), ENABLED("enabled"), MATCH_ALL_NEWS("matchAllNews"), MATCH_ALL_CONDITIONS("matchAllConditions");
-
-    private String fName;
-
-    Attributes(String name) {
-      fName = name;
-    }
-
-    String get() {
-      return fName;
-    }
-  }
 
   /*
    * @see org.rssowl.core.interpreter.ITypeExporter#exportTo(java.io.File,
