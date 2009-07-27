@@ -77,6 +77,7 @@ public class ExportSettingsPage extends WizardPage {
     /* Labels */
     Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
     fExportLabelsCheck = new Button(container, SWT.CHECK);
+    fExportLabelsCheck.setImage(OwlUI.getImage(fExportLabelsCheck, "icons/elcl16/labels.gif"));
     if (!labels.isEmpty())
       fExportLabelsCheck.setText("Export Labels (" + labels.size() + " in total)");
     else
@@ -88,6 +89,7 @@ public class ExportSettingsPage extends WizardPage {
     /* Filters */
     Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
     fExportFiltersCheck = new Button(container, SWT.CHECK);
+    fExportFiltersCheck.setImage(OwlUI.getImage(fExportFiltersCheck, "icons/etool16/filter.gif"));
     if (!filters.isEmpty())
       fExportFiltersCheck.setText("Export News Filters (" + filters.size() + " in total)");
     else
@@ -97,6 +99,7 @@ public class ExportSettingsPage extends WizardPage {
 
     /* Properties */
     fExportSettingsCheck = new Button(container, SWT.CHECK);
+    fExportSettingsCheck.setImage(OwlUI.getImage(fExportSettingsCheck, "icons/elcl16/preferences.gif"));
     fExportSettingsCheck.setText("Export Settings of Elements");
     fExportSettingsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
