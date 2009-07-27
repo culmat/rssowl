@@ -24,14 +24,19 @@
 
 package org.rssowl.ui.internal.dialogs.export;
 
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.rssowl.core.internal.newsaction.LabelNewsAction;
 import org.rssowl.core.interpreter.ITypeExporter;
+import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -88,6 +93,7 @@ public class ExportSettingsPage extends WizardPage {
 
     /* Filters */
     Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
+    final boolean filtersUseLabels = filtersUseLabels(filters);
     fExportFiltersCheck = new Button(container, SWT.CHECK);
     fExportFiltersCheck.setImage(OwlUI.getImage(fExportFiltersCheck, "icons/etool16/filter.gif"));
     if (!filters.isEmpty())
@@ -96,6 +102,17 @@ public class ExportSettingsPage extends WizardPage {
       fExportFiltersCheck.setText("Export News Filters (No Filters Found)");
     fExportFiltersCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     fExportFiltersCheck.setEnabled(!filters.isEmpty());
+    fExportFiltersCheck.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        if (fExportFiltersCheck.getSelection() && !fExportLabelsCheck.getSelection() && filtersUseLabels) {
+          fExportLabelsCheck.setSelection(true);
+          setMessage("Labels will also be exported because some Filters make use of them as part of their actions.", IMessageProvider.INFORMATION);
+        } else if (!fExportFiltersCheck.getSelection()) {
+          setMessage("Please select additional options for the export.");
+        }
+      }
+    });
 
     /* Properties */
     fExportSettingsCheck = new Button(container, SWT.CHECK);
@@ -104,6 +121,18 @@ public class ExportSettingsPage extends WizardPage {
     fExportSettingsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     setControl(container);
+  }
+
+  private boolean filtersUseLabels(Collection<ISearchFilter> filters) {
+    for (ISearchFilter filter : filters) {
+      List<IFilterAction> actions = filter.getActions();
+      for (IFilterAction action : actions) {
+        if (LabelNewsAction.ID.equals(action.getActionId()))
+          return true;
+      }
+    }
+
+    return false;
   }
 
   EnumSet<ITypeExporter.Options> getExportOptions() {
