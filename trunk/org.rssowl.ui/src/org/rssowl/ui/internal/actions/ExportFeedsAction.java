@@ -24,66 +24,29 @@
 
 package org.rssowl.ui.internal.actions;
 
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.rssowl.core.persist.IBookMark;
-import org.rssowl.core.persist.IEntity;
-import org.rssowl.core.persist.IFilterAction;
-import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
-import org.rssowl.core.persist.ILabel;
-import org.rssowl.core.persist.IMark;
-import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.INewsBin;
-import org.rssowl.core.persist.ISearch;
-import org.rssowl.core.persist.ISearchCondition;
-import org.rssowl.core.persist.ISearchFilter;
-import org.rssowl.core.persist.ISearchMark;
-import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.service.PersistenceException;
-import org.rssowl.core.util.CoreUtils;
-import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.text.DateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.EnumSet;
-import java.util.List;
+import org.rssowl.ui.internal.dialogs.export.ExportWizard;
 
 /**
- * Export Feeds and also support backup of Labels and Filters.
+ * Opens a Wizard to export {@link IFolderChild} with the option to also
+ * consider Filters, Labels and Preferences.
  *
  * @author bpasero
  */
-public class ExportFeedsAction extends Action implements IWorkbenchWindowActionDelegate {
-  private Shell fShell;
-  private DateFormat fDateFormat = DateFormat.getDateInstance();
-  private boolean fIsBackup;
+public class ExportFeedsAction implements IWorkbenchWindowActionDelegate {
 
-  /**
-   * Default Export Action (no backup).
-   */
-  public ExportFeedsAction() {
-    this(false);
-  }
+  /* Section for Dialogs Settings */
+  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.export.ExportWizard";
 
-  /**
-   * @param isBackup if <code>true</code> will also export Labels and Filters.
-   */
-  public ExportFeedsAction(boolean isBackup) {
-    fIsBackup = isBackup;
-  }
+  private IWorkbenchWindow fWindow;
 
   /*
    * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
@@ -94,304 +57,49 @@ public class ExportFeedsAction extends Action implements IWorkbenchWindowActionD
    * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
    */
   public void init(IWorkbenchWindow window) {
-    fShell = window.getShell();
+    fWindow = window;
   }
 
   /*
    * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
    */
   public void run(IAction action) {
-    run();
-  }
-
-  @Override
-  public void run() {
-    FileDialog dialog = new FileDialog(fShell, SWT.SAVE);
-    dialog.setText("Export all Feeds to OPML");
-    dialog.setFilterExtensions(new String[] { "*.opml", "*.xml", "*.*" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    dialog.setFileName("feeds.opml");
-    dialog.setOverwrite(true);
-    String string = dialog.open();
-    if (string != null) {
-      try {
-        File file = new File(string);
-
-        /* Proceed Exporting */
-        Collection<IFolder> rootFolders = CoreUtils.loadRootFolders();
-        exportToOPML(file, rootFolders);
-      } catch (IOException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
-      }
-    }
+    openWizard(fWindow.getShell());
   }
 
   /**
-   * Public to use from Test
-   *
-   * @param file
-   * @param rootFolders
-   * @throws IOException
-   * @throws PersistenceException
+   * @param shell the {@link Shell} acting as parent of the wizard.
    */
-  public void exportToOPML(File file, Collection<IFolder> rootFolders) throws IOException, PersistenceException {
-    OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), "UTF-8");
-    writer.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-    writer.write("<opml version=\"1.1\" xmlns:rssowl=\"http://www.rssowl.org\">\n");
-    writer.write("<body>\n");
+  public void openWizard(Shell shell) {
+    ExportWizard exportWizard = new ExportWizard();
 
-    /* Export Folders */
-    for (IFolder folder : rootFolders) {
-      String name = escape(folder.getName());
-      writer.write("<outline text=\"" + name + "\" rssowl:isSet=\"true\" " + getIDAttribute(folder) + ">\n");
-      exportToOPML(folder, writer);
-      writer.write("</outline>\n");
-    }
-
-    /* Export Labels */
-    if (fIsBackup) {
-      Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
-      for (ILabel label : labels) {
-        Long id = label.getId();
-        String name = escape(label.getName());
-        String color = label.getColor();
-        int order = label.getOrder();
-
-        writer.write("<rssowl:label id=\"" + id + "\" name=\"" + name + "\" order=\"" + order + "\" color=\"" + color + "\" />\n");
-      }
-    }
-
-    /* Export Filters */
-    if (fIsBackup) {
-      Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
-      for (ISearchFilter filter : filters) {
-        String name = escape(filter.getName());
-        int order = filter.getOrder();
-        boolean isEnabled = filter.isEnabled();
-        boolean matchAllNews = filter.matchAllNews();
-
-        writer.write("<rssowl:searchfilter name=\"" + name + "\" order=\"" + order + "\" enabled=\"" + isEnabled + "\" matchAllNews=\"" + matchAllNews + "\">\n");
-        exportToOPML(filter, writer);
-        writer.write("</rssowl:searchfilter>\n");
-      }
-    }
-
-    writer.write("</body>\n");
-    writer.write("</opml>\n");
-
-    writer.close();
-  }
-
-  private void exportToOPML(ISearchFilter filter, OutputStreamWriter writer) throws IOException {
-
-    /* Export Search if provided */
-    ISearch search = filter.getSearch();
-    if (search != null) {
-      List<ISearchCondition> conditions = search.getSearchConditions();
-      writer.write("<rssowl:search matchAllConditions=\"" + search.matchAllConditions() + "\">\n");
-      for (ISearchCondition condition : conditions) {
-        writer.write("\t<rssowl:searchcondition>\n");
-        writer.write(toXML(condition));
-        writer.write("\t</rssowl:searchcondition>\n");
-      }
-      writer.write("</rssowl:search>\n");
-    }
-
-    /* Export Actions */
-    List<IFilterAction> actions = filter.getActions();
-    for (IFilterAction action : actions) {
-      String actionId = action.getActionId();
-      String data = toString(action.getData());
-
-      if (data != null)
-        writer.write("<rssowl:filteraction id=\"" + actionId + "\" data=\"" + escape(data) + "\" />\n");
-      else
-        writer.write("<rssowl:filteraction id=\"" + actionId + "\" />\n");
-    }
-  }
-
-  private String toString(Object data) {
-    if (data == null)
-      return null;
-
-    if (data instanceof String)
-      return (String) data;
-
-    if (data instanceof Long)
-      return String.valueOf(data);
-
-    if (data instanceof Long[]) {
-      Long[] value = (Long[]) data;
-      StringBuilder builder = new StringBuilder();
-      for (Long val : value) {
-        builder.append(val).append(",");
+    WizardDialog dialog = new WizardDialog(shell, exportWizard) {
+      @Override
+      protected boolean isResizable() {
+        return true;
       }
 
-      if (value.length > 0)
-        builder.delete(builder.length() - 1, builder.length());
+      @Override
+      protected IDialogSettings getDialogBoundsSettings() {
+        IDialogSettings settings = Activator.getDefault().getDialogSettings();
+        IDialogSettings section = settings.getSection(SETTINGS_SECTION);
+        if (section != null)
+          return section;
 
-      return builder.toString();
-    }
-
-    return null;
-  }
-
-  private void exportToOPML(IFolder folder, OutputStreamWriter writer) throws IOException, PersistenceException {
-    List<IMark> marks = folder.getMarks();
-    for (IMark mark : marks) {
-      String name = escape(mark.getName());
-
-      /* Export BookMark */
-      if (mark instanceof IBookMark) {
-        String link = escape(((IBookMark) mark).getFeedLinkReference().getLinkAsText());
-
-        writer.write("<outline text=\"" + name + "\" xmlUrl=\"" + link + "\" " + getIDAttribute(mark) + "/>\n");
+        return settings.addNewSection(SETTINGS_SECTION);
       }
 
-      /* Export SearchMark */
-      else if (mark instanceof ISearchMark) {
-        ISearchMark searchMark = (ISearchMark) mark;
-        List<ISearchCondition> conditions = searchMark.getSearchConditions();
-
-        writer.write("<rssowl:savedsearch name=\"" + name + "\" matchAllConditions=\"" + searchMark.matchAllConditions() + "\" " + getIDAttribute(mark) + ">\n");
-        for (ISearchCondition condition : conditions) {
-          writer.write("\t<rssowl:searchcondition>\n");
-          writer.write(toXML(condition));
-          writer.write("\t</rssowl:searchcondition>\n");
-        }
-        writer.write("</rssowl:savedsearch>\n\n");
+      @Override
+      protected int getDialogBoundsStrategy() {
+        return DIALOG_PERSISTSIZE;
       }
-
-      /* Export Newsbin */
-      else if (mark instanceof INewsBin) {
-        writer.write("<rssowl:newsbin name=\"" + name + "\" " + getIDAttribute(mark) + "/>\n");
-      }
-    }
-
-    /* Export Folders */
-    List<IFolder> childFolders = folder.getFolders();
-    for (IFolder childFolder : childFolders) {
-      String name = escape(childFolder.getName());
-      writer.write("<outline text=\"" + name + "\" " + getIDAttribute(childFolder) + ">\n");
-      exportToOPML(childFolder, writer);
-      writer.write("</outline>\n");
-    }
-  }
-
-  private String getIDAttribute(IFolderChild entity) {
-    return "rssowl:id=\"" + entity.getId() + "\"";
-  }
-
-  private String escape(String str) {
-    str = StringUtils.replaceAll(str, "&", "&amp;");
-    str = StringUtils.replaceAll(str, "<", "&lt;");
-    str = StringUtils.replaceAll(str, ">", "&gt;");
-    str = StringUtils.replaceAll(str, "\"", "&#0034;");
-
-    return str;
-  }
-
-  private String toXML(ISearchCondition condition) {
-    StringBuilder str = new StringBuilder();
-
-    /* Search Specifier */
-    str.append("\t\t<rssowl:searchspecifier id=\"" + condition.getSpecifier().ordinal() + "\" />\n");
-
-    /* Search Condition: Location */
-    if (condition.getValue() instanceof Long[][]) {
-      List<IFolderChild> locations = CoreUtils.toEntities((Long[][]) condition.getValue());
-
-      str.append("\t\t<rssowl:searchvalue type=\"" + condition.getField().getSearchValueType().getId() + "\">\n");
-
-      for (IFolderChild child : locations) {
-        boolean isFolder = (child instanceof IFolder);
-        boolean isNewsbin = (child instanceof INewsBin);
-        str.append("\t\t\t<rssowl:location isBin=\"" + isNewsbin + "\" isFolder=\"" + isFolder + "\" value=\"" + child.getId() + "\" />\n");
-      }
-
-      str.append("\t\t</rssowl:searchvalue>\n");
-    }
-
-    /* Single Value */
-    else if (!EnumSet.class.isAssignableFrom(condition.getValue().getClass()))
-      str.append("\t\t<rssowl:searchvalue value=\"" + getValueString(condition) + "\" type=\"" + condition.getField().getSearchValueType().getId() + "\" />\n");
-
-    /* Multiple Values */
-    else {
-      EnumSet<?> values = ((EnumSet<?>) condition.getValue());
-
-      str.append("\t\t<rssowl:searchvalue type=\"" + condition.getField().getSearchValueType().getId() + "\">\n");
-
-      for (Enum<?> enumValue : values)
-        str.append("\t\t\t<rssowl:newsstate value=\"" + enumValue.ordinal() + "\" />\n");
-
-      str.append("\t\t</rssowl:searchvalue>\n");
-    }
-
-    /* Search Field */
-    str.append("\t\t<rssowl:searchfield name=\"" + getSearchFieldName(condition.getField().getId()) + "\" entity=\"" + condition.getField().getEntityName() + "\" />\n");
-
-    return str.toString();
-  }
-
-  private String getSearchFieldName(int fieldId) {
-    switch (fieldId) {
-      case (IEntity.ALL_FIELDS):
-        return "allFields";
-      case (INews.TITLE):
-        return "title";
-      case (INews.LINK):
-        return "link";
-      case (INews.DESCRIPTION):
-        return "description";
-      case (INews.PUBLISH_DATE):
-        return "publishDate";
-      case (INews.MODIFIED_DATE):
-        return "modifiedDate";
-      case (INews.RECEIVE_DATE):
-        return "receiveDate";
-      case (INews.AUTHOR):
-        return "author";
-      case (INews.COMMENTS):
-        return "comments";
-      case (INews.GUID):
-        return "guid";
-      case (INews.SOURCE):
-        return "source";
-      case (INews.HAS_ATTACHMENTS):
-        return "hasAttachments";
-      case (INews.ATTACHMENTS_CONTENT):
-        return "attachments";
-      case (INews.CATEGORIES):
-        return "categories";
-      case (INews.IS_FLAGGED):
-        return "isFlagged";
-      case (INews.STATE):
-        return "state";
-      case (INews.LABEL):
-        return "label";
-      case (INews.RATING):
-        return "rating";
-      case (INews.FEED):
-        return "feed";
-      case (INews.AGE_IN_DAYS):
-        return "ageInDays";
-      case (INews.LOCATION):
-        return "location";
-      default:
-        return "allFields";
-    }
-  }
-
-  private String getValueString(ISearchCondition condition) {
-    if (condition.getValue() instanceof Date)
-      return fDateFormat.format((Date) condition.getValue());
-
-    return escape(condition.getValue().toString());
+    };
+    dialog.create();
+    dialog.open();
   }
 
   /*
-   * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
-   * org.eclipse.jface.viewers.ISelection)
+   * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction, org.eclipse.jface.viewers.ISelection)
    */
   public void selectionChanged(IAction action, ISelection selection) {}
 }

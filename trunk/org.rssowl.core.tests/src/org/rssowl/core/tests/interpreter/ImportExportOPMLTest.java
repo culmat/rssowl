@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.newsaction.LabelNewsAction;
 import org.rssowl.core.internal.newsaction.MoveNewsAction;
+import org.rssowl.core.interpreter.ITypeExporter.Options;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
@@ -60,7 +61,6 @@ import org.rssowl.core.persist.dao.INewsBinDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
-import org.rssowl.ui.internal.actions.ExportFeedsAction;
 import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 
@@ -122,8 +122,8 @@ public class ImportExportOPMLTest {
     rootFolders.add(fDefaultSet);
     rootFolders.add(fCustomSet);
 
-    new ExportFeedsAction().exportToOPML(fTmpFile, rootFolders);
-    new ExportFeedsAction(true).exportToOPML(fTmpBackupFile, rootFolders);
+    Owl.getInterpreter().exportTo(fTmpFile, rootFolders, null);
+    Owl.getInterpreter().exportTo(fTmpBackupFile, rootFolders, EnumSet.of(Options.EXPORT_FILTERS, Options.EXPORT_LABELS, Options.EXPORT_PREFERENCES));
 
     /* Clear */
     Owl.getPersistenceService().recreateSchema();

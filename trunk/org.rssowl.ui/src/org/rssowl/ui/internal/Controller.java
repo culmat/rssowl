@@ -51,6 +51,7 @@ import org.rssowl.core.connection.UnknownFeedException;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.interpreter.ParserException;
+import org.rssowl.core.interpreter.ITypeExporter.Options;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IEntity;
@@ -88,7 +89,6 @@ import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TaskAdapter;
 import org.rssowl.core.util.URIUtils;
-import org.rssowl.ui.internal.actions.ExportFeedsAction;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyPageWrapper;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
@@ -102,7 +102,6 @@ import org.rssowl.ui.internal.services.SavedSearchService;
 import org.rssowl.ui.internal.util.JobRunner;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -1022,7 +1021,7 @@ public class Controller {
     try {
       Set<IFolder> rootFolders = CoreUtils.loadRootFolders();
       if (!rootFolders.isEmpty()) {
-        new ExportFeedsAction(true).exportToOPML(backupTmpFile, rootFolders);
+        Owl.getInterpreter().exportTo(backupTmpFile, rootFolders, EnumSet.of(Options.EXPORT_FILTERS, Options.EXPORT_LABELS, Options.EXPORT_PREFERENCES));
 
         /* Rename to actual backup in a short op to avoid corrupt data */
         if (!backupTmpFile.renameTo(dailyBackupFile)) {
@@ -1030,9 +1029,7 @@ public class Controller {
           backupTmpFile.renameTo(dailyBackupFile);
         }
       }
-    } catch (PersistenceException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
-    } catch (IOException e) {
+    } catch (InterpreterException e) {
       Activator.getDefault().logError(e.getMessage(), e);
     }
   }

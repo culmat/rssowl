@@ -16,6 +16,7 @@
    <extension-point id="SSLHandler" name="SSL Handler" schema="schema/SSLHandler.exsd"/>
    <extension-point id="DAOService" name="DAO Service" schema="schema/DAOService.exsd"/>
    <extension-point id="NewsAction" name="News Action" schema="schema/NewsAction.exsd"/>
+   <extension-point id="TypeExporter" name="Type Exporter" schema="schema/TypeExporter.exsd"/>
    <extension
          point="org.rssowl.core.PersistenceService">
       <persistenceservice class="org.rssowl.core.internal.persist.service.PersistenceServiceImpl"/>
@@ -83,6 +84,18 @@
       <typeImporter
             class="org.rssowl.core.internal.interpreter.OPMLImporter"
             rootElement="opml"/>
+   </extension>
+   <extension
+         point="org.rssowl.core.TypeExporter">
+      <typeExporter
+            class="org.rssowl.core.internal.interpreter.OPMLExporter">
+         <format
+               name="opml">
+         </format>
+         <format
+               name="xml">
+         </format>
+      </typeExporter>
    </extension>
    <extension
          point="org.rssowl.core.ProtocolHandler">

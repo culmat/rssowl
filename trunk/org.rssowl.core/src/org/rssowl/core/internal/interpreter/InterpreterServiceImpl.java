@@ -39,16 +39,22 @@ import org.rssowl.core.interpreter.IElementHandler;
 import org.rssowl.core.interpreter.IFormatInterpreter;
 import org.rssowl.core.interpreter.IInterpreterService;
 import org.rssowl.core.interpreter.INamespaceHandler;
+import org.rssowl.core.interpreter.ITypeExporter;
 import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.interpreter.IXMLParser;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.interpreter.ParserException;
 import org.rssowl.core.interpreter.UnknownFormatException;
+import org.rssowl.core.interpreter.ITypeExporter.Options;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.util.ExtensionUtils;
 
+import java.io.File;
 import java.io.InputStream;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +87,9 @@ public class InterpreterServiceImpl implements IInterpreterService {
   /* ID for TypeImporter Contributions */
   private static final String TYPEIMPORTER_EXTENSION_POINT = "org.rssowl.core.TypeImporter"; //$NON-NLS-1$
 
+  /* ID for TypeExporter Contributions */
+  private static final String TYPEEXPORTER_EXTENSION_POINT = "org.rssowl.core.TypeExporter"; //$NON-NLS-1$
+
   /* ID for NamespaceHandler Contributions */
   private static final String NSHANDLER_EXTENSION_POINT = "org.rssowl.core.NamespaceHandler"; //$NON-NLS-1$
 
@@ -89,9 +98,11 @@ public class InterpreterServiceImpl implements IInterpreterService {
 
   private volatile Map<String, IFormatInterpreter> fFormatInterpreters;
   private volatile Map<String, ITypeImporter> fTypeImporters;
+  private volatile Map<String, ITypeExporter> fTypeExporters;
   private volatile Map<String, INamespaceHandler> fNamespaceHandlers;
   private volatile Map<String, IElementHandler> fElementHandlers;
   private volatile IXMLParser fXMLParserImpl;
+  private ITypeExporter fDefaultExporter = new OPMLExporter();
 
   /** */
   public InterpreterServiceImpl() {
@@ -99,7 +110,9 @@ public class InterpreterServiceImpl implements IInterpreterService {
   }
 
   /*
-   * @see org.rssowl.core.interpreter.IInterpreterService#interpret(java.io.InputStream, org.rssowl.core.persist.IFeed, java.util.Map)
+   * @see
+   * org.rssowl.core.interpreter.IInterpreterService#interpret(java.io.InputStream
+   * , org.rssowl.core.persist.IFeed, java.util.Map)
    */
   public void interpret(InputStream inS, IFeed feed, Map<Object, Object> properties) throws ParserException, InterpreterException {
     Document document = fXMLParserImpl.parse(inS, properties);
@@ -108,8 +121,9 @@ public class InterpreterServiceImpl implements IInterpreterService {
   }
 
   /*
-   * @see org.rssowl.core.interpreter.IInterpreterService#interpretW3CDocument(org.w3c.dom.Document,
-   * org.rssowl.core.model.persist.IFeed)
+   * @see
+   * org.rssowl.core.interpreter.IInterpreterService#interpretW3CDocument(org
+   * .w3c.dom.Document, org.rssowl.core.model.persist.IFeed)
    */
   public void interpretW3CDocument(org.w3c.dom.Document w3cDocument, IFeed feed) throws InterpreterException {
     DOMBuilder domBuilder = new DOMBuilder();
@@ -119,8 +133,9 @@ public class InterpreterServiceImpl implements IInterpreterService {
   }
 
   /*
-   * @see org.rssowl.core.interpreter.IInterpreterService#interpretJDomDocument(org.jdom.Document,
-   * org.rssowl.core.model.persist.IFeed)
+   * @see
+   * org.rssowl.core.interpreter.IInterpreterService#interpretJDomDocument(org
+   * .jdom.Document, org.rssowl.core.model.persist.IFeed)
    */
   public void interpretJDomDocument(Document document, IFeed feed) throws InterpreterException {
 
@@ -140,9 +155,11 @@ public class InterpreterServiceImpl implements IInterpreterService {
   }
 
   /*
-   * @see org.rssowl.core.interpreter.IInterpreterService#importFrom(java.io.InputStream)
+   * @see
+   * org.rssowl.core.interpreter.IInterpreterService#importFrom(java.io.InputStream
+   * )
    */
-  public List< ? extends IEntity> importFrom(InputStream inS) throws InterpreterException, ParserException {
+  public List<? extends IEntity> importFrom(InputStream inS) throws InterpreterException, ParserException {
     Document document = fXMLParserImpl.parse(inS, null);
 
     /* A Root Element is required */
@@ -161,15 +178,43 @@ public class InterpreterServiceImpl implements IInterpreterService {
   }
 
   /*
-   * @see org.rssowl.core.interpreter.IInterpreterService#getNamespaceHandler(java.lang.String)
+   * @see org.rssowl.core.interpreter.IInterpreterService#exportTo(java.io.File,
+   * java.util.List, java.util.EnumSet)
+   */
+  public void exportTo(File destination, Collection<? extends IFolderChild> elements, EnumSet<Options> options) throws InterpreterException {
+    String fileName = destination.getName();
+    int i = fileName.lastIndexOf(".");
+    if (i != -1 && !fileName.endsWith(".")) {
+      String formatName = fileName.substring(i + 1);
+      ITypeExporter exporter = fTypeExporters.get(formatName);
+      if (exporter != null)
+        exporter.exportTo(destination, elements, options);
+    }
+
+    /* Use Default as Fallback */
+    fDefaultExporter.exportTo(destination, elements, options);
+  }
+
+  /*
+   * @see org.rssowl.core.interpreter.IInterpreterService#getExportFormats()
+   */
+  public Collection<String> getExportFormats() {
+    return fTypeExporters.keySet();
+  }
+
+  /*
+   * @see
+   * org.rssowl.core.interpreter.IInterpreterService#getNamespaceHandler(java
+   * .lang.String)
    */
   public INamespaceHandler getNamespaceHandler(String namespaceUri) {
     return fNamespaceHandlers.get(namespaceUri);
   }
 
   /*
-   * @see org.rssowl.core.interpreter.IInterpreterService#getElementHandler(java.lang.String,
-   * java.lang.String)
+   * @see
+   * org.rssowl.core.interpreter.IInterpreterService#getElementHandler(java.
+   * lang.String, java.lang.String)
    */
   public IElementHandler getElementHandler(String elementName, String rootName) {
     if (fElementHandlers != null)
@@ -207,6 +252,10 @@ public class InterpreterServiceImpl implements IInterpreterService {
     /* Load Type Importers */
     fTypeImporters = new HashMap<String, ITypeImporter>();
     loadTypeImporters();
+
+    /* Load Type Exporters */
+    fTypeExporters = new HashMap<String, ITypeExporter>();
+    loadTypeExporters();
 
     /* Load Namespace Handlers */
     fNamespaceHandlers = new HashMap<String, INamespaceHandler>();
@@ -294,6 +343,30 @@ public class InterpreterServiceImpl implements IInterpreterService {
           continue;
 
         fTypeImporters.put(format, (ITypeImporter) element.createExecutableExtension("class")); //$NON-NLS-1$
+      } catch (InvalidRegistryObjectException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      } catch (CoreException e) {
+        Activator.getDefault().getLog().log(e.getStatus());
+      }
+    }
+  }
+
+  private void loadTypeExporters() {
+    IExtensionRegistry reg = Platform.getExtensionRegistry();
+    IConfigurationElement elements[] = reg.getConfigurationElementsFor(TYPEEXPORTER_EXTENSION_POINT);
+
+    for (IConfigurationElement element : elements) {
+      try {
+        IConfigurationElement[] formats = element.getChildren("format");
+        for (IConfigurationElement format : formats) {
+          String formatName = format.getAttribute("name").toLowerCase();
+
+          /* Let 3d-Party contributions override our contributions */
+          if (fTypeExporters.containsKey(formatName) && element.getNamespaceIdentifier().contains(ExtensionUtils.RSSOWL_NAMESPACE))
+            continue;
+
+          fTypeExporters.put(formatName, (ITypeExporter) element.createExecutableExtension("class")); //$NON-NLS-1$
+        }
       } catch (InvalidRegistryObjectException e) {
         Activator.getDefault().logError(e.getMessage(), e);
       } catch (CoreException e) {
