@@ -99,6 +99,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
   /** Leave for reflection */
   public ManageLabelsPreferencePage() {
     fResources = new LocalResourceManager(JFaceResources.getResources());
+    setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/labels.gif"));
   }
 
   /*

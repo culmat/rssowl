@@ -43,6 +43,7 @@ import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Application;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.WebsiteListDialog;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -71,6 +72,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
   public BrowserPreferencePage() {
     fGlobalScope = Owl.getPreferenceService().getGlobalScope();
     fEclipseScope = Owl.getPreferenceService().getEclipseScope();
+    setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/browser.gif"));
   }
 
   /*
