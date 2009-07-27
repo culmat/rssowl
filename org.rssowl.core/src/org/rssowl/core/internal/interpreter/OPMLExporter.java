@@ -59,6 +59,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
@@ -93,6 +94,19 @@ public class OPMLExporter implements ITypeExporter {
     root.addNamespaceDeclaration(RSSOWL_NS);
     document.setRootElement(root);
 
+    /* Head */
+    Element head = new Element(Tags.HEAD.get());
+    root.addContent(head);
+
+    Element title = new Element(Tags.TITLE.get());
+    title.setText("RSSOwl Subscriptions");
+    head.addContent(title);
+
+    Element dateModified = new Element(Tags.DATE_MODIFIED.get());
+    dateModified.setText(new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z").format(new Date()));
+    head.addContent(dateModified);
+
+    /* Body */
     Element body = new Element(Tags.BODY.get());
     root.addContent(body);
 
