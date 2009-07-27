@@ -80,19 +80,19 @@
                definitionId="org.rssowl.ui.actions.ExportFeeds"
                icon="icons/etool16/export.gif"
                id="org.rssowl.ui.actions.ExportFeeds"
-               label="&amp;Export Feeds..."
+               label="&amp;Export..."
                menubarPath="file/additions"
                style="push"
-               tooltip="Export Feeds to an OPML source"/>
+               tooltip="Export to a OPML file"/>
          <action
                class="org.rssowl.ui.internal.actions.ImportFeedsAction"
                definitionId="org.rssowl.ui.actions.ImportFeeds"
                icon="icons/etool16/import.gif"
                id="org.rssowl.ui.actions.ImportFeeds"
-               label="&amp;Import Feeds..."
+               label="&amp;Import..."
                menubarPath="file/additions"
                style="push"
-               tooltip="Import Feeds from an OPML source"/>
+               tooltip="Import from a OPML file"/>
          <menu
                id="new_sub"
                label="&amp;New"
@@ -626,13 +626,15 @@
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Export Feeds and Settings"
             id="org.rssowl.ui.actions.ExportFeeds"
-            name="Export Feeds">
+            name="Export Feeds and Settings">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Import Feeds and Settings"
             id="org.rssowl.ui.actions.ImportFeeds"
-            name="Import Feeds">
+            name="Import Feeds and Settings">
       </command>
       <command
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
