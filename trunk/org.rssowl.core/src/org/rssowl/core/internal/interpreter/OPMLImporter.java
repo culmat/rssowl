@@ -33,6 +33,7 @@ import org.jdom.Namespace;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.interpreter.OPMLConstants.Attributes;
+import org.rssowl.core.internal.interpreter.OPMLConstants.PropertyType;
 import org.rssowl.core.internal.interpreter.OPMLConstants.Tags;
 import org.rssowl.core.internal.newsaction.CopyNewsAction;
 import org.rssowl.core.internal.newsaction.LabelNewsAction;
@@ -43,7 +44,6 @@ import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.ILabel;
-import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
@@ -58,8 +58,10 @@ import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.IFeedDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 
+import java.io.Serializable;
 import java.net.URI;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -217,19 +219,28 @@ public class OPMLImporter implements ITypeImporter {
     ISearchMark searchmark = Owl.getModelFactory().createSearchMark(null, folder, name);
     searchmark.setMatchAllConditions(matchAllConditions);
 
-    List<?> conditions = savedSearchElement.getChildren(Tags.SEARCH_CONDITION.get(), RSSOWL_NS);
-    for (int i = 0; i < conditions.size(); i++) {
-      try {
-        Element condition = (Element) conditions.get(i);
+    /* Recursively Interpret Children */
+    List<?> children = savedSearchElement.getChildren();
+    for (Iterator<?> iter = children.iterator(); iter.hasNext();) {
+      Element child = (Element) iter.next();
+      String childName = child.getName().toLowerCase();
 
-        ISearchCondition searchCondition = processSearchCondition(condition);
-        if (searchCondition != null)
-          searchmark.addSearchCondition(searchCondition);
-      } catch (NumberFormatException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
-      } catch (ParseException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
+      /* Process Search Condition */
+      if (Tags.SEARCH_CONDITION.get().equals(childName)) {
+        try {
+          ISearchCondition searchCondition = processSearchCondition(child);
+          if (searchCondition != null)
+            searchmark.addSearchCondition(searchCondition);
+        } catch (NumberFormatException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+        } catch (ParseException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+        }
       }
+
+      /* Process Preference */
+      else if (Tags.PREFERENCE.get().equals(childName))
+        processPreference(searchmark, child);
     }
   }
 
@@ -500,13 +511,13 @@ public class OPMLImporter implements ITypeImporter {
       }
     }
 
-    /* In case this Outline Element did not represent a Folder */
-    if (type == null || type instanceof IMark)
+    /* In case this Outline Element did not represent a Entity */
+    if (type == null)
       return;
 
     /* Recursively Interpret Children */
-    List<?> feedChildren = outline.getChildren();
-    for (Iterator<?> iter = feedChildren.iterator(); iter.hasNext();) {
+    List<?> children = outline.getChildren();
+    for (Iterator<?> iter = children.iterator(); iter.hasNext();) {
       Element child = (Element) iter.next();
       String name = child.getName().toLowerCase();
 
@@ -521,7 +532,47 @@ public class OPMLImporter implements ITypeImporter {
       /* Process News Bin */
       else if (Tags.BIN.get().equals(name))
         processNewsBin(child, (IFolder) type);
+
+      /* Process Preference */
+      else if (Tags.PREFERENCE.get().equals(name))
+        processPreference(type, child);
     }
+  }
+
+  private void processPreference(IEntity entity, Element element) {
+    String key = element.getAttributeValue(Attributes.ID.get());
+    String value = element.getAttributeValue(Attributes.VALUE.get());
+    String type = element.getAttributeValue(Attributes.TYPE.get());
+
+    if (StringUtils.isSet(key) && value != null && type != null)
+      entity.setProperty(key, getPropertyValue(value, PropertyType.values()[Integer.parseInt(type)]));
+  }
+
+  private Serializable getPropertyValue(String value, PropertyType type) {
+    switch (type) {
+      case BOOLEAN:
+        return Boolean.valueOf(value);
+
+      case INTEGER:
+        return Integer.valueOf(value);
+
+      case INTEGERS:
+        break;//TODO
+
+      case LONG:
+        return Long.valueOf(value);
+
+      case LONGS:
+        break; //TODO
+
+      case STRING:
+        return value;
+
+      case STRINGS:
+        break;//TODO
+    }
+
+    return value;
   }
 
   private void processLabel(Element labelElement, List<IEntity> importedEntities) {
@@ -552,5 +603,16 @@ public class OPMLImporter implements ITypeImporter {
     /* Assign old ID value */
     if (id != null)
       newsbin.setProperty(ID_KEY, id);
+
+    /* Recursively Interpret Children */
+    List<?> children = newsBinElement.getChildren();
+    for (Iterator<?> iter = children.iterator(); iter.hasNext();) {
+      Element child = (Element) iter.next();
+      String childName = child.getName().toLowerCase();
+
+      /* Process Preference */
+      if (Tags.PREFERENCE.get().equals(childName))
+        processPreference(newsbin, child);
+    }
   }
 }

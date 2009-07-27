@@ -80,4 +80,15 @@ public class OPMLConstants {
       return fName;
     }
   }
+
+  /* List of possible property types */
+  enum PropertyType {
+    BOOLEAN,
+    INTEGER,
+    INTEGERS,
+    LONG,
+    LONGS,
+    STRING,
+    STRINGS
+  }
 }
