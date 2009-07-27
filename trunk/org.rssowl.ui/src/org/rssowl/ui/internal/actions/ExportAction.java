@@ -41,7 +41,7 @@ import org.rssowl.ui.internal.dialogs.export.ExportWizard;
  *
  * @author bpasero
  */
-public class ExportFeedsAction implements IWorkbenchWindowActionDelegate {
+public class ExportAction implements IWorkbenchWindowActionDelegate {
 
   /* Section for Dialogs Settings */
   private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.export.ExportWizard";

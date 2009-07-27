@@ -76,7 +76,7 @@
                style="push">
          </action>
          <action
-               class="org.rssowl.ui.internal.actions.ExportFeedsAction"
+               class="org.rssowl.ui.internal.actions.ExportAction"
                definitionId="org.rssowl.ui.actions.ExportFeeds"
                icon="icons/etool16/export.gif"
                id="org.rssowl.ui.actions.ExportFeeds"
