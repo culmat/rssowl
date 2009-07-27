@@ -52,6 +52,10 @@ public class SelectImportPage extends WizardPage {
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(new GridLayout(1, false));
 
+    //TODO Add "Import Nothing" for first start welcome wizard support
+    //TODO Add input field for OPML file
+    //TODO Allow to select the default OPML file
+
     setControl(container);
   }
 
