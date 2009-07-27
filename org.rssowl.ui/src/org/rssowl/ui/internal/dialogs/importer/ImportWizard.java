@@ -22,49 +22,53 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal.actions;
+package org.rssowl.ui.internal.dialogs.importer;
 
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.JobRunner;
 
 /**
+ * A {@link Wizard} to import bookmarks, saved searches and bins with the option
+ * to also import settings (Labels, Filters, Properties) from OPML.
+ *
  * @author bpasero
  */
-public class ImportFeedsAction extends Action implements IWorkbenchWindowActionDelegate {
-  private Shell fShell;
+public class ImportWizard extends Wizard {
+  private SelectImportPage fSelectImportsPage;
 
   /*
-   * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#dispose()
+   * @see org.eclipse.jface.wizard.Wizard#addPages()
    */
-  public void dispose() {}
-
-  /*
-   * @see org.eclipse.ui.IWorkbenchWindowActionDelegate#init(org.eclipse.ui.IWorkbenchWindow)
-   */
-  public void init(IWorkbenchWindow window) {
-    fShell = window.getShell();
-  }
-
-  /*
-   * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
-   */
-  public void run(IAction action) {
-    run();
-  }
-
   @Override
-  public void run() {
-    FileDialog dialog = new FileDialog(fShell);
+  public void addPages() {
+    setWindowTitle("Import");
+
+    /* Page 1: Import Selection */
+    fSelectImportsPage = new SelectImportPage("TODO");
+    addPage(fSelectImportsPage);
+  }
+
+  /*
+   * @see org.eclipse.jface.wizard.Wizard#canFinish()
+   */
+  @Override
+  public boolean canFinish() {
+    return true;
+  }
+
+  /*
+   * @see org.eclipse.jface.wizard.Wizard#performFinish()
+   */
+  @Override
+  public boolean performFinish() {
+    // TODO Auto-generated method stub
+
+    FileDialog dialog = new FileDialog(getShell());
     dialog.setText("Import Feeds from OPML");
     dialog.setFilterExtensions(new String[] { "*.opml", "*.xml", "*.*" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     String string = dialog.open();
@@ -73,7 +77,7 @@ public class ImportFeedsAction extends Action implements IWorkbenchWindowActionD
         ImportUtils.importFeeds(string);
       } catch (Exception e) {
         Activator.getDefault().logError(e.getMessage(), e);
-        ErrorDialog.openError(fShell, "Error importing Feeds", "RSSOwl was unable to import '" + string + "'", Activator.getDefault().createErrorStatus(e.getMessage(), e));
+        ErrorDialog.openError(getShell(), "Error importing Feeds", "RSSOwl was unable to import '" + string + "'", Activator.getDefault().createErrorStatus(e.getMessage(), e));
       }
 
       /* Force to rerun saved searches */
@@ -83,11 +87,15 @@ public class ImportFeedsAction extends Action implements IWorkbenchWindowActionD
         }
       });
     }
+
+    return true;
   }
 
   /*
-   * @see org.eclipse.ui.IActionDelegate#selectionChanged(org.eclipse.jface.action.IAction,
-   * org.eclipse.jface.viewers.ISelection)
+   * @see org.eclipse.jface.wizard.Wizard#needsProgressMonitor()
    */
-  public void selectionChanged(IAction action, ISelection selection) {}
+  @Override
+  public boolean needsProgressMonitor() {
+    return false;
+  }
 }

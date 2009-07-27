@@ -85,7 +85,7 @@
                style="push"
                tooltip="Export to a OPML file"/>
          <action
-               class="org.rssowl.ui.internal.actions.ImportFeedsAction"
+               class="org.rssowl.ui.internal.actions.ImportAction"
                definitionId="org.rssowl.ui.actions.ImportFeeds"
                icon="icons/etool16/import.gif"
                id="org.rssowl.ui.actions.ImportFeeds"
