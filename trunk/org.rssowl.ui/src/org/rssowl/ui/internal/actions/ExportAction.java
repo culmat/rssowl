@@ -33,7 +33,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.ui.internal.Activator;
-import org.rssowl.ui.internal.dialogs.export.ExportWizard;
+import org.rssowl.ui.internal.dialogs.exporter.ExportWizard;
 
 /**
  * Opens a Wizard to export {@link IFolderChild} with the option to also
