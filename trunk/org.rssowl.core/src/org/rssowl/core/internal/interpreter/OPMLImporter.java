@@ -557,19 +557,29 @@ public class OPMLImporter implements ITypeImporter {
         return Integer.valueOf(value);
 
       case INTEGERS:
-        break;//TODO
+        String[] values = value.split(",");
+        int[] intValues = new int[values.length];
+        for (int i = 0; i < values.length; i++) {
+          intValues[i] = Integer.parseInt(values[i]);
+        }
+        return intValues;
 
       case LONG:
         return Long.valueOf(value);
 
       case LONGS:
-        break; //TODO
+        values = value.split(",");
+        long[] longValues = new long[values.length];
+        for (int i = 0; i < values.length; i++) {
+          longValues[i] = Long.parseLong(values[i]);
+        }
+        return longValues;
 
       case STRING:
         return value;
 
       case STRINGS:
-        break;//TODO
+        return value.split(",");
     }
 
     return value;
