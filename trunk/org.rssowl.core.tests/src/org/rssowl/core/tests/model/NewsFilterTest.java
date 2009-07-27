@@ -282,7 +282,7 @@ public class NewsFilterTest {
     assertEquals(3, bin.getNewsCount(EnumSet.of(INews.State.NEW)));
     for (INews newsitem : binNews) {
       assertEquals(INews.State.NEW, newsitem.getState());
-      assertEquals(bin.getId(), (Long)newsitem.getParentId());
+      assertEquals(bin.getId(), (Long) newsitem.getParentId());
     }
 
   }
@@ -330,9 +330,8 @@ public class NewsFilterTest {
     assertEquals(3, bin.getNewsCount(EnumSet.of(INews.State.NEW)));
     for (INews newsitem : binNews) {
       assertEquals(INews.State.NEW, newsitem.getState());
-      assertEquals(bin.getId(), (Long)newsitem.getParentId());
+      assertEquals(bin.getId(), (Long) newsitem.getParentId());
     }
-
   }
 
   /**
@@ -381,7 +380,7 @@ public class NewsFilterTest {
     assertEquals(3, bin.getNewsCount(EnumSet.of(INews.State.NEW)));
     for (INews newsitem : binNews) {
       assertEquals(INews.State.NEW, newsitem.getState());
-      assertEquals(bin.getId(), (Long)newsitem.getParentId());
+      assertEquals(bin.getId(), (Long) newsitem.getParentId());
       assertEquals(true, newsitem.isFlagged());
     }
 
@@ -1052,6 +1051,48 @@ public class NewsFilterTest {
     }
   }
 
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void test_MoveNewsToInvalidLocation_MatchAll() throws Exception {
+    IBookMark bm = createBookMark("local1");
+    IFeed feed = fFactory.createFeed(null, bm.getFeedLinkReference().getLink());
+
+    INews news1 = createNews(feed, "News1");
+    news1.setState(INews.State.NEW);
+
+    INews news2 = createNews(feed, "News2");
+    news2.setState(INews.State.NEW);
+
+    INews news3 = createNews(feed, "News3");
+    news3.setState(INews.State.NEW);
+
+    INewsBin bin = fFactory.createNewsBin(null, bm.getParent(), "Bin");
+    DynamicDAO.save(bin);
+
+    ISearchFilter filter = fFactory.createSearchFilter(null, null, "All News");
+    filter.setMatchAllNews(true);
+    filter.setEnabled(true);
+
+    IFilterAction action = fFactory.createFilterAction(MOVE_NEWS_ID);
+    action.setData(new Long[] { bin.getId() + 1 });
+    filter.addAction(action);
+
+    DynamicDAO.save(filter);
+
+    fAppService.handleFeedReload(bm, feed, null, false);
+
+    List<INews> news = bm.getFeedLinkReference().resolve().getNews();
+    assertEquals(3, news.size());
+    assertEquals(3, bm.getNewsCount(EnumSet.of(INews.State.NEW)));
+    for (INews newsitem : news) {
+      assertEquals(INews.State.NEW, newsitem.getState());
+    }
+
+    List<INews> binNews = bin.getNews();
+    assertEquals(0, binNews.size());
+  }
 
   private ISearch createStickySearch(boolean sticky) {
     ISearch search = fFactory.createSearch(null);
