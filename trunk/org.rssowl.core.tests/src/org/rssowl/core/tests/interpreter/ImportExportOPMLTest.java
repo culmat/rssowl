@@ -58,6 +58,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
 import org.rssowl.core.persist.dao.INewsBinDAO;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
@@ -97,6 +98,7 @@ public class ImportExportOPMLTest {
   private IFolder fCustomFolder2;
   private INewsBin fNewsBin;
   private ILabel fImportantLabel;
+  private ISearchMark fSearchmark;
 
   /**
    * @throws Exception
@@ -271,12 +273,14 @@ public class ImportExportOPMLTest {
     fDefaultSet = fFactory.createFolder(null, null, "My Bookmarks");
 
     fDefaultFolder1 = fFactory.createFolder(null, fDefaultSet, "Default Folder 1");
+    addProperties(fDefaultFolder1);
 
     fDefaultFolder2 = fFactory.createFolder(null, fDefaultSet, "Default Folder 2");
 
     /* Default > BookMark 1 */
     IFeed feed1 = fFactory.createFeed(null, new URI("feed1"));
     fBookMark1 = fFactory.createBookMark(null, fDefaultSet, new FeedLinkReference(feed1.getLink()), "Bookmark 1");
+    addProperties(fBookMark1);
 
     /* Default > Folder 1 > BookMark 3 */
     IFeed feed3 = fFactory.createFeed(null, new URI("feed3"));
@@ -284,6 +288,29 @@ public class ImportExportOPMLTest {
 
     /* Default > News Bin 1 */
     fNewsBin = fFactory.createNewsBin(null, fDefaultSet, "Bin 1");
+    addProperties(fNewsBin);
+  }
+
+  private void addProperties(IFolderChild child) {
+    IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(child);
+    prefs.putBoolean("boolean", true);
+    prefs.putInteger("integer", 5);
+    prefs.putIntegers("integers", new int[] { -1, 0, 1, 2, 3 });
+    prefs.putLong("long", 8);
+    prefs.putLongs("longs", new long[] { -3, -2, -1, 0, 1, 2, 3 });
+    prefs.putString("string", "hello world");
+    prefs.putStrings("strings", new String[] { "hello", "world", "foo", "bar" });
+  }
+
+  private void assertProperties(IFolderChild child) {
+    IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(child);
+    assertEquals(true, prefs.getBoolean("boolean"));
+    assertEquals(5, prefs.getInteger("integer"));
+    assertTrue(Arrays.equals(new int[] { -1, 0, 1, 2, 3 }, prefs.getIntegers("integers")));
+    assertEquals(8, prefs.getLong("long"));
+    assertTrue(Arrays.equals(new long[] { -3, -2, -1, 0, 1, 2, 3 }, prefs.getLongs("longs")));
+    assertEquals("hello world", prefs.getString("string"));
+    assertTrue(Arrays.equals(new String[] { "hello", "world", "foo", "bar" }, prefs.getStrings("strings")));
   }
 
   private void fillCustomSet() throws URISyntaxException {
@@ -307,16 +334,17 @@ public class ImportExportOPMLTest {
   private void fillSearchMarks(IFolder parent) {
     String newsName = INews.class.getName();
 
-    /* 1) State IS *new* */
+    /* 1) State ISnew */
     {
       ISearchField field = fFactory.createSearchField(INews.STATE, newsName);
       ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, EnumSet.of(State.NEW));
 
-      ISearchMark searchmark = fFactory.createSearchMark(null, parent, "Search");
-      searchmark.addSearchCondition(condition);
+      fSearchmark = fFactory.createSearchMark(null, parent, "Search");
+      fSearchmark.addSearchCondition(condition);
+      addProperties(fSearchmark);
     }
 
-    /* 2) State IS *new* *unread* *updated* */
+    /* 2) State ISnewunreadupdated */
     {
       ISearchField field = fFactory.createSearchField(INews.STATE, newsName);
       ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED));
@@ -376,7 +404,7 @@ public class ImportExportOPMLTest {
     }
 
     /*
-     * 8) Entire News CONTAINS foo?bar AND State IS *new* AND Has Attachments is
+     * 8) Entire News CONTAINS foo?bar AND State ISnew AND Has Attachments is
      * TRUE
      */
     {
@@ -546,6 +574,9 @@ public class ImportExportOPMLTest {
         defaultFolder2 = defaultFolder;
     }
 
+    if (useBackup)
+      assertProperties(defaultFolder1);
+
     assertNotNull(defaultFolder1);
     assertNotNull(defaultFolder2);
 
@@ -574,8 +605,12 @@ public class ImportExportOPMLTest {
         bookmark1 = (IBookMark) mark;
     }
 
+
+
     assertNotNull(bookmark1);
     assertEquals("feed1", bookmark1.getFeedLinkReference().getLink().toString());
+    if (useBackup)
+      assertProperties(bookmark1);
 
     INewsBin bin = null;
     for (IMark mark : defaultMarks) {
@@ -584,6 +619,8 @@ public class ImportExportOPMLTest {
     }
 
     assertNotNull(bin);
+    if (useBackup)
+      assertProperties(bin);
 
     List<IMark> customMarks = customSet.getMarks();
     assertEquals(17, customMarks.size());
@@ -621,10 +658,10 @@ public class ImportExportOPMLTest {
     assertNotNull(bookmark4);
     assertEquals("feed4", bookmark4.getFeedLinkReference().getLink().toString());
 
-    assertSearchMarks(defaultSet);
-    assertSearchMarks(customSet);
-    assertSearchMarks(defaultFolder2);
-    assertSearchMarks(customFolder2);
+    assertSearchMarks(defaultSet, useBackup);
+    assertSearchMarks(customSet, useBackup);
+    assertSearchMarks(defaultFolder2, useBackup);
+    assertSearchMarks(customFolder2, useBackup);
 
     if (useBackup) {
       assertLabels();
@@ -781,7 +818,7 @@ public class ImportExportOPMLTest {
     }
   }
 
-  private void assertSearchMarks(IFolder folder) {
+  private void assertSearchMarks(IFolder folder, boolean isBackup) {
     List<IMark> marks = folder.getMarks();
     List<ISearchMark> searchmarks = new ArrayList<ISearchMark>();
     for (IMark mark : marks) {
@@ -789,7 +826,7 @@ public class ImportExportOPMLTest {
         searchmarks.add((ISearchMark) mark);
     }
 
-    /* 1) State IS *new* */
+    /* 1) State ISnew */
     ISearchMark searchmark = searchmarks.get(0);
     assertEquals("Search", searchmark.getName());
     List<ISearchCondition> conditions = searchmark.getSearchConditions();
@@ -797,8 +834,10 @@ public class ImportExportOPMLTest {
     assertEquals(INews.STATE, conditions.get(0).getField().getId());
     assertEquals(SearchSpecifier.IS, conditions.get(0).getSpecifier());
     assertEquals(EnumSet.of(INews.State.NEW), conditions.get(0).getValue());
+    if (isBackup)
+      assertProperties(searchmark);
 
-    /* 2) State IS *new* *unread* *updated* */
+    /* 2) State ISnewunreadupdated */
     searchmark = searchmarks.get(1);
     conditions = searchmark.getSearchConditions();
     assertEquals(1, conditions.size());
@@ -852,7 +891,7 @@ public class ImportExportOPMLTest {
     assertEquals(true, conditions.get(0).getValue());
 
     /*
-     * 8) Entire News CONTAINS foo?bar AND State IS *new* AND Has Attachments is
+     * 8) Entire News CONTAINS foo?bar AND State ISnew AND Has Attachments is
      * TRUE
      */
     searchmark = searchmarks.get(7);
