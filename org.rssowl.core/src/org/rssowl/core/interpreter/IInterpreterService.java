@@ -25,10 +25,15 @@
 package org.rssowl.core.interpreter;
 
 import org.jdom.Document;
+import org.rssowl.core.interpreter.ITypeExporter.Options;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.IFolderChild;
 
+import java.io.File;
 import java.io.InputStream;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 
@@ -99,6 +104,24 @@ public interface IInterpreterService {
    * @throws ParserException In case of an Error while Parsing.
    */
   List<? extends IEntity> importFrom(InputStream inS) throws InterpreterException, ParserException;
+
+  /**
+   * Perform Export of provided {@link IFolderChild} with {@link Options} to
+   * consider.
+   *
+   * @param destination the destination {@link File} to export to.
+   * @param elements the list of {@link IFolderChild} to export.
+   * @param options a set of {@link Options} for the export.
+   * @throws InterpreterException in case of an exception during export.
+   */
+  void exportTo(File destination, Collection<? extends IFolderChild> elements, EnumSet<Options> options) throws InterpreterException;
+
+  /**
+   * Returns a {@link List} of all formats supported for an export.
+   *
+   * @return a {@link List} of all formats supported for an export.
+   */
+  Collection<String> getExportFormats();
 
   /**
    * Get the Namespace Handler for the given Namespace or NULL if not
