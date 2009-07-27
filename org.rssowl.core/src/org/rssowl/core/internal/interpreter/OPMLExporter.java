@@ -32,6 +32,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.interpreter.OPMLConstants.Attributes;
+import org.rssowl.core.internal.interpreter.OPMLConstants.PropertyType;
 import org.rssowl.core.internal.interpreter.OPMLConstants.Tags;
 import org.rssowl.core.interpreter.ITypeExporter;
 import org.rssowl.core.interpreter.InterpreterException;
@@ -171,11 +172,89 @@ public class OPMLExporter implements ITypeExporter {
         if (StringUtils.isSet(entry.getKey()) && entry.getValue() != null) {
           Element prefElement = new Element(Tags.PREFERENCE.get(), RSSOWL_NS);
           prefElement.setAttribute(Attributes.ID.get(), entry.getKey());
-          prefElement.setAttribute(Attributes.VALUE.get(), entry.getValue().toString());
+          prefElement.setAttribute(Attributes.VALUE.get(), getValueAsString(entry.getValue()));
+          prefElement.setAttribute(Attributes.TYPE.get(), String.valueOf(getPropertyType(entry.getValue()).ordinal()));
           parent.addContent(prefElement);
         }
       }
     }
+  }
+
+  private PropertyType getPropertyType(Object property) {
+    if (property instanceof String)
+      return PropertyType.STRING;
+
+    if (property instanceof Long)
+      return PropertyType.LONG;
+
+    if (property instanceof Integer)
+      return PropertyType.INTEGER;
+
+    if (property instanceof Boolean)
+      return PropertyType.BOOLEAN;
+
+    if (property instanceof long[])
+      return PropertyType.LONGS;
+
+    if (property instanceof int[])
+      return PropertyType.INTEGERS;
+
+    if (property instanceof String[])
+      return PropertyType.STRINGS;
+
+    return PropertyType.STRING;
+  }
+
+  private String getValueAsString(Object property) {
+    if (property instanceof String)
+      return (String) property;
+
+    if (property instanceof Long || property instanceof Integer || property instanceof Boolean)
+      return String.valueOf(property);
+
+    if (property instanceof long[]) {
+      long[] values = (long[]) property;
+
+      StringBuilder builder = new StringBuilder();
+      for (long val : values) {
+        builder.append(val).append(",");
+      }
+
+      if (values.length > 0)
+        builder.delete(builder.length() - 1, builder.length());
+
+      return builder.toString();
+    }
+
+    if (property instanceof int[]) {
+      int[] values = (int[]) property;
+
+      StringBuilder builder = new StringBuilder();
+      for (int val : values) {
+        builder.append(val).append(",");
+      }
+
+      if (values.length > 0)
+        builder.delete(builder.length() - 1, builder.length());
+
+      return builder.toString();
+    }
+
+    if (property instanceof String[]) {
+      String[] values = (String[]) property;
+
+      StringBuilder builder = new StringBuilder();
+      for (String val : values) {
+        builder.append(val).append(",");
+      }
+
+      if (values.length > 0)
+        builder.delete(builder.length() - 1, builder.length());
+
+      return builder.toString();
+    }
+
+    return property.toString();
   }
 
   private void exportMark(Element parent, IMark mark, boolean exportPreferences, DateFormat df) {
