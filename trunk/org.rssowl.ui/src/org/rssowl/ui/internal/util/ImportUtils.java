@@ -218,15 +218,17 @@ public class ImportUtils {
             Object data = action.getData();
             if (data != null && data instanceof Long[]) {
               Long[] oldBinLocations = (Long[]) data;
-              Long[] newBinLocations = new Long[oldBinLocations.length];
+              List<Long> newBinLocations = new ArrayList<Long>(oldBinLocations.length);
 
               for (int i = 0; i < oldBinLocations.length; i++) {
                 Long oldLocation = oldBinLocations[i];
-                IFolderChild location = mapOldIdToFolderChild.get(oldLocation);
-                newBinLocations[i] = location.getId();
+                if (mapOldIdToFolderChild.containsKey(oldLocation)) {
+                  IFolderChild location = mapOldIdToFolderChild.get(oldLocation);
+                  newBinLocations.add(location.getId());
+                }
               }
 
-              action.setData(newBinLocations);
+              action.setData(newBinLocations.toArray(new Long[newBinLocations.size()]));
             }
           }
         }
@@ -304,7 +306,8 @@ public class ImportUtils {
           for (int i = 0; value[CoreUtils.FOLDER] != null && i < value[CoreUtils.FOLDER].length; i++) {
             if (value[CoreUtils.FOLDER][i] != null && value[CoreUtils.FOLDER][i] != 0) {
               Long id = value[CoreUtils.FOLDER][i];
-              newLocations.add(oldIdToFolderChildMap.get(id));
+              if (oldIdToFolderChildMap.containsKey(id))
+                newLocations.add(oldIdToFolderChildMap.get(id));
             }
           }
 
@@ -312,7 +315,8 @@ public class ImportUtils {
           for (int i = 0; value[CoreUtils.BOOKMARK] != null && i < value[CoreUtils.BOOKMARK].length; i++) {
             if (value[CoreUtils.BOOKMARK][i] != null && value[CoreUtils.BOOKMARK][i] != 0) {
               Long id = value[CoreUtils.BOOKMARK][i];
-              newLocations.add(oldIdToFolderChildMap.get(id));
+              if (oldIdToFolderChildMap.containsKey(id))
+                newLocations.add(oldIdToFolderChildMap.get(id));
             }
           }
 
@@ -321,7 +325,8 @@ public class ImportUtils {
             for (int i = 0; value[CoreUtils.NEWSBIN] != null && i < value[CoreUtils.NEWSBIN].length; i++) {
               if (value[CoreUtils.NEWSBIN][i] != null && value[CoreUtils.NEWSBIN][i] != 0) {
                 Long id = value[CoreUtils.NEWSBIN][i];
-                newLocations.add(oldIdToFolderChildMap.get(id));
+                if (oldIdToFolderChildMap.containsKey(id))
+                  newLocations.add(oldIdToFolderChildMap.get(id));
               }
             }
           }
