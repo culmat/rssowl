@@ -281,6 +281,15 @@ public class OwlUI {
   /* Workaround for unknown State Width */
   private static int STATE_WIDTH = -1;
 
+  /** ID of Label News Action */
+  public static final String LABEL_NEWS_ACTION_ID = "org.rssowl.core.LabelNewsAction";
+
+  /** ID of Copy News Action */
+  public static final String COPY_NEWS_ACTION_ID = "org.rssowl.core.CopyNewsAction";
+
+  /** ID of Move News Action */
+  public static final String MOVE_NEWS_ACTION_ID = "org.rssowl.core.MoveNewsAction";
+
   /** An enumeration of Operating System Themes */
   enum OSTheme {
 
