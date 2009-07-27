@@ -42,7 +42,7 @@ public class OPMLConstants {
   enum Tags {
 
     /** Standard OPML */
-    OPML("opml"), OUTLINE("outline"), BODY("body"),
+    OPML("opml"), OUTLINE("outline"), BODY("body"), HEAD("head"), TITLE("title"), DATE_MODIFIED("dateModified"),
 
     /** Custom RSSOwl */
     PREFERENCE("pref"), BIN("newsbin"), SAVED_SEARCH("savedsearch"), LABEL("label"), STATE("newsstate"),
