@@ -267,20 +267,24 @@ public class ImportUtils {
   private static void reparentAndSaveChildren(IFolder from, IFolder to) {
     boolean changed = false;
 
-    /* Reparent all imported folders into selected Set */
-    List<IFolder> folders = from.getFolders();
-    for (IFolder folder : folders) {
-      folder.setParent(to);
-      to.addFolder(folder, null, null);
-      changed = true;
-    }
+    List<IFolderChild> children = from.getChildren();
+    for (IFolderChild child : children) {
 
-    /* Reparent all imported marks into selected Set */
-    List<IMark> marks = from.getMarks();
-    for (IMark mark : marks) {
-      mark.setParent(to);
-      to.addMark(mark, null, null);
-      changed = true;
+      /* Reparent Folder */
+      if (child instanceof IFolder) {
+        IFolder folder = (IFolder) child;
+        folder.setParent(to);
+        to.addFolder(folder, null, null);
+        changed = true;
+      }
+
+      /* Reparent Mark */
+      else if (child instanceof IMark) {
+        IMark mark = (IMark) child;
+        mark.setParent(to);
+        to.addMark(mark, null, null);
+        changed = true;
+      }
     }
 
     /* Save Set */
