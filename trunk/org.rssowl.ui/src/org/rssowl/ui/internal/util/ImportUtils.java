@@ -118,7 +118,8 @@ public class ImportUtils {
 
       /* Reparent and Save */
       reparentAndSaveChildren(defaultContainer, selectedRootFolder);
-      entitiesToReload.addAll(defaultContainer.getChildren());
+      entitiesToReload.addAll(defaultContainer.getMarks());
+      entitiesToReload.addAll(defaultContainer.getFolders());
     }
 
     /* 2.) Handle other Sets */
@@ -146,7 +147,8 @@ public class ImportUtils {
 
         /* Reparent and Save */
         reparentAndSaveChildren(setFolder, existingSetFolder);
-        entitiesToReload.addAll(existingSetFolder.getChildren());
+        entitiesToReload.addAll(existingSetFolder.getMarks());
+        entitiesToReload.addAll(existingSetFolder.getFolders());
       }
 
       /* Otherwise save as new Set */
