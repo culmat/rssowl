@@ -30,9 +30,9 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.interpreter.OPMLConstants.Attributes;
-import org.rssowl.core.internal.interpreter.OPMLConstants.PropertyType;
 import org.rssowl.core.internal.interpreter.OPMLConstants.Tags;
 import org.rssowl.core.interpreter.ITypeExporter;
 import org.rssowl.core.interpreter.InterpreterException;
@@ -50,6 +50,10 @@ import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.pref.IPreferenceType;
+import org.rssowl.core.persist.pref.IPreferences;
+import org.rssowl.core.persist.pref.IPreferenceScope.Kind;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 
@@ -184,39 +188,18 @@ public class OPMLExporter implements ITypeExporter {
       Set<Entry<String, Serializable>> entries = properties.entrySet();
       for (Entry<String, Serializable> entry : entries) {
         if (StringUtils.isSet(entry.getKey()) && entry.getValue() != null) {
-          Element prefElement = new Element(Tags.PREFERENCE.get(), RSSOWL_NS);
-          prefElement.setAttribute(Attributes.ID.get(), entry.getKey());
-          prefElement.setAttribute(Attributes.VALUE.get(), getValueAsString(entry.getValue()));
-          prefElement.setAttribute(Attributes.TYPE.get(), String.valueOf(getPropertyType(entry.getValue()).ordinal()));
-          parent.addContent(prefElement);
+          String value = getValueAsString(entry.getValue());
+
+          if (value != null) {
+            Element prefElement = new Element(Tags.PREFERENCE.get(), RSSOWL_NS);
+            prefElement.setAttribute(Attributes.ID.get(), entry.getKey());
+            prefElement.setAttribute(Attributes.VALUE.get(), value);
+            prefElement.setAttribute(Attributes.TYPE.get(), String.valueOf(IPreferenceType.getType(entry.getValue()).ordinal()));
+            parent.addContent(prefElement);
+          }
         }
       }
     }
-  }
-
-  private PropertyType getPropertyType(Object property) {
-    if (property instanceof String)
-      return PropertyType.STRING;
-
-    if (property instanceof Long)
-      return PropertyType.LONG;
-
-    if (property instanceof Integer)
-      return PropertyType.INTEGER;
-
-    if (property instanceof Boolean)
-      return PropertyType.BOOLEAN;
-
-    if (property instanceof long[])
-      return PropertyType.LONGS;
-
-    if (property instanceof int[])
-      return PropertyType.INTEGERS;
-
-    if (property instanceof String[])
-      return PropertyType.STRINGS;
-
-    return PropertyType.STRING;
   }
 
   private String getValueAsString(Object property) {
@@ -268,7 +251,7 @@ public class OPMLExporter implements ITypeExporter {
       return builder.toString();
     }
 
-    return property.toString();
+    return null;
   }
 
   private void exportMark(Element parent, IMark mark, boolean exportPreferences, DateFormat df) {
@@ -523,7 +506,48 @@ public class OPMLExporter implements ITypeExporter {
     }
   }
 
-  private void exportPreferences(@SuppressWarnings("unused") Element body) {
-  //TODO Implement export of all Eclipse and Global preferences.
+  private void exportPreferences(Element body) {
+    IPreferenceScope globalPreferences = Owl.getPreferenceService().getGlobalScope();
+    IPreferenceScope eclipsePreferences = Owl.getPreferenceService().getEclipseScope();
+
+    IPreferences[] preferences = IPreferences.values();
+    for (IPreferences preference : preferences) {
+      if (preference.getKind() == Kind.ENTITY)
+        continue;
+
+      String value = getValueAsString(preference, globalPreferences, eclipsePreferences);
+      if (value != null) {
+        Element prefElement = new Element(Tags.PREFERENCE.get(), RSSOWL_NS);
+        prefElement.setAttribute(Attributes.ID.get(), preference.id());
+        prefElement.setAttribute(Attributes.VALUE.get(), value);
+        prefElement.setAttribute(Attributes.TYPE.get(), String.valueOf(preference.getType().ordinal()));
+        prefElement.setAttribute(Attributes.KIND.get(), String.valueOf(preference.getKind().ordinal()));
+        body.addContent(prefElement);
+      }
+    }
+  }
+
+  private String getValueAsString(IPreferences preference, IPreferenceScope global, IPreferenceScope eclipse) {
+    IPreferenceScope actualScope = (preference.getKind() == Kind.GLOBAL) ? global : eclipse;
+    String id = preference.id();
+
+    switch (preference.getType()) {
+      case BOOLEAN:
+        return getValueAsString(actualScope.getBoolean(id));
+      case INTEGER:
+        return getValueAsString(actualScope.getInteger(id));
+      case INTEGERS:
+        return getValueAsString(actualScope.getIntegers(id));
+      case LONG:
+        return getValueAsString(actualScope.getLong(id));
+      case LONGS:
+        return getValueAsString(actualScope.getLongs(id));
+      case STRING:
+        return getValueAsString(actualScope.getString(id));
+      case STRINGS:
+        return getValueAsString(actualScope.getStrings(id));
+    }
+
+    return null;
   }
 }

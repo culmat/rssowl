@@ -76,7 +76,7 @@ public class ExportSettingsPage extends WizardPage {
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     ((GridData) infoText.getLayoutData()).widthHint = 200;
     infoText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-    infoText.setText("The following options allow to export some of your settings. You can choose to export Labels, News Filters and Settings for the Elements that are exported. They will get restored when imported into RSSOwl.");
+    infoText.setText("The following options allow to export more than just feeds. You can choose to export Labels, News Filters and Preferences. They will get restored when imported into RSSOwl again.");
 
     /* Labels */
     Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
@@ -116,7 +116,7 @@ public class ExportSettingsPage extends WizardPage {
     /* Properties */
     fExportSettingsCheck = new Button(container, SWT.CHECK);
     fExportSettingsCheck.setImage(OwlUI.getImage(fExportSettingsCheck, "icons/elcl16/preferences.gif"));
-    fExportSettingsCheck.setText("Export Settings of Elements");
+    fExportSettingsCheck.setText("Export Preferences");
     fExportSettingsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     setControl(container);

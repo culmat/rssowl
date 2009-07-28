@@ -37,6 +37,19 @@ package org.rssowl.core.persist.pref;
  */
 public interface IPreferenceScope {
 
+  /** Supported Scopes for Preferences */
+  public enum Kind {
+
+    /** Application Global */
+    GLOBAL,
+
+    /** Eclipse */
+    ECLIPSE,
+
+    /** Entity */
+    ENTITY
+  }
+
   /**
    * Returns the parent scope to lookup Preferences in case the actual scope is
    * missing preference-values.

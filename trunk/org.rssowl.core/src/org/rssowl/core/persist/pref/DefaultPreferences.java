@@ -36,293 +36,293 @@ package org.rssowl.core.persist.pref;
 public class DefaultPreferences implements IPreferencesInitializer {
 
   /** Global: Use Master Password to encrypt passwords to feeds */
-  public static final String USE_MASTER_PASSWORD = "org.rssowl.pref.UseMasterPassword";
+  public static final String USE_MASTER_PASSWORD = IPreferences.USE_MASTER_PASSWORD.id();
 
   /** Global: Use OS Password to encrypt passwords to feeds */
-  public static final String USE_OS_PASSWORD = "org.rssowl.pref.UseOSPassword";
+  public static final String USE_OS_PASSWORD = IPreferences.USE_OS_PASSWORD.id();
 
   /** Global: Mark all news as read on minimize */
-  public static final String MARK_READ_ON_MINIMIZE = "org.rssowl.pref.MarkNewsReadOnMinimize";
+  public static final String MARK_READ_ON_MINIMIZE = IPreferences.MARK_READ_ON_MINIMIZE.id();
 
   /** Global: Mark feed as read when feed changes */
-  public static final String MARK_READ_ON_CHANGE = "org.rssowl.pref.MarkFeedReadOnChange";
+  public static final String MARK_READ_ON_CHANGE = IPreferences.MARK_READ_ON_CHANGE.id();
 
   /** Global: Mark all news as read on tab close */
-  public static final String MARK_READ_ON_TAB_CLOSE = "org.rssowl.pref.MarkNewsReadOnTabClose";
+  public static final String MARK_READ_ON_TAB_CLOSE = IPreferences.MARK_READ_ON_TAB_CLOSE.id();
 
   /** Global: Disable JavaScript */
-  public static final String DISABLE_JAVASCRIPT = "org.rssowl.pref.DisableJavaScript";
+  public static final String DISABLE_JAVASCRIPT = IPreferences.DISABLE_JAVASCRIPT.id();
 
   /** Global: Disable JavaScript Exceptions */
-  public static final String DISABLE_JAVASCRIPT_EXCEPTIONS = "org.rssowl.pref.DisableJavaScriptExceptions";
+  public static final String DISABLE_JAVASCRIPT_EXCEPTIONS = IPreferences.DISABLE_JAVASCRIPT_EXCEPTIONS.id();
 
   /** Global: Use default external browser */
-  public static final String USE_DEFAULT_EXTERNAL_BROWSER = "org.rssowl.pref.UseExternalBrowser";
+  public static final String USE_DEFAULT_EXTERNAL_BROWSER = IPreferences.USE_DEFAULT_EXTERNAL_BROWSER.id();
 
   /** Global: Use custom external browser */
-  public static final String USE_CUSTOM_EXTERNAL_BROWSER = "org.rssowl.pref.UseCustomExternalBrowser";
+  public static final String USE_CUSTOM_EXTERNAL_BROWSER = IPreferences.USE_CUSTOM_EXTERNAL_BROWSER.id();
 
   /** Global: Path to the custom Browser */
-  public static final String CUSTOM_BROWSER_PATH = "org.rssowl.pref.CustomBrowserPath";
+  public static final String CUSTOM_BROWSER_PATH = IPreferences.CUSTOM_BROWSER_PATH.id();
 
   /** Global: Re-Open last opened Browser on Startup */
-  public static final String REOPEN_BROWSER_TABS = "org.rssowl.pref.ReopenBrowserTabs";
+  public static final String REOPEN_BROWSER_TABS = IPreferences.REOPEN_BROWSER_TABS.id();
 
   /** Global: Minimize to the system tray */
-  public static final String TRAY_ON_MINIMIZE = "org.rssowl.pref.UseSystemTray";
+  public static final String TRAY_ON_MINIMIZE = IPreferences.TRAY_ON_MINIMIZE.id();
 
   /** Global: Minimize to the system tray on Shell Close */
-  public static final String TRAY_ON_CLOSE = "org.rssowl.pref.TrayOnExit";
+  public static final String TRAY_ON_CLOSE = IPreferences.TRAY_ON_CLOSE.id();
 
   /** Global: Minimize to the system tray on Application Start */
-  public static final String TRAY_ON_START = "org.rssowl.pref.TrayOnStart";
+  public static final String TRAY_ON_START = IPreferences.TRAY_ON_START.id();
 
   /** Global: Mark Read state */
-  public static final String MARK_READ_STATE = "org.rssowl.pref.MarkReadState";
+  public static final String MARK_READ_STATE = IPreferences.MARK_READ_STATE.id();
 
   /** Global: Mark Read after X seconds */
-  public static final String MARK_READ_IN_MILLIS = "org.rssowl.pref.MarkReadInMillis";
+  public static final String MARK_READ_IN_MILLIS = IPreferences.MARK_READ_IN_MILLIS.id();
 
   /** Retention Policy: Delete News > N (boolean) */
-  public static final String DEL_NEWS_BY_COUNT_STATE = "org.rssowl.pref.DelNewsByCountState";
+  public static final String DEL_NEWS_BY_COUNT_STATE = IPreferences.DEL_NEWS_BY_COUNT_STATE.id();
 
   /** Retention Policy: Delete News > N (int) */
-  public static final String DEL_NEWS_BY_COUNT_VALUE = "org.rssowl.pref.DelNewsByCountValue";
+  public static final String DEL_NEWS_BY_COUNT_VALUE = IPreferences.DEL_NEWS_BY_COUNT_VALUE.id();
 
   /** Retention Policy: Delete News > N Days (boolean) */
-  public static final String DEL_NEWS_BY_AGE_STATE = "org.rssowl.pref.DelNewsByAgeState";
+  public static final String DEL_NEWS_BY_AGE_STATE = IPreferences.DEL_NEWS_BY_AGE_STATE.id();
 
   /** Retention Policy: Delete News > N Days (int) */
-  public static final String DEL_NEWS_BY_AGE_VALUE = "org.rssowl.pref.DelNewsByAgeValue";
+  public static final String DEL_NEWS_BY_AGE_VALUE = IPreferences.DEL_NEWS_BY_AGE_VALUE.id();
 
   /** Retention Policy: Delete read News (boolean) */
-  public static final String DEL_READ_NEWS_STATE = "org.rssowl.pref.DelReadNewsState";
+  public static final String DEL_READ_NEWS_STATE = IPreferences.DEL_READ_NEWS_STATE.id();
 
   /** Retention Policy: Never Delete Unread News (boolean) */
-  public static final String NEVER_DEL_UNREAD_NEWS_STATE = "org.rssowl.pref.NeverDelUnreadNewsState";
+  public static final String NEVER_DEL_UNREAD_NEWS_STATE = IPreferences.NEVER_DEL_UNREAD_NEWS_STATE.id();
 
   /** BookMarks: Visible Columns */
-  public static final String BM_NEWS_COLUMNS = "org.rssowl.pref.BMNewsColumns";
+  public static final String BM_NEWS_COLUMNS = IPreferences.BM_NEWS_COLUMNS.id();
 
   /** BookMarks: Sorted Column */
-  public static final String BM_NEWS_SORT_COLUMN = "org.rssowl.pref.BMNewsSortColumn";
+  public static final String BM_NEWS_SORT_COLUMN = IPreferences.BM_NEWS_SORT_COLUMN.id();
 
   /** BookMarks: Ascended / Descended Sorting */
-  public static final String BM_NEWS_SORT_ASCENDING = "org.rssowl.pref.BMNewsSortAscending";
+  public static final String BM_NEWS_SORT_ASCENDING = IPreferences.BM_NEWS_SORT_ASCENDING.id();
 
   /** BookMarks: Auto-Update Interval (integer) */
-  public static final String BM_UPDATE_INTERVAL = "org.rssowl.pref.BMUpdateInterval";
+  public static final String BM_UPDATE_INTERVAL = IPreferences.BM_UPDATE_INTERVAL.id();
 
   /** BookMarks: Auto-Update Interval State (boolean) */
-  public static final String BM_UPDATE_INTERVAL_STATE = "org.rssowl.pref.BMUpdateIntervalState";
+  public static final String BM_UPDATE_INTERVAL_STATE = IPreferences.BM_UPDATE_INTERVAL_STATE.id();
 
   /** BookMarks: Open on Startup */
-  public static final String BM_OPEN_ON_STARTUP = "org.rssowl.pref.BMOpenOnStartup";
+  public static final String BM_OPEN_ON_STARTUP = IPreferences.BM_OPEN_ON_STARTUP.id();
 
   /** BookMarks: Reload on Startup */
-  public static final String BM_RELOAD_ON_STARTUP = "org.rssowl.pref.BMReloadOnStartup";
+  public static final String BM_RELOAD_ON_STARTUP = IPreferences.BM_RELOAD_ON_STARTUP.id();
 
   /** Feed View: Search Target */
-  public static final String FV_SEARCH_TARGET = "org.rssowl.ui.internal.editors.feed.SearchTarget";
+  public static final String FV_SEARCH_TARGET = IPreferences.FV_SEARCH_TARGET.id();
 
   /** Feed View: Selected Grouping */
-  public static final String FV_GROUP_TYPE = "org.rssowl.ui.internal.editors.feed.GroupType";
+  public static final String FV_GROUP_TYPE = IPreferences.FV_GROUP_TYPE.id();
 
   /** Feed View: Selected Filter */
-  public static final String FV_FILTER_TYPE = "org.rssowl.ui.internal.editors.feed.FilterType";
+  public static final String FV_FILTER_TYPE = IPreferences.FV_FILTER_TYPE.id();
 
   /** Feed View: SashForm Weights */
-  public static final String FV_SASHFORM_WEIGHTS = "org.rssowl.ui.internal.editors.feed.SashFormWeights";
+  public static final String FV_SASHFORM_WEIGHTS = IPreferences.FV_SASHFORM_WEIGHTS.id();
 
   /** Feed View: Layout */
-  public static final String FV_LAYOUT_CLASSIC = "org.rssowl.ui.internal.editors.feed.LayoutVertical";
+  public static final String FV_LAYOUT_CLASSIC = IPreferences.FV_LAYOUT_CLASSIC.id();
 
   /** Feed View: Browser Maximized */
-  public static final String FV_BROWSER_MAXIMIZED = "org.rssowl.ui.internal.editors.feed.BrowserMaximized";
+  public static final String FV_BROWSER_MAXIMIZED = IPreferences.FV_BROWSER_MAXIMIZED.id();
 
   /** Feed View: Highlight Search Results */
-  public static final String FV_HIGHLIGHT_SEARCH_RESULTS = "org.rssowl.ui.internal.editors.feed.HighlightSearchResults";
+  public static final String FV_HIGHLIGHT_SEARCH_RESULTS = IPreferences.FV_HIGHLIGHT_SEARCH_RESULTS.id();
 
   /** BookMark Explorer */
-  public static final String BE_BEGIN_SEARCH_ON_TYPING = "org.rssowl.ui.internal.views.explorer.BeginSearchOnTyping"; //$NON-NLS-1$
+  public static final String BE_BEGIN_SEARCH_ON_TYPING = IPreferences.BE_BEGIN_SEARCH_ON_TYPING.id();
 
   /** BookMark Explorer */
-  public static final String BE_ALWAYS_SHOW_SEARCH = "org.rssowl.ui.internal.views.explorer.AlwaysShowSearch"; //$NON-NLS-1$
+  public static final String BE_ALWAYS_SHOW_SEARCH = IPreferences.BE_ALWAYS_SHOW_SEARCH.id();
 
   /** BookMark Explorer */
-  public static final String BE_SORT_BY_NAME = "org.rssowl.ui.internal.views.explorer.SortByName"; //$NON-NLS-1$
+  public static final String BE_SORT_BY_NAME = IPreferences.BE_SORT_BY_NAME.id();
 
   /** BookMark Explorer */
-  public static final String BE_FILTER_TYPE = "org.rssowl.ui.internal.views.explorer.FilterType"; //$NON-NLS-1$
+  public static final String BE_FILTER_TYPE = IPreferences.BE_FILTER_TYPE.id();
 
   /** BookMark Explorer */
-  public static final String BE_GROUP_TYPE = "org.rssowl.ui.internal.views.explorer.GroupingType"; //$NON-NLS-1$
+  public static final String BE_GROUP_TYPE = IPreferences.BE_GROUP_TYPE.id();
 
   /** BookMark Explorer */
-  public static final String BE_ENABLE_LINKING = "org.rssowl.ui.internal.views.explorer.EnableLinking"; //$NON-NLS-1$
+  public static final String BE_ENABLE_LINKING = IPreferences.BE_ENABLE_LINKING.id();
 
   /** BookMark Explorer */
-  public static final String BE_DISABLE_FAVICONS = "org.rssowl.ui.internal.views.explorer.DisableFavicons"; //$NON-NLS-1$
+  public static final String BE_DISABLE_FAVICONS = IPreferences.BE_DISABLE_FAVICONS.id();
 
   /** BookMark News-Grouping */
-  public static final String BM_NEWS_FILTERING = "org.rssowl.pref.BMNewsFiltering";
+  public static final String BM_NEWS_FILTERING = IPreferences.BM_NEWS_FILTERING.id();
 
   /** BookMark News-Filtering */
-  public static final String BM_NEWS_GROUPING = "org.rssowl.pref.BMNewsGrouping";
+  public static final String BM_NEWS_GROUPING = IPreferences.BM_NEWS_GROUPING.id();
 
   /** BookMark Load Images */
-  public static final String BM_LOAD_IMAGES = "org.rssowl.pref.BMLoadImages";
+  public static final String BM_LOAD_IMAGES = IPreferences.BM_LOAD_IMAGES.id();
 
   /** NewsMark Selected News */
-  public static final String NM_SELECTED_NEWS = "org.rssowl.pref.NMSelectedNews";
+  public static final String NM_SELECTED_NEWS = IPreferences.NM_SELECTED_NEWS.id();
 
   /** Mark: Open Website instead of showing News */
-  public static final String BM_OPEN_SITE_FOR_NEWS = "org.rssowl.pref.BMOpenSiteForNews";
+  public static final String BM_OPEN_SITE_FOR_NEWS = IPreferences.BM_OPEN_SITE_FOR_NEWS.id();
 
   /** Global: Open Website instead of showing News when description is empty */
-  public static final String BM_OPEN_SITE_FOR_EMPTY_NEWS = "org.rssowl.pref.OpenSiteForEmptyNews";
+  public static final String BM_OPEN_SITE_FOR_EMPTY_NEWS = IPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS.id();
 
   /** Global: Show Notification Popup */
-  public static final String SHOW_NOTIFICATION_POPUP = "org.rssowl.pref.ShowNotificationPoup";
+  public static final String SHOW_NOTIFICATION_POPUP = IPreferences.SHOW_NOTIFICATION_POPUP.id();
 
   /** Global: Show Notification Popup only from Tray */
-  public static final String SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED = "org.rssowl.pref.ShowNotificationPoupOnlyWhenMinimized";
+  public static final String SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED = IPreferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED.id();
 
   /** Global: Leave Notification Popup open until closed */
-  public static final String STICKY_NOTIFICATION_POPUP = "org.rssowl.pref.StickyNotificationPoup";
+  public static final String STICKY_NOTIFICATION_POPUP = IPreferences.STICKY_NOTIFICATION_POPUP.id();
 
   /** Global: Auto Close Time */
-  public static final String AUTOCLOSE_NOTIFICATION_VALUE = "org.rssowl.pref.AutoCloseNotificationPoupValue";
+  public static final String AUTOCLOSE_NOTIFICATION_VALUE = IPreferences.AUTOCLOSE_NOTIFICATION_VALUE.id();
 
   /** Global: Limit number of News in notification */
-  public static final String LIMIT_NOTIFICATION_SIZE = "org.rssowl.pref.LimitNotificationPoup";
+  public static final String LIMIT_NOTIFICATION_SIZE = IPreferences.LIMIT_NOTIFICATION_SIZE.id();
 
   /** Global: Limit Notifier to Selected Elements */
-  public static final String LIMIT_NOTIFIER_TO_SELECTION = "org.rssowl.pref.LimitNotifierToSelection";
+  public static final String LIMIT_NOTIFIER_TO_SELECTION = IPreferences.LIMIT_NOTIFIER_TO_SELECTION.id();
 
   /** Global: Close Notifier after clicking on Item */
-  public static final String CLOSE_NOTIFIER_ON_OPEN = "org.rssowl.pref.CloseNotifierOnOpen";
+  public static final String CLOSE_NOTIFIER_ON_OPEN = IPreferences.CLOSE_NOTIFIER_ON_OPEN.id();
 
   /** Global: Enable Notifier for Element */
-  public static final String ENABLE_NOTIFIER = "org.rssowl.pref.EnableNotifier";
+  public static final String ENABLE_NOTIFIER = IPreferences.ENABLE_NOTIFIER.id();
 
   /** Global: Use transparency fade in / fade out */
-  public static final String FADE_NOTIFIER = "org.rssowl.pref.FadeNotifier";
+  public static final String FADE_NOTIFIER = IPreferences.FADE_NOTIFIER.id();
 
   /** Global: Show Description Excerpt in Notifier */
-  public static final String SHOW_EXCERPT_IN_NOTIFIER = "org.rssowl.pref.ShowExcerptInNotifier";
+  public static final String SHOW_EXCERPT_IN_NOTIFIER = IPreferences.SHOW_EXCERPT_IN_NOTIFIER.id();
 
   /** Global: Always reuse feed view */
-  public static final String ALWAYS_REUSE_FEEDVIEW = "org.rssowl.pref.AlwaysReuseFeedView";
+  public static final String ALWAYS_REUSE_FEEDVIEW = IPreferences.ALWAYS_REUSE_FEEDVIEW.id();
 
   /** Global: Always reuse Browser */
-  public static final String ALWAYS_REUSE_BROWSER = "org.rssowl.pref.AlwaysReuseBrowser";
+  public static final String ALWAYS_REUSE_BROWSER = IPreferences.ALWAYS_REUSE_BROWSER.id();
 
   /** Global: Clean Up: Delete BMs by last visit (state) */
-  public static final String CLEAN_UP_BM_BY_LAST_VISIT_STATE = "org.rssowl.pref.CleanUpBMByLastVisitState";
+  public static final String CLEAN_UP_BM_BY_LAST_VISIT_STATE = IPreferences.CLEAN_UP_BM_BY_LAST_VISIT_STATE.id();
 
   /** Global: Clean Up: Delete BMs by last visit (value) */
-  public static final String CLEAN_UP_BM_BY_LAST_VISIT_VALUE = "org.rssowl.pref.CleanUpBMByLastVisitValue";
+  public static final String CLEAN_UP_BM_BY_LAST_VISIT_VALUE = IPreferences.CLEAN_UP_BM_BY_LAST_VISIT_VALUE.id();
 
   /** Global: Clean Up: Delete BMs by last update (state) */
-  public static final String CLEAN_UP_BM_BY_LAST_UPDATE_STATE = "org.rssowl.pref.CleanUpBMByLastUpdateState";
+  public static final String CLEAN_UP_BM_BY_LAST_UPDATE_STATE = IPreferences.CLEAN_UP_BM_BY_LAST_UPDATE_STATE.id();
 
   /** Global: Clean Up: Delete BMs by last update (value) */
-  public static final String CLEAN_UP_BM_BY_LAST_UPDATE_VALUE = "org.rssowl.pref.CleanUpBMByLastUpdateValue";
+  public static final String CLEAN_UP_BM_BY_LAST_UPDATE_VALUE = IPreferences.CLEAN_UP_BM_BY_LAST_UPDATE_VALUE.id();
 
   /** Global: Clean Up: Delete BMs with a connection error */
-  public static final String CLEAN_UP_BM_BY_CON_ERROR = "org.rssowl.pref.CleanUpBMByConError";
+  public static final String CLEAN_UP_BM_BY_CON_ERROR = IPreferences.CLEAN_UP_BM_BY_CON_ERROR.id();
 
   /** Global: Clean Up: Delete duplicate BMs */
-  public static final String CLEAN_UP_BM_BY_DUPLICATES = "org.rssowl.pref.CleanUpBMByDuplicates";
+  public static final String CLEAN_UP_BM_BY_DUPLICATES = IPreferences.CLEAN_UP_BM_BY_DUPLICATES.id();
 
   /** Global: Clean Up: Delete News > N (boolean) */
-  public static final String CLEAN_UP_NEWS_BY_COUNT_STATE = "org.rssowl.pref.CleanUpNewsByCountState";
+  public static final String CLEAN_UP_NEWS_BY_COUNT_STATE = IPreferences.CLEAN_UP_NEWS_BY_COUNT_STATE.id();
 
   /** Global: Clean Up: Delete News > N (int) */
-  public static final String CLEAN_UP_NEWS_BY_COUNT_VALUE = "org.rssowl.pref.CleanUpNewsByCountValue";
+  public static final String CLEAN_UP_NEWS_BY_COUNT_VALUE = IPreferences.CLEAN_UP_NEWS_BY_COUNT_VALUE.id();
 
   /** Global: Clean Up: Delete News > N Days (boolean) */
-  public static final String CLEAN_UP_NEWS_BY_AGE_STATE = "org.rssowl.pref.CleanUpNewsByAgeState";
+  public static final String CLEAN_UP_NEWS_BY_AGE_STATE = IPreferences.CLEAN_UP_NEWS_BY_AGE_STATE.id();
 
   /** Global: Clean Up: Delete News > N Days (int) */
-  public static final String CLEAN_UP_NEWS_BY_AGE_VALUE = "org.rssowl.pref.CleanUpNewsByAgeValue";
+  public static final String CLEAN_UP_NEWS_BY_AGE_VALUE = IPreferences.CLEAN_UP_NEWS_BY_AGE_VALUE.id();
 
   /** Global: Clean Up: Delete read News (boolean) */
-  public static final String CLEAN_UP_READ_NEWS_STATE = "org.rssowl.pref.CleanUpReadNewsState";
+  public static final String CLEAN_UP_READ_NEWS_STATE = IPreferences.CLEAN_UP_READ_NEWS_STATE.id();
 
   /** Global: Clean Up: Never Delete Unread News (boolean) */
-  public static final String CLEAN_UP_NEVER_DEL_UNREAD_NEWS_STATE = "org.rssowl.pref.CleanUpNeverDelUnreadNewsState";
+  public static final String CLEAN_UP_NEVER_DEL_UNREAD_NEWS_STATE = IPreferences.CLEAN_UP_NEVER_DEL_UNREAD_NEWS_STATE.id();
 
   /** Global: Clean Up: The Date of the next reminder for Clean-Up as Long */
-  public static final String CLEAN_UP_REMINDER_DATE_MILLIES = "org.rssowl.pref.CleanUpReminderDateMillies";
+  public static final String CLEAN_UP_REMINDER_DATE_MILLIES = IPreferences.CLEAN_UP_REMINDER_DATE_MILLIES.id();
 
   /** Global: Clean Up: Enabled state for the reminder for Clean-Up */
-  public static final String CLEAN_UP_REMINDER_STATE = "org.rssowl.pref.CleanUpReminderState";
+  public static final String CLEAN_UP_REMINDER_STATE = IPreferences.CLEAN_UP_REMINDER_STATE.id();
 
   /** Global: Clean Up: Number of days before showing the reminder for Clean-Up */
-  public static final String CLEAN_UP_REMINDER_DAYS_VALUE = "org.rssowl.pref.CleanUpReminderDaysValue";
+  public static final String CLEAN_UP_REMINDER_DAYS_VALUE = IPreferences.CLEAN_UP_REMINDER_DAYS_VALUE.id();
 
   /** Global: Search Dialog: State of showing Preview */
-  public static final String SEARCH_DIALOG_PREVIEW_VISIBLE = "org.rssowl.pref.SearchDialogPreviewVisible";
+  public static final String SEARCH_DIALOG_PREVIEW_VISIBLE = IPreferences.SEARCH_DIALOG_PREVIEW_VISIBLE.id();
 
   /** Global: Visible Columns in Search Dialog */
-  public static final String SEARCH_DIALOG_NEWS_COLUMNS = "org.rssowl.pref.SearchDialogNewsColumns";
+  public static final String SEARCH_DIALOG_NEWS_COLUMNS = IPreferences.SEARCH_DIALOG_NEWS_COLUMNS.id();
 
   /** Global: Sorted Column in Search Dialog */
-  public static final String SEARCH_DIALOG_NEWS_SORT_COLUMN = "org.rssowl.pref.SearchDialogNewsSortColumn";
+  public static final String SEARCH_DIALOG_NEWS_SORT_COLUMN = IPreferences.SEARCH_DIALOG_NEWS_SORT_COLUMN.id();
 
   /** Global: Ascended / Descended Sorting in Search Dialog */
-  public static final String SEARCH_DIALOG_NEWS_SORT_ASCENDING = "org.rssowl.pref.SearchDialogNewsSortAscending";
+  public static final String SEARCH_DIALOG_NEWS_SORT_ASCENDING = IPreferences.SEARCH_DIALOG_NEWS_SORT_ASCENDING.id();
 
   /** Global: Show Toolbar */
-  public static final String SHOW_TOOLBAR = "org.rssowl.pref.ShowToolbar";
+  public static final String SHOW_TOOLBAR = IPreferences.SHOW_TOOLBAR.id();
 
   /** Global: Show Statusbar */
-  public static final String SHOW_STATUS = "org.rssowl.pref.ShowStatus";
+  public static final String SHOW_STATUS = IPreferences.SHOW_STATUS.id();
 
   /** Global: Load Title from Feed in Bookmark Wizard */
-  public static final String BM_LOAD_TITLE_FROM_FEED = "org.rssowl.pref.BMLoadTitleFromFeed";
+  public static final String BM_LOAD_TITLE_FROM_FEED = IPreferences.BM_LOAD_TITLE_FROM_FEED.id();
 
   /** Global: Last used Keyword Feed */
-  public static final String LAST_KEYWORD_FEED = "org.rssowl.pref.LastKeywordFeed";
+  public static final String LAST_KEYWORD_FEED = IPreferences.LAST_KEYWORD_FEED.id();
 
   /** Global: Open Browser Tabs in the Background */
-  public static final String OPEN_BROWSER_IN_BACKGROUND = "org.rssowl.pref.OpenBrowserInBackground";
+  public static final String OPEN_BROWSER_IN_BACKGROUND = IPreferences.OPEN_BROWSER_IN_BACKGROUND.id();
 
   /** Global: Share Provider Order and Enablement */
-  public static final String SHARE_PROVIDER_STATE = "org.rssowl.pref.ShareProviderState";
+  public static final String SHARE_PROVIDER_STATE = IPreferences.SHARE_PROVIDER_STATE.id();
 
   /**
    * Eclipse Preferences Follow
    */
 
   /** Global Eclipse: Open on Single Click */
-  public static final String ECLIPSE_SINGLE_CLICK_OPEN = "instance/org.eclipse.ui.workbench/OPEN_ON_SINGLE_CLICK";
+  public static final String ECLIPSE_SINGLE_CLICK_OPEN = IPreferences.ECLIPSE_SINGLE_CLICK_OPEN.id();
 
   /** Global Eclipse: Restore Tabs on startup */
-  public static final String ECLIPSE_RESTORE_TABS = "instance/org.eclipse.ui.workbench/USE_IPERSISTABLE_EDITORS";
+  public static final String ECLIPSE_RESTORE_TABS = IPreferences.ECLIPSE_RESTORE_TABS.id();
 
   /** Global Eclipse: Use multiple Tabs */
-  public static final String ECLIPSE_MULTIPLE_TABS = "instance/org.eclipse.ui/SHOW_MULTIPLE_EDITOR_TABS";
+  public static final String ECLIPSE_MULTIPLE_TABS = IPreferences.ECLIPSE_MULTIPLE_TABS.id();
 
   /** Global Eclipse: Autoclose Tabs */
-  public static final String ECLIPSE_AUTOCLOSE_TABS = "instance/org.eclipse.ui.workbench/REUSE_OPEN_EDITORS_BOOLEAN";
+  public static final String ECLIPSE_AUTOCLOSE_TABS = IPreferences.ECLIPSE_AUTOCLOSE_TABS.id();
 
   /** Global Eclipse: Autoclose Tabs Threshold */
-  public static final String ECLIPSE_AUTOCLOSE_TABS_THRESHOLD = "instance/org.eclipse.ui.workbench/REUSE_OPEN_EDITORS";
+  public static final String ECLIPSE_AUTOCLOSE_TABS_THRESHOLD = IPreferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD.id();
 
   /** Global Eclipse: Use Proxy */
-  public static final String ECLIPSE_USE_PROXY = "/configuration/org.eclipse.core.net/proxiesEnabled";
+  public static final String ECLIPSE_USE_PROXY = IPreferences.ECLIPSE_USE_PROXY.id();
 
   /** Global Eclipse: Use System Proxy */
-  public static final String ECLIPSE_USE_SYSTEM_PROXY = "/configuration/org.eclipse.core.net/systemProxiesEnabled";
+  public static final String ECLIPSE_USE_SYSTEM_PROXY = IPreferences.ECLIPSE_USE_SYSTEM_PROXY.id();
 
   /** Global Eclipse: Proxy Host */
-  public static final String ECLIPSE_PROXY_HOST = "/configuration/org.eclipse.core.net/proxyData/HTTP/host";
+  public static final String ECLIPSE_PROXY_HOST = IPreferences.ECLIPSE_PROXY_HOST.id();
 
   /** Global Eclipse: Proxy Port */
-  public static final String ECLIPSE_PROXY_PORT = "/configuration/org.eclipse.core.net/proxyData/HTTP/port";
+  public static final String ECLIPSE_PROXY_PORT = IPreferences.ECLIPSE_PROXY_PORT.id();
 
   /*
    * @see
@@ -386,7 +386,7 @@ public class DefaultPreferences implements IPreferencesInitializer {
     defaultScope.putIntegers(SEARCH_DIALOG_NEWS_COLUMNS, new int[] { 9, 0, 8, 1, 2, 3, 6 }); //TODO Must be in sync with NewsColumn enum
     defaultScope.putInteger(SEARCH_DIALOG_NEWS_SORT_COLUMN, 9); //TODO Must be in sync with NewsColumn enum
     defaultScope.putBoolean(SEARCH_DIALOG_NEWS_SORT_ASCENDING, false);
-    defaultScope.putIntegers(SHARE_PROVIDER_STATE, new int[] { 1, 2, 3, 4, 5, 6, 7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18  }); //TODO Must be in sync with Share Provider contributions
+    defaultScope.putIntegers(SHARE_PROVIDER_STATE, new int[] { 1, 2, 3, 4, 5, 6, 7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18 }); //TODO Must be in sync with Share Provider contributions
   }
 
   /**
