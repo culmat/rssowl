@@ -24,20 +24,15 @@
 
 package org.rssowl.core.internal.persist.pref;
 
-import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.pref.Preferences;
-import org.rssowl.core.persist.pref.IPreferencesInitializer;
 
 /**
- * An instance of <code>IPreferencesInitializer</code> responsible for defining
- * the default preferences of RSSOwl.
- * <p>
- * Subclasses may override to provide custom settings.
- * </p>
+ * Static access to {@link Preferences}. Held for history reasons due to many
+ * references from org.rssowl.ui bundle.
  *
  * @author bpasero
  */
-public class DefaultPreferences implements IPreferencesInitializer {
+public class DefaultPreferences {
 
   /** Global: Use Master Password to encrypt passwords to feeds */
   public static final String USE_MASTER_PASSWORD = Preferences.USE_MASTER_PASSWORD.id();
@@ -327,150 +322,4 @@ public class DefaultPreferences implements IPreferencesInitializer {
 
   /** Global Eclipse: Proxy Port */
   public static final String ECLIPSE_PROXY_PORT = Preferences.ECLIPSE_PROXY_PORT.id();
-
-  /*
-   * @see
-   * org.rssowl.core.model.preferences.IPreferencesInitializer#initialize(org
-   * .rssowl.core.model.preferences.IPreferencesScope)
-   */
-  public void initialize(IPreferenceScope defaultScope) {
-
-    /* Default Globals */
-    initGlobalDefaults(defaultScope);
-
-    /* Default Eclipse Globals */
-    initGlobalEclipseDefaults(defaultScope);
-
-    /* Default News Column Settings */
-    initNewsColumnsDefaults(defaultScope);
-
-    /* Default Retention Policy */
-    initRetentionDefaults(defaultScope);
-
-    /* Default Clean Up */
-    initCleanUpDefaults(defaultScope);
-
-    /* Default Display Settings */
-    initDisplayDefaults(defaultScope);
-
-    /* Default BookMark Explorer */
-    initBookMarkExplorerDefaults(defaultScope);
-
-    /* Default Feed View */
-    initFeedViewDefaults(defaultScope);
-
-    /* Default Reload/Open Settings */
-    initReloadOpenDefaults(defaultScope);
-  }
-
-  /**
-   * @param defaultScope the container for preferences to fill.
-   */
-  protected void initGlobalDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putBoolean(USE_OS_PASSWORD, true);
-    defaultScope.putBoolean(MARK_READ_ON_MINIMIZE, false);
-    defaultScope.putBoolean(MARK_READ_ON_CHANGE, false);
-    defaultScope.putBoolean(MARK_READ_ON_TAB_CLOSE, false);
-    defaultScope.putBoolean(DISABLE_JAVASCRIPT, true);
-    defaultScope.putBoolean(USE_DEFAULT_EXTERNAL_BROWSER, true);
-    defaultScope.putBoolean(TRAY_ON_MINIMIZE, false);
-    defaultScope.putBoolean(MARK_READ_STATE, true);
-    defaultScope.putInteger(MARK_READ_IN_MILLIS, 0);
-    defaultScope.putBoolean(BM_OPEN_SITE_FOR_EMPTY_NEWS, false);
-    defaultScope.putBoolean(FADE_NOTIFIER, true);
-    defaultScope.putBoolean(CLOSE_NOTIFIER_ON_OPEN, true);
-    defaultScope.putInteger(LIMIT_NOTIFICATION_SIZE, 5);
-    defaultScope.putBoolean(SHOW_NOTIFICATION_POPUP, true);
-    defaultScope.putBoolean(SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED, true);
-    defaultScope.putBoolean(SEARCH_DIALOG_PREVIEW_VISIBLE, true);
-    defaultScope.putInteger(AUTOCLOSE_NOTIFICATION_VALUE, 8);
-    defaultScope.putBoolean(SHOW_TOOLBAR, true);
-    defaultScope.putBoolean(SHOW_STATUS, true);
-    defaultScope.putBoolean(BM_LOAD_TITLE_FROM_FEED, true);
-    defaultScope.putIntegers(SEARCH_DIALOG_NEWS_COLUMNS, new int[] { 9, 0, 8, 1, 2, 3, 6 }); //TODO Must be in sync with NewsColumn enum
-    defaultScope.putInteger(SEARCH_DIALOG_NEWS_SORT_COLUMN, 9); //TODO Must be in sync with NewsColumn enum
-    defaultScope.putBoolean(SEARCH_DIALOG_NEWS_SORT_ASCENDING, false);
-    defaultScope.putIntegers(SHARE_PROVIDER_STATE, new int[] { 1, 2, 3, 4, 5, 6, 7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18 }); //TODO Must be in sync with Share Provider contributions
-  }
-
-  /**
-   * @param defaultScope the container for preferences to fill.
-   */
-  protected void initGlobalEclipseDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putBoolean(ECLIPSE_SINGLE_CLICK_OPEN, true);
-    defaultScope.putBoolean(ECLIPSE_RESTORE_TABS, true);
-    defaultScope.putBoolean(ECLIPSE_MULTIPLE_TABS, true);
-    defaultScope.putInteger(ECLIPSE_AUTOCLOSE_TABS_THRESHOLD, 5);
-  }
-
-  /**
-   * @param defaultScope the container for preferences to fill.
-   */
-  protected void initRetentionDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putBoolean(DEL_NEWS_BY_COUNT_STATE, true);
-    defaultScope.putInteger(DEL_NEWS_BY_COUNT_VALUE, 200);
-    defaultScope.putInteger(DEL_NEWS_BY_AGE_VALUE, 30);
-  }
-
-  /**
-   * @param defaultScope the container for preferences to fill.
-   */
-  protected void initCleanUpDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putBoolean(CLEAN_UP_BM_BY_LAST_UPDATE_STATE, true);
-    defaultScope.putInteger(CLEAN_UP_BM_BY_LAST_UPDATE_VALUE, 30);
-
-    defaultScope.putBoolean(CLEAN_UP_BM_BY_LAST_VISIT_STATE, true);
-    defaultScope.putInteger(CLEAN_UP_BM_BY_LAST_VISIT_VALUE, 30);
-
-    defaultScope.putInteger(CLEAN_UP_NEWS_BY_COUNT_VALUE, 200);
-    defaultScope.putInteger(CLEAN_UP_NEWS_BY_AGE_VALUE, 30);
-
-    defaultScope.putBoolean(CLEAN_UP_REMINDER_STATE, true);
-    defaultScope.putInteger(CLEAN_UP_REMINDER_DAYS_VALUE, 30);
-  }
-
-  /**
-   * @param defaultScope the container for preferences to fill.
-   */
-  protected void initDisplayDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putInteger(BM_NEWS_FILTERING, -1);
-    defaultScope.putInteger(BM_NEWS_GROUPING, -1);
-    defaultScope.putBoolean(BM_LOAD_IMAGES, true);
-  }
-
-  /**
-   * @param defaultScope the container for preferences to fill.
-   */
-  protected void initReloadOpenDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putBoolean(BM_UPDATE_INTERVAL_STATE, true);
-    defaultScope.putLong(BM_UPDATE_INTERVAL, 60 * 30); // 30 Minutes
-    defaultScope.putBoolean(BM_OPEN_ON_STARTUP, false);
-    defaultScope.putBoolean(BM_RELOAD_ON_STARTUP, false);
-  }
-
-  /**
-   * @param defaultScope the container for preferences to fill.
-   */
-  protected void initNewsColumnsDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putIntegers(BM_NEWS_COLUMNS, new int[] { 0, 1, 2, 3, 6 }); //TODO Must be in sync with NewsColumn enum
-    defaultScope.putInteger(BM_NEWS_SORT_COLUMN, 1); //TODO Must be in sync with NewsColumn enum
-    defaultScope.putBoolean(BM_NEWS_SORT_ASCENDING, false);
-  }
-
-  /**
-   * @param defaultScope the container for preferences to fill.
-   */
-  protected void initBookMarkExplorerDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putBoolean(BE_BEGIN_SEARCH_ON_TYPING, true);
-    defaultScope.putBoolean(BE_SORT_BY_NAME, false);
-  }
-
-  /**
-   * @param defaultScope the container for preferences to fill.
-   */
-  protected void initFeedViewDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putBoolean(FV_LAYOUT_CLASSIC, true);
-    defaultScope.putIntegers(FV_SASHFORM_WEIGHTS, new int[] { 50, 50 });
-    defaultScope.putBoolean(BM_OPEN_SITE_FOR_NEWS, false);
-  }
 }
