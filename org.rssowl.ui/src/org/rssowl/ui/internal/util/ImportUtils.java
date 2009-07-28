@@ -27,6 +27,9 @@ package org.rssowl.ui.internal.util;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.InternalOwl;
+import org.rssowl.core.internal.newsaction.CopyNewsAction;
+import org.rssowl.core.internal.newsaction.LabelNewsAction;
+import org.rssowl.core.internal.newsaction.MoveNewsAction;
 import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.interpreter.ParserException;
@@ -211,7 +214,7 @@ public class ImportUtils {
       for (ISearchFilter filter : filters) {
         List<IFilterAction> actions = filter.getActions();
         for (IFilterAction action : actions) {
-          if (OwlUI.MOVE_NEWS_ACTION_ID.equals(action.getActionId()) || OwlUI.COPY_NEWS_ACTION_ID.equals(action.getActionId())) {
+          if (MoveNewsAction.ID.equals(action.getActionId()) || CopyNewsAction.ID.equals(action.getActionId())) {
             Object data = action.getData();
             if (data != null && data instanceof Long[]) {
               Long[] oldBinLocations = (Long[]) data;
@@ -235,7 +238,7 @@ public class ImportUtils {
       for (ISearchFilter filter : filters) {
         List<IFilterAction> actions = filter.getActions();
         for (IFilterAction action : actions) {
-          if (OwlUI.LABEL_NEWS_ACTION_ID.equals(action.getActionId())) {
+          if (LabelNewsAction.ID.equals(action.getActionId())) {
             Object data = action.getData();
             if (data != null && data instanceof Long) {
               ILabel label = mapOldIdToImportedLabel.get(data);
