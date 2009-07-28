@@ -34,6 +34,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.rssowl.core.internal.newsaction.LabelNewsAction;
 import org.rssowl.core.interpreter.ITypeExporter;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.ILabel;
@@ -126,7 +127,7 @@ public class ExportSettingsPage extends WizardPage {
     for (ISearchFilter filter : filters) {
       List<IFilterAction> actions = filter.getActions();
       for (IFilterAction action : actions) {
-        if (OwlUI.LABEL_NEWS_ACTION_ID.equals(action.getActionId()))
+        if (LabelNewsAction.ID.equals(action.getActionId()))
           return true;
       }
     }

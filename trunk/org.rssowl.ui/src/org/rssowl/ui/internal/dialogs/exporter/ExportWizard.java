@@ -28,6 +28,8 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.FileDialog;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.newsaction.CopyNewsAction;
+import org.rssowl.core.internal.newsaction.MoveNewsAction;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.interpreter.ITypeExporter.Options;
 import org.rssowl.core.persist.IFilterAction;
@@ -44,7 +46,6 @@ import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.Activator;
-import org.rssowl.ui.internal.OwlUI;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -210,7 +211,7 @@ public class ExportWizard extends Wizard {
     /* Locations from Actions */
     List<IFilterAction> actions = filter.getActions();
     for (IFilterAction action : actions) {
-      if (OwlUI.MOVE_NEWS_ACTION_ID.equals(action.getActionId()) || OwlUI.COPY_NEWS_ACTION_ID.equals(action.getActionId())) {
+      if (MoveNewsAction.ID.equals(action.getActionId()) || CopyNewsAction.ID.equals(action.getActionId())) {
         Object value = action.getData();
         if (value instanceof Long[]) {
           Long[] binIds = (Long[]) value;

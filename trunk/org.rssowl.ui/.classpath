@@ -7,6 +7,7 @@
 			<accessrule kind="nonaccessible" pattern="java/net/URL"/>
 			<accessrule kind="accessible" pattern="org/rssowl/core/internal/InternalOwl"/>
 			<accessrule kind="accessible" pattern="org/rssowl/core/internal/persist/pref/**"/>
+			<accessrule kind="accessible" pattern="org/rssowl/core/internal/newsaction/**"/>
 			<accessrule kind="discouraged" pattern="**/internal/**"/>
 			<accessrule kind="accessible" pattern="*"/>
 		</accessrules>
