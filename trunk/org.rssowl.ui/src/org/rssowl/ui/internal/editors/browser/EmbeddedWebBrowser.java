@@ -27,7 +27,7 @@ package org.rssowl.ui.internal.editors.browser;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.ui.browser.IWebBrowser;
 import org.rssowl.core.Owl;
-import org.rssowl.core.persist.pref.DefaultPreferences;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.util.BrowserUtils;
 

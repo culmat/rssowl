@@ -57,7 +57,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.actions.ActionFactory;
 import org.rssowl.core.Owl;
-import org.rssowl.core.persist.pref.DefaultPreferences;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
