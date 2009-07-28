@@ -33,7 +33,6 @@ import org.jdom.Namespace;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.interpreter.OPMLConstants.Attributes;
-import org.rssowl.core.internal.interpreter.OPMLConstants.PropertyType;
 import org.rssowl.core.internal.interpreter.OPMLConstants.Tags;
 import org.rssowl.core.internal.newsaction.CopyNewsAction;
 import org.rssowl.core.internal.newsaction.LabelNewsAction;
@@ -56,6 +55,9 @@ import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.IFeedDAO;
+import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.pref.IPreferenceType;
+import org.rssowl.core.persist.pref.IPreferenceScope.Kind;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.util.StringUtils;
@@ -105,6 +107,9 @@ public class OPMLImporter implements ITypeImporter {
     List<IEntity> importedEntities = new ArrayList<IEntity>();
     importedEntities.add(defaultRootFolder);
 
+    IPreferenceScope globalPreferences = Owl.getPreferenceService().getGlobalScope();
+    IPreferenceScope eclipsePreferences = Owl.getPreferenceService().getEclipseScope();
+
     /* Interpret Children */
     List<?> feedChildren = body.getChildren();
     for (Iterator<?> iter = feedChildren.iterator(); iter.hasNext();) {
@@ -130,6 +135,10 @@ public class OPMLImporter implements ITypeImporter {
       /* Process News Filter */
       else if (Tags.FILTER.get().equals(name))
         processFilter(child, importedEntities);
+
+      /* Process Global/Eclipse Preferences */
+      else if (Tags.PREFERENCE.get().equals(name))
+        processPreference(child, globalPreferences, eclipsePreferences);
     }
 
     return importedEntities;
@@ -539,52 +548,6 @@ public class OPMLImporter implements ITypeImporter {
     }
   }
 
-  private void processPreference(IEntity entity, Element element) {
-    String key = element.getAttributeValue(Attributes.ID.get());
-    String value = element.getAttributeValue(Attributes.VALUE.get());
-    String type = element.getAttributeValue(Attributes.TYPE.get());
-
-    if (StringUtils.isSet(key) && value != null && type != null)
-      entity.setProperty(key, getPropertyValue(value, PropertyType.values()[Integer.parseInt(type)]));
-  }
-
-  private Serializable getPropertyValue(String value, PropertyType type) {
-    switch (type) {
-      case BOOLEAN:
-        return Boolean.valueOf(value);
-
-      case INTEGER:
-        return Integer.valueOf(value);
-
-      case INTEGERS:
-        String[] values = value.split(",");
-        int[] intValues = new int[values.length];
-        for (int i = 0; i < values.length; i++) {
-          intValues[i] = Integer.parseInt(values[i]);
-        }
-        return intValues;
-
-      case LONG:
-        return Long.valueOf(value);
-
-      case LONGS:
-        values = value.split(",");
-        long[] longValues = new long[values.length];
-        for (int i = 0; i < values.length; i++) {
-          longValues[i] = Long.parseLong(values[i]);
-        }
-        return longValues;
-
-      case STRING:
-        return value;
-
-      case STRINGS:
-        return value.split(",");
-    }
-
-    return value;
-  }
-
   private void processLabel(Element labelElement, List<IEntity> importedEntities) {
     String id = labelElement.getAttributeValue(Attributes.ID.get());
     String name = labelElement.getAttributeValue(Attributes.NAME.get());
@@ -623,6 +586,89 @@ public class OPMLImporter implements ITypeImporter {
       /* Process Preference */
       if (Tags.PREFERENCE.get().equals(childName))
         processPreference(newsbin, child);
+    }
+  }
+
+  private void processPreference(IEntity entity, Element element) {
+    String key = element.getAttributeValue(Attributes.ID.get());
+    String value = element.getAttributeValue(Attributes.VALUE.get());
+    String type = element.getAttributeValue(Attributes.TYPE.get());
+
+    if (StringUtils.isSet(key) && value != null && type != null)
+      entity.setProperty(key, getPropertyValue(value, IPreferenceType.values()[Integer.parseInt(type)]));
+  }
+
+  private Serializable getPropertyValue(String value, IPreferenceType type) {
+    switch (type) {
+      case BOOLEAN:
+        return Boolean.valueOf(value);
+
+      case INTEGER:
+        return Integer.valueOf(value);
+
+      case INTEGERS:
+        String[] values = value.split(",");
+        int[] intValues = new int[values.length];
+        for (int i = 0; i < values.length; i++) {
+          intValues[i] = Integer.parseInt(values[i]);
+        }
+        return intValues;
+
+      case LONG:
+        return Long.valueOf(value);
+
+      case LONGS:
+        values = value.split(",");
+        long[] longValues = new long[values.length];
+        for (int i = 0; i < values.length; i++) {
+          longValues[i] = Long.parseLong(values[i]);
+        }
+        return longValues;
+
+      case STRING:
+        return value;
+
+      case STRINGS:
+        return value.split(",");
+    }
+
+    return value;
+  }
+
+  private void processPreference(Element element, IPreferenceScope globalPreferences, IPreferenceScope eclipsePreferences) {
+    String key = element.getAttributeValue(Attributes.ID.get());
+    String value = element.getAttributeValue(Attributes.VALUE.get());
+    String typeVal = element.getAttributeValue(Attributes.TYPE.get());
+    String kindVal = element.getAttributeValue(Attributes.KIND.get());
+
+    if (StringUtils.isSet(key) && value != null && typeVal != null && kindVal != null) {
+      IPreferenceScope.Kind kind = IPreferenceScope.Kind.values()[Integer.parseInt(kindVal)];
+      IPreferenceType type = IPreferenceType.values()[Integer.parseInt(typeVal)];
+
+      IPreferenceScope actualScope = (kind == Kind.GLOBAL) ? globalPreferences : eclipsePreferences;
+      switch (type) {
+        case BOOLEAN:
+          actualScope.putBoolean(key, Boolean.parseBoolean(value));
+          break;
+        case INTEGER:
+          actualScope.putInteger(key, Integer.parseInt(value));
+          break;
+        case INTEGERS:
+          actualScope.putIntegers(key, (int[]) getPropertyValue(value, type));
+          break;
+        case LONG:
+          actualScope.putLong(key, Long.parseLong(value));
+          break;
+        case LONGS:
+          actualScope.putLongs(key, (long[]) getPropertyValue(value, type));
+          break;
+        case STRING:
+          actualScope.putString(key, value);
+          break;
+        case STRINGS:
+          actualScope.putStrings(key, (String[]) getPropertyValue(value, type));
+          break;
+      }
     }
   }
 }

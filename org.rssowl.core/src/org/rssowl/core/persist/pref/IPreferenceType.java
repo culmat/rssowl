@@ -22,62 +22,63 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.internal.interpreter;
-
-import org.jdom.Namespace;
+package org.rssowl.core.persist.pref;
 
 /**
- * Common constants being used from {@link OPMLImporter} and
- * {@link OPMLExporter}
+ * An enumeration listing the supported data types of preferences stored via
+ * {@link IPreferenceScope}.
  *
  * @author bpasero
  */
-@SuppressWarnings("all")
-public class OPMLConstants {
+public enum IPreferenceType {
 
-  /* The namespace RSSOwl is using */
-  static final Namespace RSSOWL_NS = Namespace.getNamespace("rssowl", "http://www.rssowl.org");
+  /** Datatype: Boolean */
+  BOOLEAN,
 
-  /* List of Elements to use for the XML */
-  enum Tags {
+  /** Datatype: Integer */
+  INTEGER,
 
-    /** Standard OPML */
-    OPML("opml"), OUTLINE("outline"), BODY("body"), HEAD("head"), TITLE("title"), DATE_MODIFIED("dateModified"),
+  /** Datatype: int[] */
+  INTEGERS,
 
-    /** Custom RSSOwl */
-    PREFERENCE("pref"), BIN("newsbin"), SAVED_SEARCH("savedsearch"), LABEL("label"), STATE("newsstate"),
-    SPECIFIER("searchspecifier"), LOCATION("location"), SEARCH_VALUE("searchvalue"), SEARCH_FIELD("searchfield"),
-    FILTER("searchfilter"), SEARCH("search"), SEARCH_CONDITION("searchcondition"), ACTION("filteraction");
+  /** Datatype: Long */
+  LONG,
 
-    private String fName;
+  /** Datatype: long[] */
+  LONGS,
 
-    Tags(String name) {
-      fName = name;
-    }
+  /** Datatype: String */
+  STRING,
 
-    String get() {
-      return fName;
-    }
-  }
+  /** Datatype: String[] */
+  STRINGS;
 
-  /* List of Attributes to use for the XML */
-  enum Attributes {
+  /**
+   * @param obj the object to infere the {@link IPreferenceType} from.
+   * @return the infered {@link IPreferenceType} from the given object.
+   */
+  public static IPreferenceType getType(Object obj) {
+    if (obj instanceof String)
+      return STRING;
 
-    /** Standard OPML */
-    VERSION("version"), ID("id"), XML_URL("xmlUrl"), TEXT("text"), TITLE("title"), HTML_URL("htmlUrl"), DESCRIPTION("description"),
+    if (obj instanceof Long)
+      return LONG;
 
-    /** Custom RSSOwl */
-    IS_SET("isSet"), TYPE("type"), VALUE("value"), DATA("data"), NAME("name"), IS_BIN("isBin"), IS_FOLDER("isFolder"), KIND("kind"),
-    ENTITY("entity"), ORDER("order"), COLOR("color"), ENABLED("enabled"), MATCH_ALL_NEWS("matchAllNews"), MATCH_ALL_CONDITIONS("matchAllConditions");
+    if (obj instanceof Integer)
+      return INTEGER;
 
-    private String fName;
+    if (obj instanceof Boolean)
+      return BOOLEAN;
 
-    Attributes(String name) {
-      fName = name;
-    }
+    if (obj instanceof long[])
+      return LONGS;
 
-    String get() {
-      return fName;
-    }
+    if (obj instanceof int[])
+      return INTEGERS;
+
+    if (obj instanceof String[])
+      return STRINGS;
+
+    return STRING;
   }
 }
