@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.notifier;
 
 import org.eclipse.swt.graphics.RGB;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.ISearchCondition;
@@ -37,7 +38,6 @@ import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.event.SearchMarkAdapter;
 import org.rssowl.core.persist.event.SearchMarkEvent;
 import org.rssowl.core.persist.event.SearchMarkListener;
-import org.rssowl.core.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.BatchedBuffer;

@@ -116,7 +116,7 @@
    <extension
          point="org.rssowl.core.PreferencesInitializer">
       <preferencesInitializer
-            class="org.rssowl.core.persist.pref.DefaultPreferences">
+            class="org.rssowl.core.internal.persist.pref.DefaultPreferences">
       </preferencesInitializer>
    </extension>
    <extension

@@ -22,7 +22,11 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.persist.pref;
+package org.rssowl.core.internal.persist.pref;
+
+import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.pref.IPreferences;
+import org.rssowl.core.persist.pref.IPreferencesInitializer;
 
 /**
  * An instance of <code>IPreferencesInitializer</code> responsible for defining
