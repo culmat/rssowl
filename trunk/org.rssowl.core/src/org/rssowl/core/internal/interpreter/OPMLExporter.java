@@ -52,7 +52,7 @@ import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.pref.IPreferenceType;
-import org.rssowl.core.persist.pref.IPreferences;
+import org.rssowl.core.persist.pref.Preferences;
 import org.rssowl.core.persist.pref.IPreferenceScope.Kind;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
@@ -510,8 +510,8 @@ public class OPMLExporter implements ITypeExporter {
     IPreferenceScope globalPreferences = Owl.getPreferenceService().getGlobalScope();
     IPreferenceScope eclipsePreferences = Owl.getPreferenceService().getEclipseScope();
 
-    IPreferences[] preferences = IPreferences.values();
-    for (IPreferences preference : preferences) {
+    Preferences[] preferences = Preferences.values();
+    for (Preferences preference : preferences) {
       if (preference.getKind() == Kind.ENTITY)
         continue;
 
@@ -527,7 +527,7 @@ public class OPMLExporter implements ITypeExporter {
     }
   }
 
-  private String getValueAsString(IPreferences preference, IPreferenceScope global, IPreferenceScope eclipse) {
+  private String getValueAsString(Preferences preference, IPreferenceScope global, IPreferenceScope eclipse) {
     IPreferenceScope actualScope = (preference.getKind() == Kind.GLOBAL) ? global : eclipse;
     String id = preference.id();
 
