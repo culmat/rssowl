@@ -982,10 +982,10 @@ public class Controller {
 
     /* Backup Subscriptions as OPML if no error */
     else {
-      SafeRunner.run(new LoggingSafeRunnable() {
-        public void run() throws Exception {
-          JobRunner.runDelayedInBackgroundThread(new Runnable() {
-            public void run() {
+      JobRunner.runDelayedInBackgroundThread(new Runnable() {
+        public void run() {
+          SafeRunner.run(new LoggingSafeRunnable() {
+            public void run() throws Exception {
               if (!fShuttingDown)
                 backupSubscriptions();
             }
