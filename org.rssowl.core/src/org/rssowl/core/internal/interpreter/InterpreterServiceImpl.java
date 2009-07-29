@@ -117,7 +117,8 @@ public class InterpreterServiceImpl implements IInterpreterService {
   public void interpret(InputStream inS, IFeed feed, Map<Object, Object> properties) throws ParserException, InterpreterException {
     Document document = fXMLParserImpl.parse(inS, properties);
 
-    interpretJDomDocument(document, feed);
+    if (document != null)
+      interpretJDomDocument(document, feed);
   }
 
   /*
@@ -129,7 +130,8 @@ public class InterpreterServiceImpl implements IInterpreterService {
     DOMBuilder domBuilder = new DOMBuilder();
     Document jDomDocument = domBuilder.build(w3cDocument);
 
-    interpretJDomDocument(jDomDocument, feed);
+    if (jDomDocument != null)
+      interpretJDomDocument(jDomDocument, feed);
   }
 
   /*
