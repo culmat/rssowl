@@ -579,22 +579,40 @@ public class ImportExportOPMLTest {
     /* Validate */
     Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
 
-    assertEquals(1, rootFolders.size());
-    List<IFolderChild> children = rootFolders.iterator().next().getChildren();
+    assertEquals(2, rootFolders.size());
 
-    int countBookmarks = 0;
-    int countBins = 0;
+    IFolder defaultSet = null;
+    IFolder customSet = null;
+    for (IFolder rootFolder : rootFolders) {
+      if (rootFolder.getName().equals("My Bookmarks"))
+        defaultSet = rootFolder;
+      else if (rootFolder.getName().equals("Custom"))
+        customSet = rootFolder;
+    }
+
+    assertNotNull(defaultSet);
+    assertNotNull(customSet);
+
+    assertEquals(2, defaultSet.getChildren().size());
+    assertEquals(1, customSet.getChildren().size());
+
+    List<IFolderChild> children = defaultSet.getChildren();
     for (IFolderChild child : children) {
       if (child instanceof IBookMark)
-        countBookmarks++;
+        assertEquals("Bookmark 1", child.getName());
       else if (child instanceof INewsBin)
-        countBins++;
+        assertEquals("Bin 1", child.getName());
       else
         fail();
     }
 
-    assertEquals(2, countBookmarks);
-    assertEquals(1, countBins);
+    children = customSet.getChildren();
+    for (IFolderChild child : children) {
+      if (child instanceof IBookMark)
+        assertEquals("Bookmark 2", child.getName());
+      else
+        fail();
+    }
   }
 
   /**
@@ -610,8 +628,26 @@ public class ImportExportOPMLTest {
     /* Validate */
     Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
 
-    assertEquals(1, rootFolders.size());
-    List<IFolderChild> children = rootFolders.iterator().next().getChildren();
+    IFolder defaultSet = null;
+    IFolder customSet = null;
+    for (IFolder rootFolder : rootFolders) {
+      if (rootFolder.getName().equals("My Bookmarks"))
+        defaultSet = rootFolder;
+      else if (rootFolder.getName().equals("Custom"))
+        customSet = rootFolder;
+    }
+
+    assertNotNull(defaultSet);
+    assertNotNull(customSet);
+
+    List<IFolderChild> children = customSet.getChildren();
+
+    assertEquals(1, children.size());
+    assertTrue(children.get(0) instanceof IFolder);
+    assertEquals("Custom Folder 2", children.get(0).getName());
+
+    IFolder customFolder2 = (IFolder) children.get(0);
+    children = customFolder2.getChildren();
 
     assertEquals(1, children.size());
     assertTrue(children.get(0) instanceof ISearchMark);
