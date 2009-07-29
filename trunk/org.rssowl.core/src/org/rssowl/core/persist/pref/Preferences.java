@@ -314,11 +314,35 @@ public enum Preferences {
   /** Global Eclipse: Use System Proxy */
   ECLIPSE_USE_SYSTEM_PROXY("/configuration/org.eclipse.core.net/systemProxiesEnabled", IPreferenceType.BOOLEAN, IPreferenceScope.Kind.ECLIPSE),
 
-  /** Global Eclipse: Proxy Host */
-  ECLIPSE_PROXY_HOST("/configuration/org.eclipse.core.net/proxyData/HTTP/host", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE),
+  /** Global Eclipse: Proxy Host (HTTP) */
+  ECLIPSE_PROXY_HOST_HTTP("/configuration/org.eclipse.core.net/proxyData/HTTP/host", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE),
 
-  /** Global Eclipse: Proxy Port */
-  ECLIPSE_PROXY_PORT("/configuration/org.eclipse.core.net/proxyData/HTTP/port", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE);
+  /** Global Eclipse: Proxy Port (HTTP) */
+  ECLIPSE_PROXY_PORT_HTTP("/configuration/org.eclipse.core.net/proxyData/HTTP/port", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE),
+
+  /** Global Eclipse: Proxy Authentication (HTTP) */
+  ECLIPSE_PROXY_HTTP_HAS_AUTH("/configuration/org.eclipse.core.net/proxyData/HTTP/hasAuth", IPreferenceType.BOOLEAN, IPreferenceScope.Kind.ECLIPSE),
+
+  /** Global Eclipse: Proxy Host (HTTPS) */
+  ECLIPSE_PROXY_HOST_HTTPS("/configuration/org.eclipse.core.net/proxyData/HTTPS/host", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE),
+
+  /** Global Eclipse: Proxy Port (HTTPS) */
+  ECLIPSE_PROXY_PORT_HTTPS("/configuration/org.eclipse.core.net/proxyData/HTTPS/port", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE),
+
+  /** Global Eclipse: Proxy Authentication (HTTPS) */
+  ECLIPSE_PROXY_HTTPS_HAS_AUTH("/configuration/org.eclipse.core.net/proxyData/HTTPS/hasAuth", IPreferenceType.BOOLEAN, IPreferenceScope.Kind.ECLIPSE),
+
+  /** Global Eclipse: Proxy Host (SOCKS) */
+  ECLIPSE_PROXY_HOST_SOCKS("/configuration/org.eclipse.core.net/proxyData/SOCKS/host", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE),
+
+  /** Global Eclipse: Proxy Port (SOCKS) */
+  ECLIPSE_PROXY_PORT_SOCKS("/configuration/org.eclipse.core.net/proxyData/SOCKS/port", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE),
+
+  /** Global Eclipse: Proxy Authentication (SOCKS) */
+  ECLIPSE_PROXY_SOCKS_HAS_AUTH("/configuration/org.eclipse.core.net/proxyData/SOCKS/hasAuth", IPreferenceType.BOOLEAN, IPreferenceScope.Kind.ECLIPSE),
+
+  /** Global Eclipse: Non Proxied Hosts */
+  ECLIPSE_NON_PROXIED_HOSTS("/configuration/org.eclipse.core.net/nonProxiedHosts", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE);
 
   private String fId;
   private IPreferenceType fType;

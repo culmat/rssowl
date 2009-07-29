@@ -318,8 +318,8 @@ public class DefaultPreferences {
   public static final String ECLIPSE_USE_SYSTEM_PROXY = Preferences.ECLIPSE_USE_SYSTEM_PROXY.id();
 
   /** Global Eclipse: Proxy Host */
-  public static final String ECLIPSE_PROXY_HOST = Preferences.ECLIPSE_PROXY_HOST.id();
+  public static final String ECLIPSE_PROXY_HOST = Preferences.ECLIPSE_PROXY_HOST_HTTP.id();
 
   /** Global Eclipse: Proxy Port */
-  public static final String ECLIPSE_PROXY_PORT = Preferences.ECLIPSE_PROXY_PORT.id();
+  public static final String ECLIPSE_PROXY_PORT = Preferences.ECLIPSE_PROXY_PORT_HTTP.id();
 }
