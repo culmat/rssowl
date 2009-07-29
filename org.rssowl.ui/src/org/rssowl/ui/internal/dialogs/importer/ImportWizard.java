@@ -49,16 +49,8 @@ public class ImportWizard extends Wizard {
     setWindowTitle("Import");
 
     /* Page 1: Import Selection */
-    fSelectImportsPage = new SelectImportPage("TODO");
+    fSelectImportsPage = new SelectImportPage("Choose Source");
     addPage(fSelectImportsPage);
-  }
-
-  /*
-   * @see org.eclipse.jface.wizard.Wizard#canFinish()
-   */
-  @Override
-  public boolean canFinish() {
-    return true;
   }
 
   /*
