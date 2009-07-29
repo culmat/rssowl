@@ -214,7 +214,7 @@ public class OPMLExporter implements ITypeExporter {
 
       StringBuilder builder = new StringBuilder();
       for (long val : values) {
-        builder.append(val).append(",");
+        builder.append(val).append(OPMLConstants.SEPARATOR);
       }
 
       if (values.length > 0)
@@ -228,7 +228,7 @@ public class OPMLExporter implements ITypeExporter {
 
       StringBuilder builder = new StringBuilder();
       for (int val : values) {
-        builder.append(val).append(",");
+        builder.append(val).append(OPMLConstants.SEPARATOR);
       }
 
       if (values.length > 0)
@@ -242,7 +242,7 @@ public class OPMLExporter implements ITypeExporter {
 
       StringBuilder builder = new StringBuilder();
       for (String val : values) {
-        builder.append(val).append(",");
+        builder.append(val).append(OPMLConstants.SEPARATOR);
       }
 
       if (values.length > 0)
@@ -469,7 +469,7 @@ public class OPMLExporter implements ITypeExporter {
       Long[] value = (Long[]) data;
       StringBuilder builder = new StringBuilder();
       for (Long val : value) {
-        builder.append(val).append(",");
+        builder.append(val).append(OPMLConstants.SEPARATOR);
       }
 
       if (value.length > 0)

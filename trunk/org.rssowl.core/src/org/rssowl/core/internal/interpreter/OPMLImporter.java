@@ -200,7 +200,7 @@ public class OPMLImporter implements ITypeImporter {
 
         /* Special case Move/Copy Action */
         else if (MoveNewsAction.ID.equals(id) || CopyNewsAction.ID.equals(id)) {
-          String[] binIds = data.split(",");
+          String[] binIds = data.split(OPMLConstants.SEPARATOR);
           Long[] binIdsLong = new Long[binIds.length];
           for (int j = 0; j < binIds.length; j++) {
             binIdsLong[j] = Long.parseLong(binIds[j]);
@@ -607,7 +607,7 @@ public class OPMLImporter implements ITypeImporter {
         return Integer.valueOf(value);
 
       case INTEGERS:
-        String[] values = value.split(",");
+        String[] values = value.split(OPMLConstants.SEPARATOR);
         int[] intValues = new int[values.length];
         for (int i = 0; i < values.length; i++) {
           intValues[i] = Integer.parseInt(values[i]);
@@ -618,7 +618,7 @@ public class OPMLImporter implements ITypeImporter {
         return Long.valueOf(value);
 
       case LONGS:
-        values = value.split(",");
+        values = value.split(OPMLConstants.SEPARATOR);
         long[] longValues = new long[values.length];
         for (int i = 0; i < values.length; i++) {
           longValues[i] = Long.parseLong(values[i]);
@@ -629,7 +629,7 @@ public class OPMLImporter implements ITypeImporter {
         return value;
 
       case STRINGS:
-        return value.split(",");
+        return value.split(OPMLConstants.SEPARATOR);
     }
 
     return value;
