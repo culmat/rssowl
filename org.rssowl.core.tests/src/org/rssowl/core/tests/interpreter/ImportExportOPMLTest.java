@@ -204,7 +204,7 @@ public class ImportExportOPMLTest {
 
     eclipsePreferences.putBoolean(Preferences.ECLIPSE_SINGLE_CLICK_OPEN.id(), true);
     eclipsePreferences.putInteger(Preferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD.id(), 5);
-    eclipsePreferences.putString(Preferences.ECLIPSE_PROXY_HOST.id(), "");
+    eclipsePreferences.putString(Preferences.ECLIPSE_PROXY_HOST_HTTP.id(), "");
   }
 
   private void assertPreferences() {
@@ -221,7 +221,7 @@ public class ImportExportOPMLTest {
 
     assertEquals(true, eclipsePreferences.getBoolean(Preferences.ECLIPSE_SINGLE_CLICK_OPEN.id()));
     assertEquals(5, eclipsePreferences.getInteger(Preferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD.id()));
-    assertEquals("", eclipsePreferences.getString(Preferences.ECLIPSE_PROXY_HOST.id()));
+    assertEquals("", eclipsePreferences.getString(Preferences.ECLIPSE_PROXY_HOST_HTTP.id()));
   }
 
   private void fillFilters() {
