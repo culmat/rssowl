@@ -67,6 +67,8 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -74,7 +76,7 @@ import java.util.Map.Entry;
 
 /**
  * Implementation of {@link ITypeExporter} for the OPML XML format.
- *
+ * 
  * @author bpasero
  */
 public class OPMLExporter implements ITypeExporter {
@@ -117,8 +119,16 @@ public class OPMLExporter implements ITypeExporter {
     boolean exportPreferences = (options != null && options.contains(Options.EXPORT_PREFERENCES));
 
     /* Export Folder Childs */
-    if (elements != null && !elements.isEmpty())
-      exportFolderChilds(body, elements, exportPreferences, dateFormat);
+    if (elements != null && !elements.isEmpty()) {
+      Map<IFolder, Element> mapFolderToElement = new HashMap<IFolder, Element>();
+      mapFolderToElement.put(null, body);
+
+      /* Ensure that all Parent Elements exist */
+      repairHierarchy(mapFolderToElement, elements, exportPreferences);
+
+      /* Now export Elements */
+      exportFolderChilds(mapFolderToElement, elements, exportPreferences, dateFormat);
+    }
 
     /* Export Labels */
     if (options != null && options.contains(Options.EXPORT_LABELS))
@@ -153,33 +163,78 @@ public class OPMLExporter implements ITypeExporter {
     }
   }
 
-  private void exportFolderChilds(Element parent, Collection<? extends IFolderChild> childs, boolean exportPreferences, DateFormat df) {
+  private void repairHierarchy(Map<IFolder, Element> mapFolderToElement, Collection<? extends IFolderChild> elementsToExport, boolean exportPreferences) {
+
+    /* Retrieve all Parents */
+    Set<IFolder> allParentFolders = new HashSet<IFolder>();
+    for (IFolderChild element : elementsToExport) {
+      fillParents(allParentFolders, element);
+    }
+
+    /* Return if Hierarchy is already consistent */
+    if (allParentFolders.isEmpty())
+      return;
+
+    /* Create Elements for all Parents */
+    for (IFolder parent : allParentFolders) {
+      Element folderElement = createElement(parent, exportPreferences);
+      mapFolderToElement.put(parent, folderElement);
+    }
+
+    /* Connect all Parent Nodes according to hierarchy */
+    for (IFolder parent : allParentFolders) {
+      Element folderElement = mapFolderToElement.get(parent);
+      Element parentElement = mapFolderToElement.get(parent.getParent());
+
+      parentElement.addContent(folderElement);
+    }
+  }
+
+  private void fillParents(Set<IFolder> parents, IFolderChild child) {
+    IFolder parent = child.getParent();
+    if (parent != null) {
+      parents.add(parent);
+      fillParents(parents, parent);
+    }
+  }
+
+  private void exportFolderChilds(Map<IFolder, Element> mapFolderToElement, Collection<? extends IFolderChild> childs, boolean exportPreferences, DateFormat df) {
     for (IFolderChild child : childs) {
 
       /* Export Folder */
       if (child instanceof IFolder)
-        exportFolder(parent, (IFolder) child, exportPreferences, df);
+        exportFolder(mapFolderToElement, (IFolder) child, exportPreferences, df);
 
       /* Export Bookmark, Search or Bin */
       else if (child instanceof IMark)
-        exportMark(parent, (IMark) child, exportPreferences, df);
+        exportMark(mapFolderToElement, (IMark) child, exportPreferences, df);
     }
   }
 
-  private void exportFolder(Element parent, IFolder folder, boolean exportPreferences, DateFormat df) {
-    String name = folder.getName();
-
+  private Element createElement(IFolder folder, boolean exportPreferences) {
     Element folderElement = new Element(Tags.OUTLINE.get());
-    folderElement.setAttribute(Attributes.TEXT.get(), name);
+    folderElement.setAttribute(Attributes.TEXT.get(), folder.getName());
     folderElement.setAttribute(Attributes.IS_SET.get(), String.valueOf(folder.getParent() == null), RSSOWL_NS);
     folderElement.setAttribute(Attributes.ID.get(), String.valueOf(folder.getId()), RSSOWL_NS);
-    parent.addContent(folderElement);
 
     /* Export Preferences if set */
     if (exportPreferences)
       exportPreferences(folderElement, folder);
 
-    exportFolderChilds(folderElement, folder.getChildren(), exportPreferences, df);
+    return folderElement;
+  }
+
+  private void exportFolder(Map<IFolder, Element> mapFolderToElement, IFolder folder, boolean exportPreferences, DateFormat df) {
+    Element folderElement = createElement(folder, exportPreferences);
+
+    /* Store in Map for Childs to Use */
+    mapFolderToElement.put(folder, folderElement);
+
+    /* Connect Node according to hierarchy */
+    mapFolderToElement.get(folder.getParent()).addContent(folderElement);
+
+    /* Proceed with Folder Childs */
+    exportFolderChilds(mapFolderToElement, folder.getChildren(), exportPreferences, df);
   }
 
   private void exportPreferences(Element parent, IFolderChild child) {
@@ -254,7 +309,7 @@ public class OPMLExporter implements ITypeExporter {
     return null;
   }
 
-  private void exportMark(Element parent, IMark mark, boolean exportPreferences, DateFormat df) {
+  private void exportMark(Map<IFolder, Element> mapFolderToElement, IMark mark, boolean exportPreferences, DateFormat df) {
     String name = mark.getName();
     Element element = null;
 
@@ -266,7 +321,7 @@ public class OPMLExporter implements ITypeExporter {
       element.setAttribute(Attributes.TEXT.get(), name);
       element.setAttribute(Attributes.XML_URL.get(), link);
       element.setAttribute(Attributes.ID.get(), String.valueOf(mark.getId()), RSSOWL_NS);
-      parent.addContent(element);
+      mapFolderToElement.get(mark.getParent()).addContent(element);
     }
 
     /* Export SearchMark */
@@ -278,7 +333,7 @@ public class OPMLExporter implements ITypeExporter {
       element.setAttribute(Attributes.NAME.get(), name);
       element.setAttribute(Attributes.MATCH_ALL_CONDITIONS.get(), String.valueOf(searchMark.matchAllConditions()));
       element.setAttribute(Attributes.ID.get(), String.valueOf(mark.getId()), RSSOWL_NS);
-      parent.addContent(element);
+      mapFolderToElement.get(mark.getParent()).addContent(element);
 
       for (ISearchCondition condition : conditions) {
         Element conditionElement = new Element(Tags.SEARCH_CONDITION.get(), RSSOWL_NS);
@@ -293,7 +348,7 @@ public class OPMLExporter implements ITypeExporter {
       element = new Element(Tags.BIN.get(), RSSOWL_NS);
       element.setAttribute(Attributes.NAME.get(), name);
       element.setAttribute(Attributes.ID.get(), String.valueOf(mark.getId()), RSSOWL_NS);
-      parent.addContent(element);
+      mapFolderToElement.get(mark.getParent()).addContent(element);
     }
 
     /* Export Preferences if set */
