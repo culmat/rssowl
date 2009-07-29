@@ -144,7 +144,8 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
       fCustomBrowserInput.setText(customBrowserValue);
 
     fCustomBrowserSearchButton = new Button(browserGroup, SWT.PUSH);
-    fCustomBrowserSearchButton.setText("Search...");
+    fCustomBrowserSearchButton.setText("Browse...");
+    setButtonLayoutData(fCustomBrowserSearchButton);
     fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
     fCustomBrowserSearchButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -197,6 +198,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
       fDisableJavaScriptExceptionsButton = new Button(jsContainer, SWT.PUSH);
       fDisableJavaScriptExceptionsButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
       fDisableJavaScriptExceptionsButton.setText("Exceptions...");
+      setButtonLayoutData(fDisableJavaScriptExceptionsButton);
       fDisableJavaScriptExceptionsButton.setEnabled(fDisableJavaScriptCheck.getSelection());
       fDisableJavaScriptExceptionsButton.addSelectionListener(new SelectionAdapter() {
         @Override

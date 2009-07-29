@@ -227,8 +227,8 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     fResetMasterPassword = new Button(masterContainer, SWT.PUSH);
     fResetMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
-    fResetMasterPassword.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
     fResetMasterPassword.setText("Change Master Password...");
+    setButtonLayoutData(fResetMasterPassword);
     fResetMasterPassword.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
