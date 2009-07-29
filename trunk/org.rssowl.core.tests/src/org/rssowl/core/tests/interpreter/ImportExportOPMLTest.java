@@ -35,6 +35,7 @@ import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.newsaction.LabelNewsAction;
 import org.rssowl.core.internal.newsaction.MoveNewsAction;
+import org.rssowl.core.internal.persist.pref.GlobalScope;
 import org.rssowl.core.interpreter.ITypeExporter.Options;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
@@ -59,6 +60,7 @@ import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
 import org.rssowl.core.persist.dao.INewsBinDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.pref.Preferences;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
@@ -113,16 +115,16 @@ public class ImportExportOPMLTest {
     Owl.getPersistenceService().recreateSchema();
 
     fFactory = Owl.getModelFactory();
-    fTmpFile = File.createTempFile("rssowl", "opml");
+    fTmpFile = File.createTempFile("rssowl", ".opml");
     fTmpFile.deleteOnExit();
 
-    fTmpFileOnlyMarks = File.createTempFile("rssowl_onlymarks", "opml");
+    fTmpFileOnlyMarks = File.createTempFile("rssowl_onlymarks", ".opml");
     fTmpFileOnlyMarks.deleteOnExit();
 
-    fTmpFileInvalidLocations = File.createTempFile("rssowl_invalidlocations", "opml");
+    fTmpFileInvalidLocations = File.createTempFile("rssowl_invalidlocations", ".opml");
     fTmpFileInvalidLocations.deleteOnExit();
 
-    fTmpBackupFile = File.createTempFile("rssowl_backup", "opml");
+    fTmpBackupFile = File.createTempFile("rssowl_backup", ".opml");
     fTmpBackupFile.deleteOnExit();
 
     /* Fill Defaults */
@@ -183,6 +185,43 @@ public class ImportExportOPMLTest {
 
     /* Filters */
     fillFilters();
+
+    /* Global / Eclipse Preferences */
+    fillPreferences();
+  }
+
+  private void fillPreferences() {
+    IPreferenceScope globalPreferences = Owl.getPreferenceService().getGlobalScope();
+    IPreferenceScope eclipsePreferences = Owl.getPreferenceService().getGlobalScope();
+
+    globalPreferences.putBoolean(Preferences.MARK_READ_ON_TAB_CLOSE.id(), true);
+    globalPreferences.putInteger(Preferences.MARK_READ_IN_MILLIS.id(), 5);
+    globalPreferences.putIntegers(Preferences.BM_NEWS_COLUMNS.id(), new int[] { -1, 0, 1, 2, 3 });
+    globalPreferences.putLong(Preferences.BM_UPDATE_INTERVAL.id(), 8);
+    globalPreferences.putLong(Preferences.NM_SELECTED_NEWS.id(), 100);
+    globalPreferences.putString(Preferences.CUSTOM_BROWSER_PATH.id(), "hello world");
+    globalPreferences.putStrings(Preferences.DISABLE_JAVASCRIPT_EXCEPTIONS.id(), new String[] { "hello", "world", "foo", "bar" });
+
+    eclipsePreferences.putBoolean(Preferences.ECLIPSE_SINGLE_CLICK_OPEN.id(), true);
+    eclipsePreferences.putInteger(Preferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD.id(), 5);
+    eclipsePreferences.putString(Preferences.ECLIPSE_PROXY_HOST.id(), "");
+  }
+
+  private void assertPreferences() {
+    IPreferenceScope globalPreferences = new GlobalScope(Owl.getPreferenceService().getDefaultScope());
+    IPreferenceScope eclipsePreferences = Owl.getPreferenceService().getGlobalScope();
+
+    assertEquals(true, globalPreferences.getBoolean(Preferences.MARK_READ_ON_TAB_CLOSE.id()));
+    assertEquals(5, globalPreferences.getInteger(Preferences.MARK_READ_IN_MILLIS.id()));
+    assertTrue(Arrays.equals(new int[] { -1, 0, 1, 2, 3 }, globalPreferences.getIntegers(Preferences.BM_NEWS_COLUMNS.id())));
+    assertEquals(8, globalPreferences.getLong(Preferences.BM_UPDATE_INTERVAL.id()));
+    assertTrue(globalPreferences.getLong(Preferences.NM_SELECTED_NEWS.id()) != 100);
+    assertEquals("hello world", globalPreferences.getString(Preferences.CUSTOM_BROWSER_PATH.id()));
+    assertTrue(Arrays.equals(new String[] { "hello", "world", "foo", "bar" }, globalPreferences.getStrings(Preferences.DISABLE_JAVASCRIPT_EXCEPTIONS.id())));
+
+    assertEquals(true, eclipsePreferences.getBoolean(Preferences.ECLIPSE_SINGLE_CLICK_OPEN.id()));
+    assertEquals(5, eclipsePreferences.getInteger(Preferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD.id()));
+    assertEquals("", eclipsePreferences.getString(Preferences.ECLIPSE_PROXY_HOST.id()));
   }
 
   private void fillFilters() {
@@ -294,14 +333,14 @@ public class ImportExportOPMLTest {
     fDefaultSet = fFactory.createFolder(null, null, "My Bookmarks");
 
     fDefaultFolder1 = fFactory.createFolder(null, fDefaultSet, "Default Folder 1");
-    addProperties(fDefaultFolder1);
+    addProperties(Owl.getPreferenceService().getEntityScope(fDefaultFolder1));
 
     fDefaultFolder2 = fFactory.createFolder(null, fDefaultSet, "Default Folder 2");
 
     /* Default > BookMark 1 */
     IFeed feed1 = fFactory.createFeed(null, new URI("feed1"));
     fBookMark1 = fFactory.createBookMark(null, fDefaultSet, new FeedLinkReference(feed1.getLink()), "Bookmark 1");
-    addProperties(fBookMark1);
+    addProperties(Owl.getPreferenceService().getEntityScope(fBookMark1));
 
     /* Default > Folder 1 > BookMark 3 */
     IFeed feed3 = fFactory.createFeed(null, new URI("feed3"));
@@ -309,11 +348,10 @@ public class ImportExportOPMLTest {
 
     /* Default > News Bin 1 */
     fNewsBin = fFactory.createNewsBin(null, fDefaultSet, "Bin 1");
-    addProperties(fNewsBin);
+    addProperties(Owl.getPreferenceService().getEntityScope(fNewsBin));
   }
 
-  private void addProperties(IFolderChild child) {
-    IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(child);
+  private void addProperties(IPreferenceScope prefs) {
     prefs.putBoolean("boolean", true);
     prefs.putInteger("integer", 5);
     prefs.putIntegers("integers", new int[] { -1, 0, 1, 2, 3 });
@@ -323,8 +361,7 @@ public class ImportExportOPMLTest {
     prefs.putStrings("strings", new String[] { "hello", "world", "foo", "bar" });
   }
 
-  private void assertProperties(IFolderChild child) {
-    IPreferenceScope prefs = Owl.getPreferenceService().getEntityScope(child);
+  private void assertProperties(IPreferenceScope prefs) {
     assertEquals(true, prefs.getBoolean("boolean"));
     assertEquals(5, prefs.getInteger("integer"));
     assertTrue(Arrays.equals(new int[] { -1, 0, 1, 2, 3 }, prefs.getIntegers("integers")));
@@ -362,7 +399,7 @@ public class ImportExportOPMLTest {
 
       fSearchmark = fFactory.createSearchMark(null, parent, "Search");
       fSearchmark.addSearchCondition(condition);
-      addProperties(fSearchmark);
+      addProperties(Owl.getPreferenceService().getEntityScope(fSearchmark));
     }
 
     /* 2) State ISnewunreadupdated */
@@ -647,7 +684,7 @@ public class ImportExportOPMLTest {
     }
 
     if (useBackup)
-      assertProperties(defaultFolder1);
+      assertProperties(Owl.getPreferenceService().getEntityScope(defaultFolder1));
 
     assertNotNull(defaultFolder1);
     assertNotNull(defaultFolder2);
@@ -680,7 +717,7 @@ public class ImportExportOPMLTest {
     assertNotNull(bookmark1);
     assertEquals("feed1", bookmark1.getFeedLinkReference().getLink().toString());
     if (useBackup)
-      assertProperties(bookmark1);
+      assertProperties(Owl.getPreferenceService().getEntityScope(bookmark1));
 
     INewsBin bin = null;
     for (IMark mark : defaultMarks) {
@@ -690,7 +727,7 @@ public class ImportExportOPMLTest {
 
     assertNotNull(bin);
     if (useBackup)
-      assertProperties(bin);
+      assertProperties(Owl.getPreferenceService().getEntityScope(bin));
 
     List<IMark> customMarks = customSet.getMarks();
     assertEquals(17, customMarks.size());
@@ -736,6 +773,7 @@ public class ImportExportOPMLTest {
     if (useBackup) {
       assertLabels();
       assertFilters();
+      assertPreferences();
     }
   }
 
@@ -905,7 +943,7 @@ public class ImportExportOPMLTest {
     assertEquals(SearchSpecifier.IS, conditions.get(0).getSpecifier());
     assertEquals(EnumSet.of(INews.State.NEW), conditions.get(0).getValue());
     if (isBackup)
-      assertProperties(searchmark);
+      assertProperties(Owl.getPreferenceService().getEntityScope(searchmark));
 
     /* 2) State ISnewunreadupdated */
     searchmark = searchmarks.get(1);
