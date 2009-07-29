@@ -131,9 +131,9 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Controller {
 
   /* Backup Files */
-  private static final String DAILY_BACKUP = "subscriptions.opml";
-  private static final String BACKUP_TMP = "subscriptions.tmp";
-  private static final String WEEKLY_BACKUP = "subscriptions_weekly.opml";
+  private static final String DAILY_BACKUP = "backup.opml";
+  private static final String BACKUP_TMP = "backup.tmp";
+  private static final String WEEKLY_BACKUP = "backup_weekly.opml";
 
   /* Extension-Points */
   private static final String ENTITY_PROPERTY_PAGE_EXTENSION_POINT = "org.rssowl.ui.EntityPropertyPage"; //$NON-NLS-1$
