@@ -184,17 +184,19 @@ public class InterpreterServiceImpl implements IInterpreterService {
    * java.util.List, java.util.EnumSet)
    */
   public void exportTo(File destination, Collection<? extends IFolderChild> elements, EnumSet<Options> options) throws InterpreterException {
+    ITypeExporter exporter = null;
     String fileName = destination.getName();
     int i = fileName.lastIndexOf(".");
     if (i != -1 && !fileName.endsWith(".")) {
       String formatName = fileName.substring(i + 1);
-      ITypeExporter exporter = fTypeExporters.get(formatName);
-      if (exporter != null)
-        exporter.exportTo(destination, elements, options);
+      exporter = fTypeExporters.get(formatName);
     }
 
-    /* Use Default as Fallback */
-    fDefaultExporter.exportTo(destination, elements, options);
+    /* Use default as Fallback */
+    if (exporter == null)
+      exporter = fDefaultExporter;
+
+    exporter.exportTo(destination, elements, options);
   }
 
   /*
