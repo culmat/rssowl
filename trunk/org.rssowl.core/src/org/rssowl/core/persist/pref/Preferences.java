@@ -342,7 +342,25 @@ public enum Preferences {
   ECLIPSE_PROXY_SOCKS_HAS_AUTH("/configuration/org.eclipse.core.net/proxyData/SOCKS/hasAuth", IPreferenceType.BOOLEAN, IPreferenceScope.Kind.ECLIPSE),
 
   /** Global Eclipse: Non Proxied Hosts */
-  ECLIPSE_NON_PROXIED_HOSTS("/configuration/org.eclipse.core.net/nonProxiedHosts", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE);
+  ECLIPSE_NON_PROXIED_HOSTS("/configuration/org.eclipse.core.net/nonProxiedHosts", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE),
+
+  /** Global Eclipse: Newstext Font */
+  ECLIPSE_NEWSTEXT_FONT("instance/org.eclipse.ui.workbench/org.rssowl.ui.NewsTextFont", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE),
+
+  /** Global Eclipse: Headlines Font */
+  ECLIPSE_HEADLINES_FONT("instance/org.eclipse.ui.workbench/org.rssowl.ui.HeadlinesFont", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE),
+
+  /** Global Eclipse: Bookmark Explorer Font */
+  ECLIPSE_BOOKMARK_FONT("instance/org.eclipse.ui.workbench/org.rssowl.ui.BookmarkExplorerFont", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE),
+
+  /** Global Eclipse: Notification Popup Font */
+  ECLIPSE_NOTIFICATION_FONT("instance/org.eclipse.ui.workbench/org.rssowl.ui.NotificationPopupFont", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE),
+
+  /** Global Eclipse: Sticky Background Color */
+  ECLIPSE_STICKYBG_COLOR("instance/org.eclipse.ui.workbench/org.rssowl.ui.StickyBGColor", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE),
+
+  /** Global Eclipse: Search Highlight Background Color */
+  ECLIPSE_SEARCH_COLOR("instance/org.eclipse.ui.workbench/org.rssowl.ui.SearchHighlightBGColor", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE);
 
   private String fId;
   private IPreferenceType fType;
