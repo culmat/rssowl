@@ -38,6 +38,9 @@ public class OPMLConstants {
   /* The namespace RSSOwl is using */
   static final Namespace RSSOWL_NS = Namespace.getNamespace("rssowl", "http://www.rssowl.org");
 
+  /* Separator for Multi Values */
+  static final String SEPARATOR = ",";
+
   /* List of Elements to use for the XML */
   enum Tags {
 
