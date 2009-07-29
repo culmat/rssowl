@@ -107,6 +107,7 @@ public class OPMLImporter implements ITypeImporter {
     List<IEntity> importedEntities = new ArrayList<IEntity>();
     importedEntities.add(defaultRootFolder);
 
+    boolean flushPreferences = false;
     IPreferenceScope globalPreferences = Owl.getPreferenceService().getGlobalScope();
     IPreferenceScope eclipsePreferences = Owl.getPreferenceService().getEclipseScope();
 
@@ -137,9 +138,15 @@ public class OPMLImporter implements ITypeImporter {
         processFilter(child, importedEntities);
 
       /* Process Global/Eclipse Preferences */
-      else if (Tags.PREFERENCE.get().equals(name))
+      else if (Tags.PREFERENCE.get().equals(name)) {
         processPreference(child, globalPreferences, eclipsePreferences);
+        flushPreferences = true;
+      }
     }
+
+    /* Flush Preferences if Imported */
+    if (flushPreferences)
+      eclipsePreferences.flush();
 
     return importedEntities;
   }
