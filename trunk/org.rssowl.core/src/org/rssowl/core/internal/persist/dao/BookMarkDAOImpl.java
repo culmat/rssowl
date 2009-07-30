@@ -69,4 +69,13 @@ public final class BookMarkDAOImpl extends AbstractEntityDAO<IBookMark, BookMark
       throw new PersistenceException(e);
     }
   }
+
+  public boolean exists(FeedLinkReference feedRef) {
+    try {
+      Collection<IBookMark> marks = DBHelper.loadAllBookMarks(fDb, feedRef);
+      return !marks.isEmpty();
+    } catch (Db4oException e) {
+      throw new PersistenceException(e);
+    }
+  }
 }

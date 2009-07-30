@@ -43,8 +43,18 @@ public interface IBookMarkDAO extends IEntityDAO<IBookMark, BookMarkListener, Bo
    * given feed.
    *
    * @param feedRef A reference to the feed of interest.
-   * @return Returns a Collection of all <code>IBookMark</code>s that
-   * reference the given feed.
+   * @return Returns a Collection of all <code>IBookMark</code>s that reference
+   * the given feed.
    */
   Collection<IBookMark> loadAll(FeedLinkReference feedRef);
+
+  /**
+   * Checks whether a {@link IBookMark} with the given {@link FeedLinkReference}
+   * exists.
+   *
+   * @param feedRef A reference to the feed of interest.
+   * @return <code>true</code> if a {@link IBookMark} with the given
+   * {@link FeedLinkReference} exists and <code>false</code> otherwise.
+   */
+  boolean exists(FeedLinkReference feedRef);
 }
