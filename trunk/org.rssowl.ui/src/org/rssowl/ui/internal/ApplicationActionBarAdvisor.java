@@ -83,6 +83,8 @@ import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.UndoAction;
 import org.rssowl.ui.internal.dialogs.ShareProvidersListDialog;
 import org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage;
+import org.rssowl.ui.internal.dialogs.preferences.NotifierPreferencesPage;
+import org.rssowl.ui.internal.dialogs.preferences.OverviewPreferencesPage;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
@@ -930,9 +932,39 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
   /**
    * @param trayItem
+   * @param shell
+   * @param advisor
    */
-  protected void fillTrayItem(IMenuManager trayItem) {
-    trayItem.add(new ReloadAllAction());
+  protected void fillTrayItem(IMenuManager trayItem, final Shell shell, final ApplicationWorkbenchWindowAdvisor advisor) {
+    trayItem.add(new ReloadAllAction(false));
+    trayItem.add(new Separator());
+
+    trayItem.add(new Action("Configure Notifications") {
+      @Override
+      public void run() {
+        advisor.restoreFromTray(shell);
+        PreferencesUtil.createPreferenceDialogOn(shell, NotifierPreferencesPage.ID, null, null).open();
+      }
+
+      @Override
+      public ImageDescriptor getImageDescriptor() {
+        return OwlUI.getImageDescriptor("icons/elcl16/notification.gif");
+      }
+    });
+
+    trayItem.add(new Action("Preferences") {
+      @Override
+      public void run() {
+        advisor.restoreFromTray(shell);
+        PreferencesUtil.createPreferenceDialogOn(shell, OverviewPreferencesPage.ID, null, null).open();
+      }
+
+      @Override
+      public ImageDescriptor getImageDescriptor() {
+        return OwlUI.getImageDescriptor("icons/elcl16/preferences.gif");
+      }
+    });
+
     trayItem.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
     trayItem.add(getAction(ActionFactory.QUIT.getId()));
   }

@@ -54,6 +54,9 @@ import java.util.List;
 public class OverviewPreferencesPage extends PreferencePage implements IWorkbenchPreferencePage {
   private LocalResourceManager fResources;
 
+  /** ID of this Preference Page */
+  public static final String ID = "org.eclipse.ui.preferencePages.Workbench";
+
   /** Leave for reflection */
   public OverviewPreferencesPage() {
     fResources = new LocalResourceManager(JFaceResources.getResources());

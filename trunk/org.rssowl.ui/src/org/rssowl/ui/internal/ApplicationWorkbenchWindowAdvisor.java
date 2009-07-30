@@ -437,7 +437,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         trayMenu.add(new Separator());
 
         /* Other Items */
-        fActionBarAdvisor.fillTrayItem(trayMenu);
+        fActionBarAdvisor.fillTrayItem(trayMenu, shell, ApplicationWorkbenchWindowAdvisor.this);
 
         Menu menu = trayMenu.createContextMenu(shell);
         menu.setVisible(true);
@@ -463,8 +463,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
       @Override
       public void entitiesAdded(Set<NewsEvent> events) {
-       if (!CoreUtils.containsState(events, INews.State.NEW))
-         return;
+        if (!CoreUtils.containsState(events, INews.State.NEW))
+          return;
 
         JobRunner.runInUIThread(fTrayItem, new Runnable() {
           public void run() {
