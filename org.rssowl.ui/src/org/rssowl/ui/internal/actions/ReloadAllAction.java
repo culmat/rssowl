@@ -52,9 +52,21 @@ public class ReloadAllAction extends Action implements IWorkbenchWindowActionDel
    * Action to reload all BookMarks.
    */
   public ReloadAllAction() {
+    this(true);
+  }
+
+  /**
+   * Action to reload all BookMarks.
+   *
+   * @param registerIds if <code>true</code> registers with the command and
+   * shows a keybinding.
+   */
+  public ReloadAllAction(boolean registerIds) {
     super("Update &All", OwlUI.getImageDescriptor("icons/elcl16/reload_all.gif"));
-    setId(ID);
-    setActionDefinitionId(ID);
+    if (registerIds) {
+      setId(ID);
+      setActionDefinitionId(ID);
+    }
   }
 
   /*
