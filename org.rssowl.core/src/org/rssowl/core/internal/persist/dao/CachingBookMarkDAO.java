@@ -71,4 +71,12 @@ public final class CachingBookMarkDAO extends CachingDAO<BookMarkDAOImpl, IBookM
     return marks;
   }
 
+  public boolean exists(FeedLinkReference feedRef) {
+    //TODO Check if this is faster than the db query
+    for (IBookMark mark : getCache().values()) {
+      if (mark.getFeedLinkReference().equals(feedRef))
+       return true;
+    }
+    return false;
+  }
 }
