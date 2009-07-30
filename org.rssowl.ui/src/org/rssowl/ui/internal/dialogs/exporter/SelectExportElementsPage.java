@@ -62,7 +62,7 @@ import java.util.List;
  *
  * @author bpasero
  */
-public class FolderChildsPage extends WizardPage {
+public class SelectExportElementsPage extends WizardPage {
   private CheckboxTreeViewer fViewer;
   private Button fSelectAll;
   private Button fDeselectAll;
@@ -70,7 +70,7 @@ public class FolderChildsPage extends WizardPage {
   /**
    * @param pageName
    */
-  protected FolderChildsPage(String pageName) {
+  protected SelectExportElementsPage(String pageName) {
     super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/export_wiz.png"));
     setMessage("Please choose the elements you want to export.");
   }
