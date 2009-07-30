@@ -728,7 +728,8 @@ public class OwlUI {
    * @return ImageDescriptor
    */
   public static ImageDescriptor getFavicon(IBookMark bookmark) {
-    Assert.isNotNull(bookmark.getId());
+    if (bookmark.getId() == null)
+      return null;
 
     /* 1.) Check if ImageDescriptor exists in Memory */
     ImageDescriptor descriptor = FAVICO_CACHE.get(bookmark.getId());
