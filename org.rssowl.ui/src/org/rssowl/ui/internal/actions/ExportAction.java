@@ -25,14 +25,12 @@
 package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.persist.IFolderChild;
-import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.exporter.ExportWizard;
 
 /**
@@ -72,30 +70,7 @@ public class ExportAction implements IWorkbenchWindowActionDelegate {
    */
   public void openWizard(Shell shell) {
     ExportWizard exportWizard = new ExportWizard();
-
-    WizardDialog dialog = new WizardDialog(shell, exportWizard) {
-      @Override
-      protected boolean isResizable() {
-        return true;
-      }
-
-      @Override
-      protected IDialogSettings getDialogBoundsSettings() {
-        IDialogSettings settings = Activator.getDefault().getDialogSettings();
-        IDialogSettings section = settings.getSection(SETTINGS_SECTION);
-        if (section != null)
-          return section;
-
-        return settings.addNewSection(SETTINGS_SECTION);
-      }
-
-      @Override
-      protected int getDialogBoundsStrategy() {
-        return DIALOG_PERSISTSIZE;
-      }
-    };
-    dialog.create();
-    dialog.open();
+    OwlUI.openWizard(shell, exportWizard, false, SETTINGS_SECTION);
   }
 
   /*
