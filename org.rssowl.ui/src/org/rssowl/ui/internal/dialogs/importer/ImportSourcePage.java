@@ -47,7 +47,7 @@ import java.io.File;
  *
  * @author bpasero
  */
-public class SelectImportSourcePage extends WizardPage {
+public class ImportSourcePage extends WizardPage {
   private Button fImportFromFileRadio;
   private Button fImportFromDefaultRadio;
   private Text fFileInput;
@@ -61,7 +61,7 @@ public class SelectImportSourcePage extends WizardPage {
   /**
    * @param pageName
    */
-  protected SelectImportSourcePage(String pageName) {
+  protected ImportSourcePage(String pageName) {
     super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/import_wiz.png"));
     setMessage("Please choose the source of import.");
   }

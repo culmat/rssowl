@@ -67,7 +67,7 @@ import java.util.Set;
  * @author bpasero
  */
 public class ExportWizard extends Wizard {
-  private SelectExportElementsPage fFolderChildsPage;
+  private ExportElementsPage fFolderChildsPage;
   private ExportSettingsPage fExportSettingsPage;
 
   /*
@@ -78,7 +78,7 @@ public class ExportWizard extends Wizard {
     setWindowTitle("Export");
 
     /* Page 1: Folder Child Selection */
-    fFolderChildsPage = new SelectExportElementsPage("Choose Elements");
+    fFolderChildsPage = new ExportElementsPage("Choose Elements");
     addPage(fFolderChildsPage);
 
     /* Page 2: Export Settings Configuration */

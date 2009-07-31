@@ -39,9 +39,9 @@ import org.rssowl.ui.internal.util.JobRunner;
  * @author bpasero
  */
 public class ImportWizard extends Wizard {
-  private SelectImportSourcePage fSelectImportsPage;
-  private SelectImportElementsPage fSelectElementsPage;
-  private SelectImportTargetPage fSelectTargetPage;
+  private ImportSourcePage fSelectImportsPage;
+  private ImportElementsPage fSelectElementsPage;
+  private ImportTargetPage fSelectTargetPage;
   private ImportOptionsPage fImportOptionsPage;
 
   /*
@@ -52,15 +52,15 @@ public class ImportWizard extends Wizard {
     setWindowTitle("Import");
 
     /* Page 1: Source to Import */
-    fSelectImportsPage = new SelectImportSourcePage("Choose Source");
+    fSelectImportsPage = new ImportSourcePage("Choose Source");
     addPage(fSelectImportsPage);
 
     /* Page 2: Elements to Import */
-    fSelectElementsPage = new SelectImportElementsPage("Choose Elements");
+    fSelectElementsPage = new ImportElementsPage("Choose Elements");
     addPage(fSelectElementsPage);
 
     /* Page 3: Target to Import */
-    fSelectTargetPage = new SelectImportTargetPage("Choose Target Location");
+    fSelectTargetPage = new ImportTargetPage("Choose Target Location");
     addPage(fSelectTargetPage);
 
     /* Page 4: Import Options */
