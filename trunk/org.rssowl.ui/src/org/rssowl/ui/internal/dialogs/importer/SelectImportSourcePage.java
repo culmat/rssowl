@@ -43,22 +43,40 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 import java.io.File;
 
 /**
- * A {@link WizardPage} to select the option of import.
+ * A {@link WizardPage} to select the source of import.
  *
  * @author bpasero
  */
-public class SelectImportPage extends WizardPage {
+public class SelectImportSourcePage extends WizardPage {
   private Button fImportFromFileRadio;
   private Button fImportFromDefaultRadio;
   private Text fFileInput;
   private Button fSearchFileButton;
 
+  /* Sources for Import */
+  enum Source {
+    NONE, FILE, DEFAULT
+  }
+
   /**
    * @param pageName
    */
-  protected SelectImportPage(String pageName) {
+  protected SelectImportSourcePage(String pageName) {
     super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/import_wiz.png"));
     setMessage("Please choose the source of import.");
+  }
+
+  /* Returns the type of Source to use for the Import */
+  Source getSource() {
+    if (fImportFromFileRadio.getSelection())
+      return Source.FILE;
+
+    return Source.DEFAULT;
+  }
+
+  /* Returns the File to Import from or null if none */
+  File getImportFile() {
+    return fImportFromFileRadio.getSelection() ? new File(fFileInput.getText()) : null;
   }
 
   /*
@@ -86,6 +104,7 @@ public class SelectImportPage extends WizardPage {
     Composite fileInputContainer = new Composite(container, SWT.None);
     fileInputContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
     ((GridLayout) fileInputContainer.getLayout()).marginLeft = 15;
+    ((GridLayout) fileInputContainer.getLayout()).marginBottom = 10;
     fileInputContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fFileInput = new Text(fileInputContainer, SWT.SINGLE | SWT.BORDER);
@@ -116,8 +135,6 @@ public class SelectImportPage extends WizardPage {
         updatePageComplete();
       }
     });
-
-    //TODO Show live content of selection above in a tree here
 
     setControl(container);
     updatePageComplete();
