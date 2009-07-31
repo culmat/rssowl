@@ -39,7 +39,6 @@ import org.rssowl.core.internal.newsaction.LabelNewsAction;
 import org.rssowl.core.internal.newsaction.MoveNewsAction;
 import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.persist.IEntity;
-import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.ILabel;
@@ -47,6 +46,7 @@ import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPersistable;
+import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
@@ -54,12 +54,8 @@ import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.SearchSpecifier;
-import org.rssowl.core.persist.dao.IFeedDAO;
-import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.pref.IPreferenceType;
-import org.rssowl.core.persist.pref.IPreferenceScope.Kind;
 import org.rssowl.core.persist.reference.FeedLinkReference;
-import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 
@@ -105,11 +101,6 @@ public class OPMLImporter implements ITypeImporter {
   private List<IEntity> processBody(Element body) {
     IFolder defaultRootFolder = Owl.getModelFactory().createFolder(null, null, "My Bookmarks");
     List<IEntity> importedEntities = new ArrayList<IEntity>();
-    importedEntities.add(defaultRootFolder);
-
-    boolean flushPreferences = false;
-    IPreferenceScope globalPreferences = Owl.getPreferenceService().getGlobalScope();
-    IPreferenceScope eclipsePreferences = Owl.getPreferenceService().getEclipseScope();
 
     /* Interpret Children */
     List<?> feedChildren = body.getChildren();
@@ -138,15 +129,13 @@ public class OPMLImporter implements ITypeImporter {
         processFilter(child, importedEntities);
 
       /* Process Global/Eclipse Preferences */
-      else if (Tags.PREFERENCE.get().equals(name)) {
-        processPreference(child, globalPreferences, eclipsePreferences);
-        flushPreferences = true;
-      }
+      else if (Tags.PREFERENCE.get().equals(name))
+        processPreference(child, importedEntities);
     }
 
-    /* Flush Preferences if Imported */
-    if (flushPreferences)
-      eclipsePreferences.flush();
+    /* Only add the default root folder if actually used */
+    if (!defaultRootFolder.getChildren().isEmpty())
+      importedEntities.add(defaultRootFolder);
 
     return importedEntities;
   }
@@ -451,8 +440,6 @@ public class OPMLImporter implements ITypeImporter {
     Long id = null;
     String title = null;
     String link = null;
-    String homepage = null;
-    String description = null;
 
     /* Interpret Attributes */
     List<?> attributes = outline.getAttributes();
@@ -471,14 +458,6 @@ public class OPMLImporter implements ITypeImporter {
       /* Text */
       else if (title == null && name.toLowerCase().equals(Attributes.TEXT.get())) //$NON-NLS-1$
         title = attribute.getValue();
-
-      /* Homepage */
-      else if (name.toLowerCase().equals(Attributes.HTML_URL.get().toLowerCase())) //$NON-NLS-1$
-        homepage = attribute.getValue();
-
-      /* Description */
-      else if (name.toLowerCase().equals(Attributes.DESCRIPTION.get())) //$NON-NLS-1$
-        description = attribute.getValue();
     }
 
     /* RSSOwl Namespace Attributes */
@@ -504,18 +483,6 @@ public class OPMLImporter implements ITypeImporter {
     else {
       URI uri = link != null ? URIUtils.createURI(link) : null;
       if (uri != null) {
-
-        /* Check if a Feed with the URL already exists */
-        IFeedDAO feedDao = Owl.getPersistenceService().getDAOService().getFeedDAO();
-        FeedReference feedRef = feedDao.loadReference(uri);
-
-        /* Create a new Feed then */
-        if (feedRef == null) {
-          IFeed feed = Owl.getModelFactory().createFeed(null, uri);
-          feed.setHomepage(homepage != null ? URIUtils.createURI(homepage) : null);
-          feed.setDescription(description);
-          feed = feedDao.save(feed);
-        }
 
         /* Create the BookMark */
         FeedLinkReference feedLinkRef = new FeedLinkReference(uri);
@@ -642,40 +609,41 @@ public class OPMLImporter implements ITypeImporter {
     return value;
   }
 
-  private void processPreference(Element element, IPreferenceScope globalPreferences, IPreferenceScope eclipsePreferences) {
+  private void processPreference(Element element, List<IEntity> importedEntities) {
     String key = element.getAttributeValue(Attributes.ID.get());
     String value = element.getAttributeValue(Attributes.VALUE.get());
     String typeVal = element.getAttributeValue(Attributes.TYPE.get());
     String kindVal = element.getAttributeValue(Attributes.KIND.get());
 
     if (StringUtils.isSet(key) && value != null && typeVal != null && kindVal != null) {
-      IPreferenceScope.Kind kind = IPreferenceScope.Kind.values()[Integer.parseInt(kindVal)];
       IPreferenceType type = IPreferenceType.values()[Integer.parseInt(typeVal)];
+      IPreference preference = Owl.getModelFactory().createPreference(key);
 
-      IPreferenceScope actualScope = (kind == Kind.GLOBAL) ? globalPreferences : eclipsePreferences;
       switch (type) {
         case BOOLEAN:
-          actualScope.putBoolean(key, Boolean.parseBoolean(value));
+          preference.putBooleans(Boolean.parseBoolean(value));
           break;
         case INTEGER:
-          actualScope.putInteger(key, Integer.parseInt(value));
+          preference.putIntegers(Integer.parseInt(value));
           break;
         case INTEGERS:
-          actualScope.putIntegers(key, (int[]) getPropertyValue(value, type));
+          preference.putIntegers((int[]) getPropertyValue(value, type));
           break;
         case LONG:
-          actualScope.putLong(key, Long.parseLong(value));
+          preference.putLongs(Long.parseLong(value));
           break;
         case LONGS:
-          actualScope.putLongs(key, (long[]) getPropertyValue(value, type));
+          preference.putLongs((long[]) getPropertyValue(value, type));
           break;
         case STRING:
-          actualScope.putString(key, value);
+          preference.putStrings(value);
           break;
         case STRINGS:
-          actualScope.putStrings(key, (String[]) getPropertyValue(value, type));
+          preference.putStrings((String[]) getPropertyValue(value, type));
           break;
       }
+
+      importedEntities.add(preference);
     }
   }
 }
