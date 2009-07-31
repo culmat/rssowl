@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.bindings.keys.KeyStroke;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -45,6 +46,9 @@ import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.ProgressMonitorPart;
+import org.eclipse.jface.wizard.Wizard;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.SWTException;
@@ -61,6 +65,9 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Region;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -1700,5 +1707,60 @@ public class OwlUI {
 
     /* Perform Reparenting */
     Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(reparenting);
+  }
+
+  /**
+   * @param shell the {@link Shell} as parent of the {@link WizardDialog}.
+   * @param wizard the {@link Wizard} to use in the {@link WizardDialog}.
+   * @param needsProgressPart <code>true</code> to leave some room for the
+   * {@link ProgressMonitorPart} and <code>false</code> otherwise.
+   * @param dialogSettingsKey the key to use to store dialog settings.
+   */
+  public static void openWizard(Shell shell, Wizard wizard, final boolean needsProgressPart, final String dialogSettingsKey) {
+    WizardDialog dialog = new WizardDialog(shell, wizard) {
+      private ProgressMonitorPart progressMonitorPart;
+
+      @Override
+      protected boolean isResizable() {
+        return true;
+      }
+
+      @Override
+      protected Control createDialogArea(Composite parent) {
+        Control control = super.createDialogArea(parent);
+        if (progressMonitorPart != null && !needsProgressPart)
+          ((GridData) progressMonitorPart.getLayoutData()).exclude = true;
+        return control;
+      }
+
+      @Override
+      public boolean close() {
+        progressMonitorPart = null;
+        return super.close();
+      }
+
+      @Override
+      protected ProgressMonitorPart createProgressMonitorPart(Composite composite, GridLayout pmlayout) {
+        progressMonitorPart = super.createProgressMonitorPart(composite, pmlayout);
+        return progressMonitorPart;
+      }
+
+      @Override
+      protected IDialogSettings getDialogBoundsSettings() {
+        IDialogSettings settings = Activator.getDefault().getDialogSettings();
+        IDialogSettings section = settings.getSection(dialogSettingsKey);
+        if (section != null)
+          return section;
+
+        return settings.addNewSection(dialogSettingsKey);
+      }
+
+      @Override
+      protected int getDialogBoundsStrategy() {
+        return DIALOG_PERSISTSIZE;
+      }
+    };
+    dialog.create();
+    dialog.open();
   }
 }
