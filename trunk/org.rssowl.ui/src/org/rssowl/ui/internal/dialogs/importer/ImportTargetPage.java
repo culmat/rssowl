@@ -53,7 +53,7 @@ import java.util.Set;
  *
  * @author bpasero
  */
-public class SelectImportTargetPage extends WizardPage {
+public class ImportTargetPage extends WizardPage {
   private FolderChooser fFolderChooser;
   private Button fChooseExistingRadio;
   private Button fCreateNewSetRadio;
@@ -62,7 +62,7 @@ public class SelectImportTargetPage extends WizardPage {
   /**
    * @param pageName
    */
-  protected SelectImportTargetPage(String pageName) {
+  protected ImportTargetPage(String pageName) {
     super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/import_wiz.png"));
     setMessage("Please choose the target location to import into.");
   }
