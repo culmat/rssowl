@@ -25,13 +25,11 @@
 package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.cleanup.CleanUpWizard;
 
 /**
@@ -68,30 +66,7 @@ public class CleanUpAction implements IWorkbenchWindowActionDelegate {
    */
   public void openWizard(Shell shell) {
     CleanUpWizard cleanUpWizard = new CleanUpWizard();
-
-    WizardDialog dialog = new WizardDialog(shell, cleanUpWizard) {
-      @Override
-      protected boolean isResizable() {
-        return true;
-      }
-
-      @Override
-      protected IDialogSettings getDialogBoundsSettings() {
-        IDialogSettings settings = Activator.getDefault().getDialogSettings();
-        IDialogSettings section = settings.getSection(SETTINGS_SECTION);
-        if (section != null)
-          return section;
-
-        return settings.addNewSection(SETTINGS_SECTION);
-      }
-
-      @Override
-      protected int getDialogBoundsStrategy() {
-        return DIALOG_PERSISTSIZE;
-      }
-    };
-    dialog.create();
-    dialog.open();
+    OwlUI.openWizard(shell, cleanUpWizard, true, SETTINGS_SECTION);
   }
 
   /*
