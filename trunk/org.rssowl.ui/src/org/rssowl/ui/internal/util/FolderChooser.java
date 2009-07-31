@@ -51,6 +51,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.ToolBar;
@@ -72,9 +73,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * The <code>FolderChooser</code> allows to select a <code>IFolder</code>.
- * It provides an expandable Tree-Viewer to display all folders which is
- * initially collapsed.
+ * The <code>FolderChooser</code> allows to select a <code>IFolder</code>. It
+ * provides an expandable Tree-Viewer to display all folders which is initially
+ * collapsed.
  *
  * @author bpasero
  */
@@ -82,6 +83,9 @@ public class FolderChooser extends Composite implements DisposeListener {
 
   /* Delay in ms before updating Selection on Events */
   private static final int SELECTION_DELAY = 20;
+
+  /* Default Height in Items */
+  private static final int DEFAULT_ITEM_HEIGHT = 10;
 
   private Composite fParent;
   private IFolder fSelectedFolder;
@@ -96,6 +100,8 @@ public class FolderChooser extends Composite implements DisposeListener {
   private ToolBar fAddFolderBar;
   private List<IFolder> fExcludes;
   private final boolean fExpandable;
+  private int fItemHeight;
+
 
   /**
    * @param parent
@@ -115,11 +121,24 @@ public class FolderChooser extends Composite implements DisposeListener {
    * @param expandable
    */
   public FolderChooser(Composite parent, IFolder initial, List<IFolder> excludes, int style, boolean expandable) {
+    this(parent, initial, excludes, style, expandable, DEFAULT_ITEM_HEIGHT);
+  }
+
+  /**
+   * @param parent
+   * @param initial
+   * @param excludes
+   * @param style
+   * @param expandable
+   * @param itemHeight
+   */
+  public FolderChooser(Composite parent, IFolder initial, List<IFolder> excludes, int style, boolean expandable, int itemHeight) {
     super(parent, style);
     fParent = parent;
     fSelectedFolder = initial;
     fExcludes = excludes;
     fExpandable = expandable;
+    fItemHeight = itemHeight;
     fResources = new LocalResourceManager(JFaceResources.getResources(), parent);
 
     initComponents();
@@ -250,6 +269,7 @@ public class FolderChooser extends Composite implements DisposeListener {
       @Override
       public void widgetSelected(SelectionEvent e) {
         onNewFolder();
+        notifyListeners(SWT.Selection, new Event());
       }
     });
 
@@ -282,7 +302,7 @@ public class FolderChooser extends Composite implements DisposeListener {
     fFolderViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fFolderViewer.getTree().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
 
-    fViewerHeight = fFolderViewer.getTree().getItemHeight() * 10 + 12;
+    fViewerHeight = fFolderViewer.getTree().getItemHeight() * fItemHeight + 12;
     ((GridData) fFolderViewerContainer.getLayoutData()).heightHint = fViewerHeight;
     ((GridData) fFolderViewerContainer.getLayoutData()).exclude = fExpandable;
 
@@ -356,6 +376,7 @@ public class FolderChooser extends Composite implements DisposeListener {
         IStructuredSelection selection = (IStructuredSelection) event.getSelection();
         if (!selection.isEmpty())
           onFolderSelected((IFolder) selection.getFirstElement());
+        notifyListeners(SWT.Selection, new Event());
       }
     });
 
