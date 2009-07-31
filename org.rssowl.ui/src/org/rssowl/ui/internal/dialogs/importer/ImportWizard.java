@@ -39,7 +39,10 @@ import org.rssowl.ui.internal.util.JobRunner;
  * @author bpasero
  */
 public class ImportWizard extends Wizard {
-  private SelectImportPage fSelectImportsPage;
+  private SelectImportSourcePage fSelectImportsPage;
+  private SelectImportElementsPage fSelectElementsPage;
+  private SelectImportTargetPage fSelectTargetPage;
+  private ImportOptionsPage fImportOptionsPage;
 
   /*
    * @see org.eclipse.jface.wizard.Wizard#addPages()
@@ -48,9 +51,21 @@ public class ImportWizard extends Wizard {
   public void addPages() {
     setWindowTitle("Import");
 
-    /* Page 1: Import Selection */
-    fSelectImportsPage = new SelectImportPage("Choose Source");
+    /* Page 1: Source to Import */
+    fSelectImportsPage = new SelectImportSourcePage("Choose Source");
     addPage(fSelectImportsPage);
+
+    /* Page 2: Elements to Import */
+    fSelectElementsPage = new SelectImportElementsPage("Choose Elements");
+    addPage(fSelectElementsPage);
+
+    /* Page 3: Target to Import */
+    fSelectTargetPage = new SelectImportTargetPage("Choose Target Location");
+    addPage(fSelectTargetPage);
+
+    /* Page 4: Import Options */
+    fImportOptionsPage = new ImportOptionsPage("Import Options");
+    addPage(fImportOptionsPage);
   }
 
   /*
@@ -58,7 +73,19 @@ public class ImportWizard extends Wizard {
    */
   @Override
   public boolean performFinish() {
-    // TODO Auto-generated method stub
+    //TODO Properly handle this method if called from first page
+    //TODO Save Entities, Save Global/Eclipse Scope, Flush Eclipse Scope
+    //TODO Properly save feeds for bookmarks if necessary
+    //    IFeedDAO feedDao = Owl.getPersistenceService().getDAOService().getFeedDAO();
+    //    FeedReference feedRef = feedDao.loadReference(uri);
+    //
+    //    /* Create a new Feed then */
+    //    if (feedRef == null) {
+    //      IFeed feed = Owl.getModelFactory().createFeed(null, uri);
+    //      feed.setHomepage(homepage != null ? URIUtils.createURI(homepage) : null);
+    //      feed.setDescription(description);
+    //      feed = feedDao.save(feed);
+    //    }
 
     FileDialog dialog = new FileDialog(getShell());
     dialog.setText("Import Feeds from OPML");
