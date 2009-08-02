@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.dialogs.importer;
 
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.swt.widgets.FileDialog;
 import org.rssowl.ui.internal.Activator;
@@ -39,9 +40,9 @@ import org.rssowl.ui.internal.util.JobRunner;
  * @author bpasero
  */
 public class ImportWizard extends Wizard {
-  private ImportSourcePage fSelectImportsPage;
-  private ImportElementsPage fSelectElementsPage;
-  private ImportTargetPage fSelectTargetPage;
+  private ImportSourcePage fImportSourcePage;
+  private ImportElementsPage fImportElementsPage;
+  private ImportTargetPage fImportTargetPage;
   private ImportOptionsPage fImportOptionsPage;
 
   /*
@@ -52,20 +53,33 @@ public class ImportWizard extends Wizard {
     setWindowTitle("Import");
 
     /* Page 1: Source to Import */
-    fSelectImportsPage = new ImportSourcePage("Choose Source");
-    addPage(fSelectImportsPage);
+    fImportSourcePage = new ImportSourcePage("Choose Source");
+    addPage(fImportSourcePage);
 
     /* Page 2: Elements to Import */
-    fSelectElementsPage = new ImportElementsPage("Choose Elements");
-    addPage(fSelectElementsPage);
+    fImportElementsPage = new ImportElementsPage("Choose Elements");
+    addPage(fImportElementsPage);
 
     /* Page 3: Target to Import */
-    fSelectTargetPage = new ImportTargetPage("Choose Target Location");
-    addPage(fSelectTargetPage);
+    fImportTargetPage = new ImportTargetPage("Choose Target Location");
+    addPage(fImportTargetPage);
 
     /* Page 4: Import Options */
     fImportOptionsPage = new ImportOptionsPage("Import Options");
     addPage(fImportOptionsPage);
+  }
+
+  /*
+   * @see org.eclipse.jface.wizard.Wizard#getNextPage(org.eclipse.jface.wizard.IWizardPage)
+   */
+  @Override
+  public IWizardPage getNextPage(IWizardPage page) {
+
+    /* Check if the ImportOptionsPage needs to be shown */
+    if (page instanceof ImportTargetPage && !fImportElementsPage.showOptionsPage())
+      return null;
+
+    return super.getNextPage(page);
   }
 
   /*
