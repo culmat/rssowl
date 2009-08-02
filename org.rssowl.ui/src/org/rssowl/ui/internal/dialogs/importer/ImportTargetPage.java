@@ -102,7 +102,7 @@ public class ImportTargetPage extends WizardPage {
 
     /* No Specific Location */
     fNoSpecificLocationRadio = new Button(container, SWT.RADIO);
-    fNoSpecificLocationRadio.setText("Direct Import"); //TODO Better wording
+    fNoSpecificLocationRadio.setText("Direct Import");
     fNoSpecificLocationRadio.setSelection(true);
     fNoSpecificLocationRadio.addSelectionListener(new SelectionAdapter() {
       @Override

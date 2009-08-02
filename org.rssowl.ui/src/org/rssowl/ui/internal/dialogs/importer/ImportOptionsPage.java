@@ -34,12 +34,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.internal.newsaction.LabelNewsAction;
+import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.ISearchFilter;
-import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.ui.internal.OwlUI;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * A {@link WizardPage} to select additionsl options for the import.
@@ -49,7 +50,8 @@ import java.util.Collection;
 public class ImportOptionsPage extends WizardPage {
   private Button fImportLabelsCheck;
   private Button fImportFiltersCheck;
-  private Button fImportSettingsCheck;
+  private Button fImportPreferencesCheck;
+  private boolean fFiltersUseLabels;
 
   /**
    * @param pageName
@@ -57,6 +59,18 @@ public class ImportOptionsPage extends WizardPage {
   protected ImportOptionsPage(String pageName) {
     super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/import_wiz.png"));
     setMessage("Please select additional options for the import.");
+  }
+
+  boolean importLabels() {
+    return fImportLabelsCheck.getSelection();
+  }
+
+  boolean importFilters() {
+    return fImportFiltersCheck.getSelection();
+  }
+
+  boolean importPreferences() {
+    return fImportPreferencesCheck.getSelection();
   }
 
   /*
@@ -70,35 +84,23 @@ public class ImportOptionsPage extends WizardPage {
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     ((GridData) infoText.getLayoutData()).widthHint = 200;
     infoText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-    infoText.setText("The following options allow to import more than just feeds. You can choose to import Labels, News Filters and Preferences.");
+    infoText.setText("The following options allow to import more than just feeds. You can choose to import Labels, News Filters and Preferences if available from the source.");
 
     /* Labels */
-    Collection<ILabel> labels = DynamicDAO.loadAll(ILabel.class);
     fImportLabelsCheck = new Button(container, SWT.CHECK);
     fImportLabelsCheck.setImage(OwlUI.getImage(fImportLabelsCheck, "icons/elcl16/labels.gif"));
-    if (!labels.isEmpty())
-      fImportLabelsCheck.setText("Import Labels (" + labels.size() + " in total)");
-    else
-      fImportLabelsCheck.setText("Import Labels (No Labels Found)");
     fImportLabelsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     ((GridData) fImportLabelsCheck.getLayoutData()).verticalIndent = 10;
-    fImportLabelsCheck.setEnabled(!labels.isEmpty());
 
     /* Filters */
-    Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
-    final boolean filtersUseLabels = false; //filtersUseLabels(filters); TODO
     fImportFiltersCheck = new Button(container, SWT.CHECK);
     fImportFiltersCheck.setImage(OwlUI.getImage(fImportFiltersCheck, "icons/etool16/filter.gif"));
-    if (!filters.isEmpty())
-      fImportFiltersCheck.setText("Import News Filters (" + filters.size() + " in total)");
-    else
-      fImportFiltersCheck.setText("Import News Filters (No Filters Found)");
     fImportFiltersCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fImportFiltersCheck.setEnabled(!filters.isEmpty());
     fImportFiltersCheck.addSelectionListener(new SelectionAdapter() {
+
       @Override
       public void widgetSelected(SelectionEvent e) {
-        if (fImportFiltersCheck.getSelection() && !fImportLabelsCheck.getSelection() && filtersUseLabels) {
+        if (fImportFiltersCheck.getSelection() && !fImportLabelsCheck.getSelection() && fFiltersUseLabels) {
           fImportLabelsCheck.setSelection(true);
           setMessage("Labels will also be imported because some Filters make use of them as part of their actions.", IMessageProvider.INFORMATION);
         } else if (!fImportFiltersCheck.getSelection()) {
@@ -107,11 +109,10 @@ public class ImportOptionsPage extends WizardPage {
       }
     });
 
-    /* Properties */
-    fImportSettingsCheck = new Button(container, SWT.CHECK);
-    fImportSettingsCheck.setImage(OwlUI.getImage(fImportSettingsCheck, "icons/elcl16/preferences.gif"));
-    fImportSettingsCheck.setText("Import Preferences");
-    fImportSettingsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    /* Preferences */
+    fImportPreferencesCheck = new Button(container, SWT.CHECK);
+    fImportPreferencesCheck.setImage(OwlUI.getImage(fImportPreferencesCheck, "icons/elcl16/preferences.gif"));
+    fImportPreferencesCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     setControl(container);
   }
@@ -121,6 +122,46 @@ public class ImportOptionsPage extends WizardPage {
   */
   @Override
   public void setVisible(boolean visible) {
+    ImportElementsPage elementsPage = (ImportElementsPage) getPreviousPage().getPreviousPage();
+    update(elementsPage.getLabelsToImport().size(), elementsPage.getFiltersToImport().size(), !elementsPage.getPreferencesToImport().isEmpty());
+    fFiltersUseLabels = filtersUseLabels(elementsPage.getFiltersToImport());
+
     super.setVisible(visible);
+  }
+
+  private void update(int labelCount, int filterCount, boolean hasPreferences) {
+
+    /* Labels */
+    if (labelCount != 0)
+      fImportLabelsCheck.setText("Import Labels (" + labelCount + " in total)");
+    else
+      fImportLabelsCheck.setText("Import Labels (No Labels Available)");
+    fImportLabelsCheck.setEnabled(labelCount != 0);
+
+    /* Filters */
+    if (filterCount != 0)
+      fImportFiltersCheck.setText("Import News Filters (" + filterCount + " in total)");
+    else
+      fImportFiltersCheck.setText("Import News Filters (No Filters Available)");
+    fImportFiltersCheck.setEnabled(filterCount != 0);
+
+    /* Preferences */
+    if (hasPreferences)
+      fImportPreferencesCheck.setText("Import Preferences");
+    else
+      fImportPreferencesCheck.setText("Import Preferences (No Preferences Available)");
+    fImportPreferencesCheck.setEnabled(hasPreferences);
+  }
+
+  private boolean filtersUseLabels(Collection<ISearchFilter> filters) {
+    for (ISearchFilter filter : filters) {
+      List<IFilterAction> actions = filter.getActions();
+      for (IFilterAction action : actions) {
+        if (LabelNewsAction.ID.equals(action.getActionId()))
+          return true;
+      }
+    }
+
+    return false;
   }
 }

@@ -51,6 +51,9 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.IPreference;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.ui.internal.Activator;
@@ -84,6 +87,9 @@ public class ImportElementsPage extends WizardPage {
   private ExistingBookmarkFilter fExistingFilter = new ExistingBookmarkFilter();
   private Source fLastSourceKind;
   private File fLastSourceFile;
+  private List<ILabel> fLabels = new ArrayList<ILabel>();
+  private List<ISearchFilter> fFilters = new ArrayList<ISearchFilter>();
+  private List<IPreference> fPreferences = new ArrayList<IPreference>();
 
   /* Filter to Exclude Existing Bookmarks (empty folders are excluded as well) */
   private static class ExistingBookmarkFilter extends ViewerFilter {
@@ -140,6 +146,38 @@ public class ImportElementsPage extends WizardPage {
   protected ImportElementsPage(String pageName) {
     super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/import_wiz.png"));
     setMessage("Please choose the elements to import.");
+  }
+
+  List<IFolderChild> getFolderChildsToImport() {
+
+    /* Find Checked Elements */
+    List<IFolderChild> folderChilds = new ArrayList<IFolderChild>();
+    Object[] checkedElements = fViewer.getCheckedElements();
+    for (Object checkedElement : checkedElements) {
+      if (checkedElement instanceof IFolderChild)
+        folderChilds.add((IFolderChild) checkedElement);
+    }
+
+    return folderChilds;
+  }
+
+  /* Returns Labels available for Import */
+  List<ILabel> getLabelsToImport() {
+    return fLabels;
+  }
+
+  /* Returns Filters available for Import */
+  List<ISearchFilter> getFiltersToImport() {
+    return fFilters;
+  }
+
+  /* Returns the Preferences available for Import */
+  List<IPreference> getPreferencesToImport() {
+    return fPreferences;
+  }
+
+  boolean showOptionsPage() {
+    return !fLabels.isEmpty() || !fFilters.isEmpty() || !fPreferences.isEmpty();
   }
 
   /*
@@ -352,12 +390,17 @@ public class ImportElementsPage extends WizardPage {
     else if (source == Source.FILE && importSourcePage.getImportFile().equals(fLastSourceFile))
       return;
 
+    /* Remember Source */
     fLastSourceKind = source;
     fLastSourceFile = importSourcePage.getImportFile();
 
-    InputStream in = null;
+    /* Reset Fields */
+    fLabels.clear();
+    fFilters.clear();
+    fPreferences.clear();
 
     /* Import from Supplied File */
+    InputStream in = null;
     if (source == Source.FILE) {
       File fileToImport = importSourcePage.getImportFile();
       in = new FileInputStream(fileToImport);
@@ -374,6 +417,12 @@ public class ImportElementsPage extends WizardPage {
     for (IEntity type : types) {
       if (type instanceof IFolderChild)
         folderChilds.add((IFolderChild) type);
+      else if (type instanceof ILabel)
+        fLabels.add((ILabel) type);
+      else if (type instanceof ISearchFilter)
+        fFilters.add((ISearchFilter) type);
+      else if (type instanceof IPreference)
+        fPreferences.add((IPreference) type);
     }
 
     /* Re-Add Filter if necessary */
