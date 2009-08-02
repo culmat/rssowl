@@ -55,6 +55,7 @@ import java.util.Set;
  */
 public class ImportTargetPage extends WizardPage {
   private FolderChooser fFolderChooser;
+  private Button fNoSpecificLocationRadio;
   private Button fChooseExistingRadio;
   private Button fCreateNewSetRadio;
   private Text fSetNameInput;
@@ -68,17 +69,25 @@ public class ImportTargetPage extends WizardPage {
   }
 
   /**
-   * @return the target {@link IFolder} for the import.
+   * @return the target {@link IFolder} for the import or <code>null</code> if
+   * no specific location is selected.
    */
   IFolder getTargetLocation() {
+
+    /* No specific Location */
+    if (fNoSpecificLocationRadio.getSelection())
+      return null;
+
+    /* Specific Location */
     if (fChooseExistingRadio.getSelection())
       return fFolderChooser.getFolder();
 
+    /* New Bookmark Set */
     return Owl.getModelFactory().createFolder(null, null, fSetNameInput.getText());
   }
 
   private void updatePageComplete() {
-    if (fChooseExistingRadio.getSelection())
+    if (fNoSpecificLocationRadio.getSelection() || fChooseExistingRadio.getSelection())
       setPageComplete(true);
     else
       setPageComplete(StringUtils.isSet(fSetNameInput.getText()));
@@ -91,19 +100,20 @@ public class ImportTargetPage extends WizardPage {
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(new GridLayout(1, false));
 
-    /* Choose Existing Folder */
-    fChooseExistingRadio = new Button(container, SWT.RADIO);
-    fChooseExistingRadio.setText("Import into an existing Folder");
-    fChooseExistingRadio.setSelection(true);
-    fChooseExistingRadio.addSelectionListener(new SelectionAdapter() {
+    /* No Specific Location */
+    fNoSpecificLocationRadio = new Button(container, SWT.RADIO);
+    fNoSpecificLocationRadio.setText("Direct Import"); //TODO Better wording
+    fNoSpecificLocationRadio.setSelection(true);
+    fNoSpecificLocationRadio.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        fSetNameInput.setEnabled(!fChooseExistingRadio.getSelection());
-        if (!fChooseExistingRadio.getSelection())
-          fSetNameInput.setFocus();
         updatePageComplete();
       }
     });
+
+    /* Choose Existing Folder */
+    fChooseExistingRadio = new Button(container, SWT.RADIO);
+    fChooseExistingRadio.setText("Import into an existing Folder");
 
     Composite folderContainer = new Composite(container, SWT.None);
     folderContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
@@ -118,8 +128,9 @@ public class ImportTargetPage extends WizardPage {
     fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
     fFolderChooser.addListener(SWT.Selection, new Listener() {
       public void handleEvent(Event event) {
-        if (fCreateNewSetRadio.getSelection()) {
+        if (!fChooseExistingRadio.getSelection()) {
           fChooseExistingRadio.setSelection(true);
+          fNoSpecificLocationRadio.setSelection(false);
           fCreateNewSetRadio.setSelection(false);
           fSetNameInput.setEnabled(false);
           updatePageComplete();
@@ -130,6 +141,15 @@ public class ImportTargetPage extends WizardPage {
     /* Create new Bookmark Set */
     fCreateNewSetRadio = new Button(container, SWT.RADIO);
     fCreateNewSetRadio.setText("Import into a new Bookmark Set");
+    fChooseExistingRadio.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        fSetNameInput.setEnabled(fCreateNewSetRadio.getSelection());
+        if (fCreateNewSetRadio.getSelection())
+          fSetNameInput.setFocus();
+        updatePageComplete();
+      }
+    });
 
     Composite newBookmarkSetContainer = new Composite(container, SWT.None);
     newBookmarkSetContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
