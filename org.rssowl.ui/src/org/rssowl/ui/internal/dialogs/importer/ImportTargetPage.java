@@ -113,16 +113,17 @@ public class ImportTargetPage extends WizardPage {
 
     /* Choose Existing Folder */
     fChooseExistingRadio = new Button(container, SWT.RADIO);
+    fChooseExistingRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    ((GridData) fChooseExistingRadio.getLayoutData()).verticalIndent = 10;
     fChooseExistingRadio.setText("Import into an existing Folder");
 
     Composite folderContainer = new Composite(container, SWT.None);
     folderContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
     ((GridLayout) folderContainer.getLayout()).marginLeft = 15;
-    ((GridLayout) folderContainer.getLayout()).marginBottom = 5;
     folderContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     Set<IFolder> rootFolders = CoreUtils.loadRootFolders();
-    fFolderChooser = new FolderChooser(folderContainer, rootFolders.iterator().next(), null, SWT.BORDER, false, 7);
+    fFolderChooser = new FolderChooser(folderContainer, rootFolders.iterator().next(), null, SWT.BORDER, true, 5);
     fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
     fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -140,6 +141,8 @@ public class ImportTargetPage extends WizardPage {
 
     /* Create new Bookmark Set */
     fCreateNewSetRadio = new Button(container, SWT.RADIO);
+    fCreateNewSetRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    ((GridData) fCreateNewSetRadio.getLayoutData()).verticalIndent = 10;
     fCreateNewSetRadio.setText("Import into a new Bookmark Set");
     fChooseExistingRadio.addSelectionListener(new SelectionAdapter() {
       @Override
