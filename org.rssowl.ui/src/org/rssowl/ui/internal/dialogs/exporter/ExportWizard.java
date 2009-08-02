@@ -67,8 +67,8 @@ import java.util.Set;
  * @author bpasero
  */
 public class ExportWizard extends Wizard {
-  private ExportElementsPage fFolderChildsPage;
-  private ExportOptionsPage fExportSettingsPage;
+  private ExportElementsPage fExportElementsPage;
+  private ExportOptionsPage fExportOptionsPage;
 
   /*
    * @see org.eclipse.jface.wizard.Wizard#addPages()
@@ -78,12 +78,12 @@ public class ExportWizard extends Wizard {
     setWindowTitle("Export");
 
     /* Page 1: Folder Child Selection */
-    fFolderChildsPage = new ExportElementsPage("Choose Elements");
-    addPage(fFolderChildsPage);
+    fExportElementsPage = new ExportElementsPage("Choose Elements");
+    addPage(fExportElementsPage);
 
     /* Page 2: Export Settings Configuration */
-    fExportSettingsPage = new ExportOptionsPage("Export Options");
-    addPage(fExportSettingsPage);
+    fExportOptionsPage = new ExportOptionsPage("Export Options");
+    addPage(fExportOptionsPage);
   }
 
   /*
@@ -121,7 +121,7 @@ public class ExportWizard extends Wizard {
     if (string != null) {
       File file = new File(string);
       try {
-        Owl.getInterpreter().exportTo(file, getElementsToExport(), fExportSettingsPage.getExportOptions());
+        Owl.getInterpreter().exportTo(file, getElementsToExport(), fExportOptionsPage.getExportOptions());
 
         return true;
       } catch (InterpreterException e) {
@@ -134,8 +134,8 @@ public class ExportWizard extends Wizard {
 
   /* Ensure that Childs to Export is normalized and contains all dependent Locations from Searches and Filters */
   private List<IFolderChild> getElementsToExport() {
-    List<IFolderChild> selectedElements = fFolderChildsPage.getElementsToExport();
-    EnumSet<Options> options = fExportSettingsPage.getExportOptions();
+    List<IFolderChild> selectedElements = fExportElementsPage.getElementsToExport();
+    EnumSet<Options> options = fExportOptionsPage.getExportOptions();
 
     /* Check if dependent locations need to be added manually */
     Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
