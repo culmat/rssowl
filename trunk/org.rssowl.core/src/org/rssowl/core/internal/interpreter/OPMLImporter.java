@@ -54,6 +54,7 @@ import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.SearchSpecifier;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.pref.IPreferenceType;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.StringUtils;
@@ -618,6 +619,7 @@ public class OPMLImporter implements ITypeImporter {
     if (StringUtils.isSet(key) && value != null && typeVal != null && kindVal != null) {
       IPreferenceType type = IPreferenceType.values()[Integer.parseInt(typeVal)];
       IPreference preference = Owl.getModelFactory().createPreference(key);
+      preference.setProperty(ITypeImporter.DATA_KEY, IPreferenceScope.Kind.values()[Integer.parseInt(kindVal)]);
 
       switch (type) {
         case BOOLEAN:
