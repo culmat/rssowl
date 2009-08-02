@@ -41,6 +41,9 @@ public interface ITypeImporter {
   /** Key to store the actual ID of an {@link IEntity} if required */
   public static final String ID_KEY = "org.rssowl.core.interpreter.typeimporter.EntityId";
 
+  /** Key to store extra data with the {@link IEntity} if required */
+  public static final String DATA_KEY = "org.rssowl.core.interpreter.typeimporter.DataId";
+
   /**
    * Import a Type from the given Document. A very common usecase is importing
    * an <code>IFolder</code> from an OPML or other XML Document.
