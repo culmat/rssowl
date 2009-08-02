@@ -53,7 +53,7 @@ import java.util.List;
  *
  * @author bpasero
  */
-public class ExportSettingsPage extends WizardPage {
+public class ExportOptionsPage extends WizardPage {
   private Button fExportSettingsCheck;
   private Button fExportFiltersCheck;
   private Button fExportLabelsCheck;
@@ -61,7 +61,7 @@ public class ExportSettingsPage extends WizardPage {
   /**
    * @param pageName
    */
-  protected ExportSettingsPage(String pageName) {
+  protected ExportOptionsPage(String pageName) {
     super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/export_wiz.png"));
     setMessage("Please select additional options for the export.");
   }

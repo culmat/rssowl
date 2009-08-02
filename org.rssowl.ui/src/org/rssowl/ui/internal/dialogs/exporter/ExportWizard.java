@@ -68,7 +68,7 @@ import java.util.Set;
  */
 public class ExportWizard extends Wizard {
   private ExportElementsPage fFolderChildsPage;
-  private ExportSettingsPage fExportSettingsPage;
+  private ExportOptionsPage fExportSettingsPage;
 
   /*
    * @see org.eclipse.jface.wizard.Wizard#addPages()
@@ -82,7 +82,7 @@ public class ExportWizard extends Wizard {
     addPage(fFolderChildsPage);
 
     /* Page 2: Export Settings Configuration */
-    fExportSettingsPage = new ExportSettingsPage("Export Options");
+    fExportSettingsPage = new ExportOptionsPage("Export Options");
     addPage(fExportSettingsPage);
   }
 
