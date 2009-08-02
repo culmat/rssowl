@@ -149,6 +149,7 @@ public class ImportElementsPage extends WizardPage {
   }
 
   List<IFolderChild> getFolderChildsToImport() {
+    importSource(); //Ensure to be in sync with Source
 
     /* Find Checked Elements */
     List<IFolderChild> folderChilds = new ArrayList<IFolderChild>();
@@ -163,16 +164,19 @@ public class ImportElementsPage extends WizardPage {
 
   /* Returns Labels available for Import */
   List<ILabel> getLabelsToImport() {
+    importSource(); //Ensure to be in sync with Source
     return fLabels;
   }
 
   /* Returns Filters available for Import */
   List<ISearchFilter> getFiltersToImport() {
+    importSource(); //Ensure to be in sync with Source
     return fFilters;
   }
 
   /* Returns the Preferences available for Import */
   List<IPreference> getPreferencesToImport() {
+    importSource(); //Ensure to be in sync with Source
     return fPreferences;
   }
 
