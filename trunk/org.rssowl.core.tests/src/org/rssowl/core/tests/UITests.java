@@ -27,6 +27,7 @@ package org.rssowl.core.tests;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.rssowl.core.tests.importer.FileImportTest;
 import org.rssowl.core.tests.importer.ImportExportOPMLTest;
 import org.rssowl.core.tests.ui.CleanUpTests;
 import org.rssowl.core.tests.ui.EntityPropertyPageTests;
@@ -58,5 +59,6 @@ import org.rssowl.core.tests.ui.UndoTest;
   CleanUpTests.class,
   ExpandingReaderTests.class,
   ImportExportOPMLTest.class,
+  FileImportTest.class,
   UndoTest.class })
 public class UITests {}
