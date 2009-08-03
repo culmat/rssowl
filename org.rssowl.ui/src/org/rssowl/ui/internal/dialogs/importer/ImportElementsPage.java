@@ -87,6 +87,7 @@ public class ImportElementsPage extends WizardPage {
   private ExistingBookmarkFilter fExistingFilter = new ExistingBookmarkFilter();
   private Source fLastSourceKind;
   private File fLastSourceFile;
+  private long fLastSourceFileModified;
   private List<ILabel> fLabels = new ArrayList<ILabel>();
   private List<ISearchFilter> fFilters = new ArrayList<ISearchFilter>();
   private List<IPreference> fPreferences = new ArrayList<IPreference>();
@@ -396,12 +397,13 @@ public class ImportElementsPage extends WizardPage {
     /* Return if the Source did not Change */
     if (source == Source.DEFAULT && fLastSourceKind == Source.DEFAULT)
       return;
-    else if (source == Source.FILE && importSourcePage.getImportFile().equals(fLastSourceFile))
+    else if (source == Source.FILE && importSourcePage.getImportFile().equals(fLastSourceFile) && importSourcePage.getImportFile().lastModified() == fLastSourceFileModified)
       return;
 
     /* Remember Source */
     fLastSourceKind = source;
     fLastSourceFile = importSourcePage.getImportFile();
+    fLastSourceFileModified = fLastSourceFile.lastModified();
 
     /* Reset Fields */
     fLabels.clear();
