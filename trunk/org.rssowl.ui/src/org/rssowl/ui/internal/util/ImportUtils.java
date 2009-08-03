@@ -79,6 +79,35 @@ public class ImportUtils {
    * <code>null</code> if none and this is a direct import. May only be
    * <code>null</code> if a {@link IFolder} is already present in the
    * application.
+   * @param elements the list of elements to import. Supported types are
+   * {@link IFolderChild}, {@link ILabel}, {@link ISearchFilter} and
+   * {@link IPreference}.
+   */
+  public static void doImport(IFolder target, List<? extends IEntity> elements) {
+    List<IFolderChild> folderChilds = new ArrayList<IFolderChild>();
+    List<ILabel> labels = new ArrayList<ILabel>();
+    List<ISearchFilter> filters = new ArrayList<ISearchFilter>();
+    List<IPreference> preferences = new ArrayList<IPreference>();
+
+    for (IEntity entity : elements) {
+      if (entity instanceof IFolderChild)
+        folderChilds.add((IFolderChild) entity);
+      else if (entity instanceof ILabel)
+        labels.add((ILabel) entity);
+      else if (entity instanceof ISearchFilter)
+        filters.add((ISearchFilter) entity);
+      else if (entity instanceof IPreference)
+        preferences.add((IPreference) entity);
+    }
+
+    doImport(target, folderChilds, labels, filters, preferences);
+  }
+
+  /**
+   * @param target the target {@link IFolder} for the import or
+   * <code>null</code> if none and this is a direct import. May only be
+   * <code>null</code> if a {@link IFolder} is already present in the
+   * application.
    * @param elements the list of {@link IFolderChild} to import.
    * @param labels the list of {@link ILabel} to import.
    * @param filters the list of {@link ISearchFilter} to import.
