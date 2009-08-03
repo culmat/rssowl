@@ -144,6 +144,9 @@ public class ImportSourcePage extends WizardPage {
     FileDialog dialog = new FileDialog(getShell());
     dialog.setText("Import From File");
     dialog.setFilterExtensions(new String[] { "*.opml", "*.xml", "*.*" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+    if (StringUtils.isSet(fFileInput.getText()))
+      dialog.setFileName(fFileInput.getText());
+
     String string = dialog.open();
     if (string != null)
       fFileInput.setText(string);
