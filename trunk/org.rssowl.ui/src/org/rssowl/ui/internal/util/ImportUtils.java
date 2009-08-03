@@ -78,7 +78,8 @@ public class ImportUtils {
    * @param target the target {@link IFolder} for the import or
    * <code>null</code> if none and this is a direct import. May only be
    * <code>null</code> if a {@link IFolder} is already present in the
-   * application.
+   * application or the list of elements to import contains a bookmark set
+   * itself.
    * @param elements the list of elements to import. Supported types are
    * {@link IFolderChild}, {@link ILabel}, {@link ISearchFilter} and
    * {@link IPreference}.
@@ -107,7 +108,8 @@ public class ImportUtils {
    * @param target the target {@link IFolder} for the import or
    * <code>null</code> if none and this is a direct import. May only be
    * <code>null</code> if a {@link IFolder} is already present in the
-   * application.
+   * application or the list of elements to import contains a bookmark set
+   * itself.
    * @param elements the list of {@link IFolderChild} to import.
    * @param labels the list of {@link ILabel} to import.
    * @param filters the list of {@link ISearchFilter} to import.
@@ -314,13 +316,15 @@ public class ImportUtils {
     Set<IFolder> rootFolders = CoreUtils.loadRootFolders();
 
     /* Load the current selected Set as Location if necessary */
-    IFolder selectedSet;
-    if (!InternalOwl.TESTING) {
-      String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
-      Long selectedFolderID = prefsDAO.load(selectedBookMarkSetPref).getLong();
-      selectedSet = folderDAO.load(selectedFolderID);
-    } else
-      selectedSet = rootFolders.iterator().next();
+    IFolder selectedSet = null;
+    if (!rootFolders.isEmpty()) {
+      if (!InternalOwl.TESTING) {
+        String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
+        Long selectedFolderID = prefsDAO.load(selectedBookMarkSetPref).getLong();
+        selectedSet = folderDAO.load(selectedFolderID);
+      } else
+        selectedSet = rootFolders.iterator().next();
+    }
 
     /* Import Elements */
     for (IFolderChild element : elements) {
@@ -333,7 +337,7 @@ public class ImportUtils {
         if (folder.getParent() == null) {
 
           /* Default Bookmark Set */
-          if (folder.getProperty(ITypeImporter.TEMPORARY_FOLDER) != null) {
+          if (folder.getProperty(ITypeImporter.TEMPORARY_FOLDER) != null && selectedSet != null) {
 
             /* Reparent Childs into selected set */
             reparent(folder, selectedSet);
@@ -374,7 +378,7 @@ public class ImportUtils {
         }
 
         /* Normal Folder */
-        else {
+        else if (selectedSet != null) {
           folder.setParent(selectedSet);
           selectedSet.addFolder(folder, null, null);
           foldersToSave.add(selectedSet);
@@ -382,7 +386,7 @@ public class ImportUtils {
       }
 
       /* Any Newsmark */
-      else if (element instanceof INewsMark) {
+      else if (element instanceof INewsMark && selectedSet != null) {
         INewsMark mark = (INewsMark) element;
         mark.setParent(selectedSet);
         selectedSet.addMark(mark, null, null);
