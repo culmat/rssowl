@@ -44,6 +44,9 @@ public interface ITypeImporter {
   /** Key to store extra data with the {@link IEntity} if required */
   public static final String DATA_KEY = "org.rssowl.core.interpreter.typeimporter.DataId";
 
+  /** Key to store a boolean indicating that a Folder was only created as temporary container */
+  public static final String TEMPORARY_FOLDER = "org.rssowl.core.interpreter.typeimporter.TemporaryFolder";
+
   /**
    * Import a Type from the given Document. A very common usecase is importing
    * an <code>IFolder</code> from an OPML or other XML Document.
