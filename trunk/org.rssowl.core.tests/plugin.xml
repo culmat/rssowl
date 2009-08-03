@@ -52,7 +52,7 @@
    <extension
          point="org.rssowl.core.TypeImporter">
       <typeImporter
-            class="org.rssowl.core.tests.interpreter.MyTypeImporter"
+            class="org.rssowl.core.tests.importer.MyTypeImporter"
             rootElement="myimport"/>
    </extension>
    <extension

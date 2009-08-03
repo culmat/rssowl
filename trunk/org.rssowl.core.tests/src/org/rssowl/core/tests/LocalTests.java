@@ -29,7 +29,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.rssowl.core.tests.controller.ControllerTestLocal;
 import org.rssowl.core.tests.controller.ReloadTestLocal;
-import org.rssowl.core.tests.interpreter.ImporterTest;
+import org.rssowl.core.tests.importer.ImporterTest;
 import org.rssowl.core.tests.interpreter.InterpreterTest;
 import org.rssowl.core.tests.model.ApplicationLayerTest;
 import org.rssowl.core.tests.model.DBManagerTest;

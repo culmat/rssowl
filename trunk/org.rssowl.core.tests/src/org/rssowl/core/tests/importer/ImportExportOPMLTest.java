@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.tests.interpreter;
+package org.rssowl.core.tests.importer;
 
 import static junit.framework.Assert.assertNull;
 import static junit.framework.Assert.assertTrue;
