@@ -45,6 +45,7 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.FolderChooser;
 import org.rssowl.ui.internal.util.LayoutUtils;
+import org.rssowl.ui.internal.util.FolderChooser.ExpandStrategy;
 
 import java.util.Set;
 
@@ -124,6 +125,7 @@ public class ImportTargetPage extends WizardPage {
 
     Set<IFolder> rootFolders = CoreUtils.loadRootFolders();
     fFolderChooser = new FolderChooser(folderContainer, rootFolders.iterator().next(), null, SWT.BORDER, true, 5);
+    fFolderChooser.setExpandStrategy(ExpandStrategy.LAYOUT);
     fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
     fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
