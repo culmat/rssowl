@@ -76,7 +76,7 @@ import java.util.Map.Entry;
 
 /**
  * Implementation of {@link ITypeExporter} for the OPML XML format.
- * 
+ *
  * @author bpasero
  */
 public class OPMLExporter implements ITypeExporter {
@@ -339,7 +339,8 @@ public class OPMLExporter implements ITypeExporter {
         Element conditionElement = new Element(Tags.SEARCH_CONDITION.get(), RSSOWL_NS);
         element.addContent(conditionElement);
 
-        fillElement(conditionElement, condition, df);
+        if (condition.getValue() != null)
+          fillElement(conditionElement, condition, df);
       }
     }
 
@@ -384,7 +385,8 @@ public class OPMLExporter implements ITypeExporter {
           Element conditionElement = new Element(Tags.SEARCH_CONDITION.get(), RSSOWL_NS);
           searchElement.addContent(conditionElement);
 
-          fillElement(conditionElement, condition, df);
+          if (condition.getValue() != null)
+            fillElement(conditionElement, condition, df);
         }
       }
 
