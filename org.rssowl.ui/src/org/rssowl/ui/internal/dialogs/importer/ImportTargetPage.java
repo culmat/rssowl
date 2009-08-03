@@ -144,7 +144,7 @@ public class ImportTargetPage extends WizardPage {
     fCreateNewSetRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     ((GridData) fCreateNewSetRadio.getLayoutData()).verticalIndent = 10;
     fCreateNewSetRadio.setText("Import into a new Bookmark Set");
-    fChooseExistingRadio.addSelectionListener(new SelectionAdapter() {
+    fCreateNewSetRadio.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         fSetNameInput.setEnabled(fCreateNewSetRadio.getSelection());
