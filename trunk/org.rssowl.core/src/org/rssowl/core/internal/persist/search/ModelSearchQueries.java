@@ -455,32 +455,34 @@ public class ModelSearchQueries {
   private static BooleanQuery createLocationClause(ISearchCondition condition) {
     BooleanQuery bQuery = new BooleanQuery();
     Long[][] value = (Long[][]) condition.getValue();
+    if (value != null) {
 
-    /* Receive Folders */
-    for (int i = 0; value[0] != null && i < value[0].length; i++) {
-      if (value[0][i] != null) {
-        IFolder folder = new FolderReference(value[0][i]).resolve();
-        if (folder != null)
-          addFolderLocationClause(bQuery, folder);
+      /* Receive Folders */
+      for (int i = 0; value[0] != null && i < value[0].length; i++) {
+        if (value[0][i] != null) {
+          IFolder folder = new FolderReference(value[0][i]).resolve();
+          if (folder != null)
+            addFolderLocationClause(bQuery, folder);
+        }
       }
-    }
 
-    /* Receive BookMarks */
-    for (int i = 0; value[1] != null && i < value[1].length; i++) {
-      if (value[1][i] != null) {
-        IBookMark bookmark = new BookMarkReference(value[1][i]).resolve();
-        if (bookmark != null)
-          addBookMarkLocationClause(bQuery, bookmark);
+      /* Receive BookMarks */
+      for (int i = 0; value[1] != null && i < value[1].length; i++) {
+        if (value[1][i] != null) {
+          IBookMark bookmark = new BookMarkReference(value[1][i]).resolve();
+          if (bookmark != null)
+            addBookMarkLocationClause(bQuery, bookmark);
+        }
       }
-    }
 
-    /* Receive NewsBins */
-    if (value.length == 3) {
-      for (int i = 0; value[2] != null && i < value[2].length; i++) {
-        if (value[2][i] != null) {
-          INewsBin newsbin = new NewsBinReference(value[2][i]).resolve();
-          if (newsbin != null)
-            addNewsBinLocationClause(bQuery, newsbin);
+      /* Receive NewsBins */
+      if (value.length == 3) {
+        for (int i = 0; value[2] != null && i < value[2].length; i++) {
+          if (value[2][i] != null) {
+            INewsBin newsbin = new NewsBinReference(value[2][i]).resolve();
+            if (newsbin != null)
+              addNewsBinLocationClause(bQuery, newsbin);
+          }
         }
       }
     }

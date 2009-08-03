@@ -255,14 +255,20 @@ public class OPMLImporter implements ITypeImporter {
 
     /* Search Specifier */
     Element specifierElement = conditionElement.getChild(Tags.SPECIFIER.get(), RSSOWL_NS);
+    if (specifierElement == null)
+      return null;
     SearchSpecifier searchSpecifier = SearchSpecifier.values()[Integer.parseInt(specifierElement.getAttributeValue(Attributes.ID.get()))];
 
     /* Search Value */
     Element valueElement = conditionElement.getChild(Tags.SEARCH_VALUE.get(), RSSOWL_NS);
+    if (valueElement == null)
+      return null;
     Object value = getValue(valueElement, RSSOWL_NS, dateFormat);
 
     /* Search Field */
     Element fieldElement = conditionElement.getChild(Tags.SEARCH_FIELD.get(), RSSOWL_NS);
+    if (fieldElement == null)
+      return null;
     String fieldName = fieldElement.getAttributeValue(Attributes.NAME.get());
     String entityName = fieldElement.getAttributeValue(Attributes.ENTITY.get());
     ISearchField searchField = Owl.getModelFactory().createSearchField(getFieldID(fieldName), entityName);
