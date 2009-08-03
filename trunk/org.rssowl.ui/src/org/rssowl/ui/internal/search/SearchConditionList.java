@@ -237,10 +237,11 @@ public class SearchConditionList extends ScrolledComposite {
       }
 
       /* Add Conditions */
-      if (conditions != null) {
+      if (conditions != null && !conditions.isEmpty()) {
         for (ISearchCondition condition : conditions)
           addItem(condition);
-      }
+      } else
+        addItem(getDefaultCondition());
     } finally {
       setRedraw(true);
     }
@@ -289,10 +290,11 @@ public class SearchConditionList extends ScrolledComposite {
     setContent(fContainer);
 
     /* Add Conditions */
-    if (conditions != null) {
+    if (conditions != null && !conditions.isEmpty()) {
       for (ISearchCondition condition : conditions)
         addItem(condition);
-    }
+    } else
+      addItem(getDefaultCondition());
 
     /* Update Size */
     updateSize();
