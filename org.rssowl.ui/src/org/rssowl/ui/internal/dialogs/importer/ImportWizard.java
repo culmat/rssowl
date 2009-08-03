@@ -29,11 +29,15 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.PlatformUI;
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearchFilter;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IFeedDAO;
+import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
@@ -42,6 +46,7 @@ import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.JobRunner;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -106,6 +111,9 @@ public class ImportWizard extends Wizard {
 
     /* Collect Elements to Import */
     List<IFolderChild> folderChilds = fImportElementsPage.getFolderChildsToImport();
+    if (fImportElementsPage.excludeExisting())
+      folderChilds = excludeExisting(folderChilds);
+
     List<ILabel> labels = fImportElementsPage.getLabelsToImport();
     List<ISearchFilter> filters = fImportElementsPage.getFiltersToImport();
     List<IPreference> preferences = fImportElementsPage.getPreferencesToImport();
@@ -159,6 +167,61 @@ public class ImportWizard extends Wizard {
         Controller.getDefault().getSavedSearchService().updateSavedSearches(true);
       }
     });
+  }
+
+  private List<IFolderChild> excludeExisting(List<IFolderChild> folderChilds) {
+    IFeedDAO dao = DynamicDAO.getDAO(IFeedDAO.class);
+
+    for (Iterator<IFolderChild> iterator = folderChilds.iterator(); iterator.hasNext();) {
+      IFolderChild child = iterator.next();
+
+      /* Bookmark */
+      if (child instanceof IBookMark) {
+        IBookMark bm = (IBookMark) child;
+        FeedReference existingFeed = dao.loadReference(bm.getFeedLinkReference().getLink());
+        if (existingFeed != null)
+          iterator.remove();
+      }
+
+      /* Folder */
+      else if (child instanceof IFolder) {
+        excludeExisting((IFolder) child);
+      }
+    }
+
+    /* Exclude Empty Folders */
+    for (Iterator<IFolderChild> iterator = folderChilds.iterator(); iterator.hasNext();) {
+      IFolderChild child = iterator.next();
+      if (child instanceof IFolder && ((IFolder) child).getChildren().isEmpty())
+        iterator.remove();
+    }
+
+    return folderChilds;
+  }
+
+  private void excludeExisting(IFolder folder) {
+    IFeedDAO dao = DynamicDAO.getDAO(IFeedDAO.class);
+    List<IFolderChild> children = folder.getChildren();
+
+    for (IFolderChild child : children) {
+
+      /* Bookmark */
+      if (child instanceof IBookMark) {
+        IBookMark bm = (IBookMark) child;
+        FeedReference existingFeed = dao.loadReference(bm.getFeedLinkReference().getLink());
+        if (existingFeed != null)
+          folder.removeChild(bm);
+      }
+
+      /* Folder */
+      else if (child instanceof IFolder) {
+        excludeExisting((IFolder) child);
+      }
+    }
+
+    /* Remove from Parent if Empty Now */
+    if (folder.getChildren().isEmpty() && folder.getParent() != null)
+      folder.getParent().removeChild(folder);
   }
 
   /*
