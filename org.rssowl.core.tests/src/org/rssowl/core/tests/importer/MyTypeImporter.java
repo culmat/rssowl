@@ -22,7 +22,7 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.tests.interpreter;
+package org.rssowl.core.tests.importer;
 
 import org.jdom.Attribute;
 import org.jdom.Document;
