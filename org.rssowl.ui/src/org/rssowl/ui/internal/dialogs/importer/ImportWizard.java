@@ -24,14 +24,25 @@
 
 package org.rssowl.ui.internal.dialogs.importer;
 
-import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
-import org.eclipse.swt.widgets.FileDialog;
-import org.rssowl.ui.internal.Activator;
+import org.eclipse.ui.PlatformUI;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.IPreference;
+import org.rssowl.core.persist.ISearchFilter;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.JobRunner;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A {@link Wizard} to import bookmarks, saved searches and bins with the option
@@ -87,41 +98,67 @@ public class ImportWizard extends Wizard {
    */
   @Override
   public boolean performFinish() {
-    //TODO Properly handle this method if called from first page
-    //TODO Save Entities, Save Global/Eclipse Scope, Flush Eclipse Scope
-    //TODO Properly save feeds for bookmarks if necessary
-    //    IFeedDAO feedDao = Owl.getPersistenceService().getDAOService().getFeedDAO();
-    //    FeedReference feedRef = feedDao.loadReference(uri);
-    //
-    //    /* Create a new Feed then */
-    //    if (feedRef == null) {
-    //      IFeed feed = Owl.getModelFactory().createFeed(null, uri);
-    //      feed.setHomepage(homepage != null ? URIUtils.createURI(homepage) : null);
-    //      feed.setDescription(description);
-    //      feed = feedDao.save(feed);
-    //    }
+    doImport();
+    return true;
+  }
 
-    FileDialog dialog = new FileDialog(getShell());
-    dialog.setText("Import Feeds from OPML");
-    dialog.setFilterExtensions(new String[] { "*.opml", "*.xml", "*.*" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-    String string = dialog.open();
-    if (string != null) {
-      try {
-        ImportUtils.importFeeds(string);
-      } catch (Exception e) {
-        Activator.getDefault().logError(e.getMessage(), e);
-        ErrorDialog.openError(getShell(), "Error importing Feeds", "RSSOwl was unable to import '" + string + "'", Activator.getDefault().createErrorStatus(e.getMessage(), e));
-      }
+  private void doImport() {
 
-      /* Force to rerun saved searches */
-      JobRunner.runDelayedInBackgroundThread(new Runnable() {
-        public void run() {
-          Controller.getDefault().getSavedSearchService().updateSavedSearches(true);
-        }
-      });
+    /* Collect Elements to Import */
+    List<IFolderChild> folderChilds = fImportElementsPage.getFolderChildsToImport();
+    List<ILabel> labels = fImportElementsPage.getLabelsToImport();
+    List<ISearchFilter> filters = fImportElementsPage.getFiltersToImport();
+    List<IPreference> preferences = fImportElementsPage.getPreferencesToImport();
+
+    /* Normalize Elements to Import */
+    List<IFolder> folders = new ArrayList<IFolder>();
+    for (IFolderChild child : folderChilds) {
+      if (child instanceof IFolder)
+        folders.add((IFolder) child);
     }
 
-    return true;
+    for (IFolder folder : folders) {
+      CoreUtils.normalize(folder, folderChilds);
+    }
+
+    /* Get Target Location (may be null) */
+    IFolder target = fImportTargetPage.getTargetLocation();
+
+    /* Get Options */
+    boolean importLabels = fImportOptionsPage.importLabels();
+    boolean importFilters = fImportOptionsPage.importFilters();
+    boolean importPreferences = fImportOptionsPage.importPreferences();
+
+    if (!importLabels)
+      labels = null;
+
+    if (!importFilters)
+      filters = null;
+
+    if (!importPreferences)
+      preferences = null;
+
+    /* Run Import */
+    ImportUtils.doImport(target, folderChilds, labels, filters, preferences);
+
+    /* Ask for a restart if preferences have been imported */
+    if (importPreferences && preferences != null && !preferences.isEmpty()) {
+      boolean restart = MessageDialog.openQuestion(getShell(), "Restart RSSOwl", "It is recommended to restart RSSOwl after preferences have been imported.\n\nDo you want to restart now?");
+      if (restart) {
+        PlatformUI.getWorkbench().restart();
+        return;
+      }
+    }
+
+    /* Reload Imported Elements */
+    new ReloadTypesAction(new StructuredSelection(folderChilds), OwlUI.getPrimaryShell()).run();
+
+    /* Force to rerun saved searches */
+    JobRunner.runDelayedInBackgroundThread(new Runnable() {
+      public void run() {
+        Controller.getDefault().getSavedSearchService().updateSavedSearches(true);
+      }
+    });
   }
 
   /*
