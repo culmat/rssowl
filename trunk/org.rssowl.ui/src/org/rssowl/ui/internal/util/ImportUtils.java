@@ -85,10 +85,10 @@ public class ImportUtils {
   public static void doImport(IFolder target, List<IFolderChild> elements, List<ILabel> labels, List<ISearchFilter> filters, List<IPreference> preferences) {
 
     /* Map Old Id to IFolderChild */
-    Map<Long, IFolderChild> mapOldIdToFolderChild = ImportUtils.createOldIdToEntityMap(elements);
+    Map<Long, IFolderChild> mapOldIdToFolderChild = createOldIdToEntityMap(elements);
 
     /* Load SearchMarks containing location condition */
-    List<ISearchMark> locationConditionSavedSearches = ImportUtils.getLocationConditionSavedSearches(elements);
+    List<ISearchMark> locationConditionSavedSearches = getLocationConditionSavedSearches(elements);
 
     /* Look for Feeds in Elements and Save them if required */
     IFeedDAO feedDao = DynamicDAO.getDAO(IFeedDAO.class);
@@ -106,7 +106,7 @@ public class ImportUtils {
 
     /* Fix locations in Search Marks if required and save */
     if (!locationConditionSavedSearches.isEmpty()) {
-      ImportUtils.updateLocationConditions(mapOldIdToFolderChild, locationConditionSavedSearches);
+      updateLocationConditions(mapOldIdToFolderChild, locationConditionSavedSearches);
       DynamicDAO.getDAO(ISearchMarkDAO.class).saveAll(locationConditionSavedSearches);
     }
 
@@ -147,9 +147,9 @@ public class ImportUtils {
     if (filters != null && !filters.isEmpty()) {
 
       /* Fix locations in Searches if required */
-      List<ISearch> locationConditionSearches = ImportUtils.getLocationConditionSearchesFromFilters(filters);
+      List<ISearch> locationConditionSearches = getLocationConditionSearchesFromFilters(filters);
       if (!locationConditionSearches.isEmpty())
-        ImportUtils.updateLocationConditions(mapOldIdToFolderChild, locationConditionSearches);
+        updateLocationConditions(mapOldIdToFolderChild, locationConditionSearches);
 
       /* Fix locations in Actions if required */
       for (ISearchFilter filter : filters) {
@@ -525,17 +525,6 @@ public class ImportUtils {
     return locationConditionSearches;
   }
 
-  private static Map<Long, IFolderChild> createOldIdToEntityMap(List<? extends IEntity> types) {
-    Map<Long, IFolderChild> oldIdToEntityMap = new HashMap<Long, IFolderChild>();
-
-    for (IEntity entity : types) {
-      if (entity instanceof IFolderChild)
-        fillOldIdToEntityMap(oldIdToEntityMap, (IFolderChild) entity);
-    }
-
-    return oldIdToEntityMap;
-  }
-
   private static void fillLocationConditionSavedSearches(List<ISearchMark> searchmarks, IEntity entity) {
     if (entity instanceof ISearchMark && containsLocationCondition((ISearchMark) entity)) {
       searchmarks.add((ISearchMark) entity);
@@ -556,6 +545,17 @@ public class ImportUtils {
     }
 
     return false;
+  }
+
+  private static Map<Long, IFolderChild> createOldIdToEntityMap(List<? extends IEntity> types) {
+    Map<Long, IFolderChild> oldIdToEntityMap = new HashMap<Long, IFolderChild>();
+
+    for (IEntity entity : types) {
+      if (entity instanceof IFolderChild)
+        fillOldIdToEntityMap(oldIdToEntityMap, (IFolderChild) entity);
+    }
+
+    return oldIdToEntityMap;
   }
 
   private static void fillOldIdToEntityMap(Map<Long, IFolderChild> oldIdToEntityMap, IFolderChild folderChild) {
