@@ -76,7 +76,9 @@ public class ImportUtils {
 
   /**
    * @param target the target {@link IFolder} for the import or
-   * <code>null</code> if none and this is a direct import.
+   * <code>null</code> if none and this is a direct import. May only be
+   * <code>null</code> if a {@link IFolder} is already present in the
+   * application.
    * @param elements the list of {@link IFolderChild} to import.
    * @param labels the list of {@link ILabel} to import.
    * @param filters the list of {@link ISearchFilter} to import.
@@ -301,15 +303,16 @@ public class ImportUtils {
         /* Bookmark Set */
         if (folder.getParent() == null) {
 
-          /* Default Bookmark Set: Reparent Childs into selected set */
+          /* Default Bookmark Set */
           if (folder.getProperty(ITypeImporter.TEMPORARY_FOLDER) != null) {
+
+            /* Reparent Childs into selected set */
             reparent(folder, selectedSet);
+            foldersToSave.add(selectedSet);
 
             /* Also Update Mapping if necessary */
             if (folder.getProperty(ITypeImporter.ID_KEY) != null)
               mapOldIdToFolderChild.put((Long) folder.getProperty(ITypeImporter.ID_KEY), selectedSet);
-
-            foldersToSave.add(selectedSet);
           }
 
           /* Any other Bookmark Set */
@@ -327,12 +330,11 @@ public class ImportUtils {
             /* Reparent into Existing Set */
             if (existingSetFolder != null) {
               reparent(folder, existingSetFolder);
+              foldersToSave.add(existingSetFolder);
 
               /* Also Update Mapping if necessary */
               if (folder.getProperty(ITypeImporter.ID_KEY) != null)
                 mapOldIdToFolderChild.put((Long) folder.getProperty(ITypeImporter.ID_KEY), existingSetFolder);
-
-              foldersToSave.add(existingSetFolder);
             }
 
             /* Otherwise save as new Set */
@@ -381,15 +383,16 @@ public class ImportUtils {
         /* Bookmark Set */
         if (folder.getParent() == null) {
 
-          /* Default Bookmark Set: Reparent Childs into selected target */
+          /* Default Bookmark Set */
           if (folder.getProperty(ITypeImporter.TEMPORARY_FOLDER) != null) {
+
+            /* Reparent Childs into selected target */
             reparent(folder, target);
+            foldersToSave.add(target);
 
             /* Also Update Mapping if necessary */
             if (folder.getProperty(ITypeImporter.ID_KEY) != null)
               mapOldIdToFolderChild.put((Long) folder.getProperty(ITypeImporter.ID_KEY), target);
-
-            foldersToSave.add(target);
           }
 
           /* Any other Bookmark Set */
