@@ -68,6 +68,7 @@ import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -574,7 +575,8 @@ public class ImportExportOPMLTest {
   public void testExportImportOnlyMarkOPML() throws Exception {
 
     /* Import */
-    ImportUtils.importFeeds(fTmpFileOnlyMarks.getAbsolutePath());
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(new FileInputStream(fTmpFileOnlyMarks));
+    ImportUtils.doImport(null, elements);
 
     /* Validate */
     Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
@@ -623,7 +625,8 @@ public class ImportExportOPMLTest {
   public void testExportImportInvalidLocationsOPML() throws Exception {
 
     /* Import */
-    ImportUtils.importFeeds(fTmpFileInvalidLocations.getAbsolutePath());
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(new FileInputStream(fTmpFileInvalidLocations));
+    ImportUtils.doImport(null, elements);
 
     /* Validate */
     Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
@@ -687,7 +690,8 @@ public class ImportExportOPMLTest {
   private void exportImportCompleteOPML(boolean useBackup) throws Exception {
 
     /* Import */
-    ImportUtils.importFeeds(useBackup ? fTmpBackupFile.getAbsolutePath() : fTmpFile.getAbsolutePath());
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(new FileInputStream(useBackup ? fTmpBackupFile.getAbsolutePath() : fTmpFile.getAbsolutePath()));
+    ImportUtils.doImport(null, elements);
 
     /* Validate */
     Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
