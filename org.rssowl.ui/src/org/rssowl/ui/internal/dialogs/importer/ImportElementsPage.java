@@ -403,7 +403,7 @@ public class ImportElementsPage extends WizardPage {
     /* Remember Source */
     fLastSourceKind = source;
     fLastSourceFile = importSourcePage.getImportFile();
-    fLastSourceFileModified = fLastSourceFile.lastModified();
+    fLastSourceFileModified = fLastSourceFile != null ? fLastSourceFile.lastModified() : 0;
 
     /* Reset Fields */
     fLabels.clear();
