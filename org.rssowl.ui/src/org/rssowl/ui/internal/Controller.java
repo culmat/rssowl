@@ -58,6 +58,7 @@ import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
@@ -99,6 +100,7 @@ import org.rssowl.ui.internal.services.ContextService;
 import org.rssowl.ui.internal.services.DownloadService;
 import org.rssowl.ui.internal.services.FeedReloadService;
 import org.rssowl.ui.internal.services.SavedSearchService;
+import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.JobRunner;
 
 import java.io.File;
@@ -106,6 +108,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1107,15 +1110,16 @@ public class Controller {
     /* Import Default Feeds */
     InputStream inS = getClass().getResourceAsStream("/default_feeds.xml"); //$NON-NLS-1$;
     List<? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
-    IFolder imported = (IFolder) types.get(0);
-    imported.setName("My Bookmarks"); //$NON-NLS-1$
+
+    IFolder root = Owl.getModelFactory().createFolder(null, null, "My Bookmarks");
+    ImportUtils.doImport(root, Collections.singletonList((IFolderChild) types.get(0)), null, null, null);
 
     /* Create Default SearchMarks */
     String newsEntityName = INews.class.getName();
 
     /* SearchCondition: New and Updated News */
     {
-      ISearchMark mark = fFactory.createSearchMark(null, imported, "New and Updated News");
+      ISearchMark mark = fFactory.createSearchMark(null, root, "New and Updated News");
       mark.setMatchAllConditions(true);
 
       ISearchField field1 = fFactory.createSearchField(INews.STATE, newsEntityName);
@@ -1124,7 +1128,7 @@ public class Controller {
 
     /* SearchCondition: Recent News */
     {
-      ISearchMark mark = fFactory.createSearchMark(null, imported, "Recent News");
+      ISearchMark mark = fFactory.createSearchMark(null, root, "Recent News");
       mark.setMatchAllConditions(true);
 
       ISearchField field1 = fFactory.createSearchField(INews.AGE_IN_DAYS, newsEntityName);
@@ -1133,7 +1137,7 @@ public class Controller {
 
     /* SearchCondition: News with Attachments */
     {
-      ISearchMark mark = fFactory.createSearchMark(null, imported, "News with Attachments");
+      ISearchMark mark = fFactory.createSearchMark(null, root, "News with Attachments");
       mark.setMatchAllConditions(true);
 
       ISearchField field = fFactory.createSearchField(INews.HAS_ATTACHMENTS, newsEntityName);
@@ -1142,7 +1146,7 @@ public class Controller {
 
     /* SearchCondition: Sticky News */
     {
-      ISearchMark mark = fFactory.createSearchMark(null, imported, "Sticky News");
+      ISearchMark mark = fFactory.createSearchMark(null, root, "Sticky News");
       mark.setMatchAllConditions(true);
 
       ISearchField field = fFactory.createSearchField(INews.IS_FLAGGED, newsEntityName);
@@ -1151,7 +1155,7 @@ public class Controller {
 
     /* SearchCondition: News is Labeld */
     {
-      ISearchMark mark = fFactory.createSearchMark(null, imported, "Labeled News");
+      ISearchMark mark = fFactory.createSearchMark(null, root, "Labeled News");
       IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(mark);
       preferences.putInteger(DefaultPreferences.BM_NEWS_GROUPING, NewsGrouping.Type.GROUP_BY_LABEL.ordinal());
 
@@ -1159,7 +1163,7 @@ public class Controller {
       fFactory.createSearchCondition(null, mark, field, SearchSpecifier.IS, "*");
     }
 
-    fFolderDAO.save(imported);
+    fFolderDAO.save(root);
   }
 
   private IStatus createWarningStatus(IStatus status, IBookMark bookmark, URI feedLink) {
