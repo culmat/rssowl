@@ -39,6 +39,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFeedDAO;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
@@ -103,16 +104,21 @@ public class ImportWizard extends Wizard {
    */
   @Override
   public boolean performFinish() {
-    doImport();
-    return true;
+    return doImport();
   }
 
-  private void doImport() {
+  private boolean doImport() {
 
     /* Collect Elements to Import */
     List<IFolderChild> folderChilds = fImportElementsPage.getFolderChildsToImport();
     if (fImportElementsPage.excludeExisting())
       folderChilds = excludeExisting(folderChilds);
+
+    /* Check for Errors First */
+    if (StringUtils.isSet(fImportElementsPage.getErrorMessage())) {
+      getContainer().showPage(fImportElementsPage);
+      return false;
+    }
 
     List<ILabel> labels = fImportElementsPage.getLabelsToImport();
     List<ISearchFilter> filters = fImportElementsPage.getFiltersToImport();
@@ -154,7 +160,7 @@ public class ImportWizard extends Wizard {
       boolean restart = MessageDialog.openQuestion(getShell(), "Restart RSSOwl", "It is recommended to restart RSSOwl after preferences have been imported.\n\nDo you want to restart now?");
       if (restart) {
         PlatformUI.getWorkbench().restart();
-        return;
+        return true;
       }
     }
 
@@ -167,6 +173,8 @@ public class ImportWizard extends Wizard {
         Controller.getDefault().getSavedSearchService().updateSavedSearches(true);
       }
     });
+
+    return true;
   }
 
   private List<IFolderChild> excludeExisting(List<IFolderChild> folderChilds) {

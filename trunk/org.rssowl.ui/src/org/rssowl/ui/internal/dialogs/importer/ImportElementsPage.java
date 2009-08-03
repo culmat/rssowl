@@ -335,7 +335,7 @@ public class ImportElementsPage extends WizardPage {
           fViewer.removeFilter(fExistingFilter);
 
         fViewer.expandToLevel(2);
-        updateMessage();
+        updateMessage(false);
       }
     });
 
@@ -443,15 +443,17 @@ public class ImportElementsPage extends WizardPage {
     /* Apply as Input */
     fViewer.setInput(folderChilds);
     OwlUI.setAllChecked(fViewer.getTree(), true);
-    updateMessage();
+    updateMessage(true);
   }
 
-  private void updateMessage() {
+  private void updateMessage(boolean clearErrors) {
     List<?> input = (List<?>) fViewer.getInput();
     if (!input.isEmpty() && fViewer.getTree().getItemCount() == 0)
       setMessage("Some elemens are hidden because they already exist.", IMessageProvider.WARNING);
     else
       setMessage("Please choose the elements to import.");
+    if (clearErrors)
+      setErrorMessage(null);
   }
 
   /*
