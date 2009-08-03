@@ -605,4 +605,62 @@ public class FileImportTest {
     assertEquals(6, otherRoot.getMarks().size());
     assertEquals(0, otherRoot.getFolders().size());
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Folders_All_DirectImport() throws Exception {
+    IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/folders.opml"));
+    ImportUtils.doImport(null, elements);
+
+    Set<IFolder> roots = CoreUtils.loadRootFolders();
+    assertEquals(1, roots.size());
+    root = roots.iterator().next();
+    assertEquals(0, root.getMarks().size());
+    assertEquals(3, root.getFolders().size());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Folders_All_Target() throws Exception {
+    IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/folders.opml"));
+    ImportUtils.doImport(root, elements);
+
+    Set<IFolder> roots = CoreUtils.loadRootFolders();
+    assertEquals(1, roots.size());
+    root = roots.iterator().next();
+    assertEquals(0, root.getMarks().size());
+    assertEquals(3, root.getFolders().size());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Folders_All_SecondSet() throws Exception {
+    IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
+    IFolder otherRoot = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Other Root"));
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/folders.opml"));
+    ImportUtils.doImport(otherRoot, elements);
+
+    Set<IFolder> roots = CoreUtils.loadRootFolders();
+    assertEquals(2, roots.size());
+
+    assertEquals(0, otherRoot.getMarks().size());
+    assertEquals(3, otherRoot.getFolders().size());
+  }
 }
