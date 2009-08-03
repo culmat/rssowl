@@ -76,13 +76,13 @@ import java.util.List;
  * @author bpasero
  */
 public class OPMLImporter implements ITypeImporter {
-  private final DateFormat fDateFormat = DateFormat.getDateInstance();
 
   /*
    * @see
    * org.rssowl.core.interpreter.ITypeImporter#importFrom(org.jdom.Document)
    */
   public List<? extends IEntity> importFrom(Document document) {
+    DateFormat dateFormat = DateFormat.getDateInstance();
     Element root = document.getRootElement();
 
     /* Interpret Children */
@@ -93,14 +93,15 @@ public class OPMLImporter implements ITypeImporter {
 
       /* Process Body */
       if (Tags.BODY.get().equals(name)) //$NON-NLS-1$
-        return processBody(child);
+        return processBody(child, dateFormat);
     }
 
     return null;
   }
 
-  private List<IEntity> processBody(Element body) {
-    IFolder defaultRootFolder = Owl.getModelFactory().createFolder(null, null, "My Bookmarks");
+  private List<IEntity> processBody(Element body, DateFormat dateFormat) {
+    IFolder defaultRootFolder = Owl.getModelFactory().createFolder(null, null, "Bookmarks");
+    defaultRootFolder.setProperty(ITypeImporter.TEMPORARY_FOLDER, true);
     List<IEntity> importedEntities = new ArrayList<IEntity>();
 
     /* Interpret Children */
@@ -111,11 +112,11 @@ public class OPMLImporter implements ITypeImporter {
 
       /* Process Outline */
       if (Tags.OUTLINE.get().equals(name)) //$NON-NLS-1$
-        processOutline(child, defaultRootFolder, importedEntities);
+        processOutline(child, defaultRootFolder, importedEntities, dateFormat);
 
       /* Process Saved Search */
       else if (Tags.SAVED_SEARCH.get().equals(name))
-        processSavedSearch(child, defaultRootFolder);
+        processSavedSearch(child, defaultRootFolder, dateFormat);
 
       /* Process News Bin */
       else if (Tags.BIN.get().equals(name))
@@ -127,7 +128,7 @@ public class OPMLImporter implements ITypeImporter {
 
       /* Process News Filter */
       else if (Tags.FILTER.get().equals(name))
-        processFilter(child, importedEntities);
+        processFilter(child, importedEntities, dateFormat);
 
       /* Process Global/Eclipse Preferences */
       else if (Tags.PREFERENCE.get().equals(name))
@@ -141,7 +142,7 @@ public class OPMLImporter implements ITypeImporter {
     return importedEntities;
   }
 
-  private void processFilter(Element filterElement, List<IEntity> importedEntities) {
+  private void processFilter(Element filterElement, List<IEntity> importedEntities, DateFormat dateFormat) {
     IModelFactory factory = Owl.getModelFactory();
 
     String name = filterElement.getAttributeValue(Attributes.NAME.get());
@@ -162,7 +163,7 @@ public class OPMLImporter implements ITypeImporter {
         try {
           Element condition = (Element) conditions.get(i);
 
-          ISearchCondition searchCondition = processSearchCondition(condition);
+          ISearchCondition searchCondition = processSearchCondition(condition, dateFormat);
           if (searchCondition != null)
             search.addSearchCondition(searchCondition);
         } catch (NumberFormatException e) {
@@ -218,7 +219,7 @@ public class OPMLImporter implements ITypeImporter {
     importedEntities.add(filter);
   }
 
-  private void processSavedSearch(Element savedSearchElement, IFolder folder) {
+  private void processSavedSearch(Element savedSearchElement, IFolder folder, DateFormat dateFormat) {
     String name = savedSearchElement.getAttributeValue(Attributes.NAME.get());
     boolean matchAllConditions = Boolean.parseBoolean(savedSearchElement.getAttributeValue(Attributes.MATCH_ALL_CONDITIONS.get()));
 
@@ -234,7 +235,7 @@ public class OPMLImporter implements ITypeImporter {
       /* Process Search Condition */
       if (Tags.SEARCH_CONDITION.get().equals(childName)) {
         try {
-          ISearchCondition searchCondition = processSearchCondition(child);
+          ISearchCondition searchCondition = processSearchCondition(child, dateFormat);
           if (searchCondition != null)
             searchmark.addSearchCondition(searchCondition);
         } catch (NumberFormatException e) {
@@ -250,7 +251,7 @@ public class OPMLImporter implements ITypeImporter {
     }
   }
 
-  private ISearchCondition processSearchCondition(Element conditionElement) throws ParseException {
+  private ISearchCondition processSearchCondition(Element conditionElement, DateFormat dateFormat) throws ParseException {
 
     /* Search Specifier */
     Element specifierElement = conditionElement.getChild(Tags.SPECIFIER.get(), RSSOWL_NS);
@@ -258,7 +259,7 @@ public class OPMLImporter implements ITypeImporter {
 
     /* Search Value */
     Element valueElement = conditionElement.getChild(Tags.SEARCH_VALUE.get(), RSSOWL_NS);
-    Object value = getValue(valueElement, RSSOWL_NS);
+    Object value = getValue(valueElement, RSSOWL_NS, dateFormat);
 
     /* Search Field */
     Element fieldElement = conditionElement.getChild(Tags.SEARCH_FIELD.get(), RSSOWL_NS);
@@ -343,7 +344,7 @@ public class OPMLImporter implements ITypeImporter {
     return IEntity.ALL_FIELDS;
   }
 
-  private Object getValue(Element valueElement, Namespace namespace) throws ParseException {
+  private Object getValue(Element valueElement, Namespace namespace, DateFormat dateFormat) throws ParseException {
     Object value = null;
     int valueType = Integer.parseInt(valueElement.getAttributeValue(Attributes.TYPE.get()));
 
@@ -416,15 +417,15 @@ public class OPMLImporter implements ITypeImporter {
           break;
 
         case ISearchValueType.DATE:
-          value = fDateFormat.parse(valueAsString);
+          value = dateFormat.parse(valueAsString);
           break;
 
         case ISearchValueType.DATETIME:
-          value = fDateFormat.parse(valueAsString);
+          value = dateFormat.parse(valueAsString);
           break;
 
         case ISearchValueType.TIME:
-          value = fDateFormat.parse(valueAsString);
+          value = dateFormat.parse(valueAsString);
           break;
 
         case ISearchValueType.ENUM:
@@ -436,7 +437,7 @@ public class OPMLImporter implements ITypeImporter {
     return value;
   }
 
-  private void processOutline(Element outline, IPersistable parent, List<IEntity> importedEntities) {
+  private void processOutline(Element outline, IPersistable parent, List<IEntity> importedEntities, DateFormat dateFormat) {
     IEntity type = null;
     Long id = null;
     String title = null;
@@ -507,11 +508,11 @@ public class OPMLImporter implements ITypeImporter {
 
       /* Process Outline */
       if (Tags.OUTLINE.get().equals(name)) //$NON-NLS-1$
-        processOutline(child, type, importedEntities);
+        processOutline(child, type, importedEntities, dateFormat);
 
       /* Process Saved Search */
       else if (Tags.SAVED_SEARCH.get().equals(name))
-        processSavedSearch(child, (IFolder) type);
+        processSavedSearch(child, (IFolder) type, dateFormat);
 
       /* Process News Bin */
       else if (Tags.BIN.get().equals(name))
@@ -617,9 +618,10 @@ public class OPMLImporter implements ITypeImporter {
     String kindVal = element.getAttributeValue(Attributes.KIND.get());
 
     if (StringUtils.isSet(key) && value != null && typeVal != null && kindVal != null) {
+      IPreferenceScope.Kind kind = IPreferenceScope.Kind.values()[Integer.parseInt(kindVal)];
       IPreferenceType type = IPreferenceType.values()[Integer.parseInt(typeVal)];
       IPreference preference = Owl.getModelFactory().createPreference(key);
-      preference.setProperty(ITypeImporter.DATA_KEY, IPreferenceScope.Kind.values()[Integer.parseInt(kindVal)]);
+      preference.setProperty(ITypeImporter.DATA_KEY, new Object[] { kind, type });
 
       switch (type) {
         case BOOLEAN:
