@@ -58,6 +58,7 @@ import org.rssowl.ui.internal.util.ImportUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Tests import of various OPML files.
@@ -491,5 +492,117 @@ public class FileImportTest {
     }
 
     return count;
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Filter() throws Exception {
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/filter.opml"));
+    assertEquals(1, elements.size());
+    assertEquals(1, count(SearchFilter.class.getName(), elements));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Labels() throws Exception {
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/labels.opml"));
+    assertEquals(5, elements.size());
+    assertEquals(5, count(Label.class.getName(), elements));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Preferences() throws Exception {
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/preferences.opml"));
+    assertEquals(91, elements.size());
+    assertEquals(91, count(Preference.class.getName(), elements));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Labels_Filters_Preferences() throws Exception {
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/label_filter_prefs.opml"));
+    assertEquals(97, elements.size());
+    assertEquals(91, count(Preference.class.getName(), elements));
+    assertEquals(5, count(Label.class.getName(), elements));
+    assertEquals(1, count(SearchFilter.class.getName(), elements));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Marks_All_DirectImport() throws Exception {
+    IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/marks.opml"));
+    ImportUtils.doImport(null, elements);
+
+    Set<IFolder> roots = CoreUtils.loadRootFolders();
+    assertEquals(1, roots.size());
+    root = roots.iterator().next();
+    assertEquals(6, root.getMarks().size());
+    assertEquals(0, root.getFolders().size());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Marks_All_Target() throws Exception {
+    IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/marks.opml"));
+    ImportUtils.doImport(root, elements);
+
+    Set<IFolder> roots = CoreUtils.loadRootFolders();
+    assertEquals(1, roots.size());
+    root = roots.iterator().next();
+    assertEquals(6, root.getMarks().size());
+    assertEquals(0, root.getFolders().size());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Marks_All_SecondSet() throws Exception {
+    IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
+    IFolder otherRoot = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Other Root"));
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/marks.opml"));
+    ImportUtils.doImport(otherRoot, elements);
+
+    Set<IFolder> roots = CoreUtils.loadRootFolders();
+    assertEquals(2, roots.size());
+
+    assertEquals(6, otherRoot.getMarks().size());
+    assertEquals(0, otherRoot.getFolders().size());
   }
 }
