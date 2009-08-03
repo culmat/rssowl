@@ -162,6 +162,11 @@ public class ImportElementsPage extends WizardPage {
     return folderChilds;
   }
 
+  /* Returns whether existing bookmarks should be ignored for the Import */
+  boolean excludeExisting() {
+    return fHideExisting.getSelection();
+  }
+
   /* Returns Labels available for Import */
   List<ILabel> getLabelsToImport() {
     importSource(); //Ensure to be in sync with Source
