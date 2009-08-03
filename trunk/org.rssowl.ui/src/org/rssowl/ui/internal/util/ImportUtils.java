@@ -24,15 +24,13 @@
 
 package org.rssowl.ui.internal.util;
 
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.newsaction.CopyNewsAction;
 import org.rssowl.core.internal.newsaction.LabelNewsAction;
 import org.rssowl.core.internal.newsaction.MoveNewsAction;
 import org.rssowl.core.interpreter.ITypeImporter;
-import org.rssowl.core.interpreter.InterpreterException;
-import org.rssowl.core.interpreter.ParserException;
+import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
@@ -40,128 +38,71 @@ import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsMark;
+import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IFeedDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
+import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.pref.IPreferenceType;
+import org.rssowl.core.persist.pref.IPreferenceScope.Kind;
+import org.rssowl.core.persist.reference.FeedLinkReference;
+import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 /**
- * Helper methods mainly to support location conditions when importing OPML
- * files.
+ * Helper to perform import of Feeds, Labels, Filters and Preferences including
+ * the ability to restore location conditions.
  *
  * @author bpasero
  */
 public class ImportUtils {
 
   /**
-   * @param fileName
-   * @throws FileNotFoundException In case of an error.
-   * @throws ParserException In case of an error.
-   * @throws InterpreterException In case of an error.
+   * @param target the target {@link IFolder} for the import or
+   * <code>null</code> if none and this is a direct import.
+   * @param elements the list of {@link IFolderChild} to import.
+   * @param labels the list of {@link ILabel} to import.
+   * @param filters the list of {@link ISearchFilter} to import.
+   * @param preferences the list of {@link IPreference} to import.
    */
-  public static void importFeeds(String fileName) throws FileNotFoundException, InterpreterException, ParserException {
-    List<IEntity> entitiesToReload = new ArrayList<IEntity>();
-    IPreferenceDAO prefsDAO = Owl.getPersistenceService().getDAOService().getPreferencesDAO();
-    IFolderDAO folderDAO = DynamicDAO.getDAO(IFolderDAO.class);
-
-    /* Import from File */
-    File file = new File(fileName);
-    InputStream inS = new FileInputStream(file);
-    List<? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
-    IFolder defaultContainer = (IFolder) types.get(0);
+  public static void doImport(IFolder target, List<IFolderChild> elements, List<ILabel> labels, List<ISearchFilter> filters, List<IPreference> preferences) {
 
     /* Map Old Id to IFolderChild */
-    Map<Long, IFolderChild> mapOldIdToFolderChild = ImportUtils.createOldIdToEntityMap(types);
+    Map<Long, IFolderChild> mapOldIdToFolderChild = ImportUtils.createOldIdToEntityMap(elements);
 
     /* Load SearchMarks containing location condition */
-    List<ISearchMark> locationConditionSavedSearches = ImportUtils.getLocationConditionSavedSearches(types);
+    List<ISearchMark> locationConditionSavedSearches = ImportUtils.getLocationConditionSavedSearches(elements);
 
-    /* Load the current selected Set */
-    IFolder selectedRootFolder;
-    if (!InternalOwl.TESTING) {
-      String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
-      Long selectedFolderID = prefsDAO.load(selectedBookMarkSetPref).getLong();
-      selectedRootFolder = folderDAO.load(selectedFolderID);
-    } else {
-      Collection<IFolder> rootFolders = CoreUtils.loadRootFolders();
-      selectedRootFolder = rootFolders.iterator().next();
+    /* Look for Feeds in Elements and Save them if required */
+    IFeedDAO feedDao = DynamicDAO.getDAO(IFeedDAO.class);
+    for (IFolderChild element : elements) {
+      saveFeedsOfBookmarks(element, feedDao);
     }
 
-    /* Load all Root Folders */
-    Set<IFolder> rootFolders = CoreUtils.loadRootFolders();
+    /* Direct Import */
+    if (target == null)
+      doDirectImport(elements, mapOldIdToFolderChild);
 
-    /* 1.) Handle Folders and Marks from default Container */
-    {
-
-      /* Also update Map of Old ID */
-      if (defaultContainer.getProperty(ITypeImporter.ID_KEY) != null)
-        mapOldIdToFolderChild.put((Long) defaultContainer.getProperty(ITypeImporter.ID_KEY), selectedRootFolder);
-
-      /* Reparent and Save */
-      reparentAndSaveChildren(defaultContainer, selectedRootFolder);
-      entitiesToReload.addAll(defaultContainer.getMarks());
-      entitiesToReload.addAll(defaultContainer.getFolders());
-    }
-
-    /* 2.) Handle other Sets */
-    for (int i = 1; i < types.size(); i++) {
-      if (!(types.get(i) instanceof IFolder))
-        continue;
-
-      IFolder setFolder = (IFolder) types.get(i);
-      IFolder existingSetFolder = null;
-
-      /* Check if set already exists */
-      for (IFolder rootFolder : rootFolders) {
-        if (rootFolder.getName().equals(setFolder.getName())) {
-          existingSetFolder = rootFolder;
-          break;
-        }
-      }
-
-      /* Reparent into Existing Set */
-      if (existingSetFolder != null) {
-
-        /* Also update Map of Old ID */
-        if (setFolder.getProperty(ITypeImporter.ID_KEY) != null)
-          mapOldIdToFolderChild.put((Long) setFolder.getProperty(ITypeImporter.ID_KEY), existingSetFolder);
-
-        /* Reparent and Save */
-        reparentAndSaveChildren(setFolder, existingSetFolder);
-        entitiesToReload.addAll(existingSetFolder.getMarks());
-        entitiesToReload.addAll(existingSetFolder.getFolders());
-      }
-
-      /* Otherwise save as new Set */
-      else {
-
-        /* Unset ID Property first */
-        ImportUtils.unsetIdProperty(setFolder);
-
-        /* Save */
-        folderDAO.save(setFolder);
-        entitiesToReload.add(setFolder);
-      }
-    }
+    /* Import to target */
+    else
+      doImportToTarget(target, elements, mapOldIdToFolderChild);
 
     /* Fix locations in Search Marks if required and save */
     if (!locationConditionSavedSearches.isEmpty()) {
@@ -169,23 +110,22 @@ public class ImportUtils {
       DynamicDAO.getDAO(ISearchMarkDAO.class).saveAll(locationConditionSavedSearches);
     }
 
-    /* Look for Labels (from backup OPML) */
+    /* Import Labels  */
     Map<String, ILabel> mapExistingLabelToName = new HashMap<String, ILabel>();
     Map<Long, ILabel> mapOldIdToImportedLabel = new HashMap<Long, ILabel>();
-    List<ILabel> importedLabels = ImportUtils.getLabels(types);
-    if (!importedLabels.isEmpty()) {
+    if (labels != null && !labels.isEmpty()) {
       Collection<ILabel> existingLabels = DynamicDAO.loadAll(ILabel.class);
       for (ILabel existingLabel : existingLabels) {
         mapExistingLabelToName.put(existingLabel.getName(), existingLabel);
       }
 
-      for (ILabel importedLabel : importedLabels) {
+      for (ILabel importedLabel : labels) {
         Object oldIdValue = importedLabel.getProperty(ITypeImporter.ID_KEY);
         if (oldIdValue != null && oldIdValue instanceof Long)
           mapOldIdToImportedLabel.put((Long) oldIdValue, importedLabel);
       }
 
-      for (ILabel importedLabel : importedLabels) {
+      for (ILabel importedLabel : labels) {
         ILabel existingLabel = mapExistingLabelToName.get(importedLabel.getName());
 
         /* Update Existing */
@@ -203,9 +143,8 @@ public class ImportUtils {
       }
     }
 
-    /* Look for Filters (from backup OPML) */
-    List<ISearchFilter> filters = ImportUtils.getFilters(types);
-    if (!filters.isEmpty()) {
+    /* Import Filters */
+    if (filters != null && !filters.isEmpty()) {
 
       /* Fix locations in Searches if required */
       List<ISearch> locationConditionSearches = ImportUtils.getLocationConditionSearchesFromFilters(filters);
@@ -261,14 +200,233 @@ public class ImportUtils {
       DynamicDAO.saveAll(filters);
     }
 
-    /* Reload imported Feeds */
-    if (!InternalOwl.TESTING)
-      new ReloadTypesAction(new StructuredSelection(entitiesToReload), OwlUI.getPrimaryShell()).run();
+    /* Import Preferences */
+    if (preferences != null && !preferences.isEmpty()) {
+      IPreferenceScope globalPreferences = Owl.getPreferenceService().getGlobalScope();
+      IPreferenceScope eclipsePreferences = Owl.getPreferenceService().getEclipseScope();
+      boolean flushEclipsePreferences = false;
+
+      for (IPreference preference : preferences) {
+        Object data = preference.getProperty(ITypeImporter.DATA_KEY);
+        if (data != null && data instanceof Object[] && ((Object[]) data).length == 2) {
+          IPreferenceScope.Kind kind = (IPreferenceScope.Kind) ((Object[]) data)[0];
+          IPreferenceType type = (IPreferenceType) ((Object[]) data)[1];
+          IPreferenceScope scope = (kind == Kind.GLOBAL) ? globalPreferences : eclipsePreferences;
+          if (kind == Kind.ECLIPSE)
+            flushEclipsePreferences = true;
+
+          switch (type) {
+            case BOOLEAN:
+              scope.putBoolean(preference.getKey(), preference.getBoolean());
+              break;
+
+            case INTEGER:
+              scope.putInteger(preference.getKey(), preference.getInteger());
+              break;
+
+            case INTEGERS:
+              scope.putIntegers(preference.getKey(), preference.getIntegers());
+              break;
+
+            case LONG:
+              scope.putLong(preference.getKey(), preference.getLong());
+              break;
+
+            case LONGS:
+              scope.putLongs(preference.getKey(), preference.getLongs());
+              break;
+
+            case STRING:
+              scope.putString(preference.getKey(), preference.getString());
+              break;
+
+            case STRINGS:
+              scope.putStrings(preference.getKey(), preference.getStrings());
+              break;
+          }
+        }
+      }
+
+      /* Flush Eclipse preferences if required */
+      if (flushEclipsePreferences)
+        eclipsePreferences.flush();
+    }
   }
 
-  private static void reparentAndSaveChildren(IFolder from, IFolder to) {
-    boolean changed = false;
+  private static void saveFeedsOfBookmarks(IFolderChild element, IFeedDAO feedDao) {
 
+    /* Bookmark */
+    if (element instanceof IBookMark) {
+      IBookMark bm = (IBookMark) element;
+      FeedLinkReference feedReference = bm.getFeedLinkReference();
+
+      /* Create a new Feed if necessary */
+      FeedReference existingFeed = feedDao.loadReference(feedReference.getLink());
+      if (existingFeed == null)
+        feedDao.save(Owl.getModelFactory().createFeed(null, feedReference.getLink()));
+    }
+
+    /* Folder */
+    else if (element instanceof IFolder) {
+      IFolder folder = (IFolder) element;
+      List<IFolderChild> children = folder.getChildren();
+      for (IFolderChild child : children) {
+        saveFeedsOfBookmarks(child, feedDao);
+      }
+    }
+  }
+
+  private static void doDirectImport(List<IFolderChild> elements, Map<Long, IFolderChild> mapOldIdToFolderChild) {
+    IPreferenceDAO prefsDAO = Owl.getPersistenceService().getDAOService().getPreferencesDAO();
+    IFolderDAO folderDAO = DynamicDAO.getDAO(IFolderDAO.class);
+    Set<IFolder> foldersToSave = new HashSet<IFolder>();
+    Set<IFolder> rootFolders = CoreUtils.loadRootFolders();
+
+    /* Load the current selected Set as Location if necessary */
+    IFolder selectedSet;
+    if (!InternalOwl.TESTING) {
+      String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
+      Long selectedFolderID = prefsDAO.load(selectedBookMarkSetPref).getLong();
+      selectedSet = folderDAO.load(selectedFolderID);
+    } else
+      selectedSet = rootFolders.iterator().next();
+
+    /* Import Elements */
+    for (IFolderChild element : elements) {
+
+      /* Folder */
+      if (element instanceof IFolder) {
+        IFolder folder = (IFolder) element;
+
+        /* Bookmark Set */
+        if (folder.getParent() == null) {
+
+          /* Default Bookmark Set: Reparent Childs into selected set */
+          if (folder.getProperty(ITypeImporter.TEMPORARY_FOLDER) != null) {
+            reparent(folder, selectedSet);
+
+            /* Also Update Mapping if necessary */
+            if (folder.getProperty(ITypeImporter.ID_KEY) != null)
+              mapOldIdToFolderChild.put((Long) folder.getProperty(ITypeImporter.ID_KEY), selectedSet);
+
+            foldersToSave.add(selectedSet);
+          }
+
+          /* Any other Bookmark Set */
+          else {
+
+            /* Check if set already exists */
+            IFolder existingSetFolder = null;
+            for (IFolder rootFolder : rootFolders) {
+              if (rootFolder.getName().equals(folder.getName())) {
+                existingSetFolder = rootFolder;
+                break;
+              }
+            }
+
+            /* Reparent into Existing Set */
+            if (existingSetFolder != null) {
+              reparent(folder, existingSetFolder);
+
+              /* Also Update Mapping if necessary */
+              if (folder.getProperty(ITypeImporter.ID_KEY) != null)
+                mapOldIdToFolderChild.put((Long) folder.getProperty(ITypeImporter.ID_KEY), existingSetFolder);
+
+              foldersToSave.add(existingSetFolder);
+            }
+
+            /* Otherwise save as new Set */
+            else {
+              foldersToSave.add(folder);
+            }
+          }
+        }
+
+        /* Normal Folder */
+        else {
+          folder.setParent(selectedSet);
+          selectedSet.addFolder(folder, null, null);
+          foldersToSave.add(selectedSet);
+        }
+      }
+
+      /* Any Newsmark */
+      else if (element instanceof INewsMark) {
+        INewsMark mark = (INewsMark) element;
+        mark.setParent(selectedSet);
+        selectedSet.addMark(mark, null, null);
+        foldersToSave.add(selectedSet);
+      }
+    }
+
+    /* Un-set ID Property prior Save */
+    for (IFolder folderToSave : foldersToSave) {
+      unsetIdProperty(folderToSave);
+    }
+
+    /* Save Folders that have changed */
+    DynamicDAO.saveAll(foldersToSave);
+  }
+
+  private static void doImportToTarget(IFolder target, List<IFolderChild> elements, Map<Long, IFolderChild> mapOldIdToFolderChild) {
+    Set<IFolder> foldersToSave = new HashSet<IFolder>();
+
+    /* Import Elements */
+    for (IFolderChild element : elements) {
+
+      /* Folder */
+      if (element instanceof IFolder) {
+        IFolder folder = (IFolder) element;
+
+        /* Bookmark Set */
+        if (folder.getParent() == null) {
+
+          /* Default Bookmark Set: Reparent Childs into selected target */
+          if (folder.getProperty(ITypeImporter.TEMPORARY_FOLDER) != null) {
+            reparent(folder, target);
+
+            /* Also Update Mapping if necessary */
+            if (folder.getProperty(ITypeImporter.ID_KEY) != null)
+              mapOldIdToFolderChild.put((Long) folder.getProperty(ITypeImporter.ID_KEY), target);
+
+            foldersToSave.add(target);
+          }
+
+          /* Any other Bookmark Set */
+          else {
+            folder.setParent(target);
+            target.addFolder(folder, null, null);
+            foldersToSave.add(target);
+          }
+        }
+
+        /* Normal Folder */
+        else {
+          folder.setParent(target);
+          target.addFolder(folder, null, null);
+          foldersToSave.add(target);
+        }
+      }
+
+      /* Any Newsmark */
+      else if (element instanceof INewsMark) {
+        INewsMark mark = (INewsMark) element;
+        mark.setParent(target);
+        target.addMark(mark, null, null);
+        foldersToSave.add(target);
+      }
+    }
+
+    /* Un-set ID Property prior Save */
+    for (IFolder folderToSave : foldersToSave) {
+      unsetIdProperty(folderToSave);
+    }
+
+    /* Save Folders that have changed */
+    DynamicDAO.saveAll(foldersToSave);
+  }
+
+  private static void reparent(IFolder from, IFolder to) {
     List<IFolderChild> children = from.getChildren();
     for (IFolderChild child : children) {
 
@@ -277,7 +435,6 @@ public class ImportUtils {
         IFolder folder = (IFolder) child;
         folder.setParent(to);
         to.addFolder(folder, null, null);
-        changed = true;
       }
 
       /* Reparent Mark */
@@ -285,20 +442,11 @@ public class ImportUtils {
         IMark mark = (IMark) child;
         mark.setParent(to);
         to.addMark(mark, null, null);
-        changed = true;
       }
     }
-
-    /* Save Set */
-    if (changed)
-      DynamicDAO.getDAO(IFolderDAO.class).save(to);
   }
 
-  /**
-   * @param oldIdToFolderChildMap
-   * @param searches
-   */
-  public static void updateLocationConditions(Map<Long, IFolderChild> oldIdToFolderChildMap, List<? extends ISearch> searches) {
+  private static void updateLocationConditions(Map<Long, IFolderChild> oldIdToFolderChildMap, List<? extends ISearch> searches) {
     for (ISearch search : searches) {
       List<ISearchCondition> conditions = search.getSearchConditions();
       for (ISearchCondition condition : conditions) {
@@ -344,10 +492,7 @@ public class ImportUtils {
     }
   }
 
-  /**
-   * @param entity
-   */
-  public static void unsetIdProperty(IEntity entity) {
+  private static void unsetIdProperty(IEntity entity) {
     entity.removeProperty(ITypeImporter.ID_KEY);
 
     if (entity instanceof IFolder) {
@@ -359,11 +504,7 @@ public class ImportUtils {
     }
   }
 
-  /**
-   * @param types
-   * @return List of Saved Searches with Location Conditions.
-   */
-  public static List<ISearchMark> getLocationConditionSavedSearches(List<? extends IEntity> types) {
+  private static List<ISearchMark> getLocationConditionSavedSearches(List<? extends IEntity> types) {
     List<ISearchMark> locationConditionSavedSearches = new ArrayList<ISearchMark>();
 
     for (IEntity entity : types)
@@ -372,11 +513,7 @@ public class ImportUtils {
     return locationConditionSavedSearches;
   }
 
-  /**
-   * @param filters
-   * @return List of Searches with Location Conditions.
-   */
-  public static List<ISearch> getLocationConditionSearchesFromFilters(List<ISearchFilter> filters) {
+  private static List<ISearch> getLocationConditionSearchesFromFilters(List<ISearchFilter> filters) {
     List<ISearch> locationConditionSearches = new ArrayList<ISearch>();
 
     for (ISearchFilter filter : filters) {
@@ -388,41 +525,7 @@ public class ImportUtils {
     return locationConditionSearches;
   }
 
-  /**
-   * @param types
-   * @return List of Labels.
-   */
-  public static List<ILabel> getLabels(List<? extends IEntity> types) {
-    List<ILabel> labels = new ArrayList<ILabel>();
-
-    for (IEntity entity : types) {
-      if (entity instanceof ILabel)
-        labels.add((ILabel) entity);
-    }
-
-    return labels;
-  }
-
-  /**
-   * @param types
-   * @return List of Filters.
-   */
-  public static List<ISearchFilter> getFilters(List<? extends IEntity> types) {
-    List<ISearchFilter> filters = new ArrayList<ISearchFilter>();
-
-    for (IEntity entity : types) {
-      if (entity instanceof ISearchFilter)
-        filters.add((ISearchFilter) entity);
-    }
-
-    return filters;
-  }
-
-  /**
-   * @param types
-   * @return Map
-   */
-  public static Map<Long, IFolderChild> createOldIdToEntityMap(List<? extends IEntity> types) {
+  private static Map<Long, IFolderChild> createOldIdToEntityMap(List<? extends IEntity> types) {
     Map<Long, IFolderChild> oldIdToEntityMap = new HashMap<Long, IFolderChild>();
 
     for (IEntity entity : types) {
