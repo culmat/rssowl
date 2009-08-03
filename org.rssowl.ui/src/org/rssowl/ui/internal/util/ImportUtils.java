@@ -488,7 +488,7 @@ public class ImportUtils {
       for (ISearchCondition condition : conditions) {
 
         /* Location Condition */
-        if (condition.getField().getId() == INews.LOCATION) {
+        if (condition.getField().getId() == INews.LOCATION && condition.getValue() != null) {
           Long[][] value = (Long[][]) condition.getValue();
           List<IFolderChild> newLocations = new ArrayList<IFolderChild>();
 
