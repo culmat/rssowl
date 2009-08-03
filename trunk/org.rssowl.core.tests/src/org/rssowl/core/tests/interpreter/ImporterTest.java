@@ -82,28 +82,14 @@ public class ImporterTest {
     /* Category 1 Marks */
     IBookMark category1_mark1 = (IBookMark) category1.getMarks().get(0);
     assertEquals("category_1_feed_1_title", category1_mark1.getName());
-    assertNotNull(category1_mark1.getFeedLinkReference().resolve());
-
-    IFeed category1_mark1_feed = category1_mark1.getFeedLinkReference().resolve();
-    assertEquals(new URI("http://www.category_1_feed_1_url.com").toString(), category1_mark1_feed.getLink().toString());
-    assertEquals(new URI("category_1_feed_1_website"), category1_mark1_feed.getHomepage());
-    assertEquals("category_1_feed_1_description", category1_mark1_feed.getDescription());
+    assertEquals("http://www.category_1_feed_1_url.com", category1_mark1.getFeedLinkReference().getLink().toString());
 
     IBookMark category1_mark2 = (IBookMark) category1.getMarks().get(1);
     assertEquals("category_1_feed_2_text", category1_mark2.getName());
-    assertNotNull(category1_mark2.getFeedLinkReference().resolve());
-
-    IFeed category1_mark2_feed = category1_mark2.getFeedLinkReference().resolve();
-    assertEquals(new URI("http://www.category_1_feed_2_url.com").toString(), category1_mark2_feed.getLink().toString());
-    assertEquals(new URI("category_1_feed_2_website"), category1_mark2_feed.getHomepage());
-    assertEquals("category_1_feed_2_description", category1_mark2_feed.getDescription());
+    assertEquals("http://www.category_1_feed_2_url.com", category1_mark2.getFeedLinkReference().getLink().toString());
 
     IBookMark category1_mark3 = (IBookMark) category1.getMarks().get(2);
     assertEquals("category_1_feed_3_title", category1_mark3.getName());
-    assertNotNull(category1_mark3.getFeedLinkReference().resolve());
-
-    IFeed category1_mark3_feed = category1_mark3.getFeedLinkReference().resolve();
-    assertEquals(new URI("http://www.category_1_feed_3_url.com").toString(), category1_mark3_feed.getLink().toString());
 
     /* Category 2 */
     IFolder category2 = root.getFolders().get(1);
@@ -120,17 +106,9 @@ public class ImporterTest {
     /* Sub Category 1 Marks */
     IBookMark subcategory_1_mark_1 = (IBookMark) subcategory_1.getMarks().get(0);
     assertEquals("sub_category_1_feed_1_title", subcategory_1_mark_1.getName());
-    assertNotNull(subcategory_1_mark_1.getFeedLinkReference().resolve());
-
-    IFeed subcategory_1_mark_1_feed = subcategory_1_mark_1.getFeedLinkReference().resolve();
-    assertEquals(new URI("http://www.sub_category_1_feed_1_url.com").toString(), subcategory_1_mark_1_feed.getLink().toString());
 
     IBookMark subcategory_1_mark_2 = (IBookMark) subcategory_1.getMarks().get(1);
     assertEquals("http://www.sub_category_1_feed_2_url.com", subcategory_1_mark_2.getName());
-    assertNotNull(subcategory_1_mark_2.getFeedLinkReference().resolve());
-
-    IFeed subcategory_1_mark_2_feed = subcategory_1_mark_2.getFeedLinkReference().resolve();
-    assertEquals(new URI("http://www.sub_category_1_feed_2_url.com").toString(), subcategory_1_mark_2_feed.getLink().toString());
 
     /* Sub Sub Category 1 */
     IFolder sub_subcategory_1 = subcategory_1.getFolders().get(0);
@@ -139,10 +117,6 @@ public class ImporterTest {
 
     IBookMark sub_subcategory_1_mark = (IBookMark) sub_subcategory_1.getMarks().get(0);
     assertEquals("sub_sub_category_1_feed_1_title", sub_subcategory_1_mark.getName());
-    assertNotNull(sub_subcategory_1_mark.getFeedLinkReference().resolve());
-
-    IFeed sub_subcategory_1_mark_feed = sub_subcategory_1_mark.getFeedLinkReference().resolve();
-    assertEquals(new URI("http://www.sub_sub_category_1_feed_1_url.com").toString(), sub_subcategory_1_mark_feed.getLink().toString());
   }
 
   /**
