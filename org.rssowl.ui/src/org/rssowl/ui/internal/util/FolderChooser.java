@@ -101,7 +101,17 @@ public class FolderChooser extends Composite implements DisposeListener {
   private List<IFolder> fExcludes;
   private final boolean fExpandable;
   private int fItemHeight;
+  private ExpandStrategy fExpandStrategy = ExpandStrategy.RESIZE;
 
+  /** The strategy when expanding the Control */
+  public enum ExpandStrategy {
+
+    /** Relayout the Parent */
+    LAYOUT,
+
+    /** Resize the Parent */
+    RESIZE;
+  }
 
   /**
    * @param parent
@@ -150,6 +160,14 @@ public class FolderChooser extends Composite implements DisposeListener {
    */
   public IFolder getFolder() {
     return fSelectedFolder;
+  }
+
+  /**
+   * @param expandStrategy the strategy when expanding the Control (either
+   * {@link ExpandStrategy#LAYOUT} or {@link ExpandStrategy#RESIZE}.
+   */
+  public void setExpandStrategy(ExpandStrategy expandStrategy) {
+    fExpandStrategy = expandStrategy;
   }
 
   /*
@@ -447,8 +465,15 @@ public class FolderChooser extends Composite implements DisposeListener {
 
     fAddFolderBar.setVisible(excluded);
 
-    Point size = fFolderViewerContainer.getShell().getSize();
-    fFolderViewerContainer.getShell().setSize(size.x, size.y + (excluded ? fViewerHeight : -fViewerHeight));
+    /* Increase Size of Shell to fit Control */
+    if (fExpandStrategy == ExpandStrategy.RESIZE) {
+      Point size = fFolderViewerContainer.getShell().getSize();
+      fFolderViewerContainer.getShell().setSize(size.x, size.y + (excluded ? fViewerHeight : -fViewerHeight));
+    }
+
+    /* Layout Shell and expect enough room to fit the Control */
+    else
+      fFolderViewerContainer.getShell().layout(true, true);
 
     if (excluded)
       fFolderViewer.getTree().setFocus();
