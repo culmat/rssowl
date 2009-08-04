@@ -134,7 +134,7 @@ public class ImportElementsPage extends WizardPage {
           cache.put(folder, select);
         }
 
-        return select;
+        return select != null ? select : false;
       }
 
       return true;
