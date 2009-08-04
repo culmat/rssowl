@@ -34,10 +34,12 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.rssowl.core.internal.newsaction.LabelNewsAction;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -114,6 +116,21 @@ public class ImportOptionsPage extends WizardPage {
     fImportPreferencesCheck = new Button(container, SWT.CHECK);
     fImportPreferencesCheck.setImage(OwlUI.getImage(fImportPreferencesCheck, "icons/elcl16/preferences.gif"));
     fImportPreferencesCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+    /* Info Container */
+    Composite infoContainer = new Composite(container, SWT.None);
+    infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.END, false, true));
+    infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+
+    Label infoImg = new Label(infoContainer, SWT.NONE);
+    infoImg.setImage(OwlUI.getImage(infoImg, "icons/obj16/info.gif"));
+    infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    infoText = new StyledText(infoContainer, SWT.WRAP | SWT.READ_ONLY);
+    infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    ((GridData) infoText.getLayoutData()).widthHint = 200;
+    infoText.setText("Note: Use 'Import Preferences' with care. All of your existing preferences will be replaced by the imported ones if selected.");
+    infoText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
     setControl(container);
   }
