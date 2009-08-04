@@ -26,14 +26,14 @@
         <rssowl:searchcondition>
           <rssowl:searchspecifier id="11" />
           <rssowl:searchvalue type="0" value="foo" />
-          <rssowl:searchfield name="allFields" entity="org.rssowl.core.persist.INews" />
+          <rssowl:searchfield id="-1" entity="org.rssowl.core.persist.INews" />
         </rssowl:searchcondition>
         <rssowl:searchcondition>
           <rssowl:searchspecifier id="12" />
           <rssowl:searchvalue type="0">
             <rssowl:location isBin="false" isFolder="true" value="426" />
           </rssowl:searchvalue>
-          <rssowl:searchfield name="location" entity="org.rssowl.core.persist.INews" />
+          <rssowl:searchfield id="19" entity="org.rssowl.core.persist.INews" />
         </rssowl:searchcondition>
       </rssowl:savedsearch>
     </outline>
@@ -48,14 +48,14 @@
         <rssowl:searchcondition>
           <rssowl:searchspecifier id="11" />
           <rssowl:searchvalue type="0" value="bar" />
-          <rssowl:searchfield name="allFields" entity="org.rssowl.core.persist.INews" />
+          <rssowl:searchfield id="-1" entity="org.rssowl.core.persist.INews" />
         </rssowl:searchcondition>
         <rssowl:searchcondition>
           <rssowl:searchspecifier id="12" />
           <rssowl:searchvalue type="0">
             <rssowl:location isBin="false" isFolder="true" value="423" />
           </rssowl:searchvalue>
-          <rssowl:searchfield name="location" entity="org.rssowl.core.persist.INews" />
+          <rssowl:searchfield id="19" entity="org.rssowl.core.persist.INews" />
         </rssowl:searchcondition>
       </rssowl:search>
       <rssowl:filteraction id="org.rssowl.core.MoveNewsAction" data="531" />

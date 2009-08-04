@@ -39,6 +39,7 @@ import org.rssowl.core.internal.persist.Preference;
 import org.rssowl.core.internal.persist.SearchFilter;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
@@ -53,10 +54,13 @@ import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.util.ImportUtils;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -95,7 +99,38 @@ public class FileImportTest {
     List<IFolder> folders = root.getFolders();
     folders.remove(target);
     validate_Complex(folders, elements);
-    Owl.getPersistenceService().recreateSchema();
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused" })
+  public void testImport_Complex_All_Root_CheckProperties() throws Exception {
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/complex.opml"));
+    IFolder root = Owl.getModelFactory().createFolder(null, null, "Root");
+    IFolder target = Owl.getModelFactory().createFolder(null, root, "Target");
+    IFolder otherRoot = Owl.getModelFactory().createFolder(null, null, "Other Root");
+    DynamicDAO.save(root);
+    DynamicDAO.save(otherRoot);
+
+    ImportUtils.doImport(root, elements);
+    Set<IFolder> roots = CoreUtils.loadRootFolders();
+    for (IFolder foo : roots) {
+      assertEmptyProperties(foo);
+    }
+  }
+
+  private void assertEmptyProperties(IFolderChild child) {
+    assertTrue(child.getProperties().isEmpty());
+    if (child instanceof IFolder) {
+      List<IFolderChild> children = ((IFolder) child).getChildren();
+      for (IFolderChild foo : children) {
+        assertEmptyProperties(foo);
+      }
+    }
   }
 
   /**
@@ -662,5 +697,132 @@ public class FileImportTest {
 
     assertEquals(0, otherRoot.getMarks().size());
     assertEquals(3, otherRoot.getFolders().size());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Sets_Keep_Order() throws Exception {
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/sets.opml"));
+    ImportUtils.doImport(null, elements);
+
+    Set<IFolder> roots = CoreUtils.loadRootFolders();
+    Iterator<IFolder> iterator = roots.iterator();
+    assertEquals("Set 1", iterator.next().getName());
+    assertEquals("Set 2", iterator.next().getName());
+    assertEquals("Set 3", iterator.next().getName());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Empty() throws Exception {
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/empty.opml"));
+    ImportUtils.doImport(null, elements);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Marks_DescriptionHomepage() throws Exception {
+    IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/marks.opml"));
+    ImportUtils.doImport(root, elements);
+
+    root = CoreUtils.loadRootFolders().iterator().next();
+    List<IMark> marks = root.getMarks();
+    assertEquals("RSSOwl News", root.getMarks().get(0).getName());
+
+    IBookMark mark = (IBookMark) root.getMarks().get(0);
+    IFeed feed = mark.getFeedLinkReference().resolve();
+    assertNotNull(feed);
+    assertEquals("The Reader to Use!", feed.getDescription());
+    assertEquals(URIUtils.createURI("http://www.rssowl.org"), feed.getHomepage());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_AvoidDuplicateFeeds() throws Exception {
+    IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
+    IFeed feed = DynamicDAO.save(Owl.getModelFactory().createFeed(null, new URI("http://www.rssowl.org/newsfeed")));
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/marks.opml"));
+    ImportUtils.doImport(root, elements);
+
+    root = CoreUtils.loadRootFolders().iterator().next();
+    List<IMark> marks = root.getMarks();
+    assertEquals("RSSOwl News", root.getMarks().get(0).getName());
+
+    IBookMark mark = (IBookMark) root.getMarks().get(0);
+    IFeed otherFeed = mark.getFeedLinkReference().resolve();
+    assertNotNull(otherFeed);
+    assertEquals(feed, otherFeed);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Order_DirectImport() throws Exception {
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/order.opml"));
+    ImportUtils.doImport(null, elements);
+
+    IFolder root = CoreUtils.loadRootFolders().iterator().next();
+    List<IFolderChild> childs = root.getChildren();
+    assertEquals("RSSOwl News", childs.get(0).getName());
+    assertEquals("Engadget", childs.get(1).getName());
+    assertEquals("Search A", childs.get(2).getName());
+    assertEquals("MarketWatch", childs.get(3).getName());
+    assertEquals("New York Times", childs.get(4).getName());
+    assertEquals("Bins", childs.get(5).getName());
+    assertEquals("Techcrunch", childs.get(6).getName());
+    assertEquals("Bin A", childs.get(7).getName());
+    assertEquals("Wired Top Stories", childs.get(8).getName());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Order_Target() throws Exception {
+    IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/order.opml"));
+    ImportUtils.doImport(root, elements);
+
+    root = CoreUtils.loadRootFolders().iterator().next();
+    List<IFolderChild> childs = root.getChildren();
+    assertEquals(1, childs.size());
+    childs = ((IFolder) childs.get(0)).getChildren();
+    assertEquals("RSSOwl News", childs.get(0).getName());
+    assertEquals("Engadget", childs.get(1).getName());
+    assertEquals("Search A", childs.get(2).getName());
+    assertEquals("MarketWatch", childs.get(3).getName());
+    assertEquals("New York Times", childs.get(4).getName());
+    assertEquals("Bins", childs.get(5).getName());
+    assertEquals("Techcrunch", childs.get(6).getName());
+    assertEquals("Bin A", childs.get(7).getName());
+    assertEquals("Wired Top Stories", childs.get(8).getName());
   }
 }
