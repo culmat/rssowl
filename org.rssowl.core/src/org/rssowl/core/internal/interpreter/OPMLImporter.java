@@ -269,9 +269,16 @@ public class OPMLImporter implements ITypeImporter {
     Element fieldElement = conditionElement.getChild(Tags.SEARCH_FIELD.get(), RSSOWL_NS);
     if (fieldElement == null)
       return null;
-    String fieldName = fieldElement.getAttributeValue(Attributes.NAME.get());
     String entityName = fieldElement.getAttributeValue(Attributes.ENTITY.get());
-    ISearchField searchField = Owl.getModelFactory().createSearchField(getFieldID(fieldName), entityName);
+
+    String fieldName = fieldElement.getAttributeValue(Attributes.NAME.get());
+    String fieldId = fieldElement.getAttributeValue(Attributes.ID.get());
+
+    ISearchField searchField;
+    if (StringUtils.isSet(fieldName)) //Pre 2.0 M10
+      searchField = Owl.getModelFactory().createSearchField(getFieldID(fieldName), entityName);
+    else //Since 2.0 M10
+      searchField = Owl.getModelFactory().createSearchField(Integer.parseInt(fieldId), entityName);
 
     /*
      * Guard against null (Location Conditions may potentially lead to NULL if
@@ -283,6 +290,7 @@ public class OPMLImporter implements ITypeImporter {
     return null;
   }
 
+  /* TODO Delete me in 2.1 (only works for pre 2.0 M10) */
   private int getFieldID(String fieldName) {
     if ("allFields".equals(fieldName))
       return IEntity.ALL_FIELDS;
@@ -448,6 +456,8 @@ public class OPMLImporter implements ITypeImporter {
     Long id = null;
     String title = null;
     String link = null;
+    String homepage = null;
+    String description = null;
 
     /* Interpret Attributes */
     List<?> attributes = outline.getAttributes();
@@ -466,6 +476,14 @@ public class OPMLImporter implements ITypeImporter {
       /* Text */
       else if (title == null && name.toLowerCase().equals(Attributes.TEXT.get())) //$NON-NLS-1$
         title = attribute.getValue();
+
+      /* Homepage */
+      else if (name.toLowerCase().equals(Attributes.HTML_URL.get().toLowerCase())) //$NON-NLS-1$
+        homepage = attribute.getValue();
+
+      /* Description */
+      else if (name.toLowerCase().equals(Attributes.DESCRIPTION.get())) //$NON-NLS-1$
+        description = attribute.getValue();
     }
 
     /* RSSOwl Namespace Attributes */
@@ -499,6 +517,14 @@ public class OPMLImporter implements ITypeImporter {
         /* Assign old ID value */
         if (id != null)
           type.setProperty(ID_KEY, id);
+
+        /* Store Description if set */
+        if (StringUtils.isSet(description))
+          type.setProperty(ITypeImporter.DESCRIPTION_KEY, description);
+
+        /* Store Homepage if set */
+        if (StringUtils.isSet(homepage))
+          type.setProperty(ITypeImporter.HOMEPAGE_KEY, homepage);
       }
     }
 
