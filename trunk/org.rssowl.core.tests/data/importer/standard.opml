@@ -253,35 +253,35 @@
             <rssowl:newsstate value="0" />
             <rssowl:newsstate value="3" />
           </rssowl:searchvalue>
-          <rssowl:searchfield name="state" entity="org.rssowl.core.persist.INews" />
+          <rssowl:searchfield id="14" entity="org.rssowl.core.persist.INews" />
         </rssowl:searchcondition>
       </rssowl:savedsearch>
       <rssowl:savedsearch name="Recent News" matchAllConditions="true" rssowl:id="411">
         <rssowl:searchcondition>
           <rssowl:searchspecifier id="9" />
           <rssowl:searchvalue type="4" value="2" />
-          <rssowl:searchfield name="ageInDays" entity="org.rssowl.core.persist.INews" />
+          <rssowl:searchfield id="18" entity="org.rssowl.core.persist.INews" />
         </rssowl:searchcondition>
       </rssowl:savedsearch>
       <rssowl:savedsearch name="News with Attachments" matchAllConditions="true" rssowl:id="413">
         <rssowl:searchcondition>
           <rssowl:searchspecifier id="0" />
           <rssowl:searchvalue type="6" value="true" />
-          <rssowl:searchfield name="hasAttachments" entity="org.rssowl.core.persist.INews" />
+          <rssowl:searchfield id="10" entity="org.rssowl.core.persist.INews" />
         </rssowl:searchcondition>
       </rssowl:savedsearch>
       <rssowl:savedsearch name="Sticky News" matchAllConditions="true" rssowl:id="415">
         <rssowl:searchcondition>
           <rssowl:searchspecifier id="0" />
           <rssowl:searchvalue type="6" value="true" />
-          <rssowl:searchfield name="isFlagged" entity="org.rssowl.core.persist.INews" />
+          <rssowl:searchfield id="13" entity="org.rssowl.core.persist.INews" />
         </rssowl:searchcondition>
       </rssowl:savedsearch>
       <rssowl:savedsearch name="Labeled News" matchAllConditions="false" rssowl:id="417">
         <rssowl:searchcondition>
           <rssowl:searchspecifier id="0" />
           <rssowl:searchvalue type="7" value="*" />
-          <rssowl:searchfield name="label" entity="org.rssowl.core.persist.INews" />
+          <rssowl:searchfield id="15" entity="org.rssowl.core.persist.INews" />
         </rssowl:searchcondition>
       </rssowl:savedsearch>
     </outline>

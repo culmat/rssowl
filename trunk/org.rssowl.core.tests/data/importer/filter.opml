@@ -10,7 +10,7 @@
         <rssowl:searchcondition>
           <rssowl:searchspecifier id="11" />
           <rssowl:searchvalue type="0" value="foo" />
-          <rssowl:searchfield name="allFields" entity="org.rssowl.core.persist.INews" />
+          <rssowl:searchfield id="-1" entity="org.rssowl.core.persist.INews" />
         </rssowl:searchcondition>
       </rssowl:search>
       <rssowl:filteraction id="org.rssowl.core.MarkReadNewsAction" />

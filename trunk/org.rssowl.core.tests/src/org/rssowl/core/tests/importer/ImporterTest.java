@@ -31,6 +31,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
+import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
@@ -83,10 +84,14 @@ public class ImporterTest {
     IBookMark category1_mark1 = (IBookMark) category1.getMarks().get(0);
     assertEquals("category_1_feed_1_title", category1_mark1.getName());
     assertEquals("http://www.category_1_feed_1_url.com", category1_mark1.getFeedLinkReference().getLink().toString());
+    assertEquals("category_1_feed_1_website", category1_mark1.getProperty(ITypeImporter.HOMEPAGE_KEY));
+    assertEquals("category_1_feed_1_description", category1_mark1.getProperty(ITypeImporter.DESCRIPTION_KEY));
 
     IBookMark category1_mark2 = (IBookMark) category1.getMarks().get(1);
     assertEquals("category_1_feed_2_text", category1_mark2.getName());
     assertEquals("http://www.category_1_feed_2_url.com", category1_mark2.getFeedLinkReference().getLink().toString());
+    assertEquals("category_1_feed_2_website", category1_mark2.getProperty(ITypeImporter.HOMEPAGE_KEY));
+    assertEquals("category_1_feed_2_description", category1_mark2.getProperty(ITypeImporter.DESCRIPTION_KEY));
 
     IBookMark category1_mark3 = (IBookMark) category1.getMarks().get(2);
     assertEquals("category_1_feed_3_title", category1_mark3.getName());
