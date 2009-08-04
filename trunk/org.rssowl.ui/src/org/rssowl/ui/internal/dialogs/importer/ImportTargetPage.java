@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.importer;
 
+import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -66,7 +67,7 @@ public class ImportTargetPage extends WizardPage {
    */
   protected ImportTargetPage(String pageName) {
     super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/import_wiz.png"));
-    setMessage("Please choose the target location to import into.");
+    setMessage("Please choose the target folder to import into.");
   }
 
   /**
@@ -92,6 +93,11 @@ public class ImportTargetPage extends WizardPage {
       setPageComplete(true);
     else
       setPageComplete(StringUtils.isSet(fSetNameInput.getText()));
+
+    if (fCreateNewSetRadio.getSelection() && newSetExists())
+      setMessage("A Bookmark Set with the name '" + fSetNameInput.getText() + "' already exists.", IMessageProvider.WARNING);
+    else
+      setMessage("Please choose the target folder to import into.");
   }
 
   /*
@@ -174,5 +180,15 @@ public class ImportTargetPage extends WizardPage {
     });
 
     setControl(container);
+  }
+
+  private boolean newSetExists() {
+    Set<IFolder> roots = CoreUtils.loadRootFolders();
+    for (IFolder root : roots) {
+      if (root.getName().equals(fSetNameInput.getText()))
+        return true;
+    }
+
+    return false;
   }
 }
