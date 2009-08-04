@@ -44,8 +44,17 @@ public interface ITypeImporter {
   /** Key to store extra data with the {@link IEntity} if required */
   public static final String DATA_KEY = "org.rssowl.core.interpreter.typeimporter.DataId";
 
-  /** Key to store a boolean indicating that a Folder was only created as temporary container */
+  /**
+   * Key to store a boolean indicating that a Folder was only created as
+   * temporary container
+   */
   public static final String TEMPORARY_FOLDER = "org.rssowl.core.interpreter.typeimporter.TemporaryFolder";
+
+  /** Key to store the Homepage with the {@link IEntity} */
+  public static final String HOMEPAGE_KEY = "org.rssowl.core.interpreter.typeimporter.Homepage";
+
+  /** Key to store the Description with the {@link IEntity} */
+  public static final String DESCRIPTION_KEY = "org.rssowl.core.interpreter.typeimporter.Description";
 
   /**
    * Import a Type from the given Document. A very common usecase is importing
