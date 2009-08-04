@@ -37,13 +37,11 @@ import org.rssowl.core.internal.interpreter.OPMLConstants.Tags;
 import org.rssowl.core.interpreter.ITypeExporter;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.persist.IBookMark;
-import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
-import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
@@ -458,58 +456,9 @@ public class OPMLExporter implements ITypeExporter {
 
     /* Search Field */
     Element field = new Element(Tags.SEARCH_FIELD.get(), RSSOWL_NS);
-    field.setAttribute(Attributes.NAME.get(), getSearchFieldName(condition.getField().getId()));
+    field.setAttribute(Attributes.ID.get(), String.valueOf(condition.getField().getId()));
     field.setAttribute(Attributes.ENTITY.get(), condition.getField().getEntityName());
     conditionElement.addContent(field);
-  }
-
-  private String getSearchFieldName(int fieldId) {
-    switch (fieldId) {
-      case (IEntity.ALL_FIELDS):
-        return "allFields";
-      case (INews.TITLE):
-        return "title";
-      case (INews.LINK):
-        return "link";
-      case (INews.DESCRIPTION):
-        return "description";
-      case (INews.PUBLISH_DATE):
-        return "publishDate";
-      case (INews.MODIFIED_DATE):
-        return "modifiedDate";
-      case (INews.RECEIVE_DATE):
-        return "receiveDate";
-      case (INews.AUTHOR):
-        return "author";
-      case (INews.COMMENTS):
-        return "comments";
-      case (INews.GUID):
-        return "guid";
-      case (INews.SOURCE):
-        return "source";
-      case (INews.HAS_ATTACHMENTS):
-        return "hasAttachments";
-      case (INews.ATTACHMENTS_CONTENT):
-        return "attachments";
-      case (INews.CATEGORIES):
-        return "categories";
-      case (INews.IS_FLAGGED):
-        return "isFlagged";
-      case (INews.STATE):
-        return "state";
-      case (INews.LABEL):
-        return "label";
-      case (INews.RATING):
-        return "rating";
-      case (INews.FEED):
-        return "feed";
-      case (INews.AGE_IN_DAYS):
-        return "ageInDays";
-      case (INews.LOCATION):
-        return "location";
-      default:
-        return "allFields";
-    }
   }
 
   private String toString(Object data) {
