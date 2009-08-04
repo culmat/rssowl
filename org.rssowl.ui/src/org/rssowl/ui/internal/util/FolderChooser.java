@@ -237,6 +237,7 @@ public class FolderChooser extends Composite implements DisposeListener {
         @Override
         public void mouseDown(MouseEvent e) {
           onToggle();
+          notifyListeners(SWT.Selection, new Event());
         }
       });
     }
@@ -251,6 +252,7 @@ public class FolderChooser extends Composite implements DisposeListener {
         @Override
         public void mouseDown(MouseEvent e) {
           onToggle();
+          notifyListeners(SWT.Selection, new Event());
         }
       });
     }
@@ -265,6 +267,7 @@ public class FolderChooser extends Composite implements DisposeListener {
         @Override
         public void mouseDown(MouseEvent e) {
           onToggle();
+          notifyListeners(SWT.Selection, new Event());
         }
       });
     }
@@ -304,6 +307,7 @@ public class FolderChooser extends Composite implements DisposeListener {
       @Override
       public void widgetSelected(SelectionEvent e) {
         onToggle();
+        notifyListeners(SWT.Selection, new Event());
       }
     });
 
