@@ -58,7 +58,6 @@ import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
-import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
@@ -108,7 +107,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1112,7 +1110,7 @@ public class Controller {
     List<? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
 
     IFolder root = Owl.getModelFactory().createFolder(null, null, "My Bookmarks");
-    ImportUtils.doImport(root, Collections.singletonList((IFolderChild) types.get(0)), null, null, null);
+    ImportUtils.doImport(root, types);
 
     /* Create Default SearchMarks */
     String newsEntityName = INews.class.getName();

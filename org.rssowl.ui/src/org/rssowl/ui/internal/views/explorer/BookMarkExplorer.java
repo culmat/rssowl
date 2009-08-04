@@ -39,7 +39,6 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.LocalSelectionTransfer;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IElementComparer;
 import org.eclipse.jface.viewers.IInputProvider;
@@ -194,7 +193,7 @@ public class BookMarkExplorer extends ViewPart {
 
   /* Viewer Classes */
   private TreeViewer fViewer;
-  private IContentProvider fContentProvider;
+  private BookMarkContentProvider fContentProvider;
   private BookMarkLabelProvider fLabelProvider;
   private BookMarkSorter fBookMarkComparator;
   private BookMarkFilter fBookMarkFilter;
@@ -324,8 +323,8 @@ public class BookMarkExplorer extends ViewPart {
     fBookMarkGrouping.setType(fGroupingType);
 
     /* Let the ContentProvider know */
-    ((BookMarkContentProvider) fContentProvider).setBookmarkFilter(fBookMarkFilter);
-    ((BookMarkContentProvider) fContentProvider).setBookmarkGrouping(fBookMarkGrouping);
+    fContentProvider.setBookmarkFilter(fBookMarkFilter);
+    fContentProvider.setBookmarkGrouping(fBookMarkGrouping);
 
     /* Set the initial Input based on selected Bookmark Set */
     fViewer.setInput(fSelectedBookMarkSet);
@@ -1814,7 +1813,7 @@ public class BookMarkExplorer extends ViewPart {
     loadExpandedElements();
 
     /* Selected Folder Child */
-    fLastSelectedFolderChild= fGlobalPreferences.getLong(PREF_SELECTED_FOLDER_CHILD);
+    fLastSelectedFolderChild = fGlobalPreferences.getLong(PREF_SELECTED_FOLDER_CHILD);
   }
 
   /* Expanded Elements - Use ID of selected Set to make it Unique */

@@ -72,7 +72,7 @@ public class ExportElementsPage extends WizardPage {
    */
   protected ExportElementsPage(String pageName) {
     super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/export_wiz.png"));
-    setMessage("Please choose the elements you want to export.");
+    setMessage("Please choose the elements to export.");
   }
 
   List<IFolderChild> getElementsToExport() {
