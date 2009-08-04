@@ -70,6 +70,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1134,5 +1135,25 @@ public class CoreUtils {
         }
       }
     }
+  }
+
+  /**
+   * @param <T> the type of elements of the list.
+   * @param list a list to remove duplicates from using object identity equal
+   * checks.
+   * @return returns a list where all duplicates are removed using object
+   * identiy equalness.
+   */
+  public static <T> List<T> removeIdentityDuplicates(List<T> list) {
+    List<T> newList = new ArrayList<T>(list.size());
+    Map<T, T> identityMap = new IdentityHashMap<T, T>();
+    for (T t : list) {
+      if (!identityMap.containsKey(t)) {
+        newList.add(t);
+        identityMap.put(t, t);
+      }
+    }
+
+    return newList;
   }
 }
