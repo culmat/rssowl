@@ -30,6 +30,8 @@ import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.LocalSelectionTransfer;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -238,6 +240,13 @@ public class ManageSetsDialog extends TitleAreaDialog {
         IFolder folder2 = (IFolder) e2;
 
         return folder1.getId().compareTo(folder2.getId());
+      }
+    });
+
+    /* Edit on Doubleclick */
+    fViewer.addDoubleClickListener(new IDoubleClickListener() {
+      public void doubleClick(DoubleClickEvent event) {
+        onEdit();
       }
     });
 
