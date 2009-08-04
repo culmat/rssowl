@@ -1,245 +1,249 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <opml version="1.1">
-	<body>
-		<outline text="Business">
-		<outline text="Forbes.com Business News" xmlUrl="http://www.forbes.com/business/index.xml" />
-		<outline text="Moreover - Entrepreneur news" xmlUrl="http://www.moreover.com/cgi-local/page?o=rss002&amp;c=entrepreneur%20news&amp;wiz=2277468" />
-		<outline text="BusinessWeek Online -- Top News" xmlUrl="http://www.businessweek.com/rss/bwdaily.rss" />
-		<outline text="CNN/Money" xmlUrl="http://www.cnn.com/rss/money_topstories.rss" />
-		<outline text="The Motley Fool" xmlUrl="http://www.fool.com/xml/foolnews_rss091.xml" />
-		<outline text="Smartmoney.com" xmlUrl="http://www.smartmoney.com/rss/smheadlines.cfm?feed=1&amp;format=rss091" />
-		<outline text="Inc.com" xmlUrl="http://www.inc.com/rss.xml" />
-		<outline text="Moreover - Small business news" xmlUrl="http://www.moreover.com/cgi-local/page?o=rss002&amp;c=small%20business%20news&amp;wiz=2277468" />
-		<outline text="WSJ.com: Today's Free Features" xmlUrl="http://online.wsj.com/xml/rss/0,,3_7077,00.xml" />
-		</outline>
-		<outline text="Computers">
-		<outline text="Mac">
-		<outline text="digg - tech news / apple / dig" xmlUrl="http://digg.com/rss/indexappledig.xml" />
-		<outline text="Editors' Notes Weblog" xmlUrl="http://www.macworld.com/weblogs/editors/rss.xml" />
-		<outline text="VersionTracker: Mac OS X" xmlUrl="http://www.versiontracker.com/macosx/recent.rss" />
-		<outline text="Mac 911 Weblog" xmlUrl="http://www.macworld.com/weblogs/mac911/rss.xml" />
-		<outline text="Macworld" xmlUrl="http://rss.macworld.com/macworld/feeds/main" />
-		<outline text="MacNN | The Macintosh News Network" xmlUrl="http://www.macnn.com/macnn.rss" />
-		<outline text="MacFixIt" xmlUrl="http://www.macfixit.com/backend/macfixit.rss" />
-		<outline text="Daring Fireball" xmlUrl="http://daringfireball.net/index.xml" />
-		<outline text="macosxhints" xmlUrl="http://www.macosxhints.com/backend/geeklog.rdf" />
-		<outline text="Mac Help Forums" xmlUrl="http://www.mac-help.com/forums/external.php?type=rss2" />
-		<outline text="Mac OS X Knowledge Base Docs" xmlUrl="http://docs.info.apple.com/rss/macosx.rss" />
-		<outline text="MACnn News" xmlUrl="http://macnn.com/macnn.rss" />
-		<outline text="Macworld" xmlUrl="http://www.macworld.com/rss.xml" />
-		<outline text="Mac Gems Weblog" xmlUrl="http://www.macworld.com/weblogs/macgems/rss.xml" />
-		<outline text="MacInTouch" xmlUrl="http://www.macintouch.com/rss.xml" />
-		<outline text="MacMerc.com" xmlUrl="http://www.macmerc.com/index.rss" />
-		</outline>
-		<outline text="PDA">
-		<outline text="Pocket PC Thoughts" xmlUrl="http://www.pocketpcthoughts.com/xml" />
-		</outline>
-		<outline text="Unix">
-		<outline text="Linux Journal" xmlUrl="http://www.linuxjournal.com/news.rss" />
-		<outline text="Linux Weekly News" xmlUrl="http://lwn.net/headlines/rss" />
-		</outline>
-		<outline text="OS News" xmlUrl="http://www.osnews.com/files/recent.rdf" />
-		</outline>
-		<outline text="Entertainment">
-		<outline text="Books">
-		<outline text="Variety.com" xmlUrl="http://www.variety.com/rss.asp?categoryid=1010" />
-		<outline text="NYT Book Review" xmlUrl="http://radio.weblogs.com/0124132/staplerfeeds/nytbook.xml" />
-		<outline text="The Literary Saloon" xmlUrl="http://www.complete-review.com/saloon/rss.xml" />
-		<outline text="The Shifted Librarian" xmlUrl="http://www.theshiftedlibrarian.com/rss.xml" />
-		</outline>
-		<outline text="Cars">
-		<outline text="Jalopnik" xmlUrl="http://feeds.gawker.com/jalopnik/full" />
-		<outline text="Future cars, Hybrid Cars" xmlUrl="http://futurecars.blogspot.com/atom.xml" />
-		<outline text="Motorcycle.Com News Feed" xmlUrl="http://www.motorcycle.com/news/news.xml" />
-		</outline>
-		<outline text="Games">
-		<outline text="GamersCircle" xmlUrl="http://www.gamerscircle.net/b2rss2.php" />
-		<outline text="Gaming News: GameCube" xmlUrl="http://www.dailygame.net/news/archives/categories/gc/index.xml" />
-		<outline text="Gaming News: Playstation 2" xmlUrl="http://www.dailygame.net/news/archives/categories/ps2/index.xml" />
-		<outline text="Joystiq" xmlUrl="http://www.joystiq.com/rss.xml" />
-		</outline>
-		<outline text="Humor">
-		<outline text="Dilbert.com Blog" xmlUrl="http://dilbert.com/blog/" />
-		<outline text="Darkgate Comic Slurper" xmlUrl="http://darkgate.net/comic/feed.php?foxtrot&amp;dilbert&amp;doonesbury&amp;sherman&amp;userf&amp;stonesoup" />
-		<outline text="Get Fuzzy" xmlUrl="http://www.tapestrycomics.com/getfuzzy.xml" />
-		<outline text="Lost Brain" xmlUrl="http://www.lostbrain.com/rss/rssv0_91.xml" />
-		</outline>
-		<outline text="SciFi">
-		<outline text="Stargate Blog" xmlUrl="http://blog.scifi.com/stargate/index.rdf" />
-		<outline text="Sci-Fi Storm" xmlUrl="http://scifistorm.org/scifistorm.rdf" />
-		</outline>
-		<outline text="Gawker" xmlUrl="http://www.gawker.com/index.xml" />
-		<outline text="The Movie Blog" xmlUrl="http://feeds.feedburner.com/themovieblog/VkTh" />
-		<outline text="CC Insider" xmlUrl="http://ccinsider.comedycentral.com/cc_insider/atom.xml" />
-		</outline>
-		<outline text="Food">
-		<outline text="Bay Area Bites" xmlUrl="http://www.kqed.org/weblog/food/atom.xml" />
-		<outline text="Cucina Testa Rossa" xmlUrl="http://cucinatestarossa.blogs.com/weblog/atom.xml" />
-		<outline text="Eat Feed" xmlUrl="http://www.eatfeed.com/eatfeed.xml" />
-		<outline text="The Food Section" xmlUrl="http://www.thefoodsection.com/foodsection/index.rdf" />
-		<outline text="Simply Recipes" xmlUrl="http://www.elise.com/recipes/index.rdf" />
-		</outline>
-		<outline text="Health">
-		<outline text="BBC News | Health" xmlUrl="http://news.bbc.co.uk/rss/newsonline_world_edition/health/rss091.xml" />
-		<outline text="Kevin, M.D. - Medical Weblog" xmlUrl="http://www.kevinmd.com/blog/atom.xml" />
-		<outline text="NBC Bay Area - Health Top Stories" xmlUrl="http://feeds.nbcbayarea.com/nbcbayarea/health/?rss=y" />
-		<outline text="Family Medicine Notes" xmlUrl="http://www.docnotes.net/index.rdf" />
-		<outline text="Pharyngula" xmlUrl="http://pharyngula.org/index.xml" />
-		</outline>
-		<outline text="Internet">
-		<outline text="WebDeveloper.com" xmlUrl="http://www.webdeveloper.com/webdeveloper.rdf" />
-		<outline text="internetnews.com" xmlUrl="http://headlines.internet.com/internetnews/top-news/news.rss" />
-		<outline text="SimpleBits" xmlUrl="http://www.simplebits.com/xml/rss.xml" />
-		<outline text="Accessify" xmlUrl="http://www.accessify.com/rss/accessify_rss.xml" />
-		<outline text="WebReference News" xmlUrl="http://www.webreference.com/webreference.rdf" />
-		</outline>
-		<outline text="Music">
-		<outline text="iTunes 25 Just Added Albums" xmlUrl="http://phobos.apple.com/WebObjects/MZStore.woa/wpa/MRSS/justadded/limit=25/rss.xml" />
-		<outline text="RollingStone.com Music News" xmlUrl="http://www.rollingstone.com/rssxml/music_news.xml" />
-		<outline text="VH1 News" xmlUrl="http://www.vh1.com/rss/news/latest.jhtml" />
-		<outline text="MTV News" xmlUrl="http://www.mtv.com/rss/news/latest.jhtml" />
-		<outline text="CMT News" xmlUrl="http://www.cmt.com/rss/news/latest.jhtml" />
-		<outline text="iTunes Top 25 Songs" xmlUrl="http://phobos.apple.com/WebObjects/MZStore.woa/wpa/MRSS/topsongs/limit=25/rss.xml" />
-		</outline>
-		<outline text="News">
-		<outline text="Guardian Unlimited" xmlUrl="http://www.guardian.co.uk/rss/1,,,00.xml" />
-		<outline text="World Press Review" xmlUrl="http://www.worldpress.org/feeds/topstories.xml" />
-		<outline text="Yahoo! News" xmlUrl="http://rss.news.yahoo.com/rss/topstories" />
-		<outline text="CNN" xmlUrl="http://xml.newsisfree.com/feeds/15/2315.xml" />
-		<outline text="BBC News | News Front Page" xmlUrl="http://news.bbc.co.uk/rss/newsonline_world_edition/front_page/rss091.xml" />
-		<outline text="Reuters: Top News" xmlUrl="http://www.microsite.reuters.com/rss/topnews" />
-		<outline text="U.S. News &amp; World Report" xmlUrl="http://www.usnews.com/usnews/usnews.rss" />
-		<outline text="New York Times" xmlUrl="http://xml.newsisfree.com/feeds/64/164.xml" />
-		<outline text="Guardian Unlimited World Latest" xmlUrl="http://www.guardian.co.uk/rssfeed/0,,12,00.xml" />
-		<outline text="The Wall Street Transcript" xmlUrl="http://www.twst.com/mynetscape/main.rdf" />
-		<outline text="TIME Magazine Online" xmlUrl="http://www.time.com/time/rss/top/0,20326,,00.xml" />
-		</outline>
-		<outline text="Podcast">
-		<outline text="The Chris Pirillo Show" xmlUrl="http://feeds.pirillo.com/ChrisPirilloShow" />
-		<outline text="Open Source" xmlUrl="http://www.radioopensource.org/wp-rss2.php?cat=18" />
-		<outline text="President's Weekly Radio Address" xmlUrl="http://www.whitehouse.gov/rss/radioaddress.xml" />
-		<outline text="Geek News Central" xmlUrl="http://www.geeknewscentral.com/index.xml" />
-		<outline text="this WEEK in TECH" xmlUrl="http://leo.am/podcasts/twit" />
-		<outline text="Adam Curry: Daily Source Code" xmlUrl="http://radio.weblogs.com/0001014/categories/dailysourcecode/rss.xml" />
-		<outline text="Geek News Central Podcast" xmlUrl="http://www.geeknewscentral.com/podcast.xml" />
-		</outline>
-		<outline text="Politics">
-		<outline text="GrokLaw" xmlUrl="http://www.groklaw.net/backend/groklaw.rdf" />
-		<outline text="The Agitator" xmlUrl="http://theagitator.com/index.xml" />
-		<outline text="Davenetics Politics (electablog)" xmlUrl="http://www.electablog.com/rss.xml" />
-		<outline text="Talking Points Memo" xmlUrl="http://www.talkingpointsmemo.com/index.xml" />
-		</outline>
-		<outline text="Science">
-		<outline text="Physics Post" xmlUrl="http://physicspost.com/rss.php" />
-		<outline text="ScienceDaily Headlines" xmlUrl="http://www.sciencedaily.com/newsfeed.xml" />
-		<outline text="National Geographic News" xmlUrl="http://news.nationalgeographic.com/index.rss" />
-		<outline text="Tom's Astronomy Blog" xmlUrl="http://tomsastroblog.com/?feed=atom" />
-		<outline text="Scientific American - Official RSS Feed" xmlUrl="http://www.sciam.com/xml/sciam.xml" />
-		<outline text="SPACE.com" xmlUrl="http://www.space.com/syn/space.xml" />
-		<outline text="Minding the Planet" xmlUrl="http://novaspivack.typepad.com/nova_spivacks_weblog/atom.xml" />
-		<outline text="Yahoo! News: Science News" xmlUrl="http://rss.news.yahoo.com/rss/science" />
-		</outline>
-		<outline text="Software">
-		<outline text="BetaNews.Com" xmlUrl="http://www.betanews.com/mnn.php3" />
-		<outline text="freshmeat.net" xmlUrl="http://freshmeat.net/backend/fm.rdf" />
-		<outline text="SnapFiles latest software" xmlUrl="http://www.webattack.com/webattack.xml" />
-		<outline text="Dev Shed" xmlUrl="http://www.devshed.com/index2.php?option=mos_rss&amp;no_html=1" />
-		<outline text="MajorGeeks.com" xmlUrl="http://www.majorgeeks.com/backend.php?id=120" />
-		<outline text="PC Magazine" xmlUrl="http://rssnewsapps.ziffdavis.com/pcmag.xml" />
-		<outline text="Slashdot" xmlUrl="http://slashdot.org/slashdot.rss" />
-		<outline text="PCWorld.com - Popular downloads" xmlUrl="http://feeds.pcworld.com/pcworld/downloads/weekly" />
-		<outline text="mozillaZine" xmlUrl="http://www.mozillazine.org/atom.xml" />
-		<outline text="Free Vista Files" xmlUrl="http://www.freevistafiles.com/rss/new_software.xml" />
-		<outline text="FilePlaza" xmlUrl="http://www.fileplaza.com/lastaddedsoftware.rss" />
-		<outline text="Do Download" xmlUrl="http://www.dodownload.com/rss/new_software.xml" />
-		</outline>
-		<outline text="Sports">
-		<outline text="NBC Bay Area - Sports Top Stories" xmlUrl="http://feeds.nbcbayarea.com/nbcbayarea/sports/?rss=y" />
-		<outline text="AP Sports" xmlUrl="http://xml.newsisfree.com/feeds/71/1471.xml" />
-		<outline text="Yahoo! News - Sports" xmlUrl="http://rss.news.yahoo.com/rss/sports" />
-		<outline text="BBC Sport" xmlUrl="http://newsrss.bbc.co.uk/rss/sportonline_world_edition/front_page/rss.xml" />
-		<outline text="PR Web Sports" xmlUrl="http://www.prweb.com/xml/sports.xml" />
-		<outline text="Fanblogs.com" xmlUrl="http://www.fanblogs.com/site.xml" />
-		<outline text="New York Times: Sports" xmlUrl="http://partners.userland.com/nytrss/sports.xml" />
-		<outline text="ESPN.com" xmlUrl="http://sports.espn.go.com/espn/rss/news" />
-		</outline>
-		<outline text="Technology">
-		<outline text="Programming Languages">
-		<outline text="PHPBuilder.com" xmlUrl="http://phpbuilder.com/rss_feed.php?type=articles&amp;limit=20" />
-		<outline text="PHP News" xmlUrl="http://www.php.net/news.rss" />
-		<outline text="Java" xmlUrl="http://developers.sun.com/rss/sdn.xml" />
-		<outline text="Planet JDK" xmlUrl="http://planetjdk.org/feed.atom-1.0" />
-		<outline text="Servlets.com" xmlUrl="http://www.servlets.com/blog/index.rss" />
-		<outline text="JavaScript Tips" xmlUrl="http://www.webreference.com/js/tips/channels/last1515.rdf" />
-		</outline>
-		<outline text="Security">
-		<outline text="Computer World Security Knowledge Center" xmlUrl="http://www.computerworld.com/news/xml/0,5000,73,00.xml" />
-		<outline text="Computer World Security Holes" xmlUrl="http://www.computerworld.com/news/xml/0,5000,584,00.xml" />
-		<outline text="Computer World Hacking News" xmlUrl="http://www.computerworld.com/news/xml/0,5000,583,00.xml" />
-		</outline>
-		<outline text="Wireless">
-		<outline text="Computer World Mobile" xmlUrl="http://www.computerworld.com/news/xml/0,5000,68,00.xml" />
-		<outline text="The RFID Weblog" xmlUrl="http://www.rfid-weblog.com/index.rdf" />
-		<outline text="WiFi Planet" xmlUrl="http://www.wi-fiplanet.com/icom_includes/feeds/80211/xml_front-news-10.xml" />
-		<outline text="InfoWorld: Wireless" xmlUrl="http://www.infoworld.com/rss/wireless.rdf" />
-		</outline>
-		<outline text="Digital Photography Review" xmlUrl="http://www.dpreview.com/news/dpr.rdf" />
-		<outline text="eWEEK Technology News" xmlUrl="http://rssnewsapps.ziffdavis.com/tech.xml" />
-		<outline text="Javalobby Front Page" xmlUrl="http://www.javalobby.org/forumrss/61.xml" />
-		<outline text="Joel on Software" xmlUrl="http://www.joelonsoftware.com/rss.xml" />
-		<outline text="BBC News | Technology | World Edition" xmlUrl="http://news.bbc.co.uk/rss/newsonline_world_edition/technology/rss091.xml" />
-		<outline text="Shacknews" xmlUrl="http://www.shacknews.com/headlines.rdf" />
-		<outline text="Graphics News" xmlUrl="http://www.graphicsnews.com/backend.php" />
-		<outline text="ThinkGeek: What's New" xmlUrl="http://www.thinkgeek.com/thinkgeek.rdf" />
-		<outline text="Ars Technica" xmlUrl="http://arstechnica.com/index.ars/rss" />
-		<outline text="TechBookReport" xmlUrl="http://www.techbookreport.com/rss/rss.xml" />
-		<outline text="KDE Dot News" xmlUrl="http://www.kde.org/dotkdeorg.rdf" />
-		<outline text="iPodlounge" xmlUrl="http://www.ipodlounge.com/index.xml" />
-		<outline text="Wired News" xmlUrl="http://www.wired.com/news_drop/netcenter/netcenter.rdf" />
-		<outline text="OSI News Weblog" xmlUrl="http://opensource.org/blog/feed" />
-		<outline text="digg - tech news" xmlUrl="http://digg.com/rss/index.xml" />
-		<outline text="CNET News" xmlUrl="http://rss.com.com/2547-12-0-20.xml" />
-		<outline text="Anand Tech" xmlUrl="http://www.anandtech.com/rss/articlefeed.aspx" />
-		<outline text="ZDNet News - Front Door" xmlUrl="http://news.zdnet.com/2509-1_22-0-20.xml" />
-		<outline text="XML News" xmlUrl="http://www.xml.com/cs/xml/query/q/19" />
-		<outline text="The Register" xmlUrl="http://www.theregister.co.uk/tonys/slashdot.rdf" />
-		<outline text="Apache News Online" xmlUrl="http://www.apachenews.org/index.rdf" />
-		<outline text="NewsForge" xmlUrl="http://www.newsforge.com/reports.rss" />
-		<outline text="Computer World" xmlUrl="http://www.computerworld.com/news/xml/10/0,5009,,00.xml" />
-		<outline text="Microsoft Security Bulletins" xmlUrl="http://www.microsoft.com/technet/security/bulletin/secrss.aspx" />
-		<outline text="MAKE: Blog" xmlUrl="http://www.makezine.com/blog/index.rdf" />
-		<outline text="Planet Mozilla" xmlUrl="http://planet.mozilla.org/rss20.xml" />
-		<outline text="Planet GNOME" xmlUrl="http://planet.gnome.org/rss20.xml" />
-		<outline text="Planet Classpath" xmlUrl="http://planet.classpath.org/rss20.xml" />
-		<outline text="Fedora People" xmlUrl="http://planet.fedoraproject.org/rss20.xml" />
-		<outline text="Planet Debian" xmlUrl="http://planet.debian.org/rss20.xml" />
-		<outline text="Mozillazine" xmlUrl="http://planet.mozillazine.org/rss20.xml" />
-		<outline text="Eclipse News" xmlUrl="http://www.eclipse.org/home/eclipsenews.rss" />
-		<outline text="Planet Eclipse" xmlUrl="http://www.planeteclipse.org/planet/atom.xml" />
-		<outline text="EclipseZone: News" xmlUrl="http://www.eclipsezone.com/forumRSS/18112.xml" />
-		<outline text="EclipseZone: Tips" xmlUrl="http://www.eclipsezone.com/forumRSS/18111.xml" />
-		<outline text="Eclipse Podcasts" xmlUrl="http://feeds.feedburner.com/ezpodcast" />
-		</outline>
-		<outline text="Weblogs">
-		<outline text="Google Sightseeing" xmlUrl="http://googlesightseeing.com/feed" />
-		<outline text="LivingRoom. A space for Life" xmlUrl="http://www.livingroom.org.au/blog/index.rdf" />
-		<outline text="Scobleizer -- Tech geek blogger" xmlUrl="http://scobleizer.wordpress.com/feed/" />
-		<outline text="Mini-Microsoft" xmlUrl="http://minimsft.blogspot.com/atom.xml" />
-		<outline text="Google Blogoscoped" xmlUrl="http://blog.outer-court.com/rss.xml" />
-		<outline text="HorsePigCow: life uncommon" xmlUrl="http://feeds.feedburner.com/horsepigcowLifeUncommon" />
-		<outline text="Wizbang" xmlUrl="http://wizbangblog.com/index.rdf" />
-		<outline text="little. yellow. different." xmlUrl="http://littleyellowdifferent.com/index.xml" />
-		<outline text="Blogcritics" xmlUrl="http://www.blogcritics.org/index.rdf" />
-		<outline text="Jonathan Schwartz's Weblog" xmlUrl="http://blogs.sun.com/roller/rss/jonathan" />
-		<outline text="Boing Boing" xmlUrl="http://www.boingboing.net/index.rdf" />
-		<outline text="Anil Dash" xmlUrl="http://www.dashes.com/anil/index.rdf" />
-		<outline text="Pandagon" xmlUrl="http://pandagon.net/index.php/site/rss_2.0/" />
-		</outline>
-		<outline text="RSSOwl News" xmlUrl="http://www.rssowl.org/newsfeed" />
-		<outline text="Engadget" xmlUrl="http://www.engadget.com/rss.xml" />
-		<outline text="MarketWatch" xmlUrl="http://feeds.marketwatch.com/marketwatch/topstories" />
-		<outline text="New York Times" xmlUrl="http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml" />
-		<outline text="Techcrunch" xmlUrl="http://feedproxy.google.com/Techcrunch" />
-		<outline text="Wired Top Stories" xmlUrl="http://feeds.wired.com/wired/index" />
-	</body>
+  <head>
+    <title>RSSOwl Default Subscriptions</title>
+    <dateModified>Di, 04 Aug 2009 16:05:36 CEST</dateModified>
+  </head>
+  <body>
+    <outline text="Business">
+      <outline text="Forbes.com Business News" xmlUrl="http://www.forbes.com/business/index.xml" htmlUrl="http://www.forbes.com/business/?feed=rss_business" description=" Business news and reports from Forbes.com " />
+      <outline text="Moreover - Entrepreneur news" xmlUrl="http://www.moreover.com/cgi-local/page?o=rss002&amp;c=entrepreneur%20news&amp;wiz=2277468" htmlUrl="http://www.moreover.com/rss" description="Moreover Technologies - Real-time news and blogs from thousands of sources" />
+      <outline text="BusinessWeek Online -- Top News" xmlUrl="http://www.businessweek.com/rss/bwdaily.rss" htmlUrl="http://www.businessweek.com//index.html" />
+      <outline text="CNN/Money" xmlUrl="http://www.cnn.com/rss/money_topstories.rss" htmlUrl="http://money.cnn.com/rssclick/?section=money_topstories" description="From CNN and Money magazine, CNNMoney.com combines business news and in-depth market analysis with practical advice and answers to personal finance questions." />
+      <outline text="The Motley Fool" xmlUrl="http://www.fool.com/xml/foolnews_rss091.xml" htmlUrl="http://www.fool.com/" description="Today's top headlines from The Motley Fool" />
+      <outline text="Smartmoney.com" xmlUrl="http://www.smartmoney.com/rss/smheadlines.cfm?feed=1&amp;format=rss091" htmlUrl="http://www.smartmoney.com/?cid=1122" description="Investing, Saving and Personal Finance" />
+      <outline text="Inc.com" xmlUrl="http://www.inc.com/rss.xml" htmlUrl="http://www.inc.com" description="Inc.com, the daily resource for entrepreneurs." />
+      <outline text="Moreover - Small business news" xmlUrl="http://www.moreover.com/cgi-local/page?o=rss002&amp;c=small%20business%20news&amp;wiz=2277468" htmlUrl="http://www.moreover.com/rss" description="Moreover Technologies - Real-time news and blogs from thousands of sources" />
+      <outline text="WSJ.com: Today's Free Features" xmlUrl="http://online.wsj.com/xml/rss/0,,3_7077,00.xml" htmlUrl="http://online.wsj.com/free" description="Today's Free Features" />
+    </outline>
+    <outline text="Computers">
+      <outline text="Mac">
+        <outline text="digg - tech news / apple / dig" xmlUrl="http://digg.com/rss/indexappledig.xml" htmlUrl="http://digg.com/" description="digg.com: Stories / Apple / Upcoming" />
+        <outline text="Editors' Notes Weblog" xmlUrl="http://www.macworld.com/weblogs/editors/rss.xml" htmlUrl="http://www.macworld.com" />
+        <outline text="VersionTracker: Mac OS X" xmlUrl="http://www.versiontracker.com/macosx/recent.rss" htmlUrl="http://www.versiontracker.com/" description="The #1 source for software updates" />
+        <outline text="Mac 911 Weblog" xmlUrl="http://www.macworld.com/weblogs/mac911/rss.xml" htmlUrl="http://www.macworld.com" />
+        <outline text="Macworld" xmlUrl="http://rss.macworld.com/macworld/feeds/main" htmlUrl="http://www.macworld.com" />
+        <outline text="MacNN | The Macintosh News Network" xmlUrl="http://www.macnn.com/macnn.rss" htmlUrl="http://www.macnn.com/" description="MacNN is the leading source for news about Apple and the Mac industry. It offers news, reviews, discussion, tips, troubleshooting, links, and reviews every day. The best place for Mac News. Period." />
+        <outline text="MacFixIt" xmlUrl="http://www.macfixit.com/backend/macfixit.rss" htmlUrl="http://www.macfixit.com" description="Mac OS X and iPod Troubleshooting, Support, and Help" />
+        <outline text="Daring Fireball" xmlUrl="http://daringfireball.net/index.xml" htmlUrl="http://daringfireball.net/" description="Mac and web curmudgeonry/nerdery. By John Gruber." />
+        <outline text="macosxhints" xmlUrl="http://www.macosxhints.com/backend/geeklog.rdf" htmlUrl="http://www.macosxhints.com" description="Macosxhints.com RSS feed" />
+        <outline text="Mac Help Forums" xmlUrl="http://www.mac-help.com/forums/external.php?type=rss2" htmlUrl="http://www.mac-help.com/forums" description="Mac OSX help and discussion forum website." />
+        <outline text="Mac OS X Knowledge Base Docs" xmlUrl="http://docs.info.apple.com/rss/macosx.rss" htmlUrl="http://www.apple.com/support/" description="Apple - Support - Most Recent - Apple Inc." />
+        <outline text="MACnn News" xmlUrl="http://macnn.com/macnn.rss" htmlUrl="http://www.macnn.com/" description="MacNN is the leading source for news about Apple and the Mac industry. It offers news, reviews, discussion, tips, troubleshooting, links, and reviews every day. The best place for Mac News. Period." />
+        <outline text="Macworld" xmlUrl="http://www.macworld.com/rss.xml" htmlUrl="http://www.macworld.com" />
+        <outline text="Mac Gems Weblog" xmlUrl="http://www.macworld.com/weblogs/macgems/rss.xml" htmlUrl="http://www.macworld.com" />
+        <outline text="MacInTouch" xmlUrl="http://www.macintouch.com/rss.xml" htmlUrl="http://www.macintouch.com/" description="&#xA;The original Mac news and information site since 1994&#xA;" />
+        <outline text="MacMerc.com" xmlUrl="http://www.macmerc.com/index.rss" />
+      </outline>
+      <outline text="PDA">
+        <outline text="Pocket PC Thoughts" xmlUrl="http://www.pocketpcthoughts.com/xml" htmlUrl="http://www.PocketPCThoughts.com" description="Pocket PC Thoughts - Daily News, Views, Rants and Raves" />
+      </outline>
+      <outline text="Unix">
+        <outline text="Linux Journal" xmlUrl="http://www.linuxjournal.com/news.rss" htmlUrl="http://www.linuxjournal.com" description="Since 1994: The Original Monthly Magazine of the Linux Community" />
+        <outline text="Linux Weekly News" xmlUrl="http://lwn.net/headlines/rss" htmlUrl="http://lwn.net" description="&#xA;&#x9;LWN.net is a comprehensive source of news and opinions from&#xA;        and about the Linux community.&#xA;    " />
+      </outline>
+      <outline text="OS News" xmlUrl="http://www.osnews.com/files/recent.rdf" htmlUrl="http://www.osnews.com/" description="Exploring the Future of Computing" />
+    </outline>
+    <outline text="Entertainment">
+      <outline text="Books">
+        <outline text="Variety.com" xmlUrl="http://www.variety.com/rss.asp?categoryid=1010" htmlUrl="http://www.variety.com" description="The premier source of entertainment news. Turn to Variety.com for timely, credible articles, reviews and analysis of film, TV, music, theater, video, gaming and movie and television production -- information vital to your showbiz career." />
+        <outline text="NYT Book Review" xmlUrl="http://radio.weblogs.com/0124132/staplerfeeds/nytbook.xml" htmlUrl="http://www.nytimes.com/pages/books/text/index.html" description="NYT Book Review" />
+        <outline text="The Literary Saloon" xmlUrl="http://www.complete-review.com/saloon/rss.xml" htmlUrl="http://www.complete-review.com/saloon/index.htm" description="opinionated commentary on literary matters" />
+        <outline text="The Shifted Librarian" xmlUrl="http://www.theshiftedlibrarian.com/rss.xml" htmlUrl="http://theshiftedlibrarian.com" description="shifting libraries at the speed of byte" />
+      </outline>
+      <outline text="Cars">
+        <outline text="Jalopnik" xmlUrl="http://feeds.gawker.com/jalopnik/full" htmlUrl="http://jalopnik.com" description="Jalopnik loves cars. Secret cars, concept cars, flying cars, vintage cars, tricked-out cars, red cars, black cars, blonde cars -- sometimes, cars just because of the curve of a hood." />
+        <outline text="Future cars, Hybrid Cars" xmlUrl="http://futurecars.blogspot.com/atom.xml" htmlUrl="http://futurecars.blogspot.com/" description="Articles and discussions about new cars, Future cars and hybrid Cars. " />
+        <outline text="Motorcycle.Com News Feed" xmlUrl="http://www.motorcycle.com/news/news.xml" htmlUrl="http://www.motorcycle.com/" description="Motorcycle.Com RSS News Feed" />
+      </outline>
+      <outline text="Games">
+        <outline text="GamersCircle" xmlUrl="http://www.gamerscircle.net/b2rss2.php" htmlUrl="http://www.gamerscircle.net" description="One stop shop for Gaming, Technology and Industry News." />
+        <outline text="Gaming News: GameCube" xmlUrl="http://www.dailygame.net/news/archives/categories/gc/index.xml" htmlUrl="http://www.dailygame.net/" description="DailyGame's videogame news and reviews for Xbox, PlayStation 2, PS2, Nintendo GameCube and Game Boy Advance." />
+        <outline text="Gaming News: Playstation 2" xmlUrl="http://www.dailygame.net/news/archives/categories/ps2/index.xml" htmlUrl="http://www.dailygame.net/" description="DailyGame's videogame news and reviews for Xbox, PlayStation 2, PS2, Nintendo GameCube and Game Boy Advance." />
+        <outline text="Joystiq" xmlUrl="http://www.joystiq.com/rss.xml" htmlUrl="http://www.joystiq.com" description="Joystiq" />
+      </outline>
+      <outline text="Humor">
+        <outline text="Dilbert.com Blog" xmlUrl="http://dilbert.com/blog/" />
+        <outline text="Darkgate Comic Slurper" xmlUrl="http://darkgate.net/comic/feed.php?foxtrot&amp;dilbert&amp;doonesbury&amp;sherman&amp;userf&amp;stonesoup" htmlUrl="http://darkgate.net/comic/" description="The latest strips of your favourite web-comics slurped from the internet.  Configure your preferences at &lt;a href=&quot;http://darkgate.net/comic/&quot;&gt;http://darkgate.net/comic/&lt;/a&gt;." />
+        <outline text="Get Fuzzy" xmlUrl="http://www.tapestrycomics.com/getfuzzy.xml" />
+        <outline text="Lost Brain" xmlUrl="http://www.lostbrain.com/rss/rssv0_91.xml" htmlUrl="http://www.lostbrain.com" description="LostBrain.com Humor, Parody and More" />
+      </outline>
+      <outline text="SciFi">
+        <outline text="Stargate Blog" xmlUrl="http://blog.scifi.com/stargate/index.rdf" htmlUrl="http://blogs.syfy.com/stargate/" />
+        <outline text="Sci-Fi Storm" xmlUrl="http://scifistorm.org/scifistorm.rdf" htmlUrl="http://scifistorm.org/" description="Your Source for Sci-Fi News" />
+      </outline>
+      <outline text="Gawker" xmlUrl="http://www.gawker.com/index.xml" htmlUrl="http://gawker.com" description="Gawker is the Manhattan media gossip sheet." />
+      <outline text="The Movie Blog" xmlUrl="http://feeds.feedburner.com/themovieblog/VkTh" />
+      <outline text="CC Insider" xmlUrl="http://ccinsider.comedycentral.com/cc_insider/atom.xml" />
+    </outline>
+    <outline text="Food">
+      <outline text="Bay Area Bites" xmlUrl="http://www.kqed.org/weblog/food/atom.xml" htmlUrl="http://blogs.kqed.org/bayareabites" description="Culinary Rants &amp; Raves from Bay Area Foodies and Professionals" />
+      <outline text="Cucina Testa Rossa" xmlUrl="http://cucinatestarossa.blogs.com/weblog/atom.xml" htmlUrl="http://cucinatestarossa.blogs.com/weblog/" description="Bonjour! Ciao! Benvenuti a Cucina Testa Rossa, the red head's kitchen. &#xA;Please join me on my culinary journey through France. You'll have a front row seat in a French kitchen  so fasten your aprons and let's get cooking!  Experience the highs and lows, the cuts and burns,  the rants and raves, the fish guts and real nuts...&#xA;" />
+      <outline text="Eat Feed" xmlUrl="http://www.eatfeed.com/eatfeed.xml" htmlUrl="http://www.eatfeed.com" description="The Sound of Good Food" />
+      <outline text="The Food Section" xmlUrl="http://www.thefoodsection.com/foodsection/index.rdf" htmlUrl="http://www.thefoodsection.com/foodsection/" description="A blog about food, wine, and travel" />
+      <outline text="Simply Recipes" xmlUrl="http://www.elise.com/recipes/index.rdf" htmlUrl="http://simplyrecipes.com" description="A family cooking and food blog. Healthy, whole-food recipes and cooking tips for the home cook.  Photographs and easy-to-follow step-by-step instructions." />
+    </outline>
+    <outline text="Health">
+      <outline text="BBC News | Health" xmlUrl="http://news.bbc.co.uk/rss/newsonline_world_edition/health/rss091.xml" htmlUrl="http://news.bbc.co.uk/go/rss/-/2/hi/health/default.stm" description="Get the latest BBC Health News: breaking health and medical news from the UK and around the world, with in-depth features on well-being and lifestyle." />
+      <outline text="Kevin, M.D. - Medical Weblog" xmlUrl="http://www.kevinmd.com/blog/atom.xml" htmlUrl="http://www.kevinmd.com/blog" description="medical blog" />
+      <outline text="NBC Bay Area - Health Top Stories" xmlUrl="http://feeds.nbcbayarea.com/nbcbayarea/health/?rss=y" htmlUrl="http://www.nbcbayarea.com/news/health" />
+      <outline text="Family Medicine Notes" xmlUrl="http://www.docnotes.net/index.rdf" htmlUrl="http://www.docnotes.com/" description="Health, Technology, Family Medicine and other observations - since 1999" />
+      <outline text="Pharyngula" xmlUrl="http://pharyngula.org/index.xml" htmlUrl="http://scienceblogs.com/pharyngula/" description="Evolution, development, and random biological ejaculations from a godless liberal" />
+    </outline>
+    <outline text="Internet">
+      <outline text="WebDeveloper.com" xmlUrl="http://www.webdeveloper.com/webdeveloper.rdf" htmlUrl="http://www.webdeveloper.com" description="Where Web Developers and Designers Learn how to Build Web Sites." />
+      <outline text="internetnews.com" xmlUrl="http://headlines.internet.com/internetnews/top-news/news.rss" htmlUrl="http://www.internetnews.com" description="All the top news, features, analysis and insight into enterprise and Internet technology, geared for IT managers and delivered by the best in the industry." />
+      <outline text="SimpleBits" xmlUrl="http://www.simplebits.com/xml/rss.xml" htmlUrl="http://simplebits.com/" description="Hand-crafted web sites, pixels and text by Dan Cederholm." />
+      <outline text="Accessify" xmlUrl="http://www.accessify.com/rss/accessify_rss.xml" htmlUrl="http://accessify.com/news" description="Accessibility news: WCAG, WAI, PAS 78 ... and all manner of other weird acronyms and stuff" />
+      <outline text="WebReference News" xmlUrl="http://www.webreference.com/webreference.rdf" htmlUrl="http://www.webreference.com" description="Daily news, views, and how-tos on all aspects of web design and development. Features free web-based tools, open source scripts, and in-depth tutorials on DHTML, HTML, JavaScript, 3D, Graphics, XML, and Design for webmasters." />
+    </outline>
+    <outline text="Music">
+      <outline text="iTunes 25 Just Added Albums" xmlUrl="http://phobos.apple.com/WebObjects/MZStore.woa/wpa/MRSS/justadded/limit=25/rss.xml" htmlUrl="http://itunes.apple.com/WebObjects/MZStore.woa/wa/viewNewReleases?pageType=justAdded&amp;id=34" description="iTunes Store: 25 Just Added Albums" />
+      <outline text="RollingStone.com Music News" xmlUrl="http://www.rollingstone.com/rssxml/music_news.xml" htmlUrl="http://www.rollingstone.com/news?source=music_news_rssfeed" description="Rolling Stone Magazine comes to life online with music news, videos&#xA;and photo galleries, the latest movie and music reviews, cover stories and online exclusives." />
+      <outline text="VH1 News" xmlUrl="http://www.vh1.com/rss/news/latest.jhtml" htmlUrl="http://www.vh1.com/news/" description="Full pop music coverage and daily entertainment updates." />
+      <outline text="MTV News" xmlUrl="http://www.mtv.com/rss/news/latest.jhtml" htmlUrl="http://www.mtv.com/news/" description="Up to the minute news on music and pop culture." />
+      <outline text="CMT News" xmlUrl="http://www.cmt.com/rss/news/latest.jhtml" htmlUrl="http://www.cmt.com/news/" description="All the news from country music's most reliable source." />
+      <outline text="iTunes Top 25 Songs" xmlUrl="http://phobos.apple.com/WebObjects/MZStore.woa/wpa/MRSS/topsongs/limit=25/rss.xml" htmlUrl="http://itunes.apple.com/WebObjects/MZStore.woa/wa/viewTop?id=1&amp;popId=1" description="iTunes Store: Today's Top 25 Songs" />
+    </outline>
+    <outline text="News">
+      <outline text="Guardian Unlimited" xmlUrl="http://www.guardian.co.uk/rss/1,,,00.xml" htmlUrl="http://www.guardian.co.uk" description="Latest news and features from guardian.co.uk, the world's leading liberal voice" />
+      <outline text="World Press Review" xmlUrl="http://www.worldpress.org/feeds/topstories.xml" htmlUrl="http://www.worldpress.org" description="World News Review" />
+      <outline text="Yahoo! News" xmlUrl="http://rss.news.yahoo.com/rss/topstories" htmlUrl="http://news.yahoo.com/i/716" description="Top Stories" />
+      <outline text="CNN" xmlUrl="http://xml.newsisfree.com/feeds/15/2315.xml" htmlUrl="http://www.cnn.com/" description="The world's news leader (By http://www.newsisfree.com/syndicate.php - FOR PERSONAL AND NON COMMERCIAL USE ONLY!)" />
+      <outline text="BBC News | News Front Page" xmlUrl="http://news.bbc.co.uk/rss/newsonline_world_edition/front_page/rss091.xml" htmlUrl="http://news.bbc.co.uk/go/rss/-/2/hi/default.stm" description="Get the latest BBC World news: international news, features and analysis from Africa, Americas, South Asia, Asia-Pacific, Europe and the Middle East." />
+      <outline text="Reuters: Top News" xmlUrl="http://www.microsite.reuters.com/rss/topnews" htmlUrl="http://www.reuters.com" description="Reuters.com is your source for breaking news, business, financial and investing news, including personal finance and stocks.  Reuters is the leading global provider of news, financial information and technology solutions to the world's media, financial institutions, businesses and individuals." />
+      <outline text="U.S. News &amp; World Report" xmlUrl="http://www.usnews.com/usnews/usnews.rss" htmlUrl="http://www.usnews.com" />
+      <outline text="New York Times" xmlUrl="http://xml.newsisfree.com/feeds/64/164.xml" htmlUrl="http://www.nytimes.com/pages/world/" description="Find breaking news, world news, multimedia &amp; opinion on the US, Africa, Canada, Mexico, South &amp; Central Americas, Asia, Europe, the Middle East and Iraq. (By http://www.newsisfree.com/syndicate.php - FOR PERSONAL AND NON COMMERCIAL USE ONLY!)" />
+      <outline text="Guardian Unlimited World Latest" xmlUrl="http://www.guardian.co.uk/rssfeed/0,,12,00.xml" htmlUrl="http://www.guardian.co.uk/world" description="Latest news and features from guardian.co.uk, the world's leading liberal voice" />
+      <outline text="The Wall Street Transcript" xmlUrl="http://www.twst.com/mynetscape/main.rdf" htmlUrl="http://www.twst.com/?netscape" description="What is the word on Wall Street. The Wall Street Transcript helps you to understand the financial markets. Each week prominent analyst, money managers and CEOs analyze market trends, discuss industry issues and rate management performance." />
+      <outline text="TIME Magazine Online" xmlUrl="http://www.time.com/time/rss/top/0,20326,,00.xml" htmlUrl="http://www.time.com?xid=rss-topstories" description="Top stories of the day on TIME.com" />
+    </outline>
+    <outline text="Podcast">
+      <outline text="The Chris Pirillo Show" xmlUrl="http://feeds.pirillo.com/ChrisPirilloShow" htmlUrl="http://chris.pirillo.com" description="Technology, Science, and Entertainment - that's the Chris Pirillo Show! We bring the world's most interesting stories and personalities straight to your ears - blending information with humor in every byte-sized segment. We're answering your tech questions every day!" />
+      <outline text="Open Source" xmlUrl="http://www.radioopensource.org/wp-rss2.php?cat=18" />
+      <outline text="President's Weekly Radio Address" xmlUrl="http://www.whitehouse.gov/rss/radioaddress.xml" htmlUrl="/news/radio" description="President George W. Bush delivers a weekly radio address to the nation that airs each Saturday at 10:06 AM (ET)." />
+      <outline text="Geek News Central" xmlUrl="http://www.geeknewscentral.com/index.xml" htmlUrl="http://www.geeknewscentral.com" description="Geek News Central is the technical weblog for Geeks. We Spin tech for the common man. With a twice weekly tech podcast" />
+      <outline text="this WEEK in TECH" xmlUrl="http://leo.am/podcasts/twit" htmlUrl="http://thisWEEKinTECH.com" description="Your first podcast of the week is the last word in tech. Join Leo Laporte, Patrick Norton, Kevin Rose, John C. Dvorak, and other tech luminaries in a roundtable discussion of the latest trends in digital technology. Winner of the 2005 People's Choice Podcast Award for best overall podcast and Best Technology Podcast. Released every Sunday at midnight Pacific." />
+      <outline text="Adam Curry: Daily Source Code" xmlUrl="http://radio.weblogs.com/0001014/categories/dailysourcecode/rss.xml" htmlUrl="http://radio.weblogs.com/0001014/categories/dailySourceCode/" description="Adam Curry's Daily Source Code Podcast&#xA;dailysourcecode.com" />
+      <outline text="Geek News Central Podcast" xmlUrl="http://www.geeknewscentral.com/podcast.xml" htmlUrl="http://www.geeknewscentral.com/" description="Talking tech for the common man. With a twice weekly tech show covering a wide range of technical issues. A Top Tech Podcasts and home of the Author of Podcasting The Do it Yourself Guide Visit Geek News Central at geeknewscentral.com" />
+    </outline>
+    <outline text="Politics">
+      <outline text="GrokLaw" xmlUrl="http://www.groklaw.net/backend/groklaw.rdf" htmlUrl="http://www.groklaw.net" description="Digging for Truth" />
+      <outline text="The Agitator" xmlUrl="http://theagitator.com/index.xml" htmlUrl="http://www.theagitator.com" description="It rankles me when somebody tries to tell somebody what to do." />
+      <outline text="Davenetics Politics (electablog)" xmlUrl="http://www.electablog.com/rss.xml" htmlUrl="http://davenetics.com" description="Remote Control Revolutionary :: by Dave Pell" />
+      <outline text="Talking Points Memo" xmlUrl="http://www.talkingpointsmemo.com/index.xml" htmlUrl="http://talkingpointsmemo.com" />
+    </outline>
+    <outline text="Science">
+      <outline text="Physics Post" xmlUrl="http://physicspost.com/rss.php" htmlUrl="http://www.physicspost.com" description="Read physics and science articles.  Learn about black holes, speed of light and superstring theory." />
+      <outline text="ScienceDaily Headlines" xmlUrl="http://www.sciencedaily.com/newsfeed.xml" htmlUrl="http://www.sciencedaily.com/news/" description="Breaking science news and articles on global warming, extrasolar planets, stem cells, bird flu, autism, nanotechnology, dinosaurs, evolution -- the latest discoveries in astronomy, anthropology, biology, chemistry, climate &amp;amp; environment, computers, engineering, health &amp;amp; medicine, math, physics, psychology, technology, and more -- from the world's leading universities and research organizations." />
+      <outline text="National Geographic News" xmlUrl="http://news.nationalgeographic.com/index.rss" htmlUrl="http://news.nationalgeographic.com" description="National Geographic News" />
+      <outline text="Tom's Astronomy Blog" xmlUrl="http://tomsastroblog.com/?feed=atom" htmlUrl="http://tomsastroblog.com" description="Astronomy News, Notes and Observations." />
+      <outline text="Scientific American - Official RSS Feed" xmlUrl="http://www.sciam.com/xml/sciam.xml" htmlUrl="http://www.sciam.com/" description="Science news and technology updates from Scientific American" />
+      <outline text="SPACE.com" xmlUrl="http://www.space.com/syn/space.xml" htmlUrl="http://www.space.com/" description="Something amazing every day." />
+      <outline text="Minding the Planet" xmlUrl="http://novaspivack.typepad.com/nova_spivacks_weblog/atom.xml" htmlUrl="http://novaspivack.typepad.com/nova_spivacks_weblog/" description="Nova Spivack's Journal of Unusual News &amp; Ideas" />
+      <outline text="Yahoo! News: Science News" xmlUrl="http://rss.news.yahoo.com/rss/science" htmlUrl="http://news.yahoo.com/i/753" description="Science News" />
+    </outline>
+    <outline text="Software">
+      <outline text="BetaNews.Com" xmlUrl="http://www.betanews.com/mnn.php3" htmlUrl="http://www.betanews.com" description="Technology News and IT Business Intelligence" />
+      <outline text="freshmeat.net" xmlUrl="http://freshmeat.net/backend/fm.rdf" />
+      <outline text="SnapFiles latest software" xmlUrl="http://www.webattack.com/webattack.xml" htmlUrl="http://www.snapfiles.com/" description="The latest shareware and freeware downloads on the web" />
+      <outline text="Dev Shed" xmlUrl="http://www.devshed.com/index2.php?option=mos_rss&amp;no_html=1" htmlUrl="http://www.devshed.com" description="Dev Shed - RSS Feeds" />
+      <outline text="MajorGeeks.com" xmlUrl="http://www.majorgeeks.com/backend.php?id=120" htmlUrl="http://www.majorgeeks.com/index.php" description="Last 20 items on MajorGeeks.com" />
+      <outline text="PC Magazine" xmlUrl="http://rssnewsapps.ziffdavis.com/pcmag.xml" htmlUrl="http://www.pcmag.com" description="First Look At New Products From PCMag.com including Lab Tests, Ratings, Editor's and User's Reviews.&#xD;&#xA;" />
+      <outline text="Slashdot" xmlUrl="http://slashdot.org/slashdot.rss" htmlUrl="http://slashdot.org/" description="News for nerds, stuff that matters" />
+      <outline text="PCWorld.com - Popular downloads" xmlUrl="http://feeds.pcworld.com/pcworld/downloads/weekly" htmlUrl="http://www.pcworld.com" description="Most popular downloads of the Week from PCWorld.com" />
+      <outline text="mozillaZine" xmlUrl="http://www.mozillazine.org/atom.xml" htmlUrl="http://www.mozillazine.org/" description="Your Source for Daily Mozilla News and Advocacy" />
+      <outline text="Free Vista Files" xmlUrl="http://www.freevistafiles.com/rss/new_software.xml" htmlUrl="http://www.freevistafiles.com/" description="FreeVistaFiles.com - Free Windows Vista Files" />
+      <outline text="FilePlaza" xmlUrl="http://www.fileplaza.com/lastaddedsoftware.rss" htmlUrl="http://www.fileplaza.com/default.rss" description="FilePlaza is the best source of free software downloads. Free download - games, screen savers, free wallpaper, java download, anti virus software and desktop software for windows, unix and palm." />
+      <outline text="Do Download" xmlUrl="http://www.dodownload.com/rss/new_software.xml" htmlUrl="http://www.dodownload.com/" description="Do Download.com - Software Downloads" />
+    </outline>
+    <outline text="Sports">
+      <outline text="NBC Bay Area - Sports Top Stories" xmlUrl="http://feeds.nbcbayarea.com/nbcbayarea/sports/?rss=y" htmlUrl="http://www.nbcbayarea.com/news/sports" />
+      <outline text="AP Sports" xmlUrl="http://xml.newsisfree.com/feeds/71/1471.xml" htmlUrl="http://www.dailycamera.com/news/sports/" description="Associated Press news (By http://www.newsisfree.com/syndicate.php - FOR PERSONAL AND NON COMMERCIAL USE ONLY!)" />
+      <outline text="Yahoo! News - Sports" xmlUrl="http://rss.news.yahoo.com/rss/sports" htmlUrl="http://news.yahoo.com/i/755" description="Sports News" />
+      <outline text="BBC Sport" xmlUrl="http://newsrss.bbc.co.uk/rss/sportonline_world_edition/front_page/rss.xml" htmlUrl="http://news.bbc.co.uk/go/rss/-/sport2/hi/default.stm" description="BBC Sport: breaking news, results, video, audio and analysis on football, cricket, rugby, golf, tennis, motorsport and all the main world sports." />
+      <outline text="PR Web Sports" xmlUrl="http://www.prweb.com/xml/sports.xml" htmlUrl="http://www.prweb.com" description="Latest news releases for Sports from PRWeb" />
+      <outline text="Fanblogs.com" xmlUrl="http://www.fanblogs.com/site.xml" htmlUrl="http://www.fanblogs.com/" />
+      <outline text="New York Times: Sports" xmlUrl="http://partners.userland.com/nytrss/sports.xml" htmlUrl="http://www.nytimes.com/pages/sports/index.html?partner=rss" />
+      <outline text="ESPN.com" xmlUrl="http://sports.espn.go.com/espn/rss/news" htmlUrl="http://espn.go.com/" description="Latest news from ESPN.com" />
+    </outline>
+    <outline text="Technology">
+      <outline text="Programming Languages">
+        <outline text="PHPBuilder.com" xmlUrl="http://phpbuilder.com/rss_feed.php?type=articles&amp;limit=20" htmlUrl="http://phpbuilder.com" description="Newest Articles and How-To's on PHPBuilder.com" />
+        <outline text="PHP News" xmlUrl="http://www.php.net/news.rss" htmlUrl="http://www.php.net/" description="The PHP scripting language web site" />
+        <outline text="Java" xmlUrl="http://developers.sun.com/rss/sdn.xml" htmlUrl="http://developers.sun.com/rss/sdn.xml" description="Product and technology highlights from the Sun Developer Network." />
+        <outline text="Planet JDK" xmlUrl="http://planetjdk.org/feed.atom-1.0" htmlUrl="http://planetjdk.org" description="News and views from the Java SE Development-Kit Community" />
+        <outline text="Servlets.com" xmlUrl="http://www.servlets.com/blog/index.rss" htmlUrl="http://www.servlets.com/blog/" description="Java, Open Source, XML, Web Services, and (gasp) .NET" />
+        <outline text="JavaScript Tips" xmlUrl="http://www.webreference.com/js/tips/channels/last1515.rdf" htmlUrl="http://www.webreference.com/js/tips/" description="Doc JavaScript's Tip of the Day Archive" />
+      </outline>
+      <outline text="Security">
+        <outline text="Computer World Security Knowledge Center" xmlUrl="http://www.computerworld.com/news/xml/0,5000,73,00.xml" htmlUrl="http://www.computerworld.com/" />
+        <outline text="Computer World Security Holes" xmlUrl="http://www.computerworld.com/news/xml/0,5000,584,00.xml" />
+        <outline text="Computer World Hacking News" xmlUrl="http://www.computerworld.com/news/xml/0,5000,583,00.xml" />
+      </outline>
+      <outline text="Wireless">
+        <outline text="Computer World Mobile" xmlUrl="http://www.computerworld.com/news/xml/0,5000,68,00.xml" htmlUrl="http://www.computerworld.com/" />
+        <outline text="The RFID Weblog" xmlUrl="http://www.rfid-weblog.com/index.rdf" htmlUrl="http://www.rfid-weblog.com" description="Implementation and Application of RFID technology " />
+        <outline text="WiFi Planet" xmlUrl="http://www.wi-fiplanet.com/icom_includes/feeds/80211/xml_front-news-10.xml" htmlUrl="http://www.wi-fiplanet.com" description="The Source for Wi-Fi Business and Technology" />
+        <outline text="InfoWorld: Wireless" xmlUrl="http://www.infoworld.com/rss/wireless.rdf" htmlUrl="http://www.infoworld.com/t/2085" />
+      </outline>
+      <outline text="Digital Photography Review" xmlUrl="http://www.dpreview.com/news/dpr.rdf" htmlUrl="http://www.dpreview.com/" description="Digital Photography Review, Latest digital camera news, camera reviews, galleries, technology and comparisons." />
+      <outline text="eWEEK Technology News" xmlUrl="http://rssnewsapps.ziffdavis.com/tech.xml" htmlUrl="http://www.eweek.com" description="eWeek - RSS Feeds" />
+      <outline text="Javalobby Front Page" xmlUrl="http://www.javalobby.org/forumrss/61.xml" htmlUrl="http://java.dzone.com/" />
+      <outline text="Joel on Software" xmlUrl="http://www.joelonsoftware.com/rss.xml" htmlUrl="http://www.joelonsoftware.com" description="Painless Software Management" />
+      <outline text="BBC News | Technology | World Edition" xmlUrl="http://news.bbc.co.uk/rss/newsonline_world_edition/technology/rss091.xml" htmlUrl="http://news.bbc.co.uk/go/rss/-/2/hi/technology/default.stm" description="Get the latest BBC Technology News: breaking news and analysis on computing, the web, blogs, games, gadgets, social media, broadband and more." />
+      <outline text="Shacknews" xmlUrl="http://www.shacknews.com/headlines.rdf" htmlUrl="http://www.shacknews.com/" description="Shacknews - Your source for the latest video game news" />
+      <outline text="Graphics News" xmlUrl="http://www.graphicsnews.com/backend.php" htmlUrl="http://www.graphics.com" description="Graphics.com" />
+      <outline text="ThinkGeek: What's New" xmlUrl="http://www.thinkgeek.com/thinkgeek.rdf" htmlUrl="http://www.thinkgeek.com/?cpg=wnrdf" description="Stuff for Smart Masses" />
+      <outline text="Ars Technica" xmlUrl="http://arstechnica.com/index.ars/rss" htmlUrl="http://arstechnica.com/" />
+      <outline text="TechBookReport" xmlUrl="http://www.techbookreport.com/rss/rss.xml" htmlUrl="http://www.techbookreport.com" description="The latest 10 book reviews from TechBookReport" />
+      <outline text="KDE Dot News" xmlUrl="http://www.kde.org/dotkdeorg.rdf" htmlUrl="http://www.kdenews.org" />
+      <outline text="iPodlounge" xmlUrl="http://www.ipodlounge.com/index.xml" htmlUrl="http://www.iLounge.com" />
+      <outline text="Wired News" xmlUrl="http://www.wired.com/news_drop/netcenter/netcenter.rdf" htmlUrl="http://www.wired.com/rss/index.xml" description="Top Stories&lt;img src=&quot;http://www.wired.com/rss_views/index.gif&quot;&gt;" />
+      <outline text="OSI News Weblog" xmlUrl="http://opensource.org/blog/feed" htmlUrl="http://opensource.org/blog" />
+      <outline text="digg - tech news" xmlUrl="http://digg.com/rss/index.xml" htmlUrl="http://digg.com/" description="digg.com: Stories / Popular" />
+      <outline text="CNET News" xmlUrl="http://rss.com.com/2547-12-0-20.xml" htmlUrl="http://news.cnet.com/" description="Tech news and business reports by CNET News. Focused on&#xA;information technology, core topics include computers, hardware, software,&#xA;networking, and Internet media." />
+      <outline text="Anand Tech" xmlUrl="http://www.anandtech.com/rss/articlefeed.aspx" htmlUrl="http://www.anandtech.com" description="This channel features the latest computer hardware related articles." />
+      <outline text="ZDNet News - Front Door" xmlUrl="http://news.zdnet.com/2509-1_22-0-20.xml" htmlUrl="http://updates.zdnet.com/index.php?t=7" description="News items" />
+      <outline text="XML News" xmlUrl="http://www.xml.com/cs/xml/query/q/19" htmlUrl="http://www.xml.com/" description="&#xA;&#x9;XML.com features a rich mix of information and services for the XML community.&#xA;    " />
+      <outline text="The Register" xmlUrl="http://www.theregister.co.uk/tonys/slashdot.rdf" htmlUrl="http://www.theregister.co.uk/" description="Biting the hand that feeds IT" />
+      <outline text="Apache News Online" xmlUrl="http://www.apachenews.org/index.rdf" htmlUrl="http://www.apachenews.org/" />
+      <outline text="NewsForge" xmlUrl="http://www.newsforge.com/reports.rss" />
+      <outline text="Computer World" xmlUrl="http://www.computerworld.com/news/xml/10/0,5009,,00.xml" htmlUrl="http://www.computerworld.com/" />
+      <outline text="Microsoft Security Bulletins" xmlUrl="http://www.microsoft.com/technet/security/bulletin/secrss.aspx" htmlUrl="http://www.microsoft.com/technet/security/current.aspx" description="Microsoft Security Bulletins" />
+      <outline text="MAKE: Blog" xmlUrl="http://www.makezine.com/blog/index.rdf" htmlUrl="http://blog.makezine.com/" description="MAKE is a quarterly publication from O'Reilly for those who just can't stop tinkering, disassembling, re-creating, and inventing cool new uses for the technology in our lives.  It's the first do-it-yourself magazine dedicated to the incorrigible and chronically incurable technology enthusiast in all of us.  MAKE celebrates your right to tweak, hack, and bend technology any way you want." />
+      <outline text="Planet Mozilla" xmlUrl="http://planet.mozilla.org/rss20.xml" htmlUrl="http://planet.mozilla.org/" description="Planet Mozilla - http://planet.mozilla.org/" />
+      <outline text="Planet GNOME" xmlUrl="http://planet.gnome.org/rss20.xml" htmlUrl="http://planet.gnome.org/" description="Planet GNOME - http://planet.gnome.org/" />
+      <outline text="Planet Classpath" xmlUrl="http://planet.classpath.org/rss20.xml" htmlUrl="http://planet.classpath.org/" description="Planet Classpath - http://planet.classpath.org/" />
+      <outline text="Fedora People" xmlUrl="http://planet.fedoraproject.org/rss20.xml" htmlUrl="http://fedoraproject.org/people/" description="Fedora People: http://planet.fedoraproject.org" />
+      <outline text="Planet Debian" xmlUrl="http://planet.debian.org/rss20.xml" htmlUrl="http://planet.debian.org/" description="Planet Debian - http://planet.debian.org/" />
+      <outline text="Mozillazine" xmlUrl="http://planet.mozillazine.org/rss20.xml" htmlUrl="http://feedhouse.mozillazine.org/" description="mozillaZine feedHouse - http://feedhouse.mozillazine.org/" />
+      <outline text="Eclipse News" xmlUrl="http://www.eclipse.org/home/eclipsenews.rss" htmlUrl="http://www.eclipse.org" description="Eclipse News" />
+      <outline text="Planet Eclipse" xmlUrl="http://www.planeteclipse.org/planet/atom.xml" htmlUrl="http://planeteclipse.org/planet/" />
+      <outline text="EclipseZone: News" xmlUrl="http://www.eclipsezone.com/forumRSS/18112.xml" htmlUrl="http://eclipse.dzone.com/" />
+      <outline text="EclipseZone: Tips" xmlUrl="http://www.eclipsezone.com/forumRSS/18111.xml" htmlUrl="http://eclipse.dzone.com/" />
+      <outline text="Eclipse Podcasts" xmlUrl="http://feeds.feedburner.com/ezpodcast" htmlUrl="http://www.eclipsezone.com/" description="The editors of EclipseZone talk about the latest Eclipse platform news, tips, and releases." />
+    </outline>
+    <outline text="Weblogs">
+      <outline text="Google Sightseeing" xmlUrl="http://googlesightseeing.com/feed" htmlUrl="http://googlesightseeing.com" description="Why bother seeing the world for real?" />
+      <outline text="LivingRoom. A space for Life" xmlUrl="http://www.livingroom.org.au/blog/index.rdf" htmlUrl="http://www.livingroom.org.au/blog/" description="Talking Emerging Church, Blogging, Faith and General Silliness from South of the Equator" />
+      <outline text="Scobleizer -- Tech geek blogger" xmlUrl="http://scobleizer.wordpress.com/feed/" htmlUrl="http://scobleizer.com" description="Exploring the 2010 Web" />
+      <outline text="Mini-Microsoft" xmlUrl="http://minimsft.blogspot.com/atom.xml" htmlUrl="http://minimsft.blogspot.com/" />
+      <outline text="Google Blogoscoped" xmlUrl="http://blog.outer-court.com/rss.xml" htmlUrl="http://blogoscoped.com" description="Google, the World, and the World Wide Web, Weblogged" />
+      <outline text="HorsePigCow: life uncommon" xmlUrl="http://feeds.feedburner.com/horsepigcowLifeUncommon" htmlUrl="http://www.horsepigcow.com" description="...helping you find a cure for 'viral'..." />
+      <outline text="Wizbang" xmlUrl="http://wizbangblog.com/index.rdf" htmlUrl="http://wizbangblog.com/" description="Explosively Unique..." />
+      <outline text="little. yellow. different." xmlUrl="http://littleyellowdifferent.com/index.xml" htmlUrl="http://www.littleyellowdifferent.com" description="A weblog by Ernie Hsiung" />
+      <outline text="Blogcritics" xmlUrl="http://www.blogcritics.org/index.rdf" />
+      <outline text="Jonathan Schwartz's Weblog" xmlUrl="http://blogs.sun.com/roller/rss/jonathan" htmlUrl="http://blogs.sun.com/jonathan/" description="Jonathan Schwartz's Blog" />
+      <outline text="Boing Boing" xmlUrl="http://www.boingboing.net/index.rdf" htmlUrl="http://www.boingboing.net/" />
+      <outline text="Anil Dash" xmlUrl="http://www.dashes.com/anil/index.rdf" htmlUrl="http://dashes.com/anil/" description="A Blog About Making Culture" />
+      <outline text="Pandagon" xmlUrl="http://pandagon.net/index.php/site/rss_2.0/" htmlUrl="http://pandagon.net/index.php/site/index/" />
+    </outline>
+    <outline text="RSSOwl News" xmlUrl="http://www.rssowl.org/newsfeed" htmlUrl="http://www.rssowl.org" />
+    <outline text="Engadget" xmlUrl="http://www.engadget.com/rss.xml" htmlUrl="http://www.engadget.com" description="Engadget" />
+    <outline text="MarketWatch" xmlUrl="http://feeds.marketwatch.com/marketwatch/topstories" htmlUrl="http://www.marketwatch.com/" description="MarketWatch, a leading publisher of business and financial news, offers users up-to-the minute news, investment tools, and subscription products." />
+    <outline text="New York Times" xmlUrl="http://www.nytimes.com/services/xml/rss/nyt/HomePage.xml" htmlUrl="http://www.nytimes.com/pages/index.html?partner=rss" />
+    <outline text="Techcrunch" xmlUrl="http://feedproxy.google.com/Techcrunch" htmlUrl="http://www.techcrunch.com" description="TechCrunch is a group-edited blog that profiles the companies, products and events defining and transforming the new web." />
+    <outline text="Wired Top Stories" xmlUrl="http://feeds.wired.com/wired/index" htmlUrl="http://www.wired.com/rss/index.xml" description="Top Stories&lt;img src=&quot;http://www.wired.com/rss_views/index.gif&quot;&gt;" />
+  </body>
 </opml>
