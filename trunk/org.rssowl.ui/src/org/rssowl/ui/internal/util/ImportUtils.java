@@ -32,6 +32,7 @@ import org.rssowl.core.internal.newsaction.MoveNewsAction;
 import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
@@ -55,13 +56,13 @@ import org.rssowl.core.persist.pref.IPreferenceScope.Kind;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -90,15 +91,17 @@ public class ImportUtils {
     List<ISearchFilter> filters = new ArrayList<ISearchFilter>();
     List<IPreference> preferences = new ArrayList<IPreference>();
 
-    for (IEntity entity : elements) {
-      if (entity instanceof IFolderChild)
-        folderChilds.add((IFolderChild) entity);
-      else if (entity instanceof ILabel)
-        labels.add((ILabel) entity);
-      else if (entity instanceof ISearchFilter)
-        filters.add((ISearchFilter) entity);
-      else if (entity instanceof IPreference)
-        preferences.add((IPreference) entity);
+    if (elements != null) {
+      for (IEntity entity : elements) {
+        if (entity instanceof IFolderChild)
+          folderChilds.add((IFolderChild) entity);
+        else if (entity instanceof ILabel)
+          labels.add((ILabel) entity);
+        else if (entity instanceof ISearchFilter)
+          filters.add((ISearchFilter) entity);
+        else if (entity instanceof IPreference)
+          preferences.add((IPreference) entity);
+      }
     }
 
     doImport(target, folderChilds, labels, filters, preferences);
@@ -295,8 +298,22 @@ public class ImportUtils {
 
       /* Create a new Feed if necessary */
       FeedReference existingFeed = feedDao.loadReference(feedReference.getLink());
-      if (existingFeed == null)
-        feedDao.save(Owl.getModelFactory().createFeed(null, feedReference.getLink()));
+      if (existingFeed == null) {
+        IFeed feed = Owl.getModelFactory().createFeed(null, feedReference.getLink());
+
+        Object homepage = bm.getProperty(ITypeImporter.HOMEPAGE_KEY);
+        if (homepage != null && homepage instanceof String)
+          feed.setHomepage(URIUtils.createURI((String) homepage));
+
+        Object description = bm.getProperty(ITypeImporter.DESCRIPTION_KEY);
+        if (description != null && description instanceof String)
+          feed.setDescription((String) description);
+
+        feedDao.save(feed);
+      }
+
+      bm.removeProperty(ITypeImporter.DESCRIPTION_KEY);
+      bm.removeProperty(ITypeImporter.HOMEPAGE_KEY);
     }
 
     /* Folder */
@@ -312,7 +329,7 @@ public class ImportUtils {
   private static void doDirectImport(List<IFolderChild> elements, Map<Long, IFolderChild> mapOldIdToFolderChild) {
     IPreferenceDAO prefsDAO = Owl.getPersistenceService().getDAOService().getPreferencesDAO();
     IFolderDAO folderDAO = DynamicDAO.getDAO(IFolderDAO.class);
-    Set<IFolder> foldersToSave = new HashSet<IFolder>();
+    List<IFolder> foldersToSave = new ArrayList<IFolder>();
     Set<IFolder> rootFolders = CoreUtils.loadRootFolders();
 
     /* Load the current selected Set as Location if necessary */
@@ -394,6 +411,9 @@ public class ImportUtils {
       }
     }
 
+    /* Remove Duplicates (using object identity) */
+    foldersToSave = CoreUtils.removeIdentityDuplicates(foldersToSave);
+
     /* Un-set ID Property prior Save */
     for (IFolder folderToSave : foldersToSave) {
       unsetIdProperty(folderToSave);
@@ -404,7 +424,7 @@ public class ImportUtils {
   }
 
   private static void doImportToTarget(IFolder target, List<IFolderChild> elements, Map<Long, IFolderChild> mapOldIdToFolderChild) {
-    Set<IFolder> foldersToSave = new HashSet<IFolder>();
+    List<IFolder> foldersToSave = new ArrayList<IFolder>();
 
     /* Import Elements */
     for (IFolderChild element : elements) {
@@ -452,6 +472,9 @@ public class ImportUtils {
         foldersToSave.add(target);
       }
     }
+
+    /* Remove Duplicates (using object identity) */
+    foldersToSave = CoreUtils.removeIdentityDuplicates(foldersToSave);
 
     /* Un-set ID Property prior Save */
     for (IFolder folderToSave : foldersToSave) {
