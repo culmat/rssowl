@@ -1428,6 +1428,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
             fNewsSorter.setSortBy(newSortBy);
             fNewsSorter.setAscending(ascending);
 
+            fColumnModel.setSortColumn(newSortBy);
+            fColumnModel.setAscending(ascending);
+
             /* Indicate Sort-Column in UI for Columns that have a certain width */
             if (newSortBy.showSortIndicator()) {
               fResultViewer.getTable().setSortColumn(column);
