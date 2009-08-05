@@ -45,6 +45,7 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.JobRunner;
+import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -159,6 +160,10 @@ public class ImportWizard extends Wizard {
     if (importPreferences && preferences != null && !preferences.isEmpty()) {
       boolean restart = MessageDialog.openQuestion(getShell(), "Restart RSSOwl", "It is recommended to restart RSSOwl after preferences have been imported.\n\nDo you want to restart now?");
       if (restart) {
+        BookMarkExplorer explorer = OwlUI.getOpenBookMarkExplorer();
+        if (explorer != null)
+          explorer.saveStateOnDispose(false);
+
         PlatformUI.getWorkbench().restart();
         return true;
       }
