@@ -29,8 +29,6 @@ import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.rssowl.core.persist.IEntity;
-import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
@@ -41,7 +39,6 @@ import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
 import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -76,13 +73,9 @@ public class SearchInTypeAction extends Action {
     }
 
     List<IFolderChild> entities = ModelUtils.getFoldersBookMarksBins(selection);
-    List<IEntity> entitiesTmp = new ArrayList<IEntity>(entities);
 
     /* Normalize */
-    for (IEntity entity : entitiesTmp) {
-      if (entity instanceof IFolder)
-        CoreUtils.normalize((IFolder) entity, entities);
-    }
+    CoreUtils.normalize(entities);
 
     SearchNewsDialog dialog = new SearchNewsDialog(fWindow.getShell(), entities);
     dialog.open();

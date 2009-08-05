@@ -172,17 +172,8 @@ public class ExportWizard extends Wizard {
       }
     }
 
-    /* Search for Folders */
-    Set<IFolder> folders = new HashSet<IFolder>();
-    for (IFolderChild child : selectedElements) {
-      if (child instanceof IFolder)
-        folders.add((IFolder) child);
-    }
-
     /* Remove those childs where its parents are present in the list already */
-    for (IFolder folder : folders) {
-      CoreUtils.normalize(folder, selectedElements);
-    }
+    CoreUtils.normalize(selectedElements);
 
     return selectedElements;
   }

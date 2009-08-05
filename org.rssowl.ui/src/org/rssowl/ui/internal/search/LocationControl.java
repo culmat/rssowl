@@ -61,7 +61,6 @@ import org.eclipse.ui.dialogs.PatternFilter;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
-import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
@@ -81,7 +80,6 @@ import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkLabelProvider;
 import org.rssowl.ui.internal.views.explorer.BookMarkSorter;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -139,13 +137,9 @@ public class LocationControl extends Composite {
       IStructuredSelection selection = new StructuredSelection(checkedObjects);
 
       List<IFolderChild> entities = ModelUtils.getFoldersBookMarksBins(selection);
-      List<IEntity> entitiesTmp = new ArrayList<IEntity>(entities);
 
       /* Normalize */
-      for (IEntity entity : entitiesTmp) {
-        if (entity instanceof IFolder)
-          CoreUtils.normalize((IFolder) entity, entities);
-      }
+      CoreUtils.normalize(entities);
 
       fCheckedElements = entities;
       fModified = true;
