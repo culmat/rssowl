@@ -96,6 +96,7 @@ public class ImportExportOPMLTest {
   private File fTmpFileOnlyMarks;
   private File fTmpFileInvalidLocations;
   private File fTmpBackupFile;
+  private File fTmpFileHierarchy;
   private IModelFactory fFactory;
   private IFolder fDefaultSet;
   private IFolder fCustomSet;
@@ -107,6 +108,8 @@ public class ImportExportOPMLTest {
   private ILabel fImportantLabel;
   private ISearchMark fSearchmark;
   private ISearchMark fSearchmarkWithLocation;
+  private IBookMark fBookMark2;
+  private IBookMark fBookMark3;
 
   /**
    * @throws Exception
@@ -121,6 +124,9 @@ public class ImportExportOPMLTest {
 
     fTmpFileOnlyMarks = File.createTempFile("rssowl_onlymarks", ".opml");
     fTmpFileOnlyMarks.deleteOnExit();
+
+    fTmpFileHierarchy = File.createTempFile("rssowl_hierarchy", ".opml");
+    fTmpFileHierarchy.deleteOnExit();
 
     fTmpFileInvalidLocations = File.createTempFile("rssowl_invalidlocations", ".opml");
     fTmpFileInvalidLocations.deleteOnExit();
@@ -148,6 +154,7 @@ public class ImportExportOPMLTest {
 
     Owl.getInterpreter().exportTo(fTmpFile, rootFolders, null);
     Owl.getInterpreter().exportTo(fTmpFileOnlyMarks, marks, null);
+    Owl.getInterpreter().exportTo(fTmpFileHierarchy, Arrays.asList(new IFolderChild[] { fBookMark2, fBookMark3 }), null);
     Owl.getInterpreter().exportTo(fTmpFileInvalidLocations, Collections.singleton(fSearchmarkWithLocation), EnumSet.of(Options.EXPORT_FILTERS, Options.EXPORT_LABELS, Options.EXPORT_PREFERENCES));
     Owl.getInterpreter().exportTo(fTmpBackupFile, rootFolders, EnumSet.of(Options.EXPORT_FILTERS, Options.EXPORT_LABELS, Options.EXPORT_PREFERENCES));
 
@@ -345,7 +352,7 @@ public class ImportExportOPMLTest {
 
     /* Default > Folder 1 > BookMark 3 */
     IFeed feed3 = fFactory.createFeed(null, new URI("feed3"));
-    fFactory.createBookMark(null, fDefaultFolder1, new FeedLinkReference(feed3.getLink()), "Bookmark 3");
+    fBookMark3 = fFactory.createBookMark(null, fDefaultFolder1, new FeedLinkReference(feed3.getLink()), "Bookmark 3");
 
     /* Default > News Bin 1 */
     fNewsBin = fFactory.createNewsBin(null, fDefaultSet, "Bin 1");
@@ -382,7 +389,7 @@ public class ImportExportOPMLTest {
 
     /* Custom > BookMark 2 */
     IFeed feed2 = fFactory.createFeed(null, new URI("feed2"));
-    fFactory.createBookMark(null, fCustomSet, new FeedLinkReference(feed2.getLink()), "Bookmark 2");
+    fBookMark2 = fFactory.createBookMark(null, fCustomSet, new FeedLinkReference(feed2.getLink()), "Bookmark 2");
 
     /* Custom > Folder 1 > BookMark 4 */
     IFeed feed4 = fFactory.createFeed(null, new URI("feed4"));
@@ -1170,5 +1177,43 @@ public class ImportExportOPMLTest {
     }
 
     assertEquals(true, found);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @SuppressWarnings("null")
+  @Test
+  public void testExportHierarchyConsistent() throws Exception {
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(new FileInputStream(fTmpFileHierarchy));
+
+    assertEquals(2, elements.size());
+
+    IFolder defaultSet = null;
+    IFolder customSet = null;
+    for (IEntity entity : elements) {
+      assertTrue(entity instanceof IFolder);
+      IFolder rootFolder = (IFolder) entity;
+      if (rootFolder.getName().equals("My Bookmarks"))
+        defaultSet = rootFolder;
+      else if (rootFolder.getName().equals("Custom"))
+        customSet = rootFolder;
+    }
+
+    assertNotNull(defaultSet);
+    assertEquals(1, defaultSet.getChildren().size());
+    assertTrue(defaultSet.getChildren().get(0) instanceof IFolder);
+    IFolder folder = (IFolder) defaultSet.getChildren().get(0);
+    assertEquals(fDefaultFolder1.getName(), folder.getName());
+    assertEquals(1, folder.getChildren().size());
+    assertTrue(folder.getChildren().get(0) instanceof IBookMark);
+    assertEquals(fBookMark3.getName(), folder.getChildren().get(0).getName());
+
+    assertNotNull(customSet);
+    assertEquals(1, customSet.getChildren().size());
+    assertTrue(customSet.getChildren().get(0) instanceof IBookMark);
+    assertEquals(fBookMark2.getName(), customSet.getChildren().get(0).getName());
   }
 }
