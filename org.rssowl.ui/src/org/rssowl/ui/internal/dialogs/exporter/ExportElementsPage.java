@@ -75,9 +75,8 @@ public class ExportElementsPage extends WizardPage {
     setMessage("Please choose the elements to export.");
   }
 
+  /* Return the Checked Elements */
   List<IFolderChild> getElementsToExport() {
-
-    /* Find Checked Elements */
     List<IFolderChild> folderChilds = new ArrayList<IFolderChild>();
     Object[] checkedElements = fViewer.getCheckedElements();
     for (Object checkedElement : checkedElements) {

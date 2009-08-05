@@ -64,18 +64,6 @@ public class ImportOptionsPage extends WizardPage {
     setMessage("Please select additional options for the import.");
   }
 
-  boolean importLabels() {
-    return fImportLabelsCheck.getSelection();
-  }
-
-  boolean importFilters() {
-    return fImportFiltersCheck.getSelection();
-  }
-
-  boolean importPreferences() {
-    return fImportPreferencesCheck.getSelection();
-  }
-
   /*
    * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
    */
@@ -140,6 +128,8 @@ public class ImportOptionsPage extends WizardPage {
   */
   @Override
   public void setVisible(boolean visible) {
+
+    /* Updated Checkboxes based on the Imported Elements */
     ImportElementsPage elementsPage = (ImportElementsPage) getPreviousPage().getPreviousPage();
     update(elementsPage.getLabelsToImport().size(), elementsPage.getFiltersToImport().size(), !elementsPage.getPreferencesToImport().isEmpty());
     fFiltersUseLabels = filtersUseLabels(elementsPage.getFiltersToImport());
@@ -147,6 +137,22 @@ public class ImportOptionsPage extends WizardPage {
     super.setVisible(visible);
   }
 
+  /* Import Labels */
+  boolean importLabels() {
+    return fImportLabelsCheck.getSelection();
+  }
+
+  /* Import Filters */
+  boolean importFilters() {
+    return fImportFiltersCheck.getSelection();
+  }
+
+  /* Import Preferences */
+  boolean importPreferences() {
+    return fImportPreferencesCheck.getSelection();
+  }
+
+  /* Update Checkboxes based on the given Counter Values */
   private void update(int labelCount, int filterCount, boolean hasPreferences) {
 
     /* Labels */
@@ -172,6 +178,7 @@ public class ImportOptionsPage extends WizardPage {
     fBottomInfoContainer.setVisible(hasPreferences);
   }
 
+  /* Check if any Filter uses the Label Action */
   private boolean filtersUseLabels(Collection<ISearchFilter> filters) {
     for (ISearchFilter filter : filters) {
       List<IFilterAction> actions = filter.getActions();

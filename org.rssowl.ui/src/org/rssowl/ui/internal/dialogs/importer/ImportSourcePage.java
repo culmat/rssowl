@@ -172,8 +172,11 @@ public class ImportSourcePage extends WizardPage {
   private void updatePageComplete() {
     String errorMessage = null;
 
+    /* Import Default */
     if (fImportFromDefaultRadio.getSelection())
       setPageComplete(true);
+
+    /* Import from File */
     else if (fImportFromFileRadio.getSelection()) {
       String filePath = fFileInput.getText();
       File fileToImport = new File(filePath);
@@ -183,8 +186,11 @@ public class ImportSourcePage extends WizardPage {
         errorMessage = "Please select an existing file.";
     }
 
+    /* Set Error Message */
     if (errorMessage != null)
       setErrorMessage(errorMessage);
+
+    /* Restore Normal Message */
     else {
       setErrorMessage(null);
       setMessage("Please choose the source of import.");

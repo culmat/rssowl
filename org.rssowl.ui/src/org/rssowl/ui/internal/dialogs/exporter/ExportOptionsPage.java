@@ -123,6 +123,7 @@ public class ExportOptionsPage extends WizardPage {
     setControl(container);
   }
 
+  /* Check if any Filter uses the Label Action */
   private boolean filtersUseLabels(Collection<ISearchFilter> filters) {
     for (ISearchFilter filter : filters) {
       List<IFilterAction> actions = filter.getActions();
@@ -135,6 +136,7 @@ public class ExportOptionsPage extends WizardPage {
     return false;
   }
 
+  /* Get selected Export Options */
   EnumSet<ITypeExporter.Options> getExportOptions() {
     List<ITypeExporter.Options> options = new ArrayList<ITypeExporter.Options>();
     if (fExportLabelsCheck.getSelection())
