@@ -39,7 +39,8 @@ import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.persist.IBookMark;
-import org.rssowl.core.persist.IFeed;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
@@ -219,13 +220,9 @@ public class Application implements IApplication {
     }
 
     /* Check if a BookMark exists for the Link */
-    IFeed feed = Owl.getPersistenceService().getDAOService().getFeedDAO().load(linkAsURI);
-    if (feed != null) {
-      FeedLinkReference feedRef = new FeedLinkReference(feed.getLink());
-      final Collection<IBookMark> bookMarks = Owl.getPersistenceService().getDAOService().getBookMarkDAO().loadAll(feedRef);
-      if (bookMarks.size() > 0)
-        return bookMarks.iterator().next();
-    }
+    Collection<IBookMark> existingBookmarks = DynamicDAO.getDAO(IBookMarkDAO.class).loadAll(new FeedLinkReference(linkAsURI));
+    if (existingBookmarks.size() > 0)
+      return existingBookmarks.iterator().next();
 
     return null;
   }
