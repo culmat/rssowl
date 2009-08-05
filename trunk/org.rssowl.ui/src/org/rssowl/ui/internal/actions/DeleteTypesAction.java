@@ -201,20 +201,8 @@ public class DeleteTypesAction extends Action implements IObjectActionDelegate {
     /* Only consider Entities */
     final List<IEntity> entities = ModelUtils.getEntities(fSelection);
 
-    /* Retrieve any Folder that is to be deleted */
-    List<IFolder> folders = null;
-    for (Object element : entities) {
-      if (element instanceof IFolder) {
-        if (folders == null)
-          folders = new ArrayList<IFolder>();
-        folders.add((IFolder) element);
-      }
-    }
-
     /* Normalize */
-    if (folders != null)
-      for (IFolder folder : folders)
-        CoreUtils.normalize(folder, entities);
+    CoreUtils.normalize(entities);
 
     /* Separate News */
     final List<INews> newsToDelete = new ArrayList<INews>();

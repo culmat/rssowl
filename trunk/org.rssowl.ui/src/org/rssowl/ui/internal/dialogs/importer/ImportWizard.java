@@ -47,7 +47,6 @@ import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -126,15 +125,7 @@ public class ImportWizard extends Wizard {
     List<IPreference> preferences = fImportElementsPage.getPreferencesToImport();
 
     /* Normalize Elements to Import */
-    List<IFolder> folders = new ArrayList<IFolder>();
-    for (IFolderChild child : folderChilds) {
-      if (child instanceof IFolder)
-        folders.add((IFolder) child);
-    }
-
-    for (IFolder folder : folders) {
-      CoreUtils.normalize(folder, folderChilds);
-    }
+    CoreUtils.normalize(folderChilds);
 
     /* Get Target Location (may be null) */
     IFolder target = fImportTargetPage.getTargetLocation();
