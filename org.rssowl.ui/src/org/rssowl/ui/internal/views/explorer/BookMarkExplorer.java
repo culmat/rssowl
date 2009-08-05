@@ -215,6 +215,7 @@ public class BookMarkExplorer extends ViewPart {
   private IPartListener2 fPartListener;
   private IPreferenceDAO fPrefDAO;
   private IPropertyChangeListener fPropertyChangeListener;
+  private boolean fBlockSaveState;
 
   /**
    * Returns the preferences key for the selected bookmark set for the given
@@ -1760,13 +1761,15 @@ public class BookMarkExplorer extends ViewPart {
       fGlobalPreferences.delete(PREF_SELECTED_FOLDER_CHILD);
 
     /* Misc. Settings */
-    fGlobalPreferences.putBoolean(DefaultPreferences.BE_BEGIN_SEARCH_ON_TYPING, fBeginSearchOnTyping);
-    fGlobalPreferences.putBoolean(DefaultPreferences.BE_ALWAYS_SHOW_SEARCH, fAlwaysShowSearch);
-    fGlobalPreferences.putBoolean(DefaultPreferences.BE_SORT_BY_NAME, fSortByName);
-    fGlobalPreferences.putBoolean(DefaultPreferences.BE_ENABLE_LINKING, fLinkingEnabled);
-    fGlobalPreferences.putBoolean(DefaultPreferences.BE_DISABLE_FAVICONS, !fFaviconsEnabled);
-    fGlobalPreferences.putInteger(DefaultPreferences.BE_FILTER_TYPE, fBookMarkFilter.getType().ordinal());
-    fGlobalPreferences.putInteger(DefaultPreferences.BE_GROUP_TYPE, fBookMarkGrouping.getType().ordinal());
+    if (!fBlockSaveState) {
+      fGlobalPreferences.putBoolean(DefaultPreferences.BE_BEGIN_SEARCH_ON_TYPING, fBeginSearchOnTyping);
+      fGlobalPreferences.putBoolean(DefaultPreferences.BE_ALWAYS_SHOW_SEARCH, fAlwaysShowSearch);
+      fGlobalPreferences.putBoolean(DefaultPreferences.BE_SORT_BY_NAME, fSortByName);
+      fGlobalPreferences.putBoolean(DefaultPreferences.BE_ENABLE_LINKING, fLinkingEnabled);
+      fGlobalPreferences.putBoolean(DefaultPreferences.BE_DISABLE_FAVICONS, !fFaviconsEnabled);
+      fGlobalPreferences.putInteger(DefaultPreferences.BE_FILTER_TYPE, fBookMarkFilter.getType().ordinal());
+      fGlobalPreferences.putInteger(DefaultPreferences.BE_GROUP_TYPE, fBookMarkGrouping.getType().ordinal());
+    }
   }
 
   private void saveExpandedElements() {
@@ -1875,5 +1878,16 @@ public class BookMarkExplorer extends ViewPart {
 
   boolean isSortByNameEnabled() {
     return fBookMarkComparator.getType() == BookMarkSorter.Type.SORT_BY_NAME;
+  }
+
+  /**
+   * Allows to disable saving settings on dispose. Useful if settings have been
+   * imported and the application is to restart.
+   *
+   * @param saveStateOnDispose <code>true</code> to save settings on dispose and
+   * <code>false</code> to block this.
+   */
+  public void saveStateOnDispose(boolean saveStateOnDispose) {
+    fBlockSaveState = !saveStateOnDispose;
   }
 }
