@@ -49,7 +49,6 @@ import java.util.List;
  *
  * @author bpasero
  */
-//TODO Clarify what happens with existing Labels, Filters, Preferences
 public class ImportOptionsPage extends WizardPage {
   private Button fImportLabelsCheck;
   private Button fImportFiltersCheck;
