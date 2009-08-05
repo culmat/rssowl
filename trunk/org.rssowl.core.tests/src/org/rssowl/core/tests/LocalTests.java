@@ -48,6 +48,7 @@ import org.rssowl.core.tests.persist.LongArrayListTest;
 import org.rssowl.core.tests.persist.LongHashSetTest;
 import org.rssowl.core.tests.persist.MigrationsTest;
 import org.rssowl.core.tests.persist.service.DefragmentTest;
+import org.rssowl.core.tests.util.CoreUtilsTest;
 import org.rssowl.core.tests.util.MergeUtilsTest;
 import org.rssowl.core.tests.util.StringUtilsTest;
 
@@ -78,6 +79,7 @@ import org.rssowl.core.tests.util.StringUtilsTest;
   MergeUtilsTest.class,
   INewsTest.class,
   StringUtilsTest.class,
+  CoreUtilsTest.class,
   DefragmentTest.class,
   MigrationsTest.class,
   LongArrayListTest.class,
