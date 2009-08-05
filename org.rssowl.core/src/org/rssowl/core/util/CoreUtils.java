@@ -311,6 +311,34 @@ public class CoreUtils {
   }
 
   /**
+   * Delete any Folder and Mark that is child of folders contained in the list.
+   *
+   * @param entities the list to scan for elements that are already contained in
+   * existing folders.
+   */
+  public static void normalize(List<? extends IEntity> entities) {
+    if (entities == null)
+      return;
+
+    /* Find Folders */
+    List<IFolder> folders = null;
+    for (Object element : entities) {
+      if (element instanceof IFolder) {
+        if (folders == null)
+          folders = new ArrayList<IFolder>();
+        folders.add((IFolder) element);
+      }
+    }
+
+    /* Normalize */
+    if (folders != null) {
+      for (IFolder folder : folders) {
+        CoreUtils.normalize(folder, entities);
+      }
+    }
+  }
+
+  /**
    * Delete any Folder and Mark that is child of the given Folder
    *
    * @param folder
