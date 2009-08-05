@@ -58,6 +58,7 @@ import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.dao.ISearchMarkDAO;
 import org.rssowl.core.persist.event.AttachmentAdapter;
@@ -2708,5 +2709,33 @@ public class ModelTest3 {
     } finally {
       DynamicDAO.removeEntityListener(ISearchCondition.class, listener);
     }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testBookMarkExists() throws Exception {
+    IFolder root = fFactory.createFolder(null, null, "Root");
+
+    IFeed feed = fFactory.createFeed(null, new URI("feed1"));
+    DynamicDAO.save(feed);
+
+    IBookMark mark1 = fFactory.createBookMark(null, root, new FeedLinkReference(feed.getLink()), "Mark 1");
+    IBookMark mark2 = fFactory.createBookMark(null, root, new FeedLinkReference(new URI("feed2")), "Mark 2");
+
+    DynamicDAO.save(root);
+
+    IBookMark mark3 = fFactory.createBookMark(null, root, new FeedLinkReference(new URI("feed3")), "Mark 3");
+
+    assertTrue(DynamicDAO.getDAO(IBookMarkDAO.class).exists(mark1.getFeedLinkReference()));
+    assertTrue(DynamicDAO.getDAO(IBookMarkDAO.class).exists(mark2.getFeedLinkReference()));
+    assertFalse(DynamicDAO.getDAO(IBookMarkDAO.class).exists(mark3.getFeedLinkReference()));
+
+    System.gc();
+
+    assertTrue(DynamicDAO.getDAO(IBookMarkDAO.class).exists(mark1.getFeedLinkReference()));
+    assertTrue(DynamicDAO.getDAO(IBookMarkDAO.class).exists(mark2.getFeedLinkReference()));
+    assertFalse(DynamicDAO.getDAO(IBookMarkDAO.class).exists(mark3.getFeedLinkReference()));
   }
 }
