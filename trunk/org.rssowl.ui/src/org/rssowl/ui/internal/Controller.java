@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
@@ -218,7 +219,7 @@ public class Controller {
   private final Lock fLoginDialogLock = new ReentrantLock();
   private BookMarkAdapter fBookMarkListener;
   private LabelAdapter fLabelListener;
-  private List<BookMarkLoadListener> fBookMarkLoadListeners = new ArrayList<BookMarkLoadListener>(1);
+  private ListenerList fBookMarkLoadListeners = new ListenerList();
   private final int fConnectionTimeout;
   private List<ShareProvider> fShareProviders = new ArrayList<ShareProvider>();
 
@@ -1222,8 +1223,7 @@ public class Controller {
    * from the controller.
    */
   public void addBookMarkLoadListener(BookMarkLoadListener listener) {
-    if (!fBookMarkLoadListeners.contains(listener))
-      fBookMarkLoadListeners.add(listener);
+    fBookMarkLoadListeners.add(listener);
   }
 
   /**
@@ -1235,20 +1235,22 @@ public class Controller {
   }
 
   private void fireBookMarkAboutToLoad(final IBookMark bookmark) {
-    for (final BookMarkLoadListener listener : fBookMarkLoadListeners) {
+    Object[] listeners = fBookMarkLoadListeners.getListeners();
+    for (final Object listener : listeners) {
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.bookMarkAboutToLoad(bookmark);
+          ((BookMarkLoadListener) listener).bookMarkAboutToLoad(bookmark);
         }
       });
     }
   }
 
   private void fireBookMarkDoneLoading(final IBookMark bookmark) {
-    for (final BookMarkLoadListener listener : fBookMarkLoadListeners) {
+    Object[] listeners = fBookMarkLoadListeners.getListeners();
+    for (final Object listener : listeners) {
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
-          listener.bookMarkDoneLoading(bookmark);
+          ((BookMarkLoadListener) listener).bookMarkDoneLoading(bookmark);
         }
       });
     }
