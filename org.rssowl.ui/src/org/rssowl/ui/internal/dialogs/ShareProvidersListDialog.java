@@ -174,6 +174,15 @@ public class ShareProvidersListDialog extends TitleAreaDialog {
     fViewer.setInput(this);
     updateCheckedState();
 
+    /* Ensure that the first checked element is visible */
+    TableItem[] items = fViewer.getTable().getItems();
+    for (TableItem item : items) {
+      if (item.getChecked()) {
+        fViewer.getTable().showItem(item);
+        break;
+      }
+    }
+
     /* Listen on Check State Changes */
     fViewer.addCheckStateListener(new ICheckStateListener() {
       public void checkStateChanged(CheckStateChangedEvent event) {
