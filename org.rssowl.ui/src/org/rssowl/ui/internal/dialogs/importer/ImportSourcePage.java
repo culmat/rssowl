@@ -36,11 +36,15 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Text;
+import org.rssowl.core.Owl;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * A {@link WizardPage} to select the source of import.
@@ -143,7 +147,18 @@ public class ImportSourcePage extends WizardPage {
   private void onBrowse() {
     FileDialog dialog = new FileDialog(getShell());
     dialog.setText("Choose Import File");
-    dialog.setFilterExtensions(new String[] { "*.opml", "*.xml", "*.*" }); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+
+    /* Set Export Formats also for Import (we assume this is supported) */
+    Collection<String> exportFormats = Owl.getInterpreter().getExportFormats();
+    List<String> filterExtensions = new ArrayList<String>();
+    for (String exportFormat : exportFormats) {
+      filterExtensions.add("*." + exportFormat.toLowerCase());
+    }
+
+    if (!filterExtensions.contains("*.*"))
+      filterExtensions.add("*.*");
+
+    dialog.setFilterExtensions(filterExtensions.toArray(new String[filterExtensions.size()]));
     if (StringUtils.isSet(fFileInput.getText()))
       dialog.setFileName(fFileInput.getText());
 
