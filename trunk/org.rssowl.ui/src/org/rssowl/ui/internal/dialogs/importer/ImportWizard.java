@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.importer;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -152,6 +153,13 @@ public class ImportWizard extends Wizard {
 
     if (!importPreferences)
       preferences = null;
+
+    /* Show warning and ask for confirmation if preferences should be imported */
+    if (importPreferences && preferences != null && !preferences.isEmpty()) {
+      MessageDialog dialog = new MessageDialog(getShell(), "Attention", null, "All of your existing preferences will be replaced with the imported ones.\n\nDo you want to continue?", MessageDialog.WARNING, new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL }, 0);
+      if (dialog.open() != 0)
+        return false;
+    }
 
     /* Run Import */
     ImportUtils.doImport(target, folderChilds, labels, filters, preferences);
