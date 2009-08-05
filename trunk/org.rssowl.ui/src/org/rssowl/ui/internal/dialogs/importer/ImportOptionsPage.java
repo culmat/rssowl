@@ -128,7 +128,7 @@ public class ImportOptionsPage extends WizardPage {
     infoText = new StyledText(infoContainer, SWT.WRAP | SWT.READ_ONLY);
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     ((GridData) infoText.getLayoutData()).widthHint = 200;
-    infoText.setText("Note: Use 'Import Preferences' with care. All of your existing preferences will be replaced by the imported ones if selected.");
+    infoText.setText("Note: Use 'Import Preferences' with care. All of your existing preferences will be replaced with the imported ones if selected.");
     infoText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
     setControl(container);
