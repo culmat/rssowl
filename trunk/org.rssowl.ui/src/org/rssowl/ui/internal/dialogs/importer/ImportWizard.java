@@ -158,7 +158,7 @@ public class ImportWizard extends Wizard {
 
     /* Ask for a restart if preferences have been imported */
     if (importPreferences && preferences != null && !preferences.isEmpty()) {
-      boolean restart = MessageDialog.openQuestion(getShell(), "Restart RSSOwl", "It is recommended to restart RSSOwl after preferences have been imported.\n\nDo you want to restart now?");
+      boolean restart = MessageDialog.openQuestion(getShell(), "Restart RSSOwl", "It is necessary to restart RSSOwl after preferences have been imported.\n\nDo you want to restart now?");
       if (restart) {
         BookMarkExplorer explorer = OwlUI.getOpenBookMarkExplorer();
         if (explorer != null)
