@@ -37,8 +37,7 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.IFeedDAO;
-import org.rssowl.core.persist.reference.FeedReference;
+import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Controller;
@@ -191,7 +190,7 @@ public class ImportWizard extends Wizard {
 
   /* Remove existing Bookmarks and Empty Folders */
   private List<IFolderChild> excludeExisting(List<IFolderChild> folderChilds) {
-    IFeedDAO dao = DynamicDAO.getDAO(IFeedDAO.class);
+    IBookMarkDAO dao = DynamicDAO.getDAO(IBookMarkDAO.class);
 
     for (Iterator<IFolderChild> iterator = folderChilds.iterator(); iterator.hasNext();) {
       IFolderChild child = iterator.next();
@@ -199,8 +198,7 @@ public class ImportWizard extends Wizard {
       /* Bookmark */
       if (child instanceof IBookMark) {
         IBookMark bm = (IBookMark) child;
-        FeedReference existingFeed = dao.loadReference(bm.getFeedLinkReference().getLink());
-        if (existingFeed != null)
+        if (dao.exists(bm.getFeedLinkReference()))
           iterator.remove();
       }
 
@@ -222,7 +220,7 @@ public class ImportWizard extends Wizard {
 
   /* Remove existing Bookmarks and Empty Folders */
   private void excludeExisting(IFolder folder) {
-    IFeedDAO dao = DynamicDAO.getDAO(IFeedDAO.class);
+    IBookMarkDAO dao = DynamicDAO.getDAO(IBookMarkDAO.class);
     List<IFolderChild> children = folder.getChildren();
 
     for (IFolderChild child : children) {
@@ -230,8 +228,7 @@ public class ImportWizard extends Wizard {
       /* Bookmark */
       if (child instanceof IBookMark) {
         IBookMark bm = (IBookMark) child;
-        FeedReference existingFeed = dao.loadReference(bm.getFeedLinkReference().getLink());
-        if (existingFeed != null)
+        if (dao.exists(bm.getFeedLinkReference()))
           folder.removeChild(bm);
       }
 
