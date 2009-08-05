@@ -350,6 +350,12 @@ public enum Preferences {
   /** Global Eclipse: Headlines Font */
   ECLIPSE_HEADLINES_FONT("instance/org.eclipse.ui.workbench/org.rssowl.ui.HeadlinesFont", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE),
 
+  /** Global Eclipse: Dialog Font */
+  ECLIPSE_DIALOG_FONT("instance/org.eclipse.ui.workbench/org.eclipse.jface.dialogfont", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE),
+
+  /** Global Eclipse: Part Font */
+  ECLIPSE_PART_FONT("instance/org.eclipse.ui.workbench/org.eclipse.ui.workbench.TAB_TEXT_FONT", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE),
+
   /** Global Eclipse: Bookmark Explorer Font */
   ECLIPSE_BOOKMARK_FONT("instance/org.eclipse.ui.workbench/org.rssowl.ui.BookmarkExplorerFont", IPreferenceType.STRING, IPreferenceScope.Kind.ECLIPSE),
 
