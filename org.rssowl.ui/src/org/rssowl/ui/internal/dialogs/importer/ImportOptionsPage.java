@@ -54,6 +54,7 @@ public class ImportOptionsPage extends WizardPage {
   private Button fImportFiltersCheck;
   private Button fImportPreferencesCheck;
   private boolean fFiltersUseLabels;
+  private Composite fBottomInfoContainer;
 
   /**
    * @param pageName
@@ -117,15 +118,15 @@ public class ImportOptionsPage extends WizardPage {
     fImportPreferencesCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Info Container */
-    Composite infoContainer = new Composite(container, SWT.None);
-    infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.END, false, true));
-    infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    fBottomInfoContainer = new Composite(container, SWT.None);
+    fBottomInfoContainer.setLayoutData(new GridData(SWT.FILL, SWT.END, false, true));
+    fBottomInfoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
 
-    Label infoImg = new Label(infoContainer, SWT.NONE);
+    Label infoImg = new Label(fBottomInfoContainer, SWT.NONE);
     infoImg.setImage(OwlUI.getImage(infoImg, "icons/obj16/info.gif"));
     infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 
-    infoText = new StyledText(infoContainer, SWT.WRAP | SWT.READ_ONLY);
+    infoText = new StyledText(fBottomInfoContainer, SWT.WRAP | SWT.READ_ONLY);
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     ((GridData) infoText.getLayoutData()).widthHint = 200;
     infoText.setText("Note: Use 'Import Preferences' with care. All of your existing preferences will be replaced with the imported ones if selected.");
@@ -168,6 +169,7 @@ public class ImportOptionsPage extends WizardPage {
     else
       fImportPreferencesCheck.setText("Import Preferences (No Preferences Available)");
     fImportPreferencesCheck.setEnabled(hasPreferences);
+    fBottomInfoContainer.setVisible(hasPreferences);
   }
 
   private boolean filtersUseLabels(Collection<ISearchFilter> filters) {
