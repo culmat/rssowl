@@ -105,6 +105,10 @@ public class ImportElementsPage extends WizardPage {
       return true;
     }
 
+    void clear() {
+      cache.clear();
+    }
+
     private boolean select(IFolderChild element) {
 
       /* Bookmark */
@@ -445,6 +449,7 @@ public class ImportElementsPage extends WizardPage {
     /* Apply as Input */
     fViewer.setInput(folderChilds);
     OwlUI.setAllChecked(fViewer.getTree(), true);
+    fExistingFilter.clear();
     updateMessage(true);
   }
 
