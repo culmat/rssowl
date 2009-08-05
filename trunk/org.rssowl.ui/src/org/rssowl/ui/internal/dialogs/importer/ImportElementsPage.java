@@ -153,6 +153,7 @@ public class ImportElementsPage extends WizardPage {
     setMessage("Please choose the elements to import.");
   }
 
+  /* Get Elements to Import */
   List<IFolderChild> getFolderChildsToImport() {
     importSource(); //Ensure to be in sync with Source
 
@@ -190,6 +191,7 @@ public class ImportElementsPage extends WizardPage {
     return fPreferences;
   }
 
+  /* Check if the Options Page should be shown from the Wizard */
   boolean showOptionsPage() {
     return !fLabels.isEmpty() || !fFilters.isEmpty() || !fPreferences.isEmpty();
   }
@@ -256,6 +258,7 @@ public class ImportElementsPage extends WizardPage {
     /* LabelProvider */
     fViewer.setLabelProvider(new BookMarkLabelProvider(false));
 
+    /* Filter (exclude existing) */
     fViewer.addFilter(fExistingFilter);
 
     /* Listen on Doubleclick */
@@ -459,6 +462,7 @@ public class ImportElementsPage extends WizardPage {
       setMessage("Some elemens are hidden because they already exist.", IMessageProvider.WARNING);
     else
       setMessage("Please choose the elements to import.");
+
     if (clearErrors)
       setErrorMessage(null);
   }

@@ -142,15 +142,14 @@ public class ImportWizard extends Wizard {
 
     /* Get Options */
     boolean importLabels = fImportOptionsPage.importLabels();
-    boolean importFilters = fImportOptionsPage.importFilters();
-    boolean importPreferences = fImportOptionsPage.importPreferences();
-
     if (!importLabels)
       labels = null;
 
+    boolean importFilters = fImportOptionsPage.importFilters();
     if (!importFilters)
       filters = null;
 
+    boolean importPreferences = fImportOptionsPage.importPreferences();
     if (!importPreferences)
       preferences = null;
 
@@ -190,6 +189,7 @@ public class ImportWizard extends Wizard {
     return true;
   }
 
+  /* Remove existing Bookmarks and Empty Folders */
   private List<IFolderChild> excludeExisting(List<IFolderChild> folderChilds) {
     IFeedDAO dao = DynamicDAO.getDAO(IFeedDAO.class);
 
@@ -220,6 +220,7 @@ public class ImportWizard extends Wizard {
     return folderChilds;
   }
 
+  /* Remove existing Bookmarks and Empty Folders */
   private void excludeExisting(IFolder folder) {
     IFeedDAO dao = DynamicDAO.getDAO(IFeedDAO.class);
     List<IFolderChild> children = folder.getChildren();

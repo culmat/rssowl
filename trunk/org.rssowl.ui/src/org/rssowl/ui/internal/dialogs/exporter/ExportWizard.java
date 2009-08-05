@@ -104,6 +104,7 @@ public class ExportWizard extends Wizard {
     FileDialog dialog = new FileDialog(getShell(), SWT.SAVE);
     dialog.setText("Choose Export File");
 
+    /* Receive Formats for Export */
     Collection<String> exportFormats = Owl.getInterpreter().getExportFormats();
     List<String> filterExtensions = new ArrayList<String>();
     for (String exportFormat : exportFormats) {
@@ -114,10 +115,11 @@ public class ExportWizard extends Wizard {
       filterExtensions.add("*.*");
 
     dialog.setFilterExtensions(filterExtensions.toArray(new String[filterExtensions.size()]));
-
     dialog.setFileName("rssowl.opml");
     dialog.setOverwrite(true);
     String string = dialog.open();
+
+    /* Export to given File */
     if (string != null) {
       File file = new File(string);
       try {
@@ -158,14 +160,14 @@ public class ExportWizard extends Wizard {
 
       /* Add those Locations required by Saved Searches */
       for (ISearchMark savedSearch : savedSearches) {
-        extractLocations(selectedElements, savedSearch);
+        collectLocations(selectedElements, savedSearch);
       }
 
       /* Add those Locations required by Filters */
       if (options != null && options.contains(Options.EXPORT_FILTERS)) {
         Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
         for (ISearchFilter filter : filters) {
-          extractLocations(selectedElements, filter);
+          collectLocations(selectedElements, filter);
         }
       }
     }
@@ -185,7 +187,8 @@ public class ExportWizard extends Wizard {
     return selectedElements;
   }
 
-  private void extractLocations(List<IFolderChild> selectedElements, ISearch search) {
+  /* Collect Locations from Searches */
+  private void collectLocations(List<IFolderChild> selectedElements, ISearch search) {
     if (search != null) {
       List<ISearchCondition> conditions = search.getSearchConditions();
       for (ISearchCondition condition : conditions) {
@@ -203,10 +206,11 @@ public class ExportWizard extends Wizard {
     }
   }
 
-  private void extractLocations(List<IFolderChild> selectedElements, ISearchFilter filter) {
+  /* Collect Locations from Filters */
+  private void collectLocations(List<IFolderChild> selectedElements, ISearchFilter filter) {
 
     /* Locations from Search */
-    extractLocations(selectedElements, filter.getSearch());
+    collectLocations(selectedElements, filter.getSearch());
 
     /* Locations from Actions */
     List<IFilterAction> actions = filter.getActions();

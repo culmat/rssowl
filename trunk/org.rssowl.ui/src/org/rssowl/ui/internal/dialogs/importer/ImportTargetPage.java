@@ -94,7 +94,7 @@ public class ImportTargetPage extends WizardPage {
     else
       setPageComplete(StringUtils.isSet(fSetNameInput.getText()));
 
-    if (fCreateNewSetRadio.getSelection() && newSetExists())
+    if (fCreateNewSetRadio.getSelection() && newSetExists(fSetNameInput.getText()))
       setMessage("A Bookmark Set with the name '" + fSetNameInput.getText() + "' already exists.", IMessageProvider.WARNING);
     else
       setMessage("Please choose the target folder to import into.");
@@ -182,10 +182,11 @@ public class ImportTargetPage extends WizardPage {
     setControl(container);
   }
 
-  private boolean newSetExists() {
+  /* Check if a Bookmark Set with the Name already exists */
+  private boolean newSetExists(String name) {
     Set<IFolder> roots = CoreUtils.loadRootFolders();
     for (IFolder root : roots) {
-      if (root.getName().equals(fSetNameInput.getText()))
+      if (root.getName().equals(name))
         return true;
     }
 
