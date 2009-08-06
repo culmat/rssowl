@@ -1912,7 +1912,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
           /* Configure Providers */
           shareMenu.add(new Separator());
-          shareMenu.add(new Action("&Configure...") {
+          shareMenu.add(new Action("&Organize...") {
             @Override
             public void run() {
               new ShareProvidersListDialog(fResultViewer.getTable().getShell()).open();

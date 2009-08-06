@@ -1275,7 +1275,7 @@ public class BookMarkExplorer extends ViewPart {
 
           /* Configure Providers */
           shareMenu.add(new Separator());
-          shareMenu.add(new Action("&Configure...") {
+          shareMenu.add(new Action("&Organize...") {
             @Override
             public void run() {
               new ShareProvidersListDialog(fViewer.getTree().getShell()).open();
