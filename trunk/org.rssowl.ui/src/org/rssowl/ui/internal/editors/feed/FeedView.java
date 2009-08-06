@@ -122,7 +122,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
@@ -405,22 +404,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       return;
 
     /* Write into File */
-    OutputStreamWriter writer = null;
-    try {
-      writer = new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8");
-      writer.write(content.toString());
-      writer.close();
-    } catch (IOException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
-    } finally {
-      if (writer != null) {
-        try {
-          writer.close();
-        } catch (IOException e) {
-          Activator.getDefault().logError(e.getMessage(), e);
-        }
-      }
-    }
+    CoreUtils.write(fileName, content);
   }
 
   /*

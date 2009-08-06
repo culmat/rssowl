@@ -49,7 +49,6 @@ import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -57,8 +56,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Scrollable;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.ui.internal.Activator;
@@ -137,7 +134,7 @@ public class CleanUpSummaryPage extends WizardPage {
       Rectangle rect = event.getBounds();
 
       /* Paint the selection beyond the end of last column */
-      expandRegion(event, scrollable, gc, area);
+      OwlUI.codExpandRegion(event, scrollable, gc, area);
 
       /* Draw Gradient Rectangle */
       Color oldForeground = gc.getForeground();
@@ -157,25 +154,6 @@ public class CleanUpSummaryPage extends WizardPage {
 
       /* Mark as Background being handled */
       event.detail &= ~SWT.BACKGROUND;
-    }
-
-    private void expandRegion(Event event, Scrollable scrollable, GC gc, Rectangle area) {
-      int columnCount;
-      if (scrollable instanceof Table)
-        columnCount = ((Table) scrollable).getColumnCount();
-      else
-        columnCount = ((Tree) scrollable).getColumnCount();
-
-      if (event.index == columnCount - 1 || columnCount == 0) {
-        int width = area.x + area.width - event.x;
-        if (width > 0) {
-          Region region = new Region();
-          gc.getClipping(region);
-          region.add(event.x, event.y, width, event.height);
-          gc.setClipping(region);
-          region.dispose();
-        }
-      }
     }
   }
 

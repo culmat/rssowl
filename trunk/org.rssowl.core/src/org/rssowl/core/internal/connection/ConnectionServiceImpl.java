@@ -251,16 +251,9 @@ public class ConnectionServiceImpl implements IConnectionService {
    * .URI, java.lang.String)
    */
   public ICredentials getAuthCredentials(URI link, String realm) throws CredentialsException {
-    String protocol = link.getScheme();
-
-    /* Require protocol */
-    if (!StringUtils.isSet(protocol))
-      throw new CredentialsException(Activator.getDefault().createErrorStatus("Unknown protocol", null));
 
     /* Require credentials provider */
-    ICredentialsProvider credentialsProvider = fCredentialsProvider.get(protocol);
-    if (credentialsProvider == null)
-      throw new CredentialsException(Activator.getDefault().createErrorStatus("Could not find any credentials provider for protocol: " + protocol, null));
+    ICredentialsProvider credentialsProvider = internalGetCredentialsProvider(link);
 
     /* Retrieve Credentials */
     ICredentials credentials = credentialsProvider.getAuthCredentials(link, realm);
@@ -273,6 +266,16 @@ public class ConnectionServiceImpl implements IConnectionService {
    * net.URI)
    */
   public IProxyCredentials getProxyCredentials(URI link) throws CredentialsException {
+
+    /* Require credentials provider */
+    ICredentialsProvider credentialsProvider = internalGetCredentialsProvider(link);
+
+    /* Retrieve Credentials */
+    IProxyCredentials credentials = credentialsProvider.getProxyCredentials(link);
+    return credentials;
+  }
+
+  private ICredentialsProvider internalGetCredentialsProvider(URI link) throws CredentialsException {
     String protocol = link.getScheme();
 
     /* Require protocol */
@@ -284,9 +287,7 @@ public class ConnectionServiceImpl implements IConnectionService {
     if (credentialsProvider == null)
       throw new CredentialsException(Activator.getDefault().createErrorStatus("Could not find any credentials provider for protocol: " + protocol, null));
 
-    /* Retrieve Credentials */
-    IProxyCredentials credentials = credentialsProvider.getProxyCredentials(link);
-    return credentials;
+    return credentialsProvider;
   }
 
   private void loadProtocolHandlers() {

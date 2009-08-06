@@ -71,6 +71,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.Scrollable;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
@@ -96,10 +97,13 @@ import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.IPreferenceDAO;
 import org.rssowl.core.persist.reference.BookMarkReference;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
+import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.ReparentInfo;
@@ -1762,5 +1766,67 @@ public class OwlUI {
     };
     dialog.create();
     dialog.open();
+  }
+
+  /**
+   * @param folder a selected {@link IFolder}
+   * @return the selected {@link IFolder} if part of the currently selected
+   * Bookmark Set, or the currently selected Bookmark Set otherwise.
+   * @throws PersistenceException in case of an error while loading.
+   */
+  public static IFolder getSelectedParent(IFolder folder) throws PersistenceException {
+    String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
+    Long selectedRootFolderID = DynamicDAO.getDAO(IPreferenceDAO.class).load(selectedBookMarkSetPref).getLong();
+
+    /* Check if available Parent is still valid */
+    if (folder != null) {
+      if (hasParent(folder, new FolderReference(selectedRootFolderID)))
+        return folder;
+    }
+
+    /* Otherwise return visible root-folder */
+    return new FolderReference(selectedRootFolderID).resolve();
+  }
+
+  private static boolean hasParent(IFolder folder, FolderReference folderRef) {
+    if (folder == null)
+      return false;
+
+    if (folderRef.references(folder))
+      return true;
+
+    return hasParent(folder.getParent(), folderRef);
+  }
+
+  /**
+   * Adjust the bounds of the given Shell to respect the addition or removal of
+   * the vertical bar.
+   *
+   * @param shell the Shell of the container.
+   * @param verticalBar the vertical {@link ScrollBar} of the container.
+   * @param wasScrollbarShowing <code>true</code> if the vertical scrollbar was
+   * showing and <code>false</code> otherwise.
+   */
+  public static void adjustSizeForScrollbar(Shell shell, ScrollBar verticalBar, boolean wasScrollbarShowing) {
+    if (verticalBar == null)
+      return;
+
+    /* Ignore for application window */
+    if (shell.getParent() == null)
+      return;
+
+    int barWidth = verticalBar.getSize().x;
+
+    if (wasScrollbarShowing != verticalBar.isVisible()) {
+      Rectangle shellBounds = shell.getBounds();
+
+      /* Increase if Scrollbar now Visible */
+      if (!wasScrollbarShowing)
+        shell.setBounds(shellBounds.x, shellBounds.y, shellBounds.width + barWidth, shellBounds.height);
+
+      /* Reduce if Scrollbar now Invisible */
+      else
+        shell.setBounds(shellBounds.x, shellBounds.y, shellBounds.width - barWidth, shellBounds.height);
+    }
   }
 }
