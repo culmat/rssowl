@@ -92,6 +92,10 @@ public class ImportWizard extends Wizard {
   @Override
   public IWizardPage getNextPage(IWizardPage page) {
 
+    /* Check if the ImportTargetPage needs to be shown */
+    if (page instanceof ImportElementsPage && fImportElementsPage.getFolderChildsToImport().isEmpty() && fImportElementsPage.showOptionsPage())
+      return fImportOptionsPage;
+
     /* Check if the ImportOptionsPage needs to be shown */
     if (page instanceof ImportTargetPage && !fImportElementsPage.showOptionsPage())
       return null;
