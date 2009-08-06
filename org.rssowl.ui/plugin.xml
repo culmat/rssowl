@@ -462,6 +462,14 @@
                id="org.rssowl.ui.preferences.keywords.Browser">
          </keywordReference>
       </page>
+      <page
+            class="org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage"
+            id="org.rssowl.ui.SharingPreferencesPage"
+            name="Sharing">
+         <keywordReference
+               id="org.rssowl.ui.preferences.keywords.Sharing">
+         </keywordReference>
+      </page>
    </extension>
    <extension
          point="org.eclipse.ui.keywords">
@@ -497,6 +505,10 @@
       <keyword
             id="org.rssowl.ui.preferences.keywords.Browser"
             label="internal embedded external browser script js web link javascript java background">
+      </keyword>
+      <keyword
+            id="org.rssowl.ui.preferences.keywords.Sharing"
+            label="publish blog share notify inform email create send print export delicious technorati facebook digg twitter stumbleupon reddit mixx friendfeed google bookmark linkedin tumblr">
       </keyword>
    </extension>
    <extension

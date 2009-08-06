@@ -116,6 +116,11 @@ public class OverviewPreferencesPage extends PreferencePage implements IWorkbenc
     images.add(OwlUI.getImage(fResources, "icons/elcl16/browser.gif"));
     labels.add("Configure the Integrated Web Browser");
 
+    /* Sharing */
+    ids.add(SharingPreferencesPage.ID);
+    images.add(OwlUI.getImage(fResources, "icons/elcl16/share.gif"));
+    labels.add("Share Bookmarks and News with Others");
+
     /* Key Bindings */
     ids.add("org.rssowl.ui.preferences.Keys");
     images.add(OwlUI.getImage(fResources, "icons/elcl16/keyspref.gif"));
