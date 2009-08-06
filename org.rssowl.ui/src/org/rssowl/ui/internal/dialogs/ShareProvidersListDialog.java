@@ -111,7 +111,7 @@ public class ShareProvidersListDialog extends TitleAreaDialog {
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     /* Title */
-    setTitle("Configure Communities");
+    setTitle("Organize Sharing");
 
     /* Title Image */
     setTitleImage(OwlUI.getImage(fResources, "icons/wizban/share_wiz.gif"));
@@ -137,7 +137,7 @@ public class ShareProvidersListDialog extends TitleAreaDialog {
     TableColumn nameCol = new TableColumn(fViewer.getTable(), SWT.NONE);
 
     CColumnLayoutData data = new CColumnLayoutData(Size.FILL, 100);
-    cTable.manageColumn(nameCol, data, "Available Providers", null, null, false, false);
+    cTable.manageColumn(nameCol, data, "Available Communities", null, null, false, false);
 
     /* ContentProvider returns all providers */
     fViewer.setContentProvider(new IStructuredContentProvider() {
@@ -371,7 +371,7 @@ public class ShareProvidersListDialog extends TitleAreaDialog {
   @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
-    shell.setText("Configure Communities");
+    shell.setText("Organize Sharing");
   }
 
   /*

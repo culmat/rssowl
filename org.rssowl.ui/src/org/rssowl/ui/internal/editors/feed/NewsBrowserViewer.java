@@ -370,7 +370,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
           /* Configure Providers */
           shareMenu.add(new Separator());
-          shareMenu.add(new Action("&Configure...") {
+          shareMenu.add(new Action("&Organize...") {
             @Override
             public void run() {
               new ShareProvidersListDialog(fBrowser.getControl().getShell()).open();
@@ -471,7 +471,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
         /* Configure Providers */
         manager.add(new Separator());
-        manager.add(new Action("&Configure...") {
+        manager.add(new Action("&Organize...") {
           @Override
           public void run() {
             new ShareProvidersListDialog(fBrowser.getControl().getShell()).open();
