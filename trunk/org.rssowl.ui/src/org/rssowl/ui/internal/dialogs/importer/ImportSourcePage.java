@@ -149,10 +149,15 @@ public class ImportSourcePage extends WizardPage {
     dialog.setText("Choose Import File");
 
     /* Set Export Formats also for Import (we assume this is supported) */
-    Collection<String> exportFormats = Owl.getInterpreter().getExportFormats();
     List<String> filterExtensions = new ArrayList<String>();
+    filterExtensions.add("*.opml");
+    filterExtensions.add("*.xml");
+
+    Collection<String> exportFormats = Owl.getInterpreter().getExportFormats();
     for (String exportFormat : exportFormats) {
-      filterExtensions.add("*." + exportFormat.toLowerCase());
+      String format = "*." + exportFormat.toLowerCase();
+      if (!filterExtensions.contains(format))
+        filterExtensions.add(format);
     }
 
     if (!filterExtensions.contains("*.*"))
