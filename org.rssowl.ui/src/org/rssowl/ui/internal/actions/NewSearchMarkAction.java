@@ -34,13 +34,9 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
-import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.IPreferenceDAO;
-import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.SearchMarkDialog;
-import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 /**
  * @author bpasero
@@ -86,7 +82,7 @@ public class NewSearchMarkAction implements IWorkbenchWindowActionDelegate, IObj
   }
 
   private void internalRun() throws PersistenceException {
-    SearchMarkDialog dialog = new SearchMarkDialog(fShell, getParent(), fPosition);
+    SearchMarkDialog dialog = new SearchMarkDialog(fShell, OwlUI.getSelectedParent(fParent), fPosition);
     dialog.open();
   }
 
@@ -121,29 +117,5 @@ public class NewSearchMarkAction implements IWorkbenchWindowActionDelegate, IObj
    */
   public void setActivePart(IAction action, IWorkbenchPart targetPart) {
     fShell = targetPart.getSite().getShell();
-  }
-
-  private IFolder getParent() throws PersistenceException {
-    String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
-    Long selectedRootFolderID = DynamicDAO.getDAO(IPreferenceDAO.class).load(selectedBookMarkSetPref).getLong();
-
-    /* Check if available Parent is still valid */
-    if (fParent != null) {
-      if (hasParent(fParent, new FolderReference(selectedRootFolderID)))
-        return fParent;
-    }
-
-    /* Otherwise return visible root-folder */
-    return new FolderReference(selectedRootFolderID).resolve();
-  }
-
-  private boolean hasParent(IFolder folder, FolderReference folderRef) {
-    if (folder == null)
-      return false;
-
-    if (folderRef.references(folder))
-      return true;
-
-    return hasParent(folder.getParent(), folderRef);
   }
 }

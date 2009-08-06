@@ -41,7 +41,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.ScrollBar;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.rssowl.core.Owl;
@@ -342,37 +341,13 @@ public class NewsActionList extends ScrolledComposite {
 
     /* Update Size */
     updateSize();
-    adjustSizeForScrollbar(wasScrollbarShowing);
+    OwlUI.adjustSizeForScrollbar(getShell(), getVerticalBar(), wasScrollbarShowing);
 
     /* Scroll to Bottom if added as last element */
     if (scroll && addedToEnd)
       setOrigin(0, getContent().getSize().y);
 
     return item;
-  }
-
-  private void adjustSizeForScrollbar(boolean wasScrollbarShowing) {
-    ScrollBar verticalBar = getVerticalBar();
-    if (verticalBar == null)
-      return;
-
-    /* Ignore for application window */
-    if (getShell().getParent() == null)
-      return;
-
-    int barWidth = verticalBar.getSize().x;
-
-    if (wasScrollbarShowing != verticalBar.isVisible()) {
-      Rectangle shellBounds = getShell().getBounds();
-
-      /* Increase if Scrollbar now Visible */
-      if (!wasScrollbarShowing)
-        getShell().setBounds(shellBounds.x, shellBounds.y, shellBounds.width + barWidth, shellBounds.height);
-
-      /* Reduce if Scrollbar now Invisible */
-      else
-        getShell().setBounds(shellBounds.x, shellBounds.y, shellBounds.width - barWidth, shellBounds.height);
-    }
   }
 
   private void createActionMenu(Menu menu, NewsActionItem item) {
@@ -426,7 +401,7 @@ public class NewsActionList extends ScrolledComposite {
     if (fItems.size() == 0)
       addItem(getDefaultAction());
 
-    adjustSizeForScrollbar(wasScrollbarShowing);
+    OwlUI.adjustSizeForScrollbar(getShell(), getVerticalBar(), wasScrollbarShowing);
   }
 
   private IFilterAction createAction(IFilterAction current) {

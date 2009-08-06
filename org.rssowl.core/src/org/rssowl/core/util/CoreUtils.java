@@ -58,9 +58,11 @@ import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -249,6 +251,21 @@ public class CoreUtils {
     }
 
     return name.toString();
+  }
+
+  /**
+   * @param primitives An array that stores the IDs of {@link INewsBin}.
+   * @return a list of {@link INewsBin} loaded from the provided IDs.
+   */
+  public static List<INewsBin> toBins(Long[] primitives) {
+    List<INewsBin> bins = new ArrayList<INewsBin>(primitives.length);
+    for (Long id : primitives) {
+      INewsBin bin = DynamicDAO.load(INewsBin.class, id);
+      if (bin != null)
+        bins.add(bin);
+    }
+
+    return bins;
   }
 
   /**
@@ -1005,27 +1022,6 @@ public class CoreUtils {
   }
 
   /**
-   * @return all labels sorted by their sort value.
-   */
-  public static Set<ILabel> loadSortedLabels() {
-
-    /* Sort by Sort Key to respect order */
-    Set<ILabel> labels = new TreeSet<ILabel>(new Comparator<ILabel>() {
-      public int compare(ILabel l1, ILabel l2) {
-        if (l1.equals(l2))
-          return 0;
-
-        return l1.getOrder() < l2.getOrder() ? -1 : 1;
-      }
-    });
-
-    /* Add Labels */
-    labels.addAll(DynamicDAO.loadAll(ILabel.class));
-
-    return labels;
-  }
-
-  /**
    * @return all saved searches sorted by name.
    */
   public static Set<ISearchMark> loadSortedSearchMarks() {
@@ -1056,8 +1052,20 @@ public class CoreUtils {
     if (newsLabels.isEmpty())
       return newsLabels;
 
+    return sortLabels(newsLabels);
+  }
+
+  /**
+   * @return all labels sorted by their sort value.
+   */
+  public static Set<ILabel> loadSortedLabels() {
+    return sortLabels(DynamicDAO.loadAll(ILabel.class));
+  }
+
+  private static Set<ILabel> sortLabels(Collection<ILabel> labels) {
+
     /* Sort by Sort Key to respect order */
-    Set<ILabel> labels = new TreeSet<ILabel>(new Comparator<ILabel>() {
+    Set<ILabel> sortedLabels = new TreeSet<ILabel>(new Comparator<ILabel>() {
       public int compare(ILabel l1, ILabel l2) {
         if (l1.equals(l2))
           return 0;
@@ -1067,9 +1075,9 @@ public class CoreUtils {
     });
 
     /* Add Labels */
-    labels.addAll(newsLabels);
+    sortedLabels.addAll(labels);
 
-    return labels;
+    return sortedLabels;
   }
 
   /**
@@ -1158,6 +1166,29 @@ public class CoreUtils {
       if (fos != null) {
         try {
           fos.close();
+        } catch (IOException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+        }
+      }
+    }
+  }
+
+  /**
+   * @param fileName the name of the file to write the content into.
+   * @param content the content to write into the file as {@link StringBuilder}.
+   */
+  public static void write(String fileName, StringBuilder content) {
+    OutputStreamWriter writer = null;
+    try {
+      writer = new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8");
+      writer.write(content.toString());
+      writer.close();
+    } catch (IOException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    } finally {
+      if (writer != null) {
+        try {
+          writer.close();
         } catch (IOException e) {
           Activator.getDefault().logError(e.getMessage(), e);
         }

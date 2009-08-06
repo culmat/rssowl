@@ -30,6 +30,7 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.util.CoreUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,13 +51,7 @@ public class CopyNewsAction implements INewsAction {
    */
   public List<IEntity> run(List<INews> news, Object data) {
     Long[] binIds = (Long[]) data;
-    List<INewsBin> bins = new ArrayList<INewsBin>(binIds.length);
-    for (Long id : binIds) {
-      INewsBin bin = DynamicDAO.load(INewsBin.class, id);
-      if (bin != null)
-        bins.add(bin);
-    }
-
+    List<INewsBin> bins = CoreUtils.toBins(binIds);
     if (bins.isEmpty())
       return Collections.emptyList();
 

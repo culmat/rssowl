@@ -40,15 +40,12 @@ import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.ISearchValueType;
-import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.util.CoreUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 /**
  * <p>
@@ -434,7 +431,7 @@ public class SearchField implements ISearchField {
 
   /* Return the Label Values */
   private List<String> loadLabelValues() {
-    Collection<ILabel> labels = loadSortedLabels();
+    Collection<ILabel> labels = CoreUtils.loadSortedLabels();
 
     List<String> values = new ArrayList<String>(labels.size());
     for (ILabel label : labels) {
@@ -442,24 +439,6 @@ public class SearchField implements ISearchField {
     }
 
     return values;
-  }
-
-  private Set<ILabel> loadSortedLabels() {
-
-    /* Sort by Sort Key to respect order */
-    Set<ILabel> labels = new TreeSet<ILabel>(new Comparator<ILabel>() {
-      public int compare(ILabel l1, ILabel l2) {
-        if (l1.equals(l2))
-          return 0;
-
-        return l1.getOrder() < l2.getOrder() ? -1 : 1;
-      }
-    });
-
-    /* Add Labels */
-    labels.addAll(DynamicDAO.loadAll(ILabel.class));
-
-    return labels;
   }
 
   /**

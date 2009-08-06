@@ -70,9 +70,9 @@ import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.EditorPart;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.reference.NewsReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
-import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.Controller;
@@ -87,9 +87,6 @@ import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.CBrowser;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.util.List;
 
 /**
@@ -502,7 +499,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
 
         /* Configure Providers */
         shareMenu.add(new Separator());
-        shareMenu.add(new Action("&Configure...") {
+        shareMenu.add(new Action("&Organize...") {
           @Override
           public void run() {
             new ShareProvidersListDialog(fBrowser.getControl().getShell()).open();
@@ -713,22 +710,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
       return;
 
     /* Write into File */
-    OutputStreamWriter writer = null;
-    try {
-      writer = new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8");
-      writer.write(content.toString());
-      writer.close();
-    } catch (IOException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
-    } finally {
-      if (writer != null) {
-        try {
-          writer.close();
-        } catch (IOException e) {
-          Activator.getDefault().logError(e.getMessage(), e);
-        }
-      }
-    }
+    CoreUtils.write(fileName, content);
   }
 
   /*
