@@ -130,7 +130,12 @@ public class ImportOptionsPage extends WizardPage {
   public void setVisible(boolean visible) {
 
     /* Updated Checkboxes based on the Imported Elements */
-    ImportElementsPage elementsPage = (ImportElementsPage) getPreviousPage().getPreviousPage();
+    ImportElementsPage elementsPage;
+    if (getPreviousPage() instanceof ImportElementsPage)
+      elementsPage = (ImportElementsPage) getPreviousPage();
+    else
+      elementsPage = (ImportElementsPage) getPreviousPage().getPreviousPage();
+
     update(elementsPage.getLabelsToImport().size(), elementsPage.getFiltersToImport().size(), !elementsPage.getPreferencesToImport().isEmpty());
     fFiltersUseLabels = filtersUseLabels(elementsPage.getFiltersToImport());
 

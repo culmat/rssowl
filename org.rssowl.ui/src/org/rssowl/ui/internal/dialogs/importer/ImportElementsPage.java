@@ -288,6 +288,8 @@ public class ImportElementsPage extends WizardPage {
 
           if (!item.getChecked())
             setParentsChecked((IFolderChild) item.getData(), false);
+
+          updatePageComplete();
         }
       }
     });
@@ -315,6 +317,7 @@ public class ImportElementsPage extends WizardPage {
       @Override
       public void widgetSelected(SelectionEvent e) {
         OwlUI.setAllChecked(fViewer.getTree(), true);
+        updatePageComplete();
       }
     });
 
@@ -325,6 +328,7 @@ public class ImportElementsPage extends WizardPage {
       @Override
       public void widgetSelected(SelectionEvent e) {
         OwlUI.setAllChecked(fViewer.getTree(), false);
+        updatePageComplete();
       }
     });
 
@@ -465,13 +469,12 @@ public class ImportElementsPage extends WizardPage {
 
     if (clearErrors)
       setErrorMessage(null);
+
+    updatePageComplete();
   }
 
-  /*
-   * @see org.eclipse.jface.wizard.WizardPage#isPageComplete()
-   */
-  @Override
-  public boolean isPageComplete() {
-    return true;
+  private void updatePageComplete() {
+    boolean complete = (showOptionsPage() || fViewer.getCheckedElements().length > 0);
+    setPageComplete(complete);
   }
 }
