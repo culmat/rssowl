@@ -28,6 +28,7 @@ import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -36,7 +37,6 @@ import org.eclipse.core.runtime.Platform;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
-import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.IConditionalGetCompatible;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IConnectionService;
@@ -85,6 +85,31 @@ public class ConnectionTests {
     assertEquals("admin", proxyCredentials.getPassword());
     assertEquals("127.0.0.1", proxyCredentials.getHost());
     assertEquals(0, proxyCredentials.getPort());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testGetLabel() throws Exception {
+    IConnectionService conManager = Owl.getConnectionService();
+    URI feedUrl = new URI("http://www.rssowl.org/node/feed");
+    String label = conManager.getLabel(feedUrl);
+    assertEquals("RSSOwl - A Java RSS / RDF / Atom Newsreader - May the owl be with you", label);
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testGetFavicon() throws Exception {
+    IConnectionService conManager = Owl.getConnectionService();
+    URI feedUrl = new URI("http://www.rssowl.org/node/feed");
+    byte[] feedIcon = conManager.getFeedIcon(feedUrl);
+    assertNotNull(feedIcon);
+    assertTrue(feedIcon.length != 0);
   }
 
   /**
@@ -165,6 +190,24 @@ public class ConnectionTests {
   @SuppressWarnings("nls")
   public void testHTTPFeed() throws Exception {
     URI feedUrl = new URI("http://www.rssowl.org/rssowl2dg/tests/connection/rss_2_0.xml");
+    IFeed feed = new Feed(feedUrl);
+
+    InputStream inS = Owl.getConnectionService().getHandler(feed.getLink()).openStream(feed.getLink(), null, null);
+    assertNotNull(inS);
+
+    Owl.getInterpreter().interpret(inS, feed, null);
+    assertEquals("RSS 2.0", feed.getFormat());
+  }
+
+  /**
+   * Test a normal Feed via FEED Protocol.
+   *
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testFEEDFeed() throws Exception {
+    URI feedUrl = new URI("feed://www.rssowl.org/rssowl2dg/tests/connection/rss_2_0.xml");
     IFeed feed = new Feed(feedUrl);
 
     InputStream inS = Owl.getConnectionService().getHandler(feed.getLink()).openStream(feed.getLink(), null, null);
@@ -348,7 +391,7 @@ public class ConnectionTests {
         assertNull(id, feed.getFormat());
         Owl.getInterpreter().interpret(inS, feed, null);
         assertNotNull(id, feed.getFormat());
-      } catch (ConnectionException e) {
+      } catch (Exception e) {
         fail(feedUrlStr);
       }
     }
