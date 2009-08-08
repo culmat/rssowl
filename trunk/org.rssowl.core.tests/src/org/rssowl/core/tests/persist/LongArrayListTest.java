@@ -21,9 +21,12 @@
  **     RSSOwl Development Team - initial API and implementation             **
  **                                                                          **
  **  **********************************************************************  */
+
 package org.rssowl.core.tests.persist;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
 import org.rssowl.core.internal.persist.LongArrayList;
@@ -75,5 +78,25 @@ public class LongArrayListTest {
     list.add(1);
     list.add(2);
     list.get(3);
+  }
+
+  /**
+   * Test some more API of LongArrayList.
+   */
+  @Test
+  public void testApi() {
+    LongArrayList list = new LongArrayList(10);
+    list.add(0);
+    list.add(1);
+    list.add(2);
+
+    assertTrue(list.elementsEqual(new long[] { 0, 1, 2 }));
+    assertFalse(list.elementsEqual(new long[] { 1, 6, 2 }));
+
+    assertEquals(2, list.lastIndexOf(2));
+
+    list.removeByIndex(2);
+    assertEquals(2, list.size());
+    assertFalse(list.isEmpty());
   }
 }
