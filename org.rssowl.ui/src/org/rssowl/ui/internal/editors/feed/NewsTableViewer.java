@@ -31,8 +31,8 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.rssowl.core.persist.INews;
-import org.rssowl.ui.internal.util.ITreeNode;
-import org.rssowl.ui.internal.util.TreeTraversal;
+import org.rssowl.core.util.ITreeNode;
+import org.rssowl.core.util.TreeTraversal;
 import org.rssowl.ui.internal.util.WidgetTreeNode;
 
 /**
