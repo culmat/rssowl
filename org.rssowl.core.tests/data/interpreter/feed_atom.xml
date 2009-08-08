@@ -68,6 +68,9 @@
 	<entry>
 		<title type="html"><![CDATA[<p>atom_entry2.title</p>]]></title>
 		<content type="html"><![CDATA[<p>atom_entry2.description</p>]]></content>
+		<source>
+		  <link>atom_entry2.source.link</link>
+		</source>
 	</entry>
 	
 	<!-- Entry #3 using "xhtml" as type -->
@@ -85,5 +88,11 @@
 	<entry>
 		<title type="application/xhtml+xml"><div xmlns="http://www.w3.org/1999/xhtml"><p>atom_entry5.title</p></div></title>
 		<summary type="application/xhtml+xml"><div xmlns="http://www.w3.org/1999/xhtml"><p>atom_entry5.description</p></div></summary>
+	</entry>
+	
+	<!-- Entry #6 using "xhtml" as type and CDATA inside -->
+	<entry>
+		<title type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><![CDATA[<p>atom_entry6.title</p>]]></div></title>
+		<summary type="xhtml"><div xmlns="http://www.w3.org/1999/xhtml"><p>atom_entry6.description</p></div></summary>
 	</entry>
 </feed>
