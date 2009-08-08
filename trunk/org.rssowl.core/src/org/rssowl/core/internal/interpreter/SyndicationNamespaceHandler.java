@@ -37,7 +37,7 @@ import org.rssowl.core.util.DateUtils;
  * Namespace Prefix: sy<br>
  * Namespace URI: http://purl.org/rss/1.0/modules/syndication/
  * </p>
- * 
+ *
  * @author bpasero
  */
 public class SyndicationNamespaceHandler implements INamespaceHandler {
@@ -50,7 +50,7 @@ public class SyndicationNamespaceHandler implements INamespaceHandler {
     String name = element.getName().toLowerCase();
 
     /* Update Period */
-    if ("updatePeriod".equals(name) && type instanceof IFeed) { //$NON-NLS-1$
+    if ("updateperiod".equals(name) && type instanceof IFeed) { //$NON-NLS-1$
       String period = element.getText().toLowerCase();
       int index = IFeed.PERIODS.indexOf(period);
       if (index >= 0)
@@ -58,7 +58,7 @@ public class SyndicationNamespaceHandler implements INamespaceHandler {
     }
 
     /* Update Frequency */
-    else if ("updateFrequency".equals(name) && type instanceof IFeed) { //$NON-NLS-1$
+    else if ("updatefrequency".equals(name) && type instanceof IFeed) { //$NON-NLS-1$
       try {
         int value = Integer.parseInt(element.getText());
         ((IFeed) type).setUpdateFrequency(value);
@@ -68,7 +68,7 @@ public class SyndicationNamespaceHandler implements INamespaceHandler {
     }
 
     /* Update Base */
-    else if ("updateBase".equals(name) && type instanceof IFeed) //$NON-NLS-1$
+    else if ("updatebase".equals(name) && type instanceof IFeed) //$NON-NLS-1$
       ((IFeed) type).setUpdateBase(DateUtils.parseDate(element.getText()));
   }
 
