@@ -53,7 +53,6 @@ import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.RegExUtils;
 import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.ui.internal.EntityGroup;
-import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
 import org.rssowl.ui.internal.actions.NewBookMarkAction;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
@@ -566,7 +565,7 @@ public class BookMarkDNDImpl extends ViewerDropAdapter implements DragSourceList
       final List<ReparentInfo<IFolderChild, IFolder>> finalReparenting = reparenting;
       BusyIndicator.showWhile(getViewer().getControl().getDisplay(), new Runnable() {
         public void run() {
-          OwlUI.reparentWithProperties(finalReparenting);
+          CoreUtils.reparentWithProperties(finalReparenting);
         }
       });
     }
