@@ -28,6 +28,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
+import org.rssowl.core.util.ITreeNode;
 import org.rssowl.ui.internal.views.explorer.BookMarkViewer;
 
 /**
