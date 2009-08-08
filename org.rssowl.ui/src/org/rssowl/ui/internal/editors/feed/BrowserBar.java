@@ -56,6 +56,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
@@ -68,7 +69,7 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.ShareProvider;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
-import org.rssowl.ui.internal.dialogs.ShareProvidersListDialog;
+import org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage;
 import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.CBrowser;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -329,10 +330,10 @@ public class BrowserBar {
 
         /* Configure Providers */
         shareMenu.add(new Separator());
-        shareMenu.add(new Action("&Organize...") {
+        shareMenu.add(new Action("&Configure...") {
           @Override
           public void run() {
-            new ShareProvidersListDialog(fBrowser.getControl().getShell()).open();
+            PreferencesUtil.createPreferenceDialogOn(fBrowser.getControl().getShell(), SharingPreferencesPage.ID, null, null).open();
           };
         });
 

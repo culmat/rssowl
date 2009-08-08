@@ -149,6 +149,7 @@ import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage;
+import org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserViewer;
 import org.rssowl.ui.internal.editors.feed.NewsColumn;
@@ -1912,10 +1913,10 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
           /* Configure Providers */
           shareMenu.add(new Separator());
-          shareMenu.add(new Action("&Organize...") {
+          shareMenu.add(new Action("&Configure...") {
             @Override
             public void run() {
-              new ShareProvidersListDialog(fResultViewer.getTable().getShell()).open();
+              PreferencesUtil.createPreferenceDialogOn(fResultViewer.getTable().getShell(), SharingPreferencesPage.ID, null, null).open();
             };
           });
         }

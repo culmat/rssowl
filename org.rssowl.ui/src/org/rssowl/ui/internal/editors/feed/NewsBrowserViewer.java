@@ -89,8 +89,8 @@ import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
-import org.rssowl.ui.internal.dialogs.ShareProvidersListDialog;
 import org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage;
+import org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider.Dynamic;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
 import org.rssowl.ui.internal.undo.StickyOperation;
@@ -370,10 +370,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
           /* Configure Providers */
           shareMenu.add(new Separator());
-          shareMenu.add(new Action("&Organize...") {
+          shareMenu.add(new Action("&Configure...") {
             @Override
             public void run() {
-              new ShareProvidersListDialog(fBrowser.getControl().getShell()).open();
+              PreferencesUtil.createPreferenceDialogOn(fBrowser.getControl().getShell(), SharingPreferencesPage.ID, null, null).open();
             };
           });
         }
@@ -471,10 +471,10 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
         /* Configure Providers */
         manager.add(new Separator());
-        manager.add(new Action("&Organize...") {
+        manager.add(new Action("&Configure...") {
           @Override
           public void run() {
-            new ShareProvidersListDialog(fBrowser.getControl().getShell()).open();
+            PreferencesUtil.createPreferenceDialogOn(fBrowser.getControl().getShell(), SharingPreferencesPage.ID, null, null).open();
           };
         });
       }

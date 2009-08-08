@@ -88,6 +88,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.progress.IWorkbenchSiteProgressService;
 import org.rssowl.core.Owl;
@@ -111,7 +112,10 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.reference.ModelReference;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.ITreeNode;
+import org.rssowl.core.util.ModelTreeNode;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.TreeTraversal;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
@@ -130,14 +134,11 @@ import org.rssowl.ui.internal.actions.RetargetActions;
 import org.rssowl.ui.internal.actions.SearchInTypeAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.dialogs.ManageSetsDialog;
-import org.rssowl.ui.internal.dialogs.ShareProvidersListDialog;
+import org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.EditorUtils;
-import org.rssowl.ui.internal.util.ITreeNode;
 import org.rssowl.ui.internal.util.JobRunner;
-import org.rssowl.ui.internal.util.ModelTreeNode;
-import org.rssowl.ui.internal.util.TreeTraversal;
 import org.rssowl.ui.internal.util.WidgetTreeNode;
 
 import java.util.ArrayList;
@@ -1275,10 +1276,10 @@ public class BookMarkExplorer extends ViewPart {
 
           /* Configure Providers */
           shareMenu.add(new Separator());
-          shareMenu.add(new Action("&Organize...") {
+          shareMenu.add(new Action("&Configure...") {
             @Override
             public void run() {
-              new ShareProvidersListDialog(fViewer.getTree().getShell()).open();
+              PreferencesUtil.createPreferenceDialogOn(fViewer.getTree().getShell(), SharingPreferencesPage.ID, null, null).open();
             };
           });
         }

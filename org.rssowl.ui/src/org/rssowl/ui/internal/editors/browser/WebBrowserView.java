@@ -67,6 +67,7 @@ import org.eclipse.ui.IPartListener2;
 import org.eclipse.ui.IReusableEditor;
 import org.eclipse.ui.IWorkbenchPartReference;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.part.EditorPart;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.reference.NewsReference;
@@ -81,7 +82,7 @@ import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.ShareProvider;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
-import org.rssowl.ui.internal.dialogs.ShareProvidersListDialog;
+import org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.CBrowser;
@@ -499,10 +500,10 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
 
         /* Configure Providers */
         shareMenu.add(new Separator());
-        shareMenu.add(new Action("&Organize...") {
+        shareMenu.add(new Action("&Configure...") {
           @Override
           public void run() {
-            new ShareProvidersListDialog(fBrowser.getControl().getShell()).open();
+            PreferencesUtil.createPreferenceDialogOn(fBrowser.getControl().getShell(), SharingPreferencesPage.ID, null, null).open();
           };
         });
 

@@ -46,7 +46,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -82,6 +81,7 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
   private Button fMoveDownButton;
   private Button fMoveUpButton;
   private CheckboxTableViewer fViewer;
+  private int[] fInitialShareProviderState;
 
   /** Leave for reflection */
   public SharingPreferencesPage() {
@@ -94,7 +94,7 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
    * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
    */
   public void init(IWorkbench workbench) {
-    noDefaultAndApplyButton();
+    fInitialShareProviderState = fPreferences.getIntegers(DefaultPreferences.SHARE_PROVIDER_STATE);
   }
 
   /*
@@ -108,7 +108,7 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
     ((GridData) infoText.getLayoutData()).widthHint = 200;
     infoText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-    infoText.setText("Select from the following list of available communities to share your Bookmarks and News with:");
+    infoText.setText("Select from the following list of available communities to share your Bookmarks and News with others:");
 
     Composite tableContainer = new Composite(container, SWT.NONE);
     tableContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
@@ -143,11 +143,9 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
       @Override
       public void update(ViewerCell cell) {
         ShareProvider provider = (ShareProvider) cell.getElement();
-        Display display = fViewer.getControl().getDisplay();
         cell.setText(provider.getName());
         if (StringUtils.isSet(provider.getIconPath()))
           cell.setImage(fResources.createImage(OwlUI.getImageDescriptor(provider.getPluginId(), provider.getIconPath())));
-        cell.setForeground(provider.isEnabled() ? display.getSystemColor(SWT.COLOR_BLACK) : display.getSystemColor(SWT.COLOR_DARK_GRAY));
       }
     });
 
@@ -235,6 +233,19 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
         onSelectAll(true);
       }
     });
+
+    /* Info Container */
+    Composite infoContainer = new Composite(container, SWT.None);
+    infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+    infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+
+    Label infoImg = new Label(infoContainer, SWT.NONE);
+    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
+    infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    Label infoTextLabel = new Label(infoContainer, SWT.WRAP);
+    infoTextLabel.setText("Enabled communities will appar in the menu for selected Bookmarks and News.");
+    infoTextLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
     return container;
   }
@@ -349,6 +360,38 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
   public boolean performOk() {
     save();
     return super.performOk();
+  }
+
+  /*
+   * @see org.eclipse.jface.preference.PreferencePage#performDefaults()
+   */
+  @Override
+  protected void performDefaults() {
+    IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
+    int[] defaultState = defaultScope.getIntegers(DefaultPreferences.SHARE_PROVIDER_STATE);
+
+    Owl.getPreferenceService().getGlobalScope().putIntegers(DefaultPreferences.SHARE_PROVIDER_STATE, defaultState);
+    fViewer.refresh();
+    updateCheckedState();
+    updateMoveEnablement();
+  }
+
+  /*
+   * @see org.eclipse.jface.preference.PreferencePage#performApply()
+   */
+  @Override
+  protected void performApply() {
+    super.performApply();
+    fInitialShareProviderState = fPreferences.getIntegers(DefaultPreferences.SHARE_PROVIDER_STATE);
+  }
+
+  /*
+   * @see org.eclipse.jface.preference.PreferencePage#performCancel()
+   */
+  @Override
+  public boolean performCancel() {
+    fPreferences.putIntegers(DefaultPreferences.SHARE_PROVIDER_STATE, fInitialShareProviderState);
+    return super.performCancel();
   }
 
   /*

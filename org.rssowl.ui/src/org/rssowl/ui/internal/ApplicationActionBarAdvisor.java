@@ -81,10 +81,10 @@ import org.rssowl.ui.internal.actions.SearchNewsAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.UndoAction;
-import org.rssowl.ui.internal.dialogs.ShareProvidersListDialog;
 import org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.dialogs.preferences.NotifierPreferencesPage;
 import org.rssowl.ui.internal.dialogs.preferences.OverviewPreferencesPage;
+import org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
@@ -711,10 +711,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
           /* Configure Providers */
           shareMenu.add(new Separator());
-          shareMenu.add(new Action("&Organize...") {
+          shareMenu.add(new Action("&Configure...") {
             @Override
             public void run() {
-              new ShareProvidersListDialog(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell()).open();
+              PreferencesUtil.createPreferenceDialogOn(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), SharingPreferencesPage.ID, null, null).open();
             };
           });
         }
