@@ -419,7 +419,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
     }
 
     /* Perform reparenting */
-    OwlUI.reparentWithProperties(reparenting);
+    CoreUtils.reparentWithProperties(reparenting);
     fViewer.setSelection(fViewer.getSelection());
   }
 
