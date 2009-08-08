@@ -62,6 +62,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
@@ -610,7 +611,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       }
 
       /* Perform Reparenting */
-      OwlUI.reparentWithProperties(reparenting);
+      CoreUtils.reparentWithProperties(reparenting);
     }
   }
 
