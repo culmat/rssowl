@@ -37,7 +37,7 @@ import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.util.CoreUtils;
-import org.rssowl.ui.internal.util.StringMatcher;
+import org.rssowl.core.util.StringMatcher;
 
 import java.text.BreakIterator;
 import java.util.ArrayList;
