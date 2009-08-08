@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.Assert;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.reference.FolderReference;
 import org.rssowl.core.persist.reference.NewsReference;
 
 import java.text.DateFormat;
@@ -154,13 +153,6 @@ public abstract class Mark extends AbstractEntity implements IMark {
         news.add(newsItem);
     }
     return news;
-  }
-
-  /**
-   * @return a uncached reference to the parent folder.
-   */
-  protected FolderReference getFolderReference() {
-    return getParent() == null ? null : new FolderReference(getParent().getId());
   }
 
   @Override
