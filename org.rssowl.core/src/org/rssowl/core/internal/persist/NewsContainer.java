@@ -139,44 +139,6 @@ public final class NewsContainer {
     return news.getState().ordinal();
   }
 
-  public LongIterator getNewsIterator() {
-    return new LongIterator() {
-      private int outerIndex = 0;
-      private int innerIndex = 0;
-      public boolean hasNext() {
-        if (outerIndex < fNewsIds.length - 1) {
-          if (innerIndex < fNewsIds[outerIndex].size() - 1)
-            return true;
-
-          for (int i = outerIndex + 1, c = fNewsIds.length; i < c; ++i) {
-            if (fNewsIds[i].size() > 0)
-              return true;
-          }
-          return false;
-        }
-
-        if (outerIndex == fNewsIds.length - 1) {
-          return innerIndex < fNewsIds[outerIndex].size() - 1;
-        }
-        return false;
-      }
-
-      public long next() {
-        long value = fNewsIds[outerIndex].get(innerIndex);
-        Assert.isLegal(value > 0);
-
-        if (innerIndex < fNewsIds[outerIndex].size() - 1)
-          ++innerIndex;
-        else {
-          ++outerIndex;
-          innerIndex = 0;
-        }
-
-        return value;
-      }
-    };
-  }
-
   public boolean removeNews(INews news) {
     checkNewsIdNotNull(news);
     return fNewsIds[getIndex(news)].removeByElement(news.getId());
@@ -225,16 +187,6 @@ public final class NewsContainer {
     }
 
     return newsRefs;
-  }
-
-  public List<NewsReference> getVisibleNews() {
-    return getNews(INews.State.getVisible());
-  }
-
-  void compact() {
-    for (int i = 0; i < fNewsIds.length; i++) {
-      fNewsIds[i].compact();
-    }
   }
 
   public List<NewsReference> removeNews(Set<INews.State> states) {
