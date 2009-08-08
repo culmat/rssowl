@@ -117,8 +117,8 @@ import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
-import org.rssowl.ui.internal.dialogs.ShareProvidersListDialog;
 import org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage;
+import org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
 import org.rssowl.ui.internal.undo.UndoStack;
@@ -977,10 +977,10 @@ public class NewsTableControl implements IFeedViewPart {
 
           /* Configure Providers */
           shareMenu.add(new Separator());
-          shareMenu.add(new Action("&Organize...") {
+          shareMenu.add(new Action("&Configure...") {
             @Override
             public void run() {
-              new ShareProvidersListDialog(fViewer.getTree().getShell()).open();
+              PreferencesUtil.createPreferenceDialogOn(fViewer.getTree().getShell(), SharingPreferencesPage.ID, null, null).open();
             };
           });
         }
