@@ -34,9 +34,9 @@ import org.rssowl.core.internal.persist.Folder;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.reference.FeedLinkReference;
-import org.rssowl.ui.internal.util.ITreeNode;
-import org.rssowl.ui.internal.util.ModelTreeNode;
-import org.rssowl.ui.internal.util.TreeTraversal;
+import org.rssowl.core.util.ITreeNode;
+import org.rssowl.core.util.ModelTreeNode;
+import org.rssowl.core.util.TreeTraversal;
 
 import java.net.URI;
 import java.net.URISyntaxException;

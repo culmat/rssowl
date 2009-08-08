@@ -27,7 +27,7 @@ package org.rssowl.core.tests.ui;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.rssowl.ui.internal.util.ExpandingReader;
+import org.rssowl.core.util.ExpandingReader;
 
 import java.io.IOException;
 import java.io.Reader;
