@@ -228,7 +228,7 @@ public class RSSInterpreter extends BasicInterpreter {
       /* Skip Hours */
       else if ("skiphours".equals(name)) { //$NON-NLS-1$
         processNamespaceAttributes(child, feed);
-        List< ? > skipHoursChildren = element.getChildren("hour"); //$NON-NLS-1$
+        List< ? > skipHoursChildren = child.getChildren("hour"); //$NON-NLS-1$
 
         /* For each <hour> Element */
         for (Iterator< ? > iterator = skipHoursChildren.iterator(); iterator.hasNext();) {
@@ -244,7 +244,7 @@ public class RSSInterpreter extends BasicInterpreter {
       /* Skip Days */
       else if ("skipdays".equals(name)) { //$NON-NLS-1$
         processNamespaceAttributes(child, feed);
-        List< ? > skipDaysChildren = element.getChildren("day"); //$NON-NLS-1$
+        List< ? > skipDaysChildren = child.getChildren("day"); //$NON-NLS-1$
 
         /* For each <day> Element */
         for (Iterator< ? > iterator = skipDaysChildren.iterator(); iterator.hasNext();) {
