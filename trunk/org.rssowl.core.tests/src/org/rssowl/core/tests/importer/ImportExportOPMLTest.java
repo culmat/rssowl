@@ -119,7 +119,7 @@ public class ImportExportOPMLTest {
     Owl.getPersistenceService().recreateSchema();
 
     fFactory = Owl.getModelFactory();
-    fTmpFile = File.createTempFile("rssowl", ".opml");
+    fTmpFile = File.createTempFile("rssowl", ".opml2"); //Test the fallback to OPML format too
     fTmpFile.deleteOnExit();
 
     fTmpFileOnlyMarks = File.createTempFile("rssowl_onlymarks", ".opml");
@@ -400,7 +400,7 @@ public class ImportExportOPMLTest {
   private void fillSearchMarks(IFolder parent) {
     String newsName = INews.class.getName();
 
-    /* 1) State ISnew */
+    /* 1) State IS new */
     {
       ISearchField field = fFactory.createSearchField(INews.STATE, newsName);
       ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, EnumSet.of(State.NEW));
@@ -410,7 +410,7 @@ public class ImportExportOPMLTest {
       addProperties(Owl.getPreferenceService().getEntityScope(fSearchmark));
     }
 
-    /* 2) State ISnewunreadupdated */
+    /* 2) State IS new, unread, updated */
     {
       ISearchField field = fFactory.createSearchField(INews.STATE, newsName);
       ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, EnumSet.of(State.NEW, State.UNREAD, State.UPDATED));
@@ -1215,5 +1215,16 @@ public class ImportExportOPMLTest {
     assertEquals(1, customSet.getChildren().size());
     assertTrue(customSet.getChildren().get(0) instanceof IBookMark);
     assertEquals(fBookMark2.getName(), customSet.getChildren().get(0).getName());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @SuppressWarnings("null")
+  @Test
+  public void testExportFormats() throws Exception {
+    Collection<String> formats = Owl.getInterpreter().getExportFormats();
+    assertTrue(formats.contains("opml"));
+    assertTrue(formats.contains("xml"));
   }
 }
