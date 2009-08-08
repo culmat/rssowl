@@ -91,7 +91,6 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
-import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INewsBin;
@@ -106,7 +105,6 @@ import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
-import org.rssowl.core.util.ReparentInfo;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.editors.browser.WebBrowserInput;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
@@ -121,7 +119,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.DateFormat;
@@ -135,7 +132,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -1691,26 +1687,6 @@ public class OwlUI {
         region.dispose();
       }
     }
-  }
-
-  /**
-   * @param reparenting
-   */
-  public static void reparentWithProperties(List<ReparentInfo<IFolderChild, IFolder>> reparenting) {
-
-    /* Copy over Properties from new Parent that are unset in folder child */
-    for (ReparentInfo<IFolderChild, IFolder> info : reparenting) {
-      IFolderChild objToReparent = info.getObject();
-      IFolder newParent = info.getNewParent();
-      Set<Entry<String, Serializable>> set = newParent.getProperties().entrySet();
-      for (Entry<String, Serializable> entry : set) {
-        if (objToReparent.getProperty(entry.getKey()) == null)
-          objToReparent.setProperty(entry.getKey(), entry.getValue());
-      }
-    }
-
-    /* Perform Reparenting */
-    Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(reparenting);
   }
 
   /**
