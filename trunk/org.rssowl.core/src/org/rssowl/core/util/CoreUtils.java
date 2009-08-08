@@ -63,6 +63,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1214,5 +1215,25 @@ public class CoreUtils {
     }
 
     return newList;
+  }
+
+  /**
+   * @param reparenting
+   */
+  public static void reparentWithProperties(List<ReparentInfo<IFolderChild, IFolder>> reparenting) {
+
+    /* Copy over Properties from new Parent that are unset in folder child */
+    for (ReparentInfo<IFolderChild, IFolder> info : reparenting) {
+      IFolderChild objToReparent = info.getObject();
+      IFolder newParent = info.getNewParent();
+      Set<Entry<String, Serializable>> set = newParent.getProperties().entrySet();
+      for (Entry<String, Serializable> entry : set) {
+        if (objToReparent.getProperty(entry.getKey()) == null)
+          objToReparent.setProperty(entry.getKey(), entry.getValue());
+      }
+    }
+
+    /* Perform Reparenting */
+    Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(reparenting);
   }
 }
