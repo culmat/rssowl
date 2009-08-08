@@ -25,6 +25,7 @@
 package org.rssowl.core.tests.controller;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Before;
@@ -34,6 +35,7 @@ import org.rssowl.core.internal.persist.Feed;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.INewsCounterDAO;
@@ -69,9 +71,23 @@ public class ControllerTestNetwork {
   public void testReloadFeed() throws Exception {
     IFeed feed = new Feed(new URI("http://www.rssowl.org/rssowl2dg/tests/manager/rss_2_0.xml")); //$NON-NLS-1$
     feed = DynamicDAO.save(feed);
-    Controller.getDefault().reload(createBookMark(feed), null, new NullProgressMonitor());
+    IBookMark bookmark = createBookMark(feed);
+
+    assertTrue(bookmark.getNewsRefs().isEmpty());
+    assertTrue(bookmark.getNewsRefs(INews.State.getVisible()).isEmpty());
+    assertTrue(bookmark.getNews().isEmpty());
+    assertTrue(bookmark.getNews(INews.State.getVisible()).isEmpty());
+    assertEquals(0, bookmark.getNewsCount(INews.State.getVisible()));
+
+    Controller.getDefault().reload(bookmark, null, new NullProgressMonitor());
 
     assertEquals(new FeedReference(feed.getId()).resolve().getFormat(), "RSS 2.0"); //$NON-NLS-1$
+
+    assertEquals(15, bookmark.getNewsRefs().size());
+    assertEquals(15, bookmark.getNewsRefs(INews.State.getVisible()).size());
+    assertEquals(15, bookmark.getNews().size());
+    assertEquals(15, bookmark.getNews(INews.State.getVisible()).size());
+    assertEquals(15, bookmark.getNewsCount(INews.State.getVisible()));
   }
 
   /**
