@@ -49,6 +49,7 @@ import org.rssowl.core.persist.ISource;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
+import org.rssowl.core.util.ExpandingReader;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
@@ -56,7 +57,6 @@ import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.util.ExpandingReader;
 
 import java.io.IOException;
 import java.io.StringReader;
