@@ -90,7 +90,7 @@ public class InterpreterTest {
     assertEquals(new URI("atom_author.uri"), feed.getAuthor().getUri());
     assertEquals(new URI("atom_author.email"), feed.getAuthor().getEmail());
 
-    assertEquals(5, feed.getNews().size());
+    assertEquals(6, feed.getNews().size());
 
     INews news1 = feed.getNews().get(0);
     assertEquals("atom_entry1.title", news1.getTitle());
@@ -131,6 +131,9 @@ public class InterpreterTest {
     assertEquals("<p>atom_entry2.description</p>", news2.getDescription());
     assertEquals(new URI("http://www.feed-uri.de"), news2.getBase());
 
+    assertNotNull(news2.getSource());
+    assertEquals(new URI("atom_entry2.source.link"), news2.getSource().getLink());
+
     INews news3 = feed.getNews().get(2);
     assertEquals("<p xmlns=\"http://www.w3.org/1999/xhtml\">atom_entry3.title</p>", news3.getTitle());
     assertEquals("<p xmlns=\"http://www.w3.org/1999/xhtml\">atom_entry3.description</p>", news3.getDescription());
@@ -142,6 +145,9 @@ public class InterpreterTest {
     INews news5 = feed.getNews().get(4);
     assertEquals("<p xmlns=\"http://www.w3.org/1999/xhtml\">atom_entry5.title</p>", news5.getTitle());
     assertEquals("<p xmlns=\"http://www.w3.org/1999/xhtml\">atom_entry5.description</p>", news5.getDescription());
+
+    INews news6 = feed.getNews().get(5);
+    assertEquals("<p>atom_entry6.title</p>", news6.getTitle());
   }
 
   /**
@@ -266,7 +272,7 @@ public class InterpreterTest {
     assertEquals("rdf_image.title", feed.getImage().getTitle());
     assertEquals(new URI("rdf_image.link"), feed.getImage().getHomepage());
 
-    assertEquals(3, feed.getNews().size());
+    assertEquals(4, feed.getNews().size());
 
     INews news1 = feed.getNews().get(0);
     assertEquals("rdf_item1.title", news1.getTitle());
@@ -283,6 +289,11 @@ public class InterpreterTest {
 
     assertNotNull(news1.getSource());
     assertEquals(new URI("rdf_item1.source"), news1.getSource().getLink());
+
+    INews news4 = feed.getNews().get(3);
+    assertEquals("rdf_item4.title", news4.getTitle());
+    assertEquals(new URI("rdf_item4.link"), news4.getLink());
+    assertEquals("rdf_item4.description", news4.getDescription());
   }
 
   /**
@@ -471,8 +482,8 @@ public class InterpreterTest {
   }
 
   /**
-   * Test a Feed using undeclared Entities.
-   * TODO: Enable again once it succeeds on Java 1.6 (see Bug 325)
+   * Test a Feed using undeclared Entities. TODO: Enable again once it succeeds
+   * on Java 1.6 (see Bug 325)
    *
    * @throws Exception
    */
@@ -911,7 +922,18 @@ public class InterpreterTest {
     assertEquals("Comment from bugzilla_who", news.getTitle());
     assertEquals("bugzilla_thetext", news.getDescription());
     assertEquals(DateUtils.parseDate("2006-01-12 22:29"), news.getModifiedDate());
+  }
 
-    // TODO_KAY weitere Tests
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testSyndicationNamespace() throws Exception {
+    InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_syndication.xml");
+    IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_syndication.xml"));
+    Owl.getInterpreter().interpret(inS, feed, null);
+
+    assertEquals("RSS 2.0", feed.getFormat());
   }
 }
