@@ -114,6 +114,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -222,6 +223,7 @@ public class Controller {
   private ListenerList fBookMarkLoadListeners = new ListenerList();
   private final int fConnectionTimeout;
   private List<ShareProvider> fShareProviders = new ArrayList<ShareProvider>();
+  private Map<Long, Long> fDeletedBookmarksCache = new ConcurrentHashMap<Long, Long>();
 
   /**
    * A listener that informs when a {@link IBookMark} is getting reloaded from
@@ -328,12 +330,15 @@ public class Controller {
 
   private void registerListeners() {
 
-    /* Delete Favicon when Bookmark gets deleted */
+    /* Delete Favicon when Bookmark gets deleted and remember ID */
     fBookMarkListener = new BookMarkAdapter() {
       @Override
       public void entitiesDeleted(Set<BookMarkEvent> events) {
         for (BookMarkEvent event : events) {
-          OwlUI.deleteImage(event.getEntity().getId());
+          Long id = event.getEntity().getId();
+          OwlUI.deleteImage(id);
+          if (id != null)
+            fDeletedBookmarksCache.put(id, id);
         }
       }
     };
@@ -568,8 +573,8 @@ public class Controller {
 
     try {
 
-      /* Return on Cancelation or shutdown */
-      if (monitor.isCanceled() || fShuttingDown)
+      /* Return on Cancelation or shutdown or deletion */
+      if (!shouldProceedReloading(monitor, bookmark))
         return Status.CANCEL_STATUS;
 
       /* Notify about Bookmark getting loaded */
@@ -593,11 +598,15 @@ public class Controller {
           properties.put(IConnectionPropertyConstants.IF_NONE_MATCH, ifNoneMatch);
       }
 
+      /* Return on Cancelation or shutdown or deletion */
+      if (!shouldProceedReloading(monitor, bookmark))
+        return Status.CANCEL_STATUS;
+
       /* Load the Feed */
       final Pair<IFeed, IConditionalGet> pairResult = Owl.getConnectionService().reload(feedLink, monitor, properties);
 
-      /* Return on Cancelation or Shutdown */
-      if (monitor.isCanceled() || fShuttingDown)
+      /* Return on Cancelation or shutdown or deletion */
+      if (!shouldProceedReloading(monitor, bookmark))
         return Status.CANCEL_STATUS;
 
       /* Update ConditionalGet Entity */
@@ -605,8 +614,8 @@ public class Controller {
       conditionalGet = updateConditionalGet(feedLink, conditionalGet, pairResult.getSecond());
       boolean deleteConditionalGet = (!conditionalGetIsNull && conditionalGet == null);
 
-      /* Return on Cancelation or Shutdown */
-      if (monitor.isCanceled() || fShuttingDown)
+      /* Return on Cancelation or shutdown or deletion */
+      if (!shouldProceedReloading(monitor, bookmark))
         return Status.CANCEL_STATUS;
 
       /* Load the Favicon directly afterwards if required */
@@ -624,15 +633,15 @@ public class Controller {
             faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
 
           /* Store locally */
-          if (!monitor.isCanceled() && !fShuttingDown)
+          if (shouldProceedReloading(monitor, bookmark))
             OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK, 16, 16);
         } catch (UnknownFeedException e) {
           Activator.getDefault().getLog().log(e.getStatus());
         }
       }
 
-      /* Return on Cancelation or Shutdown */
-      if (monitor.isCanceled() || fShuttingDown)
+      /* Return on Cancelation or shutdown or deletion */
+      if (!shouldProceedReloading(monitor, bookmark))
         return Status.CANCEL_STATUS;
 
       /* Merge and Save Feed */
@@ -640,10 +649,10 @@ public class Controller {
         final IConditionalGet finalConditionalGet = conditionalGet;
         final boolean finalDeleteConditionalGet = deleteConditionalGet;
         fSaveFeedQueue.schedule(new TaskAdapter() {
-          public IStatus run(IProgressMonitor monitor) {
+          public IStatus run(IProgressMonitor otherMonitor) {
 
-            /* Return on Cancelation or Shutdown */
-            if (monitor.isCanceled() || fShuttingDown)
+            /* Return on Cancelation or shutdown or deletion */
+            if (otherMonitor.isCanceled() || !shouldProceedReloading(monitor, bookmark))
               return Status.CANCEL_STATUS;
 
             /* Handle Feed Reload */
@@ -667,7 +676,7 @@ public class Controller {
 
       /* Authentication Required */
       final Shell[] shellAr = new Shell[] { shell };
-      if (e instanceof AuthenticationRequiredException && !fShuttingDown) {
+      if (e instanceof AuthenticationRequiredException && shouldProceedReloading(monitor, bookmark)) {
 
         /* Resolve active Shell if necessary */
         if (shellAr[0] == null || shellAr[0].isDisposed()) {
@@ -686,14 +695,14 @@ public class Controller {
             JobRunner.runSyncedInUIThread(shellAr[0], new Runnable() {
               public void run() {
 
-                /* Check for shutdown flag and return if required */
-                if (fShuttingDown || monitor.isCanceled())
+                /* Return on Cancelation or shutdown or deletion */
+                if (!shouldProceedReloading(monitor, bookmark))
                   return;
 
                 /* Credentials might have been provided meanwhile in another dialog */
                 try {
                   URI normalizedUri = URIUtils.normalizeUri(feedLink, true);
-                  if (!fShuttingDown && Owl.getConnectionService().getAuthCredentials(normalizedUri, authEx.getRealm()) != null) {
+                  if (Owl.getConnectionService().getAuthCredentials(normalizedUri, authEx.getRealm()) != null) {
                     reloadQueued(bookmark, shellAr[0]);
                     return;
                   }
@@ -703,7 +712,7 @@ public class Controller {
 
                 /* Show Login Dialog */
                 LoginDialog login = new LoginDialog(shellAr[0], feedLink, authEx.getRealm());
-                if (login.open() == Window.OK && !fShuttingDown) {
+                if (login.open() == Window.OK && shouldProceedReloading(monitor, bookmark)) {
 
                   /* Store info about Realm in Bookmark */
                   if (StringUtils.isSet(authEx.getRealm())) {
@@ -716,7 +725,7 @@ public class Controller {
                 }
 
                 /* Update Error Flag if user hit Cancel */
-                else if (!fShuttingDown && !monitor.isCanceled() && !bookmark.isErrorLoading()) {
+                else if (shouldProceedReloading(monitor, bookmark) && !bookmark.isErrorLoading()) {
                   bookmark.setErrorLoading(true);
                   if (StringUtils.isSet(authEx.getMessage()))
                     bookmark.setProperty(LOAD_ERROR_KEY, authEx.getMessage());
@@ -738,7 +747,7 @@ public class Controller {
       }
 
       /* Load the Favicon directly afterwards if required */
-      else if ((e instanceof InterpreterException || e instanceof ParserException) && OwlUI.getFavicon(bookmark) == null && !fShuttingDown) {
+      else if ((e instanceof InterpreterException || e instanceof ParserException) && OwlUI.getFavicon(bookmark) == null && shouldProceedReloading(monitor, bookmark)) {
         try {
           byte[] faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
           OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK, 16, 16);
@@ -763,8 +772,8 @@ public class Controller {
 
   private void updateErrorIndicator(final IBookMark bookmark, final IProgressMonitor monitor, CoreException ex) {
 
-    /* Return on Cancelation or Shutdown */
-    if (monitor.isCanceled() || fShuttingDown)
+    /* Return on Cancelation or shutdown or deletion */
+    if (!shouldProceedReloading(monitor, bookmark))
       return;
 
     /* Reset Error-Loading flag if necessary */
@@ -781,6 +790,27 @@ public class Controller {
         bookmark.setProperty(LOAD_ERROR_KEY, ex.getMessage());
       fBookMarkDAO.save(bookmark);
     }
+  }
+
+  private boolean shouldProceedReloading(IProgressMonitor monitor, IBookMark mark) {
+    if (fShuttingDown)
+      return false;
+
+    if (monitor.isCanceled())
+      return false;
+
+    if (isDeleted(mark))
+      return false;
+
+    return true;
+  }
+
+  private boolean isDeleted(IBookMark mark) {
+    Long id = mark.getId();
+    if (id != null)
+      return fDeletedBookmarksCache.containsKey(id);
+
+    return false;
   }
 
   /*
