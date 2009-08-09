@@ -44,8 +44,10 @@ import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPerson;
+import org.rssowl.core.persist.ISearch;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -443,5 +445,41 @@ public class ModelTest4 {
     assertEquals(2, child.getChildren().size());
     assertEquals("Child 3", child.getFolders().get(0).getName());
     assertEquals("Child 1", child.getFolders().get(1).getName());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testFeedLinkReferenceReferences() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    feed = DynamicDAO.save(feed);
+
+    assertTrue(new FeedLinkReference(feed.getLink()).references(feed));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSearchFilterReference() throws Exception {
+    ISearchFilter filter = fFactory.createSearchFilter(null, null, "All News");
+    filter.setMatchAllNews(true);
+    filter.setEnabled(true);
+
+    filter = DynamicDAO.save(filter);
+
+    assertEquals(filter, filter.toReference().resolve());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSearchReference() throws Exception {
+    ISearch search = fFactory.createSearch(null);
+    search = DynamicDAO.save(search);
+
+    assertEquals(search, search.toReference().resolve());
   }
 }
