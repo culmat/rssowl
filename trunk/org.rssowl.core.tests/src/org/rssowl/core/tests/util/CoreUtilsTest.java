@@ -25,27 +25,56 @@
 package org.rssowl.core.tests.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
+import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.IGuid;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
+import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.ISearchCondition;
+import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.SearchSpecifier;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.event.NewsAdapter;
+import org.rssowl.core.persist.event.NewsEvent;
+import org.rssowl.core.persist.event.NewsListener;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Tests methods in CoreUtils.
  */
 public class CoreUtilsTest {
+  private IModelFactory fFactory = Owl.getModelFactory();
+
+  /**
+   * @throws Exception
+   */
+  @Before
+  public void setUp() throws Exception {
+    Owl.getPersistenceService().recreateSchema();
+  }
 
   /**
    * @throws Exception
@@ -104,5 +133,421 @@ public class CoreUtilsTest {
     CoreUtils.normalize(entities);
     assertEquals(1, entities.size());
     assertEquals(folder3, entities.get(0));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testGenerateNameForSearch() throws Exception {
+    IFolderChild root = DynamicDAO.save(fFactory.createFolder(null, null, "Root"));
+
+    ISearchField field1 = fFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
+    ISearchField field2 = fFactory.createSearchField(INews.LOCATION, INews.class.getName());
+    ISearchField field3 = fFactory.createSearchField(INews.IS_FLAGGED, INews.class.getName());
+    ISearchField field4 = fFactory.createSearchField(INews.PUBLISH_DATE, INews.class.getName());
+    ISearchField field5 = fFactory.createSearchField(INews.STATE, INews.class.getName());
+
+    ISearchCondition cond1 = fFactory.createSearchCondition(field1, SearchSpecifier.CONTAINS, "foo bar");
+    ISearchCondition cond2 = fFactory.createSearchCondition(field2, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList(root)));
+    ISearchCondition cond3 = fFactory.createSearchCondition(field3, SearchSpecifier.IS, true);
+    ISearchCondition cond4 = fFactory.createSearchCondition(field4, SearchSpecifier.IS, new Date());
+    ISearchCondition cond5 = fFactory.createSearchCondition(field5, SearchSpecifier.IS, INews.State.getVisible());
+
+    String name = CoreUtils.getName(Arrays.asList(new ISearchCondition[] { cond1, cond2, cond3, cond4, cond5 }), true);
+    assertNotNull(name);
+    assertTrue(name.contains("foo bar"));
+    assertTrue(name.contains("Root"));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testGetHeadline() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    INews news1 = fFactory.createNews(null, feed, new Date());
+
+    assertNotNull(CoreUtils.getHeadline(news1, false));
+
+    news1.setDescription("Foo Bar");
+    assertEquals("Foo Bar", CoreUtils.getHeadline(news1, false));
+
+    news1.setDescription("Foo &auml; Bar");
+    assertEquals("Foo &auml; Bar", CoreUtils.getHeadline(news1, false));
+    assertEquals("Foo ä Bar", CoreUtils.getHeadline(news1, true));
+
+    news1.setTitle("A Foo Bar");
+    assertEquals("A Foo Bar", CoreUtils.getHeadline(news1, false));
+
+    news1.setTitle("A Foo &auml; Bar");
+    assertEquals("A Foo &auml; Bar", CoreUtils.getHeadline(news1, false));
+    assertEquals("A Foo ä Bar", CoreUtils.getHeadline(news1, true));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testGetLink() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    INews news1 = fFactory.createNews(null, feed, new Date());
+
+    assertNull(CoreUtils.getLink(news1));
+
+    IGuid guid = fFactory.createGuid(news1, "www.guid.de", false);
+    news1.setGuid(guid);
+    assertEquals("www.guid.de", CoreUtils.getLink(news1));
+
+    news1.setLink(new URI("link"));
+    assertEquals("link", CoreUtils.getLink(news1));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testStickyStateChange() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    INews news = fFactory.createNews(null, feed, new Date());
+
+    DynamicDAO.save(feed);
+
+    final AtomicInteger mode = new AtomicInteger(0);
+    final AtomicInteger counter = new AtomicInteger(0);
+
+    NewsListener listener = null;
+    try {
+      listener = new NewsAdapter() {
+        @Override
+        public void entitiesUpdated(Set<NewsEvent> events) {
+          assertEquals(1, events.size());
+
+          if (mode.get() == 0) {
+            assertTrue(CoreUtils.isStickyStateChange(events.iterator().next()));
+            assertTrue(CoreUtils.isStickyStateChange(events));
+            assertTrue(CoreUtils.isStickyStateChange(events, true));
+            counter.incrementAndGet();
+          }
+
+          else if (mode.get() == 1) {
+            assertFalse(CoreUtils.isStickyStateChange(events.iterator().next()));
+            assertFalse(CoreUtils.isStickyStateChange(events));
+            assertFalse(CoreUtils.isStickyStateChange(events, true));
+            counter.incrementAndGet();
+          }
+
+          else if (mode.get() == 2) {
+            assertTrue(CoreUtils.isStickyStateChange(events.iterator().next()));
+            assertTrue(CoreUtils.isStickyStateChange(events));
+            assertFalse(CoreUtils.isStickyStateChange(events, true));
+            counter.incrementAndGet();
+          }
+        }
+      };
+
+      DynamicDAO.addEntityListener(INews.class, listener);
+
+      mode.set(0);
+      news.setFlagged(true);
+      DynamicDAO.save(news);
+
+      mode.set(1);
+      news.setTitle("Foo");
+      DynamicDAO.save(news);
+
+      mode.set(2);
+      news.setFlagged(false);
+      DynamicDAO.save(news);
+
+      assertEquals(3, counter.get());
+    } finally {
+      if (listener != null)
+        DynamicDAO.removeEntityListener(INews.class, listener);
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testStateStateChange() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    INews news = fFactory.createNews(null, feed, new Date());
+    news.setState(INews.State.NEW);
+
+    DynamicDAO.save(feed);
+
+    final AtomicInteger mode = new AtomicInteger(0);
+    final AtomicInteger counter = new AtomicInteger(0);
+
+    NewsListener listener = null;
+    try {
+      listener = new NewsAdapter() {
+        @Override
+        public void entitiesUpdated(Set<NewsEvent> events) {
+          assertEquals(1, events.size());
+
+          if (mode.get() == 0) {
+            assertTrue(CoreUtils.isStateChange(events.iterator().next()));
+            assertTrue(CoreUtils.isStateChange(events));
+            counter.incrementAndGet();
+          }
+
+          else if (mode.get() == 1) {
+            assertFalse(CoreUtils.isStateChange(events.iterator().next()));
+            assertFalse(CoreUtils.isStateChange(events));
+            counter.incrementAndGet();
+          }
+
+          else if (mode.get() == 2) {
+            assertTrue(CoreUtils.isStateChange(events.iterator().next()));
+            assertTrue(CoreUtils.isStateChange(events));
+            counter.incrementAndGet();
+          }
+        }
+      };
+
+      DynamicDAO.addEntityListener(INews.class, listener);
+
+      mode.set(0);
+      news.setState(INews.State.READ);
+      DynamicDAO.save(news);
+
+      mode.set(1);
+      news.setTitle("Foo");
+      DynamicDAO.save(news);
+
+      mode.set(2);
+      news.setState(INews.State.UNREAD);
+      DynamicDAO.save(news);
+
+      assertEquals(3, counter.get());
+    } finally {
+      if (listener != null)
+        DynamicDAO.removeEntityListener(INews.class, listener);
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testGotDeleted() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    INews news = fFactory.createNews(null, feed, new Date());
+    news.setState(INews.State.NEW);
+
+    DynamicDAO.save(feed);
+
+    final AtomicInteger mode = new AtomicInteger(0);
+    final AtomicInteger counter = new AtomicInteger(0);
+
+    NewsListener listener = null;
+    try {
+      listener = new NewsAdapter() {
+        @Override
+        public void entitiesUpdated(Set<NewsEvent> events) {
+          assertEquals(1, events.size());
+
+          if (mode.get() == 0) {
+            assertFalse(CoreUtils.gotDeleted(events));
+            counter.incrementAndGet();
+          }
+
+          else if (mode.get() == 1) {
+            assertTrue(CoreUtils.gotDeleted(events));
+            counter.incrementAndGet();
+          }
+        }
+      };
+
+      DynamicDAO.addEntityListener(INews.class, listener);
+
+      mode.set(0);
+      news.setState(INews.State.READ);
+      DynamicDAO.save(news);
+
+      mode.set(1);
+      news.setState(INews.State.HIDDEN);
+      DynamicDAO.save(news);
+
+      assertEquals(2, counter.get());
+    } finally {
+      if (listener != null)
+        DynamicDAO.removeEntityListener(INews.class, listener);
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testGotRestored() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    INews news = fFactory.createNews(null, feed, new Date());
+    news.setState(INews.State.NEW);
+
+    DynamicDAO.save(feed);
+
+    final AtomicInteger mode = new AtomicInteger(0);
+    final AtomicInteger counter = new AtomicInteger(0);
+
+    NewsListener listener = null;
+    try {
+      listener = new NewsAdapter() {
+        @Override
+        public void entitiesUpdated(Set<NewsEvent> events) {
+          assertEquals(1, events.size());
+
+          if (mode.get() == 0) {
+            assertTrue(CoreUtils.gotDeleted(events));
+            counter.incrementAndGet();
+          }
+
+          else if (mode.get() == 1) {
+            assertTrue(CoreUtils.gotRestored(events));
+            counter.incrementAndGet();
+          }
+        }
+      };
+
+      DynamicDAO.addEntityListener(INews.class, listener);
+
+      mode.set(0);
+      news.setState(INews.State.HIDDEN);
+      DynamicDAO.save(news);
+
+      mode.set(1);
+      news.setState(INews.State.UNREAD);
+      DynamicDAO.save(news);
+
+      assertEquals(2, counter.get());
+    } finally {
+      if (listener != null)
+        DynamicDAO.removeEntityListener(INews.class, listener);
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testLabelChange() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    INews news = fFactory.createNews(null, feed, new Date());
+    news.setState(INews.State.NEW);
+
+    DynamicDAO.save(feed);
+
+    final AtomicInteger mode = new AtomicInteger(0);
+    final AtomicInteger counter = new AtomicInteger(0);
+
+    NewsListener listener = null;
+    try {
+      listener = new NewsAdapter() {
+        @Override
+        public void entitiesUpdated(Set<NewsEvent> events) {
+          assertEquals(1, events.size());
+
+          if (mode.get() == 0) {
+            assertTrue(CoreUtils.isLabelChange(events));
+            counter.incrementAndGet();
+          }
+
+          else if (mode.get() == 1) {
+            assertTrue(CoreUtils.isLabelChange(events));
+            counter.incrementAndGet();
+          }
+        }
+      };
+
+      DynamicDAO.addEntityListener(INews.class, listener);
+
+      mode.set(0);
+      ILabel label = DynamicDAO.save(fFactory.createLabel(null, "Label"));
+      news.addLabel(label);
+      DynamicDAO.save(news);
+
+      mode.set(1);
+      news.removeLabel(label);
+      DynamicDAO.save(news);
+
+      assertEquals(2, counter.get());
+    } finally {
+      if (listener != null)
+        DynamicDAO.removeEntityListener(INews.class, listener);
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testTitleChange() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    INews news = fFactory.createNews(null, feed, new Date());
+    news.setState(INews.State.NEW);
+
+    DynamicDAO.save(feed);
+
+    final AtomicInteger mode = new AtomicInteger(0);
+    final AtomicInteger counter = new AtomicInteger(0);
+
+    NewsListener listener = null;
+    try {
+      listener = new NewsAdapter() {
+        @Override
+        public void entitiesUpdated(Set<NewsEvent> events) {
+          assertEquals(1, events.size());
+
+          if (mode.get() == 0) {
+            assertTrue(CoreUtils.isTitleChange(events));
+            counter.incrementAndGet();
+          }
+
+          else if (mode.get() == 1) {
+            assertFalse(CoreUtils.isTitleChange(events));
+            counter.incrementAndGet();
+          }
+        }
+      };
+
+      DynamicDAO.addEntityListener(INews.class, listener);
+
+      mode.set(0);
+      news.setTitle("Foo");
+      DynamicDAO.save(news);
+
+      mode.set(1);
+      news.setDescription("Bar");
+      DynamicDAO.save(news);
+
+      assertEquals(2, counter.get());
+    } finally {
+      if (listener != null)
+        DynamicDAO.removeEntityListener(INews.class, listener);
+    }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testFeedLinks() throws Exception {
+    IFeed feed1 = DynamicDAO.save(fFactory.createFeed(null, new URI("feed1")));
+    IFeed feed2 = DynamicDAO.save(fFactory.createFeed(null, new URI("feed2")));
+    DynamicDAO.save(fFactory.createFeed(null, new URI("feed3")));
+
+    IFolder root = fFactory.createFolder(null, null, "root");
+    fFactory.createBookMark(null, root, new FeedLinkReference(feed1.getLink()), "Mark 1");
+    fFactory.createBookMark(null, root, new FeedLinkReference(feed2.getLink()), "Mark 2");
+
+    DynamicDAO.save(root);
+
+    Set<String> feedLinks = CoreUtils.getFeedLinks();
+    assertEquals(2, feedLinks.size());
+    assertTrue(feedLinks.contains("feed1"));
+    assertTrue(feedLinks.contains("feed2"));
   }
 }
