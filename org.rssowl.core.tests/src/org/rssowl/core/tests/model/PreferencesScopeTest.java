@@ -59,6 +59,10 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
   private static final String TEST_LONGS = "testLongs";
   private static final String TEST_STRING = "testString";
   private static final String TEST_STRINGS = "testStrings";
+  private static final String TEST_BOOLEAN_ECLIPSE = "/testBoolean";
+  private static final String TEST_INTEGER_ECLIPSE = "/testInteger";
+  private static final String TEST_LONG_ECLIPSE = "/testLong";
+  private static final String TEST_STRING_ECLIPSE = "/testString";
   private IModelFactory fFactory;
 
   /**
@@ -136,6 +140,40 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
     assertEquals(true, Arrays.equals(new String[] { "foo", "bar" }, globalScope.getStrings(TEST_STRINGS)));
     assertEquals(1L, globalScope.getLong(TEST_LONG));
     assertEquals(true, Arrays.equals(new long[] { 1L, 2L, 3L }, globalScope.getLongs(TEST_LONGS)));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public final void testEclipseScope() throws Exception {
+    IPreferenceScope prefs = Owl.getPreferenceService().getEclipseScope();
+
+    /* Test Defaults Taken */
+    assertEquals(true, prefs.getBoolean(TEST_BOOLEAN_ECLIPSE));
+    assertEquals(1, prefs.getInteger(TEST_INTEGER_ECLIPSE));
+    assertEquals("foo", prefs.getString(TEST_STRING_ECLIPSE));
+    assertEquals(1L, prefs.getLong(TEST_LONG_ECLIPSE));
+
+    /* Change Settings and test again */
+    prefs.putBoolean(TEST_BOOLEAN_ECLIPSE, false);
+    prefs.putInteger(TEST_INTEGER_ECLIPSE, 2);
+    prefs.putString(TEST_STRING_ECLIPSE, "hello");
+    prefs.putLong(TEST_LONG_ECLIPSE, 2L);
+
+    /* Test new Settings */
+    assertEquals(false, prefs.getBoolean(TEST_BOOLEAN_ECLIPSE));
+    assertEquals(2, prefs.getInteger(TEST_INTEGER_ECLIPSE));
+    assertEquals("hello", prefs.getString(TEST_STRING_ECLIPSE));
+    assertEquals(2L, prefs.getLong(TEST_LONG_ECLIPSE));
+
+    prefs.flush();
+
+    /* Test Again */
+    assertEquals(false, prefs.getBoolean(TEST_BOOLEAN_ECLIPSE));
+    assertEquals(2, prefs.getInteger(TEST_INTEGER_ECLIPSE));
+    assertEquals("hello", prefs.getString(TEST_STRING_ECLIPSE));
+    assertEquals(2L, prefs.getLong(TEST_LONG_ECLIPSE));
   }
 
   /**
@@ -300,7 +338,9 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
   }
 
   /*
-   * @see org.rssowl.core.model.preferences.IPreferencesInitializer#initialize(org.rssowl.core.model.preferences.IPreferencesScope)
+   * @see
+   * org.rssowl.core.model.preferences.IPreferencesInitializer#initialize(org
+   * .rssowl.core.model.preferences.IPreferencesScope)
    */
   public void initialize(IPreferenceScope defaultScope) {
     defaultScope.putBoolean(TEST_BOOLEAN, true);
@@ -310,5 +350,10 @@ public class PreferencesScopeTest implements IPreferencesInitializer {
     defaultScope.putStrings(TEST_STRINGS, new String[] { "foo", "bar" });
     defaultScope.putLong(TEST_LONG, 1L);
     defaultScope.putLongs(TEST_LONGS, new long[] { 1L, 2L, 3L });
+
+    defaultScope.putBoolean(TEST_BOOLEAN_ECLIPSE, true);
+    defaultScope.putInteger(TEST_INTEGER_ECLIPSE, 1);
+    defaultScope.putString(TEST_STRING_ECLIPSE, "foo");
+    defaultScope.putLong(TEST_LONG_ECLIPSE, 1L);
   }
 }
