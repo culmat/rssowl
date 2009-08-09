@@ -26,6 +26,7 @@ package org.rssowl.core.tests.importer;
 
 import static junit.framework.Assert.assertNotNull;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -77,6 +78,22 @@ public class FileImportTest {
   @Before
   public void setUp() throws Exception {
     Owl.getPersistenceService().recreateSchema();
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused" })
+  public void testImport_Defaults() throws Exception {
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(ImportUtils.class.getResourceAsStream("/default_feeds.xml"));
+
+    ImportUtils.doImport(null, elements);
+    Set<IFolder> roots = CoreUtils.loadRootFolders();
+    assertFalse(roots.isEmpty());
+    assertFalse(roots.iterator().next().getChildren().isEmpty());
   }
 
   /**
