@@ -48,6 +48,9 @@ import org.rssowl.core.tests.persist.LongArrayListTest;
 import org.rssowl.core.tests.persist.LongHashSetTest;
 import org.rssowl.core.tests.persist.MigrationsTest;
 import org.rssowl.core.tests.persist.service.DefragmentTest;
+import org.rssowl.core.tests.ui.ExpandingReaderTests;
+import org.rssowl.core.tests.ui.RetentionStrategyTests;
+import org.rssowl.core.tests.ui.TreeTraversalTest;
 import org.rssowl.core.tests.util.CoreUtilsTest;
 import org.rssowl.core.tests.util.MergeUtilsTest;
 import org.rssowl.core.tests.util.StringUtilsTest;
@@ -83,6 +86,9 @@ import org.rssowl.core.tests.util.StringUtilsTest;
   DefragmentTest.class,
   MigrationsTest.class,
   LongArrayListTest.class,
-  LongHashSetTest.class
+  LongHashSetTest.class,
+  RetentionStrategyTests.class,
+  TreeTraversalTest.class,
+  ExpandingReaderTests.class
 })
 public class LocalTests {}
