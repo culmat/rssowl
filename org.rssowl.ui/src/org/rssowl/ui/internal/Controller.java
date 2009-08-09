@@ -793,6 +793,9 @@ public class Controller {
   }
 
   private boolean shouldProceedReloading(IProgressMonitor monitor, IBookMark mark) {
+    if (InternalOwl.TESTING)
+      return true;
+
     if (fShuttingDown)
       return false;
 
