@@ -27,6 +27,8 @@ package org.rssowl.core.tests.model;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.persist.IAttachment;
@@ -36,6 +38,7 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.persist.ISearchCondition;
@@ -51,6 +54,7 @@ import org.rssowl.core.util.SearchHit;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -1024,5 +1028,94 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
 
     List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition1), false);
     assertEquals(0, result.size());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testNewsReindexedWhenLabelChanges() throws Exception {
+    ILabel label = DynamicDAO.save(fFactory.createLabel(null, "Foo"));
+
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
+    INews news = createNews(feed, "News with Label", "http://www.news.com/news3.html", State.READ);
+    news.addLabel(label);
+    DynamicDAO.save(feed);
+
+    waitForIndexer();
+
+    ISearchField field = fFactory.createSearchField(INews.LABEL, fNewsEntityName);
+
+    ISearchCondition condition1 = fFactory.createSearchCondition(field, SearchSpecifier.IS, "foo");
+
+    List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition1), false);
+    assertEquals(1, result.size());
+    assertEquals("News with Label", result.get(0).getResult().resolve().getTitle());
+
+    label.setName("Bar");
+    DynamicDAO.save(label);
+
+    waitForIndexer();
+
+    condition1 = fFactory.createSearchCondition(field, SearchSpecifier.IS, "bar");
+
+    result = fModelSearch.searchNews(list(condition1), false);
+    assertEquals(1, result.size());
+    assertEquals("News with Label", result.get(0).getResult().resolve().getTitle());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testMaxClauseCount() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
+    createNews(feed, "Foo", "http://www.news.com/news3.html", State.READ);
+    DynamicDAO.save(feed);
+
+    waitForIndexer();
+
+    ISearchField field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+
+    List<ISearchCondition> conditions = new ArrayList<ISearchCondition>();
+    for (int i = 0; i < 1030; i++) {
+      ISearchCondition condition1 = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "foo" + i);
+      conditions.add(condition1);
+    }
+
+    conditions.add(fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "foo"));
+
+    List<SearchHit<NewsReference>> result = fModelSearch.searchNews(conditions, false);
+    assertEquals(1, result.size());
+    assertEquals("Foo", result.get(0).getResult().resolve().getTitle());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @Ignore
+  public void testReindexAll() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
+    createNews(feed, "Foo", "http://www.news.com/news.html", State.NEW);
+    DynamicDAO.save(feed);
+
+    waitForIndexer();
+
+    ISearchField field = fFactory.createSearchField(INews.TITLE, fNewsEntityName);
+    ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "foo");
+
+    List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(1, result.size());
+    assertEquals("Foo", result.get(0).getResult().resolve().getTitle());
+
+    fModelSearch.reindexAll(new NullProgressMonitor());
+    fModelSearch.optimize();
+
+    waitForIndexer();
+
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(1, result.size());
+    assertEquals("Foo", result.get(0).getResult().resolve().getTitle());
   }
 }
