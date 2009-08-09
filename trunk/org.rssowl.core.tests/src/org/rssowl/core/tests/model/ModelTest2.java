@@ -95,7 +95,7 @@ import java.util.Date;
 import java.util.Set;
 
 /**
- * This TestCase is for testing the Model Plugin (2 of 3).
+ * This TestCase is for testing the Model Plugin (2 of 4).
  *
  * @author bpasero
  */

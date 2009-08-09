@@ -76,7 +76,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This TestCase is for testing the Model Plugin (1 of 3).
+ * This TestCase is for testing the Model Plugin (1 of 4).
  *
  * @author bpasero
  */
