@@ -399,7 +399,7 @@ public class ModelTest4 {
     Set<String> persons = DynamicDAO.getDAO(IPersonDAO.class).loadAllNames();
     assertEquals(2, persons.size());
     assertTrue(persons.contains(pers1.getName()));
-    assertTrue(persons.contains(pers2.getName()));
+    assertTrue(persons.contains(pers2.getEmail().toString()));
   }
 
   /**
