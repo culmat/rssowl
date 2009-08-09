@@ -35,7 +35,9 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.LazyList;
 import org.rssowl.core.internal.persist.MergeResult;
+import org.rssowl.core.internal.persist.NewsBin;
 import org.rssowl.core.internal.persist.dao.EntitiesToBeIndexedDAOImpl;
 import org.rssowl.core.internal.persist.service.DBHelper;
 import org.rssowl.core.internal.persist.service.EntityIdsByEventType;
@@ -45,6 +47,7 @@ import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
@@ -97,10 +100,12 @@ import org.rssowl.core.persist.reference.SearchConditionReference;
 import org.rssowl.core.persist.reference.SearchMarkReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.tests.TestUtils;
+import org.rssowl.ui.internal.Controller;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -2737,5 +2742,172 @@ public class ModelTest3 {
     assertTrue(DynamicDAO.getDAO(IBookMarkDAO.class).exists(mark1.getFeedLinkReference()));
     assertTrue(DynamicDAO.getDAO(IBookMarkDAO.class).exists(mark2.getFeedLinkReference()));
     assertFalse(DynamicDAO.getDAO(IBookMarkDAO.class).exists(mark3.getFeedLinkReference()));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testFolderSort() throws Exception {
+    IFolder root = fFactory.createFolder(null, null, "Root");
+    IBookMark mark2 = fFactory.createBookMark(null, root, new FeedLinkReference(new URI("mark1")), "B Mark 2");
+    IBookMark mark1 = fFactory.createBookMark(null, root, new FeedLinkReference(new URI("mark2")), "A Mark 1");
+    IBookMark mark3 = fFactory.createBookMark(null, root, new FeedLinkReference(new URI("mark3")), "C Mark 3");
+    IFolder folder2 = fFactory.createFolder(null, root, "B Folder");
+    IFolder folder1 = fFactory.createFolder(null, root, "A Folder");
+    DynamicDAO.save(root);
+
+    assertTrue(root.containsChild(mark1));
+
+    root.sort();
+
+    List<IFolderChild> children = root.getChildren();
+    assertEquals(folder1, children.get(0));
+    assertEquals(folder2, children.get(1));
+    assertEquals(mark1, children.get(2));
+    assertEquals(mark2, children.get(3));
+    assertEquals(mark3, children.get(4));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testFolderReorder() throws Exception {
+    IFolder root = fFactory.createFolder(null, null, "Root");
+    IBookMark mark1 = fFactory.createBookMark(null, root, new FeedLinkReference(new URI("mark2")), "A Mark 1");
+    IBookMark mark2 = fFactory.createBookMark(null, root, new FeedLinkReference(new URI("mark1")), "B Mark 2");
+    IBookMark mark3 = fFactory.createBookMark(null, root, new FeedLinkReference(new URI("mark3")), "C Mark 3");
+    IFolder folder1 = fFactory.createFolder(null, root, "A Folder");
+    IFolder folder2 = fFactory.createFolder(null, root, "B Folder");
+    DynamicDAO.save(root);
+
+    root.reorderChildren(Arrays.asList(new IFolderChild[] { mark1, mark2 }), folder1, true);
+
+    List<IFolderChild> children = root.getChildren();
+    assertEquals(mark3, children.get(0));
+    assertEquals(folder1, children.get(1));
+    assertEquals(mark1, children.get(2));
+    assertEquals(mark2, children.get(3));
+    assertEquals(folder2, children.get(4));
+
+    root.reorderChildren(Arrays.asList(new IFolderChild[] { mark1, folder2 }), folder1, false);
+
+    children = root.getChildren();
+    assertEquals(mark3, children.get(0));
+    assertEquals(mark1, children.get(1));
+    assertEquals(folder2, children.get(2));
+    assertEquals(folder1, children.get(3));
+    assertEquals(mark2, children.get(4));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @Ignore
+  public void testNewsLazyList() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    INews news3 = fFactory.createNews(null, feed, new Date());
+
+    DynamicDAO.save(feed);
+
+    List<INews> list = feed.getNews();
+    news1 = list.get(0);
+    news2 = list.get(1);
+    news3 = list.get(2);
+
+    LazyList<INews> news = (LazyList<INews>) DynamicDAO.getDAO(INewsDAO.class).loadAll();
+    assertTrue(news.iterator().hasNext());
+    assertEquals(3, news.size());
+    assertTrue(news.contains(news1));
+    assertTrue(news.containsAll(Arrays.asList(new INews[] { news1, news2, news3 })));
+
+    assertEquals(3, news.toArray().length);
+    assertEquals(3, news.toArray(new INews[news.size()]).length);
+
+    assertNotNull(news.get(0));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testBinRemoveNews() throws Exception {
+    IFolder root = fFactory.createFolder(null, null, "Root");
+
+    INewsBin bin = fFactory.createNewsBin(null, root, "Bin");
+
+    DynamicDAO.save(bin);
+
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    INews news3 = fFactory.createNews(null, feed, new Date());
+
+    DynamicDAO.save(feed);
+
+    news1 = fFactory.createNews(news1, bin);
+    DynamicDAO.save(news1);
+    news2 = fFactory.createNews(news2, bin);
+    DynamicDAO.save(news2);
+    news3 = fFactory.createNews(news3, bin);
+    DynamicDAO.save(news3);
+
+    DynamicDAO.save(bin);
+
+    bin.removeNews(news1);
+    ((NewsBin) bin).removeNewsRefs(Arrays.asList(new NewsReference[] { news2.toReference() }));
+
+    List<INews> news = bin.getNews();
+    assertEquals(1, news.size());
+    assertEquals(news3, news.get(0));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSearchMark() throws Exception {
+    IFolder root = fFactory.createFolder(null, null, "Root");
+
+    ISearchField field = fFactory.createSearchField(INews.IS_FLAGGED, INews.class.getName());
+    ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, true);
+
+    ISearchMark search = fFactory.createSearchMark(null, root, "Search");
+    search.addSearchCondition(condition);
+
+    DynamicDAO.save(root);
+
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    news1.setFlagged(true);
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    news2.setFlagged(true);
+    INews news3 = fFactory.createNews(null, feed, new Date());
+    news3.setFlagged(true);
+
+    DynamicDAO.save(feed);
+
+    waitForIndexer();
+    Controller.getDefault().getSavedSearchService().updateSavedSearches(true);
+
+    assertTrue(search.containsNews(news1));
+    assertTrue(search.containsNews(news2));
+    assertTrue(search.containsNews(news3));
+
+    List<INews> news = search.getNews();
+    assertEquals(3, news.size());
+
+    news = search.getNews(INews.State.getVisible());
+    assertEquals(3, news.size());
+
+    List<NewsReference> newsRefs = search.getNewsRefs();
+    assertEquals(3, newsRefs.size());
+
+    newsRefs = search.getNewsRefs(INews.State.getVisible());
+    assertEquals(3, newsRefs.size());
   }
 }
