@@ -31,13 +31,10 @@ import org.rssowl.core.tests.importer.FileImportTest;
 import org.rssowl.core.tests.importer.ImportExportOPMLTest;
 import org.rssowl.core.tests.ui.CleanUpTests;
 import org.rssowl.core.tests.ui.EntityPropertyPageTests;
-import org.rssowl.core.tests.ui.ExpandingReaderTests;
 import org.rssowl.core.tests.ui.FolderMarkGroupFilterTest;
 import org.rssowl.core.tests.ui.MiscUITests;
 import org.rssowl.core.tests.ui.ModelUtilsTest;
 import org.rssowl.core.tests.ui.NewsGroupFilterTest;
-import org.rssowl.core.tests.ui.RetentionStrategyTests;
-import org.rssowl.core.tests.ui.TreeTraversalTest;
 import org.rssowl.core.tests.ui.UndoTest;
 
 /**
@@ -50,14 +47,11 @@ import org.rssowl.core.tests.ui.UndoTest;
 @RunWith(Suite.class)
 @SuiteClasses( {
   EntityPropertyPageTests.class,
-  RetentionStrategyTests.class,
   ModelUtilsTest.class,
   FolderMarkGroupFilterTest.class,
   NewsGroupFilterTest.class,
-  TreeTraversalTest.class,
   MiscUITests.class,
   CleanUpTests.class,
-  ExpandingReaderTests.class,
   ImportExportOPMLTest.class,
   FileImportTest.class,
   UndoTest.class })
