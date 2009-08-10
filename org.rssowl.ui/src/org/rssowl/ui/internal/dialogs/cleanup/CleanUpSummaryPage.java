@@ -239,17 +239,7 @@ public class CleanUpSummaryPage extends WizardPage {
     /* Listen on Doubleclick */
     fViewer.addDoubleClickListener(new IDoubleClickListener() {
       public void doubleClick(DoubleClickEvent event) {
-        IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-        CleanUpGroup group = selection.getFirstElement() instanceof CleanUpGroup ? (CleanUpGroup) selection.getFirstElement() : null;
-
-        /* Expand / Collapse Folder */
-        if (group != null) {
-          boolean expandedState = !fViewer.getExpandedState(group);
-          fViewer.setExpandedState(group, expandedState);
-
-          if (expandedState && fViewer.getChecked(group))
-            setChildsChecked(group, true, true);
-        }
+        onDoubleClick(event);
       }
     });
 
@@ -257,24 +247,14 @@ public class CleanUpSummaryPage extends WizardPage {
     fViewer.getTree().addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        if (e.detail == SWT.CHECK) {
-          TreeItem item = (TreeItem) e.item;
-
-          if (item.getData() instanceof CleanUpGroup)
-            setChildsChecked((CleanUpGroup) item.getData(), item.getChecked(), true);
-
-          if (!item.getChecked() && item.getData() instanceof CleanUpTask)
-            setParentsChecked((CleanUpTask) item.getData(), false);
-        }
+        onSelect(e);
       }
     });
 
     /* Update Checks on Expand */
     fViewer.addTreeListener(new ITreeViewerListener() {
       public void treeExpanded(TreeExpansionEvent event) {
-        boolean isChecked = fViewer.getChecked(event.getElement());
-        if (isChecked)
-          setChildsChecked((CleanUpGroup) event.getElement(), isChecked, false);
+        onExpand(event);
       }
 
       public void treeCollapsed(TreeExpansionEvent event) {}
@@ -306,20 +286,6 @@ public class CleanUpSummaryPage extends WizardPage {
     });
 
     setControl(container);
-  }
-
-  private void setChildsChecked(CleanUpGroup cleanUpGroup, boolean checked, boolean onlyExpanded) {
-    if (!onlyExpanded || fViewer.getExpandedState(cleanUpGroup)) {
-      List<CleanUpTask> children = cleanUpGroup.getTasks();
-      for (CleanUpTask child : children)
-        fViewer.setChecked(child, checked);
-    }
-  }
-
-  private void setParentsChecked(CleanUpTask cleanUpTask, boolean checked) {
-    CleanUpGroup parent = cleanUpTask.getGroup();
-    if (parent != null)
-      fViewer.setChecked(parent, checked);
   }
 
   /*
@@ -383,5 +349,51 @@ public class CleanUpSummaryPage extends WizardPage {
   public void dispose() {
     super.dispose();
     fResources.dispose();
+  }
+
+  private void onDoubleClick(DoubleClickEvent event) {
+    IStructuredSelection selection = (IStructuredSelection) event.getSelection();
+    CleanUpGroup group = selection.getFirstElement() instanceof CleanUpGroup ? (CleanUpGroup) selection.getFirstElement() : null;
+
+    /* Expand / Collapse Folder */
+    if (group != null) {
+      boolean expandedState = !fViewer.getExpandedState(group);
+      fViewer.setExpandedState(group, expandedState);
+
+      if (expandedState && fViewer.getChecked(group))
+        setChildsChecked(group, true, true);
+    }
+  }
+
+  private void onSelect(SelectionEvent e) {
+    if (e.detail == SWT.CHECK) {
+      TreeItem item = (TreeItem) e.item;
+
+      if (item.getData() instanceof CleanUpGroup)
+        setChildsChecked((CleanUpGroup) item.getData(), item.getChecked(), true);
+
+      if (!item.getChecked() && item.getData() instanceof CleanUpTask)
+        setParentsChecked((CleanUpTask) item.getData(), false);
+    }
+  }
+
+  private void onExpand(TreeExpansionEvent event) {
+    boolean isChecked = fViewer.getChecked(event.getElement());
+    if (isChecked)
+      setChildsChecked((CleanUpGroup) event.getElement(), isChecked, false);
+  }
+
+  private void setChildsChecked(CleanUpGroup cleanUpGroup, boolean checked, boolean onlyExpanded) {
+    if (!onlyExpanded || fViewer.getExpandedState(cleanUpGroup)) {
+      List<CleanUpTask> children = cleanUpGroup.getTasks();
+      for (CleanUpTask child : children)
+        fViewer.setChecked(child, checked);
+    }
+  }
+
+  private void setParentsChecked(CleanUpTask cleanUpTask, boolean checked) {
+    CleanUpGroup parent = cleanUpTask.getGroup();
+    if (parent != null)
+      fViewer.setChecked(parent, checked);
   }
 }
