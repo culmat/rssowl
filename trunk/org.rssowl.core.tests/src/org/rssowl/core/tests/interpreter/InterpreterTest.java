@@ -297,6 +297,36 @@ public class InterpreterTest {
   }
 
   /**
+   * Test an RDF Feed with more DC elements.
+   *
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testRDF_DublinCore() throws Exception {
+    InputStream inS = getClass().getResourceAsStream("/data/interpreter/feed_rdf_dc.xml");
+    IFeed feed = new Feed(new URI("http://www.data.interpreter.feed_rdf.xml"));
+    Owl.getInterpreter().interpret(inS, feed, null);
+
+    assertEquals("RDF", feed.getFormat());
+    assertEquals("rdf_title", feed.getTitle());
+    assertEquals(new URI("rdf_link"), feed.getHomepage());
+    assertEquals("rdf_description", feed.getDescription());
+    assertEquals("rdf_rights", feed.getCopyright());
+    assertEquals("en-us", feed.getLanguage());
+
+    assertNotNull(feed.getAuthor());
+    assertEquals("rdf_publisher", feed.getAuthor().getName());
+
+    assertNotNull(feed.getPublishDate());
+
+    assertNotNull(feed.getImage());
+    assertEquals(new URI("rdf_image.url"), feed.getImage().getLink());
+    assertEquals("rdf_image.title", feed.getImage().getTitle());
+    assertEquals(new URI("rdf_image.link"), feed.getImage().getHomepage());
+  }
+
+  /**
    * Test an RDF Feed with rdf:about.
    *
    * @throws Exception

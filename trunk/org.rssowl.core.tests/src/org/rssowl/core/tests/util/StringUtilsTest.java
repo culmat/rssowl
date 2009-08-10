@@ -31,9 +31,13 @@ import org.junit.Test;
 import org.rssowl.core.util.StringUtils;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Tests methods in StringUtils.
+ * Tests methods in {@link StringUtils}.
+ *
+ * @author bpasero
  */
 public class StringUtilsTest {
 
@@ -116,5 +120,54 @@ public class StringUtilsTest {
     assertEquals(Arrays.asList(new String[] { "foo", "\"bar foobar\"" }), StringUtils.tokenizePhraseAware("foo  \"bar    foobar\""));
     assertEquals(Arrays.asList(new String[] { "\"foo bar foobar\"" }), StringUtils.tokenizePhraseAware("\"foo bar foobar\""));
     assertEquals(Arrays.asList(new String[] { "\"foo\"bar\"foobar\"" }), StringUtils.tokenizePhraseAware("\"foo\"bar\"foobar\""));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSmartTrim() throws Exception {
+    assertEquals("foo", StringUtils.smartTrim("foo", 10));
+    assertEquals("foo bar", StringUtils.smartTrim("foo bar", 10));
+    assertEquals("foo...", StringUtils.smartTrim("foo bar", 5));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testReplaceAll() throws Exception {
+    Set<String> strings = new HashSet<String>();
+    strings.add("foo");
+    strings.add("bar");
+    strings.add("foo ? bar");
+
+    Set<String> result = StringUtils.replaceAll(strings, "foo", "bar");
+    assertTrue(result.containsAll(Arrays.asList(new String[] { "bar", "bar ? bar" })));
+
+    result = StringUtils.replaceAll(strings, "?", "bar");
+    assertTrue(result.containsAll(Arrays.asList(new String[] { "bar", "foo", "foo bar bar" })));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testhtmlEscape() throws Exception {
+    assertEquals("foo bar", StringUtils.htmlEscape("foo bar"));
+    assertEquals("&lt;foo bar&gt;", StringUtils.htmlEscape("<foo bar>"));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testFilterTags() throws Exception {
+    assertEquals("foo bar", StringUtils.filterTags("foo bar", null, false));
+    assertEquals(" bar", StringUtils.filterTags("<foo> bar", null, false));
+    assertEquals("foo bar", StringUtils.filterTags("foo bar", new HashSet<String>(Arrays.asList(new String[] { "a", "br" })), false));
+    assertEquals("<foo> bar", StringUtils.filterTags("<foo> bar", new HashSet<String>(Arrays.asList(new String[] { "a", "br" })), false));
+    assertEquals("alles       bar", StringUtils.filterTags("alles <foo> bar", new HashSet<String>(Arrays.asList(new String[] { "foo", "br" })), false));
+    assertEquals("      bar", StringUtils.filterTags("<foo> bar", new HashSet<String>(Arrays.asList(new String[] { "foo", "br" })), false));
   }
 }

@@ -833,4 +833,32 @@ public class ModelUtilsTest {
     title = "Re[33]: Hello World[3]";
     assertEquals("Hello World[3]", CoreUtils.normalizeTitle(title));
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testGetLabelsForAll() throws Exception {
+    ILabel label1 = DynamicDAO.save(fFactory.createLabel(null, "Foo"));
+    ILabel label2 = DynamicDAO.save(fFactory.createLabel(null, "Bar"));
+
+    IFeed feed = fFactory.createFeed(null, new URI("feed"));
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    INews news2 = fFactory.createNews(null, feed, new Date());
+    INews news3 = fFactory.createNews(null, feed, new Date());
+
+    news1.addLabel(label1);
+    news1.addLabel(label2);
+    news2.addLabel(label1);
+    news3.addLabel(label2);
+
+    Set<ILabel> labels = ModelUtils.getLabelsForAll(new StructuredSelection(news1));
+    assertEquals(2, labels.size());
+
+    labels = ModelUtils.getLabelsForAll(new StructuredSelection(new Object[] { news1, news2 }));
+    assertEquals(1, labels.size());
+
+    labels = ModelUtils.getLabelsForAll(new StructuredSelection(new Object[] { news1, news2, news3 }));
+    assertEquals(0, labels.size());
+  }
 }

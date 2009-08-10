@@ -55,6 +55,7 @@ import org.rssowl.core.tests.ui.TreeTraversalTest;
 import org.rssowl.core.tests.util.CoreUtilsTest;
 import org.rssowl.core.tests.util.MergeUtilsTest;
 import org.rssowl.core.tests.util.StringUtilsTest;
+import org.rssowl.core.tests.util.URIUtilsTest;
 
 /**
  * Test-Suite for Core-Tests that are not requiring Network-Access.
@@ -85,6 +86,7 @@ import org.rssowl.core.tests.util.StringUtilsTest;
   INewsTest.class,
   StringUtilsTest.class,
   CoreUtilsTest.class,
+  URIUtilsTest.class,
   DefragmentTest.class,
   MigrationsTest.class,
   LongArrayListTest.class,
