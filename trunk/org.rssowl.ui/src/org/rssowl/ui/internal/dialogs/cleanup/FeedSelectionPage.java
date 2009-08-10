@@ -25,12 +25,6 @@
 package org.rssowl.ui.internal.dialogs.cleanup;
 
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
-import org.eclipse.jface.viewers.DoubleClickEvent;
-import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.ITreeContentProvider;
-import org.eclipse.jface.viewers.ITreeViewerListener;
-import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.wizard.WizardPage;
@@ -41,21 +35,14 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.TreeItem;
-import org.rssowl.core.Owl;
-import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
-import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.core.util.CoreUtils;
-import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.FolderChildCheckboxTree;
 import org.rssowl.ui.internal.util.LayoutUtils;
-import org.rssowl.ui.internal.views.explorer.BookMarkLabelProvider;
-import org.rssowl.ui.internal.views.explorer.BookMarkSorter;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -64,6 +51,7 @@ import java.util.Set;
  * @author bpasero
  */
 public class FeedSelectionPage extends WizardPage {
+  private FolderChildCheckboxTree fFolderChildTree;
   private CheckboxTreeViewer fViewer;
   private Button fSelectAll;
   private Button fDeselectAll;
@@ -118,61 +106,9 @@ public class FeedSelectionPage extends WizardPage {
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(new GridLayout(1, false));
 
-    /* Viewer to select particular Folders/Marks */
-    fViewer = new CheckboxTreeViewer(container, SWT.BORDER);
-    fViewer.setAutoExpandLevel(2);
-    fViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    ((GridData) fViewer.getTree().getLayoutData()).heightHint = 190;
-    fViewer.getTree().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
-
-    /* Sort by Name if set so */
-    if (Owl.getPreferenceService().getGlobalScope().getBoolean(DefaultPreferences.BE_SORT_BY_NAME)) {
-      BookMarkSorter sorter = new BookMarkSorter();
-      sorter.setType(BookMarkSorter.Type.SORT_BY_NAME);
-      fViewer.setComparator(sorter);
-    }
-
-    /* ContentProvider */
-    fViewer.setContentProvider(new ITreeContentProvider() {
-      public Object[] getElements(Object inputElement) {
-        Collection<IFolder> rootFolders = CoreUtils.loadRootFolders();
-        return rootFolders.toArray();
-      }
-
-      public Object[] getChildren(Object parentElement) {
-        if (parentElement instanceof IFolder) {
-          IFolder folder = (IFolder) parentElement;
-          return folder.getChildren().toArray();
-        }
-
-        return new Object[0];
-      }
-
-      public Object getParent(Object element) {
-        if (element instanceof IFolder) {
-          IFolder folder = (IFolder) element;
-          return folder.getParent();
-        }
-
-        return null;
-      }
-
-      public boolean hasChildren(Object element) {
-        if (element instanceof IFolder) {
-          IFolder folder = (IFolder) element;
-          return !folder.isEmpty();
-        }
-
-        return false;
-      }
-
-      public void dispose() {}
-
-      public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
-    });
-
-    /* LabelProvider */
-    fViewer.setLabelProvider(new BookMarkLabelProvider(false));
+    /* Viewer for Folder Child Selection */
+    fFolderChildTree = new FolderChildCheckboxTree(container);
+    fViewer = fFolderChildTree.getViewer();
 
     /* Filter out any non Bookmarks and empty folders */
     fViewer.addFilter(new ViewerFilter() {
@@ -185,51 +121,9 @@ public class FeedSelectionPage extends WizardPage {
       }
     });
 
-    /* Listen on Doubleclick */
-    fViewer.addDoubleClickListener(new IDoubleClickListener() {
-      public void doubleClick(DoubleClickEvent event) {
-        IStructuredSelection selection = (IStructuredSelection) event.getSelection();
-        IFolder folder = selection.getFirstElement() instanceof IFolder ? (IFolder) selection.getFirstElement() : null;
-
-        /* Expand / Collapse Folder */
-        if (folder != null && !folder.isEmpty()) {
-          boolean expandedState = !fViewer.getExpandedState(folder);
-          fViewer.setExpandedState(folder, expandedState);
-
-          if (expandedState && fViewer.getChecked(folder))
-            setChildsChecked(folder, true);
-        }
-      }
-    });
-
-    /* Dummy Input */
-    fViewer.setInput(new Object());
-    OwlUI.setAllChecked(fViewer.getTree(), true);
-
-    /* Update Checks on Selection */
-    fViewer.getTree().addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        if (e.detail == SWT.CHECK) {
-          TreeItem item = (TreeItem) e.item;
-          setChildsChecked((IFolderChild) item.getData(), item.getChecked());
-
-          if (!item.getChecked())
-            setParentsChecked((IFolderChild) item.getData(), false);
-        }
-      }
-    });
-
-    /* Update Checks on Expand */
-    fViewer.addTreeListener(new ITreeViewerListener() {
-      public void treeExpanded(TreeExpansionEvent event) {
-        boolean isChecked = fViewer.getChecked(event.getElement());
-        if (isChecked)
-          setChildsChecked((IFolderChild) event.getElement(), isChecked);
-      }
-
-      public void treeCollapsed(TreeExpansionEvent event) {}
-    });
+    /* Set Input */
+    fFolderChildTree.getViewer().setInput(CoreUtils.loadRootFolders());
+    fFolderChildTree.setAllChecked(true);
 
     /* Select All / Deselect All */
     Composite buttonContainer = new Composite(container, SWT.NONE);
@@ -242,7 +136,7 @@ public class FeedSelectionPage extends WizardPage {
     fSelectAll.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        OwlUI.setAllChecked(fViewer.getTree(), true);
+        fFolderChildTree.setAllChecked(true);
       }
     });
 
@@ -252,7 +146,7 @@ public class FeedSelectionPage extends WizardPage {
     fDeselectAll.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        OwlUI.setAllChecked(fViewer.getTree(), false);
+        fFolderChildTree.setAllChecked(false);
       }
     });
 
@@ -273,23 +167,5 @@ public class FeedSelectionPage extends WizardPage {
     }
 
     return false;
-  }
-
-  private void setChildsChecked(IFolderChild folderChild, boolean checked) {
-    if (folderChild instanceof IFolder) {
-      List<IFolderChild> children = ((IFolder) folderChild).getChildren();
-      for (IFolderChild child : children) {
-        fViewer.setChecked(child, checked);
-        setChildsChecked(child, checked);
-      }
-    }
-  }
-
-  private void setParentsChecked(IFolderChild folderChild, boolean checked) {
-    IFolder parent = folderChild.getParent();
-    if (parent != null) {
-      fViewer.setChecked(parent, checked);
-      setParentsChecked(parent, checked);
-    }
   }
 }
