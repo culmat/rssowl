@@ -174,8 +174,6 @@ public class StringUtils {
     if (!StringUtils.isSet(str))
       return str;
 
-    int length = 0;
-    char[] result = new char[str.length()];
     Reader stripReader;
     if (tags == null || tags.isEmpty())
       stripReader = new HTMLStripReader(new StringReader(str), replaceEntities);
@@ -183,7 +181,7 @@ public class StringUtils {
       stripReader = new HTMLFilterReader(new StringReader(str), tags, replaceEntities);
 
     try {
-      length += stripReader.read(result);
+      return readString(stripReader);
     } catch (IOException e) {
       Activator.getDefault().logError(e.getMessage(), e);
       return str;
@@ -194,8 +192,6 @@ public class StringUtils {
         Activator.getDefault().logError(e.getMessage(), e);
       }
     }
-
-    return length > 0 ? new String(result, 0, length) : "";
   }
 
   /**
@@ -353,5 +349,21 @@ public class StringUtils {
     str = StringUtils.replaceAll(str, ">", "&gt;");
 
     return str;
+  }
+
+  /**
+   * @param reader the {@link Reader} to read from.
+   * @return a {@link String} as result from reading.
+   * @throws IOException in case of an error.
+   */
+  public static String readString(Reader reader) throws IOException {
+    StringBuilder str = new StringBuilder();
+    int len = 0;
+    char[] buf = new char[1000];
+
+    while ((len = reader.read(buf)) != -1)
+      str.append(buf, 0, len);
+
+    return str.toString();
   }
 }
