@@ -950,11 +950,10 @@ public class CoreUtils {
 
   /**
    * @param conditions
-   * @param ignoreWildcards
    * @param ignoreStopWords
    * @return Returns a set of words from the given conditions.
    */
-  public static Set<String> extractWords(List<ISearchCondition> conditions, boolean ignoreWildcards, boolean ignoreStopWords) {
+  public static Set<String> extractWords(List<ISearchCondition> conditions, boolean ignoreStopWords) {
     Set<String> words = new HashSet<String>(conditions.size());
 
     /* Check Search Conditions for String-Values */
@@ -964,10 +963,6 @@ public class CoreUtils {
 
         /* Ignore Wildcard Only Values (e.g. search for Labels) */
         if ("?".equals(value) || "*".equals(value))
-          continue;
-
-        /* Ignore Wildcards if set */
-        if (ignoreWildcards && (value.contains("?") || value.contains("*")))
           continue;
 
         /* Split into Words */
