@@ -107,6 +107,7 @@ public class TreeTraversalTest {
     assertEquals(subRoot3Folder1, t.nextNode().getData());
     assertEquals(subRoot31Mark1, t.nextNode().getData());
     assertEquals(null, t.nextNode());
+
   }
 
   /**
@@ -148,6 +149,23 @@ public class TreeTraversalTest {
     assertEquals(subRoot2Mark1, t.nextNode().getData());
     assertEquals(subRoot31Mark1, t.nextNode().getData());
     assertEquals(null, t.nextNode());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testTreeTraversalFromLeafWithBackwardNavigation() throws Exception {
+    ITreeNode startingNode = getStartingNode(false);
+
+    TreeTraversal t = new TreeTraversal(startingNode) {
+      @Override
+      public boolean select(ITreeNode node) {
+        return true;
+      }
+    };
+
+    assertEquals("SubRoot11Folder1", ((IFolder) t.previousNode().getData()).getName());
   }
 
   /**

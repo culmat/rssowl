@@ -44,8 +44,10 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.Controller.BookMarkLoadListener;
 
 import java.net.URI;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This TestCase covers use-cases for the Controller (network only).
@@ -69,25 +71,49 @@ public class ControllerTestNetwork {
    */
   @Test
   public void testReloadFeed() throws Exception {
-    IFeed feed = new Feed(new URI("http://www.rssowl.org/rssowl2dg/tests/manager/rss_2_0.xml")); //$NON-NLS-1$
-    feed = DynamicDAO.save(feed);
-    IBookMark bookmark = createBookMark(feed);
+    BookMarkLoadListener listener = null;
+    try {
+      final IFeed feed = DynamicDAO.save(new Feed(new URI("http://www.rssowl.org/rssowl2dg/tests/manager/rss_2_0.xml"))); //$NON-NLS-1$
+      IBookMark bookmark = createBookMark(feed);
 
-    assertTrue(bookmark.getNewsRefs().isEmpty());
-    assertTrue(bookmark.getNewsRefs(INews.State.getVisible()).isEmpty());
-    assertTrue(bookmark.getNews().isEmpty());
-    assertTrue(bookmark.getNews(INews.State.getVisible()).isEmpty());
-    assertEquals(0, bookmark.getNewsCount(INews.State.getVisible()));
+      final AtomicBoolean bool1 = new AtomicBoolean(false);
+      final AtomicBoolean bool2 = new AtomicBoolean(false);
 
-    Controller.getDefault().reload(bookmark, null, new NullProgressMonitor());
+      assertTrue(bookmark.getNewsRefs().isEmpty());
+      assertTrue(bookmark.getNewsRefs(INews.State.getVisible()).isEmpty());
+      assertTrue(bookmark.getNews().isEmpty());
+      assertTrue(bookmark.getNews(INews.State.getVisible()).isEmpty());
+      assertEquals(0, bookmark.getNewsCount(INews.State.getVisible()));
 
-    assertEquals(new FeedReference(feed.getId()).resolve().getFormat(), "RSS 2.0"); //$NON-NLS-1$
+      listener = new BookMarkLoadListener() {
+        public void bookMarkDoneLoading(IBookMark bookmark) {
+          if (bookmark.getFeedLinkReference().references(feed))
+            bool1.set(true);
+        }
 
-    assertEquals(15, bookmark.getNewsRefs().size());
-    assertEquals(15, bookmark.getNewsRefs(INews.State.getVisible()).size());
-    assertEquals(15, bookmark.getNews().size());
-    assertEquals(15, bookmark.getNews(INews.State.getVisible()).size());
-    assertEquals(15, bookmark.getNewsCount(INews.State.getVisible()));
+        public void bookMarkAboutToLoad(IBookMark bookmark) {
+          if (bookmark.getFeedLinkReference().references(feed))
+            bool2.set(true);
+        }
+      };
+      Controller.getDefault().addBookMarkLoadListener(listener);
+
+      Controller.getDefault().reload(bookmark, null, new NullProgressMonitor());
+
+      assertEquals(new FeedReference(feed.getId()).resolve().getFormat(), "RSS 2.0"); //$NON-NLS-1$
+
+      assertEquals(15, bookmark.getNewsRefs().size());
+      assertEquals(15, bookmark.getNewsRefs(INews.State.getVisible()).size());
+      assertEquals(15, bookmark.getNews().size());
+      assertEquals(15, bookmark.getNews(INews.State.getVisible()).size());
+      assertEquals(15, bookmark.getNewsCount(INews.State.getVisible()));
+
+      assertTrue(bool1.get());
+      assertTrue(bool2.get());
+    } finally {
+      if (listener != null)
+        Controller.getDefault().removeBookMarkLoadListener(listener);
+    }
   }
 
   /**

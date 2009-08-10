@@ -40,7 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Tests methods in MergeUtils.
+ * Tests methods in {@link MergeUtils}.
  */
 public class MergeUtilsTest {
 
