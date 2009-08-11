@@ -57,16 +57,12 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.keys.IBindingService;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
-import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.core.util.CoreUtils;
-import org.rssowl.ui.internal.actions.AssignLabelsAction;
 import org.rssowl.ui.internal.actions.CopyLinkAction;
 import org.rssowl.ui.internal.actions.CreateFilterAction;
 import org.rssowl.ui.internal.actions.FindAction;
-import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
@@ -78,22 +74,18 @@ import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.actions.SearchNewsAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.UndoAction;
-import org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.dialogs.preferences.NotifierPreferencesPage;
 import org.rssowl.ui.internal.dialogs.preferences.OverviewPreferencesPage;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.util.BrowserUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author bpasero
@@ -583,36 +575,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           }
 
           /* Label */
-          {
-            Collection<ILabel> labels = CoreUtils.loadSortedLabels();
-
-            MenuManager labelMenu = new MenuManager("&Label");
-            manager.add(labelMenu);
-
-            /* Assign / Organize Labels */
-            labelMenu.add(new AssignLabelsAction(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), selection));
-            labelMenu.add(new Action("&Organize Labels...") {
-              @Override
-              public void run() {
-                PreferencesUtil.createPreferenceDialogOn(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), ManageLabelsPreferencePage.ID, null, null).open();
-              }
-            });
-            labelMenu.add(new Separator());
-
-            /* Retrieve Labels that all selected News contain */
-            Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(selection);
-            for (final ILabel label : labels) {
-              LabelAction labelAction = new LabelAction(label, selection);
-              labelAction.setChecked(selectedLabels.contains(label));
-              labelMenu.add(labelAction);
-            }
-
-            /* Remove All Labels */
-            labelMenu.add(new Separator());
-            LabelAction removeAllLabels = new LabelAction(null, selection);
-            removeAllLabels.setEnabled(!labels.isEmpty());
-            labelMenu.add(removeAllLabels);
-          }
+          OwlUI.fillLabelMenu(manager, selection, getActionBarConfigurer().getWindowConfigurer().getWindow(), false);
         }
 
         /* Move To / Copy To */

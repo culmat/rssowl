@@ -99,7 +99,6 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
@@ -137,14 +136,11 @@ import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.actions.AssignLabelsAction;
-import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
 import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
-import org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserViewer;
 import org.rssowl.ui.internal.editors.feed.NewsColumn;
@@ -1789,37 +1785,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
           markMenu.add(action);
 
           /* Label */
-          if (!selection.isEmpty()) {
-            Collection<ILabel> labels = CoreUtils.loadSortedLabels();
-
-            /* Label */
-            MenuManager labelMenu = new MenuManager("Label");
-            manager.appendToGroup("mark", labelMenu);
-
-            /* Assign / Organize Labels */
-            labelMenu.add(new AssignLabelsAction(getShell(), selection));
-            labelMenu.add(new Action("Organize Labels...") {
-              @Override
-              public void run() {
-                PreferencesUtil.createPreferenceDialogOn(getShell(), ManageLabelsPreferencePage.ID, null, null).open();
-              }
-            });
-            labelMenu.add(new Separator());
-
-            /* Retrieve Labels that all selected News contain */
-            Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(selection);
-            for (final ILabel label : labels) {
-              LabelAction labelAction = new LabelAction(label, selection);
-              labelAction.setChecked(selectedLabels.contains(label));
-              labelMenu.add(labelAction);
-            }
-
-            /* Remove All Labels */
-            labelMenu.add(new Separator());
-            LabelAction removeAllLabels = new LabelAction(null, selection);
-            removeAllLabels.setEnabled(!labels.isEmpty());
-            labelMenu.add(removeAllLabels);
-          }
+          OwlUI.fillLabelMenu(manager, selection, new SameShellProvider(getShell()), false);
         }
 
         /* Move To / Copy To */
