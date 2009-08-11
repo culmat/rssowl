@@ -54,6 +54,7 @@ import org.rssowl.core.persist.event.ModelEvent;
 import org.rssowl.core.persist.event.NewsEvent;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.Pair;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.util.ModelUtils;
@@ -895,11 +896,17 @@ public class ModelUtilsTest {
 
     DynamicDAO.save(feed);
 
-    List<URI> links = ModelUtils.getAttachmentLinks(new StructuredSelection(news));
+    List<Pair<IAttachment, URI>> links = ModelUtils.getAttachmentLinks(new StructuredSelection(news));
     assertEquals(4, links.size());
-    assertTrue(links.contains(new URI("http://www.rssowl.org/foobar")));
-    assertTrue(links.contains(new URI("http://www.rssowl.org/download1.mp3")));
-    assertTrue(links.contains(new URI("http://www.rssowl.org/download2.mp3")));
-    assertTrue(links.contains(new URI("http://www.rssowl.org/download3.mp3")));
+
+    List<URI> uris = new ArrayList<URI>();
+    for (Pair<IAttachment, URI> pair : links) {
+      uris.add(pair.getSecond());
+    }
+
+    assertTrue(uris.contains(new URI("http://www.rssowl.org/foobar")));
+    assertTrue(uris.contains(new URI("http://www.rssowl.org/download1.mp3")));
+    assertTrue(uris.contains(new URI("http://www.rssowl.org/download2.mp3")));
+    assertTrue(uris.contains(new URI("http://www.rssowl.org/download3.mp3")));
   }
 }
