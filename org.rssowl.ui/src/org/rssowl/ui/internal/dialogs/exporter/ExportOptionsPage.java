@@ -95,7 +95,7 @@ public class ExportOptionsPage extends WizardPage {
     Collection<ISearchFilter> filters = DynamicDAO.loadAll(ISearchFilter.class);
     final boolean filtersUseLabels = filtersUseLabels(filters);
     fExportFiltersCheck = new Button(container, SWT.CHECK);
-    fExportFiltersCheck.setImage(OwlUI.getImage(fExportFiltersCheck, "icons/etool16/filter.gif"));
+    fExportFiltersCheck.setImage(OwlUI.getImage(fExportFiltersCheck, OwlUI.FILTER));
     if (!filters.isEmpty())
       fExportFiltersCheck.setText("Export News Filters (" + filters.size() + " in total)");
     else
