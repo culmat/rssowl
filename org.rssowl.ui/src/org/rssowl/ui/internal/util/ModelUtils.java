@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.util;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
@@ -33,11 +34,13 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -280,5 +283,29 @@ public class ModelUtils {
     }
 
     return labelsForAll;
+  }
+
+  /**
+   * @param selection a {@link IStructuredSelection} of {@link INews}.
+   * @return a {@link List} of {@link String} from the selection of
+   * {@link INews} pointing to downloadable attachment links.
+   */
+  public static List<URI> getAttachmentLinks(IStructuredSelection selection) {
+    List<URI> attachmentLinks = new ArrayList<URI>();
+    Set<INews> news = normalize(selection.toList());
+    for (INews newsitem : news) {
+      List<IAttachment> attachments = newsitem.getAttachments();
+      for (IAttachment attachment : attachments) {
+        URI link = attachment.getLink();
+        if (link != null) {
+          if (!link.isAbsolute())
+            link = URIUtils.resolve(newsitem.getFeedReference().getLink(), link);
+
+          attachmentLinks.add(link);
+        }
+      }
+    }
+
+    return attachmentLinks;
   }
 }

@@ -53,6 +53,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewerColumn;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.window.SameShellProvider;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
@@ -821,6 +822,11 @@ public class NewsTableControl implements IFeedViewPart {
           /* Show only when internal browser is used */
           if (!selection.isEmpty() && !fGlobalPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fGlobalPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
             manager.add(new OpenInExternalBrowserAction(selection));
+        }
+
+        /* Attachments */
+        {
+          OwlUI.fillAttachmentsMenu(manager, selection, new SameShellProvider(fViewer.getTree().getShell()), false);
         }
 
         /* Mark / Label */

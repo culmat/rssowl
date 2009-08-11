@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.editors.feed;
 
 import static org.rssowl.ui.internal.ILinkHandler.HANDLER_PROTOCOL;
+import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.ATTACHMENTS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.DELETE_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.LABELS_MENU_HANDLER_ID;
 import static org.rssowl.ui.internal.editors.feed.NewsBrowserViewer.NEWS_MENU_HANDLER_ID;
@@ -371,10 +372,12 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       color = null;
 
     boolean hasAttachments = false;
-    if (!news.getAttachments().isEmpty()) {
-      URI attachmentLink = news.getAttachments().get(0).getLink();
-      if (attachmentLink != null)
-        hasAttachments = URIUtils.looksLikeLink(attachmentLink.toString());
+    List<IAttachment> attachments = news.getAttachments();
+    for (IAttachment attachment : attachments) {
+      if (attachment.getLink() != null) {
+        hasAttachments = true;
+        break;
+      }
     }
 
     /* DIV: NewsItem */
@@ -521,10 +524,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       builder.append("</td>");
 
       builder.append("<td class=\"subline\">");
-      IAttachment attachment = news.getAttachments().get(0);
-      String link = attachment.getLink().toASCIIString();
-      String name = URIUtils.getFile(attachment.getLink());
-      imageLink(builder, link, StringUtils.isSet(name) ? StringUtils.htmlEscape(name) : "Attachment", "Attachment", "/icons/obj16/attachment_light.gif", "attachment_light.gif", null, null);
+      String link = HANDLER_PROTOCOL + ATTACHMENTS_MENU_HANDLER_ID + "?" + news.getId();
+      imageLink(builder, link, "Attachments", "Attachments", "/icons/obj16/attachment_light.gif", "attachment_light.gif", null, null);
       builder.append("</td>");
     }
 
@@ -599,7 +600,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       div(footer, news.isFlagged() ? "footerSticky" : "footer", Dynamic.FOOTER.getId(news));
 
       /* Attachments */
-      List<IAttachment> attachments = news.getAttachments();
       if (attachments.size() != 0) {
 
         /* DIV: NewsItem/Footer/Attachments */

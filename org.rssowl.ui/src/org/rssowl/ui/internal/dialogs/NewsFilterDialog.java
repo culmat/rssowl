@@ -114,6 +114,8 @@ public class NewsFilterDialog extends TitleAreaDialog {
   private Text fNameInput;
   private int fFilterPosition;
   private ISearch fPresetSearch;
+  private boolean fPresetMatchAll;
+  private List<IFilterAction> fPresetActions;
   private ISearchFilter fAddedFilter;
 
   /**
@@ -140,9 +142,22 @@ public class NewsFilterDialog extends TitleAreaDialog {
    * @param presetSearch a search that is preset in the condition area.
    */
   public NewsFilterDialog(Shell parentShell, ISearch presetSearch) {
+    this(parentShell, presetSearch, null, false);
+  }
+
+  /**
+   * @param parentShell the Shell to create this Dialog on.
+   * @param presetSearch a search that is preset in the condition area.
+   * @param presetActions a list of {@link IFilterAction} that is preset
+   * @param matchAll <code>true</code> to all news or <code>false</code>
+   * otherwise.
+   */
+  public NewsFilterDialog(Shell parentShell, ISearch presetSearch, List<IFilterAction> presetActions, boolean matchAll) {
     super(parentShell);
 
     fPresetSearch = presetSearch;
+    fPresetActions = presetActions;
+    fPresetMatchAll = matchAll;
     fEditedFilter = null;
     fResources = new LocalResourceManager(JFaceResources.getResources());
   }
@@ -429,7 +444,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
     topControlsContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
     topControlsContainer.setLayout(LayoutUtils.createGridLayout(6, 10, 3));
 
-    boolean matchAllNews = (fEditedFilter != null) ? fEditedFilter.matchAllNews() : false;
+    boolean matchAllNews = (fEditedFilter != null) ? fEditedFilter.matchAllNews() : fPresetMatchAll;
     boolean matchAllConditions = !matchAllNews && (fEditedFilter != null) ? fEditedFilter.getSearch().matchAllConditions() : true;
 
     if (fPresetSearch != null)
@@ -662,6 +677,8 @@ public class NewsFilterDialog extends TitleAreaDialog {
     /* Show initial Actions if present */
     if (fEditedFilter != null)
       fFilterActionList.showActions(fEditedFilter.getActions());
+    else if (fPresetActions != null)
+      fFilterActionList.showActions(fPresetActions);
   }
 
   private List<IFilterAction> getDefaultActions() {

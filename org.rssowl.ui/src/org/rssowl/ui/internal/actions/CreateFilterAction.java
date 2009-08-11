@@ -34,6 +34,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.rssowl.core.Owl;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
+import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
@@ -50,10 +51,12 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.NewsFilterDialog;
 import org.rssowl.ui.internal.dialogs.NewsFiltersListDialog;
+import org.rssowl.ui.internal.filter.DownloadAttachmentsNewsAction;
 import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -64,11 +67,20 @@ import java.util.List;
  */
 public class CreateFilterAction implements IObjectActionDelegate {
   private IStructuredSelection fSelection;
+  private boolean fAutomateDownload = false;
 
   /*
    * @see org.eclipse.ui.IObjectActionDelegate#setActivePart(org.eclipse.jface.action.IAction, org.eclipse.ui.IWorkbenchPart)
    */
   public void setActivePart(IAction action, IWorkbenchPart targetPart) {}
+
+  /**
+   * @param automateDownload if <code>true</code> creates a new filter for
+   * automatic download, <code>false</code> to create a normal filter.
+   */
+  public void setAutomateDownload(boolean automateDownload) {
+    fAutomateDownload = automateDownload;
+  }
 
   /*
    * @see org.eclipse.ui.IActionDelegate#run(org.eclipse.jface.action.IAction)
@@ -80,7 +92,18 @@ public class CreateFilterAction implements IObjectActionDelegate {
       fillSearchConditions(presetSearch);
       presetSearch.setMatchAllConditions(true);
 
-      NewsFilterDialog dialog = new NewsFilterDialog(shell, presetSearch);
+      NewsFilterDialog dialog;
+
+      /* Preset with Automatic Download Filter */
+      if (fAutomateDownload) {
+        IFilterAction downloadAction = Owl.getModelFactory().createFilterAction(DownloadAttachmentsNewsAction.ID);
+        dialog = new NewsFilterDialog(shell, presetSearch, Collections.singletonList(downloadAction), true);
+      }
+
+      /* Preset with Normal Filter */
+      else
+        dialog = new NewsFilterDialog(shell, presetSearch);
+
       Collection<ISearchFilter> existingFilters = DynamicDAO.loadAll(ISearchFilter.class);
       if (existingFilters != null && !existingFilters.isEmpty())
         dialog.setFilterPosition(existingFilters.size());
@@ -135,6 +158,10 @@ public class CreateFilterAction implements IObjectActionDelegate {
       ISearchCondition condition = factory.createSearchCondition(locationField, SearchSpecifier.SCOPE, value);
       presetSearch.addSearchCondition(condition);
     }
+
+    /* Category and Author are not used for automated Download */
+    if (fAutomateDownload)
+      return;
 
     /* Category (only first one) */
     List<ICategory> categories = news.getCategories();
