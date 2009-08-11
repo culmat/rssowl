@@ -39,6 +39,7 @@ import org.rssowl.core.internal.persist.Folder;
 import org.rssowl.core.internal.persist.Label;
 import org.rssowl.core.internal.persist.News;
 import org.rssowl.core.internal.persist.Person;
+import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
@@ -860,5 +861,45 @@ public class ModelUtilsTest {
 
     labels = ModelUtils.getLabelsForAll(new StructuredSelection(new Object[] { news1, news2, news3 }));
     assertEquals(0, labels.size());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testGetAttachmentLinks() throws Exception {
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.rssowl.org"));
+    INews news1 = fFactory.createNews(null, feed, new Date());
+    INews news2 = fFactory.createNews(null, feed, new Date());
+
+    IAttachment att = fFactory.createAttachment(null, news2);
+
+    att = fFactory.createAttachment(null, news2);
+    att.setLink(new URI("foobar"));
+
+    INews news3 = fFactory.createNews(null, feed, new Date());
+
+    att = fFactory.createAttachment(null, news3);
+    att.setLink(new URI("http://www.rssowl.org/download1.mp3"));
+
+    att = fFactory.createAttachment(null, news3);
+    att.setLink(new URI("/download2.mp3"));
+
+    att = fFactory.createAttachment(null, news3);
+    att.setLink(new URI("download3.mp3"));
+
+    List<INews> news = new ArrayList<INews>();
+    news.add(news1);
+    news.add(news2);
+    news.add(news3);
+
+    DynamicDAO.save(feed);
+
+    List<URI> links = ModelUtils.getAttachmentLinks(new StructuredSelection(news));
+    assertEquals(4, links.size());
+    assertTrue(links.contains(new URI("http://www.rssowl.org/foobar")));
+    assertTrue(links.contains(new URI("http://www.rssowl.org/download1.mp3")));
+    assertTrue(links.contains(new URI("http://www.rssowl.org/download2.mp3")));
+    assertTrue(links.contains(new URI("http://www.rssowl.org/download3.mp3")));
   }
 }

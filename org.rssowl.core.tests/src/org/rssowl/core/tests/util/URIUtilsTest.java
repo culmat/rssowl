@@ -105,4 +105,31 @@ public class URIUtilsTest {
     assertEquals("http://www.rssowl.org", URIUtils.normalizeUri(new URI("http://www.rssowl.org/path"), true).toString());
     assertEquals("http://www.rssowl.org:80", URIUtils.normalizeUri(new URI("http://www.rssowl.org:80/path"), true).toString());
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testResolve() throws Exception {
+    URI baseWithTrailingSlash = new URI("http://www.rssowl.org/");
+    URI baseWithoutTrailingSlash = new URI("http://www.rssowl.org");
+
+    URI base2WithTrailingSlash = new URI("http://www.rssowl.org/other/");
+    URI base2WithoutTrailingSlash = new URI("http://www.rssowl.org/other");
+
+    URI relativeWithLeadingSlash = new URI("/path/download.mp3");
+    URI relativeWithoutLeadingSlash = new URI("path/download.mp3");
+
+    assertEquals("http://www.rssowl.org/path/download.mp3", URIUtils.resolve(baseWithTrailingSlash, relativeWithLeadingSlash).toString());
+    assertEquals("http://www.rssowl.org/path/download.mp3", URIUtils.resolve(baseWithTrailingSlash, relativeWithoutLeadingSlash).toString());
+
+    assertEquals("http://www.rssowl.org/path/download.mp3", URIUtils.resolve(baseWithoutTrailingSlash, relativeWithLeadingSlash).toString());
+    assertEquals("http://www.rssowl.org/path/download.mp3", URIUtils.resolve(baseWithoutTrailingSlash, relativeWithoutLeadingSlash).toString());
+
+    assertEquals("http://www.rssowl.org/path/download.mp3", URIUtils.resolve(base2WithTrailingSlash, relativeWithLeadingSlash).toString());
+    assertEquals("http://www.rssowl.org/other/path/download.mp3", URIUtils.resolve(base2WithTrailingSlash, relativeWithoutLeadingSlash).toString());
+
+    assertEquals("http://www.rssowl.org/path/download.mp3", URIUtils.resolve(base2WithoutTrailingSlash, relativeWithLeadingSlash).toString());
+    assertEquals("http://www.rssowl.org/other/path/download.mp3", URIUtils.resolve(base2WithoutTrailingSlash, relativeWithoutLeadingSlash).toString());
+  }
 }
