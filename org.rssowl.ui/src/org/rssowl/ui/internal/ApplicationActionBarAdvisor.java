@@ -58,12 +58,10 @@ import org.eclipse.ui.keys.IBindingService;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.ILabel;
-import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.CoreUtils;
-import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.actions.AssignLabelsAction;
 import org.rssowl.ui.internal.actions.CopyLinkAction;
 import org.rssowl.ui.internal.actions.CreateFilterAction;
@@ -78,13 +76,11 @@ import org.rssowl.ui.internal.actions.RedoAction;
 import org.rssowl.ui.internal.actions.ReloadAllAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.actions.SearchNewsAction;
-import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.UndoAction;
 import org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.dialogs.preferences.NotifierPreferencesPage;
 import org.rssowl.ui.internal.dialogs.preferences.OverviewPreferencesPage;
-import org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage;
 import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
@@ -665,63 +661,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
         /* Share */
         if (!selection.isEmpty()) {
-          manager.add(new Separator("share"));
-          MenuManager shareMenu = new MenuManager("S&hare News", OwlUI.SHARE, "sharenews");
-          manager.add(shareMenu);
-
-          List<ShareProvider> providers = Controller.getDefault().getShareProviders();
-          for (final ShareProvider provider : providers) {
-            if (provider.isEnabled()) {
-              shareMenu.add(new Action(provider.getName()) {
-                @Override
-                public void run() {
-                  if (SendLinkAction.ID.equals(provider.getId())) {
-                    IActionDelegate action = new SendLinkAction();
-                    action.selectionChanged(null, selection);
-                    action.run(null);
-                  } else {
-                    Object obj = selection.getFirstElement();
-                    if (obj != null && obj instanceof INews) {
-                      String shareLink = provider.toShareUrl((INews) obj);
-                      new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
-                    }
-                  }
-                };
-
-                @Override
-                public ImageDescriptor getImageDescriptor() {
-                  if (StringUtils.isSet(provider.getIconPath()))
-                    return OwlUI.getImageDescriptor(provider.getPluginId(), provider.getIconPath());
-
-                  return super.getImageDescriptor();
-                };
-
-                @Override
-                public boolean isEnabled() {
-                  return !selection.isEmpty();
-                }
-
-                @Override
-                public String getActionDefinitionId() {
-                  return SendLinkAction.ID.equals(provider.getId()) ? SendLinkAction.ID : super.getActionDefinitionId();
-                }
-
-                @Override
-                public String getId() {
-                  return SendLinkAction.ID.equals(provider.getId()) ? SendLinkAction.ID : super.getId();
-                }
-              });
-            }
-          }
-
-          /* Configure Providers */
-          shareMenu.add(new Separator());
-          shareMenu.add(new Action("&Configure...") {
-            @Override
-            public void run() {
-              PreferencesUtil.createPreferenceDialogOn(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), SharingPreferencesPage.ID, null, null).open();
-            };
-          });
+          OwlUI.fillShareMenu(manager, selection, getActionBarConfigurer().getWindowConfigurer().getWindow(), false);
         }
 
         /* Filter */

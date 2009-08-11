@@ -50,6 +50,7 @@ import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.jface.wizard.ProgressMonitorPart;
 import org.eclipse.jface.wizard.Wizard;
@@ -85,6 +86,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewPart;
@@ -94,6 +96,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
@@ -116,6 +119,9 @@ import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.actions.CreateFilterAction;
+import org.rssowl.ui.internal.actions.OpenInBrowserAction;
+import org.rssowl.ui.internal.actions.SendLinkAction;
+import org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage;
 import org.rssowl.ui.internal.editors.browser.WebBrowserInput;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 import org.rssowl.ui.internal.editors.feed.FeedView;
@@ -1862,6 +1868,7 @@ public class OwlUI {
     if (!attachments.isEmpty()) {
       manager.add(new Separator("attachments"));
 
+      /* Either as direct Menu or Submenu */
       IMenuManager attachmentMenu;
       if (directMenu)
         attachmentMenu = manager;
@@ -1922,5 +1929,85 @@ public class OwlUI {
         });
       }
     }
+  }
+
+  /**
+   * @param manager the {@link IMenuManager} to fill this menu into.
+   * @param selection the current {@link IStructuredSelection} of {@link INews}.
+   * @param shellProvider a {@link IShellProvider} for dialogs.
+   * @param directMenu if <code>true</code> directly fill all items to the menu,
+   * otherwise create a sub menu.
+   */
+  public static void fillShareMenu(IMenuManager manager, final IStructuredSelection selection, final IShellProvider shellProvider, boolean directMenu) {
+    manager.add(new Separator("share"));
+
+    /* Either as direct Menu or Submenu */
+    IMenuManager shareMenu;
+    if (directMenu)
+      shareMenu = manager;
+    else {
+      shareMenu = new MenuManager("&Share News", OwlUI.SHARE, "sharenews");
+      manager.add(shareMenu);
+    }
+
+    /* List all selected Share Providers  */
+    List<ShareProvider> providers = Controller.getDefault().getShareProviders();
+    for (final ShareProvider provider : providers) {
+      if (provider.isEnabled()) {
+        shareMenu.add(new Action(provider.getName()) {
+          @Override
+          public void run() {
+
+            /* Special Case "Send E-Mail" action */
+            if (SendLinkAction.ID.equals(provider.getId())) {
+              IActionDelegate action = new SendLinkAction();
+              action.selectionChanged(null, selection);
+              action.run(null);
+            }
+
+            /* Other Action */
+            else {
+              Object obj = selection.getFirstElement();
+              if (obj != null && obj instanceof INews) {
+                String shareLink = provider.toShareUrl((INews) obj);
+                new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
+              }
+            }
+          };
+
+          @Override
+          public ImageDescriptor getImageDescriptor() {
+            if (StringUtils.isSet(provider.getIconPath()))
+              return OwlUI.getImageDescriptor(provider.getPluginId(), provider.getIconPath());
+
+            return super.getImageDescriptor();
+          };
+
+          @Override
+          public boolean isEnabled() {
+            return !selection.isEmpty();
+          }
+
+          @Override
+          public String getActionDefinitionId() {
+            return SendLinkAction.ID.equals(provider.getId()) ? SendLinkAction.ID : super.getActionDefinitionId();
+          }
+
+          @Override
+          public String getId() {
+            return SendLinkAction.ID.equals(provider.getId()) ? SendLinkAction.ID : super.getId();
+          }
+        });
+      }
+    }
+
+    /* Allow to Configure Providers */
+    shareMenu.add(new Separator());
+    shareMenu.add(new Action("&Configure...") {
+      @Override
+      public void run() {
+        PreferencesUtil.createPreferenceDialogOn(shellProvider.getShell(), SharingPreferencesPage.ID, null, null).open();
+      };
+    });
   }
 }
