@@ -59,12 +59,14 @@ import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.eclipse.ui.keys.IBindingService;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.actions.AssignLabelsAction;
@@ -97,6 +99,8 @@ import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.io.File;
 import java.net.URI;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -120,6 +124,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
   /** End of the View Top Menu */
   public static final String M_VIEW_END = "viewEnd";
+
+  /* Used to format Sizes */
+  private static final NumberFormat fgSizeNumberFormat = new DecimalFormat("0.0");
 
   private IContributionItem fOpenWindowsItem;
   private IContributionItem fReopenEditors;
@@ -916,7 +923,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
    * otherwise create a sub menu.
    */
   public static void fillAttachmentsMenu(IMenuManager manager, final IStructuredSelection selection, final IShellProvider shellProvider, boolean directMenu) {
-    final List<URI> attachments = ModelUtils.getAttachmentLinks(selection);
+    final List<Pair<IAttachment, URI>> attachments = ModelUtils.getAttachmentLinks(selection);
     if (!attachments.isEmpty()) {
       manager.add(new Separator("attachments"));
 
@@ -930,20 +937,23 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       }
 
       /* Offer Download Action for each */
-      for (final URI attachmentLink : attachments) {
-        String name = URIUtils.getFile(attachmentLink);
-        Action action = new Action(name) {
+      for (final Pair<IAttachment, URI> attachmentPair : attachments) {
+        IAttachment attachment = attachmentPair.getFirst();
+        String fileName = URIUtils.getFile(attachmentPair.getSecond());
+        String size = getSize(attachment.getLength());
+
+        Action action = new Action(size != null ? (fileName + " (" + size + ")") : (fileName)) {
           @Override
           public void run() {
             DirectoryDialog dialog = new DirectoryDialog(shellProvider.getShell(), SWT.None);
             dialog.setText("Select a Folder for the Download");
             String folder = dialog.open();
             if (StringUtils.isSet(folder))
-              Controller.getDefault().getDownloadService().download(attachmentLink, new File(folder));
+              Controller.getDefault().getDownloadService().download(attachmentPair.getSecond(), new File(folder));
           }
         };
 
-        action.setImageDescriptor(OwlUI.getAttachmentImage(name));
+        action.setImageDescriptor(OwlUI.getAttachmentImage(fileName));
         attachmentMenu.add(action);
       }
 
@@ -973,14 +983,29 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             dialog.setText("Select a Folder for the Downloads");
             String folder = dialog.open();
             if (StringUtils.isSet(folder)) {
-              for (URI uri : attachments) {
-                Controller.getDefault().getDownloadService().download(uri, new File(folder));
+              for (Pair<IAttachment, URI> attachment : attachments) {
+                Controller.getDefault().getDownloadService().download(attachment.getSecond(), new File(folder));
               }
             }
           }
         });
       }
     }
+  }
+
+  private static String getSize(int bytes) {
+    if (bytes > 0) {
+      double mb = bytes / (1024d * 1024d);
+      double kb = bytes / 1024d;
+
+      if (mb >= 1)
+        return fgSizeNumberFormat.format(mb) + " MB";
+
+      if (kb >= 1)
+        return fgSizeNumberFormat.format(kb) + " KB";
+    }
+
+    return null;
   }
 
   /**
