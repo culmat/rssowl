@@ -118,9 +118,12 @@ import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.actions.AssignLabelsAction;
 import org.rssowl.ui.internal.actions.CreateFilterAction;
+import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
+import org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage;
 import org.rssowl.ui.internal.editors.browser.WebBrowserInput;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
@@ -2009,5 +2012,51 @@ public class OwlUI {
         PreferencesUtil.createPreferenceDialogOn(shellProvider.getShell(), SharingPreferencesPage.ID, null, null).open();
       };
     });
+  }
+
+  /**
+   * @param manager the {@link IMenuManager} to fill this menu into.
+   * @param selection the current {@link IStructuredSelection} of {@link INews}.
+   * @param shellProvider a {@link IShellProvider} for dialogs.
+   * @param directMenu if <code>true</code> directly fill all items to the menu,
+   * otherwise create a sub menu.
+   */
+  public static void fillLabelMenu(IMenuManager manager, final IStructuredSelection selection, final IShellProvider shellProvider, boolean directMenu) {
+    if (!selection.isEmpty()) {
+      Collection<ILabel> labels = CoreUtils.loadSortedLabels();
+
+      /* Either as direct Menu or Submenu */
+      IMenuManager labelMenu;
+      if (directMenu)
+        labelMenu = manager;
+      else {
+        labelMenu = new MenuManager("&Label");
+        manager.add(labelMenu);
+      }
+
+      /* Assign / Organize Labels */
+      labelMenu.add(new AssignLabelsAction(shellProvider.getShell(), selection));
+      labelMenu.add(new Action("&Organize Labels...") {
+        @Override
+        public void run() {
+          PreferencesUtil.createPreferenceDialogOn(shellProvider.getShell(), ManageLabelsPreferencePage.ID, null, null).open();
+        }
+      });
+      labelMenu.add(new Separator());
+
+      /* Retrieve Labels that all selected News contain */
+      Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(selection);
+      for (final ILabel label : labels) {
+        LabelAction labelAction = new LabelAction(label, selection);
+        labelAction.setChecked(selectedLabels.contains(label));
+        labelMenu.add(labelAction);
+      }
+
+      /* Remove All Labels */
+      labelMenu.add(new Separator());
+      LabelAction removeAllLabels = new LabelAction(null, selection);
+      removeAllLabels.setEnabled(!labels.isEmpty());
+      labelMenu.add(removeAllLabels);
+    }
   }
 }

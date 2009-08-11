@@ -26,7 +26,6 @@ package org.rssowl.ui.internal.editors.feed;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
@@ -52,7 +51,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.ILabel;
@@ -75,8 +73,6 @@ import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.actions.AssignLabelsAction;
-import org.rssowl.ui.internal.actions.LabelAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
 import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
@@ -85,13 +81,11 @@ import org.rssowl.ui.internal.actions.OpenInExternalBrowserAction;
 import org.rssowl.ui.internal.actions.OpenNewsAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.dialogs.SearchNewsDialog;
-import org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.editors.feed.NewsBrowserLabelProvider.Dynamic;
 import org.rssowl.ui.internal.undo.NewsStateOperation;
 import org.rssowl.ui.internal.undo.StickyOperation;
 import org.rssowl.ui.internal.undo.UndoStack;
 import org.rssowl.ui.internal.util.CBrowser;
-import org.rssowl.ui.internal.util.ModelUtils;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -249,37 +243,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           markMenu.add(action);
 
           /* Label */
-          if (!fCurrentSelection.isEmpty()) {
-            Collection<ILabel> labels = CoreUtils.loadSortedLabels();
-
-            /* Label */
-            MenuManager labelMenu = new MenuManager("Label");
-            manager.appendToGroup("mark", labelMenu);
-
-            /* Assign / Organize Labels */
-            labelMenu.add(new AssignLabelsAction(fBrowser.getControl().getShell(), fCurrentSelection));
-            labelMenu.add(new Action("Organize Labels...") {
-              @Override
-              public void run() {
-                PreferencesUtil.createPreferenceDialogOn(fBrowser.getControl().getShell(), ManageLabelsPreferencePage.ID, null, null).open();
-              }
-            });
-            labelMenu.add(new Separator());
-
-            /* Retrieve Labels that all selected News contain */
-            Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(fCurrentSelection);
-            for (final ILabel label : labels) {
-              LabelAction labelAction = new LabelAction(label, fCurrentSelection);
-              labelAction.setChecked(selectedLabels.contains(label));
-              labelMenu.add(labelAction);
-            }
-
-            /* Remove All Labels */
-            labelMenu.add(new Separator());
-            LabelAction removeAllLabels = new LabelAction(null, fCurrentSelection);
-            removeAllLabels.setEnabled(!labels.isEmpty());
-            labelMenu.add(removeAllLabels);
-          }
+          OwlUI.fillLabelMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), false);
         }
 
         /* Move To / Copy To */
@@ -368,31 +332,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     manager.setRemoveAllWhenShown(true);
     manager.addMenuListener(new IMenuListener() {
       public void menuAboutToShow(IMenuManager manager) {
-        Collection<ILabel> labels = CoreUtils.loadSortedLabels();
-
-        /* Assign / Organize Labels */
-        manager.add(new AssignLabelsAction(fBrowser.getControl().getShell(), fCurrentSelection));
-        manager.add(new Action("Organize Labels...") {
-          @Override
-          public void run() {
-            PreferencesUtil.createPreferenceDialogOn(fBrowser.getControl().getShell(), ManageLabelsPreferencePage.ID, null, null).open();
-          }
-        });
-        manager.add(new Separator());
-
-        /* Retrieve Labels that all selected News contain */
-        Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(fCurrentSelection);
-        for (final ILabel label : labels) {
-          LabelAction labelAction = new LabelAction(label, fCurrentSelection);
-          labelAction.setChecked(selectedLabels.contains(label));
-          manager.add(labelAction);
-        }
-
-        /* Remove All Labels */
-        manager.add(new Separator());
-        LabelAction removeAllLabels = new LabelAction(null, fCurrentSelection);
-        removeAllLabels.setEnabled(!labels.isEmpty());
-        manager.add(removeAllLabels);
+        OwlUI.fillLabelMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), true);
       }
     });
 
