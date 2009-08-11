@@ -85,7 +85,7 @@ public class ImportOptionsPage extends WizardPage {
 
     /* Filters */
     fImportFiltersCheck = new Button(container, SWT.CHECK);
-    fImportFiltersCheck.setImage(OwlUI.getImage(fImportFiltersCheck, "icons/etool16/filter.gif"));
+    fImportFiltersCheck.setImage(OwlUI.getImage(fImportFiltersCheck, OwlUI.FILTER));
     fImportFiltersCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     fImportFiltersCheck.addSelectionListener(new SelectionAdapter() {
 

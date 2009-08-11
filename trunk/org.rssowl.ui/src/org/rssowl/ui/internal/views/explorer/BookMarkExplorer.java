@@ -820,7 +820,7 @@ public class BookMarkExplorer extends ViewPart {
       @Override
       public ImageDescriptor getImageDescriptor() {
         if (fBookMarkFilter.getType() == BookMarkFilter.Type.SHOW_ALL)
-          return OwlUI.getImageDescriptor("icons/etool16/filter.gif"); //$NON-NLS-1$
+          return OwlUI.FILTER; //$NON-NLS-1$
 
         return OwlUI.getImageDescriptor("icons/etool16/filter_active.gif"); //$NON-NLS-1$
       }

@@ -555,6 +555,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             manager.add(new OpenInExternalBrowserAction(selection));
         }
 
+        /* Attachments */
+        {
+          OwlUI.fillAttachmentsMenu(manager, selection, getActionBarConfigurer().getWindowConfigurer().getWindow(), false);
+        }
+
         /* Mark / Label */
         {
           manager.add(new Separator("mark"));
@@ -734,7 +739,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
             @Override
             public ImageDescriptor getImageDescriptor() {
-              return OwlUI.getImageDescriptor("icons/etool16/filter.gif");
+              return OwlUI.FILTER;
             }
           });
         }
