@@ -27,10 +27,6 @@ package org.rssowl.ui.internal;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IMenuManager;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
@@ -50,8 +46,6 @@ import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.jface.wizard.ProgressMonitorPart;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -76,7 +70,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ScrollBar;
@@ -86,7 +79,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IViewPart;
@@ -96,14 +88,12 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.dialogs.PreferencesUtil;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
-import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
@@ -117,21 +107,12 @@ import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
-import org.rssowl.core.util.URIUtils;
-import org.rssowl.ui.internal.actions.AssignLabelsAction;
-import org.rssowl.ui.internal.actions.CreateFilterAction;
-import org.rssowl.ui.internal.actions.LabelAction;
-import org.rssowl.ui.internal.actions.OpenInBrowserAction;
-import org.rssowl.ui.internal.actions.SendLinkAction;
-import org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage;
-import org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage;
 import org.rssowl.ui.internal.editors.browser.WebBrowserInput;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.EditorUtils;
-import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.io.ByteArrayInputStream;
@@ -1857,206 +1838,5 @@ public class OwlUI {
     }
 
     return ATTACHMENT;
-  }
-
-  /**
-   * @param manager the {@link IMenuManager} to fill this menu into.
-   * @param selection the current {@link IStructuredSelection} of {@link INews}.
-   * @param shellProvider a {@link IShellProvider} for dialogs.
-   * @param directMenu if <code>true</code> directly fill all items to the menu,
-   * otherwise create a sub menu.
-   */
-  public static void fillAttachmentsMenu(IMenuManager manager, final IStructuredSelection selection, final IShellProvider shellProvider, boolean directMenu) {
-    final List<URI> attachments = ModelUtils.getAttachmentLinks(selection);
-    if (!attachments.isEmpty()) {
-      manager.add(new Separator("attachments"));
-
-      /* Either as direct Menu or Submenu */
-      IMenuManager attachmentMenu;
-      if (directMenu)
-        attachmentMenu = manager;
-      else {
-        attachmentMenu = new MenuManager("&Attachments", "attachments");
-        manager.add(attachmentMenu);
-      }
-
-      /* Offer Download Action for each */
-      for (final URI attachmentLink : attachments) {
-        String name = URIUtils.getFile(attachmentLink);
-        Action action = new Action(name) {
-          @Override
-          public void run() {
-            DirectoryDialog dialog = new DirectoryDialog(shellProvider.getShell(), SWT.None);
-            dialog.setText("Select a Folder for the Download");
-            String folder = dialog.open();
-            if (StringUtils.isSet(folder))
-              Controller.getDefault().getDownloadService().download(attachmentLink, new File(folder));
-          }
-        };
-
-        action.setImageDescriptor(OwlUI.getAttachmentImage(name));
-        attachmentMenu.add(action);
-      }
-
-      /* Offer to Automize Downloading */
-      attachmentMenu.add(new Separator());
-      attachmentMenu.add(new Action("&Automate Download...") {
-        @Override
-        public void run() {
-          CreateFilterAction action = new CreateFilterAction();
-          action.setAutomateDownload(true);
-          action.selectionChanged(null, selection);
-          action.run(null);
-        }
-
-        @Override
-        public ImageDescriptor getImageDescriptor() {
-          return OwlUI.FILTER;
-        }
-      });
-
-      /* Offer to Download All */
-      if (attachments.size() > 1) {
-        attachmentMenu.add(new Action("&Download All...") {
-          @Override
-          public void run() {
-            DirectoryDialog dialog = new DirectoryDialog(shellProvider.getShell(), SWT.None);
-            dialog.setText("Select a Folder for the Downloads");
-            String folder = dialog.open();
-            if (StringUtils.isSet(folder)) {
-              for (URI uri : attachments) {
-                Controller.getDefault().getDownloadService().download(uri, new File(folder));
-              }
-            }
-          }
-        });
-      }
-    }
-  }
-
-  /**
-   * @param manager the {@link IMenuManager} to fill this menu into.
-   * @param selection the current {@link IStructuredSelection} of {@link INews}.
-   * @param shellProvider a {@link IShellProvider} for dialogs.
-   * @param directMenu if <code>true</code> directly fill all items to the menu,
-   * otherwise create a sub menu.
-   */
-  public static void fillShareMenu(IMenuManager manager, final IStructuredSelection selection, final IShellProvider shellProvider, boolean directMenu) {
-    manager.add(new Separator("share"));
-
-    /* Either as direct Menu or Submenu */
-    IMenuManager shareMenu;
-    if (directMenu)
-      shareMenu = manager;
-    else {
-      shareMenu = new MenuManager("&Share News", OwlUI.SHARE, "sharenews");
-      manager.add(shareMenu);
-    }
-
-    /* List all selected Share Providers  */
-    List<ShareProvider> providers = Controller.getDefault().getShareProviders();
-    for (final ShareProvider provider : providers) {
-      if (provider.isEnabled()) {
-        shareMenu.add(new Action(provider.getName()) {
-          @Override
-          public void run() {
-
-            /* Special Case "Send E-Mail" action */
-            if (SendLinkAction.ID.equals(provider.getId())) {
-              IActionDelegate action = new SendLinkAction();
-              action.selectionChanged(null, selection);
-              action.run(null);
-            }
-
-            /* Other Action */
-            else {
-              Object obj = selection.getFirstElement();
-              if (obj != null && obj instanceof INews) {
-                String shareLink = provider.toShareUrl((INews) obj);
-                new OpenInBrowserAction(new StructuredSelection(shareLink)).run();
-              }
-            }
-          };
-
-          @Override
-          public ImageDescriptor getImageDescriptor() {
-            if (StringUtils.isSet(provider.getIconPath()))
-              return OwlUI.getImageDescriptor(provider.getPluginId(), provider.getIconPath());
-
-            return super.getImageDescriptor();
-          };
-
-          @Override
-          public boolean isEnabled() {
-            return !selection.isEmpty();
-          }
-
-          @Override
-          public String getActionDefinitionId() {
-            return SendLinkAction.ID.equals(provider.getId()) ? SendLinkAction.ID : super.getActionDefinitionId();
-          }
-
-          @Override
-          public String getId() {
-            return SendLinkAction.ID.equals(provider.getId()) ? SendLinkAction.ID : super.getId();
-          }
-        });
-      }
-    }
-
-    /* Allow to Configure Providers */
-    shareMenu.add(new Separator());
-    shareMenu.add(new Action("&Configure...") {
-      @Override
-      public void run() {
-        PreferencesUtil.createPreferenceDialogOn(shellProvider.getShell(), SharingPreferencesPage.ID, null, null).open();
-      };
-    });
-  }
-
-  /**
-   * @param manager the {@link IMenuManager} to fill this menu into.
-   * @param selection the current {@link IStructuredSelection} of {@link INews}.
-   * @param shellProvider a {@link IShellProvider} for dialogs.
-   * @param directMenu if <code>true</code> directly fill all items to the menu,
-   * otherwise create a sub menu.
-   */
-  public static void fillLabelMenu(IMenuManager manager, final IStructuredSelection selection, final IShellProvider shellProvider, boolean directMenu) {
-    if (!selection.isEmpty()) {
-      Collection<ILabel> labels = CoreUtils.loadSortedLabels();
-
-      /* Either as direct Menu or Submenu */
-      IMenuManager labelMenu;
-      if (directMenu)
-        labelMenu = manager;
-      else {
-        labelMenu = new MenuManager("&Label");
-        manager.add(labelMenu);
-      }
-
-      /* Assign / Organize Labels */
-      labelMenu.add(new AssignLabelsAction(shellProvider.getShell(), selection));
-      labelMenu.add(new Action("&Organize Labels...") {
-        @Override
-        public void run() {
-          PreferencesUtil.createPreferenceDialogOn(shellProvider.getShell(), ManageLabelsPreferencePage.ID, null, null).open();
-        }
-      });
-      labelMenu.add(new Separator());
-
-      /* Retrieve Labels that all selected News contain */
-      Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(selection);
-      for (final ILabel label : labels) {
-        LabelAction labelAction = new LabelAction(label, selection);
-        labelAction.setChecked(selectedLabels.contains(label));
-        labelMenu.add(labelAction);
-      }
-
-      /* Remove All Labels */
-      labelMenu.add(new Separator());
-      LabelAction removeAllLabels = new LabelAction(null, selection);
-      removeAllLabels.setEnabled(!labels.isEmpty());
-      labelMenu.add(removeAllLabels);
-    }
   }
 }
