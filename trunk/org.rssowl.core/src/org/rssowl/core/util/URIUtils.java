@@ -93,6 +93,29 @@ public class URIUtils {
   }
 
   /**
+   * @param base the base {@link URI} to resolve against.
+   * @param relative the relative {@link URI} to resolve.
+   * @return a resolved {@link URI} that is absolute.
+   */
+  public static URI resolve(URI base, URI relative) {
+    if (relative.isAbsolute())
+      return relative;
+
+    /* Resolve against Host */
+    if (relative.toString().startsWith("/")) {
+      base = normalizeUri(base, true);
+      return base.resolve(relative);
+    }
+
+    /* Resolve against Given Base */
+    if (base.toString().endsWith("/"))
+      return base.resolve(relative);
+
+    /* Resolve against Given Base By Appending Leading Slash */
+    return URI.create(base.toString() + "/").resolve(relative.toString());
+  }
+
+  /**
    * Return TRUE in case the given String looks like a Link to a Feed.
    *
    * @param str The String to check
