@@ -97,6 +97,7 @@ import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TaskAdapter;
+import org.rssowl.ui.internal.ApplicationActionBarAdvisor;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.FolderNewsMark;
@@ -814,7 +815,7 @@ public class NewsTableControl implements IFeedViewPart {
 
         /* Attachments */
         {
-          OwlUI.fillAttachmentsMenu(manager, selection, new SameShellProvider(fViewer.getTree().getShell()), false);
+          ApplicationActionBarAdvisor.fillAttachmentsMenu(manager, selection, new SameShellProvider(fViewer.getTree().getShell()), false);
         }
 
         /* Mark / Label */
@@ -841,7 +842,7 @@ public class NewsTableControl implements IFeedViewPart {
           markMenu.add(action);
 
           /* Label */
-          OwlUI.fillLabelMenu(manager, selection, new SameShellProvider(fViewer.getTree().getShell()), false);
+          ApplicationActionBarAdvisor.fillLabelMenu(manager, selection, new SameShellProvider(fViewer.getTree().getShell()), false);
         }
 
         /* Move To / Copy To */
@@ -890,7 +891,7 @@ public class NewsTableControl implements IFeedViewPart {
 
         /* Share */
         {
-          OwlUI.fillShareMenu(manager, selection, new SameShellProvider(fViewer.getTree().getShell()), false);
+          ApplicationActionBarAdvisor.fillShareMenu(manager, selection, new SameShellProvider(fViewer.getTree().getShell()), false);
         }
 
         manager.add(new Separator("filter"));

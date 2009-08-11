@@ -133,6 +133,7 @@ import org.rssowl.core.util.SearchHit;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.ApplicationActionBarAdvisor;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.OwlUI;
@@ -1762,7 +1763,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
         /* Attachments */
         {
-          OwlUI.fillAttachmentsMenu(manager, selection, new SameShellProvider(getShell()), false);
+          ApplicationActionBarAdvisor.fillAttachmentsMenu(manager, selection, new SameShellProvider(getShell()), false);
         }
 
         /* Mark / Label */
@@ -1785,7 +1786,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
           markMenu.add(action);
 
           /* Label */
-          OwlUI.fillLabelMenu(manager, selection, new SameShellProvider(getShell()), false);
+          ApplicationActionBarAdvisor.fillLabelMenu(manager, selection, new SameShellProvider(getShell()), false);
         }
 
         /* Move To / Copy To */
@@ -1828,7 +1829,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
         /* Share */
         {
-          OwlUI.fillShareMenu(manager, selection, new SameShellProvider(getShell()), false);
+          ApplicationActionBarAdvisor.fillShareMenu(manager, selection, new SameShellProvider(getShell()), false);
         }
 
         manager.add(new Separator("filter"));

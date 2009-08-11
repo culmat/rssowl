@@ -69,6 +69,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.ApplicationActionBarAdvisor;
 import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.ILinkHandler;
@@ -216,7 +217,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
         /* Attachments */
         {
-          OwlUI.fillAttachmentsMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), false);
+          ApplicationActionBarAdvisor.fillAttachmentsMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), false);
         }
 
         /* Mark / Label */
@@ -243,7 +244,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           markMenu.add(action);
 
           /* Label */
-          OwlUI.fillLabelMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), false);
+          ApplicationActionBarAdvisor.fillLabelMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), false);
         }
 
         /* Move To / Copy To */
@@ -292,7 +293,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
 
         /* Share */
         {
-          OwlUI.fillShareMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), false);
+          ApplicationActionBarAdvisor.fillShareMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), false);
         }
 
         manager.add(new Separator("filter"));
@@ -319,7 +320,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     manager.setRemoveAllWhenShown(true);
     manager.addMenuListener(new IMenuListener() {
       public void menuAboutToShow(IMenuManager manager) {
-        OwlUI.fillAttachmentsMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), true);
+        ApplicationActionBarAdvisor.fillAttachmentsMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), true);
       }
     });
 
@@ -332,7 +333,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     manager.setRemoveAllWhenShown(true);
     manager.addMenuListener(new IMenuListener() {
       public void menuAboutToShow(IMenuManager manager) {
-        OwlUI.fillLabelMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), true);
+        ApplicationActionBarAdvisor.fillLabelMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), true);
       }
     });
 
@@ -345,7 +346,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     manager.setRemoveAllWhenShown(true);
     manager.addMenuListener(new IMenuListener() {
       public void menuAboutToShow(IMenuManager manager) {
-        OwlUI.fillShareMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), true);
+        ApplicationActionBarAdvisor.fillShareMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), true);
       }
     });
 
