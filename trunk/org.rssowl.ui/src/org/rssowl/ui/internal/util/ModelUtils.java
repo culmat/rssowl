@@ -34,6 +34,7 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
@@ -287,11 +288,11 @@ public class ModelUtils {
 
   /**
    * @param selection a {@link IStructuredSelection} of {@link INews}.
-   * @return a {@link List} of {@link String} from the selection of
-   * {@link INews} pointing to downloadable attachment links.
+   * @return a {@link List} of {@link IAttachment} and {@link URI} from the
+   * selection of {@link INews} pointing to downloadable attachment links.
    */
-  public static List<URI> getAttachmentLinks(IStructuredSelection selection) {
-    List<URI> attachmentLinks = new ArrayList<URI>();
+  public static List<Pair<IAttachment, URI>> getAttachmentLinks(IStructuredSelection selection) {
+    List<Pair<IAttachment, URI>> attachmentLinks = new ArrayList<Pair<IAttachment, URI>>();
     Set<INews> news = normalize(selection.toList());
     for (INews newsitem : news) {
       List<IAttachment> attachments = newsitem.getAttachments();
@@ -301,7 +302,7 @@ public class ModelUtils {
           if (!link.isAbsolute())
             link = URIUtils.resolve(newsitem.getFeedReference().getLink(), link);
 
-          attachmentLinks.add(link);
+          attachmentLinks.add(Pair.create(attachment, link));
         }
       }
     }
