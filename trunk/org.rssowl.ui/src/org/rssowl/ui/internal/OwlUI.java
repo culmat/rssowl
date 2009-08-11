@@ -27,6 +27,10 @@ package org.rssowl.ui.internal;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
@@ -46,6 +50,7 @@ import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.jface.wizard.ProgressMonitorPart;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -67,8 +72,10 @@ import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.program.Program;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ScrollBar;
@@ -93,6 +100,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IMark;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchMark;
@@ -106,12 +114,15 @@ import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.actions.CreateFilterAction;
 import org.rssowl.ui.internal.editors.browser.WebBrowserInput;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
 import org.rssowl.ui.internal.util.EditorUtils;
+import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.io.ByteArrayInputStream;
@@ -227,6 +238,9 @@ public class OwlUI {
 
   /** Share */
   public static final ImageDescriptor SHARE = Activator.getImageDescriptor("icons/elcl16/share.gif"); //$NON-NLS-1$
+
+  /** Share */
+  public static final ImageDescriptor FILTER = Activator.getImageDescriptor("icons/etool16/filter.gif"); //$NON-NLS-1$
 
   /** Group Foreground Color */
   public static final RGB GROUP_FG_COLOR = new RGB(0, 0, 128);
@@ -542,6 +556,16 @@ public class OwlUI {
   public static Image getImage(Control owner, String path) {
     LocalResourceManager manager = new LocalResourceManager(JFaceResources.getResources(), owner);
     return getImage(manager, path);
+  }
+
+  /**
+   * @param owner
+   * @param descriptor
+   * @return Image
+   */
+  public static Image getImage(Control owner, ImageDescriptor descriptor) {
+    LocalResourceManager manager = new LocalResourceManager(JFaceResources.getResources(), owner);
+    return getImage(manager, descriptor);
   }
 
   /**
@@ -1803,6 +1827,100 @@ public class OwlUI {
       /* Reduce if Scrollbar now Invisible */
       else
         shell.setBounds(shellBounds.x, shellBounds.y, shellBounds.width - barWidth, shellBounds.height);
+    }
+  }
+
+  /**
+   * @param name the name of the attachment.
+   * @return an {@link ImageDescriptor} for the attachment. Never
+   * <code>null</code>.
+   */
+  @SuppressWarnings("restriction")
+  public static ImageDescriptor getAttachmentImage(String name) {
+    if (StringUtils.isSet(name)) {
+      int lastIndexOfDot = name.lastIndexOf('.');
+      if (lastIndexOfDot != -1 && !name.endsWith(".")) {
+        String extension = name.substring(lastIndexOfDot + 1);
+        Program p = Program.findProgram(extension);
+        if (p != null)
+          return new org.eclipse.ui.internal.misc.ExternalProgramImageDescriptor(p);
+      }
+    }
+
+    return ATTACHMENT;
+  }
+
+  /**
+   * @param manager the {@link IMenuManager} to fill this menu into.
+   * @param selection the current {@link IStructuredSelection} of {@link INews}.
+   * @param shellProvider a {@link IShellProvider} for dialogs.
+   * @param directMenu if <code>true</code> directly fill all items to the menu,
+   * otherwise create a sub menu.
+   */
+  public static void fillAttachmentsMenu(IMenuManager manager, final IStructuredSelection selection, final IShellProvider shellProvider, boolean directMenu) {
+    final List<URI> attachments = ModelUtils.getAttachmentLinks(selection);
+    if (!attachments.isEmpty()) {
+      manager.add(new Separator("attachments"));
+
+      IMenuManager attachmentMenu;
+      if (directMenu)
+        attachmentMenu = manager;
+      else {
+        attachmentMenu = new MenuManager("&Attachments", "attachments");
+        manager.add(attachmentMenu);
+      }
+
+      /* Offer Download Action for each */
+      for (final URI attachmentLink : attachments) {
+        String name = URIUtils.getFile(attachmentLink);
+        Action action = new Action(name) {
+          @Override
+          public void run() {
+            DirectoryDialog dialog = new DirectoryDialog(shellProvider.getShell(), SWT.None);
+            dialog.setText("Select a Folder for the Download");
+            String folder = dialog.open();
+            if (StringUtils.isSet(folder))
+              Controller.getDefault().getDownloadService().download(attachmentLink, new File(folder));
+          }
+        };
+
+        action.setImageDescriptor(OwlUI.getAttachmentImage(name));
+        attachmentMenu.add(action);
+      }
+
+      /* Offer to Automize Downloading */
+      attachmentMenu.add(new Separator());
+      attachmentMenu.add(new Action("&Automate Download...") {
+        @Override
+        public void run() {
+          CreateFilterAction action = new CreateFilterAction();
+          action.setAutomateDownload(true);
+          action.selectionChanged(null, selection);
+          action.run(null);
+        }
+
+        @Override
+        public ImageDescriptor getImageDescriptor() {
+          return OwlUI.FILTER;
+        }
+      });
+
+      /* Offer to Download All */
+      if (attachments.size() > 1) {
+        attachmentMenu.add(new Action("&Download All...") {
+          @Override
+          public void run() {
+            DirectoryDialog dialog = new DirectoryDialog(shellProvider.getShell(), SWT.None);
+            dialog.setText("Select a Folder for the Downloads");
+            String folder = dialog.open();
+            if (StringUtils.isSet(folder)) {
+              for (URI uri : attachments) {
+                Controller.getDefault().getDownloadService().download(uri, new File(folder));
+              }
+            }
+          }
+        });
+      }
     }
   }
 }

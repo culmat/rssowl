@@ -44,6 +44,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.window.SameShellProvider;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Composite;
@@ -122,6 +123,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   static final String TOGGLE_READ_HANDLER_ID = "org.rssowl.ui.ToggleRead";
   static final String TOGGLE_STICKY_HANDLER_ID = "org.rssowl.ui.ToggleSticky";
   static final String DELETE_HANDLER_ID = "org.rssowl.ui.Delete";
+  static final String ATTACHMENTS_MENU_HANDLER_ID = "org.rssowl.ui.AttachmentsMenu";
   static final String LABELS_MENU_HANDLER_ID = "org.rssowl.ui.LabelsMenu";
   static final String NEWS_MENU_HANDLER_ID = "org.rssowl.ui.NewsMenu";
   static final String SHARE_NEWS_MENU_HANDLER_ID = "org.rssowl.ui.ShareNewsMenu";
@@ -135,6 +137,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
   private IWorkbenchPartSite fSite;
   private boolean fIsEmbedded;
   private Menu fNewsContextMenu;
+  private Menu fAttachmentsContextMenu;
   private Menu fLabelsContextMenu;
   private Menu fShareNewsContextMenu;
   private IStructuredSelection fCurrentSelection = StructuredSelection.EMPTY;
@@ -171,6 +174,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fIsEmbedded = (fSite != null);
     hookControl(fBrowser.getControl());
     hookNewsContextMenu();
+    hookAttachmentsContextMenu();
     hookLabelContextMenu();
     hookShareNewsContextMenu();
     fId = String.valueOf(hashCode());
@@ -185,6 +189,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fBrowser.addLinkHandler(TOGGLE_READ_HANDLER_ID, this);
     fBrowser.addLinkHandler(TOGGLE_STICKY_HANDLER_ID, this);
     fBrowser.addLinkHandler(DELETE_HANDLER_ID, this);
+    fBrowser.addLinkHandler(ATTACHMENTS_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(LABELS_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(NEWS_MENU_HANDLER_ID, this);
     fBrowser.addLinkHandler(SHARE_NEWS_MENU_HANDLER_ID, this);
@@ -219,6 +224,11 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           /* Show only when internal browser is used */
           if (!fCurrentSelection.isEmpty() && !fPreferences.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER) && !fPreferences.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER))
             manager.add(new OpenInExternalBrowserAction(fCurrentSelection));
+        }
+
+        /* Attachments */
+        {
+          OwlUI.fillAttachmentsMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), false);
         }
 
         /* Mark / Label */
@@ -395,6 +405,19 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     /* Register with Part Site if possible */
     if (fSite != null)
       fSite.registerContextMenu(manager, this);
+  }
+
+  private void hookAttachmentsContextMenu() {
+    MenuManager manager = new MenuManager();
+    manager.setRemoveAllWhenShown(true);
+    manager.addMenuListener(new IMenuListener() {
+      public void menuAboutToShow(IMenuManager manager) {
+        OwlUI.fillAttachmentsMenu(manager, fCurrentSelection, new SameShellProvider(fBrowser.getControl().getShell()), true);
+      }
+    });
+
+    /* Create  */
+    fAttachmentsContextMenu = manager.createContextMenu(fBrowser.getControl().getShell());
   }
 
   private void hookLabelContextMenu() {
@@ -591,6 +614,18 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
       }
     }
 
+    /*  Attachments Menu */
+    else if (StringUtils.isSet(query) && ATTACHMENTS_MENU_HANDLER_ID.equals(id)) {
+      INews news = getNews(query);
+      if (news != null) {
+        setSelection(new StructuredSelection(news));
+        Point cursorLocation = fBrowser.getControl().getDisplay().getCursorLocation();
+        cursorLocation.y = cursorLocation.y + 16;
+        fAttachmentsContextMenu.setLocation(cursorLocation);
+        fAttachmentsContextMenu.setVisible(true);
+      }
+    }
+
     /* News Context Menu */
     else if (StringUtils.isSet(query) && NEWS_MENU_HANDLER_ID.equals(id)) {
       INews news = getNews(query);
@@ -716,6 +751,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     fServer.unregister(fId);
     fCurrentSelection = null;
     fNewsContextMenu.dispose();
+    fAttachmentsContextMenu.dispose();
     fLabelsContextMenu.dispose();
     fShareNewsContextMenu.dispose();
     super.handleDispose(event);
