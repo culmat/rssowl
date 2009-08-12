@@ -967,7 +967,11 @@ public class OwlUI {
   private static File getImageFile(String fileName) {
     boolean res = false;
 
-    IPath path = new Path(Activator.getDefault().getStateLocation().toOSString());
+    Activator activator = Activator.getDefault();
+    if (activator == null)
+      return null;
+
+    IPath path = new Path(activator.getStateLocation().toOSString());
     path = path.append(ICONS_FOLDER);
     File root = new File(path.toOSString());
     if (!root.exists())
@@ -978,7 +982,7 @@ public class OwlUI {
     path = path.append(fileName);
 
     if (!res) {
-      Activator.getDefault().logInfo("Unable to get image file with name " + fileName);
+      activator.logInfo("Unable to get image file with name " + fileName);
       return null;
     }
 
