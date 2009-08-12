@@ -125,7 +125,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
@@ -770,13 +769,16 @@ public class FeedView extends EditorPart implements IReusableEditor {
   private void saveSettings() {
 
     /* Update Settings in DB */
-    if (fCacheWeights != null && !Arrays.equals(fCacheWeights, new int[] { 50, 50 })) {
-      JobRunner.runInBackgroundThread(new Runnable() {
-        public void run() {
-          int strWeights[] = new int[] { fCacheWeights[0], fCacheWeights[1] };
-          fPreferences.putIntegers(DefaultPreferences.FV_SASHFORM_WEIGHTS, strWeights);
-        }
-      });
+    if (fCacheWeights != null && fCacheWeights[0] != fCacheWeights[1]) {
+      int weightDiff = (fInitialWeights[0] - fCacheWeights[0]);
+      if (Math.abs(weightDiff) > 5) {
+        JobRunner.runInBackgroundThread(new Runnable() {
+          public void run() {
+            int strWeights[] = new int[] { fCacheWeights[0], fCacheWeights[1] };
+            fPreferences.putIntegers(DefaultPreferences.FV_SASHFORM_WEIGHTS, strWeights);
+          }
+        });
+      }
     }
   }
 
