@@ -228,6 +228,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             parent = parent.getParent();
             if (parent != null && !(parent instanceof Shell) && !parent.isDisposed() && parent.getLayoutData() instanceof org.eclipse.ui.internal.progress.ProgressRegion) {
               event.doit = false;
+              event.type= SWT.None;
               asyncOpenActivityDialog(toolbar.getShell());
             }
           }
