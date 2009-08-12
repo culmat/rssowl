@@ -65,6 +65,7 @@ import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.part.EditorPart;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.ConnectionException;
+import org.rssowl.core.connection.IAbortable;
 import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
@@ -289,6 +290,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
             InputStream in = null;
             FileOutputStream out = null;
+            boolean canceled = false;
             try {
               byte[] buffer = new byte[8192];
 
@@ -297,8 +299,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
               while (true) {
 
                 /* Check for Cancellation and Shutdown */
-                if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
+                if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
+                  canceled = true;
                   return Status.CANCEL_STATUS;
+                }
 
                 /* Read from Stream */
                 int read = in.read(buffer);
@@ -326,7 +330,10 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
               if (in != null) {
                 try {
-                  in.close();
+                  if (canceled && in instanceof IAbortable)
+                    ((IAbortable) in).abort();
+                  else
+                    in.close();
                 } catch (IOException e) {
                   Activator.getDefault().logError(e.getMessage(), e);
                 }
