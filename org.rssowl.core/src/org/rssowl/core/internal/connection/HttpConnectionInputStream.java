@@ -27,6 +27,7 @@ package org.rssowl.core.internal.connection;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.rssowl.core.connection.IAbortable;
 import org.rssowl.core.connection.IConditionalGetCompatible;
 import org.rssowl.core.connection.MonitorCanceledException;
 
@@ -46,10 +47,10 @@ import java.io.InputStream;
  * for early cancelation by throwing an Exception from the various
  * stream-methods as soon as the monitor is canceled.
  * </p>
- * 
+ *
  * @author bpasero
  */
-public class HttpConnectionInputStream extends FilterInputStream implements IConditionalGetCompatible {
+public class HttpConnectionInputStream extends FilterInputStream implements IConditionalGetCompatible, IAbortable {
 
   /* Request Header */
   private static final String HEADER_RESPONSE_ETAG = "ETag"; //$NON-NLS-1$
@@ -61,10 +62,10 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
   private String fIfNoneMatch;
 
   /**
-   * Creates a <code>HttpConnectionInputStream</code> by assigning the
-   * argument <code>inS</code> to the field <code>this.in</code> so as to
-   * remember it for later use.
-   * 
+   * Creates a <code>HttpConnectionInputStream</code> by assigning the argument
+   * <code>inS</code> to the field <code>this.in</code> so as to remember it for
+   * later use.
+   *
    * @param getMethod The Method holding the connection of the given Stream.
    * @param monitor A ProgressMonitor to support early cancelation, or
    * <code>NULL</code> if no monitor is being used.
@@ -86,39 +87,56 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
   }
 
   /*
-   * @see org.rssowl.core.connection.internal.http.IConditionalGetCompatible#getIfModifiedSince()
+   * @seeorg.rssowl.core.connection.internal.http.IConditionalGetCompatible#
+   * getIfModifiedSince()
    */
   public String getIfModifiedSince() {
     return fIfModifiedSince;
   }
 
   /*
-   * @see org.rssowl.core.connection.internal.http.IConditionalGetCompatible#getIfNoneMatch()
+   * @seeorg.rssowl.core.connection.internal.http.IConditionalGetCompatible#
+   * getIfNoneMatch()
    */
   public String getIfNoneMatch() {
     return fIfNoneMatch;
   }
 
   /*
-   * @see org.rssowl.core.connection.internal.http.IConditionalGetCompatible#setIfModifiedSince(java.lang.String)
+   * @seeorg.rssowl.core.connection.internal.http.IConditionalGetCompatible#
+   * setIfModifiedSince(java.lang.String)
    */
   public void setIfModifiedSince(String ifModifiedSince) {
     fIfModifiedSince = ifModifiedSince;
   }
 
   /*
-   * @see org.rssowl.core.connection.internal.http.IConditionalGetCompatible#setIfNoneMatch(java.lang.String)
+   * @seeorg.rssowl.core.connection.internal.http.IConditionalGetCompatible#
+   * setIfNoneMatch(java.lang.String)
    */
   public void setIfNoneMatch(String ifNoneMatch) {
     fIfNoneMatch = ifNoneMatch;
   }
 
+  /*
+   * @see org.rssowl.core.connection.IAbortable#abort()
+   */
+  public void abort() {
+    fGetMethod.abort();
+  }
+
+  /*
+   * @see java.io.FilterInputStream#close()
+   */
   @Override
   public void close() throws IOException {
     super.close();
     fGetMethod.releaseConnection();
   }
 
+  /*
+   * @see java.io.FilterInputStream#read()
+   */
   @Override
   public int read() throws IOException {
 
@@ -129,6 +147,9 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
     return super.read();
   }
 
+  /*
+   * @see java.io.FilterInputStream#read(byte[], int, int)
+   */
   @Override
   public int read(byte[] b, int off, int len) throws IOException {
 
@@ -139,6 +160,9 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
     return super.read(b, off, len);
   }
 
+  /*
+   * @see java.io.FilterInputStream#available()
+   */
   @Override
   public int available() throws IOException {
 
