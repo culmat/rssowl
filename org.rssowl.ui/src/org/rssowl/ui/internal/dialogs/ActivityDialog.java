@@ -148,7 +148,7 @@ public class ActivityDialog extends TitleAreaDialog {
     org.eclipse.ui.internal.progress.DetailedProgressViewer viewer = new org.eclipse.ui.internal.progress.DetailedProgressViewer(composite, SWT.NONE);
     viewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-    org.eclipse.ui.internal.progress.ProgressViewerContentProvider provider = new org.eclipse.ui.internal.progress.ProgressViewerContentProvider(viewer, false, false);
+    org.eclipse.ui.internal.progress.ProgressViewerContentProvider provider = new org.eclipse.ui.internal.progress.ProgressViewerContentProvider(viewer, false, true);
     viewer.setContentProvider(provider);
     viewer.setInput(org.eclipse.ui.internal.progress.ProgressManager.getInstance());
 
