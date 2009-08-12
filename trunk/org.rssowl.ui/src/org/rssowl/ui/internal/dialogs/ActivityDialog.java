@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.dialogs;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -35,6 +36,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -50,10 +52,15 @@ public class ActivityDialog extends TitleAreaDialog {
   /* Keep the visible instance saved */
   private static ActivityDialog fgVisibleInstance;
 
+  /* Section for Dialogs Settings */
+  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.ActivityDialog";
+
   /* Minimum Height in DLUs */
   private static final int MIN_DIALOG_HEIGHT_DLU = 160;
 
   private LocalResourceManager fResources;
+  private IDialogSettings fDialogSettings;
+  private boolean fFirstTimeOpen;
 
   /**
    * @param parentShell
@@ -61,6 +68,8 @@ public class ActivityDialog extends TitleAreaDialog {
   public ActivityDialog(Shell parentShell) {
     super(parentShell);
     fResources = new LocalResourceManager(JFaceResources.getResources());
+    fDialogSettings = Activator.getDefault().getDialogSettings();
+    fFirstTimeOpen = (fDialogSettings.getSection(SETTINGS_SECTION) == null);
   }
 
   /**
@@ -154,7 +163,7 @@ public class ActivityDialog extends TitleAreaDialog {
    */
   @Override
   protected int getShellStyle() {
-    int style = SWT.MIN | SWT.TITLE | SWT.BORDER | getDefaultOrientation();
+    int style = SWT.MIN | SWT.TITLE | SWT.BORDER | SWT.RESIZE | getDefaultOrientation();
 
     /* Follow Apple's Human Interface Guidelines for Application Modal Dialogs */
     if (!Application.IS_MAC)
@@ -172,22 +181,37 @@ public class ActivityDialog extends TitleAreaDialog {
   }
 
   /*
+   * @see org.eclipse.jface.dialogs.Dialog#getDialogBoundsSettings()
+   */
+  @Override
+  protected IDialogSettings getDialogBoundsSettings() {
+    IDialogSettings section = fDialogSettings.getSection(SETTINGS_SECTION);
+    if (section != null)
+      return section;
+
+    return fDialogSettings.addNewSection(SETTINGS_SECTION);
+  }
+
+  /*
    * @see org.eclipse.jface.dialogs.Dialog#initializeBounds()
    */
   @Override
   protected void initializeBounds() {
     super.initializeBounds();
 
-    Shell shell = getShell();
+    /* No dialog settings stored */
+    if (fFirstTimeOpen) {
+      Shell shell = getShell();
 
-    /* Minimum Size */
-    int minWidth = convertHorizontalDLUsToPixels(OwlUI.MIN_DIALOG_WIDTH_DLU);
-    int minHeight = convertVerticalDLUsToPixels(MIN_DIALOG_HEIGHT_DLU);
+      /* Minimum Size */
+      int minWidth = convertHorizontalDLUsToPixels(OwlUI.MIN_DIALOG_WIDTH_DLU);
+      int minHeight = convertVerticalDLUsToPixels(MIN_DIALOG_HEIGHT_DLU);
 
-    /* Required Size */
-    Point requiredSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+      /* Required Size */
+      Point requiredSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT);
 
-    shell.setSize(Math.max(minWidth, requiredSize.x), Math.max(minHeight, requiredSize.y));
-    LayoutUtils.positionShell(shell, false);
+      shell.setSize(Math.max(minWidth, requiredSize.x), Math.max(minHeight, requiredSize.y));
+      LayoutUtils.positionShell(shell, false);
+    }
   }
 }
