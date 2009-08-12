@@ -724,11 +724,15 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     MenuManager toolsMenu = new MenuManager("&Tools", OwlUI.M_TOOLS);
     menuBar.add(toolsMenu);
 
+    /* Contributions */
     toolsMenu.add(new GroupMarker("begin"));
     toolsMenu.add(new Separator());
     toolsMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
     toolsMenu.add(new Separator());
+    toolsMenu.add(new GroupMarker("end"));
+    toolsMenu.add(new Separator());
 
+    /* Preferences */
     IAction preferences = getAction(ActionFactory.PREFERENCES.getId());
     preferences.setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/preferences.gif"));
     toolsMenu.add(preferences);
@@ -953,8 +957,37 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           }
         };
 
-        action.setImageDescriptor(OwlUI.getAttachmentImage(fileName));
+        action.setImageDescriptor(OwlUI.getAttachmentImage(fileName, attachmentPair.getFirst().getType()));
         attachmentMenu.add(action);
+      }
+
+      /* Offer to Download All */
+      if (attachments.size() > 1) {
+        int sumBytes = 0;
+        for (Pair<IAttachment, URI> attachment : attachments) {
+          if (attachment.getFirst().getLength() > 0) {
+            sumBytes += attachment.getFirst().getLength();
+          } else {
+            sumBytes = 0;
+            break;
+          }
+        }
+        String sumSize = getSize(sumBytes);
+
+        attachmentMenu.add(new Separator());
+        attachmentMenu.add(new Action(sumSize != null ? ("&Download All..." + " (" + sumSize + ")") : ("&Download All...")) {
+          @Override
+          public void run() {
+            DirectoryDialog dialog = new DirectoryDialog(shellProvider.getShell(), SWT.None);
+            dialog.setText("Select a Folder for the Downloads");
+            String folder = dialog.open();
+            if (StringUtils.isSet(folder)) {
+              for (Pair<IAttachment, URI> attachment : attachments) {
+                Controller.getDefault().getDownloadService().download(attachment.getSecond(), new File(folder));
+              }
+            }
+          }
+        });
       }
 
       /* Offer to Automize Downloading */
@@ -973,23 +1006,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
           return OwlUI.FILTER;
         }
       });
-
-      /* Offer to Download All */
-      if (attachments.size() > 1) {
-        attachmentMenu.add(new Action("&Download All...") {
-          @Override
-          public void run() {
-            DirectoryDialog dialog = new DirectoryDialog(shellProvider.getShell(), SWT.None);
-            dialog.setText("Select a Folder for the Downloads");
-            String folder = dialog.open();
-            if (StringUtils.isSet(folder)) {
-              for (Pair<IAttachment, URI> attachment : attachments) {
-                Controller.getDefault().getDownloadService().download(attachment.getSecond(), new File(folder));
-              }
-            }
-          }
-        });
-      }
     }
   }
 
@@ -1003,6 +1019,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       if (kb >= 1)
         return fgSizeNumberFormat.format(kb) + " KB";
+
+      return bytes + " Bytes";
     }
 
     return null;
