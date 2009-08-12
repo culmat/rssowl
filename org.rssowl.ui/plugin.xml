@@ -366,20 +366,23 @@
                style="push">
          </action>
       </actionSet>
+      <actionSet
+            id="org.rssowl.ui.ShowActivitySet"
+            label="Show Activity"
+            visible="true">
+         <action
+               class="org.rssowl.ui.internal.actions.ShowActivityAction"
+               definitionId="org.rssowl.ui.ShowActivityAction"
+               icon="icons/elcl16/activity.gif"
+               id="org.rssowl.ui.ShowActivityAction"
+               label="Show &amp;Activity"
+               menubarPath="tools/end"
+               style="push">
+         </action>
+      </actionSet>
    </extension>
    <extension
          point="org.eclipse.ui.views">
-      <!--<view
-            allowMultiple="false"
-            category="org.eclipse.ui"
-            class="org.eclipse.ui.ExtensionFactory:progressView"
-            fastViewWidthRatio="0.5"
-            icon="icons/eview16/pview.gif"
-            id="org.eclipse.ui.views.ProgressView"
-            name="Progress"/>
-      <category
-            id="org.rssowl.ui.category"
-            name="RSSOwl"/>-->
       <view
             allowMultiple="false"
             category="org.rssowl.ui.category"
@@ -817,6 +820,12 @@
             description="Show or hide headlines from the feed view."
             id="org.rssowl.ui.ToggleHeadlinesCommand"
             name="Toggle Headlines">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Show pending feed updates and downloads."
+            id="org.rssowl.ui.ShowActivityAction"
+            name="Show Activity">
       </command>
    </extension>
    <extension

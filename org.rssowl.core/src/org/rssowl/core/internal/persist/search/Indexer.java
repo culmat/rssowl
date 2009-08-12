@@ -111,7 +111,7 @@ public class Indexer {
   Indexer(ModelSearchImpl search, Directory directory) throws PersistenceException {
     fSearch = search;
     fIndexDirectory = directory;
-    fJobQueue = new JobQueue("Updating Saved Searches", MAX_INDEX_JOBS_COUNT, Integer.MAX_VALUE, true, INDEX_JOB_PROGRESS_DELAY);
+    fJobQueue = new JobQueue("Updating Saved Searches", MAX_INDEX_JOBS_COUNT, Integer.MAX_VALUE, false, INDEX_JOB_PROGRESS_DELAY);
     fUncommittedNews = new EntityIdsByEventType(false);
   }
 
