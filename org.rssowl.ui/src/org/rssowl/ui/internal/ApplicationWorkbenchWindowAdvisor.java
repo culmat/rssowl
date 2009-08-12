@@ -38,6 +38,7 @@ import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
@@ -45,6 +46,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 import org.eclipse.ui.IEditorPart;
@@ -67,6 +70,7 @@ import org.rssowl.core.persist.event.runnable.EventType;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.LoggingSafeRunnable;
+import org.rssowl.ui.internal.dialogs.ActivityDialog;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.util.JobRunner;
 
@@ -212,8 +216,41 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
       }
     });
 
+    /* Hook into Selection Listeners to open Activiy Dialog if needed (this is a hack :-) ) */
+    shell.getDisplay().addFilter(SWT.Selection, new Listener() {
+      @SuppressWarnings("restriction")
+      public void handleEvent(Event event) {
+        if (event.item == null && event.widget instanceof ToolItem) {
+          ToolItem item = (ToolItem) event.widget;
+          ToolBar toolbar = item.getParent();
+          Composite parent = toolbar.getParent();
+          if (!(parent instanceof Shell)) {
+            parent = parent.getParent();
+            if (parent != null && !(parent instanceof Shell) && !parent.isDisposed() && parent.getLayoutData() instanceof org.eclipse.ui.internal.progress.ProgressRegion) {
+              event.doit = false;
+              asyncOpenActivityDialog(toolbar.getShell());
+            }
+          }
+        }
+      }
+    });
+
     /* Notify Controller */
     Controller.getDefault().postWindowOpen();
+  }
+
+  private void asyncOpenActivityDialog(final Shell shell) {
+    shell.getDisplay().asyncExec(new Runnable() {
+      public void run() {
+        ActivityDialog instance = ActivityDialog.getVisibleInstance();
+        if (instance == null) {
+          ActivityDialog dialog = new ActivityDialog(shell);
+          dialog.open();
+        } else {
+          instance.getShell().forceActive();
+        }
+      }
+    });
   }
 
   /*
