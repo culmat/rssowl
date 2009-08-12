@@ -123,6 +123,8 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -1917,6 +1919,29 @@ public class OwlUI {
       Program p = Program.findProgram(extension);
       if (p != null)
         return new org.eclipse.ui.internal.misc.ExternalProgramImageDescriptor(p);
+    }
+
+    return null;
+  }
+
+  /**
+   * @param bytes the number of bytes.
+   * @return a human readable representation of the bytes.
+   */
+  public static String getSize(int bytes) {
+    if (bytes > 0) {
+      double mb = bytes / (1024d * 1024d);
+      double kb = bytes / 1024d;
+
+      NumberFormat format = new DecimalFormat("0.0");
+
+      if (mb >= 1)
+        return format.format(mb) + " MB";
+
+      if (kb >= 1)
+        return format.format(kb) + " KB";
+
+      return bytes + " Bytes";
     }
 
     return null;
