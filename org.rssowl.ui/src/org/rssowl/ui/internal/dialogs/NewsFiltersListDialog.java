@@ -181,7 +181,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     setTitle("News Filters");
 
     /* Title Image */
-    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/filter_wiz.gif"));
+    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/filter_wiz.png"));
 
     /* Composite to hold all components */
     Composite composite = new Composite(parent, SWT.NONE);
@@ -446,7 +446,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
       ConfirmDialog dialog = new ConfirmDialog(getShell(), title, "This action can not be undone", message.toString(), IDialogConstants.OK_LABEL, null) {
         @Override
         protected String getTitleImage() {
-          return "icons/wizban/filter_wiz.gif";
+          return "icons/wizban/filter_wiz.png";
         }
       };
 
