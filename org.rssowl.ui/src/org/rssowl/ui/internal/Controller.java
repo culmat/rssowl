@@ -296,7 +296,7 @@ public class Controller {
   private Controller() {
     int maxConcurrentReloadJobs = getSystemProperty(MAX_CONCURRENT_RELOAD_JOBS_PROPERTY, 0, DEFAULT_MAX_CONCURRENT_RELOAD_JOBS);
     fReloadFeedQueue = new JobQueue("Updating Feeds", maxConcurrentReloadJobs, Integer.MAX_VALUE, true, 0);
-    fSaveFeedQueue = new JobQueue("Updating Feeds", MAX_CONCURRENT_SAVE_JOBS, MAX_SAVE_QUEUE_SIZE, true, 0);
+    fSaveFeedQueue = new JobQueue("Updating Feeds", MAX_CONCURRENT_SAVE_JOBS, MAX_SAVE_QUEUE_SIZE, false, 0);
     fSaveFeedQueue.setUnknownProgress(true);
     fEntityPropertyPages = loadEntityPropertyPages();
     fBookMarkDAO = DynamicDAO.getDAO(IBookMarkDAO.class);
@@ -625,7 +625,7 @@ public class Controller {
 
           /* First try using the Homepage of the Feed */
           URI homepage = pairResult.getFirst().getHomepage();
-          if (homepage != null && StringUtils.isSet(homepage.toString()))
+          if (homepage != null && StringUtils.isSet(homepage.toString()) && homepage.isAbsolute())
             faviconBytes = Owl.getConnectionService().getFeedIcon(homepage);
 
           /* Then try with Feed address itself */
