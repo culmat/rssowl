@@ -277,7 +277,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
   @SuppressWarnings("restriction")
   private void saveAsXml(final String fileName) {
-    IBookMark bm = (IBookMark) fInput.getMark();
+    final IBookMark bm = (IBookMark) fInput.getMark();
     final URI feedLink = bm.getFeedLinkReference().getLink();
     try {
       final IProtocolHandler handler = Owl.getConnectionService().getHandler(feedLink);
@@ -285,7 +285,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
         Job downloadJob = new Job("Downloading Feed...") {
           @Override
           protected IStatus run(IProgressMonitor monitor) {
-            monitor.beginTask("Downloading Feed...", IProgressMonitor.UNKNOWN);
+            monitor.beginTask(bm.getName(), IProgressMonitor.UNKNOWN);
 
             InputStream in = null;
             FileOutputStream out = null;
@@ -316,17 +316,17 @@ public class FeedView extends EditorPart implements IReusableEditor {
             } finally {
               monitor.done();
 
-              if (in != null) {
+              if (out != null) {
                 try {
-                  in.close();
+                  out.close();
                 } catch (IOException e) {
                   Activator.getDefault().logError(e.getMessage(), e);
                 }
               }
 
-              if (out != null) {
+              if (in != null) {
                 try {
-                  out.close();
+                  in.close();
                 } catch (IOException e) {
                   Activator.getDefault().logError(e.getMessage(), e);
                 }
