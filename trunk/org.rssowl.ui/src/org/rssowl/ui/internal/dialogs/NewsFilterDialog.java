@@ -336,7 +336,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
     setTitle("News Filter");
 
     /* Title Image */
-    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/filter_wiz.gif"));
+    setTitleImage(OwlUI.getImage(fResources, "icons/wizban/filter_wiz.png"));
 
     /* Title Message */
     setMessage("Please define the search conditions and actions to perform on matching news.");
