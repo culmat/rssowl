@@ -143,6 +143,7 @@ public class DownloadService {
         String downloadFileName = URIUtils.getFile(link);
         File downloadFile = new File(folder, downloadFileName);
         File partFile = new File(folder, downloadFileName + ".part");
+        boolean canceled = false;
         try {
           partFile.createNewFile();
           partFile.deleteOnExit();
@@ -152,8 +153,10 @@ public class DownloadService {
           while (true) {
 
             /* Check for Cancellation and Shutdown */
-            if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
+            if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
+              canceled = true;
               return Status.CANCEL_STATUS;
+            }
 
             /* Read from Stream */
             int read = in.read(buffer);
@@ -169,6 +172,17 @@ public class DownloadService {
         } finally {
           monitor.done();
 
+          if (out != null) {
+            try {
+              out.close();
+              fOutputStreamMap.remove(out);
+              if (canceled)
+                partFile.delete();
+            } catch (IOException e) {
+              return Activator.getDefault().createErrorStatus(e.getMessage(), e);
+            }
+          }
+
           if (in != null) {
             try {
               in.close();
@@ -176,20 +190,13 @@ public class DownloadService {
               return Activator.getDefault().createErrorStatus(e.getMessage(), e);
             }
           }
-
-          if (out != null) {
-            try {
-              out.close();
-              fOutputStreamMap.remove(out);
-            } catch (IOException e) {
-              return Activator.getDefault().createErrorStatus(e.getMessage(), e);
-            }
-          }
         }
 
         /* Check for Cancellation and Shutdown */
-        if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
+        if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
+          partFile.delete();
           return Status.CANCEL_STATUS;
+        }
 
         /* Now copy over the part file to the actual file in an atomic operation */
         if (!partFile.renameTo(downloadFile)) {
