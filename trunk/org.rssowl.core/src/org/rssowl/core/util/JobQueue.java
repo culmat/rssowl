@@ -64,6 +64,7 @@ public class JobQueue {
   private final int fMaxConcurrentJobs;
   private final int fProgressDelay;
   private final String fName;
+  private String fTaskPrefix;
   private final boolean fShowProgress;
   private boolean fIsUnknownProgress;
   private final ListenerList fListeners = new ListenerList();
@@ -94,9 +95,32 @@ public class JobQueue {
    * to 0 will show Progress instantly with no delay.
    */
   public JobQueue(String name, int maxConcurrentJobs, int maxQueueSize, boolean showProgress, int progressDelay) {
-    Assert.isNotNull(name);
+    this(name, name, maxConcurrentJobs, maxQueueSize, showProgress, progressDelay);
+  }
+
+  /**
+   * Creates an instance of <code>JobQueue</code> that allows to add
+   * <code>Runnables</code> into a Queue to process them in Jobs up to a certain
+   * amount of allowed parallel Jobs.
+   *
+   * @param globalName A human-readable name that is displayed in the
+   * Progress-View while the Queue is processed.
+   * @param taskPrefix A human-readable prefix that is shown before the name of
+   * a task that is currently processed.
+   * @param maxConcurrentJobs The maximum number of concurrent running Tasks.
+   * @param maxQueueSize The maximum number of tasks that this queue will accept
+   * before blocking.
+   * @param showProgress If TRUE, show Progress of Jobs running from Queue.
+   * @param progressDelay The time in milliseconds to wait before showing any
+   * progress. This is useful in case the Tasks finish very quickly. Setting it
+   * to 0 will show Progress instantly with no delay.
+   */
+  public JobQueue(String globalName, String taskPrefix, int maxConcurrentJobs, int maxQueueSize, boolean showProgress, int progressDelay) {
+    Assert.isNotNull(globalName);
+    Assert.isNotNull(taskPrefix);
     Assert.isLegal(progressDelay >= 0, "JobQueue Progress delay is negative"); //$NON-NLS-1$
-    fName = name;
+    fName = globalName;
+    fTaskPrefix = taskPrefix;
     fMaxConcurrentJobs = maxConcurrentJobs;
     fShowProgress = showProgress;
     fProgressDelay = progressDelay;
@@ -427,13 +451,13 @@ public class JobQueue {
 
   private String formatTask() {
     StringBuilder buf = new StringBuilder();
-    buf.append(fName);
-    buf.append(" ("); //$NON-NLS-1$
+    buf.append(fTaskPrefix);
+    buf.append(" "); //$NON-NLS-1$
     int workDone = fWorkDone.get();
     buf.append(workDone != 0 ? workDone : 1); // Show a Minimum of '1'
     buf.append(" of ");
     buf.append(fTotalWork.get());
-    buf.append("): "); //$NON-NLS-1$
+    buf.append(": "); //$NON-NLS-1$
     buf.append(fCurrentTask.replaceAll("&", "&&")); //$NON-NLS-1$//$NON-NLS-2$
     return buf.toString();
   }
