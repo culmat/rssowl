@@ -292,6 +292,45 @@ public class OwlUI {
   /* Workaround for unknown State Width */
   private static int STATE_WIDTH = -1;
 
+  /* Map Common Mime Types to Extensions (used for Attachments) */
+  private static final Map<String, String> fgMapMimeToExtension = new HashMap<String, String>();
+  static {
+
+    /* Audio */
+    fgMapMimeToExtension.put("audio/mpeg", "mp3");
+    fgMapMimeToExtension.put("audio/mpeg3", "mp3");
+    fgMapMimeToExtension.put("audio/x-mpeg3", "mp3");
+    fgMapMimeToExtension.put("audio/mpeg4", "mp4");
+    fgMapMimeToExtension.put("audio/x-mpeg4", "mp4");
+    fgMapMimeToExtension.put("audio/aac", "aac");
+    fgMapMimeToExtension.put("audio/aacp", "aac");
+
+    /* Image */
+    fgMapMimeToExtension.put("image/bmp", "bmp");
+    fgMapMimeToExtension.put("image/x-windows-bmp", "bmp");
+    fgMapMimeToExtension.put("image/gif", "gif");
+    fgMapMimeToExtension.put("image/jpeg", "jpg");
+    fgMapMimeToExtension.put("image/pjpeg", "jpg");
+    fgMapMimeToExtension.put("image/png", "png");
+    fgMapMimeToExtension.put("image/x-quicktime", "qti");
+
+    /* Video */
+    fgMapMimeToExtension.put("video/x-ms-asf", "asd");
+    fgMapMimeToExtension.put("application/x-troff-msvideo", "avi");
+    fgMapMimeToExtension.put("video/avi", "avi");
+    fgMapMimeToExtension.put("video/msvideo", "avi");
+    fgMapMimeToExtension.put("video/x-msvideo", "avi");
+    fgMapMimeToExtension.put("video/x-flv", "flv");
+    fgMapMimeToExtension.put("video/quicktime", "mov");
+
+    /* Application */
+    fgMapMimeToExtension.put("application/msword", "doc");
+    fgMapMimeToExtension.put("application/pdf", "pdf");
+    fgMapMimeToExtension.put("application/rtf", "rtf");
+    fgMapMimeToExtension.put("text/richtext", "rtf");
+    fgMapMimeToExtension.put("application/x-rtf", "rtf");
+  }
+
   /** An enumeration of Operating System Themes */
   enum OSTheme {
 
@@ -1822,21 +1861,60 @@ public class OwlUI {
 
   /**
    * @param name the name of the attachment.
+   * @param mimeType the mime type of the attachment or <code>null</code> if
+   * none.
    * @return an {@link ImageDescriptor} for the attachment. Never
    * <code>null</code>.
    */
   @SuppressWarnings("restriction")
-  public static ImageDescriptor getAttachmentImage(String name) {
-    if (StringUtils.isSet(name)) {
-      int lastIndexOfDot = name.lastIndexOf('.');
-      if (lastIndexOfDot != -1 && !name.endsWith(".")) {
-        String extension = name.substring(lastIndexOfDot + 1);
-        Program p = Program.findProgram(extension);
-        if (p != null)
-          return new org.eclipse.ui.internal.misc.ExternalProgramImageDescriptor(p);
+  public static ImageDescriptor getAttachmentImage(String name, String mimeType) {
+
+    /* First try to lookup image from Mime Type */
+    ImageDescriptor descriptor = getImageForMime(mimeType);
+    if (descriptor != null)
+      return descriptor;
+
+    /* Second try to lookup image from File Name */
+    descriptor = getImageForFile(name);
+    if (descriptor != null)
+      return descriptor;
+
+    /* Return Default */
+    return ATTACHMENT;
+  }
+
+  /* Find a Image for the given File Name using Program API from SWT */
+  private static ImageDescriptor getImageForFile(String file) {
+    if (StringUtils.isSet(file)) {
+      int lastIndexOfDot = file.lastIndexOf('.');
+      if (lastIndexOfDot != -1 && !file.endsWith(".")) {
+        String extension = file.substring(lastIndexOfDot + 1);
+        return getImageForExtension(extension.toLowerCase());
       }
     }
 
-    return ATTACHMENT;
+    return null;
+  }
+
+  /* Find a Image for the given Mime Type using Program API from SWT */
+  private static ImageDescriptor getImageForMime(String mime) {
+    if (StringUtils.isSet(mime)) {
+      String extension = fgMapMimeToExtension.get(mime.toLowerCase());
+      return getImageForExtension(extension);
+    }
+
+    return null;
+  }
+
+  /* Find a Image for the given Extension using Program API from SWT */
+  @SuppressWarnings("restriction")
+  private static ImageDescriptor getImageForExtension(String extension) {
+    if (StringUtils.isSet(extension)) {
+      Program p = Program.findProgram(extension);
+      if (p != null)
+        return new org.eclipse.ui.internal.misc.ExternalProgramImageDescriptor(p);
+    }
+
+    return null;
   }
 }
