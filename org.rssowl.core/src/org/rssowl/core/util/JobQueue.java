@@ -43,8 +43,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * This class allows to add <code>Runnables</code> into a Queue to process
- * them in Jobs up to a certain amount of allowed parallel Jobs.
+ * This class allows to add <code>Runnables</code> into a Queue to process them
+ * in Jobs up to a certain amount of allowed parallel Jobs.
  *
  * @author bpasero
  */
@@ -80,8 +80,8 @@ public class JobQueue {
 
   /**
    * Creates an instance of <code>JobQueue</code> that allows to add
-   * <code>Runnables</code> into a Queue to process them in Jobs up to a
-   * certain amount of allowed parallel Jobs.
+   * <code>Runnables</code> into a Queue to process them in Jobs up to a certain
+   * amount of allowed parallel Jobs.
    *
    * @param name A human-readable name that is displayed in the Progress-View
    * while the Queue is processed.
@@ -121,11 +121,11 @@ public class JobQueue {
   /**
    * Cancels all Jobs that belong to this Queue. Optionally the caller may
    * decide to join the running Jobs that are not yet done. Note that this will
-   * <em>block</em> the calling Thread until all running Tasks have finished
-   * so this should only be considered for <em>short-running</em> Tasks.
+   * <em>block</em> the calling Thread until all running Tasks have finished so
+   * this should only be considered for <em>short-running</em> Tasks.
    *
-   * @param joinRunning If <code>TRUE</code>, join the running Jobs that are
-   * not yet done.
+   * @param joinRunning If <code>TRUE</code>, join the running Jobs that are not
+   * yet done.
    */
   public void cancel(boolean joinRunning) {
 
@@ -157,8 +157,8 @@ public class JobQueue {
    * the Task is scheduled and did not yet run to completion.
    *
    * @param task The Task to check for being queued in this Queue.
-   * @return <code>TRUE</code> in case the given Task is already queued in
-   * this Queue, meaning that it has been scheduled but did not yet complete
+   * @return <code>TRUE</code> in case the given Task is already queued in this
+   * Queue, meaning that it has been scheduled but did not yet complete
    * execution, <code>FALSE</code> otherwise.
    */
   public boolean isQueued(ITask task) {
@@ -171,10 +171,8 @@ public class JobQueue {
    * parallel processed Tasks is below <code>MAX_SCHEDULED_JOBS</code>.
    *
    * @param task The Task to add into this Queue.
-   *
-   * @return {@code true} if all the tasks were scheduled or {@code false}
-   * if some tasks were not scheduled because the current thread was
-   * interrupted.
+   * @return {@code true} if all the tasks were scheduled or {@code false} if
+   * some tasks were not scheduled because the current thread was interrupted.
    */
   public boolean schedule(ITask task) {
     return schedule(Collections.singletonList(task));
@@ -182,14 +180,13 @@ public class JobQueue {
 
   /**
    * Adds the given List of Tasks into the Queue waiting is necessary for space
-   * to become available. Each Runnable is processed in a <code>Job</code>
-   * once the number of parallel processed Tasks is below
+   * to become available. Each Runnable is processed in a <code>Job</code> once
+   * the number of parallel processed Tasks is below
    * <code>MAX_SCHEDULED_JOBS</code>.
    *
    * @param tasks The Tasks to add into this Queue.
-   * @return {@code true} if all the tasks were scheduled or {@code false}
-   * if some tasks were not scheduled because the current thread was
-   * interrupted.
+   * @return {@code true} if all the tasks were scheduled or {@code false} if
+   * some tasks were not scheduled because the current thread was interrupted.
    */
   //TODO Consider returning the tasks that were not scheduled instead
   public boolean schedule(List<ITask> tasks) {
@@ -209,7 +206,6 @@ public class JobQueue {
         return false;
       }
     }
-
 
     /* Schedule Job if not yet done */
     if (!fProgressJobScheduled && fShowProgress) {
@@ -321,11 +317,10 @@ public class JobQueue {
   }
 
   /**
-   * Returns <code>TRUE</code> in case the JobQueue has finished all open
-   * Tasks.
+   * Returns <code>TRUE</code> in case the JobQueue has finished all open Tasks.
    *
-   * @return <code>TRUE</code> in case the JobQueue has finished all open
-   * Tasks, <code>FALSE</code> otherwise.
+   * @return <code>TRUE</code> in case the JobQueue has finished all open Tasks,
+   * <code>FALSE</code> otherwise.
    */
   public synchronized boolean isEmpty() {
     return internalIsEmpty();
@@ -367,7 +362,7 @@ public class JobQueue {
         while (!monitor.isCanceled() && !internalIsEmpty()) {
 
           /* Update the Task Label if there was an Update */
-          if (fCurrentTask != null && ((fLastWorkDone != fWorkDone.get()) || fLastTask == null)) {
+          if (fCurrentTask != null && ((fLastWorkDone != fWorkDone.get()) || !StringUtils.isSet(fLastTask))) {
             fLastWorkDone = fWorkDone.get();
             fLastTask = fCurrentTask;
             monitor.setTaskName(formatTask());
