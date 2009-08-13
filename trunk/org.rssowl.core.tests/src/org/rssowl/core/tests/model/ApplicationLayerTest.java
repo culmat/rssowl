@@ -52,8 +52,6 @@ import org.rssowl.core.persist.NewsCounter;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
-import org.rssowl.core.persist.dao.IFeedDAO;
-import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.INewsCounterDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.event.BookMarkEvent;
