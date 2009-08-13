@@ -28,6 +28,7 @@ import org.rssowl.core.INewsAction;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Controller;
 
 import java.io.File;
@@ -44,7 +45,7 @@ import java.util.List;
 public class DownloadAttachmentsNewsAction implements INewsAction {
 
   /** Unique ID of this Action */
-  public static final String ID= "org.rssowl.ui.DownloadAttachmentsNewsAction";
+  public static final String ID = "org.rssowl.ui.DownloadAttachmentsNewsAction";
 
   /*
    * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
@@ -57,8 +58,13 @@ public class DownloadAttachmentsNewsAction implements INewsAction {
           List<IAttachment> attachments = newsitem.getAttachments();
           for (IAttachment attachment : attachments) {
             URI link = attachment.getLink();
+            if (link != null) {
+              if (!link.isAbsolute())
+                link = URIUtils.resolve(newsitem.getFeedReference().getLink(), link);
+            }
+
             if (link != null)
-              Controller.getDefault().getDownloadService().download(link, folder);
+              Controller.getDefault().getDownloadService().download(attachment, link, folder);
           }
         }
       }
