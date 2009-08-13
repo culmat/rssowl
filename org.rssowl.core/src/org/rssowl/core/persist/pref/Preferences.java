@@ -289,6 +289,9 @@ public enum Preferences {
   /** Global: Share Provider Order and Enablement */
   SHARE_PROVIDER_STATE("org.rssowl.pref.ShareProviderState", IPreferenceType.INTEGERS),
 
+  /** Global: Hide Completed Downloads */
+  HIDE_COMPLETED_DOWNLOADS("org.rssowl.pref.HideCompletedDownloads", IPreferenceType.BOOLEAN),
+
   /******************************
    * Eclipse Preferences Follow *
    ******************************/

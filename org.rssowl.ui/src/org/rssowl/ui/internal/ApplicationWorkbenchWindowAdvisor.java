@@ -228,7 +228,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             parent = parent.getParent();
             if (parent != null && !(parent instanceof Shell) && !parent.isDisposed() && parent.getLayoutData() instanceof org.eclipse.ui.internal.progress.ProgressRegion) {
               event.doit = false;
-              event.type= SWT.None;
+              event.type = SWT.None;
               asyncOpenActivityDialog(toolbar.getShell());
             }
           }
@@ -246,6 +246,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         ActivityDialog instance = ActivityDialog.getVisibleInstance();
         if (instance == null) {
           ActivityDialog dialog = new ActivityDialog(shell);
+          dialog.setBlockOnOpen(false);
           dialog.open();
         } else {
           instance.getShell().forceActive();

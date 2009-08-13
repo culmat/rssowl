@@ -99,8 +99,6 @@ import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.io.File;
 import java.net.URI;
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -124,9 +122,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
   /** End of the View Top Menu */
   public static final String M_VIEW_END = "viewEnd";
-
-  /* Used to format Sizes */
-  private static final NumberFormat fgSizeNumberFormat = new DecimalFormat("0.0");
 
   private IContributionItem fOpenWindowsItem;
   private IContributionItem fReopenEditors;
@@ -940,27 +935,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         manager.add(attachmentMenu);
       }
 
-      /* Offer Download Action for each */
-      for (final Pair<IAttachment, URI> attachmentPair : attachments) {
-        IAttachment attachment = attachmentPair.getFirst();
-        String fileName = URIUtils.getFile(attachmentPair.getSecond());
-        String size = getSize(attachment.getLength());
-
-        Action action = new Action(size != null ? (fileName + " (" + size + ")") : (fileName)) {
-          @Override
-          public void run() {
-            DirectoryDialog dialog = new DirectoryDialog(shellProvider.getShell(), SWT.None);
-            dialog.setText("Select a Folder for the Download");
-            String folder = dialog.open();
-            if (StringUtils.isSet(folder))
-              Controller.getDefault().getDownloadService().download(attachmentPair.getSecond(), new File(folder));
-          }
-        };
-
-        action.setImageDescriptor(OwlUI.getAttachmentImage(fileName, attachmentPair.getFirst().getType()));
-        attachmentMenu.add(action);
-      }
-
       /* Offer to Download All */
       if (attachments.size() > 1) {
         int sumBytes = 0;
@@ -972,9 +946,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             break;
           }
         }
-        String sumSize = getSize(sumBytes);
+        String sumSize = OwlUI.getSize(sumBytes);
 
-        attachmentMenu.add(new Separator());
         attachmentMenu.add(new Action(sumSize != null ? ("&Download All..." + " (" + sumSize + ")") : ("&Download All...")) {
           @Override
           public void run() {
@@ -983,11 +956,33 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             String folder = dialog.open();
             if (StringUtils.isSet(folder)) {
               for (Pair<IAttachment, URI> attachment : attachments) {
-                Controller.getDefault().getDownloadService().download(attachment.getSecond(), new File(folder));
+                Controller.getDefault().getDownloadService().download(attachment.getFirst(), attachment.getSecond(), new File(folder));
               }
             }
           }
         });
+        attachmentMenu.add(new Separator());
+      }
+
+      /* Offer Download Action for each */
+      for (final Pair<IAttachment, URI> attachmentPair : attachments) {
+        IAttachment attachment = attachmentPair.getFirst();
+        String fileName = URIUtils.getFile(attachmentPair.getSecond());
+        String size = OwlUI.getSize(attachment.getLength());
+
+        Action action = new Action(size != null ? (fileName + " (" + size + ")") : (fileName)) {
+          @Override
+          public void run() {
+            DirectoryDialog dialog = new DirectoryDialog(shellProvider.getShell(), SWT.None);
+            dialog.setText("Select a Folder for the Download");
+            String folder = dialog.open();
+            if (StringUtils.isSet(folder))
+              Controller.getDefault().getDownloadService().download(attachmentPair.getFirst(), attachmentPair.getSecond(), new File(folder));
+          }
+        };
+
+        action.setImageDescriptor(OwlUI.getAttachmentImage(fileName, attachmentPair.getFirst().getType()));
+        attachmentMenu.add(action);
       }
 
       /* Offer to Automize Downloading */
@@ -1007,23 +1002,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         }
       });
     }
-  }
-
-  private static String getSize(int bytes) {
-    if (bytes > 0) {
-      double mb = bytes / (1024d * 1024d);
-      double kb = bytes / 1024d;
-
-      if (mb >= 1)
-        return fgSizeNumberFormat.format(mb) + " MB";
-
-      if (kb >= 1)
-        return fgSizeNumberFormat.format(kb) + " KB";
-
-      return bytes + " Bytes";
-    }
-
-    return null;
   }
 
   /**

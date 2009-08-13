@@ -55,6 +55,7 @@ public class ShowActivityAction implements IWorkbenchWindowActionDelegate {
     ActivityDialog instance = ActivityDialog.getVisibleInstance();
     if (instance == null) {
       ActivityDialog dialog = new ActivityDialog(fWindow.getShell());
+      dialog.setBlockOnOpen(false);
       dialog.open();
     } else {
       instance.getShell().forceActive();
