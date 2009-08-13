@@ -53,8 +53,6 @@ import org.rssowl.core.persist.ISearchValueType;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.INews.State;
 import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.IFeedDAO;
-import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.event.FolderAdapter;
 import org.rssowl.core.persist.event.FolderEvent;
 import org.rssowl.core.persist.event.FolderListener;

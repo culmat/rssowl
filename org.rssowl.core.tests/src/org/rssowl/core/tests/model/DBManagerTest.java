@@ -50,7 +50,6 @@ import org.rssowl.core.internal.persist.SearchCondition;
 import org.rssowl.core.internal.persist.SearchMark;
 import org.rssowl.core.internal.persist.Source;
 import org.rssowl.core.internal.persist.service.DBManager;
-import org.rssowl.core.internal.persist.service.NewsCounterService;
 import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
@@ -168,6 +167,9 @@ public class DBManagerTest {
     assertEquals(news, newsFromFeed.iterator().next());
   }
 
+  /**
+   *
+   */
   @Test
   public void testAddDuplicateNewsDeadlocks() {
     List<INews> newsList = new ArrayList<INews>();

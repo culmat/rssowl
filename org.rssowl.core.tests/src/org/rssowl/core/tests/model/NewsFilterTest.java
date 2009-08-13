@@ -241,6 +241,7 @@ public class NewsFilterTest {
   /**
    * @throws Exception
    */
+  @SuppressWarnings("cast")
   @Test
   public void test_CopyNews_MatchAll() throws Exception {
     IBookMark bm = createBookMark("local1");
@@ -290,6 +291,7 @@ public class NewsFilterTest {
   /**
    * @throws Exception
    */
+  @SuppressWarnings("cast")
   @Test
   public void test_MoveNews_MatchAll() throws Exception {
     IBookMark bm = createBookMark("local1");
@@ -337,6 +339,7 @@ public class NewsFilterTest {
   /**
    * @throws Exception
    */
+  @SuppressWarnings("cast")
   @Test
   public void test_MoveNews_MatchAll_RunAllActions() throws Exception {
     IBookMark bm = createBookMark("local1");
