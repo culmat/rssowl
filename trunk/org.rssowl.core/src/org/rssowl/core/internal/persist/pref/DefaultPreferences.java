@@ -292,6 +292,9 @@ public class DefaultPreferences {
   /** Global: Share Provider Order and Enablement */
   public static final String SHARE_PROVIDER_STATE = Preferences.SHARE_PROVIDER_STATE.id();
 
+  /** Global: Hide Completed Downloads */
+  public static final String HIDE_COMPLETED_DOWNLOADS = Preferences.HIDE_COMPLETED_DOWNLOADS.id();
+
   /**
    * Eclipse Preferences Follow
    */

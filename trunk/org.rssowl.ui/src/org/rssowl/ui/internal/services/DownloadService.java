@@ -27,15 +27,24 @@ package org.rssowl.ui.internal.services;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.swt.program.Program;
+import org.eclipse.ui.progress.IProgressConstants;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.ConnectionException;
+import org.rssowl.core.connection.IAbortable;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IProtocolHandler;
-import org.rssowl.core.util.ITask;
-import org.rssowl.core.util.JobQueue;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.IAttachment;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
+import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.DownloadJobQueue;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -50,8 +59,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * A service to download files in a {@link JobQueue} with proper progress
- * reporting.
+ * A service to download files in a {@link DownloadJobQueue} with proper
+ * progress reporting.
  *
  * @author bpasero
  */
@@ -63,21 +72,25 @@ public class DownloadService {
   /* Connection Timeouts in MS */
   private static final int DEFAULT_CON_TIMEOUT = 30000;
 
-  private JobQueue fDownloadQueue;
+  private DownloadJobQueue fDownloadQueue;
   private Map<OutputStream, OutputStream> fOutputStreamMap = new ConcurrentHashMap<OutputStream, OutputStream>();
+  private IPreferenceScope fPreferences = Owl.getPreferenceService().getGlobalScope();
 
   /* Task for a Download */
-  private class DownloadTask implements ITask {
+  private class AttachmentDownloadTask extends DownloadJobQueue.DownloadTask {
+    private IAttachment fAttachment;
     private URI fFile;
     private File fFolder;
 
-    private DownloadTask(URI file, File folder) {
+    private AttachmentDownloadTask(IAttachment attachment, URI file, File folder) {
+      fAttachment = attachment;
       fFile = file;
       fFolder = folder;
     }
 
-    public IStatus run(IProgressMonitor monitor) {
-      return internalDownload(fFile, fFolder, monitor);
+    @Override
+    public IStatus run(Job job, IProgressMonitor monitor) {
+      return internalDownload(job, fAttachment, fFile, fFolder, monitor);
     }
 
     public String getName() {
@@ -104,28 +117,34 @@ public class DownloadService {
       if (getClass() != obj.getClass())
         return false;
 
-      final DownloadTask other = (DownloadTask) obj;
+      final AttachmentDownloadTask other = (AttachmentDownloadTask) obj;
       return fFile.equals(other.fFile);
     }
   }
 
   /** Default Constructor to create a Download Queue */
   public DownloadService() {
-    fDownloadQueue = new JobQueue("Downloading Attachments...", MAX_CONCURRENT_DOWNLOAD_JOBS, Integer.MAX_VALUE, true, 0);
-    fDownloadQueue.setUnknownProgress(true);
+    fDownloadQueue = new DownloadJobQueue("Downloading...", MAX_CONCURRENT_DOWNLOAD_JOBS, Integer.MAX_VALUE);
   }
 
   /**
+   * @param attachment the {@link IAttachment} to download.
    * @param file the file to download as {@link URI}.
    * @param folder the folder to download to as {@link File}.
    */
-  public void download(URI file, File folder) {
-    DownloadTask task = new DownloadTask(file, folder);
+  public void download(IAttachment attachment, URI file, File folder) {
+    AttachmentDownloadTask task = new AttachmentDownloadTask(attachment, file, folder);
     if (!fDownloadQueue.isQueued(task))
       fDownloadQueue.schedule(task);
   }
 
-  private IStatus internalDownload(URI link, File folder, IProgressMonitor monitor) {
+  private IStatus internalDownload(Job job, IAttachment attachment, URI link, File folder, IProgressMonitor monitor) {
+    String downloadFileName = URIUtils.getFile(link);
+    File downloadFile = new File(folder, downloadFileName);
+    job.setName("Downloading " + downloadFileName + "...");
+    job.setProperty(IProgressConstants.ICON_PROPERTY, OwlUI.getAttachmentImage(downloadFileName, attachment.getType()));
+
+    int bytesConsumed = 0;
     try {
       IProtocolHandler handler = Owl.getConnectionService().getHandler(link);
       if (handler != null) {
@@ -136,20 +155,36 @@ public class DownloadService {
         if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
           return Status.CANCEL_STATUS;
 
-        /* First Download to a temporary File */
+        /* Initialize Fields */
+        long bytesPerSecond = 0;
+        long lastTaskNameUpdate = 0;
+        long start = System.currentTimeMillis();
+        int length = attachment.getLength();
         byte[] buffer = new byte[8192];
-        InputStream in = handler.openStream(link, monitor, properties);
+
+        /* Begin Task */
+        monitor.beginTask(formatTask(bytesConsumed, length, -1), length > 0 ? length : IProgressMonitor.UNKNOWN);
+
+        /* First Download to a temporary File */
+        InputStream in = null;
         FileOutputStream out = null;
-        String downloadFileName = URIUtils.getFile(link);
-        File downloadFile = new File(folder, downloadFileName);
         File partFile = new File(folder, downloadFileName + ".part");
         boolean canceled = false;
+        Exception error = null;
         try {
+
+          /* Open Stream */
+          in = handler.openStream(link, monitor, properties);
+
+          /* Create tmp part File */
           partFile.createNewFile();
           partFile.deleteOnExit();
 
+          /* Keep Outputstream for later */
           out = new FileOutputStream(partFile);
           fOutputStreamMap.put(out, out);
+
+          /* Download */
           while (true) {
 
             /* Check for Cancellation and Shutdown */
@@ -160,18 +195,50 @@ public class DownloadService {
 
             /* Read from Stream */
             int read = in.read(buffer);
+            bytesConsumed += read;
             if (read == -1)
               break;
 
+            /* Write to File */
             out.write(buffer, 0, read);
+
+            /* Update Task Name once per Second */
+            long now = System.currentTimeMillis();
+            if (now - lastTaskNameUpdate > 1000) {
+              long secondsSpent = (System.currentTimeMillis() - start) / 1000;
+              bytesPerSecond = (bytesConsumed / Math.max(1, secondsSpent));
+              monitor.setTaskName(formatTask(bytesConsumed, length, (int) bytesPerSecond));
+              lastTaskNameUpdate = now;
+            }
+
+            /* Update Worked */
+            monitor.worked(read);
           }
         } catch (FileNotFoundException e) {
+          error = e;
           return Activator.getDefault().createErrorStatus(e.getMessage(), e);
         } catch (IOException e) {
+          error = e;
+          return Activator.getDefault().createErrorStatus(e.getMessage(), e);
+        } catch (ConnectionException e) {
+          error = e;
           return Activator.getDefault().createErrorStatus(e.getMessage(), e);
         } finally {
           monitor.done();
 
+          /* Indicate Error Message if any and offer Action to download again */
+          if (error != null) {
+            if (error.getMessage() != null)
+              job.setName("Error Downloading " + downloadFileName + ": " + error.getMessage());
+            else
+              job.setName("Error Downloading " + downloadFileName);
+
+            job.setProperty(IProgressConstants.ICON_PROPERTY, OwlUI.ERROR);
+            job.setProperty(IProgressConstants.ACTION_PROPERTY, getRedownloadAction(new AttachmentDownloadTask(attachment, link, folder)));
+            monitor.setTaskName("Try Again");
+          }
+
+          /* Close Output Stream */
           if (out != null) {
             try {
               out.close();
@@ -183,9 +250,13 @@ public class DownloadService {
             }
           }
 
+          /* Close Input Stream */
           if (in != null) {
             try {
-              in.close();
+              if (canceled && in instanceof IAbortable)
+                ((IAbortable) in).abort();
+              else
+                in.close();
             } catch (IOException e) {
               return Activator.getDefault().createErrorStatus(e.getMessage(), e);
             }
@@ -208,7 +279,75 @@ public class DownloadService {
       return Activator.getDefault().createErrorStatus(e.getMessage(), e);
     }
 
-    return Status.OK_STATUS;
+    /* Offer Action to Open Attachment by keeping Job in Viewer if set */
+    if (!fPreferences.getBoolean(DefaultPreferences.HIDE_COMPLETED_DOWNLOADS)) {
+      job.setProperty(IProgressConstants.KEEP_PROPERTY, Boolean.TRUE);
+      job.setProperty(IProgressConstants.ACTION_PROPERTY, getOpenAction(downloadFile));
+    }
+
+    /* Update Job Name */
+    if (bytesConsumed > 0)
+      job.setName(downloadFileName + " - " + OwlUI.getSize(bytesConsumed));
+    else
+      job.setName(downloadFileName);
+
+    /* The Label of the Status is used as Link for Action */
+    return new Status(IStatus.OK, Activator.PLUGIN_ID, "Open Folder");
+  }
+
+  private String formatTask(int bytesConsumed, int totalBytes, int bytesPerSecond) {
+    StringBuilder str = new StringBuilder();
+
+    /* "Time Remaining" */
+    int bytesToGo = totalBytes - bytesConsumed;
+    if (bytesToGo > 0 && bytesPerSecond > 0) {
+      int secondsRemaining = bytesToGo / bytesPerSecond;
+      String period = OwlUI.getPeriod(secondsRemaining);
+      if (period != null)
+        str.append(period).append(" Remaining - ");
+    }
+
+    /* "X MB of Y MB "*/
+    String consumed = OwlUI.getSize(bytesConsumed);
+    if (consumed == null)
+      consumed = "0";
+
+    str.append(consumed);
+    str.append(" of ");
+
+    String total = OwlUI.getSize(totalBytes);
+    if (total != null)
+      str.append(total);
+    else
+      str.append("Unknown Size");
+
+    /* "(X MB/sec)" */
+    if (bytesPerSecond > 0) {
+      str.append(" (");
+      str.append(OwlUI.getSize(bytesPerSecond));
+      str.append("/sec");
+      str.append(")");
+    }
+
+    return str.toString();
+  }
+
+  private IAction getOpenAction(final File downloadFile) {
+    return new Action("Open Folder") {
+      @Override
+      public void run() {
+        Program.launch(downloadFile.getParent());
+      }
+    };
+  }
+
+  private IAction getRedownloadAction(final AttachmentDownloadTask task) {
+    return new Action("Re-Download") {
+      @Override
+      public void run() {
+        fDownloadQueue.schedule(task);
+      }
+    };
   }
 
   /**

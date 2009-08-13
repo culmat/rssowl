@@ -1925,6 +1925,39 @@ public class OwlUI {
   }
 
   /**
+   * @param seconds the number of seconds.
+   * @return the period spanned by the seconds as human readable label.
+   */
+  public static String getPeriod(int seconds) {
+    if (seconds > 0) {
+      int hours = seconds / 3600;
+      int minutes = (seconds / 60) % 60;
+
+      String hoursStr = (hours == 1) ? " Hour" : " Hours";
+      String minutesStr = (minutes == 1) ? " Minute" : " Minutes";
+      String secondsStr = (seconds == 1) ? " Second" : " Seconds";
+
+      /* X Hours, Y Minutes */
+      if (hours > 0 && minutes > 0)
+        return hours + hoursStr + ", " + minutes + minutesStr;
+
+      /* X Hours */
+      else if (hours > 0)
+        return hours + hoursStr;
+
+      /* X Minutes */
+      else if (hours == 0 && minutes > 0)
+        return minutes + minutesStr;
+
+      /* X Seconds */
+      else if (seconds < 60)
+        return seconds + secondsStr;
+    }
+
+    return null;
+  }
+
+  /**
    * @param bytes the number of bytes.
    * @return a human readable representation of the bytes.
    */

@@ -368,14 +368,14 @@
       </actionSet>
       <actionSet
             id="org.rssowl.ui.ShowActivitySet"
-            label="Show Activity"
+            label="Downloads &amp; Activity"
             visible="true">
          <action
                class="org.rssowl.ui.internal.actions.ShowActivityAction"
                definitionId="org.rssowl.ui.ShowActivityAction"
                icon="icons/elcl16/activity.gif"
                id="org.rssowl.ui.ShowActivityAction"
-               label="Show &amp;Activity"
+               label="&amp;Downloads &amp;&amp; Activity"
                menubarPath="tools/end"
                style="push">
          </action>
@@ -825,7 +825,7 @@
             categoryId="org.rssowl.ui.commands.category.RSSOwl"
             description="Show pending feed updates and downloads."
             id="org.rssowl.ui.ShowActivityAction"
-            name="Show Activity">
+            name="Downloads &amp; Activity">
       </command>
    </extension>
    <extension
@@ -1050,6 +1050,12 @@
             contextId="org.eclipse.ui.contexts.dialogAndWindow"
             schemeId="org.rssowl.ui.KeyScheme"
             sequence="M1+A">
+      </key>
+      <key
+            commandId="org.rssowl.ui.ShowActivityAction"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1+J">
       </key>
    </extension>
    <extension

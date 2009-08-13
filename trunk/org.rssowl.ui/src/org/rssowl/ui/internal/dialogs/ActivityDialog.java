@@ -29,21 +29,36 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
+import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 /**
  * A Dialog to show activity, such as the progress of updating feeds or
  * downloading attachments.
+ * <p>
+ * TODO This dialog uses internal Eclipse classes (Progress Viewer) that can
+ * break over future releases.
+ * </p>
  *
  * @author bpasero
  */
@@ -58,9 +73,13 @@ public class ActivityDialog extends TitleAreaDialog {
   /* Minimum Height in DLUs */
   private static final int MIN_DIALOG_HEIGHT_DLU = 160;
 
+  @SuppressWarnings("restriction")
+  private org.eclipse.ui.internal.progress.DetailedProgressViewer fViewer;
   private LocalResourceManager fResources;
   private IDialogSettings fDialogSettings;
   private boolean fFirstTimeOpen;
+  private Button fHideCompletedCheck;
+  private IPreferenceScope fPreferences;
 
   /**
    * @param parentShell
@@ -70,6 +89,7 @@ public class ActivityDialog extends TitleAreaDialog {
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fDialogSettings = Activator.getDefault().getDialogSettings();
     fFirstTimeOpen = (fDialogSettings.getSection(SETTINGS_SECTION) == null);
+    fPreferences = Owl.getPreferenceService().getGlobalScope();
   }
 
   /**
@@ -105,7 +125,7 @@ public class ActivityDialog extends TitleAreaDialog {
   @Override
   protected void configureShell(Shell shell) {
     super.configureShell(shell);
-    shell.setText("Activity");
+    shell.setText("Downloads & Activity");
   }
 
   /*
@@ -128,13 +148,13 @@ public class ActivityDialog extends TitleAreaDialog {
   protected Control createDialogArea(Composite parent) {
 
     /* Title */
-    setTitle("Activity");
+    setTitle("Downloads && Activity");
 
     /* Title Image */
     setTitleImage(OwlUI.getImage(fResources, "icons/wizban/activity_wiz.png"));
 
     /* Title Message */
-    setMessage("Currently running feed updates and downloads.");
+    setMessage("Downloads and Feed Updates show up in the list below.");
 
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -144,18 +164,44 @@ public class ActivityDialog extends TitleAreaDialog {
     composite.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
     composite.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-    /* Progress Viewer (TODO This is Internal Eclipse) */
-    org.eclipse.ui.internal.progress.DetailedProgressViewer viewer = new org.eclipse.ui.internal.progress.DetailedProgressViewer(composite, SWT.NONE);
-    viewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    /* Progress Viewer */
+    fViewer = new org.eclipse.ui.internal.progress.DetailedProgressViewer(composite, SWT.NONE);
+    fViewer.getControl().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-    org.eclipse.ui.internal.progress.ProgressViewerContentProvider provider = new org.eclipse.ui.internal.progress.ProgressViewerContentProvider(viewer, false, true);
-    viewer.setContentProvider(provider);
-    viewer.setInput(org.eclipse.ui.internal.progress.ProgressManager.getInstance());
+    /* Content Provider */
+    boolean hideCompleted = fPreferences.getBoolean(DefaultPreferences.HIDE_COMPLETED_DOWNLOADS);
+    fViewer.setContentProvider(new org.eclipse.ui.internal.progress.ProgressViewerContentProvider(fViewer, false, !hideCompleted));
+
+    /* Comparator */
+    fViewer.setComparator(new ViewerComparator() {
+      @SuppressWarnings("unchecked")
+      @Override
+      public int compare(Viewer viewer, Object obj1, Object obj2) {
+        if (obj1 instanceof Comparable && obj2 instanceof Comparable)
+          return ((Comparable) obj1).compareTo(obj2);
+
+        return super.compare(viewer, obj1, obj2);
+      }
+    });
+
+    /* Input */
+    fViewer.setInput(org.eclipse.ui.internal.progress.ProgressManager.getInstance());
+
+    /* Bug: The initial size is not set properly for the List */
+    updateViewerSize();
 
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     return composite;
+  }
+
+  @SuppressWarnings("restriction")
+  private void updateViewerSize() {
+    Point size = fViewer.getControl().computeSize(SWT.DEFAULT, SWT.DEFAULT);
+    size.x += IDialogConstants.HORIZONTAL_SPACING;
+    size.y += IDialogConstants.VERTICAL_SPACING;
+    ((ScrolledComposite) fViewer.getControl()).setMinSize(size);
   }
 
   /*
@@ -173,11 +219,47 @@ public class ActivityDialog extends TitleAreaDialog {
   }
 
   /*
-   * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+   * @see org.eclipse.jface.dialogs.TrayDialog#createButtonBar(org.eclipse.swt.widgets.Composite)
    */
   @Override
-  protected void createButtonsForButtonBar(Composite parent) {
-    createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
+  protected Control createButtonBar(Composite parent) {
+    GridLayout layout = new GridLayout(1, false);
+    layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
+    layout.marginHeight = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN);
+    layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
+    layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
+
+    Composite buttonBar = new Composite(parent, SWT.NONE);
+    buttonBar.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    buttonBar.setLayout(layout);
+
+    /* Keep or Hide Completed Downloads */
+    fHideCompletedCheck = new Button(buttonBar, SWT.CHECK);
+    fHideCompletedCheck.setText("Remove Completed Downloads from List");
+    fHideCompletedCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+    fHideCompletedCheck.setSelection(fPreferences.getBoolean(DefaultPreferences.HIDE_COMPLETED_DOWNLOADS));
+    fHideCompletedCheck.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        final boolean hideCompleted = fHideCompletedCheck.getSelection();
+        refreshProgressViewer(hideCompleted);
+        JobRunner.runInBackgroundThread(new Runnable() {
+          public void run() {
+            fPreferences.putBoolean(DefaultPreferences.HIDE_COMPLETED_DOWNLOADS, hideCompleted);
+          }
+        });
+      }
+    });
+
+    /* OK */
+    createButton(buttonBar, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
+
+    return buttonBar;
+  }
+
+  @SuppressWarnings("restriction")
+  private void refreshProgressViewer(boolean hideCompleted) {
+    fViewer.setContentProvider(new org.eclipse.ui.internal.progress.ProgressViewerContentProvider(fViewer, false, !hideCompleted));
   }
 
   /*
