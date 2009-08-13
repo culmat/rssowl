@@ -180,16 +180,16 @@ public class CoreUtilsTest {
     news1.setDescription("Foo Bar");
     assertEquals("Foo Bar", CoreUtils.getHeadline(news1, false));
 
-    news1.setDescription("Foo &auml; Bar");
-    assertEquals("Foo &auml; Bar", CoreUtils.getHeadline(news1, false));
-    assertEquals("Foo ä Bar", CoreUtils.getHeadline(news1, true));
+    news1.setDescription("Foo &amp; Bar");
+    assertEquals("Foo &amp; Bar", CoreUtils.getHeadline(news1, false));
+    assertEquals("Foo & Bar", CoreUtils.getHeadline(news1, true));
 
     news1.setTitle("A Foo Bar");
     assertEquals("A Foo Bar", CoreUtils.getHeadline(news1, false));
 
-    news1.setTitle("A Foo &auml; Bar");
-    assertEquals("A Foo &auml; Bar", CoreUtils.getHeadline(news1, false));
-    assertEquals("A Foo ä Bar", CoreUtils.getHeadline(news1, true));
+    news1.setTitle("A Foo &amp; Bar");
+    assertEquals("A Foo &amp; Bar", CoreUtils.getHeadline(news1, false));
+    assertEquals("A Foo & Bar", CoreUtils.getHeadline(news1, true));
   }
 
   /**
