@@ -568,8 +568,9 @@ public class Controller {
     Assert.isNotNull(bookmark);
     CoreException ex = null;
 
-    /* Keep URL of Feed as final var */
+    /* Keep URL and Homepage of Feed as final var */
     final URI feedLink = bookmark.getFeedLinkReference().getLink();
+    URI feedHomepage = null;
 
     try {
 
@@ -604,6 +605,7 @@ public class Controller {
 
       /* Load the Feed */
       final Pair<IFeed, IConditionalGet> pairResult = Owl.getConnectionService().reload(feedLink, monitor, properties);
+      feedHomepage = pairResult.getFirst().getHomepage();
 
       /* Return on Cancelation or shutdown or deletion */
       if (!shouldProceedReloading(monitor, bookmark))
@@ -619,26 +621,8 @@ public class Controller {
         return Status.CANCEL_STATUS;
 
       /* Load the Favicon directly afterwards if required */
-      if (!InternalOwl.PERF_TESTING && OwlUI.getFavicon(bookmark) == null) {
-        try {
-          byte[] faviconBytes = null;
-
-          /* First try using the Homepage of the Feed */
-          URI homepage = pairResult.getFirst().getHomepage();
-          if (homepage != null && StringUtils.isSet(homepage.toString()) && homepage.isAbsolute())
-            faviconBytes = Owl.getConnectionService().getFeedIcon(homepage);
-
-          /* Then try with Feed address itself */
-          if (faviconBytes == null)
-            faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
-
-          /* Store locally */
-          if (shouldProceedReloading(monitor, bookmark))
-            OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK, 16, 16);
-        } catch (UnknownFeedException e) {
-          Activator.getDefault().getLog().log(e.getStatus());
-        }
-      }
+      if (!InternalOwl.PERF_TESTING && OwlUI.getFavicon(bookmark) == null)
+        loadFavicon(bookmark, monitor, feedLink, feedHomepage);
 
       /* Return on Cancelation or shutdown or deletion */
       if (!shouldProceedReloading(monitor, bookmark))
@@ -741,21 +725,16 @@ public class Controller {
         }
       }
 
-      /* Feed's Content has not modified since */
-      else if (e instanceof NotModifiedException) {
-        return Status.OK_STATUS;
-      }
-
       /* Load the Favicon directly afterwards if required */
-      else if ((e instanceof InterpreterException || e instanceof ParserException) && OwlUI.getFavicon(bookmark) == null && shouldProceedReloading(monitor, bookmark)) {
-        try {
-          byte[] faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
-          OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK, 16, 16);
-        } catch (ConnectionException exe) {
-          Activator.getDefault().getLog().log(exe.getStatus());
-        }
+      else if (!InternalOwl.TESTING && (e instanceof NotModifiedException || e instanceof InterpreterException || e instanceof ParserException) && OwlUI.getFavicon(bookmark) == null && shouldProceedReloading(monitor, bookmark)) {
+        loadFavicon(bookmark, monitor, feedLink, feedHomepage);
       }
 
+      /* Feed has not been Modified Since */
+      if (e instanceof NotModifiedException)
+        return Status.OK_STATUS;
+
+      /* Report Exceptions as Warnings */
       return createWarningStatus(e.getStatus(), bookmark, feedLink);
     }
 
@@ -768,6 +747,28 @@ public class Controller {
     }
 
     return Status.OK_STATUS;
+  }
+
+  private void loadFavicon(final IBookMark bookmark, final IProgressMonitor monitor, final URI feedLink, URI feedHomepage) {
+    try {
+      byte[] faviconBytes = null;
+
+      /* First try using the Homepage of the Feed */
+      if (feedHomepage != null && StringUtils.isSet(feedHomepage.toString()) && feedHomepage.isAbsolute())
+        faviconBytes = Owl.getConnectionService().getFeedIcon(feedHomepage);
+
+      /* Then try with Feed address itself */
+      if (faviconBytes == null)
+        faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
+
+      /* Store locally */
+      if (shouldProceedReloading(monitor, bookmark))
+        OwlUI.storeImage(bookmark.getId(), faviconBytes, OwlUI.BOOKMARK, 16, 16);
+    } catch (UnknownFeedException e) {
+      Activator.getDefault().getLog().log(e.getStatus());
+    } catch (ConnectionException e) {
+      Activator.getDefault().getLog().log(e.getStatus());
+    }
   }
 
   private void updateErrorIndicator(final IBookMark bookmark, final IProgressMonitor monitor, CoreException ex) {
