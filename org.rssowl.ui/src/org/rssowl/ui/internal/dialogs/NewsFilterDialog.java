@@ -497,69 +497,114 @@ public class NewsFilterDialog extends TitleAreaDialog {
     /* Separator */
     dialogToolBar.add(new Separator());
 
-    /* Existing Saved Searches */
-    IAction savedSearches = new Action("S&aved Searches", IAction.AS_DROP_DOWN_MENU) {
-      @Override
-      public void run() {
-        getMenuCreator().getMenu(dialogToolBar.getControl()).setVisible(true);
-      }
+    /* Existing Filters */
+    {
+      IAction existingFilters = new Action("Show News Filter", IAction.AS_DROP_DOWN_MENU) {
+        @Override
+        public void run() {
+          getMenuCreator().getMenu(dialogToolBar.getControl()).setVisible(true);
+        }
 
-      @Override
-      public ImageDescriptor getImageDescriptor() {
-        return OwlUI.SEARCHMARK;
-      }
-    };
+        @Override
+        public ImageDescriptor getImageDescriptor() {
+          return OwlUI.FILTER;
+        }
+      };
 
-    savedSearches.setMenuCreator(new IMenuCreator() {
-      public void dispose() {}
+      existingFilters.setMenuCreator(new IMenuCreator() {
+        public void dispose() {}
 
-      public Menu getMenu(Control parent) {
-        Collection<ISearchMark> searchMarks = CoreUtils.loadSortedSearchMarks();
-        Menu menu = new Menu(parent);
+        public Menu getMenu(Control parent) {
+          Collection<ISearchFilter> filters = CoreUtils.loadSortedNewsFilters();
+          Menu menu = new Menu(parent);
 
-        /* Show Existing Saved Searches */
-        for (final ISearchMark searchMark : searchMarks) {
-          if (isSupported(searchMark)) {
+          /* Show Existing News Filters */
+          for (final ISearchFilter filter : filters) {
             MenuItem item = new MenuItem(menu, SWT.None);
-            item.setText(searchMark.getName());
-            item.setImage(OwlUI.getImage(fResources, OwlUI.SEARCHMARK));
+            item.setText(filter.getName());
+            item.setImage(OwlUI.getImage(fResources, OwlUI.FILTER));
             item.addSelectionListener(new SelectionAdapter() {
 
               @Override
               public void widgetSelected(SelectionEvent e) {
 
-                /* Match Conditions */
-                fMatchAllRadio.setSelection(searchMark.matchAllConditions());
-                fMatchAnyRadio.setSelection(!searchMark.matchAllConditions());
-                fMatchAllNewsRadio.setSelection(false);
-                setControlEnabled(fSearchConditionList, !fMatchAllNewsRadio.getSelection());
+                /* Search */
+                if (filter.getSearch() != null)
+                  showSearch(filter.getSearch());
 
-                /* Location */
-                Pair<ISearchCondition, List<ISearchCondition>> conditions = CoreUtils.splitScope(searchMark.getSearchConditions());
-                Long[][] location = null;
-                if (conditions.getFirst() != null && conditions.getFirst().getValue() instanceof Long[][])
-                  location = (Long[][]) conditions.getFirst().getValue();
-                fLocationControl.select(location);
+                /* Match All News */
+                if (filter.matchAllNews()) {
+                  fMatchAnyRadio.setSelection(false);
+                  fMatchAllRadio.setSelection(false);
+                  fMatchAllNewsRadio.setSelection(true);
+                  setControlEnabled(fSearchConditionList, false);
+                }
 
-                /* Show Conditions */
-                fSearchConditionList.showConditions(conditions.getSecond());
-
-                /* Layout */
-                fLocationControl.getParent().getParent().getParent().layout(true, true);
+                /* Actions */
+                fFilterActionList.showActions(filter.getActions());
               }
             });
           }
+
+          return menu;
         }
 
-        return menu;
-      }
+        public Menu getMenu(Menu parent) {
+          return null;
+        }
+      });
 
-      public Menu getMenu(Menu parent) {
-        return null;
-      }
-    });
+      dialogToolBar.add(existingFilters);
+    }
 
-    dialogToolBar.add(savedSearches);
+    /* Existing Saved Searches */
+    {
+      IAction savedSearches = new Action("Show Saved Search", IAction.AS_DROP_DOWN_MENU) {
+        @Override
+        public void run() {
+          getMenuCreator().getMenu(dialogToolBar.getControl()).setVisible(true);
+        }
+
+        @Override
+        public ImageDescriptor getImageDescriptor() {
+          return OwlUI.SEARCHMARK;
+        }
+      };
+
+      savedSearches.setMenuCreator(new IMenuCreator() {
+        public void dispose() {}
+
+        public Menu getMenu(Control parent) {
+          Collection<ISearchMark> searchMarks = CoreUtils.loadSortedSearchMarks();
+          Menu menu = new Menu(parent);
+
+          /* Show Existing Saved Searches */
+          for (final ISearchMark searchMark : searchMarks) {
+            if (isSupported(searchMark)) {
+              MenuItem item = new MenuItem(menu, SWT.None);
+              item.setText(searchMark.getName());
+              item.setImage(OwlUI.getImage(fResources, OwlUI.SEARCHMARK));
+              item.addSelectionListener(new SelectionAdapter() {
+
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                  showSearch(searchMark);
+                }
+              });
+            }
+          }
+
+          return menu;
+        }
+
+        public Menu getMenu(Menu parent) {
+          return null;
+        }
+      });
+
+      dialogToolBar.add(savedSearches);
+    }
+
     dialogToolBar.createControl(topControlsContainer);
     dialogToolBar.getControl().setLayoutData(new GridData(SWT.END, SWT.BEGINNING, true, false));
 
@@ -612,6 +657,29 @@ public class NewsFilterDialog extends TitleAreaDialog {
     /* Generate Name if preset */
     if (fPresetSearch != null)
       onGenerateName();
+  }
+
+  /* Load a search into the UI */
+  private void showSearch(ISearch search) {
+
+    /* Match Conditions */
+    fMatchAllRadio.setSelection(search.matchAllConditions());
+    fMatchAnyRadio.setSelection(!search.matchAllConditions());
+    fMatchAllNewsRadio.setSelection(false);
+    setControlEnabled(fSearchConditionList, true);
+
+    /* Location */
+    Pair<ISearchCondition, List<ISearchCondition>> conditions = CoreUtils.splitScope(search.getSearchConditions());
+    Long[][] location = null;
+    if (conditions.getFirst() != null && conditions.getFirst().getValue() instanceof Long[][])
+      location = (Long[][]) conditions.getFirst().getValue();
+    fLocationControl.select(location);
+
+    /* Show Conditions */
+    fSearchConditionList.showConditions(conditions.getSecond());
+
+    /* Layout */
+    fLocationControl.getParent().getParent().getParent().layout(true, true);
   }
 
   private void setControlEnabled(Control control, boolean enabled) {
