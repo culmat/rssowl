@@ -43,6 +43,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.views.explorer.BookMarkLabelProvider;
@@ -60,6 +61,7 @@ import java.util.List;
 public class FolderChildCheckboxTree {
   private Composite fParent;
   private CheckboxTreeViewer fViewer;
+  private boolean fFlat;
 
   /**
    * @param parent the parent for the {@link CheckboxTreeViewer}.
@@ -75,6 +77,15 @@ public class FolderChildCheckboxTree {
    */
   public void setAllChecked(boolean checked) {
     OwlUI.setAllChecked(fViewer.getTree(), checked);
+  }
+
+  /**
+   * @param flat if <code>true</code> will show the {@link INewsMark} in a flat
+   * list instead of a hierarchy of {@link IFolder}, false otherwise.
+   */
+  public void setFlat(boolean flat) {
+    fFlat = flat;
+    fViewer.refresh();
   }
 
   /**
@@ -118,6 +129,9 @@ public class FolderChildCheckboxTree {
     /* ContentProvider */
     fViewer.setContentProvider(new ITreeContentProvider() {
       public Object[] getElements(Object inputElement) {
+        if (fFlat)
+          return getNewsMarks((Collection<?>) inputElement).toArray();
+
         return ((Collection<?>) inputElement).toArray();
       }
 
@@ -179,7 +193,29 @@ public class FolderChildCheckboxTree {
 
       public void treeCollapsed(TreeExpansionEvent event) {}
     });
+  }
 
+  private List<INewsMark> getNewsMarks(Collection<?> input) {
+    List<INewsMark> childs = new ArrayList<INewsMark>();
+
+    for (Object element : input) {
+      if (element instanceof IFolder)
+        getNewsMarks(childs, (IFolder) element);
+      else if (element instanceof INewsMark)
+        childs.add((INewsMark) element);
+    }
+
+    return childs;
+  }
+
+  private void getNewsMarks(List<INewsMark> childs, IFolder folder) {
+    List<IFolderChild> children = folder.getChildren();
+    for (IFolderChild child : children) {
+      if (child instanceof IFolder)
+        getNewsMarks(childs, (IFolder) child);
+      else if (child instanceof INewsMark)
+        childs.add((INewsMark) child);
+    }
   }
 
   private void onSelect(SelectionEvent e) {
