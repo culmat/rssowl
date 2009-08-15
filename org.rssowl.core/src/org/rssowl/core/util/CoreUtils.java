@@ -28,6 +28,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.newsaction.CopyNewsAction;
 import org.rssowl.core.internal.newsaction.MoveNewsAction;
+import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.ICategory;
 import org.rssowl.core.persist.IEntity;
@@ -1039,6 +1040,27 @@ public class CoreUtils {
   }
 
   /**
+   * @return all news filters sorted by name.
+   */
+  public static Set<ISearchFilter> loadSortedNewsFilters() {
+
+    /* Sort by Sort Key to respect order */
+    Set<ISearchFilter> filters = new TreeSet<ISearchFilter>(new Comparator<ISearchFilter>() {
+      public int compare(ISearchFilter f1, ISearchFilter f2) {
+        if (f1.getName().equalsIgnoreCase(f2.getName())) //Duplicate names are allowed!
+          return -1;
+
+        return f1.getName().compareToIgnoreCase(f2.getName());
+      }
+    });
+
+    /* Add Filters */
+    filters.addAll(DynamicDAO.loadAll(ISearchFilter.class));
+
+    return filters;
+  }
+
+  /**
    * @param news the news to obtain the labels from.
    * @return all labels sorted by their sort value from the given news or an
    * empty {@link Set} if none.
@@ -1230,5 +1252,158 @@ public class CoreUtils {
 
     /* Perform Reparenting */
     Owl.getPersistenceService().getDAOService().getFolderDAO().reparent(reparenting);
+  }
+
+  /**
+   * Check if the given searchmark is already existing in the set of
+   * subscriptions by comparing names of all parents and conditions.
+   *
+   * @param search the searchmark to find in the current set of subscriptions.
+   * @return <code>true</code> if there is a {@link ISearchMark} that matches
+   * the name of the given search including the names of all parent folders or
+   * and its conditions or <code>false</code> otherwise.
+   */
+  public static boolean existsSearchMark(ISearchMark search) {
+    if (search == null || search.getParent() == null)
+      return false;
+
+    IFolder folder = findFolder(search.getParent());
+    if (folder != null) {
+      List<IMark> marks = folder.getMarks();
+      for (IMark mark : marks) {
+        if (mark instanceof ISearchMark) {
+          ISearchMark other = (ISearchMark) mark;
+          if (isIdentical(search, other))
+            return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
+  private static final boolean isIdentical(ISearchMark s1, ISearchMark s2) {
+
+    /* Check "matchAllConditions" */
+    if (s1.matchAllConditions() != s2.matchAllConditions())
+      return false;
+
+    List<ISearchCondition> conditions1 = s1.getSearchConditions();
+    List<ISearchCondition> conditions2 = s2.getSearchConditions();
+
+    /* Check on Number of Conditions */
+    if (conditions1.size() != conditions2.size())
+      return false;
+
+    /* Compare Conditions */
+    for (int i = 0; i < conditions1.size(); i++) {
+      ISearchCondition condition1 = conditions1.get(i);
+      ISearchCondition condition2 = conditions2.get(i);
+
+      /* Check Field */
+      if (condition1.getField().getId() != condition2.getField().getId())
+        return false;
+
+      /* Check Specifier */
+      if (condition1.getSpecifier() != condition2.getSpecifier())
+        return false;
+
+      //TODO We need to properly support Locations too, but the IDs may differ
+      if (condition1.getField().getId() == INews.LOCATION || condition2.getField().getId() == INews.LOCATION)
+        return false;
+
+      /* Check Value */
+      if (condition1.getValue() != null && !condition1.getValue().equals(condition2.getValue()))
+        return false;
+      else if (condition1.getValue() == null && condition2.getValue() != null)
+        return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Check if the given bin is already existing in the set of subscriptions by
+   * comparing names of all parents.
+   *
+   * @param bin the bin to find in the current set of subscriptions.
+   * @return <code>true</code> if there is a {@link INewsBin} that matches the
+   * name of the given bin including the names of all parent folders or
+   * <code>false</code> otherwise.
+   */
+  public static boolean existsNewsBin(INewsBin bin) {
+    if (bin == null || bin.getParent() == null)
+      return false;
+
+    IFolder folder = findFolder(bin.getParent());
+    if (folder != null) {
+      List<IMark> marks = folder.getMarks();
+      for (IMark mark : marks) {
+        if (mark instanceof INewsBin && mark.getName().equals(bin.getName()))
+          return true;
+      }
+    }
+
+    return false;
+  }
+
+  /**
+   * Check if the given folder is already existing in the set of folders by
+   * comparing names of all parents.
+   *
+   * @param folder the folder to find in the current set of folders.
+   * @return the {@link IFolder} that matches the name of the given folder
+   * including the names of all parent folders or <code>null</code> if none.
+   */
+  public static IFolder findFolder(IFolder folder) {
+    if (folder == null)
+      return null;
+
+    /* Load Roots */
+    Collection<IFolder> folders = loadRootFolders();
+    if (folders.isEmpty())
+      return null;
+
+    /* Use oldest Root Folder as Default if required */
+    String defaultSetName = folders.iterator().next().getName();
+
+    /* Build a Chain of all Parent Names starting from Root */
+    List<String> folderNameChain = new ArrayList<String>();
+    if (folder.getProperty(ITypeImporter.TEMPORARY_FOLDER) != null)
+      folderNameChain.add(defaultSetName);
+    else
+      folderNameChain.add(folder.getName());
+
+    IFolder parent = folder;
+    while ((parent = parent.getParent()) != null) {
+      if (parent.getProperty(ITypeImporter.TEMPORARY_FOLDER) != null)
+        folderNameChain.add(defaultSetName);
+      else
+        folderNameChain.add(parent.getName());
+    }
+
+    /* Reverse so that parents appear first */
+    Collections.reverse(folderNameChain);
+
+    /* Search the Folder by Name using the Chain */
+    IFolder foundFolder = null;
+    for (String folderNameChainValue : folderNameChain) {
+      foundFolder = findFolderByName(folderNameChainValue, folders);
+      if (foundFolder != null)
+        folders = foundFolder.getFolders();
+      else
+        return null;
+    }
+
+    return foundFolder;
+  }
+
+  private static IFolder findFolderByName(String name, Collection<IFolder> folders) {
+    for (IFolder folder : folders) {
+      if (folder.getName().equals(name))
+        return folder;
+    }
+
+    return null;
   }
 }

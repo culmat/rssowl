@@ -44,10 +44,13 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearchFilter;
+import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.importer.ImportSourcePage.Source;
@@ -73,7 +76,8 @@ public class ImportElementsPage extends WizardPage {
   private FolderChildCheckboxTree fFolderChildTree;
   private Button fDeselectAll;
   private Button fSelectAll;
-  private Button fHideExisting;
+  private Button fFlattenCheck;
+  private Button fHideExistingCheck;
   private ExistingBookmarkFilter fExistingFilter = new ExistingBookmarkFilter();
   private Source fLastSourceKind;
   private File fLastSourceFile;
@@ -101,10 +105,10 @@ public class ImportElementsPage extends WizardPage {
 
     private boolean select(IFolderChild element) {
 
-      /* Bookmark */
+      /* Bookmark (exclude if another Bookmark with same Link exists) */
       if (element instanceof IBookMark) {
         IBookMark bm = (IBookMark) element;
-        Boolean select = cache.get(bm.getId());
+        Boolean select = cache.get(bm);
         if (select == null) {
           select = !dao.exists(bm.getFeedLinkReference());
           cache.put(bm, select);
@@ -113,10 +117,34 @@ public class ImportElementsPage extends WizardPage {
         return select;
       }
 
+      /* Bin (exclude if another Bin with same name Exists at same Location) */
+      else if (element instanceof INewsBin) {
+        INewsBin bin = (INewsBin) element;
+        Boolean select = cache.get(bin);
+        if (select == null) {
+          select = !CoreUtils.existsNewsBin(bin);
+          cache.put(bin, select);
+        }
+
+        return select;
+      }
+
+      /* Search (exclude if another Search with same name Exists at same Location and same Conditions) */
+      else if (element instanceof ISearchMark) {
+        ISearchMark searchmark = (ISearchMark) element;
+        Boolean select = cache.get(searchmark);
+        if (select == null) {
+          select = !CoreUtils.existsSearchMark(searchmark);
+          cache.put(searchmark, select);
+        }
+
+        return select;
+      }
+
       /* Folder */
       else if (element instanceof IFolder) {
         IFolder folder = (IFolder) element;
-        Boolean select = cache.get(folder.getId());
+        Boolean select = cache.get(folder);
         if (select == null) {
           List<IFolderChild> children = folder.getChildren();
           for (IFolderChild child : children) {
@@ -152,7 +180,7 @@ public class ImportElementsPage extends WizardPage {
 
   /* Returns whether existing bookmarks should be ignored for the Import */
   boolean excludeExisting() {
-    return fHideExisting.getSelection();
+    return fHideExistingCheck.getSelection();
   }
 
   /* Returns Labels available for Import */
@@ -202,7 +230,7 @@ public class ImportElementsPage extends WizardPage {
 
     /* Select All / Deselect All */
     Composite buttonContainer = new Composite(container, SWT.NONE);
-    buttonContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0));
+    buttonContainer.setLayout(LayoutUtils.createGridLayout(4, 0, 0));
     buttonContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fSelectAll = new Button(buttonContainer, SWT.PUSH);
@@ -227,16 +255,29 @@ public class ImportElementsPage extends WizardPage {
       }
     });
 
-    fHideExisting = new Button(buttonContainer, SWT.CHECK);
-    fHideExisting.setText("Hide Existing Bookmarks");
-    fHideExisting.setSelection(true);
-    setButtonLayoutData(fHideExisting);
-    ((GridData) fHideExisting.getLayoutData()).horizontalAlignment = SWT.END;
-    ((GridData) fHideExisting.getLayoutData()).grabExcessHorizontalSpace = true;
-    fHideExisting.addSelectionListener(new SelectionAdapter() {
+    /* Show as Flat List of News Marks */
+    fFlattenCheck = new Button(buttonContainer, SWT.CHECK);
+    fFlattenCheck.setText("Flatten Hierarchy");
+    setButtonLayoutData(fFlattenCheck);
+    ((GridData) fFlattenCheck.getLayoutData()).horizontalAlignment = SWT.END;
+    ((GridData) fFlattenCheck.getLayoutData()).grabExcessHorizontalSpace = true;
+    fFlattenCheck.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        if (fHideExisting.getSelection())
+        fFolderChildTree.setFlat(fFlattenCheck.getSelection());
+        fViewer.expandToLevel(2);
+      }
+    });
+
+    /* Hide Existing News Marks */
+    fHideExistingCheck = new Button(buttonContainer, SWT.CHECK);
+    fHideExistingCheck.setText("Hide Existing");
+    fHideExistingCheck.setSelection(true);
+    setButtonLayoutData(fHideExistingCheck);
+    fHideExistingCheck.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        if (fHideExistingCheck.getSelection())
           fViewer.addFilter(fExistingFilter);
         else
           fViewer.removeFilter(fExistingFilter);
@@ -325,8 +366,8 @@ public class ImportElementsPage extends WizardPage {
     }
 
     /* Re-Add Filter if necessary */
-    if (!fHideExisting.getSelection()) {
-      fHideExisting.setSelection(true);
+    if (!fHideExistingCheck.getSelection()) {
+      fHideExistingCheck.setSelection(true);
       fViewer.addFilter(fExistingFilter);
     }
 

@@ -34,8 +34,10 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearchFilter;
+import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.util.CoreUtils;
@@ -157,6 +159,9 @@ public class ImportWizard extends Wizard {
     /* Run Import */
     ImportUtils.doImport(target, folderChilds, labels, filters, preferences);
 
+    /* Save Settings of Pages */
+    fImportSourcePage.saveSettings();
+
     /* Ask for a restart if preferences have been imported */
     if (importPreferences && preferences != null && !preferences.isEmpty()) {
       boolean restart = MessageDialog.openQuestion(getShell(), "Restart RSSOwl", "It is necessary to restart RSSOwl after preferences have been imported.\n\nDo you want to restart now?");
@@ -190,10 +195,24 @@ public class ImportWizard extends Wizard {
     for (Iterator<IFolderChild> iterator = folderChilds.iterator(); iterator.hasNext();) {
       IFolderChild child = iterator.next();
 
-      /* Bookmark */
+      /* Bookmark (exclude if another Bookmark with same Link exists) */
       if (child instanceof IBookMark) {
         IBookMark bm = (IBookMark) child;
         if (dao.exists(bm.getFeedLinkReference()))
+          iterator.remove();
+      }
+
+      /* Bin (exclude if another Bin with same name Exists at same Location) */
+      else if (child instanceof INewsBin) {
+        INewsBin bin = (INewsBin) child;
+        if (CoreUtils.existsNewsBin(bin))
+          iterator.remove();
+      }
+
+      /* Search (exclude if another Search with same name Exists at same Location and same Conditions) */
+      else if (child instanceof ISearchMark) {
+        ISearchMark search = (ISearchMark) child;
+        if (CoreUtils.existsSearchMark(search))
           iterator.remove();
       }
 
@@ -220,11 +239,25 @@ public class ImportWizard extends Wizard {
 
     for (IFolderChild child : children) {
 
-      /* Bookmark */
+      /* Bookmark (exclude if another Bookmark with same Link exists) */
       if (child instanceof IBookMark) {
         IBookMark bm = (IBookMark) child;
         if (dao.exists(bm.getFeedLinkReference()))
           folder.removeChild(bm);
+      }
+
+      /* Bin (exclude if another Bin with same name Exists at same Location) */
+      else if (child instanceof INewsBin) {
+        INewsBin bin = (INewsBin) child;
+        if (CoreUtils.existsNewsBin(bin))
+          folder.removeChild(bin);
+      }
+
+      /* Search (exclude if another Search with same name Exists at same Location and same Conditions) */
+      else if (child instanceof ISearchMark) {
+        ISearchMark search = (ISearchMark) child;
+        if (CoreUtils.existsSearchMark(search))
+          folder.removeChild(search);
       }
 
       /* Folder */
