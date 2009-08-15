@@ -210,7 +210,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
     /* ContentProvider returns Root-Folders */
     fViewer.setContentProvider(new IStructuredContentProvider() {
       public Object[] getElements(Object inputElement) {
-        return DynamicDAO.getDAO(IFolderDAO.class).loadRoots().toArray();
+        return CoreUtils.loadRootFolders().toArray();
       }
 
       public void dispose() {}
