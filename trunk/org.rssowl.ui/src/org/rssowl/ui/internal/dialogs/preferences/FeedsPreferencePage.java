@@ -51,10 +51,9 @@ import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
-import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.service.PersistenceException;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.RetentionStrategy;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
@@ -554,7 +553,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
   }
 
   private void finish(boolean autoUpdateChange, boolean displayChange, boolean columnChange, boolean runCleanup) throws PersistenceException {
-    final Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
+    final Collection<IFolder> rootFolders = CoreUtils.loadRootFolders();
 
     /* Inform Reload Service about update-change */
     if (autoUpdateChange) {
