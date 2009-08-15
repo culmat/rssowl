@@ -956,7 +956,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             String folder = dialog.open();
             if (StringUtils.isSet(folder)) {
               for (Pair<IAttachment, URI> attachment : attachments) {
-                Controller.getDefault().getDownloadService().download(attachment.getFirst(), attachment.getSecond(), new File(folder));
+                Controller.getDefault().getDownloadService().download(attachment.getFirst(), attachment.getSecond(), new File(folder), true);
               }
             }
           }
@@ -977,7 +977,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             dialog.setText("Select a Folder for the Download");
             String folder = dialog.open();
             if (StringUtils.isSet(folder))
-              Controller.getDefault().getDownloadService().download(attachmentPair.getFirst(), attachmentPair.getSecond(), new File(folder));
+              Controller.getDefault().getDownloadService().download(attachmentPair.getFirst(), attachmentPair.getSecond(), new File(folder), true);
           }
         };
 

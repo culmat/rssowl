@@ -30,10 +30,14 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.program.Program;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.IProgressConstants;
 import org.rssowl.core.Owl;
+import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
+import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.IAbortable;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IProtocolHandler;
@@ -44,7 +48,9 @@ import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.util.DownloadJobQueue;
+import org.rssowl.ui.internal.util.JobRunner;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -78,19 +84,21 @@ public class DownloadService {
 
   /* Task for a Download */
   private class AttachmentDownloadTask extends DownloadJobQueue.DownloadTask {
-    private IAttachment fAttachment;
-    private URI fFile;
-    private File fFolder;
+    private final IAttachment fAttachment;
+    private final URI fFile;
+    private final File fFolder;
+    private final boolean fUserInitiated;
 
-    private AttachmentDownloadTask(IAttachment attachment, URI file, File folder) {
+    private AttachmentDownloadTask(IAttachment attachment, URI file, File folder, boolean userInitiated) {
       fAttachment = attachment;
       fFile = file;
       fFolder = folder;
+      fUserInitiated = userInitiated;
     }
 
     @Override
     public IStatus run(Job job, IProgressMonitor monitor) {
-      return internalDownload(job, fAttachment, fFile, fFolder, monitor);
+      return internalDownload(job, fAttachment, fFile, fFolder, monitor, fUserInitiated);
     }
 
     public String getName() {
@@ -131,14 +139,17 @@ public class DownloadService {
    * @param attachment the {@link IAttachment} to download.
    * @param file the file to download as {@link URI}.
    * @param folder the folder to download to as {@link File}.
+   * @param userInitiated if <code>true</code> the user explicitly asked for a
+   * download and <code>false</code> otherwise (e.g. if download is from a
+   * filter).
    */
-  public void download(IAttachment attachment, URI file, File folder) {
-    AttachmentDownloadTask task = new AttachmentDownloadTask(attachment, file, folder);
+  public void download(IAttachment attachment, URI file, File folder, boolean userInitiated) {
+    AttachmentDownloadTask task = new AttachmentDownloadTask(attachment, file, folder, userInitiated);
     if (!fDownloadQueue.isQueued(task))
       fDownloadQueue.schedule(task);
   }
 
-  private IStatus internalDownload(Job job, IAttachment attachment, URI link, File folder, IProgressMonitor monitor) {
+  private IStatus internalDownload(Job job, final IAttachment attachment, final URI link, final File folder, final IProgressMonitor monitor, final boolean userInitiated) {
     String downloadFileName = URIUtils.getFile(link);
     File downloadFile = new File(folder, downloadFileName);
     job.setName("Downloading " + downloadFileName + "...");
@@ -221,8 +232,57 @@ public class DownloadService {
           error = e;
           return Activator.getDefault().createErrorStatus(e.getMessage(), e);
         } catch (ConnectionException e) {
-          error = e;
-          return Activator.getDefault().createErrorStatus(e.getMessage(), e);
+          final boolean showError[] = new boolean[] { true };
+
+          /* Offer a Login Dialog if Authentication is Required */
+          if (userInitiated && e instanceof AuthenticationRequiredException && !monitor.isCanceled() && !Controller.getDefault().isShuttingDown()) {
+            final Shell shell = OwlUI.getActiveShell();
+            if (shell != null && !shell.isDisposed()) {
+              Controller.getDefault().getLoginDialogLock().lock();
+              try {
+                final AuthenticationRequiredException authEx = (AuthenticationRequiredException) e;
+                JobRunner.runSyncedInUIThread(shell, new Runnable() {
+                  public void run() {
+
+                    /* Return on Cancelation or shutdown or deletion */
+                    if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
+                      return;
+
+                    /* Credentials might have been provided meanwhile in another dialog */
+                    try {
+                      URI normalizedUri = URIUtils.normalizeUri(link, true);
+                      if (Owl.getConnectionService().getAuthCredentials(normalizedUri, authEx.getRealm()) != null) {
+                        fDownloadQueue.schedule(new AttachmentDownloadTask(attachment, link, folder, userInitiated));
+                        showError[0] = false;
+                        return;
+                      }
+                    } catch (CredentialsException exe) {
+                      Activator.getDefault().getLog().log(exe.getStatus());
+                    }
+
+                    /* Show Login Dialog */
+                    LoginDialog login = new LoginDialog(shell, link, authEx.getRealm());
+                    if (login.open() == Window.OK && !monitor.isCanceled() && !Controller.getDefault().isShuttingDown()) {
+                      fDownloadQueue.schedule(new AttachmentDownloadTask(attachment, link, folder, userInitiated));
+                      showError[0] = false;
+                    }
+                  }
+                });
+              } finally {
+                Controller.getDefault().getLoginDialogLock().unlock();
+              }
+            }
+          }
+
+          /* User has not Provided Login Credentials or any other error */
+          if (showError[0]) {
+            error = e;
+            return Activator.getDefault().createErrorStatus(e.getMessage(), e);
+          }
+
+          /* User has Provided Login Credentials - cancel this Task */
+          monitor.setCanceled(true);
+          return Status.CANCEL_STATUS;
         } finally {
           monitor.done();
 
@@ -234,7 +294,7 @@ public class DownloadService {
               job.setName("Error Downloading " + downloadFileName);
 
             job.setProperty(IProgressConstants.ICON_PROPERTY, OwlUI.ERROR);
-            job.setProperty(IProgressConstants.ACTION_PROPERTY, getRedownloadAction(new AttachmentDownloadTask(attachment, link, folder)));
+            job.setProperty(IProgressConstants.ACTION_PROPERTY, getRedownloadAction(new AttachmentDownloadTask(attachment, link, folder, true)));
             monitor.setTaskName("Try Again");
           }
 
