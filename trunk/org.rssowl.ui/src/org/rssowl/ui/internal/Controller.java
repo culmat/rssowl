@@ -1268,6 +1268,14 @@ public class Controller {
     fBookMarkLoadListeners.remove(listener);
   }
 
+  /**
+   * @return the {@link Lock} used to ensure that at any time only a single
+   * login dialog is showing.
+   */
+  public Lock getLoginDialogLock() {
+    return fLoginDialogLock;
+  }
+
   private void fireBookMarkAboutToLoad(final IBookMark bookmark) {
     Object[] listeners = fBookMarkLoadListeners.getListeners();
     for (final Object listener : listeners) {

@@ -64,7 +64,7 @@ public class DownloadAttachmentsNewsAction implements INewsAction {
             }
 
             if (link != null)
-              Controller.getDefault().getDownloadService().download(attachment, link, folder);
+              Controller.getDefault().getDownloadService().download(attachment, link, folder, false);
           }
         }
       }
