@@ -186,7 +186,7 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
 
   private boolean equalsRootFolders(Collection<IFolder> folders) {
     Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
-    return folders != null && folders.equals(rootFolders);
+    return folders != null && folders.size() == rootFolders.size() && rootFolders.containsAll(folders);
   }
 
   private void fillNews(IFolder folder, Collection<INews> news, Map<IBookMark, Collection<INews>> bookMarkNewsMap) {
