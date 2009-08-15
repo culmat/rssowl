@@ -295,6 +295,9 @@ public class DefaultPreferences {
   /** Global: Hide Completed Downloads */
   public static final String HIDE_COMPLETED_DOWNLOADS = Preferences.HIDE_COMPLETED_DOWNLOADS.id();
 
+  /** Global: List of Import Sources */
+  public static final String IMPORT_SOURCES = Preferences.IMPORT_SOURCES.id();
+
   /**
    * Eclipse Preferences Follow
    */
