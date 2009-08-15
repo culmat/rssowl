@@ -33,10 +33,12 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Text;
 import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -52,10 +54,15 @@ import java.util.List;
  * @author bpasero
  */
 public class ImportSourcePage extends WizardPage {
+
+  /* Max number of Sources to remember */
+  private static final int MAX_REMEMBER_SOURCES = 5;
+
   private Button fImportFromFileRadio;
   private Button fImportFromDefaultRadio;
-  private Text fFileInput;
+  private Combo fFileInput;
   private Button fSearchFileButton;
+  private IPreferenceScope fPreferences;
 
   /* Sources for Import */
   enum Source {
@@ -68,6 +75,29 @@ public class ImportSourcePage extends WizardPage {
   protected ImportSourcePage(String pageName) {
     super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/import_wiz.png"));
     setMessage("Please choose the source of import.");
+    fPreferences = Owl.getPreferenceService().getGlobalScope();
+  }
+
+  /* Save Import Sources */
+  void saveSettings() {
+
+    /* First fill current as new one */
+    List<String> newImportSources = new ArrayList<String>();
+    if (fImportFromFileRadio.getSelection())
+      newImportSources.add(fFileInput.getText());
+
+    /* Then add up to 4 more old ones to remember */
+    String[] oldImportSources = fPreferences.getStrings(DefaultPreferences.IMPORT_SOURCES);
+    if (oldImportSources != null) {
+      for (int i = 0; i < oldImportSources.length && newImportSources.size() < MAX_REMEMBER_SOURCES; i++) {
+        if (!newImportSources.contains(oldImportSources[i]))
+          newImportSources.add(oldImportSources[i]);
+      }
+    }
+
+    /* Save List */
+    if (!newImportSources.isEmpty())
+      fPreferences.putStrings(DefaultPreferences.IMPORT_SOURCES, newImportSources.toArray(new String[newImportSources.size()]));
   }
 
   /* Returns the type of Source to use for the Import */
@@ -111,8 +141,15 @@ public class ImportSourcePage extends WizardPage {
     ((GridLayout) fileInputContainer.getLayout()).marginBottom = 10;
     fileInputContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
-    fFileInput = new Text(fileInputContainer, SWT.SINGLE | SWT.BORDER);
+    fFileInput = new Combo(fileInputContainer, SWT.DROP_DOWN | SWT.BORDER);
     fFileInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+    String[] previousSources = fPreferences.getStrings(DefaultPreferences.IMPORT_SOURCES);
+    if (previousSources != null) {
+      for (String source : previousSources) {
+        fFileInput.add(source);
+      }
+    }
+
     fFileInput.setFocus();
     fFileInput.addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
