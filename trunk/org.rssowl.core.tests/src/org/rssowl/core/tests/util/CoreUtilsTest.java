@@ -33,6 +33,7 @@ import static org.junit.Assert.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 import org.rssowl.core.Owl;
+import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFeed;
@@ -42,8 +43,10 @@ import org.rssowl.core.persist.IGuid;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
+import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
@@ -656,6 +659,22 @@ public class CoreUtilsTest {
    * @throws Exception
    */
   @Test
+  public void loadSortedFilters() throws Exception {
+    DynamicDAO.save(fFactory.createSearchFilter(null, null, "C Filter"));
+    DynamicDAO.save(fFactory.createSearchFilter(null, null, "A Filter"));
+    DynamicDAO.save(fFactory.createSearchFilter(null, null, "B Filter"));
+
+    Set<ISearchFilter> filters = CoreUtils.loadSortedNewsFilters();
+    Iterator<ISearchFilter> iterator = filters.iterator();
+    assertEquals("A Filter", iterator.next().getName());
+    assertEquals("B Filter", iterator.next().getName());
+    assertEquals("C Filter", iterator.next().getName());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
   public void testContainsState() throws Exception {
     IFeed feed = fFactory.createFeed(null, new URI("feed"));
     INews news = fFactory.createNews(null, feed, new Date());
@@ -786,5 +805,275 @@ public class CoreUtilsTest {
     links = RegExUtils.extractLinksFromText("this is a http://www.rssowl.org short link to http://www.google.com as well", true);
     assertEquals(2, links.size());
     assertTrue(links.containsAll(Arrays.asList(new String[] { "http://www.rssowl.org", "http://www.google.com" })));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testExistsSearchMark() throws Exception {
+    IFolder rootA = fFactory.createFolder(null, null, "Root A");
+    IFolder folderA = fFactory.createFolder(null, rootA, "Folder A");
+
+    fFactory.createBookMark(null, rootA, new FeedLinkReference(new URI("bmA")), "BM Root A");
+    fFactory.createBookMark(null, folderA, new FeedLinkReference(new URI("bmB")), "BM Folder A");
+
+    fFactory.createNewsBin(null, rootA, "BIN Root A");
+    fFactory.createNewsBin(null, folderA, "BIN Folder A");
+
+    ISearchMark smRootA = createSimpleSearchMark(rootA, "SM Root A");
+    ISearchMark smRootALocation = createLocationSearchMark(rootA, "SM Root A Location");
+    ISearchMark smFolderA = createSimpleSearchMark(folderA, "SM Folder A");
+    ISearchMark smFolderALocation = createLocationSearchMark(folderA, "SM Folder A Location");
+
+    rootA = DynamicDAO.save(rootA);
+
+    IFolder rootB = fFactory.createFolder(null, null, "Root B");
+    IFolder folderB = fFactory.createFolder(null, rootB, "Folder B");
+
+    fFactory.createBookMark(null, rootB, new FeedLinkReference(new URI("bmC")), "BM Root B");
+    fFactory.createBookMark(null, folderB, new FeedLinkReference(new URI("bmD")), "BM Folder B");
+
+    fFactory.createNewsBin(null, rootB, "BIN Root B");
+    fFactory.createNewsBin(null, folderB, "BIN Folder B");
+
+    ISearchMark smRootB = createSimpleSearchMark(rootB, "SM Root B");
+    ISearchMark smRootBAuthor = createAuthorSearchMark(rootB, "SM Root B Author");
+    ISearchMark smFolderB = createSimpleSearchMark(folderB, "SM Folder B");
+    ISearchMark smFolderBAuthor = createAuthorSearchMark(folderB, "SM Folder B Author");
+
+    rootB = DynamicDAO.save(rootB);
+
+    /* Start Testing */
+    IFolder rootACopy = fFactory.createFolder(null, null, "Root A");
+    IFolder folderACopy = fFactory.createFolder(null, rootACopy, "Folder A");
+
+    fFactory.createNewsBin(null, rootA, "BIN Root A");
+    fFactory.createNewsBin(null, folderACopy, "BIN Folder A");
+
+    ISearchMark smRootACopy = createSimpleSearchMark(rootACopy, "SM Root A");
+    ISearchMark smRootACopyLocation = createLocationSearchMark(rootACopy, "SM Root A Location");
+    ISearchMark smFolderACopy = createSimpleSearchMark(folderACopy, "SM Folder A");
+    ISearchMark smFolderACopyLocation = createLocationSearchMark(folderACopy, "SM Folder A Location");
+
+    IFolder rootBCopy = fFactory.createFolder(null, null, "Root B");
+    IFolder folderBCopy = fFactory.createFolder(null, rootBCopy, "Folder B");
+
+    fFactory.createNewsBin(null, rootB, "BIN Root B");
+    fFactory.createNewsBin(null, folderBCopy, "BIN Folder B");
+
+    ISearchMark smRootBCopy = createSimpleSearchMark(rootBCopy, "SM Root B");
+    ISearchMark smRootBAuthorCopy = createAuthorSearchMark(rootBCopy, "SM Root B Other");
+    ISearchMark smFolderBCopy = createSimpleSearchMark(folderBCopy, "SM Folder B");
+    ISearchMark smFolderBAuthorCopy = createSimpleSearchMark(folderBCopy, "SM Folder B");
+
+    IFolder rootC = fFactory.createFolder(null, null, "Root C");
+    IFolder folderC = fFactory.createFolder(null, rootC, "Folder C");
+
+    fFactory.createNewsBin(null, rootC, "BIN Root C");
+    fFactory.createNewsBin(null, folderC, "BIN Folder C");
+
+    ISearchMark smRootC = createSimpleSearchMark(rootC, "SM Root C");
+    ISearchMark smFolderC = createSimpleSearchMark(folderC, "SM Folder C");
+
+    assertTrue(smRootA.getId() != -1);
+    assertTrue(smRootALocation.getId() != -1);
+    assertTrue(smFolderA.getId() != -1);
+    assertTrue(smFolderALocation.getId() != -1);
+    assertTrue(smRootB.getId() != -1);
+    assertTrue(smRootBAuthor.getId() != -1);
+    assertTrue(smFolderB.getId() != -1);
+    assertTrue(smFolderBAuthor.getId() != -1);
+
+    assertTrue(CoreUtils.existsSearchMark(smRootACopy));
+    assertFalse(CoreUtils.existsSearchMark(smRootACopyLocation));
+    assertTrue(CoreUtils.existsSearchMark(smFolderACopy));
+    assertFalse(CoreUtils.existsSearchMark(smFolderACopyLocation));
+
+    assertTrue(CoreUtils.existsSearchMark(smRootBCopy));
+    assertTrue(CoreUtils.existsSearchMark(smRootBAuthorCopy));
+    assertTrue(CoreUtils.existsSearchMark(smFolderBCopy));
+    assertTrue(CoreUtils.existsSearchMark(smFolderBAuthorCopy));
+
+    assertFalse(CoreUtils.existsSearchMark(smRootC));
+    assertFalse(CoreUtils.existsSearchMark(smFolderC));
+  }
+
+  private ISearchMark createSimpleSearchMark(IFolder parent, String name) {
+    ISearchField field = fFactory.createSearchField(IEntity.ALL_FIELDS, INews.class.getName());
+    ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.CONTAINS, "foo bar");
+
+    ISearchMark sm = fFactory.createSearchMark(null, parent, name);
+    sm.addSearchCondition(condition);
+
+    return sm;
+  }
+
+  private ISearchMark createAuthorSearchMark(IFolder parent, String name) {
+    ISearchField field = fFactory.createSearchField(INews.AUTHOR, INews.class.getName());
+    ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, "bar");
+
+    ISearchMark sm = fFactory.createSearchMark(null, parent, name);
+    sm.addSearchCondition(condition);
+
+    return sm;
+  }
+
+  private ISearchMark createLocationSearchMark(IFolder parent, String name) {
+    ISearchField field = fFactory.createSearchField(INews.LOCATION, INews.class.getName());
+    ISearchCondition condition = fFactory.createSearchCondition(field, SearchSpecifier.IS, ModelUtils.toPrimitive(Collections.singletonList((IFolderChild) parent)));
+
+    ISearchMark sm = fFactory.createSearchMark(null, parent, name);
+    sm.addSearchCondition(condition);
+
+    return sm;
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testExistsNewsBin() throws Exception {
+    IFolder rootA = fFactory.createFolder(null, null, "Root A");
+    IFolder folderA = fFactory.createFolder(null, rootA, "Folder A");
+
+    fFactory.createBookMark(null, rootA, new FeedLinkReference(new URI("bmA")), "BM Root A");
+    fFactory.createBookMark(null, folderA, new FeedLinkReference(new URI("bmB")), "BM Folder A");
+
+    INewsBin binRootA = fFactory.createNewsBin(null, rootA, "BIN Root A");
+    INewsBin binFolderA = fFactory.createNewsBin(null, folderA, "BIN Folder A");
+
+    createSimpleSearchMark(rootA, "SM Root A");
+    createSimpleSearchMark(folderA, "SM Folder A");
+
+    rootA = DynamicDAO.save(rootA);
+
+    IFolder rootB = fFactory.createFolder(null, null, "Root B");
+    IFolder folderB = fFactory.createFolder(null, rootB, "Folder B");
+
+    fFactory.createBookMark(null, rootB, new FeedLinkReference(new URI("bmC")), "BM Root B");
+    fFactory.createBookMark(null, folderB, new FeedLinkReference(new URI("bmD")), "BM Folder B");
+
+    INewsBin binRootB = fFactory.createNewsBin(null, rootB, "BIN Root B");
+    INewsBin binFolderB = fFactory.createNewsBin(null, folderB, "BIN Folder B");
+
+    createSimpleSearchMark(rootB, "SM Root B");
+    createSimpleSearchMark(folderB, "SM Folder B");
+
+    rootB = DynamicDAO.save(rootB);
+
+    /* Start Testing */
+    IFolder rootACopy = fFactory.createFolder(null, null, "Root A");
+    IFolder folderACopy = fFactory.createFolder(null, rootACopy, "Folder A");
+
+    INewsBin binRootACopy = fFactory.createNewsBin(null, rootA, "BIN Root A");
+    INewsBin binFolderACopy = fFactory.createNewsBin(null, folderACopy, "BIN Folder A");
+
+    createSimpleSearchMark(rootACopy, "SM Root A");
+    createSimpleSearchMark(folderACopy, "SM Folder A");
+
+    IFolder rootBCopy = fFactory.createFolder(null, null, "Root B");
+    IFolder folderBCopy = fFactory.createFolder(null, rootBCopy, "Folder B");
+
+    INewsBin binRootBCopy = fFactory.createNewsBin(null, rootB, "BIN Root B");
+    INewsBin binFolderBCopy = fFactory.createNewsBin(null, folderBCopy, "BIN Folder B");
+
+    createSimpleSearchMark(rootBCopy, "SM Root B");
+    createSimpleSearchMark(folderBCopy, "SM Folder B");
+
+    IFolder rootC = fFactory.createFolder(null, null, "Root C");
+    IFolder folderC = fFactory.createFolder(null, rootC, "Folder C");
+
+    INewsBin binRootC = fFactory.createNewsBin(null, rootC, "BIN Root C");
+    INewsBin binFolderC = fFactory.createNewsBin(null, folderC, "BIN Folder C");
+
+    IFolder rootD = fFactory.createFolder(null, null, "Root D");
+    rootD.setProperty(ITypeImporter.TEMPORARY_FOLDER, true);
+    IFolder folderD = fFactory.createFolder(null, rootD, "Folder A");
+
+    INewsBin binRootD = fFactory.createNewsBin(null, rootD, "BIN Root A");
+    INewsBin binFolderD = fFactory.createNewsBin(null, folderD, "BIN Folder A");
+
+    assertTrue(binRootA.getId() != -1);
+    assertTrue(binFolderA.getId() != -1);
+    assertTrue(binRootB.getId() != -1);
+    assertTrue(binFolderB.getId() != -1);
+
+    assertTrue(CoreUtils.existsNewsBin(binRootACopy));
+    assertTrue(CoreUtils.existsNewsBin(binFolderACopy));
+
+    assertTrue(CoreUtils.existsNewsBin(binRootBCopy));
+    assertTrue(CoreUtils.existsNewsBin(binFolderBCopy));
+
+    assertFalse(CoreUtils.existsNewsBin(binRootC));
+    assertFalse(CoreUtils.existsNewsBin(binFolderC));
+
+    assertTrue(CoreUtils.existsNewsBin(binRootD));
+    assertTrue(CoreUtils.existsNewsBin(binFolderD));
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testFindFolder() throws Exception {
+    IFolder rootA = fFactory.createFolder(null, null, "Root A");
+    IFolder folderA = fFactory.createFolder(null, rootA, "Folder A");
+
+    fFactory.createBookMark(null, rootA, new FeedLinkReference(new URI("bmA")), "BM Root A");
+    fFactory.createBookMark(null, folderA, new FeedLinkReference(new URI("bmB")), "BM Folder A");
+
+    fFactory.createNewsBin(null, rootA, "BIN Root A");
+    fFactory.createNewsBin(null, folderA, "BIN Folder A");
+
+    createSimpleSearchMark(rootA, "SM Root A");
+    createSimpleSearchMark(folderA, "SM Folder A");
+
+    rootA = DynamicDAO.save(rootA);
+
+    IFolder rootB = fFactory.createFolder(null, null, "Root B");
+    IFolder folderB = fFactory.createFolder(null, rootB, "Folder B");
+
+    fFactory.createBookMark(null, rootB, new FeedLinkReference(new URI("bmC")), "BM Root B");
+    fFactory.createBookMark(null, folderB, new FeedLinkReference(new URI("bmD")), "BM Folder B");
+
+    fFactory.createNewsBin(null, rootB, "BIN Root B");
+    fFactory.createNewsBin(null, folderB, "BIN Folder B");
+
+    createSimpleSearchMark(rootB, "SM Root B");
+    createSimpleSearchMark(folderB, "SM Folder B");
+
+    rootB = DynamicDAO.save(rootB);
+
+    /* Start Testing */
+    IFolder rootACopy = fFactory.createFolder(null, null, "Root A");
+    IFolder folderACopy = fFactory.createFolder(null, rootACopy, "Folder A");
+
+    IFolder rootBCopy = fFactory.createFolder(null, null, "Root B");
+    IFolder folderBCopy = fFactory.createFolder(null, rootBCopy, "Folder B");
+
+    IFolder rootC = fFactory.createFolder(null, null, "Root C");
+    IFolder folderC = fFactory.createFolder(null, rootC, "Folder C");
+
+    IFolder rootD = fFactory.createFolder(null, null, "Root D");
+    rootD.setProperty(ITypeImporter.TEMPORARY_FOLDER, true);
+    IFolder folderD = fFactory.createFolder(null, rootD, "Folder A");
+
+    assertTrue(rootA.getId() != -1);
+    assertTrue(folderA.getId() != -1);
+    assertTrue(rootB.getId() != -1);
+    assertTrue(folderB.getId() != -1);
+
+    assertEquals(rootA, CoreUtils.findFolder(rootACopy));
+    assertEquals(folderA, CoreUtils.findFolder(folderACopy));
+
+    assertEquals(rootB, CoreUtils.findFolder(rootBCopy));
+    assertEquals(folderB, CoreUtils.findFolder(folderBCopy));
+
+    assertNull(CoreUtils.findFolder(rootC));
+    assertNull(CoreUtils.findFolder(folderC));
+
+    assertEquals(rootA, CoreUtils.findFolder(rootD));
+    assertEquals(folderA, CoreUtils.findFolder(folderD));
   }
 }
