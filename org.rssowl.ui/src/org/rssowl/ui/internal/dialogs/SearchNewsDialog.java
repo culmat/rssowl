@@ -944,7 +944,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     dialogToolBar.add(new Separator());
 
     /* Existing Saved Searches */
-    IAction savedSearches = new Action("S&aved Searches", IAction.AS_DROP_DOWN_MENU) {
+    IAction savedSearches = new Action("Show Saved Search", IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
         getMenuCreator().getMenu(dialogToolBar.getControl()).setVisible(true);
