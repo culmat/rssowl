@@ -227,7 +227,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("<style type=\"text/css\">\n");
 
     /* General */
-    writer.append("body { overflow: auto; margin: 0 0 10px 0; font-family: ").append(fNewsFontFamily).append(",Verdanna,sans-serif; }\n");
+    writer.append("body { overflow: auto; margin: 0; font-family: ").append(fNewsFontFamily).append(",Verdanna,sans-serif; }\n");
     writer.write("a { color: #009; text-decoration: none; }\n");
     writer.write("a:hover { color: #009; text-decoration: underline; }\n");
     writer.write("a:visited { color: #009; text-decoration: none; }\n");
@@ -235,11 +235,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.write("div.hidden { display: none; }\n");
 
     /* Group */
-    writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; padding: 5px 5px 0px 15px; }\n");
+    writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; padding: 10px 0px 10px 5px; }\n");
 
     /* Main DIV per Item */
-    writer.write("div.newsitemUnread { margin: 10px 10px 30px 10px; border: dotted 1px silver; }\n");
-    writer.write("div.newsitemRead { margin: 10px 10px 30px 10px; border: dotted 1px silver; }\n");
+    writer.write("div.newsitemUnread { margin: 0px 0px 25px 0px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; }\n");
+    writer.write("div.newsitemRead { margin: 0px 0px 25px 0px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; }\n");
 
     /* Main DIV Item Areas */
     writer.write("div.header { padding: 10px 10px 5px 10px; background-color: #eee; }\n");
