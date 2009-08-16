@@ -605,11 +605,13 @@ public class Controller {
 
       /* Load the Feed */
       final Pair<IFeed, IConditionalGet> pairResult = Owl.getConnectionService().reload(feedLink, monitor, properties);
-      feedHomepage = pairResult.getFirst().getHomepage();
 
       /* Return on Cancelation or shutdown or deletion */
-      if (!shouldProceedReloading(monitor, bookmark))
+      if (!shouldProceedReloading(monitor, bookmark) || pairResult == null)
         return Status.CANCEL_STATUS;
+
+      /* Remember Homepage of feed */
+      feedHomepage = pairResult.getFirst().getHomepage();
 
       /* Update ConditionalGet Entity */
       boolean conditionalGetIsNull = (conditionalGet == null);
@@ -1111,28 +1113,28 @@ public class Controller {
   }
 
   private void addDefaultLabels() throws PersistenceException {
-    ILabel label = fFactory.createLabel(null, "Later");
-    label.setColor("113,21,88");
+    ILabel label = fFactory.createLabel(null, "Important");
+    label.setColor("163,21,2");
     label.setOrder(0);
     fLabelDao.save(label);
 
-    label = fFactory.createLabel(null, "Personal");
-    label.setColor("105,130,73");
+    label = fFactory.createLabel(null, "Work");
+    label.setColor("200,118,10");
     label.setOrder(1);
     fLabelDao.save(label);
 
-    label = fFactory.createLabel(null, "Important");
-    label.setColor("177,39,52");
+    label = fFactory.createLabel(null, "Personal");
+    label.setColor("82,92,58");
     label.setOrder(2);
     fLabelDao.save(label);
 
-    label = fFactory.createLabel(null, "Work");
-    label.setColor("234,152,79");
+    label = fFactory.createLabel(null, "To Do");
+    label.setColor("92,101,126");
     label.setOrder(3);
     fLabelDao.save(label);
 
-    label = fFactory.createLabel(null, "To Do");
-    label.setColor("113,160,168");
+    label = fFactory.createLabel(null, "Later");
+    label.setColor("82,16,0");
     label.setOrder(4);
     fLabelDao.save(label);
 
