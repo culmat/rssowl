@@ -1738,8 +1738,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
       /* Separate to Browser */
       fBrowserSep = new Label(fBrowserViewerControlContainer, SWT.SEPARATOR | SWT.HORIZONTAL);
       fBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-      ((GridData) fBrowserSep.getLayoutData()).exclude = fInitialBrowserMaximized && !fBrowserBar.isVisible();
-      fBrowserSep.setVisible(fBrowserBar.isVisible() || (fSashForm.getOrientation() & SWT.VERTICAL) != 0);
+      ((GridData) fBrowserSep.getLayoutData()).exclude = !fBrowserBar.isVisible() && !fInitialLayoutClassic;
 
       fNewsBrowserControl = new NewsBrowserControl();
       fNewsBrowserControl.init(fEditorSite);
