@@ -169,7 +169,7 @@ public class DownloadService {
         /* Initialize Fields */
         long bytesPerSecond = 0;
         long lastTaskNameUpdate = 0;
-        long start = System.currentTimeMillis();
+        long lastBytesCheck = 0;
         int length = attachment.getLength();
         byte[] buffer = new byte[8192];
 
@@ -215,11 +215,13 @@ public class DownloadService {
 
             /* Update Task Name once per Second */
             long now = System.currentTimeMillis();
-            if (now - lastTaskNameUpdate > 1000) {
-              long secondsSpent = (System.currentTimeMillis() - start) / 1000;
-              bytesPerSecond = (bytesConsumed / Math.max(1, secondsSpent));
+            long timeDiff = (now - lastTaskNameUpdate);
+            if (timeDiff > 1000) {
+              long bytesDiff = bytesConsumed - lastBytesCheck;
+              bytesPerSecond = bytesDiff / (timeDiff / 1000);
               monitor.setTaskName(formatTask(bytesConsumed, length, (int) bytesPerSecond));
               lastTaskNameUpdate = now;
+              lastBytesCheck = bytesConsumed;
             }
 
             /* Update Worked */
