@@ -282,6 +282,7 @@ public class DownloadService {
 
           /* User has Provided Login Credentials - cancel this Task */
           monitor.setCanceled(true);
+          canceled = true;
           return Status.CANCEL_STATUS;
         } finally {
           monitor.done();
@@ -303,7 +304,7 @@ public class DownloadService {
             try {
               out.close();
               fOutputStreamMap.remove(out);
-              if (canceled)
+              if (canceled || error != null)
                 partFile.delete();
             } catch (IOException e) {
               return Activator.getDefault().createErrorStatus(e.getMessage(), e);
@@ -313,7 +314,7 @@ public class DownloadService {
           /* Close Input Stream */
           if (in != null) {
             try {
-              if (canceled && in instanceof IAbortable)
+              if ((canceled || error != null) && in instanceof IAbortable)
                 ((IAbortable) in).abort();
               else
                 in.close();
