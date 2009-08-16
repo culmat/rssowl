@@ -75,7 +75,7 @@ public class ColorPicker {
   };
 
   private static final RGB[] COLOR_VALUES = new RGB[] { //
-  new RGB(124, 10, 2), // "Barn Red",
+      new RGB(124, 10, 2), // "Barn Red",
       new RGB(163, 21, 2), // "Salem Red",
       new RGB(214, 148, 99), // "Salmon",
       new RGB(200, 118, 10), // "Pumpkin",
@@ -113,12 +113,7 @@ public class ColorPicker {
    * @param color the color to show.
    */
   public void setColor(RGB color) {
-    fSelectedColor = color;
-
-    if (fColorItem.getImage() != null)
-      fColorItem.getImage().dispose();
-
-    fColorItem.setImage(createColorImage(color));
+    onColorSelected(color);
   }
 
   /**
@@ -165,11 +160,12 @@ public class ColorPicker {
 
     /* Add some useful Colors */
     for (int i = 0; i < COLOR_LABELS.length; i++) {
-      MenuItem item = new MenuItem(fColorMenu, SWT.PUSH);
+      MenuItem item = new MenuItem(fColorMenu, SWT.RADIO);
       item.setText(COLOR_LABELS[i]);
 
       final RGB color = COLOR_VALUES[i];
       item.setImage(createColorImage(color));
+      item.setData(color);
       item.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
@@ -199,6 +195,14 @@ public class ColorPicker {
       fColorItem.getImage().dispose();
 
     fColorItem.setImage(createColorImage(fSelectedColor));
+
+    MenuItem[] items = fColorMenu.getItems();
+    for (MenuItem item : items) {
+      if (fSelectedColor.equals(item.getData()))
+        item.setSelection(true);
+      else if (item.getSelection())
+        item.setSelection(false);
+    }
   }
 
   private Image createColorImage(RGB color) {
