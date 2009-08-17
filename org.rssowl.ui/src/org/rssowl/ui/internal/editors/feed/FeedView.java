@@ -1471,6 +1471,12 @@ public class FeedView extends EditorPart implements IReusableEditor {
       fHorizontalBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
       ((GridData) fHorizontalBrowserSep.getLayoutData()).exclude = !fBrowserBar.isVisible();
     }
+
+    /* Update Visibility based on Layout Data */
+    fVerticalTableBrowserSep.setVisible(!((GridData) fVerticalTableBrowserSep.getLayoutData()).exclude);
+    fHorizontalTableBrowserSep.setVisible(!((GridData) fHorizontalTableBrowserSep.getLayoutData()).exclude);
+    fVerticalBrowserSep.setVisible(!((GridData) fVerticalBrowserSep.getLayoutData()).exclude);
+    fHorizontalBrowserSep.setVisible(!((GridData) fHorizontalBrowserSep.getLayoutData()).exclude);
   }
 
   /**
