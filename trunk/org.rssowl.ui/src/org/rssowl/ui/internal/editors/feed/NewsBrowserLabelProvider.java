@@ -215,6 +215,11 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     return ""; //$NON-NLS-1$
   }
 
+  private boolean isSingleNewsDisplayed() {
+    Object input = fViewer.getInput();
+    return input instanceof INews;
+  }
+
   /**
    * Writes the CSS information to the given Writer.
    *
@@ -238,8 +243,13 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     writer.append("div.group { color: #678; ").append(fBiggestFontCSS).append(" font-weight: bold; padding: 10px 0px 10px 5px; }\n");
 
     /* Main DIV per Item */
-    writer.write("div.newsitemUnread { margin: 0px 0px 25px 0px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; }\n");
-    writer.write("div.newsitemRead { margin: 0px 0px 25px 0px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; }\n");
+    if (isSingleNewsDisplayed()) {
+      writer.write("div.newsitemUnread { margin: 0; border-bottom: dotted 1px silver; }\n");
+      writer.write("div.newsitemRead { margin: 0; border-bottom: dotted 1px silver; }\n");
+    } else {
+      writer.write("div.newsitemUnread { margin: 0px 0px 25px 0px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; }\n");
+      writer.write("div.newsitemRead { margin: 0px 0px 25px 0px; border-top: dotted 1px silver; border-bottom: dotted 1px silver; }\n");
+    }
 
     /* Main DIV Item Areas */
     writer.write("div.header { padding: 10px 10px 5px 10px; background-color: #eee; }\n");
