@@ -229,14 +229,16 @@ public class FeedView extends EditorPart implements IReusableEditor {
   /* Misc. */
   private Composite fParent;
   private SashForm fSashForm;
-  private Label fTableBrowserSep;
+  private Label fHorizontalTableBrowserSep;
+  private Label fVerticalTableBrowserSep;
   private LocalResourceManager fResourceManager;
   private IPreferenceScope fPreferences;
   private long fOpenTime;
   private boolean fCreated;
   private final Object fCacheJobIdentifier = new Object();
   private ImageDescriptor fTitleImageDescriptor;
-  private Label fBrowserSep;
+  private Label fHorizontalBrowserSep;
+  private Label fVerticalBrowserSep;
   private final INewsDAO fNewsDao = Owl.getPersistenceService().getDAOService().getNewsDAO();
   private boolean fIsDisposed;
   private AtomicLong fLastCleanUpRun = new AtomicLong();
@@ -1386,20 +1388,19 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
       /* Vertical Alignment */
       if (!fPreferences.getBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC)) {
-        fBrowserSep.setVisible(fBrowserBar.isVisible());
+        updateSeparators(false, false);
         fSashForm.setOrientation(SWT.HORIZONTAL);
-        fSashForm.setBackground(fSashForm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
-        ((GridData) fTableBrowserSep.getLayoutData()).exclude = true;
-        fTableBrowserSep.getParent().layout();
+        fHorizontalTableBrowserSep.getParent().layout();
+        fHorizontalBrowserSep.getParent().layout();
       }
 
       /* Classic Alignment (default) */
       else {
-        fBrowserSep.setVisible(true);
+        updateSeparators(true, false);
         fSashForm.setOrientation(SWT.VERTICAL);
         fSashForm.setBackground(null);
-        ((GridData) fTableBrowserSep.getLayoutData()).exclude = false;
-        fTableBrowserSep.getParent().layout();
+        fHorizontalTableBrowserSep.getParent().layout();
+        fHorizontalBrowserSep.getParent().layout();
       }
     }
   }
@@ -1424,8 +1425,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     /* Maximize Browser */
     if (maximized && maximizedControl == null) {
-      ((GridData) fBrowserSep.getLayoutData()).exclude = !fBrowserBar.isVisible();
-      fBrowserSep.setVisible(fBrowserBar.isVisible());
+      updateSeparators(fInitialLayoutClassic, true);
       fSashForm.setMaximizedControl(fBrowserViewerControlContainer);
       fNewsTableControl.getViewer().setSelection(StructuredSelection.EMPTY);
       fNewsBrowserControl.setPartInput(fInput.getMark());
@@ -1435,14 +1435,41 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
     /* Restore Table */
     else if (maximizedControl != null) {
-      ((GridData) fBrowserSep.getLayoutData()).exclude = false;
-      fBrowserSep.setVisible(true);
+      updateSeparators(fInitialLayoutClassic, false);
       fSashForm.setMaximizedControl(null);
       fNewsTableControl.setPartInput(fInput.getMark());
       fNewsTableControl.adjustScrollPosition();
       expandNewsTableViewerGroups(true, StructuredSelection.EMPTY);
       fNewsBrowserControl.setPartInput(null);
       fNewsTableControl.setFocus();
+    }
+  }
+
+  private void updateSeparators(boolean layoutClassic, boolean browserMaximized) {
+
+    /* Table Separators */
+    ((GridData) fVerticalTableBrowserSep.getLayoutData()).exclude = layoutClassic || browserMaximized;
+    ((GridData) fHorizontalTableBrowserSep.getLayoutData()).exclude = !layoutClassic || browserMaximized;
+
+    /* Browser Separators */
+    ((GridData) fVerticalBrowserSep.getLayoutData()).exclude = layoutClassic || browserMaximized;
+
+    /* Horizontal Layout */
+    if (layoutClassic && !browserMaximized) {
+      fHorizontalBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, layoutClassic ? 2 : 1, 1));
+      ((GridData) fHorizontalBrowserSep.getLayoutData()).exclude = false;
+    }
+
+    /* Verical Layout */
+    else if (!browserMaximized) {
+      fHorizontalBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, layoutClassic ? 2 : 1, 1));
+      ((GridData) fHorizontalBrowserSep.getLayoutData()).exclude = !fBrowserBar.isVisible();
+    }
+
+    /* Browser Maximized */
+    else {
+      fHorizontalBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
+      ((GridData) fHorizontalBrowserSep.getLayoutData()).exclude = !fBrowserBar.isVisible();
     }
   }
 
@@ -1689,14 +1716,11 @@ public class FeedView extends EditorPart implements IReusableEditor {
     fSashForm = new SashForm(rootComposite, (fInitialLayoutClassic ? SWT.VERTICAL : SWT.HORIZONTAL) | SWT.SMOOTH);
     fSashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-    if (!fInitialLayoutClassic)
-      fSashForm.setBackground(fSashForm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
-
     /* Table-Viewer to display headlines */
     NewsTableViewer tableViewer;
     {
       Composite container = new Composite(fSashForm, SWT.None);
-      container.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 5, false));
+      container.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
       container.addControlListener(new ControlAdapter() {
         @Override
         public void controlResized(ControlEvent e) {
@@ -1720,26 +1744,52 @@ public class FeedView extends EditorPart implements IReusableEditor {
         }
       });
 
-      /* Separate from Browser-Viewer */
-      fTableBrowserSep = new Label(container, SWT.SEPARATOR | SWT.HORIZONTAL);
-      fTableBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-      ((GridData) fTableBrowserSep.getLayoutData()).exclude = !fInitialLayoutClassic;
+      /* Separate from Browser-Viewer (Vertically) */
+      fVerticalTableBrowserSep = new Label(container, SWT.SEPARATOR | SWT.VERTICAL);
+      fVerticalTableBrowserSep.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false));
+      ((GridData) fVerticalTableBrowserSep.getLayoutData()).exclude = fInitialLayoutClassic || fInitialBrowserMaximized;
+
+      /* Separate from Browser-Viewer (Horizontally) */
+      fHorizontalTableBrowserSep = new Label(container, SWT.SEPARATOR | SWT.HORIZONTAL);
+      fHorizontalTableBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
+      ((GridData) fHorizontalTableBrowserSep.getLayoutData()).exclude = !fInitialLayoutClassic || fInitialBrowserMaximized;
     }
 
     /* Browser-Viewer to display news */
     NewsBrowserViewer browserViewer;
     {
       fBrowserViewerControlContainer = new Composite(fSashForm, SWT.None);
-      fBrowserViewerControlContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 5, false));
+      fBrowserViewerControlContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
       fBrowserViewerControlContainer.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+      /* Separate to Browser (Vertically) */
+      fVerticalBrowserSep = new Label(fBrowserViewerControlContainer, SWT.SEPARATOR | SWT.VERTICAL);
+      fVerticalBrowserSep.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false, 1, 3));
+      ((GridData) fVerticalBrowserSep.getLayoutData()).exclude = fInitialLayoutClassic || fInitialBrowserMaximized;
 
       /* Browser Bar for Navigation */
       fBrowserBar = new BrowserBar(this, fBrowserViewerControlContainer);
 
-      /* Separate to Browser */
-      fBrowserSep = new Label(fBrowserViewerControlContainer, SWT.SEPARATOR | SWT.HORIZONTAL);
-      fBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-      ((GridData) fBrowserSep.getLayoutData()).exclude = !fBrowserBar.isVisible() && (!fInitialLayoutClassic || fInitialBrowserMaximized);
+      /* Separate to Browser (Horizontally) */
+      fHorizontalBrowserSep = new Label(fBrowserViewerControlContainer, SWT.SEPARATOR | SWT.HORIZONTAL);
+
+      /* Horizontal Layout */
+      if (fInitialLayoutClassic && !fInitialBrowserMaximized) {
+        fHorizontalBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, fInitialLayoutClassic ? 2 : 1, 1));
+        ((GridData) fHorizontalBrowserSep.getLayoutData()).exclude = false;
+      }
+
+      /* Verical Layout */
+      else if (!fInitialBrowserMaximized) {
+        fHorizontalBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, fInitialLayoutClassic ? 2 : 1, 1));
+        ((GridData) fHorizontalBrowserSep.getLayoutData()).exclude = !fBrowserBar.isVisible();
+      }
+
+      /* Browser Maximized */
+      else {
+        fHorizontalBrowserSep.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
+        ((GridData) fHorizontalBrowserSep.getLayoutData()).exclude = !fBrowserBar.isVisible();
+      }
 
       fNewsBrowserControl = new NewsBrowserControl();
       fNewsBrowserControl.init(fEditorSite);
