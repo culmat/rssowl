@@ -1398,7 +1398,6 @@ public class FeedView extends EditorPart implements IReusableEditor {
       else {
         updateSeparators(true, false);
         fSashForm.setOrientation(SWT.VERTICAL);
-        fSashForm.setBackground(null);
         fHorizontalTableBrowserSep.getParent().layout();
         fHorizontalBrowserSep.getParent().layout();
       }
