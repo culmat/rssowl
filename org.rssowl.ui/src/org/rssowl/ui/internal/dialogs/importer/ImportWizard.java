@@ -95,7 +95,7 @@ public class ImportWizard extends Wizard {
   public IWizardPage getNextPage(IWizardPage page) {
 
     /* Check if the ImportTargetPage needs to be shown */
-    if (page instanceof ImportElementsPage && fImportElementsPage.getFolderChildsToImport().isEmpty() && fImportElementsPage.showOptionsPage())
+    if (page instanceof ImportElementsPage && !fImportSourcePage.isRemoteSource() && fImportElementsPage.getFolderChildsToImport().isEmpty() && fImportElementsPage.showOptionsPage())
       return fImportOptionsPage;
 
     /* Check if the ImportOptionsPage needs to be shown */
@@ -111,6 +111,20 @@ public class ImportWizard extends Wizard {
   @Override
   public boolean performFinish() {
     return doImport();
+  }
+
+  /*
+   * @see org.eclipse.jface.wizard.Wizard#canFinish()
+   */
+  @Override
+  public boolean canFinish() {
+
+    /* Prohibit direct Finish from Sources that require a remote connection */
+    if (getContainer().getCurrentPage() == fImportSourcePage && fImportSourcePage.isRemoteSource())
+      return false;
+
+    /* Other Pages decide on their own */
+    return super.canFinish();
   }
 
   private boolean doImport() {
@@ -276,6 +290,6 @@ public class ImportWizard extends Wizard {
    */
   @Override
   public boolean needsProgressMonitor() {
-    return false;
+    return true;
   }
 }
