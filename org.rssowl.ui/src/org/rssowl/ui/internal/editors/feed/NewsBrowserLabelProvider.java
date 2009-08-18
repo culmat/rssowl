@@ -621,8 +621,12 @@ public class NewsBrowserLabelProvider extends LabelProvider {
             if (!StringUtils.isSet(name))
               name = link.toASCIIString();
 
-            //TODO Consider Attachment length and type
-            link(footer, link.toASCIIString(), StringUtils.htmlEscape(name), "attachment");
+            String size = OwlUI.getSize(attachment.getLength());
+            if (size != null)
+              link(footer, link.toASCIIString(), StringUtils.htmlEscape(name) + " (" + size + ")", "attachment");
+            else
+              link(footer, link.toASCIIString(), StringUtils.htmlEscape(name), "attachment");
+
             footer.append(", ");
           }
         }
