@@ -54,6 +54,12 @@ public class URIUtils {
   private static final String[] CHARS_TO_ENCODE = new String[] { " ", "[", "]", "{", "}", "|", "^", "\\", "<", ">" };
   private static final String[] ENCODED_CHARS = new String[] { "%20", "%5B", "%5D", "%7B", "%7D", "%7C", "%5E", "%5C", "%3C", "%3E" };
 
+  /** The HTTP Protocol */
+  public static final String HTTP = "http://";
+
+  /** Identifier for a Protocol */
+  public static final String PROTOCOL_IDENTIFIER = "://";
+
   /* This utility class constructor is hidden */
   private URIUtils() {
   // Protect default constructor
@@ -343,5 +349,17 @@ public class URIUtils {
       return "http://www.google.com/search?q=" + urlEncode(value);
 
     return value;
+  }
+
+  /**
+   * @param link the String to ensure that it begins with a protocol.
+   * @return the same String if it begins with a protocol, or a String where the
+   * http-protocol was appended to the beginning.
+   */
+  public static String ensureProtocol(String link) {
+    if (link != null && !link.contains(PROTOCOL_IDENTIFIER))
+      return HTTP + link;
+
+    return link;
   }
 }

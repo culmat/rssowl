@@ -69,8 +69,6 @@ import java.util.TreeSet;
  * @author bpasero
  */
 public class FeedDefinitionPage extends WizardPage {
-  private static final String HTTP = "http://";
-
   private Text fFeedLinkInput;
   private Text fKeywordInput;
   private Button fLoadTitleFromFeedButton;
@@ -101,7 +99,7 @@ public class FeedDefinitionPage extends WizardPage {
   }
 
   private String loadInitialLinkFromClipboard() {
-    String initial = HTTP;
+    String initial = URIUtils.HTTP;
 
     Clipboard cb = new Clipboard(getShell().getDisplay());
     TextTransfer transfer = TextTransfer.getInstance();
@@ -109,11 +107,8 @@ public class FeedDefinitionPage extends WizardPage {
     data = (data != null) ? data.trim() : null;
     cb.dispose();
 
-    if (URIUtils.looksLikeLink(data)) {
-      if (!data.contains("://"))
-        data = initial + data;
-      initial = data;
-    }
+    if (URIUtils.looksLikeLink(data))
+      initial = URIUtils.ensureProtocol(data);
 
     return initial;
   }
@@ -205,13 +200,13 @@ public class FeedDefinitionPage extends WizardPage {
     ((GridData) fFeedLinkInput.getLayoutData()).widthHint = entryFieldWidth; //Required to avoid large spanning dialog for long Links
     fFeedLinkInput.setFocus();
 
-    if (StringUtils.isSet(fInitialLink) && !fInitialLink.equals(HTTP)) {
+    if (StringUtils.isSet(fInitialLink) && !fInitialLink.equals(URIUtils.HTTP)) {
       fFeedLinkInput.setText(fInitialLink);
       fFeedLinkInput.selectAll();
       onLinkChange();
     } else {
-      fFeedLinkInput.setText(HTTP);
-      fFeedLinkInput.setSelection(HTTP.length());
+      fFeedLinkInput.setText(URIUtils.HTTP);
+      fFeedLinkInput.setSelection(URIUtils.HTTP.length());
     }
 
     fFeedLinkInput.addModifyListener(new ModifyListener() {
