@@ -40,6 +40,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -56,17 +57,30 @@ import java.util.List;
 public class ImportSourcePage extends WizardPage {
 
   /* Max number of Sources to remember */
-  private static final int MAX_REMEMBER_SOURCES = 5;
+  private static final int MAX_REMEMBER_SOURCES = 8;
 
-  private Button fImportFromFileRadio;
-  private Button fImportFromDefaultRadio;
-  private Combo fFileInput;
-  private Button fSearchFileButton;
+  private Button fImportFromResourceRadio;
+  private Combo fResourceInput;
+  private Button fBrowseFileButton;
+  private Button fImportFromKeyword;
+  private Combo fKeywordInput;
+  private Button fImportFromRecommendedRadio;
   private IPreferenceScope fPreferences;
 
   /* Sources for Import */
   enum Source {
-    NONE, FILE, DEFAULT
+
+    /* User has decided against importing */
+    NONE,
+
+    /* User has provided a resource (either local or online) */
+    RESOURCE,
+
+    /* User wants to search feeds matching a keyword */
+    KEYWORD,
+
+    /* User wants to import from recommended */
+    RECOMMENDED
   }
 
   /**
@@ -78,39 +92,40 @@ public class ImportSourcePage extends WizardPage {
     fPreferences = Owl.getPreferenceService().getGlobalScope();
   }
 
-  /* Save Import Sources */
-  void saveSettings() {
-
-    /* First fill current as new one */
-    List<String> newImportSources = new ArrayList<String>();
-    if (fImportFromFileRadio.getSelection())
-      newImportSources.add(fFileInput.getText());
-
-    /* Then add up to 4 more old ones to remember */
-    String[] oldImportSources = fPreferences.getStrings(DefaultPreferences.IMPORT_SOURCES);
-    if (oldImportSources != null) {
-      for (int i = 0; i < oldImportSources.length && newImportSources.size() < MAX_REMEMBER_SOURCES; i++) {
-        if (!newImportSources.contains(oldImportSources[i]))
-          newImportSources.add(oldImportSources[i]);
-      }
-    }
-
-    /* Save List */
-    if (!newImportSources.isEmpty())
-      fPreferences.putStrings(DefaultPreferences.IMPORT_SOURCES, newImportSources.toArray(new String[newImportSources.size()]));
-  }
-
   /* Returns the type of Source to use for the Import */
   Source getSource() {
-    if (fImportFromFileRadio.getSelection())
-      return Source.FILE;
+    if (fImportFromResourceRadio.getSelection())
+      return Source.RESOURCE;
 
-    return Source.DEFAULT;
+    if (fImportFromKeyword.getSelection())
+      return Source.KEYWORD;
+
+    return Source.RECOMMENDED;
   }
 
-  /* Returns the File to Import from or null if none */
-  File getImportFile() {
-    return fImportFromFileRadio.getSelection() ? new File(fFileInput.getText()) : null;
+  /* Returns the Resource to Import from or null if none */
+  String getImportResource() {
+    return fImportFromResourceRadio.getSelection() ? fResourceInput.getText() : null;
+  }
+
+  /* Returns the Keywords to Import from or null if none */
+  String getImportKeywords() {
+    return fImportFromKeyword.getSelection() ? fKeywordInput.getText() : null;
+  }
+
+  /* Returns whether the source is only remotely accessible */
+  boolean isRemoteSource() {
+    Source source = getSource();
+    if (source == Source.KEYWORD)
+      return true;
+
+    if (source == Source.RESOURCE) {
+      String resource = getImportResource();
+      if (!new File(resource).exists() && URIUtils.looksLikeLink(resource))
+        return true;
+    }
+
+    return false;
   }
 
   /*
@@ -120,57 +135,96 @@ public class ImportSourcePage extends WizardPage {
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(new GridLayout(1, false));
 
-    /* Import from File */
-    fImportFromFileRadio = new Button(container, SWT.RADIO);
-    fImportFromFileRadio.setSelection(true);
-    fImportFromFileRadio.setText("Import From a File");
-    fImportFromFileRadio.addSelectionListener(new SelectionAdapter() {
+    /* Import from File or Website */
+    fImportFromResourceRadio = new Button(container, SWT.RADIO);
+    fImportFromResourceRadio.setSelection(true);
+    fImportFromResourceRadio.setText("Import From a File or Website (TODO)");
+    fImportFromResourceRadio.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         updatePageComplete();
-        fFileInput.setEnabled(fImportFromFileRadio.getSelection());
-        fSearchFileButton.setEnabled(fImportFromFileRadio.getSelection());
-        if (fImportFromFileRadio.getSelection())
-          fFileInput.setFocus();
+        boolean importFromResource = fImportFromResourceRadio.getSelection();
+        fResourceInput.setEnabled(importFromResource);
+        fBrowseFileButton.setEnabled(importFromResource);
+        if (importFromResource)
+          fResourceInput.setFocus();
       }
     });
 
-    Composite fileInputContainer = new Composite(container, SWT.None);
-    fileInputContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
-    ((GridLayout) fileInputContainer.getLayout()).marginLeft = 15;
-    ((GridLayout) fileInputContainer.getLayout()).marginBottom = 10;
-    fileInputContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    Composite sourceInputContainer = new Composite(container, SWT.None);
+    sourceInputContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    ((GridLayout) sourceInputContainer.getLayout()).marginLeft = 15;
+    ((GridLayout) sourceInputContainer.getLayout()).marginBottom = 10;
+    sourceInputContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
-    fFileInput = new Combo(fileInputContainer, SWT.DROP_DOWN | SWT.BORDER);
-    fFileInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    String[] previousSources = fPreferences.getStrings(DefaultPreferences.IMPORT_SOURCES);
-    if (previousSources != null) {
-      for (String source : previousSources) {
-        fFileInput.add(source);
+    fResourceInput = new Combo(sourceInputContainer, SWT.DROP_DOWN | SWT.BORDER);
+    fResourceInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+    fResourceInput.setFocus();
+
+    String[] previousResources = fPreferences.getStrings(DefaultPreferences.IMPORT_RESOURCES);
+    if (previousResources != null) {
+      for (String source : previousResources) {
+        fResourceInput.add(source);
       }
     }
 
-    fFileInput.setFocus();
-    fFileInput.addModifyListener(new ModifyListener() {
+    fResourceInput.addModifyListener(new ModifyListener() {
       public void modifyText(ModifyEvent e) {
         updatePageComplete();
       }
     });
 
-    fSearchFileButton = new Button(fileInputContainer, SWT.PUSH);
-    fSearchFileButton.setText("Browse...");
-    setButtonLayoutData(fSearchFileButton);
-    fSearchFileButton.addSelectionListener(new SelectionAdapter() {
+    fBrowseFileButton = new Button(sourceInputContainer, SWT.PUSH);
+    fBrowseFileButton.setText("Browse...");
+    setButtonLayoutData(fBrowseFileButton);
+    fBrowseFileButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         onBrowse();
       }
     });
 
+    /* Import from Keyword Search */
+    fImportFromKeyword = new Button(container, SWT.RADIO);
+    fImportFromKeyword.setText("Import Feeds Matching the Following Keywords (TODO)");
+    fImportFromKeyword.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        updatePageComplete();
+        boolean importFromKeyword = fImportFromKeyword.getSelection();
+        fKeywordInput.setEnabled(importFromKeyword);
+        if (importFromKeyword)
+          fKeywordInput.setFocus();
+      }
+    });
+
+    Composite keywordInputContainer = new Composite(container, SWT.None);
+    keywordInputContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    ((GridLayout) keywordInputContainer.getLayout()).marginLeft = 15;
+    ((GridLayout) keywordInputContainer.getLayout()).marginBottom = 10;
+    keywordInputContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+    fKeywordInput = new Combo(keywordInputContainer, SWT.DROP_DOWN | SWT.BORDER);
+    fKeywordInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+    fKeywordInput.setEnabled(false);
+
+    String[] previousKeywords = fPreferences.getStrings(DefaultPreferences.IMPORT_KEYWORDS);
+    if (previousKeywords != null) {
+      for (String keyword : previousKeywords) {
+        fKeywordInput.add(keyword);
+      }
+    }
+
+    fKeywordInput.addModifyListener(new ModifyListener() {
+      public void modifyText(ModifyEvent e) {
+        updatePageComplete();
+      }
+    });
+
     /* Import from Recommended Feeds */
-    fImportFromDefaultRadio = new Button(container, SWT.RADIO);
-    fImportFromDefaultRadio.setText("Import Recommended Feeds");
-    fImportFromDefaultRadio.addSelectionListener(new SelectionAdapter() {
+    fImportFromRecommendedRadio = new Button(container, SWT.RADIO);
+    fImportFromRecommendedRadio.setText("Import Recommended Feeds");
+    fImportFromRecommendedRadio.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         updatePageComplete();
@@ -201,12 +255,12 @@ public class ImportSourcePage extends WizardPage {
       filterExtensions.add("*.*");
 
     dialog.setFilterExtensions(filterExtensions.toArray(new String[filterExtensions.size()]));
-    if (StringUtils.isSet(fFileInput.getText()))
-      dialog.setFileName(fFileInput.getText());
+    if (StringUtils.isSet(fResourceInput.getText()))
+      dialog.setFileName(fResourceInput.getText());
 
     String string = dialog.open();
     if (string != null)
-      fFileInput.setText(string);
+      fResourceInput.setText(string);
 
     updatePageComplete();
   }
@@ -215,18 +269,30 @@ public class ImportSourcePage extends WizardPage {
     String errorMessage = null;
 
     /* Import Default */
-    if (fImportFromDefaultRadio.getSelection())
+    if (fImportFromRecommendedRadio.getSelection())
       setPageComplete(true);
 
-    /* Import from File */
-    else if (fImportFromFileRadio.getSelection()) {
-      String filePath = fFileInput.getText();
-      File fileToImport = new File(filePath);
-      boolean fileExists = fileToImport.exists() && fileToImport.isFile();
-      setPageComplete(StringUtils.isSet(filePath) && fileExists);
-      if (StringUtils.isSet(filePath) && !fileExists)
-        errorMessage = "Please select an existing file.";
+    /* Import from Resource */
+    else if (fImportFromResourceRadio.getSelection()) {
+      if (!StringUtils.isSet(fResourceInput.getText()))
+        setPageComplete(false);
+      else {
+        if (isRemoteSource())
+          setPageComplete(true);
+        else {
+          String filePath = fResourceInput.getText();
+          File fileToImport = new File(filePath);
+          boolean fileExists = fileToImport.exists() && fileToImport.isFile();
+          setPageComplete(fileExists);
+          if (!fileExists)
+            errorMessage = "Please select an existing file.";
+        }
+      }
     }
+
+    /* Import From Keywords */
+    else if (fImportFromKeyword.getSelection())
+      setPageComplete(StringUtils.isSet(fImportFromKeyword.getText()));
 
     /* Set Error Message */
     if (errorMessage != null)
@@ -237,5 +303,36 @@ public class ImportSourcePage extends WizardPage {
       setErrorMessage(null);
       setMessage("Please choose the source of import.");
     }
+  }
+
+  /* Save Import Sources */
+  void saveSettings() {
+
+    /* Import Resources */
+    saveComboSettings(fImportFromResourceRadio.getSelection() ? fResourceInput.getText() : null, DefaultPreferences.IMPORT_RESOURCES);
+
+    /* Import Keywords */
+    saveComboSettings(fImportFromKeyword.getSelection() ? fKeywordInput.getText() : null, DefaultPreferences.IMPORT_KEYWORDS);
+  }
+
+  private void saveComboSettings(String valueToAdd, String prefKey) {
+
+    /* First fill current as new one */
+    List<String> newValues = new ArrayList<String>();
+    if (StringUtils.isSet(valueToAdd))
+      newValues.add(valueToAdd);
+
+    /* Then add up to N more old ones to remember */
+    String[] oldValues = fPreferences.getStrings(prefKey);
+    if (oldValues != null) {
+      for (int i = 0; i < oldValues.length && newValues.size() < MAX_REMEMBER_SOURCES; i++) {
+        if (!newValues.contains(oldValues[i]))
+          newValues.add(oldValues[i]);
+      }
+    }
+
+    /* Save List */
+    if (!newValues.isEmpty())
+      fPreferences.putStrings(prefKey, newValues.toArray(new String[newValues.size()]));
   }
 }

@@ -71,7 +71,7 @@ public class ImportAction extends Action implements IWorkbenchWindowActionDelega
    */
   public void openWizard(Shell shell) {
     ImportWizard exportWizard = new ImportWizard();
-    OwlUI.openWizard(shell, exportWizard, false, SETTINGS_SECTION);
+    OwlUI.openWizard(shell, exportWizard, true, SETTINGS_SECTION);
   }
 
   /*
