@@ -565,13 +565,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
     builder.append("</td>");
 
-    /* Add to Search */
-    for (ILabel label : labels) {
-      String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.LABEL_HANDLER_ID + "?" + URIUtils.urlEncode(label.getName());
-      link(search, link, StringUtils.htmlEscape(label.getName()), "searchrelated");
-      search.append(", ");
-    }
-
     /* Close: NewsItem/Header/Actions */
     builder.append("</tr>");
     builder.append("</table>");
@@ -641,57 +634,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         close(footer, "div");
       }
 
-      /* Categories */
-      List<ICategory> categories = news.getCategories();
-      if (categories.size() > 0) {
-        StringBuilder categoriesText = new StringBuilder();
-        boolean hasCategories = false;
-
-        /* DIV: NewsItem/Footer/Categories */
-        div(categoriesText, "categories");
-
-        /* Label */
-        span(categoriesText, categories.size() == 1 ? "Category:" : "Categories:", "label");
-
-        /* For each Category */
-        for (ICategory category : categories) {
-          String name = category.getName();
-          String domain = category.getDomain();
-
-          /* As Link */
-          if (URIUtils.looksLikeLink(domain) && StringUtils.isSet(name)) {
-            link(categoriesText, domain, StringUtils.htmlEscape(name), "category");
-            hasCategories = true;
-          }
-
-          /* As Text */
-          else if (StringUtils.isSet(name)) {
-            categoriesText.append(StringUtils.htmlEscape(name));
-            hasCategories = true;
-          }
-
-          /* Separate with colon */
-          categoriesText.append(", ");
-
-          /* Add to Search */
-          if (StringUtils.isSet(name)) {
-            String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.CATEGORY_HANDLER_ID + "?" + URIUtils.urlEncode(name);
-            link(search, link, StringUtils.htmlEscape(name), "searchrelated");
-            search.append(", ");
-          }
-        }
-
-        if (hasCategories)
-          categoriesText.delete(categoriesText.length() - 2, categoriesText.length());
-
-        /* Close: NewsItem/Footer/Categories */
-        close(categoriesText, "div");
-
-        /* Append categories if provided */
-        if (hasCategories)
-          footer.append(categoriesText);
-      }
-
       /* Source */
       ISource source = news.getSource();
       if (source != null) {
@@ -715,6 +657,30 @@ public class NewsBrowserLabelProvider extends LabelProvider {
         close(footer, "div");
       }
 
+      /* Add Categories to Search */
+      List<ICategory> categories = news.getCategories();
+      if (categories.size() > 0) {
+
+        /* For each Category */
+        for (ICategory category : categories) {
+          String name = category.getName();
+
+          /* Add to Search */
+          if (StringUtils.isSet(name)) {
+            String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.CATEGORY_HANDLER_ID + "?" + URIUtils.urlEncode(name);
+            link(search, link, StringUtils.htmlEscape(name), "searchrelated");
+            search.append(", ");
+          }
+        }
+      }
+
+      /* Add Labels to Search */
+      for (ILabel label : labels) {
+        String link = ILinkHandler.HANDLER_PROTOCOL + NewsBrowserViewer.LABEL_HANDLER_ID + "?" + URIUtils.urlEncode(label.getName());
+        link(search, link, StringUtils.htmlEscape(label.getName()), "searchrelated");
+        search.append(", ");
+      }
+
       /* Find related News */
       if (search.length() > 0) {
         search.delete(search.length() - 2, search.length());
@@ -724,7 +690,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
         /* Label */
         if (withInternalLinks)
-          span(footer, "Search related News:", "label");
+          span(footer, "Find related News:", "label");
 
         /* Append to Footer */
         if (withInternalLinks)
