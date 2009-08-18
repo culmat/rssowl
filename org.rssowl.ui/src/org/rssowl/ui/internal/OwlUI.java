@@ -29,9 +29,11 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.dialogs.IDialogSettings;
+import org.eclipse.jface.fieldassist.ComboContentAdapter;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.fieldassist.IControlContentAdapter;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.jface.resource.ColorDescriptor;
@@ -68,6 +70,7 @@ import org.eclipse.swt.graphics.Region;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.program.Program;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -1540,17 +1543,27 @@ public class OwlUI {
   }
 
   /**
-   * @param text
+   * @param combo
+   * @param values
+   * @param decorate
+   * @return Pair
+   */
+  public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Combo combo, Collection<String> values, boolean decorate) {
+    return hookAutoComplete(combo, new ComboContentAdapter(), values, decorate);
+  }
+
+  /**
+   * @param control
    * @param textContentAdapter
    * @param values
    * @param decorate
    * @return Pair
    */
-  public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Text text, TextContentAdapter textContentAdapter, Collection<String> values, boolean decorate) {
+  public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Control control, IControlContentAdapter textContentAdapter, Collection<String> values, boolean decorate) {
 
     /* Show UI Hint that Content Assist is available */
     if (decorate) {
-      ControlDecoration controlDeco = new ControlDecoration(text, SWT.LEFT | SWT.TOP);
+      ControlDecoration controlDeco = new ControlDecoration(control, SWT.LEFT | SWT.TOP);
       controlDeco.setImage(FieldDecorationRegistry.getDefault().getFieldDecoration(FieldDecorationRegistry.DEC_CONTENT_PROPOSAL).getImage());
       controlDeco.setDescriptionText("Content Assist Available (Press Arrow-Down Key)");
       controlDeco.setShowOnlyOnFocus(true);
@@ -1562,7 +1575,7 @@ public class OwlUI {
     /* Create Content Proposal Adapter */
     SimpleContentProposalProvider proposalProvider = new SimpleContentProposalProvider(new String[0]);
     proposalProvider.setFiltering(true);
-    final ContentProposalAdapter adapter = new ContentProposalAdapter(text, textContentAdapter, proposalProvider, activationKey, null);
+    final ContentProposalAdapter adapter = new ContentProposalAdapter(control, textContentAdapter, proposalProvider, activationKey, null);
     adapter.setPropagateKeys(true);
     adapter.setAutoActivationDelay(200);
     adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
@@ -1575,10 +1588,10 @@ public class OwlUI {
      * TODO: This is a hack but there doesnt seem to be any API to set the size
      * of the popup to match the actual size of the Text widget being used.
      */
-    text.getDisplay().timerExec(100, new Runnable() {
+    control.getDisplay().timerExec(100, new Runnable() {
       public void run() {
-        if (!text.isDisposed()) {
-          adapter.setPopupSize(new Point(text.getSize().x, 100));
+        if (!control.isDisposed()) {
+          adapter.setPopupSize(new Point(control.getSize().x, 100));
         }
       }
     });

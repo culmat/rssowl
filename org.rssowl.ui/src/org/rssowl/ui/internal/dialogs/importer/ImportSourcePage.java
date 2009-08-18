@@ -24,6 +24,8 @@
 
 package org.rssowl.ui.internal.dialogs.importer;
 
+import org.eclipse.jface.fieldassist.ContentProposalAdapter;
+import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -38,16 +40,25 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.dao.DynamicDAO;
+import org.rssowl.core.persist.dao.ICategoryDAO;
+import org.rssowl.core.persist.dao.ILabelDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * A {@link WizardPage} to select the source of import.
@@ -66,6 +77,7 @@ public class ImportSourcePage extends WizardPage {
   private Combo fKeywordInput;
   private Button fImportFromRecommendedRadio;
   private IPreferenceScope fPreferences;
+  private boolean fIsAutoCompleteKeywordHooked;
 
   /* Sources for Import */
   enum Source {
@@ -193,8 +205,10 @@ public class ImportSourcePage extends WizardPage {
         updatePageComplete();
         boolean importFromKeyword = fImportFromKeyword.getSelection();
         fKeywordInput.setEnabled(importFromKeyword);
-        if (importFromKeyword)
+        if (importFromKeyword) {
           fKeywordInput.setFocus();
+          hookKeywordAutocomplete();
+        }
       }
     });
 
@@ -334,5 +348,41 @@ public class ImportSourcePage extends WizardPage {
     /* Save List */
     if (!newValues.isEmpty())
       fPreferences.putStrings(prefKey, newValues.toArray(new String[newValues.size()]));
+  }
+
+  private void hookKeywordAutocomplete() {
+
+    /* Only perform once */
+    if (fIsAutoCompleteKeywordHooked)
+      return;
+    fIsAutoCompleteKeywordHooked = true;
+
+    final Pair<SimpleContentProposalProvider, ContentProposalAdapter> autoComplete = OwlUI.hookAutoComplete(fKeywordInput, null, true);
+
+    /* Load proposals in the Background */
+    JobRunner.runDelayedInBackgroundThread(new Runnable() {
+      public void run() {
+        if (!fKeywordInput.isDisposed()) {
+          Set<String> values = new TreeSet<String>(new Comparator<String>() {
+            public int compare(String o1, String o2) {
+              return o1.compareToIgnoreCase(o2);
+            }
+          });
+
+          /* Add all Categories */
+          values.addAll(DynamicDAO.getDAO(ICategoryDAO.class).loadAllNames());
+
+          /* Add all Labels */
+          Collection<ILabel> labels = DynamicDAO.getDAO(ILabelDAO.class).loadAll();
+          for (ILabel label : labels) {
+            values.add(label.getName());
+          }
+
+          /* Apply Proposals */
+          if (!fKeywordInput.isDisposed())
+            OwlUI.applyAutoCompleteProposals(values, autoComplete.getFirst(), autoComplete.getSecond());
+        }
+      }
+    });
   }
 }
