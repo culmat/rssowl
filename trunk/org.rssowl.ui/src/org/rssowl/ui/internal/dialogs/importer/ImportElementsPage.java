@@ -92,8 +92,11 @@ import java.util.Map;
  */
 public class ImportElementsPage extends WizardPage {
 
-  /* Connection Timeout when looking for Feeds remotely */
-  private static final int CON_TIMEOUT = 10000;
+  /* Initial Connection Timeout when looking for Feeds remotely */
+  private static final int INITIAL_CON_TIMEOUT = 15000;
+
+  /* Connection Timeout when testing for Feeds remotely */
+  private static final int FEED_CON_TIMEOUT = 7000;
 
   private CheckboxTreeViewer fViewer;
   private FolderChildCheckboxTree fFolderChildTree;
@@ -449,7 +452,7 @@ public class ImportElementsPage extends WizardPage {
             return;
 
           /* Open Stream */
-          in = openStream(link, monitor);
+          in = openStream(link, monitor, INITIAL_CON_TIMEOUT);
 
           /* Return on Cancellation */
           if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
@@ -600,7 +603,7 @@ public class ImportElementsPage extends WizardPage {
           break;
 
         /* Open Stream to potential Feed */
-        in = openStream(feedLink, monitor);
+        in = openStream(feedLink, monitor, FEED_CON_TIMEOUT);
 
         /* Return on Cancellation */
         if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
@@ -677,7 +680,7 @@ public class ImportElementsPage extends WizardPage {
         return null;
 
       /* Open Stream */
-      in = openStream(link, monitor);
+      in = openStream(link, monitor, INITIAL_CON_TIMEOUT);
 
       /* Return on Cancellation */
       if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
@@ -693,11 +696,11 @@ public class ImportElementsPage extends WizardPage {
     }
   }
 
-  private InputStream openStream(URI link, IProgressMonitor monitor) throws ConnectionException {
+  private InputStream openStream(URI link, IProgressMonitor monitor, int timeout) throws ConnectionException {
     IProtocolHandler handler = Owl.getConnectionService().getHandler(link);
 
     Map<Object, Object> properties = new HashMap<Object, Object>();
-    properties.put(IConnectionPropertyConstants.CON_TIMEOUT, CON_TIMEOUT);
+    properties.put(IConnectionPropertyConstants.CON_TIMEOUT, timeout);
     return handler.openStream(link, monitor, properties);
   }
 
