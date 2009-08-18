@@ -79,9 +79,10 @@ import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -506,7 +507,7 @@ public class ImportElementsPage extends WizardPage {
         /* Scan remote Resource for Links and valid Feeds */
         if (bruteForce && !monitor.isCanceled() && !Controller.getDefault().isShuttingDown()) {
           try {
-            importFromOnlineResourceBruteforce(link, monitor);
+            importFromOnlineResourceBruteforce(link, monitor, false);
           } catch (Exception e) {
             throw new InvocationTargetException(e);
           }
@@ -537,7 +538,7 @@ public class ImportElementsPage extends WizardPage {
             return;
 
           /* Scan remote Resource for Links and valid Feeds */
-          importFromOnlineResourceBruteforce(new URI(linkVal.toString()), monitor);
+          importFromOnlineResourceBruteforce(new URI(linkVal.toString()), monitor, true);
         } catch (Exception e) {
           throw new InvocationTargetException(e);
         } finally {
@@ -551,29 +552,36 @@ public class ImportElementsPage extends WizardPage {
   }
 
   @SuppressWarnings("null")
-  private void importFromOnlineResourceBruteforce(final URI resourceLink, IProgressMonitor monitor) throws ConnectionException, IOException {
+  private void importFromOnlineResourceBruteforce(final URI resourceLink, IProgressMonitor monitor, final boolean isKeywordSearch) throws ConnectionException, IOException {
 
     /* Read Content */
     String content = readContent(resourceLink, monitor);
 
     /* Extract Links from Content */
     List<String> links = RegExUtils.extractLinksFromText(content, false);
-    List<String> likelyFeedLinks = new ArrayList<String>();
-    for (Iterator<String> iterator = links.iterator(); iterator.hasNext();) {
-      String link = iterator.next();
-      if (URIUtils.looksLikeFeedLink(link)) {
-        likelyFeedLinks.add(link);
-        iterator.remove();
+
+    /* Sort List: First process likely feeds, then others */
+    final String resourceLinkValue = resourceLink.toString();
+    Collections.sort(links, new Comparator<String>() {
+      public int compare(String o1, String o2) {
+
+        /* Check common feed patterns in URL */
+        if (URIUtils.looksLikeFeedLink(o1, false))
+          return -1;
+        else if (URIUtils.looksLikeFeedLink(o2, false))
+          return 1;
+
+        /* Check Origin from same Domain */
+        if (!isKeywordSearch) {
+          if (o1.contains(resourceLinkValue))
+            return -1;
+          else if (o2.contains(resourceLinkValue))
+            return 1;
+        }
+
+        return -1;
       }
-    }
-
-    /* Return on Cancellation */
-    if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
-      return;
-
-    /* Link Queue: First process likely feeds, then others */
-    List<String> linkQueue = new ArrayList<String>(likelyFeedLinks);
-    linkQueue.addAll(links);
+    });
 
     /* A Root to add Found Bookmarks into */
     final IFolder defaultRootFolder = Owl.getModelFactory().createFolder(null, null, "Bookmarks");
@@ -583,7 +591,7 @@ public class ImportElementsPage extends WizardPage {
     IBookMarkDAO dao = DynamicDAO.getDAO(IBookMarkDAO.class);
     final List<IBookMark> foundBookMarks = new ArrayList<IBookMark>();
     final List<String> foundBookMarkNames = new ArrayList<String>();
-    for (String feedLinkVal : linkQueue) {
+    for (String feedLinkVal : links) {
       InputStream in = null;
       boolean canceled = false;
       Exception error = null;

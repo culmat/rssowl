@@ -47,8 +47,8 @@ public class URIUtils {
   /* Default Encoding */
   private static final String DEFAULT_ENCODING = "UTF-8"; //$NON-NLS-1$
 
-  /** Common Newsfeed Extensions with leading Dot */
-  private static final String[] FEED_EXTENSIONS_DOTTED = new String[] { ".rss", ".rdf", ".xml", ".atom", ".feed" };
+  /** Common Newsfeed Extensions */
+  private static final String[] FEED_EXTENSIONS = new String[] { "rss", "rdf", "xml", "atom", "feed" };
 
   /* Used when encoding a URL in a fast way */
   private static final String[] CHARS_TO_ENCODE = new String[] { " ", "[", "]", "{", "}", "|", "^", "\\", "<", ">" };
@@ -128,11 +128,25 @@ public class URIUtils {
    * @return TRUE in case the String looks like a Link to a Feed.
    */
   public static boolean looksLikeFeedLink(String str) {
+    return looksLikeFeedLink(str, true);
+  }
+
+  /**
+   * Return TRUE in case the given String looks like a Link to a Feed.
+   *
+   * @param str The String to check
+   * @param strict if <code>true</code> require the given String to contain one
+   * of the feed extensions with a leading ".", <code>false</code> otherwise.
+   * @return TRUE in case the String looks like a Link to a Feed.
+   */
+  public static boolean looksLikeFeedLink(String str, boolean strict) {
     if (!looksLikeLink(str))
       return false;
 
-    for (String extension : FEED_EXTENSIONS_DOTTED) {
-      if (str.contains(extension))
+    for (String extension : FEED_EXTENSIONS) {
+      if (strict && str.contains("." + extension))
+        return true;
+      else if (!strict && str.contains(extension))
         return true;
     }
 
