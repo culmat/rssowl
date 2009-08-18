@@ -583,6 +583,9 @@ public class ImportElementsPage extends WizardPage {
       }
     });
 
+    /* Update Task Information */
+    monitor.beginTask("Searching for Feeds ('Cancel' to stop)", links.size());
+
     /* A Root to add Found Bookmarks into */
     final IFolder defaultRootFolder = Owl.getModelFactory().createFolder(null, null, "Bookmarks");
     defaultRootFolder.setProperty(ITypeImporter.TEMPORARY_FOLDER, true);
@@ -592,6 +595,8 @@ public class ImportElementsPage extends WizardPage {
     final List<IBookMark> foundBookMarks = new ArrayList<IBookMark>();
     final List<String> foundBookMarkNames = new ArrayList<String>();
     for (String feedLinkVal : links) {
+      monitor.worked(1);
+
       InputStream in = null;
       boolean canceled = false;
       Exception error = null;
