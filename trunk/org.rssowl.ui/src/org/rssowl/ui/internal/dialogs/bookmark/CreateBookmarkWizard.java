@@ -73,9 +73,6 @@ import java.util.Map;
  * @author bpasero
  */
 public class CreateBookmarkWizard extends Wizard {
-  private static final String HTTP = "http://";
-  private static final String PROTOCOL_IDENTIFIER = "://";
-
   private FeedDefinitionPage fFeedDefinitionPage;
   private KeywordSubscriptionPage fKeywordPage;
   private BookmarkDefinitionPage fBookMarkDefinitionPage;
@@ -144,11 +141,7 @@ public class CreateBookmarkWizard extends Wizard {
 
     /* Link Subscription - Load from Feed if requested */
     else if (fFeedDefinitionPage.loadTitleFromFeed()) {
-      String linkVal = fFeedDefinitionPage.getLink();
-      if (!linkVal.contains(PROTOCOL_IDENTIFIER))
-        linkVal = HTTP + linkVal;
-
-      final String linkText = linkVal;
+      final String linkText = URIUtils.ensureProtocol(fFeedDefinitionPage.getLink());
       IRunnableWithProgress runnable = new IRunnableWithProgress() {
         public void run(IProgressMonitor monitor) {
           monitor.beginTask("Please wait while loading the title from the feed...", IProgressMonitor.UNKNOWN);
@@ -233,7 +226,7 @@ public class CreateBookmarkWizard extends Wizard {
 
     /* Allow to finish directly if link is supplied and title grabbed from feed */
     String link = fFeedDefinitionPage.getLink();
-    if (currentPage == fFeedDefinitionPage && fFeedDefinitionPage.loadTitleFromFeed() && StringUtils.isSet(link) && !HTTP.equals(link))
+    if (currentPage == fFeedDefinitionPage && fFeedDefinitionPage.loadTitleFromFeed() && StringUtils.isSet(link) && !URIUtils.HTTP.equals(link))
       return true;
 
     /* Allow to finish from Keyword Page */
@@ -276,9 +269,7 @@ public class CreateBookmarkWizard extends Wizard {
     if (fFeedDefinitionPage.isKeywordSubscription())
       uriObj[0] = new URI(fKeywordPage.getSelectedEngine().toUrl(fFeedDefinitionPage.getKeyword()));
     else {
-      String linkVal = fFeedDefinitionPage.getLink();
-      if (!linkVal.contains(PROTOCOL_IDENTIFIER))
-        linkVal = HTTP + linkVal;
+      String linkVal = URIUtils.ensureProtocol(fFeedDefinitionPage.getLink());
       if (linkVal.endsWith("/")) //Strip trailing slashes
         linkVal = linkVal.substring(0, linkVal.length() - 1);
       uriObj[0] = new URI(URIUtils.fastEncode(linkVal));

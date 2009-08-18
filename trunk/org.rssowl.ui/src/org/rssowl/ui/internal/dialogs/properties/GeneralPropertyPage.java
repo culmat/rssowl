@@ -519,10 +519,8 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
 
       /* Append "http" to Link if missing */
       String uriAsString = URIUtils.fastEncode(fFeedInput.getText());
-      if (URIUtils.looksLikeLink(uriAsString)) {
-        if (!uriAsString.contains("://"))
-          uriAsString = "http://" + uriAsString;
-      }
+      if (URIUtils.looksLikeLink(uriAsString))
+        uriAsString = URIUtils.ensureProtocol(uriAsString);
 
       /* Check for changed Feed */
       if (!bookmark.getFeedLinkReference().getLinkAsText().equals(uriAsString)) {
