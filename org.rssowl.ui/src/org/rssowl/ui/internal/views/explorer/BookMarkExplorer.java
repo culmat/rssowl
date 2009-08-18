@@ -31,6 +31,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
@@ -204,7 +205,7 @@ public class BookMarkExplorer extends ViewPart {
   private Label fSeparator;
   private Composite fSearchBarContainer;
   private BookMarkSearchbar fSearchBar;
-  private ToolBarManager fToolBarManager;
+  private IToolBarManager fToolBarManager;
 
   /* BookMark Sets */
   private Set<IFolder> fRootFolders;
@@ -801,7 +802,7 @@ public class BookMarkExplorer extends ViewPart {
   }
 
   private void hookToolBar() {
-    fToolBarManager = (ToolBarManager) fViewSite.getActionBars().getToolBarManager();
+    fToolBarManager = fViewSite.getActionBars().getToolBarManager();
 
     /* BookMark Filter */
     final IAction bookmarkFilter = new Action("Filter Bookmarks", IAction.AS_DROP_DOWN_MENU) {
@@ -813,8 +814,8 @@ public class BookMarkExplorer extends ViewPart {
           doFilter(BookMarkFilter.Type.SHOW_ALL);
 
         /* Show Menu */
-        else
-          getMenuCreator().getMenu(fToolBarManager.getControl()).setVisible(true);
+        else if (fToolBarManager instanceof ToolBarManager)
+          getMenuCreator().getMenu(((ToolBarManager) fToolBarManager).getControl()).setVisible(true);
       }
 
       @Override
@@ -936,8 +937,8 @@ public class BookMarkExplorer extends ViewPart {
           doGrouping(BookMarkGrouping.Type.NO_GROUPING);
 
         /* Show Menu */
-        else
-          getMenuCreator().getMenu(fToolBarManager.getControl()).setVisible(true);
+        else if (fToolBarManager instanceof ToolBarManager)
+          getMenuCreator().getMenu(((ToolBarManager) fToolBarManager).getControl()).setVisible(true);
       }
 
       @Override
