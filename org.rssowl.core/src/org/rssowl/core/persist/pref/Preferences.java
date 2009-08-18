@@ -292,8 +292,11 @@ public enum Preferences {
   /** Global: Hide Completed Downloads */
   HIDE_COMPLETED_DOWNLOADS("org.rssowl.pref.HideCompletedDownloads", IPreferenceType.BOOLEAN),
 
-  /** Global: List of Import Sources */
-  IMPORT_SOURCES("org.rssowl.pref.ImportSources", IPreferenceType.STRINGS),
+  /** Global: List of Import Resources */
+  IMPORT_RESOURCES("org.rssowl.pref.ImportResources", IPreferenceType.STRINGS),
+
+  /** Global: List of Import Keywords */
+  IMPORT_KEYWORDS("org.rssowl.pref.ImportKeywords", IPreferenceType.STRINGS),
 
   /******************************
    * Eclipse Preferences Follow *
