@@ -80,6 +80,9 @@ public class ModelSearchImpl implements IModelSearch {
   /* Cached News States */
   private static final INews.State[] NEWS_STATES = INews.State.values();
 
+  /* An increased clauses count to set in case of a MaxClouseCountException */
+  private static final int MAX_CLAUSE_COUNT = 65536;
+
   private volatile IndexSearcher fSearcher;
   private volatile Indexer fIndexer;
   private volatile Directory fDirectory;
@@ -336,7 +339,7 @@ public class ModelSearchImpl implements IModelSearch {
 
       /* Disable Clauses Limit */
       if (BooleanQuery.getMaxClauseCount() != Integer.MAX_VALUE) {
-        BooleanQuery.setMaxClauseCount(Integer.MAX_VALUE);
+        BooleanQuery.setMaxClauseCount(MAX_CLAUSE_COUNT);
         return doSearchNews(conditions, matchAllConditions);
       }
 
