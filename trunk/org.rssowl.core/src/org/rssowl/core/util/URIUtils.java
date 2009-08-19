@@ -102,8 +102,9 @@ public class URIUtils {
    * @param base the base {@link URI} to resolve against.
    * @param relative the relative {@link URI} to resolve.
    * @return a resolved {@link URI} that is absolute.
+   * @throws URISyntaxException in case of an error while resolving.
    */
-  public static URI resolve(URI base, URI relative) {
+  public static URI resolve(URI base, URI relative) throws URISyntaxException {
     if (relative.isAbsolute())
       return relative;
 
@@ -118,7 +119,7 @@ public class URIUtils {
       return base.resolve(relative);
 
     /* Resolve against Given Base By Appending Leading Slash */
-    return URI.create(base.toString() + "/").resolve(relative.toString());
+    return new URI(base.toString() + "/").resolve(relative.toString());
   }
 
   /**
