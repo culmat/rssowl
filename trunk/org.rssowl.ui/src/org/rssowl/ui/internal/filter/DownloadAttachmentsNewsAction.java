@@ -29,10 +29,12 @@ import org.rssowl.core.persist.IAttachment;
 import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 
@@ -59,8 +61,14 @@ public class DownloadAttachmentsNewsAction implements INewsAction {
           for (IAttachment attachment : attachments) {
             URI link = attachment.getLink();
             if (link != null) {
-              if (!link.isAbsolute())
-                link = URIUtils.resolve(newsitem.getFeedReference().getLink(), link);
+              if (!link.isAbsolute()) {
+                try {
+                  link = URIUtils.resolve(newsitem.getFeedReference().getLink(), link);
+                } catch (URISyntaxException e) {
+                  Activator.getDefault().logError(e.getMessage(), e);
+                  continue; //Proceed with other Attachments
+                }
+              }
             }
 
             if (link != null)
