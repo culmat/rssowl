@@ -150,7 +150,7 @@ public class ImportSourcePage extends WizardPage {
     /* Import from File or Website */
     fImportFromResourceRadio = new Button(container, SWT.RADIO);
     fImportFromResourceRadio.setSelection(true);
-    fImportFromResourceRadio.setText("Import From a File or Website (TODO)");
+    fImportFromResourceRadio.setText("Import Feeds from a File or Website:");
     fImportFromResourceRadio.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -198,7 +198,7 @@ public class ImportSourcePage extends WizardPage {
 
     /* Import from Keyword Search */
     fImportFromKeyword = new Button(container, SWT.RADIO);
-    fImportFromKeyword.setText("Import Feeds Matching the Following Keywords (TODO)");
+    fImportFromKeyword.setText("Import Feeds matching the following Keywords:");
     fImportFromKeyword.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -206,8 +206,8 @@ public class ImportSourcePage extends WizardPage {
         boolean importFromKeyword = fImportFromKeyword.getSelection();
         fKeywordInput.setEnabled(importFromKeyword);
         if (importFromKeyword) {
-          fKeywordInput.setFocus();
           hookKeywordAutocomplete();
+          fKeywordInput.setFocus();
         }
       }
     });
