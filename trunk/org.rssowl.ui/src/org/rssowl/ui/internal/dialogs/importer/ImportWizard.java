@@ -45,6 +45,7 @@ import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
+import org.rssowl.ui.internal.dialogs.importer.ImportSourcePage.Source;
 import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
@@ -119,9 +120,11 @@ public class ImportWizard extends Wizard {
   @Override
   public boolean canFinish() {
 
-    /* Prohibit direct Finish from Sources that require a remote connection */
-    if (getContainer().getCurrentPage() == fImportSourcePage && fImportSourcePage.isRemoteSource())
-      return false;
+    /* Prohibit direct Finish from Sources that require a remote connection or include recommended feeds */
+    if (getContainer().getCurrentPage() == fImportSourcePage) {
+      if (fImportSourcePage.isRemoteSource() || fImportSourcePage.getSource() == Source.RECOMMENDED)
+        return false;
+    }
 
     /* Other Pages decide on their own */
     return super.canFinish();
