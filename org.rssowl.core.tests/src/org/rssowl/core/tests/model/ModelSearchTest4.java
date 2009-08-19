@@ -27,6 +27,7 @@ package org.rssowl.core.tests.model;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
+import org.apache.lucene.search.BooleanQuery;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -1069,6 +1070,8 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
    */
   @Test
   public void testMaxClauseCount() throws Exception {
+    int maxClauseCount = BooleanQuery.getMaxClauseCount();
+
     IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
     createNews(feed, "Foo", "http://www.news.com/news3.html", State.READ);
     DynamicDAO.save(feed);
@@ -1088,6 +1091,8 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
     List<SearchHit<NewsReference>> result = fModelSearch.searchNews(conditions, false);
     assertEquals(1, result.size());
     assertEquals("Foo", result.get(0).getResult().resolve().getTitle());
+
+    BooleanQuery.setMaxClauseCount(maxClauseCount);
   }
 
   /**
