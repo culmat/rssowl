@@ -768,15 +768,24 @@ public class DefaultProtocolHandler implements IProtocolHandler {
                 str.append(c);
               }
 
-              /* Handle relative Links */
               String linkVal = str.toString();
-              if (!linkVal.contains("://")) {
-                try {
-                  if (!linkVal.startsWith("/"))
-                    linkVal = "/" + linkVal;
-                  linkVal = website.resolve(linkVal).toString();
-                } catch (IllegalArgumentException e) {
-                  linkVal = linkVal.startsWith("/") ? website.toString() + linkVal : website.toString() + "/" + linkVal;
+
+              /* Handle relative Links */
+              try {
+                URI uri = new URI(linkVal);
+                linkVal = URIUtils.resolve(website, uri).toString();
+              }
+
+              /* Fallback if URI is not valid */
+              catch (URISyntaxException e) {
+                if (!linkVal.contains("://")) {
+                  try {
+                    if (!linkVal.startsWith("/"))
+                      linkVal = "/" + linkVal;
+                    linkVal = website.resolve(linkVal).toString();
+                  } catch (IllegalArgumentException e1) {
+                    linkVal = linkVal.startsWith("/") ? website.toString() + linkVal : website.toString() + "/" + linkVal;
+                  }
                 }
               }
 
