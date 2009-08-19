@@ -36,12 +36,14 @@ import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
 import org.rssowl.ui.internal.FolderNewsMark;
 import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -299,8 +301,14 @@ public class ModelUtils {
       for (IAttachment attachment : attachments) {
         URI link = attachment.getLink();
         if (link != null) {
-          if (!link.isAbsolute())
-            link = URIUtils.resolve(newsitem.getFeedReference().getLink(), link);
+          if (!link.isAbsolute()) {
+            try {
+              link = URIUtils.resolve(newsitem.getFeedReference().getLink(), link);
+            } catch (URISyntaxException e) {
+              Activator.getDefault().logError(e.getMessage(), e);
+              continue; //Proceed with other Attachments
+            }
+          }
 
           attachmentLinks.add(Pair.create(attachment, link));
         }
