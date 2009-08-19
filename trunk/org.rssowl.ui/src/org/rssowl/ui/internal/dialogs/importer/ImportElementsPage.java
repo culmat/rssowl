@@ -459,7 +459,7 @@ public class ImportElementsPage extends WizardPage {
         Exception error = null;
         boolean bruteForce = false;
         try {
-          monitor.beginTask("Searching for Feeds ('Cancel' to stop)", IProgressMonitor.UNKNOWN);
+          monitor.beginTask("Importing Feeds ('Cancel' to stop)", IProgressMonitor.UNKNOWN);
           monitor.subTask("Connecting to " + link.getHost() + "...");
 
           /* Return on Cancellation */
