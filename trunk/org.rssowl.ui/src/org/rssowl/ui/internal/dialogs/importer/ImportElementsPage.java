@@ -30,6 +30,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
+import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -38,8 +39,11 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Shell;
 import org.rssowl.core.Owl;
+import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
+import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.IAbortable;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IProtocolHandler;
@@ -66,6 +70,7 @@ import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.importer.ImportSourcePage.Source;
 import org.rssowl.ui.internal.util.FolderChildCheckboxTree;
 import org.rssowl.ui.internal.util.JobRunner;
@@ -114,9 +119,9 @@ public class ImportElementsPage extends WizardPage {
   private long fCurrentSourceFileModified;
 
   /* Imported Entities */
-  private List<ILabel> fLabels = new ArrayList<ILabel>();
-  private List<ISearchFilter> fFilters = new ArrayList<ISearchFilter>();
-  private List<IPreference> fPreferences = new ArrayList<IPreference>();
+  private List<ILabel> fLabels = Collections.synchronizedList(new ArrayList<ILabel>());
+  private List<ISearchFilter> fFilters = Collections.synchronizedList(new ArrayList<ISearchFilter>());
+  private List<IPreference> fPreferences = Collections.synchronizedList(new ArrayList<IPreference>());
 
   /* Filter to Exclude Existing Bookmarks (empty folders are excluded as well) */
   private static class ExistingBookmarkFilter extends ViewerFilter {
@@ -323,7 +328,7 @@ public class ImportElementsPage extends WizardPage {
 
   private void updateMessage(boolean clearErrors) {
     List<?> input = (List<?>) fViewer.getInput();
-    if (!input.isEmpty() && fViewer.getTree().getItemCount() == 0)
+    if (!input.isEmpty() && fViewer.getTree().getItemCount() == 0 && fViewer.getFilters().length > 0)
       setMessage("Some elemens are hidden because they already exist.", IMessageProvider.WARNING);
     else
       setMessage("Please choose the elements to import.");
@@ -368,8 +373,12 @@ public class ImportElementsPage extends WizardPage {
     try {
       doImportSource();
     } catch (Exception e) {
-      Activator.getDefault().logError(e.getMessage(), e);
-      setErrorMessage(e.getMessage());
+      String message = e.getMessage();
+      if (e instanceof InvocationTargetException && e.getCause() != null && StringUtils.isSet(e.getCause().getMessage()))
+        message = e.getCause().getMessage();
+
+      Activator.getDefault().logError(message, e);
+      setErrorMessage(message);
     }
   }
 
@@ -409,6 +418,10 @@ public class ImportElementsPage extends WizardPage {
     fFilters.clear();
     fPreferences.clear();
 
+    /* Reset Messages */
+    setErrorMessage(null);
+    setMessage("Please choose the elements to import.");
+
     /* Import from Supplied File */
     if (source == Source.RESOURCE && sourceFile != null && sourceFile.exists()) {
       importFromLocalResource(new FileInputStream(sourceFile));
@@ -440,13 +453,14 @@ public class ImportElementsPage extends WizardPage {
 
   private void importFromOnlineResource(final URI link) throws InvocationTargetException, InterruptedException {
     IRunnableWithProgress runnable = new IRunnableWithProgress() {
-      public void run(IProgressMonitor monitor) throws InvocationTargetException {
+      public void run(final IProgressMonitor monitor) throws InvocationTargetException {
         InputStream in = null;
         boolean canceled = false;
         Exception error = null;
         boolean bruteForce = false;
         try {
-          monitor.beginTask("Searching for Feeds ('Cancel' to stop)...", IProgressMonitor.UNKNOWN);
+          monitor.beginTask("Searching for Feeds ('Cancel' to stop)", IProgressMonitor.UNKNOWN);
+          monitor.subTask("Connecting to " + link.getHost() + "...");
 
           /* Return on Cancellation */
           if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
@@ -488,7 +502,57 @@ public class ImportElementsPage extends WizardPage {
 
         /* Error finding a Handler for the Link - Rethrow */
         catch (Exception e) {
-          throw new InvocationTargetException(e);
+          final boolean showError[] = new boolean[] { true };
+
+          /* Give user a chance to log in */
+          if (e instanceof AuthenticationRequiredException && !monitor.isCanceled() && !Controller.getDefault().isShuttingDown()) {
+            final Shell shell = OwlUI.getActiveShell();
+            if (shell != null && !shell.isDisposed()) {
+              Controller.getDefault().getLoginDialogLock().lock();
+              try {
+                final AuthenticationRequiredException authEx = (AuthenticationRequiredException) e;
+                JobRunner.runSyncedInUIThread(shell, new Runnable() {
+                  public void run() {
+                    try {
+
+                      /* Return on Cancelation or shutdown or deletion */
+                      if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
+                        return;
+
+                      /* Credentials might have been provided meanwhile in another dialog */
+                      try {
+                        URI normalizedUri = URIUtils.normalizeUri(link, true);
+                        if (Owl.getConnectionService().getAuthCredentials(normalizedUri, authEx.getRealm()) != null) {
+                          importFromOnlineResource(link);
+                          showError[0] = false;
+                          return;
+                        }
+                      } catch (CredentialsException exe) {
+                        Activator.getDefault().getLog().log(exe.getStatus());
+                      }
+
+                      /* Show Login Dialog */
+                      LoginDialog login = new LoginDialog(shell, link, authEx.getRealm());
+                      if (login.open() == Window.OK && !monitor.isCanceled() && !Controller.getDefault().isShuttingDown()) {
+                        importFromOnlineResource(link);
+                        showError[0] = false;
+                      }
+                    } catch (InvocationTargetException e) {
+                      /* Ignore - Error will be handled outside already */
+                    } catch (InterruptedException e) {
+                      /* Ignore - Error will be handled outside already */
+                    }
+                  }
+                });
+              } finally {
+                Controller.getDefault().getLoginDialogLock().unlock();
+              }
+            }
+          }
+
+          /* Rethrow Exception */
+          if (showError[0])
+            throw new InvocationTargetException(e);
         } finally {
 
           /* Close Input Stream */
@@ -526,7 +590,8 @@ public class ImportElementsPage extends WizardPage {
     IRunnableWithProgress runnable = new IRunnableWithProgress() {
       public void run(IProgressMonitor monitor) throws InvocationTargetException {
         try {
-          monitor.beginTask("Searching for Feeds ('Cancel' to stop)...", IProgressMonitor.UNKNOWN);
+          monitor.beginTask("Searching for Feeds ('Cancel' to stop)", IProgressMonitor.UNKNOWN);
+          monitor.subTask("Connecting...");
 
           /* Build Link for Keyword-Feed Search */
           StringBuilder linkVal = new StringBuilder("http://www.syndic8.com/feedlist.php?ShowMatch=");
@@ -558,7 +623,9 @@ public class ImportElementsPage extends WizardPage {
     String content = readContent(resourceLink, monitor);
 
     /* Extract Links from Content */
-    List<String> links = RegExUtils.extractLinksFromText(content, false);
+    List<String> links = Collections.emptyList();
+    if (StringUtils.isSet(content))
+      links = RegExUtils.extractLinksFromText(content, false);
 
     /* Sort List: First process likely feeds, then others */
     final String resourceLinkValue = resourceLink.toString();
@@ -583,17 +650,29 @@ public class ImportElementsPage extends WizardPage {
       }
     });
 
+    /* Reset Input to Empty in the Beginning  */
+    JobRunner.runInUIThread(getShell(), new Runnable() {
+      @SuppressWarnings("unchecked")
+      public void run() {
+        setImportedElements(Collections.EMPTY_LIST);
+      }
+    });
+
     /* Update Task Information */
     monitor.beginTask("Searching for Feeds ('Cancel' to stop)", links.size());
+    if (isKeywordSearch)
+      monitor.subTask("Connecting...");
+    else
+      monitor.subTask("Connecting to " + resourceLink.getHost() + "...");
 
     /* A Root to add Found Bookmarks into */
     final IFolder defaultRootFolder = Owl.getModelFactory().createFolder(null, null, "Bookmarks");
     defaultRootFolder.setProperty(ITypeImporter.TEMPORARY_FOLDER, true);
 
     /* For Each Link of the Queue - try to interpret as Feed */
-    IBookMarkDAO dao = DynamicDAO.getDAO(IBookMarkDAO.class);
-    final List<IBookMark> foundBookMarks = new ArrayList<IBookMark>();
+    int counter = 0;
     final List<String> foundBookMarkNames = new ArrayList<String>();
+    IBookMarkDAO dao = DynamicDAO.getDAO(IBookMarkDAO.class);
     for (String feedLinkVal : links) {
       monitor.worked(1);
 
@@ -608,8 +687,8 @@ public class ImportElementsPage extends WizardPage {
           continue;
 
         /* Report Progress Back To User */
-        if (!foundBookMarks.isEmpty())
-          monitor.subTask(foundBookMarks.size() + (foundBookMarks.size() == 1 ? " Result" : " Results"));
+        if (counter != 0)
+          monitor.subTask(counter + (counter == 1 ? " Result" : " Results"));
 
         /* Return on Cancellation */
         if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
@@ -641,7 +720,9 @@ public class ImportElementsPage extends WizardPage {
           if (sameTitleExists && StringUtils.isSet(feed.getFormat()))
             title = title + " (" + feed.getFormat() + ")";
 
-          IBookMark bookmark = Owl.getModelFactory().createBookMark(null, defaultRootFolder, new FeedLinkReference(feedLink), title);
+          final IBookMark bookmark = Owl.getModelFactory().createBookMark(null, defaultRootFolder, new FeedLinkReference(feedLink), title);
+          foundBookMarkNames.add(bookmark.getName());
+          counter++;
 
           if (StringUtils.isSet(feed.getDescription()))
             bookmark.setProperty(ITypeImporter.DESCRIPTION_KEY, feed.getDescription());
@@ -649,8 +730,12 @@ public class ImportElementsPage extends WizardPage {
           if (feed.getHomepage() != null)
             bookmark.setProperty(ITypeImporter.HOMEPAGE_KEY, feed.getHomepage());
 
-          foundBookMarks.add(bookmark);
-          foundBookMarkNames.add(bookmark.getName());
+          /* Directly show in Viewer */
+          JobRunner.runInUIThread(getShell(), new Runnable() {
+            public void run() {
+              addImportedElement(bookmark);
+            }
+          });
         }
       }
 
@@ -676,12 +761,14 @@ public class ImportElementsPage extends WizardPage {
       }
     }
 
-    /* Show Elements in UI */
-    JobRunner.runInUIThread(getShell(), new Runnable() {
-      public void run() {
-        setImportedElements(foundBookMarks);
-      }
-    });
+    /* Inform if no feeds have been found */
+    if (counter == 0) {
+      JobRunner.runInUIThread(getShell(), new Runnable() {
+        public void run() {
+          setMessage("No Feeds Found during Search.", IMessageProvider.INFORMATION);
+        }
+      });
+    }
   }
 
   private String readContent(URI link, IProgressMonitor monitor) throws ConnectionException, IOException {
@@ -741,6 +828,16 @@ public class ImportElementsPage extends WizardPage {
     fViewer.setInput(folderChilds);
     OwlUI.setAllChecked(fViewer.getTree(), true);
     fExistingFilter.clear();
+    updateMessage(true);
+  }
+
+  /* Adds a IFolderChild to the Viewer and updates caches */
+  @SuppressWarnings("unchecked")
+  private void addImportedElement(IFolderChild child) {
+    Object input = fViewer.getInput();
+    ((List) input).add(child);
+    fViewer.add(input, child);
+    fViewer.setChecked(child, true);
     updateMessage(true);
   }
 }
