@@ -44,6 +44,7 @@ import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.ICategoryDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
+import org.rssowl.core.persist.dao.IPersonDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
@@ -68,7 +69,7 @@ import java.util.TreeSet;
 public class ImportSourcePage extends WizardPage {
 
   /* Max number of Sources to remember */
-  private static final int MAX_REMEMBER_SOURCES = 8;
+  private static final int MAX_REMEMBER_SOURCES = 20;
 
   private Button fImportFromResourceRadio;
   private Combo fResourceInput;
@@ -78,6 +79,8 @@ public class ImportSourcePage extends WizardPage {
   private Button fImportFromRecommendedRadio;
   private IPreferenceScope fPreferences;
   private boolean fIsAutoCompleteKeywordHooked;
+  private final String fWebsite;
+  private final boolean fIsKewordSearch;
 
   /* Sources for Import */
   enum Source {
@@ -97,9 +100,13 @@ public class ImportSourcePage extends WizardPage {
 
   /**
    * @param pageName
+   * @param website
+   * @param isKewordSearch
    */
-  protected ImportSourcePage(String pageName) {
+  protected ImportSourcePage(String pageName, String website, boolean isKewordSearch) {
     super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/import_wiz.png"));
+    fWebsite = website;
+    fIsKewordSearch = isKewordSearch;
     setMessage("Please choose the source of import.");
     fPreferences = Owl.getPreferenceService().getGlobalScope();
   }
@@ -149,7 +156,7 @@ public class ImportSourcePage extends WizardPage {
 
     /* Import from File or Website */
     fImportFromResourceRadio = new Button(container, SWT.RADIO);
-    fImportFromResourceRadio.setSelection(true);
+    fImportFromResourceRadio.setSelection(!fIsKewordSearch);
     fImportFromResourceRadio.setText("Import Feeds from a File or Website:");
     fImportFromResourceRadio.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -170,8 +177,13 @@ public class ImportSourcePage extends WizardPage {
     sourceInputContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fResourceInput = new Combo(sourceInputContainer, SWT.DROP_DOWN | SWT.BORDER);
+    fResourceInput.setVisibleItemCount(15);
+    fResourceInput.setEnabled(fImportFromResourceRadio.getSelection());
     fResourceInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    fResourceInput.setFocus();
+    if (StringUtils.isSet(fWebsite))
+      fResourceInput.setText(fWebsite);
+    if (fImportFromResourceRadio.getSelection())
+      fResourceInput.setFocus();
 
     String[] previousResources = fPreferences.getStrings(DefaultPreferences.IMPORT_RESOURCES);
     if (previousResources != null) {
@@ -188,6 +200,7 @@ public class ImportSourcePage extends WizardPage {
 
     fBrowseFileButton = new Button(sourceInputContainer, SWT.PUSH);
     fBrowseFileButton.setText("Browse...");
+    fBrowseFileButton.setEnabled(fImportFromResourceRadio.getSelection());
     setButtonLayoutData(fBrowseFileButton);
     fBrowseFileButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -198,6 +211,7 @@ public class ImportSourcePage extends WizardPage {
 
     /* Import from Keyword Search */
     fImportFromKeyword = new Button(container, SWT.RADIO);
+    fImportFromKeyword.setSelection(fIsKewordSearch);
     fImportFromKeyword.setText("Import Feeds matching the following Keywords:");
     fImportFromKeyword.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -206,7 +220,7 @@ public class ImportSourcePage extends WizardPage {
         boolean importFromKeyword = fImportFromKeyword.getSelection();
         fKeywordInput.setEnabled(importFromKeyword);
         if (importFromKeyword) {
-          hookKeywordAutocomplete();
+          hookKeywordAutocomplete(false);
           fKeywordInput.setFocus();
         }
       }
@@ -220,7 +234,12 @@ public class ImportSourcePage extends WizardPage {
 
     fKeywordInput = new Combo(keywordInputContainer, SWT.DROP_DOWN | SWT.BORDER);
     fKeywordInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    fKeywordInput.setEnabled(false);
+    fKeywordInput.setVisibleItemCount(15);
+    fKeywordInput.setEnabled(fImportFromKeyword.getSelection());
+    if (fImportFromKeyword.getSelection()) {
+      hookKeywordAutocomplete(true);
+      fKeywordInput.setFocus();
+    }
 
     String[] previousKeywords = fPreferences.getStrings(DefaultPreferences.IMPORT_KEYWORDS);
     if (previousKeywords != null) {
@@ -350,7 +369,7 @@ public class ImportSourcePage extends WizardPage {
       fPreferences.putStrings(prefKey, newValues.toArray(new String[newValues.size()]));
   }
 
-  private void hookKeywordAutocomplete() {
+  private void hookKeywordAutocomplete(boolean delay) {
 
     /* Only perform once */
     if (fIsAutoCompleteKeywordHooked)
@@ -360,7 +379,7 @@ public class ImportSourcePage extends WizardPage {
     final Pair<SimpleContentProposalProvider, ContentProposalAdapter> autoComplete = OwlUI.hookAutoComplete(fKeywordInput, null, true);
 
     /* Load proposals in the Background */
-    JobRunner.runDelayedInBackgroundThread(new Runnable() {
+    JobRunner.runInBackgroundThread(delay ? 100 : 0, new Runnable() {
       public void run() {
         if (!fKeywordInput.isDisposed()) {
           Set<String> values = new TreeSet<String>(new Comparator<String>() {
@@ -371,6 +390,9 @@ public class ImportSourcePage extends WizardPage {
 
           /* Add all Categories */
           values.addAll(DynamicDAO.getDAO(ICategoryDAO.class).loadAllNames());
+
+          /* Add all Authors */
+          values.addAll(DynamicDAO.getDAO(IPersonDAO.class).loadAllNames());
 
           /* Add all Labels */
           Collection<ILabel> labels = DynamicDAO.getDAO(ILabelDAO.class).loadAll();
