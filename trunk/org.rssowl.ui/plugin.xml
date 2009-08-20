@@ -350,7 +350,7 @@
                definitionId="org.rssowl.ui.CleanUpAction"
                id="org.rssowl.ui.CleanUpAction"
                label="&amp;Clean Up..."
-               menubarPath="tools/begin">
+               menubarPath="tools/middle">
          </action>
       </actionSet>
       <actionSet
@@ -363,7 +363,7 @@
                icon="icons/etool16/filter.gif"
                id="org.rssowl.ui.OpenNewsFiltersAction"
                label="&amp;News Filters..."
-               menubarPath="tools/begin"
+               menubarPath="tools/middle"
                style="push">
          </action>
       </actionSet>
@@ -378,6 +378,20 @@
                id="org.rssowl.ui.ShowActivityAction"
                label="&amp;Downloads &amp;&amp; Activity"
                menubarPath="tools/end"
+               style="push">
+         </action>
+      </actionSet>
+      <actionSet
+            id="org.rssowl.ui.FindNewFeedsSet"
+            label="Find New Feeds"
+            visible="true">
+         <action
+               class="org.rssowl.ui.internal.actions.SearchFeedsAction"
+               definitionId="org.rssowl.ui.SearchFeedsAction"
+               icon="icons/etool16/new_bkmrk.gif"
+               id="org.rssowl.ui.SearchFeedsAction"
+               label="&amp;Find New Feeds..."
+               menubarPath="tools/begin"
                style="push">
          </action>
       </actionSet>
@@ -827,6 +841,12 @@
             description="Show pending feed updates and downloads."
             id="org.rssowl.ui.ShowActivityAction"
             name="Downloads &amp; Activity">
+      </command>
+      <command
+            categoryId="org.rssowl.ui.commands.category.RSSOwl"
+            description="Search for Feeds based on Keywords."
+            id="org.rssowl.ui.SearchFeedsAction"
+            name="Find New Feeds">
       </command>
    </extension>
    <extension

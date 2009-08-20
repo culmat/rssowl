@@ -722,6 +722,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     /* Contributions */
     toolsMenu.add(new GroupMarker("begin"));
     toolsMenu.add(new Separator());
+    toolsMenu.add(new GroupMarker("middle"));
+    toolsMenu.add(new Separator());
     toolsMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
     toolsMenu.add(new Separator());
     toolsMenu.add(new GroupMarker("end"));
