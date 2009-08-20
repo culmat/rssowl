@@ -5,6 +5,7 @@
    <extension-point id="KeywordFeed" name="Keyword Feed" schema="schema/KeywordFeed.exsd"/>
    <extension-point id="NewsActionPresentation" name="News Action Presentation" schema="schema/NewsActionPresentation.exsd"/>
    <extension-point id="ShareProvider" name="Share Provider" schema="schema/ShareProvider.exsd"/>
+   <extension-point id="FeedSearch" name="Feed Search" schema="schema/FeedSearch.exsd"/>
 
    <extension
          id="rssowl"
@@ -1790,5 +1791,12 @@
             name="Propeller"
             url="http://www.propeller.com/submit/?U=[L]&amp;T=[T]">
       </shareProvider>
+   </extension>
+   <extension
+         point="org.rssowl.ui.FeedSearch">
+      <feedSearch
+            id="org.rssowl.ui.DefaultFeedSearch"
+            searchUrl="http://www.syndic8.com/feedlist.php?ShowMatch=[K]&amp;ShowStatus=all">
+      </feedSearch>
    </extension>
 </plugin>
