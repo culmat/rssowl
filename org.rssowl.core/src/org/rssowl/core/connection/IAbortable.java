@@ -24,7 +24,6 @@
 
 package org.rssowl.core.connection;
 
-import org.rssowl.core.internal.connection.HttpConnectionInputStream;
 
 /**
  * Implementors of {@link IAbortable} support cancellation of connections.

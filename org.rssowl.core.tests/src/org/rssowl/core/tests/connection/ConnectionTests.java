@@ -360,7 +360,7 @@ public class ConnectionTests {
     IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("http://www.planeteclipse.org");
 
-    assertEquals("http://www.planeteclipse.org/rss20.xml", conManager.getFeed(feedUrl).toString());
+    assertEquals("http://www.planeteclipse.org/planet/rss20.xml", conManager.getFeed(feedUrl).toString());
   }
 
   /**

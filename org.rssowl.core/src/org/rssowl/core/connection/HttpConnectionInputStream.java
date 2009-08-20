@@ -22,18 +22,18 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.internal.connection;
+package org.rssowl.core.connection;
 
 import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.URIException;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.rssowl.core.connection.IAbortable;
-import org.rssowl.core.connection.IConditionalGetCompatible;
-import org.rssowl.core.connection.MonitorCanceledException;
 
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * <p>
@@ -60,19 +60,22 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
   private final IProgressMonitor fMonitor;
   private String fIfModifiedSince;
   private String fIfNoneMatch;
+  private final URI fLink;
 
   /**
    * Creates a <code>HttpConnectionInputStream</code> by assigning the argument
    * <code>inS</code> to the field <code>this.in</code> so as to remember it for
    * later use.
    *
+   * @param link the {@link URI} that was used to create the Stream.
    * @param getMethod The Method holding the connection of the given Stream.
    * @param monitor A ProgressMonitor to support early cancelation, or
    * <code>NULL</code> if no monitor is being used.
    * @param inS the underlying input Stream.
    */
-  public HttpConnectionInputStream(GetMethod getMethod, IProgressMonitor monitor, InputStream inS) {
+  public HttpConnectionInputStream(URI link, GetMethod getMethod, IProgressMonitor monitor, InputStream inS) {
     super(inS);
+    fLink = link;
     fGetMethod = getMethod;
     fMonitor = monitor;
 
@@ -84,6 +87,19 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
     Header headerETag = getMethod.getResponseHeader(HEADER_RESPONSE_ETAG);
     if (headerETag != null)
       setIfNoneMatch(headerETag.getValue());
+  }
+
+  /**
+   * @return the actual {@link URI} used to open this stream.
+   */
+  public URI getLink() {
+    try {
+      return new URI(fGetMethod.getURI().toString());
+    } catch (URIException e) {
+      return fLink;
+    } catch (URISyntaxException e) {
+      return fLink;
+    }
   }
 
   /*
