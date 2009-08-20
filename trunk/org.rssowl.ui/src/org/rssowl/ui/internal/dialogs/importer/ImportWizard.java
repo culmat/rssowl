@@ -64,6 +64,23 @@ public class ImportWizard extends Wizard {
   private ImportElementsPage fImportElementsPage;
   private ImportTargetPage fImportTargetPage;
   private ImportOptionsPage fImportOptionsPage;
+  private String fWebsite;
+  private boolean fIsKewordSearch;
+
+  /** Default Constructor */
+  public ImportWizard() {
+    this(null, false);
+  }
+
+  /**
+   * @param website a link to a website to discover feeds on.
+   * @param isKeywordSearch defines if the keyword search should be selected or
+   * not.
+   */
+  public ImportWizard(String website, boolean isKeywordSearch) {
+    fWebsite = website;
+    fIsKewordSearch = isKeywordSearch;
+  }
 
   /*
    * @see org.eclipse.jface.wizard.Wizard#addPages()
@@ -73,7 +90,7 @@ public class ImportWizard extends Wizard {
     setWindowTitle("Import");
 
     /* Page 1: Source to Import */
-    fImportSourcePage = new ImportSourcePage("Choose Source");
+    fImportSourcePage = new ImportSourcePage("Choose Source", fWebsite, fIsKewordSearch);
     addPage(fImportSourcePage);
 
     /* Page 2: Elements to Import */
@@ -190,6 +207,13 @@ public class ImportWizard extends Wizard {
         PlatformUI.getWorkbench().restart();
         return true;
       }
+    }
+
+    /* Reveal and Select Target Folder */
+    if (target != null && target.getParent() != null) {
+      BookMarkExplorer explorer = OwlUI.getOpenBookMarkExplorer();
+      if (explorer != null)
+        explorer.reveal(target, true);
     }
 
     /* Reload Imported Elements */
