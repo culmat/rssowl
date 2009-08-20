@@ -494,7 +494,7 @@ public class SearchConditionItem extends Composite {
             final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = OwlUI.hookAutoComplete(text, null, false);
 
             /* Load proposals in the Background */
-            JobRunner.runDelayedInBackgroundThread(new Runnable() {
+            JobRunner.runInBackgroundThread(100, new Runnable() {
               public void run() {
                 if (!text.isDisposed()) {
                   Set<String> values = new TreeSet<String>(new Comparator<String>() {
