@@ -134,7 +134,7 @@ public class LabelDialog extends Dialog {
       final Pair<SimpleContentProposalProvider, ContentProposalAdapter> pair = OwlUI.hookAutoComplete(fNameInput, null, true);
 
       /* Load proposals in the Background */
-      JobRunner.runDelayedInBackgroundThread(new Runnable() {
+      JobRunner.runInBackgroundThread(100, new Runnable() {
         public void run() {
           if (!fNameInput.isDisposed()) {
             Set<String> values = new TreeSet<String>(new Comparator<String>() {
