@@ -76,11 +76,13 @@ import org.rssowl.ui.internal.util.FolderChildCheckboxTree;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -594,16 +596,14 @@ public class ImportElementsPage extends WizardPage {
           monitor.subTask("Connecting...");
 
           /* Build Link for Keyword-Feed Search */
-          StringBuilder linkVal = new StringBuilder("http://www.syndic8.com/feedlist.php?ShowMatch=");
-          linkVal.append(URIUtils.urlEncode(keywords));
-          linkVal.append("&ShowStatus=all");
+          String linkVal = Controller.getDefault().toFeedSearchLink(keywords);
 
           /* Return on Cancellation */
           if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
             return;
 
           /* Scan remote Resource for Links and valid Feeds */
-          importFromOnlineResourceBruteforce(new URI(linkVal.toString()), monitor, true);
+          importFromOnlineResourceBruteforce(new URI(linkVal), monitor, true);
         } catch (Exception e) {
           throw new InvocationTargetException(e);
         } finally {
@@ -649,6 +649,17 @@ public class ImportElementsPage extends WizardPage {
         return -1;
       }
     });
+
+    /* If this is not a keyword search, add the top most feed entry first */
+    if (!isKeywordSearch) {
+      URI feed = CoreUtils.findFeed(new BufferedReader(new StringReader(content)), resourceLink);
+      if (feed != null) {
+        String feedStr = feed.toString();
+        if (links.contains(feedStr))
+          links.remove(feedStr);
+        links.add(0, feedStr);
+      }
+    }
 
     /* Reset Input to Empty in the Beginning  */
     JobRunner.runInUIThread(getShell(), new Runnable() {
@@ -838,6 +849,5 @@ public class ImportElementsPage extends WizardPage {
     ((List) input).add(child);
     fViewer.add(input, child);
     fViewer.setChecked(child, true);
-    updateMessage(true);
   }
 }
