@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
@@ -83,6 +84,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
+import org.rssowl.core.util.ExtensionUtils;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.JobQueue;
 import org.rssowl.core.util.LoggingSafeRunnable;
@@ -207,6 +209,12 @@ public class Controller {
   /* Share News Provider Extension Point */
   private static final String SHARE_PROVIDER_EXTENSION_POINT = "org.rssowl.ui.ShareProvider";
 
+  /* Feed Search Extension Point */
+  private static final String FEED_SEARCH_EXTENSION_POINT = "org.rssowl.ui.FeedSearch";
+
+  /* Token to replace keywords with in the Feed Search Link */
+  private static final String FEED_SEARCH_KEYWORD_TOKEN = "[K]";
+
   /* Misc. */
   private final IApplicationService fAppService;
   private CleanUpReminderService fCleanUpReminderService;
@@ -224,6 +232,7 @@ public class Controller {
   private final int fConnectionTimeout;
   private List<ShareProvider> fShareProviders = new ArrayList<ShareProvider>();
   private Map<Long, Long> fDeletedBookmarksCache = new ConcurrentHashMap<Long, Long>();
+  private String fFeedSearchUrl;
 
   /**
    * A listener that informs when a {@link IBookMark} is getting reloaded from
@@ -891,6 +900,9 @@ public class Controller {
 
     /* Load Contributed News Share Providers */
     loadShareProviders();
+
+    /* Load Feed Search Provider */
+    fFeedSearchUrl = loadFeedSearchUrl();
   }
 
   private void loadShareProviders() {
@@ -911,6 +923,26 @@ public class Controller {
       boolean isEnabled = (enabled != null && Boolean.parseBoolean(enabled));
       fShareProviders.add(new ShareProvider(id, element.getNamespaceIdentifier(), i, name, iconPath, url, maxTitleLength, isEnabled));
     }
+  }
+
+  private String loadFeedSearchUrl() {
+    String feedSearch = null;
+    IExtensionRegistry reg = Platform.getExtensionRegistry();
+    IConfigurationElement elements[] = reg.getConfigurationElementsFor(FEED_SEARCH_EXTENSION_POINT);
+    for (IConfigurationElement element : elements) {
+      try {
+        feedSearch = element.getAttribute("searchUrl"); //$NON-NLS-1$
+
+        /* Let 3d-Party contributions override our contributions */
+        String nsId = element.getNamespaceIdentifier();
+        if (!nsId.contains(ExtensionUtils.RSSOWL_NAMESPACE))
+          return feedSearch;
+      } catch (InvalidRegistryObjectException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
+    }
+
+    return feedSearch;
   }
 
   /**
@@ -1276,6 +1308,15 @@ public class Controller {
    */
   public Lock getLoginDialogLock() {
     return fLoginDialogLock;
+  }
+
+  /**
+   * @param keywords the keywords to use as search for feeds.
+   * @return a {@link String} that can be used as link for search.
+   */
+  public String toFeedSearchLink(String keywords) {
+    String encodedKeywords = URIUtils.urlEncode(keywords.trim());
+    return StringUtils.replaceAll(fFeedSearchUrl, FEED_SEARCH_KEYWORD_TOKEN, encodedKeywords);
   }
 
   private void fireBookMarkAboutToLoad(final IBookMark bookmark) {
