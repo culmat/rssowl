@@ -45,6 +45,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.CredentialsException;
+import org.rssowl.core.connection.HttpConnectionInputStream;
 import org.rssowl.core.connection.IConditionalGetCompatible;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.ICredentials;
@@ -388,7 +389,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       monitor = (IProgressMonitor) properties.get(IConnectionPropertyConstants.PROGRESS_MONITOR);
 
     /* Return a Stream that releases the connection once closed */
-    return new HttpConnectionInputStream(getMethod, monitor, inS);
+    return new HttpConnectionInputStream(link, getMethod, monitor, inS);
   }
 
   private InputStream loadFileProtocol(URI link) throws ConnectionException {
@@ -727,9 +728,15 @@ public class DefaultProtocolHandler implements IProtocolHandler {
    * @see org.rssowl.core.connection.IProtocolHandler#getFeed(java.net.URI)
    */
   public URI getFeed(final URI website) throws ConnectionException {
-    BufferedInputStream bufIns = new BufferedInputStream(openStream(website, null));
+    InputStream ins = openStream(website, null);
+    BufferedInputStream bufIns = new BufferedInputStream(ins);
     BufferedReader reader = new BufferedReader(new InputStreamReader(bufIns));
 
+    /* Use real Base if possible */
+    if (ins instanceof HttpConnectionInputStream)
+      return CoreUtils.findFeed(reader, ((HttpConnectionInputStream) ins).getLink());
+
+    /* Otherwise use request URI */
     return CoreUtils.findFeed(reader, website);
   }
 }
