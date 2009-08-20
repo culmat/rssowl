@@ -526,7 +526,7 @@ public class BookMarkExplorer extends ViewPart {
     /* Try to select and reveal editor input in the Explorer */
     IEditorInput editorInput = part.getEditorInput();
     if (editorInput instanceof FeedViewInput)
-      reveal(((FeedViewInput) editorInput).getMark());
+      reveal(((FeedViewInput) editorInput).getMark(), false);
   }
 
   /**
@@ -538,16 +538,18 @@ public class BookMarkExplorer extends ViewPart {
   }
 
   /**
-   * @param mark the news mark to make visible and select.
+   * @param element the folder child to make visible and select.
+   * @param expand if <code>true</code> expand the element, <code>false</code>
+   * otherwise.
    */
-  public void reveal(INewsMark mark) {
+  public void reveal(IFolderChild element, boolean expand) {
 
     /* Return early if hidden */
     if (!fViewSite.getPage().isPartVisible(this))
       return;
 
     /* Change Set if required */
-    IFolderChild child = mark;
+    IFolderChild child = element;
     while (child.getParent() != null)
       child = child.getParent();
 
@@ -555,7 +557,13 @@ public class BookMarkExplorer extends ViewPart {
       changeSet((IFolder) child);
 
     /* Set Selection */
-    fViewer.setSelection(new StructuredSelection(mark), true);
+    fViewer.setSelection(new StructuredSelection(element), true);
+
+    /* Expand if Set */
+    if (expand) {
+      fViewer.setExpandedState(element, true);
+      fExpandedNodes.add(element.getId());
+    }
   }
 
   void changeSet(IFolder folder) {
