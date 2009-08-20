@@ -171,7 +171,7 @@ public class OpenNewsAction extends Action {
     /* Reveal Newsmark of last opened News */
     BookMarkExplorer explorer = OwlUI.getOpenBookMarkExplorer();
     if (explorer != null && lastOpenedNewsMark != null && !explorer.isLinkingEnabled()) {
-      explorer.reveal(lastOpenedNewsMark);
+      explorer.reveal(lastOpenedNewsMark, false);
     }
   }
 
