@@ -43,6 +43,8 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Text;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
@@ -56,7 +58,9 @@ import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.actions.ImportAction;
 import org.rssowl.ui.internal.util.JobRunner;
+import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -257,6 +261,25 @@ public class FeedDefinitionPage extends WizardPage {
       }
     });
 
+    /* Info Container */
+    Composite infoContainer = new Composite(container, SWT.None);
+    infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+    infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 5));
+
+    Label infoImg = new Label(infoContainer, SWT.NONE);
+    infoImg.setImage(OwlUI.getImage(infoImg, "icons/obj16/info.gif"));
+    infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    Link infoLink = new Link(infoContainer, SWT.NONE);
+    infoLink.setText("Tip: Use the <a>Import Wizard</a> to find more Feeds.");
+    infoLink.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+    infoLink.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        new ImportAction().openWizard(getShell(), true);
+      }
+    });
+
     setControl(container);
   }
 
@@ -279,7 +302,7 @@ public class FeedDefinitionPage extends WizardPage {
     final Pair<SimpleContentProposalProvider, ContentProposalAdapter> autoComplete = OwlUI.hookAutoComplete(fKeywordInput, null, true);
 
     /* Load proposals in the Background */
-    JobRunner.runDelayedInBackgroundThread(new Runnable() {
+    JobRunner.runInBackgroundThread(new Runnable() {
       public void run() {
         if (!fKeywordInput.isDisposed()) {
           Set<String> values = new TreeSet<String>(new Comparator<String>() {
