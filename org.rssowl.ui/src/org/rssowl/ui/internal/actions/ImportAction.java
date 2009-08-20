@@ -26,12 +26,15 @@ package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.persist.IFolderChild;
-import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.core.util.StringUtils;
+import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.dialogs.importer.ImportWizard;
 
 /**
@@ -70,8 +73,66 @@ public class ImportAction extends Action implements IWorkbenchWindowActionDelega
    * @param shell the {@link Shell} acting as parent of the wizard.
    */
   public void openWizard(Shell shell) {
-    ImportWizard exportWizard = new ImportWizard();
-    OwlUI.openWizard(shell, exportWizard, true, SETTINGS_SECTION);
+    openWizard(shell, null);
+  }
+
+  /**
+   * @param shell the {@link Shell} acting as parent of the wizard.
+   * @param website a link to a website to discover feeds on.
+   */
+  public void openWizard(Shell shell, String website) {
+    openWizard(shell, website, false);
+  }
+
+  /**
+   * @param shell the {@link Shell} acting as parent of the wizard.
+   * @param isKeywordSearch defines if the keyword search should be selected or
+   * not.
+   */
+  public void openWizard(Shell shell, boolean isKeywordSearch) {
+    openWizard(shell, null, isKeywordSearch);
+  }
+
+  /**
+   * @param shell the {@link Shell} acting as parent of the wizard.
+   * @param website a link to a website to discover feeds on.
+   * @param isKeywordSearch defines if the keyword search should be selected or
+   * not.
+   */
+  public void openWizard(Shell shell, final String website, boolean isKeywordSearch) {
+    final ImportWizard importWizard = new ImportWizard(website, isKeywordSearch);
+    WizardDialog dialog = new WizardDialog(shell, importWizard) {
+
+      @Override
+      protected boolean isResizable() {
+        return true;
+      }
+
+      @Override
+      public int open() {
+        if (StringUtils.isSet(website))
+          importWizard.getContainer().showPage(importWizard.getNextPage(getCurrentPage()));
+
+        return super.open();
+      }
+
+      @Override
+      protected IDialogSettings getDialogBoundsSettings() {
+        IDialogSettings settings = Activator.getDefault().getDialogSettings();
+        IDialogSettings section = settings.getSection(SETTINGS_SECTION);
+        if (section != null)
+          return section;
+
+        return settings.addNewSection(SETTINGS_SECTION);
+      }
+
+      @Override
+      protected int getDialogBoundsStrategy() {
+        return DIALOG_PERSISTSIZE;
+      }
+    };
+    dialog.create();
+    dialog.open();
   }
 
   /*
