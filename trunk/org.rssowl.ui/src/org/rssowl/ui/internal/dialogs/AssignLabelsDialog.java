@@ -4,7 +4,6 @@ package org.rssowl.ui.internal.dialogs;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
-import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.resource.ResourceManager;
@@ -28,6 +27,7 @@ import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.ContentAssistAdapter;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -156,81 +156,7 @@ public class AssignLabelsDialog extends Dialog {
     });
 
     /* Add auto-complete for Labels taken from existing Categories */
-    TextContentAdapter adapter = new TextContentAdapter() {
-      @Override
-      public String getControlContents(Control control) {
-        String text = fLabelsInput.getText();
-        int selectionOffset = fLabelsInput.getSelection().x;
-        if (selectionOffset == 0)
-          return "";
-
-        int previousCommaIndex = getPreviousCommaIndex(text, selectionOffset);
-
-        /* No Previous Comma Found - Return from Beginning */
-        if (previousCommaIndex == -1)
-          return text.substring(0, selectionOffset).trim();
-
-        /* Previous Comma Found - Return from Comma */
-        return text.substring(previousCommaIndex + 1, selectionOffset).trim();
-      }
-
-      private int getPreviousCommaIndex(String text, int selectionOffset) {
-        int previousCommaIndex = -1;
-        for (int i = 0; i < text.length(); i++) {
-          if (i == selectionOffset)
-            break;
-
-          if (text.charAt(i) == ',')
-            previousCommaIndex = i;
-        }
-        return previousCommaIndex;
-      }
-
-      private int getNextCommaIndex(String text, int selectionOffset) {
-        int nextCommaIndex = -1;
-        for (int i = selectionOffset + 1; i < text.length(); i++) {
-          if (text.charAt(i) == ',')
-            return i;
-        }
-        return nextCommaIndex;
-      }
-
-      @Override
-      public void insertControlContents(Control control, String textToInsert, int cursorPosition) {
-        String text = fLabelsInput.getText();
-
-        int selectionOffset = fLabelsInput.getSelection().x;
-        int previousCommaIndex = getPreviousCommaIndex(text, selectionOffset);
-        int nextCommaIndex = getNextCommaIndex(text, selectionOffset);
-
-        /* Replace All: No Comma Found */
-        if (previousCommaIndex == -1 && nextCommaIndex == -1) {
-          text = textToInsert + ", ";
-        }
-
-        /* Replace All beginning with Previous Comma  */
-        else if (previousCommaIndex != -1 && nextCommaIndex == -1) {
-          text = text.substring(0, previousCommaIndex);
-          text = text + ", " + textToInsert + ", ";
-        }
-
-        /* Replace all from beginning till Next Comma */
-        else if (previousCommaIndex == -1 && nextCommaIndex != -1) {
-          text = textToInsert + text.substring(nextCommaIndex);
-        }
-
-        /* Replace all from previous Comma till next Comma */
-        else {
-          String leftHand = text.substring(0, previousCommaIndex);
-          String rightHand = text.substring(nextCommaIndex);
-
-          text = leftHand + ", " + textToInsert + rightHand;
-        }
-
-        fLabelsInput.setText(text);
-        fLabelsInput.setSelection(fLabelsInput.getText().length());
-      }
-    };
+    ContentAssistAdapter adapter = new ContentAssistAdapter(fLabelsInput, ',');
 
     /* Labels */
     final List<String> labelNames = new ArrayList<String>(fExistingLabels.size());

@@ -29,13 +29,11 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.dialogs.IDialogSettings;
-import org.eclipse.jface.fieldassist.ComboContentAdapter;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.jface.fieldassist.IControlContentAdapter;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
-import org.eclipse.jface.fieldassist.TextContentAdapter;
 import org.eclipse.jface.resource.ColorDescriptor;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.DeviceResourceException;
@@ -115,6 +113,7 @@ import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.editors.feed.PerformAfterInputSet;
+import org.rssowl.ui.internal.util.ContentAssistAdapter;
 import org.rssowl.ui.internal.util.EditorUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
@@ -142,7 +141,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Central Facade for UI-related tasks.
- * 
+ *
  * @author bpasero
  */
 public class OwlUI {
@@ -433,7 +432,7 @@ public class OwlUI {
 
   /**
    * Returns the <code>OSTheme</code> that is currently being used.
-   * 
+   *
    * @param display An instance of the SWT <code>Display</code> used for
    * determining the used theme.
    * @return Returns the <code>OSTheme</code> that is currently being used.
@@ -472,7 +471,7 @@ public class OwlUI {
 
   /**
    * Get the shared instance of <code>Clipboard</code>.
-   * 
+   *
    * @return the shared instance of <code>Clipboard</code>.
    */
   public static Clipboard getClipboard() {
@@ -485,7 +484,7 @@ public class OwlUI {
   /**
    * Returns an ImageDescriptor for that matches the given Object, or the
    * default image in case the Object is unknown.
-   * 
+   *
    * @param obj The Object to retreive an Image for.
    * @return ImageDescriptor
    */
@@ -1001,7 +1000,7 @@ public class OwlUI {
   /**
    * Attempts to find the primary <code>IWorkbenchWindow</code> from the
    * PlatformUI facade. Otherwise, returns <code>NULL</code> if none.
-   * 
+   *
    * @return the primary <code>IWorkbenchWindow</code> from the PlatformUI
    * facade or <code>NULL</code> if none.
    */
@@ -1018,7 +1017,7 @@ public class OwlUI {
   /**
    * Attempts to find the first <code>IWorkbenchWindow</code> from the
    * PlatformUI facade. Otherwise, returns <code>NULL</code> if none.
-   * 
+   *
    * @return the first <code>IWorkbenchWindow</code> from the PlatformUI facade
    * or <code>NULL</code> if none.
    */
@@ -1041,7 +1040,7 @@ public class OwlUI {
    * Attempts to find the <code>IWorkbenchWindow</code> from the PlatformUI
    * facade that is located at where the mouse is pointing at. Otherwise,
    * returns <code>NULL</code> if none.
-   * 
+   *
    * @return the first <code>IWorkbenchWindow</code> from the PlatformUI facade
    * that is located at where the mouse is pointing at or <code>NULL</code> if
    * none.
@@ -1067,7 +1066,7 @@ public class OwlUI {
   /**
    * Attempts to find the first <code>IWorkbenchPage</code> from the PlatformUI
    * facade. Otherwise, returns <code>NULL</code> if none.
-   * 
+   *
    * @return the first <code>IWorkbenchPage</code> from the PlatformUI facade or
    * <code>NULL</code> if none.
    */
@@ -1091,7 +1090,7 @@ public class OwlUI {
   /**
    * Attempts to return the index of the given workbench window or
    * <code>-1</code> if none.
-   * 
+   *
    * @param window the {@link IWorkbenchWindow} to get the index in the stack of
    * windows that are open.
    * @return the index of the given workbench window or <code>-1</code> if none.
@@ -1111,7 +1110,7 @@ public class OwlUI {
    * Attempts to find the <code>IWorkbenchPage</code> from the Workbench-Window
    * the mouse is currently over from the PlatformUI facade. Otherwise, returns
    * <code>NULL</code> if none.
-   * 
+   *
    * @return the first <code>IWorkbenchPage</code> from the Workbench-Window the
    * mouse is currently over from the PlatformUI facade or <code>NULL</code> if
    * none.
@@ -1136,7 +1135,7 @@ public class OwlUI {
   /**
    * Attempts to find the first active <code>IEditorPart</code> from the
    * PlatformUI facade. Otherwise, returns <code>NULL</code> if none.
-   * 
+   *
    * @return the first active <code>IEditorPart</code> from the PlatformUI
    * facade or <code>NULL</code> if none.
    */
@@ -1164,7 +1163,7 @@ public class OwlUI {
   /**
    * Attempts to find the first active <code>FeedView</code> from the PlatformUI
    * facade. Otherwise, returns <code>NULL</code> if none.
-   * 
+   *
    * @return the first active <code>FeedView</code> from the PlatformUI facade
    * or <code>NULL</code> if none.
    */
@@ -1182,7 +1181,7 @@ public class OwlUI {
   /**
    * Attempts to find all open <code>FeedView</code>s from the PlatformUI
    * facade. Otherwise, returns an empty list if none.
-   * 
+   *
    * @return all open <code>FeedView</code>s from the PlatformUI facadeor an
    * empty list if none.
    */
@@ -1202,7 +1201,7 @@ public class OwlUI {
   /**
    * Attempts to find the selection from the first active <code>FeedView</code>
    * from the PlatformUI facade. Otherwise, returns <code>NULL</code> if none.
-   * 
+   *
    * @return the selection from the first active <code>FeedView</code> from the
    * PlatformUI facade or <code>NULL</code> if none.
    */
@@ -1221,7 +1220,7 @@ public class OwlUI {
   /**
    * Attempts to find the selection from the first active <code>Part</code> from
    * the PlatformUI facade. Otherwise, returns <code>NULL</code> if none.
-   * 
+   *
    * @return the selection from the first active <code>Part</code> from the
    * PlatformUI facade or <code>NULL</code> if none.
    */
@@ -1246,7 +1245,7 @@ public class OwlUI {
    * Attempts to find the first <code>FeedView</code> from the active Workbench
    * Window of the PlatformUI facade. Otherwise, returns <code>NULL</code> if
    * none.
-   * 
+   *
    * @return the first <code>FeedView</code> from the active Workbench Window of
    * the PlatformUI facade or <code>NULL</code> if none.
    */
@@ -1271,7 +1270,7 @@ public class OwlUI {
    * Attempts to find the first <code>WebBrowserView</code> from the active
    * Workbench Window of the PlatformUI facade. Otherwise, returns
    * <code>NULL</code> if none.
-   * 
+   *
    * @return the first <code>WebBrowserView</code> from the active Workbench
    * Window of the PlatformUI facade or <code>NULL</code> if none.
    */
@@ -1295,7 +1294,7 @@ public class OwlUI {
   /**
    * Attempts to find the opened <code>BookMarkExplorer</code> from the
    * PlatformUI facade. Otherwise, returns <code>NULL</code> if none.
-   * 
+   *
    * @return the <code>BookMarkExplorer</code> from the PlatformUI facade or
    * <code>NULL</code> if not opened.
    */
@@ -1318,7 +1317,7 @@ public class OwlUI {
   /**
    * Attempts to find the primary <code>Shell</code> from the PlatformUI facade.
    * Otherwise, returns <code>NULL</code> if none.
-   * 
+   *
    * @return the primary <code>Shell</code> from the PlatformUI facade or
    * <code>NULL</code> if none.
    */
@@ -1333,7 +1332,7 @@ public class OwlUI {
   /**
    * Attempts to find the active <code>Shell</code> from the PlatformUI facade.
    * Otherwise, returns <code>NULL</code> if none.
-   * 
+   *
    * @return the active <code>Shell</code> from the PlatformUI facade or
    * <code>NULL</code> if none.
    */
@@ -1348,7 +1347,7 @@ public class OwlUI {
   /**
    * Update the current active window title based on the given array of
    * {@link IMark}.
-   * 
+   *
    * @param shownInput the input that is currently visible in RSSOwl.
    */
   public static void updateWindowTitle(IMark[] shownInput) {
@@ -1358,7 +1357,7 @@ public class OwlUI {
 
   /**
    * Update the current active window title based on the given title.
-   * 
+   *
    * @param title the name of the input that is currently visible in RSSOwl.
    */
   public static void updateWindowTitle(String title) {
@@ -1377,7 +1376,7 @@ public class OwlUI {
   /**
    * A helper method that can be used to restore the application when its
    * minimized.
-   * 
+   *
    * @param page the workbench page the application is running in.
    */
   public static void restoreWindow(IWorkbenchPage page) {
@@ -1419,7 +1418,7 @@ public class OwlUI {
 
   /**
    * Opens a selection of {@link INewsMark} inside the feed view.
-   * 
+   *
    * @param page
    * @param selection
    */
@@ -1429,7 +1428,7 @@ public class OwlUI {
 
   /**
    * Opens a selection of {@link INewsMark} inside the feed view.
-   * 
+   *
    * @param page
    * @param selection
    * @param forceActivate
@@ -1440,7 +1439,7 @@ public class OwlUI {
 
   /**
    * Opens a selection of {@link INewsMark} inside the feed view.
-   * 
+   *
    * @param page
    * @param selection
    * @param perform
@@ -1496,7 +1495,7 @@ public class OwlUI {
 
   /**
    * Set's the checked state of all visible items to the suplied one.
-   * 
+   *
    * @param tree
    * @param state
    */
@@ -1540,7 +1539,7 @@ public class OwlUI {
    * @return Pair
    */
   public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Text text, Collection<String> values, boolean decorate) {
-    return hookAutoComplete(text, new TextContentAdapter(), values, decorate);
+    return hookAutoComplete(text, new ContentAssistAdapter(text, ' '), values, decorate);
   }
 
   /**
@@ -1551,18 +1550,18 @@ public class OwlUI {
    * @return Pair
    */
   public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Combo combo, Collection<String> values, boolean decorate) {
-    return hookAutoComplete(combo, new ComboContentAdapter(), values, decorate);
+    return hookAutoComplete(combo, new ContentAssistAdapter(combo, ' '), values, decorate);
   }
 
   /**
    * @param control the {@link Control} to hook auto complete into.
-   * @param textContentAdapter a {@link IControlContentAdapter} for the content
+   * @param contentAdapter a {@link IControlContentAdapter} for the content
    * @param values the values that show up as proposal.
    * @param decorate if <code>true</code>, decorate the control to indicate
    * content assist is available.
    * @return Pair
    */
-  public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Control control, IControlContentAdapter textContentAdapter, Collection<String> values, boolean decorate) {
+  public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Control control, IControlContentAdapter contentAdapter, Collection<String> values, boolean decorate) {
 
     /* Show UI Hint that Content Assist is available */
     if (decorate) {
@@ -1578,10 +1577,10 @@ public class OwlUI {
     /* Create Content Proposal Adapter */
     SimpleContentProposalProvider proposalProvider = new SimpleContentProposalProvider(new String[0]);
     proposalProvider.setFiltering(true);
-    final ContentProposalAdapter adapter = new ContentProposalAdapter(control, textContentAdapter, proposalProvider, activationKey, null);
+    final ContentProposalAdapter adapter = new ContentProposalAdapter(control, contentAdapter, proposalProvider, activationKey, null);
     adapter.setPropagateKeys(true);
     adapter.setAutoActivationDelay(200);
-    adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
+    adapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_INSERT);
 
     /* Apply Proposals */
     if (values != null)
@@ -1701,7 +1700,7 @@ public class OwlUI {
 
   /**
    * Custom Owner Drawn helper to draw a gradient across a Scrollable item.
-   * 
+   *
    * @param event the erase event.
    * @param fg gradient foreground.
    * @param bg gradient background.
@@ -1739,7 +1738,7 @@ public class OwlUI {
 
   /**
    * Custom Owner Draw helper to expand a drawn region over a scrollable item.
-   * 
+   *
    * @param event the erase event.
    * @param scrollable the scrollable to paint on.
    * @param gc the gc to paint on.
@@ -1852,7 +1851,7 @@ public class OwlUI {
   /**
    * Adjust the bounds of the given Shell to respect the addition or removal of
    * the vertical bar.
-   * 
+   *
    * @param shell the Shell of the container.
    * @param verticalBar the vertical {@link ScrollBar} of the container.
    * @param wasScrollbarShowing <code>true</code> if the vertical scrollbar was
