@@ -107,7 +107,7 @@ public class ImportOptionsPage extends WizardPage {
 
     /* Info Container */
     fBottomInfoContainer = new Composite(container, SWT.None);
-    fBottomInfoContainer.setLayoutData(new GridData(SWT.FILL, SWT.END, false, true));
+    fBottomInfoContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
     fBottomInfoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
 
     Label infoImg = new Label(fBottomInfoContainer, SWT.NONE);
