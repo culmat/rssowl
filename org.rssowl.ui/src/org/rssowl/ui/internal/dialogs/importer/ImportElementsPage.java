@@ -212,25 +212,25 @@ public class ImportElementsPage extends WizardPage {
 
   /* Get Elements to Import */
   List<IFolderChild> getFolderChildsToImport() {
-    importSource(); //Ensure to be in sync with Source
+    doImportSource(); //Ensure to be in sync with Source
     return fFolderChildTree.getCheckedElements();
   }
 
   /* Returns Labels available for Import */
   List<ILabel> getLabelsToImport() {
-    importSource(); //Ensure to be in sync with Source
+    doImportSource(); //Ensure to be in sync with Source
     return fLabels;
   }
 
   /* Returns Filters available for Import */
   List<ISearchFilter> getFiltersToImport() {
-    importSource(); //Ensure to be in sync with Source
+    doImportSource(); //Ensure to be in sync with Source
     return fFilters;
   }
 
   /* Returns the Preferences available for Import */
   List<IPreference> getPreferencesToImport() {
-    importSource(); //Ensure to be in sync with Source
+    doImportSource(); //Ensure to be in sync with Source
     return fPreferences;
   }
 
@@ -357,36 +357,14 @@ public class ImportElementsPage extends WizardPage {
 
     fViewer.getControl().setFocus();
 
-    Runnable runnable = new Runnable() {
-      public void run() {
-        importSource();
-      }
-    };
-
     /* Load Elements to Import from Source on first time */
-    ImportSourcePage importSourcePage = (ImportSourcePage) getPreviousPage();
-    if (importSourcePage.isRemoteSource())
-      JobRunner.runInUIThread(50, getShell(), runnable);
-    else
-      runnable.run();
+    doImportSource();
   }
 
-  private void importSource() {
-    try {
-      doImportSource();
-    } catch (Exception e) {
-      String message = e.getMessage();
-      if (e instanceof InvocationTargetException && e.getCause() != null && StringUtils.isSet(e.getCause().getMessage()))
-        message = e.getCause().getMessage();
-
-      Activator.getDefault().logError(message, e);
-      setErrorMessage(message);
-    }
-  }
-
-  private void doImportSource() throws Exception {
+  @SuppressWarnings("unchecked")
+  private void doImportSource() {
     ImportSourcePage importSourcePage = (ImportSourcePage) getPreviousPage();
-    Source source = importSourcePage.getSource();
+    final Source source = importSourcePage.getSource();
 
     /* Return if the Source did not Change */
     if (source == Source.RECOMMENDED && fCurrentSourceKind == Source.RECOMMENDED)
@@ -411,7 +389,7 @@ public class ImportElementsPage extends WizardPage {
     /* Remember Source */
     fCurrentSourceKind = source;
     fCurrentSourceResource = importSourcePage.getImportResource();
-    File sourceFile = (source == Source.RESOURCE) ? new File(importSourcePage.getImportResource()) : null;
+    final File sourceFile = (source == Source.RESOURCE) ? new File(importSourcePage.getImportResource()) : null;
     fCurrentSourceFileModified = (sourceFile != null && sourceFile.exists()) ? sourceFile.lastModified() : 0;
     fCurrentSourceKeywords = importSourcePage.getImportKeywords();
 
@@ -424,25 +402,53 @@ public class ImportElementsPage extends WizardPage {
     setErrorMessage(null);
     setMessage("Please choose the elements to import.");
 
-    /* Import from Supplied File */
-    if (source == Source.RESOURCE && sourceFile != null && sourceFile.exists()) {
-      importFromLocalResource(new FileInputStream(sourceFile));
-    }
+    /* Clear Viewer if remotely loading */
+    if (importSourcePage.isRemoteSource())
+      setImportedElements(Collections.EMPTY_LIST);
 
-    /* Import from Supplied Online Resource */
-    else if (source == Source.RESOURCE && URIUtils.looksLikeLink(fCurrentSourceResource)) {
-      importFromOnlineResource(new URI(URIUtils.ensureProtocol(fCurrentSourceResource)));
-    }
+    /* Import Runnable */
+    Runnable runnable = new Runnable() {
+      public void run() {
+        try {
 
-    /* Import by Keyword Search */
-    else if (source == Source.KEYWORD) {
-      importFromKeywordSearch(fCurrentSourceKeywords);
-    }
+          /* Import from Supplied File */
+          if (source == Source.RESOURCE && sourceFile != null && sourceFile.exists())
+            importFromLocalResource(new FileInputStream(sourceFile));
 
-    /* Import from Default OPML File */
-    else if (source == Source.RECOMMENDED) {
-      importFromLocalResource(getClass().getResourceAsStream("/default_feeds.xml")); //$NON-NLS-1$;
-    }
+          /* Import from Supplied Online Resource */
+          else if (source == Source.RESOURCE && URIUtils.looksLikeLink(fCurrentSourceResource))
+            importFromOnlineResource(new URI(URIUtils.ensureProtocol(fCurrentSourceResource)));
+
+          /* Import by Keyword Search */
+          else if (source == Source.KEYWORD)
+            importFromKeywordSearch(fCurrentSourceKeywords);
+
+          /* Import from Default OPML File */
+          else if (source == Source.RECOMMENDED)
+            importFromLocalResource(getClass().getResourceAsStream("/default_feeds.xml")); //$NON-NLS-1$;
+        }
+
+        /* Log and Show any Exception during Import */
+        catch (Exception e) {
+          String message = e.getMessage();
+          if (e instanceof InvocationTargetException && e.getCause() != null && StringUtils.isSet(e.getCause().getMessage()))
+            message = e.getCause().getMessage();
+
+          Activator.getDefault().logError(message, e);
+          setErrorMessage(message);
+          setPageComplete(false);
+
+          /* Give a chance to try again */
+          fCurrentSourceKind= null;
+        }
+      }
+    };
+
+    /* Perform delayed if remote import to give Viewer a chance to show */
+    if (importSourcePage.isRemoteSource())
+      JobRunner.runInUIThread(50, getShell(), runnable);
+    else
+      runnable.run();
   }
 
   /* Import from a Local Input Stream (no progress required) */
@@ -451,6 +457,7 @@ public class ImportElementsPage extends WizardPage {
     /* Show Folder Childs in Viewer */
     List<? extends IEntity> types = Owl.getInterpreter().importFrom(in);
     setImportedElements(types);
+    updateMessage(true);
   }
 
   private void importFromOnlineResource(final URI link) throws InvocationTargetException, InterruptedException {
@@ -461,8 +468,8 @@ public class ImportElementsPage extends WizardPage {
         Exception error = null;
         boolean bruteForce = false;
         try {
-          monitor.beginTask("Importing Feeds ('Cancel' to stop)", IProgressMonitor.UNKNOWN);
-          monitor.subTask("Connecting to " + link.getHost() + "...");
+          monitor.beginTask("Searching for Feeds ('Cancel' to stop)", IProgressMonitor.UNKNOWN);
+          monitor.subTask("Connecting...");
 
           /* Return on Cancellation */
           if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
@@ -491,6 +498,7 @@ public class ImportElementsPage extends WizardPage {
             JobRunner.runInUIThread(getShell(), new Runnable() {
               public void run() {
                 setImportedElements(types);
+                updateMessage(true);
               }
             });
           }
@@ -661,20 +669,9 @@ public class ImportElementsPage extends WizardPage {
       }
     }
 
-    /* Reset Input to Empty in the Beginning  */
-    JobRunner.runInUIThread(getShell(), new Runnable() {
-      @SuppressWarnings("unchecked")
-      public void run() {
-        setImportedElements(Collections.EMPTY_LIST);
-      }
-    });
-
     /* Update Task Information */
     monitor.beginTask("Searching for Feeds ('Cancel' to stop)", links.size());
-    if (isKeywordSearch)
-      monitor.subTask("Connecting...");
-    else
-      monitor.subTask("Connecting to " + resourceLink.getHost() + "...");
+    monitor.subTask("Fetching Results...");
 
     /* A Root to add Found Bookmarks into */
     final IFolder defaultRootFolder = Owl.getModelFactory().createFolder(null, null, "Bookmarks");
@@ -693,13 +690,15 @@ public class ImportElementsPage extends WizardPage {
       try {
         URI feedLink = new URI(feedLinkVal);
 
+        /* Report Progress Back To User */
+        if (counter == 1)
+          monitor.subTask("1 Result");
+        else if (counter > 1)
+          monitor.subTask(counter + " Results");
+
         /* Ignore if already present in Subscriptions List */
         if (dao.exists(new FeedLinkReference(feedLink)))
           continue;
-
-        /* Report Progress Back To User */
-        if (counter != 0)
-          monitor.subTask(counter + (counter == 1 ? " Result" : " Results"));
 
         /* Return on Cancellation */
         if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
@@ -839,7 +838,6 @@ public class ImportElementsPage extends WizardPage {
     fViewer.setInput(folderChilds);
     OwlUI.setAllChecked(fViewer.getTree(), true);
     fExistingFilter.clear();
-    updateMessage(true);
   }
 
   /* Adds a IFolderChild to the Viewer and updates caches */
