@@ -59,12 +59,15 @@ import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.persist.reference.NewsReference;
 import org.rssowl.core.persist.service.PersistenceException;
 
+import java.io.BufferedReader;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -103,6 +106,10 @@ public class CoreUtils {
 
   /* Special case structural actions that need to run as last action */
   private static List<String> STRUCTURAL_ACTIONS = Arrays.asList(new String[] { MoveNewsAction.ID, CopyNewsAction.ID });
+
+  /* Mime Types for Feeds */
+  private static final String[] FEED_MIME_TYPES = new String[] { "application/rss+xml", "application/atom+xml", "application/rdf+xml" };
+  private static final String HREF = "href=";
 
   /* This utility class constructor is hidden */
   private CoreUtils() {
@@ -1402,6 +1409,91 @@ public class CoreUtils {
     for (IFolder folder : folders) {
       if (folder.getName().equals(name))
         return folder;
+    }
+
+    return null;
+  }
+
+  /**
+   * @param reader a {@link BufferedReader} to read from.
+   * @param base the base {@link URI} to resolve any relative {@link URI}
+   * against.
+   * @return a {@link URI} of a feed found in the content of the reader or
+   * <code>null</code> if none.
+   */
+  public static URI findFeed(BufferedReader reader, URI base) {
+    try {
+      String line;
+      while ((line = reader.readLine()) != null) {
+        for (String feedMimeType : FEED_MIME_TYPES) {
+          int index = line.indexOf(feedMimeType);
+
+          /* Mime Type Found */
+          if (index > -1) {
+
+            /* Set index to where the Link Element starts */
+            for (int i = index; i >= 0; i--) {
+              if (line.charAt(i) == '<') {
+                index = i;
+                break;
+              }
+            }
+
+            /* Find the HREF */
+            index = line.indexOf(HREF, index);
+            if (index > -1) {
+              StringBuilder str = new StringBuilder();
+              for (int i = index + HREF.length(); i < line.length(); i++) {
+                char c = line.charAt(i);
+
+                if (c == '\"' || c == '\'')
+                  continue;
+
+                if (Character.isWhitespace(c) || c == '>')
+                  break;
+
+                str.append(c);
+              }
+
+              String linkVal = str.toString();
+
+              /* Handle relative Links */
+              try {
+                URI uri = new URI(linkVal);
+                linkVal = URIUtils.resolve(base, uri).toString();
+              }
+
+              /* Fallback if URI is not valid */
+              catch (URISyntaxException e) {
+                if (!linkVal.contains("://")) {
+                  try {
+                    if (!linkVal.startsWith("/"))
+                      linkVal = "/" + linkVal;
+                    linkVal = base.resolve(linkVal).toString();
+                  } catch (IllegalArgumentException e1) {
+                    linkVal = linkVal.startsWith("/") ? base.toString() + linkVal : base.toString() + "/" + linkVal;
+                  }
+                }
+              }
+
+              return new URI(URIUtils.fastEncode(linkVal));
+            }
+          }
+        }
+      }
+    } catch (IOException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    } catch (URISyntaxException e) {
+      Activator.getDefault().logError(e.getMessage(), e);
+    }
+
+    /* Finally close the Reader */
+    finally {
+      try {
+        reader.close();
+      } catch (IOException e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
     }
 
     return null;

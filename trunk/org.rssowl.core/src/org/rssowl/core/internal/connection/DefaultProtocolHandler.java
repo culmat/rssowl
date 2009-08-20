@@ -58,6 +58,7 @@ import org.rssowl.core.interpreter.EncodingException;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IModelFactory;
+import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
@@ -91,10 +92,6 @@ import java.util.zip.GZIPInputStream;
  * @author bpasero
  */
 public class DefaultProtocolHandler implements IProtocolHandler {
-
-  /* Mime Types for Feeds */
-  private static final String[] FEED_MIME_TYPES = new String[] { "application/rss+xml", "application/atom+xml", "application/rdf+xml" };
-  private static final String HREF = "href=";
 
   /* Http Status Codes */
   private static final int HTTP_ERRORS = 400;
@@ -730,85 +727,9 @@ public class DefaultProtocolHandler implements IProtocolHandler {
    * @see org.rssowl.core.connection.IProtocolHandler#getFeed(java.net.URI)
    */
   public URI getFeed(final URI website) throws ConnectionException {
-    URI feed = null;
-
     BufferedInputStream bufIns = new BufferedInputStream(openStream(website, null));
     BufferedReader reader = new BufferedReader(new InputStreamReader(bufIns));
 
-    try {
-      String line;
-      while ((line = reader.readLine()) != null) {
-        for (String feedMimeType : FEED_MIME_TYPES) {
-          int index = line.indexOf(feedMimeType);
-
-          /* Mime Type Found */
-          if (index > -1) {
-
-            /* Set index to where the Link Element starts */
-            for (int i = index; i >= 0; i--) {
-              if (line.charAt(i) == '<') {
-                index = i;
-                break;
-              }
-            }
-
-            /* Find the HREF */
-            index = line.indexOf(HREF, index);
-            if (index > -1) {
-              StringBuilder str = new StringBuilder();
-              for (int i = index + HREF.length(); i < line.length(); i++) {
-                char c = line.charAt(i);
-
-                if (c == '\"' || c == '\'')
-                  continue;
-
-                if (Character.isWhitespace(c) || c == '>')
-                  break;
-
-                str.append(c);
-              }
-
-              String linkVal = str.toString();
-
-              /* Handle relative Links */
-              try {
-                URI uri = new URI(linkVal);
-                linkVal = URIUtils.resolve(website, uri).toString();
-              }
-
-              /* Fallback if URI is not valid */
-              catch (URISyntaxException e) {
-                if (!linkVal.contains("://")) {
-                  try {
-                    if (!linkVal.startsWith("/"))
-                      linkVal = "/" + linkVal;
-                    linkVal = website.resolve(linkVal).toString();
-                  } catch (IllegalArgumentException e1) {
-                    linkVal = linkVal.startsWith("/") ? website.toString() + linkVal : website.toString() + "/" + linkVal;
-                  }
-                }
-              }
-
-              return new URI(URIUtils.fastEncode(linkVal));
-            }
-          }
-        }
-      }
-    } catch (IOException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
-    } catch (URISyntaxException e) {
-      Activator.getDefault().logError(e.getMessage(), e);
-    }
-
-    /* Finally close the Reader */
-    finally {
-      try {
-        reader.close();
-      } catch (IOException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
-      }
-    }
-
-    return feed;
+    return CoreUtils.findFeed(reader, website);
   }
 }
