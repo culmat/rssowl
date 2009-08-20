@@ -80,6 +80,7 @@ import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.ShareProvider;
+import org.rssowl.ui.internal.actions.ImportAction;
 import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.dialogs.preferences.SharingPreferencesPage;
@@ -337,7 +338,7 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
 
   private void createBrowserBar(Composite parent) {
     Composite container = new Composite(parent, SWT.NONE);
-    container.setLayout(LayoutUtils.createGridLayout(2, 3, 0));
+    container.setLayout(LayoutUtils.createGridLayout(2, 3, 0, 0, 2, false));
     ((GridLayout) container.getLayout()).marginBottom = 2;
     container.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
@@ -512,6 +513,19 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
 
       public void dispose() {}
     });
+
+    /* Discover Feeds on Website */
+    fNavigationToolBarManager.add(new Separator());
+    IAction discoverFeeds = new Action("Discover Feeds") {
+      @Override
+      public void run() {
+        String url = fBrowser.getControl().getUrl();
+        if (StringUtils.isSet(url) && !URIUtils.ABOUT_BLANK.equals(url))
+          new ImportAction().openWizard(fBrowser.getControl().getShell(), url);
+      }
+    };
+    fNavigationToolBarManager.add(discoverFeeds);
+    discoverFeeds.setImageDescriptor(OwlUI.getImageDescriptor("icons/etool16/new_bkmrk.gif"));
 
     fNavigationToolBarManager.createControl(parent);
   }
