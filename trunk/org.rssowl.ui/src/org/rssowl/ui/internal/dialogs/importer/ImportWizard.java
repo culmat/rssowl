@@ -55,7 +55,8 @@ import java.util.List;
 
 /**
  * A {@link Wizard} to import bookmarks, saved searches and bins with the option
- * to also import settings (Labels, Filters, Properties) from OPML.
+ * to also import settings (Labels, Filters, Properties) from OPML. Supports
+ * importing from local resources as well as remote.
  *
  * @author bpasero
  */
