@@ -689,7 +689,6 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Sashform dividing search definition from results */
     fSashForm = new SashForm(parent, SWT.VERTICAL | SWT.SMOOTH);
     fSashForm.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
-    fSashForm.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
     /* Top Area */
     Composite topSash = new Composite(fSashForm, SWT.NONE);
@@ -701,6 +700,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
     /* Create Condition Controls */
     createConditionControls(topSashContent);
+
+    /* Separator */
+    new Label(topSashContent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.END, true, false));
 
     /* Create Center Sash */
     Composite centerSash = new Composite(fSashForm, SWT.NONE);
@@ -732,6 +734,9 @@ public class SearchNewsDialog extends TitleAreaDialog {
     bottomSashContent.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
     bottomSashContent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     bottomSashContent.setBackground(bottomSashContent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+    /* Separator */
+    new Label(bottomSashContent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.END, true, false));
 
     /* Create Viewer for News Item */
     createBrowserViewer(bottomSashContent);
