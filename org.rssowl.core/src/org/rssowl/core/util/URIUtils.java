@@ -243,7 +243,7 @@ public class URIUtils {
    * work around some bugs in the implementation of Java's equals() for URIs:
    * <p>
    * <li>remove leading and trailing whitespaces</li>
-   * <li>remove trailing slashes</li>
+   * <li>encode invalid URI Characters</li>
    * </p>
    *
    * @param str The String to interpret as URI.
