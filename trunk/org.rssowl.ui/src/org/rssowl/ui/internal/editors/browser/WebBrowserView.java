@@ -516,12 +516,14 @@ public class WebBrowserView extends EditorPart implements IReusableEditor {
 
     /* Discover Feeds on Website */
     fNavigationToolBarManager.add(new Separator());
-    IAction discoverFeeds = new Action("Discover Feeds") {
+    IAction discoverFeeds = new Action("Find more Feeds") {
       @Override
       public void run() {
         String url = fBrowser.getControl().getUrl();
         if (StringUtils.isSet(url) && !URIUtils.ABOUT_BLANK.equals(url))
           new ImportAction().openWizard(fBrowser.getControl().getShell(), url);
+        else
+          new ImportAction().openWizard(fBrowser.getControl().getShell(), true);
       }
     };
     fNavigationToolBarManager.add(discoverFeeds);

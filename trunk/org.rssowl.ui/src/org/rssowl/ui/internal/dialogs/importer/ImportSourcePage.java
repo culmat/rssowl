@@ -177,7 +177,6 @@ public class ImportSourcePage extends WizardPage {
     sourceInputContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fResourceInput = new Combo(sourceInputContainer, SWT.DROP_DOWN | SWT.BORDER);
-    fResourceInput.setVisibleItemCount(15);
     fResourceInput.setEnabled(fImportFromResourceRadio.getSelection());
     fResourceInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     if (StringUtils.isSet(fWebsite))
@@ -187,6 +186,7 @@ public class ImportSourcePage extends WizardPage {
 
     String[] previousResources = fPreferences.getStrings(DefaultPreferences.IMPORT_RESOURCES);
     if (previousResources != null) {
+      fResourceInput.setVisibleItemCount(previousResources.length);
       for (String source : previousResources) {
         fResourceInput.add(source);
       }
@@ -234,7 +234,6 @@ public class ImportSourcePage extends WizardPage {
 
     fKeywordInput = new Combo(keywordInputContainer, SWT.DROP_DOWN | SWT.BORDER);
     fKeywordInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    fKeywordInput.setVisibleItemCount(15);
     fKeywordInput.setEnabled(fImportFromKeyword.getSelection());
     if (fImportFromKeyword.getSelection()) {
       hookKeywordAutocomplete(true);
@@ -243,6 +242,7 @@ public class ImportSourcePage extends WizardPage {
 
     String[] previousKeywords = fPreferences.getStrings(DefaultPreferences.IMPORT_KEYWORDS);
     if (previousKeywords != null) {
+      fKeywordInput.setVisibleItemCount(previousKeywords.length);
       for (String keyword : previousKeywords) {
         fKeywordInput.add(keyword);
       }
