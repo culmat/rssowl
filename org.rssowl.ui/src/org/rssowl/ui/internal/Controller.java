@@ -88,9 +88,9 @@ import org.rssowl.core.util.ExtensionUtils;
 import org.rssowl.core.util.ITask;
 import org.rssowl.core.util.JobQueue;
 import org.rssowl.core.util.LoggingSafeRunnable;
-import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TaskAdapter;
+import org.rssowl.core.util.Triple;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyPageWrapper;
@@ -304,8 +304,8 @@ public class Controller {
 
   private Controller() {
     int maxConcurrentReloadJobs = getSystemProperty(MAX_CONCURRENT_RELOAD_JOBS_PROPERTY, 0, DEFAULT_MAX_CONCURRENT_RELOAD_JOBS);
-    fReloadFeedQueue = new JobQueue("Updating Feeds", "Updating", maxConcurrentReloadJobs, Integer.MAX_VALUE, true, 0);
-    fSaveFeedQueue = new JobQueue("Updating Feeds", MAX_CONCURRENT_SAVE_JOBS, MAX_SAVE_QUEUE_SIZE, false, 0);
+    fReloadFeedQueue = new JobQueue("Updating Feeds...", "Updating", maxConcurrentReloadJobs, Integer.MAX_VALUE, true, 0);
+    fSaveFeedQueue = new JobQueue("Updating Feeds...", MAX_CONCURRENT_SAVE_JOBS, MAX_SAVE_QUEUE_SIZE, false, 0);
     fSaveFeedQueue.setUnknownProgress(true);
     fEntityPropertyPages = loadEntityPropertyPages();
     fBookMarkDAO = DynamicDAO.getDAO(IBookMarkDAO.class);
@@ -613,18 +613,18 @@ public class Controller {
         return Status.CANCEL_STATUS;
 
       /* Load the Feed */
-      final Pair<IFeed, IConditionalGet> pairResult = Owl.getConnectionService().reload(feedLink, monitor, properties);
+      final Triple<IFeed, IConditionalGet, URI> result = Owl.getConnectionService().reload(feedLink, monitor, properties);
 
       /* Return on Cancelation or shutdown or deletion */
-      if (!shouldProceedReloading(monitor, bookmark) || pairResult == null)
+      if (!shouldProceedReloading(monitor, bookmark) || result == null)
         return Status.CANCEL_STATUS;
 
       /* Remember Homepage of feed */
-      feedHomepage = pairResult.getFirst().getHomepage();
+      feedHomepage = result.getFirst().getHomepage();
 
       /* Update ConditionalGet Entity */
       boolean conditionalGetIsNull = (conditionalGet == null);
-      conditionalGet = updateConditionalGet(feedLink, conditionalGet, pairResult.getSecond());
+      conditionalGet = updateConditionalGet(feedLink, conditionalGet, result.getSecond());
       boolean deleteConditionalGet = (!conditionalGetIsNull && conditionalGet == null);
 
       /* Return on Cancelation or shutdown or deletion */
@@ -633,7 +633,7 @@ public class Controller {
 
       /* Load the Favicon directly afterwards if required */
       if (!InternalOwl.PERF_TESTING && OwlUI.getFavicon(bookmark) == null)
-        loadFavicon(bookmark, monitor, feedLink, feedHomepage);
+        loadFavicon(bookmark, monitor, result.getThird(), feedHomepage);
 
       /* Return on Cancelation or shutdown or deletion */
       if (!shouldProceedReloading(monitor, bookmark))
@@ -651,7 +651,7 @@ public class Controller {
               return Status.CANCEL_STATUS;
 
             /* Handle Feed Reload */
-            fAppService.handleFeedReload(bookmark, pairResult.getFirst(), finalConditionalGet, finalDeleteConditionalGet);
+            fAppService.handleFeedReload(bookmark, result.getFirst(), finalConditionalGet, finalDeleteConditionalGet);
             return Status.OK_STATUS;
           }
 
@@ -661,7 +661,7 @@ public class Controller {
           }
         });
       } else {
-        fAppService.handleFeedReload(bookmark, pairResult.getFirst(), conditionalGet, deleteConditionalGet);
+        fAppService.handleFeedReload(bookmark, result.getFirst(), conditionalGet, deleteConditionalGet);
       }
     }
 

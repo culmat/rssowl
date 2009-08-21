@@ -24,9 +24,9 @@
 
 package org.rssowl.core.tests.connection;
 
+import static junit.framework.Assert.assertNotNull;
 import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -49,14 +49,19 @@ import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
-import org.rssowl.core.util.Pair;
+import org.rssowl.core.util.RegExUtils;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.Triple;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.Controller;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -248,7 +253,7 @@ public class ConnectionTests {
     URL feedUrl = pluginLocation.toURI().resolve("data/interpreter/feed_rss.xml").toURL();
     IFeed feed = new Feed(feedUrl.toURI());
 
-    Pair<IFeed, IConditionalGet> result = conManager.reload(feed.getLink(), null, null);
+    Triple<IFeed, IConditionalGet, URI> result = conManager.reload(feed.getLink(), null, null);
 
     assertEquals("RSS 2.0", result.getFirst().getFormat());
   }
@@ -356,11 +361,23 @@ public class ConnectionTests {
    */
   @Test
   @SuppressWarnings("nls")
-  public void testLoadFeedFromWebsite() throws Exception {
+  public void testLoadFeedFromWebsiteWithRedirect() throws Exception {
     IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("http://www.planeteclipse.org");
 
     assertEquals("http://www.planeteclipse.org/planet/rss20.xml", conManager.getFeed(feedUrl).toString());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings("nls")
+  public void testLoadFeedFromWebsiteWithoutRedirect() throws Exception {
+    IConnectionService conManager = Owl.getConnectionService();
+    URI feedUrl = new URI("http://www.heise.de");
+
+    assertEquals("http://www.heise.de/newsticker/heise-atom.xml", conManager.getFeed(feedUrl).toString());
   }
 
   /**
@@ -395,5 +412,23 @@ public class ConnectionTests {
         fail(feedUrlStr);
       }
     }
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testFeedSearch() throws Exception {
+    String link = Controller.getDefault().toFeedSearchLink("blog");
+
+    Map<Object, Object> properties = new HashMap<Object, Object>();
+    properties.put(IConnectionPropertyConstants.CON_TIMEOUT, 60000);
+
+    InputStream inS = Owl.getConnectionService().getHandler(new URI(link)).openStream(new URI(link), null, properties);
+    String content = StringUtils.readString(new BufferedReader(new InputStreamReader(inS)));
+    assertNotNull(content);
+
+    List<String> links = RegExUtils.extractLinksFromText(content, false);
+    assertTrue(!links.isEmpty());
   }
 }

@@ -51,8 +51,8 @@ import org.rssowl.core.persist.event.FeedAdapter;
 import org.rssowl.core.persist.event.FeedEvent;
 import org.rssowl.core.persist.event.FeedListener;
 import org.rssowl.core.util.ExtensionUtils;
-import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.Triple;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -179,7 +179,7 @@ public class ConnectionServiceImpl implements IConnectionService {
    * @see org.rssowl.core.connection.IConnectionService#reload(java.net.URI,
    * org.eclipse.core.runtime.IProgressMonitor, java.util.Map)
    */
-  public Pair<IFeed, IConditionalGet> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException {
+  public Triple<IFeed, IConditionalGet, URI> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException {
     String protocol = link.getScheme();
     IProtocolHandler handler = fProtocolHandler.get(protocol);
 

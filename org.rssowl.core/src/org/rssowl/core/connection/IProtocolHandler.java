@@ -29,7 +29,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.osgi.service.url.URLStreamHandlerService;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
-import org.rssowl.core.util.Pair;
+import org.rssowl.core.util.Triple;
 
 import java.io.InputStream;
 import java.net.URI;
@@ -51,12 +51,14 @@ public interface IProtocolHandler {
    * @param monitor The Progress-Monitor used from the callee.
    * @param properties A Map of properties that can be used to transport custom
    * information
-   * @return Returns the <code>IFeed</code> from the given URL.
+   * @return Returns the <code>IFeed</code> from the given URL including
+   * {@link IConditionalGet} information and the actual {@link URI} that was
+   * loaded, supporting redirects.
    * @throws CoreException In case of an Exception while loading the Feed from
    * the URL.
    * @see {@link IConnectionPropertyConstants}
    */
-  Pair<IFeed, IConditionalGet> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException;
+  Triple<IFeed, IConditionalGet, URI> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException;
 
   /**
    * Opens a connection to the given {@link URI} and returns a

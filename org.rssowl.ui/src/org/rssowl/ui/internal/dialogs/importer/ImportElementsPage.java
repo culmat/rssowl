@@ -44,6 +44,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.CredentialsException;
+import org.rssowl.core.connection.HttpConnectionInputStream;
 import org.rssowl.core.connection.IAbortable;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.IProtocolHandler;
@@ -64,6 +65,7 @@ import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.RegExUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
@@ -101,7 +103,7 @@ import java.util.Map;
 public class ImportElementsPage extends WizardPage {
 
   /* Initial Connection Timeout when looking for Feeds remotely */
-  private static final int INITIAL_CON_TIMEOUT = 15000;
+  private static final int INITIAL_CON_TIMEOUT = 30000;
 
   /* Connection Timeout when testing for Feeds remotely */
   private static final int FEED_CON_TIMEOUT = 7000;
@@ -434,12 +436,17 @@ public class ImportElementsPage extends WizardPage {
           if (e instanceof InvocationTargetException && e.getCause() != null && StringUtils.isSet(e.getCause().getMessage()))
             message = e.getCause().getMessage();
 
+          if (StringUtils.isSet(message))
+            message = "Unable to Import. Reason: " + message;
+          else
+            message = "Unable to Import";
+
           Activator.getDefault().logError(message, e);
           setErrorMessage(message);
           setPageComplete(false);
 
           /* Give a chance to try again */
-          fCurrentSourceKind= null;
+          fCurrentSourceKind = null;
         }
       }
     };
@@ -518,44 +525,46 @@ public class ImportElementsPage extends WizardPage {
           if (e instanceof AuthenticationRequiredException && !monitor.isCanceled() && !Controller.getDefault().isShuttingDown()) {
             final Shell shell = OwlUI.getActiveShell();
             if (shell != null && !shell.isDisposed()) {
-              Controller.getDefault().getLoginDialogLock().lock();
-              try {
-                final AuthenticationRequiredException authEx = (AuthenticationRequiredException) e;
-                JobRunner.runSyncedInUIThread(shell, new Runnable() {
-                  public void run() {
-                    try {
-
-                      /* Return on Cancelation or shutdown or deletion */
-                      if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
-                        return;
-
-                      /* Credentials might have been provided meanwhile in another dialog */
+              boolean locked = Controller.getDefault().getLoginDialogLock().tryLock();
+              if (locked) {
+                try {
+                  final AuthenticationRequiredException authEx = (AuthenticationRequiredException) e;
+                  JobRunner.runSyncedInUIThread(shell, new Runnable() {
+                    public void run() {
                       try {
-                        URI normalizedUri = URIUtils.normalizeUri(link, true);
-                        if (Owl.getConnectionService().getAuthCredentials(normalizedUri, authEx.getRealm()) != null) {
+
+                        /* Return on Cancelation or shutdown or deletion */
+                        if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
+                          return;
+
+                        /* Credentials might have been provided meanwhile in another dialog */
+                        try {
+                          URI normalizedUri = URIUtils.normalizeUri(link, true);
+                          if (Owl.getConnectionService().getAuthCredentials(normalizedUri, authEx.getRealm()) != null) {
+                            importFromOnlineResource(link);
+                            showError[0] = false;
+                            return;
+                          }
+                        } catch (CredentialsException exe) {
+                          Activator.getDefault().getLog().log(exe.getStatus());
+                        }
+
+                        /* Show Login Dialog */
+                        LoginDialog login = new LoginDialog(shell, link, authEx.getRealm());
+                        if (login.open() == Window.OK && !monitor.isCanceled() && !Controller.getDefault().isShuttingDown()) {
                           importFromOnlineResource(link);
                           showError[0] = false;
-                          return;
                         }
-                      } catch (CredentialsException exe) {
-                        Activator.getDefault().getLog().log(exe.getStatus());
+                      } catch (InvocationTargetException e) {
+                        /* Ignore - Error will be handled outside already */
+                      } catch (InterruptedException e) {
+                        /* Ignore - Error will be handled outside already */
                       }
-
-                      /* Show Login Dialog */
-                      LoginDialog login = new LoginDialog(shell, link, authEx.getRealm());
-                      if (login.open() == Window.OK && !monitor.isCanceled() && !Controller.getDefault().isShuttingDown()) {
-                        importFromOnlineResource(link);
-                        showError[0] = false;
-                      }
-                    } catch (InvocationTargetException e) {
-                      /* Ignore - Error will be handled outside already */
-                    } catch (InterruptedException e) {
-                      /* Ignore - Error will be handled outside already */
                     }
-                  }
-                });
-              } finally {
-                Controller.getDefault().getLoginDialogLock().unlock();
+                  });
+                } finally {
+                  Controller.getDefault().getLoginDialogLock().unlock();
+                }
               }
             }
           }
@@ -625,10 +634,12 @@ public class ImportElementsPage extends WizardPage {
   }
 
   @SuppressWarnings("null")
-  private void importFromOnlineResourceBruteforce(final URI resourceLink, IProgressMonitor monitor, final boolean isKeywordSearch) throws ConnectionException, IOException {
+  private void importFromOnlineResourceBruteforce(URI resourceLink, IProgressMonitor monitor, final boolean isKeywordSearch) throws ConnectionException, IOException {
 
     /* Read Content */
-    String content = readContent(resourceLink, monitor);
+    Pair<String, URI> result = readContent(resourceLink, monitor);
+    String content = result.getFirst();
+    resourceLink = result.getSecond();
 
     /* Extract Links from Content */
     List<String> links = Collections.emptyList();
@@ -696,8 +707,12 @@ public class ImportElementsPage extends WizardPage {
         else if (counter > 1)
           monitor.subTask(counter + " Results");
 
-        /* Ignore if already present in Subscriptions List */
+        /* Ignore if already present in Subscriptions List (ignoring trailing slashes) */
         if (dao.exists(new FeedLinkReference(feedLink)))
+          continue;
+        else if (feedLinkVal.endsWith("/") && dao.exists(new FeedLinkReference(new URI(feedLinkVal.substring(0, feedLinkVal.length() - 1)))))
+          continue;
+        else if (!feedLinkVal.endsWith("/") && dao.exists(new FeedLinkReference(new URI(feedLinkVal + "/"))))
           continue;
 
         /* Return on Cancellation */
@@ -781,7 +796,7 @@ public class ImportElementsPage extends WizardPage {
     }
   }
 
-  private String readContent(URI link, IProgressMonitor monitor) throws ConnectionException, IOException {
+  private Pair<String, URI> readContent(URI link, IProgressMonitor monitor) throws ConnectionException, IOException {
     InputStream in = null;
     try {
 
@@ -797,7 +812,14 @@ public class ImportElementsPage extends WizardPage {
         return null;
 
       /* Read Content */
-      return StringUtils.readString(new InputStreamReader(in));
+      String content = StringUtils.readString(new InputStreamReader(in));
+
+      /* Return actual URI that was connected to (supporting redirects) */
+      if (in instanceof HttpConnectionInputStream)
+        return Pair.create(content, ((HttpConnectionInputStream) in).getLink());
+
+      /* Otherwise just use input URI */
+      return Pair.create(content, link);
     } finally {
       if (in instanceof IAbortable)
         ((IAbortable) in).abort();

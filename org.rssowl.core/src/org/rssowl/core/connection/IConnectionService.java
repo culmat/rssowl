@@ -29,7 +29,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
-import org.rssowl.core.util.Pair;
+import org.rssowl.core.util.Triple;
 
 import java.net.URI;
 import java.util.Map;
@@ -62,8 +62,8 @@ public interface IConnectionService {
    * @param link the link to find a responsible {@link IProtocolHandler} for.
    * @return the responsible {@link IProtocolHandler} for the link or
    * <code>null</code> if none.
-   * @throws ConnectionException In case of an Exception while loading {@link
-   * IProtocolHandler}
+   * @throws ConnectionException In case of an Exception while loading
+   * {@link IProtocolHandler}
    */
   IProtocolHandler getHandler(URI link) throws ConnectionException;
 
@@ -75,13 +75,15 @@ public interface IConnectionService {
    * @param monitor The Progress-Monitor used from the callee.
    * @param properties A Map of properties that can be used to transport custom
    * information
-   * @return Returns the <code>IFeed</code> from the given URL.
+   * @return Returns the <code>IFeed</code> from the given URL including
+   * {@link IConditionalGet} information and the actual {@link URI} that was
+   * loaded, supporting redirects.
    * @throws CoreException In case of an Exception while loading the Feed from
    * the URL.
    * @see IConnectionPropertyConstants
    * @see UnknownFeedException
    */
-  Pair<IFeed, IConditionalGet> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException;
+  Triple<IFeed, IConditionalGet, URI> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException;
 
   /**
    * Returns the Feed Icon for the given Link. For instance, this could be the
