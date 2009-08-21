@@ -28,7 +28,7 @@ package org.rssowl.core.util;
  * Instances of <code>Pair</code> combine two Objects in a single Object. This
  * can be useful in situations where multiple return-values are required from a
  * method.
- * 
+ *
  * @author bpasero
  * @param <F> The Class of the First Object.
  * @param <S> The Class of the Second Object.
@@ -44,7 +44,7 @@ public final class Pair<F, S> {
 
   /**
    * Creates a new <code>Pair</code> from the given Objects.
-   * 
+   *
    * @param first The first Object of the new Pair.
    * @param second The second Object of the new Pair.
    * @param <F> The Class of the First Object.
@@ -69,6 +69,9 @@ public final class Pair<F, S> {
     return fSecond;
   }
 
+  /*
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -78,6 +81,9 @@ public final class Pair<F, S> {
     return result;
   }
 
+  /*
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -89,7 +95,7 @@ public final class Pair<F, S> {
     if (getClass() != obj.getClass())
       return false;
 
-    final Pair< ? , ? > other = Pair.class.cast(obj);
+    final Pair<?, ?> other = Pair.class.cast(obj);
     if (fFirst == null) {
       if (other.fFirst != null)
         return false;
