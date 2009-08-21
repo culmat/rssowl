@@ -36,7 +36,7 @@ import org.rssowl.core.connection.IProtocolHandler;
 import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IModelFactory;
-import org.rssowl.core.util.Pair;
+import org.rssowl.core.util.Triple;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -58,7 +58,7 @@ public class InMemoryProtocolHandler implements IProtocolHandler {
    * @see org.rssowl.core.connection.IProtocolHandler#reload(java.net.URI,
    * org.eclipse.core.runtime.IProgressMonitor, java.util.Map)
    */
-  public Pair<IFeed, IConditionalGet> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException {
+  public Triple<IFeed, IConditionalGet, URI> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException {
     IModelFactory typesFactory = Owl.getModelFactory();
 
     /* Create a new empty feed from the existing one */
@@ -80,13 +80,13 @@ public class InMemoryProtocolHandler implements IProtocolHandler {
       } catch (IOException e) {
         /* Ignore */
       }
-      return Pair.create(feed, conditionalGet);
+      return Triple.create(feed, conditionalGet, link);
     }
 
     /* Pass the Stream to the Interpreter */
     Owl.getInterpreter().interpret(inS, feed, null);
 
-    return Pair.create(feed, conditionalGet);
+    return Triple.create(feed, conditionalGet, link);
   }
 
   /*

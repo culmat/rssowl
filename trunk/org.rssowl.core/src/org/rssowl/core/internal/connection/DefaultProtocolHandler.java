@@ -60,8 +60,8 @@ import org.rssowl.core.persist.IConditionalGet;
 import org.rssowl.core.persist.IFeed;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.util.CoreUtils;
-import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.Triple;
 import org.rssowl.core.util.URIUtils;
 
 import java.io.BufferedInputStream;
@@ -123,7 +123,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
    * @see org.rssowl.core.connection.IProtocolHandler#reload(java.net.URI,
    * org.eclipse.core.runtime.IProgressMonitor, java.util.Map)
    */
-  public Pair<IFeed, IConditionalGet> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException {
+  public Triple<IFeed, IConditionalGet, URI> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException {
     IModelFactory typesFactory = Owl.getModelFactory();
 
     /* Create a new empty feed from the existing one */
@@ -167,7 +167,12 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       Owl.getInterpreter().interpret(inS, feed, Collections.singletonMap((Object) USE_PLATFORM_ENCODING, (Object) Boolean.TRUE));
     }
 
-    return Pair.create(feed, conditionalGet);
+    /* Return actual URI that was connected to (supporting redirects) */
+    if (inS instanceof HttpConnectionInputStream)
+      return Triple.create(feed, conditionalGet, ((HttpConnectionInputStream) inS).getLink());
+
+    /* Otherwise just use input URI */
+    return Triple.create(feed, conditionalGet, link);
   }
 
   private void closeStream(InputStream inS) {
