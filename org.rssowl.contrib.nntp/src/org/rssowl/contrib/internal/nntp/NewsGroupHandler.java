@@ -49,9 +49,9 @@ import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPerson;
 import org.rssowl.core.util.DateUtils;
-import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.RegExUtils;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.core.util.Triple;
 import org.rssowl.core.util.URIUtils;
 
 import java.io.BufferedReader;
@@ -116,7 +116,7 @@ public class NewsGroupHandler implements IProtocolHandler {
    * @see org.rssowl.core.connection.IProtocolHandler#reload(java.net.URI,
    * org.eclipse.core.runtime.IProgressMonitor, java.util.Map)
    */
-  public Pair<IFeed, IConditionalGet> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException {
+  public Triple<IFeed, IConditionalGet, URI> reload(URI link, IProgressMonitor monitor, Map<Object, Object> properties) throws CoreException {
     IModelFactory factory = Owl.getModelFactory();
 
     /* Create a new empty feed from the existing one */
@@ -236,7 +236,7 @@ public class NewsGroupHandler implements IProtocolHandler {
     if (lastArticleId != null)
       conditionalGet = factory.createConditionalGet(null, link, String.valueOf(lastArticleId));
 
-    return Pair.create(feed, conditionalGet);
+    return Triple.create(feed, conditionalGet, link);
   }
 
   private Integer getLastArticleId(Map<Object, Object> properties) {
