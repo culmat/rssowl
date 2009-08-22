@@ -90,7 +90,7 @@ public class FileImportTest {
     /* Import */
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(ImportUtils.class.getResourceAsStream("/default_feeds.xml"));
 
-    ImportUtils.doImport(null, elements);
+    ImportUtils.doImport(null, elements, true);
     Set<IFolder> roots = CoreUtils.loadRootFolders();
     assertFalse(roots.isEmpty());
     assertFalse(roots.iterator().next().getChildren().isEmpty());
@@ -111,7 +111,7 @@ public class FileImportTest {
     DynamicDAO.save(root);
     DynamicDAO.save(otherRoot);
 
-    ImportUtils.doImport(root, elements);
+    ImportUtils.doImport(root, elements, true);
     assertTrue(root.getMarks().isEmpty());
     List<IFolder> folders = root.getFolders();
     folders.remove(target);
@@ -133,7 +133,7 @@ public class FileImportTest {
     DynamicDAO.save(root);
     DynamicDAO.save(otherRoot);
 
-    ImportUtils.doImport(root, elements);
+    ImportUtils.doImport(root, elements, true);
     Set<IFolder> roots = CoreUtils.loadRootFolders();
     for (IFolder foo : roots) {
       assertEmptyProperties(foo);
@@ -165,7 +165,7 @@ public class FileImportTest {
     DynamicDAO.save(root);
     DynamicDAO.save(otherRoot);
 
-    ImportUtils.doImport(target, elements);
+    ImportUtils.doImport(target, elements, true);
     assertTrue(root.getMarks().isEmpty());
     validate_Complex(target.getFolders(), elements);
   }
@@ -185,7 +185,7 @@ public class FileImportTest {
     DynamicDAO.save(root);
     DynamicDAO.save(otherRoot);
 
-    ImportUtils.doImport(otherRoot, elements);
+    ImportUtils.doImport(otherRoot, elements, true);
     assertTrue(otherRoot.getMarks().isEmpty());
     validate_Complex(otherRoot.getFolders(), elements);
   }
@@ -199,7 +199,7 @@ public class FileImportTest {
 
     /* Import */
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/complex.opml"));
-    ImportUtils.doImport(null, elements);
+    ImportUtils.doImport(null, elements, true);
 
     /* Validate */
     Collection<IFolder> roots = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
@@ -229,7 +229,7 @@ public class FileImportTest {
     }
 
     IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
-    ImportUtils.doImport(root, elementsToImport);
+    ImportUtils.doImport(root, elementsToImport, true);
 
     /* Validate */
     Collection<IFolder> roots = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
@@ -267,7 +267,7 @@ public class FileImportTest {
     }
 
     IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
-    ImportUtils.doImport(root, elementsToImport);
+    ImportUtils.doImport(root, elementsToImport, true);
 
     /* Validate */
     Collection<IFolder> roots = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
@@ -305,7 +305,7 @@ public class FileImportTest {
     }
 
     IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
-    ImportUtils.doImport(root, elementsToImport);
+    ImportUtils.doImport(root, elementsToImport, true);
 
     /* Validate */
     Collection<IFolder> roots = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
@@ -346,7 +346,7 @@ public class FileImportTest {
     IFolder target = Owl.getModelFactory().createFolder(null, root, "Target");
     DynamicDAO.save(root);
 
-    ImportUtils.doImport(target, elementsToImport);
+    ImportUtils.doImport(target, elementsToImport, true);
 
     /* Validate */
     Collection<IFolder> roots = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
@@ -610,7 +610,7 @@ public class FileImportTest {
 
     /* Import */
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/marks.opml"));
-    ImportUtils.doImport(null, elements);
+    ImportUtils.doImport(null, elements, true);
 
     Set<IFolder> roots = CoreUtils.loadRootFolders();
     assertEquals(1, roots.size());
@@ -629,7 +629,7 @@ public class FileImportTest {
 
     /* Import */
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/marks.opml"));
-    ImportUtils.doImport(root, elements);
+    ImportUtils.doImport(root, elements, true);
 
     Set<IFolder> roots = CoreUtils.loadRootFolders();
     assertEquals(1, roots.size());
@@ -649,7 +649,7 @@ public class FileImportTest {
 
     /* Import */
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/marks.opml"));
-    ImportUtils.doImport(otherRoot, elements);
+    ImportUtils.doImport(otherRoot, elements, true);
 
     Set<IFolder> roots = CoreUtils.loadRootFolders();
     assertEquals(2, roots.size());
@@ -668,7 +668,7 @@ public class FileImportTest {
 
     /* Import */
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/folders.opml"));
-    ImportUtils.doImport(null, elements);
+    ImportUtils.doImport(null, elements, true);
 
     Set<IFolder> roots = CoreUtils.loadRootFolders();
     assertEquals(1, roots.size());
@@ -687,7 +687,7 @@ public class FileImportTest {
 
     /* Import */
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/folders.opml"));
-    ImportUtils.doImport(root, elements);
+    ImportUtils.doImport(root, elements, true);
 
     Set<IFolder> roots = CoreUtils.loadRootFolders();
     assertEquals(1, roots.size());
@@ -707,7 +707,7 @@ public class FileImportTest {
 
     /* Import */
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/folders.opml"));
-    ImportUtils.doImport(otherRoot, elements);
+    ImportUtils.doImport(otherRoot, elements, true);
 
     Set<IFolder> roots = CoreUtils.loadRootFolders();
     assertEquals(2, roots.size());
@@ -725,7 +725,7 @@ public class FileImportTest {
 
     /* Import */
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/sets.opml"));
-    ImportUtils.doImport(null, elements);
+    ImportUtils.doImport(null, elements, true);
 
     Set<IFolder> roots = CoreUtils.loadRootFolders();
     Iterator<IFolder> iterator = roots.iterator();
@@ -743,7 +743,7 @@ public class FileImportTest {
 
     /* Import */
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/empty.opml"));
-    ImportUtils.doImport(null, elements);
+    ImportUtils.doImport(null, elements, true);
   }
 
   /**
@@ -756,7 +756,7 @@ public class FileImportTest {
 
     /* Import */
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/marks.opml"));
-    ImportUtils.doImport(root, elements);
+    ImportUtils.doImport(root, elements, true);
 
     root = CoreUtils.loadRootFolders().iterator().next();
     List<IMark> marks = root.getMarks();
@@ -780,7 +780,7 @@ public class FileImportTest {
 
     /* Import */
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/marks.opml"));
-    ImportUtils.doImport(root, elements);
+    ImportUtils.doImport(root, elements, true);
 
     root = CoreUtils.loadRootFolders().iterator().next();
     List<IMark> marks = root.getMarks();
@@ -801,7 +801,7 @@ public class FileImportTest {
 
     /* Import */
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/order.opml"));
-    ImportUtils.doImport(null, elements);
+    ImportUtils.doImport(null, elements, true);
 
     IFolder root = CoreUtils.loadRootFolders().iterator().next();
     List<IFolderChild> childs = root.getChildren();
@@ -826,7 +826,7 @@ public class FileImportTest {
 
     /* Import */
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/order.opml"));
-    ImportUtils.doImport(root, elements);
+    ImportUtils.doImport(root, elements, true);
 
     root = CoreUtils.loadRootFolders().iterator().next();
     List<IFolderChild> childs = root.getChildren();

@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.util;
 
+import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.InternalOwl;
 import org.rssowl.core.internal.newsaction.CopyNewsAction;
@@ -57,6 +58,7 @@ import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.URIUtils;
+import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
@@ -84,8 +86,12 @@ public class ImportUtils {
    * @param elements the list of elements to import. Supported types are
    * {@link IFolderChild}, {@link ILabel}, {@link ISearchFilter} and
    * {@link IPreference}.
+   * @param checkExistingFeeds if <code>true</code>, the method will first check
+   * if a feed with a given URL exists before creating it. set to
+   * <code>false</code> to avoid this and improve import performance (e.g. when
+   * doing an initial import into an empty RSSOwl instance).
    */
-  public static void doImport(IFolder target, List<? extends IEntity> elements) {
+  public static void doImport(IFolder target, List<? extends IEntity> elements, boolean checkExistingFeeds) {
     List<IFolderChild> folderChilds = new ArrayList<IFolderChild>();
     List<ILabel> labels = new ArrayList<ILabel>();
     List<ISearchFilter> filters = new ArrayList<ISearchFilter>();
@@ -104,7 +110,7 @@ public class ImportUtils {
       }
     }
 
-    doImport(target, folderChilds, labels, filters, preferences);
+    doImport(target, folderChilds, labels, filters, preferences, checkExistingFeeds);
   }
 
   /**
@@ -117,8 +123,12 @@ public class ImportUtils {
    * @param labels the list of {@link ILabel} to import.
    * @param filters the list of {@link ISearchFilter} to import.
    * @param preferences the list of {@link IPreference} to import.
+   * @param checkExistingFeeds if <code>true</code>, the method will first check
+   * if a feed with a given URL exists before creating it. set to
+   * <code>false</code> to avoid this and improve import performance (e.g. when
+   * doing an initial import into an empty RSSOwl instance).
    */
-  public static void doImport(IFolder target, List<IFolderChild> elements, List<ILabel> labels, List<ISearchFilter> filters, List<IPreference> preferences) {
+  public static void doImport(IFolder target, List<IFolderChild> elements, List<ILabel> labels, List<ISearchFilter> filters, List<IPreference> preferences, boolean checkExistingFeeds) {
 
     /* Map Old Id to IFolderChild */
     Map<Long, IFolderChild> mapOldIdToFolderChild = createOldIdToEntityMap(elements);
@@ -129,7 +139,7 @@ public class ImportUtils {
     /* Look for Feeds in Elements and Save them if required */
     IFeedDAO feedDao = DynamicDAO.getDAO(IFeedDAO.class);
     for (IFolderChild element : elements) {
-      saveFeedsOfBookmarks(element, feedDao);
+      saveFeedsOfBookmarks(element, feedDao, checkExistingFeeds);
     }
 
     /* Direct Import */
@@ -289,15 +299,19 @@ public class ImportUtils {
     }
   }
 
-  private static void saveFeedsOfBookmarks(IFolderChild element, IFeedDAO feedDao) {
+  private static void saveFeedsOfBookmarks(IFolderChild element, IFeedDAO feedDao, boolean checkExistingFeeds) {
 
     /* Bookmark */
     if (element instanceof IBookMark) {
       IBookMark bm = (IBookMark) element;
       FeedLinkReference feedReference = bm.getFeedLinkReference();
 
+      /* Check for Existing Feed if set */
+      FeedReference existingFeed = null;
+      if (checkExistingFeeds)
+        existingFeed = feedDao.loadReference(feedReference.getLink());
+
       /* Create a new Feed if necessary */
-      FeedReference existingFeed = feedDao.loadReference(feedReference.getLink());
       if (existingFeed == null) {
         IFeed feed = Owl.getModelFactory().createFeed(null, feedReference.getLink());
 
@@ -321,7 +335,7 @@ public class ImportUtils {
       IFolder folder = (IFolder) element;
       List<IFolderChild> children = folder.getChildren();
       for (IFolderChild child : children) {
-        saveFeedsOfBookmarks(child, feedDao);
+        saveFeedsOfBookmarks(child, feedDao, checkExistingFeeds);
       }
     }
   }
@@ -335,7 +349,7 @@ public class ImportUtils {
     /* Load the current selected Set as Location if necessary */
     IFolder selectedSet = null;
     if (!rootFolders.isEmpty()) {
-      if (!InternalOwl.TESTING) {
+      if (!InternalOwl.TESTING && PlatformUI.isWorkbenchRunning() && Controller.getDefault().isStarted()) {
         String selectedBookMarkSetPref = BookMarkExplorer.getSelectedBookMarkSetPref(OwlUI.getWindow());
         Long selectedFolderID = prefsDAO.load(selectedBookMarkSetPref).getLong();
         selectedSet = folderDAO.load(selectedFolderID);
