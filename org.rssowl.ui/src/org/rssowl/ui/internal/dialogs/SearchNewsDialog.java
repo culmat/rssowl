@@ -930,7 +930,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
 
       @Override
       public ImageDescriptor getImageDescriptor() {
-        return OwlUI.getImageDescriptor("icons/etool16/highlight.gif");
+        return OwlUI.getImageDescriptor("icons/etool16/browsermaximized.gif");
       }
 
       @Override
