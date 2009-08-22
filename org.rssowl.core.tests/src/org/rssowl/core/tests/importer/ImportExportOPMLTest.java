@@ -583,7 +583,7 @@ public class ImportExportOPMLTest {
 
     /* Import */
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(new FileInputStream(fTmpFileOnlyMarks));
-    ImportUtils.doImport(null, elements);
+    ImportUtils.doImport(null, elements, true);
 
     /* Validate */
     Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
@@ -633,7 +633,7 @@ public class ImportExportOPMLTest {
 
     /* Import */
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(new FileInputStream(fTmpFileInvalidLocations));
-    ImportUtils.doImport(null, elements);
+    ImportUtils.doImport(null, elements, true);
 
     /* Validate */
     Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
@@ -698,7 +698,7 @@ public class ImportExportOPMLTest {
 
     /* Import */
     List<? extends IEntity> elements = Owl.getInterpreter().importFrom(new FileInputStream(useBackup ? fTmpBackupFile.getAbsolutePath() : fTmpFile.getAbsolutePath()));
-    ImportUtils.doImport(null, elements);
+    ImportUtils.doImport(null, elements, true);
 
     /* Validate */
     Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();

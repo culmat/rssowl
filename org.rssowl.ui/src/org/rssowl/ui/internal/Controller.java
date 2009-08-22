@@ -65,13 +65,10 @@ import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.IPreference;
 import org.rssowl.core.persist.ISearchCondition;
-import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchMark;
-import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
 import org.rssowl.core.persist.dao.IConditionalGetDAO;
-import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
 import org.rssowl.core.persist.dao.INewsDAO;
 import org.rssowl.core.persist.dao.IPreferenceDAO;
@@ -94,7 +91,6 @@ import org.rssowl.core.util.Triple;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyPageWrapper;
-import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import org.rssowl.ui.internal.handler.LabelNewsHandler;
 import org.rssowl.ui.internal.notifier.NotificationService;
 import org.rssowl.ui.internal.services.CleanUpReminderService;
@@ -106,6 +102,8 @@ import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.JobRunner;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
@@ -179,6 +177,9 @@ public class Controller {
   /* System Property to override default connection timeout */
   private static final String FEED_CON_TIMEOUT_PROPERTY = "conTimeout";
 
+  /* System Property to import a file on first startup */
+  private static final String IMPORT_PROPERTY = "import";
+
   /* Queue for reloading Feeds */
   private final JobQueue fReloadFeedQueue;
 
@@ -200,6 +201,9 @@ public class Controller {
   /* Contributed Entity-Property-Pages */
   final List<EntityPropertyPageWrapper> fEntityPropertyPages;
 
+  /* Flag is set to TRUE when the application is done starting */
+  private boolean fIsStarted;
+
   /* Flag is set to TRUE when shutting down the application */
   private boolean fShuttingDown;
 
@@ -220,7 +224,6 @@ public class Controller {
   private CleanUpReminderService fCleanUpReminderService;
   private final IBookMarkDAO fBookMarkDAO;
   private final ISearchMarkDAO fSearchMarkDAO;
-  private final IFolderDAO fFolderDAO;
   private final IConditionalGetDAO fConditionalGetDAO;
   private final IPreferenceDAO fPrefsDAO;
   private final ILabelDAO fLabelDao;
@@ -233,6 +236,7 @@ public class Controller {
   private List<ShareProvider> fShareProviders = new ArrayList<ShareProvider>();
   private Map<Long, Long> fDeletedBookmarksCache = new ConcurrentHashMap<Long, Long>();
   private String fFeedSearchUrl;
+  private boolean fIsFirstStartup;
 
   /**
    * A listener that informs when a {@link IBookMark} is getting reloaded from
@@ -311,7 +315,6 @@ public class Controller {
     fBookMarkDAO = DynamicDAO.getDAO(IBookMarkDAO.class);
     fSearchMarkDAO = DynamicDAO.getDAO(ISearchMarkDAO.class);
     fConditionalGetDAO = DynamicDAO.getDAO(IConditionalGetDAO.class);
-    fFolderDAO = DynamicDAO.getDAO(IFolderDAO.class);
     fLabelDao = DynamicDAO.getDAO(ILabelDAO.class);
     fPrefsDAO = Owl.getPersistenceService().getDAOService().getPreferencesDAO();
     fAppService = Owl.getApplicationService();
@@ -1063,6 +1066,9 @@ public class Controller {
         }
       });
     }
+
+    /* Indicate Application is started */
+    fIsStarted = true;
   }
 
   private void backupSubscriptions() {
@@ -1123,6 +1129,16 @@ public class Controller {
   }
 
   /**
+   * Returns wether the application has finished starting.
+   *
+   * @return <code>TRUE</code> if the application is started, and
+   * <code>FALSE</code> otherwise if still initializing.
+   */
+  public boolean isStarted() {
+    return fIsStarted;
+  }
+
+  /**
    * This method is called immediately prior to workbench shutdown before any
    * windows have been closed.
    *
@@ -1135,13 +1151,19 @@ public class Controller {
     return true;
   }
 
-  private void onFirstStartup() throws PersistenceException, InterpreterException, ParserException {
+  private void onFirstStartup() throws PersistenceException, InterpreterException, ParserException, FileNotFoundException {
+    fIsFirstStartup = true;
 
     /* Add Default Labels */
     addDefaultLabels();
 
-    /* Import Default Marks */
-    importDefaults();
+    /* Add Default Set */
+    DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "My Bookmarks"));
+
+    /* Import File if specified */
+    String importFile = System.getProperty(IMPORT_PROPERTY);
+    if (StringUtils.isSet(importFile) && new File(importFile).exists())
+      initialImportFile(importFile);
   }
 
   private void addDefaultLabels() throws PersistenceException {
@@ -1169,68 +1191,13 @@ public class Controller {
     label.setColor("82,16,0");
     label.setOrder(4);
     fLabelDao.save(label);
-
   }
 
-  private void importDefaults() throws PersistenceException, InterpreterException, ParserException {
-
-    /* Import Default Feeds */
-    InputStream inS = getClass().getResourceAsStream("/default_feeds.xml"); //$NON-NLS-1$;
+  private void initialImportFile(String file) throws PersistenceException, InterpreterException, ParserException, FileNotFoundException {
+    InputStream inS = new FileInputStream(file);
     List<? extends IEntity> types = Owl.getInterpreter().importFrom(inS);
 
-    IFolder root = Owl.getModelFactory().createFolder(null, null, "My Bookmarks");
-    ImportUtils.doImport(root, types);
-
-    /* Create Default SearchMarks */
-    String newsEntityName = INews.class.getName();
-
-    /* SearchCondition: New and Updated News */
-    {
-      ISearchMark mark = fFactory.createSearchMark(null, root, "New and Updated News");
-      mark.setMatchAllConditions(true);
-
-      ISearchField field1 = fFactory.createSearchField(INews.STATE, newsEntityName);
-      fFactory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, INews.State.UPDATED));
-    }
-
-    /* SearchCondition: Recent News */
-    {
-      ISearchMark mark = fFactory.createSearchMark(null, root, "Recent News");
-      mark.setMatchAllConditions(true);
-
-      ISearchField field1 = fFactory.createSearchField(INews.AGE_IN_DAYS, newsEntityName);
-      fFactory.createSearchCondition(null, mark, field1, SearchSpecifier.IS_LESS_THAN, 2);
-    }
-
-    /* SearchCondition: News with Attachments */
-    {
-      ISearchMark mark = fFactory.createSearchMark(null, root, "News with Attachments");
-      mark.setMatchAllConditions(true);
-
-      ISearchField field = fFactory.createSearchField(INews.HAS_ATTACHMENTS, newsEntityName);
-      fFactory.createSearchCondition(null, mark, field, SearchSpecifier.IS, true);
-    }
-
-    /* SearchCondition: Sticky News */
-    {
-      ISearchMark mark = fFactory.createSearchMark(null, root, "Sticky News");
-      mark.setMatchAllConditions(true);
-
-      ISearchField field = fFactory.createSearchField(INews.IS_FLAGGED, newsEntityName);
-      fFactory.createSearchCondition(null, mark, field, SearchSpecifier.IS, true);
-    }
-
-    /* SearchCondition: News is Labeld */
-    {
-      ISearchMark mark = fFactory.createSearchMark(null, root, "Labeled News");
-      IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(mark);
-      preferences.putInteger(DefaultPreferences.BM_NEWS_GROUPING, NewsGrouping.Type.GROUP_BY_LABEL.ordinal());
-
-      ISearchField field = fFactory.createSearchField(INews.LABEL, newsEntityName);
-      fFactory.createSearchCondition(null, mark, field, SearchSpecifier.IS, "*");
-    }
-
-    fFolderDAO.save(root);
+    ImportUtils.doImport(null, types, false);
   }
 
   private IStatus createWarningStatus(IStatus status, IBookMark bookmark, URI feedLink) {

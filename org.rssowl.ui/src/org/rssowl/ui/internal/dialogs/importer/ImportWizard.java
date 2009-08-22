@@ -192,7 +192,7 @@ public class ImportWizard extends Wizard {
     }
 
     /* Run Import */
-    ImportUtils.doImport(target, folderChilds, labels, filters, preferences);
+    ImportUtils.doImport(target, folderChilds, labels, filters, preferences, true);
 
     /* Save Settings of Pages */
     fImportSourcePage.saveSettings();
