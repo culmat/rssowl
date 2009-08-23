@@ -116,7 +116,6 @@ public class FolderChildCheckboxTree {
     fViewer = new CheckboxTreeViewer(fParent, SWT.BORDER);
     fViewer.setAutoExpandLevel(2);
     fViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    ((GridData) fViewer.getTree().getLayoutData()).heightHint = 190;
     fViewer.getTree().setData(ApplicationWorkbenchWindowAdvisor.FOCUSLESS_SCROLL_HOOK, new Object());
 
     /* Sort by Name if set so */

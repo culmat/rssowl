@@ -1814,6 +1814,7 @@ public class OwlUI {
         return DIALOG_PERSISTSIZE;
       }
     };
+    dialog.setMinimumPageSize(0, 0);
     dialog.create();
     dialog.open();
   }

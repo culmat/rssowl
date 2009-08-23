@@ -131,6 +131,7 @@ public class ImportAction extends Action implements IWorkbenchWindowActionDelega
         return DIALOG_PERSISTSIZE;
       }
     };
+    dialog.setMinimumPageSize(0, 0);
     dialog.create();
     dialog.open();
   }
