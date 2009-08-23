@@ -38,6 +38,8 @@ import org.eclipse.swt.events.ShellAdapter;
 import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -45,6 +47,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -134,6 +137,16 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     configurer.setShowFastViewBars(false);
     configurer.setShowProgressIndicator(true);
     configurer.setTitle("RSSOwl"); //$NON-NLS-1$
+
+    /* Set Window Size to match monitor size (only on single monitor) */
+    Display display = Display.getDefault();
+    if (display != null) {
+      Monitor[] monitors = display.getMonitors();
+      if (monitors.length == 1) {
+        Rectangle clientArea = monitors[0].getClientArea();
+        configurer.setInitialSize(new Point(clientArea.width, clientArea.height));
+      }
+    }
 
     /* Apply DND Support for Editor Area */
     configurer.addEditorAreaTransfer(LocalSelectionTransfer.getTransfer());
