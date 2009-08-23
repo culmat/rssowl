@@ -28,6 +28,7 @@ import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -50,6 +51,7 @@ import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.dialogs.welcome.WelcomeWizard;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
@@ -74,50 +76,50 @@ public class ImportSourcePage extends WizardPage {
   private Button fImportFromResourceRadio;
   private Combo fResourceInput;
   private Button fBrowseFileButton;
-  private Button fImportFromKeyword;
+  private Button fImportFromKeywordRadio;
   private Combo fKeywordInput;
   private Button fImportFromRecommendedRadio;
+  private Button fImportNoneRadio;
   private IPreferenceScope fPreferences;
   private boolean fIsAutoCompleteKeywordHooked;
   private final String fWebsite;
   private final boolean fIsKewordSearch;
 
-  /* Sources for Import */
-  enum Source {
+  /** Sources for Import */
+  public enum Source {
 
-    /* User has decided against importing */
+    /** User has decided against importing */
     NONE,
 
-    /* User has provided a resource (either local or online) */
+    /** User has provided a resource (either local or online) */
     RESOURCE,
 
-    /* User wants to search feeds matching a keyword */
+    /** User wants to search feeds matching a keyword */
     KEYWORD,
 
-    /* User wants to import from recommended */
+    /** User wants to import from recommended */
     RECOMMENDED
   }
 
-  /**
-   * @param pageName
-   * @param website
-   * @param isKewordSearch
-   */
-  protected ImportSourcePage(String pageName, String website, boolean isKewordSearch) {
-    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/import_wiz.png"));
+  ImportSourcePage(String website, boolean isKewordSearch) {
+    super("Choose Source", "Choose Source", null);
     fWebsite = website;
     fIsKewordSearch = isKewordSearch;
-    setMessage("Please choose the source of import.");
     fPreferences = Owl.getPreferenceService().getGlobalScope();
   }
 
-  /* Returns the type of Source to use for the Import */
-  Source getSource() {
+  /**
+   * @return the type of Source to use for the Import
+   */
+  public Source getSource() {
     if (fImportFromResourceRadio.getSelection())
       return Source.RESOURCE;
 
-    if (fImportFromKeyword.getSelection())
+    if (fImportFromKeywordRadio.getSelection())
       return Source.KEYWORD;
+
+    if (fImportNoneRadio != null && fImportNoneRadio.getSelection())
+      return Source.NONE;
 
     return Source.RECOMMENDED;
   }
@@ -129,7 +131,7 @@ public class ImportSourcePage extends WizardPage {
 
   /* Returns the Keywords to Import from or null if none */
   String getImportKeywords() {
-    return fImportFromKeyword.getSelection() ? fKeywordInput.getText() : null;
+    return fImportFromKeywordRadio.getSelection() ? fKeywordInput.getText() : null;
   }
 
   /* Returns whether the source is only remotely accessible */
@@ -151,12 +153,71 @@ public class ImportSourcePage extends WizardPage {
    * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
    */
   public void createControl(Composite parent) {
+    boolean isWelcome = isWelcome();
+
+    /* Title Image */
+    setImageDescriptor(OwlUI.getImageDescriptor(isWelcome ? "icons/wizban/welcome_wiz.gif" : "icons/wizban/import_wiz.png"));
+
+    /* Override Title and Message if this is the Welcome Wizard */
+    if (isWelcome) {
+      setTitle("Welcome to RSSOwl");
+      setMessage("Please choose a source to import your initial list of Feeds.");
+    } else
+      setMessage("Please choose the source of import.");
+
+    /* Container */
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(new GridLayout(1, false));
 
-    /* Import from File or Website */
+    /* Welcome Wizard */
+    if (isWelcome) {
+      StyledText infoText = new StyledText(container, SWT.WRAP | SWT.READ_ONLY);
+      infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
+      ((GridData) infoText.getLayoutData()).widthHint = 200;
+      infoText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
+
+      StringBuilder info = new StringBuilder();
+      info.append("Welcome and thanks for using RSSOwl.\n\nThis wizard will help you subscribe to your initial list of Feeds. ");
+      info.append("It also explains some of the basic concepts in RSSOwl to help you get started.");
+
+      infoText.setText(info.toString());
+
+      /* Import from Recommended Feeds */
+      createImportRecommendedControls(container);
+
+      /* Import from File or Website */
+      createImportResourceControls(container);
+
+      /* Import from Keyword Search */
+      createImportKeywordControls(container);
+
+      /* Import None */
+      createImportNoneControls(container);
+    }
+
+    /*  Import Wizard */
+    else {
+
+      /* Import from File or Website */
+      createImportResourceControls(container);
+
+      /* Import from Keyword Search */
+      createImportKeywordControls(container);
+
+      /* Import from Recommended Feeds */
+      createImportRecommendedControls(container);
+    }
+
+    setControl(container);
+    updatePageComplete();
+  }
+
+  private void createImportResourceControls(Composite container) {
     fImportFromResourceRadio = new Button(container, SWT.RADIO);
-    fImportFromResourceRadio.setSelection(!fIsKewordSearch);
+    fImportFromResourceRadio.setSelection(!fIsKewordSearch && !isWelcome());
+    fImportFromResourceRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    if (isWelcome())
+      ((GridData) fImportFromResourceRadio.getLayoutData()).verticalIndent = 10;
     fImportFromResourceRadio.setText("Import Feeds from a File or Website:");
     fImportFromResourceRadio.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -170,7 +231,7 @@ public class ImportSourcePage extends WizardPage {
       }
     });
 
-    Composite sourceInputContainer = new Composite(container, SWT.None);
+    Composite sourceInputContainer = new Composite(container, SWT.NONE);
     sourceInputContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
     ((GridLayout) sourceInputContainer.getLayout()).marginLeft = 15;
     ((GridLayout) sourceInputContainer.getLayout()).marginBottom = 10;
@@ -208,16 +269,17 @@ public class ImportSourcePage extends WizardPage {
         onBrowse();
       }
     });
+  }
 
-    /* Import from Keyword Search */
-    fImportFromKeyword = new Button(container, SWT.RADIO);
-    fImportFromKeyword.setSelection(fIsKewordSearch);
-    fImportFromKeyword.setText("Import Feeds matching the following Keywords:");
-    fImportFromKeyword.addSelectionListener(new SelectionAdapter() {
+  private void createImportKeywordControls(Composite container) {
+    fImportFromKeywordRadio = new Button(container, SWT.RADIO);
+    fImportFromKeywordRadio.setSelection(fIsKewordSearch && !isWelcome());
+    fImportFromKeywordRadio.setText("Import Feeds matching the following Keywords:");
+    fImportFromKeywordRadio.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         updatePageComplete();
-        boolean importFromKeyword = fImportFromKeyword.getSelection();
+        boolean importFromKeyword = fImportFromKeywordRadio.getSelection();
         fKeywordInput.setEnabled(importFromKeyword);
         if (importFromKeyword) {
           hookKeywordAutocomplete(false);
@@ -226,16 +288,16 @@ public class ImportSourcePage extends WizardPage {
       }
     });
 
-    Composite keywordInputContainer = new Composite(container, SWT.None);
-    keywordInputContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    Composite keywordInputContainer = new Composite(container, SWT.NONE);
+    keywordInputContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0));
     ((GridLayout) keywordInputContainer.getLayout()).marginLeft = 15;
     ((GridLayout) keywordInputContainer.getLayout()).marginBottom = 10;
     keywordInputContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fKeywordInput = new Combo(keywordInputContainer, SWT.DROP_DOWN | SWT.BORDER);
     fKeywordInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
-    fKeywordInput.setEnabled(fImportFromKeyword.getSelection());
-    if (fImportFromKeyword.getSelection()) {
+    fKeywordInput.setEnabled(fImportFromKeywordRadio.getSelection());
+    if (fImportFromKeywordRadio.getSelection()) {
       hookKeywordAutocomplete(true);
       fKeywordInput.setFocus();
     }
@@ -253,19 +315,34 @@ public class ImportSourcePage extends WizardPage {
         updatePageComplete();
       }
     });
+  }
 
-    /* Import from Recommended Feeds */
+  private void createImportRecommendedControls(Composite container) {
     fImportFromRecommendedRadio = new Button(container, SWT.RADIO);
     fImportFromRecommendedRadio.setText("Import Recommended Feeds");
+    fImportFromRecommendedRadio.setSelection(isWelcome());
+    if (isWelcome()) {
+      fImportFromRecommendedRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      ((GridData) fImportFromRecommendedRadio.getLayoutData()).verticalIndent = 10;
+    }
     fImportFromRecommendedRadio.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
         updatePageComplete();
       }
     });
+  }
 
-    setControl(container);
-    updatePageComplete();
+  private void createImportNoneControls(Composite container) {
+    fImportNoneRadio = new Button(container, SWT.RADIO);
+    fImportNoneRadio.setText("Do not Import Feeds");
+    fImportNoneRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    fImportNoneRadio.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        updatePageComplete();
+      }
+    });
   }
 
   private void onBrowse() {
@@ -305,6 +382,10 @@ public class ImportSourcePage extends WizardPage {
     if (fImportFromRecommendedRadio.getSelection())
       setPageComplete(true);
 
+    /* Import None */
+    else if (fImportNoneRadio != null && fImportNoneRadio.getSelection())
+      setPageComplete(true);
+
     /* Import from Resource */
     else if (fImportFromResourceRadio.getSelection()) {
       if (!StringUtils.isSet(fResourceInput.getText()))
@@ -324,8 +405,8 @@ public class ImportSourcePage extends WizardPage {
     }
 
     /* Import From Keywords */
-    else if (fImportFromKeyword.getSelection())
-      setPageComplete(StringUtils.isSet(fImportFromKeyword.getText()));
+    else if (fImportFromKeywordRadio.getSelection())
+      setPageComplete(StringUtils.isSet(fKeywordInput.getText()));
 
     /* Set Error Message */
     if (errorMessage != null)
@@ -334,8 +415,12 @@ public class ImportSourcePage extends WizardPage {
     /* Restore Normal Message */
     else {
       setErrorMessage(null);
-      setMessage("Please choose the source of import.");
+      setMessage(isWelcome() ? "Please choose a source to import your initial list of Feeds." : "Please choose the source of import.");
     }
+  }
+
+  private boolean isWelcome() {
+    return getWizard() instanceof WelcomeWizard;
   }
 
   /* Save Import Sources */
@@ -345,7 +430,7 @@ public class ImportSourcePage extends WizardPage {
     saveComboSettings(fImportFromResourceRadio.getSelection() ? fResourceInput.getText() : null, DefaultPreferences.IMPORT_RESOURCES);
 
     /* Import Keywords */
-    saveComboSettings(fImportFromKeyword.getSelection() ? fKeywordInput.getText() : null, DefaultPreferences.IMPORT_KEYWORDS);
+    saveComboSettings(fImportFromKeywordRadio.getSelection() ? fKeywordInput.getText() : null, DefaultPreferences.IMPORT_KEYWORDS);
   }
 
   private void saveComboSettings(String valueToAdd, String prefKey) {
