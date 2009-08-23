@@ -32,6 +32,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.PlatformUI;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
+import org.rssowl.core.interpreter.ITypeImporter;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
@@ -187,6 +188,7 @@ public class ImportWizard extends Wizard {
 
     /* Collect Elements to Import */
     List<IFolderChild> folderChilds = fImportElementsPage.getFolderChildsToImport();
+    boolean isRSSOwlOPML = isRSSOwlOPMLImport(folderChilds);
     if (fImportElementsPage.excludeExisting())
       folderChilds = excludeExisting(folderChilds);
 
@@ -230,7 +232,7 @@ public class ImportWizard extends Wizard {
     ImportUtils.doImport(target, folderChilds, labels, filters, preferences, !fIsWelcome);
 
     /* Add Default Saved Searches if this is from Welcome Wizard */
-    if (fIsWelcome)
+    if (fIsWelcome && !isRSSOwlOPML && !importLabels && !importFilters && !importPreferences)
       addDefaultSearches();
 
     /* Save Settings of Pages */
@@ -267,6 +269,18 @@ public class ImportWizard extends Wizard {
     });
 
     return true;
+  }
+
+  private boolean isRSSOwlOPMLImport(List<IFolderChild> folderChilds) {
+    for (IFolderChild child : folderChilds) {
+      if (child instanceof IFolder && child.getParent() == null) {
+        IFolder set = (IFolder) child;
+        if (set.getProperty(ITypeImporter.TEMPORARY_FOLDER) == null)
+          return true;
+      }
+    }
+
+    return false;
   }
 
   /* Remove existing Bookmarks and Empty Folders */
