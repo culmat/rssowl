@@ -62,11 +62,8 @@ public class ImportTargetPage extends WizardPage {
   private Button fCreateNewSetRadio;
   private Text fSetNameInput;
 
-  /**
-   * @param pageName
-   */
-  protected ImportTargetPage(String pageName) {
-    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/import_wiz.png"));
+  ImportTargetPage() {
+    super("Choose Target Location", "Choose Target Location", OwlUI.getImageDescriptor("icons/wizban/import_wiz.png"));
     setMessage("Please choose the target folder to import into.");
   }
 
