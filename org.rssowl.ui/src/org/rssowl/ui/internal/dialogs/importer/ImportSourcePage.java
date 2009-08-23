@@ -28,7 +28,6 @@ import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -161,7 +160,7 @@ public class ImportSourcePage extends WizardPage {
     /* Override Title and Message if this is the Welcome Wizard */
     if (isWelcome) {
       setTitle("Welcome to RSSOwl");
-      setMessage("Please choose a source to import your initial list of Feeds.");
+      setMessage("This wizard will help you subscribe to your initial list of Feeds.");
     } else
       setMessage("Please choose the source of import.");
 
@@ -171,16 +170,6 @@ public class ImportSourcePage extends WizardPage {
 
     /* Welcome Wizard */
     if (isWelcome) {
-      StyledText infoText = new StyledText(container, SWT.WRAP | SWT.READ_ONLY);
-      infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-      ((GridData) infoText.getLayoutData()).widthHint = 200;
-      infoText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
-
-      StringBuilder info = new StringBuilder();
-      info.append("Welcome and thanks for using RSSOwl.\n\nThis wizard will help you subscribe to your initial list of Feeds. ");
-      info.append("It also explains some of the basic concepts in RSSOwl to help you get started.");
-
-      infoText.setText(info.toString());
 
       /* Import from Recommended Feeds */
       createImportRecommendedControls(container);
@@ -321,10 +310,6 @@ public class ImportSourcePage extends WizardPage {
     fImportFromRecommendedRadio = new Button(container, SWT.RADIO);
     fImportFromRecommendedRadio.setText("Import Recommended Feeds");
     fImportFromRecommendedRadio.setSelection(isWelcome());
-    if (isWelcome()) {
-      fImportFromRecommendedRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-      ((GridData) fImportFromRecommendedRadio.getLayoutData()).verticalIndent = 10;
-    }
     fImportFromRecommendedRadio.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -415,7 +400,7 @@ public class ImportSourcePage extends WizardPage {
     /* Restore Normal Message */
     else {
       setErrorMessage(null);
-      setMessage(isWelcome() ? "Please choose a source to import your initial list of Feeds." : "Please choose the source of import.");
+      setMessage(isWelcome() ? "This wizard will help you subscribe to your initial list of Feeds." : "Please choose the source of import.");
     }
   }
 
