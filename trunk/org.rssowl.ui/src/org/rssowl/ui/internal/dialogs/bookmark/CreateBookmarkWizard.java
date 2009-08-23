@@ -97,7 +97,6 @@ public class CreateBookmarkWizard extends Wizard {
    */
   @Override
   public void addPages() {
-    setHelpAvailable(false);
     setWindowTitle("New Bookmark");
 
     /* Page 1: Enter Link or Keyword */
