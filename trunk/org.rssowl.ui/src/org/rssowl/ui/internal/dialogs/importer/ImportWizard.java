@@ -171,9 +171,13 @@ public class ImportWizard extends Wizard {
 
     /* Prohibit direct Finish from Sources that require a remote connection or include recommended feeds */
     if (getContainer().getCurrentPage() == fImportSourcePage) {
-      if (fImportSourcePage.isRemoteSource() || fImportSourcePage.getSource() == Source.RECOMMENDED)
+      if (fImportSourcePage.isRemoteSource() || (fImportSourcePage.getSource() == Source.RECOMMENDED && !fIsWelcome))
         return false;
     }
+
+    /* Allow to Finish if nothing should be imported */
+    if (fImportSourcePage.getSource() == Source.NONE)
+      return true;
 
     /* Other Pages decide on their own */
     return super.canFinish();
