@@ -129,7 +129,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Note: As required by the UI, the controller should be filled with more
  * methods.
  * </p>
- * 
+ *
  * @author bpasero
  */
 public class Controller {
@@ -525,7 +525,7 @@ public class Controller {
    * Reload the given List of BookMarks. The BookMarks are processed in a queue
    * that stores all Tasks of this kind and guarantees that a certain amount of
    * Jobs process the Task concurrently.
-   * 
+   *
    * @param bookmarks The BookMarks to reload.
    * @param shell The Shell this operation is running in, used to open Dialogs
    * if necessary.
@@ -552,7 +552,7 @@ public class Controller {
    * Reload the given BookMark. The BookMark is processed in a queue that stores
    * all Tasks of this kind and guarantees that a certain amount of Jobs process
    * the Task concurrently.
-   * 
+   *
    * @param bookmark The BookMark to reload.
    * @param shell The Shell this operation is running in, used to open Dialogs
    * if necessary.
@@ -569,7 +569,7 @@ public class Controller {
 
   /**
    * Reload the given BookMark.
-   * 
+   *
    * @param bookmark The BookMark to reload.
    * @param shell The Shell this operation is running in, used to open Dialogs
    * if necessary, or <code>NULL</code> if no Shell is available.
@@ -990,7 +990,7 @@ public class Controller {
   /**
    * Tells the Controller to stop. This method is called automatically from osgi
    * as soon as the org.rssowl.ui bundle gets stopped.
-   * 
+   *
    * @param emergency If set to <code>TRUE</code>, this method is called from a
    * shutdown hook that got triggered from a non-normal shutdown (e.g. System
    * Shutdown).
@@ -1002,31 +1002,31 @@ public class Controller {
     unregisterListeners();
 
     /* Stop the Download Service */
-    if (!emergency)
+    if (!emergency && fDownloadService != null)
       fDownloadService.stopService();
 
     /* Stop Clean-Up Reminder Service */
-    if (!InternalOwl.TESTING && !emergency)
+    if (!InternalOwl.TESTING && !emergency && fCleanUpReminderService != null)
       fCleanUpReminderService.stopService();
 
     /* Stop the Feed Reload Service */
-    if (!InternalOwl.TESTING && !emergency)
+    if (!InternalOwl.TESTING && !emergency && fFeedReloadService != null)
       fFeedReloadService.stopService();
 
     /* Cancel the reload queue */
-    if (!emergency)
+    if (!emergency && fReloadFeedQueue != null)
       fReloadFeedQueue.cancel(false);
 
     /* Cancel the feed-save queue (join) */
-    if (!emergency)
+    if (!emergency && fSaveFeedQueue != null)
       fSaveFeedQueue.cancel(true);
 
     /* Stop the Notification Service */
-    if (!InternalOwl.TESTING && !emergency)
+    if (!InternalOwl.TESTING && !emergency && fNotificationService != null)
       fNotificationService.stopService();
 
     /* Stop the Saved Search Service */
-    if (!emergency)
+    if (!emergency && fSavedSearchService != null)
       fSavedSearchService.stopService();
 
     /* Shutdown ApplicationServer */
@@ -1135,7 +1135,7 @@ public class Controller {
 
   /**
    * Returns wether the application is in process of shutting down.
-   * 
+   *
    * @return <code>TRUE</code> if the application has been closed, and
    * <code>FALSE</code> otherwise.
    */
@@ -1145,7 +1145,7 @@ public class Controller {
 
   /**
    * Returns wether the application has finished starting.
-   * 
+   *
    * @return <code>TRUE</code> if the application is started, and
    * <code>FALSE</code> otherwise if still initializing.
    */
@@ -1156,7 +1156,7 @@ public class Controller {
   /**
    * This method is called immediately prior to workbench shutdown before any
    * windows have been closed.
-   * 
+   *
    * @return <code>true</code> to allow the workbench to proceed with shutdown,
    * <code>false</code> to veto a non-forced shutdown
    */
