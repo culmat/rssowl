@@ -55,13 +55,13 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.pref.IPreferenceType;
 import org.rssowl.core.persist.pref.IPreferenceScope.Kind;
 import org.rssowl.core.persist.reference.FeedLinkReference;
-import org.rssowl.core.persist.reference.FeedReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -138,8 +138,9 @@ public class ImportUtils {
 
     /* Look for Feeds in Elements and Save them if required */
     IFeedDAO feedDao = DynamicDAO.getDAO(IFeedDAO.class);
+    List<URI> feedsCreated = new ArrayList<URI>();
     for (IFolderChild element : elements) {
-      saveFeedsOfBookmarks(element, feedDao, checkExistingFeeds);
+      saveFeedsOfBookmarks(feedsCreated, element, feedDao, checkExistingFeeds);
     }
 
     /* Direct Import */
@@ -299,7 +300,7 @@ public class ImportUtils {
     }
   }
 
-  private static void saveFeedsOfBookmarks(IFolderChild element, IFeedDAO feedDao, boolean checkExistingFeeds) {
+  private static void saveFeedsOfBookmarks(List<URI> feedsCreated, IFolderChild element, IFeedDAO feedDao, boolean checkExistingFeeds) {
 
     /* Bookmark */
     if (element instanceof IBookMark) {
@@ -307,12 +308,12 @@ public class ImportUtils {
       FeedLinkReference feedReference = bm.getFeedLinkReference();
 
       /* Check for Existing Feed if set */
-      FeedReference existingFeed = null;
-      if (checkExistingFeeds)
-        existingFeed = feedDao.loadReference(feedReference.getLink());
+      boolean feedExists = feedsCreated.contains(feedReference.getLink());
+      if (!feedExists && checkExistingFeeds)
+        feedExists = feedDao.loadReference(feedReference.getLink()) != null;
 
       /* Create a new Feed if necessary */
-      if (existingFeed == null) {
+      if (!feedExists) {
         IFeed feed = Owl.getModelFactory().createFeed(null, feedReference.getLink());
 
         Object homepage = bm.getProperty(ITypeImporter.HOMEPAGE_KEY);
@@ -324,6 +325,7 @@ public class ImportUtils {
           feed.setDescription((String) description);
 
         feedDao.save(feed);
+        feedsCreated.add(feedReference.getLink());
       }
 
       bm.removeProperty(ITypeImporter.DESCRIPTION_KEY);
@@ -335,7 +337,7 @@ public class ImportUtils {
       IFolder folder = (IFolder) element;
       List<IFolderChild> children = folder.getChildren();
       for (IFolderChild child : children) {
-        saveFeedsOfBookmarks(child, feedDao, checkExistingFeeds);
+        saveFeedsOfBookmarks(feedsCreated, child, feedDao, checkExistingFeeds);
       }
     }
   }
