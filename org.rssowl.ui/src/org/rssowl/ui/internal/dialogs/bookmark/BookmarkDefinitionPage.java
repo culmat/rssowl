@@ -131,7 +131,7 @@ public class BookmarkDefinitionPage extends WizardPage {
     Label locationLabel = new Label(labelContainer, SWT.None);
     locationLabel.setText("Location: ");
 
-    fFolderChooser = new FolderChooser(container, fSelectedFolder, SWT.BORDER, false);
+    fFolderChooser = new FolderChooser(container, fSelectedFolder, null, SWT.BORDER, false, 5);
     fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
     fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
