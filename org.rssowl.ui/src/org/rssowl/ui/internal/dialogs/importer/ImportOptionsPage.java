@@ -34,13 +34,11 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
 import org.rssowl.core.internal.newsaction.LabelNewsAction;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.welcome.WelcomeWizard;
-import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -55,7 +53,6 @@ public class ImportOptionsPage extends WizardPage {
   private Button fImportFiltersCheck;
   private Button fImportPreferencesCheck;
   private boolean fFiltersUseLabels;
-  private Composite fBottomInfoContainer;
 
   ImportOptionsPage() {
     super("Import Options", "Import Options", null);
@@ -77,7 +74,7 @@ public class ImportOptionsPage extends WizardPage {
     /* Info Text */
     StyledText infoText = new StyledText(container, SWT.WRAP | SWT.READ_ONLY);
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-    ((GridData) infoText.getLayoutData()).widthHint = 200;
+    ((GridData) infoText.getLayoutData()).widthHint = 300;
     infoText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
     infoText.setText("The following options allow to import more than just feeds. You can choose to import Labels, News Filters and Preferences if available from the source.");
 
@@ -108,21 +105,6 @@ public class ImportOptionsPage extends WizardPage {
     fImportPreferencesCheck = new Button(container, SWT.CHECK);
     fImportPreferencesCheck.setImage(OwlUI.getImage(fImportPreferencesCheck, "icons/elcl16/preferences.gif"));
     fImportPreferencesCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-
-    /* Info Container */
-    fBottomInfoContainer = new Composite(container, SWT.None);
-    fBottomInfoContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false));
-    fBottomInfoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
-
-    Label infoImg = new Label(fBottomInfoContainer, SWT.NONE);
-    infoImg.setImage(OwlUI.getImage(infoImg, "icons/obj16/warning.gif"));
-    infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
-
-    infoText = new StyledText(fBottomInfoContainer, SWT.WRAP | SWT.READ_ONLY);
-    infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
-    ((GridData) infoText.getLayoutData()).widthHint = 200;
-    infoText.setText("Use 'Import Preferences' with care. All of your existing preferences will be replaced with the imported ones if selected.");
-    infoText.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND));
 
     setControl(container);
   }
@@ -184,7 +166,6 @@ public class ImportOptionsPage extends WizardPage {
     else
       fImportPreferencesCheck.setText("Import Preferences (No Preferences Available)");
     fImportPreferencesCheck.setEnabled(hasPreferences);
-    fBottomInfoContainer.setVisible(hasPreferences);
   }
 
   /* Check if any Filter uses the Label Action */
