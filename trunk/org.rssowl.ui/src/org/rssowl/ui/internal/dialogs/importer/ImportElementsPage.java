@@ -74,6 +74,7 @@ import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.importer.ImportSourcePage.Source;
+import org.rssowl.ui.internal.dialogs.welcome.WelcomeWizard;
 import org.rssowl.ui.internal.util.FolderChildCheckboxTree;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -204,11 +205,8 @@ public class ImportElementsPage extends WizardPage {
     }
   }
 
-  /**
-   * @param pageName
-   */
-  protected ImportElementsPage(String pageName) {
-    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/import_wiz.png"));
+  ImportElementsPage() {
+    super("Choose Elements", "Choose Elements", null);
     setMessage("Please choose the elements to import.");
   }
 
@@ -250,6 +248,11 @@ public class ImportElementsPage extends WizardPage {
    * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
    */
   public void createControl(Composite parent) {
+
+    /* Title Image */
+    setImageDescriptor(OwlUI.getImageDescriptor(getWizard() instanceof WelcomeWizard ? "icons/wizban/welcome_wiz.gif" : "icons/wizban/import_wiz.png"));
+
+    /* Container */
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(new GridLayout(1, false));
 
