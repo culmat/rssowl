@@ -160,7 +160,7 @@ public class ImportSourcePage extends WizardPage {
     /* Override Title and Message if this is the Welcome Wizard */
     if (isWelcome) {
       setTitle("Welcome to RSSOwl");
-      setMessage("This wizard will help you subscribe to your initial list of Feeds.");
+      setMessage("Use this wizard to subscribe to your initial list of news feeds.");
     } else
       setMessage("Please choose the source of import.");
 
@@ -400,7 +400,7 @@ public class ImportSourcePage extends WizardPage {
     /* Restore Normal Message */
     else {
       setErrorMessage(null);
-      setMessage(isWelcome() ? "This wizard will help you subscribe to your initial list of Feeds." : "Please choose the source of import.");
+      setMessage(isWelcome() ? "Use this wizard to subscribe to your initial list of news feeds." : "Please choose the source of import.");
     }
   }
 
