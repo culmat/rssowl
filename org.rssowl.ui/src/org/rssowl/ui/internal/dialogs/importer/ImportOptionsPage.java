@@ -39,6 +39,7 @@ import org.rssowl.core.internal.newsaction.LabelNewsAction;
 import org.rssowl.core.persist.IFilterAction;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.dialogs.welcome.WelcomeWizard;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.Collection;
@@ -56,11 +57,8 @@ public class ImportOptionsPage extends WizardPage {
   private boolean fFiltersUseLabels;
   private Composite fBottomInfoContainer;
 
-  /**
-   * @param pageName
-   */
-  protected ImportOptionsPage(String pageName) {
-    super(pageName, pageName, OwlUI.getImageDescriptor("icons/wizban/import_wiz.png"));
+  ImportOptionsPage() {
+    super("Import Options", "Import Options", null);
     setMessage("Please select additional options for the import.");
   }
 
@@ -68,9 +66,15 @@ public class ImportOptionsPage extends WizardPage {
    * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
    */
   public void createControl(Composite parent) {
+
+    /* Title Image */
+    setImageDescriptor(OwlUI.getImageDescriptor(getWizard() instanceof WelcomeWizard ? "icons/wizban/welcome_wiz.gif" : "icons/wizban/import_wiz.png"));
+
+    /* Container */
     Composite container = new Composite(parent, SWT.NONE);
     container.setLayout(new GridLayout(1, false));
 
+    /* Info Text */
     StyledText infoText = new StyledText(container, SWT.WRAP | SWT.READ_ONLY);
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, false));
     ((GridData) infoText.getLayoutData()).widthHint = 200;
