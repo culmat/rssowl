@@ -91,6 +91,7 @@ import org.rssowl.core.util.Triple;
 import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.properties.EntityPropertyPageWrapper;
+import org.rssowl.ui.internal.dialogs.welcome.WelcomeWizard;
 import org.rssowl.ui.internal.handler.LabelNewsHandler;
 import org.rssowl.ui.internal.notifier.NotificationService;
 import org.rssowl.ui.internal.services.CleanUpReminderService;
@@ -128,7 +129,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * Note: As required by the UI, the controller should be filled with more
  * methods.
  * </p>
- *
+ * 
  * @author bpasero
  */
 public class Controller {
@@ -236,7 +237,7 @@ public class Controller {
   private List<ShareProvider> fShareProviders = new ArrayList<ShareProvider>();
   private Map<Long, Long> fDeletedBookmarksCache = new ConcurrentHashMap<Long, Long>();
   private String fFeedSearchUrl;
-  private boolean fIsFirstStartup;
+  private boolean fShowWelcome;
 
   /**
    * A listener that informs when a {@link IBookMark} is getting reloaded from
@@ -524,7 +525,7 @@ public class Controller {
    * Reload the given List of BookMarks. The BookMarks are processed in a queue
    * that stores all Tasks of this kind and guarantees that a certain amount of
    * Jobs process the Task concurrently.
-   *
+   * 
    * @param bookmarks The BookMarks to reload.
    * @param shell The Shell this operation is running in, used to open Dialogs
    * if necessary.
@@ -551,7 +552,7 @@ public class Controller {
    * Reload the given BookMark. The BookMark is processed in a queue that stores
    * all Tasks of this kind and guarantees that a certain amount of Jobs process
    * the Task concurrently.
-   *
+   * 
    * @param bookmark The BookMark to reload.
    * @param shell The Shell this operation is running in, used to open Dialogs
    * if necessary.
@@ -568,7 +569,7 @@ public class Controller {
 
   /**
    * Reload the given BookMark.
-   *
+   * 
    * @param bookmark The BookMark to reload.
    * @param shell The Shell this operation is running in, used to open Dialogs
    * if necessary, or <code>NULL</code> if no Shell is available.
@@ -989,7 +990,7 @@ public class Controller {
   /**
    * Tells the Controller to stop. This method is called automatically from osgi
    * as soon as the org.rssowl.ui bundle gets stopped.
-   *
+   * 
    * @param emergency If set to <code>TRUE</code>, this method is called from a
    * shutdown hook that got triggered from a non-normal shutdown (e.g. System
    * Shutdown).
@@ -1067,8 +1068,22 @@ public class Controller {
       });
     }
 
+    /* Show the Welcome Wizard if this is the first startup */
+    if (fShowWelcome) {
+      JobRunner.runInUIThread(300, OwlUI.getActiveShell(), new Runnable() {
+        public void run() {
+          showWelcomeWizard();
+        }
+      });
+    }
+
     /* Indicate Application is started */
     fIsStarted = true;
+  }
+
+  private void showWelcomeWizard() {
+    WelcomeWizard wizard = new WelcomeWizard();
+    OwlUI.openWizard(OwlUI.getActiveShell(), wizard, true, null);
   }
 
   private void backupSubscriptions() {
@@ -1120,7 +1135,7 @@ public class Controller {
 
   /**
    * Returns wether the application is in process of shutting down.
-   *
+   * 
    * @return <code>TRUE</code> if the application has been closed, and
    * <code>FALSE</code> otherwise.
    */
@@ -1130,7 +1145,7 @@ public class Controller {
 
   /**
    * Returns wether the application has finished starting.
-   *
+   * 
    * @return <code>TRUE</code> if the application is started, and
    * <code>FALSE</code> otherwise if still initializing.
    */
@@ -1141,7 +1156,7 @@ public class Controller {
   /**
    * This method is called immediately prior to workbench shutdown before any
    * windows have been closed.
-   *
+   * 
    * @return <code>true</code> to allow the workbench to proceed with shutdown,
    * <code>false</code> to veto a non-forced shutdown
    */
@@ -1152,7 +1167,6 @@ public class Controller {
   }
 
   private void onFirstStartup() throws PersistenceException, InterpreterException, ParserException, FileNotFoundException {
-    fIsFirstStartup = true;
 
     /* Add Default Labels */
     addDefaultLabels();
@@ -1164,6 +1178,10 @@ public class Controller {
     String importFile = System.getProperty(IMPORT_PROPERTY);
     if (StringUtils.isSet(importFile) && new File(importFile).exists())
       initialImportFile(importFile);
+
+    /* Otherwise show Welcome Wizard to User */
+    else
+      fShowWelcome = true;
   }
 
   private void addDefaultLabels() throws PersistenceException {
