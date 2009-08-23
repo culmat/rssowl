@@ -842,4 +842,42 @@ public class FileImportTest {
     assertEquals("Bin A", childs.get(7).getName());
     assertEquals("Wired Top Stories", childs.get(8).getName());
   }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_DuplicateMarks_CheckExisting() throws Exception {
+    IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/duplicates.opml"));
+    ImportUtils.doImport(null, elements, true);
+
+    Set<IFolder> roots = CoreUtils.loadRootFolders();
+    assertEquals(1, roots.size());
+    root = roots.iterator().next();
+    assertEquals(7, root.getMarks().size());
+    assertEquals(0, root.getFolders().size());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_DuplicateMarks_DoNotCheckExisting() throws Exception {
+    IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/duplicates.opml"));
+    ImportUtils.doImport(null, elements, false);
+
+    Set<IFolder> roots = CoreUtils.loadRootFolders();
+    assertEquals(1, roots.size());
+    root = roots.iterator().next();
+    assertEquals(7, root.getMarks().size());
+    assertEquals(0, root.getFolders().size());
+  }
 }
