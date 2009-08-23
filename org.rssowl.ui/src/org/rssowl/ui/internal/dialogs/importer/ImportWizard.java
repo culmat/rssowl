@@ -30,28 +30,39 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.PlatformUI;
+import org.rssowl.core.Owl;
+import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.IModelFactory;
+import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.IPreference;
+import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.ISearchMark;
+import org.rssowl.core.persist.SearchSpecifier;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.dao.IBookMarkDAO;
+import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.dialogs.importer.ImportSourcePage.Source;
+import org.rssowl.ui.internal.dialogs.welcome.WelcomeWizard;
+import org.rssowl.ui.internal.editors.feed.NewsGrouping;
 import org.rssowl.ui.internal.util.ImportUtils;
 import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A {@link Wizard} to import bookmarks, saved searches and bins with the option
@@ -67,10 +78,20 @@ public class ImportWizard extends Wizard {
   private ImportOptionsPage fImportOptionsPage;
   private String fWebsite;
   private boolean fIsKewordSearch;
+  private boolean fIsWelcome;
 
   /** Default Constructor */
   public ImportWizard() {
     this(null, false);
+  }
+
+  /**
+   * @param isWelcome if <code>true</code>, this wizard is used from the
+   * {@link WelcomeWizard}.
+   */
+  public ImportWizard(boolean isWelcome) {
+    this(null, false);
+    fIsWelcome = isWelcome;
   }
 
   /**
@@ -91,19 +112,21 @@ public class ImportWizard extends Wizard {
     setWindowTitle("Import");
 
     /* Page 1: Source to Import */
-    fImportSourcePage = new ImportSourcePage("Choose Source", fWebsite, fIsKewordSearch);
+    fImportSourcePage = new ImportSourcePage(fWebsite, fIsKewordSearch);
     addPage(fImportSourcePage);
 
     /* Page 2: Elements to Import */
-    fImportElementsPage = new ImportElementsPage("Choose Elements");
+    fImportElementsPage = new ImportElementsPage();
     addPage(fImportElementsPage);
 
     /* Page 3: Target to Import */
-    fImportTargetPage = new ImportTargetPage("Choose Target Location");
-    addPage(fImportTargetPage);
+    if (!fIsWelcome) {
+      fImportTargetPage = new ImportTargetPage();
+      addPage(fImportTargetPage);
+    }
 
     /* Page 4: Import Options */
-    fImportOptionsPage = new ImportOptionsPage("Import Options");
+    fImportOptionsPage = new ImportOptionsPage();
     addPage(fImportOptionsPage);
   }
 
@@ -120,6 +143,8 @@ public class ImportWizard extends Wizard {
     /* Check if the ImportOptionsPage needs to be shown */
     if (page instanceof ImportTargetPage && !fImportElementsPage.showOptionsPage())
       return null;
+    else if (page instanceof ImportElementsPage && !fImportElementsPage.showOptionsPage() && fIsWelcome)
+      return null;
 
     return super.getNextPage(page);
   }
@@ -129,6 +154,12 @@ public class ImportWizard extends Wizard {
    */
   @Override
   public boolean performFinish() {
+
+    /* Directly Return if nothing to import */
+    if (fImportSourcePage.getSource() == Source.NONE)
+      return true;
+
+    /* Perform Import */
     return doImport();
   }
 
@@ -169,7 +200,7 @@ public class ImportWizard extends Wizard {
     CoreUtils.normalize(folderChilds);
 
     /* Get Target Location (may be null) */
-    IFolder target = fImportTargetPage.getTargetLocation();
+    IFolder target = fIsWelcome ? null : fImportTargetPage.getTargetLocation();
 
     /* Get Options */
     boolean importLabels = fImportOptionsPage.importLabels();
@@ -192,7 +223,11 @@ public class ImportWizard extends Wizard {
     }
 
     /* Run Import */
-    ImportUtils.doImport(target, folderChilds, labels, filters, preferences, true);
+    ImportUtils.doImport(target, folderChilds, labels, filters, preferences, !fIsWelcome);
+
+    /* Add Default Saved Searches if this is from Welcome Wizard */
+    if (fIsWelcome)
+      addDefaultSearches();
 
     /* Save Settings of Pages */
     fImportSourcePage.saveSettings();
@@ -319,5 +354,64 @@ public class ImportWizard extends Wizard {
   @Override
   public boolean needsProgressMonitor() {
     return true;
+  }
+
+  private void addDefaultSearches() {
+    Set<IFolder> roots = CoreUtils.loadRootFolders();
+    if (roots.isEmpty())
+      return;
+
+    IFolder root = roots.iterator().next();
+
+    IModelFactory factory = Owl.getModelFactory();
+    String newsEntityName = INews.class.getName();
+
+    /* SearchCondition: New and Updated News */
+    {
+      ISearchMark mark = factory.createSearchMark(null, root, "New and Updated News");
+      mark.setMatchAllConditions(true);
+
+      ISearchField field1 = factory.createSearchField(INews.STATE, newsEntityName);
+      factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS, EnumSet.of(INews.State.NEW, INews.State.UPDATED));
+    }
+
+    /* SearchCondition: Recent News */
+    {
+      ISearchMark mark = factory.createSearchMark(null, root, "Recent News");
+      mark.setMatchAllConditions(true);
+
+      ISearchField field1 = factory.createSearchField(INews.AGE_IN_DAYS, newsEntityName);
+      factory.createSearchCondition(null, mark, field1, SearchSpecifier.IS_LESS_THAN, 2);
+    }
+
+    /* SearchCondition: News with Attachments */
+    {
+      ISearchMark mark = factory.createSearchMark(null, root, "News with Attachments");
+      mark.setMatchAllConditions(true);
+
+      ISearchField field = factory.createSearchField(INews.HAS_ATTACHMENTS, newsEntityName);
+      factory.createSearchCondition(null, mark, field, SearchSpecifier.IS, true);
+    }
+
+    /* SearchCondition: Sticky News */
+    {
+      ISearchMark mark = factory.createSearchMark(null, root, "Sticky News");
+      mark.setMatchAllConditions(true);
+
+      ISearchField field = factory.createSearchField(INews.IS_FLAGGED, newsEntityName);
+      factory.createSearchCondition(null, mark, field, SearchSpecifier.IS, true);
+    }
+
+    /* SearchCondition: News is Labeld */
+    {
+      ISearchMark mark = factory.createSearchMark(null, root, "Labeled News");
+      IPreferenceScope preferences = Owl.getPreferenceService().getEntityScope(mark);
+      preferences.putInteger(DefaultPreferences.BM_NEWS_GROUPING, NewsGrouping.Type.GROUP_BY_LABEL.ordinal());
+
+      ISearchField field = factory.createSearchField(INews.LABEL, newsEntityName);
+      factory.createSearchCondition(null, mark, field, SearchSpecifier.IS, "*");
+    }
+
+    DynamicDAO.save(root);
   }
 }
