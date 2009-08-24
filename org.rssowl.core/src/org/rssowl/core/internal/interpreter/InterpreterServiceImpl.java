@@ -54,10 +54,10 @@ import org.rssowl.core.util.ExtensionUtils;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * <p>
@@ -181,9 +181,9 @@ public class InterpreterServiceImpl implements IInterpreterService {
 
   /*
    * @see org.rssowl.core.interpreter.IInterpreterService#exportTo(java.io.File,
-   * java.util.List, java.util.EnumSet)
+   * java.util.Collection, java.util.Set)
    */
-  public void exportTo(File destination, Collection<? extends IFolderChild> elements, EnumSet<Options> options) throws InterpreterException {
+  public void exportTo(File destination, Collection<? extends IFolderChild> elements, Set<Options> options) throws InterpreterException {
     ITypeExporter exporter = null;
     String fileName = destination.getName();
     int i = fileName.lastIndexOf(".");
