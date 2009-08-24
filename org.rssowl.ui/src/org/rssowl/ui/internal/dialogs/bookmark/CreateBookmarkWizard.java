@@ -69,7 +69,7 @@ import java.util.Map;
  * TODO Make loading the feed from the website independent from the checkbox
  * about loading the title from the feed.
  * </p>
- *
+ * 
  * @author bpasero
  */
 public class CreateBookmarkWizard extends Wizard {
@@ -151,6 +151,10 @@ public class CreateBookmarkWizard extends Wizard {
           try {
             link[0] = new URI(URIUtils.fastEncode(linkText));
 
+            /* Return if cancelled */
+            if (monitor.isCanceled())
+              return;
+
             /* Load Feed from Link if necessary */
             if (!URIUtils.looksLikeFeedLink(linkText)) {
               final URI feedLink = Owl.getConnectionService().getFeed(link[0], monitor);
@@ -158,12 +162,16 @@ public class CreateBookmarkWizard extends Wizard {
                 link[0] = feedLink;
             }
 
+            /* Return if cancelled */
+            if (monitor.isCanceled())
+              return;
+
             feedTitle = Owl.getConnectionService().getLabel(link[0], monitor);
             fLastRealm = null;
           } catch (final ConnectionException e) {
 
             /* Authentication Required */
-            if (e instanceof AuthenticationRequiredException && handleProtectedFeed(link[0], ((AuthenticationRequiredException) e).getRealm())) {
+            if (!monitor.isCanceled() && e instanceof AuthenticationRequiredException && handleProtectedFeed(link[0], ((AuthenticationRequiredException) e).getRealm())) {
               try {
                 feedTitle = Owl.getConnectionService().getLabel(link[0], monitor);
               } catch (ConnectionException e1) {
@@ -284,6 +292,10 @@ public class CreateBookmarkWizard extends Wizard {
             monitor.beginTask("Please wait while loading the title from the feed...", IProgressMonitor.UNKNOWN);
             try {
 
+              /* Return if cancelled */
+              if (monitor.isCanceled())
+                return;
+
               /* Load Feed from Link if necessary */
               if (!URIUtils.looksLikeFeedLink(uriObj[0].toString())) {
                 final URI feedLink = Owl.getConnectionService().getFeed(uriObj[0], monitor);
@@ -291,11 +303,15 @@ public class CreateBookmarkWizard extends Wizard {
                   uriObj[0] = feedLink;
               }
 
+              /* Return if cancelled */
+              if (monitor.isCanceled())
+                return;
+
               title[0] = Owl.getConnectionService().getLabel(uriObj[0], monitor);
             } catch (final ConnectionException e) {
 
               /* Authentication Required */
-              if (e instanceof AuthenticationRequiredException && handleProtectedFeed(uriObj[0], ((AuthenticationRequiredException) e).getRealm())) {
+              if (!monitor.isCanceled() && e instanceof AuthenticationRequiredException && handleProtectedFeed(uriObj[0], ((AuthenticationRequiredException) e).getRealm())) {
                 try {
                   title[0] = Owl.getConnectionService().getLabel(uriObj[0], monitor);
                 } catch (ConnectionException e1) {
