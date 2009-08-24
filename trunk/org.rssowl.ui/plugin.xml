@@ -20,7 +20,7 @@
          point="org.eclipse.ui.perspectives">
       <perspective
             class="org.rssowl.ui.internal.Perspective"
-            icon="icons/product/16x16.gif"
+            icon="icons/product/16x16.png"
             id="org.rssowl.ui.perspective"
             name="RSSOwl">
       </perspective>
@@ -1647,24 +1647,6 @@
             actionId="org.rssowl.ui.DownloadAttachmentsNewsAction"
             class="org.rssowl.ui.internal.filter.DownloadAttachmentsNewsActionPresentation">
       </newsActionPresentation>
-   </extension>
-   <extension
-         point="org.eclipse.ui.perspectiveExtensions">
-      <perspectiveExtension
-            targetID="org.rssowl.ui.perspective">
-         <view
-               closeable="false"
-               id="org.rssowl.ui.BookMarkExplorer"
-               minimized="false"
-               moveable="true"
-               ratio="0.25"
-               relationship="left"
-               relative="org.eclipse.ui.editorss"
-               showTitle="true"
-               standalone="false"
-               visible="true">
-         </view>
-      </perspectiveExtension>
    </extension>
    <extension
          point="org.rssowl.ui.ShareProvider">
