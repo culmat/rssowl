@@ -33,6 +33,7 @@ import static org.junit.Assert.assertTrue;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.junit.Test;
 import org.rssowl.core.Owl;
@@ -100,7 +101,7 @@ public class ConnectionTests {
   public void testGetLabel() throws Exception {
     IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("http://www.rssowl.org/node/feed");
-    String label = conManager.getLabel(feedUrl);
+    String label = conManager.getLabel(feedUrl, new NullProgressMonitor());
     assertEquals("RSSOwl - A Java RSS / RDF / Atom Newsreader - May the owl be with you", label);
   }
 
@@ -112,7 +113,7 @@ public class ConnectionTests {
   public void testGetFavicon() throws Exception {
     IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("http://www.rssowl.org/node/feed");
-    byte[] feedIcon = conManager.getFeedIcon(feedUrl);
+    byte[] feedIcon = conManager.getFeedIcon(feedUrl, new NullProgressMonitor());
     assertNotNull(feedIcon);
     assertTrue(feedIcon.length != 0);
   }
@@ -365,7 +366,7 @@ public class ConnectionTests {
     IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("http://www.planeteclipse.org");
 
-    assertEquals("http://www.planeteclipse.org/planet/rss20.xml", conManager.getFeed(feedUrl).toString());
+    assertEquals("http://www.planeteclipse.org/planet/rss20.xml", conManager.getFeed(feedUrl, new NullProgressMonitor()).toString());
   }
 
   /**
@@ -377,7 +378,7 @@ public class ConnectionTests {
     IConnectionService conManager = Owl.getConnectionService();
     URI feedUrl = new URI("http://www.heise.de");
 
-    assertEquals("http://www.heise.de/newsticker/heise-atom.xml", conManager.getFeed(feedUrl).toString());
+    assertEquals("http://www.heise.de/newsticker/heise-atom.xml", conManager.getFeed(feedUrl, new NullProgressMonitor()).toString());
   }
 
   /**

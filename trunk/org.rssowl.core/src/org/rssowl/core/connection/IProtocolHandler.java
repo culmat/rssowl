@@ -48,7 +48,8 @@ public interface IProtocolHandler {
    * and returns it.
    *
    * @param link The Link to the Feed as <code>URI</code>.
-   * @param monitor The Progress-Monitor used from the callee.
+   * @param monitor an instance of {@link IProgressMonitor} that can be used to
+   * cancel the operation and report progress.
    * @param properties A Map of properties that can be used to transport custom
    * information
    * @return Returns the <code>IFeed</code> from the given URL including
@@ -81,12 +82,14 @@ public interface IProtocolHandler {
    * <code>NULL</code> if no icon can be found.
    *
    * @param link The Link to the Feed as <code>URI</code>.
+   * @param monitor an instance of {@link IProgressMonitor} that can be used to
+   * cancel the operation and report progress.
    * @return Returns an Icon for the given Link as byte-array or
    * <code>NULL</code> if none.
    * @throws ConnectionException Checked Exception to be used in case of any
    * Exception.
    */
-  byte[] getFeedIcon(URI link) throws ConnectionException;
+  byte[] getFeedIcon(URI link, IProgressMonitor monitor) throws ConnectionException;
 
   /**
    * Returns a Label that can be used to present the resource identified by the
@@ -94,24 +97,28 @@ public interface IProtocolHandler {
    * method should return the Title of the feed.
    *
    * @param link The <code>URI</code> identifying the resource.
+   * @param monitor an instance of {@link IProgressMonitor} that can be used to
+   * cancel the operation and report progress.
    * @return Returns a Label that can be used to present the resource identified
    * by the given <code>URI</code>.
    * @throws ConnectionException Checked Exception to be used in case of any
    * Exception.
    */
-  String getLabel(URI link) throws ConnectionException;
+  String getLabel(URI link, IProgressMonitor monitor) throws ConnectionException;
 
   /**
    * Returns the {@link URI} of the Feed that is available from the given
    * website or <code>null</code> if none.
    *
    * @param website the website to look for a valid feed.
+   * @param monitor an instance of {@link IProgressMonitor} that can be used to
+   * cancel the operation and report progress.
    * @return the {@link URI} of the Feed that is available from the given
    * website or <code>null</code> if none.
    * @throws ConnectionException Checked Exception to be used in case of any
    * Exception.
    */
-  URI getFeed(URI website) throws ConnectionException;
+  URI getFeed(URI website, IProgressMonitor monitor) throws ConnectionException;
 
   /**
    * <p>

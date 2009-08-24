@@ -408,10 +408,11 @@ public class NewsGroupHandler implements IProtocolHandler {
   }
 
   /*
-   * @see org.rssowl.core.connection.IProtocolHandler#getFeedIcon(java.net.URI)
+   * @see org.rssowl.core.connection.IProtocolHandler#getFeedIcon(java.net.URI,
+   * org.eclipse.core.runtime.IProgressMonitor)
    */
-  public byte[] getFeedIcon(URI link) {
-    return loadFavicon(link, false);
+  public byte[] getFeedIcon(URI link, IProgressMonitor monitor) {
+    return loadFavicon(link, false, monitor);
   }
 
   private void interpretFrom(INews news, String value) {
@@ -538,14 +539,14 @@ public class NewsGroupHandler implements IProtocolHandler {
   }
 
   /* Load a possible Favicon from the given Feed */
-  byte[] loadFavicon(URI link, boolean rewriteHost) {
+  byte[] loadFavicon(URI link, boolean rewriteHost, IProgressMonitor monitor) {
     try {
       URI faviconLink = URIUtils.toFaviconUrl(link, rewriteHost);
       if (faviconLink == null)
         return null;
 
       /* Pass to HTTP Protocol Handler */
-      return Owl.getConnectionService().getFeedIcon(faviconLink);
+      return Owl.getConnectionService().getFeedIcon(faviconLink, monitor);
     } catch (URISyntaxException e) {
       /* Ignore */
     } catch (ConnectionException e) {
@@ -556,9 +557,10 @@ public class NewsGroupHandler implements IProtocolHandler {
   }
 
   /*
-   * @see org.rssowl.core.connection.IProtocolHandler#getLabel(java.net.URI)
+   * @see org.rssowl.core.connection.IProtocolHandler#getLabel(java.net.URI,
+   * org.eclipse.core.runtime.IProgressMonitor)
    */
-  public String getLabel(URI link) {
+  public String getLabel(URI link, IProgressMonitor monitor) {
     String path = link.getPath();
 
     if (StringUtils.isSet(path))
@@ -568,9 +570,10 @@ public class NewsGroupHandler implements IProtocolHandler {
   }
 
   /*
-   * @see org.rssowl.core.connection.IProtocolHandler#getFeed(java.net.URI)
+   * @see org.rssowl.core.connection.IProtocolHandler#getFeed(java.net.URI,
+   * org.eclipse.core.runtime.IProgressMonitor)
    */
-  public URI getFeed(URI website) {
+  public URI getFeed(URI website, IProgressMonitor monitor) {
     return website;
   }
 
