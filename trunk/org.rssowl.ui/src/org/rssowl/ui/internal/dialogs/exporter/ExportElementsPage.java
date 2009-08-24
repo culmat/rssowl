@@ -74,6 +74,7 @@ public class ExportElementsPage extends WizardPage {
     /* Viewer for Folder Child Selection */
     fFolderChildTree = new FolderChildCheckboxTree(container);
     fFolderChildTree.getViewer().setInput(CoreUtils.loadRootFolders());
+    ((GridData) fFolderChildTree.getViewer().getTree().getLayoutData()).heightHint = 190;
     fFolderChildTree.setAllChecked(true);
 
     /* Select All / Deselect All */
