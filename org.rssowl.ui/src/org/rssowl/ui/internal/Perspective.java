@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal;
 
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
@@ -32,6 +33,8 @@ import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
  * @author bpasero
  */
 public class Perspective implements IPerspectiveFactory {
+  private static final float WIDE_SCREEN_RATIO = 0.2f;
+  private static final float NORMAL_SCREEN_RATIO = 0.25f;
 
   /*
    * @see org.eclipse.ui.IPerspectiveFactory#createInitialLayout(org.eclipse.ui.IPageLayout)
@@ -40,5 +43,19 @@ public class Perspective implements IPerspectiveFactory {
 
     /* Show View */
     layout.addShowViewShortcut(BookMarkExplorer.VIEW_ID);
+
+    /* Bookmark Explorer */
+    layout.addView(BookMarkExplorer.VIEW_ID, IPageLayout.LEFT, getRatio(), layout.getEditorArea());
+    layout.getViewLayout(BookMarkExplorer.VIEW_ID).setCloseable(false);
+  }
+
+  private float getRatio() {
+    Point size = OwlUI.getFirstMonitorSize();
+    if (size != null && size.y != 0) {
+      float screenRatio = (float) size.x / (float) size.y;
+      return screenRatio > 1.5 ? WIDE_SCREEN_RATIO : NORMAL_SCREEN_RATIO;
+    }
+
+    return NORMAL_SCREEN_RATIO;
   }
 }
