@@ -123,6 +123,20 @@ public class FileImportTest {
    */
   @Test
   @SuppressWarnings( { "nls", "null", "unused" })
+  public void testImport_Complex_All_Root_NoInitialRoots() throws Exception {
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/complex.opml"));
+    ImportUtils.doImport(null, elements, true);
+
+    assertFalse(CoreUtils.loadRootFolders().isEmpty());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused" })
   public void testImport_Complex_All_Root_CheckProperties() throws Exception {
 
     /* Import */
@@ -624,6 +638,24 @@ public class FileImportTest {
    */
   @Test
   @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Marks_All_DirectImport_NoInitialRoots() throws Exception {
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/marks.opml"));
+    ImportUtils.doImport(null, elements, true);
+
+    Set<IFolder> roots = CoreUtils.loadRootFolders();
+    assertEquals(1, roots.size());
+    IFolder root = roots.iterator().next();
+    assertEquals(6, root.getMarks().size());
+    assertEquals(0, root.getFolders().size());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
   public void testImport_Marks_All_Target() throws Exception {
     IFolder root = DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "Root"));
 
@@ -673,6 +705,24 @@ public class FileImportTest {
     Set<IFolder> roots = CoreUtils.loadRootFolders();
     assertEquals(1, roots.size());
     root = roots.iterator().next();
+    assertEquals(0, root.getMarks().size());
+    assertEquals(3, root.getFolders().size());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  @SuppressWarnings( { "nls", "null", "unused", "unchecked" })
+  public void testImport_Folders_All_DirectImport_NoInitialRoots() throws Exception {
+
+    /* Import */
+    List<? extends IEntity> elements = Owl.getInterpreter().importFrom(getClass().getResourceAsStream("/data/importer/folders.opml"));
+    ImportUtils.doImport(null, elements, true);
+
+    Set<IFolder> roots = CoreUtils.loadRootFolders();
+    assertEquals(1, roots.size());
+    IFolder root = roots.iterator().next();
     assertEquals(0, root.getMarks().size());
     assertEquals(3, root.getFolders().size());
   }
