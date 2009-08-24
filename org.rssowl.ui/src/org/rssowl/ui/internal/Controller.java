@@ -1070,7 +1070,7 @@ public class Controller {
 
     /* Show the Welcome Wizard if this is the first startup */
     if (fShowWelcome) {
-      JobRunner.runInUIThread(300, OwlUI.getActiveShell(), new Runnable() {
+      JobRunner.runInUIThread(200, OwlUI.getActiveShell(), new Runnable() {
         public void run() {
           showWelcomeWizard();
         }
@@ -1166,22 +1166,28 @@ public class Controller {
     return true;
   }
 
-  private void onFirstStartup() throws PersistenceException, InterpreterException, ParserException, FileNotFoundException {
+  private void onFirstStartup() {
 
     /* Add Default Labels */
     addDefaultLabels();
 
-    /* Add Default Set */
-    DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "My Bookmarks"));
-
     /* Import File if specified */
+    boolean showWelcome = true;
     String importFile = System.getProperty(IMPORT_PROPERTY);
-    if (StringUtils.isSet(importFile) && new File(importFile).exists())
-      initialImportFile(importFile);
+    if (StringUtils.isSet(importFile) && new File(importFile).exists()) {
+      try {
+        initialImportFile(importFile);
+        showWelcome = false;
+      } catch (Exception e) {
+        Activator.getDefault().logError(e.getMessage(), e);
+      }
+    }
 
-    /* Otherwise show Welcome Wizard to User */
-    else
+    /* Show Welcome Otherwise */
+    if (showWelcome) {
+      DynamicDAO.save(Owl.getModelFactory().createFolder(null, null, "My Bookmarks"));
       fShowWelcome = true;
+    }
   }
 
   private void addDefaultLabels() throws PersistenceException {
