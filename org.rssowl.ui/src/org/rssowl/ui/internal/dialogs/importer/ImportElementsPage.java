@@ -248,6 +248,7 @@ public class ImportElementsPage extends WizardPage {
    * @see org.eclipse.jface.dialogs.IDialogPage#createControl(org.eclipse.swt.widgets.Composite)
    */
   public void createControl(Composite parent) {
+    boolean isWelcome = (getWizard() instanceof WelcomeWizard);
 
     /* Title Image */
     setImageDescriptor(OwlUI.getImageDescriptor(getWizard() instanceof WelcomeWizard ? "icons/wizban/welcome_wiz.gif" : "icons/wizban/import_wiz.png"));
@@ -273,7 +274,7 @@ public class ImportElementsPage extends WizardPage {
 
     /* Select All / Deselect All */
     Composite buttonContainer = new Composite(container, SWT.NONE);
-    buttonContainer.setLayout(LayoutUtils.createGridLayout(4, 0, 0));
+    buttonContainer.setLayout(LayoutUtils.createGridLayout(isWelcome ? 3 : 4, 0, 0));
     buttonContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fSelectAll = new Button(buttonContainer, SWT.PUSH);
@@ -309,6 +310,7 @@ public class ImportElementsPage extends WizardPage {
       public void widgetSelected(SelectionEvent e) {
         fFolderChildTree.setFlat(fFlattenCheck.getSelection());
         fViewer.expandToLevel(2);
+        fFolderChildTree.setAllChecked(true);
       }
     });
 
@@ -317,6 +319,7 @@ public class ImportElementsPage extends WizardPage {
     fHideExistingCheck.setText("Hide Existing");
     fHideExistingCheck.setSelection(true);
     setButtonLayoutData(fHideExistingCheck);
+    ((GridData) fHideExistingCheck.getLayoutData()).exclude = isWelcome;
     fHideExistingCheck.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
