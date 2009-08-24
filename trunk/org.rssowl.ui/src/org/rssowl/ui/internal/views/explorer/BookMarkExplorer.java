@@ -1755,7 +1755,10 @@ public class BookMarkExplorer extends ViewPart {
     return true;
   }
 
-  private void saveState() {
+  /**
+   * Save all Settings of the Explorer immediately.
+   */
+  public void saveState() {
 
     /* Expanded Elements */
     saveExpandedElements();

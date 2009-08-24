@@ -46,6 +46,8 @@ import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.reference.NewsBinReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -126,6 +128,15 @@ public class ExportWizard extends Wizard {
 
     /* Export to given File */
     if (string != null) {
+
+      /* Enforce that Explorer Settings are up to date if necessary */
+      if (fExportOptionsPage.getExportOptions().contains(Options.EXPORT_PREFERENCES)) {
+        BookMarkExplorer explorer = OwlUI.getOpenedBookMarkExplorer();
+        if (explorer != null)
+          explorer.saveState();
+      }
+
+      /* Export */
       File file = new File(string);
       try {
         Owl.getInterpreter().exportTo(file, getElementsToExport(), fExportOptionsPage.getExportOptions());
