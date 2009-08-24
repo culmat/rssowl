@@ -46,6 +46,7 @@ import org.rssowl.core.connection.AuthenticationRequiredException;
 import org.rssowl.core.connection.ConnectionException;
 import org.rssowl.core.connection.CredentialsException;
 import org.rssowl.core.connection.HttpConnectionInputStream;
+import org.rssowl.core.connection.IAbortable;
 import org.rssowl.core.connection.IConditionalGetCompatible;
 import org.rssowl.core.connection.IConnectionPropertyConstants;
 import org.rssowl.core.connection.ICredentials;
@@ -142,7 +143,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
     /* Return on Cancelation or Shutdown */
     if (monitor.isCanceled()) {
-      closeStream(inS);
+      closeStream(inS, true);
       return null;
     }
 
@@ -159,7 +160,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
       /* Return on Cancelation or Shutdown */
       if (monitor.isCanceled()) {
-        closeStream(inS);
+        closeStream(inS, true);
         return null;
       }
 
@@ -175,9 +176,11 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     return Triple.create(feed, conditionalGet, link);
   }
 
-  private void closeStream(InputStream inS) {
+  private void closeStream(InputStream inS, boolean abort) {
     try {
-      if (inS != null)
+      if (abort && inS instanceof IAbortable)
+        ((IAbortable) inS).abort();
+      else if (inS != null)
         inS.close();
     } catch (IOException ex) {
       /* Ignore */
@@ -597,6 +600,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     String title = "";
 
     InputStream inS = openStream(link, null);
+    Exception error = null;
     try {
 
       /* Buffered Stream to support mark and reset */
@@ -629,6 +633,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       title = title.replaceAll(Pattern.quote("<![CDATA["), "");
       title = title.replaceAll(Pattern.quote("]]>"), "");
     } catch (IOException e) {
+      error = e;
       Activator.getDefault().logError(e.getMessage(), e);
     }
 
@@ -637,7 +642,10 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
       /* Close Stream */
       try {
-        inS.close();
+        if (error != null && inS instanceof IAbortable)
+          ((IAbortable) inS).abort();
+        else
+          inS.close();
       } catch (IOException e) {
         Activator.getDefault().logError(e.getMessage(), e);
       }
