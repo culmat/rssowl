@@ -293,6 +293,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
             InputStream in = null;
             FileOutputStream out = null;
             boolean canceled = false;
+            Exception error = null;
             try {
               byte[] buffer = new byte[8192];
 
@@ -314,10 +315,13 @@ public class FeedView extends EditorPart implements IReusableEditor {
                 out.write(buffer, 0, read);
               }
             } catch (FileNotFoundException e) {
+              error = e;
               Activator.getDefault().logError(e.getMessage(), e);
             } catch (IOException e) {
+              error = e;
               Activator.getDefault().logError(e.getMessage(), e);
             } catch (ConnectionException e) {
+              error = e;
               Activator.getDefault().logError(e.getMessage(), e);
             } finally {
               monitor.done();
@@ -332,7 +336,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
 
               if (in != null) {
                 try {
-                  if (canceled && in instanceof IAbortable)
+                  if ((canceled || error != null) && in instanceof IAbortable)
                     ((IAbortable) in).abort();
                   else
                     in.close();
