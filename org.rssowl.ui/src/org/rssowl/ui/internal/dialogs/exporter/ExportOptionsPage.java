@@ -42,10 +42,10 @@ import org.rssowl.core.persist.ISearchFilter;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.ui.internal.OwlUI;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * A {@link WizardPage} to select which RSSOwl settings to include in the
@@ -137,8 +137,8 @@ public class ExportOptionsPage extends WizardPage {
   }
 
   /* Get selected Export Options */
-  EnumSet<ITypeExporter.Options> getExportOptions() {
-    List<ITypeExporter.Options> options = new ArrayList<ITypeExporter.Options>();
+  Set<ITypeExporter.Options> getExportOptions() {
+    Set<ITypeExporter.Options> options = new HashSet<ITypeExporter.Options>();
     if (fExportLabelsCheck.getSelection())
       options.add(ITypeExporter.Options.EXPORT_LABELS);
     if (fExportFiltersCheck.getSelection())
@@ -146,10 +146,7 @@ public class ExportOptionsPage extends WizardPage {
     if (fExportSettingsCheck.getSelection())
       options.add(ITypeExporter.Options.EXPORT_PREFERENCES);
 
-    if (!options.isEmpty())
-      return EnumSet.copyOf(options);
-
-    return null;
+    return options;
   }
 
   /*

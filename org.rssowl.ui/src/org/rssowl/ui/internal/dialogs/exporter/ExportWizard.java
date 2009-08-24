@@ -52,7 +52,6 @@ import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -130,7 +129,7 @@ public class ExportWizard extends Wizard {
     if (string != null) {
 
       /* Enforce that Explorer Settings are up to date if necessary */
-      if (fExportOptionsPage.getExportOptions().contains(Options.EXPORT_PREFERENCES)) {
+      if (fExportOptionsPage.getExportOptions() != null && fExportOptionsPage.getExportOptions().contains(Options.EXPORT_PREFERENCES)) {
         BookMarkExplorer explorer = OwlUI.getOpenedBookMarkExplorer();
         if (explorer != null)
           explorer.saveState();
@@ -153,7 +152,7 @@ public class ExportWizard extends Wizard {
   /* Ensure that Childs to Export is normalized and contains all dependent Locations from Searches and Filters */
   private List<IFolderChild> getElementsToExport() {
     List<IFolderChild> selectedElements = fExportElementsPage.getElementsToExport();
-    EnumSet<Options> options = fExportOptionsPage.getExportOptions();
+    Set<Options> options = fExportOptionsPage.getExportOptions();
 
     /* Check if dependent locations need to be added manually */
     Collection<IFolder> rootFolders = DynamicDAO.getDAO(IFolderDAO.class).loadRoots();
