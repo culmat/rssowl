@@ -28,7 +28,7 @@ import org.rssowl.core.persist.IFolderChild;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.EnumSet;
+import java.util.Set;
 
 /**
  * This interface allows to contribute Exporters for {@link IFolderChild}. The
@@ -62,5 +62,5 @@ public interface ITypeExporter {
    * if none.
    * @throws InterpreterException in case of an exception during export.
    */
-  public void exportTo(File destination, Collection<? extends IFolderChild> elements, EnumSet<Options> options) throws InterpreterException;
+  public void exportTo(File destination, Collection<? extends IFolderChild> elements, Set<Options> options) throws InterpreterException;
 }

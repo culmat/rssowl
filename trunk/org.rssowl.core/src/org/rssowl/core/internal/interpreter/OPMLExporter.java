@@ -84,9 +84,9 @@ public class OPMLExporter implements ITypeExporter {
 
   /*
    * @see org.rssowl.core.interpreter.ITypeExporter#exportTo(java.io.File,
-   * java.util.Collection, java.util.EnumSet)
+   * java.util.Collection, java.util.Set)
    */
-  public void exportTo(File destination, Collection<? extends IFolderChild> elements, EnumSet<Options> options) throws InterpreterException {
+  public void exportTo(File destination, Collection<? extends IFolderChild> elements, Set<Options> options) throws InterpreterException {
     Format format = Format.getPrettyFormat();
     format.setEncoding(UTF_8);
     XMLOutputter output = new XMLOutputter(format);
