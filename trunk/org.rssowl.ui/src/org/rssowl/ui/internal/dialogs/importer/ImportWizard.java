@@ -242,7 +242,7 @@ public class ImportWizard extends Wizard {
     if (importPreferences && preferences != null && !preferences.isEmpty()) {
       boolean restart = MessageDialog.openQuestion(getShell(), "Restart RSSOwl", "It is necessary to restart RSSOwl after preferences have been imported.\n\nDo you want to restart now?");
       if (restart) {
-        BookMarkExplorer explorer = OwlUI.getOpenBookMarkExplorer();
+        BookMarkExplorer explorer = OwlUI.getOpenedBookMarkExplorer();
         if (explorer != null)
           explorer.saveStateOnDispose(false);
 
@@ -253,7 +253,7 @@ public class ImportWizard extends Wizard {
 
     /* Reveal and Select Target Folder */
     if (target != null && target.getParent() != null) {
-      BookMarkExplorer explorer = OwlUI.getOpenBookMarkExplorer();
+      BookMarkExplorer explorer = OwlUI.getOpenedBookMarkExplorer();
       if (explorer != null)
         explorer.reveal(target, true);
     }

@@ -44,7 +44,7 @@ public class NextBookmarkSetHandler extends AbstractHandler implements IHandler 
    * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
    */
   public Object execute(ExecutionEvent event) {
-    BookMarkExplorer bookMarkExplorer = OwlUI.getOpenBookMarkExplorer();
+    BookMarkExplorer bookMarkExplorer = OwlUI.getOpenedBookMarkExplorer();
     if (bookMarkExplorer != null) {
       IViewSite site = (IViewSite) bookMarkExplorer.getSite();
       ActionContributionItem item = (ActionContributionItem) site.getActionBars().getToolBarManager().find(BookMarkExplorer.NEXT_SET_ACTION);

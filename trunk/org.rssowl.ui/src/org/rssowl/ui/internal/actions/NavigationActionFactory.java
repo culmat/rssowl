@@ -158,7 +158,7 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
     private boolean navigateOnOpenExplorer() {
 
       /* Try finding the open Explorer for BookMarks */
-      BookMarkExplorer bookmarkExplorer = OwlUI.getOpenBookMarkExplorer();
+      BookMarkExplorer bookmarkExplorer = OwlUI.getOpenedBookMarkExplorer();
       if (bookmarkExplorer == null)
         return false;
 

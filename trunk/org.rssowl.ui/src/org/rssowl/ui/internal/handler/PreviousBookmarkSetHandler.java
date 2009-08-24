@@ -44,7 +44,7 @@ public class PreviousBookmarkSetHandler extends AbstractHandler implements IHand
    * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
    */
   public Object execute(ExecutionEvent event) {
-    BookMarkExplorer bookMarkExplorer = OwlUI.getOpenBookMarkExplorer();
+    BookMarkExplorer bookMarkExplorer = OwlUI.getOpenedBookMarkExplorer();
     if (bookMarkExplorer != null) {
       IViewSite site = (IViewSite) bookMarkExplorer.getSite();
       ActionContributionItem item = (ActionContributionItem) site.getActionBars().getToolBarManager().find(BookMarkExplorer.PREVIOUS_SET_ACTION);
