@@ -90,9 +90,10 @@ public class InMemoryProtocolHandler implements IProtocolHandler {
   }
 
   /*
-   * @see org.rssowl.core.connection.IProtocolHandler#getFeedIcon(java.net.URI)
+   * @see org.rssowl.core.connection.IProtocolHandler#getFeedIcon(java.net.URI,
+   * org.eclipse.core.runtime.IProgressMonitor)
    */
-  public byte[] getFeedIcon(URI link) {
+  public byte[] getFeedIcon(URI link, IProgressMonitor monitor) {
     return null;
   }
 
@@ -126,17 +127,18 @@ public class InMemoryProtocolHandler implements IProtocolHandler {
   }
 
   /*
-   * @see org.rssowl.core.connection.IProtocolHandler#getLabel(java.net.URI)
+   * @see org.rssowl.core.connection.IProtocolHandler#getLabel(java.net.URI,
+   * org.eclipse.core.runtime.IProgressMonitor)
    */
-  @SuppressWarnings("unused")
-  public String getLabel(URI link) throws ConnectionException {
+  public String getLabel(URI link, IProgressMonitor monitor) {
     throw new UnsupportedOperationException();
   }
 
   /*
-   * @see org.rssowl.core.connection.IProtocolHandler#getFeed(java.net.URI)
+   * @see org.rssowl.core.connection.IProtocolHandler#getFeed(java.net.URI,
+   * org.eclipse.core.runtime.IProgressMonitor)
    */
-  public URI getFeed(URI website) {
+  public URI getFeed(URI website, IProgressMonitor monitor) {
     return website;
   }
 

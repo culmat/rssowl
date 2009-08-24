@@ -188,10 +188,11 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   }
 
   /*
-   * @see org.rssowl.core.connection.IProtocolHandler#getFeedIcon(java.net.URI)
+   * @see org.rssowl.core.connection.IProtocolHandler#getFeedIcon(java.net.URI,
+   * org.eclipse.core.runtime.IProgressMonitor)
    */
-  public byte[] getFeedIcon(URI link) {
-    return loadFavicon(link, false);
+  public byte[] getFeedIcon(URI link, IProgressMonitor monitor) {
+    return loadFavicon(link, false, monitor);
   }
 
   private IConditionalGet getConditionalGet(URI link, InputStream inS) {
@@ -209,12 +210,13 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   }
 
   /* Load a possible Favicon from the given Feed */
-  byte[] loadFavicon(URI link, boolean rewriteHost) {
+  byte[] loadFavicon(URI link, boolean rewriteHost, IProgressMonitor monitor) {
     try {
 
       /* Define Properties for Connection */
       Map<Object, Object> properties = new HashMap<Object, Object>();
       properties.put(IConnectionPropertyConstants.CON_TIMEOUT, FAVICON_CON_TIMEOUT);
+      properties.put(IConnectionPropertyConstants.PROGRESS_MONITOR, monitor);
 
       /* Load Favicon */
       URI faviconLink = URIUtils.toFaviconUrl(link, rewriteHost);
@@ -241,7 +243,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
         /* Only retry in case this is a generic ConnectionException */
         if (ConnectionException.class.getName().equals(exceptionName))
-          return loadFavicon(link, true);
+          return loadFavicon(link, true, monitor);
       }
     } catch (IOException e) {
       /* Ignore */
@@ -594,12 +596,18 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   }
 
   /*
-   * @see org.rssowl.core.connection.IProtocolHandler#getLabel(java.net.URI)
+   * @see org.rssowl.core.connection.IProtocolHandler#getLabel(java.net.URI,
+   * org.eclipse.core.runtime.IProgressMonitor)
    */
-  public String getLabel(URI link) throws ConnectionException {
+  public String getLabel(URI link, IProgressMonitor monitor) throws ConnectionException {
     String title = "";
 
-    InputStream inS = openStream(link, null);
+    /* Define Properties for Connection */
+    Map<Object, Object> properties = new HashMap<Object, Object>();
+    properties.put(IConnectionPropertyConstants.PROGRESS_MONITOR, monitor);
+
+    /* Open Stream */
+    InputStream inS = openStream(link, properties);
     Exception error = null;
     try {
 
@@ -738,10 +746,17 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   }
 
   /*
-   * @see org.rssowl.core.connection.IProtocolHandler#getFeed(java.net.URI)
+   * @see org.rssowl.core.connection.IProtocolHandler#getFeed(java.net.URI,
+   * org.eclipse.core.runtime.IProgressMonitor)
    */
-  public URI getFeed(final URI website) throws ConnectionException {
-    InputStream ins = openStream(website, null);
+  public URI getFeed(final URI website, IProgressMonitor monitor) throws ConnectionException {
+
+    /* Define Properties for Connection */
+    Map<Object, Object> properties = new HashMap<Object, Object>();
+    properties.put(IConnectionPropertyConstants.PROGRESS_MONITOR, monitor);
+
+    /* Open Stream */
+    InputStream ins = openStream(website, properties);
     BufferedInputStream bufIns = new BufferedInputStream(ins);
     BufferedReader reader = new BufferedReader(new InputStreamReader(bufIns));
 

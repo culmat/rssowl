@@ -82,7 +82,7 @@ public class ConnectionServiceImpl implements IConnectionService {
   private final SecureProtocolSocketFactory fSecureProtocolSocketFactory;
   private final FeedListener fFeedListener;
 
-  /** */
+  /** Default Constructor */
   public ConnectionServiceImpl() {
     fProtocolHandler = new HashMap<String, IProtocolHandler>();
     fCredentialsProvider = new HashMap<String, ICredentialsProvider>();
@@ -161,15 +161,16 @@ public class ConnectionServiceImpl implements IConnectionService {
   }
 
   /*
-   * @see org.rssowl.core.connection.IConnectionService#getLabel(java.net.URI)
+   * @see org.rssowl.core.connection.IConnectionService#getLabel(java.net.URI,
+   * org.eclipse.core.runtime.IProgressMonitor)
    */
-  public String getLabel(URI link) throws ConnectionException {
+  public String getLabel(URI link, IProgressMonitor monitor) throws ConnectionException {
     String protocol = link.getScheme();
     IProtocolHandler handler = fProtocolHandler.get(protocol);
 
     /* Handler present */
     if (handler != null)
-      return handler.getLabel(link);
+      return handler.getLabel(link, monitor);
 
     /* No Handler present */
     throw new UnknownFeedException(Activator.getDefault().createErrorStatus("Could not find a matching ProtocolHandler for: " + protocol, null)); //$NON-NLS-1$
@@ -197,31 +198,32 @@ public class ConnectionServiceImpl implements IConnectionService {
 
   /*
    * @see
-   * org.rssowl.core.connection.IConnectionService#getFeedIcon(java.net.URI)
+   * org.rssowl.core.connection.IConnectionService#getFeedIcon(java.net.URI,
+   * org.eclipse.core.runtime.IProgressMonitor)
    */
-  public byte[] getFeedIcon(URI link) throws ConnectionException {
+  public byte[] getFeedIcon(URI link, IProgressMonitor monitor) throws ConnectionException {
     String protocol = link.getScheme();
     IProtocolHandler handler = fProtocolHandler.get(protocol);
 
     /* Handler present */
     if (handler != null)
-      return handler.getFeedIcon(link);
+      return handler.getFeedIcon(link, monitor);
 
     /* No Handler present */
     throw new UnknownFeedException(Activator.getDefault().createErrorStatus("Could not find a matching ProtocolHandler for: " + protocol, null)); //$NON-NLS-1$
   }
 
   /*
-   * @see
-   * org.rssowl.core.connection.IConnectionService#getFeedIcon(java.net.URI)
+   * @see org.rssowl.core.connection.IConnectionService#getFeed(java.net.URI,
+   * org.eclipse.core.runtime.IProgressMonitor)
    */
-  public URI getFeed(URI link) throws ConnectionException {
+  public URI getFeed(URI link, IProgressMonitor monitor) throws ConnectionException {
     String protocol = link.getScheme();
     IProtocolHandler handler = fProtocolHandler.get(protocol);
 
     /* Handler present */
     if (handler != null)
-      return handler.getFeed(link);
+      return handler.getFeed(link, monitor);
 
     /* No Handler present */
     throw new UnknownFeedException(Activator.getDefault().createErrorStatus("Could not find a matching ProtocolHandler for: " + protocol, null)); //$NON-NLS-1$

@@ -366,7 +366,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
         protected void runInBackground(IProgressMonitor monitor) {
           try {
             URI link = new URI(URIUtils.fastEncode(linkText));
-            fLabel = Owl.getConnectionService().getLabel(link);
+            fLabel = Owl.getConnectionService().getLabel(link, monitor);
           } catch (ConnectionException e) {
             /* Ignore */
           } catch (URISyntaxException e) {

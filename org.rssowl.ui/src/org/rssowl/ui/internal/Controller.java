@@ -770,11 +770,11 @@ public class Controller {
 
       /* First try using the Homepage of the Feed */
       if (feedHomepage != null && StringUtils.isSet(feedHomepage.toString()) && feedHomepage.isAbsolute())
-        faviconBytes = Owl.getConnectionService().getFeedIcon(feedHomepage);
+        faviconBytes = Owl.getConnectionService().getFeedIcon(feedHomepage, monitor);
 
       /* Then try with Feed address itself */
       if (faviconBytes == null)
-        faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink);
+        faviconBytes = Owl.getConnectionService().getFeedIcon(feedLink, monitor);
 
       /* Store locally */
       if (shouldProceedReloading(monitor, bookmark))

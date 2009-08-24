@@ -153,19 +153,19 @@ public class CreateBookmarkWizard extends Wizard {
 
             /* Load Feed from Link if necessary */
             if (!URIUtils.looksLikeFeedLink(linkText)) {
-              final URI feedLink = Owl.getConnectionService().getFeed(link[0]);
+              final URI feedLink = Owl.getConnectionService().getFeed(link[0], monitor);
               if (feedLink != null)
                 link[0] = feedLink;
             }
 
-            feedTitle = Owl.getConnectionService().getLabel(link[0]);
+            feedTitle = Owl.getConnectionService().getLabel(link[0], monitor);
             fLastRealm = null;
           } catch (final ConnectionException e) {
 
             /* Authentication Required */
             if (e instanceof AuthenticationRequiredException && handleProtectedFeed(link[0], ((AuthenticationRequiredException) e).getRealm())) {
               try {
-                feedTitle = Owl.getConnectionService().getLabel(link[0]);
+                feedTitle = Owl.getConnectionService().getLabel(link[0], monitor);
               } catch (ConnectionException e1) {
                 Activator.getDefault().logError(e.getMessage(), e);
               }
@@ -190,7 +190,7 @@ public class CreateBookmarkWizard extends Wizard {
 
       /* Perform Runnable in separate Thread and show progress */
       try {
-        getContainer().run(true, false, runnable);
+        getContainer().run(true, true, runnable);
       } catch (InvocationTargetException e) {
         Activator.getDefault().logError(e.getMessage(), e);
       } catch (InterruptedException e) {
@@ -286,18 +286,18 @@ public class CreateBookmarkWizard extends Wizard {
 
               /* Load Feed from Link if necessary */
               if (!URIUtils.looksLikeFeedLink(uriObj[0].toString())) {
-                final URI feedLink = Owl.getConnectionService().getFeed(uriObj[0]);
+                final URI feedLink = Owl.getConnectionService().getFeed(uriObj[0], monitor);
                 if (feedLink != null)
                   uriObj[0] = feedLink;
               }
 
-              title[0] = Owl.getConnectionService().getLabel(uriObj[0]);
+              title[0] = Owl.getConnectionService().getLabel(uriObj[0], monitor);
             } catch (final ConnectionException e) {
 
               /* Authentication Required */
               if (e instanceof AuthenticationRequiredException && handleProtectedFeed(uriObj[0], ((AuthenticationRequiredException) e).getRealm())) {
                 try {
-                  title[0] = Owl.getConnectionService().getLabel(uriObj[0]);
+                  title[0] = Owl.getConnectionService().getLabel(uriObj[0], monitor);
                 } catch (ConnectionException e1) {
                   Activator.getDefault().logError(e.getMessage(), e);
                 }
@@ -308,7 +308,7 @@ public class CreateBookmarkWizard extends Wizard {
 
         /* Perform Runnable in same Thread and show progress */
         try {
-          getContainer().run(true, false, runnable);
+          getContainer().run(true, true, runnable);
         } catch (InvocationTargetException e) {
           Activator.getDefault().logError(e.getMessage(), e);
         } catch (InterruptedException e) {
