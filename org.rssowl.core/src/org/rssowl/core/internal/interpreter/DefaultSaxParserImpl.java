@@ -28,6 +28,7 @@ import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.JDOMParseException;
 import org.jdom.input.SAXBuilder;
+import org.rssowl.core.connection.IAbortable;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.connection.DefaultProtocolHandler;
 import org.rssowl.core.interpreter.EncodingException;
@@ -136,7 +137,10 @@ public class DefaultSaxParserImpl implements IXMLParser {
 
     /* Close Stream */
     try {
-      keepAliveIns.reallyClose();
+      if (ex != null && inS instanceof IAbortable)
+        ((IAbortable) inS).abort();
+      else
+        keepAliveIns.reallyClose();
     } catch (IOException e) {
       ex = e;
     }
