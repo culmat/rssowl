@@ -259,6 +259,8 @@ public class ImportElementsPage extends WizardPage {
 
     /* Viewer for Folder Child Selection */
     fFolderChildTree = new FolderChildCheckboxTree(container);
+    if (!isWelcome)
+      ((GridData) fFolderChildTree.getViewer().getTree().getLayoutData()).heightHint = 140;
     fViewer = fFolderChildTree.getViewer();
 
     /* Filter (exclude existing) */
