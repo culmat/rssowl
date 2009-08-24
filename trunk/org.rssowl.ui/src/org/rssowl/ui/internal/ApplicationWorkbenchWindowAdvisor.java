@@ -31,6 +31,7 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.util.LocalSelectionTransfer;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -39,7 +40,6 @@ import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.events.ShellListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -47,7 +47,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Monitor;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -139,14 +138,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     configurer.setTitle("RSSOwl"); //$NON-NLS-1$
 
     /* Set Window Size to match monitor size (only on single monitor) */
-    Display display = Display.getDefault();
-    if (display != null) {
-      Monitor[] monitors = display.getMonitors();
-      if (monitors.length == 1) {
-        Rectangle clientArea = monitors[0].getClientArea();
-        configurer.setInitialSize(new Point(clientArea.width, clientArea.height));
-      }
-    }
+    Point size = OwlUI.getFirstMonitorSize();
+    if (size != null)
+      configurer.setInitialSize(size);
 
     /* Apply DND Support for Editor Area */
     configurer.addEditorAreaTransfer(LocalSelectionTransfer.getTransfer());
@@ -201,10 +195,13 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     /* Use PNG on Windows and Linux */
     if (Application.IS_WINDOWS || Application.IS_LINUX) {
       Image[] shellImg = new Image[3];
-      shellImg[0] = OwlUI.getImage(shell, "icons/product/16x16.png");
-      shellImg[1] = OwlUI.getImage(shell, "icons/product/24x24.png");
-      shellImg[2] = OwlUI.getImage(shell, "icons/product/32x32.png");
+      shellImg[0] = new Image(shell.getDisplay(), getClass().getResourceAsStream("/icons/product/16x16.png"));
+      shellImg[1] = new Image(shell.getDisplay(), getClass().getResourceAsStream("/icons/product/24x24.png"));
+      shellImg[2] = new Image(shell.getDisplay(), getClass().getResourceAsStream("/icons/product/32x32.png"));
       shell.setImages(shellImg);
+
+      /* Apply to all Dialogs */
+      Window.setDefaultImages(shellImg);
     }
 
     /* System Tray */
