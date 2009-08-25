@@ -28,6 +28,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
@@ -35,10 +41,12 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
@@ -73,6 +81,7 @@ import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
+import org.rssowl.ui.internal.dialogs.PreviewFeedDialog;
 import org.rssowl.ui.internal.dialogs.importer.ImportSourcePage.Source;
 import org.rssowl.ui.internal.dialogs.welcome.WelcomeWizard;
 import org.rssowl.ui.internal.util.FolderChildCheckboxTree;
@@ -95,6 +104,7 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *A {@link WizardPage} to select the elements to import.
@@ -113,9 +123,11 @@ public class ImportElementsPage extends WizardPage {
   private FolderChildCheckboxTree fFolderChildTree;
   private Button fDeselectAll;
   private Button fSelectAll;
+  private Button fPreviewButton;
   private Button fFlattenCheck;
   private Button fHideExistingCheck;
   private ExistingBookmarkFilter fExistingFilter = new ExistingBookmarkFilter();
+  private Map<URI, IFeed> fLoadedFeedCache = new ConcurrentHashMap<URI, IFeed>();
 
   /* Remember Current Import Values */
   private Source fCurrentSourceKind;
@@ -263,6 +275,21 @@ public class ImportElementsPage extends WizardPage {
       ((GridData) fFolderChildTree.getViewer().getTree().getLayoutData()).heightHint = 140;
     fViewer = fFolderChildTree.getViewer();
 
+    /* Open Preview on Doubleclick */
+    fViewer.addDoubleClickListener(new IDoubleClickListener() {
+      public void doubleClick(DoubleClickEvent event) {
+        openPreview(event.getSelection());
+      }
+    });
+
+    /* Control Preview Button Enablement */
+    fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      public void selectionChanged(SelectionChangedEvent event) {
+        ISelection selection = event.getSelection();
+        fPreviewButton.setEnabled(!selection.isEmpty() && ((IStructuredSelection) selection).getFirstElement() instanceof IBookMark);
+      }
+    });
+
     /* Filter (exclude existing) */
     fViewer.addFilter(fExistingFilter);
 
@@ -276,7 +303,7 @@ public class ImportElementsPage extends WizardPage {
 
     /* Select All / Deselect All */
     Composite buttonContainer = new Composite(container, SWT.NONE);
-    buttonContainer.setLayout(LayoutUtils.createGridLayout(isWelcome ? 3 : 4, 0, 0));
+    buttonContainer.setLayout(LayoutUtils.createGridLayout(isWelcome ? 5 : 6, 0, 0));
     buttonContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fSelectAll = new Button(buttonContainer, SWT.PUSH);
@@ -301,11 +328,28 @@ public class ImportElementsPage extends WizardPage {
       }
     });
 
+    Label sep = new Label(buttonContainer, SWT.SEPARATOR | SWT.VERTICAL);
+    sep.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false));
+    ((GridData) sep.getLayoutData()).heightHint = 20;
+
+    fPreviewButton = new Button(buttonContainer, SWT.PUSH);
+    fPreviewButton.setText("&Preview");
+    fPreviewButton.setEnabled(false);
+    fPreviewButton.setToolTipText("Show a Preview of a Selected Feed");
+    setButtonLayoutData(fPreviewButton);
+    fPreviewButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        openPreview(fViewer.getSelection());
+      }
+    });
+
     /* Show as Flat List of News Marks */
     fFlattenCheck = new Button(buttonContainer, SWT.CHECK);
     fFlattenCheck.setText("Flatten Hierarchy");
     setButtonLayoutData(fFlattenCheck);
     ((GridData) fFlattenCheck.getLayoutData()).horizontalAlignment = SWT.END;
+    ((GridData) fFlattenCheck.getLayoutData()).horizontalIndent = 25;
     ((GridData) fFlattenCheck.getLayoutData()).grabExcessHorizontalSpace = true;
     fFlattenCheck.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -336,6 +380,31 @@ public class ImportElementsPage extends WizardPage {
     });
 
     setControl(container);
+  }
+
+  private void openPreview(ISelection selection) {
+    IStructuredSelection sel = (IStructuredSelection) selection;
+    if (!sel.isEmpty()) {
+      Object[] elements = sel.toArray();
+      int offset = 0;
+      for (Object element : elements) {
+        if (element instanceof IBookMark) {
+          IBookMark bookmark = (IBookMark) element;
+          IFeed loadedFeed = fLoadedFeedCache.get(bookmark.getFeedLinkReference().getLink());
+
+          PreviewFeedDialog dialog = new PreviewFeedDialog(getShell(), bookmark, loadedFeed);
+          dialog.setBlockOnOpen(false);
+          dialog.open();
+
+          if (offset != 0) {
+            Point location = dialog.getShell().getLocation();
+            dialog.getShell().setLocation(location.x + offset, location.y + offset);
+          }
+
+          offset += 20;
+        }
+      }
+    }
   }
 
   private void updateMessage(boolean clearErrors) {
@@ -739,6 +808,7 @@ public class ImportElementsPage extends WizardPage {
         /* Try to interpret as Feed */
         IFeed feed = Owl.getModelFactory().createFeed(null, feedLink);
         Owl.getInterpreter().interpret(in, feed, null);
+        fLoadedFeedCache.put(feedLink, feed);
 
         /* Return on Cancellation */
         if (monitor.isCanceled() || Controller.getDefault().isShuttingDown()) {
