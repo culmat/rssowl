@@ -715,9 +715,6 @@ public class SearchNewsDialog extends TitleAreaDialog {
       }
     });
 
-    /* Separator */
-    new Label(centerSash, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.END, true, false));
-
     Composite centerSashContent = new Composite(centerSash, SWT.None);
     centerSashContent.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
     centerSashContent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
