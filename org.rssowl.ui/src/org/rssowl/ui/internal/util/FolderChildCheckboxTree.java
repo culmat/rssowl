@@ -113,7 +113,7 @@ public class FolderChildCheckboxTree {
   private void initComponents() {
 
     /* Viewer to select particular Folders/Marks */
-    fViewer = new CheckboxTreeViewer(fParent, SWT.BORDER);
+    fViewer = new CheckboxTreeViewer(fParent, SWT.BORDER | SWT.MULTI);
     fViewer.setAutoExpandLevel(2);
     fViewer.getTree().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     ((GridData) fViewer.getTree().getLayoutData()).heightHint = 80;
