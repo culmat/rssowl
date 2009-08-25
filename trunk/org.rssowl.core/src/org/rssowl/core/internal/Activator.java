@@ -152,6 +152,17 @@ public class Activator extends Plugin {
   }
 
   /**
+   * Log an Info Message.
+   *
+   * @param msg The message to log as Info.
+   */
+  public void logInfo(String msg) {
+    if (msg == null)
+      msg = ""; //$NON-NLS-1$
+    getLog().log(new Status(IStatus.INFO, getBundle().getSymbolicName(), IStatus.OK, msg, null));
+  }
+
+  /**
    * Create a IStatus out of the given message and exception.
    *
    * @param msg The message describing the information.

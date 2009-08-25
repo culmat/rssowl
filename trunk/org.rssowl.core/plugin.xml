@@ -214,5 +214,14 @@
             forcable="true"
             sortKey="11">
       </newsAction>
+      <newsAction
+            class="org.rssowl.core.internal.newsaction.GrowlNotifyAction"
+            description="Shows matching News in Growl"
+            forcable="false"
+            id="org.rssowl.core.GrowlNotifyAction"
+            name="Show News in Growl"
+            platform="carbon"
+            sortKey="50">
+      </newsAction>
    </extension>
 </plugin>

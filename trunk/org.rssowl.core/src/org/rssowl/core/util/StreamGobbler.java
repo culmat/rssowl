@@ -22,13 +22,13 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.ui.internal.util;
+package org.rssowl.core.util;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.rssowl.ui.internal.Activator;
+import org.rssowl.core.internal.Activator;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -60,7 +60,9 @@ public class StreamGobbler extends Job {
   }
 
   /*
-   * @see org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor)
+   * @see
+   * org.eclipse.core.runtime.jobs.Job#run(org.eclipse.core.runtime.IProgressMonitor
+   * )
    */
   @Override
   protected IStatus run(IProgressMonitor monitor) {
