@@ -1647,6 +1647,10 @@
             actionId="org.rssowl.ui.DownloadAttachmentsNewsAction"
             class="org.rssowl.ui.internal.filter.DownloadAttachmentsNewsActionPresentation">
       </newsActionPresentation>
+      <newsActionPresentation
+            actionId="org.rssowl.core.GrowlNotifyAction"
+            class="org.rssowl.ui.internal.filter.ShowGrowlActionPresentation">
+      </newsActionPresentation>
    </extension>
    <extension
          point="org.rssowl.ui.ShareProvider">
