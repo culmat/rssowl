@@ -58,6 +58,7 @@ import org.rssowl.ui.internal.ApplicationServer;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.ILinkHandler;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.util.CBrowser;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -110,11 +111,24 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   /**
    * Creates a new Browser LabelProvider for News
    *
+   * @param browser
+   */
+  public NewsBrowserLabelProvider(CBrowser browser) {
+    this(null, browser.isIE());
+  }
+
+  /**
+   * Creates a new Browser LabelProvider for News
+   *
    * @param viewer
    */
   public NewsBrowserLabelProvider(NewsBrowserViewer viewer) {
+    this(viewer, viewer.getBrowser().isIE());
+  }
+
+  private NewsBrowserLabelProvider(NewsBrowserViewer viewer, boolean isIE) {
     fViewer = viewer;
-    fIsIE = fViewer.getBrowser().isIE();
+    fIsIE = isIE;
     createFonts();
     createColors();
     registerListeners();
@@ -216,7 +230,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
   }
 
   private boolean isSingleNewsDisplayed() {
-    Object input = fViewer.getInput();
+    Object input = fViewer != null ? fViewer.getInput() : null;
     return input instanceof INews;
   }
 
@@ -717,25 +731,27 @@ public class NewsBrowserLabelProvider extends LabelProvider {
     String result = builder.toString();
 
     /* Highlight Support */
-    Collection<String> wordsToHighlight = fViewer.getHighlightedWords();
-    if (!wordsToHighlight.isEmpty()) {
-      StringBuilder highlightedResult = new StringBuilder(result.length());
+    if (fViewer != null) {
+      Collection<String> wordsToHighlight = fViewer.getHighlightedWords();
+      if (!wordsToHighlight.isEmpty()) {
+        StringBuilder highlightedResult = new StringBuilder(result.length());
 
-      RGB searchRGB = OwlUI.getThemeRGB(OwlUI.SEARCH_HIGHLIGHT_BG_COLOR_ID, new RGB(255, 255, 0));
-      String preHighlight = "<span style=\"background-color:rgb(" + OwlUI.toString(searchRGB) + ");\">";
-      String postHighlight = "</span>";
+        RGB searchRGB = OwlUI.getThemeRGB(OwlUI.SEARCH_HIGHLIGHT_BG_COLOR_ID, new RGB(255, 255, 0));
+        String preHighlight = "<span style=\"background-color:rgb(" + OwlUI.toString(searchRGB) + ");\">";
+        String postHighlight = "</span>";
 
-      ExpandingReader resultHighlightReader = new ExpandingReader(new StringReader(result), wordsToHighlight, preHighlight, postHighlight, true);
+        ExpandingReader resultHighlightReader = new ExpandingReader(new StringReader(result), wordsToHighlight, preHighlight, postHighlight, true);
 
-      int len = 0;
-      char[] buf = new char[1000];
-      try {
-        while ((len = resultHighlightReader.read(buf)) != -1)
-          highlightedResult.append(buf, 0, len);
+        int len = 0;
+        char[] buf = new char[1000];
+        try {
+          while ((len = resultHighlightReader.read(buf)) != -1)
+            highlightedResult.append(buf, 0, len);
 
-        return highlightedResult.toString();
-      } catch (IOException e) {
-        Activator.getDefault().logError(e.getMessage(), e);
+          return highlightedResult.toString();
+        } catch (IOException e) {
+          Activator.getDefault().logError(e.getMessage(), e);
+        }
       }
     }
 
