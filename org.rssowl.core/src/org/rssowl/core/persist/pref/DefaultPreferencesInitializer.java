@@ -222,6 +222,8 @@ public class DefaultPreferencesInitializer implements IPreferencesInitializer {
 
     /* Next | Previous */
     items.add("org.rssowl.ui.internal.Separator");
+    items.add("org.rssowl.ui.NextUnreadNews");
+    items.add("org.rssowl.ui.PreviousUnreadNews");
 
     defaultScope.putStrings(Preferences.TOOLBAR_ITEMS.id(), items.toArray(new String[items.size()]));
     defaultScope.putInteger(Preferences.TOOLBAR_MODE.id(), 0);
