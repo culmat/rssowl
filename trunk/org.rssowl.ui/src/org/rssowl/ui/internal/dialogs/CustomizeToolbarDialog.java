@@ -79,6 +79,9 @@ import java.util.Map;
  *
  * @author bpasero
  */
+//TODO Implement DND (consider adapting to other dialogs supporting Move Up / Move Down)
+//TODO Separators are unhappy due to multiple occurance
+//TODO Implement Modes
 public class CustomizeToolbarDialog extends Dialog {
   private static final String DIALOG_SETTINGS_KEY = "org.rssowl.ui.internal.dialogs.CustomizeToolbarDialog";
 
@@ -145,13 +148,13 @@ public class CustomizeToolbarDialog extends Dialog {
     fViewer = new TableViewer(cTable.getControl());
     fViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fViewer.getTable().setHeaderVisible(true);
-    ((GridData) fViewer.getTable().getLayoutData()).heightHint = fViewer.getTable().getItemHeight() * 15;
+    ((GridData) fViewer.getTable().getLayoutData()).heightHint = fViewer.getTable().getItemHeight() * 20;
     fViewer.getTable().setFocus();
 
     TableColumn nameCol = new TableColumn(fViewer.getTable(), SWT.NONE);
 
     CColumnLayoutData data = new CColumnLayoutData(Size.FILL, 100);
-    cTable.manageColumn(nameCol, data, "Available Items for the Toolbar", null, null, false, false);
+    cTable.manageColumn(nameCol, data, "Currently Visible Items", null, null, false, false);
 
     /* ContentProvider returns all selected Items */
     fViewer.setContentProvider(new IStructuredContentProvider() {
