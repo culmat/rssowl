@@ -51,7 +51,10 @@ import java.util.List;
  * @author bpasero
  */
 public class ToggleReadStateAction extends Action implements IWorkbenchWindowActionDelegate {
-  private static final String ID = "org.rssowl.ui.ToggleReadState";
+
+  /** Action ID */
+  public static final String ID = "org.rssowl.ui.ToggleReadState";
+
   private static final EnumSet<INews.State> STATES = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
 
   private IStructuredSelection fSelection;

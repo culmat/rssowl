@@ -1331,4 +1331,11 @@ public class Controller {
       });
     }
   }
+
+  /**
+   * Cancels all pending Updates to Feeds.
+   */
+  public void stopUpdate() {
+    fReloadFeedQueue.cancel(false);
+  }
 }
