@@ -35,7 +35,12 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.CoolBar;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
@@ -50,6 +55,8 @@ import org.rssowl.ui.internal.actions.ReloadAllAction;
 import org.rssowl.ui.internal.actions.SearchNewsAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.UndoAction;
+import org.rssowl.ui.internal.actions.NavigationActionFactory.Actions;
+import org.rssowl.ui.internal.actions.NavigationActionFactory.NavigationAction;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -74,60 +81,59 @@ public class CoolBarAdvisor {
   public enum Item {
 
     /** Separator */
-    SEPARATOR(SEPARATOR_ID, "--- Separator ---", OwlUI.getImageDescriptor("icons/obj16/separator.gif")),
+    SEPARATOR(SEPARATOR_ID, "--- Separator ---", null, OwlUI.getImageDescriptor("icons/obj16/separator.gif")),
 
     /** New */
-    NEW("org.rssowl.ui.NewDropDown", "New", OwlUI.getImageDescriptor("icons/etool16/add.gif"), true, false),
+    NEW("org.rssowl.ui.NewDropDown", "New", null, OwlUI.getImageDescriptor("icons/etool16/add.gif"), true, false),
 
     /** Import */
-    IMPORT(ImportAction.ID, "Import", OwlUI.getImageDescriptor("icons/etool16/import.gif")),
+    IMPORT(ImportAction.ID, "Import", null, OwlUI.getImageDescriptor("icons/etool16/import.gif")),
 
     /** Export */
-    EXPORT(ExportAction.ID, "Export", OwlUI.getImageDescriptor("icons/etool16/export.gif")),
+    EXPORT(ExportAction.ID, "Export", null, OwlUI.getImageDescriptor("icons/etool16/export.gif")),
 
     /** Undo */
-    UNDO(UndoAction.ID, "Undo", OwlUI.getImageDescriptor("icons/elcl16/undo_edit.gif")),
+    UNDO(UndoAction.ID, "Undo", null, OwlUI.getImageDescriptor("icons/elcl16/undo_edit.gif")),
 
     /** Redo */
-    REDO(RedoAction.ID, "Redo", OwlUI.getImageDescriptor("icons/elcl16/redo_edit.gif")),
+    REDO(RedoAction.ID, "Redo", null, OwlUI.getImageDescriptor("icons/elcl16/redo_edit.gif")),
 
     /** Update All */
-    UPDATE_ALL(ReloadAllAction.ID, "Update All", OwlUI.getImageDescriptor("icons/elcl16/reload_all.gif")),
+    UPDATE_ALL(ReloadAllAction.ID, "Update All", null, OwlUI.getImageDescriptor("icons/elcl16/reload_all.gif")),
 
     /** Stop */
-    STOP("org.rssowl.ui.StopUpdate", "Stop", OwlUI.getImageDescriptor("icons/etool16/stop.gif"), false, false),
+    STOP("org.rssowl.ui.StopUpdate", "Stop", null, OwlUI.getImageDescriptor("icons/etool16/stop.gif"), false, false),
 
     /** Search */
-    SEARCH(SearchNewsAction.ID, "Search", OwlUI.SEARCHMARK),
+    SEARCH(SearchNewsAction.ID, "Search", null, OwlUI.SEARCHMARK),
 
     /** Mark Read */
-    MARK_READ(ToggleReadStateAction.ID, "Mark Read", OwlUI.getImageDescriptor("icons/elcl16/mark_read.gif")),
+    MARK_READ(ToggleReadStateAction.ID, "Mark Read", null, OwlUI.getImageDescriptor("icons/elcl16/mark_read.gif")),
 
     /** Mark All Read */
-    MARK_ALL_READ(MarkAllNewsReadAction.ID, "Mark All Read", OwlUI.getImageDescriptor("icons/elcl16/mark_all_read.gif"));
+    MARK_ALL_READ(MarkAllNewsReadAction.ID, "Mark All Read", null, OwlUI.getImageDescriptor("icons/elcl16/mark_all_read.gif")),
 
-    /** Next (Drop Down with all from Next, remembers Selection with Radio) */
-    //NEXT(null, null, null),
+    /** Next Unread News */
+    NEXT("org.rssowl.ui.NextUnreadNews", "Next", "Next Unread News", OwlUI.getImageDescriptor("icons/etool16/next.gif"), true, true),
 
-    /**
-     * Previous (Drop Down with all from Previous, remembers Selection with
-     * Radio)
-     */
-    //PREVIOUS(null, null, null);
+    /** Previous Unread News */
+    PREVIOUS("org.rssowl.ui.PreviousUnreadNews", "Previous", "Previous Unread News", OwlUI.getImageDescriptor("icons/etool16/previous.gif"), true, true);
 
     private final String fId;
     private final String fName;
+    private final String fTooltip;
     private final ImageDescriptor fImg;
     private final boolean fWithDropDownMenu;
     private final boolean fHasCommand;
 
-    Item(String id, String name, ImageDescriptor img) {
-      this(id, name, img, false, true);
+    Item(String id, String name, String tooltip, ImageDescriptor img) {
+      this(id, name, tooltip, img, false, true);
     }
 
-    Item(String id, String name, ImageDescriptor img, boolean withDropDownMenu, boolean hasCommand) {
+    Item(String id, String name, String tooltip, ImageDescriptor img, boolean withDropDownMenu, boolean hasCommand) {
       fId = id;
       fName = name;
+      fTooltip = tooltip;
       fImg = img;
       fWithDropDownMenu = withDropDownMenu;
       fHasCommand = hasCommand;
@@ -145,6 +151,13 @@ public class CoolBarAdvisor {
      */
     public String getName() {
       return fName;
+    }
+
+    /**
+     * @return the Tooltip to show for this Item or <code>null</code> if none.
+     */
+    public String getTooltip() {
+      return fTooltip;
     }
 
     /**
@@ -174,6 +187,19 @@ public class CoolBarAdvisor {
 
     /** Only Text */
     TEXT
+  }
+
+  /* Selection Listener for Navigation Actions */
+  private class NavigationSelectionListener extends SelectionAdapter {
+    @Override
+    public void widgetSelected(SelectionEvent e) {
+      Object data = e.widget.getData();
+      if (data instanceof Actions) {
+        NavigationAction action = new NavigationAction((Actions) data);
+        action.init(fWindow);
+        action.run(null);
+      }
+    }
   }
 
   /**
@@ -270,6 +296,11 @@ public class CoolBarAdvisor {
       @Override
       public String getId() {
         return item.getId();
+      }
+
+      @Override
+      public String getToolTipText() {
+        return item.getTooltip();
       }
 
       @Override
@@ -378,6 +409,22 @@ public class CoolBarAdvisor {
         action.run(null);
         break;
       }
+
+        /* Next */
+      case NEXT: {
+        NavigationAction action = new NavigationAction(Actions.NEXT_UNREAD_NEWS);
+        action.init(fWindow);
+        action.run(null);
+        break;
+      }
+
+        /* Previous */
+      case PREVIOUS: {
+        NavigationAction action = new NavigationAction(Actions.PREVIOUS_UNREAD_NEWS);
+        action.init(fWindow);
+        action.run(null);
+        break;
+      }
     }
   }
 
@@ -395,6 +442,102 @@ public class CoolBarAdvisor {
         if (folder != null)
           action.selectionChanged(null, new StructuredSelection(folder));
         return action;
+      }
+
+        /* Next News | Next Unread News || Next Feed | Next Unread Feed || Next Tab */
+      case NEXT: {
+        return new IMenuCreator() {
+
+          public Menu getMenu(Control parent) {
+            Menu menu = new Menu(parent);
+
+            MenuItem item = new MenuItem(menu, SWT.PUSH);
+            item.setText("Next News");
+            item.setData(Actions.NEXT_NEWS);
+            item.addSelectionListener(new NavigationSelectionListener());
+
+            item = new MenuItem(menu, SWT.PUSH);
+            item.setText("Next Unread News");
+            item.setData(Actions.NEXT_UNREAD_NEWS);
+            item.addSelectionListener(new NavigationSelectionListener());
+            menu.setDefaultItem(item);
+
+            new MenuItem(menu, SWT.SEPARATOR);
+
+            item = new MenuItem(menu, SWT.PUSH);
+            item.setText("Next Feed");
+            item.setData(Actions.NEXT_FEED);
+            item.addSelectionListener(new NavigationSelectionListener());
+
+            item = new MenuItem(menu, SWT.PUSH);
+            item.setText("Next Unread Feed");
+            item.setData(Actions.NEXT_UNREAD_FEED);
+            item.addSelectionListener(new NavigationSelectionListener());
+
+            new MenuItem(menu, SWT.SEPARATOR);
+
+            item = new MenuItem(menu, SWT.PUSH);
+            item.setText("Next Tab");
+            item.setData(Actions.NEXT_TAB);
+            item.addSelectionListener(new NavigationSelectionListener());
+
+            return menu;
+          }
+
+          public void dispose() {}
+
+          public Menu getMenu(Menu parent) {
+            return null;
+          }
+        };
+      }
+
+        /* Previous News | Previous Unread News || Previous Feed | Previous Unread Feed || Previous Tab */
+      case PREVIOUS: {
+        return new IMenuCreator() {
+
+          public Menu getMenu(Control parent) {
+            Menu menu = new Menu(parent);
+
+            MenuItem item = new MenuItem(menu, SWT.PUSH);
+            item.setText("Previous News");
+            item.setData(Actions.PREVIOUS_NEWS);
+            item.addSelectionListener(new NavigationSelectionListener());
+
+            item = new MenuItem(menu, SWT.PUSH);
+            item.setText("Previous Unread News");
+            item.setData(Actions.PREVIOUS_UNREAD_NEWS);
+            item.addSelectionListener(new NavigationSelectionListener());
+            menu.setDefaultItem(item);
+
+            new MenuItem(menu, SWT.SEPARATOR);
+
+            item = new MenuItem(menu, SWT.PUSH);
+            item.setText("Previous Feed");
+            item.setData(Actions.PREVIOUS_FEED);
+            item.addSelectionListener(new NavigationSelectionListener());
+
+            item = new MenuItem(menu, SWT.PUSH);
+            item.setText("Previous Unread Feed");
+            item.setData(Actions.PREVIOUS_UNREAD_FEED);
+            item.addSelectionListener(new NavigationSelectionListener());
+
+            new MenuItem(menu, SWT.SEPARATOR);
+
+            item = new MenuItem(menu, SWT.PUSH);
+            item.setText("Previous Tab");
+            item.setData(Actions.PREVIOUS_TAB);
+            item.addSelectionListener(new NavigationSelectionListener());
+
+            return menu;
+          }
+
+          public void dispose() {}
+
+          public Menu getMenu(Menu parent) {
+            return null;
+          }
+        };
       }
     };
 

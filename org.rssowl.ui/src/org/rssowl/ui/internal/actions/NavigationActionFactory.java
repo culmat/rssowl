@@ -52,11 +52,14 @@ import java.util.List;
 public class NavigationActionFactory implements IExecutableExtensionFactory, IExecutableExtension {
   private String fId;
 
-  /* Actual Action for the Navigation */
-  private static class NavigationAction implements IWorkbenchWindowActionDelegate {
+  /** Actual Action for the Navigation */
+  public static class NavigationAction implements IWorkbenchWindowActionDelegate {
     private final Actions fType;
 
-    NavigationAction(Actions type) {
+    /**
+     * @param type the type of Navigation.
+     */
+    public NavigationAction(Actions type) {
       fType = type;
     }
 
