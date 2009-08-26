@@ -27,12 +27,7 @@ package org.rssowl.ui.internal.handler;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.IHandler;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.PartInitException;
-import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 /**
  * This {@link IHandler} is required to support key-bindings for programmatic
@@ -46,23 +41,7 @@ public class ToggleBookMarksHandler extends AbstractHandler implements IHandler 
    * @see org.eclipse.core.commands.AbstractHandler#execute(org.eclipse.core.commands.ExecutionEvent)
    */
   public Object execute(ExecutionEvent event) {
-    IWorkbenchPage page = OwlUI.getPage();
-    if (page != null) {
-      IViewPart explorerView = page.findView(BookMarkExplorer.VIEW_ID);
-
-      /* Hide Bookmarks */
-      if (explorerView != null)
-        page.hideView(explorerView);
-
-      /* Show Bookmarks */
-      else {
-        try {
-          page.showView(BookMarkExplorer.VIEW_ID);
-        } catch (PartInitException e) {
-          Activator.getDefault().logError(e.getMessage(), e);
-        }
-      }
-    }
+    OwlUI.toggleBookmarks();
 
     return null; //As per JavaDoc
   }

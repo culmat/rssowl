@@ -27,12 +27,6 @@ package org.rssowl.ui.internal.handler;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.IHandler;
-import org.eclipse.swt.widgets.Shell;
-import org.rssowl.core.Owl;
-import org.rssowl.core.internal.persist.pref.DefaultPreferences;
-import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.ui.internal.ApplicationWorkbenchAdvisor;
-import org.rssowl.ui.internal.ApplicationWorkbenchWindowAdvisor;
 import org.rssowl.ui.internal.OwlUI;
 
 /**
@@ -47,25 +41,7 @@ public class ToggleFullScreenHandler extends AbstractHandler implements IHandler
    * @see org.eclipse.core.commands.IHandler#execute(org.eclipse.core.commands.ExecutionEvent)
    */
   public Object execute(ExecutionEvent event) {
-    IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
-    Shell shell = OwlUI.getActiveShell();
-    if (shell != null) {
-      shell.setFullScreen(!shell.getFullScreen());
-
-      /* Shell got restored */
-      if (!shell.getFullScreen()) {
-        ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
-        configurer.setStatusVisible(preferences.getBoolean(DefaultPreferences.SHOW_STATUS), false);
-
-        shell.layout(); //Need to layout to avoid screen cheese
-      }
-
-      /* Shell got fullscreen */
-      else {
-        ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
-        configurer.setStatusVisible(false, true);
-      }
-    }
+    OwlUI.toggleFullScreen();
 
     return null; //As per JavaDoc
   }
