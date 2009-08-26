@@ -37,7 +37,6 @@
                id="org.rssowl.ui.NewType"
                label="New"
                style="pulldown"
-               toolbarPath="file"
                tooltip="New">
          </action>
          <action
@@ -121,8 +120,7 @@
                icon="icons/obj16/searchmark.gif"
                id="org.rssowl.ui.SearchNewsAction"
                label="Search News..."
-               style="push"
-               toolbarPath="search">
+               style="push">
          </action>
       </actionSet>
       <actionSet
@@ -291,8 +289,7 @@
                icon="icons/elcl16/mark_all_read.gif"
                id="org.rssowl.ui.MarkAllRead"
                label="Mark All News as Read"
-               style="push"
-               toolbarPath="news/mark">
+               style="push">
          </action>
          <action
                class="org.rssowl.ui.internal.actions.ToggleReadStateAction"
@@ -303,7 +300,6 @@
                id="org.rssowl.ui.actions.MarkRead"
                label="Mark News as Read"
                style="push"
-               toolbarPath="news/mark"
                tooltip="Mark News as Read">
             <enablement>
                <or>
@@ -322,8 +318,7 @@
                icon="icons/elcl16/reload_all.gif"
                id="org.rssowl.ui.actions.ReloadAll"
                label="Update All"
-               style="push"
-               toolbarPath="news/reload"/>
+               style="push"/>
          <action
                definitionId="org.rssowl.ui.actions.Reload"
                disabledIcon="icons/dlcl16/reload.gif"
@@ -331,8 +326,7 @@
                id="org.rssowl.ui.actions.Reload"
                label="Update"
                retarget="true"
-               style="push"
-               toolbarPath="news/reload"/>
+               style="push"/>
          <menu
                id="news"
                label="News">

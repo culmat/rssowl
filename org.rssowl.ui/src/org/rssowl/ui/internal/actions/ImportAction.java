@@ -45,6 +45,9 @@ import org.rssowl.ui.internal.dialogs.importer.ImportWizard;
  */
 public class ImportAction extends Action implements IWorkbenchWindowActionDelegate {
 
+  /** Action ID */
+  public static final String ID = "org.rssowl.ui.actions.ImportFeeds";
+
   /* Section for Dialogs Settings */
   private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.importer.ImportWizard";
 

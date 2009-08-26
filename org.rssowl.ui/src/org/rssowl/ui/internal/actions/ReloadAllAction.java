@@ -44,7 +44,9 @@ import java.util.Collection;
  * @author bpasero
  */
 public class ReloadAllAction extends Action implements IWorkbenchWindowActionDelegate {
-  private static final String ID = "org.rssowl.ui.actions.ReloadAll";
+
+  /** Action ID */
+  public static final String ID = "org.rssowl.ui.actions.ReloadAll";
 
   private Shell fShell;
 

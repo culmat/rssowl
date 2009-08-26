@@ -301,6 +301,12 @@ public class DefaultPreferences {
   /** Global: List of Import Keywords */
   public static final String IMPORT_KEYWORDS = Preferences.IMPORT_KEYWORDS.id();
 
+  /** Global: List of Items in Toolbar */
+  public static final String TOOLBAR_ITEMS = Preferences.TOOLBAR_ITEMS.id();
+
+  /** Global: Toolbar Mode */
+  public static final String TOOLBAR_MODE = Preferences.TOOLBAR_MODE.id();
+
   /**
    * Eclipse Preferences Follow
    */

@@ -86,6 +86,7 @@ import org.rssowl.ui.internal.actions.SearchNewsAction;
 import org.rssowl.ui.internal.actions.SendLinkAction;
 import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.UndoAction;
+import org.rssowl.ui.internal.dialogs.CustomizeToolbarDialog;
 import org.rssowl.ui.internal.dialogs.preferences.ManageLabelsPreferencePage;
 import org.rssowl.ui.internal.dialogs.preferences.NotifierPreferencesPage;
 import org.rssowl.ui.internal.dialogs.preferences.OverviewPreferencesPage;
@@ -123,6 +124,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
   /** End of the View Top Menu */
   public static final String M_VIEW_END = "viewEnd";
 
+  private CoolBarAdvisor fCoolBarAdvisor;
   private IContributionItem fOpenWindowsItem;
   private IContributionItem fReopenEditors;
   private FindAction fFindAction;
@@ -382,6 +384,17 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
               return page.findView(BookMarkExplorer.VIEW_ID) != null;
 
             return false;
+          }
+        });
+
+        /* Customize Toolbar */
+        manager.add(new Separator());
+        manager.add(new Action("&Customize Toolbar...") {
+          @Override
+          public void run() {
+            CustomizeToolbarDialog dialog = new CustomizeToolbarDialog(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell());
+            dialog.open();
+            fCoolBarAdvisor.advise(true);
           }
         });
 
@@ -912,8 +925,20 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     MenuManager coolBarContextMenuManager = new MenuManager(null, "org.rssowl.ui.CoolBarContextMenu"); //$NON-NLS-1$
     coolBar.setContextMenuManager(coolBarContextMenuManager);
     coolBarContextMenuManager.add(getAction(ActionFactory.LOCK_TOOL_BAR.getId()));
-    //    coolBarContextMenuManager.add(getAction(ActionFactory.EDIT_ACTION_SETS.getId()));
+    coolBarContextMenuManager.add(new Separator());
+    coolBarContextMenuManager.add(new Action("Customize Toolbar...") {
+      @Override
+      public void run() {
+        CustomizeToolbarDialog dialog = new CustomizeToolbarDialog(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell());
+        dialog.open();
+        fCoolBarAdvisor.advise(true);
+      }
+    });
     coolBarContextMenuManager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+
+    /* Coolbar Advisor */
+    fCoolBarAdvisor = new CoolBarAdvisor(coolBar, getActionBarConfigurer().getWindowConfigurer().getWindow());
+    fCoolBarAdvisor.advise();
   }
 
   /**

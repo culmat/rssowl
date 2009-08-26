@@ -38,7 +38,9 @@ import org.rssowl.ui.internal.editors.feed.FeedViewInput;
  * @author bpasero
  */
 public class MarkAllNewsReadAction extends Action implements IWorkbenchWindowActionDelegate {
-  private static final String ID = "org.rssowl.ui.MarkAllRead";
+
+  /** Action ID */
+  public static final String ID = "org.rssowl.ui.MarkAllRead";
 
   /** Leave for reflection */
   public MarkAllNewsReadAction() {

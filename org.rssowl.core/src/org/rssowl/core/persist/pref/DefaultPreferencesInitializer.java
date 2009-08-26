@@ -24,12 +24,17 @@
 
 package org.rssowl.core.persist.pref;
 
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An instance of <code>IPreferencesInitializer</code> responsible for defining
  * the default preferences of RSSOwl.
  * <p>
  * Subclasses may override to provide custom settings.
+ * </p>
+ * <p>
+ * TODO Consider moving to org.rssowl.ui giving implicit dependencies.
  * </p>
  *
  * @author bpasero
@@ -69,6 +74,9 @@ public class DefaultPreferencesInitializer implements IPreferencesInitializer {
 
     /* Default Reload/Open Settings */
     initReloadOpenDefaults(defaultScope);
+
+    /* Toolbar Item Settings */
+    initToolbarDefaults(defaultScope);
   }
 
   /**
@@ -95,10 +103,10 @@ public class DefaultPreferencesInitializer implements IPreferencesInitializer {
     defaultScope.putBoolean(Preferences.SHOW_TOOLBAR.id(), true);
     defaultScope.putBoolean(Preferences.SHOW_STATUS.id(), true);
     defaultScope.putBoolean(Preferences.BM_LOAD_TITLE_FROM_FEED.id(), true);
-    defaultScope.putIntegers(Preferences.SEARCH_DIALOG_NEWS_COLUMNS.id(), new int[] { 9, 0, 8, 1, 2, 3, 6 }); //TODO Must be in sync with NewsColumn enum
-    defaultScope.putInteger(Preferences.SEARCH_DIALOG_NEWS_SORT_COLUMN.id(), 9); //TODO Must be in sync with NewsColumn enum
+    defaultScope.putIntegers(Preferences.SEARCH_DIALOG_NEWS_COLUMNS.id(), new int[] { 9, 0, 8, 1, 2, 3, 6 });
+    defaultScope.putInteger(Preferences.SEARCH_DIALOG_NEWS_SORT_COLUMN.id(), 9);
     defaultScope.putBoolean(Preferences.SEARCH_DIALOG_NEWS_SORT_ASCENDING.id(), false);
-    defaultScope.putIntegers(Preferences.SHARE_PROVIDER_STATE.id(), new int[] { 1, 2, 3, 4, 5, 6, 7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, -19, -20, -21, -22 }); //TODO Must be in sync with Share Provider contributions
+    defaultScope.putIntegers(Preferences.SHARE_PROVIDER_STATE.id(), new int[] { 1, 2, 3, 4, 5, 6, 7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, -19, -20, -21, -22 });
   }
 
   /**
@@ -160,8 +168,8 @@ public class DefaultPreferencesInitializer implements IPreferencesInitializer {
    * @param defaultScope the container for preferences to fill.
    */
   protected void initNewsColumnsDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putIntegers(Preferences.BM_NEWS_COLUMNS.id(), new int[] { 0, 1, 2, 3, 6 }); //TODO Must be in sync with NewsColumn enum
-    defaultScope.putInteger(Preferences.BM_NEWS_SORT_COLUMN.id(), 1); //TODO Must be in sync with NewsColumn enum
+    defaultScope.putIntegers(Preferences.BM_NEWS_COLUMNS.id(), new int[] { 0, 1, 2, 3, 6 });
+    defaultScope.putInteger(Preferences.BM_NEWS_SORT_COLUMN.id(), 1);
     defaultScope.putBoolean(Preferences.BM_NEWS_SORT_ASCENDING.id(), false);
   }
 
@@ -180,5 +188,42 @@ public class DefaultPreferencesInitializer implements IPreferencesInitializer {
     defaultScope.putBoolean(Preferences.FV_LAYOUT_CLASSIC.id(), true);
     defaultScope.putIntegers(Preferences.FV_SASHFORM_WEIGHTS.id(), new int[] { 50, 50 });
     defaultScope.putBoolean(Preferences.BM_OPEN_SITE_FOR_NEWS.id(), false);
+  }
+
+  /**
+   * @param defaultScope the container for preferences to fill.
+   */
+  private void initToolbarDefaults(IPreferenceScope defaultScope) {
+    List<String> items = new ArrayList<String>();
+
+    /* New | Import | Export */
+    items.add("org.rssowl.ui.NewDropDown");
+    items.add("org.rssowl.ui.actions.ImportFeeds");
+    items.add("org.rssowl.ui.actions.ExportFeeds");
+
+    /* Undo | Redo */
+    items.add("org.rssowl.ui.internal.Separator");
+    items.add("org.rssowl.ui.UndoAction");
+    items.add("org.rssowl.ui.RedoAction");
+
+    /* Update All | Stop */
+    items.add("org.rssowl.ui.internal.Separator");
+    items.add("org.rssowl.ui.actions.ReloadAll");
+    items.add("org.rssowl.ui.StopUpdate");
+
+    /* Search */
+    items.add("org.rssowl.ui.internal.Separator");
+    items.add("org.rssowl.ui.SearchNewsAction");
+
+    /* Mark Read | Mark All Read */
+    items.add("org.rssowl.ui.internal.Separator");
+    items.add("org.rssowl.ui.ToggleReadState");
+    items.add("org.rssowl.ui.MarkAllRead");
+
+    /* Next | Previous */
+    items.add("org.rssowl.ui.internal.Separator");
+
+    defaultScope.putStrings(Preferences.TOOLBAR_ITEMS.id(), items.toArray(new String[items.size()]));
+    defaultScope.putInteger(Preferences.TOOLBAR_MODE.id(), 0);
   }
 }

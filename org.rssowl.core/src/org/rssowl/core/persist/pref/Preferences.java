@@ -298,6 +298,12 @@ public enum Preferences {
   /** Global: List of Import Keywords */
   IMPORT_KEYWORDS("org.rssowl.pref.ImportKeywords", IPreferenceType.STRINGS),
 
+  /** Global: List of Items in Toolbar */
+  TOOLBAR_ITEMS("org.rssowl.pref.ToolbarItems", IPreferenceType.STRINGS),
+
+  /** Global: Toolbar Mode */
+  TOOLBAR_MODE("org.rssowl.pref.ToolbarMode", IPreferenceType.INTEGER),
+
   /******************************
    * Eclipse Preferences Follow *
    ******************************/

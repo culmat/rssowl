@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.ISelection;
@@ -46,7 +47,7 @@ import org.rssowl.ui.internal.OwlUI;
 /**
  * @author bpasero
  */
-public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate {
+public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, IMenuCreator {
   private Shell fShell;
   private IFolder fParent;
   private IMark fPosition;
@@ -183,5 +184,12 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate {
 
   private void addSearchMark() {
     new NewSearchMarkAction(fShell, fParent, fPosition).run(null);
+  }
+
+  /*
+   * @see org.eclipse.jface.action.IMenuCreator#getMenu(org.eclipse.swt.widgets.Menu)
+   */
+  public Menu getMenu(Menu parent) {
+    return null;
   }
 }
