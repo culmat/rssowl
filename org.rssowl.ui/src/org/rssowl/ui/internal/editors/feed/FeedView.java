@@ -872,10 +872,17 @@ public class FeedView extends EditorPart implements IReusableEditor {
     fPrintAction = new Action() {
       @Override
       public void run() {
-        if (fNewsBrowserControl != null)
-          fNewsBrowserControl.getViewer().getBrowser().print();
+        print();
       }
     };
+  }
+
+  /**
+   * Print the contents of the Browser if any.
+   */
+  public void print() {
+    if (fNewsBrowserControl != null)
+      fNewsBrowserControl.getViewer().getBrowser().print();
   }
 
   /**
