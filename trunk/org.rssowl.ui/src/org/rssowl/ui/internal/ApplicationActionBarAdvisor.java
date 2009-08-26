@@ -44,12 +44,10 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionDelegate;
 import org.eclipse.ui.IEditorReference;
-import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
 import org.eclipse.ui.actions.ContributionItemFactory;
@@ -348,23 +346,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         manager.add(new Action("&Bookmarks", IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
-            IWorkbenchPage page = OwlUI.getPage();
-            if (page != null) {
-              IViewPart explorerView = page.findView(BookMarkExplorer.VIEW_ID);
-
-              /* Hide Bookmarks */
-              if (explorerView != null)
-                page.hideView(explorerView);
-
-              /* Show Bookmarks */
-              else {
-                try {
-                  page.showView(BookMarkExplorer.VIEW_ID);
-                } catch (PartInitException e) {
-                  Activator.getDefault().logError(e.getMessage(), e);
-                }
-              }
-            }
+            OwlUI.toggleBookmarks();
           }
 
           @Override
@@ -483,24 +465,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         manager.add(new Action("&Full Screen", IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
-            Shell shell = OwlUI.getActiveShell();
-            if (shell != null) {
-              shell.setFullScreen(!shell.getFullScreen());
-
-              /* Shell got restored */
-              if (!shell.getFullScreen()) {
-                ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
-                configurer.setStatusVisible(preferences.getBoolean(DefaultPreferences.SHOW_STATUS), false);
-
-                shell.layout(); //Need to layout to avoid screen cheese
-              }
-
-              /* Shell got fullscreen */
-              else {
-                ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
-                configurer.setStatusVisible(false, true);
-              }
-            }
+            OwlUI.toggleFullScreen();
           }
 
           @Override

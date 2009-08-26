@@ -224,18 +224,28 @@ public class CustomizeToolbarDialog extends Dialog {
         /* Fill not yet visible Items */
         List<String> visibleItems = Arrays.asList(fPreferences.getStrings(DefaultPreferences.TOOLBAR_ITEMS));
         Item[] toolItems = Item.values();
+        int currentGroup = -1;
         for (final Item toolItem : toolItems) {
           if (!visibleItems.contains(toolItem.getId()) || toolItem == Item.SEPARATOR) {
+
+            /* Divide Groups by Separators */
+            if (currentGroup >= 0 && currentGroup != toolItem.getGroup())
+              new MenuItem(menu, SWT.SEPARATOR);
+
+            /* Create Menu Item */
             MenuItem item = new MenuItem(menu, SWT.PUSH);
             item.setText(toolItem.getName());
             if (toolItem.getImg() != null)
               item.setImage(fResources.createImage(toolItem.getImg()));
+
             item.addSelectionListener(new SelectionAdapter() {
               @Override
               public void widgetSelected(SelectionEvent e) {
                 onAdd(toolItem);
               }
             });
+
+            currentGroup = toolItem.getGroup();
           }
         }
       }
