@@ -261,6 +261,7 @@ public final class DynamicDAO {
    * @throws IllegalArgumentException if there is no DAO for
    * <code>entityClass</code>.
    */
+  @SuppressWarnings("unchecked")
   public static <T extends IEntity, L extends EntityListener<E, T>, E extends ModelEvent> void addEntityListener(Class<T> entityClass, L listener) {
     IEntityDAO<T, L, E> dao = (IEntityDAO<T, L, E>) getDAOFromPersistable(entityClass);
     checkEntityDAO(entityClass, dao);
@@ -281,6 +282,7 @@ public final class DynamicDAO {
    * @throws IllegalArgumentException if there is no DAO for
    * <code>entityClass</code>.
    */
+  @SuppressWarnings("unchecked")
   public static <T extends IEntity, L extends EntityListener<E, T>, E extends ModelEvent> void removeEntityListener(Class<T> entityClass, L listener) {
     IEntityDAO<T, L, E> dao = (IEntityDAO<T, L, E>) getDAOFromPersistable(entityClass);
     checkEntityDAO(entityClass, dao);

@@ -39,8 +39,6 @@ import java.util.List;
 /**
  * Default implementation of {@link IPreferenceDAO}.
  *
- * {@inheritDoc}
- *
  * @author Ismael Juma (ismael@juma.me.uk)
  */
 public class PreferencesDAOImpl extends AbstractEntityDAO<IPreference, PreferenceListener, PreferenceEvent> implements IPreferenceDAO  {
@@ -57,7 +55,7 @@ public class PreferencesDAOImpl extends AbstractEntityDAO<IPreference, Preferenc
     IPreference pref = load(entity.getKey());
     if (pref != null && pref != entity)
       throw new UniqueConstraintException("key", entity);
-    
+
     super.doSave(entity);
   }
 
@@ -65,7 +63,7 @@ public class PreferencesDAOImpl extends AbstractEntityDAO<IPreference, Preferenc
     IPreference pref = load(key);
     if (pref == null)
       return false;
-    
+
     delete(pref);
     return true;
   }
@@ -96,7 +94,7 @@ public class PreferencesDAOImpl extends AbstractEntityDAO<IPreference, Preferenc
     IPreference pref = load(key);
     if (pref == null)
       return Owl.getModelFactory().createPreference(key);
-    
+
     return pref;
   }
 }

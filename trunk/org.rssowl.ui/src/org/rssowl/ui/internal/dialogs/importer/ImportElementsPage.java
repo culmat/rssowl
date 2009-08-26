@@ -349,7 +349,7 @@ public class ImportElementsPage extends WizardPage {
     fFlattenCheck.setText("Flatten Hierarchy");
     setButtonLayoutData(fFlattenCheck);
     ((GridData) fFlattenCheck.getLayoutData()).horizontalAlignment = SWT.END;
-    ((GridData) fFlattenCheck.getLayoutData()).horizontalIndent = 25;
+    ((GridData) fFlattenCheck.getLayoutData()).horizontalIndent = 30;
     ((GridData) fFlattenCheck.getLayoutData()).grabExcessHorizontalSpace = true;
     fFlattenCheck.addSelectionListener(new SelectionAdapter() {
       @Override

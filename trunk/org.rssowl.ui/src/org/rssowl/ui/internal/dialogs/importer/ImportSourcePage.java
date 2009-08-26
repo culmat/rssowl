@@ -441,6 +441,10 @@ public class ImportSourcePage extends WizardPage {
 
   private void hookKeywordAutocomplete(boolean delay) {
 
+    /* No Content Assist on First Welcome Wizard */
+    if (isWelcome())
+      return;
+
     /* Only perform once */
     if (fIsAutoCompleteKeywordHooked)
       return;

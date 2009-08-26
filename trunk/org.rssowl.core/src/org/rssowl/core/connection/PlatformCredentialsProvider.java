@@ -147,7 +147,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
     try {
       IPath stateLocation = Activator.getDefault().getStateLocation();
       stateLocation = stateLocation.append(SECURE_STORAGE_FILE);
-      URL location = stateLocation.toFile().toURL();
+      URL location = stateLocation.toFile().toURI().toURL();
       Map<String, String> options = null;
 
       /* Use OS dependent password provider if available */
