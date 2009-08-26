@@ -31,6 +31,7 @@ import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.ICoolBarManager;
 import org.eclipse.jface.action.IMenuCreator;
 import org.eclipse.jface.action.ToolBarManager;
+import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -42,6 +43,8 @@ import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.keys.IBindingService;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IFolder;
@@ -76,6 +79,7 @@ public class CoolBarAdvisor {
   private final ICoolBarManager fManager;
   private IPreferenceScope fPreferences;
   private Map<String, Item> fMapIdToItem;
+  private IBindingService fBindingService = (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
 
   /** A List of Possible Items */
   public enum Item {
@@ -452,12 +456,12 @@ public class CoolBarAdvisor {
             Menu menu = new Menu(parent);
 
             MenuItem item = new MenuItem(menu, SWT.PUSH);
-            item.setText("Next News");
+            item.setText(getLabelWithBinding("org.rssowl.ui.NextNews", "Next News"));
             item.setData(Actions.NEXT_NEWS);
             item.addSelectionListener(new NavigationSelectionListener());
 
             item = new MenuItem(menu, SWT.PUSH);
-            item.setText("Next Unread News");
+            item.setText(getLabelWithBinding("org.rssowl.ui.NextUnreadNews", "Next Unread News"));
             item.setData(Actions.NEXT_UNREAD_NEWS);
             item.addSelectionListener(new NavigationSelectionListener());
             menu.setDefaultItem(item);
@@ -465,19 +469,19 @@ public class CoolBarAdvisor {
             new MenuItem(menu, SWT.SEPARATOR);
 
             item = new MenuItem(menu, SWT.PUSH);
-            item.setText("Next Feed");
+            item.setText(getLabelWithBinding("org.rssowl.ui.NextFeed", "Next Feed"));
             item.setData(Actions.NEXT_FEED);
             item.addSelectionListener(new NavigationSelectionListener());
 
             item = new MenuItem(menu, SWT.PUSH);
-            item.setText("Next Unread Feed");
+            item.setText(getLabelWithBinding("org.rssowl.ui.NextUnreadFeed", "Next Unread Feed"));
             item.setData(Actions.NEXT_UNREAD_FEED);
             item.addSelectionListener(new NavigationSelectionListener());
 
             new MenuItem(menu, SWT.SEPARATOR);
 
             item = new MenuItem(menu, SWT.PUSH);
-            item.setText("Next Tab");
+            item.setText(getLabelWithBinding("org.rssowl.ui.NextTab", "Next Tab"));
             item.setData(Actions.NEXT_TAB);
             item.addSelectionListener(new NavigationSelectionListener());
 
@@ -500,12 +504,12 @@ public class CoolBarAdvisor {
             Menu menu = new Menu(parent);
 
             MenuItem item = new MenuItem(menu, SWT.PUSH);
-            item.setText("Previous News");
+            item.setText(getLabelWithBinding("org.rssowl.ui.PreviousNews", "Previous News"));
             item.setData(Actions.PREVIOUS_NEWS);
             item.addSelectionListener(new NavigationSelectionListener());
 
             item = new MenuItem(menu, SWT.PUSH);
-            item.setText("Previous Unread News");
+            item.setText(getLabelWithBinding("org.rssowl.ui.PreviousUnreadNews", "Previous Unread News"));
             item.setData(Actions.PREVIOUS_UNREAD_NEWS);
             item.addSelectionListener(new NavigationSelectionListener());
             menu.setDefaultItem(item);
@@ -513,19 +517,19 @@ public class CoolBarAdvisor {
             new MenuItem(menu, SWT.SEPARATOR);
 
             item = new MenuItem(menu, SWT.PUSH);
-            item.setText("Previous Feed");
+            item.setText(getLabelWithBinding("org.rssowl.ui.PreviousFeed", "Previous Feed"));
             item.setData(Actions.PREVIOUS_FEED);
             item.addSelectionListener(new NavigationSelectionListener());
 
             item = new MenuItem(menu, SWT.PUSH);
-            item.setText("Previous Unread Feed");
+            item.setText(getLabelWithBinding("org.rssowl.ui.PreviousUnreadFeed", "Previous Unread Feed"));
             item.setData(Actions.PREVIOUS_UNREAD_FEED);
             item.addSelectionListener(new NavigationSelectionListener());
 
             new MenuItem(menu, SWT.SEPARATOR);
 
             item = new MenuItem(menu, SWT.PUSH);
-            item.setText("Previous Tab");
+            item.setText(getLabelWithBinding("org.rssowl.ui.PreviousTab", "Previous Tab"));
             item.setData(Actions.PREVIOUS_TAB);
             item.addSelectionListener(new NavigationSelectionListener());
 
@@ -542,5 +546,13 @@ public class CoolBarAdvisor {
     };
 
     return null;
+  }
+
+  private String getLabelWithBinding(String id, String label) {
+    TriggerSequence binding = fBindingService.getBestActiveBindingFor(id);
+    if (binding != null)
+      return label + "\t" + binding.format();
+
+    return label;
   }
 }
