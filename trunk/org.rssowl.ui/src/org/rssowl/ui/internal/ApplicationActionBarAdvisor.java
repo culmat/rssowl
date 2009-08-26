@@ -924,8 +924,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     /* CoolBar Context Menu */
     MenuManager coolBarContextMenuManager = new MenuManager(null, "org.rssowl.ui.CoolBarContextMenu"); //$NON-NLS-1$
     coolBar.setContextMenuManager(coolBarContextMenuManager);
-    coolBarContextMenuManager.add(getAction(ActionFactory.LOCK_TOOL_BAR.getId()));
-    coolBarContextMenuManager.add(new Separator());
+
+    /* Customize Coolbar */
     coolBarContextMenuManager.add(new Action("Customize Toolbar...") {
       @Override
       public void run() {
@@ -934,6 +934,24 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         fCoolBarAdvisor.advise(true);
       }
     });
+
+    /* Lock Coolbar  */
+    coolBarContextMenuManager.add(new Separator());
+    IAction lockToolbarAction = getAction(ActionFactory.LOCK_TOOL_BAR.getId());
+    lockToolbarAction.setText("Lock Toolbar");
+    coolBarContextMenuManager.add(lockToolbarAction);
+
+    /* Toggle State of Toolbar Visibility */
+    coolBarContextMenuManager.add(new Action("Hide Toolbar") {
+      @Override
+      public void run() {
+        ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
+        configurer.setToolBarVisible(false);
+        Owl.getPreferenceService().getGlobalScope().putBoolean(DefaultPreferences.SHOW_TOOLBAR, false);
+      }
+    });
+
+    /* Support for more Contributions */
     coolBarContextMenuManager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
 
     /* Coolbar Advisor */
