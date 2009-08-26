@@ -43,7 +43,10 @@ import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.keys.IBindingService;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
@@ -52,6 +55,10 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.actions.ExportAction;
 import org.rssowl.ui.internal.actions.ImportAction;
 import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
+import org.rssowl.ui.internal.actions.NewBookMarkAction;
+import org.rssowl.ui.internal.actions.NewFolderAction;
+import org.rssowl.ui.internal.actions.NewNewsBinAction;
+import org.rssowl.ui.internal.actions.NewSearchMarkAction;
 import org.rssowl.ui.internal.actions.NewTypeDropdownAction;
 import org.rssowl.ui.internal.actions.RedoAction;
 import org.rssowl.ui.internal.actions.ReloadAllAction;
@@ -60,6 +67,7 @@ import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.UndoAction;
 import org.rssowl.ui.internal.actions.NavigationActionFactory.Actions;
 import org.rssowl.ui.internal.actions.NavigationActionFactory.NavigationAction;
+import org.rssowl.ui.internal.editors.feed.FeedView;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -121,7 +129,34 @@ public class CoolBarAdvisor {
     NEXT("org.rssowl.ui.NextUnreadNews", "Next", "Next Unread News", OwlUI.getImageDescriptor("icons/etool16/next.gif"), true, true),
 
     /** Previous Unread News */
-    PREVIOUS("org.rssowl.ui.PreviousUnreadNews", "Previous", "Previous Unread News", OwlUI.getImageDescriptor("icons/etool16/previous.gif"), true, true);
+    PREVIOUS("org.rssowl.ui.PreviousUnreadNews", "Previous", "Previous Unread News", OwlUI.getImageDescriptor("icons/etool16/previous.gif"), true, true),
+
+    /** New Bookmark */
+    NEW_BOOKMARK("org.rssowl.ui.actions.NewBookMark", "Bookmark", "New Bookmark", OwlUI.BOOKMARK),
+
+    /** New News Bin */
+    NEW_BIN("org.rssowl.ui.actions.NewNewsBin", "News Bin", "New News Bin", OwlUI.NEWSBIN),
+
+    /** New Saved Search */
+    NEW_SAVED_SEARCH("org.rssowl.ui.actions.NewSearchMark", "Saved Search", "New Saved Search", OwlUI.SEARCHMARK),
+
+    /** New Folder */
+    NEW_FOLDER("org.rssowl.ui.actions.NewFolder", "Folder", "New Folder", OwlUI.FOLDER),
+
+    /** Close Tab */
+    CLOSE("org.eclipse.ui.file.close", "Close", null, OwlUI.getImageDescriptor("icons/etool16/close_tab.gif")),
+
+    /** Close Others */
+    CLOSE_OTHERS("org.eclipse.ui.file.closeOthers", "Close Others", null, OwlUI.getImageDescriptor("icons/etool16/close_other_tabs.gif")),
+
+    /** Close All Tabs */
+    CLOSE_ALL("org.eclipse.ui.file.closeAll", "Close All", null, OwlUI.getImageDescriptor("icons/etool16/close_all_tabs.gif")),
+
+    /** Save As */
+    SAVE_AS("org.eclipse.ui.file.saveAs", "Save", null, OwlUI.getImageDescriptor("icons/etool16/save_as.gif")),
+
+    /** Print */
+    PRINT("org.eclipse.ui.file.print", "Print", null, OwlUI.getImageDescriptor("icons/etool16/print.gif"));
 
     private final String fId;
     private final String fName;
@@ -335,11 +370,7 @@ public class CoolBarAdvisor {
       /* New */
       case NEW: {
         NewTypeDropdownAction action = new NewTypeDropdownAction();
-        action.init(fWindow);
-        IFolder folder = OwlUI.getBookMarkExplorerSelection();
-        if (folder != null)
-          action.selectionChanged(null, new StructuredSelection(folder));
-        action.run(null);
+        initWithExplorerSelectionAndRunAction(action);
         break;
       }
 
@@ -429,7 +460,86 @@ public class CoolBarAdvisor {
         action.run(null);
         break;
       }
+
+        /* New Bookmark */
+      case NEW_BOOKMARK: {
+        NewBookMarkAction action = new NewBookMarkAction();
+        initWithExplorerSelectionAndRunAction(action);
+        break;
+      }
+
+        /* New News Bin */
+      case NEW_BIN: {
+        NewNewsBinAction action = new NewNewsBinAction();
+        initWithExplorerSelectionAndRunAction(action);
+        break;
+      }
+
+        /* New Saved Search */
+      case NEW_SAVED_SEARCH: {
+        NewSearchMarkAction action = new NewSearchMarkAction();
+        initWithExplorerSelectionAndRunAction(action);
+        break;
+      }
+
+        /* New Folder */
+      case NEW_FOLDER: {
+        NewFolderAction action = new NewFolderAction();
+        initWithExplorerSelectionAndRunAction(action);
+        break;
+      }
+
+        /* Close */
+      case CLOSE: {
+        IWorkbenchAction action = ActionFactory.CLOSE.create(fWindow);
+        action.run();
+        break;
+      }
+
+        /* Close Others */
+      case CLOSE_OTHERS: {
+        IWorkbenchAction action = ActionFactory.CLOSE_OTHERS.create(fWindow);
+        action.run();
+        break;
+      }
+
+        /* Close All */
+      case CLOSE_ALL: {
+        IWorkbenchAction action = ActionFactory.CLOSE_ALL.create(fWindow);
+        action.run();
+        break;
+      }
+
+        /* Save As */
+      case SAVE_AS: {
+        FeedView activeFeedView = OwlUI.getActiveFeedView();
+        if (activeFeedView != null)
+          activeFeedView.doSaveAs();
+        break;
+      }
+
+        /* Print */
+      case PRINT: {
+        FeedView activeFeedView = OwlUI.getActiveFeedView();
+        if (activeFeedView != null)
+          activeFeedView.print();
+        break;
+      }
     }
+  }
+
+  private void initWithExplorerSelectionAndRunAction(IWorkbenchWindowActionDelegate action) {
+
+    /* Workbench Window */
+    action.init(fWindow);
+
+    /* Explorer Selection */
+    IFolder folder = OwlUI.getBookMarkExplorerSelection();
+    if (folder != null)
+      action.selectionChanged(null, new StructuredSelection(folder));
+
+    /* Run */
+    action.run(null);
   }
 
   private IMenuCreator getMenu(Item item) {
