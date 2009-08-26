@@ -29,10 +29,13 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
+import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -60,8 +63,10 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.CoolBarAdvisor;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.CoolBarAdvisor.Item;
+import org.rssowl.ui.internal.CoolBarAdvisor.Mode;
 import org.rssowl.ui.internal.util.CColumnLayoutData;
 import org.rssowl.ui.internal.util.CTable;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -80,14 +85,13 @@ import java.util.Map;
  * @author bpasero
  */
 //TODO Implement DND (consider adapting to other dialogs supporting Move Up / Move Down)
-//TODO Separators are unhappy due to multiple occurance
-//TODO Implement Modes
 public class CustomizeToolbarDialog extends Dialog {
   private static final String DIALOG_SETTINGS_KEY = "org.rssowl.ui.internal.dialogs.CustomizeToolbarDialog";
 
   private LocalResourceManager fResources;
   private boolean fFirstTimeOpen;
-  private TableViewer fViewer;
+  private TableViewer fItemViewer;
+  private ComboViewer fModeViewer;
   private IPreferenceScope fPreferences;
   private Map<String, Item> fMapIdToItem;
   private Button fAddButton;
@@ -145,19 +149,19 @@ public class CustomizeToolbarDialog extends Dialog {
 
     CTable cTable = new CTable(tableContainer, SWT.BORDER | SWT.MULTI | SWT.FULL_SELECTION);
 
-    fViewer = new TableViewer(cTable.getControl());
-    fViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    fViewer.getTable().setHeaderVisible(true);
-    ((GridData) fViewer.getTable().getLayoutData()).heightHint = fViewer.getTable().getItemHeight() * 20;
-    fViewer.getTable().setFocus();
+    fItemViewer = new TableViewer(cTable.getControl());
+    fItemViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    fItemViewer.getTable().setHeaderVisible(true);
+    ((GridData) fItemViewer.getTable().getLayoutData()).heightHint = fItemViewer.getTable().getItemHeight() * 20;
+    fItemViewer.getTable().setFocus();
 
-    TableColumn nameCol = new TableColumn(fViewer.getTable(), SWT.NONE);
+    TableColumn nameCol = new TableColumn(fItemViewer.getTable(), SWT.NONE);
 
     CColumnLayoutData data = new CColumnLayoutData(Size.FILL, 100);
     cTable.manageColumn(nameCol, data, "Currently Visible Items", null, null, false, false);
 
     /* ContentProvider returns all selected Items */
-    fViewer.setContentProvider(new IStructuredContentProvider() {
+    fItemViewer.setContentProvider(new IStructuredContentProvider() {
       public Object[] getElements(Object inputElement) {
         return fPreferences.getStrings(DefaultPreferences.TOOLBAR_ITEMS);
       }
@@ -168,7 +172,7 @@ public class CustomizeToolbarDialog extends Dialog {
     });
 
     /* Label Provider */
-    fViewer.setLabelProvider(new CellLabelProvider() {
+    fItemViewer.setLabelProvider(new CellLabelProvider() {
       @Override
       public void update(ViewerCell cell) {
         String itemId = (String) cell.getElement();
@@ -181,14 +185,14 @@ public class CustomizeToolbarDialog extends Dialog {
     });
 
     /* Selection */
-    fViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+    fItemViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
-        updateMoveEnablement();
+        updateButtonEnablement();
       }
     });
 
     /* Set Dummy Input */
-    fViewer.setInput(this);
+    fItemViewer.setInput(this);
 
     /* Container for the Buttons to Manage Providers */
     Composite buttonContainer = new Composite(container, SWT.None);
@@ -293,6 +297,45 @@ public class CustomizeToolbarDialog extends Dialog {
       }
     });
 
+    /* Toolbar Mode */
+    Composite modeContainer = new Composite(container, SWT.None);
+    modeContainer.setLayout(LayoutUtils.createGridLayout(2, 5, 0));
+    modeContainer.setLayoutData(new GridData(SWT.BEGINNING, SWT.FILL, false, false, 2, 1));
+
+    Label showLabel = new Label(modeContainer, SWT.NONE);
+    showLabel.setText("Show: ");
+
+    fModeViewer = new ComboViewer(modeContainer, SWT.READ_ONLY | SWT.BORDER);
+    fModeViewer.setContentProvider(new ArrayContentProvider());
+    fModeViewer.setLabelProvider(new LabelProvider() {
+      @Override
+      public String getText(Object element) {
+        if (element instanceof Mode) {
+          switch ((Mode) element) {
+            case IMAGE:
+              return "Icons";
+            case TEXT:
+              return "Text";
+            case IMAGE_TEXT:
+              return "Icons and Text";
+          }
+        }
+
+        return super.getText(element);
+      }
+    });
+
+    fModeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      public void selectionChanged(SelectionChangedEvent event) {
+        Object selection = ((IStructuredSelection) event.getSelection()).getFirstElement();
+        Mode mode = (Mode) selection;
+        fPreferences.putInteger(DefaultPreferences.TOOLBAR_MODE, mode.ordinal());
+      }
+    });
+
+    fModeViewer.setInput(CoolBarAdvisor.Mode.values());
+    fModeViewer.setSelection(new StructuredSelection(Mode.values()[fPreferences.getInteger(DefaultPreferences.TOOLBAR_MODE)]));
+
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
@@ -306,17 +349,24 @@ public class CustomizeToolbarDialog extends Dialog {
       newItems.add(item);
     }
 
-    int selectionIndex = fViewer.getTable().getSelectionIndex();
+    int selectionIndex = fItemViewer.getTable().getSelectionIndex();
     if (selectionIndex >= 0)
       newItems.add(selectionIndex + 1, newItem.getId());
     else
       newItems.add(newItem.getId());
 
+    /* Save & Refresh */
     fPreferences.putStrings(DefaultPreferences.TOOLBAR_ITEMS, newItems.toArray(new String[newItems.size()]));
-    fViewer.refresh();
-    updateMoveEnablement();
+    fItemViewer.refresh();
 
-    fViewer.setSelection(StructuredSelection.EMPTY);
+    /* Update Selection */
+    if (selectionIndex > 0)
+      fItemViewer.getTable().setSelection(selectionIndex + 1);
+    else
+      fItemViewer.getTable().setSelection(fItemViewer.getTable().getItemCount() - 1);
+
+    /* Update Buttons */
+    updateButtonEnablement();
   }
 
   private void onRemove() {
@@ -326,17 +376,26 @@ public class CustomizeToolbarDialog extends Dialog {
       newItems.add(item);
     }
 
-    int[] selectionIndices = fViewer.getTable().getSelectionIndices();
+    int selectionIndex = fItemViewer.getTable().getSelectionIndex();
+    int[] selectionIndices = fItemViewer.getTable().getSelectionIndices();
     for (int i = 0; i < selectionIndices.length; i++) {
       int index = selectionIndices[i] - i;
       newItems.remove(index);
     }
 
+    /* Save & Refresh */
     fPreferences.putStrings(DefaultPreferences.TOOLBAR_ITEMS, newItems.toArray(new String[newItems.size()]));
-    fViewer.refresh();
-    updateMoveEnablement();
+    fItemViewer.refresh();
 
-    fViewer.setSelection(StructuredSelection.EMPTY);
+    /* Update Selection */
+    int tableItemCount = fItemViewer.getTable().getItemCount();
+    if (selectionIndex < tableItemCount)
+      fItemViewer.getTable().setSelection(selectionIndex);
+    else if (tableItemCount > 0)
+      fItemViewer.getTable().setSelection(tableItemCount - 1);
+
+    /* Update Buttons */
+    updateButtonEnablement();
   }
 
   private Composite createContainer(Composite parent) {
@@ -350,20 +409,23 @@ public class CustomizeToolbarDialog extends Dialog {
 
   private void onRestoreDefaults() {
     IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
-    String[] defaultState = defaultScope.getStrings(DefaultPreferences.TOOLBAR_ITEMS);
+    String[] defaultItemsState = defaultScope.getStrings(DefaultPreferences.TOOLBAR_ITEMS);
+    int defaultMode = defaultScope.getInteger(DefaultPreferences.TOOLBAR_MODE);
 
-    fPreferences.putStrings(DefaultPreferences.TOOLBAR_ITEMS, defaultState);
-    fViewer.refresh();
-    updateMoveEnablement();
+    fPreferences.putStrings(DefaultPreferences.TOOLBAR_ITEMS, defaultItemsState);
+    fPreferences.putInteger(DefaultPreferences.TOOLBAR_MODE, defaultMode);
+    fItemViewer.refresh();
+    fModeViewer.setSelection(new StructuredSelection(Mode.values()[defaultMode]));
+    updateButtonEnablement();
   }
 
-  private void updateMoveEnablement() {
+  private void updateButtonEnablement() {
     boolean enableMoveUp = true;
     boolean enableMoveDown = true;
-    int[] selectionIndices = fViewer.getTable().getSelectionIndices();
+    int[] selectionIndices = fItemViewer.getTable().getSelectionIndices();
     if (selectionIndices.length == 1) {
       enableMoveUp = selectionIndices[0] != 0;
-      enableMoveDown = selectionIndices[0] != fViewer.getTable().getItemCount() - 1;
+      enableMoveDown = selectionIndices[0] != fItemViewer.getTable().getItemCount() - 1;
     } else {
       enableMoveUp = false;
       enableMoveDown = false;
@@ -371,21 +433,18 @@ public class CustomizeToolbarDialog extends Dialog {
 
     fMoveUpButton.setEnabled(enableMoveUp);
     fMoveDownButton.setEnabled(enableMoveDown);
-    fRemoveButton.setEnabled(!fViewer.getSelection().isEmpty());
+    fRemoveButton.setEnabled(!fItemViewer.getSelection().isEmpty());
   }
 
   private void onMove(boolean up) {
-    TableItem[] items = fViewer.getTable().getItems();
+    TableItem[] items = fItemViewer.getTable().getItems();
     List<String> sortedItemIds = new ArrayList<String>(items.length);
     for (TableItem item : items) {
       sortedItemIds.add((String) item.getData());
     }
 
-    IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
-    String selectedItem = (String) selection.getFirstElement();
-
     String[] order = fPreferences.getStrings(DefaultPreferences.TOOLBAR_ITEMS);
-    int selectedIndex = sortedItemIds.indexOf(selectedItem);
+    int selectedIndex = fItemViewer.getTable().getSelectionIndex();
 
     /* Move Up */
     if (up && selectedIndex > 0) {
@@ -403,9 +462,15 @@ public class CustomizeToolbarDialog extends Dialog {
       order[selectedIndex + 1] = order1;
     }
 
+    /* Save & Refresh */
     fPreferences.putStrings(DefaultPreferences.TOOLBAR_ITEMS, order);
-    fViewer.refresh();
-    updateMoveEnablement();
+    fItemViewer.refresh();
+
+    /* Update Selection */
+    fItemViewer.getTable().setSelection(up ? selectedIndex - 1 : selectedIndex + 1);
+
+    /* Update Buttons */
+    updateButtonEnablement();
   }
 
   /*
