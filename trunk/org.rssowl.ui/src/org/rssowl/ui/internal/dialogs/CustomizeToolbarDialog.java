@@ -42,6 +42,8 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -63,6 +65,7 @@ import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.CoolBarAdvisor;
 import org.rssowl.ui.internal.OwlUI;
 import org.rssowl.ui.internal.CoolBarAdvisor.Item;
@@ -84,8 +87,9 @@ import java.util.Map;
  *
  * @author bpasero
  */
-//TODO Implement DND (consider adapting to other dialogs supporting Move Up / Move Down)
 public class CustomizeToolbarDialog extends Dialog {
+
+  /* Size and Location Settings */
   private static final String DIALOG_SETTINGS_KEY = "org.rssowl.ui.internal.dialogs.CustomizeToolbarDialog";
 
   private LocalResourceManager fResources;
@@ -188,6 +192,15 @@ public class CustomizeToolbarDialog extends Dialog {
     fItemViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
         updateButtonEnablement();
+      }
+    });
+
+    /* Support Keyboard Remove */
+    fItemViewer.getTable().addKeyListener(new KeyAdapter() {
+      @Override
+      public void keyPressed(KeyEvent e) {
+        if (e.keyCode == SWT.DEL || (Application.IS_MAC && e.keyCode == SWT.BS))
+          onRemove();
       }
     });
 
