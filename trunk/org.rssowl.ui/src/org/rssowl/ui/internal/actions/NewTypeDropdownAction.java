@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.viewers.ISelection;
@@ -39,6 +40,8 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowPulldownDelegate;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.keys.IBindingService;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IMark;
 import org.rssowl.ui.internal.Activator;
@@ -52,6 +55,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
   private IFolder fParent;
   private IMark fPosition;
   private LocalResourceManager fResources = new LocalResourceManager(JFaceResources.getResources());
+  private IBindingService fBindingService = (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
 
   /*
    * @see org.eclipse.ui.IWorkbenchWindowPulldownDelegate#getMenu(org.eclipse.swt.widgets.Control)
@@ -60,7 +64,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
     Menu menu = new Menu(parent);
 
     MenuItem newBookMark = new MenuItem(menu, SWT.PUSH);
-    newBookMark.setText("Bookmark");
+    newBookMark.setText(getLabelWithBinding("org.rssowl.ui.actions.NewBookMark", "Bookmark"));
     newBookMark.setImage(OwlUI.getImage(fResources, OwlUI.BOOKMARK));
     newBookMark.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -73,8 +77,10 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
       }
     });
 
+    menu.setDefaultItem(newBookMark);
+
     MenuItem newNewsBin = new MenuItem(menu, SWT.PUSH);
-    newNewsBin.setText("News Bin");
+    newNewsBin.setText(getLabelWithBinding("org.rssowl.ui.actions.NewNewsBin", "News Bin"));
     newNewsBin.setImage(OwlUI.getImage(fResources, OwlUI.NEWSBIN));
     newNewsBin.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -88,7 +94,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
     });
 
     MenuItem newSearchMark = new MenuItem(menu, SWT.PUSH);
-    newSearchMark.setText("Saved Search");
+    newSearchMark.setText(getLabelWithBinding("org.rssowl.ui.actions.NewSearchMark", "Saved Search"));
     newSearchMark.setImage(OwlUI.getImage(fResources, OwlUI.SEARCHMARK));
     newSearchMark.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -104,7 +110,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
     new MenuItem(menu, SWT.SEPARATOR);
 
     MenuItem newFolder = new MenuItem(menu, SWT.PUSH);
-    newFolder.setText("Folder");
+    newFolder.setText(getLabelWithBinding("org.rssowl.ui.actions.NewFolder", "Folder"));
     newFolder.setImage(OwlUI.getImage(fResources, OwlUI.FOLDER));
     newFolder.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -191,5 +197,13 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
    */
   public Menu getMenu(Menu parent) {
     return null;
+  }
+
+  private String getLabelWithBinding(String id, String label) {
+    TriggerSequence binding = fBindingService.getBestActiveBindingFor(id);
+    if (binding != null)
+      return label + "\t" + binding.format();
+
+    return label;
   }
 }
