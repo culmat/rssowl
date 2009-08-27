@@ -42,6 +42,8 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PlatformUI;
@@ -536,8 +538,22 @@ public class CoolBarAdvisor {
 
         /* Close All */
       case CLOSE_ALL: {
-        IWorkbenchAction action = ActionFactory.CLOSE_ALL.create(fWindow);
-        action.run();
+        IWorkbenchPage page = fWindow.getActivePage();
+        if (page != null) {
+          IEditorReference[] refArray = page.getEditorReferences();
+          if (refArray != null && refArray.length > 1) {
+            IEditorReference[] otherEditors = new IEditorReference[refArray.length - 1];
+            IEditorReference activeEditor = (IEditorReference) page.getReference(page.getActiveEditor());
+            for (int i = 0; i < refArray.length; i++) {
+              if (refArray[i] != activeEditor)
+                continue;
+              System.arraycopy(refArray, 0, otherEditors, 0, i);
+              System.arraycopy(refArray, i + 1, otherEditors, i, refArray.length - 1 - i);
+              break;
+            }
+            page.closeEditors(otherEditors, true);
+          }
+        }
         break;
       }
 

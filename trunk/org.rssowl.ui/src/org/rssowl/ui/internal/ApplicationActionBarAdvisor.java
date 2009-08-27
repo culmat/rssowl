@@ -143,7 +143,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     /* Menu: File */
     register(ActionFactory.SAVE_AS.create(window)); // TODO ActionSet?
     register(ActionFactory.CLOSE.create(window)); // TODO ActionSet?
-    register(ActionFactory.CLOSE_OTHERS.create(window)); // TODO ActionSet?
     register(ActionFactory.CLOSE_ALL.create(window)); // TODO ActionSet?
     register(ActionFactory.PRINT.create(window)); // TODO ActionSet?
     register(ActionFactory.QUIT.create(window));
