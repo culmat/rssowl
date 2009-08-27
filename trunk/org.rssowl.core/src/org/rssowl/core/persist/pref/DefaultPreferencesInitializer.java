@@ -208,6 +208,7 @@ public class DefaultPreferencesInitializer implements IPreferencesInitializer {
 
     /* Update All | Stop */
     items.add("org.rssowl.ui.internal.Separator");
+    items.add("org.rssowl.ui.actions.Reload");
     items.add("org.rssowl.ui.actions.ReloadAll");
     items.add("org.rssowl.ui.StopUpdate");
 
