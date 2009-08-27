@@ -28,8 +28,11 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.ActionContributionItem;
 import org.eclipse.jface.action.CoolBarManager;
 import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.ICoolBarManager;
 import org.eclipse.jface.action.IMenuCreator;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -38,26 +41,36 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.CoolBar;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.swt.widgets.Widget;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.actions.ActionFactory;
+import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.keys.IBindingService;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.ui.internal.actions.ExportAction;
 import org.rssowl.ui.internal.actions.ImportAction;
 import org.rssowl.ui.internal.actions.MakeNewsStickyAction;
 import org.rssowl.ui.internal.actions.MarkAllNewsReadAction;
+import org.rssowl.ui.internal.actions.MoveCopyNewsToBinAction;
 import org.rssowl.ui.internal.actions.NewBookMarkAction;
 import org.rssowl.ui.internal.actions.NewFolderAction;
 import org.rssowl.ui.internal.actions.NewNewsBinAction;
@@ -74,8 +87,13 @@ import org.rssowl.ui.internal.actions.UndoAction;
 import org.rssowl.ui.internal.actions.NavigationActionFactory.Actions;
 import org.rssowl.ui.internal.actions.NavigationActionFactory.NavigationAction;
 import org.rssowl.ui.internal.editors.feed.FeedView;
+import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -87,7 +105,10 @@ import java.util.Map;
 public class CoolBarAdvisor {
 
   /* ID of a Separator */
-  private static final String SEPARATOR_ID = "org.rssowl.ui.internal.Separator";
+  private static final String SEPARATOR_ID = "org.rssowl.ui.CoolBarSeparator";
+
+  /* ID of a Separator */
+  private static final String SPACER_ID = "org.rssowl.ui.CoolBarSpacer";
 
   private final IWorkbenchWindow fWindow;
   private final ICoolBarManager fManager;
@@ -100,6 +121,9 @@ public class CoolBarAdvisor {
 
     /** Separator */
     SEPARATOR(SEPARATOR_ID, "--- Separator ---", null, OwlUI.getImageDescriptor("icons/obj16/separator.gif"), 0),
+
+    /** Spacer */
+    SPACER(SPACER_ID, "Blank Space", null, OwlUI.getImageDescriptor("icons/etool16/spacer.gif"), 0),
 
     /** New */
     NEW("org.rssowl.ui.NewDropDown", "New", null, OwlUI.getImageDescriptor("icons/etool16/add.gif"), true, false, 1),
@@ -123,7 +147,7 @@ public class CoolBarAdvisor {
     UPDATE_ALL(ReloadAllAction.ID, "Update All", null, OwlUI.getImageDescriptor("icons/elcl16/reload_all.gif"), 3),
 
     /** Stop */
-    STOP("org.rssowl.ui.StopUpdate", "Stop", null, OwlUI.getImageDescriptor("icons/etool16/cancel.gif"), false, false, 3),
+    STOP("org.rssowl.ui.StopUpdate", "Stop", "Stop Updates", OwlUI.getImageDescriptor("icons/etool16/cancel.gif"), false, false, 3),
 
     /** Search */
     SEARCH(SearchNewsAction.ID, "Search", null, OwlUI.SEARCHMARK, 4),
@@ -134,56 +158,74 @@ public class CoolBarAdvisor {
     /** Mark All Read */
     MARK_ALL_READ(MarkAllNewsReadAction.ID, "Mark All Read", null, OwlUI.getImageDescriptor("icons/elcl16/mark_all_read.gif"), 5),
 
-    /** Next Unread News */
-    NEXT("org.rssowl.ui.NextUnreadNews", "Next", "Next Unread News", OwlUI.getImageDescriptor("icons/etool16/next.gif"), true, true, 6),
-
-    /** Previous Unread News */
-    PREVIOUS("org.rssowl.ui.PreviousUnreadNews", "Previous", "Previous Unread News", OwlUI.getImageDescriptor("icons/etool16/previous.gif"), true, true, 6),
-
-    /** New Bookmark */
-    NEW_BOOKMARK("org.rssowl.ui.actions.NewBookMark", "Bookmark", "New Bookmark", OwlUI.BOOKMARK, 7),
-
-    /** New News Bin */
-    NEW_BIN("org.rssowl.ui.actions.NewNewsBin", "News Bin", "New News Bin", OwlUI.NEWSBIN, 7),
-
-    /** New Saved Search */
-    NEW_SAVED_SEARCH("org.rssowl.ui.actions.NewSearchMark", "Saved Search", "New Saved Search", OwlUI.SEARCHMARK, 7),
-
-    /** New Folder */
-    NEW_FOLDER("org.rssowl.ui.actions.NewFolder", "Folder", "New Folder", OwlUI.FOLDER, 7),
-
-    /** Close Tab */
-    CLOSE("org.eclipse.ui.file.close", "Close", null, OwlUI.getImageDescriptor("icons/etool16/close_tab.gif"), 8),
-
-    /** Close Others */
-    CLOSE_OTHERS("org.eclipse.ui.file.closeOthers", "Close Others", null, OwlUI.getImageDescriptor("icons/etool16/close_other_tabs.gif"), 8),
-
-    /** Close All Tabs */
-    CLOSE_ALL("org.eclipse.ui.file.closeAll", "Close All", null, OwlUI.getImageDescriptor("icons/etool16/close_all_tabs.gif"), 8),
-
-    /** Save As */
-    SAVE_AS("org.eclipse.ui.file.saveAs", "Save", null, OwlUI.getImageDescriptor("icons/etool16/save_as.gif"), 9),
-
-    /** Print */
-    PRINT("org.eclipse.ui.file.print", "Print", null, OwlUI.getImageDescriptor("icons/etool16/print.gif"), 9),
-
-    /** Fullscreen */
-    FULLSCREEN("org.rssowl.ui.FullScreenCommand", "Full Screen", "Toggle Full Screen", OwlUI.getImageDescriptor("icons/etool16/fullscreen.gif"), 10),
-
-    /** Bookmarks */
-    BOOKMARKS("org.rssowl.ui.ToggleBookmarksCommand", "Bookmarks", null, OwlUI.getImageDescriptor("icons/eview16/bkmrk_explorer.gif"), 10),
+    /** Label */
+    LABEL("org.rssowl.ui.Label", "Label", "Label News", OwlUI.getImageDescriptor("icons/elcl16/labels.gif"), true, false, 6),
 
     /** Sticky */
-    STICKY("org.rssowl.ui.actions.MarkSticky", "Sticky", "Mark a News Sticky", OwlUI.NEWS_PINNED, 10),
+    STICKY("org.rssowl.ui.actions.MarkSticky", "Sticky", "Mark a News Sticky", OwlUI.NEWS_PINNED, 6),
+
+    /** Next Unread News */
+    NEXT("org.rssowl.ui.Next", "Next", null, OwlUI.getImageDescriptor("icons/etool16/next.gif"), true, false, 7),
+
+    /** Previous Unread News */
+    PREVIOUS("org.rssowl.ui.Previous", "Previous", null, OwlUI.getImageDescriptor("icons/etool16/previous.gif"), true, false, 7),
+
+    /** Move To */
+    MOVE("org.rssowl.ui.Move", "Move", "Move News", OwlUI.getImageDescriptor("icons/etool16/move_to.gif"), true, false, 8),
+
+    /** Copy To */
+    COPY("org.rssowl.ui.Copy", "Copy", "Copy News", OwlUI.getImageDescriptor("icons/etool16/copy_to.gif"), true, false, 8),
+
+    /** Share */
+    SHARE("org.rssowl.ui.Share", "Share", "Share News", OwlUI.getImageDescriptor("icons/elcl16/share.gif"), true, false, 8),
+
+    /** Save As */
+    SAVE_AS("org.eclipse.ui.file.saveAs", "Save", "Save News", OwlUI.getImageDescriptor("icons/etool16/save_as.gif"), 8),
+
+    /** Print */
+    PRINT("org.eclipse.ui.file.print", "Print", "Print News", OwlUI.getImageDescriptor("icons/etool16/print.gif"), 8),
 
     /** Find More Feeds */
-    FIND_MORE_FEEDS("org.rssowl.ui.SearchFeedsAction", "Find Feeds", null, OwlUI.getImageDescriptor("icons/etool16/new_bkmrk.gif"), 10),
+    FIND_MORE_FEEDS("org.rssowl.ui.SearchFeedsAction", "Find Feeds", null, OwlUI.getImageDescriptor("icons/etool16/new_bkmrk.gif"), 9),
+
+    /** New Bookmark */
+    NEW_BOOKMARK("org.rssowl.ui.actions.NewBookMark", "Bookmark", "New Bookmark", OwlUI.BOOKMARK, 9),
+
+    /** New News Bin */
+    NEW_BIN("org.rssowl.ui.actions.NewNewsBin", "News Bin", "New News Bin", OwlUI.NEWSBIN, 9),
+
+    /** New Saved Search */
+    NEW_SAVED_SEARCH("org.rssowl.ui.actions.NewSearchMark", "Saved Search", "New Saved Search", OwlUI.SEARCHMARK, 9),
+
+    /** New Folder */
+    NEW_FOLDER("org.rssowl.ui.actions.NewFolder", "Folder", "New Folder", OwlUI.FOLDER, 9),
+
+    /** Close Tab */
+    CLOSE("org.eclipse.ui.file.close", "Close", null, OwlUI.getImageDescriptor("icons/etool16/close_tab.gif"), 10),
+
+    /** Close Others */
+    CLOSE_OTHERS("org.eclipse.ui.file.closeOthers", "Close Others", null, OwlUI.getImageDescriptor("icons/etool16/close_other_tabs.gif"), 10),
+
+    /** Close All Tabs */
+    CLOSE_ALL("org.eclipse.ui.file.closeAll", "Close All", null, OwlUI.getImageDescriptor("icons/etool16/close_all_tabs.gif"), 10),
+
+    /** Bookmarks */
+    BOOKMARKS("org.rssowl.ui.Bookmarks", "Bookmarks", null, OwlUI.getImageDescriptor("icons/etool16/subscriptions.gif"), true, false, 11),
+
+    /** History */
+    HISTORY("org.rssowl.ui.History", "History", "Recently Visited Feeds", OwlUI.getImageDescriptor("icons/etool16/history.gif"), true, false, 11),
+
+    /** Bookmark View */
+    BOOKMARK_VIEW("org.rssowl.ui.ToggleBookmarksCommand", "Bookmark View", null, OwlUI.getImageDescriptor("icons/eview16/bkmrk_explorer.gif"), 11),
 
     /** Downloads and Activity */
-    ACTIVITIES("org.rssowl.ui.ShowActivityAction", "Activity", "Downloads && Activity", OwlUI.getImageDescriptor("icons/elcl16/activity.gif"), 10),
+    ACTIVITIES("org.rssowl.ui.ShowActivityAction", "Activity", "Downloads && Activity", OwlUI.getImageDescriptor("icons/elcl16/activity.gif"), 12),
 
     /** Preferences */
-    PREFERENCES("org.rssowl.ui.ShowPreferences", "Preferences", null, OwlUI.getImageDescriptor("icons/elcl16/preferences.gif"), false, false, 10);
+    PREFERENCES("org.rssowl.ui.ShowPreferences", "Preferences", null, OwlUI.getImageDescriptor("icons/elcl16/preferences.gif"), false, false, 12),
+
+    /** Fullscreen */
+    FULLSCREEN("org.rssowl.ui.FullScreenCommand", "Full Screen", "Toggle Full Screen", OwlUI.getImageDescriptor("icons/etool16/fullscreen.gif"), 12);
 
     private final String fId;
     private final String fName;
@@ -267,13 +309,22 @@ public class CoolBarAdvisor {
 
   /* Selection Listener for Navigation Actions */
   private class NavigationSelectionListener extends SelectionAdapter {
+    private boolean fIsNext;
+
+    NavigationSelectionListener(boolean isNext) {
+      fIsNext = isNext;
+    }
+
     @Override
     public void widgetSelected(SelectionEvent e) {
       Object data = e.widget.getData();
       if (data instanceof Actions) {
-        NavigationAction action = new NavigationAction((Actions) data);
+        Actions actionType = (Actions) data;
+        NavigationAction action = new NavigationAction(actionType);
         action.init(fWindow);
         action.run(null);
+
+        fPreferences.putInteger(fIsNext ? DefaultPreferences.DEFAULT_NEXT_ACTION : DefaultPreferences.DEFAULT_PREVIOUS_ACTION, actionType.ordinal());
       }
     }
   }
@@ -337,9 +388,20 @@ public class CoolBarAdvisor {
             currentToolBar = new ToolBarManager(SWT.FLAT);
           }
 
+          /* Spacer */
+          else if (item == Item.SPACER) {
+            ActionContributionItem contribItem = new ActionContributionItem(new Action("") {
+              @Override
+              public boolean isEnabled() {
+                return false;
+              }
+            });
+            currentToolBar.add(contribItem);
+          }
+
           /* Any other Item */
           else {
-            ActionContributionItem contribItem = new ActionContributionItem(getAction(item, mode));
+            ActionContributionItem contribItem = new ActionContributionItem(getAction(item, mode, currentToolBar));
             contribItem.setId(id);
             if (mode == Mode.IMAGE_TEXT)
               contribItem.setMode(ActionContributionItem.MODE_FORCE_TEXT);
@@ -366,7 +428,7 @@ public class CoolBarAdvisor {
     }
   }
 
-  private Action getAction(final Item item, final Mode mode) {
+  private Action getAction(final Item item, final Mode mode, final ToolBarManager manager) {
     return new Action(item.getName(), item.withDropDownMenu() ? IAction.AS_DROP_DOWN_MENU : IAction.AS_PUSH_BUTTON) {
 
       @Override
@@ -391,7 +453,7 @@ public class CoolBarAdvisor {
 
       @Override
       public void run() {
-        CoolBarAdvisor.this.run(item);
+        CoolBarAdvisor.this.run(this, item, manager);
       }
 
       @Override
@@ -401,7 +463,7 @@ public class CoolBarAdvisor {
     };
   }
 
-  private void run(Item item) {
+  private void run(Action wrappingAction, Item item, ToolBarManager manager) {
     switch (item) {
 
       /* New */
@@ -460,7 +522,7 @@ public class CoolBarAdvisor {
         /* Update */
       case UPDATE: {
         IStructuredSelection activeSelection = OwlUI.getActiveSelection();
-        if (activeSelection != null) {
+        if (activeSelection != null && !activeSelection.isEmpty()) {
           ReloadTypesAction action = new ReloadTypesAction(activeSelection, fWindow.getShell());
           action.run(null);
         }
@@ -477,7 +539,7 @@ public class CoolBarAdvisor {
         /* Mark Read */
       case MARK_READ: {
         IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
-        if (selection != null) {
+        if (selection != null && !selection.isEmpty()) {
           ToggleReadStateAction action = new ToggleReadStateAction(selection);
           action.init(fWindow);
           action.run(null);
@@ -495,7 +557,8 @@ public class CoolBarAdvisor {
 
         /* Next */
       case NEXT: {
-        NavigationAction action = new NavigationAction(Actions.NEXT_UNREAD_NEWS);
+        Actions defaultAction = Actions.values()[fPreferences.getInteger(DefaultPreferences.DEFAULT_NEXT_ACTION)];
+        NavigationAction action = new NavigationAction(defaultAction);
         action.init(fWindow);
         action.run(null);
         break;
@@ -503,7 +566,8 @@ public class CoolBarAdvisor {
 
         /* Previous */
       case PREVIOUS: {
-        NavigationAction action = new NavigationAction(Actions.PREVIOUS_UNREAD_NEWS);
+        Actions defaultAction = Actions.values()[fPreferences.getInteger(DefaultPreferences.DEFAULT_PREVIOUS_ACTION)];
+        NavigationAction action = new NavigationAction(defaultAction);
         action.init(fWindow);
         action.run(null);
         break;
@@ -594,8 +658,8 @@ public class CoolBarAdvisor {
         break;
       }
 
-        /* Toggle Bookmarks */
-      case BOOKMARKS: {
+        /* Toggle Bookmarks View */
+      case BOOKMARK_VIEW: {
         OwlUI.toggleBookmarks();
         break;
       }
@@ -603,7 +667,7 @@ public class CoolBarAdvisor {
         /* Sticky */
       case STICKY: {
         IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
-        if (selection != null)
+        if (selection != null && !selection.isEmpty())
           new MakeNewsStickyAction(selection).run();
         break;
       }
@@ -630,6 +694,64 @@ public class CoolBarAdvisor {
         action.run();
         break;
       }
+
+        /* History */
+      case HISTORY: {
+        showMenu(wrappingAction, manager);
+        break;
+      }
+
+        /* Label */
+      case LABEL: {
+        showMenu(wrappingAction, manager);
+        break;
+      }
+
+        /* Move */
+      case MOVE: {
+        showMenu(wrappingAction, manager);
+        break;
+      }
+
+        /* Copy */
+      case COPY: {
+        showMenu(wrappingAction, manager);
+        break;
+      }
+
+        /* Share */
+      case SHARE: {
+        showMenu(wrappingAction, manager);
+        break;
+      }
+
+        /* Bookmarks */
+      case BOOKMARKS: {
+        showMenu(wrappingAction, manager);
+        break;
+      }
+    }
+  }
+
+  private void showMenu(Action wrappingAction, ToolBarManager manager) {
+    Menu menu = wrappingAction.getMenuCreator().getMenu(manager.getControl());
+    if (menu != null) {
+
+      /* Adjust Location */
+      IContributionItem contributionItem = manager.find(wrappingAction.getId());
+      if (contributionItem != null && contributionItem instanceof ActionContributionItem) {
+        Widget widget = ((ActionContributionItem) contributionItem).getWidget();
+        if (widget != null && widget instanceof ToolItem) {
+          ToolItem item = (ToolItem) widget;
+          Rectangle rect = item.getBounds();
+          Point pt = new Point(rect.x, rect.y + rect.height);
+          pt = manager.getControl().toDisplay(pt);
+          menu.setLocation(pt.x, pt.y);
+        }
+      }
+
+      /* Set Visible */
+      menu.setVisible(true);
     }
   }
 
@@ -669,36 +791,46 @@ public class CoolBarAdvisor {
 
           public Menu getMenu(Control parent) {
             Menu menu = new Menu(parent);
+            Actions defaultAction = Actions.values()[fPreferences.getInteger(DefaultPreferences.DEFAULT_NEXT_ACTION)];
 
-            MenuItem item = new MenuItem(menu, SWT.PUSH);
-            item.setText(getLabelWithBinding("org.rssowl.ui.NextNews", "Next News"));
+            MenuItem item = new MenuItem(menu, SWT.RADIO);
+            item.setText(getLabelWithBinding(Actions.NEXT_NEWS.getCommandId(), "Next News"));
             item.setData(Actions.NEXT_NEWS);
-            item.addSelectionListener(new NavigationSelectionListener());
+            item.addSelectionListener(new NavigationSelectionListener(true));
+            if (item.getData().equals(defaultAction))
+              item.setSelection(true);
 
-            item = new MenuItem(menu, SWT.PUSH);
-            item.setText(getLabelWithBinding("org.rssowl.ui.NextUnreadNews", "Next Unread News"));
+            item = new MenuItem(menu, SWT.RADIO);
+            item.setText(getLabelWithBinding(Actions.NEXT_UNREAD_NEWS.getCommandId(), "Next Unread News"));
             item.setData(Actions.NEXT_UNREAD_NEWS);
-            item.addSelectionListener(new NavigationSelectionListener());
-            menu.setDefaultItem(item);
+            item.addSelectionListener(new NavigationSelectionListener(true));
+            if (item.getData().equals(defaultAction))
+              item.setSelection(true);
 
             new MenuItem(menu, SWT.SEPARATOR);
 
-            item = new MenuItem(menu, SWT.PUSH);
-            item.setText(getLabelWithBinding("org.rssowl.ui.NextFeed", "Next Feed"));
+            item = new MenuItem(menu, SWT.RADIO);
+            item.setText(getLabelWithBinding(Actions.NEXT_FEED.getCommandId(), "Next Feed"));
             item.setData(Actions.NEXT_FEED);
-            item.addSelectionListener(new NavigationSelectionListener());
+            item.addSelectionListener(new NavigationSelectionListener(true));
+            if (item.getData().equals(defaultAction))
+              item.setSelection(true);
 
-            item = new MenuItem(menu, SWT.PUSH);
-            item.setText(getLabelWithBinding("org.rssowl.ui.NextUnreadFeed", "Next Unread Feed"));
+            item = new MenuItem(menu, SWT.RADIO);
+            item.setText(getLabelWithBinding(Actions.NEXT_UNREAD_FEED.getCommandId(), "Next Unread Feed"));
             item.setData(Actions.NEXT_UNREAD_FEED);
-            item.addSelectionListener(new NavigationSelectionListener());
+            item.addSelectionListener(new NavigationSelectionListener(true));
+            if (item.getData().equals(defaultAction))
+              item.setSelection(true);
 
             new MenuItem(menu, SWT.SEPARATOR);
 
-            item = new MenuItem(menu, SWT.PUSH);
-            item.setText(getLabelWithBinding("org.rssowl.ui.NextTab", "Next Tab"));
+            item = new MenuItem(menu, SWT.RADIO);
+            item.setText(getLabelWithBinding(Actions.NEXT_TAB.getCommandId(), "Next Tab"));
             item.setData(Actions.NEXT_TAB);
-            item.addSelectionListener(new NavigationSelectionListener());
+            item.addSelectionListener(new NavigationSelectionListener(true));
+            if (item.getData().equals(defaultAction))
+              item.setSelection(true);
 
             return menu;
           }
@@ -717,36 +849,46 @@ public class CoolBarAdvisor {
 
           public Menu getMenu(Control parent) {
             Menu menu = new Menu(parent);
+            Actions defaultAction = Actions.values()[fPreferences.getInteger(DefaultPreferences.DEFAULT_PREVIOUS_ACTION)];
 
-            MenuItem item = new MenuItem(menu, SWT.PUSH);
-            item.setText(getLabelWithBinding("org.rssowl.ui.PreviousNews", "Previous News"));
+            MenuItem item = new MenuItem(menu, SWT.RADIO);
+            item.setText(getLabelWithBinding(Actions.PREVIOUS_NEWS.getCommandId(), "Previous News"));
             item.setData(Actions.PREVIOUS_NEWS);
-            item.addSelectionListener(new NavigationSelectionListener());
+            item.addSelectionListener(new NavigationSelectionListener(false));
+            if (item.getData().equals(defaultAction))
+              item.setSelection(true);
 
-            item = new MenuItem(menu, SWT.PUSH);
-            item.setText(getLabelWithBinding("org.rssowl.ui.PreviousUnreadNews", "Previous Unread News"));
+            item = new MenuItem(menu, SWT.RADIO);
+            item.setText(getLabelWithBinding(Actions.PREVIOUS_UNREAD_NEWS.getCommandId(), "Previous Unread News"));
             item.setData(Actions.PREVIOUS_UNREAD_NEWS);
-            item.addSelectionListener(new NavigationSelectionListener());
-            menu.setDefaultItem(item);
+            item.addSelectionListener(new NavigationSelectionListener(false));
+            if (item.getData().equals(defaultAction))
+              item.setSelection(true);
 
             new MenuItem(menu, SWT.SEPARATOR);
 
-            item = new MenuItem(menu, SWT.PUSH);
-            item.setText(getLabelWithBinding("org.rssowl.ui.PreviousFeed", "Previous Feed"));
+            item = new MenuItem(menu, SWT.RADIO);
+            item.setText(getLabelWithBinding(Actions.PREVIOUS_FEED.getCommandId(), "Previous Feed"));
             item.setData(Actions.PREVIOUS_FEED);
-            item.addSelectionListener(new NavigationSelectionListener());
+            item.addSelectionListener(new NavigationSelectionListener(false));
+            if (item.getData().equals(defaultAction))
+              item.setSelection(true);
 
-            item = new MenuItem(menu, SWT.PUSH);
-            item.setText(getLabelWithBinding("org.rssowl.ui.PreviousUnreadFeed", "Previous Unread Feed"));
+            item = new MenuItem(menu, SWT.RADIO);
+            item.setText(getLabelWithBinding(Actions.PREVIOUS_UNREAD_FEED.getCommandId(), "Previous Unread Feed"));
             item.setData(Actions.PREVIOUS_UNREAD_FEED);
-            item.addSelectionListener(new NavigationSelectionListener());
+            item.addSelectionListener(new NavigationSelectionListener(false));
+            if (item.getData().equals(defaultAction))
+              item.setSelection(true);
 
             new MenuItem(menu, SWT.SEPARATOR);
 
-            item = new MenuItem(menu, SWT.PUSH);
-            item.setText(getLabelWithBinding("org.rssowl.ui.PreviousTab", "Previous Tab"));
+            item = new MenuItem(menu, SWT.RADIO);
+            item.setText(getLabelWithBinding(Actions.PREVIOUS_TAB.getCommandId(), "Previous Tab"));
             item.setData(Actions.PREVIOUS_TAB);
-            item.addSelectionListener(new NavigationSelectionListener());
+            item.addSelectionListener(new NavigationSelectionListener(false));
+            if (item.getData().equals(defaultAction))
+              item.setSelection(true);
 
             return menu;
           }
@@ -758,9 +900,130 @@ public class CoolBarAdvisor {
           }
         };
       }
+
+        /* History */
+      case HISTORY:
+        return new IMenuCreator() {
+
+          public Menu getMenu(Control parent) {
+            Menu menu = new Menu(parent);
+            ContributionItemFactory.REOPEN_EDITORS.create(fWindow).fill(menu, 0);
+            MenuItem[] items = menu.getItems();
+            if (items.length > 0 && (items[0].getStyle() & SWT.SEPARATOR) != 0)
+              items[0].dispose();
+            return menu;
+          }
+
+          public Menu getMenu(Menu parent) {
+            return null;
+          }
+
+          public void dispose() {}
+        };
+
+        /* Label */
+      case LABEL:
+        return new IMenuCreator() {
+          public Menu getMenu(Control parent) {
+            MenuManager manager = new MenuManager();
+            IStructuredSelection activeFeedViewSelection = OwlUI.getActiveFeedViewSelection();
+            ApplicationActionBarAdvisor.fillLabelMenu(manager, activeFeedViewSelection, fWindow, true);
+            return manager.createContextMenu(parent);
+          }
+
+          public Menu getMenu(Menu parent) {
+            return null;
+          }
+
+          public void dispose() {}
+        };
+
+        /* Move */
+      case MOVE:
+        return getMoveCopyMenu(true);
+
+        /* Copy */
+      case COPY:
+        return getMoveCopyMenu(false);
+
+        /* Share */
+      case SHARE:
+        return new IMenuCreator() {
+          public Menu getMenu(Control parent) {
+            MenuManager manager = new MenuManager();
+            IStructuredSelection activeFeedViewSelection = OwlUI.getActiveFeedViewSelection();
+            ApplicationActionBarAdvisor.fillShareMenu(manager, activeFeedViewSelection, fWindow, true);
+            return manager.createContextMenu(parent);
+          }
+
+          public Menu getMenu(Menu parent) {
+            return null;
+          }
+
+          public void dispose() {}
+        };
+
+        /* Bookmarks */
+      case BOOKMARKS:
+        return new IMenuCreator() {
+          public Menu getMenu(Control parent) {
+            MenuManager manager = new MenuManager();
+            ApplicationActionBarAdvisor.fillBookMarksMenu(manager, fWindow);
+            return manager.createContextMenu(parent);
+          }
+
+          public Menu getMenu(Menu parent) {
+            return null;
+          }
+
+          public void dispose() {}
+        };
     };
 
     return null;
+  }
+
+  private IMenuCreator getMoveCopyMenu(final boolean isMove) {
+    return new IMenuCreator() {
+      public Menu getMenu(Control parent) {
+        IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
+        if (selection == null || selection.isEmpty())
+          return null;
+
+        MenuManager manager = new MenuManager();
+
+        /* Load all news bins and sort by name */
+        List<INewsBin> newsbins = new ArrayList<INewsBin>(DynamicDAO.loadAll(INewsBin.class));
+
+        Comparator<INewsBin> comparator = new Comparator<INewsBin>() {
+          public int compare(INewsBin o1, INewsBin o2) {
+            return o1.getName().compareTo(o2.getName());
+          };
+        };
+
+        Collections.sort(newsbins, comparator);
+
+        IEditorPart activeEditor = OwlUI.getActiveEditor();
+        IEditorInput activeInput = (activeEditor != null) ? activeEditor.getEditorInput() : null;
+        for (INewsBin bin : newsbins) {
+          if (activeInput != null && activeInput instanceof FeedViewInput && ((FeedViewInput) activeInput).getMark().equals(bin))
+            continue;
+
+          manager.add(new MoveCopyNewsToBinAction(selection, bin, isMove));
+        }
+
+        manager.add(new Separator("movetonewbin"));
+        manager.add(new MoveCopyNewsToBinAction(selection, null, isMove));
+
+        return manager.createContextMenu(parent);
+      }
+
+      public Menu getMenu(Menu parent) {
+        return null;
+      }
+
+      public void dispose() {}
+    };
   }
 
   private String getLabelWithBinding(String id, String label) {

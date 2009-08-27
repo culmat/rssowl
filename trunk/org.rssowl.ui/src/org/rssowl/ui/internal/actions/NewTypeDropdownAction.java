@@ -77,8 +77,6 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
       }
     });
 
-    menu.setDefaultItem(newBookMark);
-
     MenuItem newNewsBin = new MenuItem(menu, SWT.PUSH);
     newNewsBin.setText(getLabelWithBinding("org.rssowl.ui.actions.NewNewsBin", "News Bin"));
     newNewsBin.setImage(OwlUI.getImage(fResources, OwlUI.NEWSBIN));

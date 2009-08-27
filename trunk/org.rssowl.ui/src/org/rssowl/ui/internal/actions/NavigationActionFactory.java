@@ -184,42 +184,44 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
   public enum Actions {
 
     /** Action: Go to the next News */
-    NEXT_NEWS("nextNews", true, true, false),
+    NEXT_NEWS("nextNews", "org.rssowl.ui.NextNews", true, true, false),
 
     /** Action: Go to the next unread News */
-    NEXT_UNREAD_NEWS("nextUnreadNews", true, true, true),
+    NEXT_UNREAD_NEWS("nextUnreadNews", "org.rssowl.ui.NextUnreadNews", true, true, true),
 
     /** Action: Go to the next Feed */
-    NEXT_FEED("nextFeed", false, true, false),
+    NEXT_FEED("nextFeed", "org.rssowl.ui.NextFeed", false, true, false),
 
     /** Action: Go to the next unread Feed */
-    NEXT_UNREAD_FEED("nextUnreadFeed", false, true, true),
+    NEXT_UNREAD_FEED("nextUnreadFeed", "org.rssowl.ui.NextUnreadFeed", false, true, true),
 
     /** Action: Go to the previous News */
-    PREVIOUS_NEWS("previousNews", true, false, false),
+    PREVIOUS_NEWS("previousNews", "org.rssowl.ui.PreviousNews", true, false, false),
 
     /** Action: Go to the previous unread News */
-    PREVIOUS_UNREAD_NEWS("previousUnreadNews", true, false, true),
+    PREVIOUS_UNREAD_NEWS("previousUnreadNews", "org.rssowl.ui.PreviousUnreadNews", true, false, true),
 
     /** Action: Go to the previous Feed */
-    PREVIOUS_FEED("previousFeed", false, false, false),
+    PREVIOUS_FEED("previousFeed", "org.rssowl.ui.PreviousFeed", false, false, false),
 
     /** Action: Go to the previous unread Feed */
-    PREVIOUS_UNREAD_FEED("previousUnreadFeed", false, false, true),
+    PREVIOUS_UNREAD_FEED("previousUnreadFeed", "org.rssowl.ui.PreviousUnreadFeed", false, false, true),
 
     /** Action: Go to next Tab */
-    NEXT_TAB("nextTab", false, false, false),
+    NEXT_TAB("nextTab", "org.rssowl.ui.NextTab", false, false, false),
 
     /** Action: Go to previous Tab */
-    PREVIOUS_TAB("previousTab", false, false, false);
+    PREVIOUS_TAB("previousTab", "org.rssowl.ui.PreviousTab", false, false, false);
 
     String fId;
     boolean fIsNewsScoped;
     boolean fIsNext;
     boolean fIsUnread;
+    String fCommandId;
 
-    Actions(String id, boolean isNewsScoped, boolean isNext, boolean isUnread) {
+    Actions(String id, String commandId, boolean isNewsScoped, boolean isNext, boolean isUnread) {
       fId = id;
+      fCommandId = commandId;
       fIsNewsScoped = isNewsScoped;
       fIsNext = isNext;
       fIsUnread = isUnread;
@@ -230,6 +232,13 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
      */
     public String getId() {
       return fId;
+    }
+
+    /**
+     * @return the id of the command for this navigation action.
+     */
+    public String getCommandId() {
+      return fCommandId;
     }
 
     boolean isNewsScoped() {

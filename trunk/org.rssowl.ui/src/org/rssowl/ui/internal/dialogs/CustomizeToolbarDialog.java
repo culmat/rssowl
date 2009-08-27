@@ -64,6 +64,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.CoolBarAdvisor;
@@ -156,7 +157,7 @@ public class CustomizeToolbarDialog extends Dialog {
     fItemViewer = new TableViewer(cTable.getControl());
     fItemViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fItemViewer.getTable().setHeaderVisible(true);
-    ((GridData) fItemViewer.getTable().getLayoutData()).heightHint = fItemViewer.getTable().getItemHeight() * 20;
+    ((GridData) fItemViewer.getTable().getLayoutData()).heightHint = fItemViewer.getTable().getItemHeight() * 22;
     fItemViewer.getTable().setFocus();
 
     TableColumn nameCol = new TableColumn(fItemViewer.getTable(), SWT.NONE);
@@ -226,7 +227,7 @@ public class CustomizeToolbarDialog extends Dialog {
         Item[] toolItems = Item.values();
         int currentGroup = -1;
         for (final Item toolItem : toolItems) {
-          if (!visibleItems.contains(toolItem.getId()) || toolItem == Item.SEPARATOR) {
+          if (!visibleItems.contains(toolItem.getId()) || toolItem == Item.SEPARATOR || toolItem == Item.SPACER) {
 
             /* Divide Groups by Separators */
             if (currentGroup >= 0 && currentGroup != toolItem.getGroup())
@@ -234,7 +235,10 @@ public class CustomizeToolbarDialog extends Dialog {
 
             /* Create Menu Item */
             MenuItem item = new MenuItem(menu, SWT.PUSH);
-            item.setText(toolItem.getName());
+            if (StringUtils.isSet(toolItem.getTooltip()))
+              item.setText(toolItem.getTooltip());
+            else
+              item.setText(toolItem.getName());
             if (toolItem.getImg() != null)
               item.setImage(fResources.createImage(toolItem.getImg()));
 
@@ -383,7 +387,7 @@ public class CustomizeToolbarDialog extends Dialog {
     fItemViewer.refresh();
 
     /* Update Selection */
-    if (selectionIndex > 0)
+    if (selectionIndex >= 0)
       fItemViewer.getTable().setSelection(selectionIndex + 1);
     else
       fItemViewer.getTable().setSelection(fItemViewer.getTable().getItemCount() - 1);
