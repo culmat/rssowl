@@ -45,7 +45,7 @@ public class OpenExternalHandler extends AbstractHandler {
   public Object execute(ExecutionEvent arg0) {
     IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
 
-    if (selection != null)
+    if (selection != null && !selection.isEmpty())
       new OpenInExternalBrowserAction(selection).run();
 
     return null; //As per JavaDoc
