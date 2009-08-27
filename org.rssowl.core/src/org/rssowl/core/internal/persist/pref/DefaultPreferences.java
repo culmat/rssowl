@@ -307,6 +307,12 @@ public class DefaultPreferences {
   /** Global: Toolbar Mode */
   public static final String TOOLBAR_MODE = Preferences.TOOLBAR_MODE.id();
 
+  /** Global: Default Next Action (Toolbar) */
+  public static final String DEFAULT_NEXT_ACTION = Preferences.DEFAULT_NEXT_ACTION.id();
+
+  /** Global: Default Previous Action (Toolbar) */
+  public static final String DEFAULT_PREVIOUS_ACTION = Preferences.DEFAULT_PREVIOUS_ACTION.id();
+
   /**
    * Eclipse Preferences Follow
    */

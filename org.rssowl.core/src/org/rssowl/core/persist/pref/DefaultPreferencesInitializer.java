@@ -202,31 +202,37 @@ public class DefaultPreferencesInitializer implements IPreferencesInitializer {
     items.add("org.rssowl.ui.actions.ExportFeeds");
 
     /* Undo | Redo */
-    items.add("org.rssowl.ui.internal.Separator");
+    items.add("org.rssowl.ui.CoolBarSeparator");
     items.add("org.rssowl.ui.UndoAction");
     items.add("org.rssowl.ui.RedoAction");
 
-    /* Update All | Stop */
-    items.add("org.rssowl.ui.internal.Separator");
+    /* Update | Update All */
+    items.add("org.rssowl.ui.CoolBarSeparator");
     items.add("org.rssowl.ui.actions.Reload");
     items.add("org.rssowl.ui.actions.ReloadAll");
-    items.add("org.rssowl.ui.StopUpdate");
 
     /* Search */
-    items.add("org.rssowl.ui.internal.Separator");
+    items.add("org.rssowl.ui.CoolBarSeparator");
     items.add("org.rssowl.ui.SearchNewsAction");
 
     /* Mark Read | Mark All Read */
-    items.add("org.rssowl.ui.internal.Separator");
+    items.add("org.rssowl.ui.CoolBarSeparator");
     items.add("org.rssowl.ui.ToggleReadState");
     items.add("org.rssowl.ui.MarkAllRead");
 
+    /* Label | Sticky */
+    items.add("org.rssowl.ui.CoolBarSeparator");
+    items.add("org.rssowl.ui.Label");
+    items.add("org.rssowl.ui.actions.MarkSticky");
+
     /* Next | Previous */
-    items.add("org.rssowl.ui.internal.Separator");
-    items.add("org.rssowl.ui.NextUnreadNews");
-    items.add("org.rssowl.ui.PreviousUnreadNews");
+    items.add("org.rssowl.ui.CoolBarSeparator");
+    items.add("org.rssowl.ui.Next");
+    items.add("org.rssowl.ui.Previous");
 
     defaultScope.putStrings(Preferences.TOOLBAR_ITEMS.id(), items.toArray(new String[items.size()]));
     defaultScope.putInteger(Preferences.TOOLBAR_MODE.id(), 0);
+    defaultScope.putInteger(Preferences.DEFAULT_NEXT_ACTION.id(), 1);
+    defaultScope.putInteger(Preferences.DEFAULT_PREVIOUS_ACTION.id(), 5);
   }
 }

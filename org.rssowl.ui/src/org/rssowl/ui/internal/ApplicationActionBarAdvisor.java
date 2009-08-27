@@ -58,9 +58,14 @@ import org.eclipse.ui.keys.IBindingService;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IAttachment;
+import org.rssowl.core.persist.IBookMark;
+import org.rssowl.core.persist.IFolder;
+import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.persist.INewsMark;
+import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.util.CoreUtils;
@@ -141,10 +146,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
   protected void makeActions(IWorkbenchWindow window) {
 
     /* Menu: File */
-    register(ActionFactory.SAVE_AS.create(window)); // TODO ActionSet?
-    register(ActionFactory.CLOSE.create(window)); // TODO ActionSet?
-    register(ActionFactory.CLOSE_ALL.create(window)); // TODO ActionSet?
-    register(ActionFactory.PRINT.create(window)); // TODO ActionSet?
+    register(ActionFactory.SAVE_AS.create(window));
+    register(ActionFactory.CLOSE.create(window));
+    register(ActionFactory.CLOSE_ALL.create(window));
+    register(ActionFactory.PRINT.create(window));
     register(ActionFactory.QUIT.create(window));
 
     fReopenEditors = ContributionItemFactory.REOPEN_EDITORS.create(window);
@@ -206,6 +211,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     /* Go Menu */
     createGoMenu(menuBar);
+
+    /* Bookmarks Menu */
+    createBookMarksMenu(menuBar);
 
     /* News Menu */
     createNewsMenu(menuBar);
@@ -512,6 +520,21 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     goMenu.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
     goMenu.add(fReopenEditors);
+  }
+
+  /* Menu: Bookmarks */
+  private void createBookMarksMenu(IMenuManager menuBar) {
+    MenuManager bmMenu = new MenuManager("&Bookmarks", "bookmarks");
+    bmMenu.setRemoveAllWhenShown(true);
+    bmMenu.add(new Action("") {}); //Dummy Action
+    bmMenu.addMenuListener(new IMenuListener() {
+      public void menuAboutToShow(IMenuManager manager) {
+        fillBookMarksMenu(manager, getActionBarConfigurer().getWindowConfigurer().getWindow());
+        manager.add(new GroupMarker(IWorkbenchActionConstants.MB_ADDITIONS));
+      }
+    });
+
+    menuBar.add(bmMenu);
   }
 
   /* Menu News */
@@ -1113,41 +1136,130 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
    * otherwise create a sub menu.
    */
   public static void fillLabelMenu(IMenuManager manager, final IStructuredSelection selection, final IShellProvider shellProvider, boolean directMenu) {
-    if (!selection.isEmpty()) {
-      Collection<ILabel> labels = CoreUtils.loadSortedLabels();
 
-      /* Either as direct Menu or Submenu */
-      IMenuManager labelMenu;
-      if (directMenu)
-        labelMenu = manager;
-      else {
-        labelMenu = new MenuManager("&Label");
-        manager.add(labelMenu);
-      }
-
-      /* Assign / Organize Labels */
-      labelMenu.add(new AssignLabelsAction(shellProvider.getShell(), selection));
-      labelMenu.add(new Action("&Organize Labels...") {
-        @Override
-        public void run() {
-          PreferencesUtil.createPreferenceDialogOn(shellProvider.getShell(), ManageLabelsPreferencePage.ID, null, null).open();
-        }
-      });
-      labelMenu.add(new Separator());
-
-      /* Retrieve Labels that all selected News contain */
-      Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(selection);
-      for (final ILabel label : labels) {
-        LabelAction labelAction = new LabelAction(label, selection);
-        labelAction.setChecked(selectedLabels.contains(label));
-        labelMenu.add(labelAction);
-      }
-
-      /* Remove All Labels */
-      labelMenu.add(new Separator());
-      LabelAction removeAllLabels = new LabelAction(null, selection);
-      removeAllLabels.setEnabled(!labels.isEmpty());
-      labelMenu.add(removeAllLabels);
+    /* Either as direct Menu or Submenu */
+    IMenuManager labelMenu;
+    if (directMenu)
+      labelMenu = manager;
+    else {
+      labelMenu = new MenuManager("&Label");
+      manager.add(labelMenu);
     }
+
+    /* Assign  Labels */
+    labelMenu.add(new AssignLabelsAction(shellProvider.getShell(), selection));
+
+    /* Organize Labels */
+    labelMenu.add(new Action("&Organize Labels...") {
+      @Override
+      public void run() {
+        PreferencesUtil.createPreferenceDialogOn(shellProvider.getShell(), ManageLabelsPreferencePage.ID, null, null).open();
+      }
+    });
+
+    /* Load Labels */
+    Collection<ILabel> labels = CoreUtils.loadSortedLabels();
+
+    /* Retrieve Labels that all selected News contain */
+    labelMenu.add(new Separator());
+    Set<ILabel> selectedLabels = ModelUtils.getLabelsForAll(selection);
+    for (final ILabel label : labels) {
+      LabelAction labelAction = new LabelAction(label, selection);
+      labelAction.setChecked(selectedLabels.contains(label));
+      labelMenu.add(labelAction);
+    }
+
+    /* Remove All Labels */
+    labelMenu.add(new Separator());
+    LabelAction removeAllLabels = new LabelAction(null, selection);
+    removeAllLabels.setEnabled(!selection.isEmpty() && !labels.isEmpty());
+    labelMenu.add(removeAllLabels);
+  }
+
+  /**
+   * @param menu the {@link IMenuManager} to fill.
+   * @param window the {@link IWorkbenchWindow} where the menu is living.
+   */
+  public static void fillBookMarksMenu(IMenuManager menu, IWorkbenchWindow window) {
+    Set<IFolder> roots = CoreUtils.loadRootFolders();
+
+    /* Single Bookmark Set */
+    if (roots.size() == 1) {
+      fillBookMarksMenu(window, menu, roots.iterator().next().getChildren());
+    }
+
+    /* More than one Bookmark Set */
+    else {
+      for (IFolder root : roots) {
+        MenuManager rootItem = new MenuManager(root.getName(), OwlUI.BOOKMARK_SET, null);
+        menu.add(rootItem);
+
+        fillBookMarksMenu(window, rootItem, root.getChildren());
+      }
+    }
+  }
+
+  private static void fillBookMarksMenu(final IWorkbenchWindow window, IMenuManager parent, List<IFolderChild> childs) {
+    for (final IFolderChild child : childs) {
+
+      /* News Mark or Empty Folder */
+      if (child instanceof INewsMark || (child instanceof IFolder && ((IFolder) child).getChildren().isEmpty())) {
+        Action action = new Action(child.getName()) {
+          @Override
+          public void run() {
+            if (child instanceof INewsMark)
+              OwlUI.openInFeedView(window.getActivePage(), new StructuredSelection(child));
+          }
+        };
+        action.setImageDescriptor(getImageDescriptor(child));
+        parent.add(action);
+      }
+
+      /* Folder with Children */
+      else if (child instanceof IFolder) {
+        final IFolder folder = (IFolder) child;
+
+        final MenuManager folderMenu = new MenuManager(folder.getName(), getImageDescriptor(folder), null);
+        parent.add(folderMenu);
+        folderMenu.add(new Action("") {}); //Dummy Action
+        folderMenu.setRemoveAllWhenShown(true);
+        folderMenu.addMenuListener(new IMenuListener() {
+          public void menuAboutToShow(IMenuManager manager) {
+            fillBookMarksMenu(window, folderMenu, folder.getChildren());
+          }
+        });
+      }
+    }
+  }
+
+  private static ImageDescriptor getImageDescriptor(IFolderChild child) {
+
+    /* Bookmark */
+    if (child instanceof IBookMark) {
+      ImageDescriptor favicon = OwlUI.getFavicon((IBookMark) child);
+      return favicon != null ? favicon : OwlUI.BOOKMARK;
+    }
+
+    /* Saved Search */
+    else if (child instanceof ISearchMark) {
+      ISearchMark search = (ISearchMark) child;
+      boolean containsNews = (search.getNewsCount(INews.State.getVisible()) != 0);
+
+      return containsNews ? OwlUI.SEARCHMARK : OwlUI.SEARCHMARK_EMPTY;
+    }
+
+    /* News Bin */
+    else if (child instanceof INewsBin) {
+      INewsBin bin = (INewsBin) child;
+      boolean containsNews = (bin.getNewsCount(INews.State.getVisible()) != 0);
+
+      return containsNews ? OwlUI.NEWSBIN : OwlUI.NEWSBIN_EMPTY;
+    }
+
+    /* Folder */
+    else if (child instanceof IFolder)
+      return OwlUI.FOLDER;
+
+    return null;
   }
 }

@@ -304,6 +304,12 @@ public enum Preferences {
   /** Global: Toolbar Mode */
   TOOLBAR_MODE("org.rssowl.pref.ToolbarMode", IPreferenceType.INTEGER),
 
+  /** Global: Default Next Action (Toolbar) */
+  DEFAULT_NEXT_ACTION("org.rssowl.pref.DefaultNextAction", IPreferenceType.INTEGER),
+
+  /** Global: Default Previous Action (Toolbar) */
+  DEFAULT_PREVIOUS_ACTION("org.rssowl.pref.DefaultPreviousAction", IPreferenceType.INTEGER),
+
   /******************************
    * Eclipse Preferences Follow *
    ******************************/
