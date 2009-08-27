@@ -33,6 +33,8 @@ import org.rssowl.core.util.StreamGobbler;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,6 +46,7 @@ import java.util.List;
  */
 public class GrowlNotifyAction implements INewsAction {
   private static final String APPLICATION_NAME = "RSSOwl";
+  private static final String SEPARATOR = System.getProperty("line.separator");
 
   /**
    * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
@@ -53,10 +56,7 @@ public class GrowlNotifyAction implements INewsAction {
     /* Launch if file exists */
     if (data instanceof String && new File((String) data).exists()) {
       try {
-        //TODO Rather aggregate N news into single growl call?
-        for (INews item : news) {
-          executeCommand(toGrowlnotify(item, (String) data));
-        }
+        executeCommand((String) data, news);
       }
 
       /* Log any error message */
@@ -68,8 +68,29 @@ public class GrowlNotifyAction implements INewsAction {
     return Collections.emptyList();
   }
 
-  private void executeCommand(String cmd) throws IOException {
-    Process proc = Runtime.getRuntime().exec(cmd);
+  private void executeCommand(String pathToGrowlnotify, List<INews> news) throws IOException {
+    List<String> commands = new ArrayList<String>();
+    commands.add(pathToGrowlnotify);
+    commands.add("--name");
+    commands.add(APPLICATION_NAME);
+    commands.add("-a");
+    commands.add(APPLICATION_NAME);
+    commands.add("-m");
+
+    StringBuilder message = new StringBuilder();
+    for (INews item : news) {
+      message.append(CoreUtils.getHeadline(item, true)).append(SEPARATOR);
+    }
+
+    commands.add(message.toString());
+
+    /* Execute */
+    Process proc = Runtime.getRuntime().exec(commands.toArray(new String[commands.size()]));
+
+    /* Write Message to Growl */
+    OutputStream outputStream = proc.getOutputStream();
+    outputStream.write(message.toString().getBytes());
+    outputStream.close();
 
     /* Let StreamGobbler handle error message */
     StreamGobbler errorGobbler = new StreamGobbler(proc.getErrorStream());
@@ -80,29 +101,6 @@ public class GrowlNotifyAction implements INewsAction {
     /* Flush both error and output streams */
     errorGobbler.schedule();
     outputGobbler.schedule();
-  }
-
-  private String toGrowlnotify(INews news, String pathToGrowlnotify) {
-    StringBuilder cmd = new StringBuilder();
-
-    cmd.append(pathToGrowlnotify);
-
-    /* Application Name */
-    cmd.append(" -name ").append(APPLICATION_NAME);
-
-    /* Title */
-    cmd.append(" -t ").append(CoreUtils.getHeadline(news, true));
-
-    /* Message */
-    //cmd.append(" -m ").append(); //TODO
-
-    /* Image */
-    //cmd.append(" --image ").append(); //TODO
-
-    /* Application */
-    //cmd.append(" -a ").append(APPLICATION_NAME); //TODO
-
-    return cmd.toString();
   }
 
   /*
