@@ -46,6 +46,7 @@ import org.eclipse.jface.util.OpenStrategy;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.wizard.ProgressMonitorPart;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
@@ -1201,29 +1202,31 @@ public class OwlUI {
 
   /**
    * Attempts to find the selection from the first active <code>FeedView</code>
-   * from the PlatformUI facade. Otherwise, returns <code>NULL</code> if none.
+   * from the PlatformUI facade. Otherwise, returns
+   * <code>StructuredSelection.EMPTY</code> if none.
    *
    * @return the selection from the first active <code>FeedView</code> from the
-   * PlatformUI facade or <code>NULL</code> if none.
+   * PlatformUI facade or <code>StructuredSelection.EMPTY</code> if none.
    */
   public static IStructuredSelection getActiveFeedViewSelection() {
     FeedView feedview = getActiveFeedView();
     if (feedview == null)
-      return null;
+      return StructuredSelection.EMPTY;
 
     ISelectionProvider selectionProvider = feedview.getSite().getSelectionProvider();
     if (selectionProvider == null)
-      return null;
+      return StructuredSelection.EMPTY;
 
     return (IStructuredSelection) selectionProvider.getSelection();
   }
 
   /**
    * Attempts to find the selection from the first active <code>Part</code> from
-   * the PlatformUI facade. Otherwise, returns <code>NULL</code> if none.
+   * the PlatformUI facade. Otherwise, returns
+   * <code>StructuredSelection.EMPTY</code> if none.
    *
    * @return the selection from the first active <code>Part</code> from the
-   * PlatformUI facade or <code>NULL</code> if none.
+   * PlatformUI facade or <code>StructuredSelection.EMPTY</code> if none.
    */
   public static IStructuredSelection getActiveSelection() {
     IWorkbenchPage page = getPage();
@@ -1239,7 +1242,7 @@ public class OwlUI {
       }
     }
 
-    return null;
+    return StructuredSelection.EMPTY;
   }
 
   /**
