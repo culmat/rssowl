@@ -399,7 +399,6 @@ public class CustomizeToolbarDialog extends Dialog {
       newItems.add(item);
     }
 
-    int selectionIndex = fItemViewer.getTable().getSelectionIndex();
     int[] selectionIndices = fItemViewer.getTable().getSelectionIndices();
     for (int i = 0; i < selectionIndices.length; i++) {
       int index = selectionIndices[i] - i;
@@ -412,8 +411,8 @@ public class CustomizeToolbarDialog extends Dialog {
 
     /* Update Selection */
     int tableItemCount = fItemViewer.getTable().getItemCount();
-    if (selectionIndex < tableItemCount)
-      fItemViewer.getTable().setSelection(selectionIndex);
+    if (selectionIndices.length > 0 && selectionIndices[0] < tableItemCount)
+      fItemViewer.getTable().setSelection(selectionIndices[0]);
     else if (tableItemCount > 0)
       fItemViewer.getTable().setSelection(tableItemCount - 1);
 

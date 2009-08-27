@@ -546,13 +546,6 @@ public class CoolBarAdvisor {
 
         /* Close Others */
       case CLOSE_OTHERS: {
-        IWorkbenchAction action = ActionFactory.CLOSE_OTHERS.create(fWindow);
-        action.run();
-        break;
-      }
-
-        /* Close All */
-      case CLOSE_ALL: {
         IWorkbenchPage page = fWindow.getActivePage();
         if (page != null) {
           IEditorReference[] refArray = page.getEditorReferences();
@@ -569,6 +562,13 @@ public class CoolBarAdvisor {
             page.closeEditors(otherEditors, true);
           }
         }
+        break;
+      }
+
+        /* Close All */
+      case CLOSE_ALL: {
+        IWorkbenchAction action = ActionFactory.CLOSE_ALL.create(fWindow);
+        action.run();
         break;
       }
 
