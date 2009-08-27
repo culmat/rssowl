@@ -119,7 +119,7 @@ public class CoolBarAdvisor {
     UPDATE_ALL(ReloadAllAction.ID, "Update All", null, OwlUI.getImageDescriptor("icons/elcl16/reload_all.gif"), 3),
 
     /** Stop */
-    STOP("org.rssowl.ui.StopUpdate", "Stop", null, OwlUI.getImageDescriptor("icons/etool16/stop.gif"), false, false, 3),
+    STOP("org.rssowl.ui.StopUpdate", "Stop", null, OwlUI.getImageDescriptor("icons/etool16/cancel.gif"), false, false, 3),
 
     /** Search */
     SEARCH(SearchNewsAction.ID, "Search", null, OwlUI.SEARCHMARK, 4),
