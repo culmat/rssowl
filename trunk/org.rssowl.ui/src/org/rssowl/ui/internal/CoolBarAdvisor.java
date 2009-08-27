@@ -65,6 +65,7 @@ import org.rssowl.ui.internal.actions.NewSearchMarkAction;
 import org.rssowl.ui.internal.actions.NewTypeDropdownAction;
 import org.rssowl.ui.internal.actions.RedoAction;
 import org.rssowl.ui.internal.actions.ReloadAllAction;
+import org.rssowl.ui.internal.actions.ReloadTypesAction;
 import org.rssowl.ui.internal.actions.SearchFeedsAction;
 import org.rssowl.ui.internal.actions.SearchNewsAction;
 import org.rssowl.ui.internal.actions.ShowActivityAction;
@@ -114,6 +115,9 @@ public class CoolBarAdvisor {
 
     /** Redo */
     REDO(RedoAction.ID, "Redo", null, OwlUI.getImageDescriptor("icons/elcl16/redo_edit.gif"), 2),
+
+    /** Update */
+    UPDATE(ReloadTypesAction.ID, "Update", null, OwlUI.getImageDescriptor("icons/elcl16/reload.gif"), 3),
 
     /** Update All */
     UPDATE_ALL(ReloadAllAction.ID, "Update All", null, OwlUI.getImageDescriptor("icons/elcl16/reload_all.gif"), 3),
@@ -450,6 +454,17 @@ public class CoolBarAdvisor {
         ReloadAllAction action = new ReloadAllAction();
         action.init(fWindow);
         action.run(null);
+        break;
+      }
+
+        /* Update */
+      case UPDATE: {
+        IStructuredSelection activeSelection = OwlUI.getActiveSelection();
+        if (activeSelection != null) {
+          ReloadTypesAction action = new ReloadTypesAction(activeSelection, fWindow.getShell());
+          action.run(null);
+        }
+
         break;
       }
 
