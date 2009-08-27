@@ -55,7 +55,7 @@ public class LabelNewsHandler extends AbstractHandler {
     IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
 
     /* Perform Action */
-    if (selection != null) {
+    if (selection != null && !selection.isEmpty()) {
       LabelAction action = new LabelAction(fLabel, selection);
       action.setChecked(true);
       action.run();

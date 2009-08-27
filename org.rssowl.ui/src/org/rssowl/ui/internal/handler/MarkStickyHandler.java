@@ -45,7 +45,7 @@ public class MarkStickyHandler extends AbstractHandler {
   public Object execute(ExecutionEvent event) {
     IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
 
-    if (selection != null)
+    if (selection != null && !selection.isEmpty())
       new MakeNewsStickyAction(selection).run();
 
     return null; //As per JavaDoc

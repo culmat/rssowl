@@ -45,7 +45,7 @@ public class MarkReadHandler extends AbstractHandler {
   public Object execute(ExecutionEvent event) {
     IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
 
-    if (selection != null)
+    if (selection != null && !selection.isEmpty())
       new MarkTypesReadAction(selection).run();
 
     return null;
