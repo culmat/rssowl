@@ -374,6 +374,17 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         manager.add(new Action("&Customize Toolbar...") {
           @Override
           public void run() {
+
+            /* Unhide Toolbar if hidden */
+            ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
+
+            boolean isToolBarVisible = preferences.getBoolean(DefaultPreferences.SHOW_TOOLBAR);
+            if (!isToolBarVisible) {
+              configurer.setToolBarVisible(true);
+              preferences.putBoolean(DefaultPreferences.SHOW_TOOLBAR, true);
+            }
+
+            /* Open Dialog to Customize Toolbar */
             CustomizeToolbarDialog dialog = new CustomizeToolbarDialog(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell());
             dialog.open();
             fCoolBarAdvisor.advise(true);
