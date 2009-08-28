@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IAction;
@@ -35,11 +36,18 @@ import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.resource.ResourceManager;
+import org.eclipse.jface.viewers.DecorationOverlayIcon;
+import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.window.IShellProvider;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionDelegate;
@@ -62,6 +70,7 @@ import org.rssowl.core.persist.IBookMark;
 import org.rssowl.core.persist.IFolder;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.ILabel;
+import org.rssowl.core.persist.IMark;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.persist.INewsBin;
 import org.rssowl.core.persist.INewsMark;
@@ -102,11 +111,15 @@ import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -126,6 +139,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
   /** End of the View Top Menu */
   public static final String M_VIEW_END = "viewEnd";
+
+  /* Local Resource Manager (lives across entire application life) */
+  private static ResourceManager fgResources = new LocalResourceManager(JFaceResources.getResources());
 
   private CoolBarAdvisor fCoolBarAdvisor;
   private IContributionItem fOpenWindowsItem;
@@ -821,7 +837,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     helpMenu.add(new Separator());
 
     /* Report Bugs */
-    helpMenu.add(new Action("&Report Bugs") {
+    helpMenu.add(new Action("&Report Problems") {
       @Override
       public void run() {
         BrowserUtils.openLinkExternal("http://dev.rssowl.org");
@@ -832,6 +848,31 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         return OwlUI.getImageDescriptor("icons/elcl16/bug.gif");
       }
     });
+
+    /* Export Log to File */
+    helpMenu.add(new Action("&Export Logfile...") {
+      @Override
+      public void run() {
+        FileDialog dialog = new FileDialog(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell(), SWT.SAVE);
+        dialog.setText("Export Logfile");
+        dialog.setFilterExtensions(new String[] { "*.log" });
+        dialog.setFileName("rssowl.log");
+        dialog.setOverwrite(true);
+
+        String file = dialog.open();
+        if (StringUtils.isSet(file)) {
+          try {
+            FileInputStream inS = new FileInputStream(Platform.getLogFileLocation().toFile());
+            FileOutputStream outS = new FileOutputStream(new File(file));
+            CoreUtils.copy(inS, outS);
+          } catch (FileNotFoundException e) {
+            Activator.getDefault().logError(e.getMessage(), e);
+          }
+        }
+      }
+    });
+
+    helpMenu.add(new Separator());
 
     /* Homepage */
     helpMenu.add(new Action("&Homepage") {
@@ -1204,7 +1245,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
       /* News Mark or Empty Folder */
       if (child instanceof INewsMark || (child instanceof IFolder && ((IFolder) child).getChildren().isEmpty())) {
-        Action action = new Action(child.getName()) {
+        String name = child.getName();
+        if (child instanceof INewsMark) {
+          int unreadNewsCount = (((INewsMark) child).getNewsCount(EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED)));
+          if (unreadNewsCount > 0)
+            name = name + " (" + unreadNewsCount + ")";
+        }
+
+        Action action = new Action(name) {
           @Override
           public void run() {
             if (child instanceof INewsMark)
@@ -1233,33 +1281,64 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
   }
 
   private static ImageDescriptor getImageDescriptor(IFolderChild child) {
+    boolean hasNewNews = false;
+    if (child instanceof INewsMark)
+      hasNewNews = (((INewsMark) child).getNewsCount(EnumSet.of(INews.State.NEW)) != 0);
+    else if (child instanceof IFolder)
+      hasNewNews = hasNewNews((IFolder) child);
 
     /* Bookmark */
     if (child instanceof IBookMark) {
       ImageDescriptor favicon = OwlUI.getFavicon((IBookMark) child);
-      return favicon != null ? favicon : OwlUI.BOOKMARK;
+      if (!hasNewNews)
+        return (favicon != null) ? favicon : OwlUI.BOOKMARK;
+
+      /* Overlay if News are *new* */
+      Image base = (favicon != null) ? OwlUI.getImage(fgResources, favicon) : OwlUI.getImage(fgResources, OwlUI.BOOKMARK);
+      DecorationOverlayIcon overlay = new DecorationOverlayIcon(base, OwlUI.getImageDescriptor("icons/ovr16/new.gif"), IDecoration.BOTTOM_RIGHT);
+      return overlay;
     }
 
     /* Saved Search */
     else if (child instanceof ISearchMark) {
-      ISearchMark search = (ISearchMark) child;
-      boolean containsNews = (search.getNewsCount(INews.State.getVisible()) != 0);
+      if (hasNewNews)
+        return OwlUI.SEARCHMARK_NEW;
+      else if (((INewsMark) child).getNewsCount(INews.State.getVisible()) != 0)
+        return OwlUI.SEARCHMARK;
 
-      return containsNews ? OwlUI.SEARCHMARK : OwlUI.SEARCHMARK_EMPTY;
+      return OwlUI.SEARCHMARK_EMPTY;
     }
 
     /* News Bin */
     else if (child instanceof INewsBin) {
-      INewsBin bin = (INewsBin) child;
-      boolean containsNews = (bin.getNewsCount(INews.State.getVisible()) != 0);
+      if (hasNewNews)
+        return OwlUI.NEWSBIN_NEW;
+      else if (((INewsMark) child).getNewsCount(INews.State.getVisible()) != 0)
+        return OwlUI.NEWSBIN;
 
-      return containsNews ? OwlUI.NEWSBIN : OwlUI.NEWSBIN_EMPTY;
+      return OwlUI.NEWSBIN_EMPTY;
     }
 
     /* Folder */
     else if (child instanceof IFolder)
-      return OwlUI.FOLDER;
+      return hasNewNews ? OwlUI.FOLDER_NEW : OwlUI.FOLDER;
 
     return null;
+  }
+
+  private static boolean hasNewNews(IFolder folder) {
+    List<IMark> marks = folder.getMarks();
+    for (IMark mark : marks) {
+      if (mark instanceof INewsMark && ((INewsMark) mark).getNewsCount(EnumSet.of(INews.State.NEW)) != 0)
+        return true;
+    }
+
+    List<IFolder> folders = folder.getFolders();
+    for (IFolder child : folders) {
+      if (hasNewNews(child))
+        return true;
+    }
+
+    return false;
   }
 }
