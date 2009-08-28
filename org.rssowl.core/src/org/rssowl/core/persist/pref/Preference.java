@@ -29,7 +29,7 @@ package org.rssowl.core.persist.pref;
  *
  * @author bpasero
  */
-public enum Preferences {
+public enum Preference {
 
   /** Global: Use Master Password to encrypt passwords to feeds */
   USE_MASTER_PASSWORD("org.rssowl.pref.UseMasterPassword", IPreferenceType.BOOLEAN),
@@ -393,11 +393,11 @@ public enum Preferences {
   private IPreferenceType fType;
   private IPreferenceScope.Kind fKind;
 
-  Preferences(String id, IPreferenceType type) {
+  Preference(String id, IPreferenceType type) {
     this(id, type, IPreferenceScope.Kind.GLOBAL);
   }
 
-  Preferences(String id, IPreferenceType type, IPreferenceScope.Kind kind) {
+  Preference(String id, IPreferenceType type, IPreferenceScope.Kind kind) {
     fId = id;
     fType = type;
     fKind = kind;

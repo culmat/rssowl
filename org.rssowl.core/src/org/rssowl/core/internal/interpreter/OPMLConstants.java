@@ -42,7 +42,7 @@ public class OPMLConstants {
   static final String SEPARATOR = ",";
 
   /* List of Elements to use for the XML */
-  enum Tags {
+  enum Tag {
 
     /** Standard OPML */
     OPML("opml"), OUTLINE("outline"), BODY("body"), HEAD("head"), TITLE("title"), DATE_MODIFIED("dateModified"),
@@ -54,7 +54,7 @@ public class OPMLConstants {
 
     private String fName;
 
-    Tags(String name) {
+    Tag(String name) {
       fName = name;
     }
 

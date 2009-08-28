@@ -26,7 +26,7 @@ package org.rssowl.ui.internal;
 
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.pref.IPreferencesInitializer;
-import org.rssowl.core.persist.pref.Preferences;
+import org.rssowl.core.persist.pref.Preference;
 import org.rssowl.ui.internal.actions.NavigationActionFactory.NavigationActionType;
 import org.rssowl.ui.internal.editors.feed.NewsColumn;
 
@@ -83,28 +83,28 @@ public class PreferencesInitializer implements IPreferencesInitializer {
    * @param defaultScope the container for preferences to fill.
    */
   protected void initGlobalDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putBoolean(Preferences.USE_OS_PASSWORD.id(), true);
-    defaultScope.putBoolean(Preferences.MARK_READ_ON_MINIMIZE.id(), false);
-    defaultScope.putBoolean(Preferences.MARK_READ_ON_CHANGE.id(), false);
-    defaultScope.putBoolean(Preferences.MARK_READ_ON_TAB_CLOSE.id(), false);
-    defaultScope.putBoolean(Preferences.DISABLE_JAVASCRIPT.id(), true);
-    defaultScope.putBoolean(Preferences.USE_DEFAULT_EXTERNAL_BROWSER.id(), true);
-    defaultScope.putBoolean(Preferences.TRAY_ON_MINIMIZE.id(), false);
-    defaultScope.putBoolean(Preferences.MARK_READ_STATE.id(), true);
-    defaultScope.putInteger(Preferences.MARK_READ_IN_MILLIS.id(), 0);
-    defaultScope.putBoolean(Preferences.BM_OPEN_SITE_FOR_EMPTY_NEWS.id(), false);
-    defaultScope.putBoolean(Preferences.FADE_NOTIFIER.id(), true);
-    defaultScope.putBoolean(Preferences.CLOSE_NOTIFIER_ON_OPEN.id(), true);
-    defaultScope.putInteger(Preferences.LIMIT_NOTIFICATION_SIZE.id(), 5);
-    defaultScope.putBoolean(Preferences.SHOW_NOTIFICATION_POPUP.id(), true);
-    defaultScope.putBoolean(Preferences.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED.id(), true);
-    defaultScope.putBoolean(Preferences.SEARCH_DIALOG_PREVIEW_VISIBLE.id(), true);
-    defaultScope.putInteger(Preferences.AUTOCLOSE_NOTIFICATION_VALUE.id(), 8);
-    defaultScope.putBoolean(Preferences.SHOW_TOOLBAR.id(), true);
-    defaultScope.putBoolean(Preferences.SHOW_STATUS.id(), true);
-    defaultScope.putBoolean(Preferences.BM_LOAD_TITLE_FROM_FEED.id(), true);
+    defaultScope.putBoolean(Preference.USE_OS_PASSWORD.id(), true);
+    defaultScope.putBoolean(Preference.MARK_READ_ON_MINIMIZE.id(), false);
+    defaultScope.putBoolean(Preference.MARK_READ_ON_CHANGE.id(), false);
+    defaultScope.putBoolean(Preference.MARK_READ_ON_TAB_CLOSE.id(), false);
+    defaultScope.putBoolean(Preference.DISABLE_JAVASCRIPT.id(), true);
+    defaultScope.putBoolean(Preference.USE_DEFAULT_EXTERNAL_BROWSER.id(), true);
+    defaultScope.putBoolean(Preference.TRAY_ON_MINIMIZE.id(), false);
+    defaultScope.putBoolean(Preference.MARK_READ_STATE.id(), true);
+    defaultScope.putInteger(Preference.MARK_READ_IN_MILLIS.id(), 0);
+    defaultScope.putBoolean(Preference.BM_OPEN_SITE_FOR_EMPTY_NEWS.id(), false);
+    defaultScope.putBoolean(Preference.FADE_NOTIFIER.id(), true);
+    defaultScope.putBoolean(Preference.CLOSE_NOTIFIER_ON_OPEN.id(), true);
+    defaultScope.putInteger(Preference.LIMIT_NOTIFICATION_SIZE.id(), 5);
+    defaultScope.putBoolean(Preference.SHOW_NOTIFICATION_POPUP.id(), true);
+    defaultScope.putBoolean(Preference.SHOW_NOTIFICATION_POPUP_ONLY_WHEN_MINIMIZED.id(), true);
+    defaultScope.putBoolean(Preference.SEARCH_DIALOG_PREVIEW_VISIBLE.id(), true);
+    defaultScope.putInteger(Preference.AUTOCLOSE_NOTIFICATION_VALUE.id(), 8);
+    defaultScope.putBoolean(Preference.SHOW_TOOLBAR.id(), true);
+    defaultScope.putBoolean(Preference.SHOW_STATUS.id(), true);
+    defaultScope.putBoolean(Preference.BM_LOAD_TITLE_FROM_FEED.id(), true);
 
-    defaultScope.putIntegers(Preferences.SEARCH_DIALOG_NEWS_COLUMNS.id(), new int[] {
+    defaultScope.putIntegers(Preference.SEARCH_DIALOG_NEWS_COLUMNS.id(), new int[] {
       NewsColumn.RELEVANCE.ordinal(),
       NewsColumn.TITLE.ordinal(),
       NewsColumn.FEED.ordinal(),
@@ -114,97 +114,97 @@ public class PreferencesInitializer implements IPreferencesInitializer {
       NewsColumn.STICKY.ordinal()
     });
 
-    defaultScope.putInteger(Preferences.SEARCH_DIALOG_NEWS_SORT_COLUMN.id(), NewsColumn.RELEVANCE.ordinal());
-    defaultScope.putBoolean(Preferences.SEARCH_DIALOG_NEWS_SORT_ASCENDING.id(), false);
+    defaultScope.putInteger(Preference.SEARCH_DIALOG_NEWS_SORT_COLUMN.id(), NewsColumn.RELEVANCE.ordinal());
+    defaultScope.putBoolean(Preference.SEARCH_DIALOG_NEWS_SORT_ASCENDING.id(), false);
 
-    defaultScope.putIntegers(Preferences.SHARE_PROVIDER_STATE.id(), new int[] { 1, 2, 3, 4, 5, 6, 7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, -19, -20, -21, -22 });
+    defaultScope.putIntegers(Preference.SHARE_PROVIDER_STATE.id(), new int[] { 1, 2, 3, 4, 5, 6, 7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, -19, -20, -21, -22 });
   }
 
   /**
    * @param defaultScope the container for preferences to fill.
    */
   protected void initGlobalEclipseDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putBoolean(Preferences.ECLIPSE_SINGLE_CLICK_OPEN.id(), true);
-    defaultScope.putBoolean(Preferences.ECLIPSE_RESTORE_TABS.id(), true);
-    defaultScope.putBoolean(Preferences.ECLIPSE_MULTIPLE_TABS.id(), true);
-    defaultScope.putInteger(Preferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD.id(), 5);
+    defaultScope.putBoolean(Preference.ECLIPSE_SINGLE_CLICK_OPEN.id(), true);
+    defaultScope.putBoolean(Preference.ECLIPSE_RESTORE_TABS.id(), true);
+    defaultScope.putBoolean(Preference.ECLIPSE_MULTIPLE_TABS.id(), true);
+    defaultScope.putInteger(Preference.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD.id(), 5);
   }
 
   /**
    * @param defaultScope the container for preferences to fill.
    */
   protected void initRetentionDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putBoolean(Preferences.DEL_NEWS_BY_COUNT_STATE.id(), true);
-    defaultScope.putInteger(Preferences.DEL_NEWS_BY_COUNT_VALUE.id(), 200);
-    defaultScope.putInteger(Preferences.DEL_NEWS_BY_AGE_VALUE.id(), 30);
+    defaultScope.putBoolean(Preference.DEL_NEWS_BY_COUNT_STATE.id(), true);
+    defaultScope.putInteger(Preference.DEL_NEWS_BY_COUNT_VALUE.id(), 200);
+    defaultScope.putInteger(Preference.DEL_NEWS_BY_AGE_VALUE.id(), 30);
   }
 
   /**
    * @param defaultScope the container for preferences to fill.
    */
   protected void initCleanUpDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putBoolean(Preferences.CLEAN_UP_BM_BY_LAST_UPDATE_STATE.id(), true);
-    defaultScope.putInteger(Preferences.CLEAN_UP_BM_BY_LAST_UPDATE_VALUE.id(), 30);
+    defaultScope.putBoolean(Preference.CLEAN_UP_BM_BY_LAST_UPDATE_STATE.id(), true);
+    defaultScope.putInteger(Preference.CLEAN_UP_BM_BY_LAST_UPDATE_VALUE.id(), 30);
 
-    defaultScope.putBoolean(Preferences.CLEAN_UP_BM_BY_LAST_VISIT_STATE.id(), true);
-    defaultScope.putInteger(Preferences.CLEAN_UP_BM_BY_LAST_VISIT_VALUE.id(), 30);
+    defaultScope.putBoolean(Preference.CLEAN_UP_BM_BY_LAST_VISIT_STATE.id(), true);
+    defaultScope.putInteger(Preference.CLEAN_UP_BM_BY_LAST_VISIT_VALUE.id(), 30);
 
-    defaultScope.putInteger(Preferences.CLEAN_UP_NEWS_BY_COUNT_VALUE.id(), 200);
-    defaultScope.putInteger(Preferences.CLEAN_UP_NEWS_BY_AGE_VALUE.id(), 30);
+    defaultScope.putInteger(Preference.CLEAN_UP_NEWS_BY_COUNT_VALUE.id(), 200);
+    defaultScope.putInteger(Preference.CLEAN_UP_NEWS_BY_AGE_VALUE.id(), 30);
 
-    defaultScope.putBoolean(Preferences.CLEAN_UP_REMINDER_STATE.id(), true);
-    defaultScope.putInteger(Preferences.CLEAN_UP_REMINDER_DAYS_VALUE.id(), 30);
+    defaultScope.putBoolean(Preference.CLEAN_UP_REMINDER_STATE.id(), true);
+    defaultScope.putInteger(Preference.CLEAN_UP_REMINDER_DAYS_VALUE.id(), 30);
   }
 
   /**
    * @param defaultScope the container for preferences to fill.
    */
   protected void initDisplayDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putInteger(Preferences.BM_NEWS_FILTERING.id(), -1);
-    defaultScope.putInteger(Preferences.BM_NEWS_GROUPING.id(), -1);
-    defaultScope.putBoolean(Preferences.BM_LOAD_IMAGES.id(), true);
+    defaultScope.putInteger(Preference.BM_NEWS_FILTERING.id(), -1);
+    defaultScope.putInteger(Preference.BM_NEWS_GROUPING.id(), -1);
+    defaultScope.putBoolean(Preference.BM_LOAD_IMAGES.id(), true);
   }
 
   /**
    * @param defaultScope the container for preferences to fill.
    */
   protected void initReloadOpenDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putBoolean(Preferences.BM_UPDATE_INTERVAL_STATE.id(), true);
-    defaultScope.putLong(Preferences.BM_UPDATE_INTERVAL.id(), 60 * 30); // 30 Minutes
-    defaultScope.putBoolean(Preferences.BM_OPEN_ON_STARTUP.id(), false);
-    defaultScope.putBoolean(Preferences.BM_RELOAD_ON_STARTUP.id(), false);
+    defaultScope.putBoolean(Preference.BM_UPDATE_INTERVAL_STATE.id(), true);
+    defaultScope.putLong(Preference.BM_UPDATE_INTERVAL.id(), 60 * 30); // 30 Minutes
+    defaultScope.putBoolean(Preference.BM_OPEN_ON_STARTUP.id(), false);
+    defaultScope.putBoolean(Preference.BM_RELOAD_ON_STARTUP.id(), false);
   }
 
   /**
    * @param defaultScope the container for preferences to fill.
    */
   protected void initNewsColumnsDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putIntegers(Preferences.BM_NEWS_COLUMNS.id(), new int[] {
+    defaultScope.putIntegers(Preference.BM_NEWS_COLUMNS.id(), new int[] {
       NewsColumn.TITLE.ordinal(),
       NewsColumn.DATE.ordinal(),
       NewsColumn.AUTHOR.ordinal(),
       NewsColumn.CATEGORY.ordinal(),
       NewsColumn.STICKY.ordinal()
     });
-    defaultScope.putInteger(Preferences.BM_NEWS_SORT_COLUMN.id(), NewsColumn.DATE.ordinal());
-    defaultScope.putBoolean(Preferences.BM_NEWS_SORT_ASCENDING.id(), false);
+    defaultScope.putInteger(Preference.BM_NEWS_SORT_COLUMN.id(), NewsColumn.DATE.ordinal());
+    defaultScope.putBoolean(Preference.BM_NEWS_SORT_ASCENDING.id(), false);
   }
 
   /**
    * @param defaultScope the container for preferences to fill.
    */
   protected void initBookMarkExplorerDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putBoolean(Preferences.BE_BEGIN_SEARCH_ON_TYPING.id(), true);
-    defaultScope.putBoolean(Preferences.BE_SORT_BY_NAME.id(), false);
+    defaultScope.putBoolean(Preference.BE_BEGIN_SEARCH_ON_TYPING.id(), true);
+    defaultScope.putBoolean(Preference.BE_SORT_BY_NAME.id(), false);
   }
 
   /**
    * @param defaultScope the container for preferences to fill.
    */
   protected void initFeedViewDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putBoolean(Preferences.FV_LAYOUT_CLASSIC.id(), true);
-    defaultScope.putIntegers(Preferences.FV_SASHFORM_WEIGHTS.id(), new int[] { 50, 50 });
-    defaultScope.putBoolean(Preferences.BM_OPEN_SITE_FOR_NEWS.id(), false);
+    defaultScope.putBoolean(Preference.FV_LAYOUT_CLASSIC.id(), true);
+    defaultScope.putIntegers(Preference.FV_SASHFORM_WEIGHTS.id(), new int[] { 50, 50 });
+    defaultScope.putBoolean(Preference.BM_OPEN_SITE_FOR_NEWS.id(), false);
   }
 
   /**
@@ -249,9 +249,9 @@ public class PreferencesInitializer implements IPreferencesInitializer {
     for(int i = 0; i < items.size(); i++)
       intArray[i] = items.get(i);
 
-    defaultScope.putIntegers(Preferences.TOOLBAR_ITEMS.id(), intArray);
-    defaultScope.putInteger(Preferences.TOOLBAR_MODE.id(), CoolBarAdvisor.CoolBarMode.IMAGE_TEXT.ordinal());
-    defaultScope.putInteger(Preferences.DEFAULT_NEXT_ACTION.id(), NavigationActionType.NEXT_UNREAD_NEWS.ordinal());
-    defaultScope.putInteger(Preferences.DEFAULT_PREVIOUS_ACTION.id(), NavigationActionType.PREVIOUS_UNREAD_NEWS.ordinal());
+    defaultScope.putIntegers(Preference.TOOLBAR_ITEMS.id(), intArray);
+    defaultScope.putInteger(Preference.TOOLBAR_MODE.id(), CoolBarAdvisor.CoolBarMode.IMAGE_TEXT.ordinal());
+    defaultScope.putInteger(Preference.DEFAULT_NEXT_ACTION.id(), NavigationActionType.NEXT_UNREAD_NEWS.ordinal());
+    defaultScope.putInteger(Preference.DEFAULT_PREVIOUS_ACTION.id(), NavigationActionType.PREVIOUS_UNREAD_NEWS.ordinal());
   }
 }
