@@ -79,8 +79,8 @@ import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.CoolBarAdvisor;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.CoolBarAdvisor.ToolBarItems;
-import org.rssowl.ui.internal.CoolBarAdvisor.ToolBarModes;
+import org.rssowl.ui.internal.CoolBarAdvisor.CoolBarItem;
+import org.rssowl.ui.internal.CoolBarAdvisor.CoolBarMode;
 import org.rssowl.ui.internal.util.CColumnLayoutData;
 import org.rssowl.ui.internal.util.CTable;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -113,9 +113,9 @@ public class CustomizeToolbarDialog extends Dialog {
 
   /* Used in the Toolbar Item Viewer to avoid equal conflict with Separator / Spacer */
   private static class ToolBarItem {
-    ToolBarItems item;
+    CoolBarItem item;
 
-    ToolBarItem(ToolBarItems theItem) {
+    ToolBarItem(CoolBarItem theItem) {
       item = theItem;
     }
   }
@@ -179,7 +179,7 @@ public class CustomizeToolbarDialog extends Dialog {
         int[] itemIds = fPreferences.getIntegers(DefaultPreferences.TOOLBAR_ITEMS);
         ToolBarItem[] items = new ToolBarItem[itemIds.length];
         for (int i = 0; i < itemIds.length; i++) {
-          items[i] = new ToolBarItem(ToolBarItems.values()[itemIds[i]]);
+          items[i] = new ToolBarItem(CoolBarItem.values()[itemIds[i]]);
         }
         return items;
       }
@@ -193,7 +193,7 @@ public class CustomizeToolbarDialog extends Dialog {
     fItemViewer.setLabelProvider(new CellLabelProvider() {
       @Override
       public void update(ViewerCell cell) {
-        ToolBarItems item = ((ToolBarItem) cell.getElement()).item;
+        CoolBarItem item = ((ToolBarItem) cell.getElement()).item;
         cell.setText(item.getName());
         if (item.getImg() != null)
           cell.setImage(fResources.createImage(item.getImg()));
@@ -297,15 +297,15 @@ public class CustomizeToolbarDialog extends Dialog {
 
         /* Fill not yet visible Items */
         int[] toolbarItemIds = fPreferences.getIntegers(DefaultPreferences.TOOLBAR_ITEMS);
-        List<ToolBarItems> visibleItems = new ArrayList<ToolBarItems>();
+        List<CoolBarItem> visibleItems = new ArrayList<CoolBarItem>();
         for (int toolbarItemId : toolbarItemIds) {
-          visibleItems.add(ToolBarItems.values()[toolbarItemId]);
+          visibleItems.add(CoolBarItem.values()[toolbarItemId]);
         }
 
-        ToolBarItems[] toolItems = ToolBarItems.values();
+        CoolBarItem[] toolItems = CoolBarItem.values();
         int currentGroup = -1;
-        for (final ToolBarItems toolItem : toolItems) {
-          if (!visibleItems.contains(toolItem) || toolItem == ToolBarItems.SEPARATOR || toolItem == ToolBarItems.SPACER) {
+        for (final CoolBarItem toolItem : toolItems) {
+          if (!visibleItems.contains(toolItem) || toolItem == CoolBarItem.SEPARATOR || toolItem == CoolBarItem.SPACER) {
 
             /* Divide Groups by Separators */
             if (currentGroup >= 0 && currentGroup != toolItem.getGroup())
@@ -415,8 +415,8 @@ public class CustomizeToolbarDialog extends Dialog {
     fModeViewer.setLabelProvider(new LabelProvider() {
       @Override
       public String getText(Object element) {
-        if (element instanceof ToolBarModes) {
-          switch ((ToolBarModes) element) {
+        if (element instanceof CoolBarMode) {
+          switch ((CoolBarMode) element) {
             case IMAGE:
               return "Icons";
             case TEXT:
@@ -433,13 +433,13 @@ public class CustomizeToolbarDialog extends Dialog {
     fModeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
         Object selection = ((IStructuredSelection) event.getSelection()).getFirstElement();
-        ToolBarModes mode = (ToolBarModes) selection;
+        CoolBarMode mode = (CoolBarMode) selection;
         fPreferences.putInteger(DefaultPreferences.TOOLBAR_MODE, mode.ordinal());
       }
     });
 
-    fModeViewer.setInput(CoolBarAdvisor.ToolBarModes.values());
-    fModeViewer.setSelection(new StructuredSelection(ToolBarModes.values()[fPreferences.getInteger(DefaultPreferences.TOOLBAR_MODE)]));
+    fModeViewer.setInput(CoolBarAdvisor.CoolBarMode.values());
+    fModeViewer.setSelection(new StructuredSelection(CoolBarMode.values()[fPreferences.getInteger(DefaultPreferences.TOOLBAR_MODE)]));
 
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -447,11 +447,11 @@ public class CustomizeToolbarDialog extends Dialog {
     return container;
   }
 
-  private void onAdd(ToolBarItems newItem) {
+  private void onAdd(CoolBarItem newItem) {
     int[] toolbarItemIds = fPreferences.getIntegers(DefaultPreferences.TOOLBAR_ITEMS);
-    List<ToolBarItems> newItems = new ArrayList<ToolBarItems>();
+    List<CoolBarItem> newItems = new ArrayList<CoolBarItem>();
     for (int toolbarItemId : toolbarItemIds) {
-      newItems.add(ToolBarItems.values()[toolbarItemId]);
+      newItems.add(CoolBarItem.values()[toolbarItemId]);
     }
 
     int selectionIndex = fItemViewer.getTable().getSelectionIndex();
@@ -480,9 +480,9 @@ public class CustomizeToolbarDialog extends Dialog {
 
   private void onRemove() {
     int[] toolbarItemIds = fPreferences.getIntegers(DefaultPreferences.TOOLBAR_ITEMS);
-    List<ToolBarItems> newItems = new ArrayList<ToolBarItems>();
+    List<CoolBarItem> newItems = new ArrayList<CoolBarItem>();
     for (int toolbarItemId : toolbarItemIds) {
-      newItems.add(ToolBarItems.values()[toolbarItemId]);
+      newItems.add(CoolBarItem.values()[toolbarItemId]);
     }
 
     int[] selectionIndices = fItemViewer.getTable().getSelectionIndices();
@@ -527,7 +527,7 @@ public class CustomizeToolbarDialog extends Dialog {
     fPreferences.putIntegers(DefaultPreferences.TOOLBAR_ITEMS, defaultItemsState);
     fPreferences.putInteger(DefaultPreferences.TOOLBAR_MODE, defaultMode);
     fItemViewer.refresh();
-    fModeViewer.setSelection(new StructuredSelection(ToolBarModes.values()[defaultMode]));
+    fModeViewer.setSelection(new StructuredSelection(CoolBarMode.values()[defaultMode]));
     updateButtonEnablement();
   }
 

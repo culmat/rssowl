@@ -501,7 +501,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     else if (NEXT_NEWS_HANDLER_ID.equals(id)) {
       NavigationActionFactory factory = new NavigationActionFactory();
       try {
-        factory.setInitializationData(null, null, NavigationActionFactory.NavigationActions.NEXT_FEED.getId());
+        factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.NEXT_FEED.getId());
         IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
         action.run(null);
       } catch (CoreException e) {
@@ -513,7 +513,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     else if (NEXT_UNREAD_NEWS_HANDLER_ID.equals(id)) {
       NavigationActionFactory factory = new NavigationActionFactory();
       try {
-        factory.setInitializationData(null, null, NavigationActionFactory.NavigationActions.NEXT_UNREAD_FEED.getId());
+        factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.NEXT_UNREAD_FEED.getId());
         IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
         action.run(null);
       } catch (CoreException e) {
@@ -525,7 +525,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     else if (PREVIOUS_NEWS_HANDLER_ID.equals(id)) {
       NavigationActionFactory factory = new NavigationActionFactory();
       try {
-        factory.setInitializationData(null, null, NavigationActionFactory.NavigationActions.PREVIOUS_FEED.getId());
+        factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.PREVIOUS_FEED.getId());
         IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
         action.run(null);
       } catch (CoreException e) {
@@ -537,7 +537,7 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
     else if (PREVIOUS_UNREAD_NEWS_HANDLER_ID.equals(id)) {
       NavigationActionFactory factory = new NavigationActionFactory();
       try {
-        factory.setInitializationData(null, null, NavigationActionFactory.NavigationActions.PREVIOUS_UNREAD_FEED.getId());
+        factory.setInitializationData(null, null, NavigationActionFactory.NavigationActionType.PREVIOUS_UNREAD_FEED.getId());
         IWorkbenchWindowActionDelegate action = (IWorkbenchWindowActionDelegate) factory.create();
         action.run(null);
       } catch (CoreException e) {
