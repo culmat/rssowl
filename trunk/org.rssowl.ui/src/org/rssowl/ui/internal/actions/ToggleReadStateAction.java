@@ -55,6 +55,7 @@ public class ToggleReadStateAction extends Action implements IWorkbenchWindowAct
   /** Action ID */
   public static final String ID = "org.rssowl.ui.ToggleReadState";
 
+  /* Unread States (New, Unread, Updated) */
   private static final EnumSet<INews.State> STATES = EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED);
 
   private IStructuredSelection fSelection;
