@@ -76,6 +76,7 @@ import org.rssowl.ui.internal.actions.NewFolderAction;
 import org.rssowl.ui.internal.actions.NewNewsBinAction;
 import org.rssowl.ui.internal.actions.NewSearchMarkAction;
 import org.rssowl.ui.internal.actions.NewTypeDropdownAction;
+import org.rssowl.ui.internal.actions.OpenInBrowserAction;
 import org.rssowl.ui.internal.actions.RedoAction;
 import org.rssowl.ui.internal.actions.ReloadAllAction;
 import org.rssowl.ui.internal.actions.ReloadTypesAction;
@@ -86,15 +87,14 @@ import org.rssowl.ui.internal.actions.ToggleReadStateAction;
 import org.rssowl.ui.internal.actions.UndoAction;
 import org.rssowl.ui.internal.actions.NavigationActionFactory.Actions;
 import org.rssowl.ui.internal.actions.NavigationActionFactory.NavigationAction;
+import org.rssowl.ui.internal.editors.browser.WebBrowserContext;
 import org.rssowl.ui.internal.editors.feed.FeedView;
 import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The {@link CoolBarAdvisor} is responsibe to fill the application tool bar
@@ -113,7 +113,6 @@ public class CoolBarAdvisor {
   private final IWorkbenchWindow fWindow;
   private final ICoolBarManager fManager;
   private IPreferenceScope fPreferences;
-  private Map<String, Item> fMapIdToItem;
   private IBindingService fBindingService = (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
 
   /** A List of Possible Items */
@@ -169,6 +168,9 @@ public class CoolBarAdvisor {
 
     /** Previous Unread News */
     PREVIOUS("org.rssowl.ui.Previous", "Previous", null, OwlUI.getImageDescriptor("icons/etool16/previous.gif"), true, false, 7),
+
+    /** Open News */
+    OPEN(OpenInBrowserAction.ID, "Open", "Open News", OwlUI.getImageDescriptor("icons/elcl16/browser.gif"), 8),
 
     /** Move To */
     MOVE("org.rssowl.ui.Move", "Move", "Move News", OwlUI.getImageDescriptor("icons/etool16/move_to.gif"), true, false, 8),
@@ -317,14 +319,16 @@ public class CoolBarAdvisor {
 
     @Override
     public void widgetSelected(SelectionEvent e) {
-      Object data = e.widget.getData();
-      if (data instanceof Actions) {
-        Actions actionType = (Actions) data;
-        NavigationAction action = new NavigationAction(actionType);
-        action.init(fWindow);
-        action.run(null);
+      if (((MenuItem) e.widget).getSelection()) {
+        Object data = e.widget.getData();
+        if (data instanceof Actions) {
+          Actions actionType = (Actions) data;
+          NavigationAction action = new NavigationAction(actionType);
+          action.init(fWindow);
+          action.run(null);
 
-        fPreferences.putInteger(fIsNext ? DefaultPreferences.DEFAULT_NEXT_ACTION : DefaultPreferences.DEFAULT_PREVIOUS_ACTION, actionType.ordinal());
+          fPreferences.putInteger(fIsNext ? DefaultPreferences.DEFAULT_NEXT_ACTION : DefaultPreferences.DEFAULT_PREVIOUS_ACTION, actionType.ordinal());
+        }
       }
     }
   }
@@ -337,12 +341,6 @@ public class CoolBarAdvisor {
     fManager = manager;
     fWindow = window;
     fPreferences = Owl.getPreferenceService().getGlobalScope();
-    fMapIdToItem = new HashMap<String, Item>();
-
-    Item[] items = Item.values();
-    for (Item item : items) {
-      fMapIdToItem.put(item.getId(), item);
-    }
   }
 
   /** Fill the Coolbar */
@@ -376,10 +374,13 @@ public class CoolBarAdvisor {
       Mode mode = Mode.values()[fPreferences.getInteger(DefaultPreferences.TOOLBAR_MODE)];
 
       /* Load and Add Items */
-      String[] items = fPreferences.getStrings(DefaultPreferences.TOOLBAR_ITEMS);
+      int[] items = fPreferences.getIntegers(DefaultPreferences.TOOLBAR_ITEMS);
+      if (items == null || items.length == 0)
+        items = new int[] { Item.SPACER.ordinal() };
+
       ToolBarManager currentToolBar = new ToolBarManager(SWT.FLAT);
-      for (String id : items) {
-        Item item = fMapIdToItem.get(id);
+      for (int id : items) {
+        Item item = Item.values()[id];
         if (item != null) {
 
           /* Separator: Start a new Toolbar */
@@ -402,7 +403,7 @@ public class CoolBarAdvisor {
           /* Any other Item */
           else {
             ActionContributionItem contribItem = new ActionContributionItem(getAction(item, mode, currentToolBar));
-            contribItem.setId(id);
+            contribItem.setId(item.getId());
             if (mode == Mode.IMAGE_TEXT)
               contribItem.setMode(ActionContributionItem.MODE_FORCE_TEXT);
             currentToolBar.add(contribItem);
@@ -542,7 +543,7 @@ public class CoolBarAdvisor {
         if (selection != null && !selection.isEmpty()) {
           ToggleReadStateAction action = new ToggleReadStateAction(selection);
           action.init(fWindow);
-          action.run(null);
+          action.run();
         }
         break;
       }
@@ -633,6 +634,17 @@ public class CoolBarAdvisor {
       case CLOSE_ALL: {
         IWorkbenchAction action = ActionFactory.CLOSE_ALL.create(fWindow);
         action.run();
+        break;
+      }
+
+        /* Open */
+      case OPEN: {
+        IStructuredSelection selection = OwlUI.getActiveFeedViewSelection();
+        FeedView feedView = OwlUI.getActiveFeedView();
+        if (selection != null && !selection.isEmpty() && feedView != null) {
+          OpenInBrowserAction action = new OpenInBrowserAction(selection, WebBrowserContext.createFrom(selection, feedView));
+          action.run();
+        }
         break;
       }
 
