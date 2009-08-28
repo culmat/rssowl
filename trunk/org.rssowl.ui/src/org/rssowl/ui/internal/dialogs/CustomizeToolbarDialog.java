@@ -29,9 +29,12 @@ import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.util.LocalSelectionTransfer;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -41,7 +44,13 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSourceAdapter;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.MenuEvent;
@@ -64,6 +73,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
@@ -77,10 +87,7 @@ import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.CColumnLayoutData.Size;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * The {@link CustomizeToolbarDialog} allows to manage the Items appearing in
@@ -98,12 +105,20 @@ public class CustomizeToolbarDialog extends Dialog {
   private TableViewer fItemViewer;
   private ComboViewer fModeViewer;
   private IPreferenceScope fPreferences;
-  private Map<String, Item> fMapIdToItem;
   private Button fAddButton;
   private Button fRemoveButton;
   private Button fMoveUpButton;
   private Button fMoveDownButton;
   private Button fRestoreDefaults;
+
+  /* Used in the Toolbar Item Viewer to avoid equal conflict with Separator / Spacer */
+  private static class ToolBarItem {
+    Item item;
+
+    ToolBarItem(Item theItem) {
+      item = theItem;
+    }
+  }
 
   /**
    * @param parentShell
@@ -113,13 +128,6 @@ public class CustomizeToolbarDialog extends Dialog {
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fFirstTimeOpen = (Activator.getDefault().getDialogSettings().getSection(DIALOG_SETTINGS_KEY) == null);
     fPreferences = Owl.getPreferenceService().getGlobalScope();
-
-    fMapIdToItem = new HashMap<String, Item>();
-
-    Item[] items = Item.values();
-    for (Item item : items) {
-      fMapIdToItem.put(item.getId(), item);
-    }
   }
 
   /*
@@ -168,7 +176,12 @@ public class CustomizeToolbarDialog extends Dialog {
     /* ContentProvider returns all selected Items */
     fItemViewer.setContentProvider(new IStructuredContentProvider() {
       public Object[] getElements(Object inputElement) {
-        return fPreferences.getStrings(DefaultPreferences.TOOLBAR_ITEMS);
+        int[] itemIds = fPreferences.getIntegers(DefaultPreferences.TOOLBAR_ITEMS);
+        ToolBarItem[] items = new ToolBarItem[itemIds.length];
+        for (int i = 0; i < itemIds.length; i++) {
+          items[i] = new ToolBarItem(Item.values()[itemIds[i]]);
+        }
+        return items;
       }
 
       public void dispose() {}
@@ -180,9 +193,7 @@ public class CustomizeToolbarDialog extends Dialog {
     fItemViewer.setLabelProvider(new CellLabelProvider() {
       @Override
       public void update(ViewerCell cell) {
-        String itemId = (String) cell.getElement();
-        Item item = fMapIdToItem.get(itemId);
-
+        Item item = ((ToolBarItem) cell.getElement()).item;
         cell.setText(item.getName());
         if (item.getImg() != null)
           cell.setImage(fResources.createImage(item.getImg()));
@@ -205,6 +216,68 @@ public class CustomizeToolbarDialog extends Dialog {
       }
     });
 
+    /* Drag Support */
+    fItemViewer.addDragSupport(DND.DROP_MOVE, new Transfer[] { LocalSelectionTransfer.getTransfer() }, new DragSourceAdapter() {
+      @Override
+      public void dragStart(final DragSourceEvent event) {
+        SafeRunnable.run(new LoggingSafeRunnable() {
+          public void run() throws Exception {
+            IStructuredSelection selection = (IStructuredSelection) fItemViewer.getSelection();
+            event.doit = (selection.size() == 1);
+
+            if (event.doit) {
+              LocalSelectionTransfer.getTransfer().setSelection(selection);
+              LocalSelectionTransfer.getTransfer().setSelectionSetTime(event.time & 0xFFFFFFFFL);
+            };
+          }
+        });
+      }
+
+      @Override
+      public void dragSetData(final DragSourceEvent event) {
+        SafeRunnable.run(new LoggingSafeRunnable() {
+          public void run() throws Exception {
+            if (LocalSelectionTransfer.getTransfer().isSupportedType(event.dataType))
+              event.data = LocalSelectionTransfer.getTransfer().getSelection();
+          }
+        });
+      }
+
+      @Override
+      public void dragFinished(DragSourceEvent event) {
+        SafeRunnable.run(new LoggingSafeRunnable() {
+          public void run() throws Exception {
+            LocalSelectionTransfer.getTransfer().setSelection(null);
+            LocalSelectionTransfer.getTransfer().setSelectionSetTime(0);
+          }
+        });
+      }
+    });
+
+    /* Drop Support */
+    ViewerDropAdapter dropSupport = new ViewerDropAdapter(fItemViewer) {
+
+      @Override
+      public boolean validateDrop(Object target, int operation, TransferData transferType) {
+        return true;
+      }
+
+      @Override
+      public boolean performDrop(Object data) {
+        ToolBarItem target = (ToolBarItem) getCurrentTarget();
+        if (target != null) {
+          onMove((ToolBarItem) ((StructuredSelection) data).getFirstElement(), target, getCurrentLocation());
+          return true;
+        }
+
+        return false;
+      }
+    };
+    dropSupport.setFeedbackEnabled(true);
+    dropSupport.setScrollEnabled(true);
+    dropSupport.setSelectionFeedbackEnabled(true);
+    fItemViewer.addDropSupport(DND.DROP_MOVE, new Transfer[] { LocalSelectionTransfer.getTransfer() }, dropSupport);
+
     /* Set Dummy Input */
     fItemViewer.setInput(this);
 
@@ -223,11 +296,16 @@ public class CustomizeToolbarDialog extends Dialog {
         }
 
         /* Fill not yet visible Items */
-        List<String> visibleItems = Arrays.asList(fPreferences.getStrings(DefaultPreferences.TOOLBAR_ITEMS));
+        int[] toolbarItemIds = fPreferences.getIntegers(DefaultPreferences.TOOLBAR_ITEMS);
+        List<Item> visibleItems = new ArrayList<Item>();
+        for (int toolbarItemId : toolbarItemIds) {
+          visibleItems.add(Item.values()[toolbarItemId]);
+        }
+
         Item[] toolItems = Item.values();
         int currentGroup = -1;
         for (final Item toolItem : toolItems) {
-          if (!visibleItems.contains(toolItem.getId()) || toolItem == Item.SEPARATOR || toolItem == Item.SPACER) {
+          if (!visibleItems.contains(toolItem) || toolItem == Item.SEPARATOR || toolItem == Item.SPACER) {
 
             /* Divide Groups by Separators */
             if (currentGroup >= 0 && currentGroup != toolItem.getGroup())
@@ -370,20 +448,24 @@ public class CustomizeToolbarDialog extends Dialog {
   }
 
   private void onAdd(Item newItem) {
-    String[] items = fPreferences.getStrings(DefaultPreferences.TOOLBAR_ITEMS);
-    List<String> newItems = new ArrayList<String>();
-    for (String item : items) {
-      newItems.add(item);
+    int[] toolbarItemIds = fPreferences.getIntegers(DefaultPreferences.TOOLBAR_ITEMS);
+    List<Item> newItems = new ArrayList<Item>();
+    for (int toolbarItemId : toolbarItemIds) {
+      newItems.add(Item.values()[toolbarItemId]);
     }
 
     int selectionIndex = fItemViewer.getTable().getSelectionIndex();
     if (selectionIndex >= 0)
-      newItems.add(selectionIndex + 1, newItem.getId());
+      newItems.add(selectionIndex + 1, newItem);
     else
-      newItems.add(newItem.getId());
+      newItems.add(newItem);
 
     /* Save & Refresh */
-    fPreferences.putStrings(DefaultPreferences.TOOLBAR_ITEMS, newItems.toArray(new String[newItems.size()]));
+    int[] newItemsRaw = new int[newItems.size()];
+    for (int i = 0; i < newItems.size(); i++)
+      newItemsRaw[i] = newItems.get(i).ordinal();
+
+    fPreferences.putIntegers(DefaultPreferences.TOOLBAR_ITEMS, newItemsRaw);
     fItemViewer.refresh();
 
     /* Update Selection */
@@ -397,10 +479,10 @@ public class CustomizeToolbarDialog extends Dialog {
   }
 
   private void onRemove() {
-    String[] items = fPreferences.getStrings(DefaultPreferences.TOOLBAR_ITEMS);
-    List<String> newItems = new ArrayList<String>();
-    for (String item : items) {
-      newItems.add(item);
+    int[] toolbarItemIds = fPreferences.getIntegers(DefaultPreferences.TOOLBAR_ITEMS);
+    List<Item> newItems = new ArrayList<Item>();
+    for (int toolbarItemId : toolbarItemIds) {
+      newItems.add(Item.values()[toolbarItemId]);
     }
 
     int[] selectionIndices = fItemViewer.getTable().getSelectionIndices();
@@ -410,7 +492,11 @@ public class CustomizeToolbarDialog extends Dialog {
     }
 
     /* Save & Refresh */
-    fPreferences.putStrings(DefaultPreferences.TOOLBAR_ITEMS, newItems.toArray(new String[newItems.size()]));
+    int[] newItemsRaw = new int[newItems.size()];
+    for (int i = 0; i < newItems.size(); i++)
+      newItemsRaw[i] = newItems.get(i).ordinal();
+
+    fPreferences.putIntegers(DefaultPreferences.TOOLBAR_ITEMS, newItemsRaw);
     fItemViewer.refresh();
 
     /* Update Selection */
@@ -435,10 +521,10 @@ public class CustomizeToolbarDialog extends Dialog {
 
   private void onRestoreDefaults() {
     IPreferenceScope defaultScope = Owl.getPreferenceService().getDefaultScope();
-    String[] defaultItemsState = defaultScope.getStrings(DefaultPreferences.TOOLBAR_ITEMS);
+    int[] defaultItemsState = defaultScope.getIntegers(DefaultPreferences.TOOLBAR_ITEMS);
     int defaultMode = defaultScope.getInteger(DefaultPreferences.TOOLBAR_MODE);
 
-    fPreferences.putStrings(DefaultPreferences.TOOLBAR_ITEMS, defaultItemsState);
+    fPreferences.putIntegers(DefaultPreferences.TOOLBAR_ITEMS, defaultItemsState);
     fPreferences.putInteger(DefaultPreferences.TOOLBAR_MODE, defaultMode);
     fItemViewer.refresh();
     fModeViewer.setSelection(new StructuredSelection(Mode.values()[defaultMode]));
@@ -462,34 +548,75 @@ public class CustomizeToolbarDialog extends Dialog {
     fRemoveButton.setEnabled(!fItemViewer.getSelection().isEmpty());
   }
 
-  private void onMove(boolean up) {
-    TableItem[] items = fItemViewer.getTable().getItems();
-    List<String> sortedItemIds = new ArrayList<String>(items.length);
-    for (TableItem item : items) {
-      sortedItemIds.add((String) item.getData());
+  private void onMove(ToolBarItem source, ToolBarItem destination, int location) {
+
+    /* Find Source and Destination Index */
+    int sourceIndex = -1;
+    int destinationIndex = -1;
+    TableItem[] tableItems = fItemViewer.getTable().getItems();
+    for (int i = 0; i < tableItems.length; i++) {
+      if (source.equals(tableItems[i].getData()))
+        sourceIndex = i;
+      else if (destination.equals(tableItems[i].getData()))
+        destinationIndex = i;
     }
 
-    String[] order = fPreferences.getStrings(DefaultPreferences.TOOLBAR_ITEMS);
+    /* Return if Invalid */
+    if (sourceIndex == -1 || destinationIndex == -1)
+      return;
+
+    /* Remember Selection */
+    ISelection selection = fItemViewer.getSelection();
+
+    /* Determine Location */
+    int newLocation = (sourceIndex < destinationIndex) ? destinationIndex : destinationIndex + 1;
+    if (location == ViewerDropAdapter.LOCATION_BEFORE)
+      newLocation--;
+
+    /* Move using Viewer Api */
+    fItemViewer.remove(source);
+    fItemViewer.insert(source, newLocation);
+
+    /* Save */
+    tableItems = fItemViewer.getTable().getItems();
+    int[] items = new int[tableItems.length];
+    for (int i = 0; i < tableItems.length; i++) {
+      items[i] = ((ToolBarItem) tableItems[i].getData()).item.ordinal();
+    }
+
+    fPreferences.putIntegers(DefaultPreferences.TOOLBAR_ITEMS, items);
+
+    /* Restore Selection */
+    fItemViewer.setSelection(selection);
+
+    /* Update Buttons */
+    updateButtonEnablement();
+  }
+
+  private void onMove(boolean up) {
+    TableItem[] items = fItemViewer.getTable().getItems();
+
+    int[] toolbarItemIds = fPreferences.getIntegers(DefaultPreferences.TOOLBAR_ITEMS);
     int selectedIndex = fItemViewer.getTable().getSelectionIndex();
 
     /* Move Up */
     if (up && selectedIndex > 0) {
-      String order1 = order[selectedIndex];
-      String order2 = order[selectedIndex - 1];
-      order[selectedIndex] = order2;
-      order[selectedIndex - 1] = order1;
+      int order1 = toolbarItemIds[selectedIndex];
+      int order2 = toolbarItemIds[selectedIndex - 1];
+      toolbarItemIds[selectedIndex] = order2;
+      toolbarItemIds[selectedIndex - 1] = order1;
     }
 
     /* Move Down */
-    else if (!up && selectedIndex < sortedItemIds.size() - 1) {
-      String order1 = order[selectedIndex];
-      String order2 = order[selectedIndex + 1];
-      order[selectedIndex] = order2;
-      order[selectedIndex + 1] = order1;
+    else if (!up && selectedIndex < items.length - 1) {
+      int order1 = toolbarItemIds[selectedIndex];
+      int order2 = toolbarItemIds[selectedIndex + 1];
+      toolbarItemIds[selectedIndex] = order2;
+      toolbarItemIds[selectedIndex + 1] = order1;
     }
 
     /* Save & Refresh */
-    fPreferences.putStrings(DefaultPreferences.TOOLBAR_ITEMS, order);
+    fPreferences.putIntegers(DefaultPreferences.TOOLBAR_ITEMS, toolbarItemIds);
     fItemViewer.refresh();
 
     /* Update Selection */
