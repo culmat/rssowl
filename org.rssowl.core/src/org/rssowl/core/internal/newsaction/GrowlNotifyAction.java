@@ -99,11 +99,13 @@ public class GrowlNotifyAction implements INewsAction {
       commands.add(APPLICATION_NAME);
       commands.add("-a");
       commands.add(APPLICATION_NAME);
+      commands.add("-t");
+      commands.add(news.size() + " Incoming News");
       commands.add("-m");
 
       StringBuilder message = new StringBuilder();
       for (INews item : news) {
-        message.append(CoreUtils.getHeadline(item, true)).append(SEPARATOR);
+        message.append(CoreUtils.getHeadline(item, true)).append(SEPARATOR).append(SEPARATOR);
       }
 
       commands.add(message.toString());
