@@ -114,12 +114,6 @@
       </protocolHandler>
    </extension>
    <extension
-         point="org.rssowl.core.PreferencesInitializer">
-      <preferencesInitializer
-            class="org.rssowl.core.persist.pref.DefaultPreferencesInitializer">
-      </preferencesInitializer>
-   </extension>
-   <extension
          point="org.rssowl.core.DAOService">
       <daoservice
             class="org.rssowl.core.internal.persist.dao.DAOServiceImpl">
