@@ -30,6 +30,7 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.INews;
 import org.rssowl.core.util.BatchedBuffer;
 import org.rssowl.core.util.CoreUtils;
+import org.rssowl.core.util.DateUtils;
 import org.rssowl.core.util.StreamGobbler;
 import org.rssowl.core.util.StringUtils;
 
@@ -39,8 +40,11 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * An implementation of {@link INewsAction} to show matching news in Growl. This
@@ -54,7 +58,7 @@ public class GrowlNotifyAction implements INewsAction {
   private static final int BATCH_INTERVAL = 5000;
 
   /* Max number of items to show per Notification */
-  private static final int MAX_ITEMS_TO_SHOW = 3;
+  private static final int MAX_ITEMS_TO_SHOW = 5;
 
   private static final String APPLICATION_NAME = "RSSOwl";
   private static final String SEPARATOR = System.getProperty("line.separator");
@@ -106,9 +110,24 @@ public class GrowlNotifyAction implements INewsAction {
       commands.add(news.size() + " Incoming News");
       commands.add("-m");
 
+      /* Sort News by Date */
+      Set<INews> sortedNews = new TreeSet<INews>(new Comparator<INews>() {
+        public int compare(INews news1, INews news2) {
+          Date date1 = DateUtils.getRecentDate(news1);
+          Date date2 = DateUtils.getRecentDate(news2);
+
+          int res = date2.compareTo(date1);
+          if (res != 0)
+            return res;
+
+          return -1;
+        }
+      });
+      sortedNews.addAll(news);
+
       int i = 0;
       StringBuilder message = new StringBuilder();
-      for (INews item : news) {
+      for (INews item : sortedNews) {
         if (++i > MAX_ITEMS_TO_SHOW)
           break;
 
