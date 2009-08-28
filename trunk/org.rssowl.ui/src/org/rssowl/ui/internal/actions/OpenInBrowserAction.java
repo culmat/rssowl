@@ -52,7 +52,9 @@ import java.util.List;
  * @author bpasero
  */
 public class OpenInBrowserAction extends Action implements IWorkbenchWindowActionDelegate {
-  private static final String ID = "org.rssowl.ui.OpenInBrowserAction";
+
+  /** Action ID */
+  public static final String ID = "org.rssowl.ui.OpenInBrowserAction";
 
   private IStructuredSelection fSelection;
   private WebBrowserContext fContext;
