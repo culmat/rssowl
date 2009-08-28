@@ -54,12 +54,12 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
 
   /** Actual Action for the Navigation */
   public static class NavigationAction implements IWorkbenchWindowActionDelegate {
-    private final NavigationActions fType;
+    private final NavigationActionType fType;
 
     /**
      * @param type the type of Navigation.
      */
-    public NavigationAction(NavigationActions type) {
+    public NavigationAction(NavigationActionType type) {
       fType = type;
     }
 
@@ -70,7 +70,7 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
     public void run(IAction action) {
 
       /* Tab Navigation */
-      if (fType == NavigationActions.NEXT_TAB || fType == NavigationActions.PREVIOUS_TAB) {
+      if (fType == NavigationActionType.NEXT_TAB || fType == NavigationActionType.PREVIOUS_TAB) {
         navigateInTabs();
       }
 
@@ -118,11 +118,11 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
       IEditorPart tab = null;
 
       /* Next Tab */
-      if (fType == NavigationActions.NEXT_TAB)
+      if (fType == NavigationActionType.NEXT_TAB)
         tab = editors.get(index + 1 < editors.size() ? index + 1 : 0).getEditor(true);
 
       /* Previous Tab */
-      else if (fType == NavigationActions.PREVIOUS_TAB)
+      else if (fType == NavigationActionType.PREVIOUS_TAB)
         tab = editors.get(index - 1 >= 0 ? index - 1 : editors.size() - 1).getEditor(true);
 
       /* Activate */
@@ -181,7 +181,7 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
   }
 
   /** Enumeration with all possible types of NavigationAction */
-  public enum NavigationActions {
+  public enum NavigationActionType {
 
     /** Action: Go to the next News */
     NEXT_NEWS("nextNews", "org.rssowl.ui.NextNews", true, true, false),
@@ -219,7 +219,7 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
     boolean fIsUnread;
     String fCommandId;
 
-    NavigationActions(String id, String commandId, boolean isNewsScoped, boolean isNext, boolean isUnread) {
+    NavigationActionType(String id, String commandId, boolean isNewsScoped, boolean isNext, boolean isUnread) {
       fId = id;
       fCommandId = commandId;
       fIsNewsScoped = isNewsScoped;
@@ -261,35 +261,35 @@ public class NavigationActionFactory implements IExecutableExtensionFactory, IEx
    * @see org.eclipse.core.runtime.IExecutableExtensionFactory#create()
    */
   public Object create() {
-    if (NavigationActions.NEXT_NEWS.getId().equals(fId))
-      return new NavigationAction(NavigationActions.NEXT_NEWS);
+    if (NavigationActionType.NEXT_NEWS.getId().equals(fId))
+      return new NavigationAction(NavigationActionType.NEXT_NEWS);
 
-    if (NavigationActions.NEXT_UNREAD_NEWS.getId().equals(fId))
-      return new NavigationAction(NavigationActions.NEXT_UNREAD_NEWS);
+    if (NavigationActionType.NEXT_UNREAD_NEWS.getId().equals(fId))
+      return new NavigationAction(NavigationActionType.NEXT_UNREAD_NEWS);
 
-    if (NavigationActions.NEXT_FEED.getId().equals(fId))
-      return new NavigationAction(NavigationActions.NEXT_FEED);
+    if (NavigationActionType.NEXT_FEED.getId().equals(fId))
+      return new NavigationAction(NavigationActionType.NEXT_FEED);
 
-    if (NavigationActions.NEXT_UNREAD_FEED.getId().equals(fId))
-      return new NavigationAction(NavigationActions.NEXT_UNREAD_FEED);
+    if (NavigationActionType.NEXT_UNREAD_FEED.getId().equals(fId))
+      return new NavigationAction(NavigationActionType.NEXT_UNREAD_FEED);
 
-    if (NavigationActions.PREVIOUS_NEWS.getId().equals(fId))
-      return new NavigationAction(NavigationActions.PREVIOUS_NEWS);
+    if (NavigationActionType.PREVIOUS_NEWS.getId().equals(fId))
+      return new NavigationAction(NavigationActionType.PREVIOUS_NEWS);
 
-    if (NavigationActions.PREVIOUS_UNREAD_NEWS.getId().equals(fId))
-      return new NavigationAction(NavigationActions.PREVIOUS_UNREAD_NEWS);
+    if (NavigationActionType.PREVIOUS_UNREAD_NEWS.getId().equals(fId))
+      return new NavigationAction(NavigationActionType.PREVIOUS_UNREAD_NEWS);
 
-    if (NavigationActions.PREVIOUS_FEED.getId().equals(fId))
-      return new NavigationAction(NavigationActions.PREVIOUS_FEED);
+    if (NavigationActionType.PREVIOUS_FEED.getId().equals(fId))
+      return new NavigationAction(NavigationActionType.PREVIOUS_FEED);
 
-    if (NavigationActions.PREVIOUS_UNREAD_FEED.getId().equals(fId))
-      return new NavigationAction(NavigationActions.PREVIOUS_UNREAD_FEED);
+    if (NavigationActionType.PREVIOUS_UNREAD_FEED.getId().equals(fId))
+      return new NavigationAction(NavigationActionType.PREVIOUS_UNREAD_FEED);
 
-    if (NavigationActions.NEXT_TAB.getId().equals(fId))
-      return new NavigationAction(NavigationActions.NEXT_TAB);
+    if (NavigationActionType.NEXT_TAB.getId().equals(fId))
+      return new NavigationAction(NavigationActionType.NEXT_TAB);
 
-    if (NavigationActions.PREVIOUS_TAB.getId().equals(fId))
-      return new NavigationAction(NavigationActions.PREVIOUS_TAB);
+    if (NavigationActionType.PREVIOUS_TAB.getId().equals(fId))
+      return new NavigationAction(NavigationActionType.PREVIOUS_TAB);
 
     return null;
   }

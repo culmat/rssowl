@@ -36,7 +36,7 @@ import org.rssowl.core.persist.reference.NewsReference;
 public class PerformAfterInputSet {
 
   /** Enum of actions that can be performed automatically after input set */
-  enum Types {
+  enum Kind {
 
     /** Select the first News that is visible */
     SELECT_FIRST_NEWS,
@@ -49,10 +49,10 @@ public class PerformAfterInputSet {
   }
 
   /** Select the first News in the FeedView */
-  public static final PerformAfterInputSet SELECT_FIRST_NEWS = new PerformAfterInputSet(PerformAfterInputSet.Types.SELECT_FIRST_NEWS);
+  public static final PerformAfterInputSet SELECT_FIRST_NEWS = new PerformAfterInputSet(PerformAfterInputSet.Kind.SELECT_FIRST_NEWS);
 
   /** Select the first unread News in the FeedView */
-  public static final PerformAfterInputSet SELECT_UNREAD_NEWS = new PerformAfterInputSet(PerformAfterInputSet.Types.SELECT_UNREAD_NEWS);
+  public static final PerformAfterInputSet SELECT_UNREAD_NEWS = new PerformAfterInputSet(PerformAfterInputSet.Kind.SELECT_UNREAD_NEWS);
 
   /**
    * Creates a new <code>PerformAfterInputSet</code> that will select the
@@ -65,23 +65,23 @@ public class PerformAfterInputSet {
   public static PerformAfterInputSet selectNews(NewsReference reference) {
     Assert.isNotNull(reference);
 
-    return new PerformAfterInputSet(PerformAfterInputSet.Types.SELECT_SPECIFIC_NEWS, reference);
+    return new PerformAfterInputSet(PerformAfterInputSet.Kind.SELECT_SPECIFIC_NEWS, reference);
   }
 
-  private final PerformAfterInputSet.Types fType;
+  private final PerformAfterInputSet.Kind fType;
   private final NewsReference fNewsToSelect;
   private boolean fShouldActivate = true;
 
-  private PerformAfterInputSet(PerformAfterInputSet.Types type) {
+  private PerformAfterInputSet(PerformAfterInputSet.Kind type) {
     this(type, null);
   }
 
-  private PerformAfterInputSet(PerformAfterInputSet.Types type, NewsReference newsToSelect) {
+  private PerformAfterInputSet(PerformAfterInputSet.Kind type, NewsReference newsToSelect) {
     fType = type;
     fNewsToSelect = newsToSelect;
   }
 
-  PerformAfterInputSet.Types getType() {
+  PerformAfterInputSet.Kind getType() {
     return fType;
   }
 

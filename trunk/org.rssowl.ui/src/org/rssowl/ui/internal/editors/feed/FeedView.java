@@ -1228,15 +1228,15 @@ public class FeedView extends EditorPart implements IReusableEditor {
     if (perform != null) {
 
       /* Select first News */
-      if (perform.getType() == PerformAfterInputSet.Types.SELECT_FIRST_NEWS)
+      if (perform.getType() == PerformAfterInputSet.Kind.SELECT_FIRST_NEWS)
         navigate(false, false, true, false);
 
       /* Select first unread News */
-      else if (perform.getType() == PerformAfterInputSet.Types.SELECT_UNREAD_NEWS)
+      else if (perform.getType() == PerformAfterInputSet.Kind.SELECT_UNREAD_NEWS)
         navigate(false, true, true, true);
 
       /* Select specific News */
-      else if (perform.getType() == PerformAfterInputSet.Types.SELECT_SPECIFIC_NEWS)
+      else if (perform.getType() == PerformAfterInputSet.Kind.SELECT_SPECIFIC_NEWS)
         setSelection(new StructuredSelection(perform.getNewsToSelect()));
 
       /* Make sure to activate this FeedView in case of an action */

@@ -27,7 +27,7 @@ package org.rssowl.ui.internal;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.pref.IPreferencesInitializer;
 import org.rssowl.core.persist.pref.Preferences;
-import org.rssowl.ui.internal.actions.NavigationActionFactory.NavigationActions;
+import org.rssowl.ui.internal.actions.NavigationActionFactory.NavigationActionType;
 import org.rssowl.ui.internal.editors.feed.NewsColumn;
 
 import java.util.ArrayList;
@@ -214,44 +214,44 @@ public class PreferencesInitializer implements IPreferencesInitializer {
     List<Integer> items = new ArrayList<Integer>();
 
     /* New | Import | Export */
-    items.add(CoolBarAdvisor.ToolBarItems.NEW.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.NEW.ordinal());
 
     /* Undo | Redo */
-    items.add(CoolBarAdvisor.ToolBarItems.SEPARATOR.ordinal());
-    items.add(CoolBarAdvisor.ToolBarItems.UNDO.ordinal());
-    items.add(CoolBarAdvisor.ToolBarItems.REDO.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.SEPARATOR.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.UNDO.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.REDO.ordinal());
 
     /* Update | Update All */
-    items.add(CoolBarAdvisor.ToolBarItems.SEPARATOR.ordinal());
-    items.add(CoolBarAdvisor.ToolBarItems.UPDATE.ordinal());
-    items.add(CoolBarAdvisor.ToolBarItems.UPDATE_ALL.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.SEPARATOR.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.UPDATE.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.UPDATE_ALL.ordinal());
 
     /* Search */
-    items.add(CoolBarAdvisor.ToolBarItems.SEPARATOR.ordinal());
-    items.add(CoolBarAdvisor.ToolBarItems.SEARCH.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.SEPARATOR.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.SEARCH.ordinal());
 
     /* Mark Read | Mark All Read */
-    items.add(CoolBarAdvisor.ToolBarItems.SEPARATOR.ordinal());
-    items.add(CoolBarAdvisor.ToolBarItems.MARK_READ.ordinal());
-    items.add(CoolBarAdvisor.ToolBarItems.MARK_ALL_READ.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.SEPARATOR.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.MARK_READ.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.MARK_ALL_READ.ordinal());
 
     /* Label | Sticky */
-    items.add(CoolBarAdvisor.ToolBarItems.SEPARATOR.ordinal());
-    items.add(CoolBarAdvisor.ToolBarItems.LABEL.ordinal());
-    items.add(CoolBarAdvisor.ToolBarItems.STICKY.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.SEPARATOR.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.LABEL.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.STICKY.ordinal());
 
     /* Next | Previous */
-    items.add(CoolBarAdvisor.ToolBarItems.SEPARATOR.ordinal());
-    items.add(CoolBarAdvisor.ToolBarItems.NEXT.ordinal());
-    items.add(CoolBarAdvisor.ToolBarItems.PREVIOUS.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.SEPARATOR.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.NEXT.ordinal());
+    items.add(CoolBarAdvisor.CoolBarItem.PREVIOUS.ordinal());
 
     int[] intArray= new int[items.size()];
     for(int i = 0; i < items.size(); i++)
       intArray[i] = items.get(i);
 
     defaultScope.putIntegers(Preferences.TOOLBAR_ITEMS.id(), intArray);
-    defaultScope.putInteger(Preferences.TOOLBAR_MODE.id(), CoolBarAdvisor.ToolBarModes.IMAGE_TEXT.ordinal());
-    defaultScope.putInteger(Preferences.DEFAULT_NEXT_ACTION.id(), NavigationActions.NEXT_UNREAD_NEWS.ordinal());
-    defaultScope.putInteger(Preferences.DEFAULT_PREVIOUS_ACTION.id(), NavigationActions.PREVIOUS_UNREAD_NEWS.ordinal());
+    defaultScope.putInteger(Preferences.TOOLBAR_MODE.id(), CoolBarAdvisor.CoolBarMode.IMAGE_TEXT.ordinal());
+    defaultScope.putInteger(Preferences.DEFAULT_NEXT_ACTION.id(), NavigationActionType.NEXT_UNREAD_NEWS.ordinal());
+    defaultScope.putInteger(Preferences.DEFAULT_PREVIOUS_ACTION.id(), NavigationActionType.PREVIOUS_UNREAD_NEWS.ordinal());
   }
 }
