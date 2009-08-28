@@ -60,7 +60,7 @@ import org.rssowl.core.persist.dao.IFolderDAO;
 import org.rssowl.core.persist.dao.ILabelDAO;
 import org.rssowl.core.persist.dao.INewsBinDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
-import org.rssowl.core.persist.pref.Preferences;
+import org.rssowl.core.persist.pref.Preference;
 import org.rssowl.core.persist.reference.FeedLinkReference;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.DateUtils;
@@ -202,34 +202,34 @@ public class ImportExportOPMLTest {
     IPreferenceScope globalPreferences = Owl.getPreferenceService().getGlobalScope();
     IPreferenceScope eclipsePreferences = Owl.getPreferenceService().getGlobalScope();
 
-    globalPreferences.putBoolean(Preferences.MARK_READ_ON_TAB_CLOSE.id(), true);
-    globalPreferences.putInteger(Preferences.MARK_READ_IN_MILLIS.id(), 5);
-    globalPreferences.putIntegers(Preferences.BM_NEWS_COLUMNS.id(), new int[] { -1, 0, 1, 2, 3 });
-    globalPreferences.putLong(Preferences.BM_UPDATE_INTERVAL.id(), 8);
-    globalPreferences.putLong(Preferences.NM_SELECTED_NEWS.id(), 100);
-    globalPreferences.putString(Preferences.CUSTOM_BROWSER_PATH.id(), "hello world");
-    globalPreferences.putStrings(Preferences.DISABLE_JAVASCRIPT_EXCEPTIONS.id(), new String[] { "hello", "world", "foo", "bar" });
+    globalPreferences.putBoolean(Preference.MARK_READ_ON_TAB_CLOSE.id(), true);
+    globalPreferences.putInteger(Preference.MARK_READ_IN_MILLIS.id(), 5);
+    globalPreferences.putIntegers(Preference.BM_NEWS_COLUMNS.id(), new int[] { -1, 0, 1, 2, 3 });
+    globalPreferences.putLong(Preference.BM_UPDATE_INTERVAL.id(), 8);
+    globalPreferences.putLong(Preference.NM_SELECTED_NEWS.id(), 100);
+    globalPreferences.putString(Preference.CUSTOM_BROWSER_PATH.id(), "hello world");
+    globalPreferences.putStrings(Preference.DISABLE_JAVASCRIPT_EXCEPTIONS.id(), new String[] { "hello", "world", "foo", "bar" });
 
-    eclipsePreferences.putBoolean(Preferences.ECLIPSE_SINGLE_CLICK_OPEN.id(), true);
-    eclipsePreferences.putInteger(Preferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD.id(), 5);
-    eclipsePreferences.putString(Preferences.ECLIPSE_PROXY_HOST_HTTP.id(), "");
+    eclipsePreferences.putBoolean(Preference.ECLIPSE_SINGLE_CLICK_OPEN.id(), true);
+    eclipsePreferences.putInteger(Preference.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD.id(), 5);
+    eclipsePreferences.putString(Preference.ECLIPSE_PROXY_HOST_HTTP.id(), "");
   }
 
   private void assertPreferences() {
     IPreferenceScope globalPreferences = new GlobalScope(Owl.getPreferenceService().getDefaultScope());
     IPreferenceScope eclipsePreferences = Owl.getPreferenceService().getGlobalScope();
 
-    assertEquals(true, globalPreferences.getBoolean(Preferences.MARK_READ_ON_TAB_CLOSE.id()));
-    assertEquals(5, globalPreferences.getInteger(Preferences.MARK_READ_IN_MILLIS.id()));
-    assertTrue(Arrays.equals(new int[] { -1, 0, 1, 2, 3 }, globalPreferences.getIntegers(Preferences.BM_NEWS_COLUMNS.id())));
-    assertEquals(8, globalPreferences.getLong(Preferences.BM_UPDATE_INTERVAL.id()));
-    assertTrue(globalPreferences.getLong(Preferences.NM_SELECTED_NEWS.id()) != 100);
-    assertEquals("hello world", globalPreferences.getString(Preferences.CUSTOM_BROWSER_PATH.id()));
-    assertTrue(Arrays.equals(new String[] { "hello", "world", "foo", "bar" }, globalPreferences.getStrings(Preferences.DISABLE_JAVASCRIPT_EXCEPTIONS.id())));
+    assertEquals(true, globalPreferences.getBoolean(Preference.MARK_READ_ON_TAB_CLOSE.id()));
+    assertEquals(5, globalPreferences.getInteger(Preference.MARK_READ_IN_MILLIS.id()));
+    assertTrue(Arrays.equals(new int[] { -1, 0, 1, 2, 3 }, globalPreferences.getIntegers(Preference.BM_NEWS_COLUMNS.id())));
+    assertEquals(8, globalPreferences.getLong(Preference.BM_UPDATE_INTERVAL.id()));
+    assertTrue(globalPreferences.getLong(Preference.NM_SELECTED_NEWS.id()) != 100);
+    assertEquals("hello world", globalPreferences.getString(Preference.CUSTOM_BROWSER_PATH.id()));
+    assertTrue(Arrays.equals(new String[] { "hello", "world", "foo", "bar" }, globalPreferences.getStrings(Preference.DISABLE_JAVASCRIPT_EXCEPTIONS.id())));
 
-    assertEquals(true, eclipsePreferences.getBoolean(Preferences.ECLIPSE_SINGLE_CLICK_OPEN.id()));
-    assertEquals(5, eclipsePreferences.getInteger(Preferences.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD.id()));
-    assertEquals("", eclipsePreferences.getString(Preferences.ECLIPSE_PROXY_HOST_HTTP.id()));
+    assertEquals(true, eclipsePreferences.getBoolean(Preference.ECLIPSE_SINGLE_CLICK_OPEN.id()));
+    assertEquals(5, eclipsePreferences.getInteger(Preference.ECLIPSE_AUTOCLOSE_TABS_THRESHOLD.id()));
+    assertEquals("", eclipsePreferences.getString(Preference.ECLIPSE_PROXY_HOST_HTTP.id()));
   }
 
   private void fillFilters() {

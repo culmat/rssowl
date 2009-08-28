@@ -33,7 +33,7 @@ import org.jdom.output.XMLOutputter;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.internal.interpreter.OPMLConstants.Attributes;
-import org.rssowl.core.internal.interpreter.OPMLConstants.Tags;
+import org.rssowl.core.internal.interpreter.OPMLConstants.Tag;
 import org.rssowl.core.interpreter.ITypeExporter;
 import org.rssowl.core.interpreter.InterpreterException;
 import org.rssowl.core.persist.IBookMark;
@@ -50,7 +50,7 @@ import org.rssowl.core.persist.ISearchMark;
 import org.rssowl.core.persist.dao.DynamicDAO;
 import org.rssowl.core.persist.pref.IPreferenceScope;
 import org.rssowl.core.persist.pref.IPreferenceType;
-import org.rssowl.core.persist.pref.Preferences;
+import org.rssowl.core.persist.pref.Preference;
 import org.rssowl.core.persist.pref.IPreferenceScope.Kind;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.StringUtils;
@@ -93,25 +93,25 @@ public class OPMLExporter implements ITypeExporter {
     DateFormat dateFormat = DateFormat.getDateInstance();
 
     Document document = new Document();
-    Element root = new Element(Tags.OPML.get());
+    Element root = new Element(Tag.OPML.get());
     root.setAttribute(Attributes.VERSION.get(), "1.1");
     root.addNamespaceDeclaration(RSSOWL_NS);
     document.setRootElement(root);
 
     /* Head */
-    Element head = new Element(Tags.HEAD.get());
+    Element head = new Element(Tag.HEAD.get());
     root.addContent(head);
 
-    Element title = new Element(Tags.TITLE.get());
+    Element title = new Element(Tag.TITLE.get());
     title.setText("RSSOwl Subscriptions");
     head.addContent(title);
 
-    Element dateModified = new Element(Tags.DATE_MODIFIED.get());
+    Element dateModified = new Element(Tag.DATE_MODIFIED.get());
     dateModified.setText(new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z").format(new Date()));
     head.addContent(dateModified);
 
     /* Body */
-    Element body = new Element(Tags.BODY.get());
+    Element body = new Element(Tag.BODY.get());
     root.addContent(body);
 
     boolean exportPreferences = (options != null && options.contains(Options.EXPORT_PREFERENCES));
@@ -210,7 +210,7 @@ public class OPMLExporter implements ITypeExporter {
   }
 
   private Element createElement(IFolder folder, boolean exportPreferences) {
-    Element folderElement = new Element(Tags.OUTLINE.get());
+    Element folderElement = new Element(Tag.OUTLINE.get());
     folderElement.setAttribute(Attributes.TEXT.get(), folder.getName());
     folderElement.setAttribute(Attributes.IS_SET.get(), String.valueOf(folder.getParent() == null), RSSOWL_NS);
     folderElement.setAttribute(Attributes.ID.get(), String.valueOf(folder.getId()), RSSOWL_NS);
@@ -244,7 +244,7 @@ public class OPMLExporter implements ITypeExporter {
           String value = getValueAsString(entry.getValue());
 
           if (value != null) {
-            Element prefElement = new Element(Tags.PREFERENCE.get(), RSSOWL_NS);
+            Element prefElement = new Element(Tag.PREFERENCE.get(), RSSOWL_NS);
             prefElement.setAttribute(Attributes.ID.get(), entry.getKey());
             prefElement.setAttribute(Attributes.VALUE.get(), value);
             prefElement.setAttribute(Attributes.TYPE.get(), String.valueOf(IPreferenceType.getType(entry.getValue()).ordinal()));
@@ -315,7 +315,7 @@ public class OPMLExporter implements ITypeExporter {
     if (mark instanceof IBookMark) {
       String link = ((IBookMark) mark).getFeedLinkReference().getLinkAsText();
 
-      element = new Element(Tags.OUTLINE.get());
+      element = new Element(Tag.OUTLINE.get());
       element.setAttribute(Attributes.TEXT.get(), name);
       element.setAttribute(Attributes.XML_URL.get(), link);
       element.setAttribute(Attributes.ID.get(), String.valueOf(mark.getId()), RSSOWL_NS);
@@ -327,14 +327,14 @@ public class OPMLExporter implements ITypeExporter {
       ISearchMark searchMark = (ISearchMark) mark;
       List<ISearchCondition> conditions = searchMark.getSearchConditions();
 
-      element = new Element(Tags.SAVED_SEARCH.get(), RSSOWL_NS);
+      element = new Element(Tag.SAVED_SEARCH.get(), RSSOWL_NS);
       element.setAttribute(Attributes.NAME.get(), name);
       element.setAttribute(Attributes.MATCH_ALL_CONDITIONS.get(), String.valueOf(searchMark.matchAllConditions()));
       element.setAttribute(Attributes.ID.get(), String.valueOf(mark.getId()), RSSOWL_NS);
       mapFolderToElement.get(mark.getParent()).addContent(element);
 
       for (ISearchCondition condition : conditions) {
-        Element conditionElement = new Element(Tags.SEARCH_CONDITION.get(), RSSOWL_NS);
+        Element conditionElement = new Element(Tag.SEARCH_CONDITION.get(), RSSOWL_NS);
         element.addContent(conditionElement);
 
         if (condition.getValue() != null)
@@ -344,7 +344,7 @@ public class OPMLExporter implements ITypeExporter {
 
     /* Export Newsbin */
     else if (mark instanceof INewsBin) {
-      element = new Element(Tags.BIN.get(), RSSOWL_NS);
+      element = new Element(Tag.BIN.get(), RSSOWL_NS);
       element.setAttribute(Attributes.NAME.get(), name);
       element.setAttribute(Attributes.ID.get(), String.valueOf(mark.getId()), RSSOWL_NS);
       mapFolderToElement.get(mark.getParent()).addContent(element);
@@ -363,7 +363,7 @@ public class OPMLExporter implements ITypeExporter {
       boolean isEnabled = filter.isEnabled();
       boolean matchAllNews = filter.matchAllNews();
 
-      Element filterElement = new Element(Tags.FILTER.get(), RSSOWL_NS);
+      Element filterElement = new Element(Tag.FILTER.get(), RSSOWL_NS);
       filterElement.setAttribute(Attributes.NAME.get(), name);
       filterElement.setAttribute(Attributes.ORDER.get(), String.valueOf(order));
       filterElement.setAttribute(Attributes.ENABLED.get(), String.valueOf(isEnabled));
@@ -375,12 +375,12 @@ public class OPMLExporter implements ITypeExporter {
       if (search != null) {
         List<ISearchCondition> conditions = search.getSearchConditions();
 
-        Element searchElement = new Element(Tags.SEARCH.get(), RSSOWL_NS);
+        Element searchElement = new Element(Tag.SEARCH.get(), RSSOWL_NS);
         searchElement.setAttribute(Attributes.MATCH_ALL_CONDITIONS.get(), String.valueOf(search.matchAllConditions()));
         filterElement.addContent(searchElement);
 
         for (ISearchCondition condition : conditions) {
-          Element conditionElement = new Element(Tags.SEARCH_CONDITION.get(), RSSOWL_NS);
+          Element conditionElement = new Element(Tag.SEARCH_CONDITION.get(), RSSOWL_NS);
           searchElement.addContent(conditionElement);
 
           if (condition.getValue() != null)
@@ -394,7 +394,7 @@ public class OPMLExporter implements ITypeExporter {
         String actionId = action.getActionId();
         String data = toString(action.getData());
 
-        Element actionElement = new Element(Tags.ACTION.get(), RSSOWL_NS);
+        Element actionElement = new Element(Tag.ACTION.get(), RSSOWL_NS);
         actionElement.setAttribute(Attributes.ID.get(), actionId);
         if (data != null)
           actionElement.setAttribute(Attributes.DATA.get(), data);
@@ -407,7 +407,7 @@ public class OPMLExporter implements ITypeExporter {
   private void fillElement(Element conditionElement, ISearchCondition condition, DateFormat df) {
 
     /* Search Specifier */
-    Element searchSpecifier = new Element(Tags.SPECIFIER.get(), RSSOWL_NS);
+    Element searchSpecifier = new Element(Tag.SPECIFIER.get(), RSSOWL_NS);
     searchSpecifier.setAttribute(Attributes.ID.get(), String.valueOf(condition.getSpecifier().ordinal()));
     conditionElement.addContent(searchSpecifier);
 
@@ -415,7 +415,7 @@ public class OPMLExporter implements ITypeExporter {
     if (condition.getValue() instanceof Long[][]) {
       List<IFolderChild> locations = CoreUtils.toEntities((Long[][]) condition.getValue());
 
-      Element searchValue = new Element(Tags.SEARCH_VALUE.get(), RSSOWL_NS);
+      Element searchValue = new Element(Tag.SEARCH_VALUE.get(), RSSOWL_NS);
       searchValue.setAttribute(Attributes.TYPE.get(), String.valueOf(condition.getField().getSearchValueType().getId()));
       conditionElement.addContent(searchValue);
 
@@ -423,7 +423,7 @@ public class OPMLExporter implements ITypeExporter {
         boolean isFolder = (child instanceof IFolder);
         boolean isNewsbin = (child instanceof INewsBin);
 
-        Element location = new Element(Tags.LOCATION.get(), RSSOWL_NS);
+        Element location = new Element(Tag.LOCATION.get(), RSSOWL_NS);
         location.setAttribute(Attributes.IS_BIN.get(), String.valueOf(isNewsbin));
         location.setAttribute(Attributes.IS_FOLDER.get(), String.valueOf(isFolder));
         location.setAttribute(Attributes.VALUE.get(), String.valueOf(child.getId()));
@@ -433,7 +433,7 @@ public class OPMLExporter implements ITypeExporter {
 
     /* Single Value */
     else if (!EnumSet.class.isAssignableFrom(condition.getValue().getClass())) {
-      Element searchValue = new Element(Tags.SEARCH_VALUE.get(), RSSOWL_NS);
+      Element searchValue = new Element(Tag.SEARCH_VALUE.get(), RSSOWL_NS);
       searchValue.setAttribute(Attributes.TYPE.get(), String.valueOf(condition.getField().getSearchValueType().getId()));
       searchValue.setAttribute(Attributes.VALUE.get(), getValueString(df, condition));
       conditionElement.addContent(searchValue);
@@ -443,19 +443,19 @@ public class OPMLExporter implements ITypeExporter {
     else {
       EnumSet<?> values = ((EnumSet<?>) condition.getValue());
 
-      Element searchValue = new Element(Tags.SEARCH_VALUE.get(), RSSOWL_NS);
+      Element searchValue = new Element(Tag.SEARCH_VALUE.get(), RSSOWL_NS);
       searchValue.setAttribute(Attributes.TYPE.get(), String.valueOf(condition.getField().getSearchValueType().getId()));
       conditionElement.addContent(searchValue);
 
       for (Enum<?> enumValue : values) {
-        Element state = new Element(Tags.STATE.get(), RSSOWL_NS);
+        Element state = new Element(Tag.STATE.get(), RSSOWL_NS);
         state.setAttribute(Attributes.VALUE.get(), String.valueOf(enumValue.ordinal()));
         searchValue.addContent(state);
       }
     }
 
     /* Search Field */
-    Element field = new Element(Tags.SEARCH_FIELD.get(), RSSOWL_NS);
+    Element field = new Element(Tag.SEARCH_FIELD.get(), RSSOWL_NS);
     field.setAttribute(Attributes.ID.get(), String.valueOf(condition.getField().getId()));
     field.setAttribute(Attributes.ENTITY.get(), condition.getField().getEntityName());
     conditionElement.addContent(field);
@@ -502,7 +502,7 @@ public class OPMLExporter implements ITypeExporter {
       String color = label.getColor();
       int order = label.getOrder();
 
-      Element labelElement = new Element(Tags.LABEL.get(), RSSOWL_NS);
+      Element labelElement = new Element(Tag.LABEL.get(), RSSOWL_NS);
       labelElement.setAttribute(Attributes.ID.get(), String.valueOf(id));
       labelElement.setAttribute(Attributes.NAME.get(), name);
       labelElement.setAttribute(Attributes.ORDER.get(), String.valueOf(order));
@@ -516,14 +516,14 @@ public class OPMLExporter implements ITypeExporter {
     IPreferenceScope globalPreferences = Owl.getPreferenceService().getGlobalScope();
     IPreferenceScope eclipsePreferences = Owl.getPreferenceService().getEclipseScope();
 
-    Preferences[] preferences = Preferences.values();
-    for (Preferences preference : preferences) {
+    Preference[] preferences = Preference.values();
+    for (Preference preference : preferences) {
       if (preference.getKind() == Kind.ENTITY)
         continue;
 
       String value = getValueAsString(preference, globalPreferences, eclipsePreferences);
       if (value != null) {
-        Element prefElement = new Element(Tags.PREFERENCE.get(), RSSOWL_NS);
+        Element prefElement = new Element(Tag.PREFERENCE.get(), RSSOWL_NS);
         prefElement.setAttribute(Attributes.ID.get(), preference.id());
         prefElement.setAttribute(Attributes.VALUE.get(), value);
         prefElement.setAttribute(Attributes.TYPE.get(), String.valueOf(preference.getType().ordinal()));
@@ -533,7 +533,7 @@ public class OPMLExporter implements ITypeExporter {
     }
   }
 
-  private String getValueAsString(Preferences preference, IPreferenceScope global, IPreferenceScope eclipse) {
+  private String getValueAsString(Preference preference, IPreferenceScope global, IPreferenceScope eclipse) {
     IPreferenceScope actualScope = (preference.getKind() == Kind.GLOBAL) ? global : eclipse;
     String id = preference.id();
 
