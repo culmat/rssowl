@@ -79,8 +79,8 @@ import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.CoolBarAdvisor;
 import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.CoolBarAdvisor.Item;
-import org.rssowl.ui.internal.CoolBarAdvisor.Mode;
+import org.rssowl.ui.internal.CoolBarAdvisor.ToolBarItems;
+import org.rssowl.ui.internal.CoolBarAdvisor.ToolBarModes;
 import org.rssowl.ui.internal.util.CColumnLayoutData;
 import org.rssowl.ui.internal.util.CTable;
 import org.rssowl.ui.internal.util.LayoutUtils;
@@ -113,9 +113,9 @@ public class CustomizeToolbarDialog extends Dialog {
 
   /* Used in the Toolbar Item Viewer to avoid equal conflict with Separator / Spacer */
   private static class ToolBarItem {
-    Item item;
+    ToolBarItems item;
 
-    ToolBarItem(Item theItem) {
+    ToolBarItem(ToolBarItems theItem) {
       item = theItem;
     }
   }
@@ -179,7 +179,7 @@ public class CustomizeToolbarDialog extends Dialog {
         int[] itemIds = fPreferences.getIntegers(DefaultPreferences.TOOLBAR_ITEMS);
         ToolBarItem[] items = new ToolBarItem[itemIds.length];
         for (int i = 0; i < itemIds.length; i++) {
-          items[i] = new ToolBarItem(Item.values()[itemIds[i]]);
+          items[i] = new ToolBarItem(ToolBarItems.values()[itemIds[i]]);
         }
         return items;
       }
@@ -193,7 +193,7 @@ public class CustomizeToolbarDialog extends Dialog {
     fItemViewer.setLabelProvider(new CellLabelProvider() {
       @Override
       public void update(ViewerCell cell) {
-        Item item = ((ToolBarItem) cell.getElement()).item;
+        ToolBarItems item = ((ToolBarItem) cell.getElement()).item;
         cell.setText(item.getName());
         if (item.getImg() != null)
           cell.setImage(fResources.createImage(item.getImg()));
@@ -297,15 +297,15 @@ public class CustomizeToolbarDialog extends Dialog {
 
         /* Fill not yet visible Items */
         int[] toolbarItemIds = fPreferences.getIntegers(DefaultPreferences.TOOLBAR_ITEMS);
-        List<Item> visibleItems = new ArrayList<Item>();
+        List<ToolBarItems> visibleItems = new ArrayList<ToolBarItems>();
         for (int toolbarItemId : toolbarItemIds) {
-          visibleItems.add(Item.values()[toolbarItemId]);
+          visibleItems.add(ToolBarItems.values()[toolbarItemId]);
         }
 
-        Item[] toolItems = Item.values();
+        ToolBarItems[] toolItems = ToolBarItems.values();
         int currentGroup = -1;
-        for (final Item toolItem : toolItems) {
-          if (!visibleItems.contains(toolItem) || toolItem == Item.SEPARATOR || toolItem == Item.SPACER) {
+        for (final ToolBarItems toolItem : toolItems) {
+          if (!visibleItems.contains(toolItem) || toolItem == ToolBarItems.SEPARATOR || toolItem == ToolBarItems.SPACER) {
 
             /* Divide Groups by Separators */
             if (currentGroup >= 0 && currentGroup != toolItem.getGroup())
@@ -415,8 +415,8 @@ public class CustomizeToolbarDialog extends Dialog {
     fModeViewer.setLabelProvider(new LabelProvider() {
       @Override
       public String getText(Object element) {
-        if (element instanceof Mode) {
-          switch ((Mode) element) {
+        if (element instanceof ToolBarModes) {
+          switch ((ToolBarModes) element) {
             case IMAGE:
               return "Icons";
             case TEXT:
@@ -433,13 +433,13 @@ public class CustomizeToolbarDialog extends Dialog {
     fModeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       public void selectionChanged(SelectionChangedEvent event) {
         Object selection = ((IStructuredSelection) event.getSelection()).getFirstElement();
-        Mode mode = (Mode) selection;
+        ToolBarModes mode = (ToolBarModes) selection;
         fPreferences.putInteger(DefaultPreferences.TOOLBAR_MODE, mode.ordinal());
       }
     });
 
-    fModeViewer.setInput(CoolBarAdvisor.Mode.values());
-    fModeViewer.setSelection(new StructuredSelection(Mode.values()[fPreferences.getInteger(DefaultPreferences.TOOLBAR_MODE)]));
+    fModeViewer.setInput(CoolBarAdvisor.ToolBarModes.values());
+    fModeViewer.setSelection(new StructuredSelection(ToolBarModes.values()[fPreferences.getInteger(DefaultPreferences.TOOLBAR_MODE)]));
 
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
@@ -447,11 +447,11 @@ public class CustomizeToolbarDialog extends Dialog {
     return container;
   }
 
-  private void onAdd(Item newItem) {
+  private void onAdd(ToolBarItems newItem) {
     int[] toolbarItemIds = fPreferences.getIntegers(DefaultPreferences.TOOLBAR_ITEMS);
-    List<Item> newItems = new ArrayList<Item>();
+    List<ToolBarItems> newItems = new ArrayList<ToolBarItems>();
     for (int toolbarItemId : toolbarItemIds) {
-      newItems.add(Item.values()[toolbarItemId]);
+      newItems.add(ToolBarItems.values()[toolbarItemId]);
     }
 
     int selectionIndex = fItemViewer.getTable().getSelectionIndex();
@@ -480,9 +480,9 @@ public class CustomizeToolbarDialog extends Dialog {
 
   private void onRemove() {
     int[] toolbarItemIds = fPreferences.getIntegers(DefaultPreferences.TOOLBAR_ITEMS);
-    List<Item> newItems = new ArrayList<Item>();
+    List<ToolBarItems> newItems = new ArrayList<ToolBarItems>();
     for (int toolbarItemId : toolbarItemIds) {
-      newItems.add(Item.values()[toolbarItemId]);
+      newItems.add(ToolBarItems.values()[toolbarItemId]);
     }
 
     int[] selectionIndices = fItemViewer.getTable().getSelectionIndices();
@@ -527,7 +527,7 @@ public class CustomizeToolbarDialog extends Dialog {
     fPreferences.putIntegers(DefaultPreferences.TOOLBAR_ITEMS, defaultItemsState);
     fPreferences.putInteger(DefaultPreferences.TOOLBAR_MODE, defaultMode);
     fItemViewer.refresh();
-    fModeViewer.setSelection(new StructuredSelection(Mode.values()[defaultMode]));
+    fModeViewer.setSelection(new StructuredSelection(ToolBarModes.values()[defaultMode]));
     updateButtonEnablement();
   }
 
