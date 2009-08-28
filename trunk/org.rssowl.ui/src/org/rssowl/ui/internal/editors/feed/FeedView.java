@@ -40,6 +40,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.browser.Browser;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.ControlAdapter;
 import org.eclipse.swt.events.ControlEvent;
@@ -103,6 +104,7 @@ import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.ITreeNode;
 import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.RetentionStrategy;
+import org.rssowl.core.util.StringUtils;
 import org.rssowl.core.util.TreeTraversal;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
@@ -1347,10 +1349,26 @@ public class FeedView extends EditorPart implements IReusableEditor {
    */
   @Override
   public void setFocus() {
+
+    /* Focus Headlines */
     if (isTableViewerVisible())
       fNewsTableControl.setFocus();
-    else
-      fNewsBrowserControl.setFocus();
+
+    /* Focus Browser */
+    else {
+      Runnable runnable = new Runnable() {
+        public void run() {
+          fNewsBrowserControl.setFocus();
+        }
+      };
+
+      /* Run setFocus() delayed if input not yet set */
+      Browser browser = fNewsBrowserControl.getViewer().getBrowser().getControl();
+      if (!StringUtils.isSet(browser.getUrl()))
+        JobRunner.runDelayedInUIThread(browser, runnable);
+      else
+        runnable.run();
+    }
   }
 
   @Override
