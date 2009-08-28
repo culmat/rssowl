@@ -22,24 +22,24 @@
  **                                                                          **
  **  **********************************************************************  */
 
-package org.rssowl.core.persist.pref;
+package org.rssowl.ui.internal;
+
+import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.persist.pref.IPreferencesInitializer;
+import org.rssowl.core.persist.pref.Preferences;
+import org.rssowl.ui.internal.actions.NavigationActionFactory.Actions;
+import org.rssowl.ui.internal.editors.feed.NewsColumn;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * An instance of <code>IPreferencesInitializer</code> responsible for defining
- * the default preferences of RSSOwl.
- * <p>
- * Subclasses may override to provide custom settings.
- * </p>
- * <p>
- * TODO Consider moving to org.rssowl.ui giving implicit dependencies.
- * </p>
+ * the default preferences for the UI of RSSOwl.
  *
  * @author bpasero
  */
-public class DefaultPreferencesInitializer implements IPreferencesInitializer {
+public class PreferencesInitializer implements IPreferencesInitializer {
 
   /*
    * @see
@@ -103,9 +103,20 @@ public class DefaultPreferencesInitializer implements IPreferencesInitializer {
     defaultScope.putBoolean(Preferences.SHOW_TOOLBAR.id(), true);
     defaultScope.putBoolean(Preferences.SHOW_STATUS.id(), true);
     defaultScope.putBoolean(Preferences.BM_LOAD_TITLE_FROM_FEED.id(), true);
-    defaultScope.putIntegers(Preferences.SEARCH_DIALOG_NEWS_COLUMNS.id(), new int[] { 9, 0, 8, 1, 2, 3, 6 });
-    defaultScope.putInteger(Preferences.SEARCH_DIALOG_NEWS_SORT_COLUMN.id(), 9);
+
+    defaultScope.putIntegers(Preferences.SEARCH_DIALOG_NEWS_COLUMNS.id(), new int[] {
+      NewsColumn.RELEVANCE.ordinal(),
+      NewsColumn.TITLE.ordinal(),
+      NewsColumn.FEED.ordinal(),
+      NewsColumn.DATE.ordinal(),
+      NewsColumn.AUTHOR.ordinal(),
+      NewsColumn.CATEGORY.ordinal(),
+      NewsColumn.STICKY.ordinal()
+    });
+
+    defaultScope.putInteger(Preferences.SEARCH_DIALOG_NEWS_SORT_COLUMN.id(), NewsColumn.RELEVANCE.ordinal());
     defaultScope.putBoolean(Preferences.SEARCH_DIALOG_NEWS_SORT_ASCENDING.id(), false);
+
     defaultScope.putIntegers(Preferences.SHARE_PROVIDER_STATE.id(), new int[] { 1, 2, 3, 4, 5, 6, 7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, -19, -20, -21, -22 });
   }
 
@@ -168,8 +179,14 @@ public class DefaultPreferencesInitializer implements IPreferencesInitializer {
    * @param defaultScope the container for preferences to fill.
    */
   protected void initNewsColumnsDefaults(IPreferenceScope defaultScope) {
-    defaultScope.putIntegers(Preferences.BM_NEWS_COLUMNS.id(), new int[] { 0, 1, 2, 3, 6 });
-    defaultScope.putInteger(Preferences.BM_NEWS_SORT_COLUMN.id(), 1);
+    defaultScope.putIntegers(Preferences.BM_NEWS_COLUMNS.id(), new int[] {
+      NewsColumn.TITLE.ordinal(),
+      NewsColumn.DATE.ordinal(),
+      NewsColumn.AUTHOR.ordinal(),
+      NewsColumn.CATEGORY.ordinal(),
+      NewsColumn.STICKY.ordinal()
+    });
+    defaultScope.putInteger(Preferences.BM_NEWS_SORT_COLUMN.id(), NewsColumn.DATE.ordinal());
     defaultScope.putBoolean(Preferences.BM_NEWS_SORT_ASCENDING.id(), false);
   }
 
@@ -194,45 +211,47 @@ public class DefaultPreferencesInitializer implements IPreferencesInitializer {
    * @param defaultScope the container for preferences to fill.
    */
   private void initToolbarDefaults(IPreferenceScope defaultScope) {
-    List<String> items = new ArrayList<String>();
+    List<Integer> items = new ArrayList<Integer>();
 
     /* New | Import | Export */
-    items.add("org.rssowl.ui.NewDropDown");
-    items.add("org.rssowl.ui.actions.ImportFeeds");
-    items.add("org.rssowl.ui.actions.ExportFeeds");
+    items.add(CoolBarAdvisor.Item.NEW.ordinal());
 
     /* Undo | Redo */
-    items.add("org.rssowl.ui.CoolBarSeparator");
-    items.add("org.rssowl.ui.UndoAction");
-    items.add("org.rssowl.ui.RedoAction");
+    items.add(CoolBarAdvisor.Item.SEPARATOR.ordinal());
+    items.add(CoolBarAdvisor.Item.UNDO.ordinal());
+    items.add(CoolBarAdvisor.Item.REDO.ordinal());
 
     /* Update | Update All */
-    items.add("org.rssowl.ui.CoolBarSeparator");
-    items.add("org.rssowl.ui.actions.Reload");
-    items.add("org.rssowl.ui.actions.ReloadAll");
+    items.add(CoolBarAdvisor.Item.SEPARATOR.ordinal());
+    items.add(CoolBarAdvisor.Item.UPDATE.ordinal());
+    items.add(CoolBarAdvisor.Item.UPDATE_ALL.ordinal());
 
     /* Search */
-    items.add("org.rssowl.ui.CoolBarSeparator");
-    items.add("org.rssowl.ui.SearchNewsAction");
+    items.add(CoolBarAdvisor.Item.SEPARATOR.ordinal());
+    items.add(CoolBarAdvisor.Item.SEARCH.ordinal());
 
     /* Mark Read | Mark All Read */
-    items.add("org.rssowl.ui.CoolBarSeparator");
-    items.add("org.rssowl.ui.ToggleReadState");
-    items.add("org.rssowl.ui.MarkAllRead");
+    items.add(CoolBarAdvisor.Item.SEPARATOR.ordinal());
+    items.add(CoolBarAdvisor.Item.MARK_READ.ordinal());
+    items.add(CoolBarAdvisor.Item.MARK_ALL_READ.ordinal());
 
     /* Label | Sticky */
-    items.add("org.rssowl.ui.CoolBarSeparator");
-    items.add("org.rssowl.ui.Label");
-    items.add("org.rssowl.ui.actions.MarkSticky");
+    items.add(CoolBarAdvisor.Item.SEPARATOR.ordinal());
+    items.add(CoolBarAdvisor.Item.LABEL.ordinal());
+    items.add(CoolBarAdvisor.Item.STICKY.ordinal());
 
     /* Next | Previous */
-    items.add("org.rssowl.ui.CoolBarSeparator");
-    items.add("org.rssowl.ui.Next");
-    items.add("org.rssowl.ui.Previous");
+    items.add(CoolBarAdvisor.Item.SEPARATOR.ordinal());
+    items.add(CoolBarAdvisor.Item.NEXT.ordinal());
+    items.add(CoolBarAdvisor.Item.PREVIOUS.ordinal());
 
-    defaultScope.putStrings(Preferences.TOOLBAR_ITEMS.id(), items.toArray(new String[items.size()]));
-    defaultScope.putInteger(Preferences.TOOLBAR_MODE.id(), 0);
-    defaultScope.putInteger(Preferences.DEFAULT_NEXT_ACTION.id(), 1);
-    defaultScope.putInteger(Preferences.DEFAULT_PREVIOUS_ACTION.id(), 5);
+    int[] intArray= new int[items.size()];
+    for(int i = 0; i < items.size(); i++)
+      intArray[i] = items.get(i);
+
+    defaultScope.putIntegers(Preferences.TOOLBAR_ITEMS.id(), intArray);
+    defaultScope.putInteger(Preferences.TOOLBAR_MODE.id(), CoolBarAdvisor.Mode.IMAGE_TEXT.ordinal());
+    defaultScope.putInteger(Preferences.DEFAULT_NEXT_ACTION.id(), Actions.NEXT_UNREAD_NEWS.ordinal());
+    defaultScope.putInteger(Preferences.DEFAULT_PREVIOUS_ACTION.id(), Actions.PREVIOUS_UNREAD_NEWS.ordinal());
   }
 }
