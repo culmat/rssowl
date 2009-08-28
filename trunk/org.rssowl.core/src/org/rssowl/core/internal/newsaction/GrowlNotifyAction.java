@@ -53,6 +53,9 @@ public class GrowlNotifyAction implements INewsAction {
   /* Batch News-Events for every 5 seconds */
   private static final int BATCH_INTERVAL = 5000;
 
+  /* Max number of items to show per Notification */
+  private static final int MAX_ITEMS_TO_SHOW = 3;
+
   private static final String APPLICATION_NAME = "RSSOwl";
   private static final String SEPARATOR = System.getProperty("line.separator");
 
@@ -103,10 +106,17 @@ public class GrowlNotifyAction implements INewsAction {
       commands.add(news.size() + " Incoming News");
       commands.add("-m");
 
+      int i = 0;
       StringBuilder message = new StringBuilder();
       for (INews item : news) {
+        if (++i > MAX_ITEMS_TO_SHOW)
+          break;
+
         message.append(CoreUtils.getHeadline(item, true)).append(SEPARATOR).append(SEPARATOR);
       }
+
+      if (news.size() > MAX_ITEMS_TO_SHOW)
+        message.append((news.size() - MAX_ITEMS_TO_SHOW) + " more");
 
       commands.add(message.toString());
 
