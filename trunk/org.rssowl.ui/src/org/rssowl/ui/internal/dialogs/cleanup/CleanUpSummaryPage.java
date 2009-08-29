@@ -120,7 +120,7 @@ public class CleanUpSummaryPage extends WizardPage {
     }
 
     public Color getForeground(Object element) {
-      if (element instanceof CleanUpGroup)
+      if (element instanceof CleanUpGroup && !OwlUI.isHighContrast())
         return fGroupFgColor;
 
       return null;
@@ -228,13 +228,15 @@ public class CleanUpSummaryPage extends WizardPage {
     fViewer.setLabelProvider(summaryLabelProvider);
 
     /* Custom Owner Drawn Category */
-    fViewer.getControl().addListener(SWT.EraseItem, new Listener() {
-      public void handleEvent(Event event) {
-        Object element = event.item.getData();
-        if (element instanceof CleanUpGroup)
-          summaryLabelProvider.eraseGroup(event);
-      }
-    });
+    if (!OwlUI.isHighContrast()) {
+      fViewer.getControl().addListener(SWT.EraseItem, new Listener() {
+        public void handleEvent(Event event) {
+          Object element = event.item.getData();
+          if (element instanceof CleanUpGroup)
+            summaryLabelProvider.eraseGroup(event);
+        }
+      });
+    }
 
     /* Listen on Doubleclick */
     fViewer.addDoubleClickListener(new IDoubleClickListener() {

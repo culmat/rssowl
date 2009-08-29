@@ -451,7 +451,8 @@ public class NotificationPopup extends PopupDialog {
 
       @Override
       public void mouseEnter(MouseEvent e) {
-        itemLabel.setForeground(itemLabel.getDisplay().getSystemColor(SWT.COLOR_BLUE));
+        if (!OwlUI.isHighContrast())
+          itemLabel.setForeground(itemLabel.getDisplay().getSystemColor(SWT.COLOR_BLUE));
       }
 
       @Override

@@ -202,9 +202,6 @@ public class SearchNewsDialog extends TitleAreaDialog {
   private static final int BUTTON_SEARCH = 1000;
   private static final int BUTTON_CLEAR = 1001;
 
-  /* Flag to enable / disable COD */
-  private static final boolean USE_CUSTOM_OWNER_DRAWN = true;
-
   /* Viewer and Controls */
   private Button fMatchAllRadio;
   private Button fMatchAnyRadio;
@@ -390,15 +387,15 @@ public class SearchNewsDialog extends TitleAreaDialog {
       Color foreground = getForeground(scoredNews.getNews(), cell.getColumnIndex());
 
       /* This is required to invalidate + redraw the entire TableItem! */
-      if (USE_CUSTOM_OWNER_DRAWN) {
+      if (!OwlUI.isHighContrast()) {
         Item item = (Item) cell.getItem();
         if (item instanceof TableItem)
           ((TableItem) cell.getItem()).setForeground(foreground);
-      } else
-        cell.setForeground(foreground);
+      }
 
       /* Background */
-      cell.setBackground(getBackground(scoredNews.getNews(), cell.getColumnIndex()));
+      if (!OwlUI.isHighContrast())
+        cell.setBackground(getBackground(scoredNews.getNews(), cell.getColumnIndex()));
     }
 
     private String getCategories(INews news) {
@@ -1359,7 +1356,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Create LabelProvider */
     NewsColumnViewModel model = NewsColumnViewModel.loadFrom(fPreferences, true);
     fNewsTableLabelProvider = new ScoredNewsLabelProvider(model);
-    if (USE_CUSTOM_OWNER_DRAWN) {
+    if (!OwlUI.isHighContrast()) {
       fResultViewer.getControl().addListener(SWT.EraseItem, new Listener() {
         public void handleEvent(Event event) {
           Object element = event.item.getData();

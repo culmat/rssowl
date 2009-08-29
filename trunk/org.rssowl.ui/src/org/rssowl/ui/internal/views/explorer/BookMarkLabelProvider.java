@@ -181,7 +181,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       cell.setForeground(null);
 
       /* Background Color */
-      if (hasSticky)
+      if (hasSticky && !OwlUI.isHighContrast())
         cell.setBackground(fStickyBgColor);
       else
         cell.setBackground(null);
@@ -213,7 +213,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
         stickyNewsCount = ((IBookMark) newsmark).getStickyNewsCount();
 
       /* Background Color */
-      if (stickyNewsCount > 0)
+      if (stickyNewsCount > 0 && !OwlUI.isHighContrast())
         cell.setBackground(fStickyBgColor);
       else
         cell.setBackground(null);
@@ -241,7 +241,8 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       cell.setImage(fGroupIcon);
 
       /* Foreground */
-      cell.setForeground(fGroupFgColor);
+      if (!OwlUI.isHighContrast())
+        cell.setForeground(fGroupFgColor);
 
       /* Reset Background */
       cell.setBackground(null);

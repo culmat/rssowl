@@ -133,9 +133,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class NewsTableControl implements IFeedViewPart {
 
-  /* Flag to enable / disable COD */
-  static final boolean USE_CUSTOM_OWNER_DRAWN = true;
-
   /* Tracker to Mark selected news as Read */
   private class MarkReadTracker extends JobTracker {
     private boolean fUpdateDelayDynamically;
@@ -363,7 +360,7 @@ public class NewsTableControl implements IFeedViewPart {
     /* Create LabelProvider (Custom Owner Drawn enabled!) */
     NewsColumnViewModel columnModel = createColumnModel(fEditorInput.getMark());
     fNewsTableLabelProvider = new NewsTableLabelProvider(columnModel);
-    if (USE_CUSTOM_OWNER_DRAWN) {
+    if (!OwlUI.isHighContrast()) {
       fViewer.getControl().addListener(SWT.EraseItem, new Listener() {
         public void handleEvent(Event event) {
           Object element = event.item.getData();
