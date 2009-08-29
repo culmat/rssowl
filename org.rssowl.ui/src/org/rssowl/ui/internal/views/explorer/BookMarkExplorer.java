@@ -361,12 +361,14 @@ public class BookMarkExplorer extends ViewPart {
     });
 
     /* Custom Owner Drawn for Groups */
-    fViewer.getControl().addListener(SWT.EraseItem, new Listener() {
-      public void handleEvent(Event event) {
-        Object element = event.item.getData();
-        fLabelProvider.erase(event, element);
-      }
-    });
+    if (!OwlUI.isHighContrast()) {
+      fViewer.getControl().addListener(SWT.EraseItem, new Listener() {
+        public void handleEvent(Event event) {
+          Object element = event.item.getData();
+          fLabelProvider.erase(event, element);
+        }
+      });
+    }
 
     /* Update List of Expanded Nodes */
     fViewer.addTreeListener(new ITreeViewerListener() {

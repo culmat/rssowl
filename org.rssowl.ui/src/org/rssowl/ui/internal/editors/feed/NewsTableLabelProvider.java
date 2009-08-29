@@ -185,17 +185,17 @@ public class NewsTableLabelProvider extends OwnerDrawLabelProvider {
     Color foreground = getForeground(cell.getElement(), cell.getColumnIndex());
 
     /* This is required to invalidate + redraw the entire TableItem! */
-    if (NewsTableControl.USE_CUSTOM_OWNER_DRAWN) {
+    if (!OwlUI.isHighContrast()) {
       Item item = (Item) cell.getItem();
       if (item instanceof TreeItem)
         ((TreeItem) cell.getItem()).setForeground(foreground);
       else if (item instanceof TableItem)
         ((TableItem) cell.getItem()).setForeground(foreground);
-    } else
-      cell.setForeground(foreground);
+    }
 
     /* Background */
-    cell.setBackground(getBackground(cell.getElement(), cell.getColumnIndex()));
+    if (!OwlUI.isHighContrast())
+      cell.setBackground(getBackground(cell.getElement(), cell.getColumnIndex()));
   }
 
   /*

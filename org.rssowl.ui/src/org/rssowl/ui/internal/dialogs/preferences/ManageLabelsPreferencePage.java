@@ -423,7 +423,8 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
         cell.setText(label.getName());
 
         /* Color */
-        cell.setForeground(OwlUI.getColor(fResources, label));
+        if (!OwlUI.isHighContrast())
+          cell.setForeground(OwlUI.getColor(fResources, label));
       }
     });
 
