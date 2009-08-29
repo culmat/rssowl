@@ -245,7 +245,7 @@ public class BookMarkExplorer extends ViewPart {
     layout.verticalSpacing = 0;
 
     parent.setLayout(layout);
-    parent.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    parent.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     /* Create TreeViewer */
     createViewer(parent);

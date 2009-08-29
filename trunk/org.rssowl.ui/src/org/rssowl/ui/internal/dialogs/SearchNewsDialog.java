@@ -730,7 +730,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     Composite bottomSashContent = new Composite(fBottomSash, SWT.None);
     bottomSashContent.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 0, 0, false));
     bottomSashContent.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    bottomSashContent.setBackground(bottomSashContent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    bottomSashContent.setBackground(bottomSashContent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     /* Separator */
     new Label(bottomSashContent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.END, true, false));
@@ -1010,13 +1010,13 @@ public class SearchNewsDialog extends TitleAreaDialog {
     final Composite conditionsContainer = new Composite(container, SWT.NONE);
     conditionsContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
     conditionsContainer.setLayout(LayoutUtils.createGridLayout(2, 5, 10));
-    conditionsContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    conditionsContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     conditionsContainer.setBackgroundMode(SWT.INHERIT_FORCE);
     conditionsContainer.addPaintListener(new PaintListener() {
       public void paintControl(PaintEvent e) {
         GC gc = e.gc;
         Rectangle clArea = conditionsContainer.getClientArea();
-        gc.setForeground(conditionsContainer.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+        gc.setForeground(conditionsContainer.getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
         gc.drawLine(clArea.x, clArea.y, clArea.x + clArea.width, clArea.y);
       }
     });

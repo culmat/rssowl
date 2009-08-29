@@ -223,7 +223,8 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
         Display display = fViewer.getControl().getDisplay();
         cell.setText(filter.getName());
         cell.setImage(fFilterIcon);
-        cell.setForeground(filter.isEnabled() ? display.getSystemColor(SWT.COLOR_BLACK) : display.getSystemColor(SWT.COLOR_DARK_GRAY));
+        if (!OwlUI.isHighContrast())
+          cell.setForeground(filter.isEnabled() ? display.getSystemColor(SWT.COLOR_BLACK) : display.getSystemColor(SWT.COLOR_DARK_GRAY));
       }
     });
 

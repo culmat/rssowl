@@ -132,7 +132,7 @@ public class NewNewsBinAction implements IWorkbenchWindowActionDelegate, IObject
       Composite nameContainer = new Composite(container, SWT.BORDER);
       nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
       nameContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
-      nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+      nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
       fNameInput = new Text(nameContainer, SWT.SINGLE);
       fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
@@ -150,7 +150,7 @@ public class NewNewsBinAction implements IWorkbenchWindowActionDelegate, IObject
       fFolderChooser = new FolderChooser(container, fFolder, SWT.BORDER, true);
       fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
       fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
-      fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+      fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
       return container;
     }

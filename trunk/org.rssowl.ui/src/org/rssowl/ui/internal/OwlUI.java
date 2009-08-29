@@ -91,6 +91,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.themes.ITheme;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.IBookMark;
@@ -274,6 +275,9 @@ public class OwlUI {
   /** Search Highlight Background Color */
   public static final String SEARCH_HIGHLIGHT_BG_COLOR_ID = "org.rssowl.ui.SearchHighlightBGColor";
 
+  /* ID of the High Contrast Theme */
+  private static final String HIGH_CONTRAST_THEME = "org.eclipse.ui.ide.systemDefault";
+
   /* Used to cache Image-Descriptors for Favicons */
   private static final Map<Long, ImageDescriptor> FAVICO_CACHE = new HashMap<Long, ImageDescriptor>();
 
@@ -351,6 +355,9 @@ public class OwlUI {
 
     /** Windows Classic */
     WINDOWS_CLASSIC,
+
+    /** High Contrast */
+    HIGH_CONTRAST,
 
     /** Any other Theme */
     OTHER
@@ -445,6 +452,12 @@ public class OwlUI {
     if (fgCachedOSTheme != null)
       return fgCachedOSTheme;
 
+    ITheme currentTheme = PlatformUI.getWorkbench().getThemeManager().getCurrentTheme();
+    if (HIGH_CONTRAST_THEME.equals(currentTheme.getId())) {
+      fgCachedOSTheme = OSTheme.HIGH_CONTRAST;
+      return fgCachedOSTheme;
+    }
+
     RGB widgetBackground = display.getSystemColor(SWT.COLOR_WIDGET_BACKGROUND).getRGB();
     RGB listSelection = display.getSystemColor(SWT.COLOR_LIST_SELECTION).getRGB();
 
@@ -469,6 +482,14 @@ public class OwlUI {
       fgCachedOSTheme = OSTheme.OTHER;
 
     return fgCachedOSTheme;
+  }
+
+  /**
+   * @return <code>true</code> if the display settings is set to high contrast
+   * mode and <code>false</code> otherwise.
+   */
+  public static boolean isHighContrast() {
+    return getOSTheme(Display.getDefault()) == OSTheme.HIGH_CONTRAST;
   }
 
   /**

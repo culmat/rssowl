@@ -1794,7 +1794,7 @@ public class FeedView extends EditorPart implements IReusableEditor {
     {
       fBrowserViewerControlContainer = new Composite(fSashForm, SWT.None);
       fBrowserViewerControlContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 0, false));
-      fBrowserViewerControlContainer.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+      fBrowserViewerControlContainer.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
       /* Separate to Browser (Vertically) */
       fVerticalBrowserSep = new Label(fBrowserViewerControlContainer, SWT.SEPARATOR | SWT.VERTICAL);

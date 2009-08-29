@@ -304,7 +304,7 @@ public class LocationControl extends Composite {
 
           if (fMode == Mode.SELECT_BIN) {
             Object element = cell.getElement();
-            if (element instanceof IFolder)
+            if (element instanceof IFolder && !OwlUI.isHighContrast())
               cell.setForeground(fViewer.getControl().getDisplay().getSystemColor(SWT.COLOR_GRAY));
           }
         }
