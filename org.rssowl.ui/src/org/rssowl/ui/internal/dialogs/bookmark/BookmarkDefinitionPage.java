@@ -134,7 +134,7 @@ public class BookmarkDefinitionPage extends WizardPage {
     fFolderChooser = new FolderChooser(container, fSelectedFolder, null, SWT.BORDER, false, 5);
     fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
-    fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     setControl(container);
   }

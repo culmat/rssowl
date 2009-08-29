@@ -124,14 +124,14 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     Composite nameContainer = new Composite(container, SWT.BORDER);
     nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     nameContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
-    nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     fNameInput = new Text(nameContainer, SWT.NONE);
     fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     fNameInput.setText(mark.getName());
 
     ToolBar generateTitleBar = new ToolBar(nameContainer, SWT.FLAT);
-    generateTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    generateTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     ToolItem generateTitleItem = new ToolItem(generateTitleBar, SWT.PUSH);
     generateTitleItem.setImage(OwlUI.getImage(fSite.getResourceManager(), "icons/etool16/info.gif"));
@@ -151,7 +151,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     fFolderChooser = new FolderChooser(container, mark.getParent(), SWT.BORDER, true);
     fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
-    fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     Composite topControlsContainer = new Composite(container, SWT.None);
     topControlsContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false, 2, 1));
@@ -194,7 +194,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     Composite conditionsContainer = new Composite(container, SWT.BORDER);
     conditionsContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
     conditionsContainer.setLayout(LayoutUtils.createGridLayout(1));
-    conditionsContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    conditionsContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     conditionsContainer.setBackgroundMode(SWT.INHERIT_FORCE);
 
     /* Search Conditions List */
@@ -226,7 +226,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
       fFolderChooser = new FolderChooser(container, sameParent, null, SWT.BORDER, true);
       fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
       fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
-      fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+      fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     }
 
     /* Other Settings */
@@ -245,7 +245,7 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     Composite conditionsContainer = new Composite(otherSettingsContainer, SWT.BORDER);
     conditionsContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
     conditionsContainer.setLayout(LayoutUtils.createGridLayout(1));
-    conditionsContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    conditionsContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     conditionsContainer.setBackgroundMode(SWT.INHERIT_FORCE);
 
     /* Search Conditions List */

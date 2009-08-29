@@ -352,7 +352,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
     Composite nameContainer = new Composite(container, SWT.BORDER);
     nameContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     nameContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
-    nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    nameContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     fNameInput = new Text(nameContainer, SWT.SINGLE);
     fNameInput.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
@@ -376,7 +376,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
     ((GridData) fNameInput.getLayoutData()).widthHint = entryFieldWidth; //Required to avoid large spanning dialog for long Links
 
     ToolBar generateTitleBar = new ToolBar(nameContainer, SWT.FLAT);
-    generateTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    generateTitleBar.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     ToolItem generateTitleItem = new ToolItem(generateTitleBar, SWT.PUSH);
     generateTitleItem.setImage(OwlUI.getImage(fResources, "icons/etool16/info.gif"));
@@ -612,13 +612,13 @@ public class NewsFilterDialog extends TitleAreaDialog {
     final Composite conditionsContainer = new Composite(container, SWT.NONE);
     conditionsContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
     conditionsContainer.setLayout(LayoutUtils.createGridLayout(2, 5, 10));
-    conditionsContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    conditionsContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     conditionsContainer.setBackgroundMode(SWT.INHERIT_FORCE);
     conditionsContainer.addPaintListener(new PaintListener() {
       public void paintControl(PaintEvent e) {
         GC gc = e.gc;
         Rectangle clArea = conditionsContainer.getClientArea();
-        gc.setForeground(conditionsContainer.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+        gc.setForeground(conditionsContainer.getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
         gc.drawLine(clArea.x, clArea.y, clArea.x + clArea.width, clArea.y);
         gc.drawLine(clArea.x, clArea.y + clArea.height - 1, clArea.x + clArea.width, clArea.y + clArea.height - 1);
       }
@@ -726,13 +726,13 @@ public class NewsFilterDialog extends TitleAreaDialog {
     final Composite actionsContainer = new Composite(container, SWT.NONE);
     actionsContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1));
     actionsContainer.setLayout(LayoutUtils.createGridLayout(2, 5, 10));
-    actionsContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    actionsContainer.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     actionsContainer.setBackgroundMode(SWT.INHERIT_FORCE);
     actionsContainer.addPaintListener(new PaintListener() {
       public void paintControl(PaintEvent e) {
         GC gc = e.gc;
         Rectangle clArea = actionsContainer.getClientArea();
-        gc.setForeground(actionsContainer.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+        gc.setForeground(actionsContainer.getDisplay().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW));
         gc.drawLine(clArea.x, clArea.y, clArea.x + clArea.width, clArea.y);
       }
     });

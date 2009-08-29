@@ -417,10 +417,12 @@ public class NotificationPopup extends PopupDialog {
   }
 
   private void updateItemColor(NotificationItem item, CCLabel itemLabel) {
-    if (item.getColor() == null)
-      itemLabel.setForeground(itemLabel.getDisplay().getSystemColor(SWT.COLOR_BLACK));
-    else
-      itemLabel.setForeground(OwlUI.getColor(fResources, item.getColor()));
+    if (!OwlUI.isHighContrast()) {
+      if (item.getColor() == null)
+        itemLabel.setForeground(itemLabel.getDisplay().getSystemColor(SWT.COLOR_BLACK));
+      else
+        itemLabel.setForeground(OwlUI.getColor(fResources, item.getColor()));
+    }
   }
 
   private void renderItem(final NotificationItem item) {
@@ -747,7 +749,7 @@ public class NotificationPopup extends PopupDialog {
     ((GridLayout) fInnerContentCircle.getLayout()).marginLeft = 5;
     ((GridLayout) fInnerContentCircle.getLayout()).marginRight = 2;
     fInnerContentCircle.addMouseTrackListener(fMouseTrackListner);
-    fInnerContentCircle.setBackground(fShell.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    fInnerContentCircle.setBackground(fShell.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     /* Footer Area containing navigational controls */
     final Composite footerCircle = new Composite(outerCircle, SWT.NO_FOCUS);

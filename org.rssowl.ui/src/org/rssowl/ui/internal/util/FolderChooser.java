@@ -229,7 +229,7 @@ public class FolderChooser extends Composite implements DisposeListener {
     headerContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0));
     ((GridLayout) headerContainer.getLayout()).marginLeft = 3;
     headerContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    headerContainer.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    headerContainer.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     if (fExpandable) {
       headerContainer.setCursor(fParent.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
@@ -244,7 +244,7 @@ public class FolderChooser extends Composite implements DisposeListener {
 
     fFolderIcon = new Label(headerContainer, SWT.None);
     fFolderIcon.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
-    fFolderIcon.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    fFolderIcon.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     if (fExpandable) {
       fFolderIcon.setCursor(fParent.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
@@ -259,7 +259,7 @@ public class FolderChooser extends Composite implements DisposeListener {
 
     fFolderName = new Label(headerContainer, SWT.None);
     fFolderName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
-    fFolderName.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    fFolderName.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     if (fExpandable) {
       fFolderName.setCursor(fParent.getDisplay().getSystemCursor(SWT.CURSOR_HAND));
@@ -275,11 +275,11 @@ public class FolderChooser extends Composite implements DisposeListener {
     Composite toolbarContainer = new Composite(headerContainer, SWT.NONE);
     toolbarContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0, 0, 1, false));
     toolbarContainer.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
-    toolbarContainer.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    toolbarContainer.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     fAddFolderBar = new ToolBar(toolbarContainer, SWT.FLAT);
     fAddFolderBar.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
-    fAddFolderBar.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    fAddFolderBar.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     fAddFolderBar.setCursor(headerContainer.getDisplay().getSystemCursor(SWT.CURSOR_ARROW));
     fAddFolderBar.setVisible(!fExpandable);
 
@@ -297,7 +297,7 @@ public class FolderChooser extends Composite implements DisposeListener {
     ToolBar toggleBar = new ToolBar(toolbarContainer, SWT.FLAT);
     toggleBar.setLayoutData(new GridData(SWT.END, SWT.CENTER, false, true));
     ((GridData) toggleBar.getLayoutData()).exclude = !fExpandable;
-    toggleBar.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    toggleBar.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     toggleBar.setCursor(headerContainer.getDisplay().getSystemCursor(SWT.CURSOR_ARROW));
 
     fToggleItem = new ToolItem(toggleBar, SWT.PUSH);
@@ -314,7 +314,7 @@ public class FolderChooser extends Composite implements DisposeListener {
     fFolderViewerContainer = new Composite(this, SWT.None);
     fFolderViewerContainer.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 0, false));
     fFolderViewerContainer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-    fFolderViewerContainer.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    fFolderViewerContainer.setBackground(fParent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
     Label separator = new Label(fFolderViewerContainer, SWT.SEPARATOR | SWT.HORIZONTAL);
     separator.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));

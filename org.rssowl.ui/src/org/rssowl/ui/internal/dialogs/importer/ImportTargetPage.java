@@ -129,7 +129,7 @@ public class ImportTargetPage extends WizardPage {
     fFolderChooser = new FolderChooser(folderContainer, rootFolders.iterator().next(), null, SWT.BORDER, true, 5);
     fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
-    fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+    fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     fFolderChooser.addListener(SWT.Selection, new Listener() {
       public void handleEvent(Event event) {
         if (!fChooseExistingRadio.getSelection()) {
