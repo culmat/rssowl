@@ -25,6 +25,8 @@
 package org.rssowl.ui.internal.undo;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.util.SafeRunnable;
+import org.rssowl.core.util.LoggingSafeRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,7 @@ public class UndoStack {
 
   private final List<IUndoOperation> fOperations = new ArrayList<IUndoOperation>();
   private int fCurrentIndex = 0;
+  private List<IUndoRedoListener> fListeners = new ArrayList<IUndoRedoListener>();
 
   private UndoStack() {}
 
@@ -53,6 +56,22 @@ public class UndoStack {
       singleton = new UndoStack();
 
     return singleton;
+  }
+
+  /**
+   * @param listener the listener to be notified when Undo or Redo was
+   * performed, or when an operation was added to the stack.
+   */
+  public void addListener(IUndoRedoListener listener) {
+    if (!fListeners.contains(listener))
+      fListeners.add(listener);
+  }
+
+  /**
+   * @param listener the listener to remove from the list of listeners.
+   */
+  public void removeListener(IUndoRedoListener listener) {
+    fListeners.remove(listener);
   }
 
   /**
@@ -80,6 +99,9 @@ public class UndoStack {
 
     /* Set pointer to last element */
     fCurrentIndex = fOperations.size() - 1;
+
+    /* Notify Listeners */
+    notifyOperationAdded();
   }
 
   /**
@@ -130,6 +152,7 @@ public class UndoStack {
 
     fOperations.get(fCurrentIndex).undo();
     fCurrentIndex--;
+    notifyUndoPerformed();
   }
 
   /**
@@ -142,5 +165,36 @@ public class UndoStack {
 
     fCurrentIndex++;
     fOperations.get(fCurrentIndex).redo();
+    notifyRedoPerformed();
+  }
+
+  private void notifyUndoPerformed() {
+    for (final IUndoRedoListener listener : fListeners) {
+      SafeRunnable.run(new LoggingSafeRunnable() {
+        public void run() throws Exception {
+          listener.undoPerformed();
+        }
+      });
+    }
+  }
+
+  private void notifyRedoPerformed() {
+    for (final IUndoRedoListener listener : fListeners) {
+      SafeRunnable.run(new LoggingSafeRunnable() {
+        public void run() throws Exception {
+          listener.redoPerformed();
+        }
+      });
+    }
+  }
+
+  private void notifyOperationAdded() {
+    for (final IUndoRedoListener listener : fListeners) {
+      SafeRunnable.run(new LoggingSafeRunnable() {
+        public void run() throws Exception {
+          listener.operationAdded();
+        }
+      });
+    }
   }
 }
