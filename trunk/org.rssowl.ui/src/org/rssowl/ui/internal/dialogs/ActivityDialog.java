@@ -137,6 +137,8 @@ public class ActivityDialog extends TitleAreaDialog {
 
     getButton(IDialogConstants.OK_ID).setFocus();
 
+    applyDialogFont(c);
+
     return c;
   }
 

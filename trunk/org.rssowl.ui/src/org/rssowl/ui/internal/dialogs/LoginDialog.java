@@ -213,6 +213,8 @@ public class LoginDialog extends TitleAreaDialog {
     /* Try loading Credentials from Platform if available */
     preload();
 
+    applyDialogFont(composite);
+
     return composite;
   }
 

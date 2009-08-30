@@ -444,6 +444,8 @@ public class CustomizeToolbarDialog extends Dialog {
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
+    applyDialogFont(container);
+
     return container;
   }
 

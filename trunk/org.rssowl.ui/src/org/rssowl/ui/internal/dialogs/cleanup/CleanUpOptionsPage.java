@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.cleanup;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.wizard.WizardPage;
@@ -109,6 +110,8 @@ public class CleanUpOptionsPage extends WizardPage {
 
     /* Options per News */
     createNewsOptions(container);
+
+    Dialog.applyDialogFont(container);
 
     setControl(container);
   }

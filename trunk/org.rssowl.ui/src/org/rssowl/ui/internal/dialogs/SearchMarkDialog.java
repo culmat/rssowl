@@ -345,6 +345,8 @@ public class SearchMarkDialog extends TitleAreaDialog {
     if (fShowLocationConflict)
       setMessage("You are using a location condition together with a value for \"Search in\".", IMessageProvider.WARNING);
 
+    applyDialogFont(container);
+
     return container;
   }
 

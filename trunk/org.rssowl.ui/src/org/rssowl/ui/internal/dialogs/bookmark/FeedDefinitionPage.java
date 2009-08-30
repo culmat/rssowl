@@ -280,6 +280,8 @@ public class FeedDefinitionPage extends WizardPage {
       }
     });
 
+    Dialog.applyDialogFont(container);
+
     setControl(container);
   }
 

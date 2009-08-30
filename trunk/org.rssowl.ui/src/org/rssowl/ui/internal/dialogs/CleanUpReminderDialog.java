@@ -166,6 +166,8 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
     /* Separator */
     new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
+    applyDialogFont(composite);
+
     return composite;
   }
 

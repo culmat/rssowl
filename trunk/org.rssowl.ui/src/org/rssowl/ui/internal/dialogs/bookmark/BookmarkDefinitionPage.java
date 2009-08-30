@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.bookmark;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -135,6 +136,8 @@ public class BookmarkDefinitionPage extends WizardPage {
     fFolderChooser.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
     fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+
+    Dialog.applyDialogFont(container);
 
     setControl(container);
   }

@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.dialogs.importer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
@@ -378,6 +379,8 @@ public class ImportElementsPage extends WizardPage {
         updateMessage(false);
       }
     });
+
+    Dialog.applyDialogFont(container);
 
     setControl(container);
   }

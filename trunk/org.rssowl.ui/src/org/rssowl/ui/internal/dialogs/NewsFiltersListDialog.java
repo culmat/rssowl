@@ -380,6 +380,8 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     if (fSelectedFilter != null)
       fViewer.setSelection(new StructuredSelection(fSelectedFilter), true);
 
+    applyDialogFont(composite);
+
     return composite;
   }
 

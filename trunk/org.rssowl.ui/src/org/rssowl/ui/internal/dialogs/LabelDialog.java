@@ -180,6 +180,8 @@ public class LabelDialog extends Dialog {
 
     showInfo();
 
+    applyDialogFont(composite);
+
     return composite;
   }
 

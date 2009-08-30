@@ -27,6 +27,7 @@ package org.rssowl.ui.internal.dialogs.bookmark;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
 import org.eclipse.jface.wizard.WizardPage;
@@ -178,6 +179,8 @@ public class KeywordSubscriptionPage extends WizardPage {
         fSelectedEngine = engine;
       }
     }
+
+    Dialog.applyDialogFont(container);
 
     setControl(container);
   }

@@ -148,6 +148,8 @@ public class NewFolderAction implements IWorkbenchWindowActionDelegate, IObjectA
         fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
       }
 
+      applyDialogFont(container);
+
       return container;
     }
 

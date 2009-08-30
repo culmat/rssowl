@@ -154,6 +154,8 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
       }
     });
 
+    applyDialogFont(container);
+
     return container;
   }
 

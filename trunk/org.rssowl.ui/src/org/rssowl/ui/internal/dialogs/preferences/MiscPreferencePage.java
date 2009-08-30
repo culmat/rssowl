@@ -110,6 +110,8 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     /* Misc Options */
     createMiscOptions(container);
 
+    applyDialogFont(container);
+
     return container;
   }
 

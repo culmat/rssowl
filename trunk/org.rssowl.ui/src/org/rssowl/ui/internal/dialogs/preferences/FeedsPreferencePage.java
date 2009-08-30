@@ -174,6 +174,8 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     infoText.setText("You can also define these properties per folder or bookmark.");
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
+    applyDialogFont(container);
+
     return container;
   }
 

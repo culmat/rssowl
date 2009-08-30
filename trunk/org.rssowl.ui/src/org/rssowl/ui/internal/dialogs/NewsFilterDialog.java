@@ -418,6 +418,8 @@ public class NewsFilterDialog extends TitleAreaDialog {
     /* Set weights to even */
     sashForm.setWeights(new int[] { 50, 50 });
 
+    applyDialogFont(parent);
+
     return parent;
   }
 

@@ -210,6 +210,8 @@ public class MasterPasswordDialog extends TitleAreaDialog {
     Label separator = new Label(parent, SWT.SEPARATOR | SWT.HORIZONTAL);
     separator.setLayoutData(new GridData(SWT.FILL, SWT.END, true, true));
 
+    applyDialogFont(composite);
+
     return composite;
   }
 

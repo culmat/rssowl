@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.cleanup;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
@@ -149,6 +150,8 @@ public class FeedSelectionPage extends WizardPage {
         fFolderChildTree.setAllChecked(false);
       }
     });
+
+    Dialog.applyDialogFont(container);
 
     setControl(container);
   }

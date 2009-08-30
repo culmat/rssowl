@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.exporter;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -119,6 +120,8 @@ public class ExportOptionsPage extends WizardPage {
     fExportSettingsCheck.setImage(OwlUI.getImage(fExportSettingsCheck, "icons/elcl16/preferences.gif"));
     fExportSettingsCheck.setText("Export Preferences");
     fExportSettingsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+    Dialog.applyDialogFont(container);
 
     setControl(container);
   }
