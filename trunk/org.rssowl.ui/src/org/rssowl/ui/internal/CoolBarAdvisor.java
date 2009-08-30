@@ -37,6 +37,7 @@ import org.eclipse.jface.action.ToolBarContributionItem;
 import org.eclipse.jface.action.ToolBarManager;
 import org.eclipse.jface.bindings.TriggerSequence;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -53,7 +54,11 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IPageListener;
+import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.eclipse.ui.PlatformUI;
@@ -117,14 +122,30 @@ public class CoolBarAdvisor {
   /* ID of a Separator */
   private static final String SPACER_ID = "org.rssowl.ui.CoolBarSpacer";
 
-  /* ID used to force a custom update of a Coolbar Item */
-  private static final String COOLBAR_ITEM_UPDATE = "org.rssowl.ui.internal.CoolBarItemUpdate";
-
   private final IWorkbenchWindow fWindow;
   private final ICoolBarManager fManager;
   private final IPreferenceScope fPreferences;
   private final AtomicInteger fLoadCounter = new AtomicInteger();
   private final IBindingService fBindingService = (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
+
+  /* Subclass of ActionContributionItem to use for the CoolBar */
+  private class CoolBarActionContributionitem extends ActionContributionItem {
+    private final CoolBarItem fItem;
+
+    CoolBarActionContributionitem(CoolBarItem item, IAction action) {
+      super(action);
+      fItem = item;
+    }
+
+    /**
+     * @param selection the current active {@link ISelection}.
+     * @param part the {@link IWorkbenchPart} that has become visible or
+     * <code>null</code> if none.
+     */
+    public void update(ISelection selection, IWorkbenchPart part) {
+      CoolBarAdvisor.this.update(getAction(), fItem, selection, part);
+    }
+  }
 
   /** A List of Possible Items */
   public enum CoolBarItem {
@@ -366,18 +387,18 @@ public class CoolBarAdvisor {
     /* Update Undo / Redo */
     UndoStack.getInstance().addListener(new IUndoRedoListener() {
       public void undoPerformed() {
-        update(CoolBarItem.UNDO, true);
-        update(CoolBarItem.REDO, true);
+        update(CoolBarItem.UNDO, null, null, true);
+        update(CoolBarItem.REDO, null, null, true);
       }
 
       public void redoPerformed() {
-        update(CoolBarItem.UNDO, true);
-        update(CoolBarItem.REDO, true);
+        update(CoolBarItem.UNDO, null, null, true);
+        update(CoolBarItem.REDO, null, null, true);
       }
 
       public void operationAdded() {
-        update(CoolBarItem.UNDO, true);
-        update(CoolBarItem.REDO, true);
+        update(CoolBarItem.UNDO, null, null, true);
+        update(CoolBarItem.REDO, null, null, true);
       }
     });
 
@@ -385,13 +406,78 @@ public class CoolBarAdvisor {
     Controller.getDefault().addBookMarkLoadListener(new BookMarkLoadListener() {
       public void bookMarkAboutToLoad(IBookMark bookmark) {
         if (fLoadCounter.incrementAndGet() == 1)
-          update(CoolBarItem.STOP, true);
+          update(CoolBarItem.STOP, null, null, true);
       }
 
       public void bookMarkDoneLoading(IBookMark bookmark) {
         if (fLoadCounter.decrementAndGet() == 0)
-          update(CoolBarItem.STOP, true);
+          update(CoolBarItem.STOP, null, null, true);
       }
+    });
+
+    /* Selection Listener across the Workbench */
+    final ISelectionListener selectionListener = new ISelectionListener() {
+      public void selectionChanged(IWorkbenchPart part, ISelection selection) {
+        update(CoolBarItem.MARK_READ, selection, part, false);
+        update(CoolBarItem.MOVE, selection, part, false);
+        update(CoolBarItem.COPY, selection, part, false);
+        update(CoolBarItem.STICKY, selection, part, false);
+        update(CoolBarItem.OPEN, selection, part, false);
+        update(CoolBarItem.UPDATE, selection, part, false);
+      }
+    };
+
+    /* Part Listener across the Workbench */
+    final IPartListener partListener = new IPartListener() {
+      public void partOpened(IWorkbenchPart part) {
+        update(CoolBarItem.SAVE_AS, null, part, false);
+        update(CoolBarItem.PRINT, null, part, false);
+        update(CoolBarItem.MARK_ALL_READ, null, part, false);
+        update(CoolBarItem.CLOSE, null, part, false);
+        update(CoolBarItem.CLOSE_OTHERS, null, part, false);
+        update(CoolBarItem.CLOSE_ALL, null, part, false);
+      }
+
+      public void partDeactivated(IWorkbenchPart part) {}
+
+      public void partClosed(IWorkbenchPart part) {
+        update(CoolBarItem.CLOSE, null, part, false);
+        update(CoolBarItem.CLOSE_OTHERS, null, part, false);
+        update(CoolBarItem.CLOSE_ALL, null, part, false);
+      }
+
+      public void partBroughtToTop(IWorkbenchPart part) {
+        update(CoolBarItem.SAVE_AS, null, part, false);
+        update(CoolBarItem.PRINT, null, part, false);
+        update(CoolBarItem.MARK_ALL_READ, null, part, false);
+        update(CoolBarItem.CLOSE, null, part, false);
+        update(CoolBarItem.CLOSE_OTHERS, null, part, false);
+        update(CoolBarItem.CLOSE_ALL, null, part, false);
+      }
+
+      public void partActivated(IWorkbenchPart part) {
+        update(CoolBarItem.SAVE_AS, null, part, false);
+        update(CoolBarItem.PRINT, null, part, false);
+        update(CoolBarItem.MARK_ALL_READ, null, part, false);
+        update(CoolBarItem.CLOSE, null, part, false);
+        update(CoolBarItem.CLOSE_OTHERS, null, part, false);
+        update(CoolBarItem.CLOSE_ALL, null, part, false);
+      }
+    };
+
+    /* Add Selection Listener to Workbench Pages */
+    fWindow.addPageListener(new IPageListener() {
+      public void pageOpened(IWorkbenchPage page) {
+        page.addSelectionListener(selectionListener);
+        page.addPartListener(partListener);
+      }
+
+      public void pageClosed(IWorkbenchPage page) {
+        page.removeSelectionListener(selectionListener);
+        page.removePartListener(partListener);
+      }
+
+      public void pageActivated(IWorkbenchPage page) {}
     });
   }
 
@@ -454,15 +540,7 @@ public class CoolBarAdvisor {
 
           /* Any other Item */
           else {
-            ActionContributionItem contribItem = new ActionContributionItem(getAction(item, mode, currentToolBar)) {
-              @Override
-              public void update(String propertyName) {
-                if (COOLBAR_ITEM_UPDATE.equals(propertyName))
-                  CoolBarAdvisor.this.update(getAction(), item);
-                else
-                  super.update(propertyName);
-              }
-            };
+            ActionContributionItem contribItem = new CoolBarActionContributionitem(item, getAction(item, mode, currentToolBar));
             contribItem.setId(item.getId());
             if (mode == CoolBarMode.IMAGE_TEXT)
               contribItem.setMode(ActionContributionItem.MODE_FORCE_TEXT);
@@ -480,7 +558,7 @@ public class CoolBarAdvisor {
       for (int id : items) {
         CoolBarItem item = CoolBarItem.values()[id];
         if (item != null) {
-          update(item, false);
+          update(item, null, null, false);
         }
       }
 
@@ -536,7 +614,7 @@ public class CoolBarAdvisor {
     return action;
   }
 
-  private void update(IAction action, CoolBarItem item) {
+  private void update(IAction action, CoolBarItem item, ISelection selection, IWorkbenchPart part) {
     switch (item) {
 
       /* Update Undo */
@@ -555,18 +633,78 @@ public class CoolBarAdvisor {
       case STOP:
         action.setEnabled(fLoadCounter.get() != 0);
         break;
+
+      /* Update Mark Read */
+      case MARK_READ:
+        action.setEnabled(part instanceof FeedView && !selection.isEmpty());
+        break;
+
+      /* Update Move */
+      case MOVE:
+        action.setEnabled(part instanceof FeedView && !selection.isEmpty());
+        break;
+
+      /* Update Copy */
+      case COPY:
+        action.setEnabled(part instanceof FeedView && !selection.isEmpty());
+        break;
+
+      /* Update Sticky */
+      case STICKY:
+        action.setEnabled(part instanceof FeedView && !selection.isEmpty());
+        break;
+
+      /* Update Open */
+      case OPEN:
+        action.setEnabled(part instanceof FeedView && !selection.isEmpty());
+        break;
+
+      /* Update Update */
+      case UPDATE:
+        action.setEnabled(!selection.isEmpty());
+        break;
+
+      /* Update Save As */
+      case SAVE_AS:
+        action.setEnabled(part instanceof FeedView || OwlUI.getActiveFeedView() != null);
+        break;
+
+      /* Update Print */
+      case PRINT:
+        action.setEnabled(part instanceof FeedView || OwlUI.getActiveFeedView() != null);
+        break;
+
+      /* Update Mark All Read */
+      case MARK_ALL_READ:
+        action.setEnabled(part instanceof FeedView || OwlUI.getActiveFeedView() != null);
+        break;
+
+      /* Update Close */
+      case CLOSE:
+        action.setEnabled(!OwlUI.getEditorReferences().isEmpty());
+        break;
+
+      /* Update Close Others */
+      case CLOSE_OTHERS:
+        action.setEnabled(OwlUI.getEditorReferences().size() > 1);
+        break;
+
+      /* Update Close All */
+      case CLOSE_ALL:
+        action.setEnabled(!OwlUI.getEditorReferences().isEmpty());
+        break;
     }
   }
 
-  private void update(final CoolBarItem coolBarItem, boolean ensureUIThread) {
+  private void update(final CoolBarItem coolBarItem, final ISelection selection, final IWorkbenchPart part, boolean ensureUIThread) {
     if (Controller.getDefault().isShuttingDown())
       return;
 
     Runnable runnable = new Runnable() {
       public void run() {
-        IContributionItem item = find(coolBarItem.getId());
+        CoolBarActionContributionitem item = find(coolBarItem.getId());
         if (item != null)
-          item.update(COOLBAR_ITEM_UPDATE);
+          item.update(selection != null ? selection : StructuredSelection.EMPTY, part);
       }
     };
 
@@ -576,13 +714,13 @@ public class CoolBarAdvisor {
       runnable.run();
   }
 
-  private IContributionItem find(String id) {
+  private CoolBarActionContributionitem find(String id) {
     IContributionItem[] items = fManager.getItems();
     for (IContributionItem item : items) {
       if (item instanceof ToolBarContributionItem) {
         IContributionItem result = ((ToolBarContributionItem) item).getToolBarManager().find(id);
-        if (result != null)
-          return result;
+        if (result != null && result instanceof CoolBarActionContributionitem)
+          return (CoolBarActionContributionitem) result;
       }
     }
 
