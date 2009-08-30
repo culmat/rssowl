@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.importer;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.wizard.WizardPage;
@@ -196,6 +197,8 @@ public class ImportSourcePage extends WizardPage {
       /* Import from Recommended Feeds */
       createImportRecommendedControls(container);
     }
+
+    Dialog.applyDialogFont(container);
 
     setControl(container);
     updatePageComplete();

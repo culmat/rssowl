@@ -206,6 +206,8 @@ public class AssignLabelsDialog extends Dialog {
 
     showInfo();
 
+    applyDialogFont(composite);
+
     return composite;
   }
 

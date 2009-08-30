@@ -206,6 +206,8 @@ public class EntityPropertyDialog extends Dialog implements IPropertyDialogSite 
     if (fInitialMessage != null && fInitialMessageType != null)
       setMessage(fInitialMessage, fInitialMessageType);
 
+    applyDialogFont(composite);
+
     return composite;
   }
 

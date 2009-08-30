@@ -160,6 +160,8 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
       }
     });
 
+    applyDialogFont(container);
+
     return container;
   }
 

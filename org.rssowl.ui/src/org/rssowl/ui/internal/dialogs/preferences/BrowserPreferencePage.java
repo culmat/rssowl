@@ -90,6 +90,8 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
     /* Browser Options */
     createBrowserOptions(container);
 
+    applyDialogFont(container);
+
     return container;
   }
 

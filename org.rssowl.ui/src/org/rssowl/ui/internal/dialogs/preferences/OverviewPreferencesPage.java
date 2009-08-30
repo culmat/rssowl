@@ -189,6 +189,8 @@ public class OverviewPreferencesPage extends PreferencePage implements IWorkbenc
     infoText.setText("Tip: Use the text field on top to search over all preferences.");
     infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
+    applyDialogFont(container);
+
     return container;
   }
 }

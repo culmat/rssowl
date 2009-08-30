@@ -152,6 +152,8 @@ public class NewNewsBinAction implements IWorkbenchWindowActionDelegate, IObject
       fFolderChooser.setLayout(LayoutUtils.createGridLayout(1, 0, 0, 2, 5, false));
       fFolderChooser.setBackground(container.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
 
+      applyDialogFont(container);
+
       return container;
     }
 

@@ -25,6 +25,7 @@
 package org.rssowl.ui.internal.dialogs.cleanup;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -286,6 +287,8 @@ public class CleanUpSummaryPage extends WizardPage {
         OwlUI.setAllChecked(fViewer.getTree(), false);
       }
     });
+
+    Dialog.applyDialogFont(container);
 
     setControl(container);
   }

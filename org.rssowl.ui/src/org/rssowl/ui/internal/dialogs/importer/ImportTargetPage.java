@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.importer;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -173,6 +174,8 @@ public class ImportTargetPage extends WizardPage {
         updatePageComplete();
       }
     });
+
+    Dialog.applyDialogFont(container);
 
     setControl(container);
   }

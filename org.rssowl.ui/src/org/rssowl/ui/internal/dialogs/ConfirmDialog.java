@@ -178,6 +178,8 @@ public class ConfirmDialog extends TitleAreaDialog {
     Label separator = new Label(sepHolder, SWT.SEPARATOR | SWT.HORIZONTAL);
     separator.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
+    applyDialogFont(composite);
+
     return composite;
   }
 

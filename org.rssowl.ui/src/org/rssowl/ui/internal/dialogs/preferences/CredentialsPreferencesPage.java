@@ -347,6 +347,8 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
       }
     });
 
+    applyDialogFont(container);
+
     return container;
   }
 

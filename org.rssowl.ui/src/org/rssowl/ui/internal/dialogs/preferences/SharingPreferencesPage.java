@@ -247,6 +247,8 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
     infoTextLabel.setText("Enabled communities will appar in the menu for selected Bookmarks and News.");
     infoTextLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
+    applyDialogFont(container);
+
     return container;
   }
 

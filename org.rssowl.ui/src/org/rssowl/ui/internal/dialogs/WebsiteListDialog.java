@@ -145,6 +145,8 @@ public class WebsiteListDialog extends Dialog {
     /* Set input */
     fViewer.setInput(fPreferences.getStrings(DefaultPreferences.DISABLE_JAVASCRIPT_EXCEPTIONS));
 
+    applyDialogFont(composite);
+
     return composite;
   }
 

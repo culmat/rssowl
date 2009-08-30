@@ -744,6 +744,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Separator */
     new Label(fBottomSash, SWT.SEPARATOR | SWT.HORIZONTAL).setLayoutData(new GridData(SWT.FILL, SWT.END, true, false));
 
+    applyDialogFont(fSashForm);
+
     return fSashForm;
   }
 

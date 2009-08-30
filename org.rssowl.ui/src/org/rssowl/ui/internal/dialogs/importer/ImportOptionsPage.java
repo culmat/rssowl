@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.importer;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -105,6 +106,8 @@ public class ImportOptionsPage extends WizardPage {
     fImportPreferencesCheck = new Button(container, SWT.CHECK);
     fImportPreferencesCheck.setImage(OwlUI.getImage(fImportPreferencesCheck, "icons/elcl16/preferences.gif"));
     fImportPreferencesCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+
+    Dialog.applyDialogFont(container);
 
     setControl(container);
   }
