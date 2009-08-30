@@ -719,7 +719,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
             @Override
             public boolean isEnabled() {
-              return !selection.isEmpty();
+              return !selection.isEmpty() || OwlUI.getActiveFeedView() != null;
             }
 
             @Override
