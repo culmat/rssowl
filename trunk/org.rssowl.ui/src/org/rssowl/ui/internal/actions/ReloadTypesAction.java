@@ -42,6 +42,9 @@ import org.rssowl.core.persist.INews;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.EntityGroup;
 import org.rssowl.ui.internal.EntityGroupItem;
+import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.editors.feed.FeedView;
+import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -101,6 +104,9 @@ public class ReloadTypesAction extends Action implements IObjectActionDelegate {
       fSelection = (IStructuredSelection) selection;
   }
 
+  /*
+   * @see org.eclipse.jface.action.Action#run()
+   */
   @Override
   public void run() {
     Set<IBookMark> selectedBookMarks = new TreeSet<IBookMark>(new Comparator<IBookMark>() {
@@ -109,6 +115,16 @@ public class ReloadTypesAction extends Action implements IObjectActionDelegate {
       }
     });
 
+    /* Set Selection to Input if Empty */
+    if (fSelection.isEmpty()) {
+      FeedView activeFeedView = OwlUI.getActiveFeedView();
+      if (activeFeedView != null) {
+        FeedViewInput input = (FeedViewInput) activeFeedView.getEditorInput();
+        fSelection = new StructuredSelection(input.getMark());
+      }
+    }
+
+    /* Run Update */
     List<?> list = fSelection.toList();
     for (Object selection : list) {
       if (selection instanceof IFolder) {
