@@ -661,7 +661,7 @@ public class CoolBarAdvisor {
 
       /* Update Update */
       case UPDATE:
-        action.setEnabled(!selection.isEmpty());
+        action.setEnabled(!selection.isEmpty() || OwlUI.getActiveFeedView() != null);
         break;
 
       /* Update Save As */
@@ -786,10 +786,8 @@ public class CoolBarAdvisor {
         /* Update */
       case UPDATE: {
         IStructuredSelection activeSelection = OwlUI.getActiveSelection();
-        if (activeSelection != null && !activeSelection.isEmpty()) {
-          ReloadTypesAction action = new ReloadTypesAction(activeSelection, fWindow.getShell());
-          action.run(null);
-        }
+        ReloadTypesAction action = new ReloadTypesAction(activeSelection, fWindow.getShell());
+        action.run(null);
 
         break;
       }
