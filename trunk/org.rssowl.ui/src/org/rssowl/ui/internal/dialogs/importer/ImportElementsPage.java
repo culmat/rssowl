@@ -309,6 +309,7 @@ public class ImportElementsPage extends WizardPage {
 
     fSelectAll = new Button(buttonContainer, SWT.PUSH);
     fSelectAll.setText("&Select All");
+    Dialog.applyDialogFont(fSelectAll);
     setButtonLayoutData(fSelectAll);
     fSelectAll.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -320,6 +321,7 @@ public class ImportElementsPage extends WizardPage {
 
     fDeselectAll = new Button(buttonContainer, SWT.PUSH);
     fDeselectAll.setText("&Deselect All");
+    Dialog.applyDialogFont(fDeselectAll);
     setButtonLayoutData(fDeselectAll);
     fDeselectAll.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -337,6 +339,7 @@ public class ImportElementsPage extends WizardPage {
     fPreviewButton.setText("&Preview");
     fPreviewButton.setEnabled(false);
     fPreviewButton.setToolTipText("Show a Preview of a Selected Feed");
+    Dialog.applyDialogFont(fPreviewButton);
     setButtonLayoutData(fPreviewButton);
     fPreviewButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -348,6 +351,7 @@ public class ImportElementsPage extends WizardPage {
     /* Show as Flat List of News Marks */
     fFlattenCheck = new Button(buttonContainer, SWT.CHECK);
     fFlattenCheck.setText("Flatten Hierarchy");
+    Dialog.applyDialogFont(fFlattenCheck);
     setButtonLayoutData(fFlattenCheck);
     ((GridData) fFlattenCheck.getLayoutData()).horizontalAlignment = SWT.END;
     ((GridData) fFlattenCheck.getLayoutData()).horizontalIndent = 30;
@@ -365,6 +369,7 @@ public class ImportElementsPage extends WizardPage {
     fHideExistingCheck = new Button(buttonContainer, SWT.CHECK);
     fHideExistingCheck.setText("Hide Existing");
     fHideExistingCheck.setSelection(true);
+    Dialog.applyDialogFont(fHideExistingCheck);
     setButtonLayoutData(fHideExistingCheck);
     ((GridData) fHideExistingCheck.getLayoutData()).exclude = isWelcome;
     fHideExistingCheck.addSelectionListener(new SelectionAdapter() {

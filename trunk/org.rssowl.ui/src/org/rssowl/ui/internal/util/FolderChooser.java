@@ -390,7 +390,8 @@ public class FolderChooser extends Composite implements DisposeListener {
       public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
     });
 
-    fFolderViewer.setLabelProvider(new BookMarkLabelProvider(false));
+    boolean usedInDialog = (fParent.getShell().getParent() != null);
+    fFolderViewer.setLabelProvider(new BookMarkLabelProvider(false, usedInDialog));
     fFolderViewer.setInput(new Object());
 
     fFolderViewer.addSelectionChangedListener(new ISelectionChangedListener() {

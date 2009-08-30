@@ -100,6 +100,7 @@ public class WebsiteListDialog extends Dialog {
     Button addWebsiteButton = new Button(composite, SWT.PUSH);
     addWebsiteButton.getShell().setDefaultButton(addWebsiteButton);
     addWebsiteButton.setText("&Add");
+    applyDialogFont(addWebsiteButton);
     setButtonLayoutData(addWebsiteButton);
     addWebsiteButton.addSelectionListener(new SelectionAdapter() {
       @Override

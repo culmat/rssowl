@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.preferences;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -188,6 +189,7 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
     fMoveUpButton = new Button(buttonContainer, SWT.PUSH);
     fMoveUpButton.setText("Move &Up");
     fMoveUpButton.setEnabled(false);
+    Dialog.applyDialogFont(fMoveUpButton);
     setButtonLayoutData(fMoveUpButton);
     fMoveUpButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -200,6 +202,7 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
     fMoveDownButton = new Button(buttonContainer, SWT.PUSH);
     fMoveDownButton.setText("Move &Down");
     fMoveDownButton.setEnabled(false);
+    Dialog.applyDialogFont(fMoveDownButton);
     setButtonLayoutData(fMoveDownButton);
     fMoveDownButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -215,6 +218,7 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
     /* Select All */
     Button selectAllButton = new Button(buttonContainer, SWT.PUSH);
     selectAllButton.setText("Select &All");
+    Dialog.applyDialogFont(selectAllButton);
     setButtonLayoutData(selectAllButton);
     selectAllButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -226,6 +230,7 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
     /* De-Select All */
     Button deSelectAllButton = new Button(buttonContainer, SWT.PUSH);
     deSelectAllButton.setText("&Deselect All");
+    Dialog.applyDialogFont(deSelectAllButton);
     setButtonLayoutData(deSelectAllButton);
     deSelectAllButton.addSelectionListener(new SelectionAdapter() {
       @Override

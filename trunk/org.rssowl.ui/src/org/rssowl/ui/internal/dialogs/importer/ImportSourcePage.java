@@ -254,6 +254,7 @@ public class ImportSourcePage extends WizardPage {
     fBrowseFileButton = new Button(sourceInputContainer, SWT.PUSH);
     fBrowseFileButton.setText("Browse...");
     fBrowseFileButton.setEnabled(fImportFromResourceRadio.getSelection());
+    Dialog.applyDialogFont(fBrowseFileButton);
     setButtonLayoutData(fBrowseFileButton);
     fBrowseFileButton.addSelectionListener(new SelectionAdapter() {
       @Override

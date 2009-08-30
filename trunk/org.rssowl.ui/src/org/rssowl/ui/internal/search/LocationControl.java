@@ -297,7 +297,7 @@ public class LocationControl extends Composite {
         public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {}
       });
 
-      fViewer.setLabelProvider(new BookMarkLabelProvider(false) {
+      fViewer.setLabelProvider(new BookMarkLabelProvider(false, true) {
         @Override
         public void update(ViewerCell cell) {
           super.update(cell);
@@ -420,6 +420,7 @@ public class LocationControl extends Composite {
       if (fMode == Mode.SEARCH_LOCATION) {
         Button selectAll = new Button(buttonContainer, SWT.PUSH);
         selectAll.setText("&Select All");
+        Dialog.applyDialogFont(selectAll);
         setButtonLayoutData(selectAll);
         selectAll.addSelectionListener(new SelectionAdapter() {
           @Override
@@ -431,6 +432,7 @@ public class LocationControl extends Composite {
 
         Button deselectAll = new Button(buttonContainer, SWT.PUSH);
         deselectAll.setText("&Deselect All");
+        Dialog.applyDialogFont(deselectAll);
         setButtonLayoutData(deselectAll);
         deselectAll.addSelectionListener(new SelectionAdapter() {
           @Override
@@ -445,6 +447,7 @@ public class LocationControl extends Composite {
       else {
         Button createBin = new Button(buttonContainer, SWT.PUSH);
         createBin.setText("&New News Bin...");
+        Dialog.applyDialogFont(createBin);
         setButtonLayoutData(createBin);
         createBin.addSelectionListener(new SelectionAdapter() {
           @Override

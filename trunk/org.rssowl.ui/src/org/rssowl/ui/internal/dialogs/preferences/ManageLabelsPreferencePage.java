@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.preferences;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
@@ -166,6 +167,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
 
     Button addButton = new Button(buttonBox, SWT.PUSH);
     addButton.setText("&New...");
+    Dialog.applyDialogFont(addButton);
     setButtonLayoutData(addButton);
     addButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -177,6 +179,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     final Button editButton = new Button(buttonBox, SWT.PUSH);
     editButton.setText("&Edit...");
     editButton.setEnabled(!fViewer.getSelection().isEmpty());
+    Dialog.applyDialogFont(editButton);
     setButtonLayoutData(editButton);
     editButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -188,6 +191,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     final Button deleteButton = new Button(buttonBox, SWT.PUSH);
     deleteButton.setText("&Delete...");
     deleteButton.setEnabled(!fViewer.getSelection().isEmpty());
+    Dialog.applyDialogFont(deleteButton);
     setButtonLayoutData(deleteButton);
     deleteButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -203,6 +207,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     fMoveUpButton = new Button(buttonBox, SWT.PUSH);
     fMoveUpButton.setText("Move &Up");
     fMoveUpButton.setEnabled(false);
+    Dialog.applyDialogFont(fMoveUpButton);
     setButtonLayoutData(fMoveUpButton);
     fMoveUpButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -215,6 +220,7 @@ public class ManageLabelsPreferencePage extends PreferencePage implements IWorkb
     fMoveDownButton = new Button(buttonBox, SWT.PUSH);
     fMoveDownButton.setText("Move &Down");
     fMoveDownButton.setEnabled(false);
+    Dialog.applyDialogFont(fMoveDownButton);
     setButtonLayoutData(fMoveDownButton);
     fMoveDownButton.addSelectionListener(new SelectionAdapter() {
       @Override

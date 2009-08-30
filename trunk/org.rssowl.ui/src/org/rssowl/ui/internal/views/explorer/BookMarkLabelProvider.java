@@ -81,9 +81,10 @@ public class BookMarkLabelProvider extends CellLabelProvider {
 
   /* Settings */
   private boolean fIndicateState;
+  private final boolean fUseDialogFont;
   private boolean fUseFavicons = true;
 
-  /** */
+  /** Default Constructor */
   public BookMarkLabelProvider() {
     this(true);
   }
@@ -92,7 +93,16 @@ public class BookMarkLabelProvider extends CellLabelProvider {
    * @param indicateState
    */
   public BookMarkLabelProvider(boolean indicateState) {
+    this(indicateState, false);
+  }
+
+  /**
+   * @param indicateState
+   * @param useDialogFont
+   */
+  public BookMarkLabelProvider(boolean indicateState, boolean useDialogFont) {
     fIndicateState = indicateState;
+    fUseDialogFont = useDialogFont;
     fResources = new LocalResourceManager(JFaceResources.getResources());
     createResources();
   }
@@ -124,8 +134,8 @@ public class BookMarkLabelProvider extends CellLabelProvider {
     fNewsBinEmptyIcon = OwlUI.getImage(fResources, OwlUI.NEWSBIN_EMPTY);
 
     /* Fonts */
-    fBoldFont = OwlUI.getThemeFont(OwlUI.BKMRK_EXPLORER_FONT_ID, SWT.BOLD);
-    fDefaultFont = OwlUI.getThemeFont(OwlUI.BKMRK_EXPLORER_FONT_ID, SWT.NORMAL);
+    fBoldFont = OwlUI.getThemeFont(fUseDialogFont ? OwlUI.DIALOG_FONT_ID : OwlUI.BKMRK_EXPLORER_FONT_ID, SWT.BOLD);
+    fDefaultFont = OwlUI.getThemeFont(fUseDialogFont ? OwlUI.DIALOG_FONT_ID : OwlUI.BKMRK_EXPLORER_FONT_ID, SWT.NORMAL);
 
     /* Colors */
     fStickyBgColor = OwlUI.getThemeColor(OwlUI.STICKY_BG_COLOR_ID, fResources, new RGB(255, 255, 180));

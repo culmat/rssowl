@@ -392,6 +392,7 @@ public class SearchMarkDialog extends TitleAreaDialog {
     /* Status Label */
     Link previewLink = new Link(buttonBar, SWT.NONE);
     previewLink.setText("Click <a>here</a> to preview the search results.");
+    applyDialogFont(previewLink);
     previewLink.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     previewLink.addSelectionListener(new SelectionAdapter() {
       @Override

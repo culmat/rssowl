@@ -337,6 +337,7 @@ public class CustomizeToolbarDialog extends Dialog {
 
     fAddButton = new Button(buttonContainer, SWT.DOWN);
     fAddButton.setText("&Add");
+    applyDialogFont(fAddButton);
     setButtonLayoutData(fAddButton);
     fAddButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -353,6 +354,7 @@ public class CustomizeToolbarDialog extends Dialog {
     fRemoveButton = new Button(buttonContainer, SWT.PUSH);
     fRemoveButton.setText("&Remove");
     fRemoveButton.setEnabled(false);
+    applyDialogFont(fRemoveButton);
     setButtonLayoutData(fRemoveButton);
     fRemoveButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -369,6 +371,7 @@ public class CustomizeToolbarDialog extends Dialog {
     fMoveUpButton = new Button(buttonContainer, SWT.PUSH);
     fMoveUpButton.setText("Move &Up");
     fMoveUpButton.setEnabled(false);
+    applyDialogFont(fMoveUpButton);
     setButtonLayoutData(fMoveUpButton);
     fMoveUpButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -381,6 +384,7 @@ public class CustomizeToolbarDialog extends Dialog {
     fMoveDownButton = new Button(buttonContainer, SWT.PUSH);
     fMoveDownButton.setText("Move &Down");
     fMoveDownButton.setEnabled(false);
+    applyDialogFont(fMoveDownButton);
     setButtonLayoutData(fMoveDownButton);
     fMoveDownButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -392,6 +396,7 @@ public class CustomizeToolbarDialog extends Dialog {
     /* Restore Defaults */
     fRestoreDefaults = new Button(buttonContainer, SWT.PUSH);
     fRestoreDefaults.setText("Restore &Defaults");
+    applyDialogFont(fRestoreDefaults);
     setButtonLayoutData(fRestoreDefaults);
     ((GridData) fRestoreDefaults.getLayoutData()).grabExcessVerticalSpace = true;
     ((GridData) fRestoreDefaults.getLayoutData()).verticalAlignment = SWT.END;

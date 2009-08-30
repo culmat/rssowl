@@ -1090,6 +1090,8 @@ public class SearchNewsDialog extends TitleAreaDialog {
     /* Status Label */
     fStatusLabel = new Link(buttonBar, SWT.NONE);
     fStatusLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    fStatusLabel.setText("");
+    applyDialogFont(fStatusLabel);
     fStatusLabel.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

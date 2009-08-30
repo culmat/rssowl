@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.preferences;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -232,7 +233,7 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
     });
 
     /* LabelProvider */
-    fViewer.setLabelProvider(new BookMarkLabelProvider(false));
+    fViewer.setLabelProvider(new BookMarkLabelProvider(false, true));
 
     /* Viewer Filter */
     fViewer.addFilter(new ViewerFilter() {
@@ -300,6 +301,7 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
 
     fSelectAll = new Button(buttonContainer, SWT.PUSH);
     fSelectAll.setText("&Select All");
+    Dialog.applyDialogFont(fSelectAll);
     setButtonLayoutData(fSelectAll);
     fSelectAll.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -310,6 +312,7 @@ public class NotifierPreferencesPage extends PreferencePage implements IWorkbenc
 
     fDeselectAll = new Button(buttonContainer, SWT.PUSH);
     fDeselectAll.setText("&Deselect All");
+    Dialog.applyDialogFont(fDeselectAll);
     setButtonLayoutData(fDeselectAll);
     fDeselectAll.addSelectionListener(new SelectionAdapter() {
       @Override
