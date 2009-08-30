@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.preferences;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -147,6 +148,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
 
     fCustomBrowserSearchButton = new Button(browserGroup, SWT.PUSH);
     fCustomBrowserSearchButton.setText("Browse...");
+    Dialog.applyDialogFont(fCustomBrowserSearchButton);
     setButtonLayoutData(fCustomBrowserSearchButton);
     fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
     fCustomBrowserSearchButton.addSelectionListener(new SelectionAdapter() {
@@ -200,6 +202,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
       fDisableJavaScriptExceptionsButton = new Button(jsContainer, SWT.PUSH);
       fDisableJavaScriptExceptionsButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
       fDisableJavaScriptExceptionsButton.setText("Exceptions...");
+      Dialog.applyDialogFont(fDisableJavaScriptExceptionsButton);
       setButtonLayoutData(fDisableJavaScriptExceptionsButton);
       fDisableJavaScriptExceptionsButton.setEnabled(fDisableJavaScriptCheck.getSelection());
       fDisableJavaScriptExceptionsButton.addSelectionListener(new SelectionAdapter() {

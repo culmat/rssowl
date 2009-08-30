@@ -282,6 +282,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     Button addButton = new Button(buttonContainer, SWT.PUSH);
     addButton.setText("&New...");
     addButton.setFocus();
+    applyDialogFont(addButton);
     setButtonLayoutData(addButton);
     addButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -293,6 +294,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     /* Edits a selected Filter */
     fEditButton = new Button(buttonContainer, SWT.PUSH);
     fEditButton.setText("&Edit...");
+    applyDialogFont(fEditButton);
     setButtonLayoutData(fEditButton);
     fEditButton.setEnabled(false);
     fEditButton.addSelectionListener(new SelectionAdapter() {
@@ -305,6 +307,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     /* Deletes the selected Filter */
     fDeleteButton = new Button(buttonContainer, SWT.PUSH);
     fDeleteButton.setText("&Delete...");
+    applyDialogFont(fDeleteButton);
     setButtonLayoutData(fDeleteButton);
     fDeleteButton.setEnabled(false);
     fDeleteButton.addSelectionListener(new SelectionAdapter() {
@@ -322,6 +325,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     fMoveUpButton = new Button(buttonContainer, SWT.PUSH);
     fMoveUpButton.setText("Move &Up");
     fMoveUpButton.setEnabled(false);
+    applyDialogFont(fMoveUpButton);
     setButtonLayoutData(fMoveUpButton);
     fMoveUpButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -334,6 +338,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     fMoveDownButton = new Button(buttonContainer, SWT.PUSH);
     fMoveDownButton.setText("Move &Down");
     fMoveDownButton.setEnabled(false);
+    applyDialogFont(fMoveDownButton);
     setButtonLayoutData(fMoveDownButton);
     fMoveDownButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -350,6 +355,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     fApplySelectedFilter = new Button(buttonBar, SWT.PUSH);
     fApplySelectedFilter.setText("&Run Selected Filter...");
     fApplySelectedFilter.setEnabled(false);
+    applyDialogFont(fApplySelectedFilter);
     setButtonLayoutData(fApplySelectedFilter);
     ((GridData) fApplySelectedFilter.getLayoutData()).grabExcessHorizontalSpace = false;
     ((GridData) fApplySelectedFilter.getLayoutData()).horizontalAlignment = SWT.BEGINNING;
@@ -363,6 +369,7 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
     /* Close */
     Button closeButton = new Button(buttonBar, SWT.PUSH);
     closeButton.setText("&Close");
+    applyDialogFont(closeButton);
     setButtonLayoutData(closeButton);
     ((GridData) closeButton.getLayoutData()).grabExcessHorizontalSpace = true;
     ((GridData) closeButton.getLayoutData()).horizontalAlignment = SWT.END;

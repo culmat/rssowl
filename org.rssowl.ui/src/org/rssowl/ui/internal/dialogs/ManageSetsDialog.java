@@ -261,6 +261,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
     /* Adds a new Bookmark Set */
     Button addButton = new Button(buttonContainer, SWT.PUSH);
     addButton.setText("&New...");
+    applyDialogFont(addButton);
     setButtonLayoutData(addButton);
     addButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -272,6 +273,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
     /* Edits a selected Bookmark Set */
     fEditButton = new Button(buttonContainer, SWT.PUSH);
     fEditButton.setText("&Edit...");
+    applyDialogFont(fEditButton);
     setButtonLayoutData(fEditButton);
     fEditButton.setEnabled(false);
     fEditButton.addSelectionListener(new SelectionAdapter() {
@@ -284,6 +286,7 @@ public class ManageSetsDialog extends TitleAreaDialog {
     /* Deletes the selected Bookmark Set */
     fDeleteButton = new Button(buttonContainer, SWT.PUSH);
     fDeleteButton.setText("&Delete...");
+    applyDialogFont(fDeleteButton);
     setButtonLayoutData(fDeleteButton);
     ((GridData) fDeleteButton.getLayoutData()).verticalAlignment = SWT.END;
     ((GridData) fDeleteButton.getLayoutData()).grabExcessVerticalSpace = true;

@@ -24,6 +24,7 @@
 
 package org.rssowl.ui.internal.dialogs.preferences;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.viewers.CellLabelProvider;
@@ -228,6 +229,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     fResetMasterPassword = new Button(masterContainer, SWT.PUSH);
     fResetMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
     fResetMasterPassword.setText("Change Master Password...");
+    Dialog.applyDialogFont(fResetMasterPassword);
     setButtonLayoutData(fResetMasterPassword);
     fResetMasterPassword.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -336,6 +338,8 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
       }
     });
 
+    Dialog.applyDialogFont(fRemoveSelected);
+    Dialog.applyDialogFont(fRemoveAll);
     setButtonLayoutData(fRemoveSelected);
     setButtonLayoutData(fRemoveAll);
     ((GridData) fRemoveAll.getLayoutData()).grabExcessHorizontalSpace = false;

@@ -371,6 +371,7 @@ public class PreviewFeedDialog extends Dialog {
 
     /* Status Label */
     fStatusLabel = new Link(buttonBar, SWT.NONE);
+    applyDialogFont(fStatusLabel);
     fStatusLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     if (StringUtils.isSet(fBookmark.getName()))
       fStatusLabel.setText(fBookmark.getName());

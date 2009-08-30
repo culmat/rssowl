@@ -85,6 +85,7 @@ public class ExportElementsPage extends WizardPage {
 
     fSelectAll = new Button(buttonContainer, SWT.PUSH);
     fSelectAll.setText("&Select All");
+    Dialog.applyDialogFont(fSelectAll);
     setButtonLayoutData(fSelectAll);
     fSelectAll.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -95,6 +96,7 @@ public class ExportElementsPage extends WizardPage {
 
     fDeselectAll = new Button(buttonContainer, SWT.PUSH);
     fDeselectAll.setText("&Deselect All");
+    Dialog.applyDialogFont(fDeselectAll);
     setButtonLayoutData(fDeselectAll);
     fDeselectAll.addSelectionListener(new SelectionAdapter() {
       @Override

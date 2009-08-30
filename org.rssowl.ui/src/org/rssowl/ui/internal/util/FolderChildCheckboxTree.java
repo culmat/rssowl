@@ -168,7 +168,8 @@ public class FolderChildCheckboxTree {
     });
 
     /* LabelProvider */
-    fViewer.setLabelProvider(new BookMarkLabelProvider(false));
+    boolean usedInDialog = (fParent.getShell().getParent() != null);
+    fViewer.setLabelProvider(new BookMarkLabelProvider(false, usedInDialog));
 
     /* Listen on Doubleclick */
     fViewer.addDoubleClickListener(new IDoubleClickListener() {

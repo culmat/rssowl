@@ -269,6 +269,9 @@ public class OwlUI {
   /** Notification Popup Font Id */
   public static final String NOTIFICATION_POPUP_FONT_ID = "org.rssowl.ui.NotificationPopupFont";
 
+  /** Dialog Font Id */
+  public static final String DIALOG_FONT_ID = "org.eclipse.jface.dialogfont";
+
   /** Sticky Background Color */
   public static final String STICKY_BG_COLOR_ID = "org.rssowl.ui.StickyBGColor";
 
