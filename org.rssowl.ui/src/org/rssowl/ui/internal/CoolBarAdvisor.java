@@ -795,6 +795,7 @@ public class CoolBarAdvisor {
         /* Stop */
       case STOP: {
         Controller.getDefault().stopUpdate();
+        wrappingAction.setEnabled(false);
         break;
       }
 
