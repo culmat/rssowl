@@ -454,6 +454,8 @@ public class LocationControl extends Composite {
         });
       }
 
+      applyDialogFont(composite);
+
       return composite;
     }
 
