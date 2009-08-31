@@ -194,7 +194,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     autoReloadContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fUpdateCheck = new Button(autoReloadContainer, SWT.CHECK);
-    fUpdateCheck.setText("&Automatically update the feeds every ");
+    fUpdateCheck.setText("Automatically &update the feeds every ");
     fUpdateCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_UPDATE_INTERVAL_STATE));
     fUpdateCheck.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -229,13 +229,13 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     /* Reload Feeds on Startup */
     fReloadOnStartupCheck = new Button(group, SWT.CHECK);
     fReloadOnStartupCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fReloadOnStartupCheck.setText("Automatically &update the feeds on start-up");
+    fReloadOnStartupCheck.setText("Automatically update the feeds on &start-up");
     fReloadOnStartupCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_RELOAD_ON_STARTUP));
 
     /* Open on Startup */
     fOpenOnStartupCheck = new Button(group, SWT.CHECK);
     fOpenOnStartupCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fOpenOnStartupCheck.setText("&Display the feeds on start-up");
+    fOpenOnStartupCheck.setText("Display the &feeds on start-up");
     fOpenOnStartupCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_OPEN_ON_STARTUP));
   }
 
@@ -274,17 +274,17 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     /* Mark Read on changing displayed Feed */
     fMarkReadOnChange = new Button(group, SWT.CHECK);
-    fMarkReadOnChange.setText("Mark &displayed news as read when switching feeds");
+    fMarkReadOnChange.setText("Mark displayed &news as read when switching feeds");
     fMarkReadOnChange.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_READ_ON_CHANGE));
 
     /* Mark Read on closing the Feed Tab */
     fMarkReadOnTabClose = new Button(group, SWT.CHECK);
-    fMarkReadOnTabClose.setText("Mark displayed &news as read when closing the tab");
+    fMarkReadOnTabClose.setText("Mark displayed news as read when &closing the tab");
     fMarkReadOnTabClose.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE));
 
     /* Mark Read on Minimize */
     fMarkReadOnMinimize = new Button(group, SWT.CHECK);
-    fMarkReadOnMinimize.setText("Mark displayed news as read on &minimize");
+    fMarkReadOnMinimize.setText("Mark displayed news as read on m&inimize");
     fMarkReadOnMinimize.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE));
   }
 
@@ -341,7 +341,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     /* Load Images for News Settings */
     fLoadImagesForNewsCheck = new Button(group, SWT.CHECK);
-    fLoadImagesForNewsCheck.setText("&Display images and flash content from news");
+    fLoadImagesForNewsCheck.setText("Display &images and flash content from news");
     fLoadImagesForNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fLoadImagesForNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_LOAD_IMAGES));
   }

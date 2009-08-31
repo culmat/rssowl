@@ -201,7 +201,7 @@ public class WebsiteListDialog extends Dialog {
     });
 
     /* Remove All */
-    Button removeAllButton = createButton(parent, -2, "Remove &all Websites", false);
+    Button removeAllButton = createButton(parent, -2, "Remove all &Websites", false);
     removeAllButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

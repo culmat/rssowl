@@ -329,7 +329,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
     });
 
     fRemoveAll = new Button(container, SWT.PUSH);
-    fRemoveAll.setText("Remove &All");
+    fRemoveAll.setText("Re&move All");
     fRemoveAll.setEnabled(fViewer.getTable().getItemCount() > 0);
     fRemoveAll.addSelectionListener(new SelectionAdapter() {
       @Override

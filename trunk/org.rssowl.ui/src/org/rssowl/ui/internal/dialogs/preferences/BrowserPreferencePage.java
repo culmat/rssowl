@@ -189,7 +189,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
       jsContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
 
       fDisableJavaScriptCheck = new Button(jsContainer, SWT.CHECK);
-      fDisableJavaScriptCheck.setText("&Disable JavaScript in Browser");
+      fDisableJavaScriptCheck.setText("Disable &JavaScript in Browser");
       fDisableJavaScriptCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, true));
       fDisableJavaScriptCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT));
       fDisableJavaScriptCheck.addSelectionListener(new SelectionAdapter() {
@@ -201,7 +201,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
 
       fDisableJavaScriptExceptionsButton = new Button(jsContainer, SWT.PUSH);
       fDisableJavaScriptExceptionsButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
-      fDisableJavaScriptExceptionsButton.setText("&Exceptions...");
+      fDisableJavaScriptExceptionsButton.setText("E&xceptions...");
       Dialog.applyDialogFont(fDisableJavaScriptExceptionsButton);
       setButtonLayoutData(fDisableJavaScriptExceptionsButton);
       fDisableJavaScriptExceptionsButton.setEnabled(fDisableJavaScriptCheck.getSelection());

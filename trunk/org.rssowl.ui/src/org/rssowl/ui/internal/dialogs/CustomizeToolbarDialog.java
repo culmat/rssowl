@@ -405,7 +405,7 @@ public class CustomizeToolbarDialog extends Dialog {
 
     /* Restore Defaults */
     fRestoreDefaults = new Button(buttonContainer, SWT.PUSH);
-    fRestoreDefaults.setText("Restore &Defaults");
+    fRestoreDefaults.setText("R&estore Defaults");
     applyDialogFont(fRestoreDefaults);
     setButtonLayoutData(fRestoreDefaults);
     ((GridData) fRestoreDefaults.getLayoutData()).grabExcessVerticalSpace = true;
@@ -436,8 +436,10 @@ public class CustomizeToolbarDialog extends Dialog {
               return "Icons";
             case TEXT:
               return "Text";
-            case IMAGE_TEXT:
+            case IMAGE_TEXT_VERTICAL:
               return "Icons and Text";
+            case IMAGE_TEXT_HORIZONTAL:
+              return "Icons and Text (small)";
           }
         }
 
