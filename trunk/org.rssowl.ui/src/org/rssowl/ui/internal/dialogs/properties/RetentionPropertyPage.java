@@ -152,7 +152,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     fDeleteNewsByCountCheck = new Button(container, SWT.CHECK);
     fDeleteNewsByCountCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
     fDeleteNewsByCountCheck.setSelection(fPrefDeleteNewsByCountState);
-    fDeleteNewsByCountCheck.setText("Maximum number of news to keep: ");
+    fDeleteNewsByCountCheck.setText("&Maximum number of news to keep: ");
     fDeleteNewsByCountCheck.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -171,7 +171,7 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     fDeleteNewsByAgeCheck = new Button(container, SWT.CHECK);
     fDeleteNewsByAgeCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
     fDeleteNewsByAgeCheck.setSelection(fPrefDeleteNewsByAgeState);
-    fDeleteNewsByAgeCheck.setText("Maximum age of news in days: ");
+    fDeleteNewsByAgeCheck.setText("Maximum &age of news in days: ");
     fDeleteNewsByAgeCheck.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -189,13 +189,13 @@ public class RetentionPropertyPage implements IEntityPropertyPage {
     /* Delete by State */
     fDeleteReadNewsCheck = new Button(container, SWT.CHECK);
     fDeleteReadNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
-    fDeleteReadNewsCheck.setText("Always delete read news");
+    fDeleteReadNewsCheck.setText("Always &delete read news");
     fDeleteReadNewsCheck.setSelection(fPrefDeleteReadNews);
 
     /* Never Delete Unread News State */
     fNeverDeleteUnreadNewsCheck = new Button(container, SWT.CHECK);
     fNeverDeleteUnreadNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
-    fNeverDeleteUnreadNewsCheck.setText("Never delete unread news");
+    fNeverDeleteUnreadNewsCheck.setText("Never delete &unread news");
     fNeverDeleteUnreadNewsCheck.setSelection(fPrefNeverDeleteUnReadNews);
 
     /* Info Container */

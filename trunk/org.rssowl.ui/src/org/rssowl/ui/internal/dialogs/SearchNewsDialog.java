@@ -801,7 +801,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
     fMatchAllRadio.setSelection(fMatchAllConditions);
 
     fMatchAnyRadio = new Button(topControlsContainer, SWT.RADIO);
-    fMatchAnyRadio.setText("Match any c&ondition");
+    fMatchAnyRadio.setText("Match &any condition");
     fMatchAnyRadio.setSelection(!fMatchAllConditions);
 
     /* Separator */

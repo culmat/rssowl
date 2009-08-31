@@ -462,7 +462,7 @@ public class NewsFilterDialog extends TitleAreaDialog {
     fMatchAnyRadio.setSelection(!matchAllConditions && !matchAllNews);
 
     fMatchAllNewsRadio = new Button(topControlsContainer, SWT.RADIO);
-    fMatchAllNewsRadio.setText("Match All");
+    fMatchAllNewsRadio.setText("Match &all");
     fMatchAllNewsRadio.setSelection(matchAllNews);
     fMatchAllNewsRadio.addSelectionListener(new SelectionAdapter() {
       @Override

@@ -159,11 +159,11 @@ public class SearchMarkPropertyPage implements IEntityPropertyPage {
     ((GridLayout) topControlsContainer.getLayout()).marginTop = 10;
 
     fMatchAllRadio = new Button(topControlsContainer, SWT.RADIO);
-    fMatchAllRadio.setText("Match all conditions");
+    fMatchAllRadio.setText("&Match all conditions");
     fMatchAllRadio.setSelection(mark.matchAllConditions());
 
     fMatchAnyRadio = new Button(topControlsContainer, SWT.RADIO);
-    fMatchAnyRadio.setText("Match any condition");
+    fMatchAnyRadio.setText("Match &any condition");
     fMatchAnyRadio.setSelection(!mark.matchAllConditions());
 
     /* Separator */

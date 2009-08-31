@@ -194,7 +194,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     autoReloadContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fUpdateCheck = new Button(autoReloadContainer, SWT.CHECK);
-    fUpdateCheck.setText("Automatically update the feeds every ");
+    fUpdateCheck.setText("&Automatically update the feeds every ");
     fUpdateCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_UPDATE_INTERVAL_STATE));
     fUpdateCheck.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -229,13 +229,13 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     /* Reload Feeds on Startup */
     fReloadOnStartupCheck = new Button(group, SWT.CHECK);
     fReloadOnStartupCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fReloadOnStartupCheck.setText("Automatically update the feeds on start-up");
+    fReloadOnStartupCheck.setText("Automatically &update the feeds on start-up");
     fReloadOnStartupCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_RELOAD_ON_STARTUP));
 
     /* Open on Startup */
     fOpenOnStartupCheck = new Button(group, SWT.CHECK);
     fOpenOnStartupCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fOpenOnStartupCheck.setText("Display the feeds on start-up");
+    fOpenOnStartupCheck.setText("&Display the feeds on start-up");
     fOpenOnStartupCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_OPEN_ON_STARTUP));
   }
 
@@ -254,7 +254,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     /* Mark Read after Millis */
     fMarkReadStateCheck = new Button(markReadAfterContainer, SWT.CHECK);
-    fMarkReadStateCheck.setText("Mark selected news as read after ");
+    fMarkReadStateCheck.setText("&Mark selected news as read after ");
     fMarkReadStateCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_READ_STATE));
     fMarkReadStateCheck.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -274,17 +274,17 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     /* Mark Read on changing displayed Feed */
     fMarkReadOnChange = new Button(group, SWT.CHECK);
-    fMarkReadOnChange.setText("Mark displayed news as read when switching feeds");
+    fMarkReadOnChange.setText("Mark &displayed news as read when switching feeds");
     fMarkReadOnChange.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_READ_ON_CHANGE));
 
     /* Mark Read on closing the Feed Tab */
     fMarkReadOnTabClose = new Button(group, SWT.CHECK);
-    fMarkReadOnTabClose.setText("Mark displayed news as read when closing the tab");
+    fMarkReadOnTabClose.setText("Mark displayed &news as read when closing the tab");
     fMarkReadOnTabClose.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_READ_ON_TAB_CLOSE));
 
     /* Mark Read on Minimize */
     fMarkReadOnMinimize = new Button(group, SWT.CHECK);
-    fMarkReadOnMinimize.setText("Mark displayed news as read on minimize");
+    fMarkReadOnMinimize.setText("Mark displayed news as read on &minimize");
     fMarkReadOnMinimize.setSelection(fGlobalScope.getBoolean(DefaultPreferences.MARK_READ_ON_MINIMIZE));
   }
 
@@ -329,19 +329,19 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
 
     /* Open Site for News Settings */
     fOpenSiteForNewsCheck = new Button(group, SWT.CHECK);
-    fOpenSiteForNewsCheck.setText("When a news is selected, open its link directly");
+    fOpenSiteForNewsCheck.setText("&When a news is selected, open its link directly");
     fOpenSiteForNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fOpenSiteForNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_NEWS));
 
     /* Open Site for empty News Settings */
     fOpenSiteForEmptyNewsCheck = new Button(group, SWT.CHECK);
-    fOpenSiteForEmptyNewsCheck.setText("When a news' summary is empty, open its link directly");
+    fOpenSiteForEmptyNewsCheck.setText("When a news' &summary is empty, open its link directly");
     fOpenSiteForEmptyNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fOpenSiteForEmptyNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_OPEN_SITE_FOR_EMPTY_NEWS));
 
     /* Load Images for News Settings */
     fLoadImagesForNewsCheck = new Button(group, SWT.CHECK);
-    fLoadImagesForNewsCheck.setText("Display images and flash content from news");
+    fLoadImagesForNewsCheck.setText("&Display images and flash content from news");
     fLoadImagesForNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fLoadImagesForNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_LOAD_IMAGES));
   }
@@ -378,7 +378,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fDeleteNewsByCountCheck = new Button(group, SWT.CHECK);
     fDeleteNewsByCountCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
     fDeleteNewsByCountCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.DEL_NEWS_BY_COUNT_STATE));
-    fDeleteNewsByCountCheck.setText("Maximum number of news to keep: ");
+    fDeleteNewsByCountCheck.setText("&Maximum number of news to keep: ");
     fDeleteNewsByCountCheck.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -397,7 +397,7 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     fDeleteNewsByAgeCheck = new Button(group, SWT.CHECK);
     fDeleteNewsByAgeCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
     fDeleteNewsByAgeCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.DEL_NEWS_BY_AGE_STATE));
-    fDeleteNewsByAgeCheck.setText("Maximum age of news in days: ");
+    fDeleteNewsByAgeCheck.setText("Maximum &age of news in days: ");
     fDeleteNewsByAgeCheck.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -415,13 +415,13 @@ public class FeedsPreferencePage extends PreferencePage implements IWorkbenchPre
     /* Delete by State */
     fDeleteReadNewsCheck = new Button(group, SWT.CHECK);
     fDeleteReadNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
-    fDeleteReadNewsCheck.setText("Always delete read news");
+    fDeleteReadNewsCheck.setText("Always &delete read news");
     fDeleteReadNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.DEL_READ_NEWS_STATE));
 
     /* Never Delete Unread State */
     fNeverDeleteUnReadNewsCheck = new Button(group, SWT.CHECK);
     fNeverDeleteUnReadNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
-    fNeverDeleteUnReadNewsCheck.setText("Never delete unread news");
+    fNeverDeleteUnReadNewsCheck.setText("&Never delete unread news");
     fNeverDeleteUnReadNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.NEVER_DEL_UNREAD_NEWS_STATE));
 
     /* Info Container */

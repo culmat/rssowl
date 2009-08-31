@@ -350,7 +350,7 @@ public class ImportElementsPage extends WizardPage {
 
     /* Show as Flat List of News Marks */
     fFlattenCheck = new Button(buttonContainer, SWT.CHECK);
-    fFlattenCheck.setText("Flatten Hierarchy");
+    fFlattenCheck.setText("&Flatten Hierarchy");
     Dialog.applyDialogFont(fFlattenCheck);
     setButtonLayoutData(fFlattenCheck);
     ((GridData) fFlattenCheck.getLayoutData()).horizontalAlignment = SWT.END;
@@ -367,7 +367,7 @@ public class ImportElementsPage extends WizardPage {
 
     /* Hide Existing News Marks */
     fHideExistingCheck = new Button(buttonContainer, SWT.CHECK);
-    fHideExistingCheck.setText("Hide Existing");
+    fHideExistingCheck.setText("&Hide Existing");
     fHideExistingCheck.setSelection(true);
     Dialog.applyDialogFont(fHideExistingCheck);
     setButtonLayoutData(fHideExistingCheck);

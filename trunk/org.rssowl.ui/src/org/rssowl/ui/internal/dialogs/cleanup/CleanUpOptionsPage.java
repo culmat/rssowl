@@ -127,7 +127,7 @@ public class CleanUpOptionsPage extends WizardPage {
       fDeleteFeedByLastVisitCheck = new Button(container, SWT.CHECK);
       fDeleteFeedByLastVisitCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
       fDeleteFeedByLastVisitCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CLEAN_UP_BM_BY_LAST_VISIT_STATE));
-      fDeleteFeedByLastVisitCheck.setText("Delete bookmarks you have not displayed for ");
+      fDeleteFeedByLastVisitCheck.setText("Delete bookmarks you have not &displayed for ");
       fDeleteFeedByLastVisitCheck.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
@@ -151,7 +151,7 @@ public class CleanUpOptionsPage extends WizardPage {
       fDeleteFeedByLastUpdateCheck = new Button(container, SWT.CHECK);
       fDeleteFeedByLastUpdateCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
       fDeleteFeedByLastUpdateCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CLEAN_UP_BM_BY_LAST_UPDATE_STATE));
-      fDeleteFeedByLastUpdateCheck.setText("Delete bookmarks that have not been updated for ");
+      fDeleteFeedByLastUpdateCheck.setText("Delete bookmarks that have not been &updated for ");
       fDeleteFeedByLastUpdateCheck.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
@@ -174,7 +174,7 @@ public class CleanUpOptionsPage extends WizardPage {
     {
       fDeleteDuplicateBookmarksCheck = new Button(container, SWT.CHECK);
       fDeleteDuplicateBookmarksCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
-      fDeleteDuplicateBookmarksCheck.setText("Delete recently created duplicate bookmarks");
+      fDeleteDuplicateBookmarksCheck.setText("Delete recently created &duplicate bookmarks");
       fDeleteDuplicateBookmarksCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CLEAN_UP_BM_BY_DUPLICATES));
     }
 
@@ -182,7 +182,7 @@ public class CleanUpOptionsPage extends WizardPage {
     {
       fDeleteConErrorFeedCheck = new Button(container, SWT.CHECK);
       fDeleteConErrorFeedCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
-      fDeleteConErrorFeedCheck.setText("Delete bookmarks with a connection error");
+      fDeleteConErrorFeedCheck.setText("Delete bookmarks with a &connection error");
       fDeleteConErrorFeedCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CLEAN_UP_BM_BY_CON_ERROR));
     }
   }
@@ -198,7 +198,7 @@ public class CleanUpOptionsPage extends WizardPage {
       fDeleteNewsByCountCheck = new Button(container, SWT.CHECK);
       fDeleteNewsByCountCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
       fDeleteNewsByCountCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CLEAN_UP_NEWS_BY_COUNT_STATE));
-      fDeleteNewsByCountCheck.setText("Maximum number of news to keep per feed: ");
+      fDeleteNewsByCountCheck.setText("Maximum &number of news to keep per feed: ");
       fDeleteNewsByCountCheck.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
@@ -219,7 +219,7 @@ public class CleanUpOptionsPage extends WizardPage {
       fDeleteNewsByAgeCheck = new Button(container, SWT.CHECK);
       fDeleteNewsByAgeCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false));
       fDeleteNewsByAgeCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CLEAN_UP_NEWS_BY_AGE_STATE));
-      fDeleteNewsByAgeCheck.setText("Maximum age of news in days: ");
+      fDeleteNewsByAgeCheck.setText("Maximum &age of news in days: ");
       fDeleteNewsByAgeCheck.addSelectionListener(new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
@@ -239,7 +239,7 @@ public class CleanUpOptionsPage extends WizardPage {
     {
       fDeleteReadNewsCheck = new Button(container, SWT.CHECK);
       fDeleteReadNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
-      fDeleteReadNewsCheck.setText("Delete read news");
+      fDeleteReadNewsCheck.setText("&Delete read news");
       fDeleteReadNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CLEAN_UP_READ_NEWS_STATE));
     }
 
@@ -247,7 +247,7 @@ public class CleanUpOptionsPage extends WizardPage {
     {
       fNeverDeleteUnreadNewsCheck = new Button(container, SWT.CHECK);
       fNeverDeleteUnreadNewsCheck.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, false, 2, 1));
-      fNeverDeleteUnreadNewsCheck.setText("Do not delete unread news");
+      fNeverDeleteUnreadNewsCheck.setText("Do not delete &unread news");
       fNeverDeleteUnreadNewsCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.CLEAN_UP_NEVER_DEL_UNREAD_NEWS_STATE));
     }
 

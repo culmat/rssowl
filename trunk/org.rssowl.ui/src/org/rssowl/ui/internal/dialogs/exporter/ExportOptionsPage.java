@@ -85,9 +85,9 @@ public class ExportOptionsPage extends WizardPage {
     fExportLabelsCheck = new Button(container, SWT.CHECK);
     fExportLabelsCheck.setImage(OwlUI.getImage(fExportLabelsCheck, "icons/elcl16/labels.gif"));
     if (!labels.isEmpty())
-      fExportLabelsCheck.setText("Export Labels (" + labels.size() + " in total)");
+      fExportLabelsCheck.setText("Export &Labels (" + labels.size() + " in total)");
     else
-      fExportLabelsCheck.setText("Export Labels (No Labels Found)");
+      fExportLabelsCheck.setText("Export &Labels (No Labels Found)");
     fExportLabelsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     ((GridData) fExportLabelsCheck.getLayoutData()).verticalIndent = 10;
     fExportLabelsCheck.setEnabled(!labels.isEmpty());
@@ -98,9 +98,9 @@ public class ExportOptionsPage extends WizardPage {
     fExportFiltersCheck = new Button(container, SWT.CHECK);
     fExportFiltersCheck.setImage(OwlUI.getImage(fExportFiltersCheck, OwlUI.FILTER));
     if (!filters.isEmpty())
-      fExportFiltersCheck.setText("Export News Filters (" + filters.size() + " in total)");
+      fExportFiltersCheck.setText("Export News &Filters (" + filters.size() + " in total)");
     else
-      fExportFiltersCheck.setText("Export News Filters (No Filters Found)");
+      fExportFiltersCheck.setText("Export News &Filters (No Filters Found)");
     fExportFiltersCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     fExportFiltersCheck.setEnabled(!filters.isEmpty());
     fExportFiltersCheck.addSelectionListener(new SelectionAdapter() {
@@ -118,7 +118,7 @@ public class ExportOptionsPage extends WizardPage {
     /* Properties */
     fExportSettingsCheck = new Button(container, SWT.CHECK);
     fExportSettingsCheck.setImage(OwlUI.getImage(fExportSettingsCheck, "icons/elcl16/preferences.gif"));
-    fExportSettingsCheck.setText("Export Preferences");
+    fExportSettingsCheck.setText("Export &Preferences");
     fExportSettingsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     Dialog.applyDialogFont(container);

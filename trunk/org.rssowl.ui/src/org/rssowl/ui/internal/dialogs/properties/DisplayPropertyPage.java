@@ -154,13 +154,13 @@ public class DisplayPropertyPage implements IEntityPropertyPage {
 
     /* Open Site for News Settings */
     fOpenSiteForNewsCheck = new Button(container, SWT.CHECK);
-    fOpenSiteForNewsCheck.setText("When a news is selected, open its link directly");
+    fOpenSiteForNewsCheck.setText("&When a news is selected, open its link directly");
     fOpenSiteForNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fOpenSiteForNewsCheck.setSelection(fPrefOpenSiteForNews);
 
     /* Load Images for News Settings */
     fLoadImagesForNewsCheck = new Button(container, SWT.CHECK);
-    fLoadImagesForNewsCheck.setText("Display images and flash content from news");
+    fLoadImagesForNewsCheck.setText("&Display images and flash content from news");
     fLoadImagesForNewsCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fLoadImagesForNewsCheck.setSelection(fPrefLoadImagesForNews);
 
