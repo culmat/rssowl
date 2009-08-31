@@ -1237,7 +1237,7 @@ public class BookMarkExplorer extends ViewPart {
         final IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
         if (getBookMark(selection) != null) {
           manager.add(new Separator("share"));
-          MenuManager shareMenu = new MenuManager("&Share Bookmark", OwlUI.SHARE, "sharebookmark");
+          MenuManager shareMenu = new MenuManager("Share &Bookmark", OwlUI.SHARE, "sharebookmark");
           manager.add(shareMenu);
 
           List<ShareProvider> providers = Controller.getDefault().getShareProviders();
