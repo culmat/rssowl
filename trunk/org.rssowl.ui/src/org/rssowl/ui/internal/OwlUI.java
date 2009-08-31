@@ -1114,6 +1114,32 @@ public class OwlUI {
   }
 
   /**
+   * Attempts to find the active <code>IWorkbenchPart</code> from the PlatformUI
+   * facade. Otherwise, returns <code>NULL</code> if none.
+   *
+   * @param window the {@link IWorkbenchWindow} to search in.
+   * @return the active <code>IWorkbenchPart</code> from the PlatformUI facade
+   * or <code>NULL</code> if none.
+   */
+  public static IWorkbenchPart getActivePart(IWorkbenchWindow window) {
+    if (window != null) {
+
+      /* First try active Page */
+      if (window.getActivePage() != null)
+        return window.getActivePage().getActivePart();
+
+      /* Finally try any Page */
+      IWorkbenchPage[] pages = window.getPages();
+      for (IWorkbenchPage page : pages) {
+        if (page.getActivePart() != null)
+          return page.getActivePart();
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * Attempts to return the index of the given workbench window or
    * <code>-1</code> if none.
    *
