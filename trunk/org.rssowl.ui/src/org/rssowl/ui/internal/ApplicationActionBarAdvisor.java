@@ -1231,7 +1231,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     Type selectedFilter = allFilters[preferences.getInteger(DefaultPreferences.BM_MENU_FILTER)];
     List<Type> displayedFilters = Arrays.asList(new Type[] { Type.SHOW_ALL, Type.SHOW_NEW, Type.SHOW_UNREAD, Type.SHOW_STICKY });
 
-    MenuManager optionsMenu = new MenuManager("&Filter Bookmarks", (selectedFilter == Type.SHOW_ALL) ? OwlUI.FILTER : OwlUI.getImageDescriptor("icons/etool16/filter_active.gif"), null);
+    MenuManager optionsMenu = new MenuManager("&Filter Elements", (selectedFilter == Type.SHOW_ALL) ? OwlUI.FILTER : OwlUI.getImageDescriptor("icons/etool16/filter_active.gif"), null);
     for (final Type filter : displayedFilters) {
       String name = "Show &All";
       switch (filter) {
