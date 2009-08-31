@@ -109,6 +109,8 @@ import org.rssowl.ui.internal.editors.feed.FeedViewInput;
 import org.rssowl.ui.internal.util.BrowserUtils;
 import org.rssowl.ui.internal.util.ModelUtils;
 import org.rssowl.ui.internal.views.explorer.BookMarkExplorer;
+import org.rssowl.ui.internal.views.explorer.BookMarkFilter;
+import org.rssowl.ui.internal.views.explorer.BookMarkFilter.Type;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -116,6 +118,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1222,24 +1225,84 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
   public static void fillBookMarksMenu(IMenuManager menu, IWorkbenchWindow window) {
     Set<IFolder> roots = CoreUtils.loadRootFolders();
 
+    /* Filter Options */
+    final IPreferenceScope preferences = Owl.getPreferenceService().getGlobalScope();
+    Type[] allFilters = BookMarkFilter.Type.values();
+    Type selectedFilter = allFilters[preferences.getInteger(DefaultPreferences.BM_MENU_FILTER)];
+    List<Type> displayedFilters = Arrays.asList(new Type[] { Type.SHOW_ALL, Type.SHOW_NEW, Type.SHOW_UNREAD, Type.SHOW_STICKY });
+
+    MenuManager optionsMenu = new MenuManager("&Filter Bookmarks", (selectedFilter == Type.SHOW_ALL) ? OwlUI.FILTER : OwlUI.getImageDescriptor("icons/etool16/filter_active.gif"), null);
+    for (final Type filter : displayedFilters) {
+      String name = "Show &All";
+      switch (filter) {
+        case SHOW_NEW:
+          name = "Show &New";
+          break;
+        case SHOW_UNREAD:
+          name = "Show &Unread";
+          break;
+        case SHOW_STICKY:
+          name = "Show &Sticky";
+          break;
+      }
+
+      Action action = new Action(name, IAction.AS_RADIO_BUTTON) {
+        @Override
+        public void run() {
+          preferences.putInteger(DefaultPreferences.BM_MENU_FILTER, filter.ordinal());
+        }
+      };
+      action.setChecked(filter == selectedFilter);
+      optionsMenu.add(action);
+      if (filter == Type.SHOW_ALL)
+        optionsMenu.add(new Separator());
+    }
+    menu.add(optionsMenu);
+    menu.add(new Separator());
+
     /* Single Bookmark Set */
     if (roots.size() == 1) {
-      fillBookMarksMenu(window, menu, roots.iterator().next().getChildren());
+      fillBookMarksMenu(window, menu, roots.iterator().next().getChildren(), selectedFilter);
     }
 
     /* More than one Bookmark Set */
     else {
       for (IFolder root : roots) {
-        MenuManager rootItem = new MenuManager(root.getName(), OwlUI.BOOKMARK_SET, null);
-        menu.add(rootItem);
+        if (shouldShow(root, selectedFilter)) {
+          MenuManager rootItem = new MenuManager(root.getName(), OwlUI.BOOKMARK_SET, null);
+          menu.add(rootItem);
 
-        fillBookMarksMenu(window, rootItem, root.getChildren());
+          fillBookMarksMenu(window, rootItem, root.getChildren(), selectedFilter);
+        }
       }
     }
   }
 
-  private static void fillBookMarksMenu(final IWorkbenchWindow window, IMenuManager parent, List<IFolderChild> childs) {
+  private static boolean shouldShow(IFolderChild child, Type filter) {
+    switch (filter) {
+      case SHOW_ALL:
+        return true;
+
+      case SHOW_NEW:
+        return hasNewsWithState(child, EnumSet.of(INews.State.NEW));
+
+      case SHOW_UNREAD:
+        return hasNewsWithState(child, EnumSet.of(INews.State.NEW, INews.State.UNREAD, INews.State.UPDATED));
+
+      case SHOW_STICKY:
+        return hasStickyNews(child);
+
+      default:
+        return true;
+    }
+  }
+
+  private static void fillBookMarksMenu(final IWorkbenchWindow window, IMenuManager parent, List<IFolderChild> childs, final Type filter) {
     for (final IFolderChild child : childs) {
+
+      /* Check if a Filter applies */
+      if (!shouldShow(child, filter))
+        continue;
 
       /* News Mark or Empty Folder */
       if (child instanceof INewsMark || (child instanceof IFolder && ((IFolder) child).getChildren().isEmpty())) {
@@ -1271,7 +1334,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         folderMenu.setRemoveAllWhenShown(true);
         folderMenu.addMenuListener(new IMenuListener() {
           public void menuAboutToShow(IMenuManager manager) {
-            fillBookMarksMenu(window, folderMenu, folder.getChildren());
+            fillBookMarksMenu(window, folderMenu, folder.getChildren(), filter);
           }
         });
       }
@@ -1279,11 +1342,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
   }
 
   private static ImageDescriptor getImageDescriptor(IFolderChild child) {
-    boolean hasNewNews = false;
-    if (child instanceof INewsMark)
-      hasNewNews = (((INewsMark) child).getNewsCount(EnumSet.of(INews.State.NEW)) != 0);
-    else if (child instanceof IFolder)
-      hasNewNews = hasNewNews((IFolder) child);
+    boolean hasNewNews = hasNewsWithState(child, EnumSet.of(INews.State.NEW));
 
     /* Bookmark */
     if (child instanceof IBookMark) {
@@ -1324,16 +1383,49 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     return null;
   }
 
-  private static boolean hasNewNews(IFolder folder) {
+  private static boolean hasNewsWithState(IFolderChild child, EnumSet<INews.State> states) {
+    if (child instanceof IFolder)
+      return hasNewsWithStates((IFolder) child, states);
+
+    return ((INewsMark) child).getNewsCount(states) != 0;
+  }
+
+  private static boolean hasNewsWithStates(IFolder folder, EnumSet<INews.State> states) {
     List<IMark> marks = folder.getMarks();
     for (IMark mark : marks) {
-      if (mark instanceof INewsMark && ((INewsMark) mark).getNewsCount(EnumSet.of(INews.State.NEW)) != 0)
+      if (mark instanceof INewsMark && ((INewsMark) mark).getNewsCount(states) != 0)
         return true;
     }
 
     List<IFolder> folders = folder.getFolders();
     for (IFolder child : folders) {
-      if (hasNewNews(child))
+      if (hasNewsWithStates(child, states))
+        return true;
+    }
+
+    return false;
+  }
+
+  private static boolean hasStickyNews(IFolderChild child) {
+    if (child instanceof IFolder)
+      return hasStickyNews((IFolder) child);
+
+    if (child instanceof IBookMark)
+      return ((IBookMark) child).getStickyNewsCount() != 0;
+
+    return false;
+  }
+
+  private static boolean hasStickyNews(IFolder folder) {
+    List<IMark> marks = folder.getMarks();
+    for (IMark mark : marks) {
+      if (mark instanceof IBookMark && ((IBookMark) mark).getStickyNewsCount() != 0)
+        return true;
+    }
+
+    List<IFolder> folders = folder.getFolders();
+    for (IFolder child : folders) {
+      if (hasStickyNews(child))
         return true;
     }
 

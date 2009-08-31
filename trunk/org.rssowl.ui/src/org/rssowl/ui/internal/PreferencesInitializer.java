@@ -29,6 +29,7 @@ import org.rssowl.core.persist.pref.IPreferencesInitializer;
 import org.rssowl.core.persist.pref.Preference;
 import org.rssowl.ui.internal.actions.NavigationActionFactory.NavigationActionType;
 import org.rssowl.ui.internal.editors.feed.NewsColumn;
+import org.rssowl.ui.internal.views.explorer.BookMarkFilter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -118,6 +119,7 @@ public class PreferencesInitializer implements IPreferencesInitializer {
     defaultScope.putBoolean(Preference.SEARCH_DIALOG_NEWS_SORT_ASCENDING.id(), false);
 
     defaultScope.putIntegers(Preference.SHARE_PROVIDER_STATE.id(), new int[] { 1, 2, 3, 4, 5, 6, 7, -8, -9, -10, -11, -12, -13, -14, -15, -16, -17, -18, -19, -20, -21, -22 });
+    defaultScope.putInteger(Preference.BM_MENU_FILTER.id(), BookMarkFilter.Type.SHOW_ALL.ordinal());
   }
 
   /**
@@ -250,7 +252,7 @@ public class PreferencesInitializer implements IPreferencesInitializer {
       intArray[i] = items.get(i);
 
     defaultScope.putIntegers(Preference.TOOLBAR_ITEMS.id(), intArray);
-    defaultScope.putInteger(Preference.TOOLBAR_MODE.id(), CoolBarAdvisor.CoolBarMode.IMAGE_TEXT.ordinal());
+    defaultScope.putInteger(Preference.TOOLBAR_MODE.id(), CoolBarAdvisor.CoolBarMode.IMAGE_TEXT_VERTICAL.ordinal());
     defaultScope.putInteger(Preference.DEFAULT_NEXT_ACTION.id(), NavigationActionType.NEXT_UNREAD_NEWS.ordinal());
     defaultScope.putInteger(Preference.DEFAULT_PREVIOUS_ACTION.id(), NavigationActionType.PREVIOUS_UNREAD_NEWS.ordinal());
   }

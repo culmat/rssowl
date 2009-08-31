@@ -310,6 +310,9 @@ public enum Preference {
   /** Global: Default Previous Action (Toolbar) */
   DEFAULT_PREVIOUS_ACTION("org.rssowl.pref.DefaultPreviousAction", IPreferenceType.INTEGER),
 
+  /** Global: Bookmark Menu Filter  */
+  BM_MENU_FILTER("org.rssowl.pref.BMMenuFilter", IPreferenceType.INTEGER),
+
   /******************************
    * Eclipse Preferences Follow *
    ******************************/

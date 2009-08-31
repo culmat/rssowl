@@ -313,6 +313,9 @@ public class DefaultPreferences {
   /** Global: Default Previous Action (Toolbar) */
   public static final String DEFAULT_PREVIOUS_ACTION = Preference.DEFAULT_PREVIOUS_ACTION.id();
 
+  /** Global: Bookmark Menu Filter */
+  public static final String BM_MENU_FILTER = Preference.BM_MENU_FILTER.id();
+
   /**
    * Eclipse Preferences Follow
    */
