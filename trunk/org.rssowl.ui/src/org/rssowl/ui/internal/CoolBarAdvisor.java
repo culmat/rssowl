@@ -1133,7 +1133,7 @@ public class CoolBarAdvisor {
               item.setSelection(true);
 
             item = new MenuItem(menu, SWT.RADIO);
-            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_UNREAD_NEWS.getCommandId(), "Previous &Unread News"));
+            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_UNREAD_NEWS.getCommandId(), "Previous Unrea&d News"));
             item.setData(NavigationActionType.PREVIOUS_UNREAD_NEWS);
             item.addSelectionListener(new NavigationSelectionListener(false));
             if (item.getData().equals(defaultAction))
@@ -1142,14 +1142,14 @@ public class CoolBarAdvisor {
             new MenuItem(menu, SWT.SEPARATOR);
 
             item = new MenuItem(menu, SWT.RADIO);
-            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_FEED.getCommandId(), "Previous &Feed"));
+            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_FEED.getCommandId(), "Previous F&eed"));
             item.setData(NavigationActionType.PREVIOUS_FEED);
             item.addSelectionListener(new NavigationSelectionListener(false));
             if (item.getData().equals(defaultAction))
               item.setSelection(true);
 
             item = new MenuItem(menu, SWT.RADIO);
-            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_UNREAD_FEED.getCommandId(), "Previous Feed &with Unread News"));
+            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_UNREAD_FEED.getCommandId(), "Previous Feed wit&h Unread News"));
             item.setData(NavigationActionType.PREVIOUS_UNREAD_FEED);
             item.addSelectionListener(new NavigationSelectionListener(false));
             if (item.getData().equals(defaultAction))
@@ -1158,7 +1158,7 @@ public class CoolBarAdvisor {
             new MenuItem(menu, SWT.SEPARATOR);
 
             item = new MenuItem(menu, SWT.RADIO);
-            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_TAB.getCommandId(), "Previous &Tab"));
+            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_TAB.getCommandId(), "Previous T&ab"));
             item.setData(NavigationActionType.PREVIOUS_TAB);
             item.addSelectionListener(new NavigationSelectionListener(false));
             if (item.getData().equals(defaultAction))
