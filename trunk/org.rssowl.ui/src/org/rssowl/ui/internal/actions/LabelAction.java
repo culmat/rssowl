@@ -73,7 +73,7 @@ public class LabelAction extends Action {
   @Override
   public String getText() {
     if (fLabel == null)
-      return "Remove All Labels";
+      return "&Remove All Labels";
 
     IBindingService bs = (IBindingService) PlatformUI.getWorkbench().getService(IBindingService.class);
     TriggerSequence binding = bs.getBestActiveBindingFor(Controller.LABEL_ACTION_PREFIX + fLabel.getId());

@@ -1068,14 +1068,14 @@ public class CoolBarAdvisor {
             NavigationActionType defaultAction = NavigationActionType.values()[fPreferences.getInteger(DefaultPreferences.DEFAULT_NEXT_ACTION)];
 
             MenuItem item = new MenuItem(menu, SWT.RADIO);
-            item.setText(getLabelWithBinding(NavigationActionType.NEXT_NEWS.getCommandId(), "Next News"));
+            item.setText(getLabelWithBinding(NavigationActionType.NEXT_NEWS.getCommandId(), "&Next News"));
             item.setData(NavigationActionType.NEXT_NEWS);
             item.addSelectionListener(new NavigationSelectionListener(true));
             if (item.getData().equals(defaultAction))
               item.setSelection(true);
 
             item = new MenuItem(menu, SWT.RADIO);
-            item.setText(getLabelWithBinding(NavigationActionType.NEXT_UNREAD_NEWS.getCommandId(), "Next Unread News"));
+            item.setText(getLabelWithBinding(NavigationActionType.NEXT_UNREAD_NEWS.getCommandId(), "Next &Unread News"));
             item.setData(NavigationActionType.NEXT_UNREAD_NEWS);
             item.addSelectionListener(new NavigationSelectionListener(true));
             if (item.getData().equals(defaultAction))
@@ -1084,14 +1084,14 @@ public class CoolBarAdvisor {
             new MenuItem(menu, SWT.SEPARATOR);
 
             item = new MenuItem(menu, SWT.RADIO);
-            item.setText(getLabelWithBinding(NavigationActionType.NEXT_FEED.getCommandId(), "Next Feed"));
+            item.setText(getLabelWithBinding(NavigationActionType.NEXT_FEED.getCommandId(), "Next &Feed"));
             item.setData(NavigationActionType.NEXT_FEED);
             item.addSelectionListener(new NavigationSelectionListener(true));
             if (item.getData().equals(defaultAction))
               item.setSelection(true);
 
             item = new MenuItem(menu, SWT.RADIO);
-            item.setText(getLabelWithBinding(NavigationActionType.NEXT_UNREAD_FEED.getCommandId(), "Next Unread Feed"));
+            item.setText(getLabelWithBinding(NavigationActionType.NEXT_UNREAD_FEED.getCommandId(), "Next Feed &with Unread News"));
             item.setData(NavigationActionType.NEXT_UNREAD_FEED);
             item.addSelectionListener(new NavigationSelectionListener(true));
             if (item.getData().equals(defaultAction))
@@ -1100,7 +1100,7 @@ public class CoolBarAdvisor {
             new MenuItem(menu, SWT.SEPARATOR);
 
             item = new MenuItem(menu, SWT.RADIO);
-            item.setText(getLabelWithBinding(NavigationActionType.NEXT_TAB.getCommandId(), "Next Tab"));
+            item.setText(getLabelWithBinding(NavigationActionType.NEXT_TAB.getCommandId(), "Next &Tab"));
             item.setData(NavigationActionType.NEXT_TAB);
             item.addSelectionListener(new NavigationSelectionListener(true));
             if (item.getData().equals(defaultAction))
@@ -1126,14 +1126,14 @@ public class CoolBarAdvisor {
             NavigationActionType defaultAction = NavigationActionType.values()[fPreferences.getInteger(DefaultPreferences.DEFAULT_PREVIOUS_ACTION)];
 
             MenuItem item = new MenuItem(menu, SWT.RADIO);
-            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_NEWS.getCommandId(), "Previous News"));
+            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_NEWS.getCommandId(), "&Previous News"));
             item.setData(NavigationActionType.PREVIOUS_NEWS);
             item.addSelectionListener(new NavigationSelectionListener(false));
             if (item.getData().equals(defaultAction))
               item.setSelection(true);
 
             item = new MenuItem(menu, SWT.RADIO);
-            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_UNREAD_NEWS.getCommandId(), "Previous Unread News"));
+            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_UNREAD_NEWS.getCommandId(), "Previous &Unread News"));
             item.setData(NavigationActionType.PREVIOUS_UNREAD_NEWS);
             item.addSelectionListener(new NavigationSelectionListener(false));
             if (item.getData().equals(defaultAction))
@@ -1142,14 +1142,14 @@ public class CoolBarAdvisor {
             new MenuItem(menu, SWT.SEPARATOR);
 
             item = new MenuItem(menu, SWT.RADIO);
-            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_FEED.getCommandId(), "Previous Feed"));
+            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_FEED.getCommandId(), "Previous &Feed"));
             item.setData(NavigationActionType.PREVIOUS_FEED);
             item.addSelectionListener(new NavigationSelectionListener(false));
             if (item.getData().equals(defaultAction))
               item.setSelection(true);
 
             item = new MenuItem(menu, SWT.RADIO);
-            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_UNREAD_FEED.getCommandId(), "Previous Unread Feed"));
+            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_UNREAD_FEED.getCommandId(), "Previous Feed &with Unread News"));
             item.setData(NavigationActionType.PREVIOUS_UNREAD_FEED);
             item.addSelectionListener(new NavigationSelectionListener(false));
             if (item.getData().equals(defaultAction))
@@ -1158,7 +1158,7 @@ public class CoolBarAdvisor {
             new MenuItem(menu, SWT.SEPARATOR);
 
             item = new MenuItem(menu, SWT.RADIO);
-            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_TAB.getCommandId(), "Previous Tab"));
+            item.setText(getLabelWithBinding(NavigationActionType.PREVIOUS_TAB.getCommandId(), "Previous &Tab"));
             item.setData(NavigationActionType.PREVIOUS_TAB);
             item.addSelectionListener(new NavigationSelectionListener(false));
             if (item.getData().equals(defaultAction))

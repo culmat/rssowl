@@ -64,7 +64,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
     Menu menu = new Menu(parent);
 
     MenuItem newBookMark = new MenuItem(menu, SWT.PUSH);
-    newBookMark.setText(getLabelWithBinding("org.rssowl.ui.actions.NewBookMark", "Bookmark"));
+    newBookMark.setText(getLabelWithBinding("org.rssowl.ui.actions.NewBookMark", "&Bookmark"));
     newBookMark.setImage(OwlUI.getImage(fResources, OwlUI.BOOKMARK));
     newBookMark.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -78,7 +78,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
     });
 
     MenuItem newNewsBin = new MenuItem(menu, SWT.PUSH);
-    newNewsBin.setText(getLabelWithBinding("org.rssowl.ui.actions.NewNewsBin", "News Bin"));
+    newNewsBin.setText(getLabelWithBinding("org.rssowl.ui.actions.NewNewsBin", "&News Bin"));
     newNewsBin.setImage(OwlUI.getImage(fResources, OwlUI.NEWSBIN));
     newNewsBin.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -92,7 +92,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
     });
 
     MenuItem newSearchMark = new MenuItem(menu, SWT.PUSH);
-    newSearchMark.setText(getLabelWithBinding("org.rssowl.ui.actions.NewSearchMark", "Saved Search"));
+    newSearchMark.setText(getLabelWithBinding("org.rssowl.ui.actions.NewSearchMark", "&Saved Search"));
     newSearchMark.setImage(OwlUI.getImage(fResources, OwlUI.SEARCHMARK));
     newSearchMark.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -108,7 +108,7 @@ public class NewTypeDropdownAction implements IWorkbenchWindowPulldownDelegate, 
     new MenuItem(menu, SWT.SEPARATOR);
 
     MenuItem newFolder = new MenuItem(menu, SWT.PUSH);
-    newFolder.setText(getLabelWithBinding("org.rssowl.ui.actions.NewFolder", "Folder"));
+    newFolder.setText(getLabelWithBinding("org.rssowl.ui.actions.NewFolder", "&Folder"));
     newFolder.setImage(OwlUI.getImage(fResources, OwlUI.FOLDER));
     newFolder.addSelectionListener(new SelectionAdapter() {
       @Override

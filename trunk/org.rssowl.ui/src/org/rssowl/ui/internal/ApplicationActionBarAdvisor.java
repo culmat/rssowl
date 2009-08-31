@@ -925,7 +925,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     trayItem.add(new ReloadAllAction(false));
     trayItem.add(new Separator());
 
-    trayItem.add(new Action("Configure Notifications") {
+    trayItem.add(new Action("&Configure Notifications") {
       @Override
       public void run() {
         advisor.restoreFromTray(shell);
@@ -938,7 +938,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       }
     });
 
-    trayItem.add(new Action("Preferences") {
+    trayItem.add(new Action("&Preferences") {
       @Override
       public void run() {
         advisor.restoreFromTray(shell);
@@ -966,7 +966,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     coolBar.setContextMenuManager(coolBarContextMenuManager);
 
     /* Customize Coolbar */
-    coolBarContextMenuManager.add(new Action("Customize Toolbar...") {
+    coolBarContextMenuManager.add(new Action("&Customize Toolbar...") {
       @Override
       public void run() {
         CustomizeToolbarDialog dialog = new CustomizeToolbarDialog(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell());
@@ -978,11 +978,11 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     /* Lock Coolbar  */
     coolBarContextMenuManager.add(new Separator());
     IAction lockToolbarAction = getAction(ActionFactory.LOCK_TOOL_BAR.getId());
-    lockToolbarAction.setText("Lock Toolbar");
+    lockToolbarAction.setText("&Lock Toolbar");
     coolBarContextMenuManager.add(lockToolbarAction);
 
     /* Toggle State of Toolbar Visibility */
-    coolBarContextMenuManager.add(new Action("Hide Toolbar") {
+    coolBarContextMenuManager.add(new Action("&Hide Toolbar") {
       @Override
       public void run() {
         ApplicationWorkbenchWindowAdvisor configurer = ApplicationWorkbenchAdvisor.fgPrimaryApplicationWorkbenchWindowAdvisor;
