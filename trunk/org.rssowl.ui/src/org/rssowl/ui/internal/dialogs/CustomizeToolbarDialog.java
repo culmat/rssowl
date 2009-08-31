@@ -34,7 +34,6 @@ import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -224,7 +223,7 @@ public class CustomizeToolbarDialog extends Dialog {
         SafeRunnable.run(new LoggingSafeRunnable() {
           public void run() throws Exception {
             IStructuredSelection selection = (IStructuredSelection) fItemViewer.getSelection();
-            event.doit = (selection.size() == 1);
+            event.doit = (selection.size() < fItemViewer.getTable().getItemCount());
 
             if (event.doit) {
               LocalSelectionTransfer.getTransfer().setSelection(selection);
@@ -267,7 +266,7 @@ public class CustomizeToolbarDialog extends Dialog {
       public boolean performDrop(Object data) {
         ToolBarItem target = (ToolBarItem) getCurrentTarget();
         if (target != null) {
-          onMove((ToolBarItem) ((StructuredSelection) data).getFirstElement(), target, getCurrentLocation());
+          onMove((StructuredSelection) data, target, getCurrentLocation());
           return true;
         }
 
@@ -567,49 +566,55 @@ public class CustomizeToolbarDialog extends Dialog {
     fRemoveButton.setEnabled(!fItemViewer.getSelection().isEmpty());
   }
 
-  private void onMove(ToolBarItem source, ToolBarItem destination, int location) {
+  private void onMove(StructuredSelection selection, ToolBarItem destination, int location) {
 
-    /* Find Source and Destination Index */
-    int sourceIndex = -1;
-    int destinationIndex = -1;
-    TableItem[] tableItems = fItemViewer.getTable().getItems();
-    for (int i = 0; i < tableItems.length; i++) {
-      if (source.equals(tableItems[i].getData()))
-        sourceIndex = i;
-      else if (destination.equals(tableItems[i].getData()))
-        destinationIndex = i;
+    /* Determine Moved Items */
+    List<ToolBarItem> movedItems = new ArrayList<ToolBarItem>();
+    Object[] selectedElements = selection.toArray();
+    for (Object element : selectedElements) {
+      movedItems.add((ToolBarItem) element);
     }
 
-    /* Return if Invalid */
-    if (sourceIndex == -1 || destinationIndex == -1)
+    /* Determine Visible Items */
+    List<ToolBarItem> visibleItems = new ArrayList<ToolBarItem>();
+    TableItem[] items = fItemViewer.getTable().getItems();
+    for (TableItem item : items) {
+      visibleItems.add((ToolBarItem) item.getData());
+    }
+
+    /* Return in these unlikely cases */
+    if (movedItems.isEmpty() || visibleItems.isEmpty())
       return;
 
-    /* Remember Selection */
-    ISelection selection = fItemViewer.getSelection();
+    /* Remove all Moved Items from Visible */
+    visibleItems.removeAll(movedItems);
 
-    /* Determine Location */
-    int newLocation = (sourceIndex < destinationIndex) ? destinationIndex : destinationIndex + 1;
-    if (location == ViewerDropAdapter.LOCATION_BEFORE)
-      newLocation--;
+    /* Put Moved Items to Destination Index if possible */
+    int destinationIndex = visibleItems.indexOf(destination);
+    if (destinationIndex >= 0) {
 
-    /* Move using Viewer Api */
-    fItemViewer.remove(source);
-    fItemViewer.insert(source, newLocation);
+      /* Adjust Destination */
+      if (location == ViewerDropAdapter.LOCATION_ON || location == ViewerDropAdapter.LOCATION_AFTER)
+        destinationIndex++;
 
-    /* Save */
-    tableItems = fItemViewer.getTable().getItems();
-    int[] items = new int[tableItems.length];
-    for (int i = 0; i < tableItems.length; i++) {
-      items[i] = ((ToolBarItem) tableItems[i].getData()).item.ordinal();
+      /* Add to Visible */
+      visibleItems.addAll(destinationIndex, movedItems);
+
+      /* Save Visible */
+      int[] newToolBarItems = new int[visibleItems.size()];
+      for (int i = 0; i < visibleItems.size(); i++)
+        newToolBarItems[i] = visibleItems.get(i).item.ordinal();
+      fPreferences.putIntegers(DefaultPreferences.TOOLBAR_ITEMS, newToolBarItems);
+
+      /* Show Updates */
+      fItemViewer.refresh();
+
+      /* Restore Selection */
+      fItemViewer.getTable().setSelection(destinationIndex, destinationIndex + movedItems.size() - 1);
+
+      /* Update Buttons */
+      updateButtonEnablement();
     }
-
-    fPreferences.putIntegers(DefaultPreferences.TOOLBAR_ITEMS, items);
-
-    /* Restore Selection */
-    fItemViewer.setSelection(selection);
-
-    /* Update Buttons */
-    updateButtonEnablement();
   }
 
   private void onMove(boolean up) {
