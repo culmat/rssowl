@@ -1548,7 +1548,7 @@
       <keywordFeed
             icon="icons/obj16/fav_twitter.gif"
             id="org.rssowl.ui.TwitterKeywordFeed"
-            name="&amp;Twitter"
+            name="T&amp;witter"
             url="http://search.twitter.com/search.atom?q=[:]">
       </keywordFeed>
       <keywordFeed
