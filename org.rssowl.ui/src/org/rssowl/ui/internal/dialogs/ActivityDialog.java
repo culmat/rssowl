@@ -237,7 +237,7 @@ public class ActivityDialog extends TitleAreaDialog {
 
     /* Keep or Hide Completed Downloads */
     fHideCompletedCheck = new Button(buttonBar, SWT.CHECK);
-    fHideCompletedCheck.setText("Remove Completed Downloads from List");
+    fHideCompletedCheck.setText("&Remove Completed Downloads from List");
     fHideCompletedCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
     fHideCompletedCheck.setSelection(fPreferences.getBoolean(DefaultPreferences.HIDE_COMPLETED_DOWNLOADS));
     fHideCompletedCheck.addSelectionListener(new SelectionAdapter() {

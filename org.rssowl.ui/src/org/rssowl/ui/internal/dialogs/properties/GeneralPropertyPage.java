@@ -271,7 +271,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
       autoReloadContainer.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, true));
 
       fUpdateCheck = new Button(autoReloadContainer, SWT.CHECK);
-      fUpdateCheck.setText("Automatically update the " + (fIsSingleBookMark ? "feed" : "feeds") + " every ");
+      fUpdateCheck.setText("&Automatically update the " + (fIsSingleBookMark ? "feed" : "feeds") + " every ");
       fUpdateCheck.setSelection(fPrefUpdateIntervalState);
       fUpdateCheck.addSelectionListener(new SelectionAdapter() {
         @Override
@@ -304,7 +304,7 @@ public class GeneralPropertyPage implements IEntityPropertyPage {
     /* Open on Startup */
     fOpenOnStartupCheck = new Button(otherSettingsContainer, SWT.CHECK);
     fOpenOnStartupCheck.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fOpenOnStartupCheck.setText("Display the " + getDisplayName() + " on start-up");
+    fOpenOnStartupCheck.setText("&Display the " + getDisplayName() + " on start-up");
     fOpenOnStartupCheck.setSelection(fPrefOpenOnStartup);
 
     return container;

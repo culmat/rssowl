@@ -129,15 +129,15 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fClassicLayoutRadio = new Button(group, SWT.RADIO);
-    fClassicLayoutRadio.setText("Classic View");
+    fClassicLayoutRadio.setText("&Classic View");
     fClassicLayoutRadio.setSelection(!browserMaximized && fGlobalScope.getBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC));
 
     fVerticalLayoutRadio = new Button(group, SWT.RADIO);
-    fVerticalLayoutRadio.setText("Vertical View");
+    fVerticalLayoutRadio.setText("&Vertical View");
     fVerticalLayoutRadio.setSelection(!browserMaximized && !fGlobalScope.getBoolean(DefaultPreferences.FV_LAYOUT_CLASSIC));
 
     fBrowserMaximizedLayoutRadio = new Button(group, SWT.RADIO);
-    fBrowserMaximizedLayoutRadio.setText("Newspaper View");
+    fBrowserMaximizedLayoutRadio.setText("&Newspaper View");
     fBrowserMaximizedLayoutRadio.setSelection(browserMaximized);
   }
 
@@ -153,18 +153,18 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     group.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fAlwaysReuseFeedView = new Button(group, SWT.CHECK);
-    fAlwaysReuseFeedView.setText("Always open feeds in the same tab");
+    fAlwaysReuseFeedView.setText("&Always open feeds in the same tab");
     fAlwaysReuseFeedView.setSelection(fGlobalScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_FEEDVIEW));
 
     fUseMultipleTabsCheck = new Button(group, SWT.CHECK);
-    fUseMultipleTabsCheck.setText("Show multiple tabs side by side");
+    fUseMultipleTabsCheck.setText("&Show multiple tabs side by side");
     fUseMultipleTabsCheck.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_MULTIPLE_TABS));
 
     Composite autoCloseTabsContainer = new Composite(group, SWT.None);
     autoCloseTabsContainer.setLayout(LayoutUtils.createGridLayout(3, 0, 0, 0, 2, false));
 
     fAutoCloseTabsCheck = new Button(autoCloseTabsContainer, SWT.CHECK);
-    fAutoCloseTabsCheck.setText("Never show more than  ");
+    fAutoCloseTabsCheck.setText("&Never show more than  ");
     fAutoCloseTabsCheck.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_AUTOCLOSE_TABS));
     fAutoCloseTabsCheck.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -203,11 +203,11 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
     miscGroup.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
 
     fReopenFeedsOnStartupCheck = new Button(miscGroup, SWT.CHECK);
-    fReopenFeedsOnStartupCheck.setText("Reopen last opened feeds on startup");
+    fReopenFeedsOnStartupCheck.setText("&Reopen last opened feeds on startup");
     fReopenFeedsOnStartupCheck.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_RESTORE_TABS));
 
     fOpenOnSingleClick = new Button(miscGroup, SWT.CHECK);
-    fOpenOnSingleClick.setText("Open feeds with a single mouse-click");
+    fOpenOnSingleClick.setText("&Open feeds with a single mouse-click");
     fOpenOnSingleClick.setSelection(fEclipseScope.getBoolean(DefaultPreferences.ECLIPSE_SINGLE_CLICK_OPEN));
   }
 
@@ -227,17 +227,17 @@ public class MiscPreferencePage extends PreferencePage implements IWorkbenchPref
 
     /* Enable / Disable Tray */
     fMinimizeToTray = new Button(group, SWT.CHECK);
-    fMinimizeToTray.setText("when minimizing RSSOwl");
+    fMinimizeToTray.setText("when &minimizing RSSOwl");
     fMinimizeToTray.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_MINIMIZE));
 
     /* Move to Tray on Start */
     fMoveToTrayOnStart = new Button(group, SWT.CHECK);
-    fMoveToTrayOnStart.setText("when starting RSSOwl");
+    fMoveToTrayOnStart.setText("when &starting RSSOwl");
     fMoveToTrayOnStart.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_START));
 
     /* Move to Tray on Close */
     fMoveToTrayOnExit = new Button(group, SWT.CHECK);
-    fMoveToTrayOnExit.setText("when closing RSSOwl");
+    fMoveToTrayOnExit.setText("when &closing RSSOwl");
     fMoveToTrayOnExit.setSelection(fGlobalScope.getBoolean(DefaultPreferences.TRAY_ON_CLOSE));
   }
 

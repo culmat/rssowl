@@ -1518,55 +1518,55 @@
       <keywordFeed
             icon="icons/obj16/fav_google.gif"
             id="org.rssowl.ui.GoogleNewsKeywordFeed"
-            name="Google News"
+            name="&amp;Google News"
             url="http://news.google.com/news?q=[:]&amp;output=rss">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_technorati.gif"
             id="org.rssowl.ui.TechnoratiKeywordFeed"
-            name="Technorati"
+            name="&amp;Technorati"
             url="http://feeds.technorati.com/search/[:]">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_delicious.gif"
             id="org.rssowl.ui.DeliciousKeywordFeed"
-            name="Delicious"
+            name="&amp;Delicious"
             url="http://del.icio.us/rss/tag/[:]">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_live.gif"
             id="org.rssowl.ui.LiveKeywordFeed"
-            name="Live Search"
+            name="&amp;Live Search"
             url="http://search.live.com/results.aspx?q=[:]&amp;format=rss">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_digg.gif"
             id="org.rssowl.ui.DiggKeywordFeed"
-            name="Digg"
+            name="&amp;Digg"
             url="http://digg.com/rss_search?s=[:]">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_twitter.gif"
             id="org.rssowl.ui.TwitterKeywordFeed"
-            name="Twitter"
+            name="&amp;Twitter"
             url="http://search.twitter.com/search.atom?q=[:]">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_google.gif"
             id="org.rssowl.ui.GoogleBlogKeywordFeed"
-            name="Google Blog"
+            name="Google &amp;Blog"
             url="http://blogsearch.google.com/blogsearch_feeds?q=[:]&amp;num=10&amp;output=rss">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_youtube.gif"
             id="org.rssowl.ui.YoutubeKeywordFeed"
-            name="YouTube Video"
+            name="&amp;YouTube Video"
             url="http://www.youtube.com/rss/tag/[:].rss">
       </keywordFeed>
       <keywordFeed
             icon="icons/obj16/fav_flickr.gif"
             id="org.rssowl.ui.FlickrKeywordFeed"
-            name="Flickr Photo"
+            name="&amp;Flickr Photo"
             url="http://www.flickr.com/services/feeds/photos_public.gne?tags=[:]&amp;format=rss_200">
       </keywordFeed>
    </extension>

@@ -137,7 +137,7 @@ public class CleanUpReminderDialog extends TitleAreaDialog {
     ((GridLayout) controlsContainer.getLayout()).marginTop = 25;
 
     final Button reminderCheck = new Button(controlsContainer, SWT.CHECK);
-    reminderCheck.setText("Remind me every ");
+    reminderCheck.setText("&Remind me every ");
     reminderCheck.setSelection(fPreferences.getBoolean(DefaultPreferences.CLEAN_UP_REMINDER_STATE));
 
     final Spinner reminderDaysValue = new Spinner(controlsContainer, SWT.BORDER);

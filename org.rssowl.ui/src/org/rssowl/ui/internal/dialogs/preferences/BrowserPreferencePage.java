@@ -103,7 +103,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
 
     /* Use internal Browser */
     fUseInternalBrowser = new Button(browserGroup, SWT.RADIO);
-    fUseInternalBrowser.setText("Use the embedded Browser");
+    fUseInternalBrowser.setText("Use the &embedded Browser");
     fUseInternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fUseInternalBrowser.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -116,16 +116,16 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
     fUseDefaultExternalBrowser = new Button(browserGroup, SWT.RADIO);
     String name = getDefaultBrowserName();
     if (StringUtils.isSet(name))
-      fUseDefaultExternalBrowser.setText("Use the standard external Browser (" + name + ")");
+      fUseDefaultExternalBrowser.setText("Use the &standard external Browser (" + name + ")");
     else
-      fUseDefaultExternalBrowser.setText("Use the standard external Browser");
+      fUseDefaultExternalBrowser.setText("Use the &standard external Browser");
 
     fUseDefaultExternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fUseDefaultExternalBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_DEFAULT_EXTERNAL_BROWSER));
 
     /* Use custom external Browser */
     fUseCustomExternalBrowser = new Button(browserGroup, SWT.RADIO);
-    fUseCustomExternalBrowser.setText("Use the following external Browser:");
+    fUseCustomExternalBrowser.setText("Use the &following external Browser:");
     fUseCustomExternalBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fUseCustomExternalBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_CUSTOM_EXTERNAL_BROWSER));
     fUseCustomExternalBrowser.addSelectionListener(new SelectionAdapter() {
@@ -147,7 +147,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
       fCustomBrowserInput.setText(customBrowserValue);
 
     fCustomBrowserSearchButton = new Button(browserGroup, SWT.PUSH);
-    fCustomBrowserSearchButton.setText("Browse...");
+    fCustomBrowserSearchButton.setText("&Browse...");
     Dialog.applyDialogFont(fCustomBrowserSearchButton);
     setButtonLayoutData(fCustomBrowserSearchButton);
     fCustomBrowserSearchButton.setEnabled(fUseCustomExternalBrowser.getSelection());
@@ -168,17 +168,17 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
     ((GridLayout) bottomContainer.getLayout()).marginTop = 10;
 
     fReOpenBrowserTabs = new Button(bottomContainer, SWT.CHECK);
-    fReOpenBrowserTabs.setText("Reopen last opened websites on startup");
+    fReOpenBrowserTabs.setText("&Reopen last opened websites on startup");
     fReOpenBrowserTabs.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fReOpenBrowserTabs.setSelection(fGlobalScope.getBoolean(DefaultPreferences.REOPEN_BROWSER_TABS));
 
     fLoadBrowserTabInBackground = new Button(bottomContainer, SWT.CHECK);
-    fLoadBrowserTabInBackground.setText("Open websites in the background");
+    fLoadBrowserTabInBackground.setText("&Open websites in the background");
     fLoadBrowserTabInBackground.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fLoadBrowserTabInBackground.setSelection(fGlobalScope.getBoolean(DefaultPreferences.OPEN_BROWSER_IN_BACKGROUND));
 
     fAlwaysReuseBrowser = new Button(bottomContainer, SWT.CHECK);
-    fAlwaysReuseBrowser.setText("Always open websites in the same tab");
+    fAlwaysReuseBrowser.setText("&Always open websites in the same tab");
     fAlwaysReuseBrowser.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, false, false, 2, 1));
     fAlwaysReuseBrowser.setSelection(fGlobalScope.getBoolean(DefaultPreferences.ALWAYS_REUSE_BROWSER));
 
@@ -189,7 +189,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
       jsContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
 
       fDisableJavaScriptCheck = new Button(jsContainer, SWT.CHECK);
-      fDisableJavaScriptCheck.setText("Disable JavaScript in Browser");
+      fDisableJavaScriptCheck.setText("&Disable JavaScript in Browser");
       fDisableJavaScriptCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, true));
       fDisableJavaScriptCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.DISABLE_JAVASCRIPT));
       fDisableJavaScriptCheck.addSelectionListener(new SelectionAdapter() {
@@ -201,7 +201,7 @@ public class BrowserPreferencePage extends PreferencePage implements IWorkbenchP
 
       fDisableJavaScriptExceptionsButton = new Button(jsContainer, SWT.PUSH);
       fDisableJavaScriptExceptionsButton.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
-      fDisableJavaScriptExceptionsButton.setText("Exceptions...");
+      fDisableJavaScriptExceptionsButton.setText("&Exceptions...");
       Dialog.applyDialogFont(fDisableJavaScriptExceptionsButton);
       setButtonLayoutData(fDisableJavaScriptExceptionsButton);
       fDisableJavaScriptExceptionsButton.setEnabled(fDisableJavaScriptCheck.getSelection());

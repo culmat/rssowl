@@ -166,7 +166,7 @@ public class ConfirmDialog extends TitleAreaDialog {
     /* Checkbox to disable confirm dialog */
     if (fConfirmPrefKey != null) {
       fNeverAskAgainCheck = new Button(composite, SWT.CHECK);
-      fNeverAskAgainCheck.setText("Never ask again");
+      fNeverAskAgainCheck.setText("&Never ask again");
     }
 
     /* Holder for the separator to the OK and Cancel buttons */

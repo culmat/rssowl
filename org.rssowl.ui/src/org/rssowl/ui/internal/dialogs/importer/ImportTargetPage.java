@@ -106,7 +106,7 @@ public class ImportTargetPage extends WizardPage {
 
     /* No Specific Location */
     fNoSpecificLocationRadio = new Button(container, SWT.RADIO);
-    fNoSpecificLocationRadio.setText("Direct Import");
+    fNoSpecificLocationRadio.setText("&Direct Import");
     fNoSpecificLocationRadio.setSelection(true);
     fNoSpecificLocationRadio.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -119,7 +119,7 @@ public class ImportTargetPage extends WizardPage {
     fChooseExistingRadio = new Button(container, SWT.RADIO);
     fChooseExistingRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     ((GridData) fChooseExistingRadio.getLayoutData()).verticalIndent = 10;
-    fChooseExistingRadio.setText("Import into an existing Folder");
+    fChooseExistingRadio.setText("&Import into an existing Folder");
 
     Composite folderContainer = new Composite(container, SWT.None);
     folderContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
@@ -147,7 +147,7 @@ public class ImportTargetPage extends WizardPage {
     fCreateNewSetRadio = new Button(container, SWT.RADIO);
     fCreateNewSetRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     ((GridData) fCreateNewSetRadio.getLayoutData()).verticalIndent = 10;
-    fCreateNewSetRadio.setText("Import into a new Bookmark Set");
+    fCreateNewSetRadio.setText("Import into a new &Bookmark Set");
     fCreateNewSetRadio.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

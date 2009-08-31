@@ -214,7 +214,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
       infoText.setText("It is recommended to set a master password to protect your passwords from unauthorized access.");
 
     fUseMasterPasswordCheck = new Button(masterContainer, SWT.CHECK);
-    fUseMasterPasswordCheck.setText("Use a master password");
+    fUseMasterPasswordCheck.setText("&Use a master password");
     fUseMasterPasswordCheck.setFocus();
     fUseMasterPasswordCheck.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     fUseMasterPasswordCheck.setSelection(fGlobalScope.getBoolean(DefaultPreferences.USE_MASTER_PASSWORD));
@@ -228,7 +228,7 @@ public class CredentialsPreferencesPage extends PreferencePage implements IWorkb
 
     fResetMasterPassword = new Button(masterContainer, SWT.PUSH);
     fResetMasterPassword.setEnabled(fUseMasterPasswordCheck.getSelection());
-    fResetMasterPassword.setText("Change Master Password...");
+    fResetMasterPassword.setText("&Change Master Password...");
     Dialog.applyDialogFont(fResetMasterPassword);
     setButtonLayoutData(fResetMasterPassword);
     fResetMasterPassword.addSelectionListener(new SelectionAdapter() {

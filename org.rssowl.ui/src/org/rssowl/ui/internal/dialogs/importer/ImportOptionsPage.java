@@ -151,23 +151,23 @@ public class ImportOptionsPage extends WizardPage {
 
     /* Labels */
     if (labelCount != 0)
-      fImportLabelsCheck.setText("Import Labels (" + labelCount + " in total)");
+      fImportLabelsCheck.setText("Import &Labels (" + labelCount + " in total)");
     else
-      fImportLabelsCheck.setText("Import Labels (No Labels Available)");
+      fImportLabelsCheck.setText("Import &Labels (No Labels Available)");
     fImportLabelsCheck.setEnabled(labelCount != 0);
 
     /* Filters */
     if (filterCount != 0)
-      fImportFiltersCheck.setText("Import News Filters (" + filterCount + " in total)");
+      fImportFiltersCheck.setText("Import News &Filters (" + filterCount + " in total)");
     else
-      fImportFiltersCheck.setText("Import News Filters (No Filters Available)");
+      fImportFiltersCheck.setText("Import News &Filters (No Filters Available)");
     fImportFiltersCheck.setEnabled(filterCount != 0);
 
     /* Preferences */
     if (hasPreferences)
-      fImportPreferencesCheck.setText("Import Preferences");
+      fImportPreferencesCheck.setText("Import &Preferences");
     else
-      fImportPreferencesCheck.setText("Import Preferences (No Preferences Available)");
+      fImportPreferencesCheck.setText("Import &Preferences (No Preferences Available)");
     fImportPreferencesCheck.setEnabled(hasPreferences);
   }
 

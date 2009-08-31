@@ -174,7 +174,7 @@ public class FeedDefinitionPage extends WizardPage {
 
     fFeedByLinkButton = new Button(container, SWT.RADIO);
     fFeedByLinkButton.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fFeedByLinkButton.setText("Create a feed by supplying the website or direct link:");
+    fFeedByLinkButton.setText("&Create a feed by supplying the website or direct link:");
     fFeedByLinkButton.setSelection(true);
     fFeedByLinkButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -221,7 +221,7 @@ public class FeedDefinitionPage extends WizardPage {
     });
 
     fLoadTitleFromFeedButton = new Button(textIndent, SWT.CHECK);
-    fLoadTitleFromFeedButton.setText("Use the title of the feed as name for the bookmark");
+    fLoadTitleFromFeedButton.setText("&Use the title of the feed as name for the bookmark");
     fLoadTitleFromFeedButton.setSelection(fGlobalScope.getBoolean(DefaultPreferences.BM_LOAD_TITLE_FROM_FEED));
     fLoadTitleFromFeedButton.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -233,7 +233,7 @@ public class FeedDefinitionPage extends WizardPage {
     /* 2) Feed by Keyword */
     fFeedByKeywordButton = new Button(container, SWT.RADIO);
     fFeedByKeywordButton.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
-    fFeedByKeywordButton.setText("Create a feed by typing a keyword or phrase describing your interest:");
+    fFeedByKeywordButton.setText("Create a feed by typing a &keyword or phrase describing your interest:");
     fFeedByKeywordButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

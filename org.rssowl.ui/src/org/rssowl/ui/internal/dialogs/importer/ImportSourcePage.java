@@ -210,7 +210,7 @@ public class ImportSourcePage extends WizardPage {
     fImportFromResourceRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     if (isWelcome())
       ((GridData) fImportFromResourceRadio.getLayoutData()).verticalIndent = 10;
-    fImportFromResourceRadio.setText("Import Feeds from a File or Website:");
+    fImportFromResourceRadio.setText("&Import Feeds from a File or Website:");
     fImportFromResourceRadio.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -252,7 +252,7 @@ public class ImportSourcePage extends WizardPage {
     });
 
     fBrowseFileButton = new Button(sourceInputContainer, SWT.PUSH);
-    fBrowseFileButton.setText("Browse...");
+    fBrowseFileButton.setText("&Browse...");
     fBrowseFileButton.setEnabled(fImportFromResourceRadio.getSelection());
     Dialog.applyDialogFont(fBrowseFileButton);
     setButtonLayoutData(fBrowseFileButton);
@@ -267,7 +267,7 @@ public class ImportSourcePage extends WizardPage {
   private void createImportKeywordControls(Composite container) {
     fImportFromKeywordRadio = new Button(container, SWT.RADIO);
     fImportFromKeywordRadio.setSelection(fIsKewordSearch && !isWelcome());
-    fImportFromKeywordRadio.setText("Import Feeds matching the following Keywords:");
+    fImportFromKeywordRadio.setText("Import Feeds matching the following &Keywords:");
     fImportFromKeywordRadio.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -312,7 +312,7 @@ public class ImportSourcePage extends WizardPage {
 
   private void createImportRecommendedControls(Composite container) {
     fImportFromRecommendedRadio = new Button(container, SWT.RADIO);
-    fImportFromRecommendedRadio.setText("Import Recommended Feeds");
+    fImportFromRecommendedRadio.setText("Import &Recommended Feeds");
     fImportFromRecommendedRadio.setSelection(isWelcome());
     fImportFromRecommendedRadio.addSelectionListener(new SelectionAdapter() {
       @Override
@@ -324,7 +324,7 @@ public class ImportSourcePage extends WizardPage {
 
   private void createImportNoneControls(Composite container) {
     fImportNoneRadio = new Button(container, SWT.RADIO);
-    fImportNoneRadio.setText("Do not Import Feeds");
+    fImportNoneRadio.setText("Do &not Import Feeds");
     fImportNoneRadio.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
     fImportNoneRadio.addSelectionListener(new SelectionAdapter() {
       @Override
