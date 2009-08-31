@@ -646,11 +646,45 @@ public class CustomizeToolbarDialog extends Dialog {
   }
 
   /*
-   * @see org.eclipse.jface.dialogs.Dialog#createButtonsForButtonBar(org.eclipse.swt.widgets.Composite)
+   * @see org.eclipse.jface.dialogs.TrayDialog#createButtonBar(org.eclipse.swt.widgets.Composite)
    */
   @Override
-  protected void createButtonsForButtonBar(Composite parent) {
-    createButton(parent, IDialogConstants.OK_ID, IDialogConstants.CLOSE_LABEL, true);
+  protected Control createButtonBar(Composite parent) {
+    GridLayout layout = new GridLayout(1, false);
+    layout.marginWidth = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_MARGIN);
+    layout.marginHeight = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_MARGIN);
+    layout.horizontalSpacing = convertHorizontalDLUsToPixels(IDialogConstants.HORIZONTAL_SPACING);
+    layout.verticalSpacing = convertVerticalDLUsToPixels(IDialogConstants.VERTICAL_SPACING);
+
+    Composite buttonBar = new Composite(parent, SWT.NONE);
+    buttonBar.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+    buttonBar.setLayout(layout);
+
+    /* Info Container */
+    Composite infoContainer = new Composite(buttonBar, SWT.None);
+    infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
+    infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+
+    Label infoImg = new Label(infoContainer, SWT.NONE);
+    infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
+    infoImg.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
+
+    Label infoText = new Label(infoContainer, SWT.WRAP);
+    infoText.setText("You can use the mouse to move items.");
+    infoText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+
+    applyDialogFont(infoContainer);
+
+    /* Close */
+    Button closeButton = createButton(buttonBar, IDialogConstants.CLOSE_ID, IDialogConstants.CLOSE_LABEL, false);
+    closeButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        close();
+      }
+    });
+
+    return buttonBar;
   }
 
   /*
