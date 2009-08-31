@@ -670,9 +670,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         }
 
         /* Share */
-        if (!selection.isEmpty()) {
-          fillShareMenu(manager, selection, getActionBarConfigurer().getWindowConfigurer().getWindow(), false);
-        }
+        fillShareMenu(manager, selection, getActionBarConfigurer().getWindowConfigurer().getWindow(), false);
 
         /* Filter */
         if (!selection.isEmpty()) {
