@@ -1276,6 +1276,26 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         }
       }
     }
+
+    /* Indicate that no Items are Showing */
+    if (menu.getItems().length == 2 && selectedFilter != Type.SHOW_ALL) {
+      boolean hasBookMarks = false;
+      for (IFolder root : roots) {
+        if (!root.getChildren().isEmpty()) {
+          hasBookMarks = true;
+          break;
+        }
+      }
+
+      if (hasBookMarks) {
+        menu.add(new Action("Some Elements are Filtered") {
+          @Override
+          public boolean isEnabled() {
+            return false;
+          }
+        });
+      }
+    }
   }
 
   private static boolean shouldShow(IFolderChild child, Type filter) {
