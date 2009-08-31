@@ -35,7 +35,7 @@
                class="org.rssowl.ui.internal.actions.NewTypeDropdownAction"
                icon="icons/etool16/add.gif"
                id="org.rssowl.ui.NewType"
-               label="New"
+               label="&amp;New"
                style="pulldown"
                tooltip="New">
          </action>
@@ -119,7 +119,7 @@
                definitionId="org.rssowl.ui.SearchNewsAction"
                icon="icons/obj16/searchmark.gif"
                id="org.rssowl.ui.SearchNewsAction"
-               label="Search News..."
+               label="&amp;Search News..."
                style="push">
          </action>
       </actionSet>
@@ -288,7 +288,7 @@
                disabledIcon="icons/dlcl16/mark_all_read.gif"
                icon="icons/elcl16/mark_all_read.gif"
                id="org.rssowl.ui.MarkAllRead"
-               label="Mark All News as Read"
+               label="Mark &amp;All News as Read"
                style="push">
          </action>
          <action
@@ -298,7 +298,7 @@
                enablesFor="+"
                icon="icons/elcl16/mark_read.gif"
                id="org.rssowl.ui.actions.MarkRead"
-               label="Mark News as Read"
+               label="&amp;Mark News as Read"
                style="push"
                tooltip="Mark News as Read">
             <enablement>
@@ -317,14 +317,14 @@
                definitionId="org.rssowl.ui.actions.ReloadAll"
                icon="icons/elcl16/reload_all.gif"
                id="org.rssowl.ui.actions.ReloadAll"
-               label="Update All"
+               label="Update &amp;All"
                style="push"/>
          <action
                definitionId="org.rssowl.ui.actions.Reload"
                disabledIcon="icons/dlcl16/reload.gif"
                icon="icons/elcl16/reload.gif"
                id="org.rssowl.ui.actions.Reload"
-               label="Update"
+               label="&amp;Update"
                retarget="true"
                style="push"/>
          <menu
@@ -1206,7 +1206,7 @@
                definitionId="org.rssowl.ui.OpenInBrowserAction"
                enablesFor="+"
                id="org.rssowl.ui.OpenInBrowserAction"
-               label="Open in Browser"
+               label="&amp;Open in Browser"
                menubarPath="open"
                style="push"/>
       </objectContribution>
@@ -1244,7 +1244,7 @@
                definitionId="org.rssowl.ui.AggregateFolderAction"
                enablesFor="1"
                id="org.rssowl.ui.AggregateFolderAction"
-               label="Aggregate News"
+               label="&amp;Aggregate News"
                menubarPath="new.ext">
          </action>
       </objectContribution>
@@ -1257,7 +1257,7 @@
                definitionId="org.rssowl.ui.CreateFilterAction"
                icon="icons/etool16/filter.gif"
                id="org.rssowl.ui.FilterNewsAction"
-               label="Filter News..."
+               label="&amp;Filter News..."
                menubarPath="find.ext"
                style="push">
          </action>
@@ -1281,7 +1281,7 @@
                definitionId="org.rssowl.ui.CreateFilterAction"
                icon="icons/etool16/filter.gif"
                id="org.rssowl.ui.CreateFilterAction"
-               label="Create Filter..."
+               label="&amp;Create Filter..."
                menubarPath="filter"
                style="push">
          </action>

@@ -685,7 +685,7 @@ public class BookMarkExplorer extends ViewPart {
       public void menuAboutToShow(IMenuManager manager) {
 
         /* Manage Bookmark Sets */
-        IAction manageSets = new Action("Manage Bookmark Sets...") {
+        IAction manageSets = new Action("&Manage Bookmark Sets...") {
           @Override
           public void run() {
             ManageSetsDialog instance = ManageSetsDialog.getVisibleInstance();
@@ -719,11 +719,11 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Search Bar */
         manager.add(new Separator());
-        MenuManager searchMenu = new MenuManager("Find");
+        MenuManager searchMenu = new MenuManager("&Find");
         manager.add(searchMenu);
 
         /* Search Bar - Always Show Bar */
-        IAction alwaysShow = new Action("Always Show", IAction.AS_CHECK_BOX) {
+        IAction alwaysShow = new Action("&Always Show", IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             fAlwaysShowSearch = !fAlwaysShowSearch;
@@ -737,7 +737,7 @@ public class BookMarkExplorer extends ViewPart {
         searchMenu.add(alwaysShow);
 
         /* Search Bar - Begin Search when Typing */
-        IAction beginWhenTyping = new Action("Begin When Typing", IAction.AS_CHECK_BOX) {
+        IAction beginWhenTyping = new Action("&Begin When Typing", IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             fBeginSearchOnTyping = !fBeginSearchOnTyping;
@@ -748,7 +748,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* Misc. Settings */
         manager.add(new Separator());
-        IAction sortByName = new Action("Sort By Name", IAction.AS_CHECK_BOX) {
+        IAction sortByName = new Action("&Sort By Name", IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             fSortByName = !fSortByName;
@@ -765,7 +765,7 @@ public class BookMarkExplorer extends ViewPart {
         sortByName.setChecked(fSortByName);
         manager.add(sortByName);
 
-        IAction showFavicons = new Action("Show Feed Icons", IAction.AS_CHECK_BOX) {
+        IAction showFavicons = new Action("Show &Feed Icons", IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             fFaviconsEnabled = isChecked();
@@ -785,7 +785,7 @@ public class BookMarkExplorer extends ViewPart {
         /* Allow Contributions */
         manager.add(new Separator());
 
-        IAction linkFeedView = new Action("Link with Feed-View", IAction.AS_CHECK_BOX) {
+        IAction linkFeedView = new Action("&Link with Feed-View", IAction.AS_CHECK_BOX) {
           @Override
           public void run() {
             fLinkingEnabled = isChecked();
@@ -1143,11 +1143,11 @@ public class BookMarkExplorer extends ViewPart {
       public void menuAboutToShow(IMenuManager manager) {
 
         /* New Menu */
-        MenuManager newMenu = new MenuManager("New");
+        MenuManager newMenu = new MenuManager("&New");
         manager.add(newMenu);
 
         /* New BookMark */
-        Action newBookmarkAction = new Action("Bookmark...") {
+        Action newBookmarkAction = new Action("&Bookmark...") {
           @Override
           public void run() {
             IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
@@ -1166,7 +1166,7 @@ public class BookMarkExplorer extends ViewPart {
         newMenu.add(newBookmarkAction);
 
         /* New NewsBin */
-        Action newNewsBinAction = new Action("News Bin...") {
+        Action newNewsBinAction = new Action("&News Bin...") {
           @Override
           public void run() {
             IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
@@ -1185,7 +1185,7 @@ public class BookMarkExplorer extends ViewPart {
         newMenu.add(newNewsBinAction);
 
         /* New Saved Search */
-        Action newSavedSearchAction = new Action("Saved Search...") {
+        Action newSavedSearchAction = new Action("&Saved Search...") {
           @Override
           public void run() {
             IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
@@ -1205,7 +1205,7 @@ public class BookMarkExplorer extends ViewPart {
 
         /* New Folder */
         newMenu.add(new Separator());
-        Action newFolderAction = new Action("Folder...") {
+        Action newFolderAction = new Action("&Folder...") {
           @Override
           public void run() {
             IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
@@ -1237,7 +1237,7 @@ public class BookMarkExplorer extends ViewPart {
         final IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
         if (getBookMark(selection) != null) {
           manager.add(new Separator("share"));
-          MenuManager shareMenu = new MenuManager("Share Bookmark", OwlUI.SHARE, "sharebookmark");
+          MenuManager shareMenu = new MenuManager("&Share Bookmark", OwlUI.SHARE, "sharebookmark");
           manager.add(shareMenu);
 
           List<ShareProvider> providers = Controller.getDefault().getShareProviders();

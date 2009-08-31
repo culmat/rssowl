@@ -53,7 +53,7 @@ public class CopyLinkAction extends Action {
   public CopyLinkAction() {
     setId(ID);
     setActionDefinitionId(ID);
-    setText("Copy Link");
+    setText("Copy &Link");
     setImageDescriptor(OwlUI.getImageDescriptor("icons/elcl16/copy_link.gif"));
     setDisabledImageDescriptor(OwlUI.getImageDescriptor("icons/dlcl16/copy_link.gif"));
   }

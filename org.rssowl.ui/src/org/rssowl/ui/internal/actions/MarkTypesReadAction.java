@@ -69,9 +69,7 @@ public class MarkTypesReadAction extends Action implements IWorkbenchWindowActio
   private IStructuredSelection fSelection;
   private INewsDAO fNewsDao;
 
-  /**
-   *
-   */
+  /** Default Constructor */
   public MarkTypesReadAction() {
     this(StructuredSelection.EMPTY);
   }

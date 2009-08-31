@@ -45,7 +45,7 @@ public class OpenInExternalBrowserAction extends Action {
   public OpenInExternalBrowserAction(IStructuredSelection selection) {
     fSelection = selection;
 
-    setText("Open in External Browser");
+    setText("Open in &External Browser");
     setId(ID);
     setActionDefinitionId(ID);
   }

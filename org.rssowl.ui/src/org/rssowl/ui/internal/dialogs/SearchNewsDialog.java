@@ -1774,7 +1774,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
           manager.add(new Separator("mark"));
 
           /* Mark */
-          MenuManager markMenu = new MenuManager("Mark", "mark");
+          MenuManager markMenu = new MenuManager("M&ark", "mark");
           manager.add(markMenu);
 
           /* Mark as Read */
@@ -1808,7 +1808,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
           Collections.sort(newsbins, comparator);
 
           /* Move To */
-          MenuManager moveMenu = new MenuManager("Move To", "moveto");
+          MenuManager moveMenu = new MenuManager("&Move To", "moveto");
           manager.add(moveMenu);
 
           for (INewsBin bin : newsbins) {
@@ -1819,7 +1819,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
           moveMenu.add(new MoveCopyNewsToBinAction(selection, null, true));
 
           /* Copy To */
-          MenuManager copyMenu = new MenuManager("Copy To", "copyto");
+          MenuManager copyMenu = new MenuManager("&Copy To", "copyto");
           manager.add(copyMenu);
 
           for (INewsBin bin : newsbins) {
