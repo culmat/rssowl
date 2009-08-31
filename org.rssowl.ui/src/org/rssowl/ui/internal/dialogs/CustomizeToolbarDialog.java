@@ -83,6 +83,7 @@ import org.rssowl.ui.internal.CoolBarAdvisor.CoolBarItem;
 import org.rssowl.ui.internal.CoolBarAdvisor.CoolBarMode;
 import org.rssowl.ui.internal.util.CColumnLayoutData;
 import org.rssowl.ui.internal.util.CTable;
+import org.rssowl.ui.internal.util.JobRunner;
 import org.rssowl.ui.internal.util.LayoutUtils;
 import org.rssowl.ui.internal.util.CColumnLayoutData.Size;
 
@@ -323,7 +324,16 @@ public class CustomizeToolbarDialog extends Dialog {
             item.addSelectionListener(new SelectionAdapter() {
               @Override
               public void widgetSelected(SelectionEvent e) {
+
+                /* Add Item */
                 onAdd(toolItem);
+
+                /* Re-Open Menu for More */
+                JobRunner.runInUIThread(menu, new Runnable() {
+                  public void run() {
+                    menu.setVisible(true);
+                  };
+                });
               }
             });
 
