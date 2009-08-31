@@ -102,14 +102,18 @@ public class LabelAction extends Action {
     for (INews newsItem : newsList) {
       Set<ILabel> newsLabels = newsItem.getLabels();
 
-      /* Add Label */
-      if (isChecked()) {
-        newsItem.addLabel(fLabel);
-      }
+      /* Add or Remove particular Label */
+      if (fLabel != null) {
 
-      /* Remove single Label */
-      else if (fLabel != null)
-        newsItem.removeLabel(fLabel);
+        /* Add Label */
+        if (!newsLabels.contains(fLabel)) {
+          newsItem.addLabel(fLabel);
+        }
+
+        /* Remove single Label */
+        else
+          newsItem.removeLabel(fLabel);
+      }
 
       /* Remove all Labels */
       else {
