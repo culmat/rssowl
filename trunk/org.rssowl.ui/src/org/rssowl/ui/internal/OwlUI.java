@@ -32,6 +32,7 @@ import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
+import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IControlContentAdapter;
 import org.eclipse.jface.fieldassist.SimpleContentProposalProvider;
 import org.eclipse.jface.resource.ColorDescriptor;
@@ -1629,7 +1630,15 @@ public class OwlUI {
     KeyStroke activationKey = KeyStroke.getInstance(SWT.ARROW_DOWN);
 
     /* Create Content Proposal Adapter */
-    SimpleContentProposalProvider proposalProvider = new SimpleContentProposalProvider(new String[0]);
+    SimpleContentProposalProvider proposalProvider = new SimpleContentProposalProvider(new String[0]) {
+      @Override
+      public IContentProposal[] getProposals(String contents, int position) {
+        if (Display.getCurrent() != null && !control.isVisible())
+          return new IContentProposal[0];
+
+        return super.getProposals(contents, position);
+      }
+    };
     proposalProvider.setFiltering(true);
     final ContentProposalAdapter adapter = new ContentProposalAdapter(control, contentAdapter, proposalProvider, activationKey, null);
     adapter.setPropagateKeys(true);
