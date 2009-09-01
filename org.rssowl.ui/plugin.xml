@@ -1084,6 +1084,12 @@
             schemeId="org.rssowl.ui.KeyScheme"
             sequence="M1+ARROW_LEFT">
       </key>
+      <key
+            commandId="org.rssowl.ui.ToggleBookmarksCommand"
+            contextId="org.eclipse.ui.contexts.window"
+            schemeId="org.rssowl.ui.KeyScheme"
+            sequence="M1+B">
+      </key>
    </extension>
    <extension
          point="org.eclipse.ui.popupMenus">
