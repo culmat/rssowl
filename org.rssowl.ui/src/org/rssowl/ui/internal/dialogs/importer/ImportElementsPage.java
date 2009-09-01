@@ -723,6 +723,9 @@ public class ImportElementsPage extends WizardPage {
 
     /* Read Content */
     Pair<String, URI> result = readContent(resourceLink, monitor);
+    if (result == null)
+      return;
+
     String content = result.getFirst();
     resourceLink = result.getSecond();
 
