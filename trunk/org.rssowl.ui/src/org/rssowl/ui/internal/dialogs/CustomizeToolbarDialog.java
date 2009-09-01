@@ -165,7 +165,7 @@ public class CustomizeToolbarDialog extends Dialog {
     fItemViewer = new TableViewer(cTable.getControl());
     fItemViewer.getTable().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
     fItemViewer.getTable().setHeaderVisible(true);
-    ((GridData) fItemViewer.getTable().getLayoutData()).heightHint = fItemViewer.getTable().getItemHeight() * 22;
+    ((GridData) fItemViewer.getTable().getLayoutData()).heightHint = fItemViewer.getTable().getItemHeight() * 23;
     fItemViewer.getTable().setFocus();
 
     TableColumn nameCol = new TableColumn(fItemViewer.getTable(), SWT.NONE);
