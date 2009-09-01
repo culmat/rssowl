@@ -35,6 +35,7 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
@@ -413,8 +414,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
             /* Open Dialog to Customize Toolbar */
             CustomizeToolbarDialog dialog = new CustomizeToolbarDialog(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell());
-            dialog.open();
-            fCoolBarAdvisor.advise(true);
+            if (dialog.open() == IDialogConstants.OK_ID)
+              fCoolBarAdvisor.advise(true);
           }
         });
 
@@ -971,8 +972,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       @Override
       public void run() {
         CustomizeToolbarDialog dialog = new CustomizeToolbarDialog(getActionBarConfigurer().getWindowConfigurer().getWindow().getShell());
-        dialog.open();
-        fCoolBarAdvisor.advise(true);
+        if (dialog.open() == IDialogConstants.OK_ID)
+          fCoolBarAdvisor.advise(true);
       }
     });
 
