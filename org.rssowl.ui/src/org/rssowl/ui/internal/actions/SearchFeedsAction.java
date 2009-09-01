@@ -29,17 +29,11 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
-import org.rssowl.ui.internal.OwlUI;
-import org.rssowl.ui.internal.dialogs.importer.ImportWizard;
 
 /**
  * @author bpasero
  */
 public class SearchFeedsAction implements IWorkbenchWindowActionDelegate {
-
-  /* Section for Dialogs Settings */
-  private static final String SETTINGS_SECTION = "org.rssowl.ui.internal.dialogs.importer.ImportWizard";
-
   private IWorkbenchWindow fWindow;
 
   /*
@@ -65,8 +59,8 @@ public class SearchFeedsAction implements IWorkbenchWindowActionDelegate {
    * @param shell the {@link Shell} acting as parent of the wizard.
    */
   public void openWizard(Shell shell) {
-    ImportWizard importWizard = new ImportWizard(null, true);
-    OwlUI.openWizard(shell, importWizard, true, SETTINGS_SECTION);
+    ImportAction action = new ImportAction();
+    action.openWizard(shell, true);
   }
 
   /*
