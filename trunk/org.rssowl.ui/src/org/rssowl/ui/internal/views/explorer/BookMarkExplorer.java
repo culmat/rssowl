@@ -815,7 +815,7 @@ public class BookMarkExplorer extends ViewPart {
     fToolBarManager = fViewSite.getActionBars().getToolBarManager();
 
     /* BookMark Filter */
-    final IAction bookmarkFilter = new Action("Filter Bookmarks", IAction.AS_DROP_DOWN_MENU) {
+    final IAction bookmarkFilter = new Action("Filter Elements", IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
 
@@ -938,7 +938,7 @@ public class BookMarkExplorer extends ViewPart {
 
     /* Bookmark Group */
     fToolBarManager.add(new Separator());
-    final IAction bookmarkGroup = new Action("Group Bookmarks", IAction.AS_DROP_DOWN_MENU) {
+    final IAction bookmarkGroup = new Action("Group Elements", IAction.AS_DROP_DOWN_MENU) {
       @Override
       public void run() {
 
