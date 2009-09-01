@@ -84,7 +84,7 @@ public class NewsBrowserLabelProvider extends LabelProvider {
 
   /* Dynamic HTML in Content */
   enum Dynamic {
-    NEWS("newsitem"), TITLE("title"), TOGGLE_READ("toggleRead"), HEADER("header"), FOOTER("footer"), TOGGLE_STICKY("toggleSticky"), LABELS("labels"), LABELS_SEPARATOR("labelsSeparator");
+    NEWS("newsitem"), TITLE("title"), TOGGLE_READ_LINK("toggleRead"), TOGGLE_READ_IMG("toggleReadImg"), HEADER("header"), FOOTER("footer"), TOGGLE_STICKY("toggleSticky"), LABELS("labels"), LABELS_SEPARATOR("labelsSeparator");
 
     private String fId;
 
@@ -454,7 +454,8 @@ public class NewsBrowserLabelProvider extends LabelProvider {
       /* Toggle Read */
       builder.append("<td class=\"subline\">");
       String link = HANDLER_PROTOCOL + TOGGLE_READ_HANDLER_ID + "?" + news.getId();
-      imageLink(builder, link, news.getState() == INews.State.READ ? "Mark Unread" : "Mark Read", "Toggle Read", "/icons/elcl16/mark_read_light.gif", "mark_read_light.gif", Dynamic.TOGGLE_READ.getId(news), null);
+      String text= (news.getState() == INews.State.READ) ? "Mark Unread" : "Mark Read";
+      imageLink(builder, link, text, text, "/icons/elcl16/mark_read_light.gif", "mark_read_light.gif", Dynamic.TOGGLE_READ_LINK.getId(news), Dynamic.TOGGLE_READ_IMG.getId(news));
       builder.append("</td>");
 
       /* Toggle Sticky */

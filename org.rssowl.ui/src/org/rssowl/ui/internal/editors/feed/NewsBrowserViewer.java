@@ -940,7 +940,8 @@ public class NewsBrowserViewer extends ContentViewer implements ILinkHandler {
           boolean isRead = (INews.State.READ == news.getState());
           js.append(getElementById(Dynamic.NEWS.getId(news)).append(isRead ? ".className='newsitemRead'; " : ".className='newsitemUnread'; "));
           js.append(getElementById(Dynamic.TITLE.getId(news)).append(isRead ? ".className='read'; " : ".className='unread'; "));
-          js.append(getElementById(Dynamic.TOGGLE_READ.getId(news)).append(isRead ? ".title='Mark Unread'; " : ".title='Mark Read'; "));
+          js.append(getElementById(Dynamic.TOGGLE_READ_LINK.getId(news)).append(isRead ? ".title='Mark Unread'; " : ".title='Mark Read'; "));
+          js.append(getElementById(Dynamic.TOGGLE_READ_IMG.getId(news)).append(isRead ? ".alt='Mark Unread'; " : ".alt='Mark Read'; "));
         }
 
         /* Sticky (Title Background, Footer Background, Mark Sticky Image) */
