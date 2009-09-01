@@ -110,6 +110,11 @@ public class CustomizeToolbarDialog extends Dialog {
   private Button fMoveUpButton;
   private Button fMoveDownButton;
   private Button fRestoreDefaults;
+  private boolean fOkPressed;
+
+  /* Remember State when Dialog Opened */
+  private int[] fInitialToolBarItems;
+  private int fInitialToolBarMode;
 
   /* Used in the Toolbar Item Viewer to avoid equal conflict with Separator / Spacer */
   private static class ToolBarItem {
@@ -131,11 +136,34 @@ public class CustomizeToolbarDialog extends Dialog {
   }
 
   /*
+   * @see org.eclipse.jface.dialogs.Dialog#okPressed()
+   */
+  @Override
+  protected void okPressed() {
+    fOkPressed = true;
+    super.okPressed();
+  }
+
+  /*
+   * @see org.eclipse.jface.window.Window#open()
+   */
+  @Override
+  public int open() {
+    fInitialToolBarItems = fPreferences.getIntegers(DefaultPreferences.TOOLBAR_ITEMS);
+    fInitialToolBarMode = fPreferences.getInteger(DefaultPreferences.TOOLBAR_MODE);
+    return super.open();
+  }
+
+  /*
    * @see org.eclipse.jface.dialogs.Dialog#close()
    */
   @Override
   public boolean close() {
     fResources.dispose();
+    if (!fOkPressed) {
+      fPreferences.putIntegers(DefaultPreferences.TOOLBAR_ITEMS, fInitialToolBarItems);
+      fPreferences.putInteger(DefaultPreferences.TOOLBAR_MODE, fInitialToolBarMode);
+    }
     return super.close();
   }
 
@@ -669,6 +697,7 @@ public class CustomizeToolbarDialog extends Dialog {
     Composite infoContainer = new Composite(buttonBar, SWT.None);
     infoContainer.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     infoContainer.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+    ((GridLayout) infoContainer.getLayout()).marginRight = 10;
 
     Label infoImg = new Label(infoContainer, SWT.NONE);
     infoImg.setImage(OwlUI.getImage(fResources, "icons/obj16/info.gif"));
@@ -680,14 +709,8 @@ public class CustomizeToolbarDialog extends Dialog {
 
     applyDialogFont(infoContainer);
 
-    /* Close */
-    Button closeButton = createButton(buttonBar, IDialogConstants.CLOSE_ID, IDialogConstants.CLOSE_LABEL, false);
-    closeButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        close();
-      }
-    });
+    /* Create Ok / Cancel Buttons */
+    createButtonsForButtonBar(buttonBar);
 
     return buttonBar;
   }
