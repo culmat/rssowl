@@ -54,6 +54,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.rssowl.core.Owl;
@@ -106,8 +107,8 @@ public class FolderChooser extends Composite implements DisposeListener {
   /** The strategy when expanding the Control */
   public enum ExpandStrategy {
 
-    /** Relayout the Parent */
-    LAYOUT,
+    /** Pack the Parent */
+    PACK,
 
     /** Resize the Parent */
     RESIZE;
@@ -164,7 +165,7 @@ public class FolderChooser extends Composite implements DisposeListener {
 
   /**
    * @param expandStrategy the strategy when expanding the Control (either
-   * {@link ExpandStrategy#LAYOUT} or {@link ExpandStrategy#RESIZE}.
+   * {@link ExpandStrategy#PACK} or {@link ExpandStrategy#RESIZE}.
    */
   public void setExpandStrategy(ExpandStrategy expandStrategy) {
     fExpandStrategy = expandStrategy;
@@ -466,19 +467,25 @@ public class FolderChooser extends Composite implements DisposeListener {
     fToggleItem.setToolTipText(excluded ? "Hide Folders" : "Show Folders");
 
     ((GridData) fFolderViewerContainer.getLayoutData()).exclude = !excluded;
-    fFolderViewerContainer.getShell().layout();
+    Shell shell = fFolderViewerContainer.getShell();
+    shell.layout();
 
     fAddFolderBar.setVisible(excluded);
 
     /* Increase Size of Shell to fit Control */
     if (fExpandStrategy == ExpandStrategy.RESIZE) {
-      Point size = fFolderViewerContainer.getShell().getSize();
-      fFolderViewerContainer.getShell().setSize(size.x, size.y + (excluded ? fViewerHeight : -fViewerHeight));
+      Point size = shell.getSize();
+      shell.setSize(size.x, size.y + (excluded ? fViewerHeight : -fViewerHeight));
     }
 
-    /* Layout Shell and expect enough room to fit the Control */
-    else
-      fFolderViewerContainer.getShell().layout(true, true);
+    /* Pack Shell and expect enough room to fit the Control */
+    else {
+      Point desiredSize = shell.computeSize(shell.getSize().x, SWT.DEFAULT);
+      if (desiredSize.y > shell.getSize().y)
+        shell.pack();
+      else
+        shell.layout(true, true);
+    }
 
     if (excluded)
       fFolderViewer.getTree().setFocus();
