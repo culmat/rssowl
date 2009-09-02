@@ -56,16 +56,22 @@ import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.MenuListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Scrollable;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -116,6 +122,10 @@ public class CustomizeToolbarDialog extends Dialog {
   private int[] fInitialToolBarItems;
   private int fInitialToolBarMode;
 
+  /* Colors */
+  private Color fSeparatorBorderFg;
+  private Color fSeparatorBg;
+
   /* Used in the Toolbar Item Viewer to avoid equal conflict with Separator / Spacer */
   private static class ToolBarItem {
     CoolBarItem item;
@@ -133,6 +143,10 @@ public class CustomizeToolbarDialog extends Dialog {
     fResources = new LocalResourceManager(JFaceResources.getResources());
     fFirstTimeOpen = (Activator.getDefault().getDialogSettings().getSection(DIALOG_SETTINGS_KEY) == null);
     fPreferences = Owl.getPreferenceService().getGlobalScope();
+
+    /* Colors */
+    fSeparatorBorderFg = OwlUI.getColor(fResources, new RGB(210, 210, 210));
+    fSeparatorBg = OwlUI.getColor(fResources, new RGB(240, 240, 240));
   }
 
   /*
@@ -196,6 +210,44 @@ public class CustomizeToolbarDialog extends Dialog {
     ((GridData) fItemViewer.getTable().getLayoutData()).heightHint = fItemViewer.getTable().getItemHeight() * 23;
     fItemViewer.getTable().setFocus();
 
+    /* Custom Owner Drawn Category */
+    if (!OwlUI.isHighContrast()) {
+      fItemViewer.getControl().addListener(SWT.EraseItem, new Listener() {
+        public void handleEvent(Event event) {
+          ToolBarItem item = (ToolBarItem) event.item.getData();
+          if (item.item == CoolBarItem.SEPARATOR) {
+            Scrollable scrollable = (Scrollable) event.widget;
+            GC gc = event.gc;
+
+            Rectangle area = scrollable.getClientArea();
+            Rectangle rect = event.getBounds();
+
+            /* Paint the selection beyond the end of last column */
+            OwlUI.codExpandRegion(event, scrollable, gc, area);
+
+            /* Draw Gradient Rectangle */
+            Color oldForeground = gc.getForeground();
+            Color oldBackground = gc.getBackground();
+
+            /* Gradient */
+            gc.setBackground(fSeparatorBg);
+            gc.fillRectangle(0, rect.y, area.width, rect.height);
+
+            /* Top / Bottom Line */
+            gc.setForeground(fSeparatorBorderFg);
+            gc.drawLine(0, rect.y + rect.height - 1, area.width, rect.y + rect.height - 1);
+            gc.drawLine(0, rect.y, area.width, rect.y);
+
+            gc.setForeground(oldForeground);
+            gc.setBackground(oldBackground);
+
+            /* Mark as Background being handled */
+            event.detail &= ~SWT.BACKGROUND;
+          }
+        }
+      });
+    }
+
     TableColumn nameCol = new TableColumn(fItemViewer.getTable(), SWT.NONE);
 
     CColumnLayoutData data = new CColumnLayoutData(Size.FILL, 100);
@@ -223,8 +275,12 @@ public class CustomizeToolbarDialog extends Dialog {
       public void update(ViewerCell cell) {
         CoolBarItem item = ((ToolBarItem) cell.getElement()).item;
         cell.setText(item.getName());
+
         if (item.getImg() != null)
           cell.setImage(fResources.createImage(item.getImg()));
+
+        if (!OwlUI.isHighContrast() && item == CoolBarItem.SPACER)
+          cell.setForeground(getShell().getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
       }
     });
 
