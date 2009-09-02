@@ -31,7 +31,7 @@ import org.rssowl.core.persist.IEntity;
  * Instances of <code>EntityGroupItem</code> act as a wrapper arround a
  * <code>IEntity</code>. The can be added into
  * <code>EntityGroup</code>s.
- * 
+ *
  * @author bpasero
  */
 public class EntityGroupItem {
@@ -41,7 +41,7 @@ public class EntityGroupItem {
   /**
    * Creates a new EntityGroupItem with the given EntityGroup as parent and a
    * IEntity to wrap.
-   * 
+   *
    * @param group The EntityGroup this Item is contained.
    * @param entity The instance of <code>IEntity</code> to wrap.
    */
@@ -50,7 +50,7 @@ public class EntityGroupItem {
     fGroup = group;
     Assert.isNotNull(entity);
     fEntity = entity;
-    
+
     /* Link to Parent */
     fGroup.add(this);
   }
@@ -69,6 +69,9 @@ public class EntityGroupItem {
     return fEntity;
   }
 
+  /*
+   * @see java.lang.Object#equals(java.lang.Object)
+   */
   @Override
   public boolean equals(Object obj) {
     if (this == obj)
@@ -81,6 +84,9 @@ public class EntityGroupItem {
     return fEntity.equals(item.fEntity);
   }
 
+  /*
+   * @see java.lang.Object#hashCode()
+   */
   @Override
   public int hashCode() {
     return fEntity.hashCode();
