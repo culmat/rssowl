@@ -112,6 +112,7 @@ import org.rssowl.core.persist.service.PersistenceException;
 import org.rssowl.core.util.CoreUtils;
 import org.rssowl.core.util.Pair;
 import org.rssowl.core.util.StringUtils;
+import org.rssowl.ui.internal.dialogs.CustomWizardDialog;
 import org.rssowl.ui.internal.editors.browser.WebBrowserInput;
 import org.rssowl.ui.internal.editors.browser.WebBrowserView;
 import org.rssowl.ui.internal.editors.feed.FeedView;
@@ -1834,7 +1835,7 @@ public class OwlUI {
    * @param dialogSettingsKey the key to use to store dialog settings.
    */
   public static void openWizard(Shell shell, Wizard wizard, final boolean needsProgressPart, final String dialogSettingsKey) {
-    WizardDialog dialog = new WizardDialog(shell, wizard) {
+    CustomWizardDialog dialog = new CustomWizardDialog(shell, wizard) {
       private ProgressMonitorPart progressMonitorPart;
 
       @Override
