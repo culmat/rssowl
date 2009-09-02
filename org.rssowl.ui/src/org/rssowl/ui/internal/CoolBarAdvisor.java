@@ -152,7 +152,7 @@ public class CoolBarAdvisor {
   public enum CoolBarItem {
 
     /** Separator */
-    SEPARATOR(SEPARATOR_ID, "--- Separator ---", null, OwlUI.getImageDescriptor("icons/obj16/separator.gif"), null, 0),
+    SEPARATOR(SEPARATOR_ID, "Separator", null, OwlUI.getImageDescriptor("icons/obj16/separator.gif"), null, 0),
 
     /** Spacer */
     SPACER(SPACER_ID, "Blank Space", null, OwlUI.getImageDescriptor("icons/etool16/spacer.gif"), null, 0),
