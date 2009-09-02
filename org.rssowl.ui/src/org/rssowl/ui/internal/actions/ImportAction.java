@@ -28,13 +28,13 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Activator;
+import org.rssowl.ui.internal.dialogs.CustomWizardDialog;
 import org.rssowl.ui.internal.dialogs.importer.ImportWizard;
 
 /**
@@ -104,7 +104,7 @@ public class ImportAction extends Action implements IWorkbenchWindowActionDelega
    */
   public void openWizard(Shell shell, final String website, boolean isKeywordSearch) {
     final ImportWizard importWizard = new ImportWizard(website, isKeywordSearch);
-    WizardDialog dialog = new WizardDialog(shell, importWizard) {
+    CustomWizardDialog dialog = new CustomWizardDialog(shell, importWizard) {
 
       @Override
       protected boolean isResizable() {

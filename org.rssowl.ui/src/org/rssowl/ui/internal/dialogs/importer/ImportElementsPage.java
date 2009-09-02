@@ -26,6 +26,7 @@ package org.rssowl.ui.internal.dialogs.importer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.CheckboxTreeViewer;
@@ -81,6 +82,7 @@ import org.rssowl.core.util.URIUtils;
 import org.rssowl.ui.internal.Activator;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
+import org.rssowl.ui.internal.dialogs.CustomWizardDialog;
 import org.rssowl.ui.internal.dialogs.LoginDialog;
 import org.rssowl.ui.internal.dialogs.PreviewFeedDialog;
 import org.rssowl.ui.internal.dialogs.importer.ImportSourcePage.Source;
@@ -129,6 +131,7 @@ public class ImportElementsPage extends WizardPage {
   private Button fHideExistingCheck;
   private ExistingBookmarkFilter fExistingFilter = new ExistingBookmarkFilter();
   private Map<URI, IFeed> fLoadedFeedCache = new ConcurrentHashMap<URI, IFeed>();
+  private IProgressMonitor fCurrentProgressMonitor;
 
   /* Remember Current Import Values */
   private Source fCurrentSourceKind;
@@ -385,9 +388,30 @@ public class ImportElementsPage extends WizardPage {
       }
     });
 
+    /* React on user clicking Cancel if a progress is showing */
+    if (getContainer() instanceof CustomWizardDialog) {
+      Button cancelButton = ((CustomWizardDialog) getContainer()).getButton(IDialogConstants.CANCEL_ID);
+      if (cancelButton != null) {
+        cancelButton.addSelectionListener(new SelectionAdapter() {
+          @Override
+          public void widgetSelected(SelectionEvent e) {
+            onCancel();
+          }
+        });
+      }
+    }
+
     Dialog.applyDialogFont(container);
 
     setControl(container);
+  }
+
+  private void onCancel() {
+    if (fCurrentProgressMonitor != null) {
+      IProgressMonitor monitor = fCurrentProgressMonitor;
+      monitor.setTaskName("Please wait while the search is canceled...");
+      monitor.subTask("");
+    }
   }
 
   private void openPreview(ISelection selection) {
@@ -562,6 +586,7 @@ public class ImportElementsPage extends WizardPage {
         try {
           monitor.beginTask("Searching for Feeds ('Cancel' to stop)", IProgressMonitor.UNKNOWN);
           monitor.subTask("Connecting...");
+          fCurrentProgressMonitor = monitor;
 
           /* Return on Cancellation */
           if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
@@ -659,6 +684,10 @@ public class ImportElementsPage extends WizardPage {
             throw new InvocationTargetException(e);
         } finally {
 
+          /* Reset Field in case of error or cancellation */
+          if (canceled || error != null)
+            fCurrentProgressMonitor = null;
+
           /* Close Input Stream */
           if (in != null) {
             try {
@@ -683,6 +712,7 @@ public class ImportElementsPage extends WizardPage {
 
         /* Done */
         monitor.done();
+        fCurrentProgressMonitor = null;
       }
     };
 
@@ -696,6 +726,7 @@ public class ImportElementsPage extends WizardPage {
         try {
           monitor.beginTask("Searching for Feeds ('Cancel' to stop)", IProgressMonitor.UNKNOWN);
           monitor.subTask("Connecting...");
+          fCurrentProgressMonitor = monitor;
 
           /* Build Link for Keyword-Feed Search */
           String linkVal = Controller.getDefault().toFeedSearchLink(keywords);
@@ -710,6 +741,7 @@ public class ImportElementsPage extends WizardPage {
           throw new InvocationTargetException(e);
         } finally {
           monitor.done();
+          fCurrentProgressMonitor = null;
         }
       }
     };
@@ -767,6 +799,10 @@ public class ImportElementsPage extends WizardPage {
         links.add(0, feedStr);
       }
     }
+
+    /* Return on Cancellation */
+    if (monitor.isCanceled() || Controller.getDefault().isShuttingDown())
+      return;
 
     /* Update Task Information */
     monitor.beginTask("Searching for Feeds ('Cancel' to stop)", links.size());
