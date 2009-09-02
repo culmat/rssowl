@@ -28,6 +28,8 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.preference.PreferencePage;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.resource.LocalResourceManager;
+import org.eclipse.jface.util.LocalSelectionTransfer;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.jface.viewers.CellLabelProvider;
 import org.eclipse.jface.viewers.CheckStateChangedEvent;
 import org.eclipse.jface.viewers.CheckboxTableViewer;
@@ -36,10 +38,17 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.jface.viewers.ViewerDropAdapter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSourceAdapter;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.TransferData;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -55,6 +64,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.rssowl.core.Owl;
 import org.rssowl.core.internal.persist.pref.DefaultPreferences;
 import org.rssowl.core.persist.pref.IPreferenceScope;
+import org.rssowl.core.util.LoggingSafeRunnable;
 import org.rssowl.core.util.StringUtils;
 import org.rssowl.ui.internal.Controller;
 import org.rssowl.ui.internal.OwlUI;
@@ -156,6 +166,68 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
         updateMoveEnablement();
       }
     });
+
+    /* Drag Support */
+    fViewer.addDragSupport(DND.DROP_MOVE, new Transfer[] { LocalSelectionTransfer.getTransfer() }, new DragSourceAdapter() {
+      @Override
+      public void dragStart(final DragSourceEvent event) {
+        SafeRunnable.run(new LoggingSafeRunnable() {
+          public void run() throws Exception {
+            IStructuredSelection selection = (IStructuredSelection) fViewer.getSelection();
+            event.doit = (selection.size() < fViewer.getTable().getItemCount());
+
+            if (event.doit) {
+              LocalSelectionTransfer.getTransfer().setSelection(selection);
+              LocalSelectionTransfer.getTransfer().setSelectionSetTime(event.time & 0xFFFFFFFFL);
+            };
+          }
+        });
+      }
+
+      @Override
+      public void dragSetData(final DragSourceEvent event) {
+        SafeRunnable.run(new LoggingSafeRunnable() {
+          public void run() throws Exception {
+            if (LocalSelectionTransfer.getTransfer().isSupportedType(event.dataType))
+              event.data = LocalSelectionTransfer.getTransfer().getSelection();
+          }
+        });
+      }
+
+      @Override
+      public void dragFinished(DragSourceEvent event) {
+        SafeRunnable.run(new LoggingSafeRunnable() {
+          public void run() throws Exception {
+            LocalSelectionTransfer.getTransfer().setSelection(null);
+            LocalSelectionTransfer.getTransfer().setSelectionSetTime(0);
+          }
+        });
+      }
+    });
+
+    /* Drop Support */
+    ViewerDropAdapter dropSupport = new ViewerDropAdapter(fViewer) {
+
+      @Override
+      public boolean validateDrop(Object target, int operation, TransferData transferType) {
+        return true;
+      }
+
+      @Override
+      public boolean performDrop(Object data) {
+        ShareProvider target = (ShareProvider) getCurrentTarget();
+        if (target != null) {
+          onMove((StructuredSelection) data, target, getCurrentLocation());
+          return true;
+        }
+
+        return false;
+      }
+    };
+    dropSupport.setFeedbackEnabled(true);
+    dropSupport.setScrollEnabled(true);
+    dropSupport.setSelectionFeedbackEnabled(true);
+    fViewer.addDropSupport(DND.DROP_MOVE, new Transfer[] { LocalSelectionTransfer.getTransfer() }, dropSupport);
 
     /* Set input (ignored by ContentProvider anyways) */
     fViewer.setInput(this);
@@ -350,6 +422,67 @@ public class SharingPreferencesPage extends PreferencePage implements IWorkbench
     fViewer.getTable().showSelection();
     updateCheckedState();
     updateMoveEnablement();
+  }
+
+  private void onMove(StructuredSelection selection, ShareProvider destination, int location) {
+
+    /* Determine Moved Items */
+    List<ShareProvider> movedItems = new ArrayList<ShareProvider>();
+    Object[] selectedElements = selection.toArray();
+    for (Object element : selectedElements) {
+      movedItems.add((ShareProvider) element);
+    }
+
+    /* Determine Visible Items */
+    List<ShareProvider> visibleItems = new ArrayList<ShareProvider>();
+    TableItem[] items = fViewer.getTable().getItems();
+    for (TableItem item : items) {
+      visibleItems.add((ShareProvider) item.getData());
+    }
+
+    /* Return in these unlikely cases */
+    if (movedItems.isEmpty() || visibleItems.isEmpty())
+      return;
+
+    /* Remove all Moved Items from Visible */
+    visibleItems.removeAll(movedItems);
+
+    /* Put Moved Items to Destination Index if possible */
+    int destinationIndex = visibleItems.indexOf(destination);
+    if (destinationIndex >= 0) {
+
+      /* Adjust Destination */
+      if (location == ViewerDropAdapter.LOCATION_ON || location == ViewerDropAdapter.LOCATION_AFTER)
+        destinationIndex++;
+
+      /* Add to Visible */
+      visibleItems.addAll(destinationIndex, movedItems);
+
+      /* Save Visible */
+      int[] newState = new int[items.length];
+      for (int i = 0; i < visibleItems.size(); i++) {
+        ShareProvider provider = visibleItems.get(i);
+
+        int index = provider.getIndex();
+        index++; //Adjust to non-zero indexing
+        if (!provider.isEnabled())
+          index = index * -1;
+
+        newState[i] = index;
+      }
+
+      fPreferences.putIntegers(DefaultPreferences.SHARE_PROVIDER_STATE, newState);
+
+      /* Show Updates */
+      fViewer.refresh();
+
+      /* Restore Selection */
+      fViewer.getTable().setSelection(destinationIndex, destinationIndex + movedItems.size() - 1);
+
+      /* Update */
+      updateCheckedState();
+      updateMoveEnablement();
+    }
   }
 
   private void updateCheckedState() {
