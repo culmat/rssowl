@@ -1243,7 +1243,7 @@ public class SearchNewsDialog extends TitleAreaDialog {
         else
           text = "The search returned " + fResult.size() + " results. ";
 
-        text += "Click <a>here</a> to save this search.";
+        text += "<a>Click here</a> to save this search.";
         fStatusLabel.setText(text);
 
         /* Enable Buttons and update Cursor */

@@ -458,6 +458,11 @@ public class NewsFiltersListDialog extends TitleAreaDialog {
         protected String getTitleImage() {
           return "icons/wizban/filter_wiz.png";
         }
+
+        @Override
+        public void setTitle(String newTitle) {
+          super.setTitle("Run Selected Filter");
+        }
       };
 
       /* Apply Actions in chunks of N Items to avoid Memory issues */
