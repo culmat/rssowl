@@ -520,6 +520,13 @@ public class NewsFilterDialog extends TitleAreaDialog {
           Collection<ISearchFilter> filters = CoreUtils.loadSortedNewsFilters();
           Menu menu = new Menu(parent);
 
+          /* Show Something if Collection is Empty */
+          if (filters.isEmpty()) {
+            MenuItem item= new MenuItem(menu, SWT.None);
+            item.setText("No News Filter Found");
+            item.setEnabled(false);
+          }
+
           /* Show Existing News Filters */
           for (final ISearchFilter filter : filters) {
             MenuItem item = new MenuItem(menu, SWT.None);
@@ -579,6 +586,13 @@ public class NewsFilterDialog extends TitleAreaDialog {
         public Menu getMenu(Control parent) {
           Collection<ISearchMark> searchMarks = CoreUtils.loadSortedSearchMarks();
           Menu menu = new Menu(parent);
+
+          /* Show Something if Collection is Empty */
+          if (searchMarks.isEmpty()) {
+            MenuItem item= new MenuItem(menu, SWT.None);
+            item.setText("No Saved Search Found");
+            item.setEnabled(false);
+          }
 
           /* Show Existing Saved Searches */
           for (final ISearchMark searchMark : searchMarks) {
