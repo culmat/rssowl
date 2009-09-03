@@ -61,6 +61,8 @@ import org.rssowl.core.persist.IEntity;
 import org.rssowl.core.persist.IFolderChild;
 import org.rssowl.core.persist.IModelFactory;
 import org.rssowl.core.persist.INews;
+import org.rssowl.core.persist.INewsBin;
+import org.rssowl.core.persist.INewsMark;
 import org.rssowl.core.persist.ISearchCondition;
 import org.rssowl.core.persist.ISearchField;
 import org.rssowl.core.persist.SearchSpecifier;
@@ -694,8 +696,9 @@ public class FilterBar {
           }
         });
 
-        /* Only offer for IBookMark */
-        if (((FeedViewInput) fFeedView.getEditorInput()).getMark() instanceof IBookMark) {
+        /* Offer to Save as Search */
+        INewsMark inputMark = ((FeedViewInput) fFeedView.getEditorInput()).getMark();
+        if (inputMark instanceof IBookMark || inputMark instanceof INewsBin || inputMark instanceof FolderNewsMark) {
 
           /* Separator */
           new MenuItem(menu, SWT.SEPARATOR);
