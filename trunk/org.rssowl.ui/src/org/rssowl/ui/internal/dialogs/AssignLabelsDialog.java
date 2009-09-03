@@ -156,7 +156,7 @@ public class AssignLabelsDialog extends Dialog {
     });
 
     /* Add auto-complete for Labels taken from existing Categories */
-    ContentAssistAdapter adapter = new ContentAssistAdapter(fLabelsInput, ',');
+    ContentAssistAdapter adapter = new ContentAssistAdapter(fLabelsInput, ',', true);
 
     /* Labels */
     final List<String> labelNames = new ArrayList<String>(fExistingLabels.size());
