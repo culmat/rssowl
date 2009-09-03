@@ -46,14 +46,17 @@ public class ContentAssistAdapter implements IControlContentAdapter, IControlCon
   private Control fControl;
   private final char fSeparator;
   private String fSeparatorStr;
+  private final boolean fExpectMultiValues;
 
   /**
    * @param control
    * @param separator
+   * @param expectMultiValues
    */
-  public ContentAssistAdapter(Control control, char separator) {
+  public ContentAssistAdapter(Control control, char separator, boolean expectMultiValues) {
     fControl = control;
     fSeparator = separator;
+    fExpectMultiValues = expectMultiValues;
     fSeparatorStr = new String(new char[] { fSeparator });
     if (fSeparator != ' ')
       fSeparatorStr = fSeparatorStr + " ";
@@ -118,7 +121,7 @@ public class ContentAssistAdapter implements IControlContentAdapter, IControlCon
 
     /* Replace All: No Separator Found */
     if (previousSeparatorIndex == -1 && nextSeparatorIndex == -1) {
-      text = textToInsert + fSeparatorStr;
+      text = fExpectMultiValues ? textToInsert + fSeparatorStr : textToInsert;
     }
 
     /* Replace All beginning with Previous Separator  */

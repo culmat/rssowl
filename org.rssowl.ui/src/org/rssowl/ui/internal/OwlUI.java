@@ -1595,7 +1595,7 @@ public class OwlUI {
    * @return Pair
    */
   public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Text text, Collection<String> values, boolean decorate) {
-    return hookAutoComplete(text, new ContentAssistAdapter(text, ' '), values, decorate);
+    return hookAutoComplete(text, new ContentAssistAdapter(text, ' ', false), values, decorate);
   }
 
   /**
@@ -1606,7 +1606,7 @@ public class OwlUI {
    * @return Pair
    */
   public static Pair<SimpleContentProposalProvider, ContentProposalAdapter> hookAutoComplete(final Combo combo, Collection<String> values, boolean decorate) {
-    return hookAutoComplete(combo, new ContentAssistAdapter(combo, ' '), values, decorate);
+    return hookAutoComplete(combo, new ContentAssistAdapter(combo, ' ', false), values, decorate);
   }
 
   /**
