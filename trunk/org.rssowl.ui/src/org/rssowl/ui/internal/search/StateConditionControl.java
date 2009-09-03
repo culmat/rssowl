@@ -25,21 +25,26 @@
 package org.rssowl.ui.internal.search;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusAdapter;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.ToolTip;
 import org.rssowl.core.persist.INews;
+import org.rssowl.ui.internal.Application;
 import org.rssowl.ui.internal.util.LayoutUtils;
 
 import java.util.EnumSet;
 
 /**
- * The <code>StateConditionControl</code> is a <code>Composite</code>
- * providing the UI to define State-Conditions for a Search.
+ * The <code>StateConditionControl</code> is a <code>Composite</code> providing
+ * the UI to define State-Conditions for a Search.
  * <p>
  * TODO This class is currently only working on INews.
  * </p>
@@ -123,6 +128,73 @@ public class StateConditionControl extends Composite {
     fUnreadState.setText("&Unread");
     fUnreadState.setToolTipText("News that have been seen but not read");
     fUnreadState.setLayoutData(new GridData(SWT.BEGINNING, SWT.CENTER, false, true));
+
+    /* Use a Tooltip to help the user understand the State Semantic */
+    final ToolTip newStateToolTip = new ToolTip(getShell(), SWT.BALLOON);
+    newStateToolTip.setMessage("Select 'New' to include News that have not yet been seen.");
+    newStateToolTip.setAutoHide(false);
+
+    final ToolTip unreadStateToolTip = new ToolTip(getShell(), SWT.BALLOON);
+    unreadStateToolTip.setMessage("Select 'Unread' to include News that have been seen but not read.");
+    unreadStateToolTip.setAutoHide(false);
+
+    fNewState.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        if (fNewState.getSelection() && !fUnreadState.getSelection()) {
+          Point toolTipLocation = toDisplay(fUnreadState.getLocation());
+          toolTipLocation.y += fUnreadState.getSize().y;
+          if (Application.IS_WINDOWS)
+            toolTipLocation.x += 5;
+
+          unreadStateToolTip.setLocation(toolTipLocation);
+          unreadStateToolTip.setVisible(true);
+        } else {
+          unreadStateToolTip.setVisible(false);
+        }
+      }
+    });
+
+    fUnreadState.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        if (fUnreadState.getSelection() && !fNewState.getSelection()) {
+          Point toolTipLocation = toDisplay(fNewState.getLocation());
+          toolTipLocation.y += fNewState.getSize().y;
+          if (Application.IS_WINDOWS)
+            toolTipLocation.x += 5;
+
+          newStateToolTip.setLocation(toolTipLocation);
+          newStateToolTip.setVisible(true);
+        } else {
+          newStateToolTip.setVisible(false);
+        }
+      }
+    });
+
+    fNewState.addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusGained(FocusEvent e) {
+        newStateToolTip.setVisible(false);
+      }
+
+      @Override
+      public void focusLost(FocusEvent e) {
+        unreadStateToolTip.setVisible(false);
+      }
+    });
+
+    fUnreadState.addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusGained(FocusEvent e) {
+        unreadStateToolTip.setVisible(false);
+      }
+
+      @Override
+      public void focusLost(FocusEvent e) {
+        newStateToolTip.setVisible(false);
+      }
+    });
 
     /* State: Updated */
     fUpdatedState = new Button(this, SWT.CHECK);
