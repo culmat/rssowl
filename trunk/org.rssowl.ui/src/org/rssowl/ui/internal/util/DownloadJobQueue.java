@@ -198,7 +198,7 @@ public class DownloadJobQueue {
 
   /* Create a Job for a Task to handle */
   private Job createTaskJob() {
-    Job job = new Job(fName) { //$NON-NLS-1$
+    Job job = new Job(fName) {
       @Override
       protected IStatus run(final IProgressMonitor monitor) {
         final Job job = this;
