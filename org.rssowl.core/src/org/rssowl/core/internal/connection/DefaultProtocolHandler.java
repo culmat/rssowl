@@ -40,6 +40,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.osgi.util.NLS;
 import org.osgi.service.url.URLStreamHandlerService;
 import org.rssowl.core.Owl;
 import org.rssowl.core.connection.AuthenticationRequiredException;
@@ -108,7 +109,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   private static final String HEADER_RESPOND_IF_MODIFIED_SINCE = "If-Modified-Since"; //$NON-NLS-1$
 
   /** Property to tell the XML parser to use platform encoding */
-  public static final String USE_PLATFORM_ENCODING = "org.rssowl.core.internal.connection.DefaultProtocolHandler.UsePlatformEncoding";
+  public static final String USE_PLATFORM_ENCODING = "org.rssowl.core.internal.connection.DefaultProtocolHandler.UsePlatformEncoding"; //$NON-NLS-1$
 
   /* The Default Connection Timeout */
   private static final int DEFAULT_CON_TIMEOUT = 30000;
@@ -335,7 +336,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
   private InputStream internalOpenStream(URI link, URI authLink, String authRealm, Map<Object, Object> properties) throws ConnectionException {
 
     /* Handle File Protocol at first */
-    if ("file".equals(link.getScheme()))
+    if ("file".equals(link.getScheme())) //$NON-NLS-1$
       return loadFileProtocol(link);
 
     /* SSL Support */
@@ -343,7 +344,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       initSSLProtocol();
 
     /* Feed Support */
-    if ("feed".equals(link.getScheme()))
+    if ("feed".equals(link.getScheme())) //$NON-NLS-1$
       initFeedProtocol();
 
     /* Init Client */
@@ -374,24 +375,24 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     /* In case authentication required / failed */
     if (getMethod.getStatusCode() == HTTP_ERROR_AUTH_REQUIRED) {
       AuthState hostAuthState = getMethod.getHostAuthState();
-      throw new AuthenticationRequiredException(hostAuthState != null ? hostAuthState.getRealm() : null, Activator.getDefault().createErrorStatus("Authentication required.", null)); //$NON-NLS-1$
+      throw new AuthenticationRequiredException(hostAuthState != null ? hostAuthState.getRealm() : null, Activator.getDefault().createErrorStatus(Messages.DefaultProtocolHandler_ERROR_AUTHENTICATION_REQUIRED, null));
     }
 
     /* In case proxy-authentication required / failed */
     if (getMethod.getStatusCode() == HTTP_ERROR_PROXY_AUTH_REQUIRED)
-      throw new ProxyAuthenticationRequiredException(Activator.getDefault().createErrorStatus("Proxy-Authentication required!", null)); //$NON-NLS-1$
+      throw new ProxyAuthenticationRequiredException(Activator.getDefault().createErrorStatus(Messages.DefaultProtocolHandler_ERROR_PROXY_AUTHENTICATION_REQUIRED, null));
 
     /* If status code is 4xx, throw an IOException with the status code included */
     if (getMethod.getStatusCode() >= HTTP_ERRORS)
-      throw new ConnectionException(Activator.getDefault().createErrorStatus("Server returned HTTP Status " + String.valueOf(getMethod.getStatusCode()), null)); //$NON-NLS-1$
+      throw new ConnectionException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.DefaultProtocolHandler_ERROR_HTTP_STATUS, String.valueOf(getMethod.getStatusCode())), null));
 
     /* In case the Feed has not been modified since */
     if (getMethod.getStatusCode() == HTTP_STATUS_NOT_MODIFIED)
-      throw new NotModifiedException(Activator.getDefault().createInfoStatus("Feed has not been modified since!", null)); //$NON-NLS-1$
+      throw new NotModifiedException(Activator.getDefault().createInfoStatus(Messages.DefaultProtocolHandler_INFO_NOT_MODIFIED_SINCE, null));
 
     /* In case response body is not available */
     if (inS == null)
-      throw new ConnectionException(Activator.getDefault().createErrorStatus("Response Stream is not available!", null)); //$NON-NLS-1$
+      throw new ConnectionException(Activator.getDefault().createErrorStatus(Messages.DefaultProtocolHandler_ERROR_STREAM_UNAVAILABLE, null));
 
     /* Check wether a Progress Monitor is provided to support early cancelation */
     IProgressMonitor monitor = null;
@@ -438,8 +439,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
       /* Authenticate if required */
       if (creds.getUsername() != null || creds.getPassword() != null) {
-        String user = StringUtils.isSet(creds.getUsername()) ? creds.getUsername() : "";
-        String pw = StringUtils.isSet(creds.getPassword()) ? creds.getPassword() : "";
+        String user = StringUtils.isSet(creds.getUsername()) ? creds.getUsername() : ""; //$NON-NLS-1$
+        String pw = StringUtils.isSet(creds.getPassword()) ? creds.getPassword() : ""; //$NON-NLS-1$
 
         AuthScope proxyAuthScope = new AuthScope(creds.getHost(), creds.getPort());
 
@@ -469,8 +470,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     if (fgFeedProtocolInitialized)
       return;
 
-    Protocol feed = new Protocol("feed", new DefaultProtocolSocketFactory(), 80);
-    Protocol.registerProtocol("feed", feed);
+    Protocol feed = new Protocol("feed", new DefaultProtocolSocketFactory(), 80); //$NON-NLS-1$
+    Protocol.registerProtocol("feed", feed); //$NON-NLS-1$
 
     fgFeedProtocolInitialized = true;
   }
@@ -600,7 +601,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
    * org.eclipse.core.runtime.IProgressMonitor)
    */
   public String getLabel(URI link, IProgressMonitor monitor) throws ConnectionException {
-    String title = "";
+    String title = ""; //$NON-NLS-1$
 
     /* Define Properties for Connection */
     Map<Object, Object> properties = new HashMap<Object, Object>();
@@ -619,8 +620,8 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       String encoding = getEncodingFromXML(new InputStreamReader(bufIns));
 
       /* Avoid lowercase UTF-8 notation */
-      if ("utf-8".equalsIgnoreCase(encoding))
-        encoding = "UTF-8";
+      if ("utf-8".equalsIgnoreCase(encoding)) //$NON-NLS-1$
+        encoding = "UTF-8"; //$NON-NLS-1$
 
       /* Reset the Stream to its beginning */
       bufIns.reset();
@@ -634,12 +635,12 @@ public class DefaultProtocolHandler implements IProtocolHandler {
         title = getTitleFromFeed(new BufferedReader(new InputStreamReader(bufIns)));
 
       /* Remove the title tags (also delete attributes in title tag) */
-      title = title.replaceAll("<title[^>]*>", "");
-      title = title.replaceAll("</title>", "");
+      title = title.replaceAll("<title[^>]*>", ""); //$NON-NLS-1$ //$NON-NLS-2$
+      title = title.replaceAll("</title>", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
       /* Remove potential CDATA Tags */
-      title = title.replaceAll(Pattern.quote("<![CDATA["), "");
-      title = title.replaceAll(Pattern.quote("]]>"), "");
+      title = title.replaceAll(Pattern.quote("<![CDATA["), ""); //$NON-NLS-1$ //$NON-NLS-2$
+      title = title.replaceAll(Pattern.quote("]]>"), ""); //$NON-NLS-1$ //$NON-NLS-2$
     } catch (IOException e) {
       error = e;
       Activator.getDefault().logError(e.getMessage(), e);
@@ -691,10 +692,10 @@ public class DefaultProtocolHandler implements IProtocolHandler {
     String firstLine = strBuf.toString();
 
     /* Look if Encoding is supplied */
-    if (firstLine.indexOf("encoding") >= 0) {
+    if (firstLine.indexOf("encoding") >= 0) { //$NON-NLS-1$
 
       /* Extract the Encoding Value */
-      String regEx = "<\\?.*encoding=[\"']([^\\s]*)[\"'].*\\?>";
+      String regEx = "<\\?.*encoding=[\"']([^\\s]*)[\"'].*\\?>"; //$NON-NLS-1$
       Pattern pattern = Pattern.compile(regEx);
       Matcher match = pattern.matcher(firstLine);
 
@@ -707,7 +708,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
 
   /* Tries to find the title information from the given Reader */
   private String getTitleFromFeed(BufferedReader inputReader) throws IOException {
-    String title = "";
+    String title = ""; //$NON-NLS-1$
     String firstLine;
     boolean titleFound = false;
 
@@ -722,7 +723,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
         break;
 
       /* If the line contains the title, break loop */
-      if (firstLine.indexOf("<title") >= 0 && firstLine.indexOf("</title>") >= 0) {
+      if (firstLine.indexOf("<title") >= 0 && firstLine.indexOf("</title>") >= 0) { //$NON-NLS-1$ //$NON-NLS-2$
         title = firstLine.trim();
         titleFound = true;
         break;
@@ -734,7 +735,7 @@ public class DefaultProtocolHandler implements IProtocolHandler {
       return title;
 
     /* Extract the title String */
-    String regEx = "<title[^>]*>[^<]*</title>";
+    String regEx = "<title[^>]*>[^<]*</title>"; //$NON-NLS-1$
     Pattern pattern = Pattern.compile(regEx);
     Matcher match = pattern.matcher(title);
 

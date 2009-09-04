@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.osgi.util.NLS;
 import org.osgi.service.url.URLConstants;
 import org.osgi.service.url.URLStreamHandlerService;
 import org.rssowl.core.connection.ConnectionException;
@@ -157,7 +158,7 @@ public class ConnectionServiceImpl implements IConnectionService {
       return handler;
 
     /* No Handler present */
-    throw new UnknownFeedException(Activator.getDefault().createErrorStatus("Could not find a matching ProtocolHandler for: " + protocol, null)); //$NON-NLS-1$
+    throw new UnknownFeedException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.ConnectionServiceImpl_ERROR_NO_PROTOCOL_HANDLER, protocol), null));
   }
 
   /*
@@ -173,7 +174,7 @@ public class ConnectionServiceImpl implements IConnectionService {
       return handler.getLabel(link, monitor);
 
     /* No Handler present */
-    throw new UnknownFeedException(Activator.getDefault().createErrorStatus("Could not find a matching ProtocolHandler for: " + protocol, null)); //$NON-NLS-1$
+    throw new UnknownFeedException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.ConnectionServiceImpl_ERROR_NO_PROTOCOL_HANDLER, protocol), null));
   }
 
   /*
@@ -193,7 +194,7 @@ public class ConnectionServiceImpl implements IConnectionService {
       return handler.reload(link, monitor, properties);
 
     /* No Handler present */
-    throw new UnknownFeedException(Activator.getDefault().createErrorStatus("Could not find a matching ProtocolHandler for: " + protocol, null)); //$NON-NLS-1$
+    throw new UnknownFeedException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.ConnectionServiceImpl_ERROR_NO_PROTOCOL_HANDLER, protocol), null));
   }
 
   /*
@@ -210,7 +211,7 @@ public class ConnectionServiceImpl implements IConnectionService {
       return handler.getFeedIcon(link, monitor);
 
     /* No Handler present */
-    throw new UnknownFeedException(Activator.getDefault().createErrorStatus("Could not find a matching ProtocolHandler for: " + protocol, null)); //$NON-NLS-1$
+    throw new UnknownFeedException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.ConnectionServiceImpl_ERROR_NO_PROTOCOL_HANDLER, protocol), null));
   }
 
   /*
@@ -226,7 +227,7 @@ public class ConnectionServiceImpl implements IConnectionService {
       return handler.getFeed(link, monitor);
 
     /* No Handler present */
-    throw new UnknownFeedException(Activator.getDefault().createErrorStatus("Could not find a matching ProtocolHandler for: " + protocol, null)); //$NON-NLS-1$
+    throw new UnknownFeedException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.ConnectionServiceImpl_ERROR_NO_PROTOCOL_HANDLER, protocol), null));
   }
 
   /*
@@ -282,12 +283,12 @@ public class ConnectionServiceImpl implements IConnectionService {
 
     /* Require protocol */
     if (!StringUtils.isSet(protocol))
-      throw new CredentialsException(Activator.getDefault().createErrorStatus("Unknown protocol", null));
+      throw new CredentialsException(Activator.getDefault().createErrorStatus(Messages.ConnectionServiceImpl_ERROR_UNKNOWN_PROTOCOL, null));
 
     /* Require credentials provider */
     ICredentialsProvider credentialsProvider = fCredentialsProvider.get(protocol);
     if (credentialsProvider == null)
-      throw new CredentialsException(Activator.getDefault().createErrorStatus("Could not find any credentials provider for protocol: " + protocol, null));
+      throw new CredentialsException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.ConnectionServiceImpl_ERROR_NO_CREDENTIAL_PROVIDER, protocol), null));
 
     return credentialsProvider;
   }
