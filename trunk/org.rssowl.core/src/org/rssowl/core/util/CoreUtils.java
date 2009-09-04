@@ -108,8 +108,8 @@ public class CoreUtils {
   private static List<String> STRUCTURAL_ACTIONS = Arrays.asList(new String[] { MoveNewsAction.ID, CopyNewsAction.ID });
 
   /* Mime Types for Feeds */
-  private static final String[] FEED_MIME_TYPES = new String[] { "application/rss+xml", "application/atom+xml", "application/rdf+xml" };
-  private static final String HREF = "href=";
+  private static final String[] FEED_MIME_TYPES = new String[] { "application/rss+xml", "application/atom+xml", "application/rdf+xml" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+  private static final String HREF = "href="; //$NON-NLS-1$
 
   /* This utility class constructor is hidden */
   private CoreUtils() {
@@ -189,6 +189,7 @@ public class CoreUtils {
         String condValue = fieldCondition.getValue().toString();
         String specName = fieldCondition.getSpecifier().getName();
         int typeId = fieldCondition.getField().getSearchValueType().getId();
+        int fieldId = fieldCondition.getField().getId();
 
         /* Condition Value provided */
         if (condValue.length() > 0) {
@@ -199,34 +200,47 @@ public class CoreUtils {
             prevSpecName = specName;
           }
 
+          /* Specially Treat Age */
+          if (fieldId == INews.AGE_IN_DAYS || fieldId == INews.AGE_IN_MINUTES) {
+            Integer value = Integer.valueOf(condValue);
+            if (value >= 0)
+              fieldExpression.append(value).append(value == 1 ? " Day" : " Days");
+            else if (value % 60 == 0)
+              fieldExpression.append(Math.abs(value) / 60).append(value == -60 ? " Hour" : " Hours");
+            else
+              fieldExpression.append(Math.abs(value)).append(value == -1 ? " Minute" : " Minutes");
+          }
+
           /* Append Condition Value based on Type */
-          switch (typeId) {
-            case ISearchValueType.STRING:
-              fieldExpression.append("'").append(condValue).append("'");
-              break;
-            case ISearchValueType.LINK:
-              fieldExpression.append("'").append(condValue).append("'");
-              break;
-            case ISearchValueType.ENUM:
-              condValue = condValue.toLowerCase();
-              condValue = condValue.replace("[", "");
-              condValue = condValue.replace("]", "");
+          else {
+            switch (typeId) {
+              case ISearchValueType.STRING:
+                fieldExpression.append("'").append(condValue).append("'");
+                break;
+              case ISearchValueType.LINK:
+                fieldExpression.append("'").append(condValue).append("'");
+                break;
+              case ISearchValueType.ENUM:
+                condValue = condValue.toLowerCase();
+                condValue = condValue.replace("[", "");
+                condValue = condValue.replace("]", "");
 
-              fieldExpression.append(condValue.toLowerCase());
+                fieldExpression.append(condValue.toLowerCase());
 
-              break;
-            case ISearchValueType.DATE:
-              fieldExpression.append(dateFormat.format(fieldCondition.getValue()));
-              break;
-            case ISearchValueType.TIME:
-              fieldExpression.append(dateFormat.format(fieldCondition.getValue()));
-              break;
-            case ISearchValueType.DATETIME:
-              fieldExpression.append(dateFormat.format(fieldCondition.getValue()));
-              break;
+                break;
+              case ISearchValueType.DATE:
+                fieldExpression.append(dateFormat.format(fieldCondition.getValue()));
+                break;
+              case ISearchValueType.TIME:
+                fieldExpression.append(dateFormat.format(fieldCondition.getValue()));
+                break;
+              case ISearchValueType.DATETIME:
+                fieldExpression.append(dateFormat.format(fieldCondition.getValue()));
+                break;
 
-            default:
-              fieldExpression.append(condValue);
+              default:
+                fieldExpression.append(condValue);
+            }
           }
 
           fieldExpression.append(matchAllConditions ? " and " : " or ");
@@ -970,11 +984,11 @@ public class CoreUtils {
         String value = cond.getValue().toString();
 
         /* Ignore Wildcard Only Values (e.g. search for Labels) */
-        if ("?".equals(value) || "*".equals(value))
+        if ("?".equals(value) || "*".equals(value))  //$NON-NLS-1$//$NON-NLS-2$
           continue;
 
         /* Split into Words */
-        value = StringUtils.replaceAll(value, "\"", "");
+        value = StringUtils.replaceAll(value, "\"", ""); //$NON-NLS-1$ //$NON-NLS-2$
         StringTokenizer tokenizer = new StringTokenizer(value);
         while (tokenizer.hasMoreElements()) {
           String nextWord = tokenizer.nextElement().toString().toLowerCase();
@@ -1205,7 +1219,7 @@ public class CoreUtils {
   public static void write(String fileName, StringBuilder content) {
     OutputStreamWriter writer = null;
     try {
-      writer = new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8");
+      writer = new OutputStreamWriter(new FileOutputStream(fileName), "UTF-8"); //$NON-NLS-1$
       writer.write(content.toString());
       writer.close();
     } catch (IOException e) {
@@ -1465,13 +1479,13 @@ public class CoreUtils {
 
               /* Fallback if URI is not valid */
               catch (URISyntaxException e) {
-                if (!linkVal.contains("://")) {
+                if (!linkVal.contains("://")) { //$NON-NLS-1$
                   try {
-                    if (!linkVal.startsWith("/"))
-                      linkVal = "/" + linkVal;
+                    if (!linkVal.startsWith("/")) //$NON-NLS-1$
+                      linkVal = "/" + linkVal; //$NON-NLS-1$
                     linkVal = base.resolve(linkVal).toString();
                   } catch (IllegalArgumentException e1) {
-                    linkVal = linkVal.startsWith("/") ? base.toString() + linkVal : base.toString() + "/" + linkVal;
+                    linkVal = linkVal.startsWith("/") ? base.toString() + linkVal : base.toString() + "/" + linkVal; //$NON-NLS-1$ //$NON-NLS-2$
                   }
                 }
               }
