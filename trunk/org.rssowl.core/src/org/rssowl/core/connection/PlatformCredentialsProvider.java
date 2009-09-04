@@ -58,16 +58,16 @@ import java.util.Set;
 public class PlatformCredentialsProvider implements ICredentialsProvider {
 
   /* Node for feed related security preferences */
-  private static final String SECURE_FEED_NODE = "rssowl/feeds";
+  private static final String SECURE_FEED_NODE = "rssowl/feeds"; //$NON-NLS-1$
 
   /* File with credentials stored */
-  private static final String SECURE_STORAGE_FILE = ".credentials";
+  private static final String SECURE_STORAGE_FILE = ".credentials"; //$NON-NLS-1$
 
   /* ID of the Win32 dependent password provider (win32) */
-  private static final String WIN_PW_PROVIDER_ID = "org.eclipse.equinox.security.WindowsPasswordProvider";
+  private static final String WIN_PW_PROVIDER_ID = "org.eclipse.equinox.security.WindowsPasswordProvider"; //$NON-NLS-1$
 
   /* ID of the MacOS dependent password provider */
-  private static final String MACOS_PW_PROVIDER_ID = "org.eclipse.equinox.security.OSXKeystoreIntegration";
+  private static final String MACOS_PW_PROVIDER_ID = "org.eclipse.equinox.security.OSXKeystoreIntegration"; //$NON-NLS-1$
 
   /* Unique Key to store Usernames */
   private static final String USERNAME = "org.rssowl.core.connection.auth.Username"; //$NON-NLS-1$
@@ -215,7 +215,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
       return null;
 
     String host = link.getHost();
-    boolean isSSL = "https".equals(link.getScheme());
+    boolean isSSL = "https".equals(link.getScheme()); //$NON-NLS-1$
 
     /* Retrieve Proxy Data */
     final IProxyData proxyData = proxyService.getProxyDataForHost(host, isSSL ? IProxyData.HTTPS_PROXY_TYPE : IProxyData.HTTP_PROXY_TYPE);
@@ -297,7 +297,7 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
   public void setProxyCredentials(IProxyCredentials credentials, URI link) {
     IProxyService proxyService = Activator.getDefault().getProxyService();
     proxyService.setProxiesEnabled(true);
-    boolean isSSL = "https".equals(link.getScheme());
+    boolean isSSL = "https".equals(link.getScheme()); //$NON-NLS-1$
 
     /* Retrieve Proxy Data */
     final IProxyData proxyData = proxyService.getProxyData(isSSL ? IProxyData.HTTPS_PROXY_TYPE : IProxyData.HTTP_PROXY_TYPE);
@@ -356,7 +356,6 @@ public class PlatformCredentialsProvider implements ICredentialsProvider {
    * method is called e.g. when the master password is to be changed or
    * disabled.
    */
-  @SuppressWarnings("restriction")
   public void clear() {
 
     /* Clear cached info */
