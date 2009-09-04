@@ -40,7 +40,7 @@ import org.rssowl.core.util.LoggingSafeRunnable;
  */
 public class Activator extends Plugin {
 
-  private static final String CORE_NET_BUNDLE = "org.eclipse.core.net";
+  private static final String CORE_NET_BUNDLE = "org.eclipse.core.net"; //$NON-NLS-1$
 
   private static Activator fPlugin;
   private BundleContext fContext;
@@ -80,7 +80,7 @@ public class Activator extends Plugin {
     }
 
     if (fProxyService == null)
-      logError("Proxy service could not be found.", null);
+      logError("Proxy service could not be found.", null); //$NON-NLS-1$
 
     return null;
   }
