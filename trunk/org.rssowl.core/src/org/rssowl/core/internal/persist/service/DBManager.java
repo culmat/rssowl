@@ -85,7 +85,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public class DBManager {
   private static final int MAX_BACKUPS_COUNT = 2;
-  private static final String FORMAT_FILE_NAME = "format2";
+  private static final String FORMAT_FILE_NAME = "format2"; //$NON-NLS-1$
   private static DBManager fInstance;
   private ObjectContainer fObjectContainer;
   private final ReadWriteLock fLock = new ReentrantReadWriteLock();
@@ -158,10 +158,10 @@ public class DBManager {
       File file = new File(getDBFilePath());
 
       if (!file.exists())
-        throw new DiskFullException("Failed to create an empty database. This seems to indicate that the disk is full. Please fix the issue and restart RSSOwl.", e);
+        throw new DiskFullException("Failed to create an empty database. This seems to indicate that the disk is full. Please fix the issue and restart RSSOwl.", e); //$NON-NLS-1$
 
       if (!file.canRead() || (!file.canWrite()))
-        throw new InsufficientFilePermissionException("Current user has no permission to read and/or write file: " + file + ". Please fix the issue and restart RSSOwl.", null);
+        throw new InsufficientFilePermissionException("Current user has no permission to read and/or write file: " + file + ". Please fix the issue and restart RSSOwl.", null); //$NON-NLS-1$ //$NON-NLS-2$
 
 
       BackupService backupService = createOnlineBackupService();
@@ -177,16 +177,16 @@ public class DBManager {
        * for more than 10 minutes.
        */
       if (backupService.getBackupFile(0) == null) {
-        status = Activator.getDefault().createErrorStatus("Database file is corrupted and no back-up could be found. The corrupted file has been saved to: " + currentDbCorruptedFile.getAbsolutePath(), e);
+        status = Activator.getDefault().createErrorStatus("Database file is corrupted and no back-up could be found. The corrupted file has been saved to: " + currentDbCorruptedFile.getAbsolutePath(), e); //$NON-NLS-1$
         createEmptyObjectContainer(config, status);
       } else {
         status = restoreFromBackup(config, e, currentDbCorruptedFile, backupService, scheduledBackupService);
       }
     }
 
-    Assert.isNotNull(status, "status");
+    Assert.isNotNull(status, "status"); //$NON-NLS-1$
     final BackupService backupService = createOnlineBackupService();
-    Job job = new Job("Back-up service") {
+    Job job = new Job("Back-up service") { //$NON-NLS-1$
       @Override
       protected IStatus run(IProgressMonitor monitor) {
         backupService.backup(true);
@@ -202,13 +202,13 @@ public class DBManager {
   private void checkDirPermissions() {
     File dir = new File(Activator.getDefault().getStateLocation().toOSString());
     if (!dir.canRead() || (!dir.canWrite()))
-      throw new InsufficientFilePermissionException("Current user has no permission to read from and/or write to directory: " + dir + "Please fix the issue and restart RSSOwl.", null);
+      throw new InsufficientFilePermissionException("Current user has no permission to read from and/or write to directory: " + dir + "Please fix the issue and restart RSSOwl.", null); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   private IStatus restoreFromBackup(Configuration config, Throwable startupException, File currentDbCorruptedFile, BackupService... backupServices) {
-    Assert.isNotNull(backupServices, "backupServices");
-    Assert.isLegal(backupServices.length > 0, "backupServices should have at least one element");
-    Assert.isNotNull(backupServices[0].getBackupFile(0), "backupServices[0] should contain at least one back-up");
+    Assert.isNotNull(backupServices, "backupServices"); //$NON-NLS-1$
+    Assert.isLegal(backupServices.length > 0, "backupServices should have at least one element"); //$NON-NLS-1$
+    Assert.isNotNull(backupServices[0].getBackupFile(0), "backupServices[0] should contain at least one back-up"); //$NON-NLS-1$
     long lastModified = -1;
     boolean foundSuitableBackup = false;
     for (BackupService backupService : backupServices) {
@@ -226,7 +226,7 @@ public class DBManager {
           foundSuitableBackup = true;
           break;
         } catch (Throwable e1) {
-          Activator.getDefault().logError("Back-up database corrupted: " + backupFile, e1);
+          Activator.getDefault().logError("Back-up database corrupted: " + backupFile, e1); //$NON-NLS-1$
           DBHelper.rename(new File(getDBFilePath()), backupService.getCorruptedFile(i));
         }
       }
@@ -239,14 +239,14 @@ public class DBManager {
       return Activator.getDefault().createErrorStatus(message, startupException);
     }
 
-    IStatus status = Activator.getDefault().createErrorStatus("Database file and its back-ups are all corrupted. The corrupted database file has been saved to: " + currentDbCorruptedFile.getAbsolutePath(), startupException);
+    IStatus status = Activator.getDefault().createErrorStatus("Database file and its back-ups are all corrupted. The corrupted database file has been saved to: " + currentDbCorruptedFile.getAbsolutePath(), startupException); //$NON-NLS-1$
     createEmptyObjectContainer(config, status);
     return status;
   }
 
   private String createRecoveredFromCorruptedDatabaseMessage(File corruptedFile, long lastModified) {
     String date = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT).format(new Date(lastModified));
-    return "There was a problem opening the database file. RSSOwl has reverted to the last working back-up (from " + date + "). The corrupted file has been saved to: " + corruptedFile.getAbsolutePath();
+    return "There was a problem opening the database file. RSSOwl has reverted to the last working back-up (from " + date + "). The corrupted file has been saved to: " + corruptedFile.getAbsolutePath(); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   private boolean shouldReindex(MigrationResult migrationResult, IStatus startupStatus) {
@@ -254,14 +254,14 @@ public class DBManager {
     if (shouldReindex)
       return true;
 
-    return Boolean.getBoolean("rssowl.reindex");
+    return Boolean.getBoolean("rssowl.reindex"); //$NON-NLS-1$
   }
 
   private long getOnlineBackupDelay(boolean initial) {
     if (initial)
       return 1000 * 60 * 10;
 
-    return getLongProperty("rssowl.onlinebackup.interval", 1000 * 60 * 60 * 4);
+    return getLongProperty("rssowl.onlinebackup.interval", 1000 * 60 * 60 * 4); //$NON-NLS-1$
   }
 
   private long getLongProperty(String propertyName, long defaultValue) {
@@ -287,7 +287,7 @@ public class DBManager {
     if (!file.exists())
       return null;
 
-    BackupService backupService = new BackupService(file, ".onlinebak", 2);
+    BackupService backupService = new BackupService(file, ".onlinebak", 2); //$NON-NLS-1$
     backupService.setBackupStrategy(new BackupService.BackupStrategy() {
       public void backup(File originFile, File destinationFile) {
         try {
@@ -306,7 +306,7 @@ public class DBManager {
    */
   public File getDefragmentFile() {
     File dir = new File(Activator.getDefault().getStateLocation().toOSString());
-    return new File(dir, "defragment");
+    return new File(dir, "defragment"); //$NON-NLS-1$
   }
 
   /**
@@ -338,7 +338,7 @@ public class DBManager {
     try {
       if (workspaceVersion != getCurrentFormatVersion()) {
         progressMonitor.beginLongOperation();
-        subMonitor = SubMonitor.convert(progressMonitor, "Please wait while RSSOwl migrates data to the new version", 100);
+        subMonitor = SubMonitor.convert(progressMonitor, Messages.DBManager_RSSOWL_MIGRATION, 100);
         //TODO Have a better way to allocate the ticks to the child. We need
         //to be able to do it dynamically based on whether a reindex is required or not.
         migrationResult = migrate(workspaceVersion, getCurrentFormatVersion(), subMonitor.newChild(70));
@@ -363,7 +363,7 @@ public class DBManager {
       boolean shouldReindex = shouldReindex(migrationResult, startupStatus);
       if (subMonitor == null && shouldReindex) {
         progressMonitor.beginLongOperation();
-        subMonitor = SubMonitor.convert(progressMonitor, "Please wait while RSSOwl reindexes your data", 20);
+        subMonitor = SubMonitor.convert(progressMonitor, Messages.DBManager_RSSOWL_REINDEX, 20);
       }
 
       IModelSearch modelSearch = InternalOwl.getDefault().getPersistenceService().getModelSearch();
@@ -386,20 +386,20 @@ public class DBManager {
   }
 
   private BackupService createScheduledBackupService(Long backupFrequency) {
-    return new BackupService(new File(getDBFilePath()), ".backup", MAX_BACKUPS_COUNT, getDBLastBackUpFile(), backupFrequency);
+    return new BackupService(new File(getDBFilePath()), ".backup", MAX_BACKUPS_COUNT, getDBLastBackUpFile(), backupFrequency); //$NON-NLS-1$
   }
 
   private void scheduledBackup() {
     if (!new File(getDBFilePath()).exists())
       return;
 
-    long sevenDays = getLongProperty("rssowl.offlinebackup.interval", 1000 * 60 * 60 * 24 * 7);
+    long sevenDays = getLongProperty("rssowl.offlinebackup.interval", 1000 * 60 * 60 * 24 * 7); //$NON-NLS-1$
     createScheduledBackupService(sevenDays).backup(false);
   }
 
   public File getDBLastBackUpFile() {
     File dir = new File(Activator.getDefault().getStateLocation().toOSString());
-    File lastBackUpFile = new File(dir, "lastbackup");
+    File lastBackUpFile = new File(dir, "lastbackup"); //$NON-NLS-1$
     return lastBackUpFile;
   }
 
@@ -411,11 +411,11 @@ public class DBManager {
     };
     Migration migration = new Migrations().getMigration(workspaceFormat, currentFormat);
     if (migration == null) {
-      throw new PersistenceException("It was not possible to migrate your data to the current version of RSSOwl. Migrations are supported between final versions and between consecutive milestones. In other words, 2.0M7 to 2.0M8 and 2.0 to 2.1 are supported but 2.0M6 to 2.0M8 is not supported. In the latter case, you would need to launch 2.0M7 and then 2.0M8 to be able to use that version. Migration was attempted from originFormat: " + workspaceFormat + " to destinationFormat: " + currentFormat);
+      throw new PersistenceException("It was not possible to migrate your data to the current version of RSSOwl. Migrations are supported between final versions and between consecutive milestones. In other words, 2.0M7 to 2.0M8 and 2.0 to 2.1 are supported but 2.0M6 to 2.0M8 is not supported. In the latter case, you would need to launch 2.0M7 and then 2.0M8 to be able to use that version. Migration was attempted from originFormat: " + workspaceFormat + " to destinationFormat: " + currentFormat); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     final File dbFile = new File(getDBFilePath());
-    final String backupFileSuffix = ".mig.";
+    final String backupFileSuffix = ".mig."; //$NON-NLS-1$
 
     /*
      * Copy the db file to a permanent back-up where the file name includes the
@@ -434,7 +434,7 @@ public class DBManager {
       }
 
       public void rotateBackups(List<File> backupFiles) {
-        throw new UnsupportedOperationException("No rotation supported because maxBackupCount is 1");
+        throw new UnsupportedOperationException("No rotation supported because maxBackupCount is 1"); //$NON-NLS-1$
       }
     });
     backupService.backup(true);
@@ -447,7 +447,7 @@ public class DBManager {
     MigrationResult migrationResult = migration.migrate(configFactory, migDbFile.getAbsolutePath(), progressMonitor);
 
     File dbFormatFile = getDBFormatFile();
-    File migFormatFile = new File(dbFormatFile.getAbsolutePath() + ".mig.temp");
+    File migFormatFile = new File(dbFormatFile.getAbsolutePath() + ".mig.temp"); //$NON-NLS-1$
     try {
       if (!migFormatFile.exists()) {
         migFormatFile.createNewFile();
@@ -474,7 +474,7 @@ public class DBManager {
 
   private File getOldDBFormatFile() {
     File dir = new File(Activator.getDefault().getStateLocation().toOSString());
-    File formatFile = new File(dir, "format");
+    File formatFile = new File(dir, "format"); //$NON-NLS-1$
     return formatFile;
   }
 
@@ -509,7 +509,7 @@ public class DBManager {
         int version = Integer.parseInt(versionText);
         return version;
       } catch (NumberFormatException e) {
-        throw new PersistenceException("Format file does not contain a number as the version", e);
+        throw new PersistenceException("Format file does not contain a number as the version", e); //$NON-NLS-1$
       }
     }
     /*
@@ -541,7 +541,7 @@ public class DBManager {
       return false;
     }
     if (!defragmentFile.delete()) {
-      Activator.getDefault().logError("Failed to delete defragment file", null);
+      Activator.getDefault().logError("Failed to delete defragment file", null); //$NON-NLS-1$
     }
     defragment(progressMonitor, subMonitor);
     return true;
@@ -551,7 +551,7 @@ public class DBManager {
     SubMonitor monitor;
     if (subMonitor == null) {
       progressMonitor.beginLongOperation();
-      String monitorText = "Please wait while RSSOwl cleans up the database";
+      String monitorText = Messages.DBManager_RSSOWL_CLEANUP;
       subMonitor = SubMonitor.convert(progressMonitor, monitorText, 100);
       monitor = subMonitor.newChild(100);
 
@@ -618,10 +618,10 @@ public class DBManager {
       for (NewsReference newsRef : newsBin.getNewsRefs()) {
         Query query = sourceDb.query();
         query.constrain(News.class);
-        query.descend("fId").constrain(newsRef.getId());
+        query.descend("fId").constrain(newsRef.getId()); //$NON-NLS-1$
         Iterator<?> newsIt = query.execute().iterator();
         if (!newsIt.hasNext()) {
-          Activator.getDefault().logError("NewsBin " + newsBin + " has reference to news with id: " + newsRef.getId() + ", but that news does not exist.", null);
+          Activator.getDefault().logError("NewsBin " + newsBin + " has reference to news with id: " + newsRef.getId() + ", but that news does not exist.", null); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
           staleNewsRefs.add(newsRef);
           continue;
         }
@@ -741,27 +741,27 @@ public class DBManager {
     configureFeed(config);
     configureNews(config);
     configureFolder(config);
-    config.objectClass(Description.class).objectField("fNewsId").indexed(true);
+    config.objectClass(Description.class).objectField("fNewsId").indexed(true); //$NON-NLS-1$
     config.objectClass(NewsCounter.class).cascadeOnDelete(true);
     config.objectClass(Preference.class).cascadeOnDelete(true);
     config.objectClass(Preference.class).objectField("fKey").indexed(true); //$NON-NLS-1$
-    config.objectClass(SearchFilter.class).objectField("fActions").cascadeOnDelete(true);
+    config.objectClass(SearchFilter.class).objectField("fActions").cascadeOnDelete(true); //$NON-NLS-1$
 
     if (isIBM_VM_1_6()) //See defect 733
-      config.objectClass("java.util.MiniEnumSet").translate(new com.db4o.config.TSerializable());
+      config.objectClass("java.util.MiniEnumSet").translate(new com.db4o.config.TSerializable()); //$NON-NLS-1$
 
     return config;
   }
 
   private static boolean isIBM_VM_1_6() {
-    String javaVendor = System.getProperty("java.vendor");
-    String javaVersion = System.getProperty("java.version");
-    return javaVendor != null && javaVendor.contains("IBM") && javaVersion != null && javaVersion.contains("1.6");
+    String javaVendor = System.getProperty("java.vendor"); //$NON-NLS-1$
+    String javaVersion = System.getProperty("java.version"); //$NON-NLS-1$
+    return javaVendor != null && javaVendor.contains("IBM") && javaVersion != null && javaVersion.contains("1.6"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   private static void configureAbstractEntity(Configuration config) {
     ObjectClass abstractEntityClass = config.objectClass(AbstractEntity.class);
-    ObjectField idField = abstractEntityClass.objectField("fId");
+    ObjectField idField = abstractEntityClass.objectField("fId"); //$NON-NLS-1$
     idField.indexed(true);
     idField.cascadeOnActivate(true);
     abstractEntityClass.objectField("fProperties").cascadeOnUpdate(true); //$NON-NLS-1$
@@ -776,7 +776,7 @@ public class DBManager {
     ObjectClass oc = config.objectClass(News.class);
 
     /* Indexes */
-    oc.objectField("fParentId").indexed(true);
+    oc.objectField("fParentId").indexed(true); //$NON-NLS-1$
     oc.objectField("fFeedLink").indexed(true); //$NON-NLS-1$
     oc.objectField("fStateOrdinal").indexed(true); //$NON-NLS-1$
   }

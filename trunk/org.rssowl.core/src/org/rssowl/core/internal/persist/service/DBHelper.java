@@ -97,7 +97,7 @@ public final class DBHelper {
     if (!origin.renameTo(destination)) {
       destination.delete();
       if (!origin.renameTo(destination)) {
-        throw new PersistenceException("Failed to rename: " + origin + " to: " + destination);
+        throw new PersistenceException("Failed to rename: " + origin + " to: " + destination); //$NON-NLS-1$ //$NON-NLS-2$
       }
     }
   }
@@ -106,7 +106,7 @@ public final class DBHelper {
     BufferedReader reader = null;
     try {
       try {
-        reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
+        reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8")); //$NON-NLS-1$
       } catch (UnsupportedEncodingException e) {
         reader = new BufferedReader(new FileReader(file));
       }
@@ -141,8 +141,8 @@ public final class DBHelper {
       }
 
     } catch (IOException e) {
-      Activator.getDefault().logError("Failed to copy file using NIO. Falling " +
-      		"back to traditional IO", e);
+      Activator.getDefault().logError("Failed to copy file using NIO. Falling " + //$NON-NLS-1$
+      		"back to traditional IO", e); //$NON-NLS-1$
       copyFileWithoutNio(originFile, destinationFile);
     } finally {
       closeQuietly(inputStream);
@@ -177,7 +177,7 @@ public final class DBHelper {
     BufferedWriter writer = null;
     try {
       try {
-        writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8"));
+        writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file), "UTF-8")); //$NON-NLS-1$
       } catch (UnsupportedEncodingException e) {
         writer = new BufferedWriter(new FileWriter(file));
       }
@@ -195,7 +195,7 @@ public final class DBHelper {
       try {
         closeable.close();
       } catch (IOException e) {
-        Activator.getDefault().logError("Failed to close stream.", e);
+        Activator.getDefault().logError("Failed to close stream.", e); //$NON-NLS-1$
       }
   }
 
@@ -230,7 +230,7 @@ public final class DBHelper {
 
   public static final void saveFeed(ObjectContainer db, IFeed feed) {
     if (feed.getId() == null && feedExists(db, feed.getLink()))
-      throw new UniqueConstraintException("link", feed);
+      throw new UniqueConstraintException("link", feed); //$NON-NLS-1$
 
     ModelEvent feedEventTemplate = new FeedEvent(feed, true);
     DBHelper.putEventTemplate(feedEventTemplate);
@@ -376,7 +376,7 @@ public final class DBHelper {
     if (daoService instanceof DAOServiceImpl)
       return ((DAOServiceImpl) daoService).getDescriptionDAO();
 
-    throw new IllegalStateException("This method should only be called if DAOService is of type " + DAOServiceImpl.class + ", but it is of type: " + daoService.getClass());
+    throw new IllegalStateException("This method should only be called if DAOService is of type " + DAOServiceImpl.class + ", but it is of type: " + daoService.getClass()); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   public static void preCommit(ObjectContainer db) {
@@ -539,8 +539,8 @@ public final class DBHelper {
   static boolean feedHasNewsWithCopies(ObjectContainer db, FeedLinkReference feedRef) {
     Query query = db.query();
     query.constrain(News.class);
-    query.descend("fFeedLink").constrain(feedRef.getLink().toString());
-    query.descend("fParentId").constrain(0).not();
+    query.descend("fFeedLink").constrain(feedRef.getLink().toString()); //$NON-NLS-1$
+    query.descend("fParentId").constrain(0).not(); //$NON-NLS-1$
     return !query.execute().isEmpty();
   }
 
