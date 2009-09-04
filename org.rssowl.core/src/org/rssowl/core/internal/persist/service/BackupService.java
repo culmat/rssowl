@@ -66,7 +66,7 @@ public final class BackupService {
       File tempFile = fBackupFile;
       while (tempFile.exists()) {
         backupFiles.add(tempFile);
-        tempFile = new File(fBackupFile.getAbsolutePath() + "." + index++);
+        tempFile = new File(fBackupFile.getAbsolutePath() + "." + index++); //$NON-NLS-1$
       }
       return backupFiles;
     }
@@ -80,9 +80,9 @@ public final class BackupService {
          * index is correct here because filesToRename includes a back up file
          * with no index as well as .0 index
          */
-        File newFile = new File(fBackupFile.getAbsolutePath() + "." + index);
+        File newFile = new File(fBackupFile.getAbsolutePath() + "." + index); //$NON-NLS-1$
         if (!fileToRename.renameTo(newFile)) {
-          throw new PersistenceException("Failed to rename file from " + fileToRename + " to " + newFile);
+          throw new PersistenceException("Failed to rename file from " + fileToRename + " to " + newFile); //$NON-NLS-1$ //$NON-NLS-2$
         }
       }
     }
@@ -104,12 +104,12 @@ public final class BackupService {
 
   public BackupService(File fileToBackup, String backupFileSuffix, int maxBackupsCount,
       File backupTimestampFile, Long backupFrequency) {
-    Assert.isNotNull(fileToBackup, "fileToBackup");
-    Assert.isLegal(fileToBackup.isFile(), "fileToBackup must be a file: " + fileToBackup.getAbsolutePath());
-    Assert.isLegal(backupFileSuffix  != null && backupFileSuffix.length() > 0, "backupSuffix should contain a non-empty String");
-    Assert.isLegal(maxBackupsCount > 0, "filesKeptCount should be higher than 0");
+    Assert.isNotNull(fileToBackup, "fileToBackup"); //$NON-NLS-1$
+    Assert.isLegal(fileToBackup.isFile(), "fileToBackup must be a file: " + fileToBackup.getAbsolutePath()); //$NON-NLS-1$
+    Assert.isLegal(backupFileSuffix  != null && backupFileSuffix.length() > 0, "backupSuffix should contain a non-empty String"); //$NON-NLS-1$
+    Assert.isLegal(maxBackupsCount > 0, "filesKeptCount should be higher than 0"); //$NON-NLS-1$
     if (backupFrequency != null)
-      Assert.isNotNull(backupTimestampFile, "backupTimestampFile should not be null if backupFrequency is not null");
+      Assert.isNotNull(backupTimestampFile, "backupTimestampFile should not be null if backupFrequency is not null"); //$NON-NLS-1$
 
     fFileToBackup = fileToBackup;
     fBackupFileSuffix = backupFileSuffix;
@@ -136,7 +136,7 @@ public final class BackupService {
    * @param alias
    */
   public void setFileToBackupAlias(File alias) {
-    Assert.isLegal(alias.isFile(), "alias must be a file");
+    Assert.isLegal(alias.isFile(), "alias must be a file"); //$NON-NLS-1$
     fFileToBackupAlias = alias;
   }
 
@@ -161,7 +161,7 @@ public final class BackupService {
     if (!backupFiles.isEmpty())
       fLayoutStrategy.rotateBackups(backupFiles);
 
-    Assert.isLegal(!backupFile.exists(), "backupFile should have been rotated or deleted: " + backupFile);
+    Assert.isLegal(!backupFile.exists(), "backupFile should have been rotated or deleted: " + backupFile); //$NON-NLS-1$
   }
 
   /**
@@ -205,7 +205,7 @@ public final class BackupService {
       long now = System.currentTimeMillis();
       return (now - lastBackupTimestamp) >= fBackupFrequency.longValue();
     } catch (NumberFormatException e) {
-      throw new PersistenceException(fBackupTimestampFile.getAbsolutePath() + " does not contain a number for the date as expected", e);
+      throw new PersistenceException(fBackupTimestampFile.getAbsolutePath() + " does not contain a number for the date as expected", e); //$NON-NLS-1$
     }
   }
 
@@ -217,7 +217,7 @@ public final class BackupService {
       try {
         fBackupTimestampFile.createNewFile();
       } catch (IOException e) {
-        throw new PersistenceException("Failed to create new file", e);
+        throw new PersistenceException("Failed to create new file", e); //$NON-NLS-1$
       }
     }
     DBHelper.writeToFile(fBackupTimestampFile, String.valueOf(System.currentTimeMillis()));
@@ -238,13 +238,13 @@ public final class BackupService {
   }
 
   public File getTempBackupFile() {
-    return new File(getBackupFile().getAbsolutePath() + ".temp");
+    return new File(getBackupFile().getAbsolutePath() + ".temp"); //$NON-NLS-1$
   }
 
   public File getCorruptedFile(Integer index) {
-    String fileName = getFileToBackup().getAbsolutePath() + ".corrupted";
+    String fileName = getFileToBackup().getAbsolutePath() + ".corrupted"; //$NON-NLS-1$
     if (index != null)
-      fileName += "." + index;
+      fileName += "." + index; //$NON-NLS-1$
 
     return new File(fileName);
   }
@@ -254,7 +254,7 @@ public final class BackupService {
     while (backupFiles.size() > (fMaxBackupsCount - 1)) {
       File fileToDelete = backupFiles.remove(backupFiles.size() - 1);
       if (!fileToDelete.delete()) {
-        throw new PersistenceException("Failed to delete file: " + fileToDelete);
+        throw new PersistenceException("Failed to delete file: " + fileToDelete); //$NON-NLS-1$
       }
     }
   }

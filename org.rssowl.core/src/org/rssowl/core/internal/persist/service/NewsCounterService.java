@@ -107,7 +107,7 @@ public final class NewsCounterService {
           continue;
 
         INews oldNews = event.getOldNews();
-        Assert.isNotNull(oldNews, "oldNews cannot be null on newsUpdated");
+        Assert.isNotNull(oldNews, "oldNews cannot be null on newsUpdated"); //$NON-NLS-1$
 
         boolean oldStateUnread = isUnread(oldNews.getState());
         boolean currentStateUnread = isUnread(currentNews.getState());
