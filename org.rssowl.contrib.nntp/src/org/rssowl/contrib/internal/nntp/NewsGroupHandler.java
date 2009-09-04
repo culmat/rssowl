@@ -89,15 +89,15 @@ public class NewsGroupHandler implements IProtocolHandler {
   private static final int INITIAL_NEWS = 50;
 
   /* Protocol Separator for Links */
-  private static final String PROTOCOL_SEPARATOR = "://";
+  private static final String PROTOCOL_SEPARATOR = "://"; //$NON-NLS-1$
 
   /* Some NNTP Protcol specific constants */
-  private static final String MODE_READER = "mode reader";
-  private static final String HEADER_MESSAGE_ID = "Message-ID: ";
-  private static final String HEADER_DATE = "Date: ";
-  private static final String HEADER_SUBJECT = "Subject: ";
-  private static final String HEADER_FROM = "From: ";
-  private static final String HEADER_REFERENCES = "References: ";
+  private static final String MODE_READER = "mode reader"; //$NON-NLS-1$
+  private static final String HEADER_MESSAGE_ID = "Message-ID: "; //$NON-NLS-1$
+  private static final String HEADER_DATE = "Date: "; //$NON-NLS-1$
+  private static final String HEADER_SUBJECT = "Subject: "; //$NON-NLS-1$
+  private static final String HEADER_FROM = "From: "; //$NON-NLS-1$
+  private static final String HEADER_REFERENCES = "References: "; //$NON-NLS-1$
 
   /* Some NNTP Status Values */
   private static final int STATUS_ARTICLE_POINTER_OK = 223;
@@ -105,12 +105,12 @@ public class NewsGroupHandler implements IProtocolHandler {
   private static final int STATUS_AUTH_REQUIRED_ALTERNATIVE = 480;
 
   /* Some Mime Types */
-  private static final String MIME_TEXT = "text/";
-  private static final String MIME_TEXT_HTML = "text/html";
-  private static final String MIME_TEXT_PLAIN = "text/plain";
+  private static final String MIME_TEXT = "text/"; //$NON-NLS-1$
+  private static final String MIME_TEXT_HTML = "text/html"; //$NON-NLS-1$
+  private static final String MIME_TEXT_PLAIN = "text/plain"; //$NON-NLS-1$
 
   /* The Default Encoding of mime4j */
-  private static final String DEFAULT_ENCODING = "us-ascii";
+  private static final String DEFAULT_ENCODING = "us-ascii"; //$NON-NLS-1$
 
   /*
    * @see org.rssowl.core.connection.IProtocolHandler#reload(java.net.URI,
@@ -165,7 +165,7 @@ public class NewsGroupHandler implements IProtocolHandler {
         return null;
 
       /* Select Newsgroup */
-      String newsgroup = link.getPath().replace("/", "");
+      String newsgroup = link.getPath().replace("/", ""); //$NON-NLS-1$ //$NON-NLS-2$
       NewsgroupInfo groupInfo = new NewsgroupInfo();
       boolean selected = client.selectNewsgroup(newsgroup, groupInfo);
 
@@ -174,7 +174,7 @@ public class NewsGroupHandler implements IProtocolHandler {
 
       /* Check Newsgroup Selected */
       if (!selected)
-        throwConnectionException("Unable to select Newsgroup", client);
+        throwConnectionException(Messages.NewsGroupHandler_ERROR_SELECT_NEWSGROUP, client);
 
       /* Support early cancellation */
       if (monitor.isCanceled())
@@ -186,7 +186,7 @@ public class NewsGroupHandler implements IProtocolHandler {
         /* Set Article Pointer to last Article */
         int status = client.stat(groupInfo.getLastArticle());
         if (status != STATUS_ARTICLE_POINTER_OK)
-          throwConnectionException("Unable to retrieve any News", client);
+          throwConnectionException(Messages.NewsGroupHandler_ERROR_RETRIEVE_NEWS, client);
 
         /* Retrieve initial news */
         for (int i = 0; i < INITIAL_NEWS && !monitor.isCanceled(); i++) {
@@ -205,7 +205,7 @@ public class NewsGroupHandler implements IProtocolHandler {
         /* Set Article Pointer to last retrieved News */
         int status = client.stat(lastArticleId);
         if (status != STATUS_ARTICLE_POINTER_OK)
-          throwConnectionException("Unable to retrieve any News", client);
+          throwConnectionException(Messages.NewsGroupHandler_ERROR_RETRIEVE_NEWS, client);
 
         /* Retrieve all the following News */
         while (client.next() == STATUS_ARTICLE_POINTER_OK && !monitor.isCanceled())
@@ -349,25 +349,25 @@ public class NewsGroupHandler implements IProtocolHandler {
         while ((line = reader.readLine()) != null && !monitor.isCanceled()) {
 
           /* Check for quote */
-          boolean isQuote = line.startsWith(">");
-          if (line.startsWith(">>>>"))
-            strBuilder.append("<span class=\"quote_lvl4\">");
-          else if (line.startsWith(">>>"))
-            strBuilder.append("<span class=\"quote_lvl3\">");
-          else if (line.startsWith(">>"))
-            strBuilder.append("<span class=\"quote_lvl2\">");
-          else if (line.startsWith(">"))
-            strBuilder.append("<span class=\"quote_lvl1\">");
+          boolean isQuote = line.startsWith(">"); //$NON-NLS-1$
+          if (line.startsWith(">>>>")) //$NON-NLS-1$
+            strBuilder.append("<span class=\"quote_lvl4\">"); //$NON-NLS-1$
+          else if (line.startsWith(">>>")) //$NON-NLS-1$
+            strBuilder.append("<span class=\"quote_lvl3\">"); //$NON-NLS-1$
+          else if (line.startsWith(">>")) //$NON-NLS-1$
+            strBuilder.append("<span class=\"quote_lvl2\">"); //$NON-NLS-1$
+          else if (line.startsWith(">")) //$NON-NLS-1$
+            strBuilder.append("<span class=\"quote_lvl1\">"); //$NON-NLS-1$
 
           /* Beautify Body (if non-html) */
           if (!MIME_TEXT_HTML.equals(mimeType))
-            strBuilder.append(beautifyBody(line)).append("<br>\n");
+            strBuilder.append(beautifyBody(line)).append("<br>\n"); //$NON-NLS-1$
           else
             strBuilder.append(line);
 
           /* Check for quote */
           if (isQuote)
-            strBuilder.append("</span>");
+            strBuilder.append("</span>"); //$NON-NLS-1$
         }
       }
     });
@@ -386,9 +386,9 @@ public class NewsGroupHandler implements IProtocolHandler {
       if (description.contains(PROTOCOL_SEPARATOR)) {
         List<String> links = RegExUtils.extractLinksFromText(description, true);
         for (String link : links) {
-          StringBuilder strB = new StringBuilder("<a href=\"");
-          strB.append(link).append("\"/>");
-          strB.append(link).append("</a>");
+          StringBuilder strB = new StringBuilder("<a href=\""); //$NON-NLS-1$
+          strB.append(link).append("\"/>"); //$NON-NLS-1$
+          strB.append(link).append("</a>"); //$NON-NLS-1$
 
           description = StringUtils.replaceAll(description, link, strB.toString());
         }
@@ -399,10 +399,10 @@ public class NewsGroupHandler implements IProtocolHandler {
   }
 
   private String beautifyBody(String str) {
-    str = StringUtils.replaceAll(str, "  ", "&nbsp;&nbsp;");
-    str = StringUtils.replaceAll(str, "\t", "&nbsp;&nbsp;");
-    str = StringUtils.replaceAll(str, "<", "&lt;");
-    str = StringUtils.replaceAll(str, ">", "&gt;");
+    str = StringUtils.replaceAll(str, "  ", "&nbsp;&nbsp;"); //$NON-NLS-1$ //$NON-NLS-2$
+    str = StringUtils.replaceAll(str, "\t", "&nbsp;&nbsp;"); //$NON-NLS-1$ //$NON-NLS-2$
+    str = StringUtils.replaceAll(str, "<", "&lt;"); //$NON-NLS-1$ //$NON-NLS-2$
+    str = StringUtils.replaceAll(str, ">", "&gt;"); //$NON-NLS-1$ //$NON-NLS-2$
 
     return str;
   }
@@ -420,14 +420,14 @@ public class NewsGroupHandler implements IProtocolHandler {
     value = value.trim();
 
     /* Complex value */
-    if (value.contains(" ")) {
+    if (value.contains(" ")) { //$NON-NLS-1$
 
       /* Remove quotes first */
-      value = value.replace("\"", "");
-      value = value.replace("'", "");
+      value = value.replace("\"", "");  //$NON-NLS-1$//$NON-NLS-2$
+      value = value.replace("'", ""); //$NON-NLS-1$ //$NON-NLS-2$
 
       /* foo@bar.com (Forename Name) */
-      if (value.contains("(") && value.contains(")")) {
+      if (value.contains("(") && value.contains(")")) { //$NON-NLS-1$ //$NON-NLS-2$
         int start = value.indexOf('(');
         int end = value.indexOf(')');
 
@@ -441,7 +441,7 @@ public class NewsGroupHandler implements IProtocolHandler {
       }
 
       /* Forename Name <foo@bar.com> */
-      if (value.contains("<") && value.contains(">")) {
+      if (value.contains("<") && value.contains(">")) { //$NON-NLS-1$ //$NON-NLS-2$
         int start = value.indexOf('<');
         int end = value.indexOf('>');
 
@@ -456,7 +456,7 @@ public class NewsGroupHandler implements IProtocolHandler {
     }
 
     /* Simple Value (EMail) */
-    else if (value.contains("@"))
+    else if (value.contains("@")) //$NON-NLS-1$
       person.setEmail(URIUtils.createURI(value));
 
     /* Simple Value (Name) */
@@ -514,13 +514,13 @@ public class NewsGroupHandler implements IProtocolHandler {
 
   private void checkAuthenticationRequired(NNTPClient client) throws AuthenticationRequiredException {
     if (client.getReplyCode() == STATUS_AUTH_REQUIRED || client.getReplyCode() == STATUS_AUTH_REQUIRED_ALTERNATIVE)
-      throw new AuthenticationRequiredException(null, Activator.createErrorStatus("Authentication required.", null)); //$NON-NLS-1$
+      throw new AuthenticationRequiredException(null, Activator.createErrorStatus(Messages.NewsGroupHandler_ERROR_AUTH_REQUIRED, null));
   }
 
   private void throwConnectionException(String msg, NNTPClient client) throws ConnectionException {
     StringBuilder str = new StringBuilder();
     str.append(msg);
-    str.append(" (").append(client.getReplyString()).append(")");
+    str.append(" (").append(client.getReplyString()).append(")");  //$NON-NLS-1$//$NON-NLS-2$
 
     throw new ConnectionException(Activator.createErrorStatus(str.toString(), null));
   }
@@ -564,7 +564,7 @@ public class NewsGroupHandler implements IProtocolHandler {
     String path = link.getPath();
 
     if (StringUtils.isSet(path))
-      return path.replace("/", "");
+      return path.replace("/", "");  //$NON-NLS-1$//$NON-NLS-2$
 
     return link.toString();
   }
