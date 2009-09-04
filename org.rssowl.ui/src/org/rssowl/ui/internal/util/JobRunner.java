@@ -90,7 +90,7 @@ public class JobRunner {
 
     /* Otherwise use UI Job */
     else {
-      UIJob uiJob = new UIJob("UIJob Runner") { //$NON-NLS-1$
+      UIJob uiJob = new UIJob("") { //$NON-NLS-1$
         @Override
         public IStatus runInUIThread(IProgressMonitor monitor) {
           if (widget == null || !widget.isDisposed())
@@ -143,7 +143,7 @@ public class JobRunner {
    */
   public static void runInBackgroundThread(int delay, final Runnable runnable) {
     Assert.isNotNull(runnable);
-    Job job = new Job("Job Runner") { //$NON-NLS-1$
+    Job job = new Job("") { //$NON-NLS-1$
       @Override
       public IStatus run(IProgressMonitor monitor) {
         runnable.run();
