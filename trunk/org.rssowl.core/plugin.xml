@@ -1,22 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.0"?>
 <plugin>
-   <extension-point id="ModelFactory" name="Model Factory" schema="schema/ModelFactory.exsd"/>
-   <extension-point id="PersistenceService" name="Persistence Service" schema="schema/PersistenceService.exsd"/>
-   <extension-point id="ApplicationService" name="Application Service" schema="schema/ApplicationService.exsd"/>
-   <extension-point id="PreferencesInitializer" name="Preferences Initializer" schema="schema/PreferencesInitializer.exsd"/>
-   <extension-point id="IDGenerator" name="ID Generator" schema="schema/IDGenerator.exsd"/>
-   <extension-point id="FormatInterpreter" name="Format Interpreter" schema="schema/FormatInterpreter.exsd"/>
-   <extension-point id="NamespaceHandler" name="Namespace Handler" schema="schema/NamespaceHandler.exsd"/>
-   <extension-point id="ElementHandler" name="Element Handler" schema="schema/ElementHandler.exsd"/>
-   <extension-point id="XMLParser" name="XML Parser" schema="schema/XMLParser.exsd"/>
-   <extension-point id="TypeImporter" name="Type Importer" schema="schema/TypeImporter.exsd"/>
-   <extension-point id="ProtocolHandler" name="Protocol Handler" schema="schema/ProtocolHandler.exsd"/>
-   <extension-point id="CredentialsProvider" name="Credentials Provider" schema="schema/CredentialsProvider.exsd"/>
-   <extension-point id="SSLHandler" name="SSL Handler" schema="schema/SSLHandler.exsd"/>
-   <extension-point id="DAOService" name="DAO Service" schema="schema/DAOService.exsd"/>
-   <extension-point id="NewsAction" name="News Action" schema="schema/NewsAction.exsd"/>
-   <extension-point id="TypeExporter" name="Type Exporter" schema="schema/TypeExporter.exsd"/>
+   <extension-point id="ModelFactory" name="%extension-point.name" schema="schema/ModelFactory.exsd"/>
+   <extension-point id="PersistenceService" name="%extension-point.name.0" schema="schema/PersistenceService.exsd"/>
+   <extension-point id="ApplicationService" name="%extension-point.name.1" schema="schema/ApplicationService.exsd"/>
+   <extension-point id="PreferencesInitializer" name="%extension-point.name.2" schema="schema/PreferencesInitializer.exsd"/>
+   <extension-point id="IDGenerator" name="%extension-point.name.3" schema="schema/IDGenerator.exsd"/>
+   <extension-point id="FormatInterpreter" name="%extension-point.name.4" schema="schema/FormatInterpreter.exsd"/>
+   <extension-point id="NamespaceHandler" name="%extension-point.name.5" schema="schema/NamespaceHandler.exsd"/>
+   <extension-point id="ElementHandler" name="%extension-point.name.6" schema="schema/ElementHandler.exsd"/>
+   <extension-point id="XMLParser" name="%extension-point.name.7" schema="schema/XMLParser.exsd"/>
+   <extension-point id="TypeImporter" name="%extension-point.name.8" schema="schema/TypeImporter.exsd"/>
+   <extension-point id="ProtocolHandler" name="%extension-point.name.9" schema="schema/ProtocolHandler.exsd"/>
+   <extension-point id="CredentialsProvider" name="%extension-point.name.10" schema="schema/CredentialsProvider.exsd"/>
+   <extension-point id="SSLHandler" name="%extension-point.name.11" schema="schema/SSLHandler.exsd"/>
+   <extension-point id="DAOService" name="%extension-point.name.12" schema="schema/DAOService.exsd"/>
+   <extension-point id="NewsAction" name="%extension-point.name.13" schema="schema/NewsAction.exsd"/>
+   <extension-point id="TypeExporter" name="%extension-point.name.14" schema="schema/TypeExporter.exsd"/>
    <extension
          point="org.rssowl.core.PersistenceService">
       <persistenceservice class="org.rssowl.core.internal.persist.service.PersistenceServiceImpl"/>
@@ -161,59 +161,59 @@
       <newsAction
             class="org.rssowl.core.internal.newsaction.MoveNewsAction"
             id="org.rssowl.core.MoveNewsAction"
-            name="Move News"
+            name="%MOVE_NEWS_ACTION"
             forcable="true"
             sortKey="95">
       </newsAction>
       <newsAction
             class="org.rssowl.core.internal.newsaction.CopyNewsAction"
             id="org.rssowl.core.CopyNewsAction"
-            name="Copy News"
+            name="%COPY_NEWS_ACTION"
             forcable="true"
             sortKey="90">
       </newsAction>
       <newsAction
             class="org.rssowl.core.internal.newsaction.MarkReadNewsAction"
             id="org.rssowl.core.MarkReadNewsAction"
-            name="Mark News as Read"
+            name="%MARK_READ_ACTION"
             forcable="true"
             sortKey="85">
       </newsAction>
       <newsAction
             class="org.rssowl.core.internal.newsaction.MarkStickyNewsAction"
             id="org.rssowl.core.MarkStickyNewsAction"
-            name="Mark News as Sticky"
+            name="%MARK_STICKY_ACTION"
             forcable="true"
             sortKey="83">
       </newsAction>
       <newsAction
             class="org.rssowl.core.internal.newsaction.LabelNewsAction"
             id="org.rssowl.core.LabelNewsAction"
-            name="Label News"
+            name="%LABEL_ACTION"
             forcable="true"
             sortKey="80">
       </newsAction>
       <newsAction
             class="org.rssowl.core.internal.newsaction.StopFilterNewsAction"
-            description="Stops applying any more filters to matching News"
+            description="%STOP_FILTER_DESCRIPTION"
             id="org.rssowl.core.StopFilterAction"
-            name="Stop Filtering"
+            name="%STOP_FILTER_ACTION"
             forcable="true"
             sortKey="12">
       </newsAction>
       <newsAction
             class="org.rssowl.core.internal.newsaction.DeleteNewsAction"
             id="org.rssowl.core.DeleteNewsAction"
-            name="Delete News"
+            name="%DELETE_ACTION"
             forcable="true"
             sortKey="11">
       </newsAction>
       <newsAction
             class="org.rssowl.core.internal.newsaction.GrowlNotifyAction"
-            description="Shows matching News in Growl"
+            description="%SHOW_GROWL_DESCRIPTION"
             forcable="false"
             id="org.rssowl.core.GrowlNotifyAction"
-            name="Show News in Growl"
+            name="%SHOW_GROWL"
             platform="carbon"
             sortKey="50">
       </newsAction>
