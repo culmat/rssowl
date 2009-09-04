@@ -77,7 +77,7 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
    */
   protected final long getIdAsPrimitive() {
     Long id = getId();
-    Assert.isNotNull(id, "fId");
+    Assert.isNotNull(id, "fId"); //$NON-NLS-1$
     return id.longValue();
   }
 
@@ -177,13 +177,12 @@ public abstract class AbstractEntity extends Persistable implements IEntity {
    * @see java.lang.Object#toString()
    */
   @Override
-  @SuppressWarnings("nls")
   public synchronized String toString() {
     String name = super.toString();
     int index = name.lastIndexOf('.');
     if (index != -1)
       name = name.substring(index + 1, name.length());
 
-    return name + " (id = " + fId + ", Properties = " + getProperties() + ", ";
+    return name + " (id = " + fId + ", Properties = " + getProperties() + ", "; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
   }
 }

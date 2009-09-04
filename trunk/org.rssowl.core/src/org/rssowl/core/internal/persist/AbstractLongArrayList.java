@@ -69,7 +69,7 @@ public abstract class AbstractLongArrayList {
 
   private void rangeCheck(int index) {
     if (index >= fSize)
-      throw new IndexOutOfBoundsException("size: " + fSize + ", index: " + index);
+      throw new IndexOutOfBoundsException("size: " + fSize + ", index: " + index); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   public void add(long element) {

@@ -60,13 +60,12 @@ public final class DescriptionReference {
   }
 
   @Override
-  @SuppressWarnings("nls")
   public String toString() {
     String name = super.toString();
     int index = name.lastIndexOf('.');
     if (index != -1)
       name = name.substring(index + 1, name.length());
 
-    return name + " (ID = " + fNewsId + ")";
+    return name + " (ID = " + fNewsId + ")"; //$NON-NLS-1$ //$NON-NLS-2$
   }
 }

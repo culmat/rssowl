@@ -176,10 +176,9 @@ public class Image extends Persistable implements IImage {
     }
   }
 
-  @SuppressWarnings("nls")
   @Override
   public synchronized String toString() {
-    return super.toString() + "Link = " + fLink + ")";
+    return super.toString() + "Link = " + fLink + ")"; //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /**
@@ -187,9 +186,8 @@ public class Image extends Persistable implements IImage {
    *
    * @return A String describing the state of this Entity.
    */
-  @SuppressWarnings("nls")
   public synchronized String toLongString() {
-    return super.toString() + "Link = " + fLink + ", Title = " + fTitle + ", Homepage = " + fHomepage + ", Width = " + fWidth + ", Height = " + fHeight + ", Description = " + fDescription + ")";
+    return super.toString() + "Link = " + fLink + ", Title = " + fTitle + ", Homepage = " + fHomepage + ", Width = " + fWidth + ", Height = " + fHeight + ", Description = " + fDescription + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
   }
 
   private boolean simpleFieldsEqual(IImage image) {

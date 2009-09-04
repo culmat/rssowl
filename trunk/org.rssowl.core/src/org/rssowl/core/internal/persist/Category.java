@@ -114,10 +114,9 @@ public class Category extends AbstractEntity implements ICategory {
     }
   }
 
-  @SuppressWarnings("nls")
   @Override
   public synchronized String toString() {
-    return super.toString() + "Name = " + fName + ")";
+    return super.toString() + "Name = " + fName + ")"; //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /**
@@ -125,13 +124,12 @@ public class Category extends AbstractEntity implements ICategory {
    *
    * @return A String describing the state of this Entity.
    */
-  @SuppressWarnings("nls")
   public synchronized String toLongString() {
-    return super.toString() + "Name = " + fName + ", Domain = " + fDomain + ")";
+    return super.toString() + "Name = " + fName + ", Domain = " + fDomain + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
   }
 
   public synchronized MergeResult merge(ICategory objectToMerge) {
-    Assert.isNotNull(objectToMerge, "objectToMerge");
+    Assert.isNotNull(objectToMerge, "objectToMerge"); //$NON-NLS-1$
     synchronized (objectToMerge) {
       boolean updated = false;
       updated |= !MergeUtils.equals(fDomain, objectToMerge.getDomain());

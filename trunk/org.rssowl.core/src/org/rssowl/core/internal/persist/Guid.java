@@ -97,8 +97,7 @@ public final class Guid extends Persistable implements IGuid {
   }
 
   @Override
-  @SuppressWarnings("nls")
   public String toString() {
-    return super.toString() + "Value = " + fValue + ", IsPermaLink = " + fIsPermaLink + ")";
+    return super.toString() + "Value = " + fValue + ", IsPermaLink = " + fIsPermaLink + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
   }
 }

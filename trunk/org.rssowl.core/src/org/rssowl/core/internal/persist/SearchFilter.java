@@ -174,8 +174,7 @@ public class SearchFilter extends AbstractEntity implements ISearchFilter {
   }
 
   @Override
-  @SuppressWarnings("nls")
   public synchronized String toString() {
-    return super.toString() + "Name = " + fName + ", ";
+    return super.toString() + "Name = " + fName + ", "; //$NON-NLS-1$ //$NON-NLS-2$
   }
 }

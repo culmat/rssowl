@@ -147,10 +147,9 @@ public class Attachment extends AbstractEntity implements IAttachment {
     return fLinkURI;
   }
 
-  @SuppressWarnings("nls")
   @Override
   public synchronized String toString() {
-    return super.toString() + "Link = " + fLink + ")";
+    return super.toString() + "Link = " + fLink + ")"; //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /**
@@ -158,9 +157,8 @@ public class Attachment extends AbstractEntity implements IAttachment {
    *
    * @return A String describing the state of this Entity.
    */
-  @SuppressWarnings("nls")
   public synchronized String toLongString() {
-    return super.toString() + "Link = " + fLink + ", Type = " + fType + ", Length = " + fLength + ", Belongs to News = " + fNews.getId() + ")";
+    return super.toString() + "Link = " + fLink + ", Type = " + fType + ", Length = " + fLength + ", Belongs to News = " + fNews.getId() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
   }
 
   /**
@@ -188,7 +186,7 @@ public class Attachment extends AbstractEntity implements IAttachment {
    * @see org.rssowl.core.model.types.MergeCapable#merge(java.lang.Object)
    */
   public synchronized MergeResult merge(IAttachment objectToMerge) {
-    Assert.isNotNull(objectToMerge, "objectToMerge");
+    Assert.isNotNull(objectToMerge, "objectToMerge"); //$NON-NLS-1$
     synchronized (objectToMerge) {
       boolean updated = false;
       updated = fLength != objectToMerge.getLength();
@@ -207,7 +205,7 @@ public class Attachment extends AbstractEntity implements IAttachment {
    * @see org.rssowl.core.model.types.Reparentable#setParent(java.lang.Object)
    */
   public synchronized void setParent(INews newParent) {
-    Assert.isNotNull(newParent, "newParent");
+    Assert.isNotNull(newParent, "newParent"); //$NON-NLS-1$
     fNews = newParent;
   }
 

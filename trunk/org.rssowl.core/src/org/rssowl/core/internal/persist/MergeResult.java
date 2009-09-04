@@ -85,7 +85,7 @@ public class MergeResult {
    * @param mergeResult MergeResult to copy all items from.
    */
   public final void addAll(MergeResult mergeResult) {
-    Assert.isNotNull(mergeResult, "mergeResult");
+    Assert.isNotNull(mergeResult, "mergeResult"); //$NON-NLS-1$
     fRemovedObjects = addAll(fRemovedObjects, mergeResult.getRemovedObjects());
     fUpdatedObjects = addAll(fUpdatedObjects, mergeResult.getUpdatedObjects());
   }
@@ -116,7 +116,7 @@ public class MergeResult {
 
   private void checkArgument(Object entity) {
     if (entity instanceof IEntity) {
-      Assert.isNotNull(((IEntity) entity).getId(), "entity.getId()");
+      Assert.isNotNull(((IEntity) entity).getId(), "entity.getId()"); //$NON-NLS-1$
     }
   }
 

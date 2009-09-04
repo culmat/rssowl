@@ -39,8 +39,8 @@ public class Description extends Persistable    {
   }
 
   public Description(INews news, String value) {
-    Assert.isNotNull(news, "news");
-    Assert.isNotNull(news.getId(), "news.getId()");
+    Assert.isNotNull(news, "news"); //$NON-NLS-1$
+    Assert.isNotNull(news.getId(), "news.getId()"); //$NON-NLS-1$
     fNewsId = news.getId();
 
     fValue = value;

@@ -132,9 +132,8 @@ public class Person extends AbstractEntity implements IPerson {
   }
 
   @Override
-  @SuppressWarnings("nls")
   public synchronized String toString() {
-    return super.toString() + "Name = " + fName + ", URI = " + fUri + ", EMail = " + fEmail + ")";
+    return super.toString() + "Name = " + fName + ", URI = " + fUri + ", EMail = " + fEmail + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
   }
 
   private boolean isSimpleFieldsEqual(IPerson person) {
