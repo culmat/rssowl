@@ -104,6 +104,9 @@ public interface INews extends IEntity, MergeCapable<INews>, Reparentable<IFeed>
   /** One of the fields in this type described as constant */
   public static final int PARENT_ID = 20;
 
+  /** One of the fields in this type described as constant */
+  public static final int AGE_IN_MINUTES = 21;
+
   /**
    * States of a INews being exclusive. Explanation follows:
    * <ul>

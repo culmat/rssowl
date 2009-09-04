@@ -85,31 +85,31 @@ public enum SearchSpecifier implements IPersistable {
   public String getName() {
     switch (this) {
       case IS:
-        return "is";
+        return Messages.SearchSpecifier_IS;
       case IS_NOT:
-        return "isn't";
+        return Messages.SearchSpecifier_ISNT;
       case CONTAINS:
-        return "contains any";
+        return Messages.SearchSpecifier_CONTAINS_ANY;
       case CONTAINS_ALL:
-        return "contains";
+        return Messages.SearchSpecifier_CONTAINS;
       case CONTAINS_NOT:
-        return "doesn't contain";
+        return Messages.SearchSpecifier_DOESNT_CONTAIN;
       case BEGINS_WITH:
-        return "begins with";
+        return Messages.SearchSpecifier_BEGINS_WITH;
       case ENDS_WITH:
-        return "ends with";
+        return Messages.SearchSpecifier_ENDS_WITH;
       case IS_BEFORE:
-        return "is before";
+        return Messages.SearchSpecifier_IS_BEFORE;
       case IS_AFTER:
-        return "is after";
+        return Messages.SearchSpecifier_IS_AFTER;
       case IS_GREATER_THAN:
-        return "is greater than";
+        return Messages.SearchSpecifier_IS_GREATHER_THAN;
       case IS_LESS_THAN:
-        return "is less than";
+        return Messages.SearchSpecifier_IS_LESS_THAN;
       case SIMILIAR_TO:
-        return "is similar to";
+        return Messages.SearchSpecifier_IS_SIMILAR_TO;
       case SCOPE:
-        return "is";
+        return Messages.SearchSpecifier_IS;
       default:
         return super.toString();
     }

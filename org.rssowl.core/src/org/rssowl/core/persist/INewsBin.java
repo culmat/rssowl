@@ -53,7 +53,7 @@ public interface INewsBin extends INewsMark {
      * @param newsReference the reference to the news
      */
     public StatesUpdateInfo(State oldState, State newState, NewsReference newsReference) {
-      Assert.isNotNull(newState, "newState");
+      Assert.isNotNull(newState, "newState"); //$NON-NLS-1$
       this.fOldState = oldState;
       this.fNewState = newState;
       this.fNewsReference = newsReference;
