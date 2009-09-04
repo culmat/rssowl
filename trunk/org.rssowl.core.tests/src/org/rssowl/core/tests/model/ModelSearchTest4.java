@@ -58,6 +58,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -1122,5 +1123,126 @@ public class ModelSearchTest4 extends AbstractModelSearchTest {
     result = fModelSearch.searchNews(list(condition), false);
     assertEquals(1, result.size());
     assertEquals("Foo", result.get(0).getResult().resolve().getTitle());
+  }
+
+  /**
+   * @throws Exception
+   */
+  @Test
+  public void testSearchNewsByAge() throws Exception {
+
+    /* First add some Types */
+    IFeed feed = fFactory.createFeed(null, new URI("http://www.feed.com/feed.xml"));
+
+    INews news_1_Minute = fFactory.createNews(null, feed, new Date());
+    news_1_Minute.setPublishDate(new Date(System.currentTimeMillis() - 1 * MINUTE));
+
+    INews news_2_Minutes = fFactory.createNews(null, feed, new Date());
+    news_2_Minutes.setPublishDate(new Date(System.currentTimeMillis() - 2 * MINUTE));
+
+    INews news_1_Hour = fFactory.createNews(null, feed, new Date());
+    news_1_Hour.setPublishDate(new Date(System.currentTimeMillis() - 60 * MINUTE));
+
+    INews news_2_Hours = fFactory.createNews(null, feed, new Date());
+    news_2_Hours.setPublishDate(new Date(System.currentTimeMillis() - 120 * MINUTE));
+
+    INews news_1_Day = fFactory.createNews(null, feed, new Date());
+    news_1_Day.setPublishDate(new Date(System.currentTimeMillis() - 1 * DAY - 1 * MINUTE));
+
+    INews news_2_Days = fFactory.createNews(null, feed, new Date());
+    news_2_Days.setPublishDate(new Date(System.currentTimeMillis() - 2 * DAY));
+
+    DynamicDAO.save(feed);
+
+    /* Wait for Indexer */
+    waitForIndexer();
+
+    ISearchField ageField = fFactory.createSearchField(INews.AGE_IN_DAYS, fNewsEntityName);
+
+    /* 1 Minute */
+    ISearchCondition condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS, -1);
+    List<SearchHit<NewsReference>> result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(1, result.size());
+    assertTrue(result.get(0).getResult().references(news_1_Minute));
+
+    condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS_LESS_THAN, -1);
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(0, result.size());
+
+    condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS_GREATER_THAN, -1);
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(5, result.size());
+
+    /* 2 Minutes */
+    condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS, -2);
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(1, result.size());
+    assertTrue(result.get(0).getResult().references(news_2_Minutes));
+
+    condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS_LESS_THAN, -2);
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(1, result.size());
+    assertTrue(result.get(0).getResult().references(news_1_Minute));
+
+    condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS_GREATER_THAN, -2);
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(4, result.size());
+
+    /* 1 Hour */
+    condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS, -60);
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(1, result.size());
+    assertTrue(result.get(0).getResult().references(news_1_Hour));
+
+    condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS_LESS_THAN, -60);
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(2, result.size());
+
+    condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS_GREATER_THAN, -60);
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(3, result.size());
+
+    /* 2 Hours */
+    condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS, -120);
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(1, result.size());
+    assertTrue(result.get(0).getResult().references(news_2_Hours));
+
+    condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS_LESS_THAN, -120);
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(3, result.size());
+
+    condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS_GREATER_THAN, -120);
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(2, result.size());
+
+    /* 1 Day */
+    condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS, 1);
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(1, result.size());
+    assertTrue(result.get(0).getResult().references(news_1_Day));
+
+    condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS_LESS_THAN, 1);
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(4, result.size());
+
+    condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS_GREATER_THAN, 1);
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(1, result.size());
+    assertTrue(result.get(0).getResult().references(news_2_Days));
+
+    /* 2 Days */
+    condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS, 2);
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(1, result.size());
+    assertTrue(result.get(0).getResult().references(news_2_Days));
+
+    condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS_LESS_THAN, 2);
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(5, result.size());
+
+    condition = fFactory.createSearchCondition(ageField, SearchSpecifier.IS_GREATER_THAN, 2);
+    result = fModelSearch.searchNews(list(condition), false);
+    assertEquals(0, result.size());
   }
 }

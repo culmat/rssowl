@@ -54,6 +54,9 @@ public abstract class AbstractModelSearchTest {
   /** One Day in Millis */
   protected static final Long DAY = 1000 * 3600 * 24L;
 
+  /** One Minute in Millis */
+  protected static final Long MINUTE = 1000 * 60L;
+
   /** Model Factory */
   protected IModelFactory fFactory;
 
