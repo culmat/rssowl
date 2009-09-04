@@ -51,7 +51,7 @@ public class NewsGroupCredentialsProvider extends PlatformCredentialsProvider {
    * java.lang.String)
    */
   @Override
-  public void deleteAuthCredentials(URI link, String realm) {}
+  public synchronized void deleteAuthCredentials(URI link, String realm) {}
 
   /*
    * @see org.rssowl.core.connection.internal.DefaultCredentialsProvider#deleteProxyCredentials(java.net.URI)
@@ -64,7 +64,7 @@ public class NewsGroupCredentialsProvider extends PlatformCredentialsProvider {
    * java.lang.String)
    */
   @Override
-  public ICredentials getAuthCredentials(URI link, String realm) throws CredentialsException {
+  public synchronized ICredentials getAuthCredentials(URI link, String realm) throws CredentialsException {
     return super.getAuthCredentials(URIUtils.normalizeUri(link), realm);
   }
 

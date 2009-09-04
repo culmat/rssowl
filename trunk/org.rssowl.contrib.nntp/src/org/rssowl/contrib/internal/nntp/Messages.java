@@ -24,61 +24,18 @@
 
 package org.rssowl.contrib.internal.nntp;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
-import org.osgi.framework.BundleContext;
+import org.eclipse.osgi.util.NLS;
 
-/**
- * The activator class controls the plug-in life cycle
- */
-public class Activator extends Plugin {
+public class Messages extends NLS {
+  private static final String BUNDLE_NAME = "org.rssowl.contrib.internal.nntp.messages"; //$NON-NLS-1$
+  public static String NewsGroupHandler_ERROR_AUTH_REQUIRED;
+  public static String NewsGroupHandler_ERROR_RETRIEVE_NEWS;
+  public static String NewsGroupHandler_ERROR_SELECT_NEWSGROUP;
 
-  /* The shared instance */
-  private static Activator fgPlugin;
+  private Messages() {}
 
-  /* This plugins ID */
-  private static final String PLUGIN_ID = "org.rssowl.contrib.nntp"; //$NON-NLS-1$
-
-  /**
-   * The constructor
-   */
-  public Activator() {}
-
-  /*
-   * @see org.eclipse.core.runtime.Plugin#start(org.osgi.framework.BundleContext)
-   */
-  @Override
-  public void start(BundleContext context) throws Exception {
-    super.start(context);
-    fgPlugin = this;
-  }
-
-  /*
-   * @see org.eclipse.core.runtime.Plugin#stop(org.osgi.framework.BundleContext)
-   */
-  @Override
-  public void stop(BundleContext context) throws Exception {
-    fgPlugin = null;
-    super.stop(context);
-  }
-
-  /**
-   * @param e the exception to log.
-   */
-  public static void log(Exception e) {
-    if (fgPlugin != null)
-      fgPlugin.getLog().log(createErrorStatus(e.getMessage(), e));
-  }
-
-  /**
-   * Create a Error IStatus out of the given message and exception.
-   *
-   * @param msg The message describing the error.
-   * @param e The Exception that occured.
-   * @return An IStatus out of the given message and exception.
-   */
-  public static IStatus createErrorStatus(String msg, Exception e) {
-    return new Status(IStatus.ERROR, PLUGIN_ID, IStatus.ERROR, msg, e);
+  static {
+    // initialize resource bundle
+    NLS.initializeMessages(BUNDLE_NAME, Messages.class);
   }
 }
