@@ -191,7 +191,7 @@ public final class LazyList<E extends IEntity> implements List<E>   {
     if (o == this)
       return true;
 
-    if (!(o instanceof Set))
+    if (!(o instanceof Set<?>))
       return false;
     Collection< ? > c = (Collection< ? >) o;
     if (c.size() != size())
