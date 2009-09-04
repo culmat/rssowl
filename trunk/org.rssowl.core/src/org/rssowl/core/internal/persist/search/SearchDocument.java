@@ -152,10 +152,23 @@ public abstract class SearchDocument<T extends IEntity> {
    * @return Field
    */
   protected Field createDateField(int fieldConstant, Date value, Store store) {
+    return createDateField(fieldConstant, value, store, Resolution.DAY);
+  }
+
+  /**
+   * Creates a new <code>Field</code> from the given Date value.
+   *
+   * @param fieldConstant
+   * @param value
+   * @param store
+   * @param resolution
+   * @return Field
+   */
+  protected Field createDateField(int fieldConstant, Date value, Store store, Resolution resolution) {
     if (value == null)
       return null;
 
-    String valueText = DateTools.dateToString(value, Resolution.DAY);
+    String valueText = DateTools.dateToString(value, resolution);
     return new Field(String.valueOf(fieldConstant), valueText, store, Index.UN_TOKENIZED);
   }
 
@@ -235,7 +248,7 @@ public abstract class SearchDocument<T extends IEntity> {
 
     /* Add Name and EMail */
     if (person.getName() != null && person.getEmail() != null) {
-      return createStringField(fieldConstant, person.getName() + " " + person.getEmail().toString(), store, index);
+      return createStringField(fieldConstant, person.getName() + " " + person.getEmail().toString(), store, index); //$NON-NLS-1$
     }
 
     /* Add Name if present */
@@ -288,10 +301,10 @@ public abstract class SearchDocument<T extends IEntity> {
     StringBuilder attachmentValues = new StringBuilder();
     for (IAttachment attachment : attachments) {
       if (attachment.getLink() != null)
-        attachmentValues.append(attachment.getLink()).append(" ");
+        attachmentValues.append(attachment.getLink()).append(" "); //$NON-NLS-1$
 
       if (attachment.getType() != null)
-        attachmentValues.append(attachment.getType()).append(" ");
+        attachmentValues.append(attachment.getType()).append(" "); //$NON-NLS-1$
     }
 
     if (attachmentValues.length() > 0)

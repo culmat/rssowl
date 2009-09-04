@@ -65,7 +65,7 @@ public class Indexer {
   private static final int MAX_INDEX_JOBS_COUNT = 1;
 
   /* DWord to disable stop words when Indexing */
-  private static final String DISABLE_STOP_WORDS_PROPERTY = "disableStopWords";
+  private static final String DISABLE_STOP_WORDS_PROPERTY = "disableStopWords"; //$NON-NLS-1$
 
   /* The directory to the lucene index */
   private final Directory fIndexDirectory;
@@ -111,7 +111,7 @@ public class Indexer {
   Indexer(ModelSearchImpl search, Directory directory) throws PersistenceException {
     fSearch = search;
     fIndexDirectory = directory;
-    fJobQueue = new JobQueue("Updating Saved Searches", MAX_INDEX_JOBS_COUNT, Integer.MAX_VALUE, false, INDEX_JOB_PROGRESS_DELAY);
+    fJobQueue = new JobQueue(Messages.Indexer_UPDATE_SAVED_SEARCHES, MAX_INDEX_JOBS_COUNT, Integer.MAX_VALUE, false, INDEX_JOB_PROGRESS_DELAY);
     fUncommittedNews = new EntityIdsByEventType(false);
   }
 
@@ -298,7 +298,7 @@ public class Indexer {
 
     /* Index outstanding news */
     if (!InternalOwl.TESTING) {
-      Job delayedIndexJob = new Job("Indexing from dirty shutdown") {
+      Job delayedIndexJob = new Job(Messages.Indexer_INDEX_FROM_SHUTDOWN) {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
           for (IndexingTask task : getIndexOutstandingEntitiesTasks())
@@ -504,7 +504,7 @@ public class Indexer {
     if (sync || InternalOwl.TESTING)
       doSaveCommittedNews(uncommittedNews);
     else {
-      Job job = new Job("Save indexer news that have been committed") {
+      Job job = new Job(Messages.Indexer_SAVE_INDEXER) {
         @Override
         protected IStatus run(IProgressMonitor monitor) {
           doSaveCommittedNews(uncommittedNews);

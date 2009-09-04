@@ -94,6 +94,9 @@ public class ModelSearchQueries {
   /* One Day in Millis */
   private static final Long DAY = 1000 * 3600 * 24L;
 
+  /* One Minute in Millis */
+  private static final Long MINUTE = 1000 * 60L;
+
   /* Wildcard matching any String */
   private static final char STRING_WILDCARD = '*';
 
@@ -367,7 +370,7 @@ public class ModelSearchQueries {
     Query query = null;
 
     /* Separately handle this dynamic Query */
-    if (condition.getField().getId() == INews.AGE_IN_DAYS)
+    if (condition.getField().getId() == INews.AGE_IN_DAYS || condition.getField().getId() == INews.AGE_IN_MINUTES)
       query = createAgeClause(condition);
 
     /* Separately handle this dynamic Query */
@@ -421,13 +424,28 @@ public class ModelSearchQueries {
   /* This Clause needs to be generated dynamically */
   private static Query createAgeClause(ISearchCondition condition) {
     Integer age = (Integer) condition.getValue();
-    String fieldname = String.valueOf(condition.getField().getId());
+    String value;
 
-    /* Calculate Desired Date */
+    /* Minute Format */
+    if (age < 0) {
+      Calendar cal = Calendar.getInstance();
+      cal.setTimeInMillis(System.currentTimeMillis() + age * MINUTE); //age is negative
+      value = DateTools.dateToString(cal.getTime(), Resolution.MINUTE);
+
+      String fieldname = String.valueOf(INews.AGE_IN_MINUTES);
+      return createAgeQuery(condition, fieldname, value);
+    }
+
+    /* Day Format */
     Calendar cal = Calendar.getInstance();
     cal.setTimeInMillis(System.currentTimeMillis() - age * DAY);
-    String value = DateTools.dateToString(cal.getTime(), Resolution.DAY);
+    value = DateTools.dateToString(cal.getTime(), Resolution.DAY);
 
+    String fieldname = String.valueOf(INews.AGE_IN_DAYS);
+    return createAgeQuery(condition, fieldname, value);
+  }
+
+  private static Query createAgeQuery(ISearchCondition condition, String fieldname, String value) {
     switch (condition.getSpecifier()) {
       case IS: {
         return new TermQuery(new Term(fieldname, value));
@@ -448,7 +466,7 @@ public class ModelSearchQueries {
       }
     }
 
-    throw new UnsupportedOperationException("Unsupported Specifier for Age Query");
+    throw new UnsupportedOperationException("Unsupported Specifier for Age Query"); //$NON-NLS-1$
   }
 
   /* This Clause needs to be generated dynamically */
@@ -489,7 +507,7 @@ public class ModelSearchQueries {
 
     /* The folder could be empty, make sure to add at least 1 Clause */
     if (bQuery.clauses().isEmpty())
-      bQuery.add(new TermQuery(new Term(String.valueOf(INews.FEED), "")), Occur.SHOULD);
+      bQuery.add(new TermQuery(new Term(String.valueOf(INews.FEED), "")), Occur.SHOULD); //$NON-NLS-1$
 
     return bQuery;
   }
@@ -570,13 +588,13 @@ public class ModelSearchQueries {
 
         /* Wildcard-Query with trailing '*' */
       case BEGINS_WITH: {
-        value = value.toLowerCase() + "*";
+        value = value.toLowerCase() + "*"; //$NON-NLS-1$
         return createWildcardQuery(fieldname, value);
       }
 
         /* Wildcard-Query with leading '*' */
       case ENDS_WITH: {
-        value = "*" + value.toLowerCase();
+        value = "*" + value.toLowerCase(); //$NON-NLS-1$
         return createWildcardQuery(fieldname, value);
       }
 
@@ -597,7 +615,7 @@ public class ModelSearchQueries {
       }
     }
 
-    throw new UnsupportedOperationException("Unsupported Specifier for Parsed Queries");
+    throw new UnsupportedOperationException("Unsupported Specifier for Parsed Queries"); //$NON-NLS-1$
   }
 
   @SuppressWarnings("unchecked")
@@ -639,7 +657,7 @@ public class ModelSearchQueries {
       }
     }
 
-    throw new UnsupportedOperationException("Unsupported Specifier for Date/Time Queries");
+    throw new UnsupportedOperationException("Unsupported Specifier for Date/Time Queries"); //$NON-NLS-1$
   }
 
   private static Query createNumberQuery(ISearchCondition condition) {
@@ -667,7 +685,7 @@ public class ModelSearchQueries {
       }
     }
 
-    throw new UnsupportedOperationException("Unsupported Specifier for Number Queries");
+    throw new UnsupportedOperationException("Unsupported Specifier for Number Queries"); //$NON-NLS-1$
   }
 
   private static Occur getOccur(SearchSpecifier specifier, boolean matchAllConditions) {
