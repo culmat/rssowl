@@ -77,8 +77,7 @@ public class FilterAction extends Persistable implements IFilterAction {
   }
 
   @Override
-  @SuppressWarnings("nls")
   public synchronized String toString() {
-    return super.toString() + "Action ID = " + fActionId + ", ";
+    return super.toString() + "Action ID = " + fActionId + ", "; //$NON-NLS-1$ //$NON-NLS-2$
   }
 }

@@ -70,8 +70,8 @@ public class News extends AbstractEntity implements INews {
 
     void acquireWriteLock() {
       if (fReadLockThread == Thread.currentThread()) {
-        throw new IllegalStateException("Cannot acquire the write lock from the " +
-        		"same thread as the read lock.");
+        throw new IllegalStateException("Cannot acquire the write lock from the " + //$NON-NLS-1$
+        		"same thread as the read lock."); //$NON-NLS-1$
       }
       fLock.writeLock().lock();
     }
@@ -860,18 +860,17 @@ public class News extends AbstractEntity implements INews {
     return State.getVisible().contains(state);
   }
 
-  @SuppressWarnings("nls")
   @Override
-  public String toString() {
+  public synchronized String toString() {
     StringBuilder str = new StringBuilder();
-    str.append("\n\n****************************** News ******************************\n");
+    str.append("\n\n****************************** News ******************************\n"); //$NON-NLS-1$
     fLock.acquireReadLock();
     try {
-      str.append("\nNews ID: ").append(getId());
+      str.append("\nNews ID: ").append(getId()); //$NON-NLS-1$
       if (getTitle() != null)
-        str.append("\nTitle: ").append(getTitle());
+        str.append("\nTitle: ").append(getTitle()); //$NON-NLS-1$
       if (getLinkAsText() != null)
-        str.append("\nLink: ").append(getLinkAsText());
+        str.append("\nLink: ").append(getLinkAsText()); //$NON-NLS-1$
     } finally {
       fLock.releaseReadLock();
     }
@@ -883,47 +882,46 @@ public class News extends AbstractEntity implements INews {
    *
    * @return A String describing the state of this Entity.
    */
-  @SuppressWarnings("nls")
   public String toLongString() {
     StringBuilder str = new StringBuilder();
 
-    str.append("\n\n****************************** News ******************************\n");
+    str.append("\n\n****************************** News ******************************\n"); //$NON-NLS-1$
     fLock.acquireReadLock();
     try {
-      str.append("\nNews ID: ").append(getId());
+      str.append("\nNews ID: ").append(getId()); //$NON-NLS-1$
       if (fFeedLink != null)
-        str.append("\nFeed Link: ").append(fFeedLink);
-      str.append("\nState: ").append(getState());
+        str.append("\nFeed Link: ").append(fFeedLink); //$NON-NLS-1$
+      str.append("\nState: ").append(getState()); //$NON-NLS-1$
       if (getTitle() != null)
-        str.append("\nTitle: ").append(getTitle());
+        str.append("\nTitle: ").append(getTitle()); //$NON-NLS-1$
       if (getLinkAsText() != null)
-        str.append("\nLink: ").append(getLinkAsText());
+        str.append("\nLink: ").append(getLinkAsText()); //$NON-NLS-1$
       if (getBase() != null)
-        str.append("\nBase URI: ").append(getBase());
+        str.append("\nBase URI: ").append(getBase()); //$NON-NLS-1$
       if (getDescription() != null)
-        str.append("\nDescription: ").append(getDescription());
-      str.append("\nRating: ").append(getRating());
+        str.append("\nDescription: ").append(getDescription()); //$NON-NLS-1$
+      str.append("\nRating: ").append(getRating()); //$NON-NLS-1$
       if (getPublishDate() != null)
-        str.append("\nPublish Date: ").append(DateFormat.getDateTimeInstance().format(getPublishDate()));
+        str.append("\nPublish Date: ").append(DateFormat.getDateTimeInstance().format(getPublishDate())); //$NON-NLS-1$
       if (getReceiveDate() != null)
-        str.append("\nReceive Date: ").append(DateFormat.getDateTimeInstance().format(getReceiveDate()));
+        str.append("\nReceive Date: ").append(DateFormat.getDateTimeInstance().format(getReceiveDate())); //$NON-NLS-1$
       if (getModifiedDate() != null)
-        str.append("\nModified Date: ").append(DateFormat.getDateTimeInstance().format(getModifiedDate()));
+        str.append("\nModified Date: ").append(DateFormat.getDateTimeInstance().format(getModifiedDate())); //$NON-NLS-1$
       if (getAuthor() != null)
-        str.append("\nAuthor: ").append(getAuthor());
+        str.append("\nAuthor: ").append(getAuthor()); //$NON-NLS-1$
       if (getComments() != null)
-        str.append("\nComments: ").append(getComments());
+        str.append("\nComments: ").append(getComments()); //$NON-NLS-1$
       if (getGuid() != null)
-        str.append("\nGUID: ").append(getGuid());
+        str.append("\nGUID: ").append(getGuid()); //$NON-NLS-1$
       if (getSource() != null)
-        str.append("\nSource: ").append(getSource());
+        str.append("\nSource: ").append(getSource()); //$NON-NLS-1$
       if (getInReplyTo() != null)
-        str.append("\nIn Reply To: ").append(getInReplyTo());
-      str.append("\nLabesl: ").append(getLabels());
-      str.append("\nAttachments: ").append(getAttachments());
-      str.append("\nCategories: ").append(getCategories());
-      str.append("\nIs Flagged: ").append(fIsFlagged);
-      str.append("\nProperties: ").append(getProperties());
+        str.append("\nIn Reply To: ").append(getInReplyTo()); //$NON-NLS-1$
+      str.append("\nLabesl: ").append(getLabels()); //$NON-NLS-1$
+      str.append("\nAttachments: ").append(getAttachments()); //$NON-NLS-1$
+      str.append("\nCategories: ").append(getCategories()); //$NON-NLS-1$
+      str.append("\nIs Flagged: ").append(fIsFlagged); //$NON-NLS-1$
+      str.append("\nProperties: ").append(getProperties()); //$NON-NLS-1$
     } finally {
       fLock.releaseReadLock();
     }
@@ -977,7 +975,7 @@ public class News extends AbstractEntity implements INews {
 
   public MergeResult merge(INews news) {
     Assert.isNotNull(news, "news cannot be null"); //$NON-NLS-1$
-    Assert.isLegal(this != news, "Trying to merge the same news, this is most likely a mistake, news: " + news);
+    Assert.isLegal(this != news, "Trying to merge the same news, this is most likely a mistake, news: " + news); //$NON-NLS-1$
 
     //TODO It's _in theory_ possible for a deadlock to occur here. Even though
     //we may want to remove that possibility at some point, it should not happen

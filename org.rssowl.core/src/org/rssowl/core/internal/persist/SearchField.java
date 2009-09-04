@@ -110,13 +110,13 @@ public class SearchField implements ISearchField {
     if (fEntityName.equals(IAttachment.class.getName())) {
       switch (fField) {
         case (IEntity.ALL_FIELDS):
-          return "Entire Attachment";
+          return Messages.SearchField_ENTIRE_ATTACHMENT;
         case (IAttachment.LINK):
-          return "Link";
+          return Messages.SearchField_LINK;
         case (IAttachment.LENGTH):
-          return "Size";
+          return Messages.SearchField_SIZE;
         case (IAttachment.TYPE):
-          return "Type";
+          return Messages.SearchField_TYPE;
       }
     }
 
@@ -124,15 +124,15 @@ public class SearchField implements ISearchField {
     if (fEntityName.equals(IFolder.class.getName())) {
       switch (fField) {
         case (IEntity.ALL_FIELDS):
-          return "Entire Folder";
+          return Messages.SearchField_ENTIRE_FOLDER;
         case (IFolder.NAME):
-          return "Name";
+          return Messages.SearchField_NAME;
         case (IFolder.BLOGROLL_LINK):
-          return "Blogroll Link";
+          return Messages.SearchField_BLOGROLL_LINK;
         case (IFolder.FOLDERS):
-          return "Number of Sub-Folders";
+          return Messages.SearchField_SUB_FOLDERS;
         case (IFolder.MARKS):
-          return "Number of BookMarks";
+          return Messages.SearchField_BOOKMARKS;
       }
     }
 
@@ -140,11 +140,11 @@ public class SearchField implements ISearchField {
     if (fEntityName.equals(ILabel.class.getName())) {
       switch (fField) {
         case (IEntity.ALL_FIELDS):
-          return "Entire Label";
+          return Messages.SearchField_ENTIRE_LABEL;
         case (ILabel.NAME):
-          return "Name";
+          return Messages.SearchField_NAME;
         case (ILabel.COLOR):
-          return "Color";
+          return Messages.SearchField_COLOR;
       }
     }
 
@@ -152,11 +152,11 @@ public class SearchField implements ISearchField {
     if (fEntityName.equals(ICategory.class.getName())) {
       switch (fField) {
         case (IEntity.ALL_FIELDS):
-          return "Entire Category";
+          return Messages.SearchField_ENTIRE_CATEGORY;
         case (ICategory.NAME):
-          return "Name";
+          return Messages.SearchField_NAME;
         case (ICategory.DOMAIN):
-          return "Domain";
+          return Messages.SearchField_DOMAIN;
       }
     }
 
@@ -164,17 +164,17 @@ public class SearchField implements ISearchField {
     if (fEntityName.equals(IBookMark.class.getName())) {
       switch (fField) {
         case (IEntity.ALL_FIELDS):
-          return "Entire BookMark";
+          return Messages.SearchField_ENTIRE_BOOKMARK;
         case (IMark.CREATION_DATE):
-          return "Date of creation";
+          return Messages.SearchField_CREATION_DATE;
         case (IMark.NAME):
-          return "Name";
+          return Messages.SearchField_NAME;
         case (IMark.LAST_VISIT_DATE):
-          return "Last visit";
+          return Messages.SearchField_LAST_VISIT;
         case (IMark.POPULARITY):
-          return "Number of Visits";
+          return Messages.SearchField_NUMBER_OF_VISITS;
         case (IBookMark.IS_ERROR_LOADING):
-          return "Error while Loading";
+          return Messages.SearchField_ERROR_LOADING;
       }
     }
 
@@ -182,15 +182,15 @@ public class SearchField implements ISearchField {
     if (fEntityName.equals(ISearchMark.class.getName())) {
       switch (fField) {
         case (IEntity.ALL_FIELDS):
-          return "Entire SearchMark";
+          return Messages.SearchField_ENTIRE_SEARCHMARK;
         case (IMark.CREATION_DATE):
-          return "Date of creation";
+          return Messages.SearchField_CREATION_DATE;
         case (IMark.NAME):
-          return "Name";
+          return Messages.SearchField_NAME;
         case (IMark.LAST_VISIT_DATE):
-          return "Last visit";
+          return Messages.SearchField_LAST_VISIT;
         case (IMark.POPULARITY):
-          return "Number of Visits";
+          return Messages.SearchField_NUMBER_OF_VISITS;
       }
     }
 
@@ -198,13 +198,13 @@ public class SearchField implements ISearchField {
     if (fEntityName.equals(IPerson.class.getName())) {
       switch (fField) {
         case (IEntity.ALL_FIELDS):
-          return "Entire Person";
+          return Messages.SearchField_ENTIRE_PERSON;
         case (IPerson.NAME):
-          return "Name";
+          return Messages.SearchField_NAME;
         case (IPerson.EMAIL):
-          return "EMail";
+          return Messages.SearchField_EMAIL;
         case (IPerson.URI):
-          return "URI";
+          return Messages.SearchField_URI;
       }
     }
 
@@ -212,47 +212,49 @@ public class SearchField implements ISearchField {
     if (fEntityName.equals(INews.class.getName())) {
       switch (fField) {
         case (IEntity.ALL_FIELDS):
-          return "Entire News";
+          return Messages.SearchField_ENTIRE_NEWS;
         case (INews.TITLE):
-          return "Title";
+          return Messages.SearchField_TITLE;
         case (INews.LINK):
-          return "Link";
+          return Messages.SearchField_LINK;
         case (INews.DESCRIPTION):
-          return "Description";
+          return Messages.SearchField_DESCRIPTION;
         case (INews.PUBLISH_DATE):
-          return "Date Published";
+          return Messages.SearchField_PUBLISH_DATE;
         case (INews.MODIFIED_DATE):
-          return "Date Modified";
+          return Messages.SearchField_MODIFIED_DATE;
         case (INews.RECEIVE_DATE):
-          return "Date Received";
+          return Messages.SearchField_RECEIVED_DATE;
         case (INews.AUTHOR):
-          return "Author";
+          return Messages.SearchField_AUTHOR;
         case (INews.COMMENTS):
-          return "Comments";
+          return Messages.SearchField_COMMENTS;
         case (INews.GUID):
-          return "GUID";
+          return Messages.SearchField_GUID;
         case (INews.SOURCE):
-          return "Source";
+          return Messages.SearchField_SOURCE;
         case (INews.HAS_ATTACHMENTS):
-          return "Has Attachment";
+          return Messages.SearchField_HAS_ATTACHMENT;
         case (INews.ATTACHMENTS_CONTENT):
-          return "Attachment";
+          return Messages.SearchField_ATTACHMENT;
         case (INews.CATEGORIES):
-          return "Category";
+          return Messages.SearchField_CATEGORY;
         case (INews.IS_FLAGGED):
-          return "Is Sticky";
+          return Messages.SearchField_IS_STICKY;
         case (INews.STATE):
-          return "State of News";
+          return Messages.SearchField_STATE_OF_NEWS;
         case (INews.LABEL):
-          return "Label";
+          return Messages.SearchField_LABEL;
         case (INews.RATING):
-          return "Rating";
+          return Messages.SearchField_RATING;
         case (INews.FEED):
-          return "Feed";
+          return Messages.SearchField_FEED;
         case (INews.AGE_IN_DAYS):
-          return "Age in Days";
+          return Messages.SearchField_AGE;
+        case (INews.AGE_IN_MINUTES):
+          return Messages.SearchField_AGE;
         case (INews.LOCATION):
-          return "Location";
+          return Messages.SearchField_LOCATION;
       }
     }
 
@@ -260,48 +262,48 @@ public class SearchField implements ISearchField {
     if (fEntityName.equals(IFeed.class.getName())) {
       switch (fField) {
         case (IEntity.ALL_FIELDS):
-          return "Entire News";
+          return Messages.SearchField_ENTIRE_NEWS;
         case (IFeed.LINK):
-          return "Link";
+          return Messages.SearchField_LINK;
         case (IFeed.TITLE):
-          return "Title";
+          return Messages.SearchField_TITLE;
         case (IFeed.PUBLISH_DATE):
-          return "Date Published";
+          return Messages.SearchField_PUBLISH_DATE;
         case (IFeed.DESCRIPTION):
-          return "Description";
+          return Messages.SearchField_DESCRIPTION;
         case (IFeed.HOMEPAGE):
-          return "Homepage";
+          return Messages.SearchField_HOMEPAGE;
         case (IFeed.LANGUAGE):
-          return "Language";
+          return Messages.SearchField_LANGUAGE;
         case (IFeed.COPYRIGHT):
-          return "Copyright";
+          return Messages.SearchField_COPYRIGHT;
         case (IFeed.DOCS):
-          return "Docs";
+          return Messages.SearchField_DOCS;
         case (IFeed.GENERATOR):
-          return "Generator";
+          return Messages.SearchField_GENERATOR;
         case (IFeed.LAST_BUILD_DATE):
-          return "Date Last Built";
+          return Messages.SearchField_LAST_BUILT_DATE;
         case (IFeed.WEBMASTER):
-          return "Webmaster";
+          return Messages.SearchField_WEBMASTER;
         case (IFeed.LAST_MODIFIED_DATE):
-          return "Date Last Modified";
+          return Messages.SearchField_LAST_MODIFIED_DATE;
         case (IFeed.TTL):
-          return "Time To Live";
+          return Messages.SearchField_TIME_TO_LIVE;
         case (IFeed.FORMAT):
-          return "Format";
+          return Messages.SearchField_FORMAT;
         case (IFeed.AUTHOR):
-          return "Author";
+          return Messages.SearchField_AUTHOR;
         case (IFeed.NEWS):
-          return "Number of News";
+          return Messages.SearchField_NUMBER_OF_NEWS;
         case (IFeed.CATEGORIES):
-          return "Category";
+          return Messages.SearchField_CATEGORY;
         case (IFeed.IMAGE):
-          return "Image";
+          return Messages.SearchField_IMAGE;
       }
     }
 
     /* Default */
-    return fEntityName + "#" + fField;
+    return fEntityName + "#" + fField; //$NON-NLS-1$
   }
 
   /*
@@ -390,6 +392,8 @@ public class SearchField implements ISearchField {
           return SearchValueType.LINK;
         case (INews.AGE_IN_DAYS):
           return SearchValueType.INTEGER;
+        case (INews.AGE_IN_MINUTES):
+          return SearchValueType.INTEGER;
         case (INews.SOURCE):
           return SearchValueType.LINK;
         case (INews.HAS_ATTACHMENTS):
@@ -422,7 +426,7 @@ public class SearchField implements ISearchField {
 
   /* Return human-readable list of News-States */
   private List<String> loadStateValues() {
-    return new ArrayList<String>(Arrays.asList(new String[] { "New", "Read", "Unread", "Updated", "Deleted" }));
+    return new ArrayList<String>(Arrays.asList(new String[] { Messages.SearchField_NEW, Messages.SearchField_READ, Messages.SearchField_UNREAD, Messages.SearchField_UPDATED, Messages.SearchField_DELETED }));
   }
 
   private List<String> loadLanguageValues() {
@@ -484,9 +488,8 @@ public class SearchField implements ISearchField {
   }
 
   @Override
-  @SuppressWarnings("nls")
   public synchronized String toString() {
-    return fEntityName + ": " + fField;
+    return fEntityName + ": " + fField; //$NON-NLS-1$
   }
 
   /**
@@ -494,8 +497,7 @@ public class SearchField implements ISearchField {
    *
    * @return A String describing the state of this Entity.
    */
-  @SuppressWarnings("nls")
   public synchronized String toLongString() {
-    return super.toString() + "(Field = " + fField + ", Class = " + fEntityName + ", Name = " + getName() + ", Search-Value-Type = " + getSearchValueType() + ")";
+    return super.toString() + "(Field = " + fField + ", Class = " + fEntityName + ", Name = " + getName() + ", Search-Value-Type = " + getSearchValueType() + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
   }
 }

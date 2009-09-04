@@ -88,7 +88,7 @@ public class BookMark extends Mark implements IBookMark {
 
 
   public synchronized void setMostRecentNewsDate(Date date) {
-    Assert.isNotNull(date, "date");
+    Assert.isNotNull(date, "date"); //$NON-NLS-1$
     fMostRecentNewsDate = date.getTime();
   }
 
@@ -157,16 +157,14 @@ public class BookMark extends Mark implements IBookMark {
     }
   }
 
-  @SuppressWarnings("nls")
   @Override
   public synchronized String toLongString() {
-    return super.toString() + ", Is Error Loading: " + fIsErrorLoading + ", Belongs " + "to Feed = " + fFeedLink + ")";
+    return super.toString() + ", Is Error Loading: " + fIsErrorLoading + ", Belongs " + "to Feed = " + fFeedLink + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
   }
 
   @Override
-  @SuppressWarnings("nls")
   public synchronized String toString() {
-    return super.toString() + "Belongs to Feed = " + fFeedLink + ")";
+    return super.toString() + "Belongs to Feed = " + fFeedLink + ")"; //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /* getIdAsPrimitive is synchronized so this method doesn't need to be */

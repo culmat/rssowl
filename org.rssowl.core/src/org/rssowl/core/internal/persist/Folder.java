@@ -289,10 +289,9 @@ public class Folder extends AbstractEntity implements IFolder {
     }
   }
 
-  @SuppressWarnings("nls")
   @Override
   public synchronized String toString() {
-    return super.toString() + "Name = " + fName + ")";
+    return super.toString() + "Name = " + fName + ")"; //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /**
@@ -300,9 +299,8 @@ public class Folder extends AbstractEntity implements IFolder {
    *
    * @return A String describing the state of this Entity.
    */
-  @SuppressWarnings("nls")
   public synchronized String toLongString() {
-    return super.toString() + "Name = " + fName + ", Blogroll Link = " + fBlogrollLink + ", Children = " + fChildren.toString() + ", Parent Folder = " + (fParent != null ? fParent.getId() : "none") + ")";
+    return super.toString() + "Name = " + fName + ", Blogroll Link = " + fBlogrollLink + ", Children = " + fChildren.toString() + ", Parent Folder = " + (fParent != null ? fParent.getId() : "none") + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
   }
 
   public FolderReference toReference() {

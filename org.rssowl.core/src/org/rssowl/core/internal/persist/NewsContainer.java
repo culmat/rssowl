@@ -66,7 +66,7 @@ public final class NewsContainer {
   }
 
   public Pair<Boolean, Boolean> setNews(Map<INews.State, List<NewsReference>> newsMap) {
-    Assert.isNotNull(newsMap, "newsMap");
+    Assert.isNotNull(newsMap, "newsMap"); //$NON-NLS-1$
 
     boolean changed = false;
     boolean isNewNewsAdded = false;
@@ -89,8 +89,8 @@ public final class NewsContainer {
       List<NewsReference> news = mapEntry.getValue();
       INews.State state = mapEntry.getKey();
 
-      Assert.isNotNull(news, "news");
-      Assert.isNotNull(state, "state");
+      Assert.isNotNull(news, "news"); //$NON-NLS-1$
+      Assert.isNotNull(state, "state"); //$NON-NLS-1$
 
       long[] newArray = new long[news.size()];
 
@@ -145,7 +145,7 @@ public final class NewsContainer {
   }
 
   public int getNewsCount(Set<INews.State> states) {
-    Assert.isNotNull(states, "states");
+    Assert.isNotNull(states, "states"); //$NON-NLS-1$
 
     int count = 0;
 
@@ -166,7 +166,7 @@ public final class NewsContainer {
   }
 
   private void checkNewsIdNotNull(INews news) {
-    Assert.isNotNull(news.getId(), "news.getId()");
+    Assert.isNotNull(news.getId(), "news.getId()"); //$NON-NLS-1$
   }
 
   public List<NewsReference> getNews()  {

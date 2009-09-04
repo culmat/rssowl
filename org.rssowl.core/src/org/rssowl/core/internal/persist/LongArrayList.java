@@ -150,7 +150,7 @@ public class LongArrayList {
 
   private void rangeCheck(int index) {
     if (index >= fSize)
-      throw new IndexOutOfBoundsException("size: " + fSize + ", index: " + index);
+      throw new IndexOutOfBoundsException("size: " + fSize + ", index: " + index); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   public final boolean contains(long element) {

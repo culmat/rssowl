@@ -153,43 +153,42 @@ public class SearchValueType implements ISearchValueType {
   }
 
   @Override
-  @SuppressWarnings("nls")
   public synchronized String toString() {
     String type;
     switch (fType) {
       case ISearchValueType.BOOLEAN:
-        type = "Boolean";
+        type = "Boolean"; //$NON-NLS-1$
         break;
       case ISearchValueType.DATE:
-        type = "Date";
+        type = "Date"; //$NON-NLS-1$
         break;
       case ISearchValueType.DATETIME:
-        type = "DateTime";
+        type = "DateTime"; //$NON-NLS-1$
         break;
       case ISearchValueType.ENUM:
-        type = "Enum";
+        type = "Enum"; //$NON-NLS-1$
         break;
       case ISearchValueType.INTEGER:
-        type = "Integer";
+        type = "Integer"; //$NON-NLS-1$
         break;
       case ISearchValueType.NUMBER:
-        type = "Number";
+        type = "Number"; //$NON-NLS-1$
         break;
       case ISearchValueType.STRING:
-        type = "String";
+        type = "String"; //$NON-NLS-1$
         break;
       case ISearchValueType.TIME:
-        type = "Time";
+        type = "Time"; //$NON-NLS-1$
         break;
       case ISearchValueType.LINK:
-        type = "Link";
+        type = "Link"; //$NON-NLS-1$
         break;
       default:
-        type = "Unknown";
+        type = "Unknown"; //$NON-NLS-1$
     }
 
     if (fType != ENUM)
-      return super.toString() + "(Type = " + type + ")";
-    return super.toString() + "(Type = " + type + ", Values = " + fEnumValues + ")";
+      return super.toString() + "(Type = " + type + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+    return super.toString() + "(Type = " + type + ", Values = " + fEnumValues + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
   }
 }

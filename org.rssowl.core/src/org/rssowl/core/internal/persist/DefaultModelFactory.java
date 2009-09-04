@@ -79,7 +79,7 @@ public class DefaultModelFactory implements IModelFactory {
   }
 
   public INews createNews(INews news, INewsBin newsBin) {
-    Assert.isNotNull(newsBin.getId(), "ID of the Bin must not be null!");
+    Assert.isNotNull(newsBin.getId(), "ID of the Bin must not be null!"); //$NON-NLS-1$
 
     INews copy = new News((News) news, newsBin.getId());
     copy.setId(Owl.getPersistenceService().getIDGenerator().getNext());

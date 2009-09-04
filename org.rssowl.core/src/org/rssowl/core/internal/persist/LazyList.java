@@ -42,8 +42,8 @@ public final class LazyList<E extends IEntity> implements List<E>   {
   private final ObjectContainer fObjectContainer;
 
   public LazyList(ObjectSet<? extends E> entities, ObjectContainer objectContainer) {
-    Assert.isNotNull(entities, "entities");
-    Assert.isNotNull(objectContainer, "objectContainer");
+    Assert.isNotNull(entities, "entities"); //$NON-NLS-1$
+    Assert.isNotNull(objectContainer, "objectContainer"); //$NON-NLS-1$
     long[] ids = entities.ext().getIDs();
     fIds = new LongArrayList(ids.length);
     fIds.setAll(ids);

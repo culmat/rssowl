@@ -136,7 +136,7 @@ public abstract class Mark extends AbstractEntity implements IMark {
   }
 
   public synchronized void setParent(IFolder parent) {
-    Assert.isNotNull(parent, "parent");
+    Assert.isNotNull(parent, "parent"); //$NON-NLS-1$
     fParent = parent;
   }
 
@@ -147,7 +147,7 @@ public abstract class Mark extends AbstractEntity implements IMark {
       INews newsItem = newsRef.resolve();
 
       if (!ignoreNullResolve)
-        Assert.isNotNull(newsItem, "newsItem");
+        Assert.isNotNull(newsItem, "newsItem"); //$NON-NLS-1$
 
       if (newsItem != null)
         news.add(newsItem);
@@ -156,9 +156,8 @@ public abstract class Mark extends AbstractEntity implements IMark {
   }
 
   @Override
-  @SuppressWarnings("nls")
   public synchronized String toString() {
-    return super.toString() + "Name = " + fName + ", ";
+    return super.toString() + "Name = " + fName + ", "; //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /**
@@ -166,12 +165,11 @@ public abstract class Mark extends AbstractEntity implements IMark {
    *
    * @return A String describing the state of this Entity.
    */
-  @SuppressWarnings("nls")
   public synchronized String toLongString() {
-    String retValue = super.toString() + "Name = " + fName + ", Creation Date = " + fCreationDate + ", Popularity: " + getPopularity();
+    String retValue = super.toString() + "Name = " + fName + ", Creation Date = " + fCreationDate + ", Popularity: " + getPopularity(); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     if (getLastVisitDate() != null)
       retValue = retValue + (DateFormat.getDateTimeInstance().format(getLastVisitDate()));
 
-    return retValue + ", Belongs to Folder = " + fParent.getId() + ", ";
+    return retValue + ", Belongs to Folder = " + fParent.getId() + ", "; //$NON-NLS-1$ //$NON-NLS-2$
   }
 }

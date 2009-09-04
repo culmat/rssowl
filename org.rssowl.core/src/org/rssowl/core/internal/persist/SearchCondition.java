@@ -187,9 +187,8 @@ public class SearchCondition extends AbstractEntity implements ISearchCondition 
   }
 
   @Override
-  @SuppressWarnings("nls")
   public synchronized String toString() {
-    return super.toString() + "Search-Field = " + fField + ", Search-Specifier = " + fSpecifier.name() + ", Search-Value = " + fValue + ")";
+    return super.toString() + "Search-Field = " + fField + ", Search-Specifier = " + fSpecifier.name() + ", Search-Value = " + fValue + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
   }
 
   public SearchConditionReference toReference() {

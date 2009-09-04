@@ -130,9 +130,8 @@ public class Label extends AbstractEntity implements ILabel {
   }
 
   @Override
-  @SuppressWarnings("nls")
   public synchronized String toString() {
-    return super.toString() + "Name = " + fName + ", Color = " + fColor + ")";
+    return super.toString() + "Name = " + fName + ", Color = " + fColor + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
   }
 
   public LabelReference toReference() {

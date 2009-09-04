@@ -119,9 +119,8 @@ public class Source extends Persistable implements ISource {
   }
 
   @Override
-  @SuppressWarnings("nls")
   public synchronized String toString() {
-    return super.toString() + "Link = " + fLink + ", Name = " + fName + ")";
+    return super.toString() + "Link = " + fLink + ", Name = " + fName + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
   }
 
   public synchronized MergeResult merge(ISource objectToMerge) {

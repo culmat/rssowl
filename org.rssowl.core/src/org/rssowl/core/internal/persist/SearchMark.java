@@ -153,9 +153,8 @@ public class SearchMark extends Mark implements ISearchMark {
    * @return A String describing the state of this Entity.
    */
   @Override
-  @SuppressWarnings("nls")
   public synchronized String toLongString() {
-    return super.toString() + "Search Conditions = " + fSearchConditions.toString() + ")";
+    return super.toString() + "Search Conditions = " + fSearchConditions.toString() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /* getIdAsPrimitive is synchronized so this method doesn't need to be */
@@ -177,7 +176,7 @@ public class SearchMark extends Mark implements ISearchMark {
   }
 
   public synchronized int getNewsCount(Set<State> states) {
-    Assert.isNotNull(states, "states");
+    Assert.isNotNull(states, "states"); //$NON-NLS-1$
     return fNewsContainer.getNewsCount(states);
   }
 

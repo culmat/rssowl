@@ -473,16 +473,15 @@ public class Feed extends AbstractEntity implements IFeed {
     }
   }
 
-  @SuppressWarnings("nls")
   @Override
   public synchronized String toString() {
     StringBuilder str = new StringBuilder();
 
-    str.append("\n\n\n****************************** Feed ******************************");
-    str.append("\nID: ").append(getId());
-    str.append("\nLink: ").append(getLink());
+    str.append("\n\n\n****************************** Feed ******************************"); //$NON-NLS-1$
+    str.append("\nID: ").append(getId()); //$NON-NLS-1$
+    str.append("\nLink: ").append(getLink()); //$NON-NLS-1$
     if (getTitle() != null)
-      str.append("\nTitle: ").append(getTitle());
+      str.append("\nTitle: ").append(getTitle()); //$NON-NLS-1$
 
     return str.toString();
   }
@@ -492,49 +491,48 @@ public class Feed extends AbstractEntity implements IFeed {
    *
    * @return A String describing the state of this Entity.
    */
-  @SuppressWarnings("nls")
   public synchronized String toLongString() {
     StringBuilder str = new StringBuilder();
 
-    str.append("\n\n\n****************************** Feed ******************************");
-    str.append("\nID: ").append(getId());
-    str.append("\nFormat: ").append(getFormat());
-    str.append("\nLink: ").append(getLink());
+    str.append("\n\n\n****************************** Feed ******************************"); //$NON-NLS-1$
+    str.append("\nID: ").append(getId()); //$NON-NLS-1$
+    str.append("\nFormat: ").append(getFormat()); //$NON-NLS-1$
+    str.append("\nLink: ").append(getLink()); //$NON-NLS-1$
     if (getBase() != null)
-      str.append("\nBase URI: ").append(getBase());
+      str.append("\nBase URI: ").append(getBase()); //$NON-NLS-1$
     if (getTitle() != null)
-      str.append("\nTitle: ").append(getTitle());
+      str.append("\nTitle: ").append(getTitle()); //$NON-NLS-1$
     if (getDescription() != null)
-      str.append("\nDescription: ").append(getDescription());
+      str.append("\nDescription: ").append(getDescription()); //$NON-NLS-1$
     if (getHomepage() != null)
-      str.append("\nHomepage: ").append(getHomepage());
+      str.append("\nHomepage: ").append(getHomepage()); //$NON-NLS-1$
     if (getLanguage() != null)
-      str.append("\nLanguage: ").append(getLanguage());
+      str.append("\nLanguage: ").append(getLanguage()); //$NON-NLS-1$
     if (getImage() != null)
-      str.append("\nImage: ").append(getImage());
+      str.append("\nImage: ").append(getImage()); //$NON-NLS-1$
     if (getCopyright() != null)
-      str.append("\nCopyright: ").append(getCopyright());
+      str.append("\nCopyright: ").append(getCopyright()); //$NON-NLS-1$
     if (getPublishDate() != null)
-      str.append("\nPublish Date: ").append(DateFormat.getDateTimeInstance().format(getPublishDate()));
+      str.append("\nPublish Date: ").append(DateFormat.getDateTimeInstance().format(getPublishDate())); //$NON-NLS-1$
     if (getLastBuildDate() != null)
-      str.append("\nLast Build: ").append(DateFormat.getDateTimeInstance().format(getLastBuildDate()));
+      str.append("\nLast Build: ").append(DateFormat.getDateTimeInstance().format(getLastBuildDate())); //$NON-NLS-1$
     if (getLastModifiedDate() != null)
-      str.append("\nLast Modified: ").append(DateFormat.getDateTimeInstance().format(getLastModifiedDate()));
-    str.append("\nCategories: ").append(getCategories());
+      str.append("\nLast Modified: ").append(DateFormat.getDateTimeInstance().format(getLastModifiedDate())); //$NON-NLS-1$
+    str.append("\nCategories: ").append(getCategories()); //$NON-NLS-1$
     if (getGenerator() != null)
-      str.append("\nGenerator: ").append(getGenerator());
+      str.append("\nGenerator: ").append(getGenerator()); //$NON-NLS-1$
     if (getTTL() != 0)
-      str.append("\nTTL: ").append(getTTL());
+      str.append("\nTTL: ").append(getTTL()); //$NON-NLS-1$
     if (getDocs() != null)
-      str.append("\nDocs: ").append(getDocs());
+      str.append("\nDocs: ").append(getDocs()); //$NON-NLS-1$
     if (getAuthor() != null)
-      str.append("\nAuthor: ").append(getAuthor());
+      str.append("\nAuthor: ").append(getAuthor()); //$NON-NLS-1$
     if (getWebmaster() != null)
-      str.append("\nWebmaster: ").append(getWebmaster());
-    str.append("\nProperties: ").append(getProperties());
-    str.append("\n\nNews: ").append(getNews());
+      str.append("\nWebmaster: ").append(getWebmaster()); //$NON-NLS-1$
+    str.append("\nProperties: ").append(getProperties()); //$NON-NLS-1$
+    str.append("\n\nNews: ").append(getNews()); //$NON-NLS-1$
 
-    str.append("\n******************\n");
+    str.append("\n******************\n"); //$NON-NLS-1$
 
     return str.toString();
   }
@@ -734,7 +732,7 @@ public class Feed extends AbstractEntity implements IFeed {
 
   public synchronized MergeResult mergeAndCleanUp(IFeed objectToMerge) {
     Assert.isNotNull(objectToMerge);
-    Assert.isLegal(this != objectToMerge, "Trying to merge the same feed. This is most likely a mistake: " + objectToMerge);
+    Assert.isLegal(this != objectToMerge, "Trying to merge the same feed. This is most likely a mistake: " + objectToMerge); //$NON-NLS-1$
     synchronized (objectToMerge) {
       return merge(objectToMerge, true);
     }
