@@ -158,7 +158,7 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
 
     /* Support early cancelation */
     if (fMonitor != null && fMonitor.isCanceled())
-      throw new MonitorCanceledException("Connection canceled"); //$NON-NLS-1$
+      throw new MonitorCanceledException(Messages.HttpConnectionInputStream_ERROR_CONNECTION_CANCELED);
 
     return super.read();
   }
@@ -171,7 +171,7 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
 
     /* Support early cancelation */
     if (fMonitor != null && fMonitor.isCanceled())
-      throw new MonitorCanceledException("Connection canceled"); //$NON-NLS-1$
+      throw new MonitorCanceledException(Messages.HttpConnectionInputStream_ERROR_CONNECTION_CANCELED);
 
     return super.read(b, off, len);
   }
@@ -184,7 +184,7 @@ public class HttpConnectionInputStream extends FilterInputStream implements ICon
 
     /* Support early cancelation */
     if (fMonitor != null && fMonitor.isCanceled())
-      throw new MonitorCanceledException("Connection canceled"); //$NON-NLS-1$
+      throw new MonitorCanceledException(Messages.HttpConnectionInputStream_ERROR_CONNECTION_CANCELED);
 
     return super.available();
   }
