@@ -52,9 +52,9 @@ public final class NewsCounterItem extends Persistable {
    * @param stickyCounter number of sticky news
    */
   public NewsCounterItem(int newCounter, int unreadCounter, int stickyCounter) {
-    Assert.isLegal(newCounter >= 0, "newCounter should be >= 0");
-    Assert.isLegal(unreadCounter >= 0, "unreadCounter should be >= 0");
-    Assert.isLegal(stickyCounter >= 0, "stickyCounter should be >= 0");
+    Assert.isLegal(newCounter >= 0, "newCounter should be >= 0"); //$NON-NLS-1$
+    Assert.isLegal(unreadCounter >= 0, "unreadCounter should be >= 0"); //$NON-NLS-1$
+    Assert.isLegal(stickyCounter >= 0, "stickyCounter should be >= 0"); //$NON-NLS-1$
     fNewCounter = newCounter;
     fUnreadCounter = unreadCounter;
     fStickyCounter = stickyCounter;
