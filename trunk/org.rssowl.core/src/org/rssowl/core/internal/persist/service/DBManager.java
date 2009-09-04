@@ -26,6 +26,7 @@ package org.rssowl.core.internal.persist.service;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
@@ -370,7 +371,7 @@ public class DBManager {
       if (shouldReindex || migrationResult.isOptimizeIndex()) {
         modelSearch.startup();
         if (shouldReindex)
-          modelSearch.reindexAll(subMonitor.newChild(20));
+          modelSearch.reindexAll(subMonitor != null ? subMonitor.newChild(20) : new NullProgressMonitor());
         if (migrationResult.isOptimizeIndex())
           modelSearch.optimize();
       }
@@ -707,8 +708,7 @@ public class DBManager {
 
   /**
    * Internal method, exposed for tests only.
-   *
-   * @return
+   * @return Configuration
    */
   public static final Configuration createConfiguration() {
     Configuration config = Db4o.newConfiguration();
