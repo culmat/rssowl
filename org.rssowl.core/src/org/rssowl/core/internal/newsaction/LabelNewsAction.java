@@ -41,7 +41,7 @@ import java.util.List;
 public class LabelNewsAction implements INewsAction {
 
   /** ID of this Action */
-  public static final String ID = "org.rssowl.core.LabelNewsAction";
+  public static final String ID = "org.rssowl.core.LabelNewsAction"; //$NON-NLS-1$
 
   /*
    * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)

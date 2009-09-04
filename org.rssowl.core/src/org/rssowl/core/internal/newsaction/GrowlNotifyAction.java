@@ -24,6 +24,7 @@
 
 package org.rssowl.core.internal.newsaction;
 
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.INewsAction;
 import org.rssowl.core.internal.Activator;
 import org.rssowl.core.persist.IEntity;
@@ -60,8 +61,8 @@ public class GrowlNotifyAction implements INewsAction {
   /* Max number of items to show per Notification */
   private static final int MAX_ITEMS_TO_SHOW = 5;
 
-  private static final String APPLICATION_NAME = "RSSOwl";
-  private static final String SEPARATOR = System.getProperty("line.separator");
+  private static final String APPLICATION_NAME = "RSSOwl"; //$NON-NLS-1$
+  private static final String SEPARATOR = System.getProperty("line.separator"); //$NON-NLS-1$
 
   private BatchedBuffer<INews> fBatchedBuffer;
   private String fPathToGrowlNotify;
@@ -102,13 +103,13 @@ public class GrowlNotifyAction implements INewsAction {
     if (StringUtils.isSet(pathToGrowlnotify)) {
       List<String> commands = new ArrayList<String>();
       commands.add(pathToGrowlnotify);
-      commands.add("--name");
+      commands.add("--name"); //$NON-NLS-1$
       commands.add(APPLICATION_NAME);
-      commands.add("-a");
+      commands.add("-a"); //$NON-NLS-1$
       commands.add(APPLICATION_NAME);
-      commands.add("-t");
-      commands.add(news.size() + " Incoming News");
-      commands.add("-m");
+      commands.add("-t"); //$NON-NLS-1$
+      commands.add(NLS.bind(Messages.GrowlNotifyAction_N_INCOMING_NEWS, news.size()));
+      commands.add("-m"); //$NON-NLS-1$
 
       /* Sort News by Date */
       Set<INews> sortedNews = new TreeSet<INews>(new Comparator<INews>() {
@@ -135,7 +136,7 @@ public class GrowlNotifyAction implements INewsAction {
       }
 
       if (news.size() > MAX_ITEMS_TO_SHOW)
-        message.append((news.size() - MAX_ITEMS_TO_SHOW) + " more");
+        message.append(NLS.bind(Messages.GrowlNotifyAction_N_MORE, (news.size() - MAX_ITEMS_TO_SHOW)));
 
       commands.add(message.toString());
 
