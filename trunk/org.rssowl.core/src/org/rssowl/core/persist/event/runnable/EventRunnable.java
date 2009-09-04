@@ -63,8 +63,8 @@ public abstract class EventRunnable<T extends ModelEvent> implements Runnable   
    * runnable.
    */
   protected EventRunnable(Class<T> eventClass, IEntityDAO<?, ?, T> entityDAO) {
-    Assert.isNotNull(eventClass, "eventClass");
-    Assert.isNotNull(entityDAO, "entityDAO");
+    Assert.isNotNull(eventClass, "eventClass"); //$NON-NLS-1$
+    Assert.isNotNull(entityDAO, "entityDAO"); //$NON-NLS-1$
     fEventClass = eventClass;
     fEntityDAO = entityDAO;
   }
