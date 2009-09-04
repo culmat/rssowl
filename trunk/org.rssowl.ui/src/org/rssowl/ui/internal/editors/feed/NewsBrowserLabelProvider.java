@@ -204,7 +204,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
    * @see org.eclipse.jface.viewers.ILabelProvider#getText(java.lang.Object)
    */
   @Override
-  @SuppressWarnings("nls")
   public String getText(Object element) {
     return getText(element, true);
   }
@@ -215,7 +214,6 @@ public class NewsBrowserLabelProvider extends LabelProvider {
    * protocol rssowl:// and <code>false</code> otherwise.
    * @return the HTML representation for the given element.
    */
-  @SuppressWarnings("nls")
   public String getText(Object element, boolean withInternalLinks) {
 
     /* Return HTML for a Group */

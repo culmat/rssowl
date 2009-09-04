@@ -592,7 +592,7 @@ public class FilterBar {
       @Override
       public ImageDescriptor getImageDescriptor() {
         if (filter.getType() == NewsFilter.Type.SHOW_ALL)
-          return OwlUI.FILTER; //$NON-NLS-1$
+          return OwlUI.FILTER;
 
         return OwlUI.getImageDescriptor("icons/etool16/filter_active.gif"); //$NON-NLS-1$
       }
