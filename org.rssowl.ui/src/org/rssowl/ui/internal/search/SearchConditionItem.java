@@ -353,6 +353,66 @@ public class SearchConditionItem extends Composite {
       fInputValue = locationConditionControl.getSelection();
     }
 
+    /* Specially treat Age */
+    else if (field.getId() == INews.AGE_IN_DAYS || field.getId() == INews.AGE_IN_MINUTES) {
+      Composite container = new Composite(inputField, SWT.NONE);
+      container.setLayout(LayoutUtils.createGridLayout(2, 0, 0));
+
+      final Spinner spinner = new Spinner(container, SWT.BORDER);
+      spinner.setLayoutData(new GridData(SWT.FILL, SWT.BEGINNING, true, false));
+      spinner.setMinimum(1);
+      spinner.setMaximum(1000000);
+
+      final Combo combo = new Combo(container, SWT.BORDER | SWT.READ_ONLY);
+      combo.add("Days");
+      combo.add("Hours");
+      combo.add("Minutes");
+
+      Listener listener = new Listener() {
+        public void handleEvent(Event event) {
+          fInputValue = getAgeValue(spinner, combo);
+
+          if (!fInputValue.equals(input))
+            fModified = true;
+        }
+      };
+      spinner.addListener(SWT.Modify, listener);
+      combo.addListener(SWT.Modify, listener);
+
+      /* Pre-Select input if given */
+      Object presetInput = (input == null) ? fInputValue : input;
+      if (presetInput != null && presetInput instanceof Integer) {
+        Integer inputValue = (Integer) presetInput;
+
+        /* Day */
+        if (inputValue >= 0) {
+          spinner.setSelection(inputValue);
+          combo.select(0);
+        }
+
+        /* Hour */
+        else if (inputValue % 60 == 0) {
+          spinner.setSelection(Math.abs(inputValue) / 60);
+          combo.select(1);
+        }
+
+        /* Minute */
+        else {
+          spinner.setSelection(Math.abs(inputValue));
+          combo.select(2);
+        }
+      }
+
+      /* Otherwise use Default */
+      else {
+        spinner.setSelection(1);
+        combo.select(0);
+      }
+
+      /* Update Input Value */
+      fInputValue = getAgeValue(spinner, combo);
+    }
+
     /* Create new Input Field based on search-value-type */
     else {
       switch (field.getSearchValueType().getId()) {
@@ -543,6 +603,21 @@ public class SearchConditionItem extends Composite {
     inputField.update();
   }
 
+  private int getAgeValue(Spinner valueSpinner, Combo scopeCombo) {
+    int value = valueSpinner.getSelection();
+
+    /* Day Value (positive int) */
+    if (scopeCombo.getSelectionIndex() == 0)
+      return value;
+
+    /* Hour Value (negative int) */
+    if (scopeCombo.getSelectionIndex() == 1)
+      return value * 60 * -1;
+
+    /* Minute Value (negative int) */
+    return value * -1;
+  }
+
   /* TODO This is currently only supporting INews as Entity */
   private List<ISearchField> createFields(ISearchCondition condition) {
     List<ISearchField> fields = new ArrayList<ISearchField>();
@@ -558,10 +633,10 @@ public class SearchConditionItem extends Composite {
       newsFields.add(INews.DESCRIPTION);
       newsFields.add(INews.AUTHOR);
       newsFields.add(INews.CATEGORIES);
+      newsFields.add(INews.AGE_IN_DAYS);
       newsFields.add(INews.PUBLISH_DATE);
       newsFields.add(INews.MODIFIED_DATE);
       newsFields.add(INews.RECEIVE_DATE);
-      newsFields.add(INews.AGE_IN_DAYS);
       newsFields.add(INews.HAS_ATTACHMENTS);
       newsFields.add(INews.ATTACHMENTS_CONTENT);
       newsFields.add(INews.SOURCE);

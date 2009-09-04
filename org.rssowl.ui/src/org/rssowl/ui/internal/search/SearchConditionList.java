@@ -453,6 +453,14 @@ public class SearchConditionList extends ScrolledComposite {
     Menu dateMenu = new Menu(mItem);
     mItem.setMenu(dateMenu);
 
+    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.AGE_IN_DAYS)) {
+      mItem = new MenuItem(dateMenu, SWT.PUSH);
+      mItem.setText("Age");
+      hookSelectionListener(mItem, item, factory.createSearchField(INews.AGE_IN_DAYS, news));
+
+      new MenuItem(dateMenu, SWT.SEPARATOR);
+    }
+
     if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.MODIFIED_DATE)) {
       mItem = new MenuItem(dateMenu, SWT.PUSH);
       mItem.setText("Date Modified");
@@ -469,14 +477,6 @@ public class SearchConditionList extends ScrolledComposite {
       mItem = new MenuItem(dateMenu, SWT.PUSH);
       mItem.setText("Date Received");
       hookSelectionListener(mItem, item, factory.createSearchField(INews.RECEIVE_DATE, news));
-    }
-
-    new MenuItem(dateMenu, SWT.SEPARATOR);
-
-    if (fFieldsToExclude == null || !fFieldsToExclude.contains(INews.AGE_IN_DAYS)) {
-      mItem = new MenuItem(dateMenu, SWT.PUSH);
-      mItem.setText("Age in Days");
-      hookSelectionListener(mItem, item, factory.createSearchField(INews.AGE_IN_DAYS, news));
     }
 
     mItem = new MenuItem(menu, SWT.SEPARATOR);
