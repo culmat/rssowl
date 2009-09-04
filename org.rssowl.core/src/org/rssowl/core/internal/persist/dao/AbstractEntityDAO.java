@@ -86,9 +86,9 @@ public abstract class AbstractEntityDAO<T extends IEntity,
       if (list.isEmpty())
         return null;
       if (list.size() > 1) {
-        String message = "There should only be a single entity for a given id, but there are: " + list.size() + ", id: " + id + ", entities:\n";
+        String message = "There should only be a single entity for a given id, but there are: " + list.size() + ", id: " + id + ", entities:\n"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
         for (T entity : list)
-          message += entity.toString() + "\n";
+          message += entity.toString() + "\n"; //$NON-NLS-1$
         throw new IllegalStateException(message);
       }
       T entity = list.get(0);
@@ -124,7 +124,7 @@ public abstract class AbstractEntityDAO<T extends IEntity,
   }
 
   public final void fireEvents(final Set<E> events, final EventType eventType) {
-    Assert.isNotNull(eventType, "eventType");
+    Assert.isNotNull(eventType, "eventType"); //$NON-NLS-1$
     for (final L listener : fEntityListeners) {
       SafeRunner.run(new LoggingSafeRunnable() {
         public void run() throws Exception {
@@ -139,7 +139,7 @@ public abstract class AbstractEntityDAO<T extends IEntity,
               listener.entitiesDeleted(events);
               break;
             default:
-              throw new IllegalArgumentException("eventType unknown: " + eventType);
+              throw new IllegalArgumentException("eventType unknown: " + eventType); //$NON-NLS-1$
           }
         }
       });

@@ -70,7 +70,7 @@ public final class SearchMarkDAOImpl extends AbstractEntityDAO<ISearchMark, Sear
   public ISearchMark load(ISearchCondition searchCondition) {
     Query query = fDb.query();
     query.constrain(fEntityClass);
-    query.descend("fSearchConditions").constrain(searchCondition);
+    query.descend("fSearchConditions").constrain(searchCondition); //$NON-NLS-1$
     return getSingleResult(query);
   }
 
