@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Apache Lucene
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.rssowl.lib.lucene
 Bundle-Version: 2.0.0.qualifier
 Bundle-ClassPath: lucene-core-2.3.2.jar
@@ -16,5 +16,6 @@ Export-Package: org.apache.lucene,
  org.apache.lucene.search.spans,
  org.apache.lucene.store,
  org.apache.lucene.util
-Bundle-Vendor: RSSOwl.org
+Bundle-Vendor: %Bundle-Vendor
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Localization: plugin
