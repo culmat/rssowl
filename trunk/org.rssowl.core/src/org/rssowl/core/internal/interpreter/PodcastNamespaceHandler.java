@@ -62,7 +62,7 @@ public class PodcastNamespaceHandler implements INamespaceHandler {
     IModelFactory factory = Owl.getModelFactory();
 
     /* Category */
-    if ("category".equals(element.getName())) {
+    if ("category".equals(element.getName())) { //$NON-NLS-1$
 
       /* Process Top-Category (Level 1) */
       processCategory(element, type);
@@ -71,13 +71,13 @@ public class PodcastNamespaceHandler implements INamespaceHandler {
       List< ? > children = element.getChildren();
       for (Iterator< ? > iter = children.iterator(); iter.hasNext();) {
         Element child = (Element) iter.next();
-        if ("category".equals(child.getName()))
+        if ("category".equals(child.getName())) //$NON-NLS-1$
           processCategory(child, type);
       }
     }
 
     /* Author */
-    else if ("author".equals(element.getName())) {
+    else if ("author".equals(element.getName())) { //$NON-NLS-1$
       IPerson person = factory.createPerson(null, type);
       person.setName(element.getText());
     }
@@ -92,7 +92,7 @@ public class PodcastNamespaceHandler implements INamespaceHandler {
       Attribute attribute = (Attribute) iter.next();
       String name = attribute.getName();
 
-      if ("text".equals(name)) {
+      if ("text".equals(name)) { //$NON-NLS-1$
         category.setName(attribute.getValue());
         break;
       }

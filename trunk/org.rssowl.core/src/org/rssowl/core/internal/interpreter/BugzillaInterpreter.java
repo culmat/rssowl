@@ -24,6 +24,7 @@
 
 package org.rssowl.core.internal.interpreter;
 
+import org.eclipse.osgi.util.NLS;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -165,7 +166,7 @@ public class BugzillaInterpreter extends BasicInterpreter {
           IPerson person = Owl.getModelFactory().createPerson(null, news);
           person.setEmail(uri);
         }
-        news.setTitle("Comment from " + child.getText());
+        news.setTitle(NLS.bind(Messages.BugzillaInterpreter_COMMENT_FROM, child.getText()));
       }
 
       /* Date of the comment */

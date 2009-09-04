@@ -94,7 +94,7 @@ public class OPMLExporter implements ITypeExporter {
 
     Document document = new Document();
     Element root = new Element(Tag.OPML.get());
-    root.setAttribute(Attributes.VERSION.get(), "1.1");
+    root.setAttribute(Attributes.VERSION.get(), "1.1"); //$NON-NLS-1$
     root.addNamespaceDeclaration(RSSOWL_NS);
     document.setRootElement(root);
 
@@ -103,11 +103,11 @@ public class OPMLExporter implements ITypeExporter {
     root.addContent(head);
 
     Element title = new Element(Tag.TITLE.get());
-    title.setText("RSSOwl Subscriptions");
+    title.setText(Messages.OPMLExporter_RSSOWL_SUBSCRIPTIONS);
     head.addContent(title);
 
     Element dateModified = new Element(Tag.DATE_MODIFIED.get());
-    dateModified.setText(new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z").format(new Date()));
+    dateModified.setText(new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z").format(new Date())); //$NON-NLS-1$
     head.addContent(dateModified);
 
     /* Body */

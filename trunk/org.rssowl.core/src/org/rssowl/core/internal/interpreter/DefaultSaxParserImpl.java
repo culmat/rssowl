@@ -58,7 +58,7 @@ public class DefaultSaxParserImpl implements IXMLParser {
   private static final String ALLOW_JAVA_ENCODINGS = "http://apache.org/xml/features/allow-java-encodings"; //$NON-NLS-1$
 
   /* DTD to use for all XMLs */
-  private static final String DEFAULT_DTD = "entities.dtd";
+  private static final String DEFAULT_DTD = "entities.dtd"; //$NON-NLS-1$
 
   /* A Stream that overrides close() to do nothing */
   private static class KeepAliveInputStream extends BufferedInputStream {
@@ -164,7 +164,7 @@ public class DefaultSaxParserImpl implements IXMLParser {
       return true;
 
     String name = ex.getClass().getName();
-    return (StringUtils.isSet(name) && name.contains("MalformedByteSequenceException"));
+    return (StringUtils.isSet(name) && name.contains("MalformedByteSequenceException")); //$NON-NLS-1$
   }
 
   private SAXBuilder getBuilder() {

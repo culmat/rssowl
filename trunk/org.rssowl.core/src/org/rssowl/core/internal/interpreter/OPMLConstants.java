@@ -32,25 +32,24 @@ import org.jdom.Namespace;
  *
  * @author bpasero
  */
-@SuppressWarnings("all")
 public class OPMLConstants {
 
   /* The namespace RSSOwl is using */
-  static final Namespace RSSOWL_NS = Namespace.getNamespace("rssowl", "http://www.rssowl.org");
+  static final Namespace RSSOWL_NS = Namespace.getNamespace("rssowl", "http://www.rssowl.org"); //$NON-NLS-1$ //$NON-NLS-2$
 
   /* Separator for Multi Values */
-  static final String SEPARATOR = ",";
+  static final String SEPARATOR = ","; //$NON-NLS-1$
 
   /* List of Elements to use for the XML */
   enum Tag {
 
     /** Standard OPML */
-    OPML("opml"), OUTLINE("outline"), BODY("body"), HEAD("head"), TITLE("title"), DATE_MODIFIED("dateModified"),
+    OPML("opml"), OUTLINE("outline"), BODY("body"), HEAD("head"), TITLE("title"), DATE_MODIFIED("dateModified"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
     /** Custom RSSOwl */
-    PREFERENCE("pref"), BIN("newsbin"), SAVED_SEARCH("savedsearch"), LABEL("label"), STATE("newsstate"),
-    SPECIFIER("searchspecifier"), LOCATION("location"), SEARCH_VALUE("searchvalue"), SEARCH_FIELD("searchfield"),
-    FILTER("searchfilter"), SEARCH("search"), SEARCH_CONDITION("searchcondition"), ACTION("filteraction");
+    PREFERENCE("pref"), BIN("newsbin"), SAVED_SEARCH("savedsearch"), LABEL("label"), STATE("newsstate"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+    SPECIFIER("searchspecifier"), LOCATION("location"), SEARCH_VALUE("searchvalue"), SEARCH_FIELD("searchfield"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
+    FILTER("searchfilter"), SEARCH("search"), SEARCH_CONDITION("searchcondition"), ACTION("filteraction"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
     private String fName;
 
@@ -67,11 +66,11 @@ public class OPMLConstants {
   enum Attributes {
 
     /** Standard OPML */
-    VERSION("version"), ID("id"), XML_URL("xmlUrl"), TEXT("text"), TITLE("title"), HTML_URL("htmlUrl"), DESCRIPTION("description"),
+    VERSION("version"), ID("id"), XML_URL("xmlUrl"), TEXT("text"), TITLE("title"), HTML_URL("htmlUrl"), DESCRIPTION("description"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
 
     /** Custom RSSOwl */
-    IS_SET("isSet"), TYPE("type"), VALUE("value"), DATA("data"), NAME("name"), IS_BIN("isBin"), IS_FOLDER("isFolder"), KIND("kind"),
-    ENTITY("entity"), ORDER("order"), COLOR("color"), ENABLED("enabled"), MATCH_ALL_NEWS("matchAllNews"), MATCH_ALL_CONDITIONS("matchAllConditions");
+    IS_SET("isSet"), TYPE("type"), VALUE("value"), DATA("data"), NAME("name"), IS_BIN("isBin"), IS_FOLDER("isFolder"), KIND("kind"), //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+    ENTITY("entity"), ORDER("order"), COLOR("color"), ENABLED("enabled"), MATCH_ALL_NEWS("matchAllNews"), MATCH_ALL_CONDITIONS("matchAllConditions"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$
 
     private String fName;
 

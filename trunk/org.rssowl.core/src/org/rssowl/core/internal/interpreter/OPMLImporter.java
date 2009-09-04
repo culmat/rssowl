@@ -92,7 +92,7 @@ public class OPMLImporter implements ITypeImporter {
       String name = child.getName().toLowerCase();
 
       /* Process Body */
-      if (Tag.BODY.get().equals(name)) //$NON-NLS-1$
+      if (Tag.BODY.get().equals(name))
         return processBody(child, dateFormat);
     }
 
@@ -100,7 +100,7 @@ public class OPMLImporter implements ITypeImporter {
   }
 
   private List<IEntity> processBody(Element body, DateFormat dateFormat) {
-    IFolder defaultRootFolder = Owl.getModelFactory().createFolder(null, null, "Bookmarks");
+    IFolder defaultRootFolder = Owl.getModelFactory().createFolder(null, null, Messages.OPMLImporter_BOOKMARKS);
     defaultRootFolder.setProperty(ITypeImporter.TEMPORARY_FOLDER, true);
     List<IEntity> importedEntities = new ArrayList<IEntity>();
 
@@ -111,7 +111,7 @@ public class OPMLImporter implements ITypeImporter {
       String name = child.getName().toLowerCase();
 
       /* Process Outline */
-      if (Tag.OUTLINE.get().equals(name)) //$NON-NLS-1$
+      if (Tag.OUTLINE.get().equals(name))
         processOutline(child, defaultRootFolder, importedEntities, dateFormat);
 
       /* Process Saved Search */
@@ -292,67 +292,67 @@ public class OPMLImporter implements ITypeImporter {
 
   /* TODO Delete me in 2.1 (only works for pre 2.0 M10) */
   private int getFieldID(String fieldName) {
-    if ("allFields".equals(fieldName))
+    if ("allFields".equals(fieldName)) //$NON-NLS-1$
       return IEntity.ALL_FIELDS;
 
-    if ("title".equals(fieldName))
+    if ("title".equals(fieldName)) //$NON-NLS-1$
       return INews.TITLE;
 
-    if ("link".equals(fieldName))
+    if ("link".equals(fieldName)) //$NON-NLS-1$
       return INews.LINK;
 
-    if ("description".equals(fieldName))
+    if ("description".equals(fieldName)) //$NON-NLS-1$
       return INews.DESCRIPTION;
 
-    if ("publishDate".equals(fieldName))
+    if ("publishDate".equals(fieldName)) //$NON-NLS-1$
       return INews.PUBLISH_DATE;
 
-    if ("modifiedDate".equals(fieldName))
+    if ("modifiedDate".equals(fieldName)) //$NON-NLS-1$
       return INews.MODIFIED_DATE;
 
-    if ("receiveDate".equals(fieldName))
+    if ("receiveDate".equals(fieldName)) //$NON-NLS-1$
       return INews.RECEIVE_DATE;
 
-    if ("author".equals(fieldName))
+    if ("author".equals(fieldName)) //$NON-NLS-1$
       return INews.AUTHOR;
 
-    if ("comments".equals(fieldName))
+    if ("comments".equals(fieldName)) //$NON-NLS-1$
       return INews.COMMENTS;
 
-    if ("guid".equals(fieldName))
+    if ("guid".equals(fieldName)) //$NON-NLS-1$
       return INews.GUID;
 
-    if ("source".equals(fieldName))
+    if ("source".equals(fieldName)) //$NON-NLS-1$
       return INews.SOURCE;
 
-    if ("hasAttachments".equals(fieldName))
+    if ("hasAttachments".equals(fieldName)) //$NON-NLS-1$
       return INews.HAS_ATTACHMENTS;
 
-    if ("attachments".equals(fieldName))
+    if ("attachments".equals(fieldName)) //$NON-NLS-1$
       return INews.ATTACHMENTS_CONTENT;
 
-    if ("categories".equals(fieldName))
+    if ("categories".equals(fieldName)) //$NON-NLS-1$
       return INews.CATEGORIES;
 
-    if ("isFlagged".equals(fieldName))
+    if ("isFlagged".equals(fieldName)) //$NON-NLS-1$
       return INews.IS_FLAGGED;
 
-    if ("state".equals(fieldName))
+    if ("state".equals(fieldName)) //$NON-NLS-1$
       return INews.STATE;
 
-    if ("label".equals(fieldName))
+    if ("label".equals(fieldName)) //$NON-NLS-1$
       return INews.LABEL;
 
-    if ("rating".equals(fieldName))
+    if ("rating".equals(fieldName)) //$NON-NLS-1$
       return INews.RATING;
 
-    if ("feed".equals(fieldName))
+    if ("feed".equals(fieldName)) //$NON-NLS-1$
       return INews.FEED;
 
-    if ("ageInDays".equals(fieldName))
+    if ("ageInDays".equals(fieldName)) //$NON-NLS-1$
       return INews.AGE_IN_DAYS;
 
-    if ("location".equals(fieldName))
+    if ("location".equals(fieldName)) //$NON-NLS-1$
       return INews.LOCATION;
 
     return IEntity.ALL_FIELDS;
@@ -466,23 +466,23 @@ public class OPMLImporter implements ITypeImporter {
       String name = attribute.getName();
 
       /* Link */
-      if (name.toLowerCase().equals(Attributes.XML_URL.get().toLowerCase())) //$NON-NLS-1$
+      if (name.toLowerCase().equals(Attributes.XML_URL.get().toLowerCase()))
         link = attribute.getValue();
 
       /* Title */
-      else if (name.toLowerCase().equals(Attributes.TITLE.get())) //$NON-NLS-1$
+      else if (name.toLowerCase().equals(Attributes.TITLE.get()))
         title = attribute.getValue();
 
       /* Text */
-      else if (title == null && name.toLowerCase().equals(Attributes.TEXT.get())) //$NON-NLS-1$
+      else if (title == null && name.toLowerCase().equals(Attributes.TEXT.get()))
         title = attribute.getValue();
 
       /* Homepage */
-      else if (name.toLowerCase().equals(Attributes.HTML_URL.get().toLowerCase())) //$NON-NLS-1$
+      else if (name.toLowerCase().equals(Attributes.HTML_URL.get().toLowerCase()))
         homepage = attribute.getValue();
 
       /* Description */
-      else if (name.toLowerCase().equals(Attributes.DESCRIPTION.get())) //$NON-NLS-1$
+      else if (name.toLowerCase().equals(Attributes.DESCRIPTION.get()))
         description = attribute.getValue();
     }
 
@@ -539,7 +539,7 @@ public class OPMLImporter implements ITypeImporter {
       String name = child.getName().toLowerCase();
 
       /* Process Outline */
-      if (Tag.OUTLINE.get().equals(name)) //$NON-NLS-1$
+      if (Tag.OUTLINE.get().equals(name))
         processOutline(child, type, importedEntities, dateFormat);
 
       /* Process Saved Search */
