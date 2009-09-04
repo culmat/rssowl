@@ -90,7 +90,7 @@ public final class Owl {
    * @see IPreferencesInitializer
    */
   public static IPreferenceService getPreferenceService() {
-    Assert.isTrue(InternalOwl.getDefault().isStarted(), "The Owl facade  has not yet finished initialization");
+    Assert.isTrue(InternalOwl.getDefault().isStarted(), "The Owl facade  has not yet finished initialization"); //$NON-NLS-1$
     return InternalOwl.getDefault().getPreferenceService();
   }
 
@@ -110,7 +110,7 @@ public final class Owl {
    * @see IModelSearch
    */
   public static IPersistenceService getPersistenceService() {
-    Assert.isTrue(InternalOwl.getDefault().isStarted(), "The Owl facade  has not yet finished initialization");
+    Assert.isTrue(InternalOwl.getDefault().isStarted(), "The Owl facade  has not yet finished initialization"); //$NON-NLS-1$
     return InternalOwl.getDefault().getPersistenceService();
   }
 
@@ -129,7 +129,7 @@ public final class Owl {
    * @see ICredentialsProvider
    */
   public static IConnectionService getConnectionService() {
-    Assert.isTrue(InternalOwl.getDefault().isStarted(), "The Owl facade  has not yet finished initialization");
+    Assert.isTrue(InternalOwl.getDefault().isStarted(), "The Owl facade  has not yet finished initialization"); //$NON-NLS-1$
     return InternalOwl.getDefault().getConnectionService();
   }
 
@@ -158,7 +158,7 @@ public final class Owl {
    * @see IXMLParser
    */
   public static IInterpreterService getInterpreter() {
-    Assert.isTrue(InternalOwl.getDefault().isStarted(), "The Owl facade  has not yet finished initialization");
+    Assert.isTrue(InternalOwl.getDefault().isStarted(), "The Owl facade  has not yet finished initialization"); //$NON-NLS-1$
     return InternalOwl.getDefault().getInterpreter();
   }
 
@@ -170,7 +170,7 @@ public final class Owl {
    * @return Returns the model factory that is used to create model types.
    */
   public static IModelFactory getModelFactory() {
-    Assert.isTrue(InternalOwl.getDefault().isStarted(), "The Owl facade  has not yet finished initialization");
+    Assert.isTrue(InternalOwl.getDefault().isStarted(), "The Owl facade  has not yet finished initialization"); //$NON-NLS-1$
     return InternalOwl.getDefault().getModelFactory();
   }
 }
