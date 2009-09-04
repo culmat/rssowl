@@ -709,7 +709,7 @@ public class BookMarkExplorer extends ViewPart {
                 changeSet(rootFolder);
             }
           };
-          selectBookMarkSet.setImageDescriptor(OwlUI.BOOKMARK_SET); //$NON-NLS-1$
+          selectBookMarkSet.setImageDescriptor(OwlUI.BOOKMARK_SET);
 
           if (fSelectedBookMarkSet.equals(rootFolder))
             selectBookMarkSet.setChecked(true);
@@ -831,7 +831,7 @@ public class BookMarkExplorer extends ViewPart {
       @Override
       public ImageDescriptor getImageDescriptor() {
         if (fBookMarkFilter.getType() == BookMarkFilter.Type.SHOW_ALL)
-          return OwlUI.FILTER; //$NON-NLS-1$
+          return OwlUI.FILTER;
 
         return OwlUI.getImageDescriptor("icons/etool16/filter_active.gif"); //$NON-NLS-1$
       }
@@ -1815,7 +1815,7 @@ public class BookMarkExplorer extends ViewPart {
 
     String selectedBookMarkSetPref = getSelectedBookMarkSetPref(fViewSite.getWorkbenchWindow());
     IPreference pref = fPrefDAO.load(selectedBookMarkSetPref);
-    Assert.isTrue(fRootFolders.size() > 0, "Could not find any Bookmark Set!"); //$NON-NLS-1$
+    Assert.isTrue(fRootFolders.size() > 0, "Could not find any Bookmark Set!");
     if (pref != null)
       fSelectedBookMarkSet = new FolderReference(pref.getLong().longValue()).resolve();
     else {

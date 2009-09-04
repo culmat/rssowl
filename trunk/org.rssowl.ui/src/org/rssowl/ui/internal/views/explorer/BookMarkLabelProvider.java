@@ -184,7 +184,7 @@ public class BookMarkLabelProvider extends CellLabelProvider {
       /* Text */
       StringBuilder str = new StringBuilder(folder.getName());
       if (unreadNewsCount > 0)
-        str.append(" (").append(unreadNewsCount).append(")"); //$NON-NLS-1$ //$NON-NLS-2$
+        str.append(" (").append(unreadNewsCount).append(")");
       cell.setText(str.toString());
 
       /* Reset Foreground */
