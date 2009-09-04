@@ -137,7 +137,6 @@ public abstract class ModelEvent {
   /*
    * @see java.lang.Object#toString()
    */
-  @SuppressWarnings("nls")
   @Override
   public String toString() {
     String name = super.toString();
@@ -145,6 +144,6 @@ public abstract class ModelEvent {
     if (index != -1)
       name = name.substring(index + 1, name.length());
 
-    return name + " (Reference = " + fEntity + ", Root Event = " + fIsRoot + ")";
+    return name + " (Reference = " + fEntity + ", Root Event = " + fIsRoot + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
   }
 }
