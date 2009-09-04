@@ -24,63 +24,17 @@
 
 package org.rssowl.core.internal.newsaction;
 
-import org.rssowl.core.INewsAction;
-import org.rssowl.core.Owl;
-import org.rssowl.core.persist.IEntity;
-import org.rssowl.core.persist.INews;
-import org.rssowl.core.persist.INewsBin;
-import org.rssowl.core.persist.dao.DynamicDAO;
-import org.rssowl.core.util.CoreUtils;
+import org.eclipse.osgi.util.NLS;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+public class Messages extends NLS {
+  private static final String BUNDLE_NAME = "org.rssowl.core.internal.newsaction.messages"; //$NON-NLS-1$
+  public static String GrowlNotifyAction_N_INCOMING_NEWS;
+  public static String GrowlNotifyAction_N_MORE;
 
-/**
- * An instance of {@link INewsAction} to copy a list of news to a bin.
- *
- * @author bpasero
- */
-public class CopyNewsAction implements INewsAction {
+  private Messages() {}
 
-  /** ID of this Action */
-  public static final String ID = "org.rssowl.core.CopyNewsAction"; //$NON-NLS-1$
-
-  /*
-   * @see org.rssowl.core.INewsAction#run(java.util.List, java.lang.Object)
-   */
-  public List<IEntity> run(List<INews> news, Object data) {
-    Long[] binIds = (Long[]) data;
-    List<INewsBin> bins = CoreUtils.toBins(binIds);
-    if (bins.isEmpty())
-      return Collections.emptyList();
-
-    /* For each target Bin */
-    for (INewsBin bin : bins) {
-
-      /* For each News: Copy */
-      List<INews> copiedNews = new ArrayList<INews>(news.size());
-      for (INews newsitem : news) {
-        if (newsitem.getParentId() != bin.getId()) { // News could be already inside the bin
-          INews newsCopy = Owl.getModelFactory().createNews(newsitem, bin);
-          copiedNews.add(newsCopy);
-        }
-      }
-
-      /* Save */
-      if (!copiedNews.isEmpty()) {
-        DynamicDAO.saveAll(copiedNews);
-        DynamicDAO.save(bin);
-      }
-    }
-
-    return Collections.emptyList(); //The original news where not touched at all
-  }
-
-  /*
-   * @see org.rssowl.core.INewsAction#isConflicting(org.rssowl.core.INewsAction)
-   */
-  public boolean conflictsWith(INewsAction otherAction) {
-    return otherAction instanceof DeleteNewsAction || otherAction instanceof MoveNewsAction || otherAction instanceof CopyNewsAction;
+  static {
+    // initialize resource bundle
+    NLS.initializeMessages(BUNDLE_NAME, Messages.class);
   }
 }
