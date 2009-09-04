@@ -1,10 +1,10 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: db4objects
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.rssowl.lib.db4o
 Bundle-Version: 2.0.0.qualifier
 Eclipse-BuddyPolicy: registered
-Bundle-Vendor: RSSOwl.org
+Bundle-Vendor: %Bundle-Vendor
 Export-Package: com.db4o,
  com.db4o.cluster,
  com.db4o.config,
@@ -54,3 +54,4 @@ Export-Package: com.db4o,
  com.db4o.types
 Bundle-ClassPath: db4o-6.1-java5.jar
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Localization: plugin
