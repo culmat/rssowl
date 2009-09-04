@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Apache HTTPClient
+Bundle-Name: %Bundle-Name
 Bundle-SymbolicName: org.rssowl.lib.httpclient
 Bundle-Version: 2.0.0.qualifier
 Bundle-ClassPath: codec-1.3.jar,
@@ -23,8 +23,9 @@ Export-Package: org.apache.commons.codec,
  org.apache.commons.logging,
  org.apache.commons.logging.impl,
  org.rssowl.lib.httpclient.internal
-Bundle-Vendor: RSSOwl.org
+Bundle-Vendor: %Bundle-Vendor
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.rssowl.lib.httpclient.internal.Activator
 Require-Bundle: org.eclipse.core.runtime
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
+Bundle-Localization: plugin

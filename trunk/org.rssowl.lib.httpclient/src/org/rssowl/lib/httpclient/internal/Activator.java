@@ -31,7 +31,7 @@ import org.osgi.framework.BundleContext;
 
 /**
  * Activator of the HTTPClient bundle.
- * 
+ *
  * @author bpasero
  */
 public class Activator extends Plugin {
@@ -49,12 +49,12 @@ public class Activator extends Plugin {
     super.start(context);
 
     /* Use the LogBridge as Logger */
-    System.setProperty("org.apache.commons.logging.Log", "org.rssowl.lib.httpclient.internal.LogBridge");
+    System.setProperty("org.apache.commons.logging.Log", "org.rssowl.lib.httpclient.internal.LogBridge"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 
   /**
    * Returns the shared instance.
-   * 
+   *
    * @return the shared instance
    */
   public static Activator getDefault() {
@@ -63,7 +63,7 @@ public class Activator extends Plugin {
 
   /**
    * Create a Error IStatus out of the given message and exception.
-   * 
+   *
    * @param msg The message describing the error.
    * @param e The Exception that occured.
    * @return An IStatus out of the given message and exception.
@@ -74,7 +74,7 @@ public class Activator extends Plugin {
 
   /**
    * Log an Error Message.
-   * 
+   *
    * @param msg The message to log as Error.
    * @param e The occuring Exception to log.
    */
