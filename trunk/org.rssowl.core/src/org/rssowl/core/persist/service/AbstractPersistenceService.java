@@ -49,7 +49,7 @@ public abstract class AbstractPersistenceService implements IPersistenceService 
   private static final String MODEL_ID_GENERATOR_EXTENSION_POINT = "org.rssowl.core.IDGenerator"; //$NON-NLS-1$
 
   /* ID for DAO Factory Contribution */
-  private static final String MODEL_DAO_FACTORY_EXTENSION_POINT = "org.rssowl.core.DAOService";
+  private static final String MODEL_DAO_FACTORY_EXTENSION_POINT = "org.rssowl.core.DAOService"; //$NON-NLS-1$
 
   private volatile IModelSearch fModelSearch;
   private volatile IDGenerator fIDGenerator;

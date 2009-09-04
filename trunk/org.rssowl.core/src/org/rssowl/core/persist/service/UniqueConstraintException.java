@@ -46,8 +46,8 @@ public final class UniqueConstraintException extends PersistenceException {
    */
   public UniqueConstraintException(String propertyName,
       IPersistable persistable) {
-    Assert.isNotNull(persistable, "persistable");
-    Assert.isNotNull(propertyName, "propertyName");
+    Assert.isNotNull(persistable, "persistable"); //$NON-NLS-1$
+    Assert.isNotNull(propertyName, "propertyName"); //$NON-NLS-1$
     fPersistable = persistable;
     fPropertyName = propertyName;
   }
