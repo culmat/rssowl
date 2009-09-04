@@ -50,7 +50,7 @@ public class Migration2To5 implements Migration {
   public MigrationResult migrate(ConfigurationFactory configFactory, String dbFileName, IProgressMonitor progressMonitor) {
     final int totalProgress = 100;
     int totalProgressIncremented = 0;
-    progressMonitor.beginTask("Migrating data", totalProgress);
+    progressMonitor.beginTask(Messages.Migration2To5_MIGRATING_DATA, totalProgress);
 
     ObjectContainer oc = Db4o.openFile(configFactory.createConfiguration(), dbFileName);
 
