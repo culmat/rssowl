@@ -32,6 +32,7 @@ import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.osgi.util.NLS;
 import org.jdom.Document;
 import org.jdom.input.DOMBuilder;
 import org.rssowl.core.internal.Activator;
@@ -143,14 +144,14 @@ public class InterpreterServiceImpl implements IInterpreterService {
 
     /* A Root Element is required */
     if (!document.hasRootElement())
-      throw new InterpreterException(Activator.getDefault().createErrorStatus("Document has no Root Element set!", null)); //$NON-NLS-1$
+      throw new InterpreterException(Activator.getDefault().createErrorStatus(Messages.InterpreterServiceImpl_ERROR_NO_ROOT_ELEMENT, null));
 
     /* Determine Format of the Feed */
     String format = document.getRootElement().getName().toLowerCase();
 
     /* A Interpreter is required */
     if (!fFormatInterpreters.containsKey(format))
-      throw new UnknownFormatException(Activator.getDefault().createErrorStatus("No Interpreter found for Format \"" + format + "\"", null)); //$NON-NLS-1$//$NON-NLS-2$
+      throw new UnknownFormatException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.InterpreterServiceImpl_ERROR_NO_INTERPRETER_FOUND, format), null));
 
     /* Interpret Document into a Feed */
     fFormatInterpreters.get(format).interpret(document, feed);
@@ -166,14 +167,14 @@ public class InterpreterServiceImpl implements IInterpreterService {
 
     /* A Root Element is required */
     if (!document.hasRootElement())
-      throw new InterpreterException(Activator.getDefault().createErrorStatus("Document has no Root Element set!", null)); //$NON-NLS-1$
+      throw new InterpreterException(Activator.getDefault().createErrorStatus(Messages.InterpreterServiceImpl_ERROR_NO_ROOT_ELEMENT, null));
 
     /* Determine Format of the Feed */
     String format = document.getRootElement().getName().toLowerCase();
 
     /* An Importer is required */
     if (!fTypeImporters.containsKey(format))
-      throw new UnknownFormatException(Activator.getDefault().createErrorStatus("No Importer found for Format \"" + format + "\"", null)); //$NON-NLS-1$//$NON-NLS-2$
+      throw new UnknownFormatException(Activator.getDefault().createErrorStatus(NLS.bind(Messages.InterpreterServiceImpl_ERROR_NO_IMPORTER_FOUND, format), null));
 
     /* Import Type from the Document */
     return fTypeImporters.get(format).importFrom(document);
@@ -186,8 +187,8 @@ public class InterpreterServiceImpl implements IInterpreterService {
   public void exportTo(File destination, Collection<? extends IFolderChild> elements, Set<Options> options) throws InterpreterException {
     ITypeExporter exporter = null;
     String fileName = destination.getName();
-    int i = fileName.lastIndexOf(".");
-    if (i != -1 && !fileName.endsWith(".")) {
+    int i = fileName.lastIndexOf("."); //$NON-NLS-1$
+    if (i != -1 && !fileName.endsWith(".")) { //$NON-NLS-1$
       String formatName = fileName.substring(i + 1);
       exporter = fTypeExporters.get(formatName);
     }
@@ -361,9 +362,9 @@ public class InterpreterServiceImpl implements IInterpreterService {
 
     for (IConfigurationElement element : elements) {
       try {
-        IConfigurationElement[] formats = element.getChildren("format");
+        IConfigurationElement[] formats = element.getChildren("format"); //$NON-NLS-1$
         for (IConfigurationElement format : formats) {
-          String formatName = format.getAttribute("name").toLowerCase();
+          String formatName = format.getAttribute("name").toLowerCase(); //$NON-NLS-1$
 
           /* Let 3d-Party contributions override our contributions */
           if (fTypeExporters.containsKey(formatName) && element.getNamespaceIdentifier().contains(ExtensionUtils.RSSOWL_NAMESPACE))
