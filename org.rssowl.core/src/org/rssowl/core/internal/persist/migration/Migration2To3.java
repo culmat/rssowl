@@ -51,7 +51,7 @@ public class Migration2To3 implements Migration {
   public MigrationResult migrate(ConfigurationFactory configFactory, String dbFileName, IProgressMonitor progressMonitor) {
     final int totalProgress = 100;
     int totalProgressIncremented = 0;
-    progressMonitor.beginTask("Migrating data", totalProgress);
+    progressMonitor.beginTask(Messages.Migration2To3_MIGRATING_DATA, totalProgress);
 
     ObjectContainer oc = Db4o.openFile(configFactory.createConfiguration(), dbFileName);
 
@@ -71,7 +71,7 @@ public class Migration2To3 implements Migration {
     int i = 0;
     for (News news : newsList) {
       oc.activate(news, Integer.MAX_VALUE);
-      String descriptionFieldName = "fDescription";
+      String descriptionFieldName = "fDescription"; //$NON-NLS-1$
       String descriptionValue = (String) MigrationHelper.getFieldValue(news, descriptionFieldName);
       if (descriptionValue != null) {
         MigrationHelper.setField(news, descriptionFieldName, null);

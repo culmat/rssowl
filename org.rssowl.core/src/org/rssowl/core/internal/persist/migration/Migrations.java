@@ -108,7 +108,7 @@ public final class Migrations {
    * @return a Migration or {@code} null.
    */
   public final Migration getMigration(int originFormat, int destinationFormat) {
-    Assert.isLegal(originFormat < destinationFormat, "Only forward migrations supported currently, originFormat: " + originFormat + ", destinationFormat: " + destinationFormat);
+    Assert.isLegal(originFormat < destinationFormat, "Only forward migrations supported currently, originFormat: " + originFormat + ", destinationFormat: " + destinationFormat); //$NON-NLS-1$ //$NON-NLS-2$
     Migration migration = doGetMigration(originFormat, destinationFormat);
     if (migration != null)
       return migration;

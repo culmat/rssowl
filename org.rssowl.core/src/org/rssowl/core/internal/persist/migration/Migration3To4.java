@@ -54,7 +54,7 @@ public class Migration3To4 implements Migration {
   public MigrationResult migrate(ConfigurationFactory configFactory, String dbFileName, IProgressMonitor progressMonitor) {
     final int totalProgress = 100;
     int totalProgressIncremented = 0;
-    progressMonitor.beginTask("Migrating data", totalProgress);
+    progressMonitor.beginTask(Messages.Migration3To4_MIGRATING_DATA, totalProgress);
 
     ObjectContainer oc = Db4o.openFile(configFactory.createConfiguration(), dbFileName);
 
@@ -65,10 +65,10 @@ public class Migration3To4 implements Migration {
       for (NewsReference newsRef : newsBin.getNewsRefs()) {
         Query query = oc.query();
         query.constrain(News.class);
-        query.descend("fId").constrain(newsRef.getId());
+        query.descend("fId").constrain(newsRef.getId()); //$NON-NLS-1$
         News news = (News) query.execute().iterator().next();
         oc.activate(news, Integer.MAX_VALUE);
-        String parentIdFieldName = "fParentId";
+        String parentIdFieldName = "fParentId"; //$NON-NLS-1$
         MigrationHelper.setField(news, parentIdFieldName, newsBin.getId().longValue());
         oc.ext().set(news, Integer.MAX_VALUE);
       }

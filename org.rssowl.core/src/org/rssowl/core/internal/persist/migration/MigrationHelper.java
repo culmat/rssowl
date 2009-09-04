@@ -47,7 +47,7 @@ final class MigrationHelper {
       }
       klass = klass.getSuperclass();
     }
-    throw new IllegalArgumentException("No field with name: " + fieldName);
+    throw new IllegalArgumentException("No field with name: " + fieldName); //$NON-NLS-1$
   }
 
   static void setField(Object object, String fieldName, Object value) {
