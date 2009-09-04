@@ -239,12 +239,12 @@ public final class DynamicDAO {
 
   private static void checkPersistableDAO(Class<? extends IPersistable> persistableClass, IPersistableDAO<?> dao) {
     if (dao == null)
-      throw new IllegalArgumentException("There is no DAO for persistable of type: " + persistableClass);
+      throw new IllegalArgumentException("There is no DAO for persistable of type: " + persistableClass); //$NON-NLS-1$
   }
 
   private static void checkEntityDAO(Class<? extends IPersistable> entityClass, IEntityDAO<?, ?, ?> dao) {
     if (dao == null)
-      throw new IllegalArgumentException("There is no DAO for entity of type: " + entityClass);
+      throw new IllegalArgumentException("There is no DAO for entity of type: " + entityClass); //$NON-NLS-1$
   }
 
   /**
