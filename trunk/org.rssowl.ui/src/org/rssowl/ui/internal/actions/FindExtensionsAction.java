@@ -70,7 +70,6 @@ public class FindExtensionsAction extends Action implements IWorkbenchWindowActi
     });
   }
 
-  @SuppressWarnings("nls")
   UpdateSearchRequest getSearchRequest() {
     UpdateSearchScope scope = new UpdateSearchScope();
     try {
