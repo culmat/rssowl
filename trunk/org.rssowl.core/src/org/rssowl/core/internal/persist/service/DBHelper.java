@@ -365,9 +365,11 @@ public final class DBHelper {
     else if (dbDescriptionValue != null && newsDescriptionValue == null)
       db.delete(dbDescription);
 
-    else if (!dbDescriptionValue.equals(newsDescriptionValue)) {
-      dbDescription.setDescription(newsDescriptionValue);
-      db.set(dbDescription);
+    else if (dbDescriptionValue != null && !dbDescriptionValue.equals(newsDescriptionValue)) {
+      if (dbDescription != null) {
+        dbDescription.setDescription(newsDescriptionValue);
+        db.set(dbDescription);
+      }
     }
   }
 
