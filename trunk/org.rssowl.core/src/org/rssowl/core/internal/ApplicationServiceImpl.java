@@ -38,6 +38,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.SafeRunner;
+import org.eclipse.osgi.util.NLS;
 import org.rssowl.core.IApplicationService;
 import org.rssowl.core.INewsAction;
 import org.rssowl.core.Owl;
@@ -139,7 +140,7 @@ public class ApplicationServiceImpl implements IApplicationService {
     IConfigurationElement elements[] = reg.getConfigurationElementsFor(NEWS_ACTION_EXTENSION_POINT);
     for (IConfigurationElement element : elements) {
       try {
-        String id = element.getAttribute("id");
+        String id = element.getAttribute("id"); //$NON-NLS-1$
         fNewsActions.put(id, (INewsAction) element.createExecutableExtension("class"));//$NON-NLS-1$
       } catch (InvalidRegistryObjectException e) {
         Activator.getDefault().logError(e.getMessage(), e);
@@ -453,7 +454,7 @@ public class ApplicationServiceImpl implements IApplicationService {
         if (resolvedNews != null)
           newsItem.setState(resolvedNews.getState());
         else
-          logWarning("Stale Lucene index, it has returned a news that does not exist in the database anymore, id: " + newsRef.getId());
+          logWarning(NLS.bind(Messages.ApplicationServiceImpl_ERROR_STALE_LUCENE_INDEX, newsRef.getId()));
       } else {
         equivalentNewsRefs = linkToNewsRefs.get(newsItem.getLink());
         if (equivalentNewsRefs != null && !equivalentNewsRefs.isEmpty()) {
@@ -462,7 +463,7 @@ public class ApplicationServiceImpl implements IApplicationService {
           if (resolvedNews != null)
             newsItem.setState(resolvedNews.getState());
           else
-            logWarning("Stale Lucene index, it has returned a news that does not exist in the database anymore, id: " + newsRef.getId());
+            logWarning(NLS.bind(Messages.ApplicationServiceImpl_ERROR_STALE_LUCENE_INDEX, newsRef.getId()));
         }
       }
     }
