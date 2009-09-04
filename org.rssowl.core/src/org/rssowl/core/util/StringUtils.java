@@ -345,8 +345,8 @@ public class StringUtils {
     if (!StringUtils.isSet(str))
       return str;
 
-    str = StringUtils.replaceAll(str, "<", "&lt;");
-    str = StringUtils.replaceAll(str, ">", "&gt;");
+    str = StringUtils.replaceAll(str, "<", "&lt;"); //$NON-NLS-1$ //$NON-NLS-2$
+    str = StringUtils.replaceAll(str, ">", "&gt;"); //$NON-NLS-1$ //$NON-NLS-2$
 
     return str;
   }

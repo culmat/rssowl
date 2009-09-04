@@ -48,17 +48,17 @@ public class URIUtils {
   private static final String DEFAULT_ENCODING = "UTF-8"; //$NON-NLS-1$
 
   /** Common Newsfeed Extensions */
-  private static final String[] FEED_EXTENSIONS = new String[] { "rss", "rdf", "xml", "atom", "feed" };
+  private static final String[] FEED_EXTENSIONS = new String[] { "rss", "rdf", "xml", "atom", "feed" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
 
   /* Used when encoding a URL in a fast way */
-  private static final String[] CHARS_TO_ENCODE = new String[] { " ", "[", "]", "{", "}", "|", "^", "\\", "<", ">" };
-  private static final String[] ENCODED_CHARS = new String[] { "%20", "%5B", "%5D", "%7B", "%7D", "%7C", "%5E", "%5C", "%3C", "%3E" };
+  private static final String[] CHARS_TO_ENCODE = new String[] { " ", "[", "]", "{", "}", "|", "^", "\\", "<", ">" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
+  private static final String[] ENCODED_CHARS = new String[] { "%20", "%5B", "%5D", "%7B", "%7D", "%7C", "%5E", "%5C", "%3C", "%3E" }; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$ //$NON-NLS-10$
 
   /** The HTTP Protocol */
-  public static final String HTTP = "http://";
+  public static final String HTTP = "http://"; //$NON-NLS-1$
 
   /** Identifier for a Protocol */
-  public static final String PROTOCOL_IDENTIFIER = "://";
+  public static final String PROTOCOL_IDENTIFIER = "://"; //$NON-NLS-1$
 
   /* This utility class constructor is hidden */
   private URIUtils() {
@@ -109,17 +109,17 @@ public class URIUtils {
       return relative;
 
     /* Resolve against Host */
-    if (relative.toString().startsWith("/")) {
+    if (relative.toString().startsWith("/")) { //$NON-NLS-1$
       base = normalizeUri(base, true);
       return base.resolve(relative);
     }
 
     /* Resolve against Given Base */
-    if (base.toString().endsWith("/"))
+    if (base.toString().endsWith("/")) //$NON-NLS-1$
       return base.resolve(relative);
 
     /* Resolve against Given Base By Appending Leading Slash */
-    return new URI(base.toString() + "/").resolve(relative.toString());
+    return new URI(base.toString() + "/").resolve(relative.toString()); //$NON-NLS-1$
   }
 
   /**
@@ -145,7 +145,7 @@ public class URIUtils {
       return false;
 
     for (String extension : FEED_EXTENSIONS) {
-      if (strict && str.contains("." + extension))
+      if (strict && str.contains("." + extension)) //$NON-NLS-1$
         return true;
       else if (!strict && str.contains(extension))
         return true;
@@ -296,7 +296,7 @@ public class URIUtils {
 
       /* Rewrite failed, avoid reloading by throwing an exception */
       else
-        throw new URISyntaxException("", "");
+        throw new URISyntaxException("", ""); //$NON-NLS-1$ //$NON-NLS-2$
     }
 
     StringBuilder buf = new StringBuilder();
@@ -316,7 +316,7 @@ public class URIUtils {
   public static String getFile(URI uri) {
     String file = uri.getPath();
     if (StringUtils.isSet(file)) {
-      String parts[] = file.split("/");
+      String parts[] = file.split("/"); //$NON-NLS-1$
       if (parts.length > 0 && StringUtils.isSet(parts[parts.length - 1]))
         return urlDecode(parts[parts.length - 1]);
     }
@@ -357,11 +357,11 @@ public class URIUtils {
     if (!StringUtils.isSet(value))
       return value;
 
-    if (value.contains(":") || value.contains("/"))
+    if (value.contains(":") || value.contains("/")) //$NON-NLS-1$ //$NON-NLS-2$
       return value;
 
-    if (value.contains(" ") || !value.contains("."))
-      return "http://www.google.com/search?q=" + urlEncode(value);
+    if (value.contains(" ") || !value.contains(".")) //$NON-NLS-1$ //$NON-NLS-2$
+      return "http://www.google.com/search?q=" + urlEncode(value); //$NON-NLS-1$
 
     return value;
   }

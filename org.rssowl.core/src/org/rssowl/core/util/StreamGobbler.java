@@ -54,7 +54,7 @@ public class StreamGobbler extends Job {
    * @param is The inputstream of the process
    */
   public StreamGobbler(InputStream is) {
-    super("Stream Gobbler");
+    super(""); //$NON-NLS-1$
     setSystem(true);
     fIs = is;
   }
@@ -68,7 +68,7 @@ public class StreamGobbler extends Job {
   protected IStatus run(IProgressMonitor monitor) {
     BufferedReader br = null;
     try {
-      StringBuilder msg = new StringBuilder("");
+      StringBuilder msg = new StringBuilder(""); //$NON-NLS-1$
       String line;
       br = new BufferedReader(new InputStreamReader(fIs));
 

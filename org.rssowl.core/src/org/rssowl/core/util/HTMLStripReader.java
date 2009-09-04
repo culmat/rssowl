@@ -55,39 +55,39 @@ public class HTMLStripReader extends Reader {
     fgEntityTable = new HashMap<String, Character>();
 
     /* Entity Names */
-    final String[] entityName = { "zwnj", "aring", "gt", "yen", "ograve",
-        "Chi", "delta", "rang", "sup", "trade", "Ntilde", "xi", "upsih",
-        "nbsp", "Atilde", "radic", "otimes", "aelig", "oelig", "equiv", "ni",
-        "infin", "Psi", "auml", "cup", "Epsilon", "otilde", "lt", "Icirc",
-        "Eacute", "Lambda", "sbquo", "Prime", "prime", "psi", "Kappa",
-        "rsaquo", "Tau", "uacute", "ocirc", "lrm", "zwj", "cedil", "Alpha",
-        "not", "amp", "AElig", "oslash", "acute", "lceil", "alefsym", "laquo",
-        "shy", "loz", "ge", "Igrave", "nu", "Ograve", "lsaquo", "sube", "euro",
-        "rarr", "sdot", "rdquo", "Yacute", "lfloor", "lArr", "Auml", "Dagger",
-        "brvbar", "Otilde", "szlig", "clubs", "diams", "agrave", "Ocirc",
-        "Iota", "Theta", "Pi", "zeta", "Scaron", "frac14", "egrave", "sub",
-        "iexcl", "frac12", "ordf", "sum", "prop", "Uuml", "ntilde", "atilde",
-        "asymp", "uml", "prod", "nsub", "reg", "rArr", "Oslash", "emsp",
-        "THORN", "yuml", "aacute", "Mu", "hArr", "le", "thinsp", "dArr",
-        "ecirc", "bdquo", "Sigma", "Aring", "tilde", "nabla", "mdash", "uarr",
-        "times", "Ugrave", "Eta", "Agrave", "chi", "real", "circ", "eth",
-        "rceil", "iuml", "gamma", "lambda", "harr", "Egrave", "frac34",
-        "dagger", "divide", "Ouml", "image", "ndash", "hellip", "igrave",
-        "Yuml", "ang", "alpha", "frasl", "ETH", "lowast", "Nu", "plusmn",
-        "bull", "sup1", "sup2", "sup3", "Aacute", "cent", "oline", "Beta",
-        "perp", "Delta", "there4", "pi", "iota", "empty", "euml", "notin",
-        "iacute", "para", "epsilon", "weierp", "OElig", "uuml", "larr",
-        "icirc", "Upsilon", "omicron", "upsilon", "copy", "Iuml", "Oacute",
-        "Xi", "kappa", "ccedil", "Ucirc", "cap", "mu", "scaron", "lsquo",
-        "isin", "Zeta", "minus", "deg", "and", "tau", "pound", "curren", "int",
-        "ucirc", "rfloor", "ensp", "crarr", "ugrave", "exist", "cong", "theta",
-        "oplus", "permil", "Acirc", "piv", "Euml", "Phi", "Iacute", "quot",
-        "Uacute", "Omicron", "ne", "iquest", "eta", "rsquo", "yacute", "Rho",
-        "darr", "Ecirc", "Omega", "acirc", "sim", "phi", "sigmaf", "macr",
-        "thetasym", "Ccedil", "ordm", "uArr", "forall", "beta", "fnof", "rho",
-        "micro", "eacute", "omega", "middot", "Gamma", "rlm", "lang", "spades",
-        "supe", "thorn", "ouml", "or", "raquo", "part", "sect", "ldquo",
-        "hearts", "sigma", "oacute"
+    final String[] entityName = { "zwnj", "aring", "gt", "yen", "ograve", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$
+        "Chi", "delta", "rang", "sup", "trade", "Ntilde", "xi", "upsih", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "nbsp", "Atilde", "radic", "otimes", "aelig", "oelig", "equiv", "ni", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "infin", "Psi", "auml", "cup", "Epsilon", "otilde", "lt", "Icirc", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "Eacute", "Lambda", "sbquo", "Prime", "prime", "psi", "Kappa", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+        "rsaquo", "Tau", "uacute", "ocirc", "lrm", "zwj", "cedil", "Alpha", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "not", "amp", "AElig", "oslash", "acute", "lceil", "alefsym", "laquo", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "shy", "loz", "ge", "Igrave", "nu", "Ograve", "lsaquo", "sube", "euro", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
+        "rarr", "sdot", "rdquo", "Yacute", "lfloor", "lArr", "Auml", "Dagger", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "brvbar", "Otilde", "szlig", "clubs", "diams", "agrave", "Ocirc", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+        "Iota", "Theta", "Pi", "zeta", "Scaron", "frac14", "egrave", "sub", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "iexcl", "frac12", "ordf", "sum", "prop", "Uuml", "ntilde", "atilde", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "asymp", "uml", "prod", "nsub", "reg", "rArr", "Oslash", "emsp", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "THORN", "yuml", "aacute", "Mu", "hArr", "le", "thinsp", "dArr", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "ecirc", "bdquo", "Sigma", "Aring", "tilde", "nabla", "mdash", "uarr", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "times", "Ugrave", "Eta", "Agrave", "chi", "real", "circ", "eth", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "rceil", "iuml", "gamma", "lambda", "harr", "Egrave", "frac34", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+        "dagger", "divide", "Ouml", "image", "ndash", "hellip", "igrave", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+        "Yuml", "ang", "alpha", "frasl", "ETH", "lowast", "Nu", "plusmn", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "bull", "sup1", "sup2", "sup3", "Aacute", "cent", "oline", "Beta", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "perp", "Delta", "there4", "pi", "iota", "empty", "euml", "notin", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "iacute", "para", "epsilon", "weierp", "OElig", "uuml", "larr", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+        "icirc", "Upsilon", "omicron", "upsilon", "copy", "Iuml", "Oacute", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$
+        "Xi", "kappa", "ccedil", "Ucirc", "cap", "mu", "scaron", "lsquo", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "isin", "Zeta", "minus", "deg", "and", "tau", "pound", "curren", "int", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$ //$NON-NLS-9$
+        "ucirc", "rfloor", "ensp", "crarr", "ugrave", "exist", "cong", "theta", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "oplus", "permil", "Acirc", "piv", "Euml", "Phi", "Iacute", "quot", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "Uacute", "Omicron", "ne", "iquest", "eta", "rsquo", "yacute", "Rho", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "darr", "Ecirc", "Omega", "acirc", "sim", "phi", "sigmaf", "macr", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "thetasym", "Ccedil", "ordm", "uArr", "forall", "beta", "fnof", "rho", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "micro", "eacute", "omega", "middot", "Gamma", "rlm", "lang", "spades", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "supe", "thorn", "ouml", "or", "raquo", "part", "sect", "ldquo", //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$ //$NON-NLS-5$ //$NON-NLS-6$ //$NON-NLS-7$ //$NON-NLS-8$
+        "hearts", "sigma", "oacute" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
      };
 
     /* Entity Values */
@@ -118,7 +118,7 @@ public class HTMLStripReader extends Reader {
       fgEntityTable.put(entityName[i], Character.valueOf(entityVal[i]));
 
     /* Special-case nbsp to a simple space instead of 0xa0 */
-    fgEntityTable.put("nbsp", Character.valueOf(' '));
+    fgEntityTable.put("nbsp", Character.valueOf(' ')); //$NON-NLS-1$
   }
 
   /**
@@ -438,7 +438,7 @@ public class HTMLStripReader extends Reader {
      * see if it's a special tag.
      */
     String name = fStrBuf.toString();
-    if (name.equals("script") || name.equals("style")) {
+    if (name.equals("script") || name.equals("style")) { //$NON-NLS-1$ //$NON-NLS-2$
       // The content of script and style elements is
       //  CDATA in HTML 4 but PCDATA in XHTML.
 

@@ -108,7 +108,7 @@ public class BatchedBuffer<T> {
 
   /* Creates a Job to process the contents of the Buffer */
   private Job createBufferProcessor() {
-    Job job = new Job("Batched Buffer Processor") {
+    Job job = new Job("") { //$NON-NLS-1$
       @Override
       protected IStatus run(IProgressMonitor monitor) {
         synchronized (fBuffer) {
