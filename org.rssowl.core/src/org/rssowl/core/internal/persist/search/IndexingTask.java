@@ -113,7 +113,7 @@ public final class IndexingTask implements ITask {
    * @see org.rssowl.core.util.ITask#getName()
    */
   public final String getName() {
-    return "Indexing Feed";
+    return Messages.IndexingTask_INDEXING_FEED;
   }
 
   /*

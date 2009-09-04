@@ -246,7 +246,7 @@ public class ModelSearchImpl implements IModelSearch {
    * @return a List of {@link NewsReference} matching the given search.
    */
   public List<NewsReference> searchNewsByLink(URI link, boolean copy) {
-    Assert.isNotNull(link, "link");
+    Assert.isNotNull(link, "link"); //$NON-NLS-1$
     BooleanQuery query = createNewsByLinkBooleanQuery(link, copy);
     return simpleSearch(query);
   }
@@ -264,7 +264,7 @@ public class ModelSearchImpl implements IModelSearch {
    * @return a List of {@link NewsReference} matching the given search.
    */
   public List<NewsReference> searchNewsByGuid(IGuid guid, boolean copy) {
-    Assert.isNotNull(guid, "guid");
+    Assert.isNotNull(guid, "guid"); //$NON-NLS-1$
     BooleanQuery query = createGuidQuery(guid, copy);
     return simpleSearch(query);
   }
@@ -344,7 +344,7 @@ public class ModelSearchImpl implements IModelSearch {
       }
 
       /* Maximum reached */
-      throw new PersistenceException("Please avoid using the wildcards '*' and '?' as standalone terms.", e);
+      throw new PersistenceException(Messages.ModelSearchImpl_ERROR_WILDCARDS, e);
     }
   }
 
@@ -388,7 +388,7 @@ public class ModelSearchImpl implements IModelSearch {
         disposeIfNecessary(currentSearcher);
       }
     } catch (IOException e) {
-      throw new PersistenceException("Error searching news", e);
+      throw new PersistenceException(Messages.ModelSearchImpl_ERROR_SEARCH, e);
     }
   }
 
@@ -495,7 +495,7 @@ public class ModelSearchImpl implements IModelSearch {
                */
               Thread.sleep(100);
             } catch (InterruptedException e) {
-              throw new PersistenceException("Failed to close IndexSearcher: " + fSearcher);
+              throw new PersistenceException("Failed to close IndexSearcher: " + fSearcher); //$NON-NLS-1$
             }
           }
         }
@@ -549,7 +549,7 @@ public class ModelSearchImpl implements IModelSearch {
     /* May be used before Owl is completely set-up */
     Collection<INews> newsList = InternalOwl.getDefault().getPersistenceService().getDAOService().getNewsDAO().loadAll();
 
-    monitor.beginTask("Re-Indexing all News", newsList.size());
+    monitor.beginTask(Messages.ModelSearchImpl_RE_INDEXING_NEWS, newsList.size());
 
     EntityIdsByEventType entitiesToBeIndexed = DBHelper.getEntitiesToBeIndexedDAO().load();
 

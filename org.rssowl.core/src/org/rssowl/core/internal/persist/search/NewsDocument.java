@@ -2,6 +2,7 @@
 package org.rssowl.core.internal.persist.search;
 
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.DateTools.Resolution;
 import org.apache.lucene.document.Field.Index;
 import org.apache.lucene.document.Field.Store;
 import org.rssowl.core.persist.IAttachment;
@@ -62,6 +63,7 @@ public class NewsDocument extends SearchDocument<INews> {
     addField(fields, createDateField(INews.PUBLISH_DATE, news.getPublishDate(), Store.NO));
     addField(fields, createDateField(INews.MODIFIED_DATE, news.getModifiedDate(), Store.NO));
     addField(fields, createDateField(INews.AGE_IN_DAYS, DateUtils.getRecentDate(news), Store.NO));
+    addField(fields, createDateField(INews.AGE_IN_MINUTES, DateUtils.getRecentDate(news), Store.NO, Resolution.MINUTE));
 
     /* Add States (actually store INews.State in Index) */
     addField(fields, createEnumField(INews.STATE, news.getState(), Store.YES));
