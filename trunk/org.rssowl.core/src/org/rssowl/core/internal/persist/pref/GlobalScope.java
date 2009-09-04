@@ -456,7 +456,7 @@ public class GlobalScope implements IPreferenceScope {
     fPreferenceDAO.save(pref);
   }
 
-  private boolean cached(String key, Object value) {
+  private boolean cached(@SuppressWarnings("unused") String key, @SuppressWarnings("unused") Object value) {
     //FIXME Fix this, bug #429
     return false;
 //    synchronized (fCache) {

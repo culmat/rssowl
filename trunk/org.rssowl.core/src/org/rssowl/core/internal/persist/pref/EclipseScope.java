@@ -42,7 +42,7 @@ import org.rssowl.core.persist.pref.IPreferenceScope;
  * @author bpasero
  */
 public class EclipseScope implements IPreferenceScope {
-  private static final String NODE_SEPARATOR = "/";
+  private static final String NODE_SEPARATOR = "/"; //$NON-NLS-1$
   private static final String ROOT_NAME = NODE_SEPARATOR;
 
   private final IPreferenceScope fParent;
@@ -152,7 +152,7 @@ public class EclipseScope implements IPreferenceScope {
    * boolean)
    */
   public void putBoolean(String key, boolean value) {
-    Assert.isTrue(key.contains(NODE_SEPARATOR), "Invalid Eclipse Preferences Key!");
+    Assert.isTrue(key.contains(NODE_SEPARATOR), "Invalid Eclipse Preferences Key!"); //$NON-NLS-1$
 
     String nodePath = getNodePath(key);
     key = key.substring(key.lastIndexOf(NODE_SEPARATOR) + 1);
@@ -167,7 +167,7 @@ public class EclipseScope implements IPreferenceScope {
    * int)
    */
   public void putInteger(String key, int value) {
-    Assert.isTrue(key.contains(NODE_SEPARATOR), "Invalid Eclipse Preferences Key!");
+    Assert.isTrue(key.contains(NODE_SEPARATOR), "Invalid Eclipse Preferences Key!"); //$NON-NLS-1$
 
     String nodePath = getNodePath(key);
     key = key.substring(key.lastIndexOf(NODE_SEPARATOR) + 1);
@@ -191,7 +191,7 @@ public class EclipseScope implements IPreferenceScope {
    * long)
    */
   public void putLong(String key, long value) {
-    Assert.isTrue(key.contains(NODE_SEPARATOR), "Invalid Eclipse Preferences Key!");
+    Assert.isTrue(key.contains(NODE_SEPARATOR), "Invalid Eclipse Preferences Key!"); //$NON-NLS-1$
 
     String nodePath = getNodePath(key);
     key = key.substring(key.lastIndexOf(NODE_SEPARATOR) + 1);
@@ -215,7 +215,7 @@ public class EclipseScope implements IPreferenceScope {
    * java.lang.String)
    */
   public void putString(String key, String value) {
-    Assert.isTrue(key.contains(NODE_SEPARATOR), "Invalid Eclipse Preferences Key!");
+    Assert.isTrue(key.contains(NODE_SEPARATOR), "Invalid Eclipse Preferences Key!"); //$NON-NLS-1$
 
     String nodePath = getNodePath(key);
     key = key.substring(key.lastIndexOf(NODE_SEPARATOR) + 1);
@@ -234,7 +234,7 @@ public class EclipseScope implements IPreferenceScope {
   }
 
   private String getNodePath(String key) {
-    if (key.startsWith("/"))
+    if (key.startsWith("/")) //$NON-NLS-1$
       return key.substring(0, key.lastIndexOf(NODE_SEPARATOR));
 
     return ROOT_NAME + key.substring(0, key.lastIndexOf(NODE_SEPARATOR));
