@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <!-- Schema file written by PDE -->
-<schema targetNamespace="org.rssowl.ui">
+<schema targetNamespace="org.rssowl.ui" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appInfo>
          <meta.schema plugin="org.rssowl.ui" id="entityPropertyPage" name="Entity Property Page"/>
@@ -13,6 +13,11 @@ as separate tabs.
    </annotation>
 
    <element name="extension">
+      <annotation>
+         <appInfo>
+            <meta.element />
+         </appInfo>
+      </annotation>
       <complexType>
          <sequence>
             <element ref="entityPropertyPage" minOccurs="1" maxOccurs="unbounded"/>
@@ -76,6 +81,9 @@ as separate tabs.
                <documentation>
                   The name of the property page that will show up in the title of the tab.
                </documentation>
+               <appInfo>
+                  <meta.attribute translatable="true"/>
+               </appInfo>
             </annotation>
          </attribute>
          <attribute name="order" type="string" use="required">
@@ -158,23 +166,7 @@ page for the entities &lt;samp&gt;IFolder&lt;/samp&gt; and &lt;samp&gt;IBookMark
       </documentation>
    </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="apiInfo"/>
-      </appInfo>
-      <documentation>
-         
-      </documentation>
-   </annotation>
 
-   <annotation>
-      <appInfo>
-         <meta.section type="implementation"/>
-      </appInfo>
-      <documentation>
-         
-      </documentation>
-   </annotation>
 
    <annotation>
       <appInfo>
