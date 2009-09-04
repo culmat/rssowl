@@ -124,13 +124,12 @@ public abstract class ModelReference {
    * @see java.lang.Object#toString()
    */
   @Override
-  @SuppressWarnings("nls")
   public String toString() {
     String name = super.toString();
     int index = name.lastIndexOf('.');
     if (index != -1)
       name = name.substring(index + 1, name.length());
 
-    return name + " (ID = " + getId() + ")";
+    return name + " (ID = " + getId() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
   }
 }
