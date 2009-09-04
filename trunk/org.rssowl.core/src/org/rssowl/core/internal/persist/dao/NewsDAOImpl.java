@@ -131,7 +131,7 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
           if (changedNews.contains(newsItem))
             continue;
           if (!newsItem.isVisible() && affectEquivalentNews)
-            throw new IllegalArgumentException("affectEquivalentNews is not supported for invisible news");
+            throw new IllegalArgumentException("affectEquivalentNews is not supported for invisible news"); //$NON-NLS-1$
 
           List<INews> equivalentNews;
 
@@ -182,7 +182,7 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
   private RuntimeException createIllegalException(String message, INews newsItem) {
     News dbNews = (News) DBHelper.peekPersistedNews(fDb, newsItem);
     if (dbNews == null)
-      return new IllegalArgumentException("The news has been deleted from the persistence layer: " + newsItem);
+      return new IllegalArgumentException("The news has been deleted from the persistence layer: " + newsItem); //$NON-NLS-1$
 
     return new IllegalStateException(message + ". This news in the db looks like: " //$NON-NLS-1$
         + dbNews.toLongString());
@@ -218,7 +218,7 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
       return news;
 
     //TODO Get EntityIdsByEventType and check if the news is in there
-    logWarning("Stale Lucene index while setting news state, sleeping for 50 ms");
+    logWarning("Stale Lucene index while setting news state, sleeping for 50 ms"); //$NON-NLS-1$
     try {
       Thread.sleep(50);
     } catch (InterruptedException e) {
@@ -230,7 +230,7 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
 
     news = doSearchNews(newsItem, guid);
     if (!news.contains(newsItem)) {
-      logWarning("Stale Lucene index while setting news state, ignoring equivalent news");
+      logWarning("Stale Lucene index while setting news state, ignoring equivalent news"); //$NON-NLS-1$
       news.add(newsItem);
     }
 
@@ -252,7 +252,7 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
       else {
         INews resolvedNewsItem = hit.resolve();
         if (resolvedNewsItem == null)
-          logWarning("Stale Lucene index, it has returned a news that does not exist in the database anymore, id: " + hit.getId());
+          logWarning("Stale Lucene index, it has returned a news that does not exist in the database anymore, id: " + hit.getId()); //$NON-NLS-1$
         else
           news.add(resolvedNewsItem);
       }
@@ -272,23 +272,23 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
   }
 
   public Collection<INews> loadAll(FeedLinkReference feedRef, Set<State> states) {
-    Assert.isNotNull(feedRef, "feedRef");
-    Assert.isNotNull(states, "states");
+    Assert.isNotNull(feedRef, "feedRef"); //$NON-NLS-1$
+    Assert.isNotNull(states, "states"); //$NON-NLS-1$
     if (states.isEmpty())
       return new ArrayList<INews>(0);
 
     try {
       Query query = fDb.query();
       query.constrain(News.class);
-      query.descend("fFeedLink").constrain(feedRef.getLink().toString());
-      query.descend("fParentId").constrain(0);
+      query.descend("fFeedLink").constrain(feedRef.getLink().toString()); //$NON-NLS-1$
+      query.descend("fParentId").constrain(0); //$NON-NLS-1$
       if (!states.containsAll(EnumSet.allOf(INews.State.class))) {
         Constraint constraint = null;
         for (INews.State state : states) {
           if (constraint == null)
-            constraint = query.descend("fStateOrdinal").constrain(state.ordinal());
+            constraint = query.descend("fStateOrdinal").constrain(state.ordinal()); //$NON-NLS-1$
           else
-            constraint = query.descend("fStateOrdinal").constrain(state.ordinal()).or(constraint);
+            constraint = query.descend("fStateOrdinal").constrain(state.ordinal()).or(constraint); //$NON-NLS-1$
         }
       }
 
@@ -302,8 +302,8 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
   }
 
   public void setState(Set<State> originalStates, State state, boolean affectEquivalentNews) throws PersistenceException {
-    Assert.isNotNull(originalStates, "states");
-    Assert.isNotNull(state, "state");
+    Assert.isNotNull(originalStates, "states"); //$NON-NLS-1$
+    Assert.isNotNull(state, "state"); //$NON-NLS-1$
     if (originalStates.isEmpty())
       return;
 
@@ -314,9 +314,9 @@ public final class NewsDAOImpl extends AbstractEntityDAO<INews, NewsListener, Ne
         Constraint constraint = null;
         for (INews.State originalState : originalStates) {
           if (constraint == null)
-            constraint = query.descend("fStateOrdinal").constrain(originalState.ordinal());
+            constraint = query.descend("fStateOrdinal").constrain(originalState.ordinal()); //$NON-NLS-1$
           else
-            constraint = query.descend("fStateOrdinal").constrain(originalState.ordinal()).or(constraint);
+            constraint = query.descend("fStateOrdinal").constrain(originalState.ordinal()).or(constraint); //$NON-NLS-1$
         }
       }
 

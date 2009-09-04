@@ -82,11 +82,11 @@ public abstract class CachingDAO<D extends AbstractEntityDAO<T, L, E>, T extends
       fCache.remove(event.getEntity().getId());
   }
 
-  protected void onDatabaseClosed(DatabaseEvent event) {
+  protected void onDatabaseClosed(@SuppressWarnings("unused") DatabaseEvent event) {
     fCache.clear();
   }
 
-  protected void onDatabaseOpened(DatabaseEvent event) {
+  protected void onDatabaseOpened(@SuppressWarnings("unused") DatabaseEvent event) {
     for (T entity : fDAO.loadAll())
       fCache.put(entity.getId(), entity);
   }

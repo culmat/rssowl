@@ -54,7 +54,7 @@ public class PreferencesDAOImpl extends AbstractEntityDAO<IPreference, Preferenc
   protected void doSave(IPreference entity) {
     IPreference pref = load(entity.getKey());
     if (pref != null && pref != entity)
-      throw new UniqueConstraintException("key", entity);
+      throw new UniqueConstraintException("key", entity); //$NON-NLS-1$
 
     super.doSave(entity);
   }
@@ -81,7 +81,7 @@ public class PreferencesDAOImpl extends AbstractEntityDAO<IPreference, Preferenc
   public IPreference load(String key) throws PersistenceException {
     Query query = fDb.query();
     query.constrain(fEntityClass);
-    query.descend("fKey").constrain(key);
+    query.descend("fKey").constrain(key); //$NON-NLS-1$
     List<IPreference> prefs = getList(query);
     activateAll(prefs);
     if (!prefs.isEmpty()) {

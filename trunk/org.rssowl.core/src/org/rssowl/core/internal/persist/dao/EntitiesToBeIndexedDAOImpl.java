@@ -60,7 +60,7 @@ public class EntitiesToBeIndexedDAOImpl extends AbstractPersistableDAO<EntityIds
 
   private EntityIdsByEventType doLoad() {
     Collection<EntityIdsByEventType> entityIdsCollection = super.loadAll();
-    Assert.isLegal(entityIdsCollection.size() <= 1, "There shouldn't be more than 1 EntityIdsByEventType, size: " + entityIdsCollection.size());
+    Assert.isLegal(entityIdsCollection.size() <= 1, "There shouldn't be more than 1 EntityIdsByEventType, size: " + entityIdsCollection.size()); //$NON-NLS-1$
 
     for (EntityIdsByEventType entityIds : entityIdsCollection) {
       /* Return the first one since we assert that we don't have more than one */
@@ -79,7 +79,7 @@ public class EntitiesToBeIndexedDAOImpl extends AbstractPersistableDAO<EntityIds
   @Override
   public final void delete(EntityIdsByEventType newsCounter) {
     if (!newsCounter.equals(load()))
-      throw new IllegalArgumentException("Only a single entity should be used. " + "Trying to delete a non-existent one.");
+      throw new IllegalArgumentException("Only a single entity should be used. " + "Trying to delete a non-existent one."); //$NON-NLS-1$ //$NON-NLS-2$
 
     super.delete(newsCounter);
   }
@@ -94,7 +94,7 @@ public class EntitiesToBeIndexedDAOImpl extends AbstractPersistableDAO<EntityIds
   @Override
   public final void saveAll(Collection<EntityIdsByEventType> entities) {
     if (entities.size() > 1) {
-      throw new IllegalArgumentException("Only a single entity can be stored");
+      throw new IllegalArgumentException("Only a single entity can be stored"); //$NON-NLS-1$
     }
     super.saveAll(entities);
   }
@@ -102,7 +102,7 @@ public class EntitiesToBeIndexedDAOImpl extends AbstractPersistableDAO<EntityIds
   @Override
   protected final void doSave(EntityIdsByEventType entity) {
     if (!fDb.ext().isStored(entity) && (load() != null))
-      throw new IllegalArgumentException("Only a single entity can be stored");
+      throw new IllegalArgumentException("Only a single entity can be stored"); //$NON-NLS-1$
 
     super.doSave(entity);
   }

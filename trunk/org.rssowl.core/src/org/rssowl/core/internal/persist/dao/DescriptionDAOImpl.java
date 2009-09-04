@@ -36,7 +36,7 @@ public class DescriptionDAOImpl extends AbstractPersistableDAO<Description> impl
   public Description load(long newsId) {
     Query query = fDb.query();
     query.constrain(Description.class);
-    query.descend("fNewsId").constrain(newsId);
+    query.descend("fNewsId").constrain(newsId); //$NON-NLS-1$
     Description description = getSingleResult(query);
     fDb.activate(description, Integer.MAX_VALUE);
     return description;

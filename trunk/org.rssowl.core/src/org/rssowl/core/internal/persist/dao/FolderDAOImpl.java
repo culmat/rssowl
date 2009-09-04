@@ -177,12 +177,12 @@ public final class FolderDAOImpl extends AbstractEntityDAO<IFolder, FolderListen
         else if (mark instanceof INewsBin)
           markEvent = new NewsBinEvent((INewsBin) mark, oldParent, true);
         else
-          throw new IllegalArgumentException("Unknown IMark subclass found: " + child.getClass());
+          throw new IllegalArgumentException("Unknown IMark subclass found: " + child.getClass()); //$NON-NLS-1$
 
         DBHelper.putEventTemplate(markEvent);
         markEvents.add(markEvent);
       } else {
-        throw new IllegalArgumentException("Unknown IFolderChild subclass found: " + child.getClass());
+        throw new IllegalArgumentException("Unknown IFolderChild subclass found: " + child.getClass()); //$NON-NLS-1$
       }
     }
   }

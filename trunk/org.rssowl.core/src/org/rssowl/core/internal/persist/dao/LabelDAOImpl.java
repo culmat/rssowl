@@ -58,7 +58,7 @@ public final class LabelDAOImpl extends AbstractEntityDAO<ILabel, LabelListener,
   protected void doDelete(ILabel entity) {
     Query query = fDb.query();
     query.constrain(News.class);
-    query.descend("fLabels").constrain(entity);
+    query.descend("fLabels").constrain(entity); //$NON-NLS-1$
     @SuppressWarnings("unchecked")
     List<INews> news = query.execute();
     for (INews newsItem : news) {

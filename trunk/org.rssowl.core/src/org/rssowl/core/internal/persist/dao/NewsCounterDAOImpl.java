@@ -65,7 +65,7 @@ public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter
 
   private NewsCounter doLoad() {
     Collection<NewsCounter> counters = super.loadAll();
-    Assert.isLegal(counters.size() <= 1, "There shouldn't be more than 1 NewsCounter, size: " + counters.size());
+    Assert.isLegal(counters.size() <= 1, "There shouldn't be more than 1 NewsCounter, size: " + counters.size()); //$NON-NLS-1$
 
     for (NewsCounter newsCounter : counters) {
       /* Return the first one since we assert that we don't have more than one */
@@ -119,7 +119,7 @@ public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter
   @Override
   public final void delete(NewsCounter newsCounter) {
     if (!newsCounter.equals(load()))
-      throw new IllegalArgumentException("Only a single newsCounter should be used. " + "Trying to delete a non-existent one.");
+      throw new IllegalArgumentException("Only a single newsCounter should be used. " + "Trying to delete a non-existent one."); //$NON-NLS-1$ //$NON-NLS-2$
 
     super.delete(newsCounter);
   }
@@ -138,7 +138,7 @@ public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter
   @Override
   public final void saveAll(Collection<NewsCounter> entities) {
     if (entities.size() > 1) {
-      throw new IllegalArgumentException("Only a single newsCounter can be stored");
+      throw new IllegalArgumentException("Only a single newsCounter can be stored"); //$NON-NLS-1$
     }
     super.saveAll(entities);
   }
@@ -146,13 +146,13 @@ public final class NewsCounterDAOImpl extends AbstractPersistableDAO<NewsCounter
   @Override
   protected final void doSave(NewsCounter entity) {
     if (!fDb.ext().isStored(entity) && (load() != null))
-      throw new IllegalArgumentException("Only a single newsCounter can be stored");
+      throw new IllegalArgumentException("Only a single newsCounter can be stored"); //$NON-NLS-1$
 
     super.doSave(entity);
   }
 
   public void save() {
-    Assert.isNotNull(fNewsCounter, "fNewsCounter");
+    Assert.isNotNull(fNewsCounter, "fNewsCounter"); //$NON-NLS-1$
     fDb.ext().set(fNewsCounter, Integer.MAX_VALUE);
   }
 }

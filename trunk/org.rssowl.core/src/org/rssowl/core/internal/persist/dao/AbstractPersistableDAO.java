@@ -56,7 +56,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
   protected volatile ObjectContainer fDb;
 
   public AbstractPersistableDAO(Class<? extends T> entityClass, boolean saveFully) {
-    Assert.isNotNull(entityClass, "entityClass");
+    Assert.isNotNull(entityClass, "entityClass"); //$NON-NLS-1$
     fEntityClass = entityClass;
     fSaveFully = saveFully;
     DBManager.getDefault().addEntityStoreListener(new DatabaseListener() {
@@ -69,7 +69,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
     });
   }
 
-  protected void onDatabaseClosed(DatabaseEvent event) {
+  protected void onDatabaseClosed(@SuppressWarnings("unused") DatabaseEvent event) {
     fDb = null;
   }
 
@@ -93,7 +93,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
     if (resultSize == 1) {
       return result.get(0);
     }
-    throw new IllegalStateException("Expected a single result, but got: "
+    throw new IllegalStateException("Expected a single result, but got: " //$NON-NLS-1$
         + resultSize);
   }
 
@@ -160,15 +160,15 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
     }
   }
 
-  protected void preSaveAll(Collection<T> objects) {
+  protected void preSaveAll(@SuppressWarnings("unused") Collection<T> objects) {
     // Do nothing by default
   }
 
-  protected void postSaveAll(Collection<T> objects) {
+  protected void postSaveAll(@SuppressWarnings("unused") Collection<T> objects) {
     // Do nothing by default
   }
 
-  protected void preSave(T persistable) {
+  protected void preSave(@SuppressWarnings("unused") T persistable) {
     // Do nothing by default
   }
 
@@ -219,7 +219,7 @@ public abstract class AbstractPersistableDAO<T extends IPersistable> implements
     DBHelper.preCommit(fDb);
   }
 
-  protected void preDelete(T persistable) {
+  protected void preDelete(@SuppressWarnings("unused") T persistable) {
     // Do nothing by default
   }
 
