@@ -105,7 +105,7 @@ public class EntityGroup implements IActionFilter {
    * @return Returns the Name of this EntityGroup.
    */
   public String getName() {
-    return fName != null ? fName : "Group " + fId; //$NON-NLS-1$
+    return fName != null ? fName : "Group " + fId;
   }
 
   /**

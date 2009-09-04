@@ -612,7 +612,6 @@ public class ApplicationServer {
   }
 
   /* Create HTML out of the Elements and reply to the Socket */
-  @SuppressWarnings("nls")
   private void reply(Socket socket, String viewerId, Object[] elements) {
 
     /* Only responsible for Viewer-Concerns */
@@ -728,7 +727,6 @@ public class ApplicationServer {
     return null;
   }
 
-  @SuppressWarnings("nls")
   private String unicodeToEntities(String str) {
     StringBuilder strBuf = new StringBuilder();
 

@@ -516,7 +516,6 @@ public class OwlUI {
    * @param obj The Object to retreive an Image for.
    * @return ImageDescriptor
    */
-  @SuppressWarnings("nls")
   public static ImageDescriptor getImageDescriptor(Object obj) {
     if (obj instanceof IFolder) {
       IFolder folder = (IFolder) obj;
